@@ -1,108 +1,111 @@
-Return-Path: <netdev+bounces-74745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF98C862AD1
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 15:48:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CD4F862B5C
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 16:58:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1435B281A27
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 14:48:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 128511F21146
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 15:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D646913AC5;
-	Sun, 25 Feb 2024 14:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B6321643A;
+	Sun, 25 Feb 2024 15:58:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WymMGjSi"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E524D79D3
-	for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 14:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A387414280;
+	Sun, 25 Feb 2024 15:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708872477; cv=none; b=p7BFd3AEbUhjwE2QvI8DKKfWymoWvkYMVs/kwJsHq0N7ZoCi5HL/CG2bYVWmmUmDTYOy8sFpiTKT0Jea6dYR7hypiPTEQwrYcMkP2qYT/rz94o7izv/2Mr02sM90mPasbn+AKeHjNN9lo3yjK9dMhTS3QMiWXshZk2Ec+RrM1FI=
+	t=1708876727; cv=none; b=GnQSYtE6i2rledHEgxkq8u4D6pQZaER4ufhLBWodAIxDJowFJjbxGMAIo9Xi2Ar3asduNAhC+mb6ZOfoLK2PTcYpnjmL1DVIHMZJi1Uc8nhvva3RldawmoRnhGK8gSnJJ/LnCQ27yuF+EECtxAC6mcKG69qXiQsUQ6tpLyjUSYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708872477; c=relaxed/simple;
-	bh=34Eq+uHp5yJqj4VGBsCh+xInlxIzSmCOpKaV0p3dL+M=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=NsadL2fVNrWzbKWI3xAoIecbTT1OtgwLDGMc5f+0Aj7JsaI0hIGI8HKlBIXGbuTYOlmGtPbAXzwlhjWk+GT4r0Vz+Wvpx/7WJENx0/YTmEGgupANtNaO0VnCNak7Icy2Sp9t2kJ9yp8EtB5VIIWd3nmQsEmNLq+/Lb6w4xeda2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-304-9wbhQDAnMhGhNXbq82bMeg-1; Sun, 25 Feb 2024 14:47:46 +0000
-X-MC-Unique: 9wbhQDAnMhGhNXbq82bMeg-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 25 Feb
- 2024 14:47:45 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Sun, 25 Feb 2024 14:47:45 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Kent Overstreet' <kent.overstreet@linux.dev>
-CC: 'Herbert Xu' <herbert@gondor.apana.org.au>, "Matthew Wilcox (Oracle)"
-	<willy@infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Thomas Graf <tgraf@suug.ch>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"maple-tree@lists.infradead.org" <maple-tree@lists.infradead.org>,
-	"rcu@vger.kernel.org" <rcu@vger.kernel.org>
-Subject: RE: [PATCH 0/1] Rosebush, a new hash table
-Thread-Topic: [PATCH 0/1] Rosebush, a new hash table
-Thread-Index: AQHaZrdg3OPv1gzlbEiBbQpUz0xlprEaCpvwgABak4CAAL43MA==
-Date: Sun, 25 Feb 2024 14:47:45 +0000
-Message-ID: <2a6001442b354c2fb5b881c2a9d75895@AcuMS.aculab.com>
-References: <20240222203726.1101861-1-willy@infradead.org>
- <Zdk2YgIoAGOEvcJi@gondor.apana.org.au>
- <4a1416fcb3c547eb9612ce07da6a77ed@AcuMS.aculab.com>
- <2s73sed5n6kxg42xqceenjtcwxys4j2r5dc5x4fdtwkmhkw3go@7viy7qli43wd>
-In-Reply-To: <2s73sed5n6kxg42xqceenjtcwxys4j2r5dc5x4fdtwkmhkw3go@7viy7qli43wd>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1708876727; c=relaxed/simple;
+	bh=oWPwKUfFaUKDvLe8z6kb5kll3d3LDHDHamj9jCZzWf4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k4Rhj6/jINreWFGDbt3Q8Q8+Ca1ukwRjzAxihFUvrguJ/we28dOjE2EXkFpOsKYNCAA+KBJms/4cJfoCR7777yf5cezChCRkd4NDbACFShgH7IkIpi1bbzEzgfmYro3GvEYJ1KV9xcpJP2wvcgwqOcVzH1z/4IN/Gs4CLcAv4Is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WymMGjSi; arc=none smtp.client-ip=209.85.160.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-21fdf31a154so651032fac.3;
+        Sun, 25 Feb 2024 07:58:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708876725; x=1709481525; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=idPAAJ96XdV4kQvBDm67FrrO1sdpsDxXupC8T/KxzXY=;
+        b=WymMGjSiwOyYc+W8UEWbRf8Ty0TWjteLlRsUIq6AAe/tXyOwEtJcKjnBXxflsvhpXq
+         L4s0qdQqHxGywzUPcTgOLwEFMJ2faf2Gw73JqqYeNvObQnR8t65kucYEclIiqNbsU3WB
+         10ptyMwY3h3SrgTkEbkSNAbXnMj4kv25P9zu7CU1xa2jXz5WlEl8OBIGev74dqXMxBRy
+         L7Moh3BTxjVoKrpR5GLOYBBBZvMDsiTqyrZAygXrMDyKPjGMhMkG6rxH9ov3uYK85T8J
+         Fl9JyNywpOf4aQRBJpSxSqOh1rqvBer6ymy/vqQJUpi10THB136t6jv8/yUyypXyqejh
+         vl3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708876725; x=1709481525;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=idPAAJ96XdV4kQvBDm67FrrO1sdpsDxXupC8T/KxzXY=;
+        b=r/x3mHRsdkym390h01i1xUa1xWQheJtGS8V8m0PSyZezyKA1SNa+PZ2t4lHSbVRI8L
+         nyanO9G1JbCNLQNzhy7BX9FCJgPR5/0u1WyuVNcXpE7txCZ0k/F7odpGtk2TeUcsSg/V
+         yof3s2FaCludF6Keusz+tXZmJ9HdDMaLqg1ybXzzt4JLkVxXv0umPZw5GrjvnJOqFAx6
+         MVcmt3qYBY+an9WLdn5dpg+aDK3vuYPnUsYBN6rAnxCP16RExrOe5tNIdZNVov3yG4Wn
+         DlHYts/OgUbjzf+d2IbLok6Bl16xUiO3Mg+ChGXCyjWgw1/jvTR5qgxYsMcz1pyauitv
+         g58g==
+X-Forwarded-Encrypted: i=1; AJvYcCWzSbr0J7a0BNgir15jnjayTXLBYEL219DUqsvzRCQcEqi9U+YNrmeqDNSqSAkf/niej1SXlCqI/cpxVqwClN7uzt0etc9cBvj+mPhUCXDx549gr8mr3BXgJaSGCXyyIau1JNn3
+X-Gm-Message-State: AOJu0YynTrsttKIFt0pWEF/TK0VaJHXm9VuWCUVHB5WKz953AFk3MbkL
+	VuxvdqU/+K3WHUgeSVpQsr0oQ3KyLx+z5gaYjzITdX0dV4Jv8I6hWeoUP9yy
+X-Google-Smtp-Source: AGHT+IHG6YNLTj/YF9EppSR8plKWQXM3ymd76N7wy9J7i7mq3+f6Ljk9ryZxtjo1bfNt3q9zrvVCYw==
+X-Received: by 2002:a05:6870:c6aa:b0:21e:e583:25e1 with SMTP id cv42-20020a056870c6aa00b0021ee58325e1mr6105925oab.32.1708876724618;
+        Sun, 25 Feb 2024 07:58:44 -0800 (PST)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id z2-20020aa78882000000b006e47ab9b2e5sm2445339pfe.215.2024.02.25.07.58.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Feb 2024 07:58:44 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Sun, 25 Feb 2024 07:58:43 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Charlie Jenkins <charlie@rivosinc.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Erhard Furtner <erhard_f@mailbox.org>
+Subject: Re: [PATCH net] kunit: Fix again checksum tests on big endian CPUs
+Message-ID: <56565259-906b-490c-8543-5009e0a555d8@roeck-us.net>
+References: <73df3a9e95c2179119398ad1b4c84cdacbd8dfb6.1708684443.git.christophe.leroy@csgroup.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <73df3a9e95c2179119398ad1b4c84cdacbd8dfb6.1708684443.git.christophe.leroy@csgroup.eu>
 
-From: Kent Overstreet
-> Sent: 25 February 2024 03:19
-..
-> when I implemented cuckoo (which is more obviously sensitive to a weak
-> hash function), I had to go with siphash, even jhash wasn't giving me
-> great reslts. and looking at the code it's not hard to see why, it's all
-> adds, and the rotates are byte aligned... you want mixed adds and xors
-> and the rotates to be more prime-ish.
->=20
-> right idea, just old...
->=20
-> what would be ideal is something more like siphash, but with fewer
-> rounds, so same number of instructions as jhash. xxhash might fit the
-> bill, I haven't looked at the code yet...
+On Fri, Feb 23, 2024 at 11:41:52AM +0100, Christophe Leroy wrote:
+> Commit b38460bc463c ("kunit: Fix checksum tests on big endian CPUs")
+> fixed endianness issues with kunit checksum tests, but then
+> commit 6f4c45cbcb00 ("kunit: Add tests for csum_ipv6_magic and
+> ip_fast_csum") introduced new issues on big endian CPUs. Those issues
+> are once again reflected by the warnings reported by sparse.
+> 
+> So, fix them with the same approach, perform proper conversion in
+> order to support both little and big endian CPUs. Once the conversions
+> are properly done and the right types used, the sparse warnings are
+> cleared as well.
+> 
+> Reported-by: Erhard Furtner <erhard_f@mailbox.org>
+> Fixes: 6f4c45cbcb00 ("kunit: Add tests for csum_ipv6_magic and ip_fast_csum")
+> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 
-There is likely to be a point where scanning a list of values
-for the right hash value is faster than executing a hash function
-that is good enough to separate them to separate buckets.
-
-You don't want to scan a linked list because they have horrid
-cache footprints.
-The locking is equally horrid - especially for remove.
-Arrays of pointers ar ethe way forward :-)
-
-=09David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
-
+Tested-by: Guenter Roeck <linux@roeck-us.net>
 
