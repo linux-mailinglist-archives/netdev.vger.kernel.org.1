@@ -1,181 +1,141 @@
-Return-Path: <netdev+bounces-74728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FA13862915
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 05:13:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC64E86291D
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 06:01:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F17B1F21487
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 04:13:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56A05281F51
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 05:01:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38CCA7460;
-	Sun, 25 Feb 2024 04:13:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04D5D8BF8;
+	Sun, 25 Feb 2024 05:01:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="Ldyy43De"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rFDRrDPf"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-233.mail.qq.com (out203-205-221-233.mail.qq.com [203.205.221.233])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A6D63CF
-	for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 04:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C5F8BF7;
+	Sun, 25 Feb 2024 05:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708834398; cv=none; b=daeuNGs31ukjQ+No/Q70B3ZZ+TdolF0mkUr5ES1zQKHG0RaYoVgTpFFLBemQrA34JU6g4XrtqyznPNHdOox+rAlUaspC07JeiODyqMA7U+k3OOODl+KrZ3iAbTw1+E2kAIpIaymYL8f/8Zkp27uPTu3e4USdvh86Y6tguz1Jz/M=
+	t=1708837287; cv=none; b=lxUfIIvK0sI6/YZ8HWRO9wJXs5hkrEAJOO76zTvhAdUfb0VygLCIXMOEb83v3Qwnl7J9M+mezWK2+H1rZAi4XJVUwjhbu5uOVpCZQcI+syFO4uWzlmLRCYdAIcco6VfLMnfX7IQoHPDtR6hEOir8GjbL3IRFIyBXR/mQXLt46pI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708834398; c=relaxed/simple;
-	bh=q4dKeuWe6W4Noz1+d/7Yfs/ZMDZdDCxYAicIx07p0Fw=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=pzsZ3OlMesvqh+3evQWDy/QJ0x5kPC7aYaK1ERdOeYTSWkNdRSbEqeM2XrkC1Qg9SJxWK4nAq9+ASKeRLsz+50j5jBc4OKfm7QoWDObGfn02KN2pGTvkOqbPfmr61PFYOO51RAS1D1JJOE5k4moluMbVSM052+fMXSv7ZKRoj3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=Ldyy43De; arc=none smtp.client-ip=203.205.221.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1708834394;
-	bh=VLgh3i1HLl4qsZsnPo2rlFAeoCtuGCX5i0c6X8Lsfio=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Ldyy43DexctNx7uaqfCer2qqMgaoAONIYmVf8UrW4CAfxUwY9mdW6pVGeqQrqv+Ju
-	 3rSw2IdQSqE/BVG5QKmbEfKTMpPilrsRnQSKmJOz7uX1MhqYAvyrLMu3N1kLfa/8DP
-	 fe2MvNnXxHumx6lIoIB/0flElcvp6XuEnpg2pWME=
-Received: from localhost.localdomain ([2409:8a60:2a61:ef40:480f:5c56:cca3:1b20])
-	by newxmesmtplogicsvrszb6-0.qq.com (NewEsmtp) with SMTP
-	id 18993038; Sun, 25 Feb 2024 12:06:09 +0800
-X-QQ-mid: xmsmtpt1708834004tx0ivesbr
-Message-ID: <tencent_A7FD9E9E75AA74A87583A427F5D20F988B09@qq.com>
-X-QQ-XMAILINFO: MyIXMys/8kCt9c0H52Jz366tiakHJ3gYHewk0A//04bB4zWcvxj0dGp5YbLv6C
-	 FGtFQ8Y/PXdjyK2qk/u4xSOuFL7zwAGNaOmhXXpV3IwXHJsAbiY/Di5b/G6kK4eUzrgyPrknbUWS
-	 UBr/IC4wtS6nAwFGBsnBEiDkexwhWmWKLoRnXj3ekg1cX7EYxleemBTi4dPIjOtf4zyX+i+4ot5W
-	 7MQuhTDBfpQVSUkwADIIQv7SZVtyUg8cPu7P1ZMblMIaWjVHDKBRc/jD6mEplPM9bb7YaDIosqeq
-	 1Q2JW2XUcWEifiy04qzBbUEadc11O6dhPbJ6TdHEG3/vLLTFSMtdlsExY214kPZtXvcErUTRf5Pk
-	 F5q7XC00fw4fSlKdGEhGXtNdhvnMPsa1CDI/QrkD68O6lx4Vv1pdEtclvH3ygKBrW6G6Gc/VITPR
-	 4xwfIDSbwp0D/0PiZD2kK8bQjFbYBUFmEWDKrZFsB2hk/36MPOJ1EJhgztQiP2ePikJjZ1YkK6WF
-	 JSMh3RrN/+l2eeD0YxtlzhoCr5EG9Viky8379KlPNVMuagUeEgb80A07M5K6VgtXieqyypQXfYwN
-	 0pbYB9pVyxD/8ITWyX5jf/EICKD+mE6LZvebLO/CHUNF1qD8+ryXRzMhCLCfCZdFFbcqkOXkk1hm
-	 i1MeMdO3UAzGxwcI5K6vyREUATt5AXgGP86Q4LCvBdM/cRmYiVrNcHuaM5WLIW6kVuxd7Wxr5NUJ
-	 vwdpn/AQOm+1mTowMxjvQOZS5nlGEGC6WnGfEKjy/yQEan87waQspiyH9HRVqxX/KbYyQ83IsZTw
-	 H5qmRLIA9UgBi4JLi9TJxrENsIEp2FPwcgMs5GkePXXBcJqzVQFpGvTJ2ITFlYxyrOJj1ilmRuzZ
-	 JpGdRXTmSfJkzpHbK1uoo6dgrfsgpagPeP2mPxQ1scqLYPR5xIrlv7Ik6kQ390WpsrYDKbB4Wu7U
-	 N8/+18UZl+IQNvC+6Iv+k8nmoxNdS981uZl/by0DZzdeVpRTdG4Hp8j56rZMfX9FcxBOszZvdYFn
-	 hLw6UdnTK7Ad/J2XEXXeQiOx4LC3s84hgZ3q5atCF6ZwzcdC+NRtHzMa0eSpkf8783YPkcHvmPlr
-	 tutj8l
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-From: wenyang.linux@foxmail.com
-To: Luis Chamberlain <mcgrof@kernel.org>,
-	Kees Cook <keescook@chromium.org>,
-	Joel Granados <j.granados@samsung.com>,
-	Christian Brauner <brauner@kernel.org>,
-	davem@davemloft.net,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Wen Yang <wenyang.linux@foxmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 4/8] svcrdma: delete the duplicate static variables zero
-Date: Sun, 25 Feb 2024 12:05:34 +0800
-X-OQ-MSGID: <20240225040538.845899-5-wenyang.linux@foxmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240225040538.845899-1-wenyang.linux@foxmail.com>
-References: <20240225040538.845899-1-wenyang.linux@foxmail.com>
+	s=arc-20240116; t=1708837287; c=relaxed/simple;
+	bh=fGZltGZNoJBL0qVbGmPCoIkPh0GK+3Eoei2TVfZIXgA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o6Yb3/FAX7waF5yK+tgKGcOTY+lcPrIZouUGPTWDkY3xXVHVmCGarSHmwbub89tp15x1ckiwewHeVTbDUn0HNV5MuCsAmZM/ulp2hOJXB0ff50lyYVGHWUkfg62V7COVW6oeio5o5hG8KOwC1YhJNPrXWBGCjoI5w/FXlgHju+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=rFDRrDPf; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=s5ZqZD7A6lH7mWMZnVXwTZc0c5NMrcq/moxPl8tGVLs=; b=rFDRrDPf8tWfYxe+lK4UGzVEDL
+	xGoCs8oYxMni+++XQVt4UltsjPu0WZMp8RJe/6YA9aYCak6FucCUSy4cfUFniup07o59MJccPJ/4Z
+	BSdCt/BWIET2vV8cjvdujdTd5kNLenAeV09P/GhWOMIe6numy2xPzJiUkmY3PR6lbAP0TP0LrfU/a
+	/MbKWjMgIbJPjiPr9sQVymuuKBa1VCnTpxY2ohh0hvN964qDY9+3/y7IYiDTrGAArbhrhm3MNhOWU
+	AyqViMWne7YOY3o8h9uy90VlFWFdflh5HuK4syEpROrKEdRYpq5cvhCOhtbpMoLva2+2rstZ9jgBF
+	KH5dEY9g==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1re6db-0000000D1Ox-0Pfe;
+	Sun, 25 Feb 2024 05:01:19 +0000
+Date: Sun, 25 Feb 2024 05:01:19 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Kent Overstreet <kent.overstreet@linux.dev>
+Cc: David Laight <David.Laight@aculab.com>,
+	'Herbert Xu' <herbert@gondor.apana.org.au>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Thomas Graf <tgraf@suug.ch>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"maple-tree@lists.infradead.org" <maple-tree@lists.infradead.org>,
+	"rcu@vger.kernel.org" <rcu@vger.kernel.org>
+Subject: Re: [PATCH 0/1] Rosebush, a new hash table
+Message-ID: <ZdrJn0lkFeYGuYIC@casper.infradead.org>
+References: <20240222203726.1101861-1-willy@infradead.org>
+ <Zdk2YgIoAGOEvcJi@gondor.apana.org.au>
+ <4a1416fcb3c547eb9612ce07da6a77ed@AcuMS.aculab.com>
+ <2s73sed5n6kxg42xqceenjtcwxys4j2r5dc5x4fdtwkmhkw3go@7viy7qli43wd>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2s73sed5n6kxg42xqceenjtcwxys4j2r5dc5x4fdtwkmhkw3go@7viy7qli43wd>
 
-From: Wen Yang <wenyang.linux@foxmail.com>
+On Sat, Feb 24, 2024 at 10:18:31PM -0500, Kent Overstreet wrote:
+> On Sat, Feb 24, 2024 at 10:10:27PM +0000, David Laight wrote:
+> > I remember playing around with the elf symbol table for a browser
+> > and all its shared libraries.
+> > While the hash function is pretty trivial, it really didn't matter
+> > whether you divided 2^n, 2^n-1 or 'the prime below 2^n' some hash
+> > chains were always long.
+> 
+> that's a pretty bad hash, even golden ratio hash would be better, but
+> still bad; you really should be using at least jhash.
 
-Since these static variable zero is only used for boundary checks and
-will not be changed, remove it and use the ones in our shared const array.
+There's a "fun" effect; essentially the "biased observer" effect which
+leads students to erroneously conclude that the majority of classes are
+oversubscribed.  As somebody observed in this thread, for some usecases
+you only look up hashes which actually exist.
 
-Signed-off-by: Wen Yang <wenyang.linux@foxmail.com>
-Cc: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Joel Granados <j.granados@samsung.com>
-Cc: Christian Brauner <brauner@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: David Ahern <dsahern@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
- net/sunrpc/xprtrdma/svc_rdma.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
+Task a trivial example where you have four entries unevenly distributed
+between two buckets, three in one bucket and one in the other.  Now 3/4
+of your lookups hit in one bucket and 1/4 in the other bucket.
+Obviously it's not as pronounced if you have 1000 buckets with 1000
+entries randomly distributed between the buckets.  But that distribution
+is not nearly as even as you might expect:
 
-diff --git a/net/sunrpc/xprtrdma/svc_rdma.c b/net/sunrpc/xprtrdma/svc_rdma.c
-index f86970733eb0..5e4cd17eeb5a 100644
---- a/net/sunrpc/xprtrdma/svc_rdma.c
-+++ b/net/sunrpc/xprtrdma/svc_rdma.c
-@@ -63,7 +63,6 @@ unsigned int svcrdma_max_req_size = RPCRDMA_DEF_INLINE_THRESH;
- static unsigned int min_max_inline = RPCRDMA_DEF_INLINE_THRESH;
- static unsigned int max_max_inline = RPCRDMA_MAX_INLINE_THRESH;
- static unsigned int svcrdma_stat_unused;
--static unsigned int zero;
- 
- struct percpu_counter svcrdma_stat_read;
- struct percpu_counter svcrdma_stat_recv;
-@@ -170,8 +169,8 @@ static struct ctl_table svcrdma_parm_table[] = {
- 		.maxlen		= sizeof(unsigned int),
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec_minmax,
--		.extra1		= &zero,
--		.extra2		= &zero,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_ZERO,
- 	},
- 	{
- 		.procname	= "rdma_stat_rq_poll",
-@@ -179,8 +178,8 @@ static struct ctl_table svcrdma_parm_table[] = {
- 		.maxlen		= sizeof(unsigned int),
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec_minmax,
--		.extra1		= &zero,
--		.extra2		= &zero,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_ZERO,
- 	},
- 	{
- 		.procname	= "rdma_stat_rq_prod",
-@@ -188,8 +187,8 @@ static struct ctl_table svcrdma_parm_table[] = {
- 		.maxlen		= sizeof(unsigned int),
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec_minmax,
--		.extra1		= &zero,
--		.extra2		= &zero,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_ZERO,
- 	},
- 	{
- 		.procname	= "rdma_stat_sq_poll",
-@@ -197,8 +196,8 @@ static struct ctl_table svcrdma_parm_table[] = {
- 		.maxlen		= sizeof(unsigned int),
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec_minmax,
--		.extra1		= &zero,
--		.extra2		= &zero,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_ZERO,
- 	},
- 	{
- 		.procname	= "rdma_stat_sq_prod",
-@@ -206,8 +205,8 @@ static struct ctl_table svcrdma_parm_table[] = {
- 		.maxlen		= sizeof(unsigned int),
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec_minmax,
--		.extra1		= &zero,
--		.extra2		= &zero,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_ZERO,
- 	},
- 	{ },
- };
--- 
-2.25.1
+$ ./distrib
+0: 362
+1: 371
+2: 193
+3: 57
+4: 13
+5: 4
 
+That's using lrand48() to decide which bucket to use, so not even a
+"quality of hash" problem, just a "your mathematical intuition may not
+be right here".
+
+To put this data another way, 371 entries are in a bucket with a single
+entry, 384 are in a bucket with two entries, 171 are in a 3-entry
+bucket, 52 are in a 4-entry bucket and 20 are in a 5-entry bucket.
+
+$ cat distrib.c
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
+
+int bucket[1000];
+int freq[10];
+
+int main(int argc, char **argv)
+{
+	int i;
+
+	for (i = 0; i < 1000; i++)
+		bucket[lrand48() % 1000]++;
+
+	for (i = 0; i < 1000; i++)
+		freq[bucket[i]]++;
+
+	for (i = 0; i < 10; i++)
+		printf("%d: %d\n", i, freq[i]);
+
+	return 0;
+}
+
+(ok, quibble about "well, 1000 doesn't divide INT_MAX evenly so your
+random number generation is biased", but i maintain that will not
+materially affect these results due to it affecting only 0.00003% of
+numbers generated)
 
