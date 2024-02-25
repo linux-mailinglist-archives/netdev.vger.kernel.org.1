@@ -1,140 +1,115 @@
-Return-Path: <netdev+bounces-74721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D5A8862872
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 00:20:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AD2D862891
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 01:34:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F6C4B212CF
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 23:20:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2DD4281D5E
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 00:34:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33354D9F6;
-	Sat, 24 Feb 2024 23:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2B1C7FD;
+	Sun, 25 Feb 2024 00:34:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gr4Dx+q3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K4ukc6IK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D691B59A;
-	Sat, 24 Feb 2024 23:20:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AD4563D
+	for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 00:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708816817; cv=none; b=ZWK2BAO0Tw+yFUNS5Pi7ZP7Qq1c2WGe/t2Q4FrzVYKlSoammQLLo3NxdeLBmeBdBOG8mJYJUc6v6hVOw2S/C7tbRco5x6yoX2h/ZW+NNEyEYXo+ANqmn0yzjHbER2IoHrCHLg/KLudu8u+iZRKHxmY9I5RiraqYbHaG6MZ/2t9U=
+	t=1708821272; cv=none; b=Z4jA6JajHY/1fjHEkcb6VTQKUMAhAsF4T1uOym6ftMsujFuOf8vH+O8En3I+XNqi9xOiIsqIbSkZTdJJ4c57/rPLKefC9UbOgZly3Lrhyq4el99xMX/LgAmMJ/u50X9mx8q3SZUdWqTVHc6uKiLAxliZa98/V87Y0wGviAcw9GE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708816817; c=relaxed/simple;
-	bh=ddpbApfXPnRAvt72tIRg9a0nGvs0psYM9aIpXQBkLgY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=uicnWJpbdTiGb8txOMUuOA7GuJpR72ksIiXajfMwjr3YhU7yUoq5i0VWqzTxNSAP2uKdrzhCzfgzG0eB8vim0k9bO+uupxEJJc4MQT/kBcwMXXw6jY7Rsvh8DW/RrNC/rN9+b8xho7/grHt+9Cfyes40M2izhBLMCvxDXGw/Xc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gr4Dx+q3; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-512a65cd2c7so2797387e87.0;
-        Sat, 24 Feb 2024 15:20:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708816814; x=1709421614; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ewC5em/L4cp2/EK3EgWgLTwF3e1USIQQRxwh9lx3yRY=;
-        b=Gr4Dx+q3AHyF/zawHHmeTctgVUQTrk8BYWmbxihnweavCClSAmaIUafRBAIFrzh7f1
-         ifRmPL/VVpMLz2AKX/H0Mpp9Sp9IR5GOyeZHk7xsuVKZgZ+09w3ihEDPE4bwpc2ffdbQ
-         q3A2jrHVDF7BtJx4PGWII4SQ9j6c6iHqSLfuHxEeRaTjrTohs9lVKD0yuoNzrBotIS12
-         UGl1v3ZnWzlIK6/HZltGedFpI9UFUuqLsF6VuXVbt47vNIcf1eOjwpiUYttHZxDOUuZc
-         OmmLWRMfXeNjBN8IdEo1jB/gvq2bzHYaMqizro37BPDxBXDW+axujjMwyFwKA7wKoSg+
-         JjLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708816814; x=1709421614;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ewC5em/L4cp2/EK3EgWgLTwF3e1USIQQRxwh9lx3yRY=;
-        b=MFB4jJnbPAFr7e37oYdcT5hbEQXjXw0FVS9D/NKVmx8ubIE3RVZyb3wCgyidBYW84A
-         e9uq2YLfEVD8MVijHYIDtMuVUx/m8bBWCfD3twfGQMNRTROHEqm/yIS6WsuWdqamh1yY
-         wiXsfFKIlkBxSrY+qyZqggOPo15HRcRDPg1mg/fmrr54uad0drx6ih67p2vGYESaTSby
-         /8pEjZg4ccDqHtdbucvQgE+gKnuex5SFHlurlai8A7dHgLfh3yEltuIX2XlBuawWATXG
-         v8Y4DrjSjfEqusRqTrJ0BqB2tr30LBpvUR50UB82sdJTmQRr3NVfRWHrpvidGgxujlkv
-         SIVg==
-X-Forwarded-Encrypted: i=1; AJvYcCUBnivK1dfv3vlccC2MqLBfiZ4D+VnG3hNzKAm0L3PVIX999SQbJXvJUE+ieI6kMR9Hznf6flFllybLgz0P2RY7rQmzPG0kYAiamAGSxCPjNdjm/ZwGvFX7/rWYhNCPJCVSPJUXQGk5
-X-Gm-Message-State: AOJu0Ywxk46lcchqEqnW2EKuGSDxALLF8jtAStqQ+c6Qpd/Hu7uXh2sV
-	c4jWlCDFHd7zeg/SvQrS82B/Dru/E30kkty4LdVjXk0qNBCzT8wQ
-X-Google-Smtp-Source: AGHT+IFZ3ISb+iAdCSF6RROWczKAp5Me66N/c0/Abte9/kVtdGpQs7KuFb8Ryxa+5C3vL+a+Xlxvyw==
-X-Received: by 2002:ac2:4c36:0:b0:512:ae9b:559 with SMTP id u22-20020ac24c36000000b00512ae9b0559mr1705374lfq.34.1708816814128;
-        Sat, 24 Feb 2024 15:20:14 -0800 (PST)
-Received: from [127.0.1.1] (2a02-8389-41cf-e200-75bf-ebcd-fec9-7873.cable.dynamic.v6.surfer.at. [2a02:8389:41cf:e200:75bf:ebcd:fec9:7873])
-        by smtp.gmail.com with ESMTPSA id vh9-20020a170907d38900b00a4323d1b18fsm75344ejc.34.2024.02.24.15.20.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Feb 2024 15:20:13 -0800 (PST)
-From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Date: Sun, 25 Feb 2024 00:20:06 +0100
-Subject: [PATCH] net: usb: dm9601: fix wrong return value in
- dm9601_mdio_read
+	s=arc-20240116; t=1708821272; c=relaxed/simple;
+	bh=pW35lHmRZbmLNwBmL2fWBG9v27WSVr02Mm18cN6snmk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lJ3XY2f99+cB8LFjXft8rnbKLzZ7+m3Y4mVwsBaTu5sbPrfTtbPcY766ckjsfl1S7roOJi/+Mu8msFlNxb9eM7WCDIJDqCrrVIgWi1oSq+VAy3iY8HJAN5ygIhjO3JZ0NtMxUlSblslPX9QyoTNhpVrnYqJwpCgWf2eLd3lF0G8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K4ukc6IK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5C65C433F1;
+	Sun, 25 Feb 2024 00:34:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708821272;
+	bh=pW35lHmRZbmLNwBmL2fWBG9v27WSVr02Mm18cN6snmk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=K4ukc6IKBtizGP99kMFAId3915KrC/6M4R9EIQ9xsyLGdcoO8NK+ZySKOiqtulkNm
+	 4Z5hwN6nyb5zynpjhps24Ke+Ped5SrHmimKeoAM4mxLci10CY68EMXVTtCceXnnG4X
+	 1fxmXEpcWep0PN4VsEQJ+v2osuVys/gES1GXir/cFIcHxEWh6/MTmaup8IvQHm2mbx
+	 7lDCAS8VYhcBDUhwIBEPdWjMQwbkFoC3VdjLmOIYhAejBnjalGaCyfX3Y8y34zMHDn
+	 /8+WnzA50RItSC1fRUivkknD9k2kD97IJiLOQLpCBuZG/VcrYeEdOuEHiKTqwiTNSq
+	 qzqhwcKIv5Gww==
+Date: Sat, 24 Feb 2024 16:34:30 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima
+ <kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v3 net-next 05/14] af_unix: Detect Strongly Connected
+ Components.
+Message-ID: <20240224163430.05595eb0@kernel.org>
+In-Reply-To: <20240223214003.17369-6-kuniyu@amazon.com>
+References: <20240223214003.17369-1-kuniyu@amazon.com>
+	<20240223214003.17369-6-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240225-dm9601_ret_err-v1-1-02c1d959ea59@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAKV52mUC/x3MSwqAMAwA0atI1hbSoEK9ikiRNmoWfkhFBOndL
- S7fYuaFxCqcoK9eUL4lybEX2LqCsE77wkZiMRBSg0SNiZvr0Hrly7OqwckFF10bokUo0ak8y/M
- PhzHnD/syCglgAAAA
-To: Peter Korsgaard <peter@korsgaard.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Javier Carrasco <javier.carrasco.cruz@gmail.com>
-X-Mailer: b4 0.14-dev
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1708816813; l=1563;
- i=javier.carrasco.cruz@gmail.com; s=20230509; h=from:subject:message-id;
- bh=ddpbApfXPnRAvt72tIRg9a0nGvs0psYM9aIpXQBkLgY=;
- b=LQY/Y23hWUYaQe2RKybVLCRW+6QDIdyppqxDWZ0SdXIX5gWkG7IdeMab+0+8M5Cm2Up+roC8c
- 4KcWpnmHFr+CusG+Qvae0a1tmKeSIdMyytGYCZpMAv9MZlsav6wiDUn
-X-Developer-Key: i=javier.carrasco.cruz@gmail.com; a=ed25519;
- pk=tIGJV7M+tCizagNijF0eGMBGcOsPD+0cWGfKjl4h6K8=
 
-The MII code does not check the return value of mdio_read (among
-others), and therefore no error code should be sent. A previous fix to
-the use of an uninitialized variable propagates negative error codes,
-that might lead to wrong operations by the MII library.
+On Fri, 23 Feb 2024 13:39:54 -0800 Kuniyuki Iwashima wrote:
+> +	list_for_each_entry(edge, &vertex->edges, vertex_entry) {
+> +		struct unix_vertex *next_vertex = edge->successor->vertex;
+> +
+> +		if (!next_vertex)
+> +			continue;
+> +
+> +		if (next_vertex->index == UNIX_VERTEX_INDEX_UNVISITED) {
+> +			list_add(&edge->stack_entry, &edge_stack);
+> +
+> +			vertex = next_vertex;
+> +			goto next_vertex;
+> +prev_vertex:
+> +			next_vertex = vertex;
+> +
+> +			edge = list_first_entry(&edge_stack, typeof(*edge), stack_entry);
+> +			list_del_init(&edge->stack_entry);
+> +
+> +			vertex = edge->predecessor->vertex;
+> +
+> +			vertex->lowlink = min(vertex->lowlink, next_vertex->lowlink);
+> +		} else if (edge->successor->vertex->on_stack) {
+> +			vertex->lowlink = min(vertex->lowlink, next_vertex->index);
+> +		}
+> +	}
+> +
+> +	if (vertex->index == vertex->lowlink) {
+> +		struct list_head scc;
+> +
+> +		__list_cut_position(&scc, &vertex_stack, &vertex->scc_entry);
+> +
+> +		list_for_each_entry_reverse(vertex, &scc, scc_entry) {
+> +			list_move_tail(&vertex->entry, &unix_visited_vertices);
+> +
+> +			vertex->on_stack = false;
+> +		}
+> +
+> +		list_del(&scc);
+> +	}
+> +
+> +	if (!list_empty(&edge_stack))
+> +		goto prev_vertex;
 
-An example of such issues is the use of mii_nway_restart by the dm9601
-driver. The mii_nway_restart function does not check the value returned
-by mdio_read, which in this case might be a negative number which could
-contain the exact bit the function checks (BMCR_ANENABLE = 0x1000).
+coccicheck says:
 
-Return zero in case of error, as it is common practice in users of
-mdio_read to avoid wrong uses of the return value.
+net/unix/garbage.c:406:17-23: ERROR: invalid reference to the index variable of the iterator on line 425
 
-Fixes: 8f8abb863fa5 ("net: usb: dm9601: fix uninitialized variable use in dm9601_mdio_read")
-Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
----
- drivers/net/usb/dm9601.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/usb/dm9601.c b/drivers/net/usb/dm9601.c
-index 99ec1d4a972d..8b6d6a1b3c2e 100644
---- a/drivers/net/usb/dm9601.c
-+++ b/drivers/net/usb/dm9601.c
-@@ -232,7 +232,7 @@ static int dm9601_mdio_read(struct net_device *netdev, int phy_id, int loc)
- 	err = dm_read_shared_word(dev, 1, loc, &res);
- 	if (err < 0) {
- 		netdev_err(dev->net, "MDIO read error: %d\n", err);
--		return err;
-+		return 0;
- 	}
- 
- 	netdev_dbg(dev->net,
-
----
-base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
-change-id: 20240224-dm9601_ret_err-0a9c9d95cd10
-
-Best regards,
--- 
-Javier Carrasco <javier.carrasco.cruz@gmail.com>
-
+this code looks way to complicated to untangle on a quick weekend scan,
+so please LMK if this is a false positive, I'll hide the patches from
+patchwork for now ;)
 
