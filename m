@@ -1,255 +1,212 @@
-Return-Path: <netdev+bounces-74789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF658862CCC
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 21:17:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1163F862CD4
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 21:26:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E9791F225E5
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 20:17:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E7D11C210FB
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 20:26:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4585619BCA;
-	Sun, 25 Feb 2024 20:17:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B1EEADD;
+	Sun, 25 Feb 2024 20:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Ve1h7206"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H7YStHhZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A10F71BDCE;
-	Sun, 25 Feb 2024 20:17:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B171B807
+	for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 20:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708892232; cv=none; b=drtVgvASGsPHGoxRdgdVC3i66YSQYf2WqHgVUpCjquSfy6y0KaiAKW8+OexBT+mKwMC5Ndcc1jSLSOmUAX7NQN79GIDBpZGOHVuaefBcp94mGexWF0siiOIJX/MIRhRrQPobXz95DJFOlBuSrKeqIkRUzcuP0NSzIPwj3uQPTwU=
+	t=1708892781; cv=none; b=MjPsCf98ETdCfodUuvHQAUrweV9lTxOsVOoEI0523o6iuAn3uGIZUj2rGx29OKWl81KgCwAcpwks/diu98/HU8OPBPsy+lj7QHCOYPpEfQWUzEwPfDHWMV3n6GtQMo0x4ijErqu+pXtWSP+XbdJoFIINiaqKuHkTJaK/j8CCvQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708892232; c=relaxed/simple;
-	bh=8mBiiw1K6hy4KkWF0bACSrn0c7z/Q+4n0AoXESCVheY=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:References; b=vFwgKlZLq1SBxVbQchfUN1qkJlc693n95KHZ3Ucp/roFH4Kd1iDu8gZDizYLyYij6ukmns1BNQqQFTh6D0C1XR61R9kQ3bLiIV9GptYzEu/ZYHWQG/RkkiLzxE61OY2qewBrBva/CBrpMf6ZmFC2YTHqAHr6+plwlRnCbZkUIXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Ve1h7206; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20240225201701euoutp016779edea2249c28248dbba8c4251c000~3NGveewUT3072430724euoutp01d;
-	Sun, 25 Feb 2024 20:17:01 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20240225201701euoutp016779edea2249c28248dbba8c4251c000~3NGveewUT3072430724euoutp01d
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1708892221;
-	bh=dhW+yOBdo3voypPsFOkyfZsFdQSuzWwwvrfGVCZWSrc=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=Ve1h7206ul8aONip2vy8Phb+MlbhOJ6vVF0OIvcjntM+tpM9mqWlP+K8KfwCI3ID1
-	 HOTXwV6WZmPDQZGECqRc4oQZKe2ZVDDHOJL2RysYp80pdVm1yf6sTFQIBQ6kcSDvMH
-	 d57FtfZ+WeqCMaI3ZOx0KjBKjmGVElMLRIZOz1fM=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20240225201701eucas1p1d89fc1e57d360ca7c9b5e2c90cc56bf8~3NGvL1Hjs1109111091eucas1p1C;
-	Sun, 25 Feb 2024 20:17:01 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-	eusmges2new.samsung.com (EUCPMTA) with SMTP id 8B.65.09814.D30ABD56; Sun, 25
-	Feb 2024 20:17:01 +0000 (GMT)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240225201700eucas1p1fcf1392cd0d4230c17d1ff296c5995e2~3NGut75Ky2582925829eucas1p1t;
-	Sun, 25 Feb 2024 20:17:00 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240225201700eusmtrp1596f260bbede93134299c568c0b311d0~3NGutXJui0768107681eusmtrp1E;
-	Sun, 25 Feb 2024 20:17:00 +0000 (GMT)
-X-AuditID: cbfec7f4-711ff70000002656-60-65dba03da3d3
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-	eusmgms1.samsung.com (EUCPMTA) with SMTP id 07.F7.09146.C30ABD56; Sun, 25
-	Feb 2024 20:17:00 +0000 (GMT)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240225201700eusmtip186ccfa89ac58e360b12b80e5490a2b54~3NGui2XHm1504315043eusmtip1U;
-	Sun, 25 Feb 2024 20:17:00 +0000 (GMT)
-Received: from localhost (106.210.248.222) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Sun, 25 Feb 2024 20:16:59 +0000
-Date: Sun, 25 Feb 2024 21:16:58 +0100
-From: Joel Granados <j.granados@samsung.com>
-To: <wenyang.linux@foxmail.com>
-CC: Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <keescook@chromium.org>,
-	Christian Brauner <brauner@kernel.org>, <davem@davemloft.net>, David Ahern
-	<dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/8] sysctl: introduce sysctl SYSCTL_U8_MAX and
- SYSCTL_LONG_S32_MAX
-Message-ID: <20240225201658.h6nod4c4uxclq53a@joelS2.panther.com>
+	s=arc-20240116; t=1708892781; c=relaxed/simple;
+	bh=uia9Xpa1Ux/c4AXYRfNZbxYrdciWIwDldX5aSUd5yRo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lJvPbhvmGAdae+/2WoCI6iGgAEHIYnLQitYdYjzHngSmsqOPdCut5ZEKcYPWfHhYwn2SsKeN7uXcAmVZT8nx9+AkHTxbyzCN5UgUW9nj1hlenUJe7hHlyVanodsOLcKtyPX9KIwC+bp53+WhVR7BHyG3frUMwfhiR8S+Qm4JHn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H7YStHhZ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708892778;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J3ytopfXqBqOL1Vu/I3rG4YfjxYxF7yRKyhbp2kFyno=;
+	b=H7YStHhZux5RCNFJE2zK/JyJ5Yy/3fneHCrNsdg/JHtRP7QWMbYXNR1UvD9w62U97Cm0Oa
+	Vor7lagXx/XqxNHZX4IByIpMjyus7d++jWbXxUoUEiDWOlB2AgfByl9Kwd8919kxvTaeBY
+	YW1z3ziTm5UZhdz8Pv+Mmi15W9ukK4M=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-628-2s-ALWGuMZWQlNrcJnYhLw-1; Sun, 25 Feb 2024 15:26:17 -0500
+X-MC-Unique: 2s-ALWGuMZWQlNrcJnYhLw-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-41296d7c800so12072735e9.1
+        for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 12:26:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708892775; x=1709497575;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=J3ytopfXqBqOL1Vu/I3rG4YfjxYxF7yRKyhbp2kFyno=;
+        b=KvOxxsjuSEyzrJCn7qLsKSOc3mxZXXN1UqUhjjJAgYeuuwkj1nBMpqjAp0CgaXXs8s
+         uRK1A0vkM8Tp7gfs3sNFNv8MTtzNpIWS/EaDbCzhgGjHpmA9H/qson2i3FzrPw2og+We
+         v3rmQKe7aGXvcDOpYD6UnlM02IYbGI7si+HhTFhmU0467Q8J/O+Ml+rQXSqBEUmOUjGE
+         pAz6YeUcvFutankVZvjPHrlhSG98alrS3VoQS1t9cezDmzKjl0qybck41Ln4+6jJhHEe
+         +bxCOUnZBRjZa0b80Nqj/rxa3a4g05ULYmQjoqHcn+MyFU5mQD3Z0mUzllQcYN7o4sdT
+         IM5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX6hsRz2HzCXv+9q4Uc3U/rf3NhhZ9IzmLIB0jqiar5na/XrGrfK+BdIt5IECIHY66C7T83yBI+JXDW5f8fRUk4UkKSCMWV
+X-Gm-Message-State: AOJu0YznF1Hr1dwcD7hZCeYk4YhrQ6mHn6g/M0634n8A7R0RwSUkcXqT
+	lhfTksChTFZ+6fBw/HLXT0ecwlwA/xVnIzufA7D+zt+pDYj0WffxNr/ut2w4mDabtfEHCorqn8i
+	6CGOKozBBXbawLgsgMIHMt7gxorInn1WuO/Tc6sx+aDD0H2idFoBXoA==
+X-Received: by 2002:a05:600c:4885:b0:410:f5d2:cbe5 with SMTP id j5-20020a05600c488500b00410f5d2cbe5mr3903022wmp.37.1708892774878;
+        Sun, 25 Feb 2024 12:26:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHM/Hc5aKEKDw17cQ7DrumqyLC5t7v2MRdRvGOBVg16+X6zFVBJiqvGL5wqhJhU7eoliAdjow==
+X-Received: by 2002:a05:600c:4885:b0:410:f5d2:cbe5 with SMTP id j5-20020a05600c488500b00410f5d2cbe5mr3903019wmp.37.1708892774498;
+        Sun, 25 Feb 2024 12:26:14 -0800 (PST)
+Received: from redhat.com ([109.253.193.52])
+        by smtp.gmail.com with ESMTPSA id s7-20020a05600c45c700b0040fd1629443sm5967317wmo.18.2024.02.25.12.26.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Feb 2024 12:26:13 -0800 (PST)
+Date: Sun, 25 Feb 2024 15:26:09 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Dave Taht <dave.taht@gmail.com>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Jason Wang <jasowang@redhat.com>, hengqi@linux.alibaba.com,
+	netdev@vger.kernel.org
+Subject: Re: virtio-net + BQL
+Message-ID: <20240225145946-mutt-send-email-mst@kernel.org>
+References: <1708678175.1740165-3-xuanzhuo@linux.alibaba.com>
+ <CAA93jw7G5ukKv2fM3D3YQKUcAPs7A8cW46gRt6gJnYLYaRnNWg@mail.gmail.com>
+ <20240225133416-mutt-send-email-mst@kernel.org>
+ <CAA93jw4DMnDMzzggDzBczvppgWWwu5tzcA=hOKOobVxJ7Se5xw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="xhnys3c7pu7tlmrh"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <tencent_95D22FF919A42A99DA3C886B322CBD983905@qq.com>
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrFKsWRmVeSWpSXmKPExsWy7djPc7q2C26nGpxewWrx+vAnRos551tY
-	LNbtamWyeHrsEbvFme5ciwvb+lgtLu+aw2ZxY8JTRotjC8Qsvp1+w2jRsnoXqwO3x+yGiywe
-	W1beZPJY0HOe2WPBplKPTas62Tze77vK5vF5k1wAexSXTUpqTmZZapG+XQJXxpPjXgV7lSu2
-	Nj1nbGBcJ9fFyMkhIWAiMbtnC3MXIxeHkMAKRokrT5vYIZwvjBK3P66DynxmlPj26h4TTMuO
-	7euhEssZJbbveMoGVzVx+Qeo/q2MEqtmrGMEaWERUJX4+3QaG4jNJqAjcf7NHWYQW0RAXuLc
-	k1VgDcwCV5kkJt2YAlYkLBApcevdbjCbV8BBouHGa1YIW1Di5MwnLCA2s0CFxNF7b4BsDiBb
-	WmL5Pw6QMKeAk0TTk3XMEKcqS6zfdg7KrpU4teUWE8guCYH9nBKbNtxjhUi4SEzt3sQOYQtL
-	vDq+BcqWkTg9uYcFomEyo8T+fxCvSQisZpRY1vgVGhrWEi1XnkB1OErM7j/EDnKRhACfxI23
-	ghCH8klM2jadGSLMK9HRJgRRrSaxGuj+CYzKs5C8NgvJa7MQXoMI60gs2P2JDUNYW2LZwtfM
-	ELatxLp171kWMLKvYhRPLS3OTU8tNspLLdcrTswtLs1L10vOz93ECEyCp/8d/7KDcfmrj3qH
-	GJk4GA8xqgA1P9qw+gKjFEtefl6qkghvuMzNVCHelMTKqtSi/Pii0pzU4kOM0hwsSuK8qiny
-	qUIC6YklqdmpqQWpRTBZJg5OqQYmLrOKZ7obK8X28acpm+o9unb27puFDo49rZNaP24OW3N+
-	DufB32ze5tLcrhZzNwY4TVq/adPcAstZyjbuxansltrmF1+t99FWOPLbMCX3Ya7rpW+XAzRV
-	pP/MN3Ba8/D49UmGv/9+erI0xVFermTF5UqTXcbn9SJr5nP9Wj9XLKyQ3zxPImuyzeMLmZ/+
-	5ux78nXJZw0vSaaWTa/qmRsUDH5u251zWNz4r9HC2d7zI4N47TvKvm67LJU7ZeHavx+ZnvCv
-	i0tcFz1B4l6le0jrqZVcKbf3P+w426In/rzn+sHHKlW35fm1Sj/bn7397fGzoD+ha9z2dXQc
-	818rcDP77aM/kW9sk1jZfi40XJsRosRSnJFoqMVcVJwIAHXTy+79AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmphleLIzCtJLcpLzFFi42I5/e/4XV2bBbdTDV7dVbV4ffgTo8Wc8y0s
-	Fut2tTJZPD32iN3iTHeuxYVtfawWl3fNYbO4MeEpo8WxBWIW306/YbRoWb2L1YHbY3bDRRaP
-	LStvMnks6DnP7LFgU6nHplWdbB7v911l8/i8SS6APUrPpii/tCRVISO/uMRWKdrQwkjP0NJC
-	z8jEUs/Q2DzWyshUSd/OJiU1J7MstUjfLkEv49Hfo6wFu5UrPm5uYm1gXCPXxcjJISFgIrFj
-	+3rmLkYuDiGBpYwSJ6YtYIZIyEhs/HKVFcIWlvhzrYsNxBYS+MgosbNdBqJhK6PE6aYzTCAJ
-	FgFVib9Pp4EVsQnoSJx/cwdskIiAvMS5J6vYQRqYBa4ySRx/NZ0RJCEsEClx691usAZeAQeJ
-	hhuvWSGmngY64/JjqISgxMmZT1i6GDmAusskpq7ThDClJZb/4wCp4BRwkmh6sg7qaGWJ9dvO
-	Qdm1Ep//PmOcwCg8C8mgWQiDZiEMAqlgFtCSuPHvJROGsLbEsoWvmSFsW4l1696zLGBkX8Uo
-	klpanJueW2yoV5yYW1yal66XnJ+7iRGYBLYd+7l5B+O8Vx/1DjEycTAeYlQB6ny0YfUFRimW
-	vPy8VCUR3nCZm6lCvCmJlVWpRfnxRaU5qcWHGE2BgTiRWUo0OR+YnvJK4g3NDEwNTcwsDUwt
-	zYyVxHk9CzoShQTSE0tSs1NTC1KLYPqYODilGpjsYtPz6jZy32ldHGe4Q2p18UpF97kWYedX
-	t2+eosWTUrj8BqNr9asP0Veeip6dOEFApnTez8s9ed+jdxjZvRXk+xbX9PvQs44/8XMPKc7b
-	szDkTG38q0nOuqdWZbR5ih3kqzBx3SoqqR4zT/XbDDUThgKtXZ7mqy4aXi6vXDSjeLPFXMlD
-	ZqJnmdbVT7NuX6couKpVVbD6R7Fe5vp/RjYvLu1JNT0W1Sa4OHshN//eywfakxied23/rTL3
-	5XS2rq0yjtWsTpuynhUFFVTuiN6k6abwqClR54jp653rPF9oeP/TWqUsmxbx7HT0lKdHFA2v
-	Xn65fXrRgmcds94xvcvcrsvls9twx87bJ+0kjZuVWIozEg21mIuKEwGPcGKRlwMAAA==
-X-CMS-MailID: 20240225201700eucas1p1fcf1392cd0d4230c17d1ff296c5995e2
-X-Msg-Generator: CA
-X-RootMTR: 20240225040629eucas1p12649e57aa00bbabc99c525b98eb74670
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240225040629eucas1p12649e57aa00bbabc99c525b98eb74670
-References: <20240225040538.845899-1-wenyang.linux@foxmail.com>
-	<CGME20240225040629eucas1p12649e57aa00bbabc99c525b98eb74670@eucas1p1.samsung.com>
-	<tencent_95D22FF919A42A99DA3C886B322CBD983905@qq.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAA93jw4DMnDMzzggDzBczvppgWWwu5tzcA=hOKOobVxJ7Se5xw@mail.gmail.com>
 
---xhnys3c7pu7tlmrh
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Sun, Feb 25, 2024 at 01:58:53PM -0500, Dave Taht wrote:
+> On Sun, Feb 25, 2024 at 1:36 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Fri, Feb 23, 2024 at 07:58:34AM -0500, Dave Taht wrote:
+> > > On Fri, Feb 23, 2024 at 3:59 AM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
+> > > >
+> > > > Hi Dave,
+> > > >
+> > > > We study the BQL recently.
+> > > >
+> > > > For virtio-net, the skb orphan mode is the problem for the BQL. But now, we have
+> > > > netdim, maybe it is time for a change. @Heng is working for the netdim.
+> > > >
+> > > > But the performance number from https://lwn.net/Articles/469652/ has not appeal
+> > > > to me.
+> > > >
+> > > > The below number is good, but that just work when the nic is busy.
+> > > >
+> > > >         No BQL, tso on: 3000-3200K bytes in queue: 36 tps
+> > > >         BQL, tso on: 156-194K bytes in queue, 535 tps
+> > >
+> > > That is data from 2011 against a gbit interface. Each of those BQL
+> > > queues is additive.
+> > >
+> > > > Or I miss something.
+> > >
+> > > What I see nowadays is 16+Mbytes vanishing into ring buffers and
+> > > affecting packet pacing, and fair queue and QoS behaviors. Certainly
+> > > my own efforts with eBPF and LibreQos are helping observability here,
+> > > but it seems to me that the virtualized stack is not getting enough
+> > > pushback from the underlying cloudy driver - be it this one, or nitro.
+> > > Most of the time the packet shaping seems to take place in the cloud
+> > > network or driver on a per-vm basis.
+> > >
+> > > I know that adding BQL to virtio has been tried before, and I keep
+> > > hoping it gets tried again,
+> > > measuring latency under load.
+> > >
+> > > BQL has sprouted some new latency issues since 2011 given the enormous
+> > > number of hardware queues exposed which I talked about a bit in my
+> > > netdevconf talk here:
+> > >
+> > > https://www.youtube.com/watch?v=rWnb543Sdk8&t=2603s
+> > >
+> > > I am also interested in how similar AI workloads are to the infamous
+> > > rrul test in a virtualized environment also.
+> > >
+> > > There is also AFAP thinking mis-understood-  with a really
+> > > mind-bogglingly-wrong application of it documented over here, where
+> > > 15ms of delay in the stack is considered good.
+> > >
+> > > https://github.com/cilium/cilium/issues/29083#issuecomment-1824756141
+> > >
+> > > So my overall concern is a bit broader than "just add bql", but in
+> > > other drivers, it was only 6 lines of code....
+> > >
+> > > > Thanks.
+> > > >
+> > >
+> > >
+> >
+> > It is less BQL it is more TCP small queues which do not
+> > seem to work well when your kernel isn't running part of the
+> > time because hypervisor scheduled it out. wireless has some
+> > of the same problem with huge variance in latency unrelated
+> > to load and IIRC worked around that by
+> > tuning socket queue size slightly differently.
+> 
+> Add that to the problems-with-virtualization list, then. :/
 
-On Sun, Feb 25, 2024 at 12:05:31PM +0800, wenyang.linux@foxmail.com wrote:
-> From: Wen Yang <wenyang.linux@foxmail.com>
->=20
-> The boundary check of multiple modules uses these static variables (such =
-as
-> two_five_five, n_65535, ue_int_max, etc), and they are also not changed.
-> Therefore, add them to the shared sysctl_vals and sysctl_long_vals to avo=
-id
-> duplication.
->=20
-> Also rearranged sysctl_vals and sysctl_long_vals in numerical order.
->=20
-> Signed-off-by: Wen Yang <wenyang.linux@foxmail.com>
-> Cc: Luis Chamberlain <mcgrof@kernel.org>
-> Cc: Kees Cook <keescook@chromium.org>
-> Cc: Joel Granados <j.granados@samsung.com>
-> Cc: Christian Brauner <brauner@kernel.org>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: David Ahern <dsahern@kernel.org>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> ---
->  include/linux/sysctl.h | 15 +++++++++------
->  kernel/sysctl.c        |  4 ++--
->  2 files changed, 11 insertions(+), 8 deletions(-)
->=20
-> diff --git a/include/linux/sysctl.h b/include/linux/sysctl.h
-> index ee7d33b89e9e..b7a13e4c411c 100644
-> --- a/include/linux/sysctl.h
-> +++ b/include/linux/sysctl.h
-> @@ -45,19 +45,22 @@ struct ctl_dir;
->  #define SYSCTL_FOUR			((void *)&sysctl_vals[4])
->  #define SYSCTL_ONE_HUNDRED		((void *)&sysctl_vals[5])
->  #define SYSCTL_TWO_HUNDRED		((void *)&sysctl_vals[6])
-> -#define SYSCTL_ONE_THOUSAND		((void *)&sysctl_vals[7])
-> -#define SYSCTL_THREE_THOUSAND		((void *)&sysctl_vals[8])
-> -#define SYSCTL_INT_MAX			((void *)&sysctl_vals[9])
-> +#define SYSCTL_U8_MAX			((void *)&sysctl_vals[7])
-> +#define SYSCTL_ONE_THOUSAND		((void *)&sysctl_vals[8])
-> +#define SYSCTL_THREE_THOUSAND		((void *)&sysctl_vals[9])
-> +#define SYSCTL_U16_MAX			((void *)&sysctl_vals[10])
-> +#define SYSCTL_INT_MAX			((void *)&sysctl_vals[11])
-> +#define SYSCTL_NEG_ONE			((void *)&sysctl_vals[12])
-> =20
->  /* this is needed for the proc_dointvec_minmax for [fs_]overflow UID and=
- GID */
-> -#define SYSCTL_MAXOLDUID		((void *)&sysctl_vals[10])
-> -#define SYSCTL_NEG_ONE			((void *)&sysctl_vals[11])
-> +#define SYSCTL_MAXOLDUID		SYSCTL_U16_MAX
-> =20
->  extern const int sysctl_vals[];
-> =20
->  #define SYSCTL_LONG_ZERO	((void *)&sysctl_long_vals[0])
->  #define SYSCTL_LONG_ONE		((void *)&sysctl_long_vals[1])
-> -#define SYSCTL_LONG_MAX		((void *)&sysctl_long_vals[2])
-> +#define SYSCTL_LONG_S32_MAX	((void *)&sysctl_long_vals[2])
-> +#define SYSCTL_LONG_MAX		((void *)&sysctl_long_vals[3])
-> =20
->  extern const unsigned long sysctl_long_vals[];
-> =20
-> diff --git a/kernel/sysctl.c b/kernel/sysctl.c
-> index 157f7ce2942d..e1e00937cb29 100644
-> --- a/kernel/sysctl.c
-> +++ b/kernel/sysctl.c
-> @@ -82,10 +82,10 @@
->  #endif
-> =20
->  /* shared constants to be used in various sysctls */
-> -const int sysctl_vals[] =3D { 0, 1, 2, 3, 4, 100, 200, 1000, 3000, INT_M=
-AX, 65535, -1 };
-> +const int sysctl_vals[] =3D { 0, 1, 2, 3, 4, 100, 200, U8_MAX, 1000, 300=
-0, 65535, INT_MAX, -1, };
-Why do you insert the new values instead of just appending?
-I figure that the patch would be much smaller if you appended.
+yep
 
->  EXPORT_SYMBOL(sysctl_vals);
-> =20
-> -const unsigned long sysctl_long_vals[] =3D { 0, 1, LONG_MAX };
-> +const unsigned long sysctl_long_vals[] =3D { 0, 1, S32_MAX, LONG_MAX, };
-Same here. Why insert instead of append?
->  EXPORT_SYMBOL_GPL(sysctl_long_vals);
-> =20
->  #if defined(CONFIG_SYSCTL)
-> --=20
-> 2.25.1
->=20
+for example, attempts to drop packets to fight bufferbloat do
+not work well because as you start dropping packets you have less
+work to do on host and so VM starts going even faster
+flooding you with even more packets.
 
---=20
+virtualization has to be treated more like userspace than like
+a physical machine.
 
-Joel Granados
 
---xhnys3c7pu7tlmrh
-Content-Type: application/pgp-signature; name="signature.asc"
+> I was
+> aghast at a fix jakub put in to kick things at 7ms that went by
+> recently.
 
------BEGIN PGP SIGNATURE-----
+which one is it?
 
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmXboDoACgkQupfNUreW
-QU/BSgv/XumlvLIqQzPZ2K8w08RnGaSRuoZb7SFKrMlCLvNKIEHUiqKoONhvu1S/
-lM+a2IGc9elUAMVlLdBslxR4FxHTOveKJgpTmrvuU3iPTHgU2l3ZTXtKzOWn2THT
-mFY8UpSgUBaU/kYb/aq+BgBcHmJcBmvlFjmghPHdcz7hxpfh/Qp0B+qPpl6g/PSp
-wl/QC/sJFjUggUTdUuEIJau5eL6xGmARCf5w8vVZUVxQvKQYO3F/epQXLNQNH7mD
-GP8IJbml9MZYM+kJ0NqWAMsOyjVqUqDDmTQhVXkqUVDkvUWHMOSndkcNk7hkNkG+
-klvjyMu3eyFdiPmwAOVH2/76xBU4TyoDsXrF6sWU5lkWFxLyEIeWvbpyTFsAZSGl
-9c+aSWaRK8agw3KBkJQBmxKpImO9yV0jDKVASo9fGGxoXvz0yL2USzonTJG7HF3w
-UNZKbYz+2brykoIga1OkjhSgo7Q41/ixzvOoFL83eiSGs2jDoTXeM6BUI+rpKe+w
-Ba4pv/mZ
-=Pa77
------END PGP SIGNATURE-----
+> Wireless is kind of an overly broad topic. I was (6 years ago) pretty
+> happy with all the fixes we put in there for WiFi softmac devices, the
+> mt76 and the new mt79 seem to be performing rather well. Ath9k is
+> still good, ath10k not horrible, I have no data about ath11k, and
+> let's not talk about the Broadcom nightmare.
+> 
+> This was still a pretty good day, in my memory:
+> https://forum.openwrt.org/t/aql-and-the-ath10k-is-lovely/59002
+> 
+> Is something else in wif igoing to hell? There are still, oh, 200
+> drivers left to fix. ENOFUNDING.
+> 
+> And so far as I know the 3GPP (5g) work is entirely out of tree and
+> almost entirely dpdk or ebpf?
+> 
+> >
+> >
+> > --
+> > MST
+> >
+> 
+> 
+> -- 
+> https://blog.cerowrt.org/post/2024_predictions/
+> Dave Täht CSO, LibreQos
 
---xhnys3c7pu7tlmrh--
 
