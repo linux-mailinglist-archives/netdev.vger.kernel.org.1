@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-74782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ECE1862C64
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 18:46:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3290862C63
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 18:46:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01467B20C1E
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 17:46:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D5011F22062
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 17:46:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4901E1B597;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7F51B810;
 	Sun, 25 Feb 2024 17:46:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dMMQ0/kS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="akrmxdAA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8577117BD6
-	for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 17:46:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3681B19BBA
+	for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 17:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708883193; cv=none; b=g2gg+wEnYqN3Iruwx7yDCV+5QiMKMmFNkrVBsZr45MJaAyiyqq/+Upqf87FVreaniOyqmnlfj7GlAL7H3eRNvSvHg+9BOzDfjggmPNcyfcbbQMBdqZscGqCUplSztXHFzENQJsZmpO7Bc84B7O/uwg6AmBEUKQq5+D1M7grdqEw=
+	t=1708883193; cv=none; b=GLtUftfmr39qdnqg5lZAGMoqZ7TNtyWCmbXLwRaHyjs+/UZqIxkBFVUAM855aEG8kYehWwJZwF3MHi6e2HxhXL3cCFHe0uaPZnfESU7AXMIR51Ddq8FDPT1UimW3pg4YBkycGRpKglh5gvIrr9RYTD3Noj6/EXQpY7ey1yr0s7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708883193; c=relaxed/simple;
-	bh=PX2GNCYHv6n1KXDu2ZDfzrozQFX7aIfSNoRfyRiEyIo=;
+	bh=7wAqg9foTIHMmx4OsmIdZ1GzxvWbzdvDTUIdriH5JmM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NmAKXK71v8bruoMoKYl/MB9VKfebfjpFDDDzv0waNFEJw6jc+ovIDOJFvX51MKW3gSrvVc8mq4MhjMXI0XWSpMFBaRQgs14w6L7c1LXVnvc4gGeHBUDEY+CW2aNY0CRCeae3+YrJ0dfftkF/nrWM3W5+E5JZRLd3W0bAV+lanLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dMMQ0/kS; arc=none smtp.client-ip=209.85.208.181
+	 MIME-Version; b=LNd3GtoV0OmG5SqZzrny65ZgXdel8DROqerADGuSlsjCXg9TLF1sqseTKQT4/hUJ/KUh2zv5p9XcbQhecrnb3YzSHglqLg9lqZyEJcds595ckN8mVzm7ubhjuR4NR4UJx0rDNUjsKgoCjbeTRkx0DaFoFcOtWoxl7oDVSno3q3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=akrmxdAA; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2d220e39907so40641411fa.1
-        for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 09:46:31 -0800 (PST)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-33d32f74833so1326742f8f.3
+        for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 09:46:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708883189; x=1709487989; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708883190; x=1709487990; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ow9Dqjj2Vt2O9LPzJjX4mqagWHoEa67N0WCC5IIwegE=;
-        b=dMMQ0/kSzPTFCIA2LPRKtoYDrDL2PbIpqUcR212xduNWt3bj9vKi7rJOuFMfF/W6kC
-         S7+k2duqP+cAUI7bFs7ZnD8PVx1Twuw0Af50DuMPbMuUwGPOE8EzN84d9k27cxAf2RbD
-         GoIPJJn0H4J4uZqkZ/sf+wzoRp4Bex1kRtdh0QxGLCCXZbkOXQt9AngFaEvhLCjJ3nmg
-         OGHB6KS8eqFxKMn5JrZV99/R+xIiGoOPmBD99WNdoLQUsa4Ax4RKhCWVLQeks3X9LzaB
-         nI8zN9hlD12YNcrKGmuVQ5y4bCC9kFg6NJZIq9xohxm6ji/uyJWVSSlYn4jNDLEDEQmH
-         1dRg==
+        bh=JgJVZsaQlQklBgNjFjDp6oBPw9KW1L83Q0alGDwej54=;
+        b=akrmxdAAbJoQR9C5sIzhLMOYBx90bVXXRMiHmVN9BdLTj5RHIx/R6iOseR0keIFYN6
+         hRw6iksTUkopa1CKgwz0hOcMlvaKuH56i3+e2ipvuULy3kJD6V70j4d9qo2zznP/EFnA
+         RhQdROJ/3VADf7SaoNoG8zlV8WNHYPawW55O8wCnjqZeARoKlR5b4GCHnefQ+WfRxbL3
+         ZUeegOyF2vdtUXFVyP8EOkhoI1ZraAinMPibsu3ot7r2uxALEjK65AgUPoNA7v1jX0vb
+         DJnuZIvIWBjeC8q0/plJGYAHxQGViayxinqx4/LwmPkKDYQZHwHifnFAY+2n538UlcEI
+         s/JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708883189; x=1709487989;
+        d=1e100.net; s=20230601; t=1708883190; x=1709487990;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ow9Dqjj2Vt2O9LPzJjX4mqagWHoEa67N0WCC5IIwegE=;
-        b=q0B5mJm9XgMuLgA6b6i+5AxjD7Je1DX5hqyp5vpOS3fQopFJ48vcV7s2OH34UmMdSs
-         7SQCAqiwaMUnBX3G+Lcqufy0UHbWiiA4SEz37s3Ua6h2nW4ywR6Dj69tvJgPL/q97MXE
-         yzW1q6eygPs9BGm/xvmzA6HS+bKIpKBN82PWLsiKzcvjo6iv/hmq2TFKOZ4NiWVPYpXa
-         j0GXmXUCBwFdNr/n9wlVSLW8fBJBwQzwQABbO0PeJLsMBwD3Wv/wMXGMXdsrW19gA0s4
-         sugY7HJE6ulz3o4rb3hh7wd2Rwa+4hQwG85VUnE/do1fcfbdcA6b5zNOhd9hUFKvg5QW
-         5Lvg==
-X-Gm-Message-State: AOJu0Yzg0xaGb1yuenWPGAHrC+OmcZygf2J52aEgquHFB3DE1n2ZI8cn
-	PtBZBxadbULPV4cGZazpjQ8xLrhAIZ2tE0KObUHyPRRyASmZkSQUpeHdhXg0YRg=
-X-Google-Smtp-Source: AGHT+IHvJIgvwiEzLDJQ0inAadiuNnm1LfFTy3pLlKcf+Wmcytfx3GyWgBA04akAA0UNEvpzWcIKPw==
-X-Received: by 2002:a05:651c:331:b0:2d2:4377:e9f3 with SMTP id b17-20020a05651c033100b002d24377e9f3mr2802519ljp.36.1708883188905;
-        Sun, 25 Feb 2024 09:46:28 -0800 (PST)
+        bh=JgJVZsaQlQklBgNjFjDp6oBPw9KW1L83Q0alGDwej54=;
+        b=cQ3XcrGubIlwrw9YRgy3Do/giEqv51FNBcna01HMuD6Ygag7aUW4V8RRAL5Xmweh4N
+         OFPesGQgB85I5wwNCSy7yzVB72feNh3evkbtawqhq6FSB2LLcYKC6USSw61BAIuVPmoJ
+         Q5mkke7qJx/BoMIQimikSjDUDp7BDAkkSQ9H8Rrcg6n6790TiLoNQ29SXTOybT8PpJmI
+         GfqIiLY0Qxj7ovx8LDyMOWKn06+b1ITNA4QlRCOhButDP+Np7Hf1bNVyfF2jAhwm2TZi
+         rHDZw37NhogDGStYe4HYoVXbPD+O4GfoDMJc0vIMvMBPqLlwHOJxFzFcNH3FTcf0HAO6
+         gF8g==
+X-Gm-Message-State: AOJu0YysGnbkQrockcMuaHV/c9sQOp2oSWUD56+ssxpIKpvvShMKWQCp
+	P6l+SV75mHK5xp12SNcVSJzch2p5ulmoHKH1C1xjtBO1+Mr3lbTXdBbtJmS238c=
+X-Google-Smtp-Source: AGHT+IGImNXWxkV4fXyqi6RrpEBzIqmZgFgT3YbLWpqU/hBlz5s8mLfKbrxSQZ83nxdbRwdvFTdUdQ==
+X-Received: by 2002:adf:cd89:0:b0:33d:3830:769c with SMTP id q9-20020adfcd89000000b0033d3830769cmr3325376wrj.65.1708883190253;
+        Sun, 25 Feb 2024 09:46:30 -0800 (PST)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:907c:51fb:7b4f:c84f])
-        by smtp.gmail.com with ESMTPSA id r2-20020adff702000000b0033b60bad2fcsm5558729wrp.113.2024.02.25.09.46.27
+        by smtp.gmail.com with ESMTPSA id r2-20020adff702000000b0033b60bad2fcsm5558729wrp.113.2024.02.25.09.46.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Feb 2024 09:46:28 -0800 (PST)
+        Sun, 25 Feb 2024 09:46:29 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -77,9 +77,9 @@ To: netdev@vger.kernel.org,
 	Stanislav Fomichev <sdf@google.com>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [RFC net-next 2/4] tools/net/ynl: Extract message encoding into _encode_message()
-Date: Sun, 25 Feb 2024 17:46:17 +0000
-Message-ID: <20240225174619.18990-3-donald.hunter@gmail.com>
+Subject: [RFC net-next 3/4] tools/net/ynl: Add batch message encoding for nftables
+Date: Sun, 25 Feb 2024 17:46:18 +0000
+Message-ID: <20240225174619.18990-4-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240225174619.18990-1-donald.hunter@gmail.com>
 References: <20240225174619.18990-1-donald.hunter@gmail.com>
@@ -91,47 +91,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Make the message encoding a separate method so that it can be reused for
-encoding batch messages.
+The nftables families use batch operations for create, update and delete
+operations. For ops that have 'is-batch: true' wrap them in begin-batch
+and end-batch messages.
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- tools/net/ynl/lib/ynl.py | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ tools/net/ynl/lib/ynl.py | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
 diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index ac55aa5a3083..c6fc9588c235 100644
+index c6fc9588c235..3a4af3c5a6a7 100644
 --- a/tools/net/ynl/lib/ynl.py
 +++ b/tools/net/ynl/lib/ynl.py
-@@ -831,6 +831,16 @@ class YnlFamily(SpecFamily):
+@@ -841,6 +841,12 @@ class YnlFamily(SpecFamily):
+         msg = _genl_msg_finalize(msg)
+         return msg
  
-       return op['do']['request']['attributes'].copy()
- 
-+    def _encode_message(self, op, vals, nl_flags, req_seq):
-+        msg = self.nlproto.message(nl_flags, op.req_value, 1, req_seq)
-+        if op.fixed_header:
-+            msg += self._encode_struct(op.fixed_header, vals)
-+        search_attrs = SpaceAttrs(op.attr_set, vals)
-+        for name, value in vals.items():
-+            msg += self._add_attr(op.attr_set.name, name, value, search_attrs)
-+        msg = _genl_msg_finalize(msg)
-+        return msg
++    def _encode_batch_message(self, name, nl_flags, req_seq):
++        msg = self.yaml.get('operations').get(name)
++        op = self.ops[msg['operation']]
++        params = msg['parameters']
++        return self._encode_message(op, params, nl_flags, req_seq)
 +
      def _op(self, method, vals, flags=None, dump=False):
          op = self.ops[method]
  
-@@ -841,13 +851,7 @@ class YnlFamily(SpecFamily):
+@@ -851,7 +857,16 @@ class YnlFamily(SpecFamily):
              nl_flags |= Netlink.NLM_F_DUMP
  
          req_seq = random.randint(1024, 65535)
--        msg = self.nlproto.message(nl_flags, op.req_value, 1, req_seq)
--        if op.fixed_header:
--            msg += self._encode_struct(op.fixed_header, vals)
--        search_attrs = SpaceAttrs(op.attr_set, vals)
--        for name, value in vals.items():
--            msg += self._add_attr(op.attr_set.name, name, value, search_attrs)
--        msg = _genl_msg_finalize(msg)
-+        msg = self._encode_message(op, vals, nl_flags, req_seq)
+-        msg = self._encode_message(op, vals, nl_flags, req_seq)
++        msg = b''
++
++        is_batch = op['do']['request'].get('is-batch', False)
++        if is_batch:
++            msg += self._encode_batch_message('begin-batch', nl_flags, req_seq)
++
++        msg += self._encode_message(op, vals, nl_flags, req_seq)
++
++        if is_batch:
++            msg += self._encode_batch_message('end-batch', nl_flags, req_seq)
  
          self.sock.send(msg, 0)
  
