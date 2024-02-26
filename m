@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-75108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 787E58682E6
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 22:21:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09AA58682E7
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 22:21:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CE391F26BB6
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 21:21:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B93C228ED02
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 21:21:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94ECB132496;
-	Mon, 26 Feb 2024 21:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06040132C05;
+	Mon, 26 Feb 2024 21:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sAqZglSP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cZ61sV2L"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72508132492
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E1913249E
 	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 21:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708982432; cv=none; b=JgMPJx7HpAz084DWMKHkpBmEED2guzX8uiWE5JSxH2fBHvwCRvqzPZzeanTd9bDKEYPkosKcwM2ZJCuA5zb3jYbbD4xWlP+79rgUxIFUMP1OfeArMtfF2fnaOoDPN4ckHvftirPbmHQCLYQwfu1EwcDa0kYiWCqQbSYy5HfIDQU=
+	t=1708982432; cv=none; b=ny/9L/91nkvo+kPuHMoWEVKtYXRjiwr42nScFs2ar0IzFaF/0+l/K47JeYlpEjO2BgnvD4nmc1NhNCP4CmAnq0cvkxfpeBvG/LR1kjsGRaK6ljhZ9gN0FfuXmfD3a7KmljWu+YjtZd7gcJ30pBQbZsWgMyq1+VZ7IB8y/9xknCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708982432; c=relaxed/simple;
-	bh=4FabDURe3ntQWAuyxcLjrVcZ4MxY8gqndiSSoEAy3N4=;
+	bh=PlfHzNmd4dYl4oxIug3qxbLXKp1/3CNg0f3QgWBvvEQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mJRtmGj4jk4a9Kk0VYVh/YGF5ZOGMZ+j4le6w4JKi+79YJhHdLr7xBfi5ER8ICvwyN38oKkJNhSpOaRwFFMv2tVcovM3xOivvW/99o8hKxIhDiyk+FOhoqi0ewjlEPQxafU3CCG8w83qNAp3cwrrHwHJBeWDSq73kD0HAvQimU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sAqZglSP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04165C43399;
-	Mon, 26 Feb 2024 21:20:31 +0000 (UTC)
+	 MIME-Version; b=d9amc5LC99I/P1jFarstag4G7Z5kab71dio5KZHA9NHtfFXqQqo2hbTsglsafQYA54FGNFLRAMpYbaELggD8xCn09x0wTm5yJZxJ9sqYBpYe/IdO8G70xFrkfL7yBfwGpOwdTktuDuo0GxDsc4GEYpBuVqSH0LWT2pjrV3s8Ti4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cZ61sV2L; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 714CCC433A6;
+	Mon, 26 Feb 2024 21:20:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708982432;
-	bh=4FabDURe3ntQWAuyxcLjrVcZ4MxY8gqndiSSoEAy3N4=;
+	bh=PlfHzNmd4dYl4oxIug3qxbLXKp1/3CNg0f3QgWBvvEQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sAqZglSP+kikXyBpsdV5PHe6yAaAs5K/jUR0Nhx+3lxkvGLsnjTdPNS9N7eHJbG3i
-	 7+WuSwvtIQ00ikV5OvbREgx4KbTHUqOQKoyNa0+LLA+M7J78XRM/BVdlLxDgiBo7h/
-	 zRhKGd2Ze4OSy591cdtR6WSEbJHiAjgW6G8VSdPartokNDqM4WPhL1Y0ZLi+ybSJG9
-	 6dRfoVjkXduzl+UUqc0CExpg0GnCjdj0lHONlVo5w7MPcTTvTY7floiM5aERSCABcC
-	 XqwdjQOWoDBBCvezmfbpaUsiHbpdDHbNj2lhzmI3aNoEXlF/bW/8OSAxRfLc4XK5Wu
-	 3LfOC8VokDvLA==
+	b=cZ61sV2LdHchmz7NxoFX7NYPcLnnozPNzmMkb3fq0vJpINszal6abEH+mZDWiZ9rp
+	 4kfY62b4fi+j8k8M64YryA5L7fb7QW5GBX2EUz9IOoKpADuZDAPdXPxCjBV6n+cPQi
+	 Mbzkukw8Gjkl8VlTk5tz+muZCgJCHsRYIa8pZjrmw59qSfinMkbBi20HuUXaelXHFU
+	 NaGTu7RYQz/bsZAAxHW8p1oDsD/nRtSf5cZWZrGWXnZLyK5jWml8dlEZSZH9vMVZDI
+	 iyA8KQkyTLJIKSswjiUCqJPzNZZ5i4NA78/cnuiT+pyC7GSIqATzr1YUqB6/eEjYAl
+	 /ES8S8j5p2gRw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: netdev@vger.kernel.org,
 	jiri@resnulli.us,
 	sdf@google.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 09/15] tools: ynl: use ynl_sock_read_msgs() for ACK handling
-Date: Mon, 26 Feb 2024 13:20:15 -0800
-Message-ID: <20240226212021.1247379-10-kuba@kernel.org>
+Subject: [PATCH net-next v2 10/15] tools: ynl: stop using mnl_cb_run2()
+Date: Mon, 26 Feb 2024 13:20:16 -0800
+Message-ID: <20240226212021.1247379-11-kuba@kernel.org>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20240226212021.1247379-1-kuba@kernel.org>
 References: <20240226212021.1247379-1-kuba@kernel.org>
@@ -65,83 +65,134 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ynl_recv_ack() is simple and it's the only user of mnl_cb_run().
-Now that ynl_sock_read_msgs() exists it's actually less code
-to use ynl_sock_read_msgs() instead of being special.
+There's only one set of callbacks in YNL, for netlink control
+messages, and most of them are trivial. So implement the message
+walking directly without depending on mnl_cb_run2().
 
-Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+--
+v2:
+ - fold NLMSG_NEXT(nlh, rem) into the for () statement
 ---
- tools/net/ynl/lib/ynl-priv.h |  3 ---
- tools/net/ynl/lib/ynl.c      | 34 ++++++++++++++--------------------
- 2 files changed, 14 insertions(+), 23 deletions(-)
+ tools/net/ynl/lib/ynl.c | 63 ++++++++++++++++++++++++++++-------------
+ tools/net/ynl/lib/ynl.h |  1 +
+ 2 files changed, 45 insertions(+), 19 deletions(-)
 
-diff --git a/tools/net/ynl/lib/ynl-priv.h b/tools/net/ynl/lib/ynl-priv.h
-index 59e9682ce2a9..310302e48f61 100644
---- a/tools/net/ynl/lib/ynl-priv.h
-+++ b/tools/net/ynl/lib/ynl-priv.h
-@@ -90,9 +90,6 @@ ynl_gemsg_start_dump(struct ynl_sock *ys, __u32 id, __u8 cmd, __u8 version);
- 
- int ynl_attr_validate(struct ynl_parse_arg *yarg, const struct nlattr *attr);
- 
--int ynl_recv_ack(struct ynl_sock *ys, int ret);
--int ynl_cb_null(const struct nlmsghdr *nlh, void *data);
--
- /* YNL specific helpers used by the auto-generated code */
- 
- struct ynl_req_state {
 diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
-index 7c0f404526a0..f830990b3f4a 100644
+index f830990b3f4a..fd658aaff345 100644
 --- a/tools/net/ynl/lib/ynl.c
 +++ b/tools/net/ynl/lib/ynl.c
-@@ -462,26 +462,7 @@ ynl_gemsg_start_dump(struct ynl_sock *ys, __u32 id, __u8 cmd, __u8 version)
- 			       cmd, version);
+@@ -255,10 +255,10 @@ ynl_ext_ack_check(struct ynl_sock *ys, const struct nlmsghdr *nlh,
+ 	return MNL_CB_OK;
  }
  
--int ynl_recv_ack(struct ynl_sock *ys, int ret)
+-static int ynl_cb_error(const struct nlmsghdr *nlh, void *data)
++static int
++ynl_cb_error(const struct nlmsghdr *nlh, struct ynl_parse_arg *yarg)
+ {
+ 	const struct nlmsgerr *err = ynl_nlmsg_data(nlh);
+-	struct ynl_parse_arg *yarg = data;
+ 	unsigned int hlen;
+ 	int code;
+ 
+@@ -275,9 +275,8 @@ static int ynl_cb_error(const struct nlmsghdr *nlh, void *data)
+ 	return code ? MNL_CB_ERROR : MNL_CB_STOP;
+ }
+ 
+-static int ynl_cb_done(const struct nlmsghdr *nlh, void *data)
++static int ynl_cb_done(const struct nlmsghdr *nlh, struct ynl_parse_arg *yarg)
+ {
+-	struct ynl_parse_arg *yarg = data;
+ 	int err;
+ 
+ 	err = *(int *)NLMSG_DATA(nlh);
+@@ -292,18 +291,6 @@ static int ynl_cb_done(const struct nlmsghdr *nlh, void *data)
+ 	return MNL_CB_STOP;
+ }
+ 
+-static int ynl_cb_noop(const struct nlmsghdr *nlh, void *data)
 -{
--	struct ynl_parse_arg yarg = { .ys = ys, };
--
--	if (!ret) {
--		yerr(ys, YNL_ERROR_EXPECT_ACK,
--		     "Expecting an ACK but nothing received");
--		return -1;
--	}
--
--	ret = mnl_socket_recvfrom(ys->sock, ys->rx_buf, MNL_SOCKET_BUFFER_SIZE);
--	if (ret < 0) {
--		perr(ys, "Socket receive failed");
--		return ret;
--	}
--	return mnl_cb_run(ys->rx_buf, ret, ys->seq, ys->portid,
--			  ynl_cb_null, &yarg);
+-	return MNL_CB_OK;
 -}
 -
--int ynl_cb_null(const struct nlmsghdr *nlh, void *data)
-+static int ynl_cb_null(const struct nlmsghdr *nlh, void *data)
+-static mnl_cb_t ynl_cb_array[NLMSG_MIN_TYPE] = {
+-	[NLMSG_NOOP]	= ynl_cb_noop,
+-	[NLMSG_ERROR]	= ynl_cb_error,
+-	[NLMSG_DONE]	= ynl_cb_done,
+-	[NLMSG_OVERRUN]	= ynl_cb_noop,
+-};
+-
+ /* Attribute validation */
+ 
+ int ynl_attr_validate(struct ynl_parse_arg *yarg, const struct nlattr *attr)
+@@ -475,14 +462,52 @@ static int ynl_cb_null(const struct nlmsghdr *nlh, void *data)
+ static int ynl_sock_read_msgs(struct ynl_parse_arg *yarg, mnl_cb_t cb)
  {
- 	struct ynl_parse_arg *yarg = data;
+ 	struct ynl_sock *ys = yarg->ys;
+-	ssize_t len;
++	const struct nlmsghdr *nlh;
++	ssize_t len, rem;
++	int ret;
  
-@@ -504,6 +485,19 @@ static int ynl_sock_read_msgs(struct ynl_parse_arg *yarg, mnl_cb_t cb)
- 			   cb, yarg, ynl_cb_array, NLMSG_MIN_TYPE);
- }
+ 	len = mnl_socket_recvfrom(ys->sock, ys->rx_buf, MNL_SOCKET_BUFFER_SIZE);
+ 	if (len < 0)
+ 		return len;
  
-+static int ynl_recv_ack(struct ynl_sock *ys, int ret)
-+{
-+	struct ynl_parse_arg yarg = { .ys = ys, };
+-	return mnl_cb_run2(ys->rx_buf, len, ys->seq, ys->portid,
+-			   cb, yarg, ynl_cb_array, NLMSG_MIN_TYPE);
++	ret = MNL_CB_STOP;
++	for (rem = len; rem > 0; NLMSG_NEXT(nlh, rem)) {
++		nlh = (struct nlmsghdr *)&ys->rx_buf[len - rem];
++		if (!NLMSG_OK(nlh, rem)) {
++			yerr(yarg->ys, YNL_ERROR_INV_RESP,
++			     "Invalid message or trailing data in the response.");
++			return MNL_CB_ERROR;
++		}
 +
-+	if (!ret) {
-+		yerr(ys, YNL_ERROR_EXPECT_ACK,
-+		     "Expecting an ACK but nothing received");
-+		return -1;
++		if (nlh->nlmsg_flags & NLM_F_DUMP_INTR) {
++			/* TODO: handle this better */
++			yerr(yarg->ys, YNL_ERROR_DUMP_INTER,
++			     "Dump interrupted / inconsistent, please retry.");
++			return MNL_CB_ERROR;
++		}
++
++		switch (nlh->nlmsg_type) {
++		case 0:
++			yerr(yarg->ys, YNL_ERROR_INV_RESP,
++			     "Invalid message type in the response.");
++			return MNL_CB_ERROR;
++		case NLMSG_NOOP:
++		case NLMSG_OVERRUN ... NLMSG_MIN_TYPE - 1:
++			ret = MNL_CB_OK;
++			break;
++		case NLMSG_ERROR:
++			ret = ynl_cb_error(nlh, yarg);
++			break;
++		case NLMSG_DONE:
++			ret = ynl_cb_done(nlh, yarg);
++			break;
++		default:
++			ret = cb(nlh, yarg);
++			break;
++		}
 +	}
 +
-+	return ynl_sock_read_msgs(&yarg, ynl_cb_null);
-+}
-+
- /* Init/fini and genetlink boiler plate */
- static int
- ynl_get_family_info_mcast(struct ynl_sock *ys, const struct nlattr *mcasts)
++	return ret;
+ }
+ 
+ static int ynl_recv_ack(struct ynl_sock *ys, int ret)
+diff --git a/tools/net/ynl/lib/ynl.h b/tools/net/ynl/lib/ynl.h
+index ce77a6d76ce0..4849c142fce0 100644
+--- a/tools/net/ynl/lib/ynl.h
++++ b/tools/net/ynl/lib/ynl.h
+@@ -12,6 +12,7 @@ enum ynl_error_code {
+ 	YNL_ERROR_NONE = 0,
+ 	__YNL_ERRNO_END = 4096,
+ 	YNL_ERROR_INTERNAL,
++	YNL_ERROR_DUMP_INTER,
+ 	YNL_ERROR_EXPECT_ACK,
+ 	YNL_ERROR_EXPECT_MSG,
+ 	YNL_ERROR_UNEXPECT_MSG,
 -- 
 2.43.2
 
