@@ -1,132 +1,204 @@
-Return-Path: <netdev+bounces-74879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02E4E8672BF
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:14:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F11798672C0
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:15:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7888B2AF4A
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:33:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D3CBB2F20B
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C46D31D52B;
-	Mon, 26 Feb 2024 10:19:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA7653375;
+	Mon, 26 Feb 2024 10:29:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fXHeBuy+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V2GhjPKz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306091D54B
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 10:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C19A5336E
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 10:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708942777; cv=none; b=IUj7Ch+3n6SHMktsxlaO4njBaE5FdVWXZF+1wJkblJH43FeDj5QXihuc3Tb2W14jlHdKgk2soUEBFr8mdkNRJYlUZjoa7D+bSbMCxJDhfXTUqEIInWKLtm5SNh9lVsmug+m9sxNa3d2oX2B7pme9vVFfIL7OxIvRuRupJlcpfPE=
+	t=1708943366; cv=none; b=r4EL+gDQWn2SHnQiPo5LJ6spYOOz0nxeToroe872xGk2Lg78zthiPipijaCMyBQ54rAlQP8y/gGsPHjDV7XCoo04NIdlHhFBIyyP5xqsQUJNQqGQKvuKwvASw5wZrHHngCubg2IrkPhJMpbnwKK/DXSDXeg5/cGyLPOdm2qhZv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708942777; c=relaxed/simple;
-	bh=LiSkPDsK0YRKQ2b62s4C2k2tHtSyGqvlAWpIA/tkZq8=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=UkLWFc2Rt5TeJ6FiunW1no4r3s/7WqPMv8lr1Z3iCN40WJPAG7XiAzTttPdbMzBEzBKdZy1RAjTHapVFGfkxNK+4gTfDxQRfLAtOW2rAICaiHX1o8l6t8BIDSIZAoacJh9/6DmvfBrNcKl/EpQxwax0MEUEq3mJtSMMOEt0W3aY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fXHeBuy+; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a3fb8b0b7acso362961666b.2
-        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 02:19:34 -0800 (PST)
+	s=arc-20240116; t=1708943366; c=relaxed/simple;
+	bh=j8vs2kYNqidZarWFkHkNVn2iIvZToZdN0qkN5+xNYUA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=imKVYGOvct9bKa23CQH0juZ8u+dytvxglCev157ncKSjzqHSoZ/W78oCL80tFjmtPkyNCtAHebGmhYkEXjZqtAIHga6h0bdHiHZMLKtNgD+KY+91ZXevN0/CR2G+in/7yUjKo4/Eqjagw3YYNF0vej/vVCSMEratbSG+XGzdNKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V2GhjPKz; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5654ef0c61fso15352a12.0
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 02:29:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708942773; x=1709547573; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hl30HSs8opuKoFzq4M/y4nKYc0opbCv/ypBIuWYZOgc=;
-        b=fXHeBuy+bdrfd7r3pZO/+gOUQdU87jbwno2VSiCQNC9hnjiA0fqmiU2sHIdnw+duSs
-         P2AFx4OfuvRiRVgNEfNRKSoUEJJHJTf9h5ra8xsbQbjJ4JiNrt0Qvxr9UEGwV0cysxid
-         qyIqDi0nMWPnDlytLJoPkYP/LzZtXtpFflA31LWB2it1LKT3Ja/SkpoLauL0izrNFyEB
-         mMGapA+JSlB7qzFjiU4CzH0tL9LDIaXPL0Kx4GT6FkQWZLuTBKCBsXrUuRqURcb4rgwy
-         oeXrvjMFUcMGhCgdp+RdexGUVLa14ilHKsqtGQDnPmsVYdcXkUlvH/bHtVc3c5KsfF+V
-         yjcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708942773; x=1709547573;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1708943362; x=1709548162; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Hl30HSs8opuKoFzq4M/y4nKYc0opbCv/ypBIuWYZOgc=;
-        b=IS1UL6OL1lbfMJQ8+9OIR/eBGYcmMeGUWjzh5B4Q1mIUjyW17RgmWw24DGJsRbkkhw
-         6JJcp6vHPVuBkPeXGTu9G2cUBP4Z7ZY8yR0Gso1DQZGa3C16Y1eypJDJ3IvtqKf6ZOYQ
-         4RPASmBTqKt2fQFzYdMZgnLhB1+cDQZtLy8fkO1QAmBP36BQSy9Beg4ImoI74tyk6wHW
-         c1gL1XMklFlTKTLKkeZsP3qmfstnAg/46kFJkFY/x+EnvMBEWrNehSyVxVbdyl4vguP8
-         Ly0GJj7KwVB0uT8Kop5mYcGv9ZyV0e3Angx1xEY3LWceeMT2jmr/osm0HKEDYJAvxDl1
-         gGoA==
-X-Forwarded-Encrypted: i=1; AJvYcCV0SQoWdY/sQx7tzakrCuLVsLDUs+FQQizlMujgv9m6cSSfjy4gT3Up9ob9nyL2p0ADvn3jIpRnM8bYrkgyCenCmoPRsdh4
-X-Gm-Message-State: AOJu0Yx1hKfqiryjMJWcTOvPHVvkjb1n3Gftz0K9uJQjZv6yQoTFRj/H
-	7/YnRWd7KeNRWswU/VdqF5meCWcsa7IXMNrFg1ll6tVdgJkCxLed
-X-Google-Smtp-Source: AGHT+IGsSFDGhAzE9sBukMit+zs1dWO5zlIZfEAGDZWGX0g3ueTV/AlZsfphxTPZgvP9LWSFJry81w==
-X-Received: by 2002:a17:906:6d8c:b0:a3d:9ed3:dd1f with SMTP id h12-20020a1709066d8c00b00a3d9ed3dd1fmr4339226ejt.18.1708942773132;
-        Mon, 26 Feb 2024 02:19:33 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:ac76:79a7:ef5d:d314])
-        by smtp.gmail.com with ESMTPSA id r5-20020a170906280500b00a3e0b7e7217sm2264888ejc.48.2024.02.26.02.19.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 02:19:32 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,  Jakub Kicinski
- <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
-  netdev@vger.kernel.org,  Ido Schimmel <idosch@nvidia.com>,  Jiri Pirko
- <jiri@nvidia.com>,  eric.dumazet@gmail.com
-Subject: Re: [PATCH v2 net-next 01/14] rtnetlink: prepare nla_put_iflink()
- to run under RCU
-In-Reply-To: <CANn89i+PPT7QDQKs9c-fUeshr_+Heh_mCLfFxwCEtbnUM5fjxA@mail.gmail.com>
-	(Eric Dumazet's message of "Sat, 24 Feb 2024 12:08:56 +0100")
-Date: Mon, 26 Feb 2024 08:59:47 +0000
-Message-ID: <m2bk83ob24.fsf@gmail.com>
-References: <20240222105021.1943116-1-edumazet@google.com>
-	<20240222105021.1943116-2-edumazet@google.com>
-	<m2wmqvqpex.fsf@gmail.com>
-	<CANn89i+UXeRoG4yMF+xYVDDNv-j2iZYTwUogQWsHk_OiDwoukA@mail.gmail.com>
-	<CAD4GDZyV5H4RK_8H2CiUfEj_DSu=w12HqeCzy+2mmu3cMivGww@mail.gmail.com>
-	<CANn89i+PPT7QDQKs9c-fUeshr_+Heh_mCLfFxwCEtbnUM5fjxA@mail.gmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        bh=+9LBZSvHXbFImgyGtsmIfeO7+emcfrVlLTSHoyquOhU=;
+        b=V2GhjPKze02j75RwUxXRdFvDaAyVns3p4JoF2SfROBj6oBvTAjQyJmXD7j8EUoiPts
+         XDwm38iLP/HiYVPZGypvUXPuXfJQ4a/e/ioAfUNfjeFIr7P27ytyqzPZnl4XteClNEV9
+         VYXqK9Nie+OzBF3v9iJPBiAeyX6p0CRoi502zjiBthaGmAFjNn57DmB6uyFff8nPsH9P
+         NVLzpuCrmJeqtU6Un+azJzLOwu7ylSc8tcDgTb2o3Mcl6bmz2bSKML9cHsXxAzgy0fu7
+         lKaYUSbdJ6JdX+L1k1w0ANUo10e9r7lpX99H9carH7fpBVOa94O9ON4+yJOC2tJnNZ/c
+         ByDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708943362; x=1709548162;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+9LBZSvHXbFImgyGtsmIfeO7+emcfrVlLTSHoyquOhU=;
+        b=tsys9OISO2U+TDBVbKkF+AkZFj4otSMdLgcUrbr6LYM7qrRpRr+HqMVGIBLFa0VCHP
+         jl51s432FbZibEtI1WBWwrr/YOBf2SfJcRQuR6QPAOoIuhzyl8ijAmqTJjZZ1Lf7tDKF
+         jw2j14dW/s+ht7L8rXDWZeCq9wKt3HQqpYaGDs70cWeHhXdsYc+kzd73afCvF8hTl82A
+         Lah3uTKi7PRGLWFbBpfb+xBJO4nZHy2rYgJCJtSHVadGNEOMyxfhaC9Lb9WoH7LHcgdY
+         A2AFfVjXZbqmzVRsNNHgPbB10e9glh1DTiVWXhrFWklhvkc27qe/fN+0XtQzLa7jmkLN
+         19QQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUK2S++/TU0RRJgiMGwCoA6WAr+Jz+ckmUTozEp6+Dxtf3Vh8qn1nG0Hn4fJ6WfNvh33jUCu9m8lHy2j4pFxL1f3H1SW6jW
+X-Gm-Message-State: AOJu0YyLCtqx7iquS6QT/mn5lZmTIOZ4IXFOBsU+JX1cO04W8uGCD9EY
+	FHMQxSQoTBdxZZCSysPAmqNz0D2WoLQYGbyiMlrdKBxVR/Hf/krftSUXQ79axgztJdfhxZLhQgk
+	JezcKQMsfxl6jtZsdALBCnDW1GBjYMFkfO2Qx
+X-Google-Smtp-Source: AGHT+IFKz46PFB51fdJ85PXmyLQGXMahOGGYRTDTtbRxiAG3nY7eMN8+lnfxZ63efS90ND8l5xonPPcns8ila5ukGns=
+X-Received: by 2002:a50:a6d7:0:b0:565:4b98:758c with SMTP id
+ f23-20020a50a6d7000000b005654b98758cmr279364edc.4.1708943362220; Mon, 26 Feb
+ 2024 02:29:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240220021804.9541-1-shijie@os.amperecomputing.com>
+ <CANn89iJoHDzfYfhcwVvR4m7DiVG-UfFNqm+D1WD-2wjOttk6ew@mail.gmail.com>
+ <bea860f8-a196-4dff-a655-4da920e2ebfa@amperemail.onmicrosoft.com>
+ <CANn89i+1uMAL_025rNc3C1Ut-E5S8Nat6KhKEzcFeC1xxcFWaA@mail.gmail.com>
+ <c2bd73b6-b21f-4ad8-a176-eec677bc6cf3@amperemail.onmicrosoft.com>
+ <CANn89i+Cr1Tbdxqy6fB-sOLca+AHFc-3-0xGktVUsQFFMVsC0A@mail.gmail.com> <bd0a9d66-783d-4936-a5b0-cd4082704137@kernel.org>
+In-Reply-To: <bd0a9d66-783d-4936-a5b0-cd4082704137@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 26 Feb 2024 11:29:07 +0100
+Message-ID: <CANn89iKJtLZFjY_kYhV5NcgKiAkhi_stftvai1dCwQLMOLea6g@mail.gmail.com>
+Subject: Re: [PATCH] net: skbuff: allocate the fclone in the current NUMA node
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: aleksander.lobakin@intel.com, 
+	Shijie Huang <shijie@amperemail.onmicrosoft.com>, 
+	Huang Shijie <shijie@os.amperecomputing.com>, kuba@kernel.org, 
+	patches@amperecomputing.com, davem@davemloft.net, horms@kernel.org, 
+	ast@kernel.org, dhowells@redhat.com, linyunsheng@huawei.com, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	cl@os.amperecomputing.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Eric Dumazet <edumazet@google.com> writes:
->>
->> And use of them here:
->>
->> > diff --git a/drivers/net/can/vxcan.c b/drivers/net/can/vxcan.c
->> > index 98c669ad5141479b509ee924ddba3da6bca554cd..f7fabba707ea640cab8863e63bb19294e333ba2c 100644
->> > --- a/drivers/net/can/vxcan.c
->> > +++ b/drivers/net/can/vxcan.c
->> > @@ -119,7 +119,7 @@ static int vxcan_get_iflink(const struct net_device *dev)
->> >
->> >       rcu_read_lock();
->> >       peer = rcu_dereference(priv->peer);
->> > -     iflink = peer ? peer->ifindex : 0;
->> > +     iflink = peer ? READ_ONCE(peer->ifindex) : 0;
->> >       rcu_read_unlock();
->> >
->> >       return iflink;
->>
->>
->> > We do not need an rcu_read_lock() only to fetch dev->ifindex, if this
->> > is what concerns you.
->>
->> In which case, it seems that no .ndo_get_iflink implementations should
->> need the rcu_read_* calls?
+On Mon, Feb 26, 2024 at 11:18=E2=80=AFAM Jesper Dangaard Brouer <hawk@kerne=
+l.org> wrote:
 >
-> rcu_read_lock() is needed in all cases a dereference is performed,
-> expecting RCU protection of the pointer.
 >
-> In vxcan_get_iflink(), we access priv->peer, then peer->ifindex.
 >
-> rcu_read_lock() is needed because of the second dereference, peer->ifindex.
+> On 24/02/2024 20.07, Eric Dumazet wrote:
+> > On Tue, Feb 20, 2024 at 9:37=E2=80=AFAM Shijie Huang
+> > <shijie@amperemail.onmicrosoft.com> wrote:
+> >>
+> >>
+> >> =E5=9C=A8 2024/2/20 16:17, Eric Dumazet =E5=86=99=E9=81=93:
+> >>> On Tue, Feb 20, 2024 at 7:26=E2=80=AFAM Shijie Huang
+> >>> <shijie@amperemail.onmicrosoft.com> wrote:
+> >>>>
+> >>>> =E5=9C=A8 2024/2/20 13:32, Eric Dumazet =E5=86=99=E9=81=93:
+> >>>>> On Tue, Feb 20, 2024 at 3:18=E2=80=AFAM Huang Shijie
+> >>>>> <shijie@os.amperecomputing.com> wrote:
+> >>>>>> The current code passes NUMA_NO_NODE to __alloc_skb(), we found
+> >>>>>> it may creates fclone SKB in remote NUMA node.
+> >>>>> This is intended (WAI)
+> >>>> Okay. thanks a lot.
+> >>>>
+> >>>> It seems I should fix the issue in other code, not the networking.
+> >>>>
+> >>>>> What about the NUMA policies of the current thread ?
+> >>>> We use "numactl -m 0" for memcached, the NUMA policy should allocate
+> >>>> fclone in
+> >>>>
+> >>>> node 0, but we can see many fclones were allocated in node 1.
+> >>>>
+> >>>> We have enough memory to allocate these fclones in node 0.
+> >>>>
+> >>>>> Has NUMA_NO_NODE behavior changed recently?
+> >>>> I guess not.
+> >>>>> What means : "it may creates" ? Please be more specific.
+> >>>> When we use the memcached for testing in NUMA, there are maybe 20% ~=
+ 30%
+> >>>> fclones were allocated in
+> >>>>
+> >>>> remote NUMA node.
+> >>> Interesting, how was it measured exactly ?
+> >>
+> >> I created a private patch to record the status for each fclone allocat=
+ion.
+> >>
+> >>
+> >>> Are you using SLUB or SLAB ?
+> >>
+> >> I think I use SLUB. (CONFIG_SLUB=3Dy,
+> >> CONFIG_SLAB_MERGE_DEFAULT=3Dy,CONFIG_SLUB_CPU_PARTIAL=3Dy)
+> >>
+> >
+> > A similar issue comes from tx_action() calling __napi_kfree_skb() on
+> > arbitrary skbs
+> > including ones that were allocated on a different NUMA node.
+> >
+> > This pollutes per-cpu caches with not optimally placed sk_buff :/
+> >
+> > Although this should not impact fclones, __napi_kfree_skb() only ?
+> >
+> > commit 15fad714be86eab13e7568fecaf475b2a9730d3e
+> > Author: Jesper Dangaard Brouer <brouer@redhat.com>
+> > Date:   Mon Feb 8 13:15:04 2016 +0100
+> >
+> >      net: bulk free SKBs that were delay free'ed due to IRQ context
+> >
+> > What about :
+> >
+> > diff --git a/net/core/dev.c b/net/core/dev.c
+> > index c588808be77f563c429eb4a2eaee5c8062d99582..63165138c6f690e14520f11=
+e32dc16f2845abad4
+> > 100644
+> > --- a/net/core/dev.c
+> > +++ b/net/core/dev.c
+> > @@ -5162,11 +5162,7 @@ static __latent_entropy void
+> > net_tx_action(struct softirq_action *h)
+> >                                  trace_kfree_skb(skb, net_tx_action,
+> >                                                  get_kfree_skb_cb(skb)-=
+>reason);
+> >
+> > -                       if (skb->fclone !=3D SKB_FCLONE_UNAVAILABLE)
+> > -                               __kfree_skb(skb);
+> > -                       else
+> > -                               __napi_kfree_skb(skb,
+> > -                                                get_kfree_skb_cb(skb)-=
+>reason);
 >
-> Without rcu_read_lock(), peer could be freed before we get a chance to
-> read peer->ifindex.
+> Yes, I think it makes sense to avoid calling __napi_kfree_skb here.
+> The __napi_kfree_skb call will cache SKB slub-allocation (but "release"
+> data) on a per CPU napi_alloc_cache (see code napi_skb_cache_put()).
+> In net_tx_action() there is a chance this could originate from another
+> CPU or even NUMA node.  I notice this is only for SKBs on the
+> softnet_data->completion_queue, which have a high chance of being cache
+> cold.  My patch 15fad714be86e only made sense when we bulk freed these
+> SKBs, but after Olek's changes to cache freed SKBs, then this shouldn't
+> be calling __napi_kfree_skb() (previously named __kfree_skb_defer).
+>
+> I support this RFC patch from Eric.
+>
+> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
-Thanks for the detailed explanation.
+Note that this should not matter for most NIC, because their drivers
+perform TX completion from NAPI context, we do not hit this path.
+
+It seems that switching to SLUB instead of SLAB has increased the chances
+of getting memory from another node.
+
+We probably need to investigate.
 
