@@ -1,233 +1,210 @@
-Return-Path: <netdev+bounces-74868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60340866FD1
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:04:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D1F9866FE8
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:06:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2E171F20F30
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:04:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDD131F27363
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:06:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9225DF34;
-	Mon, 26 Feb 2024 09:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E1E60271;
+	Mon, 26 Feb 2024 09:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MCnZkOuA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HXNvFhKf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214CD5F49A
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 09:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708940408; cv=fail; b=VmWNWbOV/TtpLagfudoAMqskaT5KaLKIp5GW6w/2ywQDyEd7ZwfEz1l1KR7QmJTeh3TOrOdnwX1NqJt1oRxEQNfwQPzIVMboYRnkOswOGKorkvw67OmVbDPsT+p1sb1kOZngeYSlhdzYDurf+ix0syE+VPOtNS+uKLEgyEpRpJA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708940408; c=relaxed/simple;
-	bh=DuHRdKoabxsiRR5zEIuumur50fKFJEUA2RYHNCRJgbs=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=RzTyKLHbMdpVaoJ7xovGXabS/h0a3mtrSIfQMZ7JiyDalHo8nqX/k0Ab/vIpwMdwdDU/qcshOsP0RevZescyL7xxJlHhTmyDjYTbF3YLNxDjgxbKXYd08Q61XQw9e9vd0FUcvB74Jkyyxyz/IBVPoUggCon//Xw4W6WfdotMz8A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MCnZkOuA; arc=fail smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113FC6024F;
+	Mon, 26 Feb 2024 09:43:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708940591; cv=none; b=gqaJeQm7ciWhCskSewRaIvMA9ikijAKWJa17X2uoVMzZLg1pNq3iwJj5QDZd1pcDc977bghSskbmuSyWJ8hOzkJqV/VjPV2L35Gl1bacgpY5PXbKWAF9qvejs4GU9OVowSxZyE8E3tN+GRqe/Ub7BdTmujv1/0UBFPxQKiUc310=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708940591; c=relaxed/simple;
+	bh=peeh3uBT6rkaZj0IWaTOnmOqCf87o+9OlPo0K0aPohw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ugF4KSDhZ/fcUWaDLy7cffkxNU/HwxVb8d9es4nnR7Lp73dDVy3yafpCL7EoqqSuirDJ3qw56wbVxma+ZULbj6JPACwnhu/+j2ChO8tg1dCM4elB0bPGJbqeI89lE+fBSxgeTuFBgCiL9tj1bxmg7+uvdFMF4AW7aZ9VcY6kLi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HXNvFhKf; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708940407; x=1740476407;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=DuHRdKoabxsiRR5zEIuumur50fKFJEUA2RYHNCRJgbs=;
-  b=MCnZkOuAmO4efo+HV59noP6G0Wu/V1lhD+8k4StEkqL3m0EfjzptvztK
-   M0pYU/TzRQ4UKS6nE23kf1a1hC0MWRuAtBCBd/m4/GzN4CsNU3aAP1HlE
-   ZzywkIsZ4ZgFrck2BmL2XN1Ftg3fZoAJS6V+1t8lO2EoNYOjybDMnIynU
-   YwAEx/Q9tbkow142Y/0Lr8NLX9+1lmqat7OX2eURauosv4gAt6i+bsqjX
-   UD9PK6Hb+GSUUGnF/qc/horw9p43WYZ1wXwVjCCOgqgmmwyYNQ3v/7SFy
-   W3wza47sirqoZrMvvQrshg2uiEb3krD3jHyH/t5THXQMtFkd8tMWtBxQh
+  t=1708940590; x=1740476590;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=peeh3uBT6rkaZj0IWaTOnmOqCf87o+9OlPo0K0aPohw=;
+  b=HXNvFhKf+bHFH3XaVKlF/uYyCSLx0vGwogKBu1T9CZUMiqlYe0DgA1Pp
+   h0RagLTVhmBJzE6WIyW6cWSRn/8aS6rdact470i2eCFXg9MVWyqEerUy/
+   WxibEHwPwm0HNONhTc2pmKyRMD0eDhr1OaUBZLEIcYzxDmj9LMQfaIHaY
+   zoZ3Y4MVlDEZsqJVhitgHCNpIkZ8eq0q11XN51zbYpJf3qd2pQ82ksBVO
+   ZRgOaBiJqMt0hX4bB50fzvy8ztZkDfDeLkgmhXpk3avYp0saPnXUfbD87
+   wHaavXRiRxK6NIn8i9hvruBtlrjjGOkuNS1gmFwond9cft6ke0P7E0i5z
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="13765949"
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="14346765"
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="13765949"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 01:40:06 -0800
+   d="scan'208";a="14346765"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 01:43:09 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="7131444"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Feb 2024 01:40:06 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 26 Feb 2024 01:40:05 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 26 Feb 2024 01:40:05 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 26 Feb 2024 01:40:05 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 26 Feb 2024 01:40:05 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G7ogsMy+tSYztp8o5+V6t5ECS2R4KhIGiluJ7CzDfnCEqihH+8TodYDCZ3rPXFBydv9DMV9e4HQ68SEXR6nU/uRYOwjJjhmrJO1mUwUSGIRx9AawWwBUGiiFnvqdP7PpFRrqJbEgXb6TVU6rGOD0K5ZK4giO2tZJlIIACfag1dpxxoCYmPDIVaQr3qrjSsyTLgmYeXTTTS0dYrD7QBWVlx1W5eg5K2JyL+pcL9cUpFy/IhU99JP2asLmmZU1B+uWQgC5Vppx6dOwuD+2rqCslVKwhEQQ9c4EpTS8jkGrDH14bRhDqqZ9G/G0pw0m0KF0zjSCmGg+tF07cz/hxtZZmw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=i3joN8LB3Dz+jCz1p9GKRJ8egYhWXcFhqqXARjSN7Qc=;
- b=c8smHrhjU1WwgyhBcd5HZSz/6RcTbd977xQAoQYTvhZt+zmb25fisRvmeyU0xVwLNbsnD5OB4yN0cnQN2SUsHR8TVmgzKiPuRENlbIdKcQQq/tLsnFjaI69xVOm+MsJU0PLG1/phWwYqcDMnaKtykNj6ELYDHzxEMKheXOejXSK71eBSjsaX5vGYY64MeTRvOS+rRp9oCjuEgmbs1d4KLNQJ6YDFFIp9suo+oRfNXCOh4CObHilnK4isZXrDUYSVvA8xzm7olaJuQ46LyLoXtRp8Z3jByWDhc4+idmYqf9EeeF2lnGu4zjB5b0eV01ZlUXr2rJcQXk0hYuLqJdaiIA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ0PR11MB5865.namprd11.prod.outlook.com (2603:10b6:a03:428::13)
- by PH7PR11MB5942.namprd11.prod.outlook.com (2603:10b6:510:13e::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.22; Mon, 26 Feb
- 2024 09:40:03 +0000
-Received: from SJ0PR11MB5865.namprd11.prod.outlook.com
- ([fe80::1859:eed7:cd98:cc08]) by SJ0PR11MB5865.namprd11.prod.outlook.com
- ([fe80::1859:eed7:cd98:cc08%7]) with mapi id 15.20.7339.019; Mon, 26 Feb 2024
- 09:40:03 +0000
-From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
-To: "Kaminski, Pawel" <pawel.kaminski@intel.com>, Jakub Kicinski
-	<kuba@kernel.org>
-CC: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	"intel-wired-lan@osuosl.org" <intel-wired-lan@osuosl.org>, "Wilczynski,
- Michal" <michal.wilczynski@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v1] ice: Add support for
- devlink loopback param.
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v1] ice: Add support for
- devlink loopback param.
-Thread-Index: AQHaJLKlUkqkrO7JlUOXtMBEGNxpcbCVR3kAgAe3GYCAf+dcEA==
-Date: Mon, 26 Feb 2024 09:40:03 +0000
-Message-ID: <SJ0PR11MB58659DE151F3BC99A3B55C1B8F5A2@SJ0PR11MB5865.namprd11.prod.outlook.com>
-References: <20231201235949.62728-1-pawel.kaminski@intel.com>
- <20231201183704.382f5964@kernel.org>
- <340900d4-b30a-4387-9ce2-1971e8d8024c@intel.com>
-In-Reply-To: <340900d4-b30a-4387-9ce2-1971e8d8024c@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR11MB5865:EE_|PH7PR11MB5942:EE_
-x-ms-office365-filtering-correlation-id: bac3765a-d96f-4b14-eed8-08dc36aee883
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: B62kR4dyPvigzf9cDQpsHXJhj3eiN8WatdFK8xRWjs8ouE5ioyqrQWgOAxBb9uAB13TrY8Cl3j4YxLv0UykOB7yzHHFFQjfbYg3NhtiE85aU7Na5X0B03nkRU8HnvOs/Bq3i2WiAYxTL+N9UMsWQEc/bthBeHLCQh+lXHS63herv22gs1aff0lmDMkr6ChvCctcOT8nZjwSEflhLNn1re84BY9CKWjzVYVvYYWrsvokPHKfS4l8hhuxcAGUW476vEI62L7GlRtnrn6OnPUhPCcKov+qnot50U0Ei4NvtKu29Ern6u3tqY/oeRHCDhvee+CUit7xAX/KHj5/Hkyw8iiunGTsSuuRiVrvufY1xr19hHSEsTCWpiPytIXxUwohXHqpO7BJ+FmZNz+Rud5yjiI7Lxew8+zInb5sxGzItX6/j6Tw4wII6sQ+XD8B2F2V5oJ574NgKzK1yGb8NrLbDcMm9NBBLAn7OcXTA1N1k/4G8vS4SO2N/cdLY/MpPadVVk6+UL976PUPN27Qj3IQmWnQyvJxIHTVShMLRD0oUxOZVBWKnsD1NranZmXOZIfE7VT80EqQ7kQxmIhblMSleAHtfubSQlBaaW9mo6c7lupvhQ/ABcDgNdECr7ZIjf56tlEjEhEcHoZ8IBSRiI3SmaY+w6+m/P2xtp3ZazCGzzMOvveTod/fyUTfFsVQeLSYl7hD815exfmAzFep0yRTjfw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5865.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?IVDCpR2t0xPP9CDxTQODc0HBSqdUfHmoOWdXf8DIiyjfowwxLNXUuQ6rMJa8?=
- =?us-ascii?Q?uwAyDLcGqd3GaeqALFeahcd89pNDTAzH6T71wh548p5EnlleWcCYcJlbEp5U?=
- =?us-ascii?Q?qOROiGvpD0o3Obr8ZjsuxE52LYxOu/JTIdQq1pTletHpx2egq3dJM3bM+it8?=
- =?us-ascii?Q?p6066Xj6/ZGMLUuw3oNjgKl6g34/XGMdRsGlwYmKBArhVf936C/BXn/sGd86?=
- =?us-ascii?Q?JxPlMh99t56EjeHuaNVzmkz9xrb1t/3y2Sj9C4g1BHPpSDCUUXo/8e1EuKq+?=
- =?us-ascii?Q?bt/ANM+9LtSmedcxtQhflaZZGzWpEd0IoRZZmywQTfjoMurSkpYvJwyJweuJ?=
- =?us-ascii?Q?y2yfbuW3sAV81llfDq9/dML6T57HiSeeuuK4UzX9OQ4D2vMOV3B8AGMtPLUH?=
- =?us-ascii?Q?k9CSA2kEawANFcIuFZf42Y+PBVzmiQ1NiwANGYHkWTxzEGVFpuGoJATyKNAh?=
- =?us-ascii?Q?QIOa0YmCYUgLFOGiXxdsJf9m+3CFCKsxUEFvtNzeGZqEEOTzbaIGkXW+zF68?=
- =?us-ascii?Q?d7OY0boRmIYcbwfrXMfIqKqQcblO48G+CM3MmDi2kbqR7LDJhZnCCoGEYcq8?=
- =?us-ascii?Q?EmvJPiksvLEvhhlGaLgJHuW653CQq3Q+A8u3VVHwczu7J4Rwg6EMrk6fU1PC?=
- =?us-ascii?Q?bTUAKOKvKDPPmLQn3GwkK1Z1j44kjQhUwN2rk67LxpiaEmOatEeGhoinSsBY?=
- =?us-ascii?Q?MhAzFVUxf3nO68G2SaRE9lUGg0KrAwVjXjB2ZsNkn06AHE74Cgo8HHFZ9Hpz?=
- =?us-ascii?Q?YPx3/aNCmMkMOo4Snz7wr+hbdeTw4k8FEaqntC9TP0wH3VlnqDzlUqEDuTQ/?=
- =?us-ascii?Q?GJn4NuHhJrt74vqLFVI/i7g/cXcwhG/DlxDF/xTjkYSF6KYF14AMfe+T91Mr?=
- =?us-ascii?Q?1Bk1unAqqsmlS5v7of9+4iz+C53m3B5htFpPXZWdBoi+gTKKgWC9Avz9ihCf?=
- =?us-ascii?Q?Qck3eGfzAPC9GKS2IxzvJQ4vjsHwwql/vehImNiB3Zr2XI8jZF3BP1hVKJnG?=
- =?us-ascii?Q?+AIc8u5fbEB9pFP5woJOvZQY84rTUEXv2hJEgdx4luHxp8H+cOqsPBVpNlEF?=
- =?us-ascii?Q?Z7NOGOGlxvRRywXL/CrMSNLNjXGavkzcmqbguVwYkqt3VXcFZfyjELA5x1aK?=
- =?us-ascii?Q?h1qlT62IN7PHSeAjB+/Z+rnVzaCq6Zqi4h6kDQWdADixrzCiia7EPR9Onqfj?=
- =?us-ascii?Q?kTOmLUrlHSF0Z2aPixgdX+oEQTelcDwqvZRU6ElpZFKpge73P7AKTEf26SPf?=
- =?us-ascii?Q?gPzR0qIxVG0Kj5owOlQqjx4gfhXGXLo/WzWp8g1J8yTvt104jk/YzYPTB7TV?=
- =?us-ascii?Q?DkOlkU5l9dEACEtm/Ow17y3XCirboPVqdp59ugIjnXQytOcs+9Pc1UH2x/8F?=
- =?us-ascii?Q?DKqXNGbT23++s4++pjJbqFaVgYZNaOVtRkycgIn7KCOfN7bkU7lm4aHr0fRa?=
- =?us-ascii?Q?Rearwiym7PadiOuNx6DnHTk+kMOGk6YR/6rOHkvmRPjAeck8GRfGVgwnruka?=
- =?us-ascii?Q?w1DDwqpl4+FNWjZiCZzKrLxknsZoqcp0bffPdbQy19W985BG8WtmQ9oa6h+z?=
- =?us-ascii?Q?wgkyAe4OKciMoP8zoOmwCk7rFkc+M72gctKXkNYc4c0ZuLPf6/PLZWAyxxxm?=
- =?us-ascii?Q?7g=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="11201013"
+Received: from lkp-server02.sh.intel.com (HELO 3c78fa4d504c) ([10.239.97.151])
+  by fmviesa003.fm.intel.com with ESMTP; 26 Feb 2024 01:43:05 -0800
+Received: from kbuild by 3c78fa4d504c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1reXVn-000AE7-0w;
+	Mon, 26 Feb 2024 09:43:03 +0000
+Date: Mon, 26 Feb 2024 17:42:13 +0800
+From: kernel test robot <lkp@intel.com>
+To: David Laight <David.Laight@aculab.com>,
+	"'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>,
+	'Linus Torvalds' <torvalds@linux-foundation.org>,
+	'Netdev' <netdev@vger.kernel.org>,
+	"'dri-devel@lists.freedesktop.org'" <dri-devel@lists.freedesktop.org>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	'Jens Axboe' <axboe@kernel.dk>,
+	"'Matthew Wilcox (Oracle)'" <willy@infradead.org>,
+	'Christoph Hellwig' <hch@infradead.org>,
+	"'linux-btrfs@vger.kernel.org'" <linux-btrfs@vger.kernel.org>,
+	'Andrew Morton' <akpm@linux-foundation.org>,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	'Andy Shevchenko' <andriy.shevchenko@linux.intel.com>,
+	"'David S . Miller'" <davem@davemloft.net>,
+	'Dan Carpenter' <dan.carpenter@linaro.org>,
+	'Jani Nikula' <jani.nikula@linux.intel.com>
+Subject: Re: [PATCH next v2 11/11] minmax: min() and max() don't need to
+ return constant expressions
+Message-ID: <202402261720.EAMC0eHM-lkp@intel.com>
+References: <a18dcae310f74dcb9c6fc01d5bdc0568@AcuMS.aculab.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5865.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bac3765a-d96f-4b14-eed8-08dc36aee883
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2024 09:40:03.2473
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: wv4uSOXg4BTD4Cd3OV4haPWyPTsDLzuU5xWn6AU5OG7LseAWXqlek13LBRSQZjUTV0LBmbViX2SKf5DtfHaJlueWeigLFibhM2aZWcADouo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5942
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a18dcae310f74dcb9c6fc01d5bdc0568@AcuMS.aculab.com>
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Kaminski, Pawel
-> Sent: Thursday, December 7, 2023 1:26 AM
-> To: Jakub Kicinski <kuba@kernel.org>
-> Cc: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; intel-wired-
-> lan@osuosl.org; Wilczynski, Michal <michal.wilczynski@intel.com>;
-> netdev@vger.kernel.org
-> Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1] ice: Add support for d=
-evlink
-> loopback param.
->=20
-> On 2023-12-01 20:37, Jakub Kicinski wrote:
-> > On Fri,  1 Dec 2023 15:59:49 -0800 Pawel Kaminski wrote:
-> >> Add support for devlink loopback param. Supported values are
-> >> "enabled", "disabled" and "prioritized". Default configuration is set =
-to
-> "enabled.
-> >>
-> >> By default loopback traffic BW is locked to PF configured BW.
-> >
-> > First off - hairpin-bandwidth or some such would be a much better name.
-> > Second - you must explain every devlink param in Documentation/
-> >
-> > Also admission ctrl vs prioritizing sounds like different knobs.
->=20
-> While at certain abstraction level I agree, in my opinion it is not worth=
- here to
-> divide this to separate knobs, since underlying logic (FW) doesn't follow=
- that
-> anyways. It is driver specific and extremely unlikely to change in the fu=
-ture.
-> Hopefully next gen card will not need this knob at all.
->=20
-> >> HW is
-> >> capable of higher speeds on loopback traffic. Loopback param set to
-> >> "prioritized" enables HW BW prioritization for VF to VF traffic,
-> >> effectively increasing BW between VFs. Applicable to 8x10G and 4x25G
-> >> cards.
-> >
-> > Not very clear what this means...
-> > So the VFs are Tx bandwidth limited to link speed.
-> > How does the device know it can admit extra traffic?
-> > Presumably this doesn't affect rates set by devlink rate?
->=20
-> I will rewrite the description and explanation in v2 and include document=
-ation
-> change.
->=20
-> Thank you,
-> PK
-> _______________________________________________
-> Intel-wired-lan mailing list
-> Intel-wired-lan@osuosl.org
-> https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
+Hi David,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on drm-misc/drm-misc-next]
+[also build test WARNING on linux/master mkl-can-next/testing kdave/for-next akpm-mm/mm-nonmm-unstable linus/master v6.8-rc6]
+[cannot apply to next-20240223 dtor-input/next dtor-input/for-linus axboe-block/for-next horms-ipvs/master next-20240223]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/David-Laight/minmax-Put-all-the-clamp-definitions-together/20240226-005902
+base:   git://anongit.freedesktop.org/drm/drm-misc drm-misc-next
+patch link:    https://lore.kernel.org/r/a18dcae310f74dcb9c6fc01d5bdc0568%40AcuMS.aculab.com
+patch subject: [PATCH next v2 11/11] minmax: min() and max() don't need to return constant expressions
+config: i386-buildonly-randconfig-001-20240226 (https://download.01.org/0day-ci/archive/20240226/202402261720.EAMC0eHM-lkp@intel.com/config)
+compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240226/202402261720.EAMC0eHM-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202402261720.EAMC0eHM-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> arch/x86/mm/pgtable.c:437:14: warning: variable length array used [-Wvla]
+     437 |         pmd_t *pmds[MAX_PREALLOCATED_PMDS];
+         |                     ^~~~~~~~~~~~~~~~~~~~~
+   arch/x86/mm/pgtable.c:180:31: note: expanded from macro 'MAX_PREALLOCATED_PMDS'
+     180 | #define MAX_PREALLOCATED_PMDS   MAX_UNSHARED_PTRS_PER_PGD
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/x86/mm/pgtable.c:113:2: note: expanded from macro 'MAX_UNSHARED_PTRS_PER_PGD'
+     113 |         max_t(size_t, KERNEL_PGD_BOUNDARY, PTRS_PER_PGD)
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/minmax.h:152:27: note: expanded from macro 'max_t'
+     152 | #define max_t(type, x, y)       __careful_cmp(max, (type)(x), (type)(y), __COUNTER__)
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/minmax.h:62:2: note: expanded from macro '__careful_cmp'
+      59 | #define __careful_cmp(op, x, y, uniq) ({        \
+         |                                       ~~~~~~~~~~~
+      60 |         _Static_assert(__types_ok(x, y),        \
+         |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      61 |                 #op "(" #x ", " #y ") signedness error, fix types or consider u" #op "() before " #op "_t()"); \
+         |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      62 |         __cmp_once(op, x, y, uniq); })
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/minmax.h:57:2: note: expanded from macro '__cmp_once'
+      57 |         __cmp(op, __x_##uniq, __y_##uniq); })
+         |         ^
+   include/linux/minmax.h:52:26: note: expanded from macro '__cmp'
+      52 | #define __cmp(op, x, y) ((x) __cmp_op_##op (y) ? (x) : (y))
+         |                          ^
+   1 warning generated.
 
 
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+vim +437 arch/x86/mm/pgtable.c
 
+1db491f77b6ed0 Fenghua Yu          2015-01-15  432  
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  433  pgd_t *pgd_alloc(struct mm_struct *mm)
+1ec1fe73dfb711 Ingo Molnar         2008-03-19  434  {
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  435  	pgd_t *pgd;
+184d47f0fd3651 Kees Cook           2018-10-08  436  	pmd_t *u_pmds[MAX_PREALLOCATED_USER_PMDS];
+184d47f0fd3651 Kees Cook           2018-10-08 @437  	pmd_t *pmds[MAX_PREALLOCATED_PMDS];
+1ec1fe73dfb711 Ingo Molnar         2008-03-19  438  
+1db491f77b6ed0 Fenghua Yu          2015-01-15  439  	pgd = _pgd_alloc();
+1ec1fe73dfb711 Ingo Molnar         2008-03-19  440  
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  441  	if (pgd == NULL)
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  442  		goto out;
+4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  443  
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  444  	mm->pgd = pgd;
+4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  445  
+25226df4b9be7f Gustavo A. R. Silva 2022-09-21  446  	if (sizeof(pmds) != 0 &&
+25226df4b9be7f Gustavo A. R. Silva 2022-09-21  447  			preallocate_pmds(mm, pmds, PREALLOCATED_PMDS) != 0)
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  448  		goto out_free_pgd;
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  449  
+25226df4b9be7f Gustavo A. R. Silva 2022-09-21  450  	if (sizeof(u_pmds) != 0 &&
+25226df4b9be7f Gustavo A. R. Silva 2022-09-21  451  			preallocate_pmds(mm, u_pmds, PREALLOCATED_USER_PMDS) != 0)
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  452  		goto out_free_pmds;
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  453  
+f59dbe9ca6707e Joerg Roedel        2018-07-18  454  	if (paravirt_pgd_alloc(mm) != 0)
+f59dbe9ca6707e Joerg Roedel        2018-07-18  455  		goto out_free_user_pmds;
+f59dbe9ca6707e Joerg Roedel        2018-07-18  456  
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  457  	/*
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  458  	 * Make sure that pre-populating the pmds is atomic with
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  459  	 * respect to anything walking the pgd_list, so that they
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  460  	 * never see a partially populated pgd.
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  461  	 */
+a79e53d85683c6 Andrea Arcangeli    2011-02-16  462  	spin_lock(&pgd_lock);
+4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  463  
+617d34d9e5d832 Jeremy Fitzhardinge 2010-09-21  464  	pgd_ctor(mm, pgd);
+25226df4b9be7f Gustavo A. R. Silva 2022-09-21  465  	if (sizeof(pmds) != 0)
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  466  		pgd_prepopulate_pmd(mm, pgd, pmds);
+25226df4b9be7f Gustavo A. R. Silva 2022-09-21  467  
+25226df4b9be7f Gustavo A. R. Silva 2022-09-21  468  	if (sizeof(u_pmds) != 0)
+f59dbe9ca6707e Joerg Roedel        2018-07-18  469  		pgd_prepopulate_user_pmd(mm, pgd, u_pmds);
+4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  470  
+a79e53d85683c6 Andrea Arcangeli    2011-02-16  471  	spin_unlock(&pgd_lock);
+4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  472  
+4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  473  	return pgd;
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  474  
+f59dbe9ca6707e Joerg Roedel        2018-07-18  475  out_free_user_pmds:
+25226df4b9be7f Gustavo A. R. Silva 2022-09-21  476  	if (sizeof(u_pmds) != 0)
+f59dbe9ca6707e Joerg Roedel        2018-07-18  477  		free_pmds(mm, u_pmds, PREALLOCATED_USER_PMDS);
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  478  out_free_pmds:
+25226df4b9be7f Gustavo A. R. Silva 2022-09-21  479  	if (sizeof(pmds) != 0)
+f59dbe9ca6707e Joerg Roedel        2018-07-18  480  		free_pmds(mm, pmds, PREALLOCATED_PMDS);
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  481  out_free_pgd:
+1db491f77b6ed0 Fenghua Yu          2015-01-15  482  	_pgd_free(pgd);
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  483  out:
+d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  484  	return NULL;
+4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  485  }
+4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  486  
 
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
