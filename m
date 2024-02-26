@@ -1,244 +1,234 @@
-Return-Path: <netdev+bounces-74815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03D06866978
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 05:59:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33C3586697D
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 06:03:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C92E1C20DD3
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 04:59:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD4B328136E
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 05:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 101D31B279;
-	Mon, 26 Feb 2024 04:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C5C18EA1;
+	Mon, 26 Feb 2024 05:03:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PTTvxzs9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fwoJb+vo"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F272C95
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 04:59:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED10101C4
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 05:03:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708923583; cv=none; b=dC/l6zhsIW/0FPhHbQULS9XS6LiTeeQNM2KBGvfY71nPSutVQXJHV7XGEMWdjZq2dphA0c4a6pHSKqjch7Y/wyXiyexcUbuv+Csroj3TMP2Jw4jWtIW+6e7MDt/WjoFSvsE7RRyOsBxNo3lkMYxRFj9aHUt4KJePis+Fv1hnyrE=
+	t=1708923809; cv=none; b=VmcFAEkknZmBPBkZaGigKcfnujjVoaaOZiPiFEPBkNx6p94K8OBzF59CuGg6Le+0HnNR+TsoPb95171XEO8qM0n32qohcdv5WWGYFro4WB7wLfUA83vNukSG+N6rlTCB8YtgMQKZqLR7K3c/aQ9gEVd8m8YroQgvts17gphfhHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708923583; c=relaxed/simple;
-	bh=AaJMamp2Nb+Yq5spo7QL5Q4FyDBAAXS9vg0TE+DBw+s=;
+	s=arc-20240116; t=1708923809; c=relaxed/simple;
+	bh=a3tEgyaJCtPG/p3fVcd1CgAnCegNQ8ZsfgH1ZWFhhIc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q5mt7VeHdZsqeM/PfUjiLdemGQaV1kNIRbSPEenq8ya/WNOC8ySeVEgqkhMGRyjzx/UyXhhsJlhnK3dRgy4+6ooWRoIvYqwTVr376vETpWyFvHk+0DXSouIX+vEjG4CGTJ55hv4mW5wLg+rVadAQTzxPQa/WE8WjLp3gVw0cKHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PTTvxzs9; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=IVQT77YQsSPSFcSSNYMhBDeKvq9pD1iOsoQJ5o6Kce4v+Ioqsp9KSDUlZhNrmCGtCQyr+xXRcMzj1/hFXIg2VNDWjlvzQjFMa9Je4w5+ltaqMULL4Uld3FNdkeoDrFAwk9eE6cbzqDVvJb8sb4jFJeQw3JVB6QKD+p7qHK7DN24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fwoJb+vo; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708923580;
+	s=mimecast20190719; t=1708923806;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iso6K6DyWAnnF++t9+yhMMEiOuk3VKMqC/cJQai+WRQ=;
-	b=PTTvxzs9cVIp3acEcuWwCUtXx5yfaWsYiYrTGrWJz4wB5+Mo0lHsJmViIJ4TleKTKzrJxY
-	nT+zwDvpPpED8hec+tXPfZZW0Pc6kMcWjoHqYMCs1LlN47spMAofsKafX++0HgY9IE9SsP
-	5W1QPxZjjm/5aImp/WGIF13YJjVkrVA=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=UTvrw5muOxvvYI3cWfdC2xiirxyCiY1jvcXxIyw2mqg=;
+	b=fwoJb+voCCRXw3+5kihXGgERh8e5TSWJHJEnVCOh4bkgD4yWMynsaYCtWOEfc87be01rX0
+	0Wr330IplHxyjESEusc6dBH907s5HXw6iLH8xT90nF8QnEoiBYR90ZgKUEKYnNrJxPaGyv
+	dYJtOFKfFCpqfxd72xorSqGPpGSZ69c=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-434-kFVqwBzkM0yXxNZ_1efxhg-1; Sun, 25 Feb 2024 23:59:39 -0500
-X-MC-Unique: kFVqwBzkM0yXxNZ_1efxhg-1
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-29a82907e96so2178076a91.2
-        for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 20:59:38 -0800 (PST)
+ us-mta-150-DyzylVbsOE-PeMiiAT5g4Q-1; Mon, 26 Feb 2024 00:03:25 -0500
+X-MC-Unique: DyzylVbsOE-PeMiiAT5g4Q-1
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1dbcf647a9dso18043135ad.1
+        for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 21:03:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708923578; x=1709528378;
+        d=1e100.net; s=20230601; t=1708923804; x=1709528604;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iso6K6DyWAnnF++t9+yhMMEiOuk3VKMqC/cJQai+WRQ=;
-        b=NWQuvZzDh++NXBVLficYhyUitZMtvh1ig6SEQhI2mkqU3L3d8TXi2NexcBE7eWVgHm
-         zkleildlMzAtrH3vSo6yJhQG9v7ipOMwTj4iWYs+g53MLmWH60Ho8tjryG0MIMogRm24
-         jdfDACa+LrZY3IcHUTsTR8ONqDzb+EnGvNMeeWv2Bk/Ad9+eZpHYtNAY5OZzDAM9m4As
-         GuDuLgFyfzyUsOJg61Qq0WnuRjUiS+jgo168zB5wI+kXR5px7DMh0rmAzpUvJA8xopdi
-         dBLS7g8H57nHxL0oKm+cMKwVHZXUm9lAI7OX7hpIyYFOiPp3qP6K55HLuY8dCXoxU9dW
-         D2FQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUy3SsUwFVQVnBhI7EXjZMabty738wbiiv62gQyWwkcDvJg0tG/oLOiA0hevb9o2COTVB92mRpKUa/+hDiX0j7dwLdTD8FC
-X-Gm-Message-State: AOJu0YwGotp9yHm5FR7OEUFngie4IhJ37HkRcxQ1YUHZ6UyvLmTAxlI+
-	drwkxonjMuvocVoKSOMP9dwi0eeo1sxijW62rZBwaRcqamD03HDQtC8R8FPCuu7Q7uTYJHfFm3t
-	pdIzT3FHjUUszdsRmp/lR3M11pvnaiJgHYanRTjF8sYPasam1nhEHFUQUjCtuCMb6b2Y4ukEhON
-	w4XfcNr3vMsKW1ZeJ0e975rjdfdaAY
-X-Received: by 2002:a17:90a:ad8a:b0:29a:a38c:8262 with SMTP id s10-20020a17090aad8a00b0029aa38c8262mr2919883pjq.48.1708923577747;
-        Sun, 25 Feb 2024 20:59:37 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFFTAN/Lw+RGzf9GeokVG5jtOCl25KGwF/7DbhV8aGSvRwum+aJwJ9WzPtrwumrWZ0Ki7ztusPHGEY87VqwktA=
-X-Received: by 2002:a17:90a:ad8a:b0:29a:a38c:8262 with SMTP id
- s10-20020a17090aad8a00b0029aa38c8262mr2919868pjq.48.1708923577403; Sun, 25
- Feb 2024 20:59:37 -0800 (PST)
+        bh=UTvrw5muOxvvYI3cWfdC2xiirxyCiY1jvcXxIyw2mqg=;
+        b=RF8PU8dfAicJa3eAay5oLOMoP7InFh+ithDjnQwnZSlc1ZbEy78ZNlYY14Ag5zO0BK
+         6m4uy96UDIUU3OZZ3wITFYET5pM/WPMj08fkbJ1XoRTQhxNijmKq5xwS4qwBiqi0/gkP
+         DglCPd4ufNfqd+NhTKrcm6gdUrWGKcje+uxss08jNCY+e96apiyApf9gklsnzSRq+gXn
+         5jwi3DQuP/4se1JyiQM12+TDNawBJxVStQYpyh5WumRhaTVwki7ckC6leDlPQ0MDtGHg
+         3E8+M00ysrTI/2Fmr6d4uGzCn8gV7Pm87GH3UNqv92BKd9QrnpUb0Moi+vJ4U4lQKst3
+         iODA==
+X-Forwarded-Encrypted: i=1; AJvYcCVYVbW/HneRt98899zFAGkXMxhRnu9/QN2sucTtR4L0ktUoHc8gAMkQbyXKb6oN/q8CaY42g7Gzz6ccsmzmq5f86oi70FhA
+X-Gm-Message-State: AOJu0Yxr+CxN8dIW5KbD1OIoU1bj19qi2TYQHqE6yNU7aiPGzu9gM4jA
+	b70szgrQE4TaDvX5QRWcZ22jG7ejwHIoy7jadhy9KaDAyz3rTmeDtFpR5grMhmHaScxQt/oagW8
+	KPNUazBh9B3d5+qWvfoRBFAbPJBUvl8fXKqEJtxZnpuFu48oQeimBfZ8uTY3Cw3pg8KGVLVDuUi
+	BUPXckysXVEUy9hE5SudmEb2XrS8ZG
+X-Received: by 2002:a17:903:2447:b0:1db:cf64:7331 with SMTP id l7-20020a170903244700b001dbcf647331mr8002163pls.13.1708923803852;
+        Sun, 25 Feb 2024 21:03:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFFUmeTA+/ExLnN9SAAROrp6Trci1fDHliS70EzZoHXWxf87Y4AIxRRU8H8CAsD7uPwkKiXN6bgMUSwJDZP40Q=
+X-Received: by 2002:a17:903:2447:b0:1db:cf64:7331 with SMTP id
+ l7-20020a170903244700b001dbcf647331mr8002144pls.13.1708923803519; Sun, 25 Feb
+ 2024 21:03:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240202121151.65710-1-liangchen.linux@gmail.com>
- <c8d59e75-d0bb-4a03-9ef4-d6de65fa9356@kernel.org> <CAKhg4tJFpG5nUNdeEbXFLonKkFUP0QCh8A9CpwU5OvtnBuz4Sw@mail.gmail.com>
- <5297dad6499f6d00f7229e8cf2c08e0eacb67e0c.camel@redhat.com>
- <CAKhg4tLbF8SfYD4dU9U9Nhii4FY2dftjPKYz-Emrn-CRwo10mg@mail.gmail.com>
- <73c242b43513bde04eebb4eb581deb189443c26b.camel@redhat.com>
- <CAKhg4tJPjcShkw4-FHFkKOcgzHK27A5pMu9FP7OWj4qJUX1ApA@mail.gmail.com>
- <1b2d471a5d06ecadcb75e3d9155b6d566afb2767.camel@redhat.com> <1708652254.1517398-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1708652254.1517398-1-xuanzhuo@linux.alibaba.com>
+References: <1708678175.1740165-3-xuanzhuo@linux.alibaba.com>
+ <CAA93jw7G5ukKv2fM3D3YQKUcAPs7A8cW46gRt6gJnYLYaRnNWg@mail.gmail.com>
+ <20240225133416-mutt-send-email-mst@kernel.org> <CAA93jw4DMnDMzzggDzBczvppgWWwu5tzcA=hOKOobVxJ7Se5xw@mail.gmail.com>
+ <20240225145946-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240225145946-mutt-send-email-mst@kernel.org>
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 26 Feb 2024 12:59:25 +0800
-Message-ID: <CACGkMEuUeQTJYpZDx8ggqwBWULQS1Fjd_DgPvVMLq-_cjYfm7g@mail.gmail.com>
-Subject: Re: [PATCH net-next v5] virtio_net: Support RX hash XDP hint
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, mst@redhat.com, 
-	hengqi@linux.alibaba.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, netdev@vger.kernel.org, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, john.fastabend@gmail.com, 
-	daniel@iogearbox.net, ast@kernel.org, Liang Chen <liangchen.linux@gmail.com>
+Date: Mon, 26 Feb 2024 13:03:12 +0800
+Message-ID: <CACGkMEuFRQW6TFkF8KSHd7kGQH991pj_fCAT8BkMt8T51mEbWg@mail.gmail.com>
+Subject: Re: virtio-net + BQL
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Dave Taht <dave.taht@gmail.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	hengqi@linux.alibaba.com, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 23, 2024 at 9:42=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
+On Mon, Feb 26, 2024 at 4:26=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
 >
-> On Fri, 09 Feb 2024 13:57:25 +0100, Paolo Abeni <pabeni@redhat.com> wrote=
-:
-> > On Fri, 2024-02-09 at 18:39 +0800, Liang Chen wrote:
-> > > On Wed, Feb 7, 2024 at 10:27=E2=80=AFPM Paolo Abeni <pabeni@redhat.co=
-m> wrote:
-> > > >
-> > > > On Wed, 2024-02-07 at 10:54 +0800, Liang Chen wrote:
-> > > > > On Tue, Feb 6, 2024 at 6:44=E2=80=AFPM Paolo Abeni <pabeni@redhat=
-.com> wrote:
-> > > > > >
-> > > > > > On Sat, 2024-02-03 at 10:56 +0800, Liang Chen wrote:
-> > > > > > > On Sat, Feb 3, 2024 at 12:20=E2=80=AFAM Jesper Dangaard Broue=
-r <hawk@kernel.org> wrote:
-> > > > > > > > On 02/02/2024 13.11, Liang Chen wrote:
-> > > > > > [...]
-> > > > > > > > > @@ -1033,6 +1039,16 @@ static void put_xdp_frags(struct x=
-dp_buff *xdp)
-> > > > > > > > >       }
-> > > > > > > > >   }
-> > > > > > > > >
-> > > > > > > > > +static void virtnet_xdp_save_rx_hash(struct virtnet_xdp_=
-buff *virtnet_xdp,
-> > > > > > > > > +                                  struct net_device *dev=
-,
-> > > > > > > > > +                                  struct virtio_net_hdr_=
-v1_hash *hdr_hash)
-> > > > > > > > > +{
-> > > > > > > > > +     if (dev->features & NETIF_F_RXHASH) {
-> > > > > > > > > +             virtnet_xdp->hash_value =3D hdr_hash->hash_=
-value;
-> > > > > > > > > +             virtnet_xdp->hash_report =3D hdr_hash->hash=
-_report;
-> > > > > > > > > +     }
-> > > > > > > > > +}
-> > > > > > > > > +
-> > > > > > > >
-> > > > > > > > Would it be possible to store a pointer to hdr_hash in virt=
-net_xdp_buff,
-> > > > > > > > with the purpose of delaying extracting this, until and onl=
-y if XDP
-> > > > > > > > bpf_prog calls the kfunc?
-> > > > > > > >
-> > > > > > >
-> > > > > > > That seems to be the way v1 works,
-> > > > > > > https://lore.kernel.org/all/20240122102256.261374-1-liangchen=
-.linux@gmail.com/
-> > > > > > > . But it was pointed out that the inline header may be overwr=
-itten by
-> > > > > > > the xdp prog, so the hash is copied out to maintain its integ=
-rity.
-> > > > > >
-> > > > > > Why? isn't XDP supposed to get write access only to the pkt
-> > > > > > contents/buffer?
-> > > > > >
+> On Sun, Feb 25, 2024 at 01:58:53PM -0500, Dave Taht wrote:
+> > On Sun, Feb 25, 2024 at 1:36=E2=80=AFPM Michael S. Tsirkin <mst@redhat.=
+com> wrote:
+> > >
+> > > On Fri, Feb 23, 2024 at 07:58:34AM -0500, Dave Taht wrote:
+> > > > On Fri, Feb 23, 2024 at 3:59=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.a=
+libaba.com> wrote:
 > > > > >
-> > > > > Normally, an XDP program accesses only the packet data. However,
-> > > > > there's also an XDP RX Metadata area, referenced by the data_meta
-> > > > > pointer. This pointer can be adjusted with bpf_xdp_adjust_meta to
-> > > > > point somewhere ahead of the data buffer, thereby granting the XD=
-P
-> > > > > program access to the virtio header located immediately before th=
-e
+> > > > > Hi Dave,
+> > > > >
+> > > > > We study the BQL recently.
+> > > > >
+> > > > > For virtio-net, the skb orphan mode is the problem for the BQL. B=
+ut now, we have
+> > > > > netdim, maybe it is time for a change. @Heng is working for the n=
+etdim.
+> > > > >
+> > > > > But the performance number from https://lwn.net/Articles/469652/ =
+has not appeal
+> > > > > to me.
+> > > > >
+> > > > > The below number is good, but that just work when the nic is busy=
+.
+> > > > >
+> > > > >         No BQL, tso on: 3000-3200K bytes in queue: 36 tps
+> > > > >         BQL, tso on: 156-194K bytes in queue, 535 tps
 > > > >
-> > > > AFAICS bpf_xdp_adjust_meta() does not allow moving the meta_data be=
-fore
-> > > > xdp->data_hard_start:
+> > > > That is data from 2011 against a gbit interface. Each of those BQL
+> > > > queues is additive.
 > > > >
-> > > > https://elixir.bootlin.com/linux/latest/source/net/core/filter.c#L4=
-210
+> > > > > Or I miss something.
 > > > >
-> > > > and virtio net set such field after the virtio_net_hdr:
+> > > > What I see nowadays is 16+Mbytes vanishing into ring buffers and
+> > > > affecting packet pacing, and fair queue and QoS behaviors. Certainl=
+y
+> > > > my own efforts with eBPF and LibreQos are helping observability her=
+e,
+> > > > but it seems to me that the virtualized stack is not getting enough
+> > > > pushback from the underlying cloudy driver - be it this one, or nit=
+ro.
+> > > > Most of the time the packet shaping seems to take place in the clou=
+d
+> > > > network or driver on a per-vm basis.
 > > > >
-> > > > https://elixir.bootlin.com/linux/latest/source/drivers/net/virtio_n=
-et.c#L1218
-> > > > https://elixir.bootlin.com/linux/latest/source/drivers/net/virtio_n=
-et.c#L1420
+> > > > I know that adding BQL to virtio has been tried before, and I keep
+> > > > hoping it gets tried again,
+> > > > measuring latency under load.
 > > > >
-> > > > I don't see how the virtio hdr could be touched? Possibly even more
-> > > > important: if such thing is possible, I think is should be somewhat
-> > > > denied (for the same reason an H/W nic should prevent XDP from
-> > > > modifying its own buffer descriptor).
+> > > > BQL has sprouted some new latency issues since 2011 given the enorm=
+ous
+> > > > number of hardware queues exposed which I talked about a bit in my
+> > > > netdevconf talk here:
+> > > >
+> > > > https://www.youtube.com/watch?v=3DrWnb543Sdk8&t=3D2603s
+> > > >
+> > > > I am also interested in how similar AI workloads are to the infamou=
+s
+> > > > rrul test in a virtualized environment also.
+> > > >
+> > > > There is also AFAP thinking mis-understood-  with a really
+> > > > mind-bogglingly-wrong application of it documented over here, where
+> > > > 15ms of delay in the stack is considered good.
+> > > >
+> > > > https://github.com/cilium/cilium/issues/29083#issuecomment-18247561=
+41
+> > > >
+> > > > So my overall concern is a bit broader than "just add bql", but in
+> > > > other drivers, it was only 6 lines of code....
+> > > >
+> > > > > Thanks.
+> > > > >
+> > > >
+> > > >
 > > >
-> > > Thank you for highlighting this concern. The header layout differs
-> > > slightly between small and mergeable mode. Taking 'mergeable mode' as
-> > > an example, after calling xdp_prepare_buff the layout of xdp_buff
-> > > would be as depicted in the diagram below,
-> > >
-> > >                       buf
-> > >                        |
-> > >                        v
-> > >         +--------------+--------------+-------------+
-> > >         | xdp headroom | virtio header| packet      |
-> > >         | (256 bytes)  | (20 bytes)   | content     |
-> > >         +--------------+--------------+-------------+
-> > >         ^                             ^
-> > >         |                             |
-> > >  data_hard_start                    data
-> > >                                   data_meta
-> > >
-> > > If 'bpf_xdp_adjust_meta' repositions the 'data_meta' pointer a little
-> > > towards 'data_hard_start', it would point to the inline header, thus
-> > > potentially allowing the XDP program to access the inline header.
+> > > It is less BQL it is more TCP small queues which do not
+> > > seem to work well when your kernel isn't running part of the
+> > > time because hypervisor scheduled it out. wireless has some
+> > > of the same problem with huge variance in latency unrelated
+> > > to load and IIRC worked around that by
+> > > tuning socket queue size slightly differently.
 > >
-> > I see. That layout was completely unexpected to me.
-> >
-> > AFAICS the virtio_net driver tries to avoid accessing/using the
-> > virtio_net_hdr after the XDP program execution, so nothing tragic
-> > should happen.
-> >
-> > @Michael, @Jason, I guess the above is like that by design? Isn't it a
-> > bit fragile?
-
-Yes.
-
+> > Add that to the problems-with-virtualization list, then. :/
 >
-> YES. We process it carefully. That brings some troubles, we hope to put t=
-he
-> virtio-net header to the vring desc like other NICs. But that is a big pr=
-oject.
-
-Yes, and we still need to support the "legacy" layout.
-
+> yep
 >
-> I think this patch is ok, this can be merged to net-next firstly.
+> for example, attempts to drop packets to fight bufferbloat do
+> not work well because as you start dropping packets you have less
+> work to do on host and so VM starts going even faster
+> flooding you with even more packets.
+>
+> virtualization has to be treated more like userspace than like
+> a physical machine.
 
-+1
+Probaby, but I think we need a new rfc with a benchmark for more
+information (there's no need to bother with the mode switching so it
+should be a tiny patch).
+
+One interesting thing is that gve implements bql.
 
 Thanks
 
 >
-> Thanks.
 >
+> > I was
+> > aghast at a fix jakub put in to kick things at 7ms that went by
+> > recently.
 >
+> which one is it?
+>
+> > Wireless is kind of an overly broad topic. I was (6 years ago) pretty
+> > happy with all the fixes we put in there for WiFi softmac devices, the
+> > mt76 and the new mt79 seem to be performing rather well. Ath9k is
+> > still good, ath10k not horrible, I have no data about ath11k, and
+> > let's not talk about the Broadcom nightmare.
 > >
-> > Thanks!
+> > This was still a pretty good day, in my memory:
+> > https://forum.openwrt.org/t/aql-and-the-ath10k-is-lovely/59002
 > >
-> > Paolo
+> > Is something else in wif igoing to hell? There are still, oh, 200
+> > drivers left to fix. ENOFUNDING.
 > >
+> > And so far as I know the 3GPP (5g) work is entirely out of tree and
+> > almost entirely dpdk or ebpf?
+> >
+> > >
+> > >
+> > > --
+> > > MST
+> > >
+> >
+> >
+> > --
+> > https://blog.cerowrt.org/post/2024_predictions/
+> > Dave T=C3=A4ht CSO, LibreQos
 >
 
 
