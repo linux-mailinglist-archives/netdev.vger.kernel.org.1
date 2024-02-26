@@ -1,134 +1,126 @@
-Return-Path: <netdev+bounces-74844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4A3A866D8F
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:05:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2B2D866DE9
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:16:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1785B28C4A
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 09:03:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D26E51C235DC
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 09:16:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40BAD1292CF;
-	Mon, 26 Feb 2024 08:29:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209C11EB31;
+	Mon, 26 Feb 2024 08:31:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="SiB7ahBR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X93QE35U"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7518E7D416;
-	Mon, 26 Feb 2024 08:29:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703B918AF8
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 08:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708936146; cv=none; b=dbvCMcQf5lzONI1P40ctK+3hqxQlweXCmkz7JcPbwPO7UR6megamQnEJbzZpN+VPrYfprVkMtw17F5JULP4Lmi3I9eKGK8YQ0ElQVTTMoTcGz6QXZerqippxhd4YMLFImqmSlqGYE+2pAHQGenKbd37b9X54oh58SuC1o+tHAIE=
+	t=1708936280; cv=none; b=DJ1GTrlbC+/5M3F6t3eK6b8dc8zskTOA7oV/LHO02NuoflbC0MdrSjRufreku6/nWKbakRZv344qPESnu1cr3mE8ou7qduZi9HfeOJvVzaxO0yyRp5+yLI/bA6moslADc/alXjOQwOTZjF3364aafcNds9btcOZi4w1MjD1mnFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708936146; c=relaxed/simple;
-	bh=QwdokXlJ3prP3UF9aEemis8U44QlFFmI3psO/hocK/o=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U8w6/hAygUHqM/r7d15gIJ+SCIyT2L9mkdCVPmf/2KMeuPR8RR5d9/PfSyXxtEnOgyM/mRSBfzfla89rRciOhtIsZ8Gl05+7ZNEmwntG9P/TbnHQnx7PSM4J5KN3Azab5PkFz2+NN0UUrLsps3xQAORooXTb31Bsat5R4ILmDj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=SiB7ahBR; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1708936144; x=1740472144;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=QwdokXlJ3prP3UF9aEemis8U44QlFFmI3psO/hocK/o=;
-  b=SiB7ahBRcdxsngPF4zyQVglhMm+vm22u1856/pntAOlLPQBHjl7LUEG0
-   2TYVkXQZsmhSnLydmGkuOKNwBME6PbS++Aa9Z43OfEIB4WryV4C/K2/R0
-   XLDJAzskrOMF3BfTJs9MkagsPNB8C+5UJqScWV3KeKmVM1QxtKw/c5ElI
-   irFvsO+4GkQKEWAZIdNRue5rJbrf27FBbXGkT3Q1xvIWNR2wrACkIjFM0
-   CSMN7n4veht8tW+zGqFLn1E49TTmsfbcZL0sP/ncl2pLVLFgd5w6dF5fV
-   eosVXU89r4sZEq/cNfqTkwosj0XWA+oEWBjWpG+UFN/GVv4XdPXXduA1H
-   A==;
-X-CSE-ConnectionGUID: hSJ/T3kRRSKwdBvF30aJmQ==
-X-CSE-MsgGUID: qFUve9w1So+ytz1WOU+MeA==
-X-IronPort-AV: E=Sophos;i="6.06,185,1705388400"; 
-   d="scan'208";a="16813907"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Feb 2024 01:29:03 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 26 Feb 2024 01:28:41 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Mon, 26 Feb 2024 01:28:41 -0700
-Date: Mon, 26 Feb 2024 09:28:40 +0100
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <bryan.whitehead@microchip.com>,
-	<richardcochran@gmail.com>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net 2/3] net: lan743x: support WOL in MAC even when PHY
- does not
-Message-ID: <20240226082840.qbofj764s35zo352@DEN-DL-M31836.microchip.com>
-References: <20240226080934.46003-1-Raju.Lakkaraju@microchip.com>
- <20240226080934.46003-3-Raju.Lakkaraju@microchip.com>
+	s=arc-20240116; t=1708936280; c=relaxed/simple;
+	bh=Dygiyz1OnjTfaz+BngVouI977noQ0Hft298bDIocTX4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mQstVceoQ5neFKpw1EtZXkdZbLU+7ueaJ74uS2j5nONkg9G+WfOHULazH8KCe11BKe667IyZ8elzsvR3HvTTa9Mg2TwCH8CvmRfJShFfzQvVedkL5zm/W44ps/fJEG3K6xgwe6ilnMa/O5VQvv7driXn3oSetaW9b5J5SsRxoGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X93QE35U; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708936277;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TfCEbsiS180Pzdnz3BmbeixICS+mxWP3WbokAEMsGb4=;
+	b=X93QE35UGYNsh/jjlggILxsEYwRkax8OSMs8R1jZTCnrFfGwQyThcg8y/7HQM1E/JBi0js
+	Lc7e/Ira5ARgmu99B49TTjx7FBEuGSAVQiLTmnQGoGrt7eQHB19AL5uLqd7snpb8kdGBgF
+	+De1OaxUFj5nRI9m3rQ74Za1l4D/sXM=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-213-B0ZEbJQUMA2_ZMktunU6Rw-1; Mon, 26 Feb 2024 03:31:15 -0500
+X-MC-Unique: B0ZEbJQUMA2_ZMktunU6Rw-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a3fc1f1805bso145402266b.2
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 00:31:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708936274; x=1709541074;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TfCEbsiS180Pzdnz3BmbeixICS+mxWP3WbokAEMsGb4=;
+        b=ByIsn7Gy+yS7YWN7EKfk7ZpPU/gNx17mxEMVkxP/zRSVcZUBphFYLdtK9K4CZLqZ6/
+         +OTOpOMrmW0q70ZzzMfqEUc6YaM4Jlsr5YQj2e25XcvlupJh/tNZCt1PCquDwG0DWbt6
+         NdH9YxDHnBlXB6XwRPw7kc7v2TEJZSto6GRJ+gEPdhsz5h6vIWX5huDuUeCXNE3g1y8O
+         j03obKZ7NZmBpYeWNyUBiz7qIRdfJ1fyXeooTPCfWxJa1xwyN9R2Be6FbXM2AA10waGj
+         UrpAZhZKWFRxOxAfAqi10V05j/zA52++/iuT0hbLAgNXfdaH9IuoH4rRU/wlXk4Gx11Q
+         CRhw==
+X-Forwarded-Encrypted: i=1; AJvYcCVb3JQyjkDQxXCH4aCCCUG7czYwhwA28T/u1xryEOmDH99RGKqp/gcW0b+8ehupU0UWh1wLGU0OjN8Tk7NG7fLc5nKQ4Lzc
+X-Gm-Message-State: AOJu0YweX64v5I3nNtEnnEx96syjsw7EeaBP7sp/uu4sa5lqDuqXcjCq
+	K17vN5pECGmHKZtzsn2p7m4fk1MeXbI3cbwiRVmouQnbik+/uwAzv6Y8nrOCI5Bca4/8cXmcgJT
+	dRIPIV3/k4stjpoqbQFvm2xC0pACrMrMRoEv2dOhSoyc0G7EeyHJpAA==
+X-Received: by 2002:a17:906:a44d:b0:a3d:9a28:52e6 with SMTP id cb13-20020a170906a44d00b00a3d9a2852e6mr4010970ejb.50.1708936274468;
+        Mon, 26 Feb 2024 00:31:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHkiK6ZRARULAZlIUD5UEKkd5/oLyZp7eTkoe/Z67A7OQ0GXsH51rC970dStdoLZ85YatD2eQ==
+X-Received: by 2002:a17:906:a44d:b0:a3d:9a28:52e6 with SMTP id cb13-20020a170906a44d00b00a3d9a2852e6mr4010953ejb.50.1708936274154;
+        Mon, 26 Feb 2024 00:31:14 -0800 (PST)
+Received: from sgarzare-redhat (host-87-11-6-148.retail.telecomitalia.it. [87.11.6.148])
+        by smtp.gmail.com with ESMTPSA id vk3-20020a170907cbc300b00a42fe08081fsm1874734ejc.47.2024.02.26.00.31.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Feb 2024 00:31:13 -0800 (PST)
+Date: Mon, 26 Feb 2024 09:31:11 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com, 
+	edumazet@google.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	horms@kernel.org, 
+	"open list:VM SOCKETS (AF_VSOCK)" <virtualization@lists.linux.dev>
+Subject: Re: [PATCH net-next 2/2] net/vsockmon: Do not set zeroed statistics
+Message-ID: <rqyg27a7ukbrg7wz44jqliv3ckl6ub6fnpdcpxsutw3yyczajm@iqzvhw4rqdy6>
+References: <20240223115839.3572852-1-leitao@debian.org>
+ <20240223115839.3572852-2-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20240226080934.46003-3-Raju.Lakkaraju@microchip.com>
+In-Reply-To: <20240223115839.3572852-2-leitao@debian.org>
 
-The 02/26/2024 13:39, Raju Lakkaraju wrote:
-> Allow WOL support if MAC supports it, even if the PHY does not support it
-> 
-> Fixes: e9e13b6adc338 ("lan743x: fix for potential NULL pointer dereference
-> with bare card")
-> 
-Please no spaces between the tags. And you should not split on multiple
-line Fixes tag.
+On Fri, Feb 23, 2024 at 03:58:38AM -0800, Breno Leitao wrote:
+>Do not set rtnl_link_stats64 fields to zero, since they are zeroed
+>before ops->ndo_get_stats64 is called in core dev_get_stats() function.
+>
+>Signed-off-by: Breno Leitao <leitao@debian.org>
+>---
+> drivers/net/vsockmon.c | 3 ---
+> 1 file changed, 3 deletions(-)
 
-> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-> ---
->  drivers/net/ethernet/microchip/lan743x_ethtool.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-> index a2b3f4433ca8..4899582b3d1d 100644
-> --- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
-> +++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-> @@ -1163,6 +1163,17 @@ static int lan743x_ethtool_set_wol(struct net_device *netdev,
->  				   struct ethtool_wolinfo *wol)
->  {
->  	struct lan743x_adapter *adapter = netdev_priv(netdev);
-> +	int ret;
-> +
-> +	if (netdev->phydev) {
-> +		ret = phy_ethtool_set_wol(netdev->phydev, wol);
-> +		if (ret != -EOPNOTSUPP && ret != 0)
-> +			return ret;
-> +
-> +		if (ret == -EOPNOTSUPP)
-> +			netif_info(adapter, drv, adapter->netdev,
-> +				   "phy does not support WOL\n");
-> +	}
->  
->  	adapter->wolopts = 0;
->  	if (wol->wolopts & WAKE_UCAST)
-> @@ -1187,8 +1198,7 @@ static int lan743x_ethtool_set_wol(struct net_device *netdev,
->  
->  	device_set_wakeup_enable(&adapter->pdev->dev, (bool)wol->wolopts);
->  
-> -	return netdev->phydev ? phy_ethtool_set_wol(netdev->phydev, wol)
-> -			: -ENETDOWN;
-> +	return 0;
->  }
->  #endif /* CONFIG_PM */
->  
-> -- 
-> 2.34.1
-> 
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
--- 
-/Horatiu
+>
+>diff --git a/drivers/net/vsockmon.c b/drivers/net/vsockmon.c
+>index a0b4dca36baf..a1ba5169ed5d 100644
+>--- a/drivers/net/vsockmon.c
+>+++ b/drivers/net/vsockmon.c
+>@@ -46,9 +46,6 @@ static void
+> vsockmon_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
+> {
+> 	dev_lstats_read(dev, &stats->rx_packets, &stats->rx_bytes);
+>-
+>-	stats->tx_packets = 0;
+>-	stats->tx_bytes = 0;
+> }
+>
+> static int vsockmon_is_valid_mtu(int new_mtu)
+>-- 
+>2.39.3
+>
+
 
