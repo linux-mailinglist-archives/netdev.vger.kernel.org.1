@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-75091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23569868223
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 21:56:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8026868217
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 21:51:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9F911F25203
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 20:56:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DDDB1F23F2F
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 20:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD49A130E41;
-	Mon, 26 Feb 2024 20:55:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E8D9131E20;
+	Mon, 26 Feb 2024 20:50:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="hbhyWQdG"
+	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="NCJ3Q9Us"
 X-Original-To: netdev@vger.kernel.org
 Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC5D2AD0F;
-	Mon, 26 Feb 2024 20:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B701F131745;
+	Mon, 26 Feb 2024 20:50:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708980957; cv=none; b=XS49tVPjDDruoxZz5951KNH35BGHLqFIL7+43EmAkI9mb7JWybV78PIb5hrR7BrITYEy9RSM9fdeLe3SYuJNtPuJJq1kK5lCPdG7EtbORRgSMHv/s0GWBWuBpeSXrDrwJGTBalxEguJ8kzcl/X/7Mr0yVdpYReB02kp48lDFtss=
+	t=1708980644; cv=none; b=Cka4RWpjEWSUQ8bg7uc1Y0GM4uX2eLeOOY+YFDmodL6sV2pPx5+G5milQ5YygU+ZmQCgAAU2Tvz7+xueBqA7m250MZ6bOSU/FjeX/VwpazOnIE7bmbG6J1yRxiEW0nGaz6tPDNoCuhxCWV5vwPwkaRMwqEfZ+0c7RM/m1q2z6TY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708980957; c=relaxed/simple;
-	bh=02zprmOhLIbgChsRDiWJHbDY7QAwsInduXqZqDxFSDU=;
+	s=arc-20240116; t=1708980644; c=relaxed/simple;
+	bh=QgzzaM9ViGKcwOoH1Mzli8mKf9EzfwB3b2b39L7lRuI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KGpsDy7xIClgjz7O7Fp0sgNfFyykJpOJITX/m90CxLuXUEHe5iWG5q7Ik0bP/FV5la5G5A2M4Z1xmPVwLJsUNjQGe7QVWzxwF2oDWAoiIdFxpXoGagPNl9vkSooS1Jvhuk+8zHSQ5vSC5bk4cGMgs8OniiVPC2cAv59W6OIfVOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=hbhyWQdG; arc=none smtp.client-ip=78.47.171.185
+	 In-Reply-To:Content-Type; b=mXzQWH/XyJf9bBdJvAK53DGyBen2j7eEYvhC/lvePvIYhasKkUvSYu4foRa6PQj88nuuliZIbnM+2Kf7v26x8Hqah/B5lKnLyonqpVEMy2B2IqSlJykJDEd+cgQiVKB+qlCPnobInhd+j8qA2I36o2IJqXtAt70yfN2ivZMcmu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=NCJ3Q9Us; arc=none smtp.client-ip=78.47.171.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
 Received: from [IPV6:2003:e9:d739:bb29:632d:d63:dac0:8169] (p200300e9d739bb29632d0d63dac08169.dip0.t-ipconnect.de [IPv6:2003:e9:d739:bb29:632d:d63:dac0:8169])
@@ -36,22 +36,22 @@ Received: from [IPV6:2003:e9:d739:bb29:632d:d63:dac0:8169] (p200300e9d739bb29632
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id CA816C0924;
-	Mon, 26 Feb 2024 21:49:49 +0100 (CET)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id 7B8F2C0944;
+	Mon, 26 Feb 2024 21:50:38 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1708980590;
+	s=2021; t=1708980638;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=W7OAuuFC+fmZ1nPUbf+yUsQuGL64Qf+7Ju4BkHDCQyU=;
-	b=hbhyWQdGtF1jVC6oFeUWMiEA/2Uib6EkQ9ecEZuw5ktZEAFcoeRjg36hFd+fjGEi1Ry3bg
-	FTfFLjiNkbsHpRnwGCAeDr2kmyJBzchfBRjEvRgYrdFiwHk7DggMh3tsa/+m7nSN1s10XT
-	UhA49YuCE0Ctac11Zadx53QbVWQ5NMcvmHEgLTirVGWm4ne24wyQ8/KjK5uhcl51EVowba
-	0keODdJYk1JEG8emE9DsER76SyIIPL59ZpukYG29wPjDYuuI83vm4JUFzjJG9/PL2XX32S
-	MtuKOcZmiNQ7oPhMf0kgl5lel3SFTruW3U6U+YmSO4QaY509Mpb708uVTPkURg==
-Message-ID: <87cc872f-d6f9-47d6-b579-f0412430889c@datenfreihafen.org>
-Date: Mon, 26 Feb 2024 21:48:40 +0100
+	bh=uHQOxK4Dx7A2fhV1c1TcZ/1+zV41qKk72MzwYutnA1Y=;
+	b=NCJ3Q9UsGp96FnucjRhhPvB/ig41Kdjsesa9mMLjvhWK/mvvvRNCp/3CsfuMXWjKauj3AL
+	AgWDvwNz98ivtFV4e0o/mzmvRiT4vLAc0eYb64AlrYDQ+w9fxio0z/l4veGuczkpCKzleo
+	0CiVqbBKeIt8yW3XrSM9+eawng5pQa9mojJIjifDAPCCzWzxEcezxHLBIZqUwKFThekOFF
+	d4DLjnCuL4LdVCm4Ub5a9/t2JLuiwWt2l+Nsal/Wb4z9ut5avAL8/z4wZ0nU4GdroDIf52
+	csNk+eC+I4jU1jMapT/+g/OtcUP7mN61xkjY4vgqZRcSAnI6KXVyohAt0xbalA==
+Message-ID: <bc64b713-0e38-4674-8d8e-54389c22d95c@datenfreihafen.org>
+Date: Mon, 26 Feb 2024 21:50:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,7 +59,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: ieee802154: at86rf230: convert to use maple tree
+Subject: Re: [PATCH] net: ieee802154: mcr20a: convert to use maple tree
  register cache
 Content-Language: en-US
 To: Bo Liu <liubo03@inspur.com>, alex.aring@gmail.com,
@@ -67,37 +67,46 @@ To: Bo Liu <liubo03@inspur.com>, alex.aring@gmail.com,
  kuba@kernel.org, pabeni@redhat.com
 Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org
-References: <20240202064512.39259-1-liubo03@inspur.com>
+References: <20240202064611.39346-1-liubo03@inspur.com>
 From: Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20240202064512.39259-1-liubo03@inspur.com>
+In-Reply-To: <20240202064611.39346-1-liubo03@inspur.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hello,
 
-On 02.02.24 07:45, Bo Liu wrote:
+On 02.02.24 07:46, Bo Liu wrote:
 > The maple tree register cache is based on a much more modern data structure
 > than the rbtree cache and makes optimisation choices which are probably
 > more appropriate for modern systems than those made by the rbtree cache.
 > 
 > Signed-off-by: Bo Liu <liubo03@inspur.com>
 > ---
->   drivers/net/ieee802154/at86rf230.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   drivers/net/ieee802154/mcr20a.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-> index 164c7f605af5..6212164ffb36 100644
-> --- a/drivers/net/ieee802154/at86rf230.c
-> +++ b/drivers/net/ieee802154/at86rf230.c
-> @@ -316,7 +316,7 @@ static const struct regmap_config at86rf230_regmap_spi_config = {
->   	.val_bits = 8,
->   	.write_flag_mask = CMD_REG | CMD_WRITE,
->   	.read_flag_mask = CMD_REG,
-> -	.cache_type = REGCACHE_RBTREE,
-> +	.cache_type = REGCACHE_MAPLE,
->   	.max_register = AT86RF2XX_NUMREGS,
->   	.writeable_reg = at86rf230_reg_writeable,
->   	.readable_reg = at86rf230_reg_readable,
+> diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
+> index 87abe3b46316..efb1be3c644e 100644
+> --- a/drivers/net/ieee802154/mcr20a.c
+> +++ b/drivers/net/ieee802154/mcr20a.c
+> @@ -251,7 +251,7 @@ static const struct regmap_config mcr20a_dar_regmap = {
+>   	.val_bits		= 8,
+>   	.write_flag_mask	= REGISTER_ACCESS | REGISTER_WRITE,
+>   	.read_flag_mask		= REGISTER_ACCESS | REGISTER_READ,
+> -	.cache_type		= REGCACHE_RBTREE,
+> +	.cache_type		= REGCACHE_MAPLE,
+>   	.writeable_reg		= mcr20a_dar_writeable,
+>   	.readable_reg		= mcr20a_dar_readable,
+>   	.volatile_reg		= mcr20a_dar_volatile,
+> @@ -387,7 +387,7 @@ static const struct regmap_config mcr20a_iar_regmap = {
+>   	.val_bits		= 8,
+>   	.write_flag_mask	= REGISTER_ACCESS | REGISTER_WRITE | IAR_INDEX,
+>   	.read_flag_mask		= REGISTER_ACCESS | REGISTER_READ  | IAR_INDEX,
+> -	.cache_type		= REGCACHE_RBTREE,
+> +	.cache_type		= REGCACHE_MAPLE,
+>   	.writeable_reg		= mcr20a_iar_writeable,
+>   	.readable_reg		= mcr20a_iar_readable,
+>   	.volatile_reg		= mcr20a_iar_volatile,
 
 This patch has been applied to the wpan-next tree and will be
 part of the next pull request to net-next. Thanks!
