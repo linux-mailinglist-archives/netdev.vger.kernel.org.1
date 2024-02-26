@@ -1,83 +1,99 @@
-Return-Path: <netdev+bounces-74988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D52AF867A8E
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:44:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC9BC867A9E
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:46:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70B101F24339
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:44:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 587C61F2777E
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:46:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B946F12BE8B;
-	Mon, 26 Feb 2024 15:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KD6zZoZg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13A0112BEBD;
+	Mon, 26 Feb 2024 15:46:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A3C12AAE5;
-	Mon, 26 Feb 2024 15:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2A91BDDC;
+	Mon, 26 Feb 2024 15:45:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708962239; cv=none; b=NtOMSoNFwR7+XoevLuhr3b0MQoObjXnVHDeSCSlUg4cZUtyZ8S+FDM4o1tm/sMYzNH9/mILJNxi87XO4MDDNQjkF9eDdEcrx2Q9yB4S0YqA4AUN0uPR4cLi47uiJ/tamxACTu2M+LMwnGu75jCBHElIar03cq9kVsBjzRRNnWmM=
+	t=1708962360; cv=none; b=IIn3AjoxMCg3OtF/Z9srvktuNZML46un1KAhUqJS+4Ef5A+RBE0NAfJgN1Vre2suHkC+9+OvokIaUk+EzRAlY+C3bUy3UtlTkghAljI12WRrjCUBPFbMJfppDSlQp9rPHdwWnK6uKcxDzWVIRSIhCouWSeX+OmeBJzfgmf8pLnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708962239; c=relaxed/simple;
-	bh=A01BNmVP9A1tmR3VtlSByNSQsi8R6HrQkgjno3xZJLs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gu5d/1H+doX7zRGeaBdZp7oJK7UJ9p39ZXzxytjovadEaXmdXnsIc/QwjiZxkKSgupzvH64lprGpeDWmekt1NCTjJ9b05xSLK+Cf8XWfZ83jf5ooWdVxCL+N9dCkr8YxpSWPvbFDOzDFEumoW8JpKYsUvOgv4hy/jMJn79HRDUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KD6zZoZg; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=VQ6ZSxatzFmn25+yzQDmr+s/5uD5itV+q5l/DZTxHwI=; b=KD6zZoZgvnLZUnuYQ6vfPvEv0x
-	NkfDIfPm42C8wJTy/gC4AEFjeVv9Mpa6TDw3lgLpKSb8ZoiDbCPoQJ3g/WZyap/7vtjJbf79DSbqv
-	H0lpUuKbvBUIE3upA4C6MhLt8aaUvEIpz9PqwOel9giPa49lg4oVkXkoFhNQ39u068KQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1red9A-008jol-KK; Mon, 26 Feb 2024 16:44:04 +0100
-Date: Mon, 26 Feb 2024 16:44:04 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bsp-development.geo@leica-geosystems.com, m.felsch@pengutronix.de
-Subject: Re: [PATCH] net: phy: dp83826: disable WOL at init
-Message-ID: <0fca6571-39ee-47de-94bc-1bf9749192b1@lunn.ch>
-References: <20240223143127.1942129-1-catalin.popescu@leica-geosystems.com>
+	s=arc-20240116; t=1708962360; c=relaxed/simple;
+	bh=bdJTfIlFy3ED3bBg1k1z8Me8BEsVndqCk6aPs/qgrVU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a39wgW1+Hw+1btwCFEIrzoZ2gLafKFiu2dDNuek5MouahrSXUqZcBQpSOzMF+W3Vi1fug3Gjf0fWuUI6hMWna+jmWpaWbrLAbHbr5kS+gzmqlgS4M3UhirDw1Nl3Fx329H3ms2n6jB+xZCN37om1ml+jbp1zoGV9YHxyOfxN93Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B4E93DA7;
+	Mon, 26 Feb 2024 07:46:36 -0800 (PST)
+Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 10D503F762;
+	Mon, 26 Feb 2024 07:45:55 -0800 (PST)
+Message-ID: <7e3c779e-09ae-4c87-855e-f0e6ae945169@arm.com>
+Date: Mon, 26 Feb 2024 15:45:44 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240223143127.1942129-1-catalin.popescu@leica-geosystems.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/7] dma: avoid redundant calls for sync
+ operations
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Christoph Hellwig <hch@lst.de>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Magnus Karlsson <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Alexander Duyck <alexanderduyck@fb.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20240214162201.4168778-1-aleksander.lobakin@intel.com>
+ <20240214162201.4168778-3-aleksander.lobakin@intel.com>
+ <3a9dd580-1977-418f-a3f3-73003dd37710@arm.com>
+ <4d2678be-e36c-4726-83a5-ae9a3a0def55@intel.com>
+Content-Language: en-GB
+From: Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <4d2678be-e36c-4726-83a5-ae9a3a0def55@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 23, 2024 at 03:31:27PM +0100, Catalin Popescu wrote:
-> Commit d1d77120bc28 ("net: phy: dp83826: support TX data voltage tuning")
-> introduced a regression in that WOL is not disabled by default for DP83826.
-> WOL should normally be enabled through ethtool.
+On 19/02/2024 12:49 pm, Alexander Lobakin wrote:
+> From: Robin Murphy <robin.murphy@arm.com>
+> Date: Wed, 14 Feb 2024 17:55:23 +0000
 > 
-> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+>> On 2024-02-14 4:21 pm, Alexander Lobakin wrote:
+> 
+> [...]
+> 
+>>> +        /*
+>>> +         * Synchronization is not possible when none of DMA sync ops
+>>> +         * is set. This check precedes the below one as it disables
+>>> +         * the synchronization unconditionally.
+>>> +         */
+>>> +        dev->dma_skip_sync = true;
+>>> +    else if (ops->flags & DMA_F_CAN_SKIP_SYNC)
+>>
+>> Personally I'd combine this into the dma-direct condition.
+> 
+> Please read the code comment a couple lines above :D
 
-d1d77120bc28 ("net: phy: dp83826: support TX data voltage tuning") is
-only in net-next? So you should set the patch subject to
-net-next. See:
+And my point is that that logic is not actually useful, since it would 
+be nonsensical for ops to set DMA_F_CAN_SKIP_SYNC if they don't even 
+implement sync ops anyway.
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#netdev-faq
+If the intent of DMA_F_CAN_SKIP_SYNC is to mean "behaves like 
+dma-direct", then "if (dma_map_direct(...) || ops->flags & 
+DMA_F_CAN_SKIP_SYNC)" is an entirely logical and expected condition.
 
-Please also add a Fixes tag.
-
-The change itself looks O.K.
-
-       Andrew
+Thanks,
+Robin.
 
