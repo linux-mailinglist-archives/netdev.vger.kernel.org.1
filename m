@@ -1,166 +1,115 @@
-Return-Path: <netdev+bounces-75064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB1F98680F9
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 20:27:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F7D18680B1
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 20:16:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C3F3B221B9
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 19:16:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6161D1C27BB1
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 19:16:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E73C13175F;
-	Mon, 26 Feb 2024 19:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Ynqm5rzn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80772130E2A;
+	Mon, 26 Feb 2024 19:15:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8735C12EBE8;
-	Mon, 26 Feb 2024 19:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+Received: from mail.rmail.be (mail.rmail.be [85.234.218.189])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2CC612F583
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 19:15:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.234.218.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708974884; cv=none; b=Cw4ddmWq1fYV4PP2CozjfcqyvlqldTUZT0PNNpW9GEPShvgLfYz5/cxt8z3l5XQXsbZBdmcp+9dORzun76+CKZFIYi3Zqnwk19gluc5WXPBeJM/gWlIZGKA1o8ZulAwp3/faCg13RvX630pV8zg/qFyc8J87Le/L34aQznG2B+I=
+	t=1708974907; cv=none; b=m/Drg25a9a+Q2azUmx9kx+LQ/Qg9HfVZloLehjjEncccPb+s3R843z9lDhygn+cTjxaZ7mar3qEJMsk76xZE/M/9+WTghlE+A/CnWB9/Gx88VpScFTimLP9Xejz8aRI4lFKXjW4zppMLEQrmkFtycN4JqhZ6WMcbA5Q9SCVUvHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708974884; c=relaxed/simple;
-	bh=2IMvj6BKrad+UO3o4Lame0r1eHqCS356qNz3ZuhZK+s=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gWQvJMpEeQVtVD6QkBgUdwFa3jyIhBTViC7+wuofMGMBLDwhE1p6r3uft4gqXc7pUG/+yNAzEnxUJhtdpuBi/NEY6HXinCg0Z4ZbyqYw05RaSjUA8Xz8l+9vYAtodVwOEhqph0o9T8vm6bEoTolVX35xBQ1dL7ub+3s5bx2oPzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Ynqm5rzn; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1708974883; x=1740510883;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=iEKwG7cNpTMOSKTX2FSnQ7X44J36E2CiTEJVO4bOpAs=;
-  b=Ynqm5rznyuBrOe/SiBZdfsvE2R0SIzqjpXrRV3hqcY2g8mP3Ei0evwG2
-   Lx/QQ49W365ivOhJVnXoB1SYo3nyjvFuzjG5ER6fWTvkof33aaXaTS2n2
-   8jbzp1dbzroxzK7wclhNU610xNe9jL/UNwkVfwXiUmf4lxNGqlVidue/d
-   k=;
-X-IronPort-AV: E=Sophos;i="6.06,186,1705363200"; 
-   d="scan'208";a="383773673"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 19:14:39 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:65011]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.27:2525] with esmtp (Farcaster)
- id 6c797f54-cb18-4c26-bb08-5b44a9c49f79; Mon, 26 Feb 2024 19:14:38 +0000 (UTC)
-X-Farcaster-Flow-ID: 6c797f54-cb18-4c26-bb08-5b44a9c49f79
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 26 Feb 2024 19:14:33 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.48) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 26 Feb 2024 19:14:30 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuniyu@amazon.com>
-CC: <allison.henderson@oracle.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <kuni1840@gmail.com>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<rds-devel@oss.oracle.com>, <sowmini.varadhan@oracle.com>,
-	<syzkaller@googlegroups.com>
-Subject: Re: [PATCH v1 net 2/2] rds: tcp: Fix use-after-free of net in reqsk_timer_handler().
-Date: Mon, 26 Feb 2024 11:14:21 -0800
-Message-ID: <20240226191421.66834-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240223182832.99661-1-kuniyu@amazon.com>
-References: <20240223182832.99661-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1708974907; c=relaxed/simple;
+	bh=rVJzeL0Cnk7tB5HsXAqTDFQ2XSB2X6f0OPgXmd9uCb4=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=cxeqG8+3hVWjgTYtn5TJuh5bkSRfWChQxRwtMaN+7DLSKypMcnBTicGwK4aHtHvFw7iRKz6a3Q6yDjq4FH4C6c9fJfCUpUQRsnu2dTIbRwOi9j504iLMsEacmMdfS34OObEakRVke3wf0F4Au7Jz/ItEziDRkq5S9QkAQnQ/ApY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rmail.be; spf=pass smtp.mailfrom=rmail.be; arc=none smtp.client-ip=85.234.218.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rmail.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rmail.be
+Received: from mail.rmail.be (domotica.rmail.be [10.238.9.4])
+	by mail.rmail.be (Postfix) with ESMTP id 83D4D4B0B4;
+	Mon, 26 Feb 2024 20:14:54 +0100 (CET)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D032UWB001.ant.amazon.com (10.13.139.152) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Date: Mon, 26 Feb 2024 20:14:54 +0100
+From: Maarten <maarten@rmail.be>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Doug Berger <opendmb@gmail.com>, netdev@vger.kernel.org, Broadcom
+ internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Phil
+ Elwell <phil@raspberrypi.com>
+Subject: Re: [PATCH] net: bcmgenet: Reset RBUF on first open
+In-Reply-To: <bc73b1e2-d99d-4ac2-9ae0-a55a8b271747@broadcom.com>
+References: <20240224000025.2078580-1-maarten@rmail.be>
+ <bc73b1e2-d99d-4ac2-9ae0-a55a8b271747@broadcom.com>
+Message-ID: <47ba4ef5a42fe7412d7e3432a0995464@rmail.be>
+X-Sender: maarten@rmail.be
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Fri, 23 Feb 2024 10:28:32 -0800
-> From: Eric Dumazet <edumazet@google.com>
-> Date: Fri, 23 Feb 2024 19:09:27 +0100
-> > On Fri, Feb 23, 2024 at 6:26 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> > >
-> > > syzkaller reported a warning of netns tracker [0] followed by KASAN
-> > > splat [1] and another ref tracker warning [1].
-> > >
-> > > syzkaller could not find a repro, but in the log, the only suspicious
-> > > sequence was as follows:
-> > >
-> > >   18:26:22 executing program 1:
-> > >   r0 = socket$inet6_mptcp(0xa, 0x1, 0x106)
-> > >   ...
-> > >   connect$inet6(r0, &(0x7f0000000080)={0xa, 0x4001, 0x0, @loopback}, 0x1c) (async)
-> > >
-> > > The notable thing here is 0x4001 in connect(), which is RDS_TCP_PORT.
-> > >
-> > > So, the scenario would be:
-> > >
-> > >   1. unshare(CLONE_NEWNET) creates a per netns tcp listener in
-> > >       rds_tcp_listen_init().
-> > >   2. syz-executor connect()s to it and creates a reqsk.
-> > >   3. syz-executor exit()s immediately.
-> > >   4. netns is dismantled.  [0]
-> > >   5. reqsk timer is fired, and UAF happens while freeing reqsk.  [1]
-> > >   6. listener is freed after RCU grace period.  [2]
-> > >
-> > > Basically, reqsk assumes that the listener guarantees netns safety
-> > > until all reqsk timers are expired by holding the listener's refcount.
-> > > However, this was not the case for kernel sockets.
-> > >
-> > > Commit 740ea3c4a0b2 ("tcp: Clean up kernel listener's reqsk in
-> > > inet_twsk_purge()") fixed this issue only for per-netns ehash, but
-> > > the issue still exists for the global ehash.
-> > >
-> > > We can apply the same fix, but this issue is specific to RDS.
-> > >
-> > > Instead of iterating potentially large ehash and purging reqsk during
-> > > netns dismantle, let's hold netns refcount for the kernel TCP listener.
-> > >
-> > >
-> > > Reported-by: syzkaller <syzkaller@googlegroups.com>
-> > > Fixes: 467fa15356ac ("RDS-TCP: Support multiple RDS-TCP listen endpoints, one per netns.")
-> > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > > ---
-> > >  net/rds/tcp_listen.c | 5 +++++
-> > >  1 file changed, 5 insertions(+)
-> > >
-> > > diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-> > > index 05008ce5c421..4f7863932df7 100644
-> > > --- a/net/rds/tcp_listen.c
-> > > +++ b/net/rds/tcp_listen.c
-> > > @@ -282,6 +282,11 @@ struct socket *rds_tcp_listen_init(struct net *net, bool isv6)
-> > >                 goto out;
-> > >         }
-> > >
-> > > +       __netns_tracker_free(net, &sock->sk->ns_tracker, false);
-> > > +       sock->sk->sk_net_refcnt = 1;
-> > > +       get_net_track(net, &sock->sk->ns_tracker, GFP_KERNEL);
-> > > +       sock_inuse_add(net, 1);
-> > > +
-> > 
-> > Why using sock_create_kern() then later 'convert' this kernel socket
-> > to a user one ?
-> > 
-> > Would using __sock_create() avoid this ?
+Florian Fainelli schreef op 2024-02-26 18:34:
+> On 2/23/24 15:53, Maarten Vanraes wrote:
+>> From: Phil Elwell <phil@raspberrypi.com>
+>> 
+>> If the RBUF logic is not reset when the kernel starts then there
+>> may be some data left over from any network boot loader. If the
+>> 64-byte packet headers are enabled then this can be fatal.
+>> 
+>> Extend bcmgenet_dma_disable to do perform the reset, but not when
+>> called from bcmgenet_resume in order to preserve a wake packet.
+>> 
+>> N.B. This different handling of resume is just based on a hunch -
+>> why else wouldn't one reset the RBUF as well as the TBUF? If this
+>> isn't the case then it's easy to change the patch to make the RBUF
+>> reset unconditional.
 > 
-> I think yes, but LSM would see kern=0 in pre/post socket() hooks.
+> The real question is why is not the boot loader putting the GENET core
+> into a quasi power-on-reset state, since this is what Linux expects,
+> and also it seems the most conservative and prudent approach. Assuming
+> the RDMA and Unimac RX are disabled, otherwise we would happily
+> continuing to accept packets in DRAM, then the question is why is not
+> the RBUF flushed too, or is it flushed, but this is insufficient, if
+> so, have we determined why?
+
+I can only say that when I was testing upstream kernels (6.7, 6.8) I had 
+a lot of issue rebooting the RPI4B, and after some searched, I found 
+this patch in the raspberrypi kernel (from 2020) and since I've used it, 
+I do not have this issue anymore for at least 10 boots. Not sure if I 
+should've added a Tested-By with myself?
+
+>> 
+>> See: https://github.com/raspberrypi/linux/issues/3850
+>> 
+>> Signed-off-by: Phil Elwell <phil@raspberrypi.com>
+>> Signed-off-by: Maarten Vanraes <maarten@rmail.be>
+>> ---
+>>   drivers/net/ethernet/broadcom/genet/bcmgenet.c | 16 ++++++++++++----
+>>   1 file changed, 12 insertions(+), 4 deletions(-)
+>> 
+>> This patch fixes a problem on RPI 4B where in ~2/3 cases (if you're 
+>> using
+>> nfsroot), you fail to boot; or at least the boot takes longer than
+>> 30 minutes.
 > 
-> Probably we can use __sock_create() in net-next and see if someone
-> complains.
-
-I noticed the patchwork status is Changes Requested.
-https://patchwork.kernel.org/project/netdevbpf/list/?series=829213&state=*
-
-Should we use __sock_create() for RDS or add another parameter
-to __sock_create(..., kern=true/false, netref=true/false) and
-fix other similar uses (MPTCP, SMC, Netlink) altogether ?
-
-Thanks!
+> This makes me wonder whether this also fixes the issues that Maxime
+> reported a long time ago, which I can reproduce too, but have not been
+> able to track down the source of:
+> 
+> https://lore.kernel.org/linux-kernel/20210706081651.diwks5meyaighx3e@gilmour/
+> 
+>> 
+>> Doing a simple ping revealed that when the ping starts working again
+>> (during the boot process), you have ping timings of ~1000ms, 2000ms or
+>> even 3000ms; while in normal cases it would be around 0.2ms.
+> 
+> I would prefer that we find a way to better qualify whether a RBUF
+> reset is needed or not, but I suppose there is not any other way,
+> since there is an "RBUF enabled" bit that we can key off.
+> 
+> Doug, what do you think?
 
