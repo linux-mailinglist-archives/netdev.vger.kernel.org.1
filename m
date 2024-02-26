@@ -1,169 +1,135 @@
-Return-Path: <netdev+bounces-74878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC9E3867124
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:33:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64FEC867148
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:35:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A66D1C27598
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:33:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CE1B288D22
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC4F1CD21;
-	Mon, 26 Feb 2024 10:18:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AEF123768;
+	Mon, 26 Feb 2024 10:27:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S8LsbQBT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SLM+liUb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAA11CABF;
-	Mon, 26 Feb 2024 10:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1704817;
+	Mon, 26 Feb 2024 10:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708942700; cv=none; b=u9HYPPnXy6QLSSnDPqhdZ3ejMLs8Pz4faflqmnDyL+b3SK7fWwF8wQ/tAQ7JezAFNQdwiv6xvcleohuShuYkt4Wjn/GRcdUAqLNtcgiKg7DJOzY/jH6fAYOXO0Z/G3W6yUvBLZC0LgmF6KhfTqBl+ZBLPVlaOsvjQJQwqVCrgxw=
+	t=1708943252; cv=none; b=bzBsF8t0rCsydfR1bUNQwpEucRA/Zm9pXqDOyjTyZTkFq3Upk9dDdHeUfbQwMH1t2hCoGv7R+yuz23plQJziLx/TMoR9XJbCU3AsR97QuYglDlhExwpiFhZ/L6L9Q0l5oDUHur1ZpP/xcQdKkzGGTVM8kFOlCt2vbIm1zRjNeAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708942700; c=relaxed/simple;
-	bh=mFO7+G0tEjbg4M4mUtn7+xGTlT36Az3/BD2MVuIpse4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SSmFmrt5vSoZ8+UG4bOj9dZt0x28zLJ1G6HKT4mlm5btpR5Om7X/xNVR20Vk8vcUIXhri8lUSeOQjRcPRyMGEKQdMPWK69f3Kd4tFA1yZvNf496ApGiN4JA8pxQQ+5szA49JmDI5xzLSxN247ReN3jUBMNTu3AxZBbhQmox94J8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S8LsbQBT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25517C433F1;
-	Mon, 26 Feb 2024 10:18:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708942699;
-	bh=mFO7+G0tEjbg4M4mUtn7+xGTlT36Az3/BD2MVuIpse4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=S8LsbQBTdYmj8SyRiLaflK/cml3rC77ADNJ482G2pHTuRPtkjhrFBNXWd9NGaZSUF
-	 r57kf12lEEYkR/9I4ZvHLw1XjeEZh0kpmxSWThvUVo/FhXQoF2IuHdK8oVBXPV/Eai
-	 vfplAvuhy44dLK5zFZ/rdi8cLtC0U6aSO8XAeH/B3wzdHQeXo3V1Zb3PW/lWQXeCeC
-	 4s6L2JfXYzwZ/Hugf2dg+NlyeUiUYQjXpbWdL8DbC7YmUDjJ4Fi/t9vd4bRuZL4CK4
-	 9hncXE8VDdk+n5YIWXkyYeDetHIBrT+gc1vSZ29l0SACkRoqPvlXiKwv1Cg2vJHYzi
-	 wC7D0PmK2uWlg==
-Message-ID: <bd0a9d66-783d-4936-a5b0-cd4082704137@kernel.org>
-Date: Mon, 26 Feb 2024 11:18:15 +0100
+	s=arc-20240116; t=1708943252; c=relaxed/simple;
+	bh=5L9QNoh0f+vRtiDXMwpI8NJgAp36BLuI/7gvCVOlhwg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=k5wRLfpm0zu6UOLLrFaczmPkCy2MmWgKpHTu+zXkfaAVj570FL69udg+FhW55alcyoX6z9wSM5YPPOwvDsWVuy/ZLknuIwbTpd5ntF8mMPWCxoNSbeMF8QNjR3M3RmZ8+8akIisQJwEiF4VlQTTkPYqSb0Pq8zWngwI82dK7Ops=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SLM+liUb; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708943250; x=1740479250;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=5L9QNoh0f+vRtiDXMwpI8NJgAp36BLuI/7gvCVOlhwg=;
+  b=SLM+liUbOTfMOALNwe8Lba5XSWMgMzJPJIXsWWFwHNTC/2ZkT4MzmZKJ
+   4hCzomsahoob/7WtRLTlbsk9nRh533Em6kH+OEDA/EBocCH5k41CKZLKP
+   VgzwPPyaHui480IxgbKeVpe+T2F8+bGP/Qky5kMVRF07JXiI+SSWgnfl+
+   uB4q2Z8QIwyZxQeNClV0h5jQ5JGsdTp6w1VaU6UbN9LbkMqIRQLfxtdKz
+   VmCSYcz/rws2eioqUyNlORq1NPbO7bJtx1eMwCk2SDDwXjzjhgcbWvlIQ
+   v+cILIeekRoR8D2aSV+j0DU1SB7HtvyNRpjw+Ja3LNI3KzNGKXBzqtBxC
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="3060928"
+X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
+   d="scan'208";a="3060928"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 02:27:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
+   d="scan'208";a="37629455"
+Received: from hibeid-mobl.amr.corp.intel.com (HELO localhost) ([10.252.46.254])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 02:27:24 -0800
+From: Jani Nikula <jani.nikula@linux.intel.com>
+To: David Laight <David.Laight@ACULAB.COM>, "'linux-kernel@vger.kernel.org'"
+ <linux-kernel@vger.kernel.org>, 'Linus
+ Torvalds' <torvalds@linux-foundation.org>, 'Netdev'
+ <netdev@vger.kernel.org>, "'dri-devel@lists.freedesktop.org'"
+ <dri-devel@lists.freedesktop.org>
+Cc: 'Jens Axboe' <axboe@kernel.dk>, "'Matthew Wilcox (Oracle)'"
+ <willy@infradead.org>, 'Christoph Hellwig' <hch@infradead.org>,
+ "'linux-btrfs@vger.kernel.org'" <linux-btrfs@vger.kernel.org>, 'Andrew
+ Morton' <akpm@linux-foundation.org>, 'Andy Shevchenko'
+ <andriy.shevchenko@linux.intel.com>, "'David S . Miller'"
+ <davem@davemloft.net>, 'Dan Carpenter' <dan.carpenter@linaro.org>, Rasmus
+ Villemoes <linux@rasmusvillemoes.dk>
+Subject: RE: [PATCH next v2 02/11] minmax: Use _Static_assert() instead of
+ static_assert()
+In-Reply-To: <824b0f70413d4570bcc97b39aad81a93@AcuMS.aculab.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <0fff52305e584036a777f440b5f474da@AcuMS.aculab.com>
+ <8059bc04da1a45bc810ac339a1129a4c@AcuMS.aculab.com>
+ <87v86bo9qi.fsf@intel.com>
+ <824b0f70413d4570bcc97b39aad81a93@AcuMS.aculab.com>
+Date: Mon, 26 Feb 2024 12:27:22 +0200
+Message-ID: <87sf1fo705.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: skbuff: allocate the fclone in the current NUMA node
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, aleksander.lobakin@intel.com,
- Shijie Huang <shijie@amperemail.onmicrosoft.com>
-Cc: Huang Shijie <shijie@os.amperecomputing.com>, kuba@kernel.org,
- patches@amperecomputing.com, davem@davemloft.net, horms@kernel.org,
- ast@kernel.org, dhowells@redhat.com, linyunsheng@huawei.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- cl@os.amperecomputing.com
-References: <20240220021804.9541-1-shijie@os.amperecomputing.com>
- <CANn89iJoHDzfYfhcwVvR4m7DiVG-UfFNqm+D1WD-2wjOttk6ew@mail.gmail.com>
- <bea860f8-a196-4dff-a655-4da920e2ebfa@amperemail.onmicrosoft.com>
- <CANn89i+1uMAL_025rNc3C1Ut-E5S8Nat6KhKEzcFeC1xxcFWaA@mail.gmail.com>
- <c2bd73b6-b21f-4ad8-a176-eec677bc6cf3@amperemail.onmicrosoft.com>
- <CANn89i+Cr1Tbdxqy6fB-sOLca+AHFc-3-0xGktVUsQFFMVsC0A@mail.gmail.com>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <CANn89i+Cr1Tbdxqy6fB-sOLca+AHFc-3-0xGktVUsQFFMVsC0A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+
+On Mon, 26 Feb 2024, David Laight <David.Laight@ACULAB.COM> wrote:
+> From: Jani Nikula
+>> Sent: 26 February 2024 09:28
+>> 
+>> On Sun, 25 Feb 2024, David Laight <David.Laight@ACULAB.COM> wrote:
+>> > The wrapper just adds two more lines of error output when the test fails.
+>> 
+>> There are only a handful of places in kernel code that use
+>> _Static_assert() directly. Nearly 900 instances of static_assert().
+>
+> How many of those supply an error message?
+
+At a glance, not many.
+
+>> Are we now saying it's fine to use _Static_assert() directly all over
+>> the place? People will copy-paste and cargo cult.
+>
+> Is that actually a problem?
+
+I don't know. I'm asking.
+
+Usually when we have compiler wrappers, they're meant to be used instead
+of the thing being wrapped.
+
+This series deviates from that, so it would seem to fair to mention it
+slightly more verbosely than just stating what's being done.
+
+> The wrapper allows the error message to be omitted and substitutes
+> the text of the conditional.
+> But it isn't 'free'.
+> As well as slightly slowing down the compilation, the error messages
+> from the compiler get more difficult to interpret.
+>
+> Most of the static_assert() will probably never generate an error.
+> But the ones in min()/max() will so it is best to make them as
+> readable as possible.
+> (Don't even look as the mess clang makes....)
+
+I'm not arguing any of this. :)
 
 
+BR,
+Jani.
 
-On 24/02/2024 20.07, Eric Dumazet wrote:
-> On Tue, Feb 20, 2024 at 9:37 AM Shijie Huang
-> <shijie@amperemail.onmicrosoft.com> wrote:
->>
->>
->> 在 2024/2/20 16:17, Eric Dumazet 写道:
->>> On Tue, Feb 20, 2024 at 7:26 AM Shijie Huang
->>> <shijie@amperemail.onmicrosoft.com> wrote:
->>>>
->>>> 在 2024/2/20 13:32, Eric Dumazet 写道:
->>>>> On Tue, Feb 20, 2024 at 3:18 AM Huang Shijie
->>>>> <shijie@os.amperecomputing.com> wrote:
->>>>>> The current code passes NUMA_NO_NODE to __alloc_skb(), we found
->>>>>> it may creates fclone SKB in remote NUMA node.
->>>>> This is intended (WAI)
->>>> Okay. thanks a lot.
->>>>
->>>> It seems I should fix the issue in other code, not the networking.
->>>>
->>>>> What about the NUMA policies of the current thread ?
->>>> We use "numactl -m 0" for memcached, the NUMA policy should allocate
->>>> fclone in
->>>>
->>>> node 0, but we can see many fclones were allocated in node 1.
->>>>
->>>> We have enough memory to allocate these fclones in node 0.
->>>>
->>>>> Has NUMA_NO_NODE behavior changed recently?
->>>> I guess not.
->>>>> What means : "it may creates" ? Please be more specific.
->>>> When we use the memcached for testing in NUMA, there are maybe 20% ~ 30%
->>>> fclones were allocated in
->>>>
->>>> remote NUMA node.
->>> Interesting, how was it measured exactly ?
->>
->> I created a private patch to record the status for each fclone allocation.
->>
->>
->>> Are you using SLUB or SLAB ?
->>
->> I think I use SLUB. (CONFIG_SLUB=y,
->> CONFIG_SLAB_MERGE_DEFAULT=y,CONFIG_SLUB_CPU_PARTIAL=y)
->>
-> 
-> A similar issue comes from tx_action() calling __napi_kfree_skb() on
-> arbitrary skbs
-> including ones that were allocated on a different NUMA node.
-> 
-> This pollutes per-cpu caches with not optimally placed sk_buff :/
-> 
-> Although this should not impact fclones, __napi_kfree_skb() only ?
-> 
-> commit 15fad714be86eab13e7568fecaf475b2a9730d3e
-> Author: Jesper Dangaard Brouer <brouer@redhat.com>
-> Date:   Mon Feb 8 13:15:04 2016 +0100
-> 
->      net: bulk free SKBs that were delay free'ed due to IRQ context
-> 
-> What about :
-> 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index c588808be77f563c429eb4a2eaee5c8062d99582..63165138c6f690e14520f11e32dc16f2845abad4
-> 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -5162,11 +5162,7 @@ static __latent_entropy void
-> net_tx_action(struct softirq_action *h)
->                                  trace_kfree_skb(skb, net_tx_action,
->                                                  get_kfree_skb_cb(skb)->reason);
-> 
-> -                       if (skb->fclone != SKB_FCLONE_UNAVAILABLE)
-> -                               __kfree_skb(skb);
-> -                       else
-> -                               __napi_kfree_skb(skb,
-> -                                                get_kfree_skb_cb(skb)->reason);
 
-Yes, I think it makes sense to avoid calling __napi_kfree_skb here.
-The __napi_kfree_skb call will cache SKB slub-allocation (but "release"
-data) on a per CPU napi_alloc_cache (see code napi_skb_cache_put()).
-In net_tx_action() there is a chance this could originate from another
-CPU or even NUMA node.  I notice this is only for SKBs on the
-softnet_data->completion_queue, which have a high chance of being cache
-cold.  My patch 15fad714be86e only made sense when we bulk freed these
-SKBs, but after Olek's changes to cache freed SKBs, then this shouldn't
-be calling __napi_kfree_skb() (previously named __kfree_skb_defer).
-
-I support this RFC patch from Eric.
-
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-
-> +                       __kfree_skb(skb);
->                  }
->          }
+-- 
+Jani Nikula, Intel
 
