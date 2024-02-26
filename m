@@ -1,94 +1,196 @@
-Return-Path: <netdev+bounces-74859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4780866F72
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:56:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 915A8866F74
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:56:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E638E1C23A0F
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 09:56:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 494FB286C67
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 09:56:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50ECE53E3C;
-	Mon, 26 Feb 2024 09:26:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392DD548F8;
+	Mon, 26 Feb 2024 09:26:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="p69MXhWn"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jeLtCvF5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58123D53E
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 09:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AACC335C0;
+	Mon, 26 Feb 2024 09:26:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708939565; cv=none; b=tuHg0CLDPgwM8hYH7hObGJJjY9WCEMqQrHDMeC8InqLM+peWxDbmC8487Yq7i+OXur82LeglHSPhXRhnKgvesaMl/LSkTo6HAVEfeAXBRfV2N9plR9yILMqmER0tvK51fvRmno+/J6Ygtso0l88ADyMsgENFj8zubKZhRiDBwBA=
+	t=1708939585; cv=none; b=sDCsLmR+slg1v5aa8Q1veoQXhOuNxqYjx+ilkWSPrMq6FDf8gTRh3f4DyreMt4Pbi6wBeE4Qc1B/ormaYY172p5RQjP0obfJvRuGQjttmrvQmVKye+4AvK0q4+nI7Cuh9VQJOHXo4Ms66VSq49Jtw2PlENrohEUPFlCOq6itP8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708939565; c=relaxed/simple;
-	bh=x9uCrGUckkPuYOH7j9FKj0T4LOdFpik/wacqUqvzeOs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vC+Fx8XhNcVlccGd8Gwmv478sX9o/Jsy3P0klH76HAlhMt4+1uXsYSo+vYOFnvt86hlEalQsFpYpxpAt2kgE1tOziPRGj5Rz5X03OqYOsP0SDBU1r+mzdw61fcBANE22oRT6ZLRuVl0kbQbBAQmg241bfoXD9bRVIt7oI85phiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=p69MXhWn; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-512fd840142so818742e87.2
-        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 01:26:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708939561; x=1709544361; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=x9uCrGUckkPuYOH7j9FKj0T4LOdFpik/wacqUqvzeOs=;
-        b=p69MXhWnbF5jFCFYZ3XRf/xq1GQtgqacQw3rh3m1nH7g94gPDowdaRbZVfkiNEVRw8
-         Wm8s4PpllLZma3+X6DwA7kR7hQM/A931fMi0eWoQqvzHYVMlOs1qImbf2qW+jmG0Vp7A
-         KH+hGxDsX3/sjsngN8E7zzx2MsqqZKN572jPWtzLXJakHyfNs1CFi6C7VOruZaQtvT/W
-         kkr9ycQOE7yWtcsTyCa7hKypw+cBRV4YCGcxCQ21M1++70uvEl1u6L/0h9GeEFsKfIF6
-         oKrhNlU40Mu+dt0PcWqN8I3gYTyhKQEgF44k9fiZV2d0QtCvDgdF4tyT+PaLzbv7J3YD
-         Wl1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708939561; x=1709544361;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x9uCrGUckkPuYOH7j9FKj0T4LOdFpik/wacqUqvzeOs=;
-        b=d1niGEVpustE4kF5w8DoERbSodixsiDE8C+Zpqj5/p1ch+EPm6mbjxkZUdBPg44FYf
-         13eHyDdE1lwjrMrxq1ipnX7zPwEcAxvnSGljVc3Hy8nx68HYEEpKqnlgHayzwEVSNxbe
-         fr1PlVjmoB5icZ6S5ohPHVTfTa1Rm08xzzOZAY4ltdDBmJ+1XAINMX9i3wK0ccZF3x3W
-         6DBDOlKI3vnHr5WEeZepTOD2dsEanmkqptY5lgM6dL+gsDNsEr0BecmlWQJGYyKPWYmU
-         CagQBy9/RrKBHzIsDsxXMrRUvq2JpJn8I0qu2IHXv4Q6vFwME5zWY/5gji+P682eKUfB
-         iUcA==
-X-Gm-Message-State: AOJu0YxkEjTHjTmaxFABRFdWsAS90sqhJG3RG3Y5o6CAeSC7KB2AArdj
-	SE7KZ6ottBw+GGfWFo2T8O2Dk8NENPnc+DH9FM5XhQRZrFkyDayX+Jz0QNIcW24=
-X-Google-Smtp-Source: AGHT+IFtL5F7p0fq3M+budN97a0V3Hde2uyoclQGoU8bLA7/TqQC0CEhZbvFiHf7QrEkfrh0jp93Ew==
-X-Received: by 2002:a05:6512:1326:b0:512:da77:6f2a with SMTP id x38-20020a056512132600b00512da776f2amr4867063lfu.53.1708939561584;
-        Mon, 26 Feb 2024 01:26:01 -0800 (PST)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id p19-20020a05600c205300b00412945d2051sm7484425wmg.12.2024.02.26.01.26.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 01:26:01 -0800 (PST)
-Date: Mon, 26 Feb 2024 10:26:00 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	weiyongjun1@huawei.com, yuehaibing@huawei.com
-Subject: Re: [PATCH net-next] ipv6: raw: remove useless input parameter in
- rawv6_err
-Message-ID: <ZdxZKOvys1wMMURM@nanopsycho>
-References: <20240224084121.2479603-1-shaozhengchao@huawei.com>
+	s=arc-20240116; t=1708939585; c=relaxed/simple;
+	bh=XwLxxp8u8DvmEjdgtmzsdNA/nMFyAao9iyW50HyGSqc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=F4kXQOgek7s9f0jaL9cJb6lNWOP8wRkZeHkSXoIdysLwOvvx+kVERxi0J69/CAAz/WyRS848fNBI3zqpxYbcSutZDumf6oFW/bJm5vwQUADYU6sOFfQiAo1U9lZsJqnmz0/FdN44ExwhdBzh91UCVPJj9YVmCkRjXyFDcSuXXUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jeLtCvF5; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8654920007;
+	Mon, 26 Feb 2024 09:26:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708939574;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dJ/TScN96xow2EgjcWkCcR2wGSrDb70yHEKhAIhIqck=;
+	b=jeLtCvF51DIye3jd9TDzyVizqTWW0ZkjrTr6zB6ApmN3dCkSvOaMv1ITwAKf8eG/rXsQ7b
+	O2XzGbGiBzFsf7rXcq6WEhPQLZIoEpmR0EEXImxcuSixWK1OE7ZPQ33JDy1RfLTFoli/ZY
+	y9b9UvjEw6QfZ20HsI3BbfCFP+v7uOlRtg3MN3H/K0WN2blm86CKEzOIw3NhIU0n6j0WJC
+	http5/7pXhfjw3qlWgVIzdrLL69waGkW2hnybaReMfji+i46OI+2YTM46LRInjSNgpCpAd
+	o3yTHnLaT8x4TKNzgHoLN0bomHuraPzXRS/N7VDTcoMfBZHiy1DVJWzfpFjuGA==
+Date: Mon, 26 Feb 2024 10:26:08 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Cc: Saeed Mahameed <saeed@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Richard Cochran
+ <richardcochran@gmail.com>, Tariq Toukan <tariqt@nvidia.com>, Gal Pressman
+ <gal@nvidia.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, Hangbin Liu
+ <liuhangbin@gmail.com>, Paul Greenwalt <paul.greenwalt@intel.com>, Justin
+ Stitt <justinstitt@google.com>, Randy Dunlap <rdunlap@infradead.org>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, Wojciech Drewek
+ <wojciech.drewek@intel.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Jiri Pirko <jiri@resnulli.us>, Jacob Keller <jacob.e.keller@intel.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v1 4/6] net/mlx5e: Implement ethtool
+ hardware timestamping statistics
+Message-ID: <20240226102608.135cb11c@kmaincent-XPS-13-7390>
+In-Reply-To: <20240223192658.45893-5-rrameshbabu@nvidia.com>
+References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
+	<20240223192658.45893-5-rrameshbabu@nvidia.com>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240224084121.2479603-1-shaozhengchao@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Sat, Feb 24, 2024 at 09:41:21AM CET, shaozhengchao@huawei.com wrote:
->The input parameter 'opt' in rawv6_err() is not used. Therefore, remove it.
->
->Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+On Fri, 23 Feb 2024 11:24:48 -0800
+Rahul Rameshbabu <rrameshbabu@nvidia.com> wrote:
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> Feed driver statistics counters related to hardware timestamping to
+> standardized ethtool hardware timestamping statistics group.
+>=20
+> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c index
+> bc31196d348a..836198445726 100644 ---
+> a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c +++
+> b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c @@ -1155,6 +1155,74 =
+@@
+> void mlx5e_stats_rmon_get(struct mlx5e_priv *priv, *ranges =3D
+> mlx5e_rmon_ranges; }
+> =20
+> +void mlx5e_stats_ts_get(struct mlx5e_priv *priv,
+> +			struct ethtool_ts_stats *ts_stats)
+> +{
+> +	enum ethtool_ts_stats_layer layer;
+> +	struct mlx5e_ptp *ptp;
+> +	bool tx_ptp_opened;
+> +	int i, j;
+> +
+> +	mutex_lock(&priv->state_lock);
+> +
+> +	tx_ptp_opened =3D priv->tx_ptp_opened;
+> +
+> +	/* NOTE: this needs to be changed whenever ethtool timestamping
+> +	 * layer selection is implemented.
+> +	 */
+> +	if (ts_stats->layer =3D=3D ETHTOOL_TS_STATS_LAYER_ACTIVE)
+> +		layer =3D tx_ptp_opened ? ETHTOOL_TS_STATS_LAYER_PHY :
+> +					ETHTOOL_TS_STATS_LAYER_DMA;
+> +	else
+> +		layer =3D ts_stats->layer;
+> +
+> +	switch (layer) {
+> +	case ETHTOOL_TS_STATS_LAYER_PHY:
+> +		if (!tx_ptp_opened)
+> +			return;
+> +
+> +		ptp =3D priv->channels.ptp;
+> +
+> +		ts_stats->pkts =3D 0;
+> +		ts_stats->err =3D 0;
+> +		ts_stats->late =3D 0;
+> +		ts_stats->lost =3D 0;
+> +
+> +		/* Aggregate stats across all TCs */
+> +		for (i =3D 0; i < ptp->num_tc; i++) {
+> +			struct mlx5e_ptp_cq_stats *stats =3D
+> ptp->ptpsq[i].cq_stats; +
+> +			ts_stats->pkts +=3D stats->cqe;
+> +			ts_stats->err +=3D stats->abort + stats->err_cqe;
+> +			ts_stats->late +=3D stats->late_cqe;
+> +			ts_stats->lost +=3D stats->lost_cqe;
+> +		}
+> +		break;
+> +	case ETHTOOL_TS_STATS_LAYER_DMA:
+> +		/* DMA layer will always successfully timestamp packets.
+> Other
+> +		 * counters do not make sense for this layer.
+> +		 */
+> +		ts_stats->pkts =3D 0;
+> +
+> +		/* Aggregate stats across all SQs */
+> +		mutex_lock(&priv->state_lock);
+> +		for (j =3D 0; j < priv->channels.num; j++) {
+> +			struct mlx5e_channel *c =3D priv->channels.c[j];
+> +
+> +			for (i =3D 0; i < c->num_tc; i++) {
+> +				struct mlx5e_sq_stats *stats =3D
+> c->sq[i].stats; +
+> +				ts_stats->pkts +=3D stats->timestamps;
+> +			}
+> +		}
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +
+> +	mutex_unlock(&priv->state_lock);
+> +}
+> +
+
+To follow the same logic as my patch series you should use phc qualifier in=
+stead
+of the layer. See patch 9 of my series.
+With HWTSTAMP_PROVIDER_QUALIFIER_PRECISE for the IEEE 1588 which mean the P=
+HY
+layer on your case and HWTSTAMP_PROVIDER_QUALIFIER_APPROX for the DMA layer.
+
+Even if the timestamp is made physically on the PHY, this driver does not
+register any phy device. The NIC manages all the network architecture by
+itself. We decided to use the phc qualifier to fit this use case.
+
+The layer description should only be used internally in the kernel when we =
+are
+registering a PHY device and using the phy tsinfo/hwtstamp/rxtstamp/tstsamp
+callbacks.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
