@@ -1,159 +1,116 @@
-Return-Path: <netdev+bounces-74872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF2FE86704D
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:15:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42BC28670A5
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:23:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8510A285838
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:15:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D17E91F2B8E1
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:23:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA31D1CD37;
-	Mon, 26 Feb 2024 09:52:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="XqsvtyJm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 923505577A;
+	Mon, 26 Feb 2024 10:07:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40411C292;
-	Mon, 26 Feb 2024 09:52:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F7114280
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 10:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708941130; cv=none; b=qCpC6xoDkVLB4B4oQ77cRZbXDrcCbE8RfStgdNQ94Mt0V+ivDN59EeqMCCJc3514cNliIiCw2jYvjOUGw9xBro7fjodMKXxJShar2GCYM/PuzDM19nOgzGYCt2aukogzlVE3c7Ld3pnosKawF0BDWw9iC8q1eFflgkE1fsjFXMc=
+	t=1708942030; cv=none; b=tEIRQVEAvEk6MoGL5lP91qdRpwuwJk+8wVakw1lrcuynx55FTyXQlyHT8Nzv6PbFhdE+u8P+sbg38H//+D5h4bpvvl3F43dNXSv/kCfKII4Si49DQXkXUvfwg0ou+wkxRraRt3ASvpGOXeqDywk2MWABGOpF4Ao/746UzIHz06g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708941130; c=relaxed/simple;
-	bh=bjjIsryzIkgWdBrE8ljZIXZJZRlbXaBSO7Ggu+Lj5iY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e44vq4T9c08Nce+1u3e1cpeYkaAt7qn22ZZS8K/bZA30VN2p6gVwrQYE0i5hxSSXb9SSwNPDDNIZ3XcEa7cLHHR56SCxs0kFvvT5PE/S0tf+AlpaCB1OwP/nolBgOJhty9+26tLGHUOVS39c2JLalXBtZkuyBZr+RG3PGCqId30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=XqsvtyJm; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:Reply-To:MIME-Version:Date:
-	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	In-Reply-To:References; bh=L5xZC2Izj3nU4loPeVkRvNhUrf88CIQ/mXkio06DCJA=;
-	t=1708941128; x=1709373128; b=XqsvtyJmNUSaNWFt9a2Zxhc3MycXQ0yGyWfptFBzVgwvvJV
-	ZER5JGxcGB0baVlQqe+3Rhjez/IvMkT7cV9pjA+F/tnRfu1S2nxLtVOa7dQGhQeZ8PbcBYBSe1S2n
-	AwPY7QlC75hRGY+k1WRKpU7xGLLLmNn+Q3VbrC25DN84K2Kz3mZKR5fn2xUP7xo5Gl8xMFooD0otp
-	j7MKKdIa5or+lre24YntO+jo0QHfL/e6uJ3kjH6ioOYzelpBqOm34JHF3PVVr4FzQGETyAnSEjOBj
-	ISHxuZFoVP59sFQ7PaZvnVdaH+Zeuj2CYsOKyN74WZjh8bLkHwG15Gy+PTz/BLIg==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1reXeL-0004Te-6R; Mon, 26 Feb 2024 10:51:53 +0100
-Message-ID: <410817b8-1cf9-4285-b20b-f1fa0513cee8@leemhuis.info>
-Date: Mon, 26 Feb 2024 10:51:52 +0100
+	s=arc-20240116; t=1708942030; c=relaxed/simple;
+	bh=tjXnZ4goM1qumYJwf47U7+WWJdpRRWcTWLqYqEFbbQg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=RDxrYOy5iOH2YdztKCv8t8h4UNYAKZiuapmKrvMA4xKP/VEFWYhcA5jkEjtvMnRUkAMTKdy97QaG6s96q3HJvEAAgtJYutdLsEg5RV9OaQJ71S/F9ehdGF1YSwD7N7S6Slahlitbk7gy8yfUrUs9gbyP6obQiNjL64hvu8neBds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-28-hJeJAT_oPHyxzCcPYljXKg-1; Mon, 26 Feb 2024 10:07:05 +0000
+X-MC-Unique: hJeJAT_oPHyxzCcPYljXKg-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 26 Feb
+ 2024 10:07:04 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Mon, 26 Feb 2024 10:07:04 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Jani Nikula' <jani.nikula@linux.intel.com>,
+	"'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>, "'Linus
+ Torvalds'" <torvalds@linux-foundation.org>, 'Netdev'
+	<netdev@vger.kernel.org>, "'dri-devel@lists.freedesktop.org'"
+	<dri-devel@lists.freedesktop.org>
+CC: 'Jens Axboe' <axboe@kernel.dk>, "'Matthew Wilcox (Oracle)'"
+	<willy@infradead.org>, 'Christoph Hellwig' <hch@infradead.org>,
+	"'linux-btrfs@vger.kernel.org'" <linux-btrfs@vger.kernel.org>, "'Andrew
+ Morton'" <akpm@linux-foundation.org>, 'Andy Shevchenko'
+	<andriy.shevchenko@linux.intel.com>, "'David S . Miller'"
+	<davem@davemloft.net>, 'Dan Carpenter' <dan.carpenter@linaro.org>, "Rasmus
+ Villemoes" <linux@rasmusvillemoes.dk>
+Subject: RE: [PATCH next v2 02/11] minmax: Use _Static_assert() instead of
+ static_assert()
+Thread-Topic: [PATCH next v2 02/11] minmax: Use _Static_assert() instead of
+ static_assert()
+Thread-Index: AdpoComWnYboZopTTWeIFfAWCv2rOwAi5neAAAEPFJA=
+Date: Mon, 26 Feb 2024 10:07:03 +0000
+Message-ID: <824b0f70413d4570bcc97b39aad81a93@AcuMS.aculab.com>
+References: <0fff52305e584036a777f440b5f474da@AcuMS.aculab.com>
+ <8059bc04da1a45bc810ac339a1129a4c@AcuMS.aculab.com>
+ <87v86bo9qi.fsf@intel.com>
+In-Reply-To: <87v86bo9qi.fsf@intel.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: Re: This is the fourth time I've tried to find what led to the
- regression of outgoing network speed and each time I find the merge commit
- 8c94ccc7cd691472461448f98e2372c75849406c
-Content-Language: en-US, de-DE
-To: Mathias Nyman <mathias.nyman@linux.intel.com>,
- Linux regressions mailing list <regressions@lists.linux.dev>,
- Thomas Gleixner <tglx@linutronix.de>
-Cc: "Christian A. Ehrhardt" <lk@c--e.de>, niklas.neronin@linux.intel.com,
- Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
- Greg KH <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
- linux-x86_64@vger.kernel.org, netdev@vger.kernel.org,
- Randy Dunlap <rdunlap@infradead.org>,
- Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-References: <CABXGCsNnUfCCYVSb_-j-a-cAdONu1r6Fe8p2OtQ5op_wskOfpw@mail.gmail.com>
- <CABXGCsPu73D+JS9dpvzX78RktK2VOv_xT8vvuVaQ=B6zs2dMNQ@mail.gmail.com>
- <e7b96819-edf7-1f9f-7b01-e2e805c99b33@linux.intel.com>
- <CABXGCsPjW_Gr4fGBzYSkr_4tsn0fvuT72G-YJYXcb1a4kX=CQw@mail.gmail.com>
- <2d87509a-1515-520c-4b9e-bba4cd4fa2c6@linux.intel.com>
- <CABXGCsPdXqRG6v97KDGy+o59xc3ayaq3rLj267veC7YcKVp8ww@mail.gmail.com>
- <1126ed0a-bfc1-a752-1b5e-f1339d7a8aa5@linux.intel.com>
- <CABXGCsN5_O3iKDOyYxtsGTGDA6fw4962CjzXLSnOK3rscELq+Q@mail.gmail.com>
- <a026ecd8-6fba-017d-d673-0d0759a37ed8@linux.intel.com>
- <CABXGCsOgy8H4GGcNU1jRE+SzRqwnPeNuy_3xBukjwB-bPxeZrQ@mail.gmail.com>
- <CABXGCsOd=E428ixUOw+msRpnaubgx5-cVU7TDXwRUCdrM5Oicw@mail.gmail.com>
- <34d7ab1b-ab12-489d-a480-5e6ccc41bfc3@infradead.org>
- <10487018-49b8-4b27-98a1-07cee732290d@infradead.org>
- <4f34b6a8-4415-6ea4-8090-262847d606c6@linux.intel.com>
- <3ea25443-1275-4c67-90e0-b637212d32b5@leemhuis.info>
- <1e719367-01ae-565a-2199-0ff7e260422b@linux.intel.com>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-In-Reply-To: <1e719367-01ae-565a-2199-0ff7e260422b@linux.intel.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1708941128;d91db294;
-X-HE-SMSGID: 1reXeL-0004Te-6R
+Content-Transfer-Encoding: quoted-printable
 
-On 26.02.24 10:24, Mathias Nyman wrote:
-> On 26.2.2024 7.45, Linux regression tracking (Thorsten Leemhuis) wrote:
->> On 21.02.24 14:44, Mathias Nyman wrote:
->>> On 21.2.2024 1.43, Randy Dunlap wrote:
->>>> On 2/20/24 15:41, Randy Dunlap wrote:
->>>>> {+ tglx]
->>>>> On 2/20/24 15:19, Mikhail Gavrilov wrote:
->>>>>> On Mon, Feb 19, 2024 at 2:41 PM Mikhail Gavrilov
->>>>>> <mikhail.v.gavrilov@gmail.com> wrote:
->>>>>> I spotted network performance regression and it turned out, this was
->>>>>> due to the network card getting other interrupt. It is a side effect
->>>>>> of commit 57e153dfd0e7a080373fe5853c5609443d97fa5a.
->>>>> That's a merge commit (AFAIK, maybe not so much). The commit in
->>>>> mainline is:
->>>>>
->>>>> commit f977f4c9301c
->>>>> Author: Niklas Neronin <niklas.neronin@linux.intel.com>
->>>>> Date:   Fri Dec 1 17:06:40 2023 +0200
->>>>>
->>>>>       xhci: add handler for only one interrupt line
->>>>>
->>>>>> Installing irqbalance daemon did not help. Maybe someone experienced
->>>>>> such a problem?
->>>>>
->>>>> Thomas, would you look at this, please?
->>>>>
->>>>> A network device and xhci (USB) driver are now sharing interrupts.
->>>>> This causes a large performance decrease for the networking device.
->>>
->>> Short recap:
->>
->> Thx for that. As the 6.8 release is merely two or three weeks away while
->> a fix is nowhere near in sight yet (afaics!) I start to wonder if we
->> should consider a revert here and try reapplying the culprit in a later
->> cycle when this problem is fixed.
+From: Jani Nikula
+> Sent: 26 February 2024 09:28
+>=20
+> On Sun, 25 Feb 2024, David Laight <David.Laight@ACULAB.COM> wrote:
+> > The wrapper just adds two more lines of error output when the test fail=
+s.
+>=20
+> There are only a handful of places in kernel code that use
+> _Static_assert() directly. Nearly 900 instances of static_assert().
 
-Thx for the reply.
+How many of those supply an error message?
 
-> I don't think reverting this series is a solution.
-> 
-> This isn't really about those usb xhci patches.
-> This is about which interrupt gets assigned to which CPU.
+> Are we now saying it's fine to use _Static_assert() directly all over
+> the place? People will copy-paste and cargo cult.
 
-I know, but from my understanding of Linus expectations wrt to handling
-regressions it does not matter much if a bug existed earlier or
-somewhere else: what counts is the commit that exposed the problem.
+Is that actually a problem?
+The wrapper allows the error message to be omitted and substitutes
+the text of the conditional.
+But it isn't 'free'.
+As well as slightly slowing down the compilation, the error messages
+from the compiler get more difficult to interpret.
 
-But I might be wrong here. Anyway, not CCing Linus for this; but I'll
-likely point him to this direction on Sunday in my next weekly report,
-unless some fix comes into sight.
+Most of the static_assert() will probably never generate an error.
+But the ones in min()/max() will so it is best to make them as
+readable as possible.
+(Don't even look as the mess clang makes....)
 
-> Mikhail got unlucky when the network adapter interrupts on that system was
-> assigned to CPU0, clearly a more "clogged" CPU, thus causing a drop in max
-> bandwidth.
+=09David
 
-But maybe others will be just as "unlucky". Or is there anything to
-believe otherwise? Maybe some aspect of the .config or local setup that
-is most likely unique to Mikhail's setup?
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-If I did something stupid, please tell me, as explained on that page.
 
