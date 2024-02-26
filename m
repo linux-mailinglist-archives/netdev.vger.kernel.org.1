@@ -1,155 +1,163 @@
-Return-Path: <netdev+bounces-75015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBFE7867BBA
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 17:23:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02525867BD0
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 17:25:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C3E71C2A648
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:23:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABF4B1F2A9E9
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:25:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC60012C807;
-	Mon, 26 Feb 2024 16:23:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7398712D740;
+	Mon, 26 Feb 2024 16:24:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b="KCw/pjAf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aEiTnkVf"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2067.outbound.protection.outlook.com [40.107.249.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9EA12C54B;
-	Mon, 26 Feb 2024 16:23:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708964628; cv=fail; b=MHy/DFujG0INefgy1E5bAmMoRk+rRqYH/LgQBeKuJG6e/K/9ICh8SuBxnXeDgerFtnipkRmha4Q9CnIkFvC2ycLvKo6mdC7NtThSfmJ/v2IowCUmRhcYfT1fy9Q36E504evFjhAs5RQMlyvIMnOu8J3s03fvtGeHS99JG1x1+t8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708964628; c=relaxed/simple;
-	bh=EUsaDE3yL68RnitcmKg7uVqIAvVYWX8bcmUQ9aIDw3o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ttuvFi/5iLopl1GlyOsUfmJ7JX4UM2KGqFkN3aJG8tE42LSgZvJU7gCGELi1vl3uUS5EFxgVU/CtXovw3jQYgfuOs+qMA87CjshU42mcziffwM7fhklLFFDbnTA/MTty8ouJq+RaZBkVZK4P4jFjjR16k7Xty6pvvc0pGqdTNAI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com; spf=fail smtp.mailfrom=leica-geosystems.com; dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b=KCw/pjAf; arc=fail smtp.client-ip=40.107.249.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=leica-geosystems.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TIoSWfeQIUvAQY+ofI7TpLT12wk4l8nG1WWc/MMhA5i6RCDvZ6A7ugjzxYJJV4oe8xdCvv6RtyZsVN62rqn0qPKhd/5DNEAvnEq40nJHu7qU39r8EvEUqRONuA0efdJx/QvV6PbpfYhTVxtgvdFMl9R5KeJAAwtZs8Yne11T61qNDTeVHeDwVtIg5GrMVppYSeLGdWRcquCOg8h1drabLLGyJo/pBnrJESHx8ieeLQdfQjCa+v11oiVNwzb2szm+uQYYuS+OEO3uD0DGIK+g/8g5NIetqrAkolKJDNngXvLa0X8SU13nukpY7JL+gK+A/P79juX9OOwXfu/BXn3ZZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=a2PUlhb7aluY9PS1b2gzvNJikv/DQK9mmeHonP8mdI4=;
- b=HnEGmqt1vbLMRw6Sl1X2DbhI0m8jKwPOiaJnrMc2N/vyoHY99MDPjNGPDwgyX2UjOE4OcqrL1AITjVGZJuubReak6rI5Mmu/sB0kEDWATMkURkDBO3jtub/3odvC9fmL9WzuAbBvN10khVx45FBlALWRN93VPwxH3RFaA5FMlxK3QScanRSntMv0N1yfZYvOf8Aw1SCSCXpUdLYcJ40JdDZVa3ZfwhB3TeOVZJGrZOFOMCcaxtiPvIY1f7iKBqAwTskttFvbwYvCM4i0XTntRpIMwyWCwK1KFD0AGh0kBsTPhEyx4SGfSi0fVhYhWOJs5D0Syx4vixF0LpK+sOWXUw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 193.8.40.94) smtp.rcpttodomain=vger.kernel.org
- smtp.mailfrom=leica-geosystems.com; dmarc=pass (p=reject sp=reject pct=100)
- action=none header.from=leica-geosystems.com; dkim=none (message not signed);
- arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leica-geosystems.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=a2PUlhb7aluY9PS1b2gzvNJikv/DQK9mmeHonP8mdI4=;
- b=KCw/pjAfAiizGqPARePMFeH+xBC0eNPrxE7DryGCdVu3z5oevKvXki3EKKYuNTYpldt3mzFrP1wk2n7u4h4Pe0k15iKCzfyGtr6aQm3qbZGD3H/nBD4g/fWOOt2+lYpVRngRcJ77UI9hY7pVjhSLzAPQJvsgdpF4GGE9zDtqUUU=
-Received: from DBBPR09CA0016.eurprd09.prod.outlook.com (2603:10a6:10:c0::28)
- by DBAPR06MB6806.eurprd06.prod.outlook.com (2603:10a6:10:180::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.23; Mon, 26 Feb
- 2024 16:23:42 +0000
-Received: from DU6PEPF0000A7E1.eurprd02.prod.outlook.com
- (2603:10a6:10:c0:cafe::e1) by DBBPR09CA0016.outlook.office365.com
- (2603:10a6:10:c0::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.49 via Frontend
- Transport; Mon, 26 Feb 2024 16:23:42 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 193.8.40.94)
- smtp.mailfrom=leica-geosystems.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=leica-geosystems.com;
-Received-SPF: Pass (protection.outlook.com: domain of leica-geosystems.com
- designates 193.8.40.94 as permitted sender) receiver=protection.outlook.com;
- client-ip=193.8.40.94; helo=hexagon.com; pr=C
-Received: from hexagon.com (193.8.40.94) by
- DU6PEPF0000A7E1.mail.protection.outlook.com (10.167.8.45) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7292.25 via Frontend Transport; Mon, 26 Feb 2024 16:23:41 +0000
-Received: from aherlnxbspsrv01.lgs-net.com ([10.60.34.116]) by hexagon.com with Microsoft SMTPSVC(10.0.17763.1697);
-	 Mon, 26 Feb 2024 17:23:41 +0100
-From: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bsp-development.geo@leica-geosystems.com,
-	m.felsch@pengutronix.de,
-	Catalin Popescu <catalin.popescu@leica-geosystems.com>
-Subject: [PATCH net-next v2] net: phy: dp83826: disable WOL at init
-Date: Mon, 26 Feb 2024 17:23:39 +0100
-Message-Id: <20240226162339.696461-1-catalin.popescu@leica-geosystems.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8954C12C803
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 16:24:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708964674; cv=none; b=NIXhbt+4blPid+wbkkCsikScU8CVCofKVy79gCadU7TUtIhFef1TOA+nrcPZN9SMrL/0TpADC+/YCNYMeGvq4ge5sEA+n5+8klqQxwajFX+uqIltvFAg1uunMG+pvmyrHg3kPxP6JvHy7KfIsXw6Z0h0ncEXt3F6APslsBOcqRA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708964674; c=relaxed/simple;
+	bh=87/3HQ2nXNOR8v198nPxfdavzNcBdWKhfFhhpkuAC0U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=osHDH48M/7lYULCMocJfdls23Alq6zi2ZAuMjggbq5WQ9PE6I2GNA5Osq4+zPFssHgxn5wT6RRGmrQdC7hZUv/jPJVoOfxnrLbjFbjrEPq3JKxNxLkWFCZlJJfqqcG5vpMRw4Hic9E0QIXEOd3o0ikLP7fx32ZVfEAdxlWkthRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aEiTnkVf; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56619428c41so6543a12.0
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 08:24:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708964671; x=1709569471; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tqr/fjPVAmWXbrUzan4Cqqe9iQZo4lb55vnOkr6z4tg=;
+        b=aEiTnkVfNCyZ5ZraOCQUC7XkhYkmgk5fcsqcwg15oxzxr6+EeB1PjMYtcMuCVDeAv6
+         Ue67TX4DHwqsTYw4VNbpesmnqqm1lrRcdEtizT71+MFL0pfoFKzk7dYr9nKmlActIlTd
+         WEr8aWqX7Q7uevU2en2VZY6sOlCWvpLqW2ZiCu7Nmth1597pli8fADsfF9AtxmFjI3s8
+         ArctKlaxy6T54whXcd1H1UVqaG04Y/nC95LbusTRvHmdk2L21JxV4Lyt7z88D7Husq3z
+         O6+PLihtH0g6j3Yrj1u1OlysvwE2H1YfMNo0iHSB0N2M81D4svLWdA5gqCBhPnqp7Ku5
+         7KUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708964671; x=1709569471;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tqr/fjPVAmWXbrUzan4Cqqe9iQZo4lb55vnOkr6z4tg=;
+        b=dHgjB3FJ/ZtNjhcmmXiADFFEmfcHsm50+i1ipeHEwnZKFpbJrrh6YxMfPw3MntVn9K
+         UJ5lqyZay40jXiVrIeRDV2nSHuAnurSD0GzjM3+tWLI/g0Q3+6eqS0vHhPlx2XOaUCKL
+         R9Y9rKHUEuDbdPXjwfKtMb6Ij6fH+TQYSsKu2M9hAYgfKkA+T5kcuoNobN2yWvSMhX0T
+         W6L1WlAcr3sCfku3nHLyedlDvdp1vNiqqeMW9CQBCplUMg3Q2D8tUwmtC43PGokoJ7Wx
+         ffoD0vVxNmDZKvtMQjQQUFulhvWkG6jNeFn2E0SKJ+HCkxaj87G2e9XQbOr0rmkZ6d68
+         roOA==
+X-Forwarded-Encrypted: i=1; AJvYcCXFcrOkzLwJ/ovPrdV7BdOiqK8NGzwR5t5pEstV36/97Ou97ZvkjB+EL4iPIgES2vp/ZKswU3WPSFkCu9BHFHKaNqKlOg32
+X-Gm-Message-State: AOJu0YzGHpTZ7I3PXp8G4uAfn0jpHNTuXkUCPWKCE8s76nJlYSq1BKjS
+	ThHC7xYJbt0Pdu+HIbctvogh4GD2nMi0t+k7A8omvvHMYmnOlFl5KhObxweXXeJfHaPKy1oDZRk
+	TArfr5wS92oI25BRmjT0UGMzEZaP09jJJtoTW
+X-Google-Smtp-Source: AGHT+IH8NDYG1n5G1TrzHjH2rL0+zr1j17UkmcIJ0XN8JXyl6efZFGGAgHdHxgBUTiXr3vupd0Y2tQSRaI4hmfO5QU8=
+X-Received: by 2002:a50:9f28:0:b0:562:9d2:8857 with SMTP id
+ b37-20020a509f28000000b0056209d28857mr336964edf.6.1708964670588; Mon, 26 Feb
+ 2024 08:24:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-OriginalArrivalTime: 26 Feb 2024 16:23:41.0603 (UTC) FILETIME=[2949A730:01DA68D0]
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU6PEPF0000A7E1:EE_|DBAPR06MB6806:EE_
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: ce34d50a-2112-48a2-7a7d-08dc36e74c10
-X-SET-LOWER-SCL-SCANNER: YES
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	//713sEnSpTDhuySVRPpDuAs2YNTzRQCA1HyzzpHu8q/mmwGjh5Syu+p88L3TS3whQ04/g+f4ce1rpr/k8Dy/7KjGl1e78/u+gzNKQtmoH/T2W+AFbtE6O9u5V0TXdLnKmVAERn+PxAnbKxJdT3EXoWUetM6d8GMj7iUQ8A5IsgIK8n+Vtxs+hWVis8toyRWJ7/ohVWlZwwy36EE8VTGgaXRbenfotGaXsnGL3M4auu9NR9hCYAGNZQtGLnqlPYmsPsFuajCeKYWX7sFVSMrI8jC9mgXDRXOCbXiyfxtz7Rr+6qu/Tm5yihHFkRzT5vDCLfY78awlyJw4Ej2RIcH0e9V//2LCAiTET5dHD/M+oNMb9fT5eQNhRhOplTzU4k4IQYTKcChcmH+FeC7JH+pIx2dV/xD/KNFJ9izpfzb/2Ja7TqTdKukmEvP+Wq9+RNU0jXBktfOTuZLPr3mKQw9eEccM8lvhNKq4aXW2Y5ZxZDDi50SkjorsPDXrVK/6jCVoVk9uWJOAANSEIBSywLcZkULOMCJ0euMdU+1Q7u+O489MGfwFIxxFkLhDvkTLI/cdIaufKGWiOaCM7M8xZTUMIMmxnB+5UeNjGNDTPba3nxrKxj4eFG790KebBeOGgOO0Lrq5ofzz8KD1yA76U42QkBQ3oUvwjBNJtdZ7MbYIUh30luCF1kPZrK6t4umabrfKcWpLFyXbiDXfeA/Bab1ntqqTtUfQWuc6onCJ1Dct4T3AhZlasQpPjI/ffEKO3WO
-X-Forefront-Antispam-Report:
-	CIP:193.8.40.94;CTRY:CH;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:hexagon.com;PTR:ahersrvdom50.leica-geosystems.com;CAT:NONE;SFS:(13230031)(36860700004);DIR:OUT;SFP:1101;
-X-OriginatorOrg: leica-geosystems.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2024 16:23:41.9855
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ce34d50a-2112-48a2-7a7d-08dc36e74c10
-X-MS-Exchange-CrossTenant-Id: 1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a;Ip=[193.8.40.94];Helo=[hexagon.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DU6PEPF0000A7E1.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR06MB6806
+References: <20240226155055.1141336-1-edumazet@google.com> <20240226155055.1141336-3-edumazet@google.com>
+ <Zdy3tnU-QZUda0HI@nanopsycho> <CANn89iKM1yJ-uUtZ+uRkVdir8vbck8593RAxZt7fzNvFHU5W_Q@mail.gmail.com>
+ <Zdy54LUdeUGH2OuB@nanopsycho>
+In-Reply-To: <Zdy54LUdeUGH2OuB@nanopsycho>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 26 Feb 2024 17:24:19 +0100
+Message-ID: <CANn89iLXrjT=JpAJNuvtqTxPC+jKto8+j62KOd5nPk25QqoOAg@mail.gmail.com>
+Subject: Re: [PATCH net-next 02/13] ipv6: annotate data-races around cnf.disable_ipv6
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Commit d1d77120bc28 ("net: phy: dp83826: support TX data voltage tuning")
-introduced a regression in that WOL is not disabled by default for DP83826.
-WOL should normally be enabled through ethtool.
+On Mon, Feb 26, 2024 at 5:18=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote=
+:
+>
+> Mon, Feb 26, 2024 at 05:14:36PM CET, edumazet@google.com wrote:
+> >On Mon, Feb 26, 2024 at 5:09=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wr=
+ote:
+> >>
+> >> Mon, Feb 26, 2024 at 04:50:44PM CET, edumazet@google.com wrote:
+> >> >disable_ipv6 is read locklessly, add appropriate READ_ONCE()
+> >> >and WRITE_ONCE() annotations.
+> >> >
+> >> >Signed-off-by: Eric Dumazet <edumazet@google.com>
+> >> >---
+> >> > net/ipv6/addrconf.c   | 12 ++++++------
+> >> > net/ipv6/ip6_input.c  |  4 ++--
+> >> > net/ipv6/ip6_output.c |  2 +-
+> >> > 3 files changed, 9 insertions(+), 9 deletions(-)
+> >> >
+> >> >diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+> >> >index a280614b37652deee0d1f3c70ba1b41b01cc7d91..0d7746b113cc65303b5c2=
+ec223b3331c3598ded6 100644
+> >> >--- a/net/ipv6/addrconf.c
+> >> >+++ b/net/ipv6/addrconf.c
+> >> >@@ -4214,7 +4214,7 @@ static void addrconf_dad_work(struct work_struc=
+t *w)
+> >> >                       if (!ipv6_generate_eui64(addr.s6_addr + 8, ide=
+v->dev) &&
+> >> >                           ipv6_addr_equal(&ifp->addr, &addr)) {
+> >> >                               /* DAD failed for link-local based on =
+MAC */
+> >> >-                              idev->cnf.disable_ipv6 =3D 1;
+> >> >+                              WRITE_ONCE(idev->cnf.disable_ipv6, 1);
+> >> >
+> >> >                               pr_info("%s: IPv6 being disabled!\n",
+> >> >                                       ifp->idev->dev->name);
+> >> >@@ -6388,7 +6388,8 @@ static void addrconf_disable_change(struct net =
+*net, __s32 newf)
+> >> >               idev =3D __in6_dev_get(dev);
+> >> >               if (idev) {
+> >> >                       int changed =3D (!idev->cnf.disable_ipv6) ^ (!=
+newf);
+> >> >-                      idev->cnf.disable_ipv6 =3D newf;
+> >> >+
+> >> >+                      WRITE_ONCE(idev->cnf.disable_ipv6, newf);
+> >> >                       if (changed)
+> >> >                               dev_disable_change(idev);
+> >> >               }
+> >> >@@ -6397,15 +6398,14 @@ static void addrconf_disable_change(struct ne=
+t *net, __s32 newf)
+> >> >
+> >> > static int addrconf_disable_ipv6(struct ctl_table *table, int *p, in=
+t newf)
+> >> > {
+> >> >-      struct net *net;
+> >> >+      struct net *net =3D (struct net *)table->extra2;
+> >>
+> >> How is this related to the rest of the patch and why is it okay to
+> >> access table->extra2 without holding rtnl mutex?
+> >
+> >table->extra2 is immutable, it can be fetched before grabbing RTNL.
+> >Everything that can be done before acquiring RTNL is a win under RTNL pr=
+essure.
+> >
+> >I had a followup minor patch, but the patch series was already too big.
+>
+> I see, so this hunk should be part of that patch, not this one, I
+> believe.
+>
 
-Fixes: d1d77120bc28 ("net: phy: dp83826: support TX data voltage tuning")
-Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
----
-Changes in v2:
- - add Fixes tag to commit message
- - update subject prefix to [PATCH net-next]
----
- drivers/net/phy/dp83822.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+If I send a V2, I will add the followup patch instead.
 
-diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
-index 30f2616ab1c2..ba320dc3df98 100644
---- a/drivers/net/phy/dp83822.c
-+++ b/drivers/net/phy/dp83822.c
-@@ -528,7 +528,7 @@ static int dp83826_config_init(struct phy_device *phydev)
- 			return ret;
- 	}
- 
--	return 0;
-+	return dp8382x_disable_wol(phydev);
- }
- 
- static int dp8382x_config_init(struct phy_device *phydev)
+IMO this is a minor point.
 
-base-commit: 33e1d31873f87d119e5120b88cd350efa68ef276
-prerequisite-patch-id: 0000000000000000000000000000000000000000
--- 
-2.34.1
-
+Thank you.
 
