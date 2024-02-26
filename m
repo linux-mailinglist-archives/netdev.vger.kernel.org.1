@@ -1,68 +1,121 @@
-Return-Path: <netdev+bounces-74982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AD54867A53
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:31:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E10D9867BAE
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 17:22:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA1FB28FC15
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:31:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9CD8B22D94
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE0C12BE81;
-	Mon, 26 Feb 2024 15:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF0912AAEE;
+	Mon, 26 Feb 2024 15:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2PNEOOjn"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB7412B157;
-	Mon, 26 Feb 2024 15:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2826C7E794;
+	Mon, 26 Feb 2024 15:34:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708961477; cv=none; b=Fb4IVUSlRg1g3kPOK51BPYnYOxidaA8cpxjF6cjjnnc/fw/MZkqKSyUVzLDpUCRBG3b0P1Z0coJ3fLOfHBQa7UUm5XbZWigdsZXXCFytaL5kHDTA4+Q22uZGKugqitjowTm9ZxRHpjymwIpWSsxRw1tz4cPeEn829blBceUGW2I=
+	t=1708961668; cv=none; b=KebEiYaptD1ZT9p+iEhgBHW8cXw0DK4/9HGww4BH/U9ui6MHWnjobvLEyzTssYtV2nHW4JuxbeMLcBfHV546J+ypfrrvdPxHe80Tj+SFi7WfbIUxSqXMh6Ja6N11jAjL19llNBjnIFmQIRvNEspMfP2jhQw6faP0XMxwtlL4RSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708961477; c=relaxed/simple;
-	bh=Fi2I6JWdoxNsLOZPWDvOCoChddUq4ZOZqj4K5cnTqfg=;
+	s=arc-20240116; t=1708961668; c=relaxed/simple;
+	bh=kuB0H4FU8bT6x452qiWGPFUounbrJC67yGBA/EwPPlc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lBiPrmVzXl8vmygHIat2cg0ke/Gfyp4dHFz0WjKWKUMxuuKsK1P+K/ObxMhb0BhVZ0ye1oq36CORpsYRCECcCTWCbS3i00K0Ffv+ujZrvGmwX7h2ApmK2RGSpNIWGd18aS0xIcJL9TsVkVGOu8yhY4j+b/UDnhv0NEdM450MRyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.41.52] (port=40758 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1recwZ-001VQn-BZ; Mon, 26 Feb 2024 16:31:05 +0100
-Date: Mon, 26 Feb 2024 16:31:01 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	fw@strlen.de
-Subject: Re: [PATCH net] netlink: validate length of NLA_{BE16,BE32} types
-Message-ID: <Zdyutaij0JRDY8g1@calendula>
-References: <20240225225845.45555-1-pablo@netfilter.org>
- <20240226071806.50c45890@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jclwg94lTS/nm/c2Qhg7MijWDQanJrj1yr128PL1yROmjDgFB4bkwK8Ak4raC/GYOA02Ao3eLcZdrhu9Z7Eo9EU6Pb+OT89UGidq++lOHpIZqggTYj9uIZ/Wn6N18v7AFdBL30im93c/VG7GxzyIyM/zD9FHVhNuJSEqTi6kMRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2PNEOOjn; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=Fr1Kk+BTfvCgehT0HKmG9zqX5uvmp1iVYnEnXQZLIm0=; b=2P
+	NEOOjnRUsWhPnM+8MVmxsJVwF19KuGfFLSVatDNgAJFpGgAQ6uIdkWd8t9vaVK7JXSnsJJ/e0PnIX
+	0b6do8qtJ7zYkI5uelSWBco6g5F3ZKq2HMfFOo79V25DwLUJD+QsnvJUu9FX7dHc9/IR60Zytl8nD
+	hvVYPqK4Br2HqWc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1reczy-008jmA-Bn; Mon, 26 Feb 2024 16:34:34 +0100
+Date: Mon, 26 Feb 2024 16:34:34 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?J=E9r=E9mie?= Dautheribes <jeremie.dautheribes@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, Andrew Davis <afd@ti.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	=?iso-8859-1?Q?Miqu=E8l?= Raynal <miquel.raynal@bootlin.com>,
+	Yen-Mei Goh <yen-mei.goh@keysight.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next 2/3] net: phy: dp83826: Add support for phy-mode
+ configuration
+Message-ID: <aee610ab-2815-42f0-a4e4-5f695238beae@lunn.ch>
+References: <20240222103117.526955-1-jeremie.dautheribes@bootlin.com>
+ <20240222103117.526955-3-jeremie.dautheribes@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240226071806.50c45890@kernel.org>
-X-Spam-Score: -1.9 (-)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240222103117.526955-3-jeremie.dautheribes@bootlin.com>
 
-On Mon, Feb 26, 2024 at 07:18:06AM -0800, Jakub Kicinski wrote:
-> On Sun, 25 Feb 2024 23:58:45 +0100 Pablo Neira Ayuso wrote:
-> > Fixes: ecaf75ffd5f5 ("netlink: introduce bigendian integer types")
-> > Reported-by: syzbot+3f497b07aa3baf2fb4d0@syzkaller.appspotmail.com
-> > Reported-by: xingwei lee <xrivendell7@gmail.com>
+On Thu, Feb 22, 2024 at 11:31:16AM +0100, Jérémie Dautheribes wrote:
+> The TI DP83826 PHY can operate in either MII mode or RMII mode.
+> By default, it is configured by straps.
+> It can also be configured by writing to the bit 5 of register 0x17 - RMII
+> and Status Register (RCSR).
 > 
-> Florian already fixes it, commit 9a0d18853c28 ("netlink: add nla be16/32
-> types to minlen array") in net.
+> When phydev->interface is rmii, rmii mode must be enabled, otherwise
+> mii mode must be set.
+> This prevents misconfiguration of hw straps.
+> 
+> Signed-off-by: Jérémie Dautheribes <jeremie.dautheribes@bootlin.com>
+> ---
+>  drivers/net/phy/dp83822.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
+> index 30f2616ab1c2..2d8275e59dcc 100644
+> --- a/drivers/net/phy/dp83822.c
+> +++ b/drivers/net/phy/dp83822.c
+> @@ -100,6 +100,7 @@
+>  #define DP83822_WOL_CLR_INDICATION BIT(11)
+>  
+>  /* RCSR bits */
+> +#define DP83822_RMII_MODE_EN	BIT(5)
+>  #define DP83822_RGMII_MODE_EN	BIT(9)
+>  #define DP83822_RX_CLK_SHIFT	BIT(12)
+>  #define DP83822_TX_CLK_SHIFT	BIT(11)
+> @@ -500,6 +501,16 @@ static int dp83826_config_init(struct phy_device *phydev)
+>  	u16 val, mask;
+>  	int ret;
+>  
+> +	if (phydev->interface == PHY_INTERFACE_MODE_RMII)
+> +		ret = phy_set_bits_mmd(phydev, DP83822_DEVADDR, MII_DP83822_RCSR,
+> +				       DP83822_RMII_MODE_EN);
+> +	else
+> +		ret = phy_clear_bits_mmd(phydev, DP83822_DEVADDR, MII_DP83822_RCSR,
+> +					 DP83822_RMII_MODE_EN);
 
-Indeed, he told me, I overlook this fix, thanks.
+I would probably add a test for MII and return -EINVAL if asked to do
+something else altogether.
+
+	  Andrew
 
