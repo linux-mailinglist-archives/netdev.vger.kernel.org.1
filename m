@@ -1,108 +1,109 @@
-Return-Path: <netdev+bounces-74914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16A0F867498
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 13:18:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5E7486749F
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 13:20:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 476D11C24A1C
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:18:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 030521C226CF
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E3055B03B;
-	Mon, 26 Feb 2024 12:18:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E3ffn9bd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C42604BA;
+	Mon, 26 Feb 2024 12:20:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75940604BA;
-	Mon, 26 Feb 2024 12:18:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A7D604C4;
+	Mon, 26 Feb 2024 12:20:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708949908; cv=none; b=FxCwoznXTKdbafmL2h4ip6QY9cYvUyoADHi1wgubjbNMnSXETDg5C2c5uY+RQhrCIB6Ue4JyOaYpIPuFL9l/0a8CRQZYTAC8lqxUXHy4VJxyJzqvIzTBkW6KMxSOxKOVdOwybfRzM41amq5snZhO+QDr7LLlFR/mNir8FRaKCjk=
+	t=1708950018; cv=none; b=MkcPi00sKjGnTsGCYwWSkLB9ibDXLRSi1kLIKgOsXaUgVTaUdlcWS6xx5PqYSRW2pkO7ox14GHsB9eSVB34KeRYaU5maIsdZBROAghE/Hsgibq/t7KLmmOZM9EmZb3ZTYoA6dHsrhZ5bPKqR8fAu7a7exGz5ET+0sPzmpBTqKMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708949908; c=relaxed/simple;
-	bh=VSnvGelLdUIxZaIuWRNLfdqqVKrr+uqj31Ykk1ZLMCY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g7ng5c1FEF+5N1NsI9B0c+4QwwPRH65yTFHmwfFUWRydw/izYeSzfdwyxH4jxi7wIyCSRtc2NPYhFsVLTa2UoTwjdLhPgBPGnfA9XnrzA/qW2otUj2X8ech7KutL6pMpmZBP7Ak5Wbk9o2O/qCAj45lWeyP3KbK4qmt5Slxx3Yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E3ffn9bd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EC11C433F1;
-	Mon, 26 Feb 2024 12:18:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708949908;
-	bh=VSnvGelLdUIxZaIuWRNLfdqqVKrr+uqj31Ykk1ZLMCY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=E3ffn9bdlAqqJECX5jOmuhuODqmMzGVocETBwQE3reLPzykSZ3ycyJ0TEf4AZ+KJb
-	 yLRnbdhjiPrrgHEcwKAv+u68lWMGraKvyP59AB4dytfWg/mjHpABqrOYxdFiIo7jxO
-	 25vwmq+dwb8iVzkGSjTsfeRvcAghQSmfRSwtzw40EPNFKNSh3LupfSzaLtWD7BUMUR
-	 Fmw4V9sOwsRMO5d6oZiRtMLskwDTYjhrZoJD6B5xYb0PIQV88SjdZO8l3XDEnFgRC+
-	 URKxKJ8vyhcnocyQDFMf9NhLtOU/ZTSvriJeQK35sgCGdSP0rz0PMrr1Fwse/g7gpY
-	 gHlpcOgeJt3Mw==
-Message-ID: <fc4f148d-d4d3-4994-8d36-c382c13ba52b@kernel.org>
-Date: Mon, 26 Feb 2024 14:18:22 +0200
+	s=arc-20240116; t=1708950018; c=relaxed/simple;
+	bh=kzsP9SMdQi9uXkmXE7VtoRsZjWjTd4h4Y2jjaWZrcbc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NAZuT6JRzE3EK6raLaN/7QWuxn/GlZisFD8SvTaXVnmQ8FNEHX0oTbeXw0Hs/FmklpxY2BOGnW6zT5sskdSR2y+VLLlXPeXX/5GyV6qJD2yr/ZdbJMkLLTF6piK5wpl75dFo7RUi7Fj9dw++rBC3TepJmOvlG2Qfd38/YwJx4K0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-60908e5fb9eso5813357b3.2;
+        Mon, 26 Feb 2024 04:20:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708950014; x=1709554814;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E4J/cxB0tcjU1L2Z32zud+kvug5qqY91R00zM2x+EZo=;
+        b=OlfFaegxpfes01GHkY6Ootx7MEsurII6X/G+1zxG6gcee5j/2s1WAJyM8EfpLuyjYz
+         OLSPjf456Eigsv7YeGCXEMvSwZ/tvbe4/uxWlxRmP6P0xAg828jqgVL/+mg+j898a4io
+         synUVDVQDgJylVr6C/AacPA2Bc5GpekwD+B8nuMqvWXfJ7oo/VPgs8D1hHwy6+xSN7VG
+         xC3TFbDLqlvSdqqAejELa/tqXdFNgTe91nY6P057NGRxJnBQ6j6fAOGtPraetf37hMnF
+         QJV7yLkh+ZsqqtC7zEilMiAY/8x2vIYcYoy2wNqAEbFxgjJexGZ9tRR1DW93s1hTDYl0
+         JtFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX3dXjlMUhAXzfrap6Z7S/QY1YXrLxiBvLM+1B52GwEQUQYyhBz2t4z1dk/auZeG4ndzw6wP+3bUtIsKfvIJrnWUuFVs8c3YTZKeacFZ7n3EGC2fBhdIFsI1/tfzM5+VmxLR9ET8O+QsBZUYaa+lm6CqMyMeMyBzZo1xzKsIvz1XWi0QFtN
+X-Gm-Message-State: AOJu0YwOys2G2P3XFuEZvnRs7xwsfHfze0W8PHTgeoEjtqPxZ7w0pEui
+	wvSfto9XoE/meIbWcT73Ow0iG9TzAjksAN7W/BfUJNsXaogrxvMgnr0u6oco3Wo=
+X-Google-Smtp-Source: AGHT+IFpVAPgWrVr+QEyj+mdbbR6FavL5Lw2ic5j6M9S0vty0r59mWNrQaW69jrOeX3VhqoJT6oLMg==
+X-Received: by 2002:a05:6902:4d0:b0:dc7:43b7:31ac with SMTP id v16-20020a05690204d000b00dc743b731acmr4276214ybs.14.1708950014108;
+        Mon, 26 Feb 2024 04:20:14 -0800 (PST)
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com. [209.85.219.171])
+        by smtp.gmail.com with ESMTPSA id b14-20020a5b0b4e000000b00dcda90f43d7sm858633ybr.59.2024.02.26.04.20.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Feb 2024 04:20:13 -0800 (PST)
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dcbc00f6c04so2994992276.3;
+        Mon, 26 Feb 2024 04:20:13 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCW8ySn6g6UKIKRsL12yoznXQsoJsnJNRmIKNEjl79v44PT08uao72RJcWZWCyatgH84HlCOx4+DSOvPbW58i45AhXmDfYfhZRKujWOqgKBKVZUmEqJ7e/Pe3xsNT7J7VgkJTZQdUznOcjNNwrUqgm/9S3XG69LxYsid5a848bsU9ifUN01V
+X-Received: by 2002:a25:918d:0:b0:dcc:7af5:97b4 with SMTP id
+ w13-20020a25918d000000b00dcc7af597b4mr4109099ybl.12.1708950013074; Mon, 26
+ Feb 2024 04:20:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: ethernet: ti: am65-cpsw: Enable RX HW
- timestamp only for PTP packets
-To: Siddharth Vadapalli <s-vadapalli@ti.com>
-Cc: Chintan Vankar <c-vankar@ti.com>, Dan Carpenter
- <dan.carpenter@linaro.org>, Richard Cochran <richardcochran@gmail.com>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Pekka Varis <p-varis@ti.com>
-References: <20240215110953.3225099-1-c-vankar@ti.com>
- <20240215110953.3225099-2-c-vankar@ti.com>
- <4c82705d-b05c-4ee8-88ed-42f944a023ac@kernel.org>
- <03d53049-e649-4714-8ad4-49619a5e9475@ti.com>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <03d53049-e649-4714-8ad4-49619a5e9475@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240223195526.1161232-1-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20240223195526.1161232-1-niklas.soderlund+renesas@ragnatech.se>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 26 Feb 2024 13:20:01 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdW5VO-u5fmrRqRhUDZbODn-yzCZPh0bOqYiG-oZXYBDdw@mail.gmail.com>
+Message-ID: <CAMuHMdW5VO-u5fmrRqRhUDZbODn-yzCZPh0bOqYiG-oZXYBDdw@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: net: renesas,ethertsn: Document default for delays
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	devicetree@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Feb 23, 2024 at 8:56=E2=80=AFPM Niklas S=C3=B6derlund
+<niklas.soderlund+renesas@ragnatech.se> wrote:
+> The internal delay properties are not mandatory and should have a
+> documented default value. The device only supports either no delay or a
+> fixed delay and the device reset default is no delay, document the
+> default as no delay.
+>
+> Signed-off-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnatech.=
+se>
 
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-On 24/02/2024 10:59, Siddharth Vadapalli wrote:
-> On Mon, Feb 19, 2024 at 12:59:55PM +0200, Roger Quadros wrote:
->> Hi,
->>
->> On 15/02/2024 13:09, Chintan Vankar wrote:
->>> The CPSW peripherals on J7AHP, J7VCL, J7AEP, J7ES, AM64 SoCs have
->>> an errata i2401 "CPSW: Host Timestamps Cause CPSW Port to Lock up".
->>
-> ...
-> 
->>>  
->>> @@ -856,6 +852,9 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_common *common,
->>>  		ndev_priv = netdev_priv(ndev);
->>>  		am65_cpsw_nuss_set_offload_fwd_mark(skb, ndev_priv->offload_fwd_mark);
->>>  		skb_put(skb, pkt_len);
->>> +		skb_reset_mac_header(skb);
->>
->> Why do you need to add skb_reset_mac_header here?
->>
->>> +		if (port->rx_ts_enabled)
->>> +			am65_cpts_rx_timestamp(common->cpts, skb);
->>
->> The timestamp should be added before you do skb_put().
-> 
-> Roger,
-> 
-> Could you please clarify why the timestamp should be added before
-> skb_put()?
+Gr{oetje,eeting}s,
 
-My bad. hwtimestamps lies after skb->end so it doesn't matter.
+                        Geert
 
--- 
-cheers,
--roger
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
