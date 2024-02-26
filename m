@@ -1,85 +1,73 @@
-Return-Path: <netdev+bounces-74991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D6D4867AB8
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:49:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2132B867BAF
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 17:22:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB67B29501C
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:49:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3B09B24CE7
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:50:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26B412BF39;
-	Mon, 26 Feb 2024 15:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B06112B153;
+	Mon, 26 Feb 2024 15:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="AksM7EtY"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="P1/DIoeU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A15A12BF33
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 15:49:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4183F1BDDC;
+	Mon, 26 Feb 2024 15:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708962571; cv=none; b=pRHzNkmubptaiHEoOuqJbNUkszulG6OFQBTcbrMhkwgZ78xWiIz+zwB0jHxyubzRhHEDExUOrXpqGxlPIYKd+E52acziiBgkVMevTXSlcQjNdfGvIrXcY04TEOCLcvIacUXi5eE5ujoggMg5CvafY0n1WSA7T/Qn4ezV4mb2cTw=
+	t=1708962653; cv=none; b=oAlp0juLQtIkbFr5GGzypKLvIDgtJDko73V8g+Y20Bkj68K3yv8pQFNL6DnkC8CexhP09DQk/NfHarfa0wtL9vlsvCU0KrVnoqqXoPZl2p9j5Pdk+buKmJL5BDHwZuaF+y+/nEClMKhfPGy56p1X971kzoWNOJcVvIbsVxB65Sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708962571; c=relaxed/simple;
-	bh=QuQOhoSKYSA6S6ecyRCikKpWB3gG/2419qaq5K6HK+I=;
+	s=arc-20240116; t=1708962653; c=relaxed/simple;
+	bh=hePlh93u4XXUHR1BI8WwV3QAM8EGXP2vvnNe4R5gcAA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i/zJZNZrY3wdupWEKyyJMeH/cYjdUSuobSdL8c9a81WpghXe5nYbmvVuPyt6F6z+LS9K9J0ruVXJcdc9OKI2v/tMF6n0GxrxI8hlf45bEUXmGRjrhGTMBhkGcnzqFhcRHidkrLgUFicbkW/aPsTAM8uuVlJ5J7TXr8gBph2KhzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=AksM7EtY; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-412a9457b2eso2731655e9.1
-        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 07:49:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708962568; x=1709567368; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QuQOhoSKYSA6S6ecyRCikKpWB3gG/2419qaq5K6HK+I=;
-        b=AksM7EtYqW1I/QTTUjqQolFd8YqvKSgQ/M2632pmj1+sykdIb77UGUsbqlnISPx0kH
-         /861Q/eoWb7WXJz4j9vCMXNAotbtV6ioV4QDSfbh3oszWQFJYfAV2V/N2eMYNWB+L462
-         k0vM33V5E7Ip16TXAaHlvWIU22CvmWFTOy46yXoz8SuhXYtrqwA/cUq5OTg91hALA22U
-         iahmet3J/LFegebHLjWVtzTtLqW+epX3cS2RptjBUa0o+mQlFB0lprp3zgD4VSE2IZDL
-         Rqpl1Y9YMIk0RPy5AumJ39ZWkUxnU6VuWmrg+yIRtC+GB4HaKSBqTsholL6rZhHS9/jF
-         Mv4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708962568; x=1709567368;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QuQOhoSKYSA6S6ecyRCikKpWB3gG/2419qaq5K6HK+I=;
-        b=kvUwbyvWk8Y97RlZZB3iY9klb2dJNPYP8x4uBBNNNi6pf+Tv8DsXVpX7OclezUpj+r
-         jQ+ou/PDX97qwzaC4DE0RLFvEXDyag2ct7SjKAWvd9xodltRt5MvdfeMUiFAStibWUDu
-         Bi9U6/i7d1QKbDHbXaVUOM9Y6kZwZDRjx7lRNzuyFu1yXUmj1dLoDMUGRRYaggMJi6hV
-         x4PcCrJcm0jTIKyN1Ucyw4k6OhM+xsd9bQHHh7eljnFlBfMlWsuBH5e/v0Ae1XgkhUmH
-         hzgFKIva6c3SwnXeibUv8UWgUzt6+2MJbgxKXign17a5pwSPIqWJN2AlDPai07rrWv5U
-         s1eA==
-X-Forwarded-Encrypted: i=1; AJvYcCUzgOPta5osF/HjVARaiO3lE4F3xXUly3vf0SUt/R21F0vY3KBQzoU8EHTkRR/7SaHceyPvcCY+MDu7le55KjXh4YJ8B7Za
-X-Gm-Message-State: AOJu0Ywus9kHYgu1HVm0ImDMQNM8IUpAGp4FvcV+2+PkxnDNIaD4C04u
-	xPN3Fvgc4vsB5fGZdaT1ytxzAYhXyzjYqnCGywO/TSa7NjmIyYoEm3FlAVVhWbc=
-X-Google-Smtp-Source: AGHT+IH62EmCPT2grL133xioxj+/UqxRqyJFrqd2I0knBMx9mTTaBj9K9DXm9vddfUPo+sSSBe5aOQ==
-X-Received: by 2002:a05:600c:1987:b0:412:a5cb:5aab with SMTP id t7-20020a05600c198700b00412a5cb5aabmr2356320wmq.16.1708962568302;
-        Mon, 26 Feb 2024 07:49:28 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id k35-20020a05600c1ca300b00412a7d9fb9csm2252060wms.45.2024.02.26.07.49.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 07:49:27 -0800 (PST)
-Date: Mon, 26 Feb 2024 16:49:24 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Ziyang Xuan <william.xuanziyang@huawei.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH] net: hsr: Fix typo in the hsr_forward_do() function
- comment
-Message-ID: <ZdyzBIzIvqSvnzju@nanopsycho>
-References: <20240226150954.3438229-1-lukma@denx.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tSJFN9om/WTbXRxDTo68SWSrzQCNXA/M0XEQh/JCwshiE62h8xOSblMxhrodo0Xst2RYbCzU1knDuD67XMJIeOKo0pv8jA2jzsgoR2YYYT+W+iy3kr6Lf7fpy88RNafvlqYrkjloqBBm6/qo46SK+APgcszuvLB/mVFBbYOeWoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=P1/DIoeU; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=VTknhU/j0S+TFKgathhuAGd6GVWPtOPefADa7SFok1o=; b=P1/DIoeUAxIuhX8rToX6Jm818m
+	2Il57xrk8I2BUehcQQpqbUdvwRdfXRlnjDEU+TmhD98V4ST5G+lrb2pcSnIDB5yD/qqEWh0ukF1d2
+	trRol/o7ha7Y68IdXCwZMfQCdb/vqnAsVC+QWyCea2hV6jVoKKMs5DMdE9Lf9Bxm/D6X0Az9RxoLq
+	wvS6CvK46gJdRGf92M3T4e6BCxMW11BjIM9/fvr9nrWI4/aVfZg/K2ISM2jeB6jUmA9y6JAky4gQ9
+	4BUHm3JidYRr5fJenhPFRO6mQ1aSJ6BmkoqEUCmzzme+5hkPh1FXkS6bveTcfSYOIGJjS6TYcUOMx
+	tWlozHbw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33124)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1redFZ-00045f-2G;
+	Mon, 26 Feb 2024 15:50:41 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1redFY-0006YJ-FF; Mon, 26 Feb 2024 15:50:40 +0000
+Date: Mon, 26 Feb 2024 15:50:40 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Shengyu Qu <wiagn233@outlook.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v1] net: sfp: add quirks for ODI DFP-34X-2C2
+Message-ID: <ZdyzUMQ+MmQ7E7sX@shell.armlinux.org.uk>
+References: <TY3P286MB2611C0FA24318AA397DB689B985A2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
+ <ZdyahVYAhPgf2Xqn@shell.armlinux.org.uk>
+ <TY3P286MB2611BD62C30B37A5BE02D3C5985A2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
+ <ZdyiigYNGf8WVZNu@shell.armlinux.org.uk>
+ <TY3P286MB261155090B2D07593901C0DE985A2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
+ <b8fdb5df-57e4-491a-b310-e8e13a89d331@lunn.ch>
+ <TY3P286MB2611578CBBB25D48FA5452A7985A2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,17 +76,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240226150954.3438229-1-lukma@denx.de>
+In-Reply-To: <TY3P286MB2611578CBBB25D48FA5452A7985A2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Mon, Feb 26, 2024 at 04:09:54PM CET, lukma@denx.de wrote:
->Correct type in the hsr_forward_do() comment.
->
->Signed-off-by: Lukasz Majewski <lukma@denx.de>
+On Mon, Feb 26, 2024 at 11:20:47PM +0800, Shengyu Qu wrote:
+> Hi Andrew,
+> 
+> When telnet connected to the stick(It's using busybox), "cat /proc/kmsg"
+> would report something like "<4>change mode to 0", that 0 is the actual
+> speed rate codename it changes to. You could check this [1] for more
+> information.
+> 
+> Sorry but I can't record my kmsg output now, since enable connection to
+> my stick would make the network to disconnect for all users and my
+> roommates are using it.
+> 
+> Best regards,
+> Shengyu
+> 
+> [1] https://github.com/Anime4000/RTL960x/blob/main/Docs/FLASH_GETSET_INFO.md#lan_sds_mode
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+I'm aware of that link, and sadly the information in that table can at
+best be described as "confused".
 
-Next time please indicate the tree you target, by "[PATCH net-next]"
-or "[PATCH net]" email subject prefix, so it is clear.
+For example, under "Behaviour" it mentions "1GbaseT/100baseT". How
+exactly does a SFP module exhibit baseT behaviour (which is twisted
+pair copper ethernet.) Hint: it can't and it doesn't. "Mode" being
+listed as "TP" is also misleading and wrong. The ethtool value of
+0x20 is bit 5, which is 1000baseT_Full which has nothing to do with
+a SFP (and won't be reported as even a supported mode for this SFP.)
+Bit 41 would make sense (1000baseX), which is listed against mode 1.
 
-Thanks!
+I'm afraid looking at that URL just adds to more confusion.
+
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
