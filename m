@@ -1,213 +1,107 @@
-Return-Path: <netdev+bounces-74876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0EA48670CC
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:26:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2B21867195
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:42:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FA631F2A177
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:26:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5D38B28601
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49DD1EB35;
-	Mon, 26 Feb 2024 10:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nSZOpiea"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E4DA6025A;
+	Mon, 26 Feb 2024 10:16:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF581BDDC;
-	Mon, 26 Feb 2024 10:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708942220; cv=fail; b=j3wIpyuULyTgDKqhAb1jWAB6lL8PaNQPUCuhNPXx8epmX2nC9VBfvYHgv9c2j9/nSayGClDHrdZDOI7HQtRnZYgMEb3n1HL6qGAa3oQeHp1U883TWw+fgMon89lEm5EpnHr69/jbCu9Bm0TyyTdObY9JgXKMixyPeuVuh1SjUPU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708942220; c=relaxed/simple;
-	bh=Ap2Pty0fauq3EqvuUhCgiFE8rSDwZJ/Y0j+hIXG3thY=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=tixNPWmB8s4yKWX3WkDYqwUKcXvf5jKTeEWTAelanEduJ3ZCdipG+3V1rWbm4pl7OczozQwhT0eLzuGZTtiR7IVarvg/gwogWngEEvSQrVfl1/vGuW1IQtJBKLo0rZAd9WPugXRYkPNahLH437sptjQ6+Z3hMpru48DYTjipg8Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nSZOpiea; arc=fail smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708942219; x=1740478219;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Ap2Pty0fauq3EqvuUhCgiFE8rSDwZJ/Y0j+hIXG3thY=;
-  b=nSZOpieaheOpHnDJKmDu4jKLqUrGTJ7IbGaTeVTiX8JfbHOqbTSk4t1c
-   PRI5EqkXPaUJMyk5K2TD2pmKq0dqrnizu+WHaGZZCEFXDOAA76pH1LiD7
-   24HLrZQtgNXq8BGFfuLnutLhGcOldQmPVEoopdZ1R2WNnvAEFq7k7GPp4
-   q64XQdb1tHAZdWMMKxzlt/HkVfarmz3aB+RBHPkUL5kdcO0bIOQm/ATep
-   VmgpBbUhqLtSNbkXTzShjBFuvYjQ0XKQv7HvZ/ZBhQxKiimUaof1JHKoK
-   6eV9FdsDRMFLghXXXJWmTvEPp/icBLxsBjVvVSPjg9vrB+xt8wmQ27WJV
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="3087867"
-X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="3087867"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 02:10:18 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="6511128"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Feb 2024 02:10:18 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 26 Feb 2024 02:10:17 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 26 Feb 2024 02:10:17 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 26 Feb 2024 02:10:17 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 26 Feb 2024 02:10:16 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=L5bQWOTCIehaHZhqNpPNgDLMHVNduqEZWn4KrZIXXd3MoSA8qME2XZIAtAQJLjwSVWcThWdVppyrVH2v/BfCZAOszyTFvd2aE18G3r5dX14K1adAs757AZshrExuAHL3F9DXyFt/tE/KS/7l911H0U1vHMCtdpHiu8ezMpjWQZVmztfF6D1dURjV1AElQVDICd9TZciMuoecQsFFIkioINT7/cCnVbIblYpWqFJOpnYEhOeSqbh86b3IaB2A6OfWBgIl+YM6hfO3W3i8XojFKajUGTenYIhSpjDpPtG0pyTaDEGJU31ADnUQUKVhTNorPI/sHAGW99X9NYto7GlX2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qZnAeImvCKABDbxfCRnkMR3fIHwMtbsTobi0MIGWJeI=;
- b=jZIAxV5XqPdN+s1qlhjWMq99vBGm4KbwfjZ8Wb2QxsCyVYbkmvpWdHJ3go6CDbph0Ih/JVs1YWwZHE8aaoPyUaUHIypHS+ixN5YWt8bLIpvEQ20Dx/506oEVARIEDo0zJcyATPkTVOudi8hdkqkFW/gM55fAOpqt5zNOKy+zWAf49HdT2hcgQ1OK4DR8yf4Qr0QbZpwPV5HlumdqqXIx5eQau7Gy/qjSnqghZ6gl0scapg/FHvaZTrVJelfPUyPVoIUY9egE+1fU80ZsL1glqorTTEoaaniXaqqheH64QoTHh6YSp/Z60ccocSS/eQG9m90NJlWvCqg93m1B1kelSA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by CH3PR11MB7251.namprd11.prod.outlook.com (2603:10b6:610:147::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.24; Mon, 26 Feb
- 2024 10:10:15 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::f082:826a:7761:7aca]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::f082:826a:7761:7aca%2]) with mapi id 15.20.7339.022; Mon, 26 Feb 2024
- 10:10:15 +0000
-Message-ID: <de696b4c-bda5-4ab2-a0c0-490b4eba8163@intel.com>
-Date: Mon, 26 Feb 2024 11:10:07 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: skbuff: allocate the fclone in the current NUMA node
-To: Huang Shijie <shijie@os.amperecomputing.com>
-CC: <kuba@kernel.org>, <patches@amperecomputing.com>, <davem@davemloft.net>,
-	<horms@kernel.org>, <edumazet@google.com>, <ast@kernel.org>,
-	<dhowells@redhat.com>, <linyunsheng@huawei.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<cl@os.amperecomputing.com>
-References: <20240220021804.9541-1-shijie@os.amperecomputing.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20240220021804.9541-1-shijie@os.amperecomputing.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: WA2P291CA0047.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1f::16) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88FA038DE9
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 10:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708942572; cv=none; b=GfFsM+qZE3ByhPz9f9XlcxbUboTQRhXj3pZXXf/6WXDsM/iN3SOC5/OkjY4PbGg7UjSoMaNXtwxnP/4wYOKAdDasTVF04UXnYXDkY8yc9AQ9obrtyycCv/eX1AZRT78x02DlI1vObte+5NaA/glgbZ8Zguk/X8Ee+U5ncaHvxv0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708942572; c=relaxed/simple;
+	bh=VmTbkppW6YpAajcXsJ4b9OS5/DxwJNy3p3kYrUucLas=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=LBrnqy8JxZPLMgiqKsyUr+Bko1Lc8b9NFE0IA/4pQaqut9VwBlvIPw5wIpytrQ4KSmRnYxojXUIzPC69kO1fH3rE+BqVHECfakEQNWKHIGKsluXfAV1YzgO53cU1HdBUUU/f5yD8Au+qIs4gkCNS01kr5p8hUStNl08Tmusdgto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-91-CfTYQ5CAOY6_UOUoiheBlQ-1; Mon, 26 Feb 2024 10:16:02 +0000
+X-MC-Unique: CfTYQ5CAOY6_UOUoiheBlQ-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 26 Feb
+ 2024 10:16:01 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Mon, 26 Feb 2024 10:16:01 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'kernel test robot' <lkp@intel.com>, "'linux-kernel@vger.kernel.org'"
+	<linux-kernel@vger.kernel.org>, 'Linus Torvalds'
+	<torvalds@linux-foundation.org>, 'Netdev' <netdev@vger.kernel.org>,
+	"'dri-devel@lists.freedesktop.org'" <dri-devel@lists.freedesktop.org>
+CC: "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
+	"oe-kbuild-all@lists.linux.dev" <oe-kbuild-all@lists.linux.dev>, 'Jens Axboe'
+	<axboe@kernel.dk>, "'Matthew Wilcox (Oracle)'" <willy@infradead.org>,
+	'Christoph Hellwig' <hch@infradead.org>, "'linux-btrfs@vger.kernel.org'"
+	<linux-btrfs@vger.kernel.org>, 'Andrew Morton' <akpm@linux-foundation.org>,
+	Linux Memory Management List <linux-mm@kvack.org>, 'Andy Shevchenko'
+	<andriy.shevchenko@linux.intel.com>, "'David S . Miller'"
+	<davem@davemloft.net>, 'Dan Carpenter' <dan.carpenter@linaro.org>, "'Jani
+ Nikula'" <jani.nikula@linux.intel.com>
+Subject: RE: [PATCH next v2 11/11] minmax: min() and max() don't need to
+ return constant expressions
+Thread-Topic: [PATCH next v2 11/11] minmax: min() and max() don't need to
+ return constant expressions
+Thread-Index: AdpoC6KUHy5Z1N7yRkiaBkc7ZdEdRQAjHDKAAAEYtvA=
+Date: Mon, 26 Feb 2024 10:16:01 +0000
+Message-ID: <bd7321effdf24d11aa16098bb40869ce@AcuMS.aculab.com>
+References: <a18dcae310f74dcb9c6fc01d5bdc0568@AcuMS.aculab.com>
+ <202402261720.EAMC0eHM-lkp@intel.com>
+In-Reply-To: <202402261720.EAMC0eHM-lkp@intel.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|CH3PR11MB7251:EE_
-X-MS-Office365-Filtering-Correlation-Id: 903b0b50-a2c4-42a6-70a1-08dc36b32040
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ElWLYHlDb8o1e4Twy/pgM4/cTjnHM7vxJSgNCgb7brwTU21Gz8TSu+8bqgKvlz+oNON75l1nASAcg+R25dReTnG0gRhOmdXEA5TedjEqV9iYdr4x3hOrj2KClbkvCealRk4oBvtH7OmBM873a7W5PTN137rZgOI1diWjqMC91q9jQZXnETtMrecMFRNKVGTuBb5TLdeblM/BzZH/5DyazgUtYpN81VpF3rwR18kTOktFw4b2eIPg0DYnyu8sYCtjYnatKMKGbswXXa7UBZpsMyjOgzEUwMfXGrXLla5ZqrkPIjdq2mLjcKOY0GuYodmAOh0YI+olHfh5+eNt/z+8cI2e3gCahp2l0NfEOIczLQwWngGFRXOUZyWDWXPbNFHVWEDmRjHp3wAhnAA+STOhfJLAgUyPcIFGrFl4EFF9tXVUzFjylt+VUp3qW46WbH+JHdnB53fUayPn/RXMQlhKMH2956KKpvxM4Vaa6hKmRzOzDR/B2cElDE63lkMufTliWg8s+BFFzMWxle9yD0B6qZr2AmFEj8Ab9VzHUSdDalgiBgOdCwR4wJpVM5Kdi11yCfcVualysHoadeMhcK5ADEDMX8WwiiOqZUCh9hHF7ssoIhYyiNHQNT1pPEVrRo1e8z63wQZ5jvZAMGz1Czg+zQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a1FncGdkQXlqSFdJaTF5cWxFZXQ5Z3RCWFlhdzhaMVRCb1k5MmhtRURpVUFl?=
- =?utf-8?B?TXhxWmxoWkdNVFpzblpWUFdxQzBCSXdBdjF0Ynk5amx3V2hwMmxiOWZTVUEz?=
- =?utf-8?B?cVlDcUMwbVBWN3kybXFRK3FhZUhYZnFzYlZYTkRBK1VKaVB4KytEUnd2S0s4?=
- =?utf-8?B?L04zbTVGL0xkMXhWcTllTVNHMVVvMGp4WEplYkhHbFcvajFsSnF1eUN0cXl0?=
- =?utf-8?B?NUd6dHlqRng5SjFXM0NvMnR5bkF5WkNHQXJzeEwrYmpKS0ZBbU9XaXVuZkhM?=
- =?utf-8?B?NnZKVThqZnVWdmJWcG5PdDRpUUFkalZKTWJYVFA1UFAwUXFJTmpqRGZTeTZm?=
- =?utf-8?B?dEtlSXZYcnBDWFNidFdMS1VpVHYyTmxLNlZsRHpXQitVbzQxZmc3dnpZTU03?=
- =?utf-8?B?by8yaHFaWG8rMWZ5QVd0QVlsdEs0OEF2RHFEQ3RzR1JTVkJISGtMZC9Wd3lp?=
- =?utf-8?B?TWVVSzFVR0JzT3RZQ3cxTVlxUkZOWjBnWFRWL003UVlYWE10Wnl2cTZjUHBv?=
- =?utf-8?B?RUQ0M1VNcjJMZ0U5OFNpOTBqMmxhL1RXa29XamJwcWp6eFBRa203dVZiTCtu?=
- =?utf-8?B?NGZUajZCMUZTaWdRc2lBbjdKc245bkJuVlhtTENEWU1IMG9ZY1VtUHZ1Wm9U?=
- =?utf-8?B?YnNiNWFpL2NEcTg0NUtXRUY1S2dNOVBlb0VvdjNkMlFVZTdBOVM5TWlRMXB4?=
- =?utf-8?B?aDlzT3ZRSTZSS2hER20wemdVcXVUcVNGWG9wUjhKQkthSnlRYlM2TTNKUDN6?=
- =?utf-8?B?ZTNBMU8vUDB1dTczdFdSeGFKbXBNQWFDa1F4b2MvM0FBdGVZS0thbXJYUHlF?=
- =?utf-8?B?b3BzUEduNGJaaU16djV4LzlEdUltc2F0S2NWTDVXdDFwWG91cFJ3OHQ0MXVS?=
- =?utf-8?B?YjhpRHRmb1Z6MGQ5OW40a2tHV09qTVJ1ZzdydzN1MTAzWjNhamI3NkVwU2lO?=
- =?utf-8?B?ektidjBFM0NqaDc3NEVTbGMyQ1RnK2huN1RBZ3ZDLzZicThCWHBYaHZqdXZG?=
- =?utf-8?B?cFpLai9CdXhzSjdIeFRtbVF0Q1pyaWxnNmpWUmM1dU90bmxFbnozdStMUUdo?=
- =?utf-8?B?SGUrRkI3dUF6Y2d1NUxmY2J3blJCb1Q3UkJWZkFsNVNmOHBKRTFKdzN2bzdH?=
- =?utf-8?B?SXl4ckRHU254V1VJSmdnOUlrb3J5SFRSUnJPWTVwQUpJM2NwT0pGdEc2WEt2?=
- =?utf-8?B?TDdEL3pJRnBySHlMcUZCbnFiZnB1TFdSZklSZEVvQVpQdVM5cWJjZ1FsR21G?=
- =?utf-8?B?ZVhSV1B2bTIzZkdzVlE2VWJuVlJiWjR4byt1SVl1ZTlSaVZHVkhVZmNvckdu?=
- =?utf-8?B?bU5HeERHRitmV1BtTEp0VXpBRWIvYzE2ZUZycWxnbGovNENXL2kyV1c2YkZ0?=
- =?utf-8?B?dEtEbG54YlZBN3FZN2FjSFNXdEl6eXpFRmpFd2VqTWRhTjBqbStyYUV4aVhr?=
- =?utf-8?B?QnB3QVA1eFdNV1Y3V0lveWgxdDNZVjZRRG40TWV2Qno3NEpvWE5Kc1lZcjB6?=
- =?utf-8?B?dVBZQXgzVWRsUUliZ2ZmZFdwMnZQb3NnSmY2YzByeHBKZGxHMTErUXBWMEhT?=
- =?utf-8?B?dUs0SzlQTWg4QU51Y2xjaXA2dWFUSHAxREFuZ3B0VmpOVEloSlYxT3JUNnl6?=
- =?utf-8?B?L1VBTmVTM1FzMGc2VGZwMTdpdGJZR28rK0gxUFdHRDV2aVplV2lzV0tMbWR3?=
- =?utf-8?B?YUVBeHNWczFMYmRZVGpaNWl3YUFpN0gyM2RKMFhXeGZNZ1plUnRCNTU5ckE2?=
- =?utf-8?B?YjN1bDJmdmEwN291bUpCR1l3U1ErdVUyeFBSK0E4cVo5RjFCNEx2VE41bmhE?=
- =?utf-8?B?WjBnaWNDdGVzRmQxaEJqMHltOUNnY3ZxVXFnTStTb1JmQ3VONEU2QzVwb2hK?=
- =?utf-8?B?MUtQR2dsUlZCN2xoclVnRHUrSmJ5SWdnVmxseWdjUXlhdmJCTDBaNklaQTNH?=
- =?utf-8?B?Q3ZoaGNEa2ZBSTNUMURRVnA3L2YzOGpXRWVMRVN2L3VYdXp6ODN2QnVYZ3JI?=
- =?utf-8?B?WFRzVURWMW1Nb2w0NkwvY2xEYjhUSnI5aGxDR2N6MEVYUGljNFFHTUJ6MGk5?=
- =?utf-8?B?bDlySy94MnpndS9Qc09DczZTbmtUWXpnelFRc0dYeDdRRGFWV2NDSjRFR005?=
- =?utf-8?B?VFNlRjgraSttVkJDV2VPNEg1OU5NUXFFbEtObmFxV1ZlTm5GQnRrVGNBN1pU?=
- =?utf-8?B?cUE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 903b0b50-a2c4-42a6-70a1-08dc36b32040
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2024 10:10:15.0119
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RIyKpt+OepV8Ed0rks2Vxi6pIQwmUo/20PK69Kgg4Kppw5hHT/WaoU0Ds6P1RChhrqKtbtVhDXcAiNyO58i+7s+AxqSiUJ6Mmbf59eGunbk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7251
-X-OriginatorOrg: intel.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Huang Shijie <shijie@os.amperecomputing.com>
-Date: Tue, 20 Feb 2024 10:18:04 +0800
+From: kernel test robot <lkp@intel.com>
+> Sent: 26 February 2024 09:42
+....
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202402261720.EAMC0eHM-lkp=
+@intel.com/
+>=20
+> All warnings (new ones prefixed by >>):
+>=20
+> >> arch/x86/mm/pgtable.c:437:14: warning: variable length array used [-Wv=
+la]
+>      437 |         pmd_t *pmds[MAX_PREALLOCATED_PMDS];
 
-> The current code passes NUMA_NO_NODE to __alloc_skb(), we found
-> it may creates fclone SKB in remote NUMA node.
-> 
-> So use numa_node_id() to limit the allocation to current NUMA node.
-> 
-> Signed-off-by: Huang Shijie <shijie@os.amperecomputing.com>
-> ---
->  include/linux/skbuff.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 2dde34c29203..ebc42b2604ad 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -1343,7 +1343,7 @@ static inline bool skb_fclone_busy(const struct sock *sk,
->  static inline struct sk_buff *alloc_skb_fclone(unsigned int size,
->  					       gfp_t priority)
->  {
-> -	return __alloc_skb(size, priority, SKB_ALLOC_FCLONE, NUMA_NO_NODE);
-> +	return __alloc_skb(size, priority, SKB_ALLOC_FCLONE, numa_node_id());
+Not surprisingly I missed X86_CONFIG_PAE builds :-)
 
-Because it tries to defragment the memory and pick an optimal node.
+=09David
 
-__alloc_skb() and skb clones aren't anyway something very hotpathish, do
-you have any particular perf numbers and/or usecases where %NUMA_NO_NODE
-really hurts?
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
->  }
->  
->  struct sk_buff *skb_morph(struct sk_buff *dst, struct sk_buff *src);
-
-Thanks,
-Olek
 
