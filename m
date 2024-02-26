@@ -1,115 +1,243 @@
-Return-Path: <netdev+bounces-74916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19E1D86751B
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 13:36:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96B53867594
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 13:49:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 338ADB217DE
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:29:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21CE51F25AA1
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88107605DD;
-	Mon, 26 Feb 2024 12:29:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB0E47F7DE;
+	Mon, 26 Feb 2024 12:49:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TiG2qLMz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eXWqTQMe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90D4605B7
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 12:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B5660860;
+	Mon, 26 Feb 2024 12:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708950559; cv=none; b=qRv+y6sCL1QikmEP8SjUfxnGaYF7Kq2PwZM7BcUrxSRVh9AULSEo/EfBM0AzO1aOShIQ9BWq8o9IMcxudo4tJLazz6ywHuaoTWhnObvya8dZuIlfBk7rkwZl8ItrnSNxcJnE2bNOdXUcRTENZj2W/WjimBPkHNh4q5o9ipX7QjQ=
+	t=1708951758; cv=none; b=N+A83zAB7sllAg9rVvzgjk7j++kGSWS5uxB1zAyoy4u2SzFiXtuUX73X2JiGKsNx71i1FNWleSEcrtlAAtHdL0OI9RBQHtH8yNod+PuELvNNYgxux/Y2iDFrQf/NlA7mrRB/aqo8j8rbcmL29WXULggMHzZ+aWVK8MlL/Kz9O9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708950559; c=relaxed/simple;
-	bh=GXBeYP8/NZGB5qf7XT5SAdvVmTap9xNVMLCGmPvvpCE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PN1Q1yXEwr6wrVpJX+ukuTURQ7dUW+hCVbgJgUHKoZX4HpoEBVAS7eR9aE8ELZKE4+q3fT4K9vTL5SxWJsaTBg7hc2RkQcQF24sn6dlMB4zb1d+OpHdunrlun4gxwh9nultniGgIC9bKCrEUcNq7zXtV1X0HRLdM8XpIx9Zz/Gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TiG2qLMz; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a43488745bcso134352566b.3
-        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 04:29:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708950556; x=1709555356; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9HdH6UtXyV/jkzcX4bUHV7TOheGh3mZ5gM3aVou29Dg=;
-        b=TiG2qLMz5qJUgsGBdPzBPRSIIHYodgqkh/gNB/BM6T1KlnLmfDxFxyhgvVDg1GIxUf
-         HrOqaW1zdWMvApiLo+aQRhiYuMeUT7kCbEAvGZed8tk1VR9EyG7Oj/l7tCx6GTOuO7TJ
-         9RzvX/dczCo3hda3Yi7fQeK1+Om5723GU5XSbKUENrXe8qKRhVjeu7lwryvo8UaNkAqh
-         v38/TiSXL+pascDs4rUj+b0SxDxWwOthDdje3OjGdFT5//y6UD92cGshiYfnv5hsigbE
-         UU9D8+TUy9Fi+DR9uEwhzIuUetSNKSRX0qwjjOzgLddYLIN2A7oZZ/uX9C+MpLkTOE8t
-         SVQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708950556; x=1709555356;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9HdH6UtXyV/jkzcX4bUHV7TOheGh3mZ5gM3aVou29Dg=;
-        b=jofZkp8ri6VXVKD1qNboJxAxI69lX0BFN+Ds+lzEcqgQDkOp0GJWVZTAjlkzkBiwSc
-         sdcObhYcPCg+MxJrlY2OzZ/Hb5bqIOfUzELW0DPkIXmJ+J60pYSN94uHRJfxX6FAhfFL
-         mEKfn1+lM3UOpzavHBZlrVkAf1XfcRNVd5wsEVu1N2OmyMmEJrWzoZv4ATVZ1bzpRONF
-         40RUn6i787dun+n/DNOl6oTPqGjY1l5OpceqBZCYGlmYWoEMovAk18djc9hZMu21yVAq
-         TMgA21irvH5iiHgjFLk6i2w011//ZbrZPLna8S1h/De2yS2ubPgvDH3onZbzbpTwlHca
-         NWbg==
-X-Forwarded-Encrypted: i=1; AJvYcCXJoMPGhhqx5ZiQjnihJVgOciBFoReICA/ukYJoBzkoSMXmk4cxZk+BiE99VqXMGV040aOyzLPrAZmjRJ6Oa3g+jZr5U6Y1
-X-Gm-Message-State: AOJu0YxHY8NsOJG6s+Joun05aKBUy6qmVHivSEGCEEAS791uOMlKDF/w
-	nS2zgnGkyV72GUjiD41saxjp9BQCgvRe06qvp8sgnUEe27OiQcHMXwAU5fiUTdM=
-X-Google-Smtp-Source: AGHT+IHqozMTz0LD5vswK7bz7pL+WRBEhCMhfrrlLmOZUkgEm9k8MLdczRTNH55JCrx0Mk5cSvGapQ==
-X-Received: by 2002:a17:906:6bcb:b0:a43:3c7a:39f8 with SMTP id t11-20020a1709066bcb00b00a433c7a39f8mr2340993ejs.71.1708950556073;
-        Mon, 26 Feb 2024 04:29:16 -0800 (PST)
-Received: from krzk-bin.. ([178.197.222.116])
-        by smtp.gmail.com with ESMTPSA id fj10-20020a1709069c8a00b00a42ffa6b85asm2048272ejc.114.2024.02.26.04.29.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 04:29:15 -0800 (PST)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH net-next] dt-bindings: net: ethernet-controller: drop redundant type from label
-Date: Mon, 26 Feb 2024 13:29:13 +0100
-Message-Id: <20240226122913.87669-1-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1708951758; c=relaxed/simple;
+	bh=YaQ7iie46bN8OA3waDtVulhSF25jw18+2/GwG6SNbMQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a7HO2mWcEQNVDKk4dLHOhcqrCAgIuhjtB3QfNrL/O7qNspVbPadHc2etZdi6Dzh3luWznPxWMA8GeVpAh06XK4KS0l2HlIpAJj5ZYpPjZzA2Mj3yzL6ENabek3uXmBrvufYUza+jpng9IDDViOiReP/+mc/YFZsgZVtR7aWErDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eXWqTQMe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9030C433F1;
+	Mon, 26 Feb 2024 12:49:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708951758;
+	bh=YaQ7iie46bN8OA3waDtVulhSF25jw18+2/GwG6SNbMQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eXWqTQMekHtX30LLTD9EqjgnQyS0vdfBPUSwkthjObi2pqZFZq/iVrgG5/6I5+4na
+	 hK6H3VJYhyxSKOC4AN1D8LHNX96LGPg5CKMY2ld74rhSkpzyl+k2xh9vUVPj42lN2S
+	 GnsjLmaoBoYerfyrD1KGfr3aSiiwj2jGVviDHMCW8kzncZWrSnTOdRX/JnsDnGEGET
+	 OX7tv1au0C35gA6ZxCOWCf+8xAvO0db+pyzbq1tFQlkSd8ufE/U+6T8qX2PNA3zI52
+	 r7pt/zOhV5e2wDG23Z3BMsv4smrhg8TPbdhtrMS1wj+GmlcY4AYvqg4IUyPUwl014o
+	 sK58XYh0VIbFQ==
+Message-ID: <0f62faa4-608f-4e8e-98e5-7e6e50e20308@kernel.org>
+Date: Mon, 26 Feb 2024 14:49:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] net: ethernet: ti: am65-cpts: Enable PTP RX
+ HW timestamp using CPTS FIFO
+Content-Language: en-US
+To: Chintan Vankar <c-vankar@ti.com>, Dan Carpenter
+ <dan.carpenter@linaro.org>, Siddharth Vadapalli <s-vadapalli@ti.com>,
+ Richard Cochran <richardcochran@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20240215110953.3225099-1-c-vankar@ti.com>
+ <52ff5e18-3616-478a-ab40-8f9a6f7f3e37@kernel.org>
+ <3713e01e-1e48-489b-8ec2-e98471ca22f0@ti.com>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <3713e01e-1e48-489b-8ec2-e98471ca22f0@ti.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-dtschema defines label as string, so $ref in other bindings is
-redundant.
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- Documentation/devicetree/bindings/net/ethernet-controller.yaml | 1 -
- 1 file changed, 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-index d14d123ad7a0..b2785b03139f 100644
---- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-+++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-@@ -14,7 +14,6 @@ properties:
-     pattern: "^ethernet(@.*)?$"
- 
-   label:
--    $ref: /schemas/types.yaml#/definitions/string
-     description: Human readable label on a port of a box.
- 
-   local-mac-address:
+On 26/02/2024 11:08, Chintan Vankar wrote:
+> 
+> On 19/02/24 16:54, Roger Quadros wrote:
+>>
+>> On 15/02/2024 13:09, Chintan Vankar wrote:
+>>> CPTS module supports capturing timestamp for every packet it receives,
+>>> add a new function named "am65_cpts_rx_find_ts()" to get the timestamp
+>>> of received packets from CPTS FIFO.
+>>>
+>>> Add another function named "am65_cpts_rx_timestamp()" which internally
+>>> calls "am65_cpts_rx_find_ts()" function and timestamps the received
+>>> PTP packets.
+>>>
+>>> Signed-off-by: Chintan Vankar <c-vankar@ti.com>
+>>> ---
+>>>   drivers/net/ethernet/ti/am65-cpts.c | 84 +++++++++++++++++++++--------
+>>>   drivers/net/ethernet/ti/am65-cpts.h | 11 ++--
+>>>   2 files changed, 67 insertions(+), 28 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/ti/am65-cpts.c b/drivers/net/ethernet/ti/am65-cpts.c
+>>> index c66618d91c28..92a3b40e60d6 100644
+>>> --- a/drivers/net/ethernet/ti/am65-cpts.c
+>>> +++ b/drivers/net/ethernet/ti/am65-cpts.c
+>>> @@ -859,29 +859,6 @@ static long am65_cpts_ts_work(struct ptp_clock_info *ptp)
+>>>       return delay;
+>>>   }
+>>>   -/**
+>>> - * am65_cpts_rx_enable - enable rx timestamping
+>>> - * @cpts: cpts handle
+>>> - * @en: enable
+>>> - *
+>>> - * This functions enables rx packets timestamping. The CPTS can timestamp all
+>>> - * rx packets.
+>>> - */
+>>> -void am65_cpts_rx_enable(struct am65_cpts *cpts, bool en)
+>>> -{
+>>> -    u32 val;
+>>> -
+>>> -    mutex_lock(&cpts->ptp_clk_lock);
+>>> -    val = am65_cpts_read32(cpts, control);
+>>> -    if (en)
+>>> -        val |= AM65_CPTS_CONTROL_TSTAMP_EN;
+>>> -    else
+>>> -        val &= ~AM65_CPTS_CONTROL_TSTAMP_EN;
+>>> -    am65_cpts_write32(cpts, val, control);
+>>> -    mutex_unlock(&cpts->ptp_clk_lock);
+>>> -}
+>>> -EXPORT_SYMBOL_GPL(am65_cpts_rx_enable);
+>>> -
+>>>   static int am65_skb_get_mtype_seqid(struct sk_buff *skb, u32 *mtype_seqid)
+>>>   {
+>>>       unsigned int ptp_class = ptp_classify_raw(skb);
+>>> @@ -906,6 +883,67 @@ static int am65_skb_get_mtype_seqid(struct sk_buff *skb, u32 *mtype_seqid)
+>>>       return 1;
+>>>   }
+>>>   +static u64 am65_cpts_find_rx_ts(struct am65_cpts *cpts, struct sk_buff *skb,
+>>> +                int ev_type, u32 skb_mtype_seqid)
+>>> +{
+>>> +    struct list_head *this, *next;
+>>> +    struct am65_cpts_event *event;
+>>> +    unsigned long flags;
+>>> +    u32 mtype_seqid;
+>>> +    u64 ns = 0;
+>>> +
+>>> +    am65_cpts_fifo_read(cpts);
+>> am65_cpts_fifo_read() is called from the CPTS interrupt handler and the
+>> event is popped out of the FIFO and pushed into an event list.
+>>
+>> Doesn't this race with that interrupt handler?
+> Could you clarify why there be a race condition ?
+
+I'm not sure so was asking. The question is, do you have to call
+am65_cpts_fifo_read() here? If yes, could you please add a comment why.
+
+>> Can't you use that event list instead of reading cpts_fifo directly?
+>>
+>> Something like am65_cpts_match_tx_ts()?
+>>
+>>> +    spin_lock_irqsave(&cpts->lock, flags);
+>>> +    list_for_each_safe(this, next, &cpts->events) {
+>>> +        event = list_entry(this, struct am65_cpts_event, list);
+>>> +        if (time_after(jiffies, event->tmo)) {
+>>> +            list_del_init(&event->list);
+>>> +            list_add(&event->list, &cpts->pool);
+>>> +            continue;
+>>> +        }
+>>> +
+>>> +        mtype_seqid = event->event1 &
+>>> +                  (AM65_CPTS_EVENT_1_MESSAGE_TYPE_MASK |
+>>> +                   AM65_CPTS_EVENT_1_SEQUENCE_ID_MASK |
+>>> +                   AM65_CPTS_EVENT_1_EVENT_TYPE_MASK);
+>>> +
+>>> +        if (mtype_seqid == skb_mtype_seqid) {
+>>> +            ns = event->timestamp;
+>>> +            list_del_init(&event->list);
+>>> +            list_add(&event->list, &cpts->pool);
+>>> +            break;
+>>> +        }
+>>> +    }
+>>> +    spin_unlock_irqrestore(&cpts->lock, flags);
+>>> +
+>>> +    return ns;
+>>> +}
+>>> +
+>>> +void am65_cpts_rx_timestamp(struct am65_cpts *cpts, struct sk_buff *skb)
+>>> +{
+>>> +    struct am65_cpts_skb_cb_data *skb_cb = (struct am65_cpts_skb_cb_data *)skb->cb;
+>>> +    struct skb_shared_hwtstamps *ssh;
+>>> +    int ret;
+>>> +    u64 ns;
+>>> +
+>>> +    ret = am65_skb_get_mtype_seqid(skb, &skb_cb->skb_mtype_seqid);
+>>> +    if (!ret)
+>>> +        return; /* if not PTP class packet */
+>>> +
+>>> +    skb_cb->skb_mtype_seqid |= (AM65_CPTS_EV_RX << AM65_CPTS_EVENT_1_EVENT_TYPE_SHIFT);
+>>> +
+>>> +    dev_dbg(cpts->dev, "%s mtype seqid %08x\n", __func__, skb_cb->skb_mtype_seqid);
+>>> +
+>>> +    ns = am65_cpts_find_rx_ts(cpts, skb, AM65_CPTS_EV_RX, skb_cb->skb_mtype_seqid);
+>>> +    if (!ns)
+>>> +        return;
+>>> +
+>>> +    ssh = skb_hwtstamps(skb);
+>>> +    memset(ssh, 0, sizeof(*ssh));
+>>> +    ssh->hwtstamp = ns_to_ktime(ns);
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(am65_cpts_rx_timestamp);
+>>> +
+>>>   /**
+>>>    * am65_cpts_tx_timestamp - save tx packet for timestamping
+>>>    * @cpts: cpts handle
+>>> diff --git a/drivers/net/ethernet/ti/am65-cpts.h b/drivers/net/ethernet/ti/am65-cpts.h
+>>> index 6e14df0be113..6099d772799d 100644
+>>> --- a/drivers/net/ethernet/ti/am65-cpts.h
+>>> +++ b/drivers/net/ethernet/ti/am65-cpts.h
+>>> @@ -22,9 +22,9 @@ void am65_cpts_release(struct am65_cpts *cpts);
+>>>   struct am65_cpts *am65_cpts_create(struct device *dev, void __iomem *regs,
+>>>                      struct device_node *node);
+>>>   int am65_cpts_phc_index(struct am65_cpts *cpts);
+>>> +void am65_cpts_rx_timestamp(struct am65_cpts *cpts, struct sk_buff *skb);
+>>>   void am65_cpts_tx_timestamp(struct am65_cpts *cpts, struct sk_buff *skb);
+>>>   void am65_cpts_prep_tx_timestamp(struct am65_cpts *cpts, struct sk_buff *skb);
+>>> -void am65_cpts_rx_enable(struct am65_cpts *cpts, bool en);
+>>>   u64 am65_cpts_ns_gettime(struct am65_cpts *cpts);
+>>>   int am65_cpts_estf_enable(struct am65_cpts *cpts, int idx,
+>>>                 struct am65_cpts_estf_cfg *cfg);
+>>> @@ -48,17 +48,18 @@ static inline int am65_cpts_phc_index(struct am65_cpts *cpts)
+>>>       return -1;
+>>>   }
+>>>   -static inline void am65_cpts_tx_timestamp(struct am65_cpts *cpts,
+>>> +static inline void am65_cpts_rx_timestamp(struct am65_cpts *cpts,
+>>>                         struct sk_buff *skb)
+>>>   {
+>>>   }
+>>>   -static inline void am65_cpts_prep_tx_timestamp(struct am65_cpts *cpts,
+>>> -                           struct sk_buff *skb)
+>>> +static inline void am65_cpts_tx_timestamp(struct am65_cpts *cpts,
+>>> +                      struct sk_buff *skb)
+>>>   {
+>>>   }
+>>>   -static inline void am65_cpts_rx_enable(struct am65_cpts *cpts, bool en)
+>>> +static inline void am65_cpts_prep_tx_timestamp(struct am65_cpts *cpts,
+>>> +                           struct sk_buff *skb)
+>>>   {
+>>>   }
+>>>   
+
 -- 
-2.34.1
-
+cheers,
+-roger
 
