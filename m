@@ -1,177 +1,243 @@
-Return-Path: <netdev+bounces-75088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2B5286820B
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 21:43:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30663868205
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 21:42:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82FDC1F23144
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 20:43:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D99CF289F0D
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 20:42:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD50112FF76;
-	Mon, 26 Feb 2024 20:43:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3340B130AF0;
+	Mon, 26 Feb 2024 20:42:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mFTKedXe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BzHkKzZk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EADF1E878;
-	Mon, 26 Feb 2024 20:43:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D691DFCD;
+	Mon, 26 Feb 2024 20:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708980197; cv=none; b=CdfJjekNh+rxCs5edzht5nSzVfvsckvfGn+9F/KPSSHVqC974eXmrvhzkxPtlJxJO5BEiR/VG1QrQ+ExaRz9TCp4YYUyibqoQwh0/5uKRsO3Vyv0TTTpKAXdP6GPTNBMxi+38POFhCy74pvO1WjhIJTHhhfNpKxzjrUn/s3VXl0=
+	t=1708980141; cv=none; b=BXCH6+R4WA3qpm6zWfxqEdX8LjMEZyDjv1MpJ2PsuiYUKR1+bWx3dOAZ5hlhcqio+d1b83bwxY+MI3JvvanegmevorMzo8btyGgnTmdw8lAt7mI8E7oE/Qls+gy8A+AMNPsoz7yXsXzPsU3j0rtoyLuLpxlh32jOjKDN3dGnOa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708980197; c=relaxed/simple;
-	bh=MdpXJHvPFyl1RGvBDZHlVxvMYdSYQEzmwqbyhU9uefI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pllEUbQcNu5kfDFWYcoVSQG1kpnvMoibO3vFQbt3U2B92MjShMut4M4osFBxhVqbiW74QuLGPSTEkGpIe/M7YWmkFuDUtdeotifXzW2BErR2SZ/6dejajnwqMpKbJ1rGEl90amxZxWL6yWT2uIsOGXu+RU0XSLcCnrLLjjfQJuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mFTKedXe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DBD2C433F1;
-	Mon, 26 Feb 2024 20:43:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708980197;
-	bh=MdpXJHvPFyl1RGvBDZHlVxvMYdSYQEzmwqbyhU9uefI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mFTKedXeGids3PFaNjc8pIdSTCfpY1rxt/VGX52eFORSwm45uc6U8Oly1UDpo09jC
-	 wTbTQrcU68F418dMHqJgghcgJeLiGFJyM6Uyvyc4+kOs3rzNrEal2u4J9dZPH87xjA
-	 679uJKZDD04T90Tn2sYH5JMv4RGiSa0d+OEUlICSJ89mBVtWQvvHuij2mPHyqpc4yQ
-	 u1LQQM9X/HNRt23aBUqs/qQw/INSsjexkrkXS5jf6JAE7nmOWP5qiczWIN1T4CdAMm
-	 3wzvIOMJo53sB3obX1HRSqbkiD7nbspgIgYdPSbxgsIiI5DJnfBK3SN9F/3kcogWp+
-	 tvsvsWXuRs7qw==
-Date: Mon, 26 Feb 2024 20:41:42 +0000
-From: Simon Horman <horms@kernel.org>
-To: Dmitry Safonov <dima@arista.com>
-Cc: Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	Dmitry Safonov <0x7f454c46@gmail.com>
-Subject: Re: [PATCH net-next 03/10] net/tcp: Move tcp_inbound_hash() from
- headers
-Message-ID: <20240226204142.GJ13129@kernel.org>
-References: <20240224-tcp-ao-tracepoints-v1-0-15f31b7f30a7@arista.com>
- <20240224-tcp-ao-tracepoints-v1-3-15f31b7f30a7@arista.com>
+	s=arc-20240116; t=1708980141; c=relaxed/simple;
+	bh=OWpEILxNCGKi9UijO32jbCo3J5K197DN5nUkWLCXD3w=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=TnusNcdsIk2nVqiPcNQwtkx8V1hT0gptijh8AWUgfAQD617TNP//wLytE/uFqT6mJAzHb4MZZ/SRK8sU5u8Qsx7auZjS6KWwAF6n5cd3hIQwKO0dVdxO/xY8HHEZA+5BhRg5wbeMDdfjwIQ+Wvr+AmvMdhzYnTbinm6uJv8QE14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BzHkKzZk; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1dc75972f25so28940275ad.1;
+        Mon, 26 Feb 2024 12:42:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708980138; x=1709584938; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X8/sZv9YSQN5VoeMFHC9Ppfxe4Q4sN12GRL5yh7nIDA=;
+        b=BzHkKzZkgrvNUX3Kz7bIAuNb1WbnTRwnxGhpZ0Y5d5KVFiz30CSyTJbLKSMWbvEFER
+         u4muabf7BuKeky77wqYn8ujy01lH9pHPCyK8grSZEXFtJCJj/HJfvpgp15Di+pIn6Oks
+         ZeGIYggh/eqtVhdXfttXQzyRKDUnl3FO1Yzj+sI3FjyvzDlUB8c+tiYSpy2aKooleLSn
+         0HKqGpJnV46vwLPMblzjeOYepxaMiX0/5CQrk3CWVRAKWDjIqtETMfcRiC+Bnuu0AT2j
+         PF6GZRFVa8ETnpdM8IW+3N1ohbEW6WHHBHlxS4H5At/yJJzjyaFoqWgFJ/m8IUEbhG6E
+         QEAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708980138; x=1709584938;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=X8/sZv9YSQN5VoeMFHC9Ppfxe4Q4sN12GRL5yh7nIDA=;
+        b=MBtdAzeT5tOcPEYZcuO/XywLhTxLGQhVt9uxVhCdFwyr88ooFgAP0vIVfETfxThp8N
+         SkZ1VhhxeicXaIbs7c/7hdSAyba4L3FC7gketb2DajTYukAs483O7pX1T70dvCzeXf4Y
+         QDh6ljGJybvjpfev14681/hZjVGoDczST5hbaH3ek8eI3qCIuBKGCQ/bv1nQrXAl/Ce7
+         zFHgozNiRbmoi2Nc/nI39Mov4SrHvLXrITjuejpo6a6ebvVzQ6UCrRwF2NGllHg2b1ng
+         ZG6m1YbQJGsBDxJtbS2N+XpUgrlF9abx4Opem5PczZS36e6iGDn9pHIDc34sE0StK5JN
+         CYvg==
+X-Forwarded-Encrypted: i=1; AJvYcCVeZ9L2pOVTq66PjkId8v+0EEMkhiMZkeqvrAmjurg31RuPVxhjvEkAxfsoemcjUnMwMfDa6k+yPVRheZqz7sokNUTKHhsYjD/2wfMuEcJa9AIx92llq305vV5rWD4nUPGco/a1hlhD+1mm03ULdXJuOJfV943EaeXn
+X-Gm-Message-State: AOJu0Yy1cIUCfHibYDTBfuRC3hf7cklQkDec/PTeqn3ApaqgU4itg41/
+	kbyxpnBnDeNwnc5WmdtI8MirPsQLUq4cIFD+9dO5a12c12lDd6VM
+X-Google-Smtp-Source: AGHT+IGwekaX4Ei1fFfoNjzsX11nAcGMnXREGSlHn4sg62b/PqcMNxEWgMrzf2y7rtNSewGJei8qQg==
+X-Received: by 2002:a17:902:b906:b0:1dc:3294:f09b with SMTP id bf6-20020a170902b90600b001dc3294f09bmr7490733plb.26.1708980137547;
+        Mon, 26 Feb 2024 12:42:17 -0800 (PST)
+Received: from localhost ([98.97.116.12])
+        by smtp.gmail.com with ESMTPSA id mh13-20020a17090309cd00b001dc9893b03bsm100695plb.272.2024.02.26.12.42.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Feb 2024 12:42:16 -0800 (PST)
+Date: Mon, 26 Feb 2024 12:42:15 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ mst@redhat.com, 
+ hengqi@linux.alibaba.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ netdev@vger.kernel.org, 
+ virtualization@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ john.fastabend@gmail.com, 
+ daniel@iogearbox.net, 
+ ast@kernel.org, 
+ Liang Chen <liangchen.linux@gmail.com>
+Message-ID: <65dcf7a775437_20e0a2087f@john.notmuch>
+In-Reply-To: <CACGkMEuUeQTJYpZDx8ggqwBWULQS1Fjd_DgPvVMLq-_cjYfm7g@mail.gmail.com>
+References: <20240202121151.65710-1-liangchen.linux@gmail.com>
+ <c8d59e75-d0bb-4a03-9ef4-d6de65fa9356@kernel.org>
+ <CAKhg4tJFpG5nUNdeEbXFLonKkFUP0QCh8A9CpwU5OvtnBuz4Sw@mail.gmail.com>
+ <5297dad6499f6d00f7229e8cf2c08e0eacb67e0c.camel@redhat.com>
+ <CAKhg4tLbF8SfYD4dU9U9Nhii4FY2dftjPKYz-Emrn-CRwo10mg@mail.gmail.com>
+ <73c242b43513bde04eebb4eb581deb189443c26b.camel@redhat.com>
+ <CAKhg4tJPjcShkw4-FHFkKOcgzHK27A5pMu9FP7OWj4qJUX1ApA@mail.gmail.com>
+ <1b2d471a5d06ecadcb75e3d9155b6d566afb2767.camel@redhat.com>
+ <1708652254.1517398-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEuUeQTJYpZDx8ggqwBWULQS1Fjd_DgPvVMLq-_cjYfm7g@mail.gmail.com>
+Subject: Re: [PATCH net-next v5] virtio_net: Support RX hash XDP hint
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240224-tcp-ao-tracepoints-v1-3-15f31b7f30a7@arista.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Feb 24, 2024 at 09:04:11AM +0000, Dmitry Safonov wrote:
-> Two reasons:
-> 1. It's grown up enough
-> 2. In order to not do header spaghetti by including
->    <trace/events/tcp.h>, which is necessary for TCP tracepoints.
-> 
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
+Jason Wang wrote:
+> On Fri, Feb 23, 2024 at 9:42=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.aliba=
+ba.com> wrote:
+> >
+> > On Fri, 09 Feb 2024 13:57:25 +0100, Paolo Abeni <pabeni@redhat.com> w=
+rote:
+> > > On Fri, 2024-02-09 at 18:39 +0800, Liang Chen wrote:
+> > > > On Wed, Feb 7, 2024 at 10:27=E2=80=AFPM Paolo Abeni <pabeni@redha=
+t.com> wrote:
+> > > > >
+> > > > > On Wed, 2024-02-07 at 10:54 +0800, Liang Chen wrote:
+> > > > > > On Tue, Feb 6, 2024 at 6:44=E2=80=AFPM Paolo Abeni <pabeni@re=
+dhat.com> wrote:
+> > > > > > >
+> > > > > > > On Sat, 2024-02-03 at 10:56 +0800, Liang Chen wrote:
+> > > > > > > > On Sat, Feb 3, 2024 at 12:20=E2=80=AFAM Jesper Dangaard B=
+rouer <hawk@kernel.org> wrote:
+> > > > > > > > > On 02/02/2024 13.11, Liang Chen wrote:
+> > > > > > > [...]
+> > > > > > > > > > @@ -1033,6 +1039,16 @@ static void put_xdp_frags(stru=
+ct xdp_buff *xdp)
+> > > > > > > > > >       }
+> > > > > > > > > >   }
+> > > > > > > > > >
+> > > > > > > > > > +static void virtnet_xdp_save_rx_hash(struct virtnet_=
+xdp_buff *virtnet_xdp,
+> > > > > > > > > > +                                  struct net_device =
+*dev,
+> > > > > > > > > > +                                  struct virtio_net_=
+hdr_v1_hash *hdr_hash)
+> > > > > > > > > > +{
+> > > > > > > > > > +     if (dev->features & NETIF_F_RXHASH) {
+> > > > > > > > > > +             virtnet_xdp->hash_value =3D hdr_hash->h=
+ash_value;
+> > > > > > > > > > +             virtnet_xdp->hash_report =3D hdr_hash->=
+hash_report;
+> > > > > > > > > > +     }
+> > > > > > > > > > +}
+> > > > > > > > > > +
+> > > > > > > > >
+> > > > > > > > > Would it be possible to store a pointer to hdr_hash in =
+virtnet_xdp_buff,
+> > > > > > > > > with the purpose of delaying extracting this, until and=
+ only if XDP
+> > > > > > > > > bpf_prog calls the kfunc?
+> > > > > > > > >
+> > > > > > > >
+> > > > > > > > That seems to be the way v1 works,
+> > > > > > > > https://lore.kernel.org/all/20240122102256.261374-1-liang=
+chen.linux@gmail.com/
+> > > > > > > > . But it was pointed out that the inline header may be ov=
+erwritten by
+> > > > > > > > the xdp prog, so the hash is copied out to maintain its i=
+ntegrity.
+> > > > > > >
+> > > > > > > Why? isn't XDP supposed to get write access only to the pkt=
 
-...
+> > > > > > > contents/buffer?
+> > > > > > >
+> > > > > >
+> > > > > > Normally, an XDP program accesses only the packet data. Howev=
+er,
+> > > > > > there's also an XDP RX Metadata area, referenced by the data_=
+meta
+> > > > > > pointer. This pointer can be adjusted with bpf_xdp_adjust_met=
+a to
+> > > > > > point somewhere ahead of the data buffer, thereby granting th=
+e XDP
+> > > > > > program access to the virtio header located immediately befor=
+e the
+> > > > >
+> > > > > AFAICS bpf_xdp_adjust_meta() does not allow moving the meta_dat=
+a before
+> > > > > xdp->data_hard_start:
+> > > > >
+> > > > > https://elixir.bootlin.com/linux/latest/source/net/core/filter.=
+c#L4210
+> > > > >
+> > > > > and virtio net set such field after the virtio_net_hdr:
+> > > > >
+> > > > > https://elixir.bootlin.com/linux/latest/source/drivers/net/virt=
+io_net.c#L1218
+> > > > > https://elixir.bootlin.com/linux/latest/source/drivers/net/virt=
+io_net.c#L1420
+> > > > >
+> > > > > I don't see how the virtio hdr could be touched? Possibly even =
+more
+> > > > > important: if such thing is possible, I think is should be some=
+what
+> > > > > denied (for the same reason an H/W nic should prevent XDP from
+> > > > > modifying its own buffer descriptor).
+> > > >
+> > > > Thank you for highlighting this concern. The header layout differ=
+s
+> > > > slightly between small and mergeable mode. Taking 'mergeable mode=
+' as
+> > > > an example, after calling xdp_prepare_buff the layout of xdp_buff=
 
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index c82dc42f57c6..5fd61ae6bcc9 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -4485,6 +4485,78 @@ EXPORT_SYMBOL(tcp_inbound_md5_hash);
->  
->  #endif
->  
-> +/* Called with rcu_read_lock() */
-> +enum skb_drop_reason
-> +tcp_inbound_hash(struct sock *sk, const struct request_sock *req,
-> +		 const struct sk_buff *skb,
-> +		 const void *saddr, const void *daddr,
-> +		 int family, int dif, int sdif)
-> +{
-> +	const struct tcphdr *th = tcp_hdr(skb);
-> +	const struct tcp_ao_hdr *aoh;
-> +	const __u8 *md5_location;
-> +	int l3index;
-> +
-> +	/* Invalid option or two times meet any of auth options */
-> +	if (tcp_parse_auth_options(th, &md5_location, &aoh)) {
-> +		tcp_hash_fail("TCP segment has incorrect auth options set",
-> +			      family, skb, "");
-> +		return SKB_DROP_REASON_TCP_AUTH_HDR;
-> +	}
-> +
-> +	if (req) {
-> +		if (tcp_rsk_used_ao(req) != !!aoh) {
-> +			u8 keyid, rnext, maclen;
-> +
-> +			if (aoh) {
-> +				keyid = aoh->keyid;
-> +				rnext = aoh->rnext_keyid;
-> +				maclen = tcp_ao_hdr_maclen(aoh);
-> +			} else {
-> +				keyid = rnext = maclen = 0;
-> +			}
+> > > > would be as depicted in the diagram below,
+> > > >
+> > > >                       buf
+> > > >                        |
+> > > >                        v
+> > > >         +--------------+--------------+-------------+
+> > > >         | xdp headroom | virtio header| packet      |
+> > > >         | (256 bytes)  | (20 bytes)   | content     |
+> > > >         +--------------+--------------+-------------+
+> > > >         ^                             ^
+> > > >         |                             |
+> > > >  data_hard_start                    data
+> > > >                                   data_meta
+> > > >
+> > > > If 'bpf_xdp_adjust_meta' repositions the 'data_meta' pointer a li=
+ttle
+> > > > towards 'data_hard_start', it would point to the inline header, t=
+hus
+> > > > potentially allowing the XDP program to access the inline header.=
 
-Hi Dmitry,
 
-it looks like keyid is set but otherwise unused.
+Fairly late to the thread sorry. Given above layout does it make sense to=
 
-Flagged by W=1 builds with gcc-13 and clang-17.
+just delay extraction to the kfunc as suggested above? Sure the XDP progr=
+am
+could smash the entry in virtio header, but this is already the case for
+anything else there. A program writing over the virtio header is likely
+buggy anyways. Worse that might happen is bad rss values and mappings?
 
-> +
-> +			NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOBAD);
-> +			tcp_hash_fail("TCP connection can't start/end using TCP-AO",
-> +				      family, skb, "%s",
-> +				      !aoh ? "missing AO" : "AO signed");
-> +			return SKB_DROP_REASON_TCP_AOFAILURE;
-> +		}
-> +	}
-> +
-> +	/* sdif set, means packet ingressed via a device
-> +	 * in an L3 domain and dif is set to the l3mdev
-> +	 */
-> +	l3index = sdif ? dif : 0;
-> +
-> +	/* Fast path: unsigned segments */
-> +	if (likely(!md5_location && !aoh)) {
-> +		/* Drop if there's TCP-MD5 or TCP-AO key with any rcvid/sndid
-> +		 * for the remote peer. On TCP-AO established connection
-> +		 * the last key is impossible to remove, so there's
-> +		 * always at least one current_key.
-> +		 */
-> +		if (tcp_ao_required(sk, saddr, family, l3index, true)) {
-> +			tcp_hash_fail("AO hash is required, but not found",
-> +					family, skb, "L3 index %d", l3index);
-> +			return SKB_DROP_REASON_TCP_AONOTFOUND;
-> +		}
-> +		if (unlikely(tcp_md5_do_lookup(sk, l3index, saddr, family))) {
-> +			NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5NOTFOUND);
-> +			tcp_hash_fail("MD5 Hash not found",
-> +				      family, skb, "L3 index %d", l3index);
-> +			return SKB_DROP_REASON_TCP_MD5NOTFOUND;
-> +		}
-> +		return SKB_NOT_DROPPED_YET;
-> +	}
-> +
-> +	if (aoh)
-> +		return tcp_inbound_ao_hash(sk, skb, family, req, l3index, aoh);
-> +
-> +	return tcp_inbound_md5_hash(sk, skb, saddr, daddr, family,
-> +				    l3index, md5_location);
-> +}
-> +
->  void tcp_done(struct sock *sk)
->  {
->  	struct request_sock *req;
-> 
-> -- 
-> 2.43.0
-> 
-> 
+I like seeing more use cases for the hints though.
+
+Thanks!
+John=
 
