@@ -1,176 +1,115 @@
-Return-Path: <netdev+bounces-74907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0E65867406
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:57:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BE40867417
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:59:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21A601F2965D
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:57:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CE961C27759
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:59:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C54F5B21C;
-	Mon, 26 Feb 2024 11:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19DE5A7B5;
+	Mon, 26 Feb 2024 11:59:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="blRy128n"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="xgrpF85O";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ROsfE2Cf"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A92C5B04F
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 11:57:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5495A792
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 11:59:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708948652; cv=none; b=t/mLZN8fKg3YzvR0oTQ8KwUFrF08Hk+cOW977Ug/WTrXcE7Q+RA8NoTBjCWJBZ2SFnhp4e3IhX+gu/J7GdOf+UaSMzjcxHA3EyGdqtFYuuGpS3gniAmfAI6zurQoXeCWDauJ24Pa0Kg99ERT+sH5K+2wTXDQeqCYmVPx5WLOz5s=
+	t=1708948767; cv=none; b=UclMvazIudjyYmwFeo1GMjQxK7BgInVb6b3lwEX0Q3fYNftEkjA03djWn32zPqm80hLHwXHFJgvrPbN655rG592BQZzGS7ljkdVna+pr/I2y/JGskQnukVQe3sTVoGMd2mU2RwF161Y7EYREVGYPlEFglKC48Qo6AOaCk+anxw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708948652; c=relaxed/simple;
-	bh=Foucft6WlPR2KyfAnFENVyW3MER3G1QZvKQCjZkxl/c=;
+	s=arc-20240116; t=1708948767; c=relaxed/simple;
+	bh=tgH3PrWlS4v5W2HgdnQPhXMwJOPRARa3rjWxgwjcsFk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XD/heZlq6IbzZes0suyKHbCJ/koQZC2XSWLd43+/Y/rxIE9vY8NJVZb5WSecgLWYYn2wVu9TSrT59EuMpPBXXy60OyKMvaBv6fvwBFVFWeUQ9wpXZdfPrwX2Q9U40arqST/sCsoxILbx4kWv8DRDwuyI1gUdm6mAgBxHbP3wrko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=blRy128n; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708948649;
+	 Content-Type:Content-Disposition:In-Reply-To; b=foHL6Aed1Vd6pFVwe4hJEsaqon3Ww1qPvBG/FLhw10iXxtzWq8J8yxD3B3dw2avrY4TAyTnqkQR2SizXT3utGj9Xfj/edN4vsbF3YWrVC/C0Ygvpk5FWX0/g2Mx51MIovHRcokqhtTRtIRuKxf/mnzo5JWBy3/ZHdyllzEodRUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=xgrpF85O; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ROsfE2Cf; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Mon, 26 Feb 2024 12:59:22 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1708948764;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MwTMNcm/OZxGXy6MTFKOugn5j6dLDR0+J9PuYt4fDWs=;
-	b=blRy128nYHLdCZxG4jJoUa2ap2DEJ6w2mvf0PskQEkf6Zw2TlcFEzqM7dP9X1U5OMU7GwK
-	ZJnc6kKoSMz5YJTmRmZ3XVoSiMlQyyEWh4xCEYFR1ApoxaN3LzloGzCNfnMFRgT9XXkU4i
-	v/WcEsT+KkkxIxB38XQb/bDmLt6d99o=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-320-dioU2XSaNtCmVimiccDvEQ-1; Mon, 26 Feb 2024 06:57:28 -0500
-X-MC-Unique: dioU2XSaNtCmVimiccDvEQ-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-50e91f9d422so3876085e87.2
-        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 03:57:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708948646; x=1709553446;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MwTMNcm/OZxGXy6MTFKOugn5j6dLDR0+J9PuYt4fDWs=;
-        b=azexgWDDoE1zYq9l8dqy3mYH85YC4b4e6JlpU3uE5FaZ1TOuafE2mOpFZF5uLThPaw
-         5V0XjX3iOdi4WUHtGeG0BmuTWxd+mCgtcmNLk7VSXXFhssUxjA5rLXGcu3rgGAjy12eF
-         NKLh7hV5SQLih/083Q9Q9rdFCauNSF/1xOAxu4AWZOD52yQEogpPhiHQrfMVAjCmdb6K
-         xCmBZtmUcT13O8zkVfWbbn+EW61M/DNXdAvekPwOaE6L+SCdkqphC2yUVaOGDlkCcyOt
-         4yfj9+Bp7GjPZZLf+yWFOK7TiwRJcogpk8duMELqtdTWRNv00eivL20I7yEdm/D5ZXP8
-         QkZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW/YmeJZapXV0ZUwU3Bkt/e3oQxGKq1htbp+/ACIgEkSlEBT1UCDKqLx7sdatr7AwugrzKpw5ymjrMSuJatDD/eqO6ylsGU
-X-Gm-Message-State: AOJu0Yz8wj/ViauewX/knaLAXqx6871iuqzH9qjJJV/wsHnb8toywtDf
-	2D2TV4YbdYGThWWBJ9F1qNSX5RERSN5rzaBk02iA63OXQaXQB+Y1CyIEFWJjQbK39hvjZUqfLTW
-	+qgTWMwrVRGqab8lh4n0wT2yjpLN7Rl5oOSd4cQPZ1e2JIMfibGApZQ==
-X-Received: by 2002:a05:6512:2206:b0:512:fbb0:3c55 with SMTP id h6-20020a056512220600b00512fbb03c55mr2652517lfu.17.1708948646537;
-        Mon, 26 Feb 2024 03:57:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGhlB+sQrxdk/wnezoDvCnQO/+FHCrT1btYEeq6+bycpFpncFqBUrdfh9u7XJ++FrnKpKlBAA==
-X-Received: by 2002:a05:6512:2206:b0:512:fbb0:3c55 with SMTP id h6-20020a056512220600b00512fbb03c55mr2652497lfu.17.1708948646157;
-        Mon, 26 Feb 2024 03:57:26 -0800 (PST)
-Received: from redhat.com ([109.253.193.52])
-        by smtp.gmail.com with ESMTPSA id z9-20020a05600c114900b004128fa77216sm11737552wmz.1.2024.02.26.03.57.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 03:57:25 -0800 (PST)
-Date: Mon, 26 Feb 2024 06:57:17 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	bh=NgFK5jWzx6DmWx8ZqtnGBdRZPOE4Pah2OmJH2CdXGaI=;
+	b=xgrpF85OEvtndIcCC15iWe/ReYbovMJAFfZlxxqFv4mFH8OyzzdfCJBcWeW+ycy7T8f9eo
+	Bq7OX1+AYcitxXyY4WHNSpQ5QgnjsOxPxETcNjY9BKHGIUONpNih6M8TIRHXD2gaGqw+mw
+	6wWWmkB2KTT/d4Wpa0lTI7/bAG9pzFWZ38D1e3wbO0ExvThe1mKqywQDK/jrrCiRi2nG+u
+	CCxh6KC/BBYSjIsjVmKXD2oqR50j9vbPvr1v5IZ8kupoUM3zc5WuK9eMPGdcKST7RWFYX9
+	HhrYVmgdENe4W/yo6ANIG7NHPPPrBKDXJEQa8Bu5X3udHG8AzMsMa2VikNcrAg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1708948764;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NgFK5jWzx6DmWx8ZqtnGBdRZPOE4Pah2OmJH2CdXGaI=;
+	b=ROsfE2CfZXJ4ct/WQfkM79CU7iwJndqOdOIN+Y0zt8xRRgs0ZH9WHIVt3mKfuZiUcvl84i
+	rXEv9b13mYbu/QBg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Vadim Pasternak <vadimp@nvidia.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-um@lists.infradead.org, netdev@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org,
-	linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-	kvm@vger.kernel.org, bpf@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH vhost v2 19/19] virtio_net: sq support premapped mode
-Message-ID: <20240226065709-mutt-send-email-mst@kernel.org>
-References: <20240223082726.52915-1-xuanzhuo@linux.alibaba.com>
- <20240223082726.52915-20-xuanzhuo@linux.alibaba.com>
- <20240225032330-mutt-send-email-mst@kernel.org>
- <1708946440.799724-1-xuanzhuo@linux.alibaba.com>
- <20240226063120-mutt-send-email-mst@kernel.org>
- <1708947209.1148863-1-xuanzhuo@linux.alibaba.com>
- <20240226063532-mutt-send-email-mst@kernel.org>
- <1708947549.7906592-2-xuanzhuo@linux.alibaba.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Wander Lairson Costa <wander@redhat.com>,
+	Yan Zhai <yan@cloudflare.com>
+Subject: Re: [PATCH v2 net-next 3/3] net: Use backlog-NAPI to clean up the
+ defer_list.
+Message-ID: <20240226115922.3ghr5wuD@linutronix.de>
+References: <20240221172032.78737-1-bigeasy@linutronix.de>
+ <20240221172032.78737-4-bigeasy@linutronix.de>
+ <20240223180257.5d828020@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1708947549.7906592-2-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20240223180257.5d828020@kernel.org>
 
-On Mon, Feb 26, 2024 at 07:39:09PM +0800, Xuan Zhuo wrote:
-> On Mon, 26 Feb 2024 06:36:53 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > On Mon, Feb 26, 2024 at 07:33:29PM +0800, Xuan Zhuo wrote:
-> > > > what is dma_map_direct? can't find it in the tree.
-> > >
-> > > YES.
-> > >
-> > >
-> > > diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
-> > > index 58db8fd70471..5a8f7a927aa1 100644
-> > > --- a/kernel/dma/mapping.c
-> > > +++ b/kernel/dma/mapping.c
-> > > @@ -144,6 +144,18 @@ static inline bool dma_map_direct(struct device *dev,
-> > >         return dma_go_direct(dev, *dev->dma_mask, ops);
-> > >  }
-> > >
-> > > +bool dma_is_direct(struct device *dev)
-> > > +{
-> > > +       if (!dma_map_direct(dev, ops))
-> > > +               return false;
-> > > +
-> > > +       if (is_swiotlb_force_bounce(dev))
-> > > +               return false;
-> > > +
-> > > +       return true;
-> > > +}
-> > > +EXPORT_SYMBOL(dma_unmap_page_attrs);
-> > > +
-> > >
-> > > Thanks.
-> >
-> >
-> > where is it? linux-next?
+On 2024-02-23 18:02:57 [-0800], Jakub Kicinski wrote:
+> On Wed, 21 Feb 2024 18:00:13 +0100 Sebastian Andrzej Siewior wrote:
+> > +	if (use_backlog_threads()) {
+> > +		rps_lock_irqsave(sd, &flags);
+> > +
+> > +		if (!__test_and_set_bit(NAPI_STATE_SCHED, &sd->backlog.state))
+> > +			napi_schedule_rps(sd);
 > 
-> 
-> I see it in the vhost branch kernel/dma/mapping.c.
-> 
-> Maybe you miss it.
-> 
-> Thanks.
-> 
+> Why are you calling napi_schedule_rps() here?
+> Just do __napi_schedule_irqoff(&sd->backlog);
+Looking at it, __napi_schedule_irqoff() is enough here given that we are
+already in the use_backlog_threads() case.
 
-which hash?
+> Then you can move the special case inside napi_schedule_rps()
+> into the if (sd != mysd) block.
 
-> >
-> > --
-> > MST
-> >
+Okay.
 
+> > +		rps_unlock_irq_restore(sd, &flags);
+> 
+> Also not sure if the lock helpers should still be called RPS since they
+> also protect state on non-RPS configs now.
+
+They protect the list in input_pkt_queue and the NAPI state. It is just
+in the !RPS case it is always CPU-local and the lock is avoided (while
+interrupts are still disabled/ enabled).
+
+What about
+	input_queue_lock_irq_save()
+	input_queue_lock_irq_disable()
+	input_queue_lock_irq_restore()
+	input_queue_lock_irq_enable()
+? 
+
+Sebastian
 
