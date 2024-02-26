@@ -1,156 +1,136 @@
-Return-Path: <netdev+bounces-74919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B99F867604
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 14:07:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77BDF8675F4
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 14:05:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C279AB28D56
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:53:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E6D9283EBD
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 13:05:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911F47F7E8;
-	Mon, 26 Feb 2024 12:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB70F7F7F9;
+	Mon, 26 Feb 2024 13:05:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="B7Q7sYMf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cUtB3ULY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC25EC7
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 12:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4185E7F7CA
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 13:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708951981; cv=none; b=UrBBADQIoLIGMMRuPoPRiBRc71W7O1TSHPAE2EduGImYmZcDJDx4MCSBPelufelu9bkyEWtbke4IKY5nb4EKk2DcOd+h41dJasxhTsvttVQEdxNrn9we8VxZBtEY+Zd4wAVxiccvTDTBgK/rikiMBtZJVCwaKT65DEV4J8hL77M=
+	t=1708952709; cv=none; b=DDZuYHHrisU5Er5/xQw+14dFotzK2dYrdwJ9N2wINkZZ+DZKOm+gbpU4QjmtQjAzdA+ZfV5zms+ja/fCJnUFrPkTHJq/cES/5Imgco2FVibep1ZXuaFoyxyII3l+tQHmjGjcW1yF9on+FR7CFwIvYzTXzcIkHyt3p+eLSmSQaK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708951981; c=relaxed/simple;
-	bh=titE56FlJl3hqXS9Fw3Xp5ov0sJVkKaI8t50GpSw+5Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rIV1mqKAZsvxZyXfq5Y+SL63sCDopeZakG/zxAsh6euKs6bMghwxH4rkrIYITrNE+lfdvum4TALMBHZLDqIKRyIN7La+KgcazuzCLKb7GjP5oWs5iL8sPpcIwh63UddT1Vy6WWYXn9SgVMDkD3RCxqnnKTUZwm0Sbl5sgpTIp+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=B7Q7sYMf; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d26227d508so33180651fa.2
-        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 04:52:58 -0800 (PST)
+	s=arc-20240116; t=1708952709; c=relaxed/simple;
+	bh=TSU/7vhopuediqaMB29afnxjrkk5SfO2S1L2CO1wyA4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mpEdrFC5s0F7tL7fT9HVmKbvF0Vk4ivIuzBJycL9PuOZrVL3Dr4xrl1rIDlPc3a5zkCfjhq/BEEyxGqmFI01RILhoY6X9hpcG7NqvzmMHAdg0mp/zPuZ2jZaE9fh05Ygw7ovg2/YTFOsQLWUaztpipZgy8pb0evUYb+rmfpaLCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cUtB3ULY; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56619428c41so3097a12.0
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 05:05:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708951977; x=1709556777; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dvKY8egBITSvg7eGivJmR08wh/1LCGSVapnsSF/ZFdA=;
-        b=B7Q7sYMfG5Q7qqEDyZ0W3i0vsWXSlYp/dsKzo9wM8o/10H5Z/+AWqWCCK3QkurnS4j
-         nK8f5ZZTcH6rMlMir5e+BZIWQnTVZm8uqqzw2Iq5eawV+CbW0ls0chVgMS/pom6jKrXY
-         bYRoVUBnoRzbxq3kENr/9FY6H571EueKnyaLhHKqCc8Q9MjZbPUEqswsY3KwhBR792uH
-         dmZ1mFWe3fiUJWJLccBgUaTFkTUFx3cJF6S+YiDZAq0dARlf5bpuJNJy0sy3ABn3avwP
-         XDQ0m5yC9nk4eSpVVXXoyfoyn4bMSvXGA3dThADqlRr5S0RDbNAw2yHplxTwQJkm4wAq
-         fhAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708951977; x=1709556777;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1708952706; x=1709557506; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dvKY8egBITSvg7eGivJmR08wh/1LCGSVapnsSF/ZFdA=;
-        b=ZgN0VnR+PeyPjP/0qocYn/ehUsjZaUzj3cbDXZIJB7JoN1F5Enp+Y4k/ykXCLoamzT
-         mjsaJj2+pjN1/Rw6hhjg9T64T+KXZcKl83r7lpMKjShY775KRVo0/NGr/RTZQjAOOI4p
-         eN+j4ji2XyI2Ihcypol1htvAVuDGAUmjVnthdTLFrUvIF6ev1HhpTQn4lwcRSTtd+Nn+
-         UhJJrpS1DvERvV4gp026k7Pf1P4wkbAKjnpl+XAinbuml9B+DWsREvHS0uufOaMvIq0p
-         XDsgtuuuH5U2MiRk9fpc2meOI2lj3Gu6/kuK5hJWHXREa76cXYowIx+r3Z5D82kIYPYj
-         xL/Q==
-X-Gm-Message-State: AOJu0Yx3v4AXGtRGkNEfWmR2BaSu3vuA/udl4Ri1J++7xGpW6ezCSeWV
-	uJIzpTt6VXzsXxfGzFNDvje38wl06eG4NVelVgQhfLZNfhqQC1H19RPIpcXgAvY=
-X-Google-Smtp-Source: AGHT+IFu2x/lLm1my6ABgx4FESQyrIC9uBUkdhcWddGI/6V4lRKv8j3o7bvS75xXMvoM0SXSXCgGeA==
-X-Received: by 2002:a2e:b8c4:0:b0:2d2:8fb4:46cf with SMTP id s4-20020a2eb8c4000000b002d28fb446cfmr1049487ljp.15.1708951976668;
-        Mon, 26 Feb 2024 04:52:56 -0800 (PST)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id f6-20020a05600c154600b00412a482cd90sm3638986wmg.25.2024.02.26.04.52.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 04:52:56 -0800 (PST)
-Date: Mon, 26 Feb 2024 13:52:55 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, fw@strlen.de
-Subject: Re: [PATCH net] netlink: validate length of NLA_{BE16,BE32} types
-Message-ID: <ZdyJp3kb--fjF09V@nanopsycho>
-References: <20240225225845.45555-1-pablo@netfilter.org>
+        bh=Zy6MKgUPkyetuB1Y1eJL9OxnWLY+8uMAQrEG8a3TiZc=;
+        b=cUtB3ULYfuD4wu/3vO/+EMNrEJQFpSEdwicV5GW1JRkokPnatObaalZUE5QO/VgX7Z
+         ljhxEnEjkWsRkDt33gI2mGG9EpaO6vHZq7YTkE5/HZZjGp3OFwdshoiRfGw+tMUDihpy
+         rl+yUsQAa2tLgk1zrBc1+tN4OOJ5fr8w5R+f8Nyl/b3P4olO9jgFnq8MOIJ7+UoGofcB
+         oMIw1NpKYynhEv79H7sEpKcVxLKSuVAOklw7AMtzMLAUnm2vIkf0sgcJ+HYEu/30glsE
+         Aqk2KOHLEddIUnvNB0H4HjXP5kDPAjPPMyaMhleZl9wgXZktS4QoM4v56sUbF+C83Bpp
+         QHBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708952706; x=1709557506;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Zy6MKgUPkyetuB1Y1eJL9OxnWLY+8uMAQrEG8a3TiZc=;
+        b=GLfBJECIEYRGP6tNZc2A4Hs31PeZulRfFPtOF/WFBa0H6VEliBSvy/srqirvYRVaPm
+         H88xcxSUXJq6MJUU0UDaCAPPI0+V9RsEvKdFXHeoaFP8tUHat/slbxXcbzLMxYWUJBfx
+         Gsh+xxRcWnqqrSV71VIbJXOgVsbd/dkPA7/gIqhdiA1s7pACB7NGnfu0MTxbsU13SFt8
+         9T+qkAUbcsudYm5x+H7yGqDzJ2pr9MbkTNXuuhF4gLCAYcbXwLPjZQ6/u1gCP6laDpsx
+         fRwk3s0ZqqCw2iN8aRbevqdxPSG3q8By9p6Wu3JYJKW9DcRhjDVkqbAm+CoDjQJzssio
+         2yxw==
+X-Gm-Message-State: AOJu0YxQ6fQ4KKNiI2UQyQPBmLKT3BM+jMyHvaZxJhFaXGLmHHlxAWHl
+	G5cqLiHNWYf1HwR4NUqgeRnJ3q9CtKisp6ZSNZWufSikl/ZhdNFGCjoPoJrcDTKalrnaoGuK1od
+	drdck3LXunBC47lbYAwM4+8qSLm+OBEXwPzbA
+X-Google-Smtp-Source: AGHT+IE9kaSYsBbM+tOsGzJDOXFjCoBfN0PchoTRkAb97i97cnXlO1P4tee2BSQu3/6t8WsOawF9VLsrsWuCV8jCdhI=
+X-Received: by 2002:a50:9b05:0:b0:560:1a1:eb8d with SMTP id
+ o5-20020a509b05000000b0056001a1eb8dmr279013edi.7.1708952706186; Mon, 26 Feb
+ 2024 05:05:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20240225225845.45555-1-pablo@netfilter.org>
 In-Reply-To: <20240225225845.45555-1-pablo@netfilter.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 26 Feb 2024 14:04:51 +0100
+Message-ID: <CANn89iKjemgfRL-Yy2AS8kQj4iEa3DGT+uq1GabFTTw6Mr5o4w@mail.gmail.com>
+Subject: Re: [PATCH net] netlink: validate length of NLA_{BE16,BE32} types
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, fw@strlen.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Sun, Feb 25, 2024 at 11:58:45PM CET, pablo@netfilter.org wrote:
->syzbot reports:
+On Sun, Feb 25, 2024 at 11:58=E2=80=AFPM Pablo Neira Ayuso <pablo@netfilter=
+.org> wrote:
 >
->=====================================================
->BUG: KMSAN: uninit-value in nla_validate_range_unsigned lib/nlattr.c:222 [inline]
->BUG: KMSAN: uninit-value in nla_validate_int_range lib/nlattr.c:336 [inline]
->BUG: KMSAN: uninit-value in validate_nla lib/nlattr.c:575 [inline]
->BUG: KMSAN: uninit-value in __nla_validate_parse+0x2e20/0x45c0 lib/nlattr.c:631
-> nla_validate_range_unsigned lib/nlattr.c:222 [inline]
-> nla_validate_int_range lib/nlattr.c:336 [inline]
-> validate_nla lib/nlattr.c:575 [inline]
-> __nla_validate_parse+0x2e20/0x45c0 lib/nlattr.c:631
-> __nla_parse+0x5f/0x70 lib/nlattr.c:728
-> nla_parse_deprecated include/net/netlink.h:703 [inline]
-> nfnetlink_rcv_msg+0x723/0xde0 net/netfilter/nfnetlink.c:275
-> netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2543
-> nfnetlink_rcv+0x372/0x4950 net/netfilter/nfnetlink.c:659
-> netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
-> netlink_unicast+0xf49/0x1250 net/netlink/af_netlink.c:1367
-> netlink_sendmsg+0x1238/0x13d0 net/netlink/af_netlink.c:1908
-> sock_sendmsg_nosec net/socket.c:730 [inline]
-> __sock_sendmsg net/socket.c:745 [inline]
-> ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
-> ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
-> __sys_sendmsg net/socket.c:2667 [inline]
-> __do_sys_sendmsg net/socket.c:2676 [inline]
-> __se_sys_sendmsg net/socket.c:2674 [inline]
-> __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
-> do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
-> entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> syzbot reports:
 >
->Uninit was created at:
-> slab_post_alloc_hook mm/slub.c:3819 [inline]
-> slab_alloc_node mm/slub.c:3860 [inline]
-> kmem_cache_alloc_node+0x5cb/0xbc0 mm/slub.c:3903
-> kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
-> __alloc_skb+0x352/0x790 net/core/skbuff.c:651
-> alloc_skb include/linux/skbuff.h:1296 [inline]
-> netlink_alloc_large_skb net/netlink/af_netlink.c:1213 [inline]
-> netlink_sendmsg+0xb34/0x13d0 net/netlink/af_netlink.c:1883
-> sock_sendmsg_nosec net/socket.c:730 [inline]
-> __sock_sendmsg net/socket.c:745 [inline]
-> ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
-> ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
-> __sys_sendmsg net/socket.c:2667 [inline]
-> __do_sys_sendmsg net/socket.c:2676 [inline]
-> __se_sys_sendmsg net/socket.c:2674 [inline]
-> __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
-> do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
-> entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
 >
->NLA_BE16 and NLA_BE32 minimum attribute length is not validated, update
->nla_attr_len and nla_attr_minlen accordingly.
->
->After this update, kernel displays:
->
->  netlink: 'x': attribute type 2 has an invalid length.
->
->in case that the attribute payload is too small and it reports -ERANGE
->to userspace.
->
->Fixes: ecaf75ffd5f5 ("netlink: introduce bigendian integer types")
->Reported-by: syzbot+3f497b07aa3baf2fb4d0@syzkaller.appspotmail.com
->Reported-by: xingwei lee <xrivendell7@gmail.com>
->Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+...
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> After this update, kernel displays:
+>
+>   netlink: 'x': attribute type 2 has an invalid length.
+>
+> in case that the attribute payload is too small and it reports -ERANGE
+> to userspace.
+>
+> Fixes: ecaf75ffd5f5 ("netlink: introduce bigendian integer types")
+> Reported-by: syzbot+3f497b07aa3baf2fb4d0@syzkaller.appspotmail.com
+> Reported-by: xingwei lee <xrivendell7@gmail.com>
+> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> ---
+>  lib/nlattr.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/lib/nlattr.c b/lib/nlattr.c
+> index ed2ab43e1b22..be9c576b6e2d 100644
+> --- a/lib/nlattr.c
+> +++ b/lib/nlattr.c
+> @@ -30,6 +30,8 @@ static const u8 nla_attr_len[NLA_TYPE_MAX+1] =3D {
+>         [NLA_S16]       =3D sizeof(s16),
+>         [NLA_S32]       =3D sizeof(s32),
+>         [NLA_S64]       =3D sizeof(s64),
+> +       [NLA_BE16]      =3D sizeof(__be16),
+> +       [NLA_BE32]      =3D sizeof(__be32),
+>  };
+>
+>  static const u8 nla_attr_minlen[NLA_TYPE_MAX+1] =3D {
+> @@ -43,6 +45,8 @@ static const u8 nla_attr_minlen[NLA_TYPE_MAX+1] =3D {
+>         [NLA_S16]       =3D sizeof(s16),
+>         [NLA_S32]       =3D sizeof(s32),
+>         [NLA_S64]       =3D sizeof(s64),
+> +       [NLA_BE16]      =3D sizeof(__be16),
+> +       [NLA_BE32]      =3D sizeof(__be32),
+>  };
+>
+
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+
+Thanks.
 
