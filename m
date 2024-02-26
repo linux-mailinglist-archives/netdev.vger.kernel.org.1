@@ -1,128 +1,116 @@
-Return-Path: <netdev+bounces-75037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43325867DBA
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 18:13:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF31F867DE4
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 18:17:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEAAA294663
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 17:13:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A2DD2942FB
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 17:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1CA133986;
-	Mon, 26 Feb 2024 17:00:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C063012D766;
+	Mon, 26 Feb 2024 17:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DyIxUsKG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ly1WuY+c"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6E612CD8E;
-	Mon, 26 Feb 2024 17:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD7F12C800;
+	Mon, 26 Feb 2024 17:10:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708966834; cv=none; b=fwK/DLwab+p0vi2JMwpnY9wOomaRbmkRqlPt8+Nu7mSEW4MtVpAAmeVZnwFda56Wyragg8Nuf3KR6yssNac1v+AUMdqXJ4I6joJ3hcmr63zgo36k7BIH6ufz/qN1IY/5mTJ56rvYJk8E9Q43Qxj9RCYlShYFHcZFR62oQOaKgto=
+	t=1708967410; cv=none; b=kpSn/yE2Li6fayGGqAa6Bj1lTBSvhHBIpLhOCpKNdrq2N2nAm/mmD/bWL97GKWzzY2ojIJe6YDzi9qFccaEd5A307aAz0Z6n/HbI6bBh3vx6xxOdl6ThU0NhzugfZUY3GzXxtLG9YUcpPk3S9QUybb5wI4m8yC04CIcAKb9VvGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708966834; c=relaxed/simple;
-	bh=o7v0UCT9OJMGkA8U7iwQfdvtLg8GUAcNkvD+ZlnbU24=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=DeNNRBhSLVIRS4hJ7tlr2y4AfO4qGdsS9hHIMUmIEUmD0atQiYDQGk5bhCJzV7z+enxc4afYBeR1zQdOaEpsz171T8aKpXi9LxSjOlZxFgnRJa6FPUD4QZMED2tV6KS3r+b6Cka/QzInzOcxHeAWNsWF6aknjoTiWCA5eW329Sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DyIxUsKG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4EADC433C7;
-	Mon, 26 Feb 2024 17:00:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708966834;
-	bh=o7v0UCT9OJMGkA8U7iwQfdvtLg8GUAcNkvD+ZlnbU24=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=DyIxUsKGGPDAmjVcDmEACK0+SYqCLsCEN5Pvrv/hVkCVhiqVmMWpjrDX5QNXfk9dw
-	 PlKm10ffgHy6JyuJpdZGm5o/ETxm+cQD+aMgYDXJMEQ4jE0IR+TwJATYJ82t1scM6b
-	 mfySgmNWSO1it0+Pf8NbovTGCnx3GWcah+jCTYA06f5hLjRcEgos20ExHSyMJEU9mf
-	 itmqNwDXg3F75jbwx9K3G24zgczNPR6H/JDKfXX4OSgNOTJ7gRNpqaffOrauaVFrsc
-	 SIjvJTC2qxrWOCA9swBjLmVWazr7fHuYWrI10K+c5aCNkoz5RxfWI/RUDb8NNkbj6Z
-	 agj0RVgmeUpiw==
-Date: Mon, 26 Feb 2024 11:00:32 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Sai Krishna Gajula <saikrishnag@marvell.com>
-Cc: "bhelgaas@google.com" <bhelgaas@google.com>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"vinicius.gomes@intel.com" <vinicius.gomes@intel.com>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Geethasowjanya Akula <gakula@marvell.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Hariprasad Kelam <hkelam@marvell.com>,
-	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-	Naveen Mamindlapalli <naveenm@marvell.com>
-Subject: Re: [net-next PATCH v2] octeontx2: Add PTP clock driver for Octeon
- PTM clock.
-Message-ID: <20240226170032.GA202638@bhelgaas>
+	s=arc-20240116; t=1708967410; c=relaxed/simple;
+	bh=xT4hap9IvpjLgMP/HHzHVUba5+EIi7T8RgyP7aSJiOk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ht1YAURVzS6ugRL5PEyYXY22fj5uqbhB4YkU71Lki7UWD1xQJvSiS6ge/yEXHe5TYA6kcU3pSOopTGB2oZgFAM843Ur3WVAyVnS7ZeyD9KjPHhhLG6lpkxoUcLZM+3JRsU2jcpqHdLaa0wYSPPJMHihXVDe2BHa1EO08KxYCRps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ly1WuY+c; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708967409; x=1740503409;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xT4hap9IvpjLgMP/HHzHVUba5+EIi7T8RgyP7aSJiOk=;
+  b=Ly1WuY+cOvZ4viIMXAKS95RncyFy3Xcg6V9ADtMrhFo71VFL4aT8Pzpw
+   JmeLIH0aKjw42I18iLCbLgjRXrIcZyUh+uVhJTJ3EAaTKbaWSV5ukj+se
+   eiYqS7Otsi8aCZl/V/pWZhpOY3wPx9wMQH58v310n5qHam/twr/m4x5YR
+   +cR6syRm3dZl+UW76gyPZEDVVCcKzmjnCLsMuiMvT2c4aUjdO+SZlKjgf
+   S7s17d80VBKf4aFAoYS+fP7Roxs62F7eLJKKFQcRNnT90TCXpoDDcziDh
+   WyST4qI9yqdTgeJSo0Gkt4GDyFr0EfOvxxC8OTMCkjs3SkCWlG8miUnan
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="3426882"
+X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
+   d="scan'208";a="3426882"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 09:10:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
+   d="scan'208";a="6606452"
+Received: from dcai-bmc-sherry-1.sh.intel.com ([10.239.138.57])
+  by fmviesa007.fm.intel.com with ESMTP; 26 Feb 2024 09:10:05 -0800
+From: Haiyue Wang <haiyue.wang@intel.com>
+To: netdev@vger.kernel.org,
+	lixiaoyan@google.com
+Cc: Haiyue Wang <haiyue.wang@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org (open list:DOCUMENTATION),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net v3] Documentations: correct net_cachelines title for struct inet_sock
+Date: Tue, 27 Feb 2024 01:09:16 +0800
+Message-ID: <20240226171254.4066289-1-haiyue.wang@intel.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BY3PR18MB470764DFFE3E532B8D1851E4A05A2@BY3PR18MB4707.namprd18.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 26, 2024 at 03:40:25PM +0000, Sai Krishna Gajula wrote:
-> > -----Original Message-----
-> > From: Bjorn Helgaas <helgaas@kernel.org>
-> > Sent: Wednesday, February 14, 2024 10:59 PM
-> > ...
-> > On Wed, Feb 14, 2024 at 06:38:53PM +0530, Sai Krishna wrote:
-> > > The PCIe PTM(Precision time measurement) protocol provides precise
-> > > coordination of events across multiple components like PCIe host
-> > > clock, PCIe EP PHC local clocks of PCIe devices. This patch adds
-> > > support for ptp clock based PTM clock. We can use this PTP device to
-> > > sync the PTM time with CLOCK_REALTIME or other PTP PHC devices using
-> > > phc2sys.
+The fast path usage breakdown describes the detail for 'inet_sock', fix
+the markup title.
 
-> > > +#define PCI_VENDOR_ID_CAVIUM			0x177d
+Signed-off-by: Haiyue Wang <haiyue.wang@intel.com>
+---
+v3:
+  - Update the git commit message.
+  - Stop using the git '--in-reply-to' to reply.
 
-Already defined in pci_ids.h.
+v2: https://lore.kernel.org/netdev/20240226165821.4062854-1-haiyue.wang@intel.com/
+   - Adjust the title length to the markup lines.
 
-> > > +static int __init ptp_oct_ptm_init(void) {
-> > > +	struct pci_dev *pdev = NULL;
-> > > +
-> > > +	pdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
-> > > +			      PCI_DEVID_OCTEONTX2_PTP, pdev);
-> > 
-> > pci_get_device() is a sub-optimal method for a driver to claim a device.
-> > pci_register_driver() is the preferred method.  If you can't use that, a
-> > comment here explaining why not would be helpful.
-> 
-> We just want to check the PTP device availability in the system as
-> one of the use case is to sync PTM time to PTP.
+v1: https://lore.kernel.org/netdev/20240223120215.2300560-1-haiyue.wang@intel.com/
+---
+ Documentation/networking/net_cachelines/inet_sock.rst | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-This doesn't explain why you can't use pci_register_driver().  Can you
-clarify that?
+diff --git a/Documentation/networking/net_cachelines/inet_sock.rst b/Documentation/networking/net_cachelines/inet_sock.rst
+index a2babd0d7954..595d7ef5fc8b 100644
+--- a/Documentation/networking/net_cachelines/inet_sock.rst
++++ b/Documentation/networking/net_cachelines/inet_sock.rst
+@@ -1,9 +1,9 @@
+ .. SPDX-License-Identifier: GPL-2.0
+ .. Copyright (C) 2023 Google LLC
+ 
+-=====================================================
+-inet_connection_sock struct fast path usage breakdown
+-=====================================================
++==========================================
++inet_sock struct fast path usage breakdown
++==========================================
+ 
+ Type                    Name                  fastpath_tx_access  fastpath_rx_access  comment
+ ..struct                ..inet_sock                                                     
+-- 
+2.43.2
 
-> > > +	ptm_ctl_addr = ioremap(PEMX_PTM_CTL, 8);
-> > 
-> > Hard-coded register addresses?  That can't be right.  Shouldn't
-> > this be discoverable either as a PCI BAR or via DT or similar
-> > firmware interface?
-> 
-> Ack, will explore the DT implementation for register addresses
-> access and submit patch V3. Thanks for the review.
-
-I assume the PCI_DEVID_OCTEONTX2_PTP device is a PCIe Endpoint, and
-this driver runs on the host?  I.e., this driver does not run as
-firmware on the Endpoint itself?  So if you run lspci on the host, you
-would see this device as one of the PCI devices?
-
-If that's the case, a driver would normally operate the device via
-MMIO accesses to regions described by PCI BARs.  "lspci -v" would show
-those addresses.
-
-Bjorn
 
