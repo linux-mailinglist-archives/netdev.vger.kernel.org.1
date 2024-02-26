@@ -1,131 +1,99 @@
-Return-Path: <netdev+bounces-75117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32DEF868352
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 22:49:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B639F868388
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 23:19:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E05DF28EBC8
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 21:49:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7C201C23162
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 22:19:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 717F1131E2F;
-	Mon, 26 Feb 2024 21:49:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0867131E39;
+	Mon, 26 Feb 2024 22:19:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jqB74OTx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jk4tA/v1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59FEA13173B;
-	Mon, 26 Feb 2024 21:49:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC01D1DFCD
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 22:19:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708984160; cv=none; b=fcZMh+wN0Vawd5o8vVt8WPWbF+UIF+SP6Cr/4pKJp2/RxETZeFTqO5NagAnJ1Tcp2nbt/kUG1et5ZkyRPq5h33YygrX+Ou99bq4SbUc6ld/aZgiY72mKsphakehs53wgnp9Mrmw+9CO5GVSbmLa6O2jdzP66IXnituXjyMWULAU=
+	t=1708985969; cv=none; b=VBl+rvnBAq7h43KcAXOXcc74axUNKT5jeidd0h8JWtOdIATsdoGE9D5RkVoALWWq0rDdGWfXeXaRNIjlsG4OPUhMIN726F/uRuE3d2ciK8UMaafRCJnBGmi8+AOnTXMeSL2BvFmzPUt+KjwdQgLWR30bLd7a07s+A0GL+zqc12s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708984160; c=relaxed/simple;
-	bh=xxNT92wHxxTAF343Ur3NkxIivonccbypJ8Cd9wEfuUM=;
-	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=sPYzp0XNewO3/B7QOpdHNH8hipFBuhG6HbxS3pz1ytppVpZjCbfwZSYOGgb2IVJ0EjEfsOHDWi6l7g0sjfhKWv5xBcoj4ml9sHaPELEm+ZScv6s5wectmJsLRRQBeBi3+f6jRgonzg8QbwV87ImlwekJMdXwd88ufpgI6GtzIz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jqB74OTx; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1dc1e7c0e29so16606145ad.1;
-        Mon, 26 Feb 2024 13:49:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708984158; x=1709588958; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hMKd9+17BOHgFCqJAjklcy+fs0vsFDPhHNPoIQN+MOo=;
-        b=jqB74OTxM1Nealj9b3w3HGNkXGQNg1xfq2NFhNrkX05qE6SSqPgaK9jQpENrZO54lV
-         3JZgNkMyDypoflGhPHp4J2g21iF7Kwd1ov43EuaE1SpCKYKv9WG9hyi9+KbYaF7JIZ8E
-         q+WZrOApp3bZokz7HnuOzx76KpGkNpFip/wZhs7ISLmoaMVBxRy08XSr2anfITsmF6H3
-         HzYPlFHBG5RrNfeeOX1jjkf06GN3/eh6/CSZMZijkHVG8KL2hg3tsgqcPMMwt9+Nv1W6
-         eaP/frHN6iQJOBWrYe519dlrUOj34EEqsf4ym4sUUH3tPVvJwoEBleU8+cbMqBGD402O
-         gfFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708984158; x=1709588958;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hMKd9+17BOHgFCqJAjklcy+fs0vsFDPhHNPoIQN+MOo=;
-        b=SfXGjUoDfzpen78tICWjmFFHyxXOxKnHhAGuzYQZlEus9sQjRFnnmNJaNVglwARkC8
-         tMl468H7GURWi1jjeSUSj2Ms7TuxCCKs66Ll8eJjAtWHG3hi7sdU/z63kO2kZK/87ppr
-         BglsVD8MPosbCDnxqKX14kLJHGNDCFWg+tjCeKDcxqxtaUEJDjV4tVBLtlouZbuhyDni
-         lHKfsu8Wq369XyQ1J7FaoZDGXgj6GIKkVAdoq8I2Hyqw7bd7w7pJCW0n/bjtRXDp2W44
-         WDKmnrWLyvF12s0V/2iINq3oSRf9TevJLm22e3LHYMqaOXXX2LVST5S1JJYWFDsh0qNd
-         U+jQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU19oMivmAw8yrCzkmdIMLyVycWJc+vFcjW15DLo2KPFQqtxrTU6bwQGsUzNTRJI1a2RP/vdceWHRWlFrYW0uR+UGFtUHZGbElAX3k05PyTY89yOkboPzfRChTRn1FuYcRq9onqEgJXeiv4YKn8aZjziGnSnywG0D8k
-X-Gm-Message-State: AOJu0YzsCj5yKB8jh/hUmXlU6eq6qTp1N5uCyGlY4nJNJI/SUuhzr58j
-	zhacnI/SQ5rW1gW17vgc6m5puxX7hu5aLNUOXrwjssHKzzKV7rN7
-X-Google-Smtp-Source: AGHT+IHKGlYbPWjr9qm/ZY+QN4AiZsr/p8apNkvY5o73JWDZ/VvT3yqY4AhsDiSOFU9kl+41votkBA==
-X-Received: by 2002:a17:902:ec8b:b0:1dc:11f:d946 with SMTP id x11-20020a170902ec8b00b001dc011fd946mr9687389plg.8.1708984157528;
-        Mon, 26 Feb 2024 13:49:17 -0800 (PST)
-Received: from localhost ([98.97.116.12])
-        by smtp.gmail.com with ESMTPSA id b1-20020a170902ed0100b001db717ed294sm149725pld.120.2024.02.26.13.49.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 13:49:16 -0800 (PST)
-Date: Mon, 26 Feb 2024 13:49:15 -0800
-From: John Fastabend <john.fastabend@gmail.com>
-To: syzbot <syzbot+8cd36f6b65f3cafd400a@syzkaller.appspotmail.com>, 
- andrii@kernel.org, 
- ast@kernel.org, 
- bpf@vger.kernel.org, 
- daniel@iogearbox.net, 
- davem@davemloft.net, 
- haoluo@google.com, 
- hawk@kernel.org, 
- john.fastabend@gmail.com, 
- jolsa@kernel.org, 
- kpsingh@kernel.org, 
- kuba@kernel.org, 
- linux-kernel@vger.kernel.org, 
- martin.lau@linux.dev, 
- netdev@vger.kernel.org, 
- sdf@google.com, 
- song@kernel.org, 
- syzkaller-bugs@googlegroups.com, 
- yonghong.song@linux.dev
-Message-ID: <65dd075bc6cbd_20e0a20892@john.notmuch>
-In-Reply-To: <0000000000001d1939061240cbd7@google.com>
-References: <000000000000ed666a0611af6818@google.com>
- <0000000000001d1939061240cbd7@google.com>
-Subject: Re: [syzbot] [bpf?] [net?] BUG: unable to handle kernel NULL pointer
- dereference in dev_map_hash_update_elem
+	s=arc-20240116; t=1708985969; c=relaxed/simple;
+	bh=Kf9C5rjCshg0Rv+IgdGFp/y0eMmxUityYfRPszEf+b4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZhDYn9XOedR9eb2i2QTNZ1VUBcbQt12fZHNBLseM4F0QtKanBQsbDjOM8sQ7+gW6kT59DfflArgK4qwnk79fLmjgCP8KnL9KGkO/FVzNj4V8Lt6D45kS5iyndQxXFAy+PtNQFlZ+3gfYIfuUtxu+E7WLs5IkLuLpFqWtukNcfjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jk4tA/v1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50CC7C433C7;
+	Mon, 26 Feb 2024 22:19:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708985969;
+	bh=Kf9C5rjCshg0Rv+IgdGFp/y0eMmxUityYfRPszEf+b4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jk4tA/v1DFlkt5FK5OD6xEtKQyz71uMqD6Rs2cO6xu9Ktu3Yo7CWRK5/QE9Vp8fFJ
+	 QiOkf/iaT6tpeqgHIYwEQ6YmisUsci/ACC7mvUBJlJgX9n0fBQOov4Jeomgo4gIh63
+	 l/ZVoDVVdz+M1YzMVMvRvZUl/Asc9lMibHhnnTNgvmii1juH6smKDhsysZGvf2whm2
+	 KReBEF1Twu5W9Ios6I8cN7ktDF5P5It2Sm8Szo7dYqbQqD6ycjKUn90B8D7jR/t7t2
+	 Od9V7D5IYeIAdTuOo8rn/dS+iy3k2sUBWQrkI1fLUOQoYy2TZrnUE43sGOJ0fnBZ4y
+	 It3WlqKaafqiA==
+Date: Mon, 26 Feb 2024 14:19:28 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stanislav Fomichev <sdf@google.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, amritha.nambiar@intel.com, danielj@nvidia.com,
+ mst@redhat.com, michael.chan@broadcom.com, vadim.fedorenko@linux.dev
+Subject: Re: [PATCH net-next 1/3] netdev: add per-queue statistics
+Message-ID: <20240226141928.171b79fe@kernel.org>
+In-Reply-To: <Zd0EJq3gS2_p9NQ8@google.com>
+References: <20240226211015.1244807-1-kuba@kernel.org>
+	<20240226211015.1244807-2-kuba@kernel.org>
+	<Zd0EJq3gS2_p9NQ8@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-syzbot wrote:
-> syzbot has found a reproducer for the following issue on:
+On Mon, 26 Feb 2024 13:35:34 -0800 Stanislav Fomichev wrote:
+> > +  -
+> > +    name: stats-scope
+> > +    type: flags
+> > +    entries: [ queue ]  
 > 
-> HEAD commit:    70ff1fe626a1 Merge tag 'docs-6.8-fixes3' of git://git.lwn...
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=1762045c180000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=4cf52b43f46d820d
-> dashboard link: https://syzkaller.appspot.com/bug?extid=8cd36f6b65f3cafd400a
-> compiler:       arm-linux-gnueabi-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> userspace arch: arm
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=110cf122180000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=142f6d8c180000
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/8ead8862021c/non_bootable_disk-70ff1fe6.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/bc398db9fd8c/vmlinux-70ff1fe6.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/6d3f8b72a671/zImage-70ff1fe6.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+8cd36f6b65f3cafd400a@syzkaller.appspotmail.com
-> 
+> IIUC, in order to get netdev-scoped stats in v1 (vs rfc) is to not set
+> stats-scope, right? Any reason we dropped the explicit netdev entry?
+> It seems more robust with a separate entry and removes the ambiguity about
+> which stats we're querying.
 
-I'll take a look this week if no one beats me to it. Looks like there is
-a reproducer so should be able to sort it out.
+The change is because I switched from enum to flags.
+
+I'm not 100% sure which one is going to cause fewer issues down
+the line. It's a question of whether the next scope we add will 
+be disjoint with or subdividing previous scopes.
+
+I think only subdividing previous scopes makes sense. If we were 
+to add "stats per NAPI" (bad example) or "per buffer pool" or IDK what
+other thing -- we should expose that as a new netlink command, not mix 
+it with the queues.
+
+The expectation is that scopes will be extended with hw vs sw, or
+per-CPU (e.g. page pool recycling). In which case we'll want flags,
+so that we can combine them -- ask for HW stats for a queue or hw
+stats for the entire netdev.
+
+Perhaps I should rename stats -> queue-stats to make this more explicit?
+
+The initial version I wrote could iterate both over NAPIs and
+queues. This could be helpful to some drivers - but I realized that it
+would lead to rather painful user experience (does the driver maintain
+stats per NAPI or per queue?) and tricky implementation of the device
+level sum (device stats = Sum(queue) or Sum(queue) + Sum(NAPI)??)
 
