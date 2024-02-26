@@ -1,120 +1,163 @@
-Return-Path: <netdev+bounces-75121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F7DD868472
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 00:05:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CEC7868483
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 00:14:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08DE61F221B2
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 23:05:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A6901C2205C
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 23:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BDE3135A45;
-	Mon, 26 Feb 2024 23:05:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9CE0133285;
+	Mon, 26 Feb 2024 23:14:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="biDX9XVZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NXq0pOSz"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C0541350CF;
-	Mon, 26 Feb 2024 23:05:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01F560864
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 23:14:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708988733; cv=none; b=BJXvR+hJGMTG3JVQgq3YZQl8wu6+blAkV7DqXdGf6dS3jAeRWq9uStCHzNQhaS+tRULNLjX6LcUb56aOvt6YTPQ0hkZnmQWJ8WxNpjJbG1NRakgfPFmuIY7k/vM20JwT3BsSd1hm/++g2C8c4K+iz/QZRpbHIPslYwLLAkkw5LQ=
+	t=1708989243; cv=none; b=DQ5p8DJKNakZU32RA2RGwMWSHn2XkdTp61nb9b4NaUqdAVbSlodo/cIJOVyYBTBdgDYMHjir9rqB+simniPSj3IGSxxGrFr6obd+7p+SCsCpJUXUgntijlSZ/U/2m0XzF71zeT3IKAV+AeYcBwp2xNTWa+EcrXxrUM/fRc3rBiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708988733; c=relaxed/simple;
-	bh=TWzun0oNIPfc6lqE3DTPBQ4RosQxCFz5BwOT4xEIKSs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uMoQgVUQ3eG48O6dhBw23K0PTlj9/PBaBgQlh+gvDohGBR/ixek/svdURsq7h6ETxb49siW81EoGOMjwRS/cqKDji0LsSoxrRt75Jx3OJe5NMAa+mIfK0UHZoGSqhDD9tcIWuCworOvS1Kdtnq2oEaQlWsRSyvYo/3uxOLqgViQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=biDX9XVZ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=pYmdkgX1dVrE40bWWH7YizC1+wHj2Ilzj2iousZ5MvQ=; b=biDX9XVZoNS+cu+iILmQSUl1K+
-	Qg9ttG/A56qZt0e4lsHbOPZw1aHansTRFWg7u3iBfNdZv0inSyJh+RRvOrrYAm72UhuCMqRUD/KCG
-	5Ojfv0AiI7kvUVIbFYnMiYQiIeYZlZGzXUM38f9nmsFFD8fcu/6Cn2Xmyc4O66l8g7+w=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rek2P-008lo4-S6; Tue, 27 Feb 2024 00:05:33 +0100
-Date: Tue, 27 Feb 2024 00:05:33 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Konrad Dybcio <konrad.dybcio@linaro.org>
-Cc: Sarosh Hasan <quic_sarohasa@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Prasad Sodagudi <psodagud@quicinc.com>,
-	Andrew Halaney <ahalaney@redhat.com>, Rob Herring <robh@kernel.org>,
-	kernel@quicinc.com, Sneh Shah <quic_snehshah@quicinc.com>,
-	Suraj Jaiswal <quic_jsuraj@quicinc.com>
-Subject: Re: [PATCH net-next] net: stmmac: dwmac-qcom-ethqos: Update link
- clock rate only for RGMII
-Message-ID: <89c54319-82d0-4cb3-b3be-ccdf6dcf2742@lunn.ch>
-References: <20240222125517.3356-1-quic_sarohasa@quicinc.com>
- <54b8c58a-6288-4ae6-9ed7-aa7b212e63da@linaro.org>
+	s=arc-20240116; t=1708989243; c=relaxed/simple;
+	bh=Jjcv+xa9kh2Wiw+Zd+ky5XQ7X+A7ycL7jBCIoB0zquE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VGvJ1l7fv6rqYfVh5peqk48V75ofhlC7utoYGB23ze0T5JgKwrlxj0z5xQ9PFtZ0nLV5qfIpPYDPlO15plBvgWHWmnYP8KJNwV18cPW8UFFz3GtgX2cXQN/Hd8/8co0uI/BeIB1bBIFE/bsvy/yXk1N0vWZmeO1dxd3/VimEop8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NXq0pOSz; arc=none smtp.client-ip=209.85.167.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3c1a3384741so966113b6e.0
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 15:14:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708989241; x=1709594041; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AcbfQ2ZMtTXwvOmlNhigDtqzxobvdNMDqUZ3xL5Yzrg=;
+        b=NXq0pOSzrOCsGiB/jfsJyo+P/FnEnMS2e4jfZ0CcundQEtpZdu8V2d19lBvMvr4xmT
+         zoiDJXDPI1cTi5NJokv6XDqsjFW8OsPzbhuDkAxbyk1C7D9PTt5dZxr2DAh5V08zQyN3
+         19qPG1RLW4zsohLiBNd68u7cLouJsuADW8KlFvXPfk6AgxejiVh+aQ7116kBMDPUkEeG
+         fNJi5M2kR3xbC7YICzEJgsaZDDsYUlN+khXpTAVeDCJsuk9cWBcjulfWudMneRAdeOwp
+         p5Wl9ZVvphErLueMq37rRLu2vfD3rDwrXbOpEW4wQxcOa1AxzwGmxPGYTLyPNGtx8/aa
+         QG+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708989241; x=1709594041;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AcbfQ2ZMtTXwvOmlNhigDtqzxobvdNMDqUZ3xL5Yzrg=;
+        b=dUZlMp9c0qPgq3NSJnGeSWrn+XkGN0SBhTD/BPtThwOYWeeUN6AoqLQVim1Z/9iqZC
+         /bKV/DYqrvC+YNZL90C1jtG0jKfSaz9aaPVv85i271RH3iBWV4nGngePSHibd1t+UkS0
+         2js+iXpCsS1sbobGrpmnXdLMI5lOnrWCNntNB9RWx4uZ04HDyHszmltmin9gJcGG/WPM
+         iuxcARNoUtHM0X/QPpEgJZOSyXDMf+79JYNg3cohXPZ5j0m6bx/0e7XSmHlBjH92PUx6
+         yRKUOS2LsP0bGbdNXWStLGJIp/ChiXJhPL9U3PkRxmNbXgXmha7ero/le5ZBZfSG/DXm
+         b0IQ==
+X-Gm-Message-State: AOJu0YxL+QeMdbBg5yNZ9X/XOU1EsJvNOOTdTxfaUrkvUEW0HWRju2mW
+	gVylP4/aH6SY54CsOZXHbD2nwACpqIfwFg/0HP8j0cQfugYl8k2U
+X-Google-Smtp-Source: AGHT+IEz7EQPvsPHPkhJo9iBgVKGCv1SFtqJqmM8InXvJaSJHbur/eZEZ+WKl/Ce19kgt3bqw+UUpg==
+X-Received: by 2002:a05:6808:159d:b0:3c1:9519:1c19 with SMTP id t29-20020a056808159d00b003c195191c19mr587672oiw.37.1708989240717;
+        Mon, 26 Feb 2024 15:14:00 -0800 (PST)
+Received: from [10.69.40.148] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id kv5-20020a056214534500b0068d191dfa9fsm3478310qvb.94.2024.02.26.15.13.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Feb 2024 15:14:00 -0800 (PST)
+Message-ID: <f189f3c9-0ea7-4863-aba7-1c7d0fe11ee2@gmail.com>
+Date: Mon, 26 Feb 2024 15:13:57 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <54b8c58a-6288-4ae6-9ed7-aa7b212e63da@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: bcmgenet: Reset RBUF on first open
+To: Florian Fainelli <florian.fainelli@broadcom.com>,
+ Maarten Vanraes <maarten@rmail.be>
+Cc: netdev@vger.kernel.org,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Phil Elwell <phil@raspberrypi.com>
+References: <20240224000025.2078580-1-maarten@rmail.be>
+ <bc73b1e2-d99d-4ac2-9ae0-a55a8b271747@broadcom.com>
+Content-Language: en-US
+From: Doug Berger <opendmb@gmail.com>
+In-Reply-To: <bc73b1e2-d99d-4ac2-9ae0-a55a8b271747@broadcom.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-> >   static void
-> >   ethqos_update_link_clk(struct qcom_ethqos *ethqos, unsigned int speed)
-> >   {
-> > -	switch (speed) {
-> > -	case SPEED_1000:
-> > -		ethqos->link_clk_rate =  RGMII_1000_NOM_CLK_FREQ;
-> > -		break;
-> > +	if (phy_interface_mode_is_rgmii(ethqos->phy_mode)) {
-> > +		switch (speed) {
-> > +		case SPEED_1000:
-> > +			ethqos->link_clk_rate =  RGMII_1000_NOM_CLK_FREQ;
-> > +			break;
-> > -	case SPEED_100:
-> > -		ethqos->link_clk_rate =  RGMII_ID_MODE_100_LOW_SVS_CLK_FREQ;
-> > -		break;
-> > +		case SPEED_100:
-> > +			ethqos->link_clk_rate =  RGMII_ID_MODE_100_LOW_SVS_CLK_FREQ;
-> > +			break;
-> > -	case SPEED_10:
-> > -		ethqos->link_clk_rate =  RGMII_ID_MODE_10_LOW_SVS_CLK_FREQ;
-> > -		break;
-> > -	}
-> > +		case SPEED_10:
-> > +			ethqos->link_clk_rate =  RGMII_ID_MODE_10_LOW_SVS_CLK_FREQ;
-> > +			break;
-> > +		}
-> > -	clk_set_rate(ethqos->link_clk, ethqos->link_clk_rate);
-> > +		clk_set_rate(ethqos->link_clk, ethqos->link_clk_rate);
-> > +	}
-> >   }
+On 2/26/2024 9:34 AM, Florian Fainelli wrote:
+> On 2/23/24 15:53, Maarten Vanraes wrote:
+>> From: Phil Elwell <phil@raspberrypi.com>
+>>
+>> If the RBUF logic is not reset when the kernel starts then there
+>> may be some data left over from any network boot loader. If the
+>> 64-byte packet headers are enabled then this can be fatal.
+>>
+>> Extend bcmgenet_dma_disable to do perform the reset, but not when
+>> called from bcmgenet_resume in order to preserve a wake packet.
+>>
+>> N.B. This different handling of resume is just based on a hunch -
+>> why else wouldn't one reset the RBUF as well as the TBUF? If this
+>> isn't the case then it's easy to change the patch to make the RBUF
+>> reset unconditional.
 > 
-> if (!phy_interface_mode_is_rgmii(ethqos->phy_mode))
-> 	return 0;
+> The real question is why is not the boot loader putting the GENET core 
+> into a quasi power-on-reset state, since this is what Linux expects, and 
+> also it seems the most conservative and prudent approach. Assuming the 
+> RDMA and Unimac RX are disabled, otherwise we would happily continuing 
+> to accept packets in DRAM, then the question is why is not the RBUF 
+> flushed too, or is it flushed, but this is insufficient, if so, have we 
+> determined why?
+> 
+>>
+>> See: https://github.com/raspberrypi/linux/issues/3850
+>>
+>> Signed-off-by: Phil Elwell <phil@raspberrypi.com>
+>> Signed-off-by: Maarten Vanraes <maarten@rmail.be>
+>> ---
+>>   drivers/net/ethernet/broadcom/genet/bcmgenet.c | 16 ++++++++++++----
+>>   1 file changed, 12 insertions(+), 4 deletions(-)
+>>
+>> This patch fixes a problem on RPI 4B where in ~2/3 cases (if you're using
+>> nfsroot), you fail to boot; or at least the boot takes longer than
+>> 30 minutes.
+> 
+> This makes me wonder whether this also fixes the issues that Maxime 
+> reported a long time ago, which I can reproduce too, but have not been 
+> able to track down the source of:
+> 
+> https://lore.kernel.org/linux-kernel/20210706081651.diwks5meyaighx3e@gilmour/
+> 
+>>
+>> Doing a simple ping revealed that when the ping starts working again
+>> (during the boot process), you have ping timings of ~1000ms, 2000ms or
+>> even 3000ms; while in normal cases it would be around 0.2ms.
+> 
+> I would prefer that we find a way to better qualify whether a RBUF reset 
+> is needed or not, but I suppose there is not any other way, since there 
+> is an "RBUF enabled" bit that we can key off.
+> 
+> Doug, what do you think?
+I agree that the Linux driver expects the GENET core to be in a "quasi 
+power-on-reset state" and it seems likely that in both Maxime's case and 
+the one identified here that is not the case. It would appear that the 
+Raspberry Pi bootloader and/or "firmware" are likely not disabling the 
+GENET receiver after loading the kernel image and before invoking the 
+kernel. They may be disabling the DMA, but that is insufficient since 
+any received data would likely overflow the RBUF leaving it in a "bad" 
+state which this patch apparently improves.
 
-It is a void function, so no 0, but otherwise this does look less
-invasive.
+So it seems likely these issues are caused by improper 
+bootloader/firmware behavior.
 
-   Andrew
+That said, I suppose it would be nice if the driver were more robust. 
+However, we both know how finicky the receive path of the GENET core can 
+be about its initialization. Therefore, I am unwilling to "bless" this 
+change for upstream without more due diligence on our side.
+
+-Doug
 
