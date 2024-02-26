@@ -1,323 +1,227 @@
-Return-Path: <netdev+bounces-74820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D716866A3B
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 07:47:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88789866A31
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 07:44:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A65491C21CB3
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 06:47:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB6911C21C6C
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 06:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AAB51B27D;
-	Mon, 26 Feb 2024 06:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 337E1175BE;
+	Mon, 26 Feb 2024 06:44:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="NiG9q+O3"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="W2C6wma+";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="KJMoawp/";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="W2C6wma+";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="KJMoawp/"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DDDF1BDC3;
-	Mon, 26 Feb 2024 06:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22C71BDCB;
+	Mon, 26 Feb 2024 06:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708930047; cv=none; b=u30wVM1pRrI7JmSNwLXfkgbd/h7AnevrgOm13T5LoxzEj6SFRSz5OlbpQtIf1jiigPS517SXEHQSBolDiBnb33GifpkOmObANdZQiGZ4DtRa7Eru3MNwyeaqT9hUi66dsUuWEcj7TK9BX8OOZctWLbi9LR+4JeyZuCTiMGVfv5k=
+	t=1708929885; cv=none; b=LEoMYMvBMbWf7CLFx0Z26nOGreAqZTSUAYy7b7LL13FvFkWI/kgEXqh7Lra7Yq6MnXACVjfHxy9aroLceqEOh0XbjhBvxBuFXh41dozXurXCCgzslkABl0Webm4PaILJkwka7VQY7zAkgwgKuO4J7khdKMvwlEwcssJlRMQVYSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708930047; c=relaxed/simple;
-	bh=r+YRIokGyqR9X8s9S5ioq/Xrj7AOa13EKl+Y0GQmDFk=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=HbUinRLWub6I5w3jRjXsv3tQTy3tYYK9Nn+gJms8FvG5LLZ4YEu5l+NPj1ecohdMxAqIqlUasFPXMup1nLre9mCNUUwEk7IftQe9wO5BN1QV9g+N9yG1VX1bi4iqrwcgWqy+Ij7OIRaEOv5bcx7INPuOmmdeW5FHt6GvNNnOSHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=NiG9q+O3; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1708930036; h=Message-ID:Subject:Date:From:To;
-	bh=zqZsfZ/qluUEW7qkID/ee5gWeGwmJGn3HGM5FIAvvSM=;
-	b=NiG9q+O39eHStuM8y8B1udACnITePfJKKGw2Ll8ljZALTMgpu0a+NdGnMfL6ZtMDtabKgOfh0aVod/qFUUHoC0StBwLKl7sGvsMOka0ZTtaHq2NdET55fDmavQ/jnQk7EfHcaK5ad16ZIb9pM9H0e7+uv6UPb/xVlSAl7Js4Tbg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R781e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=34;SR=0;TI=SMTPD_---0W1Cedgm_1708930033;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W1Cedgm_1708930033)
-          by smtp.aliyun-inc.com;
-          Mon, 26 Feb 2024 14:47:14 +0800
-Message-ID: <1708927861.8802218-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v2 19/19] virtio_net: sq support premapped mode
-Date: Mon, 26 Feb 2024 14:11:01 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux.dev,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Hans de Goede <hdegoede@redhat.com>,
- =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Vadim Pasternak <vadimp@nvidia.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- linux-um@lists.infradead.org,
- netdev@vger.kernel.org,
- platform-driver-x86@vger.kernel.org,
- linux-remoteproc@vger.kernel.org,
- linux-s390@vger.kernel.org,
- kvm@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20240223082726.52915-1-xuanzhuo@linux.alibaba.com>
- <20240223082726.52915-20-xuanzhuo@linux.alibaba.com>
- <20240225032330-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240225032330-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1708929885; c=relaxed/simple;
+	bh=0jR4/i7gzhFMuOdekx0+xLT5ggNU6KA0YqzULT8MLiI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qF4O5YgFNcnf/+AaDivG79gwxsnZHFRlMbpjTadfEZgf2KsONKgytFgkzLdcI2miH9CgPGbJeM+86W/D/ckKCtyD2usJlRB8LTNtNJbeN0Z3vhGGwA7awRNox5/ckXFJvwDMxvXeu11OP+XDDcuFmRzizgvrnFXVnDNX96ke/5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=W2C6wma+; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=KJMoawp/; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=W2C6wma+; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=KJMoawp/; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from lion.mk-sys.cz (unknown [10.100.225.114])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id AA1922233F;
+	Mon, 26 Feb 2024 06:44:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1708929880; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U+h6mH/zm8We5PynLw0CU0r1+Xfy20Hg53wFN8364kU=;
+	b=W2C6wma+ZOEZsgkmamUWxY50Nicn++NFciUw9MzkP/imZEZk7NqwckYvv9/4Jc2vAP7nzR
+	Y3TmopAjVzgtSscKLguqCfFjq4UtD8FbmPk1r0FvuAYG6X+dtjNm4unBBugG8b+444bKNT
+	fvL9Sqr03RFX9akcvGBusZmO34KpCtA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1708929880;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U+h6mH/zm8We5PynLw0CU0r1+Xfy20Hg53wFN8364kU=;
+	b=KJMoawp/vPoAmOMiYZJMyiNhIgIjkwr/HEpzLUmkw7GQoOiOydzNc0Bds9QSg5Lb3bAoQP
+	CQv31JvV44DAfjDg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1708929880; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U+h6mH/zm8We5PynLw0CU0r1+Xfy20Hg53wFN8364kU=;
+	b=W2C6wma+ZOEZsgkmamUWxY50Nicn++NFciUw9MzkP/imZEZk7NqwckYvv9/4Jc2vAP7nzR
+	Y3TmopAjVzgtSscKLguqCfFjq4UtD8FbmPk1r0FvuAYG6X+dtjNm4unBBugG8b+444bKNT
+	fvL9Sqr03RFX9akcvGBusZmO34KpCtA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1708929880;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U+h6mH/zm8We5PynLw0CU0r1+Xfy20Hg53wFN8364kU=;
+	b=KJMoawp/vPoAmOMiYZJMyiNhIgIjkwr/HEpzLUmkw7GQoOiOydzNc0Bds9QSg5Lb3bAoQP
+	CQv31JvV44DAfjDg==
+Received: by lion.mk-sys.cz (Postfix, from userid 1000)
+	id 95ECD20147; Mon, 26 Feb 2024 07:44:40 +0100 (CET)
+Date: Mon, 26 Feb 2024 07:44:40 +0100
+From: Michal Kubecek <mkubecek@suse.cz>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
+	Lennart Franzen <lennart@lfdomain.com>,
+	Alexandru Tachici <alexandru.tachici@analog.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] net: ethernet: adi: requires PHYLIB support
+Message-ID: <20240226064440.ismpxvp5qmnskyna@lion.mk-sys.cz>
+References: <20240215070050.2389-1-rdunlap@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="dokggcunvhr5bb4x"
+Content-Disposition: inline
+In-Reply-To: <20240215070050.2389-1-rdunlap@infradead.org>
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spamd-Result: default: False [-5.20 / 50.00];
+	 ARC_NA(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 RCPT_COUNT_SEVEN(0.00)[10];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,infradead.org:email];
+	 SIGNED_PGP(-2.00)[];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 RCVD_COUNT_ZERO(0.00)[0];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+,1:+,2:~];
+	 BAYES_HAM(-3.00)[100.00%]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -5.20
 
-On Sun, 25 Feb 2024 03:38:48 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Fri, Feb 23, 2024 at 04:27:26PM +0800, Xuan Zhuo wrote:
-> > If the xsk is enabling, the xsk tx will share the send queue.
-> > But the xsk requires that the send queue use the premapped mode.
-> > So the send queue must support premapped mode.
-> >
-> > cmd:
-> >     sh samples/pktgen/pktgen_sample01_simple.sh -i eth0 \
-> >         -s 16 -d 10.0.0.128 -m 00:16:3e:2c:c8:2e -n 0 -p 100
-> > CPU:
-> >     Intel(R) Xeon(R) Platinum 8369B CPU @ 2.70GHz
-> >
-> > Machine:
-> >     ecs.g7.2xlarge(Aliyun)
-> >
-> > before:              1600010.00
-> > after(no-premapped): 1599966.00
-> > after(premapped):    1600014.00
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/net/virtio_net.c | 136 +++++++++++++++++++++++++++++++++++++--
-> >  1 file changed, 132 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 7715bb7032ec..b83ef6afc4fb 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -146,6 +146,25 @@ struct virtnet_rq_dma {
-> >  	u16 need_sync;
-> >  };
-> >
-> > +
 
-[...]
+--dokggcunvhr5bb4x
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > +static struct virtnet_sq_dma *virtnet_sq_map_sg(struct send_queue *sq,
-> > +						int nents, void *data)
-> > +{
-> > +	struct virtnet_sq_dma *d;
-> > +	struct scatterlist *sg;
-> > +	int i;
-> > +
-> > +	if (!sq->dmainfo.free)
-> > +		return NULL;
-> > +
-> > +	d = sq->dmainfo.free;
-> > +	sq->dmainfo.free = d->next;
-> > +
-> > +	for_each_sg(sq->sg, sg, nents, i) {
-> > +		if (virtqueue_dma_map_sg_attrs(sq->vq, sg, DMA_TO_DEVICE, 0))
-> > +			goto err;
-> > +
-> > +		d->addr[i] = sg->dma_address;
-> > +		d->len[i] = sg->length;
-> > +	}
-> > +
-> > +	d->data = data;
-> > +	d->num = i;
-> > +	return d;
-> > +
-> > +err:
-> > +	d->num = i;
-> > +	virtnet_sq_unmap(sq, (void **)&d);
-> > +	return NULL;
-> > +}
->
->
-> Do I see a reimplementation of linux/llist.h here?
+On Wed, Feb 14, 2024 at 11:00:50PM -0800, Randy Dunlap wrote:
+> This driver uses functions that are supplied by the Kconfig symbol
+> PHYLIB, so select it to ensure that they are built as needed.
+>=20
+> When CONFIG_ADIN1110=3Dy and CONFIG_PHYLIB=3Dm, there are multiple build
+> (linker) errors that are resolved by this Kconfig change:
+>=20
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_net_ope=
+n':
+>    drivers/net/ethernet/adi/adin1110.c:933: undefined reference to `phy_s=
+tart'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_probe_n=
+etdevs':
+>    drivers/net/ethernet/adi/adin1110.c:1603: undefined reference to `get_=
+phy_device'
+>    ld: drivers/net/ethernet/adi/adin1110.c:1609: undefined reference to `=
+phy_connect'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_disconn=
+ect_phy':
+>    drivers/net/ethernet/adi/adin1110.c:1226: undefined reference to `phy_=
+disconnect'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `devm_mdiobus_all=
+oc':
+>    include/linux/phy.h:455: undefined reference to `devm_mdiobus_alloc_si=
+ze'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_registe=
+r_mdiobus':
+>    drivers/net/ethernet/adi/adin1110.c:529: undefined reference to `__dev=
+m_mdiobus_register'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_net_sto=
+p':
+>    drivers/net/ethernet/adi/adin1110.c:958: undefined reference to `phy_s=
+top'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_disconn=
+ect_phy':
+>    drivers/net/ethernet/adi/adin1110.c:1226: undefined reference to `phy_=
+disconnect'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_adjust_=
+link':
+>    drivers/net/ethernet/adi/adin1110.c:1077: undefined reference to `phy_=
+print_status'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_ioctl':
+>    drivers/net/ethernet/adi/adin1110.c:790: undefined reference to `phy_d=
+o_ioctl'
+>    ld: drivers/net/ethernet/adi/adin1110.o:(.rodata+0xf60): undefined ref=
+erence to `phy_ethtool_get_link_ksettings'
+>    ld: drivers/net/ethernet/adi/adin1110.o:(.rodata+0xf68): undefined ref=
+erence to `phy_ethtool_set_link_ksettings'
+>=20
+> Fixes: bc93e19d088b ("net: ethernet: adi: Add ADIN1110 support")
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202402070626.eZsfVHG5-lkp@i=
+ntel.com/
+> Cc: Lennart Franzen <lennart@lfdomain.com>
+> Cc: Alexandru Tachici <alexandru.tachici@analog.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: netdev@vger.kernel.org
+> ---
+>  drivers/net/ethernet/adi/Kconfig |    1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff -- a/drivers/net/ethernet/adi/Kconfig b/drivers/net/ethernet/adi/Kco=
+nfig
+> --- a/drivers/net/ethernet/adi/Kconfig
+> +++ b/drivers/net/ethernet/adi/Kconfig
+> @@ -7,6 +7,7 @@ config NET_VENDOR_ADI
+>  	bool "Analog Devices devices"
+>  	default y
+>  	depends on SPI
+> +	select PHYLIB
+>  	help
+>  	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-YES. This can be done by the APIs of linux/lllist.h.
+Shouldn't the "select PHYLIB" be added to ADIN1110 rather than
+NET_VENDOR_ADI? Now with v6.8-rc6, PHYLIB and few other options are
+forced to "Y" whenever NET_VENDOR_ADI is enabled (even with ADIN1110
+disabled).
 
-But now, there is not __llist_del_first() (That will be used by
-virtnet_sq_map_sg()).
-And that is simple and just two places may use the APIs, so I implement it
-directly.
+Michal
 
->
->
-> > +
-> > +static int virtnet_add_outbuf(struct send_queue *sq, u32 num, void *data)
-> > +{
-> > +	int ret;
-> > +
-> > +	if (sq->vq->premapped) {
-> > +		data = virtnet_sq_map_sg(sq, num, data);
-> > +		if (!data)
-> > +			return -ENOMEM;
-> > +	}
-> > +
-> > +	ret = virtqueue_add_outbuf(sq->vq, sq->sg, num, data, GFP_ATOMIC);
-> > +	if (ret && sq->vq->premapped)
-> > +		virtnet_sq_unmap(sq, &data);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +static int virtnet_sq_init_dma_mate(struct send_queue *sq)
->
-> Mate? The popular south african drink?
+--dokggcunvhr5bb4x
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Sorry, should be meta, I mean metadata.
+-----BEGIN PGP SIGNATURE-----
 
->
-> > +{
-> > +	struct virtnet_sq_dma *d;
-> > +	int num, i;
-> > +
-> > +	num = virtqueue_get_vring_size(sq->vq);
-> > +
-> > +	sq->dmainfo.free = kcalloc(num, sizeof(*sq->dmainfo.free), GFP_KERNEL);
-> > +	if (!sq->dmainfo.free)
-> > +		return -ENOMEM;
->
->
-> This could be quite a bit of memory for a large queue.  And for a bunch
-> of common cases where unmap is a nop (e.g. iommu pt) this does nothing
-> useful at all.
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmXcM1MACgkQ538sG/LR
+dpWWyQf+IwV1bbDi03xWEPWF9NbDjKpBv4a2Lg5jNjnCa+k3kW3DNzThJTedzX5F
+ROmPLIj1cH4cKnaK++npbAlv8K4rZXlvibJDDrXHzNi67IuoExFy1foTyfx8Kr/1
+fImb56B2WQXW4SrlHPXi8dB8CDIqlu+z3ec1eG0DEKYBM1WbVP9LKNA/FjNVi0pX
+ktr2s2tv2CgZ/4m3+/cPvxQIhiQYFjdfeiXmWaEcfjxgqZRoyGOqqqrCylHk2mIG
+0auC4nBbvEkFZqE9p4iPgFQ4IoMf8bnFtNMOawmx/DoDuj3QbgGEKBdDvDbdlRVn
+/z0uBAhXH5yRjGpd9XHPDcV2JZthLQ==
+=wmo4
+-----END PGP SIGNATURE-----
 
-Then can we skip the unmap api, so pass a zero to the unmap api?
-
-> And also, this does nothing useful if PLATFORM_ACCESS is off
-> which is super common.
-
-That is ok. That just work when PLATFORM_ACCESS is on.
-
-Thanks.
-
->
-> A while ago I proposed:
-> - extend DMA APIs so one can query whether unmap is a nop
->   and whether sync is a nop
-> - virtio wrapper taking into account PLATFORM_ACCESS too
->
-> then we can save all this work and memory when not needed.
->
->
->
-> > +
-> > +	sq->dmainfo.p = sq->dmainfo.free;
-> > +
-> > +	for (i = 0; i < num; ++i) {
-> > +		d = &sq->dmainfo.free[i];
-> > +		d->next = d + 1;
-> > +	}
-> > +
-> > +	d->next = NULL;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  static void __free_old_xmit(struct send_queue *sq, bool in_napi,
-> >  			    struct virtnet_sq_free_stats *stats)
-> >  {
-> > @@ -377,6 +487,9 @@ static void __free_old_xmit(struct send_queue *sq, bool in_napi,
-> >  	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
-> >  		++stats->packets;
-> >
-> > +		if (sq->vq->premapped)
-> > +			virtnet_sq_unmap(sq, &ptr);
-> > +
-> >  		if (!is_xdp_frame(ptr)) {
-> >  			struct sk_buff *skb = ptr;
-> >
-> > @@ -890,8 +1003,7 @@ static int __virtnet_xdp_xmit_one(struct virtnet_info *vi,
-> >  			    skb_frag_size(frag), skb_frag_off(frag));
-> >  	}
-> >
-> > -	err = virtqueue_add_outbuf(sq->vq, sq->sg, nr_frags + 1,
-> > -				   xdp_to_ptr(xdpf), GFP_ATOMIC);
-> > +	err = virtnet_add_outbuf(sq, nr_frags + 1, xdp_to_ptr(xdpf));
-> >  	if (unlikely(err))
-> >  		return -ENOSPC; /* Caller handle free/refcnt */
-> >
-> > @@ -2357,7 +2469,7 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb)
-> >  			return num_sg;
-> >  		num_sg++;
-> >  	}
-> > -	return virtqueue_add_outbuf(sq->vq, sq->sg, num_sg, skb, GFP_ATOMIC);
-> > +	return virtnet_add_outbuf(sq, num_sg, skb);
-> >  }
-> >
-> >  static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
-> > @@ -4166,6 +4278,8 @@ static void virtnet_free_queues(struct virtnet_info *vi)
-> >  	for (i = 0; i < vi->max_queue_pairs; i++) {
-> >  		__netif_napi_del(&vi->rq[i].napi);
-> >  		__netif_napi_del(&vi->sq[i].napi);
-> > +
-> > +		kfree(vi->sq[i].dmainfo.p);
-> >  	}
-> >
-> >  	/* We called __netif_napi_del(),
-> > @@ -4214,6 +4328,15 @@ static void free_receive_page_frags(struct virtnet_info *vi)
-> >
-> >  static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
-> >  {
-> > +	struct virtnet_info *vi = vq->vdev->priv;
-> > +	struct send_queue *sq;
-> > +	int i = vq2rxq(vq);
-> > +
-> > +	sq = &vi->sq[i];
-> > +
-> > +	if (sq->vq->premapped)
-> > +		virtnet_sq_unmap(sq, &buf);
-> > +
-> >  	if (!is_xdp_frame(buf))
-> >  		dev_kfree_skb(buf);
-> >  	else
-> > @@ -4327,8 +4450,10 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
-> >  		if (ctx)
-> >  			ctx[rxq2vq(i)] = true;
-> >
-> > -		if (premapped)
-> > +		if (premapped) {
-> >  			premapped[rxq2vq(i)] = true;
-> > +			premapped[txq2vq(i)] = true;
-> > +		}
-> >  	}
-> >
-> >  	cfg.nvqs      = total_vqs;
-> > @@ -4352,6 +4477,9 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
-> >  		vi->rq[i].vq = vqs[rxq2vq(i)];
-> >  		vi->rq[i].min_buf_len = mergeable_min_buf_len(vi, vi->rq[i].vq);
-> >  		vi->sq[i].vq = vqs[txq2vq(i)];
-> > +
-> > +		if (vi->sq[i].vq->premapped)
-> > +			virtnet_sq_init_dma_mate(&vi->sq[i]);
-> >  	}
-> >
-> >  	/* run here: ret == 0. */
-> > --
-> > 2.32.0.3.g01195cf9f
->
+--dokggcunvhr5bb4x--
 
