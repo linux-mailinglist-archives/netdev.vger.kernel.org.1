@@ -1,114 +1,184 @@
-Return-Path: <netdev+bounces-74920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C55B8675AD
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 13:54:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FD0D8675DF
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 14:00:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD60E1C23505
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:54:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48304283669
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 13:00:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D88180044;
-	Mon, 26 Feb 2024 12:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97B68060F;
+	Mon, 26 Feb 2024 12:59:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Z9O9xi7d"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="rk4ywl2T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB488EC7
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 12:53:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20E280053;
+	Mon, 26 Feb 2024 12:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708952037; cv=none; b=L9DHcq1wR2T7fCWAKVZAD+r2B+Xrmgf5wSeAMtHfSTZzlRmu5mRbe8Qm0bi4I1XfgIAcXwc54OWm7ceK0/DP8sq4ujVrjRRjIcgs7FocNz9D6i8Aam/3FdVkSmlnD3FFaJatFkpSDNn5WfpRPonduq0HVLM2D4jdq5jkuiK+g7E=
+	t=1708952347; cv=none; b=kIEOAhoZmd+HhqeDHuwlNgd1VQY7srfHqbia8lWbrIFnKqZ5ebSBnCZi3yGNj1POCvFaLNATl08qF7nqxXdTvlbUF8RTTeWZswu6hXf5lUb5wEhKE1uyQlc+4KK1mTgM6G10RlbcmDsJzY1dT5GY6VWwQ/NnECOyVu08kCxEY84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708952037; c=relaxed/simple;
-	bh=M9B5Uvew9xAvuUMjh9ofeJ7p8pQRcV7VkL83dSaI60U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZPPyk3QB1c6gbVAZj9feKvEFD3qhP/ma3IbH6YqcPSWVyjeXSnIKVrwQqZNm71S59Ntbq4M2ix28ecH22Pb6d40jk1mjj8ynuFmoK9EcRB9YE7O4ZQLhkv8QCywpXB0SeAQzdYv/5WG3c63fwkyZARwEK/6wAW++0PTMFGushRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Z9O9xi7d; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-412a958d525so1090655e9.3
-        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 04:53:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708952033; x=1709556833; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M9B5Uvew9xAvuUMjh9ofeJ7p8pQRcV7VkL83dSaI60U=;
-        b=Z9O9xi7dxpp7cx8NUpGPeXLqnAP2bM+5vufZEBB1FbO1LLRHK0w7C3uEnE0ZZcUk7D
-         124lgXKsnGfHmrA4JsiSP9SPRg6yLCczezFbJmprkr4qxQGgqoodV328KJV9p/fclPlL
-         /t1CMNe2Ivu9vZ8Tu6DAz2EvfMxiNvPiex+FxhEdSLVFJLxnMkwEBk2DlQoAD7PIkBRg
-         0d/DI1vyiMjIvrtg4lYKZ6NPl2oNtwZf0mjP7vOsdtIC2KZNrVV4S80W6wyYSyyt8edq
-         hcgoawZbKD/+Y5FuVunhZxUj5foe0vgWFjwODqpyV6rtD6MrnCp1Edqam0jlnvdiZ2jm
-         85hA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708952033; x=1709556833;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M9B5Uvew9xAvuUMjh9ofeJ7p8pQRcV7VkL83dSaI60U=;
-        b=ABwAwAQIdVg3KTSplZLvpI/Wtwjqd5j4pmryri+pwrpytj/XQ4A3OGkT6c1i7ImyU2
-         NkiCOr4D/8LDLf3fZ0oim6SDd6nNvfGqWR8AhWB95YlHL9jnT7S945xhpw83FkYyPtA5
-         LHmMf7SW6qpslZxO9cEE9cr2lcndMdYd3F0EQ+dcS+wMYvW5SiHinRoSQEgDKmlcC8NT
-         HEW+AJ8U5Kmp5YU6gG9S3xIzaCmz94VFzYdt8J60LlFatFMvenRgHrhs9Vl7XEChhowo
-         shhb1l5GgKQhQuJtAGCBbmBcrzOuPMeDNMCWQWOa63wPiCtWTt6cnIf7fzswIrvGvWTk
-         EMJw==
-X-Gm-Message-State: AOJu0Yxl1P27n2xdymtEsKN1P6i7xuKBOiKZRGXh1lXpm7Kd+l++UgcB
-	Ll9VVCUKUOWDvFxu4xcQ/BiLBiAB/fhosYoBOdw7i2mUPGufNVInx4sUJ5cBy2CMUq2ooyPotvf
-	0
-X-Google-Smtp-Source: AGHT+IH2HngUcMJC48WFCod9LwDdU8GV8wk6wSxDPAdNYGXBCkBvfwODhTqtj1uuUDkwMZa8j7vurA==
-X-Received: by 2002:a5d:5b85:0:b0:33d:87e9:5900 with SMTP id df5-20020a5d5b85000000b0033d87e95900mr4608962wrb.62.1708952033028;
-        Mon, 26 Feb 2024 04:53:53 -0800 (PST)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id g16-20020adffc90000000b0033d3b8820f8sm8172448wrr.109.2024.02.26.04.53.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 04:53:52 -0800 (PST)
-Date: Mon, 26 Feb 2024 13:53:51 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jones Syue =?utf-8?B?6Jab5oe35a6X?= <jonessyue@qnap.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"j.vosburgh@gmail.com" <j.vosburgh@gmail.com>,
-	"andy@greyhouse.net" <andy@greyhouse.net>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3] bonding: 802.3ad replace MAC_ADDRESS_EQUAL
- with __agg_has_partner
-Message-ID: <ZdyJ32Ne-qKs-RDP@nanopsycho>
-References: <SI2PR04MB5097BCA8FF2A2F03D9A5A3EEDC5A2@SI2PR04MB5097.apcprd04.prod.outlook.com>
+	s=arc-20240116; t=1708952347; c=relaxed/simple;
+	bh=CivS165SpOZxqTRi7Y0BERi3bxixI6EZFS1RildTF20=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hS3gQ5idw8AYMDTu3DwxuJOYYapuPLLIXQG6wa4GjA3CCWNrEaWKIrj1iV/VE5AV9xzvO7pPH6ChDMac/tIPd8yO2GlXK99w4i1XykwxulD5j6kJXFEOMW8Zy98KV47cl60yMoynX2P5FW+H80iIDzhRPMhUMtanQwwCqDhq/K8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=rk4ywl2T; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1708952342; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=cD5eT8WkRRrjceQq/anwpIvtg55UdVcwbYHTzVSwFEg=;
+	b=rk4ywl2TJMeiUIy+03NU8clSRH/3GSgj3Kh2QEyogVEQMbhgmadBoiwhXV+cbgp06BqZ3l5RaI9YLlSeutbVYBOVgh/i1YEbkZ4HupKbxVv25e3+1/mi1lX9HrLfC4QmYxhWLGeLGhYdzjl4uz/YrPS69t76hbPixnpt2ntC3J0=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0W1JpswJ_1708952340;
+Received: from 30.221.129.59(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W1JpswJ_1708952340)
+          by smtp.aliyun-inc.com;
+          Mon, 26 Feb 2024 20:59:01 +0800
+Message-ID: <253e7be2-5f31-45a6-9dce-b8080d2d2ebd@linux.alibaba.com>
+Date: Mon, 26 Feb 2024 20:58:59 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SI2PR04MB5097BCA8FF2A2F03D9A5A3EEDC5A2@SI2PR04MB5097.apcprd04.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 09/15] net/smc: introduce loopback-ism statistics
+ attributes
+To: Wenjia Zhang <wenjia@linux.ibm.com>, wintera@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240111120036.109903-1-guwen@linux.alibaba.com>
+ <20240111120036.109903-10-guwen@linux.alibaba.com>
+ <417a1b7c-4136-4f96-a614-9fd976dc884d@linux.ibm.com>
+ <cac6192e-85d8-4289-b5af-bc8143e76004@linux.alibaba.com>
+ <700198c8-e4dc-4974-9ebf-f819deaa785b@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <700198c8-e4dc-4974-9ebf-f819deaa785b@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Mon, Feb 26, 2024 at 03:24:52AM CET, jonessyue@qnap.com wrote:
->Replace macro MAC_ADDRESS_EQUAL() for null_mac_addr checking with inline
->function__agg_has_partner(). When MAC_ADDRESS_EQUAL() is verifiying
->aggregator's partner mac addr with null_mac_addr, means that seeing if
->aggregator has a valid partner or not. Using __agg_has_partner() makes it
->more clear to understand.
->
->In ad_port_selection_logic(), since aggregator->partner_system and
->port->partner_oper.system has been compared first as a prerequisite, it is
->safe to replace the upcoming MAC_ADDRESS_EQUAL() for null_mac_addr checking
->with __agg_has_partner().
->
->Delete null_mac_addr, which is not required anymore in bond_3ad.c, since
->all references to it are gone.
->
->Signed-off-by: Jones Syue <jonessyue@qnap.com>
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+
+On 2024/2/23 22:13, Wenjia Zhang wrote:
+> 
+> 
+> On 20.02.24 03:45, Wen Gu wrote:
+>>
+>>
+>> On 2024/2/16 22:24, Wenjia Zhang wrote:
+>>>
+>>>
+>>> On 11.01.24 13:00, Wen Gu wrote:
+>>>> This introduces some statistics attributes of loopback-ism. They can be
+>>>> read from /sys/devices/virtual/smc/loopback-ism/{xfer_tytes|dmbs_cnt}.
+>>>>
+>>>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>>>> ---
+>>>>   net/smc/smc_loopback.c | 74 ++++++++++++++++++++++++++++++++++++++++++
+>>>>   net/smc/smc_loopback.h | 22 +++++++++++++
+>>>>   2 files changed, 96 insertions(+)
+>>>>
+>>>
+>>> I've read the comments from Jiri and your answer. I can understand your thought. However, from the perspective of the 
+>>> end user, it makes more sense to integetrate the stats info into 'smcd stats'. Otherwise, it would make users 
+>>> confused to find out with which tool to check which statisic infornation. Sure, some improvement of the smc-tools is 
+>>> also needed
+>>
+>> Thank you Wenjia.
+>>
+>> Let's draw an analogy with RDMA devices, which is used in SMC-R. If we want
+>> to check the RNIC status or statistics, we may use rdma statistic command, or
+>> ibv_devinfo command, or check file under /sys/class/infiniband/mlx5_0. These
+>> provide details or attributes related to *devices*.
+>>
+>> Since s390 ISM can be used out of SMC, I guess it also has its own way (other
+>> than smc-tools) to check the statistic?
+>>
+>> What we can see in smcr stats or smcd stats command is about statistic or
+>> status of SMC *protocol* layer, such as DMB status, Tx/Rx, connections, fallbacks.
+>>
+>> If we put the underlying devices's statistics into smc-tools, should we also
+>> put RNIC statistics or s390 ISM statistics into smcr stat or smcd stat? and
+>> for each futures device that can be used by SMC-R/SMC-D, should we update them
+>> into smcr stat and smcd stat? And the attributes of each devices may be different,
+>> should we add entries in smcd stat for each of them?
+>>
+>> After considering the above things, I believe that the details of the underlying
+>> device should not be exposed to smc(smc-tools). What do you think?
+>>
+>> Thanks!
+>>
+> That is a very good point. It really depends on how we understand *devices* and how we want to use it. The more we are 
+> thinking, the more complicated the thing is getting. I'm trying to find accurate definitions on modeling virtual devices 
+> hoping that would make things eaiser. Unfortunately, it is not easy. Finally, I found this article: 
+> https://lwn.net/Articles/645810/ (Heads up! It is even from nine years ago, I'm not sure how reliable it is.) With the 
+> insight of this article, I'm trying to summarize my thought:
+> 
+> It looks good to put the loopback-ism under the /sys/devices/virtual, especially according to the article
+> "
+> ... it is simply a place to put things that don't belong anywhere else.
+> "
+
+Yes, it can also be reflected from the implementation of get_device_parent():
+
+static struct kobject *get_device_parent(struct device *dev,
+					 struct device *parent)
+{
+<...>
+		/*
+		 * If we have no parent, we live in "virtual".
+		 * Class-devices with a non class-device as parent, live
+		 * in a "glue" directory to prevent namespace collisions.
+		 */
+		if (parent == NULL)
+			parent_kobj = virtual_device_parent(dev);
+		else if (parent->class && !dev->class->ns_type) {
+			subsys_put(sp);
+			return &parent->kobj;
+		} else {
+			parent_kobj = &parent->kobj;
+		}
+<...>
+}
+
+> However, in practice we use this in the term of simulated ism, which includes not only loopback-ism, but also other 
+> ones. Thus, does it not make sense to classify all of them together? E.g. same bus (just a half-baked idea)
+> 
+> Then the following questions are comig up:
+> - How should we organize them?
+> - Should it show up in the smc_rnics?
+> - How should it be seen from the perspective of the container?
+> - If we see this loopback-ism as a *device*, should we not only put the device related information under the /sys? Thus, 
+> dmbs_cnt seems ok, but xfer_tytes not. Besides, we have a field in smd stat naming "Data transmitted (Bytes)", which 
+> should be suitable for this information.
+
+Actually I created 'smc' class under /sys/devices/virtual just to place
+loopback-ism, since it doesn't seem to belong to a certain class of device
+and serves only SMC. Other 'smc devices', e.g. RDMA device, s390 ISM and
+other Emulated-ISM like virtio-ism, all belong to a certain class or bus,
+so I have no intention of putting them under the same path.
+
+But now looks like that the 'smc' class and /sys/devices/virtual/smc path
+will lead people to mistakenly think that there is a class of 'SMC devices',
+but in fact these 'SMC devices' belongs to different classes or buses. They
+can be used by SMC and any other users. So I think it is better to avoid
+creating such 'smc' class.
+
+Alternatively, after referring to other examples in the kernel, I think
+another choice is to to put loopback-ism under /sys/devices/virtual/misc/,
+for devices which can't fit in a specific class. What do you think?
+
+Thanks a lot!
 
