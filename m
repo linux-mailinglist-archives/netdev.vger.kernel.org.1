@@ -1,100 +1,147 @@
-Return-Path: <netdev+bounces-75061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C0CF868039
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 19:59:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B83B86807C
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 20:09:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BCA11C2419B
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 18:59:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 001E429153A
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 19:09:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E786A12F398;
-	Mon, 26 Feb 2024 18:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93E8812FF71;
+	Mon, 26 Feb 2024 19:04:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="U/G3rUNl"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="B3XZR+6t"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49BD112EBF6;
-	Mon, 26 Feb 2024 18:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB83913540C
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 19:04:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708973965; cv=none; b=rCNctQnEhEzR0kNZ7M9raPfEPq4OBtaCY6PAf20/wFg0MfTcFNTHgUKUeNG37+J/np4Xf3dhXmqGXDac76TfbV+RWv3LWNf7/JOtSyUbtoZKR1NzH0pLGxilaKkqdAJ7LxJiEnAEVxElU6OWt7hqLhSzEC/ICsQwcLxqf459Dho=
+	t=1708974255; cv=none; b=lFLt80FhiC2rdfz7J9cagMYlh/Eqv6HzEZMLeRTdtL3bZYmiVyzhlTXpO1qYUQ+JaWtCrVTX6y1cBgNzDUjIBGBoUj8C4gG8LtGlpES7en2rGpMomzxOeEvAepKdLO8KGADYrfC+yfJaCmJ2xjOovbUKhB+kfzq74QgQWmmbTcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708973965; c=relaxed/simple;
-	bh=qlAmNKHGR7vwy7bKxbfNjwMCIzUTjBUjhpOzPJgm7ts=;
+	s=arc-20240116; t=1708974255; c=relaxed/simple;
+	bh=JIqIxUB3Ayzkf/mD0blka6O8DKfFWgrE9WEYSScIHy4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gHvzVHVCcdlCHkW/aKuYwRCVroaiAtf/c6mK1l/oaRDC3Jp+Ib//zKWohHucLoLdfEgOKOo+n1rGTkIduskqlBy/xu4Do3YpPYqSsdLO7ljbpjMPf82V9+OtUKwm7wz3e/KbPuGVx4EGqHgoR/SEcXg4rlYS9mEIHd1hfsyLheA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=U/G3rUNl; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=QGUT/3moj2OhsxsxICwpbLQML/W18VFE18o89MKHXvw=; b=U/G3rUNlaV4fF493SyQmav3vC2
-	ARJZzTqt9VPnTCGOzK5BBRZUHEgyd4s2/64ilvkL3ArZJDIM2EbAdRZnbJpsyHiTF3ckTMXDI7KlA
-	bbHcwR5lcIcDC1MolngdfESjvbVkKsDtqNtNA2omCqE8KB70lYLZF9c6DxP9uWZZFtZI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1regCG-008kvg-CP; Mon, 26 Feb 2024 19:59:28 +0100
-Date: Mon, 26 Feb 2024 19:59:28 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Wei Fang <wei.fang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>
-Subject: Re: [PATCH net-next v6 5/8] net: phy: Immediately call adjust_link
- if only tx_lpi_enabled changes
-Message-ID: <fe071598-64eb-4dd2-8926-d4d0954e7e7e@lunn.ch>
-References: <20240223094425.691209-1-o.rempel@pengutronix.de>
- <20240223094425.691209-6-o.rempel@pengutronix.de>
- <Zdh1nMWZDynP/AMc@shell.armlinux.org.uk>
- <84e1368d-ec6a-48af-945b-509528c45dff@lunn.ch>
- <Zdic+ua5LnWxjLPn@shell.armlinux.org.uk>
- <6af3406a-7968-41e5-bf6e-71d020d8b28a@broadcom.com>
- <Zdot-Mqw1z4ZEo8v@pengutronix.de>
- <c6b0716d-f093-4aba-8453-c89a562ab581@lunn.ch>
- <e679f467-d4cd-4a1e-9bfc-92e2c9bf35d4@broadcom.com>
- <ZdzQG6t2slqEyH0m@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DTfRAS3+rHtTuMZjUIaOhiHSsMFpRR9pO5yRlwX0y7xfpgwsy4u1xekBGBCySvhwN8zZudY/E/V5WbWFM3W4ZWR0sVOjEhy2hcmQoIdI7wHHJBAcYtL6FZqd4A05pjvkYU4zRLx3RGcFym2wfYc2UPljohs/FhhxdVjFU7cl7MQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=B3XZR+6t; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1dc5d0162bcso29022255ad.0
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 11:04:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1708974253; x=1709579053; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=rqEaslcv+csbSpF6YQBGR7kuM3sWH8YoMpbM5vrlm2I=;
+        b=B3XZR+6tYaiLmvO0ormzojOJS7q2VNS3VFHyapT0mYeCoLK0DxsW42E/Fyoss/kqcp
+         mLiKMAOlbl9wyTCPu5nS79QgEgum9zDXpFi3SNMTipdU+yE37Q/xZySU6Z2PWb7019Hi
+         5m35Vb5iqfIONp2TiVTpVr5BtosabOcNFViMs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708974253; x=1709579053;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rqEaslcv+csbSpF6YQBGR7kuM3sWH8YoMpbM5vrlm2I=;
+        b=UwiRiNMiVJvem196t5GvdvdJpDfF/QsXaRs+N/8fw0JOoSOYLjP4Q33klUNoBeie4q
+         uQky27Q2pWkw8QuU8sno/xrAEXScjOFUZ2osumJEjSagODSartzHft0qJsdk8J1t2geU
+         9Ia3yipKJxSLLWz4HyItLjuq4Ya+7UGiBAekYwq/tzamNAARTkIitWGz+vWfYBImiIxw
+         FlwiCTY6ZUVKyDoFe5VUU0W667WpYvkl8f7E+03JazGOovUsVIPAY60G1bLWi6oyEYtz
+         KcBbbrsiyJX9fzsKmS4dFbYy2M0nlGd89RQ6r486WKfPByz9wsT/EEodKTUsT9sx8Zco
+         xpug==
+X-Forwarded-Encrypted: i=1; AJvYcCV/WXeMdiZN5E41IMqErNiqgIQ4xRDQQoWZKrO9Gx92GvwVN1NPmRvM3MdXk+utfk7Kx0PH583OQuqaHTydg0y/ji6xTReA
+X-Gm-Message-State: AOJu0YwCLuRkS20uWMP515L6N1oJAC3IvmqtqI5lxa4PJQsU8vY9HeIe
+	UUAt9yLSHoorrLimgoX4osfN0+6maOGvNVIeNY/SPKNqNxBSuznM2HzLJYUWEQ==
+X-Google-Smtp-Source: AGHT+IGFFetjjHPW/ivkyZlW9eIrIhfwZbvoWRltu7/bfVEDnv3KZmmFg2wZd+UfH3HTAx1gx80+dA==
+X-Received: by 2002:a17:902:d2cc:b0:1d9:7095:7e3c with SMTP id n12-20020a170902d2cc00b001d970957e3cmr8949703plc.57.1708974253283;
+        Mon, 26 Feb 2024 11:04:13 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id u6-20020a170902b28600b001d8aadaa7easm31822plr.96.2024.02.26.11.04.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Feb 2024 11:04:12 -0800 (PST)
+Date: Mon, 26 Feb 2024 11:04:12 -0800
+From: Kees Cook <keescook@chromium.org>
+To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
+Cc: Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	davem@davemloft.net,
+	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
+	Will Drewry <wad@chromium.org>, edumazet@google.com,
+	jakub@cloudflare.com, pabeni@redhat.com,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 2/2] selftests/harness: Merge TEST_F_FORK() into TEST_F()
+Message-ID: <202402261102.3BE03F08DF@keescook>
+References: <20240223160259.22c61d1e@kernel.org>
+ <20240226162335.3532920-1-mic@digikod.net>
+ <20240226162335.3532920-3-mic@digikod.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <ZdzQG6t2slqEyH0m@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240226162335.3532920-3-mic@digikod.net>
 
-On Mon, Feb 26, 2024 at 05:53:31PM +0000, Russell King (Oracle) wrote:
-> On Mon, Feb 26, 2024 at 09:50:02AM -0800, Florian Fainelli wrote:
-> > This is the source of the concern, we don't know which MAC drivers we might
-> > end-up breaking by calling adjust_link(link == 1) twice in a row, hopefully
-> > none, because they should be well written to only update the parameters that
-> > need updating, but who knows?
+On Mon, Feb 26, 2024 at 05:23:35PM +0100, Mickaël Salaün wrote:
+> Remplace Landlock-specific TEST_F_FORK() with an improved TEST_F() which
+> brings four related changes:
 > 
-> Just quickly... There are some (I went through a bunch.) They don't
-> support EEE. I haven't been through all though, so there could be
-> some which support EEE and where adjust_link() with phydev->link=true
-> twice in a row could result in badness.
+> Run TEST_F()'s tests in a grandchild process to make it possible to
+> drop privileges and delegate teardown to the parent.
+> 
+> Compared to TEST_F_FORK(), simplify handling of the test grandchild
+> process thanks to vfork(2), and makes it generic (e.g. no explicit
+> conversion between exit code and _metadata).
+> 
+> Compared to TEST_F_FORK(), run teardown even when tests failed with an
+> assert thanks to commit 63e6b2a42342 ("selftests/harness: Run TEARDOWN
+> for ASSERT failures").
+> 
+> Simplify the test harness code by removing the no_print and step fields
+> which are not used.  I added this feature just after I made
+> kselftest_harness.h more broadly available but this step counter
+> remained even though it wasn't needed after all. See commit 369130b63178
+> ("selftests: Enhance kselftest_harness.h to print which assert failed").
 
-So i think we all agree the MAC needs to see a down/up, even if the
-link itself never went down. Anything else is too risky and will
-probably break something somewhere.
+I'm personally fine dropping the step counter. (I do wonder if that
+removal should be split from the grandchild launching.)
 
-	 Andrew
+> Replace spaces with tabs in one line of __TEST_F_IMPL().
+> 
+> Cc: Günther Noack <gnoack@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Shuah Khan <shuah@kernel.org>
+> Cc: Will Drewry <wad@chromium.org>
+> Signed-off-by: Mickaël Salaün <mic@digikod.net>
 
+One typo below, but otherwise seems good to me:
+
+Reviewed-by: Kees Cook <keescook@chromium.org>
+
+
+> [...]
+>  			_metadata->setup_completed = true; \
+> -			fixture_name##_##test_name(_metadata, &self, variant->data); \
+> +			/* Use the same _metadata. */ \
+> +			child = vfork(); \
+> +			if (child == 0) { \
+> +				fixture_name##_##test_name(_metadata, &self, variant->data); \
+> +				_exit(0); \
+> +			} \
+> +			if (child < 0) { \
+> +				ksft_print_msg("ERROR SPAWNING TEST GANDCHILD\n"); \
+
+typo: GAND -> GRAND
+
+-- 
+Kees Cook
 
