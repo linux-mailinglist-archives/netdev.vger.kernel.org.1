@@ -1,92 +1,97 @@
-Return-Path: <netdev+bounces-74968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 696CA8679D7
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:16:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F9F18679DE
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:17:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F467290ABE
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:16:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5865029528D
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C707129A60;
-	Mon, 26 Feb 2024 15:07:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04FF712CD86;
+	Mon, 26 Feb 2024 15:10:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="j/wyto49"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="QpXUQycL"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D272C1BDD8;
-	Mon, 26 Feb 2024 15:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2040E12C815
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 15:10:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708960064; cv=none; b=Z0DXkngAZ3oeiMz5aCnCwV22eYt2GffFY5oT+oHi9dfRbyhGuT+SvrMm9FYGn/fAs+A+iYmomOcVZz79Yjsltp7x9/76A5Rq7aeG+zgxPAud9CXXPoKFrS9VO7P15MD4X29LodcSno+YmQD+LjsF8tkqUMbvSizyAkGSBeXlXVU=
+	t=1708960238; cv=none; b=mS2FyvlwF1ngyUGAQ2wxbHwV3mBa1dnsW3cjPGro/ZFrtujV407D080+kreCQNrUjbQLG6zXrZNy+6pH91AGAnAWGccGn+OcfIxWz9Vdr3H22+N977TYsV950YsjIMBZd2iR2mrKxdcMtW9eeUuiul/DkjQDsW4HoREnlw1FbIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708960064; c=relaxed/simple;
-	bh=M7isSVoISBnfAYmSdJfpU2svN/fglbkO/NWIZRmoyJA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O/j67CK91kzkg0bNCUWCTJC8ppwWN5SX2MawtodxOKNbxi0QmK2jTlLITFIEH6FSfYXdGEecE6Vmfx+w52nMG9jeaBXOugPBSGSmG+2/AvFkN/HCN5T3ZhSqNNDmvs/FrAscbFwiL+79c0DUDuOAdqqqFcICRCub7IpC3XSszog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=j/wyto49; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 9097A1BF214;
-	Mon, 26 Feb 2024 15:07:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1708960060;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KziltWlW/enUkzAKM/Tk7OteTNYodSmSK05UPd9lgds=;
-	b=j/wyto49AhT8qkVrQVcz4QBLfaAh7ivuygjixxSQbqcEDQ3/hsBDFvEtfwV14Pkudhpa64
-	Lk+yQk0uoIwvMfZ3otZ4Ta0h+eNBicOPlzjRqfQM1dm0vlpwd28nNZeY/qAMjWlc53pKxc
-	tAn1r1BaFqUUGW4K7fHLWcl/VxrdxDxA8xaDBGXKzamJ9vBcsiXOFpjIPDb4yPoLLijG3a
-	QsK4Y5j/Nd5ElZVPRh+1+3cBP+T865h8xvX/6ib9Aw9aPWx1d5fk+Nhfsbnd8+Bii+PFYE
-	4O43RE4JyrxNFain1pyQJaxXuxZFRY4Pd5i7H65cb6g9yD8H8ksSvfEltOTDag==
-Date: Mon, 26 Feb 2024 16:07:36 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
- <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Florian Fainelli
- <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Jonathan
- Corbet <corbet@lwn.net>
-Subject: Re: [PATCH net-next 2/2] doc: sfp-phylink: mention the
- mac_capabilities and supported_interfaces
-Message-ID: <20240226160736.5a10733f@device-28.home>
-In-Reply-To: <Zdx5v1UXDqsKsjW8@shell.armlinux.org.uk>
-References: <20240220160406.3363002-1-maxime.chevallier@bootlin.com>
-	<20240220160406.3363002-3-maxime.chevallier@bootlin.com>
-	<Zdx5v1UXDqsKsjW8@shell.armlinux.org.uk>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1708960238; c=relaxed/simple;
+	bh=/k++mZjGgkhII1OMgJiLiNh4PK+CSD9y2N9wOfsHXTk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=H3fjnLE3J5AVm3UCd4BM6h4c+jXEHtHP6MYXZn0tL52weJKCRWb5tz8oKHmefQn3388N9l4XNsD1z1t7Kzl3fF77DIfh3jMC6DMruXcBedICZ84fT7AGbY1+XW/qUymU0/fd+l42E8Fj5bWB51IgBhWIrtVa4YF13V/QLK3MKN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=QpXUQycL; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 0BD4A87F06;
+	Mon, 26 Feb 2024 16:10:28 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1708960228;
+	bh=Zfta2dajafM86iL+IHPIFZMeyflF+LU0hHE3imfpqzo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QpXUQycL2AEMm9OJv6WlQSFqRYVSLrt261M8pTZQCWb0Yx4KhAEjrq3O72zsiNgMp
+	 6ePauYACnjgkT2fU+CRDIPmqN76mSLb2Id97d3UW4I1cT4BPGwcIK2QT2oO51640WZ
+	 VXyTO0Ts/D4JkXoraW53FdL9rzQHS2TX0N1jRq7VX+slANH+Ckdhb9bXDlIhZKlcIS
+	 IooOeb1JEXsiez92zziYp5eND4XoGTy1hJXO2LkBcQQuNf2oCy2L5PAwLAzMNHgQy6
+	 kU0YFp0ntAjydpYLRFPJTuhowkfhbXE77wyIr9pKo3xHb7P3M8Ma6CCJkkTcDeTFOI
+	 aLTlsoatRttNw==
+From: Lukasz Majewski <lukma@denx.de>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Ziyang Xuan <william.xuanziyang@huawei.com>,
+	netdev@vger.kernel.org,
+	Lukasz Majewski <lukma@denx.de>
+Subject: [PATCH] net: hsr: Fix typo in the hsr_forward_do() function comment
+Date: Mon, 26 Feb 2024 16:09:54 +0100
+Message-Id: <20240226150954.3438229-1-lukma@denx.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Mon, 26 Feb 2024 11:45:03 +0000
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+Correct type in the hsr_forward_do() comment.
 
-> On Tue, Feb 20, 2024 at 05:04:04PM +0100, Maxime Chevallier wrote:
-> > +   Fill-in all the :c:type:`phy_interface_t <phy_interface_t>` (i.e. all MAC to
-> > +   PHY link modes) that your MAC can output. The following example shows a  
-> 
-> Technically, this should be "MAC and all PCS associated with this MAC".
-> 
+Signed-off-by: Lukasz Majewski <lukma@denx.de>
+---
+ net/hsr/hsr_forward.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Given that PCS should be covered in the doc, that's true :) I'll add
-that in V2.
+diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
+index 80cdc6f6b34c..2afe28712a7a 100644
+--- a/net/hsr/hsr_forward.c
++++ b/net/hsr/hsr_forward.c
+@@ -435,7 +435,7 @@ static void hsr_forward_do(struct hsr_frame_info *frame)
+ 			continue;
+ 
+ 		/* Don't send frame over port where it has been sent before.
+-		 * Also fro SAN, this shouldn't be done.
++		 * Also for SAN, this shouldn't be done.
+ 		 */
+ 		if (!frame->is_from_san &&
+ 		    hsr_register_frame_out(port, frame->node_src,
+-- 
+2.20.1
 
-Thanks,
-
-Maxime
 
