@@ -1,226 +1,174 @@
-Return-Path: <netdev+bounces-75043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95F40867E22
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 18:22:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC112867E5E
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 18:25:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B4D2293D16
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 17:22:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F2062907E5
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 17:25:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072E5130AD6;
-	Mon, 26 Feb 2024 17:19:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4951712C815;
+	Mon, 26 Feb 2024 17:24:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ua0qrjg+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MCoT1GLT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC33C12B166;
-	Mon, 26 Feb 2024 17:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2585412C7E6
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 17:24:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708967971; cv=none; b=dbfV3XJTlCnzHnc7igha6CZEDNvXat6oBKxIzk2frzcZE9N87GBXnkBL5WuYL71tzqQ4LPtjw+wmWyPi1kCwwrY1iRcWWTOy2zFYK+Eq+UH7022aoWUTt4if/lg+Vtc0hYtZrSPFD1GSReizWNwc0AGLZ2FAz0zc1KDEnU9HJtU=
+	t=1708968241; cv=none; b=PvHfc7k0Zr8HOGc58zIUr+E02VKfgqt47yNTOLO5jrIa6UAo19lc3SQFxwvxnp/Qq3PK6PcU7DIOYb9Z5ue0rocI7ZE9cMy5ULv5GYg6EstK4gyJ6NowkgmEetry9ILtXg3XPwG57orOyLpBgu+e1RhI9VsNnY8hXcRyn3wIYqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708967971; c=relaxed/simple;
-	bh=dSCOT5VowSSiF2b2NApXSB/9K003MpinyKVVYOsEMq8=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=dIrA8Hf3gbBJBM+UsiEIYTPqwezf3SM6q8C2S41/RdgtAzh6QzzMRrnIZksx4KmTgBBTqm4tcQnckO9yPNNz0vnGiZdbuvumljuMrjqewFQ98dXiLBxNzKMEYZLcM5jRCG0664Hy7Ie7y2/kH8ktis6zQd7QFhdaEp2oNQQYgIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ua0qrjg+; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708967970; x=1740503970;
-  h=message-id:date:mime-version:to:cc:references:from:
-   subject:in-reply-to:content-transfer-encoding;
-  bh=dSCOT5VowSSiF2b2NApXSB/9K003MpinyKVVYOsEMq8=;
-  b=Ua0qrjg+Q9qi2rb3PAY5C8K0GZjHoWk6k4o+laeT9fyRPnqPz5qRbfz9
-   6KD37sd60HhTMFZHXi61/fuH2P994BrAMaPh67HWnYIxJpKyRuPXzelZd
-   NFpznx2ymcoFmz8m7xgpcSazkKt4wJlEnyZLEYs/sMVqhxO+aR9/i9T8e
-   5JH2fGB4pNsmCaVaRAAxBEayME+3/BuQp1jm8LqoVW3QyQu/ZxyqEKFiz
-   EY+DwXs/546z58oOnzUFVxGgtcgVITKM72tkNcppPTdQpE4XdNSUo8AT/
-   PD6YPCte87je6A2OGyYV0pPYLFdxDEbyBq6/mAxOxkrwp7Vu9CnRyMINt
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="20714036"
-X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
-   d="scan'208";a="20714036"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 09:19:30 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10996"; a="937030284"
-X-IronPort-AV: E=Sophos;i="6.06,186,1705392000"; 
-   d="scan'208";a="937030284"
-Received: from mattu-haswell.fi.intel.com (HELO [10.237.72.199]) ([10.237.72.199])
-  by fmsmga001.fm.intel.com with ESMTP; 26 Feb 2024 09:19:26 -0800
-Message-ID: <785ddb6f-dca2-466d-c4bb-a6723a51e3e8@linux.intel.com>
-Date: Mon, 26 Feb 2024 19:21:06 +0200
+	s=arc-20240116; t=1708968241; c=relaxed/simple;
+	bh=Q+g9Mnr4g2BXFm8vbAR/k8t6/yZcCrZP7p1rjLSCFq0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YCjYTIbl4ynAjTEdrCDi3CcbVEFyg727CyV32LnVonMymcvlQUCZIuVeTNpfIu6QMavHwPEl206BEdKa9fAzFoGDWfR6c3Ox8epocY7dwuZA1YlP0wrg3V5HJXAOuG2OIp/rUbOKt2P7iq0NRfPs807GZ5RpDg9q6EFmpFm3T5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MCoT1GLT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7BD7C433C7;
+	Mon, 26 Feb 2024 17:23:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708968240;
+	bh=Q+g9Mnr4g2BXFm8vbAR/k8t6/yZcCrZP7p1rjLSCFq0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MCoT1GLTnNoZ1LYWhy8MqjJR6RL3g/Fn6+rULK2379F5tpfXz0NwUyts57TBhMNZt
+	 Z2y3lLdrjXjFLKdkXwUhyiC0VqfWcGngKMJFWW94Ca1HVjyXosLHpKasn+CZpdlYSz
+	 FZlfFbFomuSjslccY4R2ft1VlFugroDkWVq2oDC9hq7bV4pu3lNyrlO66tuKZu182I
+	 NJWzMz0IZr8q3iF481ap5afqb5tz1lv3b9xsEsegh66q38fKPCViRBQMEirR9z1wo+
+	 F65yy6Px6/BW8AmctId7wLO2k2v3kyHdK0+XjWxpERenICIFh9L3Jua+Mjatai4O76
+	 wy5CC+q+xLJng==
+Message-ID: <5337e08b-a4dd-46d0-bc2e-a30b82aeeb15@kernel.org>
+Date: Mon, 26 Feb 2024 19:23:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.13.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 04/10] net: ti: icssg-prueth: Add
+ SR1.0-specific configuration bits
 Content-Language: en-US
-To: Heikki Krogerus <heikki.krogerus@linux.intel.com>,
- Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Greg KH <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
- Mike Jones <mike@mjones.io>
-References: <14c16bf9-bcdf-4e6b-ac36-f995f5f088a1@molgen.mpg.de>
- <ZdxVTBkym5ovV8ss@kuha.fi.intel.com>
-From: Mathias Nyman <mathias.nyman@linux.intel.com>
-Subject: Re: xhci_hcd: `Timeout while waiting for setup device command`, 37 s
- until Ethernet connection is established
-In-Reply-To: <ZdxVTBkym5ovV8ss@kuha.fi.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Diogo Ivo <diogo.ivo@siemens.com>, danishanwar@ti.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew@lunn.ch, linux-arm-kernel@lists.infradead.org,
+ netdev@vger.kernel.org
+Cc: jan.kiszka@siemens.com
+References: <20240221152421.112324-1-diogo.ivo@siemens.com>
+ <20240221152421.112324-5-diogo.ivo@siemens.com>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20240221152421.112324-5-diogo.ivo@siemens.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 26.2.2024 11.09, Heikki Krogerus wrote:
-> +Mathias
+Hi Diogo,
+
+On 21/02/2024 17:24, Diogo Ivo wrote:
+> Define the firmware configuration structure and commands needed to
+> communicate with SR1.0 firmware, as well as SR1.0 buffer information
+> where it differs from SR2.0.
 > 
-> On Sat, Feb 24, 2024 at 08:45:43PM +0100, Paul Menzel wrote:
->> Dear Linux folks,
->>
->>
->> I suspended a Dell XPS 13 9360 with no devices attached into ACPI S3. Then
->> connecting an LMP USB-C mini Dock (P/N 15954) [1] with an Ethernet cable
->> attached to the left USB-C port and resumed the system from ACPI S3. It took
->> 37 seconds, until the link was established.
->>
->> ```
->> [    0.000000] Linux version 6.8.0-rc5+
+> Based on the work of Roger Quadros, Murali Karicheri and
+> Grygorii Strashko in TI's 5.10 SDK [1].
+> 
+> [1]: https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tree/?h=ti-linux-5.10.y
+> 
+> Co-developed-by: Jan Kiszka <jan.kiszka@siemens.com>
+> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
+> ---
+> Changes in v2:
+>  - Removed explicit references to SR2.0
+> 
+>  drivers/net/ethernet/ti/icssg/icssg_config.h | 56 ++++++++++++++++++++
+>  1 file changed, 56 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.h b/drivers/net/ethernet/ti/icssg/icssg_config.h
+> index 43eb0922172a..cb465b3f5355 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_config.h
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.h
+> @@ -35,6 +35,23 @@ struct icssg_flow_cfg {
+>  	(2 * (PRUETH_EMAC_BUF_POOL_SIZE * PRUETH_NUM_BUF_POOLS + \
+>  	 PRUETH_EMAC_RX_CTX_BUF_SIZE * 2))
+>  
+> +/* SR1.0 defines */
+> +#define PRUETH_MAX_RX_FLOWS_SR1		4	/* excluding default flow */
+> +#define PRUETH_RX_FLOW_DATA_SR1		3       /* highest priority flow */
+> +#define PRUETH_MAX_RX_MGM_DESC		8
+> +#define PRUETH_MAX_RX_MGM_FLOWS		2	/* excluding default flow */
+> +#define PRUETH_RX_MGM_FLOW_RESPONSE	0
+> +#define PRUETH_RX_MGM_FLOW_TIMESTAMP	1
 
-...
+Should we add suffix _SR1 to all SR1 specific macro names?
 
->> [135636.985555] hub 4-1.1:1.0: hub_suspend
->> [135636.985997] usb 4-1.1: usb auto-suspend, wakeup 1
->> [135637.005910] usb 4-1.1: usb auto-resume
->> [135637.071744] usb 4-1.1: Waited 0ms for CONNECT
->> [135637.071751] usb 4-1.1: finish resume
->> [135637.072442] hub 4-1.1:1.0: hub_resume
->> [135637.100903] usb 4-1.1-port3: link state change
->> [135637.101072] usb 4-1.1-port3: do warm reset, port only
->> [135637.160024] usb 4-1.1-port3: not warm reset yet, waiting 50ms
->> [135642.359752] xhci_hcd 0000:39:00.0: Timeout while waiting for setup
->> device command
->> [135642.359904] usb 4-1.1: kworker/1:0 timed out on ep0in len=0/4
->> [135642.360403] usb 4-1.1-port3: not warm reset yet, waiting 200ms
->> [135642.567550] usb 4-1.4: device not accepting address 4, error -62
->> [135642.567787] usb 4-1.1-port3: not warm reset yet, waiting 200ms
->> [135642.587834] usb 3-1.1-port3: not reset yet, waiting 10ms
->> [135642.608022] usb 3-1.1-port3: not reset yet, waiting 10ms
->> [135642.627960] usb 3-1.1-port3: not reset yet, waiting 200ms
->> [135642.779575] usb 4-1.1-port3: not warm reset yet, waiting 200ms
->> [135642.836010] usb 3-1.1-port3: not reset yet, waiting 200ms
->> [135642.987924] usb 4-1.1-port3: not warm reset yet, waiting 200ms
->> [135642.989649] usb 4-1.1-port3: not enabled, trying warm reset again...
->> [135643.044090] usb 3-1.1-port3: not reset yet, waiting 200ms
->> [135643.253218] usb 3-1.1-port3: not reset yet, waiting 200ms
->> [135643.254188] hub 3-1.1:1.0: state 7 ports 4 chg 0000 evt 0008
->> [135643.254573] usb 3-1.1-port3: status 0100, change 0001, 12 Mb/s
->> [135643.254782] usb 3-1.1-port3: indicator auto status 0
->> [135643.255501] hub 4-1.1:1.0: state 7 ports 4 chg 0000 evt 0008
->> [135643.256309] usb 4-1.1-port3: status 0203, change 0001, 5.0 Gb/s
->> [135643.272060] usb 4-1-port4: not reset yet, waiting 10ms
->> [135643.292703] usb 4-1-port4: not reset yet, waiting 10ms
->> [135643.311459] usb 4-1-port4: not reset yet, waiting 200ms
->> [135643.395529] usb 3-1.1-port3: debounce total 100ms stable 100ms status
->> 0x100
->> [135643.395546] hub 3-1.1:1.0: hub_suspend
->> [135643.395900] usb 3-1.1: usb auto-suspend, wakeup 1
->> [135643.399598] usb 4-1.1-port3: debounce total 100ms stable 100ms status
->> 0x203
->> [135648.759590] xhci_hcd 0000:39:00.0: Timeout while waiting for setup
->> device command
->> [135654.135471] xhci_hcd 0000:39:00.0: Timeout while waiting for setup
->> device command
->> [135654.343365] usb 4-1.4: device not accepting address 5, error -62
->> [135654.343741] usb 4-1-port4: attempt power cycle
->> [135654.423462] usb 4-1.1.3: new SuperSpeed USB device number 6 using
->> xhci_hcd
->> [135654.443569] usb 4-1.1.3: USB quirks for this device: 400
->> [135654.443996] usb 4-1.1.3: skipped 1 descriptor after endpoint
->> [135654.444015] usb 4-1.1.3: skipped 1 descriptor after endpoint
->> [135654.444026] usb 4-1.1.3: skipped 1 descriptor after endpoint
->> [135654.444146] usb 4-1.1.3: skipped 3 descriptors after interface
->> [135654.444157] usb 4-1.1.3: skipped 1 descriptor after endpoint
->> [135654.444166] usb 4-1.1.3: skipped 1 descriptor after endpoint
->> [135654.444174] usb 4-1.1.3: skipped 1 descriptor after endpoint
->> [135654.444231] usb 4-1.1.3: default language 0x0409
->> [135654.444459] usb 4-1.1.3: udev 6, busnum 4, minor = 389
->> [135654.444472] usb 4-1.1.3: New USB device found, idVendor=0bda,
->> idProduct=8153, bcdDevice=30.00
->> [135654.444485] usb 4-1.1.3: New USB device strings: Mfr=1, Product=2,
->> SerialNumber=6
->> [135654.444495] usb 4-1.1.3: Product: USB 10/100/1000 LAN
->> [135654.444503] usb 4-1.1.3: Manufacturer: Realtek
->> [135654.444510] usb 4-1.1.3: SerialNumber: 000001
->> [135654.444978] r8152-cfgselector 4-1.1.3: usb_probe_device
->> [135654.447545] r8152-cfgselector 4-1.1.3: adding 4-1.1.3:1.0 (config #1,
->> interface 0)
->> [135654.447741] r8152 4-1.1.3:1.0: usb_probe_interface
->> [135654.447753] r8152 4-1.1.3:1.0: usb_probe_interface - got id
->> [135654.527864] r8152-cfgselector 4-1.1.3: reset SuperSpeed USB device
->> number 6 using xhci_hcd
->> [135654.547443] r8152-cfgselector 4-1.1.3: USB quirks for this device: 400
->> [135654.570025] r8152 4-1.1.3:1.0: load rtl8153a-4 v2 02/07/20 successfully
->> [135654.601390] r8152 4-1.1.3:1.0 eth0: v1.12.13
->> [135654.602115] hub 4-1.1:1.0: state 7 ports 4 chg 0000 evt 0008
->> [135660.535346] xhci_hcd 0000:39:00.0: Timeout while waiting for setup
->> device command
->> [135665.911069] xhci_hcd 0000:39:00.0: Timeout while waiting for setup
->> device command
->> [135666.118792] usb 4-1.4: device not accepting address 7, error -62
->> [135666.138995] usb 4-1-port4: not reset yet, waiting 10ms
->> [135666.158967] usb 4-1-port4: not reset yet, waiting 10ms
->> [135666.178919] usb 4-1-port4: not reset yet, waiting 200ms
->> [135666.387360] usb 4-1-port4: not reset yet, waiting 200ms
->> [135666.595345] usb 4-1-port4: not reset yet, waiting 200ms
->> [135666.803419] usb 4-1-port4: not reset yet, waiting 200ms
->> [135666.804994] hub 4-1:1.0: state 7 ports 4 chg 0000 evt 0010
->> [135666.861597] r8152 4-1.1.3:1.0 enx00e04ceabb21: renamed from eth0
->> [135666.922339] r8152 4-1.1.3:1.0 enx00e04ceabb21: carrier on
+> +
+> +#define PRUETH_NUM_BUF_POOLS_SR1		16
+> +#define PRUETH_EMAC_BUF_POOL_START_SR1		8
+> +#define PRUETH_EMAC_BUF_POOL_MIN_SIZE_SR1	128
+> +#define PRUETH_EMAC_BUF_SIZE_SR1		1536
+> +#define PRUETH_EMAC_NUM_BUF_SR1			4
+> +#define PRUETH_EMAC_BUF_POOL_SIZE_SR1	(PRUETH_EMAC_NUM_BUF_SR1 * \
+> +					 PRUETH_EMAC_BUF_SIZE_SR1)
+> +#define MSMC_RAM_SIZE_SR1	(SZ_64K + SZ_32K + SZ_2K) /* 0x1880 x 8 x 2 */
+> +
+>  struct icssg_rxq_ctx {
+>  	__le32 start[3];
+>  	__le32 end;
+> @@ -104,6 +121,45 @@ enum icssg_port_state_cmd {
+>  #define ICSSG_NUM_NORMAL_PDS	64
+>  #define ICSSG_NUM_SPECIAL_PDS	16
+>  
+> +struct icssg_sr1_config {
+> +	__le32 status;		/* Firmware status */
+> +	__le32 addr_lo;		/* MSMC Buffer pool base address low. */
+> +	__le32 addr_hi;		/* MSMC Buffer pool base address high. Must be 0 */
+> +	__le32 tx_buf_sz[16];	/* Array of buffer pool sizes */
+> +	__le32 num_tx_threads;	/* Number of active egress threads, 1 to 4 */
+> +	__le32 tx_rate_lim_en;	/* Bitmask: Egress rate limit en per thread */
+> +	__le32 rx_flow_id;	/* RX flow id for first rx ring */
+> +	__le32 rx_mgr_flow_id;	/* RX flow id for the first management ring */
+> +	__le32 flags;		/* TBD */
+> +	__le32 n_burst;		/* for debug */
+> +	__le32 rtu_status;	/* RTU status */
+> +	__le32 info;		/* reserved */
+> +	__le32 reserve;
+> +	__le32 rand_seed;	/* Used for the random number generation at fw */
+> +} __packed;
+> +
+> +/* SR1.0 shutdown command to stop processing at firmware.
+> + * Command format: 0x8101ss00, where
+> + *	- ss: sequence number. Currently not used by driver.
+> + */
+> +#define ICSSG_SHUTDOWN_CMD		0x81010000
+> +
+> +/* SR1.0 pstate speed/duplex command to set speed and duplex settings
+> + * in firmware.
+> + * Command format: 0x8102ssPN, where
+> + *	- ss: sequence number. Currently not used by driver.
+> + *	- P: port number (for switch mode).
+> + *	- N: Speed/Duplex state:
+> + *		0x0 - 10Mbps/Half duplex;
+> + *		0x8 - 10Mbps/Full duplex;
+> + *		0x2 - 100Mbps/Half duplex;
+> + *		0xa - 100Mbps/Full duplex;
+> + *		0xc - 1Gbps/Full duplex;
+> + *		NOTE: The above are the same value as bits [3..1](slice 0)
+> + *		      or bits [7..5](slice 1) of RGMII CFG register.
+> + */
+> +#define ICSSG_PSTATE_SPEED_DUPLEX_CMD	0x81020000
+> +
 
-...
+How about bunching all S1.0 related changes at one place in this file?
 
->> The last part continues until unplugging device, but this might be a
->> separate issue, as the Ethernet connection was functional.
->>
->> So from
->>
->>      [135654.601390] r8152 4-1.1.3:1.0 eth0: v1.12.13
->>
->> to
->>
->>      [135666.861597] r8152 4-1.1.3:1.0 enx00e04ceabb21: renamed from eth0
->>
->> it took 12 seconds.
->>
->> Is that a problem with the laptop or the adapter? And can it be fixed
->> somehow?
+>  #define ICSSG_NORMAL_PD_SIZE	8
+>  #define ICSSG_SPECIAL_PD_SIZE	20
+>  
 
-Your dock has a couple usb hubs, the network adapter is behind the second one.
-
-Looks like several of the usb devices have issues enumerating, hub enumerates one
-device at a time so enumeration issue on a hub will block enumerating other
-devices on that same hub.
-
-In addition to other devices failing it looks like this network adapter
-behind 4-1.1-port3 takes a long time to reset as well.
-
-Are there any other usb devices connected to this hub that can be removed?
-Does that improve the situation?
-
-Does dock work normally if its connected to a fully running system, (S0)
-
-Also, those extra hub_suspend and hub_resume entries looks suspicious
-
-Thanks
-Mathias
-
+-- 
+cheers,
+-roger
 
