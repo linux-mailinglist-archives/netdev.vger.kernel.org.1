@@ -1,97 +1,164 @@
-Return-Path: <netdev+bounces-74969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F9F18679DE
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:17:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB6878679E1
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:17:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5865029528D
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:17:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17E7E1C2B34F
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:17:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04FF712CD86;
-	Mon, 26 Feb 2024 15:10:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37599130ADB;
+	Mon, 26 Feb 2024 15:10:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="QpXUQycL"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="QNaYGvka";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="MBsTalFN";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="QNaYGvka";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="MBsTalFN"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2040E12C815
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 15:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62DB6130AD7;
+	Mon, 26 Feb 2024 15:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708960238; cv=none; b=mS2FyvlwF1ngyUGAQ2wxbHwV3mBa1dnsW3cjPGro/ZFrtujV407D080+kreCQNrUjbQLG6zXrZNy+6pH91AGAnAWGccGn+OcfIxWz9Vdr3H22+N977TYsV950YsjIMBZd2iR2mrKxdcMtW9eeUuiul/DkjQDsW4HoREnlw1FbIE=
+	t=1708960252; cv=none; b=tuTagVdbHtl3q1yvEqDeu7dLr3SpIYb5W8dETHdN5D5uX13qKAp9MafVxWK5SGw4u5XiE0xycBAEBeH5lqM+Mpo/P0eMvonYOdiAOWWaIiNqvOPu/w5W8P9EJQHIGIk/XZu+Dq8dAXARwelULwDj+5Z3g7OhfRQPgiPGVe+Y/Ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708960238; c=relaxed/simple;
-	bh=/k++mZjGgkhII1OMgJiLiNh4PK+CSD9y2N9wOfsHXTk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=H3fjnLE3J5AVm3UCd4BM6h4c+jXEHtHP6MYXZn0tL52weJKCRWb5tz8oKHmefQn3388N9l4XNsD1z1t7Kzl3fF77DIfh3jMC6DMruXcBedICZ84fT7AGbY1+XW/qUymU0/fd+l42E8Fj5bWB51IgBhWIrtVa4YF13V/QLK3MKN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=QpXUQycL; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	s=arc-20240116; t=1708960252; c=relaxed/simple;
+	bh=xn/pH+vPtBtele+UeKPThfWaFBEQ5GmIN19lX7//sGo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pBQU2yHpYRSHG9jMtS7ca9GIXVsvS69r7nxwImXEK5sYOaRyfpAt58rEegniyPIJoWg9evoJdXEtXK+vSGmG1klXi8/abvNpBXXF6lIUrFdglt/YL7/NVkAOwCEukGx1S31Lskuh1FoiJhSQem9Cewhjg+CpyU1D3uVMnPlQ3DA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=QNaYGvka; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=MBsTalFN; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=QNaYGvka; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=MBsTalFN; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from lion.mk-sys.cz (unknown [10.100.225.114])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 0BD4A87F06;
-	Mon, 26 Feb 2024 16:10:28 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1708960228;
-	bh=Zfta2dajafM86iL+IHPIFZMeyflF+LU0hHE3imfpqzo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=QpXUQycL2AEMm9OJv6WlQSFqRYVSLrt261M8pTZQCWb0Yx4KhAEjrq3O72zsiNgMp
-	 6ePauYACnjgkT2fU+CRDIPmqN76mSLb2Id97d3UW4I1cT4BPGwcIK2QT2oO51640WZ
-	 VXyTO0Ts/D4JkXoraW53FdL9rzQHS2TX0N1jRq7VX+slANH+Ckdhb9bXDlIhZKlcIS
-	 IooOeb1JEXsiez92zziYp5eND4XoGTy1hJXO2LkBcQQuNf2oCy2L5PAwLAzMNHgQy6
-	 kU0YFp0ntAjydpYLRFPJTuhowkfhbXE77wyIr9pKo3xHb7P3M8Ma6CCJkkTcDeTFOI
-	 aLTlsoatRttNw==
-From: Lukasz Majewski <lukma@denx.de>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 74DBD225BD;
+	Mon, 26 Feb 2024 15:10:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1708960248; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xn/pH+vPtBtele+UeKPThfWaFBEQ5GmIN19lX7//sGo=;
+	b=QNaYGvka84rY7kBmWN/fZ+2Asnbtis4MDIzfJn5B8kWUzItQ72eHvTyMsxr3wB5FwJ6DwK
+	m6JvF6FqAiMY7jEY/UUFsdRah4+3YI5xUMcJqpV6RGCs4achuEidUJuqNSf86NHRWNAJ+N
+	yjKNXP0C6ITi3aPIMl6Lo78utYgoOkc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1708960248;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xn/pH+vPtBtele+UeKPThfWaFBEQ5GmIN19lX7//sGo=;
+	b=MBsTalFNrWDr4rg2OQ6C2R5zQEBx56oWvq12h98aEV/A5NWE0/U1DhOpKxX6s7kp0dTirO
+	tKqdAc5kUkFq6gCg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1708960248; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xn/pH+vPtBtele+UeKPThfWaFBEQ5GmIN19lX7//sGo=;
+	b=QNaYGvka84rY7kBmWN/fZ+2Asnbtis4MDIzfJn5B8kWUzItQ72eHvTyMsxr3wB5FwJ6DwK
+	m6JvF6FqAiMY7jEY/UUFsdRah4+3YI5xUMcJqpV6RGCs4achuEidUJuqNSf86NHRWNAJ+N
+	yjKNXP0C6ITi3aPIMl6Lo78utYgoOkc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1708960248;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xn/pH+vPtBtele+UeKPThfWaFBEQ5GmIN19lX7//sGo=;
+	b=MBsTalFNrWDr4rg2OQ6C2R5zQEBx56oWvq12h98aEV/A5NWE0/U1DhOpKxX6s7kp0dTirO
+	tKqdAc5kUkFq6gCg==
+Received: by lion.mk-sys.cz (Postfix, from userid 1000)
+	id 61D0D20147; Mon, 26 Feb 2024 16:10:48 +0100 (CET)
+Date: Mon, 26 Feb 2024 16:10:48 +0100
+From: Michal Kubecek <mkubecek@suse.cz>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kernel@vger.kernel.org, Lennart Franzen <lennart@lfdomain.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Ziyang Xuan <william.xuanziyang@huawei.com>,
-	netdev@vger.kernel.org,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [PATCH] net: hsr: Fix typo in the hsr_forward_do() function comment
-Date: Mon, 26 Feb 2024 16:09:54 +0100
-Message-Id: <20240226150954.3438229-1-lukma@denx.de>
-X-Mailer: git-send-email 2.39.2
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Nuno Sa <nuno.sa@analog.com>
+Subject: Re: [PATCH] net: ethernet: adi: move PHYLIB from vendor to driver
+ symbol
+Message-ID: <20240226151048.avr3qaxdxwactoxn@lion.mk-sys.cz>
+References: <20240226074820.29250-1-rdunlap@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="owllcezk7bkfsbh6"
+Content-Disposition: inline
+In-Reply-To: <20240226074820.29250-1-rdunlap@infradead.org>
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spamd-Result: default: False [-2.20 / 50.00];
+	 ARC_NA(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 RCPT_COUNT_SEVEN(0.00)[9];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email];
+	 SIGNED_PGP(-2.00)[];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 RCVD_COUNT_ZERO(0.00)[0];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+,1:+,2:~];
+	 BAYES_HAM(-0.00)[43.59%]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -2.20
 
-Correct type in the hsr_forward_do() comment.
 
-Signed-off-by: Lukasz Majewski <lukma@denx.de>
----
- net/hsr/hsr_forward.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+--owllcezk7bkfsbh6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
-index 80cdc6f6b34c..2afe28712a7a 100644
---- a/net/hsr/hsr_forward.c
-+++ b/net/hsr/hsr_forward.c
-@@ -435,7 +435,7 @@ static void hsr_forward_do(struct hsr_frame_info *frame)
- 			continue;
- 
- 		/* Don't send frame over port where it has been sent before.
--		 * Also fro SAN, this shouldn't be done.
-+		 * Also for SAN, this shouldn't be done.
- 		 */
- 		if (!frame->is_from_san &&
- 		    hsr_register_frame_out(port, frame->node_src,
--- 
-2.20.1
+On Sun, Feb 25, 2024 at 11:48:20PM -0800, Randy Dunlap wrote:
+> In a previous patch I added "select PHYLIB" at the wrong place for the
+> ADIN1110 driver symbol, so move it to its correct place under the
+> ADIN1110 kconfig symbol.
+>=20
+> Fixes: a9f80df4f514 ("net: ethernet: adi: requires PHYLIB support")
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Reported-by: Michal Kubecek <mkubecek@suse.cz>
+> Closes: https://lore.kernel.org/lkml/77012b38-4b49-47f4-9a88-d773d52909ad=
+@infradead.org/T/#m8ba397484738711edc0ad607b2c63ca02244e3c3
+> Cc: Lennart Franzen <lennart@lfdomain.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: netdev@vger.kernel.org
+> Cc: Nuno Sa <nuno.sa@analog.com>
 
+Thank you for the quick update, now the dependencies work as expected.
+
+Tested-by: Michal Kubecek <mkubecek@suse.cz>
+
+--owllcezk7bkfsbh6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmXcqfMACgkQ538sG/LR
+dpUgpAf/Vi0RzVEjPg5VK1CXIo1F4djgYRitLryRYpAd08//OsnLFxPy0y/kG1CE
+9YGxN4RsR91bgEKQ1+e6ViM2FT98XoHSuvcjFLNwNg2r9RSsTY7GrME42Y6qle5h
+lDD2myLgMPRH3Q6yjbNp5NAz4T6Jh5bu7dVLWm5VbWx1mV5YRD3sGDgNvgJQ3hzp
+j2w2xj3XecBo9jXNvNyycMR6gtV5OUdl8wMkCguzYTUcJSHf1zI5ZmN8zXnLcMwT
+SioQj+13pAIcfh9ZkPqNUJmWM4/1rUQ2n+3HO2sr+LutAFoRDmP4gmCtLz5W87bb
+UTJGlP2hO1dC7ka0zZvHaZRleTk+8g==
+=feKe
+-----END PGP SIGNATURE-----
+
+--owllcezk7bkfsbh6--
 
