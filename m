@@ -1,116 +1,129 @@
-Return-Path: <netdev+bounces-74992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2132B867BAF
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 17:22:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3423B867ABD
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:51:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3B09B24CE7
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:50:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C79CF1F2B0DF
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:51:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B06112B153;
-	Mon, 26 Feb 2024 15:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F0AF12BEBA;
+	Mon, 26 Feb 2024 15:51:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="P1/DIoeU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hnijSpEY"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4183F1BDDC;
-	Mon, 26 Feb 2024 15:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B621112AAD8
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 15:51:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708962653; cv=none; b=oAlp0juLQtIkbFr5GGzypKLvIDgtJDko73V8g+Y20Bkj68K3yv8pQFNL6DnkC8CexhP09DQk/NfHarfa0wtL9vlsvCU0KrVnoqqXoPZl2p9j5Pdk+buKmJL5BDHwZuaF+y+/nEClMKhfPGy56p1X971kzoWNOJcVvIbsVxB65Sc=
+	t=1708962667; cv=none; b=HhfafMOtu2p1PRZc4JKcWG/N/x5bzKQuqwLdZTy7JrvCa7TTpWBLWTqRQoT7Qa5O4puFua/W8rzuAKDf/MrrQePmQdZAOel6vIJ5rP7luHIDqrtM9rdw6NrZixmlqmY3GhTYBzUHWBimhrxRP1gkwIEtziFLL1m7zJJfJfokVgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708962653; c=relaxed/simple;
-	bh=hePlh93u4XXUHR1BI8WwV3QAM8EGXP2vvnNe4R5gcAA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tSJFN9om/WTbXRxDTo68SWSrzQCNXA/M0XEQh/JCwshiE62h8xOSblMxhrodo0Xst2RYbCzU1knDuD67XMJIeOKo0pv8jA2jzsgoR2YYYT+W+iy3kr6Lf7fpy88RNafvlqYrkjloqBBm6/qo46SK+APgcszuvLB/mVFBbYOeWoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=P1/DIoeU; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=VTknhU/j0S+TFKgathhuAGd6GVWPtOPefADa7SFok1o=; b=P1/DIoeUAxIuhX8rToX6Jm818m
-	2Il57xrk8I2BUehcQQpqbUdvwRdfXRlnjDEU+TmhD98V4ST5G+lrb2pcSnIDB5yD/qqEWh0ukF1d2
-	trRol/o7ha7Y68IdXCwZMfQCdb/vqnAsVC+QWyCea2hV6jVoKKMs5DMdE9Lf9Bxm/D6X0Az9RxoLq
-	wvS6CvK46gJdRGf92M3T4e6BCxMW11BjIM9/fvr9nrWI4/aVfZg/K2ISM2jeB6jUmA9y6JAky4gQ9
-	4BUHm3JidYRr5fJenhPFRO6mQ1aSJ6BmkoqEUCmzzme+5hkPh1FXkS6bveTcfSYOIGJjS6TYcUOMx
-	tWlozHbw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33124)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1redFZ-00045f-2G;
-	Mon, 26 Feb 2024 15:50:41 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1redFY-0006YJ-FF; Mon, 26 Feb 2024 15:50:40 +0000
-Date: Mon, 26 Feb 2024 15:50:40 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Shengyu Qu <wiagn233@outlook.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v1] net: sfp: add quirks for ODI DFP-34X-2C2
-Message-ID: <ZdyzUMQ+MmQ7E7sX@shell.armlinux.org.uk>
-References: <TY3P286MB2611C0FA24318AA397DB689B985A2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
- <ZdyahVYAhPgf2Xqn@shell.armlinux.org.uk>
- <TY3P286MB2611BD62C30B37A5BE02D3C5985A2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
- <ZdyiigYNGf8WVZNu@shell.armlinux.org.uk>
- <TY3P286MB261155090B2D07593901C0DE985A2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
- <b8fdb5df-57e4-491a-b310-e8e13a89d331@lunn.ch>
- <TY3P286MB2611578CBBB25D48FA5452A7985A2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
+	s=arc-20240116; t=1708962667; c=relaxed/simple;
+	bh=WWgnZ/T/uz36k/bisotJuU+H6/Y1uGUsXWr5Hznhebk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=i4c8Tf0FiHKUxK09iqDC3yaCA5EJ4iUqkXXKFtPVHnTgJ91CNamyuNG7pHHAgtECf9r16MteMXr2D1JzJgrPGtTOLvsyBEJ7B0E7NHFhNuOXz2GJ6k5SuIsq8+VKhGH8Gv6QV3xEuUgoQEr0bXPBBssfwUuFqqiAIb/nmqust4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hnijSpEY; arc=none smtp.client-ip=209.85.160.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-42e3fa7e328so39821581cf.1
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 07:51:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708962664; x=1709567464; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=23nnpLadNZyuqDQ7rfqLMhqNpA9sR3M/DBIB5GmZiiQ=;
+        b=hnijSpEYksEnchr+YaJb8s/6fv1anKMmeftwy34Ai0BNPgmkZArK7Zh2DcudajEPQN
+         bx1ZMko0sx/Tu7MV5DDFfmrW1cjcQ+22v5giuwRtbp/IlI5MxgD+7O397smpqUYPM1hs
+         pEh18ZKGnT8zkTlf+0d/svPAKg+2rNDbBm9Kgw9gNiUX1fILruglpXgZHWEDSW9v6bwZ
+         ZROyQZ3fM8I4PYtSmMqssAeLVnoSWC0si+4crug+E9oPMaBLUN1n3P5P4FRd4uPhwD/3
+         fM7pkE2oN8VyRbSdY8++EULjMJ9RF+arwF9GT/elB3P+o3HyoW4JRIjghZkWWiOQ5bcP
+         i8Hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708962664; x=1709567464;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=23nnpLadNZyuqDQ7rfqLMhqNpA9sR3M/DBIB5GmZiiQ=;
+        b=IosBqzyytGCz1+diopaTxMLK0RW0I99jYBGJjrpKwtr86e1aae6hiQ0+2BO2CmGs9s
+         cMgyfVMauj2sbXOpJ0A5xiTEzh3fSKbJ9TYBCXn7LrcpCcw1WHqNYcban1qGHhCSA1YQ
+         d8O4lwcdw4hj97sROJtPozaK7U3mxuyUC5jF/BEXa4+r46zM4vftQ3Wh9PhBwPLmfzac
+         wl40pn1DHXwFECJlJXL3vWflKtkqiNfVVmrF9sK8YA3g0AjCYKQZkZFAKWv59Z7isM0c
+         zTrWruIegOPVoOA7K1qB7NB0jG1B567ytSGbndLkrJA5gDH0YeCluEK1HXuPaUaS78Y5
+         kmgA==
+X-Forwarded-Encrypted: i=1; AJvYcCUMhswVtcjyYnYHFTHZpeBw//JdrrRD9CkuiqdlpcStePFrEiOdjGzv5T8BkSGKMqxWVO2n66kEnPx/a4F+fMdE1f7a3DYf
+X-Gm-Message-State: AOJu0YxifRgyE21T7+w4NMbl1XBSuZDRg/lxPVrDYjFnvK3ga+b7THVn
+	b6cxyaE2ev/+g/5YbSivvmP3p5YLPDuKMXzaki8nJS7m1TsPHkBUr4AxqiHhZvnNOfhSVDVAiX4
+	WpUKWP5rpqQ==
+X-Google-Smtp-Source: AGHT+IHJoM4mt8QpPzZuzDTe81Z9wVKFhAxXxAOelPhqUm7f8L3Dt++JhFEnT1QPe1Wxua+D+hMIlxqA9Ywpbw==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:ac8:5c84:0:b0:42e:68d3:177f with SMTP id
+ r4-20020ac85c84000000b0042e68d3177fmr28774qta.0.1708962664687; Mon, 26 Feb
+ 2024 07:51:04 -0800 (PST)
+Date: Mon, 26 Feb 2024 15:50:42 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <TY3P286MB2611578CBBB25D48FA5452A7985A2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
+Message-ID: <20240226155055.1141336-1-edumazet@google.com>
+Subject: [PATCH net-next 00/13] ipv6: lockless accesses to devconf
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Feb 26, 2024 at 11:20:47PM +0800, Shengyu Qu wrote:
-> Hi Andrew,
-> 
-> When telnet connected to the stick(It's using busybox), "cat /proc/kmsg"
-> would report something like "<4>change mode to 0", that 0 is the actual
-> speed rate codename it changes to. You could check this [1] for more
-> information.
-> 
-> Sorry but I can't record my kmsg output now, since enable connection to
-> my stick would make the network to disconnect for all users and my
-> roommates are using it.
-> 
-> Best regards,
-> Shengyu
-> 
-> [1] https://github.com/Anime4000/RTL960x/blob/main/Docs/FLASH_GETSET_INFO.md#lan_sds_mode
+- First patch puts in a cacheline_group the fields used in fast paths.
 
-I'm aware of that link, and sadly the information in that table can at
-best be described as "confused".
+- Annotate all data races around idev->cnf fields.
 
-For example, under "Behaviour" it mentions "1GbaseT/100baseT". How
-exactly does a SFP module exhibit baseT behaviour (which is twisted
-pair copper ethernet.) Hint: it can't and it doesn't. "Mode" being
-listed as "TP" is also misleading and wrong. The ethtool value of
-0x20 is bit 5, which is 1000baseT_Full which has nothing to do with
-a SFP (and won't be reported as even a supported mode for this SFP.)
-Bit 41 would make sense (1000baseX), which is listed against mode 1.
+- Last patch in this series removes RTNL use for RTM_GETNETCONF dumps.
 
-I'm afraid looking at that URL just adds to more confusion.
+Eric Dumazet (13):
+  ipv6: add ipv6_devconf_read_txrx cacheline_group
+  ipv6: annotate data-races around cnf.disable_ipv6
+  ipv6: annotate data-races around cnf.mtu6
+  ipv6: annotate data-races around cnf.hop_limit
+  ipv6: annotate data-races around cnf.forwarding
+  ipv6: annotate data-races in ndisc_router_discovery()
+  ipv6: annotate data-races around idev->cnf.ignore_routes_with_linkdown
+  ipv6: annotate data-races in rt6_probe()
+  ipv6: annotate data-races around devconf->proxy_ndp
+  ipv6: annotate data-races around devconf->disable_policy
+  ipv6/addrconf: annotate data-races around devconf fields (I)
+  ipv6/addrconf: annotate data-races around devconf fields (II)
+  ipv6: use xa_array iterator to implement inet6_netconf_dump_devconf()
 
+ .../ethernet/netronome/nfp/flower/action.c    |   2 +-
+ drivers/net/usb/cdc_mbim.c                    |   2 +-
+ include/linux/ipv6.h                          |  13 +-
+ include/net/addrconf.h                        |   2 +-
+ include/net/ip6_route.h                       |   2 +-
+ include/net/ipv6.h                            |   8 +-
+ net/core/filter.c                             |   2 +-
+ net/ipv6/addrconf.c                           | 258 +++++++++---------
+ net/ipv6/exthdrs.c                            |  16 +-
+ net/ipv6/ioam6.c                              |   8 +-
+ net/ipv6/ip6_input.c                          |   6 +-
+ net/ipv6/ip6_output.c                         |  10 +-
+ net/ipv6/ipv6_sockglue.c                      |   2 +-
+ net/ipv6/mcast.c                              |  14 +-
+ net/ipv6/ndisc.c                              |  69 ++---
+ net/ipv6/netfilter/nf_reject_ipv6.c           |   4 +-
+ net/ipv6/output_core.c                        |   4 +-
+ net/ipv6/route.c                              |  20 +-
+ net/ipv6/seg6_hmac.c                          |   8 +-
+ net/netfilter/nf_synproxy_core.c              |   2 +-
+ 20 files changed, 234 insertions(+), 218 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.44.0.rc1.240.g4c46232300-goog
+
 
