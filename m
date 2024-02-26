@@ -1,82 +1,71 @@
-Return-Path: <netdev+bounces-74976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 737B68679F2
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:19:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11138867A09
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:21:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DE0229F24A
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:19:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF4152A2C12
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:21:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C3212F363;
-	Mon, 26 Feb 2024 15:13:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEB4112BF3C;
+	Mon, 26 Feb 2024 15:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="YgBszIjO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OD8PNejY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0818C12AADA;
-	Mon, 26 Feb 2024 15:13:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FE412B152;
+	Mon, 26 Feb 2024 15:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708960419; cv=none; b=alVkQHtglMC0cR6I6/i2883X8+8z9ncR5CZSjQDnAHhfbYEZXqkfRDYAPWGkYHy2Bet+ntzViV9eePofxtDARoJHdtO1VOFNcdqOy8Ggt2AQq14fWWm1YgH6hovrePQgoYAZxh0NI1cpe6KAB7TV9L28Lui2NkNMQQkcTJFvaN8=
+	t=1708960687; cv=none; b=iJ/rzMKCvrNWv92S3Bqu4sD6emy6vmPSDEg/NOyrmfWzdoPonoO267AJoN/EXsQcNlNvzl9Wty+HtAALfcIKLu4Lv38f7lRFEGLSbUV/6FiZhezu3dNILJRRTiavxyiIWJ+gqFg106PIo7ZWQsetKfasEnbiJXDbxx4kuN5584k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708960419; c=relaxed/simple;
-	bh=3K5Q+uUQ3Nix87plZgBtdiamDN+V1OA8pvKevYiMOh4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ah9Vo893EWt7XteM1YVKv6DfZRev3sgjlJf8JADECa8kpfa7xEPezHto095QLA7I+J0OuWR8ngaFyjS5HPWIHie5P4ceiLWtVlnmFUIz4Rg15BWuwOBnjZveoyMApGqhTOOhS5S0exvxthmU949M0eV2IDThxnvOpAor7zm7ifI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=YgBszIjO; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=4mImZSK+nWI+wjJkO50Cew7O8xH1ti6eRINL7vztxBQ=; b=YgBszIjOtxEkvEuhbgEs4yvRCG
-	Gm/4GxjQWuJaJlSNYXgVNfw105v6/O6/9zgLdptu9tAnh4LyaiD3maMNYiVj7VHCfALlQ4bQ+ato/
-	1a0Bcq/a32TcCEm/yTc5G4hnqLjZpSZUwVzfiqKvU+rmntO5jOYx8AnMIH/cpueGqRD8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1recfh-008jbJ-RK; Mon, 26 Feb 2024 16:13:37 +0100
-Date: Mon, 26 Feb 2024 16:13:37 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: forbidden405@outlook.com
-Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v5 2/7] dt-bindings: net:
- hisilicon,hisi-femac-mdio: remove clocks
-Message-ID: <e566de39-dd54-494c-8a13-78250467e923@lunn.ch>
-References: <20240223-net-v5-0-43b22d39c013@outlook.com>
- <20240223-net-v5-2-43b22d39c013@outlook.com>
+	s=arc-20240116; t=1708960687; c=relaxed/simple;
+	bh=Q6aRQ+aaABdlMpDT5MgMtUKAnI1gEdR6x5KojLN1wG0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GdUBujP/TPxIS6aAZ9k23vav3YtwPXymm03SeOGD2+019L4gZv9g2MxLVdxTfr3/N1g3/BRo3BLKAmyt7aJ4wfvGtLfDQU1BI2CtapXr8t3nB1mrP+x1dtiylqOFha/FPd/lyOOGhj6hKHc+gGeLmSlsthYMgXF90Skujhp/4fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OD8PNejY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0377C433F1;
+	Mon, 26 Feb 2024 15:18:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708960687;
+	bh=Q6aRQ+aaABdlMpDT5MgMtUKAnI1gEdR6x5KojLN1wG0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OD8PNejYyA4HHbUAtLwWZpBacHHTvMF2Y07L0/7WLadXNWxp4+2g2g5H29K+rZJ1k
+	 /SymkBz9NeCboJfPizIIfOb4bRfAjD/A3Aq13AuSo6BoNP7N6Pd98Gp1vIr97Qk3qb
+	 Q0R08uPewqbnImlXNRnkj07RCaYH8mtSEp4VTn0uNpGhBQZN42KWSX27+9qgGushpv
+	 JkR8GUUKkXvD7Z3c+2nbp8rxxzEltzfIo/uMQlNst+xpOQ7nXcC/U2EvvP/U+q1f5j
+	 I/yDb42zRygMAckiAq0Ts4UymCATUUsn1COSM5H0+J9LI9xzAyL93nB6xHIYy/v2h0
+	 8Tp0rv3YX+yeA==
+Date: Mon, 26 Feb 2024 07:18:06 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, fw@strlen.de
+Subject: Re: [PATCH net] netlink: validate length of NLA_{BE16,BE32} types
+Message-ID: <20240226071806.50c45890@kernel.org>
+In-Reply-To: <20240225225845.45555-1-pablo@netfilter.org>
+References: <20240225225845.45555-1-pablo@netfilter.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240223-net-v5-2-43b22d39c013@outlook.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 23, 2024 at 09:28:17PM +0800, Yang Xiwen via B4 Relay wrote:
-> From: Yang Xiwen <forbidden405@outlook.com>
-> 
-> This integrated MDIO bus does have a dedicated clock. Remove it. The old
+On Sun, 25 Feb 2024 23:58:45 +0100 Pablo Neira Ayuso wrote:
+> Fixes: ecaf75ffd5f5 ("netlink: introduce bigendian integer types")
+> Reported-by: syzbot+3f497b07aa3baf2fb4d0@syzkaller.appspotmail.com
+> Reported-by: xingwei lee <xrivendell7@gmail.com>
 
-I think you are missing a 'not' in that sentence.
-
-  Andrew
+Florian already fixes it, commit 9a0d18853c28 ("netlink: add nla be16/32
+types to minlen array") in net.
+-- 
+pw-bot: nap
 
