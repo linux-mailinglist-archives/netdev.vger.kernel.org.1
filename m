@@ -1,163 +1,142 @@
-Return-Path: <netdev+bounces-74821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 787F1866A46
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 07:49:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49CAF866A4B
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 07:50:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFBE01F21CF9
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 06:49:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BB421C21E10
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 06:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2007218E2A;
-	Mon, 26 Feb 2024 06:49:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988D51B299;
+	Mon, 26 Feb 2024 06:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LvZNwcMT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 766FC1BDCE
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 06:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89731BF28;
+	Mon, 26 Feb 2024 06:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708930158; cv=none; b=XEEX1MMy4mMhwud9asnmIj8Hrzt9Zs/WPAAqUfiE3IWNLt+PQwSc4Z8Dw9rnCoBHqdTGDvCVNYhR2FFq7szdCQXChXhEUMCKq2DNcQBFoi4538AhNy/oHkkyj1axdWL1E8UENPN5rPOl0Uw6Eg3PVuwyZxFel3vDfU0aQqRklrI=
+	t=1708930216; cv=none; b=gTDetIgeIMZy7f0Bnqq2uVh9k16F69/7jYN6lbEGXaIgGxV7U5JpD/TxXtiUDAZo2ofqWafmTJKrmSKDBIylPHGXSC1gSbuTGrs0x3eMQcodkPnYGE2JMkJkab3YG3eU2vr4K3MQxHbE43KiAmNSJHYTOCFi9qChZXZ2by/8y9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708930158; c=relaxed/simple;
-	bh=skqVvvgaswYH/WEaOwX9w475uwS/p84Gka6Zk3K+GN8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dcUU1Oy/fbSpK50lswwBoYlalGxHAfaw2xYoN4D56sy9epoafvTF9cIL0azuSdvV9mo/yj3DPdALYuyPtZa9mc9A6CSdNnuxZC+LKg3ra6T7WIvwdrz1ztBTkZ/XSxKsAeDPmEzi0OLanOYwjNbfCYhW9mrThH3WHIA25LV20Xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7c7a733ce70so179962739f.3
-        for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 22:49:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708930155; x=1709534955;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MiwReltw5l/9lgFXelRMQJoGyzLPKT+OcNcrGA3d1ls=;
-        b=Wvc1XQfo+95/KbzJBB0BlUjI/WcawieDmgz3O+5IuoVTlhh2tAnFTi5ENJttc5d1/R
-         H8p3nj9THyKlTYxO3THc4JZnZJBhmI6Ow0vOzl2cawTjJFxkF4W3GsRStN3pA0rPps4P
-         2m7lstELkJkubk9R6SN5HEEfSiAqynpnnZ1pez4cm5ORuyO3KZD1eUwhGXWWMeA4BqWd
-         ZvKfgc5Axd74twOTFhpd9Nu7867XxgXM+b31Toyc4m3Te7A59ueVTyBJ2jZMwuUKNE1o
-         RAC6cJJ5aeeySl9D4PHdUdeDaZ+G0VlKXSd1Nzr7BmFLjFdWt7Pgj0o00+tAtXAllc/z
-         +22A==
-X-Forwarded-Encrypted: i=1; AJvYcCWGBrVn8F9h9Qig3PQxSVj3c4zZ12aiSf24uruu2GyLmQu5znrGAmLqXrEuYqOKO9NzKtL8j5R28TqiQW2IZJwfLIBTzjCk
-X-Gm-Message-State: AOJu0Yyt3efLcdnPJ/dh+DVJJ+eAupS3EHdM/W9X92NOsVqmFw9Shinv
-	JsMGUcbyyxibxAsaetYI3rIe2uyeMCNcSK724ya8KEkYjITQupB1ShtkioN+W+pTOH4oS2Sp4Ys
-	IyBZYBPMG/aZhDBNMWrX/kuqvtSY2vLpfduK7uaTueZd825cSCJMcPFs=
-X-Google-Smtp-Source: AGHT+IHtNvAlMcbT0OKeWgo2OEqBQ8gNaZFbz+QtW2/TAnVfx6wWYxq/kZKND5fNwECz+V/kxSF+e0PVg89UHGOn93RL+a8vRnvl
+	s=arc-20240116; t=1708930216; c=relaxed/simple;
+	bh=6oiheK8jXhJu3jEbbcTC7KYrEfi4/V3nGQUHfUKvfCs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KT0zWV9G/rv2OWMOHjnXBdVQ7BtodQsphtt7bK7TKUS0cwsdw8rb3TGMwPgJYZs+UXAQEMQSbwETnie+oiZtyMbgv9iDzJQUCmr8Qx99Gsa7kcRxZsR19LzDGaV+eLM0gh70bLM5kpGe2pixU3fu6c08oKMp51anVXwQ5kYv7ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LvZNwcMT; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=1kc2WcM3zb+rxch8r0ftfqGh2C9F2iUAZFnheJ+68jk=; b=LvZNwcMTQzKVcHpiPtles1wWKs
+	Z8S57J8xGJj9KeJiehkQqflREG3srrXKYZBNOA0dV2EJFCPMAJ1rFJBEa/CEdi0X+fnCe2ZA4JRbV
+	mQnSRTg9j3JRdWMjav4ma7k/6tWO5jbAAC328Vhu0A75WTKJHNLrKcmt3aMna+nk7txDYddBtaraG
+	ziEzsPkadrVJkYjRV4AjxmhO2UmMhDC2YoJcq9yosU9j7mdbvrmM2m5p2kA+9XYVW0311XBsNKdJn
+	RIPLCFgiGLDOke7cDXJhh6tL0kCoaLD+NTKtkSkiL9J6xgTTjUxMzon2WSRx3sDRakOd6MvgBHE/w
+	Ezro9YTQ==;
+Received: from [50.53.50.0] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1reUoV-0000000GhjS-1wzZ;
+	Mon, 26 Feb 2024 06:50:11 +0000
+Message-ID: <77012b38-4b49-47f4-9a88-d773d52909ad@infradead.org>
+Date: Sun, 25 Feb 2024 22:50:10 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:12c8:b0:363:b9d6:1261 with SMTP id
- i8-20020a056e0212c800b00363b9d61261mr348596ilm.0.1708930155728; Sun, 25 Feb
- 2024 22:49:15 -0800 (PST)
-Date: Sun, 25 Feb 2024 22:49:15 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e0d7ac0612434e59@google.com>
-Subject: [syzbot] [wireless?] WARNING in drv_unassign_vif_chanctx
-From: syzbot <syzbot+1c8a495af056338d5c19@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: ethernet: adi: requires PHYLIB support
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
+ Lennart Franzen <lennart@lfdomain.com>,
+ Alexandru Tachici <alexandru.tachici@analog.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <20240215070050.2389-1-rdunlap@infradead.org>
+ <20240226064440.ismpxvp5qmnskyna@lion.mk-sys.cz>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20240226064440.ismpxvp5qmnskyna@lion.mk-sys.cz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+Hi,
 
-syzbot found the following issue on:
+On 2/25/24 22:44, Michal Kubecek wrote:
+> On Wed, Feb 14, 2024 at 11:00:50PM -0800, Randy Dunlap wrote:
+>> This driver uses functions that are supplied by the Kconfig symbol
+>> PHYLIB, so select it to ensure that they are built as needed.
+>>
+>> When CONFIG_ADIN1110=y and CONFIG_PHYLIB=m, there are multiple build
+>> (linker) errors that are resolved by this Kconfig change:
+>>
+>>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_net_open':
+>>    drivers/net/ethernet/adi/adin1110.c:933: undefined reference to `phy_start'
+>>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_probe_netdevs':
+>>    drivers/net/ethernet/adi/adin1110.c:1603: undefined reference to `get_phy_device'
+>>    ld: drivers/net/ethernet/adi/adin1110.c:1609: undefined reference to `phy_connect'
+>>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_disconnect_phy':
+>>    drivers/net/ethernet/adi/adin1110.c:1226: undefined reference to `phy_disconnect'
+>>    ld: drivers/net/ethernet/adi/adin1110.o: in function `devm_mdiobus_alloc':
+>>    include/linux/phy.h:455: undefined reference to `devm_mdiobus_alloc_size'
+>>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_register_mdiobus':
+>>    drivers/net/ethernet/adi/adin1110.c:529: undefined reference to `__devm_mdiobus_register'
+>>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_net_stop':
+>>    drivers/net/ethernet/adi/adin1110.c:958: undefined reference to `phy_stop'
+>>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_disconnect_phy':
+>>    drivers/net/ethernet/adi/adin1110.c:1226: undefined reference to `phy_disconnect'
+>>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_adjust_link':
+>>    drivers/net/ethernet/adi/adin1110.c:1077: undefined reference to `phy_print_status'
+>>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_ioctl':
+>>    drivers/net/ethernet/adi/adin1110.c:790: undefined reference to `phy_do_ioctl'
+>>    ld: drivers/net/ethernet/adi/adin1110.o:(.rodata+0xf60): undefined reference to `phy_ethtool_get_link_ksettings'
+>>    ld: drivers/net/ethernet/adi/adin1110.o:(.rodata+0xf68): undefined reference to `phy_ethtool_set_link_ksettings'
+>>
+>> Fixes: bc93e19d088b ("net: ethernet: adi: Add ADIN1110 support")
+>> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+>> Reported-by: kernel test robot <lkp@intel.com>
+>> Closes: https://lore.kernel.org/oe-kbuild-all/202402070626.eZsfVHG5-lkp@intel.com/
+>> Cc: Lennart Franzen <lennart@lfdomain.com>
+>> Cc: Alexandru Tachici <alexandru.tachici@analog.com>
+>> Cc: "David S. Miller" <davem@davemloft.net>
+>> Cc: Eric Dumazet <edumazet@google.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: Paolo Abeni <pabeni@redhat.com>
+>> Cc: netdev@vger.kernel.org
+>> ---
+>>  drivers/net/ethernet/adi/Kconfig |    1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff -- a/drivers/net/ethernet/adi/Kconfig b/drivers/net/ethernet/adi/Kconfig
+>> --- a/drivers/net/ethernet/adi/Kconfig
+>> +++ b/drivers/net/ethernet/adi/Kconfig
+>> @@ -7,6 +7,7 @@ config NET_VENDOR_ADI
+>>  	bool "Analog Devices devices"
+>>  	default y
+>>  	depends on SPI
+>> +	select PHYLIB
+>>  	help
+>>  	  If you have a network (Ethernet) card belonging to this class, say Y.
+> 
+> Shouldn't the "select PHYLIB" be added to ADIN1110 rather than
+> NET_VENDOR_ADI? Now with v6.8-rc6, PHYLIB and few other options are
+> forced to "Y" whenever NET_VENDOR_ADI is enabled (even with ADIN1110
+> disabled).
 
-HEAD commit:    2a770cdc4382 tun: Fix xdp_rxq_info's queue_index when deta..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=14aec3aa180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=eff9f3183d0a20dd
-dashboard link: https://syzkaller.appspot.com/bug?extid=1c8a495af056338d5c19
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+ugh, I believe that you are correct.
+I'll send a corrected patch.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/54ceb0944449/disk-2a770cdc.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/69b79e7b7a86/vmlinux-2a770cdc.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/dedbc599c2f7/bzImage-2a770cdc.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1c8a495af056338d5c19@syzkaller.appspotmail.com
-
-WARNING: CPU: 1 PID: 14618 at net/mac80211/driver-ops.c:343 drv_unassign_vif_chanctx+0x477/0x6c0 net/mac80211/driver-ops.c:343
-Modules linked in:
-CPU: 1 PID: 14618 Comm: syz-executor.1 Not tainted 6.8.0-rc5-syzkaller-00129-g2a770cdc4382 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-RIP: 0010:drv_unassign_vif_chanctx+0x477/0x6c0 net/mac80211/driver-ops.c:343
-Code: e9 48 b8 00 00 00 00 00 fc ff df 0f b6 04 03 84 c0 0f 85 08 01 00 00 41 8b 16 48 c7 c7 40 27 bb 8c 48 89 ee e8 8a 18 83 f6 90 <0f> 0b 90 90 e9 db fc ff ff 48 c7 c1 0c 9a 85 8f 80 e1 07 80 c1 03
-RSP: 0018:ffffc90018017130 EFLAGS: 00010246
-RAX: c575d6a35704e800 RBX: 1ffff11005a0b29a RCX: 0000000000040000
-RDX: ffffc9000b9f4000 RSI: 000000000001c717 RDI: 000000000001c718
-RBP: ffff88802d058128 R08: ffffffff81577ab2 R09: 1ffff110172a51a2
-R10: dffffc0000000000 R11: ffffed10172a51a3 R12: ffff88802d05a740
-R13: ffff88802d058c80 R14: ffff88802d0594d0 R15: ffff88802e178e20
-FS:  00007f013e91c6c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000c01c04b000 CR3: 000000008cbc6000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ieee80211_assign_link_chanctx+0x16d/0x8b0 net/mac80211/chan.c:878
- __ieee80211_link_release_channel+0x306/0x460 net/mac80211/chan.c:1801
- ieee80211_teardown_sdata net/mac80211/iface.c:810 [inline]
- ieee80211_if_change_type+0x222/0xad0 net/mac80211/iface.c:1897
- ieee80211_change_iface+0xd2/0x4f0 net/mac80211/cfg.c:219
- rdev_change_virtual_intf net/wireless/rdev-ops.h:74 [inline]
- cfg80211_change_iface+0x75e/0xed0 net/wireless/util.c:1209
- nl80211_set_interface+0x592/0x810 net/wireless/nl80211.c:4229
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1113 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
- genl_rcv_msg+0xad6/0xe50 net/netlink/genetlink.c:1208
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2543
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
- netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
- netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1367
- netlink_sendmsg+0xa3b/0xd70 net/netlink/af_netlink.c:1908
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:745
- ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
- ___sys_sendmsg net/socket.c:2638 [inline]
- __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
- do_syscall_64+0xf9/0x240
- entry_SYSCALL_64_after_hwframe+0x6f/0x77
-RIP: 0033:0x7f013dc7dda9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f013e91c0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f013ddac050 RCX: 00007f013dc7dda9
-RDX: 0000000000000000 RSI: 0000000020000100 RDI: 0000000000000008
-RBP: 00007f013dcca47a R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000006e R14: 00007f013ddac050 R15: 00007ffc6b796908
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Thanks.
+-- 
+#Randy
 
