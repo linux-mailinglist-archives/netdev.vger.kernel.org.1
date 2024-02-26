@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-74900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CADD8673FC
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:56:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BC90867396
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:41:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D34AB22DC3
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:41:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C7B41C21698
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2AFE2C198;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B843B25774;
 	Mon, 26 Feb 2024 11:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B/xjhlNX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IciREwrv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9192557F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF8224219;
 	Mon, 26 Feb 2024 11:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708947632; cv=none; b=NSCykPwrKPd/SG2wdYNlg1KGJSCspR/jLJQAcF6dQ1+yqgRxVkazUT4qofOHJk/W0U53UxhjIdBOnU1mv2yq4PLd6YeX7aUT1jHeJip33I1pQoYq3JpGSN4kCM/lqxLhBwUlESAzj+5JFrUeOaMnT0tUwYoA/BDrD4eA/6QOm/4=
+	t=1708947632; cv=none; b=ld8f6Bvhp0pU1XhYK7gzBEhzzCPaq8qdKAsRHSRYSlOX3ABM6PK+yryzgugPUpy8Wk3LGvZndkFBgCx6GqMIal8TrxRx/cNkK08AwVCTZoz+W8p/OL3v19X09mppouBOJRgvacMKTi95mdohuQDHpVJvTr+8Rj3FCgkVnFxfCGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708947632; c=relaxed/simple;
-	bh=zmYoQSAAJBlRXeHR52mQWL2C4tPRmHijjrJ32Dly2QY=;
+	bh=AGMvW8EzegrzngxDywguUoFCHmieih2v3vNs74/+sig=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bbdDrvZ42h9RqVAFaIWlxXZyBGmzWtVfU2FndwbBAmxaFW9zL0TcaQeVzPr25MCFP5X7dTRUgr2UJIM6cUCENIWHx6MD5lJLJytBtUHLlnzDRWj7MizaBEDtV+OE95wWAiZywVvBaai0c0ZWIOmhlsoqLqtp0CnC+WZSgt/9TfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B/xjhlNX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F467C433C7;
+	 In-Reply-To:To:Cc; b=DMdC6a66w/Xfyinb1RJZBej1ojcaOCZpEyIhC+bcwJVYzPj8i7li6TX9QTJhB1i8as0T8e/0XeOfQgJ2WOmuf2D4XkK0UOv+kKdfdbR8GXP5KF730T62kaqiNMutQ0pdNCeiWwgOiJK89eiUGTUYICVYlwgAQo71xKaW2O0zel8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IciREwrv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 198F2C43390;
 	Mon, 26 Feb 2024 11:40:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708947632;
-	bh=zmYoQSAAJBlRXeHR52mQWL2C4tPRmHijjrJ32Dly2QY=;
+	bh=AGMvW8EzegrzngxDywguUoFCHmieih2v3vNs74/+sig=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=B/xjhlNXIhha2w1LNFsnfpTcA5bdHhn+bf1G09Ob30Tfm/xuz27SAGxBQF8ObdqBp
-	 jSwl7s2EWhghB5lNuUFZ1pH5WvmUgVB5fryTdmBId4oV+22tGI+GmlYIJyP6Gad4PA
-	 2WZ9q3JZFHQu/4eq1buDkCXJ8lx+/yDJMrwPwtcGOGkLSkeIZjYqBrnb1VMM4E472h
-	 48v/ReFBnzDUPCTmJJMpjAxq/q9MpMznAYLDgM5ll3l/OqQcWtwYFJThN5/kRDC2kL
-	 15IBNvmSpiuwBpLqjTg7Nf0dMckAgIJOFf5HRDz6sn+8XqhH4PK5CHjx81wMO/hGVu
-	 mHzNDzhmguFmA==
+	b=IciREwrvQsqlzZpOHwerFS7IMRIVdUuF8hT/60pVNBTe5UJzfIAhOJKep8i3kNq8a
+	 9YsaAyZI29ql9+uAqLYJUYETMKOQ+epr78TphVNb/jWax8v4u6AaEdsxrhfktmO8VY
+	 HwDYc5aaI4xuQYQk9O1MoASw/24x9gXJRv85Gkynv9WwdhWXvIwGpk+MkD6izUDA8N
+	 d5W1LSKQcdozx7PFxDqkQlPaowzsZjrWN0HheCQt0Z4cFNIBkNrJIY/0wPgI1LXPl7
+	 pb8SCY9h1M5rwr+ORTlgCrag09eFeBnRwx1PuD3MFIMeQMLyrH5gM4zWHjnzh3UpXS
+	 9GamgmH8h/U7w==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 10550D88FB6;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 04DEDD88FB0;
 	Mon, 26 Feb 2024 11:40:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,39 +52,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 1/1] net: dsa: microchip: Add support for bridge
- port isolation
+Subject: Re: [PATCH net-next 0/3] Add support for TI DP83826 configuration
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170894763206.4235.9816052153130545658.git-patchwork-notify@kernel.org>
+ <170894763201.4235.16287009126578340303.git-patchwork-notify@kernel.org>
 Date: Mon, 26 Feb 2024 11:40:32 +0000
-References: <20240222075113.2564540-1-o.rempel@pengutronix.de>
-In-Reply-To: <20240222075113.2564540-1-o.rempel@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: davem@davemloft.net, andrew@lunn.ch, edumazet@google.com,
- f.fainelli@gmail.com, kuba@kernel.org, pabeni@redhat.com, olteanv@gmail.com,
- woojung.huh@microchip.com, arun.ramadoss@microchip.com,
- kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- UNGLinuxDriver@microchip.com
+References: <20240222103117.526955-1-jeremie.dautheribes@bootlin.com>
+In-Reply-To: <20240222103117.526955-1-jeremie.dautheribes@bootlin.com>
+To: =?utf-8?q?J=C3=A9r=C3=A9mie_Dautheribes_=3Cjeremie=2Edautheribes=40bootlin?=@codeaurora.org,
+	=?utf-8?q?=2Ecom=3E?=@codeaurora.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, afd@ti.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, miquel.raynal@bootlin.com,
+ yen-mei.goh@keysight.com, maxime.chevallier@bootlin.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 22 Feb 2024 08:51:13 +0100 you wrote:
-> Implement bridge port isolation for KSZ switches. Enabling the isolation
-> of switch ports from each other while maintaining connectivity with the
-> CPU and other forwarding ports. For instance, to isolate swp1 and swp2
-> from each other, use the following commands:
-> - bridge link set dev swp1 isolated on
-> - bridge link set dev swp2 isolated on
+On Thu, 22 Feb 2024 11:31:14 +0100 you wrote:
+> Hi everyone,
+> 
+> This short patch series introduces the possibility of overriding
+> some parameters which are latched by default by hardware straps on the
+> TI DP83826 PHY.
+> 
+> The settings that can be overridden include:
+>   - Configuring the PHY in either MII mode or RMII mode.
+>   - When in RMII mode, configuring the PHY in RMII slave mode or RMII
+>   master mode.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,1/1] net: dsa: microchip: Add support for bridge port isolation
-    https://git.kernel.org/netdev/net-next/c/a7f08029e2e8
+  - [net-next,1/3] dt-bindings: net: dp83822: support configuring RMII master/slave mode
+    https://git.kernel.org/netdev/net-next/c/95f4fa1f459a
+  - [net-next,2/3] net: phy: dp83826: Add support for phy-mode configuration
+    https://git.kernel.org/netdev/net-next/c/d2ed0774b633
+  - [net-next,3/3] net: phy: dp83826: support configuring RMII master/slave operation mode
+    https://git.kernel.org/netdev/net-next/c/2844a0d7cffe
 
 You are awesome, thank you!
 -- 
