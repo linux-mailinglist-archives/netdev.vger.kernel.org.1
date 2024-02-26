@@ -1,104 +1,137 @@
-Return-Path: <netdev+bounces-74847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06769866EA1
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:35:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3822F866EBB
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:38:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF46C1F25F4D
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 09:35:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC48B1F2609B
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 09:38:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09411612D8;
-	Mon, 26 Feb 2024 08:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3967E6BB30;
+	Mon, 26 Feb 2024 08:59:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="E/d9E7GQ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JuIsGb/T"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF2931F61C
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 08:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E26C2033F;
+	Mon, 26 Feb 2024 08:59:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708937741; cv=none; b=mRHSniiyQuZ0as1K8xr0y/EZ/gulo32JvR9cp+xhRDU1FdZliLCR4v6PqEPvDMKIa4urGVtZvZn0/ECUjqnNp5Z3v7/8yv+t+Q963/zVRNLSPX3YpqbJA3nh4zmAIyMtAGHc1ZDj5A//CF4+kkRpByCZjqa0qzsYOw+z2IDf+pA=
+	t=1708937974; cv=none; b=Fkf37ZtUfxczDa5jSPIxRs7W9HkzQAJkulk4OEnh/HnfzXwN8xMBkuUv9EjQdJ+F2DdYDGXSXYAlkgvdL79b8SO1zmAK1GsmSvm11lFEYp7jyJlQuU7mVsggEePAqlTrZeFmZNnZ04HEGn8C+C98C0fz222anYD2fVFcmifKwXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708937741; c=relaxed/simple;
-	bh=mQhdhs0eG99ugKitt0T802I/y8woUyUpvbpMhZE5pY4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j8yVRSHpDYhpalDlrHv0U0hp9qnlnnO2sc82ar0I04u6sVvlgVAHS3w7QnkKpsYjLaAR3HTeXnAqBU1GUCGHL6MKmPqZHPiIUveovWHXiLMaV+N5SCDGv/BOi9psb3UPAv2RqVh+bgBTnm1rgHY9JKWHeYOQ5RA04FV8h4hrv10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=E/d9E7GQ; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <bda53361-d334-411b-8ac1-069d41025804@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708937736;
+	s=arc-20240116; t=1708937974; c=relaxed/simple;
+	bh=TKMBEQsICcf1Jqz8go5zK6Xhh9LdECeamokbuWo4YyM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IN7dBQShA1dIFU9/t/jM7B9FagaG76xvopR2YyHs880wv8jCq95ckAKq+/RSEWs5QnF/FHtivf/PdTP2k7DE4i+7t6mXQvOL3S2Qahj0uRENpCfqs1t3br3GSS4Aueo1YolgiXWQWrgzNqCI2QB+JsUqESJeNKlWAJSZ5UuqrQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JuIsGb/T; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 826DF60008;
+	Mon, 26 Feb 2024 08:59:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708937964;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=edBZCaExlvThpicmDyNTy0RLjhxVcCzS4RTR1xHtImI=;
-	b=E/d9E7GQdda0ZeIBeDukSRZjzoUWkgNHD1Zu1wUTZZ0R2M9SXXGijixZaaksWoqy4Bl9/T
-	bjjWkSpoUkjpjOvCQ+dNqF+G0N38bYjKNAYi+62sDsv05KsudDn8yo/mQimA6J5qj+DLD3
-	g6ahp1cllfckg/gFytEGepano0MSeuE=
-Date: Mon, 26 Feb 2024 16:55:01 +0800
+	bh=VPb6uM0vuQeGyvRuwmurAcfRX+uCUbmF9exG7CadPqI=;
+	b=JuIsGb/Tqmh9AHLD4dviBjlXLScBrmdGVV5R1jGgg5j267sxOuG19XceWlMRagF/nv5OSF
+	dklMzNwHtdhRhQ+dMe2Ivi8C2cYlWMVkmnOJRIVxgMQIG42j+0mChiQO3ozCzOSuUFzFg5
+	+4iPdt/3FSqa8oY8yhYF3/OIoBCGrZJGHCna11I0Xz1iNHwOwq3wjT/FQEcFQWqqKX6KUo
+	BTcRM8W4Ygwed5tbFeahfprYw1YaNgXc1aQ4g5INwaX6neF8hpAaYnmf5YZ4U+f4nGxS4T
+	vA38EF+eaTATYvVDh9Fuv1ohVZpWvYOBQjFBJXvaMz51Ld6UTpoF9G4jA48mYw==
+Date: Mon, 26 Feb 2024 09:59:19 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Cc: Saeed Mahameed <saeed@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Richard Cochran
+ <richardcochran@gmail.com>, Tariq Toukan <tariqt@nvidia.com>, Gal Pressman
+ <gal@nvidia.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, Hangbin Liu
+ <liuhangbin@gmail.com>, Paul Greenwalt <paul.greenwalt@intel.com>, Justin
+ Stitt <justinstitt@google.com>, Randy Dunlap <rdunlap@infradead.org>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, Wojciech Drewek
+ <wojciech.drewek@intel.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Jiri Pirko <jiri@resnulli.us>, Jacob Keller <jacob.e.keller@intel.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v1 1/6] ethtool: add interface to read Tx
+ hardware timestamping statistics
+Message-ID: <20240226095919.1c242444@kmaincent-XPS-13-7390>
+In-Reply-To: <20240223192658.45893-2-rrameshbabu@nvidia.com>
+References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
+	<20240223192658.45893-2-rrameshbabu@nvidia.com>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] net: remove SLAB_MEM_SPREAD flag usage
-Content-Language: en-US
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, vbabka@suse.cz,
- Xiongwei.Song@windriver.com
-References: <20240224134943.829751-1-chengming.zhou@linux.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Chengming Zhou <chengming.zhou@linux.dev>
-In-Reply-To: <20240224134943.829751-1-chengming.zhou@linux.dev>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On 2024/2/24 21:49, chengming.zhou@linux.dev wrote:
-> From: Chengming Zhou <zhouchengming@bytedance.com>
-> 
-> The SLAB_MEM_SPREAD flag is already a no-op as of 6.8-rc1, remove
-> its usage so we can delete it from slab. No functional change.
+On Fri, 23 Feb 2024 11:24:45 -0800
+Rahul Rameshbabu <rrameshbabu@nvidia.com> wrote:
 
-Update changelog to make it clearer:
+> Multiple network devices that support hardware timestamping appear to have
+> common behavior with regards to timestamp handling. Implement common Tx
+> hardware timestamping statistics in a tx_stats struct_group. Common Rx
+> hardware timestamping statistics can subsequently be implemented in a
+> rx_stats struct_group for ethtool_ts_stats.
+>=20
+> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+ =20
+> +/**
+> + * enum ethtool_ts_stats_layer - layer to query hardware timestamping
+> statistics
+> + * @ETHTOOL_TS_STATS_LAYER_ACTIVE:
+> + *	retrieve the statistics from the layer that is currently feeding
+> + *	hardware timestamps for packets.
+> + * @ETHTOOL_TS_STATS_LAYER_DMA:
+> + *	retrieve the statistics from the DMA hardware timestamping layer
+> of the
+> + *	device.
+> + * @ETHTOOL_TS_STATS_PHY:
+> + *	retrieve the statistics from the PHY hardware timestamping layer
+> of the
+> + *	device.
+> + */
+> +enum ethtool_ts_stats_layer {
+> +	ETHTOOL_TS_STATS_LAYER_ACTIVE,
+> +	ETHTOOL_TS_STATS_LAYER_DMA,
+> +	ETHTOOL_TS_STATS_LAYER_PHY,
+> +};
 
-The SLAB_MEM_SPREAD flag used to be implemented in SLAB, which was
-removed as of v6.8-rc1, so it became a dead flag since the commit
-16a1d968358a ("mm/slab: remove mm/slab.c and slab_def.h"). And the
-series[1] went on to mark it obsolete explicitly to avoid confusion
-for users. Here we can just remove all its users, which has no any
-functional change.
+The all point of my v8 series new implementation (asked by the maintainers)=
+ was
+to move on from the timestamp layer to the phc provider which is described =
+by a
+phc index + phc qualifier (precise IEEE 1588/approx DMA). The struct being
+introduce in patch 9 of my series.
+You should do the same, use the phc provider instead of the layer.
 
-[1] https://lore.kernel.org/all/20240223-slab-cleanup-flags-v2-1-02f1753e8303@suse.cz/
+With using only the layer and in case of several PHYs we could not reach the
+right ts stats.
+Same goes for the MAC having both type of timestamp IEEE 1588 and DMA.
 
-Thanks!
-
-> 
-> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
-> ---
->  net/socket.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/socket.c b/net/socket.c
-> index ed3df2f749bf..7e9c8fc9a5b4 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -343,7 +343,7 @@ static void init_inodecache(void)
->  					      0,
->  					      (SLAB_HWCACHE_ALIGN |
->  					       SLAB_RECLAIM_ACCOUNT |
-> -					       SLAB_MEM_SPREAD | SLAB_ACCOUNT),
-> +					       SLAB_ACCOUNT),
->  					      init_once);
->  	BUG_ON(sock_inode_cachep == NULL);
->  }
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
