@@ -1,204 +1,140 @@
-Return-Path: <netdev+bounces-74883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F11798672C0
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:15:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E8E88672C1
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:15:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D3CBB2F20B
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:37:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3AB62B304BD
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:39:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA7653375;
-	Mon, 26 Feb 2024 10:29:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BF51CA8A;
+	Mon, 26 Feb 2024 10:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V2GhjPKz"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="LD9y0C60"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C19A5336E
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 10:29:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FCC556746
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 10:30:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708943366; cv=none; b=r4EL+gDQWn2SHnQiPo5LJ6spYOOz0nxeToroe872xGk2Lg78zthiPipijaCMyBQ54rAlQP8y/gGsPHjDV7XCoo04NIdlHhFBIyyP5xqsQUJNQqGQKvuKwvASw5wZrHHngCubg2IrkPhJMpbnwKK/DXSDXeg5/cGyLPOdm2qhZv0=
+	t=1708943441; cv=none; b=ZzKS0VwsTlEeJQgn7g+3CSC0s7CBp6OrC3faPs3DF3y3cHi8+33+kgk9XSxUnEmDMUood8XxBQkgN5FFENB9di27Wz/ZuATbRe43x/HXdOQIPxoRCqcvXC4nXoWooDyKGLrJ/k6PpvguzKrApQuAZiK7VpUNeAtYXACyDHmp7zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708943366; c=relaxed/simple;
-	bh=j8vs2kYNqidZarWFkHkNVn2iIvZToZdN0qkN5+xNYUA=;
+	s=arc-20240116; t=1708943441; c=relaxed/simple;
+	bh=3AEg61c9t2RdSbrA3SOYlabwim+w14UVA/dDDZpqvZs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=imKVYGOvct9bKa23CQH0juZ8u+dytvxglCev157ncKSjzqHSoZ/W78oCL80tFjmtPkyNCtAHebGmhYkEXjZqtAIHga6h0bdHiHZMLKtNgD+KY+91ZXevN0/CR2G+in/7yUjKo4/Eqjagw3YYNF0vej/vVCSMEratbSG+XGzdNKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V2GhjPKz; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5654ef0c61fso15352a12.0
-        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 02:29:23 -0800 (PST)
+	 To:Cc:Content-Type; b=oILfmONbvBMM5qlkG559FweClga5dpoH1P8ExCszkrN+jEYa2ZN4qhtGGCRrCRZ+nYmKtSyPbuNDulF4YVGTb3euVnrN5BANIjEoMYBrHX1mBz0gFqIJHFDs5v74CNIcWBx00zwkgAMZAjs3SUe5jNU2vsbITDhMwZBo2bRU4tY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=LD9y0C60; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a3d01a9a9a2so301860866b.1
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 02:30:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708943362; x=1709548162; darn=vger.kernel.org;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1708943438; x=1709548238; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+9LBZSvHXbFImgyGtsmIfeO7+emcfrVlLTSHoyquOhU=;
-        b=V2GhjPKze02j75RwUxXRdFvDaAyVns3p4JoF2SfROBj6oBvTAjQyJmXD7j8EUoiPts
-         XDwm38iLP/HiYVPZGypvUXPuXfJQ4a/e/ioAfUNfjeFIr7P27ytyqzPZnl4XteClNEV9
-         VYXqK9Nie+OzBF3v9iJPBiAeyX6p0CRoi502zjiBthaGmAFjNn57DmB6uyFff8nPsH9P
-         NVLzpuCrmJeqtU6Un+azJzLOwu7ylSc8tcDgTb2o3Mcl6bmz2bSKML9cHsXxAzgy0fu7
-         lKaYUSbdJ6JdX+L1k1w0ANUo10e9r7lpX99H9carH7fpBVOa94O9ON4+yJOC2tJnNZ/c
-         ByDA==
+        bh=Bz6b+eCtgnaUFENSuU3KdIVlMwnoCTOF+cGcVtN0DkI=;
+        b=LD9y0C60HOh1RKDhvMKmtT2nQe+qq2hbqV2q0nc9XCGhJ2wEJ5KveN6fMOpovGmq5C
+         i5dPH6raI2NaBnEG5ymEiHTsrVbSf7bQ0w5lW/VMxst3jZy6alVWpyyCvnpsXHeSJukD
+         hV6TjnjL/fm3eRWGZ8dR+lkgiqzKZOUBDjBhxtQiEXGrV8MOcfgB/ho5m/jsYSa+8cI5
+         nhycQDBOFyooPAbnZhyh9XFncW367sg5bBjf1ByZRWloVxIsa6V8+iGs0tAnMJ+hs4IY
+         0HJ0uAxdsG2TrwXvoDeuvAKIITjPlKU5AMALDEttgL9162t+u7ptmm5Q9ewpGa7Ebpgv
+         TrDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708943362; x=1709548162;
+        d=1e100.net; s=20230601; t=1708943438; x=1709548238;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+9LBZSvHXbFImgyGtsmIfeO7+emcfrVlLTSHoyquOhU=;
-        b=tsys9OISO2U+TDBVbKkF+AkZFj4otSMdLgcUrbr6LYM7qrRpRr+HqMVGIBLFa0VCHP
-         jl51s432FbZibEtI1WBWwrr/YOBf2SfJcRQuR6QPAOoIuhzyl8ijAmqTJjZZ1Lf7tDKF
-         jw2j14dW/s+ht7L8rXDWZeCq9wKt3HQqpYaGDs70cWeHhXdsYc+kzd73afCvF8hTl82A
-         Lah3uTKi7PRGLWFbBpfb+xBJO4nZHy2rYgJCJtSHVadGNEOMyxfhaC9Lb9WoH7LHcgdY
-         A2AFfVjXZbqmzVRsNNHgPbB10e9glh1DTiVWXhrFWklhvkc27qe/fN+0XtQzLa7jmkLN
-         19QQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUK2S++/TU0RRJgiMGwCoA6WAr+Jz+ckmUTozEp6+Dxtf3Vh8qn1nG0Hn4fJ6WfNvh33jUCu9m8lHy2j4pFxL1f3H1SW6jW
-X-Gm-Message-State: AOJu0YyLCtqx7iquS6QT/mn5lZmTIOZ4IXFOBsU+JX1cO04W8uGCD9EY
-	FHMQxSQoTBdxZZCSysPAmqNz0D2WoLQYGbyiMlrdKBxVR/Hf/krftSUXQ79axgztJdfhxZLhQgk
-	JezcKQMsfxl6jtZsdALBCnDW1GBjYMFkfO2Qx
-X-Google-Smtp-Source: AGHT+IFKz46PFB51fdJ85PXmyLQGXMahOGGYRTDTtbRxiAG3nY7eMN8+lnfxZ63efS90ND8l5xonPPcns8ila5ukGns=
-X-Received: by 2002:a50:a6d7:0:b0:565:4b98:758c with SMTP id
- f23-20020a50a6d7000000b005654b98758cmr279364edc.4.1708943362220; Mon, 26 Feb
- 2024 02:29:22 -0800 (PST)
+        bh=Bz6b+eCtgnaUFENSuU3KdIVlMwnoCTOF+cGcVtN0DkI=;
+        b=er09tm8lrgiORZ28OCnwxEWHUCsCB7hmD96WsNJrs+FRkBVUKvwwn1GEDMZFpLCkiy
+         K8ObwjzWzm7WjXfnoxsnwh9/c2V1z9Im84sXViLC4Ene14kB+EFU5Etj4bvGdfOeVkDZ
+         NdUF9GdzD5m6lgIThL8MDtK5Cb8JYeSoRWFMsL6+Qfiui8F67E/V++RPX1deZlcr1aUF
+         kmjEJquKRfMJkQu1lFSzz+QLOo+JvunrCvb49aMA9qQ6sPdySG4NVJbknYA411bmWvPR
+         8Fuj4m5ayjlL81OPd//ZgRz8zuiOpQ94QDWEqSM7yxMTtVPuj63W/NfQn4+mj9vmS2ru
+         iPXw==
+X-Forwarded-Encrypted: i=1; AJvYcCVvLv3bZK2QOeMHNSaU0zaUGMwVWWgXkgev7cRILdQ3GZ1ypWFthdJ9XCrEFfKRlrQ7aVTM2wgYlQs5LrQs9dIVfLjFVTjy
+X-Gm-Message-State: AOJu0Yx8UKhBhT+GtJHAD96njLVA5zLQGsUYhFgSKHL/8acUVAzCe+1t
+	1oDTcApZhVsbm7h33pB2hngesc2mrEK6+lr1NwEvf3bgpQWAe7uGc5npM+Eo+JCOjj8Hn6mql+W
+	dj0ZYqNRlbxD3Lul0r5GQoIUmwfYhUXOWctPXJA==
+X-Google-Smtp-Source: AGHT+IFRPov8/cpih2mq251F4b8kRlFyC5NNX1J7o+YMmyopd5NzNTlRC1I0AnsNzV9tfVe1KWjRjh446NXfYck2paE=
+X-Received: by 2002:a17:906:68d2:b0:a3e:5b7f:6d31 with SMTP id
+ y18-20020a17090668d200b00a3e5b7f6d31mr3616604ejr.5.1708943437867; Mon, 26 Feb
+ 2024 02:30:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240220021804.9541-1-shijie@os.amperecomputing.com>
- <CANn89iJoHDzfYfhcwVvR4m7DiVG-UfFNqm+D1WD-2wjOttk6ew@mail.gmail.com>
- <bea860f8-a196-4dff-a655-4da920e2ebfa@amperemail.onmicrosoft.com>
- <CANn89i+1uMAL_025rNc3C1Ut-E5S8Nat6KhKEzcFeC1xxcFWaA@mail.gmail.com>
- <c2bd73b6-b21f-4ad8-a176-eec677bc6cf3@amperemail.onmicrosoft.com>
- <CANn89i+Cr1Tbdxqy6fB-sOLca+AHFc-3-0xGktVUsQFFMVsC0A@mail.gmail.com> <bd0a9d66-783d-4936-a5b0-cd4082704137@kernel.org>
-In-Reply-To: <bd0a9d66-783d-4936-a5b0-cd4082704137@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 26 Feb 2024 11:29:07 +0100
-Message-ID: <CANn89iKJtLZFjY_kYhV5NcgKiAkhi_stftvai1dCwQLMOLea6g@mail.gmail.com>
-Subject: Re: [PATCH] net: skbuff: allocate the fclone in the current NUMA node
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: aleksander.lobakin@intel.com, 
-	Shijie Huang <shijie@amperemail.onmicrosoft.com>, 
-	Huang Shijie <shijie@os.amperecomputing.com>, kuba@kernel.org, 
-	patches@amperecomputing.com, davem@davemloft.net, horms@kernel.org, 
-	ast@kernel.org, dhowells@redhat.com, linyunsheng@huawei.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	cl@os.amperecomputing.com
+References: <20240115194840.1183077-1-andrew@daynix.com> <20240115172837-mutt-send-email-mst@kernel.org>
+ <20240222150212-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240222150212-mutt-send-email-mst@kernel.org>
+From: Andrew Melnichenko <andrew@daynix.com>
+Date: Mon, 26 Feb 2024 12:30:27 +0200
+Message-ID: <CABcq3pEtW4j60n3jJgkSUDy=VbcfzAbS_4eYMHpEPR2bYU9aww@mail.gmail.com>
+Subject: Re: [PATCH 1/1] vhost: Added pad cleanup if vnet_hdr is not present.
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jasowang@redhat.com, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	yuri.benditovich@daynix.com, yan@daynix.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 26, 2024 at 11:18=E2=80=AFAM Jesper Dangaard Brouer <hawk@kerne=
-l.org> wrote:
->
->
->
-> On 24/02/2024 20.07, Eric Dumazet wrote:
-> > On Tue, Feb 20, 2024 at 9:37=E2=80=AFAM Shijie Huang
-> > <shijie@amperemail.onmicrosoft.com> wrote:
-> >>
-> >>
-> >> =E5=9C=A8 2024/2/20 16:17, Eric Dumazet =E5=86=99=E9=81=93:
-> >>> On Tue, Feb 20, 2024 at 7:26=E2=80=AFAM Shijie Huang
-> >>> <shijie@amperemail.onmicrosoft.com> wrote:
-> >>>>
-> >>>> =E5=9C=A8 2024/2/20 13:32, Eric Dumazet =E5=86=99=E9=81=93:
-> >>>>> On Tue, Feb 20, 2024 at 3:18=E2=80=AFAM Huang Shijie
-> >>>>> <shijie@os.amperecomputing.com> wrote:
-> >>>>>> The current code passes NUMA_NO_NODE to __alloc_skb(), we found
-> >>>>>> it may creates fclone SKB in remote NUMA node.
-> >>>>> This is intended (WAI)
-> >>>> Okay. thanks a lot.
-> >>>>
-> >>>> It seems I should fix the issue in other code, not the networking.
-> >>>>
-> >>>>> What about the NUMA policies of the current thread ?
-> >>>> We use "numactl -m 0" for memcached, the NUMA policy should allocate
-> >>>> fclone in
-> >>>>
-> >>>> node 0, but we can see many fclones were allocated in node 1.
-> >>>>
-> >>>> We have enough memory to allocate these fclones in node 0.
-> >>>>
-> >>>>> Has NUMA_NO_NODE behavior changed recently?
-> >>>> I guess not.
-> >>>>> What means : "it may creates" ? Please be more specific.
-> >>>> When we use the memcached for testing in NUMA, there are maybe 20% ~=
- 30%
-> >>>> fclones were allocated in
-> >>>>
-> >>>> remote NUMA node.
-> >>> Interesting, how was it measured exactly ?
-> >>
-> >> I created a private patch to record the status for each fclone allocat=
-ion.
-> >>
-> >>
-> >>> Are you using SLUB or SLAB ?
-> >>
-> >> I think I use SLUB. (CONFIG_SLUB=3Dy,
-> >> CONFIG_SLAB_MERGE_DEFAULT=3Dy,CONFIG_SLUB_CPU_PARTIAL=3Dy)
-> >>
-> >
-> > A similar issue comes from tx_action() calling __napi_kfree_skb() on
-> > arbitrary skbs
-> > including ones that were allocated on a different NUMA node.
-> >
-> > This pollutes per-cpu caches with not optimally placed sk_buff :/
-> >
-> > Although this should not impact fclones, __napi_kfree_skb() only ?
-> >
-> > commit 15fad714be86eab13e7568fecaf475b2a9730d3e
-> > Author: Jesper Dangaard Brouer <brouer@redhat.com>
-> > Date:   Mon Feb 8 13:15:04 2016 +0100
-> >
-> >      net: bulk free SKBs that were delay free'ed due to IRQ context
-> >
-> > What about :
-> >
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index c588808be77f563c429eb4a2eaee5c8062d99582..63165138c6f690e14520f11=
-e32dc16f2845abad4
-> > 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -5162,11 +5162,7 @@ static __latent_entropy void
-> > net_tx_action(struct softirq_action *h)
-> >                                  trace_kfree_skb(skb, net_tx_action,
-> >                                                  get_kfree_skb_cb(skb)-=
->reason);
-> >
-> > -                       if (skb->fclone !=3D SKB_FCLONE_UNAVAILABLE)
-> > -                               __kfree_skb(skb);
-> > -                       else
-> > -                               __napi_kfree_skb(skb,
-> > -                                                get_kfree_skb_cb(skb)-=
->reason);
->
-> Yes, I think it makes sense to avoid calling __napi_kfree_skb here.
-> The __napi_kfree_skb call will cache SKB slub-allocation (but "release"
-> data) on a per CPU napi_alloc_cache (see code napi_skb_cache_put()).
-> In net_tx_action() there is a chance this could originate from another
-> CPU or even NUMA node.  I notice this is only for SKBs on the
-> softnet_data->completion_queue, which have a high chance of being cache
-> cold.  My patch 15fad714be86e only made sense when we bulk freed these
-> SKBs, but after Olek's changes to cache freed SKBs, then this shouldn't
-> be calling __napi_kfree_skb() (previously named __kfree_skb_defer).
->
-> I support this RFC patch from Eric.
->
-> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+Hi all,
+Ok, let me prepare a new patch v2, where I'll write a
+description/analysis of the issue in the commit message.
 
-Note that this should not matter for most NIC, because their drivers
-perform TX completion from NAPI context, we do not hit this path.
-
-It seems that switching to SLUB instead of SLAB has increased the chances
-of getting memory from another node.
-
-We probably need to investigate.
+On Thu, Feb 22, 2024 at 10:02=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com=
+> wrote:
+>
+> On Mon, Jan 15, 2024 at 05:32:25PM -0500, Michael S. Tsirkin wrote:
+> > On Mon, Jan 15, 2024 at 09:48:40PM +0200, Andrew Melnychenko wrote:
+> > > When the Qemu launched with vhost but without tap vnet_hdr,
+> > > vhost tries to copy vnet_hdr from socket iter with size 0
+> > > to the page that may contain some trash.
+> > > That trash can be interpreted as unpredictable values for
+> > > vnet_hdr.
+> > > That leads to dropping some packets and in some cases to
+> > > stalling vhost routine when the vhost_net tries to process
+> > > packets and fails in a loop.
+> > >
+> > > Qemu options:
+> > >   -netdev tap,vhost=3Don,vnet_hdr=3Doff,...
+> > >
+> > > Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+> > > ---
+> > >  drivers/vhost/net.c | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > >
+> > > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> > > index f2ed7167c848..57411ac2d08b 100644
+> > > --- a/drivers/vhost/net.c
+> > > +++ b/drivers/vhost/net.c
+> > > @@ -735,6 +735,9 @@ static int vhost_net_build_xdp(struct vhost_net_v=
+irtqueue *nvq,
+> > >     hdr =3D buf;
+> > >     gso =3D &hdr->gso;
+> > >
+> > > +   if (!sock_hlen)
+> > > +           memset(buf, 0, pad);
+> > > +
+> > >     if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
+> > >         vhost16_to_cpu(vq, gso->csum_start) +
+> > >         vhost16_to_cpu(vq, gso->csum_offset) + 2 >
+> >
+> >
+> > Hmm need to analyse it to make sure there are no cases where we leak
+> > some data to guest here in case where sock_hlen is set ...
+>
+>
+> Could you post this analysis pls?
+>
+> > > --
+> > > 2.43.0
+>
 
