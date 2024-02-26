@@ -1,105 +1,112 @@
-Return-Path: <netdev+bounces-74899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BC90867396
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:41:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D81F86739E
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:42:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C7B41C21698
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:41:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E5EB1C25574
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:42:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B843B25774;
-	Mon, 26 Feb 2024 11:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7BDB1D54B;
+	Mon, 26 Feb 2024 11:41:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IciREwrv"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tnwZ/sP4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF8224219;
-	Mon, 26 Feb 2024 11:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975541CD1B;
+	Mon, 26 Feb 2024 11:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708947632; cv=none; b=ld8f6Bvhp0pU1XhYK7gzBEhzzCPaq8qdKAsRHSRYSlOX3ABM6PK+yryzgugPUpy8Wk3LGvZndkFBgCx6GqMIal8TrxRx/cNkK08AwVCTZoz+W8p/OL3v19X09mppouBOJRgvacMKTi95mdohuQDHpVJvTr+8Rj3FCgkVnFxfCGo=
+	t=1708947685; cv=none; b=gbHtKBhgP+WFnVjVlfXfAceB87gREti7nZfmMY/SCjQ72VfclL0aW0vZwsaPNE+HA6ZMz+I8+JmJYVkbo56Empj1ircz6/P1m0yceX5/Nt/u3uDwjk4Qv5wZO/6e8/rfgk/bIpnBbFzSuCq2nwHveazhKGueam+obG/mQgkvjVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708947632; c=relaxed/simple;
-	bh=AGMvW8EzegrzngxDywguUoFCHmieih2v3vNs74/+sig=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DMdC6a66w/Xfyinb1RJZBej1ojcaOCZpEyIhC+bcwJVYzPj8i7li6TX9QTJhB1i8as0T8e/0XeOfQgJ2WOmuf2D4XkK0UOv+kKdfdbR8GXP5KF730T62kaqiNMutQ0pdNCeiWwgOiJK89eiUGTUYICVYlwgAQo71xKaW2O0zel8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IciREwrv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 198F2C43390;
-	Mon, 26 Feb 2024 11:40:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708947632;
-	bh=AGMvW8EzegrzngxDywguUoFCHmieih2v3vNs74/+sig=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IciREwrvQsqlzZpOHwerFS7IMRIVdUuF8hT/60pVNBTe5UJzfIAhOJKep8i3kNq8a
-	 9YsaAyZI29ql9+uAqLYJUYETMKOQ+epr78TphVNb/jWax8v4u6AaEdsxrhfktmO8VY
-	 HwDYc5aaI4xuQYQk9O1MoASw/24x9gXJRv85Gkynv9WwdhWXvIwGpk+MkD6izUDA8N
-	 d5W1LSKQcdozx7PFxDqkQlPaowzsZjrWN0HheCQt0Z4cFNIBkNrJIY/0wPgI1LXPl7
-	 pb8SCY9h1M5rwr+ORTlgCrag09eFeBnRwx1PuD3MFIMeQMLyrH5gM4zWHjnzh3UpXS
-	 9GamgmH8h/U7w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 04DEDD88FB0;
-	Mon, 26 Feb 2024 11:40:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1708947685; c=relaxed/simple;
+	bh=i0sZPE2siA+KbeFuOAnfEtNMdZnct79f6csjj2KTG+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kDEqOYaEY6SFyc30FzhmAf/Vl0OCdPocsyUSnpWOzR9J29qOHqcZz/nAFMr0UopZU6HB8wWhQygxYs9m9zxHOG6J3z4T6gQwvTgXbwxmE1+dTa899izot/wqB8vNdkkD4nis7rWQFvPLW40iEv3KEZkOf0O4PqHOD/a1lBXFBEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=tnwZ/sP4; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=yfZTLN5C2RkxA/kaPf/m9p9YAtmZBNtR82Q6hYJPxLM=; b=tnwZ/sP4RiscbQRTfiGAaEXsqn
+	8IH5bQ2CUgY95aH0jdx/aX5gu/6OnrDygICiOEbqe0V3JeDnOG0d5erGNQPdiK97Lgg/xmJuJeRJe
+	Ae1QPU6MxN1W9mErx7LQd6aS1ytcx6OZiA9hv214YJSmM6DAKnWZr0/jOxkcoNakYdfK9o3DszvW7
+	KJI8hIIMv7KtN5DwMi5QJ1gTwEuakIM3CtJFVkaZ+7s39rqkQRThWvQIvjMKBI90ORlgVAe9abwzK
+	fRlfk8xoJdqTN1xlCs2KF2F78CVUoh0MbTeNCdUGNqQkT13ObfJLzdUCAttW8bq4oGi/u/gg3EDxX
+	3ELKMmAw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60790)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1reZM7-00038r-2I;
+	Mon, 26 Feb 2024 11:41:11 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1reZM3-0006Op-Jk; Mon, 26 Feb 2024 11:41:07 +0000
+Date: Mon, 26 Feb 2024 11:41:07 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH net-next 1/2] doc: sfp-phylink: drop the mention to
+ phylink_config->pcs_poll
+Message-ID: <Zdx40zi1Qz61sCX7@shell.armlinux.org.uk>
+References: <20240220160406.3363002-1-maxime.chevallier@bootlin.com>
+ <20240220160406.3363002-2-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] Add support for TI DP83826 configuration
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170894763201.4235.16287009126578340303.git-patchwork-notify@kernel.org>
-Date: Mon, 26 Feb 2024 11:40:32 +0000
-References: <20240222103117.526955-1-jeremie.dautheribes@bootlin.com>
-In-Reply-To: <20240222103117.526955-1-jeremie.dautheribes@bootlin.com>
-To: =?utf-8?q?J=C3=A9r=C3=A9mie_Dautheribes_=3Cjeremie=2Edautheribes=40bootlin?=@codeaurora.org,
-	=?utf-8?q?=2Ecom=3E?=@codeaurora.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, afd@ti.com, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, miquel.raynal@bootlin.com,
- yen-mei.goh@keysight.com, maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240220160406.3363002-2-maxime.chevallier@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
+On Tue, Feb 20, 2024 at 05:04:03PM +0100, Maxime Chevallier wrote:
+> commit 64b4a0f8b51b ("net: phylink: remove phylink_config's pcs_poll")
+> dropped the phylink_config->pcs_poll field, which is no longer required
+> to be set by MAC drivers. Remove that mention in the phylink porting
+> guide.
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+The porting guide needs to be updated with the PCS, and the details for
+that moved over rather than being deleted. While it's true that this
+member is gone from phylink_config, it was only removed after the
+introduction of the similarly named member in phylink_pcs.
 
-On Thu, 22 Feb 2024 11:31:14 +0100 you wrote:
-> Hi everyone,
-> 
-> This short patch series introduces the possibility of overriding
-> some parameters which are latched by default by hardware straps on the
-> TI DP83826 PHY.
-> 
-> The settings that can be overridden include:
->   - Configuring the PHY in either MII mode or RMII mode.
->   - When in RMII mode, configuring the PHY in RMII slave mode or RMII
->   master mode.
-> 
-> [...]
+In other words, point 10 should probably read:
 
-Here is the summary with links:
-  - [net-next,1/3] dt-bindings: net: dp83822: support configuring RMII master/slave mode
-    https://git.kernel.org/netdev/net-next/c/95f4fa1f459a
-  - [net-next,2/3] net: phy: dp83826: Add support for phy-mode configuration
-    https://git.kernel.org/netdev/net-next/c/d2ed0774b633
-  - [net-next,3/3] net: phy: dp83826: support configuring RMII master/slave operation mode
-    https://git.kernel.org/netdev/net-next/c/2844a0d7cffe
+10. Arrange for PCS link state interrupts to be forwarded into
+    phylink, via:
 
-You are awesome, thank you!
+    .. code-block:: c
+
+        phylink_pcs_change(pcs, link_is_up);
+
+    where ``link_is_up`` is true if the link is currently up or false
+    otherwise. If a PCS is unable to provide these interrupts, then
+    it should set ``pcs->pcs_poll = true;`` when creating the PCS.
+
+However, for that to make sense, we then need the guide to provide
+details about creating the PCS, and also the mac_select_pcs() method.
+Thus my comment about a much bigger update being required.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
