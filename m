@@ -1,89 +1,74 @@
-Return-Path: <netdev+bounces-75060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46638868000
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 19:47:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C0CF868039
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 19:59:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA6B8B236FF
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 18:47:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BCA11C2419B
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 18:59:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B41312D77D;
-	Mon, 26 Feb 2024 18:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E786A12F398;
+	Mon, 26 Feb 2024 18:59:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C3IiloCx"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="U/G3rUNl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057D812BEAC;
-	Mon, 26 Feb 2024 18:47:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49BD112EBF6;
+	Mon, 26 Feb 2024 18:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708973231; cv=none; b=lsqqKDUFH3oK6eX5DvAp4AsA1IyTlmnGFgg0RAbOY3w//8JYA4cz6TtFFJjgVoVSrKmAxyWUT0MsfVAZ+DEgER2XOT4VDQznWQd7Oaah+thH++2HVSLAefnflzVZsQ3vxdSCzvoLIZrKsLysryYaGx2OkLaUOcQnh0hnjfTMRkY=
+	t=1708973965; cv=none; b=rCNctQnEhEzR0kNZ7M9raPfEPq4OBtaCY6PAf20/wFg0MfTcFNTHgUKUeNG37+J/np4Xf3dhXmqGXDac76TfbV+RWv3LWNf7/JOtSyUbtoZKR1NzH0pLGxilaKkqdAJ7LxJiEnAEVxElU6OWt7hqLhSzEC/ICsQwcLxqf459Dho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708973231; c=relaxed/simple;
-	bh=D4J+iACiEQMVt1Yvog+GeKbpf9dV3YV9YJZuQfPNjjk=;
+	s=arc-20240116; t=1708973965; c=relaxed/simple;
+	bh=qlAmNKHGR7vwy7bKxbfNjwMCIzUTjBUjhpOzPJgm7ts=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QDrbf2OAtOfhmxLOLpctYryPW3fVLebq6AWNTaRtZxAtexWzoMKVdv7GSplzqBEafyJgXTM/j3zrCXhhXqgUnT4l0ZcJBfyi8BhU1XkyLCds0t4rzdof+tUUtBE5xOdiV/4muAU8JxtQX/wJadKfP4PqdZvLLGhyEhLAVauF1nE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C3IiloCx; arc=none smtp.client-ip=209.85.161.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-59fb0b5b47eso1383644eaf.3;
-        Mon, 26 Feb 2024 10:47:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708973229; x=1709578029; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PFL8pDiC7nUP+eFCvCdg4g+ZRJAF9hLv9BvAZ0ru27I=;
-        b=C3IiloCxgC6j4q+Ns1u8xSgFf0rdz+dHxZu13dn74VtL1CGlmr+418dgBHFq+/1Uff
-         RND7ER6MHQpcwfHq3QzXVrXzfFWGqgrUlNWtHgObqWoJ02V2w5zP0ksokYjrLc8N2sK1
-         AesU3T0Yp3CKJet+pOgAquAGoGp0bpFDJCYzys9j0b/bKqi/LaqSZbkjt7prmrABxDt3
-         06YdfX2o8UzGGokTG8C0VG+AbVZC1JWRMg1bW8P7bpTCq4B7dO0S/dJI1k/wyDnHtenU
-         z+P6F8OSMA5aag5NgjnySNIxPlkQR0oFKBzj2HkOG/6HL9zGxusOMPNYX1+5N0uJZHW0
-         +eow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708973229; x=1709578029;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PFL8pDiC7nUP+eFCvCdg4g+ZRJAF9hLv9BvAZ0ru27I=;
-        b=ny61U/rUO3hAEaN9Y8XSgAiHoA6dT1l8Y8LJ7thnqEmqncVoTgKS2AhPBjGV9sEOvu
-         cM6U813BMQbYLPzgQMvaBexbrAHRaSJlCY9wxTMuX4/p6U9x2WXMr2nWfyvez6yl1NLS
-         1fnVwrHmRvPC5cCSJi5LYY9OEqwkORPx896mPtUOLEkQ3Kd7/6E/wD93jo76ucv4NGv0
-         3V935IK5ef23dK/lSkWHFzI6i/yx830JEqHBncJlkF+Mi2VDJvZfN3RFvSkGWFvpvl3j
-         GRoHphAVNL7QY9mPFAlST21oykmZAESUSAxSG0ZqGIquvOZk0UztQtRRnIb0d3tOwyKq
-         PQaA==
-X-Forwarded-Encrypted: i=1; AJvYcCWsb1KdTXxehCYEA/9eQkPc5x3OligcrHHkWsIIJ8D1NmBKqb12Ag6vLg1h7+dKOCbfSoN+/MDHCoaaRIzoiF65XZBMjszbErOXCFk4GUbp03PDZjSMqQmxlUTv6rBIPEelMTX1
-X-Gm-Message-State: AOJu0Yz8GxQ3YYtSTd/Y/QBHDUaUegh/CCu4nP79bp2VOw1m55rTyq6b
-	Hc6jfSIsPiLxfJ8X6zPyqoEbAkVmo9b9eb72nDldN29Yn3nb2zn5
-X-Google-Smtp-Source: AGHT+IE/z/ZckjyccWtrq/CQPSJPdlaFy9/8HNqmT+/ptTbkYGWVj24Pf5Ol4cbQHtjyQZpqiJDyOw==
-X-Received: by 2002:a05:6359:4102:b0:17b:b52c:c121 with SMTP id kh2-20020a056359410200b0017bb52cc121mr1452236rwc.13.1708973229018;
-        Mon, 26 Feb 2024 10:47:09 -0800 (PST)
-Received: from localhost ([2620:10d:c090:400::4:31e4])
-        by smtp.gmail.com with ESMTPSA id a22-20020a631a56000000b005dc832ed816sm4293862pgm.59.2024.02.26.10.47.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 10:47:08 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Mon, 26 Feb 2024 08:47:07 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: torvalds@linux-foundation.org, mpatocka@redhat.com,
-	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
-	msnitzer@redhat.com, ignat@cloudflare.com, damien.lemoal@wdc.com,
-	bob.liu@oracle.com, houtao1@huawei.com, peterz@infradead.org,
-	mingo@kernel.org, netdev@vger.kernel.org, allen.lkml@gmail.com,
-	kernel-team@meta.com, Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v3 3/8] workqueue: Implement BH workqueues to eventually
- replace tasklets
-Message-ID: <Zdzcq_Z9iGb4XC0B@slm.duckdns.org>
-References: <20240130091300.2968534-1-tj@kernel.org>
- <20240130091300.2968534-4-tj@kernel.org>
- <ZcABypwUML6Osiec@slm.duckdns.org>
- <Zdvw0HdSXcU3JZ4g@boqun-archlinux>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gHvzVHVCcdlCHkW/aKuYwRCVroaiAtf/c6mK1l/oaRDC3Jp+Ib//zKWohHucLoLdfEgOKOo+n1rGTkIduskqlBy/xu4Do3YpPYqSsdLO7ljbpjMPf82V9+OtUKwm7wz3e/KbPuGVx4EGqHgoR/SEcXg4rlYS9mEIHd1hfsyLheA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=U/G3rUNl; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=QGUT/3moj2OhsxsxICwpbLQML/W18VFE18o89MKHXvw=; b=U/G3rUNlaV4fF493SyQmav3vC2
+	ARJZzTqt9VPnTCGOzK5BBRZUHEgyd4s2/64ilvkL3ArZJDIM2EbAdRZnbJpsyHiTF3ckTMXDI7KlA
+	bbHcwR5lcIcDC1MolngdfESjvbVkKsDtqNtNA2omCqE8KB70lYLZF9c6DxP9uWZZFtZI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1regCG-008kvg-CP; Mon, 26 Feb 2024 19:59:28 +0100
+Date: Mon, 26 Feb 2024 19:59:28 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Wei Fang <wei.fang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>
+Subject: Re: [PATCH net-next v6 5/8] net: phy: Immediately call adjust_link
+ if only tx_lpi_enabled changes
+Message-ID: <fe071598-64eb-4dd2-8926-d4d0954e7e7e@lunn.ch>
+References: <20240223094425.691209-1-o.rempel@pengutronix.de>
+ <20240223094425.691209-6-o.rempel@pengutronix.de>
+ <Zdh1nMWZDynP/AMc@shell.armlinux.org.uk>
+ <84e1368d-ec6a-48af-945b-509528c45dff@lunn.ch>
+ <Zdic+ua5LnWxjLPn@shell.armlinux.org.uk>
+ <6af3406a-7968-41e5-bf6e-71d020d8b28a@broadcom.com>
+ <Zdot-Mqw1z4ZEo8v@pengutronix.de>
+ <c6b0716d-f093-4aba-8453-c89a562ab581@lunn.ch>
+ <e679f467-d4cd-4a1e-9bfc-92e2c9bf35d4@broadcom.com>
+ <ZdzQG6t2slqEyH0m@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,21 +77,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zdvw0HdSXcU3JZ4g@boqun-archlinux>
+In-Reply-To: <ZdzQG6t2slqEyH0m@shell.armlinux.org.uk>
 
-Hello,
+On Mon, Feb 26, 2024 at 05:53:31PM +0000, Russell King (Oracle) wrote:
+> On Mon, Feb 26, 2024 at 09:50:02AM -0800, Florian Fainelli wrote:
+> > This is the source of the concern, we don't know which MAC drivers we might
+> > end-up breaking by calling adjust_link(link == 1) twice in a row, hopefully
+> > none, because they should be well written to only update the parameters that
+> > need updating, but who knows?
+> 
+> Just quickly... There are some (I went through a bunch.) They don't
+> support EEE. I haven't been through all though, so there could be
+> some which support EEE and where adjust_link() with phydev->link=true
+> twice in a row could result in badness.
 
-On Sun, Feb 25, 2024 at 06:00:48PM -0800, Boqun Feng wrote:
-> Sorry, late to the party, but I wonder how this play along with cpu
-> hotplug? Say we've queued a lot BH_WORK on a CPU, and we offline that
-> cpu, wouldn't that end up with a few BH_WORK left on that CPU not being
-> executed?
+So i think we all agree the MAC needs to see a down/up, even if the
+link itself never went down. Anything else is too risky and will
+probably break something somewhere.
 
-Ah, good point. tasklets get transferred out of offline CPU. Workqueue
-counterpart doesn't do that. I'll fix that.
+	 Andrew
 
-Thanks.
-
--- 
-tejun
 
