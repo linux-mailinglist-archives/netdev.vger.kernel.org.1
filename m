@@ -1,137 +1,88 @@
-Return-Path: <netdev+bounces-75084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B9638681DE
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 21:21:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2F7B8681EB
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 21:30:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1ED5EB21086
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 20:21:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 343B11F24B1E
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 20:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1208E130E2F;
-	Mon, 26 Feb 2024 20:21:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5156312F390;
+	Mon, 26 Feb 2024 20:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="KJUhhXGf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KvxLWMi7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-1909.mail.infomaniak.ch (smtp-1909.mail.infomaniak.ch [185.125.25.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453091F94C
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 20:21:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C77C335BA
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 20:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708978889; cv=none; b=chWQ3QpXMN3omcGGqsRfi/JkXe4K1M6dBJ1zrIWsMXdHcLjmuqMLgWnOPq58S2ATyzLCPOvAZKo3Wv9G8k3H4FWkNweRiFXm+FXMVHDh04h7ma4jVjemboxScnUUj5jHzTcfvnMZQ2qzPj2hD+vRaiwVQLQXX50Y8Dv8h5dsAT4=
+	t=1708979429; cv=none; b=jHjD4OVbcFEPdKVa0AMg59FgucuPIRf4eQ/WeoW36ogfujxza6ivcDwYxfLnHYXB827kNSK8RrUAm02J5OCpatRn7miXQJfaQHp1js8A1O3bK//n86U//2WznnZcalPk5jDBI+crdWvMVqiV0S7GihFExwAMXC0jVFCjW7n/ocA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708978889; c=relaxed/simple;
-	bh=V+U8mYk2PqPb7oIAg3nmSJcwO6wdq7wethQJpUrnYu8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gYMbFiMx0mD0i7JlAH0gk+dQIlgIrtSadFAZgD/GKJH2IFTHS+790FNtM/6X4pod5LLB8L3V+QinWg6cCR9G6Bay9bNaqF3xmIHmddWzJk8nQZ+6eQU+g62hp6sD3++nhs5gnuo9IQK0jzrCp/A5+wa//NqTN70m473yUWfcUO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=KJUhhXGf; arc=none smtp.client-ip=185.125.25.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4TkBpN1hWzz1BN;
-	Mon, 26 Feb 2024 21:21:16 +0100 (CET)
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4TkBpM2YKfzNmm;
-	Mon, 26 Feb 2024 21:21:15 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1708978876;
-	bh=V+U8mYk2PqPb7oIAg3nmSJcwO6wdq7wethQJpUrnYu8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KJUhhXGffQjx/Gy/vSu3BvRt5p6/m8qt0oVPUu0MiyipgKJ0hAYnuWpdQEYzPRq8z
-	 cz+Ds0eGefPzBwWXJyxxXfR+RvvLwgUbsLCKZtgDF8xd23cUIkqM/e3CtssPnYFbLs
-	 RORbAwEpx2+UG/bVEZIZStVfNGkJkOLwb1hZIzok=
-Date: Mon, 26 Feb 2024 21:21:06 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Kees Cook <keescook@chromium.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	davem@davemloft.net, =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
-	Will Drewry <wad@chromium.org>, edumazet@google.com, jakub@cloudflare.com, pabeni@redhat.com, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 2/2] selftests/harness: Merge TEST_F_FORK() into TEST_F()
-Message-ID: <20240226.NooJ5ahBip8A@digikod.net>
-References: <20240223160259.22c61d1e@kernel.org>
- <20240226162335.3532920-1-mic@digikod.net>
- <20240226162335.3532920-3-mic@digikod.net>
- <202402261102.3BE03F08DF@keescook>
+	s=arc-20240116; t=1708979429; c=relaxed/simple;
+	bh=b/VSCJTqxqSbpQCqGDn1ah67LS2JZWSaERNgeck6xTk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qi2inloNeTbBtQ9QHEZBa3FLcgM2hpuT0Q6HSachcbhA8mbBj/k1YFAJGQXL7GQURpnEkk2YvkhJJOd3UEVwjUYnfwpN5OteotqaW1s41u00IGLjC72yxLIEC8s7m4ZPq8od1oGpukdpMWAf0swKvIbF7B7bpmdHdLn2z+jTYZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KvxLWMi7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 99404C43390;
+	Mon, 26 Feb 2024 20:30:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708979428;
+	bh=b/VSCJTqxqSbpQCqGDn1ah67LS2JZWSaERNgeck6xTk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KvxLWMi7pvtBmR7zC/XEgDa7+vDNNhmGGHVICwTZ8RnGvR8UfZpLCScx1DCy8aWZ0
+	 VnPXFZX5b+pSnL7hp8MVo+LKrQulJTMMcSGtOMOgAGWpONDUalvzDXdzT69fHJaVnp
+	 /lKSXTWRQ37OWYdNN1ELLO9Uw8+EfQFlB+2HxrmdbkZ1ifRsW3QrMuNLjaHREOk7Rv
+	 5Pw/xYqMyBWhFOmZQmUjmedeY4xAM0WyrCxMkEuD2J6waSDmK2AgfyhtRRnMkVZUrE
+	 VDGhiSq02n9E3I9VfuazJBfJh5Tcz2lwSEC15+O0YQ0XGYB0akXnzGW6pfKGlMB+i8
+	 faDwuLdyM1ayA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 822BDD88FB1;
+	Mon, 26 Feb 2024 20:30:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <202402261102.3BE03F08DF@keescook>
-X-Infomaniak-Routing: alpha
+Subject: Re: [PATCH iproute2] iptuntap: use TUNDEV macro
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170897942853.28014.3875908663092092958.git-patchwork-notify@kernel.org>
+Date: Mon, 26 Feb 2024 20:30:28 +0000
+References: <20240220134544.31119-1-dkirjanov@suse.de>
+In-Reply-To: <20240220134544.31119-1-dkirjanov@suse.de>
+To: Denis Kirjanov <kirjanov@gmail.com>
+Cc: stephen@networkplumber.org, netdev@vger.kernel.org, dkirjanov@suse.de
 
-On Mon, Feb 26, 2024 at 11:04:12AM -0800, Kees Cook wrote:
-> On Mon, Feb 26, 2024 at 05:23:35PM +0100, Mickaël Salaün wrote:
-> > Remplace Landlock-specific TEST_F_FORK() with an improved TEST_F() which
-> > brings four related changes:
-> > 
-> > Run TEST_F()'s tests in a grandchild process to make it possible to
-> > drop privileges and delegate teardown to the parent.
-> > 
-> > Compared to TEST_F_FORK(), simplify handling of the test grandchild
-> > process thanks to vfork(2), and makes it generic (e.g. no explicit
-> > conversion between exit code and _metadata).
-> > 
-> > Compared to TEST_F_FORK(), run teardown even when tests failed with an
-> > assert thanks to commit 63e6b2a42342 ("selftests/harness: Run TEARDOWN
-> > for ASSERT failures").
-> > 
-> > Simplify the test harness code by removing the no_print and step fields
-> > which are not used.  I added this feature just after I made
-> > kselftest_harness.h more broadly available but this step counter
-> > remained even though it wasn't needed after all. See commit 369130b63178
-> > ("selftests: Enhance kselftest_harness.h to print which assert failed").
-> 
-> I'm personally fine dropping the step counter. (I do wonder if that
-> removal should be split from the grandchild launching.)
+Hello:
 
-I thought about that but it was not worth it to add more lines to
-review.
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
 
+On Tue, 20 Feb 2024 08:45:44 -0500 you wrote:
+> the code already has a path to the tan/tap device
 > 
-> > Replace spaces with tabs in one line of __TEST_F_IMPL().
-> > 
-> > Cc: Günther Noack <gnoack@google.com>
-> > Cc: Jakub Kicinski <kuba@kernel.org>
-> > Cc: Kees Cook <keescook@chromium.org>
-> > Cc: Shuah Khan <shuah@kernel.org>
-> > Cc: Will Drewry <wad@chromium.org>
-> > Signed-off-by: Mickaël Salaün <mic@digikod.net>
-> 
-> One typo below, but otherwise seems good to me:
-> 
-> Reviewed-by: Kees Cook <keescook@chromium.org>
-> 
-> 
-> > [...]
-> >  			_metadata->setup_completed = true; \
-> > -			fixture_name##_##test_name(_metadata, &self, variant->data); \
-> > +			/* Use the same _metadata. */ \
-> > +			child = vfork(); \
-> > +			if (child == 0) { \
-> > +				fixture_name##_##test_name(_metadata, &self, variant->data); \
-> > +				_exit(0); \
-> > +			} \
-> > +			if (child < 0) { \
-> > +				ksft_print_msg("ERROR SPAWNING TEST GANDCHILD\n"); \
-> 
-> typo: GAND -> GRAND
+> Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
+> ---
+>  ip/iptuntap.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 
-Good catch!
+Here is the summary with links:
+  - [iproute2] iptuntap: use TUNDEV macro
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=533fb3c4bec8
 
-Jakub, please fix this with the next combined+rebased series. Thanks!
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> 
-> -- 
-> Kees Cook
-> 
+
 
