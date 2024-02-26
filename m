@@ -1,107 +1,169 @@
-Return-Path: <netdev+bounces-74877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2B21867195
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:42:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC9E3867124
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:33:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5D38B28601
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:31:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A66D1C27598
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E4DA6025A;
-	Mon, 26 Feb 2024 10:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC4F1CD21;
+	Mon, 26 Feb 2024 10:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S8LsbQBT"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88FA038DE9
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 10:16:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAA11CABF;
+	Mon, 26 Feb 2024 10:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708942572; cv=none; b=GfFsM+qZE3ByhPz9f9XlcxbUboTQRhXj3pZXXf/6WXDsM/iN3SOC5/OkjY4PbGg7UjSoMaNXtwxnP/4wYOKAdDasTVF04UXnYXDkY8yc9AQ9obrtyycCv/eX1AZRT78x02DlI1vObte+5NaA/glgbZ8Zguk/X8Ee+U5ncaHvxv0=
+	t=1708942700; cv=none; b=u9HYPPnXy6QLSSnDPqhdZ3ejMLs8Pz4faflqmnDyL+b3SK7fWwF8wQ/tAQ7JezAFNQdwiv6xvcleohuShuYkt4Wjn/GRcdUAqLNtcgiKg7DJOzY/jH6fAYOXO0Z/G3W6yUvBLZC0LgmF6KhfTqBl+ZBLPVlaOsvjQJQwqVCrgxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708942572; c=relaxed/simple;
-	bh=VmTbkppW6YpAajcXsJ4b9OS5/DxwJNy3p3kYrUucLas=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=LBrnqy8JxZPLMgiqKsyUr+Bko1Lc8b9NFE0IA/4pQaqut9VwBlvIPw5wIpytrQ4KSmRnYxojXUIzPC69kO1fH3rE+BqVHECfakEQNWKHIGKsluXfAV1YzgO53cU1HdBUUU/f5yD8Au+qIs4gkCNS01kr5p8hUStNl08Tmusdgto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-91-CfTYQ5CAOY6_UOUoiheBlQ-1; Mon, 26 Feb 2024 10:16:02 +0000
-X-MC-Unique: CfTYQ5CAOY6_UOUoiheBlQ-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 26 Feb
- 2024 10:16:01 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Mon, 26 Feb 2024 10:16:01 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'kernel test robot' <lkp@intel.com>, "'linux-kernel@vger.kernel.org'"
-	<linux-kernel@vger.kernel.org>, 'Linus Torvalds'
-	<torvalds@linux-foundation.org>, 'Netdev' <netdev@vger.kernel.org>,
-	"'dri-devel@lists.freedesktop.org'" <dri-devel@lists.freedesktop.org>
-CC: "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
-	"oe-kbuild-all@lists.linux.dev" <oe-kbuild-all@lists.linux.dev>, 'Jens Axboe'
-	<axboe@kernel.dk>, "'Matthew Wilcox (Oracle)'" <willy@infradead.org>,
-	'Christoph Hellwig' <hch@infradead.org>, "'linux-btrfs@vger.kernel.org'"
-	<linux-btrfs@vger.kernel.org>, 'Andrew Morton' <akpm@linux-foundation.org>,
-	Linux Memory Management List <linux-mm@kvack.org>, 'Andy Shevchenko'
-	<andriy.shevchenko@linux.intel.com>, "'David S . Miller'"
-	<davem@davemloft.net>, 'Dan Carpenter' <dan.carpenter@linaro.org>, "'Jani
- Nikula'" <jani.nikula@linux.intel.com>
-Subject: RE: [PATCH next v2 11/11] minmax: min() and max() don't need to
- return constant expressions
-Thread-Topic: [PATCH next v2 11/11] minmax: min() and max() don't need to
- return constant expressions
-Thread-Index: AdpoC6KUHy5Z1N7yRkiaBkc7ZdEdRQAjHDKAAAEYtvA=
-Date: Mon, 26 Feb 2024 10:16:01 +0000
-Message-ID: <bd7321effdf24d11aa16098bb40869ce@AcuMS.aculab.com>
-References: <a18dcae310f74dcb9c6fc01d5bdc0568@AcuMS.aculab.com>
- <202402261720.EAMC0eHM-lkp@intel.com>
-In-Reply-To: <202402261720.EAMC0eHM-lkp@intel.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1708942700; c=relaxed/simple;
+	bh=mFO7+G0tEjbg4M4mUtn7+xGTlT36Az3/BD2MVuIpse4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SSmFmrt5vSoZ8+UG4bOj9dZt0x28zLJ1G6HKT4mlm5btpR5Om7X/xNVR20Vk8vcUIXhri8lUSeOQjRcPRyMGEKQdMPWK69f3Kd4tFA1yZvNf496ApGiN4JA8pxQQ+5szA49JmDI5xzLSxN247ReN3jUBMNTu3AxZBbhQmox94J8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S8LsbQBT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25517C433F1;
+	Mon, 26 Feb 2024 10:18:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708942699;
+	bh=mFO7+G0tEjbg4M4mUtn7+xGTlT36Az3/BD2MVuIpse4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=S8LsbQBTdYmj8SyRiLaflK/cml3rC77ADNJ482G2pHTuRPtkjhrFBNXWd9NGaZSUF
+	 r57kf12lEEYkR/9I4ZvHLw1XjeEZh0kpmxSWThvUVo/FhXQoF2IuHdK8oVBXPV/Eai
+	 vfplAvuhy44dLK5zFZ/rdi8cLtC0U6aSO8XAeH/B3wzdHQeXo3V1Zb3PW/lWQXeCeC
+	 4s6L2JfXYzwZ/Hugf2dg+NlyeUiUYQjXpbWdL8DbC7YmUDjJ4Fi/t9vd4bRuZL4CK4
+	 9hncXE8VDdk+n5YIWXkyYeDetHIBrT+gc1vSZ29l0SACkRoqPvlXiKwv1Cg2vJHYzi
+	 wC7D0PmK2uWlg==
+Message-ID: <bd0a9d66-783d-4936-a5b0-cd4082704137@kernel.org>
+Date: Mon, 26 Feb 2024 11:18:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: skbuff: allocate the fclone in the current NUMA node
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+To: Eric Dumazet <edumazet@google.com>, aleksander.lobakin@intel.com,
+ Shijie Huang <shijie@amperemail.onmicrosoft.com>
+Cc: Huang Shijie <shijie@os.amperecomputing.com>, kuba@kernel.org,
+ patches@amperecomputing.com, davem@davemloft.net, horms@kernel.org,
+ ast@kernel.org, dhowells@redhat.com, linyunsheng@huawei.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ cl@os.amperecomputing.com
+References: <20240220021804.9541-1-shijie@os.amperecomputing.com>
+ <CANn89iJoHDzfYfhcwVvR4m7DiVG-UfFNqm+D1WD-2wjOttk6ew@mail.gmail.com>
+ <bea860f8-a196-4dff-a655-4da920e2ebfa@amperemail.onmicrosoft.com>
+ <CANn89i+1uMAL_025rNc3C1Ut-E5S8Nat6KhKEzcFeC1xxcFWaA@mail.gmail.com>
+ <c2bd73b6-b21f-4ad8-a176-eec677bc6cf3@amperemail.onmicrosoft.com>
+ <CANn89i+Cr1Tbdxqy6fB-sOLca+AHFc-3-0xGktVUsQFFMVsC0A@mail.gmail.com>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <CANn89i+Cr1Tbdxqy6fB-sOLca+AHFc-3-0xGktVUsQFFMVsC0A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-From: kernel test robot <lkp@intel.com>
-> Sent: 26 February 2024 09:42
-....
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202402261720.EAMC0eHM-lkp=
-@intel.com/
->=20
-> All warnings (new ones prefixed by >>):
->=20
-> >> arch/x86/mm/pgtable.c:437:14: warning: variable length array used [-Wv=
-la]
->      437 |         pmd_t *pmds[MAX_PREALLOCATED_PMDS];
 
-Not surprisingly I missed X86_CONFIG_PAE builds :-)
 
-=09David
+On 24/02/2024 20.07, Eric Dumazet wrote:
+> On Tue, Feb 20, 2024 at 9:37 AM Shijie Huang
+> <shijie@amperemail.onmicrosoft.com> wrote:
+>>
+>>
+>> 在 2024/2/20 16:17, Eric Dumazet 写道:
+>>> On Tue, Feb 20, 2024 at 7:26 AM Shijie Huang
+>>> <shijie@amperemail.onmicrosoft.com> wrote:
+>>>>
+>>>> 在 2024/2/20 13:32, Eric Dumazet 写道:
+>>>>> On Tue, Feb 20, 2024 at 3:18 AM Huang Shijie
+>>>>> <shijie@os.amperecomputing.com> wrote:
+>>>>>> The current code passes NUMA_NO_NODE to __alloc_skb(), we found
+>>>>>> it may creates fclone SKB in remote NUMA node.
+>>>>> This is intended (WAI)
+>>>> Okay. thanks a lot.
+>>>>
+>>>> It seems I should fix the issue in other code, not the networking.
+>>>>
+>>>>> What about the NUMA policies of the current thread ?
+>>>> We use "numactl -m 0" for memcached, the NUMA policy should allocate
+>>>> fclone in
+>>>>
+>>>> node 0, but we can see many fclones were allocated in node 1.
+>>>>
+>>>> We have enough memory to allocate these fclones in node 0.
+>>>>
+>>>>> Has NUMA_NO_NODE behavior changed recently?
+>>>> I guess not.
+>>>>> What means : "it may creates" ? Please be more specific.
+>>>> When we use the memcached for testing in NUMA, there are maybe 20% ~ 30%
+>>>> fclones were allocated in
+>>>>
+>>>> remote NUMA node.
+>>> Interesting, how was it measured exactly ?
+>>
+>> I created a private patch to record the status for each fclone allocation.
+>>
+>>
+>>> Are you using SLUB or SLAB ?
+>>
+>> I think I use SLUB. (CONFIG_SLUB=y,
+>> CONFIG_SLAB_MERGE_DEFAULT=y,CONFIG_SLUB_CPU_PARTIAL=y)
+>>
+> 
+> A similar issue comes from tx_action() calling __napi_kfree_skb() on
+> arbitrary skbs
+> including ones that were allocated on a different NUMA node.
+> 
+> This pollutes per-cpu caches with not optimally placed sk_buff :/
+> 
+> Although this should not impact fclones, __napi_kfree_skb() only ?
+> 
+> commit 15fad714be86eab13e7568fecaf475b2a9730d3e
+> Author: Jesper Dangaard Brouer <brouer@redhat.com>
+> Date:   Mon Feb 8 13:15:04 2016 +0100
+> 
+>      net: bulk free SKBs that were delay free'ed due to IRQ context
+> 
+> What about :
+> 
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index c588808be77f563c429eb4a2eaee5c8062d99582..63165138c6f690e14520f11e32dc16f2845abad4
+> 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -5162,11 +5162,7 @@ static __latent_entropy void
+> net_tx_action(struct softirq_action *h)
+>                                  trace_kfree_skb(skb, net_tx_action,
+>                                                  get_kfree_skb_cb(skb)->reason);
+> 
+> -                       if (skb->fclone != SKB_FCLONE_UNAVAILABLE)
+> -                               __kfree_skb(skb);
+> -                       else
+> -                               __napi_kfree_skb(skb,
+> -                                                get_kfree_skb_cb(skb)->reason);
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
+Yes, I think it makes sense to avoid calling __napi_kfree_skb here.
+The __napi_kfree_skb call will cache SKB slub-allocation (but "release"
+data) on a per CPU napi_alloc_cache (see code napi_skb_cache_put()).
+In net_tx_action() there is a chance this could originate from another
+CPU or even NUMA node.  I notice this is only for SKBs on the
+softnet_data->completion_queue, which have a high chance of being cache
+cold.  My patch 15fad714be86e only made sense when we bulk freed these
+SKBs, but after Olek's changes to cache freed SKBs, then this shouldn't
+be calling __napi_kfree_skb() (previously named __kfree_skb_defer).
 
+I support this RFC patch from Eric.
+
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+
+> +                       __kfree_skb(skb);
+>                  }
+>          }
 
