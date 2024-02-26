@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-75103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F0B08682E1
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 22:20:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4E058682E2
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 22:20:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B816328E70F
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 21:20:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FF54B2215F
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 21:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0EA131E55;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA4B131E5A;
 	Mon, 26 Feb 2024 21:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pVcrXd9g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pagb6Spr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97372131E4F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9436131739
 	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 21:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708982430; cv=none; b=eWCTf7s/nzwEMi6cOvfemWmwRPkZYCzWDNuzwMeN69E+FHKMf1vzEffrUm/HwpkxFe17M5A7zm+I0+SFwMsbVussL0fJQu6h7tdJpokuBmQYEEYPMGwlrer1NHi+jyzCtbk3JaHfkRZtaPKxnPMGG8FX5PULZuTc/vVc/y6wGiY=
+	t=1708982430; cv=none; b=eTvQNvQtkmBYlQ6rLBF8a5pndHOCK3iHVw5xMD2nH+NLbvBeZGQx8tmcuGT1tlw4xT7NH2KD1o+7o6NBc0JgD+xTNRW611HFhhHW5r1ySHlfqeSodGpZznIEih3F4p31tQwzE2BxTgQZaOuBmGhpeWK9VZhqD69Q5PIOwpDoRoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708982430; c=relaxed/simple;
-	bh=MCvTlJqJLo6ot++mYFEc+n/iSEhSUBP54stV5Xv6rQg=;
+	bh=3m4tpVEuLWeMx4iO2ks7IAiO72eHCXKYksI3Pm3BULc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mz0ChFl6N7iTLGy8lyLYVySXg1FhAuaRAmsuBV9XiTRdd/eYl/ZreOcF+x4Qbsua8U/rasKhDzd5XecSaC5lnUHpQvFdLwhYsFLnFfqox2bi24ECXg5fmiXUU/ZzIwIqd3sEy3nQmgdM3bw7aT5ZqlAvvzg4kRpRQ1Whd6ZzBSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pVcrXd9g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8A00C4166C;
-	Mon, 26 Feb 2024 21:20:29 +0000 (UTC)
+	 MIME-Version; b=dRUhLD5a23dROpwV7sTnuYKc69rJZQMVeu5bYEfvY7aTF7GMnmqeX64E5l63SjV360B8osa5dcIyyoRFO+vqc+N6V+gDoVSEdvdqqM64y1OkXmf4SOAwTwzscwAR23vcSRQIFRJKIMxRjThoJcPTm8oLCrj2ldhBggeQl//0XsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pagb6Spr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ACDAC433B2;
+	Mon, 26 Feb 2024 21:20:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708982430;
-	bh=MCvTlJqJLo6ot++mYFEc+n/iSEhSUBP54stV5Xv6rQg=;
+	bh=3m4tpVEuLWeMx4iO2ks7IAiO72eHCXKYksI3Pm3BULc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pVcrXd9g/rbTW/bIInqrOI7ztRp+R6HzyLDSQPvx2GyA+f3wtPoxq65tFW9c5woKH
-	 VdM+WQ+e9iTe0sQ8ZDaaisbki7VTd20k3Hd57rQTwVJEDi/Ute7FFLEYPYzpkUTbLO
-	 aIi1PlDhoMyjBbPUtUVL3z8SZOF++4PrK5ZHJTiUZR6nbkyej+CysOwilVH7P4NPnu
-	 lzLtwXOYzx5imogj5pByInKpZMeSRRiAe23N8cd2tcz1aDdVWb64whSUM/+SpHqUXC
-	 shgqFfxPUmO6IHRLcnb+IqEPlu2s3S8bpJIePhsPupdFDsvaQOjB24D3iyepZJgPuw
-	 hKDLhe8oGt/zA==
+	b=Pagb6Spreu/kltOjkk7hsQFXCC71utHkcvJ0b3eAZCqiBBzBxdnyfqhzGrpdEsv8F
+	 7K2vc007M3wRFJciZ7u/+/A460Hps78XYmTEK9J0DfN/u+uYCLHaNKEOpVAMAc3Ajj
+	 bkDvk0X/2XWZrdV7EXqj3vaWJs2UEyU5iJkH4WNX+9cIDu57/9liNa23WQOnqVI04C
+	 mNlaXhkJGH1X2UUCpx643RSpFcinVZ8qSkZeYAQwTGxjHq+X/qhDM2HNI6/10W6FKG
+	 9YSgmPD4QEGVMbcN3OUPD1zC77BQSeaLoJa8tlu9aK4g9ibJ0TnzZA9PFvR0VxtacR
+	 0vBnGqZEc6Z6A==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: netdev@vger.kernel.org,
 	jiri@resnulli.us,
 	sdf@google.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 04/15] tools: ynl: create local nlmsg access helpers
-Date: Mon, 26 Feb 2024 13:20:10 -0800
-Message-ID: <20240226212021.1247379-5-kuba@kernel.org>
+Subject: [PATCH net-next v2 05/15] tools: ynl: create local ARRAY_SIZE() helper
+Date: Mon, 26 Feb 2024 13:20:11 -0800
+Message-ID: <20240226212021.1247379-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20240226212021.1247379-1-kuba@kernel.org>
 References: <20240226212021.1247379-1-kuba@kernel.org>
@@ -65,192 +65,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Create helpers for accessing payloads of struct nlmsg.
-Use them instead of the libmnl ones.
+libc doesn't have an ARRAY_SIZE() create one locally.
 
 Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/lib/ynl-priv.h | 39 +++++++++++++++++++++++++++++++++++-
- tools/net/ynl/lib/ynl.c      | 24 ++++++++++------------
- tools/net/ynl/ynl-gen-c.py   |  6 +++---
- 3 files changed, 52 insertions(+), 17 deletions(-)
+ tools/net/ynl/lib/ynl-priv.h | 3 +++
+ tools/net/ynl/ynl-gen-c.py   | 4 ++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/tools/net/ynl/lib/ynl-priv.h b/tools/net/ynl/lib/ynl-priv.h
-index e4199255769e..85970df350ee 100644
+index 85970df350ee..c893fd5aaf27 100644
 --- a/tools/net/ynl/lib/ynl-priv.h
 +++ b/tools/net/ynl/lib/ynl-priv.h
-@@ -125,13 +125,50 @@ int ynl_exec_dump(struct ynl_sock *ys, struct nlmsghdr *req_nlh,
- void ynl_error_unknown_notification(struct ynl_sock *ys, __u8 cmd);
- int ynl_error_parse(struct ynl_parse_arg *yarg, const char *msg);
+@@ -27,6 +27,9 @@ enum ynl_policy_type {
+ 	YNL_PT_BITFIELD32,
+ };
  
--/* Attribute helpers */
-+/* Netlink message handling helpers */
++#define YNL_ARRAY_SIZE(array)	(sizeof(array) ?			\
++				 sizeof(array) / sizeof(array[0]) : 0)
 +
-+static inline struct nlmsghdr *ynl_nlmsg_put_header(void *buf)
-+{
-+	struct nlmsghdr *nlh = buf;
-+
-+	memset(nlh, 0, sizeof(*nlh));
-+	nlh->nlmsg_len = NLMSG_HDRLEN;
-+
-+	return nlh;
-+}
-+
-+static inline unsigned int ynl_nlmsg_data_len(const struct nlmsghdr *nlh)
-+{
-+	return nlh->nlmsg_len - NLMSG_HDRLEN;
-+}
-+
-+static inline void *ynl_nlmsg_data(const struct nlmsghdr *nlh)
-+{
-+	return (unsigned char *)nlh + NLMSG_HDRLEN;
-+}
-+
-+static inline void *
-+ynl_nlmsg_data_offset(const struct nlmsghdr *nlh, unsigned int offset)
-+{
-+	return (unsigned char *)nlh + NLMSG_HDRLEN + offset;
-+}
- 
- static inline void *ynl_nlmsg_end_addr(const struct nlmsghdr *nlh)
- {
- 	return (char *)nlh + nlh->nlmsg_len;
- }
- 
-+static inline void *
-+ynl_nlmsg_put_extra_header(struct nlmsghdr *nlh, unsigned int size)
-+{
-+	void *tail = ynl_nlmsg_end_addr(nlh);
-+
-+	nlh->nlmsg_len += NLMSG_ALIGN(size);
-+	return tail;
-+}
-+
-+/* Netlink attribute helpers */
-+
- static inline unsigned int ynl_attr_type(const struct nlattr *attr)
- {
- 	return attr->nla_type & NLA_TYPE_MASK;
-diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
-index 0f71e69b70c0..5f303d6e751f 100644
---- a/tools/net/ynl/lib/ynl.c
-+++ b/tools/net/ynl/lib/ynl.c
-@@ -190,9 +190,8 @@ ynl_ext_ack_check(struct ynl_sock *ys, const struct nlmsghdr *nlh,
- 		n = snprintf(bad_attr, sizeof(bad_attr), "%sbad attribute: ",
- 			     str ? " (" : "");
- 
--		start = mnl_nlmsg_get_payload_offset(ys->nlh,
--						     ys->family->hdr_len);
--		end = mnl_nlmsg_get_payload_tail(ys->nlh);
-+		start = ynl_nlmsg_data_offset(ys->nlh, ys->family->hdr_len);
-+		end = ynl_nlmsg_end_addr(ys->nlh);
- 
- 		off = ys->err.attr_offs;
- 		off -= sizeof(struct nlmsghdr);
-@@ -216,9 +215,8 @@ ynl_ext_ack_check(struct ynl_sock *ys, const struct nlmsghdr *nlh,
- 		n = snprintf(miss_attr, sizeof(miss_attr), "%smissing attribute: ",
- 			     bad_attr[0] ? ", " : (str ? " (" : ""));
- 
--		start = mnl_nlmsg_get_payload_offset(ys->nlh,
--						     ys->family->hdr_len);
--		end = mnl_nlmsg_get_payload_tail(ys->nlh);
-+		start = ynl_nlmsg_data_offset(ys->nlh, ys->family->hdr_len);
-+		end = ynl_nlmsg_end_addr(ys->nlh);
- 
- 		nest_pol = ys->req_policy;
- 		if (tb[NLMSGERR_ATTR_MISS_NEST]) {
-@@ -259,7 +257,7 @@ ynl_ext_ack_check(struct ynl_sock *ys, const struct nlmsghdr *nlh,
- 
- static int ynl_cb_error(const struct nlmsghdr *nlh, void *data)
- {
--	const struct nlmsgerr *err = mnl_nlmsg_get_payload(nlh);
-+	const struct nlmsgerr *err = ynl_nlmsg_data(nlh);
- 	struct ynl_parse_arg *yarg = data;
- 	unsigned int hlen;
- 	int code;
-@@ -270,7 +268,7 @@ static int ynl_cb_error(const struct nlmsghdr *nlh, void *data)
- 
- 	hlen = sizeof(*err);
- 	if (!(nlh->nlmsg_flags & NLM_F_CAPPED))
--		hlen += mnl_nlmsg_get_payload_len(&err->msg);
-+		hlen += ynl_nlmsg_data_len(&err->msg);
- 
- 	ynl_ext_ack_check(yarg->ys, nlh, hlen);
- 
-@@ -413,7 +411,7 @@ struct nlmsghdr *ynl_msg_start(struct ynl_sock *ys, __u32 id, __u16 flags)
- 
- 	ynl_err_reset(ys);
- 
--	nlh = ys->nlh = mnl_nlmsg_put_header(ys->tx_buf);
-+	nlh = ys->nlh = ynl_nlmsg_put_header(ys->tx_buf);
- 	nlh->nlmsg_type	= id;
- 	nlh->nlmsg_flags = flags;
- 	nlh->nlmsg_seq = ++ys->seq;
-@@ -435,7 +433,7 @@ ynl_gemsg_start(struct ynl_sock *ys, __u32 id, __u16 flags,
- 	gehdr.cmd = cmd;
- 	gehdr.version = version;
- 
--	data = mnl_nlmsg_put_extra_header(nlh, sizeof(gehdr));
-+	data = ynl_nlmsg_put_extra_header(nlh, sizeof(gehdr));
- 	memcpy(data, &gehdr, sizeof(gehdr));
- 
- 	return nlh;
-@@ -718,7 +716,7 @@ static int ynl_ntf_parse(struct ynl_sock *ys, const struct nlmsghdr *nlh)
- 	struct genlmsghdr *gehdr;
- 	int ret;
- 
--	gehdr = mnl_nlmsg_get_payload(nlh);
-+	gehdr = ynl_nlmsg_data(nlh);
- 	if (gehdr->cmd >= ys->family->ntf_info_size)
- 		return MNL_CB_ERROR;
- 	info = &ys->family->ntf_info[gehdr->cmd];
-@@ -808,13 +806,13 @@ ynl_check_alien(struct ynl_sock *ys, const struct nlmsghdr *nlh, __u32 rsp_cmd)
- {
- 	struct genlmsghdr *gehdr;
- 
--	if (mnl_nlmsg_get_payload_len(nlh) < sizeof(*gehdr)) {
-+	if (ynl_nlmsg_data_len(nlh) < sizeof(*gehdr)) {
- 		yerr(ys, YNL_ERROR_INV_RESP,
- 		     "Kernel responded with truncated message");
- 		return -1;
- 	}
- 
--	gehdr = mnl_nlmsg_get_payload(nlh);
-+	gehdr = ynl_nlmsg_data(nlh);
- 	if (gehdr->cmd != rsp_cmd)
- 		return ynl_ntf_parse(ys, nlh);
- 
+ struct ynl_policy_attr {
+ 	enum ynl_policy_type type;
+ 	unsigned int len;
 diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index eabce06f03d9..90d7bf4849fc 100755
+index 90d7bf4849fc..407902b903e0 100755
 --- a/tools/net/ynl/ynl-gen-c.py
 +++ b/tools/net/ynl/ynl-gen-c.py
-@@ -1650,7 +1650,7 @@ _C_KW = {
-         ri.cw.p(f'dst->{arg} = {arg};')
+@@ -1535,7 +1535,7 @@ _C_KW = {
+     cw.block_start()
+     if enum and enum.type == 'flags':
+         cw.p(f'{arg_name} = ffs({arg_name}) - 1;')
+-    cw.p(f'if ({arg_name} < 0 || {arg_name} >= (int)MNL_ARRAY_SIZE({map_name}))')
++    cw.p(f'if ({arg_name} < 0 || {arg_name} >= (int)YNL_ARRAY_SIZE({map_name}))')
+     cw.p('return NULL;')
+     cw.p(f'return {map_name}[{arg_name}];')
+     cw.block_end()
+@@ -2569,7 +2569,7 @@ _C_KW = {
+         cw.p('.hdr_len\t= sizeof(struct genlmsghdr),')
+     if family.ntfs:
+         cw.p(f".ntf_info\t= {family['name']}_ntf_info,")
+-        cw.p(f".ntf_info_size\t= MNL_ARRAY_SIZE({family['name']}_ntf_info),")
++        cw.p(f".ntf_info_size\t= YNL_ARRAY_SIZE({family['name']}_ntf_info),")
+     cw.block_end(line=';')
  
-     if ri.fixed_hdr:
--        ri.cw.p('hdr = mnl_nlmsg_get_payload_offset(nlh, sizeof(struct genlmsghdr));')
-+        ri.cw.p('hdr = ynl_nlmsg_data_offset(nlh, sizeof(struct genlmsghdr));')
-         ri.cw.p(f"memcpy(&dst->_hdr, hdr, sizeof({ri.fixed_hdr}));")
-     for anest in sorted(all_multi):
-         aspec = struct[anest]
-@@ -1794,7 +1794,7 @@ _C_KW = {
- 
-     if ri.fixed_hdr:
-         ri.cw.p("hdr_len = sizeof(req->_hdr);")
--        ri.cw.p("hdr = mnl_nlmsg_put_extra_header(nlh, hdr_len);")
-+        ri.cw.p("hdr = ynl_nlmsg_put_extra_header(nlh, hdr_len);")
-         ri.cw.p("memcpy(hdr, &req->_hdr, hdr_len);")
-         ri.cw.nl()
- 
-@@ -1857,7 +1857,7 @@ _C_KW = {
- 
-     if ri.fixed_hdr:
-         ri.cw.p("hdr_len = sizeof(req->_hdr);")
--        ri.cw.p("hdr = mnl_nlmsg_put_extra_header(nlh, hdr_len);")
-+        ri.cw.p("hdr = ynl_nlmsg_put_extra_header(nlh, hdr_len);")
-         ri.cw.p("memcpy(hdr, &req->_hdr, hdr_len);")
-         ri.cw.nl()
  
 -- 
 2.43.2
