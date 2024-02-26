@@ -1,188 +1,108 @@
-Return-Path: <netdev+bounces-74913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2281867475
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 13:12:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16A0F867498
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 13:18:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60C8D2870C7
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:12:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 476D11C24A1C
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:18:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51BF4604AB;
-	Mon, 26 Feb 2024 12:12:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E3055B03B;
+	Mon, 26 Feb 2024 12:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CvVL7FDX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E3ffn9bd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A6860277
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 12:12:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75940604BA;
+	Mon, 26 Feb 2024 12:18:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708949535; cv=none; b=oB83CnjUA0hW9wMrNYTO/Zz8dQAZp0ssUdG2odbVWb5tXwz5cbrSeXBvRzjBQXkh95n+zJZNUCFGpEfcCJ0xY/ffmf6dvaVW/Zxl+ngZhbt1148J8R07kr445Ph4QtQSKr1Twz6llAaqVJCEi234LfwGNbzOHf+GYFJ2u9gVjTM=
+	t=1708949908; cv=none; b=FxCwoznXTKdbafmL2h4ip6QY9cYvUyoADHi1wgubjbNMnSXETDg5C2c5uY+RQhrCIB6Ue4JyOaYpIPuFL9l/0a8CRQZYTAC8lqxUXHy4VJxyJzqvIzTBkW6KMxSOxKOVdOwybfRzM41amq5snZhO+QDr7LLlFR/mNir8FRaKCjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708949535; c=relaxed/simple;
-	bh=e0N6/2zQUM1QOqkgabnyahS6/9h1qmMEkf5qlHoAwkI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o8zZ3JNftL3ki0A2+0UysHzUcy9tN4Doqib9BI3Q2w3wK63uyp+1azy4bN9dTnxVUXhfotE/6AvoQG/IBAGj77ubfqWEehYz0IxIJD/KamQx7bxXMYFAgZrmbq5iByXuxgeg9n5n+ntz4rOO+p4H3uRrU56aWiE4T82J46Ch/qo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CvVL7FDX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708949531;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lVX2aIqulG7pb2ZKAY6wEN/hr8j5RuJ02O3KYwJHnAk=;
-	b=CvVL7FDXkKfEg8tZhAHlNenPRx0PMP1hfHRMZyjjlWJU76Cx8RjlYGHRFkT1Zjk+bqF/36
-	eavpHvGenCgY66X3eNN3VX9+y6PpLVVIsPe7DuKMVTfHa3C/hqqS9CPpvhBJcZhsmGQWNV
-	PjYm/lJLfBh3/ORDcrYgFOX5eWxLr3E=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-433-Bpx31TBpPL-boyIZpZydkQ-1; Mon, 26 Feb 2024 07:12:10 -0500
-X-MC-Unique: Bpx31TBpPL-boyIZpZydkQ-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33dadb50731so1627053f8f.1
-        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 04:12:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708949529; x=1709554329;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lVX2aIqulG7pb2ZKAY6wEN/hr8j5RuJ02O3KYwJHnAk=;
-        b=aDCGVNbMIeUDs7/MRevMEsbljTW9fiwCbKQsANMRm8QtemNmQPMx1ay44CXMzI0hRO
-         G+yGT64l22FNRzkxhbV1I+JakPSvM/NZLxD6txwCCbgKtWd956v6Nn0Vfm/Qr2w5dWfK
-         C5QE7hncsLgLwIlBfI3adHrK98nU9l4Ag416K97i8pcrqkVuouhaoWjvr1AxKx05/7qD
-         D/L9WOLF9tTGVyYKdeMYzZ7AxARRrtQlvDR0sf/Ry5yrmIeqeeigTHfEze64IxowBoAg
-         t/s/2XNu3lB0d7XwgGrd03Co6ikvdchO0kfQC1kMOWgWAlvuye6NE4ILhTbGpJTprouH
-         h2Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCUoCaU1ypM38JsmIBFvhPdS1+bOFIoa75zvSWzZlKoOTLWFKuPDQyz9K/BBGLBdQgKoG9am/HIJQNNiln3Krg4LI5o8vRjt
-X-Gm-Message-State: AOJu0YwcV5C0GZqDTAQewixL/YKYChUae30BK0zeWuYS5RXevt28BQYJ
-	8khwKcDmFoGG90gqWxFZeewq57RguprVuTfiuO6WyJ068NSpVAL5TwDB+eQp/i7tjGrflri77nI
-	dhu75FaogSCr8vV5XOZ9Gdo1D/kxmZMIto+18SvrX1Jr+R/8Yyv7OrA==
-X-Received: by 2002:a05:6000:1961:b0:33d:7ea3:5b90 with SMTP id da1-20020a056000196100b0033d7ea35b90mr5099364wrb.65.1708949529663;
-        Mon, 26 Feb 2024 04:12:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEf07k3zYsXuRGP5oY8KvF8nVh4PymH1C6S7+HQTQO4YjooNJ90xav4OKE27dfDSxc5oKl0bw==
-X-Received: by 2002:a05:6000:1961:b0:33d:7ea3:5b90 with SMTP id da1-20020a056000196100b0033d7ea35b90mr5099329wrb.65.1708949529347;
-        Mon, 26 Feb 2024 04:12:09 -0800 (PST)
-Received: from redhat.com ([109.253.193.52])
-        by smtp.gmail.com with ESMTPSA id t20-20020adfa2d4000000b0033de1e1bddcsm1414633wra.26.2024.02.26.04.12.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 04:12:08 -0800 (PST)
-Date: Mon, 26 Feb 2024 07:12:01 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Vadim Pasternak <vadimp@nvidia.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-um@lists.infradead.org, netdev@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org,
-	linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-	kvm@vger.kernel.org, bpf@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH vhost v2 19/19] virtio_net: sq support premapped mode
-Message-ID: <20240226071010-mutt-send-email-mst@kernel.org>
-References: <20240223082726.52915-1-xuanzhuo@linux.alibaba.com>
- <20240223082726.52915-20-xuanzhuo@linux.alibaba.com>
- <20240225032330-mutt-send-email-mst@kernel.org>
- <1708946440.799724-1-xuanzhuo@linux.alibaba.com>
- <20240226063120-mutt-send-email-mst@kernel.org>
- <1708947209.1148863-1-xuanzhuo@linux.alibaba.com>
- <20240226063532-mutt-send-email-mst@kernel.org>
- <1708947549.7906592-2-xuanzhuo@linux.alibaba.com>
- <20240226065709-mutt-send-email-mst@kernel.org>
- <1708949183.5224328-4-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1708949908; c=relaxed/simple;
+	bh=VSnvGelLdUIxZaIuWRNLfdqqVKrr+uqj31Ykk1ZLMCY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g7ng5c1FEF+5N1NsI9B0c+4QwwPRH65yTFHmwfFUWRydw/izYeSzfdwyxH4jxi7wIyCSRtc2NPYhFsVLTa2UoTwjdLhPgBPGnfA9XnrzA/qW2otUj2X8ech7KutL6pMpmZBP7Ak5Wbk9o2O/qCAj45lWeyP3KbK4qmt5Slxx3Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E3ffn9bd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EC11C433F1;
+	Mon, 26 Feb 2024 12:18:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708949908;
+	bh=VSnvGelLdUIxZaIuWRNLfdqqVKrr+uqj31Ykk1ZLMCY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=E3ffn9bdlAqqJECX5jOmuhuODqmMzGVocETBwQE3reLPzykSZ3ycyJ0TEf4AZ+KJb
+	 yLRnbdhjiPrrgHEcwKAv+u68lWMGraKvyP59AB4dytfWg/mjHpABqrOYxdFiIo7jxO
+	 25vwmq+dwb8iVzkGSjTsfeRvcAghQSmfRSwtzw40EPNFKNSh3LupfSzaLtWD7BUMUR
+	 Fmw4V9sOwsRMO5d6oZiRtMLskwDTYjhrZoJD6B5xYb0PIQV88SjdZO8l3XDEnFgRC+
+	 URKxKJ8vyhcnocyQDFMf9NhLtOU/ZTSvriJeQK35sgCGdSP0rz0PMrr1Fwse/g7gpY
+	 gHlpcOgeJt3Mw==
+Message-ID: <fc4f148d-d4d3-4994-8d36-c382c13ba52b@kernel.org>
+Date: Mon, 26 Feb 2024 14:18:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1708949183.5224328-4-xuanzhuo@linux.alibaba.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/2] net: ethernet: ti: am65-cpsw: Enable RX HW
+ timestamp only for PTP packets
+To: Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: Chintan Vankar <c-vankar@ti.com>, Dan Carpenter
+ <dan.carpenter@linaro.org>, Richard Cochran <richardcochran@gmail.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Pekka Varis <p-varis@ti.com>
+References: <20240215110953.3225099-1-c-vankar@ti.com>
+ <20240215110953.3225099-2-c-vankar@ti.com>
+ <4c82705d-b05c-4ee8-88ed-42f944a023ac@kernel.org>
+ <03d53049-e649-4714-8ad4-49619a5e9475@ti.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <03d53049-e649-4714-8ad4-49619a5e9475@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 26, 2024 at 08:06:23PM +0800, Xuan Zhuo wrote:
-> On Mon, 26 Feb 2024 06:57:17 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > On Mon, Feb 26, 2024 at 07:39:09PM +0800, Xuan Zhuo wrote:
-> > > On Mon, 26 Feb 2024 06:36:53 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > On Mon, Feb 26, 2024 at 07:33:29PM +0800, Xuan Zhuo wrote:
-> > > > > > what is dma_map_direct? can't find it in the tree.
-> > > > >
-> > > > > YES.
-> > > > >
-> > > > >
-> > > > > diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
-> > > > > index 58db8fd70471..5a8f7a927aa1 100644
-> > > > > --- a/kernel/dma/mapping.c
-> > > > > +++ b/kernel/dma/mapping.c
-> > > > > @@ -144,6 +144,18 @@ static inline bool dma_map_direct(struct device *dev,
-> > > > >         return dma_go_direct(dev, *dev->dma_mask, ops);
-> > > > >  }
-> > > > >
-> > > > > +bool dma_is_direct(struct device *dev)
-> > > > > +{
-> > > > > +       if (!dma_map_direct(dev, ops))
-> > > > > +               return false;
-> > > > > +
-> > > > > +       if (is_swiotlb_force_bounce(dev))
-> > > > > +               return false;
-> > > > > +
-> > > > > +       return true;
-> > > > > +}
-> > > > > +EXPORT_SYMBOL(dma_unmap_page_attrs);
-> > > > > +
-> > > > >
-> > > > > Thanks.
-> > > >
-> > > >
-> > > > where is it? linux-next?
-> > >
-> > >
-> > > I see it in the vhost branch kernel/dma/mapping.c.
-> > >
-> > > Maybe you miss it.
-> > >
-> > > Thanks.
-> > >
-> >
-> > which hash?
+
+
+On 24/02/2024 10:59, Siddharth Vadapalli wrote:
+> On Mon, Feb 19, 2024 at 12:59:55PM +0200, Roger Quadros wrote:
+>> Hi,
+>>
+>> On 15/02/2024 13:09, Chintan Vankar wrote:
+>>> The CPSW peripherals on J7AHP, J7VCL, J7AEP, J7ES, AM64 SoCs have
+>>> an errata i2401 "CPSW: Host Timestamps Cause CPSW Port to Lock up".
+>>
+> ...
 > 
-> fd0b29af02bb75acc94eb08c06e2c10cbce2ea67
+>>>  
+>>> @@ -856,6 +852,9 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_common *common,
+>>>  		ndev_priv = netdev_priv(ndev);
+>>>  		am65_cpsw_nuss_set_offload_fwd_mark(skb, ndev_priv->offload_fwd_mark);
+>>>  		skb_put(skb, pkt_len);
+>>> +		skb_reset_mac_header(skb);
+>>
+>> Why do you need to add skb_reset_mac_header here?
+>>
+>>> +		if (port->rx_ts_enabled)
+>>> +			am65_cpts_rx_timestamp(common->cpts, skb);
+>>
+>> The timestamp should be added before you do skb_put().
+> 
+> Roger,
+> 
+> Could you please clarify why the timestamp should be added before
+> skb_put()?
 
+My bad. hwtimestamps lies after skb->end so it doesn't matter.
 
-Thanks. Now I see it donnu what was wrong with me.
-
-
-> >
-> > > >
-> > > > --
-> > > > MST
-> > > >
-> >
-
+-- 
+cheers,
+-roger
 
