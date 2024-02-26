@@ -1,86 +1,120 @@
-Return-Path: <netdev+bounces-75120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A624868419
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 23:58:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F7DD868472
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 00:05:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43344282178
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 22:58:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08DE61F221B2
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 23:05:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D15A1350CF;
-	Mon, 26 Feb 2024 22:58:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BDE3135A45;
+	Mon, 26 Feb 2024 23:05:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Em/lZyZP"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="biDX9XVZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1C71E878
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 22:58:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C0541350CF;
+	Mon, 26 Feb 2024 23:05:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708988295; cv=none; b=ZFPM7+R6bCqhIZzccGKDOiyOCStF8Yqxdp5D1BU294NOubux94Kv/VbLaDIkE1b/8PdrR4xm78bebQDgEcTvUO821+3M0i2bkWMliFz4hknd/xusPz2pRKE6S3hQx2L0fPSFCm2IMoTHrIsUPPGtEIgOTcfxGPkOwFISLGYVHVc=
+	t=1708988733; cv=none; b=BJXvR+hJGMTG3JVQgq3YZQl8wu6+blAkV7DqXdGf6dS3jAeRWq9uStCHzNQhaS+tRULNLjX6LcUb56aOvt6YTPQ0hkZnmQWJ8WxNpjJbG1NRakgfPFmuIY7k/vM20JwT3BsSd1hm/++g2C8c4K+iz/QZRpbHIPslYwLLAkkw5LQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708988295; c=relaxed/simple;
-	bh=k2sGkS9JPLzUg8YsQYsM6SmvSUEI6/EqGZcoIPL8DGE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sparFURLVDiGf3hZ7vleox7rKGq2oW8NpQX6h9W2fUmL/8ccObNqWFuS8dKSbm8PAdHlIOUu8scnTiGydb7z80C/ZdHMIZOA0KtDJii0GlQ80WdKoKDaVbfm21ozp3aTyP/a+4/CV5sy6btIejmIcn9MKcv9iGVidOq2DggPfWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Em/lZyZP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47A08C433F1;
-	Mon, 26 Feb 2024 22:58:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708988294;
-	bh=k2sGkS9JPLzUg8YsQYsM6SmvSUEI6/EqGZcoIPL8DGE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Em/lZyZPNjbJVAsU84JduEkmMrUHhOyZZyALZ0Kb3RHZS2fx5i2cwui5/bJVjc1Ce
-	 YxiDIfEPF0P3f/IB4iKjyN3AzkRfF6H3nVDtJxIGxlnlDAVdvr5RJHv+bSSXfAnhl4
-	 YKDkbXxa/22A8y1dHlq0rnpOig8V5T43/NXsTpObWjsgp1Xt/oq3K5YoP86TXWL6ve
-	 jQD0jQaTzZXX02/a6a7fGVxycvDG3pj6TiRNBJQXtKC+vRwlzIJLKBGRC+SF1NYKIw
-	 YW7zpM6FOh9Deom1DKZqxKnLM+InhsM+vvxDVeuXYQmb1L2fDzb9ahm37CO4RB/rmG
-	 sfxPBbLG9R6Rg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	jiri@resnulli.us,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next] tools: ynl: protect from old OvS headers
-Date: Mon, 26 Feb 2024 14:58:06 -0800
-Message-ID: <20240226225806.1301152-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.43.2
+	s=arc-20240116; t=1708988733; c=relaxed/simple;
+	bh=TWzun0oNIPfc6lqE3DTPBQ4RosQxCFz5BwOT4xEIKSs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uMoQgVUQ3eG48O6dhBw23K0PTlj9/PBaBgQlh+gvDohGBR/ixek/svdURsq7h6ETxb49siW81EoGOMjwRS/cqKDji0LsSoxrRt75Jx3OJe5NMAa+mIfK0UHZoGSqhDD9tcIWuCworOvS1Kdtnq2oEaQlWsRSyvYo/3uxOLqgViQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=biDX9XVZ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=pYmdkgX1dVrE40bWWH7YizC1+wHj2Ilzj2iousZ5MvQ=; b=biDX9XVZoNS+cu+iILmQSUl1K+
+	Qg9ttG/A56qZt0e4lsHbOPZw1aHansTRFWg7u3iBfNdZv0inSyJh+RRvOrrYAm72UhuCMqRUD/KCG
+	5Ojfv0AiI7kvUVIbFYnMiYQiIeYZlZGzXUM38f9nmsFFD8fcu/6Cn2Xmyc4O66l8g7+w=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rek2P-008lo4-S6; Tue, 27 Feb 2024 00:05:33 +0100
+Date: Tue, 27 Feb 2024 00:05:33 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc: Sarosh Hasan <quic_sarohasa@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Prasad Sodagudi <psodagud@quicinc.com>,
+	Andrew Halaney <ahalaney@redhat.com>, Rob Herring <robh@kernel.org>,
+	kernel@quicinc.com, Sneh Shah <quic_snehshah@quicinc.com>,
+	Suraj Jaiswal <quic_jsuraj@quicinc.com>
+Subject: Re: [PATCH net-next] net: stmmac: dwmac-qcom-ethqos: Update link
+ clock rate only for RGMII
+Message-ID: <89c54319-82d0-4cb3-b3be-ccdf6dcf2742@lunn.ch>
+References: <20240222125517.3356-1-quic_sarohasa@quicinc.com>
+ <54b8c58a-6288-4ae6-9ed7-aa7b212e63da@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <54b8c58a-6288-4ae6-9ed7-aa7b212e63da@linaro.org>
 
-Since commit 7c59c9c8f202 ("tools: ynl: generate code for ovs families")
-we need relatively recent OvS headers to get YNL to compile.
-Add the direct include workaround to fix compilation on less
-up-to-date OSes like CentOS 9.
+> >   static void
+> >   ethqos_update_link_clk(struct qcom_ethqos *ethqos, unsigned int speed)
+> >   {
+> > -	switch (speed) {
+> > -	case SPEED_1000:
+> > -		ethqos->link_clk_rate =  RGMII_1000_NOM_CLK_FREQ;
+> > -		break;
+> > +	if (phy_interface_mode_is_rgmii(ethqos->phy_mode)) {
+> > +		switch (speed) {
+> > +		case SPEED_1000:
+> > +			ethqos->link_clk_rate =  RGMII_1000_NOM_CLK_FREQ;
+> > +			break;
+> > -	case SPEED_100:
+> > -		ethqos->link_clk_rate =  RGMII_ID_MODE_100_LOW_SVS_CLK_FREQ;
+> > -		break;
+> > +		case SPEED_100:
+> > +			ethqos->link_clk_rate =  RGMII_ID_MODE_100_LOW_SVS_CLK_FREQ;
+> > +			break;
+> > -	case SPEED_10:
+> > -		ethqos->link_clk_rate =  RGMII_ID_MODE_10_LOW_SVS_CLK_FREQ;
+> > -		break;
+> > -	}
+> > +		case SPEED_10:
+> > +			ethqos->link_clk_rate =  RGMII_ID_MODE_10_LOW_SVS_CLK_FREQ;
+> > +			break;
+> > +		}
+> > -	clk_set_rate(ethqos->link_clk, ethqos->link_clk_rate);
+> > +		clk_set_rate(ethqos->link_clk, ethqos->link_clk_rate);
+> > +	}
+> >   }
+> 
+> if (!phy_interface_mode_is_rgmii(ethqos->phy_mode))
+> 	return 0;
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/net/ynl/Makefile.deps | 3 +++
- 1 file changed, 3 insertions(+)
+It is a void function, so no 0, but otherwise this does look less
+invasive.
 
-diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
-index 7dcec16da509..07373c5a7afe 100644
---- a/tools/net/ynl/Makefile.deps
-+++ b/tools/net/ynl/Makefile.deps
-@@ -21,3 +21,6 @@ CFLAGS_handshake:=$(call get_hdr_inc,_LINUX_HANDSHAKE_H,handshake.h)
- CFLAGS_mptcp_pm:=$(call get_hdr_inc,_LINUX_MPTCP_PM_H,mptcp_pm.h)
- CFLAGS_netdev:=$(call get_hdr_inc,_LINUX_NETDEV_H,netdev.h)
- CFLAGS_nfsd:=$(call get_hdr_inc,_LINUX_NFSD_NETLINK_H,nfsd_netlink.h)
-+CFLAGS_ovs_datapath:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
-+CFLAGS_ovs_flow:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
-+CFLAGS_ovs_vport:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
--- 
-2.43.2
-
+   Andrew
 
