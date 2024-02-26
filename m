@@ -1,147 +1,114 @@
-Return-Path: <netdev+bounces-74857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88785866F54
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:54:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7AAA866F71
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:56:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF0231C24E14
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 09:54:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2B3B28224D
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 09:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D011C4F1E1;
-	Mon, 26 Feb 2024 09:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F4D253E05;
+	Mon, 26 Feb 2024 09:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lw6p1EJV"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="DMGPGHHE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332134EB5D;
-	Mon, 26 Feb 2024 09:22:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2AD524B5
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 09:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708939361; cv=none; b=evKFAhtMCq67NbZFq1Ej4c0suMaJUqKyfcXO3XUVyaZdY2eeytH92cVq8RKViDlL0AxE2gWcBUhagzDNoTrQtxxZlyZEod11jStyW9C9CO2TZVEZ0DHLzNdyhiATWhf0dSk4v0zeH+gNAun9Zs4GZInGyzlRVyXeQKmAj893nh0=
+	t=1708939499; cv=none; b=TM85rvMTeyOzV9qr5LPHIqdGyXuUPRWvidR0/vH9gQq7pGMtwS6G8Wmr5v68CJEmPpO4ipkvQj7qgIatjsfXoNJAxPzfSg0XHXBarGu9TJouwuAVWeF2m3rB4Bgw8LDet0qbUjC0XcjcnCJAEK4DQ6QsIZl8M6GrtYtrxAe5OmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708939361; c=relaxed/simple;
-	bh=nHmAy4X/MhOUx7m403mmSo7DPD1Gl0hucVSHAPwk1YA=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=LrppRc1rwiJ8FfiSzyS0qeA0J+k7PbbxxkmTG71QwsNDY/NUrWBW4kKLPkO6ea3qZ4tgcf3iXpyIHuU3MZWHW2Q4ES2Zf2xLmFHyhWrbATyDFG8wKuVKlJnTAZ+NXKoJGOSe8WGuUByhNrj4333V9apaI+rk1ye45LpJrOyhgoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lw6p1EJV; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708939361; x=1740475361;
-  h=message-id:date:mime-version:to:cc:references:from:
-   subject:in-reply-to:content-transfer-encoding;
-  bh=nHmAy4X/MhOUx7m403mmSo7DPD1Gl0hucVSHAPwk1YA=;
-  b=Lw6p1EJV7agIkqG+SujyyR4/TdX+pYm/lqAdQw/YbhjV+u/3L/SAKCnp
-   6J1GOMbrkYR1vKBdtdZKYFapcHCZcvpsG8gloFn3eqiTiLT5lkj/IizUu
-   CTTItcj4r8BRQva6j+/SXrLTijQhD1SU9m5vkMjERifiMiGkHGXwtyNx3
-   kTWmjBubOWhfH3hp73VVMC4QwhgMHXK0GuBPuKcKP2fbIXReeXSveim+n
-   EgSd1dmrpGJJts2MX2bhfF7aUnhwZYMM3cO+00U3JqM5nylPCXgrXhEA4
-   mOsFTPbz2scXGiAkC1QIlp3ZORlYURv5f4jyVWCB0+GQLPTzeUgd6ysf+
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="13764211"
-X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="13764211"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 01:22:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="937029631"
-X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="937029631"
-Received: from mattu-haswell.fi.intel.com (HELO [10.237.72.199]) ([10.237.72.199])
-  by fmsmga001.fm.intel.com with ESMTP; 26 Feb 2024 01:22:36 -0800
-Message-ID: <1e719367-01ae-565a-2199-0ff7e260422b@linux.intel.com>
-Date: Mon, 26 Feb 2024 11:24:16 +0200
+	s=arc-20240116; t=1708939499; c=relaxed/simple;
+	bh=KDm3zUp8zkRu/r4C3EOkXlcvSwHeRKt1G1Pg6U+Sn0s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nmH6pYUZ9EXSXM539si9LXzBh1ov8yh+M00IVsQWlmB57JqC5VqpYhhoqcjeDBSQeCneZ/aHZsbsrMe7RqIWB6LG5poYYxPUtMV38c+tlUNFVJpItKY5+xYF222TY523E5LxsMu5NxGQkfcwRT35ZPO8w2DiHJ4S+KV2/KDsERE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=DMGPGHHE; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-512f6f263a6so798055e87.2
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 01:24:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708939496; x=1709544296; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KDm3zUp8zkRu/r4C3EOkXlcvSwHeRKt1G1Pg6U+Sn0s=;
+        b=DMGPGHHEifo0Bjm9rbYswnSfb+UQBUN3HvF2evbvTkSM5aSfvpD8kFRFkjPeBQrO9R
+         DAeymaSphFyTsQrtTfHcHd5gNptZtYFIpuoX5aYpfIEQF2pF6o+wbHzZaDGezLAdCb9G
+         UfSMiaU+7uo4MuXqMeaA/r+QrY17lQ2EEduc8NOpk47+2ixIHfzEYn5LDX4LTkZUUZvl
+         lH/oDeRE7LPxeMpLbj2T3/Qp16nopcintr/3vIxDqRnuhdW+KyEvTkSwen37gbxEV+F4
+         Cce3rkmA73TJrSBiNdRGTbh7ITUFyqMa6ehu3tfrr4PZZrUfnNeJpDUFgzCmPCAQsZwa
+         gwKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708939496; x=1709544296;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KDm3zUp8zkRu/r4C3EOkXlcvSwHeRKt1G1Pg6U+Sn0s=;
+        b=gKWDEv1XSNy7xU8RTBDmbg5XV8GRCsivjXtkA81cOhjYbADAtNZlWlzKR0G19VLYhA
+         R8cY2dn5CMk3/7qdtokQncZ6FlDAvOtHHxVzpn/DOWF7r988yTmVwAivfsMq03IfUBnp
+         Wk6eMCf1mcXhy44g6TRkXmXUrSLXSq1gAWo1RnKVZS8302d1E4zTi4p93soTztK0LBxT
+         +gvySWlBjx7KAqUnraOoR4z3zrPPJ1qJCxLHSQFVKivkNZWCCzkgJCHYiI+X54bBUyQo
+         5Id8zz3/SME2bRvSeRMivsA2wUrVagJ/vRUFJbrxVKSplkkSWYOAmfdXkohJ4VCtOquT
+         qFgg==
+X-Forwarded-Encrypted: i=1; AJvYcCVdLDvJ4O1Utpw+Ngh2Vs2NbZJsBL4BBOKLvVGLr/b7WWqAvcpmlsIFzNem5wk3ApqD42gLDIw/qQPprR3yaryTGgfjrksY
+X-Gm-Message-State: AOJu0YynJsiOVSAMDXCAR0TM+skZ2s7Wyhu1s/b98+SvfIHRpXFh3T+e
+	79eJ2e0bdn4bm8EZ5mAhDe90GoJb42RxyVw49bWVuBaqNV3+zxUm3jsGHGHGTZo=
+X-Google-Smtp-Source: AGHT+IFxmadF1CFcWTvSIqOIm+TEqY8ZzrjSiBldW5ZMoXA+UFJ34f0JrQDQxXgWW3T2GgUSjwmprQ==
+X-Received: by 2002:a05:6512:3119:b0:512:901a:eb9e with SMTP id n25-20020a056512311900b00512901aeb9emr4195773lfb.58.1708939495714;
+        Mon, 26 Feb 2024 01:24:55 -0800 (PST)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id n41-20020a05600c3ba900b004123b049f86sm7788798wms.37.2024.02.26.01.24.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Feb 2024 01:24:55 -0800 (PST)
+Date: Mon, 26 Feb 2024 10:24:54 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next] selftests: netdevsim: be less selective for FW
+ for the devlink test
+Message-ID: <ZdxY5vj22RSSUOXv@nanopsycho>
+References: <20240224050658.930272-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.13.0
-Content-Language: en-US
-To: Linux regressions mailing list <regressions@lists.linux.dev>,
- Thomas Gleixner <tglx@linutronix.de>
-Cc: "Christian A. Ehrhardt" <lk@c--e.de>, niklas.neronin@linux.intel.com,
- Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
- Greg KH <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
- linux-x86_64@vger.kernel.org, netdev@vger.kernel.org,
- Randy Dunlap <rdunlap@infradead.org>,
- Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-References: <CABXGCsNnUfCCYVSb_-j-a-cAdONu1r6Fe8p2OtQ5op_wskOfpw@mail.gmail.com>
- <Zb6D/5R8nNrxveAP@cae.in-ulm.de> <Zb/30qOGYAH4j6Mn@cae.in-ulm.de>
- <CABXGCsPu73D+JS9dpvzX78RktK2VOv_xT8vvuVaQ=B6zs2dMNQ@mail.gmail.com>
- <e7b96819-edf7-1f9f-7b01-e2e805c99b33@linux.intel.com>
- <CABXGCsPjW_Gr4fGBzYSkr_4tsn0fvuT72G-YJYXcb1a4kX=CQw@mail.gmail.com>
- <2d87509a-1515-520c-4b9e-bba4cd4fa2c6@linux.intel.com>
- <CABXGCsPdXqRG6v97KDGy+o59xc3ayaq3rLj267veC7YcKVp8ww@mail.gmail.com>
- <1126ed0a-bfc1-a752-1b5e-f1339d7a8aa5@linux.intel.com>
- <CABXGCsN5_O3iKDOyYxtsGTGDA6fw4962CjzXLSnOK3rscELq+Q@mail.gmail.com>
- <a026ecd8-6fba-017d-d673-0d0759a37ed8@linux.intel.com>
- <CABXGCsOgy8H4GGcNU1jRE+SzRqwnPeNuy_3xBukjwB-bPxeZrQ@mail.gmail.com>
- <CABXGCsOd=E428ixUOw+msRpnaubgx5-cVU7TDXwRUCdrM5Oicw@mail.gmail.com>
- <34d7ab1b-ab12-489d-a480-5e6ccc41bfc3@infradead.org>
- <10487018-49b8-4b27-98a1-07cee732290d@infradead.org>
- <4f34b6a8-4415-6ea4-8090-262847d606c6@linux.intel.com>
- <3ea25443-1275-4c67-90e0-b637212d32b5@leemhuis.info>
-From: Mathias Nyman <mathias.nyman@linux.intel.com>
-Subject: Re: This is the fourth time I've tried to find what led to the
- regression of outgoing network speed and each time I find the merge commit
- 8c94ccc7cd691472461448f98e2372c75849406c
-In-Reply-To: <3ea25443-1275-4c67-90e0-b637212d32b5@leemhuis.info>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240224050658.930272-1-kuba@kernel.org>
 
-On 26.2.2024 7.45, Linux regression tracking (Thorsten Leemhuis) wrote:
-> On 21.02.24 14:44, Mathias Nyman wrote:
->> On 21.2.2024 1.43, Randy Dunlap wrote:
->>> On 2/20/24 15:41, Randy Dunlap wrote:
->>>> {+ tglx]
->>>> On 2/20/24 15:19, Mikhail Gavrilov wrote:
->>>>> On Mon, Feb 19, 2024 at 2:41 PM Mikhail Gavrilov
->>>>> <mikhail.v.gavrilov@gmail.com> wrote:
->>>>> I spotted network performance regression and it turned out, this was
->>>>> due to the network card getting other interrupt. It is a side effect
->>>>> of commit 57e153dfd0e7a080373fe5853c5609443d97fa5a.
->>>> That's a merge commit (AFAIK, maybe not so much). The commit in
->>>> mainline is:
->>>>
->>>> commit f977f4c9301c
->>>> Author: Niklas Neronin <niklas.neronin@linux.intel.com>
->>>> Date:   Fri Dec 1 17:06:40 2023 +0200
->>>>
->>>>       xhci: add handler for only one interrupt line
->>>>
->>>>> Installing irqbalance daemon did not help. Maybe someone experienced
->>>>> such a problem?
->>>>
->>>> Thomas, would you look at this, please?
->>>>
->>>> A network device and xhci (USB) driver are now sharing interrupts.
->>>> This causes a large performance decrease for the networking device.
->>
->> Short recap:
-> 
-> Thx for that. As the 6.8 release is merely two or three weeks away while
-> a fix is nowhere near in sight yet (afaics!) I start to wonder if we
-> should consider a revert here and try reapplying the culprit in a later
-> cycle when this problem is fixed.
+Sat, Feb 24, 2024 at 06:06:58AM CET, kuba@kernel.org wrote:
+>Commit 6151ff9c7521 ("selftests: netdevsim: use suitable existing dummy
+>file for flash test") introduced a nice trick to the devlink flashing
+>test. Instead of user having to create a file under /lib/firmware
+>we just pick the first one that already exists.
+>
+>Sadly, in AWS Linux there are no files directly under /lib/firmware,
 
-I don't think reverting this series is a solution.
+Ah :)
 
-This isn't really about those usb xhci patches.
-This is about which interrupt gets assigned to which CPU.
 
-Mikhail got unlucky when the network adapter interrupts on that system was
-assigned to CPU0, clearly a more "clogged" CPU, thus causing a drop in max
-bandwidth.
+>only in subdirectories. Don't limit the search to -maxdepth 1.
+>We can use the %P print format to get the correct path for files
+>inside subdirectories:
+>
+>$ find /lib/firmware -type f -printf '%P\n' | head -1
+>intel-ucode/06-1a-05
+>
+>The full path is /lib/firmware/intel-ucode/06-1a-05
+>
+>This works in GNU find, busybox doesn't have printf at all,
+>so we're not making it worse.
+>
+>Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Thanks
-Mathias
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
