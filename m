@@ -1,238 +1,121 @@
-Return-Path: <netdev+bounces-75080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CB9A8681A6
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 21:01:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AF478681A8
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 21:01:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7E661F2792F
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 20:01:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7AE18B2339E
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 20:01:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F1BB130AEE;
-	Mon, 26 Feb 2024 20:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87767130AF0;
+	Mon, 26 Feb 2024 20:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="MmF7uzWE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IP0fYwh8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E4C129A91;
-	Mon, 26 Feb 2024 20:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC539129A91
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 20:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708977667; cv=none; b=EHVyKFETK/KtIgiJlb1EZKkcK48sKfrmu1yPTuxyrr0Vp6oRSlqQgqvKfZ9NCcvAnWa7ioGzBNocDwvh0rWMscF1KeSKfuifO2od05K0wyQdpcL5vLzJL9rHty0cr8NTkXjkj2VY7+UObjZ1MmfcHw9a9DCOBYEoUHiZHxuISbM=
+	t=1708977687; cv=none; b=t3OpQDnO5DKJ4TVQOOF4J1ozhA6I4tfN9dRWSCTHaeZzxwoERb5AP3ZEGWaKBDFyGpmSyRfaNr9hEcN48vLhHDbsO6FXxmwb4WW3nIso3BtTIOscLOPeo4AGtjlCjwWAZlwICcRZRyTtyqTnVBfk19yuA8i8BuRV2QR3TTyuUP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708977667; c=relaxed/simple;
-	bh=XF6HBlstObL7tYjyP0gGN/+EF9C6yA1SIHDSAYKDQ5Q=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P1hPDnZdKpXGZ4BlcwPR4DA/N58IF9Fac9dOpxtTY+rm3rYsP13ayivmynE/uCpe6vceSqnYTO81WPUxwnZrKFLMXDUV5wsljjJWQBUrBek+gCV6/0ZLAURNrHsi4Q8DoO6YXXCXb/woRHPFKsscq/MTnNi4qnS2sBIdip+6iX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=MmF7uzWE; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1708977666; x=1740513666;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=mnBaJ7CtH6e4OUZFMPWkwm1W/OlrTstwL9y6AsGZ9Fg=;
-  b=MmF7uzWEflYa+ex1/R3ZS+A2WLUVV6MmbLibRBMlq4WD2c7vk6oiM9H2
-   hGqro4BcH0Dk0GOfjv7mVvHZ5hL4aqxeqbLU/Raqer/G4M/wALJy8tY4D
-   FgRxyonU5xdzA2UEM4/X08zFcTQvmvBvV/ge1cvdzCLp5/pz77/oqzrDX
-   U=;
-X-IronPort-AV: E=Sophos;i="6.06,186,1705363200"; 
-   d="scan'208";a="68881664"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 20:01:03 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:25431]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.16.67:2525] with esmtp (Farcaster)
- id 28dc76bb-c6a2-425e-9a69-44f99aedd695; Mon, 26 Feb 2024 20:01:03 +0000 (UTC)
-X-Farcaster-Flow-ID: 28dc76bb-c6a2-425e-9a69-44f99aedd695
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 26 Feb 2024 20:01:02 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.48) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 26 Feb 2024 20:00:59 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <allison.henderson@oracle.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <linux-rdma@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <rds-devel@oss.oracle.com>,
-	<sowmini.varadhan@oracle.com>, <syzkaller@googlegroups.com>
-Subject: Re: [PATCH v1 net 2/2] rds: tcp: Fix use-after-free of net in reqsk_timer_handler().
-Date: Mon, 26 Feb 2024 12:00:50 -0800
-Message-ID: <20240226200050.71690-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CANn89iL+SSPYC8Bwm=-oDYRAkjE509_abvNK1KABThEPFaNL1g@mail.gmail.com>
-References: <CANn89iL+SSPYC8Bwm=-oDYRAkjE509_abvNK1KABThEPFaNL1g@mail.gmail.com>
+	s=arc-20240116; t=1708977687; c=relaxed/simple;
+	bh=zGlJ3EiOXR/34ioCepx5r0FEC6F58ty99m/GrlzjQAM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RhAbjftQ2hxYHghn5T2sNonklhdwhFSPZlF//aUyApA92ZsVvD6xhBpARxutjSQWmLVqjalHCLlNh7nV0z4kqQeFdfHvLo69nYHVyG4L89vq9GelB3UVQT99h0slrK+rZnl/3icvTEm09RaQthJkM/BxcNxWRZs7QhbVHLpZUDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IP0fYwh8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708977684;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nYxGw25SGI76GYgAampCb+LamaCZ5XgpHA2NlSjROPE=;
+	b=IP0fYwh801S6XdAGmipoA5eoYIh6Rey1jo/xy6XJ5zScbFX/cVV1iQf6iRKMzuzleclsEC
+	214DuuzkZmaUIzWAL+Cvuu68/vdf3JkdV7HmzcFJkHx3p5jVKo7PFQ1QLApEe/BKG222Sy
+	P3aRcPXJ7NJzN7dWwaq7tZKZJrm01kg=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-70-GPb1aWbCOfOg3H48DPq8_Q-1; Mon, 26 Feb 2024 15:01:23 -0500
+X-MC-Unique: GPb1aWbCOfOg3H48DPq8_Q-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-565ad4513d9so1302355a12.3
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 12:01:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708977682; x=1709582482;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nYxGw25SGI76GYgAampCb+LamaCZ5XgpHA2NlSjROPE=;
+        b=vguF0dUcf4fG8I03sptWxIQ6aDeFlIeQ1B99UsiDaF82ngAbi/ixAcRGEPsGweelhU
+         G9IHKAF7lyA2IVrKr8RXw9iYE/PQC2eyehT1iOTQ+O11sFl6/zSDCbkjZXiH7NNKHkQj
+         YeiUVpHZMH7ahBP/mm860zVfscQtpfrNoJBTMiCV0v3cV8qwdRHin4kDT+M9GzrC8PzK
+         4cSMd2XdJUJUl0wiMB1zN8zIeGsho8Tys6Q5Lmsv+xmDIZPwlRjubN0x535aXTbxczj5
+         ejBqQVV6HdWK7WPZ+geaa4jhC0xMSoXeBv8oxyY5r/0NSlQl+j35dNLzXl7s2bZRRwOJ
+         V5zw==
+X-Forwarded-Encrypted: i=1; AJvYcCUpXkfdjzSBiinwNrM3AVilpOKZZK7Ga80/2ec5XZjJ8XzVtCDOMIHeBBZ/7ly+Q/qjPgn/U6cv3MCddqq5ojXHz0+zrXHb
+X-Gm-Message-State: AOJu0YwyAtObe8tstxlzlcobVOG2aJxQZPzZJPCYehVwYFoXDp4p5K27
+	0fOErQ30tJ4kQII/KPYyxlSFvK+iaIHysKlXDZvdlDDioHBSWFJdfBFX9jhzu8fR+9RGN9ZAHJm
+	c8MBLvCXaSEP8IzxDunO1geB9q5BUlDAQJU8SklsSMpIv/lKOyiNGkfIlOJPJs8u4UKmLwUf6Af
+	qEE2bQsVZp1qv9NIPIoGXOe9RNNzNo
+X-Received: by 2002:a17:906:470e:b0:a3e:4d4c:d120 with SMTP id y14-20020a170906470e00b00a3e4d4cd120mr5377374ejq.12.1708977681803;
+        Mon, 26 Feb 2024 12:01:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGP8eld4XKjdHNinbhF+/WCSbrZBK7KYuAHXWGrSWsn9IST28vNpm+5g3NJMnd2r8qUxtdXhS8woALmCut452Q=
+X-Received: by 2002:a17:906:470e:b0:a3e:4d4c:d120 with SMTP id
+ y14-20020a170906470e00b00a3e4d4cd120mr5377360ejq.12.1708977681508; Mon, 26
+ Feb 2024 12:01:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240226151125.45391-1-mschmidt@redhat.com> <83a3cc75-a8c8-446b-a083-0ef62134d850@intel.com>
+In-Reply-To: <83a3cc75-a8c8-446b-a083-0ef62134d850@intel.com>
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Mon, 26 Feb 2024 21:01:10 +0100
+Message-ID: <CADEbmW2cncmVNkNLdrd_zq6CGLNOB_O0BvmGowZMbB1ZTyo8DA@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/3] ice: lighter locking for PTP time reading
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, 
+	Jesse Brandeburg <jesse.brandeburg@intel.com>, Richard Cochran <richardcochran@gmail.com>, 
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, 
+	Karol Kolacinski <karol.kolacinski@intel.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D039UWB002.ant.amazon.com (10.13.138.79) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Transfer-Encoding: quoted-printable
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 26 Feb 2024 20:52:35 +0100
-> On Mon, Feb 26, 2024 at 8:39 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+On Mon, Feb 26, 2024 at 8:17=E2=80=AFPM Jacob Keller <jacob.e.keller@intel.=
+com> wrote:
+> On 2/26/2024 7:11 AM, Michal Schmidt wrote:
+> > This series removes the use of the heavy-weight PTP hardware semaphore
+> > in the gettimex64 path. Instead, serialization of access to the time
+> > register is done using a host-side spinlock. The timer hardware is
+> > shared between PFs on the PCI adapter, so the spinlock must be shared
+> > between ice_pf instances too.
 > >
-> > From: Allison Henderson <allison.henderson@oracle.com>
-> > Date: Mon, 26 Feb 2024 19:22:01 +0000
-> > > On Mon, 2024-02-26 at 11:14 -0800, Kuniyuki Iwashima wrote:
-> > > > From: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > > > Date: Fri, 23 Feb 2024 10:28:32 -0800
-> > > > > From: Eric Dumazet <edumazet@google.com>
-> > > > > Date: Fri, 23 Feb 2024 19:09:27 +0100
-> > > > > > On Fri, Feb 23, 2024 at 6:26 PM Kuniyuki Iwashima
-> > > > > > <kuniyu@amazon.com> wrote:
-> > > > > > >
-> > > > > > > syzkaller reported a warning of netns tracker [0] followed by
-> > > > > > > KASAN
-> > > > > > > splat [1] and another ref tracker warning [1].
-> > > > > > >
-> > > > > > > syzkaller could not find a repro, but in the log, the only
-> > > > > > > suspicious
-> > > > > > > sequence was as follows:
-> > > > > > >
-> > > > > > >   18:26:22 executing program 1:
-> > > > > > >   r0 = socket$inet6_mptcp(0xa, 0x1, 0x106)
-> > > > > > >   ...
-> > > > > > >   connect$inet6(r0, &(0x7f0000000080)={0xa, 0x4001, 0x0,
-> > > > > > > @loopback}, 0x1c) (async)
-> > > > > > >
-> > > > > > > The notable thing here is 0x4001 in connect(), which is
-> > > > > > > RDS_TCP_PORT.
-> > > > > > >
-> > > > > > > So, the scenario would be:
-> > > > > > >
-> > > > > > >   1. unshare(CLONE_NEWNET) creates a per netns tcp listener in
-> > > > > > >       rds_tcp_listen_init().
-> > > > > > >   2. syz-executor connect()s to it and creates a reqsk.
-> > > > > > >   3. syz-executor exit()s immediately.
-> > > > > > >   4. netns is dismantled.  [0]
-> > > > > > >   5. reqsk timer is fired, and UAF happens while freeing
-> > > > > > > reqsk.  [1]
-> > > > > > >   6. listener is freed after RCU grace period.  [2]
-> > > > > > >
-> > > > > > > Basically, reqsk assumes that the listener guarantees netns
-> > > > > > > safety
-> > > > > > > until all reqsk timers are expired by holding the listener's
-> > > > > > > refcount.
-> > > > > > > However, this was not the case for kernel sockets.
-> > > > > > >
-> > > > > > > Commit 740ea3c4a0b2 ("tcp: Clean up kernel listener's reqsk in
-> > > > > > > inet_twsk_purge()") fixed this issue only for per-netns ehash,
-> > > > > > > but
-> > > > > > > the issue still exists for the global ehash.
-> > > > > > >
-> > > > > > > We can apply the same fix, but this issue is specific to RDS.
-> > > > > > >
-> > > > > > > Instead of iterating potentially large ehash and purging reqsk
-> > > > > > > during
-> > > > > > > netns dismantle, let's hold netns refcount for the kernel TCP
-> > > > > > > listener.
-> > > > > > >
-> > > > > > >
-> > > > > > > Reported-by: syzkaller <syzkaller@googlegroups.com>
-> > > > > > > Fixes: 467fa15356ac ("RDS-TCP: Support multiple RDS-TCP listen
-> > > > > > > endpoints, one per netns.")
-> > > > > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > > > > > > ---
-> > > > > > >  net/rds/tcp_listen.c | 5 +++++
-> > > > > > >  1 file changed, 5 insertions(+)
-> > > > > > >
-> > > > > > > diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-> > > > > > > index 05008ce5c421..4f7863932df7 100644
-> > > > > > > --- a/net/rds/tcp_listen.c
-> > > > > > > +++ b/net/rds/tcp_listen.c
-> > > > > > > @@ -282,6 +282,11 @@ struct socket *rds_tcp_listen_init(struct
-> > > > > > > net *net, bool isv6)
-> > > > > > >                 goto out;
-> > > > > > >         }
-> > > > > > >
-> > > > > > > +       __netns_tracker_free(net, &sock->sk->ns_tracker,
-> > > > > > > false);
-> > > > > > > +       sock->sk->sk_net_refcnt = 1;
-> > > > > > > +       get_net_track(net, &sock->sk->ns_tracker, GFP_KERNEL);
-> > > > > > > +       sock_inuse_add(net, 1);
-> > > > > > > +
-> > > > > >
-> > > > > > Why using sock_create_kern() then later 'convert' this kernel
-> > > > > > socket
-> > > > > > to a user one ?
-> > > > > >
-> > > > > > Would using __sock_create() avoid this ?
-> > > > >
-> > > > > I think yes, but LSM would see kern=0 in pre/post socket() hooks.
-> > > > >
-> > > > > Probably we can use __sock_create() in net-next and see if someone
-> > > > > complains.
-> > > >
-> > > > I noticed the patchwork status is Changes Requested.
-> > > > https://urldefense.com/v3/__https://patchwork.kernel.org/project/netdevbpf/list/?series=829213&state=*__;Kg!!ACWV5N9M2RV99hQ!KHKUQKUDnNCdiEcb4ZK1VBiYSitarEb-CAWeSJvaeK04fgW4cuWePg3Ac2HmIAPUHuqeCwgt466fHEKAAdfa$
-> > > >
-> > > >
-> > > > Should we use __sock_create() for RDS or add another parameter
-> > > > to __sock_create(..., kern=true/false, netref=true/false) and
-> > > > fix other similar uses (MPTCP, SMC, Netlink) altogether ?
-> > > >
-> > > > Thanks!
-> > >
-> > > Hi all,
-> > >
-> > > Thank you for looking at this.  I've been doing a little investigation
-> > > in the area to better understand the issue and this fix.  While I
-> > > understand what this patch is trying to do here, I'd like to do a
-> > > little more digging as to why 740ea3c4a0b2 didnt work for rds,
+> > Michal Schmidt (3):
+> >   ice: add ice_adapter for shared data across PFs on the same NIC
+> >   ice: avoid the PTP hardware semaphore in gettimex64 path
+> >   ice: fold ice_ptp_read_time into ice_ptp_gettimex64
 > >
-> > 740ea3c4a0b2 works only for netns with its dedicated ehash, which
-> > is unshare(CLONE_NEWNET)d with net.ipv4.tcp_child_ehash_entries != 0.
-> >
-> > With the diff below, we can fix the issue, but as noted in the
-> > description, this slows down netns dismantle where no reqsk, this
-> > is true if the netns did not have kernel TCP sockets.
-> 
-> BTW I note that inet_twsk_purge() probably would need this "goto
-> restart;" as well....
-> 
-> sk_nulls_for_each_rcu(sk, node, &head->chain)  is not a _safe variant...
+>
+> Glad to see some fix and improvement in this place. I had been
+> considering switching the hardware semaphore entirely to be a shared
+> mutex instead, but this direction also seems reasonable and fixes most
+> of the issues. We could actually extend this to replace the semaphore
+> with a mutex in order to avoid the PCIe transactions required to handle
+> the hardware semaphore register.
 
-Ah exactly!  Will you post it or I can include it as the first patch.
+Thanks for the review. I'm glad you mentioned replacing the hw
+semaphore with a mutex, because I was already going in that direction
+:)
+Michal
 
-The following patch will remove it and the end result will be the
-same though.
-
-
-> 
-> diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
-> index 5befa4de5b2416281ad2795713a70d0fd847b0b2..a62031d85bcce00261193136dd72d9f57ffd34fc
-> 100644
-> --- a/net/ipv4/inet_timewait_sock.c
-> +++ b/net/ipv4/inet_timewait_sock.c
-> @@ -283,10 +283,11 @@ void inet_twsk_purge(struct inet_hashinfo
-> *hashinfo, int family)
->                                  * freed.  Userspace listener and
-> reqsk never exist here.
->                                  */
->                                 if (unlikely(sk->sk_state == TCP_NEW_SYN_RECV &&
-> -                                            hashinfo->pernet)) {
-> +
-> !refcount_read(&sock_net(sk)->ns.count))) {
->                                         struct request_sock *req =
-> inet_reqsk(sk);
-> 
-> 
-> inet_csk_reqsk_queue_drop_and_put(req->rsk_listener, req);
-> +                                       goto restart;
->                                 }
-> 
->                                 continue;
 
