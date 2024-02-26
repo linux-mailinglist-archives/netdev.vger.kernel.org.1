@@ -1,158 +1,107 @@
-Return-Path: <netdev+bounces-74958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39CB686792C
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:56:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9617E86795B
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:03:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E86CD291338
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 14:56:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50B73B27B83
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:01:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE5F1145FE5;
-	Mon, 26 Feb 2024 14:37:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EB7D14CAA3;
+	Mon, 26 Feb 2024 14:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="JpBUoPUa"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="i36GNJFU"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62350145B25
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 14:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D9C14AD2D;
+	Mon, 26 Feb 2024 14:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708958254; cv=none; b=mTTCBbm7gLNJrpDPZLAugHOoS6pVlszVFWXDakIk+bd91iX6DSz6+8G2okWkVxDByNKsnt7a9ozb7d7PpNtUIG5eZ1CaXB1FZuayFdXn5klECxyxZRl++IL11zMOYrgv+EGlfJXilps1si9oH/WcjBsma4asEHZAMYvTuZRmTmk=
+	t=1708958362; cv=none; b=V/NybaR+DA7/X4GtxnFH7ztOtRvOz4KHXpvq7aFBOnAfkWbGOAgFgDTvLBmTW0YMD5Kqxe9vb24kEmSd8RDARZ8uDRduhhIgLIpLYgFPNMvLgXmK45nkFhEqEw4vF6kyWiTv9EF8qLzuxYPyFCmw1L+eQmi553wictYUprz7mLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708958254; c=relaxed/simple;
-	bh=BllqSZzFzm46ETRRb7f/ZnInxNzbvLNTReNdXBub+3Q=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=iYYpe1rWmXQQkqtWAKWbRsmJgpWJk8lT+TninC/cqxSOI5jYZJAiTJkNaPH5rt4Xg2MYQb8vvZmmk5KsHyzSQvEp2DT2secoVIiINIDP7Y2PNpMMTt+DBaD11X7lcMXEzG+k1zQp05RR2XIEURj88wQc6jhObmSQzpp0RPx4u20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=JpBUoPUa; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-Received: from sparky.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 0B50D201B5;
-	Mon, 26 Feb 2024 22:37:29 +0800 (AWST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1708958249;
-	bh=Ifv1HbBODQ6Nb2yJVN7DXJhNi5ZN2BXA4Vdp39eB79M=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=JpBUoPUaODoJKl+4r8XxbpeGTxYQ35XP/Bsp2KdPHjPwND44GQekw7yBzWHki+36D
-	 2TukI1OopOaTIjyTuQUL6Y/rSg/PC8tC+bG2l/vqMIfghYkGJZcJa5dkijPODNX70A
-	 oZhGXV5LeV99p04asA3jl1LbbAtk5ArQU+3MRNH7gUjS3nohmcC4ezubEo9WY8R/D2
-	 hl35iIEMi0UBp9oF+SgFI5sz14SSu22eX+Q3g++ejVqN2AmkYPoH3AbPTKP2rGMBEg
-	 Eex7yvBsSRRHH4kjAo0blH/sh6PtFDp0TOIPZG6lU7c7zNIBnu5YKNCDBolMQLDuvQ
-	 nbqdm7DYT0wYw==
-Message-ID: <6aaffdd81feeb1cf6ff374a534f916410c106cf6.camel@codeconstruct.com.au>
-Subject: Re: MCTP - Socket Queue Behavior
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: "Ramaiah, DharmaBhushan" <Dharma.Ramaiah@dell.com>, 
-	"netdev@vger.kernel.org"
-	 <netdev@vger.kernel.org>, "matt@codeconstruct.com.au"
-	 <matt@codeconstruct.com.au>
-Cc: "Rahiman, Shinose" <Shinose.Rahiman@dell.com>
-Date: Mon, 26 Feb 2024 22:37:28 +0800
-In-Reply-To: <SJ0PR19MB4415097526AFE55EC0EE2714875A2@SJ0PR19MB4415.namprd19.prod.outlook.com>
-References:
-	 <SJ0PR19MB4415F935BD23A6D96794ABE687512@SJ0PR19MB4415.namprd19.prod.outlook.com>
-	 <202197c5a0b755c155828ef406d6250611815678.camel@codeconstruct.com.au>
-	 <SJ0PR19MB4415EA14FC114942FC79953587502@SJ0PR19MB4415.namprd19.prod.outlook.com>
-	 <fbf0f5f5216fb53ee17041d61abc81aaff04553b.camel@codeconstruct.com.au>
-	 <BLAPR19MB4404FF0A3217D54558D1E85587502@BLAPR19MB4404.namprd19.prod.outlook.com>
-	 <da7c53667c89cb7afa8d50433904de54e6514dde.camel@codeconstruct.com.au>
-	 <SJ0PR19MB4415097526AFE55EC0EE2714875A2@SJ0PR19MB4415.namprd19.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1708958362; c=relaxed/simple;
+	bh=u6Nlj9aFWUkGtMphlgtcfzyYeMBYqT2bTgNnhxzd4PA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QOFpq6rrWE0okhZIUPbi8cnh+KMKhcwFhWKRPRNHlu9JP70LF27zruBxHAJ2VKdOZAMN3gHqUZs+5PdEgOtHTqceH53goStOPdkdVhhOCO0DrHjwVIC2NOyno00zWDbUQQSvxQ3dp0okeGauYhIGFnEU3SFVAUslzJfvibj3I6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=i36GNJFU; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=XPs0zPZIiUMU61zxAetpvc6AZcILYC4oTZnxDxpcdNc=; b=i36GNJFUnA++Z4gOewmHXVagLb
+	6ejWEec7cnUdo6EPzUZnziutrcncOvwrvq/t31x4xz5gInslKYJbXQH9/Nu7s/CARGxVrP/eckNPc
+	YocpXU/nvYsaKSb9a23T84FaOIQ/5Vh9ZMRPJbmLWOQL2dk6OfvW2cRHs6gMThumQ6p4XDdEW9/9r
+	iSimuM7vxqGMMNyTL1WEmsiovJdAj/4R77IJtcGI+LKG/FQBiTlyh741voW9xicVhea+DTRbbB3uI
+	WQq2A+H6aS4g40j10/cZRZsa7FRSrJa53olqCx2KCIxKgmxG72NpIDwb9mPlR10OMVmdTCJ20KoLA
+	4ar5Lq4A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45490)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rec8K-0003qd-23;
+	Mon, 26 Feb 2024 14:39:08 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rec8I-0006VD-77; Mon, 26 Feb 2024 14:39:06 +0000
+Date: Mon, 26 Feb 2024 14:39:06 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Shengyu Qu <wiagn233@outlook.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v1] net: sfp: add quirks for ODI DFP-34X-2C2
+Message-ID: <ZdyiigYNGf8WVZNu@shell.armlinux.org.uk>
+References: <TY3P286MB2611C0FA24318AA397DB689B985A2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
+ <ZdyahVYAhPgf2Xqn@shell.armlinux.org.uk>
+ <TY3P286MB2611BD62C30B37A5BE02D3C5985A2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <TY3P286MB2611BD62C30B37A5BE02D3C5985A2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Dharma,
+On Mon, Feb 26, 2024 at 10:16:46PM +0800, Shengyu Qu wrote:
+> Hi Russell,
+> 
+> > On Mon, Feb 26, 2024 at 09:23:46PM +0800, Shengyu Qu wrote:
+> > > ODI DFP-34X-2C2 is capable of 2500base-X, but incorrectly report its
+> > > capabilities in the EEPROM.
+> > > So use sfp_quirk_2500basex for this module to allow 2500Base-X mode.
+> > This was previously submitted by Sergio Palumbo, and comes in two
+> > different forms - an OEM version and non-OEM. There was extensive
+> > discussion about this, and the result is that I'm not accepting this
+> > quirk for this module.
+> > 
+> > The reason is that the module _defaults_ to 1000base-X and requires
+> > manual reconfiguration by the user to operate at 2500base-X.
+> > Unfortunately, there is no way for the kernel to know whether that
+> > reconfiguration has occurred.
+> No, In the firmware of this stick, the speed rate is configured to auto
+> negotiation rather than fixed 1000base-X.
 
-> Basically, interleaving of the messages completely depends on the I2C
-> driver.
+How does this "auto negotiation" work?
 
-To clarify: it completely depends on the MCTP-over-i2c transport driver
-(as opposed to the i2c controller hardware driver). This is the entity
-that is acquiring/releasing the i2c bus lock during MCTP packet
-transmission.
+I mean *exactly* how does it work? How does it know whether the host is
+operating at 1000base-X or 2500base-X?
 
-> If lock in the transport driver is designed to block the I2C
-> communication till the existing transaction is complete, then
-> messages shall be serialized. If transport driver does the locking in
-> the way I have mentioned does this in anyway effect the Kernel socket
-> implementation (time out)?
+There is *no* inband protocol to allow this to be negotiated.
 
-This approach would need some fundamental changes to the core kernel
-MCTP support.
-
-The transport drivers do not work on a message granularity; like other
-network interface drivers, they deal with individual packets from the
-protocol core. The driver has access to hints around which "flows" may
-be active (which the i2c driver uses to acquire/release the bus lock),
-but in order to implement your proposed message serialisation, the
-driver would need to re-order packets back into messages, otherwise we
-would be prone to deadlocks.
-
-... then, given MCTP cannot accommodate reordered packets, this would
-also be prone to packet loss in all but the simplest of message
-transfers.
-
-That is why the MCTP-over-i2c transport's use of the i2c bus lock is
-nestable: we need to prevent loss of MUX state, but need to ensure we
-can make forward progress given multiple packet streams, and their
-expected responses.
-
-> > So, if this is manageable in userspace (particularly: you don't
-> > need to manage
-> > concurency across multiple upper-layer protocols), the sockets API
-> > is already
-> > well suited to single-request / single-response interactions.
-> >=20
-> If we can manage concurrency in the Kernel this would provide more
-> design options at the user space,
-
-Sure, a kernel-based approach would probably make for a cleaner overall
-design, and would cater for multiple applications attempting to
-communicate without requiring their own means of managing concurrency.
-
-> > Why do you need to prevent interactions with *other* devices on the
-> > bus?
-> >=20
-> When bus the is shared with multiple devices and requests are
-> interleaved, responses are dropped by the EP points due to bus busy
-> condition.
-
-So this specific endpoint implementation needs a *completely* quiesced
-bus over a request/response transaction? this is a little surprising, as
-it restricts a lot of bus behaviours:
-
- - it requires a completely serialised command/response stream
-
- - it can only operate as a responder
-
- - it cannot correctly implement any upper layer protocols that do not
-   have a strict request-then-response model (there are components in
-   all of NVMe-MI, PLDM and SPDM that may violate this requirement!)
-
- - it cannot be present on a bus with other endpoints which may
-   asynchronously send their own MCTP packets, and/or participate in
-   SMBUs ARP (and so are not serialisable by the kernel's MCTP
-   behaviour)
-
-Given these limitations, it may be more effective to improve that
-endpoint's MCTP/SMBus support, rather than add workarounds to the kernel
-MCTP implementation. Of course, I understand this may not always be
-feasible, but may make things easier for you in the long term.
-
-Cheers,
-
-
-Jeremy
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
