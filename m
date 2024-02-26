@@ -1,92 +1,124 @@
-Return-Path: <netdev+bounces-75125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 073048684A4
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 00:39:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF2CB8684C4
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 00:52:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E9A8B22C78
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 23:39:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AFC4B221D2
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 23:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02D4135A50;
-	Mon, 26 Feb 2024 23:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB6D135A50;
+	Mon, 26 Feb 2024 23:52:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iJfF8cvJ"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="B6X5dYA3"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AEC260864;
-	Mon, 26 Feb 2024 23:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5111EB22
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 23:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708990754; cv=none; b=UstDb94ctG2rEKBmuirEzQCiPUSZ3c33dNxLRYnbQxzP1ny0RYqa7gKZik50D3dv5tnkf9EjqO4I4u86oEWnNeR2kMniWPH2FM2togJTI4PbkbsmGUKsd1ZEytv5L6yF8i0pCHJyuLLAOzwkHL+/kxQtzznvnPrMLTLW72EUuvU=
+	t=1708991522; cv=none; b=rmoMlx2p0qPC/I1cJMJJ6ShiCwtGdi1To2Mm+qfxS0zcHrmhL+lITXsLN7rN4uHfVnil/ZNPYDF8MYLCT0ekmh9jPk1lB7hQgcvnbfBSjnGqFFCToN71aeD/9CUPqBeFbW//tpYPOszfB+Lyhfom1vSEw8w1Em9rqT7DeR6atbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708990754; c=relaxed/simple;
-	bh=DC4XPRGfDGkd+lTP0RPnZft98OYBjzRmA203J/eHadU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M8ZqRbk2FejGtmzCPXisOn7D5VRpecw8cpBmNGpaQunJdl7m8brHnBH6F91REsSIm2jNDu2DMAfTLj0ebZ1pt0HnGxizhiSRszutay4x+U1F/yfCMIZV65kBvotmrBL7UlrgvErKSx63VfFMLWURppggcLyMaLKvj1Ca1Ulad8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iJfF8cvJ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7Otld8V/bzkJaFDg5xKk0LY1UIWmUWFwWmtXGjOC6yU=; b=iJfF8cvJ/VlmCEUV3k+y55j5+A
-	jkGnLmwMn+4b2kyVoBJ/ZtWI/CW5V/ZkvTFCytF3AwIpxEmkYl+bihY0OvF0ggYrnagtM1bKTjEz+
-	QwFY7UAe0ZIPxTtz8KS7RSTlC22W6N8L/gj80aLXSljhSBIHboaYRtnTi7ChWqLlFQ9E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rekZ5-008lx7-6g; Tue, 27 Feb 2024 00:39:19 +0100
-Date: Tue, 27 Feb 2024 00:39:19 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sarosh Hasan <quic_sarohasa@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Prasad Sodagudi <psodagud@quicinc.com>,
-	Andrew Halaney <ahalaney@redhat.com>, Rob Herring <robh@kernel.org>,
-	kernel@quicinc.com, Sneh Shah <quic_snehshah@quicinc.com>,
-	Suraj Jaiswal <quic_jsuraj@quicinc.com>
-Subject: Re: [PATCH net-next v2] net: stmmac: dwmac-qcom-ethqos: Update link
- clock rate only for RGMII
-Message-ID: <dd9b608d-aa37-4798-b1ca-20ee447d3065@lunn.ch>
-References: <20240226094226.14276-1-quic_sarohasa@quicinc.com>
+	s=arc-20240116; t=1708991522; c=relaxed/simple;
+	bh=8lUSqlHGMqI8I1r1rpRBEXkwRpZ7oqe4M8MCNf1etHA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HdwFaAn5sET2UmSuwGSGTdyBQwtnI4DIZS1WzHLkH8yGWg9M87h3z1+X2eYzHtDnHiwnKUJRnQ7zaaaPcBoNX0piKA8ubDLhZYXek9foBEE0+ShI0beaub26MaMMPA5Egovf2aokp8iJESbwzjrsqwYmG3Z7vDcnTpRxXO0Y238=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=B6X5dYA3; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d7881b1843so28340095ad.3
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 15:52:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1708991520; x=1709596320; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vyh7mdFRyjlmJV4fW69ox7tTTJCxGb5XPOBSz1bCTds=;
+        b=B6X5dYA3THgOp6st2c8F6tAXMRD1omasU5NmLQgv59huRvDdk544qAzWwMS1+dkokV
+         Z2aMZgwNAjX5NbwbNDjudPSys5kedeAn67NLAm8AUCM0jrckZ0l+qbSYUvrUy7EgkDc1
+         TOKRoMdkJnZ1nULU19ChI3FxdQ1yCIvUUIjc9Sf9zqvpPqeKueHG6Msr1BgA/TDROXK+
+         FpHCdJ4F8Fx36Zghr07QNGX+lIWpX4s2DX60dJ6guEdzK0K4MOXFdjTEn5Z6SMjGKwKE
+         qtyQGv0gfJTnxbKY2JsIWQEu9aOSaYfXP5mcPPCh0JL2M0ddPbNtTS8wPMyZnqeGaCaU
+         Hj7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708991520; x=1709596320;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vyh7mdFRyjlmJV4fW69ox7tTTJCxGb5XPOBSz1bCTds=;
+        b=OsC6I6Yk1pK8z+hwI0/EX9rS7JHacUEuE0XK+xeD0ZrSAP4J7mrjPZC1tQXg5heayf
+         V6/WcibbOtWME/rfC8x5HeJAy0hQUX1C/tY76JnAxnYqd1PfCemXkbqlkkMIqAACw2YH
+         OIlzRSvVcJHh6DjCcie+04OT5HBbzuc9A+yuupFqvTCH0i/K7aOwP+EK5epUEZl/PC6Q
+         3dL2iTLztIWpQ8vl5nIMuU2plFFx/tZJw0LEsxb/JDIbD9OqbqtBjIjAY2ZSqz8ab2Za
+         VPvHIl5OrpMZHfBOw140qq94+um+0mYcmSzxErKSsBjSjCNfeOMIUVjZKsylTKu04sqI
+         z7pw==
+X-Forwarded-Encrypted: i=1; AJvYcCVapJJdldR9s9igLkIyIuQ3XTPw+GLH9CxltefhqR50t6EJ6ujRp2LUZGhAzgkBm9UVR//jAcMuJfY+xUm0aixmlewqRIXI
+X-Gm-Message-State: AOJu0Yz55TesaDTLweU2CRqBPDkuPTfg5UQ61UGSt2yI6pQhLtvcF9hi
+	/4L5Z7h4Gyqou6VElN0WrXspXWewiMRNOCPsSgFiEl9CSTBVXycir0j0GmqGGZ31AhnqoFP/Nux
+	L11DhqIUpi27g0PwSk2DK5gPYY/arNiUs1o75
+X-Google-Smtp-Source: AGHT+IGcY9ko42XXIFbh54WiWMk6NMI+6vNUAaXKGgq93/tZ3zK1OHEtzgeAGptztw3FB17mOtXCnI7Z0xkxwMG3Vu8=
+X-Received: by 2002:a17:902:ebc6:b0:1dc:83b3:99a6 with SMTP id
+ p6-20020a170902ebc600b001dc83b399a6mr9032283plg.41.1708991520569; Mon, 26 Feb
+ 2024 15:52:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240226094226.14276-1-quic_sarohasa@quicinc.com>
+References: <20240224-tcp-ao-tracepoints-v1-0-15f31b7f30a7@arista.com>
+ <20240224-tcp-ao-tracepoints-v1-3-15f31b7f30a7@arista.com> <20240226204142.GJ13129@kernel.org>
+In-Reply-To: <20240226204142.GJ13129@kernel.org>
+From: Dmitry Safonov <dima@arista.com>
+Date: Mon, 26 Feb 2024 23:51:49 +0000
+Message-ID: <CAGrbwDTDfkwf40cTkXh6QgQwPpsAVVLWENYH=_eko5tHCKC5VQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 03/10] net/tcp: Move tcp_inbound_hash() from headers
+To: Simon Horman <horms@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Shuah Khan <shuah@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	Dmitry Safonov <0x7f454c46@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 26, 2024 at 03:12:26PM +0530, Sarosh Hasan wrote:
-> Updating link clock rate for different speeds is only needed when
-> using RGMII, as that mode requires changing clock speed when the link
-> speed changes. Let's restrict updating the link clock speed in
-> ethqos_update_link_clk() to just RGMII. Other modes such as SGMII
-> only need to enable the link clock (which is already done in probe).
-> 
-> Signed-off-by: Sarosh Hasan <quic_sarohasa@quicinc.com>
+On Mon, Feb 26, 2024 at 8:43=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
+te:
+>
+> On Sat, Feb 24, 2024 at 09:04:11AM +0000, Dmitry Safonov wrote:
+[..]
+> > +     if (req) {
+> > +             if (tcp_rsk_used_ao(req) !=3D !!aoh) {
+> > +                     u8 keyid, rnext, maclen;
+> > +
+> > +                     if (aoh) {
+> > +                             keyid =3D aoh->keyid;
+> > +                             rnext =3D aoh->rnext_keyid;
+> > +                             maclen =3D tcp_ao_hdr_maclen(aoh);
+> > +                     } else {
+> > +                             keyid =3D rnext =3D maclen =3D 0;
+> > +                     }
+>
+> Hi Dmitry,
+>
+> it looks like keyid is set but otherwise unused.
+>
+> Flagged by W=3D1 builds with gcc-13 and clang-17.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Hi Simon,
 
-    Andrew
+Yeah, I think I didn't notice it when I was splitting the WIP patch.
+It should be in the very next patch that uses them:
++                       trace_tcp_ao_handshake_failure(sk, skb, keyid,
+rnext, maclen);
+
+Thanks for the report, going to fix in v2,
+             Dmitry
 
