@@ -1,109 +1,115 @@
-Return-Path: <netdev+bounces-74915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5E7486749F
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 13:20:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19E1D86751B
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 13:36:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 030521C226CF
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:20:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 338ADB217DE
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C42604BA;
-	Mon, 26 Feb 2024 12:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88107605DD;
+	Mon, 26 Feb 2024 12:29:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TiG2qLMz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A7D604C4;
-	Mon, 26 Feb 2024 12:20:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90D4605B7
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 12:29:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708950018; cv=none; b=MkcPi00sKjGnTsGCYwWSkLB9ibDXLRSi1kLIKgOsXaUgVTaUdlcWS6xx5PqYSRW2pkO7ox14GHsB9eSVB34KeRYaU5maIsdZBROAghE/Hsgibq/t7KLmmOZM9EmZb3ZTYoA6dHsrhZ5bPKqR8fAu7a7exGz5ET+0sPzmpBTqKMM=
+	t=1708950559; cv=none; b=qRv+y6sCL1QikmEP8SjUfxnGaYF7Kq2PwZM7BcUrxSRVh9AULSEo/EfBM0AzO1aOShIQ9BWq8o9IMcxudo4tJLazz6ywHuaoTWhnObvya8dZuIlfBk7rkwZl8ItrnSNxcJnE2bNOdXUcRTENZj2W/WjimBPkHNh4q5o9ipX7QjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708950018; c=relaxed/simple;
-	bh=kzsP9SMdQi9uXkmXE7VtoRsZjWjTd4h4Y2jjaWZrcbc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NAZuT6JRzE3EK6raLaN/7QWuxn/GlZisFD8SvTaXVnmQ8FNEHX0oTbeXw0Hs/FmklpxY2BOGnW6zT5sskdSR2y+VLLlXPeXX/5GyV6qJD2yr/ZdbJMkLLTF6piK5wpl75dFo7RUi7Fj9dw++rBC3TepJmOvlG2Qfd38/YwJx4K0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-60908e5fb9eso5813357b3.2;
-        Mon, 26 Feb 2024 04:20:16 -0800 (PST)
+	s=arc-20240116; t=1708950559; c=relaxed/simple;
+	bh=GXBeYP8/NZGB5qf7XT5SAdvVmTap9xNVMLCGmPvvpCE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PN1Q1yXEwr6wrVpJX+ukuTURQ7dUW+hCVbgJgUHKoZX4HpoEBVAS7eR9aE8ELZKE4+q3fT4K9vTL5SxWJsaTBg7hc2RkQcQF24sn6dlMB4zb1d+OpHdunrlun4gxwh9nultniGgIC9bKCrEUcNq7zXtV1X0HRLdM8XpIx9Zz/Gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TiG2qLMz; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a43488745bcso134352566b.3
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 04:29:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708950556; x=1709555356; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9HdH6UtXyV/jkzcX4bUHV7TOheGh3mZ5gM3aVou29Dg=;
+        b=TiG2qLMz5qJUgsGBdPzBPRSIIHYodgqkh/gNB/BM6T1KlnLmfDxFxyhgvVDg1GIxUf
+         HrOqaW1zdWMvApiLo+aQRhiYuMeUT7kCbEAvGZed8tk1VR9EyG7Oj/l7tCx6GTOuO7TJ
+         9RzvX/dczCo3hda3Yi7fQeK1+Om5723GU5XSbKUENrXe8qKRhVjeu7lwryvo8UaNkAqh
+         v38/TiSXL+pascDs4rUj+b0SxDxWwOthDdje3OjGdFT5//y6UD92cGshiYfnv5hsigbE
+         UU9D8+TUy9Fi+DR9uEwhzIuUetSNKSRX0qwjjOzgLddYLIN2A7oZZ/uX9C+MpLkTOE8t
+         SVQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708950014; x=1709554814;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E4J/cxB0tcjU1L2Z32zud+kvug5qqY91R00zM2x+EZo=;
-        b=OlfFaegxpfes01GHkY6Ootx7MEsurII6X/G+1zxG6gcee5j/2s1WAJyM8EfpLuyjYz
-         OLSPjf456Eigsv7YeGCXEMvSwZ/tvbe4/uxWlxRmP6P0xAg828jqgVL/+mg+j898a4io
-         synUVDVQDgJylVr6C/AacPA2Bc5GpekwD+B8nuMqvWXfJ7oo/VPgs8D1hHwy6+xSN7VG
-         xC3TFbDLqlvSdqqAejELa/tqXdFNgTe91nY6P057NGRxJnBQ6j6fAOGtPraetf37hMnF
-         QJV7yLkh+ZsqqtC7zEilMiAY/8x2vIYcYoy2wNqAEbFxgjJexGZ9tRR1DW93s1hTDYl0
-         JtFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX3dXjlMUhAXzfrap6Z7S/QY1YXrLxiBvLM+1B52GwEQUQYyhBz2t4z1dk/auZeG4ndzw6wP+3bUtIsKfvIJrnWUuFVs8c3YTZKeacFZ7n3EGC2fBhdIFsI1/tfzM5+VmxLR9ET8O+QsBZUYaa+lm6CqMyMeMyBzZo1xzKsIvz1XWi0QFtN
-X-Gm-Message-State: AOJu0YwOys2G2P3XFuEZvnRs7xwsfHfze0W8PHTgeoEjtqPxZ7w0pEui
-	wvSfto9XoE/meIbWcT73Ow0iG9TzAjksAN7W/BfUJNsXaogrxvMgnr0u6oco3Wo=
-X-Google-Smtp-Source: AGHT+IFpVAPgWrVr+QEyj+mdbbR6FavL5Lw2ic5j6M9S0vty0r59mWNrQaW69jrOeX3VhqoJT6oLMg==
-X-Received: by 2002:a05:6902:4d0:b0:dc7:43b7:31ac with SMTP id v16-20020a05690204d000b00dc743b731acmr4276214ybs.14.1708950014108;
-        Mon, 26 Feb 2024 04:20:14 -0800 (PST)
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com. [209.85.219.171])
-        by smtp.gmail.com with ESMTPSA id b14-20020a5b0b4e000000b00dcda90f43d7sm858633ybr.59.2024.02.26.04.20.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Feb 2024 04:20:13 -0800 (PST)
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dcbc00f6c04so2994992276.3;
-        Mon, 26 Feb 2024 04:20:13 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCW8ySn6g6UKIKRsL12yoznXQsoJsnJNRmIKNEjl79v44PT08uao72RJcWZWCyatgH84HlCOx4+DSOvPbW58i45AhXmDfYfhZRKujWOqgKBKVZUmEqJ7e/Pe3xsNT7J7VgkJTZQdUznOcjNNwrUqgm/9S3XG69LxYsid5a848bsU9ifUN01V
-X-Received: by 2002:a25:918d:0:b0:dcc:7af5:97b4 with SMTP id
- w13-20020a25918d000000b00dcc7af597b4mr4109099ybl.12.1708950013074; Mon, 26
- Feb 2024 04:20:13 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708950556; x=1709555356;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9HdH6UtXyV/jkzcX4bUHV7TOheGh3mZ5gM3aVou29Dg=;
+        b=jofZkp8ri6VXVKD1qNboJxAxI69lX0BFN+Ds+lzEcqgQDkOp0GJWVZTAjlkzkBiwSc
+         sdcObhYcPCg+MxJrlY2OzZ/Hb5bqIOfUzELW0DPkIXmJ+J60pYSN94uHRJfxX6FAhfFL
+         mEKfn1+lM3UOpzavHBZlrVkAf1XfcRNVd5wsEVu1N2OmyMmEJrWzoZv4ATVZ1bzpRONF
+         40RUn6i787dun+n/DNOl6oTPqGjY1l5OpceqBZCYGlmYWoEMovAk18djc9hZMu21yVAq
+         TMgA21irvH5iiHgjFLk6i2w011//ZbrZPLna8S1h/De2yS2ubPgvDH3onZbzbpTwlHca
+         NWbg==
+X-Forwarded-Encrypted: i=1; AJvYcCXJoMPGhhqx5ZiQjnihJVgOciBFoReICA/ukYJoBzkoSMXmk4cxZk+BiE99VqXMGV040aOyzLPrAZmjRJ6Oa3g+jZr5U6Y1
+X-Gm-Message-State: AOJu0YxHY8NsOJG6s+Joun05aKBUy6qmVHivSEGCEEAS791uOMlKDF/w
+	nS2zgnGkyV72GUjiD41saxjp9BQCgvRe06qvp8sgnUEe27OiQcHMXwAU5fiUTdM=
+X-Google-Smtp-Source: AGHT+IHqozMTz0LD5vswK7bz7pL+WRBEhCMhfrrlLmOZUkgEm9k8MLdczRTNH55JCrx0Mk5cSvGapQ==
+X-Received: by 2002:a17:906:6bcb:b0:a43:3c7a:39f8 with SMTP id t11-20020a1709066bcb00b00a433c7a39f8mr2340993ejs.71.1708950556073;
+        Mon, 26 Feb 2024 04:29:16 -0800 (PST)
+Received: from krzk-bin.. ([178.197.222.116])
+        by smtp.gmail.com with ESMTPSA id fj10-20020a1709069c8a00b00a42ffa6b85asm2048272ejc.114.2024.02.26.04.29.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Feb 2024 04:29:15 -0800 (PST)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH net-next] dt-bindings: net: ethernet-controller: drop redundant type from label
+Date: Mon, 26 Feb 2024 13:29:13 +0100
+Message-Id: <20240226122913.87669-1-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240223195526.1161232-1-niklas.soderlund+renesas@ragnatech.se>
-In-Reply-To: <20240223195526.1161232-1-niklas.soderlund+renesas@ragnatech.se>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 26 Feb 2024 13:20:01 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdW5VO-u5fmrRqRhUDZbODn-yzCZPh0bOqYiG-oZXYBDdw@mail.gmail.com>
-Message-ID: <CAMuHMdW5VO-u5fmrRqRhUDZbODn-yzCZPh0bOqYiG-oZXYBDdw@mail.gmail.com>
-Subject: Re: [PATCH] dt-bindings: net: renesas,ethertsn: Document default for delays
-To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	devicetree@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 23, 2024 at 8:56=E2=80=AFPM Niklas S=C3=B6derlund
-<niklas.soderlund+renesas@ragnatech.se> wrote:
-> The internal delay properties are not mandatory and should have a
-> documented default value. The device only supports either no delay or a
-> fixed delay and the device reset default is no delay, document the
-> default as no delay.
->
-> Signed-off-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnatech.=
-se>
+dtschema defines label as string, so $ref in other bindings is
+redundant.
 
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ Documentation/devicetree/bindings/net/ethernet-controller.yaml | 1 -
+ 1 file changed, 1 deletion(-)
 
-Gr{oetje,eeting}s,
+diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+index d14d123ad7a0..b2785b03139f 100644
+--- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
++++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+@@ -14,7 +14,6 @@ properties:
+     pattern: "^ethernet(@.*)?$"
+ 
+   label:
+-    $ref: /schemas/types.yaml#/definitions/string
+     description: Human readable label on a port of a box.
+ 
+   local-mac-address:
+-- 
+2.34.1
 
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
