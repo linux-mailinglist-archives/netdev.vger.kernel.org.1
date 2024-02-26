@@ -1,75 +1,68 @@
-Return-Path: <netdev+bounces-74981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0172F867A3B
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:28:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AD54867A53
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:31:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA0CD1F23AD9
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:28:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA1FB28FC15
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:31:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7604912B140;
-	Mon, 26 Feb 2024 15:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r5VB1e+G"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE0C12BE81;
+	Mon, 26 Feb 2024 15:31:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C37D12AAEE;
-	Mon, 26 Feb 2024 15:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB7412B157;
+	Mon, 26 Feb 2024 15:31:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708961296; cv=none; b=HO8NZZ7/Eddvif/VN5Kcebz1DPYAfiZOxluOkNn319x35kVcTTTbu7IWREdIf+pX/K7BSx416j4wbGgVAfe86uAPj0jj0BvlS+FUEP3/4E7Tw/mVO2RNrRPWNIF8Fzv7lY6yfx/ii8klMqiu5XU6PQk50azXmQ3QcwFmZiLGm/Y=
+	t=1708961477; cv=none; b=Fb4IVUSlRg1g3kPOK51BPYnYOxidaA8cpxjF6cjjnnc/fw/MZkqKSyUVzLDpUCRBG3b0P1Z0coJ3fLOfHBQa7UUm5XbZWigdsZXXCFytaL5kHDTA4+Q22uZGKugqitjowTm9ZxRHpjymwIpWSsxRw1tz4cPeEn829blBceUGW2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708961296; c=relaxed/simple;
-	bh=kn8CsHxeqDeP0T8Y+7WnbCgzGRh3dcKdz1ZaTvleJR8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lamFvMTPhf8agC0CI3ih+oT3c7BEnugSU0k59VTv9qKuOQO4g9wU3W6Cydoj33zNdoKBLLTRIuu59LsbdMmkGCVjN8ETkN4wkd3a2iUH/Um1m9cYAJd1sR6TUqIlPK77Oklf5K65CgrgMuHEV7vBlbYUbHuw2S0xoqsglfh6aWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r5VB1e+G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6413CC433F1;
-	Mon, 26 Feb 2024 15:28:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708961295;
-	bh=kn8CsHxeqDeP0T8Y+7WnbCgzGRh3dcKdz1ZaTvleJR8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=r5VB1e+GKBGqyMISOJnMz7UmKSCHQI7f6E9Hz2sT1hHrDS1+gakIQz2YaMUfuQ/Pc
-	 gpzrJtfVOJo3Yj9bdsVYbI9wvKMdGzBdL+jtOsEo/5EVPRBscKdC6nolxMib7xQsxp
-	 1mLUs4+CpjR3zvgNcrg0LgVI1e33Hfbywurhqjs5YmaaA8Twahk/BCZtbv1IUXIv6g
-	 u+kQArVJvHcuU+TqoFNLWkPCvBCEkYDzup4DwVtvFyE01URwBv1ZG2adQC9d3L1CkW
-	 PQi4jb9TxdVSRtPG4jbAv6m02/ga4bi8V8ZhWAD9lSUTOufO+5dyRD1cp0xPLjMSdU
-	 gSZPjU+3VuM1w==
-Date: Mon, 26 Feb 2024 07:28:14 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: wenyang.linux@foxmail.com
-Cc: Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <keescook@chromium.org>,
- Joel Granados <j.granados@samsung.com>, Christian Brauner
- <brauner@kernel.org>, davem@davemloft.net, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/8] introduce sysctl SYSCTL_U8_MAX and
- SYSCTL_LONG_S32_MAX
-Message-ID: <20240226072814.1d9ab85f@kernel.org>
-In-Reply-To: <tencent_275FF7F351D515B570D0F82447BA30F3AA06@qq.com>
-References: <tencent_275FF7F351D515B570D0F82447BA30F3AA06@qq.com>
+	s=arc-20240116; t=1708961477; c=relaxed/simple;
+	bh=Fi2I6JWdoxNsLOZPWDvOCoChddUq4ZOZqj4K5cnTqfg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lBiPrmVzXl8vmygHIat2cg0ke/Gfyp4dHFz0WjKWKUMxuuKsK1P+K/ObxMhb0BhVZ0ye1oq36CORpsYRCECcCTWCbS3i00K0Ffv+ujZrvGmwX7h2ApmK2RGSpNIWGd18aS0xIcJL9TsVkVGOu8yhY4j+b/UDnhv0NEdM450MRyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.41.52] (port=40758 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1recwZ-001VQn-BZ; Mon, 26 Feb 2024 16:31:05 +0100
+Date: Mon, 26 Feb 2024 16:31:01 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+	fw@strlen.de
+Subject: Re: [PATCH net] netlink: validate length of NLA_{BE16,BE32} types
+Message-ID: <Zdyutaij0JRDY8g1@calendula>
+References: <20240225225845.45555-1-pablo@netfilter.org>
+ <20240226071806.50c45890@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240226071806.50c45890@kernel.org>
+X-Spam-Score: -1.9 (-)
 
-On Sun, 25 Feb 2024 12:05:30 +0800 wenyang.linux@foxmail.com wrote:
-> The boundary check of multiple modules uses these static variables (such as
-> two_five_five, n_65535, ue_int_max, etc), and they are also not changed.
-> Therefore, add them to the shared sysctl_vals and sysctl_long_vals to avoid
-> duplication. This also reduce the size a bit 
+On Mon, Feb 26, 2024 at 07:18:06AM -0800, Jakub Kicinski wrote:
+> On Sun, 25 Feb 2024 23:58:45 +0100 Pablo Neira Ayuso wrote:
+> > Fixes: ecaf75ffd5f5 ("netlink: introduce bigendian integer types")
+> > Reported-by: syzbot+3f497b07aa3baf2fb4d0@syzkaller.appspotmail.com
+> > Reported-by: xingwei lee <xrivendell7@gmail.com>
+> 
+> Florian already fixes it, commit 9a0d18853c28 ("netlink: add nla be16/32
+> types to minlen array") in net.
 
-You provide no data on how big the reduction is.
-Eric's suggestion to encode the values directly in the table entry
-sounds great, please invest your time in that, instead of half measures.
+Indeed, he told me, I overlook this fix, thanks.
 
