@@ -1,119 +1,143 @@
-Return-Path: <netdev+bounces-74874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C13E68670BE
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:25:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 552778670C7
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:25:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68BF7282466
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:25:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B1A51F299F7
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:25:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8559258226;
-	Mon, 26 Feb 2024 10:08:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168A624A03;
+	Mon, 26 Feb 2024 10:09:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K76OoFLd"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ETyCFEzv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7685813E;
-	Mon, 26 Feb 2024 10:08:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F0D1CD32;
+	Mon, 26 Feb 2024 10:09:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708942107; cv=none; b=o1e4RFE1fJtUBIzPB2gn0fBx/NKtPf1H4AonHZWaJ1Ca1ygQJplkROK0lXJEl6GB/hvnyXWUEe82dbR1rY1HMWtxCCVa5gGakx8VH5z6EeVs4ZlifqvpVN9rEHdV5mUko+5zBzjl+hzJTsv0uwwxOi/5smQVYwUQRH3XJMotYlw=
+	t=1708942196; cv=none; b=L7tKumsUZD+PgjjtQr0woPbZiitqT6pqwvK8Hh/osJi8a7TXfaEJ0EL8GAAwHLQgrcsPLWCDKP234VAmeqr+X3sGBHKOGX4nXbR0VI3AlQhmh5RkbWHG8MUQyirmxXLCAXJowF19TRnUnn41kL278RomikmZ7Ln95T27C9JY3Yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708942107; c=relaxed/simple;
-	bh=lwjbu1Q0/9loDrm+iJepXM7M1HSx/bbkPALcAKCv0Dk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GbjwDEBfuuTnQuHZkQnIb++/Jbx27noFZEVP1Eq4uwVI/nglfeLJ4VKDuEk7/GKdag66DxtWKOm7Y+4IRc3+gnpZwCEGx0El54e0cCPMlC77zvqDS1YQ8tkK650TVV2TlNzBGMSxL+YyTal2DXO4h12V6mmBMv7Me+7EKVgoyLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K76OoFLd; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1dc98892850so8749385ad.0;
-        Mon, 26 Feb 2024 02:08:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708942105; x=1709546905; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=KmvSrMWGTpoTLX2/mgE51mXymfz8MKqe8Izfo4yIEPo=;
-        b=K76OoFLdKUGGFyDopkci0kJsRRPk6pPseO1p5d0hwd2nHfzBHBHXHGTIbx+OwrJz54
-         GJ7Eu7q/dzXY/Cy4LkSKcgIQzhlFglj2eGDR1VZ9IaR0VONkXqJdhSX+mXozzEowf/FL
-         m9hU7BMAr+RHXdm4C5wwQEZVj1QvyIZbLA3+vnw/0akP1cUiCOOmPSXlFF0avmt50zFL
-         bn/QpXO362pmziDyMrYitgR0nZJ5UdxxQgShBm/ne3dn5XyYfltsUoWDt1qF4i6mtNQr
-         THjth+ji6oz7aSLC+LOA/0k73WHlFbiuNrCBxUBqFHiwIhvEHqrYKdK8hBvxI6ffOZUw
-         0Hlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708942105; x=1709546905;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KmvSrMWGTpoTLX2/mgE51mXymfz8MKqe8Izfo4yIEPo=;
-        b=r9ufh98BYHhMjBsc7qE0zP0osPf9ZZ+tozMYl3ZVdunRnRwQ+YFR6ecfHqAjfZuQ5t
-         Ggy5awCeHUTndZ28ai73XzuxDLLbhXlD5wxfducPtE9fuiBZRDiKtXo4cB+NXrCD4NXl
-         aaXTf8RGEJTZWqt+srH1mRL5YW4ZK4P36bGdLiKFBPyVD+QRMXTVQN/qVIKdZeSvmKBm
-         bTUUa1UE/n28VfW8Ov/CHVUSwt8g9S7vx0ks7n8uCqp6Ix+jUMK3ZpTF5u4/avMMgDBC
-         68YaoX3AD6jKNG5VtPajm1iIaAwXEJyEz3n8BqRVwxV9vbUx7BlWnAoqLTHOcFw4kX49
-         WNlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXm/1pws5utxW664X0nuUaalSCYroS9o8j/7T8RlsamWZ2FJZmpfZwgFjXHrE/WaMmPiUorTTgh6TCpKY81MfhLT7skNSjcYZAdhcZ16tzaytTGCJiHS1IEXDfQNtBlJLN6n1dKIWS/
-X-Gm-Message-State: AOJu0YzXkCUrRCW0oSb5ohvhugLhizYbUKkq8ip9CuNxcd7OYEM7ibOu
-	c1SuhPkXKpmVV8tAVmRqKJyDpSdvzwemmxhsVU6n9oDjWYGZQy9V
-X-Google-Smtp-Source: AGHT+IGQ26tAcyyC/8tI5qPNi4DYuzcZCygBrxkPaZuSUugpHT00ENprx0I82J8f9CWB/jx1fBCcKA==
-X-Received: by 2002:a17:902:efd6:b0:1dc:affa:5f6c with SMTP id ja22-20020a170902efd600b001dcaffa5f6cmr278239plb.2.1708942105288;
-        Mon, 26 Feb 2024 02:08:25 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id ji22-20020a170903325600b001dc23e877bfsm3578580plb.268.2024.02.26.02.08.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 02:08:24 -0800 (PST)
-Date: Mon, 26 Feb 2024 18:08:19 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jones Syue =?utf-8?B?6Jab5oe35a6X?= <jonessyue@qnap.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"j.vosburgh@gmail.com" <j.vosburgh@gmail.com>,
-	"andy@greyhouse.net" <andy@greyhouse.net>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3] bonding: 802.3ad replace MAC_ADDRESS_EQUAL
- with __agg_has_partner
-Message-ID: <ZdxjEzNQpT_duEfC@Laptop-X1>
-References: <SI2PR04MB5097BCA8FF2A2F03D9A5A3EEDC5A2@SI2PR04MB5097.apcprd04.prod.outlook.com>
+	s=arc-20240116; t=1708942196; c=relaxed/simple;
+	bh=fD06I6761Bblu6LIz/0Vqc/s50lUzSjG3wEpIkRmx+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jic/BIh9qA9n2CbtOkZm19yJfDIpwfDXcBaZvRPUzXW9n1pPPpxMBb9F266Bq00/NklkEdMxKEpxegVOwuUryxjVoS5fYWSflIMV/i0ilSSr3nFcKiCnFHju37JRFTCzFfR8f5uVHdNWtrpFwoIHf0J5+Zk0n0A1aos4QVlHbpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ETyCFEzv; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A3794E0013;
+	Mon, 26 Feb 2024 10:09:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708942190;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZZjpenESpoom5pXFPq/3Rgc0cq0sAg4BJvGnYZALf+U=;
+	b=ETyCFEzvQnohjoo51KU0oyPDzRB5Zwv+KDf9I/3SAn+w2caCL7sdiLNDo5jV8nEkpR6OZy
+	oIvi8m4Vg3MYIr9ECx7T1EERfMoiBCzbVUpw8KQvJVuK8tKWSPcUeMcVWhuvi7BPo9TEtU
+	WsHcpis5x1mzSlvkquPS72cdWpjpR0pAuvBEn6D9FwFsXfrO7SD/WOF2kn/lYnCeegDR2i
+	/mWsYJjPS8JgkTkT/Kc8TPsTqNBfmxIgnHdfkqENOhnz6srjUlF5o6A5thMb62WnZKOnHi
+	+Iyh6QekmauaK6/ugbgW58kbcANNxVoUjrugGjhgFYj05G0RZCfxdyz9IzNv0A==
+Date: Mon, 26 Feb 2024 11:09:46 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Cc: Saeed Mahameed <saeed@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Richard Cochran
+ <richardcochran@gmail.com>, Tariq Toukan <tariqt@nvidia.com>, Gal Pressman
+ <gal@nvidia.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, Hangbin Liu
+ <liuhangbin@gmail.com>, Paul Greenwalt <paul.greenwalt@intel.com>, Justin
+ Stitt <justinstitt@google.com>, Randy Dunlap <rdunlap@infradead.org>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, Wojciech Drewek
+ <wojciech.drewek@intel.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Jiri Pirko <jiri@resnulli.us>, Jacob Keller <jacob.e.keller@intel.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v1 1/6] ethtool: add interface to read Tx
+ hardware timestamping statistics
+Message-ID: <20240226110946.626a8474@kmaincent-XPS-13-7390>
+In-Reply-To: <20240223192658.45893-2-rrameshbabu@nvidia.com>
+References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
+	<20240223192658.45893-2-rrameshbabu@nvidia.com>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <SI2PR04MB5097BCA8FF2A2F03D9A5A3EEDC5A2@SI2PR04MB5097.apcprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Mon, Feb 26, 2024 at 02:24:52AM +0000, Jones Syue 薛懷宗 wrote:
-> Replace macro MAC_ADDRESS_EQUAL() for null_mac_addr checking with inline
-> function__agg_has_partner(). When MAC_ADDRESS_EQUAL() is verifiying
+On Fri, 23 Feb 2024 11:24:45 -0800
+Rahul Rameshbabu <rrameshbabu@nvidia.com> wrote:
 
-nit: function __agg_has_partner()
+> Multiple network devices that support hardware timestamping appear to have
+> common behavior with regards to timestamp handling. Implement common Tx
+> hardware timestamping statistics in a tx_stats struct_group. Common Rx
+> hardware timestamping statistics can subsequently be implemented in a
+> rx_stats struct_group for ethtool_ts_stats.
+>=20
+> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
 
-> aggregator's partner mac addr with null_mac_addr, means that seeing if
-> aggregator has a valid partner or not. Using __agg_has_partner() makes it
-> more clear to understand.
-> 
-> In ad_port_selection_logic(), since aggregator->partner_system and
-> port->partner_oper.system has been compared first as a prerequisite, it is
-> safe to replace the upcoming MAC_ADDRESS_EQUAL() for null_mac_addr checking
-> with __agg_has_partner().
-> 
-> Delete null_mac_addr, which is not required anymore in bond_3ad.c, since
-> all references to it are gone.
-> 
-> Signed-off-by: Jones Syue <jonessyue@qnap.com>
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+> +
+> +const struct nla_policy ethnl_stats_get_policy[__ETHTOOL_A_STATS_CNT] =
+=3D {
+> +	[ETHTOOL_A_STATS_HEADER] =3D NLA_POLICY_NESTED(ethnl_header_policy),
+> +	[ETHTOOL_A_STATS_GROUPS] =3D { .type =3D NLA_NESTED },
+> +	[ETHTOOL_A_STATS_SRC] =3D
+>  		NLA_POLICY_MAX(NLA_U32, ETHTOOL_MAC_STATS_SRC_PMAC),
+> +	[ETHTOOL_A_STATS_LAYER] =3D
+> +		NLA_POLICY_MAX(NLA_U32, ETHTOOL_TS_STATS_LAYER_PHY),
+>  };
+
+You should add this new netlink attributes to the specs in a new patch to be
+able to test it.
+
+diff --git a/Documentation/netlink/specs/ethtool.yaml
+b/Documentation/netlink/specs/ethtool.yaml
+index cfe48f8d6283..118508de2c88 100644
+--- a/Documentation/netlink/specs/ethtool.yaml
++++ b/Documentation/netlink/specs/ethtool.yaml
+@@ -859,6 +859,9 @@ attribute-sets:
+       -
+         name: src
+         type: u32
++      -
++        name: layer
++        type: u32
+   -
+     name: phc-vclocks
+     attributes:
+@@ -1526,6 +1529,7 @@ operations:
+           attributes:
+             - header
+             - groups
++            - layer
+         reply:
+           attributes:
+             - header
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
