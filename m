@@ -1,140 +1,170 @@
-Return-Path: <netdev+bounces-74884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E8E88672C1
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:15:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 325AF8672D1
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:16:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3AB62B304BD
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:39:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08312B370BE
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BF51CA8A;
-	Mon, 26 Feb 2024 10:30:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13C941CAAE;
+	Mon, 26 Feb 2024 10:52:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="LD9y0C60"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EcqgKii1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FCC556746
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 10:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5C61CD2F;
+	Mon, 26 Feb 2024 10:52:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708943441; cv=none; b=ZzKS0VwsTlEeJQgn7g+3CSC0s7CBp6OrC3faPs3DF3y3cHi8+33+kgk9XSxUnEmDMUood8XxBQkgN5FFENB9di27Wz/ZuATbRe43x/HXdOQIPxoRCqcvXC4nXoWooDyKGLrJ/k6PpvguzKrApQuAZiK7VpUNeAtYXACyDHmp7zI=
+	t=1708944748; cv=none; b=OTdzz6Ak1HiExwT4XQmV/OePmDr8vhLIv1rre0YiIQWPRBR2RpWdFFVbJ5N1QhXV4tUrLk7QlUTYTz7bXrnJMfvxxQebiywI8P03uMsAqwFJWDFdFeYxsuB06D5siwVIRWCfDFcnU66yZUrgMSMh0cbYMsBUhm+ResdOJGwR/VA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708943441; c=relaxed/simple;
-	bh=3AEg61c9t2RdSbrA3SOYlabwim+w14UVA/dDDZpqvZs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oILfmONbvBMM5qlkG559FweClga5dpoH1P8ExCszkrN+jEYa2ZN4qhtGGCRrCRZ+nYmKtSyPbuNDulF4YVGTb3euVnrN5BANIjEoMYBrHX1mBz0gFqIJHFDs5v74CNIcWBx00zwkgAMZAjs3SUe5jNU2vsbITDhMwZBo2bRU4tY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=LD9y0C60; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a3d01a9a9a2so301860866b.1
-        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 02:30:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1708943438; x=1709548238; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Bz6b+eCtgnaUFENSuU3KdIVlMwnoCTOF+cGcVtN0DkI=;
-        b=LD9y0C60HOh1RKDhvMKmtT2nQe+qq2hbqV2q0nc9XCGhJ2wEJ5KveN6fMOpovGmq5C
-         i5dPH6raI2NaBnEG5ymEiHTsrVbSf7bQ0w5lW/VMxst3jZy6alVWpyyCvnpsXHeSJukD
-         hV6TjnjL/fm3eRWGZ8dR+lkgiqzKZOUBDjBhxtQiEXGrV8MOcfgB/ho5m/jsYSa+8cI5
-         nhycQDBOFyooPAbnZhyh9XFncW367sg5bBjf1ByZRWloVxIsa6V8+iGs0tAnMJ+hs4IY
-         0HJ0uAxdsG2TrwXvoDeuvAKIITjPlKU5AMALDEttgL9162t+u7ptmm5Q9ewpGa7Ebpgv
-         TrDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708943438; x=1709548238;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Bz6b+eCtgnaUFENSuU3KdIVlMwnoCTOF+cGcVtN0DkI=;
-        b=er09tm8lrgiORZ28OCnwxEWHUCsCB7hmD96WsNJrs+FRkBVUKvwwn1GEDMZFpLCkiy
-         K8ObwjzWzm7WjXfnoxsnwh9/c2V1z9Im84sXViLC4Ene14kB+EFU5Etj4bvGdfOeVkDZ
-         NdUF9GdzD5m6lgIThL8MDtK5Cb8JYeSoRWFMsL6+Qfiui8F67E/V++RPX1deZlcr1aUF
-         kmjEJquKRfMJkQu1lFSzz+QLOo+JvunrCvb49aMA9qQ6sPdySG4NVJbknYA411bmWvPR
-         8Fuj4m5ayjlL81OPd//ZgRz8zuiOpQ94QDWEqSM7yxMTtVPuj63W/NfQn4+mj9vmS2ru
-         iPXw==
-X-Forwarded-Encrypted: i=1; AJvYcCVvLv3bZK2QOeMHNSaU0zaUGMwVWWgXkgev7cRILdQ3GZ1ypWFthdJ9XCrEFfKRlrQ7aVTM2wgYlQs5LrQs9dIVfLjFVTjy
-X-Gm-Message-State: AOJu0Yx8UKhBhT+GtJHAD96njLVA5zLQGsUYhFgSKHL/8acUVAzCe+1t
-	1oDTcApZhVsbm7h33pB2hngesc2mrEK6+lr1NwEvf3bgpQWAe7uGc5npM+Eo+JCOjj8Hn6mql+W
-	dj0ZYqNRlbxD3Lul0r5GQoIUmwfYhUXOWctPXJA==
-X-Google-Smtp-Source: AGHT+IFRPov8/cpih2mq251F4b8kRlFyC5NNX1J7o+YMmyopd5NzNTlRC1I0AnsNzV9tfVe1KWjRjh446NXfYck2paE=
-X-Received: by 2002:a17:906:68d2:b0:a3e:5b7f:6d31 with SMTP id
- y18-20020a17090668d200b00a3e5b7f6d31mr3616604ejr.5.1708943437867; Mon, 26 Feb
- 2024 02:30:37 -0800 (PST)
+	s=arc-20240116; t=1708944748; c=relaxed/simple;
+	bh=ekKIocdQoec7SV7sHdadhD/DGm3snDu/b5yKeGLLLck=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=cv5na6GE1zBdUgD9mRfIt1HqoFEA1ByIA5HisBD9w7WRlh56Wubp7+l0z+6jt5gr6kyrGXfJx69DZmc+nZ8VjfLwd4VbBRR4TPxh3Sud5zyMBppniDXC4cjkGH4ybePMJxtbHuDspaRWX/WhZnj2uGoxYdEdeLLAsHbAKa5gQWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EcqgKii1; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708944747; x=1740480747;
+  h=message-id:date:mime-version:to:cc:references:from:
+   subject:in-reply-to:content-transfer-encoding;
+  bh=ekKIocdQoec7SV7sHdadhD/DGm3snDu/b5yKeGLLLck=;
+  b=EcqgKii1PoRnIiruPzyDmQij4HHJGAPE6YW5Os+E9hH2rw2IbeeodIXl
+   stiX+LNmu694CCTCH7oE9Kxu3xFsHwn4LxQA919z3KZ2fKjCU9LBwnxal
+   eUrYTBRJSzE2TC8qeXQnbVy3jMbGzOrbAMupRMf2sUdvoY/mvkquR7wC8
+   Dk4an5HwItUWxpqeWk/zC/a+39TfT2yh2FJXaFw3nzN49iAsuLzyBLWS3
+   cPds3USnf/0CLwGNqUUYBRfFbokU5cQUyo7BkL9zORQYO6V8jygjAI4Vd
+   KeyKrl8K+hxBoXGJwsJfGXLKweQ2t/ry8Y/AmMmoNK1DZLaLAw4eFD3V0
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="3367919"
+X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
+   d="scan'208";a="3367919"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 02:52:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="937029783"
+X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
+   d="scan'208";a="937029783"
+Received: from mattu-haswell.fi.intel.com (HELO [10.237.72.199]) ([10.237.72.199])
+  by fmsmga001.fm.intel.com with ESMTP; 26 Feb 2024 02:52:23 -0800
+Message-ID: <acc2b877-4b42-fd4d-867b-603dae95d09d@linux.intel.com>
+Date: Mon, 26 Feb 2024 12:54:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240115194840.1183077-1-andrew@daynix.com> <20240115172837-mutt-send-email-mst@kernel.org>
- <20240222150212-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240222150212-mutt-send-email-mst@kernel.org>
-From: Andrew Melnichenko <andrew@daynix.com>
-Date: Mon, 26 Feb 2024 12:30:27 +0200
-Message-ID: <CABcq3pEtW4j60n3jJgkSUDy=VbcfzAbS_4eYMHpEPR2bYU9aww@mail.gmail.com>
-Subject: Re: [PATCH 1/1] vhost: Added pad cleanup if vnet_hdr is not present.
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	yuri.benditovich@daynix.com, yan@daynix.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.13.0
+Content-Language: en-US
+To: Linux regressions mailing list <regressions@lists.linux.dev>,
+ Thomas Gleixner <tglx@linutronix.de>
+Cc: "Christian A. Ehrhardt" <lk@c--e.de>, niklas.neronin@linux.intel.com,
+ Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
+ Greg KH <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
+ linux-x86_64@vger.kernel.org, netdev@vger.kernel.org,
+ Randy Dunlap <rdunlap@infradead.org>,
+ Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+References: <CABXGCsNnUfCCYVSb_-j-a-cAdONu1r6Fe8p2OtQ5op_wskOfpw@mail.gmail.com>
+ <e7b96819-edf7-1f9f-7b01-e2e805c99b33@linux.intel.com>
+ <CABXGCsPjW_Gr4fGBzYSkr_4tsn0fvuT72G-YJYXcb1a4kX=CQw@mail.gmail.com>
+ <2d87509a-1515-520c-4b9e-bba4cd4fa2c6@linux.intel.com>
+ <CABXGCsPdXqRG6v97KDGy+o59xc3ayaq3rLj267veC7YcKVp8ww@mail.gmail.com>
+ <1126ed0a-bfc1-a752-1b5e-f1339d7a8aa5@linux.intel.com>
+ <CABXGCsN5_O3iKDOyYxtsGTGDA6fw4962CjzXLSnOK3rscELq+Q@mail.gmail.com>
+ <a026ecd8-6fba-017d-d673-0d0759a37ed8@linux.intel.com>
+ <CABXGCsOgy8H4GGcNU1jRE+SzRqwnPeNuy_3xBukjwB-bPxeZrQ@mail.gmail.com>
+ <CABXGCsOd=E428ixUOw+msRpnaubgx5-cVU7TDXwRUCdrM5Oicw@mail.gmail.com>
+ <34d7ab1b-ab12-489d-a480-5e6ccc41bfc3@infradead.org>
+ <10487018-49b8-4b27-98a1-07cee732290d@infradead.org>
+ <4f34b6a8-4415-6ea4-8090-262847d606c6@linux.intel.com>
+ <3ea25443-1275-4c67-90e0-b637212d32b5@leemhuis.info>
+ <1e719367-01ae-565a-2199-0ff7e260422b@linux.intel.com>
+ <410817b8-1cf9-4285-b20b-f1fa0513cee8@leemhuis.info>
+From: Mathias Nyman <mathias.nyman@linux.intel.com>
+Subject: Re: This is the fourth time I've tried to find what led to the
+ regression of outgoing network speed and each time I find the merge commit
+ 8c94ccc7cd691472461448f98e2372c75849406c
+In-Reply-To: <410817b8-1cf9-4285-b20b-f1fa0513cee8@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi all,
-Ok, let me prepare a new patch v2, where I'll write a
-description/analysis of the issue in the commit message.
+On 26.2.2024 11.51, Linux regression tracking (Thorsten Leemhuis) wrote:
+> On 26.02.24 10:24, Mathias Nyman wrote:
+>> On 26.2.2024 7.45, Linux regression tracking (Thorsten Leemhuis) wrote:
+>>> On 21.02.24 14:44, Mathias Nyman wrote:
+>>>> On 21.2.2024 1.43, Randy Dunlap wrote:
+>>>>> On 2/20/24 15:41, Randy Dunlap wrote:
+>>>>>> {+ tglx]
+>>>>>> On 2/20/24 15:19, Mikhail Gavrilov wrote:
+>>>>>>> On Mon, Feb 19, 2024 at 2:41 PM Mikhail Gavrilov
+>>>>>>> <mikhail.v.gavrilov@gmail.com> wrote:
+>>>>>>> I spotted network performance regression and it turned out, this was
+>>>>>>> due to the network card getting other interrupt. It is a side effect
+>>>>>>> of commit 57e153dfd0e7a080373fe5853c5609443d97fa5a.
+>>>>>> That's a merge commit (AFAIK, maybe not so much). The commit in
+>>>>>> mainline is:
+>>>>>>
+>>>>>> commit f977f4c9301c
+>>>>>> Author: Niklas Neronin <niklas.neronin@linux.intel.com>
+>>>>>> Date:   Fri Dec 1 17:06:40 2023 +0200
+>>>>>>
+>>>>>>        xhci: add handler for only one interrupt line
+>>>>>>
+>>>>>>> Installing irqbalance daemon did not help. Maybe someone experienced
+>>>>>>> such a problem?
+>>>>>>
+>>>>>> Thomas, would you look at this, please?
+>>>>>>
+>>>>>> A network device and xhci (USB) driver are now sharing interrupts.
+>>>>>> This causes a large performance decrease for the networking device.
+>>>>
+>>>> Short recap:
+>>>
+>>> Thx for that. As the 6.8 release is merely two or three weeks away while
+>>> a fix is nowhere near in sight yet (afaics!) I start to wonder if we
+>>> should consider a revert here and try reapplying the culprit in a later
+>>> cycle when this problem is fixed.
+> 
+> Thx for the reply.
+> 
+>> I don't think reverting this series is a solution.
+>>
+>> This isn't really about those usb xhci patches.
+>> This is about which interrupt gets assigned to which CPU.
+> 
+> I know, but from my understanding of Linus expectations wrt to handling
+> regressions it does not matter much if a bug existed earlier or
+> somewhere else: what counts is the commit that exposed the problem.
+> 
+> But I might be wrong here. Anyway, not CCing Linus for this; but I'll
+> likely point him to this direction on Sunday in my next weekly report,
+> unless some fix comes into sight.
+> 
+>> Mikhail got unlucky when the network adapter interrupts on that system was
+>> assigned to CPU0, clearly a more "clogged" CPU, thus causing a drop in max
+>> bandwidth.
+> 
+> But maybe others will be just as "unlucky". Or is there anything to
+> believe otherwise? Maybe some aspect of the .config or local setup that
+> is most likely unique to Mikhail's setup?
 
-On Thu, Feb 22, 2024 at 10:02=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com=
-> wrote:
->
-> On Mon, Jan 15, 2024 at 05:32:25PM -0500, Michael S. Tsirkin wrote:
-> > On Mon, Jan 15, 2024 at 09:48:40PM +0200, Andrew Melnychenko wrote:
-> > > When the Qemu launched with vhost but without tap vnet_hdr,
-> > > vhost tries to copy vnet_hdr from socket iter with size 0
-> > > to the page that may contain some trash.
-> > > That trash can be interpreted as unpredictable values for
-> > > vnet_hdr.
-> > > That leads to dropping some packets and in some cases to
-> > > stalling vhost routine when the vhost_net tries to process
-> > > packets and fails in a loop.
-> > >
-> > > Qemu options:
-> > >   -netdev tap,vhost=3Don,vnet_hdr=3Doff,...
-> > >
-> > > Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
-> > > ---
-> > >  drivers/vhost/net.c | 3 +++
-> > >  1 file changed, 3 insertions(+)
-> > >
-> > > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > > index f2ed7167c848..57411ac2d08b 100644
-> > > --- a/drivers/vhost/net.c
-> > > +++ b/drivers/vhost/net.c
-> > > @@ -735,6 +735,9 @@ static int vhost_net_build_xdp(struct vhost_net_v=
-irtqueue *nvq,
-> > >     hdr =3D buf;
-> > >     gso =3D &hdr->gso;
-> > >
-> > > +   if (!sock_hlen)
-> > > +           memset(buf, 0, pad);
-> > > +
-> > >     if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
-> > >         vhost16_to_cpu(vq, gso->csum_start) +
-> > >         vhost16_to_cpu(vq, gso->csum_offset) + 2 >
-> >
-> >
-> > Hmm need to analyse it to make sure there are no cases where we leak
-> > some data to guest here in case where sock_hlen is set ...
->
->
-> Could you post this analysis pls?
->
-> > > --
-> > > 2.43.0
->
+I believe this is a zero-sum case.
+
+Others got equally lucky due to this change.
+Their devices end up interrupting less clogged CPUs and see a similar
+performance increase.
+  
+Thanks
+Mathias
+
 
