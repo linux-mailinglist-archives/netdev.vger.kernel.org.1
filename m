@@ -1,194 +1,86 @@
-Return-Path: <netdev+bounces-74951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2011B867732
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 14:49:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8F48867763
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 14:58:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42F4F1C29925
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 13:49:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 267651C29AE5
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 13:58:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C4A1292C9;
-	Mon, 26 Feb 2024 13:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA8E21292EC;
+	Mon, 26 Feb 2024 13:57:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="fasx7DXb"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XKuYZxOI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4991128386
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 13:49:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D53B1292D2;
+	Mon, 26 Feb 2024 13:57:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708955385; cv=none; b=ojVrXjqV6T2WR2Gr0fgRkGh9W8S20T1DmVysxhA6+EhZbLjlE918S8t5WkzF7grVwS6y4U+J4HfWUj1obP1j+50iGTEBuDN+rH6e4QmuHMlTm4TDfZRNODmYSHLji95EScHJgRYc38YgOFqDAWu4HRG3fSQJeNRbe3hs5MIT0rs=
+	t=1708955839; cv=none; b=LMR9IHT4+5BEj+9RAQ0sEoepgNORq0wkLR3dHzxEJL7kYUqLWGXI6+cWwmesXDXuM6zdMN4mwoIPojUqe55GiefLRdFWAUXMhxoaL8y//WpxKhOQ5ny2oYHpPG5Igde6rWvpLouEfdTQPa6QqIPHglsI/E9QRYGnj1oPEJrNGDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708955385; c=relaxed/simple;
-	bh=GOUQ9EgukG6RRtnE1Su278zy8DeEqSUNKqbnNEQsCzk=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=b1JQX76PMvHY0+8zRXoNpP9fZ8cfMaGQmmc8mCuML274N0vhrg+OfOMlWPA/eX0KHWmteMlv6oSbKFpJ6ZL5YVNi1xKlMcVYo1EMZcS4yRH9ygxPN4mdxgg6W6Rix5gIO0+ssFEVMXONnRy73aIw2Ow5ATs+MHgJQcyNhOXn6+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=fasx7DXb; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5656e5754ccso3809363a12.0
-        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 05:49:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1708955381; x=1709560181; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JHO/J+vf2DDcCI4GqVxCtzd8SIKAxrbqAtBS777veKY=;
-        b=fasx7DXbdWy8gNpO8onf1gq/18DvbDReEWDRDdqVeycgvR9yXZp/s8TkmToJa6BhVK
-         l+JcNv8V8VG3xGCWPzp4lNoa6Bv5c3d5uQthHe4Ku91IUe3KDG6fp9cupNZNS61XuTaI
-         q5xs08nSh+jNBHEJTvyPN98FZY2udN4FkHtZ4Xxh47HIVg0l+1so9vCcqATiF/m/Zu46
-         LoAPA2zuh0HPU8BRIRBdkbmnjGjqxrjF22Sv5YgJ0NPGlupcB0nCb191MGp4ESDbqWl0
-         HoIBraPq24vXOxQnb6OMqDLHVHcXfTWLt61fTuDWiuSTpyKr0kPPdCc93sORiPHMBvT/
-         Gykw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708955381; x=1709560181;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JHO/J+vf2DDcCI4GqVxCtzd8SIKAxrbqAtBS777veKY=;
-        b=Uj0ZXKPdk8pc+eU6mHSmJ50ikmVoCY2IZqUd+YawDm/t9CWFX9buu3oAbaehaxzDxB
-         0oJNzC+mFwFeD+OWLomeDvaWaLnwUdZqxJnUVrEESFGfCS5eWgMZQYzNlXR4a241+jux
-         v6KPo2I89ylrtCpwUWKvykOHzod0n4cFoRrXxjKeDlQ2AgCPuFwcjKhWvJBqkaMG9TfG
-         +mBGstKSrufEU3QSzg+FibOv+q+q5tBTYdidCgVoUuzn7EJ+FMqk0qkRfWReR07v9Aor
-         tCG0Um8e4d+phiu6UGA0sWhWoopp1QTcGTzTjTAGotJkGbAOtWqiykmU06EJpd1qeWl3
-         zTeg==
-X-Gm-Message-State: AOJu0Yzqqxm653C5BpX18cIflivSiqu1Q6Wfa/XgJd8FHFHQdG5O06KG
-	jzAaQiL2aVyRl1FRx4SdxAlkOW32DXR6xDhuzoYE2QSLxI4TNKUZ243DiV3zLcGUz+PZ4Hpg0St
-	eyYVL3iE5TUbuowaiy/QXnZ4fl4zRhchEWtFrQ2jO7iVGiJD/q1A=
-X-Google-Smtp-Source: AGHT+IHbFR3DTeHeRXHbuoR6pQDWl3aEEaHxb90ISrA6C0BnPpw2vDhqvaggbLWZO/1OmyvIWSu+EMwFszJEzlvmHdQ=
-X-Received: by 2002:aa7:d385:0:b0:565:9b29:ad3e with SMTP id
- x5-20020aa7d385000000b005659b29ad3emr4302106edq.6.1708955380782; Mon, 26 Feb
- 2024 05:49:40 -0800 (PST)
+	s=arc-20240116; t=1708955839; c=relaxed/simple;
+	bh=y9DpvrMKncsJIyMpWz8tOjPI2WeSTcMqZkZG7j7ckAI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rQnS7uDvc+JVC+d+thgosDHOpXLt05fxaT0ATSriPNvkKD9Lm4uSkadeT/BhhKJIQX/vw5o36/eNTGg4MGjrHMqZm7Wp5uZWAUmwYOrzlSPDCcPzygsJW/if+dph0cIEpzfs63A0Eh+MmLndZ28yT9p2LWaFRAEndPFpKiI7fxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XKuYZxOI; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5HgsmUy/QJ0+mc91YMn/OH0OmZCKCaNpc6mj1PBX7x0=; b=XKuYZxOIycao5s/ijRy8JRxuOc
+	V3esM+UT/Gg0r1oeAmX+uHuUxnqslv+y0La5V1j59sA9Ma6C0utAc+N8rBEHtiLFHj05tb37ihI++
+	Y7dOEVwqYlw7w6/zLjAsEhzvFIRbl+Lmbf94AQuQOZc3r6zg7ev5S7d0sJ4+9r04A4To=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rebTz-008jE1-G0; Mon, 26 Feb 2024 14:57:27 +0100
+Date: Mon, 26 Feb 2024 14:57:27 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Robert Marko <robimarko@gmail.com>
+Cc: f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: mv88e6xxx: add Amethyst specific SMI
+ GPIO function
+Message-ID: <cb5c185f-1946-4548-9918-01548e9dd9cf@lunn.ch>
+References: <20240224203349.1358064-1-robimarko@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Jinpu Wang <jinpu.wang@ionos.com>
-Date: Mon, 26 Feb 2024 14:49:29 +0100
-Message-ID: <CAMGffE=jkiaK5c9xcm4WJxxz8joYJwkCHWCXkbj2EMf3zRQ_Ug@mail.gmail.com>
-Subject: [BUG] Null pointer deref from fib6_walk_continue+0x6d (kernel 5.15.137)
-To: netdev <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240224203349.1358064-1-robimarko@gmail.com>
 
-Hi Folks on the list,
+On Sat, Feb 24, 2024 at 09:33:09PM +0100, Robert Marko wrote:
+> The existing mv88e6xxx_g2_scratch_gpio_set_smi() cannot be used on the
+> 88E6393X as it requires certain P0_MODE, it also checks the CPU mode
+> as it impacts the bit setting value.
+> 
+> This is all irrelevant for Amethyst (MV88E6191X/6193X/6393X) as only
+> the default value of the SMI_PHY Config bit is set to CPU_MGD bootstrap
+> pin value but it can be changed without restrictions so that GPIO pins
+> 9 and 10 are used as SMI pins.
+> 
+> So, introduce Amethyst specific function and call that if the Amethyst
+> family wants to setup the external PHY.
 
-We hit following a null pointer deref from fib6_walk_continue+0x6d
-from kernel 5.15.137 during test:
-[277691.646765] BUG: kernel NULL pointer dereference, address: 0000000000000008
-[277691.646877] #PF: supervisor read access in kernel mode
-[277691.646971] #PF: error_code(0x0000) - not-present page
-[277691.647067] PGD 0 P4D 0
-[277691.647158] Oops: 0000 [#1] SMP
-[277691.647249] CPU: 14 PID: 5186 Comm: ovs-vswitchd Kdump: loaded
-Tainted: G           O      5.15.137-pserv
-er #5.15.137-7~deb11
-[277691.647376] Hardware name: Supermicro SBI-7228R-T2F2/B10DRT-IBF2,
-BIOS 2.0b 07/11/2017
-[277691.647493] RIP: 0010:fib6_walk_continue+0x6d/0x170
-[277691.647592] Code: 43 28 00 00 00 00 48 85 d2 75 d2 31 c0 5b c3 cc
-cc cc cc 83 f8 03 0f 84 a4 00 00 00 83 f8 04 75 b7 48 39 53 10 74 e4
-48 8b 02 <48> 8b 48 08 48 8b 70 10 48 89 43 18 48 39 50 18 0f 84 a7 00
-00 00
-[277691.647751] RSP: 0018:ffffad1bce1bfae0 EFLAGS: 00010283
-[277691.647846] RAX: 0000000000000000 RBX: ffff8c5f35ec8840 RCX:
-0000000000000000
-[277691.647962] RDX: ffff8c5ec748e398 RSI: ffffad1bce1bfb38 RDI:
-ffff8c5ec956f400
-[277691.648077] RBP: ffff8c3f49272368 R08: 0000000000000000 R09:
-ffff8c5f19fa3d29
-[277691.648192] R10: 0000000000000002 R11: ffff8c7e3f6348e0 R12:
-0000000000000003
-[277691.648308] R13: ffffffffa5ad9b40 R14: ffff8c41751b3314 R15:
-ffff8c45c78fa100
-[277691.648424] FS:  00007f6c6d73ca40(0000) GS:ffff8c7e3f600000(0000)
-knlGS:0000000000000000
-[277691.648542] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[277691.648637] CR2: 0000000000000008 CR3: 00000020f42b7004 CR4:
-00000000003726e0
-[277691.648752] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
-0000000000000000
-[277691.648868] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:
-0000000000000400
-[277691.648983] Call Trace:
-[277691.649074]  <TASK>
-[277691.649163]  ? __die_body.cold+0x1a/0x1f
-[277691.649258]  ? page_fault_oops+0x135/0x2a0
-[277691.649353]  ? __nla_put+0xc/0x20
-[277691.649446]  ? nla_put+0x28/0x40
-[277691.649536]  ? rt6_fill_node+0x2fc/0x880
-[277691.649628]  ? exc_page_fault+0x5d/0x110
-[277691.649723]  ? asm_exc_page_fault+0x22/0x30
-[277691.649817]  ? fib6_walk_continue+0x6d/0x170
-[277691.649910]  fib6_dump_table.isra.0+0x67/0x1d0
-[277691.650004]  inet6_dump_fib+0xea/0x340
-[277691.650096]  rtnl_dump_all+0xd3/0x110
-[277691.650189]  netlink_dump+0x193/0x3f0
-[277691.650282]  netlink_recvmsg+0x21c/0x3e0
-[277691.650375]  ____sys_recvmsg+0x87/0x180
-[277691.650470]  ? __check_object_size+0x4a/0x160
-[277691.650565]  ? _copy_from_user+0x2b/0x70
-[277691.650658]  ? iovec_from_user+0xf5/0x1a0
-[277691.650750]  ___sys_recvmsg+0x82/0x110
-[277691.650843]  ? slab_free_freelist_hook.constprop.0+0xf4/0x1a0
-[277691.650940]  ? __dentry_kill+0x127/0x160
-[277691.651033]  ? __fput+0xf9/0x250
-[277691.651125]  ? __fget_files+0x79/0xb0
-[277691.651218]  __sys_recvmsg+0x56/0xa0
+This looks good. The only comment i have is maybe we should rename
+mv88e6xxx_g2_scratch_gpio_set_smi() to something more specific. It
+seems it is only applicable to MV88E6XXX_FAMILY_6390, so maybe
+mv88e6390_g2_scratch_gpio_set_smi()?
 
-While checking the kdump, I noticed it failed in following lines:
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-2122                 case FWS_U:
-2123                         if (fn == w->root)
-2124                                 return 0;
-2125                         pn =
-rcu_dereference_protected(fn->parent, 1);
-2126                         left =
-rcu_dereference_protected(pn->left, 1); ---> this line crashed, seems
-pn is NULL, which lead to NULL pointer deref.
-2127                         right = rcu_dereference_protected(pn->right, 1);
-
-crash> struct fib6_walker ffff8c5f35ec8840
-struct fib6_walker {
-  lh = {
-    next = 0xffffffffa5ada268 <init_net+1832>,
-    prev = 0xffffffffa5ada268 <init_net+1832>
-  },
-  root = 0xffff8c41751b3318,
-  node = 0xffff8c5ec748e398,
-  leaf = 0x0,
-  state = FWS_U,
-  skip = 0,
-  count = 2057,
-  skip_in_node = 0,
-  func = 0xffffffffa3839010 <fib6_dump_node>,
-  args = 0xffffad1bce1bfb38
-}
-crash> struct fib6_node 0xffff8c5ec748e398
-struct fib6_node {
-  parent = 0x0,
-  left = 0xffff8c5f340aea80,
-  right = 0xffff8c43895ac500,
-  subtree = 0x0,
-  leaf = 0xffff8c5ec956f400,
-  fn_bit = 0,
-  fn_flags = 7,
-  fn_sernum = 64134,
-  rr_ptr = 0x0,
-  rcu = {
-    next = 0x0,
-    func = 0x0
-  }
-
-So the parent pointer is NULL, and while access left, null pointer
-deref crashed the system.
-I checked in git history, and can't find a fix for this case, does
-this ring any bell? If you need any info from the crash dump, I'm
-happy to share.
-
-Thx!
-Jinpu Wang @ IONOS
+    Andrew
 
