@@ -1,76 +1,143 @@
-Return-Path: <netdev+bounces-75038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A518C867E68
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 18:26:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB7E3867E73
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 18:28:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7432EB264F6
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 17:17:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1A7CB30D90
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 17:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B91312C7F0;
-	Mon, 26 Feb 2024 17:09:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 181B312DDAB;
+	Mon, 26 Feb 2024 17:14:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OKthYGNn"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MbvrA4li"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161C212AAEF
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 17:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21211127B4D;
+	Mon, 26 Feb 2024 17:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708967369; cv=none; b=quBdVtdv7BuPI+liXkpMMbAq5TxQfjg6g4qpZw2976NzZHt/fgv9n57W0BJYhEVG5yNW/ahpC9zEq4Cx/8HIPNzWSA94UNI7vldBgZbzfcSfc/2cezPWUulnF3Wja+XKREbrSbaoCQBgVfaLLp6GE8wgD6yZhg3cEZc4aSyGimU=
+	t=1708967674; cv=none; b=pikF5n6CNQf8LuMNpsNFkfdMtheVr3P0WBcgSGUQqJLugplUKcYSm8pEoq+5VhKC6kwJJcroHeBG52DsrzonW3jm1ezlIzSKEnaBnFY7BsRykMbbt2nVoV6kXC9TkAuHKX/PLk4OmdyDJ8yUI0TYgbMPw/Li19kP0cTQdZGveW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708967369; c=relaxed/simple;
-	bh=O59zq4ZquGyuGfD7zdDDda7h6I2IBDplOrak/rEy9pM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RD8gU9mxQ1QiFZhbUTUPwT23dIMF0vbY1MaDJpyIjolmVYAhM7FpJP50X5vzbg0bzHBWB1friLRmjwblBUucPrs34Qr6Diu7Zce9oGmZRZ7o6TZo6ibN9D1716RDgmAi7RfjUDTzf7hG/PVGA8ZoLYUSqapL2A28YAVGHh7tD0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OKthYGNn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAB7CC433C7;
-	Mon, 26 Feb 2024 17:09:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708967368;
-	bh=O59zq4ZquGyuGfD7zdDDda7h6I2IBDplOrak/rEy9pM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OKthYGNnPHmyphliFdWZkO6MenLmjV2iwS2X6auMHX808B8tsBTweDlL5ykcQE3z9
-	 sVVxjLCd/o5nnC92pYJQD2FADGjclYiPQbW9WyMWts0G6R3/NgPY0LVlOinxAvTLZv
-	 rE6Nl6pzzmL2JZ7kv4Q8eMO8MlUepmnl/g5BvjpUAiRFTVp45zGYpsmCA8vQvIw7Dj
-	 xyCIZHqwveELhvdlYm8EAE0b/evE5McaWWDZ1vkGMUDCCS0IOWQxzB1Mzahqvf5I+T
-	 GGVJ2UiZArvPajJzDO+Nw4Keaj4mBT8kl2SZrFu2Bf6gl1uqP4zIZ3WoO2kjz6Hqqs
-	 rLHa09yXXrLFg==
-Date: Mon, 26 Feb 2024 17:09:25 +0000
-From: Simon Horman <horms@kernel.org>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: Re: [iwl-net v1] ice: reconfig host after changing MSI-X on VF
-Message-ID: <20240226170925.GF13129@kernel.org>
-References: <20240223064024.4333-1-michal.swiatkowski@linux.intel.com>
+	s=arc-20240116; t=1708967674; c=relaxed/simple;
+	bh=ZatBfX3GImAl/bUCZ9kxeO02BxuKFeBHkwxbI7272vE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A7ab12j+zzNhrJw5zmGP707D99HRlm0+hDpH+ENBqTuZP2qBP+xkFTNHCAXew+pzDJ2BihzhcfKN/2okKHpj2dBKWcHr/MS0DzXD8Som9QKWN2yCPj0TnODIrXm/Zb0PKo5ynVgmiC1LajidxvgmBL8pmrkSMEYDXs9l7Do9jio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MbvrA4li; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41QGwR0e032270;
+	Mon, 26 Feb 2024 17:14:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=7EiwRdm/V3a7kLEUdExazAqNGWLSc4lYEtu/GG4qUJ0=;
+ b=MbvrA4liD26UBVHzakTuYr0t60g3p3lFTN8BkLwRvT6ziymLUJgzI6fpxn7PD76+wLYs
+ 42zVAplEkClN8YKbxIWO9I2ImjJjU4TN7EXFs0W8o9bFwHYEjAsXqrRnK56xb2nTGaOA
+ KN3ipTfcuAl3/MK4gfpgW5P2zURHSb7LIcZTsQ7kHewvZt3jUZIh+vONFX0QylQg+Sal
+ kcJrpGJPFncGuJ9dvdCzwds4jJzgBqbVCbgHsGcZ5M/rWOJ3S+GLU4SKAk+bJbLuiYrd
+ AzmfWdwoYduR6JzUZNwRCfPZE9ijUt5hd4bPVU5Q3QrWcl3TazbX+OlvqHPIuAmdpgZH aQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wgxmm8fmc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 26 Feb 2024 17:14:19 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41QGx2Rw001319;
+	Mon, 26 Feb 2024 17:14:18 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wgxmm8fkh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 26 Feb 2024 17:14:18 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41QGTLLA021808;
+	Mon, 26 Feb 2024 17:14:17 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wfu5ytquv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 26 Feb 2024 17:14:17 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41QHEDNQ9372320
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 26 Feb 2024 17:14:15 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2CBAF2004D;
+	Mon, 26 Feb 2024 17:14:13 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E8E6520049;
+	Mon, 26 Feb 2024 17:14:11 +0000 (GMT)
+Received: from [9.171.4.124] (unknown [9.171.4.124])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 26 Feb 2024 17:14:11 +0000 (GMT)
+Message-ID: <3aae1410-e30f-4cd5-8c6c-3f1c6362ffee@linux.ibm.com>
+Date: Mon, 26 Feb 2024 18:13:41 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240223064024.4333-1-michal.swiatkowski@linux.intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 08/21] s390/cio: rename bitmap_size() ->
+ idset_bitmap_size()
+Content-Language: en-US
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+        Marcin Szycik <marcin.szycik@linux.intel.com>,
+        Wojciech Drewek <wojciech.drewek@intel.com>,
+        Yury Norov <yury.norov@gmail.com>, Andy Shevchenko <andy@kernel.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Alexander Potapenko <glider@google.com>, Jiri Pirko <jiri@resnulli.us>,
+        Ido Schimmel <idosch@nvidia.com>,
+        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+        Simon Horman <horms@kernel.org>, linux-btrfs@vger.kernel.org,
+        dm-devel@redhat.com, ntfs3@lists.linux.dev, linux-s390@vger.kernel.org,
+        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20240201122216.2634007-1-aleksander.lobakin@intel.com>
+ <20240201122216.2634007-9-aleksander.lobakin@intel.com>
+From: Peter Oberparleiter <oberpar@linux.ibm.com>
+In-Reply-To: <20240201122216.2634007-9-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: kJ2xFVSXDENYmSmRhicxbmrwDujXC5lV
+X-Proofpoint-GUID: yP0KC4JJEtYmY4bzsPQdnvQdAB2lXb3v
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-26_11,2024-02-26_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1011
+ suspectscore=0 lowpriorityscore=0 mlxlogscore=961 adultscore=0 spamscore=0
+ impostorscore=0 priorityscore=1501 mlxscore=0 bulkscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2402260131
 
-On Fri, Feb 23, 2024 at 07:40:24AM +0100, Michal Swiatkowski wrote:
-> During VSI reconfiguration filters and VSI config which is set in
-> ice_vf_init_host_cfg() are lost. Recall the host configuration function
-> to restore them.
+On 01.02.2024 13:22, Alexander Lobakin wrote:
+> bitmap_size() is a pretty generic name and one may want to use it for
+> a generic bitmap API function. At the same time, its logic is not
+> "generic", i.e. it's not just `nbits -> size of bitmap in bytes`
+> converter as it would be expected from its name.
+> Add the prefix 'idset_' used throughout the file where the function
+> resides.
 > 
-> Without this config VF on which MSI-X amount was changed might had a
-> connection problems.
-> 
-> Fixes: 4d38cb44bd32 ("ice: manage VFs MSI-X using resource tracking")
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Apologies for the delay.
+
+Acked-by: Peter Oberparleiter <oberpar@linux.ibm.com>
+
+
+-- 
+Peter Oberparleiter
+Linux on IBM Z Development - IBM Germany R&D
 
 
