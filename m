@@ -1,164 +1,101 @@
-Return-Path: <netdev+bounces-74971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB6878679E1
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:17:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 318708679E6
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:18:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17E7E1C2B34F
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:17:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62DBC1C2BB5C
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 15:18:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37599130ADB;
-	Mon, 26 Feb 2024 15:10:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7738F12CD96;
+	Mon, 26 Feb 2024 15:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="QNaYGvka";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="MBsTalFN";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="QNaYGvka";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="MBsTalFN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HdagfNOL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62DB6130AD7;
-	Mon, 26 Feb 2024 15:10:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886AE12DD89
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 15:11:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708960252; cv=none; b=tuTagVdbHtl3q1yvEqDeu7dLr3SpIYb5W8dETHdN5D5uX13qKAp9MafVxWK5SGw4u5XiE0xycBAEBeH5lqM+Mpo/P0eMvonYOdiAOWWaIiNqvOPu/w5W8P9EJQHIGIk/XZu+Dq8dAXARwelULwDj+5Z3g7OhfRQPgiPGVe+Y/Ek=
+	t=1708960319; cv=none; b=hW4fpYEAZjKAEEfT0hmgirA0R8sKDUEvK4tI0eVnsboGIL7dY3Rw1wOKBt9+xqz1GqTty9Ia/RkfMpBMME774gnSFno7VY6ABvaZ5lAK0xbguzeuOs8QcTdhTW0k2IwpDo5v7M4++ev5JbQ8ClrUh8BUmAGlzgNqe+I6sDjQ/4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708960252; c=relaxed/simple;
-	bh=xn/pH+vPtBtele+UeKPThfWaFBEQ5GmIN19lX7//sGo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pBQU2yHpYRSHG9jMtS7ca9GIXVsvS69r7nxwImXEK5sYOaRyfpAt58rEegniyPIJoWg9evoJdXEtXK+vSGmG1klXi8/abvNpBXXF6lIUrFdglt/YL7/NVkAOwCEukGx1S31Lskuh1FoiJhSQem9Cewhjg+CpyU1D3uVMnPlQ3DA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=QNaYGvka; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=MBsTalFN; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=QNaYGvka; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=MBsTalFN; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from lion.mk-sys.cz (unknown [10.100.225.114])
+	s=arc-20240116; t=1708960319; c=relaxed/simple;
+	bh=Izt8MSglQMxpxfMiPFl8cRrAaQ+cYDAR+BVYdR5T2l4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=td3mLtM0FTjCEtVGHurh6af1j3+XC4g96hSuxqxr6kbHV2hWeshU54tmLrzaJiOf23me5OSaTV0/zLQ6HDBiTsT42+oH46bJzaPp2rHrGybjkbfqzA7HnJnue4isdfqgt6V2ZOeuePPcVmUfwOpGJ/bmvj+91gFAt2EWC/vJOKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HdagfNOL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708960316;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=arjLEsNVAf2p6iVSRF6nLA+wY3OMCZil0QQSx73WkXI=;
+	b=HdagfNOLfriy3Y9Yun226d2F66HID7vA/J2sRM8EKk7N8JTEqJdORqrg0UKt2Kq7f9d8Tb
+	2ZAhs41X7HHxCIRuJJIoldQ8Kn75XzLthArrHUEUtw1pU3TMYa6lL716AgkkK78P31zPNJ
+	Ko1J/A5Ofuaq8zfy1kA6uRo5+FqFscE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-636-U5OoBLd2OTyeB97jKBdtjw-1; Mon, 26 Feb 2024 10:11:52 -0500
+X-MC-Unique: U5OoBLd2OTyeB97jKBdtjw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 74DBD225BD;
-	Mon, 26 Feb 2024 15:10:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1708960248; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xn/pH+vPtBtele+UeKPThfWaFBEQ5GmIN19lX7//sGo=;
-	b=QNaYGvka84rY7kBmWN/fZ+2Asnbtis4MDIzfJn5B8kWUzItQ72eHvTyMsxr3wB5FwJ6DwK
-	m6JvF6FqAiMY7jEY/UUFsdRah4+3YI5xUMcJqpV6RGCs4achuEidUJuqNSf86NHRWNAJ+N
-	yjKNXP0C6ITi3aPIMl6Lo78utYgoOkc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1708960248;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xn/pH+vPtBtele+UeKPThfWaFBEQ5GmIN19lX7//sGo=;
-	b=MBsTalFNrWDr4rg2OQ6C2R5zQEBx56oWvq12h98aEV/A5NWE0/U1DhOpKxX6s7kp0dTirO
-	tKqdAc5kUkFq6gCg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1708960248; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xn/pH+vPtBtele+UeKPThfWaFBEQ5GmIN19lX7//sGo=;
-	b=QNaYGvka84rY7kBmWN/fZ+2Asnbtis4MDIzfJn5B8kWUzItQ72eHvTyMsxr3wB5FwJ6DwK
-	m6JvF6FqAiMY7jEY/UUFsdRah4+3YI5xUMcJqpV6RGCs4achuEidUJuqNSf86NHRWNAJ+N
-	yjKNXP0C6ITi3aPIMl6Lo78utYgoOkc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1708960248;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xn/pH+vPtBtele+UeKPThfWaFBEQ5GmIN19lX7//sGo=;
-	b=MBsTalFNrWDr4rg2OQ6C2R5zQEBx56oWvq12h98aEV/A5NWE0/U1DhOpKxX6s7kp0dTirO
-	tKqdAc5kUkFq6gCg==
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id 61D0D20147; Mon, 26 Feb 2024 16:10:48 +0100 (CET)
-Date: Mon, 26 Feb 2024 16:10:48 +0100
-From: Michal Kubecek <mkubecek@suse.cz>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kernel@vger.kernel.org, Lennart Franzen <lennart@lfdomain.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Nuno Sa <nuno.sa@analog.com>
-Subject: Re: [PATCH] net: ethernet: adi: move PHYLIB from vendor to driver
- symbol
-Message-ID: <20240226151048.avr3qaxdxwactoxn@lion.mk-sys.cz>
-References: <20240226074820.29250-1-rdunlap@infradead.org>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1DDC9185A781;
+	Mon, 26 Feb 2024 15:11:52 +0000 (UTC)
+Received: from toolbox.redhat.com (unknown [10.45.226.57])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 500EC492BC6;
+	Mon, 26 Feb 2024 15:11:50 +0000 (UTC)
+From: Michal Schmidt <mschmidt@redhat.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next 0/3] ice: lighter locking for PTP time reading
+Date: Mon, 26 Feb 2024 16:11:22 +0100
+Message-ID: <20240226151125.45391-1-mschmidt@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="owllcezk7bkfsbh6"
-Content-Disposition: inline
-In-Reply-To: <20240226074820.29250-1-rdunlap@infradead.org>
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spamd-Result: default: False [-2.20 / 50.00];
-	 ARC_NA(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 RCPT_COUNT_SEVEN(0.00)[9];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email];
-	 SIGNED_PGP(-2.00)[];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 RCVD_COUNT_ZERO(0.00)[0];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+,1:+,2:~];
-	 BAYES_HAM(-0.00)[43.59%]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -2.20
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
+This series removes the use of the heavy-weight PTP hardware semaphore
+in the gettimex64 path. Instead, serialization of access to the time
+register is done using a host-side spinlock. The timer hardware is
+shared between PFs on the PCI adapter, so the spinlock must be shared
+between ice_pf instances too.
 
---owllcezk7bkfsbh6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Michal Schmidt (3):
+  ice: add ice_adapter for shared data across PFs on the same NIC
+  ice: avoid the PTP hardware semaphore in gettimex64 path
+  ice: fold ice_ptp_read_time into ice_ptp_gettimex64
 
-On Sun, Feb 25, 2024 at 11:48:20PM -0800, Randy Dunlap wrote:
-> In a previous patch I added "select PHYLIB" at the wrong place for the
-> ADIN1110 driver symbol, so move it to its correct place under the
-> ADIN1110 kconfig symbol.
->=20
-> Fixes: a9f80df4f514 ("net: ethernet: adi: requires PHYLIB support")
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Reported-by: Michal Kubecek <mkubecek@suse.cz>
-> Closes: https://lore.kernel.org/lkml/77012b38-4b49-47f4-9a88-d773d52909ad=
-@infradead.org/T/#m8ba397484738711edc0ad607b2c63ca02244e3c3
-> Cc: Lennart Franzen <lennart@lfdomain.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
-> Cc: Nuno Sa <nuno.sa@analog.com>
+ drivers/net/ethernet/intel/ice/Makefile      |  3 +-
+ drivers/net/ethernet/intel/ice/ice.h         |  2 +
+ drivers/net/ethernet/intel/ice/ice_adapter.c | 69 ++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_adapter.h | 28 ++++++++
+ drivers/net/ethernet/intel/ice/ice_main.c    |  8 +++
+ drivers/net/ethernet/intel/ice/ice_ptp.c     | 33 ++--------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c  |  3 +
+ 7 files changed, 116 insertions(+), 30 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_adapter.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_adapter.h
 
-Thank you for the quick update, now the dependencies work as expected.
+-- 
+2.43.2
 
-Tested-by: Michal Kubecek <mkubecek@suse.cz>
-
---owllcezk7bkfsbh6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmXcqfMACgkQ538sG/LR
-dpUgpAf/Vi0RzVEjPg5VK1CXIo1F4djgYRitLryRYpAd08//OsnLFxPy0y/kG1CE
-9YGxN4RsR91bgEKQ1+e6ViM2FT98XoHSuvcjFLNwNg2r9RSsTY7GrME42Y6qle5h
-lDD2myLgMPRH3Q6yjbNp5NAz4T6Jh5bu7dVLWm5VbWx1mV5YRD3sGDgNvgJQ3hzp
-j2w2xj3XecBo9jXNvNyycMR6gtV5OUdl8wMkCguzYTUcJSHf1zI5ZmN8zXnLcMwT
-SioQj+13pAIcfh9ZkPqNUJmWM4/1rUQ2n+3HO2sr+LutAFoRDmP4gmCtLz5W87bb
-UTJGlP2hO1dC7ka0zZvHaZRleTk+8g==
-=feKe
------END PGP SIGNATURE-----
-
---owllcezk7bkfsbh6--
 
