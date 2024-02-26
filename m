@@ -1,147 +1,158 @@
-Return-Path: <netdev+bounces-75062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B83B86807C
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 20:09:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BB33868088
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 20:11:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 001E429153A
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 19:09:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A77F71C2035A
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 19:11:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93E8812FF71;
-	Mon, 26 Feb 2024 19:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B961A130E44;
+	Mon, 26 Feb 2024 19:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="B3XZR+6t"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="FiGxXs0F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB83913540C
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 19:04:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06CD12C815
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 19:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708974255; cv=none; b=lFLt80FhiC2rdfz7J9cagMYlh/Eqv6HzEZMLeRTdtL3bZYmiVyzhlTXpO1qYUQ+JaWtCrVTX6y1cBgNzDUjIBGBoUj8C4gG8LtGlpES7en2rGpMomzxOeEvAepKdLO8KGADYrfC+yfJaCmJ2xjOovbUKhB+kfzq74QgQWmmbTcE=
+	t=1708974479; cv=none; b=Gl5R0GSGTCvBAk6nDe6t6PmHofrcyw59tSSun4dGRdmUiL9NgrTBtjerYRnGZuktk4g6KD9Lf7b69wXqhuZ98uya42Y6szTj/VnvodlgG/MdpHhOz4C/VSbC7ZVBxYAhjQn6SOql1XoMGxZwrNt1Xp0/3yoaZmG2CW+gZrJh880=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708974255; c=relaxed/simple;
-	bh=JIqIxUB3Ayzkf/mD0blka6O8DKfFWgrE9WEYSScIHy4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DTfRAS3+rHtTuMZjUIaOhiHSsMFpRR9pO5yRlwX0y7xfpgwsy4u1xekBGBCySvhwN8zZudY/E/V5WbWFM3W4ZWR0sVOjEhy2hcmQoIdI7wHHJBAcYtL6FZqd4A05pjvkYU4zRLx3RGcFym2wfYc2UPljohs/FhhxdVjFU7cl7MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=B3XZR+6t; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1dc5d0162bcso29022255ad.0
-        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 11:04:13 -0800 (PST)
+	s=arc-20240116; t=1708974479; c=relaxed/simple;
+	bh=L8scKpuFDwoyP2sAc+awhMVtotMWditmGyjFRudQ0WI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rNfNzy2MCttFlSi4mLugRwpkHcfRAPEpiZu/suGAjewR5eRl0lylV01LEbqRA8QvrM/K0q99k70q6ZdTy0AF0JCvTh4VAVm7wiVaJz960FGd7BhscoiCJnrMotUkSAunCPKJ6sB6FpRT4uy+ISGAvJxPzhjE+8JVwXmm7tv6VwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=FiGxXs0F; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1708974253; x=1709579053; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=rqEaslcv+csbSpF6YQBGR7kuM3sWH8YoMpbM5vrlm2I=;
-        b=B3XZR+6tYaiLmvO0ormzojOJS7q2VNS3VFHyapT0mYeCoLK0DxsW42E/Fyoss/kqcp
-         mLiKMAOlbl9wyTCPu5nS79QgEgum9zDXpFi3SNMTipdU+yE37Q/xZySU6Z2PWb7019Hi
-         5m35Vb5iqfIONp2TiVTpVr5BtosabOcNFViMs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708974253; x=1709579053;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rqEaslcv+csbSpF6YQBGR7kuM3sWH8YoMpbM5vrlm2I=;
-        b=UwiRiNMiVJvem196t5GvdvdJpDfF/QsXaRs+N/8fw0JOoSOYLjP4Q33klUNoBeie4q
-         uQky27Q2pWkw8QuU8sno/xrAEXScjOFUZ2osumJEjSagODSartzHft0qJsdk8J1t2geU
-         9Ia3yipKJxSLLWz4HyItLjuq4Ya+7UGiBAekYwq/tzamNAARTkIitWGz+vWfYBImiIxw
-         FlwiCTY6ZUVKyDoFe5VUU0W667WpYvkl8f7E+03JazGOovUsVIPAY60G1bLWi6oyEYtz
-         KcBbbrsiyJX9fzsKmS4dFbYy2M0nlGd89RQ6r486WKfPByz9wsT/EEodKTUsT9sx8Zco
-         xpug==
-X-Forwarded-Encrypted: i=1; AJvYcCV/WXeMdiZN5E41IMqErNiqgIQ4xRDQQoWZKrO9Gx92GvwVN1NPmRvM3MdXk+utfk7Kx0PH583OQuqaHTydg0y/ji6xTReA
-X-Gm-Message-State: AOJu0YwCLuRkS20uWMP515L6N1oJAC3IvmqtqI5lxa4PJQsU8vY9HeIe
-	UUAt9yLSHoorrLimgoX4osfN0+6maOGvNVIeNY/SPKNqNxBSuznM2HzLJYUWEQ==
-X-Google-Smtp-Source: AGHT+IGFFetjjHPW/ivkyZlW9eIrIhfwZbvoWRltu7/bfVEDnv3KZmmFg2wZd+UfH3HTAx1gx80+dA==
-X-Received: by 2002:a17:902:d2cc:b0:1d9:7095:7e3c with SMTP id n12-20020a170902d2cc00b001d970957e3cmr8949703plc.57.1708974253283;
-        Mon, 26 Feb 2024 11:04:13 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id u6-20020a170902b28600b001d8aadaa7easm31822plr.96.2024.02.26.11.04.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 11:04:12 -0800 (PST)
-Date: Mon, 26 Feb 2024 11:04:12 -0800
-From: Kees Cook <keescook@chromium.org>
-To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	davem@davemloft.net,
-	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
-	Will Drewry <wad@chromium.org>, edumazet@google.com,
-	jakub@cloudflare.com, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 2/2] selftests/harness: Merge TEST_F_FORK() into TEST_F()
-Message-ID: <202402261102.3BE03F08DF@keescook>
-References: <20240223160259.22c61d1e@kernel.org>
- <20240226162335.3532920-1-mic@digikod.net>
- <20240226162335.3532920-3-mic@digikod.net>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1708974478; x=1740510478;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=EL+sALY9h1Ql9dmZzngXV3Y653/tFdFqvO1T0n2gSJs=;
+  b=FiGxXs0FhK19BJdDl9usxdmwBVJ3h71rPYAfD1pnZ9cEPW2poDfcTfs8
+   iG8331JyAzq2T/MFB0r2YoCt5DRHYud06KQWwbCAoP4znN8ClxNSeR3tM
+   TPuLLwfVF9bTD3IM0Kf7Faeu5xGSWS4+lIEJhNPQ/9KTjsrYGgetVbMkl
+   w=;
+X-IronPort-AV: E=Sophos;i="6.06,186,1705363200"; 
+   d="scan'208";a="389239343"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 19:07:55 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:60606]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.47.113:2525] with esmtp (Farcaster)
+ id 63f26ee4-78cd-4674-a983-5359ebab3dff; Mon, 26 Feb 2024 19:07:54 +0000 (UTC)
+X-Farcaster-Flow-ID: 63f26ee4-78cd-4674-a983-5359ebab3dff
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 26 Feb 2024 19:07:53 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.48) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Mon, 26 Feb 2024 19:07:51 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v3 net-next 05/14] af_unix: Detect Strongly Connected Components.
+Date: Mon, 26 Feb 2024 11:07:41 -0800
+Message-ID: <20240226190741.66233-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240224163430.05595eb0@kernel.org>
+References: <20240224163430.05595eb0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240226162335.3532920-3-mic@digikod.net>
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWA003.ant.amazon.com (10.13.139.47) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Mon, Feb 26, 2024 at 05:23:35PM +0100, Mickaël Salaün wrote:
-> Remplace Landlock-specific TEST_F_FORK() with an improved TEST_F() which
-> brings four related changes:
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Sat, 24 Feb 2024 16:34:30 -0800
+> On Fri, 23 Feb 2024 13:39:54 -0800 Kuniyuki Iwashima wrote:
+> > +	list_for_each_entry(edge, &vertex->edges, vertex_entry) {
+> > +		struct unix_vertex *next_vertex = edge->successor->vertex;
+> > +
+> > +		if (!next_vertex)
+> > +			continue;
+> > +
+> > +		if (next_vertex->index == UNIX_VERTEX_INDEX_UNVISITED) {
+> > +			list_add(&edge->stack_entry, &edge_stack);
+> > +
+> > +			vertex = next_vertex;
+> > +			goto next_vertex;
+> > +prev_vertex:
+> > +			next_vertex = vertex;
+> > +
+> > +			edge = list_first_entry(&edge_stack, typeof(*edge), stack_entry);
+> > +			list_del_init(&edge->stack_entry);
+> > +
+> > +			vertex = edge->predecessor->vertex;
+> > +
+> > +			vertex->lowlink = min(vertex->lowlink, next_vertex->lowlink);
+> > +		} else if (edge->successor->vertex->on_stack) {
+> > +			vertex->lowlink = min(vertex->lowlink, next_vertex->index);
+> > +		}
+> > +	}
+> > +
+> > +	if (vertex->index == vertex->lowlink) {
+> > +		struct list_head scc;
+> > +
+> > +		__list_cut_position(&scc, &vertex_stack, &vertex->scc_entry);
+> > +
+> > +		list_for_each_entry_reverse(vertex, &scc, scc_entry) {
+> > +			list_move_tail(&vertex->entry, &unix_visited_vertices);
+> > +
+> > +			vertex->on_stack = false;
+> > +		}
+> > +
+> > +		list_del(&scc);
+> > +	}
+> > +
+> > +	if (!list_empty(&edge_stack))
+> > +		goto prev_vertex;
 > 
-> Run TEST_F()'s tests in a grandchild process to make it possible to
-> drop privileges and delegate teardown to the parent.
+> coccicheck says:
 > 
-> Compared to TEST_F_FORK(), simplify handling of the test grandchild
-> process thanks to vfork(2), and makes it generic (e.g. no explicit
-> conversion between exit code and _metadata).
+> net/unix/garbage.c:406:17-23: ERROR: invalid reference to the index variable of the iterator on line 425
 > 
-> Compared to TEST_F_FORK(), run teardown even when tests failed with an
-> assert thanks to commit 63e6b2a42342 ("selftests/harness: Run TEARDOWN
-> for ASSERT failures").
-> 
-> Simplify the test harness code by removing the no_print and step fields
-> which are not used.  I added this feature just after I made
-> kselftest_harness.h more broadly available but this step counter
-> remained even though it wasn't needed after all. See commit 369130b63178
-> ("selftests: Enhance kselftest_harness.h to print which assert failed").
+> this code looks way to complicated to untangle on a quick weekend scan,
+> so please LMK if this is a false positive, I'll hide the patches from
+> patchwork for now ;)
 
-I'm personally fine dropping the step counter. (I do wonder if that
-removal should be split from the grandchild launching.)
+Yeah, I think it's false positive :)
 
-> Replace spaces with tabs in one line of __TEST_F_IMPL().
-> 
-> Cc: Günther Noack <gnoack@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Kees Cook <keescook@chromium.org>
-> Cc: Shuah Khan <shuah@kernel.org>
-> Cc: Will Drewry <wad@chromium.org>
-> Signed-off-by: Mickaël Salaün <mic@digikod.net>
+The code above implements recursion withtout nesting call stack
+and instead uses goto jump and restores the previous in-loop
+variables there.
 
-One typo below, but otherwise seems good to me:
+  __unix_walk_scc(struct unix_vertex *vertex)
+  {
+    ...
+    list_for_each_entry(edge, &vertex->edges, vertex_entry) {
+      if (next_vertex->index == UNIX_VERTEX_INDEX_UNVISITED) {
+        __unix_walk_scc(next_vertex);
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+        ^-- This is rewritten with goto next_vertex & prev_vertex.
 
+        vertex->lowlink = min(vertex->lowlink, next_vertex->lowlink);
+      } else {
+        vertex->lowlink = min(vertex->lowlink, next_vertex->index);
+      }
+    }
+    ...
 
-> [...]
->  			_metadata->setup_completed = true; \
-> -			fixture_name##_##test_name(_metadata, &self, variant->data); \
-> +			/* Use the same _metadata. */ \
-> +			child = vfork(); \
-> +			if (child == 0) { \
-> +				fixture_name##_##test_name(_metadata, &self, variant->data); \
-> +				_exit(0); \
-> +			} \
-> +			if (child < 0) { \
-> +				ksft_print_msg("ERROR SPAWNING TEST GANDCHILD\n"); \
-
-typo: GAND -> GRAND
-
--- 
-Kees Cook
+Here's the original recursive pseudocode.
+https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm
 
