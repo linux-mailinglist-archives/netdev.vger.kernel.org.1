@@ -1,86 +1,82 @@
-Return-Path: <netdev+bounces-75030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AA3E867C71
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 17:49:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A68CA867CB7
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 17:53:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C926B29465F
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:49:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D80E71C22E46
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F5612CD83;
-	Mon, 26 Feb 2024 16:48:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19DB612C7F0;
+	Mon, 26 Feb 2024 16:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cfwS3AVG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rwXAmHKN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA47560DC6;
-	Mon, 26 Feb 2024 16:48:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C4212AAEF;
+	Mon, 26 Feb 2024 16:53:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708966109; cv=none; b=SRDOofeVwi/Fz2eohYGWXi9T/mHOnZ/yIX/pm854ar8jezgGZo07miqcnAzNqZcPzY9SYc/gpwCFdlxm5NqvsGo5vVQ4RuRllHii7rPL2lefUmL5Yj5lAWHct4XEEyMHtL+IkaKPy2OPoMsbobkTEVU/2Am7a4eCIzBZejggdEk=
+	t=1708966387; cv=none; b=FNRemwDUZBcKhmhr42Y3uIdVlfRd0ICfTFDL4SUqKfCALYwIm+MGyCogSUiUH9OA1HhxmQwbzvN5Od+Ui1s3cHBVneHMxqSkCNm26V46pYGohSNoQwCOnnwduwd5mREMOuMO3cIOS7aggef50O/Qykn07+VmsVgBxjaki+DL0xA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708966109; c=relaxed/simple;
-	bh=TBcPD0LiF4Ta/LAWQUOaW1Bzs0XKAIO3UtxBPZmhSCE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HP7W+z3jto40JdrsdvECjBs6LTpC64yvx7KB6IBBQgGcd+6BTu4dfiIQVOZEJpFH8Xp4Ws2SaplN2M9AAbOZpA917bNKeXh1DwLDXhsR9QGa4GiJ4sNcocGkNrT0Lm+6O0rp5YvyM0oeLii26QPwQvQ9RvZNRGenZeDPGeS8JDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cfwS3AVG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B5ECC433C7;
-	Mon, 26 Feb 2024 16:48:26 +0000 (UTC)
+	s=arc-20240116; t=1708966387; c=relaxed/simple;
+	bh=uvXVPnvYD/yAKKfwAi1xFd+k3dhGavlaDorjhvkq7Gs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iVrmI9U6ZiVDGdlXT9TsbSPdJ4mbtHfCsGgI4rqCT6JwKAkMWl6qgtxWRMOhG8Al5EI5Wxd0/89y1apyXKiWwpYX5Zqc9DjqX6Yam7E1uH4h+nAB4UP4PUSbdTP7leCL6TNVmW3Y9g5tDArWDQi5TSjApZsTY0Ro2brhldBMiDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rwXAmHKN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28803C433C7;
+	Mon, 26 Feb 2024 16:53:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708966109;
-	bh=TBcPD0LiF4Ta/LAWQUOaW1Bzs0XKAIO3UtxBPZmhSCE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cfwS3AVGyDk9cwQGgcUr5wo93F5HwFmgSTtUjh5LvJLwOA2olSE4sKBqb4Xt4FL53
-	 ddb7+Pgz2pWhl0SlqWEE+hDP7zG/D9Hb0CW/5gafRvNk7arKgJ05azCC7hqNp0tWEX
-	 wxR/caxRt4KBSXTuyFL6aT3bRkoOdKma0vx2eRTaloWxfGiQ6luyfXn6GpAo0xnowF
-	 gazK6bBNB0xIIoWLTZ3g2yUBIZcGAGauqCbM/k90sqtYuy9IXu8gV89XKRfmUQbT/4
-	 fRQPIil8JoqBc3pyLsIrLPwrwEB2Av+Uj8xUILIPpUz1G97w2q0mREM3SdM+aOh9LM
-	 cBvLspv5OnJgA==
-Message-ID: <7b03fe64-abe0-4a3c-9a23-1dbed465ed37@kernel.org>
-Date: Mon, 26 Feb 2024 18:48:23 +0200
+	s=k20201202; t=1708966386;
+	bh=uvXVPnvYD/yAKKfwAi1xFd+k3dhGavlaDorjhvkq7Gs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rwXAmHKNONsVopUVRQfWkmT1rzgKqKMz1/k9Ed8mh/S8vYzB0qVwuqpr5mq+7Mrzf
+	 KmTAguLpzq4quLCYIB6riF/275aDXB7kF5Audz99YU+FK1FgoKfvRPW0LKtcSvWea6
+	 BT9bPQfmUjxzPU9a8LGBXHuvmyauccNruCnTs1Z581GfjHbe8B2/ZndtOW9OXoxf4v
+	 RUeDPndZbk33EI0w3KdqXplVCU0GiP8+HMLnofcIcGlCSmSjshX73WNlyZvPuj9GvA
+	 GkBUXKK+KAmsu/SFyT3hSbTo0lnuggAxWaG8LacP15awnBDbQSnWt8mjL88CFhTaQh
+	 aDzZJYYvCMWvQ==
+Date: Mon, 26 Feb 2024 08:53:05 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org,
+ linux-security-module@vger.kernel.org, keescook@chromium.org,
+ jakub@cloudflare.com
+Subject: Re: [PATCH net-next v3 00/11] selftests: kselftest_harness: support
+ using xfail
+Message-ID: <20240226085305.67ad776a@kernel.org>
+In-Reply-To: <20240226.Juthoojee3qu@digikod.net>
+References: <20240220192235.2953484-1-kuba@kernel.org>
+	<20240223160259.22c61d1e@kernel.org>
+	<20240226.Juthoojee3qu@digikod.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 01/10] dt-bindings: net: Add support for AM65x
- SR1.0 in ICSSG
-Content-Language: en-US
-To: Diogo Ivo <diogo.ivo@siemens.com>, danishanwar@ti.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, linux-arm-kernel@lists.infradead.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org
-Cc: jan.kiszka@siemens.com
-References: <20240221152421.112324-1-diogo.ivo@siemens.com>
- <20240221152421.112324-2-diogo.ivo@siemens.com>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20240221152421.112324-2-diogo.ivo@siemens.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, 26 Feb 2024 17:27:34 +0100 Micka=C3=ABl Sala=C3=BCn wrote:
+> > would you be able to take a look at those changes? landlock seems to be
+> > the sole user of the "no_print" functionality in the selftest harness.
+> > If the patches look good I'll create a branch based on Linus's tree
+> > so that anyone interested can pull the changes in.. =20
+>=20
+> Hi Jakub,
+>=20
+> I missed your patches before this series.  I just sent two patches to
+> clean things up before you change them.  This should simplify your
+> patches and improve the overall maintenance.  I'd appreciate if you
+> rebase on top of them.
 
-
-On 21/02/2024 17:24, Diogo Ivo wrote:
-> Silicon Revision 1.0 of the AM65x came with a slightly different ICSSG
-> support: Only 2 PRUs per slice are available and instead 2 additional
-> DMA channels are used for management purposes. We have no restrictions
-> on specified PRUs, but the DMA channels need to be adjusted.
-> 
-> Co-developed-by: Jan Kiszka <jan.kiszka@siemens.com>
-> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-> Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
-
-Reviewed-by: Roger Quadros <rogerq@kernel.org>
-
--- 
-cheers,
--roger
+Nice! vfork() is a bit scary so I'll give people a couple of days to
+review and then post a combined+rebased series.
 
