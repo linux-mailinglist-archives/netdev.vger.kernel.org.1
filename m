@@ -1,243 +1,167 @@
-Return-Path: <netdev+bounces-75057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6412C867F73
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 19:00:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB790867F92
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 19:09:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01FB91F27103
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 18:00:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80084B20ED2
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 18:09:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7E812E1ED;
-	Mon, 26 Feb 2024 18:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A1E12EBED;
+	Mon, 26 Feb 2024 18:09:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="umcXnLPr"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="G5sDphJs";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="mZXkRcmU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F0112E1CC
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 18:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5205C12E1F5;
+	Mon, 26 Feb 2024 18:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708970422; cv=none; b=pO9VXEHIVEB/1oGermJCCb9gIHefMJD4UhD/oiW5je2AlnJNYnMY87p4aQFH0zsEm+mKLezXRVCgCW7iklfnewjzzwTbvo/UO/rzrj2AkbHJNe1YjdxAiFfBqVuPtVXVLPVCg59aZDS9yXGTXTqjgG8a4CtTGfyDJAQRMuJlGPY=
+	t=1708970967; cv=none; b=Ou+VEvHtnc3b3Z+c7cmH26wsVri1ZjuHOwDz22QFxzqo2cvey0kFCxqKz8AYEA0rqpXV52XSpK9Fz074Ww4+c+vu0vyueMwk1QgkvHrg69V1fIxzJWJntTK5Jd9dOkIgu2ldiOLLcloeyR8SzgjUz0GoZfSICCk55XnBgvZNpD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708970422; c=relaxed/simple;
-	bh=3cgWbsILfFUsLgfMhtdxKybF9L7xscWnZzCJILBs2xk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ci8ULAWThudFrJDl9uA+4O4L2tb005TWuHTOTv9WWvVaxnnXre+EoiezR/5o+6YhFSB2aC2ezRBNDZvpwHj/ybIwW9ejUu9cjFqmuLshG4NNV0R7VYTS7qObEuQ9sEpa2m7wVoFcGWGsLemRTcUjczaJ8XbcZcfhnRN/hnWAxZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=umcXnLPr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C1CDC433F1;
-	Mon, 26 Feb 2024 18:00:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708970421;
-	bh=3cgWbsILfFUsLgfMhtdxKybF9L7xscWnZzCJILBs2xk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=umcXnLPrOCif7IFHdjK3WlpRUmIjqxuMvZvPTHsTVdfx1IhUCMBQ2O9wFfZhuZ6dR
-	 9jnq7I0vQrsTCwADHaLVVibNTBtmdUblNXxMhSlBGatjThwWxUlwnsGUOuCOj1KFX9
-	 Zp6mDEESS5EtFRX0AgD+89j76M42r4bncrQTBHCL/mRCjO/etTavBkKTkWNF4X0cvY
-	 nyk3czMFa1slAXznyfb+4t4FcIh6RLC+h/l7tf6ez7bMZz+9j9LTrVntF3+u4VKgXt
-	 kNer/kCgxehA1qcXYuzP/xGgLodIqAaGaUKhgt3GeX8CMjCh70xcszytaS8vG1CPNd
-	 3Srqynog6kxtg==
-Date: Mon, 26 Feb 2024 10:00:20 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, jiri@resnulli.us, sdf@google.com,
- nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net-next 00/15] tools: ynl: stop using libmnl
-Message-ID: <20240226100020.2aa27e8f@kernel.org>
-In-Reply-To: <m27ciroaur.fsf@gmail.com>
-References: <20240222235614.180876-1-kuba@kernel.org>
-	<CAD4GDZzF55bkoZ_o0S784PmfW4+L_QrG2ofWg6CeQk4FCWTUiw@mail.gmail.com>
-	<20240223083440.0793cd46@kernel.org>
-	<m27ciroaur.fsf@gmail.com>
+	s=arc-20240116; t=1708970967; c=relaxed/simple;
+	bh=EgcqXpFezT+1t7YK8f56X0MEgJ6W6GxDYo7o8TM6gUE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=KPhTYJQ+7InPGLmyaoQRq0vHRXm+kg5IThQMyuGfHFR1Ga2niTCrOw9hUjo6BUXV3SOGSm8odcDQ7X8qg3MIw6BcK6k0gAkQF6Lh9FWm69X/oHHx4afBNzpEPy5CPUZBd41yXoPDdoIn96u/+9t69x9e6lr0XUcnWYyLin7mg54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=G5sDphJs; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=mZXkRcmU; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1708970963;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lBiIbeLll0i8806pw3+a5wtiCC8R3KilwQQO3Vmsk48=;
+	b=G5sDphJs7t9/raF+7NYDjjcuKFwrRc0mqtuV/gpfLcT+jH6DXladNCYEqLak8e2uai5TD+
+	ZcTwChJ8MRp+01HO3nKWNKe+NhKUZvPjHaVfpllKVSfsey894PDzlGGuvLRd0X5D8J82dv
+	CqMwC6SoYU86gtUCYVqmQ8Yu7sD05uyf777NW9SzmGMWzGpcxyL2FVvckmC6GlOfGem5AS
+	33YWLOeIMQWQJhI0qjRJgCA7E7rPEUqWA++z25qhnjTzfUmFgKFgXhtYxaa1S1rNjafLx6
+	1JE8wnN5SQygZR6jXnuuQzKneRTbC7TmsoLykcIhsO39hkJ4+vHGjujy2sTf7w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1708970963;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lBiIbeLll0i8806pw3+a5wtiCC8R3KilwQQO3Vmsk48=;
+	b=mZXkRcmUoZuND93toW5bsRFgQG3qHZFIQrwEXNOwCdtZ2hwAjok8Xgut2Ym9p5Xw23JOqV
+	3M+bMQhHuGc36HAg==
+To: Mathias Nyman <mathias.nyman@linux.intel.com>, Linux regressions mailing
+ list <regressions@lists.linux.dev>
+Cc: "Christian A. Ehrhardt" <lk@c--e.de>, niklas.neronin@linux.intel.com,
+ Linux List Kernel Mailing <linux-kernel@vger.kernel.org>, Greg KH
+ <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
+ linux-x86_64@vger.kernel.org, netdev@vger.kernel.org, Randy Dunlap
+ <rdunlap@infradead.org>, Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+Subject: Re: This is the fourth time I've tried to find what led to the
+ regression of outgoing network speed and each time I find the merge commit
+ 8c94ccc7cd691472461448f98e2372c75849406c
+In-Reply-To: <acc2b877-4b42-fd4d-867b-603dae95d09d@linux.intel.com>
+References: <CABXGCsNnUfCCYVSb_-j-a-cAdONu1r6Fe8p2OtQ5op_wskOfpw@mail.gmail.com>
+ <e7b96819-edf7-1f9f-7b01-e2e805c99b33@linux.intel.com>
+ <CABXGCsPjW_Gr4fGBzYSkr_4tsn0fvuT72G-YJYXcb1a4kX=CQw@mail.gmail.com>
+ <2d87509a-1515-520c-4b9e-bba4cd4fa2c6@linux.intel.com>
+ <CABXGCsPdXqRG6v97KDGy+o59xc3ayaq3rLj267veC7YcKVp8ww@mail.gmail.com>
+ <1126ed0a-bfc1-a752-1b5e-f1339d7a8aa5@linux.intel.com>
+ <CABXGCsN5_O3iKDOyYxtsGTGDA6fw4962CjzXLSnOK3rscELq+Q@mail.gmail.com>
+ <a026ecd8-6fba-017d-d673-0d0759a37ed8@linux.intel.com>
+ <CABXGCsOgy8H4GGcNU1jRE+SzRqwnPeNuy_3xBukjwB-bPxeZrQ@mail.gmail.com>
+ <CABXGCsOd=E428ixUOw+msRpnaubgx5-cVU7TDXwRUCdrM5Oicw@mail.gmail.com>
+ <34d7ab1b-ab12-489d-a480-5e6ccc41bfc3@infradead.org>
+ <10487018-49b8-4b27-98a1-07cee732290d@infradead.org>
+ <4f34b6a8-4415-6ea4-8090-262847d606c6@linux.intel.com>
+ <3ea25443-1275-4c67-90e0-b637212d32b5@leemhuis.info>
+ <1e719367-01ae-565a-2199-0ff7e260422b@linux.intel.com>
+ <410817b8-1cf9-4285-b20b-f1fa0513cee8@leemhuis.info>
+ <acc2b877-4b42-fd4d-867b-603dae95d09d@linux.intel.com>
+Date: Mon, 26 Feb 2024 19:09:22 +0100
+Message-ID: <87r0gz9jxp.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On Mon, 26 Feb 2024 09:04:12 +0000 Donald Hunter wrote:
-> > On Fri, 23 Feb 2024 16:26:33 +0000 Donald Hunter wrote:  
-> >> Is the absence of buffer bounds checking intentional, i.e. relying on libasan?  
-> >
-> > In ynl.c or the generated code?  
-> 
-> I'm looking at ynl_attr_nest_start() and ynl_attr_put*() in ynl-priv.h
-> and there's no checks for buffer overrun. It is admittedly a big
-> buffer, with rx following tx, but still.
+On Mon, Feb 26 2024 at 12:54, Mathias Nyman wrote:
+> On 26.2.2024 11.51, Linux regression tracking (Thorsten Leemhuis) wrote:
+>>> I don't think reverting this series is a solution.
+>>>
+>>> This isn't really about those usb xhci patches.
+>>> This is about which interrupt gets assigned to which CPU.
+>> 
+>> I know, but from my understanding of Linus expectations wrt to handling
+>> regressions it does not matter much if a bug existed earlier or
+>> somewhere else: what counts is the commit that exposed the problem.
+>> 
+>> But I might be wrong here. Anyway, not CCing Linus for this; but I'll
+>> likely point him to this direction on Sunday in my next weekly report,
+>> unless some fix comes into sight.
+>> 
+>>> Mikhail got unlucky when the network adapter interrupts on that system was
+>>> assigned to CPU0, clearly a more "clogged" CPU, thus causing a drop in max
+>>> bandwidth.
+>> 
+>> But maybe others will be just as "unlucky". Or is there anything to
+>> believe otherwise? Maybe some aspect of the .config or local setup that
+>> is most likely unique to Mikhail's setup?
+>
+> I believe this is a zero-sum case.
+>
+> Others got equally lucky due to this change.
+> Their devices end up interrupting less clogged CPUs and see a similar
+> performance increase.
 
-You're right. But this series isn't making it worse, AFAIU.
-We weren't checking before, we aren't checking now.
+Reverting this does not make any sense.
 
-I don't want to have to add another arg to all put() calls.
-How about we sash the max len on nlmsg_pid?
+The kernel assigns the initial interrupt affinities to the CPUs so that
+the number of interrupts is halfways balanced. That spreading algorithm
+is completely agnostic of the actual usage of the interrupts. Where
+e.g. the network interrupt ends up depends on the probe/enumeration
+order of devices. Add another PCI-E card into the machine and it will
+again look different.
 
-Something like:
+There is nothing the kernel can do about it and earlier attempts to do
+interrupt frequency based balancing in the kernel ended up nowhere
+simply because the kernel does not have enough information about the
+overall requirements. That's why the kernel leaves the affinity
+configuration for user space, e.g. irqbalanced, except for true
+multi-queue scenarios like NVME where the kernel binds queues and their
+interrupts to specific CPUs or groups of CPUs.
 
-diff --git a/tools/net/ynl/lib/ynl-priv.h b/tools/net/ynl/lib/ynl-priv.h
-index 6361318e5c4c..d4ffe18b00f9 100644
---- a/tools/net/ynl/lib/ynl-priv.h
-+++ b/tools/net/ynl/lib/ynl-priv.h
-@@ -135,6 +135,8 @@ int ynl_error_parse(struct ynl_parse_arg *yarg, const char *msg);
- 
- /* Netlink message handling helpers */
- 
-+#define YNL_MSG_OVERFLOW	1
-+
- static inline struct nlmsghdr *ynl_nlmsg_put_header(void *buf)
- {
- 	struct nlmsghdr *nlh = buf;
-@@ -239,11 +241,26 @@ ynl_attr_first(const void *start, size_t len, size_t skip)
- 	return ynl_attr_if_good(start + len, attr);
- }
- 
-+static inline bool
-+__ynl_attr_put_overflow(struct nlmsghdr *nlh, size_t size)
-+{
-+	bool o;
-+
-+	/* We stash buffer length on nlmsg_pid. */
-+	o = nlh->nlmsg_len + NLA_HDRLEN + NLMSG_ALIGN(size) > nlh->nlmsg_pid;
-+	if (o)
-+		nlh->nlmsg_pid = YNL_MSG_OVERFLOW;
-+	return o;
-+}
-+
- static inline struct nlattr *
- ynl_attr_nest_start(struct nlmsghdr *nlh, unsigned int attr_type)
- {
- 	struct nlattr *attr;
- 
-+	if (__ynl_attr_put_overflow(nlh, 0))
-+		return ynl_nlmsg_end_addr(nlh) - NLA_HDRLEN;
-+
- 	attr = ynl_nlmsg_end_addr(nlh);
- 	attr->nla_type = attr_type | NLA_F_NESTED;
- 	nlh->nlmsg_len += NLMSG_ALIGN(sizeof(struct nlattr));
-@@ -263,6 +280,9 @@ ynl_attr_put(struct nlmsghdr *nlh, unsigned int attr_type,
- {
- 	struct nlattr *attr;
- 
-+	if (__ynl_attr_put_overflow(nlh, size))
-+		return;
-+
- 	attr = ynl_nlmsg_end_addr(nlh);
- 	attr->nla_type = attr_type;
- 	attr->nla_len = NLA_HDRLEN + size;
-@@ -276,14 +296,17 @@ static inline void
- ynl_attr_put_str(struct nlmsghdr *nlh, unsigned int attr_type, const char *str)
- {
- 	struct nlattr *attr;
--	const char *end;
-+	size_t len;
-+
-+	len = strlen(str);
-+	if (__ynl_attr_put_overflow(nlh, len))
-+		return;
- 
- 	attr = ynl_nlmsg_end_addr(nlh);
- 	attr->nla_type = attr_type;
- 
--	end = stpcpy(ynl_attr_data(attr), str);
--	attr->nla_len =
--		NLA_HDRLEN + NLA_ALIGN(end - (char *)ynl_attr_data(attr));
-+	strcpy(ynl_attr_data(attr), str);
-+	attr->nla_len = NLA_HDRLEN + NLA_ALIGN(len);
- 
- 	nlh->nlmsg_len += NLMSG_ALIGN(attr->nla_len);
- }
-diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
-index 86729119e1ef..c2ba72f68028 100644
---- a/tools/net/ynl/lib/ynl.c
-+++ b/tools/net/ynl/lib/ynl.c
-@@ -404,9 +404,33 @@ struct nlmsghdr *ynl_msg_start(struct ynl_sock *ys, __u32 id, __u16 flags)
- 	nlh->nlmsg_flags = flags;
- 	nlh->nlmsg_seq = ++ys->seq;
- 
-+	/* This is a local YNL hack for length checking, we put the buffer
-+	 * length in nlmsg_pid, since messages sent to the kernel always use
-+	 * PID 0. Message needs to be terminated with ynl_msg_end().
-+	 */
-+	nlh->nlmsg_pid = YNL_SOCKET_BUFFER_SIZE;
-+
- 	return nlh;
- }
- 
-+static int ynl_msg_end(struct ynl_sock *ys, struct nlmsghdr *nlh)
-+{
-+	/* We stash buffer length on nlmsg_pid */
-+	if (nlh->nlmsg_pid == 0) {
-+		yerr(ys, YNL_ERROR_INPUT_INVALID,
-+		     "Unknwon input buffer lenght");
-+		return -EINVAL;
-+	}
-+	if (nlh->nlmsg_pid == YNL_MSG_OVERFLOW) {
-+		yerr(ys, YNL_ERROR_INPUT_TOO_BIG,
-+		     "Constructred message longer than internal buffer");
-+		return -EMSGSIZE;
-+	}
-+
-+	nlh->nlmsg_pid = 0;
-+	return 0;
-+}
-+
- struct nlmsghdr *
- ynl_gemsg_start(struct ynl_sock *ys, __u32 id, __u16 flags,
- 		__u8 cmd, __u8 version)
-@@ -606,6 +630,10 @@ static int ynl_sock_read_family(struct ynl_sock *ys, const char *family_name)
- 	nlh = ynl_gemsg_start_req(ys, GENL_ID_CTRL, CTRL_CMD_GETFAMILY, 1);
- 	ynl_attr_put_str(nlh, CTRL_ATTR_FAMILY_NAME, family_name);
- 
-+	err = ynl_msg_end(ys, nlh);
-+	if (err < 0)
-+		return err;
-+
- 	err = send(ys->socket, nlh, nlh->nlmsg_len, 0);
- 	if (err < 0) {
- 		perr(ys, "failed to request socket family info");
-@@ -867,6 +895,10 @@ int ynl_exec(struct ynl_sock *ys, struct nlmsghdr *req_nlh,
- {
- 	int err;
- 
-+	err = ynl_msg_end(ys, req_nlh);
-+	if (err < 0)
-+		return err;
-+
- 	err = send(ys->socket, req_nlh, req_nlh->nlmsg_len, 0);
- 	if (err < 0)
- 		return err;
-@@ -920,6 +952,10 @@ int ynl_exec_dump(struct ynl_sock *ys, struct nlmsghdr *req_nlh,
- {
- 	int err;
- 
-+	err = ynl_msg_end(ys, req_nlh);
-+	if (err < 0)
-+		return err;
-+
- 	err = send(ys->socket, req_nlh, req_nlh->nlmsg_len, 0);
- 	if (err < 0)
- 		return err;
-diff --git a/tools/net/ynl/lib/ynl.h b/tools/net/ynl/lib/ynl.h
-index dbeeef8ce91a..9842e85a8c57 100644
---- a/tools/net/ynl/lib/ynl.h
-+++ b/tools/net/ynl/lib/ynl.h
-@@ -20,6 +20,8 @@ enum ynl_error_code {
- 	YNL_ERROR_ATTR_INVALID,
- 	YNL_ERROR_UNKNOWN_NTF,
- 	YNL_ERROR_INV_RESP,
-+	YNL_ERROR_INPUT_INVALID,
-+	YNL_ERROR_INPUT_TOO_BIG,
- };
- 
- /**
--- 
-2.43.2
+Why ending up on CPU0 has this particular effect on Mikhails machine is
+unclear as we don't have any information about the overall workload,
+other interrupt sources on CPU0 and their frequency. That'd need to be
+investigated with instrumentation and might unearth some completely
+different underlying reason causing this behavior.
+
+So I don't think this is a regression in the true sense of
+regressions. It's an unfortunate coincidence and reverting the
+identified commits would just paper over the real problem, if there is
+actually one single source of trouble which causes the performance drop
+only on CPU0.  The commits are definitely _not_ the root cause, they
+happen to unearth some other issue, which might be as mundane as
+e.g. that the NVME interrupt on CPU0 is competing with the network
+interrupt. So don't shoot the messenger.
+
+Thanks,
+
+        tglx
+
+
+
+
+
+
+
+
+
 
 
