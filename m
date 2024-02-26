@@ -1,185 +1,106 @@
-Return-Path: <netdev+bounces-74886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA505867255
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:58:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CFEF867279
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 12:01:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E81928F5B8
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:58:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CEAA1C293C5
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7101D545;
-	Mon, 26 Feb 2024 10:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3BD01CF83;
+	Mon, 26 Feb 2024 11:01:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H0YWAJyn"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="TuokuyE3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8341DFD1;
-	Mon, 26 Feb 2024 10:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5FA41CAB9;
+	Mon, 26 Feb 2024 11:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708945030; cv=none; b=BYsQdeRFS942q5ztNmuvCnP3sl3drV5MaFBrgELOiXawtbrIT5Ccb6qy79pMHo2cw46g//1I7HPF8QQZwH7tgADWI9rsrlhIzRt3+sqPXjZUDeC+zu/G5WvIAg8R0fhi32IsGhIhp9ve6Gq4hTkeoUwSScQ7iFnAUjCQFglELzo=
+	t=1708945268; cv=none; b=lsbjpg5LoW3EZYZ5BLH3gC4Ji/VGjrGVTbQL/LgkmEB3aHtgFfJyE9Tnr276Mf1FMxgttTbhZgeZWS4Z5eKyk6QGFaRPbVgDlMPOmbYhxUCzyakXXIbS1hSBKbz94kWJKrfy6miT08+qlvPU8vFExJLzzcnDhVZh7BcAzfsyfQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708945030; c=relaxed/simple;
-	bh=4CBBW4ZBYHjYKmvJucsk9myJi964v26M/utBchas9+0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q1wPSm4+GwFVQPJXHCLX6yESR6H1S/HGi5gYAnZW5pX44TSHD1hBFuh8pW9gd+hNf07leZZUOh9TQMlFPF4mr1ZD6T0OWAWImstz6IYjyUfj8hr5aGYVb6wOKIaWGLqgmFmGWC0dYImAhkzIQVV1V2DH4iddimZHnmptfk6NRLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H0YWAJyn; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708945028; x=1740481028;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4CBBW4ZBYHjYKmvJucsk9myJi964v26M/utBchas9+0=;
-  b=H0YWAJynERB2puwmMKXcrpsECDKaO0h+bRu75wC4fjH9s0S91qWB8rwA
-   ydp3SL8ZWyeOQcNkXS0pmCTFCQJ90SLBUtiDlp3IxlUpOhvQkNV7KE4mH
-   N2dnl3yGD3kVaDJADrg7mfT4L6gyJ9FHMW/DOYj0uL2lfH84Z/2DMd7Nv
-   uX8TztPRreEWGdusvkcdpzyKgLyiISW5FN9YvQLkIjpuJdkxoJGMAC52V
-   qORGOfaMnMRgJgP84wUOmR0EUPxHwF3KJYYIdHOBice8ZsdRib2qtS84l
-   5KZKfxWO9WkakSm9/8/wpd13VhcTE5jpDr4orw51EWJtJmCOsoPmsig0I
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="13918357"
-X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="13918357"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 02:57:07 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="6829018"
-Received: from lkp-server02.sh.intel.com (HELO 3c78fa4d504c) ([10.239.97.151])
-  by fmviesa006.fm.intel.com with ESMTP; 26 Feb 2024 02:57:03 -0800
-Received: from kbuild by 3c78fa4d504c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1reYfN-000AGB-18;
-	Mon, 26 Feb 2024 10:57:01 +0000
-Date: Mon, 26 Feb 2024 18:56:27 +0800
-From: kernel test robot <lkp@intel.com>
-To: David Laight <David.Laight@aculab.com>,
-	"'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>,
-	'Linus Torvalds' <torvalds@linux-foundation.org>,
-	'Netdev' <netdev@vger.kernel.org>,
-	"'dri-devel@lists.freedesktop.org'" <dri-devel@lists.freedesktop.org>
-Cc: oe-kbuild-all@lists.linux.dev, 'Jens Axboe' <axboe@kernel.dk>,
-	"'Matthew Wilcox (Oracle)'" <willy@infradead.org>,
-	'Christoph Hellwig' <hch@infradead.org>,
-	"'linux-btrfs@vger.kernel.org'" <linux-btrfs@vger.kernel.org>,
-	'Andrew Morton' <akpm@linux-foundation.org>,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	'Andy Shevchenko' <andriy.shevchenko@linux.intel.com>,
-	"'David S . Miller'" <davem@davemloft.net>,
-	'Dan Carpenter' <dan.carpenter@linaro.org>,
-	'Jani Nikula' <jani.nikula@linux.intel.com>
-Subject: Re: [PATCH next v2 11/11] minmax: min() and max() don't need to
- return constant expressions
-Message-ID: <202402261802.9ShoXRwY-lkp@intel.com>
-References: <a18dcae310f74dcb9c6fc01d5bdc0568@AcuMS.aculab.com>
+	s=arc-20240116; t=1708945268; c=relaxed/simple;
+	bh=LzhaBbcauACYgRqWWxkBvFp7cRRf5oYmpzyjCxeAY98=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=j3PAjmVXHDcGHBbsKMeG0V49J9ztyNtJ18P6XEABoO0gvOJs5etwjqwlojq64EMPc3XJOSlJKOskz8+9727k8FTs0stLntXSEnqjALwAQFF3tCvLtfKAGfi1uwS2z30qGAvbWPD50td8ejlWZEdMLctDCqbBIziJd0AI42tmMfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TuokuyE3; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B178A1C0006;
+	Mon, 26 Feb 2024 11:01:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708945265;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HqkRj/rY7R3cywYO9k2uRqXTAZKlVb9uhXpJ8UyQP0I=;
+	b=TuokuyE3C1jQg9T65gISvpN6QmI6EHUW42lXxLt/pi8Do2rzZ8Cjr7Di4BzTsb4hV1kpqB
+	wL0pdVVAkVCgAz3dFLcuNuPajyusBCWg/om3tgcrOe64dSnZS5VrL0gII/YvVihOQNzLV6
+	V81PPcRAOf0C+V1fBn+lOKzJ6JTtNEjx+RVJVyptMGTPSQItuoQv/zf81Jx9gR59GsvZ5u
+	QkgO1F6bbIeXf7tpdmChTakmvO7F9ZWF6i7UUDKFJv4eRohlRY+5S77dfHtV5ZxSqONSrQ
+	FkeZLiIYAzi1w+r9S03AdcIbW4DX60bMb28NmJl2LpPAB34ja89DGIyo8iUnyw==
+Date: Mon, 26 Feb 2024 12:01:00 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net, Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH net-next 0/2] doc: sfp-phylink: update the porting guide
+Message-ID: <20240226120100.47ee550c@device-28.home>
+In-Reply-To: <20240220160406.3363002-1-maxime.chevallier@bootlin.com>
+References: <20240220160406.3363002-1-maxime.chevallier@bootlin.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a18dcae310f74dcb9c6fc01d5bdc0568@AcuMS.aculab.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hi David,
+Hello everyone,
 
-kernel test robot noticed the following build warnings:
+Russell, did you get a chance to take a look at this series (maybe it
+went under the radar, if not, sorry about the ping) ? I'd like to make
+sure the examples are meaningful and correct, and you're clearly the
+most qualified to comment on this :)
 
-[auto build test WARNING on drm-misc/drm-misc-next]
-[also build test WARNING on linux/master mkl-can-next/testing kdave/for-next akpm-mm/mm-nonmm-unstable linus/master v6.8-rc6]
-[cannot apply to next-20240223 dtor-input/next dtor-input/for-linus axboe-block/for-next horms-ipvs/master next-20240223]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Best regards,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/David-Laight/minmax-Put-all-the-clamp-definitions-together/20240226-005902
-base:   git://anongit.freedesktop.org/drm/drm-misc drm-misc-next
-patch link:    https://lore.kernel.org/r/a18dcae310f74dcb9c6fc01d5bdc0568%40AcuMS.aculab.com
-patch subject: [PATCH next v2 11/11] minmax: min() and max() don't need to return constant expressions
-config: i386-randconfig-011-20240226 (https://download.01.org/0day-ci/archive/20240226/202402261802.9ShoXRwY-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240226/202402261802.9ShoXRwY-lkp@intel.com/reproduce)
+Maxime
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202402261802.9ShoXRwY-lkp@intel.com/
+On Tue, 20 Feb 2024 17:04:02 +0100
+Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
 
-All warnings (new ones prefixed by >>):
+> Hi everyone,
+> 
+> I'm currently in the process of porting fs_enet to phylink, and I'm
+> using this occasion to update the porting guide along the way. Let me
+> know if these changes are clear enough, and if there are any mistakes in
+> there.
+> 
+> Thanks,
+> 
+> Maxime
+> 
+> Maxime Chevallier (2):
+>   doc: sfp-phylink: drop the mention to phylink_config->pcs_poll
+>   doc: sfp-phylink: mention the mac_capabilities and
+>     supported_interfaces
+> 
+>  Documentation/networking/sfp-phylink.rst | 48 ++++++++++++++++++------
+>  1 file changed, 37 insertions(+), 11 deletions(-)
+> 
 
-   arch/x86/mm/pgtable.c: In function 'pgd_alloc':
->> arch/x86/mm/pgtable.c:437:9: warning: ISO C90 forbids variable length array 'pmds' [-Wvla]
-     437 |         pmd_t *pmds[MAX_PREALLOCATED_PMDS];
-         |         ^~~~~
-
-
-vim +/pmds +437 arch/x86/mm/pgtable.c
-
-1db491f77b6ed0 Fenghua Yu          2015-01-15  432  
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  433  pgd_t *pgd_alloc(struct mm_struct *mm)
-1ec1fe73dfb711 Ingo Molnar         2008-03-19  434  {
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  435  	pgd_t *pgd;
-184d47f0fd3651 Kees Cook           2018-10-08  436  	pmd_t *u_pmds[MAX_PREALLOCATED_USER_PMDS];
-184d47f0fd3651 Kees Cook           2018-10-08 @437  	pmd_t *pmds[MAX_PREALLOCATED_PMDS];
-1ec1fe73dfb711 Ingo Molnar         2008-03-19  438  
-1db491f77b6ed0 Fenghua Yu          2015-01-15  439  	pgd = _pgd_alloc();
-1ec1fe73dfb711 Ingo Molnar         2008-03-19  440  
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  441  	if (pgd == NULL)
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  442  		goto out;
-4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  443  
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  444  	mm->pgd = pgd;
-4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  445  
-25226df4b9be7f Gustavo A. R. Silva 2022-09-21  446  	if (sizeof(pmds) != 0 &&
-25226df4b9be7f Gustavo A. R. Silva 2022-09-21  447  			preallocate_pmds(mm, pmds, PREALLOCATED_PMDS) != 0)
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  448  		goto out_free_pgd;
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  449  
-25226df4b9be7f Gustavo A. R. Silva 2022-09-21  450  	if (sizeof(u_pmds) != 0 &&
-25226df4b9be7f Gustavo A. R. Silva 2022-09-21  451  			preallocate_pmds(mm, u_pmds, PREALLOCATED_USER_PMDS) != 0)
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  452  		goto out_free_pmds;
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  453  
-f59dbe9ca6707e Joerg Roedel        2018-07-18  454  	if (paravirt_pgd_alloc(mm) != 0)
-f59dbe9ca6707e Joerg Roedel        2018-07-18  455  		goto out_free_user_pmds;
-f59dbe9ca6707e Joerg Roedel        2018-07-18  456  
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  457  	/*
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  458  	 * Make sure that pre-populating the pmds is atomic with
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  459  	 * respect to anything walking the pgd_list, so that they
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  460  	 * never see a partially populated pgd.
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  461  	 */
-a79e53d85683c6 Andrea Arcangeli    2011-02-16  462  	spin_lock(&pgd_lock);
-4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  463  
-617d34d9e5d832 Jeremy Fitzhardinge 2010-09-21  464  	pgd_ctor(mm, pgd);
-25226df4b9be7f Gustavo A. R. Silva 2022-09-21  465  	if (sizeof(pmds) != 0)
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  466  		pgd_prepopulate_pmd(mm, pgd, pmds);
-25226df4b9be7f Gustavo A. R. Silva 2022-09-21  467  
-25226df4b9be7f Gustavo A. R. Silva 2022-09-21  468  	if (sizeof(u_pmds) != 0)
-f59dbe9ca6707e Joerg Roedel        2018-07-18  469  		pgd_prepopulate_user_pmd(mm, pgd, u_pmds);
-4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  470  
-a79e53d85683c6 Andrea Arcangeli    2011-02-16  471  	spin_unlock(&pgd_lock);
-4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  472  
-4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  473  	return pgd;
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  474  
-f59dbe9ca6707e Joerg Roedel        2018-07-18  475  out_free_user_pmds:
-25226df4b9be7f Gustavo A. R. Silva 2022-09-21  476  	if (sizeof(u_pmds) != 0)
-f59dbe9ca6707e Joerg Roedel        2018-07-18  477  		free_pmds(mm, u_pmds, PREALLOCATED_USER_PMDS);
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  478  out_free_pmds:
-25226df4b9be7f Gustavo A. R. Silva 2022-09-21  479  	if (sizeof(pmds) != 0)
-f59dbe9ca6707e Joerg Roedel        2018-07-18  480  		free_pmds(mm, pmds, PREALLOCATED_PMDS);
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  481  out_free_pgd:
-1db491f77b6ed0 Fenghua Yu          2015-01-15  482  	_pgd_free(pgd);
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  483  out:
-d8d5900ef8afc5 Jeremy Fitzhardinge 2008-06-25  484  	return NULL;
-4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  485  }
-4f76cd382213b2 Jeremy Fitzhardinge 2008-03-17  486  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
