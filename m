@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-74830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C196866B6D
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 08:54:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF8D8866B71
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 08:55:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3BF8B21183
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 07:54:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66FE21F226C8
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 07:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B07041BF50;
-	Mon, 26 Feb 2024 07:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DB181BDDC;
+	Mon, 26 Feb 2024 07:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TrqQizda"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HQhmawur"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB70A1BF2A
-	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 07:54:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5231C29C
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 07:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708934074; cv=none; b=pyPj4CKYsXSeKYH99Xir5QfjQJb3sWH6Ed/u9rsjeYiGIVTa1vpQDSJ3iIxMNH3uXAKPrvOdiwJ9AUhuiGuaVU+RysjKJIQSelX43cGuziCwoG0mnf2it99ijezq4RwkvAc1oX+iZJ5muW43UpMMab5VcFRbzI8jp1PQzDBPAfU=
+	t=1708934126; cv=none; b=VvVC/LIzwWv29MpOuNp6sr+RidaOsb5FMlZjVKB45Og0D4VtvCb5PXukSFZkUP05pWpQBHsPUhyVq7sfG55m7qTskTJCPiOEwLgGgmMt8xY3JBVJv3XvLzp8CGZ86/2i4seHqoTvQqIyy67foBkDu7Zc4pEFzShTtrbIS7LnqiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708934074; c=relaxed/simple;
-	bh=G5KOtPDbpnAFOpFzpaTSqNX7Tz4AFEc+OIzZeezuDr0=;
+	s=arc-20240116; t=1708934126; c=relaxed/simple;
+	bh=9So+VxECD4rt3y6z963Gp32BP+1mZN3qYtKUghVVUhc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EZda2zBqVMn1iBhesIbKgoureIFXtZRwXx0vwcod7VdTdg2pnvizXJ994CAtHBB9YFdTCyuX+9fw9ooutF2SkV0SD98w+KBM7UVq/J5+4asK7L9ZcJfEloRkg4c8aqVmUJF0XP55gnT0arb+2GuxyISWtMqKR3ccRL/dflLnd7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TrqQizda; arc=none smtp.client-ip=209.85.218.54
+	 In-Reply-To:Content-Type; b=gZ/x91Eo3D/9nMD6ieX4qrxWTBj4s3/KYPacjJirT/QoYbfCHBWv5NUX5RWC6WbpbfTjm6w0fN9wUdLxAzj2SDPaVePtGpiPwdZsNk/9KgD91eIcz0oq7ADkCfgwlTdbScUXaL7cB1ZJIVE6pV1RId9G/L/Xg2iRtJx5uIWan3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HQhmawur; arc=none smtp.client-ip=209.85.218.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a3f893ad5f4so384656466b.2
-        for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 23:54:32 -0800 (PST)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a3e7f7b3d95so304898466b.3
+        for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 23:55:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708934071; x=1709538871; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1708934123; x=1709538923; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=DbQEFDf7xkN53excRVfl59sUr+LDuUA3URXOCRzV1z8=;
-        b=TrqQizdaTU2kdsZRM2UMFe+erNbzVhymTvOiMMu1sL85ZgF3X72GwuMpRTtS5KWJiN
-         SsXSV24E2CXM3dwmLyQZ+07VCxGYSNF1XT6aTyeXeBZYZu3GOrfRLruzgw61BjeujMYU
-         3H8DtANSA9t8K/xiv2nSTB+mENe1LKzTH1AnFmRAEEUELZPDqCpnjXi5ORPs2WhhlBIj
-         oXkbfISHhMERHo4v6z84haaFITHpzpJRY8RtDwniSakb3fIGNB/30XGDr7BuMNdr/Fia
-         MfYd8ssvjIzBVOzRjuQ1N+sMAV1v3W2C0mvwwDu22+mpxu4lIF+rjgPA+XodGapUa/Un
-         EQ5Q==
+        bh=tB4iSBwjI3DJDXgoB5MqoAJGUZkmgQ34RlUII3BCG74=;
+        b=HQhmawur2XZaqaR1h+WIfA9bbo6MK6p6uI4sd6qJs1fDMwYUbvEiqz/33oOIyENi+Q
+         OwUAYvXdsvzCG0uHPm4vne6V/a+RB62vx4a0Gsaqb2Ld0Bm6fXdsYdpuDvAzyM8n1Okp
+         ZE4IILdo0mAUIGJtI6N31IVfOpAnGRbPpqLSLPOwxhZoH0Jv82BKIeL55T9S8kFooI3B
+         GSvGU5z6J9TtE5wNsGJUkAUPH3C1KWu3CoVGjeWM3SF0tI52u0uwdvg6MZjH4rVO6PxR
+         wDYCcQit5DOE7wN+WbtnqNcx3mDTtVQlVZa7+SzV4pj1XwxbaboxT++PA2QGR8rE87N5
+         bkow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708934071; x=1709538871;
+        d=1e100.net; s=20230601; t=1708934123; x=1709538923;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DbQEFDf7xkN53excRVfl59sUr+LDuUA3URXOCRzV1z8=;
-        b=PYmPPruHyk988m0GDwfTaIAaQu8/WsgCiBWmNZEQIdRejkPbirVK9Xx8h5DJBO3nDZ
-         7lLROkPCExuZRBNlui9uM3//AU4oMl4y360b8jkL6+U+mgQVTqmR8+5idY7Ezp2nOyzT
-         WK/id7JCB2xaAQoSiKAdVc9IDudRYbs/0dQ9SxCgg0ck43F3QnoQHxk81pxSWph4afTq
-         BB3DW8y5sPaorLaBsp/XIO90S/Y5QD2jIdcK5aEzT1QOr6s+0JO3ODwRjV4gfQNzFn53
-         KBskb4qmL/OIdWqbQ3RF5DGJ0k7DSG3DbeSC47bsapug+5lYxv3cW6C6tFcSV6V/9W1s
-         QmXA==
-X-Gm-Message-State: AOJu0Yyhqo9iiC+nadp43YZEWKrMoMNO0AaOO7x6NFnHr8UkE5vOUC43
-	3XW94xzse82B7ZO5sy1/wpwmKjIqkCwWS8iM4uMsRsylRH++dqirNKpuZH3z5x4=
-X-Google-Smtp-Source: AGHT+IH3+zlRhHgufUywyLyswVKOQJQDCv1xR/RwWvblgkIKWTxcusx3WC/q/IejnnrgZJIAixSxuQ==
-X-Received: by 2002:a17:906:e1b:b0:a3f:1e62:2674 with SMTP id l27-20020a1709060e1b00b00a3f1e622674mr4190082eji.48.1708934071273;
-        Sun, 25 Feb 2024 23:54:31 -0800 (PST)
+        bh=tB4iSBwjI3DJDXgoB5MqoAJGUZkmgQ34RlUII3BCG74=;
+        b=evYbonkLm50+n2QDJUBp3G78ZKDxeZaiF4NhIW5w1FLblUesRZlXnMGL2tLmEByLOQ
+         CGqMQ/JVOvP3rlCbbxpwVg278YbQkVXDZW87jdgQt9c8Oa6zsZixQdcvWhijO7eagBNX
+         1P90ToSE6bdit4ZkPsuz00rNpH7Jdn0mxf3Ln3+OvBXFc8hDXfWaPf+8JgI254DQrylV
+         e+w74xw29TRKK7EVWT+nXlbhZk24/oWTCc/YWTiQ5M9P0dQCm4EBU4jY/Co4agNM70DG
+         uh9nbWU29B3rhvYM8BVbksW6pNt2qVLeXE/tpjLGX9tofVfOUEi5BenNSD6pdbcjUKAY
+         OC9Q==
+X-Gm-Message-State: AOJu0Yw+Wxoi1vnxnCOU4CBaWfvqqlqcazlTUA5+vpxDV4DehDiNMOGl
+	uQScqUjcpTDUREUl1qpjsRSzQ7W9CH8MW7cAS4qBt06mASf21DUubKQAvldgj+U=
+X-Google-Smtp-Source: AGHT+IGP7uBeiGfc1jN56DupDo3tdDNFA7M9vwD/sDNJHZPCAPHthCPHqwTkjDJ9u/2b/6N2ezxevA==
+X-Received: by 2002:a17:906:af09:b0:a43:803d:b4ab with SMTP id lx9-20020a170906af0900b00a43803db4abmr124087ejb.31.1708934122585;
+        Sun, 25 Feb 2024 23:55:22 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.222.116])
-        by smtp.gmail.com with ESMTPSA id vg9-20020a170907d30900b00a42ec389486sm2115596ejc.207.2024.02.25.23.54.29
+        by smtp.gmail.com with ESMTPSA id vg9-20020a170907d30900b00a42ec389486sm2115596ejc.207.2024.02.25.23.55.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 25 Feb 2024 23:54:30 -0800 (PST)
-Message-ID: <2fd7a1e7-4f49-4c22-8252-7f6cbd989f49@linaro.org>
-Date: Mon, 26 Feb 2024 08:54:29 +0100
+        Sun, 25 Feb 2024 23:55:22 -0800 (PST)
+Message-ID: <ccdcdb1b-44a9-4233-994e-18d875a99c2f@linaro.org>
+Date: Mon, 26 Feb 2024 08:55:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,8 +75,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 5/6] net: hisilicon: add support for
- hisi_femac core on Hi3798MV200
+Subject: Re: [PATCH net-next v4 6/6] net: hisi_femac: remove unused compatible
+ strings
 Content-Language: en-US
 To: forbidden405@outlook.com, Yisen Zhuang <yisen.zhuang@huawei.com>,
  Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
@@ -89,7 +89,7 @@ To: forbidden405@outlook.com, Yisen Zhuang <yisen.zhuang@huawei.com>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  devicetree@vger.kernel.org
 References: <20240222-net-v4-0-eea68f93f090@outlook.com>
- <20240222-net-v4-5-eea68f93f090@outlook.com>
+ <20240222-net-v4-6-eea68f93f090@outlook.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -135,39 +135,41 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240222-net-v4-5-eea68f93f090@outlook.com>
+In-Reply-To: <20240222-net-v4-6-eea68f93f090@outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 22/02/2024 13:43, Yang Xiwen via B4 Relay wrote:
 > From: Yang Xiwen <forbidden405@outlook.com>
 > 
-> Register the sub MDIO bus if it is found. Also implement the internal
-> PHY reset procedure as needed.
+> The only documented SoC Hi3516DV300 does not receive any updates from 8
+> years ago. With the recent driver changes, it unlikely works for this
+> SoC anymore. Remove the binding for this SoC.
 > 
-
-
-> +	ret = clk_bulk_prepare_enable(CLK_NUM, priv->clks);
-> +	if (ret) {
-> +		dev_err(&pdev->dev, "failed to enable clk bulk: %d\n", ret);
-> +		return ret;
-> +	}
+> Also it's hard to get the version number and it's unknown how the
+> version can be used. Remove them until it's really needed.
+> 
+> Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
+> ---
+>  drivers/net/ethernet/hisilicon/hisi_femac.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/hisilicon/hisi_femac.c b/drivers/net/ethernet/hisilicon/hisi_femac.c
+> index eab91e011d11..9466ca9da2bb 100644
+> --- a/drivers/net/ethernet/hisilicon/hisi_femac.c
+> +++ b/drivers/net/ethernet/hisilicon/hisi_femac.c
+> @@ -990,9 +990,7 @@ static int hisi_femac_drv_resume(struct platform_device *pdev)
+>  #endif
 >  
-> -	clk_prepare_enable(priv->clk);
->  	if (priv->phy_rst)
->  		hisi_femac_phy_reset(priv);
->  
-> @@ -948,6 +993,7 @@ static const struct of_device_id hisi_femac_match[] = {
->  	{.compatible = "hisilicon,hisi-femac-v1",},
->  	{.compatible = "hisilicon,hisi-femac-v2",},
->  	{.compatible = "hisilicon,hi3516cv300-femac",},
-> +	{.compatible = "hisilicon,hi3798mv200-femac",},
+>  static const struct of_device_id hisi_femac_match[] = {
+> -	{.compatible = "hisilicon,hisi-femac-v1",},
+> -	{.compatible = "hisilicon,hisi-femac-v2",},
+> -	{.compatible = "hisilicon,hi3516cv300-femac",},
+> +	{.compatible = "hisilicon,hisi-femac",},
 
-What's the point of growing the list? All are fully compatible according
-to your match table.
-
-Stop growing it and either express compatibility or use proper match
-data, if they are not compatible.
+What is happening here? Removal could be justified, but then order of
+your patches is totally wrong. But that hisi-femac is a no-go or provide
+proper rationale.
 
 Best regards,
 Krzysztof
