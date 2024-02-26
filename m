@@ -1,139 +1,504 @@
-Return-Path: <netdev+bounces-74870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94195866FEB
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:06:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42EA0867036
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 11:13:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46BFE289144
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:06:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 292B3B2C73D
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51971604CA;
-	Mon, 26 Feb 2024 09:43:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA92662A1C;
+	Mon, 26 Feb 2024 09:49:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="BMQO1ZH/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NB9wIWDR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E43CA4E;
-	Mon, 26 Feb 2024 09:43:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708940602; cv=none; b=qW4XKN0+i1M5HK45595FiqFw2YLM5hF01vWT6PU7yKbu28wWAIv1rBKq4QL3NbT6F1SncSkfMyu/+kjSVpF4nATjrG9zIbVlt5T3vV5h/V+9njXYfRIMYKpACVAN+7Pxw7J9LKWyreeIRPQFSVmLQekCPaq3kAQXmYXZPwD13nY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708940602; c=relaxed/simple;
-	bh=K4GBuBvY1jfaKNJfI+V2iQAToLrbcQCzobKkx+s7CfI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=otiKHpXIaZR9Zg3jh9jSvazyWHyEiP1pcKM574ZLnB0jwis9+jRuw4y+QtEcffRhhCuRdDRGpgFW1zxi/OyheND5DFZtZpgIj287yD1C7A9IGe3bXtKsOob4bkYHs+rJTVmBcV/h2UW2/t1LFhKVG31hWq624NNJvDkRJreuZIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=BMQO1ZH/; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41Q9PrLp028933;
-	Mon, 26 Feb 2024 09:43:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type; s=
-	qcppdkim1; bh=tPqIhtoFZXpZFmCyP7Lnu9T4i55IofRcpfNy6UEYCmY=; b=BM
-	QO1ZH/h1SrCYOvYK0GONf06sofiRF/gqfcIRaF/dC4hx2zVcCbBJslkuSVcAqEsr
-	p1u61ruVFRdcebf8gUI/6lMpwVKge5lrCZdafHTGgKlsDuk2Skqt7QfRwClmgmJj
-	LMWGj5TZkWv4VXjaStQpLq3ynH64vw0YLSdxd/iYo5UZAZP/C1iQPVJGKUrtaJnD
-	FxeJScgVepVK+0R+fPR+ndyBdGEWfhA62tGSMFKVtDStXke42PUee9JE45XvGgg8
-	iP7y3MNlIqDBn3gcGsfofSahzfM0MNKe/GbNkp1nVkUTj08YlouvGi3TC3HuY/uA
-	/4hdsrVR/DByZ2STvVtQ==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wgkxkrh25-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 Feb 2024 09:43:05 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41Q9h4OM019569
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 Feb 2024 09:43:04 GMT
-Received: from hu-sarohasa-hyd.qualcomm.com (10.80.80.8) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787D562A18
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 09:49:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708940988; cv=fail; b=urckeonuTrHe50N2s3IitKffLOMsenGWvt13zI2Grt4DtHJ4GUORDJdVmspeNdWcKApgFwndWztVbXKlv1DoF20q9lw/hSaAeq/aVmQ0ZI4A+hMsZHlvgqYXIendufHnMe8Xe0a/PHmCU7gBvwwl8QubZYT3PI58v0w1rKJQEyE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708940988; c=relaxed/simple;
+	bh=4tpknAPi0eZRjaSB4b0TTPt8PPnC2+FpLx7rx1Hm+A4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=rouEKvuH3BFLnsR0eIM8rk9qIDxfWi1tFsR0bUrr8UFCpPQVQ7w8QAxWBUHIBnO4u5iqSBnPqSfiOP0/b2BwYyBxHaU4xVl+U4t1aIuierMnPE+EfosjViv2AzXietGW2Az7z+ZoW6COdeBnZb1WctYUerhAoC7mo3ZkdFEjgIs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NB9wIWDR; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708940987; x=1740476987;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=4tpknAPi0eZRjaSB4b0TTPt8PPnC2+FpLx7rx1Hm+A4=;
+  b=NB9wIWDRHJV6ZYlkhp/H/4wvQyIaoCsLm+Jd1mp2aIBUVSzirA58OwYp
+   rVGi/7kSv1WJXV7ihI/4NFPafBU43O8xouHwn4nRC4agj6xUMV1Qm1jbt
+   JM+gOYqqyw1lV+qwXvBGhJCFEt19DZnB06gxRzFxrlMhKx95xvRxHUCYe
+   J0xMMmzBaY5IxCZNUoSc9OvxmEE0GU/KfXYG9bfqpiT2lyRdgvRHsYCI/
+   0mCl11PwtAmmFmwZxTZa4iPqJZrf4tDnn6t+aen7jvXkq3EU4z0JWWpUf
+   VyGtbdQlBUQnq/KW6SNSUIYBciAGBlidhGaEobbphMmQ3Swmg3tPu+h5n
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="13766996"
+X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
+   d="scan'208";a="13766996"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 01:49:45 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
+   d="scan'208";a="7132855"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Feb 2024 01:49:46 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 26 Feb 2024 01:49:44 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 26 Feb 2024 01:49:44 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 26 Feb 2024 01:42:54 -0800
-From: Sarosh Hasan <quic_sarohasa@quicinc.com>
-To: Vinod Koul <vkoul@kernel.org>, Andy Gross <agross@kernel.org>,
-        "Bjorn
- Andersson" <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        "Jose
- Abreu" <joabreu@synopsys.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        Prasad Sodagudi
-	<psodagud@quicinc.com>,
-        Andrew Halaney <ahalaney@redhat.com>, Rob Herring
-	<robh@kernel.org>
-CC: <kernel@quicinc.com>, Sneh Shah <quic_snehshah@quicinc.com>,
-        Suraj Jaiswal
-	<quic_jsuraj@quicinc.com>
-Subject: [PATCH net-next v2] net: stmmac: dwmac-qcom-ethqos: Update link clock rate only for RGMII
-Date: Mon, 26 Feb 2024 15:12:26 +0530
-Message-ID: <20240226094226.14276-1-quic_sarohasa@quicinc.com>
-X-Mailer: git-send-email 2.17.1
+ 15.1.2507.35; Mon, 26 Feb 2024 01:49:44 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=E3mpls3AVy+KVneKelEJnzUvKj+OjrDEGUQ+eTiKIq3VRQomV3Hz2ezY1yDVtqyB2yF8tyetcVv80swxpcIksyU0rJhpb0qh0fSsovXCs9LApxxu421Kv99sAJDupPpJg7EjgwOub1t0PEu+tA8wNV7FY8w6ixQGl/34Ck6PaLr1LNpDF7DXrqmjlBssrcRYKa4koScJHUla25QmjMfEQ3SMko1QXrywRR3QHswe25rK1pmKkCbn18HK/qdy2ulLfuQaef6KlqWDTotbbWz44Jlf7nbmeFx2kAcBMh9AC9IGSD74VO/PAN+JhRTuZhQ3ERjHfwQk2p8Ub5IvFelqVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IbvlGP7HTuIVyrr66kci0OxqdcuPusnfS72LpkQw1ZY=;
+ b=Db/uudZq/3osa1CSSLwD+iloV8vNyNCg9XIh2wXKeZpkGPxtqlnOkNi2BEqKBvYD1fZLTB+BXBHhCrutVzj20GEBTTkEYNMw6lD2tYrp2zuZPlo/EQoO26bNZGD7p/tHD0pRzFvIuy1fcEtYKf7JIMPW+iWo2trfR+zfkGKWzLXFxY3xN/3Nqrar2B0rWHsT2LZN472oA9xk8iwSfwFxnhd42IDomXiNLhv8Yq37N3pRujDBbVGBTBVk3TffZzq1aXh3RPa5UTrL74baomPACZzgWBBKbGH5HQaaGKdjAawq0mac7+bNCj/Ce9Bg34jLn5WN75haVX1yedl8WQ1EaQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ0PR11MB5865.namprd11.prod.outlook.com (2603:10b6:a03:428::13)
+ by BL3PR11MB5699.namprd11.prod.outlook.com (2603:10b6:208:33e::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.25; Mon, 26 Feb
+ 2024 09:49:39 +0000
+Received: from SJ0PR11MB5865.namprd11.prod.outlook.com
+ ([fe80::1859:eed7:cd98:cc08]) by SJ0PR11MB5865.namprd11.prod.outlook.com
+ ([fe80::1859:eed7:cd98:cc08%7]) with mapi id 15.20.7339.019; Mon, 26 Feb 2024
+ 09:49:39 +0000
+From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
+To: "Kaminski, Pawel" <pawel.kaminski@intel.com>, "intel-wired-lan@osuosl.org"
+	<intel-wired-lan@osuosl.org>
+CC: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kaminski, Pawel"
+	<pawel.kaminski@intel.com>, "Wilczynski, Michal"
+	<michal.wilczynski@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2] ice: Add support for
+ devlink loopback param.
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2] ice: Add support for
+ devlink loopback param.
+Thread-Index: AQHaKW9/IGWwUFCLOEyvJdl5H+XEqrEc3zuw
+Date: Mon, 26 Feb 2024 09:49:39 +0000
+Message-ID: <SJ0PR11MB58650ACC7B4527A93C91A5648F5A2@SJ0PR11MB5865.namprd11.prod.outlook.com>
+References: <20231208004227.195801-1-pawel.kaminski@intel.com>
+In-Reply-To: <20231208004227.195801-1-pawel.kaminski@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ0PR11MB5865:EE_|BL3PR11MB5699:EE_
+x-ms-office365-filtering-correlation-id: e353bdb2-8eb7-4d58-fb2f-08dc36b04010
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: +rRUVhPcdCm7tceZqhyD3tDiixb5X25sjxOdr8YS3UzRv2P9f/q8hg53qONW5s1FWxJ+LjI7IFkpJojhHe52rAepYUfguiER5m4xlEgBxP6zaQxxkaKvLn4rgc2MOx7kUHH4gSiyV9oXhFCejDd6BacjjalX7VNrKyAnSxdapTWVJg20sDaIx38JiJGSq/adU+FGlapQQRULfbICvM7cdlGLIePjiVgXgP8FPMM3uCEno++BtlVXcSPFF2zG5dlUw7muFuBI/5KiN4VYXU3+iSECBnaryg4N/rOs8cnq5moz+CWK053SISq7+oXEngBXwme0N6sxI5b7EI9KVMmrQDJnbYJ60gd07SZdyqwPjTWbaekUQFZOkDt4E6c6MyWKcKponEaM9M3g8gnbz0KfpnK/FNovEFamCi7ZyzrnQOXk3KR+uBmS7/AZzJWrKf7AOAz0fP94Ux49JdimPqlvDevollvNH6fSFWCvRGIh1cLXHT3KXXW7+8RbFkZISn1b4g1WqZSF2aRe6N3WAguwP1pgJaj0TFIqq9zYI8VDtoSezylsM+hT9dKB+PWYNEt8L2CRZ7sJsNvbfovwHzNOEtFYAvZDjolrEYoUPfBx99X3HBS1VIr7hYOPpHf2uO4Q/df34s2y44gxmIT2WGO7F6p+a+VAKzG+L094n8qGk7UiFkuJaXqC87y8dQ4a2/uu0IVF0evr8W66bjfQYTq1hA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5865.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(230273577357003)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?h1RaElIrBoRBl1cRsPtacqxCnmOfIV1qADRDkvsuvZ7FyapSV9F4WOb33bla?=
+ =?us-ascii?Q?3vO7Qu9GbY59CeiFhl2thpqSeJTiB6rJB176w4M3dtSZcqwPmA5ecF212LgN?=
+ =?us-ascii?Q?fj0vb8MpUnnfy+4fi3zoST0U2AMdmk31Vf5t8DNqSoZS5tJY8uAWMA7T5NXN?=
+ =?us-ascii?Q?3yu17M9o13ktRK1is9lMttK2gUWlR7V73I0yP/Q5SB5b/1nOcNzNURAfVxv3?=
+ =?us-ascii?Q?F7eThPqosLLwd5CuNYYlKVLTyDwOMq5xS98pS4I/1BipJ7Mf5LiCxvU9mOIr?=
+ =?us-ascii?Q?eTBr51a3SN+hMkfSPgqjA0I2A9DKK1dnX6nHyUouNjsbPcYZL2z2e+4NVc7Z?=
+ =?us-ascii?Q?A8SPhEh3pFCbxWbNOECsjLuASGzfjD9bFM0OvLRjdACGeXDv8ikGZWXrz3kr?=
+ =?us-ascii?Q?MY3AsIRl55B6C/6973HbApqMOGfUOkbiXcN/IcHMSx1VwhGOCUpEDPFkBSrS?=
+ =?us-ascii?Q?AdVvscOQqo3jwjFZCGCKqcW1vPI2LfgL8xsKuMCsCOD2VZvgK9r5TKy35Uza?=
+ =?us-ascii?Q?E3bjAcDDSS/LhGxGisPcibCMwM1/E1C5CPfTUQnucPdf4DDDiTIGeBLCe/2p?=
+ =?us-ascii?Q?0z7BqyB/ueerM3vcG90q785dW2FsAhIQWeeb83mDN2QC71OztnkGX+DLTeoC?=
+ =?us-ascii?Q?00cniVuc1XnFO+0bALfy8uWzLVRNnNFAmzC4k4oRGlQs01Bsfmz0lc/1plmu?=
+ =?us-ascii?Q?BqHBMC6HJbATOgK5CfXKz7t21D+QjqF5BRoj+7+unWi/bXMe6w6BljNfwHz4?=
+ =?us-ascii?Q?AweaHkE4TIOF8R0aqG4QbYQZElleiI+ij3XTQrDM8qkDJLMlE1h89ypRFmfY?=
+ =?us-ascii?Q?sCCeYf0ztua4unhl1joSVpeD6aZXyvwfYrDT61bM0HYfelp1f7Pwc3+eBqSx?=
+ =?us-ascii?Q?MPnH6+ccSNf+GaaLnxNi5oQnjkE7LmBLx08JzvAvH01oT0kwetIUioWFowlD?=
+ =?us-ascii?Q?nNO3lNG8anb9i97M5BAXer39whnMqmc7r0enndxYNLt++F/q2TtEJ2k38B7d?=
+ =?us-ascii?Q?xygz3x8uPpTX4hdvdbqXo6RZYIwZT7067baSEKuuMETcU1deRQEO9hXbCQ6W?=
+ =?us-ascii?Q?Re0/Q7RUA/YPsJkljW5ZXu3SZp3IbJuoreNi5bs0UUtEG9LtUAQ5Dr5NTPsF?=
+ =?us-ascii?Q?uU8ca64zN5ogtu3E3FONLkcyqgoH9+V+cGWvPLk4jSY4KmgxYRnVYTyPzYA8?=
+ =?us-ascii?Q?x+LZUbTyDwa9wvaXBBtSRm63EYPu8fk/XtX0cNmqWSSS0ozv93E2eh/PRj8K?=
+ =?us-ascii?Q?YXSfC5WIZcKl27VyvJsTdkqdrAN3yIb105S7MHFFvCD0VCd7TYfi86u/bUs0?=
+ =?us-ascii?Q?UfymFApvQX56KVrKIwiZMm5vy+9NimXyPomCgLW71up0VtV0LVKcQ3/urhDB?=
+ =?us-ascii?Q?sxeMaDqMu1bQkhd1/Q7m49dtWsg3AU6Wii87Msrs7afYJvfC+032n2yk7e1z?=
+ =?us-ascii?Q?laec8xjXaje5aYvHIL244KWyKoVwHfWCQgvL60kkGyJx5AF3Wwp1mGKcOfPv?=
+ =?us-ascii?Q?SDH8lms0ea7lKYH1jGJkOL+Wum6WRzK2UOAQVwZ1sS7d5tdT8RxCIxNaZLdc?=
+ =?us-ascii?Q?FjMecqx39Dy3byGV67wtqJKFYHLXogVz40uhaRDK2ylOBf41/XxLXyxFN7/z?=
+ =?us-ascii?Q?/w=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: tUDjRYwkIeEMxJzJSSUfF6jLBNtXEbHZ
-X-Proofpoint-GUID: tUDjRYwkIeEMxJzJSSUfF6jLBNtXEbHZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-26_07,2024-02-23_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 phishscore=0 mlxlogscore=924 malwarescore=0
- suspectscore=0 bulkscore=0 adultscore=0 spamscore=0 clxscore=1015
- priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2402120000 definitions=main-2402260073
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5865.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e353bdb2-8eb7-4d58-fb2f-08dc36b04010
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2024 09:49:39.6308
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ACjxhAU5ElRT0TwStfsJYOUdSx7HKVTeDgTBume1GuahTecSEXaEhCdW0ZlqlHABUPWm3L9LtrGZMfJqEv8haY+WGw2hKSR1zShWJy03OrA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB5699
+X-OriginatorOrg: intel.com
 
-Updating link clock rate for different speeds is only needed when
-using RGMII, as that mode requires changing clock speed when the link
-speed changes. Let's restrict updating the link clock speed in
-ethqos_update_link_clk() to just RGMII. Other modes such as SGMII
-only need to enable the link clock (which is already done in probe).
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Pawel Kaminski
+> Sent: Friday, December 8, 2023 1:42 AM
+> To: intel-wired-lan@osuosl.org
+> Cc: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>;
+> netdev@vger.kernel.org; Kaminski, Pawel <pawel.kaminski@intel.com>;
+> Wilczynski, Michal <michal.wilczynski@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v2] ice: Add support for devli=
+nk
+> loopback param.
+>=20
+> Add support for driver-specific devlink loopback param. Supported values =
+are
+> "enabled", "disabled" and "prioritized". Default configuration is set to
+> "enabled".
+>=20
+> Add documentation in networking/devlink/ice.rst.
+>=20
+> In previous generations of Intel NICs the trasmit scheduler was only limi=
+ted by
+> PCIe bandwidth when scheduling/assigning hairpin-badwidth between VFs.
+> Changes to E810 HW design introduced scheduler limitation, so that availa=
+ble
+> hairpin-bandwidth is bound to external port speed.
+> In order to address this limitation and enable NFV services such as "serv=
+ice
+> chaining" a knob to adjust the scheduler config was created.
+> Driver can send a configuration message to the FW over admin queue and
+> internal FW logic will reconfigure HW to prioritize and add more BW to VF=
+ to
+> VF traffic. As end result for example 10G port will no longer limit hairp=
+in-
+> badwith to 10G and much higher speeds can be achieved.
+>=20
+> Devlink loopback param set to "prioritized" enables higher hairpin-badwit=
+dh
+> on related PFs. Configuration is applicable only to 8x10G and 4x25G cards=
+.
+>=20
+> Changing loopback configuration will trigger CORER reset in order to take
+> effect.
+>=20
+> Example command to change current value:
+> devlink dev param set pci/0000:b2:00.3 name loopback value prioritized \
+>         cmode runtime
+>=20
+> Co-developed-by: Michal Wilczynski <michal.wilczynski@intel.com>
+> Signed-off-by: Michal Wilczynski <michal.wilczynski@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Pawel Kaminski <pawel.kaminski@intel.com>
+> ---
+> Changes in v2:
+>  - improved commit message,
+>  - added documentation change
+>  - changed parameter devlink mode to "runtime"
+>  - Link to v1: https://lore.kernel.org/all/20231201235949.62728-1-
+> pawel.kaminski@intel.com/
+> ---
+>  Documentation/networking/devlink/ice.rst      |  15 ++
+>  .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  11 +-
+>  drivers/net/ethernet/intel/ice/ice_common.c   |   6 +-
+>  drivers/net/ethernet/intel/ice/ice_devlink.c  | 128 +++++++++++++++++-
+>  drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+>  5 files changed, 158 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/Documentation/networking/devlink/ice.rst
+> b/Documentation/networking/devlink/ice.rst
+> index 7f30ebd5debb..efc6be109dc3 100644
+> --- a/Documentation/networking/devlink/ice.rst
+> +++ b/Documentation/networking/devlink/ice.rst
+> @@ -11,6 +11,7 @@ Parameters
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+>  .. list-table:: Generic parameters implemented
+> +   :widths: 5 5 90
+>=20
+>     * - Name
+>       - Mode
+> @@ -22,6 +23,20 @@ Parameters
+>       - runtime
+>       - mutually exclusive with ``enable_roce``
+>=20
+> +.. list-table:: Driver specific parameters implemented
+> +   :widths: 5 5 90
+> +
+> +   * - Name
+> +     - Mode
+> +     - Description
+> +   * - ``loopback``
+> +     - runtime
+> +     - Controls loopback behavior by tuning scheduler bandwidth.
+> +       Supported values are ``enabled``, ``disabled``, ``prioritized``.
+> +       The latter allows for bandwidth higher than external port speed
+> +       when looping back traffic between VFs. Works with 8x10G and 4x25G
+> +       cards.
+> +
+>  Info versions
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> index 6a5e974a1776..13d0e3cbc24c 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> @@ -230,6 +230,13 @@ struct ice_aqc_get_sw_cfg_resp_elem {
+>  #define ICE_AQC_GET_SW_CONF_RESP_IS_VF		BIT(15)
+>  };
+>=20
+> +/* Loopback port parameter mode values. */ enum ice_loopback_mode {
+> +	ICE_LOOPBACK_MODE_ENABLED =3D 0,
+> +	ICE_LOOPBACK_MODE_DISABLED =3D 1,
+> +	ICE_LOOPBACK_MODE_PRIORITIZED =3D 2,
+> +};
+> +
+>  /* Set Port parameters, (direct, 0x0203) */  struct ice_aqc_set_port_par=
+ams {
+>  	__le16 cmd_flags;
+> @@ -238,7 +245,9 @@ struct ice_aqc_set_port_params {
+>  	__le16 swid;
+>  #define ICE_AQC_PORT_SWID_VALID			BIT(15)
+>  #define ICE_AQC_PORT_SWID_M			0xFF
+> -	u8 reserved[10];
+> +	u8 loopback_mode;
+> +#define ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_VALID BIT(2)
+> +	u8 reserved[9];
+>  };
+>=20
+>  /* These resource type defines are used for all switch resource diff --g=
+it
+> a/drivers/net/ethernet/intel/ice/ice_common.c
+> b/drivers/net/ethernet/intel/ice/ice_common.c
+> index 2f67ea1feb60..2efa781efcdb 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_common.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
+> @@ -1019,7 +1019,7 @@ int ice_init_hw(struct ice_hw *hw)
+>  		status =3D -ENOMEM;
+>  		goto err_unroll_cqinit;
+>  	}
+> -
+> +	hw->port_info->loopback_mode =3D ICE_LOOPBACK_MODE_ENABLED;
+>  	/* set the back pointer to HW */
+>  	hw->port_info->hw =3D hw;
+>=20
+> @@ -2962,6 +2962,10 @@ ice_aq_set_port_params(struct ice_port_info *pi,
+> bool double_vlan,
+>  	cmd =3D &desc.params.set_port_params;
+>=20
+>  	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_port_params);
+> +
+> +	cmd->loopback_mode =3D pi->loopback_mode |
+> +
+> 	ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_VALID;
+> +
+>  	if (double_vlan)
+>  		cmd_flags |=3D ICE_AQC_SET_P_PARAMS_DOUBLE_VLAN_ENA;
+>  	cmd->cmd_flags =3D cpu_to_le16(cmd_flags); diff --git
+> a/drivers/net/ethernet/intel/ice/ice_devlink.c
+> b/drivers/net/ethernet/intel/ice/ice_devlink.c
+> index 65be56f2af9e..97182bacafa3 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_devlink.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
+> @@ -1429,6 +1429,127 @@ ice_devlink_enable_iw_validate(struct devlink
+> *devlink, u32 id,
+>  	return 0;
+>  }
+>=20
+> +#define DEVLINK_LPBK_DISABLED_STR "disabled"
+> +#define DEVLINK_LPBK_ENABLED_STR "enabled"
+> +#define DEVLINK_LPBK_PRIORITIZED_STR "prioritized"
+> +
+> +/**
+> + * ice_devlink_loopback_mode_to_str - Get string for loopback mode.
+> + * @mode: Loopback mode used in port_info struct.
+> + *
+> + * Return: Mode respective string or "Invalid".
+> + */
+> +static const char *ice_devlink_loopback_mode_to_str(enum
+> +ice_loopback_mode mode) {
+> +	switch (mode) {
+> +	case ICE_LOOPBACK_MODE_ENABLED:
+> +		return DEVLINK_LPBK_ENABLED_STR;
+> +	case ICE_LOOPBACK_MODE_PRIORITIZED:
+> +		return DEVLINK_LPBK_PRIORITIZED_STR;
+> +	case ICE_LOOPBACK_MODE_DISABLED:
+> +		return DEVLINK_LPBK_DISABLED_STR;
+> +	}
+> +
+> +	return "Invalid";
+> +}
+> +
+> +/**
+> + * ice_devlink_loopback_str_to_mode - Get loopback mode from string
+> name.
+> + * @mode_str: Loopback mode string.
+> + *
+> + * Return: Mode value or negative number if invalid.
+> + */
+> +static int ice_devlink_loopback_str_to_mode(const char *mode_str) {
+> +	if (!strcmp(mode_str, DEVLINK_LPBK_ENABLED_STR))
+> +		return ICE_LOOPBACK_MODE_ENABLED;
+> +	else if (!strcmp(mode_str, DEVLINK_LPBK_PRIORITIZED_STR))
+> +		return ICE_LOOPBACK_MODE_PRIORITIZED;
+> +	else if (!strcmp(mode_str, DEVLINK_LPBK_DISABLED_STR))
+> +		return ICE_LOOPBACK_MODE_DISABLED;
+> +
+> +	return -EINVAL;
+> +}
+> +
+> +/**
+> + * ice_devlink_loopback_get - Get loopback parameter.
+> + * @devlink: Pointer to the devlink instance.
+> + * @id: The parameter ID to set.
+> + * @ctx: Context to store the parameter value.
+> + *
+> + * Return: Zero.
+> + */
+> +static int ice_devlink_loopback_get(struct devlink *devlink, u32 id,
+> +				    struct devlink_param_gset_ctx *ctx) {
+> +	struct ice_pf *pf =3D devlink_priv(devlink);
+> +	struct ice_port_info *pi;
+> +	const char *mode_str;
+> +
+> +	pi =3D pf->hw.port_info;
+> +	mode_str =3D ice_devlink_loopback_mode_to_str(pi->loopback_mode);
+> +	snprintf(ctx->val.vstr, sizeof(ctx->val.vstr), "%s", mode_str);
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * ice_devlink_loopback_set - Set loopback parameter.
+> + * @devlink: Pointer to the devlink instance.
+> + * @id: The parameter ID to set.
+> + * @ctx: Context to get the parameter value.
+> + *
+> + * Return: Zero.
+> + */
+> +static int ice_devlink_loopback_set(struct devlink *devlink, u32 id,
+> +				    struct devlink_param_gset_ctx *ctx) {
+> +	int new_loopback_mode =3D ice_devlink_loopback_str_to_mode(ctx-
+> >val.vstr);
+> +	struct ice_pf *pf =3D devlink_priv(devlink);
+> +	struct device *dev =3D ice_pf_to_dev(pf);
+> +	struct ice_port_info *pi;
+> +
+> +	pi =3D pf->hw.port_info;
+> +	if (pi->loopback_mode !=3D new_loopback_mode) {
+> +		pi->loopback_mode =3D new_loopback_mode;
+> +		dev_info(dev, "Setting loopback to %s\n", ctx->val.vstr);
+> +		ice_schedule_reset(pf, ICE_RESET_CORER);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * ice_devlink_loopback_validate - Validate passed loopback parameter va=
+lue.
+> + * @devlink: Unused pointer to devlink instance.
+> + * @id: The parameter ID to validate.
+> + * @val: Value to validate.
+> + * @extack: Netlink extended ACK structure.
+> + *
+> + * Supported values are:
+> + * "enabled" - loopback is enabled, "disabled" - loopback is disabled
+> + * "prioritized" - loopback traffic is prioritized in scheduling.
+> + *
+> + * Return: Zero when passed parameter value is supported. Negative
+> +value on
+> + * error.
+> + */
+> +static int ice_devlink_loopback_validate(struct devlink *devlink, u32 id=
+,
+> +					 union devlink_param_value val,
+> +					 struct netlink_ext_ack *extack)
+> +{
+> +	if (ice_devlink_loopback_str_to_mode(val.vstr) < 0) {
+> +		NL_SET_ERR_MSG_MOD(extack, "Error: Requested value is
+> not supported.");
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +enum ice_param_id {
+> +	ICE_DEVLINK_PARAM_ID_BASE =3D
+> DEVLINK_PARAM_GENERIC_ID_MAX,
+> +	ICE_DEVLINK_PARAM_ID_LOOPBACK,
+> +};
+> +
+>  static const struct devlink_param ice_devlink_params[] =3D {
+>  	DEVLINK_PARAM_GENERIC(ENABLE_ROCE,
+> BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+>  			      ice_devlink_enable_roce_get,
+> @@ -1438,7 +1559,12 @@ static const struct devlink_param
+> ice_devlink_params[] =3D {
+>  			      ice_devlink_enable_iw_get,
+>  			      ice_devlink_enable_iw_set,
+>  			      ice_devlink_enable_iw_validate),
+> -
+> +	DEVLINK_PARAM_DRIVER(ICE_DEVLINK_PARAM_ID_LOOPBACK,
+> +			     "loopback", DEVLINK_PARAM_TYPE_STRING,
+> +			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+> +			     ice_devlink_loopback_get,
+> +			     ice_devlink_loopback_set,
+> +			     ice_devlink_loopback_validate),
+>  };
+>=20
+>  static void ice_devlink_free(void *devlink_ptr) diff --git
+> a/drivers/net/ethernet/intel/ice/ice_type.h
+> b/drivers/net/ethernet/intel/ice/ice_type.h
+> index 1fff865d0661..c8d75a1820a1 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_type.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_type.h
+> @@ -713,6 +713,7 @@ struct ice_port_info {
+>  	u16 sw_id;			/* Initial switch ID belongs to port */
+>  	u16 pf_vf_num;
+>  	u8 port_state;
+> +	u8 loopback_mode;
+>  #define ICE_SCHED_PORT_STATE_INIT	0x0
+>  #define ICE_SCHED_PORT_STATE_READY	0x1
+>  	u8 lport;
+> --
+> 2.41.0
+>=20
+> _______________________________________________
+> Intel-wired-lan mailing list
+> Intel-wired-lan@osuosl.org
+> https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
 
-Signed-off-by: Sarosh Hasan <quic_sarohasa@quicinc.com>
----
-v2 changelog:
-- Addressed Konrad Dybcio comment on optimizing the patch
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index 31631e3f89d0..c182294a6515 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -169,6 +169,9 @@ static void rgmii_dump(void *priv)
- static void
- ethqos_update_link_clk(struct qcom_ethqos *ethqos, unsigned int speed)
- {
-+	if (!phy_interface_mode_is_rgmii(ethqos->phy_mode))
-+		return;
-+
- 	switch (speed) {
- 	case SPEED_1000:
- 		ethqos->link_clk_rate =  RGMII_1000_NOM_CLK_FREQ;
--- 
-2.17.1
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+
+
 
 
