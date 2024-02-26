@@ -1,79 +1,194 @@
-Return-Path: <netdev+bounces-74950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 691DC867725
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 14:48:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2011B867732
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 14:49:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A48F1C29801
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 13:48:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42F4F1C29925
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 13:49:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0DA81292CA;
-	Mon, 26 Feb 2024 13:47:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C4A1292C9;
+	Mon, 26 Feb 2024 13:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SLF2GRs1"
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="fasx7DXb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2C91AACC;
-	Mon, 26 Feb 2024 13:47:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4991128386
+	for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 13:49:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708955256; cv=none; b=aEJMX3MxKcxNwdGANM1x6eqiSKU53vmzOfbYzA5dFYzEFeZSMusgLbaZn3QkBtC5UbarwdouQXCoOLwR4zQWIKWbwRLnnJ5AWkb9Nag75lHH1H5dSUzhfeJbBWsYV1dCJFMFtRh6HKILSjyxktAZw0sUGp3bNPrlhVfRx+rKPE0=
+	t=1708955385; cv=none; b=ojVrXjqV6T2WR2Gr0fgRkGh9W8S20T1DmVysxhA6+EhZbLjlE918S8t5WkzF7grVwS6y4U+J4HfWUj1obP1j+50iGTEBuDN+rH6e4QmuHMlTm4TDfZRNODmYSHLji95EScHJgRYc38YgOFqDAWu4HRG3fSQJeNRbe3hs5MIT0rs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708955256; c=relaxed/simple;
-	bh=fSJaGhfbzk3mg9Gy/IkD4517DdQOP65I1oQqAokj57g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kv5owtYhvTKfPO+JgWkoQ5IDtG7KjL6kXjcIJFt04QSjKr9Wm14nyyI6QXjGyWI7gUgQ3uXkVRD4p9YGFds4p7DUej0Pies5WmRxLuX7QOyFk77awWxlt7IwREK+xjgAQFvUjqlrbNukDeMZAl+48SViDyQwL/9H6KXU+Jh7+oA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SLF2GRs1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B552C433C7;
-	Mon, 26 Feb 2024 13:47:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708955255;
-	bh=fSJaGhfbzk3mg9Gy/IkD4517DdQOP65I1oQqAokj57g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SLF2GRs1FNRQRREvRc0IrbCboJQPubtEH/xb1/5pMSw4F/R5Ds+sNAKHXtH3bTZ73
-	 IipHQ7/5PdlRjKq0/n2WuEQGT81qUUAmsd3l4Sh3rEbbDgoUHGhFBWTmRRYrKrKD1k
-	 p3rqxWMAuCSy8yyPUBPCawWS46wLH6pUQXi1Aw5Lpog2b5rLJsMxOfJS9CajvuICQ0
-	 d+zJv0b8zQ/PNYvOzo+GG+/3srCyC6GNu1PEMK+XPrBfRVzvo3Ra7qoINBrJHuIZIZ
-	 aqlSU/DN4ZjmecGXdHB+/Oj4iAreUbOoBZximzjzWy7xdkBy2mR3V0FOUVHMFyH4gz
-	 d3HbrlViWZT+w==
-Date: Mon, 26 Feb 2024 13:47:30 +0000
-From: Simon Horman <horms@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] xfrm: Do not allocate stats in the driver
-Message-ID: <20240226134730.GE13129@kernel.org>
-References: <20240222144117.1370101-1-leitao@debian.org>
+	s=arc-20240116; t=1708955385; c=relaxed/simple;
+	bh=GOUQ9EgukG6RRtnE1Su278zy8DeEqSUNKqbnNEQsCzk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=b1JQX76PMvHY0+8zRXoNpP9fZ8cfMaGQmmc8mCuML274N0vhrg+OfOMlWPA/eX0KHWmteMlv6oSbKFpJ6ZL5YVNi1xKlMcVYo1EMZcS4yRH9ygxPN4mdxgg6W6Rix5gIO0+ssFEVMXONnRy73aIw2Ow5ATs+MHgJQcyNhOXn6+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=fasx7DXb; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5656e5754ccso3809363a12.0
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 05:49:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google; t=1708955381; x=1709560181; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JHO/J+vf2DDcCI4GqVxCtzd8SIKAxrbqAtBS777veKY=;
+        b=fasx7DXbdWy8gNpO8onf1gq/18DvbDReEWDRDdqVeycgvR9yXZp/s8TkmToJa6BhVK
+         l+JcNv8V8VG3xGCWPzp4lNoa6Bv5c3d5uQthHe4Ku91IUe3KDG6fp9cupNZNS61XuTaI
+         q5xs08nSh+jNBHEJTvyPN98FZY2udN4FkHtZ4Xxh47HIVg0l+1so9vCcqATiF/m/Zu46
+         LoAPA2zuh0HPU8BRIRBdkbmnjGjqxrjF22Sv5YgJ0NPGlupcB0nCb191MGp4ESDbqWl0
+         HoIBraPq24vXOxQnb6OMqDLHVHcXfTWLt61fTuDWiuSTpyKr0kPPdCc93sORiPHMBvT/
+         Gykw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708955381; x=1709560181;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JHO/J+vf2DDcCI4GqVxCtzd8SIKAxrbqAtBS777veKY=;
+        b=Uj0ZXKPdk8pc+eU6mHSmJ50ikmVoCY2IZqUd+YawDm/t9CWFX9buu3oAbaehaxzDxB
+         0oJNzC+mFwFeD+OWLomeDvaWaLnwUdZqxJnUVrEESFGfCS5eWgMZQYzNlXR4a241+jux
+         v6KPo2I89ylrtCpwUWKvykOHzod0n4cFoRrXxjKeDlQ2AgCPuFwcjKhWvJBqkaMG9TfG
+         +mBGstKSrufEU3QSzg+FibOv+q+q5tBTYdidCgVoUuzn7EJ+FMqk0qkRfWReR07v9Aor
+         tCG0Um8e4d+phiu6UGA0sWhWoopp1QTcGTzTjTAGotJkGbAOtWqiykmU06EJpd1qeWl3
+         zTeg==
+X-Gm-Message-State: AOJu0Yzqqxm653C5BpX18cIflivSiqu1Q6Wfa/XgJd8FHFHQdG5O06KG
+	jzAaQiL2aVyRl1FRx4SdxAlkOW32DXR6xDhuzoYE2QSLxI4TNKUZ243DiV3zLcGUz+PZ4Hpg0St
+	eyYVL3iE5TUbuowaiy/QXnZ4fl4zRhchEWtFrQ2jO7iVGiJD/q1A=
+X-Google-Smtp-Source: AGHT+IHbFR3DTeHeRXHbuoR6pQDWl3aEEaHxb90ISrA6C0BnPpw2vDhqvaggbLWZO/1OmyvIWSu+EMwFszJEzlvmHdQ=
+X-Received: by 2002:aa7:d385:0:b0:565:9b29:ad3e with SMTP id
+ x5-20020aa7d385000000b005659b29ad3emr4302106edq.6.1708955380782; Mon, 26 Feb
+ 2024 05:49:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240222144117.1370101-1-leitao@debian.org>
+From: Jinpu Wang <jinpu.wang@ionos.com>
+Date: Mon, 26 Feb 2024 14:49:29 +0100
+Message-ID: <CAMGffE=jkiaK5c9xcm4WJxxz8joYJwkCHWCXkbj2EMf3zRQ_Ug@mail.gmail.com>
+Subject: [BUG] Null pointer deref from fib6_walk_continue+0x6d (kernel 5.15.137)
+To: netdev <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Feb 22, 2024 at 06:41:17AM -0800, Breno Leitao wrote:
-> With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
-> convert veth & vrf"), stats allocation could be done on net core
-> instead of this driver.
-> 
-> With this new approach, the driver doesn't have to bother with error
-> handling (allocation failure checking, making sure free happens in the
-> right spot, etc). This is core responsibility now.
-> 
-> Remove the allocation in the xfrm driver and leverage the network
-> core allocation.
+Hi Folks on the list,
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+We hit following a null pointer deref from fib6_walk_continue+0x6d
+from kernel 5.15.137 during test:
+[277691.646765] BUG: kernel NULL pointer dereference, address: 0000000000000008
+[277691.646877] #PF: supervisor read access in kernel mode
+[277691.646971] #PF: error_code(0x0000) - not-present page
+[277691.647067] PGD 0 P4D 0
+[277691.647158] Oops: 0000 [#1] SMP
+[277691.647249] CPU: 14 PID: 5186 Comm: ovs-vswitchd Kdump: loaded
+Tainted: G           O      5.15.137-pserv
+er #5.15.137-7~deb11
+[277691.647376] Hardware name: Supermicro SBI-7228R-T2F2/B10DRT-IBF2,
+BIOS 2.0b 07/11/2017
+[277691.647493] RIP: 0010:fib6_walk_continue+0x6d/0x170
+[277691.647592] Code: 43 28 00 00 00 00 48 85 d2 75 d2 31 c0 5b c3 cc
+cc cc cc 83 f8 03 0f 84 a4 00 00 00 83 f8 04 75 b7 48 39 53 10 74 e4
+48 8b 02 <48> 8b 48 08 48 8b 70 10 48 89 43 18 48 39 50 18 0f 84 a7 00
+00 00
+[277691.647751] RSP: 0018:ffffad1bce1bfae0 EFLAGS: 00010283
+[277691.647846] RAX: 0000000000000000 RBX: ffff8c5f35ec8840 RCX:
+0000000000000000
+[277691.647962] RDX: ffff8c5ec748e398 RSI: ffffad1bce1bfb38 RDI:
+ffff8c5ec956f400
+[277691.648077] RBP: ffff8c3f49272368 R08: 0000000000000000 R09:
+ffff8c5f19fa3d29
+[277691.648192] R10: 0000000000000002 R11: ffff8c7e3f6348e0 R12:
+0000000000000003
+[277691.648308] R13: ffffffffa5ad9b40 R14: ffff8c41751b3314 R15:
+ffff8c45c78fa100
+[277691.648424] FS:  00007f6c6d73ca40(0000) GS:ffff8c7e3f600000(0000)
+knlGS:0000000000000000
+[277691.648542] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[277691.648637] CR2: 0000000000000008 CR3: 00000020f42b7004 CR4:
+00000000003726e0
+[277691.648752] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
+0000000000000000
+[277691.648868] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:
+0000000000000400
+[277691.648983] Call Trace:
+[277691.649074]  <TASK>
+[277691.649163]  ? __die_body.cold+0x1a/0x1f
+[277691.649258]  ? page_fault_oops+0x135/0x2a0
+[277691.649353]  ? __nla_put+0xc/0x20
+[277691.649446]  ? nla_put+0x28/0x40
+[277691.649536]  ? rt6_fill_node+0x2fc/0x880
+[277691.649628]  ? exc_page_fault+0x5d/0x110
+[277691.649723]  ? asm_exc_page_fault+0x22/0x30
+[277691.649817]  ? fib6_walk_continue+0x6d/0x170
+[277691.649910]  fib6_dump_table.isra.0+0x67/0x1d0
+[277691.650004]  inet6_dump_fib+0xea/0x340
+[277691.650096]  rtnl_dump_all+0xd3/0x110
+[277691.650189]  netlink_dump+0x193/0x3f0
+[277691.650282]  netlink_recvmsg+0x21c/0x3e0
+[277691.650375]  ____sys_recvmsg+0x87/0x180
+[277691.650470]  ? __check_object_size+0x4a/0x160
+[277691.650565]  ? _copy_from_user+0x2b/0x70
+[277691.650658]  ? iovec_from_user+0xf5/0x1a0
+[277691.650750]  ___sys_recvmsg+0x82/0x110
+[277691.650843]  ? slab_free_freelist_hook.constprop.0+0xf4/0x1a0
+[277691.650940]  ? __dentry_kill+0x127/0x160
+[277691.651033]  ? __fput+0xf9/0x250
+[277691.651125]  ? __fget_files+0x79/0xb0
+[277691.651218]  __sys_recvmsg+0x56/0xa0
 
+While checking the kdump, I noticed it failed in following lines:
+
+2122                 case FWS_U:
+2123                         if (fn == w->root)
+2124                                 return 0;
+2125                         pn =
+rcu_dereference_protected(fn->parent, 1);
+2126                         left =
+rcu_dereference_protected(pn->left, 1); ---> this line crashed, seems
+pn is NULL, which lead to NULL pointer deref.
+2127                         right = rcu_dereference_protected(pn->right, 1);
+
+crash> struct fib6_walker ffff8c5f35ec8840
+struct fib6_walker {
+  lh = {
+    next = 0xffffffffa5ada268 <init_net+1832>,
+    prev = 0xffffffffa5ada268 <init_net+1832>
+  },
+  root = 0xffff8c41751b3318,
+  node = 0xffff8c5ec748e398,
+  leaf = 0x0,
+  state = FWS_U,
+  skip = 0,
+  count = 2057,
+  skip_in_node = 0,
+  func = 0xffffffffa3839010 <fib6_dump_node>,
+  args = 0xffffad1bce1bfb38
+}
+crash> struct fib6_node 0xffff8c5ec748e398
+struct fib6_node {
+  parent = 0x0,
+  left = 0xffff8c5f340aea80,
+  right = 0xffff8c43895ac500,
+  subtree = 0x0,
+  leaf = 0xffff8c5ec956f400,
+  fn_bit = 0,
+  fn_flags = 7,
+  fn_sernum = 64134,
+  rr_ptr = 0x0,
+  rcu = {
+    next = 0x0,
+    func = 0x0
+  }
+
+So the parent pointer is NULL, and while access left, null pointer
+deref crashed the system.
+I checked in git history, and can't find a fix for this case, does
+this ring any bell? If you need any info from the crash dump, I'm
+happy to share.
+
+Thx!
+Jinpu Wang @ IONOS
 
