@@ -1,240 +1,303 @@
-Return-Path: <netdev+bounces-74798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6BBB866821
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 03:25:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6172C866877
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 04:05:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DF281F21268
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 02:25:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AA50281D7C
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 03:05:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E110DF4D;
-	Mon, 26 Feb 2024 02:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B234101C3;
+	Mon, 26 Feb 2024 03:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qnap.com header.i=@qnap.com header.b="tUuqVXKn"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="kLcVw91j"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2115.outbound.protection.outlook.com [40.107.215.115])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE4EEEB5;
-	Mon, 26 Feb 2024 02:24:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.215.115
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708914299; cv=fail; b=m6jpylnwx/NyplIeqcQRweB5ba1MPvU56ePyEwRmkYdy1g6p+GihFitmmSviJZPUQ7B75IgwgfBDZDmmRKvE3pUCA+DYzCio2ZUXz8sntGNDvUFmBx0Qt+vengJ2HqsXaBT/OdQEYfImwJYUOftvOl+3OBQis66+9+P5mnsVk/E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708914299; c=relaxed/simple;
-	bh=RQGJTp3q/ZnOcc6gPKZAuikIuPmdQPWVDg4ag7dJ0uc=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=p8N3UeVy4A885vJ1N72cxOMwCeWuAB/L16MqLxsMZGnY0LYAm7ZPXMoyO6//ABnBiE3ZC2BrGoLFc5NY66/9gl44i3SVCj0h4uFTVGkXS7gr405ec5HNNQutP9AQlv/aLvWLkFw23kbWPOvhvfqz+bBDS+DcZB6/HGC2YT3vpfs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qnap.com; spf=pass smtp.mailfrom=qnap.com; dkim=pass (2048-bit key) header.d=qnap.com header.i=@qnap.com header.b=tUuqVXKn; arc=fail smtp.client-ip=40.107.215.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qnap.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qnap.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=g8xB12N3TTPBNbRp0j2hh1Kl4GhPy34ugKN8kkQaylX7ieW/iztYBic/vmOFcK1aTg/KGK/uEAUFctcVPmm/+Ii+PDKe6LPraQn9GNJImIw2fku4aaphI7ucMh3bPQAe4xi0o07wMhC1G61k9/av+6mEraKMS7Wt9NbGnGGFeVuuGVD9mhCjFzj+X902/GxAqfWBX0lMaTd8KilA7aZPT3Vy+o2XUUTagyTqIjaLEdGlnWsq7dY2hAEcsqTxAY65WJblLJkG04wsPgS+27H0ZCUSacMIYb6D2LQAdtQlwf7CitmF4V9Qa91xckhieaj/j9v1ShFBE8n0c5J93Vj9Sg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mgcZ7yehYF9wQxmG0pQM3P+OzlWDfXOj/uAp//Ck7m8=;
- b=XvsQsekp3pOT8RG10qMatcXpP6eIB/kDbvp3PmQJdShYKXsQ2nSim/TWIHHjegQolvsxAFL1RvbGqo/yLRxD3Iw23rswrnKnxVPPEVV6WtpxMwb7fKFc9WCs/0dNHlKGfdo3yyW+/pPHI+CWkJ5JyGkA6JEW69CbO7N3Ll3Sqh3ZpimkEL6o29zSZwwYsfGQGkA4sPdxsGCWhF1Is9ErcmawGBiGlzbINwvKmZx0OFGmHT0Cel/T9bMPH9vxpwJYqKsazsLYZQLAztWBidyPvArpeZNyNbQcPyzRJaC+RdWgnSBFK+xJWQNyJbW3AdhgWSZ0+SvuMUGeKwUKqYkyeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=qnap.com; dmarc=pass action=none header.from=qnap.com;
- dkim=pass header.d=qnap.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qnap.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mgcZ7yehYF9wQxmG0pQM3P+OzlWDfXOj/uAp//Ck7m8=;
- b=tUuqVXKnqiUppUfnZ/MrAOarGNeAiuBHfeVTYMlmf9MonlnkH32XojwByh/Nl6HQaqjN7pV0B0sRliJWliGKEfRgkpM5ILrcZKNK2jpBwYyYIST80fg6q8oWgERd/NJyakML2PI1z6gVMcuqNCFnR/TRJZb/KdEDM9+FgZytASCfUGxWrYRMbovAvvka4uuwzyvUdhdG2T6/5sqrFHwmsVgk/RNpWUoJ3ssv6fj138zvHMUvgh3nPOWXtKWPsb6b7cXC6RAFEUtWZdZ5BreoJy5f/bXDFh9yJocf6bovUXJq8pPyEVRlpucu+jqkGnwkdtdwl8kIkbatD59hB2uocw==
-Received: from SI2PR04MB5097.apcprd04.prod.outlook.com (2603:1096:4:14d::9) by
- TY0PR04MB5863.apcprd04.prod.outlook.com (2603:1096:400:214::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.34; Mon, 26 Feb
- 2024 02:24:52 +0000
-Received: from SI2PR04MB5097.apcprd04.prod.outlook.com
- ([fe80::d7ad:6be5:d8bf:6f92]) by SI2PR04MB5097.apcprd04.prod.outlook.com
- ([fe80::d7ad:6be5:d8bf:6f92%4]) with mapi id 15.20.7316.031; Mon, 26 Feb 2024
- 02:24:52 +0000
-From: =?iso-2022-jp?B?Sm9uZXMgU3l1ZSAbJEJpLVhnPSEbKEI=?= <jonessyue@qnap.com>
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC: "j.vosburgh@gmail.com" <j.vosburgh@gmail.com>, "andy@greyhouse.net"
-	<andy@greyhouse.net>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "corbet@lwn.net"
-	<corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next v3] bonding: 802.3ad replace MAC_ADDRESS_EQUAL with
-  __agg_has_partner
-Thread-Topic: [PATCH net-next v3] bonding: 802.3ad replace MAC_ADDRESS_EQUAL
- with  __agg_has_partner
-Thread-Index: AQHaaFbWkhUe2N25ukCQQErH1cvW8A==
-Date: Mon, 26 Feb 2024 02:24:52 +0000
-Message-ID:
- <SI2PR04MB5097BCA8FF2A2F03D9A5A3EEDC5A2@SI2PR04MB5097.apcprd04.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=qnap.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SI2PR04MB5097:EE_|TY0PR04MB5863:EE_
-x-ms-office365-filtering-correlation-id: b18f80f6-5ec2-462d-0116-08dc36721d1b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- a+Vbj4LbILJVswpYzDj6rQdSBdBIXYzD3UVNKfvYP3UuswVcbK7m0ftYcuCYoWHjX64WI38vZ4gm6HcAO26Q/ec7NOLNNcEyQMHHEG9M3T1KtAfMEW9qmlBgtdvZJWii9yh+8B9ElGacQjfRqwqCA10dtsfgzIAjci9L6XqGsDINLGPeRcMzatkxVVFTumorhKewqEpTvSb9xIfNRLcVQYfZ3oHzFuCBTETc+BhlCLPiEhTi0EkgRzzdjFb6ZFiHfZt01QCO6ThbhuUnrTxm9n3yKZFncQtk2bB/kNBADnQsleR6IYs5csbyI/hmKbbEmDmsMgWqZyp1nezDAMCrZG+uZEHniPLLPXRIxPF9qYLxWnEEf3e5rhdmEpYhwpH60bd6Rxn+akF+qM5/hum5OSro3hKn7k3sOMmxNDwGxSmZI7BW7mYHLsfHhxlCo61HXdU4x0NAFwmgQn/mC5tdSQ3PJ7gZFI3E0FXp1jw+C3eJbb0dSm5BbpbZX9lzySN2ByVW8Opc9NEmVG14ZGxC5u7/cn9fNRvM9+njjb3OX2KrLjFNM8wHZ18NoK+8CSTZngh8DuwImfdUMGMVUzMBj498cJkBWUxqF2zzpN5jrceJ2WCkiIEI4qYf9dPI62zgP3FTyCpM70gQ9SajsYdQwO9q2TCDx5EjhIGFM464jgzek4xyddNHUVEdeZG3aCBYwIjqVi8TFubyddmtv/8/Sg==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:ja;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SI2PR04MB5097.apcprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-2022-jp?B?RGNsdlJWSi9jc29DbDAxSWlVSDIyaWZScEF0ejFFWEswWi9naGlqTzlM?=
- =?iso-2022-jp?B?NzhmOEY0NlhDSml6U2Fzc3ZteWRoNnBVdEdWRHpLMy9FZnR3RWROL085?=
- =?iso-2022-jp?B?YXBDWGFzZCtoUDkxTG9ES0xjeUNwSzhxL3BEZkc1MEF2bXpvVVBPZm9T?=
- =?iso-2022-jp?B?eFBBcXU1TGNsMzNTaWRtQ0FWamRLUnNocCtxcStNc2NPWWdsd0luYVBZ?=
- =?iso-2022-jp?B?ZVhVWnRRR2hNL1d4NFAzWXh0U3g1QmF0WmdHTFdYampuQW00dXpwR2px?=
- =?iso-2022-jp?B?c3RYRVJLMXNWNlJjK0dIOGJDUmI5VWorRHRIS01IandmM1Zvc3lwZDNm?=
- =?iso-2022-jp?B?V3dmWnV0dTRIWFoybzllTk9laURXd1F0TGsxY0FNblZzRVMzZzFUTVo0?=
- =?iso-2022-jp?B?THFGSUIyWDI2MmxPQ3RuVTIwRUtZMkNHbFYwNDBIQ003K1VXQUdhZGpE?=
- =?iso-2022-jp?B?RmR5N0thUGt2UFJOSEVpN2V6QitSUWlYZmZ5aTVzTHBFWjMybmdEYUtT?=
- =?iso-2022-jp?B?Y2VGeHVWRzl1SWlZZTNyMUFsZ0dXcm9lUjZEd3p6MHRadVJQSktYRHhL?=
- =?iso-2022-jp?B?cFAvV3YyeFcxdURzUWtmVW5LQUhqbnorL2N3SFRmR2JIM0xJOTdVNkpv?=
- =?iso-2022-jp?B?NkRGeDBBeDRaY1FGQktjZUdMSzJxQXpPNkdtakp4SGNXaS9PaU95dU5w?=
- =?iso-2022-jp?B?Ulh5RXJFK0Q1T3lCM250RHlmdGw5Ylk2dVFhSHczS2k3NEhVd2gvRnZw?=
- =?iso-2022-jp?B?Q0Z0cGJ0cFlZOFcxNGVuSWpoWUJzWGZkMnRXZkZrc3hhZW8ycCt2SzIv?=
- =?iso-2022-jp?B?MU9nNXpzQjFZVjlSVkh3bDkyMjdVeWpBWUVHbE5NckFPNUJOTGtDVytm?=
- =?iso-2022-jp?B?a0JzcGdySXV3eWdEZWxQUGZWWkRPektUTWlJZGhsckN1N0NZT1JVM2VS?=
- =?iso-2022-jp?B?ZEtydVEvYU9SSmdPK1EyenU2VmpERDh6dFZvZlRxajFDT2pManBEQVdP?=
- =?iso-2022-jp?B?MzNpSWpheWQrM0pua0ZvWTN0dVZpQStaWlpxcFk4VThRMUxkWEdpaE04?=
- =?iso-2022-jp?B?SkRXU0UvcXBHczlCU05ZTERySFJ0NlJ3NkJmeVlqSmIwRWs0S2ptSWx4?=
- =?iso-2022-jp?B?NUhKYlZ4R0xSdFlzRVduYkVrcW9TYkdjUFR5enB0SWt0bzhwSDE2Q0lY?=
- =?iso-2022-jp?B?OWpDZjNTVWE1QUpoSlRXTFdNZVE0VlJoa1p0YVZNZnFGSmpiRmQrLy9k?=
- =?iso-2022-jp?B?RlBtQ3FTMTBlRk4rUXNTYlpNUlYzSlBLSjNqcndhc3ZCM25ITFVXcmky?=
- =?iso-2022-jp?B?UzhzOHFxeCtiUHRqVCtJSFdOeGFGditUS1J0U0Y1VnpHWXhacVkvMmJI?=
- =?iso-2022-jp?B?QVdJMkJEcHZJL0dRTjlkNGp6VlZLYVFiUElMMDcrSFk4UThLeVhKRk9i?=
- =?iso-2022-jp?B?R3luZVhMMW12M0czVGtvYURhL1F2SlpXYjhZd3ZnaHU4MWY5OXlYY0hI?=
- =?iso-2022-jp?B?MFlMUllLd0ZTRWs5RGpKU0hUZWFRS2szLzZtVlYxemIrU3cxcldnQzlh?=
- =?iso-2022-jp?B?YjZNY2QySE1FaGNYYkx0SzNjNnZLR0Z2Rkl5RnpZb3IxTU1HUXdzVjJE?=
- =?iso-2022-jp?B?M29vTnVtZ09hd2R3aElhRHdQckJxaTlQNXhKRjg3YkdMcll5OG9DcGZi?=
- =?iso-2022-jp?B?ODJkRUhpSk9RK0xMbm9qWjNGSXZQc2R6MnBmSXJ1RTQ2OTFyUHgvdVFr?=
- =?iso-2022-jp?B?Q3NVYWFVV2tYRFF0SVhBWW9jaWVBQTFEWDU3dlAvNTY0NXA1cDhFNkZG?=
- =?iso-2022-jp?B?ZG5mNS93cHJ2eTF6aklLZ2lta2k3czlFZzkyamVrTnVtNStFRGpNSytt?=
- =?iso-2022-jp?B?VnNsREhLTnRzU0tBcGZZQUx2NTRqc21LTlBMdER6RCt4d0NBa01mUnRq?=
- =?iso-2022-jp?B?b00zbEdYMUFDUzh1dC9Hd0FFUUpsK05QZUlqU1JaTFNNRWRkdTJhL0hy?=
- =?iso-2022-jp?B?T1V2YVFpVXRoNTgvR0R2bHZ6cWtpU0FibTRzSUx0VmpSeGpLR25PVkdK?=
- =?iso-2022-jp?B?QjVxMkFLbUNJNUNNcW10L01FcXFTcERGT1lNNkE5dkxoM1U3TVV6bUpu?=
- =?iso-2022-jp?B?QXU1Y3k1QjZyc1g2dERjZUhmUTNsQzRsZlovSEgyYkNNUkR1T0RXQkpk?=
- =?iso-2022-jp?B?SWpvbExVcXdNQlN4NEVkVnhKam9kZlZ3NkNXS0liaGxiaFBFSnRNV2Rp?=
- =?iso-2022-jp?B?ZjV0NWZibmVSMVNSTkI3OHRjNlJLUkxacz0=?=
-Content-Type: text/plain; charset="iso-2022-jp"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9AA3C8C7;
+	Mon, 26 Feb 2024 03:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708916699; cv=none; b=BSEt57m0dxQekucnIG7birg9L0AajabOHSQaNAozjXnTafBfbb1k4V7wNB6gyCbI7BNbLmxMyjJiesjpJb2I1lR2Vo5qGXCyPIz7WPaqJXYWwS3JHFmOKXx3CnspLN5Uk4YHpo2mvd8eqhu2zTIH3MkcgtD+klI3cuGjRBtbcOY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708916699; c=relaxed/simple;
+	bh=7DPdQp+crI03h1yJx2LmjB97PDiC+mM7c78GGmSvO3s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kC2MY79QMYRgkRM4UTSmcP1mGrqFiWF07AswbUZbYkj/mGKa0Z27ATI0XFGIa36gCgU+DbhhOw8HycxYFxkGhL+zUto5YJb9h2eHpuufAdknYO3t2Mj8Qu9LHShR7+PRXLv6m26gRNGGVU2pqCVa203rQv2iDlc2AmZJvXUMsxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=kLcVw91j; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1708916693; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=8fHEj3Es1WjucFLsLgdW49Mkhy0Q0HKu/7afnZ+AaHQ=;
+	b=kLcVw91j+1601OCE5O3fVMYSJUhyPt/uhiZGr6V73/plm4M5fXUqx3uRs7J/5hTIReOLsMljNdZtGlqZ5hubLv2iStOpso07wBaVrymT4OBZxtuY+vJhweXxvb3TovigJw0ULHvfffgt7rEzLiAqpH08qsLOPlaAY9EOJ9OssBc=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W1AK4gS_1708916691;
+Received: from 30.221.129.59(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W1AK4gS_1708916691)
+          by smtp.aliyun-inc.com;
+          Mon, 26 Feb 2024 11:04:52 +0800
+Message-ID: <a1890ec0-99be-41cc-9117-46269bc6abad@linux.alibaba.com>
+Date: Mon, 26 Feb 2024 11:04:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: qnap.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SI2PR04MB5097.apcprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b18f80f6-5ec2-462d-0116-08dc36721d1b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2024 02:24:52.1705
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 6eba8807-6ef0-4e31-890c-a6ecfbb98568
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: bNjodppTAmHdDI4DooNCoh1o3DpLImrIEYNYBP/RYsstadMsxSAQ/fwQhpg6S8atYEyGX2VJaiXI4StQXlaIlw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY0PR04MB5863
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 06/15] net/smc: implement DMB-related operations
+ of loopback-ism
+To: Wenjia Zhang <wenjia@linux.ibm.com>, wintera@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jaka@linux.ibm.com, Gerd Bayer <gbayer@linux.ibm.com>
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240111120036.109903-1-guwen@linux.alibaba.com>
+ <20240111120036.109903-7-guwen@linux.alibaba.com>
+ <b5b4b96f-e512-4c1a-b749-f9fc3e7c2fcf@linux.ibm.com>
+ <a06cdb50-591b-4984-b7d5-7ab758569d21@linux.alibaba.com>
+ <2fe9e5e0-aa5a-41e8-a2b3-80db0208cfa9@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <2fe9e5e0-aa5a-41e8-a2b3-80db0208cfa9@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Replace macro MAC_ADDRESS_EQUAL() for null_mac_addr checking with inline=0A=
-function__agg_has_partner(). When MAC_ADDRESS_EQUAL() is verifiying=0A=
-aggregator's partner mac addr with null_mac_addr, means that seeing if=0A=
-aggregator has a valid partner or not. Using __agg_has_partner() makes it=
-=0A=
-more clear to understand.=0A=
-=0A=
-In ad_port_selection_logic(), since aggregator->partner_system and=0A=
-port->partner_oper.system has been compared first as a prerequisite, it is=
-=0A=
-safe to replace the upcoming MAC_ADDRESS_EQUAL() for null_mac_addr checking=
-=0A=
-with __agg_has_partner().=0A=
-=0A=
-Delete null_mac_addr, which is not required anymore in bond_3ad.c, since=0A=
-all references to it are gone.=0A=
-=0A=
-Signed-off-by: Jones Syue <jonessyue@qnap.com>=0A=
----=0A=
-v3:=0A=
-  - replace macro with inline function in ad_port_selection_logic()=0A=
-  - delete static variable null_mac_addr in bond_3ad.c=0A=
-  - re-phrase patch description with more precise text=0A=
-  - re-phrase patch description in imperative mood=0A=
-v2: https://lore.kernel.org/netdev/SI2PR04MB5097AA23EE6799B3E56C0762DC552@S=
-I2PR04MB5097.apcprd04.prod.outlook.com/=0A=
-  - add correct CC list by 'get_maintainer.pl -f .../bonding.rst'=0A=
-v1: https://lore.kernel.org/netdev/SI2PR04MB50977DA9BB51D9C8FAF6928ADC562@S=
-I2PR04MB5097.apcprd04.prod.outlook.com/=0A=
----=0A=
- drivers/net/bonding/bond_3ad.c | 14 +++-----------=0A=
- 1 file changed, 3 insertions(+), 11 deletions(-)=0A=
-=0A=
-diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.=
-c=0A=
-index f2942e8c6c91..c6807e473ab7 100644=0A=
---- a/drivers/net/bonding/bond_3ad.c=0A=
-+++ b/drivers/net/bonding/bond_3ad.c=0A=
-@@ -82,10 +82,6 @@ enum ad_link_speed_type {=0A=
- #define MAC_ADDRESS_EQUAL(A, B)	\=0A=
- 	ether_addr_equal_64bits((const u8 *)A, (const u8 *)B)=0A=
- =0A=
--static const u8 null_mac_addr[ETH_ALEN + 2] __long_aligned =3D {=0A=
--	0, 0, 0, 0, 0, 0=0A=
--};=0A=
--=0A=
- static const u16 ad_ticks_per_sec =3D 1000 / AD_TIMER_INTERVAL;=0A=
- static const int ad_delta_in_ticks =3D (AD_TIMER_INTERVAL * HZ) / 1000;=0A=
- =0A=
-@@ -1588,7 +1584,7 @@ static void ad_port_selection_logic(struct port *port=
-, bool *update_slave_arr)=0A=
- 		     (aggregator->partner_system_priority =3D=3D port->partner_oper.syst=
-em_priority) &&=0A=
- 		     (aggregator->partner_oper_aggregator_key =3D=3D port->partner_oper.=
-key)=0A=
- 		    ) &&=0A=
--		    ((!MAC_ADDRESS_EQUAL(&(port->partner_oper.system), &(null_mac_addr))=
- && /* partner answers */=0A=
-+		    ((__agg_has_partner(aggregator) && /* partner answers */=0A=
- 		      !aggregator->is_individual)  /* but is not individual OR */=0A=
- 		    )=0A=
- 		   ) {=0A=
-@@ -2036,9 +2032,7 @@ static void ad_enable_collecting(struct port *port)=
-=0A=
-  */=0A=
- static void ad_disable_distributing(struct port *port, bool *update_slave_=
-arr)=0A=
- {=0A=
--	if (port->aggregator &&=0A=
--	    !MAC_ADDRESS_EQUAL(&port->aggregator->partner_system,=0A=
--			       &(null_mac_addr))) {=0A=
-+	if (port->aggregator && __agg_has_partner(port->aggregator)) {=0A=
- 		slave_dbg(port->slave->bond->dev, port->slave->dev,=0A=
- 			  "Disabling distributing on port %d (LAG %d)\n",=0A=
- 			  port->actor_port_number,=0A=
-@@ -2078,9 +2072,7 @@ static void ad_enable_collecting_distributing(struct =
-port *port,=0A=
- static void ad_disable_collecting_distributing(struct port *port,=0A=
- 					       bool *update_slave_arr)=0A=
- {=0A=
--	if (port->aggregator &&=0A=
--	    !MAC_ADDRESS_EQUAL(&(port->aggregator->partner_system),=0A=
--			       &(null_mac_addr))) {=0A=
-+	if (port->aggregator && __agg_has_partner(port->aggregator)) {=0A=
- 		slave_dbg(port->slave->bond->dev, port->slave->dev,=0A=
- 			  "Disabling port %d (LAG %d)\n",=0A=
- 			  port->actor_port_number,=0A=
--- =0A=
-2.1.4=0A=
+
+
+On 2024/2/23 22:12, Wenjia Zhang wrote:
+> 
+> 
+> On 20.02.24 02:55, Wen Gu wrote:
+>>
+>>
+>> On 2024/2/16 22:13, Wenjia Zhang wrote:
+>>>
+>>>
+>>> On 11.01.24 13:00, Wen Gu wrote:
+>>>> This implements DMB (un)registration and data move operations of
+>>>> loopback-ism device.
+>>>>
+>>>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>>>> ---
+>>>>   net/smc/smc_cdc.c      |   6 ++
+>>>>   net/smc/smc_cdc.h      |   1 +
+>>>>   net/smc/smc_loopback.c | 133 ++++++++++++++++++++++++++++++++++++++++-
+>>>>   net/smc/smc_loopback.h |  13 ++++
+>>>>   4 files changed, 150 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
+>>>> index 3c06625ceb20..c820ef197610 100644
+>>>> --- a/net/smc/smc_cdc.c
+>>>> +++ b/net/smc/smc_cdc.c
+>>>> @@ -410,6 +410,12 @@ static void smc_cdc_msg_recv(struct smc_sock *smc, struct smc_cdc_msg *cdc)
+>>>>   static void smcd_cdc_rx_tsklet(struct tasklet_struct *t)
+>>>>   {
+>>>>       struct smc_connection *conn = from_tasklet(conn, t, rx_tsklet);
+>>>> +
+>>>> +    smcd_cdc_rx_handler(conn);
+>>>> +}
+>>>> +
+>>>> +void smcd_cdc_rx_handler(struct smc_connection *conn)
+>>>> +{
+>>>>       struct smcd_cdc_msg *data_cdc;
+>>>>       struct smcd_cdc_msg cdc;
+>>>>       struct smc_sock *smc;
+>>>> diff --git a/net/smc/smc_cdc.h b/net/smc/smc_cdc.h
+>>>> index 696cc11f2303..11559d4ebf2b 100644
+>>>> --- a/net/smc/smc_cdc.h
+>>>> +++ b/net/smc/smc_cdc.h
+>>>> @@ -301,5 +301,6 @@ int smcr_cdc_msg_send_validation(struct smc_connection *conn,
+>>>>                    struct smc_wr_buf *wr_buf);
+>>>>   int smc_cdc_init(void) __init;
+>>>>   void smcd_cdc_rx_init(struct smc_connection *conn);
+>>>> +void smcd_cdc_rx_handler(struct smc_connection *conn);
+>>>>   #endif /* SMC_CDC_H */
+>>>> diff --git a/net/smc/smc_loopback.c b/net/smc/smc_loopback.c
+>>>> index 353d4a2d69a1..f72e7b24fc1a 100644
+>>>> --- a/net/smc/smc_loopback.c
+>>>> +++ b/net/smc/smc_loopback.c
+>>>> @@ -15,11 +15,13 @@
+>>>>   #include <linux/types.h>
+>>>>   #include <net/smc.h>
+>>>> +#include "smc_cdc.h"
+>>>>   #include "smc_ism.h"
+>>>>   #include "smc_loopback.h"
+>>>>   #if IS_ENABLED(CONFIG_SMC_LO)
+>>>>   #define SMC_LO_V2_CAPABLE    0x1 /* loopback-ism acts as ISMv2 */
+>>>> +#define SMC_DMA_ADDR_INVALID    (~(dma_addr_t)0)
+>>>>   static const char smc_lo_dev_name[] = "loopback-ism";
+>>>>   static struct smc_lo_dev *lo_dev;
+>>>> @@ -50,6 +52,97 @@ static int smc_lo_query_rgid(struct smcd_dev *smcd, struct smcd_gid *rgid,
+>>>>       return 0;
+>>>>   }
+>>>> +static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
+>>>> +                   void *client_priv)
+>>>> +{
+>>>> +    struct smc_lo_dmb_node *dmb_node, *tmp_node;
+>>>> +    struct smc_lo_dev *ldev = smcd->priv;
+>>>> +    int sba_idx, order, rc;
+>>>> +    struct page *pages;
+>>>> +
+>>>> +    /* check space for new dmb */
+>>>> +    for_each_clear_bit(sba_idx, ldev->sba_idx_mask, SMC_LO_MAX_DMBS) {
+>>>> +        if (!test_and_set_bit(sba_idx, ldev->sba_idx_mask))
+>>>> +            break;
+>>>> +    }
+>>>> +    if (sba_idx == SMC_LO_MAX_DMBS)
+>>>> +        return -ENOSPC;
+>>>> +
+>>>> +    dmb_node = kzalloc(sizeof(*dmb_node), GFP_KERNEL);
+>>>> +    if (!dmb_node) {
+>>>> +        rc = -ENOMEM;
+>>>> +        goto err_bit;
+>>>> +    }
+>>>> +
+>>>> +    dmb_node->sba_idx = sba_idx;
+>>>> +    order = get_order(dmb->dmb_len);
+>>>> +    pages = alloc_pages(GFP_KERNEL | __GFP_NOWARN |
+>>>> +                __GFP_NOMEMALLOC | __GFP_COMP |
+>>>> +                __GFP_NORETRY | __GFP_ZERO,
+>>>> +                order);
+>>>> +    if (!pages) {
+>>>> +        rc = -ENOMEM;
+>>>> +        goto err_node;
+>>>> +    }
+>>>> +    dmb_node->cpu_addr = (void *)page_address(pages);
+>>>> +    dmb_node->len = dmb->dmb_len;
+>>>> +    dmb_node->dma_addr = SMC_DMA_ADDR_INVALID;
+>>>> +
+>>>> +again:
+>>>> +    /* add new dmb into hash table */
+>>>> +    get_random_bytes(&dmb_node->token, sizeof(dmb_node->token));
+>>>> +    write_lock(&ldev->dmb_ht_lock);
+>>>> +    hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb_node->token) {
+>>>> +        if (tmp_node->token == dmb_node->token) {
+>>>> +            write_unlock(&ldev->dmb_ht_lock);
+>>>> +            goto again;
+>>>> +        }
+>>>> +    }
+>>>> +    hash_add(ldev->dmb_ht, &dmb_node->list, dmb_node->token);
+>>>> +    write_unlock(&ldev->dmb_ht_lock);
+>>>> +
+>>> The write_lock_irqsave()/write_unlock_irqrestore() and read_lock_irqsave()/read_unlock_irqrestore()should be used 
+>>> instead of write_lock()/write_unlock() and read_lock()/read_unlock() in order to keep the lock irq-safe.
+>>>
+>>
+>> dmb_ht_lock won't be hold in an interrupt or sockirq context. The dmb_{register|unregister},
+>> dmb_{attach|detach} and data_move are all on the process context. So I think write_(un)lock
+>> and read_(un)lock is safe here.
+> 
+> right, it is not directly hold in a interrupt context, but it has a dependency on conn->send_lock as you wrote below, 
+> which requires irq-safe lock. And this matches our finding from a test:
+> 
+> =====================================================
+> WARNING: SOFTIRQ-safe -> SOFTIRQ-unsafe lock order detected
+> 6.8.0-rc4-00787-g8eb4d2392609 #2 Not tainted
+> -----------------------------------------------------
+> smcapp/33802 [HC0[0]:SC0[2]:HE1:SE0] is trying to acquire:
+> 00000000a2fc0330 (&ldev->dmb_ht_lock){++++}-{2:2}, at: smc_lo_move_data+0x84/0x1d0 [>
+> and this task is already holding:
+> 00000000e4df6f28 (&smc->conn.send_lock){+.-.}-{2:2}, at: smc_tx_sndbuf_nonempty+0xaa>
+> which would create a new lock dependency:
+> (&smc->conn.send_lock){+.-.}-{2:2} -> (&ldev->dmb_ht_lock){++++}-{2:2}
+> but this new dependency connects a SOFTIRQ-irq-safe lock:
+> (&smc->conn.send_lock){+.-.}-{2:2}
+> 
+
+I understand, thank you Wenjia. I will fix it in the next version.
+
+>>
+>>>> +    dmb->sba_idx = dmb_node->sba_idx;
+>>>> +    dmb->dmb_tok = dmb_node->token;
+>>>> +    dmb->cpu_addr = dmb_node->cpu_addr;
+>>>> +    dmb->dma_addr = dmb_node->dma_addr;
+>>>> +    dmb->dmb_len = dmb_node->len;
+>>>> +
+>>>> +    return 0;
+>>>> +
+>>>> +err_node:
+>>>> +    kfree(dmb_node);
+>>>> +err_bit:
+>>>> +    clear_bit(sba_idx, ldev->sba_idx_mask);
+>>>> +    return rc;
+>>>> +}
+>>>> +
+>>>> +static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
+>>>> +{
+>>>> +    struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
+>>>> +    struct smc_lo_dev *ldev = smcd->priv;
+>>>> +
+>>>> +    /* remove dmb from hash table */
+>>>> +    write_lock(&ldev->dmb_ht_lock);
+>>>> +    hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb->dmb_tok) {
+>>>> +        if (tmp_node->token == dmb->dmb_tok) {
+>>>> +            dmb_node = tmp_node;
+>>>> +            break;
+>>>> +        }
+>>>> +    }
+>>>> +    if (!dmb_node) {
+>>>> +        write_unlock(&ldev->dmb_ht_lock);
+>>>> +        return -EINVAL;
+>>>> +    }
+>>>> +    hash_del(&dmb_node->list);
+>>>> +    write_unlock(&ldev->dmb_ht_lock);
+>>>> +
+>>>> +    clear_bit(dmb_node->sba_idx, ldev->sba_idx_mask);
+>>>> +    kfree(dmb_node->cpu_addr);
+>>>> +    kfree(dmb_node);
+>>>> +
+>>>> +    return 0;
+>>>> +}
+>>>> +
+>>>>   static int smc_lo_add_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
+>>>>   {
+>>>>       return -EOPNOTSUPP;
+>>>> @@ -76,6 +169,38 @@ static int smc_lo_signal_event(struct smcd_dev *dev, struct smcd_gid *rgid,
+>>>>       return 0;
+>>>>   }
+>>>> +static int smc_lo_move_data(struct smcd_dev *smcd, u64 dmb_tok,
+>>>> +                unsigned int idx, bool sf, unsigned int offset,
+>>>> +                void *data, unsigned int size)
+>>>> +{
+>>>> +    struct smc_lo_dmb_node *rmb_node = NULL, *tmp_node;
+>>>> +    struct smc_lo_dev *ldev = smcd->priv;
+>>>> +
+>>>> +    read_lock(&ldev->dmb_ht_lock);
+>>>> +    hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb_tok) {
+>>>> +        if (tmp_node->token == dmb_tok) {
+>>>> +            rmb_node = tmp_node;
+>>>> +            break;
+>>>> +        }
+>>>> +    }
+>>>> +    if (!rmb_node) {
+>>>> +        read_unlock(&ldev->dmb_ht_lock);
+>>>> +        return -EINVAL;
+>>>> +    }
+>>>> +    read_unlock(&ldev->dmb_ht_lock);
+>>>> +
+>>>> +    memcpy((char *)rmb_node->cpu_addr + offset, data, size);
+>>>> +
+>>>
+>>> Should this read_unlock be placed behind memcpy()?
+>>>
+>>
+>> dmb_ht_lock is used to ensure safe access to the DMB hash table of loopback-ism.
+>> The DMB hash table could be accessed by all the connections on loopback-ism, so
+>> it should be protected.
+>>
+>> But a certain DMB is only used by one connection, and the move_data process is
+>> protected by conn->send_lock (see smcd_tx_sndbuf_nonempty()), so the memcpy(rmb_node)
+>> here is safe and no race with other.
+>>
+>> Thanks!
+>>
+> sounds reasonable.
+>>> <...>
 
