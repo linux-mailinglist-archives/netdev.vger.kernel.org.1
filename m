@@ -1,387 +1,147 @@
-Return-Path: <netdev+bounces-74863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC63B866F8F
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:59:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 88785866F54
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 10:54:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D03081C25782
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 09:59:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF0231C24E14
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 09:54:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5897557880;
-	Mon, 26 Feb 2024 09:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D011C4F1E1;
+	Mon, 26 Feb 2024 09:22:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="C1J5Z6CN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lw6p1EJV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D101BC30;
-	Mon, 26 Feb 2024 09:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332134EB5D;
+	Mon, 26 Feb 2024 09:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708939844; cv=none; b=is3j56z1D3XOQD0Xpa3Ch1nEV1R52jrTZf17fdtMgjDonic/rHEk2hhZ6F9LyEmu14a/6F4ecH4M0gA+XkvK8U76LVCMkSq44QzdCVbB0c6MwV7giyvfNP0k6VGfRgyhpmtKFzL8Gt/mAFGK86nQU+00gDx2AlOSfWfArIsX10I=
+	t=1708939361; cv=none; b=evKFAhtMCq67NbZFq1Ej4c0suMaJUqKyfcXO3XUVyaZdY2eeytH92cVq8RKViDlL0AxE2gWcBUhagzDNoTrQtxxZlyZEod11jStyW9C9CO2TZVEZ0DHLzNdyhiATWhf0dSk4v0zeH+gNAun9Zs4GZInGyzlRVyXeQKmAj893nh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708939844; c=relaxed/simple;
-	bh=OiE2GjI9ymIQ6HLdX0je5+ntcMKubBu34WK+jFxRGvU=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=WL5CLe9h+w4LhS3v5NehrlR9UkysMqf+ruhzNAzCQDDpthZMfeqHYobAIbhsWj7JGlwxL3ctr01Vg0Xm8/knAip1Rej7e9wkx5ohhlsdz4xvjP+2vzJNuGt3WnO9zEVid0LJWatAUamio3NdCB/vrkf6AEqjVlkQ8pzkVo5/E4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=C1J5Z6CN; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1708939838; h=Message-ID:Subject:Date:From:To;
-	bh=xEH79XloeCWwYFRjbQWwvM/K3wpplCxfHiQw2CFFMEw=;
-	b=C1J5Z6CNpobwtdL/mJzebFYe3fObzQTeUIaFu0CGMFGZ6mgwmvPl4yF3KnR/Lhb9xxW0MnCnRWjr7lz9Evhy/4DMrnrLSLfP/IEaEOq6B7mN6OWERG7wLEXcnEoQghke/PGQFN++w1tB0SL3KSYlYcom7mWfwkJp/yozhbaKl7A=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=34;SR=0;TI=SMTPD_---0W1FmByV_1708939835;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W1FmByV_1708939835)
-          by smtp.aliyun-inc.com;
-          Mon, 26 Feb 2024 17:30:36 +0800
-Message-ID: <1708939451.7601678-3-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v2 19/19] virtio_net: sq support premapped mode
-Date: Mon, 26 Feb 2024 17:24:11 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux.dev,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Hans de Goede <hdegoede@redhat.com>,
- =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Vadim Pasternak <vadimp@nvidia.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- linux-um@lists.infradead.org,
- netdev@vger.kernel.org,
- platform-driver-x86@vger.kernel.org,
- linux-remoteproc@vger.kernel.org,
- linux-s390@vger.kernel.org,
- kvm@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20240223082726.52915-1-xuanzhuo@linux.alibaba.com>
- <20240223082726.52915-20-xuanzhuo@linux.alibaba.com>
- <20240225032330-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240225032330-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1708939361; c=relaxed/simple;
+	bh=nHmAy4X/MhOUx7m403mmSo7DPD1Gl0hucVSHAPwk1YA=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=LrppRc1rwiJ8FfiSzyS0qeA0J+k7PbbxxkmTG71QwsNDY/NUrWBW4kKLPkO6ea3qZ4tgcf3iXpyIHuU3MZWHW2Q4ES2Zf2xLmFHyhWrbATyDFG8wKuVKlJnTAZ+NXKoJGOSe8WGuUByhNrj4333V9apaI+rk1ye45LpJrOyhgoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lw6p1EJV; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708939361; x=1740475361;
+  h=message-id:date:mime-version:to:cc:references:from:
+   subject:in-reply-to:content-transfer-encoding;
+  bh=nHmAy4X/MhOUx7m403mmSo7DPD1Gl0hucVSHAPwk1YA=;
+  b=Lw6p1EJV7agIkqG+SujyyR4/TdX+pYm/lqAdQw/YbhjV+u/3L/SAKCnp
+   6J1GOMbrkYR1vKBdtdZKYFapcHCZcvpsG8gloFn3eqiTiLT5lkj/IizUu
+   CTTItcj4r8BRQva6j+/SXrLTijQhD1SU9m5vkMjERifiMiGkHGXwtyNx3
+   kTWmjBubOWhfH3hp73VVMC4QwhgMHXK0GuBPuKcKP2fbIXReeXSveim+n
+   EgSd1dmrpGJJts2MX2bhfF7aUnhwZYMM3cO+00U3JqM5nylPCXgrXhEA4
+   mOsFTPbz2scXGiAkC1QIlp3ZORlYURv5f4jyVWCB0+GQLPTzeUgd6ysf+
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="13764211"
+X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
+   d="scan'208";a="13764211"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 01:22:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="937029631"
+X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
+   d="scan'208";a="937029631"
+Received: from mattu-haswell.fi.intel.com (HELO [10.237.72.199]) ([10.237.72.199])
+  by fmsmga001.fm.intel.com with ESMTP; 26 Feb 2024 01:22:36 -0800
+Message-ID: <1e719367-01ae-565a-2199-0ff7e260422b@linux.intel.com>
+Date: Mon, 26 Feb 2024 11:24:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.13.0
+Content-Language: en-US
+To: Linux regressions mailing list <regressions@lists.linux.dev>,
+ Thomas Gleixner <tglx@linutronix.de>
+Cc: "Christian A. Ehrhardt" <lk@c--e.de>, niklas.neronin@linux.intel.com,
+ Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
+ Greg KH <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
+ linux-x86_64@vger.kernel.org, netdev@vger.kernel.org,
+ Randy Dunlap <rdunlap@infradead.org>,
+ Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+References: <CABXGCsNnUfCCYVSb_-j-a-cAdONu1r6Fe8p2OtQ5op_wskOfpw@mail.gmail.com>
+ <Zb6D/5R8nNrxveAP@cae.in-ulm.de> <Zb/30qOGYAH4j6Mn@cae.in-ulm.de>
+ <CABXGCsPu73D+JS9dpvzX78RktK2VOv_xT8vvuVaQ=B6zs2dMNQ@mail.gmail.com>
+ <e7b96819-edf7-1f9f-7b01-e2e805c99b33@linux.intel.com>
+ <CABXGCsPjW_Gr4fGBzYSkr_4tsn0fvuT72G-YJYXcb1a4kX=CQw@mail.gmail.com>
+ <2d87509a-1515-520c-4b9e-bba4cd4fa2c6@linux.intel.com>
+ <CABXGCsPdXqRG6v97KDGy+o59xc3ayaq3rLj267veC7YcKVp8ww@mail.gmail.com>
+ <1126ed0a-bfc1-a752-1b5e-f1339d7a8aa5@linux.intel.com>
+ <CABXGCsN5_O3iKDOyYxtsGTGDA6fw4962CjzXLSnOK3rscELq+Q@mail.gmail.com>
+ <a026ecd8-6fba-017d-d673-0d0759a37ed8@linux.intel.com>
+ <CABXGCsOgy8H4GGcNU1jRE+SzRqwnPeNuy_3xBukjwB-bPxeZrQ@mail.gmail.com>
+ <CABXGCsOd=E428ixUOw+msRpnaubgx5-cVU7TDXwRUCdrM5Oicw@mail.gmail.com>
+ <34d7ab1b-ab12-489d-a480-5e6ccc41bfc3@infradead.org>
+ <10487018-49b8-4b27-98a1-07cee732290d@infradead.org>
+ <4f34b6a8-4415-6ea4-8090-262847d606c6@linux.intel.com>
+ <3ea25443-1275-4c67-90e0-b637212d32b5@leemhuis.info>
+From: Mathias Nyman <mathias.nyman@linux.intel.com>
+Subject: Re: This is the fourth time I've tried to find what led to the
+ regression of outgoing network speed and each time I find the merge commit
+ 8c94ccc7cd691472461448f98e2372c75849406c
+In-Reply-To: <3ea25443-1275-4c67-90e0-b637212d32b5@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sun, 25 Feb 2024 03:38:48 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Fri, Feb 23, 2024 at 04:27:26PM +0800, Xuan Zhuo wrote:
-> > If the xsk is enabling, the xsk tx will share the send queue.
-> > But the xsk requires that the send queue use the premapped mode.
-> > So the send queue must support premapped mode.
-> >
-> > cmd:
-> >     sh samples/pktgen/pktgen_sample01_simple.sh -i eth0 \
-> >         -s 16 -d 10.0.0.128 -m 00:16:3e:2c:c8:2e -n 0 -p 100
-> > CPU:
-> >     Intel(R) Xeon(R) Platinum 8369B CPU @ 2.70GHz
-> >
-> > Machine:
-> >     ecs.g7.2xlarge(Aliyun)
-> >
-> > before:              1600010.00
-> > after(no-premapped): 1599966.00
-> > after(premapped):    1600014.00
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/net/virtio_net.c | 136 +++++++++++++++++++++++++++++++++++++--
-> >  1 file changed, 132 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 7715bb7032ec..b83ef6afc4fb 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -146,6 +146,25 @@ struct virtnet_rq_dma {
-> >  	u16 need_sync;
-> >  };
-> >
-> > +struct virtnet_sq_dma {
-> > +	union {
-> > +		struct virtnet_sq_dma *next;
-> > +		void *data;
-> > +	};
-> > +
-> > +	u32 num;
-> > +
-> > +	dma_addr_t addr[MAX_SKB_FRAGS + 2];
-> > +	u32 len[MAX_SKB_FRAGS + 2];
-> > +};
-> > +
-> > +struct virtnet_sq_dma_head {
-> > +	/* record for kfree */
-> > +	void *p;
-> > +
-> > +	struct virtnet_sq_dma *free;
-> > +};
-> > +
-> >  /* Internal representation of a send virtqueue */
-> >  struct send_queue {
-> >  	/* Virtqueue associated with this send _queue */
-> > @@ -165,6 +184,8 @@ struct send_queue {
-> >
-> >  	/* Record whether sq is in reset state. */
-> >  	bool reset;
-> > +
-> > +	struct virtnet_sq_dma_head dmainfo;
-> >  };
-> >
-> >  /* Internal representation of a receive virtqueue */
-> > @@ -368,6 +389,95 @@ static struct xdp_frame *ptr_to_xdp(void *ptr)
-> >  	return (struct xdp_frame *)((unsigned long)ptr & ~VIRTIO_XDP_FLAG);
-> >  }
-> >
-> > +static struct virtnet_sq_dma *virtnet_sq_unmap(struct send_queue *sq, void **data)
-> > +{
-> > +	struct virtnet_sq_dma *d;
-> > +	int i;
-> > +
-> > +	d = *data;
-> > +	*data = d->data;
-> > +
-> > +	for (i = 0; i < d->num; ++i)
-> > +		virtqueue_dma_unmap_page_attrs(sq->vq, d->addr[i], d->len[i],
-> > +					       DMA_TO_DEVICE, 0);
-> > +
-> > +	d->next = sq->dmainfo.free;
-> > +	sq->dmainfo.free = d;
-> > +
-> > +	return d;
-> > +}
-> > +
-> > +static struct virtnet_sq_dma *virtnet_sq_map_sg(struct send_queue *sq,
-> > +						int nents, void *data)
-> > +{
-> > +	struct virtnet_sq_dma *d;
-> > +	struct scatterlist *sg;
-> > +	int i;
-> > +
-> > +	if (!sq->dmainfo.free)
-> > +		return NULL;
-> > +
-> > +	d = sq->dmainfo.free;
-> > +	sq->dmainfo.free = d->next;
-> > +
-> > +	for_each_sg(sq->sg, sg, nents, i) {
-> > +		if (virtqueue_dma_map_sg_attrs(sq->vq, sg, DMA_TO_DEVICE, 0))
-> > +			goto err;
-> > +
-> > +		d->addr[i] = sg->dma_address;
-> > +		d->len[i] = sg->length;
-> > +	}
-> > +
-> > +	d->data = data;
-> > +	d->num = i;
-> > +	return d;
-> > +
-> > +err:
-> > +	d->num = i;
-> > +	virtnet_sq_unmap(sq, (void **)&d);
-> > +	return NULL;
-> > +}
->
->
-> Do I see a reimplementation of linux/llist.h here?
->
->
-> > +
-> > +static int virtnet_add_outbuf(struct send_queue *sq, u32 num, void *data)
-> > +{
-> > +	int ret;
-> > +
-> > +	if (sq->vq->premapped) {
-> > +		data = virtnet_sq_map_sg(sq, num, data);
-> > +		if (!data)
-> > +			return -ENOMEM;
-> > +	}
-> > +
-> > +	ret = virtqueue_add_outbuf(sq->vq, sq->sg, num, data, GFP_ATOMIC);
-> > +	if (ret && sq->vq->premapped)
-> > +		virtnet_sq_unmap(sq, &data);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +static int virtnet_sq_init_dma_mate(struct send_queue *sq)
->
-> Mate? The popular south african drink?
->
-> > +{
-> > +	struct virtnet_sq_dma *d;
-> > +	int num, i;
-> > +
-> > +	num = virtqueue_get_vring_size(sq->vq);
-> > +
-> > +	sq->dmainfo.free = kcalloc(num, sizeof(*sq->dmainfo.free), GFP_KERNEL);
-> > +	if (!sq->dmainfo.free)
-> > +		return -ENOMEM;
->
->
-> This could be quite a bit of memory for a large queue.  And for a bunch
-> of common cases where unmap is a nop (e.g. iommu pt) this does nothing
-> useful at all.  And also, this does nothing useful if PLATFORM_ACCESS is off
-> which is super common.
->
-> A while ago I proposed:
-> - extend DMA APIs so one can query whether unmap is a nop
+On 26.2.2024 7.45, Linux regression tracking (Thorsten Leemhuis) wrote:
+> On 21.02.24 14:44, Mathias Nyman wrote:
+>> On 21.2.2024 1.43, Randy Dunlap wrote:
+>>> On 2/20/24 15:41, Randy Dunlap wrote:
+>>>> {+ tglx]
+>>>> On 2/20/24 15:19, Mikhail Gavrilov wrote:
+>>>>> On Mon, Feb 19, 2024 at 2:41 PM Mikhail Gavrilov
+>>>>> <mikhail.v.gavrilov@gmail.com> wrote:
+>>>>> I spotted network performance regression and it turned out, this was
+>>>>> due to the network card getting other interrupt. It is a side effect
+>>>>> of commit 57e153dfd0e7a080373fe5853c5609443d97fa5a.
+>>>> That's a merge commit (AFAIK, maybe not so much). The commit in
+>>>> mainline is:
+>>>>
+>>>> commit f977f4c9301c
+>>>> Author: Niklas Neronin <niklas.neronin@linux.intel.com>
+>>>> Date:   Fri Dec 1 17:06:40 2023 +0200
+>>>>
+>>>>       xhci: add handler for only one interrupt line
+>>>>
+>>>>> Installing irqbalance daemon did not help. Maybe someone experienced
+>>>>> such a problem?
+>>>>
+>>>> Thomas, would you look at this, please?
+>>>>
+>>>> A network device and xhci (USB) driver are now sharing interrupts.
+>>>> This causes a large performance decrease for the networking device.
+>>
+>> Short recap:
+> 
+> Thx for that. As the 6.8 release is merely two or three weeks away while
+> a fix is nowhere near in sight yet (afaics!) I start to wonder if we
+> should consider a revert here and try reapplying the culprit in a later
+> cycle when this problem is fixed.
 
+I don't think reverting this series is a solution.
 
-We may have trouble for this.
+This isn't really about those usb xhci patches.
+This is about which interrupt gets assigned to which CPU.
 
-dma_addr_t dma_map_page_attrs(struct device *dev, struct page *page,
-		size_t offset, size_t size, enum dma_data_direction dir,
-		unsigned long attrs)
-{
-	const struct dma_map_ops *ops = get_dma_ops(dev);
-	dma_addr_t addr;
+Mikhail got unlucky when the network adapter interrupts on that system was
+assigned to CPU0, clearly a more "clogged" CPU, thus causing a drop in max
+bandwidth.
 
-	BUG_ON(!valid_dma_direction(dir));
-
-	if (WARN_ON_ONCE(!dev->dma_mask))
-		return DMA_MAPPING_ERROR;
-
-	if (dma_map_direct(dev, ops) ||
-	    arch_dma_map_page_direct(dev, page_to_phys(page) + offset + size))
-		addr = dma_direct_map_page(dev, page, offset, size, dir, attrs);
-	else
-		addr = ops->map_page(dev, page, offset, size, dir, attrs);
-	kmsan_handle_dma(page, offset, size, dir);
-	debug_dma_map_page(dev, page, offset, size, dir, addr, attrs);
-
-	return addr;
-}
-
-arch_dma_map_page_direct will check the dma address.
-So we can not judge by the API in advance.
-
-Thanks.
-
-
-
-
->   and whether sync is a nop
-> - virtio wrapper taking into account PLATFORM_ACCESS too
->
-> then we can save all this work and memory when not needed.
->
->
->
-> > +
-> > +	sq->dmainfo.p = sq->dmainfo.free;
-> > +
-> > +	for (i = 0; i < num; ++i) {
-> > +		d = &sq->dmainfo.free[i];
-> > +		d->next = d + 1;
-> > +	}
-> > +
-> > +	d->next = NULL;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  static void __free_old_xmit(struct send_queue *sq, bool in_napi,
-> >  			    struct virtnet_sq_free_stats *stats)
-> >  {
-> > @@ -377,6 +487,9 @@ static void __free_old_xmit(struct send_queue *sq, bool in_napi,
-> >  	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
-> >  		++stats->packets;
-> >
-> > +		if (sq->vq->premapped)
-> > +			virtnet_sq_unmap(sq, &ptr);
-> > +
-> >  		if (!is_xdp_frame(ptr)) {
-> >  			struct sk_buff *skb = ptr;
-> >
-> > @@ -890,8 +1003,7 @@ static int __virtnet_xdp_xmit_one(struct virtnet_info *vi,
-> >  			    skb_frag_size(frag), skb_frag_off(frag));
-> >  	}
-> >
-> > -	err = virtqueue_add_outbuf(sq->vq, sq->sg, nr_frags + 1,
-> > -				   xdp_to_ptr(xdpf), GFP_ATOMIC);
-> > +	err = virtnet_add_outbuf(sq, nr_frags + 1, xdp_to_ptr(xdpf));
-> >  	if (unlikely(err))
-> >  		return -ENOSPC; /* Caller handle free/refcnt */
-> >
-> > @@ -2357,7 +2469,7 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb)
-> >  			return num_sg;
-> >  		num_sg++;
-> >  	}
-> > -	return virtqueue_add_outbuf(sq->vq, sq->sg, num_sg, skb, GFP_ATOMIC);
-> > +	return virtnet_add_outbuf(sq, num_sg, skb);
-> >  }
-> >
-> >  static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
-> > @@ -4166,6 +4278,8 @@ static void virtnet_free_queues(struct virtnet_info *vi)
-> >  	for (i = 0; i < vi->max_queue_pairs; i++) {
-> >  		__netif_napi_del(&vi->rq[i].napi);
-> >  		__netif_napi_del(&vi->sq[i].napi);
-> > +
-> > +		kfree(vi->sq[i].dmainfo.p);
-> >  	}
-> >
-> >  	/* We called __netif_napi_del(),
-> > @@ -4214,6 +4328,15 @@ static void free_receive_page_frags(struct virtnet_info *vi)
-> >
-> >  static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
-> >  {
-> > +	struct virtnet_info *vi = vq->vdev->priv;
-> > +	struct send_queue *sq;
-> > +	int i = vq2rxq(vq);
-> > +
-> > +	sq = &vi->sq[i];
-> > +
-> > +	if (sq->vq->premapped)
-> > +		virtnet_sq_unmap(sq, &buf);
-> > +
-> >  	if (!is_xdp_frame(buf))
-> >  		dev_kfree_skb(buf);
-> >  	else
-> > @@ -4327,8 +4450,10 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
-> >  		if (ctx)
-> >  			ctx[rxq2vq(i)] = true;
-> >
-> > -		if (premapped)
-> > +		if (premapped) {
-> >  			premapped[rxq2vq(i)] = true;
-> > +			premapped[txq2vq(i)] = true;
-> > +		}
-> >  	}
-> >
-> >  	cfg.nvqs      = total_vqs;
-> > @@ -4352,6 +4477,9 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
-> >  		vi->rq[i].vq = vqs[rxq2vq(i)];
-> >  		vi->rq[i].min_buf_len = mergeable_min_buf_len(vi, vi->rq[i].vq);
-> >  		vi->sq[i].vq = vqs[txq2vq(i)];
-> > +
-> > +		if (vi->sq[i].vq->premapped)
-> > +			virtnet_sq_init_dma_mate(&vi->sq[i]);
-> >  	}
-> >
-> >  	/* run here: ret == 0. */
-> > --
-> > 2.32.0.3.g01195cf9f
->
+Thanks
+Mathias
 
