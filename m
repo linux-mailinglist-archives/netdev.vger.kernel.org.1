@@ -1,82 +1,97 @@
-Return-Path: <netdev+bounces-75032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A68CA867CB7
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 17:53:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D0C0867CBB
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 17:53:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D80E71C22E46
-	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:53:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4C291F242F1
+	for <lists+netdev@lfdr.de>; Mon, 26 Feb 2024 16:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19DB612C7F0;
-	Mon, 26 Feb 2024 16:53:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A141A12C807;
+	Mon, 26 Feb 2024 16:53:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rwXAmHKN"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="O8RMkpuQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C4212AAEF;
-	Mon, 26 Feb 2024 16:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5ACA12C7FC;
+	Mon, 26 Feb 2024 16:53:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708966387; cv=none; b=FNRemwDUZBcKhmhr42Y3uIdVlfRd0ICfTFDL4SUqKfCALYwIm+MGyCogSUiUH9OA1HhxmQwbzvN5Od+Ui1s3cHBVneHMxqSkCNm26V46pYGohSNoQwCOnnwduwd5mREMOuMO3cIOS7aggef50O/Qykn07+VmsVgBxjaki+DL0xA=
+	t=1708966407; cv=none; b=h8HEUjDyuGMZbKjuWzw8/miCVSo0RAbC4zw/CXyGx4WmxbT+nJsUZ5cWB5KcGFRD9wNA+42JMqKOuDGzCoGaf5VBAWlxFvoiD3te7sBgVSlqus+6nZdzle+C+Pio8g/C8qyJ90GD8/7sghKSxqyBb8q86L9jajAbnoX+3jv8XJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708966387; c=relaxed/simple;
-	bh=uvXVPnvYD/yAKKfwAi1xFd+k3dhGavlaDorjhvkq7Gs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iVrmI9U6ZiVDGdlXT9TsbSPdJ4mbtHfCsGgI4rqCT6JwKAkMWl6qgtxWRMOhG8Al5EI5Wxd0/89y1apyXKiWwpYX5Zqc9DjqX6Yam7E1uH4h+nAB4UP4PUSbdTP7leCL6TNVmW3Y9g5tDArWDQi5TSjApZsTY0Ro2brhldBMiDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rwXAmHKN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28803C433C7;
-	Mon, 26 Feb 2024 16:53:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708966386;
-	bh=uvXVPnvYD/yAKKfwAi1xFd+k3dhGavlaDorjhvkq7Gs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rwXAmHKNONsVopUVRQfWkmT1rzgKqKMz1/k9Ed8mh/S8vYzB0qVwuqpr5mq+7Mrzf
-	 KmTAguLpzq4quLCYIB6riF/275aDXB7kF5Audz99YU+FK1FgoKfvRPW0LKtcSvWea6
-	 BT9bPQfmUjxzPU9a8LGBXHuvmyauccNruCnTs1Z581GfjHbe8B2/ZndtOW9OXoxf4v
-	 RUeDPndZbk33EI0w3KdqXplVCU0GiP8+HMLnofcIcGlCSmSjshX73WNlyZvPuj9GvA
-	 GkBUXKK+KAmsu/SFyT3hSbTo0lnuggAxWaG8LacP15awnBDbQSnWt8mjL88CFhTaQh
-	 aDzZJYYvCMWvQ==
-Date: Mon, 26 Feb 2024 08:53:05 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org,
- linux-security-module@vger.kernel.org, keescook@chromium.org,
- jakub@cloudflare.com
-Subject: Re: [PATCH net-next v3 00/11] selftests: kselftest_harness: support
- using xfail
-Message-ID: <20240226085305.67ad776a@kernel.org>
-In-Reply-To: <20240226.Juthoojee3qu@digikod.net>
-References: <20240220192235.2953484-1-kuba@kernel.org>
-	<20240223160259.22c61d1e@kernel.org>
-	<20240226.Juthoojee3qu@digikod.net>
+	s=arc-20240116; t=1708966407; c=relaxed/simple;
+	bh=KiMCRLVbukxEd51VY4SmxiqAWQeh8Z/9xcRcx2E0GJE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ArWvTSpIaGKA9p8k0Aa8wuJUy992opduedtgh9vg7y/HV8meN4BviITSxD0xA+N4VX+YUf7eVuFrPzOgP/Uobn/QMZmsxv3iF+uL4a4SgRbywY02sjESv/4aKNgAGINaMNGzgoqIgRw1JSUSfGhdNLGWKBU1BMc+rI6HqZ4Q2Hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=O8RMkpuQ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=e5LzI+fYwzqDfr49BonbGexI34AFnEafybLaYyE7TzE=; b=O8RMkpuQvWfdaWYT9H+x798kxN
+	3OjtAKfdXSLzuH/3DhZVZ0N2S7PEqUyi+ZmvSt97RQ9fu+wOij778f2eIiYt+2Pia4fkuRzN6edx0
+	sj/Ta2LGh6x+2xCJVvg/jHX9QLaw+ZyWh3o9c8zgSuQhee+h1MvF+eCoKWlAfJmYJwgM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1reeEP-008kFI-KP; Mon, 26 Feb 2024 17:53:33 +0100
+Date: Mon, 26 Feb 2024 17:53:33 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Catalin Popescu <catalin.popescu@leica-geosystems.com>,
+	hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bsp-development.geo@leica-geosystems.com, m.felsch@pengutronix.de
+Subject: Re: [PATCH net-next v2] net: phy: dp83826: disable WOL at init
+Message-ID: <13a68356-235e-4945-8cf7-5b7a42b0bf46@lunn.ch>
+References: <20240226162339.696461-1-catalin.popescu@leica-geosystems.com>
+ <Zdy+Y8Mqs22yRrre@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zdy+Y8Mqs22yRrre@shell.armlinux.org.uk>
 
-On Mon, 26 Feb 2024 17:27:34 +0100 Micka=C3=ABl Sala=C3=BCn wrote:
-> > would you be able to take a look at those changes? landlock seems to be
-> > the sole user of the "no_print" functionality in the selftest harness.
-> > If the patches look good I'll create a branch based on Linus's tree
-> > so that anyone interested can pull the changes in.. =20
->=20
-> Hi Jakub,
->=20
-> I missed your patches before this series.  I just sent two patches to
-> clean things up before you change them.  This should simplify your
-> patches and improve the overall maintenance.  I'd appreciate if you
-> rebase on top of them.
+On Mon, Feb 26, 2024 at 04:37:55PM +0000, Russell King (Oracle) wrote:
+> On Mon, Feb 26, 2024 at 05:23:39PM +0100, Catalin Popescu wrote:
+> > Commit d1d77120bc28 ("net: phy: dp83826: support TX data voltage tuning")
+> > introduced a regression in that WOL is not disabled by default for DP83826.
+> > WOL should normally be enabled through ethtool.
+> > 
+> > Fixes: d1d77120bc28 ("net: phy: dp83826: support TX data voltage tuning")
+> > Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+> 
+> It seems rather interesting that WoL is disabled in the config_init()
+> method - because this will be called when the PHY is attached to its
+> network driver (reasonable I guess) but also at resume time - which
+> means one can't just set the WoL mode once and that status will be
+> preserved.
+> 
+> Maybe Andrew can clarify, but I thought once WoL was configured, that
+> configuration should remain until the system is rebooted.
 
-Nice! vfork() is a bit scary so I'll give people a couple of days to
-review and then post a combined+rebased series.
+Yes, i noticed this as well.
+
+d1d77120bc28 does change the behaviour, clearing WoL was dropped. As
+you say, WoL was probably broken before d1d77120bc28 and it will still
+be broken after this patch, so no real change there :-)
+
+Catalin as a followup, could you please look at suspend/resume via
+WoL. As Russell pointed out, if the machine is woken from suspend, we
+expect the WoL settings to be kept. So WoL should be cleared on boot,
+but not resume.
+
+    Andrew
 
