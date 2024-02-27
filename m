@@ -1,113 +1,123 @@
-Return-Path: <netdev+bounces-75235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86944868C50
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:32:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 559BE868C38
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:28:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6D031C20DAA
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 09:32:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F28A28A629
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 09:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF46C136984;
-	Tue, 27 Feb 2024 09:32:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5817136651;
+	Tue, 27 Feb 2024 09:28:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A482136674
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 09:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C58013665C;
+	Tue, 27 Feb 2024 09:28:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709026338; cv=none; b=dOOaj+71WXBUCOUOSqEzVgElFbYieK08uDv4OxpnjrrEUVpziBrFiS+QtbRFZYYb7htHa8zI3bO77JyauB2a1fyzxBgTXS8mXUTY2FaMzFNCrmebW2GSO2uP5mApgs+SAiKOAalCcqpqtvP2/yUzxIZIDTo8diSIrUtoQeltfjs=
+	t=1709026086; cv=none; b=CvcGLnNor1Mx28u4NG9al8jry6fOmwlVGq8IUYVNtLNP220XxwrQma4bcimMJG+93RXM2QzOOIeYB5Zvwjs4p+tx1wh7wV6OsNfjvY2q52BhA+YsYN5l2Lrr9+u/IsbZfVlfGAns6dZ3qBhsNgmU07Zrm87alhaEqS1xAq6HFPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709026338; c=relaxed/simple;
-	bh=3UlkW27UdpL5WFsTVdJEkJVMGLlMP+znlstRRekB9Ks=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=eTp0SrN2CgkjQVCLLSttnLOtxiZWwUa4Lxrfi9O7JXdjK2maG8oAAWqCR2LhkPDpI68/K8Jy5NmtO8YvTr+zb7cn5a8E7aHYSSnUcqhfzcsBGueT29rgB3Fo6M9V/WwTLAshYKdVLcxc0H34irR2aEw9tZh8xvrk4X9P9XAVnvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-365810221f3so31554735ab.2
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 01:32:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709026336; x=1709631136;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VSzEE+cK+nSRt2VzOCPLmcohDy07PYkHlPu8819BDPs=;
-        b=lIbe0i9Jrd2QaPv3lWYw4ZQhynt1wxmg47GHmRWlywrvjYURUBiap0jjTLBAjas+1w
-         3K+UR242Vkl/njMAj976ucljQ/aQPSR39sJOEW5cD8I+6Jw5hV9lAn0BBJIC9TrJLPMw
-         4fHsAMocEdg+OnN4/hWlgOXxiWLylbgbisBKjnJ32XOO+hU47yJpv5bsdQLpMQslgH6y
-         JzszIBwlUue6KuX9D9F4O72fHiuADLSJmjGcKWOzFKaqpEhPBjJFOiiBMMGiHAJdgUpy
-         w1kEXbAD+Ay+dWb33Yku2AmTZChfokX79h8/k41bpm6zMPT98kzTx9XpNCKltv0IY1NO
-         MRTA==
-X-Forwarded-Encrypted: i=1; AJvYcCX4BfhgaOeUojGbxuHFjLb+VctomQG28wNXnP+oBJMy6P9r1BQOFZupyWdjqUf0PmZ+QLeQAH9D8l+F/F6Pj0YYQtL3WSCU
-X-Gm-Message-State: AOJu0YykkC7OI26x/8mUm8yTvAdy4WVJhoqneTIQ/pBYQuCx2vuquenX
-	rndKSPCER0AtwcOQDdpM6YITXA1LgVnvzDlwdyjlnEn7YQkQsHOcT/sXZU+ZcVWxsDP98UgePBe
-	0KGI+JFwogwsBmxwveRXjyGH083PUTCyAh87FDEHDs/BX4g2nCx2ZBbQ=
-X-Google-Smtp-Source: AGHT+IF5u+2XMHoOgvxvA91H49CoSBaKTt/P6Fn0gkG723u0iO2lQXX3Xy+RzGq2OaWY6vaJgF2BWL7HdRTjYBKOy+P0hnbLxnpq
+	s=arc-20240116; t=1709026086; c=relaxed/simple;
+	bh=Zbvn6ZhoUbnLmX0A3Zm9N0pbkE8+2Ni+LdZohLEciOM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lrc5fymaRAQOtiTp1H0LU0gT5gVxcvIkA9hEwfFv4AKua7lMX3LhrIM5wc0J2IoVqxG3e6DfY6n1CIyYfzpz170hDU2mRax22clsQ/qDyzdyP0cIkG56Z7l83aRlyJEy9RF+UPFBZDH/iB9Y2xY8VbhPNSflzZqSw8FJayvGfPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TkX8P0GRQz1b14C;
+	Tue, 27 Feb 2024 17:23:01 +0800 (CST)
+Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2C8CE1A016B;
+	Tue, 27 Feb 2024 17:27:59 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
+ (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Tue, 27 Feb
+ 2024 17:27:58 +0800
+From: Zhengchao Shao <shaozhengchao@huawei.com>
+To: <netdev@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
+	<davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <paul@paul-moore.com>, <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
+	<shaozhengchao@huawei.com>
+Subject: [PATCH net-next] netlabel: remove impossible return value in netlbl_bitmap_walk
+Date: Tue, 27 Feb 2024 17:36:04 +0800
+Message-ID: <20240227093604.3574241-1-shaozhengchao@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2166:b0:365:afb3:e438 with SMTP id
- s6-20020a056e02216600b00365afb3e438mr8229ilv.1.1709026336557; Tue, 27 Feb
- 2024 01:32:16 -0800 (PST)
-Date: Tue, 27 Feb 2024 01:32:16 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b3d2ed061259b3b3@google.com>
-Subject: [syzbot] Monthly net report (Feb 2024)
-From: syzbot <syzbot+listaa3831d981acb8a56caa@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
 
-Hello net maintainers/developers,
+Since commit 446fda4f2682 ("[NetLabel]: CIPSOv4 engine"), *bitmap_walk
+function only returns -1. Nearly 18 years have passed, -2 scenes never
+come up, so there's no need to consider it.
 
-This is a 31-day syzbot report for the net subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/net
-
-During the period, 10 new issues were detected and 12 were fixed.
-In total, 66 issues are still open and 1378 have been fixed so far.
-
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  4149    Yes   KMSAN: uninit-value in eth_type_trans (2)
-                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
-<2>  971     Yes   possible deadlock in __dev_queue_xmit (3)
-                   https://syzkaller.appspot.com/bug?extid=3b165dac15094065651e
-<3>  956     Yes   INFO: task hung in switchdev_deferred_process_work (2)
-                   https://syzkaller.appspot.com/bug?extid=8ecc009e206a956ab317
-<4>  835     Yes   INFO: task hung in rtnetlink_rcv_msg
-                   https://syzkaller.appspot.com/bug?extid=8218a8a0ff60c19b8eae
-<5>  831     Yes   INFO: task hung in rfkill_global_led_trigger_worker (2)
-                   https://syzkaller.appspot.com/bug?extid=2e39bc6569d281acbcfb
-<6>  473     Yes   unregister_netdevice: waiting for DEV to become free (8)
-                   https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
-<7>  437     Yes   WARNING in kcm_write_msgs
-                   https://syzkaller.appspot.com/bug?extid=52624bdfbf2746d37d70
-<8>  307     Yes   INFO: rcu detected stall in tc_modify_qdisc
-                   https://syzkaller.appspot.com/bug?extid=9f78d5c664a8c33f4cce
-<9>  270     No    INFO: task hung in linkwatch_event (3)
-                   https://syzkaller.appspot.com/bug?extid=d4b2f8282f84f54e87a1
-<10> 257     Yes   KMSAN: uninit-value in nci_rx_work
-                   https://syzkaller.appspot.com/bug?extid=d7b4dc6cd50410152534
-
+Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/ipv4/cipso_ipv4.c        | 5 +----
+ net/ipv6/calipso.c           | 5 +----
+ net/netlabel/netlabel_kapi.c | 2 +-
+ 3 files changed, 3 insertions(+), 9 deletions(-)
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+diff --git a/net/ipv4/cipso_ipv4.c b/net/ipv4/cipso_ipv4.c
+index d048aa833293..8b17d83e5fde 100644
+--- a/net/ipv4/cipso_ipv4.c
++++ b/net/ipv4/cipso_ipv4.c
+@@ -864,11 +864,8 @@ static int cipso_v4_map_cat_rbm_ntoh(const struct cipso_v4_doi *doi_def,
+ 					      net_clen_bits,
+ 					      net_spot + 1,
+ 					      1);
+-		if (net_spot < 0) {
+-			if (net_spot == -2)
+-				return -EFAULT;
++		if (net_spot < 0)
+ 			return 0;
+-		}
+ 
+ 		switch (doi_def->type) {
+ 		case CIPSO_V4_MAP_PASS:
+diff --git a/net/ipv6/calipso.c b/net/ipv6/calipso.c
+index 1578ed9e97d8..eb8ee1e9373a 100644
+--- a/net/ipv6/calipso.c
++++ b/net/ipv6/calipso.c
+@@ -657,11 +657,8 @@ static int calipso_map_cat_ntoh(const struct calipso_doi *doi_def,
+ 					  net_clen_bits,
+ 					  spot + 1,
+ 					  1);
+-		if (spot < 0) {
+-			if (spot == -2)
+-				return -EFAULT;
++		if (spot < 0)
+ 			return 0;
+-		}
+ 
+ 		ret_val = netlbl_catmap_setbit(&secattr->attr.mls.cat,
+ 					       spot,
+diff --git a/net/netlabel/netlabel_kapi.c b/net/netlabel/netlabel_kapi.c
+index 7b844581ebee..1ba4f58e1d35 100644
+--- a/net/netlabel/netlabel_kapi.c
++++ b/net/netlabel/netlabel_kapi.c
+@@ -876,7 +876,7 @@ int netlbl_catmap_setlong(struct netlbl_lsm_catmap **catmap,
+  * Description:
+  * Starting at @offset, walk the bitmap from left to right until either the
+  * desired bit is found or we reach the end.  Return the bit offset, -1 if
+- * not found, or -2 if error.
++ * not found.
+  */
+ int netlbl_bitmap_walk(const unsigned char *bitmap, u32 bitmap_len,
+ 		       u32 offset, u8 state)
+-- 
+2.34.1
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
