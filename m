@@ -1,103 +1,144 @@
-Return-Path: <netdev+bounces-75313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5845486918A
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 14:16:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 787B6869459
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 14:53:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C59471F29B3C
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 13:16:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C398FB22206
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 13:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B60F13AA51;
-	Tue, 27 Feb 2024 13:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC3613B7AB;
+	Tue, 27 Feb 2024 13:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="CRuqj2YQ"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="L6+PT4Md"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A07AE13AA4C
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 13:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DFF13B2B8;
+	Tue, 27 Feb 2024 13:40:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709039810; cv=none; b=TH/s8Yqc5IaVrm3vuCfRJag+yVNymO2Eb01Ya1KXn3RUTJ308pgdb/SXTkv8Q56Y8FW0ze2nukmN7yM3vUsYXbLxEljLSnBdqGrL0lkim4o8ny9yeqoAEHaxCu6Sy9yoiYHc16IFla5j4Ov0BBSzJG2JJw8F+XbAmjMeaVS16Wg=
+	t=1709041209; cv=none; b=JlX4LQieDMRMvT0XuirtBogTadeBWMK7Xe78ffgSDPY/x1gbV5dEZ7o+udJAOQMkd6lMvlP4hR3zDLfnG3jQmqnFyg6k6HHacz8/fRSAPdRFu+A7gYkLJUDE2wAW2Daw2ZZJUa1ktBA7J0GQ2KDRq3yk52JtCv8ODVkZEqYYjuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709039810; c=relaxed/simple;
-	bh=sLSnm5sDDAgj4iXUanzlaO3dk9veURq4FvyOwrFUb90=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S4G+V6rlM+OGunz0y5iyGP1xvTSbX6ERloMg491vLkTJ/QBXwpT9RcCqf3vLzbNplmVuPppwIjpVSrh0//cPgW00J6HTNOl1hX16Ly5WGSSEKQ5rXRx2bl7GcrcBHgniickVHXx+Uo5rcFYXDVuoVIl7zzLLDjB5KQVKo/7f5Z0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=CRuqj2YQ; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-412af1c91f3so2953525e9.1
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 05:16:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709039806; x=1709644606; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sLSnm5sDDAgj4iXUanzlaO3dk9veURq4FvyOwrFUb90=;
-        b=CRuqj2YQDJXhNKaN4/TBDm5z7TYHG/2LyhKD1p22DXDkSfOJxXWQOM5Pc4aQ3t9UM5
-         lCFbISJ3E+O0iYfsCn2YAfI2N5Rep9/eYirtzByeSMSgzNqv/WKHJAV685ojF0WEPHrc
-         svF5zpLS6fNI9JWof77SRPUYqT7JNwV8Air5/tEE1jr+mzvuP53r6diTR0qTIM1IQcrN
-         y9L9B+o8eAn4PemduqvE+Rmq0y1cW6ZTFokutmfsVlkKK52oTb5aZkVu3ein4svywoTn
-         MiCbTDSARZuRAOYz0u4jca7TST0dL0rppjgbsARWHDmPvnUOysHBW4fshSll7Q9AJDbF
-         r7kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709039806; x=1709644606;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sLSnm5sDDAgj4iXUanzlaO3dk9veURq4FvyOwrFUb90=;
-        b=OfO0JehjJae4k1vszh+kL/S/gCQNX8qj1efihIB58fmjgxnD1y5dbKspaoHki4QuYZ
-         6tDu4xAifj9qzS3glSr9AGLcxzTY26YJHtSqDmCU3jjuwd/N9d8HeQ3BEeK76k6xd2+8
-         EJn1frefcMcIJtA4pEulqb9KxbZIbWXXP/bljsPuNQPjMFpIfC4exsMG6NBuvN8eIDtP
-         6oxkuOW69QlzIxrRD3IXL78RS+qzwSSTkp2nOTK0rDw2RNrAzdSMoaupWsMKkZaFxNR5
-         ar3kEiUWue9F6+J39y9TassZgQ7NQIwEuN0ZQSUVt/0QEbIBqWySnclcjxHKsfYr8hOS
-         A9nw==
-X-Gm-Message-State: AOJu0YwXVKHQAL4kVx8HUIeansyNdQ4K7qAOPBap3ZhrZw6AatEYRyUd
-	R16s6nvCp7+E+Bm44dJZQNrWkWNnY01ZaSMfeymjGOZ95TXlPiSaCLEkN81Kr2w=
-X-Google-Smtp-Source: AGHT+IHVwzejnC0mU8vDYAfBnv4dzKsSVW/MjvgOtEqga8tB19xw0rosYNSCyp9knEStmh94Em0BaA==
-X-Received: by 2002:a05:6000:52:b0:33d:815a:47c with SMTP id k18-20020a056000005200b0033d815a047cmr6493085wrx.24.1709039805964;
-        Tue, 27 Feb 2024 05:16:45 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id g16-20020adffc90000000b0033d3b8820f8sm11308242wrr.109.2024.02.27.05.16.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Feb 2024 05:16:45 -0800 (PST)
-Date: Tue, 27 Feb 2024 14:16:42 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
+	s=arc-20240116; t=1709041209; c=relaxed/simple;
+	bh=MAf/yw3Qdn5tKkz2mk2dHRhx+P6zgmGPFRzO5hW5dig=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SDhBEujSNF9znNHfnMQl9KQbYI09Wl36om2OXNH7SZpXnV/ufzaLf4KMjcMFScPeBCZIitxdTyVAb8vxKyKewWWlc0vtoaoHjq3gHGK9RT+GXpIWj5JP0gfeEbRwD+frEYKjAnCPcRKv7gY6L+uYGJXvrjO9qK7BMjcyxlE9ENk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=L6+PT4Md; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E44F5C433C7;
+	Tue, 27 Feb 2024 13:40:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1709041209;
+	bh=MAf/yw3Qdn5tKkz2mk2dHRhx+P6zgmGPFRzO5hW5dig=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=L6+PT4MdD5Rmw75M5NdV8dmf+svXjiW+FfYOzqveaLnTefMxblhexFGThlc625Jbv
+	 ZwE5lhaecQBa2BQkslJWzIldrhwZgLqzskpd+0J5Rb46ZLU91FeansYeb/oewqoBhS
+	 MAHs6ByxnyLY86QX1PYpPFFB3sgBA3p3yveYExvQ=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Randy Dunlap <rdunlap@infradead.org>,
+	kernel test robot <lkp@intel.com>,
+	Lennart Franzen <lennart@lfdomain.com>,
+	Alexandru Tachici <alexandru.tachici@analog.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next v3 1/6] virtio_net: introduce device stats
- feature and structures
-Message-ID: <Zd3gutgi_22F79jR@nanopsycho>
-References: <20240227080303.63894-1-xuanzhuo@linux.alibaba.com>
- <20240227080303.63894-2-xuanzhuo@linux.alibaba.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	Nuno Sa <nuno.sa@analog.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.7 260/334] net: ethernet: adi: requires PHYLIB support
+Date: Tue, 27 Feb 2024 14:21:58 +0100
+Message-ID: <20240227131639.320153289@linuxfoundation.org>
+X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240227131630.636392135@linuxfoundation.org>
+References: <20240227131630.636392135@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240227080303.63894-2-xuanzhuo@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
 
-Tue, Feb 27, 2024 at 09:02:58AM CET, xuanzhuo@linux.alibaba.com wrote:
->The virtio-net device stats spec:
->
->https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
->
->This commit introduces the relative feature and structures.
+6.7-stable review patch.  If anyone has any objections, please let me know.
 
-Don't talk about "this commit" in the patch description. Tell the
-codebase what to do:
-https://www.kernel.org/doc/html/v6.6/process/submitting-patches.html#describe-your-changes
+------------------
+
+From: Randy Dunlap <rdunlap@infradead.org>
+
+[ Upstream commit a9f80df4f51440303d063b55bb98720857693821 ]
+
+This driver uses functions that are supplied by the Kconfig symbol
+PHYLIB, so select it to ensure that they are built as needed.
+
+When CONFIG_ADIN1110=y and CONFIG_PHYLIB=m, there are multiple build
+(linker) errors that are resolved by this Kconfig change:
+
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_net_open':
+   drivers/net/ethernet/adi/adin1110.c:933: undefined reference to `phy_start'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_probe_netdevs':
+   drivers/net/ethernet/adi/adin1110.c:1603: undefined reference to `get_phy_device'
+   ld: drivers/net/ethernet/adi/adin1110.c:1609: undefined reference to `phy_connect'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_disconnect_phy':
+   drivers/net/ethernet/adi/adin1110.c:1226: undefined reference to `phy_disconnect'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `devm_mdiobus_alloc':
+   include/linux/phy.h:455: undefined reference to `devm_mdiobus_alloc_size'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_register_mdiobus':
+   drivers/net/ethernet/adi/adin1110.c:529: undefined reference to `__devm_mdiobus_register'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_net_stop':
+   drivers/net/ethernet/adi/adin1110.c:958: undefined reference to `phy_stop'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_disconnect_phy':
+   drivers/net/ethernet/adi/adin1110.c:1226: undefined reference to `phy_disconnect'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_adjust_link':
+   drivers/net/ethernet/adi/adin1110.c:1077: undefined reference to `phy_print_status'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_ioctl':
+   drivers/net/ethernet/adi/adin1110.c:790: undefined reference to `phy_do_ioctl'
+   ld: drivers/net/ethernet/adi/adin1110.o:(.rodata+0xf60): undefined reference to `phy_ethtool_get_link_ksettings'
+   ld: drivers/net/ethernet/adi/adin1110.o:(.rodata+0xf68): undefined reference to `phy_ethtool_set_link_ksettings'
+
+Fixes: bc93e19d088b ("net: ethernet: adi: Add ADIN1110 support")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202402070626.eZsfVHG5-lkp@intel.com/
+Cc: Lennart Franzen <lennart@lfdomain.com>
+Cc: Alexandru Tachici <alexandru.tachici@analog.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+Reviewed-by: Nuno Sa <nuno.sa@analog.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/adi/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ethernet/adi/Kconfig b/drivers/net/ethernet/adi/Kconfig
+index da3bdd3025022..c91b4dcef4ec2 100644
+--- a/drivers/net/ethernet/adi/Kconfig
++++ b/drivers/net/ethernet/adi/Kconfig
+@@ -7,6 +7,7 @@ config NET_VENDOR_ADI
+ 	bool "Analog Devices devices"
+ 	default y
+ 	depends on SPI
++	select PHYLIB
+ 	help
+ 	  If you have a network (Ethernet) card belonging to this class, say Y.
+ 
+-- 
+2.43.0
+
+
 
 
