@@ -1,86 +1,170 @@
-Return-Path: <netdev+bounces-75144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 505078685BA
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 02:26:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E60E8685C7
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 02:29:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8724BB221BA
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 01:26:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C713E1F21CE3
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 01:29:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D24C4C6F;
-	Tue, 27 Feb 2024 01:26:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 674404C8E;
+	Tue, 27 Feb 2024 01:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aHDODS1B"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gs2hyjJR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B082F56;
-	Tue, 27 Feb 2024 01:26:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6904136E;
+	Tue, 27 Feb 2024 01:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708997181; cv=none; b=mdoolG+m+4dcepG7nsvqYjyPYuZukWNpRts55EkA4z3BNsgXrh5LuxYqDqE8v9ZHNuQOng4wgDtDSct6baG7YslayF+p/Ow6fcGF4VWn1afMzrXkXnslhRrWy6JtPxx4HqTYvy2+bgERXF3kMj72arTZ3pe43EVDDmKkHifEOtQ=
+	t=1708997385; cv=none; b=aXBlfJ3XWgYP17sJF5sJcR3MZT2dlToKo6k9SAR5QN7I1XPgxfWFAJ+rv+P1txdX+wA1UJIc8od7tmu/LOavrEUIVkDKJSMHiwAR4gppiw/5sf4kDQxIEfvEvSNlbBAWAlvdaVS9aM7AO2LO2bY/rq/HIwXht+mqQMMD7aoKfXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708997181; c=relaxed/simple;
-	bh=bJnkg4o/lnbk66QKJ1pLyaWugnPbKZ6rSmeYjGhatOE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=le7qZFoV1DcKQEjbFja8jGwtwEyx/GyE+fNxIEgaG8Pwz/MLzUTsUzYtTcRxLCuXp/r3OIwUPKmOe7s7XSzdLI38iNJLOgH4E6SMQjz7VTyI8Dabr4+5s+XPCFFV0yHFgTSolwiO7DM+Q3yOvA/kOg7uZn8kkfoQP3RFaBU4uYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aHDODS1B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B2C5C433F1;
-	Tue, 27 Feb 2024 01:26:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708997180;
-	bh=bJnkg4o/lnbk66QKJ1pLyaWugnPbKZ6rSmeYjGhatOE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aHDODS1BJa2mTw7KMtTpB3UW4CtJzQGXAJ9ehwu+0h4N8/JZVr+q4YSYFo9mNaK9n
-	 CPMq8XKUyJY+HT3I2ZC1LbWN8eWFaTfsHsOdmHplifEbW2qc/dnEp3G2Hqle3PP1EX
-	 0OLkVthSPHZyDjgOaJkzQOp3W/Wqnh4CZPaXrcReyYV/L14rnOVV8dl2JMqXi1ZsP2
-	 dB90HncWK8LdkT2zl8gTkviz74qf92PQ7Voc4Yzls2tlcJsd6d4TGsUaLfBeqbhBO0
-	 1Ih51Q33qBO+yRUyF1OEyLsdVpa4FPyd/93XphOCBgQL6FGx0HHKhoTubtNDecKcFt
-	 luTp24btvjlfQ==
-Date: Mon, 26 Feb 2024 17:26:19 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Vladimir Oltean <olteanv@gmail.com>, Russell King
- <linux@armlinux.org.uk>
-Cc: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= via B4 Relay
- <devnull+arinc.unal.arinc9.com@kernel.org>, <arinc.unal@arinc9.com>, Daniel
- Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, Sean Wang
- <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
- <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Matthias
- Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, Bartel Eerdekens <bartel.eerdekens@constell8.be>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2 0/8] MT7530 DSA Subdriver Improvements Act
- III
-Message-ID: <20240226172619.59defc7b@kernel.org>
-In-Reply-To: <20240216-for-netnext-mt7530-improvements-3-v2-0-094cae3ff23b@arinc9.com>
-References: <20240216-for-netnext-mt7530-improvements-3-v2-0-094cae3ff23b@arinc9.com>
+	s=arc-20240116; t=1708997385; c=relaxed/simple;
+	bh=X9uF/uCVLaYoZ/UKfRhY0Z/OtU/iRssDZmmPq6jkPiM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Hta3X0/AaosfIDEr6KF9zLSoGwLLA8C809rkZbEfVxDxMJsVLy3rLJp3WRJldWuiAX6hOif3oeRoFyW3GpW5ugp2U0XHLuVbxAYp4zoIrGAZuxqW1EMw4WgUcRYMMSpZ16Tku7Q2CeUl2QOrqkk9KCA2ePilIYPONhymMTlQSEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gs2hyjJR; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From:From:Sender:Reply-To:Subject:Date:Message-ID:To:
+	Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=E00RMWjz0kyaXuAuFrpIZAawFdA5eOtO3b61GfROLOc=; b=gs2hyjJRfYIytPByhHfY+tvJxF
+	Hs9orAF8y7IH78BCZebggQ6gGQVRulrBASCr3Gqi2zkkLHp2vdX3YV6Z3Js1PlXclJXJBWbDEO/dn
+	xei5YpU/iVoZkI5BD/LvEgEQUfVc6u5IvOVMhDtzTJAjyItPpxqRmZGTNCK+hPhRSbU4=;
+Received: from c-76-156-36-110.hsd1.mn.comcast.net ([76.156.36.110] helo=thinkpad.home.lunn.ch)
+	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1remI1-008mef-Hg; Tue, 27 Feb 2024 02:29:49 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+Subject: [PATCH net-next v5 0/9] drivers: net: Convert EEE handling to use
+ linkmode bitmaps
+Date: Mon, 26 Feb 2024 19:29:06 -0600
+Message-Id: <20240226-keee-u32-cleanup-v5-0-9e7323c41c38@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOM63WUC/3XNyQ6CMBgE4FcxPVvTjVI8+R7GQ5e/0kgKYQuG8
+ O5WLkKCx8nkm5lRB22ADl1PM2phDF2oYwrZ+YRsqeMTcHApI0aYIIwI/AIAPHCGbQU6Dg02Sjq
+ pRKacIiixpgUfpnXyjiL0OMLUo0dqytD1dftev0a69v9nR4oJ9kYCUZwVrtC3aojxYst1amQbT
+ o84S1xom3FhFHdS7jnf8vyA8++79dJIponN/Z6LLVcHXCSeU0+5yS0HSX58WZYPUsEI7XUBAAA
+ =
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Ariel Elior <aelior@marvell.com>, 
+ Manish Chopra <manishc@marvell.com>, 
+ Jesse Brandeburg <jesse.brandeburg@intel.com>, 
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
+ Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>, 
+ Jacob Keller <jacob.e.keller@intel.com>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3525; i=andrew@lunn.ch;
+ h=from:subject:message-id; bh=X9uF/uCVLaYoZ/UKfRhY0Z/OtU/iRssDZmmPq6jkPiM=;
+ b=owEBbQKS/ZANAwAKAea/DcumaUyEAcsmYgBl3Tru++alK1pI+HFFTn3B6TRBO+BgOSJimGIPa
+ V5ZehTnmfCJAjMEAAEKAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZd067gAKCRDmvw3LpmlM
+ hCTQEACRK0RLiDwcvtAXAUhYgWBAlZhpmnjHVNP/FiJfh/UQ14VH1mDJ4KuB8eNlODtbe3ayb6L
+ FdyyVYFL4Ey+70ol4q6CwcSj0KyNUau7O9vY5lu0WnpLlR4OGtFVrrtnZswPX6dwoQJwo1LUXJL
+ BSSieOH2fqhR9jHIH26jZWec9GATWVZEwndwbhX7cUKXmtKnjkw+5YjGWSFqlNf5CRnpsAR7ztu
+ unnzlbIA4TuB0xosZRvpEnWbvUos/sOSMUtnoMCZ8SX4JxXE5Q0iWlmdHxcQGTsh4y34Al9afdk
+ 4y4cx0mGbnq5Qf2RiE4ImsAFDxRf824FJmgjMapfyVlXoQo3ko+45hyPnGjADfNHg5EBpTGzIPP
+ FOic2wqC+pABPtBrVEsrYsIjlJAys/iAtQ/q4p/uN9c+BgwO9xYgKM3Z4oo0JLE1JO8VCBh88aP
+ QhNhGX86SIvBoSZ9TmyDUSeUH+jbj0fdKM7y3nLB7y2Ak6UBKHJDQbBDY41T4C6Xf4NSGNgUHPk
+ 9pQm24HsHqbb6BHv78Q/Hm4hc0ZfD3J+YB3E2q2zSxPK/qMLSiZfC7tqZVV4B85PmBWqcgNbK8x
+ IlF1qUVa5MJzKtvOY3Gx3bCZPeWmJ0qJzT8XCngGQPBmq/LF+xsNhijW/dG5YK81UngUldh3tZ+
+ mocBIDvC/btMcmQ==
+X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
+ fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 
-On Fri, 16 Feb 2024 14:05:28 +0300 Ar=C4=B1n=C3=A7 =C3=9CNAL via B4 Relay w=
-rote:
-> This is the third patch series with the goal of simplifying the MT7530 DSA
-> subdriver and improving support for MT7530, MT7531, and the switch on the
-> MT7988 SoC.
->=20
-> I have done a simple ping test to confirm basic communication on all swit=
-ch
-> ports on MCM and standalone MT7530, and MT7531 switch with this patch
-> series applied.
+EEE has until recently been limited to lower speeds due to the use of
+the legacy u32 for link speeds. This restriction has been lifted, with
+the use of linkmode bitmaps, added in the following patches:
 
-Russell, Vladimir, there are patches here carrying your Suggested-by
-tags. Would either of you be able to take a look thru these?
+1f069de63602 ethtool: add linkmode bitmap support to struct ethtool_keee
+1d756ff13da6 ethtool: add suffix _u32 to legacy bitmap members of struct ethtool_keee
+285cc15cc555 ethtool: adjust struct ethtool_keee to kernel needs
+0b3100bc8fa7 ethtool: switch back from ethtool_keee to ethtool_eee for ioctl
+d80a52335374 ethtool: replace struct ethtool_eee with a new struct ethtool_keee on kernel side
+
+This patchset converts the remaining MAC drivers still using the old
+_u32 to link modes.
+
+A couple of Intel drivers do odd things with EEE, setting the autoneg
+bit. It is unclear why, no other driver does, ethtool does not display
+it, and EEE is always negotiated. One patch in this series deletes
+this code.
+
+With all users of the legacy _u32 changed to link modes, the _u32
+values are removed from keee, and support for them in the ethtool core
+is removed.
+
+Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+---
+Changes in v5:
+- Restore zeroing eee_data.advertised in ax8817_178a
+- Fix lp_advertised -> supported in ixgdb
+- Link to v4: https://lore.kernel.org/r/20240218-keee-u32-cleanup-v4-0-71f13b7c3e60@lunn.ch
+
+Changes in v4:
+- Add missing conversion in igb
+- Add missing conversion in r8152
+- Add patch to remove now unused _u32 members
+- Link to v3: https://lore.kernel.org/r/20240217-keee-u32-cleanup-v3-0-fcf6b62a0c7f@lunn.ch
+
+Changes in v3:
+- Add list of commits adding linkmodes to EEE to cover letter
+- Fix grammar error in cover letter.
+- Add Reviewed-by from Jacob Keller
+- Link to v2: https://lore.kernel.org/r/20240214-keee-u32-cleanup-v2-0-4ac534b83d66@lunn.ch
+
+Changes in v2:
+- igb: Fix type 100BaseT to 1000BaseT.
+- Link to v1: https://lore.kernel.org/r/20240204-keee-u32-cleanup-v1-0-fb6e08329d9a@lunn.ch
+
+---
+Andrew Lunn (9):
+      net: usb: r8152: Use linkmode helpers for EEE
+      net: usb: ax88179_178a: Use linkmode helpers for EEE
+      net: qlogic: qede: Use linkmode helpers for EEE
+      net: ethernet: ixgbe: Convert EEE to use linkmodes
+      net: intel: i40e/igc: Remove setting Autoneg in EEE capabilities
+      net: intel: e1000e: Use linkmode helpers for EEE
+      net: intel: igb: Use linkmode helpers for EEE
+      net: intel: igc: Use linkmode helpers for EEE
+      net: ethtool: eee: Remove legacy _u32 from keee
+
+ drivers/net/ethernet/intel/e1000e/ethtool.c      | 17 +++++--
+ drivers/net/ethernet/intel/i40e/i40e_ethtool.c   |  7 +--
+ drivers/net/ethernet/intel/igb/igb_ethtool.c     | 35 +++++++++-----
+ drivers/net/ethernet/intel/igc/igc_ethtool.c     | 13 ++---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c | 48 ++++++++++---------
+ drivers/net/ethernet/qlogic/qede/qede_ethtool.c  | 60 +++++++++++++++---------
+ drivers/net/usb/Kconfig                          |  1 +
+ drivers/net/usb/ax88179_178a.c                   | 10 ++--
+ drivers/net/usb/r8152.c                          | 33 +++++++------
+ include/linux/ethtool.h                          |  3 --
+ net/ethtool/eee.c                                | 31 ++----------
+ net/ethtool/ioctl.c                              | 29 ++++--------
+ 12 files changed, 140 insertions(+), 147 deletions(-)
+---
+base-commit: 25d4342574644bca5cbe1ace865955e406b9a741
+change-id: 20240204-keee-u32-cleanup-b86d68458d80
+
+Best regards,
+-- 
+Andrew Lunn <andrew@lunn.ch>
+
 
