@@ -1,221 +1,149 @@
-Return-Path: <netdev+bounces-75378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA649869A68
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:31:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2BDD869A7D
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:36:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C596B23201
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 15:31:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C78C81C2309A
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 15:36:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB739145B15;
-	Tue, 27 Feb 2024 15:31:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89C7514534F;
+	Tue, 27 Feb 2024 15:36:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="F5WsoJYQ"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="LLGYtntJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA5313B79F
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 15:31:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359631DFF5
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 15:36:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709047880; cv=none; b=pYYB4kpbrHNuYxUnwiJ6BBJz15odkDQN8XCElyq2wZOFt3XxkUbMcKp3WzcwrXldIizZYwhU14hBs9nWzgB3oFMN0Azr9/AqNDx4fiK3SnNBUyZjqW6bHfCmdeG3qT6mZE+pBAvKAoDaXO45ijseiOy7+Ig0qLBifP1c8QJ7LLw=
+	t=1709048175; cv=none; b=Yfwjj+yH4QdvjdQiAtmyHNQLv0UGEboQgq0ZdVpTq9bbZJkTdsr6TPALzvFCNcZxPR+c1OCLcjCEF9wqvfoNaN22v6Du0E+uA1M0IYYeOcehqjcQJRANXOg7eA+CNTTwFLm9LiHlPQV8huRFRY70TyUg1tAMGB7rWh3ZiliERs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709047880; c=relaxed/simple;
-	bh=/M8wynPJ9hWR3NdkG8xbaATbFhESmsZqG6LLBAZyUR4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gE98VwtB3GvnZeIPYveNWeailgbwI/u23jg7KiudX/y6WF4NuUf6ivM2SbYalFkoQ/feJZuhF85Ev9VvEw/3EHWRZ6UyyXnYAw/IldL/9exe8uyT0AcMM72mUqSJvXTk/L0BVije6B5mbFRuoMRsxhmkMuSMjTF9mmew5p517J8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=F5WsoJYQ; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-608959cfcbfso46048317b3.3
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 07:31:17 -0800 (PST)
+	s=arc-20240116; t=1709048175; c=relaxed/simple;
+	bh=MTXVSoXCe3+NiM6pFapT2t15samHUEPGBgyp7Bps65I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P1ApQikhNvFJujSXR2EURAWKaTP3jLBJ3x5ThLAfj0GVtua24NthVItchTxpwQbJytC0jJt2Em8X2IRKrHoSz1tZnzBjVf6kYLheWpYQS+BSwUNmDl2PyH6ONh7Hjq5ro1JTfGnGXXfi9pqXB2FF8lIa9uHae6WycOMPNGVW5Vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=LLGYtntJ; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-412a4848f0dso16269715e9.1
+        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 07:36:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1709047876; x=1709652676; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gRYaqYRi+3F/3uHRenTFC45AylG9BESTewFZhEha2sQ=;
-        b=F5WsoJYQK5AH1MPqbbHIYhug+7Pyz8L8FB/wfVealauGGoMB4M3llImhTkTWnvVcxM
-         l8idYkOFGQscDsEQs48Udv8mvGdWY8AoNujzuLPeiXcAgF57cUCpOGi73N85Nof+OfhX
-         6+xC9vtN0d1vuLSiOzGbV+Be5oQ3NKu4Z7G9jOOLjfPPIciCMiUqDRY5kLKDij8NTt4V
-         izxpyv4lZbmUBhnl9/hhfiAOKwK6HRgObsHN1t4wOip2alc5illGJmIfFJSvnQii2g68
-         yS59Yg3QclVDh/samMgr6c0guF3+4YrXKszk74VFaQdWacwyMKxYwCaoY54UduJ/IUpM
-         oPzA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709048171; x=1709652971; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qQ3MAbvmJmzaq8Lwhna7tgCbWBoA4wKd3GYIZXywM8Q=;
+        b=LLGYtntJZJNni+NaIl7aCEyEQaL5PRpsNO6AZsu7zBNLW3kJeRe0oBWzgrZSpdZGG4
+         sM48safeKzxBm+BK4B3vNfM8x7h5LdSCdOBfrPMy0q0/4MxF8yboa1Ruz7TWIR8zMf2P
+         raJ5uFkEDjU+phHVr+pY3Z8HJ1x6NHsZwg0505T85ZT4e+t5LpWQw2qfecdfi643J+nz
+         MoaPz0QDFZdDNH+VsjThAPej5rbaVrDEGDosentFibG7fhjTCUGqmySVZgPMiotm4B59
+         Ld34zSHc9QMS+3dlDq76lhbJsozoboEwzA5zdE0Xg0quPf557LhQ772QcHGfimmkPpy7
+         DDqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709047876; x=1709652676;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gRYaqYRi+3F/3uHRenTFC45AylG9BESTewFZhEha2sQ=;
-        b=S5cIQmWEkmn7vh9GGhqm5BdLRQ0unDQ/Au4Pp8BRZQFQg3i1CNkYyRs1OxehO08apB
-         j+NxbBCwE6pkAlA57Ke4l+8WTV/ysIubGY6mCHX89+xZxWS0O6YHFCoSU/8wP28yBkxe
-         y5GzvcjEE++Du3m5NCZxj6VbyFePHmzO8jPt/Wv5yJyMUCCwp46VQzcVZFvjEEbPMQ5o
-         sETZ85+kSaxs7NFknwzf0oGguyW7K8C8jn9RQQlBal2pYW6THf7SHyruubauldeK7AXC
-         fYgPcvD0QO1KIIYHp1n08VE+byZ2KqINi5/DdmMaWVQvFneV6CsYMRlrSi1KptU2+tX3
-         pOwg==
-X-Forwarded-Encrypted: i=1; AJvYcCU7NN8H3VlVgQ+Ie71MebqX4yKucVuMKgFOX1zCmgRvI6m2zi9CUSiUQrRU+doHBAXaDkeCz48XvhHM3R4B7ZAN9EjeDPTA
-X-Gm-Message-State: AOJu0YyHK17K+SlKT7VE3OcSt7GXj+fIykqUATnxie45lhzlf+Y5bWaF
-	PgOLCRNBgAqgR8xNVQWx4a5XG8lEIZb44rU5m+Kb8Lt9npIl5C8EAMNohapmfBSebTCcnPhcCk1
-	UzCKBvanx7ZuWetSLdfwSNUjgDsSswULHtzi1
-X-Google-Smtp-Source: AGHT+IGy0eQ3YNLVWVgjeMOPTQb/2KqLY7USqqeVSG+fxHnakfCslc6a0iEyqlZgE+HoAi+0hU5T2r0o/4IueD1WwyU=
-X-Received: by 2002:a81:9107:0:b0:608:bc79:1af5 with SMTP id
- i7-20020a819107000000b00608bc791af5mr2680393ywg.18.1709047876681; Tue, 27 Feb
- 2024 07:31:16 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709048171; x=1709652971;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qQ3MAbvmJmzaq8Lwhna7tgCbWBoA4wKd3GYIZXywM8Q=;
+        b=LzaRRYPUNYdUFSEDGmMEPPivZxPpV3s435j9w4coqc7LQrlPjKLq1CkFy2zm/LeAqv
+         c9rEQ4CIaIA1nZ+0NzdCbm8vKv+yx6OH2wUHyTSxnnPVe4rNg4FuG2FggAsPHZPf3maV
+         Kv5v0iupvkx3zTyPik45T2gUvIQH4iMplmseQKOvf1jaeaIV4glwzaCaNf4iwOy5lHW3
+         icG0mB2yD5LcQhUau7WRb5STXCjiE+I44zu9OlNi67sBiuc00GYqwxA5QsucOQ81QOUA
+         BJ9gdcg3CoxAkoewE6CSZE9S2VdvbNC+5GoiZx2Gj1D0onPbQyi7TcyawyrmEFWUbxbM
+         eM8w==
+X-Forwarded-Encrypted: i=1; AJvYcCXJ6LuDYlqunoy1wziw+MfRqp5ziZZhOqcD+BzD1b1Wa91Fjhh1JybX1Q/QJEq7OH3nNrUbJdud+szddaehD8JYej5SHo7l
+X-Gm-Message-State: AOJu0YyNiKxinISpg6ouojBtDioOzi/1JWS7g6m2Rhp9ossHXWeR5HHo
+	pAgKTriqdD3TDuS441/97Y5LrLrnLED15v7F/5JMJ/TrRDI7xnDz9FrgbBaznik=
+X-Google-Smtp-Source: AGHT+IHCmRXTEATu3W2ZdTUl6L02Xzo83GSXeI+XpfMPo1e0OIhynh3xqHDOw6BXMrLwFgu7v+nO/A==
+X-Received: by 2002:a05:600c:a002:b0:412:a498:ad36 with SMTP id jg2-20020a05600ca00200b00412a498ad36mr4920595wmb.20.1709048171366;
+        Tue, 27 Feb 2024 07:36:11 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id r9-20020a05600c458900b004122b7a680dsm11760534wmo.21.2024.02.27.07.36.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Feb 2024 07:36:10 -0800 (PST)
+Date: Tue, 27 Feb 2024 16:36:08 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>, Jiri Pirko <jiri@nvidia.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH v2 net-next 00/15] ipv6: lockless accesses to devconf
+Message-ID: <Zd4BaDVZltdcpr1S@nanopsycho>
+References: <20240227150200.2814664-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
-In-Reply-To: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 27 Feb 2024 10:31:05 -0500
-Message-ID: <CAM0EoM=Q3hdXSHNADKX=erJQJWT4Jz0XeAD8kMYHv_VGagvPQA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 00/17] net: Add support for Power over
- Ethernet (PoE)
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>, 
-	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240227150200.2814664-1-edumazet@google.com>
 
-On Tue, Feb 27, 2024 at 9:43=E2=80=AFAM Kory Maincent <kory.maincent@bootli=
-n.com> wrote:
+Tue, Feb 27, 2024 at 04:01:45PM CET, edumazet@google.com wrote:
+>- First patch puts in a cacheline_group the fields used in fast paths.
 >
-> This patch series aims at adding support for PoE (Power over Ethernet),
-> based on the already existing support for PoDL (Power over Data Line)
-> implementation. In addition, it adds support for two specific PoE
-> controller, the Microchip PD692x0 and the TI TPS23881.
+>- Annotate all data races around idev->cnf fields.
 >
-> This patch series is sponsored by Dent Project
-> <dentproject@linuxfoundation.org>.
+>- Last patch in this series removes RTNL use for RTM_GETNETCONF dumps.
+>
+>v2: addressed Jiri Pirko feedback
+> - Added "ipv6: addrconf_disable_ipv6() optimizations"
+>   and "ipv6: addrconf_disable_policy() optimization"
+>
+>Eric Dumazet (15):
+>  ipv6: add ipv6_devconf_read_txrx cacheline_group
+>  ipv6: annotate data-races around cnf.disable_ipv6
+>  ipv6: addrconf_disable_ipv6() optimizations
+>  ipv6: annotate data-races around cnf.mtu6
+>  ipv6: annotate data-races around cnf.hop_limit
+>  ipv6: annotate data-races around cnf.forwarding
+>  ipv6: annotate data-races in ndisc_router_discovery()
+>  ipv6: annotate data-races around idev->cnf.ignore_routes_with_linkdown
+>  ipv6: annotate data-races in rt6_probe()
+>  ipv6: annotate data-races around devconf->proxy_ndp
+>  ipv6: annotate data-races around devconf->disable_policy
+>  ipv6: addrconf_disable_policy() optimization
+>  ipv6/addrconf: annotate data-races around devconf fields (I)
+>  ipv6/addrconf: annotate data-races around devconf fields (II)
+>  ipv6: use xa_array iterator to implement inet6_netconf_dump_devconf()
 
-Sorry, couldnt resist because it sounded like a commercial;-> And
-likely i am out of touch. I am all for giving credit but does it have
-to be explicitly called out as "this patch is sponsored by X"?
+set-
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
-cheers,
-jamal
+Thanks!
 
-
-> In detail:
-> - Patch 1 to 13 prepare net to support PoE devices.
-> - Patch 14 and 15 add PD692x0 PoE PSE controller driver and its binding.
-> - Patch 16 and 17 add TI TPS23881 PSE controller driver and its binding.
 >
-> Changes in v5:
-> - Fix bindings nit.
-> - Add supported-polarity parameter to bindings.
-> - Fix yamllint binding errors.
-> - Remove the nested lock brought by the use of regulator framework.
-> - Link to v4: https://lore.kernel.org/r/20240215-feature_poe-v4-0-35bb4c2=
-3266c@bootlin.com
+> .../ethernet/netronome/nfp/flower/action.c    |   2 +-
+> drivers/net/usb/cdc_mbim.c                    |   2 +-
+> include/linux/ipv6.h                          |  13 +-
+> include/net/addrconf.h                        |   2 +-
+> include/net/ip6_route.h                       |   2 +-
+> include/net/ipv6.h                            |   8 +-
+> net/core/filter.c                             |   2 +-
+> net/ipv6/addrconf.c                           | 283 +++++++++---------
+> net/ipv6/exthdrs.c                            |  16 +-
+> net/ipv6/ioam6.c                              |   8 +-
+> net/ipv6/ip6_input.c                          |   6 +-
+> net/ipv6/ip6_output.c                         |  10 +-
+> net/ipv6/ipv6_sockglue.c                      |   2 +-
+> net/ipv6/mcast.c                              |  14 +-
+> net/ipv6/ndisc.c                              |  69 +++--
+> net/ipv6/netfilter/nf_reject_ipv6.c           |   4 +-
+> net/ipv6/output_core.c                        |   4 +-
+> net/ipv6/route.c                              |  20 +-
+> net/ipv6/seg6_hmac.c                          |   8 +-
+> net/netfilter/nf_synproxy_core.c              |   2 +-
+> 20 files changed, 246 insertions(+), 231 deletions(-)
 >
-> Changes in v4:
-> - Replaced sponsored-by tag by a simple sentence.
-> - Fix pse_pi node bindings.
-> - Add pse pi documentation written by Oleksij.
-> - Link to v3: https://lore.kernel.org/r/20240208-feature_poe-v3-0-531d267=
-4469e@bootlin.com
->
-> Changes in v3:
-> - Add patches to add Oleksij and myself to PSE MAINTAINERS.
-> - Add patches to add pse devlink.
-> - Add TI TPS23881 PSE controller driver with its binding.
-> - Replace pse_get_types helper by pse_has_podl and pse_has_c33
-> - Changed the PSE core bindings.
-> - Add a setup_pi_matrix callback.
-> - Register regulator for each PSE PI (Power Interface).
-> - Changed the PD692x0 bindings.
-> - Updated PD692x0 drivers to new bindings and PSE PI description.
-> - Updated PD692x0 drivers according to the reviews and made fixes.
-> - Link to v2: https://lore.kernel.org/r/20231201-feature_poe-v2-0-56d8cac=
-607fa@bootlin.com
->
-> Changes in v2:
-> - Extract "firmware_loader: Expand Firmware upload error codes patches" t=
-o
->   send it alone and get it merge in an immutable branch.
-> - Add "c33" prefix for PoE variables and enums.
-> - Enhance few comments.
-> - Add PSE Documentation.
-> - Make several changes in pd692x0 driver, mainly for readibility.
-> - Link to v1: https://lore.kernel.org/r/20231116-feature_poe-v1-0-be48044=
-bf249@bootlin.com
->
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
-> Kory Maincent (17):
->       MAINTAINERS: net: Add Oleksij to pse-pd maintainers
->       of: property: Add fw_devlink support for pse parent
->       net: pse-pd: Rectify and adapt the naming of admin_cotrol member of=
- struct pse_control_config
->       ethtool: Expand Ethernet Power Equipment with c33 (PoE) alongside P=
-oDL
->       net: pse-pd: Introduce PSE types enumeration
->       net: ethtool: pse-pd: Expand pse commands with the PSE PoE interfac=
-e
->       netlink: specs: Modify pse attribute prefix
->       netlink: specs: Expand the pse netlink command with PoE interface
->       MAINTAINERS: Add myself to pse networking maintainer
->       net: pse-pd: Add support for PSE PIs
->       dt-bindings: net: pse-pd: Add another way of describing several PSE=
- PIs
->       net: pse-pd: Add support for setup_pi_matrix callback
->       net: pse-pd: Use regulator framework within PSE framework
->       dt-bindings: net: pse-pd: Add bindings for PD692x0 PSE controller
->       net: pse-pd: Add PD692x0 PSE controller driver
->       dt-bindings: net: pse-pd: Add bindings for TPS23881 PSE controller
->       net: pse-pd: Add TI TPS23881 PSE controller driver
->
->  .../bindings/net/pse-pd/microchip,pd692x0.yaml     |  158 +++
->  .../bindings/net/pse-pd/pse-controller.yaml        |  100 +-
->  .../bindings/net/pse-pd/ti,tps23881.yaml           |   93 ++
->  Documentation/netlink/specs/ethtool.yaml           |   33 +-
->  Documentation/networking/ethtool-netlink.rst       |   20 +
->  Documentation/networking/index.rst                 |    1 +
->  Documentation/networking/pse-pd/index.rst          |   10 +
->  Documentation/networking/pse-pd/introduction.rst   |   73 ++
->  Documentation/networking/pse-pd/pse-pi.rst         |  302 +++++
->  MAINTAINERS                                        |    8 +
->  drivers/net/mdio/fwnode_mdio.c                     |   29 +-
->  drivers/net/pse-pd/Kconfig                         |   20 +
->  drivers/net/pse-pd/Makefile                        |    2 +
->  drivers/net/pse-pd/pd692x0.c                       | 1223 ++++++++++++++=
-++++++
->  drivers/net/pse-pd/pse_core.c                      |  429 ++++++-
->  drivers/net/pse-pd/pse_regulator.c                 |   49 +-
->  drivers/net/pse-pd/tps23881.c                      |  818 +++++++++++++
->  drivers/of/property.c                              |    2 +
->  include/linux/pse-pd/pse.h                         |   86 +-
->  include/uapi/linux/ethtool.h                       |   55 +
->  include/uapi/linux/ethtool_netlink.h               |    3 +
->  net/ethtool/pse-pd.c                               |   60 +-
->  22 files changed, 3451 insertions(+), 123 deletions(-)
-> ---
-> base-commit: f308eae1e1cdacca3cef65c7f4f691dfcb0c8976
-> change-id: 20231024-feature_poe-139490e73403
->
-> Best regards,
-> --
-> K=C3=B6ry Maincent, Bootlin
-> Embedded Linux and kernel engineering
-> https://bootlin.com
+>-- 
+>2.44.0.rc1.240.g4c46232300-goog
 >
 >
 
