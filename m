@@ -1,84 +1,111 @@
-Return-Path: <netdev+bounces-75395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7CBD869BB1
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 17:11:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10DD5869BB4
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 17:12:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7ABBC288A7E
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:11:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9359C1F265B9
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:12:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4010146E8D;
-	Tue, 27 Feb 2024 16:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 958DF1474AB;
+	Tue, 27 Feb 2024 16:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SBmL7CsF"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SR+lYKpz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0FE21474B0
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 16:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A931F14533F;
+	Tue, 27 Feb 2024 16:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709050271; cv=none; b=b2EU42ijFBmuiTM3Ci1zYgZZ6pL5R5oM5FeYzNkSMkFJUtEPmQuE40S1A3h/s6CSq/Iu94dZ0WsXBfIZS50g921T1aeHHklOgDS7XW7ka2oBYvoR0cXmBwymkD40sWkUvKsXwd5ZuwiVo4WjX1mAQxM0FHafX8017/cFsPhV6jQ=
+	t=1709050333; cv=none; b=G5ZI9Pxc8hWkFpsdDHJZ5a3kZhvxWciZii+NbRYv5D/pg8QwYdjPW6jekys8NHHu58UqGnZK3jOe5Yg8SSgFnD7JhD6/efca8+uLeymbNEFy0aSspRuLJcRXcRkJ5jfGiXvbku30wgKB9jWiC4od+Zx1cAJdXMYEqu3Khs3fo94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709050271; c=relaxed/simple;
-	bh=+sjtZyKG1EQY3kd920/lzgpqx6JPWvMT6IFfse1fF2A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HZKSSVB5WTcGt49ZnsTZcDcQHcteWzwN3xhgl2QDEYq+z+xUQIApaq4BUPlr1vHRPoPXQDelx2lNbMCBu2g3dI+imXW17ksI3jaTtk/lUf3jdFmsqQImNVdOaT2nN/7UISRKq3tqrxdlKhbpXTbAkun33laetZdoa74Adff+lsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SBmL7CsF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33524C43394;
-	Tue, 27 Feb 2024 16:11:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709050270;
-	bh=+sjtZyKG1EQY3kd920/lzgpqx6JPWvMT6IFfse1fF2A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SBmL7CsFS12DBs7xrcNWp8N8IzjxxUZr7vLrSut4K/IbP47SnKWn3hJxqjz7pRkGq
-	 AYj6uQAJG3Lkq6H2G7MTp2yitBmyeXWS8jWOQyVgxHHrV7e4IRUDYXHg+3xrJ6H/WS
-	 nr2xdPn3HokPnkVEQqE2G2ALIjBwN1oECE8BNUcRvFZ8JQuJ/up5oIea662smxgyoI
-	 tYfY3iLvvF3IrajFwfsfrLf4IVjeU0kgrNNLx4g8Kl5YWusv7rdp+bMmyXRwsxUDL/
-	 fluNYfTDK/jIig206w77bfaoWOp0MiIV5+ORZXfm/cdEdqBoO4p3wS72gWpmvhcOrX
-	 F/3/159VotMuQ==
-Date: Tue, 27 Feb 2024 08:11:09 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jacob
- Keller <jacob.e.keller@intel.com>, Jiri Pirko <jiri@resnulli.us>, Stanislav
- Fomichev <sdf@google.com>, donald.hunter@redhat.com
-Subject: Re: [RFC net-next 1/4] doc/netlink: Add batch op definitions to
- netlink-raw schema
-Message-ID: <20240227081109.72536b94@kernel.org>
-In-Reply-To: <20240225174619.18990-2-donald.hunter@gmail.com>
-References: <20240225174619.18990-1-donald.hunter@gmail.com>
-	<20240225174619.18990-2-donald.hunter@gmail.com>
+	s=arc-20240116; t=1709050333; c=relaxed/simple;
+	bh=19neBC5EubG6CbCXy05obvW+BJGJ9FEAr9hCMDGwxUk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bl1QeAyam4eaQzQNNYuyu4CRcEwrm68mx8Fi9enN3SlBD41aBq1+/2Q9HiVegjX91GTMvdMRDu6GA8PuLaypv6Yb1e3I0Agvkpx05tViuMFoU6SnL+6ydcekkJA64ohcXP9oby6IcJrs/zyDBq9V/1MMYD+7sqbr3GqPy4ZhWEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SR+lYKpz; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=JOoRwSmiX4D2HjFfMhasejwRBKICagkGvcW1hfqPDeg=; b=SR+lYKpzMzfnHjFr6ZK8w1hN5I
+	lK42n7hCpMubD5Q3ThZUr9EZ2ENNz3bUYw7iZnPWP2b8rZTw3DRcjVLsOnYm3fbz24oX9R5ligiy+
+	5MzUFjRtEsU0mswqFrhXv2/eNphoJWszK14STiGGffTJg8BotbsfU7V+dCy6K3DUBv6U=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rf046-008rtK-Mh; Tue, 27 Feb 2024 17:12:22 +0100
+Date: Tue, 27 Feb 2024 17:12:22 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	netdev@vger.kernel.org, Clark Wang <xiaoning.wang@nxp.com>,
+	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>, Wei Fang <wei.fang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>, kernel@pengutronix.de,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net-next v6 5/8] net: phy: Immediately call adjust_link
+ if only tx_lpi_enabled changes
+Message-ID: <8d48af5b-e92b-431c-9bc0-ce6ef0e0ab2e@lunn.ch>
+References: <Zdh1nMWZDynP/AMc@shell.armlinux.org.uk>
+ <84e1368d-ec6a-48af-945b-509528c45dff@lunn.ch>
+ <Zdic+ua5LnWxjLPn@shell.armlinux.org.uk>
+ <6af3406a-7968-41e5-bf6e-71d020d8b28a@broadcom.com>
+ <Zdot-Mqw1z4ZEo8v@pengutronix.de>
+ <c6b0716d-f093-4aba-8453-c89a562ab581@lunn.ch>
+ <e679f467-d4cd-4a1e-9bfc-92e2c9bf35d4@broadcom.com>
+ <ZdzQG6t2slqEyH0m@shell.armlinux.org.uk>
+ <fe071598-64eb-4dd2-8926-d4d0954e7e7e@lunn.ch>
+ <Zd10qUJzq-2nG7b7@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zd10qUJzq-2nG7b7@pengutronix.de>
 
-On Sun, 25 Feb 2024 17:46:16 +0000 Donald Hunter wrote:
-> The nftables netlink families use batch operations for create update and
-> delete operations. Extend the netlink-raw schema so that operations can
-> be marked as batch ops. Add definitions of the begin-batch and end-batch
-> messages.
+On Tue, Feb 27, 2024 at 06:35:38AM +0100, Oleksij Rempel wrote:
+> On Mon, Feb 26, 2024 at 07:59:28PM +0100, Andrew Lunn wrote:
+> > On Mon, Feb 26, 2024 at 05:53:31PM +0000, Russell King (Oracle) wrote:
+> > > On Mon, Feb 26, 2024 at 09:50:02AM -0800, Florian Fainelli wrote:
+> > > > This is the source of the concern, we don't know which MAC drivers we might
+> > > > end-up breaking by calling adjust_link(link == 1) twice in a row, hopefully
+> > > > none, because they should be well written to only update the parameters that
+> > > > need updating, but who knows?
+> > > 
+> > > Just quickly... There are some (I went through a bunch.) They don't
+> > > support EEE. I haven't been through all though, so there could be
+> > > some which support EEE and where adjust_link() with phydev->link=true
+> > > twice in a row could result in badness.
+> > 
+> > So i think we all agree the MAC needs to see a down/up, even if the
+> > link itself never went down. Anything else is too risky and will
+> > probably break something somewhere.
 > 
-> The begin/end messages themselves are defined as ordinary ops, but there
-> are new attributes that describe the op name and parameters for the
-> begin/end messages.
-> 
-> The section of yaml spec that defines the begin/end ops looks like this;
-> the newtable op is marked 'is-batch: true' so the message needs to be
-> wrapped with 'batch-begin(res-id: 10)' and batch-end(res-id: 10) messages:
+> Means, this patch should be dropped.
 
-I'm not familiar with nftables nl. Can you explain what the batch ops
-are for and how they function?
+No.
 
-Begin / end makes it sound like some form of a transaction, is it?
+This patch handles the case that EEE is changed, but does not require
+an auto-neg cycle. If you drop this patch, that use case breaks.
+
+You need to extend this patch to signal to the MAC a down followed by
+an up. It is a fake down, the media side never goes down, but the MAC
+needs to think it has in order to keep with the usual convention that
+we never call adjust_link() twice with phydev->link not changing.
+
+   Andrew
 
