@@ -1,62 +1,64 @@
-Return-Path: <netdev+bounces-75317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02082869517
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 14:58:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B87F86976A
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 15:21:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D97A6B311E1
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 13:46:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F038DB2ACD4
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 14:19:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411FF13DBBC;
-	Tue, 27 Feb 2024 13:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0199013EFEC;
+	Tue, 27 Feb 2024 14:19:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="F+1tz0v1"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="raRPppU6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1807613DBBF;
-	Tue, 27 Feb 2024 13:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7EB78B61;
+	Tue, 27 Feb 2024 14:19:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709041515; cv=none; b=UCekCw6i7Q+LxSVET2JNz+wVZBQO5ORKVKP0EMRDKe1APw1G+UbeYflD2uOErFAjSE7gXjqCr0NPzSLa1HwdFJI84d/7CEosHirveCvIPQh0KXEHZ+5uobB4pVL0xxxIwupexQGx13vK6gphdQZFLkRz9sLJCFUn2x4bsuITj8s=
+	t=1709043552; cv=none; b=QEfzRLZnQmo9o/FRsFAG+3Vd32isYdAi17m7wgxVeDfEpi1xY36nVw0lD1qWl0lNv/4+7tx4HoJjFq4uG8ZWPAG3zzYdAaCX43oQn/DDUH4iPNFYEoyhXw9DzlA6SfuOMym6+ot0K6zHUMZ61CwyXvCC8if7BjKbf0lNeP5Opm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709041515; c=relaxed/simple;
-	bh=68HHk01czVH7Q2kVBI9fiOPP5ZlUlZljCnFVbhPNnkk=;
+	s=arc-20240116; t=1709043552; c=relaxed/simple;
+	bh=r5GZW9a+F29x34GFV7nDmKB2J6OxCkJT5pc3P9PpbdM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H8tMYT/sMonWrUkUVQ4wjMItfohdrYT4ZEn/R2p/JyR9VPzpA3mT1zSqut8EuXVoBzabgFaXKBFoVf0vIVsjjmwThhhfykRc2qHzFm67jR7Z3xbARqx0vajllM8ht/HYZn3YdPhQQlF6rXSu99hWxY7BoZ38fjumI6ryLQfkYgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=F+1tz0v1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 921A5C433C7;
-	Tue, 27 Feb 2024 13:45:14 +0000 (UTC)
+	 MIME-Version; b=bAEl5+zeYprBQhBY689dfcSSNbSs1iZN2BbZEv+nBCwct1yIsQTXQeS6oBOKFKVjF+jXIyDvZqzMI0aniKkbwyQRKGsR/yqH6aR1yZRZZQAdOh8gBeMNRN7OtaqfJV+HVsrQWPartSZGv3A5AKOp9ZwpzmLLdgO/Vg+I1hFXYTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=raRPppU6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EF12C43390;
+	Tue, 27 Feb 2024 14:19:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1709041514;
-	bh=68HHk01czVH7Q2kVBI9fiOPP5ZlUlZljCnFVbhPNnkk=;
+	s=korg; t=1709043552;
+	bh=r5GZW9a+F29x34GFV7nDmKB2J6OxCkJT5pc3P9PpbdM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=F+1tz0v1w2bF5Fo1sqnCbupRWrHw/afDEDc9jjNJeYWqJeF6kJUZQZp0+oTs2+fkE
-	 mK+d/sp2jTSKxDy/z12dXA/ssOg+MlzjiWlqihDK2E+qpsxBo2a4FOsc/5cljikdVE
-	 210ZWsujMMgrjqDLG2am/gFdUtAcX5tFQvPekGck=
+	b=raRPppU652BIfsAjL+SBuHDR9JI6ILgHISGyqwQUe8sHdfqvRdzoh6SR12T3R1JMo
+	 2EL9bx7wHXIQfnsW1/pWzr5gSXBV4ijcWCAt7xLaGzOFl/4PXXG/GvKS4af6kn+UZ7
+	 ScJovbmyewmrLyBzGCDAe01z7X9jcBi3xtXifGRM=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	kernel test robot <lkp@intel.com>,
+	Lennart Franzen <lennart@lfdomain.com>,
+	Alexandru Tachici <alexandru.tachici@analog.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Hugo SIMELIERE <hsimeliere.opensource@witekio.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH 4.19 04/52] stmmac: no need to check return value of debugfs_create functions
-Date: Tue, 27 Feb 2024 14:25:51 +0100
-Message-ID: <20240227131548.667291630@linuxfoundation.org>
+	Nuno Sa <nuno.sa@analog.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.1 149/195] net: ethernet: adi: requires PHYLIB support
+Date: Tue, 27 Feb 2024 14:26:50 +0100
+Message-ID: <20240227131615.340879732@linuxfoundation.org>
 X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240227131548.514622258@linuxfoundation.org>
-References: <20240227131548.514622258@linuxfoundation.org>
+In-Reply-To: <20240227131610.391465389@linuxfoundation.org>
+References: <20240227131610.391465389@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -68,144 +70,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-4.19-stable review patch.  If anyone has any objections, please let me know.
+6.1-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+From: Randy Dunlap <rdunlap@infradead.org>
 
-commit 8d72ab119f42f25abb393093472ae0ca275088b6 upstream.
+[ Upstream commit a9f80df4f51440303d063b55bb98720857693821 ]
 
-When calling debugfs functions, there is no need to ever check the
-return value.  The function can work or not, but the code logic should
-never do something different based on this.
+This driver uses functions that are supplied by the Kconfig symbol
+PHYLIB, so select it to ensure that they are built as needed.
 
-Because we don't care about the individual files, we can remove the
-stored dentry for the files, as they are not needed to be kept track of
-at all.
+When CONFIG_ADIN1110=y and CONFIG_PHYLIB=m, there are multiple build
+(linker) errors that are resolved by this Kconfig change:
 
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>
-Cc: Alexandre Torgue <alexandre.torgue@st.com>
-Cc: Jose Abreu <joabreu@synopsys.com>
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_net_open':
+   drivers/net/ethernet/adi/adin1110.c:933: undefined reference to `phy_start'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_probe_netdevs':
+   drivers/net/ethernet/adi/adin1110.c:1603: undefined reference to `get_phy_device'
+   ld: drivers/net/ethernet/adi/adin1110.c:1609: undefined reference to `phy_connect'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_disconnect_phy':
+   drivers/net/ethernet/adi/adin1110.c:1226: undefined reference to `phy_disconnect'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `devm_mdiobus_alloc':
+   include/linux/phy.h:455: undefined reference to `devm_mdiobus_alloc_size'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_register_mdiobus':
+   drivers/net/ethernet/adi/adin1110.c:529: undefined reference to `__devm_mdiobus_register'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_net_stop':
+   drivers/net/ethernet/adi/adin1110.c:958: undefined reference to `phy_stop'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_disconnect_phy':
+   drivers/net/ethernet/adi/adin1110.c:1226: undefined reference to `phy_disconnect'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_adjust_link':
+   drivers/net/ethernet/adi/adin1110.c:1077: undefined reference to `phy_print_status'
+   ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_ioctl':
+   drivers/net/ethernet/adi/adin1110.c:790: undefined reference to `phy_do_ioctl'
+   ld: drivers/net/ethernet/adi/adin1110.o:(.rodata+0xf60): undefined reference to `phy_ethtool_get_link_ksettings'
+   ld: drivers/net/ethernet/adi/adin1110.o:(.rodata+0xf68): undefined reference to `phy_ethtool_set_link_ksettings'
+
+Fixes: bc93e19d088b ("net: ethernet: adi: Add ADIN1110 support")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202402070626.eZsfVHG5-lkp@intel.com/
+Cc: Lennart Franzen <lennart@lfdomain.com>
+Cc: Alexandru Tachici <alexandru.tachici@analog.com>
 Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org
-Cc: linux-stm32@st-md-mailman.stormreply.com
+Reviewed-by: Nuno Sa <nuno.sa@analog.com>
 Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Hugo SIMELIERE <hsimeliere.opensource@witekio.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Stable-dep-of: 474a31e13a4e ("net: stmmac: fix notifier registration")
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac.h      |    2 
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c |   52 +++-------------------
- 2 files changed, 8 insertions(+), 46 deletions(-)
+ drivers/net/ethernet/adi/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -188,8 +188,6 @@ struct stmmac_priv {
+diff --git a/drivers/net/ethernet/adi/Kconfig b/drivers/net/ethernet/adi/Kconfig
+index da3bdd3025022..c91b4dcef4ec2 100644
+--- a/drivers/net/ethernet/adi/Kconfig
++++ b/drivers/net/ethernet/adi/Kconfig
+@@ -7,6 +7,7 @@ config NET_VENDOR_ADI
+ 	bool "Analog Devices devices"
+ 	default y
+ 	depends on SPI
++	select PHYLIB
+ 	help
+ 	  If you have a network (Ethernet) card belonging to this class, say Y.
  
- #ifdef CONFIG_DEBUG_FS
- 	struct dentry *dbgfs_dir;
--	struct dentry *dbgfs_rings_status;
--	struct dentry *dbgfs_dma_cap;
- #endif
- 
- 	unsigned long state;
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -115,7 +115,7 @@ static irqreturn_t stmmac_interrupt(int
- 
- #ifdef CONFIG_DEBUG_FS
- static const struct net_device_ops stmmac_netdev_ops;
--static int stmmac_init_fs(struct net_device *dev);
-+static void stmmac_init_fs(struct net_device *dev);
- static void stmmac_exit_fs(struct net_device *dev);
- #endif
- 
-@@ -4063,47 +4063,22 @@ static struct notifier_block stmmac_noti
- 	.notifier_call = stmmac_device_event,
- };
- 
--static int stmmac_init_fs(struct net_device *dev)
-+static void stmmac_init_fs(struct net_device *dev)
- {
- 	struct stmmac_priv *priv = netdev_priv(dev);
- 
- 	/* Create per netdev entries */
- 	priv->dbgfs_dir = debugfs_create_dir(dev->name, stmmac_fs_dir);
- 
--	if (!priv->dbgfs_dir || IS_ERR(priv->dbgfs_dir)) {
--		netdev_err(priv->dev, "ERROR failed to create debugfs directory\n");
--
--		return -ENOMEM;
--	}
--
- 	/* Entry to report DMA RX/TX rings */
--	priv->dbgfs_rings_status =
--		debugfs_create_file("descriptors_status", 0444,
--				    priv->dbgfs_dir, dev,
--				    &stmmac_rings_status_fops);
--
--	if (!priv->dbgfs_rings_status || IS_ERR(priv->dbgfs_rings_status)) {
--		netdev_err(priv->dev, "ERROR creating stmmac ring debugfs file\n");
--		debugfs_remove_recursive(priv->dbgfs_dir);
--
--		return -ENOMEM;
--	}
-+	debugfs_create_file("descriptors_status", 0444, priv->dbgfs_dir, dev,
-+			    &stmmac_rings_status_fops);
- 
- 	/* Entry to report the DMA HW features */
--	priv->dbgfs_dma_cap = debugfs_create_file("dma_cap", 0444,
--						  priv->dbgfs_dir,
--						  dev, &stmmac_dma_cap_fops);
--
--	if (!priv->dbgfs_dma_cap || IS_ERR(priv->dbgfs_dma_cap)) {
--		netdev_err(priv->dev, "ERROR creating stmmac MMC debugfs file\n");
--		debugfs_remove_recursive(priv->dbgfs_dir);
--
--		return -ENOMEM;
--	}
-+	debugfs_create_file("dma_cap", 0444, priv->dbgfs_dir, dev,
-+			    &stmmac_dma_cap_fops);
- 
- 	register_netdevice_notifier(&stmmac_notifier);
--
--	return 0;
- }
- 
- static void stmmac_exit_fs(struct net_device *dev)
-@@ -4442,10 +4417,7 @@ int stmmac_dvr_probe(struct device *devi
- 	}
- 
- #ifdef CONFIG_DEBUG_FS
--	ret = stmmac_init_fs(ndev);
--	if (ret < 0)
--		netdev_warn(priv->dev, "%s: failed debugFS registration\n",
--			    __func__);
-+	stmmac_init_fs(ndev);
- #endif
- 
- 	return ret;
-@@ -4705,16 +4677,8 @@ static int __init stmmac_init(void)
- {
- #ifdef CONFIG_DEBUG_FS
- 	/* Create debugfs main directory if it doesn't exist yet */
--	if (!stmmac_fs_dir) {
-+	if (!stmmac_fs_dir)
- 		stmmac_fs_dir = debugfs_create_dir(STMMAC_RESOURCE_NAME, NULL);
--
--		if (!stmmac_fs_dir || IS_ERR(stmmac_fs_dir)) {
--			pr_err("ERROR %s, debugfs create directory failed\n",
--			       STMMAC_RESOURCE_NAME);
--
--			return -ENOMEM;
--		}
--	}
- #endif
- 
- 	return 0;
+-- 
+2.43.0
+
 
 
 
