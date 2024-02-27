@@ -1,178 +1,113 @@
-Return-Path: <netdev+bounces-75282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1D20868F63
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 12:46:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 93E8B868F64
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 12:47:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 591811F28ABA
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 11:46:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EDA41F23EEC
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 11:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7DD13959B;
-	Tue, 27 Feb 2024 11:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 461AB13958A;
+	Tue, 27 Feb 2024 11:46:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BSCmAKqu"
+	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="DFSuvy0P"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mta-64-226.siemens.flowmailer.net (mta-64-226.siemens.flowmailer.net [185.136.64.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB53D139590
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 11:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242D41386DC
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 11:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709034358; cv=none; b=izYSqZ0SQxZzG/2kd8Y3Cfjssvd2YX5hALrSvtjMSeGEGgi0aSBzHzQZ/xvHZPZw8gW+e5u3UWjfzP45YfYnd+K2LH/BP23J9xLuMFm23qV4Nv0LKK+OZ4513JGXL/KNiLfq9ryHh3gYOjRN+qk/L6LrQvN3IG+MLSqEmUp6Zlk=
+	t=1709034419; cv=none; b=M6wLSWiGVBPCl7g52YBnv5KJDqqzymmuh/WvIx50ZcU/BKk7v4tC2ofcgh3JfnrdPNhOuXl/eOChSuzaLyb1B9Xcprq3ap84ez/W+V3Rx/jKBp17lzNpiTvNTJf55TY2MAibOBkXHI8O+HwxpcFg41811KVy0NdfKKvNyl4FyAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709034358; c=relaxed/simple;
-	bh=xFt7TcJ2O8tEOIXD6Jmcidfp7BHJpkg6WOVsVDSWACo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=YiRYxXwWrUyLmdXjlERRlaHcpVqHtlEYhZnhF/kTHkGFA7+0MApJpDUDG2El5ii0Lc4BgjHb7kNdxTGACcTmsK7P9bO8TYE97iDBhqOfR/wWV4ye3JFQQd5T9Dw1BBAYqh3GiU/QN4BOV6bW5i7kij6spdEvzaEV1r58a1ayxH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BSCmAKqu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709034355;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=yNeL6cMune++QSJiWmgjhpkk8+HIlgdUXjqshRiIhkw=;
-	b=BSCmAKquwFbM/Y+G20xzmMItuiyUov+GCMRgws21Qd3T9z7OnDg/qgL1IUfqdSU3zDFw3Y
-	exMbjJc4Xl1tmO9tQyWt7FZ/Pz6mw3uaRITVG6RoBI3VHyjV4RQR15WuTuRicF52dd3GFy
-	CImJ3sTxjBm3QIjv2W80zsqvu35vh6Q=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-277-eQX3gceeP0SL3BU49fWKWg-1; Tue, 27 Feb 2024 06:45:51 -0500
-X-MC-Unique: eQX3gceeP0SL3BU49fWKWg-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2d2a269ead9so262991fa.0
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 03:45:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709034349; x=1709639149;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yNeL6cMune++QSJiWmgjhpkk8+HIlgdUXjqshRiIhkw=;
-        b=S7qXtjFNR/WbzFf6hKpGqS/acpbk1mPThAKIjVnWyjmPp6+zgHy2t0CJQxqpfoKyXu
-         wmpK3t5G/rTTciZmPcllyAQiTU38hqNh3v5CwZe6ln30Odbc35Bx28ypqemT2c3STgRH
-         dCNuNGpRLD5AlRz41D3/rV2wk9CXMePwqxxgrUJr28utp9mbDu+kY5PJ9EQykJNhz+Kg
-         trjPwTMWTDI0QvWnFP1ggai4wahVJtXKB+SFSb/xN980KMgh2px9XvBVhyfk5k5LVS+K
-         vB80C9NMdSnMq0H5ZGrMsp9cjnAYVNzpCL+Ng8MicQdoXY66QFsbkF6XeYApMFiXd/HM
-         4Olw==
-X-Forwarded-Encrypted: i=1; AJvYcCVAVc/x+8fmT47vtcidamCdrwAIDs1L/5jFnVQ7V2VDIn2wi7KLFpH8EoME7kRv37HC6bjDzHGhHpWdyH4zc+PEqIJVm6f5
-X-Gm-Message-State: AOJu0YxcuPiqo5vy+hgB3BKCKzUgTstaUzll4C3RbA3IoiUvEUKx2fzv
-	y9HzmYG0I0j3L/EBvwWviAKUP12GMOtpnNZ5R3LXqvFJWw4h/89K5VMRmVuhX8+OScRFSSbrBOP
-	gyCBXMeaaxTWRgTFnCTBtwsNajqC3StgUUUVzn0ZUltpgWYeymF5SWg==
-X-Received: by 2002:a2e:9f42:0:b0:2d2:3178:6b5b with SMTP id v2-20020a2e9f42000000b002d231786b5bmr5960687ljk.3.1709034349643;
-        Tue, 27 Feb 2024 03:45:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEwRi2G2y071WE+2dwqaYTGStIysDm6JbR5gPBoWIed3UDGNULeEYzBfwRqbHARV6NDxfaNEA==
-X-Received: by 2002:a2e:9f42:0:b0:2d2:3178:6b5b with SMTP id v2-20020a2e9f42000000b002d231786b5bmr5960673ljk.3.1709034349286;
-        Tue, 27 Feb 2024 03:45:49 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-245-60.dyn.eolo.it. [146.241.245.60])
-        by smtp.gmail.com with ESMTPSA id a2-20020a2e8302000000b002d2934578e1sm312310ljh.19.2024.02.27.03.45.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Feb 2024 03:45:48 -0800 (PST)
-Message-ID: <414f4e710890fde702fd0aeb91990f92ede3bafc.camel@redhat.com>
-Subject: Re: [PATCH net-next resend 2/6] dt-bindings: net: brcm,asp-v2.0:
- Add asp-v2.2
-From: Paolo Abeni <pabeni@redhat.com>
-To: Justin Chen <justin.chen@broadcom.com>, Krzysztof Kozlowski
-	 <krzysztof.kozlowski@linaro.org>, netdev@vger.kernel.org
-Cc: bcm-kernel-feedback-list@broadcom.com, florian.fainelli@broadcom.com, 
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- robh+dt@kernel.org,  krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, opendmb@gmail.com,  andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, rafal@milecki.pl, 
- devicetree@vger.kernel.org
-Date: Tue, 27 Feb 2024 12:45:46 +0100
-In-Reply-To: <09c07d4b-6004-4897-adca-0d6211414d2a@broadcom.com>
-References: <20240223222434.590191-1-justin.chen@broadcom.com>
-	 <20240223222434.590191-3-justin.chen@broadcom.com>
-	 <b9164eae-69e2-44f3-8deb-e3a5180e459c@linaro.org>
-	 <b6c74bbe-89f0-4201-b968-57996f0e0223@broadcom.com>
-	 <c0e9eb68-f485-40a9-b025-82a73af06006@linaro.org>
-	 <09c07d4b-6004-4897-adca-0d6211414d2a@broadcom.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1709034419; c=relaxed/simple;
+	bh=RCWkA/LV3dYJPFejTHRXAkQ3Cnwynpsgw9QvvgSGaD8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lvlSRWGplArxCuDmblN4517Ae4kluWN7LG1nkIVXrXvuScbT+BQ5PNSyky8VTe8E/7DKsVO3U36bbttG/Rck4Xh0uL2PSn8dVwQFpglE1MVUv3pLDrEUhpQz9WIMJ5uzn40bFlFpKzR9u1DfVHPSpTXQZyXSJFfc11M8H0Zbmjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=DFSuvy0P; arc=none smtp.client-ip=185.136.64.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-64-226.siemens.flowmailer.net with ESMTPSA id 202402271146509bd4075fd87b5f17fd
+        for <netdev@vger.kernel.org>;
+        Tue, 27 Feb 2024 12:46:50 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=diogo.ivo@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
+ bh=O9MtN3amMckTj4yG25B4boLtlatA/jeZ6MoIj8UNgmM=;
+ b=DFSuvy0PeMOp5IfO+EgBY0uFGeJrupHUxfOc/+NN3b5mmjwoDEvIajHlSQdkWFaEyQdjZo
+ mmC6zb17Tpz8qWXc3zYiBU7XY2y8TMQ9/RFkmzEzkVGETfOIyvFNA3/W4RPkDiKbo2+EHSrW
+ 95NAkRoAdY1ejsNfNf2rAyenQWjFg=;
+Message-ID: <1a2c7175-e7f5-42b7-9a3e-dd727eed259a@siemens.com>
+Date: Tue, 27 Feb 2024 11:46:48 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH net-next v3 04/10] net: ti: icssg-prueth: Add
+ SR1.0-specific configuration bits
+Content-Language: en-US
+To: Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew@lunn.ch, linux-arm-kernel@lists.infradead.org,
+ netdev@vger.kernel.org
+Cc: jan.kiszka@siemens.com
+References: <20240221152421.112324-1-diogo.ivo@siemens.com>
+ <20240221152421.112324-5-diogo.ivo@siemens.com>
+ <5337e08b-a4dd-46d0-bc2e-a30b82aeeb15@kernel.org>
+From: Diogo Ivo <diogo.ivo@siemens.com>
+In-Reply-To: <5337e08b-a4dd-46d0-bc2e-a30b82aeeb15@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-1320519:519-21489:flowmailer
 
-On Mon, 2024-02-26 at 23:07 -0800, Justin Chen wrote:
-> On 2/26/2024 10:55 PM, Krzysztof Kozlowski wrote:
-> > On 26/02/2024 20:42, Justin Chen wrote:
-> > > On 2/24/24 2:22 AM, Krzysztof Kozlowski wrote:
-> > > > On 23/02/2024 23:24, Justin Chen wrote:
-> > > > > Add support for ASP 2.2.
-> > > > >=20
-> > > > > Signed-off-by: Justin Chen <justin.chen@broadcom.com>
-> > > > > ---
-> > > > >    Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml | 4 +=
-+++
-> > > > >    1 file changed, 4 insertions(+)
-> > > > >=20
-> > > > > diff --git a/Documentation/devicetree/bindings/net/brcm,asp-v2.0.=
-yaml b/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
-> > > > > index 75d8138298fb..5a345f03de17 100644
-> > > > > --- a/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
-> > > > > +++ b/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
-> > > > > @@ -15,6 +15,10 @@ description: Broadcom Ethernet controller firs=
-t introduced with 72165
-> > > > >    properties:
-> > > > >      compatible:
-> > > > >        oneOf:
-> > > > > +      - items:
-> > > > > +          - enum:
-> > > > > +              - brcm,bcm74165-asp
-> > > > > +          - const: brcm,asp-v2.2
-> > > > >          - items:
-> > > > >              - enum:
-> > > > >                  - brcm,bcm74165-asp
-> > > >=20
-> > > > Hm, this confuses me: why do you have same SoC with three different
-> > > > versions of the same block?
-> > > >=20
-> > >=20
-> > > bcm72165 -> asp-v2.0
-> > > bcm74165 -> asp-v2.1
-> > > Are two different SoCs.
-> >=20
-> > Ah, right, existing bindings has two SoCs.
-> >=20
-> > >=20
-> > > The entry I just added is
-> > > bcm74165 -> asp-v2.2
-> > > This is a SoC minor revision. Maybe it should bcm74165b0-asp instead?
-> > > Not sure what the protocol is.
-> >=20
-> > So still the confusion - same SoC with different IP blocks. That's
-> > totally opposite of what we expect: same version of IP block used in
-> > multiple SoCs.
->=20
-> Agreed. Unfortunately what we expect is not always what comes to fruition=
-...
->=20
-> Thinking about it again, I prefer bcm74165b0-asp. Otherwise it doesn't=
-=20
-> properly describe the hardware as we do not have one SoC with two=20
-> different IP blocks.
+On 2/26/24 17:23, Roger Quadros wrote:
+> Hi Diogo,
+> 
+> On 21/02/2024 17:24, Diogo Ivo wrote:
+>> Define the firmware configuration structure and commands needed to
+>> communicate with SR1.0 firmware, as well as SR1.0 buffer information
+>> where it differs from SR2.0.
+>>
+>> +/* SR1.0 defines */
+>> +#define PRUETH_MAX_RX_FLOWS_SR1		4	/* excluding default flow */
+>> +#define PRUETH_RX_FLOW_DATA_SR1		3       /* highest priority flow */
+>> +#define PRUETH_MAX_RX_MGM_DESC		8
+>> +#define PRUETH_MAX_RX_MGM_FLOWS		2	/* excluding default flow */
+>> +#define PRUETH_RX_MGM_FLOW_RESPONSE	0
+>> +#define PRUETH_RX_MGM_FLOW_TIMESTAMP	1
+> 
+> Should we add suffix _SR1 to all SR1 specific macro names?
+>> +#define ICSSG_SHUTDOWN_CMD		0x81010000
+>> +
+>> +/* SR1.0 pstate speed/duplex command to set speed and duplex settings
+>> + * in firmware.
+>> + * Command format: 0x8102ssPN, where
+>> + *	- ss: sequence number. Currently not used by driver.
+>> + *	- P: port number (for switch mode).
+>> + *	- N: Speed/Duplex state:
+>> + *		0x0 - 10Mbps/Half duplex;
+>> + *		0x8 - 10Mbps/Full duplex;
+>> + *		0x2 - 100Mbps/Half duplex;
+>> + *		0xa - 100Mbps/Full duplex;
+>> + *		0xc - 1Gbps/Full duplex;
+>> + *		NOTE: The above are the same value as bits [3..1](slice 0)
+>> + *		      or bits [7..5](slice 1) of RGMII CFG register.
+>> + */
+>> +#define ICSSG_PSTATE_SPEED_DUPLEX_CMD	0x81020000
+>> +
+> 
+> How about bunching all S1.0 related changes at one place in this file?
 
-I read the above as you intend to send a v2 with an update dt-binding.
-Please correct me if I'm wrong.
+Both suggestions sound good, I'll add the missing _SR1 suffixes and move
+things together down in the file for v4.
 
-Meanwhile dropping this revision from PW.
-
-Cheers,
-
-Paolo
-
+Best regards,
+Diogo
 
