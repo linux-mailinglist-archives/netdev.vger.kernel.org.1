@@ -1,140 +1,156 @@
-Return-Path: <netdev+bounces-75310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7665186917A
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 14:14:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E65D86918F
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 14:17:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BFBC28FD43
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 13:14:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED832B2B658
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 13:15:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6651613B28B;
-	Tue, 27 Feb 2024 13:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220AC13B293;
+	Tue, 27 Feb 2024 13:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ZIY3lcaY"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="f2BOj/wU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D6713B285
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 13:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93EC213AA47;
+	Tue, 27 Feb 2024 13:15:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709039670; cv=none; b=DLlX/4nzqXmaCHv6KND3IV4W9pa2Cu0wuQmheW0uNLt6dBoWoKrKKj8d/PEgrKVYV/J1k7bPp4UNimcbHi/uE0KjtzB7v4Jw8aYPzA/dl5Z4FILB59v/7czXsTPGP95hmeH0CG6tszuCNYCbkDX4jtywWT2F0ERI0Tb46iD9IH0=
+	t=1709039719; cv=none; b=cahpikHUVSx9ancYIW5eczor9e9giXd/Gln34E1uJmbEjU1wUYXtKobVMCZ91+8JtcCdXcWTANtdqlPrXGtsbjnnIZid/jIZVsc0oFxfjvXr7YtBy8/lY8ddtHqEVfsx4eRTXoAj1Aiv1gmfQ55ON18uWLpnnCdMvKf+nLKbx0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709039670; c=relaxed/simple;
-	bh=ptRFBXO9Jpg8128ah9oHQMEu8XEuCDUQRkxKmyhlxas=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bA6NEpLJfqfU1oBxKNbCYaI7aVv4OuVF1QJU3qSdZyPSzfqwSA+qXOaUBVCH9xrB63OeuNThubtkwTVxfbGepf+U4QCxvlH3D6BIuWe0IwkzWFhK2RF6bTtvGFMKHm536c7eSMLfMpS5L284I9ZNL1lw05WAijzmKV1FQXbtgFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ZIY3lcaY; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d22b8801b9so70041431fa.0
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 05:14:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709039666; x=1709644466; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HaqJXVS/o9ZLjDcC3LExNS8YspO5mJ2Ato/Q0hLHtpM=;
-        b=ZIY3lcaYC0ZL3aY957sQJ93bBTle60UX0xFcLWk/to1sm7ZH4GYLo7IjnmMeOKI2UW
-         d6CqLGwkewrrLK1CKNvlrDVOLd15pZITjcbER5tEBYtIZ2FEZQF4qOggFXsTFT4GRO81
-         zNMGamCigjFGCVfZ4Vq7sMDrrQDr2OYji3AzNfdYBCtvleixRVTfXua86nMhmuDwvJlW
-         pj/RXfK9/EZ1BgS/sn5nDUmvbFim2EsEkA00GRm9zrxkj22h67NF+8p2abkg7rEDbeIn
-         rHxt4CFot27FvztGJUPm0MLAxcIoQD4ySd1SW25yDeigXIhSVat7NPDsuzAnUPdU8YCE
-         6iZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709039666; x=1709644466;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HaqJXVS/o9ZLjDcC3LExNS8YspO5mJ2Ato/Q0hLHtpM=;
-        b=eawsOzr0eWx3av/n/ylf9rrpicrrTfvC4kGVGKlZjV+MUAt+LSK/grFgmrbFZgaU+J
-         2EMy5eiLwhiobkWA1hjn+NaSDwilhH26qwDQu+XUdFcWAWpHbmzzL+LM2Y9tGzeEZbj6
-         9XQ5lYJi60aqgvIkfNX5L+uHoK+9szNYjidnBBib6z/9R9rJdf3TSUaXAtsE1yK+2Ka8
-         kjfQKxJdkRRXvN+gGBepxEUks5wV78T0ODxkQM2iAHKjHPQb+OAGU1O1KY9a6+YWTP0T
-         8o/5QwzkdnkwLMTbTi9Y4cfQ3zfWdEpQl1yWF/c4gUvsU6kxgijE8ODKOX2/nrbipNsM
-         EQIg==
-X-Gm-Message-State: AOJu0YxqMYWed3CI+tlwI5x263759tje0RFNgbL0qKdyDFLOvYiiSSoh
-	cFsBA3ObJ+LyuJzogwGPc2rpsgoqo0Wh0dm3TKvcCrBPbM6xk2SDy+0ZHbozoow=
-X-Google-Smtp-Source: AGHT+IHpjC36J3Q+WJOGBOAur6xPab0p/dNZi1zN9BC2HwfKmlYBwHXsetNgRWncF7WsZpwUw5Ak4Q==
-X-Received: by 2002:a2e:9999:0:b0:2d2:65ff:3b78 with SMTP id w25-20020a2e9999000000b002d265ff3b78mr6030020lji.35.1709039666300;
-        Tue, 27 Feb 2024 05:14:26 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id v5-20020a05600c470500b00412b0ef22basm52304wmo.10.2024.02.27.05.14.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Feb 2024 05:14:25 -0800 (PST)
-Date: Tue, 27 Feb 2024 14:14:22 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next v3 0/6] virtio-net: support device stats
-Message-ID: <Zd3gLsIfhMlvm_0T@nanopsycho>
-References: <20240227080303.63894-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1709039719; c=relaxed/simple;
+	bh=FBp4MDnDC75gzPDqxDP5QxL3po+9KLgHyEoDNJ8jPX0=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=jHTQSExsQIPmLOYxRt/3bC/sjdMdHcmyI3y1Za+x6lkq2/DqomLfgUoHrSKzx3hNVWRGZfV7oowfjBr6ScAk6LyEvACUGmKMYLWBFnDz44ekozwosdjkODyGuIs5uAHBZ3SEd5ICq1jrLrFM8YN5KhOT49IY7LkPynBaBu0pIgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=f2BOj/wU; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1709039695; x=1709644495; i=markus.elfring@web.de;
+	bh=FBp4MDnDC75gzPDqxDP5QxL3po+9KLgHyEoDNJ8jPX0=;
+	h=X-UI-Sender-Class:Date:To:Cc:From:Subject;
+	b=f2BOj/wUphPDnXxiqUYksZagtn/Jd4Md3BUDukbzbBpXnewv7EXlSUwIOcDVWVHj
+	 o63Gvz8DdKEttH1lIaNayIfJuVsTzfPjhUMGmraJQP3pkGj5q81mfpHR8lqKhElK6
+	 OUh+RJ5jM+3Al/Vx7dnmvXkR3L2hEDlPtmoCmrviEvCYXdBDRdG4lmZbZe53dPZX+
+	 b/jRZSLs/6QpI3TALw1WCO3XpiaQpoBDTmf4/35YCUg52T43Nm/OLN9z0EcGALe9M
+	 ZbJsgc/4hce7WDjQ/VCCIaRnP7XHHixMOrRh/BHE8rfEgyyn2Spuvq3JtE6GvcVC+
+	 L4xg8PQT6pVfEBPy3Q==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.82.95]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MActo-1rlWsR2EKe-00B2xL; Tue, 27
+ Feb 2024 14:14:55 +0100
+Message-ID: <9b879c8d-4c28-4748-acf6-18dc69d8ebdf@web.de>
+Date: Tue, 27 Feb 2024 14:14:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240227080303.63894-1-xuanzhuo@linux.alibaba.com>
+User-Agent: Mozilla Thunderbird
+To: netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Madalin Bucur <madalin.bucur@nxp.com>,
+ Paolo Abeni <pabeni@redhat.com>, Sean Anderson <sean.anderson@seco.com>
+Content-Language: en-GB
+Cc: LKML <linux-kernel@vger.kernel.org>
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] net: fman: Use common error handling code in dtsec_init()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:uZyZ7wALjwGCm5kyUSIblzVfyzZ0lkUpsX745gNqt2IL/1JyiYR
+ xKuLS5MHaSaWBKS5JZzmnUt9nZRkdLJiSywPZmJfNLYBmnrhaCuhtYmFUoZoxXbGEUOVVVd
+ DT559PhNXUd6W0NwQFRSIkFLTQSM9tNxZlZAg0r6NoZzwBFjSlnO5QTdtUGkrzHcfIVEfI3
+ X2Xd6wpKL7tasXzjcVdlQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:MMHx4LFE7is=;DRqgI+61KeO1S7erGzNs44kiDPH
+ VSaTx1zQSD+TWBMa5N3SsnNGpa5Qc+y2x0ZpyHgVo7m0y8hGVom5ru3EWVbXBSYZy02geUb82
+ jpGIU+9p22o/I0LK6wvbnrk9xozleo9fLQEVJL+pYkIBkTRHPAE5XlCCtGni1hwdty1QQ+5sU
+ kvQX22u9K7s5exwL9rjExyG5F3tD/lL6+rGyOgW4usuN92L4Ss8aGjEhEKY/+B8uy7Zm7cT1d
+ UJl+sAOwn63nWxB+x1WNk/MLRgrQ8uArapuVbZu4dBhJe9tfNdHbJDyqFIkFQSO31cgTfsLUS
+ 7ib0etfM7SK+TesulpXykuqzEXexgXkVc3IjlPBom6h+RoiS/GaCLxaL+vLENRD97G+DuVea0
+ d54qKE79zpKM3BcQmSUxVL6CZ+jZGZi43pVJNZe1oUSwpuleK7fiHDTkn7pBuZav/x8BYq42x
+ ObHmBUyEj+v0Nk7cyqmvHRkDV4CHO6c1kq2ishjXOMcM19HGud+BrJVGCrHmNBmRbwsPbDYRp
+ B3nYWOyyrsZ7TGqoIc7IXe0d3u8KUTzk0HtW0N9Y5oNrXYfnjhV9clC5FWtvQsAJWfZ2O8vFC
+ fgsMxjJDudnUI3gyPhbwdRZ+duDbDCoXMlzWkIkoX0ixazNo1UP+hwNCHr/VhLeG9Oir342Fo
+ cATnqlDl25tXRPtKN/Z1tkNoE091WZKOZVxNWRNlFoCw+7Xhg9UTPDM4RgNJqy/uaw2moET1w
+ //asaFl7VGJjuSaqI2fOjYctRT0LXkk/il1+A0GqWc73/pjma0FO1bH1kY3YnPijgGaO4Vlr3
+ gZqTjxAlgGsyqNlEnK1sxN4Jp21vJKwiT9OWmXlWLPSrI=
 
-Tue, Feb 27, 2024 at 09:02:57AM CET, xuanzhuo@linux.alibaba.com wrote:
->As the spec:
->
->https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
->
->The virtio net supports to get device stats.
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Tue, 27 Feb 2024 14:05:25 +0100
 
-Okay, you state what hw supports. It would be nice to throw in a
-sentence or two about this patchset (as the cover letter should do)
-what it actually does. Some details would be also nice, like example
-commands and their outputs to show what is the actual benefit
-for the user.
+Adjust jump targets so that a bit of exception handling can be better
+reused at the end of this function implementation.
 
-pw-bot: cr
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ .../net/ethernet/freescale/fman/fman_dtsec.c  | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
+diff --git a/drivers/net/ethernet/freescale/fman/fman_dtsec.c b/drivers/ne=
+t/ethernet/freescale/fman/fman_dtsec.c
+index 3088da7adf0f..1de22400fd89 100644
+=2D-- a/drivers/net/ethernet/freescale/fman/fman_dtsec.c
++++ b/drivers/net/ethernet/freescale/fman/fman_dtsec.c
+@@ -1279,9 +1279,8 @@ static int dtsec_init(struct fman_mac *dtsec)
+ 		   dtsec->max_speed, dtsec->addr, dtsec->exceptions,
+ 		   dtsec->tbidev->addr);
+ 	if (err) {
+-		free_init_resources(dtsec);
+ 		pr_err("DTSEC version doesn't support this i/f mode\n");
+-		return err;
++		goto free_resources;
+ 	}
 
->
->Please review.
->
->Thanks.
->
->v3:
->    1. rebase net-next
->
->v2:
->    1. fix the usage of the leXX_to_cpu()
->    2. add comment to the structure virtnet_stats_map
->
->v1:
->    1. fix some definitions of the marco and the struct
->
->
->
->
->Xuan Zhuo (6):
->  virtio_net: introduce device stats feature and structures
->  virtio_net: virtnet_send_command supports command-specific-result
->  virtio_net: support device stats
->  virtio_net: stats map include driver stats
->  virtio_net: add the total stats field
->  virtio_net: rename stat tx_timeout to timeout
->
-> drivers/net/virtio_net.c        | 536 ++++++++++++++++++++++++++++----
-> include/uapi/linux/virtio_net.h | 137 ++++++++
-> 2 files changed, 613 insertions(+), 60 deletions(-)
->
->--
->2.32.0.3.g01195cf9f
->
->
+ 	/* Configure the TBI PHY Control Register */
+@@ -1296,23 +1295,21 @@ static int dtsec_init(struct fman_mac *dtsec)
+ 	err =3D fman_set_mac_max_frame(dtsec->fm, dtsec->mac_id, max_frm_ln);
+ 	if (err) {
+ 		pr_err("Setting max frame length failed\n");
+-		free_init_resources(dtsec);
+-		return -EINVAL;
++		err =3D -EINVAL;
++		goto free_resources;
+ 	}
+
+ 	dtsec->multicast_addr_hash =3D
+ 	alloc_hash_table(EXTENDED_HASH_TABLE_SIZE);
+ 	if (!dtsec->multicast_addr_hash) {
+-		free_init_resources(dtsec);
+ 		pr_err("MC hash table is failed\n");
+-		return -ENOMEM;
++		goto e_nomem;
+ 	}
+
+ 	dtsec->unicast_addr_hash =3D alloc_hash_table(DTSEC_HASH_TABLE_SIZE);
+ 	if (!dtsec->unicast_addr_hash) {
+-		free_init_resources(dtsec);
+ 		pr_err("UC hash table is failed\n");
+-		return -ENOMEM;
++		goto e_nomem;
+ 	}
+
+ 	/* register err intr handler for dtsec to FPM (err) */
+@@ -1326,6 +1323,12 @@ static int dtsec_init(struct fman_mac *dtsec)
+ 	dtsec->dtsec_drv_param =3D NULL;
+
+ 	return 0;
++
++e_nomem:
++	err =3D -ENOMEM;
++free_resources:
++	free_init_resources(dtsec);
++	return err;
+ }
+
+ static int dtsec_free(struct fman_mac *dtsec)
+=2D-
+2.43.2
+
 
