@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-75176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38A5F868788
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 04:10:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F0388687B1
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 04:20:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6010E1C21699
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 03:10:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CE8C1C21ABE
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 03:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4665E1BC27;
-	Tue, 27 Feb 2024 03:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FDBA1DA21;
+	Tue, 27 Feb 2024 03:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nwk7fJ5g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KO0zQFsU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2257C182BB
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 03:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62C91B28D
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 03:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709003429; cv=none; b=A6PCp4w8OI6YPCXWiN7hPNJ5R5i6sDtjTCEdN1utpZqcrPtondPTYAipl+cRCHZb98siErDQ0keRDp+NDDerUeZWr2Mn1ofhAz5ZoWJ7cAQscFJ7fkUefB6J0qI8dl5kt2DjV8QizIxexuGy9Hxuz3FnAAHopUHFBkIG1dvLsoM=
+	t=1709004030; cv=none; b=RlxXX+lu0kgE/L5tZ2++sUYJ9i9HhzoqZB74w4I6AnUf6Kmy3K/qblVpb7daeEtoLuhdmEUVD2X72T8weIc+dut1RqP0xpN78Qz1KQyVoE1uZkDq2l4G1ev94hySa9II5Y34bfckJ5KlQ3nQhiXXAp6yz3LTKa7fWRixbbuUGfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709003429; c=relaxed/simple;
-	bh=qdDTMTR7qCN+PieV3v2JY/BVYV8WlYCOL8HyrCRHJ1I=;
+	s=arc-20240116; t=1709004030; c=relaxed/simple;
+	bh=aRRmDl5mIEDIT+q90DMIJihUK07ODUjPpKpGtw5eXJ8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Oose1Isar1XMV6LjQA3mu61bTCNFI7GSMmINjOE3srrKeKJ4a1GpKRLNzHJ2Rb/EMABK+2R8AzQKdN1ReEmAqkqKyvkBITbyusiIxAsdSu0Lu4AHfvCHGMSDjGDBHdqYrqif2T07XgZlDYXbXD23pnHnIQBSTVvyH82oeNLwjhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nwk7fJ5g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C31A2C433F1;
-	Tue, 27 Feb 2024 03:10:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ABPhmvdAwulYTRfxkTWECCYK/zUnUkkmImiIcJfjF4rHEY+V42wsTb1ojMk3sfHIRuqUwGP9nsYPTaG1H1FVaIH3NdmIdTsQhrdlTViQciuQ1GgAah9Nz+evc0Lkk9jxHbB4b7azHZqf3xxaqMwBGKfdo2XIhGTuKDz5b8lxgUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KO0zQFsU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6FEB4C43399;
+	Tue, 27 Feb 2024 03:20:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709003428;
-	bh=qdDTMTR7qCN+PieV3v2JY/BVYV8WlYCOL8HyrCRHJ1I=;
+	s=k20201202; t=1709004030;
+	bh=aRRmDl5mIEDIT+q90DMIJihUK07ODUjPpKpGtw5eXJ8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nwk7fJ5gWlcTGFUjfBXSwi2cTFs2zKDW7p6cBw8bLRNyLsEgu3tzC+9d6dBAGr9Z+
-	 7gVv+pGfz3uqNm/A4pD92HYSYCKVpbqeMvdJ8YYNRLvJbzcsgg9g64P259Zq6qIeuu
-	 r5rqtaQ3kI5qbT36uLrgx0UdKeP8xHOvGgMPhPhD6hE95Diovs9olktMXjKx3iLJxC
-	 8vbsuFkkiI8mH5BD8xqRZx0HO+SPuhHo2sTSTd8wQM3FB++6gfn70OHIRpxe88HTk1
-	 yOnuDYlD2Py1LBIiClpiVEVqVClgnoBgLTlQlmOaZB2vN97vQwGfe0OOAHrvSIpD5R
-	 RrZKVglRfNwSA==
+	b=KO0zQFsUfN1PW1S7CQxZcosklbqzdtuw2SYco23IEjFK4HxM/WloNtcFnmqmx/qDW
+	 Ch9HJ35lYg1jaka44tTwbKNib1bEEyOYX+XMgXQvZqpbODAaPRld07pKybYd2nh9g9
+	 CgGI9kkZeCgO5Sd9V2hUzKlMFsvnrWVFw9eqwasDZB4qynqQOZNKns0WUnCi1SSDwH
+	 g6oA2miqCK8HmHtnXv0CNVOA/SkbL3j3QZymQThlqCmxaHC1cB4EC65KRgqsZTxf/M
+	 r7gBxNuEC7jdsyH2XaaMtvmrbPw/eJ5dq78TIm/3Z3AIzKgOTNPbhoATsllWpQ8cK5
+	 HwMYTHMnLibmw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AC058D88FB2;
-	Tue, 27 Feb 2024 03:10:28 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4F089C39562;
+	Tue, 27 Feb 2024 03:20:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] dpll: rely on rcu for netdev_dpll_pin()
+Subject: Re: [PATCH net-next] ipv6: anycast: complete RCU handling of struct
+ ifacaddr6
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170900342870.19917.4713964463786092641.git-patchwork-notify@kernel.org>
-Date: Tue, 27 Feb 2024 03:10:28 +0000
-References: <20240223123208.3543319-1-edumazet@google.com>
-In-Reply-To: <20240223123208.3543319-1-edumazet@google.com>
+ <170900403032.25082.2080537927072119269.git-patchwork-notify@kernel.org>
+Date: Tue, 27 Feb 2024 03:20:30 +0000
+References: <20240223201054.220534-1-edumazet@google.com>
+In-Reply-To: <20240223201054.220534-1-edumazet@google.com>
 To: Eric Dumazet <edumazet@google.com>
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, jiri@nvidia.com,
- arkadiusz.kubalewski@intel.com, vadim.fedorenko@linux.dev
+ dsahern@kernel.org, netdev@vger.kernel.org, eric.dumazet@gmail.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 23 Feb 2024 12:32:08 +0000 you wrote:
-> This fixes a possible UAF in if_nlmsg_size(),
-> which can run without RTNL.
+On Fri, 23 Feb 2024 20:10:54 +0000 you wrote:
+> struct ifacaddr6 are already freed after RCU grace period.
 > 
-> Add rcu protection to "struct dpll_pin"
+> Add __rcu qualifier to aca_next pointer, and idev->ac_list
 > 
-> Move netdev_dpll_pin() from netdevice.h to dpll.h to
-> decrease name pollution.
+> Add relevant rcu_assign_pointer() and dereference accessors.
+> 
+> ipv6_chk_acast_dev() no longer needs to acquire idev->lock.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net] dpll: rely on rcu for netdev_dpll_pin()
-    https://git.kernel.org/netdev/net/c/0d60d8df6f49
+  - [net-next] ipv6: anycast: complete RCU handling of struct ifacaddr6
+    https://git.kernel.org/netdev/net-next/c/c3718936ec47
 
 You are awesome, thank you!
 -- 
