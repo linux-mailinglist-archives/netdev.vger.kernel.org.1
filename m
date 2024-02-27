@@ -1,78 +1,81 @@
-Return-Path: <netdev+bounces-75353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00F7F8699BE
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:03:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 071688699BF
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:03:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B052229377B
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 15:03:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6E90293CDC
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 15:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCDBE5645E;
-	Tue, 27 Feb 2024 15:02:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A864146E7C;
+	Tue, 27 Feb 2024 15:02:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RHL/1AWY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QblMSDTb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D1B146E83
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 15:02:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 959D51420D2
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 15:02:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709046126; cv=none; b=e9vyD8owft4thU7+RDSqeo4X0LvGvVrgUEe3/Vc2TDZk3Oz9hwaUQ6Daijg+8uT2ok9ySFXbzL+UvUCoyV8nUomuYWmUdP3DfXd8MJmp25Mq17A99KMXqt/hZXeV6vrWLsHTenTUDc/lcb9XQ+ooAcCgSXcAX30AozK5ZhBePZ0=
+	t=1709046127; cv=none; b=riSoy/dGtCymLzv8gKenaJ/67xl79RlVRD3goCQkzwNtM4jFVYBQi29XIUreXsHTk+V9Xq0bxuvCm12tgy6gKbdSLJ7FwxpDI1Tum/GRtpWB3Oi3D+UUetq6rhL/ZWTuEUofYV26KKUOuZg3/sfPUrT8in/NJzEi9duqc01KObw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709046126; c=relaxed/simple;
-	bh=j5b5/zmpDLBNMysBzUhloM12e0DULjwOojYdVX2+KjY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IIV5jlC4ovhkUj0g74uVQ3IOEWjIciupED5Eek46ScsVHXLKO9ESSth7wS8dS4fZH0iRV3ZmAXMcJ7UTch9mDuTROfk0FX8jPaXkbyQ0PnObbIYbBSvZEidVF1j/ZvRmfYLzjlRHhUQ/ltQUxNyDH/4p4CWErpOg+iOCyUEd2+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RHL/1AWY; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1709046127; c=relaxed/simple;
+	bh=i8XZnKq7CEvtdxno2TiJNwE4AVDucR6+uLav2Z0NyLE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=MCNPEtFEVG2RgjNVICkc4p9SzSAYRZ9xoIaEFMmA0zHLmXK5JLqUfqAiMD/slkTTEf9zHl9VcVyD1bv+xvL0/E3m1ZS4LXnylGAfJ/4L1Y859xZgBIBIaagtWe0BBry9XhKXFroKCyNYc9swYLFB5e9mwLZJnterKozVHzIOV2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QblMSDTb; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dced704f17cso6898218276.1
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 07:02:03 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc64e0fc7c8so6375132276.2
+        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 07:02:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709046123; x=1709650923; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8ciVIxwtouCFGP+dO/6eeBnZfkql8cXZDKhKP4Ieato=;
-        b=RHL/1AWYPWfNNTJwzDjduDVD8jZXeP/RNBNz0aMWUfffMQW0IKRalq/OTH9u3xrCsT
-         041X5dsah9weTm21J3V9G1d6HpYXLJuAggkp9dFJUs6d6xEDPmFqYKMcua8iMyeXvnGI
-         baBnMeeI7q444OK3aZR38SraAF/iTUO8ATuQ9uFerh0LhUo+bKghgjIoqGArbEX9rRg3
-         meh4SvwbuCfy2sexhm3RRXHkhEnj9+0VM10vd0tcDHtBrX/y/4s2OWZCUz4RMwKQXtja
-         TqVVUX1aPF+feattMmp+b7577qgeWXCoAZOcA7juXS89lQawpUGj9RtzMaziK3+VDy1a
-         HJbg==
+        d=google.com; s=20230601; t=1709046124; x=1709650924; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SdBZXBk2gv6UW277qt+gkbQY2W35kI58cJkB4PnWA1I=;
+        b=QblMSDTbDZ+DaeJQZhj0MsFqNnyZew0yoSaTeR8HoHRfle2rLJftMcghSaS79ovQZc
+         pwW54tTW9Cdk5IaPnOYel1JncNUxXmDAPS1GBB/cDSpHNYgfiC4wFrYZTj40KaZdkHAz
+         IeoJ3DE2VNcfIfAiPwvo5zr7+jcSIRnfh49oKCt2j/HQWYIrkXpF6OHi3vn1RPeKM7It
+         KqRpNE7vQT2akxOcZy3IeWeqSbA3/ucoJ1/pIhtprWNE9l1uhZayKqijhVcll+9QTK6u
+         5EPFn9MQ1lBXnvDVatM9z46wi+HJTQ76AJXw+A8pdbpJdzRCQKvioJrB7XjZtv6OlmPW
+         Kvlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709046123; x=1709650923;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8ciVIxwtouCFGP+dO/6eeBnZfkql8cXZDKhKP4Ieato=;
-        b=Sq7CvemwEi7pZtNzqrqsZQ70OZzRTXP7dSW1Ujtk7q6Z2Aji2NmASPAda01XuVjx4V
-         J7seAxKyCq3yRE9Sk0iMrIsddIGnQQ3YW/te/MylDSVaFK+WOa+5mNSyJuulqo3wvq99
-         N1gkE1gdT0/q2GOTOYCMCTyOtlMlqFrwKrGlwmgOif1VEnlIVmNJHy1xz4/rpyNXFNDK
-         hViyMBgMr4cUOedRTEJ4WsjOJNK08w/3W55vtiGunRjJpJ0u/bAbKTitUU1oPXUiAtdx
-         WtG4DcTl7YyAWyAGhty9k0Xjx3JZaHLnIIEV6O8R00qL8mPjyEH2u7edQX8BkNfl9Lm/
-         MINw==
-X-Forwarded-Encrypted: i=1; AJvYcCU4GVlm4bwKmzp8mjR3NeQW4k6YDszK/zCF4OzvL5C0flGJIb3oKqV+K2R1LGINfO2mdyMREepJgbtAw2ngIiWm2kUaz9dN
-X-Gm-Message-State: AOJu0Ywo14+dYrbFyTNJGoQ42mU17v+xwZhjuOydfktarGypNSnaqQhK
-	pRx3TnWDsYE3ZfOKX5r0CBUxJIcXDO5TxInu4sythx6teBB3SFHHWcT0ORunRf/XIHtCvAEvUZ7
-	fPDbRy0z8Bw==
-X-Google-Smtp-Source: AGHT+IErqUDwXoQrXXB56HFyzArjXPw5WU1O7JQshHjwx8s/R9rHQ4n75WPCtiU6Guu9erWpA4bpPCN+C1D8Lg==
+        d=1e100.net; s=20230601; t=1709046124; x=1709650924;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SdBZXBk2gv6UW277qt+gkbQY2W35kI58cJkB4PnWA1I=;
+        b=ZfcKiSHsYinlbpJBycJLMvj6SBmi+5cLJHV9xV/mrstdqKAX7u6LaVif9MVMyAzU69
+         ojd5uWTfFt2tXsXM0NdhjDjIyNUZo0F2xeI57jvyRg6967aTA34GekHflbi6mLtjEZUa
+         Oz+jEpEmI34tqz2jrrL8YC9up/+1lflISLnW5Gh8kCMUe5YhSrSPYQzQk38cgwpr7HIM
+         Y2NoOJ7mzx9FFtWBkemFlsXzvp+fneN74uL/kQihe7ufU1p1W9KMdYrXfK2iD0wInbsn
+         6D/MDTjf7aA3QRq+Qk38r4zWXsqIqx/wwyRY0C8WOS7vhUTvMuYVktPQ4HGZsfLNrBEk
+         ARYw==
+X-Forwarded-Encrypted: i=1; AJvYcCWHo4ha3sXchUUkWQ4XsWeMdMlT4iKgK6gfCU1AmfnczBYzUXhcH4b0WfldG8DUhGWMicDCe28I2JCeDHLeAJ7eokruXqeq
+X-Gm-Message-State: AOJu0YzKJAKQHZ7RLykbWyKo8Iv8djEzvDx3y7xNsuWZ7IhtdX5quXC9
+	BuMmn7kW8omKFgz67nEl0A6cjLadmCbtVRaSUoNsCNshY0oxq/n3VDXolux4eYPEGxM+SujGu+T
+	RWkN5Vc8eog==
+X-Google-Smtp-Source: AGHT+IEDgBKXAH32+I1he6Ws5gTYeT7c02Ohd4UH1DMbc6JI+mGLek5Iyn5+uHi0IQPS6cr6qiwKP7koXSpGKA==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1005:b0:dc2:5273:53f9 with SMTP
- id w5-20020a056902100500b00dc2527353f9mr126583ybt.1.1709046122936; Tue, 27
- Feb 2024 07:02:02 -0800 (PST)
-Date: Tue, 27 Feb 2024 15:01:45 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:72a:b0:dc6:dfd9:d423 with SMTP
+ id l10-20020a056902072a00b00dc6dfd9d423mr96259ybt.3.1709046124549; Tue, 27
+ Feb 2024 07:02:04 -0800 (PST)
+Date: Tue, 27 Feb 2024 15:01:46 +0000
+In-Reply-To: <20240227150200.2814664-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240227150200.2814664-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
-Message-ID: <20240227150200.2814664-1-edumazet@google.com>
-Subject: [PATCH v2 net-next 00/15] ipv6: lockless accesses to devconf
+Message-ID: <20240227150200.2814664-2-edumazet@google.com>
+Subject: [PATCH v2 net-next 01/15] ipv6: add ipv6_devconf_read_txrx cacheline_group
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -80,55 +83,76 @@ Cc: David Ahern <dsahern@kernel.org>, Jiri Pirko <jiri@nvidia.com>, netdev@vger.
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-- First patch puts in a cacheline_group the fields used in fast paths.
+IPv6 TX and RX fast path use the following fields:
 
-- Annotate all data races around idev->cnf fields.
+- disable_ipv6
+- hop_limit
+- mtu6
+- forwarding
+- disable_policy
+- proxy_ndp
 
-- Last patch in this series removes RTNL use for RTM_GETNETCONF dumps.
+Place them in a group to increase data locality.
 
-v2: addressed Jiri Pirko feedback
- - Added "ipv6: addrconf_disable_ipv6() optimizations"
-   and "ipv6: addrconf_disable_policy() optimization"
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/linux/ipv6.h | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-Eric Dumazet (15):
-  ipv6: add ipv6_devconf_read_txrx cacheline_group
-  ipv6: annotate data-races around cnf.disable_ipv6
-  ipv6: addrconf_disable_ipv6() optimizations
-  ipv6: annotate data-races around cnf.mtu6
-  ipv6: annotate data-races around cnf.hop_limit
-  ipv6: annotate data-races around cnf.forwarding
-  ipv6: annotate data-races in ndisc_router_discovery()
-  ipv6: annotate data-races around idev->cnf.ignore_routes_with_linkdown
-  ipv6: annotate data-races in rt6_probe()
-  ipv6: annotate data-races around devconf->proxy_ndp
-  ipv6: annotate data-races around devconf->disable_policy
-  ipv6: addrconf_disable_policy() optimization
-  ipv6/addrconf: annotate data-races around devconf fields (I)
-  ipv6/addrconf: annotate data-races around devconf fields (II)
-  ipv6: use xa_array iterator to implement inet6_netconf_dump_devconf()
-
- .../ethernet/netronome/nfp/flower/action.c    |   2 +-
- drivers/net/usb/cdc_mbim.c                    |   2 +-
- include/linux/ipv6.h                          |  13 +-
- include/net/addrconf.h                        |   2 +-
- include/net/ip6_route.h                       |   2 +-
- include/net/ipv6.h                            |   8 +-
- net/core/filter.c                             |   2 +-
- net/ipv6/addrconf.c                           | 283 +++++++++---------
- net/ipv6/exthdrs.c                            |  16 +-
- net/ipv6/ioam6.c                              |   8 +-
- net/ipv6/ip6_input.c                          |   6 +-
- net/ipv6/ip6_output.c                         |  10 +-
- net/ipv6/ipv6_sockglue.c                      |   2 +-
- net/ipv6/mcast.c                              |  14 +-
- net/ipv6/ndisc.c                              |  69 +++--
- net/ipv6/netfilter/nf_reject_ipv6.c           |   4 +-
- net/ipv6/output_core.c                        |   4 +-
- net/ipv6/route.c                              |  20 +-
- net/ipv6/seg6_hmac.c                          |   8 +-
- net/netfilter/nf_synproxy_core.c              |   2 +-
- 20 files changed, 246 insertions(+), 231 deletions(-)
-
+diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
+index ef3aa060a289ea4eecf4d6e8c1dc614101f37c3f..383a0ea2ab9131e685822e5df506582802642e84 100644
+--- a/include/linux/ipv6.h
++++ b/include/linux/ipv6.h
+@@ -3,6 +3,7 @@
+ #define _IPV6_H
+ 
+ #include <uapi/linux/ipv6.h>
++#include <linux/cache.h>
+ 
+ #define ipv6_optlen(p)  (((p)->hdrlen+1) << 3)
+ #define ipv6_authlen(p) (((p)->hdrlen+2) << 2)
+@@ -10,9 +11,16 @@
+  * This structure contains configuration options per IPv6 link.
+  */
+ struct ipv6_devconf {
+-	__s32		forwarding;
++	/* RX & TX fastpath fields. */
++	__cacheline_group_begin(ipv6_devconf_read_txrx);
++	__s32		disable_ipv6;
+ 	__s32		hop_limit;
+ 	__s32		mtu6;
++	__s32		forwarding;
++	__s32		disable_policy;
++	__s32		proxy_ndp;
++	__cacheline_group_end(ipv6_devconf_read_txrx);
++
+ 	__s32		accept_ra;
+ 	__s32		accept_redirects;
+ 	__s32		autoconf;
+@@ -45,7 +53,6 @@ struct ipv6_devconf {
+ 	__s32		accept_ra_rt_info_max_plen;
+ #endif
+ #endif
+-	__s32		proxy_ndp;
+ 	__s32		accept_source_route;
+ 	__s32		accept_ra_from_local;
+ #ifdef CONFIG_IPV6_OPTIMISTIC_DAD
+@@ -55,7 +62,6 @@ struct ipv6_devconf {
+ #ifdef CONFIG_IPV6_MROUTE
+ 	atomic_t	mc_forwarding;
+ #endif
+-	__s32		disable_ipv6;
+ 	__s32		drop_unicast_in_l2_multicast;
+ 	__s32		accept_dad;
+ 	__s32		force_tllao;
+@@ -76,7 +82,6 @@ struct ipv6_devconf {
+ #endif
+ 	__u32		enhanced_dad;
+ 	__u32		addr_gen_mode;
+-	__s32		disable_policy;
+ 	__s32           ndisc_tclass;
+ 	__s32		rpl_seg_enabled;
+ 	__u32		ioam6_id;
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
