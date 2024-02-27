@@ -1,209 +1,101 @@
-Return-Path: <netdev+bounces-75175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E5DB868772
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 03:58:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A35FE86876E
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 03:55:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8137B21003
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 02:58:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43AA11F250DB
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 02:55:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9936C17727;
-	Tue, 27 Feb 2024 02:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEEB5168C6;
+	Tue, 27 Feb 2024 02:54:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M8AHpO8z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [58.251.27.85])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82373610D;
-	Tue, 27 Feb 2024 02:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=58.251.27.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF8C746E;
+	Tue, 27 Feb 2024 02:54:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709002694; cv=none; b=XNIJE4rGMdAzCe4cbsGIot1HsuDNZvtaNaKa1VQMgapl+Yc6yxP7duSz9nPfeqXzePRMr9yCzOSJTw6zCG+pT16M3BYcPSH7B83CTdlytbvxKfseMXVu26AEtstCqwopjDh2cAGn7UEgqFrWXQLU/LoXE/aVO5jMLHv8j9+3/bg=
+	t=1709002497; cv=none; b=PtvbZ+0E04vlwB3XIu0fNJKhWyZeqv2z/SLGbUp6JlOlTN88XDy2qKGBr7SFnc+4+j6kiEu6Nc0sSS8tyXZhNTmEaN+4bMHITNGnNY7H6HTlWmT/O63AFlYF2heXsI1seNSmz1Dk93Y854EOek1P57xyzhfL0ZNnOaXa3C1A8/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709002694; c=relaxed/simple;
-	bh=AaZ7qsvOSZA9cbUPNq84VziHt8N0O2Mp93ysaLF45VM=;
-	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=D2Tq0I5JA7WDgiJmLj3Km47ywXHcyCTNHRoaIlsC4iQVWzRFQ4xPZAbjkelhRwiUrfUMhgDnw6Bo7Gex8NzeCERhTf0WGeh4Oo6bSUORRQyet9wTTECGXUsMuHbeYM0CUU67jv87snIjqaZKhXOJXDr2ZGC7ZZBpX31AH1d95QQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=58.251.27.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mxde.zte.com.cn (unknown [10.35.20.121])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mxct.zte.com.cn (FangMail) with ESMTPS id 4TkMSC0LSwzCh15;
-	Tue, 27 Feb 2024 10:51:07 +0800 (CST)
-Received: from mxhk.zte.com.cn (unknown [192.168.250.137])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mxde.zte.com.cn (FangMail) with ESMTPS id 4TkMS20jVpzCHrX8;
-	Tue, 27 Feb 2024 10:50:58 +0800 (CST)
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4TkMRp0Q4Sz8XrRN;
-	Tue, 27 Feb 2024 10:50:46 +0800 (CST)
-Received: from xaxapp01.zte.com.cn ([10.88.99.176])
-	by mse-fl1.zte.com.cn with SMTP id 41R2oZRh081486;
-	Tue, 27 Feb 2024 10:50:35 +0800 (+08)
-	(envelope-from xu.xin16@zte.com.cn)
-Received: from mapi (xaxapp03[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Tue, 27 Feb 2024 10:50:36 +0800 (CST)
-Date: Tue, 27 Feb 2024 10:50:36 +0800 (CST)
-X-Zmail-TransId: 2afb65dd4dfc2c8-53c3e
-X-Mailer: Zmail v1.0
-Message-ID: <202402271050366715988@zte.com.cn>
+	s=arc-20240116; t=1709002497; c=relaxed/simple;
+	bh=FPwMebFM2o6jQzfsdgj1qAPJb2Wqu8P+xP0DHOAs0A0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DDH/oPMGUniSLLc+VNHmqL3y7MoBjymNnGp1xshl2/dfXnoED0TLOBfX9DcFyztBNQZVW1Mm8r+s6dlLl7TnQ9XgdUzlmv0TsrSLjNPY8oVfKgLFV8ncc8a8H2QGMaXrgrZi7YMbgB655Uq5uj3vXD5dxmVbs9D7ldEsDVx+6Oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M8AHpO8z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DD43C433F1;
+	Tue, 27 Feb 2024 02:54:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709002497;
+	bh=FPwMebFM2o6jQzfsdgj1qAPJb2Wqu8P+xP0DHOAs0A0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=M8AHpO8zyDCBdZpyTgvTsDj045t4JZBKRZX0ilBP18SqZa7tZBbUyhNkdytAM6P9B
+	 1d15L8LeUMafIaw3VRQtONp6sNG7DDzwWECANnv2r7fuABJ2/7ozUdDXVHXIHBX+hQ
+	 Hl2Zdi+8/7ywp6G4htZDbzcYY/3PHwsD+rZXXoK1KvNvprNVGv+KkkGfV5kKxsBq7d
+	 bpHpWOrOo2ad5bB09mee1nsWtfKuVZGOgaUknOFMXSI1NRL/OSYFU7wqDrEKYmlzTj
+	 nnKlfScJ9p8OgQw/+KWRFSMrINMEvHa6XiaECxmoR0bwGF9gF/FDzmDIa9uqViWMZG
+	 292ABBoLwMbDA==
+Date: Mon, 26 Feb 2024 18:54:55 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, Andrew Lunn
+ <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Claudiu Manoil
+ <claudiu.manoil@nxp.com>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, UNGLinuxDriver@microchip.com, Russell King
+ <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 12/16] net: dsa: vsc73xx: introduce tag
+ 8021q for vsc73xx
+Message-ID: <20240226185455.107f07a7@kernel.org>
+In-Reply-To: <20240223210049.3197486-13-paweldembicki@gmail.com>
+References: <20240223210049.3197486-1-paweldembicki@gmail.com>
+	<20240223210049.3197486-13-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <xu.xin16@zte.com.cn>
-To: <davem@davemloft.net>
-Cc: <rostedt@goodmis.org>, <mhiramat@kernel.org>, <dsahern@kernel.org>,
-        <edumazet@google.com>, <kuba@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <yang.yang29@zte.com.cn>,
-        <xu.xin16@zte.com.cn>, <he.peilin@zte.com.cn>, <liu.chun2@zte.com.cn>,
-        <jiang.xuexin@zte.com.cn>, <zhang.yunkai@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIXSBuZXQvaXB2NDogYWRkIHRyYWNlcG9pbnQgZm9yIGljbXBfc2VuZA==?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl1.zte.com.cn 41R2oZRh081486
-X-Fangmail-Gw-Spam-Type: 0
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 65DD4E19.000/4TkMSC0LSwzCh15
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: xu xin <xu.xin16@zte.com.cn>
+On Fri, 23 Feb 2024 22:00:42 +0100 Pawel Dembicki wrote:
+> This commit introduces a new tagger based on 802.1q tagging.
+> It's designed for the vsc73xx driver. The VSC73xx family doesn't have
+> any tag support for the RGMII port, but it could be based on VLANs.
+> 
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> ---
+> v5:
+>   - removed skb_vlan_tag_present(skb) checking
+>   - use 80 characters per line limit
+> v4:
+>   - rebase to net-next/main
+> v3:
+>   - Introduce a patch after the tagging patch split
+> 
+>  include/net/dsa.h           |  2 ++
+>  net/dsa/Kconfig             |  6 ++++
+>  net/dsa/Makefile            |  1 +
+>  net/dsa/tag_vsc73xx_8021q.c | 66 +++++++++++++++++++++++++++++++++++++
+>  4 files changed, 75 insertions(+)
+>  create mode 100644 net/dsa/tag_vsc73xx_8021q.c
 
-Introduce a tracepoint for icmp_send, which can help users to get more
-detail information conveniently when icmp abnormal events happen.
+> +MODULE_LICENSE("GPL");
+> +MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_VSC73XX_8021Q, VSC73XX_8021Q_NAME);
+> +
+> +module_dsa_tag_driver(vsc73xx_8021q_netdev_ops);
 
-1. Giving an usecase example:
-=============================
-When an application experiences packet loss due to an unreachable UDP
-destination port, the kernel will send an exception message through the
-icmp_send function. By adding a trace point for icmp_send, developers or
-system administrators can obtain the detailed information easily about the
-UDP packet loss, including the type, code, source address, destination
-address, source port, and destination port. This facilitates the
-trouble-shooting of packet loss issues especially for those complicated
-network-service applications.
+W=1 build generates:
 
-2. Operation Instructions:
-==========================
-Switch to the tracing directory.
-	cd /sys/kernel/debug/tracing
-Filter for destination port unreachable.
-	echo "type==3 && code==3" > events/icmp/icmp_send/filter
-Enable trace event.
-	echo 1 > events/icmp/icmp_send/enable
-
-3. Result View:
-================
- udp_client_erro-11370   [002] ...s.12   124.728002:  icmp_send:
-icmp_send: type=3, code=3.From 127.0.0.1:41895 to 127.0.0.1:6666 ulen=23
-skbaddr=00000000589b167a
-
-Signed-off-by: He Peilin <he.peilin@zte.com.cn>
-Reviewed-by: xu xin <xu.xin16@zte.com.cn>
-Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
-Cc: Yang Yang <yang.yang29@zte.com.cn>
-Cc: Liu Chun <liu.chun2@zte.com.cn>
-Cc: Xuexin Jiang <jiang.xuexin@zte.com.cn>
----
- include/trace/events/icmp.h | 57 +++++++++++++++++++++++++++++++++++++++++++++
- net/ipv4/icmp.c             |  4 ++++
- 2 files changed, 61 insertions(+)
- create mode 100644 include/trace/events/icmp.h
-
-diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
-new file mode 100644
-index 000000000000..3d9af5769bc3
---- /dev/null
-+++ b/include/trace/events/icmp.h
-@@ -0,0 +1,57 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM icmp
-+
-+#if !defined(_TRACE_ICMP_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_ICMP_H
-+
-+#include <linux/icmp.h>
-+#include <linux/tracepoint.h>
-+
-+TRACE_EVENT(icmp_send,
-+
-+		TP_PROTO(const struct sk_buff *skb, int type, int code),
-+
-+		TP_ARGS(skb, type, code),
-+
-+		TP_STRUCT__entry(
-+				__field(__u16, sport)
-+				__field(__u16, dport)
-+				__field(unsigned short, ulen)
-+				__field(const void *, skbaddr)
-+				__field(int, type)
-+				__field(int, code)
-+				__array(__u8, saddr, 4)
-+				__array(__u8, daddr, 4)
-+		),
-+
-+		TP_fast_assign(
-+				// Get UDP header
-+				struct udphdr *uh = udp_hdr(skb);
-+				struct iphdr *iph = ip_hdr(skb);
-+				__be32 *p32;
-+
-+				__entry->sport = ntohs(uh->source);
-+				__entry->dport = ntohs(uh->dest);
-+				__entry->ulen = ntohs(uh->len);
-+				__entry->skbaddr = skb;
-+				__entry->type = type;
-+				__entry->code = code;
-+
-+				p32 = (__be32 *) __entry->saddr;
-+				*p32 = iph->saddr;
-+
-+				p32 = (__be32 *) __entry->daddr;
-+				*p32 =  iph->daddr;
-+		),
-+
-+		TP_printk("icmp_send: type=%d, code=%d. From %pI4:%u to %pI4:%u ulen=%d skbaddr=%p",
-+			__entry->type, __entry->code,
-+			__entry->saddr, __entry->sport, __entry->daddr,
-+			__entry->dport, __entry->ulen, __entry->skbaddr)
-+);
-+
-+#endif /* _TRACE_ICMP_H */
-+
-+/* This part must be outside protection */
-+#include <trace/define_trace.h>
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index e63a3bf99617..437bdb7e2650 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -92,6 +92,8 @@
- #include <net/inet_common.h>
- #include <net/ip_fib.h>
- #include <net/l3mdev.h>
-+#define CREATE_TRACE_POINTS
-+#include <trace/events/icmp.h>
-
- /*
-  *	Build xmit assembly blocks
-@@ -599,6 +601,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
- 	struct net *net;
- 	struct sock *sk;
-
-+	trace_icmp_send(skb_in, type, code);
-+
- 	if (!rt)
- 		goto out;
-
+WARNING: modpost: missing MODULE_DESCRIPTION() in net/dsa/tag_vsc73xx_8021q.o
 -- 
-2.15.2
+pw-bot: cr
 
