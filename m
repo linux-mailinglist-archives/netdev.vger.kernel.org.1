@@ -1,158 +1,247 @@
-Return-Path: <netdev+bounces-75192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF4FE8688F7
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 07:31:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD552868915
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 07:39:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 469AA1F24187
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 06:31:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C7141F24713
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 06:39:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DCE41DFD0;
-	Tue, 27 Feb 2024 06:31:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03FA344362;
+	Tue, 27 Feb 2024 06:39:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b="Lq/UWL7n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mACDuYgs"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2132.outbound.protection.outlook.com [40.107.243.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3A0256A;
-	Tue, 27 Feb 2024 06:30:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.132
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709015460; cv=fail; b=oQpcMxt8jMB6O86vcfXCXDBp7AfqxIg6tT2FXmjCiTSgyKs39dSeHstARvhO15k+eXBZZnwi/FBJ9H7QSaM4XnnH+pQ7W5B+abAmcPAa5zaDdrk2goPHfcruiVRMqcaxTe5xanXqxatHJAr6TqnRlop/197dK4faXc4obRjUuH0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709015460; c=relaxed/simple;
-	bh=A4OBHuT+6b5vMXBjV/MpzXiQRRHtb+JKExegOVgKoSo=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=W4aqn3Y+FYZQiCy9rOWr8UyI8wIJ2VScDw50cEWDGhtl0ITz4G8rbhSDDb4QnfidvHVldE5cCQtvV2+Zk8t0QW1cB/e6usVX7yhobVt8sjlbH5JdlwU8LLpITEUfmMEgkA0VtSt+SOeHimjqzKgW2eIU2ljibFxyI/7/LJrJ3EI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=fail (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b=Lq/UWL7n reason="key not found in DNS"; arc=fail smtp.client-ip=40.107.243.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ETPCbNKMmlAfz0+Hi116e5WFMbcArx4vk6h+q+LNtoxpZxfumT4vJt+8gpIs5uHQTv9JiX0mluI8jl/LDnxd9rEsFt4hxSD2emQYkZRWU1nZQVNlPt6XlnvlFFoc5/R9RcWC0MNrZqJCqNS8UgZILHh+aM44O082uufeLHyyJJoCUqPlzeUXJMhxzL0nEQ5MNd5RTVIVwcy1BJk0P16BurPcH77rwD+WyaL36ne4MDCN+RtVS7J6bqAsdkQxaA8vLRHMWkMNgmKd1ToXqDvAnibOmmULECMtnlkrjfloVBl/hu+jbBs/k6vpIdCZoxgn0KJ72cmuX3b5KgClmx854Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=A4OBHuT+6b5vMXBjV/MpzXiQRRHtb+JKExegOVgKoSo=;
- b=SzLnmn1ORZ4uAwjy0DcTjh8dmr409rKzq1StOTe0jPUhp8g+w5AteDA8VfXh5FqXBbI5P+aBvNYNU0KLiTUPgnTkfWT1BBKVrjWSRFc+jFEgacAUvI1CQ0mcOATM6Smy5CfzXi5ZHmXIDd6Ct+A8o4Qs6byWRleYb74SLNQQHbh+IHIcBDims6Is1lOm2nlLAsDA+Dhs8RP0c7aDzN6zGpicT+t5nwtYRSyHsWaT1JMQ76JoMbzdh/PKkM+DjF0Ux8CpbOoVMPbJa09HqPyKaXDfDTB0Bz9ShHVSe2/QFwvPKBW34drEeNs50cqps/l5e+jqIJkMn50tNZNAQL+2kA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=amperemail.onmicrosoft.com; dkim=pass
- header.d=amperemail.onmicrosoft.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FED028366;
+	Tue, 27 Feb 2024 06:39:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709015959; cv=none; b=heuePHfkWSx126dg9SVtGlszB4zQ4nyON5l37Jri4v4XC2rpZczz1ZuzCZLWc1Ovd5zSU2DDUCyuOG+29eP6Bli2RtCq3hcSBmwOFew/puQjHQZbBpfQEkyVgjF28wDxPyLNS7Dw52ez1Eu8LOchsSAcWIp00MjdeWL3fvvAoKA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709015959; c=relaxed/simple;
+	bh=TpNm43UZalOh5CHEZxpB1myqjdM6GwK0aB5cvWnf9j4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o4Il0qefrINhp8BLcSAb+Okyza0RSESgg+5XDG36Nw7dITxDbOdqKsgYDJ0WHnF69Ga0Mw1ei+Gh8Y/LUcCCkSbjquOyZLR/pClEXRlio6giiJ7/KgfngEt/F+VE2R3xZIRESFwo83CMOL2g6PULwF7M+UM8rBJB8EaO1xjfO5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mACDuYgs; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a4395b7bfe5so99732166b.0;
+        Mon, 26 Feb 2024 22:39:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=A4OBHuT+6b5vMXBjV/MpzXiQRRHtb+JKExegOVgKoSo=;
- b=Lq/UWL7ngWJ38P6u3k5D6DGM/JVLrznlz5KMhZ0OM9xcq3X8nsPaaYiCb/ijeaCb37FOsOc/cZtCzxiBoQWDdvxtbavgNijuy60e65ykwPjFHowyDoWupchp84Cjxs0hJ5LZudtbmy9/RDx2oEch3i/f6R/aY0QAdmgsIOtYV/g=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
-Received: from PH0PR01MB7975.prod.exchangelabs.com (2603:10b6:510:26d::15) by
- SA0PR01MB6172.prod.exchangelabs.com (2603:10b6:806:ef::11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7316.36; Tue, 27 Feb 2024 06:30:56 +0000
-Received: from PH0PR01MB7975.prod.exchangelabs.com ([fe80::91c:92f:45a5:e68a])
- by PH0PR01MB7975.prod.exchangelabs.com ([fe80::91c:92f:45a5:e68a%6]) with
- mapi id 15.20.7316.018; Tue, 27 Feb 2024 06:30:56 +0000
-Message-ID: <19162784-e267-4531-9906-bac3de7cf6ac@amperemail.onmicrosoft.com>
-Date: Tue, 27 Feb 2024 14:30:46 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: skbuff: allocate the fclone in the current NUMA node
-To: Alexander Lobakin <aleksander.lobakin@intel.com>,
- Huang Shijie <shijie@os.amperecomputing.com>
-Cc: kuba@kernel.org, patches@amperecomputing.com, davem@davemloft.net,
- horms@kernel.org, edumazet@google.com, ast@kernel.org, dhowells@redhat.com,
- linyunsheng@huawei.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, cl@os.amperecomputing.com
-References: <20240220021804.9541-1-shijie@os.amperecomputing.com>
- <de696b4c-bda5-4ab2-a0c0-490b4eba8163@intel.com>
-From: Shijie Huang <shijie@amperemail.onmicrosoft.com>
-In-Reply-To: <de696b4c-bda5-4ab2-a0c0-490b4eba8163@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: CY8P222CA0015.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:930:6b::25) To PH0PR01MB7975.prod.exchangelabs.com
- (2603:10b6:510:26d::15)
+        d=gmail.com; s=20230601; t=1709015956; x=1709620756; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KeKhwBEW4l3tPZAIKnepBwuS085ALdBkSGDT8/kB2nM=;
+        b=mACDuYgsyZUagMZvC3i2BarvkoajedpqTZdHi9DOPLwVdszTQPdOJ9Qm9sNcytdZzB
+         xMG6YVrVWtEI8s6UJxS5MP9/uYDOnaDo+9RFTufYOmLFZhj2yLpkvxfg2U4ksWYSCyWV
+         yYbMVfMxh3NnyY+CVUICKz7Zn/68mH0Ztmk+Xvx7KRlbiuk3Tj7tVQAi5sR+75V6cJwI
+         MUhj49Q6oqFhx/MqCpbDia+uQVIKxI/GpRmU8ciAr4fNNhNZ6eHHiYZE/XKBfn/a3GUq
+         HlkEkt5ZELLM6XcS9CjLKImATkskbYiUUNKrNLBG97uM6C9/yTNJUYLMucWhYNDVpAMJ
+         rNOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709015956; x=1709620756;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KeKhwBEW4l3tPZAIKnepBwuS085ALdBkSGDT8/kB2nM=;
+        b=sCPz1RDFCy/vZFa7AR3P0ZltGHTiaqf0yPrsvYw/vFZVDt8fnDM+BNfFAzmYmPceLa
+         O2ubd2MX4n8SXwGif6AnT8Nh23i0FEF4mzP621XsJ93pTBCgamqvzMVVrfHD+KDowCX0
+         7/ehrTg3ca1KSddD+5d4PtlunVgJBgdRrvuDHBkJbdKSABTWxzspBE6bTmadIgEpqg1f
+         t/46mCjoFwjcPBV+ZfNgpGRwsTpn1l5jFMcYpTVm+bXh0mGsjRbaaJK8pCExdMSRT149
+         5r558fc0CH5po7kK7cbFG13QUgj5lC8tJyaK2yYU2xBccmbgYlGhb9lOLCvikGsjdKYd
+         zBXg==
+X-Forwarded-Encrypted: i=1; AJvYcCWDKv6aaHUBsXTvKPIFcZ+u0PcxT+D7h4qy9eSvxd1IAsfcK1y1KMmfy4RVnftPHCMgGlCTqTrdp34eNgchiafmj623BK3MLDNgwiMwl0QI2ExnKG7GHbYBO2L9JxAEHjzUtAk2OcRaKPgYP4DpyHd+fnevoyelQsKl1AmeJ5vj+drWYVh+jF9M
+X-Gm-Message-State: AOJu0Yy/Rr0mmnOPE2Vu2GPyiCADRKgGlM79ajx+BTetYh7b23y2xRIj
+	KaQGeS2l50Z0TWUkbFrHSYDBXkI0UpffdzikW5d/Ly056qXCawUUI0XdJYg6peQAP1OZr93SqLA
+	e1Qt5GN50OmQ5ZYzKNCIZIW4XUW0=
+X-Google-Smtp-Source: AGHT+IHN1QUtTaBkDh60yky4tJwi5Htl8PaJXfavM7yPRCg/hL/daSBc0cvs6PEmbTXUpBAwTZbCcN9cEda7+zl+Fos=
+X-Received: by 2002:a17:906:f0c5:b0:a43:9e1f:240e with SMTP id
+ dk5-20020a170906f0c500b00a439e1f240emr785440ejb.60.1709015956229; Mon, 26 Feb
+ 2024 22:39:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR01MB7975:EE_|SA0PR01MB6172:EE_
-X-MS-Office365-Filtering-Correlation-Id: bdc4c068-dd2d-4786-67c4-08dc375da79e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	0w+O4qS3CO8y7MOE5+ajHzUxCJ42/8Iw+v93lBHUPiVlsl17qCUAX9eKy7i0rSzG1C9HzbA1dQJ/wnJ4+F0isJ5N2JR9kEDwOj8C3+PwqfX/DhpvpyJak7yjyxY4xCfywG0KPBSmsKgs97B2pmY7K3yHclz6O8lp4ASpE1PxjWnJ3eBOFeeEnQx0sC5GhecvyB71dxuF667zg1k84m3xZ1BLpgbqVpWKt2ExK3zO/Ee7o3b5AcJchdpjaB+bU03NuE+KlVCGYYdOGwzt6HTMIxejusdNHnrmW6dC5ZYzqSvsQeNsNHq1kEbKXnh7Q6Xy62GYQlROq8ejlAF4m2LONQstywAQzfaqxHItS+/7g71twEcMobecz4WBBSdvdkjkE+5jj/oF2MP08BbRC+OjxVlwRXou0Xj/F5I8pEMzI18GHG8ks5Mar3Gby9tfDL27CRJ1OagM16JfFDVUtvy93G3JPI/mgw3fcsSBfZmqWYDBuoIA88+Ra/aJKNamDY//X96eo41X4xa2+dqgDhYpnavW7ATz5zRaEuCi9NNeLmIcMsN6nB3UyZV2OX52fmg1P1nw4KgFFLIN28g0SbKmixODSHVjWZBGJtpspn+k+vwXAfLemEZ1oWN2oM9JvW2NIL2uMeABAsdEWRYsyw8hLA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR01MB7975.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YzhQNGJ1VDJldVd2Q0FMQWE2amh6M2dhaWlKdlpIUkhXT2h3NDVEUFd2bkFI?=
- =?utf-8?B?MWhyYjdUOHdTWmkxN3JRM2pxb3NIMnBJQnBqSHpGNkNYUFQ4bUsyNjFkRmc4?=
- =?utf-8?B?dXlaQ0VNRENTNzhOUnZtK0VBQUUxNjZ2U3JsejBDT3pPckgvQ1FuV0t4ak4r?=
- =?utf-8?B?MlhsaVJzVzFTdkE4bGhUV09HWEgzNW1WL3RmRUpHVGJ3U1BZNjZ3a3h4WkE0?=
- =?utf-8?B?K3ZsM3N3NFdaNFpGcGNnblRvTlBHbjl2RE9vaXQ2V2RMZ3h4NldqbUhXZlBo?=
- =?utf-8?B?NGl6YitaSFVBdHJNMWFRQ21rOGtnWGdjUFZXazE1MXBZdk5rM0dpYnEydUJl?=
- =?utf-8?B?TjJrS0djcW1xVmtBMXhQTE5kSGRyMlJJaStRMWdBdFF4NmlQWXRzenZMcTgr?=
- =?utf-8?B?Vjg3U2wxTGI2LzNicW9teDBZTXBEaGVkNU1BRXozSGZpNDFBMkRxL0syT1Z3?=
- =?utf-8?B?WXowblA3VWc4S1lQUnlkNEFmL1M2cWpzQnNHaFpWaDJlVFUwUXM5aWlCQk9P?=
- =?utf-8?B?Y2dnV296Y3BhNm5oTWtlWmo5N0t0ZzZBaW16VWpsNmFxdVN2eWhUUVo0eUs4?=
- =?utf-8?B?TXB4L3ZubitRa3RybklnNlRLYjZNU1hjR3dtazZJL3JqMzZhQUFkcWx2UGMy?=
- =?utf-8?B?ZlViTzhUT1gvY3ZITUhmNnNGK1VuLzlpRHFYcDlodEV2N2J1dkg1S0d5VHBm?=
- =?utf-8?B?TGEzRmVzOVZqeXU3UGI3M0taN0tkS29lNTZLRkFMZ3RScEZCNmFUVmhVRHRv?=
- =?utf-8?B?M1c5SWo3TURjRDd4UTRaS1U5SWNkM0pPWkNZeFkzcFhCNlJHWG0raHIyUVVO?=
- =?utf-8?B?VXpKcFN3N2VxcHh3OVk0a2Ryai9xK2lBRDNTem5MTDlJVUVmRGNwdytwV0s0?=
- =?utf-8?B?ZnRXUEhjNjBpVGZaZWdtOXg5NlZIemFISlhBdURvYS91Vko1Z2xSYkladGVP?=
- =?utf-8?B?Mk1VZHVWVmhKQ2E4aUV0UDhtSmFIQjRxdXhtYUFremYxRzM1Qm0yMzZhUWxY?=
- =?utf-8?B?WWtBdUpJb0NCenAzT0hMQWc4VzJXV2h4TzhkUERCdzJpaElGWTdFQzQ3c05r?=
- =?utf-8?B?cTJwQkdwdTRhOWFGMCtQbVJ4RGpZdHFHQ25wdHBqYWV5Y242YTdjVWpFeldB?=
- =?utf-8?B?QklPNWd6OXA0dUwwK2VWTXBKT3A0c0J1Z2owUzUxU0QzWFg0M2xtTCtQR3Y5?=
- =?utf-8?B?Yi9FWFlTdlRLOEYwcFhBbHZUdFU5NGtJcUVKZGtsS3BkR3BPSnJaMnZkZE8r?=
- =?utf-8?B?N0s4Yy9XTHpuY1dEQ05LWjFqVkxOUHdBaW9ZRTRpNDV0ZHk0bUJPZmJRNzI5?=
- =?utf-8?B?OUhJbHFYdmNmeWVNWitUQzZ5ZnRZb2E4QUwrM21aRHdWVnY2VE5Camw1aTNS?=
- =?utf-8?B?cXBxazBsMGVBZlU2WHhKdzFEMXhrdkVRcUMySWxGdGRwVnRnWlZweWM0UGo2?=
- =?utf-8?B?dHRtUmlRWUxEMnJHTmoxY2NxRnBBS3lMZ3JDbFZkRWxhQktJamt0RlE3QTlk?=
- =?utf-8?B?U2p0SDY0QXVzL09telhJcklNVEVPRDVjaW54bWhjQlZTWUttOHdmN3FsOW54?=
- =?utf-8?B?a251TW1TSmpxMUdNNU04Qjl5WmJ3S1FPSzliZ2t6UTJ5YzJ0UG5nSFhLYnFF?=
- =?utf-8?B?Z0JIT0J5ZHlZOFlTdm9JbjdLU1FDNFptaEdydnRxMm1FMXd4ZmlkRW1RTGRy?=
- =?utf-8?B?WnFxeU5ETTdodXVsVVAvUURHRm51dGt5R0dneTdBdSs4SGtQYWhKUzZib2pC?=
- =?utf-8?B?dnFWYzNQRS8vOWZtMThFVHhER2E1NFpocWZjOWZ0dWhFaGNJK0syY3AzRW91?=
- =?utf-8?B?STRLbzkyWnd4MGxxaGdJTnkvc1ZFQlFZckdhMGJwRG1yZFF6V1FGUHpZYjRv?=
- =?utf-8?B?eWwrcjFYMnRhTldyY2tJYnhZRUd0dDU4NjZLQitNZDRPZzI0dWswWVg5WmlF?=
- =?utf-8?B?Z2UxcWRmK21ydE41b2dUNE44bnA0bWhXRWNkYVB4MFRHQUFRSll2Q3JOWnJo?=
- =?utf-8?B?WmFNQzFaVXo3RnlHYTBhVmR5OHVNN2cxM3k3cFhEUlVjY1BPUzRzOTF1VW9a?=
- =?utf-8?B?VkozekhZVGZlYVJqY2k5YlNKY2JVQ2JobzEyZFpmMDZXd2dQd3lKMHV5Q3hE?=
- =?utf-8?B?YkZ2aG1GZmJNR1I2WkpXcFdwNlBXNG44NG1remlvT2xCMSs0MUFyeFpOa1p4?=
- =?utf-8?B?NGc9PQ==?=
-X-OriginatorOrg: amperemail.onmicrosoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bdc4c068-dd2d-4786-67c4-08dc375da79e
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR01MB7975.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2024 06:30:56.6417
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HERjFW0EbvtxlfyHmTCg/AYKsfPQj3Rrr98FTRuhxPspr8FzWyMcm5OerStBsnoPRQ/wKmXDZEiX2FXluXMyROVGbaxwiK2RKXJe1xne8mLrPde228OoLOP2vfuzoxIN
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR01MB6172
+References: <202402271050366715988@zte.com.cn> <CANn89iL-y9e_VFpdw=sZtRnKRu_tnUwqHuFQTJvJsv-nz1xPDw@mail.gmail.com>
+In-Reply-To: <CANn89iL-y9e_VFpdw=sZtRnKRu_tnUwqHuFQTJvJsv-nz1xPDw@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 27 Feb 2024 14:38:38 +0800
+Message-ID: <CAL+tcoDCq=ER65e7fHgLYZd9=XCnaHFLyGt4inXyKznB3S465Q@mail.gmail.com>
+Subject: Re: [PATCH] net/ipv4: add tracepoint for icmp_send
+To: Eric Dumazet <edumazet@google.com>
+Cc: xu.xin16@zte.com.cn, davem@davemloft.net, rostedt@goodmis.org, 
+	mhiramat@kernel.org, dsahern@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, yang.yang29@zte.com.cn, he.peilin@zte.com.cn, 
+	liu.chun2@zte.com.cn, jiang.xuexin@zte.com.cn, zhang.yunkai@zte.com.cn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Feb 27, 2024 at 1:49=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Tue, Feb 27, 2024 at 3:50=E2=80=AFAM <xu.xin16@zte.com.cn> wrote:
+> >
+> > From: xu xin <xu.xin16@zte.com.cn>
+> >
+> > Introduce a tracepoint for icmp_send, which can help users to get more
+> > detail information conveniently when icmp abnormal events happen.
+> >
+> > 1. Giving an usecase example:
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D
+> > When an application experiences packet loss due to an unreachable UDP
+> > destination port, the kernel will send an exception message through the
+> > icmp_send function. By adding a trace point for icmp_send, developers o=
+r
+> > system administrators can obtain the detailed information easily about =
+the
+> > UDP packet loss, including the type, code, source address, destination
+> > address, source port, and destination port. This facilitates the
+> > trouble-shooting of packet loss issues especially for those complicated
+> > network-service applications.
+> >
+> > 2. Operation Instructions:
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+> > Switch to the tracing directory.
+> >         cd /sys/kernel/debug/tracing
+> > Filter for destination port unreachable.
+> >         echo "type=3D=3D3 && code=3D=3D3" > events/icmp/icmp_send/filte=
+r
+> > Enable trace event.
+> >         echo 1 > events/icmp/icmp_send/enable
+> >
+> > 3. Result View:
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >  udp_client_erro-11370   [002] ...s.12   124.728002:  icmp_send:
+> > icmp_send: type=3D3, code=3D3.From 127.0.0.1:41895 to 127.0.0.1:6666 ul=
+en=3D23
+> > skbaddr=3D00000000589b167a
+> >
+> > Signed-off-by: He Peilin <he.peilin@zte.com.cn>
+> > Reviewed-by: xu xin <xu.xin16@zte.com.cn>
+> > Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
+> > Cc: Yang Yang <yang.yang29@zte.com.cn>
+> > Cc: Liu Chun <liu.chun2@zte.com.cn>
+> > Cc: Xuexin Jiang <jiang.xuexin@zte.com.cn>
+> > ---
+> >  include/trace/events/icmp.h | 57 +++++++++++++++++++++++++++++++++++++=
+++++++++
+> >  net/ipv4/icmp.c             |  4 ++++
+> >  2 files changed, 61 insertions(+)
+> >  create mode 100644 include/trace/events/icmp.h
+> >
+> > diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
+> > new file mode 100644
+> > index 000000000000..3d9af5769bc3
+> > --- /dev/null
+> > +++ b/include/trace/events/icmp.h
+> > @@ -0,0 +1,57 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +#undef TRACE_SYSTEM
+> > +#define TRACE_SYSTEM icmp
+> > +
+> > +#if !defined(_TRACE_ICMP_H) || defined(TRACE_HEADER_MULTI_READ)
+> > +#define _TRACE_ICMP_H
+> > +
+> > +#include <linux/icmp.h>
+> > +#include <linux/tracepoint.h>
+> > +
+> > +TRACE_EVENT(icmp_send,
+> > +
+> > +               TP_PROTO(const struct sk_buff *skb, int type, int code)=
+,
+> > +
+> > +               TP_ARGS(skb, type, code),
+> > +
+> > +               TP_STRUCT__entry(
+> > +                               __field(__u16, sport)
+> > +                               __field(__u16, dport)
+> > +                               __field(unsigned short, ulen)
+> > +                               __field(const void *, skbaddr)
+> > +                               __field(int, type)
+> > +                               __field(int, code)
+> > +                               __array(__u8, saddr, 4)
+> > +                               __array(__u8, daddr, 4)
+> > +               ),
+> > +
+> > +               TP_fast_assign(
+> > +                               // Get UDP header
+> > +                               struct udphdr *uh =3D udp_hdr(skb);
+> > +                               struct iphdr *iph =3D ip_hdr(skb);
+> > +                               __be32 *p32;
+> > +
+> > +                               __entry->sport =3D ntohs(uh->source);
+> > +                               __entry->dport =3D ntohs(uh->dest);
+> > +                               __entry->ulen =3D ntohs(uh->len);
+> > +                               __entry->skbaddr =3D skb;
+> > +                               __entry->type =3D type;
+> > +                               __entry->code =3D code;
+> > +
+> > +                               p32 =3D (__be32 *) __entry->saddr;
+> > +                               *p32 =3D iph->saddr;
+> > +
+> > +                               p32 =3D (__be32 *) __entry->daddr;
+> > +                               *p32 =3D  iph->daddr;
+> > +               ),
+> > +
+>
+> FYI, ICMP can be generated for many other protocols than UDP.
+>
+> > +               TP_printk("icmp_send: type=3D%d, code=3D%d. From %pI4:%=
+u to %pI4:%u ulen=3D%d skbaddr=3D%p",
+> > +                       __entry->type, __entry->code,
+> > +                       __entry->saddr, __entry->sport, __entry->daddr,
+> > +                       __entry->dport, __entry->ulen, __entry->skbaddr=
+)
+> > +);
+> > +
+> > +#endif /* _TRACE_ICMP_H */
+> > +
+> > +/* This part must be outside protection */
+> > +#include <trace/define_trace.h>
+> > diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+> > index e63a3bf99617..437bdb7e2650 100644
+> > --- a/net/ipv4/icmp.c
+> > +++ b/net/ipv4/icmp.c
+> > @@ -92,6 +92,8 @@
+> >  #include <net/inet_common.h>
+> >  #include <net/ip_fib.h>
+> >  #include <net/l3mdev.h>
+> > +#define CREATE_TRACE_POINTS
+> > +#include <trace/events/icmp.h>
+> >
+> >  /*
+> >   *     Build xmit assembly blocks
+> > @@ -599,6 +601,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, =
+int code, __be32 info,
+> >         struct net *net;
+> >         struct sock *sk;
+> >
+> > +       trace_icmp_send(skb_in, type, code);
+>
+> I think you missed many sanity checks between lines 622 and 676
+[...]
+>
+> Honestly, a kprobe BPF based solution would be less risky, and less
+> maintenance for us.
+>
 
-在 2024/2/26 18:10, Alexander Lobakin 写道:
-> __alloc_skb() and skb clones aren't anyway something very hotpathish, do
-> you have any particular perf numbers and/or usecases where %NUMA_NO_NODE
-> really hurts?
+I agreed. I wonder if we can remove some trace_* at the very beginning
+of its caller function since they can be easily replaced with bpf
+tools and then we make less effort to maintain them, say,
+trace_tcp_probe(), trace_tcp_rcv_space_adjust, etc.
 
- From the memcached test, I do not see really performance hurts.
-
-
-Thanks
-
-Huang Shijie
-
+Thanks,
+Jason
 
