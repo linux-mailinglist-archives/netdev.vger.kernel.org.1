@@ -1,87 +1,70 @@
-Return-Path: <netdev+bounces-75390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 887E1869B73
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 17:00:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19AC5869B7F
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 17:03:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4111E2836AB
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:00:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8A9D28BF23
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB22C14690C;
-	Tue, 27 Feb 2024 16:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C50821482F2;
+	Tue, 27 Feb 2024 16:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="RWysv+ML"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AWKWZeel"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40713146000
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 16:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06ED2146E8A;
+	Tue, 27 Feb 2024 16:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709049603; cv=none; b=lYDhTdPPywk//9FRjPQXED5VJgkW2rhfmjS7zmzMp0t8YUfvqD0lA9C1vNCLn5RR0YbLz+XPMQrPS+eyttfB/ZIv7Wqn+0MLSodafJ7wMWONBSFUwD5utwPAyDiuTEHF1lKPIJ2jvnXOBCYDDicavm8sz2yd61f2/Pk5kLrpPzQ=
+	t=1709049789; cv=none; b=FMo5ecoUCPKF8H7A3qZKNCd7kVcg5ELoY/5nDb8orjFOvRDfkzDxL7J/EhlWoPkG62Y17JlDb6pJqsk5CCJmjAsY9mmPFpUM4wjSvYtaH+5AThTkRc1RcUES1vebp3fM+OerOAIzrkHDYA66x3dU8X6p4w2WipXM38PRMFeoFJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709049603; c=relaxed/simple;
-	bh=tKB3i2ULzUxqcZteb4ZQczEAibcM9FOTotdV80h3GfI=;
+	s=arc-20240116; t=1709049789; c=relaxed/simple;
+	bh=D8fuIEf8rJNQDmLdQLIRRJcmZttD10RcRN0fcSH1sLU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YR9ivHxfhpA0uPE+kaZmLUH0zl4efCItk7SQSAO+Ds0TcWvs7I7iBPWLmbAUxeE0dqjq/PBYzQuOsmjNLSx1m/2F454wTdM9QK5LyrpajePFMEMNseusoedSNTk6leF7Fw6OAGnccLxrlFI6KOp/6Afw5d7f3MWwNS+5dvAgl1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=RWysv+ML; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-412ae15b06fso5455475e9.1
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 08:00:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709049600; x=1709654400; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3y4We/I/OAkRE57RPqipAeKw/rV+o/vnjOiV2Pndg08=;
-        b=RWysv+MLt1uNpXCYtcVQ5G5V8PznFQyPdRo5L7i91LAq+CJvj9HzewkRr9ZpLrVF67
-         6iJ1HVHJY/z4rPW1xB5MZDyunkyGXss7WyfBIfmmAMntuKinhkxY8kwjWqYBOt0RlXa5
-         3VW0ywMyGej67smh1XK0U+GCJOr/dl44pS3PFJQ+fxJdjuVxz98JDCOqu0Ll3skBgIAe
-         eFa6NS67P3IUSwPSfuG/jBwLopgSHgzTkqwSBLlFDurlSuPlm1y0/7QWGaDtR1Cy+Q5w
-         TZ5phbgjwhlLAIbJa4p8ZbIzpkLnn1idQMhKelrXwxddoA7D717u80M+zqfC+AwB/val
-         Jv6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709049600; x=1709654400;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3y4We/I/OAkRE57RPqipAeKw/rV+o/vnjOiV2Pndg08=;
-        b=tIBKGlCUm1J2+O0g+FT22dHut1tc6+hlQwZb0NP1uBg6A5lFYqk4Nhx7eTv1TpRvup
-         oVjqQ9+DqG/fkJYK3zyHsfMfoiC+XyieUtBxGup6JssQfr4kthXDTwcbIpinIbwWelF0
-         TXSFoI9rnLqqYVpf5rElInqdwRSpmBVsWadBNMVOm0SmnMSjg2OY2H9GKdWAk0JhgpRt
-         YwWNjhR7gEZVU4tUTtdparXTJrHGBzsw/H/pdLOUAg4Hw4yviCV9BWuQ82rQ9T7pvjIb
-         m2arlhSQNP23Qk5l82hInv9KHM7fGCyIev55nzEripBKftPjn+iE3wQ3/36p5mzfutPm
-         tM6A==
-X-Forwarded-Encrypted: i=1; AJvYcCXKAFJqC2zZkTfAprwsWOSpbiwh5N4h5sRtXYLdvnWVimPa4ivXZBxO6EBoBiS2FLNTmLEXzEfiVaQDbn5J9qwD++g5jWjT
-X-Gm-Message-State: AOJu0YxeQTTLmiwiX5RO9ITZB5ba3m3Lo6HZz9rrFZhSCYvzXyzTr0kR
-	dKC5yn83ATf9PToXpLsnh5Xc4Gx5OzJJjpUUDSYlkYZodGhBxiBFWbOln4OaSJA=
-X-Google-Smtp-Source: AGHT+IFN22/PPS0qL2fxWHOrSnH0K36g5mA/lXRY/+/guJN2/bh1+PTY0kVY+08pzvReMFEyRZLSSw==
-X-Received: by 2002:a05:600c:1c8d:b0:412:afa6:cf3a with SMTP id k13-20020a05600c1c8d00b00412afa6cf3amr1073126wms.32.1709049600456;
-        Tue, 27 Feb 2024 08:00:00 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 20-20020a05600c22d400b0041069adbd87sm15255037wmg.21.2024.02.27.07.59.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Feb 2024 07:59:59 -0800 (PST)
-Date: Tue, 27 Feb 2024 16:59:56 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next v3 5/6] virtio_net: add the total stats field
-Message-ID: <Zd4G_GttG0XtQ0wz@nanopsycho>
-References: <20240227080303.63894-1-xuanzhuo@linux.alibaba.com>
- <20240227080303.63894-6-xuanzhuo@linux.alibaba.com>
- <20240227065424.2548eccd@kernel.org>
- <Zd36oZMvIvqtNSzr@nanopsycho>
- <20240227074117.128af8ca@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JcBo1KwjhCJlRe+yiZiTp2PCt9flFqpr0PSMvEGbiyl3Kj+lgTBrMcAanLGZjttRs0KsAVhldFAfXRDFs+HxHoDJat+CMlq/DxywwNsWHtzNk4hIbiJ6dcLt5XWakvjXDyzwCNOvsASI7JFkIX/A8NymfLpNtYV6sZ3h8EXH/Ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AWKWZeel; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=IY2/g60Mhri+J9MAbXvnzzlU9k4+0F6po+5bYJBis5k=; b=AWKWZeelA7RQNAtpeq50GWuqhH
+	DndOuu8VHbgWp+B/i079vkiufoHy0dbHP1X+nqUIoz+fUWJr/qDw0yWUsahEdbLkfWCLsIuo6s5Db
+	vkgCtxwoBUuiwFZztZd6rzFaDIC5PSvRzxyYUTzJiw/Yaq4ioKNtZhEP16eKCKTqrbTM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rezvG-008rpE-4l; Tue, 27 Feb 2024 17:03:14 +0100
+Date: Tue, 27 Feb 2024 17:03:14 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+	Lee Jones <lee@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-leds@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	herve.codina@bootlin.com, maxime.chevallier@bootlin.com,
+	christophercordahi@nanometrics.ca
+Subject: Re: [PATCH v2 2/6] leds: trigger: Create a new LED netdev trigger
+ for collision
+Message-ID: <e6351d0c-15e2-47a9-be6c-6f21aee9ae90@lunn.ch>
+References: <20240227093945.21525-1-bastien.curutchet@bootlin.com>
+ <20240227093945.21525-3-bastien.curutchet@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,19 +73,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240227074117.128af8ca@kernel.org>
+In-Reply-To: <20240227093945.21525-3-bastien.curutchet@bootlin.com>
 
-Tue, Feb 27, 2024 at 04:41:17PM CET, kuba@kernel.org wrote:
->On Tue, 27 Feb 2024 16:07:13 +0100 Jiri Pirko wrote:
->> >Please wait for this API to get merged:
->> >https://lore.kernel.org/all/20240226211015.1244807-1-kuba@kernel.org/
->> >A lot of the stats you're adding here can go into the new API.  
->> 
->> Can. But does that mean that ethtool additions of things like this
->> will be rejected after that?
->
->As a general policy, yes, the same way we reject duplicating other
->existing stats.
+On Tue, Feb 27, 2024 at 10:39:41AM +0100, Bastien Curutchet wrote:
+> Collisions on link does not fit into one of the existing netdev triggers.
+> 
+> Add TRIGGER_NETDEV_COLLISION in the enum led_trigger_netdev_modes.
+> Add its definition in Documentation.
+> Add its handling in ledtrig-netdev, it can only be supported by hardware
+> so no software fallback is implemented.
 
-Makes sense.
+How useful is collision? How did you test this? How did you cause
+collisions to see if the LED actually worked?
+
+As far as i can see, this is just a normal 100Base-T PHY. Everybody
+uses that point-to-point nowadays. If it was an 100Base-T1, with a
+shared medium, good old CSMA/CD then collision might actually be
+useful.
+
+I also disagree with not having software fallback:
+
+ip -s link show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 80:ee:73:83:60:27 brd ff:ff:ff:ff:ff:ff
+    RX:     bytes    packets errors dropped  missed   mcast           
+    4382213540983 2947876747      0       0       0  154890 
+    TX:     bytes    packets errors dropped carrier collsns           
+      18742773651  197507119      0       0       0       0
+
+collsns = 0. The information is there in a standard format. However,
+when did you last see it not 0?
+
+	Andrew
 
