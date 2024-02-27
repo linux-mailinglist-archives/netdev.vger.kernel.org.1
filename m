@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-75194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6661D86892E
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 07:51:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE1AD868960
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 07:54:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8481A1C21740
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 06:51:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25A661F275D6
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 06:54:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAFE45339A;
-	Tue, 27 Feb 2024 06:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B20A53804;
+	Tue, 27 Feb 2024 06:53:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oDsSTZ1H"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CY7rWYhK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2091C4CDE5
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 06:51:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED63535A8
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 06:53:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709016678; cv=none; b=dGLR9oPKmzv6C+erVf1ADgIxuLseD7RHmcT0Yr0V4lBnFgaZqFA4dQzeq6G9D0vpuynEtLWSSCKHa8hgT6izJfiykRysIS4sUiAASt8P9faoDnK4UQuAJHLrtx6iY8qjJsXY9nh08Cpohdu9ZoEBpEihRDHNHCgd2YwjC2T6PtU=
+	t=1709016797; cv=none; b=nHIPiJ6GsWGVvon1kybGhdS9X66jet079IGRVJZNY4DyuWGghXtCm/l1/3zGog13u6B0+yZC9pd2adkBloWBoxj1j2rkO5X9maZ0NQ2vRTvBYefphuZTaD30DCTCO96bWrbv5kCnXBMAjoEQGWdzu6t+FyIvkylf+oWaHpLSj0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709016678; c=relaxed/simple;
-	bh=kMm0MhaI2hrFFVsLzwvLF6qO1EAC/UVvmQ2fD2bFDAw=;
+	s=arc-20240116; t=1709016797; c=relaxed/simple;
+	bh=SKPgOyUaWMp7tVKq+GIAuvqq2ASkAq2PcfWyU1kwv6g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dI+mf1LL2+gjnW5yaKl42LQxlzXkek3MxhttEpmjwg/R3A2JwIQAEPpNrEM6SmKvRJJJ2nmvf2MlmkWQtdGbW9iWSOWMsde5PgB+0ejSJa0HIn18N1Ha28bY/ipsFGO2rUBqguigVSneJCdFNRbeohAgCEOONhPr2EmJLxvZJQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=oDsSTZ1H; arc=none smtp.client-ip=209.85.208.52
+	 In-Reply-To:Content-Type; b=bVyq58zh9b/0UYGdEd1hK8n9P/2Y/vvU/pmoT7XR9odOibsvwQACDcgSvC1n2gNpRL/CC0lnq1JbThfQAYZ5OH10MgZdId2/qs6nwFrwCQAGRa+QDHrGdCsCQGLZkWzMM/j5l3rZTOSlGPah5Jnj/A61EkMuR2UPmPSrmScnDpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CY7rWYhK; arc=none smtp.client-ip=209.85.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5654f700705so5135829a12.1
-        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 22:51:16 -0800 (PST)
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-564fd9eea75so4922831a12.3
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 22:53:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709016675; x=1709621475; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1709016794; x=1709621594; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=KyzYi/oCIq0JMIl4Zm7WvnQjiUgOFPhkkdhV4XV1/bY=;
-        b=oDsSTZ1HKhB9DxGPQTeDuqXqUB0aFjWi60RN7KSTAJLs9EDSwzurTDi0Tw02tenrSr
-         w4jGjgQdp96wlvI0vlkbUOrnv3PrRZ6NKnGh6x3vo7YuTLLo0/RHy7MxLEBczuJpub6Q
-         atleOoABi9wnqIY5pbSre7QV9xNiNMx9BLR5mbFXhExnO7L0p4S1PPZMc/soYMpgZuHT
-         wL/5dRRe948gbxTXPafKe6oE27xOuScPFBd9kRN8RU+FJy47QKqxYvEfGgx2+Bu8YuDo
-         htoraWos+yWriPA+nbMQ6pPu64rQo3457+B4OVWtQq4GN99dGP/RIeHns1JpbNQRzayE
-         XVQQ==
+        bh=rUW9NBgii9foEKz4KuucqEYpYQWu5QkJlFAfiZzpmZI=;
+        b=CY7rWYhKQCuUbEbb81ncPErfClJjZFtQ0Lqv4awW2j4gb1D8g6ppk0zLp8UKLRgTZR
+         E7qHx00HaL7NqfHXltn3H9pW7hqy2wbi73dSO9pJM2katqREBDNnLT/ZsjMJEWnWehLs
+         DAsIKeDTx3uXoBVbr9Ud+7X7w1UqAiux+3SEq+K4Y+nwsxvVD2VhsgNf7Se76W1Wliqk
+         KQf5Ji0ZXMIkYehSjMHVnCrlWRkPY2Js0ME825IGTm4jHXYQbjhfnt2EI6R2Rxy6RUwO
+         hxTeBxBhhKGswdROBwviiiXZCxvi8XnAubSsv4JhSoJdK7t6iWfEJ0hetXVz4/D3YrVa
+         H6NQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709016675; x=1709621475;
+        d=1e100.net; s=20230601; t=1709016794; x=1709621594;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KyzYi/oCIq0JMIl4Zm7WvnQjiUgOFPhkkdhV4XV1/bY=;
-        b=HGuwB6+z6PMKwkxd5mRpWjkHVHGdE4SmVNApaZVbunFihQF3PanjUC1b8RWH7rVPEC
-         puAYdxdT6OnwB86Ick5mKfnMidU8yUxvj31Vt0wr6ywgt6GPz5QJCzPrj+VAM5hmjRaR
-         BKvSR+uIJsZbhussA37YkvpARE/k9B0iq1w9BHTBbO4GKm1h2OkVtECSlESNG7DdGCpA
-         gJcz6cApbpEdPjS97ISkxglj61r4fukuK/WF0/x+tvjoC29LBnzYBilXWVPX5i1NzmwU
-         DZuw1ftCQ0sfUdH+6upC5p3crCVFKUaPBR747Iikd+ZRkGQVnM9q3Wo1rS+ePtPCTUOh
-         1f9Q==
-X-Gm-Message-State: AOJu0YxFMkIVsN3zTXtzxsMPE+FLR8rln6ZMsFSzZW9+8SetiSlobs06
-	4g2oNg5tgZFnsrUEYCAZNNVs16t4lT0DI8lBYszioN0vaNS4CSLIAD3rI+EEa1U=
-X-Google-Smtp-Source: AGHT+IEyY0uo9sxm3c77EHMIMldafeOPLJD2VjS8oEye05bD2H7dpe+TuMi9MuCDSKsXFoJEhRus7A==
-X-Received: by 2002:a17:906:528d:b0:a3f:4b56:b9bc with SMTP id c13-20020a170906528d00b00a3f4b56b9bcmr6779201ejm.47.1709016675374;
-        Mon, 26 Feb 2024 22:51:15 -0800 (PST)
+        bh=rUW9NBgii9foEKz4KuucqEYpYQWu5QkJlFAfiZzpmZI=;
+        b=cpm1/Evh0JYTR3jW1ra4p/e/6hdd8cuWnL8Pn8qC7GrXMFPuNN7CsJ6T/lauKZUofR
+         PMf0C+lkDTBVmhLQ6AxTcYRrUKvLX+ZsdaXtQWB7KHT7HmICO5ka5Ng14u7r+g8kFVjm
+         JAV/JWXsefr+/wrd+CsFDnAd7yBi3TpWkEH+CJv/i81P4I/Wgnvg5OWpdBmOORQcVIj4
+         Ow7qXXBrv8z/fDSILNa7CSKR1NlnSlDwQx8NP7uhz5oegwbg65SMU6VTJJgS5eczCtKX
+         eT1ydJPyLXZNyep4aheJxG5W9xkFwn4uFznT7HKkewBKXfeHeAH/4XMBA+aKMefUhxVV
+         NYCg==
+X-Gm-Message-State: AOJu0Yy5IN8RFaz//BHvlQY3N4sgbKw1CTNvUUOLw9fwPoEwBr2J7/yv
+	J6Txus/1NHEjfB5m3P0d3//xK/62G+beHIsIVH7ngM5liBaylknzuwJG61ZToZo=
+X-Google-Smtp-Source: AGHT+IGdu3sTsVj5pjxhy4ECPzYDAu8G5MlflGFu8A707RBlJ/Pa6FNwGTlbSqurHC22ggY2UADy6w==
+X-Received: by 2002:a17:906:8d6:b0:a3e:91fd:c0f0 with SMTP id o22-20020a17090608d600b00a3e91fdc0f0mr5537134eje.49.1709016793910;
+        Mon, 26 Feb 2024 22:53:13 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.222.116])
-        by smtp.gmail.com with ESMTPSA id k7-20020a17090627c700b00a3f81200425sm448734ejc.122.2024.02.26.22.51.13
+        by smtp.gmail.com with ESMTPSA id vh3-20020a170907d38300b00a433634ba03sm458176ejc.43.2024.02.26.22.53.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Feb 2024 22:51:14 -0800 (PST)
-Message-ID: <2e277281-0c28-4159-8c32-4e96254339c3@linaro.org>
-Date: Tue, 27 Feb 2024 07:51:13 +0100
+        Mon, 26 Feb 2024 22:53:13 -0800 (PST)
+Message-ID: <90ab2113-f3f7-4d1f-83ca-aa57cbe63a79@linaro.org>
+Date: Tue, 27 Feb 2024 07:53:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,8 +75,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 3/6] dt-bindings: net: remove outdated
- hisilicon-femac
+Subject: Re: [PATCH net-next v4 6/6] net: hisi_femac: remove unused compatible
+ strings
 Content-Language: en-US
 To: Yang Xiwen <forbidden405@outlook.com>,
  Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
@@ -89,9 +89,9 @@ To: Yang Xiwen <forbidden405@outlook.com>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  devicetree@vger.kernel.org
 References: <20240222-net-v4-0-eea68f93f090@outlook.com>
- <20240222-net-v4-3-eea68f93f090@outlook.com>
- <c3f3d276-46a5-4cc7-ab79-e1ca3262abdf@linaro.org>
- <SEZPR06MB695901BB60F786D7E209EAAC96592@SEZPR06MB6959.apcprd06.prod.outlook.com>
+ <20240222-net-v4-6-eea68f93f090@outlook.com>
+ <ccdcdb1b-44a9-4233-994e-18d875a99c2f@linaro.org>
+ <SEZPR06MB69590A200BDDD6D3DA4CD2DA96592@SEZPR06MB6959.apcprd06.prod.outlook.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -137,41 +137,58 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <SEZPR06MB695901BB60F786D7E209EAAC96592@SEZPR06MB6959.apcprd06.prod.outlook.com>
+In-Reply-To: <SEZPR06MB69590A200BDDD6D3DA4CD2DA96592@SEZPR06MB6959.apcprd06.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 27/02/2024 02:43, Yang Xiwen wrote:
-> On 2/26/2024 3:50 PM, Krzysztof Kozlowski wrote:
+On 27/02/2024 02:51, Yang Xiwen wrote:
+> On 2/26/2024 3:55 PM, Krzysztof Kozlowski wrote:
 >> On 22/02/2024 13:43, Yang Xiwen via B4 Relay wrote:
 >>> From: Yang Xiwen <forbidden405@outlook.com>
 >>>
->>> The user documented(Hi3516) is not found in current kernel anymore. And
->>> it seems this SoC has been EOL for a long time. While at it, Remove this
->>> binding entirely due to recent driver changes.
+>>> The only documented SoC Hi3516DV300 does not receive any updates from 8
+>>> years ago. With the recent driver changes, it unlikely works for this
+>>> SoC anymore. Remove the binding for this SoC.
+>>>
+>>> Also it's hard to get the version number and it's unknown how the
+>>> version can be used. Remove them until it's really needed.
+>>>
+>>> Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
+>>> ---
+>>>  drivers/net/ethernet/hisilicon/hisi_femac.c | 4 +---
+>>>  1 file changed, 1 insertion(+), 3 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/hisilicon/hisi_femac.c b/drivers/net/ethernet/hisilicon/hisi_femac.c
+>>> index eab91e011d11..9466ca9da2bb 100644
+>>> --- a/drivers/net/ethernet/hisilicon/hisi_femac.c
+>>> +++ b/drivers/net/ethernet/hisilicon/hisi_femac.c
+>>> @@ -990,9 +990,7 @@ static int hisi_femac_drv_resume(struct platform_device *pdev)
+>>>  #endif
+>>>  
+>>>  static const struct of_device_id hisi_femac_match[] = {
+>>> -	{.compatible = "hisilicon,hisi-femac-v1",},
+>>> -	{.compatible = "hisilicon,hisi-femac-v2",},
+>>> -	{.compatible = "hisilicon,hi3516cv300-femac",},
+>>> +	{.compatible = "hisilicon,hisi-femac",},
 >>
->> This removes documented compatibles, which:
->> 1. should cause checkpatch issues,
->> 2. is not what we want.
->>
->> Driver is still there, so first the driver would have to be removed...
->> but then why do you add it immediately back? No, it does not work like that.
+>> What is happening here? Removal could be justified, but then order of
+>> your patches is totally wrong. But that hisi-femac is a no-go or provide
+>> proper rationale.
 > 
-> I has downloaded TRM for this old Hi3519 SoC. So i think with the new
-> driver, it still works for Hi3519 FEMAC controller. So i'll rewrite
-> these 3 patches and describe the whole thing in commit logs. i.e. the
-> old binding is wrong, inconsistent with real hardware, etc..
+> I don't understand exactly... In dts, we commonly have a SoC specific
+> compatible string first, generic compatible string the second. e.g.
 > 
-> So you mean conversion to YAML first, in a separate commit. And then do
-> necessary edition to match the real hardware? I believe Hi3519 FEMAC and
-> Hi3798MV200 FEMAC are compatible in hardware. So the old binding is
-> wrong, missing critical hardware resources.
+> compatible = "hisilicon,hi3798mv200-perictrl", "syscon", "simple-mfd".
 
-If you remove binding, then it has to be done in reverse order than
-adding it (see DT submitting patches). However removing binding and
-re-adding it, is not what you think. It's a obfuscated way to make a
-change, so better just make a change and explicitly say why and what is
-happening
+There is no generic compatible here. hi3798mv200 is soc.
+
+> 
+> So i think this is recommended. Or does it mean we only need them in
+
+It is allowed for certain cases and recommended for even fewer ones. Do
+you want to say you have fully discoverable features here and you do not
+need any properties? Or you want to say that all possible hardware will
+have exactly the same programming interface (registers etc)?
 
 Best regards,
 Krzysztof
