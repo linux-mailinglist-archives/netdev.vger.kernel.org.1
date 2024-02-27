@@ -1,152 +1,158 @@
-Return-Path: <netdev+bounces-75464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B612F86A02A
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 20:27:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F232486A07B
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 20:49:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B49C1F24783
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 19:27:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50512B34C50
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 19:27:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7656551C50;
-	Tue, 27 Feb 2024 19:27:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E2FA51C3F;
+	Tue, 27 Feb 2024 19:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dDQ5mKyR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VHawGEHS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2A550A68;
-	Tue, 27 Feb 2024 19:27:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE80B50A68
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 19:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709062049; cv=none; b=fqaz4cEnDwvR/Z6saQb/gqlVI386QQEGIk0XowBdGYmX6Ys2TvXTrtdvUZr8RsUg96MqSzI9sxrOvErz94lT77c9qrp7V8hNzWiwlIczgcu3frno5qVQ/00R4RV5sKnwayORZriSID/1CzU2bKCGxV8VrJDdgIm4d2O8EUooIfs=
+	t=1709062046; cv=none; b=TAHXtpM1Ctg0h5JvVNq2UCbpTM9y5YUG6PHjY4h/jRqETU7Ie6J+1Yxx/h51mw3xEKc+PTH16r9ZUUJy2yxCb0cHaCj9Vv8OqMLFNDt30kHL60JJnvoBtXOB4krHCHVlPUwgjYXXQLJEE/IYWvK6NY69iY9jftAaEHyBLwganig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709062049; c=relaxed/simple;
-	bh=EqsLvIImce7QGWkPVEQZAZcNWfJbExoKdrSW+vror8c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e2DYb0To+T/+xdctYkj5vZa1Ppn2edKhGXvQ11px2OF9I8/0q7fmifgqgGya6g54EdfSM2MkciUJwpgI/tZjZA9ZRioEA0ok28EwJArFB+rTlrQOrR+YkGuhZdisHOdt+fROdSxb0G5ywaaWHLFp+S7YkhUULqEPF/Q5nmFhLPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dDQ5mKyR; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2d24a727f78so65338721fa.0;
-        Tue, 27 Feb 2024 11:27:27 -0800 (PST)
+	s=arc-20240116; t=1709062046; c=relaxed/simple;
+	bh=PBa/pJM7AcjrMxwQq5W4HIcny1Z7S8PYk+z/8Tn19X8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=HjxwawKn9HqtokM5Lt3yJXtFKwMV1wiRwjDZYVvQLg9qkSsBGCOmVqIK+obSEOJR33OFB7OCOUSDyc+1bU0werAF7bceqlSoK9FDaVFIlwAgg3Lk1AE70EiOGTx2MJ4nojrhcxc654433DHGSsf76PKkMrSkgHdjmpBE2QT0XIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VHawGEHS; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dcf22e5b70bso8360125276.1
+        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 11:27:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709062046; x=1709666846; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TtO7eARrOzPr4vplwQY3fP3qCNMybXHa66yqZyCEb6A=;
-        b=dDQ5mKyRHvcyuxVTS8EFyP0R4e7CBDNndQY6vylahFARkJ5BNG8TrV1AufUD+JOg0w
-         3Lk02g84xvq+Q3wREeKIdpL/nzYAeYKItNpvtvSCdObpQBy7q1Aq6WNL/BBVQbfhRSWu
-         0DyxiwsDKvm5vlpmkcnFBPuHtqFxEikA+nsWISDpaSWC9odYaRaTyzMI+/LW0yojZ6AJ
-         X+YXS2ugsVDlIu0hinZZ5hWotMq2WOMmD3o0jQ+hW0hURxIiPH2A5GKz0rYZ7lD+xPh2
-         tdP7hl4PgS24L8MOhVAPHg7AfD6evTprkuKBxYgl5DQg7UppnurAJAo8Of5sBEUeH4OC
-         ZyRg==
+        d=google.com; s=20230601; t=1709062043; x=1709666843; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=pcqIOfiEpesUFQCxCeEH6BLuqyD2RZZwLKPfboASVP8=;
+        b=VHawGEHStcf8mxKQEvs8TktqQi//DmmM0YaPtS6Y0DzG8e6Cp9+370j6frG0lffX5k
+         +kk9vuE/c31/1zQNzQInT1Mw8IjZBEQLeKeh6Ajx9JRQP0vJS2NG50RJF7C4WqKJKrnU
+         6NtGv75XbwBx8SxAlfGtU98tyVrQHURAil6W1zfscO25614giR6O5ZMI8gJ2WsQZ1AXA
+         mCbYJzpsPR2XHOu0wSYXyuCp/CSEBWFvKLL2zRnqEADj7xrhwIyLz7RCOOIODZgqHZcy
+         ScLanpDSgBl0SnlktV7PDAkxpZj3IKKZXNgyHR/cyseyCyqGMz1yKuHH63KGRttrb4/2
+         Ufdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709062046; x=1709666846;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TtO7eARrOzPr4vplwQY3fP3qCNMybXHa66yqZyCEb6A=;
-        b=ll3Ctk14q0MPDBPLxPbnpbErHn4COBsggNUSLOkIGCpCHpKHEkHciRaDPLbKjS2pgb
-         F59b09Q2dz+O8llPMinPC7OVXUhVt/UNZuTC9qi9movt0GA/3KOMVp9u7M7F/JeGLV9K
-         JzdQD01tq8xTHe/U3/EXS23PyoU1STwdaOBZ1abxLDmIt+f/KLBb+NWsjg07MCl9Ne8g
-         n/wL81f/4XZFdIC6FdHk2UeDbL2V0gOPovlketYZI9OvoG2Kc1I2uZGRq1XXXj9RFtop
-         DsJlQh1CRIJpf5vdMEQ4wmKR9K4oYRPsTnZpQpYVUfwkFyI53YfK75pW2ygyxVQFsTVx
-         1Maw==
-X-Forwarded-Encrypted: i=1; AJvYcCX2b0AyPoQe60LBnxAzT+XhH34XMv0LTLDGZRqQDoDZXJOKU0M6RLEpksG46CWgXCWFpeOGdbZ7Z1hj4xOPMIFGpXSpM3XIfrx9F6Q16ntT7TmdeiewkSaCp/UJ2HV3e1FbrX/u
-X-Gm-Message-State: AOJu0YxkT76gVq1EqCV3HLQmI3U/em1IlYeXP5USxHwYb+aiY6CRWiCR
-	XvGWIp+falbboM4xYRl0RJvLNCbmRrMDC/OMqYZQJDTjoDIK2FhC2XKE4qKAxqM=
-X-Google-Smtp-Source: AGHT+IEERH23YsBcEq4wE6ogzVQxQFB1kkosdw4mF04em+goPWGBrBhI6JGtQmbxRvqegX3FYr3UhQ==
-X-Received: by 2002:a2e:7315:0:b0:2d2:2eb7:9ab3 with SMTP id o21-20020a2e7315000000b002d22eb79ab3mr6912091ljc.32.1709062045563;
-        Tue, 27 Feb 2024 11:27:25 -0800 (PST)
-Received: from macminim1.retailmedia.com ([2a01:e0a:b14:c1f0:617b:c61e:d65f:861e])
-        by smtp.googlemail.com with ESMTPSA id 18-20020a05600c025200b00412abfb0ed0sm2915784wmj.0.2024.02.27.11.27.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Feb 2024 11:27:24 -0800 (PST)
-From: Erwan Velu <erwanaliasr1@gmail.com>
-X-Google-Original-From: Erwan Velu <e.velu@criteo.com>
-To: 
-Cc: erwanaliasr1@gmail.com,
-	Erwan Velu <e.velu@criteo.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] i40e: Prevent setting MTU if greater than MFS
-Date: Tue, 27 Feb 2024 20:27:03 +0100
-Message-ID: <20240227192704.376176-1-e.velu@criteo.com>
-X-Mailer: git-send-email 2.43.2
+        d=1e100.net; s=20230601; t=1709062043; x=1709666843;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pcqIOfiEpesUFQCxCeEH6BLuqyD2RZZwLKPfboASVP8=;
+        b=P17H/d2TWAKaZjutpikUNPuUAtzklV2MMHeLaLZ0XQywiBFUq/YRof5L/4fMToZ+i9
+         o0sQ/sU44UA4/7OzRd0ngbQHVNJy7RwnIDssuIJICNdMkDuVTsE4/ezaPKhUi1WvkAMh
+         FlkoFwnNFBqnD8ALLd4FvWjblTqYzfN7mYKjrfQ95WPErXZYu87OpWWYXocIvjUQBO1G
+         AMyGC1LeSxjNPyNGRgDj3R0UI9xvFGo0uZRDHOHR89khD/ezB+tJJ5PeSb6dkUiNJcz3
+         +hDqp2Ryo3v0dnz31kyHRqoVzFxbQH1+Q7ugIL1OhENVmKbbYQbPXGL0TCDk+haLFDqE
+         jFtw==
+X-Gm-Message-State: AOJu0Yzu1ZnMwkQ0LNmcRbz3Wb4+p1er7MCclhsHZY/f+s8Ur5wj313w
+	eHRjE+KOhosH0tjOXqApmKnmg0hExIhGCTspQVzufjI0OrCiVHtePJXIIhk48zf7wWx91o07cut
+	I+zMpHkoIzg==
+X-Google-Smtp-Source: AGHT+IHrvUtmF4Smp49UE3C5hBDSJAdbIWVoxMWVDpTzz5nJSoySVvR4OoeZuMKc5kv50gBlRs6zVr8GetaN+w==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:f09:b0:dcc:9f24:692b with SMTP
+ id et9-20020a0569020f0900b00dcc9f24692bmr18797ybb.13.1709062042818; Tue, 27
+ Feb 2024 11:27:22 -0800 (PST)
+Date: Tue, 27 Feb 2024 19:27:21 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
+Message-ID: <20240227192721.3558982-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp: remove some holes in struct tcp_sock
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Naman Gulati <namangulati@google.com>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Commit 6871a7de705b6f6a4046f0d19da9bcd689c3bc8e from iPXE project is
-setting the MFS to 0x600 = 1536.
+By moving some fields around, this patch shrinks
+holes size from 56 to 32, saving 24 bytes on 64bit arches.
 
-At boot time the i40e driver complains about it with
-the following message but continues.
+After the patch pahole gives the following for 'struct tcp_sock':
 
-	MFS for port 1 has been set below the default: 600
+	/* size: 2304, cachelines: 36, members: 162 */
+	/* sum members: 2234, holes: 6, sum holes: 32 */
+	/* sum bitfield members: 34 bits, bit holes: 5, sum bit holes: 14 bits */
+	/* padding: 32 */
+	/* paddings: 3, sum paddings: 10 */
+	/* forced alignments: 1, forced holes: 1, sum forced holes: 12 */
 
-If the MTU size is increased, the driver accept it but large packets will not
-be processed by the firmware generating tx_errors. The issue is pretty
-silent for users. i.e doing TCP in such context will generates lots of
-retransmissions until the proper window size (below 1500) will be used.
-
-To fix this case, it would have been ideal to increase the MFS,
-via i40e_aqc_opc_set_mac_config, but I didn't found a reliable way to do it.
-
-At least, this commit prevents setting up an MTU greater than the current MFS.
-It will avoid being in the position of having an MTU set to 9000 on the
-netdev with a firmware refusing packets larger than 1536.
-
-A typical trace looks like the following :
-[  377.548696] i40e 0000:5d:00.0 eno5: Error changing mtu to 9000 which is greater than the current mfs: 1536
-
-Signed-off-by: Erwan Velu <e.velu@criteo.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e_main.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ include/linux/tcp.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 54eb55464e31..14fc70d854d3 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -2950,7 +2950,7 @@ static int i40e_change_mtu(struct net_device *netdev, int new_mtu)
- 	struct i40e_netdev_priv *np = netdev_priv(netdev);
- 	struct i40e_vsi *vsi = np->vsi;
- 	struct i40e_pf *pf = vsi->back;
--	int frame_size;
-+	int frame_size, mfs;
+diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+index a1c47a6d69b0efd7e62765fbd873c848da22aaec..988a30ef6bfe956fa573f1f18c8284aa382dc1cc 100644
+--- a/include/linux/tcp.h
++++ b/include/linux/tcp.h
+@@ -264,10 +264,10 @@ struct tcp_sock {
+ 	u32	pushed_seq;	/* Last pushed seq, required to talk to windows */
+ 	u32	lsndtime;
+ 	u32	mdev_us;	/* medium deviation			*/
++	u32	rtt_seq;	/* sequence number to update rttvar	*/
+ 	u64	tcp_wstamp_ns;	/* departure time for next sent data packet */
+ 	u64	tcp_clock_cache; /* cache last tcp_clock_ns() (see tcp_mstamp_refresh()) */
+ 	u64	tcp_mstamp;	/* most recent packet received/sent */
+-	u32	rtt_seq;	/* sequence number to update rttvar	*/
+ 	struct list_head tsorted_sent_queue; /* time-sorted sent but un-SACKed skbs */
+ 	struct sk_buff *highest_sack;   /* skb just after the highest
+ 					 * skb with SACKed bit set
+@@ -350,7 +350,6 @@ struct tcp_sock {
+ 	u32	dsack_dups;	/* RFC4898 tcpEStatsStackDSACKDups
+ 				 * total number of DSACK blocks received
+ 				 */
+-	u32	last_oow_ack_time;  /* timestamp of last out-of-window ACK */
+ 	u32	compressed_ack_rcv_nxt;
+ 	struct list_head tsq_node; /* anchor in tsq_tasklet.head list */
  
- 	frame_size = i40e_max_vsi_frame_size(vsi, vsi->xdp_prog);
- 	if (new_mtu > frame_size - I40E_PACKET_HDR_PAD) {
-@@ -2959,6 +2959,13 @@ static int i40e_change_mtu(struct net_device *netdev, int new_mtu)
- 		return -EINVAL;
- 	}
+@@ -384,12 +383,12 @@ struct tcp_sock {
+ 		syn_fastopen_ch:1, /* Active TFO re-enabling probe */
+ 		syn_data_acked:1;/* data in SYN is acked by SYN-ACK */
  
-+	mfs = pf->hw.phy.link_info.max_frame_size;
-+	if (new_mtu > mfs) {
-+		netdev_err(netdev, "Error changing mtu to %d which is greater than the current mfs: %d\n",
-+			   new_mtu, mfs);
-+		return -EINVAL;
-+	}
-+
- 	netdev_dbg(netdev, "changing MTU from %d to %d\n",
- 		   netdev->mtu, new_mtu);
- 	netdev->mtu = new_mtu;
++	u8	keepalive_probes; /* num of allowed keep alive probes	*/
+ 	u32	tcp_tx_delay;	/* delay (in usec) added to TX packets */
+ 
+ /* RTT measurement */
+ 	u32	mdev_max_us;	/* maximal mdev for the last rtt period	*/
+ 
+-	u8	keepalive_probes; /* num of allowed keep alive probes	*/
+ 	u32	reord_seen;	/* number of data packet reordering events */
+ 
+ /*
+@@ -402,6 +401,7 @@ struct tcp_sock {
+ 	u32	prior_cwnd;	/* cwnd right before starting loss recovery */
+ 	u32	prr_delivered;	/* Number of newly delivered packets to
+ 				 * receiver in Recovery. */
++	u32	last_oow_ack_time;  /* timestamp of last out-of-window ACK */
+ 
+ 	struct hrtimer	pacing_timer;
+ 	struct hrtimer	compressed_ack_timer;
+@@ -477,8 +477,8 @@ struct tcp_sock {
+ 	bool	is_mptcp;
+ #endif
+ #if IS_ENABLED(CONFIG_SMC)
+-	bool	(*smc_hs_congested)(const struct sock *sk);
+ 	bool	syn_smc;	/* SYN includes SMC */
++	bool	(*smc_hs_congested)(const struct sock *sk);
+ #endif
+ 
+ #if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
 -- 
-2.43.2
+2.44.0.rc1.240.g4c46232300-goog
 
 
