@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-75258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61EDD868DCA
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 11:39:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24015868DCD
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 11:39:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D2151F2357D
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:39:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5545C1C23CE3
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:39:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E6113AA3F;
-	Tue, 27 Feb 2024 10:37:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="uQidwuu6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B6913AA5A;
+	Tue, 27 Feb 2024 10:37:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD291386D2
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 10:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1A91386DB;
+	Tue, 27 Feb 2024 10:37:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709030244; cv=none; b=Iv4lHfo8t9KdAjWFH9w+6u2/9zzek3KEReWJXU0UmduIcRFATM49WiYh8OFKXrCWmMwR7Jo+lJaWPE6dg7k8KMogPnGsbeZXtD6a9xUngSVOJdWlZCU+oHkT+/oseGh7Rvctwe8YQy+kp+JRMIg0RT446pJKClBfAs5bKJYSDkM=
+	t=1709030248; cv=none; b=e2HB7ZEgoM39YltPn05WXNxbXCu7t/YLApAQfbh0JD8HBA5QTK9Zqe3imnY7T2eyCeDGfxK92ozjtkiyYqsfcaadcM+lxOBc09xfhHQPmGI5JIel2hhuExbDN1z2OgqHTs8HBFtdNXXxK/d3u0VAgiFRaz+5O1rgNaCLUkXHPKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709030244; c=relaxed/simple;
-	bh=sHM/GYTwFlwAFPTUce89SAEddnBTWUpWLrwEiBJ1GzM=;
+	s=arc-20240116; t=1709030248; c=relaxed/simple;
+	bh=UopZteKsviPxCNjSny9cAIZSGOCRhXG4d51EkbeY/J4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D3fALx8RewmsfyTyiuQycYI0jibEb+mghBmIZarR05zzIynMfJXR1TGbHF4tC+74udgEPZt9x64SwI+0NFEdk6v3B718qcKTAuyt2iInklPRLn86ByyqM6deEYne29RAITvaoBmjf2t0msIeUY3o788qUNGOKoG/Rubp6+xKjlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=uQidwuu6; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=9jdUkLDl+bbxaHDb5GmFwMACzIokLVgkvd1z6P9kg1A=; b=uQidwuu6XSAlW/BM/oCiOrJMvt
-	sWaaRvPwKhxMZ9I16nciouTulxVK8bhwzV+X6JR1sJ3iJ3VXeb7ZKpFQOTk1Hj6O65f2qi17Z+j9r
-	UQWWc3CLH1WgnQQKL7+yybqrf1tkoKGcGqDsxb0dgFkgJYKsoyzdma+++Rq5KrNo3W5hCOMz/a1dp
-	TU+ukpxciIFFwXi71MubW3/BSG9Z8gLEpMdJlbW5Xh/hLU+T/j7nq+rtRnBz8Etp0WvbQEi8GZVru
-	Ks3OrJruRGgv3NKztc2TZfn59i+G0hK42NPPw6isqOWZ2cBOafe+39u7D+h/7ThoFM6ab7+OedpKY
-	pZjDPorA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33122)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1reupn-0007ni-1w;
-	Tue, 27 Feb 2024 10:37:15 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1reupm-0007Jh-SH; Tue, 27 Feb 2024 10:37:14 +0000
-Date: Tue, 27 Feb 2024 10:37:14 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=XCPGvybBcpSehkwsbeW3ETUjqOvQJh2Dqv4c9EHJ3dDL+9eQR8MMKYYpRcaFsYa/gS4TWuGJLVjU2kEB1cM8DUgm3cZ1qzxi2JXnqRDAAGGRDWvftTrLFgNP2T12enj11+B9zikic0oK5fjBVb5uSqb8Fm91geDs32tRAaFncrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAD64C433F1;
+	Tue, 27 Feb 2024 10:37:20 +0000 (UTC)
+Date: Tue, 27 Feb 2024 10:37:18 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 2/6] net: phy: realtek: add
- get_rate_matching() for rtl822x/8251b PHYs
-Message-ID: <Zd27WpSyhMNdA/B+@shell.armlinux.org.uk>
-References: <20240227075151.793496-1-ericwouds@gmail.com>
- <20240227075151.793496-3-ericwouds@gmail.com>
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+	llvm@lists.linux.dev, Ingo Molnar <mingo@redhat.com>,
+	Bill Wendling <morbo@google.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Leon Romanovsky <leonro@mellanox.com>, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Mark Rutland <mark.rutland@arm.com>,
+	Michael Guralnik <michaelgur@mellanox.com>, patches@lists.linux.dev,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 4/6] arm64/io: Provide a WC friendly __iowriteXX_copy()
+Message-ID: <Zd27XtDg_NDzLXg-@arm.com>
+References: <0-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
+ <4-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,21 +75,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240227075151.793496-3-ericwouds@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <4-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
 
-On Tue, Feb 27, 2024 at 08:51:47AM +0100, Eric Woudstra wrote:
-> Uses vendor register to determine if SerDes is setup in rate-matching mode.
-> 
-> Rate-matching only supported when SerDes is set to 2500base-x.
-> 
-> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+On Tue, Feb 20, 2024 at 09:17:08PM -0400, Jason Gunthorpe wrote:
+> +/*
+> + * This generates a memcpy that works on a from/to address which is aligned to
+> + * bits. Count is in terms of the number of bits sized quantities to copy. It
+> + * optimizes to use the STR groupings when possible so that it is WC friendly.
+> + */
+> +#define memcpy_toio_aligned(to, from, count, bits)                        \
+> +	({                                                                \
+> +		volatile u##bits __iomem *_to = to;                       \
+> +		const u##bits *_from = from;                              \
+> +		size_t _count = count;                                    \
+> +		const u##bits *_end_from = _from + ALIGN_DOWN(_count, 8); \
+> +                                                                          \
+> +		for (; _from < _end_from; _from += 8, _to += 8)           \
+> +			__const_memcpy_toio_aligned##bits(_to, _from, 8); \
+> +		if ((_count % 8) >= 4) {                                  \
+> +			__const_memcpy_toio_aligned##bits(_to, _from, 4); \
+> +			_from += 4;                                       \
+> +			_to += 4;                                         \
+> +		}                                                         \
+> +		if ((_count % 4) >= 2) {                                  \
+> +			__const_memcpy_toio_aligned##bits(_to, _from, 2); \
+> +			_from += 2;                                       \
+> +			_to += 2;                                         \
+> +		}                                                         \
+> +		if (_count % 2)                                           \
+> +			__const_memcpy_toio_aligned##bits(_to, _from, 1); \
+> +	})
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Do we actually need all this if count is not constant? If it's not
+performance critical anywhere, I'd rather copy the generic
+implementation, it's easier to read.
 
-Thanks!
+Otherwise, apart from the __raw_writeq() typo that Will mentioned, the
+patch looks fine to me.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Catalin
 
