@@ -1,163 +1,435 @@
-Return-Path: <netdev+bounces-75249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FC79868D69
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 11:23:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DBF6868D79
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 11:24:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 790CFB25C11
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:23:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4374F28E779
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFB4B138492;
-	Tue, 27 Feb 2024 10:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DiNtSMHw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97D7C13849D;
+	Tue, 27 Feb 2024 10:24:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C53E137C5E
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 10:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6814F56458;
+	Tue, 27 Feb 2024 10:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709029409; cv=none; b=jLb7ZrTj8Y4qHueVRI3NVtRP5GiinvtthQOcBV6nwVb4SlO6D8sco+pWsovRMBYTi9dAwU90uzrlisAsjI3jE2zSiAGiZljH4vrBb6uhnL0AWOBXgFD/AcRCgrm09GJJLbuVTLsr+ceWuJ/j90ycIg1QLhZesbdz2xGUXXviess=
+	t=1709029460; cv=none; b=Mi+cX8DVXPJnlj4bHhFpTgIGA8KS6RacIOV/bemIIgFEIkPB1P+iQWFuFYfvloBO6FdhnB2W+cC/8Yy3M8BTP1ZQjTiID88HjwSXZ5MVRTMS2sVU8/wqzN/B7My1ohqaQowfT4966Y3N6DXwz3tkw2EeiPl4eDUPxbnQ+L7bd8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709029409; c=relaxed/simple;
-	bh=2Q9KDrmM9tt6dM0nCK12JSvCihakXCdWBvUsQ+hydqc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=qL9dyU4vlj1/GWyGLoohveIMHN3rdGd15t3d6h7CL8BgB7zh7JeM3YS6urLOMAw2BTz4/wDAWHSEMmYSHOl4qnODtxOJBLAYaUrUi9hEFgmiYmtuKmpprSPnfYrD2Z7CGktqqWhaCN811MmXHDaSk1+fbZtmOfnPOedgv3LPhbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DiNtSMHw; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709029407;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=WtGehCEFfElimHD+TqShgtHsXC4dbFxlCmNc54Gi17M=;
-	b=DiNtSMHww6O/gV7Ta0ZGR4KSarrPv4KtoUwUDjkl+0zkaGfc6GfqJep9TrjDAOUp85o1SM
-	kt+C3+wec8ccd6js7tJSjGxrUniWYHft9ZMjyP0SovpqRhEpC0UkUVgyAKpMulw5Nw9hJu
-	mR5kIxJdMoh6dsQq8FwQpqUVtoJNq5o=
-Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com
- [209.85.160.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-694-OsQA6xCOONu3M22V878cNg-1; Tue, 27 Feb 2024 05:23:25 -0500
-X-MC-Unique: OsQA6xCOONu3M22V878cNg-1
-Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-21f6ac80f30so665615fac.0
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 02:23:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709029405; x=1709634205;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WtGehCEFfElimHD+TqShgtHsXC4dbFxlCmNc54Gi17M=;
-        b=p6uok+HBTGh/68LEWZ05/Y7rgz/625/6pr71zFvJE1YyhCtygOuDzCyWdv9y36QenW
-         7DOf6heVO02eO7W7MFnGRcnPkvxDf/obUtzv1MSZZrwYKBoQtSnxibFlDpPwrA8vVOKQ
-         60rHK1AGA/cyGbvdpB/NcT78o5njCxMZotoI/I8xMNblitvTF6DiF6w8uoEjDF+VlHD2
-         KtSm1HQ5Jeqt9Lq5lB4kIhwTV9DXTrXGT02Gz72Ik2lfXsVJ1pcOwTxYBQz6ja2tKiim
-         wTxDZ1M9tkaO8lm6vVjCvcOV43uKTxf6qDiyyM4R7pE9ipR0QJaANmSzYBCMwtuQptap
-         9AuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUJMTAoalZb+OO7TlgBUzy+0UNwXxdDG+xmPJxagWJmcJ76ho3HMXPqdzbvPekfjeBNg0Yy9ctnnfyABxa8AoWOP1W6aThg
-X-Gm-Message-State: AOJu0YzEoGJiMGtybSGOVWYrKROwp0yvjBKkq2EKmcvNbavACMzQi/Et
-	Jb+PoV0H25p6LszSZAFaI7CS0JJx8WOZn6qiOYobXRwJ6puhfDn6eZxY8NTAULR4rkOHCFEwVzC
-	acGZlq4hpVK7emBIh0azAxtERW7i7ijvIU0c3b+oErBBEgPsW9sW/jQ==
-X-Received: by 2002:a05:6871:7806:b0:21e:c50a:5e91 with SMTP id oy6-20020a056871780600b0021ec50a5e91mr10378075oac.0.1709029405159;
-        Tue, 27 Feb 2024 02:23:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEOrA1Nby4BCC+kPq5RbsZ68EDRxHVTjrQk/S01m5vEVtY4OYChDEowwg6U8GBImhvB3q18FA==
-X-Received: by 2002:a05:6871:7806:b0:21e:c50a:5e91 with SMTP id oy6-20020a056871780600b0021ec50a5e91mr10378065oac.0.1709029404831;
-        Tue, 27 Feb 2024 02:23:24 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-245-60.dyn.eolo.it. [146.241.245.60])
-        by smtp.gmail.com with ESMTPSA id r3-20020a056830134300b006e496865b32sm1128766otq.43.2024.02.27.02.23.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Feb 2024 02:23:23 -0800 (PST)
-Message-ID: <f656e38ff276f6c73d0b59eb301528cf3ae322e9.camel@redhat.com>
-Subject: Re: [PATCH net-next 1/6] net: ipa: don't bother aborting system
- resume
-From: Paolo Abeni <pabeni@redhat.com>
-To: Alex Elder <elder@linaro.org>, davem@davemloft.net, edumazet@google.com,
-  kuba@kernel.org
-Cc: mka@chromium.org, andersson@kernel.org, quic_cpratapa@quicinc.com, 
- quic_avuyyuru@quicinc.com, quic_jponduru@quicinc.com,
- quic_subashab@quicinc.com,  elder@kernel.org, netdev@vger.kernel.org,
- linux-arm-msm@vger.kernel.org,  linux-kernel@vger.kernel.org
-Date: Tue, 27 Feb 2024 11:23:18 +0100
-In-Reply-To: <20240223133930.582041-2-elder@linaro.org>
-References: <20240223133930.582041-1-elder@linaro.org>
-	 <20240223133930.582041-2-elder@linaro.org>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1709029460; c=relaxed/simple;
+	bh=Lb6u+F5Y3zDeicwtR1SX5jKmHw1GySf/c3/cLlb4RhA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LhCLeIg1NAk/YM1W038FSspqF2LSiI9PVAZjtEq88htnYHyV9w9tFg+jkPHtFOh812Wb+eWokh7W91g6au8hwGn7t9eqHsqoT576MZBZ5shGWUJXO8dr+YHaWigI43Sa/8WCoIb3vs4yVfcCvU8tWdc24piBCU1THrDo5N9XynA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-IronPort-AV: E=Sophos;i="6.06,187,1705330800"; 
+   d="asc'?scan'208";a="199446128"
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie6.idc.renesas.com with ESMTP; 27 Feb 2024 19:24:15 +0900
+Received: from [10.226.92.206] (unknown [10.226.92.206])
+	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 3A81941FC763;
+	Tue, 27 Feb 2024 19:24:11 +0900 (JST)
+Message-ID: <3ace0c25-8d3f-491a-9f3e-ccd77715e63d@bp.renesas.com>
+Date: Tue, 27 Feb 2024 10:24:10 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next 1/6] ravb: Group descriptor types used in Rx ring
+Content-Language: en-GB
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+ <niklas.soderlund+renesas@ragnatech.se>, Sergey Shtylyov
+ <s.shtylyov@omp.ru>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Biju Das <biju.das.jz@bp.renesas.com>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, netdev@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org
+References: <20240227014014.44855-1-niklas.soderlund+renesas@ragnatech.se>
+ <20240227014014.44855-2-niklas.soderlund+renesas@ragnatech.se>
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+Organization: Renesas Electronics Corporation
+In-Reply-To: <20240227014014.44855-2-niklas.soderlund+renesas@ragnatech.se>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------MkMdfntey5fdGBQQjbvxcKcs"
 
-On Fri, 2024-02-23 at 07:39 -0600, Alex Elder wrote:
-> The IPA interrupt can fire if there is data to be delivered to a GSI
-> channel that is suspended.  This condition occurs in three scenarios.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------MkMdfntey5fdGBQQjbvxcKcs
+Content-Type: multipart/mixed; boundary="------------fTPJPt5PABNxvoLccSMIxB2S";
+ protected-headers="v1"
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+ <niklas.soderlund+renesas@ragnatech.se>, Sergey Shtylyov
+ <s.shtylyov@omp.ru>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Biju Das <biju.das.jz@bp.renesas.com>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, netdev@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org
+Message-ID: <3ace0c25-8d3f-491a-9f3e-ccd77715e63d@bp.renesas.com>
+Subject: Re: [net-next 1/6] ravb: Group descriptor types used in Rx ring
+References: <20240227014014.44855-1-niklas.soderlund+renesas@ragnatech.se>
+ <20240227014014.44855-2-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20240227014014.44855-2-niklas.soderlund+renesas@ragnatech.se>
+
+--------------fTPJPt5PABNxvoLccSMIxB2S
+Content-Type: multipart/mixed; boundary="------------av7aTP2boydXDdHciuMpt90g"
+
+--------------av7aTP2boydXDdHciuMpt90g
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+On 27/02/2024 01:40, Niklas S=C3=B6derlund wrote:
+> The Rx ring can either be made up of normal or extended descriptors, no=
+t
+> a mix of the two at the same time. Make this explicitly by grouping the=
+
+> two variables in a rx_ring union.
 >=20
-> First, runtime power management automatically suspends the IPA
-> hardware after half a second of inactivity.  This has nothing
-> to do with system suspend, so a SYSTEM IPA power flag is used to
-> avoid calling pm_wakeup_dev_event() when runtime suspended.
+> The extension of the storage for more than one queue of normal
+> descriptors from a single to NUM_RX_QUEUE queues have no practical
+> effect. But aids in making the code readable as the code that uses it
+> already piggyback on other members of struct ravb_private that are
+> arrays of max length NUM_RX_QUEUE, e.g. rx_desc_dma. This will also mak=
+e
+> further refactoring easier.
 >=20
-> Second, if the system is suspended, the receipt of an IPA interrupt
-> should trigger a system resume.  Configuring the IPA interrupt for
-> wakeup accomplishes this.
+> While at it rename the normal descriptor Rx ring to make it clear it's
+> not strictly related to the GbEthernet E-MAC IP found in RZ/G2L, normal=
+
+> descriptors could be used on R-Car SoCs too.
 >=20
-> Finally, if system suspend is underway and the IPA interrupt fires,
-> we currently call pm_wakeup_dev_event() to abort the system suspend.
->=20
-> The IPA driver correctly handles quiescing the hardware before
-> suspending it, so there's really no need to abort a suspend in
-> progress in the third case.  We can simply quiesce and suspend
-> things, and be done.
->=20
-> Incoming data can still wake the system after it's suspended.
-> The IPA interrupt has wakeup mode enabled, so if it fires *after*
-> we've suspended, it will trigger a wakeup (if not disabled via
-> sysfs).
->=20
-> Stop calling pm_wakeup_dev_event() to abort a system suspend in
-> progress in ipa_power_suspend_handler().
->=20
-> Signed-off-by: Alex Elder <elder@linaro.org>
+> Signed-off-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnatec=
+h.se>
 > ---
-> Note: checkpatch warns: braces {} are not necessary...
+>  drivers/net/ethernet/renesas/ravb.h      |  6 ++-
+>  drivers/net/ethernet/renesas/ravb_main.c | 57 ++++++++++++------------=
+
+>  2 files changed, 33 insertions(+), 30 deletions(-)
 >=20
->  drivers/net/ipa/ipa_power.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/net/ipa/ipa_power.c b/drivers/net/ipa/ipa_power.c
-> index 128a816f65237..694bc71e0a170 100644
-> --- a/drivers/net/ipa/ipa_power.c
-> +++ b/drivers/net/ipa/ipa_power.c
-> @@ -220,8 +220,9 @@ void ipa_power_suspend_handler(struct ipa *ipa, enum =
-ipa_irq_id irq_id)
->  	 * system suspend, trigger a system resume.
->  	 */
->  	if (!__test_and_set_bit(IPA_POWER_FLAG_RESUMED, ipa->power->flags))
-> -		if (test_bit(IPA_POWER_FLAG_SYSTEM, ipa->power->flags))
-> -			pm_wakeup_dev_event(&ipa->pdev->dev, 0, true);
-> +		if (test_bit(IPA_POWER_FLAG_SYSTEM, ipa->power->flags)) {
-> +			;
-> +		}
+> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet=
+/renesas/ravb.h
+> index 35e642fc4b2a..aecc98282c7e 100644
+> --- a/drivers/net/ethernet/renesas/ravb.h
+> +++ b/drivers/net/ethernet/renesas/ravb.h
+> @@ -1092,8 +1092,10 @@ struct ravb_private {
+>  	struct ravb_desc *desc_bat;
+>  	dma_addr_t rx_desc_dma[NUM_RX_QUEUE];
+>  	dma_addr_t tx_desc_dma[NUM_TX_QUEUE];
+> -	struct ravb_rx_desc *gbeth_rx_ring;
+> -	struct ravb_ex_rx_desc *rx_ring[NUM_RX_QUEUE];
+> +	union {
+> +		struct ravb_rx_desc *desc;
+> +		struct ravb_ex_rx_desc *ex_desc;
+> +	} rx_ring[NUM_RX_QUEUE];
+>  	struct ravb_tx_desc *tx_ring[NUM_TX_QUEUE];
+>  	void *tx_align[NUM_TX_QUEUE];
+>  	struct sk_buff *rx_1st_skb;
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/eth=
+ernet/renesas/ravb_main.c
+> index f9fb772b05c7..c25a80f4d3b9 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -241,11 +241,11 @@ static void ravb_rx_ring_free_gbeth(struct net_de=
+vice *ndev, int q)
+>  	unsigned int ring_size;
+>  	unsigned int i;
+> =20
+> -	if (!priv->gbeth_rx_ring)
+> +	if (!priv->rx_ring[q].desc)
+>  		return;
+> =20
+>  	for (i =3D 0; i < priv->num_rx_ring[q]; i++) {
+> -		struct ravb_rx_desc *desc =3D &priv->gbeth_rx_ring[i];
+> +		struct ravb_rx_desc *desc =3D &priv->rx_ring[q].desc[i];
+> =20
+>  		if (!dma_mapping_error(ndev->dev.parent,
+>  				       le32_to_cpu(desc->dptr)))
+> @@ -255,9 +255,9 @@ static void ravb_rx_ring_free_gbeth(struct net_devi=
+ce *ndev, int q)
+>  					 DMA_FROM_DEVICE);
+>  	}
+>  	ring_size =3D sizeof(struct ravb_rx_desc) * (priv->num_rx_ring[q] + 1=
+);
+> -	dma_free_coherent(ndev->dev.parent, ring_size, priv->gbeth_rx_ring,
+> +	dma_free_coherent(ndev->dev.parent, ring_size, priv->rx_ring[q].desc,=
 
-FTR, I would have dropped the whole 'if' statement above and the
-related comment in this patch, saving a few checkpatch warnings. Not a
-big deal since the the chunk is removed a few patches later.
+>  			  priv->rx_desc_dma[q]);
+> -	priv->gbeth_rx_ring =3D NULL;
+> +	priv->rx_ring[q].desc =3D NULL;
+>  }
+> =20
+>  static void ravb_rx_ring_free_rcar(struct net_device *ndev, int q)
+> @@ -266,11 +266,11 @@ static void ravb_rx_ring_free_rcar(struct net_dev=
+ice *ndev, int q)
+>  	unsigned int ring_size;
+>  	unsigned int i;
+> =20
+> -	if (!priv->rx_ring[q])
+> +	if (!priv->rx_ring[q].ex_desc)
+>  		return;
+> =20
+>  	for (i =3D 0; i < priv->num_rx_ring[q]; i++) {
+> -		struct ravb_ex_rx_desc *desc =3D &priv->rx_ring[q][i];
+> +		struct ravb_ex_rx_desc *desc =3D &priv->rx_ring[q].ex_desc[i];
+> =20
+>  		if (!dma_mapping_error(ndev->dev.parent,
+>  				       le32_to_cpu(desc->dptr)))
+> @@ -281,9 +281,9 @@ static void ravb_rx_ring_free_rcar(struct net_devic=
+e *ndev, int q)
+>  	}
+>  	ring_size =3D sizeof(struct ravb_ex_rx_desc) *
+>  		    (priv->num_rx_ring[q] + 1);
+> -	dma_free_coherent(ndev->dev.parent, ring_size, priv->rx_ring[q],
+> +	dma_free_coherent(ndev->dev.parent, ring_size, priv->rx_ring[q].ex_de=
+sc,
+>  			  priv->rx_desc_dma[q]);
+> -	priv->rx_ring[q] =3D NULL;
+> +	priv->rx_ring[q].ex_desc =3D NULL;
+>  }
+> =20
+>  /* Free skb's and DMA buffers for Ethernet AVB */
+> @@ -335,11 +335,11 @@ static void ravb_rx_ring_format_gbeth(struct net_=
+device *ndev, int q)
+>  	unsigned int i;
+> =20
+>  	rx_ring_size =3D sizeof(*rx_desc) * priv->num_rx_ring[q];
+> -	memset(priv->gbeth_rx_ring, 0, rx_ring_size);
+> +	memset(priv->rx_ring[q].desc, 0, rx_ring_size);
+>  	/* Build RX ring buffer */
+>  	for (i =3D 0; i < priv->num_rx_ring[q]; i++) {
+>  		/* RX descriptor */
+> -		rx_desc =3D &priv->gbeth_rx_ring[i];
+> +		rx_desc =3D &priv->rx_ring[q].desc[i];
+>  		rx_desc->ds_cc =3D cpu_to_le16(GBETH_RX_DESC_DATA_SIZE);
+>  		dma_addr =3D dma_map_single(ndev->dev.parent, priv->rx_skb[q][i]->da=
+ta,
+>  					  GBETH_RX_BUFF_MAX,
+> @@ -352,7 +352,7 @@ static void ravb_rx_ring_format_gbeth(struct net_de=
+vice *ndev, int q)
+>  		rx_desc->dptr =3D cpu_to_le32(dma_addr);
+>  		rx_desc->die_dt =3D DT_FEMPTY;
+>  	}
+> -	rx_desc =3D &priv->gbeth_rx_ring[i];
+> +	rx_desc =3D &priv->rx_ring[q].desc[i];
+>  	rx_desc->dptr =3D cpu_to_le32((u32)priv->rx_desc_dma[q]);
+>  	rx_desc->die_dt =3D DT_LINKFIX; /* type */
+>  }
+> @@ -365,11 +365,11 @@ static void ravb_rx_ring_format_rcar(struct net_d=
+evice *ndev, int q)
+>  	dma_addr_t dma_addr;
+>  	unsigned int i;
+> =20
+> -	memset(priv->rx_ring[q], 0, rx_ring_size);
+> +	memset(priv->rx_ring[q].ex_desc, 0, rx_ring_size);
+>  	/* Build RX ring buffer */
+>  	for (i =3D 0; i < priv->num_rx_ring[q]; i++) {
+>  		/* RX descriptor */
+> -		rx_desc =3D &priv->rx_ring[q][i];
+> +		rx_desc =3D &priv->rx_ring[q].ex_desc[i];
+>  		rx_desc->ds_cc =3D cpu_to_le16(RX_BUF_SZ);
+>  		dma_addr =3D dma_map_single(ndev->dev.parent, priv->rx_skb[q][i]->da=
+ta,
+>  					  RX_BUF_SZ,
+> @@ -382,7 +382,7 @@ static void ravb_rx_ring_format_rcar(struct net_dev=
+ice *ndev, int q)
+>  		rx_desc->dptr =3D cpu_to_le32(dma_addr);
+>  		rx_desc->die_dt =3D DT_FEMPTY;
+>  	}
+> -	rx_desc =3D &priv->rx_ring[q][i];
+> +	rx_desc =3D &priv->rx_ring[q].ex_desc[i];
+>  	rx_desc->dptr =3D cpu_to_le32((u32)priv->rx_desc_dma[q]);
+>  	rx_desc->die_dt =3D DT_LINKFIX; /* type */
+>  }
+> @@ -437,10 +437,10 @@ static void *ravb_alloc_rx_desc_gbeth(struct net_=
+device *ndev, int q)
+> =20
+>  	ring_size =3D sizeof(struct ravb_rx_desc) * (priv->num_rx_ring[q] + 1=
+);
+> =20
+> -	priv->gbeth_rx_ring =3D dma_alloc_coherent(ndev->dev.parent, ring_siz=
+e,
+> -						 &priv->rx_desc_dma[q],
+> -						 GFP_KERNEL);
+> -	return priv->gbeth_rx_ring;
+> +	priv->rx_ring[q].desc =3D dma_alloc_coherent(ndev->dev.parent, ring_s=
+ize,
+> +						   &priv->rx_desc_dma[q],
+> +						   GFP_KERNEL);
+> +	return priv->rx_ring[q].desc;
+>  }
+> =20
+>  static void *ravb_alloc_rx_desc_rcar(struct net_device *ndev, int q)
+> @@ -450,10 +450,11 @@ static void *ravb_alloc_rx_desc_rcar(struct net_d=
+evice *ndev, int q)
+> =20
+>  	ring_size =3D sizeof(struct ravb_ex_rx_desc) * (priv->num_rx_ring[q] =
++ 1);
+> =20
+> -	priv->rx_ring[q] =3D dma_alloc_coherent(ndev->dev.parent, ring_size,
+> -					      &priv->rx_desc_dma[q],
+> -					      GFP_KERNEL);
+> -	return priv->rx_ring[q];
+> +	priv->rx_ring[q].ex_desc =3D dma_alloc_coherent(ndev->dev.parent,
+> +						      ring_size,
+> +						      &priv->rx_desc_dma[q],
+> +						      GFP_KERNEL);
+> +	return priv->rx_ring[q].ex_desc;
+>  }
+> =20
+>  /* Init skb and descriptor buffer for Ethernet AVB */
+> @@ -830,7 +831,7 @@ static bool ravb_rx_gbeth(struct net_device *ndev, =
+int *quota, int q)
+>  	limit =3D priv->dirty_rx[q] + priv->num_rx_ring[q] - priv->cur_rx[q];=
 
-Cheers,
+>  	stats =3D &priv->stats[q];
+> =20
+> -	desc =3D &priv->gbeth_rx_ring[entry];
+> +	desc =3D &priv->rx_ring[q].desc[entry];
+>  	for (i =3D 0; i < limit && rx_packets < *quota && desc->die_dt !=3D D=
+T_FEMPTY; i++) {
+>  		/* Descriptor type must be checked before all other reads */
+>  		dma_rmb();
+> @@ -901,13 +902,13 @@ static bool ravb_rx_gbeth(struct net_device *ndev=
+, int *quota, int q)
+>  		}
+> =20
+>  		entry =3D (++priv->cur_rx[q]) % priv->num_rx_ring[q];
+> -		desc =3D &priv->gbeth_rx_ring[entry];
+> +		desc =3D &priv->rx_ring[q].desc[entry];
+>  	}
+> =20
+>  	/* Refill the RX ring buffers. */
+>  	for (; priv->cur_rx[q] - priv->dirty_rx[q] > 0; priv->dirty_rx[q]++) =
+{
+>  		entry =3D priv->dirty_rx[q] % priv->num_rx_ring[q];
+> -		desc =3D &priv->gbeth_rx_ring[entry];
+> +		desc =3D &priv->rx_ring[q].desc[entry];
+>  		desc->ds_cc =3D cpu_to_le16(GBETH_RX_DESC_DATA_SIZE);
+> =20
+>  		if (!priv->rx_skb[q][entry]) {
+> @@ -957,7 +958,7 @@ static bool ravb_rx_rcar(struct net_device *ndev, i=
+nt *quota, int q)
+> =20
+>  	boguscnt =3D min(boguscnt, *quota);
+>  	limit =3D boguscnt;
+> -	desc =3D &priv->rx_ring[q][entry];
+> +	desc =3D &priv->rx_ring[q].ex_desc[entry];
+>  	while (desc->die_dt !=3D DT_FEMPTY) {
+>  		/* Descriptor type must be checked before all other reads */
+>  		dma_rmb();
+> @@ -1017,13 +1018,13 @@ static bool ravb_rx_rcar(struct net_device *nde=
+v, int *quota, int q)
+>  		}
+> =20
+>  		entry =3D (++priv->cur_rx[q]) % priv->num_rx_ring[q];
+> -		desc =3D &priv->rx_ring[q][entry];
+> +		desc =3D &priv->rx_ring[q].ex_desc[entry];
+>  	}
+> =20
+>  	/* Refill the RX ring buffers. */
+>  	for (; priv->cur_rx[q] - priv->dirty_rx[q] > 0; priv->dirty_rx[q]++) =
+{
+>  		entry =3D priv->dirty_rx[q] % priv->num_rx_ring[q];
+> -		desc =3D &priv->rx_ring[q][entry];
+> +		desc =3D &priv->rx_ring[q].ex_desc[entry];
+>  		desc->ds_cc =3D cpu_to_le16(RX_BUF_SZ);
+> =20
+>  		if (!priv->rx_skb[q][entry]) {
 
-Paolo
+Reviewed-by: Paul Barker <paul.barker.ct@bp.renesas.com>
 
+--=20
+Paul Barker
+--------------av7aTP2boydXDdHciuMpt90g
+Content-Type: application/pgp-keys; name="OpenPGP_0x27F4B3459F002257.asc"
+Content-Disposition: attachment; filename="OpenPGP_0x27F4B3459F002257.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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3D
+=3DsIIN
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------av7aTP2boydXDdHciuMpt90g--
+
+--------------fTPJPt5PABNxvoLccSMIxB2S--
+
+--------------MkMdfntey5fdGBQQjbvxcKcs
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQSiu8gv1Xr0fIw/aoLbaV4Vf/JGvQUCZd24SgUDAAAAAAAKCRDbaV4Vf/JGvYPG
+AP9AXBXAwonwgszoYAffxYNnsFY6pbzR15nU92uXc8Q1XQD/ZViA+raLBh5pP8GT5jkdrZ+KiwRo
+xMlnWn9VQfeF7QY=
+=zWVQ
+-----END PGP SIGNATURE-----
+
+--------------MkMdfntey5fdGBQQjbvxcKcs--
 
