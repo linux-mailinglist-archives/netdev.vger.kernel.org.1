@@ -1,167 +1,365 @@
-Return-Path: <netdev+bounces-75243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4AD0868C88
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:42:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E3CC868CC3
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:58:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F9691F26F02
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 09:42:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F2B61C21A4E
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 09:58:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B44E71369A5;
-	Tue, 27 Feb 2024 09:40:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74AD137C2E;
+	Tue, 27 Feb 2024 09:58:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="G7jS74uR"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="D1zFeyNR"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397701369A3;
-	Tue, 27 Feb 2024 09:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5A8131734;
+	Tue, 27 Feb 2024 09:58:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709026852; cv=none; b=YHfgAmfqKV8elq+w8o5m6GQH9VxTOt5FdxzZCE44als8/kmKbatnjQ9LTvjloGOSvicOl3SfDy9ruKOaVBSP4nt/1/4TBXxhikfkpjFEgqZYPyoRRIhCVrX+vbHM3cDXjYJSog7TsEAAYP1Wbfi4WutekPy4La4Qkg9HuOYnLMA=
+	t=1709027895; cv=none; b=jYeoQ8KLw1iR0smjr7iQqVwO0oplXPv+sncSNENT1pczalIPPqLWJuTaATiZSe+zxuaYDCjIntC1u7hDpI6BVy6OnlJN2XGkzO70ljnExeQcnTqTkHZIpB3f5+Ib0rpZkvaHJwLEOsesGeQ6ux0TZ/D/L6JJWXZZedmnvhWEy1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709026852; c=relaxed/simple;
-	bh=1RTEAdFFHOEmxNBmqAuXPQRIA7GMEv6Hxi5j0Y8gqRI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UmOmy039iAfGkmCA9NiPllzi17Ky1NJxoqeNlVlPlzGE/Bi/OnVk3jRWTrjww2uD6viCe9WvkoR0Y0EoOb3bnwxbYqAEkJdHj1jBSWgoEp9nBFs4KR9vcV9V5Li3Kn6XTgUqHLrnbvAIbdBuKCz/V6yyQboS1FYkprkjtOXEQHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=G7jS74uR; arc=none smtp.client-ip=217.70.183.198
+	s=arc-20240116; t=1709027895; c=relaxed/simple;
+	bh=rCT3zK4BVi+Q3eraF+cwejeAImcpCvbhQxPLcZgnZ/Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sW5rl1osyMdCSePfuzPACSFCjYT0boJCEbwsAqRejzexYUqqP+XiUNDN/cbyLiPhNlzUby2fxMp7D5A23LTCaVCetsKx25fz/rXuuw+zcAMYLqVR3JSHRPxfEnoj3p0T1ANdq7PgUBF78+9DdINc5QHIfgo8HqKhZLsP38LpjWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=D1zFeyNR; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BFAB5C0002;
-	Tue, 27 Feb 2024 09:40:42 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1172E40009;
+	Tue, 27 Feb 2024 09:58:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709026848;
+	t=1709027891;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Mmn0FjbhKH+X6W94t2nXwylEPzw7F/tZLjHorPr0+mk=;
-	b=G7jS74uRsUCaZ5E75Nq45zmqM7nb7gdxLE+r0CITcsJKVEX8RwON39N9Bn/jSuuRlsV+jz
-	1ZKUSEdlhJJVXYwUpUv/vcv1vqQKj7GcWNEczMtfO7Uy2UxLbtcRyvPIJEl1O6CHkwoH/B
-	OPc55phx1zLp4VtCbEf6OUzVc3z2rq9it5Y4ZkWc4SOv4QovWrBCZxe8dlim1WJN+FWgz3
-	As8H6DwpFXG/KWoFsnFudAH2f2xXQ6xFn8USrBpUJa9S1Mteb5ScZKfgWOsg5IQBZx/EKK
-	rDoo8GPQxSvegGQe92oUwtIHM1O6xNsyXMI2sw7XSSWrheyISovuX7EEmWz8Gg==
-Message-ID: <951bc29a-4483-4f4a-9c4e-900db9391112@bootlin.com>
-Date: Tue, 27 Feb 2024 10:40:42 +0100
+	bh=ZSMEk7fDTeDHzhh8GFoFNyToaruHiwoQmk0xgRlrJKI=;
+	b=D1zFeyNRRG3pejdgOfGD1rv8ggjg9CFIGycsCE2wZt82+Q/MUwd9AMeut9uOurvT3mL5Uw
+	fFbhJoUdklS67VIEfgbx1+F2He7jlSuxAXUiXDoEQXEuWv+8npXk88Ux0b1t6eDvY6PQhq
+	FI1C19rTbEpgJ3ds1tur+zqQ/rLJBlKCwBGSzB2lziiRjw3bwD4jTI9gdm4g10/wyI26Pt
+	HZ5r0IgGzkOTO1vYDexa4PpHq8NW1/sWbv/w2IETJIIJVnP6aU27n1PNjtZpTHIzx5M7oX
+	TVSJeUs7v12RYH/idZwdh/HnS8Jfh9ySxP2xL4N7O+Gl5UJsWJxjb/wt+BL+rg==
+Date: Tue, 27 Feb 2024 10:58:06 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>, Richard Cochran
+ <richardcochran@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-leds@vger.kernel.org, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, herve.codina@bootlin.com,
+ christophercordahi@nanometrics.ca
+Subject: Re: [PATCH v2 3/6] net: phy: DP83640: Add LED handling
+Message-ID: <20240227105806.7201b34a@device-28.home>
+In-Reply-To: <20240227093945.21525-4-bastien.curutchet@bootlin.com>
+References: <20240227093945.21525-1-bastien.curutchet@bootlin.com>
+	<20240227093945.21525-4-bastien.curutchet@bootlin.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3] net: stmmac: protect updates of 64-bit statistics
- counters
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, Guenter Roeck <linux@roeck-us.net>
-Cc: Jisheng Zhang <jszhang@kernel.org>, Petr Tesarik <petr@tesarici.cz>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, Chen-Yu Tsai <wens@csie.org>,
- Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>,
- "open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>,
- "moderated list:ARM/STM32 ARCHITECTURE"
- <linux-stm32@st-md-mailman.stormreply.com>,
- "moderated list:ARM/STM32 ARCHITECTURE"
- <linux-arm-kernel@lists.infradead.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:ARM/Allwinner sunXi SoC support" <linux-sunxi@lists.linux.dev>,
- Marc Haber <mh+netdev@zugschlus.de>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, stable@vger.kernel.org
-References: <20240203190927.19669-1-petr@tesarici.cz>
- <ea1567d9-ce66-45e6-8168-ac40a47d1821@roeck-us.net>
- <Zct5qJcZw0YKx54r@xhacker>
- <CANn89i+4tVWezqr=BYZ5AF=9EgV2EPqhdHun=u=ga32CEJ4BXQ@mail.gmail.com>
- <20d94512-c4f2-49f7-ac97-846dc24a6730@roeck-us.net>
- <CANn89iL1piwsbsBx4Z=kySUfmPa9LbZn-SNthgA+W6NEnojgSQ@mail.gmail.com>
-From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-In-Reply-To: <CANn89iL1piwsbsBx4Z=kySUfmPa9LbZn-SNthgA+W6NEnojgSQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: alexis.lothore@bootlin.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello, 
-FWIW I'm seeing this splat too on STM32MP157 with 6.8.0-rc5 (from wireless tree). It happens systematically a few seconds after link up
+Hello Bastien,
 
-[   27.884703] ================================
-[   27.888988] WARNING: inconsistent lock state
-[   27.893271] 6.8.0-rc5-g59460f7f45e6-dirty #16 Not tainted
-[   27.898671] --------------------------------
-[   27.902951] inconsistent {HARDIRQ-ON-W} -> {IN-HARDIRQ-W} usage.
-[   27.908954] swapper/0/0 [HC1[1]:SC0[0]:HE0:SE1] takes:
-[   27.914155] d7b764ac (&syncp->seq#3){?.-.}-{0:0}, at: dwmac4_dma_interrupt+0xc4/0x2a8
-[   27.921974] {HARDIRQ-ON-W} state was registered at:
-[   27.926863]   lock_acquire+0x12c/0x388
-[   27.930563]   __u64_stats_update_begin+0x138/0x214
-[   27.935372]   stmmac_xmit+0x55c/0xd80
-[   27.939064]   dev_hard_start_xmit+0xec/0x2f4
-[   27.943362]   sch_direct_xmit+0x94/0x310
-[   27.947255]   __dev_queue_xmit+0x3f8/0xd04
-[   27.951347]   ip6_finish_output2+0x2fc/0xbc0
-[   27.955642]   mld_sendpack+0x268/0x594
-[   27.959329]   mld_ifc_work+0x268/0x568
-[   27.963115]   process_one_work+0x20c/0x618
-[   27.967216]   worker_thread+0x1e8/0x4ac
-[   27.971009]   kthread+0x110/0x130
-[   27.974296]   ret_from_fork+0x14/0x28
-[   27.977982] irq event stamp: 12456
-[   27.981353] hardirqs last  enabled at (12455): [<c08e3558>] default_idle_call+0x1c/0x2cc
-[   27.989507] hardirqs last disabled at (12456): [<c0100b74>] __irq_svc+0x54/0xd0
-[   27.996844] softirqs last  enabled at (12440): [<c010162c>] __do_softirq+0x318/0x4dc
-[   28.004586] softirqs last disabled at (12429): [<c012b2a8>] __irq_exit_rcu+0x130/0x184
-[   28.012530]
-[   28.012530] other info that might help us debug this:
-[   28.019040]  Possible unsafe locking scenario:
-[   28.019040]
-[   28.025043]        CPU0
-[   28.027400]        ----
-[   28.029857]   lock(&syncp->seq#3);
-[   28.033253]   <Interrupt>
-[   28.035912]     lock(&syncp->seq#3);
-[   28.039410]
-[   28.039410]  *** DEADLOCK ***
-[   28.039410]
-[   28.045416] no locks held by swapper/0/0.
-[   28.049395]
-[   28.049395] stack backtrace:
-[   28.053781] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.8.0-rc5-g59460f7f45e6-dirty #16
-[   28.061819] Hardware name: STM32 (Device Tree Support)
-[   28.066918]  unwind_backtrace from show_stack+0x18/0x1c
-[   28.072140]  show_stack from dump_stack_lvl+0x58/0x70
-[   28.077253]  dump_stack_lvl from mark_lock+0xc40/0x12fc
-[   28.082478]  mark_lock from __lock_acquire+0x968/0x2c20
-[   28.087703]  __lock_acquire from lock_acquire+0x12c/0x388
-[   28.093131]  lock_acquire from __u64_stats_update_begin+0x138/0x214
-[   28.099372]  __u64_stats_update_begin from dwmac4_dma_interrupt+0xc4/0x2a8
-[   28.106219]  dwmac4_dma_interrupt from stmmac_napi_check+0x48/0x1d0
-[   28.112558]  stmmac_napi_check from stmmac_interrupt+0xa4/0x184
-[   28.118490]  stmmac_interrupt from __handle_irq_event_percpu+0xb0/0x308
-[   28.125036]  __handle_irq_event_percpu from handle_irq_event+0x40/0x88
-[   28.131578]  handle_irq_event from handle_fasteoi_irq+0xa4/0x258
-[   28.137610]  handle_fasteoi_irq from generic_handle_domain_irq+0x30/0x40
-[   28.144348]  generic_handle_domain_irq from gic_handle_irq+0x7c/0x90
-[   28.150682]  gic_handle_irq from generic_handle_arch_irq+0x34/0x44
-[   28.156911]  generic_handle_arch_irq from __irq_svc+0x8c/0xd0
-[   28.162631] Exception stack(0xc2201f30 to 0xc2201f78)
-[   28.167732] 1f20:                                     ffffffff ffffffff 00000001 000030a7
-[   28.175974] 1f40: c220c780 c0178dc4 c2208d54 c22c2e10 00000000 00000000 c0b06d28 c220c22c
-[   28.184114] 1f60: 00000000 c2201f80 c08e3558 c08e355c 600f0013 ffffffff
-[   28.190727]  __irq_svc from default_idle_call+0x20/0x2cc
-[   28.196045]  default_idle_call from do_idle+0xd8/0x144
-[   28.201165]  do_idle from cpu_startup_entry+0x30/0x34
-[   28.206181]  cpu_startup_entry from rest_init+0xf4/0x198
-[   28.211502]  rest_init from arch_post_acpi_subsys_init+0x0/0x18
+On Tue, 27 Feb 2024 10:39:42 +0100
+Bastien Curutchet <bastien.curutchet@bootlin.com> wrote:
 
+> The PHY have three LED : Activity LED, Speed LED and Link LED. The PHY
+> offers three configuration modes for them. The driver does not handle them.
+> 
+> Add LED handling through the /sys/class/leds interface.
+> On every mode the Speed LED indicates the speed (10Mbps or 100 Mbps) and
+> the Link LED indicates whether the link is good or not. Link LED will also
+> reflects link activity in mode 2 and 3. The Activity LED can reflect the
+> link activity (mode 1), the link's duplex (mode 2) or collisions on the
+> link (mode 3).
+> Only the Activity LED can have its hardware configuration updated, it
+> has an impact on Link LED as activity reflexion is added on it on modes
+> 2 and 3
+> 
+> Signed-off-by: Bastien Curutchet <bastien.curutchet@bootlin.com>
 
--- 
-Alexis Lothoré, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Regarding the LED management I don't have much knowledge on it,
+however I do have comments on the code itself :)
 
+> ---
+>  drivers/net/phy/dp83640.c     | 176 ++++++++++++++++++++++++++++++++++
+>  drivers/net/phy/dp83640_reg.h |  11 +++
+>  2 files changed, 187 insertions(+)
+> 
+> diff --git a/drivers/net/phy/dp83640.c b/drivers/net/phy/dp83640.c
+> index 5c42c47dc564..c46c81ef0ad0 100644
+> --- a/drivers/net/phy/dp83640.c
+> +++ b/drivers/net/phy/dp83640.c
+> @@ -59,6 +59,22 @@
+>  				   MII_DP83640_MISR_SPD_INT |\
+>  				   MII_DP83640_MISR_LINK_INT)
+>  
+> +#define DP83640_ACTLED_IDX	0
+> +#define DP83640_LNKLED_IDX	1
+> +#define DP83640_SPDLED_IDX	2
+> +/* LNKLED = ON for Good Link, OFF for No Link */
+> +/* SPDLED = ON in 100 Mb/s, OFF in 10 Mb/s */
+> +/* ACTLED = ON for Activity, OFF for No Activity */
+> +#define DP83640_LED_MODE_1	1
+> +/* LNKLED = ON for Good Link, Blink for Activity */
+> +/* SPDLED = ON in 100 Mb/s, OFF in 10 Mb/s */
+> +/* ACTLED = ON for Collision, OFF for No Collision */
+> +#define DP83640_LED_MODE_2	2
+> +/* LNKLED = ON for Good Link, Blink for Activity */
+> +/* SPDLED = ON in 100 Mb/s, OFF in 10 Mb/s */
+> +/* ACTLED = ON for Full-Duplex, OFF for Half-Duplex */
+> +#define DP83640_LED_MODE_3	3
+> +
+>  /* phyter seems to miss the mark by 16 ns */
+>  #define ADJTIME_FIX	16
+>  
+> @@ -1515,6 +1531,161 @@ static void dp83640_remove(struct phy_device *phydev)
+>  	kfree(dp83640);
+>  }
+>  
+> +static int dp83640_led_brightness_set(struct phy_device *phydev, u8 index,
+> +				      enum led_brightness brightness)
+> +{
+> +	int val;
+> +
+> +	if (index > DP83640_SPDLED_IDX)
+> +		return -EINVAL;
+> +
+> +	phy_write(phydev, PAGESEL, 0);
+> +
+> +	val = phy_read(phydev, LEDCR) & ~DP83640_LED_DIS(index);
+> +	val |= DP83640_LED_DRV(index);
+> +	if (brightness)
+> +		val |= DP83640_LED_VAL(index);
+> +	else
+> +		val &= ~DP83640_LED_VAL(index);
+> +	phy_write(phydev, LEDCR, val);
+
+Looks like you can use phy_modify here
+
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * dp83640_led_mode - Check the trigger netdev rules and compute the associated
+> + *                    configuration mode
+> + * @index: The targeted LED
+> + * @rules: Rules to be checked
+> + *
+> + * Returns the mode that is to be set in LED_CFNG. If the rules are not
+> + * supported by the PHY, returns -ENOTSUPP. If the rules are supported but don't
+> + * impact the LED configuration, returns 0
+> + */
+> +static int dp83640_led_mode(u8 index, unsigned long rules)
+> +{
+> +	/* Only changes on ACTLED have an impact on LED Mode configuration */
+> +	switch (index) {
+> +	case DP83640_ACTLED_IDX:
+> +		switch (rules) {
+> +		case BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX):
+> +			return DP83640_LED_MODE_1;
+> +		case BIT(TRIGGER_NETDEV_COLLISION):
+> +			return DP83640_LED_MODE_2;
+> +		case BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
+> +		     BIT(TRIGGER_NETDEV_HALF_DUPLEX):
+> +			return DP83640_LED_MODE_3;
+> +		default:
+> +			return -EOPNOTSUPP;
+> +		}
+> +
+> +	case DP83640_SPDLED_IDX:
+> +		/* SPDLED has the same function in every mode */
+> +		switch (rules) {
+> +		case BIT(TRIGGER_NETDEV_LINK_10) | BIT(TRIGGER_NETDEV_LINK_100):
+> +			return 0;
+> +		default:
+> +			return -EOPNOTSUPP;
+> +		}
+> +
+> +	case DP83640_LNKLED_IDX:
+> +		/* LNKLED has the same function in every mode */
+> +		switch (rules) {
+> +		case BIT(TRIGGER_NETDEV_LINK):
+> +			return 0;
+> +		default:
+> +			return -EOPNOTSUPP;
+> +		}
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +}
+> +
+> +static int dp83640_led_hw_is_supported(struct phy_device *phydev, u8 index,
+> +				       unsigned long rules)
+> +{
+> +	int ret;
+> +
+> +	ret = dp83640_led_mode(index, rules);
+> +
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+
+It looks like you can just return whatever dp83640_led_mode() returns
+directly ?
+
+> +
+> +static int dp83640_led_hw_control_set(struct phy_device *phydev, u8 index,
+> +				      unsigned long rules)
+> +{
+> +	int mode, val;
+> +
+> +	mode = dp83640_led_mode(index, rules);
+> +	if (mode < 0)
+> +		return mode;
+> +
+> +	if (mode) {
+> +		phy_write(phydev, PAGESEL, 0);
+
+Here the current page is written to 0, don't you need to restore the
+page to the original one afterwards ? the broadcast_* functions in the
+same driver are always restoring the page to the initial one, I think
+you also need that, or unrelated register accesses in the same PHY
+driver might write to the wrong page.
+
+If you want that to be done automatically for you, you can implement the
+.read_page and .write_page in the driver, then use the
+phy_read/write/modify_paged accessors.
+
+> +		val = phy_read(phydev, PHYCR) & ~(LED_CNFG_1 | LED_CNFG_0);
+> +		switch (mode) {
+> +		case DP83640_LED_MODE_1:
+> +			val |= LED_CNFG_0;
+> +		break;
+> +		case DP83640_LED_MODE_2:
+> +			/* Keeping LED_CNFG_1 and LED_CNFG_0 unset */
+> +			break;
+> +		case DP83640_LED_MODE_3:
+> +			val |= LED_CNFG_1;
+> +			break;
+> +		default:
+> +			return -EINVAL;
+> +		}
+> +		phy_write(phydev, PHYCR, val);
+> +	}
+> +
+> +	val = phy_read(phydev, LEDCR);
+> +	val &= ~(DP83640_LED_DIS(index) | DP83640_LED_DRV(index));
+> +	phy_write(phydev, LEDCR, val);
+
+You can use phy_modify here aswell
+
+> +
+> +	return 0;
+> +}
+> +
+> +static int dp83640_led_hw_control_get(struct phy_device *phydev, u8 index,
+> +				      unsigned long *rules)
+> +{
+> +	int val;
+> +
+> +	switch (index) {
+> +	case DP83640_ACTLED_IDX:
+> +		phy_write(phydev, PAGESEL, 0);
+
+Same comment on the page selection here.
+
+> +		val = phy_read(phydev, PHYCR);
+> +		if (val & LED_CNFG_0) {
+> +			/* Mode 1 */
+> +			*rules = BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX);
+> +		} else if (val & LED_CNFG_1) {
+> +			/* Mode 3 */
+> +			*rules = BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
+> +				 BIT(TRIGGER_NETDEV_HALF_DUPLEX);
+> +		} else {
+> +			/* Mode 2 */
+> +			*rules = BIT(TRIGGER_NETDEV_COLLISION);
+> +		}
+> +		break;
+> +
+> +	case DP83640_LNKLED_IDX:
+> +		*rules = BIT(TRIGGER_NETDEV_LINK);
+> +		break;
+> +
+> +	case DP83640_SPDLED_IDX:
+> +		*rules = BIT(TRIGGER_NETDEV_LINK_10) |
+> +			 BIT(TRIGGER_NETDEV_LINK_100);
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static struct phy_driver dp83640_driver = {
+>  	.phy_id		= DP83640_PHY_ID,
+>  	.phy_id_mask	= 0xfffffff0,
+> @@ -1526,6 +1697,11 @@ static struct phy_driver dp83640_driver = {
+>  	.config_init	= dp83640_config_init,
+>  	.config_intr    = dp83640_config_intr,
+>  	.handle_interrupt = dp83640_handle_interrupt,
+> +
+> +	.led_brightness_set = dp83640_led_brightness_set,
+> +	.led_hw_is_supported = dp83640_led_hw_is_supported,
+> +	.led_hw_control_set = dp83640_led_hw_control_set,
+> +	.led_hw_control_get = dp83640_led_hw_control_get,
+>  };
+>  
+>  static int __init dp83640_init(void)
+> diff --git a/drivers/net/phy/dp83640_reg.h b/drivers/net/phy/dp83640_reg.h
+> index daae7fa58fb8..09dd2d2527c7 100644
+> --- a/drivers/net/phy/dp83640_reg.h
+> +++ b/drivers/net/phy/dp83640_reg.h
+> @@ -6,6 +6,8 @@
+>  #define HAVE_DP83640_REGISTERS
+>  
+>  /* #define PAGE0                  0x0000 */
+> +#define LEDCR                     0x0018 /* PHY Control Register */
+> +#define PHYCR                     0x0019 /* PHY Control Register */
+>  #define PHYCR2                    0x001c /* PHY Control Register 2 */
+>  
+>  #define PAGE4                     0x0004
+> @@ -50,6 +52,15 @@
+>  #define PTP_GPIOMON               0x001e /* PTP GPIO Monitor Register */
+>  #define PTP_RXHASH                0x001f /* PTP Receive Hash Register */
+>  
+> +/* Bit definitions for the LEDCR register */
+> +#define DP83640_LED_DIS(x)        BIT((x) + 9) /* Disable LED */
+> +#define DP83640_LED_DRV(x)        BIT((x) + 3) /* Force LED val to output */
+> +#define DP83640_LED_VAL(x)        BIT((x))     /* LED val */
+> +
+> +/* Bit definitions for the PHYCR register */
+> +#define LED_CNFG_0	          BIT(5)  /* LED configuration, bit 0 */
+> +#define LED_CNFG_1	          BIT(6)  /* LED configuration, bit 1 */
+> +
+>  /* Bit definitions for the PHYCR2 register */
+>  #define BC_WRITE                  (1<<11) /* Broadcast Write Enable */
+>  
+
+Thanks,
+
+Maxime
 
