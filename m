@@ -1,280 +1,141 @@
-Return-Path: <netdev+bounces-75158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6360F868618
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 02:39:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9549186861F
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 02:42:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 872781C261FE
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 01:39:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35F201F21FF8
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 01:42:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE685C89;
-	Tue, 27 Feb 2024 01:39:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D36563D0;
+	Tue, 27 Feb 2024 01:42:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gOspWpyg"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="QRLlbVEr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E2B525E;
-	Tue, 27 Feb 2024 01:38:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B0A525E
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 01:41:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708997940; cv=none; b=CbFJyxPj8Wt07gXMPvBfAmCi9Yg4wiiVZq5n2YYmDoUIIw1bPwSA2/TJvlEIXMMPOL6/E43qSGnuzsbXgx97DCMLdabHa7HFTSvE86ikqEsvf2KGX3STuyJKNVXQQ6Q+0zUigncwm1XJF9fnILxuEv/NRUmbENcyJy/QroZnUQY=
+	t=1708998121; cv=none; b=u5Lk/XkhtVVehIQjreGoT0kZeeKnqh03TQ9PI4h6SR/v4lsRwj1qnLQtUHofO2BD+uSu+5J1v/JXKhp/B09Flyt5/iHtuXllow5lSU7VrLtAbtJyy9GKS3d3mDd2/EQuNey7PaoGVHeKv2TYHR5UJ/ix0LL4MT88XVuT81VSEf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708997940; c=relaxed/simple;
-	bh=7cHEtn5/usUauu4n2MbbitQYkJHQNxNkqreUwKPvWKE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N8/KBmn6UKeHLirs+IQJvFAJJEy5Auh+y3/K7YJnVUrCumsMlWMGCbbS12a9rQigYe/ozP/oo4J918BXcBJNEagsF1YdZfN2Lz2PQ3kKvKpcdZqpvA33fq1C06PUcvDcLTykY+R4+ZayqHuhqHiT/+HBjJTDy3ut9OPmRp5xTFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gOspWpyg; arc=none smtp.client-ip=209.85.210.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-6ddf26eba3cso3069960a34.0;
-        Mon, 26 Feb 2024 17:38:58 -0800 (PST)
+	s=arc-20240116; t=1708998121; c=relaxed/simple;
+	bh=CflGGZBBj+ilA3va3zK/OKpSZFCSCrOngD7N7YFQqdU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HJeKEu3Hjd3u7yBSy7nsi7sLI8yU5zi4XlfMGzwF61XoNSDAL1zk741G5obdGGIV858DBTlSP8shJfj2vb4na1+tY3h0UPiA51LTnH6BqxqwKX8xITuX1x1rtltytJJ8/YrR0fEqiLwG7OBpzlkOsJbWvq5dGng9xn3SzxOKR+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=QRLlbVEr; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-412a5b63c11so10216525e9.2
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 17:41:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708997937; x=1709602737; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uh/X4IvEG/YVTF6TF7CoVpwzdK/+m4nMnD3+Q9DdMTo=;
-        b=gOspWpygAZwBqyfd8CPCQvtiHfbXxwoiAkpxnPuELqSFYql3pxqHSmDzbGVLB8/dqZ
-         F+ZJS9lJ5WkwsHywfYamRnzevzpe7VRM/DU20r18Zhhzis2l/N3fCVikRbf3X4DRQLme
-         N1GIMtmqamd7RtQ5A3qTXx8FgN73h3H9H/4A6O63A/oupNzPWLZpdrXvbfYmMaXcA6xN
-         lCyhZ3MOWoUQgvYpwIvzrSTlz5dle9N5j/rXfZ5lWKLmOAqxKcFodu1IOoMCDJEhdTUl
-         q16H4tZls88oBUxp/7jPkfmicMe2xp/hXBR7qe12T8qI5nYoGu5B3jjCE9FHuNysDtHV
-         GVGg==
+        d=ragnatech.se; s=google; t=1708998116; x=1709602916; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=N5COzI3dlwznhkUrEgFBW1XP0RNdr43G1INYrUtjyY4=;
+        b=QRLlbVErsvFoREFQAUSOHE7f1hpZhivJmhQL6G3XNPJNjc0e0TBgA4knU1kT8se4z3
+         5KnTgAAEqdEoWavAsqR5wW8SYZQ+0gM3H6x0o+YeOtfNvBXCffxszpMWeh3l1fF70u3f
+         eJcfc491LpUD0bw203W6GzBwo6VvVWcQfRi1NDg0Q/HuzOhs3lGGJRsRufzzjmnxwBU+
+         3mfRHRTGyRjdSMEu0m/OwUdyCrYWTnotrELzlAqeBrrb2Fu/X5JJqlvOaw6UD/xATMCY
+         x9KCrCNpe1Ye4LYeJuPcqdJ0Ytu5tzHnttXyAv56uBMzwO63QiNO/QGb3RXXzEdHSktA
+         LXSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708997937; x=1709602737;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uh/X4IvEG/YVTF6TF7CoVpwzdK/+m4nMnD3+Q9DdMTo=;
-        b=rcZ8EGb6Ir3r/kSBAflEAjZsn2hHE2yl9EEgHNYyk9bO9xqIhypiIBrOG7enOQr6Qb
-         mxszHsSISQKy4UbbbTCRHIBHjtRTvt2hgpjri3nGRGcbsClobYWoaW9QTQ6PU51KpeH4
-         Pyh3gumd/3VOKuLRGcS5rDhSy8TnX0348yapUhbl3Xqf+dJpoYdurSmTQsPYMUuMQ9rh
-         j87RpmfAywrmEMytJcqiEQnzKX8Er+TzRiCJ6ncUEu4uN0x2wGTO86PPz0lYse9tnJrg
-         pJ3xMBt6TpIfEZQJVOBN98idC7nwoqCE1Z45hZSxrr8C6PIk63s28Oh+U0YyRtVpQbWd
-         B/vw==
-X-Forwarded-Encrypted: i=1; AJvYcCUMCCxMCvDuThiNUOi/ncxGKC8gX+2TNjxuCqsHEHV6g5U2OAndlO0DH5hPNgz62OKi/bsZIZEanP8OaYWYIzqsnRMUOt8U6NvVCHWNwvWhzSJbG4RhUJ4FEoEUQV5kRjq3z/Bl
-X-Gm-Message-State: AOJu0Yw0hhgBBJTu4AfQBxOVJnuretyOBwoO7158MS1EO1LAFoLP9sZj
-	HuDNnzbi3rm2ANtI6iFU9QoBc/YZp2WwDNQcqIs1TJpv0L5VwW+P
-X-Google-Smtp-Source: AGHT+IHkz2OvZAGja3wN+/HA2CkQlGKBxv7z1G2/NMt1RjLPbPZoLXylBDQnUmQuahGYOUaKXMthrQ==
-X-Received: by 2002:a05:6358:4901:b0:17b:5211:6976 with SMTP id w1-20020a056358490100b0017b52116976mr11619599rwn.6.1708997937489;
-        Mon, 26 Feb 2024 17:38:57 -0800 (PST)
-Received: from localhost ([2620:10d:c090:400::4:31e4])
-        by smtp.gmail.com with ESMTPSA id i6-20020a62c106000000b006e50cb38395sm3301196pfg.53.2024.02.26.17.38.56
+        d=1e100.net; s=20230601; t=1708998116; x=1709602916;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=N5COzI3dlwznhkUrEgFBW1XP0RNdr43G1INYrUtjyY4=;
+        b=klHY3dwccXXbsKL/G1xOkg7iU9KhhcoiwS/AQWljgVJVL2xdQx5LMguX2scJ2WZ1+3
+         f7B2wuTl0e3MNS+EaPAUaLporGMNW2qeOCSTQLO0qw01VLz7QQ5r8uJbSrRn1RmVDVU8
+         ZRJIzcKSjwD6ObXs3LWalhHtd6H1iSSrEX0O2OwGb+ZR/StuPeFqVNq+8FzZawsmZvKW
+         8ay7CEvYOp3XXZc97L+I+RI6WGlxlL8nIlGpimqBdF7DtjMGfBLMTMk2r9argncQjFge
+         +VdCOHAsEMaOUW64QX0nUeBqJ65HGNJed9spejewXq9G3px53H1jJjf4QgFPRg68W60e
+         aF2A==
+X-Forwarded-Encrypted: i=1; AJvYcCX8rL+L7AKy8HXcRicIxIZHrKCvzHRjPkXYQmUC7qXimBuGATZAVb35fBpUwGbDA5ug0pLIlwdSXVWWizs1rbfDUI5tUbY1
+X-Gm-Message-State: AOJu0YyL4X1lTzdFKNJGRgN4lLAmNNLIaX1MlcrKGexx2J9ejlg0mM4s
+	7slN2qzPliMryTd8TO4CkCVH2AjEk0lzoMal0P8HLqOIyI3Xm15JZyyqNfilnJ8=
+X-Google-Smtp-Source: AGHT+IGyPZFbKL4H/cmHPiVaGfO0PDlYUckMxJ5d5iseoorr5hq3r+Gqi5geGmKXK/dzCMn/9hQyjw==
+X-Received: by 2002:a05:600c:3111:b0:412:a390:54ba with SMTP id g17-20020a05600c311100b00412a39054bamr3543057wmo.32.1708998116477;
+        Mon, 26 Feb 2024 17:41:56 -0800 (PST)
+Received: from sleipner.berto.se (p4fcc8c6a.dip0.t-ipconnect.de. [79.204.140.106])
+        by smtp.googlemail.com with ESMTPSA id w15-20020a05600c474f00b004129860d532sm9827918wmo.2.2024.02.26.17.41.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 17:38:56 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Mon, 26 Feb 2024 15:38:55 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: torvalds@linux-foundation.org, mpatocka@redhat.com,
-	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
-	msnitzer@redhat.com, ignat@cloudflare.com, damien.lemoal@wdc.com,
-	bob.liu@oracle.com, houtao1@huawei.com, peterz@infradead.org,
-	mingo@kernel.org, netdev@vger.kernel.org, allen.lkml@gmail.com,
-	kernel-team@meta.com, Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH for-6.9] workqueue: Drain BH work items on hot-unplugged CPUs
-Message-ID: <Zd09L9DgerYjezGT@slm.duckdns.org>
-References: <20240130091300.2968534-1-tj@kernel.org>
- <20240130091300.2968534-4-tj@kernel.org>
- <ZcABypwUML6Osiec@slm.duckdns.org>
- <Zdvw0HdSXcU3JZ4g@boqun-archlinux>
+        Mon, 26 Feb 2024 17:41:56 -0800 (PST)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	netdev@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [net-next 0/6] ravb: Align Rx descriptor setup and maintenance
+Date: Tue, 27 Feb 2024 02:40:08 +0100
+Message-ID: <20240227014014.44855-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zdvw0HdSXcU3JZ4g@boqun-archlinux>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Boqun pointed out that workqueues aren't handling BH work items on offlined
-CPUs. Unlike tasklet which transfers out the pending tasks from
-CPUHP_SOFTIRQ_DEAD, BH workqueue would just leave them pending which is
-problematic. Note that this behavior is specific to BH workqueues as the
-non-BH per-CPU workers just become unbound when the CPU goes offline.
+Hello,
 
-This patch fixes the issue by draining the pending BH work items from an
-offlined CPU from CPUHP_SOFTIRQ_DEAD. Because work items carry more context,
-it's not as easy to transfer the pending work items from one pool to
-another. Instead, run BH work items which execute the offlined pools on an
-online CPU.
+When RZ/G2L support was added the Rx code path was split in two, one to 
+support R-Car and one to support RZ/G2L. One reason for this is that 
+R-Car uses the extended Rx descriptor format, while RZ/G2L uses the 
+normal descriptor format.
 
-Note that this assumes that no further BH work items will be queued on the
-offlined CPUs. This assumption is shared with tasklet and should be fine for
-conversions. However, this issue also exists for per-CPU workqueues which
-will just keep executing work items queued after CPU offline on unbound
-workers and workqueue should reject per-CPU and BH work items queued on
-offline CPUs. This will be addressed separately later.
+In many aspects this is not needed as the extended descriptor format is 
+just a normal descriptor with extra metadata (timestamsp) appended. And 
+the R-Car SoCs can also use normal descriptors if hardware timestamps 
+where not desired. This split has lead to RZ/G2L gaining support for 
+split descriptors in the Rx path while R-Car still lacks this.
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Reported-by: Boqun Feng <boqun.feng@gmail.com>
-Link: http://lkml.kernel.org/r/Zdvw0HdSXcU3JZ4g@boqun-archlinux
----
- include/linux/workqueue.h |    1 
- kernel/softirq.c          |    2 +
- kernel/workqueue.c        |   91 ++++++++++++++++++++++++++++++++++++++++++++--
- 3 files changed, 91 insertions(+), 3 deletions(-)
+This series is the first step in trying to merge the R-Car and RZ/G2L Rx 
+paths so features and bugs corrected in one will benefit the other.
 
---- a/include/linux/workqueue.h
-+++ b/include/linux/workqueue.h
-@@ -458,6 +458,7 @@ extern struct workqueue_struct *system_b
- extern struct workqueue_struct *system_bh_highpri_wq;
- 
- void workqueue_softirq_action(bool highpri);
-+void workqueue_softirq_dead(unsigned int cpu);
- 
- /**
-  * alloc_workqueue - allocate a workqueue
---- a/kernel/softirq.c
-+++ b/kernel/softirq.c
-@@ -932,6 +932,8 @@ static void run_ksoftirqd(unsigned int c
- #ifdef CONFIG_HOTPLUG_CPU
- static int takeover_tasklets(unsigned int cpu)
- {
-+	workqueue_softirq_dead(cpu);
-+
- 	/* CPU is dead, so no lock needed. */
- 	local_irq_disable();
- 
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -81,6 +81,7 @@ enum worker_pool_flags {
- 	POOL_BH			= 1 << 0,	/* is a BH pool */
- 	POOL_MANAGER_ACTIVE	= 1 << 1,	/* being managed */
- 	POOL_DISASSOCIATED	= 1 << 2,	/* cpu can't serve workers */
-+	POOL_BH_DRAINING	= 1 << 3,	/* draining after CPU offline */
- };
- 
- enum worker_flags {
-@@ -1218,7 +1219,9 @@ static struct irq_work *bh_pool_irq_work
- static void kick_bh_pool(struct worker_pool *pool)
- {
- #ifdef CONFIG_SMP
--	if (unlikely(pool->cpu != smp_processor_id())) {
-+	/* see drain_dead_softirq_workfn() for BH_DRAINING */
-+	if (unlikely(pool->cpu != smp_processor_id() &&
-+		     !(pool->flags & POOL_BH_DRAINING))) {
- 		irq_work_queue_on(bh_pool_irq_work(pool), pool->cpu);
- 		return;
- 	}
-@@ -3155,6 +3158,7 @@ __acquires(&pool->lock)
- 	struct worker_pool *pool = worker->pool;
- 	unsigned long work_data;
- 	int lockdep_start_depth, rcu_start_depth;
-+	bool bh_draining = pool->flags & POOL_BH_DRAINING;
- #ifdef CONFIG_LOCKDEP
- 	/*
- 	 * It is permissible to free the struct work_struct from
-@@ -3220,7 +3224,9 @@ __acquires(&pool->lock)
- 
- 	rcu_start_depth = rcu_preempt_depth();
- 	lockdep_start_depth = lockdep_depth(current);
--	lock_map_acquire(&pwq->wq->lockdep_map);
-+	/* see drain_dead_softirq_workfn() */
-+	if (!bh_draining)
-+		lock_map_acquire(&pwq->wq->lockdep_map);
- 	lock_map_acquire(&lockdep_map);
- 	/*
- 	 * Strictly speaking we should mark the invariant state without holding
-@@ -3253,7 +3259,8 @@ __acquires(&pool->lock)
- 	trace_workqueue_execute_end(work, worker->current_func);
- 	pwq->stats[PWQ_STAT_COMPLETED]++;
- 	lock_map_release(&lockdep_map);
--	lock_map_release(&pwq->wq->lockdep_map);
-+	if (!bh_draining)
-+		lock_map_release(&pwq->wq->lockdep_map);
- 
- 	if (unlikely((worker->task && in_atomic()) ||
- 		     lockdep_depth(current) != lockdep_start_depth ||
-@@ -3615,6 +3622,84 @@ void workqueue_softirq_action(bool highp
- 		bh_worker(list_first_entry(&pool->workers, struct worker, node));
- }
- 
-+struct wq_drain_dead_softirq_work {
-+	struct work_struct	work;
-+	struct worker_pool	*pool;
-+	struct completion	done;
-+};
-+
-+static void drain_dead_softirq_workfn(struct work_struct *work)
-+{
-+	struct wq_drain_dead_softirq_work *dead_work =
-+		container_of(work, struct wq_drain_dead_softirq_work, work);
-+	struct worker_pool *pool = dead_work->pool;
-+	bool repeat;
-+
-+	/*
-+	 * @pool's CPU is dead and we want to execute its still pending work
-+	 * items from this BH work item which is running on a different CPU. As
-+	 * its CPU is dead, @pool can't be kicked and, as work execution path
-+	 * will be nested, a lockdep annotation needs to be suppressed. Mark
-+	 * @pool with %POOL_BH_DRAINING for the special treatments.
-+	 */
-+	raw_spin_lock_irq(&pool->lock);
-+	pool->flags |= POOL_BH_DRAINING;
-+	raw_spin_unlock_irq(&pool->lock);
-+
-+	bh_worker(list_first_entry(&pool->workers, struct worker, node));
-+
-+	raw_spin_lock_irq(&pool->lock);
-+	pool->flags &= ~POOL_BH_DRAINING;
-+	repeat = need_more_worker(pool);
-+	raw_spin_unlock_irq(&pool->lock);
-+
-+	/*
-+	 * bh_worker() might hit consecutive execution limit and bail. If there
-+	 * still are pending work items, reschedule self and return so that we
-+	 * don't hog this CPU's BH.
-+	 */
-+	if (repeat) {
-+		if (pool->attrs->nice == HIGHPRI_NICE_LEVEL)
-+			queue_work(system_bh_highpri_wq, work);
-+		else
-+			queue_work(system_bh_wq, work);
-+	} else {
-+		complete(&dead_work->done);
-+	}
-+}
-+
-+/*
-+ * @cpu is dead. Drain the remaining BH work items on the current CPU. It's
-+ * possible to allocate dead_work per CPU and avoid flushing. However, then we
-+ * have to worry about draining overlapping with CPU coming back online or
-+ * nesting (one CPU's dead_work queued on another CPU which is also dead and so
-+ * on). Let's keep it simple and drain them synchronously. These are BH work
-+ * items which shouldn't be requeued on the same pool. Shouldn't take long.
-+ */
-+void workqueue_softirq_dead(unsigned int cpu)
-+{
-+	int i;
-+
-+	for (i = 0; i < NR_STD_WORKER_POOLS; i++) {
-+		struct worker_pool *pool = &per_cpu(bh_worker_pools, cpu)[i];
-+		struct wq_drain_dead_softirq_work dead_work;
-+
-+		if (!need_more_worker(pool))
-+			continue;
-+
-+		INIT_WORK(&dead_work.work, drain_dead_softirq_workfn);
-+		dead_work.pool = pool;
-+		init_completion(&dead_work.done);
-+
-+		if (pool->attrs->nice == HIGHPRI_NICE_LEVEL)
-+			queue_work(system_bh_highpri_wq, &dead_work.work);
-+		else
-+			queue_work(system_bh_wq, &dead_work.work);
-+
-+		wait_for_completion(&dead_work.done);
-+	}
-+}
-+
- /**
-  * check_flush_dependency - check for flush dependency sanity
-  * @target_wq: workqueue being flushed
+The first patch in the series clarify that the driver now supports 
+either normal or extended descriptors, not both at the same time by 
+grouping them in a union. This is the foundation that later patches will 
+build on the align the two Rx paths.
+
+Patch 2-5 deals with correcting small issues in the Rx frame and 
+descriptor sizes that either where incorrect at the time they were added 
+in 2017 (my bad) or concepts built on-top of this initial incorrect 
+design.
+
+While finally patch 6 merges the R-Car and RZ/G2L for Rx descriptor 
+setup and maintenance.
+
+When this work has landed I plan to follow up with more work aligning 
+the rest of the Rx code paths and hopefully bring split descriptor 
+support to the R-Car SoCs.
+
+Niklas Söderlund (6):
+  ravb: Group descriptor types used in Rx ring
+  ravb: Make it clear the information relates to maximum frame size
+  ravb: Create helper to allocate skb and align it
+  ravb: Use the max frame size from hardware info for RZ/G2L
+  ravb: Move maximum Rx descriptor data usage to info struct
+  ravb: Unify Rx ring maintenance code paths
+
+ drivers/net/ethernet/renesas/ravb.h      |  20 +--
+ drivers/net/ethernet/renesas/ravb_main.c | 205 ++++++++---------------
+ 2 files changed, 79 insertions(+), 146 deletions(-)
+
+-- 
+2.43.2
+
 
