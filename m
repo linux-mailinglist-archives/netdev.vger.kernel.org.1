@@ -1,157 +1,109 @@
-Return-Path: <netdev+bounces-75229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62E03868BE2
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:13:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6C32868C17
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:24:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F5CC1F21F15
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 09:13:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 577741F23475
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 09:24:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A087513AA32;
-	Tue, 27 Feb 2024 09:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9F213664F;
+	Tue, 27 Feb 2024 09:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S1QJh79I"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7935C13A884
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 09:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03F954BCB
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 09:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709025022; cv=none; b=bkpmpV/mUur4wHaieOCRH0x1xc/5Sotv8WNQGCGlLauXNubJhb+E72dEgHeioR+EHahsZT3eGgOIYdfTyTXA0u4P6OapymYEtPYmgle9tb3m772UnGGeHhjOMyL3Q/KDXY3gGxfCrxwk6mQn6ZKN89hEml1HWuebIGcxcypKRzI=
+	t=1709025856; cv=none; b=FItfDr0nEdg2gLkTymUG7BkkhMfpaE+zv1PpPwILL0SiVcj3aFVTB2qOUxE186cxgjO8wNV9WHSIl38raJEwT3CUswkU6Y/BxuMKnt/leMHekpsp10qv9Da9mFfWkzVuq8rEW2VWXx5wmH1uCe7FiutEkFB7fwpQXJUljJ1pSQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709025022; c=relaxed/simple;
-	bh=Jly1x0TaVXR1mzGdvscOnLLDnoZKk+aCmpg0T7pCgPo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=Kkva/nEVgkLldNJ9WPLZjDTtxRo+4F02Vk0a9ch5PxN+qlf/XZRsSqqcgF8EvgwhL7xuRQwaQC3kXG/zrbn515JT5BCuDbhbRR87maYnHs/eM8bohgAXvofZX1vA8mN/UITX4YVnM+DCYXazugt4XrX73wHULZIoKvN6WSd36gU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-128-E934HnI0OCyPXoda2PTIuw-1; Tue, 27 Feb 2024 09:10:11 +0000
-X-MC-Unique: E934HnI0OCyPXoda2PTIuw-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 27 Feb
- 2024 09:10:09 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Tue, 27 Feb 2024 09:10:09 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'kernel test robot' <lkp@intel.com>, "'linux-kernel@vger.kernel.org'"
-	<linux-kernel@vger.kernel.org>, 'Linus Torvalds'
-	<torvalds@linux-foundation.org>, 'Netdev' <netdev@vger.kernel.org>,
-	"'dri-devel@lists.freedesktop.org'" <dri-devel@lists.freedesktop.org>
-CC: "oe-kbuild-all@lists.linux.dev" <oe-kbuild-all@lists.linux.dev>, "'Jens
- Axboe'" <axboe@kernel.dk>, "'Matthew Wilcox (Oracle)'" <willy@infradead.org>,
-	'Christoph Hellwig' <hch@infradead.org>, "'linux-btrfs@vger.kernel.org'"
-	<linux-btrfs@vger.kernel.org>, 'Andrew Morton' <akpm@linux-foundation.org>,
-	Linux Memory Management List <linux-mm@kvack.org>, 'Andy Shevchenko'
-	<andriy.shevchenko@linux.intel.com>, "'David S . Miller'"
-	<davem@davemloft.net>, 'Dan Carpenter' <dan.carpenter@linaro.org>, "'Jani
- Nikula'" <jani.nikula@linux.intel.com>
-Subject: RE: [PATCH next v2 03/11] minmax: Simplify signedness check
-Thread-Topic: [PATCH next v2 03/11] minmax: Simplify signedness check
-Thread-Index: AdpoCqfCgp/0gHjwSqumBl0qZkMqdgBEnDuAAA9N+TA=
-Date: Tue, 27 Feb 2024 09:10:09 +0000
-Message-ID: <291975e1412548daa70abfe747dfd893@AcuMS.aculab.com>
-References: <8657dd5c2264456f8a005520a3b90e2b@AcuMS.aculab.com>
- <202402270937.9kmO5PFt-lkp@intel.com>
-In-Reply-To: <202402270937.9kmO5PFt-lkp@intel.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1709025856; c=relaxed/simple;
+	bh=2j11WNDCbMP/Q0C1+ZcUTH8CdCZYBiVeK5Dea7hTJjI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=D7Q5vo0bTXCT7Dp9+vBRFzI8mV2JMrop91cvvELnxn4eSGsCxBHYHCxOEmx84clDL0iJvp+OZtHYxte2f/RnxsttLCvYTw+7M8iHa/a0mHEN978yD2CBeZZcvE9DfjdJxOuihiWHXIXyCBNFiYVIqaA7Tuf1y4zSCf4sPbBIJGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S1QJh79I; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-608852fc324so66891607b3.2
+        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 01:24:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709025854; x=1709630654; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=miRC13GqqOrvpGd86p42R3CvaYaBTlmadH6DwSNw91U=;
+        b=S1QJh79INSdy+yM2vHVmWoJtWhzj06hftX3cAjk9odupKf7IV+boAawOBKvg0DJILo
+         PCPGVsbGZ+cTVSbOD3DLTV4eSLV4yEbFX6H+vxwkcMSneDrLio70UZi/OPvz33BqyWip
+         ew6W/D5rhkb82KNtHxj/Y1Ag8Iw0K+FzdgwlKliFHHMr9Ww0ZnjvDRvDDRJrSbrun4Jr
+         51Ls6trmuho8C5ZsfJ3CbdM9GbRWcF1N0l39fUSAs4V50SF6fY117johZGHyewjGDjSy
+         dGnE3X81VCPnsMJmE9A1IJ8TeqavABCuHoz8I4P/QB2diXYQY+GDUtwQB2LuerfAmLTI
+         X5IA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709025854; x=1709630654;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=miRC13GqqOrvpGd86p42R3CvaYaBTlmadH6DwSNw91U=;
+        b=SfJMSdpD0rMuPajvq573QkhAVuoqI6MXx89mcddeh82jYZIkSl1a4ULU1157JMMp8M
+         ZdN+kkouXiPj5KbGlhaWJwvWn6WY4huJDkhNM3ugHDC2UzxYVt242ieZgz2VgbNEBmcq
+         0QEZnZ0JdecSyD1rG/hGU5li8O6Dd1Rh0VdJjdNDT3+K03Lo8j0v3m9Yv7h+KtOnegFA
+         A56nxxOF8CCZI1r/tjvUCOOT6fOGCxTI+EgCKpjJCdmMIOuCuWdkr81q0ERgX34S+9eQ
+         ZjIM0wVopnhUemrvmrHdiIeDf+p0milC1LgYd+GDwUMlkimXkoBDTzpHFnijCopYbnS6
+         ldFA==
+X-Forwarded-Encrypted: i=1; AJvYcCXXL0CvuY0xvPQ8+OG3ty1Av4hbEU0cfPXIO7GpXA3i8H3wxgW1Rpzd/WWueTdZ0oIhyFaTT562jzxLrLoajW5st+1tOlYF
+X-Gm-Message-State: AOJu0YzSKyc7K4uf28GAA2j4ORmZvRk+RUmDnnC3HuCqTgqjUViQtRAT
+	lpQo9HcDEHxEvCxClCl6SaDceIj4E/gnYzha//zzB289+s9SAPhhRjno4UCxcxWQh5BygE/NTNi
+	drlLeAqTHwg==
+X-Google-Smtp-Source: AGHT+IElQT5lLqPJQnz3NzU4BF3hwJDErG8JykRvY+fSH2Ee4DD3kbcM23LeKf/KY2J+vvQNOiCgxy3/PCbLgg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a0d:d8c3:0:b0:608:406d:6973 with SMTP id
+ a186-20020a0dd8c3000000b00608406d6973mr388047ywe.5.1709025853851; Tue, 27 Feb
+ 2024 01:24:13 -0800 (PST)
+Date: Tue, 27 Feb 2024 09:24:08 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
+Message-ID: <20240227092411.2315725-1-edumazet@google.com>
+Subject: [PATCH net-next 0/3] inet: implement lockless RTM_GETNETCONF ops
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, Jiri Pirko <jiri@nvidia.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: kernel test robot
-> Sent: 27 February 2024 01:34
->=20
-> kernel test robot noticed the following build warnings:
->=20
-> [auto build test WARNING on drm-misc/drm-misc-next]
-> [also build test WARNING on linux/master mkl-can-next/testing kdave/for-n=
-ext akpm-mm/mm-nonmm-unstable
-> axboe-block/for-next linus/master v6.8-rc6 next-20240226]
-> [cannot apply to next-20240223 dtor-input/next dtor-input/for-linus horms=
--ipvs/master]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
->=20
-> url:    https://github.com/intel-lab-lkp/linux/commits/David-Laight/minma=
-x-Put-all-the-clamp-
-> definitions-together/20240226-005902
-> base:   git://anongit.freedesktop.org/drm/drm-misc drm-misc-next
-> patch link:    https://lore.kernel.org/r/8657dd5c2264456f8a005520a3b90e2b=
-%40AcuMS.aculab.com
-> patch subject: [PATCH next v2 03/11] minmax: Simplify signedness check
-> config: alpha-defconfig (https://download.01.org/0day-ci/archive/20240227=
-/202402270937.9kmO5PFt-
-> lkp@intel.com/config)
-> compiler: alpha-linux-gcc (GCC) 13.2.0
-> reproduce (this is a W=3D1 build): (https://download.01.org/0day-
-> ci/archive/20240227/202402270937.9kmO5PFt-lkp@intel.com/reproduce)
->=20
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202402270937.9kmO5PFt-lkp=
-@intel.com/
->=20
-> All warnings (new ones prefixed by >>):
->=20
->    In file included from include/linux/kernel.h:28,
->                     from include/linux/cpumask.h:10,
->                     from include/linux/smp.h:13,
->                     from include/linux/lockdep.h:14,
->                     from include/linux/spinlock.h:63,
->                     from include/linux/swait.h:7,
->                     from include/linux/completion.h:12,
->                     from include/linux/crypto.h:15,
->                     from include/crypto/aead.h:13,
->                     from include/crypto/internal/aead.h:11,
->                     from crypto/skcipher.c:12:
->    crypto/skcipher.c: In function 'skcipher_get_spot':
-> >> include/linux/minmax.h:31:70: warning: ordered comparison of pointer w=
-ith integer zero [-Wextra]
->       31 |         (is_unsigned_type(typeof(x)) || (__is_constexpr(x) ? (=
-x) + 0 >=3D 0 : 0))
+This series removes RTNL use for RTM_GETNETCONF operations on AF_INET.
 
-Hmmm -Wextra isn't normally set.
-But I do wish the compiler would do dead code elimination before
-these warnings.
+- Annotate data-races to avoid possible KCSAN splats.
 
-Apart from stopping code using min()/max() for pointer types
-(all the type checking is pointless) I think that __is_constextr()
-can be implemented using _Generic (instead of sizeof(type)) and then the
-true/false return values can be specified and need not be the same types.
-That test can then be:
-=09(__if_constexpr(x, x, -1) >=3D 0)
-(The '+ 0' is there to convert bool to int and won't be needed
-for non-constant bool.)
+- "ip -4 netconf show dev XXX" can be implemented without RTNL [1]
 
-I may drop the last few patches until MIN/MAX have been removed
-from everywhere else to free up the names.
+- "ip -4 netconf" dumps can be implemented using RCU instead of RTNL [1]
 
-=09David
+[1] This only refers to RTM_GETNETCONF operation, "ip" command
+    also uses RTM_GETLINK dumps which are using RTNL at this moment.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
+Eric Dumazet (3):
+  inet: annotate devconf data-races
+  inet: do not use RTNL in inet_netconf_get_devconf()
+  inet: use xa_array iterator to implement inet_netconf_dump_devconf()
+
+ include/linux/inetdevice.h |  14 ++--
+ net/ipv4/devinet.c         | 147 +++++++++++++++++--------------------
+ net/ipv4/igmp.c            |   4 +-
+ net/ipv4/proc.c            |   2 +-
+ net/ipv4/route.c           |   4 +-
+ 5 files changed, 81 insertions(+), 90 deletions(-)
+
+-- 
+2.44.0.rc1.240.g4c46232300-goog
 
 
