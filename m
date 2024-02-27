@@ -1,115 +1,81 @@
-Return-Path: <netdev+bounces-75142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A73886859F
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 02:13:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF9628685AF
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 02:22:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B77C1C230A5
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 01:13:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FE8EB2117D
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 01:22:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3594A24;
-	Tue, 27 Feb 2024 01:13:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55D446BA;
+	Tue, 27 Feb 2024 01:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="IVAFF0Hz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MR5v1WpU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A13D4A21;
-	Tue, 27 Feb 2024 01:13:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917B34431
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 01:22:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708996388; cv=none; b=LuzFxFVP/+4AYKf8ottazhgzbBe5LtRXCCG/sxqIWY2pqSHznsoyuBYoZzqqEE/MgIgfqEIexxtxW3FKoySOej0/V9E5u9Y57XyUNHZDKuk3sxsTQH4SnhSLtyYsYhuNWydhALdvkJ4h0gpszlcWiOoV9vZktdquPqmdgj8uRHk=
+	t=1708996954; cv=none; b=KJL7Nak6KZFzkvkF0lallmBex+GEPxgjEmVW5jDukMQnhNlMzkdJzKJX+i6ZVgwUIXQSegcG34zLS0tIsm4YqgDQ/Yo1elyVrxW/kss4XOQVlta2AXbtg0qWjCQyXNCQP0KqDq1Msu0To6FjLk+io2+jAzySWRO+L0LGyQ96F/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708996388; c=relaxed/simple;
-	bh=rjDwHqLTMJJ+cqWoqsmMZdFyD7O0WVCXFw75kbvv13g=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m3ATAnIUAQNxjKMOHW3lm60TzJYpREtgzSVhJsRjvCvukBPMOP+NGfrKrodWqoVnf4NotOnKwq0v+Uy0C8Fq++CwT2srkLQHmEuF2mg5VZD9U3mugeRxE7ifWXuYQLrrAfQ16qVbQHRoDA+BDIgQspstd/74eDXS0QDPKpCne/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=IVAFF0Hz; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1708996387; x=1740532387;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=cYQeMcglbfCsqO+n2FbujJNC86HX4oA1mykhbxRwasM=;
-  b=IVAFF0Hzp94AWhzx/Wwn/E8sxk1m6QkSFeeEqDktB5JxBylP9iyG+d0i
-   JXFDu4VkH3O9Yq+sNMrvRtXweIYw64JXoqDr2YZb4MVlsUG5YVHIWoP6x
-   zoNZvXso7x6sW3S4aWBNTSRL2GlXIZjPolIQAGeH7XBE6LsDByKLmVik4
-   8=;
-X-IronPort-AV: E=Sophos;i="6.06,187,1705363200"; 
-   d="scan'208";a="187574180"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2024 01:13:06 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:20027]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.27:2525] with esmtp (Farcaster)
- id ec880b31-c8da-499e-ae0d-5b40799d14aa; Tue, 27 Feb 2024 01:13:05 +0000 (UTC)
-X-Farcaster-Flow-ID: ec880b31-c8da-499e-ae0d-5b40799d14aa
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 27 Feb 2024 01:13:03 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.101.48) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Tue, 27 Feb 2024 01:13:00 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Allison Henderson <allison.henderson@oracle.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<rds-devel@oss.oracle.com>
-Subject: [PATCH v2 net 5/5] tcp: Add assertion for reqsk->rsk_listener->sk_net_refcnt.
-Date: Mon, 26 Feb 2024 17:10:41 -0800
-Message-ID: <20240227011041.97375-6-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240227011041.97375-1-kuniyu@amazon.com>
-References: <20240227011041.97375-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1708996954; c=relaxed/simple;
+	bh=HKMh/RERsX5QSyVfjfxLJurweHBeLZzWNKIUzGflEEU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rjBbRpRu/MwkQUHqYbHulA/nbE6fxfG8Ta85IIOCG+y+PM8xsuK9akoPtcfBt7r3zwUvciA400jS++qE/DI5YSk8S64Wyis2Z1MmrMXqVFgA68/mfy/F0UaTkaEJTvbIhjC3bqW0swBrzYPyxtiGdJiI1RvaaRGWpVToDhzQzgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MR5v1WpU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D32C5C433F1;
+	Tue, 27 Feb 2024 01:22:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708996954;
+	bh=HKMh/RERsX5QSyVfjfxLJurweHBeLZzWNKIUzGflEEU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MR5v1WpU1KxFjkKVG6HGb5tlJKttShhPu3qsGW6CVsY1a3Z5FuoJp1iLyv+EGGBkG
+	 AhFqARTqpjhZrW+ImG9TB6I5PPb9Y3EOjMFr2d0FGKNl4RB+O1CrD7oSoN1t+xGX7d
+	 ks3mEGveqDUhshcDO1ng4JvDK6IXNf1O5nFednC/WqJDxjrKwhmz+RxBGNOIB7IYQd
+	 7CUbeqyWO6/0eBETfdpAFYRG2M7f0T0AHbgd+3/6zA8b+n05ExIvi9kfZ+olWFxFi5
+	 vPtrUU+6qCOjCkgpWvqNYvYnAA+KmVjJoTu0WLj+7XScFI1PO+1v7wVgBwb7OmQTCo
+	 iqth/w4+lnthQ==
+Date: Mon, 26 Feb 2024 17:22:33 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Wander Lairson Costa <wander@redhat.com>, Yan Zhai <yan@cloudflare.com>
+Subject: Re: [PATCH v2 net-next 3/3] net: Use backlog-NAPI to clean up the
+ defer_list.
+Message-ID: <20240226172233.161c6e7e@kernel.org>
+In-Reply-To: <20240226115922.3ghr5wuD@linutronix.de>
+References: <20240221172032.78737-1-bigeasy@linutronix.de>
+	<20240221172032.78737-4-bigeasy@linutronix.de>
+	<20240223180257.5d828020@kernel.org>
+	<20240226115922.3ghr5wuD@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D033UWA004.ant.amazon.com (10.13.139.85) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-syzbot demonstrated that a reqsk timer could be fired after netns
-dismantle if the timer was kicked by kernel TCP listener.
+On Mon, 26 Feb 2024 12:59:22 +0100 Sebastian Andrzej Siewior wrote:
+> They protect the list in input_pkt_queue and the NAPI state. It is just
+> in the !RPS case it is always CPU-local and the lock is avoided (while
+> interrupts are still disabled/ enabled).
+> 
+> What about
+> 	input_queue_lock_irq_save()
+> 	input_queue_lock_irq_disable()
+> 	input_queue_lock_irq_restore()
+> 	input_queue_lock_irq_enable()
 
-Regardless of the owner of the socket, TCP listener always has to
-hold netns refcount.
-
-Let's make sure that new user will not create kernel TCP listener
-without holding netns refcount.
-
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/ipv4/tcp_input.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index df7b13f0e5e0..341dd5bb3fd1 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -6972,6 +6972,8 @@ struct request_sock *inet_reqsk_alloc(const struct request_sock_ops *ops,
- 	if (req) {
- 		struct inet_request_sock *ireq = inet_rsk(req);
- 
-+		DEBUG_NET_WARN_ON_ONCE(!sk_listener->sk_net_refcnt);
-+
- 		ireq->ireq_opt = NULL;
- #if IS_ENABLED(CONFIG_IPV6)
- 		ireq->pktopts = NULL;
--- 
-2.30.2
-
+SGTM. Maybe I'd risk calling it backlog_lock_* but not sure others
+would agree.
 
