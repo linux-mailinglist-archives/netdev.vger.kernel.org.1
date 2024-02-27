@@ -1,115 +1,114 @@
-Return-Path: <netdev+bounces-75389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46C45869B5F
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:56:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F188869B74
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 17:00:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F04861F21FE0
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 15:56:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF5F41C210C2
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA91146E78;
-	Tue, 27 Feb 2024 15:56:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50719146910;
+	Tue, 27 Feb 2024 16:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TRFr+82x"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="J25mWs/N"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F91514690A
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 15:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C8C146000
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 16:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709049367; cv=none; b=ciXPza9WUqtFzgwirJGaBLhNhV5x6JJzQjrxgdCwHD0J0EuGB8eziHE25fxz1YNUisKWS4GTvy9py+501F3p469Dmq6BuakSyVZYlYNFJkfc4kW8WonlhxuThBCcFrz+mJvSkwQHet/OfS1aGyONC6V5rT+uV20NcmOBharNRw8=
+	t=1709049609; cv=none; b=O5J0o1Htuk0RqEsfbnWpZqyUkSppIbRg74+lBuF6iEXZDM5nLBXSDxPbBvCMjMqMon1yArcAIpq9HfC1KYrhdZeL0CpEzBwdcMiqZTEsGHFx1+pVazr1jnMQiWQ/hDioe7K9s7huVLREkxxFOdShSlNmvBgOzZ0FIfGgkXvrtvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709049367; c=relaxed/simple;
-	bh=QFelD9gLAoanges+RCJzjDEagMHCJVtY8FQKqVkcovE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EL4TiEroN9qzRA7bhIoAL2svWj5WUaTy4pwLL15snYDhxi/xnrXJvkMSinZ6BgMA0eaZ+CWv6EkV1CBywbOuPsvBCxrKXPZ1JnCsDWoYTyoWTpucJVNcmDVslbB5RSdw5xJS87QLahaYgoDxzstwZjuHdIY+AkiN00unc1tA7M8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TRFr+82x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C118C433C7;
-	Tue, 27 Feb 2024 15:56:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709049366;
-	bh=QFelD9gLAoanges+RCJzjDEagMHCJVtY8FQKqVkcovE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TRFr+82x4dL6Yqsk+GVlsE101cD4SkAjUdmIne0ns+ADGbppPaqrtwayEPMudVoTm
-	 qfiiqQeRfBJE1jBFoosSqEApXYgOHEyF1xXfYmOaeku+7j1xCuTR5Tjdi0KczoG39U
-	 taoBX819szPdLmn/DwcaqYlONQjEpwWrtaoF2DguHXj2YncT5z8BqSWFDmJ/D+HG0w
-	 ZCojIbAP4KlHnQTbrWokshBA99ezS/VK+CsEGMsuaIC/AcPcEaLVqmvcdg24a22o3I
-	 j1+BWpJzBH01ORN9tK7DEWAduz03B+2dfBtMoVZmmmo+I3vyC8ZYVCIRN4/e1A2V5s
-	 TS1N537b4EwKw==
-Date: Tue, 27 Feb 2024 07:56:05 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, jiri@resnulli.us, sdf@google.com,
- nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net-next 00/15] tools: ynl: stop using libmnl
-Message-ID: <20240227075605.18ec70b8@kernel.org>
-In-Reply-To: <m2ttlumbax.fsf@gmail.com>
-References: <20240222235614.180876-1-kuba@kernel.org>
-	<CAD4GDZzF55bkoZ_o0S784PmfW4+L_QrG2ofWg6CeQk4FCWTUiw@mail.gmail.com>
-	<20240223083440.0793cd46@kernel.org>
-	<m27ciroaur.fsf@gmail.com>
-	<20240226100020.2aa27e8f@kernel.org>
-	<m2ttlumbax.fsf@gmail.com>
+	s=arc-20240116; t=1709049609; c=relaxed/simple;
+	bh=ViuZGX50JmEx2mAD00159MuafPAFKtq9bN4Yyy/BDA8=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=Nmvjj5Is/b67+rDBlqcSywy7m3Q0rB4qYpptPN2vxWzvGezaCzF8ecW3Jvox0j/GesyRv+g+6/jHX/73kduQ7rVqDjglJbcQmrIVHDPTeD5dAFSJlx+kfl43uA2XfiQLZ+alAtxR/0tfV0ygPK991StPwhE6Q4p+h13tV0Q3/J8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=J25mWs/N; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=yLcx11rp2lBhYp1/lHqhayGTmf5wvxLufEInbcf5Cx0=; b=J25mWs/NJD7vWt14zalFVp4cE6
+	Fr8cldINeByBrCPsIqKfdGvyQEDTrx1vzmIiWlpt9N1ET0qkJWlRqdi8i+Loodswle2nPkhzhxjjE
+	BaEFldBxrYTi3n9LKTY1Rk2Z5gmDNqPK936/MTOKdTasnqUg0eYWchkLjB/ofg1MEndZQ4Z6Uxnj7
+	82vlxqyGGYi6pLbF692vcD9DcHQ8r6aGg3Gz01XKRgLUPLuYKRceHjBHHrfgfO8S5O36vFS6s4UGa
+	EemqTgniIxry4TPGOrpOsD7tsLQ9FtXOszDY5DSBl+0BZTFwHyunUIszY/T/dbBdxU1Si6g0b4z49
+	DOqsDI8Q==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:45040 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1rezry-0000YC-1f;
+	Tue, 27 Feb 2024 15:59:50 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1rezry-003cXf-5f; Tue, 27 Feb 2024 15:59:50 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH RFC net-next] net: phy: marvell: add comment about
+ m88e1111_config_init_1000basex()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1rezry-003cXf-5f@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Tue, 27 Feb 2024 15:59:50 +0000
 
-On Tue, 27 Feb 2024 10:49:42 +0000 Donald Hunter wrote:
-> > +static inline bool
-> > +__ynl_attr_put_overflow(struct nlmsghdr *nlh, size_t size)
-> > +{
-> > +	bool o;
-> > +
-> > +	/* We stash buffer length on nlmsg_pid. */
-> > +	o = nlh->nlmsg_len + NLA_HDRLEN + NLMSG_ALIGN(size) > nlh->nlmsg_pid;  
-> 
-> The comment confused me here. How about "We compare against stashed buffer
-> length in nlmsg_pid".
+The comment in m88e1111_config_init_1000basex() is wrong - it claims
+that Autoneg will be enabled, but this doesn't actually happen.
 
-The comment should give context, rather than describe the code so how
-about:
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+The 88E1111 datasheet says that when changing HWCFG to 1100 (1000base-X
+no AN) then one also needs to clear bit 12 in the fibre BMCR.
+Furthermore, it says that in the Mode Switching chapter that when
+switching the mode between 1000 and 1100, bit 12 of the fibre BMCR needs
+to be manually updated.
 
-	/* ynl_msg_start() stashed buffer length in nlmsg_pid. */
+However, the 88E1111 code doesn't do this, it just changes HWCFG and then
+seems to hope for the best. Is this something which should be fixed?
 
-> > +	if (o)
-> > +		nlh->nlmsg_pid = YNL_MSG_OVERFLOW;  
-> 
-> It took me a moment to realise that this behaves like a very short
-> buffer length for subsequent calls to __ynl_attr_put_overflow(). Is it
-> worth extending the comment in ynl_msg_start() to say "buffer length or
-> overflow status"?
+ drivers/net/phy/marvell.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Added:
-		/* YNL_MSG_OVERFLOW is < NLMSG_HDRLEN, all subsequent checks
-		 * are guaranteed to fail.
-		 */
-SG?
+diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
+index 1faa22f58366..42ed013385bf 100644
+--- a/drivers/net/phy/marvell.c
++++ b/drivers/net/phy/marvell.c
+@@ -919,7 +919,10 @@ static int m88e1111_config_init_1000basex(struct phy_device *phydev)
+ 	if (extsr < 0)
+ 		return extsr;
+ 
+-	/* If using copper mode, ensure 1000BaseX auto-negotiation is enabled */
++	/* If using copper mode, ensure 1000BaseX auto-negotiation is enabled.
++	 * FIXME: this does not actually enable 1000BaseX auto-negotiation if
++	 * it was previously disabled in the Fiber BMCR!
++	 */
+ 	mode = extsr & MII_M1111_HWCFG_MODE_MASK;
+ 	if (mode == MII_M1111_HWCFG_MODE_COPPER_1000X_NOAN) {
+ 		err = phy_modify(phydev, MII_M1111_PHY_EXT_SR,
+-- 
+2.30.2
 
-> > +	return o;
-> > +}
-> > +
-> >  static inline struct nlattr *
-> >  ynl_attr_nest_start(struct nlmsghdr *nlh, unsigned int attr_type)
-> >  {
-> >  	struct nlattr *attr;
-> >  
-> > +	if (__ynl_attr_put_overflow(nlh, 0))
-> > +		return ynl_nlmsg_end_addr(nlh) - NLA_HDRLEN;  
-> 
-> Is the idea here to return a struct nlattr * that is safe to use?
-> Shouldn't we zero the values in the buffer first?
-
-The only thing that the attr is used for is to call ynl_attr_nest_end().
-so I think zero init won't make any difference.
 
