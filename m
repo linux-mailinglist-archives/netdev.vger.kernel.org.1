@@ -1,92 +1,76 @@
-Return-Path: <netdev+bounces-75461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2D8786A009
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 20:20:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B467086A01D
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 20:24:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CA482860F1
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 19:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6CBA1C21BE3
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 19:24:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E7D51C39;
-	Tue, 27 Feb 2024 19:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33112149E1E;
+	Tue, 27 Feb 2024 19:22:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kv+f9inP"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0ZxkKI2y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C525351C34
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 19:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839D114831E;
+	Tue, 27 Feb 2024 19:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709061630; cv=none; b=u+A1YTDhSW6owTHbXLGIRlMaXayKGESurGeqt/1tS1SMqMb8z/8Ki+Pv3fUY5q3AHudReKnd4zYsA8z+nzWhboO33mLV1lPE/NooARoj9KbqGzeDz9JeLF1w0YSDX/cjiqqv6VQA1d5nRm+G7YFogIh3IjbTrLtN5D/RXBp2IXk=
+	t=1709061775; cv=none; b=TCPXvEwSWxT0F+dhS6l63pfqw4/mfWDpI2hYg08yCY4OwftstuHZWcZTkr7h6AVPOSS1sqxlm4GnpgT7RXHEMV7b39VBNPUYh1sL5ffzksGc+gPg6LvUNd7/RBcBVJZqDyukYVbRlkcgGBcRlNry+tkW5FuEno8ZZCSqgRiskRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709061630; c=relaxed/simple;
-	bh=uTujFPo/NVgg0GZZHcN355DcItgsAQARffU3w8utHm8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=su8+NdSmOPKL5bWWx5OVu3ukGbVqb+j36PTeNU7SiB2Q89eRsdDJgzUHFC/yy+09C08GPsl5tBjTUHggpBpY+p35SwLTLHx6zS34a0PXuqRnycxj6jdLdvDcgQJ7I4JJxqp0ktKJq5ap+UnWcEPRFpjHT4Rpldj6VUyJ3vbcWqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kv+f9inP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 964BCC43390;
-	Tue, 27 Feb 2024 19:20:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709061630;
-	bh=uTujFPo/NVgg0GZZHcN355DcItgsAQARffU3w8utHm8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kv+f9inPCdaO4lJFGr/L52UaqJdyvvYKal+A6siiPUrtJzoyiikLrCIqp7PULAL9H
-	 zG+qFTIJXdPO7a3RqdkDk0CQvyXrN9QCVG4Wxja46PbcQ1M7uj2EQwy2EsgyCvv+nl
-	 qmpzw+T8GfSa9ynLlT0qO/Dyjy5n1j0kVwEReRetnRHIm/dad+DIOj3QyvipBh8XFs
-	 NaHCpP0sLLkU/0eWaOg2uUbH67B1xW5M5wBrtvjViYyGIcTS5bw4fBA6IipoPVfwKE
-	 5yKc1Tz97fcTLpi/CJXV/bXLSOCvs7y+Nprsp+hkzHv/ZFwTtTLpOsFHlJhAm3oOq1
-	 Af20ThR9htjcQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 780CFD84BC5;
-	Tue, 27 Feb 2024 19:20:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709061775; c=relaxed/simple;
+	bh=pqCwl9n0iZDVvOyx9l5q+MZxMdmVELWJgIvun5XHgtk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MnmneRxxtqURiaCJA0HHDHQhPAnOlnZNxhFiVHeCbzeisGcZjsobH636lW6dxRoBv7EydO23Qqxf3+0brIXVlUFIyVkpeeLOXhZk14Yppva+rTF18HgefQmpWSzkacsCdlST+hHA7ngfTLHs84b4UlNcNCptkyLZCR7Y/SZr798=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0ZxkKI2y; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=q0M+3OpEAKpGRzvgH378lrI4p8oL9B1i6eRD2Ub9zm8=; b=0ZxkKI2y4zC0+6eiZjSAQwxdI+
+	KZiYm4si4+G37m31+llOftgq+Vf7RJYk2qCsb2qdysVmaBg5z5jnILzEd3ufde9YyqEAEBQXsqBrt
+	8ABBTdEEqlqN7/aayVG9mf1vh5ZlN4sJ07wYbhkgXudEjkw7yUlgrjcbZwL/96NkRCPQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rf32b-008spb-Lw; Tue, 27 Feb 2024 20:23:01 +0100
+Date: Tue, 27 Feb 2024 20:23:01 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Robert Marko <robimarko@gmail.com>
+Cc: f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] net: dsa: mv88e6xxx: rename
+ mv88e6xxx_g2_scratch_gpio_set_smi
+Message-ID: <a9c03fc9-7805-4d16-b3c5-8dd3064f7378@lunn.ch>
+References: <20240227175457.2766628-1-robimarko@gmail.com>
+ <20240227175457.2766628-2-robimarko@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] netlink: use kvmalloc() in netlink_alloc_large_skb()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170906163048.25913.1879809835090233715.git-patchwork-notify@kernel.org>
-Date: Tue, 27 Feb 2024 19:20:30 +0000
-References: <20240224090630.605917-1-edumazet@google.com>
-In-Reply-To: <20240224090630.605917-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, shaozhengchao@huawei.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240227175457.2766628-2-robimarko@gmail.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 24 Feb 2024 09:06:30 +0000 you wrote:
-> This is a followup of commit 234ec0b6034b ("netlink: fix potential
-> sleeping issue in mqueue_flush_file"), because vfree_atomic()
-> overhead is unfortunate for medium sized allocations.
+On Tue, Feb 27, 2024 at 06:54:21PM +0100, Robert Marko wrote:
+> The name mv88e6xxx_g2_scratch_gpio_set_smi is a bit ambiguous as it appears
+> to only be applicable to the 6390 family, so lets rename it to
+> mv88e6390_g2_scratch_gpio_set_smi to make it more obvious.
 > 
-> 1) If the allocation is smaller than PAGE_SIZE, do not bother
->    with vmalloc() at all. Some arches have 64KB PAGE_SIZE,
->    while NLMSG_GOODSIZE is smaller than 8KB.
-> 
-> [...]
+> Signed-off-by: Robert Marko <robimarko@gmail.com>
 
-Here is the summary with links:
-  - [net-next] netlink: use kvmalloc() in netlink_alloc_large_skb()
-    https://git.kernel.org/netdev/net-next/c/f8cbf6bde4c8
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+    Andrew
 
