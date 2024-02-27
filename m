@@ -1,101 +1,97 @@
-Return-Path: <netdev+bounces-75425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3AE7869E46
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 18:49:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5BE1869E4F
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 18:52:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5ECD41F25084
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 17:49:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C69231C23018
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 17:52:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A975A4EB23;
-	Tue, 27 Feb 2024 17:49:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D4324E1D9;
+	Tue, 27 Feb 2024 17:52:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="grjtQ3+E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sd9+Qyxb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844C74E1DD
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 17:49:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C814E1CB
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 17:52:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709056180; cv=none; b=BpKkP33IRLcRgpcZyyPGEKtSkvQWr69a11BMuvwozE+o+pBr4bHmBeJ/r7xaM8+I2MZglS2LKl1WCWAhnE4qzSxgIko0O6e2FMXfI7WhD37WBLiIyAoM732ar1yfxyX6wt49FmBjPp9hfigsGKjvbf+ZwM8Zn/+ZpDOGrH3rq1c=
+	t=1709056366; cv=none; b=txq74gTVRCDqj226Zs96AYdGFBBjj5P9w1Up4iDB0bmcrffCBdf3z0rMX7iVpYmPqUHckE/1DyTbm211tWmFK4TfDYUNULxvoBxS+qH15LAc5L695/bYCksdtHCvUxvsnhHcCXNTRph1O6FVKRrHXPExbd0/d5+JjSM8VaW7SnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709056180; c=relaxed/simple;
-	bh=jYbfm+IX+aarBg4vFWUarkVK6qLS4Zldu3dxA5u9Hkc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EZF65vP5FgouF7EIFj9r+3CmU7GpjpBUIpeflKSTOPqgaaCRBFmN+szBeSBhTTQeW1WGAWvIwS+x2iv0FsRgdeJ8OGOrKR76y+WgQ+aT0RbJv4d33mkBolvgdz/VDDgslkdUtGdN+2ohkEakQkONs3mdcKNkPddgDA2fx3eTtSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=grjtQ3+E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEDBFC433C7;
-	Tue, 27 Feb 2024 17:49:37 +0000 (UTC)
+	s=arc-20240116; t=1709056366; c=relaxed/simple;
+	bh=HgmXVV3YwiFT2yGyjd27jeBTpRE40AUN1MX0HOXfzvY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eccOZgUMNvqrePcEx5c/+l8amPuQVOav00FTlKfQYMmbz3EWA9/D4eICxjEmWGxLqN4jJPEzaWHEHtoZE06uBDO+Do9ujy8n4lWDv+hOR22F1jHIubzwDL5M6Knm5iOFwqztu5XPCMAYudk3HGbxp5H+ExzJdOq8W1OGIv29tYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sd9+Qyxb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90953C433F1;
+	Tue, 27 Feb 2024 17:52:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709056180;
-	bh=jYbfm+IX+aarBg4vFWUarkVK6qLS4Zldu3dxA5u9Hkc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=grjtQ3+EeVm78mBdi5WCRuZJ/cZ/F4jYQizmeT0r2MH/+dBJIgIlPnj4RalYE/Ee5
-	 uXjDdpjWF0/3BLj1bgZglM4ycMPwRhvV2MhtNKMzVmExB6T/q4Oc4YiSDdwmWqx0c2
-	 ysBUGfesbMXj8fOJXmuebiiHYAjS0ox/jTZNljvzmznEIEU5T1Xyd0iqk7A7qIKhfQ
-	 /KyMrwRtVfuTIVfeyNvWrtCiNO7UdJzxZ3wWJg6zBe7NwtAidXd9ITLsYxOrddrJ1A
-	 tRofPH0I7oqNlfj68ze4NcRXsVLpMNADqSYRQrEnuikYlGr3jDuiEhsQZtN//i7RFS
-	 bOPq/caX8/0ig==
-Date: Tue, 27 Feb 2024 17:49:35 +0000
-From: Simon Horman <horms@kernel.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Tristram.Ha@microchip.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [PATCH] net: hsr: Use correct offset for HSR TLV values in
- supervisory HSR frames
-Message-ID: <20240227174935.GJ277116@kernel.org>
-References: <20240226152447.3439219-1-lukma@denx.de>
+	s=k20201202; t=1709056365;
+	bh=HgmXVV3YwiFT2yGyjd27jeBTpRE40AUN1MX0HOXfzvY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Sd9+Qyxbhd5MNXpcuoaqQHmuCkaSOcaXYFc3txYdtByyNb3Uah7nDZrSjcIfZh6CE
+	 QQvvSryeoPKtr79kDOUjS82cUlN39MkdI1oubzQuNy0XB1INfH8GhCbabrW/0UQ8B1
+	 waCBVzN8/rQyZFr1naFsgupbFSfbclxH+4YJlgMdIPfQrpauyZ6kz/JP+cT1N6xuv7
+	 +eInq3ofiGTfgRZ5PjPlw9GTTvxtjxlXiO2x4HUdiGB+Euil1kI0uFqWeBo5Ow+vRF
+	 keeVylPs7DH7NTb9DhkjtKjTe58dDQYYRiNhu/khSrnUojiJSwLud9e1ymXGOLiIVM
+	 17cVA1lwIk1NA==
+Date: Tue, 27 Feb 2024 09:52:44 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ Zhengchao Shao <shaozhengchao@huawei.com>
+Subject: Re: [PATCH net-next] netlink: use kvmalloc() in
+ netlink_alloc_large_skb()
+Message-ID: <20240227095244.23e5a740@kernel.org>
+In-Reply-To: <20240224090630.605917-1-edumazet@google.com>
+References: <20240224090630.605917-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240226152447.3439219-1-lukma@denx.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 26, 2024 at 04:24:47PM +0100, Lukasz Majewski wrote:
-> Current HSR implementation uses following supervisory frame (even for
-> HSRv1 the HSR tag is not is not present):
-> 
-> 00000000: 01 15 4e 00 01 2d XX YY ZZ 94 77 10 88 fb 00 01
-> 00000010: 7e 1c 17 06 XX YY ZZ 94 77 10 1e 06 XX YY ZZ 94
-> 00000020: 77 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 00000030: 00 00 00 00 00 00 00 00 00 00 00 00
-> 
-> The current code adds extra two bytes (i.e. sizeof(struct hsr_sup_tlv))
-> when offset for skb_pull() is calculated.
-> This is wrong, as both 'struct hsrv1_ethhdr_sp' and 'hsrv0_ethhdr_sp'
-> already have 'struct hsr_sup_tag' defined in them, so there is no need
-> for adding extra two bytes.
-> 
-> This code was working correctly as with no RedBox support, the check for
-> HSR_TLV_EOT (0x00) was off by two bytes, which were corresponding to
-> zeroed padded bytes for minimal packet size.
-> 
-> Fixes: f43200a2c98b ("net: hsr: Provide RedBox support")
+On Sat, 24 Feb 2024 09:06:30 +0000 Eric Dumazet wrote:
+>  struct sk_buff *netlink_alloc_large_skb(unsigned int size, int broadcast)
+>  {
+> +	size_t head_size = SKB_HEAD_ALIGN(size);
+>  	struct sk_buff *skb;
+>  	void *data;
+>  
+> -	if (size <= NLMSG_GOODSIZE || broadcast)
+> +	if (head_size <= PAGE_SIZE || broadcast)
+>  		return alloc_skb(size, GFP_KERNEL);
+>  
+> -	size = SKB_DATA_ALIGN(size) +
+> -	       SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+> -
+> -	data = vmalloc(size);
+> -	if (data == NULL)
+> +	data = kvmalloc(head_size, GFP_KERNEL);
+> +	if (!data)
+>  		return NULL;
+>  
+> -	skb = __build_skb(data, size);
+> -	if (skb == NULL)
+> -		vfree(data);
+> -	else
+> +	skb = __build_skb(data, head_size);
 
-Hi Lukasz,
+Is this going to work with KFENCE? Don't we need similar size
+adjustment logic as we have in __slab_build_skb() ?
 
-The commit cited above does seem to be present in net or net-next.
-Perhaps the tag should be:
-
-   Fixes: eafaa88b3eb7 ("net: hsr: Add support for redbox supervision frames")
-
-> 
-> Signed-off-by: Lukasz Majewski <lukma@denx.de>
-
-...
+> +	if (!skb)
+> +		kvfree(data);
+> +	else if (is_vmalloc_addr(data))
+>  		skb->destructor = netlink_skb_destructor;
 
