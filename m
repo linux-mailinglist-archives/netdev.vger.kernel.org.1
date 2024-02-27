@@ -1,168 +1,168 @@
-Return-Path: <netdev+bounces-75476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00D4B86A164
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 22:13:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EBEA86A156
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 22:07:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C9AAB2E08B
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 21:01:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FB2CB2E7FA
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 21:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48BA14EFE6;
-	Tue, 27 Feb 2024 21:01:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7F6B14F996;
+	Tue, 27 Feb 2024 21:01:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IMYM2yJb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u+JynnRf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7C114EFE4
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 21:01:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8084C14F991;
+	Tue, 27 Feb 2024 21:01:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709067676; cv=none; b=uvWFwPlB3tqW8FaagX7O/3GhlYtMkJWEsKeEtEenx8dkTsbX463ZVqgTOt5ALLlw3xI/6P5K0I7TMYq5lPtp+8o3si1PF89ZvSy+4v0vHByjvxO7TTFL69z42RvOW98NFtNA3yIniFb854Ms/34TGRtmcRQ/sO0OUv0uPtAIpfY=
+	t=1709067705; cv=none; b=VjJC0Mr3RzA8XZsoX/2H+Dll2kB521ewsZn494RpNC//ztb04oQHGwBjtE5VnC6RaOWb0zrlYvYEsVbLtKHg2KTrc+l+OK/GKjvBp8dyd58FVNMd3nTtZjvSNagzLhPUouY2P9BX03lGayE6Cx3PvzyFMRSm3u15IRQHyYfzBtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709067676; c=relaxed/simple;
-	bh=XEm0LSxKZQNuaJGYQoVT7GmounxnAlbK3X52bF6EhDg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=l2T8MmWuaTeaptP4zdeHiNZScdgDJ980VRftAl3Gv4AaGTrRoahxoZaB0Zib0tARnlUTMN8C4cooydxGPVDz/6vskRGpHLYcD4xCDonczfeXeZ3pAl0/VueWLOgj9AHEDdijD2SI+Mgy8sYzcAGeI84e9CGM6+VLY8G827QUtBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IMYM2yJb; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-608ac8c5781so82410677b3.3
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 13:01:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709067674; x=1709672474; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YaGnpfEfc1JmYv4H4rSxHy3xidTiqEsm7Sib6URYsBw=;
-        b=IMYM2yJbbmzmN973UGeEAHkfsFxZKeuYjxHEwlFPnxPo9MdnVfZ0hwVseP1CeCCIcM
-         nvVqWc9yzXxZDIgSJrQGaHzGuS9gHA2l7EXhzQfA3Do91/yj7ZWi2ws/bVDaw/Fd+26x
-         sGM5l6wAMUB82dso/6kz1g315qWeeNA7skQ1XLEz49gjw4PKWxWuN7089wuuNbc6dRMA
-         2IdBVfHzHjmzn9dQUphjX7uKwY87KSUEL6qSRoaR5c2zehLoLImwgLSYTjk7tQyfkULs
-         ezRjIF+lxMPdewhYNbHWwRibqExVFRHjIQJ07dgVbnrSxgrAuq08xOAWVJtdJansylS4
-         5m3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709067674; x=1709672474;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YaGnpfEfc1JmYv4H4rSxHy3xidTiqEsm7Sib6URYsBw=;
-        b=vFfSDRkmd93te9zemzG7iDCMJmhZKnopuqBXs92Q71NVMvFzxoKKJWvpPHg1Ab7luK
-         sC8JPcRlsy7HMCOYFkxpr73Z9+eaXwocYIL8xpTzwOk7or8q7CfMwcO35PM0gbVOnWQD
-         QOmZbfO60+6pBZIDNmubTVhbv2ain28rqXBtdsDnL/H9X6XIqLd3Ru0S/q+7x13E5Rvy
-         DaRu+EPJCcA4wrDXxutNjNoSLdM7LawMki/jQtskN9YSi3ks0jFn1A2KaGgKjuekbK+4
-         wLImV3FQEU7apTy6p3vZ3o3bdWE5tGsF4uLiaVW89DVvSYIDHxVEccrTabiOHJQMGSwP
-         KXSQ==
-X-Gm-Message-State: AOJu0YxELqQ4yFJ2Fu3yzKU7OZp217QzLaY30PiJAH0KpIoxXpnJMzmz
-	klFyzQTANdae3i6JCA1fCTfKqz7ifVjpT0sMl4FJ6DNzTnFQ0v1yfAvIRODb18lTOiCFtiMJLwc
-	3whNKahnp+Q==
-X-Google-Smtp-Source: AGHT+IErhYwSXSGVdyFqgABB6knNxdJzCK8U3RLFwQweLk/q4PUOlb4/QPT0D1SPetQ9rAWrRW5bVz+ZX/GFDA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a0d:d5ca:0:b0:609:38d1:2ad9 with SMTP id
- x193-20020a0dd5ca000000b0060938d12ad9mr172114ywd.4.1709067674150; Tue, 27 Feb
- 2024 13:01:14 -0800 (PST)
-Date: Tue, 27 Feb 2024 21:01:04 +0000
+	s=arc-20240116; t=1709067705; c=relaxed/simple;
+	bh=9RZq2R9Frymd/w3S8HzXoEU6qYzChWirDv0zqoRbLTk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m/vewCHhg2aWpa/t8AhPxQCayPqMMzXIHQ4yHowm/QkUCWu80M8/atUdC+iTN78NLkVpwlSepOWU1GM3Qt5LEmoYO/om8ZTWYaHpCMmKYgCnHAIdrIgZnF6EgDdijDvTLcyG//hwrDvjaLAj+pI5ioz5WQV0XFigykywfap2ejo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u+JynnRf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86FD3C433C7;
+	Tue, 27 Feb 2024 21:01:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709067705;
+	bh=9RZq2R9Frymd/w3S8HzXoEU6qYzChWirDv0zqoRbLTk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=u+JynnRfHU57qm/IfI2DmAMzW+Z+HURn/wRIswI2yK8NtC0raFRdTiOy4qlbPax3w
+	 JiI6oLi82m4D1BQ7uuvvvouZa77iboiNlYx7dHAA7iAu6uBn9DQlZtepRQTo6mIIuw
+	 3bu9ckYS/wr4aBGPpBKZGyzLUGRFuIuOl/Fa5JeE6Q+uILukCpgGZxZAIZRpGTSfVP
+	 wsGp6WhCOBdTRian9eSDB5y1gxI+ChqHkbQhsarVwzUWmWm1X+laByAiGFtC+Fo+2r
+	 76GHln3XjVUrCOOJDjj8orK0KjQAK8Uzm4VHZp38d3cFG9irPXxNSBbQe50E2DPb5O
+	 zGFPMDzAym6lw==
+Date: Tue, 27 Feb 2024 21:01:40 +0000
+From: Simon Horman <horms@kernel.org>
+To: Piotr Wejman <piotrwejman90@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: stmmac: fix rx queue priority assignment
+Message-ID: <20240227210140.GP277116@kernel.org>
+References: <20240226093144.31965-1-piotrwejman90@gmail.com>
+ <20240227170012.GC277116@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
-Message-ID: <20240227210105.3815474-1-edumazet@google.com>
-Subject: [PATCH net-next] net: call skb_defer_free_flush() from __napi_busy_loop()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Samiullah Khawaja <skhawaja@google.com>, 
-	Stanislav Fomichev <sdf@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240227170012.GC277116@kernel.org>
 
-skb_defer_free_flush() is currently called from net_rx_action()
-and napi_threaded_poll().
+On Tue, Feb 27, 2024 at 05:00:12PM +0000, Simon Horman wrote:
+> On Mon, Feb 26, 2024 at 10:31:44AM +0100, Piotr Wejman wrote:
+> > The driver should ensure that same priority is not mapped to multiple
+> > rx queues. Currently rx_queue_priority() function is adding
+> > priorities for a queue without clearing them from others.
+> > 
+> > >From DesignWare Cores Ethernet Quality-of-Service
+> > Databook, section 17.1.29 MAC_RxQ_Ctrl2:
+> > "[...]The software must ensure that the content of this field is
+> > mutually exclusive to the PSRQ fields for other queues, that is,
+> > the same priority is not mapped to multiple Rx queues[...]"
+> > 
+> > After this patch, rx_queue_priority() function will:
+> > - assign desired priorities to a queue
+> > - remove those priorities from all other queues
+> > The write sequence of CTRL2 and CTRL3 registers is done in the way to
+> > ensure this order.
+> > 
+> > Signed-off-by: Piotr Wejman <piotrwejman90@gmail.com>
+> > ---
+> > Changes in v2:
+> >   - Add some comments
+> >   - Apply same changes to dwxgmac2_rx_queue_prio()
+> >   - Revert "Rename prio argument to prio_mask"
+> >   - Link to v1: https://lore.kernel.org/netdev/20240219102405.32015-1-piotrwejman90@gmail.com/T/#u
+> > 
+> >  .../net/ethernet/stmicro/stmmac/dwmac4_core.c | 42 +++++++++++++++----
+> >  .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 40 ++++++++++++++----
+> >  2 files changed, 66 insertions(+), 16 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+> > index 6b6d0de09619..76ec0c1da250 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+> > @@ -92,19 +92,43 @@ static void dwmac4_rx_queue_priority(struct mac_device_info *hw,
+> >  				     u32 prio, u32 queue)
+> >  {
+> >  	void __iomem *ioaddr = hw->pcsr;
+> > -	u32 base_register;
+> > -	u32 value;
+> > +	u32 clear_mask = 0;
+> > +	u32 ctrl2, ctrl3;
+> > +	int i;
+> >  
+> > -	base_register = (queue < 4) ? GMAC_RXQ_CTRL2 : GMAC_RXQ_CTRL3;
+> > -	if (queue >= 4)
+> > -		queue -= 4;
+> > +	ctrl2 = readl(ioaddr + GMAC_RXQ_CTRL2);
+> > +	ctrl3 = readl(ioaddr + GMAC_RXQ_CTRL3);
+> > +	
+> > +	/* The software must ensure that the same priority
+> > +	 * is not mapped to multiple Rx queues.
+> > +	 */
+> > +	for (i = 0; i < 4; i++)
+> > +		clear_mask |= ((prio << GMAC_RXQCTRL_PSRQX_SHIFT(i)) &
+> > +						GMAC_RXQCTRL_PSRQX_MASK(i));
+> >  
+> > -	value = readl(ioaddr + base_register);
+> > +	ctrl2 &= ~clear_mask;
+> > +	ctrl3 &= ~clear_mask;
+> >  
+> > -	value &= ~GMAC_RXQCTRL_PSRQX_MASK(queue);
+> > -	value |= (prio << GMAC_RXQCTRL_PSRQX_SHIFT(queue)) &
+> > +	/* Assign new priorities to a queue and
+> > +	 * clear them from others queues.
+> > +	 * The CTRL2 and CTRL3 registers write sequence is done
+> > +	 * in the way to ensure this order.
+> > +	 */
+> > +	if (queue < 4) {
+> > +		ctrl2 |= (prio << GMAC_RXQCTRL_PSRQX_SHIFT(queue)) &
+> >  						GMAC_RXQCTRL_PSRQX_MASK(queue);
+> > -	writel(value, ioaddr + base_register);
+> > +
+> > +		writel(ctrl2, ioaddr + GMAC_RXQ_CTRL2);
+> > +		writel(ctrl3, ioaddr + GMAC_RXQ_CTRL3);
+> > +	} else {
+> > +		queue -= 4;
+> > +
+> > +		ctrl3 |= (prio << GMAC_RXQCTRL_PSRQX_SHIFT(queue)) &
+> > +						GMAC_RXQCTRL_PSRQX_MASK(queue);
+> > +
+> > +		writel(ctrl3, ioaddr + GMAC_RXQ_CTRL3);
+> > +		writel(ctrl2, ioaddr + GMAC_RXQ_CTRL2);
+> > +	}
+> >  }
+> 
+> Hi Piotr,
+> 
+> Sorry if I am on the wrong track here, but this seems a little odd to me.
+> 
+> My reading is that each byte of GMAC_RXQ_CTRL2 and GMAC_RXQ_CTRL3
+> hold the priority value - an integer in the range of 0-255 - for
+> each of 8 queues.
 
-We should also call it from __napi_busy_loop() otherwise
-there is the risk the percpu queue can grow until an IPI
-is forced from skb_attempt_defer_free() adding a latency spike.
+Thinking about this some more, and checking the code some more, I realise I
+am wrong here. I now see that the priority values are bit-fields not
+integers. So I think what you have is fine.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Samiullah Khawaja <skhawaja@google.com>
-Cc: Stanislav Fomichev <sdf@google.com>
----
- net/core/dev.c | 43 ++++++++++++++++++++++---------------------
- 1 file changed, 22 insertions(+), 21 deletions(-)
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 275fd5259a4a92d0bd2e145d66a716248b6c2804..053fac78305c7322b894ceb07a925f7e64ed70aa 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6173,6 +6173,27 @@ struct napi_struct *napi_by_id(unsigned int napi_id)
- 	return NULL;
- }
- 
-+static void skb_defer_free_flush(struct softnet_data *sd)
-+{
-+	struct sk_buff *skb, *next;
-+
-+	/* Paired with WRITE_ONCE() in skb_attempt_defer_free() */
-+	if (!READ_ONCE(sd->defer_list))
-+		return;
-+
-+	spin_lock(&sd->defer_lock);
-+	skb = sd->defer_list;
-+	sd->defer_list = NULL;
-+	sd->defer_count = 0;
-+	spin_unlock(&sd->defer_lock);
-+
-+	while (skb != NULL) {
-+		next = skb->next;
-+		napi_consume_skb(skb, 1);
-+		skb = next;
-+	}
-+}
-+
- #if defined(CONFIG_NET_RX_BUSY_POLL)
- 
- static void __busy_poll_stop(struct napi_struct *napi, bool skip_schedule)
-@@ -6297,6 +6318,7 @@ static void __napi_busy_loop(unsigned int napi_id,
- 		if (work > 0)
- 			__NET_ADD_STATS(dev_net(napi->dev),
- 					LINUX_MIB_BUSYPOLLRXPACKETS, work);
-+		skb_defer_free_flush(this_cpu_ptr(&softnet_data));
- 		local_bh_enable();
- 
- 		if (!loop_end || loop_end(loop_end_arg, start_time))
-@@ -6726,27 +6748,6 @@ static int napi_thread_wait(struct napi_struct *napi)
- 	return -1;
- }
- 
--static void skb_defer_free_flush(struct softnet_data *sd)
--{
--	struct sk_buff *skb, *next;
--
--	/* Paired with WRITE_ONCE() in skb_attempt_defer_free() */
--	if (!READ_ONCE(sd->defer_list))
--		return;
--
--	spin_lock(&sd->defer_lock);
--	skb = sd->defer_list;
--	sd->defer_list = NULL;
--	sd->defer_count = 0;
--	spin_unlock(&sd->defer_lock);
--
--	while (skb != NULL) {
--		next = skb->next;
--		napi_consume_skb(skb, 1);
--		skb = next;
--	}
--}
--
- static int napi_threaded_poll(void *data)
- {
- 	struct napi_struct *napi = data;
--- 
-2.44.0.rc1.240.g4c46232300-goog
-
+Sorry about the noise.
 
