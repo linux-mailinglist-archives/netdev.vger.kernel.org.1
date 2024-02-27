@@ -1,142 +1,154 @@
-Return-Path: <netdev+bounces-75376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FDEC869A4C
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:25:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AFB0869A54
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:27:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 257A328427D
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 15:25:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B690F1F24E1A
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 15:27:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 636F614264A;
-	Tue, 27 Feb 2024 15:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550E814533A;
+	Tue, 27 Feb 2024 15:27:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="fJJmsRjF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TRBJ4sWO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4A6146009
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 15:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD4913DBBC
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 15:27:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709047532; cv=none; b=Bb2k39k0EVgOA0Bk92tmwC9U4pErs7H0aXzAw2Z0INIZdeX/1uLrlYVK94CTMpAVpB/6/IIoFlrfZpEhYamb89bxpLrkLK7HgvlXIPEUVB0DhqEGIWXebQGdNC5EiVaFFjDfxtbnYeGO+ksTtoUuq4FX3AKzW4I8I310mA/RuEI=
+	t=1709047670; cv=none; b=oJnpsuYr7U/KGpl9E6obmWDUMXvmI74zR3L/q3Ndqmz8Zq+HeS1xNtEQY/HA4S2tt45kDe5jyFBx7KsPLWI6//rodTdchoxc+tSvlKBodQhwrxoZwa6ppWCDF7Em5f/hIP/+Tn8Vzib77TQiZfhrNlW9WkZOK9LYwBDDvemIWGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709047532; c=relaxed/simple;
-	bh=17f6eAw2Q5YZ2lBTiANOInapi8qxn8g7qVdmAOj4WsA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MG4tuNizBKIQ2gUymewpLRBgZqlIO3jAAm9jPk78VxN+EN7HaIq68ukxB61TB5bmuHCu/4DuTdCuQjmBOd/eacPI+JqsFMKgFNqM4gS1my17upD0ABXZVH+TzAlXfkSfyszV2ZfCnZzKqgOnGyT6vy/SYRWq4K2NE8jY+bm18rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=fJJmsRjF; arc=none smtp.client-ip=209.85.219.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-dc74e33fe1bso3538337276.0
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 07:25:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1709047529; x=1709652329; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=17f6eAw2Q5YZ2lBTiANOInapi8qxn8g7qVdmAOj4WsA=;
-        b=fJJmsRjFwfKhjMcbMSAq8GkD/6qZEZtcWLU2v5Sey/GJSt3KbX8kFzv7VhAZGWxthE
-         0dFY8T9mGYIZgOW/IXk1OVum6jbhKz3YXe/RLgefAnwWH0pDJVfLzmJpjnN3MELNXtSS
-         YyE71N5yoCv7ZKvFqfBIai1+bNisUH24GA8ILlMSMbmdA0RQCQuNeAgYgPofB442lDcj
-         xMPapWTmTOjAEEVSSYekZ6bLZ/zQPfl/8Qf7T9LzZa8hQBp8mDyIkwQLASb6t8YR8+AD
-         VM4cDfFxQSq/4bRSE1UQ2kQ/GngD66rDuwPx44jIDz6nj2NZw1Z63/f7hSPa0bt9UwPO
-         eD/w==
+	s=arc-20240116; t=1709047670; c=relaxed/simple;
+	bh=2Df63Y5TkYPsmn8RWXJBQXHSQxfD9l2HfIHVhK6EdD0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KTqhM729XBaPKSjYqryumDklLoy+3JJdt6WBesjca+GvP+anVKXryezqCTUedVQioCmyHgyHnHPNBNzqZpZVkR6bpfULX9T/GrR3LtUcEEHxireCEm4xe55J8PyoJPxVGUcQSBCd2qhNoJDxP+jJovmWd9IG8EOIkY3FGIrkErg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TRBJ4sWO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709047667;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ENNrvrL9NDnFw3jJyvgsGCyMMkLB6+zPb2N9cTS8YnI=;
+	b=TRBJ4sWOMdDGr91yyo0axgSvZ8uxuD8iLnMrUwJEXc65BvtcTI3gX0ksvUSFSm46rxgfuC
+	1tLKccPUNRJcNQOQreh7vME4ek++PA0P4g5fr43SQr4/i6jWUmJ85/o7SWT2ashBw4q1+K
+	IeVerAf60NJb8bPBBuQOHmwXI3wjonY=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-522-n1f7zkvsOnWbHk93Ok1dXg-1; Tue, 27 Feb 2024 10:27:46 -0500
+X-MC-Unique: n1f7zkvsOnWbHk93Ok1dXg-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-512eb4e9a77so3796939e87.3
+        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 07:27:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709047529; x=1709652329;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=17f6eAw2Q5YZ2lBTiANOInapi8qxn8g7qVdmAOj4WsA=;
-        b=OqPEFZ2DaZMKG1XOOQnpEMxPnZfBeNvBi+4QtXNn1qofdCvN/YkSbz+sVc8A6yBt1h
-         Z2Vk3G1Fv+U41RVyKmrWNHIBCEvJBPr1+GbNjpfXYoFF19sM4Mdp4PMa6GXAAQj2+2k/
-         FY4GtOLSMHWST6QwCqyHqPbHmUdB6eYVrvfbY8yWxayN/DegWM5plQxhi8gPdNIUG+hM
-         BEKsRAMEiBXW5vQMXBt8kYBIo0Ks1++syeEmDvH9Zc3f7R7gJo/4/uDdhvyBN9pS83VT
-         8IJBuwI0fyZTMIWSWbUHfYG4+HtYlK5PSy8mDEmRNTItWlLrkiuJePZm63yLK5q+VmPZ
-         0ZgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWoVBYxda7Rdcu9T2amGhSKwqJcMH9HwcgBofs72tp4mvYL/9ktBD0ecPMeNZG11Llci8l7tvpcIPLMBSPGgzYkozv5f0ee
-X-Gm-Message-State: AOJu0YwGQYwJWAYPvoUqp1e0KWXV8CESGRnOfrympJ214ndRZhExbpBc
-	6Qw+LqFHn/0w0P2SjDb+hdoXcnoQ2iZp0VUainhH5q6qfrEccWyx4DVnBUYTXagHjTOuI019jI8
-	Zn1goCcS63f958by25WRPQbAHHUyNC7tkOJjS
-X-Google-Smtp-Source: AGHT+IHP2DhSduSKymMNAogcq16iDFRZWW/XuP+wAxatcB57mLpvhZ/MViShQHDoxU7k/h0yMaF3RzpGzhZ4aA0Pc28=
-X-Received: by 2002:a25:41cf:0:b0:dc6:7247:5d94 with SMTP id
- o198-20020a2541cf000000b00dc672475d94mr2397689yba.55.1709047529361; Tue, 27
- Feb 2024 07:25:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709047665; x=1709652465;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ENNrvrL9NDnFw3jJyvgsGCyMMkLB6+zPb2N9cTS8YnI=;
+        b=nxfHdPwCHrVFTs9c9Zc80SEa1v7CorGvDqjkLKy6Qc5W+WktXAozbesVzASMrU3xR4
+         uZubIGBjNG38CiKbxXsfMUPuE7bb0tuFlZLviDRevJHhvsUEQpJ4oAGHoSprzFCGIXJW
+         RcvNJ6YLKphOw55WJuivVmZyc8C0Yoj8wwxBfD5GztuyoIyu4lyE0QMrzY6QHTMjx9nb
+         xvO5FoDQ1x0MryKIR4ZpXziLwJDC8uey34fxEwJc+UP7Xm/+5p6U//I2SAuWZFPOdxvz
+         2ddrrpN2NmfXJqhVDrrLGoKUiw/UQ3pErurjk/O2DISvPeNpY96nkGx41x1kBmI7LM48
+         Qmrw==
+X-Forwarded-Encrypted: i=1; AJvYcCWuAdYsspP6xoXnIfNjG/7vdOG2jqj/7HNaPc4gMT2PfZ6kIPyF5vDvc109WGdB3b7z5M2SAA18TAWXcFXMJyl2/zeD51c+
+X-Gm-Message-State: AOJu0YxmERJLGMTlsaO+UOR3WgX2ENF2Z+etKUk6i+DHNFZXCnFaRPfE
+	LyBTnoZN/+rzRrG/3rDzUSra1P4jktIM3JZ5yd46NqI1zZpA4FBPB7mhElQiKnQcuKyCfw8Jif/
+	iK/bxXpl3y2LDwvU+R6D7DvuMZpd6BSxVXYguFKuYT4d7tgRmPQgQUw==
+X-Received: by 2002:a05:6512:1317:b0:512:f59e:f425 with SMTP id x23-20020a056512131700b00512f59ef425mr7363477lfu.10.1709047664852;
+        Tue, 27 Feb 2024 07:27:44 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFsvXx6NGEZzcHLLmTbDVJEU4gHIYzEfwKyfUcLPgu/V1ZCIC6i2RJjITcFdOioHQU6f8dOAw==
+X-Received: by 2002:a05:6512:1317:b0:512:f59e:f425 with SMTP id x23-20020a056512131700b00512f59ef425mr7363461lfu.10.1709047664485;
+        Tue, 27 Feb 2024 07:27:44 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id gg3-20020a170906e28300b00a3edb758561sm859047ejb.129.2024.02.27.07.27.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Feb 2024 07:27:44 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id B025C112E52F; Tue, 27 Feb 2024 16:27:43 +0100 (CET)
+From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: syzbot+8cd36f6b65f3cafd400a@syzkaller.appspotmail.com,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH bpf] bpf: Fix DEVMAP_HASH overflow check on 32-bit arches
+Date: Tue, 27 Feb 2024 16:27:40 +0100
+Message-ID: <20240227152740.35120-1-toke@redhat.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <5be479fb-8fc6-4fa1-8a18-25be4c7b06f6@intel.com>
- <20240222184045.478a8986@kernel.org> <ZdhqhKbly60La_4h@nanopsycho>
- <b4ed432e-6e76-8f1b-c5ea-8f19ba610ef3@gmail.com> <ZdiOHpbYB3Ebwub5@nanopsycho>
- <375ff6ca-4155-bfd9-24f2-bd6a2171f6bf@gmail.com> <CAM0EoMkdsFTuJ-mfqBUKZbvpAzex8ws9jcrPEzTO1iUnaWOPZQ@mail.gmail.com>
- <3c5c69f8-b7c1-6de7-e22a-5bb267f5562d@gmail.com> <40539b7b-9bff-4fca-9004-16bf68aca11f@intel.com>
- <20240226070353.79154709@kernel.org>
-In-Reply-To: <20240226070353.79154709@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 27 Feb 2024 10:25:17 -0500
-Message-ID: <CAM0EoMmL24LxsJ1VOYHuxA=X1uoH+DRhJ5Yvq-h0oPK4mO=zmg@mail.gmail.com>
-Subject: Re: [RFC]: raw packet filtering via tc-flower
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Ahmed Zaki <ahmed.zaki@intel.com>, Edward Cree <ecree.xilinx@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, stephen@networkplumber.org, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, corbet@lwn.net, 
-	xiyou.wangcong@gmail.com, netdev@vger.kernel.org, 
-	"Chittim, Madhu" <madhu.chittim@intel.com>, 
-	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>, amritha.nambiar@intel.com, 
-	Jan Sokolowski <jan.sokolowski@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 26, 2024 at 10:03=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Mon, 26 Feb 2024 07:40:55 -0700 Ahmed Zaki wrote:
-> > Intel's DDP (NVM) comes with default parser tables that contain all the
-> > supported protocol definitions. In order to use RSS or flow director on
-> > any of these protocol/field that is not defined in ethtool/tc, we
-> > usually need to submit patches for kernel, PF and even virtchannel and
-> > vf drivers if we want support on the VF.
-> >
-> > While Intel's hardware supports programming the parser IP stage (and
-> > that would allow mixed protocol field + binary matching/arbitrary
-> > offset), for now we want to support something like DPDK's raw filtering=
-:
-> >
-> > https://doc.dpdk.org/dts/test_plans/iavf_fdir_protocol_agnostic_flow_te=
-st_plan.html#test-case-1-vf-fdir-mac-ipv4-udp
-> >
-> >
-> > What we had in mind is offloading based on exclusive binary matching,
-> > not mixed protocol field + binary matching. Also, as in my original
-> > example, may be restrict the protocol to 802_3, so all parsing starts a=
-t
-> > MAC hdr which would make the offset calculations much easier.
-> >
-> > Please advice what is the best way forward, flower vs u32, new filter,
-> > ..etc.
->
-> I vote for u32. We can always add a new filter. But if one already
-> exists which fully covers the functionality we shouldn't add a new
-> one until we know the exact pain points, IOW have tried the existing.
->
+The devmap code allocates a number hash buckets equal to the next power of two
+of the max_entries value provided when creating the map. When rounding up to the
+next power of two, the 32-bit variable storing the number of buckets can
+overflow, and the code checks for overflow by checking if the truncated 32-bit value
+is equal to 0. However, on 32-bit arches the rounding up itself can overflow
+mid-way through, because it ends up doing a left-shift of 32 bits on an unsigned
+long value. If the size of an unsigned long is four bytes, this is undefined
+behaviour, so there is no guarantee that we'll end up with a nice and tidy
+0-value at the end.
 
-Yes, u32 is the most "ready". No need to patch the classifier code
-(unlike flower) and the dev ops exists already (and has been used by
-drivers in the past).
+Syzbot managed to turn this into a crash on arm32 by creating a DEVMAP_HASH with
+max_entries > 0x80000000 and then trying to update it. Fix this by moving the
+overflow check to before the rounding up operation.
 
-> If we do add a new filter, I think this should be part of the P4
-> classifier. With the parsing tree instantiated from the device side
-> and filters added by the user..
+Fixes: 6f9d451ab1a3 ("xdp: Add devmap_hash map type for looking up devices by hashed index")
+Link: https://lore.kernel.org/r/000000000000ed666a0611af6818@google.com
+Reported-and-tested-by: syzbot+8cd36f6b65f3cafd400a@syzkaller.appspotmail.com
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+---
+ kernel/bpf/devmap.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-P4 will open much bigger opportunities for DDP imo (but some people
-would claim i am a little tiny biased ;->).
+diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+index a936c704d4e7..9b2286f9c6da 100644
+--- a/kernel/bpf/devmap.c
++++ b/kernel/bpf/devmap.c
+@@ -130,13 +130,11 @@ static int dev_map_init_map(struct bpf_dtab *dtab, union bpf_attr *attr)
+ 	bpf_map_init_from_attr(&dtab->map, attr);
+ 
+ 	if (attr->map_type == BPF_MAP_TYPE_DEVMAP_HASH) {
+-		dtab->n_buckets = roundup_pow_of_two(dtab->map.max_entries);
+-
+-		if (!dtab->n_buckets) /* Overflow check */
++		if (dtab->map.max_entries > U32_MAX / 2)
+ 			return -EINVAL;
+-	}
+ 
+-	if (attr->map_type == BPF_MAP_TYPE_DEVMAP_HASH) {
++		dtab->n_buckets = roundup_pow_of_two(dtab->map.max_entries);
++
+ 		dtab->dev_index_head = dev_map_create_hash(dtab->n_buckets,
+ 							   dtab->map.numa_node);
+ 		if (!dtab->dev_index_head)
+-- 
+2.43.2
 
-cheers,
-jamal
 
