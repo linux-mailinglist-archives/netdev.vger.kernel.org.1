@@ -1,73 +1,74 @@
-Return-Path: <netdev+bounces-75195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE1AD868960
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 07:54:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E21B868965
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 07:55:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25A661F275D6
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 06:54:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE1811F27564
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 06:55:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B20A53804;
-	Tue, 27 Feb 2024 06:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D09EE537FC;
+	Tue, 27 Feb 2024 06:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CY7rWYhK"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rdYD1A5Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED63535A8
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 06:53:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC22D54656
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 06:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709016797; cv=none; b=nHIPiJ6GsWGVvon1kybGhdS9X66jet079IGRVJZNY4DyuWGghXtCm/l1/3zGog13u6B0+yZC9pd2adkBloWBoxj1j2rkO5X9maZ0NQ2vRTvBYefphuZTaD30DCTCO96bWrbv5kCnXBMAjoEQGWdzu6t+FyIvkylf+oWaHpLSj0g=
+	t=1709016931; cv=none; b=K28wAUt6Su9txR2iO2H9SF7hbH+UpUt18Kcic7U0/bVFngHytTYvWI9wGyY2mzijo6FnHkewX4bUJOm5torv/UPvEng3HxJqUXQJEk9sFWR3vOHfDBE412d2Xb+ZPNgU9o3tm4fh2cTDSh53KgDGJI9Ol32RaQd68T1LEaW0W9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709016797; c=relaxed/simple;
-	bh=SKPgOyUaWMp7tVKq+GIAuvqq2ASkAq2PcfWyU1kwv6g=;
+	s=arc-20240116; t=1709016931; c=relaxed/simple;
+	bh=stDsqiTeTO9ZAv923ZYDVJq0DbjgBnDtats1p53igfw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bVyq58zh9b/0UYGdEd1hK8n9P/2Y/vvU/pmoT7XR9odOibsvwQACDcgSvC1n2gNpRL/CC0lnq1JbThfQAYZ5OH10MgZdId2/qs6nwFrwCQAGRa+QDHrGdCsCQGLZkWzMM/j5l3rZTOSlGPah5Jnj/A61EkMuR2UPmPSrmScnDpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CY7rWYhK; arc=none smtp.client-ip=209.85.208.42
+	 In-Reply-To:Content-Type; b=DLMOnOSYBfd1+H102CHwYiP00djaY0RK288uHEYmMjnrlXwrQc2+haPdPScVf6oPa6GyWe84Id6ihfu73vwGjOpL16zMWa6IjMlVydRwaSgl5lgLbJx46Q4ZNg3SmHI4xW4wqRJHqMhTeJ+O8IaSJkm/2FbhefA3K/1yqV060qY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rdYD1A5Y; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-564fd9eea75so4922831a12.3
-        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 22:53:15 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-563f675be29so4073360a12.0
+        for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 22:55:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709016794; x=1709621594; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1709016928; x=1709621728; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=rUW9NBgii9foEKz4KuucqEYpYQWu5QkJlFAfiZzpmZI=;
-        b=CY7rWYhKQCuUbEbb81ncPErfClJjZFtQ0Lqv4awW2j4gb1D8g6ppk0zLp8UKLRgTZR
-         E7qHx00HaL7NqfHXltn3H9pW7hqy2wbi73dSO9pJM2katqREBDNnLT/ZsjMJEWnWehLs
-         DAsIKeDTx3uXoBVbr9Ud+7X7w1UqAiux+3SEq+K4Y+nwsxvVD2VhsgNf7Se76W1Wliqk
-         KQf5Ji0ZXMIkYehSjMHVnCrlWRkPY2Js0ME825IGTm4jHXYQbjhfnt2EI6R2Rxy6RUwO
-         hxTeBxBhhKGswdROBwviiiXZCxvi8XnAubSsv4JhSoJdK7t6iWfEJ0hetXVz4/D3YrVa
-         H6NQ==
+        bh=p5LMWifGYvAVa7FBn8fs5JS5BqiF3tT1rVBI+M0zqeo=;
+        b=rdYD1A5YCFa5oZJ8GK+7NN4eha6Y/U2PjtWOGGfTtl4fkZSGHMROUf6C2bdicYQYwG
+         uE13Wlsrh7I3wp32JBbk60nqSl3T88Fl+TA8gy0QR0JAHwcReGD+zGU5N3nhNDkgm6lx
+         sBIXo4H6wRcbSuY3MgLQ1PAvJsIHguBQVBgc7FxUa/TsLj60a1UxVkbyZ5MnJzt+lTMw
+         TIu9z68OXb1whPzC6viZYr/FB2Xk4Zl4QQd8YTOUxMwzAPB2RKmP6hmlx4Bzvv+dzzX/
+         yubCo0aD20WeTTLE263D0LkkNOy9y780ULQEbwnjLkquP8OJmgRweNooSZTBZbh9ys8x
+         vgVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709016794; x=1709621594;
+        d=1e100.net; s=20230601; t=1709016928; x=1709621728;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rUW9NBgii9foEKz4KuucqEYpYQWu5QkJlFAfiZzpmZI=;
-        b=cpm1/Evh0JYTR3jW1ra4p/e/6hdd8cuWnL8Pn8qC7GrXMFPuNN7CsJ6T/lauKZUofR
-         PMf0C+lkDTBVmhLQ6AxTcYRrUKvLX+ZsdaXtQWB7KHT7HmICO5ka5Ng14u7r+g8kFVjm
-         JAV/JWXsefr+/wrd+CsFDnAd7yBi3TpWkEH+CJv/i81P4I/Wgnvg5OWpdBmOORQcVIj4
-         Ow7qXXBrv8z/fDSILNa7CSKR1NlnSlDwQx8NP7uhz5oegwbg65SMU6VTJJgS5eczCtKX
-         eT1ydJPyLXZNyep4aheJxG5W9xkFwn4uFznT7HKkewBKXfeHeAH/4XMBA+aKMefUhxVV
-         NYCg==
-X-Gm-Message-State: AOJu0Yy5IN8RFaz//BHvlQY3N4sgbKw1CTNvUUOLw9fwPoEwBr2J7/yv
-	J6Txus/1NHEjfB5m3P0d3//xK/62G+beHIsIVH7ngM5liBaylknzuwJG61ZToZo=
-X-Google-Smtp-Source: AGHT+IGdu3sTsVj5pjxhy4ECPzYDAu8G5MlflGFu8A707RBlJ/Pa6FNwGTlbSqurHC22ggY2UADy6w==
-X-Received: by 2002:a17:906:8d6:b0:a3e:91fd:c0f0 with SMTP id o22-20020a17090608d600b00a3e91fdc0f0mr5537134eje.49.1709016793910;
-        Mon, 26 Feb 2024 22:53:13 -0800 (PST)
+        bh=p5LMWifGYvAVa7FBn8fs5JS5BqiF3tT1rVBI+M0zqeo=;
+        b=m2S5TlzdTuCZMUh9yvAZFCLN0bGchDIHJbgS0k/xi1mA5wcAWhMLbfuUKAQMyv99jG
+         gpEzlAmz3695Hv7oG/kb5gpieeSO/m/ISfFmv18FoJEocaBCtIiZf8mx27NuV7pYuu4m
+         6eZkKdcTPjcF7KlC9rlPAwxqMNb26gAPqc/PTvv2bYarIDBFVliN8cgvKmcb0Z9704p3
+         KoruR4MxJJZM7igZjb8luNtiyVB2snRmzu4kORhfJK9SK8nnxRTTbR27TutkaWfIAdID
+         c5Yo1MrivYnUkgLjdXbrMgZjoDHT/dBlkvXHMqN/mTl+2RXIlUOzNaSzLd8sn2vPX2a1
+         vkyw==
+X-Forwarded-Encrypted: i=1; AJvYcCWQlYqptk9XZixPWw0/3TeFY3UD9K1ABhE6KKvd1K9HbmH5NtZxIkKh+XJmLxHF7fGvnpUWn9OjmCblZjFA7arpQJvy8LWW
+X-Gm-Message-State: AOJu0Yx9dOYYxzYHd8eNQmU+7KsVBd31hgxCigL7TJ3O9xHkSSTDUcMN
+	eP3eFuzN9+Ejb0x8bouETOB8PYOTS+IObKcF0OpuCLUkEUjR+AUmEhopWzqBOHM=
+X-Google-Smtp-Source: AGHT+IH7fPPNkLtZSScRegvw5/EYLfraKgmuUkavdIt5xx0O9asNd1SRe94aOWu7KBPB6Y1PWdhxKA==
+X-Received: by 2002:a17:906:4a14:b0:a3f:2b6f:6d57 with SMTP id w20-20020a1709064a1400b00a3f2b6f6d57mr4804221eju.29.1709016928096;
+        Mon, 26 Feb 2024 22:55:28 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.222.116])
-        by smtp.gmail.com with ESMTPSA id vh3-20020a170907d38300b00a433634ba03sm458176ejc.43.2024.02.26.22.53.12
+        by smtp.gmail.com with ESMTPSA id h5-20020a1709063c0500b00a432f3bc3a5sm461205ejg.76.2024.02.26.22.55.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Feb 2024 22:53:13 -0800 (PST)
-Message-ID: <90ab2113-f3f7-4d1f-83ca-aa57cbe63a79@linaro.org>
-Date: Tue, 27 Feb 2024 07:53:11 +0100
+        Mon, 26 Feb 2024 22:55:27 -0800 (PST)
+Message-ID: <c0e9eb68-f485-40a9-b025-82a73af06006@linaro.org>
+Date: Tue, 27 Feb 2024 07:55:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,23 +76,20 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 6/6] net: hisi_femac: remove unused compatible
- strings
+Subject: Re: [PATCH net-next resend 2/6] dt-bindings: net: brcm,asp-v2.0: Add
+ asp-v2.2
 Content-Language: en-US
-To: Yang Xiwen <forbidden405@outlook.com>,
- Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
- <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+To: Justin Chen <justin.chen@broadcom.com>, netdev@vger.kernel.org
+Cc: bcm-kernel-feedback-list@broadcom.com, florian.fainelli@broadcom.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, opendmb@gmail.com, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, rafal@milecki.pl,
  devicetree@vger.kernel.org
-References: <20240222-net-v4-0-eea68f93f090@outlook.com>
- <20240222-net-v4-6-eea68f93f090@outlook.com>
- <ccdcdb1b-44a9-4233-994e-18d875a99c2f@linaro.org>
- <SEZPR06MB69590A200BDDD6D3DA4CD2DA96592@SEZPR06MB6959.apcprd06.prod.outlook.com>
+References: <20240223222434.590191-1-justin.chen@broadcom.com>
+ <20240223222434.590191-3-justin.chen@broadcom.com>
+ <b9164eae-69e2-44f3-8deb-e3a5180e459c@linaro.org>
+ <b6c74bbe-89f0-4201-b968-57996f0e0223@broadcom.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -137,58 +135,59 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <SEZPR06MB69590A200BDDD6D3DA4CD2DA96592@SEZPR06MB6959.apcprd06.prod.outlook.com>
+In-Reply-To: <b6c74bbe-89f0-4201-b968-57996f0e0223@broadcom.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 27/02/2024 02:51, Yang Xiwen wrote:
-> On 2/26/2024 3:55 PM, Krzysztof Kozlowski wrote:
->> On 22/02/2024 13:43, Yang Xiwen via B4 Relay wrote:
->>> From: Yang Xiwen <forbidden405@outlook.com>
+On 26/02/2024 20:42, Justin Chen wrote:
+> 
+> 
+> On 2/24/24 2:22 AM, Krzysztof Kozlowski wrote:
+>> On 23/02/2024 23:24, Justin Chen wrote:
+>>> Add support for ASP 2.2.
 >>>
->>> The only documented SoC Hi3516DV300 does not receive any updates from 8
->>> years ago. With the recent driver changes, it unlikely works for this
->>> SoC anymore. Remove the binding for this SoC.
->>>
->>> Also it's hard to get the version number and it's unknown how the
->>> version can be used. Remove them until it's really needed.
->>>
->>> Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
+>>> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
 >>> ---
->>>  drivers/net/ethernet/hisilicon/hisi_femac.c | 4 +---
->>>  1 file changed, 1 insertion(+), 3 deletions(-)
+>>>   Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml | 4 ++++
+>>>   1 file changed, 4 insertions(+)
 >>>
->>> diff --git a/drivers/net/ethernet/hisilicon/hisi_femac.c b/drivers/net/ethernet/hisilicon/hisi_femac.c
->>> index eab91e011d11..9466ca9da2bb 100644
->>> --- a/drivers/net/ethernet/hisilicon/hisi_femac.c
->>> +++ b/drivers/net/ethernet/hisilicon/hisi_femac.c
->>> @@ -990,9 +990,7 @@ static int hisi_femac_drv_resume(struct platform_device *pdev)
->>>  #endif
->>>  
->>>  static const struct of_device_id hisi_femac_match[] = {
->>> -	{.compatible = "hisilicon,hisi-femac-v1",},
->>> -	{.compatible = "hisilicon,hisi-femac-v2",},
->>> -	{.compatible = "hisilicon,hi3516cv300-femac",},
->>> +	{.compatible = "hisilicon,hisi-femac",},
+>>> diff --git a/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml b/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
+>>> index 75d8138298fb..5a345f03de17 100644
+>>> --- a/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
+>>> +++ b/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
+>>> @@ -15,6 +15,10 @@ description: Broadcom Ethernet controller first introduced with 72165
+>>>   properties:
+>>>     compatible:
+>>>       oneOf:
+>>> +      - items:
+>>> +          - enum:
+>>> +              - brcm,bcm74165-asp
+>>> +          - const: brcm,asp-v2.2
+>>>         - items:
+>>>             - enum:
+>>>                 - brcm,bcm74165-asp
 >>
->> What is happening here? Removal could be justified, but then order of
->> your patches is totally wrong. But that hisi-femac is a no-go or provide
->> proper rationale.
+>> Hm, this confuses me: why do you have same SoC with three different
+>> versions of the same block?
+>>
 > 
-> I don't understand exactly... In dts, we commonly have a SoC specific
-> compatible string first, generic compatible string the second. e.g.
+> bcm72165 -> asp-v2.0
+> bcm74165 -> asp-v2.1
+> Are two different SoCs.
+
+Ah, right, existing bindings has two SoCs.
+
 > 
-> compatible = "hisilicon,hi3798mv200-perictrl", "syscon", "simple-mfd".
+> The entry I just added is
+> bcm74165 -> asp-v2.2
+> This is a SoC minor revision. Maybe it should bcm74165b0-asp instead? 
+> Not sure what the protocol is.
 
-There is no generic compatible here. hi3798mv200 is soc.
+So still the confusion - same SoC with different IP blocks. That's
+totally opposite of what we expect: same version of IP block used in
+multiple SoCs.
 
-> 
-> So i think this is recommended. Or does it mean we only need them in
 
-It is allowed for certain cases and recommended for even fewer ones. Do
-you want to say you have fully discoverable features here and you do not
-need any properties? Or you want to say that all possible hardware will
-have exactly the same programming interface (registers etc)?
 
 Best regards,
 Krzysztof
