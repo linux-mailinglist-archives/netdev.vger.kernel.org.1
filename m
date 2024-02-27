@@ -1,306 +1,101 @@
-Return-Path: <netdev+bounces-75200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4E038689CC
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 08:23:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E61778689D3
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 08:27:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C2AF2856B0
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 07:23:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EEE61F224C5
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 07:27:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2CD1548FC;
-	Tue, 27 Feb 2024 07:22:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73C1A5466E;
+	Tue, 27 Feb 2024 07:27:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0lpmQT0C";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="TuwC+KHy"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="TAgKUzsS";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="mt3TYD9A"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44265467A
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 07:22:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7AD53800
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 07:27:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709018573; cv=none; b=rg2xqlFxa7nML5Xlwh+Pq+EkughmCm9ILJZtwnag9dNYwo+7NrQNMTJAHubS/qICU1/pRKRw6PXap7L7eKW+v1dTfJkk8yNimsry1OdgCxdzqBpExvbLiH7XiMSiSqKF/KqHcCoZpaLvtqCdlcGcx8XRyawpLPC9KoFfA6ygY8M=
+	t=1709018839; cv=none; b=MIxXSK5sA/JpSTzGaCtmd5BS5TX9rpDDbdohI7YEiFuIB4cni4tV12XlURXpNrqbUh2KdMqbQC702l8l4YxwnVE8Rcin8hnS3vZ0FWzx2BSwhc5p20KehPj5BtIvvgodhWftFstDsT463Dy7acjQyrbv7K9ItvTsiPeesWMjClk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709018573; c=relaxed/simple;
-	bh=B9NXtnqe2oyymnSqcUL7kGGj8lGWLsHCFwwFo6o8MXk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=owv6aejheuagqN7ytVbKB4sjHtwO5v15pVgLTIdTb5ea5umm0TGPNi4ZdiDpNtWVmvpGG3n+ZiDshpLn0PJerxZVWqBNhtkblr0W/FUex3mM9L5+iI7zs8QJsYd+2DiCspdJhW2avUcOJZr46vogDkwfq/KQisceb3Dx9xZivm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0lpmQT0C; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=TuwC+KHy; arc=none smtp.client-ip=193.142.43.55
+	s=arc-20240116; t=1709018839; c=relaxed/simple;
+	bh=ovDXb7nfi5rQKi/H0ArwmyLPQ7bTNrpfPNw581cCGys=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K/6cX3hggN4lO2NyEfGzE6fc+tnZeeYItw8v5yeYPz5A3VZWCx9QMEj92WYsCVhUmQPdu/WDZnsgOccbjFgr40kubCJv3kS92Y9RohV8UVENjXkFIzfeo9Ee1YuJP4E9N1GLHoiWIj3yCZbVGPPybhkGwOcOiqxFhbLqFtk5NMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=TAgKUzsS; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=mt3TYD9A; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
+Date: Tue, 27 Feb 2024 08:27:14 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1709018569;
+	s=2020; t=1709018835;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CsnrFim6EYDuNuWnC6WWL5wPbMRzROScb1KO6aPlOsw=;
-	b=0lpmQT0CLJYRThNE52s0XJ7+4hce4BCN13PUw08fo5D70H/1tLA08WDephXXU/1I7HDgaX
-	TO/18LLULIPhDtqnnrp+xuHXALXxvgX58s0EBqNCQNYtRYp6atr7Ow33cxv0BPZsWaxi2D
-	JIIjVSH2IyvTigNTcvQannHigawAbuX+HnFnFtJ+0VrANTBD9f450D//CRG+sgjy9nkT45
-	3SNSGUC0bxskgCPORdg8NL0+Qmev1RvAMOlKArYlCTgtXwz4P7Fy+KpboPYbSONnpJSMUh
-	35mHFIeV2dhTEa0JGh8Ep5/wEZAznzJnGrBeCoGsZFQpvuqZaBwnm9RuC6MaNw==
+	bh=Bb6XdsVV3WsraE/g6xHhfxoquv/kpEULW77yWdRJ2xw=;
+	b=TAgKUzsSmsRsKgcUXHv45VGkuZa8tpukjf/h5VEAXYeKP0J2WcCCTJQalNEm56ynJ5Yf6G
+	uVTba05ReoVwKpc5mV2HCrtNW/7zmbHtqs9cMR3mkpQ7zzEZ2wa2MzloBShZTbWoQZge3j
+	SyNyH++CHMpsIYc81LmFtbT34q6tZd30CSDDjCNYOi2pQ1ABvRILMbB31Qg4PGXy3GU8MH
+	WgrxaZEUBpaFPFZQT2qQ0l9liNL4McEs/pL5/uYdVswEkV3Uk6OZvvIZ53QWvoROJAJM9V
+	Sy91UvNWx0m52y25bHgvmTjnq4rEj65nLspX6abhgEXEZ3EgIkivmOLsLri5gg==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1709018569;
+	s=2020e; t=1709018835;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CsnrFim6EYDuNuWnC6WWL5wPbMRzROScb1KO6aPlOsw=;
-	b=TuwC+KHy0v/vrA5XA1qUmOk9aHqvEAH5uD4h178mx/KJGe8mLD8qCDl/Oc9U8sXuyk1NUH
-	4WOmKjstFSrWtsDA==
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Vinicius Costa Gomes
- <vinicius.gomes@intel.com>, netdev@vger.kernel.org, Sebastian Andrzej
- Siewior <bigeasy@linutronix.de>, intel-wired-lan@lists.osuosl.org
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igc: Add MQPRIO offload support
-In-Reply-To: <fa67869c-3060-430e-a1c5-c67305e848c2@molgen.mpg.de>
-References: <20240212-igc_mqprio-v1-1-7aed95b736db@linutronix.de>
- <fa67869c-3060-430e-a1c5-c67305e848c2@molgen.mpg.de>
-Date: Tue, 27 Feb 2024 08:22:47 +0100
-Message-ID: <87zfvm2wxk.fsf@kurt.kurt.home>
+	bh=Bb6XdsVV3WsraE/g6xHhfxoquv/kpEULW77yWdRJ2xw=;
+	b=mt3TYD9AyL5jVpu0V5Vyhs0viOPUS2FoolmEGpCRvN/s8XI+w0ZAgvtOQ4tj66Ixc6+Hux
+	C6G/Ry6TnQ2ryIBA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Wander Lairson Costa <wander@redhat.com>,
+	Yan Zhai <yan@cloudflare.com>
+Subject: Re: [PATCH v2 net-next 3/3] net: Use backlog-NAPI to clean up the
+ defer_list.
+Message-ID: <20240227072714.qeSGBXNj@linutronix.de>
+References: <20240221172032.78737-1-bigeasy@linutronix.de>
+ <20240221172032.78737-4-bigeasy@linutronix.de>
+ <20240223180257.5d828020@kernel.org>
+ <20240226115922.3ghr5wuD@linutronix.de>
+ <20240226172233.161c6e7e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
-
---=-=-=
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <20240226172233.161c6e7e@kernel.org>
 
-Hello Paul,
+On 2024-02-26 17:22:33 [-0800], Jakub Kicinski wrote:
+> On Mon, 26 Feb 2024 12:59:22 +0100 Sebastian Andrzej Siewior wrote:
+> > They protect the list in input_pkt_queue and the NAPI state. It is just
+> > in the !RPS case it is always CPU-local and the lock is avoided (while
+> > interrupts are still disabled/ enabled).
+> > 
+> > What about
+> > 	input_queue_lock_irq_save()
+> > 	input_queue_lock_irq_disable()
+> > 	input_queue_lock_irq_restore()
+> > 	input_queue_lock_irq_enable()
+> 
+> SGTM. Maybe I'd risk calling it backlog_lock_* but not sure others
+> would agree.
 
-On Mon Feb 26 2024, Paul Menzel wrote:
-> Dear Kurt,
->
->
-> Thank you for the patch. Some nits from my side.
->
-> Am 26.02.24 um 09:51 schrieb Kurt Kanzenbach:
->> Add support for offloading MQPRIO. The hardware has four priorities as w=
-ell
->> as four queues. Each queue must be a assigned with a unique priority.
->>=20
->> However, the priorities are only considered in TSN Tx mode. There are two
->> TSN Tx modes. In case of MQPRIO the Qbv capability is not
->> required. Therefore, use the legacy TSN Tx mode, which performs strict
->> priority arbitration.
->
-> You could reflow this paragraph. The second line breaks too early.
+Let me repost it with backlog_lock_* today evening (UTC) unless someone
+objects.
 
-Indeed, it does.
-
->
->> Example for mqprio with hardware offload:
->>=20
->> |tc qdisc replace dev ${INTERFACE} handle 100 parent root mqprio num_tc =
-4 \
->> |   map 0 0 0 0 0 1 2 3 0 0 0 0 0 0 0 0 \
->> |   queues 1@0 1@1 1@2 1@3 \
->> |   hw 1
->
-> Thank you for the example. How can you check that it actually works? No=20
-> errors are shown?
-
-When using tc for setting up Qdisc(s) the command just returns without
-any messages. In case there's an error the user will see messages
-configured below with `extack`.
-
->
-> Also, could you please mention the datasheet name, revision and section,=
-=20
-> and on what exact device you tested this?
-
-Sure.
-
->
->> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
->> ---
->>   drivers/net/ethernet/intel/igc/igc.h         | 10 +++-
->>   drivers/net/ethernet/intel/igc/igc_defines.h |  9 ++++
->>   drivers/net/ethernet/intel/igc/igc_main.c    | 69 ++++++++++++++++++++=
-+++++++
->>   drivers/net/ethernet/intel/igc/igc_regs.h    |  2 +
->>   drivers/net/ethernet/intel/igc/igc_tsn.c     | 71 ++++++++++++++++++++=
-+++++++-
->>   5 files changed, 157 insertions(+), 4 deletions(-)
->>=20
->> diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet=
-/intel/igc/igc.h
->> index 45430e246e9c..c95919f085eb 100644
->> --- a/drivers/net/ethernet/intel/igc/igc.h
->> +++ b/drivers/net/ethernet/intel/igc/igc.h
->> @@ -227,6 +227,10 @@ struct igc_adapter {
->>   	 */
->>   	spinlock_t qbv_tx_lock;
->>=20=20=20
->> +	bool strict_priority_enable;
->> +	u8 num_tc;
->> +	u16 queue_per_tc[IGC_MAX_TX_QUEUES];
->> +
->>   	/* OS defined structs */
->>   	struct pci_dev *pdev;
->>   	/* lock for statistics */
->> @@ -343,9 +347,11 @@ extern char igc_driver_name[];
->>   #define IGC_FLAG_RX_LEGACY		BIT(16)
->>   #define IGC_FLAG_TSN_QBV_ENABLED	BIT(17)
->>   #define IGC_FLAG_TSN_QAV_ENABLED	BIT(18)
->> +#define IGC_FLAG_TSN_LEGACY_ENABLED	BIT(19)
->>=20=20=20
->> -#define IGC_FLAG_TSN_ANY_ENABLED \
->> -	(IGC_FLAG_TSN_QBV_ENABLED | IGC_FLAG_TSN_QAV_ENABLED)
->> +#define IGC_FLAG_TSN_ANY_ENABLED				\
->> +	(IGC_FLAG_TSN_QBV_ENABLED | IGC_FLAG_TSN_QAV_ENABLED |	\
->> +	 IGC_FLAG_TSN_LEGACY_ENABLED)
->>=20=20=20
->>   #define IGC_FLAG_RSS_FIELD_IPV4_UDP	BIT(6)
->>   #define IGC_FLAG_RSS_FIELD_IPV6_UDP	BIT(7)
->> diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/=
-ethernet/intel/igc/igc_defines.h
->> index 5f92b3c7c3d4..73502a0b4df7 100644
->> --- a/drivers/net/ethernet/intel/igc/igc_defines.h
->> +++ b/drivers/net/ethernet/intel/igc/igc_defines.h
->> @@ -547,6 +547,15 @@
->>=20=20=20
->>   #define IGC_MAX_SR_QUEUES		2
->>=20=20=20
->> +#define IGC_TXARB_TXQ_PRIO_0_SHIFT	0
->> +#define IGC_TXARB_TXQ_PRIO_1_SHIFT	2
->> +#define IGC_TXARB_TXQ_PRIO_2_SHIFT	4
->> +#define IGC_TXARB_TXQ_PRIO_3_SHIFT	6
->> +#define IGC_TXARB_TXQ_PRIO_0_MASK	GENMASK(1, 0)
->> +#define IGC_TXARB_TXQ_PRIO_1_MASK	GENMASK(3, 2)
->> +#define IGC_TXARB_TXQ_PRIO_2_MASK	GENMASK(5, 4)
->> +#define IGC_TXARB_TXQ_PRIO_3_MASK	GENMASK(7, 6)
->> +
->>   /* Receive Checksum Control */
->>   #define IGC_RXCSUM_CRCOFL	0x00000800   /* CRC32 offload enable */
->>   #define IGC_RXCSUM_PCSD		0x00002000   /* packet checksum disabled */
->> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/eth=
-ernet/intel/igc/igc_main.c
->> index ba8d3fe186ae..c5d3cc3c4fa9 100644
->> --- a/drivers/net/ethernet/intel/igc/igc_main.c
->> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
->> @@ -6424,6 +6424,13 @@ static int igc_tc_query_caps(struct igc_adapter *=
-adapter,
->>   	struct igc_hw *hw =3D &adapter->hw;
->>=20=20=20
->>   	switch (base->type) {
->> +	case TC_SETUP_QDISC_MQPRIO: {
->> +		struct tc_mqprio_caps *caps =3D base->caps;
->> +
->> +		caps->validate_queue_counts =3D true;
->> +
->> +		return 0;
->> +	}
->>   	case TC_SETUP_QDISC_TAPRIO: {
->>   		struct tc_taprio_caps *caps =3D base->caps;
->>=20=20=20
->> @@ -6441,6 +6448,65 @@ static int igc_tc_query_caps(struct igc_adapter *=
-adapter,
->>   	}
->>   }
->>=20=20=20
->> +static void igc_save_mqprio_params(struct igc_adapter *adapter, u8 num_=
-tc,
->> +				   u16 *offset)
->> +{
->> +	int i;
->> +
->> +	adapter->strict_priority_enable =3D true;
->> +	adapter->num_tc =3D num_tc;
->> +
->> +	for (i =3D 0; i < num_tc; i++)
->> +		adapter->queue_per_tc[i] =3D offset[i];
->> +}
->> +
->> +static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
->> +				 struct tc_mqprio_qopt_offload *mqprio)
->> +{
->> +	struct igc_hw *hw =3D &adapter->hw;
->> +	int i;
->> +
->> +	if (hw->mac.type !=3D igc_i225)
->> +		return -EOPNOTSUPP;
->> +
->> +	if (!mqprio->qopt.num_tc) {
->> +		adapter->strict_priority_enable =3D false;
->> +		goto apply;
->> +	}
->> +
->> +	/* There are as many TCs as Tx queues. */
->> +	if (mqprio->qopt.num_tc !=3D adapter->num_tx_queues) {
->> +		NL_SET_ERR_MSG_FMT_MOD(mqprio->extack,
->> +				       "Only %d traffic classes supported",
->> +				       adapter->num_tx_queues);
->
-> I=E2=80=99d also log `mqprio->qopt.num_tc`.
-
-num_tc is provided by the user.
-
->
->> +		return -EOPNOTSUPP;
->> +	}
->> +
->> +	/* Only one queue per TC is supported. */
->> +	for (i =3D 0; i < mqprio->qopt.num_tc; i++) {
->> +		if (mqprio->qopt.count[i] !=3D 1) {
->> +			NL_SET_ERR_MSG_MOD(mqprio->extack,
->> +					   "Only one queue per TC supported");
->
-> I=E2=80=99d also log the i and the count value.
-
-Oki.
-
->
->> +			return -EOPNOTSUPP;
->> +		}
->> +	}
->> +
->> +	/* Preemption is not supported yet. */
->> +	if (mqprio->preemptible_tcs) {
->> +		NL_SET_ERR_MSG_MOD(mqprio->extack,
->> +				   "Preemption is not supported yet");
->> +		return -EOPNOTSUPP;
->> +	}
->
-> Please mention this in the commit message, maybe also included, if a=20
-> patch is coming soon, or what would need to be done to implement it.
-
-Oki. At some point i'd like to see FPE implemented for igc :-).
-
-Thanks,
-Kurt
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmXdjcgTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzguTcEACvXPtfCPia4Ol3aRhNR0fDuHGPzb/G
-KuDliMMYkwJZb8NEQ4mrgM7D8USf4VfTs8pq8bafkMxzCyeoz5dLQZ63uVvLKXIz
-TIuYAUOf2sZYzIWxZXLYTB/Gq9HCqOm+2jVipd1VZYCdZ1lIzL3rtsF1eqIW36y+
-oe7QZhHjvk5cO2oWWO37WYAEb5k+ntfq7qeStj6fkkDQQBgDXxtzrCaBsL9puD8q
-/bHFw/qAJObBOz7TE9CJOne2h9G1SVl85OBJTzxV0IMwSm1suZa/gWYwxIPORolW
-3qsCpSCTsg2NhuHzpCgmFSPiqUEPlHEJ1Ln+/ORAOzmtwWTmSlmtNNQQBQ4BYsQl
-migZlf1+69xvuVjXz6/bWKdr6gXSm7mxgWg4e2R6vCtKLpiCYWFTkW9w/YtnuxiY
-+ZLEh1J8+uop2bIEtI38+c9CdNZzkR4GDoHtcgs4n01eKecI/UzB0liSA2IsTQwm
-M4LCcUZ7cO3JmQLoiUge9mvg7g4O/XFgzohsWnymwt7qlaj+IgCWO994WhNIfVXE
-Pmvvxr94d6ySsfRzpvqh3J1/HdHhucDF8Gnep/6ylXFaG4qT7bZBD1sW/5nvFBFY
-ViA4XQkaxErnIjK1Rb3Ji4fo8xJSLOsj+6I3cQaePsld5FMu0tur0KxN85f3i7Ya
-qZEaC5DmVMlTXw==
-=a1gq
------END PGP SIGNATURE-----
---=-=-=--
+Sebastian
 
