@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-75178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A090A86878B
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 04:10:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38A5F868788
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 04:10:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 403161F25781
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 03:10:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6010E1C21699
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 03:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C0D71CAB2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4665E1BC27;
 	Tue, 27 Feb 2024 03:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BWIAYWL/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nwk7fJ5g"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225B018B09;
-	Tue, 27 Feb 2024 03:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2257C182BB
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 03:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709003429; cv=none; b=at2XYRHlc2PDY0v3z8gaGmiX3sc4BYIS8kBSgoQWbuEc67eslD8ty7+YWpTl9x87q4dOXOgyRdCM8dsEZXHMS/+s4Nz84QWBNGDYEZnL0FMMRzn/zBbvnqc/S2dLplPIITJF2KJrx14ulsslfPK24QDeXT7oTkOekSGAYdQk0ag=
+	t=1709003429; cv=none; b=A6PCp4w8OI6YPCXWiN7hPNJ5R5i6sDtjTCEdN1utpZqcrPtondPTYAipl+cRCHZb98siErDQ0keRDp+NDDerUeZWr2Mn1ofhAz5ZoWJ7cAQscFJ7fkUefB6J0qI8dl5kt2DjV8QizIxexuGy9Hxuz3FnAAHopUHFBkIG1dvLsoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709003429; c=relaxed/simple;
-	bh=px+FzP8nHYq7W65Fl++IrzC/G4rPXKu6PG/CBccJBeE=;
+	bh=qdDTMTR7qCN+PieV3v2JY/BVYV8WlYCOL8HyrCRHJ1I=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SBic70/OTNoTJ8LwlDBLvL+LyoKd+xUawglCl6V8GlUFPOOCAC+skIszRm7DP8Ej4muGEsP7mEUf1596tRrbJBuACDE3J3GVuEFbOdE8C6sgD73VxO/glet6S4qD6BB7AXCFFGABPqXqvwxIakBPbhkDa5be8klxau7YHLq3zyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BWIAYWL/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B3866C43390;
+	 In-Reply-To:To:Cc; b=Oose1Isar1XMV6LjQA3mu61bTCNFI7GSMmINjOE3srrKeKJ4a1GpKRLNzHJ2Rb/EMABK+2R8AzQKdN1ReEmAqkqKyvkBITbyusiIxAsdSu0Lu4AHfvCHGMSDjGDBHdqYrqif2T07XgZlDYXbXD23pnHnIQBSTVvyH82oeNLwjhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nwk7fJ5g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C31A2C433F1;
 	Tue, 27 Feb 2024 03:10:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709003428;
-	bh=px+FzP8nHYq7W65Fl++IrzC/G4rPXKu6PG/CBccJBeE=;
+	bh=qdDTMTR7qCN+PieV3v2JY/BVYV8WlYCOL8HyrCRHJ1I=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BWIAYWL/zqHVMNL1ygzCyT6lKrBpz+Lxi8Tf5I5nvYRdK10Ak0DIOtZIDrwZJHynD
-	 QS+XzVVTtjxAraQTvsh6Jl2KP9OP8qSCIoo+mm8szah5m9z1B7yjy92dSg9JEJZyoL
-	 daZJgcU8sHq1qkSnhgi5MJ0Tdzv0Mwk6SPZyjaB4BsEVz/rIemtjda0Ps7OBH4InbK
-	 sdSvaEaY6J9SH3L1kl7L5vPngeHcpIBTxyQuMffpOqQ4jZt24ls8kOE24TjCNrm1EE
-	 CO7Paqxc2PFMxPrOJTYqFVaLWepHr87UAEFTn+Zkyl22qs4S7XAE8DkizbtE2vSk92
-	 tIxI/CeZvrx8A==
+	b=nwk7fJ5gWlcTGFUjfBXSwi2cTFs2zKDW7p6cBw8bLRNyLsEgu3tzC+9d6dBAGr9Z+
+	 7gVv+pGfz3uqNm/A4pD92HYSYCKVpbqeMvdJ8YYNRLvJbzcsgg9g64P259Zq6qIeuu
+	 r5rqtaQ3kI5qbT36uLrgx0UdKeP8xHOvGgMPhPhD6hE95Diovs9olktMXjKx3iLJxC
+	 8vbsuFkkiI8mH5BD8xqRZx0HO+SPuhHo2sTSTd8wQM3FB++6gfn70OHIRpxe88HTk1
+	 yOnuDYlD2Py1LBIiClpiVEVqVClgnoBgLTlQlmOaZB2vN97vQwGfe0OOAHrvSIpD5R
+	 RrZKVglRfNwSA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 96D48D88FB0;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AC058D88FB2;
 	Tue, 27 Feb 2024 03:10:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,57 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 00/10] mptcp: more misc. fixes for v6.8
+Subject: Re: [PATCH v2 net] dpll: rely on rcu for netdev_dpll_pin()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170900342860.19917.16044337565928875958.git-patchwork-notify@kernel.org>
+ <170900342870.19917.4713964463786092641.git-patchwork-notify@kernel.org>
 Date: Tue, 27 Feb 2024 03:10:28 +0000
-References: <20240223-upstream-net-20240223-misc-fixes-v1-0-162e87e48497@kernel.org>
-In-Reply-To: <20240223-upstream-net-20240223-misc-fixes-v1-0-162e87e48497@kernel.org>
-To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- fw@strlen.de, kishen.maloor@intel.com, shuah@kernel.org,
- peter.krystad@linux.intel.com, cpaasch@apple.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- tanggeliang@kylinos.cn, stable@vger.kernel.org, dcaratti@redhat.com
+References: <20240223123208.3543319-1-edumazet@google.com>
+In-Reply-To: <20240223123208.3543319-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, jiri@nvidia.com,
+ arkadiusz.kubalewski@intel.com, vadim.fedorenko@linux.dev
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 23 Feb 2024 17:14:10 +0100 you wrote:
-> This series includes 6 types of fixes:
+On Fri, 23 Feb 2024 12:32:08 +0000 you wrote:
+> This fixes a possible UAF in if_nlmsg_size(),
+> which can run without RTNL.
 > 
-> - Patch 1 fixes v4 mapped in v6 addresses support for the userspace PM,
->   when asking to delete a subflow. It was done everywhere else, but not
->   there. Patch 2 validates the modification, thanks to a subtest in
->   mptcp_join.sh. These patches can be backported up to v5.19.
+> Add rcu protection to "struct dpll_pin"
+> 
+> Move netdev_dpll_pin() from netdevice.h to dpll.h to
+> decrease name pollution.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,01/10] mptcp: map v4 address to v6 when destroying subflow
-    https://git.kernel.org/netdev/net/c/535d620ea5ff
-  - [net,02/10] selftests: mptcp: rm subflow with v4/v4mapped addr
-    https://git.kernel.org/netdev/net/c/7092dbee2328
-  - [net,03/10] mptcp: avoid printing warning once on client side
-    https://git.kernel.org/netdev/net/c/5b49c41ac8f2
-  - [net,04/10] mptcp: push at DSS boundaries
-    https://git.kernel.org/netdev/net/c/b9cd26f640a3
-  - [net,05/10] mptcp: fix snd_wnd initialization for passive socket
-    https://git.kernel.org/netdev/net/c/adf1bb78dab5
-  - [net,06/10] mptcp: fix potential wake-up event loss
-    https://git.kernel.org/netdev/net/c/b111d8fbd2cb
-  - [net,07/10] selftests: mptcp: join: add ss mptcp support check
-    https://git.kernel.org/netdev/net/c/9480f388a2ef
-  - [net,08/10] mptcp: fix double-free on socket dismantle
-    https://git.kernel.org/netdev/net/c/10048689def7
-  - [net,09/10] mptcp: fix possible deadlock in subflow diag
-    https://git.kernel.org/netdev/net/c/d6a9608af9a7
-  - [net,10/10] selftests: mptcp: explicitly trigger the listener diag code-path
-    https://git.kernel.org/netdev/net/c/b4b51d36bbaa
+  - [v2,net] dpll: rely on rcu for netdev_dpll_pin()
+    https://git.kernel.org/netdev/net/c/0d60d8df6f49
 
 You are awesome, thank you!
 -- 
