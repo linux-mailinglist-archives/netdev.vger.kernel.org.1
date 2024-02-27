@@ -1,234 +1,167 @@
-Return-Path: <netdev+bounces-75241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB79E868C80
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:41:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4AD0868C88
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:42:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AD631C2483A
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 09:41:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F9691F26F02
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 09:42:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5AF139574;
-	Tue, 27 Feb 2024 09:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B44E71369A5;
+	Tue, 27 Feb 2024 09:40:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ele8Kxd/"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="G7jS74uR"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED461384A9;
-	Tue, 27 Feb 2024 09:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397701369A3;
+	Tue, 27 Feb 2024 09:40:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709026817; cv=none; b=JqQ03QaEtymczjWvWTHfGawlgwFNUYhqCBaXwpe/PxL46yC6WYbGq0VEcNnZ2FlJuHmKLsqQhJctJfiB1VSMnze4mh8QYGa3v/ARBDx2CQhUGEkO/oNZxB0yBlkQWmXy8R3ktNh5D6H/UCqmhW8syNjatMcZKasEz+69YA1NBa4=
+	t=1709026852; cv=none; b=YHfgAmfqKV8elq+w8o5m6GQH9VxTOt5FdxzZCE44als8/kmKbatnjQ9LTvjloGOSvicOl3SfDy9ruKOaVBSP4nt/1/4TBXxhikfkpjFEgqZYPyoRRIhCVrX+vbHM3cDXjYJSog7TsEAAYP1Wbfi4WutekPy4La4Qkg9HuOYnLMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709026817; c=relaxed/simple;
-	bh=WKyTm9tvEpOHc9SUmAoFjXDcY9NXpqkPz111tBhUrs0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LiYrgGId+YFjBL8BV1Ik1rOhzaaosfEtetQNUj1Lbogm5T193omDE3+YfhmkT6ILK++cQNkl12lxwCni6IyG0aDzk5/lfbZTwkp+xMFufDodL0i+MRM99lelKKtf+eCndSqrD3vGnCcg6QDrXWXE7tb2zuiD0kEPwpt6Vm63WA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ele8Kxd/; arc=none smtp.client-ip=217.70.183.201
+	s=arc-20240116; t=1709026852; c=relaxed/simple;
+	bh=1RTEAdFFHOEmxNBmqAuXPQRIA7GMEv6Hxi5j0Y8gqRI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UmOmy039iAfGkmCA9NiPllzi17Ky1NJxoqeNlVlPlzGE/Bi/OnVk3jRWTrjww2uD6viCe9WvkoR0Y0EoOb3bnwxbYqAEkJdHj1jBSWgoEp9nBFs4KR9vcV9V5Li3Kn6XTgUqHLrnbvAIbdBuKCz/V6yyQboS1FYkprkjtOXEQHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=G7jS74uR; arc=none smtp.client-ip=217.70.183.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPA id 500A91BF21B;
-	Tue, 27 Feb 2024 09:40:12 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BFAB5C0002;
+	Tue, 27 Feb 2024 09:40:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709026813;
+	t=1709026848;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=rgaNBK3volcj4FhXmaNO+Po++qQCUID/slrT9VBh2II=;
-	b=ele8Kxd/pDw2DVnj7w1ZSTVzt5dJp44Z34mJh3wAoCCb1F8Uowblgmmil72EwgmkzjIbbq
-	BnV0zkfG0sko4SN3vb3/BWQ/gGE3L68HdzcY2vqoe79/DT+2DyGyv2Yr6dAGkh5Q8VVSuB
-	PvND6VZRvmeiIZUB8ODZVYVHr1W5pqL9g0E5v3GoDa2QO1eIq+yfgPuPqjaMkqKqZpAssh
-	ZwlzFMmrhJzAeju2hJO5tc4OKbrrq1B1wFgI31ZAwpE54t+edRu4BFKmyTSr1n1G22TrXu
-	mg5xISlvcK4u7ko++V1NXOoQ4jc5fEgEYKuEsupodVlBQ1ZvcE57gIFjl7rCYg==
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>,
-	Lee Jones <lee@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Bastien Curutchet <bastien.curutchet@bootlin.com>
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-leds@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	herve.codina@bootlin.com,
-	maxime.chevallier@bootlin.com,
-	christophercordahi@nanometrics.ca
-Subject: [PATCH v2 6/6] net: phy: DP83640: Add fiber mode enabling/disabling from device tree
-Date: Tue, 27 Feb 2024 10:39:45 +0100
-Message-ID: <20240227093945.21525-7-bastien.curutchet@bootlin.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240227093945.21525-1-bastien.curutchet@bootlin.com>
-References: <20240227093945.21525-1-bastien.curutchet@bootlin.com>
+	bh=Mmn0FjbhKH+X6W94t2nXwylEPzw7F/tZLjHorPr0+mk=;
+	b=G7jS74uRsUCaZ5E75Nq45zmqM7nb7gdxLE+r0CITcsJKVEX8RwON39N9Bn/jSuuRlsV+jz
+	1ZKUSEdlhJJVXYwUpUv/vcv1vqQKj7GcWNEczMtfO7Uy2UxLbtcRyvPIJEl1O6CHkwoH/B
+	OPc55phx1zLp4VtCbEf6OUzVc3z2rq9it5Y4ZkWc4SOv4QovWrBCZxe8dlim1WJN+FWgz3
+	As8H6DwpFXG/KWoFsnFudAH2f2xXQ6xFn8USrBpUJa9S1Mteb5ScZKfgWOsg5IQBZx/EKK
+	rDoo8GPQxSvegGQe92oUwtIHM1O6xNsyXMI2sw7XSSWrheyISovuX7EEmWz8Gg==
+Message-ID: <951bc29a-4483-4f4a-9c4e-900db9391112@bootlin.com>
+Date: Tue, 27 Feb 2024 10:40:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] net: stmmac: protect updates of 64-bit statistics
+ counters
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, Guenter Roeck <linux@roeck-us.net>
+Cc: Jisheng Zhang <jszhang@kernel.org>, Petr Tesarik <petr@tesarici.cz>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, Chen-Yu Tsai <wens@csie.org>,
+ Jernej Skrabec <jernej.skrabec@gmail.com>,
+ Samuel Holland <samuel@sholland.org>,
+ "open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>,
+ "moderated list:ARM/STM32 ARCHITECTURE"
+ <linux-stm32@st-md-mailman.stormreply.com>,
+ "moderated list:ARM/STM32 ARCHITECTURE"
+ <linux-arm-kernel@lists.infradead.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:ARM/Allwinner sunXi SoC support" <linux-sunxi@lists.linux.dev>,
+ Marc Haber <mh+netdev@zugschlus.de>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>, stable@vger.kernel.org
+References: <20240203190927.19669-1-petr@tesarici.cz>
+ <ea1567d9-ce66-45e6-8168-ac40a47d1821@roeck-us.net>
+ <Zct5qJcZw0YKx54r@xhacker>
+ <CANn89i+4tVWezqr=BYZ5AF=9EgV2EPqhdHun=u=ga32CEJ4BXQ@mail.gmail.com>
+ <20d94512-c4f2-49f7-ac97-846dc24a6730@roeck-us.net>
+ <CANn89iL1piwsbsBx4Z=kySUfmPa9LbZn-SNthgA+W6NEnojgSQ@mail.gmail.com>
+From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+In-Reply-To: <CANn89iL1piwsbsBx4Z=kySUfmPa9LbZn-SNthgA+W6NEnojgSQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: bastien.curutchet@bootlin.com
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-The PHY is able to use copper or fiber. The fiber mode can be enabled or
-disabled by hardware strap. If hardware strap is incorrect, PHY can't
-establish link.
+Hello, 
+FWIW I'm seeing this splat too on STM32MP157 with 6.8.0-rc5 (from wireless tree). It happens systematically a few seconds after link up
 
-Add a DT attribute 'ti,fiber-mode' that can be use to override the
-hardware strap configuration. If the property is not present, hardware
-strap configuration is left as is.
+[   27.884703] ================================
+[   27.888988] WARNING: inconsistent lock state
+[   27.893271] 6.8.0-rc5-g59460f7f45e6-dirty #16 Not tainted
+[   27.898671] --------------------------------
+[   27.902951] inconsistent {HARDIRQ-ON-W} -> {IN-HARDIRQ-W} usage.
+[   27.908954] swapper/0/0 [HC1[1]:SC0[0]:HE0:SE1] takes:
+[   27.914155] d7b764ac (&syncp->seq#3){?.-.}-{0:0}, at: dwmac4_dma_interrupt+0xc4/0x2a8
+[   27.921974] {HARDIRQ-ON-W} state was registered at:
+[   27.926863]   lock_acquire+0x12c/0x388
+[   27.930563]   __u64_stats_update_begin+0x138/0x214
+[   27.935372]   stmmac_xmit+0x55c/0xd80
+[   27.939064]   dev_hard_start_xmit+0xec/0x2f4
+[   27.943362]   sch_direct_xmit+0x94/0x310
+[   27.947255]   __dev_queue_xmit+0x3f8/0xd04
+[   27.951347]   ip6_finish_output2+0x2fc/0xbc0
+[   27.955642]   mld_sendpack+0x268/0x594
+[   27.959329]   mld_ifc_work+0x268/0x568
+[   27.963115]   process_one_work+0x20c/0x618
+[   27.967216]   worker_thread+0x1e8/0x4ac
+[   27.971009]   kthread+0x110/0x130
+[   27.974296]   ret_from_fork+0x14/0x28
+[   27.977982] irq event stamp: 12456
+[   27.981353] hardirqs last  enabled at (12455): [<c08e3558>] default_idle_call+0x1c/0x2cc
+[   27.989507] hardirqs last disabled at (12456): [<c0100b74>] __irq_svc+0x54/0xd0
+[   27.996844] softirqs last  enabled at (12440): [<c010162c>] __do_softirq+0x318/0x4dc
+[   28.004586] softirqs last disabled at (12429): [<c012b2a8>] __irq_exit_rcu+0x130/0x184
+[   28.012530]
+[   28.012530] other info that might help us debug this:
+[   28.019040]  Possible unsafe locking scenario:
+[   28.019040]
+[   28.025043]        CPU0
+[   28.027400]        ----
+[   28.029857]   lock(&syncp->seq#3);
+[   28.033253]   <Interrupt>
+[   28.035912]     lock(&syncp->seq#3);
+[   28.039410]
+[   28.039410]  *** DEADLOCK ***
+[   28.039410]
+[   28.045416] no locks held by swapper/0/0.
+[   28.049395]
+[   28.049395] stack backtrace:
+[   28.053781] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.8.0-rc5-g59460f7f45e6-dirty #16
+[   28.061819] Hardware name: STM32 (Device Tree Support)
+[   28.066918]  unwind_backtrace from show_stack+0x18/0x1c
+[   28.072140]  show_stack from dump_stack_lvl+0x58/0x70
+[   28.077253]  dump_stack_lvl from mark_lock+0xc40/0x12fc
+[   28.082478]  mark_lock from __lock_acquire+0x968/0x2c20
+[   28.087703]  __lock_acquire from lock_acquire+0x12c/0x388
+[   28.093131]  lock_acquire from __u64_stats_update_begin+0x138/0x214
+[   28.099372]  __u64_stats_update_begin from dwmac4_dma_interrupt+0xc4/0x2a8
+[   28.106219]  dwmac4_dma_interrupt from stmmac_napi_check+0x48/0x1d0
+[   28.112558]  stmmac_napi_check from stmmac_interrupt+0xa4/0x184
+[   28.118490]  stmmac_interrupt from __handle_irq_event_percpu+0xb0/0x308
+[   28.125036]  __handle_irq_event_percpu from handle_irq_event+0x40/0x88
+[   28.131578]  handle_irq_event from handle_fasteoi_irq+0xa4/0x258
+[   28.137610]  handle_fasteoi_irq from generic_handle_domain_irq+0x30/0x40
+[   28.144348]  generic_handle_domain_irq from gic_handle_irq+0x7c/0x90
+[   28.150682]  gic_handle_irq from generic_handle_arch_irq+0x34/0x44
+[   28.156911]  generic_handle_arch_irq from __irq_svc+0x8c/0xd0
+[   28.162631] Exception stack(0xc2201f30 to 0xc2201f78)
+[   28.167732] 1f20:                                     ffffffff ffffffff 00000001 000030a7
+[   28.175974] 1f40: c220c780 c0178dc4 c2208d54 c22c2e10 00000000 00000000 c0b06d28 c220c22c
+[   28.184114] 1f60: 00000000 c2201f80 c08e3558 c08e355c 600f0013 ffffffff
+[   28.190727]  __irq_svc from default_idle_call+0x20/0x2cc
+[   28.196045]  default_idle_call from do_idle+0xd8/0x144
+[   28.201165]  do_idle from cpu_startup_entry+0x30/0x34
+[   28.206181]  cpu_startup_entry from rest_init+0xf4/0x198
+[   28.211502]  rest_init from arch_post_acpi_subsys_init+0x0/0x18
 
-Signed-off-by: Bastien Curutchet <bastien.curutchet@bootlin.com>
----
- drivers/net/phy/dp83640.c     | 55 +++++++++++++++++++++++++++++++++++
- drivers/net/phy/dp83640_reg.h |  5 ++++
- 2 files changed, 60 insertions(+)
 
-diff --git a/drivers/net/phy/dp83640.c b/drivers/net/phy/dp83640.c
-index b371dea23937..886f2bc3710d 100644
---- a/drivers/net/phy/dp83640.c
-+++ b/drivers/net/phy/dp83640.c
-@@ -16,6 +16,7 @@
- #include <linux/net_tstamp.h>
- #include <linux/netdevice.h>
- #include <linux/if_vlan.h>
-+#include <linux/of.h>
- #include <linux/phy.h>
- #include <linux/ptp_classify.h>
- #include <linux/ptp_clock_kernel.h>
-@@ -141,6 +142,11 @@ struct dp83640_private {
- 	/* queues of incoming and outgoing packets */
- 	struct sk_buff_head rx_queue;
- 	struct sk_buff_head tx_queue;
-+
-+#define FIBER_MODE_DEFAULT	0
-+#define FIBER_MODE_ENABLE	1
-+#define FIBER_MODE_DISABLE	2
-+	int fiber;
- };
- 
- struct dp83640_clock {
-@@ -1141,6 +1147,17 @@ static int dp83640_config_init(struct phy_device *phydev)
- 	val = phy_read(phydev, PCFCR) & ~PCF_EN;
- 	phy_write(phydev, PCFCR, val);
- 
-+	if (dp83640->fiber != FIBER_MODE_DEFAULT) {
-+		val = phy_read(phydev, PCSR) & ~FX_EN;
-+		if (dp83640->fiber == FIBER_MODE_ENABLE)
-+			val |= FX_EN;
-+		phy_write(phydev, PCSR, val);
-+
-+		/* Write SOFT_RESET bit to ensure configuration */
-+		val = phy_read(phydev, PHYCR2) | SOFT_RESET;
-+		phy_write(phydev, PHYCR2, val);
-+	}
-+
- 	return 0;
- }
- 
-@@ -1440,6 +1457,39 @@ static int dp83640_ts_info(struct mii_timestamper *mii_ts,
- 	return 0;
- }
- 
-+#ifdef CONFIG_OF_MDIO
-+static int dp83640_of_init(struct phy_device *phydev)
-+{
-+	struct dp83640_private *dp83640 = phydev->priv;
-+	struct device *dev = &phydev->mdio.dev;
-+	struct device_node *of_node = dev->of_node;
-+	const char *fiber;
-+	int ret;
-+
-+	if (of_property_present(of_node, "ti,fiber-mode")) {
-+		ret = of_property_read_string(of_node, "ti,fiber-mode", &fiber);
-+		if (ret)
-+			return ret;
-+
-+		dp83640->fiber = FIBER_MODE_DEFAULT;
-+		if (!strncmp(fiber, "enable", 6))
-+			dp83640->fiber = FIBER_MODE_ENABLE;
-+		else if (!strncmp(fiber, "disable", 7))
-+			dp83640->fiber = FIBER_MODE_DISABLE;
-+		else
-+			return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+#else
-+static int dp83640_of_init(struct phy_device *phydev)
-+{
-+	dp83640->fiber = FIBER_MODE_DEFAULT;
-+	return 0;
-+}
-+#endif /* CONFIG_OF_MDIO */
-+
- static int dp83640_probe(struct phy_device *phydev)
- {
- 	struct dp83640_clock *clock;
-@@ -1472,6 +1522,10 @@ static int dp83640_probe(struct phy_device *phydev)
- 	phydev->mii_ts = &dp83640->mii_ts;
- 	phydev->priv = dp83640;
- 
-+	err = dp83640_of_init(phydev);
-+	if (err < 0)
-+		goto of_failed;
-+
- 	spin_lock_init(&dp83640->rx_lock);
- 	skb_queue_head_init(&dp83640->rx_queue);
- 	skb_queue_head_init(&dp83640->tx_queue);
-@@ -1494,6 +1548,7 @@ static int dp83640_probe(struct phy_device *phydev)
- 
- no_register:
- 	clock->chosen = NULL;
-+of_failed:
- 	kfree(dp83640);
- no_memory:
- 	dp83640_clock_put(clock);
-diff --git a/drivers/net/phy/dp83640_reg.h b/drivers/net/phy/dp83640_reg.h
-index b5adb8958c08..cbecf04da5a5 100644
---- a/drivers/net/phy/dp83640_reg.h
-+++ b/drivers/net/phy/dp83640_reg.h
-@@ -6,6 +6,7 @@
- #define HAVE_DP83640_REGISTERS
- 
- /* #define PAGE0                  0x0000 */
-+#define PCSR                      0x0016 /* PCS Configuration and Status Register */
- #define LEDCR                     0x0018 /* PHY Control Register */
- #define PHYCR                     0x0019 /* PHY Control Register */
- #define PHYCR2                    0x001c /* PHY Control Register 2 */
-@@ -54,6 +55,9 @@
- #define PTP_GPIOMON               0x001e /* PTP GPIO Monitor Register */
- #define PTP_RXHASH                0x001f /* PTP Receive Hash Register */
- 
-+/* Bit definitions for the PCSR register */
-+#define FX_EN		          BIT(6)  /* Enable FX Fiber Mode */
-+
- /* Bit definitions for the LEDCR register */
- #define DP83640_LED_DIS(x)        BIT((x) + 9) /* Disable LED */
- #define DP83640_LED_DRV(x)        BIT((x) + 3) /* Force LED val to output */
-@@ -64,6 +68,7 @@
- #define LED_CNFG_1	          BIT(6)  /* LED configuration, bit 1 */
- 
- /* Bit definitions for the PHYCR2 register */
-+#define SOFT_RESET		  BIT(9)  /* Soft Reset */
- #define BC_WRITE                  (1<<11) /* Broadcast Write Enable */
- 
- /* Bit definitions for the EDCR register */
 -- 
-2.43.0
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
 
