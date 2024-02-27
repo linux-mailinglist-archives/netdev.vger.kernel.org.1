@@ -1,97 +1,114 @@
-Return-Path: <netdev+bounces-75426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5BE1869E4F
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 18:52:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAA2B869E5B
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 18:55:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C69231C23018
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 17:52:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FBCD2830EC
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 17:55:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D4324E1D9;
-	Tue, 27 Feb 2024 17:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE0E4EB46;
+	Tue, 27 Feb 2024 17:55:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sd9+Qyxb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fh2sfoJc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C814E1CB
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 17:52:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD7B647A7D;
+	Tue, 27 Feb 2024 17:55:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709056366; cv=none; b=txq74gTVRCDqj226Zs96AYdGFBBjj5P9w1Up4iDB0bmcrffCBdf3z0rMX7iVpYmPqUHckE/1DyTbm211tWmFK4TfDYUNULxvoBxS+qH15LAc5L695/bYCksdtHCvUxvsnhHcCXNTRph1O6FVKRrHXPExbd0/d5+JjSM8VaW7SnM=
+	t=1709056505; cv=none; b=FE/nK1+AAF57rcSVD6a4VkwVFli50v11cq3HgRHW3Tk0u/rNXb4+k8gU2LorgLRSSsRnyon24GHvZE+qgWfP0qZsoS/TLFHVTWLpkkI6W7YYihnrgL4tdNOFNWQEZX1Ocy0BTzWSxweomAuVRvD+dRquT/2mENcy2rECt2aLxe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709056366; c=relaxed/simple;
-	bh=HgmXVV3YwiFT2yGyjd27jeBTpRE40AUN1MX0HOXfzvY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eccOZgUMNvqrePcEx5c/+l8amPuQVOav00FTlKfQYMmbz3EWA9/D4eICxjEmWGxLqN4jJPEzaWHEHtoZE06uBDO+Do9ujy8n4lWDv+hOR22F1jHIubzwDL5M6Knm5iOFwqztu5XPCMAYudk3HGbxp5H+ExzJdOq8W1OGIv29tYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sd9+Qyxb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90953C433F1;
-	Tue, 27 Feb 2024 17:52:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709056365;
-	bh=HgmXVV3YwiFT2yGyjd27jeBTpRE40AUN1MX0HOXfzvY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Sd9+Qyxbhd5MNXpcuoaqQHmuCkaSOcaXYFc3txYdtByyNb3Uah7nDZrSjcIfZh6CE
-	 QQvvSryeoPKtr79kDOUjS82cUlN39MkdI1oubzQuNy0XB1INfH8GhCbabrW/0UQ8B1
-	 waCBVzN8/rQyZFr1naFsgupbFSfbclxH+4YJlgMdIPfQrpauyZ6kz/JP+cT1N6xuv7
-	 +eInq3ofiGTfgRZ5PjPlw9GTTvxtjxlXiO2x4HUdiGB+Euil1kI0uFqWeBo5Ow+vRF
-	 keeVylPs7DH7NTb9DhkjtKjTe58dDQYYRiNhu/khSrnUojiJSwLud9e1ymXGOLiIVM
-	 17cVA1lwIk1NA==
-Date: Tue, 27 Feb 2024 09:52:44 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com,
- Zhengchao Shao <shaozhengchao@huawei.com>
-Subject: Re: [PATCH net-next] netlink: use kvmalloc() in
- netlink_alloc_large_skb()
-Message-ID: <20240227095244.23e5a740@kernel.org>
-In-Reply-To: <20240224090630.605917-1-edumazet@google.com>
-References: <20240224090630.605917-1-edumazet@google.com>
+	s=arc-20240116; t=1709056505; c=relaxed/simple;
+	bh=zkHeXCzhJoTyI/FQbYLjcD03+FpKcFDmBTJgvQ0BPN0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VOptGPqEmy0qv9/IyDV9HxIn5VoSnflRV9sxcFAZylJm5cL2XkromEHbNywiSSHI1wjgRkXNxqfN7Y5C5algIUBZHcakM6YB5JVXi7t4bVV4dwL+n14VEMedQCDPNGUUqIMsh0L6m5M2wd7NBy89GUD7pYflJ+qwahG8iWItGTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fh2sfoJc; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-51316d6e026so418606e87.1;
+        Tue, 27 Feb 2024 09:55:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709056501; x=1709661301; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y9hsMkWNb2m0rp9UNDMRhCeKg3qiWH6hyTt28k7IemM=;
+        b=Fh2sfoJcd+657bxWtaNIZ61N6cZFfCyI58WZpCOcHiaurR5j1Q9mKWfPG/hAI/mxYF
+         hVqFgVX0sWcIeZrvHXPlzlgK1JqLlN7X3GU8KBQ2NGYpLgclD80thnmNLznFG1s3x9NO
+         G2GhYwH4u8Q/V8gTtecl/E1nrxVAV4eUFlkUPpCmfMEcC+eIA/bFo63GQritYHKDAZp6
+         KsLVP5KFZzP+VNAdQiN5nneDNGEU1kYcMSq7w91zvCKzfFsXzUVBqPT6pt26KOAi/0PS
+         1e4EaNZ42RM+XL4B+Mno62ETgqhS6SJRmhopI3JdS1d5ELSULR+a/5n4BXShDCDQHS7m
+         qR6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709056501; x=1709661301;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Y9hsMkWNb2m0rp9UNDMRhCeKg3qiWH6hyTt28k7IemM=;
+        b=JBOW3vTJgzeetteBxfjqvQCd2K2VSe3brX/nCTWNAwTBd6N9eKzbBlxkcXmTxUieDJ
+         GJZKavAPWHvLi2CCXj6MPsuzFXQ0nWsZVlVJ5f1dZ/3WodtkuwLfn1voSDuXbabGUr1B
+         pOkqxc1UhnBC51i4JbA+oGb/OspYiCU0G8bGQzHNWT30654A9Z9RvlaWqAca5+1Z2S96
+         Nd2WEYMptxx3wVzTuz4Q8Ymw01v3CcfiaGZV9JpOMHyhMVPv000gQITomw+5BOw5Y1bB
+         vFySrFzEe7W5Uuvl8JKDARAuzunfgwlC6SjAx2LAM1RtPOf4TAjFRWFJUTO8l9sJe9X2
+         Vg9g==
+X-Forwarded-Encrypted: i=1; AJvYcCWUipYjpnJJxO3vWGsWIzGZdqL32pjGR+zBk4K/YFR1uPRrPRxGCyxvDr3CAQJn24GdhxWYwE13u1r7FXOsPYIXFIflKHXuxPK6imyfnBw18q/mdapA8Nd+OgrVATFdFo7tB/hH
+X-Gm-Message-State: AOJu0YyeqVScHGQtpYWHn6l3OVIkt1co+Kddqd53i4T5sCbfz8vVa1zt
+	ohl6FF2GH1pgIkR5mXRbk+S0vo7a7hdI8wONFkNWk8ex5eaLeCTf
+X-Google-Smtp-Source: AGHT+IE9dhxZ7ad7wfRmMxANudUUQrig4adMJrYPDJkbazV5NXI+e4sfi5Ck2+XlSy3hUSZonquYYQ==
+X-Received: by 2002:a05:6512:3da9:b0:512:aa52:5cce with SMTP id k41-20020a0565123da900b00512aa525ccemr8531310lfv.12.1709056500906;
+        Tue, 27 Feb 2024 09:55:00 -0800 (PST)
+Received: from fedora.. (cpe-109-60-83-139.zg3.cable.xnet.hr. [109.60.83.139])
+        by smtp.googlemail.com with ESMTPSA id fd1-20020a056402388100b00566439b97c4sm629268edb.44.2024.02.27.09.54.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Feb 2024 09:54:59 -0800 (PST)
+From: Robert Marko <robimarko@gmail.com>
+To: andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Robert Marko <robimarko@gmail.com>
+Subject: [PATCH net-next v2 0/2] net: dsa: mv88e6xxx: add Amethyst specific SMI GPIO function
+Date: Tue, 27 Feb 2024 18:54:20 +0100
+Message-ID: <20240227175457.2766628-1-robimarko@gmail.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Sat, 24 Feb 2024 09:06:30 +0000 Eric Dumazet wrote:
->  struct sk_buff *netlink_alloc_large_skb(unsigned int size, int broadcast)
->  {
-> +	size_t head_size = SKB_HEAD_ALIGN(size);
->  	struct sk_buff *skb;
->  	void *data;
->  
-> -	if (size <= NLMSG_GOODSIZE || broadcast)
-> +	if (head_size <= PAGE_SIZE || broadcast)
->  		return alloc_skb(size, GFP_KERNEL);
->  
-> -	size = SKB_DATA_ALIGN(size) +
-> -	       SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-> -
-> -	data = vmalloc(size);
-> -	if (data == NULL)
-> +	data = kvmalloc(head_size, GFP_KERNEL);
-> +	if (!data)
->  		return NULL;
->  
-> -	skb = __build_skb(data, size);
-> -	if (skb == NULL)
-> -		vfree(data);
-> -	else
-> +	skb = __build_skb(data, head_size);
+Amethyst family (MV88E6191X/6193X/6393X) has a simplified SMI GPIO setting
+via the Scratch and Misc register so it requires family specific function.
 
-Is this going to work with KFENCE? Don't we need similar size
-adjustment logic as we have in __slab_build_skb() ?
+In the v1 review, Andrew pointed out that it would make sense to rename the
+existing mv88e6xxx_g2_scratch_gpio_set_smi as it only works on the MV6390
+family.
 
-> +	if (!skb)
-> +		kvfree(data);
-> +	else if (is_vmalloc_addr(data))
->  		skb->destructor = netlink_skb_destructor;
+Changes in v2:
+* Add rename of mv88e6xxx_g2_scratch_gpio_set_smi to
+mv88e6390_g2_scratch_gpio_set_smi
+
+Robert Marko (2):
+  net: dsa: mv88e6xxx: rename mv88e6xxx_g2_scratch_gpio_set_smi
+  net: dsa: mv88e6xxx: add Amethyst specific SMI GPIO function
+
+ drivers/net/dsa/mv88e6xxx/chip.c            |  5 ++-
+ drivers/net/dsa/mv88e6xxx/global2.h         |  4 ++-
+ drivers/net/dsa/mv88e6xxx/global2_scratch.c | 35 +++++++++++++++++++--
+ 3 files changed, 40 insertions(+), 4 deletions(-)
+
+-- 
+2.43.2
+
 
