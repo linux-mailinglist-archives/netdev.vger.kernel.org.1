@@ -1,112 +1,169 @@
-Return-Path: <netdev+bounces-75323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A2B98694FE
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 14:57:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B1BC8695C7
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 15:05:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5489128E194
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 13:57:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D0EF1C222D8
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 14:05:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9C21419A6;
-	Tue, 27 Feb 2024 13:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UDX8TSI2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EDC81420D0;
+	Tue, 27 Feb 2024 14:05:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F8313F01E;
-	Tue, 27 Feb 2024 13:57:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37ACA13B2BA;
+	Tue, 27 Feb 2024 14:05:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709042272; cv=none; b=DkyyM5ixahm+ZeQvu1NRlKGd5B7Tdm7OyKhfHlbp7gPZ5nyJe1sG/7afEJhdiKu62jI7ypqzbEjd/RqzoZlwLOE5Oyd9vYyzDnNs6oAyUE7lE2suxbjo11EPWPdcEd3i90ws0PmjJbcy8EXcYF76d5giC1yFLpQ9DpnHw5EA75g=
+	t=1709042705; cv=none; b=PVSqughDCpNWRdfbg2m6OFXqB0H3EIflKNcTM9hShzqDUQBDsHW//HF9inNVl9CygE+zn5tBTGCkq5bRnIGPDB+bgsyD/FIEN6SzKwxVRpJfKc08LnzB4wP/NQYpBm8HBVb3p3YNwq+Cuylsjh5sZjQ0SDPOib/cxEbzoVWW65Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709042272; c=relaxed/simple;
-	bh=biCbZLCy7NySqqV+H6vAkrnFQ5KUncRsBTr63Ei8uJ8=;
-	h=Content-Type:MIME-Version:From:Subject:To:Cc:Message-Id:Date; b=kUM+X+MFLKOPrkvSLeeVY1ls9gsd9/i3n6NR0TWRgElfggLAZzyYi+8DIKKcFw+6OA21FEsgsTb3EPGp9zlIr+cxy+Ii8Y23hrk/tU/rpEJGaDQPuv7LKAIcQeMS00sTIDpXMoWacp106Ux+6NMQnnTkY5N26F+JOWFi/H/o5vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UDX8TSI2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5EC6C43390;
-	Tue, 27 Feb 2024 13:57:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709042272;
-	bh=biCbZLCy7NySqqV+H6vAkrnFQ5KUncRsBTr63Ei8uJ8=;
-	h=From:Subject:To:Cc:Date:From;
-	b=UDX8TSI2NC8W4w3xmtJqv6+o40jLQv32R91o38ku4NH3POsVajzYJz1YndQco8h9v
-	 jvDozxc0Ye+UGJPgFdoumAanvfbSdC63RVIGrsZk1MoDEUWge9wcBISnJ8g4fy7DOu
-	 zAefJWUMcpRHQzEp0yLhxkAQhkD5pPd+NcE418zxIPXh34spdp2SbtYF1uZ4LoBKEG
-	 8pQgnLo20uplFRapVUG4vx9iMAeaaUEJNTvwqAU7DQ/GbdaLwHVGC4WRTTXdMuzJtS
-	 3sEhztcpzAALp6CyWajYvpnB8MpIgOT4CzUKsS/C0Eo+FYhEzTiA9B4dECum57fwF1
-	 MJ+dLfExl0utw==
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709042705; c=relaxed/simple;
+	bh=35GpseE5cIbySIWv/O/c8vhnBYQWjwpsy9ZTCo11obQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jC5iJKZS1t6tu/yIMe/o6AFFdWwW7M7SH8scWG6KDKjFDSZtAnlcJnhWgNdE7hd22Vlr8v1823Z98vXKszIqUbbabI0onOaoCTlizVLhuS6UxKoLNNA9ReOMm5uJ6qxsw5QFKvh/JXRjFBvGo9igngdC0mvyJKbin6bTO7YU4Fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74B4DC433F1;
+	Tue, 27 Feb 2024 14:05:03 +0000 (UTC)
+Date: Tue, 27 Feb 2024 09:07:05 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: <xu.xin16@zte.com.cn>
+Cc: <davem@davemloft.net>, <mhiramat@kernel.org>, <dsahern@kernel.org>,
+ <edumazet@google.com>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-trace-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <yang.yang29@zte.com.cn>, <he.peilin@zte.com.cn>, <liu.chun2@zte.com.cn>,
+ <jiang.xuexin@zte.com.cn>, <zhang.yunkai@zte.com.cn>
+Subject: Re: [PATCH] net/ipv4: add tracepoint for icmp_send
+Message-ID: <20240227090705.1ed08b64@gandalf.local.home>
+In-Reply-To: <202402271050366715988@zte.com.cn>
+References: <202402271050366715988@zte.com.cn>
+X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-From: Kalle Valo <kvalo@kernel.org>
-Subject: pull-request: wireless-2024-02-27
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Message-Id: <20240227135751.C5EC6C43390@smtp.kernel.org>
-Date: Tue, 27 Feb 2024 13:57:51 +0000 (UTC)
 
-Hi,
+On Tue, 27 Feb 2024 10:50:36 +0800 (CST)
+<xu.xin16@zte.com.cn> wrote:
 
-here's a pull request to net tree, more info below. Please let me know if there
-are any problems.
+>  include/trace/events/icmp.h | 57 +++++++++++++++++++++++++++++++++++++++++++++
+>  net/ipv4/icmp.c             |  4 ++++
+>  2 files changed, 61 insertions(+)
+>  create mode 100644 include/trace/events/icmp.h
+> 
+> diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
+> new file mode 100644
+> index 000000000000..3d9af5769bc3
+> --- /dev/null
+> +++ b/include/trace/events/icmp.h
+> @@ -0,0 +1,57 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#undef TRACE_SYSTEM
+> +#define TRACE_SYSTEM icmp
+> +
+> +#if !defined(_TRACE_ICMP_H) || defined(TRACE_HEADER_MULTI_READ)
+> +#define _TRACE_ICMP_H
+> +
+> +#include <linux/icmp.h>
+> +#include <linux/tracepoint.h>
+> +
+> +TRACE_EVENT(icmp_send,
+> +
+> +		TP_PROTO(const struct sk_buff *skb, int type, int code),
+> +
+> +		TP_ARGS(skb, type, code),
+> +
+> +		TP_STRUCT__entry(
+> +				__field(__u16, sport)
 
-Kalle
+2 bytes
 
-The following changes since commit b7198383ef2debe748118996f627452281cf27d7:
+> +				__field(__u16, dport)
 
-  wifi: iwlwifi: mvm: fix a crash when we run out of stations (2024-02-08 14:55:39 +0100)
+2 bytes
 
-are available in the Git repository at:
+> +				__field(unsigned short, ulen)
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2024-02-27
+2 bytes
 
-for you to fetch changes up to 413dafc8170fcb925fb17af8842f06af305f8e0b:
+[ 2 byte hole for alignment ]
 
-  wifi: mac80211: only call drv_sta_rc_update for uploaded stations (2024-02-23 09:22:52 +0100)
+> +				__field(const void *, skbaddr)
 
-----------------------------------------------------------------
-wireless fixes for v6.8-rc7
+4/8 bytes
 
-Few remaining fixes, hopefully the last wireless pull request to v6.8. Two
-fixes to the stack and two to iwlwifi but no high priority fixes this
-time.
+It's best to keep the holes at the end of the TP_STRUCT__entry().
 
-----------------------------------------------------------------
-Benjamin Berg (1):
-      wifi: iwlwifi: mvm: ensure offloading TID queue exists
+That is, I would move ulen to the end of the structure. It doesn't affect
+anything else.
 
-Emmanuel Grumbach (1):
-      wifi: iwlwifi: mvm: fix the TXF mapping for BZ devices
+-- Steve
 
-Felix Fietkau (1):
-      wifi: mac80211: only call drv_sta_rc_update for uploaded stations
-
-Jeff Johnson (2):
-      MAINTAINERS: wifi: update Jeff Johnson e-mail address
-      MAINTAINERS: wifi: Add N: ath1*k entries to match .yaml files
-
-Johannes Berg (1):
-      wifi: nl80211: reject iftype change with mesh ID change
-
- MAINTAINERS                                       | 11 +++++----
- drivers/net/wireless/intel/iwlwifi/fw/api/txq.h   | 12 +++++++++-
- drivers/net/wireless/intel/iwlwifi/mvm/d3.c       |  9 +++++++-
- drivers/net/wireless/intel/iwlwifi/mvm/mac-ctxt.c | 11 +++++++++
- drivers/net/wireless/intel/iwlwifi/mvm/mvm.h      |  8 +++++--
- drivers/net/wireless/intel/iwlwifi/mvm/sta.c      | 28 +++++++++++++++++++++++
- drivers/net/wireless/intel/iwlwifi/mvm/sta.h      |  3 ++-
- net/mac80211/rate.c                               |  3 ++-
- net/wireless/nl80211.c                            |  2 ++
- 9 files changed, 76 insertions(+), 11 deletions(-)
+> +				__field(int, type)
+> +				__field(int, code)
+> +				__array(__u8, saddr, 4)
+> +				__array(__u8, daddr, 4)
+> +		),
+> +
+> +		TP_fast_assign(
+> +				// Get UDP header
+> +				struct udphdr *uh = udp_hdr(skb);
+> +				struct iphdr *iph = ip_hdr(skb);
+> +				__be32 *p32;
+> +
+> +				__entry->sport = ntohs(uh->source);
+> +				__entry->dport = ntohs(uh->dest);
+> +				__entry->ulen = ntohs(uh->len);
+> +				__entry->skbaddr = skb;
+> +				__entry->type = type;
+> +				__entry->code = code;
+> +
+> +				p32 = (__be32 *) __entry->saddr;
+> +				*p32 = iph->saddr;
+> +
+> +				p32 = (__be32 *) __entry->daddr;
+> +				*p32 =  iph->daddr;
+> +		),
+> +
+> +		TP_printk("icmp_send: type=%d, code=%d. From %pI4:%u to %pI4:%u ulen=%d skbaddr=%p",
+> +			__entry->type, __entry->code,
+> +			__entry->saddr, __entry->sport, __entry->daddr,
+> +			__entry->dport, __entry->ulen, __entry->skbaddr)
+> +);
+> +
+> +#endif /* _TRACE_ICMP_H */
+> +
+> +/* This part must be outside protection */
+> +#include <trace/define_trace.h>
+> diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+> index e63a3bf99617..437bdb7e2650 100644
+> --- a/net/ipv4/icmp.c
+> +++ b/net/ipv4/icmp.c
+> @@ -92,6 +92,8 @@
+>  #include <net/inet_common.h>
+>  #include <net/ip_fib.h>
+>  #include <net/l3mdev.h>
+> +#define CREATE_TRACE_POINTS
+> +#include <trace/events/icmp.h>
+> 
+>  /*
+>   *	Build xmit assembly blocks
+> @@ -599,6 +601,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
+>  	struct net *net;
+>  	struct sock *sk;
+> 
+> +	trace_icmp_send(skb_in, type, code);
+> +
+>  	if (!rt)
+>  		goto out;
+> 
 
 
