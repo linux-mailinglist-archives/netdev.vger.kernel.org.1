@@ -1,120 +1,117 @@
-Return-Path: <netdev+bounces-75470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA15986A0EB
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 21:37:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B9F286A0EE
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 21:38:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 462C11F2467B
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 20:37:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F5F628C0D7
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 20:38:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E850814A08F;
-	Tue, 27 Feb 2024 20:37:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A1E14DFE0;
+	Tue, 27 Feb 2024 20:38:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KnR8IC0X"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KZgHnISo"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F19B51C4C
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 20:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5065614D425
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 20:38:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709066271; cv=none; b=AlzxGxFyxP3iMK7viwJxDWoFQfZY9ZyWBkrpSbsEiHeSOMZuJht+5MadSfi6YFKcdV7OUzDsO/2zQoPl43t5FUdJ6rRjQj65DKeFDbNlabiKCGMB5V7eD9ZVqOxFdBrV7/3FBjuKALukxTVG1rDT87c1yqjT7whadQOgD2izj9Y=
+	t=1709066326; cv=none; b=QNGleWK6kvHf+z6u7PsXFVXdjxmWKkYpk74clZLjObbu9dmbHHeOc3RC7UYzH5DeF/McRvutB0xuAp2ilCQxX7jXyJStExLlCagp6MJ34q2uRB63Rl7d5+dIA9WaP1Cb7ihR/x9aSfGEVlZ28okPuuK6FB8rfaQ8i/KcwDbhCTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709066271; c=relaxed/simple;
-	bh=Gk4C2aybVhLI4mduFhzKKLedRl5m4UXJJTjkImqSNTM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SghWCVDenvFg9qKh/k51732D0op83433NJSTX0mct8oRvqKxnPuMwwNX/9efM1/i3F9MgEH3JS5VS4OKRVGVIhwo3rPGgYBstiqguf9hZ92YFnkLgFrU6qVoLFpcu+uxPpUwVbkaIFw1K4bbUNp1l0gxTkSXegDPEWnKnRM38xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KnR8IC0X; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=nZU6Ol1wj9X1WeOMwzgnegH/2vn+30hINy6icETe54Q=; b=KnR8IC0XW7SlsOOvg0CoSlICI9
-	cRsQxPkNVtnUFMrpBPb8pSOClSpA6ZdJtUSquNYt+omsqKD+izwN/h480cwbFC/4TStIgZwThULvu
-	yT8ejvfFpKKTu0Gj3QS+ag8ywq8lSeOiGlYag/CWJesJWiAHb5gIUhQCpHmrbIzLveDQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rf4DB-008t4N-V5; Tue, 27 Feb 2024 21:38:01 +0100
-Date: Tue, 27 Feb 2024 21:38:01 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	horms@kernel.org, Lukasz Czapnik <lukasz.czapnik@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 4/5] ice: Add
- tx_scheduling_layers devlink param
-Message-ID: <332882f9-f23c-4528-9582-51e9aea49a92@lunn.ch>
-References: <df7b6859-ff8f-4489-97b2-6fd0b95fff58@intel.com>
- <20240222150717.627209a9@kernel.org>
- <ZdhpHSWIbcTE-LQh@nanopsycho>
- <20240223062757.788e686d@kernel.org>
- <ZdrpqCF3GWrMpt-t@nanopsycho>
- <20240226183700.226f887d@kernel.org>
- <Zd3S6EXCiiwOCTs8@nanopsycho>
- <10fbc4c8-7901-470b-8d72-678f000b260b@intel.com>
- <327ae9b5-6e7d-4f8b-90b3-ee6f8d164c0d@lunn.ch>
- <Zd4IH1XUhC92zaVP@nanopsycho>
+	s=arc-20240116; t=1709066326; c=relaxed/simple;
+	bh=CkZepzpM/VosvywX+NgP8wDx4GMNVToGsSybSS8jHno=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eDZJ7RdQYnxADjm14czmlVdlu2reVYfL7xfqhWtgnY/cDTAU7yjp8+xIPPtY6To6IwnKXtUTnsI5lx1ng2c2HJo6DS300skhmKKd06O3veAJ+ym0+J2IsdoRXfOgss6PX89rjh3feZ0HzGR+mr1+AJAadgz+c9RidTLgflsPapc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KZgHnISo; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5654ef0c61fso2982a12.0
+        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 12:38:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709066324; x=1709671124; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SKmzJcorTXGx6YBSA/lEZ9Y4CRB9OUfazxwO3lY1Y2E=;
+        b=KZgHnISojW2BlMgKm7qNZjDdp/wxYhhEvuk68jHOpq4Kin2bmWyiikK/Ab/jLj7jbo
+         ASNj5/PBC961wlRJMH+TbmQMVUGx690aTkwK8CPmk3TgF64e2rFRC+BTqcxe+ZBDFsNd
+         u2nzIl7GoLn5BLnOvVJXfdex0BjFjLiPr5XibEcGV13XFKSPgEZe5kcL07Gyod6LnKcc
+         qDrNQIsYXlyY17tGKb5YoCdhREMaIdTTfxtHByWuHMXbkK1Hn68Lfx2kAF01SK2eWSqt
+         hZ2ZtHgWEWswvdi/rCS4pyDPH1uK7XW7H3CNhfJIEqMye6VzIUijBU0greS4wUcWSjhu
+         Fw9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709066324; x=1709671124;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SKmzJcorTXGx6YBSA/lEZ9Y4CRB9OUfazxwO3lY1Y2E=;
+        b=PmvXG1bCWE3CVIeHGPURFc0m2R53ETL21keK3v9pbtE9fqSjq0ZSFBFHP1qXFO5soj
+         Itix+gAbUj9DasZpprG6l2TZDC1jOvL5MIGd8YA+63Ksp5LZLx1EGFODY4UbfNidF3Ee
+         K8+Kj12PzzvKGFcxlUboBuZ/W39DJgK/lfCRkXKIFGJALA1aDTxUkuQX0zG0t8sWtVcI
+         WuU1KgVu+OCx9An7GXdnl9+VaatSjl0X2Un500N0r/KjFgx4Q/WOy1coRooEFFGdEL04
+         08LwMGNguPSZEZ+CoUmKM/209CkOKWYy59grRd7emhRYW9NDqcl46lSb17X0Xj66fcLO
+         5fYw==
+X-Forwarded-Encrypted: i=1; AJvYcCVjWjj/67Jz2b3hcVZYMYO8UyaEtfUlZ/MegeNJG/4HmfXDi3NCGtcXQECLfDd1XvKlt3M/yOV7GfjWp1rszM5au7wzPd6v
+X-Gm-Message-State: AOJu0YxmAGFzn2H+YP88qbJN4hu2H+XAHnkOazQmg6ZeZgdCw3YzGAh3
+	PRmykd6Y2W0Qce1tdSjXLVbB4JR6P8SUKl9JFfWx95u6ZNFmcyO4uXFN3oWuA94fQexNpKuq3mv
+	uh4IV4l82j9V1pf/FDX8IQhqbpuiFReBVElNM
+X-Google-Smtp-Source: AGHT+IGDJH8gnZSClW/CxZ9poeP9c5CGVKgIi1nVGctIXngEUbUoLI/1USJmcsUnG9KZ8K+rqBZefiL7ZjbT0rn04Io=
+X-Received: by 2002:a50:8711:0:b0:565:4b98:758c with SMTP id
+ i17-20020a508711000000b005654b98758cmr353143edb.4.1709066323359; Tue, 27 Feb
+ 2024 12:38:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zd4IH1XUhC92zaVP@nanopsycho>
+References: <20240226022452.20558-1-adamli@os.amperecomputing.com>
+In-Reply-To: <20240226022452.20558-1-adamli@os.amperecomputing.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 27 Feb 2024 21:38:29 +0100
+Message-ID: <CANn89iLbA4_YdQrF+9Rmv2uVSb1HLhu0qXqCm923FCut1E78FA@mail.gmail.com>
+Subject: Re: [PATCH] net: make SK_MEMORY_PCPU_RESERV tunable
+To: Adam Li <adamli@os.amperecomputing.com>
+Cc: corbet@lwn.net, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	willemb@google.com, yangtiezhu@loongson.cn, atenart@kernel.org, 
+	kuniyu@amazon.com, wuyun.abel@bytedance.com, leitao@debian.org, 
+	alexander@mihalicyn.com, dhowells@redhat.com, paulmck@kernel.org, 
+	joel.granados@gmail.com, urezki@gmail.com, joel@joelfernandes.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, patches@amperecomputing.com, 
+	cl@os.amperecomputing.com, shijie@os.amperecomputing.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 27, 2024 at 05:04:47PM +0100, Jiri Pirko wrote:
-> Tue, Feb 27, 2024 at 04:41:52PM CET, andrew@lunn.ch wrote:
-> >> What if it would not be unique, should they then proceed to add generic
-> >> (other word would be "common") param, and make the other driver/s use
-> >> it? Without deprecating the old method ofc.
-> >
-> >If it is useful, somebody else will copy it and it will become
-> >common. If nobody copies it, its probably not useful :-)
-> >
-> >A lot of what we do in networking comes from standard. Its the
-> >standards which gives us interoperability. Also, there is the saying,
-> >form follows function. There are only so many ways you can implement
-> >the same thing.
-> >
-> >Is anybody truly building unique hardware, whos form somehow does not
-> >follow function and is yet still standards compliant? More likely,
-> >they are just the first, and others will copy or re-invent it sooner
-> >or later.
-> 
-> Wait, standard in protocol sense is completely parallel to the hw/fw
-> implementations. They may be (and in reality they are) a lots of
-> tunables to tweak specific hw/fw internals. So modern nics are very
-> unique. Still providing the same inputs and outputs, protocol-wise.
+On Mon, Feb 26, 2024 at 3:25=E2=80=AFAM Adam Li <adamli@os.amperecomputing.=
+com> wrote:
+>
+> This patch adds /proc/sys/net/core/mem_pcpu_rsv sysctl file,
+> to make SK_MEMORY_PCPU_RESERV tunable.
+>
+> Commit 3cd3399dd7a8 ("net: implement per-cpu reserves for
+> memory_allocated") introduced per-cpu forward alloc cache:
+>
+> "Implement a per-cpu cache of +1/-1 MB, to reduce number
+> of changes to sk->sk_prot->memory_allocated, which
+> would otherwise be cause of false sharing."
+>
+> sk_prot->memory_allocated points to global atomic variable:
+> atomic_long_t tcp_memory_allocated ____cacheline_aligned_in_smp;
+>
+> If increasing the per-cpu cache size from 1MB to e.g. 16MB,
+> changes to sk->sk_prot->memory_allocated can be further reduced.
+> Performance may be improved on system with many cores.
 
-I think there is a general trickle down of technologies. What is top
-of the line now, because normal everyday in 5 - 10 years time. Think
-of a top of the line 10G Ethernet from 10 years ago. Is its design
-that different to what you get integrated into today's SoC?  Are the
-same or similar tunables from 10 year old top the line NICs also in
-todays everyday SoCs?
+This looks good, do you have any performance numbers to share ?
 
-Every PC is going to be an AI PC, if you believe the market hype at
-the moment. But don't you think every PC will also have a network
-processor of some sort in 5 - 10 years, derived from today network
-processor. It will just be another tile in the SoC, next to the AI
-tile, the GPU tile, and the CPU tiles. My guess would be, those
-tunables in todays hardware will trickle down into those tiles in 5-10
-years because they have been shown to be useful, they work, lets
-re-use what we have.
+On a host with 384 threads, 384*16 ->  6 GB of memory.
 
-       Andrew
-
-
-
+With this kind of use, we might need a shrinker...
 
