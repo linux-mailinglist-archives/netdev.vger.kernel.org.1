@@ -1,92 +1,148 @@
-Return-Path: <netdev+bounces-75404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4676869C18
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 17:28:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED0B4869CD1
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 17:53:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FDD228F1E1
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:28:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A18CF1F24295
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:53:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C49B01487EF;
-	Tue, 27 Feb 2024 16:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 802B2208CE;
+	Tue, 27 Feb 2024 16:53:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FNRfL+9U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R6Xbtebt"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18FB148300;
-	Tue, 27 Feb 2024 16:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8601DFD6
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 16:53:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709051298; cv=none; b=adqVTe2OF4WQP9WkAwQhKZ5KhW0zbm2U8230rXEdU/R/hB63JQj/TMCS/6CfxHPLt3gNmjwmw8EtyauA8fdUCSTpxa+/4jA8zBXgExVogbxzfA3mSp+ayfnqbY7uaubw0xkwbXr82C1y0BDcw5iMzBsNYw8zDpIw84oUT4lqsn0=
+	t=1709052783; cv=none; b=rZGW8MtzWsBGDv/yby2fGi0NetaAwrNiUbTOfAZz45Eb5VNRhQ+NW8qvZ5t4D8FOwaWHAewlzOK1G9vU6ugK77qYjLkb2bOCHayZG421hYNlwaMMmXA+9912HF5FU6Vq5ijkQD7lXY/XvchP7oMX8wYo2zg+ilXHjJCU7D34EgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709051298; c=relaxed/simple;
-	bh=zBoRncRpaabg/PphISSG21C84uO5bjeWeT18G6pOYKI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LvCvLblF8Ni5w0hRxmXZaBWhRzaKLhbkbWREN+dFk2BfdEgzwCxPcKSwDkPUTbr63VHnkkelv6mWOFI2Hmgk2+RCUc8JiOYyQxLALnVCRog5zTmjJBF3WiXAKlUtj0LW+ahK/57+cxVikynlUOxm4Yz7Nx0CSf4nwsBwD/GVxdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FNRfL+9U; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ieaqldWYxlts8vxb1oirRiS9OuCsnlGmA+e1W7mof58=; b=FNRfL+9UCjzORcduefVPxbH4Zp
-	mAgLGcE0Gz4hkr4nWBKxWYtIgwbszvE1/Q1mR+pSTZMTIdnI0077bhHaP/vWk5ojJ8W5VIxgxPxjq
-	UDtOqr8DMn0PKTSxpryfZqw7IwmVuHF7TKC/NK+054c/s3EjmbNMp3Jaax5u3IG2EfBRwb4omu91c
-	0BdLh6R+LtdhQOnuwwNK3I0i3nGWlJbTzdTLi9JiSRx6b/u0+NbJ7o/J40upfEXE0nxRCPLq2ruNV
-	BcGapW0kpYiC0pZOcyIZdPDdOpqHiHTGnXOo3dIj5C/pMeBfem8dpixeQ3mHVKBYkrip+u3w9EHDO
-	QVzgxMRQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50536)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rf0JN-0000eA-1d;
-	Tue, 27 Feb 2024 16:28:09 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rf0JM-0007Wi-JB; Tue, 27 Feb 2024 16:28:08 +0000
-Date: Tue, 27 Feb 2024 16:28:08 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Robert Marko <robimarko@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, andersson@kernel.org,
-	konrad.dybcio@linaro.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ansuelsmth@gmail.com
-Subject: Re: [PATCH net-next 1/2] net: phy: qcom: qca808x: add helper for
- checking for 1G only model
-Message-ID: <Zd4NmB/RLRXFDpjh@shell.armlinux.org.uk>
-References: <20240227162030.2728618-1-robimarko@gmail.com>
- <20240227162030.2728618-2-robimarko@gmail.com>
+	s=arc-20240116; t=1709052783; c=relaxed/simple;
+	bh=ts+Y1Vab2BNJLfRVMrmtA2nak/JCU/sSWKIUg48WLx8=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=YV/cigv/GwNzpAt5qX9jtFu9iqn1r5xDm8auAx6B6mona4mPMnraZmX7Yhd7Gz4rD2N3TOUs/KkjxQ9nQSjQXZoOt4sEje5i/AG14X7jPhr6+OsJivzFdTHHEUbgR2LTwsX//su2UJ6YxStQZm8mywmuAyf9I0ph/88tw6Z7uBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R6Xbtebt; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-412ae087378so6085075e9.3
+        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 08:53:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709052780; x=1709657580; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MuLX3trz0ucQDZWvgyrRidRJi2akiYUxUx7APFQqLC0=;
+        b=R6XbtebtpkaqS/oW8JJ8vuUGsU7IgJM24DYEFesy9WGbmCH7oO+ov5R9ov2Gx69sE2
+         9tAp6nBOvCzJKhZcKpnuEuGu1z5jenE54Z8e6/+lQgYanCcWT4IHUJF+IZHEclzbvts4
+         wJY74ZWUU/RPR9qjfSdT/Hi7x0LvayRJlhYyBQtQ+NGGp/RYFws0l1zA+Ap9e0ROCO6j
+         h+WZ9AneI+fnQpKMLLY74JtpGx/9IDbiKs5vtKuXm+x6zLUDWmmeAEoGWOgXbXahK/BC
+         N3StAhsU2s6mx6GGfvQc09a9GFYN6FdwPRuQUYV4FRvaySVON94jU/QaDCG4kQjus7eX
+         9DhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709052780; x=1709657580;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MuLX3trz0ucQDZWvgyrRidRJi2akiYUxUx7APFQqLC0=;
+        b=IGlZX+9SMuY5wcsQAfnCtBmmUhtHht3JF0ooWvufUIhbLzGIm+xjyjcKsYIIubZgIK
+         nleluQTdJHvTU8aoJtyUty/lRU5dsNFF3VrHg5xIvvI1VFckCX1XNVOPwYFtavDrfPqU
+         mbjYmxC9me8QmukZYDA/BaMEJLYQpDkjnTlnYUnBApSwlsD7sjYHbUFwLiAJg71AlOnZ
+         flAZiGx/2MJrVA/BueUjydRLcIzA+sD3tLMhUxQoxEl25K26UqbzMp+Q0XAsvN7cN4C0
+         HaqgjfUB6phfeGFidabFCgMVbbScxHU951F/6SGMj59aZqlI1kp1sqRGd0XWuYh4/rHI
+         Q/gQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWRKM0jN4gJl7lBnSx/rh9bEUTyI3aKhL26QqaWK8VGjtoX6cm4UGhZOW1gBJU+S5f+QInu++ldSivYX2Gn9zqaZJ3P1mkV
+X-Gm-Message-State: AOJu0YyzJf5kkUUTrg/mFQk/OCHBWEW/wCenKUgPQ1qro9BTSwwxvRPX
+	bx53HYyjO3c/CeWlHfJhnuui5IV7bAuFjfTx9bMpbJEqPA87XM8x
+X-Google-Smtp-Source: AGHT+IFEiTyz2v7Pe7dPNrHM1BpajVYLHrP2PWByRiCIGc1pt2NsU387A/e2bXv38IBlyPJYTlGiCQ==
+X-Received: by 2002:a05:6000:dc7:b0:33d:f475:edb2 with SMTP id dw7-20020a0560000dc700b0033df475edb2mr1283534wrb.13.1709052779945;
+        Tue, 27 Feb 2024 08:52:59 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:58f7:fdc0:53dd:c2b2])
+        by smtp.gmail.com with ESMTPSA id a7-20020a056000188700b0033d926bf7b5sm12114587wri.76.2024.02.27.08.52.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Feb 2024 08:52:59 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  jiri@resnulli.us,  sdf@google.com,
+  nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next 00/15] tools: ynl: stop using libmnl
+In-Reply-To: <20240227075605.18ec70b8@kernel.org> (Jakub Kicinski's message of
+	"Tue, 27 Feb 2024 07:56:05 -0800")
+Date: Tue, 27 Feb 2024 16:29:15 +0000
+Message-ID: <m24jdtna5g.fsf@gmail.com>
+References: <20240222235614.180876-1-kuba@kernel.org>
+	<CAD4GDZzF55bkoZ_o0S784PmfW4+L_QrG2ofWg6CeQk4FCWTUiw@mail.gmail.com>
+	<20240223083440.0793cd46@kernel.org> <m27ciroaur.fsf@gmail.com>
+	<20240226100020.2aa27e8f@kernel.org> <m2ttlumbax.fsf@gmail.com>
+	<20240227075605.18ec70b8@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240227162030.2728618-2-robimarko@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain
 
-On Tue, Feb 27, 2024 at 05:19:28PM +0100, Robert Marko wrote:
-> +	if (QCA808X_PHY_CHIP_TYPE_1G & ret)
-> +		return true;
-> +	else
-> +		return false;
+Jakub Kicinski <kuba@kernel.org> writes:
 
-	return !!(QCA808X_PHY_CHIP_TYPE_1G & ret);
+> On Tue, 27 Feb 2024 10:49:42 +0000 Donald Hunter wrote:
+>> > +static inline bool
+>> > +__ynl_attr_put_overflow(struct nlmsghdr *nlh, size_t size)
+>> > +{
+>> > +	bool o;
+>> > +
+>> > +	/* We stash buffer length on nlmsg_pid. */
+>> > +	o = nlh->nlmsg_len + NLA_HDRLEN + NLMSG_ALIGN(size) > nlh->nlmsg_pid;  
+>> 
+>> The comment confused me here. How about "We compare against stashed buffer
+>> length in nlmsg_pid".
+>
+> The comment should give context, rather than describe the code so how
+> about:
+>
+> 	/* ynl_msg_start() stashed buffer length in nlmsg_pid. */
 
-is a shorter way to write that.
+LGTM.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>> > +	if (o)
+>> > +		nlh->nlmsg_pid = YNL_MSG_OVERFLOW;  
+>> 
+>> It took me a moment to realise that this behaves like a very short
+>> buffer length for subsequent calls to __ynl_attr_put_overflow(). Is it
+>> worth extending the comment in ynl_msg_start() to say "buffer length or
+>> overflow status"?
+>
+> Added:
+> 		/* YNL_MSG_OVERFLOW is < NLMSG_HDRLEN, all subsequent checks
+> 		 * are guaranteed to fail.
+> 		 */
+> SG?
+
+Perfect.
+
+>> > +	return o;
+>> > +}
+>> > +
+>> >  static inline struct nlattr *
+>> >  ynl_attr_nest_start(struct nlmsghdr *nlh, unsigned int attr_type)
+>> >  {
+>> >  	struct nlattr *attr;
+>> >  
+>> > +	if (__ynl_attr_put_overflow(nlh, 0))
+>> > +		return ynl_nlmsg_end_addr(nlh) - NLA_HDRLEN;  
+>> 
+>> Is the idea here to return a struct nlattr * that is safe to use?
+>> Shouldn't we zero the values in the buffer first?
+>
+> The only thing that the attr is used for is to call ynl_attr_nest_end().
+> so I think zero init won't make any difference.
+
+I guess it is fine for generated code.
 
