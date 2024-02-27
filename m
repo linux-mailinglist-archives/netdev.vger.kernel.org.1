@@ -1,143 +1,144 @@
-Return-Path: <netdev+bounces-75227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15255868B8D
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:03:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70C6C868BAC
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:07:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF4C31F21C69
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 09:03:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 953BD1C2223D
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 09:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5DF81332A0;
-	Tue, 27 Feb 2024 09:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC6A136654;
+	Tue, 27 Feb 2024 09:06:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fbXmdz5C"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SOUWJKmx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021DC55784;
-	Tue, 27 Feb 2024 09:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 900E655E68
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 09:06:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709024597; cv=none; b=ZBFf9PGn0C49Vv6xrMUen5lMJSwbd71Mj+xw1/dUE/iL/wQ6V7eOwsAlazvntayU9tye6AU6slcpXJ5Vhp/LetaoHi53Xrc9sHiHS1RR/fjvuXt8+KB2N6Qi7osDEnPHnQ3B+ypq/fCvHdgaztdk1qOvVMoLROe1LqrdTxGplBM=
+	t=1709024809; cv=none; b=hetLGI17TwJ0LEInyrvctWtkZM+F3QRtk2CJSRqdzES9A+7/jOt4IdmSrxKbmEct7ESYs+7emT65XEt3V7AuXwcgX9VIL/ulwatPkDtS+RijrytxHZOP2GK2T5VggFeFb8dg4cP5xC9ZUZ31gmDASyuogLCFs7yKuC8OoK038Mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709024597; c=relaxed/simple;
-	bh=fU2iYIGjJMhLEH28pQAAHT8Nd31ZjfK3UFkPzSvJrqc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YuTlzr01duXbd96LxcORcofxeqf1ri0CRduM5/0RUAPoW0tiWz3CB/XrM7OCavusCfLoVN/bl6xcHQrx1F8Q6B0HC5HxQSbeC0gy0uKdB9uAPlVNaThuEVBYbTHNw3QdasFJtXtghdeumQj9Mh4xJ0TOxLNYpc6rlcnLURYYSUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fbXmdz5C; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33d153254b7so3088055f8f.0;
-        Tue, 27 Feb 2024 01:03:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709024594; x=1709629394; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/yDl/9Z8vdDqaR6iL8wu9PpxbAcWBuGSKPAcKXxs4mQ=;
-        b=fbXmdz5CHRCQaQwmsi1vk9S5XjtwGS/1K9ZTJSkUgRuDpImuikLjNodWcnEtGaqito
-         /GCaMIImlUqMBUEKUqhVV4mySDjRwvSQw1q8pn9o1BmD24zNxWZnpNUbpkl/hflGkBZY
-         LXj60KE5seqJbG3UMAS54ZoQsh4xiJvL9Q/UALVeTBg7tEvBQh9oGCCeBb+5JfE6fGCy
-         wyzEE+Hr98Pub1ISKv/Lc8CtVSYqlK6augzbSr8TisLvwtKcF9WbdLVunayfLcisMX08
-         skbkbnsYYBivOMG7dr0VIEsw8PuCivGYIlrIXFnlqoKFsk5GaAVPH+awYmK0bETn1zZ8
-         Th+Q==
+	s=arc-20240116; t=1709024809; c=relaxed/simple;
+	bh=nWDZ2zj8RhLA+e/LR6ZW41Ft+IJodiJtEXLpMcaC7rM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=I4IRV7unXeFTrvQ3LWNMjA0q8YCIdeJoOjtycKrn4+dm6Dm2jADVeaIOK+JB5xnLjQJYoKKaEUIb95ez0OwAF3AqqKHsJYpxwE+XAV0mRyp2wgpbGQF0eLVN/4omDiYbTAUplQ4MHZ/qXrWOvDVcC6GrkUVVIinwXl5+aeU5GXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SOUWJKmx; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709024806;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=nWDZ2zj8RhLA+e/LR6ZW41Ft+IJodiJtEXLpMcaC7rM=;
+	b=SOUWJKmxtkEj0BjH3MU9Lo2+Ti9wam+HtF7gxOG0COyco51Fg+KnxufmSxDtatw/MEfxH7
+	Uk0p8NJfmUgRuHDHaD8476gsqWObg/wzT6PtVtVt1gBpkqx2VYduDXwxF9F5hPzyWqv1Zq
+	NKrvwVYZijhwEs5+Q1YBtyKm/m8ut1s=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-542-Q3ojwjr2MY-hNTG1LECL-w-1; Tue, 27 Feb 2024 04:06:44 -0500
+X-MC-Unique: Q3ojwjr2MY-hNTG1LECL-w-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-410adb15560so6590875e9.1
+        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 01:06:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709024594; x=1709629394;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/yDl/9Z8vdDqaR6iL8wu9PpxbAcWBuGSKPAcKXxs4mQ=;
-        b=O6OrTY6tcg8lbDQ+koXpYHOI+oN0OWt7ftr+MhlMv8ji4zULaeDsrKbbdDsCexIM2d
-         JyLU/muRdPV3+V5nM7jGIbCYwEnnDL24mSeGVfYJD0/F0YOUb6GrBkz17AjyLhWopsfW
-         8VTSx6oKaF7OIOGMYPBNp/9z9qc9sk+dNvfsmiiKV2NKP4wg1N4ksssSCyjh3PlT54qz
-         ShZIN0fofGcaQ9hsjkj2jN8W4bq39XYEF/WnNa5E5ULFHMYBoiHZeCoA0sBIgYk7WiCw
-         Lf584q+Kizd+iYnT0HrIy6AYvL6i7ZbUM3TJAvAxYWHoHLwMnEQY6BkxCJpKK7jOtEX6
-         ETbg==
-X-Forwarded-Encrypted: i=1; AJvYcCVYpQEdDifIluCak9olWhJIPLHbfeliaf0jrj01ChC2n7sziSSmb+qGXvls4y9anzXBbVkAQ/kIFA6CawNsmYsMCOpjjqeaFgGi2ou/g68GkR+aX8CkzhYKy0PzIcUCt5BtuBPw
-X-Gm-Message-State: AOJu0Yy5rEJX7/eF4PxsEMyYJyJb1JuIDYGDL9DmpU71cGqN94cyk9Zg
-	HDdO0q6/Rr4xWrtuFnqboREy8Y4uda3ajnVjTYMKmtj/89pzJ5OD
-X-Google-Smtp-Source: AGHT+IFCQC28ggruhQycoMEQOPpIPfsMAl/IBFWeXrj8CG0KE1k9m7shkoRTh/ChNwd11Aks0a0Mfg==
-X-Received: by 2002:a5d:58d1:0:b0:33d:2d07:bb2c with SMTP id o17-20020a5d58d1000000b0033d2d07bb2cmr5935411wrf.28.1709024594081;
-        Tue, 27 Feb 2024 01:03:14 -0800 (PST)
-Received: from debian ([146.70.204.204])
-        by smtp.gmail.com with ESMTPSA id w2-20020adfcd02000000b003392206c808sm10603745wrm.105.2024.02.27.01.03.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Feb 2024 01:03:13 -0800 (PST)
-Message-ID: <aa5f1c11-4528-4d53-91f3-5ce8c02363ac@gmail.com>
-Date: Tue, 27 Feb 2024 10:02:51 +0100
+        d=1e100.net; s=20230601; t=1709024804; x=1709629604;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nWDZ2zj8RhLA+e/LR6ZW41Ft+IJodiJtEXLpMcaC7rM=;
+        b=faICTKwF2BukfZ8JYTUZXoIJYYhyJw42tNd1b6UNybGPuQ95pokMYg9Cdfir3vy3rN
+         JwyaBeLpb9g68ZiwyhKIY7z2kZNp1OHd+v2SbsBeGruKL+2Cq6n0XVy4JD8zHiF517TI
+         c845ADTR8WkryS96z2do6/xl+UTTK81623Wgo6XQFK9ys257QN7pEyEibSeLJM/mEsyy
+         h73TKtd3wHFkurKIpNjEhCn0TYK6TpBVML/nh5d+f5USjWsT+jqhMnvTTuiDCRAvsRqj
+         rX06ZDUEc5Y6qF2zbCY4U9CBa7TSWxbdefKqJ7SBxs89jdfByLKEXpKt5Qf2P4J1RFhh
+         5iYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUJBTtMb4JeTvZICpOsABIeIa1laGIRf7rMggUTXAXyz/nafK/oot4e4ONlTddfxbmSiK3RTjWHbbJvZrcBzbPaANAU9Qd5
+X-Gm-Message-State: AOJu0YyHCKc7sMjtAJWqKnHYTw4yMJ2qY2b1KmGECk3VR4gGQCEtDu+j
+	llyHjqphsuNCqJfllcbTTP11cMlePSChFmLtVWeUEFlnXcQqz/s9ic5/E1kQaSsGAo7g9zd2DKz
+	LBMck8uwed/byFZFKkbYtia04dBcdJ01wuzIN4kebLZnJoUWlZ+iyNg==
+X-Received: by 2002:a05:600c:358c:b0:412:abf5:cbf3 with SMTP id p12-20020a05600c358c00b00412abf5cbf3mr904759wmq.0.1709024803823;
+        Tue, 27 Feb 2024 01:06:43 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEoXMfjmhwggIZxieJMwcs+RNL0SfQa1Py2WMPLW1H146ut3MmM/ee0UCUiiLw8hHx6iG1STQ==
+X-Received: by 2002:a05:600c:358c:b0:412:abf5:cbf3 with SMTP id p12-20020a05600c358c00b00412abf5cbf3mr904738wmq.0.1709024803484;
+        Tue, 27 Feb 2024 01:06:43 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-245-60.dyn.eolo.it. [146.241.245.60])
+        by smtp.gmail.com with ESMTPSA id h13-20020a05600c314d00b00412a466f0c3sm6273243wmo.15.2024.02.27.01.06.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Feb 2024 01:06:43 -0800 (PST)
+Message-ID: <f0eeaab76d6386e22b88d9526ec7a53ae7e98ef5.camel@redhat.com>
+Subject: Re: [PATCH net] kunit: Fix again checksum tests on big endian CPUs
+From: Paolo Abeni <pabeni@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Charlie Jenkins
+ <charlie@rivosinc.com>, Palmer Dabbelt <palmer@dabbelt.com>, Erhard Furtner
+ <erhard_f@mailbox.org>, Christophe Leroy <christophe.leroy@csgroup.eu>,
+ "David S. Miller" <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>
+Date: Tue, 27 Feb 2024 10:06:41 +0100
+In-Reply-To: <c434b94a-2072-4b74-a222-0906579a351e@csgroup.eu>
+References: 
+	<73df3a9e95c2179119398ad1b4c84cdacbd8dfb6.1708684443.git.christophe.leroy@csgroup.eu>
+	 <c434b94a-2072-4b74-a222-0906579a351e@csgroup.eu>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 2/2] net: geneve: enable local address bind for
- geneve sockets
-To: Eyal Birger <eyal.birger@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, idosch@nvidia.com, razor@blackwall.org,
- amcohen@nvidia.com, petrm@nvidia.com, jbenc@redhat.com, b.galvani@gmail.com,
- bpoirier@nvidia.com, gavinl@nvidia.com, martin.lau@kernel.org,
- daniel@iogearbox.net, herbert@gondor.apana.org.au, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <df300a49-7811-4126-a56a-a77100c8841b@gmail.com>
- <79a8ba83-86bf-4c22-845c-8f285c2d1396@gmail.com>
- <CAHsH6GvX7zYSoA7JVemRtunWWSaew1S11Y996WAGt6B9d8=cOA@mail.gmail.com>
-From: Richard Gobert <richardbgobert@gmail.com>
-In-Reply-To: <CAHsH6GvX7zYSoA7JVemRtunWWSaew1S11Y996WAGt6B9d8=cOA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
-Eyal Birger wrote:
+On Sat, 2024-02-24 at 07:44 +0000, Christophe Leroy wrote:
 > Hi,
-> 
-> On Thu, Feb 22, 2024 at 12:54 PM Richard Gobert
-> <richardbgobert@gmail.com> wrote:
->>
->> This patch adds support for binding to a local address in geneve sockets.
-> 
-> Thanks for adding this.
-> 
->> It achieves this by adding a geneve_addr union to represent local address
->> to bind to, and copying it to udp_port_cfg in geneve_create_sock.
-> 
-> AFICT in geneve_sock_add(), geneve_socket_create() is only called if there's
-> no existing open socket with the GENEVE destination port. As such, wouldn't
-> this bind work only for the first socket in the namespace?
-> 
-> If that is the case, then perhaps binding the socket isn't the right
-> approach, and instead geneve_lookup() should search for the tunnel based on
-> both the source and destination IPs.
-> 
-> Am I missing something?
-> 
-> Eyal
+>=20
+> Le 23/02/2024 =C3=A0 11:41, Christophe Leroy a =C3=A9crit=C2=A0:
+> > Commit b38460bc463c ("kunit: Fix checksum tests on big endian CPUs")
+> > fixed endianness issues with kunit checksum tests, but then
+> > commit 6f4c45cbcb00 ("kunit: Add tests for csum_ipv6_magic and
+> > ip_fast_csum") introduced new issues on big endian CPUs. Those issues
+> > are once again reflected by the warnings reported by sparse.
+> >=20
+> > So, fix them with the same approach, perform proper conversion in
+> > order to support both little and big endian CPUs. Once the conversions
+> > are properly done and the right types used, the sparse warnings are
+> > cleared as well.
+> >=20
+> > Reported-by: Erhard Furtner <erhard_f@mailbox.org>
+> > Fixes: 6f4c45cbcb00 ("kunit: Add tests for csum_ipv6_magic and ip_fast_=
+csum")
+> > Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+>=20
+> netdev checkpatch complains about "1 blamed authors not CCed:=20
+> palmer@rivosinc.com; 1 maintainers not CCed: palmer@rivosinc.com "
+>=20
+> Palmer was copied but as Palmer Dabbelt <palmer@dabbelt.com>. Hope it is=
+=20
+> not a show stopper.
 
-You are right, I missed it.
-Binding the socket is the main reason for the patch, to prevent exposing
-the geneve port on all interfaces.
-I think it should be searched in geneve{6}_lookup and in geneve_find_sock:
+No, it's not.
 
-static struct geneve_sock *geneve_find_sock(struct geneve_net *gn,
-					    sa_family_t family,
-					    union geneve_addr *saddr)
- {
- 	struct geneve_sock *gs;
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 
- 	list_for_each_entry(gs, &gn->sock_list, list) {
-		struct inet_sock *inet = inet_sk(gs->sock->sk);
+I *think* this, despite the subject prefix, should go via Andrew's tree
+to avoid conflicts.
 
-		if (inet->inet_sport == dst_port && geneve_get_sk_family(gs) == family) {
-			if (family == AF_INET && inet->inet_rcv_saddr == saddr->sin.sin_addr.s_addr)
-				return gs;
-        ...
+@Andrew does the above fits you?
 
-This is also true for VXLAN
-What do you think?
-Thanks
+Cheers,
+
+Paolo
 
 
