@@ -1,158 +1,203 @@
-Return-Path: <netdev+bounces-75459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F909869FE0
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 20:07:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E16786A005
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 20:20:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0FC61C22775
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 19:07:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8684A1C238AF
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 19:20:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80C134E1DC;
-	Tue, 27 Feb 2024 19:07:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D46351009;
+	Tue, 27 Feb 2024 19:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="bmnxO5Ob"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hKWuOCRa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9066C3D988
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 19:07:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D0BEEDD;
+	Tue, 27 Feb 2024 19:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709060865; cv=none; b=GeXNTpeKRWE7YgnPn//DZ2PWw2wg/xwuf0s/aroIwVbgYXs+uyvKKqYqVjprIwXxKqkVQIXGBKeHFpwb507coLf7MiyCPXaoR4vcj7/IjIPavksKr+LroJ4dHnzD4CX59NM08OkS6wa0rLwZGAflBef3fWrQbc401ar7fbXNV98=
+	t=1709061585; cv=none; b=tJQpXIWvFzFn1HHHwVH6YH0fcbJ2Vd8nAhlbpFaghQGw98QBLp1kWxwneLfyJgJi5ha+rkkxCUp2Qp9fg/tC5pyB4IXG9m16qP+cbjfBs/zr8avEYkOtBp8eWrdGb9+VSoX2YpEOEdAyKfzapT6fGIJdwRIPEmqCCOXhS0VU2CM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709060865; c=relaxed/simple;
-	bh=8J5T/RCy12XyZUi7KtW8D6AQEm+IHJwaIE9IIco6gng=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=C57pF7Jw8cNGkXtywp+AoiqI3D/XRuj2sny0SjbW1hrieehst2GmNo6Zp7hEvL4E1P26o1zt6HJDjA6zSXliGIzq962jyLjc9belwAwdAYx3jVR5jQQIbf+v37Dkj7GO2Xpl6n/TB579gKAh6twi7T7FmCxX/X0dFALin99aOeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=bmnxO5Ob; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6e508725b64so1187796b3a.3
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 11:07:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1709060863; x=1709665663; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RC4cLOrzOlsDyKwjIVeyujamqewjmClEiupakdCMz1c=;
-        b=bmnxO5ObrLmCWlRjyagwACJivk2qJb01PBkF/RpKjJP4FErFa4zMGG7+8bkwxu12+T
-         N8/gfAWm70f/FnUUyJCUd2w3QsSUxWym5bwx1k9bbbjQET86Qn0w81hYDSsr1u53uncH
-         jCoeUTbUy9fwPeW7VlWODsurmcgNZlEeOTfeX7PisbsgUoKMPsBs0JGXB9OV1mzSISZK
-         j37kuKl+QxsaedfJXjKIh/xay66Jjy5oTsbzqnVprM2VLFm29wbRI9ldITV5idRs9X8x
-         JEpvfYoqLdlg6R0MRIuwPGh3dLT919XxuxnuDevoYkbtxiGxg3V2wJY986FrNCvwCETK
-         WItg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709060863; x=1709665663;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RC4cLOrzOlsDyKwjIVeyujamqewjmClEiupakdCMz1c=;
-        b=XvB7epAJlONe1/bwyAwOJNbt1BQSzLunbo6H3AB/59uKZIHMocEGikukGy4PmMnvmW
-         5GsAlhF2HXcjy5MplwcEhkyhDyffEmyMk0mW0cjP2oL36ARunEYOBMjFkZQ1mSjhqClz
-         jbbuGRWsSh40JJCzobXZSLSyC4aJvSF9LKShMvhtiamEajs8lx2UaOy6my5J5KhCqw2v
-         6Gk7cGxpnEpPK/tCX3gB17dXQ1YkdIQY9/g3I8ebyBds1snYgFOfSclzM8vybJkfH14B
-         qZ10WSkQ84YG8TsUhEFNNv/sLTA2g/jbuJrU3Wf/FrSQZC1zW3iHMXS1VwCvCahD6QnQ
-         FJ4g==
-X-Gm-Message-State: AOJu0YwL552FCGclv52axEtL1iW7wQCE17QF2dhcMH1Yko3tQsrnilLK
-	hE1jpK4qD4sIXrcRxe72qpP28S5OLz9fGyiQfRAdK3RRrupMToY5Z59uP9tXaZQumqjak/6ART3
-	P
-X-Google-Smtp-Source: AGHT+IHZTDw+NERddhJCBJnf50sG6cOv2L8HM9DodsrEU4MTbMR0V/ZjOYn0mo5W7WhFR9soMc+UBw==
-X-Received: by 2002:aa7:871a:0:b0:6e4:6625:5aef with SMTP id b26-20020aa7871a000000b006e466255aefmr8226927pfo.16.1709060862733;
-        Tue, 27 Feb 2024 11:07:42 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id ey11-20020a056a0038cb00b006e319d8c752sm6345016pfb.150.2024.02.27.11.07.42
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Feb 2024 11:07:42 -0800 (PST)
-Date: Tue, 27 Feb 2024 11:07:40 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Subject: Fw: [Bug 218536] New: divide error in tcp_rcv_space_adjust
-Message-ID: <20240227110740.0f657fbe@hermes.local>
+	s=arc-20240116; t=1709061585; c=relaxed/simple;
+	bh=7Y3r+EJtxbHthsDme0mY5gR+malntaQv6UjEuo6p+TQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZBuVQeBmOauDdplvWQqsd6JLg7BwQQCdbtEvPEOfH7cBAG1gkuZKM+4TtgFPq94SKHMKkZFotPATsbEozWHRh/ogPn2XOY+CUL4K1LdHG5OK/+7ph+mzghUdWHYEMsQUF7sJ++XwbY9SQt1apW9ftaziQRZ0rxvgh98Kl9elSxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hKWuOCRa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA510C433C7;
+	Tue, 27 Feb 2024 19:19:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709061584;
+	bh=7Y3r+EJtxbHthsDme0mY5gR+malntaQv6UjEuo6p+TQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hKWuOCRadSwwZAbUAoA4YqNVQfMxsf4tADIp++AMn3d7WimEALFdpQVyUFSNjVqKL
+	 UG+1vFPy7r+WIRqO/nv8CXfVrpUb10VQYTXz04ZMf+Q9lBpU30A2Dsem/MKcfbTrAn
+	 ujndKLEiu+9liEo2pJxIX8Jq8bS/VwCwfyTgfUrZ5B/fvMREEsk3jBvkVD6CcEXkqj
+	 B/7/w68pyB+dpIca1Jgmp+pEch3qRnoge7t2D+z+Y3dqOREqZfSXM3am8b3Oo8mZPe
+	 7sJ3/uoy5/Onvo9oIwiAxEWdqj3dRBn2ak/D2rqDyry9oqpJ/E7OOIuQ57Wk9H7IXO
+	 QEnA3bbJxOySw==
+Date: Tue, 27 Feb 2024 19:19:40 +0000
+From: Simon Horman <horms@kernel.org>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v3 3/6] virtio_net: support device stats
+Message-ID: <20240227191940.GM277116@kernel.org>
+References: <20240227080303.63894-1-xuanzhuo@linux.alibaba.com>
+ <20240227080303.63894-4-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240227080303.63894-4-xuanzhuo@linux.alibaba.com>
 
+On Tue, Feb 27, 2024 at 04:03:00PM +0800, Xuan Zhuo wrote:
+> As the spec https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
+> 
+> make virtio-net support getting the stats from the device by ethtool -S
+> <eth0>.
+> 
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
+...
 
-Begin forwarded message:
+> +static int virtnet_get_hw_stats(struct virtnet_info *vi,
+> +				struct virtnet_stats_ctx *ctx)
+> +{
+> +	struct virtio_net_ctrl_queue_stats *req;
+> +	struct virtio_net_stats_reply_hdr *hdr;
+> +	struct scatterlist sgs_in, sgs_out;
+> +	u32 num_rx, num_tx, num_cq, offset;
+> +	int qnum, i, j,  qid, res_size;
+> +	struct virtnet_stats_map *m;
+> +	void *reply, *p;
+> +	u64 bitmap;
+> +	int ok;
+> +	u64 *v;
+> +
+> +	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_DEVICE_STATS))
+> +		return 0;
+> +
+> +	qnum = 0;
+> +	if (ctx->bitmap_cq)
+> +		qnum += 1;
+> +
+> +	if (ctx->bitmap_rx)
+> +		qnum += vi->curr_queue_pairs;
+> +
+> +	if (ctx->bitmap_tx)
+> +		qnum += vi->curr_queue_pairs;
+> +
+> +	req = kcalloc(qnum, sizeof(*req), GFP_KERNEL);
+> +	if (!req)
+> +		return -ENOMEM;
+> +
+> +	res_size = (ctx->size_rx + ctx->size_tx) * vi->curr_queue_pairs + ctx->size_cq;
+> +	reply = kmalloc(res_size, GFP_KERNEL);
+> +	if (!reply) {
+> +		kfree(req);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	j = 0;
+> +	for (i = 0; i < vi->curr_queue_pairs; ++i) {
+> +		if (ctx->bitmap_rx) {
+> +			req->stats[j].vq_index = cpu_to_le16(i * 2);
+> +			req->stats[j].types_bitmap[0] = cpu_to_le64(ctx->bitmap_rx);
+> +			++j;
+> +		}
+> +
+> +		if (ctx->bitmap_tx) {
+> +			req->stats[j].vq_index = cpu_to_le16(i * 2 + 1);
+> +			req->stats[j].types_bitmap[0] = cpu_to_le64(ctx->bitmap_tx);
+> +			++j;
+> +		}
+> +	}
+> +
+> +	if (ctx->size_cq) {
+> +		req->stats[j].vq_index = cpu_to_le16(vi->max_queue_pairs * 2);
+> +		req->stats[j].types_bitmap[0] = cpu_to_le64(ctx->bitmap_cq);
+> +		++j;
+> +	}
+> +
+> +	sg_init_one(&sgs_out, req, sizeof(*req) * j);
+> +	sg_init_one(&sgs_in, reply, res_size);
+> +
+> +	ok = virtnet_send_command(vi, VIRTIO_NET_CTRL_STATS,
+> +				  VIRTIO_NET_CTRL_STATS_GET,
+> +				  &sgs_out, &sgs_in);
+> +	kfree(req);
+> +
+> +	if (!ok) {
+> +		kfree(reply);
+> +		return ok;
+> +	}
+> +
+> +	num_rx = VIRTNET_RQ_STATS_LEN + ctx->num_rx;
+> +	num_tx = VIRTNET_SQ_STATS_LEN + ctx->num_tx;
+> +	num_cq = ctx->num_tx;
+> +
+> +	for (p = reply; p - reply < res_size; p += le16_to_cpu(hdr->size)) {
+> +		hdr = p;
+> +
+> +		qid = le16_to_cpu(hdr->vq_index);
+> +
+> +		if (qid == vi->max_queue_pairs * 2) {
+> +			offset = 0;
+> +			bitmap = ctx->bitmap_cq;
+> +		} else if (qid % 2) {
+> +			offset = num_cq + num_rx * vi->curr_queue_pairs + num_tx * (qid / 2);
+> +			offset += VIRTNET_SQ_STATS_LEN;
+> +			bitmap = ctx->bitmap_tx;
+> +		} else {
+> +			offset = num_cq + num_rx * (qid / 2) + VIRTNET_RQ_STATS_LEN;
+> +			bitmap = ctx->bitmap_rx;
+> +		}
+> +
+> +		for (i = 0; i < ARRAY_SIZE(virtio_net_stats_map); ++i) {
+> +			m = &virtio_net_stats_map[i];
+> +
+> +			if (m->stat_type & bitmap)
+> +				offset += m->num;
+> +
+> +			if (hdr->type != m->reply_type)
+> +				continue;
+> +
+> +			for (j = 0; j < m->num; ++j) {
+> +				v = p + m->desc[j].offset;
+> +				ctx->data[offset + j] = le64_to_cpu(*v);
 
-Date: Tue, 27 Feb 2024 18:16:35 +0000
-From: bugzilla-daemon@kernel.org
-To: stephen@networkplumber.org
-Subject: [Bug 218536] New: divide error in tcp_rcv_space_adjust
+Hi Xuan Zhuo,
 
+Sparse complains about the line above because the type of *v is u64,
+but le64_to_cpu() expects __le64.
 
-https://bugzilla.kernel.org/show_bug.cgi?id=218536
+> +			}
+> +
+> +			break;
+> +		}
+> +	}
+> +
+> +	kfree(reply);
+> +	return 0;
+> +}
+> +
+>  static void virtnet_get_strings(struct net_device *dev, u32 stringset, u8 *data)
+>  {
+>  	struct virtnet_info *vi = netdev_priv(dev);
 
-            Bug ID: 218536
-           Summary: divide error in tcp_rcv_space_adjust
-           Product: Networking
-           Version: 2.5
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Other
-          Assignee: stephen@networkplumber.org
-          Reporter: adam@mizerski.pl
-        Regression: No
-
-Created attachment 305916
-  --> https://bugzilla.kernel.org/attachment.cgi?id=305916&action=edit  
-dmesg
-
-Kernel: 6.7.6 from openSUSE Tumbleweed (but I noticed it happening earlier as
-well, not sure since when)
-
-Network card:
-Bus 002 Device 005: ID 0b95:1790 ASIX Electronics Corp. AX88179 Gigabit
-Ethernet
-
-Reproducible: Happens maybe once a day or few days. Don't know how and why.
-
-Symptoms: Firefox stops being able to make any network connections. I need to
-kill it, because it's stuck even when closing. Everything else seems to be
-working fine (including stuff like https://github.com/debauchee/barrier).
-
-Call Trace:
- <TASK>
- ? die+0x36/0x90
- ? do_trap+0xda/0x100
- ? tcp_rcv_space_adjust+0xbe/0x160
- ? do_error_trap+0x6a/0x90
- ? tcp_rcv_space_adjust+0xbe/0x160
- ? exc_divide_error+0x38/0x50
- ? tcp_rcv_space_adjust+0xbe/0x160
- ? asm_exc_divide_error+0x1a/0x20
- ? tcp_rcv_space_adjust+0xbe/0x160
- ? tcp_rcv_space_adjust+0x1a/0x160
- tcp_recvmsg_locked+0x2c3/0x950
- tcp_recvmsg+0x73/0x1f0
- ? __pfx_pollwake+0x10/0x10
- inet_recvmsg+0x56/0x130
- ? security_socket_recvmsg+0x41/0x70
- sock_recvmsg+0xa6/0xd0
- __sys_recvfrom+0xaa/0x120
- ? switch_fpu_return+0x50/0xe0
- ? syscall_exit_to_user_mode+0x2b/0x40
- ? do_syscall_64+0x70/0xe0
- ? do_syscall_64+0x70/0xe0
- ? syscall_exit_to_user_mode+0x2b/0x40
- __x64_sys_recvfrom+0x24/0x30
- do_syscall_64+0x61/0xe0
- entry_SYSCALL_64_after_hwframe+0x6e/0x76
-
--- 
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.
+...
 
