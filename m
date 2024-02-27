@@ -1,111 +1,126 @@
-Return-Path: <netdev+bounces-75254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A322868D9C
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 11:30:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92C7E868DA1
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 11:31:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C2E41C241C0
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:30:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7A93B27EC8
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:31:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F1D012A14B;
-	Tue, 27 Feb 2024 10:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9090652F91;
+	Tue, 27 Feb 2024 10:31:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YfvCUwI4"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="ATNcotiI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 541B32A8C1;
-	Tue, 27 Feb 2024 10:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A570153376;
+	Tue, 27 Feb 2024 10:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709029832; cv=none; b=BSJ9fIeGiRSbfNaP2k9VRS/kGivSCaUPWOsCc9IX3AaGKWw/i1ubHt9mhbljAgPopNXRco00lpEGd7i78ge8AkYMagfNKrdi9Zk34Ci96A1d20HiMgOwSQsOWnUiFyQmlB+lJbGTjZCKjbjqkcSJTSjL7I7dbXz8NP2FmMJUCG4=
+	t=1709029877; cv=none; b=GJarLS7it+/UQKNnzlIgABI7DK3f6yRt8851CXNZKy1VjRxIIToTzo/BEN3XAjLhFKKct75biYtQShRfq8s9D8E+uURAKzdDc7BadNY7K9EFxgX9y5/qjgfd89Nj3HPZRMWwWTv8Gk35SUjuXn5REZ3pU+x4fqcHh7bIUR/jDN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709029832; c=relaxed/simple;
-	bh=b+TmIZM1BbzBrs8DPklmaQytiyICHGa9Tx0B0KH98gs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=VSveGgxwYQ8PB9ECV6maG7yxddVI57VJT9Zql/gT57DClz/dOzaLZfdORbFvmE8MLVYMd0mSsQPdeXBhFwsbjOYQ5Y8H0BsuYEajiWPg5055ywTvKAQKRTo/fJON/ZGyJ2KpDny7m1PF8Tya5vsQjRVCpZ21alS4/DQeMZV5dPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YfvCUwI4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0FA02C43390;
-	Tue, 27 Feb 2024 10:30:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709029831;
-	bh=b+TmIZM1BbzBrs8DPklmaQytiyICHGa9Tx0B0KH98gs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YfvCUwI4tvPaW9gmzzc/9luJe2CCvi77NHfMBnrR9KbKUi7UQp0XND5fbAU8FDL2f
-	 4m0IW4qTGP/pLECfqC7GE8s0urYua2Sgp8CYnYXAWqkiLXZd8dHIZRUUpCYjRtgQUI
-	 nL1VgSSugvKLl7qctMTJEVjiF8e5S2YaF3Y8y2awb3vZaEHQnB1s9+cIb3HcCIghKA
-	 +Z0Zaz3RUkIp1Rkw7boGBTFAL2+cSpZAWXEBSSozXPL2s1fXe5DWc95YzifMvgFJqz
-	 dq9PC9GpU1vle625tJ/N0hefzWyuwFUHgzdzQ7GT1/YZ0qmDZsA2P8+F/+EDwj2QMe
-	 Imr//gcJaiPRg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E7957D88FB6;
-	Tue, 27 Feb 2024 10:30:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709029877; c=relaxed/simple;
+	bh=UZPA+oW2ED27diOEsEHoW3DjwrWTidPv6l7VZbUw6+4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TctXAVZPZFuxy8wS090iAewYOSDLgKCjuCee5tb1on6KLzIujIy3usI6+yND0H+SZi334RtVVabVIMKm3OxK6TBY1aQwLV2DFQWrNj4YGozauzY9tfFHvJLEinZIyfSH6ZA98L4+xhAcqiykOt7Kx3Bor6azndW8mYxapRewam0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=ATNcotiI; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 015872087B;
+	Tue, 27 Feb 2024 11:31:06 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id Lgn6WFSWJChe; Tue, 27 Feb 2024 11:31:05 +0100 (CET)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 6CC9B207E4;
+	Tue, 27 Feb 2024 11:31:01 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 6CC9B207E4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1709029861;
+	bh=36X9HieMWPjDOQ3pURbAUKsOVyclcZ1ePVR/QDpPb64=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=ATNcotiIoTEVWQzHRSgqNfIlxyXxbx/Nh/Zeqv9ROdcZ2fR5fKHS0cQHitc7dzP1O
+	 /sXU6NP/SlMqGWteyY7NvxveZK09TUKUCCp2lpu1KlrBw70tqj/hjXeo9Tr6ddmUFq
+	 T2tbj/prS5r2qujOj1s/Y39G0rQX4dEJTxhW8iwps6ICybjWVB7Te6F5Z9v+WUzsPj
+	 TXby2SX0AIk4xuetrcUtD9mte+rXWPUrDjP0wEHlAPMorghetrjnDXD0Z/GBEajYfV
+	 CqfvtUO8RGlGMALHvGCQJBGduT44RyFDYCGBs5LV3ggR/OZTCSyS3XJNHdsnWnoiyD
+	 LPyYaiESYkeUw==
+Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
+	by mailout1.secunet.com (Postfix) with ESMTP id 5DD6A80004E;
+	Tue, 27 Feb 2024 11:31:01 +0100 (CET)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 27 Feb 2024 11:31:01 +0100
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 27 Feb
+ 2024 11:31:00 +0100
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 5DDDB3182503; Tue, 27 Feb 2024 11:31:00 +0100 (CET)
+Date: Tue, 27 Feb 2024 11:31:00 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Nathan Chancellor <nathan@kernel.org>
+CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<morbo@google.com>, <justinstitt@google.com>, <keescook@chromium.org>,
+	<netdev@vger.kernel.org>, <llvm@lists.linux.dev>, <patches@lists.linux.dev>,
+	<stable@vger.kernel.org>
+Subject: Re: [PATCH net] xfrm: Avoid clang fortify warning in
+ copy_to_user_tmpl()
+Message-ID: <Zd255JYau84UHfpo@gauss3.secunet.de>
+References: <20240221-xfrm-avoid-clang-fortify-warning-copy_to_user_tmpl-v1-1-254a788ab8ba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/6] net: ipa: don't abort system suspend
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170902983094.8915.2318266650538047473.git-patchwork-notify@kernel.org>
-Date: Tue, 27 Feb 2024 10:30:30 +0000
-References: <20240223133930.582041-1-elder@linaro.org>
-In-Reply-To: <20240223133930.582041-1-elder@linaro.org>
-To: Alex Elder <elder@linaro.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, mka@chromium.org, andersson@kernel.org,
- quic_cpratapa@quicinc.com, quic_avuyyuru@quicinc.com,
- quic_jponduru@quicinc.com, quic_subashab@quicinc.com, elder@kernel.org,
- netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240221-xfrm-avoid-clang-fortify-warning-copy_to_user_tmpl-v1-1-254a788ab8ba@kernel.org>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 23 Feb 2024 07:39:24 -0600 you wrote:
-> Currently the IPA code aborts an in-progress system suspend if an
-> IPA interrupt arrives before the suspend completes.  There is no
-> need to do that though, because the IPA driver handles a forced
-> suspend correctly, quiescing any hardware activity before finally
-> turning off clocks and interconnects.
+On Wed, Feb 21, 2024 at 02:46:21PM -0700, Nathan Chancellor wrote:
+> After a couple recent changes in LLVM, there is a warning (or error with
+> CONFIG_WERROR=y or W=e) from the compile time fortify source routines,
+> specifically the memset() in copy_to_user_tmpl().
 > 
-> This series drops the call to pm_wakeup_dev_event() if an IPA
-> SUSPEND interrupt arrives during system suspend.  Doing this
-> makes the two remaining IPA power flags unnecessary, and allows
-> some additional code to be cleaned up--and best of all, removed.
-> The result is much simpler (and I'm really glad not to be using
-> these flags any more).
+>   In file included from net/xfrm/xfrm_user.c:14:
+>   ...
+>   include/linux/fortify-string.h:438:4: error: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror,-Wattribute-warning]
+>     438 |                         __write_overflow_field(p_size_field, size);
+>         |                         ^
+>   1 error generated.
 > 
-> [...]
+> While ->xfrm_nr has been validated against XFRM_MAX_DEPTH when its value
+> is first assigned in copy_templates() by calling validate_tmpl() first
+> (so there should not be any issue in practice), LLVM/clang cannot really
+> deduce that across the boundaries of these functions. Without that
+> knowledge, it cannot assume that the loop stops before i is greater than
+> XFRM_MAX_DEPTH, which would indeed result a stack buffer overflow in the
+> memset().
+> 
+> To make the bounds of ->xfrm_nr clear to the compiler and add additional
+> defense in case copy_to_user_tmpl() is ever used in a path where
+> ->xfrm_nr has not been properly validated against XFRM_MAX_DEPTH first,
+> add an explicit bound check and early return, which clears up the
+> warning.
+> 
+> Cc: stable@vger.kernel.org
+> Link: https://github.com/ClangBuiltLinux/linux/issues/1985
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 
-Here is the summary with links:
-  - [net-next,1/6] net: ipa: don't bother aborting system resume
-    https://git.kernel.org/netdev/net-next/c/4b2274d3811a
-  - [net-next,2/6] net: ipa: kill IPA_POWER_FLAG_SYSTEM
-    https://git.kernel.org/netdev/net-next/c/54f19ff7676f
-  - [net-next,3/6] net: ipa: kill the IPA_POWER_FLAG_RESUMED flag
-    https://git.kernel.org/netdev/net-next/c/dae5d6e8f0ec
-  - [net-next,4/6] net: ipa: move ipa_interrupt_suspend_clear_all() up
-    https://git.kernel.org/netdev/net-next/c/ef63ca78da2e
-  - [net-next,5/6] net: ipa: kill ipa_power_suspend_handler()
-    https://git.kernel.org/netdev/net-next/c/423df2e09d3b
-  - [net-next,6/6] net: ipa: don't bother zeroing an already zero register
-    https://git.kernel.org/netdev/net-next/c/f9345952e74a
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Applied to the ipsec tree, thanks a lot!
 
