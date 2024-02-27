@@ -1,153 +1,235 @@
-Return-Path: <netdev+bounces-75247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15EDF868CF4
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 11:08:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BFC9868D5F
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 11:21:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47EED1C22A4E
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:08:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA98C28D907
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 10:21:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BDF1137C50;
-	Tue, 27 Feb 2024 10:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Sm0n5pQF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CED99138499;
+	Tue, 27 Feb 2024 10:21:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B02613699F;
-	Tue, 27 Feb 2024 10:08:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0F22136670;
+	Tue, 27 Feb 2024 10:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709028496; cv=none; b=CBPpsfNSWs0+NhfviOIpkV9GgXsV8f26lFxEF2/yQpxq6ZL2drl8ZWqXfboeowkt9/DNuatFuvIgLJxHi9NV+NUEEtT2tNp/5zNJWukCCuldV9MMTzRqqpOA/caDNXHvBojju0GJ3c7lfsAmDPJ1LpwXZXJPIlT5LeHZsx3YNKs=
+	t=1709029281; cv=none; b=f2j/VZxQDiX77dOedbZ8+hHnZrfyQZW6gGzjHCqVnl8ZMNnyQswOg6DkBCAEatkmL/8nP6jOSLlUfGZSPrklbJsMqQxDxPKojX47oxP+iGxjObkZUaGtMh5N6iFwo1AOqNar0aST363YLuvPntuNHJRwqW+z3SImGaN6GTs3nS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709028496; c=relaxed/simple;
-	bh=gayX3MThRtKAbxiT63s1KOxQeJc59MH4mNLhm21wvus=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H+VKAqoM62FmadKG8l7GM4+ymUCYjuhNDhRSQGtatYEw9oNH1OdlEpRByzM7aDEykKc5OZps2xH+HIfIkrV7JQGlqlWXwOFvxxZdjXU8nNt0d58hK92BODU8nL6Z/lZ0Yrgw5ER4okXPpoRMrKhYqS1e8zoPZl3aYU6I8K5nq+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Sm0n5pQF; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1B79C240008;
-	Tue, 27 Feb 2024 10:08:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709028486;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xvLaYo71E/i5pWv7T61eLjy9zgmIF4EWr3dIPInc76E=;
-	b=Sm0n5pQFxXJLkiaB1TAaCuo0oEs+Mv9KG/JGBjQ91ZO5oPkAegydRj38YtkVb6gEQ8TBGh
-	Obumgxy9ZP2JClMj0wIprCxMKrLtD29lZbBFNu28M5SXXAIA7WmTQlSepiTjtAQLUjuVGS
-	o2Xadk0RaiA/446C7RrtFdY6k1bGuhNfDT2LnpRmSZhKlfWR4Awkf1q7LGu3R31kltysjQ
-	j9H7+dpJUj6qS67T7BAy03eSeUkLRY8t9H3mK2smKAzwQJrbW1hNhgsYHhAZe8QEr7Sl7x
-	hQ9dJnLSqTGkOzOQaCofynCSP9bfxCY6/ZtUXDA8dN/3eMNMvsJqwL7nEM0uKg==
-Date: Tue, 27 Feb 2024 11:08:02 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Bastien Curutchet <bastien.curutchet@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>, Richard Cochran
- <richardcochran@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-leds@vger.kernel.org, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, herve.codina@bootlin.com,
- christophercordahi@nanometrics.ca
-Subject: Re: [PATCH v2 5/6] net: phy: DP83640: Explicitly disabling PHY
- Control Frames
-Message-ID: <20240227110802.552bff55@device-28.home>
-In-Reply-To: <20240227093945.21525-6-bastien.curutchet@bootlin.com>
-References: <20240227093945.21525-1-bastien.curutchet@bootlin.com>
-	<20240227093945.21525-6-bastien.curutchet@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1709029281; c=relaxed/simple;
+	bh=nmxMTBsRmEFH3r+wtBkZpOzPW6BjYtw0nkmJpg7GKUU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pf1TzH8ffNHVAlWKSeYjbESllbqukgOjYBILGArJ6lntKRfcMjECVbHNZBGFVxOb4n6Y7Q0qm7NFpaJ5prlIkBh63bgaskqCgGT9xT4r7j3gSOSO7jjiB9/08G/TE2f9Tce5yFcbyCZEvi/01cF83kPyZCVRm7jjuXA39A4PO+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-IronPort-AV: E=Sophos;i="6.06,187,1705330800"; 
+   d="asc'?scan'208";a="199445806"
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie6.idc.renesas.com with ESMTP; 27 Feb 2024 19:21:14 +0900
+Received: from [10.226.92.206] (unknown [10.226.92.206])
+	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 6FF7941FB597;
+	Tue, 27 Feb 2024 19:21:11 +0900 (JST)
+Message-ID: <88c93368-6dc7-45ea-9bae-e1cbc50d69a7@bp.renesas.com>
+Date: Tue, 27 Feb 2024 10:21:09 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next 3/6] ravb: Create helper to allocate skb and align it
+Content-Language: en-GB
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+ <niklas.soderlund+renesas@ragnatech.se>, Sergey Shtylyov
+ <s.shtylyov@omp.ru>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Biju Das <biju.das.jz@bp.renesas.com>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, netdev@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org
+References: <20240227014014.44855-1-niklas.soderlund+renesas@ragnatech.se>
+ <20240227014014.44855-4-niklas.soderlund+renesas@ragnatech.se>
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+Organization: Renesas Electronics Corporation
+In-Reply-To: <20240227014014.44855-4-niklas.soderlund+renesas@ragnatech.se>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------YbX4s48TqlSV3Dp4YmvE4Cxm"
 
-Hi Bastien,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------YbX4s48TqlSV3Dp4YmvE4Cxm
+Content-Type: multipart/mixed; boundary="------------lkU3yRGhlkctHV4thib0djHZ";
+ protected-headers="v1"
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+ <niklas.soderlund+renesas@ragnatech.se>, Sergey Shtylyov
+ <s.shtylyov@omp.ru>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Biju Das <biju.das.jz@bp.renesas.com>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, netdev@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org
+Message-ID: <88c93368-6dc7-45ea-9bae-e1cbc50d69a7@bp.renesas.com>
+Subject: Re: [net-next 3/6] ravb: Create helper to allocate skb and align it
+References: <20240227014014.44855-1-niklas.soderlund+renesas@ragnatech.se>
+ <20240227014014.44855-4-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20240227014014.44855-4-niklas.soderlund+renesas@ragnatech.se>
 
-On Tue, 27 Feb 2024 10:39:44 +0100
-Bastien Curutchet <bastien.curutchet@bootlin.com> wrote:
+--------------lkU3yRGhlkctHV4thib0djHZ
+Content-Type: multipart/mixed; boundary="------------Ygv1mJ8UCcAbrJkK9mNCGWa0"
 
-> The PHY offers a PHY control frame feature that allows to access PHY
-> registers through the MAC transmit data interface. This functionality
-> is not handled by the driver but can be enabled via hardware strap or
-> register access.
-> 
-> Disable the feature in config_init() to save some latency on MII packets.
-> 
-> Signed-off-by: Bastien Curutchet <bastien.curutchet@bootlin.com>
-> ---
->  drivers/net/phy/dp83640.c     | 6 ++++++
->  drivers/net/phy/dp83640_reg.h | 4 ++++
->  2 files changed, 10 insertions(+)
-> 
-> diff --git a/drivers/net/phy/dp83640.c b/drivers/net/phy/dp83640.c
-> index 16c9fda50b19..b371dea23937 100644
-> --- a/drivers/net/phy/dp83640.c
-> +++ b/drivers/net/phy/dp83640.c
-> @@ -1120,6 +1120,7 @@ static int dp83640_config_init(struct phy_device *phydev)
->  {
->  	struct dp83640_private *dp83640 = phydev->priv;
->  	struct dp83640_clock *clock = dp83640->clock;
-> +	int val;
->  
->  	if (clock->chosen && !list_empty(&clock->phylist))
->  		recalibrate(clock);
-> @@ -1135,6 +1136,11 @@ static int dp83640_config_init(struct phy_device *phydev)
->  	ext_write(0, phydev, PAGE4, PTP_CTL, PTP_ENABLE);
->  	mutex_unlock(&clock->extreg_lock);
->  
-> +	/* Disable unused PHY control frames */
-> +	phy_write(phydev, PAGESEL, 0);
-> +	val = phy_read(phydev, PCFCR) & ~PCF_EN;
-> +	phy_write(phydev, PCFCR, val);
+--------------Ygv1mJ8UCcAbrJkK9mNCGWa0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Use phy_modify instead, and you might also want to look at the paging.
-The ext_write before apparently does some page-management itself through
-the clock struct (?).
+On 27/02/2024 01:40, Niklas S=C3=B6derlund wrote:
+> The RAVB device requires the SKB data to be aligned to 128 bytes. The
+> alignment is done by allocating a skb 128 bytes larger than the maximum=
 
-> +
->  	return 0;
->  }
->  
-> diff --git a/drivers/net/phy/dp83640_reg.h b/drivers/net/phy/dp83640_reg.h
-> index bf34d422d91e..b5adb8958c08 100644
-> --- a/drivers/net/phy/dp83640_reg.h
-> +++ b/drivers/net/phy/dp83640_reg.h
-> @@ -10,6 +10,7 @@
->  #define PHYCR                     0x0019 /* PHY Control Register */
->  #define PHYCR2                    0x001c /* PHY Control Register 2 */
->  #define EDCR                      0x001D /* Energy Detect Control Register */
-> +#define PCFCR                     0x001F /* PHY Control Frames Control Register */
->  
->  #define PAGE4                     0x0004
->  #define PTP_CTL                   0x0014 /* PTP Control Register */
-> @@ -68,6 +69,9 @@
->  /* Bit definitions for the EDCR register */
->  #define ED_EN		          BIT(15) /* Enable Energy Detect Mode */
->  
-> +/* Bit definitions for the PCFCR register */
-> +#define PCF_EN                    BIT(0)  /* Enable PHY Control Frames */
-> +
->  /* Bit definitions for the PTP_CTL register */
->  #define TRIG_SEL_SHIFT            (10)    /* PTP Trigger Select */
->  #define TRIG_SEL_MASK             (0x7)
+> frame size supported by the device and adjusting the headroom to fit th=
+e
+> requirement.
+>=20
+> This code has been refactored a few times and small issues have been
+> added along the way. The issues are not harmful but prevents merging
+> parts of the Rx code which have been split in two implementations with
+> the addition of RZ/G2L support, a device that supports larger frame
+> sizes.
+>=20
+> This change removes the need for duplicated and somewhat inaccurate
+> hardware alignment constrains stored in the hardware information struct=
+
+> by creating a helper to handle the allocation of a skb and alignment of=
+
+> a skb data.
+>=20
+> For the R-Car class of devices the maximum frame size is 4K and each
+> descriptor is limited to 2K of data. The current implementation does no=
+t
+> support split descriptors, this limits the frame size to 2K. The
+> current hardware information however records the descriptor size just
+> under 2K due to bad understanding of the device when larger MTUs where
+> added.
+>=20
+> For the RZ/G2L device the maximum frame size is 8K and each descriptor
+> is limited to 4K of data. The current hardware information records this=
+
+> correctly, but it gets the alignment constrains wrong as just aligns it=
+
+> by 128, it does not extend it by 128 bytes to allow the full frame to b=
+e
+> stored. This works because the RZ/G2L device supports split descriptors=
+
+> and allocates each skb to 8K and aligns each 4K descriptor in this
+> space.
+
+This change tidies up code which I re-wrote last week but I haven't sent
+patches yet... I was holding off sending further patches until we've
+completed gPTP testing, but maybe I can get an updated RFC series sent
+first then continue with testing.
+
+To get the best RX performance, we should allocate plain RX buffers
+using a page pool, then call build_skb() when a packet is received.
+Reducing RX buffer size from 8kB to 2kB for RZ/G2L gets me a 50%
+improvement in TCP RX throughput and a 200% improvement in UDP RX
+throughput. Using a page pool gets me a further 10% or so in both TCP &
+UDP RX throughput. So, if we merge this I'll be trying to remove
+ravb_alloc_skb() shortly anyway.
+
+So NACK on this for now, but let's co-ordinate the improvements we're
+both making so there aren't any merge conflicts for the maintainers to
+resolve.
 
 Thanks,
 
-Maxime
+--=20
+Paul Barker
+--------------Ygv1mJ8UCcAbrJkK9mNCGWa0
+Content-Type: application/pgp-keys; name="OpenPGP_0x27F4B3459F002257.asc"
+Content-Disposition: attachment; filename="OpenPGP_0x27F4B3459F002257.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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3D
+=3DsIIN
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------Ygv1mJ8UCcAbrJkK9mNCGWa0--
+
+--------------lkU3yRGhlkctHV4thib0djHZ--
+
+--------------YbX4s48TqlSV3Dp4YmvE4Cxm
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQSiu8gv1Xr0fIw/aoLbaV4Vf/JGvQUCZd23lgUDAAAAAAAKCRDbaV4Vf/JGvSRj
+AP4365RrP+D8pX0DGCj8BAFqI7uMkiVN1tno5DWO9eyEhQD+J37pNAI/VAKf88hSGt9boP3qIrh3
+95WO8r6oHHK/OgY=
+=fG19
+-----END PGP SIGNATURE-----
+
+--------------YbX4s48TqlSV3Dp4YmvE4Cxm--
 
