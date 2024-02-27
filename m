@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-75452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C67B8869FA3
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 19:56:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 52336869FA5
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 19:56:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 523BB289684
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 18:56:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06B582842CB
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 18:56:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87E3614AD06;
-	Tue, 27 Feb 2024 18:55:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E5F214C5B6;
+	Tue, 27 Feb 2024 18:55:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="C2h4mQaq"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="diJ54Yrw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDFE414A086
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 18:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C2814AD04
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 18:55:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709060109; cv=none; b=TxmbGFB0kUPJA8gqR2NUtPLiERx75RQxkGXSfIafF0qUOgaaP3DFuwc1f040ncoe2zFbJrkbZu/r5dvNaLvyPG7OORWd3LtvkGDdXmjWFbEywIcvAEYDf6Y5c5pLkTJlE3EDV779J3leAWPlg5CiYrCipxCISiNQNfDlj/YiSVA=
+	t=1709060111; cv=none; b=GtuP84+lRx/yAXHjaWx4iOXFCjLkeIVDYvQe3NpUIZ9tSQF6/fcHI5HT6cYd/py9T/PDNWS/g8vv/xDzV0PIsferlLWyLbGkgvwx3m8lvGq2bC1FS2v8VXIHBzTeI5m6Rwd7+XyQl7JCmXMXWQ4AvrWl08+7tlGqH2s0dFlf9Ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709060109; c=relaxed/simple;
-	bh=RPNvbU5ToUJJd7o+1anBEfHzdFmpOP0plOiwCHrsv2g=;
+	s=arc-20240116; t=1709060111; c=relaxed/simple;
+	bh=ToD0SmBWUrk7DVTpDD1+wlNk8RiKK71OqmhkfqYpRKM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G/Ws0JZkP31EATDWTnGrWLAevKGVTynVWVwShktgRe8xEl9AirB/EDfFW0GVRvPfxuX7C4MjBvdYrDCLUMsN3GOD5/VOEPna8ZPZ0xBJCd2MMTfSJlbEU9PkOlTGdM7ug6anJrxyc45Df10CgvKNvfal+VQcbOAIyT2G2UDwtQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=C2h4mQaq; arc=none smtp.client-ip=209.85.210.49
+	 MIME-Version:Content-Type; b=p5+ZEMzSo0mOGaE0kagNP69wwAneKB2H8eJGJVObWvGr5S1X9ga/l5Jb+tYS+Z+UBTgy6YM1OFyRFyw5CyJTgpD3COTNpte6E3c4xGSwOV4J14OF/c340X4Y8wLEokM+uDWll9lj+PoTVrawItFJPHKmjywPmkzo4uX0m8nBzDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=diJ54Yrw; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6dc8b280155so3338939a34.0
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 10:55:07 -0800 (PST)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6e544f927d4so75082b3a.0
+        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 10:55:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1709060107; x=1709664907; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1709060109; x=1709664909; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=aNMC1BCh4qM1tlyl4hi2wK0/IkR9CJQr9C5n5LVM23I=;
-        b=C2h4mQaqHDmgvMl/eGLGuD9h7lyvI5k6xR0jawpgiF1W8amPinXdoDi+vRxSstRuXh
-         Y/K0hseBdFSbvLptNCGwo0Rcu3XghRq3SUCMmdUHibCztNMir0RSW0a+SrdXWjjPgBIb
-         m5+s060Jkmm00lsaBYJfj2H7Ql0iRoEJxhI5c=
+        bh=6/81acXTLD3okeoxdhRaZaWmVZzxskxx/NHE1ckLvTs=;
+        b=diJ54YrwgiMK07fS3GTvcmUAZBm+RRgtoZ4DGSHUpQS+UEheDJVaUGF4rcxZkPCb2d
+         scKZsbQsKcDR+hfMJoSUtAo5v8HqplhoJ127aVrvyVznWmihFL6FMlCSyAMgXYcSJNUY
+         s+ZH10fPoytaRSqueKBuSznhTBxNMm8wSy6K0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709060107; x=1709664907;
+        d=1e100.net; s=20230601; t=1709060109; x=1709664909;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aNMC1BCh4qM1tlyl4hi2wK0/IkR9CJQr9C5n5LVM23I=;
-        b=M48UNBYx06ShPoCE7+6ffige7pG1ltDTHlsIeVVbU93j/oYkUGGbPDoUbDa0/FHtYq
-         5e6bW/b8pYC56Lvki+4aaT6xiu5hgxS8f1F2lLJjx+EgJTlyTLtLK24oRauIOqcFNBLL
-         egP3e4Jmz4m+YGn6JKQe2dmM+54LQ5zXqOIMemzt3AjCvprFfiW/Hz2Q0RhcwEGfTYno
-         byW3C9VXoGs0ikTaDNEIEwk3/VDvgh5SYy/JfbIt+376iHFn/wrAIbG0XVwS6SzB05Ay
-         kEv8vNrpAmCw+63CRAQpn5oeEq1t4VwXNtjIG0e+9BGpfFoXiv2dx5MlbkVNuruUIzvv
-         zyDA==
-X-Gm-Message-State: AOJu0YyGuMk9BpuQoD3K1sQtc+Me5mUOb+6Rr1IkCIcrJpK9sJpePOvJ
-	edhoB2waUawnvtLC0x+RCu/CSYy2D89iwCALbmmGX158d3+rP9p5eoDrmbK77T/e5EYsavlqVr9
-	zn9Rn3aNM84Dss9EnnyggQg29KUCVukbHyVPsH5rNnaPt/evLZwpu6uc070YtdzLII8yBK7xOqN
-	S9K6+fLRPlvt17PNc91/qCuOgwjgJFLmhHnvk6/Q5rP/3T
-X-Google-Smtp-Source: AGHT+IGIyWNtEy+jOiVtH4B/95rEO+0oWON7vIgRwxQgQ4vzkFSxfZodbTXeTufQybvj+WWjghC1Kw==
-X-Received: by 2002:a9d:7dd6:0:b0:6e4:253f:c551 with SMTP id k22-20020a9d7dd6000000b006e4253fc551mr9813304otn.29.1709060106765;
-        Tue, 27 Feb 2024 10:55:06 -0800 (PST)
+        bh=6/81acXTLD3okeoxdhRaZaWmVZzxskxx/NHE1ckLvTs=;
+        b=MtJ8RPU9zu+1u2oR9iPu4KYI/+utvqa+nELVUUPLxnjNs7h4UnEm4rJTRlhUIrRGa1
+         VnYLcnTO36k3BaeMklej1iChFd7PSAA8pQ/EMzsWP9Zb1tUqg40eur/DBThAsNH5RYhT
+         +WxNY6WF2+DKyEg8M+exR2EINh6vqncq0izKqb2FQwGzcvcIYLn1AdmUEw6jE1tRKNlE
+         JgAZwUU/OF6UFQVU++MYuW5E4l5y39nADthpJWu+SGxLESlGRKPWLjXPTLmDaLeSe0lA
+         l5GaDSEixxv6LbJU8hh/QV09wQak342u/aZTR5YWvRpjUd3F9MB1/5HVLBzdfsjX1Vz+
+         X6fQ==
+X-Gm-Message-State: AOJu0YyvmG2EcZJdVv63wULEIV+j/lvHli668GEt3fKSiht9xFvLmto2
+	swxcIg2n6n1eb3CNoeD+Wq/nZI95CLHgRmWFNodbbXbJykca2rmxZ8e5sNdVUGiavS6rsDOSQ6a
+	Ul97B/ZAy0MDaleTh+2i2Pbx1Akzbic9/NHL0ydXlB/gTWJ0Y+oSla8POk1me20iNMB4/vYEL4i
+	o8Vq7kYnMCluztcsLCNtKGk11duFl31VV36Ppqx0mVw4DM
+X-Google-Smtp-Source: AGHT+IHFml8YC5w8sVYrpw7xt2tiOtfMLaUqB/iEG7thNNsuKn7QKwHLK2kCXWJEif9XHpxMW6qMPg==
+X-Received: by 2002:a05:6a00:4f0a:b0:6e5:bb8:dc19 with SMTP id lb10-20020a056a004f0a00b006e50bb8dc19mr196805pfb.15.1709060108348;
+        Tue, 27 Feb 2024 10:55:08 -0800 (PST)
 Received: from stbirv-lnx-1.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id r6-20020aa79886000000b006e466369645sm6236898pfl.132.2024.02.27.10.55.04
+        by smtp.gmail.com with ESMTPSA id r6-20020aa79886000000b006e466369645sm6236898pfl.132.2024.02.27.10.55.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Feb 2024 10:55:05 -0800 (PST)
+        Tue, 27 Feb 2024 10:55:07 -0800 (PST)
 From: Justin Chen <justin.chen@broadcom.com>
 To: netdev@vger.kernel.org
 Cc: florian.fainelli@broadcom.com,
@@ -82,9 +82,9 @@ Cc: florian.fainelli@broadcom.com,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Justin Chen <justin.chen@broadcom.com>
-Subject: [PATCH net-next v2 4/6] net: phy: mdio-bcm-unimac: Add asp v2.2 support
-Date: Tue, 27 Feb 2024 10:54:52 -0800
-Message-Id: <20240227185454.2767610-5-justin.chen@broadcom.com>
+Subject: [PATCH net-next v2 5/6] net: bcmasp: Keep buffers through power management
+Date: Tue, 27 Feb 2024 10:54:53 -0800
+Message-Id: <20240227185454.2767610-6-justin.chen@broadcom.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240227185454.2767610-1-justin.chen@broadcom.com>
 References: <20240227185454.2767610-1-justin.chen@broadcom.com>
@@ -95,36 +95,308 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000979bd80612619077"
+	boundary="000000000000b22e2b06126190e6"
 
---000000000000979bd80612619077
+--000000000000b22e2b06126190e6
 Content-Transfer-Encoding: 8bit
 
-Add mdio compat string for ASP 2.0 ethernet driver.
+There is no advantage of freeing and re-allocating buffers through
+suspend and resume. This waste cycles and makes suspend/resume time
+longer. We also open ourselves to failed allocations in systems with
+heavy memory fragmentation.
 
 Signed-off-by: Justin Chen <justin.chen@broadcom.com>
 Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
 ---
- drivers/net/mdio/mdio-bcm-unimac.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/broadcom/asp2/bcmasp.h   |   1 +
+ .../net/ethernet/broadcom/asp2/bcmasp_intf.c  | 181 ++++++++----------
+ 2 files changed, 76 insertions(+), 106 deletions(-)
 
-diff --git a/drivers/net/mdio/mdio-bcm-unimac.c b/drivers/net/mdio/mdio-bcm-unimac.c
-index 6fe08427fdd4..f40eb50bb978 100644
---- a/drivers/net/mdio/mdio-bcm-unimac.c
-+++ b/drivers/net/mdio/mdio-bcm-unimac.c
-@@ -334,6 +334,7 @@ static SIMPLE_DEV_PM_OPS(unimac_mdio_pm_ops,
- 			 NULL, unimac_mdio_resume);
+diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.h b/drivers/net/ethernet/broadcom/asp2/bcmasp.h
+index 61598dc070b1..127a5340625e 100644
+--- a/drivers/net/ethernet/broadcom/asp2/bcmasp.h
++++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.h
+@@ -315,6 +315,7 @@ struct bcmasp_intf {
+ 	struct bcmasp_desc		*rx_edpkt_cpu;
+ 	dma_addr_t			rx_edpkt_dma_addr;
+ 	dma_addr_t			rx_edpkt_dma_read;
++	dma_addr_t			rx_edpkt_dma_valid;
  
- static const struct of_device_id unimac_mdio_ids[] = {
-+	{ .compatible = "brcm,asp-v2.2-mdio", },
- 	{ .compatible = "brcm,asp-v2.1-mdio", },
- 	{ .compatible = "brcm,asp-v2.0-mdio", },
- 	{ .compatible = "brcm,genet-mdio-v5", },
+ 	/* RX buffer prefetcher ring*/
+ 	void				*rx_ring_cpu;
+diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+index 36e6fae937ea..0b378a6d43e7 100644
+--- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
++++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+@@ -674,40 +674,78 @@ static void bcmasp_adj_link(struct net_device *dev)
+ 		phy_print_status(phydev);
+ }
+ 
+-static int bcmasp_init_rx(struct bcmasp_intf *intf)
++static int bcmasp_alloc_buffers(struct bcmasp_intf *intf)
+ {
+ 	struct device *kdev = &intf->parent->pdev->dev;
+ 	struct page *buffer_pg;
+-	dma_addr_t dma;
+-	void *p;
+-	u32 reg;
+-	int ret;
+ 
++	/* Alloc RX */
+ 	intf->rx_buf_order = get_order(RING_BUFFER_SIZE);
+ 	buffer_pg = alloc_pages(GFP_KERNEL, intf->rx_buf_order);
+ 	if (!buffer_pg)
+ 		return -ENOMEM;
+ 
+-	dma = dma_map_page(kdev, buffer_pg, 0, RING_BUFFER_SIZE,
+-			   DMA_FROM_DEVICE);
+-	if (dma_mapping_error(kdev, dma)) {
+-		__free_pages(buffer_pg, intf->rx_buf_order);
+-		return -ENOMEM;
+-	}
+ 	intf->rx_ring_cpu = page_to_virt(buffer_pg);
+-	intf->rx_ring_dma = dma;
+-	intf->rx_ring_dma_valid = intf->rx_ring_dma + RING_BUFFER_SIZE - 1;
++	intf->rx_ring_dma = dma_map_page(kdev, buffer_pg, 0, RING_BUFFER_SIZE,
++					 DMA_FROM_DEVICE);
++	if (dma_mapping_error(kdev, intf->rx_ring_dma))
++		goto free_rx_buffer;
++
++	intf->rx_edpkt_cpu = dma_alloc_coherent(kdev, DESC_RING_SIZE,
++						&intf->rx_edpkt_dma_addr, GFP_KERNEL);
++	if (!intf->rx_edpkt_cpu)
++		goto free_rx_buffer_dma;
++
++	/* Alloc TX */
++	intf->tx_spb_cpu = dma_alloc_coherent(kdev, DESC_RING_SIZE,
++					      &intf->tx_spb_dma_addr, GFP_KERNEL);
++	if (!intf->tx_spb_cpu)
++		goto free_rx_edpkt_dma;
+ 
+-	p = dma_alloc_coherent(kdev, DESC_RING_SIZE, &intf->rx_edpkt_dma_addr,
++	intf->tx_cbs = kcalloc(DESC_RING_COUNT, sizeof(struct bcmasp_tx_cb),
+ 			       GFP_KERNEL);
+-	if (!p) {
+-		ret = -ENOMEM;
+-		goto free_rx_ring;
+-	}
+-	intf->rx_edpkt_cpu = p;
++	if (!intf->tx_cbs)
++		goto free_tx_spb_dma;
+ 
+-	netif_napi_add(intf->ndev, &intf->rx_napi, bcmasp_rx_poll);
++	return 0;
++
++free_tx_spb_dma:
++	dma_free_coherent(kdev, DESC_RING_SIZE, intf->tx_spb_cpu,
++			  intf->tx_spb_dma_addr);
++free_rx_edpkt_dma:
++	dma_free_coherent(kdev, DESC_RING_SIZE, intf->rx_edpkt_cpu,
++			  intf->rx_edpkt_dma_addr);
++free_rx_buffer_dma:
++	dma_unmap_page(kdev, intf->rx_ring_dma, RING_BUFFER_SIZE,
++		       DMA_FROM_DEVICE);
++free_rx_buffer:
++	__free_pages(buffer_pg, intf->rx_buf_order);
++
++	return -ENOMEM;
++}
++
++static void bcmasp_reclaim_free_buffers(struct bcmasp_intf *intf)
++{
++	struct device *kdev = &intf->parent->pdev->dev;
++
++	/* RX buffers */
++	dma_free_coherent(kdev, DESC_RING_SIZE, intf->rx_edpkt_cpu,
++			  intf->rx_edpkt_dma_addr);
++	dma_unmap_page(kdev, intf->rx_ring_dma, RING_BUFFER_SIZE,
++		       DMA_FROM_DEVICE);
++	__free_pages(virt_to_page(intf->rx_ring_cpu), intf->rx_buf_order);
++
++	/* TX buffers */
++	dma_free_coherent(kdev, DESC_RING_SIZE, intf->tx_spb_cpu,
++			  intf->tx_spb_dma_addr);
++	kfree(intf->tx_cbs);
++}
+ 
++static void bcmasp_init_rx(struct bcmasp_intf *intf)
++{
++	/* Restart from index 0 */
++	intf->rx_ring_dma_valid = intf->rx_ring_dma + RING_BUFFER_SIZE - 1;
++	intf->rx_edpkt_dma_valid = intf->rx_edpkt_dma_addr + (DESC_RING_SIZE - 1);
+ 	intf->rx_edpkt_dma_read = intf->rx_edpkt_dma_addr;
+ 	intf->rx_edpkt_index = 0;
+ 
+@@ -733,64 +771,23 @@ static int bcmasp_init_rx(struct bcmasp_intf *intf)
+ 	rx_edpkt_dma_wq(intf, intf->rx_edpkt_dma_addr, RX_EDPKT_DMA_WRITE);
+ 	rx_edpkt_dma_wq(intf, intf->rx_edpkt_dma_addr, RX_EDPKT_DMA_READ);
+ 	rx_edpkt_dma_wq(intf, intf->rx_edpkt_dma_addr, RX_EDPKT_DMA_BASE);
+-	rx_edpkt_dma_wq(intf, intf->rx_edpkt_dma_addr + (DESC_RING_SIZE - 1),
+-			RX_EDPKT_DMA_END);
+-	rx_edpkt_dma_wq(intf, intf->rx_edpkt_dma_addr + (DESC_RING_SIZE - 1),
+-			RX_EDPKT_DMA_VALID);
+-
+-	reg = UMAC2FB_CFG_DEFAULT_EN |
+-	      ((intf->channel + 11) << UMAC2FB_CFG_CHID_SHIFT);
+-	reg |= (0xd << UMAC2FB_CFG_OK_SEND_SHIFT);
+-	umac2fb_wl(intf, reg, UMAC2FB_CFG);
++	rx_edpkt_dma_wq(intf, intf->rx_edpkt_dma_valid, RX_EDPKT_DMA_END);
++	rx_edpkt_dma_wq(intf, intf->rx_edpkt_dma_valid, RX_EDPKT_DMA_VALID);
+ 
+-	return 0;
+-
+-free_rx_ring:
+-	dma_unmap_page(kdev, intf->rx_ring_dma, RING_BUFFER_SIZE,
+-		       DMA_FROM_DEVICE);
+-	__free_pages(virt_to_page(intf->rx_ring_cpu), intf->rx_buf_order);
+-
+-	return ret;
++	umac2fb_wl(intf, UMAC2FB_CFG_DEFAULT_EN | ((intf->channel + 11) <<
++		   UMAC2FB_CFG_CHID_SHIFT) | (0xd << UMAC2FB_CFG_OK_SEND_SHIFT),
++		   UMAC2FB_CFG);
+ }
+ 
+-static void bcmasp_reclaim_free_all_rx(struct bcmasp_intf *intf)
+-{
+-	struct device *kdev = &intf->parent->pdev->dev;
+-
+-	dma_free_coherent(kdev, DESC_RING_SIZE, intf->rx_edpkt_cpu,
+-			  intf->rx_edpkt_dma_addr);
+-	dma_unmap_page(kdev, intf->rx_ring_dma, RING_BUFFER_SIZE,
+-		       DMA_FROM_DEVICE);
+-	__free_pages(virt_to_page(intf->rx_ring_cpu), intf->rx_buf_order);
+-}
+ 
+-static int bcmasp_init_tx(struct bcmasp_intf *intf)
++static void bcmasp_init_tx(struct bcmasp_intf *intf)
+ {
+-	struct device *kdev = &intf->parent->pdev->dev;
+-	void *p;
+-	int ret;
+-
+-	p = dma_alloc_coherent(kdev, DESC_RING_SIZE, &intf->tx_spb_dma_addr,
+-			       GFP_KERNEL);
+-	if (!p)
+-		return -ENOMEM;
+-
+-	intf->tx_spb_cpu = p;
++	/* Restart from index 0 */
+ 	intf->tx_spb_dma_valid = intf->tx_spb_dma_addr + DESC_RING_SIZE - 1;
+ 	intf->tx_spb_dma_read = intf->tx_spb_dma_addr;
+-
+-	intf->tx_cbs = kcalloc(DESC_RING_COUNT, sizeof(struct bcmasp_tx_cb),
+-			       GFP_KERNEL);
+-	if (!intf->tx_cbs) {
+-		ret = -ENOMEM;
+-		goto free_tx_spb;
+-	}
+-
+ 	intf->tx_spb_index = 0;
+ 	intf->tx_spb_clean_index = 0;
+ 
+-	netif_napi_add_tx(intf->ndev, &intf->tx_napi, bcmasp_tx_poll);
+-
+ 	/* Make sure channels are disabled */
+ 	tx_spb_ctrl_wl(intf, 0x0, TX_SPB_CTRL_ENABLE);
+ 	tx_epkt_core_wl(intf, 0x0, TX_EPKT_C_CFG_MISC);
+@@ -806,26 +803,6 @@ static int bcmasp_init_tx(struct bcmasp_intf *intf)
+ 	tx_spb_dma_wq(intf, intf->tx_spb_dma_addr, TX_SPB_DMA_BASE);
+ 	tx_spb_dma_wq(intf, intf->tx_spb_dma_valid, TX_SPB_DMA_END);
+ 	tx_spb_dma_wq(intf, intf->tx_spb_dma_valid, TX_SPB_DMA_VALID);
+-
+-	return 0;
+-
+-free_tx_spb:
+-	dma_free_coherent(kdev, DESC_RING_SIZE, intf->tx_spb_cpu,
+-			  intf->tx_spb_dma_addr);
+-
+-	return ret;
+-}
+-
+-static void bcmasp_reclaim_free_all_tx(struct bcmasp_intf *intf)
+-{
+-	struct device *kdev = &intf->parent->pdev->dev;
+-
+-	/* Free descriptors */
+-	dma_free_coherent(kdev, DESC_RING_SIZE, intf->tx_spb_cpu,
+-			  intf->tx_spb_dma_addr);
+-
+-	/* Free cbs */
+-	kfree(intf->tx_cbs);
+ }
+ 
+ static void bcmasp_ephy_enable_set(struct bcmasp_intf *intf, bool enable)
+@@ -915,10 +892,7 @@ static void bcmasp_netif_deinit(struct net_device *dev)
+ 	bcmasp_enable_rx_irq(intf, 0);
+ 
+ 	netif_napi_del(&intf->tx_napi);
+-	bcmasp_reclaim_free_all_tx(intf);
+-
+ 	netif_napi_del(&intf->rx_napi);
+-	bcmasp_reclaim_free_all_rx(intf);
+ }
+ 
+ static int bcmasp_stop(struct net_device *dev)
+@@ -932,6 +906,8 @@ static int bcmasp_stop(struct net_device *dev)
+ 
+ 	bcmasp_netif_deinit(dev);
+ 
++	bcmasp_reclaim_free_buffers(intf);
++
+ 	phy_disconnect(dev->phydev);
+ 
+ 	/* Disable internal EPHY or external PHY */
+@@ -1073,17 +1049,12 @@ static int bcmasp_netif_init(struct net_device *dev, bool phy_connect)
+ 	intf->old_link = -1;
+ 	intf->old_pause = -1;
+ 
+-	ret = bcmasp_init_tx(intf);
+-	if (ret)
+-		goto err_phy_disconnect;
+-
+-	/* Turn on asp */
++	bcmasp_init_tx(intf);
++	netif_napi_add_tx(intf->ndev, &intf->tx_napi, bcmasp_tx_poll);
+ 	bcmasp_enable_tx(intf, 1);
+ 
+-	ret = bcmasp_init_rx(intf);
+-	if (ret)
+-		goto err_reclaim_tx;
+-
++	bcmasp_init_rx(intf);
++	netif_napi_add(intf->ndev, &intf->rx_napi, bcmasp_rx_poll);
+ 	bcmasp_enable_rx(intf, 1);
+ 
+ 	/* Turn on UniMAC TX/RX */
+@@ -1097,12 +1068,6 @@ static int bcmasp_netif_init(struct net_device *dev, bool phy_connect)
+ 
+ 	return 0;
+ 
+-err_reclaim_tx:
+-	netif_napi_del(&intf->tx_napi);
+-	bcmasp_reclaim_free_all_tx(intf);
+-err_phy_disconnect:
+-	if (phydev)
+-		phy_disconnect(phydev);
+ err_phy_disable:
+ 	if (intf->internal_phy)
+ 		bcmasp_ephy_enable_set(intf, false);
+@@ -1118,6 +1083,10 @@ static int bcmasp_open(struct net_device *dev)
+ 
+ 	netif_dbg(intf, ifup, dev, "bcmasp open\n");
+ 
++	ret = bcmasp_alloc_buffers(intf);
++	if (ret)
++		return ret;
++
+ 	ret = clk_prepare_enable(intf->parent->clk);
+ 	if (ret)
+ 		return ret;
 -- 
 2.34.1
 
 
---000000000000979bd80612619077
+--000000000000b22e2b06126190e6
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -195,14 +467,14 @@ sDL+OV16G+F9CkNMN3txsym8Nnx5WAYZb6+rBUIhMGz70V05xsHQfzvo2s7f0J1tJ5BoRlPPhL0h
 VOnWA3h71u9TfSsv+PXVm3P21TfOS2uc1hbzEqyENCP4i5XQ0rv0TmPW42GZ0o4xggJtMIICaQIB
 ATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhH
 bG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwj8BKLXNpALfemdRAwDQYJ
-YIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEINoFRhW65NVcOM3SsWqDAT2GFmMWd+Zx2nvw
-J/dqfjyFMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIyNzE4
-NTUwN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
+YIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIG8958gyjCcfu0ZInQImrERbxjENyLbelDDq
+HHhlWMI7MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIyNzE4
+NTUwOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
 AwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATAN
-BgkqhkiG9w0BAQEFAASCAQBd0t7X4YQ8p8basrLixU1l0u0bzP8DSt+qrK4rxRocfUtpifcMPClS
-Ue0o0h9gX7aWnHQK9HhKJSJ4QEw61Vg+7IYTrNwBa+HAz1ZX267HwKZSqc9HhV7PyzJxNE5KtOXS
-szOSaAevZHfAEHHk63irSGFjlop+r8XSV2C99e+8hE3UE5cqTyzWF2oXdof0teJg6x+6miZom8ME
-RyuRSI1ZlggQEktYJkOKFRkZFuLwEhfv2AgVDX16GKDpOXYt6GWklZ9wlB10Cd/0dN5FTlLlhYVN
-xDd9JKhv8L8GvMjyGJpUR4pYcfXQHCUXoRItqSiEejRbRFEVS82N/DvxJOE+
---000000000000979bd80612619077--
+BgkqhkiG9w0BAQEFAASCAQCIY0q2KRS/xk8DOP1HZnmGqH1yOVouVVZSgopqxmFXRsG0qOtLqk/Y
+6tDqxJxk68FFGUiKB4ABmpZqA4aKtIg7zjgPDqIoeGcuEUlQ1j3kbXtJ97pi5C86X7VBJhkdcf42
+N5Xqoz63fhmjq4uMpyfm3seHvo/D+SoTqXCKwy+mjyG8l1JiU6rMUZGmD++POWFE2Fp0u1RjTTB8
+bfYQP3PbMlu73TbhW6cmPlwdnH3llHzlnJqej+/RAPAucNkTOvUlDAcGzmKQn7ZJcES1ORQpgacK
+yfaURqioE/JPpQ3s2rN0GPj0wFVa7a6Ds7mdtQ1coL3L22cJjUq+gSVncOlt
+--000000000000b22e2b06126190e6--
 
