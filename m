@@ -1,126 +1,114 @@
-Return-Path: <netdev+bounces-75466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30AE986A030
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 20:28:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C3D386A094
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 20:55:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E10A9289350
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 19:28:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 791EDB27944
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 19:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D36951C5A;
-	Tue, 27 Feb 2024 19:27:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA65D51C50;
+	Tue, 27 Feb 2024 19:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="GKdYn0b8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qs4BWPQg"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE2C52F70;
-	Tue, 27 Feb 2024 19:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14D3EEDD;
+	Tue, 27 Feb 2024 19:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709062070; cv=none; b=KvAmxOUsaqANd3Cy+riQwcVu/SvVN/5rE9Y/hwz6XTsrS4Y3YXbMpqtzv5As/DdGhLnBx4Ol4nVUcKIMHt0sGA5XO7LmPD+5g96HiWP70PFG1ZpaZdCGAKtdwrSej3EulUIGLFCqv4PKTNcyJkM07TuPtcIGcWMXEf9JEe6OhIk=
+	t=1709062214; cv=none; b=jdonQYtPUORdVEvuvLgcFOJx/qfuVRucppWT72Jo4mfzrI+cHf0jSWkRXk3MT0Nl3MTnBrSkhUqxlQ9We0cAHBikfZbkSyH4dYK2gcR1Y5mwL2zlJb7re5/FpknxnpGuqruD36f03XrisEbO4awKXAR/IuSK79f3a8pUrJPhoJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709062070; c=relaxed/simple;
-	bh=5oEm1RChv3GL4arXwxEkGvioNYmhvDkfvFKj6EpBLz8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=htsDmEtG0kpWea9jP1o04Sshu1zyOTz45zzybapDqv9lRAvO4OzDDusPsf9u+NM49EGz1jLqhB30nWwjAhdSh8fsBgXrvufB91yKei5tMtCo6WzC45A/kX5Stfz+T5ccW21gKxOrz4Ibr7e/pp4dneSRFth/OEQ8tNX/Nq0JxHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=GKdYn0b8; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=5oEm1RChv3GL4arXwxEkGvioNYmhvDkfvFKj6EpBLz8=;
-	t=1709062066; x=1710271666; b=GKdYn0b8DoL8SZwBHXpwpsTgyAoAwYK4M00sIeO0dQy8Gp+
-	GWDauXoQx3RDFmXhdP511AqE7nc/ji05pm7B0v9KMfzejewjD9G8ppCXgkmlxSRZChMbqapHc0ZF9
-	TXjcobIh2W/uJGtFnqPf+H6bqC5FFb2mgaGfx36Xch/PR8kOYActAl6hfH+6bHbeViZjevw9YQD0b
-	EIbARL8TeGR8zTrfwbz2bpCzNnl9UAuLPzLi4QiChWw7mUGKFCT+duagmbPGbYv8VEQhxIjgrcYx6
-	sSFKv3/XdtYjiGVGmU4VGfJzgwkgSzXCK4jFDEzTQNQZKSYZ+u7b6nP3Sdy+xf5Q==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rf378-0000000Auqj-49jd;
-	Tue, 27 Feb 2024 20:27:43 +0100
-Message-ID: <c5cb0ce3a940fa65eee4b5f9d5000da91cf35829.camel@sipsolutions.net>
-Subject: Re: [PATCH 1/1] wifi: nl80211: Add support for plumbing SAE groups
- to driver
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jeff Johnson <quic_jjohnson@quicinc.com>, Jakub Kicinski
- <kuba@kernel.org>
-Cc: Kalle Valo <kvalo@kernel.org>, Vinayak Yadawad
-	 <vinayak.yadawad@broadcom.com>, linux-wireless@vger.kernel.org, 
-	jithu.jance@broadcom.com, Arend van Spriel <arend.vanspriel@broadcom.com>, 
-	netdev@vger.kernel.org
-Date: Tue, 27 Feb 2024 20:27:41 +0100
-In-Reply-To: <0da40ae1-c033-4089-a64e-27d16bce7ab6@quicinc.com>
-References: 
-	<309965e8ef4d220053ca7e6bd34393f892ea1bb8.1707486287.git.vinayak.yadawad@broadcom.com>
-	 <87mss6f8jh.fsf@kernel.org>
-	 <2c38eaed47808a076b6986412f92bb955b0599c3.camel@sipsolutions.net>
-	 <20240213174314.26982cd8@kernel.org>
-	 <6641f3f90bdc1d24f3a7fd795be672ce02685630.camel@sipsolutions.net>
-	 <0da40ae1-c033-4089-a64e-27d16bce7ab6@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1709062214; c=relaxed/simple;
+	bh=WtsUJfgn8IaWoMU4stYEKnDjr95yzayhTgBN8SNHDA4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uXVP/6Kn5yQaD+3guf0HlR5Y8iTSlS3oC51xviyZDvrMqRgKPaMnG/7CcC+wh3GUQN+zc5FS3RjRtVGhu7MntWRnu9JatbqkwL2pM/ev+iAjrzcERSt0mTWjzD5fuQ4HkI46cetopQMOVJ8lfUKrAt84EQqQA09DT+Zku6NhJFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qs4BWPQg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 692C2C433C7;
+	Tue, 27 Feb 2024 19:30:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709062214;
+	bh=WtsUJfgn8IaWoMU4stYEKnDjr95yzayhTgBN8SNHDA4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qs4BWPQg/AxovE4vrnNcsqcVAfH4EbdUaa3yGk5wJaqQnT489fBrU0Ax2PRwgwqVU
+	 PD/dzqH8B9UC57hh5XSN527SyU9c5ztQOHhoX2JWN18FgG+cJ3iXAoHhuSaANeejqS
+	 nPx7IWexL4GR1KUeS9MKmMkPqNqLfDbp2mMemXOwokT949OVvNMt02p6Udd2f3r/67
+	 usy94APC6iIEaT0SgNjlBQbLgbJswY0lLszqZaWBr5p0bKQuSLk8PCKU07w9uEFOsp
+	 gX36Wim2Rc2SS04vW6t5mIpBYy8kqD9VNYUNa750sBWvNaOkG4M4xnalc8cRLMl1l/
+	 XHfdkttH+oIbg==
+Date: Tue, 27 Feb 2024 19:30:09 +0000
+From: Simon Horman <horms@kernel.org>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 16/16] net: dsa: vsc73xx: start treating the
+ BR_LEARNING flag
+Message-ID: <20240227193009.GO277116@kernel.org>
+References: <20240223210049.3197486-1-paweldembicki@gmail.com>
+ <20240223210049.3197486-17-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240223210049.3197486-17-paweldembicki@gmail.com>
 
-Hi,
+On Fri, Feb 23, 2024 at 10:00:46PM +0100, Pawel Dembicki wrote:
+> This patch implements .port_pre_bridge_flags() and .port_bridge_flags(),
+> which are required for properly treating the BR_LEARNING flag. Also,
+> .port_stp_state_set() is tweaked and now disables learning for standalone
+> ports.
+> 
+> Disabling learning for standalone ports is required to avoid situations
+> where one port sees traffic originating from another, which could cause
+> invalid operations.
+> 
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 
-Sorry, I buried this thread because I thought I needed more time to
-respond than I had two weeks ago, and then forgot about it. My bad.
+...
 
-On Wed, 2024-02-14 at 08:57 -0800, Jeff Johnson wrote:
-> There are good reasons these out-of-tree drivers exist, but there is
-> also a movement, at least for the Qualcomm infrastructure products, to
-> transition to an upstream driver, in part due to customer requests. So
-> it is disconcerting that you are talking about inserting barriers to
-> converting to an upstream driver.
+> +static int vsc73xx_port_bridge_flags(struct dsa_switch *ds, int port,
+> +				     struct switchdev_brport_flags flags,
+> +				     struct netlink_ext_ack *extack)
+> +{
+> +	if (flags.mask & BR_LEARNING) {
+> +		struct vsc73xx *vsc = ds->priv;
+> +		u32 val = flags.val & BR_LEARNING ? BIT(port) : 0;
 
-FWIW, I don't think of what I wrote as advocating for *inserting*
-barriers that didn't already exist today.
+Hi Pawel,
 
-> But we need our userspace interfaces to survive since both
-> Qualcomm and our customers have years of work invested in the existing
-> userspace interfaces and applications. The customers who want an
-> upstream driver do not want to be forced to rewrite their applications
-> to support it.
+as it seems there will be a new revision anyway,
+please consider arranging local variables in reverse xmas tree order -
+longest line to shortest.
 
-Then maybe they don't _really_ want an upstream driver? What's their
-reasoning for wanting an upstream driver anyway - usually it ends up
-being something around upstream's checks & balances, etc. But not
-inventing gratuitous API differences is part of those?
+> +
+> +		return vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+> +					   VSC73XX_LEARNMASK, BIT(port), val);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int vsc73xx_port_bridge_join(struct dsa_switch *ds, int port,
+>  				    struct dsa_bridge bridge,
+>  				    bool *tx_fwd_offload,
 
-> In the kernel we have a clear mantra to not break userspace. That should
-> hopefully hold true when converting from an out-of-tree driver to an
-> upstream one.
-
-No, not at all? The kernel's policy of not breaking userspace
-unsurprisingly only extends to ... the kernel. Whatever happened out of
-tree isn't covered, and really shouldn't be. It doesn't even really
-quite extend to staging. And this policy is actually often a reason
-_not_ to include something in the kernel, until userspace interfaces
-stabilize.
-
-And since this was prompted by my mention of vendor APIs: Our upstream
-stance on vendor APIs has been debated and consequently documented here:
-https://wireless.wiki.kernel.org/en/developers/documentation/nl80211#vendor=
--specific_api
-
-As far as I'm concerned, there's no intention of deviating from that
-policy for the purpose of getting a currently non-upstream driver into
-the tree.
-
-johannes
+...
 
