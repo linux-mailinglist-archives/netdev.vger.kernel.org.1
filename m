@@ -1,110 +1,149 @@
-Return-Path: <netdev+bounces-75290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A790869024
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 13:18:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 233C2869028
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 13:19:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BA121F20419
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 12:18:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C937B2851C
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 12:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D7313F006;
-	Tue, 27 Feb 2024 12:11:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="pFoFW4zk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 523E91420DB;
+	Tue, 27 Feb 2024 12:12:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-226.siemens.flowmailer.net (mta-64-226.siemens.flowmailer.net [185.136.64.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3FC152E15
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 12:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.226
+Received: from zg8tmtu5ljg5lje1ms4xmtka.icoremail.net (zg8tmtu5ljg5lje1ms4xmtka.icoremail.net [159.89.151.119])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F911420C4;
+	Tue, 27 Feb 2024 12:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.89.151.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709035875; cv=none; b=GpWkOT7T5UThmel+wKb7Qz1a/ZGjtG0uY2shYEvAwKLvbcNimg938euZ9EfpMdH85XXevAEoVLHxsU9E/LCV6vFO07mH5qbdnhBUIAxarYa1RdotMEYQVix6faDDWEtVc73Uc3iunbnHKj5lM/ZOPzJnX8XKX10oJWgS5aXIvJA=
+	t=1709035924; cv=none; b=cD2Vt1M3OBeCIMo9gtqPeHZdELYwRavsVG+HD1vwW/LhK4sILgyiWaA1Of2mk9lI5+cu1FzYZ7oaLXzddu4jwN3BWj2T4PcbyAmv76tgqAF5a/S/0cCoBWJep3B9QffoN6/E2TsOazIcdyt3fGBG17zP9m3qnCXY4ea3ivesvus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709035875; c=relaxed/simple;
-	bh=wWTB3jhcJ0oZeCQ+b5jX7kxughQcPsjLXE0O7Mg4Y7c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BBC+D7hOe9Q1gmg6V0k/zRsrFQXOnaNbWeeqiJYxFSBjqc8Hmh57B01AF+U345u0OdyfB/mrJPk+um7bFyZ7VgV4yQn7xXYneOWHaDACJf2547TRJg2P37+Ehag/0480TBl0vcJR0b0bzPSc5H+BsEMV+rMD7wo5FlEMmoHI5JY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=pFoFW4zk; arc=none smtp.client-ip=185.136.64.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-64-226.siemens.flowmailer.net with ESMTPSA id 2024022712110731e122f39635ed4a49
-        for <netdev@vger.kernel.org>;
-        Tue, 27 Feb 2024 13:11:07 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
- d=siemens.com; i=diogo.ivo@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=O4S0Er+CAc0f8Drx3m9bkNCFpGySo/QqbYv0Z8fVrCM=;
- b=pFoFW4zkFNKZwdelmHAg4DQd9e8i2/fZoKXMQv+hPir8zFwQIJ9SwQ/jUJ+Y3kYfugkREu
- w6ILhOcNiquG/uNfFGoz/n4ahptawGKQHVLU+1fESyUYm/pwLH/5tvtHIkbAWYZIlGEUEzyZ
- yrNRbJm4Tc9ulJs+QkN9rtq2GkYwY=;
-Message-ID: <45e85d07-4cbc-47e7-a758-e4d666a3c3a9@siemens.com>
-Date: Tue, 27 Feb 2024 12:11:06 +0000
+	s=arc-20240116; t=1709035924; c=relaxed/simple;
+	bh=PRbPf7BCbHwK2buRz5uodWE7f30oFbcZYo5Q4brrAI0=;
+	h=From:To:Subject:Date:Message-Id; b=iAC/sgcYIPoNB4azTdQN6Sfbo8vSrb9jFCUqiYs+n9ysRj7V6+gLp6vK14PJoFMHcuoa9nkhtyx2xz4gQ0BcR1HcnxXvsFo7c8jg3yQK+H2Bb1fQRv50kMDfWdLQ7/+gOiWhj6wnUiSmbJ6edCL/2aT0Q8MFuqCObO7ZzREZ8l0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=159.89.151.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from localhost.localdomain (unknown [125.120.153.166])
+	by mail-app2 (Coremail) with SMTP id by_KCgCXTa550d1lORdMAg--.22855S4;
+	Tue, 27 Feb 2024 20:11:38 +0800 (CST)
+From: Lin Ma <linma@zju.edu.cn>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	idosch@nvidia.com,
+	razor@blackwall.org,
+	jiri@resnulli.us,
+	lucien.xin@gmail.com,
+	linma@zju.edu.cn,
+	edwin.peer@broadcom.com,
+	amcohen@nvidia.com,
+	pctammela@mojatatu.com,
+	liuhangbin@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] rtnetlink: fix error logic of IFLA_BRIDGE_FLAGS writing back
+Date: Tue, 27 Feb 2024 20:11:28 +0800
+Message-Id: <20240227121128.608110-1-linma@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:by_KCgCXTa550d1lORdMAg--.22855S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxGr4ftw47Cw4fWr4xuFyDWrg_yoW5Gw18pF
+	4rKa42qF4kJrn7Zr47JF4UZayavrs7GFW8Cr4Yyw10yr1aqF1ruFZ7KFy3uFyayFZrAr17
+	XF1qyFW5XanxCFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
+	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUQID7UUUUU=
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH net-next v3 08/10] net: ti: icssg-prueth: Add functions to
- configure SR1.0 packet classifier
-Content-Language: en-US
-To: Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew@lunn.ch, dan.carpenter@linaro.org,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
-Cc: jan.kiszka@siemens.com, diogo.ivo@siemens.com
-References: <20240221152421.112324-1-diogo.ivo@siemens.com>
- <20240221152421.112324-9-diogo.ivo@siemens.com>
- <38090ee4-30c2-46b3-b16d-ae0836c640ca@kernel.org>
-From: Diogo Ivo <diogo.ivo@siemens.com>
-In-Reply-To: <38090ee4-30c2-46b3-b16d-ae0836c640ca@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-1320519:519-21489:flowmailer
 
-On 2/26/24 17:26, Roger Quadros wrote:
-> 
-> 
-> On 21/02/2024 17:24, Diogo Ivo wrote:
->> Add the functions to configure the SR1.0 packet classifier.
->>
->> Based on the work of Roger Quadros in TI's 5.10 SDK [1].
->>
->> [1]: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.ti.com%2Fcgit%2Fti-linux-kernel%2Fti-linux-kernel%2Ftree%2F%3Fh%3Dti-linux-5.10.y&data=05%7C02%7Cdiogo.ivo%40siemens.com%7C5db0233cf1944b0b012808dc36f0214c%7C38ae3bcd95794fd4addab42e1495d55a%7C1%7C0%7C638445652187413851%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=u4p0vZ6LCPScUuYuwCB2iJFm6uoz%2BDMesVWnTgwg1hs%3D&reserved=0
->>
->> Co-developed-by: Jan Kiszka <jan.kiszka@siemens.com>
->> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
->> Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
->> ---
->> Changes in v3:
->>   - Replace local variables in icssg_class_add_mcast_sr1()
->>     with eth_reserved_addr_base and eth_ipv4_mcast_addr_base
->>
+In the commit d73ef2d69c0d ("rtnetlink: let rtnl_bridge_setlink checks
+IFLA_BRIDGE_MODE length"), an adjustment was made to the old loop logic
+in the function `rtnl_bridge_setlink` to enable the loop to also check
+the length of the IFLA_BRIDGE_MODE attribute. However, this adjustment
+removed the `break` statement and led to an error logic of the flags
+writing back at the end of this function.
 
-...
+if (have_flags)
+    memcpy(nla_data(attr), &flags, sizeof(flags));
+    // attr should point to IFLA_BRIDGE_FLAGS NLA !!!
 
->> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
->> index e6eac01f9f99..7d9db9683e18 100644
->> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
->> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
->> @@ -437,7 +437,7 @@ static int emac_ndo_open(struct net_device *ndev)
->>   	icssg_class_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
->>   	icssg_ft1_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
->>   
->> -	icssg_class_default(prueth->miig_rt, slice, 0);
->> +	icssg_class_default(prueth->miig_rt, slice, 0, false);
-> 
-> Should you be passing emac->is_sr1 instead of false?
+Before the mentioned commit, the `attr` is granted to be IFLA_BRIDGE_FLAGS.
+However, this is not necessarily true fow now as the updated loop will let
+the attr point to the last NLA, even an invalid NLA which could cause
+overflow writes.
 
-Given that this is the SR2.0 driver we know that bool is_sr1 will always
-be false, is there an advantage in passing emac->is_sr1 rather than
-false directly?
+This patch introduces a new variable `br_flag` to save the NLA pointer
+that points to IFLA_BRIDGE_FLAGS and uses it to resolve the mentioned
+error logic.
 
-Best regards,
-Diogo
+Fixes: d73ef2d69c0d ("rtnetlink: let rtnl_bridge_setlink checks IFLA_BRIDGE_MODE length")
+Signed-off-by: Lin Ma <linma@zju.edu.cn>
+---
+v1 -> v2: rename the br_flag to br_flags_attr which offers better
+          description suggested by Nikolay.
+
+ net/core/rtnetlink.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 9c4f427f3a50..ae86f751efc3 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -5169,10 +5169,9 @@ static int rtnl_bridge_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	struct net *net = sock_net(skb->sk);
+ 	struct ifinfomsg *ifm;
+ 	struct net_device *dev;
+-	struct nlattr *br_spec, *attr = NULL;
++	struct nlattr *br_spec, *attr, *br_flags_attr = NULL;
+ 	int rem, err = -EOPNOTSUPP;
+ 	u16 flags = 0;
+-	bool have_flags = false;
+ 
+ 	if (nlmsg_len(nlh) < sizeof(*ifm))
+ 		return -EINVAL;
+@@ -5190,11 +5189,11 @@ static int rtnl_bridge_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	br_spec = nlmsg_find_attr(nlh, sizeof(struct ifinfomsg), IFLA_AF_SPEC);
+ 	if (br_spec) {
+ 		nla_for_each_nested(attr, br_spec, rem) {
+-			if (nla_type(attr) == IFLA_BRIDGE_FLAGS && !have_flags) {
++			if (nla_type(attr) == IFLA_BRIDGE_FLAGS && !br_flags_attr) {
+ 				if (nla_len(attr) < sizeof(flags))
+ 					return -EINVAL;
+ 
+-				have_flags = true;
++				br_flags_attr = attr;
+ 				flags = nla_get_u16(attr);
+ 			}
+ 
+@@ -5238,8 +5237,8 @@ static int rtnl_bridge_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 		}
+ 	}
+ 
+-	if (have_flags)
+-		memcpy(nla_data(attr), &flags, sizeof(flags));
++	if (br_flags_attr)
++		memcpy(nla_data(br_flags_attr), &flags, sizeof(flags));
+ out:
+ 	return err;
+ }
+-- 
+2.17.1
+
 
