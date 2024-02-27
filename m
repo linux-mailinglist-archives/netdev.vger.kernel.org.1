@@ -1,140 +1,168 @@
-Return-Path: <netdev+bounces-75288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA28B868FA5
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 13:05:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8246868FAB
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 13:06:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC1C61C213E1
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 12:05:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 207CDB27554
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 12:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CD0D13A24A;
-	Tue, 27 Feb 2024 12:05:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 885EB13A267;
+	Tue, 27 Feb 2024 12:06:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="RY9yAnaS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="caCQpkxQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-228.siemens.flowmailer.net (mta-64-228.siemens.flowmailer.net [185.136.64.228])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B727417F0
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 12:05:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF3B13A25B
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 12:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709035531; cv=none; b=UvuNzEBihQ6ekKWUYbO4/q8pdw9BWGp0GyVWzgrjl2iRSSKAbHmXMOgNfoK9rgiTOX33N5g9Fi2G62epb11GXLIWf4YvL13zEq+LauCdIbLY7VWZO3Fdm3U7kUjV5d6JRYBFo4muOnk2JodXp/UB4AXqROARN93rEsiUjfxVAGc=
+	t=1709035582; cv=none; b=SoiWF6z7s5BrzeqlmdiOEpkdDc3NtOdw4VCXvlzg7bEx5wG2Jrin2ETFKwuHbweHaaoyy7eBMKYjNxTXhyU5MJuHnOUlmmj7AEyV2bbeV5aQM5TmecjhVkOWkANq/nE+GKQIkUlYcDuY2u5e45jhdVkn2kh0+Y8bICNWukVU/eQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709035531; c=relaxed/simple;
-	bh=KilOZnPbGja8OjCgg5bSsmOJcGBOID+SVk/EPzR1HxE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hQz3nlbp5QxnKdudfnF4uKcwsYbIa8jMU7xvDxtN5aJhcoSxIxHnhv47b1qZuV3HtTETux5HV0SsdaJ0DsNK0P06qkjwXx3lQkUusNPMTKage7mOzk/bUwh1TTiP9R2OumC4HAim8bFS3z4PHmr6WHThSVwU4V6YqO2frVTlrr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=RY9yAnaS; arc=none smtp.client-ip=185.136.64.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-64-228.siemens.flowmailer.net with ESMTPSA id 20240227120520c1cbc54d560bc72789
-        for <netdev@vger.kernel.org>;
-        Tue, 27 Feb 2024 13:05:20 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
- d=siemens.com; i=diogo.ivo@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=JSS/Onm9x1STdhGhG8cPOY0JxtIy2ct7R/sNC7L4Urc=;
- b=RY9yAnaSw9MaQAKc+CDonDXv155xzAyfTsQCA5CaTVHhY3Ah21AVPPmHoYNHGs/kcDmd39
- EJlInKfI6UphtaugWCOyLQz2vSIPzkYZAtail+XHqgBPaSbudS84a0EoSlgBywq7LbOIYpOZ
- EFWUS2L67Z10gLPeXQyqcWAzecMfk=;
-Message-ID: <39ca8e5f-7fba-4f8c-a0f7-59153382bcf3@siemens.com>
-Date: Tue, 27 Feb 2024 12:05:14 +0000
+	s=arc-20240116; t=1709035582; c=relaxed/simple;
+	bh=fHI1d6xBEkYiAA/ZAX2kHnxTAnTB85e+e5bYpERBO0U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aRyIzTOpvWaHaxBFdtJPTSLuchBpCVoOC8rUFjxKnsnPZlVbPK1Y48KQ5W/utvZsT2+V1bsvYCTtr0LGxunduPBtL2KMolVhfwsnf80pcEJArpbQEmY7+Z2Oh8XVfzhLWHtf+METthDTaZVE0D7B62XlJ0j7CWheO9dlXKN/kgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=caCQpkxQ; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5654ef0c61fso10385a12.0
+        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 04:06:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709035579; x=1709640379; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mng29kRLwMiV7HMfeAIuZCWaSGikFSk8b3VmpAQhE4g=;
+        b=caCQpkxQrF7K4rcLb+H3U5AkmeHe9tT9nNVgZ+2L/lhCrFRLEDgB95QljSX8fDJTWb
+         zSmBzPXu1t9vY8tiukeDI5kZ9Lzd0lORBaRJd/Xcr2ZU4gA2aROtHOfNtLP9FxM+55DY
+         D6bDPKzZbWwoFvMrI5URmfSe40e8mxKp6e67zll+PbLmeJj17PfSX+3bBaUW3+3XW37O
+         f5s6CW5qyaTugNXEU1a6CBQnejo8rfDjJIqfN7TnEctC7Jdbq1FfIblrfirm6jrceFNi
+         8CCbz+/We86/SUQi6uy/hsyXEJSNTnAot+iogtNw8Z/eaR/n3Ufkp+VVOAtJmBmpQ1/A
+         vBQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709035579; x=1709640379;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Mng29kRLwMiV7HMfeAIuZCWaSGikFSk8b3VmpAQhE4g=;
+        b=ttincTbcBdI3hqr1x10R+4dyS2N46cy3twEx0ojK02RjFfiFM2kv35Nh/Jd99lLJFM
+         jyw6SoTJCVbVivM500wJygarYxqs+Xl5uztXDJKdzaRnunIXvswZyNm6zyjPg1+idtyF
+         6xiq0qLWn2xZJp6j3M7Fo1iBxLlXKFbGODdyB6NxQyI3KS2kmVkQlrkIUY0nHfDmppcl
+         BWdO3L2uDZZr/kS9HYEq/Mr6ctr78h/auoZWclfdqaEe+Jvj5e5JCn+og6kK6sxo+7dC
+         0uBIRNdGorCWzFAYYByEYu8JuJ1yeVR7U9IQ5lKPAYccn3HsRGwrpxuwM1HHzlRaof/i
+         7oVg==
+X-Forwarded-Encrypted: i=1; AJvYcCWvzDD3t3Mq1fvn4fcOmiesqbaWVbeP6LLJOzG0pu1huO8YS5kTgxbTwR1FM+ichMLfWG3KZX/47dmG2U8uR2/TYmyrdXft
+X-Gm-Message-State: AOJu0Yxz6h+1jlSiN1c+6Qx3zaGMiW8O3yC7S0AKjE/6lw9ajwawjcnT
+	DufDJ5cmtk5LnZ6M5nNXCvovn+DlU4J6A3e/KYf2P/OmRW35B8EvfuvsoKYHeSt5HNTjGSAeq1R
+	/GymTIdOn76YEj7QeVSyl+WxV7G1TpQcCn645SV18aMfqqFCxeCtS
+X-Google-Smtp-Source: AGHT+IE5EcpHCbJ1Yg8IJ94Wwtxjam+g/DMGz8KiexN4BekXdHWEn5VGWYgoIxKj/607A0rXf+xzt2FRv+kLIlx3QG8=
+X-Received: by 2002:a50:cd19:0:b0:565:4f70:6ed with SMTP id
+ z25-20020a50cd19000000b005654f7006edmr172276edi.6.1709035578750; Tue, 27 Feb
+ 2024 04:06:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v3 10/10] net: ti: icssg-prueth: Add ICSSG
- Ethernet driver for AM65x SR1.0 platforms
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, danishanwar@ti.com, rogerq@kernel.org, vigneshr@ti.com,
- arnd@arndb.de, wsa+renesas@sang-engineering.com, vladimir.oltean@nxp.com,
- andrew@lunn.ch, dan.carpenter@linaro.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, jan.kiszka@siemens.com,
- diogo.ivo@siemens.com
-References: <20240221152421.112324-1-diogo.ivo@siemens.com>
- <20240221152421.112324-11-diogo.ivo@siemens.com>
- <20240222133103.GB960874@kernel.org>
-From: Diogo Ivo <diogo.ivo@siemens.com>
-In-Reply-To: <20240222133103.GB960874@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-1320519:519-21489:flowmailer
+References: <20240227011041.97375-1-kuniyu@amazon.com> <20240227011041.97375-5-kuniyu@amazon.com>
+In-Reply-To: <20240227011041.97375-5-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 27 Feb 2024 13:06:07 +0100
+Message-ID: <CANn89iJErUHpaAqs=qzuD_WxqtBC1rqSh3n9sJ_zJKwHyPORmg@mail.gmail.com>
+Subject: Re: [PATCH v2 net 4/5] rds: tcp: Fix use-after-free of net in reqsk_timer_handler().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Allison Henderson <allison.henderson@oracle.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	rds-devel@oss.oracle.com, syzkaller <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/22/24 13:31, Simon Horman wrote:
-> On Wed, Feb 21, 2024 at 03:24:16PM +0000, Diogo Ivo wrote:
->> Add the PRUeth driver for the ICSSG subsystem found in AM65x SR1.0 devices.
->> The main differences that set SR1.0 and SR2.0 apart are the missing TXPRU
->> core in SR1.0, two extra DMA channels for management purposes and different
->> firmware that needs to be configured accordingly.
->>
->> Based on the work of Roger Quadros, Vignesh Raghavendra and
->> Grygorii Strashko in TI's 5.10 SDK [1].
->>
->> [1]: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.ti.com%2Fcgit%2Fti-linux-kernel%2Fti-linux-kernel%2Ftree%2F%3Fh%3Dti-linux-5.10.y&data=05%7C02%7Cdiogo.ivo%40siemens.com%7Cfebc5e0f6a1b476c366d08dc33aa89ee%7C38ae3bcd95794fd4addab42e1495d55a%7C1%7C0%7C638442054773860177%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=YxcCwUMV7Zzyycb1Ss6xoCq9BK1vYsvuoF30XXA2tRI%3D&reserved=0
->>
->> Co-developed-by: Jan Kiszka <jan.kiszka@siemens.com>
->> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
->> Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
-> 
-> ...
-> 
->> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
-> 
-> ...
-> 
+On Tue, Feb 27, 2024 at 2:12=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> syzkaller reported a warning of netns tracker [0] followed by KASAN
+> splat [1] and another ref tracker warning [1].
+>
+> syzkaller could not find a repro, but in the log, the only suspicious
+> sequence was as follows:
+>
+>   18:26:22 executing program 1:
+>   r0 =3D socket$inet6_mptcp(0xa, 0x1, 0x106)
+>   ...
+>   connect$inet6(r0, &(0x7f0000000080)=3D{0xa, 0x4001, 0x0, @loopback}, 0x=
+1c) (async)
+>
+> The notable thing here is 0x4001 in connect(), which is RDS_TCP_PORT.
+>
+> So, the scenario would be:
+>
+>   1. unshare(CLONE_NEWNET) creates a per netns tcp listener in
+>       rds_tcp_listen_init().
+>   2. syz-executor connect()s to it and creates a reqsk.
+>   3. syz-executor exit()s immediately.
+>   4. netns is dismantled.  [0]
+>   5. reqsk timer is fired, and UAF happens while freeing reqsk.  [1]
+>   6. listener is freed after RCU grace period.  [2]
+>
+> Basically, reqsk assumes that the listener guarantees netns safety
+> until all reqsk timers are expired by holding the listener's refcount.
+> However, this was not the case for kernel sockets.
+>
+> Commit 740ea3c4a0b2 ("tcp: Clean up kernel listener's reqsk in
+> inet_twsk_purge()") fixed this issue only for per-netns ehash, but
+> the issue still exists for the global ehash.
+>
+> We can apply the same fix, but this issue is specific to RDS.
+>
+> Instead of iterating ehash and purging reqsk during netns dismantle,
+> let's hold netns refcount for the kernel listener.
+>
+>
 
-...
+> Reported-by: syzkaller <syzkaller@googlegroups.com>
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Fixes: 467fa15356ac ("RDS-TCP: Support multiple RDS-TCP listen endpoints,=
+ one per netns.")
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>  net/rds/tcp_listen.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
+> index 05008ce5c421..2d40e523322c 100644
+> --- a/net/rds/tcp_listen.c
+> +++ b/net/rds/tcp_listen.c
+> @@ -274,8 +274,8 @@ struct socket *rds_tcp_listen_init(struct net *net, b=
+ool isv6)
+>         int addr_len;
+>         int ret;
+>
+> -       ret =3D sock_create_kern(net, isv6 ? PF_INET6 : PF_INET, SOCK_STR=
+EAM,
+> -                              IPPROTO_TCP, &sock);
+> +       ret =3D __sock_create(net, isv6 ? PF_INET6 : PF_INET, SOCK_STREAM=
+,
+> +                           IPPROTO_TCP, &sock, SOCKET_KERN_NET_REF);
+>         if (ret < 0) {
+>                 rdsdebug("could not create %s listener socket: %d\n",
+>                          isv6 ? "IPv6" : "IPv4", ret);
 
->> +	config.rx_flow_id = emac->rx_flow_id_base; /* flow id for host port */
->> +	config.rx_mgr_flow_id = emac->rx_mgm_flow_id_base; /* for mgm ch */
->> +	config.rand_seed = get_random_u32();
-> 
-> Hi Diogo and Jan,
-> 
-> The fields of config above are all __le32.
-> However the last three lines above assign host byte-order values to these
-> fields. This does not seem correct.
-> 
-> This is flagged by Sparse along with some problems.
-> Please ensure that new Sparse warnings are not introduced.
-> 
+If RDS module keeps a listener alive, not attached to a user process,
+netns dismantle will never occur.
 
-You are correct, thank you for catching the inconsistency, this will be
-fixed in v4.
+I think we have to cleanup SYN_RECV sockets in inet_twsk_purge()
 
-...
+Yes, it removes one optimization you did.
 
->> +static int emac_send_command_sr1(struct prueth_emac *emac, u32 cmd)
->> +{
->> +	dma_addr_t desc_dma, buf_dma;
->> +	struct prueth_tx_chn *tx_chn;
->> +	struct cppi5_host_desc_t *first_desc;
->> +	u32 *data = emac->cmd_data;
->> +	u32 pkt_len = sizeof(emac->cmd_data);
->> +	void **swdata;
->> +	int ret = 0;
->> +	u32 *epib;
-> 
-> In new Networking code please express local variables in reverse xmas tree
-> order - longest line to shortest.
-
-Noted, will fix for v4.
-
-...
-
-> There is also one such problem in Patch 06/10.
-Here xmastree reported the same problem in patch 08/10 rather than 
-06/10, I assumed you meant that one.
-
-Best regards,
-Diogo
+Perhaps add a counter of all kernel sockets that were ever attached to
+a netns in order to decide to apply the optimization.
+(keeping a precise count of SYN_RECV would be too expensive)
 
