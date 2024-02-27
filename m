@@ -1,106 +1,115 @@
-Return-Path: <netdev+bounces-75388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D059C869B58
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:56:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 46C45869B5F
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:56:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86FAA1F2676A
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 15:56:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F04861F21FE0
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 15:56:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B01E14601A;
-	Tue, 27 Feb 2024 15:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA91146E78;
+	Tue, 27 Feb 2024 15:56:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="KT/goUs3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TRFr+82x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72878148303
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 15:54:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F91514690A
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 15:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709049264; cv=none; b=oG4PgZlHujKhoOXW+XGZ1tqTDDPwoxgYu+bFnY3uDpTD6EG6QaWp4IR8YEw2BvIllf5K+T7Ju1mXxbK1WeR1YOh26fEQzhG+yQPTzTj8WCYfMQ11wxN6GfOeLqIVkPZdAM6UA52kArvIXz8Fwfm+A+ggtDy2O7wflnt3PtTjZL8=
+	t=1709049367; cv=none; b=ciXPza9WUqtFzgwirJGaBLhNhV5x6JJzQjrxgdCwHD0J0EuGB8eziHE25fxz1YNUisKWS4GTvy9py+501F3p469Dmq6BuakSyVZYlYNFJkfc4kW8WonlhxuThBCcFrz+mJvSkwQHet/OfS1aGyONC6V5rT+uV20NcmOBharNRw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709049264; c=relaxed/simple;
-	bh=oq8mUdG/jkS0lSxlKIdzxgum2wxYbcShGcVGCSN2uWM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UmzikyaouJc1kE4wtR5Gipj6hCP7qZiQ1HloY50Chd+ywoWJyRS9SU1Q3GY6MFFERPLjm2r4WShD9YSjZR9PkxNZ4h9hgsPbSdyz6+03l27dvDEJd3hQAt5VjVz2mwsTxsaHIOJufndjDcLEvAov67ZA3AzTeBYYhexHc2njFnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=KT/goUs3; arc=none smtp.client-ip=209.85.219.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-dcd9e34430cso4767185276.1
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 07:54:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1709049261; x=1709654061; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fYuQmAMRp17o2iSEsObXlVBh4IvpFKiYHuMKIilc630=;
-        b=KT/goUs3G4tkhAzI0sG2QwyBx+hLl2Od3Se2eNjcKekdDmi2OTyO1/aAYWTAfbQsWV
-         UWlvoasjW0ASPMCxC1kgUphitOyxXdtAF8MXhEi1DHwFLLG4VmdTINzANZyxGahPVQlp
-         iW90VUNoV4PkoTrzDIoCwnsXfhrxYBkqRvvTo/c+Drte0qU5laL7I9hBFUpyvLTPMHg/
-         IG+FqnmYBH4Q7kFvcI3wtVVs2wyYMR7MqL7K8PNS8YSeIOnaeZOlembGr4J62TfA+rKr
-         BkaBeV1MlzTOSgefK3LMLsTuQui6jO+s/zKPtQ5VQ2Tzt/rFKEO0lGBsuyInv6HRqEf4
-         yx2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709049261; x=1709654061;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fYuQmAMRp17o2iSEsObXlVBh4IvpFKiYHuMKIilc630=;
-        b=lYeSfdWTokXB9SZclNyWc8Vnq8LC/Mht51VHKdlAy6MAricjI8psHXBJxrJNOgA0xT
-         Iuu1/Ez72TFHhugV44Trt5ECP4QxU2YVvAxeYYR3KEeg6MhRnHkNC8XDVlYL881wG23f
-         fdrV+f6wKsqXGRorl+em6HNhSYE3KhzW0bTdwyqQIm+CqKG3o3vqxe0nmEuCcCbllCF8
-         vJzRHMEmUZD1JzodhJ6lC+E6haHArB6Ns8Uff9o+1uWszVRAW+4EM8FSkyQOsauDs/ML
-         p8tCv3a07JiDY4+GFrE59Ylr0fTdkKYtIl6DVRXdCfxV6yEhnZ5DUrajJOOQj8BG54hn
-         AzgQ==
-X-Gm-Message-State: AOJu0YyXK7cuv8dJuG9jUkMUfX5/QSH2YrGLP5HwAvFx2JrMDOUJ3qGm
-	wKMdD2IvWyBBpdaAwBMap2pkMdnRKERpCfFVrP7+IkCHhsUWDy/HuRdz5RJ0PT+X2vEa5kPBWHu
-	/N8EoIavIhYM46kzuSVMecxfADN9domdUjzoY
-X-Google-Smtp-Source: AGHT+IF63JmM1ee0bnDzpGok1tjmtP5zb7sX/putD3q/YfGjFjhrbQZXgNVFBvpTSzx7Pyt+wxsNf5D6Y/3UmDUaE7A=
-X-Received: by 2002:a25:aba8:0:b0:dc7:443d:d9da with SMTP id
- v37-20020a25aba8000000b00dc7443dd9damr238618ybi.4.1709049261467; Tue, 27 Feb
- 2024 07:54:21 -0800 (PST)
+	s=arc-20240116; t=1709049367; c=relaxed/simple;
+	bh=QFelD9gLAoanges+RCJzjDEagMHCJVtY8FQKqVkcovE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EL4TiEroN9qzRA7bhIoAL2svWj5WUaTy4pwLL15snYDhxi/xnrXJvkMSinZ6BgMA0eaZ+CWv6EkV1CBywbOuPsvBCxrKXPZ1JnCsDWoYTyoWTpucJVNcmDVslbB5RSdw5xJS87QLahaYgoDxzstwZjuHdIY+AkiN00unc1tA7M8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TRFr+82x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C118C433C7;
+	Tue, 27 Feb 2024 15:56:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709049366;
+	bh=QFelD9gLAoanges+RCJzjDEagMHCJVtY8FQKqVkcovE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TRFr+82x4dL6Yqsk+GVlsE101cD4SkAjUdmIne0ns+ADGbppPaqrtwayEPMudVoTm
+	 qfiiqQeRfBJE1jBFoosSqEApXYgOHEyF1xXfYmOaeku+7j1xCuTR5Tjdi0KczoG39U
+	 taoBX819szPdLmn/DwcaqYlONQjEpwWrtaoF2DguHXj2YncT5z8BqSWFDmJ/D+HG0w
+	 ZCojIbAP4KlHnQTbrWokshBA99ezS/VK+CsEGMsuaIC/AcPcEaLVqmvcdg24a22o3I
+	 j1+BWpJzBH01ORN9tK7DEWAduz03B+2dfBtMoVZmmmo+I3vyC8ZYVCIRN4/e1A2V5s
+	 TS1N537b4EwKw==
+Date: Tue, 27 Feb 2024 07:56:05 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, jiri@resnulli.us, sdf@google.com,
+ nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next 00/15] tools: ynl: stop using libmnl
+Message-ID: <20240227075605.18ec70b8@kernel.org>
+In-Reply-To: <m2ttlumbax.fsf@gmail.com>
+References: <20240222235614.180876-1-kuba@kernel.org>
+	<CAD4GDZzF55bkoZ_o0S784PmfW4+L_QrG2ofWg6CeQk4FCWTUiw@mail.gmail.com>
+	<20240223083440.0793cd46@kernel.org>
+	<m27ciroaur.fsf@gmail.com>
+	<20240226100020.2aa27e8f@kernel.org>
+	<m2ttlumbax.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240227093604.3574241-1-shaozhengchao@huawei.com>
-In-Reply-To: <20240227093604.3574241-1-shaozhengchao@huawei.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Tue, 27 Feb 2024 10:54:10 -0500
-Message-ID: <CAHC9VhQVdEsvSf0zqOTnduJChcQ+S26N=3vy0x_6n0QDDP04FA@mail.gmail.com>
-Subject: Re: [PATCH net-next] netlabel: remove impossible return value in netlbl_bitmap_walk
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, weiyongjun1@huawei.com, yuehaibing@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 27, 2024 at 4:28=E2=80=AFAM Zhengchao Shao <shaozhengchao@huawe=
-i.com> wrote:
->
-> Since commit 446fda4f2682 ("[NetLabel]: CIPSOv4 engine"), *bitmap_walk
-> function only returns -1. Nearly 18 years have passed, -2 scenes never
-> come up, so there's no need to consider it.
->
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> ---
->  net/ipv4/cipso_ipv4.c        | 5 +----
->  net/ipv6/calipso.c           | 5 +----
->  net/netlabel/netlabel_kapi.c | 2 +-
->  3 files changed, 3 insertions(+), 9 deletions(-)
+On Tue, 27 Feb 2024 10:49:42 +0000 Donald Hunter wrote:
+> > +static inline bool
+> > +__ynl_attr_put_overflow(struct nlmsghdr *nlh, size_t size)
+> > +{
+> > +	bool o;
+> > +
+> > +	/* We stash buffer length on nlmsg_pid. */
+> > +	o = nlh->nlmsg_len + NLA_HDRLEN + NLMSG_ALIGN(size) > nlh->nlmsg_pid;  
+> 
+> The comment confused me here. How about "We compare against stashed buffer
+> length in nlmsg_pid".
 
-Looks good to me, thanks for the patch.
+The comment should give context, rather than describe the code so how
+about:
 
-Acked-by: Paul Moore <paul@paul-moore.com>
+	/* ynl_msg_start() stashed buffer length in nlmsg_pid. */
 
---=20
-paul-moore.com
+> > +	if (o)
+> > +		nlh->nlmsg_pid = YNL_MSG_OVERFLOW;  
+> 
+> It took me a moment to realise that this behaves like a very short
+> buffer length for subsequent calls to __ynl_attr_put_overflow(). Is it
+> worth extending the comment in ynl_msg_start() to say "buffer length or
+> overflow status"?
+
+Added:
+		/* YNL_MSG_OVERFLOW is < NLMSG_HDRLEN, all subsequent checks
+		 * are guaranteed to fail.
+		 */
+SG?
+
+> > +	return o;
+> > +}
+> > +
+> >  static inline struct nlattr *
+> >  ynl_attr_nest_start(struct nlmsghdr *nlh, unsigned int attr_type)
+> >  {
+> >  	struct nlattr *attr;
+> >  
+> > +	if (__ynl_attr_put_overflow(nlh, 0))
+> > +		return ynl_nlmsg_end_addr(nlh) - NLA_HDRLEN;  
+> 
+> Is the idea here to return a struct nlattr * that is safe to use?
+> Shouldn't we zero the values in the buffer first?
+
+The only thing that the attr is used for is to call ynl_attr_nest_end().
+so I think zero init won't make any difference.
 
