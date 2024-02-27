@@ -1,135 +1,142 @@
-Return-Path: <netdev+bounces-75375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA74F869A42
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:24:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FDEC869A4C
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 16:25:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC1A21C22871
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 15:24:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 257A328427D
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 15:25:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C9B713DBA4;
-	Tue, 27 Feb 2024 15:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 636F614264A;
+	Tue, 27 Feb 2024 15:25:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sNkXWKNU"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="fJJmsRjF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6752C130E2A
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 15:24:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4A6146009
+	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 15:25:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709047446; cv=none; b=dc6FRIl3+Z1GUmWlsCx5l4nGxJHpcld9wds2Gi1kOFEx7NpaGFBQOlgQQm5VHCzMhWFvrfjNDpQV6Hhr0JDZYOKGKgWLmBlMaoKmAVahrCgPcRHM0fZvpjNRrDJT2zaXpySJhefrikwdz98Fiu50rIq8CtZc+0AKu+dnQ9XZ+sI=
+	t=1709047532; cv=none; b=Bb2k39k0EVgOA0Bk92tmwC9U4pErs7H0aXzAw2Z0INIZdeX/1uLrlYVK94CTMpAVpB/6/IIoFlrfZpEhYamb89bxpLrkLK7HgvlXIPEUVB0DhqEGIWXebQGdNC5EiVaFFjDfxtbnYeGO+ksTtoUuq4FX3AKzW4I8I310mA/RuEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709047446; c=relaxed/simple;
-	bh=YyV9pkz56Afk6K/nZFq9LuTx+0xHcvZauMtAkG6vPUg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sx9uxy5xOq+8mO9KsV7tEaost2paUPwEK2T0CaGt5rvRtEPk0bBOXfui8Rx508HJeDWFByrZiZrobk0WpvJHyxT2ghAq+poTQ4tws6a14RRqpS3mjcNv55Z32BuizVfJxfdrfSWtRSBijExfjWtyGRl+eRzmPsGGCOMZQlExW6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sNkXWKNU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 701BDC433F1;
-	Tue, 27 Feb 2024 15:24:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709047445;
-	bh=YyV9pkz56Afk6K/nZFq9LuTx+0xHcvZauMtAkG6vPUg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sNkXWKNUKVxLC2y40n3JT8Ea/JpCV3oujhSOMHUegLQI/BSCMsCOVsmCvyAIZBsDP
-	 ioJcDgykL5u4OJsMzGy2GsZiysO5+SsmCScD3I2lSYpdJjgCKfqUiiq9yFylnRw8zK
-	 brHxOxlS7GBP12KHbWwcGU2PhYKn/V4HwPBAeLHoax8m9XC81aJL0IFb7lCyVWQBuK
-	 FuSfE6z9LesHNVWVfOll3Wcqr9akhLWz9nSUGacU7bS2AS9CMyf4jvuHxtb8Ec07ht
-	 5eRarr9tYkmk40PNxw8G0iFKiw9P7F2O5xoKs/Q2m/tRR2qcdlRhsZ3czPe3NgqW1u
-	 7MZ+N2yXOUiFw==
-Date: Tue, 27 Feb 2024 07:24:04 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <sdf@google.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, amritha.nambiar@intel.com, danielj@nvidia.com,
- mst@redhat.com, michael.chan@broadcom.com, vadim.fedorenko@linux.dev
-Subject: Re: [PATCH net-next 1/3] netdev: add per-queue statistics
-Message-ID: <20240227072404.06ea4843@kernel.org>
-In-Reply-To: <Zd1Y4M7gwEVmgJ8q@google.com>
-References: <20240226211015.1244807-1-kuba@kernel.org>
-	<20240226211015.1244807-2-kuba@kernel.org>
-	<Zd0EJq3gS2_p9NQ8@google.com>
-	<20240226141928.171b79fe@kernel.org>
-	<Zd1Y4M7gwEVmgJ8q@google.com>
+	s=arc-20240116; t=1709047532; c=relaxed/simple;
+	bh=17f6eAw2Q5YZ2lBTiANOInapi8qxn8g7qVdmAOj4WsA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MG4tuNizBKIQ2gUymewpLRBgZqlIO3jAAm9jPk78VxN+EN7HaIq68ukxB61TB5bmuHCu/4DuTdCuQjmBOd/eacPI+JqsFMKgFNqM4gS1my17upD0ABXZVH+TzAlXfkSfyszV2ZfCnZzKqgOnGyT6vy/SYRWq4K2NE8jY+bm18rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=fJJmsRjF; arc=none smtp.client-ip=209.85.219.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-dc74e33fe1bso3538337276.0
+        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 07:25:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1709047529; x=1709652329; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=17f6eAw2Q5YZ2lBTiANOInapi8qxn8g7qVdmAOj4WsA=;
+        b=fJJmsRjFwfKhjMcbMSAq8GkD/6qZEZtcWLU2v5Sey/GJSt3KbX8kFzv7VhAZGWxthE
+         0dFY8T9mGYIZgOW/IXk1OVum6jbhKz3YXe/RLgefAnwWH0pDJVfLzmJpjnN3MELNXtSS
+         YyE71N5yoCv7ZKvFqfBIai1+bNisUH24GA8ILlMSMbmdA0RQCQuNeAgYgPofB442lDcj
+         xMPapWTmTOjAEEVSSYekZ6bLZ/zQPfl/8Qf7T9LzZa8hQBp8mDyIkwQLASb6t8YR8+AD
+         VM4cDfFxQSq/4bRSE1UQ2kQ/GngD66rDuwPx44jIDz6nj2NZw1Z63/f7hSPa0bt9UwPO
+         eD/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709047529; x=1709652329;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=17f6eAw2Q5YZ2lBTiANOInapi8qxn8g7qVdmAOj4WsA=;
+        b=OqPEFZ2DaZMKG1XOOQnpEMxPnZfBeNvBi+4QtXNn1qofdCvN/YkSbz+sVc8A6yBt1h
+         Z2Vk3G1Fv+U41RVyKmrWNHIBCEvJBPr1+GbNjpfXYoFF19sM4Mdp4PMa6GXAAQj2+2k/
+         FY4GtOLSMHWST6QwCqyHqPbHmUdB6eYVrvfbY8yWxayN/DegWM5plQxhi8gPdNIUG+hM
+         BEKsRAMEiBXW5vQMXBt8kYBIo0Ks1++syeEmDvH9Zc3f7R7gJo/4/uDdhvyBN9pS83VT
+         8IJBuwI0fyZTMIWSWbUHfYG4+HtYlK5PSy8mDEmRNTItWlLrkiuJePZm63yLK5q+VmPZ
+         0ZgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWoVBYxda7Rdcu9T2amGhSKwqJcMH9HwcgBofs72tp4mvYL/9ktBD0ecPMeNZG11Llci8l7tvpcIPLMBSPGgzYkozv5f0ee
+X-Gm-Message-State: AOJu0YwGQYwJWAYPvoUqp1e0KWXV8CESGRnOfrympJ214ndRZhExbpBc
+	6Qw+LqFHn/0w0P2SjDb+hdoXcnoQ2iZp0VUainhH5q6qfrEccWyx4DVnBUYTXagHjTOuI019jI8
+	Zn1goCcS63f958by25WRPQbAHHUyNC7tkOJjS
+X-Google-Smtp-Source: AGHT+IHP2DhSduSKymMNAogcq16iDFRZWW/XuP+wAxatcB57mLpvhZ/MViShQHDoxU7k/h0yMaF3RzpGzhZ4aA0Pc28=
+X-Received: by 2002:a25:41cf:0:b0:dc6:7247:5d94 with SMTP id
+ o198-20020a2541cf000000b00dc672475d94mr2397689yba.55.1709047529361; Tue, 27
+ Feb 2024 07:25:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <5be479fb-8fc6-4fa1-8a18-25be4c7b06f6@intel.com>
+ <20240222184045.478a8986@kernel.org> <ZdhqhKbly60La_4h@nanopsycho>
+ <b4ed432e-6e76-8f1b-c5ea-8f19ba610ef3@gmail.com> <ZdiOHpbYB3Ebwub5@nanopsycho>
+ <375ff6ca-4155-bfd9-24f2-bd6a2171f6bf@gmail.com> <CAM0EoMkdsFTuJ-mfqBUKZbvpAzex8ws9jcrPEzTO1iUnaWOPZQ@mail.gmail.com>
+ <3c5c69f8-b7c1-6de7-e22a-5bb267f5562d@gmail.com> <40539b7b-9bff-4fca-9004-16bf68aca11f@intel.com>
+ <20240226070353.79154709@kernel.org>
+In-Reply-To: <20240226070353.79154709@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 27 Feb 2024 10:25:17 -0500
+Message-ID: <CAM0EoMmL24LxsJ1VOYHuxA=X1uoH+DRhJ5Yvq-h0oPK4mO=zmg@mail.gmail.com>
+Subject: Re: [RFC]: raw packet filtering via tc-flower
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Ahmed Zaki <ahmed.zaki@intel.com>, Edward Cree <ecree.xilinx@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, stephen@networkplumber.org, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, corbet@lwn.net, 
+	xiyou.wangcong@gmail.com, netdev@vger.kernel.org, 
+	"Chittim, Madhu" <madhu.chittim@intel.com>, 
+	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>, amritha.nambiar@intel.com, 
+	Jan Sokolowski <jan.sokolowski@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 26 Feb 2024 19:37:04 -0800 Stanislav Fomichev wrote:
-> On 02/26, Jakub Kicinski wrote:
-> > On Mon, 26 Feb 2024 13:35:34 -0800 Stanislav Fomichev wrote:  
-> > > IIUC, in order to get netdev-scoped stats in v1 (vs rfc) is to not set
-> > > stats-scope, right? Any reason we dropped the explicit netdev entry?
-> > > It seems more robust with a separate entry and removes the ambiguity about
-> > > which stats we're querying.  
-> > 
-> > The change is because I switched from enum to flags.
-> > 
-> > I'm not 100% sure which one is going to cause fewer issues down
-> > the line. It's a question of whether the next scope we add will 
-> > be disjoint with or subdividing previous scopes.
-> > 
-> > I think only subdividing previous scopes makes sense. If we were 
-> > to add "stats per NAPI" (bad example) or "per buffer pool" or IDK what
-> > other thing -- we should expose that as a new netlink command, not mix 
-> > it with the queues.
-> > 
-> > The expectation is that scopes will be extended with hw vs sw, or
-> > per-CPU (e.g. page pool recycling). In which case we'll want flags,
-> > so that we can combine them -- ask for HW stats for a queue or hw
-> > stats for the entire netdev.
-> > 
-> > Perhaps I should rename stats -> queue-stats to make this more explicit?
-> > 
-> > The initial version I wrote could iterate both over NAPIs and
-> > queues. This could be helpful to some drivers - but I realized that it
-> > would lead to rather painful user experience (does the driver maintain
-> > stats per NAPI or per queue?) and tricky implementation of the device
-> > level sum (device stats = Sum(queue) or Sum(queue) + Sum(NAPI)??)  
-> 
-> Yeah, same, not sure. The flags may be more flexible but a bit harder
-> wrt discoverability. Assuming a somewhat ignorant spec reader/user,
-> it might be hard to say which flags makes sense to combine and which isn't.
-> Or, I guess, we can try to document it?
+On Mon, Feb 26, 2024 at 10:03=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Mon, 26 Feb 2024 07:40:55 -0700 Ahmed Zaki wrote:
+> > Intel's DDP (NVM) comes with default parser tables that contain all the
+> > supported protocol definitions. In order to use RSS or flow director on
+> > any of these protocol/field that is not defined in ethtool/tc, we
+> > usually need to submit patches for kernel, PF and even virtchannel and
+> > vf drivers if we want support on the VF.
+> >
+> > While Intel's hardware supports programming the parser IP stage (and
+> > that would allow mixed protocol field + binary matching/arbitrary
+> > offset), for now we want to support something like DPDK's raw filtering=
+:
+> >
+> > https://doc.dpdk.org/dts/test_plans/iavf_fdir_protocol_agnostic_flow_te=
+st_plan.html#test-case-1-vf-fdir-mac-ipv4-udp
+> >
+> >
+> > What we had in mind is offloading based on exclusive binary matching,
+> > not mixed protocol field + binary matching. Also, as in my original
+> > example, may be restrict the protocol to 802_3, so all parsing starts a=
+t
+> > MAC hdr which would make the offset calculations much easier.
+> >
+> > Please advice what is the best way forward, flower vs u32, new filter,
+> > ..etc.
+>
+> I vote for u32. We can always add a new filter. But if one already
+> exists which fully covers the functionality we shouldn't add a new
+> one until we know the exact pain points, IOW have tried the existing.
+>
 
-We're talking about driver API here, so document and enforce in code
-review :) But fundamentally, I don't think we should be turning this op
-into a mux for all sort of stats. We can have 64k ops in the family.
+Yes, u32 is the most "ready". No need to patch the classifier code
+(unlike flower) and the dev ops exists already (and has been used by
+drivers in the past).
 
-> For HW vs SW, do you think it makes sense to expose it as a scope?
-> Why not have something like 'rx-packets' and 'hw-rx-packets'?
+> If we do add a new filter, I think this should be part of the P4
+> classifier. With the parsing tree instantiated from the device side
+> and filters added by the user..
 
-I had that in one of the WIP versions but (a) a lot of the stats can 
-be maintained by either device or the driver, so we'd end up with a hw-
-flavor for most of the entries, and (b) 90% of the time the user will
-not care whether it's the HW or SW that counted the bytes, or GSO
-segments. Similarly to how most of the users will not care about
-per-queue breakdown, TBH, which made me think that from user
-perspective both queue and hw vs sw are just a form of detailed
-breakdown. Majority will dump the combined sw|hw stats for the device.
+P4 will open much bigger opportunities for DDP imo (but some people
+would claim i am a little tiny biased ;->).
 
-I could be wrong.
-
-> Maybe, as you're suggesting, we should rename stats to queue-states
-> and drop the score for now? When the time comes to add hw counters,
-> we can revisit. For total netdev stats, we can ask the user to aggregate
-> the per-queue ones?
-
-I'd keep the scope, and ability to show the device level aggregation.
-There are drivers (bnxt, off the top of my head, but I feel like there's
-more) which stash the counters when queues get freed. Without the device
-level aggregation we'd need to expose that as "no queue" or "history"
-or "delta" etc stats. I think that's uglier that showing the sum, which
-is what user will care about 99% of the time.
-
-It'd be a pure rename.
+cheers,
+jamal
 
