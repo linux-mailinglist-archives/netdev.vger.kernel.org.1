@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-75208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56607868A36
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 08:52:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 069C6868A38
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 08:52:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D142B1F22213
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 07:52:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3658A1C21A8F
+	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 07:52:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F7BF56449;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2DEC56459;
 	Tue, 27 Feb 2024 07:52:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UuMj8elG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j/yhQV7f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8206455E64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF6E54F94
 	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 07:52:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709020337; cv=none; b=pKEpZSrd5zEgiUsESb+GB9Ri/SJ7szUkXSFFFjZaHU6dxzAoimZWA6OUY5jMtqPHGEI0yKObE7L/Vxv6KXrELlqx6e8JOyHIfYzXAnJGv81Xc0eVTrwCpAd3ReEzEzQ2iO2yOKrESP3ppWX/zftytj1lhp4Cex7C8Zlui61oZyI=
+	t=1709020337; cv=none; b=P0/GlOpCHpdFHdW8Wq2rQe0nUTBIKvQljuHepna7RHBU0qh0MCiOQGPCEbJ5aWEGBssUnEJnn4mTpC2FaeffQEPTQCO1Otc/SBuoDeMEJQTrscJMUqvWntg7bmKPjDSI+M5j9DGVRljuU7uUws3209R2ACo0Aw/QSM03Kzmyi68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709020337; c=relaxed/simple;
-	bh=WXBN17EZgGUH6eWcK8F7nRi3ldI0G96Q5Mq+ECjAY6Q=;
+	bh=IbBUCH9a8BhHyPlprzScPjuJgo74gSBae89ejOzHT9E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cbvYcGz/9R6CN4XwYPLBn5WJo1HH8+SPn2XgeA2Mrz6g9CoCm2AdHB+Z7yXmgyMdl5hLp2CIwfwWfxbA63K/mwJoBRVWjzhSbBQpvyCSCcBEWVsJOvExitagPsNhK840/KxiUoex0iXISMf87OrMPm3x/Wc5nmc12rDBt6M8nA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UuMj8elG; arc=none smtp.client-ip=209.85.208.182
+	 MIME-Version; b=POuM/PollaOYDSMQTq32oraCiHMpBH1lqGIF5e5oBK6h76xXVlAJZ4gIQ99RVQfMuUbQBb+i+M1EYwJm++C/ta7PR/oRfgmtzxgzYruYx9luJh9MGz4qABzWCHNkakyLlkw5YL/7ZJFNvEoiP3Xw5n5GKrLzrtdVamv9hu94ArU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j/yhQV7f; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d1094b5568so44036871fa.1
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a3e5d82ad86so547106566b.2
         for <netdev@vger.kernel.org>; Mon, 26 Feb 2024 23:52:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709020333; x=1709625133; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1709020334; x=1709625134; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lV0JEslqQX7lSZDJO/0feKiEgQjMhrNlSGIZWQa9fZ4=;
-        b=UuMj8elGNxUsQsVaNK0qel2FzApQYJUVaBDLOW34vatCZCnPTmuA+z/oqd1gE0dgx7
-         yn5JBdXoFApyXsX5FzXhEHQ2kJt8pWI5y1gMFdvvpq8MPL9O43xHkOB8wfzjL0n/8SAH
-         HO3b8v11o2athbHTtNdzprOzTXmZBeQzst9RTVFAm+5KcfgjYyfl5kSP9X1Dj9kKSUn4
-         eFMe7Odc91m3+mopMbUDSV8ogHxsELFQrzIka/wvN8/+jcvwZ4cT9/IqI428FjWaZ4aV
-         CRojfqlT82sOBJ5N5mxggBzbEKhQePTy16Wpxf6IBcesK2lN9x4Ih+thR6RyFn+HLkZb
-         NU1g==
+        bh=7gHVelXeXSgnMtA/zAd3Bprx2pS/mZvAhKsCp7WWu54=;
+        b=j/yhQV7f1dve81++gxMeBKaVjxfqpksW6KuU4IDb3Vgc3rGvNsH4QmRjZcOESwpj4R
+         V5bcyF/Aad+M4JsE6exnOKuKqEgoanOlw9yUUPHPNddmcFSEXeJVjfyDwfD29FTpsi5A
+         TfsGvv2a03yFuJa5lpsyrHu7daAuVbalI3V5LiRewXMndnL8d5Vrirjmd2Mz1MHZQGGI
+         JoWTCtNmP6DmcJUHjp1vB3zYETLZ/lILXduJdh9JHhuABAzDos8e4TQOuY9LBHBfXUN7
+         m4MhFo5wv5I4T3Fffjdi/BVqIGBcM3Woq2OlHYGdyuMqmmk8yigrFWaJDSoU7otX7nn4
+         Ig7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709020333; x=1709625133;
+        d=1e100.net; s=20230601; t=1709020334; x=1709625134;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lV0JEslqQX7lSZDJO/0feKiEgQjMhrNlSGIZWQa9fZ4=;
-        b=ScOaphzBjuvIaUqY8Nd9DPEa/8fjKUN5r9ZDYD4tc1eXxnAvyltcs75Q8EFGUYCBPA
-         EFogu99fBkgYwNIx2FV2/5XwwCHWfEUqbhAHJk3UiScPe/nu4hrVh+ESPLn16NUCFwRo
-         4rX0eH6nWAlQLuvUuDrRqKmYX+SY9g7FQDPOWnOwVYn8Frb0E347seCy4XxvpwDbibLN
-         lEfMTdy8bBJ89Svc1thMr4vJA2F5+8cTYwnzce7HvfV004c0u5DbTjZvhl2/ILdJkJUi
-         JddttZIEiyK4MfjQNmGwaSOwYOs3BOoaB/5sqtJyi7wtp0mTicnQgUDLX/HxaVGBMn0J
-         I7tA==
-X-Gm-Message-State: AOJu0Yzhti7otdTCqQTvZg+r2fsCZrwubeV3eNoHZSdca/rgpOiOgGGd
-	bZJ9UrG0sQrZtcIuIcWBA4md/hO9NGTBXGMksDZQIECeB+EVO+6b
-X-Google-Smtp-Source: AGHT+IGBssLLT1LntYrPHQTqNHja27lsZLZtzwkitpKXRXEpqu4qgDnePiH5s556DLr9PCTdB2tPVg==
-X-Received: by 2002:a05:6512:3c97:b0:513:ece:8f7d with SMTP id h23-20020a0565123c9700b005130ece8f7dmr554295lfv.9.1709020333380;
-        Mon, 26 Feb 2024 23:52:13 -0800 (PST)
+        bh=7gHVelXeXSgnMtA/zAd3Bprx2pS/mZvAhKsCp7WWu54=;
+        b=duW3Kc70HGdsxUPlQtxOOxwYCCGbPP6ES1TBKmoSQ7307hKbO+bj42OdbBzGFJaXFD
+         GI2row/NJUyykZ3exQQS949VSRuIInBXOv9Om9cXFWVIEmcroCVuyJLDozmYLfjOpdxj
+         C/6HZV6E6lp4bzrOyKv0p9HbY4mdIeRXsGBY7C0nwkKhxYMkVJDNReEHdx77jkJFBNrg
+         KA6eVvIWfRdkHicG5tYRN0OiA6Xq0IXAM2tvJhaEqH080rtwR3Fxoeos4Jp0LOpQ9awy
+         cnbYGr6u7Um+DWq6yrO8TTwI/VuzU+3QVqp3StjwDr/QIAaPNfoZbZygHT+esG6AghYM
+         OWng==
+X-Gm-Message-State: AOJu0YyRcQwKZMf/pLJ30vfOt39gqdEBJrizhYKHOapJu7dXUVtFTdFh
+	tniGbLSTV3961CNGC/HpdTi4emFgxL1aURHn5Vkd+aXDb1447kzg
+X-Google-Smtp-Source: AGHT+IHyJolNG79mN40aL7R9k9Wt+E1cnJqmdaFk0zQNRdGM9cGqWbisOiZaFtcu8eqtYB9Zpai1Cw==
+X-Received: by 2002:a17:906:a992:b0:a3e:eebe:7a2f with SMTP id jr18-20020a170906a99200b00a3eeebe7a2fmr6195640ejb.35.1709020334427;
+        Mon, 26 Feb 2024 23:52:14 -0800 (PST)
 Received: from corebook.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id un6-20020a170907cb8600b00a3f0dbdf106sm496460ejc.105.2024.02.26.23.52.12
+        by smtp.gmail.com with ESMTPSA id un6-20020a170907cb8600b00a3f0dbdf106sm496460ejc.105.2024.02.26.23.52.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Feb 2024 23:52:13 -0800 (PST)
+        Mon, 26 Feb 2024 23:52:14 -0800 (PST)
 From: Eric Woudstra <ericwouds@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
@@ -79,9 +79,9 @@ To: Andrew Lunn <andrew@lunn.ch>,
 	Daniel Golle <daniel@makrotopia.org>
 Cc: netdev@vger.kernel.org,
 	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH RFC net-next 2/6] net: phy: realtek: add get_rate_matching() for rtl822x/8251b PHYs
-Date: Tue, 27 Feb 2024 08:51:47 +0100
-Message-ID: <20240227075151.793496-3-ericwouds@gmail.com>
+Subject: [PATCH RFC net-next 3/6] net: phy: realtek: rtlgen_get_speed(): Pass register value as argument
+Date: Tue, 27 Feb 2024 08:51:48 +0100
+Message-ID: <20240227075151.793496-4-ericwouds@gmail.com>
 X-Mailer: git-send-email 2.42.1
 In-Reply-To: <20240227075151.793496-1-ericwouds@gmail.com>
 References: <20240227075151.793496-1-ericwouds@gmail.com>
@@ -93,104 +93,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Uses vendor register to determine if SerDes is setup in rate-matching mode.
+The value of the register to determine the speed, is retrieved
+differently when using Clause 45 only.
 
-Rate-matching only supported when SerDes is set to 2500base-x.
+To use the rtlgen_get_speed() function in this case, pass the value of the
+register as argument to rtlgen_get_speed().
+
+The function would then always return 0, so change it to void.
 
 Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
 ---
- drivers/net/phy/realtek.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ drivers/net/phy/realtek.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-index 67cffe9b7d5d..75c4f3e14371 100644
+index 75c4f3e14371..e7c42ec18971 100644
 --- a/drivers/net/phy/realtek.c
 +++ b/drivers/net/phy/realtek.c
-@@ -723,6 +723,28 @@ static int rtl822x_config_init(struct phy_device *phydev)
- 	return phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x6f11, 0x8020);
+@@ -541,16 +541,10 @@ static int rtl8366rb_config_init(struct phy_device *phydev)
  }
  
-+static int rtl822x_get_rate_matching(struct phy_device *phydev,
-+				     phy_interface_t iface)
-+{
-+	int val;
-+
-+	/* Only rate matching at 2500base-x */
-+	if (iface != PHY_INTERFACE_MODE_2500BASEX)
-+		return RATE_MATCH_NONE;
-+
-+	val = phy_read_mmd(phydev, MDIO_MMD_VEND1, RTL822X_VND1_SERDES_OPTION);
+ /* get actual speed to cover the downshift case */
+-static int rtlgen_get_speed(struct phy_device *phydev)
++static void rtlgen_get_speed(struct phy_device *phydev, int val)
+ {
+-	int val;
+-
+ 	if (!phydev->link)
+-		return 0;
+-
+-	val = phy_read_paged(phydev, 0xa43, 0x12);
+-	if (val < 0)
+-		return val;
++		return;
+ 
+ 	switch (val & RTLGEN_SPEED_MASK) {
+ 	case 0x0000:
+@@ -574,19 +568,23 @@ static int rtlgen_get_speed(struct phy_device *phydev)
+ 	default:
+ 		break;
+ 	}
+-
+-	return 0;
+ }
+ 
+ static int rtlgen_read_status(struct phy_device *phydev)
+ {
+-	int ret;
++	int ret, val;
+ 
+ 	ret = genphy_read_status(phydev);
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	return rtlgen_get_speed(phydev);
++	val = phy_read_paged(phydev, 0xa43, 0x12);
 +	if (val < 0)
 +		return val;
 +
-+	switch (val & RTL822X_VND1_SERDES_OPTION_MODE_MASK) {
-+	case RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX:
-+		return RATE_MATCH_PAUSE;
-+	/* case RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX_SGMII: */
-+	default:
-+		return RATE_MATCH_NONE;
-+	}
-+}
++	rtlgen_get_speed(phydev, val);
 +
- static int rtl822x_get_features(struct phy_device *phydev)
- {
- 	int val;
-@@ -1062,6 +1084,7 @@ static struct phy_driver realtek_drvs[] = {
- 		.get_features	= rtl822x_get_features,
- 		.config_aneg	= rtl822x_config_aneg,
- 		.config_init    = rtl822x_config_init,
-+		.get_rate_matching = rtl822x_get_rate_matching,
- 		.read_status	= rtl822x_read_status,
- 		.suspend	= genphy_suspend,
- 		.resume		= rtlgen_resume,
-@@ -1075,6 +1098,7 @@ static struct phy_driver realtek_drvs[] = {
- 		.get_features	= rtl822x_get_features,
- 		.config_aneg	= rtl822x_config_aneg,
- 		.config_init    = rtl822x_config_init,
-+		.get_rate_matching = rtl822x_get_rate_matching,
- 		.read_status	= rtl822x_read_status,
- 		.suspend	= genphy_suspend,
- 		.resume		= rtlgen_resume,
-@@ -1088,6 +1112,7 @@ static struct phy_driver realtek_drvs[] = {
- 		.get_features   = rtl822x_get_features,
- 		.config_aneg    = rtl822x_config_aneg,
- 		.config_init    = rtl822x_config_init,
-+		.get_rate_matching = rtl822x_get_rate_matching,
- 		.read_status    = rtl822x_read_status,
- 		.suspend        = genphy_suspend,
- 		.resume         = rtlgen_resume,
-@@ -1099,6 +1124,7 @@ static struct phy_driver realtek_drvs[] = {
- 		.get_features   = rtl822x_get_features,
- 		.config_aneg    = rtl822x_config_aneg,
- 		.config_init    = rtl822x_config_init,
-+		.get_rate_matching = rtl822x_get_rate_matching,
- 		.read_status    = rtl822x_read_status,
- 		.suspend        = genphy_suspend,
- 		.resume         = rtlgen_resume,
-@@ -1109,6 +1135,7 @@ static struct phy_driver realtek_drvs[] = {
- 		.name           = "RTL8221B-VB-CG 2.5Gbps PHY",
- 		.get_features   = rtl822x_get_features,
- 		.config_init    = rtl822x_config_init,
-+		.get_rate_matching = rtl822x_get_rate_matching,
- 		.config_aneg    = rtl822x_config_aneg,
- 		.read_status    = rtl822x_read_status,
- 		.suspend        = genphy_suspend,
-@@ -1121,6 +1148,7 @@ static struct phy_driver realtek_drvs[] = {
- 		.get_features   = rtl822x_get_features,
- 		.config_aneg    = rtl822x_config_aneg,
- 		.config_init    = rtl822x_config_init,
-+		.get_rate_matching = rtl822x_get_rate_matching,
- 		.read_status    = rtl822x_read_status,
- 		.suspend        = genphy_suspend,
- 		.resume         = rtlgen_resume,
-@@ -1132,6 +1160,7 @@ static struct phy_driver realtek_drvs[] = {
- 		.get_features   = rtl822x_get_features,
- 		.config_aneg    = rtl822x_config_aneg,
- 		.config_init    = rtl822x_config_init,
-+		.get_rate_matching = rtl822x_get_rate_matching,
- 		.read_status    = rtl822x_read_status,
- 		.suspend        = genphy_suspend,
- 		.resume         = rtlgen_resume,
++	return 0;
+ }
+ 
+ static int rtlgen_read_mmd(struct phy_device *phydev, int devnum, u16 regnum)
 -- 
 2.42.1
 
