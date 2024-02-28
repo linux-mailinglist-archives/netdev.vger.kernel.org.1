@@ -1,170 +1,219 @@
-Return-Path: <netdev+bounces-75735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE77B86B01D
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:21:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFE0486B04B
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:28:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68C3A282265
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:21:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74B1228A812
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:28:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 482EC14A4D6;
-	Wed, 28 Feb 2024 13:21:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 203341487DB;
+	Wed, 28 Feb 2024 13:28:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="BXda9RrP"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ryI2yKQc"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2105.outbound.protection.outlook.com [40.107.243.105])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0325145341;
-	Wed, 28 Feb 2024 13:21:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.105
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709126514; cv=fail; b=GJrgpSMBnzVlt/2cPyMJOf4gT5VPoUAmzKvoSvfS06m/9pQCbTxvYF8e1ROTynvNy9Zt4RMg0ILSubn0KJPbe3jstStJ5/EOtFd2R4HwwZt2uTjtBRay7F9Y3+ByE35n96lCySWXa2x2tli7SOFSOTng77u58xtQBKYs6wmsw9w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709126514; c=relaxed/simple;
-	bh=sqba1rF0WLX4Eh6pf24zvdsX6VY7eJZkgSAkgUqwPo0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=MlIsg6g5Sx+/XAYAUjxyZ3aPXT1dfgV4a9nnqRRdRiYceO5oU8Gml7/iT906rsqYh0EyX4sZpKH5cXe0V1Z3PSTraCFZI/Ghf9/n4N3BBkdUpKdYeumBBS/do1l8v50kEyx6eT5dEfI22sC3eTRY83eYLruTOP/99W1n13aTubo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=BXda9RrP; arc=fail smtp.client-ip=40.107.243.105
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BDFfVEKVwGwU4uf8YhZdv6B4YdIhJbYkNo3MhjH0xsn3wBdzTvNvvxBenwVh+pUJ1td8zXwzoaIzaVrOmIXH7AXAbaeAhCi+Vd2KoiJNDz6N736KqqP5BXuSbzy4kXm/m06gJOy301zvn3wtpp/A194z/pR/dW5ZDWG0TiAmNGGHqZzKpPBoOhss/3+yrzMne5V/YlQD6j5EqIiXYXUPFZHqtoUMiGF5wrHsct8EY+9L3hgFhnGeQq8IOi0kCZ879O5CYFGY++tXYltkWuTrfmeYREHojAgwagBC/ApJhjuKKr+aY+Xu86GVoXU4t6ozvifF+j/TGdVneXG9WZi12g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FMZ2B4UDD+ozu2BXQnYdNBaPjFM8AdfBKYb+iyIuzDw=;
- b=MB36KYoIxSzX8zGcdGPDAMJO8kejGw9d5/H9ow+CKQ3ZcTyDZRK5Hj/ooh6tDCXz2cFogm4Ak1M4GioA/J3f6nhBrXqCfIRXIOGSHG9rj9AjGB8mJsIrNAQvUbnyNmdVHsxnNMU6yVxtCijmqaPYx4kOkEataMZfiKoKjdPdUhUXY3cO+lb8knj+bjOKdhVe1lJlbOKNOMfJGWgwEuM0qGtZ56ZKwCai/Eg6Lpp0hnmZGZha57F5funuNXLmMxH0I+CRmBelNj/iN1s9G2kK4g58YE3d/Jqa8yQ5nSGObb0Rh+IpL2D1vDbNTABquuoD7V9xyUumxmAsSK5u3te8Jg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42DA414AD2D
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 13:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709126886; cv=none; b=L5YPlAqaeSHycl0F+DfFrnzJPGpNRRcdZYmLET0Ego3w9ZpOdA8ahp6MSzGF0FjBCuN7Z8GB45U7UKZt9Wb1eZzFFkmhFbqDo16F+S1nKQDqw+dyvNdMo939YOtyvOa+i2cD31deXFdQWmMvTWwMT9YQaouMkQhvoYCWbiG8yCQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709126886; c=relaxed/simple;
+	bh=5tu4oA59KhY06nxQt1gQkS0mgx9HIzfNvh62p6xnllQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E6LxheCmykHk0nbnxFd8a4I0IvVIpzkF6iIA0INrF8+lpSSsfEvtQypBj+8psm+0QKFkr+cF2+G4fZvFZLD1Qrxbs6EEYYe1FYV4hDkLfivPd27odcDNEy2q72SVwxUnCmoSiABBQyZKUifMacD4s2hes8RfX8a/fqd61GKYmV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ryI2yKQc; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-412a14299a4so30697645e9.1
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 05:28:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FMZ2B4UDD+ozu2BXQnYdNBaPjFM8AdfBKYb+iyIuzDw=;
- b=BXda9RrPKpw3HzjaH/+abZeuFd/VEvt/t5zwaDFlFy2MRjZBnC5bg6LSH0GgI2M7DFQoCb7U7MCom5Aqk5U6PwH+/+Re31Y0fCVwvQ4UYHK6j6dFQ/lJoMieXqQMGo7VPWejoilryfcWjdSo7f8WAkCwN4w4tjsXOm5Nl5uw8Fs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from BN7PR01MB3730.prod.exchangelabs.com (2603:10b6:406:85::11) by
- SA0PR01MB6457.prod.exchangelabs.com (2603:10b6:806:ef::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7316.36; Wed, 28 Feb 2024 13:21:49 +0000
-Received: from BN7PR01MB3730.prod.exchangelabs.com
- ([fe80::c068:c0a4:25eb:22f]) by BN7PR01MB3730.prod.exchangelabs.com
- ([fe80::c068:c0a4:25eb:22f%3]) with mapi id 15.20.7316.034; Wed, 28 Feb 2024
- 13:21:48 +0000
-Message-ID: <a8de785f-8cc3-4075-a5f2-259e20222dcb@os.amperecomputing.com>
-Date: Wed, 28 Feb 2024 21:23:23 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: make SK_MEMORY_PCPU_RESERV tunable
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: corbet@lwn.net, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- willemb@google.com, yangtiezhu@loongson.cn, atenart@kernel.org,
- kuniyu@amazon.com, wuyun.abel@bytedance.com, leitao@debian.org,
- alexander@mihalicyn.com, dhowells@redhat.com, paulmck@kernel.org,
- joel.granados@gmail.com, urezki@gmail.com, joel@joelfernandes.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, patches@amperecomputing.com,
- cl@os.amperecomputing.com, shijie@os.amperecomputing.com
-References: <20240226022452.20558-1-adamli@os.amperecomputing.com>
- <CANn89iLbA4_YdQrF+9Rmv2uVSb1HLhu0qXqCm923FCut1E78FA@mail.gmail.com>
-From: Adam Li <adamli@os.amperecomputing.com>
-In-Reply-To: <CANn89iLbA4_YdQrF+9Rmv2uVSb1HLhu0qXqCm923FCut1E78FA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH0PR03CA0361.namprd03.prod.outlook.com
- (2603:10b6:610:119::27) To BN7PR01MB3730.prod.exchangelabs.com
- (2603:10b6:406:85::11)
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709126882; x=1709731682; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=e9wUp62staKveDTu96LB6OyYEe4qCAP2aId49Azr470=;
+        b=ryI2yKQcTsrM8jS/xT0zgx+VUPnyVBj1FzTtcdEaoVKOoE3/lGEyIKYwGqUP8Q4GPY
+         yJCARAsYvHUe9N0XBZIVkT0LSihQm5t/YSbX/Aux3Vcq4KibesKAGRuX8IuKsKMqEfkC
+         VKCNPgOSvrJGjP9F1DIOTTvdn2Xa5UfuQfIxhnefAvd24J4NFS0Yz3mGQoENpycCQHco
+         rM/UMM5s/zb8DchlbZgRZ3sP5TQRPz8TAaYg6cYwJgeb9zWguAU6bq0YVQM9jFYYHwrx
+         p4L491f+FhWjdHYIaJ7GO1xtY0Xyw1cgyIMaltwZZ8o1s2ASEnbAsJa5hJPkO2hVmjsA
+         4PlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709126882; x=1709731682;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e9wUp62staKveDTu96LB6OyYEe4qCAP2aId49Azr470=;
+        b=UMIJEJ7twg0zcjHpjhkJsoxPkbdlJ1ZS1iYaOSVJV4PTVAqxWwEwSjJQiRZykbDMv7
+         UH5T8mYFHAJScI7fXmXpKWbH3ERXICFDiH3otImYweb+foBGy9qzQwms9a1E2sm0Kl9n
+         x5otvaUE0ONxulnaPunxNEbpsU7gfcwHf2DKW2KxwUkNOYhqKc6fphETOud56VlB7D0I
+         dtPxxBlLYPJgAY/zT+igTAvlyS3yL0WJwAiPSH9jRUWlLY6fm9UVP5amzQNef2p1HGQx
+         W1uQnAbALjFO60RBpPcmWcM3KLXNNN+nl3cE+9I+kDmYgj0umY7zK0/t1ObvbP64cyN0
+         1vIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVrqNwPdtpGt1GLHOYzk+/ta2tUlTzoE46skCCizbPc0CUqyjThL7ltE5nKcseSGy0UWwExxIbpYSa6WpPcZ14TL6A9+6F9
+X-Gm-Message-State: AOJu0YwspdMUBZ0z2hs2huKMpPv7Y24u+RMil70UxQYMc4ZdBIH5KYkD
+	2iEHy3fADBpb/uPoxGHN3U+D6uB0mfIcJ5Y7YXD8BArQl/MexvtjI1XPf66LBWQ=
+X-Google-Smtp-Source: AGHT+IEPcxRfVeevLifaXmgO5QobEy2Cf5VY3JV3xCE4YTrpJZ6rYoXF80CZFflldoLPhoHRiWr5EA==
+X-Received: by 2002:a5d:528d:0:b0:33d:7c8:2230 with SMTP id c13-20020a5d528d000000b0033d07c82230mr9850374wrv.24.1709126882544;
+        Wed, 28 Feb 2024 05:28:02 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id d14-20020a5d538e000000b0033d4deb2356sm14476145wrv.56.2024.02.28.05.28.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 05:28:02 -0800 (PST)
+Date: Wed, 28 Feb 2024 14:27:59 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, rogerq@kernel.org, andrew@lunn.ch,
+	vladimir.oltean@nxp.com, hkallweit1@gmail.com,
+	dan.carpenter@linaro.org, horms@kernel.org, yuehaibing@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, srk@ti.com
+Subject: Re: [PATCH net-next] net: ethernet: ti: am65-cpsw: Add priv-flag for
+ Switch VLAN Aware mode
+Message-ID: <Zd8034JJFHTjyhfc@nanopsycho>
+References: <20240227082815.2073826-1-s-vadapalli@ti.com>
+ <Zd3YHQRMnv-ZvSWs@nanopsycho>
+ <7d1496da-100a-4336-b744-33e843eba930@ti.com>
+ <Zd7taFB2nEvtZh8E@nanopsycho>
+ <49e531f7-9465-40ea-b604-22a3a7f13d62@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN7PR01MB3730:EE_|SA0PR01MB6457:EE_
-X-MS-Office365-Filtering-Correlation-Id: f2746218-69cf-490e-403a-08dc3860376f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	PB0zvpXofQm1N9z/lGzwHtXmJ9GYGcc/U8/R2kpb0NP2mJQBbxcyuNQb9Yd08x2GJtY1mK9kHKWYBFFlgN8G6YlsLHwGVso0NI2nB11p6HNbqiR1SNpNIIGNMOgcQgAKa/5BDq3E+rS+9jHIv/7HD4gQgnJkOKllxf1fWawwtq90+PAjDfaUwPMo/VLLdKLnheW3PJ6uilmUslrPifOuF1Rdq1t9I9j+QeRXMMJL4lHmy8JdFDim/1g/L0x0Ij4nNzAOLFvGYrXpxw/Kjg2Mj2jBJEPhV7n66/51uWVYnJ1VOm+XJrfxEEs88N1nPlJ1cx8OsCXMh/VCp1IAjIzin0ainY5ht4cg/qBrABvt9dNYIq4WfN3uXXYfjcy0XIMeh88mX17AMqeXeHyIIlG8va8fkENm5x/BS8SVmg2/rq4H0Ek/rsfOFNGlMgeB8Ry1i6JNb2EkJa9rUiz10ZanAhFo86Rrgo7/wMMtH19KqsjVd4dh5ozO7f+Pvwe8cG+70WvimxWUZjOfObE+ZsCU3atWXxXz7pvTvxPQ3aV5qNy18J5QJo2baoXQzQgWFvU0jbjVu2Xf3eh1gSvZxVem+iNgh+3BAB9rK0nedroqxpVWk1lftDomcQDSzKuJ2KPeFiw4kJED8GCmBGFtvnEVLA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN7PR01MB3730.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VmVqUThYUG03aFJyalU1SlZId0Zid1k5YXJ1U3psdTJ1MFFwQjVYYkZQck5p?=
- =?utf-8?B?Y0NsTXI0bEttU0JJWEl0YVhvTkJwbDBENzVGTHlvRHR1b0pLRUl0TVkxYUxy?=
- =?utf-8?B?VVcrR0FQejhuRmNZeTIwSWp5dWVNd0NTOEVGMFNMN3VaZElCV28xRTliQThS?=
- =?utf-8?B?U2NNV2V4SjJYdkJMdjdQOGhvSmg5VTRjVDlxWXdXRGxxbGVSdkNHWDRjcHhp?=
- =?utf-8?B?MHl0b1ZkQkxrYTlRVVRQMnNtSjhGMVRzR0Q1NTFlWFkyTEVyQmlVUS9WcVk0?=
- =?utf-8?B?dHRMRkYya3E2RVhQL21EN2NRbzRFVkRsZ3JVaUlrbnprWi9iRHdVYlBKQ1VQ?=
- =?utf-8?B?QjlEeHNHOU5DdHVIa21LMENnWWJpRkFyT1ZCRDRvY2Mzejc3aG42d3gwK0FQ?=
- =?utf-8?B?TmRzeDhCbkRIOXBLVEVPWWpFRSt4cWZqWEczaGZxQWEvZDlGdmw5WUQ0am9n?=
- =?utf-8?B?MzZ5ZUZOcVlQL05kbks4SzRJUUpMSVhiYklJWEJFOFJGSVlHUHRTWHV2Y3pj?=
- =?utf-8?B?eHYwRGVqa1RrSWtMY05tbDNNUnh3SVFLd21ZMHRaMmhkR0Y0T3k0UVMremVN?=
- =?utf-8?B?bFExemtpa3FBNE5DOEplTC9aSVk4c2s5WVJMczRrNlJJRkZZNEgyaXVDVHl5?=
- =?utf-8?B?RWhRa0NTOTVoaStIVDlYVEVqZHhmN3duVHZQZk1MTWJ6b2Yva0EzRzk0UTdE?=
- =?utf-8?B?Sld2dTVla3VzcERQeWZIQ0N1S1kreERWVTA1T2xkcUxWdktwVmtoSngreWk1?=
- =?utf-8?B?YmgyOXVQL0xabU4rdVd0VWhhTmFiLzYvYWx5WlFrSHgybE5RVDRSejJVWkpq?=
- =?utf-8?B?Slp0NVlvaVpHYzgwVW1tb21lTGpscEp5bld4YW1xbHBVWTdqK3J5N1d4L3ZM?=
- =?utf-8?B?SVZ0VWlraUZVSDdOM0NtT205MW9aUE9HbU9pcUF5WGdtVFlTQ2pGU0JUUklt?=
- =?utf-8?B?b2xKaWJpb01LaWdSVExwOUk0WGk0YWJTNytobUNNLysrUVhMODVtR2VkUk9R?=
- =?utf-8?B?cXV5cGhPVlVNUHBTd3BnT3ZIK3RkQkxmOGdYc09kRytyRmtiY2pYUkxoTWVk?=
- =?utf-8?B?blYwNEFvZ2ZrbTV1Z3FFN0E3VllYajMvWjdXSVIzYng2aUsvVnNXbUJqSUV5?=
- =?utf-8?B?TW1rM3RhVG1mQ1loYzdBTVJXN0ljQ0JJckxDM0NIb2tNT3VpZFhHWWxndjRN?=
- =?utf-8?B?SUxMcTZNTHdXbm81WWpNcjllQVR0NjlyaENQMzZlV1h5eVJYVDN5WXJKSloz?=
- =?utf-8?B?aFNLUGlhdmpLR1AxeDkyYkZKTzRnTUc4NlhpVTNZNWI2cEhFT0tyWGpKcWxk?=
- =?utf-8?B?NmozT1BDekVWOWlGckxXcnlIWnBjNm03S2xRemhvOWRUQ1ZTTnBxbWV1YUJI?=
- =?utf-8?B?MHFoVUcrVllqV3hsdGhMc1FWU09lSlJRY2Z4TTZNVGNtQXFPb3IxOXg3SnRK?=
- =?utf-8?B?SWFiUWZteUpUa2lGSEFJMURuajJCeEdxanU1RjB6dTJrMDdpaFNLbzBqQVly?=
- =?utf-8?B?VmkrOGpvTEhXQlZySjNUaE5IN016bExuSXovSEF4NmJUNmtia3JmbE95Q2tr?=
- =?utf-8?B?TWNCNy9kYk56NTdGK3FEUnRzbWUzTWkrQUlNMzVablBNTklNOUdUNzlqOXhx?=
- =?utf-8?B?RElZSjhJNy95KzZ3aXhQUksxejhFTmZXeXJscFpvNm1DM1hzWW9jc1JWRDBl?=
- =?utf-8?B?azdQdkk0TTBITVphYUhxbTBIOVBVdi9FT0UwNjZoKy82eVMzREdTMHRjVHNv?=
- =?utf-8?B?NnJ4bmUrZ3k2cFdTeWpmNkFRaFZZZWhaa2FZNXFTcFcwMGc4SzJuVXNSa3BW?=
- =?utf-8?B?eXR6d0pWTlkzMkhRcE55Y3A3UmJlWnFHNFZyZTBvL29DM2xKdXU2bUx4dGdu?=
- =?utf-8?B?SUFPS0hwelVWZWZZQXlZWGN2dWJxRWJTa1gvS0JIQnlKZ016YW1DRzdmbE1m?=
- =?utf-8?B?Wm9rYjYyc2NreFJCNDgvNUZ5RzVTckJSaGt0dVF3dWtoU0xBWHNhYUU2MnBh?=
- =?utf-8?B?NDd6Z2t0WUJaQmpVTTN4TjdQdkZnRTlsZDRHVTBTY29PcjZlYlhCSy8wSnhO?=
- =?utf-8?B?NGhDWFhnbXpGUmloQ0tsM1ZPOHI3TXZrL2VKU2g0WHo0Qk5yVFRYdEpwNHJM?=
- =?utf-8?B?TVljY1ZQcE5yRm9TY28rUEYyaXJyVWMzVWhIeXJjUFlESTF0SWowTHcvd2hT?=
- =?utf-8?Q?l2yBKTiUSB+0UFp2bLwQioA=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f2746218-69cf-490e-403a-08dc3860376f
-X-MS-Exchange-CrossTenant-AuthSource: BN7PR01MB3730.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2024 13:21:48.6170
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vGykPKUBvbl5ksZMQ0CGjgQV+f1NMh/SQVJPBuMrwlaIxOYH0D2UfZtarKcqLnHVCzvIXmVMfCZtIX9akhMmIMKDkLe15bIcAygeeq59cbtaCxtBkqcmyMEtxFW8xpgO
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR01MB6457
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <49e531f7-9465-40ea-b604-22a3a7f13d62@ti.com>
 
-On 2/28/2024 4:38 AM, Eric Dumazet wrote:
+Wed, Feb 28, 2024 at 11:04:55AM CET, s-vadapalli@ti.com wrote:
+>
+>
+>On 28/02/24 13:53, Jiri Pirko wrote:
+>> Wed, Feb 28, 2024 at 08:06:39AM CET, s-vadapalli@ti.com wrote:
+>>>
+>>>
+>>> On 27/02/24 18:09, Jiri Pirko wrote:
+>>>> Tue, Feb 27, 2024 at 09:28:15AM CET, s-vadapalli@ti.com wrote:
+>>>>> The CPSW Ethernet Switch on TI's K3 SoCs can be configured to operate in
+>>>>> VLAN Aware or VLAN Unaware modes of operation. This is different from
+>>>>> the ALE being VLAN Aware and Unaware. The Ethernet Switch being VLAN Aware
+>>>>> results in the addition/removal/replacement of VLAN tag of packets during
+>>>>> egress as described in section "12.2.1.4.6.4.1 Transmit VLAN Processing" of
+>>>>> the AM65x Technical Reference Manual available at:
+>>>>> https://www.ti.com/lit/ug/spruid7e/spruid7e.pdf
+>>>>> In VLAN Unaware mode, packets remain unmodified on egress.
+>>>>>
+>>>>> The driver currently configures the Ethernet Switch in VLAN Aware mode by
+>>>>> default and there is no support to toggle this capability of the Ethernet
+>>>>> Switch at runtime. Thus, add support to toggle the capability by exporting
+>>>>> it via the ethtool "priv-flags" interface.
+>>>>
+>>>> I don't follow. You have all the means to offload all bridge/vlan
+>>>> configurations properly and setup your hw according to that. See mlxsw
+>>>> for a reference. I don't see the need for any custom driver knobs.
+>>>>
+>>>
+>>> Thank you for reviewing the patch. Please note that the "VLAN Aware mode" being
+>>> referred to here is different from ALE being VLAN aware. The hw offload of
+>>> bridge/vlan configurations is already supported in the context of the ALE. The
+>>> Ethernet Switch being VLAN Aware is a layer on top of that, which enables
+>>> further processing on top of the untagged/VLAN packets. This patch aims to
+>>> provide a method to enable the following use-cases:
+>>> 1. ALE VLAN Aware + CPSW VLAN Aware
+>>> 2. ALE VLAN Aware + CPSW VLAN Unaware
+>>>
+>>> All hw offloads of bridge/vlan configurations are w.r.t. ALE VLAN Aware alone.
+>>> Currently, only use-case 1 is enabled by the driver by default and there is no
+>>> knob to toggle to use-case 2.
+>>>
+>>> I am quoting sections of the Technical Reference Manual mentioned in my commit
+>>> message, in order to clarify the CPSW VLAN Unaware and CPSW VLAN Aware terminology.
+>>>
+>>> CPSW VLAN Unaware:
+>>> Transmit packets are NOT modified during switch egress.
+>>>
+>>> CPSW VLAN Aware:
+>>> 1. Untagged Packet Operations
+>>> Untagged packets are all packets that are not a VLAN packet or a priority tagged
+>>> packet. According to the CPWS0_FORCE_UNTAGGED_EGRESS_REG[1-0] MASK bit in the
+>>> packet header the packet may exit the switch with a VLAN tag inserted or the
+>>> packet may leave the switch unchanged....
+>>> 2. Priority Tagged Packet Operations (VLAN VID == 0 && EN_VID0_MODE ==0h)
+>>> Priority tagged packets are packets that contain a VLAN header with VID = 0.
+>>> According to the CPSW_ALE_FORCE_UNTAGGED_EGRESS_REG[1-0] MASK bit in the packet
+>>> header, priority tagged packets may exit the switch with their VLAN ID and
+>>> priority replaced or they may have their priority tag completely removed....
+>>> 3. VLAN Tagged Packet Operations (VLAN VID != 0 || (EN_VID0_MODE ==1h && VLAN
+>>> VID ==0))
+>>> VLAN tagged packets are packets that contain a VLAN header specifying the VLAN
+>>> the packet belongs to
+>>> (VID), the packet priority (PRI), and the drop eligibility indicator (CFI).
+>>> According to the CPSW_ALE_FORCE_UNTAGGED_EGRESS_REG[1-0] MASK bit in the packet
+>>> header, VLAN tagged packets may exit the switch with their VLAN priority
+>>> replaced or they may have their VLAN header completely removed...
+>>>
+>>> I hope that this clarifies that CPSW VLAN Unaware/Aware is a layer on top of the
+>>> hw offload-able bridge/vlan configuration.  Please let me know if there is
+>>> anything specific that could enable this without requiring the "priv-flag" based
+>>> implementation of this patch.
+>> 
+>> I have no clue what "ALE" is. But in general. User provided
+>
+>ALE is Address Lookup Engine.
+>
+>> configuration, using ip/bridge/etc tools/uapi. According to this
+>> configuration, kernel is bahaving. When you do offload, you should just
+>> make sure to mimic/mirror the kernel behaviour. With this in mind, why
+>
+>What if there is no kernel behavior associated with it? How can it be mimicked
+>then? This patch isn't offloading any feature that is supported in software. It
+>might not be possible to offload features which act on the forwarding path of
+>packets entirely in Hardware within the Ethernet Switch.
+>
+>Please consider the following:
+>Untagged packets sent from Software via the corresponding VLAN interfaces will
+>be tagged which is the expected behavior. However, if this is offloaded, it will
+>imply that even untagged packets that are simply forwarded in the Ethernet
+>Switch and never get to software will also have to be tagged by the Ethernet
+>Switch. This is not allowing the choice of leaving untagged packets as-is on the
+>Ethernet Switch's forwarding path. This patch attempts to allow configuring
+>something quite similar to this, where it is possible to *choose* whether or not
+>to tag packets being forwarded.
 
+What would kernel datapath do? That is the question you need to ask and
+configure the hw accordingly. If 2 interfaces are in the bridge, vlans
+involved, etc, the forward behavior is well defined, isn't it. What am I
+missing?
+
+
+>
+>> can't you do it without adding additional knob? And if you really need
+>> it because the know does some internal hw/fw tuning, priv flag of netdev
+>
+>The feature can be turned on or off depending on the use-case. Is it acceptable
+>to have build configs scattered in the driver code? I don't suppose that is
+>acceptable, due to which it will be preferable to have a runtime configuration
+>option, which is what this patch provides.
+>
+>> is most probably not the correct place to put it. If it is, make sure
+>
+>Please suggest an alternative if this isn't the right place. Otherwise, I can
+>only assume that there isn't one.
+>
+>> you advocate for it properly in the patch description.
+>> 
+>> pw-bot: cr
 >>
->> sk_prot->memory_allocated points to global atomic variable:
->> atomic_long_t tcp_memory_allocated ____cacheline_aligned_in_smp;
->>
->> If increasing the per-cpu cache size from 1MB to e.g. 16MB,
->> changes to sk->sk_prot->memory_allocated can be further reduced.
->> Performance may be improved on system with many cores.
-> 
-> This looks good, do you have any performance numbers to share ?
-
-I ran localhost memcached test on system with 320 CPU threads,
-perf shows 4% cycles spent in __sk_mem_raise_allocated() -->sk_memory_allocated().
-If increasing SK_MEMORY_PCPU_RESERV to 16MB, perf cycles spent in
-__sk_mem_raise_allocated() drops to 0.4%.
-
-Thanks,
--adam
-
+>
+>-- 
+>Regards,
+>Siddharth.
 
