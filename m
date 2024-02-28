@@ -1,145 +1,98 @@
-Return-Path: <netdev+bounces-75775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1611286B270
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:54:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E44B86B27A
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:56:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 629FCB210FF
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:54:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 684C31C2404D
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB78F15958A;
-	Wed, 28 Feb 2024 14:54:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="TBlzutj3";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RWWbvqQ/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25EA415B975;
+	Wed, 28 Feb 2024 14:56:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA4973512;
-	Wed, 28 Feb 2024 14:54:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.111.4.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617DF15B96D;
+	Wed, 28 Feb 2024 14:56:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709132084; cv=none; b=TQW89ZslADvwov1np47i1xU193rDBNhqr2hammz2Fj7SfiCRflZBvrfD6KQ8UW1ylxhAj23cq09qliXurFCVZOVtgnt/sxrXomA6vBpTNgAaIZJJPtSmmgyw52ABn8M4TcE/IbPuOAHJUPP+VPzlWkVtiPjbyaNdJP29j6chTJU=
+	t=1709132186; cv=none; b=jUxiwxV9TDRKTT1ZjgbsBckEzHX3WC+NKyk4uLYUGe9yXlmR6Hu38RhokeqsyPzwONjKof9NAaY/e7cCPif60/Ifomu+V6KhRMoNwjc1JPr25pTQIoM79FrbILg5v5ZiYcZiNjzP5HKvWnowFMVgHoFlGFwLhpl/6EUaaDwqMFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709132084; c=relaxed/simple;
-	bh=Y+7/5mhPZBptJeNuYZtHzu66OCEsCfP5b3mZFAVJEho=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=jkrmX/unszqe8TKuC4fQFhTNHytOw6sQZQi3w0yBHEZs2WTCH0GU5cYwyHSPnIbZhaZ2ZId08ueqv6Oo6nAcsMeOx8VKaQv/ueiVa/Q852a47kHIBZeQk0qYbtYvJnyMQBQOI9rbvc1hu5lR02qB4DU4/rOIScLTAasFAcPDoNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=TBlzutj3; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RWWbvqQ/; arc=none smtp.client-ip=66.111.4.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id 6DB5E5C049D;
-	Wed, 28 Feb 2024 09:54:41 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Wed, 28 Feb 2024 09:54:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm3; t=1709132081; x=1709218481; bh=p2oBXCBPa5
-	Te8eYjdkY/VrzwmmeYD1hEdZ5hF+LH8JI=; b=TBlzutj3JSlO5koSP5xw7k+irJ
-	0hZavVqjKWnu7v2MYhHuOMiUE3fIFRzqi/rBPpvjGbntcg3uMyPAft+32ddXjmNX
-	5zBABph+FZaN1gFRDTXCFJAwRFtoM8/mE7BOsPsdpNeqq6DDyjSbftV8OfFdiB0V
-	+d+Aq8TQuSMnlzCje3325683suFGsnegn/tbIEAgQyrUuYnm0Hd3Xce2P4wnaPRp
-	+YOjeuvW98qaV6cLgZHG06L1VIeerPOZ5lU1b9cA3ZEK8jAwBrjQKfEJWkqqXHKC
-	E05U+vvmDT+ALjvya75BAn9NNId9lbH3kaKw+kI0y8ysAg5+4tSubv2EL/Mw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm1; t=1709132081; x=1709218481; bh=p2oBXCBPa5Te8eYjdkY/VrzwmmeY
-	D1hEdZ5hF+LH8JI=; b=RWWbvqQ/Ne/Biv7H2HA1/RgmZ4nNcBwSykwsBTU2KoKD
-	ENkzfIfAoi6RE0EqYAw2132pO/DFf1FuS6lx6B1j0hkxuHwHqnt46HAxJ3m3xnGS
-	ALsmHSC8Fjs7je8qJDodeWMDKb3mNL7+pKA1X+3KL5Dzt/3j/OcCPCNU5OhhXbHr
-	GbEoo3YWw2CPeGccgjwtHVQgS+aw6y1wRy/FEAHcS2QGhQZ/KXoe0iuao70gL4cx
-	1/dKdJjjzHz0C29vhAiFJDFW2ADPC53PHcr6vJXv2jbB198vQhU0H0noSI2ZUDqv
-	48Pi6NVQil6gE1OVy18zxChcd/s9sYee0ZsJn+TKvA==
-X-ME-Sender: <xms:MUnfZb7jHSrWyVsdUu3ZM3yG53hbGTTR3Gv0pTrxwJ1i-x3q1MJkDQ>
-    <xme:MUnfZQ7IdMi_NiixLikw6lfiygDu99L3A_orvyzjLKE1KGJG2tVCvaJH5krmgCzn_
-    f0qt5YUbqikCW7-iW8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrgeejgdeiiecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
-    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
-    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
-    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
-    hnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:MUnfZScavs01mZ8Cf7658uCEK5eKltpRUhbtWb9JyTxkd1Lhci-KOA>
-    <xmx:MUnfZcKYR5hJQLUnXr4xCTf5SLNLrN_tNVVZlv2emQBriYftASweYQ>
-    <xmx:MUnfZfIa1nQBXZKdNMaziTKaRCsm4OVK_exJq_cO-GUAf2YGSGhO6g>
-    <xmx:MUnfZRyjBj4OCu_Q8XXzsjSr5g-FhUdrSE9p_hKxuQbcE9rr7WSz8Q>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 20E56B6008D; Wed, 28 Feb 2024 09:54:41 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-182-gaab6630818-fm-20240222.002-gaab66308
+	s=arc-20240116; t=1709132186; c=relaxed/simple;
+	bh=tvMMFT7IKjYWtuCyDMSxTCVQ+1ldB6waLn5e3CF/u9Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UE+xQv8NM2qOnFizW9BiVLb1gugkw95JWspRsFNwI4bJ6CQRAo1bu5qe/4f4z6FJgqjNkjwzBZFjsgvqPoUJWvdTosQxRspoArVH2Xldgvs/5JdhW+stGw7YAD9ETHpiZ25VALpAtuFgyrOeKwP23YMxJdPFANSsrgzGGnrzSec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-412ae15b06fso13146495e9.1;
+        Wed, 28 Feb 2024 06:56:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709132183; x=1709736983;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mj0JnoSewVwlVSZlHt4DT/SaUpGZF5EhEmAbDbXm/cA=;
+        b=hTUk7Bkp8AaUhTFWN/q+Kuh+G6wjM/P/Ct0Y9KYtzgOT92afszZDRL55JMBdVKPNqk
+         JBMmPsGxk8WSjSuOPdepfKIfEGB3DDClVdcUgvmCqzkyADUnZ0VYIV3TmtM1sZkecFAp
+         zxFWAMOItljSV0+MPrZloZIIpw1p412kz0i9uzw2OpOKVF185N95z9S/K1LdrfFEUSC/
+         tCfBlBj+mkS/n4856mcwGsbozPwyj1UGwyF28SBVfoelIh2aGFpo57nx9JGymz8GLzWJ
+         wEUCb9BB8tN2R6oWxs03CtHrpdV9BYqDcTEcTeZAX8tiFCnuXEAkvPnpYMNzyeUknw0G
+         bw8A==
+X-Forwarded-Encrypted: i=1; AJvYcCWIA0aNMjlzzKE/k0IvSvkgX/WVQ/NkERN9bvEiNQN7joLBZugAStOiN/cvMweubfkrlZuY6d+9s7b+LVWXJJXf6E9Q5gf77fTHIrFjPisWEAH1nN8NDJA8kVcZxE5uILer75sy
+X-Gm-Message-State: AOJu0YzRTeNy/5afz3NhP1rWEnnIZpT5W4MOxRUASksZ1u7OHcgHwD1J
+	s34sxFDQkTnElxO+FWfGe0dL+i2WUTQcyp5gu5k5n5aNB6+hroWim3L5rpzs
+X-Google-Smtp-Source: AGHT+IHYIZAmnC6Q7trl4ZYacWDPB4uF2FtswzOgRpJrRuwBbuoiJsTzWGpC3FtxMTqdQQYwJ0ijoQ==
+X-Received: by 2002:a05:600c:a05:b0:412:8fde:ac46 with SMTP id z5-20020a05600c0a0500b004128fdeac46mr10838502wmp.21.1709132182442;
+        Wed, 28 Feb 2024 06:56:22 -0800 (PST)
+Received: from gmail.com (fwdproxy-lla-119.fbsv.net. [2a03:2880:30ff:77::face:b00c])
+        by smtp.gmail.com with ESMTPSA id u6-20020a05600c00c600b0041253d0acd6sm2305404wmm.47.2024.02.28.06.56.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 06:56:21 -0800 (PST)
+Date: Wed, 28 Feb 2024 06:56:19 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Arnd Bergmann <arnd@arndb.de>, Roger Quadros <rogerq@kernel.org>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ethernet: ti: am65-cpsw-qos: fix non-bql configs
+Message-ID: <Zd9Jk5d99h0CeM9z@gmail.com>
+References: <20240228140413.1862310-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <debdd4e5-d3f2-4199-a2f7-825e37b212da@app.fastmail.com>
-In-Reply-To: 
- <CAA93jw50D5Kqi4=ze4qn1TUswWtmEao9=FBtH=4W_g9CnBf=AA@mail.gmail.com>
-References: <20240228140413.1862310-1-arnd@kernel.org>
- <CAA93jw50D5Kqi4=ze4qn1TUswWtmEao9=FBtH=4W_g9CnBf=AA@mail.gmail.com>
-Date: Wed, 28 Feb 2024 15:54:19 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Dave Taht" <dave.taht@gmail.com>, "Arnd Bergmann" <arnd@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Breno Leitao" <leitao@debian.org>,
- "Roger Quadros" <rogerq@kernel.org>,
- "Siddharth Vadapalli" <s-vadapalli@ti.com>,
- "Grygorii Strashko" <grygorii.strashko@ti.com>,
- "Dan Carpenter" <dan.carpenter@linaro.org>, Netdev <netdev@vger.kernel.org>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ethernet: ti: am65-cpsw-qos: fix non-bql configs
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240228140413.1862310-1-arnd@kernel.org>
 
-On Wed, Feb 28, 2024, at 15:44, Dave Taht wrote:
-> but why do you want to disable BQL?
+On Wed, Feb 28, 2024 at 03:03:10PM +0100, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> It is now possible to disable BQL, but that causes cpsw to break:
+> 
+> drivers/net/ethernet/ti/am65-cpsw-nuss.c:297:28: error: no member named 'dql' in 'struct netdev_queue'
+>   297 |                    dql_avail(&netif_txq->dql),
+> 
+> Add an #ifdef check for CONFIG_BQL around this usage.
 
-I have no idea, I'm just doing randconfig build tests.
+I confirmed that all other cases where queue->dql is accessed, it is
+inside a #ifdef CONFIG_BQL block, so, seems appropriate doing the same
+here.
 
-I assume Breno has an answer for that, at least he
-sent the patch that triggered the regression, see below.
+> Fixes: ea7f3cfaa588 ("net: bql: allow the config to be disabled")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-     Arnd
-
-commit ea7f3cfaa58873bbe271577efa800647e30f18bd
-Author: Breno Leitao <leitao@debian.org>
-Date:   Thu Feb 15 09:05:07 2024 -0800
-
-    net: bql: allow the config to be disabled
-    
-    It is impossible to disable BQL individually today, since there is no
-    prompt for the Kconfig entry, so, the BQL is always enabled if SYSFS is
-    enabled.
-    
-    Create a prompt entry for BQL, so, it could be enabled or disabled at
-    build time independently of SYSFS.
-    
-    Signed-off-by: Breno Leitao <leitao@debian.org>
-    Signed-off-by: David S. Miller <davem@davemloft.net>
-
-diff --git a/net/Kconfig b/net/Kconfig
-index 4adc47d0c9c2..3e57ccf0da27 100644
---- a/net/Kconfig
-+++ b/net/Kconfig
-@@ -331,6 +331,7 @@ config NET_RX_BUSY_POLL
- 
- config BQL
-        bool
-+       prompt "Enable Byte Queue Limits"
-        depends on SYSFS
-        select DQL
-        default y
+Reviwed-by: Breno Leitao <leitao@debian.org>
 
