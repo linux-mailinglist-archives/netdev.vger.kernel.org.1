@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-75543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC33186A71B
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 04:20:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6147F86A71E
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 04:20:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AC52283F4A
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:20:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15EEC283F7F
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E72E1DDFF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940E1200AE;
 	Wed, 28 Feb 2024 03:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NhYAR4Th"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sFGXVGR1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108E21DDD5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 697821EA84;
 	Wed, 28 Feb 2024 03:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709090432; cv=none; b=Qo7fMjrC9CMYH9FFIcwSbg3aEF+aPUyRlVZmIgwdh+NR1V9j8OY/Y7DbKapJKMBp6uJ4kflkdCPjVWQYDPh94jd0FuqqX++yez/YsCtPtKXzswOMX2riGKuFLJ6lEvNk/4TtW/RNWt5ZMgiczhib/MsAAJkLtph+8orQhjfaZSM=
+	t=1709090432; cv=none; b=pGiSL3+O3DFfZClhVQlMMxpJvAoKGrnNSjsuoz+6NKGnvlk5OiktMNri4HfbdfD0jDYNTDJzUi60/qUvRaHrfDgNOMns1Qr2bxE9FpL39huuZxjO2fXKighkvKdSvBmO7LT+RbraaDhYWRZ9Jb8O7zNwuZu23B+p+PF1AJrRB2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709090432; c=relaxed/simple;
-	bh=u0axjAWtAcxEr7ZjPkE5IqKAR+IemnMqd88N4WKuBBM=;
+	bh=G/G1oButwF41ut3ZIuOiyg1G4uJOT5AFCqYpQIx/8FI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QXmUlXHVioqRozNDgOjJO6TaMtRjbg672kN3MLP1EH78TrAuJTP+mjeaQP76BsitPzk2lmHZwQ1YhVk+Ml6PGfMnubKQVyjYjmj3AKsef8Dak4ZPNN5TqIN/QUXUVy9wEo2sW5Vs7/n35Wq8ci3NGBQofzqWzwj0Rew3B0kdvBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NhYAR4Th; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A10ADC43390;
+	 In-Reply-To:To:Cc; b=RTsAlhCgC6oqCvkzT6B7edFP7YIIPhgb6L2qNVV5VdcaIwRj8IqokRnLgqDYUbKc3pOadAASlp1SGPLj8r2SKuk/C6OECZ0lO33XaUrB7EkRxxejx3JklhOgJ2bnHBx4uWH9wNX/1kcO5t+X3IIy8QRWkjqQ2DdEuANleNqudeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sFGXVGR1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BFF99C433B2;
 	Wed, 28 Feb 2024 03:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709090431;
-	bh=u0axjAWtAcxEr7ZjPkE5IqKAR+IemnMqd88N4WKuBBM=;
+	bh=G/G1oButwF41ut3ZIuOiyg1G4uJOT5AFCqYpQIx/8FI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NhYAR4ThtSche8nUOdqUa04SsV+s72UyCuiyQo02gy5DxLiaOuj1wNrONe0Z7phE4
-	 +8iGJvqcleo0pKN7mmt75OFNkZeq2XdbDaiNtSQe08OCU9RdLNqbnb8zgA8fVRGP6W
-	 GUHDy2Y+jNDWPpM9+iE44TronIoxJlkI9uH6vV6czwondDIkOmdek3xIWnUCoB4Jpn
-	 hGz803xQ8v2+W7Jb5o84Qv10PxVFWv8P6r3F2dqz8B5mEkAJFgM6BqqWZBH+w2CF9i
-	 NLi/CNDFHgGa82DWB9bHyIv1yeHLWihIuwDyr0Nnm6AJ5NNsmkbt07z+XlF90EJ6Bw
-	 Mtr0iq1zVDe8g==
+	b=sFGXVGR1wYleJqY+qqrIVo71LSeSdwb/1YTAi35lxE8h3whwfFabbdMAIRwjR6CLS
+	 dvaiYlX7u4HC1EhNssRdjiJTi+PS4Lp1njIUH3H8aYYVXFsncXL5UfSOGZq4NXHcg1
+	 jVdDUXmwrNbd3rxR64EGsg1vrkUSlf3KR5yOM2+GaLlMmd9NRzsabrhtuHduQ+/aDO
+	 vfjkMP0aPMyMEB38r4505UCe9p5/oVQOlUQtw/Eg5nNkuBt3JczNJeB8H+AZYiLByi
+	 TTTS0aep+uT5buqxLHxV67xqJcGc/xM9A8tdijV1vbVfNlgK9s9jm8kLIvH+60jdWw
+	 n8m0zrqs8av2g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 87DA6D88FB6;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A5386D990A8;
 	Wed, 28 Feb 2024 03:20:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: usb: dm9601: fix wrong return value in
- dm9601_mdio_read
+Subject: Re: [PATCH net v2] net: stmmac: Complete meta data only when enabled
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170909043155.27277.1060670387014071329.git-patchwork-notify@kernel.org>
+ <170909043166.27277.9836937383707472245.git-patchwork-notify@kernel.org>
 Date: Wed, 28 Feb 2024 03:20:31 +0000
-References: <20240225-dm9601_ret_err-v1-1-02c1d959ea59@gmail.com>
-In-Reply-To: <20240225-dm9601_ret_err-v1-1-02c1d959ea59@gmail.com>
-To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Cc: peter@korsgaard.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240222-stmmac_xdp-v2-1-4beee3a037e4@linutronix.de>
+In-Reply-To: <20240222-stmmac_xdp-v2-1-4beee3a037e4@linutronix.de>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, john.fastabend@gmail.com, yoong.siang.song@intel.com,
+ sdf@google.com, maciej.fijalkowski@intel.com, fancer.lancer@gmail.com,
+ bigeasy@linutronix.de, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 25 Feb 2024 00:20:06 +0100 you wrote:
-> The MII code does not check the return value of mdio_read (among
-> others), and therefore no error code should be sent. A previous fix to
-> the use of an uninitialized variable propagates negative error codes,
-> that might lead to wrong operations by the MII library.
+On Sun, 25 Feb 2024 12:38:37 +0100 you wrote:
+> Currently using plain XDP/ZC sockets on stmmac results in a kernel crash:
 > 
-> An example of such issues is the use of mii_nway_restart by the dm9601
-> driver. The mii_nway_restart function does not check the value returned
-> by mdio_read, which in this case might be a negative number which could
-> contain the exact bit the function checks (BMCR_ANENABLE = 0x1000).
+> |[  255.822584] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
+> |[...]
+> |[  255.822764] Call trace:
+> |[  255.822766]  stmmac_tx_clean.constprop.0+0x848/0xc38
 > 
 > [...]
 
 Here is the summary with links:
-  - net: usb: dm9601: fix wrong return value in dm9601_mdio_read
-    https://git.kernel.org/netdev/net/c/c68b2c9eba38
+  - [net,v2] net: stmmac: Complete meta data only when enabled
+    https://git.kernel.org/netdev/net/c/f72a1994698e
 
 You are awesome, thank you!
 -- 
