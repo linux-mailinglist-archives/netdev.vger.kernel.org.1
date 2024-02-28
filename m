@@ -1,127 +1,186 @@
-Return-Path: <netdev+bounces-75885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C544B86B8E1
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 21:14:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 976D286B919
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 21:35:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FC81288EB0
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 20:14:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 791D3B22386
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 20:35:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6813574418;
-	Wed, 28 Feb 2024 20:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 607F33FB9A;
+	Wed, 28 Feb 2024 20:35:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b="W5O7VKgi"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ItqSDZr4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7539E40843
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 20:14:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3555E060
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 20:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709151291; cv=none; b=WiVwnXuhWhPikaM0arse+BDhsOPwo66EHjlRv6BOIpH5X/LOKopPTWEeFBsPQpfa1xroQJcLOqX2cWnq7LO3GL5Ev8IbBlqchO8xKsDFXb4LUtpvOgZOGBWf5QUrHw4NwLpaU8+wIQJ1VGN/flyaKoAolGgvgY9w5bwGD0T6sWE=
+	t=1709152521; cv=none; b=kJcdCjyvGSuQE0yjP84IPGLUg+AGlxbIy8jt/sXrFlr0cswJfZVIkcGn4wxCmTJoOgicQxCQOjRTQBrEEINT9GnybO3hA+zYoPSrbk6R6dtsbll4JFyIe9MVfCGy+HG1ehFEW65VyJHC2yfQa0+oBtnp9fwBJ2zjKY3xGSr8LmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709151291; c=relaxed/simple;
-	bh=0nrml+WBxBMSjB6gKdozgb5uGnndn0Y89KcuAcb5ymw=;
+	s=arc-20240116; t=1709152521; c=relaxed/simple;
+	bh=k2axefX4qq8ZKhrAUoDvoKs1h2ARXenV9uuV9dVYEcM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Jn0S6jVNaoflmIw5dkNXcqKxCuiJ9pL5+D1cV1NN9T+MSYbYu4OrGo4cfu0pW3D1ymNWDfi/Hl8IKOWs99ANsZ94nTbsUhPkecPNWnNk9Fe51XmhIxlRAJH36++9K6LreoHaSFU0ARteItBah0nVQ8Cr68eUdz0gMu+E4+x0xW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org; spf=pass smtp.mailfrom=joelfernandes.org; dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b=W5O7VKgi; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=joelfernandes.org
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2d28e3c0fe0so1611101fa.2
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 12:14:49 -0800 (PST)
+	 To:Cc:Content-Type; b=dQ2f4n/PPo86bBOaeVoygKooLzSclqXloztkzXB+MBPWH65IrybUajLg/jl8LjgSOnzqV7x86uEItrmZcQ8E7+J009CqAjYIWEhXfl0QWJe71gRAAy8PvquC/q1mAu3AcxrojDzlWaONZRDyJVyz+U0f8QorRCmd3xC9rtvkbvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ItqSDZr4; arc=none smtp.client-ip=209.85.217.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-470441239easo49198137.1
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 12:35:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=joelfernandes.org; s=google; t=1709151288; x=1709756088; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0ADqDxZgPwlPHrnolYYX16DFA+qGQXF/8Cktxf1H8u4=;
-        b=W5O7VKgi0RbREj9bK4Jj5Fb/FthztsNedxht03WloYlKep64hw9KOTCl1792qGxaBQ
-         xcQKzawXUgJcl+IXmoQ9/1Yp1GVfNaxOvmPklwosEmZ2Jj1obRlTpB0GXJDQ9tktvLW5
-         2P/lviMm1/25OJAZNOdBD2hxALxvlydcFp5Sg=
+        d=linaro.org; s=google; t=1709152518; x=1709757318; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=dTsbG5Q4/3YonRF9tCw4Nlusv99qrBzh3bD+/1+Fjgk=;
+        b=ItqSDZr4kO/XuKiuHN9RyyvPmsmPwdcqM9RAMpbGn9irHlUGEMKzJgWHTGRBYFQ7qF
+         4yzTKqsYqBclASlhoXn21u5NpRS/lNlyjjU4TBbRcf3iuaG6e0QbgOhrKlHEcCdzGqSp
+         D+GBzdd+K2xqy5FhgQgqEYSfANpfjRBMHLYG3ArbPykYFzeVIfJvCA0NOr89x+Ufwx47
+         6+qqpim4PQNpt52KxQE9lcukgslzg0QYVIKWJNN2gQKCJP5DMc7JiKD2RH4VUL+zWZ3+
+         DYzzuQnazLA8VB7+uqJ+sVXB0skEEW+QomUNnQbOebpJ4WPCMxSWLeM3937jCf/TolC9
+         2ZUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709151288; x=1709756088;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0ADqDxZgPwlPHrnolYYX16DFA+qGQXF/8Cktxf1H8u4=;
-        b=F+4anSN3eEC5Qy+ucx6jA37oi6J+SVqHadhWsjhIEfd7YoyHpkEIxRCBzNWfRa1yCP
-         LcXQDueTGtpiyFl7fhSlyOvYb9QHY0AlCPKHTeP9Avbi+cl0jNd7yd2Q1oicPRh9apeZ
-         6StrxRc+wzt3xUGt+5TPY3c5omZvDoSBVFTmqNAo3kdYbFgZTk5LmdewvoV7gQqJEgum
-         osFdga/bvAMEhP67kck/GZK5/mwbi7ylrOQj2H5OQQSC5Esaq7j2rh1/9Vcg3mmKNv7e
-         JtCfA7Y71dlk0uKhVfbOVwaVVIIqyQ1XjbalDo6hgfSLC65Oah4Agfio7y9+CLkJA2x0
-         3YCg==
-X-Forwarded-Encrypted: i=1; AJvYcCVfmA+jj0dt0Xwc3gWtu8pvL7kDgHE8KSNC6HcFFLc8wp5pYbXb1H9NfyhNIe6U6yTMzQRmCg3FbqlfFvh0OG8DHfi7NSBH
-X-Gm-Message-State: AOJu0YzPbVB2bqqllotm8s6nxWpYTduqR9tsTlIL9OV36zPn5uS4AIIl
-	HXvghCoKyHElbeMMVD6/f8jZJH+bCrBF0B91CzB8ZKZuqGAodlQATA+yRx9qSjxQDQ4T/0ynYAQ
-	qJOYympHk6eU0bP8/GHogkFBFYItm7v00+IFjuA==
-X-Google-Smtp-Source: AGHT+IG7XxH4AwZOInEocXRNgWrMaGpJwprc/M5hmyKfGaWgosyEiwVI681eukxW0okBE54/dKecrCUQtR2maiJPvrI=
-X-Received: by 2002:a2e:be28:0:b0:2d2:64c8:49a6 with SMTP id
- z40-20020a2ebe28000000b002d264c849a6mr11611642ljq.21.1709151287525; Wed, 28
- Feb 2024 12:14:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709152518; x=1709757318;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dTsbG5Q4/3YonRF9tCw4Nlusv99qrBzh3bD+/1+Fjgk=;
+        b=Aal/hpVJFU+7ijFb63/ZQs3s2yYV4oBf3viHcbRnU8hEwYCflDI/x5t7TrksI+iQoS
+         xBD+V9qj987l0KpA+mq2Uw+9g3jbnLa6LG1pYGPX5PJwVaVKeqEYF9W/JZZP1K67hXn2
+         LF90ruHED2cd+zmqaErsc3DNm0stqsI2Igb85aHrlv4HvgcrthD7P1JvOuMRKdJUNzAK
+         AzpgjSbE5VbyC+3EFr9EcB7wDbM9Z+/kzJwdshnAN2Fx8YgSsHxbDsrlavR/Cnarw7sh
+         MSfFaReyLkdtzPtuJOUPEIbsNW7IxvMa+kom8fFaoNk6MKlb93V1fYNylFOJAwBKhJPX
+         CN4A==
+X-Forwarded-Encrypted: i=1; AJvYcCWHdiqciMC4QCNSX7jr2dnKGsXXZu5aYb6GzxwHnmttp1THW6JEGof/AtrR1b5bNEwbfREn6YBv917APEcU74ZLPOoAhh9g
+X-Gm-Message-State: AOJu0YyjTcPcvZ9MVnFnvxk2ufqn80cI2xWoILnSx+OG3Z4X0VpOJMOH
+	BCm3a+eeG0jka6qKQM4En0/SWSxhT00x48ZdGBkJ2yQ2CguZA1dN5k+9ss15jZ1GHtYfjpI/lsO
+	FObdlD9QMSjSuBKv1XD7j3UIGjGJeXJGViIghig==
+X-Google-Smtp-Source: AGHT+IGbPq5jv3tng931RyYaor6H6McKtd30+PYR5wOOTNYGE1fF/lo/xcMSdesLXzTiFWMBuab14Y2HllKuyH0AWKE=
+X-Received: by 2002:a05:6102:3a0e:b0:470:3c97:9787 with SMTP id
+ b14-20020a0561023a0e00b004703c979787mr46197vsu.0.1709152518180; Wed, 28 Feb
+ 2024 12:35:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Zd4DXTyCf17lcTfq@debian.debian> <CANn89iJQX14C1Qb_qbTVG4yoG26Cq7Ct+2qK_8T-Ok2JDdTGEA@mail.gmail.com>
- <d633c5b9-53a5-4cd6-9dbb-6623bb74c00b@paulmck-laptop> <f1d1e0fb-2870-4b8f-8936-881ac29a24f1@joelfernandes.org>
- <CAO3-Pboo32iQBBUHUELUkvvpSa=jZwUqefrwC-NBjDYx4yxYJQ@mail.gmail.com> <e592faa3-db99-4074-9492-3f9021b4350c@paulmck-laptop>
-In-Reply-To: <e592faa3-db99-4074-9492-3f9021b4350c@paulmck-laptop>
-From: Joel Fernandes <joel@joelfernandes.org>
-Date: Wed, 28 Feb 2024 15:14:34 -0500
-Message-ID: <CAEXW_YRfjhBjsMpBEdCoLd2S+=5YdFSs2AS07xwN72bgtW4sDQ@mail.gmail.com>
-Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
-To: paulmck@kernel.org
-Cc: Yan Zhai <yan@cloudflare.com>, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Lorenzo Bianconi <lorenzo@kernel.org>, 
-	Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>, 
-	Alexander Duyck <alexanderduyck@fb.com>, Hannes Frederic Sowa <hannes@stressinduktion.org>, 
-	linux-kernel@vger.kernel.org, rcu@vger.kernel.org, bpf@vger.kernel.org, 
-	kernel-team@cloudflare.com, rostedt@goodmis.org, mark.rutland@arm.com
+References: <20240206075950.47d0bdc7@kernel.org> <20240228164939.150403-1-naresh.kamboju@linaro.org>
+ <1562999a-05d7-4d4e-8fc0-43c5979793b8@mojatatu.com>
+In-Reply-To: <1562999a-05d7-4d4e-8fc0-43c5979793b8@mojatatu.com>
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Thu, 29 Feb 2024 02:05:06 +0530
+Message-ID: <CA+G9fYtg2Uw0Qe_iJfqdfjiYcqVGcMXxd_YdC0gcb4f7E0_xww@mail.gmail.com>
+Subject: Re: [PATCH net-next] selftests: tc-testing: add mirred to block tdc tests
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
+	jhs@mojatatu.com, kernel@mojatatu.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, pctammela@mojatatu.com, xiyou.wangcong@gmail.com, 
+	lkft-triage@lists.linaro.org, anders.roxell@linaro.org, 
+	Linux Kernel Functional Testing <lkft@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 28, 2024 at 12:18=E2=80=AFPM Paul E. McKenney <paulmck@kernel.o=
-rg> wrote:
+Hi Victor,
+
+On Wed, 28 Feb 2024 at 23:05, Victor Nogueira <victor@mojatatu.com> wrote:
 >
-> On Wed, Feb 28, 2024 at 10:37:51AM -0600, Yan Zhai wrote:
-> > On Wed, Feb 28, 2024 at 9:37=E2=80=AFAM Joel Fernandes <joel@joelfernan=
-des.org> wrote:
-> > > Also optionally, I wonder if calling rcu_tasks_qs() directly is bette=
-r
-> > > (for documentation if anything) since the issue is Tasks RCU specific=
-. Also
-> > > code comment above the rcu_softirq_qs() call about cond_resched() not=
- taking
-> > > care of Tasks RCU would be great!
-> > >
-> > Yes it's quite surprising to me that cond_resched does not help here,
+> On 28/02/2024 13:49, Naresh Kamboju wrote:
+> > LKFT tests running kselftests tc-testing noticing following run time errors
+> > on Linux next master branch.
+> >
+> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> >
+> > This is started from Linux next-20240212 with following commit,
+> >
+> > f51470c5c4a0 selftests: tc-testing: add mirred to block tdc tests
+> >
+> > Run log errors:
+> > ----------
+> > # Test e684: Delete batch of 32 mirred mirror ingress actions
+> > # multiprocessing.pool.RemoteTraceback:
+> > # """
+> > # Traceback (most recent call last):
+> > #   File "/opt/kselftests/default-in-kernel/tc-testing/./tdc.py", line 142, in call_pre_case
+> > #     pgn_inst.pre_case(caseinfo, test_skip)
+> > #   File "/opt/kselftests/default-in-kernel/tc-testing/plugin-lib/nsPlugin.py", line 63, in pre_case
+> > #     self.prepare_test(test)
+> > #   File "/opt/kselftests/default-in-kernel/tc-testing/plugin-lib/nsPlugin.py", line 36, in prepare_test
+> > #     self._nl_ns_create()
+> > #   File "/opt/kselftests/default-in-kernel/tc-testing/plugin-lib/nsPlugin.py", line 130, in _nl_ns_create
+> > #     ip.link('add', ifname=dev1, kind='veth', peer={'ifname': dev0, 'net_ns_fd':'/proc/1/ns/net'})
+> > #   File "/usr/lib/python3/dist-packages/pyroute2/iproute/linux.py", line 1593, in link
+> > #     ret = self.nlm_request(msg, msg_type=msg_type, msg_flags=msg_flags)
+> > #           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > #   File "/usr/lib/python3/dist-packages/pyroute2/netlink/nlsocket.py", line 403, in nlm_request
+> > #     return tuple(self._genlm_request(*argv, **kwarg))
+> > #            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > #   File "/usr/lib/python3/dist-packages/pyroute2/netlink/nlsocket.py", line 985, in nlm_request
+> > #     for msg in self.get(
+> > #                ^^^^^^^^^
+> > #   File "/usr/lib/python3/dist-packages/pyroute2/netlink/nlsocket.py", line 406, in get
+> > #     return tuple(self._genlm_get(*argv, **kwarg))
+> > #            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > #   File "/usr/lib/python3/dist-packages/pyroute2/netlink/nlsocket.py", line 770, in get
+> > #     raise msg['header']['error']
+> > # pyroute2.netlink.exceptions.NetlinkError: (34, 'Numerical result out of range')
 >
-> In theory, it would be possible to make cond_resched() take care of
-> Tasks RCU.  In practice, the lazy-preemption work is looking to get rid
-> of cond_resched().  But if for some reason cond_resched() needs to stay
-> around, doing that work might make sense.
+> It looks like the ip link add command is returning ERANGE.
+> We have tested this in NIPA for sometime with 64-bit and this is the
+> first time
+> we are seeing this:
+>
+> https://github.com/p4tc-dev/tc-executor/tree/storage/artifacts/485544
+>
+> Could you give us more information on how to reproduce this?
 
-In my opinion, cond_resched() doing Tasks-RCU QS does not make sense
-(to me), because cond_resched() is to inform the scheduler to run
-something else possibly of higher priority while the current task is
-still runnable. On the other hand, what's not permitted in a Tasks RCU
-reader is a voluntary sleep. So IMO even though cond_resched() is a
-voluntary call, it is still not a sleep but rather a preemption point.
+Steps to reproduce:
+-------------
 
-So a Tasks RCU reader should perfectly be able to be scheduled out in
-the middle of a read-side critical section (in current code) by
-calling cond_resched(). It is just like involuntary preemption in the
-middle of a RCU reader, in disguise, Right?
+# To install tuxrun to your home directory at ~/.local/bin:
+# pip3 install -U  \
+  --user tuxrun==0.62.2
+#
+# Or install a deb/rpm depending on the running distribution
+# See https://tuxmake.org/install-deb/ or
+# https://tuxmake.org/install-rpm/
+#
+# See https://tuxrun.org/ for complete documentation.
+#
+# Please follow the additional instructions if the tests are related to FVP:
+# https://tuxrun.org/run-fvp/
+#
 
-thanks,
+tuxrun  \
+  --runtime podman  \
+  --device qemu-x86_64  \
+  --boot-args rw  \
+  --kernel https://storage.tuxsuite.com/public/linaro/lkft/builds/2czN3tP1CXUNgatiVGk7ANylgIu/bzImage
+ \
+  --rootfs https://storage.tuxboot.com/debian/bookworm/amd64/rootfs.ext4.xz  \
+  --modules https://storage.tuxsuite.com/public/linaro/lkft/builds/2czN3tP1CXUNgatiVGk7ANylgIu/modules.tar.xz
+ \
+  --parameters SKIPFILE=skipfile-lkft.yaml  \
+  --parameters KSELFTEST=https://storage.tuxsuite.com/public/linaro/lkft/builds/2czN3tP1CXUNgatiVGk7ANylgIu/kselftest.tar.xz
+ \
+  --image docker.io/linaro/tuxrun-dispatcher:v0.62.2  \
+  --tests kselftest-tc-testing  \
+  --timeouts boot=15 kselftest-tc-testing=20
 
- - Joel
+
+Links,
+ - https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/lkft/tests/2czN6g0MY3kgnwGYHadaUQHfPOU
+ - https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/lkft/tests/2czN6g0MY3kgnwGYHadaUQHfPOU/reproducer
+
+
+>
+> Note: This doesn't seem to be related to the patches in question.
+> Seems to be a generic thing with nsPlugin itself.
+>
+> Thanks,
+> Victor
 
