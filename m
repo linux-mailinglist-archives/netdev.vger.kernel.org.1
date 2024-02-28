@@ -1,121 +1,146 @@
-Return-Path: <netdev+bounces-75758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB19886B10C
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:59:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86A3586B12C
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:02:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7087C1F23BC6
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:59:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B89541C21CE3
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:02:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 055FB1534E3;
-	Wed, 28 Feb 2024 13:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F861152E14;
+	Wed, 28 Feb 2024 14:02:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FlP4LZd1"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="mUrQbNBY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F3B151CDB
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 13:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A18153513;
+	Wed, 28 Feb 2024 14:02:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709128766; cv=none; b=ZRCo9RCpEuAK47JU4EB7CI5z+NKeRD0SKYV1fOrHO9hW4ZH1kibfuMJczhBEIZz5ynpPnJivztCAp5+cqm1W6/Ii4LYyEYJ7t2DNuActIyY3TprMJdh8PmiFs+P1dn103sJ20e9ZzHHzYEXU9nJzul0AxTXKT2zNP61uzCnurfA=
+	t=1709128945; cv=none; b=rI8pvoWeims4bursWCxZTodNWkoaF3nX/NxbWnGghmR/u8e6dN0HAiM/o44KgMjeQFJyNovLyL8U8qKuN/a8kHv40ooAIfoizpI8zSVIJ8B0ntmoaHYh6+w6rZPhUhCs3q1vrbrEdJXpCuVqh3WNKOK/Bub/ERLeKwLFbdQn2fQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709128766; c=relaxed/simple;
-	bh=38rh2rcGmYp3eG0FBJS3Tu+aaqrCsyjcVfRaI14cYfQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BiY0zpzI+BgRsa4Db6t7d2abWhRP6gGcQXO3K8y08aC99xu2LdXT2LvqSkT4GWqI5f8+ul2+r1rkj1iuL0D7fsGST66ex/cfHQzQ/B2VBYtaMqBqScH+pI/DX+5bYJ1m92z1Kh/WppwXwMZhKV1Yl7NgtBci+HOSP8jtClsUiKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FlP4LZd1; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-513056fe2b0so670179e87.0
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 05:59:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709128763; x=1709733563; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3MsZV9ZXZHa4eODBeyDTojMy/w9Lw+RzL4frXmBJ1Rc=;
-        b=FlP4LZd1q6lcNdKTXUSprhm6cSfv7AbJHii6vxDJ4n1Aw+kVOMOoSs1Q546Dq6RFaT
-         +vT0tl3aSHt/gckTZqcPxspcpH7pM3YGB9pedMISralgNfc4nD1fUyg6lKoIxnhFHfjt
-         Fyprh/5nULLk7LKS1lLcXbYr1nlimIV+lPmfoyZcVOVefnOQxTUF2uaKbo5nRZFtUqnz
-         DVM0a1X6LhdJXZXYMFtrJU2xtDzEDZk4+NhZY7g3028j1HhRIQZnmq6ubsoz7nnlrEGw
-         jkc6x2kniKxLUBQOdpjgpK4XVs+xee9kxeYtcKBjJYl9Ofd/U/oPtQRphco3ts4vCUxF
-         YMQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709128763; x=1709733563;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3MsZV9ZXZHa4eODBeyDTojMy/w9Lw+RzL4frXmBJ1Rc=;
-        b=tpcze27GZvsAAj9si7sIsCgyA9hWaOeAJJ5b3RhU5Q6Abt0J4WcOAC7vhJEVdMyoOh
-         wo+Nlh4l5P/j66HnZsYzJn99WUUB584dWj3JELUDGS1FcxkxYZRj2VKZNFKJxFTZhzCR
-         FCqx2ygP7nWKpzw54Ow6cdpDjAcISSCdTEJBY+/7DW1+oIbnYvrQ65yN6nbbbdAa3Jh9
-         6kbskTS0ceX5OoVGsEEHp9BkuD7tP1iDd8z3qfAi3DX5mPQqUosIlANtbUySVXF7zCek
-         6uHa0LJSAMCySLKHSpVccnhwYZaTuSk/Sb5dZNXsF9O4XUqs8dz7RuYzuAVN8IMkCR7H
-         01eQ==
-X-Gm-Message-State: AOJu0YyiMUX1VSECuxtQeQt/H5fxfqi7WNwz4oB3ay+2StT/yejIshO3
-	rrCVTJek96IPChvLBg6tksdp4dFEp0G1AIlSwMCCPgXbrEGtazE4Q8QOoduJlIjebaFa
-X-Google-Smtp-Source: AGHT+IEBmxTo1lGFMMPRMYm+k1bloOutCpq3Ao1WOO2bwYVderXegg6Ry8KBfJsaPVQaurycZsZ8Ow==
-X-Received: by 2002:a05:6512:2820:b0:512:bc0e:27fe with SMTP id cf32-20020a056512282000b00512bc0e27femr7952528lfb.1.1709128763251;
-        Wed, 28 Feb 2024 05:59:23 -0800 (PST)
-Received: from localhost.localdomain ([83.217.200.104])
-        by smtp.gmail.com with ESMTPSA id b19-20020a0565120b9300b005131e8b7103sm95204lfv.1.2024.02.28.05.59.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 05:59:22 -0800 (PST)
-From: Denis Kirjanov <kirjanov@gmail.com>
-X-Google-Original-From: Denis Kirjanov <dkirjanov@suse.de>
-To: stephen@networkplumber.org
-Cc: netdev@vger.kernel.org,
-	Denis Kirjanov <dkirjanov@suse.de>
-Subject: [PATCH iproute2 3/3] nstat: convert sprintf to snprintf
-Date: Wed, 28 Feb 2024 08:58:58 -0500
-Message-Id: <20240228135858.3258-3-dkirjanov@suse.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240228135858.3258-1-dkirjanov@suse.de>
-References: <20240228135858.3258-1-dkirjanov@suse.de>
+	s=arc-20240116; t=1709128945; c=relaxed/simple;
+	bh=WdXypY2ZESI6ACy57WRtQ1GL13gJ87ahK2ngODFXcu4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uOA4eDo2oi1ZtTS23QZDNxHfP0cuFzyyK8DCpL59uv+KbwE1MubFBfJaEnZX1nkaCIzBmhI3I0ycY5hBEuyklrwMVeRWbg54pgi781nLR2QijG28TF3AGBJNo3U2WIdKNuShAcDeVMBe0hUNwZqFCIUB/yVlEcvx5H4Xm2Ue/DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=mUrQbNBY; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1709128943; x=1740664943;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=WdXypY2ZESI6ACy57WRtQ1GL13gJ87ahK2ngODFXcu4=;
+  b=mUrQbNBYaG1g2ffVkIgusJ5ax1ZQEcuVlPRi/dYDfV4FW+SMrV6Ra96r
+   bfYRsoc0Vc4fbKjb4d+nuYUKXXs+iu2KMPTrZRXlOzi/KOapH55VG8h/0
+   2+sT4KNrak2TfRaEOnZHmf2B6d0fDRTEyqrl+vntrjwInkZ9YRobtS8eL
+   GHZL5A30Vdix8Ruv2RQfsjATwEff1+5izzS5G1V/McKU8YVjRNUB0wosr
+   RdRNE8KY92ER+kRHqy4Latfme2u8R62kcNZlPaF79dd5JkeYjoZNwoPL7
+   B/E+QPQW8WuZNdonR9aps8krjnfNaVaCoJRSawbpRqos1IzyirWl8qSAX
+   A==;
+X-CSE-ConnectionGUID: NNZI3UdGTamRyI3/+iKe5g==
+X-CSE-MsgGUID: Q/U1NwXmRwWY4O6IuTIWgA==
+X-IronPort-AV: E=Sophos;i="6.06,190,1705388400"; 
+   d="scan'208";a="247703922"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 Feb 2024 07:02:16 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 28 Feb 2024 07:02:07 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Wed, 28 Feb 2024 07:02:07 -0700
+Date: Wed, 28 Feb 2024 15:02:06 +0100
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Wojciech Drewek <wojciech.drewek@intel.com>
+CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
+Subject: Re: [PATCH net-next 2/2] net: phy: micrel: lan8814 cable improvement
+ errata
+Message-ID: <20240228140206.fm46zgjlhfwlkavh@DEN-DL-M31836.microchip.com>
+References: <20240228062813.1007138-1-horatiu.vultur@microchip.com>
+ <20240228062813.1007138-3-horatiu.vultur@microchip.com>
+ <62ee2e75-72d5-43bf-a37f-948692a0e551@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <62ee2e75-72d5-43bf-a37f-948692a0e551@intel.com>
 
-Use snprintf to print only valid data.
-That's the similar change done for ifstat.
+The 02/28/2024 11:03, Wojciech Drewek wrote:
 
-Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
----
- misc/nstat.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Wojciech,
 
-diff --git a/misc/nstat.c b/misc/nstat.c
-index ea96ccb0..7beb620b 100644
---- a/misc/nstat.c
-+++ b/misc/nstat.c
-@@ -483,7 +483,7 @@ static void server_loop(int fd)
- 	p.fd = fd;
- 	p.events = p.revents = POLLIN;
- 
--	sprintf(info_source, "%d.%lu sampling_interval=%d time_const=%d",
-+	snprintf(info_source, sizeof(info_source), "%d.%lu sampling_interval=%d time_const=%d",
- 		getpid(), (unsigned long)random(), scan_interval/1000, time_constant/1000);
- 
- 	load_netstat();
-@@ -636,7 +636,7 @@ int main(int argc, char *argv[])
- 
- 	sun.sun_family = AF_UNIX;
- 	sun.sun_path[0] = 0;
--	sprintf(sun.sun_path+1, "nstat%d", getuid());
-+	snprintf(sun.sun_path + 1, sizeof(sun.sun_path) - 1, "nstat%d", getuid());
- 
- 	if (scan_interval > 0) {
- 		if (time_constant == 0)
+> 
+> On 28.02.2024 07:28, Horatiu Vultur wrote:
+> > When the length of the cable is more than 100m and the lan8814 is
+> > configured to run in 1000Base-T Slave then the register of the device
+> > needs to be optimized.
+> >
+> > Workaround this by setting the measure time to a value of 0xb. This
+> > value can be set regardless of the configuration.
+> >
+> > This issue is described in 'LAN8814 Silicon Errata and Data Sheet
+> > Clarification' and according to that, this will not be corrected in a
+> > future silicon revision.
+> >
+> > Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+> > ---
+> >  drivers/net/phy/micrel.c | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> >
+> > diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+> > index 5a0cc89eaebdd..1e3b0436e161e 100644
+> > --- a/drivers/net/phy/micrel.c
+> > +++ b/drivers/net/phy/micrel.c
+> > @@ -117,6 +117,10 @@
+> >  #define LAN8814_EEE_STATE                    0x38
+> >  #define LAN8814_EEE_STATE_MASK2P5P           BIT(10)
+> >
+> > +#define LAN8814_PD_CONTROLS                  0x9d
+> > +#define LAN8814_PD_CONTROLS_PD_MEAS_TIME_MASK_       GENMASK(3, 0)
+> > +#define LAN8814_PD_CONTROLS_PD_MEAS_TIME_VAL_        0xb
+> > +
+> >  /* Represents 1ppm adjustment in 2^32 format with
+> >   * each nsec contains 4 clock cycles.
+> >   * The value is calculated as following: (1/1000000)/((2^-32)/4)
+> > @@ -3302,6 +3306,12 @@ static void lan8814_errata_fixes(struct phy_device *phydev)
+> >       val = lanphy_read_page_reg(phydev, 2, LAN8814_EEE_STATE);
+> >       val &= ~LAN8814_EEE_STATE_MASK2P5P;
+> >       lanphy_write_page_reg(phydev, 2, LAN8814_EEE_STATE, val);
+> > +
+> > +     /* Improve cable reach beyond 100m */
+> > +     val = lanphy_read_page_reg(phydev, 1, LAN8814_PD_CONTROLS);
+> > +     val &= ~LAN8814_PD_CONTROLS_PD_MEAS_TIME_MASK_;
+> > +     val |= LAN8814_PD_CONTROLS_PD_MEAS_TIME_VAL_;
+> > +     lanphy_write_page_reg(phydev, 1, LAN8814_PD_CONTROLS, val);
+> 
+> Ok, now I see that the second fix is also in lan8814_errata_fixes.
+> I'd suggest to split both fixes to separate functions and name them
+> in more descriptive way.
+
+Yes, I can do that. Then I will create a separate function for each
+errata fix and I will do the same also for future erratas.
+
+> 
+> >  }
+> >
+> >  static int lan8814_probe(struct phy_device *phydev)
+
 -- 
-2.30.2
-
+/Horatiu
 
