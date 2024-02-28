@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-75662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEE8F86AD9C
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:38:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72AE086AD9D
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:38:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AB4A28F596
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 11:38:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A07BE1C22FE0
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 11:38:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78F8B149E0C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8538F149E1D;
 	Wed, 28 Feb 2024 11:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tzzUon/l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dbi0VaVe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55140149E01
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 11:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550C3149DFC;
+	Wed, 28 Feb 2024 11:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709119832; cv=none; b=EYS830Kh4rBDAhA9ODZ/CbInbRbfty20VJhF+tigp2UKRwnQM6ieN1M1uGIgy4nRwqiiMevcO1ogV5HEFXshHRUcocnCh7xHTxUJuQrrzhi2NuWJKpVAWCTh13/Cp4LeDSxm2gas18z9gOUh6a3sYnaLPiwkzUW3CEI5aR58WVg=
+	t=1709119832; cv=none; b=ESJB0xp4ZiGwK2AfDFwNry6eigfIKo7/1rv5ICMo02VIk6BgLuplJGad0xWVPFcSwbkIZaHRdzMG3n/ckk7efiHctS5lwGecOjJBsQQ14tnhoVTylOS9uff/gPMB9T3wiJNstJ8pNdsZSJF1w3Z8Faremz5aY8mhEICYioB/amc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709119832; c=relaxed/simple;
-	bh=dExqIoBq9OUXPmisyTjHXVaNhd4OMse1HCeHa7BuDkg=;
+	bh=3dKq8DTrnn7LXnP+Vb/J3/P5tHZH+q5AeKLtMCW7rMU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ctc2yn2JljUQqWRGuWDviXX6iCF2EJ04W1zRbJzlAF3ErwMQq91JjErpBVCwKnyYal433+aW5WDYcixaOMMmJ4FehjRoLqmHLeuBqjI3Iab2Tj7TKB6zV5iBfceKd0HTgxechDE4MBL+TKHObFlqslk0XHLeCe2Q7f7/XiP/92Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tzzUon/l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 01033C43399;
+	 In-Reply-To:To:Cc; b=rgI3wm2CAENl0ppRMB8jkKl8xcd7XbIqUWtWxbFr+T5A5exmG5gOCzHduplrud9HmhkUtLNVQE1YAvLwTXoPaT7qGCLg3O3vgNXIe/LsyLZDN2PtOOt/oKJSxwW+sLFvWJI+K5SmiQr0i7JRnqhXObcoargCZ90c/q8kwvoa6Qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dbi0VaVe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F154CC433C7;
 	Wed, 28 Feb 2024 11:30:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709119832;
-	bh=dExqIoBq9OUXPmisyTjHXVaNhd4OMse1HCeHa7BuDkg=;
+	bh=3dKq8DTrnn7LXnP+Vb/J3/P5tHZH+q5AeKLtMCW7rMU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tzzUon/l8O55u8gLyHwy1hOvwKy6tyI4eMQA+1tD38KiizLJoKE4aWddPGa5NSxIJ
-	 fEvuwkIEJYnlJvta4W4u9WKJTRO3mccT0nUviAixPA0CN/MNNcFmIHV3mLxK930tFs
-	 VAOd4HGg2JdxU2yZVT8V6EUsqzYwDYblifYmnXjn/ozEmkk8TcwQo9ubEwQL62Pebt
-	 oE9sU6tPVrfY2Lj0YY3HVmw07XW/zRymqZ46zUzCOk1e5t4MI35Z7LYX00TNWtLD4P
-	 nnQFIvRVbcPSIOWdMN7XfpaHxbZ19QJ2/GZ3kNGjfwtZXCgIxA5+fJUQhL0ErObSRz
-	 oaGOH7+tE47eA==
+	b=dbi0VaVeoMJ3CXTek8Z16JlqEG3DkGPxMhPrxdttTa2uuJbJaiT7LYJPuNbIVRyHv
+	 nbS23ao6FRb8W6tVgDT7xMto1+ShbS0atTMUBPh4fL261meYhqjw4ROYT7kmIEVMa/
+	 xdDe8buQPNgVcAK/3a6aqgsz1VLkDMES5o5G/iiGgXFBBIkNg348mP5xJIZ/OjAehB
+	 EeZQ4mpMqZMP5HSV6Mr9M8F5mtR7xh8qG6+NitjramPLqBlxVVeOHfRCSurA7c/8cJ
+	 2TJT8PwCytJhdvoksoU4bFYQuWl/jcClEZWmxz+xZ1CVvvzIxNatXVImUAyW+kQWrx
+	 BVpd837eQJrbw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DE067D88FAF;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D67C7C595D2;
 	Wed, 28 Feb 2024 11:30:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,45 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] stmmac: Clear variable when destroying workqueue
+Subject: Re: [PATCH net v3] Documentations: correct net_cachelines title for
+ struct inet_sock
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170911983190.5841.7484242460715131155.git-patchwork-notify@kernel.org>
+ <170911983187.5841.9077912041625374191.git-patchwork-notify@kernel.org>
 Date: Wed, 28 Feb 2024 11:30:31 +0000
-References: <20240226164231.145848-1-j.raczynski@samsung.com>
-In-Reply-To: <20240226164231.145848-1-j.raczynski@samsung.com>
-To: Jakub Raczynski <j.raczynski@samsung.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, alexandre.torgue@foss.st.com,
- joabreu@synopsys.com
+References: <20240226171254.4066289-1-haiyue.wang@intel.com>
+In-Reply-To: <20240226171254.4066289-1-haiyue.wang@intel.com>
+To: Haiyue Wang <haiyue.wang@intel.com>
+Cc: netdev@vger.kernel.org, lixiaoyan@google.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Mon, 26 Feb 2024 17:42:32 +0100 you wrote:
-> Currently when suspending driver and stopping workqueue it is checked whether
-> workqueue is not NULL and if so, it is destroyed.
-> Function destroy_workqueue() does drain queue and does clear variable, but
-> it does not set workqueue variable to NULL. This can cause kernel/module
-> panic if code attempts to clear workqueue that was not initialized.
+On Tue, 27 Feb 2024 01:09:16 +0800 you wrote:
+> The fast path usage breakdown describes the detail for 'inet_sock', fix
+> the markup title.
 > 
-> This scenario is possible when resuming suspended driver in stmmac_resume(),
-> because there is no handling for failed stmmac_hw_setup(),
-> which can fail and return if DMA engine has failed to initialize,
-> and workqueue is initialized after DMA engine.
-> Should DMA engine fail to initialize, resume will proceed normally,
-> but interface won't work and TX queue will eventually timeout,
-> causing 'Reset adapter' error.
-> This then does destroy workqueue during reset process.
-> And since workqueue is initialized after DMA engine and can be skipped,
-> it will cause kernel/module panic.
+> Signed-off-by: Haiyue Wang <haiyue.wang@intel.com>
+> ---
+> v3:
+>   - Update the git commit message.
+>   - Stop using the git '--in-reply-to' to reply.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] stmmac: Clear variable when destroying workqueue
-    https://git.kernel.org/netdev/net/c/8af411bbba1f
+  - [net,v3] Documentations: correct net_cachelines title for struct inet_sock
+    https://git.kernel.org/netdev/net/c/4adfc94d4aec
 
 You are awesome, thank you!
 -- 
