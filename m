@@ -1,62 +1,57 @@
-Return-Path: <netdev+bounces-75760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CAF586B132
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:04:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF53D86B13E
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:05:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C52E1C21DE8
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:04:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84FCC1F223AD
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:05:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA201509AB;
-	Wed, 28 Feb 2024 14:04:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YCFN+cZr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B752151CC5;
+	Wed, 28 Feb 2024 14:05:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from baptiste.telenet-ops.be (baptiste.telenet-ops.be [195.130.132.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6FF73519;
-	Wed, 28 Feb 2024 14:04:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C551F14DFD6
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 14:05:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.132.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709129060; cv=none; b=CtTsr8k9bYdacoitHZpeSiBbHlfY4l1HqY39LB/SHJPYiElTeFNiBGc9qjjEFUfYIKEIwx/ctyl2bZNX1zRmCbgeVYZiazHqz23WHNH+wPLa6xB5pxFpyUfIodlarAMoeG8Ptp+JWmAoiVt51mr3mre6V5RPj9XPCZ3u9QLTLds=
+	t=1709129141; cv=none; b=CDtpAQizAlZHHsfbJHVM2kC3/b861zIMNczBa/TVHgkD+eQ2TCL2HoWJeAvC8iYJMxkYvQzAf3PeDHABTv7z2ms8UFRVTjDghaEKiuG+tA1ehZVZ/Ji47EBRxEEaIHhFiQHIZkFvsQlewOUqR9CD8BLB3HPd1UngO8by8A7doDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709129060; c=relaxed/simple;
-	bh=5ZN5lb9qZh+wr9R+euAaAWQtDY1Ld9pqoFz7FSR7nU4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bSSYhR0715qTp3tD/JM4m4cnSw8vK6dkDlXBd0I9hcoukkfLEFbMQzD4/Gxu0k3HAn9hQX4EfYnaK9b2I3C+/k8fSFIRCFlfWApxi4uO0cRmMRWELq0Y2nnDcGTD2BSU+oMPkCu0kKKHEsTi/DHmpoqEOdnPT5t5Dj608uxz9Os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YCFN+cZr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2803C433F1;
-	Wed, 28 Feb 2024 14:04:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709129059;
-	bh=5ZN5lb9qZh+wr9R+euAaAWQtDY1Ld9pqoFz7FSR7nU4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=YCFN+cZrz77OSYi3x49AK08LMrEZTz1xtiWB12Kz3FE7haRPxCTQL5LArbfAgRCwq
-	 pkc38JPw97vWJ/Ss5MDO7rynTPqLcae8421fO+1apsLr4p3jJzOZ9h8n2eauIAGgmL
-	 kDDvEcuDe9+WU8kDT0orjDmylaAwLEXOxNsw8iXsXna3/ttxD2yY2TywkWg/jb0qSt
-	 nalk09LUf/Q1Y5+ZBreRv07wkrxo8y5ypvOMiwQFbNFGuQ514/+rLwF4MRuz5owzFe
-	 Cv1VLVu1+EL2w8DQnylxiG3Do8GLHp5QLN8Ks3BWS6aiE1yr4QmPWK3al8KxhNsgRp
-	 BML2iZ2MeCidA==
-From: Arnd Bergmann <arnd@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1709129141; c=relaxed/simple;
+	bh=L3K4rtzy6gxBJUGpTTcskVWOegBL2LVnvlohsA27NJs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=G0Fsfqy6j9qtWkYrqtfFV93rNvJs4L5aWRfaTwc2SpM8rYHPPfGY/SwRkXzU7FAW8XITJRzBCtFEe3Gabtgi+GjCwxT69H6S6ffkgqPODHlwGOtyf95QdEon5OE45Iz3K6XgyRm57pjotsgCzlLMkBUNSknEGUS3QNb1s/B90R8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.132.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed40:48c4:26a9:d9ec:22cb])
+	by baptiste.telenet-ops.be with bizsmtp
+	id se5X2B00W4gWvPH01e5YVc; Wed, 28 Feb 2024 15:05:32 +0100
+Received: from rox.of.borg ([192.168.97.57])
+	by ramsan.of.borg with esmtp (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1rfKYk-001tZf-Ar;
+	Wed, 28 Feb 2024 15:05:31 +0100
+Received: from geert by rox.of.borg with local (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1rfKYt-006hqr-PP;
+	Wed, 28 Feb 2024 15:05:31 +0100
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+To: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Breno Leitao <leitao@debian.org>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Roger Quadros <rogerq@kernel.org>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Grygorii Strashko <grygorii.strashko@ti.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: ethernet: ti: am65-cpsw-qos: fix non-bql configs
-Date: Wed, 28 Feb 2024 15:03:10 +0100
-Message-Id: <20240228140413.1862310-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [PATCH net-next] Simplify net_dbg_ratelimited() dummy
+Date: Wed, 28 Feb 2024 15:05:29 +0100
+Message-Id: <5d75ce122b5cbfe62b018a7719960e34cfcbb1f2.1709128975.git.geert+renesas@glider.be>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,38 +60,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Arnd Bergmann <arnd@arndb.de>
+There is no need to wrap calls to the no_printk() helper inside an
+always-false check, as no_printk() already does that internally.
 
-It is now possible to disable BQL, but that causes cpsw to break:
-
-drivers/net/ethernet/ti/am65-cpsw-nuss.c:297:28: error: no member named 'dql' in 'struct netdev_queue'
-  297 |                    dql_avail(&netif_txq->dql),
-
-Add an #ifdef check for CONFIG_BQL around this usage.
-
-Fixes: ea7f3cfaa588 ("net: bql: allow the config to be disabled")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/linux/net.h | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 9d2f4ac783e4..3a3ec9959ee2 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -294,7 +294,11 @@ static void am65_cpsw_nuss_ndo_host_tx_timeout(struct net_device *ndev,
- 		   txqueue,
- 		   netif_tx_queue_stopped(netif_txq),
- 		   jiffies_to_msecs(jiffies - trans_start),
-+#ifdef CONFIG_BQL
- 		   dql_avail(&netif_txq->dql),
-+#else
-+		   0,
-+#endif
- 		   k3_cppi_desc_pool_avail(tx_chn->desc_pool));
+diff --git a/include/linux/net.h b/include/linux/net.h
+index c9b4a63791a45948..15df6d5f27a7badc 100644
+--- a/include/linux/net.h
++++ b/include/linux/net.h
+@@ -299,10 +299,7 @@ do {									\
+ 	net_ratelimited_function(pr_debug, fmt, ##__VA_ARGS__)
+ #else
+ #define net_dbg_ratelimited(fmt, ...)				\
+-	do {							\
+-		if (0)						\
+-			no_printk(KERN_DEBUG pr_fmt(fmt), ##__VA_ARGS__); \
+-	} while (0)
++	no_printk(KERN_DEBUG pr_fmt(fmt), ##__VA_ARGS__)
+ #endif
  
- 	if (netif_tx_queue_stopped(netif_txq)) {
+ #define net_get_random_once(buf, nbytes)			\
 -- 
-2.39.2
+2.34.1
 
 
