@@ -1,118 +1,148 @@
-Return-Path: <netdev+bounces-75807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EDCA86B3DB
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:56:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A18F886B3E9
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:58:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 206F51C22888
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:56:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 285DC1F29383
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:58:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C65B715CD67;
-	Wed, 28 Feb 2024 15:56:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A9815DBA8;
+	Wed, 28 Feb 2024 15:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OWThLdHv"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Xjte7aZT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2057.outbound.protection.outlook.com [40.107.92.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7E315C8;
-	Wed, 28 Feb 2024 15:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709135789; cv=none; b=roSEb85+F1Hw4TbY2E70oP2k6PyBD5b/899+l2dlcLg/9bzIEAhIhL7AJB0p859o7QNrNzk+t9uk6zt8TkYtwpFVZgih0OUSxWgOESsVp1dKBz1VxBLPh1LmFy97ngrxoWaAIEgDyizIGCJ7anKeujU47qYXooFSFi15rO1bT04=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709135789; c=relaxed/simple;
-	bh=4oMFZxzX5PZA/M9VG2s4kgB/DZ8GhzCcWfCzEPQkVt8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IUE3h+U2OoP9nookdLwWvwFenoXQ4vWHu2qH+xc1cu297DzP8C1QC0kovcyks772kIj30fxzeZJoeURm2yDEiW2SH1hqZ/FKroGnK+51qRyz7Jg+h9NkJLB7QjjCXXywe2KSbW+ZG8UUBNlB8fz/qyj8K8wdzYct8XwTuUIf7+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OWThLdHv; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d23114b19dso79799881fa.3;
-        Wed, 28 Feb 2024 07:56:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709135786; x=1709740586; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/Zr38ZfbAtVyJs0WSKTX26b9HT0iMoobWLC4JSkjjuk=;
-        b=OWThLdHvZEMmIBUxwa6IzIM3BmDlh4d6EX53fDo3MdYEzcI/MXMJktHTmmnHOGvKJX
-         7su4Npcr1QjY0c+sjz9t8s0vsUMPhp7i90YuqnnrpNbakxFGWLBrol0h0WGTUGvJznpS
-         gcd409oWO7emaMpHCzHXWGAB8RJZZrf5BvCUjrTQtUaKsn+QMjRQnJc4BPF4QUxhNAqC
-         occ7aug2KfEFekVXVLsV+HOrvk7NAvic0DXflkJrptxR80WuvnKd4I05YwoIyKIA0bmA
-         mahZHU9rcFNrCQ3FNhTnQjHNbAmJ0Y7Xsf9v7hXmVfkiokVuVYid17pUrceFucaede9m
-         VsBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709135786; x=1709740586;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/Zr38ZfbAtVyJs0WSKTX26b9HT0iMoobWLC4JSkjjuk=;
-        b=OfJWXkwlv+7qAvAlsacvey1cL/mHJ43qI1DyKjTrWQ5Z3pGcFmH5tsPDx641Nu60zm
-         g0FZnqgBEqPq3CF8vxuHoUaJsRYn9Jm3nzwBcEarM1UH70JJ6ikmnyBKHyfIWgAmgiPP
-         MEdSomY00VjA568jQoMwCmvpTkj9k3CAt5a/ua5dLa7QtNXarxs5R+XrMXCFRG5Js8tx
-         vg3VsjLZkfP+imSREJq+1epRNNRyPsab3tQ9zpVLExIk/nTyLmA6rtyjPUPuHxOIBXEY
-         xnXhlGXbYEJjTtiVR9IJCqqPfFqjk+YSBm6dInIyKZpp03PtQ7XcjfQefKxoQxjuOx/A
-         G93Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXHmv/u5jh1RcQuD+OaKRf3v2UalfOJBgA6PJ3ntdEL5CsKZQn6PFQApIKdoomkbNj9UpKdyFl5dDaWFIuYWXFuXZ0rchnddKuB5XCCde+3PTb96v6+TXjmDJogtZvvcbA9Tiy8
-X-Gm-Message-State: AOJu0YwPra0Vnd4CHi0byVAe2dIAC4M1hBKZ1S4VsYHz7hk+GTN6vDqj
-	G4oerFfjFT/4w9QxF0ths8j5zRV4NdkXnYouiHRvwsK+JPvUt7gEuLeLEHXesQnyFg==
-X-Google-Smtp-Source: AGHT+IFNobqy9dV9FmZ8nJcVhIZ7gSPgpm3c1uQL5miWa0hstEvZcs9iBhGYN77ZysQDhJVYR3TbGA==
-X-Received: by 2002:a2e:a716:0:b0:2d2:e554:976 with SMTP id s22-20020a2ea716000000b002d2e5540976mr351159lje.14.1709135785839;
-        Wed, 28 Feb 2024 07:56:25 -0800 (PST)
-Received: from rand-ubuntu-development.dl.local (mail.confident.ru. [85.114.29.218])
-        by smtp.gmail.com with ESMTPSA id e1-20020a2e8ec1000000b002d2d8d2ee45sm164863ljl.12.2024.02.28.07.56.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 07:56:25 -0800 (PST)
-From: Rand Deeb <rand.sec96@gmail.com>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: deeb.rand@confident.ru,
-	lvc-project@linuxtesting.org,
-	voskresenski.stanislav@confident.ru,
-	Rand Deeb <rand.sec96@gmail.com>
-Subject: [PATCH] net: ice: Fix potential NULL pointer dereference in ice_bridge_setlink()
-Date: Wed, 28 Feb 2024 18:54:48 +0300
-Message-Id: <20240228155448.121603-1-rand.sec96@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C770915D5C4
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 15:58:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709135889; cv=fail; b=mdNBdQMybOiHKZdadD2DuzbllkCaP9qHrBwqM6XzV9hvNJShUL8J2n4ojo/2altZmQfaJP/zWWKHNKoj7qxp91VKsvgCvzMiae0EDwDRudDuFgbjdMJ9hC0CFQ3YS6idPyR49SHxbZOwQoAsPsgVZmCJRrJkp+/9yTCXlP/EoXU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709135889; c=relaxed/simple;
+	bh=MHJeLYA5VwzqMBHfiqFjVDEBKMxNf3DGMNCwXvZ06lY=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=em7gHvCPlThb3vrfLKfPk6H+l4x9s2MJOn3ZwXApgbFwulRbcYG7qenncOZMbmDRMvv1lP2U5syX9pUVIbJHw0k7s5EjGkMqlcfbtZ1ztV/N2l6qBDjE6kouXQemwwdo2WvMrQP1f/LtO8Qzpol4L0kL9+Dq4tSet+2sDP2jMZU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Xjte7aZT; arc=fail smtp.client-ip=40.107.92.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kZc9N7sZJrkOHEpyi4aS2phLQE6g9ik8pZ6RPEU4ka/KCb7Q+vxWZwEZQRj4GQ8PfOnHCcQyR1wZ+y/8KXuo+SpWTrTwncL+cZNJ6mxKrGU+9r41HPNk581j4z1xjvP2XP/tbpBLu+tzUkd+WGuEg8HuqBt0liTEpJ9Pm7FgniAIdgSKKUZQ1J8VzetCFOKBVNJpFuQwKA1Ns2MLebh/axmApLz3s/4oU7lRQlmkJ6ZH/kFZUgK7gFDvBksf//RyliRS3E53cJ0E6QJfvEqIu8cnx4eOVHlDbjlDOrFYpoTv1aa1LQWfHSuvy95wuukEX1Q+83+YISe07h060uo47g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sx2xBwd3u3bSs+YDu1TLSo1Z7QkRyIyWwJs4GHZezAg=;
+ b=nZM/4tyVr3ONbC33IzT5DcULEMGvpEqPC4yAc1Qs0akxPvelZ/GsrmCOGqznFLpJ86zFf4Tri7pGlsCp0gSBe/6Z/qtIDgQFggCutgVqSV7zj4tnbStk2Kg6ilQ3YQVMRiHnHTo2zKpBNkvsepFV+CFp9wQXl7uhS86BQvUdKb4IxPLbW/YkEQ56iUO9R+DgtmD/c07K5RNOBNPTNK1HfMFgghPVqon8vB1Z31LKXg5T1EQGg++jh8QKy7jUezUA2JXCpZe7grYlVlJjw55qMBaVCfw+zVnPDEon8AHyK7Bvs+l9W0dhye9jJ50g2Q8gcf4SVRKhLCfWw23vTgeeTw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sx2xBwd3u3bSs+YDu1TLSo1Z7QkRyIyWwJs4GHZezAg=;
+ b=Xjte7aZTPlnjVFOw2AymhEQKb27Y9gBfCd/MBay++YceJTcEuktfTxK0UKINCtx04UX1z0G4MvJnMtV1jwB+08QE1MqlSPtz6kIpDaEtx/bDI3ixDXrg6Vc59qqQpffyrVMjNswlt0CtfQ5Xh3z6v3H0Osn33ReFmxm6VvRzW8lK2/P6jw2/dqxbm52FwSSSkcaz8VUXpKiTRV4tQr0f+m1qfzOM3U4//0FvUScss2CYigP51RgYbtlYyrUL7csIus/5tHBKYVxBkd3qe8Imu3Xyv4r4wsSZyfw1LP1RWJZxa+JqIDg7pYbz//Nztd/025FGIjmRyF/xb9V8PEo2eA==
+Received: from DM6PR02CA0074.namprd02.prod.outlook.com (2603:10b6:5:1f4::15)
+ by BL3PR12MB6617.namprd12.prod.outlook.com (2603:10b6:208:38c::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.41; Wed, 28 Feb
+ 2024 15:58:04 +0000
+Received: from CY4PEPF0000EE3B.namprd03.prod.outlook.com
+ (2603:10b6:5:1f4:cafe::19) by DM6PR02CA0074.outlook.office365.com
+ (2603:10b6:5:1f4::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.28 via Frontend
+ Transport; Wed, 28 Feb 2024 15:58:03 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CY4PEPF0000EE3B.mail.protection.outlook.com (10.167.242.15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7292.25 via Frontend Transport; Wed, 28 Feb 2024 15:58:03 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 28 Feb
+ 2024 07:57:51 -0800
+Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Wed, 28 Feb
+ 2024 07:57:46 -0800
+References: <cover.1709057158.git.petrm@nvidia.com>
+ <7b6e4e106f711bf25ffeae1da887f2ef53127ce8.1709057158.git.petrm@nvidia.com>
+ <20240228143004.GF292522@kernel.org>
+User-agent: mu4e 1.8.11; emacs 28.3
+From: Petr Machata <petrm@nvidia.com>
+To: Simon Horman <horms@kernel.org>
+CC: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>, Ido Schimmel
+	<idosch@nvidia.com>, David Ahern <dsahern@kernel.org>, <mlxsw@nvidia.com>
+Subject: Re: [PATCH net-next 3/7] net: nexthop: Add nexthop group entry stats
+Date: Wed, 28 Feb 2024 16:57:02 +0100
+In-Reply-To: <20240228143004.GF292522@kernel.org>
+Message-ID: <87plwgoa2w.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3B:EE_|BL3PR12MB6617:EE_
+X-MS-Office365-Filtering-Correlation-Id: 899dc502-8292-4f37-619e-08dc38760bcf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	UeruoZebq9UgJZ2eD91tDaDXmVEB0TqGcwKMmaT80scFKbN4Ibd8nC+c4Mpv41UzDlRSIhAaOkhzd6pBxEz68jYLP2HDGfci9x4RiSL5Xt4YURyMxNF8O1m3q2PD/mT+abVuSptmRsfapucrBNjtGyT3fKOJpbG8RLrjJP7nwrHVz6HzkWdjo3C9elqx6wZucEj8ELY5+oib/7saxj0b+7hw3/aWYgJDX2ZAui6af4/l4fe864Ei44ttUHAvyzm092VIZLWY8b/HSXc7/hr3AxyajCgz3vYRuycoxRQ7KIYeFDU4wr9qnvAbwAOTpyVx2TysSvvbV/oB06hTMLoqf9sH6P0TafejE2gHnqTNiRGWIfHvL4UYcEGbVHF4cDGgjhdcTlprFhO1vVmYwf82sqU7r221gRjjbZJMY9eIcge8eMjzHkFLgHiJicDXxbnHycVlb8ox+cSai6t4eHUQSDO+rDG4tHet1aHycpu1FhtG3qOl7DiUHRHQesH2FFnMnoLfucxsh0ByKinb/0QKbXe3wJbqRWLMuqCW413Z2bMEw/N022fNnS8XDGrLQz/s3ff/kUvwTDXrprMpxmgQbkk6g1ojSjP0LL/1nVdlTafmywJVvpSl92gcY4da6vavKVbaEWtxtfxeLsOv7aMUSDTUYihAQRJhx5ptdWkIrVwk03qP1Zf57j5HInL3cfCOMECZxIb/sqoYhWaTL+7sTwEeIBm7nQNpjvp4wlCRCgMsIbL/rdoHleZjDnJJiHYG
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2024 15:58:03.3798
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 899dc502-8292-4f37-619e-08dc38760bcf
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE3B.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6617
 
-The function ice_bridge_setlink() may encounter a NULL pointer dereference
-if nlmsg_find_attr() returns NULL and br_spec is dereferenced subsequently
-in nla_for_each_nested(). To address this issue, add a check to ensure that
-br_spec is not NULL before proceeding with the nested attribute iteration.
 
-Signed-off-by: Rand Deeb <rand.sec96@gmail.com>
----
- drivers/net/ethernet/intel/ice/ice_main.c | 2 ++
- 1 file changed, 2 insertions(+)
+Simon Horman <horms@kernel.org> writes:
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 4f0d63fa5709..ba2bbd53d543 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -6530,6 +6530,8 @@ ice_bridge_setlink(struct net_device *dev, struct nlmsghdr *nlh,
- 	pf_sw = pf->first_sw;
- 	/* find the attribute in the netlink message */
- 	br_spec = nlmsg_find_attr(nlh, sizeof(struct ifinfomsg), IFLA_AF_SPEC);
-+	if (!br_spec)
-+		return -EINVAL;
- 
- 	nla_for_each_nested(attr, br_spec, rem) {
- 		__u16 mode;
--- 
-2.34.1
+> On Tue, Feb 27, 2024 at 07:17:28PM +0100, Petr Machata wrote:
+>
+>> @@ -2483,6 +2492,12 @@ static struct nexthop *nexthop_create_group(struct net *net,
+>>  		if (nhi->family == AF_INET)
+>>  			nhg->has_v4 = true;
+>>  
+>> +		nhg->nh_entries[i].stats =
+>> +			netdev_alloc_pcpu_stats(struct nh_grp_entry_stats);
+>> +		if (!nhg->nh_entries[i].stats) {
+>> +			nexthop_put(nhe);
+>> +			goto out_no_nh;
+>
+> Hi Petr and Ido,
+>
+> Jumping to the out_no_nh label will result in err being returned,
+> however it appears that err is uninitialised here. Perhaps
+> it should be set to a negative error value?
+>
+> Flagged by Smatch.
 
+Pretty sure. It's missing an err = -ENOMEM.
 
