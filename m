@@ -1,180 +1,157 @@
-Return-Path: <netdev+bounces-75872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AB4D86B691
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 18:59:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DB5586B69C
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 19:01:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5A8D287905
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:59:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2581C28AFEA
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 18:01:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3462F79B81;
-	Wed, 28 Feb 2024 17:58:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 767E079B81;
+	Wed, 28 Feb 2024 17:59:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HKZhhflH"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="Yjb3feY5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from smtp.smtpout.orange.fr (smtp-22.smtpout.orange.fr [80.12.242.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B1E3BBC6
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 17:58:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98FEA1EA84
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 17:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709143095; cv=none; b=ajDXypFnAE5MxMTCRPlg4abFmwyTq5GLPrDyP9OgfBxdZtQ/A3pELIU85ppQ6fZ7EWC1cj0DjRdLnICmjoiU39wHPvVGdaBMfOqKFjP4BVgn5oY+VDUgYO66gXGKqjrx3Pb3TTHuesMbG8vP8FVIDUagpfsJ4k3LGrJrKJV6NpQ=
+	t=1709143198; cv=none; b=JQWltGX9Kjb+dtNoFxbTYxKSKDTM8SFl1auGclyTIGSY2rPl1CbjZUb3U2knNkEZajLONXiEKyJ4AAov0PtVcHzfl3Zo6eqDj656TT+T28uTJlVIcUbTgO34E1AsWYz51hRylhKz6kDPG8RAZAP7ftWCuzqu4PlGGnmSndPY5io=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709143095; c=relaxed/simple;
-	bh=cwZiV52W0Y4J4E8o/fpSdIpBIClZMIEQbiWW06NOSag=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U/BbBH87cz0zB84VnxFr+BQvF0Y9dXkUcI6PD+4x9b1IqDKcL98iyoEQ/vBjmxy3tBaC0BLHHMTJD2/YEc6zpnr3zHxUR/gMyE60cYMsFvz09MWfosdQ6y+46sJESeZED5IHNgvgb90D7VTCj3+GrsDx1tqSAffQ7ciqPaUC2tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HKZhhflH; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-512aafb3ca8so5739684e87.3
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 09:58:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709143091; x=1709747891; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2jJWhDy/4v7p6ijvXOsuvAzvYiBXZd1/Rbd71b95v5s=;
-        b=HKZhhflH8oebgM1wEmzKZCTJ10RlHHrhICV4QIzMsB4cxSowyjldig2JJG9bvwicQw
-         PhzEAHNxM6jTSgMiNKqEbRKV0N0DdS/nzWgPmH+h4ZW5CEIsNMvgJuLVOn3KlxLeXBtV
-         4x1o0ztGHAQWLX9bFzEgRSN9jBSWUoid5Q430C0SN3I2MFJ60TjDbE2h81QbCOUrDJjZ
-         lCq54VZFvJCF9Z9j1U/eaVjK1cs0NNuSFSJTFfIRmQ9Qxf9WLGPuChNe+BfyvaRjot3h
-         lt1dYi3T7YVhLTsY1XPBvHnwLWVEBs223CJsPKAfMSegPeV5gkQUThNVWmAd9cmSRSBG
-         R4lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709143091; x=1709747891;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2jJWhDy/4v7p6ijvXOsuvAzvYiBXZd1/Rbd71b95v5s=;
-        b=rlOS/ajrGeDIM5pYir7VWgAMxwAJmDedWviwvFo6PaDyJWg4hTNHTzqQVcj0ZLsCka
-         /UBELxD2MQ24dbzPeAnKH6TmNsRZDpYf20ObwjL/fMO92UpuPoLH4Hf7morVaYP57iT2
-         6+HQ9dXHxMtAEZDOmNRYShmisNE1ErIFtcl27wctCXbh0ikTJfJaM3ROZjZ087ARFLco
-         LE8/XNHkMlizLbNSaydfySigPR+rKpM3bK1XsptWmI0tUv6VbfImU7ub+mbI/5p8j+Gs
-         O+IjJwzCeD79NAM6QTn+o5CcuwwE61k2LgK5rp3NkLzrjIe6aC/Uf2ySRi/VOKXhTH3C
-         0sdw==
-X-Forwarded-Encrypted: i=1; AJvYcCWwg0H/c2fRMJHKsAVOrl9k1n7eKjcPYSW9ghohdOAsS6X9EIw2LbyXRrEYBH07Zv6W5xdVUXbi25rFIA6grm9kkeH7/rgh
-X-Gm-Message-State: AOJu0Yy8Cw4pVSDuSgAE/kf2noHx/P0IBHbiG58tVV5t/CQxa21KCSG5
-	X5ud9up8256s8WYyGXy7I5PfzAzsvpkrvcUZUwtgWGqpMp2bowDnKcuJE0Kh49g=
-X-Google-Smtp-Source: AGHT+IGeMb8GvdN1GKFJ44gE1Wrb49Q1GOwh8I5mdv3/2IvchNoaxUJcJdry4KzXQeujNBKsOdl3zw==
-X-Received: by 2002:a19:ae05:0:b0:512:c9bc:f491 with SMTP id f5-20020a19ae05000000b00512c9bcf491mr269277lfc.47.1709143091336;
-        Wed, 28 Feb 2024 09:58:11 -0800 (PST)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id eo8-20020a056000428800b0033dcac2a8dasm12637657wrb.68.2024.02.28.09.58.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 09:58:10 -0800 (PST)
-Date: Wed, 28 Feb 2024 20:58:07 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Tristram.Ha@microchip.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ravi Gunasekaran <r-gunasekaran@ti.com>,
-	Simon Horman <horms@kernel.org>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
-	Murali Karicheri <m-karicheri2@ti.com>,
-	Ziyang Xuan <william.xuanziyang@huawei.com>,
-	Kristian Overskeid <koverskeid@gmail.com>,
-	Matthieu Baerts <matttbe@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [RFC] net: hsr: Provide RedBox support
-Message-ID: <9ea38811-4297-424d-b82c-855ee75579f0@moroto.mountain>
-References: <20240228150735.3647892-1-lukma@denx.de>
+	s=arc-20240116; t=1709143198; c=relaxed/simple;
+	bh=0FwpwzAD/az5o+wVtVaQP081+CsxoOZPZKbjHeTacdA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r2h7tgyvXxsG57Jxkw9H9gWy0AiFGnW88LF5rb+FWgLyNLHelZXZ4/66Kk1/yl8j7M+v0ra7e2aD22/bOTO8bM2oES3kwBA+Spl2DSzz99e2Vld+I4TV+8fsPeRIwl4unvyADM3YoZ1jWV+19kFwVXB46juW2fUQTCSCr/YgC+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=Yjb3feY5; arc=none smtp.client-ip=80.12.242.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [192.168.1.18] ([92.140.202.140])
+	by smtp.orange.fr with ESMTPA
+	id fODbrhZ9PVFb9fODbrBPJG; Wed, 28 Feb 2024 18:59:49 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1709143189;
+	bh=6VMAgc74NhzsJxo+NTy1RBo7SqgKKr+Thg+OAvLcHUU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=Yjb3feY5IUAlE0MCzfv6lk++/zAkNFWvUaThblhfbkm+SBQV5+eBNlpDsSDdv1xfQ
+	 8LD33Z25T9g9yu/xAg1HmI2mMfwa+rDrJSzQWIq7mW3T1GlhMD+dLMQEKyO4ROqZlX
+	 u9PYsCVx9j/t3Tt9nHfU90JVcMGiHFC2HsPC/BndBHVajXe6813vR1JT8Bi4pGpXJ+
+	 tgAfjuEUGU4EvHA1qzkmHo8awrYUZpnx6jKfLPKmdZr3K8DKWJjSunHFNrwCbw8/Xb
+	 TNLTWzPOPsptY9yQ/8/6zV18yX81EfZIz/kI/q/sbens5iKGftU+rsMk6Si54g34rN
+	 Pl7ngA2g3Jk5g==
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Wed, 28 Feb 2024 18:59:49 +0100
+X-ME-IP: 92.140.202.140
+Message-ID: <eca39015-296c-4494-8b1b-6344b4ace3a2@wanadoo.fr>
+Date: Wed, 28 Feb 2024 18:59:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240228150735.3647892-1-lukma@denx.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/2] net: tehuti: Fix leaks in the error handling path
+ of bdx_probe()
+Content-Language: en-MW
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: andy@greyhouse.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <cover.1709066709.git.christophe.jaillet@wanadoo.fr>
+ <9090b599c7574892b77a9521e3ddb3a52a154205.1709066709.git.christophe.jaillet@wanadoo.fr>
+ <3b12e1e2-4859-40b6-8d9d-0a940251bed4@moroto.mountain>
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <3b12e1e2-4859-40b6-8d9d-0a940251bed4@moroto.mountain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 28, 2024 at 04:07:35PM +0100, Lukasz Majewski wrote:
->  void hsr_debugfs_rename(struct net_device *dev)
->  {
-> @@ -95,6 +114,19 @@ void hsr_debugfs_init(struct hsr_priv *priv, struct net_device *hsr_dev)
->  		priv->node_tbl_root = NULL;
->  		return;
->  	}
-> +
-> +	if (!priv->redbox)
-> +		return;
-> +
-> +	de = debugfs_create_file("proxy_node_table", S_IFREG | 0444,
-> +				 priv->node_tbl_root, priv,
-> +				 &hsr_proxy_node_table_fops);
-> +	if (IS_ERR(de)) {
-> +		pr_err("Cannot create hsr proxy node_table file\n");
+Le 28/02/2024 à 11:17, Dan Carpenter a écrit :
+> On Tue, Feb 27, 2024 at 09:50:56PM +0100, Christophe JAILLET wrote:
+>> If an error occurs when allocating the net_device, all the one already
+>> allocated and registered should be released, as already done in the remove
+>> function.
+>>
+>> Add a new label, remove the now useless 'err_out_disable_msi' label and
+>> adjust the error handling path accordingly.
+>>
+>> Fixes: 1a348ccc1047 ("[NET]: Add Tehuti network driver.")
+>> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+>> ---
+>> Compile tested only.
+>> ---
+>>   drivers/net/ethernet/tehuti/tehuti.c | 15 ++++++++++-----
+>>   1 file changed, 10 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/tehuti/tehuti.c b/drivers/net/ethernet/tehuti/tehuti.c
+>> index 938a5caf5a3b..6678179885cb 100644
+>> --- a/drivers/net/ethernet/tehuti/tehuti.c
+>> +++ b/drivers/net/ethernet/tehuti/tehuti.c
+>> @@ -1965,7 +1965,7 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>>   		ndev = alloc_etherdev(sizeof(struct bdx_priv));
+>>   		if (!ndev) {
+>>   			err = -ENOMEM;
+>> -			goto err_out_disable_msi;
+>> +			goto err_out_free;
+>>   		}
+>>   
+>>   		ndev->netdev_ops = &bdx_netdev_ops;
+>> @@ -2031,13 +2031,13 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>>   		if (bdx_read_mac(priv)) {
+>>   			pr_err("load MAC address failed\n");
+>>   			err = -EFAULT;
+>> -			goto err_out_disable_msi;
+>> +			goto err_out_free_current;
+>>   		}
+>>   		SET_NETDEV_DEV(ndev, &pdev->dev);
+>>   		err = register_netdev(ndev);
+>>   		if (err) {
+>>   			pr_err("register_netdev failed\n");
+>> -			goto err_out_free;
+>> +			goto err_out_free_current;
+>>   		}
+>>   		netif_carrier_off(ndev);
+>>   		netif_stop_queue(ndev);
+>> @@ -2046,9 +2046,14 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>>   	}
+>>   	RET(0);
+>>   
+>> -err_out_free:
+>> +err_out_free_current:
+>>   	free_netdev(ndev);
+> 
+> Since it seems like you're going to be resending this patch, could you
+> do this free_netdev() before gotos?  That way if someone adds more code
+> after the loop then we can still use the goto ladder to unwind.  (No one
+> is going to add more code after the loop, I know...  I wouldn't have
+> commented except that it seemed like you were going to resend.)
+> 
+> 		if (bdx_read_mac(priv)) {
+> 			free_netdev(ndev);
+> 			pr_err("load MAC address failed\n");
+> 			err = -EFAULT;
+> 			goto err_out_free;
+> 		}
+> 
 
-Debugfs functions are not supposed to be checked.  This will print a
-warning when CONFIG_DEBUGFS is disabled.  Just leave all the clean up
-out.  If debugfs can't allocate enough memory then probably this one
-debugfs_remove() is not going to save us.
+Yeh, I thought about it, but it is more verbose and this code looks 
+mostly unchanged since 2007!
 
-> +		debugfs_remove(priv->node_tbl_root);
-> +		priv->node_tbl_root = NULL;
-> +		return;
-> +	}
->  }
->  
->  /* hsr_debugfs_term - Tear down debugfs intrastructure
+Anyway, I agree with you and will update accordingly.
 
-[ snip ]
+CJ
 
-> @@ -545,8 +558,8 @@ static const unsigned char def_multicast_addr[ETH_ALEN] __aligned(2) = {
->  };
->  
->  int hsr_dev_finalize(struct net_device *hsr_dev, struct net_device *slave[2],
-> -		     unsigned char multicast_spec, u8 protocol_version,
-> -		     struct netlink_ext_ack *extack)
-> +		     struct net_device *interlink, unsigned char multicast_spec,
-> +		     u8 protocol_version, struct netlink_ext_ack *extack)
->  {
->  	bool unregister = false;
->  	struct hsr_priv *hsr;
-> @@ -555,6 +568,7 @@ int hsr_dev_finalize(struct net_device *hsr_dev, struct net_device *slave[2],
->  	hsr = netdev_priv(hsr_dev);
->  	INIT_LIST_HEAD(&hsr->ports);
->  	INIT_LIST_HEAD(&hsr->node_db);
-> +	INIT_LIST_HEAD(&hsr->proxy_node_db);
->  	spin_lock_init(&hsr->list_lock);
->  
->  	eth_hw_addr_set(hsr_dev, slave[0]->dev_addr);
-> @@ -615,6 +629,18 @@ int hsr_dev_finalize(struct net_device *hsr_dev, struct net_device *slave[2],
->  	if (res)
->  		goto err_unregister;
->  
-> +	if (interlink) {
-> +		res = hsr_add_port(hsr, interlink, HSR_PT_INTERLINK, extack);
-> +		if (res)
-> +			goto err_unregister;
-
-You need to add the iterlink port to hsr_del_ports() to avoid a leak in
-the remove() function.
-
-regards,
-dan carpenter
-
-> +
-> +		hsr->redbox = true;
-> +		ether_addr_copy(hsr->macaddress_redbox, interlink->dev_addr);
-> +		timer_setup(&hsr->prune_proxy_timer, hsr_prune_proxy_nodes, 0);
-> +		mod_timer(&hsr->prune_proxy_timer,
-> +			  jiffies + msecs_to_jiffies(PRUNE_PROXY_PERIOD));
-> +	}
-> +
->  	hsr_debugfs_init(hsr, hsr_dev);
->  	mod_timer(&hsr->prune_timer, jiffies + msecs_to_jiffies(PRUNE_PERIOD));
->  
+> regards,
+> dan carpenter
+> 
+> 
+> 
+> 
 
 
