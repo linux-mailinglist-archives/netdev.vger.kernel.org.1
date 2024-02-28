@@ -1,86 +1,84 @@
-Return-Path: <netdev+bounces-75701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDBB586AF36
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:32:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EFDB86AF3F
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:36:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45980B20C0A
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:32:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E9481C22450
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 999D7605B5;
-	Wed, 28 Feb 2024 12:31:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8BEB145FF8;
+	Wed, 28 Feb 2024 12:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="y8pfl1AJ"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="bvKkZ+ZL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FFB208C5
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 12:31:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9E6145B25
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 12:36:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709123519; cv=none; b=SJQQS3IyvoTn+jTOhv20BOJ4rX8+fkesQHjQujB/rMk1Anp8RgIm9ezqpKVWNUOf8Wr6vSAqlJM05ND7bALWhRILJDkkucpbwHUimtGYhJso0Xu/z6toemEt6cv8c5JRNBDNugOwI4nfmjEeRo5G3lSywR7sZA1fHuxa0kFYLsY=
+	t=1709123786; cv=none; b=ThZegcvs++VV3enl2vVOSpdYQSvov0DYgR7wWKYsFBZXhwmTdlI5TmCCSkXzX+qfIV1wWALj05eWOb6fBl0Mu8Qiev6F1+v/phxm23g5B/QNDUOuu5FCKVusqxSdOHTSuiwDVLr4RVvpCVy7/jf0rpG8PbBN+Qj9tXHZrWVJlIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709123519; c=relaxed/simple;
-	bh=P2lYtDQA0lj35HQ+5dlE8Zqnu3Tn2q5PM+YJkHO82dw=;
+	s=arc-20240116; t=1709123786; c=relaxed/simple;
+	bh=JV34Rsk9Ud6TAluSh/NNnx0sR4WyEiQcLsdy9DEB4qs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MsuPKzYhxLngap2llmNybLSGGRQSOUWscq4g2rr7g+lF31fgk/V67hyR/4+bEP2Uz1Seu2ma8cGy3Enc9jn22JQrvQM5susPbEKGBTHDLNf2NNbeZtmQT/R0cQeHfMVQFqD6BYaIQ299/GCKrZlh1ePn041GqXjWpL9ieEEMYs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=y8pfl1AJ; arc=none smtp.client-ip=209.85.221.49
+	 Content-Type:Content-Disposition:In-Reply-To; b=LsZlxh0UNc1txqNdKOxmwaQzmTM0u4cnUcZOyjy/vGuFy6g80x2BAbiSGwUZ5MigxvKkyJJGReOXIRrcOFE2rR/YTyEd4+CGjerByf805XjMOoNPYNyaxLUH++3YA7CUjIIQB6kQ/+G033enAkNPbjAMYnc30VKmyyBooR/O9Ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=bvKkZ+ZL; arc=none smtp.client-ip=209.85.208.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-33dcd8dec88so2311969f8f.1
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 04:31:57 -0800 (PST)
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d27184197cso68364571fa.1
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 04:36:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709123516; x=1709728316; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709123783; x=1709728583; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=P2lYtDQA0lj35HQ+5dlE8Zqnu3Tn2q5PM+YJkHO82dw=;
-        b=y8pfl1AJTf0ZJtvH9XYdButWe3CMGsHXbp8ESxD7PhhYtLXJYj1LKHDeqGG2b3Uu7t
-         2V+Y9dGs3wHMAFsfhVx7LFfhDvZRC6wlWS2esavvMAoUCiorw6VqWotXvslnUPkeRepR
-         qBCY4jgiWecfM4krJ/eTcW6LXb7etF8VgVwllMBiPhv1WUcujP59Ulw/4CuP6PWVkEZW
-         gKSEzRN3YSmDVIDd46IyTaHCV7Vbvph/Q5iDdGhRVp+U/Ygwo1brnOe3OCezFUouUrm5
-         Kp5vtQ68dYxDESgcg3UhqPlCLrGxWHyat4q+QFNDmdvfsfibAdXXmzZxuUhqJGeU/6ps
-         8Kgw==
+        bh=1r218cPQs+vQGXk5W8TMf0lKe2Qttm/rc570dURd+N8=;
+        b=bvKkZ+ZLtHNPsb7dGhSPQXPayePNh+6Lmt/DHG7HRPB3V9c7Ppzh+a3Ho/q1fuQrVM
+         t9J0NO+bVlMs4wQnKdeckyUIShPMuieGay2SK5BhALFXOyFFB2qQ4A6ArQRP/Xt4jY2u
+         bPBxtTIIJDTofbyZjsmVqk05oVSgOVEALDrtGi2XQlrJl0r44lAE1x4hQ077h0Ojxkou
+         pq8OeAjQZJkHFmU2x6PR/Ct0QTi8HA1aK4U8EPyPIx3h8sqOJuS2c1yyqPStDZtySXwT
+         cf+6V3bevYEdhAzWW1i4nslTOm/IT9XJrPueyQmgOT4hIcW45KxL89D6SfJS2Vau3wZA
+         T6Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709123516; x=1709728316;
+        d=1e100.net; s=20230601; t=1709123783; x=1709728583;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=P2lYtDQA0lj35HQ+5dlE8Zqnu3Tn2q5PM+YJkHO82dw=;
-        b=w2yj8Ruu6+9cGO0fMHfk7wgnxOZtfgTLFe91d6DttXD2eC9SmUTWvHNPVvoLM+o2Mu
-         duY/NFaWo9qhRKr2WnMcaAK05cn60RPEaKqt8S6W17CPXdRYuPCHA5o0xruwhETlXNEH
-         3bY0DB+njVN0j45wYbHRYgMMNTua8QbzqP2mOAtfcfU/WnYwmxcfHKQHDF3zd7UDKM9N
-         XWOFUiRq4FJIlR9ergTdAbL4LWP3o5SG4BSQdKiGaQdULSpErABC23soLQG0o8GCMdjV
-         kKDHzALB2iq5P4OjNW5rA+WJm3NHDFTarUDsMTwQVmttp9gFpILpiWXGYjX6L9Yw4MrQ
-         Ob0A==
-X-Forwarded-Encrypted: i=1; AJvYcCVJWD6cpGSfXasfQn3WQ7EgIU1i+npddch3z33J9EAGUxwsiCWXulOEnb1h33WDqAHZG8oqrpna07jaIUwdVZLEPxxF0TkM
-X-Gm-Message-State: AOJu0YwaIbjwaneoU84zg50irXmpdMNAXjzNHWrEow0E7bK5mGXspze8
-	nqeoiV1AiKOK+TQ3Ln6TfAdfJDYrf78mT32cotJgMlWo7LSvs7hxO2/Gd6k9tzM=
-X-Google-Smtp-Source: AGHT+IGbPRYXLZbIf/wYxiWdj7CiBE+y0JldKdFOg9+Q0dAspiLsouWPg9onelMeAKThwS0vl+z9aQ==
-X-Received: by 2002:adf:e682:0:b0:33d:3be4:6c75 with SMTP id r2-20020adfe682000000b0033d3be46c75mr9591693wrm.71.1709123516139;
-        Wed, 28 Feb 2024 04:31:56 -0800 (PST)
+        bh=1r218cPQs+vQGXk5W8TMf0lKe2Qttm/rc570dURd+N8=;
+        b=Z0KPCFQeDGeCElpe9y2G2kFdEc0DEnNNKQHV0Rt+T0Gu+7T+41NSi74IcC8h1Lnu51
+         dmwbrWj0xDIoOFeNnt1ELgo7BqN3ITQBDNj6qzSOgmEk6ZfrHpePTpLj4oe7phqxpV5f
+         AdUZP0qH7Ys0VR0qh1OCKnQ63r9iPTB+/2c/ukAqjjtJPBlEWoQ+QD0Ap2wLaGfOYk0g
+         IJ6CmgW1l6RlApZSN5jbnLXWBUqjqG6WN//gYKyPDTZyqW8T1cWaOvT3uAb1JJOm0qZj
+         zjNUXxwj+mmJpA0guPfC4EeEWoAnNx1NPz/qHkKQbde0EvOma7TGLInR3I+PccaLFxg/
+         LdkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXDP1YeOLVPX4O/cVOmulAQaFcwax+xyhPqhZDu6hZRznMIqbW4bfwZRk3W8h83BBlQOLA2kBx7p/FxW3b6nQRuBBl8jvqu
+X-Gm-Message-State: AOJu0Ywd7MCOZKh0ibTZl5CiXO5KX4oxhSNO3tq0Z0CX0t+9Q4g3yS6d
+	yPB9VFhzNmNMmA8RuMPddDGboyFrW1LNWBJadFBpxOqVxvuHZ593bEPd6CCYfWo=
+X-Google-Smtp-Source: AGHT+IFb88pLzc0mMMHFWr4GGKTyW9NIU1Fk+9L4Orhc7J610CrnBoBIDGq7iYcyyvZI2ScWuygMWw==
+X-Received: by 2002:a2e:99d5:0:b0:2d0:b758:93a5 with SMTP id l21-20020a2e99d5000000b002d0b75893a5mr7831033ljj.18.1709123783116;
+        Wed, 28 Feb 2024 04:36:23 -0800 (PST)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id w4-20020a5d4044000000b0033b7ce8b496sm14247816wrp.108.2024.02.28.04.31.54
+        by smtp.gmail.com with ESMTPSA id 9-20020a05600c230900b004129018510esm1949803wmo.22.2024.02.28.04.36.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 04:31:55 -0800 (PST)
-Date: Wed, 28 Feb 2024 13:31:52 +0100
+        Wed, 28 Feb 2024 04:36:22 -0800 (PST)
+Date: Wed, 28 Feb 2024 13:36:19 +0100
 From: Jiri Pirko <jiri@resnulli.us>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Tristram.Ha@microchip.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [PATCH v2] net: hsr: Use correct offset for HSR TLV values in
- supervisory HSR frames
-Message-ID: <Zd8nuLjDxLKPgX-W@nanopsycho>
-References: <20240228085644.3618044-1-lukma@denx.de>
+To: Yunjian Wang <wangyunjian@huawei.com>
+Cc: mst@redhat.com, willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	kuba@kernel.org, bjorn@kernel.org, magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
+	davem@davemloft.net, bpf@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, xudingke@huawei.com,
+	liwei395@huawei.com
+Subject: Re: [PATCH net-next v2 0/3] tun: AF_XDP Tx zero-copy support
+Message-ID: <Zd8ow_KkdzAfnX8l@nanopsycho>
+References: <1709118281-125508-1-git-send-email-wangyunjian@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,34 +87,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240228085644.3618044-1-lukma@denx.de>
+In-Reply-To: <1709118281-125508-1-git-send-email-wangyunjian@huawei.com>
 
-Wed, Feb 28, 2024 at 09:56:44AM CET, lukma@denx.de wrote:
->Current HSR implementation uses following supervisory frame (even for
->HSRv1 the HSR tag is not is not present):
+Wed, Feb 28, 2024 at 12:04:41PM CET, wangyunjian@huawei.com wrote:
+>Hi all:
 >
->00000000: 01 15 4e 00 01 2d XX YY ZZ 94 77 10 88 fb 00 01
->00000010: 7e 1c 17 06 XX YY ZZ 94 77 10 1e 06 XX YY ZZ 94
->00000020: 77 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->00000030: 00 00 00 00 00 00 00 00 00 00 00 00
+>Now, some drivers support the zero-copy feature of AF_XDP sockets,
+>which can significantly reduce CPU utilization for XDP programs.
 >
->The current code adds extra two bytes (i.e. sizeof(struct hsr_sup_tlv))
->when offset for skb_pull() is calculated.
->This is wrong, as both 'struct hsrv1_ethhdr_sp' and 'hsrv0_ethhdr_sp'
->already have 'struct hsr_sup_tag' defined in them, so there is no need
->for adding extra two bytes.
+>This patch set allows TUN to also support the AF_XDP Tx zero-copy
+>feature. It is based on Linux 6.8.0+(openEuler 23.09) and has
+>successfully passed Netperf and Netserver stress testing with
+>multiple streams between VM A and VM B, using AF_XDP and OVS.
 >
->This code was working correctly as with no RedBox support, the check for
->HSR_TLV_EOT (0x00) was off by two bytes, which were corresponding to
->zeroed padded bytes for minimal packet size.
+>The performance testing was performed on a Intel E5-2620 2.40GHz
+>machine. Traffic were generated/send through TUN(testpmd txonly
+>with AF_XDP) to VM (testpmd rxonly in guest).
 >
->Fixes: eafaa88b3eb7 ("net: hsr: Add support for redbox supervision frames")
+>+------+---------+---------+---------+
+>|      |   copy  |zero-copy| speedup |
+>+------+---------+---------+---------+
+>| UDP  |   Mpps  |   Mpps  |    %    |
+>| 64   |   2.5   |   4.0   |   60%   |
+>| 512  |   2.1   |   3.6   |   71%   |
+>| 1024 |   1.9   |   3.3   |   73%   |
+>+------+---------+---------+---------+
 >
+>Yunjian Wang (3):
+>  xsk: Remove non-zero 'dma_page' check in xp_assign_dev
+>  vhost_net: Call peek_len when using xdp
+>  tun: AF_XDP Tx zero-copy support
 
-And yet the extra empty line is still here :/
+Threading of the patchset seems to be broken. Did you by any chance send
+this with "--nothread" git-send-email option?
+pw seems to cope fine with this though.
 
 
->Signed-off-by: Lukasz Majewski <lukma@denx.de>
-
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+>
+> drivers/net/tun.c       | 177 ++++++++++++++++++++++++++++++++++++++--
+> drivers/vhost/net.c     |  21 +++--
+> include/linux/if_tun.h  |  32 ++++++++
+> net/xdp/xsk_buff_pool.c |   7 --
+> 4 files changed, 220 insertions(+), 17 deletions(-)
+>
+>-- 
+>2.41.0
+>
+>
 
