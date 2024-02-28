@@ -1,105 +1,163 @@
-Return-Path: <netdev+bounces-75705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC07A86AF5A
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:45:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5F1086AF62
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:48:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED2531C22DAE
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:45:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6084E286138
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:48:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E6F146908;
-	Wed, 28 Feb 2024 12:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87288145FF8;
+	Wed, 28 Feb 2024 12:48:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hCED7HzD"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8096D14534F
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 12:45:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58BCE36129;
+	Wed, 28 Feb 2024 12:48:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709124329; cv=none; b=A5XnZttXIqt8FoKupcLVFmgXF5JitSUkdJtkmTtV+zyxdCcdniJtXzx80kqAAyBhxF8Qpq6zA8Hj3Fk9Vn7v9qO7L6Qei49UtfCziPskCmLYE1e1qv0M8MFR042nn+PcBefYAXqsu6EKTZDVEoXq36qgkWQODpXphrpTiKDN9Ps=
+	t=1709124488; cv=none; b=pfY/jBa/48sQU4sjR5nK1baKueccR5WwtVjFNXUDOjXGk4fBhknnO89kFKNziCLRksYN2NONZQPSqWzXI+0k3nypsnWiESfyuIar9aAiAKRI/XU9pMbuUnsQhKB3d3hxWpjzipRcszUmZKu4Q3M6PKorYUI4lETC82HyQfo3W+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709124329; c=relaxed/simple;
-	bh=Mkz/kA06QlphSdZWuuxe94smsSodU8c3TnRldfFWMiQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Fc93TVuRbCMLfRfTijZET/WUiIff9XqpLmHk29HBM2NWydOUmV41pOHuVIL/JukZMglhFiuwjPMr8PCNjrUTbBjVj157lZBqnENxg0ZXJqfI70kMTKov35AqbMprG+mUtABP6dpvD+tA9+SxoFEPb8lXKtLqMvDkQkKiLvIdK/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rfJJH-0001mR-J0; Wed, 28 Feb 2024 13:45:19 +0100
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rfJJG-003Ocn-Ca; Wed, 28 Feb 2024 13:45:18 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rfJJG-0078tb-13;
-	Wed, 28 Feb 2024 13:45:18 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1709124488; c=relaxed/simple;
+	bh=K6KGP6T+SeD5Hx1HsZoWXozDmI8OLiyMag16ZeWLf2E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NUu/h89Ah6QJAyyiM/XGIaHsv0Kb9mVkSltxacHXuOKYKv6acW1dBcqRuSMqiNktsDhDIBxj352nxJVZQYkiMc4M5FWAe2JMhftRRmb25/kFBY0gRZjZbPDmR2C0HH+PF0kObmAykRz3wYuLJRNVewIP67t/wxboP/T0MpHM4nQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hCED7HzD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25D38C433F1;
+	Wed, 28 Feb 2024 12:48:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709124487;
+	bh=K6KGP6T+SeD5Hx1HsZoWXozDmI8OLiyMag16ZeWLf2E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hCED7HzDG5k8ELHuyoPVxRyOYEQTXmRFY04WKTQzFUxz3sw3Xil8/pRwRReUClr8C
+	 Fy7I1c398Aa9uLvKB6m8sirKyWFn0IS2QyN7IzssOrmtI6Jf55FcAffiyV/EndLsn2
+	 aSqbUrG2vgSX0U4Iwg23IpvxLMrAHAAf9SyMNx8rgcZcIUaN2icArxDLoUL75wKQs/
+	 QEOQdj8WJjWmCOzFioRZ++C1YuXkZ0u+CJfmDnzbowesx8FwrWSf/w7eeX8CiFY6qH
+	 3KmP+YUHyB72wjm+K0o4YIeAwZuNAUr+AjphgTCPnu37XBvft7rLiiDR4QDHllkZEX
+	 ssKmzRSGXALjA==
+Date: Wed, 28 Feb 2024 12:48:01 +0000
+From: Simon Horman <horms@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: [PATCH net v1 1/1] net: lan78xx: fix runtime PM count underflow on link stop
-Date: Wed, 28 Feb 2024 13:45:17 +0100
-Message-Id: <20240228124517.1702476-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v5 13/17] net: pse-pd: Use regulator framework
+ within PSE framework
+Message-ID: <20240228124801.GC292522@kernel.org>
+References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
+ <20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
 
-Current driver has some asymmetry in the runtime PM calls. On lan78xx_open()
-it will call usb_autopm_get() and unconditionally usb_autopm_put(). And
-on lan78xx_stop() it will call only usb_autopm_put(). So far, it was
-working only because this driver do not activate autosuspend by default,
-so it was visible only by warning "Runtime PM usage count underflow!".
+On Tue, Feb 27, 2024 at 03:42:55PM +0100, Kory Maincent wrote:
 
-Since, with current driver, we can't use runtime PM with active link,
-execute lan78xx_open()->usb_autopm_put() only in error case. Otherwise,
-keep ref counting high as long as interface is open.
+...
 
-Fixes: 55d7de9de6c3 ("Microchip's LAN7800 family USB 2/3 to 10/100/1000 Ethernet device driver")
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/usb/lan78xx.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
+> index 522115cc6cef..a3e297cc2150 100644
+> --- a/include/linux/pse-pd/pse.h
+> +++ b/include/linux/pse-pd/pse.h
+> @@ -55,10 +55,10 @@ struct pse_controller_ops {
+>  	int (*ethtool_get_status)(struct pse_controller_dev *pcdev,
+>  		unsigned long id, struct netlink_ext_ack *extack,
+>  		struct pse_control_status *status);
+> -	int (*ethtool_set_config)(struct pse_controller_dev *pcdev,
+> -		unsigned long id, struct netlink_ext_ack *extack,
+> -		const struct pse_control_config *config);
+>  	int (*setup_pi_matrix)(struct pse_controller_dev *pcdev);
+> +	int (*pi_is_enabled)(struct pse_controller_dev *pcdev, int id);
+> +	int (*pi_enable)(struct pse_controller_dev *pcdev, int id);
+> +	int (*pi_disable)(struct pse_controller_dev *pcdev, int id);
 
-diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index 3ff430198512..80ee4fcdfb36 100644
---- a/drivers/net/usb/lan78xx.c
-+++ b/drivers/net/usb/lan78xx.c
-@@ -3135,7 +3135,8 @@ static int lan78xx_open(struct net_device *net)
- done:
- 	mutex_unlock(&dev->dev_mutex);
- 
--	usb_autopm_put_interface(dev->intf);
-+	if (ret < 0)
-+		usb_autopm_put_interface(dev->intf);
- 
- 	return ret;
- }
--- 
-2.39.2
+Hi Kory,
 
+Please update the Kernel doc for struct pse_controller_ops to reflect the
+added and removed fields.
+
+>  };
+>  
+>  struct module;
+> @@ -90,10 +90,14 @@ struct pse_pi_pairset {
+>   *
+>   * @pairset: table of the PSE PI pinout alternative for the two pairset
+>   * @np: device node pointer of the PSE PI node
+> + * @rdev: regulator represented by the PSE PI
+> + * @enabled: PI enabled state
+>   */
+>  struct pse_pi {
+>  	struct pse_pi_pairset pairset[2];
+>  	struct device_node *np;
+> +	struct regulator_dev *rdev;
+> +	bool enabled;
+>  };
+>  
+>  /**
+> @@ -107,6 +111,8 @@ struct pse_pi {
+>   * @of_pse_n_cells: number of cells in PSE line specifiers
+>   * @nr_lines: number of PSE controls in this controller device
+>   * @lock: Mutex for serialization access to the PSE controller
+> + * @lock_owner: current owner of the mutex
+> + * @ref_cnt: mutex's reference count
+
+These newly documented fields don't seem to exist in struct
+pse_controller_dev. Perhaps this is an left over from earlier development?
+
+>   * @types: types of the PSE controller
+>   * @pi: table of PSE PIs described in this controller device
+>   * @of_legacy: flag set if the pse_pis devicetree node is not used
+> @@ -132,7 +138,8 @@ struct device;
+>  int devm_pse_controller_register(struct device *dev,
+>  				 struct pse_controller_dev *pcdev);
+>  
+> -struct pse_control *of_pse_control_get(struct device_node *node);
+> +struct pse_control *of_pse_control_get(struct device *dev,
+> +				       struct device_node *node);
+>  void pse_control_put(struct pse_control *psec);
+>  
+>  int pse_ethtool_get_status(struct pse_control *psec,
+> @@ -147,7 +154,8 @@ bool pse_has_c33(struct pse_control *psec);
+>  
+>  #else
+>  
+> -static inline struct pse_control *of_pse_control_get(struct device_node *node)
+> +static inline struct pse_control *of_pse_control_get(struct device *dev,
+> +						     struct device_node *node)
+>  {
+>  	return ERR_PTR(-ENOENT);
+>  }
+> 
+> -- 
+> 2.25.1
+> 
+> 
 
