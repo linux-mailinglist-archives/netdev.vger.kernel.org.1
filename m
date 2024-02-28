@@ -1,129 +1,145 @@
-Return-Path: <netdev+bounces-75560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 391AE86A853
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 07:30:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFBA186A878
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 07:43:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B5301C2388C
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 06:30:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DE9D1F24E2B
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 06:43:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C5D22F0E;
-	Wed, 28 Feb 2024 06:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96AA922EE8;
+	Wed, 28 Feb 2024 06:43:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="bUbpqgpy"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="eYIqAprp"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8781EB27;
-	Wed, 28 Feb 2024 06:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9CB21370
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 06:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709101840; cv=none; b=H9fHu5lX+jdq8eIcsUhIuzUc0z6n7l0ec76ntrSXFtG2rELVXfRyQiVbbi0W//HSVx9sdwRyDYfjMNvQHIuixD2XLdXf1MhmBsBZW01RofrEcFKrzw7c9+gpoxqYy6xVPqjRXKghP8PhKbsgxa7zRcxAAkaZrW6Y2Ax6s5woPWA=
+	t=1709102620; cv=none; b=n/KR0wjI5ESfP2Oc3YqVyo/PJOielI1fjGFjhCL1pkfxLoCKJ3JLnfiAwmOefzDm8pj3mTvD8xagiXosEd+cbOCdhsyjz6CRPa+qYtmX2LQKBsLyM+ajdGJtI++TAHECP4Dw9UQiYo0lJ4VS5AueCnN8KSrbC5jZ9iHilnL72WM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709101840; c=relaxed/simple;
-	bh=yykHRE1Z1DG58ITzYPSAjX+1Z8DC7NCPRqkZBbJG4/A=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LTF/IIaA1c9ii7rfwpE/7sy/TewLfqhqY7Kvv/B8n9L4+hiOHKN57LhAWoeeGEuQLEXeFFycUFCamQ5zmQJjc4pn7QczFhJVodJ0gxt0sqv0GQ9cCbTzeKpT+DsuT37nhJZQDFxGw6Oqrp/7tdmUtYMwemJ42mc1kgY3thZSNaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=bUbpqgpy; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1709101839; x=1740637839;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=yykHRE1Z1DG58ITzYPSAjX+1Z8DC7NCPRqkZBbJG4/A=;
-  b=bUbpqgpySHTZ2jutG5hDq1C+u24QmsS5+Vxr7WYV14bRWV8DnQWd+/il
-   i6ymwhWew07Ra/yj4uQjj6b1VDFferyrR7iRb7c9pL/2kbJzQrQ1B5zsC
-   vZD8hmT/hCtqH1srsMYXTX+5HC7/FFLfHJ1J7J04/m2Lv+2QVyC6BIeBb
-   w/HjHlBF3JuhRyWu9IAwPhbfi7UgyoNC1AhysGwxeDqFTCyam5T9PtLwT
-   8NWWCFaDD6KrszfrMhWF++huQ2SNLSn5NLf4xhzFgK/CqRckBWym/1L8X
-   3sd8TMLejkkCClUVEUoCMpnDZXVet7gltCIri/Yv2VE2Kg6xt3B6vKVfs
-   A==;
-X-CSE-ConnectionGUID: WwtfXDcGT3ekg/b+aiH4Eg==
-X-CSE-MsgGUID: jGD6Xd8wRRq4FYvG5xft5w==
-X-IronPort-AV: E=Sophos;i="6.06,190,1705388400"; 
-   d="scan'208";a="247685635"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Feb 2024 23:30:36 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 27 Feb 2024 23:30:08 -0700
-Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Tue, 27 Feb 2024 23:30:06 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>, Horatiu Vultur <horatiu.vultur@microchip.com>
-Subject: [PATCH net-next 2/2] net: phy: micrel: lan8814 cable improvement errata
-Date: Wed, 28 Feb 2024 07:28:13 +0100
-Message-ID: <20240228062813.1007138-3-horatiu.vultur@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240228062813.1007138-1-horatiu.vultur@microchip.com>
-References: <20240228062813.1007138-1-horatiu.vultur@microchip.com>
+	s=arc-20240116; t=1709102620; c=relaxed/simple;
+	bh=LM+OsxCppsJ6vH6sdJRPnnLwwS2Ds6CfVd62BHFGpNA=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=rqQ5AoFn6ARbjVkRY4owp1+sgh3HUSB/m3eYKD5RYaDtoQtmuvFodMZglSNI5jeNaXNQpfvL9fMeK1hXUU3lcIg+xq3uP1pV/3eGkpc59bsVMOBDI8twtHF789u/F5Fvlwjp3YKBs2pJnq87G60GUN7jAg17PCfooqp+wyVTcig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=eYIqAprp; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-5d8b276979aso3977819a12.2
+        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 22:43:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1709102618; x=1709707418; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=W37pxQOj7sbIyu7CJO+URF/XloPZZvMA9cXiDnGo9tE=;
+        b=eYIqAprpTZE0V6C0gXzkpK8BhkLlmgoXHu5jRfh9+2PJKIudDxHlJiHvN5EB/6saur
+         achkj+PCk+/02eEgatTZndkwRfxYig9rRRIIZMM5UqwBgoFsOeyEjOisSWKVhuJI1lMP
+         +x2RUd0FrXcnLcVrd7439Lr11uIrgUueDRhhQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709102618; x=1709707418;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=W37pxQOj7sbIyu7CJO+URF/XloPZZvMA9cXiDnGo9tE=;
+        b=U6LsDARR1HUCzftM5lcFFGB6XzZrgVQLWLGSYfbN5VrjhQpwA0QVE0jPwNTYwNnwAf
+         /bPis38OpaCXqjs0YGys1j6JtpUYXM72s54F5uMBS5VStJTYCRA9r9VgOl7Dl9+dIxLP
+         4z/gi2NV2OejMj5oJfNaM7p8RRBbovDkJff4kyvO1L46OhjI1geLokMIQ5rWzqSqgdbx
+         hXxXvq68ViYW7qNbXcR0U8RI6dqJiTL0F8tP2D6zZCjRNf540xhuljfD6bIeANb+x7kN
+         AkUDkVEKEZnXOeAFktRyyUTE2lp72xdPKFoe/GT4j+n4NNyKlKvZ2yssIcc6hEklPJFt
+         4w3w==
+X-Forwarded-Encrypted: i=1; AJvYcCXOXcDi4UiBat114TZXE49MNyAdE4+mFwkYNLQKmV90O3J/UpSO0o2QSarNcjB65QVMwDuNB6q+Wf0le55nxyjxjHu36t7x
+X-Gm-Message-State: AOJu0Yxw9X3vL8xwtKiCvuBqkJBh02a4+dLRpc3NN435vTxVCIz4aYOa
+	+D5Iby8sDQSsbeBTXVZNRGobM/DMf+JI9Uoi1/dIbpjr9qv28OSK4BF+0PRcP/Fs5BSgfjDtOhn
+	Hz02Lc8PQxPw2HCQdzSEhbwS8SYMw+J/VpDNV4c6WHdMrFFRFJMASE3nk/oOdWRvPigabSQLFZu
+	+oXuOfXY9r14DdKlJIXQ==
+X-Google-Smtp-Source: AGHT+IFiAFQF0tsosZziRXvjhFNgZTGoEsb3uhNiMXK7LDGGnE1BLYnqExv8d6Odjw5vZ23ToTxyjpgPL4Un3Whvc2Q=
+X-Received: by 2002:a17:90a:4209:b0:299:1777:134c with SMTP id
+ o9-20020a17090a420900b002991777134cmr9222310pjg.33.1709102618037; Tue, 27 Feb
+ 2024 22:43:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+From: Abdul Anshad Azeez <abdul-anshad.azeez@broadcom.com>
+Date: Wed, 28 Feb 2024 12:13:27 +0530
+Message-ID: <CALkn8kLOozs5UO52SQa9PR-CiKx_mqW8VF9US94qN+ixyqnkdQ@mail.gmail.com>
+Subject: Network performance regression in Linux kernel 6.6 for small socket
+ size test cases
+To: edumazet@google.com, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, corbet@lwn.net, dsahern@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Cc: Boon Ang <boon.ang@broadcom.com>, John Savanyo <john.savanyo@broadcom.com>, 
+	Peter Jonasson <peter.jonasson@broadcom.com>, Rajender M <rajender.m@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 
-When the length of the cable is more than 100m and the lan8814 is
-configured to run in 1000Base-T Slave then the register of the device
-needs to be optimized.
+During performance regression workload execution of the Linux
+kernel we observed up to 30% performance decrease in a specific networking
+workload on the 6.6 kernel compared to 6.5 (details below). The regression is
+reproducible in both Linux VMs running on ESXi and bare metal Linux.
 
-Workaround this by setting the measure time to a value of 0xb. This
-value can be set regardless of the configuration.
+Workload details:
 
-This issue is described in 'LAN8814 Silicon Errata and Data Sheet
-Clarification' and according to that, this will not be corrected in a
-future silicon revision.
+Benchmark - Netperf TCP_STREAM
+Socket buffer size - 8K
+Message size - 256B
+MTU - 1500B
+Socket option - TCP_NODELAY
+# of STREAMs - 32
+Direction - Uni-Directional Receive
+Duration - 60 Seconds
+NIC - Mellanox Technologies ConnectX-6 Dx EN 100G
+Server Config - Intel(R) Xeon(R) Gold 6348 CPU @ 2.60GHz & 512G Memory
 
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
----
- drivers/net/phy/micrel.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+Bisect between 6.5 and 6.6 kernel concluded that this regression originated
+from the below commit:
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 5a0cc89eaebdd..1e3b0436e161e 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -117,6 +117,10 @@
- #define LAN8814_EEE_STATE			0x38
- #define LAN8814_EEE_STATE_MASK2P5P		BIT(10)
- 
-+#define LAN8814_PD_CONTROLS			0x9d
-+#define LAN8814_PD_CONTROLS_PD_MEAS_TIME_MASK_	GENMASK(3, 0)
-+#define LAN8814_PD_CONTROLS_PD_MEAS_TIME_VAL_	0xb
-+
- /* Represents 1ppm adjustment in 2^32 format with
-  * each nsec contains 4 clock cycles.
-  * The value is calculated as following: (1/1000000)/((2^-32)/4)
-@@ -3302,6 +3306,12 @@ static void lan8814_errata_fixes(struct phy_device *phydev)
- 	val = lanphy_read_page_reg(phydev, 2, LAN8814_EEE_STATE);
- 	val &= ~LAN8814_EEE_STATE_MASK2P5P;
- 	lanphy_write_page_reg(phydev, 2, LAN8814_EEE_STATE, val);
-+
-+	/* Improve cable reach beyond 100m */
-+	val = lanphy_read_page_reg(phydev, 1, LAN8814_PD_CONTROLS);
-+	val &= ~LAN8814_PD_CONTROLS_PD_MEAS_TIME_MASK_;
-+	val |= LAN8814_PD_CONTROLS_PD_MEAS_TIME_VAL_;
-+	lanphy_write_page_reg(phydev, 1, LAN8814_PD_CONTROLS, val);
- }
- 
- static int lan8814_probe(struct phy_device *phydev)
+commit - dfa2f0483360d4d6f2324405464c9f281156bd87 (tcp: get rid of
+sysctl_tcp_adv_win_scale)
+Author - Eric Dumazet <edumazet@google.com>
+Link -
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=
+dfa2f0483360d4d6f2324405464c9f281156bd87
+
+Performance data for (Linux VM on ESXi):
+Test case - TCP_STREAM_RECV Throughput in Gbps
+(for different socket buffer sizes and with constant message size - 256B):
+
+Socket buffer size - [LK6.5 vs LK6.6]
+8K - [8.4 vs 5.9 Gbps]
+16K - [13.4 vs 10.6 Gbps]
+32K - [19.1 vs 16.3 Gbps]
+64K - [19.6 vs 19.7 Gbps]
+Autotune - [19.7 vs 19.6 Gbps]
+
+From the above performance data, we can infer that:
+* Regression is specific to lower fixed socket buffer sizes (8K, 16K & 32K).
+* Increasing the socket buffer size gradually decreases the throughput impact.
+* Performance is equal for higher fixed socket size (64K) and Autotune socket
+tests.
+
+We would like to know if there are any opportunities for optimization in
+the test cases with small socket sizes.
+
+Abdul Anshad Azeez
+Performance Engineering
+Broadcom Inc.
+
 -- 
-2.34.1
-
+This electronic communication and the information and any files transmitted 
+with it, or attached to it, are confidential and are intended solely for 
+the use of the individual or entity to whom it is addressed and may contain 
+information that is confidential, legally privileged, protected by privacy 
+laws, or otherwise restricted from disclosure to anyone else. If you are 
+not the intended recipient or the person responsible for delivering the 
+e-mail to the intended recipient, you are hereby notified that any use, 
+copying, distributing, dissemination, forwarding, printing, or copying of 
+this e-mail is strictly prohibited. If you received this e-mail in error, 
+please return the e-mail to the sender, delete it from your computer, and 
+destroy any printed copy of it.
 
