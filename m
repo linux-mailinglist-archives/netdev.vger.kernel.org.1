@@ -1,152 +1,142 @@
-Return-Path: <netdev+bounces-75843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4696986B534
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:42:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ADEE86B540
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:46:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCA831F246F4
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:42:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9AA4B237D1
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:46:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 702271E4A8;
-	Wed, 28 Feb 2024 16:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A2C51E4A8;
+	Wed, 28 Feb 2024 16:46:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DnmEeXzq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DRSXZdSn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3806EF13;
-	Wed, 28 Feb 2024 16:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5AC6EEE4;
+	Wed, 28 Feb 2024 16:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709138572; cv=none; b=XSwFjPAalmM2zy+H/SgGqjvBPymiwGuez5rD9eMPMTAMsx4bcqVoivo4kaDm65lVGnbzi6b+siR/oqmz1oPSh2pLfvgQPVseaV3dccZNNMI+pZHtmVQnHm88M8irqQQwcbPF/JYSp/Sr0v5T7DMt8Nf8sY/rcqAwmf/hasoyQJg=
+	t=1709138794; cv=none; b=jBxdT7/IYKvA9/6OwUtnizzbuCqEffo4NLSmJ5MpOLvbCJgNh7IoPOQOt0y11lXIg7owtp2Tx6Wqia9/mK/KHUGHWn24+41gmsjcKtFc4k/mi6+Rlr+I6yOKWNpqN1brCXbeIJRm2C3C4AZXqBkbDVSUtGzgdN8230ZHJdtfhdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709138572; c=relaxed/simple;
-	bh=w34PS7US7MJmkyMNpW5sS+Wml2/zjKiX667GmM7Bcmg=;
-	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
-	 Message-Id:Subject; b=e2ThVXdVMLO/wzCKL3f+vxOLX2I767AqbH3lzO4+1+5ML0Kzg/PawQesQiDE/IbloZ2O62s7hsVc0w6ZmGztGGnsy2KqCY8tdrMOlnCD3kDQ81UhE8ShpxjEOzN1Kd6F86qR7bPq/2AjFJyaLBC9qO1mjcd4ITUiocx38PKJuTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DnmEeXzq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7927CC433F1;
-	Wed, 28 Feb 2024 16:42:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709138571;
-	bh=w34PS7US7MJmkyMNpW5sS+Wml2/zjKiX667GmM7Bcmg=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=DnmEeXzqBJtCFoixO9DkqqjWAPGtxg9babn+o5HoiUfnrqph4SsxsoslsgunXiyvF
-	 xWKGL9W/NIcNeKlhfBePUOpqVOpJ7dK+Od5dVOZCnphgN9OZigR7/vM8WGP44geT9b
-	 bsIQ0QCAc0DZeVicX0b7G6IZaHLmZfEmw2PQ8Y0CIWktdsOAu18OhzIq5lhMaxK0Hc
-	 vMze6FuWTqdn/9TBe5GGeAxMnWv9Xc1DHibhHpWOjDTTu7zrlYmwzZvGKgHNyOUYUL
-	 ws/+8oFvijUgNzEGSJ1lY98egoQOlM4u3ObHH85Ht0Nl/3UKR/TdqQmvI2Mh6czEgH
-	 /SpiyIXES7A9A==
-Date: Wed, 28 Feb 2024 10:42:50 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1709138794; c=relaxed/simple;
+	bh=V+Wes0yro1vaPybdAdIYTu58twkZIP8KrE4+vLrxbsI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fJDCU6bzZgDObSzdAj/wfkw7SxuiR0CN/4aPBKVy+SRxA5kQDWvo2q11yW7WxiWy0gIyZ0oZHFxf1hQLuTv44pzWGUrrZQIgtXuTzJc5fHlZIr2D3jTztaPcshl6fS5Hsii86X8K5yxNEEFz+qQoQSmdm65EtOGQA4nUSVPfEaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DRSXZdSn; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dc25e12cc63so1118638276.0;
+        Wed, 28 Feb 2024 08:46:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709138791; x=1709743591; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DxwTMwCJVFMBDDvjxN0uaNIVMWBc/m50PoGk4vNalyY=;
+        b=DRSXZdSn37qd1kKt+dhafidPKpXvIpn+/ObqdhivrtC3F6e7ddTn5l0YtNgaRKGK+M
+         d9MQ9UTXf4FbnpAV1R5XwfiT79PBjpgF+VSWxQoms07ghIBsJt9l9X0V0bZUWn5pvFi9
+         SMRb4BM5i8GqKWF6xtBRccDsVisltO0HNlOm2pUdMvbiYCxNJnKjCpNQ7xvMzCWEOl9U
+         FPiP2lA92mTaALlKGf9KEjmm6zlmTO6nhzCvlOKzyEXaKH/36SB3tArGkhSeFElCnv9E
+         S2h1Tby5FPY1XGorSyWLSt17PR++PDYbmqjrQr7PqUIPzyZZTbLLxX2W3NJJsOj9X676
+         qKAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709138791; x=1709743591;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DxwTMwCJVFMBDDvjxN0uaNIVMWBc/m50PoGk4vNalyY=;
+        b=a50gL7jA1ORb2QEq2pYlynwcNl0O52+fwa0MV9XzhcKv5+ciUASQQ71Y1QySSYYfUA
+         WeqI5LW+5lVJm8C8vBb5guu1JvWre0maYL2yprNwwKq8DZEzrBuW+leOvIW887Cg18aW
+         NwNd2I+CnV0iRENfqbsjXzEJSYk30KwJGIeIChfW9PMvH9KGcoQN5IMJ12fNhQngNtDd
+         1Lmkj89KsB8ubmHanAtu26cY86bpOaRY7iiVdg1nbH0IhyzEED6FvWwos3uvcjYtAOOs
+         JWpN7fpeDD29z1N22+b/dPyxmaN5iWTwcUThf0wt3FCBgKYLjly4wonrevKIxOiy0j/+
+         s2Bg==
+X-Forwarded-Encrypted: i=1; AJvYcCUywO9m1zecZ3ofWeU4sUrDKcNKkLn2VCQMyXB7ROcp4X+Vdxi7mpbbg9PD2sUb2LbwwINZN3xFiWr6kFRX4tgGmmVSM6GfkCljFuy/sJaFWqnQ0NeFRikRTp3HCYNf/Qm4zGzoDePoM9aQJhKIjHqDXS/VWGD28XkWhcbI+7fWOcDAbakQ0Fp5lfLOM3D6ZFSY2f6M78ZvrgAKsl7z
+X-Gm-Message-State: AOJu0Yw4HKJSOkFC79K8pPJKgiFkUlYMrSkS/iDvlwmRKYtukMLTgMW3
+	h5/PHqjWSIk45Hua/eVOSfgCPIcC9qeqQRjebQy2VFf2af8GswLkAzvPJxgjThw=
+X-Google-Smtp-Source: AGHT+IG+T6i0Kg6hK0OXQQpUI7eVIpugJ4UsU/eSwtZUJTDnNAIjX3r6X/tjo8tk0qDTO98RF+EAJQ==
+X-Received: by 2002:a25:72c1:0:b0:dc7:3362:4b2f with SMTP id n184-20020a2572c1000000b00dc733624b2fmr2053330ybc.13.1709138791147;
+        Wed, 28 Feb 2024 08:46:31 -0800 (PST)
+Received: from localhost ([2601:344:8301:57f0:2256:57ae:919c:373f])
+        by smtp.gmail.com with ESMTPSA id t13-20020a25aa8d000000b00dcc620f4139sm2082379ybi.14.2024.02.28.08.46.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 08:46:30 -0800 (PST)
+Date: Wed, 28 Feb 2024 08:46:29 -0800
+From: Yury Norov <yury.norov@gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andy Shevchenko <andy@kernel.org>,
+	linux-s390@vger.kernel.org, ntfs3@lists.linux.dev,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>, dm-devel@redhat.com,
+	linux-kernel@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
+	Eric Dumazet <edumazet@google.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Alexander Potapenko <glider@google.com>,
+	Simon Horman <horms@kernel.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-btrfs@vger.kernel.org, intel-wired-lan@lists.osuosl.org
+Subject: Re: [Intel-wired-lan] [PATCH net-next v5 00/21] ice: add PFCP filter
+ support
+Message-ID: <Zd9jZZafcVyDGOTw@yury-ThinkPad>
+References: <20240201122216.2634007-1-aleksander.lobakin@intel.com>
+ <c90e7c78-47e9-46d0-a4e5-cb4aca737d11@intel.com>
+ <20240207070535.37223e13@kernel.org>
+ <4f4f3d68-7978-44c4-a7d3-6446b88a1c8e@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Conor Dooley <conor+dt@kernel.org>, 
- Oleksij Rempel <o.rempel@pengutronix.de>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, 
- Russ Weight <russ.weight@linux.dev>, Heiner Kallweit <hkallweit1@gmail.com>, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- devicetree@vger.kernel.org, Frank Rowand <frowand.list@gmail.com>, 
- Luis Chamberlain <mcgrof@kernel.org>, linux-doc@vger.kernel.org, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Dent Project <dentproject@linuxfoundation.org>, 
- Jonathan Corbet <corbet@lwn.net>, Rob Herring <robh+dt@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Eric Dumazet <edumazet@google.com>, Mark Brown <broonie@kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>
-In-Reply-To: <20240227-feature_poe-v5-11-28f0aa48246d@bootlin.com>
-References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
- <20240227-feature_poe-v5-11-28f0aa48246d@bootlin.com>
-Message-Id: <170913856921.224923.13844056647540488488.robh@kernel.org>
-Subject: Re: [PATCH net-next v5 11/17] dt-bindings: net: pse-pd: Add
- another way of describing several PSE PIs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4f4f3d68-7978-44c4-a7d3-6446b88a1c8e@intel.com>
 
-
-On Tue, 27 Feb 2024 15:42:53 +0100, Kory Maincent wrote:
-> PSE PI setup may encompass multiple PSE controllers or auxiliary circuits
-> that collectively manage power delivery to one Ethernet port.
-> Such configurations might support a range of PoE standards and require
-> the capability to dynamically configure power delivery based on the
-> operational mode (e.g., PoE2 versus PoE4) or specific requirements of
-> connected devices. In these instances, a dedicated PSE PI node becomes
-> essential for accurately documenting the system architecture. This node
-> would serve to detail the interactions between different PSE controllers,
-> the support for various PoE modes, and any additional logic required to
-> coordinate power delivery across the network infrastructure.
+On Mon, Feb 12, 2024 at 12:35:38PM +0100, Alexander Lobakin wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
+> Date: Wed, 7 Feb 2024 07:05:35 -0800
 > 
-> The old usage of "#pse-cells" is unsuficient as it carries only the PSE PI
-> index information.
+> > On Tue, 6 Feb 2024 13:46:44 +0100 Alexander Lobakin wrote:
+> >>> Add support for creating PFCP filters in switchdev mode. Add pfcp module
+> >>> that allows to create a PFCP-type netdev. The netdev then can be passed to
+> >>> tc when creating a filter to indicate that PFCP filter should be created.  
+> >>
+> >> I believe folks agreed that bitmap_{read,write}() should stay inline,
+> >> ping then?
+> > 
+> > Well, Dave dropped this from PW, again. Can you ping people to give you
 > 
-> This patch is sponsored by Dent Project <dentproject@linuxfoundation.org>.
+> Why was it dropped? :D
 > 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
+> > the acks and repost? What's your plan?
 > 
-> Changes in v3:
-> - New patch
+> Ufff, I thought people read their emails...
 > 
-> Changes in v4:
-> - Remove $def
-> - Fix pairset-names item list
-> - Upgrade few properties description
-> - Update the commit message
-> 
-> Changes in v5:
-> - Fix yamllint error.
-> - Replace underscore by dash in properties names.
-> - Add polarity-supported property.
-> ---
->  .../bindings/net/pse-pd/pse-controller.yaml        | 100 ++++++++++++++++++++-
->  1 file changed, 97 insertions(+), 3 deletions(-)
-> 
+> Yury, Konstantin, s390 folks? Could you please give some missing acks? I
+> don't want to ping everyone privately :z
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+Hi Alexander, Jakub,
 
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:86:111: [warning] line too long (111 > 110 characters) (line-length)
-./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:88:111: [warning] line too long (111 > 110 characters) (line-length)
-./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:89:111: [warning] line too long (111 > 110 characters) (line-length)
-./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:90:111: [warning] line too long (111 > 110 characters) (line-length)
-./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:91:111: [warning] line too long (111 > 110 characters) (line-length)
-./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:92:111: [warning] line too long (111 > 110 characters) (line-length)
-./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:93:111: [warning] line too long (111 > 110 characters) (line-length)
-./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:94:111: [warning] line too long (111 > 110 characters) (line-length)
-./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:95:111: [warning] line too long (111 > 110 characters) (line-length)
+I reviewed the series again and added my SOBs for bitmap-related
+patches, and Acks or RBs for the rest, where appropriate.
 
-dtschema/dtc warnings/errors:
+Regarding the patch #17, I don't think that network-related tests
+should be hosted in lib/test-bitmap. This is not a critical issue,
+but Alexander, can you find a better place for the code?
 
-doc reference errors (make refcheckdocs):
-Warning: Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml references a file that doesn't exist: Documentation/networking/pse-pd/pse-pi.rst
-Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml: Documentation/networking/pse-pd/pse-pi.rst
+The rest of the series is OK for me. I think Jakub wants to pull this
+as a whole in his -net branch? If so please go ahead, if not - I can
+pull bitmap-related part in bitmap-for-next.
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240227-feature_poe-v5-11-28f0aa48246d@bootlin.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+Thanks,
+Yury
 
