@@ -1,59 +1,82 @@
-Return-Path: <netdev+bounces-75637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D046486ABF2
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 11:12:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D71A586AC03
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 11:17:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7225A1F29E63
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 10:12:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B04D71C2115C
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 10:17:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E9B3838F;
-	Wed, 28 Feb 2024 10:12:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D0C44C71;
+	Wed, 28 Feb 2024 10:17:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n96fHgZo"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sKxKZKBm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A426A38390
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 10:12:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C47444C69
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 10:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709115142; cv=none; b=Ch31Flntv8muvfkH2fzMueppbggDCOm8ECGcLQXQWVj9OYInvjJySUxOgOyQcyDnVn3U0rzv2/VmIzGabe9H2xegIU7Zy6uWf08VAl1ilqh3Hd+kwL0w1M73+BBesvy5Yj+OG7KLGq8BlJyvMFS9ZmXj9onu/SKfg4Cc1fEI1fo=
+	t=1709115445; cv=none; b=t/Ajg9JJ0L3ao8o6gNSmH7Rb/0gOb/UJ0xlI30Ch4Bwx45D4h+gs//+9jMaVoETi4y25XLPwGlwcbEl62thQDs5z8cTgArLSB1vcHOhtATQ9we2hpiLgoYwgbPsQSxu4wvDN8WaMTwQ80f08gNI3iqpMmak7uEq4OSA3qd5Yh2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709115142; c=relaxed/simple;
-	bh=QFYQUoP97qt1SySTRyNAKrKSlup8Ut/g9RM8S9am1mM=;
+	s=arc-20240116; t=1709115445; c=relaxed/simple;
+	bh=IH3Bikqi68/A7myTJacr+ILlvEGyjU3gcgKm2F9+LWA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m9p/rBP1ywHmHFj4JoMLWC6Vg4S1/etFVbXjbYfzMiivNtCLoljMHwRKNEiZracasklnkxpu5tsSyQRJDOiP3GAqp4y25GPNmkwty5vbIAoIlSfU7v5g62qxk1eUqLhCbyRZ64NzBtap9dzj0dx/c08GoVJ3IetzDZi0EMS+vGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n96fHgZo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61A43C43394;
-	Wed, 28 Feb 2024 10:12:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709115142;
-	bh=QFYQUoP97qt1SySTRyNAKrKSlup8Ut/g9RM8S9am1mM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n96fHgZoOdwmwYupMkJDHIcXKFSXtzfuPciA6Q42WzIjAQyyy5pHqrp4mmDiktMvD
-	 XmBa/boDMeU+a2wslPm1yJwkAavc1N3w7ZIxdZg4gKwzBJVQJbovMVGpcGxmSgCp/3
-	 pyzEoAr8fum7GOtxgFr/sWyqJG/z49bfpW0rkKsqWv9apEaND2hzEjpQOt4zuEodZM
-	 MpGNikI0U3z4djHIey7UyYG/LGLBdJSKJPRDfyUAhwGnlQq0pGrxqvSLT/ghrmrUbH
-	 frHRNk9eoVqaCj7WPme6IOFcYS/699pd7GMHJyuHoEo9ylWRavq+/gaib+VQ3BeQyo
-	 N8O+BlpjtjD1g==
-Date: Wed, 28 Feb 2024 10:12:18 +0000
-From: Simon Horman <horms@kernel.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>, lukasz.czapnik@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Nebojsa Stevanovic <nebojsa.stevanovic@gcore.com>,
-	Christian Rohmann <christian.rohmann@inovex.de>
-Subject: Re: [PATCH iwl-net] ice: fix stats being updated by way too large
- values
-Message-ID: <20240228101218.GB292522@kernel.org>
-References: <20240227143124.21015-1-przemyslaw.kitszel@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=t1gj4wU7hhp718lw3jNjKnckn4MOBOOArZ4X2WK8Evor/3UqC7oUeQ5u+pyOut68o5ebC7sX5KozFrDORVq98tDjrkZoznpXTXubCYBRaiZANBh3ql0y5WbUNl04cywn0LXa5sYoX4uVfMytMlH/S4PmqSDCBr6kZVZ2hs1zxxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sKxKZKBm; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-412b272799aso5252945e9.3
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 02:17:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1709115442; x=1709720242; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CoC1aILR23YFVOifjxSejtqanuyoJI7UmmW0U6nvIzU=;
+        b=sKxKZKBmuqS3jUyOaAKDYxS5lPkpLaDSQnWoSPTw/9PWDdU5/OAMFe3frRcOFUrxyd
+         +3G4CFaVhIQVaSBnFozZqYWIVvRsDNNN9T0Eb/xmzbJzLKQ0uiYTqnQ/7kUuIggNTYXi
+         uHTc3yPutfAM/HxmiTFP9pb+jkCk3Op+zbWVjpGea3Y9rMSqVXDcrfSf7eVivpYjzn9N
+         gL5QcHTSONvdYbazTKN6BK51U19VVsjCaxS6GyKwPhRUB4dwplONnnOvXR5pZqq1mfJZ
+         cEW5swr9cPbURo7xGrhc80Ep0AXMvXZAF9O6gqmAPik51PTLFQNQTeDldWTYH4zkH6T3
+         zTQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709115442; x=1709720242;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CoC1aILR23YFVOifjxSejtqanuyoJI7UmmW0U6nvIzU=;
+        b=MxQTScDMxzz3v6/caEt6bAhs1lZEaRbIKRfPbFi5SmEH7G+jvyMNzyLptUfdtcqZ8T
+         d38JLrsC5UcEukTW0vl+nYWmEQrGGuK9b4IwW2zzVLhP7wmKFoqNoDCcCAk622rmLu3P
+         VqnvTO0nC0yA1Osr0fta6ZAOzA15iZDX9nN3Q6loephYJFeVoxCkgx8bICeoq4eyYH8S
+         i7lor3T92GRsgg6GrgYeXs1Yr4C94eyyQB+kpVLaE+HWNvoXsXq1XrA+ZNm46nRfMOoL
+         Y9JCNwHmfgfvmAbq2XpWkoTaiLDmxGAgjYKFpJmWUH0aB456xXbxwgevPnkcYAS6X8aK
+         I0FQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWQeRgaKRjY38VjBsnQUzRFMLwe05AtRbjZ+svf4zTIzTB8fQe6NB1GotK7UY28xCPP3REkonD5jMVnQN93iTqAV+jlir4c
+X-Gm-Message-State: AOJu0YxCCclLnd3qTMknc/9+A8Sf89bs9QiYAr4tOa7dxN8suY0KdBc0
+	Su3tmy0ykRJZKuuKIoMmFEaQmRloX3h1An1mA9L5tXqm0kNqdTdbIb8ul9CGhqo=
+X-Google-Smtp-Source: AGHT+IEpamqaOQJDn0FhlvGVDX/h+ul85tspB7tBYEVrVbYsrmgIR5nB914VhdUa8+jQISj4AybjKg==
+X-Received: by 2002:a05:600c:548a:b0:412:9e75:29f1 with SMTP id iv10-20020a05600c548a00b004129e7529f1mr8539047wmb.28.1709115441614;
+        Wed, 28 Feb 2024 02:17:21 -0800 (PST)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id s28-20020a05600c319c00b00412a38e732csm1605103wmp.35.2024.02.28.02.17.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 02:17:21 -0800 (PST)
+Date: Wed, 28 Feb 2024 13:17:17 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: andy@greyhouse.net, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net 2/2] net: tehuti: Fix leaks in the error handling
+ path of bdx_probe()
+Message-ID: <3b12e1e2-4859-40b6-8d9d-0a940251bed4@moroto.mountain>
+References: <cover.1709066709.git.christophe.jaillet@wanadoo.fr>
+ <9090b599c7574892b77a9521e3ddb3a52a154205.1709066709.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,36 +85,76 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240227143124.21015-1-przemyslaw.kitszel@intel.com>
+In-Reply-To: <9090b599c7574892b77a9521e3ddb3a52a154205.1709066709.git.christophe.jaillet@wanadoo.fr>
 
-On Tue, Feb 27, 2024 at 03:31:06PM +0100, Przemek Kitszel wrote:
-> Simplify stats accumulation logic to fix the case where we don't take
-> previous stat value into account, we should always respect it.
+On Tue, Feb 27, 2024 at 09:50:56PM +0100, Christophe JAILLET wrote:
+> If an error occurs when allocating the net_device, all the one already
+> allocated and registered should be released, as already done in the remove
+> function.
 > 
-> Main netdev stats of our PF (Tx/Rx packets/bytes) were reported orders of
-> magnitude too big during OpenStack reconfiguration events, possibly other
-> reconfiguration cases too.
+> Add a new label, remove the now useless 'err_out_disable_msi' label and
+> adjust the error handling path accordingly.
 > 
-> The regression was reported to be between 6.1 and 6.2, so I was almost
-> certain that on of the two "preserve stats over reset" commits were the
-> culprit. While reading the code, it was found that in some cases we will
-> increase the stats by arbitrarily large number (thanks to ignoring "-prev"
-> part of condition, after zeroing it).
+> Fixes: 1a348ccc1047 ("[NET]: Add Tehuti network driver.")
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+> Compile tested only.
+> ---
+>  drivers/net/ethernet/tehuti/tehuti.c | 15 ++++++++++-----
+>  1 file changed, 10 insertions(+), 5 deletions(-)
 > 
-> Note that this fixes also the case where we were around limits of u64, but
-> that was not the regression reported.
-> 
-> Full disclosure: I remember suggesting this particular piece of code to
-> Ben a few years ago, so blame on me.
-> 
-> Fixes: 2fd5e433cd26 ("ice: Accumulate HW and Netdev statistics over reset")
-> Reported-by: Nebojsa Stevanovic <nebojsa.stevanovic@gcore.com>
-> Link: https://lore.kernel.org/intel-wired-lan/VI1PR02MB439744DEDAA7B59B9A2833FE912EA@VI1PR02MB4397.eurprd02.prod.outlook.com
-> Reported-by: Christian Rohmann <christian.rohmann@inovex.de>
-> Link: https://lore.kernel.org/intel-wired-lan/f38a6ca4-af05-48b1-a3e6-17ef2054e525@inovex.de
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> diff --git a/drivers/net/ethernet/tehuti/tehuti.c b/drivers/net/ethernet/tehuti/tehuti.c
+> index 938a5caf5a3b..6678179885cb 100644
+> --- a/drivers/net/ethernet/tehuti/tehuti.c
+> +++ b/drivers/net/ethernet/tehuti/tehuti.c
+> @@ -1965,7 +1965,7 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  		ndev = alloc_etherdev(sizeof(struct bdx_priv));
+>  		if (!ndev) {
+>  			err = -ENOMEM;
+> -			goto err_out_disable_msi;
+> +			goto err_out_free;
+>  		}
+>  
+>  		ndev->netdev_ops = &bdx_netdev_ops;
+> @@ -2031,13 +2031,13 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  		if (bdx_read_mac(priv)) {
+>  			pr_err("load MAC address failed\n");
+>  			err = -EFAULT;
+> -			goto err_out_disable_msi;
+> +			goto err_out_free_current;
+>  		}
+>  		SET_NETDEV_DEV(ndev, &pdev->dev);
+>  		err = register_netdev(ndev);
+>  		if (err) {
+>  			pr_err("register_netdev failed\n");
+> -			goto err_out_free;
+> +			goto err_out_free_current;
+>  		}
+>  		netif_carrier_off(ndev);
+>  		netif_stop_queue(ndev);
+> @@ -2046,9 +2046,14 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	}
+>  	RET(0);
+>  
+> -err_out_free:
+> +err_out_free_current:
+>  	free_netdev(ndev);
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Since it seems like you're going to be resending this patch, could you
+do this free_netdev() before gotos?  That way if someone adds more code
+after the loop then we can still use the goto ladder to unwind.  (No one
+is going to add more code after the loop, I know...  I wouldn't have
+commented except that it seemed like you were going to resend.)
+
+		if (bdx_read_mac(priv)) {
+			free_netdev(ndev);
+			pr_err("load MAC address failed\n");
+			err = -EFAULT;
+			goto err_out_free;
+		}
+
+regards,
+dan carpenter
+
 
 
