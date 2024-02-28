@@ -1,60 +1,58 @@
-Return-Path: <netdev+bounces-75533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B45AB86A69E
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:36:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7196186A6DC
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:48:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 284B0B20CF5
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 02:36:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 121751F231FB
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 02:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D661AAC9;
-	Wed, 28 Feb 2024 02:35:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A55F200B8;
+	Wed, 28 Feb 2024 02:46:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ai6GEFp1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dEmXryY2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6FC01C2AD
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 02:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D27621342;
+	Wed, 28 Feb 2024 02:46:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709087757; cv=none; b=JvNyS7OryiyQVUiZ7MtPkQBloO86LBh4AkQPYLQPACDFrKDuVvFMo3qg4wfYiCW6WjyxtJx/xMI+m5TZxgazPg+hxSWq2fKL3P56G+6r1kHVa0Cx1xh8oSGEutgjI92DFxpICstfv9ZvHFUCHPp5fURewLaNQtZvccVuVrB2aBI=
+	t=1709088419; cv=none; b=gJZ2CyZNTE/1GLwRJ3NSWM96CiONyx9xI8lyyr87NBdzN+s36FMWfFjjLP10j4R6GZayMaqpAcJwQlKnl9oluPexHTam9gmClEeh9LxOPAjRGEchK2MuKJYHadITdQ2yuFA+mOTimU6dY77EOYhHS2keWuvW4LZBs7s6UvIbaD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709087757; c=relaxed/simple;
-	bh=55xwUWFspAVlGcKw+GAnaKAavDfKol9w4CrzXxRxf4c=;
+	s=arc-20240116; t=1709088419; c=relaxed/simple;
+	bh=Tnku9fdfb4RAYA9RXtUVS6U+UK5al6iZT05jrsPWoS0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AE6DF5TOdJ/A8v50/u1SxCp/ScwHQJAbK0KW6ne4JJUhEDlHEupYsyPSOoG3IUoc/4oaTFzZr3Zvak1oN9orGIFkfXXHa7PD5uLjqAZvLw1Sa+icGiOKX5v1k3Ta41cRYkQkR6GjBatcJ3PlJIVYXAdSbFGPWfLuM2S3gG3hlN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ai6GEFp1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0213CC433F1;
-	Wed, 28 Feb 2024 02:35:55 +0000 (UTC)
+	 MIME-Version:Content-Type; b=L6WJ4KELXAZx72l11XULB/ruaFcaN3cWkgBDr9INKzBlrxNWintrNOPchMGHKIM2CFExZGZpSr646bgsX9cCG7wSXZiQtxoN5A+ZPW+hqQ+IsyZHws3sB4Vy2eU4oHBnst8g+5D2KTpzYSWlAhSA4nvdtY0fZIghQGiTPrZaqjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dEmXryY2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 940E3C433F1;
+	Wed, 28 Feb 2024 02:46:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709087756;
-	bh=55xwUWFspAVlGcKw+GAnaKAavDfKol9w4CrzXxRxf4c=;
+	s=k20201202; t=1709088419;
+	bh=Tnku9fdfb4RAYA9RXtUVS6U+UK5al6iZT05jrsPWoS0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ai6GEFp1xYU8vcxMOLc319xHH1ub41Nj1RMCJG1hTYBZo9NLTjM/4/jBAiRiQ0NGz
-	 HhzG3AMcl694LkiaRMFxs0n0aBYyrUk3Ojo29w0PoECD+lQRfMeu7ZDiLEvnHyqD3C
-	 5K3R1a64PKoeRwoRoBAE4NupRQ26mu+xJWSOWwY7WxHvJf329rGlvHgQ1I73iWI5o9
-	 v5MjPu+uKdFdECjDhNKfjkABzH92O4P0B4MWfm8t0L5sbql2q+zE/L7pT06y3HYSkk
-	 pNOLG5aVnc9uYlAsRN0pmPamcsPPXXS1j5EjSYRvUq+u1+13jL6dOjvCw3//BuhjZ3
-	 ZVDPf0tAcGj4w==
-Date: Tue, 27 Feb 2024 18:35:55 -0800
+	b=dEmXryY25ebRwANbBUGtI6ksIrGC+yw6XPMwJUBMd6m2Gi30xmZVbqbY8Ko3brVrW
+	 HJpbknBs/B7AblepqcptwN0rSZFglUjP7NgdHr+wqwY6c2Hmb2idx4tMhbz8TH+4u2
+	 QZe4fXRNcgYAMqMGrSN5Wjf84Hd9E9QDtsn/gjyW1WSB/ZWDnwNbb5NgJoeLIU63VW
+	 z4nEgV7p+Klt1JHkvDzOesqBietzTRZWD5sNC+UQO4t5k54lxYypBDajtyz6c0ZlUF
+	 m8W4WTKn1hwFhbvx/9ROKNDaYy0A8aST1VFUd8LT9Qb231W7pPAtVIgKSt2r/dFiD3
+	 ut8Px/Nuw/5Ng==
+Date: Tue, 27 Feb 2024 18:46:57 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Michal Schmidt <mschmidt@redhat.com>
-Cc: intel-wired-lan@lists.osuosl.org, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Richard Cochran <richardcochran@gmail.com>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Karol Kolacinski
- <karol.kolacinski@intel.com>, Jacob Keller <jacob.e.keller@intel.com>,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] ice: add ice_adapter for shared data
- across PFs on the same NIC
-Message-ID: <20240227183555.01123eb7@kernel.org>
-In-Reply-To: <20240226151125.45391-2-mschmidt@redhat.com>
-References: <20240226151125.45391-1-mschmidt@redhat.com>
-	<20240226151125.45391-2-mschmidt@redhat.com>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: netdev@vger.kernel.org, kernel-janitors@vger.kernel.org, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Madalin
+ Bucur <madalin.bucur@nxp.com>, Paolo Abeni <pabeni@redhat.com>, Sean
+ Anderson <sean.anderson@seco.com>, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] net: fman: Use common error handling code in
+ dtsec_init()
+Message-ID: <20240227184657.76ec4e82@kernel.org>
+In-Reply-To: <9b879c8d-4c28-4748-acf6-18dc69d8ebdf@web.de>
+References: <9b879c8d-4c28-4748-acf6-18dc69d8ebdf@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,16 +62,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 26 Feb 2024 16:11:23 +0100 Michal Schmidt wrote:
-> There is a need for synchronization between ice PFs on the same physical
-> adapter.
-> 
-> Add a "struct ice_adapter" for holding data shared between PFs of the
-> same multifunction PCI device. The struct is refcounted - each ice_pf
-> holds a reference to it.
-> 
-> Its first use will be for PTP. I expect it will be useful also to
-> improve the ugliness that is ice_prot_id_tbl.
+On Tue, 27 Feb 2024 14:14:52 +0100 Markus Elfring wrote:
+> Adjust jump targets so that a bit of exception handling can be better
+> reused at the end of this function implementation.
 
-ice doesn't support any multi-host devices?
+Okay, but..
+
+>  .../net/ethernet/freescale/fman/fman_dtsec.c  | 19 +++++++++++--------
+>  1 file changed, 11 insertions(+), 8 deletions(-)
+
+..you've added more lines than you've removed so what's the point.
+-- 
+pw-bot: reject
 
