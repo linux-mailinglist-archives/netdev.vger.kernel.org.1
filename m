@@ -1,82 +1,81 @@
-Return-Path: <netdev+bounces-75694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 140D486AEE7
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:14:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EA7086AEEC
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:16:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1444E1C20F29
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:14:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B23F11F242CB
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:16:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3024673527;
-	Wed, 28 Feb 2024 12:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C253A36139;
+	Wed, 28 Feb 2024 12:16:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="mv7QAL7V"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="bAaMqTcP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA977353F
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 12:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8D91F608
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 12:16:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709122491; cv=none; b=LS7HeUDutFMGlsGIxLya/Or8sGb5q70l2MxLy5mkv+Ua8gPgn2/naGfvmX17ntBsGLObpYJgtkA0RUgzeEof82eJPK1IVezEavSRxvA3z8sz89zPrnIL6OCKOOENnq/hmjc8Yi7rIGy5tcRHTItRXlYkzkEgy/uqLe0ls5AIVYY=
+	t=1709122571; cv=none; b=qHx2JKPC1sTomAGzlmuTtkwylMX21f0z1Cvp3jvdzKYSSMHMxLMd/Q3lDWyy94bY5f3DE2l9AZcSgs9OfezccCsOVeGyCHq1pPErl8bulPsi9fxCDQHm+Oe2SFUMA82iRxRVv+NVSHv+InPOGTjmgKlnyCxYbFY/EjSnQMWwDok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709122491; c=relaxed/simple;
-	bh=XRJuTkht8FxfCspd+iue+yvGTbmirCbnGs+3Uw3zWFQ=;
+	s=arc-20240116; t=1709122571; c=relaxed/simple;
+	bh=p/F1zp09ShV+zNO8eCuuUf8jlkU6Npcey1XTysGtC4Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VttcLYIfjDnsD37/qJ6aGByuwfww5hAow3Gnh1NagEwGUEEKCTcnUsfI3Sp1z8ShQleXaoSHhgsVv5Nj36y8mQZP6hEh71KFMOgiDs2gYxITRhnOG6//RwF3vEM/fWE6jMDy6to7NgYVfEv+XS8vIn+XYS0C0YlCkYis1XlZBPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=mv7QAL7V; arc=none smtp.client-ip=209.85.208.42
+	 Content-Type:Content-Disposition:In-Reply-To; b=liX1C2LcYTNT0b2aGbD/V/tcm4JO9Jj8+ZNdEa0Qsu1+81O/nfa7/5BH1uw8VpeOMeGBe+Yg9Gbb/9B8lzlfjTK6puEANEIV+hEzTIMxWIVL7vdALu1aS/9J4f77HEmyJfIhvFQoxHLhhcNcyu5oj2IjSUpkaX/XPo7bPQ7rkVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=bAaMqTcP; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-564fc495d83so6337284a12.0
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 04:14:48 -0800 (PST)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-55a8fd60af0so7430479a12.1
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 04:16:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709122487; x=1709727287; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709122568; x=1709727368; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yNYMykttlXrGu+y3ZcK4zIjxaM0WUhP8MC7XJIO29wk=;
-        b=mv7QAL7VImTTNEz70Ce6uwUSejXL3dgD6uLW3WhEVArww9A1a8FcQpw07C1pRD/srQ
-         sLwmsgUSK3Od4YidKCnY1d5ixQDxTITMfILYCPteXixiXDI140lwqrwwfrnrfpJuSXib
-         e1VRWM4HIUuLkuHhiyX/orREXsmgB1eJXyXL5iEdw+nBfY3MRgY0M0Fr/7pA8VUaa5Pc
-         HEj38qixmp6JnOG8FjOUexhkUBKoE/52yAdOCJTL+ys+ZRqcmFSh2GWimRIXNKZcLfCg
-         HAYCt/yUZ4QwBdsr+2L/d1EbKT0R1MOOAPQfbyqAhv7vYtf+xM06YbVj/2A/xYSdyvgx
-         U/xA==
+        bh=MrLAHlmTxPLc26B8OhByezM02k78+T+AA9Yb2WW7rD8=;
+        b=bAaMqTcPAP8bquY993JvHoUhQ6tNhjXJ2JTK++IJ/2SibzzCPJZ/S51iB9DOY67i/1
+         dVMRHoqBL8cr3WRh1F3UFMWWpDUfVqZUCTFBD7w+gnE6oxeViijBJdTKhuQzer8/GPJL
+         +VMgpHfRKdThXGQjRcqeg1bU1OoNOj6/hhObGR/rBS4b9qpQj/BdcmrnlpgisiI6Z2m4
+         Wifr0SpYUZFYIxvyXELh21zO5303qH8RFfL3koPh9VaA8ACnW23kjRbmPONNnNN7bWRP
+         uLISAll5A3q6qMmuOrUXm1wy/atNrtFVOhHHTz8cZccrTH2R3K4u61BsLJwchMuJD8sk
+         zEJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709122487; x=1709727287;
+        d=1e100.net; s=20230601; t=1709122568; x=1709727368;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yNYMykttlXrGu+y3ZcK4zIjxaM0WUhP8MC7XJIO29wk=;
-        b=pQjMOgsZeBL7VhMaIEbYvz/dvgNpnGzCMCFApO66Swg2Z+OWmE+e+EcQ8YgAG+JIOV
-         RFTmmvAn/Q++G5BCUeKyBvNFMo2xV5D3lZyRwM8+QsWIiSE40CB8P5lyldBhZac51vGh
-         L3eQFqKpxw7xvFAvRSZr8V6a8Jo3mLuO4ZxOuzDf5Si5lMDiCevwqmH6nojvRRVSzoG0
-         0Ge3TQHX08H9SsTVFW+eyGyiyo83xP514NCeUVrB/mbB6fHo0GGk8RcSDxU/Gaz/wrEp
-         TuwoCQ7dK4J93B7JuPju4H+rtNTb06rOk+ySdrNtD4wf1LKz8FKZY5Fr65CjchygbdHQ
-         /yCg==
-X-Forwarded-Encrypted: i=1; AJvYcCUfhMIb9BSvKu/MF+h82ljfUEqcSDI2oWGsmcKz/QQtl7zciNFbsL25aWo4yjufVCquUOMqoPEjhJi8ifLXqzwUYmd1jPRI
-X-Gm-Message-State: AOJu0YwNoOjDDZQLEJQUWwdAOZQ4VEBYdU4rqDRJ+YW6XTF3gHtPo4Te
-	MVVgNrrcXOVat7nk8c2fHpjJGD2CgrNoJoujSo7QGS5XKxQwvmtLJNwjw6rk9bAR2wqLWBnbXC3
-	n
-X-Google-Smtp-Source: AGHT+IGh73Y5mwH/q9NIDOFycKr698w+3J5hP8zWoSzRrNokpqVNMgBoMAn7izajjDIbM8mozmLa+Q==
-X-Received: by 2002:aa7:d716:0:b0:564:4f6f:a7ff with SMTP id t22-20020aa7d716000000b005644f6fa7ffmr8206102edq.20.1709122486808;
-        Wed, 28 Feb 2024 04:14:46 -0800 (PST)
+        bh=MrLAHlmTxPLc26B8OhByezM02k78+T+AA9Yb2WW7rD8=;
+        b=DKmYtfmHShIw6fO09JH1OBsbrYn2HIjf/rSyulXZDn9qorIrdjLKuXGojO+O2MwCPb
+         Vu0jYTraS7aCzWAFF7Yi4UBXI9hColK5eUM96dRRgvHy6LpoexMqiQ+UgH9JEyTmPsKJ
+         CJd17icGDC5CA5fZGJhAuonoN1n/Rr32mWIaVMGVA0Kc16wUfZO1xpr2vd3gQsFzMMSW
+         IBkBk6HQgzUpUIHD3N22iDpWvTuI5IcjEC5SFSDdhAwwvNPveMTIfIS93rwxUPzZRlRr
+         4Ea/JkBIcM+8955bcDtKL6G9gXKabMRqyrjZOCdfpF9RvC+BKO2xY0WIZi1UQx8xSgnk
+         h8lg==
+X-Forwarded-Encrypted: i=1; AJvYcCW9Kv5y6BnJTfu8EMgPSU037Khv8DB7bWVD1y539rk+XUjTe1BgRuBqmSb57kTHcAF8SxdwHD4dAF8f523E0o/dyfccGM+W
+X-Gm-Message-State: AOJu0Yx4FX+Njzi+3myHr2AX+yhNq4jPJvH0+GMh3R7YaCFc1m2KVgnf
+	YdRCwtHhoyFYtpardCkXZPlTUu4nN9t7v101GiM/uacF4+N6ml/K9mJDO0x5Rss=
+X-Google-Smtp-Source: AGHT+IGuRXqWYl7PZQl7MaEOFjQ2toWdm1ZLLzWKUcqJ16rJE/M219GG6wJcDFtX5g2A7EUmaqW3Ig==
+X-Received: by 2002:a05:6402:1ca4:b0:565:a5bb:cc4c with SMTP id cz4-20020a0564021ca400b00565a5bbcc4cmr7458162edb.42.1709122568225;
+        Wed, 28 Feb 2024 04:16:08 -0800 (PST)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ec31-20020a0564020d5f00b0056650cd0156sm1048290edb.66.2024.02.28.04.14.45
+        by smtp.gmail.com with ESMTPSA id cx6-20020a05640222a600b005653fe3f180sm1718428edb.70.2024.02.28.04.16.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 04:14:46 -0800 (PST)
-Date: Wed, 28 Feb 2024 13:14:43 +0100
+        Wed, 28 Feb 2024 04:16:07 -0800 (PST)
+Date: Wed, 28 Feb 2024 13:16:05 +0100
 From: Jiri Pirko <jiri@resnulli.us>
 To: Louis Peens <louis.peens@corigine.com>
 Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>, Fei Qin <fei.qin@corigine.com>,
 	netdev@vger.kernel.org, oss-drivers@corigine.com
-Subject: Re: [PATCH net-next v2 1/4] devlink: add two info version tags
-Message-ID: <Zd8js1wsTCxSLYxy@nanopsycho>
+Subject: Re: [PATCH net-next v2 2/4] nfp: update devlink device info output
+Message-ID: <Zd8kBY-pUjKWBGFv@nanopsycho>
 References: <20240228075140.12085-1-louis.peens@corigine.com>
- <20240228075140.12085-2-louis.peens@corigine.com>
+ <20240228075140.12085-3-louis.peens@corigine.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,85 +84,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240228075140.12085-2-louis.peens@corigine.com>
+In-Reply-To: <20240228075140.12085-3-louis.peens@corigine.com>
 
-Wed, Feb 28, 2024 at 08:51:37AM CET, louis.peens@corigine.com wrote:
+Wed, Feb 28, 2024 at 08:51:38AM CET, louis.peens@corigine.com wrote:
 >From: Fei Qin <fei.qin@corigine.com>
 >
->Add definition and documentation for the new generic
->info "board.model" and "part_number".
+>Newer NIC will introduce a new part number, now add it
+>into devlink device info.
 >
 >Signed-off-by: Fei Qin <fei.qin@corigine.com>
 >Signed-off-by: Louis Peens <louis.peens@corigine.com>
 >---
-> Documentation/networking/devlink/devlink-info.rst | 10 ++++++++++
-> include/net/devlink.h                             |  5 +++++
-> 2 files changed, 15 insertions(+)
+> Documentation/networking/devlink/nfp.rst         | 3 +++
+> drivers/net/ethernet/netronome/nfp/nfp_devlink.c | 3 ++-
+> 2 files changed, 5 insertions(+), 1 deletion(-)
 >
->diff --git a/Documentation/networking/devlink/devlink-info.rst b/Documentation/networking/devlink/devlink-info.rst
->index 1242b0e6826b..e663975a6b19 100644
->--- a/Documentation/networking/devlink/devlink-info.rst
->+++ b/Documentation/networking/devlink/devlink-info.rst
->@@ -146,6 +146,11 @@ board.manufacture
-> 
-> An identifier of the company or the facility which produced the part.
-> 
->+board.model
->+-----------
->+
->+Board design model.
->+
-> fw
-> --
-> 
->@@ -203,6 +208,11 @@ fw.bootloader
-> 
-> Version of the bootloader.
-> 
->+part_number
->+-----------
->+
->+Part number of the entire product.
->+
-> Future work
-> ===========
-> 
->diff --git a/include/net/devlink.h b/include/net/devlink.h
->index 9ac394bdfbe4..edcd7a1f7068 100644
->--- a/include/net/devlink.h
->+++ b/include/net/devlink.h
->@@ -605,6 +605,8 @@ enum devlink_param_generic_id {
-> #define DEVLINK_INFO_VERSION_GENERIC_BOARD_REV	"board.rev"
-> /* Maker of the board */
-> #define DEVLINK_INFO_VERSION_GENERIC_BOARD_MANUFACTURE	"board.manufacture"
->+/* Model of the board */
->+#define DEVLINK_INFO_VERSION_GENERIC_BOARD_MODEL       "board.model"
-> 
-> /* Part number, identifier of asic design */
-> #define DEVLINK_INFO_VERSION_GENERIC_ASIC_ID	"asic.id"
->@@ -632,6 +634,9 @@ enum devlink_param_generic_id {
-> /* Bootloader */
-> #define DEVLINK_INFO_VERSION_GENERIC_FW_BOOTLOADER	"fw.bootloader"
-> 
->+/* Part number for entire product */
->+#define DEVLINK_INFO_VERSION_GENERIC_PART_NUMBER       "part_number"
+>diff --git a/Documentation/networking/devlink/nfp.rst b/Documentation/networking/devlink/nfp.rst
+>index a1717db0dfcc..f79d46472012 100644
+>--- a/Documentation/networking/devlink/nfp.rst
+>+++ b/Documentation/networking/devlink/nfp.rst
+>@@ -42,6 +42,9 @@ The ``nfp`` driver reports the following versions
+>    * - ``board.model``
+>      - fixed
+>      - Model name of the board design
+>+   * - ``part_number``
+>+     - fixed
+>+     - Part number of the entire product
+>    * - ``fw.bundle_id``
+>      - stored, running
+>      - Firmware bundle id
+>diff --git a/drivers/net/ethernet/netronome/nfp/nfp_devlink.c b/drivers/net/ethernet/netronome/nfp/nfp_devlink.c
+>index 635d33c0d6d3..5b41338d55c4 100644
+>--- a/drivers/net/ethernet/netronome/nfp/nfp_devlink.c
+>+++ b/drivers/net/ethernet/netronome/nfp/nfp_devlink.c
+>@@ -159,7 +159,8 @@ static const struct nfp_devlink_versions_simple {
+> 	{ DEVLINK_INFO_VERSION_GENERIC_BOARD_ID,	"assembly.partno", },
+> 	{ DEVLINK_INFO_VERSION_GENERIC_BOARD_REV,	"assembly.revision", },
+> 	{ DEVLINK_INFO_VERSION_GENERIC_BOARD_MANUFACTURE, "assembly.vendor", },
+>-	{ "board.model", /* code name */		"assembly.model", },
+>+	{ DEVLINK_INFO_VERSION_GENERIC_BOARD_MODEL,	"assembly.model", },
+>+	{ DEVLINK_INFO_VERSION_GENERIC_PART_NUMBER,     "pn", },
 
-/* Part number, identifier of board design */
-#define DEVLINK_INFO_VERSION_GENERIC_BOARD_ID   "board.id"
-
-Isn't this what you are looking for?
-
-"part_number" without domain (boards/asic/fw) does not look correct to
-me. "Product" sounds very odd.
-
-pw-bot: cr
+Could this be 2 patches? One logical change per patch please.
 
 
-
->+
-> /**
->  * struct devlink_flash_update_params - Flash Update parameters
->  * @fw: pointer to the firmware data to update from
+> };
+> 
+> static int
 >-- 
 >2.34.1
 >
