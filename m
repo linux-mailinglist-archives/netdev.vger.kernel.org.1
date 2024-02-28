@@ -1,78 +1,83 @@
-Return-Path: <netdev+bounces-75785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFEDA86B2C6
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:10:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6483986B2CF
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:11:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4EC6FB2850F
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:10:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 787F31C233FE
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D2615B969;
-	Wed, 28 Feb 2024 15:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD5715B988;
+	Wed, 28 Feb 2024 15:11:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="6RNvx1X0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZpcrobOo"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8027F2D022;
-	Wed, 28 Feb 2024 15:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBB715B97C
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 15:11:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709133022; cv=none; b=fMal7qlApT9h3lT3504Bkk8Hz85cdWJU7cMMKwzLvBo3i22l4BJ80aEzQIn/zE9/cU1jKS5x+rxBzgCRSuTgo2v0Ax2l2Zr/dYKj3lMWVh/qD/s/tuIYqruNLCaWdaHuLhGQUzE3id0AyzN+idGuYzhT5zAQmdlg08O5StXnebg=
+	t=1709133104; cv=none; b=fA/PaKigWSB77XuPwF5taWOkh2rmlWAMmlaCFfzURBpSi5ewRBmgNjWdr8z0UNfKogPAHhK3KvQ7zXbHtpqlewXn5mKsY2O9pjELsgdu389g571A/Vu6rRyFfQzogafrxBsI6dBKWhH7geIUPqm9KlWs32lSGOUbQbTYAFUbfIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709133022; c=relaxed/simple;
-	bh=hbU6soSNIhde/HbBZmF1+OQ6a8o7ZDnBxNw6usm4cqE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TwU2Iz1m59//6p+nd0UePDcZnJmc/GhzBOdCYW3haZufLNVggYAidRXpI0rL3COuGbEopk3ax4eRx9q892VpKBS/5cz9H8fpY0chZv7N88nQsBjny3WIIL85O+U9eUOQzhHmYKPwaRehMYUnuVmiUv0JJUmjW4PWbooC6jMboXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=6RNvx1X0; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=88pAabs67d/TaG18mZs0ENtHJpAhlznp1aL+eyjFIZY=; b=6RNvx1X0aVSuyP/gI8PFf+trpL
-	HwXlVYgad+kq4p21jk4hI/FBs7Nqpwh4BylkoAlZ9v233Ht9VswGXAm1jIFerp+am4LHEp8w7Ddzw
-	litSe5pNwbCeQF4z1zait7ziaFW5Wn6D3SHr3EF5vO9J5wxLHzt4DVBUgzH+np74PSI4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rfLZn-008xVg-Ue; Wed, 28 Feb 2024 16:10:31 +0100
-Date: Wed, 28 Feb 2024 16:10:31 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Javier Carrasco <javier.carrasco.cruz@gmail.com>,
-	Peter Korsgaard <peter@korsgaard.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: usb: dm9601: fix wrong return value in
- dm9601_mdio_read
-Message-ID: <1ed82980-6fa8-4ad6-b031-2bdd07207fe0@lunn.ch>
-References: <20240225-dm9601_ret_err-v1-1-02c1d959ea59@gmail.com>
- <20240227181709.7159d60f@kernel.org>
+	s=arc-20240116; t=1709133104; c=relaxed/simple;
+	bh=RS6MJmosP807L6gRHG3o2sEXO8NSts7Ny2svQq+6A3o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YPgO83HppVm1JKlq7+a7dlCE9pNvbqhXgzQvainc2j1JFIbjCvg2i8BjVymu3+BojomvAsonGUh8b8vAwQpy2JRRYsGJJnscpTdquTa93W113hw3VV6bhB4W332ymKXmezouP7RFACVmLXyD1qlLCFAqDXa3+HU3IvFDsz1Esk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZpcrobOo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2AF6C433C7;
+	Wed, 28 Feb 2024 15:11:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709133104;
+	bh=RS6MJmosP807L6gRHG3o2sEXO8NSts7Ny2svQq+6A3o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZpcrobOoT7TA4wIwsHZqx/JUsHR0HMIc5MB2MniLWIsfmtVAwZ19nAEnjFHTT/AaS
+	 LXFWb98P427SrT3xP86Zaf9ZjwebnVLy/TQnlIFdxBfw2YPuF7bsPGgVuHAQspnNpv
+	 xXVEW6Tlk9xUc6YKFN70h3DL22WAuoe2LJl92y/YDZS1yg0JnVncwxAboF6uNMGi7m
+	 Zin6NNEhSyXa+OxTq2jL/YY1LUgd+aGLpMOSkbC/kX3NhCpp3iR17mWCOp6HUlBow0
+	 kRkoTPY6EcMZNVjkEN7Bv9ryA2gj94POCIspoFMBzjA70hCQ+RNmQeJpTo4eTaOs6p
+	 /YIzn2g4wTYXA==
+Date: Wed, 28 Feb 2024 07:11:42 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Jiri Pirko
+ <jiri@nvidia.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH v2 net-next 03/15] ipv6: addrconf_disable_ipv6()
+ optimizations
+Message-ID: <20240228071142.29c8fe1c@kernel.org>
+In-Reply-To: <CANn89iLefNuOXBdf2Cg8SbwAXCm=X+qZ-Cqkx8CQ=vESv-LYSg@mail.gmail.com>
+References: <20240227150200.2814664-1-edumazet@google.com>
+	<20240227150200.2814664-4-edumazet@google.com>
+	<20240227185157.37355343@kernel.org>
+	<CANn89iLwcd=Gp7X7DKsw+kG2FHA1PzwG3Up8Tb2wjA=Bz94Oxg@mail.gmail.com>
+	<CANn89iLefNuOXBdf2Cg8SbwAXCm=X+qZ-Cqkx8CQ=vESv-LYSg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240227181709.7159d60f@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> Andrew, 
-> mii.h files seem to fall under PHYLIB in MAINTAINERS, but mii.c does
-> not. Is this intentional?
+On Wed, 28 Feb 2024 10:28:28 +0100 Eric Dumazet wrote:
+> > Good catch, I simply misread the line.  
+> 
+> I note that addrconf_disable_policy() does not have a similar write.
+> 
+> When writing on net->ipv6.devconf_all->disable_policy, we loop over all idev
+> to call addrconf_disable_policy_idev(),
+> but we do _not_ change net->ipv6.devconf_dflt->disable_policy
+> 
+> This seems quite strange we change net->ipv6.devconf_dflt->disable_ipv6 when
+> user only wanted to change net->ipv6.devconf_all->disable_policy
 
-Probably. There are big parts of linux/mii.h which phylib
-uses. However drivers/net/mii.c is not part of phylib and is
-unmaintained.
-
-      Andrew
+The all / default behavior is a complete mess, I don't mind changing!
+I commented because there was a flake in TCP-AO tests and I was trying
+to find any functional changes :)
 
