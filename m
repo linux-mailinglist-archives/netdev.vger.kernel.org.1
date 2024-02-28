@@ -1,88 +1,145 @@
-Return-Path: <netdev+bounces-75594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A760986AA37
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:41:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C67FF86AA4D
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:42:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46B811F23A63
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:41:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D1461F24AF3
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357512C860;
-	Wed, 28 Feb 2024 08:41:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A882CCB3;
+	Wed, 28 Feb 2024 08:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="1K1wDlxw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cdhYCy1B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F140A250E0;
-	Wed, 28 Feb 2024 08:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048282D622;
+	Wed, 28 Feb 2024 08:42:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709109665; cv=none; b=BBT7sWvRRgMLVMQbmuUkjHzyNCRYscVALkm1MyjLtg/bZnY2zD4e5PQ0vuXoN5c3SS8GrcnssheGJV3PYOPDY4Os3/tYNWYQFy/MYy5/EMs5zU7ewQLDOb+Jx0tjm+ZcE8MFcuKHHyOO4uwF/X+iLomrhK2NxtP+CG8uBI9DA7c=
+	t=1709109738; cv=none; b=PeZGbZOyzOKUZHt9Fr2g7xjrOkdfJxqVF8BN8TW0Zh2B6LeBYEhWqUbxgFzd45ZJzHIrcnIbCrqLisSRHu/KXYi5f/jpOC+4+cgmBgMlBR1FE6nZW75VmlpP4kvVfu5aL6qS9L8H91XXUnNt67HPkRGdB9Mhi4kFNKZ0HGIl0oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709109665; c=relaxed/simple;
-	bh=taafjeMyLx+9A4Iby9wddzCXCgysrqJkoAayHjldvJk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XWU8I9ZcSxHqKpFbmxXIa1e0lmAhny6S5WAr2qGsLaGTLWdAP/4+s05bpNZsMu3glpoMjFhIMM5Gc5e9PGPMzETw1G1iHJrsGxzrUhM1w8PdnBfjFTamHhTIzUx019vm8yY8hS8ECmVkPkFf/CLraJAfp793gSGBrokOAVeHBq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=1K1wDlxw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03E5EC433F1;
-	Wed, 28 Feb 2024 08:41:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1709109664;
-	bh=taafjeMyLx+9A4Iby9wddzCXCgysrqJkoAayHjldvJk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=1K1wDlxwagH9FXS5ejZTkpIRH03hI+OXuCp+2qxgSLqThN5b6P8k9fWdzJAw3ryta
-	 WEjoDRm7HevLEW1uVzK3HCbOPvcEUrDO8tcsqXO1wXuK9o5Udd7KpyyiSIRFvDGecv
-	 G3E//UuB1RL/tISXQKIaH9V2xkr5AxmEjcDebv+Q=
-Date: Wed, 28 Feb 2024 09:41:02 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Jiri Slaby <jirislaby@kernel.org>
-Cc: stable@vger.kernel.org, patches@lists.linux.dev,
-	Randy Dunlap <rdunlap@infradead.org>,
-	kernel test robot <lkp@intel.com>,
-	Lennart Franzen <lennart@lfdomain.com>,
-	Alexandru Tachici <alexandru.tachici@analog.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Nuno Sa <nuno.sa@analog.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: Re: [PATCH 6.7 260/334] net: ethernet: adi: requires PHYLIB support
-Message-ID: <2024022852-drowsily-matchbook-7363@gregkh>
-References: <20240227131630.636392135@linuxfoundation.org>
- <20240227131639.320153289@linuxfoundation.org>
- <66b4f46f-bcbd-42da-b4d6-0ecd507f8bd8@kernel.org>
+	s=arc-20240116; t=1709109738; c=relaxed/simple;
+	bh=DKje+K8ippA0ZYfJntuI0R7Vbe0XtsQE0B+iMwY1OGI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZzxWcOwjdbZ3O/7O/Yk5RN+TppKEkZBGaMtgrrI0RC44mSjR5ySKDML3rluhlAHlJEmrR++0/KDKuvx0iM711WB9VfyFTrl/DXC1ZQum/oex42ChV0jN8NdrX4Yni73ZTTWDvP1OUc9iqVVvkNuzMDNl8Vw6Zv+ZrE3actuV0e4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cdhYCy1B; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-565a3910f86so5863803a12.3;
+        Wed, 28 Feb 2024 00:42:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709109735; x=1709714535; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j/Z7R/WO7svFjmJZnbr0mJ+YCtxsZi714lKpVsB3CcM=;
+        b=cdhYCy1BcrCdUPa7udojTVvrSWDD+75lTtba8w1X5khpZBSHe2bZwY4zBYRfJUxAhU
+         k/klnnPvzWT+vcfDTmT6wriP25aF5Gw9Y1DWHv6GhQA4Bq8nnoPHMHY0/6eInice6A7/
+         XjY84lqefh7KBem8SbsL4Lx8WnIwd9Wpcedxbj5OUNmupjCiz7cQToaisqzTTOKkQfpB
+         IQU/t/ys4kg5LCVKdfQvo0ZuUIFNU7B8lYdBD2Nu+h4frSh8WfA1moec7ea4YKg4cNQH
+         /WRxyk7JWd+5frAPLi/VNtokkB97LS+83ldO2vWcn+ikNkPHgHd0hj/a3TmQaOMNzhOh
+         Vbog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709109735; x=1709714535;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j/Z7R/WO7svFjmJZnbr0mJ+YCtxsZi714lKpVsB3CcM=;
+        b=MP8BSnkGXE2RZMQqtfkOUNdAaZRcCNoAmPbv28L+KVXYdPChSaXO6G6Y9Jty6gNg4q
+         4Lzfhr7jber82+/K4v05OjEKIS0oK6IetGnxYbxe48cM3RFQtAeQYENs9gx14pPFXg4G
+         gTcSHsodpC7GjKsDlNsB8UbIUqwAn/FymVdtUTB2JlEPOhNIA+6fhFWD77+48oy7eX9U
+         QyeFQHfrIPfcMih9eI7y2O2949zIRlJTWKeHWWZ7p/XGXBQRILfpbVizJKZF2XlVULyh
+         UpsMJwDPUVP5O237kz/mdu56ipKqE20eZKNX1IQHlvB791p3wZvIPvSL78ythw/BsTrz
+         rtvA==
+X-Forwarded-Encrypted: i=1; AJvYcCUsXoc8aWYDzxQjDSw+S+/wTK9lX5jyHV/3PUI+kEAO4mmbo/WCsuZEQNJgGTRQ1RSFVcDGgg1lpVHDH25N2b4ybPi5gN49A/mlSwGt8Xi0l0W+hoxIFt4s4jCpAn8i4BAH/dKcbfKIj/3ESy9RT0A28urt3XW/WdELt9Av002jX5Dw4/xO
+X-Gm-Message-State: AOJu0YwsFjtoeDjSgIScd4ed7cJx9EXS2/MdLPeCyJ82JMD/O2oEvZt4
+	QmjTOXV9Ht6p9drXAkydlmnKDYEgPl8IKo7Wp4vRaR8dbd+0pDuuC+T6nGHS/Hj/nphEYpL2N4f
+	NNUqdVnaK8mB1fopu643PLM6fhUA=
+X-Google-Smtp-Source: AGHT+IF7MgqUj7NAYok7BIhuXjGbhI85Yb/h9+YNKq9JCA25YqjK4vUmRdjvJNQXIXwX80fcdNu+pXkNi4gpR5CYAtg=
+X-Received: by 2002:a05:6402:e9a:b0:565:af1d:7416 with SMTP id
+ h26-20020a0564020e9a00b00565af1d7416mr8007975eda.5.1709109735183; Wed, 28 Feb
+ 2024 00:42:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <66b4f46f-bcbd-42da-b4d6-0ecd507f8bd8@kernel.org>
+References: <20240227175513.8703-1-pvkumar5749404@gmail.com> <Zd7lqr8Cz4XrNoI8@nanopsycho>
+In-Reply-To: <Zd7lqr8Cz4XrNoI8@nanopsycho>
+From: prabhav kumar <pvkumar5749404@gmail.com>
+Date: Wed, 28 Feb 2024 14:12:01 +0530
+Message-ID: <CAH8oh8U1KLxY95DQW9duU30VC5hdQd1YKs+8USuuz0k4JWtBSQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] selftests: net: Correct couple of spelling mistakes
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: shuah@kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, petrm@nvidia.com, idosch@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 28, 2024 at 09:06:20AM +0100, Jiri Slaby wrote:
-> On 27. 02. 24, 14:21, Greg Kroah-Hartman wrote:
-> > 6.7-stable review patch.  If anyone has any objections, please let me know.
-> 
-> This patch is not nice and should wait for its fixup IMO:
-> https://lore.kernel.org/all/20240226074820.29250-1-rdunlap@infradead.org/
-> 
-> It makes PHYLIB=y even when not needed to be actually built in.
-> 
-> > From: Randy Dunlap <rdunlap@infradead.org>
-> > 
-> > [ Upstream commit a9f80df4f51440303d063b55bb98720857693821 ]
-> > 
-> > This driver uses functions that are supplied by the Kconfig symbol
-> > PHYLIB, so select it to ensure that they are built as needed.
-
-Now dropped from all queues, thanks!
-
-greg k-h
+On Wed, Feb 28, 2024 at 1:20=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote=
+:
+>
+> Please fix the patch subject to include appropriate prefixes and
+> rephrase a bit like this:
+>
+> Subject: [PATCH net-next] selftests: net: Correct couple of spelling mist=
+akes
+>
+> pw-bot: cr
+>
+>
+> Tue, Feb 27, 2024 at 06:55:13PM CET, pvkumar5749404@gmail.com wrote:
+> >Changes :
+> >       - "excercise" is corrected to "exercise" in drivers/net/mlxsw/spe=
+ctrum-2/tc_flower.sh
+> >       - "mutliple" is corrected to "multiple" in drivers/net/netdevsim/=
+ethtool-fec.sh
+> >
+> >Signed-off-by: Prabhav Kumar Vaish <pvkumar5749404@gmail.com>
+> >---
+> > .../testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh | 2 +-
+> > tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh    | 2 +-
+> > 2 files changed, 2 insertions(+), 2 deletions(-)
+> >
+> >diff --git a/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flo=
+wer.sh b/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh
+> >index 616d3581419c..31252bc8775e 100755
+> >--- a/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh
+> >+++ b/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh
+> >@@ -869,7 +869,7 @@ bloom_simple_test()
+> > bloom_complex_test()
+> > {
+> >       # Bloom filter index computation is affected from region ID, eRP
+> >-      # ID and from the region key size. In order to excercise those pa=
+rts
+> >+      # ID and from the region key size. In order to exercise those par=
+ts
+> >       # of the Bloom filter code, use a series of regions, each with a
+> >       # different key size and send packet that should hit all of them.
+> >       local index
+> >diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.s=
+h b/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
+> >index 7d7829f57550..6c52ce1b0450 100755
+> >--- a/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
+> >+++ b/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
+> >@@ -49,7 +49,7 @@ for o in llrs rs; do
+> > Active FEC encoding: ${o^^}"
+> > done
+> >
+> >-# Test mutliple bits
+> >+# Test multiple bits
+> > $ETHTOOL --set-fec $NSIM_NETDEV encoding rs llrs
+> > check $?
+> > s=3D$($ETHTOOL --show-fec $NSIM_NETDEV | tail -2)
+> >--
+> >2.34.1
+> >
+> >
 
