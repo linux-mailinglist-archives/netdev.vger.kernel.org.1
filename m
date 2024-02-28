@@ -1,148 +1,141 @@
-Return-Path: <netdev+bounces-75818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D92486B42B
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:07:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2746986B433
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:09:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7204AB21F2D
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:07:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D61852829B3
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:09:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6CF15D5B3;
-	Wed, 28 Feb 2024 16:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E076415D5CC;
+	Wed, 28 Feb 2024 16:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IjvtbXn9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FeH1tbkF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746CE15B98B;
-	Wed, 28 Feb 2024 16:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B363115CD6E;
+	Wed, 28 Feb 2024 16:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709136460; cv=none; b=BrKTy96pXjgiT2MHDMzBTpdmsBbkKAr4FktT9VKxFh5R07CmacAu0yYtjPMYEROWxhg/pO7nq4xvuKOezW1doKgYZLX0t/7olPZYRaHjPqfNZBXylabTO/w6VS2F59Yg5hvsuBFFXSTkEKYkVzwqCd3+Umcp51CwUINS0NKfUJ4=
+	t=1709136539; cv=none; b=r9eF1SSzPGKvJrdTHND2AM1CKxMIgMmKce7698JGfoN52Hpxuqgnvok/GE80HDoWgc4VcTmQ0PRSYJ8FH2pyAdf4PlKBUEoHjWZFLJ3rYWhmTf9NRlUso5AMxJC/27eMZ8rze+qxGBX2lSEIG138L+V9imt7+s/xcFnNd5MZAhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709136460; c=relaxed/simple;
-	bh=GdUbV1NGoO5EFJmeAqLlDDgJzYkjRPcGGbPikMTrOuk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=b0IPhSTnH39sla1MMV93uLJeO5cn9pRxJREvfUwI3yxFwSMripTbdh8VeXoUkf2nGOaDq6h3oQE695T3hb3E1bNDmk7dPksDEasFU5uI7CRrJir+PQ0oTp72jSkK0CYt4aQG/nMZTr9LpXx4ICbkzlrupIMdZQ9kParBnWezLMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IjvtbXn9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8746C433C7;
-	Wed, 28 Feb 2024 16:07:36 +0000 (UTC)
+	s=arc-20240116; t=1709136539; c=relaxed/simple;
+	bh=9vrbwp+q8XKbdPzBRfbaUnKUvH7i4vZKGrKWdjzBE5Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=eBnVaS9813iHAtpCu/KAJnb6YINxMvDkTqY77eMJRM5U1/5Zp4Iftl/i6R3XGfHQUAdcMAxJHEjijhqASpsh7a8e4gz00v1DM8lrqSfPYsTuiAsNUbhXAv8xY5jCH3vWV0a+3lLRl/1FOFFAZJE2Fb/OI9M0w7gzaNANPrZRz2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FeH1tbkF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA9B0C43390;
+	Wed, 28 Feb 2024 16:08:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709136459;
-	bh=GdUbV1NGoO5EFJmeAqLlDDgJzYkjRPcGGbPikMTrOuk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=IjvtbXn9OIoPe9Zco0Mr3HF5gXrsyY29g6QuTIhVhLvnTokyeeiNb0sJLMeaKSN2B
-	 Rx/MkVsP/53qUL7WG4NED611I01o6ZEJBYYeW6C/yijAMQdL/d2D0L1/jcwcht2aBf
-	 Q6TNB+Nz9i66axzLbqkoG8VVMEaZWS0tYvM61T4EnRfTI5udDELbb2V4gqDmUxVN1c
-	 gZ2xhk7O4HtRug47spGO6iTceRWcXRaUnjQdic2CL01wh9LhJmR1QdpDtA7zw19jx0
-	 DS93j8vta8rPRRQ9WziZilZ1nOH52eV0I+SSdv9u+LgvIP7l/IAO9XNxe3NrhJfr5I
-	 fPcgoW35Xsf5A==
-From: Arnd Bergmann <arnd@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Breno Leitao <leitao@debian.org>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	Grygorii Strashko <grygorii.strashko@ti.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Simon Horman <horms@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] [v2] net: bql: fix building with BQL disabled
-Date: Wed, 28 Feb 2024 17:06:56 +0100
-Message-Id: <20240228160732.1662287-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	s=k20201202; t=1709136539;
+	bh=9vrbwp+q8XKbdPzBRfbaUnKUvH7i4vZKGrKWdjzBE5Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=FeH1tbkFba5gPho1BM/W4ztL6g9/2PRyRgoT66iPVwBraKwUcRFuh99Q9v+PqXhI9
+	 gU5TRJ8pYOTffyDzgKIOfK8gdmtkfEVkz16/HCCVcBqZB3u4707ASMNpnz52M2cHdF
+	 aI9NgQ0sl6r5i2kseo/dFPkeNYLFZzwPtOa2V+zGe4Z7bz1rrKPkS0/AetmJlLJ1Sj
+	 pq4Kg0EOhmyeImROeXbifZgoDcYc+Mh9iHbTiOiFPgcdhXBfpBrsbL2zG0bwbkvudm
+	 IkpcLrq9jStlymI5uny+OQObCYmGmdgOqg9W3+y/HqQFbzXlaP1+9jQPCJlfyLUH+n
+	 xQjpbbpApm2Vg==
+Date: Wed, 28 Feb 2024 10:08:57 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Sai Krishna Gajula <saikrishnag@marvell.com>
+Cc: "bhelgaas@google.com" <bhelgaas@google.com>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"vinicius.gomes@intel.com" <vinicius.gomes@intel.com>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Geethasowjanya Akula <gakula@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+	Naveen Mamindlapalli <naveenm@marvell.com>
+Subject: Re: [net-next PATCH v2] octeontx2: Add PTP clock driver for Octeon
+ PTM clock.
+Message-ID: <20240228160857.GA272997@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BY3PR18MB4707DBB80B5949EA26F7ABECA0582@BY3PR18MB4707.namprd18.prod.outlook.com>
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Wed, Feb 28, 2024 at 12:37:02PM +0000, Sai Krishna Gajula wrote:
+> > -----Original Message-----
+> > From: Bjorn Helgaas <helgaas@kernel.org>
+> > Sent: Monday, February 26, 2024 10:31 PM
+> ...
+> > On Mon, Feb 26, 2024 at 03:40:25PM +0000, Sai Krishna Gajula wrote:
+> > > > -----Original Message-----
+> > > > From: Bjorn Helgaas <helgaas@kernel.org>
+> > > > Sent: Wednesday, February 14, 2024 10:59 PM ...
+> > > > On Wed, Feb 14, 2024 at 06:38:53PM +0530, Sai Krishna wrote:
+> > > > > The PCIe PTM(Precision time measurement) protocol provides precise
+> > > > > coordination of events across multiple components like PCIe host
+> > > > > clock, PCIe EP PHC local clocks of PCIe devices. This patch adds
+> > > > > support for ptp clock based PTM clock. We can use this PTP device
+> > > > > to sync the PTM time with CLOCK_REALTIME or other PTP PHC devices
+> > > > > using phc2sys.
 
-It is now possible to disable BQL, but that causes the cpsw driver to break:
+> > > > > +static int __init ptp_oct_ptm_init(void) {
+> > > > > +	struct pci_dev *pdev = NULL;
+> > > > > +
+> > > > > +	pdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
+> > > > > +			      PCI_DEVID_OCTEONTX2_PTP, pdev);
+> > > >
+> > > > pci_get_device() is a sub-optimal method for a driver to claim a device.
+> > > > pci_register_driver() is the preferred method.  If you can't use
+> > > > that, a comment here explaining why not would be helpful.
+> > >
+> > > We just want to check the PTP device availability in the system as one
+> > > of the use case is to sync PTM time to PTP.
+> > 
+> > This doesn't explain why you can't use pci_register_driver().  Can
+> > you clarify that?
+> 
+> This is not a PCI endpoint driver.  This piece of code is used to
+> identify the silicon version.  We will update the code by reading
+> the silicon version from Endpoint internal BAR register offsets.
 
-drivers/net/ethernet/ti/am65-cpsw-nuss.c:297:28: error: no member named 'dql' in 'struct netdev_queue'
-  297 |                    dql_avail(&netif_txq->dql),
+> > I assume the PCI_DEVID_OCTEONTX2_PTP device is a PCIe Endpoint,
+> > and this driver runs on the host?  I.e., this driver does not run
+> > as firmware on the Endpoint itself?  So if you run lspci on the
+> > host, you would see this device as one of the PCI devices?
+> > 
+> > If that's the case, a driver would normally operate the device via
+> > MMIO accesses to regions described by PCI BARs.  "lspci -v" would
+> > show those addresses.
+> 
+> This driver don't run on Host but runs on the EP firmware itself.
 
-There is already a helper function in net/sch_generic.h that could
-be used to help here. Move its implementation into the common
-linux/netdevice.h along with the other bql interfaces and change
-both users over to the new interface.
+The "endpoint driver" terminology is a bit confusing here.  See
+Documentation/PCI/endpoint/pci-endpoint.rst for details.
 
-Fixes: ea7f3cfaa588 ("net: bql: allow the config to be disabled")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-v2: merge the two identical implementations
----
- drivers/net/ethernet/ti/am65-cpsw-nuss.c |  2 +-
- include/linux/netdevice.h                | 10 ++++++++++
- include/net/sch_generic.h                |  7 +------
- 3 files changed, 12 insertions(+), 7 deletions(-)
+If this driver actually runs as part of the Endpoint firmware, it
+would not normally see a hierarchy of pci_devs, and I don't think
+pci_get_device() would work.
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 9d2f4ac783e4..2939a21ca74f 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -294,7 +294,7 @@ static void am65_cpsw_nuss_ndo_host_tx_timeout(struct net_device *ndev,
- 		   txqueue,
- 		   netif_tx_queue_stopped(netif_txq),
- 		   jiffies_to_msecs(jiffies - trans_start),
--		   dql_avail(&netif_txq->dql),
-+		   netdev_queue_dql_avail(netif_txq),
- 		   k3_cppi_desc_pool_avail(tx_chn->desc_pool));
- 
- 	if (netif_tx_queue_stopped(netif_txq)) {
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 4236debc79a7..cd6fdc2e6948 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3493,6 +3493,16 @@ static inline void netdev_queue_set_dql_min_limit(struct netdev_queue *dev_queue
- #endif
- }
- 
-+static inline int netdev_queue_dql_avail(const struct netdev_queue *txq)
-+{
-+#ifdef CONFIG_BQL
-+	/* Non-BQL migrated drivers will return 0, too. */
-+	return dql_avail(&txq->dql);
-+#else
-+	return 0;
-+#endif
-+}
-+
- /**
-  *	netdev_txq_bql_enqueue_prefetchw - prefetch bql data for write
-  *	@dev_queue: pointer to transmit queue
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index 934fdb977551..cefe0c4bdae3 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -238,12 +238,7 @@ static inline bool qdisc_may_bulk(const struct Qdisc *qdisc)
- 
- static inline int qdisc_avail_bulklimit(const struct netdev_queue *txq)
- {
--#ifdef CONFIG_BQL
--	/* Non-BQL migrated drivers will return 0, too. */
--	return dql_avail(&txq->dql);
--#else
--	return 0;
--#endif
-+	return netdev_queue_dql_avail(txq);
- }
- 
- struct Qdisc_class_ops {
--- 
-2.39.2
+So I suspect this driver actually runs on the host, and it looks like
+it wants to use the same device (0x177d:0xa00c) as these two drivers:
 
+  drivers/net/ethernet/cavium/common/cavium_ptp.c:#define PCI_DEVICE_ID_CAVIUM_PTP        0xA00C
+  drivers/net/ethernet/marvell/octeontx2/af/ptp.c:#define PCI_DEVID_OCTEONTX2_PTP                 0xA00C
+
+It seems like maybe it should be integrated into them?  Otherwise you
+have multiple drivers thinking they are controlling a single device.
+
+Bjorn
 
