@@ -1,72 +1,50 @@
-Return-Path: <netdev+bounces-75542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 503C086A70E
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 04:15:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC33186A71B
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 04:20:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA7F1B2AEAD
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:14:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AC52283F4A
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 945081CD38;
-	Wed, 28 Feb 2024 03:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E72E1DDFF;
+	Wed, 28 Feb 2024 03:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="mzvG/TxQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NhYAR4Th"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24272107
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 03:14:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108E21DDD5;
+	Wed, 28 Feb 2024 03:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709090095; cv=none; b=ivLIjXu4PTwz01DG1tfSjZZDzmsZOr/XhDbyaScn9yOYPvvKnD0pzKMTaKXI2znryIY8aMKhsqmUq/AatOUD61dmK8XzPyvLdNuGTIR2ntuRUCqKuuu4mWYqKvBb0pkrM++WMMFQkaUGv12WuGIEToAIots2LJ0oHPvwMYhaeFY=
+	t=1709090432; cv=none; b=Qo7fMjrC9CMYH9FFIcwSbg3aEF+aPUyRlVZmIgwdh+NR1V9j8OY/Y7DbKapJKMBp6uJ4kflkdCPjVWQYDPh94jd0FuqqX++yez/YsCtPtKXzswOMX2riGKuFLJ6lEvNk/4TtW/RNWt5ZMgiczhib/MsAAJkLtph+8orQhjfaZSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709090095; c=relaxed/simple;
-	bh=WarKF/SOZ7jtWkmkb3KFmxh/x1QWyhTbEtUwjHDvjmc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=slyGS/82zqKEu+leS2vjxY72qTubMY2DMmQpZ+fK9OvjuynZXRkDGs/LmBRF615uSkKyojCb8+KZ8gDupeeui2rEP+qYa2XCJgc5jrFttddvamPebpyMSrzBnPPoWj7PTHWP/+Fu7zNBuP4M/JN3CJEw1ebTBLiygn6Mg0J9VgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=mzvG/TxQ; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1709090095; x=1740626095;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=5M5QFhpMESPPQDIhgvMtmAW4CretKLB8aOQsQ7AFFtw=;
-  b=mzvG/TxQTUdaIUnS6XmtAu/Mpd3qjg5UzalLLH2/Z0tYUnMc+FZub9OZ
-   BwlHaZyOquJgZz8vcSn8cZH1LMSNmvOsBhhbKd+x/sNQ5TlVQzonGbIuA
-   UrTDdw8UV8cRBDeeiRJTW7V/ADFq3I2LvmBHGoO6aqLJYni0spvrWzBlq
-   s=;
-X-IronPort-AV: E=Sophos;i="6.06,189,1705363200"; 
-   d="scan'208";a="400162704"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 03:14:48 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:36169]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.50.237:2525] with esmtp (Farcaster)
- id d0becfc9-233c-4cb4-af4d-c42021d58675; Wed, 28 Feb 2024 03:14:47 +0000 (UTC)
-X-Farcaster-Flow-ID: d0becfc9-233c-4cb4-af4d-c42021d58675
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 28 Feb 2024 03:14:47 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.11) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 28 Feb 2024 03:14:44 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <pabeni@redhat.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH v3 net-next 12/14] af_unix: Detect dead SCC.
-Date: Tue, 27 Feb 2024 19:14:36 -0800
-Message-ID: <20240228031436.31927-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <3f629d0a45734914fbb64fdca80b44ff614aedb2.camel@redhat.com>
-References: <3f629d0a45734914fbb64fdca80b44ff614aedb2.camel@redhat.com>
+	s=arc-20240116; t=1709090432; c=relaxed/simple;
+	bh=u0axjAWtAcxEr7ZjPkE5IqKAR+IemnMqd88N4WKuBBM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QXmUlXHVioqRozNDgOjJO6TaMtRjbg672kN3MLP1EH78TrAuJTP+mjeaQP76BsitPzk2lmHZwQ1YhVk+Ml6PGfMnubKQVyjYjmj3AKsef8Dak4ZPNN5TqIN/QUXUVy9wEo2sW5Vs7/n35Wq8ci3NGBQofzqWzwj0Rew3B0kdvBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NhYAR4Th; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A10ADC43390;
+	Wed, 28 Feb 2024 03:20:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709090431;
+	bh=u0axjAWtAcxEr7ZjPkE5IqKAR+IemnMqd88N4WKuBBM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NhYAR4ThtSche8nUOdqUa04SsV+s72UyCuiyQo02gy5DxLiaOuj1wNrONe0Z7phE4
+	 +8iGJvqcleo0pKN7mmt75OFNkZeq2XdbDaiNtSQe08OCU9RdLNqbnb8zgA8fVRGP6W
+	 GUHDy2Y+jNDWPpM9+iE44TronIoxJlkI9uH6vV6czwondDIkOmdek3xIWnUCoB4Jpn
+	 hGz803xQ8v2+W7Jb5o84Qv10PxVFWv8P6r3F2dqz8B5mEkAJFgM6BqqWZBH+w2CF9i
+	 NLi/CNDFHgGa82DWB9bHyIv1yeHLWihIuwDyr0Nnm6AJ5NNsmkbt07z+XlF90EJ6Bw
+	 Mtr0iq1zVDe8g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 87DA6D88FB6;
+	Wed, 28 Feb 2024 03:20:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,77 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWA001.ant.amazon.com (10.13.139.22) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Subject: Re: [PATCH] net: usb: dm9601: fix wrong return value in
+ dm9601_mdio_read
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170909043155.27277.1060670387014071329.git-patchwork-notify@kernel.org>
+Date: Wed, 28 Feb 2024 03:20:31 +0000
+References: <20240225-dm9601_ret_err-v1-1-02c1d959ea59@gmail.com>
+In-Reply-To: <20240225-dm9601_ret_err-v1-1-02c1d959ea59@gmail.com>
+To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Cc: peter@korsgaard.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: Paolo Abeni <pabeni@redhat.com>
-Date: Tue, 27 Feb 2024 12:25:56 +0100
-> On Fri, 2024-02-23 at 13:40 -0800, Kuniyuki Iwashima wrote:
-> > When iterating SCC, we call unix_vertex_dead() for each vertex
-> > to check if the vertex is close()d and has no bridge to another
-> > SCC.
-> > 
-> > If both conditions are true for every vertex in SCC, we can
-> > execute garbage collection for all skb in the SCC.
-> > 
-> > The actual garbage collection is done in the following patch,
-> > replacing the old implementation.
-> > 
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> >  net/unix/garbage.c | 37 ++++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 36 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-> > index 0eb1610c96d7..060e81be3614 100644
-> > --- a/net/unix/garbage.c
-> > +++ b/net/unix/garbage.c
-> > @@ -288,6 +288,32 @@ void unix_destroy_fpl(struct scm_fp_list *fpl)
-> >  	unix_free_vertices(fpl);
-> >  }
-> >  
-> > +static bool unix_vertex_dead(struct unix_vertex *vertex)
-> > +{
-> > +	struct unix_edge *edge;
-> > +	struct unix_sock *u;
-> > +	long total_ref;
-> > +
-> > +	list_for_each_entry(edge, &vertex->edges, vertex_entry) {
-> > +		struct unix_vertex *next_vertex = unix_edge_successor(edge);
-> > +
-> > +		if (!next_vertex)
-> > +			return false;
-> > +
-> > +		if (next_vertex->scc_index != vertex->scc_index)
-> > +			return false;
-> > +	}
-> > +
-> > +	edge = list_first_entry(&vertex->edges, typeof(*edge), vertex_entry);
-> > +	u = edge->predecessor;
-> > +	total_ref = file_count(u->sk.sk_socket->file);
-> > +
-> > +	if (total_ref != vertex->out_degree)
-> > +		return false;
-> > +
-> > +	return true;
-> > +}
-> > +
-> >  static bool unix_scc_cyclic(struct list_head *scc)
-> >  {
-> >  	struct unix_vertex *vertex;
-> > @@ -350,6 +376,7 @@ static void __unix_walk_scc(struct unix_vertex *vertex)
-> >  
-> >  	if (vertex->index == vertex->scc_index) {
-> >  		struct list_head scc;
-> > +		bool dead = true;
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sun, 25 Feb 2024 00:20:06 +0100 you wrote:
+> The MII code does not check the return value of mdio_read (among
+> others), and therefore no error code should be sent. A previous fix to
+> the use of an uninitialized variable propagates negative error codes,
+> that might lead to wrong operations by the MII library.
 > 
-> Very minor nit: the above variable 'sounds' alike referring to the
-> current vertex, while instead it tracks a global status, what about
-> 'all_dead' or 'gc_all'?
+> An example of such issues is the use of mii_nway_restart by the dm9601
+> driver. The mii_nway_restart function does not check the value returned
+> by mdio_read, which in this case might be a negative number which could
+> contain the exact bit the function checks (BMCR_ANENABLE = 0x1000).
+> 
+> [...]
 
-Exactly. I'll use scc_dead or gc_scc to be consistent
-with unix_vertex_dead().
+Here is the summary with links:
+  - net: usb: dm9601: fix wrong return value in dm9601_mdio_read
+    https://git.kernel.org/netdev/net/c/c68b2c9eba38
 
-Thanks!
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
