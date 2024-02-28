@@ -1,95 +1,90 @@
-Return-Path: <netdev+bounces-75549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D14F86A733
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 04:27:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA58C86A737
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 04:30:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1854A2863E7
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:27:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C28A283852
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B6D1F94D;
-	Wed, 28 Feb 2024 03:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48BB200A8;
+	Wed, 28 Feb 2024 03:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QohiKP2o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oWYW/YvM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 318DE200A8;
-	Wed, 28 Feb 2024 03:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2D62F24;
+	Wed, 28 Feb 2024 03:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709090859; cv=none; b=e1VtvUzfosd6d60OKhKY9/aRwP2ZhOH1EbJVMtwT7nl20QqzUWV06kiirUYmtlwDJJ19iLfJOzm+V6Un6Fy9eijfusnZiP2P4fNW7QFrbPasP/ZND2CA31G85Dd0B2ave9Cu4xzjRZkctOlNilXEbyu4nm0iyxqgstli+thTweQ=
+	t=1709091032; cv=none; b=l/kaMK80PnkK3X8IrH7iczgZeLDsvEcC05YZa9RE/ZalL5oFnKRLmJmuy0HzHuBC2BTRlfHprq06lIvMsprLm87PhQVlsdeVhcUFjEV0PNIXcXpUm6C7KO8GTh1+0jOjU5PWiXlYlIGD9wnMV1eU3CNCk3WfLA+diR2lkp9xE48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709090859; c=relaxed/simple;
-	bh=PxStEec/OucY88faF3IBr5N3T4pzL8MHzbg0huNkeQQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LngL6Un/NwScGnLxkQExdTMNBqDp6+9IvHf3AWv9h6wZAcX5IsUXG3/vUharvCen5EzbV942EYjTK2flTR//J4YxrCsWmm4h82ul9nbfYQ1w/n3An+jlUZmJ/ExTpEMMRTz5YBC30UJNUX1JEOsegf0/nCrRPzx5fyh99soMU5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QohiKP2o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7E73C433F1;
-	Wed, 28 Feb 2024 03:27:37 +0000 (UTC)
+	s=arc-20240116; t=1709091032; c=relaxed/simple;
+	bh=nd/CaMYuwTn+UcDF+3uUxq1gzce4dc+lhHjqIRE/w88=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=byiqwDa3AcZHjPRbJ/TRLCR5F77tEdIETS6XZun8UAL3LPQCyQyr3nFZ7bDA7AY0VAN3SVQC8CM5Byw54bLE62Auxz3S2Ayizn7BqgjQsdl30PAIfIHQ4SxH3BWPbZrqqlkY52yVBa5KewKudjFNX9fg+d1FE5/qJRE1KfIotlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oWYW/YvM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 306D4C43390;
+	Wed, 28 Feb 2024 03:30:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709090859;
-	bh=PxStEec/OucY88faF3IBr5N3T4pzL8MHzbg0huNkeQQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QohiKP2oUlYmBY59Cy+RuyemEWPJDO5INyMmAP4cnWYa61MvqxzWbOWQ7QrkAr57U
-	 sPpg2I9PAiQzmbh9Iq3kC5nizezkGjbTn2K677Ci8RM0B5MPa5LEYDpDBWRFxVnOxv
-	 t7jm4Z8ZGZ+7HELUw5a+ri35666+dhnF4QEC7+ycodAEqtCR1ZpB3fnhllDmrQ6i2l
-	 uHWckA9X5pRSMuh0VJVv9cbl4bC/lavkenE0SYuieyYYFuJ1NZY904mEj7XJrk4rH4
-	 bOKFA5biMK++N9Y3xLJ8aq/RBcyJ3REIsDT68i7DsaVrM2ojBxaEAnBQva3sVviBmb
-	 tr1pEEF3/gjYw==
-Date: Tue, 27 Feb 2024 19:27:37 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
- kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: Re: [PATCH net-next v9 06/13] net: Add struct
- kernel_ethtool_ts_info
-Message-ID: <20240227192737.5d834155@kernel.org>
-In-Reply-To: <20240226-feature_ptp_netnext-v9-6-455611549f21@bootlin.com>
-References: <20240226-feature_ptp_netnext-v9-0-455611549f21@bootlin.com>
-	<20240226-feature_ptp_netnext-v9-6-455611549f21@bootlin.com>
+	s=k20201202; t=1709091032;
+	bh=nd/CaMYuwTn+UcDF+3uUxq1gzce4dc+lhHjqIRE/w88=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=oWYW/YvMs+poN8WVP3TKYiG8l6UPS1GraPrHxqADQp33b71T3xDwphuRWDr3mEsge
+	 mFNmGTVYqGVKqBEZ/KuXcFw/cVN8pDDY49VBryV+2Qi7Tjr1Z4y5Bzs3SaDLhzCLbI
+	 ed+ZqSuuuY66HGuAV6YduOJmjBKnU7J5ZGq6AWLrk8y/qz/xMQY43WfAhBm1qIhujm
+	 NBiC+JIynrhuq7IJDzudCL8pdK5yS5sLkVCzLVSsgxJ6/RXmfi55PN1gU/JLtDuux1
+	 +j7yzN5I4obpPVaDGQXzCmu3svKqbOYZQWafug46ny7QVN+WOfjOR/JfYljJp61Kb9
+	 +3Iq6F05DqCmQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0D495D88FB0;
+	Wed, 28 Feb 2024 03:30:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: wireless-2024-02-27
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170909103204.32106.16533188305242295276.git-patchwork-notify@kernel.org>
+Date: Wed, 28 Feb 2024 03:30:32 +0000
+References: <20240227135751.C5EC6C43390@smtp.kernel.org>
+In-Reply-To: <20240227135751.C5EC6C43390@smtp.kernel.org>
+To: Kalle Valo <kvalo@kernel.org>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
-On Mon, 26 Feb 2024 14:39:57 +0100 Kory Maincent wrote:
-> In prevision to add new UAPI for hwtstamp we will be limited to the struct
-> ethtool_ts_info that is currently passed in fixed binary format through the
-> ETHTOOL_GET_TS_INFO ethtool ioctl. It would be good if new kernel code
-> already started operating on an extensible kernel variant of that
-> structure, similar in concept to struct kernel_hwtstamp_config vs struct
-> hwtstamp_config.
+Hello:
+
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 27 Feb 2024 13:57:51 +0000 (UTC) you wrote:
+> Hi,
 > 
-> Since struct ethtool_ts_info is in include/uapi/linux/ethtool.h, here
-> we introduce the kernel-only structure in include/linux/ethtool.h.
-> The manual copy is then made in the function called by ETHTOOL_GET_TS_INFO.
+> here's a pull request to net tree, more info below. Please let me know if there
+> are any problems.
+> 
+> Kalle
+> 
+> [...]
 
-This one doesn't apply.
-It's going to be a pain to keep rebasing it, since its a nop AFAICT -
-do you want to post it separately to get it merged quickly?
+Here is the summary with links:
+  - pull-request: wireless-2024-02-27
+    https://git.kernel.org/netdev/net/c/ed2c0e4cb693
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
