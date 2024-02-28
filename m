@@ -1,113 +1,206 @@
-Return-Path: <netdev+bounces-75924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46F3D86BAF3
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 23:49:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E49B86BB06
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 23:54:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63CD71C211D3
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 22:49:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8D9A1F26E74
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 22:54:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1CD870055;
-	Wed, 28 Feb 2024 22:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F46571ED3;
+	Wed, 28 Feb 2024 22:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DDAiNwqx"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Cbg5UbpN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 902EA71EA1;
-	Wed, 28 Feb 2024 22:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596173FB98
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 22:54:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709160556; cv=none; b=hMeB8ebCc6IhOom1dQ+2ee8amDRlyaXU07DIxJ9suRINd3mPRBcGomdH5EHzsuMTZfychG/rB9BFiXTjo/TZqrs6PrglImoGb9FpmVV0OvqF1nmrzJNX+TFx2JWoQIMIzogMk7YCmeVieLJYzxYNeKhLte3r2PZsTsSrVuZHU4U=
+	t=1709160861; cv=none; b=FFtunnjJaOccpX5M/oeT3MdO5MY8uDm8yyCNws0E4rGk8L8fgcBETPvRwGGTMvMA819BXvcTiZ93eAcWT/VSsNieQm6Qeut4/Q6Whin76qCZVDOMFf+KQFNf/NVA/F/Zefcdp3wS6iDdK8uG48E1Yz1uKYiBQNxNzzQcozFJVVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709160556; c=relaxed/simple;
-	bh=Pz9CnoezD/dgggmHZ3jrf8PSRKN8xh1HR0itqdgzHns=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZVAsTHNNAYMaopIHEtktVusp21OPPnHxD8xQFwpmAOT1GoefmvuZVkSeFf1OPncucDCL+kY7hhEiCkX5XSLPsgB32JeVtTPyqEpyJiYDhGJ6OQ7ZkKkxwwfVon9WjaVC8CCA9ebo+jWHxSdmPx6eJq6r01tYZF/lMlafVl+Lo94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DDAiNwqx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1718AC433C7;
-	Wed, 28 Feb 2024 22:49:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709160556;
-	bh=Pz9CnoezD/dgggmHZ3jrf8PSRKN8xh1HR0itqdgzHns=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=DDAiNwqx+QFzs0aDq1cZJl97xgt+E/dg1Af4G2GKL33IXpDj8V3cWpBUTpQaAEbA8
-	 8BdPe8jeJKVBgwhxZM8YwycQ0CBjFu5d+dQZgPntkoQraatbu+xNqN5kQE/W7yDZO9
-	 EnKx/GLbjSM5KEff5lED6jUWU7OGdi67V4i96UO/QM//7NEBrh68n7nBTg+R/BpEub
-	 ILiifH/zub8EF+lKJ/MoYHWDVv1B7d4qpUrwi3McsbgFZk/+/qelCZ1AzjVTkY9PnT
-	 Av7XpO6wqlQceFttGkfsj419JZadiMHwaj9oVmz9xVARRlpDwVwgKNNaqN7/P7lap6
-	 HR2r3PUBnRvqQ==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id A9DFFCE0F91; Wed, 28 Feb 2024 14:49:15 -0800 (PST)
-Date: Wed, 28 Feb 2024 14:49:15 -0800
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Joel Fernandes <joel@joelfernandes.org>, Yan Zhai <yan@cloudflare.com>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Hannes Frederic Sowa <hannes@stressinduktion.org>,
-	linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
-	bpf@vger.kernel.org, kernel-team@cloudflare.com,
-	mark.rutland@arm.com,
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
-Message-ID: <1880cb02-d259-46d8-b4f7-0b3e2e0f0745@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <02913b40-7b74-48b3-b15d-53133afd3ba6@paulmck-laptop>
- <3D27EFEF-0452-4555-8277-9159486B41BF@joelfernandes.org>
- <ba95955d-b63d-4670-b947-e77b740b1a49@paulmck-laptop>
- <20240228173307.529d11ee@gandalf.local.home>
+	s=arc-20240116; t=1709160861; c=relaxed/simple;
+	bh=GkhCIMvfSdVKSqPq8L1gie4zc/s9MeDpKZJUGxCbePc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=stXFOcgl/Wv8XfBSnsXufBZcLXqTQV+9KVsHHeV755fyreU0jUiydax2CkeTbdrSD51ZUU2AaR39RpU/0jqxEkQbocKMdvRREo5pDEUr5wQE9kDN12rDoDCfsENgRsFQFjnC9UHi4CS2/KWa18ul2K0CSkdTxD+DfV5DmAXgbR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Cbg5UbpN; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-42eb3a8f4bcso1835311cf.1
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 14:54:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1709160858; x=1709765658; darn=vger.kernel.org;
+        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9w7TQmObL8dH/lkzmLgqHfD+K3Npx1QO1uGSALb79ZE=;
+        b=Cbg5UbpNjz6Q4zrAaMQuL2gFjfQKm+C/QIxdBg0N09/owSUtqesnjf9OMu1TUnzpmD
+         eVOuH426YUVjjFdocXahWbAfAek5ogtrDm+NkweJPUcL39u39ebrG1Sd2YCZBefe5diX
+         jfrf3/3Ppxf4sD8ga9XKGrUR75k41QC1zDjL4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709160858; x=1709765658;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9w7TQmObL8dH/lkzmLgqHfD+K3Npx1QO1uGSALb79ZE=;
+        b=QU0pMB9rFDlZ1GAN8LFgnpG7AFm2/2t4e+TwQF/o/BUmt8UPVE0osotCqqz/TbLIrx
+         F+tH2+cgVW3eAquqkq3q4y0wK66Eh2YZnSi8l0fWA+OKP7L1AB+Xi33b6CSr0hG3A1g6
+         enkFGSlDI7MPRoSUmQy4jGwidYfOK0b2hqshjl3Yy726Opp7Pj3Q9K7aRSJLO7ksoEtN
+         isGLo3DQsAPYWQQfESDHMfWH4OVvibBkW3WAJIfTnDwPUzGcBaPh4Z1t1I/ePTAS3k4o
+         aI7+bWsvXSMF26V6VLCERKkgklJKklCpKw4R1BfsmMsJLiVne8gdUWxuvk9umfPTeIbU
+         T3ZQ==
+X-Gm-Message-State: AOJu0Yz9qmOTYpYPcHTWNg9/CapvyGpPtFskuhpGEWXmDbnbwAuXy9+U
+	yaMMmerlNI1VE4T0/wndNn9hdDVbawo78QueMHtPiLOXP1yTJIdRPGB6J0Tt9dY7gPnLuaN/vOt
+	dzLcuF9mrog/nZQrJ+C5BHUWaQeT6elBVNWj+85xiMnStRCkXliMAazG0TJQwnBDQ7AdyrRbosK
+	st9vTPcd/XZ+xUKnhRtF1+uNNYBxIE0oyEAmQwjJMHCBCZ
+X-Google-Smtp-Source: AGHT+IG1szzt9+azs90UiHREGlw65UV7sS/b1JE/5oIAcdngQjQDEJ9DhnhJnUsDPNR0f+e6qi3Q4A==
+X-Received: by 2002:a05:622a:1646:b0:42e:5a10:27f0 with SMTP id y6-20020a05622a164600b0042e5a1027f0mr444519qtj.8.1709160857995;
+        Wed, 28 Feb 2024 14:54:17 -0800 (PST)
+Received: from stbirv-lnx-1.igp.broadcom.net ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id b1-20020ac812c1000000b0042e3468a98csm95036qtj.4.2024.02.28.14.54.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 14:54:17 -0800 (PST)
+From: Justin Chen <justin.chen@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: horms@kernel.org,
+	bcm-kernel-feedback-list@broadcom.com,
+	florian.fainelli@broadcom.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	opendmb@gmail.com,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	rafal@milecki.pl,
+	devicetree@vger.kernel.org,
+	Justin Chen <justin.chen@broadcom.com>
+Subject: [PATCH net-next v3 0/6] Support for ASP 2.2 and optimizations
+Date: Wed, 28 Feb 2024 14:53:54 -0800
+Message-Id: <20240228225400.3509156-1-justin.chen@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240228173307.529d11ee@gandalf.local.home>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000d5310f0612790503"
 
-On Wed, Feb 28, 2024 at 05:33:07PM -0500, Steven Rostedt wrote:
-> On Wed, 28 Feb 2024 14:19:11 -0800
-> "Paul E. McKenney" <paulmck@kernel.org> wrote:
-> 
-> > > > 
-> > > > Well, to your initial point, cond_resched() does eventually invoke
-> > > > preempt_schedule_common(), so you are quite correct that as far as
-> > > > Tasks RCU is concerned, cond_resched() is not a quiescent state.  
-> > > 
-> > >  Thanks for confirming. :-)  
-> > 
-> > However, given that the current Tasks RCU use cases wait for trampolines
-> > to be evacuated, Tasks RCU could make the choice that cond_resched()
-> > be a quiescent state, for example, by adjusting rcu_all_qs() and
-> > .rcu_urgent_qs accordingly.
-> > 
-> > But this seems less pressing given the chance that cond_resched() might
-> > go away in favor of lazy preemption.
-> 
-> Although cond_resched() is technically a "preemption point" and not truly a
-> voluntary schedule, I would be happy to state that it's not allowed to be
-> called from trampolines, or their callbacks. Now the question is, does BPF
-> programs ever call cond_resched()? I don't think they do.
+--000000000000d5310f0612790503
+Content-Transfer-Encoding: 8bit
 
-Nor do I, but I too must defer to Alexei.  ;-)
+ASP 2.2 adds some power savings during low power modes.
 
-> [ Added Alexei ]
+Also make various improvements when entering low power modes and
+reduce MDIO traffic by hooking up interrupts.
 
-The other issue with making cond_resched() be a Tasks RCU quiescent
-state is that the CONFIG_PREEMPTION=y version of cond_resched() would
-need to stop being a complete no-op.  Which actually might be OK.
+Justin Chen (6):
+  dt-bindings: net: brcm,unimac-mdio: Add asp-v2.2
+  dt-bindings: net: brcm,asp-v2.0: Add asp-v2.2
+  net: bcmasp: Add support for ASP 2.2
+  net: phy: mdio-bcm-unimac: Add asp v2.2 support
+  net: bcmasp: Keep buffers through power management
+  net: bcmasp: Add support for PHY interrupts
 
-							Thanx, Paul
+ .../bindings/net/brcm,asp-v2.0.yaml           |   4 +
+ .../bindings/net/brcm,unimac-mdio.yaml        |   1 +
+ drivers/net/ethernet/broadcom/asp2/bcmasp.c   |  90 +++++++-
+ drivers/net/ethernet/broadcom/asp2/bcmasp.h   |  23 +-
+ .../net/ethernet/broadcom/asp2/bcmasp_intf.c  | 203 ++++++++----------
+ drivers/net/mdio/mdio-bcm-unimac.c            |   1 +
+ 6 files changed, 204 insertions(+), 118 deletions(-)
+
+-- 
+2.34.1
+
+
+--000000000000d5310f0612790503
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+NhTY3E+cXCB11wty89QStajwXdhGJTYEvUgvsq1h8CwJj9w/38ldAQf5WjhPmApYeJR2ewFrBMCM
+4lHkdRJ6TDc9nXoEkypUfjJkJHe7Eal06tosh6JpAgMBAAGjggHZMIIB1TAOBgNVHQ8BAf8EBAMC
+BaAwgaMGCCsGAQUFBwEBBIGWMIGTME4GCCsGAQUFBzAChkJodHRwOi8vc2VjdXJlLmdsb2JhbHNp
+Z24uY29tL2NhY2VydC9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcnQwQQYIKwYBBQUHMAGG
+NWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwME0G
+A1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxz
+aWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEkGA1UdHwRCMEAwPqA8oDqGOGh0dHA6Ly9j
+cmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3JsMCMGA1UdEQQc
+MBqBGGp1c3Rpbi5jaGVuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSME
+GDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUIWGeYuaTsnIada5Xx8TR3cheUbgw
+DQYJKoZIhvcNAQELBQADggEBAHNQlMqQOFYPYFO71A+8t+qWMmtOdd2iGswSOvpSZ/pmGlfw8ZvY
+dRTkl27m37la84AxRkiVMes14JyOZJoMh/g7fbgPlU14eBc6WQWkIA6AmNkduFWTr1pRezkjpeo6
+xVmdBLM4VY1TFDYj7S8H2adPuypd62uHMY/MZi+BIUys4uAFA+N3NuUBNjcVZXYPplYxxKEuIFq6
+sDL+OV16G+F9CkNMN3txsym8Nnx5WAYZb6+rBUIhMGz70V05xsHQfzvo2s7f0J1tJ5BoRlPPhL0h
+VOnWA3h71u9TfSsv+PXVm3P21TfOS2uc1hbzEqyENCP4i5XQ0rv0TmPW42GZ0o4xggJtMIICaQIB
+ATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhH
+bG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwj8BKLXNpALfemdRAwDQYJ
+YIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPg4KtvAkc5hRzLTe6sWL8rrl7K3Zb/ho44Y
+DRrcamxLMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIyODIy
+NTQxOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
+AwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATAN
+BgkqhkiG9w0BAQEFAASCAQAUALL2aFlzpB6F/8u8yYGG4Nz1dDvScLBRhz8T0ZqGMQsBL1dbL1qe
+QmMqJvBwd0ghN+DB37rG8DBpFYMFJC5KDn26ox4HdR5UtXJUlPjOrr+/0YzLl8L7SJqUS2NK+cp8
+7KPigU+HZV//CunVoxL4qO/Wumn3wF3aeiaFZg+Ofarvq6R807ucn27mO52O2aqCk9xndKOGLtFk
+u1OyYY1uo5HRMfCtzj8Ix/KPz0XxPxFUNZjCR9SfkNgZlfJW2Wc/uq+oML2+rYzvonqsFXbDzfj5
+CxB+D8bMZl4ZNOIjhscfqLlL82UHHBsfYM4o3y709UtF8W72O9aQ6lkPAxPe
+--000000000000d5310f0612790503--
 
