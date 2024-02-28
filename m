@@ -1,145 +1,130 @@
-Return-Path: <netdev+bounces-75687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4014886AE9E
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:02:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97ADE86AED1
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:10:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71B971C20E00
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:02:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 393821F2406F
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A4457351E;
-	Wed, 28 Feb 2024 12:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C70352560C;
+	Wed, 28 Feb 2024 12:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CzQN76Pb"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="jxN1xxHK";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="AX9M5BI/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70CD73511;
-	Wed, 28 Feb 2024 12:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CFCE7353E
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 12:10:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709121735; cv=none; b=IG03B6f0w5Dw+7A7DHhqI6v/vGSvrpg5A03YcZe4DuiOBLhedsYDLHbbEzjvXckJXr+qs9dU5EmmfA5XT7zzm7K46f4R4G/kJEGb5S3ohkmBnqXOdh4pzNs2O2zqrCJ6p1oCBtT/KAr5cAlneUzCrHFbs2xGX30Ho0ulX6UF9CA=
+	t=1709122206; cv=none; b=BMRM8KbbBAAn5y8KRfK7LqSgIgsubwKML44ivSrquhXpzEyVgsmlVcM9or7n+H6Laqtxqv88DssyjBaMKfNqRCAkFMo+9M9wiNTklIKnRtOcaykthIkROmyPlCykMSk3t4cSzoXrrZ7q5+F2mOuBMileMlIPzM8/csonnqrAxv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709121735; c=relaxed/simple;
-	bh=6V9fLnX4djEHIHnxWds6qMnJtXmi2aPHUDNuD/uxng8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uLhMlUk54Xz/xGKyJCdq8gMsGyaaccNnRuLi7bLLDWSaCsHTSrfpDT6sOe/q2MU8tzK6kH5Zx9u16rnUbUNpboVptl7vG1qQ8yhtVNq4W1kFYyDvrxMAIR/P/1urbKKp+Q/UUfq4JDCatPJ/8A/4O5v7PC9CkZKE+7uEqKDy2FE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CzQN76Pb; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-7c78b520bc3so198155039f.0;
-        Wed, 28 Feb 2024 04:02:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709121733; x=1709726533; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9EbFg5rAlApTq4Ur/KjS2tqf+My7HKA0PMj35gGR2V8=;
-        b=CzQN76PbicNYox5671sKJwQOrvfML0r/Fea/aETK+pyRWmd9Y2vrrMz5j3kPRu4Z4P
-         UFioKOr8S7NbF3lQhCztNh5DFhPCdm1kEPffgzmQ7aMRzByOXBWeQXzqP2skm3p7UIS3
-         ARj1zjNyzuWgKzoNlpwdaxuA16UvQt0vY+Hd5srfFpkNAHX2lMOMN+Dxjc/duX0t6TsL
-         jIag1/dsLOhwfoP7BCQm87a/Hh0bvZdo1gTUeo42S2Xd5/+8/i6eaDldWYmT5E4ZJruV
-         qdKlMnhg1ufXurQMbfhnJCdkUlD0yymPSlVLY6X21PUxyZKSrqiUfECeNHcPAFkB5DfF
-         xN1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709121733; x=1709726533;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9EbFg5rAlApTq4Ur/KjS2tqf+My7HKA0PMj35gGR2V8=;
-        b=Td8DXD5tctQrA2UdCKlYB5uQU4d+94CBx9z29H//zlCCvD0+zrXNYicl3ZutV9Sp22
-         113BhHOn6Se3TyKisakTQmDeaY9rwzxdYcTICktWuHdKlZtzVVJzHvBbSackLNKWas7Y
-         KMKomuvAeJOQEyIsTHOkDZ6lFDCcL10JpXFsxnse/l6kHObY2txEWkCcsterg1Z1sbb3
-         ZW2u+N1z8sSpYZJKVqBdwDDm8f9lsejtM5d6t/D1kFYj+is8grFri+n8MHXir7/STRAR
-         xaDU7Qk2rIjYxU91mOV/u3QFxyK+HWrjSTZST9bDIBjLPKo2jfcvGNZajAdsuLeVp3fy
-         U8ug==
-X-Forwarded-Encrypted: i=1; AJvYcCWHMpfcs6BgJbfm86O4Na4a8iUmL1lSaBlhZ6p6DhCZ5vAmslCXNGj9UiQluMQn3/holcNNnBACb+7TtyXQeSm0iFh1hJ5vwlnNZeBIo7mu7Kw7YzG9LTGwTfZyeyM9VdgGjlD/
-X-Gm-Message-State: AOJu0YwyYr7OiVTdq0lKKgCMG5C3V65tjgQB9R2DNOzS8I1SOMq8B2EF
-	A0OSh3idWntMlyvWrUcV8FcQ+AOWPvOWLhH8bcIEckUkdYZr1x70
-X-Google-Smtp-Source: AGHT+IHQ2x000uqQolclyzQgafNQ9xKVlzClv2eZYrTcDX5jTDSRh0RJ/VLEbKeg09C1QMdrtitnjA==
-X-Received: by 2002:a05:6602:358:b0:7c4:61e7:9d77 with SMTP id w24-20020a056602035800b007c461e79d77mr15494595iou.19.1709121732669;
-        Wed, 28 Feb 2024 04:02:12 -0800 (PST)
-Received: from [192.168.0.107] ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id c8-20020a62e808000000b006e4625a0f0dsm7596575pfi.169.2024.02.28.04.02.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Feb 2024 04:02:12 -0800 (PST)
-Message-ID: <b2b21bca-9c99-4df5-9947-29d19abd89e6@gmail.com>
-Date: Wed, 28 Feb 2024 19:02:03 +0700
+	s=arc-20240116; t=1709122206; c=relaxed/simple;
+	bh=5NATaaEcHBuD7hEw5SfkIqMBiAFnRTlktYpUPib1zdE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hbhoXc0DQwno7Y64LLg1Bc1HPiVEeXVNfzYieK6bcuY4ZivqP6Saal+bClG/9Skx3q8OjYRm+lIAq/RVi0JD5HtSzc4jbES9Wx9kd9j2HkY5VsaYrQwKVBD5sQTbTkSi1vP4z89J2/W2uN9uvn1RBjkrMfIvelZB4CHN7JFdhto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=jxN1xxHK; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=AX9M5BI/; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1709122202;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xgzLqYLdam7+v9xMnqdtB7ChwLBrEJUOKW30jSTfWi4=;
+	b=jxN1xxHKXVGSoVVTSmWLwzaSZqc9cdekh0oMO//O0/1tmn6+6S9WvqEilWvOKQNPXbkIri
+	baETKpju+cSI/IIzMIQA8SL9iAYfpq7eli3IvzhlhL16fh128v7orRhMGvmBvn+OASCSNE
+	QRP+CQRXqgLJRwJcpQwIa0HzAoqxd8nX+i/EDP+xKRwAZx5cM2vatGdomnVwvvBCdfGxei
+	KRSA82RVOjZ/jw4PA7/zUJi5UjPVlzcc/I+zpYEZW6EzUpbNodkveVpUlIuZAAS1cNrOor
+	3JF2m7GLt/9w1YzwOEl8A38UfRenzQO7fsHY1JoWJLmcIR4kV33QssxrnqvHRA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1709122202;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xgzLqYLdam7+v9xMnqdtB7ChwLBrEJUOKW30jSTfWi4=;
+	b=AX9M5BI/LNGAf43jcDXAgGGwy9ComCvztXH6Mja853wHiTx2eZ5Jn7oclzsxU0HqayRvvq
+	DPFwTsLPecDxQbBA==
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Wander Lairson Costa <wander@redhat.com>,
+	Yan Zhai <yan@cloudflare.com>
+Subject: [PATCH v3 net-next 0/3] net: Provide SMP threads for backlog NAPI
+Date: Wed, 28 Feb 2024 13:05:47 +0100
+Message-ID: <20240228121000.526645-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Network performance regression in Linux kernel 6.6 for small
- socket size test cases
-Content-Language: en-US
-To: Linux regressions mailing list <regressions@lists.linux.dev>,
- Abdul Anshad Azeez <abdul-anshad.azeez@broadcom.com>, edumazet@google.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
- dsahern@kernel.org, Linux Networking <netdev@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Cc: Boon Ang <boon.ang@broadcom.com>, John Savanyo
- <john.savanyo@broadcom.com>, Peter Jonasson <peter.jonasson@broadcom.com>,
- Rajender M <rajender.m@broadcom.com>
-References: <CALkn8kLOozs5UO52SQa9PR-CiKx_mqW8VF9US94qN+ixyqnkdQ@mail.gmail.com>
- <Zd7vqSnT6ocYLuZ4@archie.me>
- <8015b1f0-d37b-45de-bd24-12fc21cbf83d@leemhuis.info>
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-In-Reply-To: <8015b1f0-d37b-45de-bd24-12fc21cbf83d@leemhuis.info>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 2/28/24 16:09, Linux regression tracking (Thorsten Leemhuis) wrote:
-> On 28.02.24 09:32, Bagas Sanjaya wrote:
->> [also Cc: regressions ML]
->>
->> On Wed, Feb 28, 2024 at 12:13:27PM +0530, Abdul Anshad Azeez wrote:
->>> During performance regression workload execution of the Linux
->>> kernel we observed up to 30% performance decrease in a specific networking
->>> workload on the 6.6 kernel compared to 6.5 (details below). The regression is
->>> reproducible in both Linux VMs running on ESXi and bare metal Linux.
->>>
->>> [...]
->>>
->>> We would like to know if there are any opportunities for optimization in
->>> the test cases with small socket sizes.
->>
->> Can you verify the regression on current mainline (v6.8-rc6)?
-> 
-> Bagas, I know that you are trying to help, but this is not helpful at
-> all (and indirectly puts regression tracking and the kernel development
-> community into a bad light).
-> 
-> Asking that question can be the right thing sometimes, for example in a
-> bugzilla ticket where the reporter is clearly reporting their first bug.
-> But the quoted report above clearly does not fall into that category for
-> various obvious reasons.
-> 
-> If you want to ensure that reports like that are acted upon, wait at
-> least two or three work days and see if there is a reply from a
-> developer. In case there is none (which happens, but I assume for a bug
-> report like this is likely rare) prodding a bit can be okay. But even
-> then you definitely want to use a more friendly tone. Maybe something
-> like "None of the developers reacted yet; maybe none of them bothered to
-> take a closer look because it's unclear if the problem still happens
-> with the latest code. You thus might want to verify and report back if
-> the problem happens with latest mainline, maybe then someone will take a
-> closer look".
-> 
-> Okay, that has way too many "maybe" in it, but I'm sure you'll get the
-> idea. :-D
-> 
+The RPS code and "deferred skb free" both send IPI/ function call
+to a remote CPU in which a softirq is raised. This leads to a warning on
+PREEMPT_RT because raising softiqrs from function call led to undesired
+behaviour in the past. I had duct tape in RT for the "deferred skb free"
+and Wander Lairson Costa reported the RPS case.
 
-Oops, I'm always impatient (and forgot to privately mail you) in this case.
-Sorry for inconvenience.
+This series only provides support for SMP threads for backlog NAPI, I
+did not attach a patch to make it default and remove the IPI related
+code to avoid confusion. I can post it for reference it asked.
 
--- 
-An old man doll... just what I always wanted! - Clara
+The RedHat performance team was so kind to provide some testing here.
+The series (with the IPI code removed) has been tested and no regression
+vs without the series has been found. For testing iperf3 was used on 25G
+interface, provided by mlx5, ix40e or ice driver and RPS was enabled. I
+can provide the individual test results if needed.
+
+Changes:
+- v2=E2=80=A6v3 https://lore.kernel.org/all/20240221172032.78737-1-bigeasy@=
+linutronix.de/
+
+  - Move the "if use_backlog_threads()" case into the CONFIG_RPS block
+    within napi_schedule_rps().
+
+  - Use __napi_schedule_irqoff() instead of napi_schedule_rps() in
+    kick_defer_list_purge().
+
+- v1=E2=80=A6v2 https://lore.kernel.org/all/20230929162121.1822900-1-bigeas=
+y@linutronix.de/
+
+  - Patch #1 is new. It ensures that NAPI_STATE_SCHED_THREADED is always
+    set (instead conditional based on task state) and the smboot thread
+    logic relies on this bit now. In v1 NAPI_STATE_SCHED was used but is
+    racy.
+
+  - The defer list clean up is split out and also relies on
+    NAPI_STATE_SCHED_THREADED. This fixes a different race.
+
+- RFC=E2=80=A6v1 https://lore.kernel.org/all/20230814093528.117342-1-bigeas=
+y@linutronix.de/
+
+   - Patch #2 has been removed. Removing the warning is still an option.
+
+   - There are two patches in the series:
+     - Patch #1 always creates backlog threads
+     - Patch #2 creates the backlog threads if requested at boot time,
+       mandatory on PREEMPT_RT.
+     So it is either or and I wanted to show how both look like.
+
+   - The kernel test robot reported a performance regression with
+     loopback (stress-ng --udp X --udp-ops Y) against the RFC version.
+     The regression is now avoided by using local-NAPI if backlog
+     processing is requested on the local CPU.
+
+Sebastian
 
 
