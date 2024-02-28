@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-75700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C84D86AF33
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:30:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDBB586AF36
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:32:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0972C1F25AFF
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:30:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45980B20C0A
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA760145B32;
-	Wed, 28 Feb 2024 12:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 999D7605B5;
+	Wed, 28 Feb 2024 12:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="buvie6fj"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="y8pfl1AJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50EC145341
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 12:30:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FFB208C5
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 12:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709123450; cv=none; b=jbOcsuPcY8jmjk+qSz+Bu4yDqGTQ9HeYDcqni8xiSh/u3jBJQxlh/AyqsAeaaFb/msV27qgmhG4PPDzhtLNo8R3ow7Qvf9xAD5uqmNHPHWFsdAyPzh+CDKudne+d/DnyS/MLAhaGm+cUDPkhEjYo2ght5n15HfTEGQlq/PJUNRk=
+	t=1709123519; cv=none; b=SJQQS3IyvoTn+jTOhv20BOJ4rX8+fkesQHjQujB/rMk1Anp8RgIm9ezqpKVWNUOf8Wr6vSAqlJM05ND7bALWhRILJDkkucpbwHUimtGYhJso0Xu/z6toemEt6cv8c5JRNBDNugOwI4nfmjEeRo5G3lSywR7sZA1fHuxa0kFYLsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709123450; c=relaxed/simple;
-	bh=rbrZB1MbCrdJEdglecBkUsgBKbk/Lf5UqKWRiSqTaHg=;
+	s=arc-20240116; t=1709123519; c=relaxed/simple;
+	bh=P2lYtDQA0lj35HQ+5dlE8Zqnu3Tn2q5PM+YJkHO82dw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jNTAH1M4JnYjt5uB6R7SOCIZmfZbICIoMWRCUZamZSjpltamg7ksXVZKMhGKQPgvR89x3iAsGuhLYH613qHGQc9Tkd5TIRZagNWHuxY+LeNcmMOd36PA6MdcT4GvGRoIXEBznR4tVXqMo8EM5N9ikfnucO4SyBwVWifD5//GNU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=buvie6fj; arc=none smtp.client-ip=209.85.128.41
+	 Content-Type:Content-Disposition:In-Reply-To; b=MsuPKzYhxLngap2llmNybLSGGRQSOUWscq4g2rr7g+lF31fgk/V67hyR/4+bEP2Uz1Seu2ma8cGy3Enc9jn22JQrvQM5susPbEKGBTHDLNf2NNbeZtmQT/R0cQeHfMVQFqD6BYaIQ299/GCKrZlh1ePn041GqXjWpL9ieEEMYs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=y8pfl1AJ; arc=none smtp.client-ip=209.85.221.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-412b7baa9c5so394905e9.2
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 04:30:48 -0800 (PST)
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-33dcd8dec88so2311969f8f.1
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 04:31:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709123447; x=1709728247; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709123516; x=1709728316; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y4koArAzLvRhp1wNjjda/nlU8knqR88gHiEfAPiHyOY=;
-        b=buvie6fj0m4OgeX0tHX8IQ7/mMEc3DqoFJiqRlctRHbQrZgGtOvZGy1/5viKUmiZO3
-         KZkfYI8sJcdE4lhnmuEHFlDrkK7Umgts+gpAImv2gkSMRWWIPoPDpAunFyo966dgv0H7
-         Cxas7BFtfsKlxj8kTMT5m8P9Hm1o80xmsi+4Z9fs2L8zMUYOtYOKstQ+Y2kj9QTx//tp
-         2V2PyhDYOuR9OU05ZJxtXLqO8LgVmkAHvqoA09DApzEsG5lHbSrd8Kb8V7o2pSThNPJA
-         A3/3rQCS+sn6vjojHy+MGuSeIKBDBJDbKb/pevNGNERrq2cocFyRBWWdl2kJC9RjQSi8
-         Z0ZA==
+        bh=P2lYtDQA0lj35HQ+5dlE8Zqnu3Tn2q5PM+YJkHO82dw=;
+        b=y8pfl1AJTf0ZJtvH9XYdButWe3CMGsHXbp8ESxD7PhhYtLXJYj1LKHDeqGG2b3Uu7t
+         2V+Y9dGs3wHMAFsfhVx7LFfhDvZRC6wlWS2esavvMAoUCiorw6VqWotXvslnUPkeRepR
+         qBCY4jgiWecfM4krJ/eTcW6LXb7etF8VgVwllMBiPhv1WUcujP59Ulw/4CuP6PWVkEZW
+         gKSEzRN3YSmDVIDd46IyTaHCV7Vbvph/Q5iDdGhRVp+U/Ygwo1brnOe3OCezFUouUrm5
+         Kp5vtQ68dYxDESgcg3UhqPlCLrGxWHyat4q+QFNDmdvfsfibAdXXmzZxuUhqJGeU/6ps
+         8Kgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709123447; x=1709728247;
+        d=1e100.net; s=20230601; t=1709123516; x=1709728316;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Y4koArAzLvRhp1wNjjda/nlU8knqR88gHiEfAPiHyOY=;
-        b=NmzHGBidP+qlgiyjYliiBtBCAYdOpaAmQhPrhH0gdqvuhXnzbfR+BLlWZKQz/0SEQ5
-         89htJyRsdC/f/dJi9r6T+R8VqEB9ol7PqPWdM1prjU7++nN/akSYh24J4CvP/f14teVK
-         ADpy2/4vEjVmb9Gsn8AZkcukPeWxAVSzp5JRVGGHsaGYJEqx64iJ89NTadW2nd5xlL4A
-         KLbvnxNreuofsZBd0BMn3+13+9BFABpmvutz0tRxHC4p4TRwOOx+CUd7bFY7z77Y8kf6
-         dBiyaeRGhNoSULNPP6e4QdmpuDNaljacOMdYF8g5lbuYDtVWzHxvA96swaKuC5c8mTWJ
-         c9Mg==
-X-Forwarded-Encrypted: i=1; AJvYcCUh/4UiEXKHaUuj5Ve22g0Cryisqkb3xIF9fRL6J7P3rOm2i7MO5zh9irpE6ODI+9eyr969e2Ompr725d8UpszZSmOvrkL9
-X-Gm-Message-State: AOJu0Ywc123MKIwZs7rZk/0f+uXRdgK/PSY96vSk+ujtF4x8fbOw0F72
-	+mCba9KHob8qHHp9wsLpsEnAGE+Vzh4sMFOMiknAxz6BRVdc7au6C54DFiBWWJA=
-X-Google-Smtp-Source: AGHT+IGnLrE4m+ahq/TbdLTjtrEFYyvRyshiJ8ta0m0zukA/VYU5g+QqAuwBq+l7IwoNfsm8rqKH4w==
-X-Received: by 2002:a05:600c:4e86:b0:412:a21b:5bf8 with SMTP id f6-20020a05600c4e8600b00412a21b5bf8mr6635147wmq.3.1709123446668;
-        Wed, 28 Feb 2024 04:30:46 -0800 (PST)
+        bh=P2lYtDQA0lj35HQ+5dlE8Zqnu3Tn2q5PM+YJkHO82dw=;
+        b=w2yj8Ruu6+9cGO0fMHfk7wgnxOZtfgTLFe91d6DttXD2eC9SmUTWvHNPVvoLM+o2Mu
+         duY/NFaWo9qhRKr2WnMcaAK05cn60RPEaKqt8S6W17CPXdRYuPCHA5o0xruwhETlXNEH
+         3bY0DB+njVN0j45wYbHRYgMMNTua8QbzqP2mOAtfcfU/WnYwmxcfHKQHDF3zd7UDKM9N
+         XWOFUiRq4FJIlR9ergTdAbL4LWP3o5SG4BSQdKiGaQdULSpErABC23soLQG0o8GCMdjV
+         kKDHzALB2iq5P4OjNW5rA+WJm3NHDFTarUDsMTwQVmttp9gFpILpiWXGYjX6L9Yw4MrQ
+         Ob0A==
+X-Forwarded-Encrypted: i=1; AJvYcCVJWD6cpGSfXasfQn3WQ7EgIU1i+npddch3z33J9EAGUxwsiCWXulOEnb1h33WDqAHZG8oqrpna07jaIUwdVZLEPxxF0TkM
+X-Gm-Message-State: AOJu0YwaIbjwaneoU84zg50irXmpdMNAXjzNHWrEow0E7bK5mGXspze8
+	nqeoiV1AiKOK+TQ3Ln6TfAdfJDYrf78mT32cotJgMlWo7LSvs7hxO2/Gd6k9tzM=
+X-Google-Smtp-Source: AGHT+IGbPRYXLZbIf/wYxiWdj7CiBE+y0JldKdFOg9+Q0dAspiLsouWPg9onelMeAKThwS0vl+z9aQ==
+X-Received: by 2002:adf:e682:0:b0:33d:3be4:6c75 with SMTP id r2-20020adfe682000000b0033d3be46c75mr9591693wrm.71.1709123516139;
+        Wed, 28 Feb 2024 04:31:56 -0800 (PST)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id z21-20020a05600c0a1500b0040fd1629443sm2041092wmp.18.2024.02.28.04.30.45
+        by smtp.gmail.com with ESMTPSA id w4-20020a5d4044000000b0033b7ce8b496sm14247816wrp.108.2024.02.28.04.31.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 04:30:45 -0800 (PST)
-Date: Wed, 28 Feb 2024 13:30:42 +0100
+        Wed, 28 Feb 2024 04:31:55 -0800 (PST)
+Date: Wed, 28 Feb 2024 13:31:52 +0100
 From: Jiri Pirko <jiri@resnulli.us>
-To: Lena Wang =?utf-8?B?KOeOi+WonCk=?= <Lena.Wang@mediatek.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"dsahern@kernel.org" <dsahern@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Shiming Cheng =?utf-8?B?KOaIkOivl+aYjik=?= <Shiming.Cheng@mediatek.com>
-Subject: Re: [PATCH net v2] Net:cache didn't flush when ipv6 rule changed
-Message-ID: <Zd8nctDzf1sgO3lX@nanopsycho>
-References: <3efcbaf0872481d1a842eb9e18fa368b4b94d940.camel@mediatek.com>
- <696e39599c7a5e793a9d96aceef0e34817ab0bb2.camel@mediatek.com>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Tristram.Ha@microchip.com,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: Re: [PATCH v2] net: hsr: Use correct offset for HSR TLV values in
+ supervisory HSR frames
+Message-ID: <Zd8nuLjDxLKPgX-W@nanopsycho>
+References: <20240228085644.3618044-1-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,147 +89,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <696e39599c7a5e793a9d96aceef0e34817ab0bb2.camel@mediatek.com>
+In-Reply-To: <20240228085644.3618044-1-lukma@denx.de>
 
-[PATCH net v2] Net:cache didn't flush when ipv6 rule changed
-
-Please make sure your patch subject is aligned with the rest:
-$ git log --no-merges --pretty=format:"%s" net/ipv6/fib6_rules.c | head -n30
-fib: remove unnecessary input parameters in fib_default_rule_add
-ipv6: change fib6_rules_net_exit() to batch mode
-ipv6: Define dscp_t and stop taking ECN bits into account in fib6-rules
-fib: rules: remove duplicated nla policies
-ipv6: fix memory leak in fib6_rule_suppress
-ipv6: fib6: remove redundant initialization of variable err
-fib: use indirect call wrappers in the most common fib_rules_ops
-ipv6: fib6: avoid indirect calls from fib6_rule_lookup
-net: fib_notifier: propagate extack down to the notifier block callback
-ipv6: do not free rt if FIB_LOOKUP_NOREF is set on suppress rule
-ipv6: honor RT6_LOOKUP_F_DST_NOREF in rule lookup logic
-treewide: Replace GPLv2 boilerplate/reference with SPDX - rule 372
-ipv6: Use result arg in fib_lookup_arg consistently
-ipv6: fib6_rule_action_alt needs to return -EAGAIN
-ipv6: Pass fib6_result to fib lookups
-net/ipv6: Add fib6_lookup
-net/ipv6: Refactor fib6_rule_action
-net: fib_rules: add extack support
-net: Drop pernet_operations::async
-net/ipv6: Pass skb to route lookup
-ipv6: route: dissect flow in input path if fib rules need it
-ipv6: fib6_rules: support for match on sport, dport and ip proto
-net: Convert fib6_rules_net_ops
-net: ipv6: avoid overhead when no custom FIB rules are installed
-ipv6: fib_rules: Dump rules during registration to FIB chain
-ipv6: fib_rules: Check if rule is a default rule
-ipv6: Do not leak throw route references
-net: flow: Add l3mdev flow update
-net: Add l3mdev rule
-ipv6: fix the incorrect return value of throw route
-
-Use imperative mood as other subjects do, tell the codebase what do do.
-
-
-
-Wed, Feb 28, 2024 at 09:24:55AM CET, Lena.Wang@mediatek.com wrote:
->From bf53859b379a653eec8a14fbb3f29286f9f888fb Mon Sep 17 00:00:00 2001
->From: shiming cheng <shiming.cheng@mediatek.com>
-
-Names start with capital letters.
-
-
->Date: Mon, 26 Feb 2024 20:17:58 +0800
->Subject: [PATCH net v2] Net:cache didn't flush when ipv6 rule changed
-
-I don't understand why you put these "headers" here. Only one "from" is
-enough in this case (you are submitting the patch in stead of another
-person).
-
-If you are not, I suggest to use git-send-email for submissions.
-
-
+Wed, Feb 28, 2024 at 09:56:44AM CET, lukma@denx.de wrote:
+>Current HSR implementation uses following supervisory frame (even for
+>HSRv1 the HSR tag is not is not present):
 >
->When changed from old rule&route configure to new one as below,
-
-"as below" where?
-
->ipv6 cache dst_entry did not change to new route table as no
->cache flush callback function, then forward to wrong out interface.
-
-I don't understand this sentence :/
-
-
->When fib6_check dst_entry, the fib6_node version[fn_sernm] is
->always the same with socket dst_cookie, old cache dst_entry is
->always used and no chance to update.
-
-Sorry, this is too cryptic for me to understand :/
-
-
+>00000000: 01 15 4e 00 01 2d XX YY ZZ 94 77 10 88 fb 00 01
+>00000010: 7e 1c 17 06 XX YY ZZ 94 77 10 1e 06 XX YY ZZ 94
+>00000020: 77 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>00000030: 00 00 00 00 00 00 00 00 00 00 00 00
 >
->So we need to update fib6_node version when rule changed and
->flush cache to avoid dispatching a wrong interface.
-
-Be imperative in the patch description too, tell the codebase what do do.
-
-https://www.kernel.org/doc/html/v6.6/process/submitting-patches.html#describe-your-changes
-
-
-
+>The current code adds extra two bytes (i.e. sizeof(struct hsr_sup_tlv))
+>when offset for skb_pull() is calculated.
+>This is wrong, as both 'struct hsrv1_ethhdr_sp' and 'hsrv0_ethhdr_sp'
+>already have 'struct hsr_sup_tag' defined in them, so there is no need
+>for adding extra two bytes.
 >
->Signed-off-by: shiming cheng <shiming.cheng@mediatek.com>
-
-Names start with capital letters.
-
-Also, when you submit the patch, your signed-off-by tag should be here
-as well.
-
-
->---
->v2: 
->    1. Add the fix tag.
-
-And there, there is none...
-
-
-pw-bot: cr
-
-
->    2. Changes according to David Ahern's suggestions, modify flush
->functions same way as ipv4 flush cache and use tabs to aligh with
->existing code.
->---
->---
-> net/ipv6/fib6_rules.c | 6 ++++++
-> 1 file changed, 6 insertions(+)
+>This code was working correctly as with no RedBox support, the check for
+>HSR_TLV_EOT (0x00) was off by two bytes, which were corresponding to
+>zeroed padded bytes for minimal packet size.
 >
->diff --git a/net/ipv6/fib6_rules.c b/net/ipv6/fib6_rules.c
->index 7523c4baef35..52c04f0ac498 100644
->--- a/net/ipv6/fib6_rules.c
->+++ b/net/ipv6/fib6_rules.c
->@@ -449,6 +449,11 @@ static size_t fib6_rule_nlmsg_payload(struct
->fib_rule *rule)
-> 	       + nla_total_size(16); /* src */
-> }
-> 
->+static void fib6_rule_flush_cache(struct fib_rules_ops *ops)
->+{
->+	rt_genid_bump_ipv6(ops->fro_net);
->+}
->+
-> static const struct fib_rules_ops __net_initconst
->fib6_rules_ops_template = {
-> 	.family			= AF_INET6,
-> 	.rule_size		= sizeof(struct fib6_rule),
->@@ -461,6 +466,7 @@ static const struct fib_rules_ops __net_initconst
->fib6_rules_ops_template = {
-> 	.compare		= fib6_rule_compare,
-> 	.fill			= fib6_rule_fill,
-> 	.nlmsg_payload		= fib6_rule_nlmsg_payload,
->+	.flush_cache		= fib6_rule_flush_cache,
-> 	.nlgroup		= RTNLGRP_IPV6_RULE,
-> 	.owner			= THIS_MODULE,
-> 	.fro_net		= &init_net,
->-- 
->2.18.0
+>Fixes: eafaa88b3eb7 ("net: hsr: Add support for redbox supervision frames")
 >
+
+And yet the extra empty line is still here :/
+
+
+>Signed-off-by: Lukasz Majewski <lukma@denx.de>
+
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
