@@ -1,90 +1,93 @@
-Return-Path: <netdev+bounces-75520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42A3886A63F
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:00:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C0D686A641
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:00:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD2021F2EB61
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 02:00:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 331F528A0AE
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 02:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2333C2D;
-	Wed, 28 Feb 2024 02:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06A112E61;
+	Wed, 28 Feb 2024 02:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tiqDzvqp"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="oW4zL/5q"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2087.outbound.protection.outlook.com [40.107.92.87])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2069.outbound.protection.outlook.com [40.107.237.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A33C23C2
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 02:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41B0524B
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 02:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.69
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709085625; cv=fail; b=MIhtbMEWzIUTSwpFi7wrSBWmUyV2f3dHUkyBL6rI9q0ibND26IU1ROQacNUpNAZPy4+/ZxCK2V6OlsDRhXBZ/PtW7oci/1waL2hsoiUGU2S82tCKye3+ylwe6ZoaKvDib1vaRy1EZ64bd+VipD8xgCycIdOMfTRnvbxcn1ryIlY=
+	t=1709085627; cv=fail; b=FtBFCSanegW0xx8cqcB/btzgi7ts/VQcLXPO1ETt++Hqe8Jk6/rRcoShadVbGNlHT6OiIbaHurC244eSBTFSwXwkPSCrVbb7pV7ID2pyFmDuE7zX1K0j2Yga4f9A/ZtH8mOF1kp2k34Ry/YHUQgnK1G+zIT8HvhbZkpG8IE9HoU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709085625; c=relaxed/simple;
-	bh=KRDwHbzqQc4i7YrgIvLJKbWAyaMTbJZcxURsnBi6Y9U=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IxA9EayyzvpL0RCoqZ3o4YjW/TCSupjpWh3MKo7R3HiG0Kn4flugEUcxZzX3nC2Kh7TWJjWME+/s6T9Lt6SAP7IV6y8GwI3/oBaKEHUUqyAsT79fCu7LyFn3JQJyiK17cbe2FZcjFWR7vwa17w+EwjH0frhQuNJ008aNzIdFmMU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tiqDzvqp; arc=fail smtp.client-ip=40.107.92.87
+	s=arc-20240116; t=1709085627; c=relaxed/simple;
+	bh=E3YeL7UTvyFumCcttZZnjeIc7aIRH1eDfTiRw3IBwiA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Y6J8tjkkALD2+28ANiXmZKeHX4Uek8Ytq76VCXsgoydFSvwJl7ukdG5KeO0XqO65Bif5pDBrMiw9gjvqS+8U/Ei8J6kE9lp4y1Zb0nQl/fuafzn7q5ZczsOYGryXY8XdXP5q8elyQ7ZaVmMZd9W8FiPDOgK9pLNeTOqWkI33suM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=oW4zL/5q; arc=fail smtp.client-ip=40.107.237.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=M9qtvcD+fbiP/tMAgHvDpGzQaJv6r/BLXhyNcBNdHc4bP4COJh62sFWNsr+KGXUlZqxz+8dgmX/pW8SXDQYx5g+R8qBLlGL22bFpE9Y3d+nm+JSpwBhhbLNhYbu+Uz+d7kGjbDyk5ay6P6xNahEy1wHuWuveegkO6oAO3DiLwfLksCnUDwJMkyJ52Y2gtGvWiDHqmGhTBzL3nQ1YHXeo+X+ZyaydY7dYxNyeY5frnD2lo8IAX9BaCwN9tNuo3doUGQ8U8hwiOF7rnn9d6hDSeRyaDyC389guZREsEfJTumxJQ8wIYfudIAvti6reqshJgiGfsLGXB0Tbc0DDirwObA==
+ b=Ica2FdUV+if84F2E6N/la13I+/t2mBEOc9w4Jz3AP6qPePDecbbYe+Ulj1WfH5sVm2WKQH4nzxRUv/2rbXZF5xZf2G8Y5z4pNY12u3CRsfQ/jtA5aNo8aAf9ixR06XTZY8XTJ0OBPx0X4lJe7mOa70fyPm4YWNLgJCpCvyTQhHdsS6mjLcwXaPv2P3HiQdlBE24D43nimw4NgqriJ0VUWNH7TOAiKCDAZSrvnGBAz4NKZ5Hc9K51ri3HtKUkuitJ8lZDjT+4y+HOjQaGA3W1KeiiQIdye8AUxq9IK7ls/pRvqUy4lI/8DyRo6PObj4d7MFjEcicGMJ06HQxoYzMcMQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lxpWRnAcFJ4rycCvdcnBReBlbfCMn/VE5VsRXTSTGeo=;
- b=L6Sh81GyUVqQWP155RDszh5Iwap7UsemM+T747Gh7J8pCTnlLnu/ooSn3rFOcYOwevsk60Mni5YxsbZmG8aitram8403APg84E6mMZHUjQlgcRa99PPblnvBjdTU2SK0RqTU3bLClTB9bN2I3SyIM7/EVJc27QFIOg2Drt9qN4ty4/WbbMjXeaPE9werBqfS/NM2jV3UlaaVxhrnwceXZYLcPdL16nPrkUyAel7gGNx79nIpOaZZjLLlltYz++aa+rurH7AKc8kCbUEcLyiCLCMI6+s0rm07ceXoReBmTdWwj6IWM2fNhLGrJ8cbHs7gzq9HPLn6v0axw7VtIHA8JA==
+ bh=DAO184hsbMGQtqrdBQSsYGez0xreM8fyzdapbxEpgwc=;
+ b=fkkCkbPTQ0RhZOAB6k6A9x5vJdPpRZZVvvnI7ybh+APvWzMBqmuJcKj6L7dmcLkswP4BNtvCfrJT0Qv676rDfUeyUxohzAhvlU4NKLBHph/Qk/ht7f4WEfeRUzIUoft0T5pULt6g842HabAL1RSWw6dIw4DB6zl3OZ7EH56Mmz816XQY42KywHU5wPkNz1kf38Rl/DMFarb8LPYySFS2iSwWkVh/D5j+s97bQ4d7T+EZ+JiXox2YYePpE8hVDqaMfA/aw6CldcSEJicVI/Gkkoa4ethENrP1yyJPU3x1SGPtWURvRWpVjDlUfhjnTO58X6yNHD8+DwJhPhJldq92UA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lxpWRnAcFJ4rycCvdcnBReBlbfCMn/VE5VsRXTSTGeo=;
- b=tiqDzvqpHnLnuUkwtPlkJG/HIcmSgON9B6ne6l+wmxCwoQozI0viiu0EaAVT7JGyTq6zlvbjnOYNlFTFx/qUFy9fE4i96+W51OMHIsvCHMvjlggIwsmT8zZih4cNxltZ9s8Bl4JAMKGCtJobTp+Zn/QmI7568aWHoyol4r5QTbG8jijg7K8QIGx2WtrJgtUEDcOjYRAx57Y+2B8d4+DUNwSOwrlbYi8OLVqjBbDbSkC1g/YVSqgytE+oyopXYZLVZF1joMuVGBRqQS7ZftXJeMibKH92O7Mn0dbwqZUTCBW/6tVDc14DSelzwW8hSY0P4PY49qEzFUpgtMfUojh5Qg==
-Received: from BN9PR03CA0686.namprd03.prod.outlook.com (2603:10b6:408:10e::31)
- by DM6PR12MB4252.namprd12.prod.outlook.com (2603:10b6:5:211::17) with
+ bh=DAO184hsbMGQtqrdBQSsYGez0xreM8fyzdapbxEpgwc=;
+ b=oW4zL/5qlK/3GxXYUSAYZt4zAxyS1z5ViJ0H09vc4hBbru/+q+JesY6bnWObl+rGfunD8Vp+oi05uhkGfPLXFfgzCGighO+QiObIv2bV8koxcEUzjbRmWrlUWWBAWdN6JDnCFJxG1zSZ6sNjuVW2Ai1eTWZzk66K51tI93j6Ty8qxrfwS6DeO194uBirfS01Q1Tr1VpXm0b/2/OV7xnmGK3Iwk0E3320jc+xZo3ZA98OexZv18Xv1lAvBQYePMb3K2lb0gRG1upuUhSsLJpwPLNFoQFzMlz5WRqdZumi8Dx4708w+ukpafitmLYc5iZAYpRnYQpIJbbI5dkA9pByyw==
+Received: from MW4PR04CA0099.namprd04.prod.outlook.com (2603:10b6:303:83::14)
+ by CYXPR12MB9386.namprd12.prod.outlook.com (2603:10b6:930:de::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.39; Wed, 28 Feb
- 2024 02:00:17 +0000
-Received: from BN3PEPF0000B075.namprd04.prod.outlook.com
- (2603:10b6:408:10e:cafe::33) by BN9PR03CA0686.outlook.office365.com
- (2603:10b6:408:10e::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.50 via Frontend
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.36; Wed, 28 Feb
+ 2024 02:00:18 +0000
+Received: from MWH0EPF000989EB.namprd02.prod.outlook.com
+ (2603:10b6:303:83:cafe::83) by MW4PR04CA0099.outlook.office365.com
+ (2603:10b6:303:83::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.49 via Frontend
  Transport; Wed, 28 Feb 2024 02:00:17 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BN3PEPF0000B075.mail.protection.outlook.com (10.167.243.120) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ MWH0EPF000989EB.mail.protection.outlook.com (10.167.241.138) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7292.25 via Frontend Transport; Wed, 28 Feb 2024 02:00:16 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.7292.25 via Frontend Transport; Wed, 28 Feb 2024 02:00:17 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 27 Feb
- 2024 18:00:01 -0800
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ 2024 18:00:03 -0800
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Tue, 27 Feb
- 2024 18:00:00 -0800
+ 2024 18:00:02 -0800
 Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
  with Microsoft SMTP Server id 15.2.1258.12 via Frontend Transport; Tue, 27
- Feb 2024 17:59:58 -0800
+ Feb 2024 18:00:01 -0800
 From: William Tu <witu@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <jiri@nvidia.com>, <bodong@nvidia.com>, <tariqt@nvidia.com>,
 	<yossiku@nvidia.com>, <kuba@kernel.org>, <witu@nvidia.com>
-Subject: [PATCH net-next RFC 1/2] devlink: Add shared descriptor eswitch attr
-Date: Wed, 28 Feb 2024 03:59:53 +0200
-Message-ID: <20240228015954.11981-1-witu@nvidia.com>
+Subject: [PATCH net-next RFC 2/2] net/mlx5e: Add eswitch shared descriptor devlink
+Date: Wed, 28 Feb 2024 03:59:54 +0200
+Message-ID: <20240228015954.11981-2-witu@nvidia.com>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20240228015954.11981-1-witu@nvidia.com>
+References: <20240228015954.11981-1-witu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,232 +99,171 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B075:EE_|DM6PR12MB4252:EE_
-X-MS-Office365-Filtering-Correlation-Id: b1348506-a2f0-4891-45ad-08dc380102b7
+X-MS-TrafficTypeDiagnostic: MWH0EPF000989EB:EE_|CYXPR12MB9386:EE_
+X-MS-Office365-Filtering-Correlation-Id: 880a118c-6b01-4401-bdbd-08dc38010311
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	3BuqOtB4XuEShVPtzagVP5F+ENTPiVoq9ikhPBGsgVfSGhWdaTM0HPeLHhBoVv9g81j2KgOpaOtaDyNGwbjaOJHgDjpSELbL/ec/U6Vc2ym0co3tiBUmBh7DETwNmMdnuS+GbB8iby0IlCGoeHXbVCURezuaDcU4sJ/95rJN7Ky6rHp9XvgAmWocheKmpn3r3tbvm5kjBuA13ch0ETL0xRBLld6wIB4KXXP+ZM6PNHhPGpOrtUfxpw6+kdNjvMNinraVOcsnFDRAn0MV5qLs1bmF1J4NzXoOsYX8i2kWUrml2olg+D/6G8IqHf3Zd4e0UVDPmv2Xe98z5eZLBs96GhIpFWelX/89S4hiSdiejLHaQQANB9g9oY6pZe3lhwqC1wC4HZahoNP6pvy64zItF6mojizKmvvmUMB1N/Sq1kOxqR8QJlztZ4BcqpQwPxGw2KRD39BW63DQUBYRFkeaTTszzju+yBxTSfi/TwM4DDsJJwkiXzx60Es6fz9gNigYxGKdeTMoxP3hHO1fwJ63mXaT8pAbOzkJhnbq/0yo5uQjhAFkx5iTGxxQIvMG8E7fXsVkbB5UwtlMsxVPiFJhWUUpXX7IWe3g7BYHDgg2/Yq9QjcH9sWYq4JleqeKYezIgstnGccA0MjONXULXtLxYknXEExkKKhdylTQxytRraBJzxBzrtHwNt/ABr9/sJdxdTH8OA9iEAOFK4SsX/YKBOjBuZGc3mMcQ24s/MSrnPe4Wkf8Tq3ICq6i2p7x4dfdGKnYjVpNH3F+6oi1dnKlGVJcoAaX5WMN6tmqw9BeBFw=
+	J4x4zDTLU74qdufEsQF0gvHpCEgJ3nCMW2LMdLJru+ZfeQEa2SxRYZO7jcwWBjhPk+wwDd8eDX1I/946GMf2WebZtaw2DBijG2KiCkdlr01hqzJirVcJIDIAzKQkaQi+15yO6Rzn2NeArzT5lBaMFd7Ykw0q/utj6vF3pv9nUAXQ4EydSKacVcgZ1rsRa6u89KI9HapMXnEUouKCm7sAonan9sSX4BNpG5Ozt2d6kS7CwBFCmhyDKx33TrxE05uZLrVsUI8Sb9McjOSoewKTnbkkKnd/RSzvUzpIv89ltEL7JXqjBfeNLiqGKU3HyA1jmNT1lsn9vk93m+FE7cO8jPxc3+t9lHl1ibOs6Cd/UcAiDkeh2pE0fRmTzrlc6gi47HkA9x1UnzgbVy/ePHBQtqTXZvDqB3NtJQIgeOO0gvt9okVCvA+A6CTRF8o/vTEqbTso/+wbqN+xHedRBd9yNt8TiCAITDI5x0zBt+Saes7PmaDh2OvU4SOfjGHi1t/h6uB4WEkdwGtS4i4NyJXMIhdujhfFrN5pjAc8BzD5kF4ieP7tMK9+H9DR8EyoRdKTWroPVHEIl567c4+m5DaKHqzOL5F6wtofaH+JRsM5zEBhmmMMp87IAYu4ZYbfYwT6mBh/YICfN7fftY3eXhQT3ceooZffbHpOKHRwfRbr0ThME6czdNEPb03s1QQJdm4ptPYNFwvNYv4Z181MvR/s0jJXF1F5RMZk08v/Ntpn5DMkYqniRNIkTg3/Nou3yaCn
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(82310400014);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(36860700004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2024 02:00:16.9428
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2024 02:00:17.5822
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b1348506-a2f0-4891-45ad-08dc380102b7
+X-MS-Exchange-CrossTenant-Network-Message-Id: 880a118c-6b01-4401-bdbd-08dc38010311
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B075.namprd04.prod.outlook.com
+	MWH0EPF000989EB.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4252
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9386
 
-Add two eswitch attrs: shrdesc_mode and shrdesc_count.
-
-1. shrdesc_mode: to enable a sharing memory buffer for
-representor's rx buffer, and 2. shrdesc_count: to control the
-number of buffers in this shared memory pool.
-
-When using switchdev mode, the representor ports handles the slow path
-traffic, the traffic that can't be offloaded will be redirected to the
-representor port for processing. Memory consumption of the representor
-port's rx buffer can grow to several GB when scaling to 1k VFs reps.
-For example, in mlx5 driver, each RQ, with a typical 1K descriptors,
-consumes 3MB of DMA memory for packet buffer in WQEs, and with four
-channels, it consumes 4 * 3MB * 1024 = 12GB of memory. And since rep
-ports are for slow path traffic, most of these rx DMA memory are idle.
-
-Add shrdesc_mode configuration, allowing multiple representors
-to share a rx memory buffer pool. When enabled, individual representor
-doesn't need to allocate its dedicated rx buffer, but just pointing
-its rq to the memory pool. This could make the memory being better
-utilized. The shrdesc_count represents the number of rx ring
-entries, e.g., same meaning as ethtool -g, that's shared across other
-representors. Users adjust it based on how many reps, total system
-memory, or performance expectation.
-
-The two params are also useful for other vendors such as Intel ICE
-drivers and Broadcom's driver, which also have representor ports for
-slow path traffic.
-
-An example use case:
-$ devlink dev eswitch show pci/0000:08:00.0
-  pci/0000:08:00.0: mode legacy inline-mode none encap-mode basic \
-  shrdesc-mode none shrdesc-count 0
-$ devlink dev eswitch set pci/0000:08:00.0 mode switchdev \
-  shrdesc-mode basic shrdesc-count 1024
-$ devlink dev eswitch show pci/0000:08:00.0
-  pci/0000:08:00.0: mode switchdev inline-mode none encap-mode basic \
-  shrdesc-mode basic shrdesc-count 1024
-
-Note that new configurations are set at legacy mode, and enabled at
-switchdev mode.
+Add devlink support for ewsitch shared descriptor
+implementation for mlx5 driver.
 
 Signed-off-by: William Tu <witu@nvidia.com>
 ---
-previous devlink-sd discussion
-https://lore.kernel.org/netdev/20240220141709.42a9c640@kernel.org/
----
- include/net/devlink.h        |  8 +++++++
- include/uapi/linux/devlink.h |  7 ++++++
- net/devlink/dev.c            | 43 ++++++++++++++++++++++++++++++++++++
- net/devlink/netlink_gen.c    |  6 +++--
- 4 files changed, 62 insertions(+), 2 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/devlink.c |  4 +
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h | 10 +++
+ .../mellanox/mlx5/core/eswitch_offloads.c     | 80 +++++++++++++++++++
+ 3 files changed, 94 insertions(+)
 
-diff --git a/include/net/devlink.h b/include/net/devlink.h
-index 9ac394bdfbe4..aca25183e72a 100644
---- a/include/net/devlink.h
-+++ b/include/net/devlink.h
-@@ -1327,6 +1327,14 @@ struct devlink_ops {
- 	int (*eswitch_encap_mode_set)(struct devlink *devlink,
- 				      enum devlink_eswitch_encap_mode encap_mode,
- 				      struct netlink_ext_ack *extack);
-+	int (*eswitch_shrdesc_mode_get)(struct devlink *devlink,
-+				        enum devlink_eswitch_shrdesc_mode *p_shrdesc_mode);
-+	int (*eswitch_shrdesc_mode_set)(struct devlink *devlink,
-+				        enum devlink_eswitch_shrdesc_mode shrdesc_mode,
-+				        struct netlink_ext_ack *extack);
-+	int (*eswitch_shrdesc_count_get)(struct devlink *devlink, int *count);
-+	int (*eswitch_shrdesc_count_set)(struct devlink *devlink, int count,
-+				        struct netlink_ext_ack *extack);
- 	int (*info_get)(struct devlink *devlink, struct devlink_info_req *req,
- 			struct netlink_ext_ack *extack);
- 	/**
-diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
-index 130cae0d3e20..31323c481614 100644
---- a/include/uapi/linux/devlink.h
-+++ b/include/uapi/linux/devlink.h
-@@ -195,6 +195,11 @@ enum devlink_eswitch_encap_mode {
- 	DEVLINK_ESWITCH_ENCAP_MODE_BASIC,
- };
- 
-+enum devlink_eswitch_shrdesc_mode {
-+	DEVLINK_ESWITCH_SHRDESC_MODE_NONE,
-+	DEVLINK_ESWITCH_SHRDESC_MODE_BASIC,
-+};
-+
- enum devlink_port_flavour {
- 	DEVLINK_PORT_FLAVOUR_PHYSICAL, /* Any kind of a port physically
- 					* facing the user.
-@@ -614,6 +619,8 @@ enum devlink_attr {
- 
- 	DEVLINK_ATTR_REGION_DIRECT,		/* flag */
- 
-+	DEVLINK_ATTR_ESWITCH_SHRDESC_MODE,	/* u8 */
-+	DEVLINK_ATTR_ESWITCH_SHRDESC_COUNT,	/* u32 */
- 	/* add new attributes above here, update the policy in devlink.c */
- 
- 	__DEVLINK_ATTR_MAX,
-diff --git a/net/devlink/dev.c b/net/devlink/dev.c
-index 19dbf540748a..90b279c3c1e6 100644
---- a/net/devlink/dev.c
-+++ b/net/devlink/dev.c
-@@ -631,8 +631,10 @@ static int devlink_nl_eswitch_fill(struct sk_buff *msg, struct devlink *devlink,
- 				   enum devlink_command cmd, u32 portid,
- 				   u32 seq, int flags)
- {
-+	enum devlink_eswitch_shrdesc_mode shrdesc_mode;
- 	const struct devlink_ops *ops = devlink->ops;
- 	enum devlink_eswitch_encap_mode encap_mode;
-+	u32 shrdesc_count;
- 	u8 inline_mode;
- 	void *hdr;
- 	int err = 0;
-@@ -674,6 +676,25 @@ static int devlink_nl_eswitch_fill(struct sk_buff *msg, struct devlink *devlink,
- 			goto nla_put_failure;
- 	}
- 
-+	if (ops->eswitch_shrdesc_mode_get) {
-+		err = ops->eswitch_shrdesc_mode_get(devlink, &shrdesc_mode);
-+		if (err)
-+			goto nla_put_failure;
-+		err = nla_put_u8(msg, DEVLINK_ATTR_ESWITCH_SHRDESC_MODE, shrdesc_mode);
-+		if (err)
-+			goto nla_put_failure;
-+
-+	}
-+
-+	if (ops->eswitch_shrdesc_count_get) {
-+		err = ops->eswitch_shrdesc_count_get(devlink, &shrdesc_count);
-+		if (err)
-+			goto nla_put_failure;
-+		err = nla_put_u32(msg, DEVLINK_ATTR_ESWITCH_SHRDESC_COUNT, shrdesc_count);
-+		if (err)
-+			goto nla_put_failure;
-+	}
-+
- 	genlmsg_end(msg, hdr);
- 	return 0;
- 
-@@ -705,9 +726,11 @@ int devlink_nl_eswitch_get_doit(struct sk_buff *skb, struct genl_info *info)
- 
- int devlink_nl_eswitch_set_doit(struct sk_buff *skb, struct genl_info *info)
- {
-+	enum devlink_eswitch_shrdesc_mode shrdesc_mode;
- 	struct devlink *devlink = info->user_ptr[0];
- 	const struct devlink_ops *ops = devlink->ops;
- 	enum devlink_eswitch_encap_mode encap_mode;
-+	u32 shrdesc_count;
- 	u8 inline_mode;
- 	int err = 0;
- 	u16 mode;
-@@ -744,6 +767,26 @@ int devlink_nl_eswitch_set_doit(struct sk_buff *skb, struct genl_info *info)
- 			return err;
- 	}
- 
-+	if (info->attrs[DEVLINK_ATTR_ESWITCH_SHRDESC_MODE]) {
-+		if (!ops->eswitch_shrdesc_mode_set)
-+			return -EOPNOTSUPP;
-+		shrdesc_mode = nla_get_u8(info->attrs[DEVLINK_ATTR_ESWITCH_SHRDESC_MODE]);
-+		err = ops->eswitch_shrdesc_mode_set(devlink, shrdesc_mode,
-+						    info->extack);
-+		if (err)
-+			return err;
-+	}
-+
-+	if (info->attrs[DEVLINK_ATTR_ESWITCH_SHRDESC_COUNT]) {
-+		if (!ops->eswitch_shrdesc_count_set)
-+			return -EOPNOTSUPP;
-+		shrdesc_count = nla_get_u32(info->attrs[DEVLINK_ATTR_ESWITCH_SHRDESC_COUNT]);
-+		err = ops->eswitch_shrdesc_count_set(devlink, shrdesc_count,
-+						     info->extack);
-+		if (err)
-+			return err;
-+	}
-+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
+index 3e064234f6fe..24eb03763b60 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
+@@ -312,6 +312,10 @@ static const struct devlink_ops mlx5_devlink_ops = {
+ 	.eswitch_inline_mode_get = mlx5_devlink_eswitch_inline_mode_get,
+ 	.eswitch_encap_mode_set = mlx5_devlink_eswitch_encap_mode_set,
+ 	.eswitch_encap_mode_get = mlx5_devlink_eswitch_encap_mode_get,
++	.eswitch_shrdesc_mode_set = mlx5_devlink_eswitch_shrdesc_mode_set,
++	.eswitch_shrdesc_mode_get = mlx5_devlink_eswitch_shrdesc_mode_get,
++	.eswitch_shrdesc_count_set = mlx5_devlink_eswitch_shrdesc_count_set,
++	.eswitch_shrdesc_count_get = mlx5_devlink_eswitch_shrdesc_count_get,
+ 	.rate_leaf_tx_share_set = mlx5_esw_devlink_rate_leaf_tx_share_set,
+ 	.rate_leaf_tx_max_set = mlx5_esw_devlink_rate_leaf_tx_max_set,
+ 	.rate_node_tx_share_set = mlx5_esw_devlink_rate_node_tx_share_set,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+index 349e28a6dd8d..f678bcb98e1f 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+@@ -378,6 +378,8 @@ struct mlx5_eswitch {
+ 	struct mlx5_esw_functions esw_funcs;
+ 	struct {
+ 		u32             large_group_num;
++		u32             shared_rx_ring_counts;
++		bool            enable_shared_rx_ring;
+ 	}  params;
+ 	struct blocking_notifier_head n_head;
+ 	struct xarray paired;
+@@ -549,6 +551,14 @@ int mlx5_devlink_eswitch_encap_mode_set(struct devlink *devlink,
+ 					struct netlink_ext_ack *extack);
+ int mlx5_devlink_eswitch_encap_mode_get(struct devlink *devlink,
+ 					enum devlink_eswitch_encap_mode *encap);
++int mlx5_devlink_eswitch_shrdesc_mode_set(struct devlink *devlink,
++					  enum devlink_eswitch_shrdesc_mode mode,
++					  struct netlink_ext_ack *extack);
++int mlx5_devlink_eswitch_shrdesc_mode_get(struct devlink *devlink,
++					  enum devlink_eswitch_shrdesc_mode *mode);
++int mlx5_devlink_eswitch_shrdesc_count_set(struct devlink *devlink, int count,
++					   struct netlink_ext_ack *extack);
++int mlx5_devlink_eswitch_shrdesc_count_get(struct devlink *devlink, int *count);
+ int mlx5_devlink_port_fn_hw_addr_get(struct devlink_port *port,
+ 				     u8 *hw_addr, int *hw_addr_len,
+ 				     struct netlink_ext_ack *extack);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+index b0455134c98e..5586f52e4239 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+@@ -4019,6 +4019,86 @@ int mlx5_devlink_eswitch_encap_mode_get(struct devlink *devlink,
  	return 0;
  }
  
-diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
-index c81cf2dd154f..ac8b0c7105dd 100644
---- a/net/devlink/netlink_gen.c
-+++ b/net/devlink/netlink_gen.c
-@@ -194,12 +194,14 @@ static const struct nla_policy devlink_eswitch_get_nl_policy[DEVLINK_ATTR_DEV_NA
- };
- 
- /* DEVLINK_CMD_ESWITCH_SET - do */
--static const struct nla_policy devlink_eswitch_set_nl_policy[DEVLINK_ATTR_ESWITCH_ENCAP_MODE + 1] = {
-+static const struct nla_policy devlink_eswitch_set_nl_policy[DEVLINK_ATTR_ESWITCH_SHRDESC_COUNT + 1] = {
- 	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
- 	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
- 	[DEVLINK_ATTR_ESWITCH_MODE] = NLA_POLICY_MAX(NLA_U16, 1),
- 	[DEVLINK_ATTR_ESWITCH_INLINE_MODE] = NLA_POLICY_MAX(NLA_U16, 3),
- 	[DEVLINK_ATTR_ESWITCH_ENCAP_MODE] = NLA_POLICY_MAX(NLA_U8, 1),
-+	[DEVLINK_ATTR_ESWITCH_SHRDESC_MODE] = NLA_POLICY_MAX(NLA_U8, 1),
-+	[DEVLINK_ATTR_ESWITCH_SHRDESC_COUNT] = NLA_POLICY_MAX(NLA_U32, 65535),
- };
- 
- /* DEVLINK_CMD_DPIPE_TABLE_GET - do */
-@@ -787,7 +789,7 @@ const struct genl_split_ops devlink_nl_ops[74] = {
- 		.doit		= devlink_nl_eswitch_set_doit,
- 		.post_doit	= devlink_nl_post_doit,
- 		.policy		= devlink_eswitch_set_nl_policy,
--		.maxattr	= DEVLINK_ATTR_ESWITCH_ENCAP_MODE,
-+		.maxattr	= DEVLINK_ATTR_ESWITCH_SHRDESC_COUNT,
- 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
- 	},
- 	{
++int mlx5_devlink_eswitch_shrdesc_mode_set(struct devlink *devlink,
++					  enum devlink_eswitch_shrdesc_mode shrdesc,
++					  struct netlink_ext_ack *extack)
++{
++	struct mlx5_eswitch *esw;
++	int err = 0;
++
++	esw = mlx5_devlink_eswitch_get(devlink);
++	if (IS_ERR(esw))
++		return PTR_ERR(esw);
++
++	down_write(&esw->mode_lock);
++	if (esw->mode != MLX5_ESWITCH_OFFLOADS) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Can't enable shared descriptors in legacy mode");
++		err = -EOPNOTSUPP;
++		goto out;
++	}
++	esw->params.enable_shared_rx_ring = shrdesc ==
++					     DEVLINK_ESWITCH_SHRDESC_MODE_BASIC;
++
++out:
++	up_write(&esw->mode_lock);
++	return err;
++}
++
++int mlx5_devlink_eswitch_shrdesc_mode_get(struct devlink *devlink,
++					  enum devlink_eswitch_shrdesc_mode *shrdesc)
++{
++	struct mlx5_eswitch *esw;
++	bool enable;
++
++	esw = mlx5_devlink_eswitch_get(devlink);
++	if (IS_ERR(esw))
++		return PTR_ERR(esw);
++
++	enable = esw->params.enable_shared_rx_ring;
++	if (enable)
++		*shrdesc = DEVLINK_ESWITCH_SHRDESC_MODE_BASIC;
++	else
++		*shrdesc = DEVLINK_ESWITCH_SHRDESC_MODE_NONE;
++
++	return 0;
++}
++
++int mlx5_devlink_eswitch_shrdesc_count_set(struct devlink *devlink, int count,
++					   struct netlink_ext_ack *extack)
++{
++	struct mlx5_eswitch *esw;
++	int err = 0;
++
++	esw = mlx5_devlink_eswitch_get(devlink);
++	if (IS_ERR(esw))
++		return PTR_ERR(esw);
++
++	down_write(&esw->mode_lock);
++	if (esw->mode != MLX5_ESWITCH_OFFLOADS) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Can't enable shared descriptors in legacy mode");
++		err = -EOPNOTSUPP;
++		goto out;
++	}
++	esw->params.shared_rx_ring_counts = count;
++out:
++	up_write(&esw->mode_lock);
++	return err;
++}
++
++int mlx5_devlink_eswitch_shrdesc_count_get(struct devlink *devlink, int *count)
++{
++	struct mlx5_eswitch *esw;
++
++	esw = mlx5_devlink_eswitch_get(devlink);
++	if (IS_ERR(esw))
++		return PTR_ERR(esw);
++
++	*count = esw->params.shared_rx_ring_counts;
++	return 0;
++}
++
+ static bool
+ mlx5_eswitch_vport_has_rep(const struct mlx5_eswitch *esw, u16 vport_num)
+ {
 -- 
 2.38.1
 
