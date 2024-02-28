@@ -1,152 +1,166 @@
-Return-Path: <netdev+bounces-75597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF2D986AA60
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:47:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 091C686AA63
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:48:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C36C1C21787
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:47:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8DBF1F2454B
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:48:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B892B2D056;
-	Wed, 28 Feb 2024 08:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C29AE2D604;
+	Wed, 28 Feb 2024 08:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="PhAJvBRV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dg0LetI4"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08992D046
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 08:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08D21F608
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 08:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709110049; cv=none; b=ab6hDWVicD7DmpL8a/JDpOThn5yPfd7FECpqHOWNHdP8x4gEFXkrXhUigWzNYLU5n+ZbGQQ9DqHicEnM6FTEQGBJC6VfZVd06zUgGr68SXZamf8dkR6VbYa5Qf/zjCBzxIjTWcNu/NkVQ3qtMIMA/6WS+NwQ7SNxmyuKGApZ9qY=
+	t=1709110104; cv=none; b=nDE8vXaA6VKRCrJ0ybJfZ8exA32bSfQeZ8gzMLKqRIFcRfopMrryeOOTCxpM3xZDbpJJKAfHP8Wx0m0QTNfL6v99mauXRypeLyjKbiaet6oRgFtJMZmAmNrdMTsJ6wV678MHJfpuxzWmh/vklIcKLsLDjwNVqysj+wJwN4XRnIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709110049; c=relaxed/simple;
-	bh=Z9/wdtQ1ru6upjNXGw5IuXg0cneKdPME8aRX7+WLIaA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l8bGYl7WN61KLtgRzlAryep7ooqOCogWsqMpsEqV86XL/DA1iHSXxcDOZVlyDdS2ob5Fef58ZA+J5eZXYt6SD9UmtZjYV1LtOUrKHaJQtzw/Nldkg6Oiu4wWbq3ZjV2j0pJHN6YUd0xNJvCQgbmz4NEsnXZr74cJi7AXaaBSTZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=PhAJvBRV; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id E07A987DC8;
-	Wed, 28 Feb 2024 09:47:19 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1709110040;
-	bh=JlgmBjz8gukCGiJ8CDDs8in+o5lRcWaw9kvgoBZtys4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PhAJvBRVXTpxrtMgo6G0bNZ7uEROXo7H7RQwh+Q8Jk50NLHRnBRPwmHPcNFpKhedC
-	 EOWiCBTGyBfuxH9hXDNIU99Ih3LrjmqUVzY93FTGAa2QsWNs7IkZF4YowUafrDno6M
-	 KN5h49PUhlvj1xUTYnTOe4rYz4KJNlmhb0QbTxSmu6f4tETmr/SBajOZw9ePjunWQB
-	 C/GB1keBDqST9nZSVAD7Y0zkowYLQz3GSFTF9ecxgIrv491VpQ9uZbon6Nhm2+4IEs
-	 B590H2OzSGt2j6TljFJylOGFxgZu7g/dbyzzjuMFW+nvLvO0cD9UYWRpwJVO8Vm20l
-	 XSxVjFyp+Sfzg==
-Date: Wed, 28 Feb 2024 09:47:13 +0100
-From: Lukasz Majewski <lukma@denx.de>
-To: Simon Horman <horms@kernel.org>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Florian Fainelli
- <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, Tristram.Ha@microchip.com, Sebastian Andrzej
- Siewior <bigeasy@linutronix.de>
-Subject: Re: [PATCH] net: hsr: Use correct offset for HSR TLV values in
- supervisory HSR frames
-Message-ID: <20240228094713.3c82b6a0@wsk>
-In-Reply-To: <20240227174935.GJ277116@kernel.org>
-References: <20240226152447.3439219-1-lukma@denx.de>
-	<20240227174935.GJ277116@kernel.org>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1709110104; c=relaxed/simple;
+	bh=c/lbvKiivAPjD0Mp3kf9YnP5KkMypKY04lHuqLtbkUM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CMUlMlXlZTznzp7gQTCbhmf1AqxDzXMxbS1tSLeoOgSVE7wCVig8USK97iFmY1Kv08G7rrjuUglQHu045lYAEY3epesMByeNZBaJKErxU4hqnOHSHqudBoOQbMDqm7TTuF439YiOnpzS8rXSIIYif1lDgArH8QTvmefOVM5pUlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dg0LetI4; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5654ef0c61fso10122a12.0
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 00:48:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709110101; x=1709714901; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LOHdb4gC52VDJXjDwJCJAgGjMtqm1gMwO+f40BDHTaw=;
+        b=dg0LetI4GImURkBNInhf7UKI4sbJF0LZqyrf5Scl5y3B8dWIghsoBmvvh3QxR7Pvqc
+         pRN3vJL2bLXT6bDKpN7s7j50rqnTMgo2J9DVOzwApVT2QYlR+Q7n7iG2kRpGC0zDP8fU
+         jWKUZ87U4vjc2x87d46GbpTfeIc+navgVcc09LSsW900dhKnjENgeBo31An85tDx2s+Y
+         qbRoy/JqLSPp6iDx9THFCqAkN8lcHydWZR3UXYbpxk5R8a+orbMPsmT7WX/CoxgU8Ley
+         3aEBheZA3s25BNHj9iqL18WFSIWd8qWKrpzrMXFJsESx14Wf08MBriCiFp7Ac5wTUwqf
+         gbaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709110101; x=1709714901;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LOHdb4gC52VDJXjDwJCJAgGjMtqm1gMwO+f40BDHTaw=;
+        b=gfG2jyuI+YTJQ0sWSuDAC/R82lrGEYo7d6ijpmslxzsjEbXUgAj6nzBVTD0vybGS9n
+         0Gf2vx5Cr+wRxYy8dSAAiY1siKa/EtPO5BN8ZMjZVM9Fx2WgB3jLKSTHuCCpkp/qy9rR
+         KQR4CEDeQ7uj9k/KiMbJWuPQnkmvuGZeI90P4+H6c7lOuotsn5yirGpID/OT6kZlUhur
+         HzwG3ANE0N5Up4aZzjK2LFUYvCfkJua5PICDt2Z4+r6DDM7I4vGMvrcLXvHjv/mHdX0v
+         JrH3KPbbc/RZMA+qZG0ATxOOOjVHeHBrnli2Qt1MrkREc0i3eZky3Xr5+D115OTuQwUF
+         yaBA==
+X-Forwarded-Encrypted: i=1; AJvYcCWwxg8aNoYzkXoCSzLmiln7Jy6waUllju7/0++2F/FcTFqQ//2BJ0iaPaLC55MJirt2fS7zgWSzjblktttrHD0ZkX6orpcP
+X-Gm-Message-State: AOJu0YwtAL1kwDvJPrGWabUcam3KQUFUOui8AGDN3C+PAZGrWhz8KL9/
+	d5+EDNWO9S19wZKNQH+IZtqstAi+QKvUN72z+iwaDC1ZD1DE42dHfMv7wCA3Bwg2D/vTzzS7vfH
+	oZQlCZccAM5G9nf81YoEAA2dQpMF6YudNdwol
+X-Google-Smtp-Source: AGHT+IF/5h+WUoGX3+I8PwNwD6dhZfIcRNEEBiiSwHrJF/F4geD/nGTDRoUtYBissdQeflMfQZ00OnScf+6jsdjEcv8=
+X-Received: by 2002:a50:9f89:0:b0:55f:8851:d03b with SMTP id
+ c9-20020a509f89000000b0055f8851d03bmr35131edf.5.1709110101052; Wed, 28 Feb
+ 2024 00:48:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/ldfn9Hb.1cDWZBRIkhbxHdF";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-
---Sig_/ldfn9Hb.1cDWZBRIkhbxHdF
-Content-Type: text/plain; charset=US-ASCII
+References: <CALkn8kLOozs5UO52SQa9PR-CiKx_mqW8VF9US94qN+ixyqnkdQ@mail.gmail.com>
+In-Reply-To: <CALkn8kLOozs5UO52SQa9PR-CiKx_mqW8VF9US94qN+ixyqnkdQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 28 Feb 2024 09:48:09 +0100
+Message-ID: <CANn89iLH5+KryWa3GMs-Fz+sdy9Qs7kJqfBwf0229iwgW65Hxg@mail.gmail.com>
+Subject: Re: Network performance regression in Linux kernel 6.6 for small
+ socket size test cases
+To: Abdul Anshad Azeez <abdul-anshad.azeez@broadcom.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, 
+	dsahern@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Boon Ang <boon.ang@broadcom.com>, John Savanyo <john.savanyo@broadcom.com>, 
+	Peter Jonasson <peter.jonasson@broadcom.com>, Rajender M <rajender.m@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Simon,
+On Wed, Feb 28, 2024 at 7:43=E2=80=AFAM Abdul Anshad Azeez
+<abdul-anshad.azeez@broadcom.com> wrote:
+>
+> During performance regression workload execution of the Linux
+> kernel we observed up to 30% performance decrease in a specific networkin=
+g
+> workload on the 6.6 kernel compared to 6.5 (details below). The regressio=
+n is
+> reproducible in both Linux VMs running on ESXi and bare metal Linux.
+>
+> Workload details:
+>
+> Benchmark - Netperf TCP_STREAM
+> Socket buffer size - 8K
+> Message size - 256B
+> MTU - 1500B
+> Socket option - TCP_NODELAY
+> # of STREAMs - 32
+> Direction - Uni-Directional Receive
+> Duration - 60 Seconds
+> NIC - Mellanox Technologies ConnectX-6 Dx EN 100G
+> Server Config - Intel(R) Xeon(R) Gold 6348 CPU @ 2.60GHz & 512G Memory
+>
+> Bisect between 6.5 and 6.6 kernel concluded that this regression originat=
+ed
+> from the below commit:
+>
+> commit - dfa2f0483360d4d6f2324405464c9f281156bd87 (tcp: get rid of
+> sysctl_tcp_adv_win_scale)
+> Author - Eric Dumazet <edumazet@google.com>
+> Link -
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit=
+/?id=3D
+> dfa2f0483360d4d6f2324405464c9f281156bd87
+>
+> Performance data for (Linux VM on ESXi):
+> Test case - TCP_STREAM_RECV Throughput in Gbps
+> (for different socket buffer sizes and with constant message size - 256B)=
+:
+>
+> Socket buffer size - [LK6.5 vs LK6.6]
+> 8K - [8.4 vs 5.9 Gbps]
+> 16K - [13.4 vs 10.6 Gbps]
+> 32K - [19.1 vs 16.3 Gbps]
+> 64K - [19.6 vs 19.7 Gbps]
+> Autotune - [19.7 vs 19.6 Gbps]
+>
+> From the above performance data, we can infer that:
+> * Regression is specific to lower fixed socket buffer sizes (8K, 16K & 32=
+K).
+> * Increasing the socket buffer size gradually decreases the throughput im=
+pact.
+> * Performance is equal for higher fixed socket size (64K) and Autotune so=
+cket
+> tests.
+>
+> We would like to know if there are any opportunities for optimization in
+> the test cases with small socket sizes.
+>
 
-> On Mon, Feb 26, 2024 at 04:24:47PM +0100, Lukasz Majewski wrote:
-> > Current HSR implementation uses following supervisory frame (even
-> > for HSRv1 the HSR tag is not is not present):
-> >=20
-> > 00000000: 01 15 4e 00 01 2d XX YY ZZ 94 77 10 88 fb 00 01
-> > 00000010: 7e 1c 17 06 XX YY ZZ 94 77 10 1e 06 XX YY ZZ 94
-> > 00000020: 77 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> > 00000030: 00 00 00 00 00 00 00 00 00 00 00 00
-> >=20
-> > The current code adds extra two bytes (i.e. sizeof(struct
-> > hsr_sup_tlv)) when offset for skb_pull() is calculated.
-> > This is wrong, as both 'struct hsrv1_ethhdr_sp' and
-> > 'hsrv0_ethhdr_sp' already have 'struct hsr_sup_tag' defined in
-> > them, so there is no need for adding extra two bytes.
-> >=20
-> > This code was working correctly as with no RedBox support, the
-> > check for HSR_TLV_EOT (0x00) was off by two bytes, which were
-> > corresponding to zeroed padded bytes for minimal packet size.
-> >=20
-> > Fixes: f43200a2c98b ("net: hsr: Provide RedBox support") =20
->=20
-> Hi Lukasz,
->=20
-> The commit cited above does seem to be present in net or net-next.
-> Perhaps the tag should be:
->=20
->    Fixes: eafaa88b3eb7 ("net: hsr: Add support for redbox supervision
-> frames")
+Sure, I would suggest not setting small SO_RCVBUF values in 2024,
+or you get what you ask for (going back to old TCP performance of year 2010=
+ )
 
-Thanks for spotting it - I must have overlook it when preparing the
-commit message.
+Back in 2018, we set tcp_rmem[1] to 131072 for a good reason.
 
->=20
-> >=20
-> > Signed-off-by: Lukasz Majewski <lukma@denx.de> =20
->=20
-> ...
+commit a337531b942bd8a03e7052444d7e36972aac2d92
+Author: Yuchung Cheng <ycheng@google.com>
+Date:   Thu Sep 27 11:21:19 2018 -0700
+
+    tcp: up initial rmem to 128KB and SYN rwin to around 64KB
 
 
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/ldfn9Hb.1cDWZBRIkhbxHdF
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmXe8xEACgkQAR8vZIA0
-zr0cGQgAhp+BHfbGgYVu3Zkki8LeZ+fs1PQDaMlllwt9FgjsxDAXYU6pUn+MYKZj
-n4XA9bsOKkx+K7DcPkesajJ310P0Cyl4dyuXxEGwzNrgRMD0AxlqqAtqyBp6YqUJ
-UP3EUw10/Gn8NPZmeGifvWMJQe0bufmX5rEpKflXLumqBiu7bv1P7rIbv73SjEil
-Mf00+a5ZVNC9MoRJsmkG7tutWB4N+oWTc85gaU3dFojZX76e6I6CH7W7p9/E5tmf
-3EPIhoVDRNzHcm2lChFAA09Mfkx6NRNo7tdK8436egnloHWIVsUKmmNJX1mTwdpA
-G5TNLqlK+sQv4gM7VA0tGAdBoG4mhQ==
-=LGwq
------END PGP SIGNATURE-----
-
---Sig_/ldfn9Hb.1cDWZBRIkhbxHdF--
+I can not enforce a minimum in SO_RCVBUF (other than the small one added in
+commit eea86af6b1e18d6fa8dc959e3ddc0100f27aff9f     ("net: sock: adapt
+SOCK_MIN_RCVBUF and SOCK_MIN_SNDBUF"))
+otherwise many test programs will break, expecting to set a low value.
 
