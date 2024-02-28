@@ -1,113 +1,85 @@
-Return-Path: <netdev+bounces-75830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B88D986B4E9
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:28:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43B8886B4EE
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:29:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 726AD28DED2
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:28:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D79CB1F23B2D
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:29:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6634A6EEFE;
-	Wed, 28 Feb 2024 16:28:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378536EF0C;
+	Wed, 28 Feb 2024 16:29:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nhtfm+mL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DaFnKqdy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77EA6EEEC;
-	Wed, 28 Feb 2024 16:28:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8936EEEC
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 16:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709137713; cv=none; b=RzwllKGV9lzhhDnkgjrz5K89zvj2A1oprPokbtjCp8zOx1vnKx2EU/C12XKYqYMbidobU2kEU5MgQANrD/zyQCb0rXU0XsoWOEg0FtpbDqWt2C/aNJTJRMG0i6Z7SuxE4OC4Do1ftgMvB5dVBGDPqJWqt3gDhXA/4w4aPnHsIF4=
+	t=1709137755; cv=none; b=SiWclvSPQFeTF47UUJ0z8Bdkhpj+ZWWTFHbyY+xPRve2jOAp806wNuUdiUKOk0U5evHLHVBjoqkTRpBVAnIWY7xLyYWiJnnyxCp8zIyt/j4BQM14R1agARI+pZEW6u131d0Lmi+PSDvHoyrsmCtQXVrsgZWHqeFHukGFY2RVUWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709137713; c=relaxed/simple;
-	bh=rzJSJkva3PtBW+oA0aOjMOzhlLevnC0c9zdiruimJy8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JpDIyQF0UoYfyoUNhCRUbKAQJlmnPmAh2aNXgEO5H5lSvaOfaHEHkokxzEXyNSkyj6cFBLIfQGb+hyCSCmM2/NYwrQu4Vjl6OR8Mp6wJ7b7uEXykCtQnQ96hTIXnoP2X7NLi4/frTvlKZUd7FT990ELsegtBpC6RtRjK/2I8apw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nhtfm+mL; arc=none smtp.client-ip=209.85.128.169
+	s=arc-20240116; t=1709137755; c=relaxed/simple;
+	bh=XNaimSICo9rFgu5GrgmXjrMWgcC6FxIHRsG01VFJsXA=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=TPX/mXNNkjAR4iIyD9QmEuKoohKeL3e2PWRtKzjiKN/JqO6SQhg3VdNJQLuPP/7hodjoBIU4vpt8X5Ova9iBSx5NBeLSV1f/xlTCtknm35PQK9waQ6qB+0skERgn6f8hFQtj7bts2Z+m1AyH9qfWnxtKsjpb/5IUNZsLJcN/FPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DaFnKqdy; arc=none smtp.client-ip=209.85.208.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-60908e5fb9eso36713037b3.2;
-        Wed, 28 Feb 2024 08:28:31 -0800 (PST)
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-563c595f968so7591890a12.0
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 08:29:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709137711; x=1709742511; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J9xXOsuu/zrmE8tx8GTKpJgtMByVr0NI+8cB4bxXCLw=;
-        b=nhtfm+mLR7XXUMae7YnmQ/wbUlmleogyBvYN0su8bpt8BUyeM853aycc1bpuoypPZy
-         pxS4xUgS8+ZoGmO1XPjRzdTOWcY57oyoiQuAUeUEWmotZJHLYAW4VeGAhkdAujV2gTEV
-         862ir61rpgbtVf9whYpJPzig4jP9wicCrETG+Kh/eblGp+j7tbkTlwLltw9SnqOSepX2
-         EcuovhYcDG1KLPr3UM6JhjLdvJO5MW3GaYUTXrpunScQpEaMaoGNzwB94RHjr+68pIa7
-         nNRKwcNIrDXYfo7DvwKrxcRW9LJZtCuF03KUrXg5zaAZeDNa8758zhMutVLBcMP3+BOH
-         JXMA==
+        d=gmail.com; s=20230601; t=1709137752; x=1709742552; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XNaimSICo9rFgu5GrgmXjrMWgcC6FxIHRsG01VFJsXA=;
+        b=DaFnKqdyKg0rrUQJVxBE5RWWbPmgR/k6OcrjIxyY8koPao1mQHzhyK16kYDdpEiLvK
+         UE+P+KasFFfQr3jiOdia3NLhvSyrN6K3jTubAewTgnXbUBQqoZ6eb5M2/m212QuyxUIT
+         m22ee0R0WCLXZFIIFHg0Y74iYtkLt3r9tBdA2C6LmGys9askVZGoNjl36R6twWd0CJvQ
+         dpOl7h+OZiswoTzSRIlI876/CFYSknyz4SuJxr6Q1atay9Il0Gue7U/EvgiDabBdHBpM
+         U3oIVf0mgJChthY2HFeZi0xjIet+EIKAOAa9VZEaHkQOvE/NEuJ1XbFxjjLI1pVjTNuu
+         b+gA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709137711; x=1709742511;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J9xXOsuu/zrmE8tx8GTKpJgtMByVr0NI+8cB4bxXCLw=;
-        b=A0/MaZHJRzztbtp0cR9dhD8BOrl4K+XdPq9ouBypnJydYOn+vLDt471jNsHTIn/EzC
-         na6AfczSUqaoDKrBiezXhnZyllnQiWXFB4AEznKhEPNFi6iEykBAFxDCEBUxsdfAIkEY
-         M5/4PdFChr+xTq6zSstGOivRk6O81qmfRFZplSA2EYxK+vgwC9fr7TxNIz3CdbPZglvO
-         gAfFWnf+H0uGfWAshqqS16Sl1DuGQf5LQ+19nHTMNO6hbh7KIvI4y3D9IFr8O69Cv0fs
-         lLMkXZqDRIRXMlWTmTC/q12tVBp2xjVDuGVgXJePTflJpE10QeJgj7gKazHFhJRBtOKb
-         P/Xg==
-X-Forwarded-Encrypted: i=1; AJvYcCWijixBnxXQ0gtD+w06ZUmYvD4nYWFkonjQgWbliDqe0pu/+lHJaZJPpCafFtnJHqPiPcOD5jF0RXN4fWr5/MlQLNgcARIlb5HSjsxjbk6Q9Mx4dOvJsi6xCcYdPCUm1tefR3K3P+NOfR+9xupoiFdMXjRrhcNEyPVu+huOvLb6QXXww8uBmMM5vGiz1+EVxGjxQIEltzA5bpaunGVm
-X-Gm-Message-State: AOJu0YwpLHh/6Ql+UcQ5tfyBsYYmJihh7LbnFVxJl6Il4UgYESq5BcVF
-	PFtXW+jAxcr+wu1y7KcMsv0J0zAw4ne7JtNCQ//H4WhPsfoWqx3b
-X-Google-Smtp-Source: AGHT+IF7XbBhR5dwgNTUI3cgJlRp6cCPJaEGoJEGT6h5P61G+BSbNJ3st82/ffk1EVnm0MCnhDNYjg==
-X-Received: by 2002:a81:e70c:0:b0:609:24ff:bf5b with SMTP id x12-20020a81e70c000000b0060924ffbf5bmr5536903ywl.22.1709137710910;
-        Wed, 28 Feb 2024 08:28:30 -0800 (PST)
-Received: from localhost ([2601:344:8301:57f0:2256:57ae:919c:373f])
-        by smtp.gmail.com with ESMTPSA id x6-20020a818706000000b0060499d3a893sm2464776ywf.116.2024.02.28.08.28.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 08:28:30 -0800 (PST)
-Date: Wed, 28 Feb 2024 08:28:29 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Alexander Potapenko <glider@google.com>,
-	Jiri Pirko <jiri@resnulli.us>, Ido Schimmel <idosch@nvidia.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Simon Horman <horms@kernel.org>, linux-btrfs@vger.kernel.org,
-	dm-devel@redhat.com, ntfs3@lists.linux.dev,
-	linux-s390@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 11/21] tools: move alignment-related macros
- to new <linux/align.h>
-Message-ID: <Zd9fLYP0uzqqwOdO@yury-ThinkPad>
-References: <20240201122216.2634007-1-aleksander.lobakin@intel.com>
- <20240201122216.2634007-12-aleksander.lobakin@intel.com>
+        d=1e100.net; s=20230601; t=1709137752; x=1709742552;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XNaimSICo9rFgu5GrgmXjrMWgcC6FxIHRsG01VFJsXA=;
+        b=uq/dDMc1VfLj3kRtk/ByICg7g7OUQNtYM9DZqQqMzk/IKawT2OMp9jU2UtUtzj2K/w
+         FkMpp37TVu7RtncGmzpA9cKSf9yRxNldf9uuVA2mlRPnStozKJDK0Nq6y/XhY+5s9SKL
+         EV0yp7s6LQ2EH2TV48oeO/TH3eXqhUXM7I+p0Vwhn4LdJ1eSyWt0d328movjRA+U6WYr
+         HbHd3RD5VRLYAY48Y2/BL420G86BHdwscj92XHfeiQ5xcEI7L8FUjYrFd1FVshAbDnyc
+         vancaFxbAnERtWWnJwJNW0RmCFPVPXMSFAuERRcDPvhWSMG2NLMBh3Gh1Ms9JJ7u3Rwm
+         OYLg==
+X-Gm-Message-State: AOJu0YyH3bmYxKsgnT/4oB8c1ywjzX2o3uWAmdT8qIP2VUQI9onnnBZ8
+	29mhqZPbj0H2idHrGfXf/OPVUdbmU1Vwcyy4m/gR2xglboCEwSkdP72wL0T4tDtLyXjfI3dU411
+	eiJtE79w99YahsAUW30bz88WkU5vS7jvl00o=
+X-Google-Smtp-Source: AGHT+IHgTP7EP8goG29ULOUNcznpObCJKmD2o86G6ei75cjZGLZD7oGuilyjn+WOzs8RiOCVtKRdaE0FWv1UNHwQ/E4=
+X-Received: by 2002:a17:906:48d7:b0:a43:553c:ea4f with SMTP id
+ d23-20020a17090648d700b00a43553cea4fmr128424ejt.23.1709137751554; Wed, 28 Feb
+ 2024 08:29:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240201122216.2634007-12-aleksander.lobakin@intel.com>
+From: Patryk <pbiel7@gmail.com>
+Date: Wed, 28 Feb 2024 17:29:00 +0100
+Message-ID: <CA+DkFDZPdS+r0vdFp0EU_xh=05gu5VuqOrT7G_Nj5gdjM8OOcg@mail.gmail.com>
+Subject: Question regarding handling PHY
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Feb 01, 2024 at 01:22:06PM +0100, Alexander Lobakin wrote:
-> Currently, tools have *ALIGN*() macros scattered across the unrelated
-> headers, as there are only 3 of them and they were added separately
-> each time on an as-needed basis.
-> Anyway, let's make it more consistent with the kernel headers and allow
-> using those macros outside of the mentioned headers. Create
-> <linux/align.h> inside the tools/ folder and include it where needed.
-> 
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Hi, I've got a question regarding phy drivers. Supposed that I want to
+use an ethernet phy device - in general - do I need a specific driver
+to handle this, or is it handled by some generic eth phy layer that
+can configure (through MDIO) and exchange data (through XMII) in a
+generic, vendor-agnostic way?
 
-Reviewed-by: Yury Norov <yury.norov@gmail.com>
+Best regards
+Patryk
 
