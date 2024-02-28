@@ -1,123 +1,133 @@
-Return-Path: <netdev+bounces-75615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B234386AAEF
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 10:09:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12B4286AB29
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 10:28:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B219282BF9
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:09:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF39E286167
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D93192E419;
-	Wed, 28 Feb 2024 09:09:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F328A33998;
+	Wed, 28 Feb 2024 09:28:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="1bRsgAC9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dAuAuecE"
 X-Original-To: netdev@vger.kernel.org
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD322D605;
-	Wed, 28 Feb 2024 09:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7B82EAE6
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 09:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709111362; cv=none; b=GjnIX77xJnqmLr92F3b6Y6/wJwd6p46psDu/oCVxdp8jagiX3Qz8grtAtLWBIJg+SlrWUN+TRuE0RZaUpkvDfzZI4x/hlSsk0YzRT/1ejnG9A6OvK5fuK4kQ70Uf6zqAn5311NjWY7ZZDbQ6NFun33CBZn0i5YsQTKM1ZTVxYPM=
+	t=1709112525; cv=none; b=FCL981oUiKOJc6cWnr3QQFcJPTeY/jd6Wjtp468H5ScCm+VURom3U6B9ifPPTQppbPBCVrpNCSZ8YyiVFAMIvebtB26IXHF/nJ1lhmpGp59bzslk9zUVnpCY8Q+XOcFA33couThS//sOuB1Mru2LivFZGTLOkIHZHuDlcBn1N2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709111362; c=relaxed/simple;
-	bh=PUo2nuzZfsQJk0wJ4A+TlJb/U4OyoYIe7zyKbRAH2j4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K1Y8Beuc0eTpAMGK5HTPLKHAbMUiBUk8ON3pc5fCBJ4RiKq5UZNxMthQQjWrWNfGhqQuY1G0nv18t/gRCjZMiRbhbmPqa4Lm/hWJH3d4S7VYFLZnx/0PP/w6Tz6SI3TAwZ6Getnm80l5KRgtXletTU6vJ4srhUXPn8Oddo7OUfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=1bRsgAC9; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	In-Reply-To:References; bh=ihAIQavaiuL126frFYxJ2J//2OLR+lm4YBVeYk3AGSM=;
-	t=1709111360; x=1709543360; b=1bRsgAC9aFQOu7f+zrKhF6ecB+vT/g0rBKrFwDzkiwF8xBq
-	r/1azdWzS8Hty/lYbMLJQRjpzzoUuJeSTffY2qXP4HXh2xp1e/IM6237DNyXrrngrjR+nx6vvjQcm
-	+kT/dOWJ9Vdh0Xrwyax3rwWIvm2gFESE40axQjup2ZMu884BAya6stNJ7iU6WJ3FLkow78dsr43he
-	GVpvc60ksZuimeTyd637NppIm/MVtUzWW7J2e0tUfvrFrVAH90LcFKy96xpocrDO4685hmUAh168C
-	TfhwXE7/ssFH/3pL2bHPv1wQcYzySTu0R3JEI7VAUUAA34m+Ke3Yi3Xy1oDiy7fQ==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1rfFw5-0000L9-8a; Wed, 28 Feb 2024 10:09:09 +0100
-Message-ID: <8015b1f0-d37b-45de-bd24-12fc21cbf83d@leemhuis.info>
-Date: Wed, 28 Feb 2024 10:09:08 +0100
+	s=arc-20240116; t=1709112525; c=relaxed/simple;
+	bh=vM25Sn00GES493f3CVIVorpnKEqNDbgsBn1rAzLnBRc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gT5dC/8h0a9qnJVswRhweQNjuoUeqZX3jKmwO4mmQwPmV0JU5PiqG9Xev7JbMA1maY0fe/EajfT6b+JVzo0/h3Jo+ptwoJwJSLVv4cRI+I9v7fCOKzqpdCgq9sDMIfXXTzjLrpqBAA7gg3olM4HVkdYL+YSmQSICLakSsJI3FAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dAuAuecE; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5654ef0c61fso10476a12.0
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 01:28:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709112522; x=1709717322; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PmGSAPwKHno/gXEojIx4FGx/OPgjQkEiVnRDIOYk90Q=;
+        b=dAuAuecEXOM5DgvXl1DAhbyvyss2LRt/6l0dcBKqiA6mA2+07U1yA4URURdFXiG6N0
+         rcZmT62CzkoONBRc2E+KoyaFM87eYK5qYyEZtHWALx1onyCVNgQYydvN8HYL/L+kZvdb
+         327LtN1tYsTqimb4lgdkwY7y8Csqm9+/wnTWH1l/JQ5T07sC0CiIIHs2DyqCD3C92YBi
+         Hq0Xa8MLd3nmGbA7838SfkLzboXqNjJ4DZI46upa2vD/cphHStG4gIfHISEK/He/Kn5N
+         NWurqw9WWfn4ZGrnxaFZeucupsu/DgYZaTEClKqTXFiAOUf7oXPMwRNnYRI2PcB/PIy5
+         Iqyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709112522; x=1709717322;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PmGSAPwKHno/gXEojIx4FGx/OPgjQkEiVnRDIOYk90Q=;
+        b=le9khlF9OEGsdrFqLg+mD3u/WqUsJ5dckmLx9sr4cZmIR14+JO3eBdURo2QClLq8KM
+         4uNb8Ypwxt8TlMFzJI8NYy3aYeoOoFRY8qSm6M771FKmPAivMgPssh32O4wvCPb7jeUr
+         bTNFbfZECC+mB+Nqm3+JDPF0aJX0uZPAoMLD7fy8iwdHg4YmG508LJZq2VmPppopOY3X
+         7CvE2et5MZrLfz53DaUHegnuaY+kb0gMaLh8RhHU5KXvwWBo1+hBbaqhwOu8/msuVGsb
+         hJ2n5bZ+jGnZa9d2zdFpilkfVThxTsteOLdcr1QUZPBnPMcI7OVEJZW7fMw/3cWKOVvp
+         eTMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXsr9yTfKyWZS8TJAlzyaNIE6ixjfJsRQ0McBnKXNkvzlOK4WnFStz6d9lOQC61/OP4y/OeMvAEPejL3rmOV4dudaIofnT3
+X-Gm-Message-State: AOJu0YwTkcPeajo6hmxfPlT+jPdPEgzDkeeNmrRnZX7kaKdC82eyTeai
+	Kb9f+DTXpMQKs+lCxGG72vf64J5cipct9QOdcs6SFkTBlDYrK6/oMkQPHEai88G5/1mzDL3fBtY
+	rEmjsnN1f9SmJsx0a7g1ks4yC5wcKB49qdDYEhVZzEdguU5Hma6k2
+X-Google-Smtp-Source: AGHT+IEwenSzycenMhnI1BztlSoSzPOKV/8W7t/ramLMrvicv8hj+V7CvaNDzt75W/70sLfZHelGZep+6MEyKsGFq+A=
+X-Received: by 2002:a50:9343:0:b0:565:4f70:6ed with SMTP id
+ n3-20020a509343000000b005654f7006edmr40551eda.6.1709112522375; Wed, 28 Feb
+ 2024 01:28:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Network performance regression in Linux kernel 6.6 for small
- socket size test cases
-Content-Language: en-US, de-DE
-To: Bagas Sanjaya <bagasdotme@gmail.com>,
- Abdul Anshad Azeez <abdul-anshad.azeez@broadcom.com>, edumazet@google.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
- dsahern@kernel.org, Linux Networking <netdev@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>
-Cc: Boon Ang <boon.ang@broadcom.com>, John Savanyo
- <john.savanyo@broadcom.com>, Peter Jonasson <peter.jonasson@broadcom.com>,
- Rajender M <rajender.m@broadcom.com>
-References: <CALkn8kLOozs5UO52SQa9PR-CiKx_mqW8VF9US94qN+ixyqnkdQ@mail.gmail.com>
- <Zd7vqSnT6ocYLuZ4@archie.me>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <Zd7vqSnT6ocYLuZ4@archie.me>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1709111360;82913b45;
-X-HE-SMSGID: 1rfFw5-0000L9-8a
+References: <20240227150200.2814664-1-edumazet@google.com> <20240227150200.2814664-4-edumazet@google.com>
+ <20240227185157.37355343@kernel.org> <CANn89iLwcd=Gp7X7DKsw+kG2FHA1PzwG3Up8Tb2wjA=Bz94Oxg@mail.gmail.com>
+In-Reply-To: <CANn89iLwcd=Gp7X7DKsw+kG2FHA1PzwG3Up8Tb2wjA=Bz94Oxg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 28 Feb 2024 10:28:28 +0100
+Message-ID: <CANn89iLefNuOXBdf2Cg8SbwAXCm=X+qZ-Cqkx8CQ=vESv-LYSg@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 03/15] ipv6: addrconf_disable_ipv6() optimizations
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	David Ahern <dsahern@kernel.org>, Jiri Pirko <jiri@nvidia.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 28.02.24 09:32, Bagas Sanjaya wrote:
-> [also Cc: regressions ML]
-> 
-> On Wed, Feb 28, 2024 at 12:13:27PM +0530, Abdul Anshad Azeez wrote:
->> During performance regression workload execution of the Linux
->> kernel we observed up to 30% performance decrease in a specific networking
->> workload on the 6.6 kernel compared to 6.5 (details below). The regression is
->> reproducible in both Linux VMs running on ESXi and bare metal Linux.
->>
->> [...]
->>
->> We would like to know if there are any opportunities for optimization in
->> the test cases with small socket sizes.
-> 
-> Can you verify the regression on current mainline (v6.8-rc6)?
+On Wed, Feb 28, 2024 at 9:51=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Wed, Feb 28, 2024 at 3:52=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > On Tue, 27 Feb 2024 15:01:48 +0000 Eric Dumazet wrote:
+> > > +     if (p =3D=3D &net->ipv6.devconf_dflt->disable_ipv6) {
+> > > +             WRITE_ONCE(*p, newf);
+> > > +             return 0;
+> > > +     }
+> > > +
+> > >       if (!rtnl_trylock())
+> > >               return restart_syscall();
+> > >
+> > > -     net =3D (struct net *)table->extra2;
+> > >       old =3D *p;
+> > >       WRITE_ONCE(*p, newf);
+> > >
+> > > -     if (p =3D=3D &net->ipv6.devconf_dflt->disable_ipv6) {
+> > > -             rtnl_unlock();
+> > > -             return 0;
+> > > -     }
+> > > -
+> > > -     if (p =3D=3D &net->ipv6.devconf_all->disable_ipv6) {
+> > > -             WRITE_ONCE(net->ipv6.devconf_dflt->disable_ipv6, newf);
+> >
+> > Why is this line going away? We pulled up the handling of devconf_all
+> > not devconf_dflt
+> >
+>
+> Good catch, I simply misread the line.
 
-Bagas, I know that you are trying to help, but this is not helpful at
-all (and indirectly puts regression tracking and the kernel development
-community into a bad light).
+I note that addrconf_disable_policy() does not have a similar write.
 
-Asking that question can be the right thing sometimes, for example in a
-bugzilla ticket where the reporter is clearly reporting their first bug.
-But the quoted report above clearly does not fall into that category for
-various obvious reasons.
+When writing on net->ipv6.devconf_all->disable_policy, we loop over all ide=
+v
+to call addrconf_disable_policy_idev(),
+but we do _not_ change net->ipv6.devconf_dflt->disable_policy
 
-If you want to ensure that reports like that are acted upon, wait at
-least two or three work days and see if there is a reply from a
-developer. In case there is none (which happens, but I assume for a bug
-report like this is likely rare) prodding a bit can be okay. But even
-then you definitely want to use a more friendly tone. Maybe something
-like "None of the developers reacted yet; maybe none of them bothered to
-take a closer look because it's unclear if the problem still happens
-with the latest code. You thus might want to verify and report back if
-the problem happens with latest mainline, maybe then someone will take a
-closer look".
+This seems quite strange we change net->ipv6.devconf_dflt->disable_ipv6 whe=
+n
+user only wanted to change net->ipv6.devconf_all->disable_policy
 
-Okay, that has way too many "maybe" in it, but I'm sure you'll get the
-idea. :-D
-
-Ciao, Thorsten
-
-
-
+Oh well.
 
