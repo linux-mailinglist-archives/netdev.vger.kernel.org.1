@@ -1,155 +1,148 @@
-Return-Path: <netdev+bounces-75778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A83086B27D
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:57:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B994786B272
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:55:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 553B81C254C5
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:56:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23964288C22
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:54:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E9E15A4A5;
-	Wed, 28 Feb 2024 14:56:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GQXsno1K"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0E8A15B967;
+	Wed, 28 Feb 2024 14:54:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991CA159580;
-	Wed, 28 Feb 2024 14:56:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804D215B11F;
+	Wed, 28 Feb 2024 14:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709132209; cv=none; b=RZbWxSVbZ69n8Dt58ZDHkK3yK4zPc+1hldJXsdR0XlcKzgUlIO4TEDkOQuKAErJojLPHgT912rrhnBI1MHhoSf8MMtn0FPx00WZ29FEjD1qU6H2aWOnPBGY0tdpSvRcZthPwqUs0UgDuBzB4NAgB121CCRI3CWjP0FM6G75UFUY=
+	t=1709132086; cv=none; b=HVAgoXsERvjHbvIsUY/fduWrUbB/rPMjcafiEuLnFKir+arxo5sFXdcH8nKRih38IMM6R6rJXzzj1Ou0oYz8ypKB9RAyegvJKo8sybeFAB8VbrovTgO8u4WD4Qy0dxoq6N+drJ4Ji3t1T8U8USAH2IbG5OP/7U3cSr5pt3GQuPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709132209; c=relaxed/simple;
-	bh=LFtt6jYH550GfjfnHy2suFQlJmGNsclLpKkLfTltmdc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bMxqrBSd+tTNR9cQVk4V8Yx70eYqnw52Rbe+xYzNUd4+SyuZqebFgWegrKTdSqpuMRJQkjbHxTFvG1wYpnUySnY07QG9pcE3U5jDQSVndLSSzxXSECiDG9U+XhKXXabgTIP/gNnWPQU2DxY4PA9sAv+99l8RiUO03Ue72dCkNkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GQXsno1K; arc=none smtp.client-ip=209.85.222.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-7d5bbbe57b9so2639751241.3;
-        Wed, 28 Feb 2024 06:56:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709132206; x=1709737006; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XK6G9YO0V0Qe0S9grj3xZi7Ihi03g6FojMFTZREVg04=;
-        b=GQXsno1KtJZQU+n60DboSR8Wz1WlCvJ+tL8pWpvBcjThjvsif1ZqWUc3lB7lkxSiBO
-         mo4YJY9k6WhwowMBPTq4PfMTnYd391sK+lRbM6f+9wsqE7/QrYahPeHe26L7tmyog/1/
-         7mhPRihGf1zOHKUKFOOLJRzYr3PdtNqgdnWnd1UFKWqTHySQS1CkILjjm+NQKoLDExZ0
-         Fd7HfpfcOClZBOKc4HfAbDcLSSwDL7mIHiypEld0LNO0rFHj5VZRfg8mt7ZorelqId2p
-         of4RVC8eicgXm+izNYrLf3M+LV08PsHZ+58wP5PQ+tumVEXJIHOH2YrHk3FMt4gVL1+O
-         GoGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709132206; x=1709737006;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XK6G9YO0V0Qe0S9grj3xZi7Ihi03g6FojMFTZREVg04=;
-        b=T1R+E12klTTFYfwNNzVl4kJQc6ucT8UIRicrXjOgVbwYxpVF1SEmQGNBJQLrBJ1kiD
-         cm1s8bbuwZfAtcdpCRowksd2oqryyE/dBIHqOtPRcI8OZJ9pyX1wbwVKMFTs8Hc2CdQ8
-         hu6Pi/9aRaAFIhPH1a+iCxB3RkO72MyUbMBVybEEdJZPfK5q6w3A8+Tfb+5fcLTGMWQd
-         q92DrfMkzPAtxOMrWKQVmKNCVhKLMz5S3uidDmE0ih9AvP28mjBgcAvwOf4PjXrvw+/Y
-         q53mRRJpWIj6no+hwDlxyPnpVQO41AN5CAaFPIXZyJsjOrspxniSz0RbRuT/5biCQUvc
-         h7yw==
-X-Forwarded-Encrypted: i=1; AJvYcCWmxoFRMPvCICU6SITDVZBrnIJq1QT9OrtawVf5oBnHNyjEvOm8v29zaocWJ0nFfUVioyx0u0/AKyvlm+wGtx1XmisYcSnv
-X-Gm-Message-State: AOJu0Yy4lg10PTSdLpYojPTah8BuAHCbRNoDqt13ZPS8EVgiKrpQ5yCn
-	3UjoIS4zgrGu9XAp+0fjNMDeeDR5A0gxS0RBsLdpLek0DkleFqon
-X-Google-Smtp-Source: AGHT+IFzia7gk+Ocdm2vnl3M/Jkb3TLv9DiLZswmEV4nYrDwwVfvu3tG1QBQKhHlfd+dw54HbqC5/g==
-X-Received: by 2002:a67:eada:0:b0:472:69ab:f7be with SMTP id s26-20020a67eada000000b0047269abf7bemr1981104vso.35.1709132206229;
-        Wed, 28 Feb 2024 06:56:46 -0800 (PST)
-Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id cf4-20020a056130114400b007d648972c4esm1395580uab.4.2024.02.28.06.56.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 06:56:45 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-02-28
-Date: Wed, 28 Feb 2024 09:56:43 -0500
-Message-ID: <20240228145644.2269088-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1709132086; c=relaxed/simple;
+	bh=wW+rzE5/HSFl0GaMs1eCk+iBVbwVvAHBBLkAbYyERb0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OOVpxhBrbN29/tAibs7M74KeUuh8KRx24klGA+KDST3Y7ZTs7UYpBtXJYLyRkXLGFSaCitLBqbelpb3rdgDGMwiayUeSl44taic3bnQn/3Evv5NjlrqrDJ/g7EnYHMBBcSvadXAz5K4Uz7RatSs0ePMd4f5rqAszcTeJ4vmHzFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6D31C43390;
+	Wed, 28 Feb 2024 14:54:44 +0000 (UTC)
+Date: Wed, 28 Feb 2024 09:56:48 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, kuba@kernel.org,
+ roopa@nvidia.com, razor@blackwall.org, bridge@lists.linux.dev,
+ netdev@vger.kernel.org, jiri@resnulli.us, ivecera@redhat.com,
+ mhiramat@kernel.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 net-next 4/4] net: switchdev: Add tracepoints
+Message-ID: <20240228095648.646a6f1a@gandalf.local.home>
+In-Reply-To: <87a5nkhnlv.fsf@waldekranz.com>
+References: <20240223114453.335809-1-tobias@waldekranz.com>
+	<20240223114453.335809-5-tobias@waldekranz.com>
+	<20240223103815.35fdf430@gandalf.local.home>
+	<4838ad92a359a10944487bbcb74690a51dd0a2f8.camel@redhat.com>
+	<87a5nkhnlv.fsf@waldekranz.com>
+X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The following changes since commit 4adfc94d4aeca1177e1188ba83c20ed581523fe1:
+On Wed, 28 Feb 2024 11:47:24 +0100
+Tobias Waldekranz <tobias@waldekranz.com> wrote:
 
-  Documentations: correct net_cachelines title for struct inet_sock (2024-02-28 11:25:37 +0000)
+> >> > +	TP_fast_assign(
+> >> > +		__entry->val = val;
+> >> > +		__assign_str(dev, info->dev ? netdev_name(info->dev) : "(null)");
+> >> > +		__entry->info = info;
+> >> > +		__entry->err = err;
+> >> > +		switchdev_notifier_str(val, info, __entry->msg, SWITCHDEV_TRACE_MSG_MAX);  
+> >> 
+> >> Is it possible to just store the information in the trace event and then
+> >> call the above function in the read stage?  
+> >
+> > I agree with Steven: it looks like that with the above code the
+> > tracepoint itself will become measurably costily in terms of CPU
+> > cycles: we want to avoid that.
+> >
+> > Perhaps using different tracepoints with different notifier_block type
+> > would help? so that each trace point could just copy a few specific
+> > fields.  
+> 
+> This can be done, but you will end up having to duplicate the decoding
+> and formatting logic from switchdev-str.c, with the additional hurdle of
+> having to figure out the sizes of all referenced objects in order to
+> create flattened versions of every notification type.
 
-are available in the Git repository at:
+Would it help if you could pass a trace_seq to it? The TP_printk() has a
+"magical" trace_seq variable that trace events can use in the TP_printk()
+called "p".
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-02-28
+Look at:
 
-for you to fetch changes up to 6abf9dd26bb1699c17d601b9a292577d01827c0e:
+  include/trace/events/libata.h:
 
-  Bluetooth: qca: Fix triggering coredump implementation (2024-02-28 09:50:51 -0500)
+const char *libata_trace_parse_status(struct trace_seq*, unsigned char);
+#define __parse_status(s) libata_trace_parse_status(p, s)
 
-----------------------------------------------------------------
-bluetooth pull request for net:
+Where we have:
 
- - mgmt: Fix limited discoverable off timeout
- - hci_qca: Set BDA quirk bit if fwnode exists in DT
- - hci_bcm4377: do not mark valid bd_addr as invalid
- - hci_sync: Check the correct flag before starting a scan
- - Enforce validation on max value of connection interval
- - hci_sync: Fix accept_list when attempting to suspend
- - hci_event: Fix handling of HCI_EV_IO_CAPA_REQUEST
- - Avoid potential use-after-free in hci_error_reset
- - rfcomm: Fix null-ptr-deref in rfcomm_check_security
- - hci_event: Fix wrongly recorded wakeup BD_ADDR
- - qca: Fix wrong event type for patch config command
- - qca: Fix triggering coredump implementation
+const char *
+libata_trace_parse_status(struct trace_seq *p, unsigned char status)
+{
+	const char *ret = trace_seq_buffer_ptr(p);
 
-----------------------------------------------------------------
-Frédéric Danis (1):
-      Bluetooth: mgmt: Fix limited discoverable off timeout
+	trace_seq_printf(p, "{ ");
+	if (status & ATA_BUSY)
+		trace_seq_printf(p, "BUSY ");
+	if (status & ATA_DRDY)
+		trace_seq_printf(p, "DRDY ");
+	if (status & ATA_DF)
+		trace_seq_printf(p, "DF ");
+	if (status & ATA_DSC)
+		trace_seq_printf(p, "DSC ");
+	if (status & ATA_DRQ)
+		trace_seq_printf(p, "DRQ ");
+	if (status & ATA_CORR)
+		trace_seq_printf(p, "CORR ");
+	if (status & ATA_SENSE)
+		trace_seq_printf(p, "SENSE ");
+	if (status & ATA_ERR)
+		trace_seq_printf(p, "ERR ");
+	trace_seq_putc(p, '}');
+	trace_seq_putc(p, 0);
 
-Janaki Ramaiah Thota (1):
-      Bluetooth: hci_qca: Set BDA quirk bit if fwnode exists in DT
+	return ret;
+}
 
-Johan Hovold (1):
-      Bluetooth: hci_bcm4377: do not mark valid bd_addr as invalid
+The "trace_seq p" is a pointer to trace_seq descriptor that can build
+strings, and then you can use it to print a custom string in the trace
+output.
 
-Jonas Dreßler (1):
-      Bluetooth: hci_sync: Check the correct flag before starting a scan
 
-Kai-Heng Feng (1):
-      Bluetooth: Enforce validation on max value of connection interval
 
-Luiz Augusto von Dentz (2):
-      Bluetooth: hci_sync: Fix accept_list when attempting to suspend
-      Bluetooth: hci_event: Fix handling of HCI_EV_IO_CAPA_REQUEST
+> 
+> What I like about the current approach is that when new notification and
+> object types are added, switchdev_notifier_str will automatically be
+> able to decode them and give you some rough idea of what is going on,
+> even if no new message specific decoding logic is added. It is also
+> reusable by drivers that might want to decode notifications or objects
+> in error messages.
+> 
+> Would some variant of (how I understand) Steven's suggestion to instead
+> store the formatted message in a dynamic array (__assign_str()), rather
+> than in the tracepoint entry, be acceptable?
 
-Ying Hsu (1):
-      Bluetooth: Avoid potential use-after-free in hci_error_reset
+Matters if you could adapt using a trace_seq for the output. Or at least
+use a seq_buf, as that's what is under the covers of trace_seq. If you
+rather just use seq_buf, the above could pretty much be the same by passing
+in: &p->seq.
 
-Yuxuan Hu (1):
-      Bluetooth: rfcomm: Fix null-ptr-deref in rfcomm_check_security
-
-Zijun Hu (3):
-      Bluetooth: hci_event: Fix wrongly recorded wakeup BD_ADDR
-      Bluetooth: qca: Fix wrong event type for patch config command
-      Bluetooth: qca: Fix triggering coredump implementation
-
- drivers/bluetooth/btqca.c       |  2 +-
- drivers/bluetooth/hci_bcm4377.c |  3 +--
- drivers/bluetooth/hci_qca.c     | 22 ++++++++++++++++------
- net/bluetooth/hci_core.c        |  7 ++++---
- net/bluetooth/hci_event.c       | 13 ++++++++++---
- net/bluetooth/hci_sync.c        |  7 +++++--
- net/bluetooth/l2cap_core.c      |  8 +++++++-
- net/bluetooth/mgmt.c            |  4 +++-
- net/bluetooth/rfcomm/core.c     |  2 +-
- 9 files changed, 48 insertions(+), 20 deletions(-)
+-- Steve
 
