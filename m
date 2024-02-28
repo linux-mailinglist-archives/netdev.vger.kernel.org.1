@@ -1,133 +1,173 @@
-Return-Path: <netdev+bounces-75616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12B4286AB29
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 10:28:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC1CA86AB31
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 10:32:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF39E286167
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:28:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96500287034
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F328A33998;
-	Wed, 28 Feb 2024 09:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dAuAuecE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9EA631A82;
+	Wed, 28 Feb 2024 09:31:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7B82EAE6
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 09:28:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4F42E657;
+	Wed, 28 Feb 2024 09:31:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709112525; cv=none; b=FCL981oUiKOJc6cWnr3QQFcJPTeY/jd6Wjtp468H5ScCm+VURom3U6B9ifPPTQppbPBCVrpNCSZ8YyiVFAMIvebtB26IXHF/nJ1lhmpGp59bzslk9zUVnpCY8Q+XOcFA33couThS//sOuB1Mru2LivFZGTLOkIHZHuDlcBn1N2k=
+	t=1709112718; cv=none; b=Iqreri7ye9+/gAaYjJhZ2n0iRs8TV2LuSEk8V+cbjwv5O4nHS4HBXtnRvC1P6Vz7vQuXGeZ3FX5w80yZkXjgLVWQze7kcaPLiI8idSVP0Q0HjLWed/vDUSS9R9FlxSYjDc+b6NiwlVmAkxFLcGTsIud0dwdAq4hQTQBqqWUYitY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709112525; c=relaxed/simple;
-	bh=vM25Sn00GES493f3CVIVorpnKEqNDbgsBn1rAzLnBRc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gT5dC/8h0a9qnJVswRhweQNjuoUeqZX3jKmwO4mmQwPmV0JU5PiqG9Xev7JbMA1maY0fe/EajfT6b+JVzo0/h3Jo+ptwoJwJSLVv4cRI+I9v7fCOKzqpdCgq9sDMIfXXTzjLrpqBAA7gg3olM4HVkdYL+YSmQSICLakSsJI3FAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dAuAuecE; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5654ef0c61fso10476a12.0
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 01:28:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709112522; x=1709717322; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PmGSAPwKHno/gXEojIx4FGx/OPgjQkEiVnRDIOYk90Q=;
-        b=dAuAuecEXOM5DgvXl1DAhbyvyss2LRt/6l0dcBKqiA6mA2+07U1yA4URURdFXiG6N0
-         rcZmT62CzkoONBRc2E+KoyaFM87eYK5qYyEZtHWALx1onyCVNgQYydvN8HYL/L+kZvdb
-         327LtN1tYsTqimb4lgdkwY7y8Csqm9+/wnTWH1l/JQ5T07sC0CiIIHs2DyqCD3C92YBi
-         Hq0Xa8MLd3nmGbA7838SfkLzboXqNjJ4DZI46upa2vD/cphHStG4gIfHISEK/He/Kn5N
-         NWurqw9WWfn4ZGrnxaFZeucupsu/DgYZaTEClKqTXFiAOUf7oXPMwRNnYRI2PcB/PIy5
-         Iqyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709112522; x=1709717322;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PmGSAPwKHno/gXEojIx4FGx/OPgjQkEiVnRDIOYk90Q=;
-        b=le9khlF9OEGsdrFqLg+mD3u/WqUsJ5dckmLx9sr4cZmIR14+JO3eBdURo2QClLq8KM
-         4uNb8Ypwxt8TlMFzJI8NYy3aYeoOoFRY8qSm6M771FKmPAivMgPssh32O4wvCPb7jeUr
-         bTNFbfZECC+mB+Nqm3+JDPF0aJX0uZPAoMLD7fy8iwdHg4YmG508LJZq2VmPppopOY3X
-         7CvE2et5MZrLfz53DaUHegnuaY+kb0gMaLh8RhHU5KXvwWBo1+hBbaqhwOu8/msuVGsb
-         hJ2n5bZ+jGnZa9d2zdFpilkfVThxTsteOLdcr1QUZPBnPMcI7OVEJZW7fMw/3cWKOVvp
-         eTMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXsr9yTfKyWZS8TJAlzyaNIE6ixjfJsRQ0McBnKXNkvzlOK4WnFStz6d9lOQC61/OP4y/OeMvAEPejL3rmOV4dudaIofnT3
-X-Gm-Message-State: AOJu0YwTkcPeajo6hmxfPlT+jPdPEgzDkeeNmrRnZX7kaKdC82eyTeai
-	Kb9f+DTXpMQKs+lCxGG72vf64J5cipct9QOdcs6SFkTBlDYrK6/oMkQPHEai88G5/1mzDL3fBtY
-	rEmjsnN1f9SmJsx0a7g1ks4yC5wcKB49qdDYEhVZzEdguU5Hma6k2
-X-Google-Smtp-Source: AGHT+IEwenSzycenMhnI1BztlSoSzPOKV/8W7t/ramLMrvicv8hj+V7CvaNDzt75W/70sLfZHelGZep+6MEyKsGFq+A=
-X-Received: by 2002:a50:9343:0:b0:565:4f70:6ed with SMTP id
- n3-20020a509343000000b005654f7006edmr40551eda.6.1709112522375; Wed, 28 Feb
- 2024 01:28:42 -0800 (PST)
+	s=arc-20240116; t=1709112718; c=relaxed/simple;
+	bh=PdsLjsWcsNlTwhr57K6QgoJxkvcwYSeSGmfoCSQstz4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=l2WDTBVFJSy3/h/2kOc/AhvRqL0bXF1zgdzzn9/Ch4WcVXa5TIg/nWw0TCwMocq/E/A7s10qfY4CeHmBSJpZjSFzemAHqyZWYGzDKc8ml7ooFLQNJ+c7nk/wQBrwQeOb89WhlYS71387onpoudBWo/Wxn4cIFN/zA1OzjoEroYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Tl8Fy1k70z1Q99X;
+	Wed, 28 Feb 2024 17:29:58 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id B377E18005C;
+	Wed, 28 Feb 2024 17:31:46 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 28 Feb 2024 17:31:46 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
+	<bpf@vger.kernel.org>
+Subject: [PATCH net-next v6 0/5] remove page frag implementation in vhost_net
+Date: Wed, 28 Feb 2024 17:30:07 +0800
+Message-ID: <20240228093013.8263-1-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240227150200.2814664-1-edumazet@google.com> <20240227150200.2814664-4-edumazet@google.com>
- <20240227185157.37355343@kernel.org> <CANn89iLwcd=Gp7X7DKsw+kG2FHA1PzwG3Up8Tb2wjA=Bz94Oxg@mail.gmail.com>
-In-Reply-To: <CANn89iLwcd=Gp7X7DKsw+kG2FHA1PzwG3Up8Tb2wjA=Bz94Oxg@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 28 Feb 2024 10:28:28 +0100
-Message-ID: <CANn89iLefNuOXBdf2Cg8SbwAXCm=X+qZ-Cqkx8CQ=vESv-LYSg@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 03/15] ipv6: addrconf_disable_ipv6() optimizations
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	David Ahern <dsahern@kernel.org>, Jiri Pirko <jiri@nvidia.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-On Wed, Feb 28, 2024 at 9:51=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Wed, Feb 28, 2024 at 3:52=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> >
-> > On Tue, 27 Feb 2024 15:01:48 +0000 Eric Dumazet wrote:
-> > > +     if (p =3D=3D &net->ipv6.devconf_dflt->disable_ipv6) {
-> > > +             WRITE_ONCE(*p, newf);
-> > > +             return 0;
-> > > +     }
-> > > +
-> > >       if (!rtnl_trylock())
-> > >               return restart_syscall();
-> > >
-> > > -     net =3D (struct net *)table->extra2;
-> > >       old =3D *p;
-> > >       WRITE_ONCE(*p, newf);
-> > >
-> > > -     if (p =3D=3D &net->ipv6.devconf_dflt->disable_ipv6) {
-> > > -             rtnl_unlock();
-> > > -             return 0;
-> > > -     }
-> > > -
-> > > -     if (p =3D=3D &net->ipv6.devconf_all->disable_ipv6) {
-> > > -             WRITE_ONCE(net->ipv6.devconf_dflt->disable_ipv6, newf);
-> >
-> > Why is this line going away? We pulled up the handling of devconf_all
-> > not devconf_dflt
-> >
->
-> Good catch, I simply misread the line.
+Currently there are three implementations for page frag:
 
-I note that addrconf_disable_policy() does not have a similar write.
+1. mm/page_alloc.c: net stack seems to be using it in the
+   rx part with 'struct page_frag_cache' and the main API
+   being page_frag_alloc_align().
+2. net/core/sock.c: net stack seems to be using it in the
+   tx part with 'struct page_frag' and the main API being
+   skb_page_frag_refill().
+3. drivers/vhost/net.c: vhost seems to be using it to build
+   xdp frame, and it's implementation seems to be a mix of
+   the above two.
 
-When writing on net->ipv6.devconf_all->disable_policy, we loop over all ide=
-v
-to call addrconf_disable_policy_idev(),
-but we do _not_ change net->ipv6.devconf_dflt->disable_policy
+This patchset tries to unfiy the page frag implementation a
+little bit by unifying gfp bit for order 3 page allocation
+and replacing page frag implementation in vhost.c with the
+one in page_alloc.c.
 
-This seems quite strange we change net->ipv6.devconf_dflt->disable_ipv6 whe=
-n
-user only wanted to change net->ipv6.devconf_all->disable_policy
+After this patchset, we are not only able to unify the page
+frag implementation a little, but also able to have about
+0.5% performance boost testing by using the vhost_net_test
+introduced in the last patch.
 
-Oh well.
+Before this patchset:
+Performance counter stats for './vhost_net_test' (10 runs):
+
+     305325.78 msec task-clock                       #    1.738 CPUs utilized               ( +-  0.12% )
+       1048668      context-switches                 #    3.435 K/sec                       ( +-  0.00% )
+            11      cpu-migrations                   #    0.036 /sec                        ( +- 17.64% )
+            33      page-faults                      #    0.108 /sec                        ( +-  0.49% )
+  244651819491      cycles                           #    0.801 GHz                         ( +-  0.43% )  (64)
+   64714638024      stalled-cycles-frontend          #   26.45% frontend cycles idle        ( +-  2.19% )  (67)
+   30774313491      stalled-cycles-backend           #   12.58% backend cycles idle         ( +-  7.68% )  (70)
+  201749748680      instructions                     #    0.82  insn per cycle
+                                              #    0.32  stalled cycles per insn     ( +-  0.41% )  (66.76%)
+   65494787909      branches                         #  214.508 M/sec                       ( +-  0.35% )  (64)
+    4284111313      branch-misses                    #    6.54% of all branches             ( +-  0.45% )  (66)
+
+       175.699 +- 0.189 seconds time elapsed  ( +-  0.11% )
+
+
+After this patchset:
+Performance counter stats for './vhost_net_test' (10 runs):
+
+     303974.38 msec task-clock                       #    1.739 CPUs utilized               ( +-  0.14% )
+       1048807      context-switches                 #    3.450 K/sec                       ( +-  0.00% )
+            14      cpu-migrations                   #    0.046 /sec                        ( +- 12.86% )
+            33      page-faults                      #    0.109 /sec                        ( +-  0.46% )
+  251289376347      cycles                           #    0.827 GHz                         ( +-  0.32% )  (60)
+   67885175415      stalled-cycles-frontend          #   27.01% frontend cycles idle        ( +-  0.48% )  (63)
+   27809282600      stalled-cycles-backend           #   11.07% backend cycles idle         ( +-  0.36% )  (71)
+  195543234672      instructions                     #    0.78  insn per cycle
+                                              #    0.35  stalled cycles per insn     ( +-  0.29% )  (69.04%)
+   62423183552      branches                         #  205.357 M/sec                       ( +-  0.48% )  (67)
+    4135666632      branch-misses                    #    6.63% of all branches             ( +-  0.63% )  (67)
+
+       174.764 +- 0.214 seconds time elapsed  ( +-  0.12% )
+
+Changelog:
+V6: Add timeout for poll() and simplify some logic as suggested
+    by Jason.
+
+V5: Address the comment from jason in vhost_net_test.c and the
+    comment about leaving out the gfp change for page frag in
+    sock.c as suggested by Paolo.
+
+V4: Resend based on latest net-next branch.
+
+V3:
+1. Add __page_frag_alloc_align() which is passed with the align mask
+   the original function expected as suggested by Alexander.
+2. Drop patch 3 in v2 suggested by Alexander.
+3. Reorder patch 4 & 5 in v2 suggested by Alexander.
+
+Note that placing this gfp flags handing for order 3 page in an inline
+function is not considered, as we may be able to unify the page_frag
+and page_frag_cache handling.
+
+V2: Change 'xor'd' to 'masked off', add vhost tx testing for
+    vhost_net_test.
+
+V1: Fix some typo, drop RFC tag and rebase on latest net-next.
+
+Yunsheng Lin (5):
+  mm/page_alloc: modify page_frag_alloc_align() to accept align as an
+    argument
+  page_frag: unify gfp bits for order 3 page allocation
+  net: introduce page_frag_cache_drain()
+  vhost/net: remove vhost_net_page_frag_refill()
+  tools: virtio: introduce vhost_net_test
+
+ drivers/net/ethernet/google/gve/gve_main.c |  11 +-
+ drivers/net/ethernet/mediatek/mtk_wed_wo.c |  17 +-
+ drivers/nvme/host/tcp.c                    |   7 +-
+ drivers/nvme/target/tcp.c                  |   4 +-
+ drivers/vhost/net.c                        |  91 ++--
+ include/linux/gfp.h                        |  16 +-
+ mm/page_alloc.c                            |  22 +-
+ net/core/skbuff.c                          |   9 +-
+ tools/virtio/.gitignore                    |   1 +
+ tools/virtio/Makefile                      |   8 +-
+ tools/virtio/linux/virtio_config.h         |   4 +
+ tools/virtio/vhost_net_test.c              | 532 +++++++++++++++++++++
+ 12 files changed, 609 insertions(+), 113 deletions(-)
+ create mode 100644 tools/virtio/vhost_net_test.c
+
+-- 
+2.33.0
+
 
