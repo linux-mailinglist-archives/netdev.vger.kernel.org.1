@@ -1,196 +1,128 @@
-Return-Path: <netdev+bounces-75881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B75F886B899
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 20:51:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDCBF86B8B6
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 21:01:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F1B2285241
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 19:51:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D558B21CE2
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 20:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86DF05E07C;
-	Wed, 28 Feb 2024 19:51:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B06E5E084;
+	Wed, 28 Feb 2024 20:01:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cMjMPkbd"
+	dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b="1jRHfke3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCAC15E079;
-	Wed, 28 Feb 2024 19:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405215E077
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 20:01:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709149899; cv=none; b=DliOhwP6+6eP1WCKrgjsIHRfsudEKI1tNQ0z4YHaH+nFv0n20C5NISUng95YjOXN6DOtOc9bMtKTaAeQ55XEg23JR1UPUrh3i52TopHX1bkfxZoILiNmPNFbnAovDo4EfBoJsWyhAPD2LRlLjkQeHkp7/fB0G0ougRv8DeI8foA=
+	t=1709150463; cv=none; b=QVeFhIbtIAAW+C39+AP+djSqT9HwYSZWxKpJESW5Z46udTbiEkaYzsYR1+5wXwESZqmg90nss6loFJLRR4rC0/g9AfOTFh1IHcbAk7hCXRsnOe06WaKxvZ36dHvY7ZqAu966UCyNdUPtMPYxsgFfZavT3VO6Jft0EUmuyYdTsDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709149899; c=relaxed/simple;
-	bh=kArOyMHY5+4vffML5guH3LLRbRSIeEUWV6WhuUq5CBU=;
+	s=arc-20240116; t=1709150463; c=relaxed/simple;
+	bh=OoLOaFtjiu5mHAEpVsVyKx/jaXG/BTwjD3qUzA1ql+0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H8luiv4F6hm4We1gQkEX0STYy7Z+IOapXQ03m9uxnWdaQus3ijA02dyJZJ/Yu7QH2mPqjqobJNvPMNgDwZ7Ya34NJLCUFmZ1DWzHrqlOE4xVtshfpqOLt6vpEM3lOpxZGVifMsT3gfWzuggDbpd/e50lMJusJujHnv1amjCi20g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cMjMPkbd; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-55f50cf2021so305831a12.1;
-        Wed, 28 Feb 2024 11:51:37 -0800 (PST)
+	 To:Cc:Content-Type; b=mYWzviUASJ2kIZ5PYHYYWmVcURZF5rer8ZFszD/lyEJIK/Lc2XLypHbc7QrbTR8F26OoDzmMDIZvxMeNvjaNz/fJbXvVQOa0Ggi/zG28NorWm8dleSuKuD0m0fJlYDlJn5lU7XeZyum1SY9+2JLgSkZMFVYBMjSZgvuWXB7y6mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b=1jRHfke3; arc=none smtp.client-ip=209.85.221.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amacapital.net
+Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-4d19972b455so7848e0c.3
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 12:01:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709149896; x=1709754696; darn=vger.kernel.org;
+        d=amacapital-net.20230601.gappssmtp.com; s=20230601; t=1709150460; x=1709755260; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PXcu3bFZcsrAoAiVrWjtsqyBDoVNoBgQRciFYDiNitI=;
-        b=cMjMPkbdGZDmLR+nDtzqTULHvY0UDrSlOmqlmfkiRxJJi1zAF6eWOXq2pxFYELrsHL
-         OPTWby4CojW9NxBSF5q11oqWnVQW4XQ0UOlHggEMAoJiR80q/95CgATNh8/Cmv87L9WY
-         Y6MRO025KLkBEYJEFbqMiJaTTl52c7kksTTPGRfr0szvfk1yUfpJSqhd2FsdZRBnIOjR
-         Yr+mnkZUL2/qBgI+2+Vab+Uhvrk6hRsvT7tg/V46oB3vcSQDkIFlZNCjYt+pPKNFbdRB
-         OxHIiz/UL1Wq8uonhaIomLp2mT9t6qaGVOGq85FgA3U69LMP/dQePWyBCD6SgvFE4/NG
-         Qp3Q==
+        bh=wNIoc5z9e1UL1YdttUpqhucICMbrEHRvuLe/Sh1Z598=;
+        b=1jRHfke36baS7LtteMU/AHdJM1PhWvMzIb9G5CjU3Wc4d71nBZ/gVvyoeE3O3Bakdj
+         zOFUhy0m+UH6C7ZClbBhFkbk+eB0SeeQvWQDnaOw/0C5y0woXx3CGyOmsvFv4Aympe7h
+         aTEpj1VrAlBU2wM/WV5UN0ALQqDVLyeaGs8UtCkGyYtZ+vJY9NWXawgkxwyKhI9W/EcN
+         4blQcKsVapDhMNKDguOjKAGM8ckdUzuNRJgsAVBS4T3y3P3E5rJ0+2Jg1jIuGkrUrXnw
+         0NfRugMSicD9yahdVaihtqSug5eRMmKjlX1MUIGVhoSE4UrCanL810G0SzHlOTzahwdJ
+         R+tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709149896; x=1709754696;
+        d=1e100.net; s=20230601; t=1709150460; x=1709755260;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PXcu3bFZcsrAoAiVrWjtsqyBDoVNoBgQRciFYDiNitI=;
-        b=u1YwqVjlVpqgWJ0vpfcPaM8N92iIC4xNb/+i8MBSmSCV4VBZwQm5xOrwGifImOnDR9
-         YWnM34SWcSlc/1vwxT6CU7/OIMZdfGsv/Hn+4p1IvFYtZpbFFGJshvQInkGLCxTmBHH8
-         EpEoafEah6coo8NwWk9IXHtM6FSq3oj45Xpg/XnhcD2X/1945biQEi+cGWnFsln06WI9
-         5GDHxw6prFaFr+jd50ksEEoWEIZpl/46fbfylOuwvO6KDxFTqFv7zu1zJoWdYX+jDOGO
-         BRhI/mj6wS9cYGozMKJOiRLKj86QP/IOzgFI0yJmfDKBlP1bD0DRomqA0E0gmSNMUtII
-         pSXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUX/0F4Ma3iVGC/abX3zU0GczVbyk6wf8fRCY91MoMHUWU4Lcl527ztUqOPJmOFpqUei5ZavRkZDHumKEfjuJBeNrXX78mO11Zo+i2CU+nc4Se+6Ki7onjq+mNx9MLCpNAfBbebJWiOKCgseXLPwScpuYtXcdHEj31WCZOgbw0V
-X-Gm-Message-State: AOJu0YxPjm5HbAsBFzLx6TP5vPZjplxc09ouQX3aFE5Lt4m4Hcp/l53J
-	hJhS4TGPdoh+KIweWnIWZPeZvn0OiYzmYJYHyRBUM3Ln1v1+THOhE7PQ3oLYq7QzPkqiPPL/Q7o
-	FPODgF9M5vXpaLk3+vxDTho+DsXY=
-X-Google-Smtp-Source: AGHT+IHVoY0oGVQWBGe4FFrjlo5iWLfO+2p8dgc6oJtU8Gv/j7UJJgrbF3TuRNKK1nSur+YZaq6r/lJD8LKpK0qMdOY=
-X-Received: by 2002:aa7:dd0b:0:b0:566:821:d183 with SMTP id
- i11-20020aa7dd0b000000b005660821d183mr242179edv.42.1709149895985; Wed, 28 Feb
- 2024 11:51:35 -0800 (PST)
+        bh=wNIoc5z9e1UL1YdttUpqhucICMbrEHRvuLe/Sh1Z598=;
+        b=luQ3zzG04G8dMP+kZZRX+Ut+vfHD0xOV7mrEQ6sAN6FkMPjwVxhbFFJHg4PpMywnRk
+         iyqiyhsG5NwnpTo2hqEaYupAs0OhiaXrwOhw0y4/GNlQtKAcqjV+dS7wZoDnm0F/Su92
+         gzQDOJDq/5x2MgiWp/1QhbfyaU812f8NVyddj/nPKdkoGm6vYPXtaXj7BMiwDFuWSsWb
+         sZVDqAjz1gHQ1Wx+xYXgEGFvD2tbqikvqTKw+HZHdphLq+O+lh0YtllweN7ewljQuQP/
+         CrcjVgkuwziCikJJS5q4Y1E7/c9gqPyMOw0wIuT8y7RSM3sdHxD63rGSFGR10BAi5lZK
+         qA8Q==
+X-Gm-Message-State: AOJu0YydI6V0IcRlTQw+FMeq4KiLDyqQ8wOYJDCOJn0EUTE2dycbI/hq
+	uBoOiD7dNOko6U6oJIMkgKejtkTxJ2dHJmr58dBYxHAKVIQ2mhXCtopkO8VTq58+jtPv3sgfgYI
+	p27kZ3t468KOhvUDlb8trTOnh4W5yjlx1Y8/t
+X-Google-Smtp-Source: AGHT+IHTBM+WR/AKVjuDKYcFjCDqCl2g6BPsVgzaaT0GitljWXCEQLn8iMCiISvoFBuY/pp5LEQPBVHtK28UNPL4pIA=
+X-Received: by 2002:a1f:cb84:0:b0:4d1:3f5d:50d4 with SMTP id
+ b126-20020a1fcb84000000b004d13f5d50d4mr725653vkg.8.1709150460121; Wed, 28 Feb
+ 2024 12:01:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240228172948.221910-1-thepacketgeek@gmail.com> <77497701-3bd2-4f5f-9404-b32d9e91683b@gmail.com>
-In-Reply-To: <77497701-3bd2-4f5f-9404-b32d9e91683b@gmail.com>
-From: Matthew Wood <thepacketgeek@gmail.com>
-Date: Wed, 28 Feb 2024 11:51:24 -0800
-Message-ID: <CADvopva5LAe2WQa8N83mhi68++GRvh1Uw8SqatYY79uEOEZTEQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: netconsole: Add continuation line prefix to
- userdata messages
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <CALCETrUe23P_3YAUMT2dmqq62xAc7zN0PVYrcChm4cHGJMDmbg@mail.gmail.com>
+ <852606cd9cbc8da9c6735b4ad6216ba55408b767.camel@redhat.com> <CALCETrUZuhvR3GygBfyfLxeas+igNe51Tnx=HEnh9LoFutN-dQ@mail.gmail.com>
+In-Reply-To: <CALCETrUZuhvR3GygBfyfLxeas+igNe51Tnx=HEnh9LoFutN-dQ@mail.gmail.com>
+From: Andy Lutomirski <luto@amacapital.net>
+Date: Wed, 28 Feb 2024 12:00:48 -0800
+Message-ID: <CALCETrXTOQRaGf650+fdyH1yKJLFY-WTpXWkThakacV0GKA=eg@mail.gmail.com>
+Subject: Re: The sk_err mechanism is infuriating in userspace
+To: Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Network Development <netdev@vger.kernel.org>, Linux API <linux-api@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 28, 2024 at 9:32=E2=80=AFAM Florian Fainelli <f.fainelli@gmail.=
-com> wrote:
+On Tue, Feb 6, 2024 at 9:24=E2=80=AFAM Andy Lutomirski <luto@amacapital.net=
+> wrote:
 >
-> On 2/28/24 09:29, Matthew Wood wrote:
-> > Add a space (' ') prefix to every userdata line to match docs for
-> > dev-kmsg. To account for this extra character in each userdata entry,
-> > reduce userdata entry names (directory name) from 54 characters to 53.
+> On Tue, Feb 6, 2024 at 12:43=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> w=
+rote:
 > >
-> > According to the dev-kmsg docs, a space is used for subsequent lines to
-> > mark them as continuation lines.
-> >
-> >> A line starting with ' ', is a continuation line, adding
-> >> key/value pairs to the log message, which provide the machine
-> >> readable context of the message, for reliable processing in
-> >> userspace.
-> >
-> > Testing for this patch::
-> >
-> >   cd /sys/kernel/config/netconsole && mkdir cmdline0
-> >   cd cmdline0
-> >   mkdir userdata/test && echo "hello" > userdata/test/value
-> >   mkdir userdata/test2 && echo "hello2" > userdata/test2/value
-> >   echo "message" > /dev/kmsg
-> >
-> > Outputs::
-> >
-> >   6.8.0-rc5-virtme,12,493,231373579,-;message
-> >    test=3Dhello
-> >    test2=3Dhello2
-> >
-> > And I confirmed all testing works as expected from the original patchse=
-t
-> >
-> > Fixes: df03f830d099 ("net: netconsole: cache userdata formatted string =
-in netconsole_target")
-> > Signed-off-by: Matthew Wood <thepacketgeek@gmail.com>
-> > ---
-> >   Documentation/networking/netconsole.rst | 6 +++---
-> >   drivers/net/netconsole.c                | 4 ++--
-> >   2 files changed, 5 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/Documentation/networking/netconsole.rst b/Documentation/ne=
-tworking/netconsole.rst
-> > index b28c525e5d1e..c2dec12f6060 100644
-> > --- a/Documentation/networking/netconsole.rst
-> > +++ b/Documentation/networking/netconsole.rst
-> > @@ -197,8 +197,8 @@ Messages will now include this additional user data=
-::
-> >   Sends::
-> >
-> >    12,607,22085407756,-;This is a message
-> > - foo=3Dbar
-> > - qux=3Dbaz
-> > +  foo=3Dbar
-> > +  qux=3Dbaz
-> >
-> >   Preview the userdata that will be appended with::
-> >
-> > @@ -218,7 +218,7 @@ The `qux` key is omitted since it has no value::
-> >
-> >    echo "This is a message" > /dev/kmsg
-> >    12,607,22085407756,-;This is a message
-> > - foo=3Dbar
-> > +  foo=3Dbar
-> >
-> >   Delete `userdata` entries with `rmdir`::
-> >
-> > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> > index 0de108a1c0c8..ffd3e19406b5 100644
-> > --- a/drivers/net/netconsole.c
-> > +++ b/drivers/net/netconsole.c
-> > @@ -43,7 +43,7 @@ MODULE_DESCRIPTION("Console driver for network interf=
-aces");
-> >   MODULE_LICENSE("GPL");
-> >
-> >   #define MAX_PARAM_LENGTH    256
-> > -#define MAX_USERDATA_NAME_LENGTH     54
-> > +#define MAX_USERDATA_NAME_LENGTH     53 /* 256 - 200 - 3 (for ' =3D\n'=
- chars)*/
->
-> Could we take this opportunity to define MAX_USERDATA_NAME_LENGTH based
-> upon MAX_PARAM_LENGTH - MAX_USERDATA_VALUE_LENGTH - 3 then?
->
-> >   #define MAX_USERDATA_VALUE_LENGTH   200
-> >   #define MAX_USERDATA_ENTRY_LENGTH   256
-> >   #define MAX_USERDATA_ITEMS          16
-> > @@ -671,7 +671,7 @@ static void update_userdata(struct netconsole_targe=
-t *nt)
-> >                * checked to not exceed MAX items with child_count above
-> >                */
-> >               complete_idx +=3D scnprintf(&nt->userdata_complete[comple=
-te_idx],
-> > -                                       MAX_USERDATA_ENTRY_LENGTH, "%s=
-=3D%s\n",
-> > +                                       MAX_USERDATA_ENTRY_LENGTH, " %s=
-=3D%s\n",
-> >                                         item->ci_name, udm_item->value)=
-;
-> >       }
-> >       nt->userdata_length =3D strnlen(nt->userdata_complete,
->
-> --
-> Florian
->
+> > What about 'destination/port unreachable' and many other similar errors
+> > reported by sk_err? Which specific errors reported by sk_err does not
+> > indicate that anything is wrong with the socket ?
 
-Yes, great suggestion. I'll send an update with this change tomorrow. thank=
- you!
+I started writing a series to improve this in a backwards-compatible
+way, but now I'm wondering whether the current behavior may be
+partially a regression and not actually something well-enshrined in
+history.
+
+The nasty behavior in question is that, if a UDP or ping (or
+presumably TCP, but that case is not necessarily a problem) socket
+enables IP_RECVERR, then an ICMP error will asynchronously cause the
+next sendmsg() to fail.  The code that causes this seems to be ancient
+(I think it's sock_wait_for_wmem, which predates git, but I won't
+swear to that)
+
+Looking at my own logs, though, a Linux 4.5.2 did not seem to
+regularly trigger this, and I'm getting it on a regular basis on 6.2
+and some newer kernels.  And, somewhat damningly (with IP addresses
+redacted):
+
+$ traceroute -I 10.1.2.3
+traceroute to 10.1.2.3 (10.1.2.3), 30 hops max, 60 byte packets
+ 1  * * *
+ 2  10.5.6.7 (10.5.6.7)  0.593 ms  0.793 ms  0.988 ms
+ 3  10.8.9.10 (10.8.9.10)  1.247 ms  1.547 ms  1.881 ms
+ 4  10.11.12.13 (10.11.12.13)  1.032 ms  1.333 ms  1.679 ms
+send: No route to host
+
+Whoops, traceroute is getting a bogus return when it sends a packet,
+causing it to give up.  The real trace should be longer.
+
+So I'm wondering if maybe this behavior should be seen as a bug to be
+fixed and not a weird old API that needs to be preserved.
+
+--Andy
 
