@@ -1,157 +1,140 @@
-Return-Path: <netdev+bounces-75873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DB5586B69C
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 19:01:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C573086B6A6
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 19:03:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2581C28AFEA
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 18:01:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B72D1F21A74
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 18:03:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 767E079B81;
-	Wed, 28 Feb 2024 17:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="Yjb3feY5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA64E79B6D;
+	Wed, 28 Feb 2024 18:03:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-22.smtpout.orange.fr [80.12.242.22])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98FEA1EA84
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 17:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E366479B66;
+	Wed, 28 Feb 2024 18:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709143198; cv=none; b=JQWltGX9Kjb+dtNoFxbTYxKSKDTM8SFl1auGclyTIGSY2rPl1CbjZUb3U2knNkEZajLONXiEKyJ4AAov0PtVcHzfl3Zo6eqDj656TT+T28uTJlVIcUbTgO34E1AsWYz51hRylhKz6kDPG8RAZAP7ftWCuzqu4PlGGnmSndPY5io=
+	t=1709143430; cv=none; b=JH2/9lJ6hGr8GdmoHCV1M9qMzvV/tr9l6QxIN7j/rtdgSCP1waZekJFti6X0xfyyIj63p3nC+xE6o8hr1cjnKIYaj0fof7J84kWTPa+dayjm1TGzNZJImLZ0XtBM2AqF5X/2qgh6rdFQjLqKDEX3PIVnLKqITgk6JYNOJ36ITSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709143198; c=relaxed/simple;
-	bh=0FwpwzAD/az5o+wVtVaQP081+CsxoOZPZKbjHeTacdA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r2h7tgyvXxsG57Jxkw9H9gWy0AiFGnW88LF5rb+FWgLyNLHelZXZ4/66Kk1/yl8j7M+v0ra7e2aD22/bOTO8bM2oES3kwBA+Spl2DSzz99e2Vld+I4TV+8fsPeRIwl4unvyADM3YoZ1jWV+19kFwVXB46juW2fUQTCSCr/YgC+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=Yjb3feY5; arc=none smtp.client-ip=80.12.242.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.18] ([92.140.202.140])
-	by smtp.orange.fr with ESMTPA
-	id fODbrhZ9PVFb9fODbrBPJG; Wed, 28 Feb 2024 18:59:49 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1709143189;
-	bh=6VMAgc74NhzsJxo+NTy1RBo7SqgKKr+Thg+OAvLcHUU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=Yjb3feY5IUAlE0MCzfv6lk++/zAkNFWvUaThblhfbkm+SBQV5+eBNlpDsSDdv1xfQ
-	 8LD33Z25T9g9yu/xAg1HmI2mMfwa+rDrJSzQWIq7mW3T1GlhMD+dLMQEKyO4ROqZlX
-	 u9PYsCVx9j/t3Tt9nHfU90JVcMGiHFC2HsPC/BndBHVajXe6813vR1JT8Bi4pGpXJ+
-	 tgAfjuEUGU4EvHA1qzkmHo8awrYUZpnx6jKfLPKmdZr3K8DKWJjSunHFNrwCbw8/Xb
-	 TNLTWzPOPsptY9yQ/8/6zV18yX81EfZIz/kI/q/sbens5iKGftU+rsMk6Si54g34rN
-	 Pl7ngA2g3Jk5g==
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Wed, 28 Feb 2024 18:59:49 +0100
-X-ME-IP: 92.140.202.140
-Message-ID: <eca39015-296c-4494-8b1b-6344b4ace3a2@wanadoo.fr>
-Date: Wed, 28 Feb 2024 18:59:47 +0100
+	s=arc-20240116; t=1709143430; c=relaxed/simple;
+	bh=uLUoeG2p5PBWHl4cb3f0GiMwfiXFa/nQ44dA6pnXfrs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iz37D0crGbeX0eGwCv/s+obpvNYaHVSOZbAjJv+IYVV2TpUDk+fKyTVaBcFcv9I50SzZl2ZbNdsD04AOA8EDKEqUc8pbY6AX8ToaZREJTMYCIvskQ0HRZG1+DY4pN/Vdwz49y4EIkBxHBXscXgz20YtrB0vLuuj6SXW87KT0C6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-412b68d1a42so323945e9.0;
+        Wed, 28 Feb 2024 10:03:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709143427; x=1709748227;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KMYCuXLMtP2VJuQAB3ZBbvwXsoOBDrgan9aFbDVxFnk=;
+        b=PjUjBSZvlIJnNw8ppZnrnwztVA16Sh32y3hGhQCV3lcmC0Rk+kRFY4rXL5+HfsIVR8
+         QpIlEnj2A8tXtCGyGxNL397VZPfPSKn6WzlLShG/NdK5qaDi/4Rfv3eKQ/6n/JyNozKx
+         t/AxTJG9071GFkyI4GduEzVDhJ5BNV3SIQLOMItId5a6YHtd9EMFV1DIiRygKm8404UN
+         V4oY90FXQYek4g6xbom8K7tYimJo2sP3SHIbb5zjTfOFAQi8sG37mLiHzr2UM8ingKql
+         UgZ5zP95vP00rXudZgqK0O0TCRVt9o2RjsEDg7s0Izz4Lj4ggJPE29j1rrt85VSNjpDr
+         lMrg==
+X-Forwarded-Encrypted: i=1; AJvYcCX1nDY88PH+cr8RtXAK3z82UFood8qJIokfpMYvZJNEL941/Gf+viXFao4xjuQML/8paDlgLihUTUDDe+RyTu7MVJCq3o8/7WXSpCOJ
+X-Gm-Message-State: AOJu0Yx3PER3soykVAgK/96rc+vbaaE0L9ZWFwPOtoXHJczgnBNJosbO
+	E4TqzVMhADLLc55+gAZ9zIIVAgut0SdXV2LYhpG2O9l6W4jrwSta/2P0Ixm/
+X-Google-Smtp-Source: AGHT+IGDCyDDpFXpcxY5/SqQkLBBH1y/2dz2ES/5aJsA7i822OJ6tS6CUn3zoE014dWL86vXjWdxoA==
+X-Received: by 2002:a05:600c:46c7:b0:412:b4c:58da with SMTP id q7-20020a05600c46c700b004120b4c58damr2047wmo.9.1709143427108;
+        Wed, 28 Feb 2024 10:03:47 -0800 (PST)
+Received: from localhost (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
+        by smtp.gmail.com with ESMTPSA id y16-20020a05600c365000b00412656ba919sm2692111wmq.20.2024.02.28.10.03.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 10:03:46 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	horms@kernel.org
+Subject: [PATCH net-next] net: ip6_tunnel: Leverage core stats allocator
+Date: Wed, 28 Feb 2024 10:03:17 -0800
+Message-ID: <20240228180318.1650988-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] net: tehuti: Fix leaks in the error handling path
- of bdx_probe()
-Content-Language: en-MW
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: andy@greyhouse.net, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-References: <cover.1709066709.git.christophe.jaillet@wanadoo.fr>
- <9090b599c7574892b77a9521e3ddb3a52a154205.1709066709.git.christophe.jaillet@wanadoo.fr>
- <3b12e1e2-4859-40b6-8d9d-0a940251bed4@moroto.mountain>
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <3b12e1e2-4859-40b6-8d9d-0a940251bed4@moroto.mountain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Le 28/02/2024 à 11:17, Dan Carpenter a écrit :
-> On Tue, Feb 27, 2024 at 09:50:56PM +0100, Christophe JAILLET wrote:
->> If an error occurs when allocating the net_device, all the one already
->> allocated and registered should be released, as already done in the remove
->> function.
->>
->> Add a new label, remove the now useless 'err_out_disable_msi' label and
->> adjust the error handling path accordingly.
->>
->> Fixes: 1a348ccc1047 ("[NET]: Add Tehuti network driver.")
->> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
->> ---
->> Compile tested only.
->> ---
->>   drivers/net/ethernet/tehuti/tehuti.c | 15 ++++++++++-----
->>   1 file changed, 10 insertions(+), 5 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/tehuti/tehuti.c b/drivers/net/ethernet/tehuti/tehuti.c
->> index 938a5caf5a3b..6678179885cb 100644
->> --- a/drivers/net/ethernet/tehuti/tehuti.c
->> +++ b/drivers/net/ethernet/tehuti/tehuti.c
->> @@ -1965,7 +1965,7 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->>   		ndev = alloc_etherdev(sizeof(struct bdx_priv));
->>   		if (!ndev) {
->>   			err = -ENOMEM;
->> -			goto err_out_disable_msi;
->> +			goto err_out_free;
->>   		}
->>   
->>   		ndev->netdev_ops = &bdx_netdev_ops;
->> @@ -2031,13 +2031,13 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->>   		if (bdx_read_mac(priv)) {
->>   			pr_err("load MAC address failed\n");
->>   			err = -EFAULT;
->> -			goto err_out_disable_msi;
->> +			goto err_out_free_current;
->>   		}
->>   		SET_NETDEV_DEV(ndev, &pdev->dev);
->>   		err = register_netdev(ndev);
->>   		if (err) {
->>   			pr_err("register_netdev failed\n");
->> -			goto err_out_free;
->> +			goto err_out_free_current;
->>   		}
->>   		netif_carrier_off(ndev);
->>   		netif_stop_queue(ndev);
->> @@ -2046,9 +2046,14 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->>   	}
->>   	RET(0);
->>   
->> -err_out_free:
->> +err_out_free_current:
->>   	free_netdev(ndev);
-> 
-> Since it seems like you're going to be resending this patch, could you
-> do this free_netdev() before gotos?  That way if someone adds more code
-> after the loop then we can still use the goto ladder to unwind.  (No one
-> is going to add more code after the loop, I know...  I wouldn't have
-> commented except that it seemed like you were going to resend.)
-> 
-> 		if (bdx_read_mac(priv)) {
-> 			free_netdev(ndev);
-> 			pr_err("load MAC address failed\n");
-> 			err = -EFAULT;
-> 			goto err_out_free;
-> 		}
-> 
+With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
+convert veth & vrf"), stats allocation could be done on net core
+instead of in this driver.
 
-Yeh, I thought about it, but it is more verbose and this code looks 
-mostly unchanged since 2007!
+With this new approach, the driver doesn't have to bother with error
+handling (allocation failure checking, making sure free happens in the
+right spot, etc). This is core responsibility now.
 
-Anyway, I agree with you and will update accordingly.
+Remove the allocation in the ip6_tunnel driver and leverage the network
+core allocation instead.
 
-CJ
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ net/ipv6/ip6_tunnel.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-> regards,
-> dan carpenter
-> 
-> 
-> 
-> 
+diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+index 5fd07581efaf..e9cc315832cb 100644
+--- a/net/ipv6/ip6_tunnel.c
++++ b/net/ipv6/ip6_tunnel.c
+@@ -247,7 +247,6 @@ static void ip6_dev_free(struct net_device *dev)
+ 
+ 	gro_cells_destroy(&t->gro_cells);
+ 	dst_cache_destroy(&t->dst_cache);
+-	free_percpu(dev->tstats);
+ }
+ 
+ static int ip6_tnl_create2(struct net_device *dev)
+@@ -1848,6 +1847,7 @@ static void ip6_tnl_dev_setup(struct net_device *dev)
+ 	dev->flags |= IFF_NOARP;
+ 	dev->addr_len = sizeof(struct in6_addr);
+ 	dev->features |= NETIF_F_LLTX;
++	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+ 	netif_keep_dst(dev);
+ 
+ 	dev->features		|= IPXIPX_FEATURES;
+@@ -1873,13 +1873,10 @@ ip6_tnl_dev_init_gen(struct net_device *dev)
+ 
+ 	t->dev = dev;
+ 	t->net = dev_net(dev);
+-	dev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
+-	if (!dev->tstats)
+-		return -ENOMEM;
+ 
+ 	ret = dst_cache_init(&t->dst_cache, GFP_KERNEL);
+ 	if (ret)
+-		goto free_stats;
++		return ret;
+ 
+ 	ret = gro_cells_init(&t->gro_cells, dev);
+ 	if (ret)
+@@ -1903,9 +1900,6 @@ ip6_tnl_dev_init_gen(struct net_device *dev)
+ 
+ destroy_dst:
+ 	dst_cache_destroy(&t->dst_cache);
+-free_stats:
+-	free_percpu(dev->tstats);
+-	dev->tstats = NULL;
+ 
+ 	return ret;
+ }
+-- 
+2.43.0
 
 
