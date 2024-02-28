@@ -1,85 +1,145 @@
-Return-Path: <netdev+bounces-75774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E68486B24C
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:49:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1611286B270
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:54:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAE0E1F26CD9
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:49:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 629FCB210FF
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:54:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CCB2151CD3;
-	Wed, 28 Feb 2024 14:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB78F15958A;
+	Wed, 28 Feb 2024 14:54:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nwuz6L4N"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="TBlzutj3";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RWWbvqQ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28EC912E1DD
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 14:49:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA4973512;
+	Wed, 28 Feb 2024 14:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.111.4.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709131741; cv=none; b=e5MjGoI20PN9qj+KYhbivmz7HW48AepZeO++vQqxd2Qetx7RlJt5EkmA4SLZRG5ctl1tUIUBAtn8tbepxdMIbXfudtRLDPLu0ivYHcW1jlL8kw81mN8reLOLEIf34zHDawrwMD1vhpTQnBgUmxtahLP4Vzk58AX+Z7BfhgOZCmg=
+	t=1709132084; cv=none; b=TQW89ZslADvwov1np47i1xU193rDBNhqr2hammz2Fj7SfiCRflZBvrfD6KQ8UW1ylxhAj23cq09qliXurFCVZOVtgnt/sxrXomA6vBpTNgAaIZJJPtSmmgyw52ABn8M4TcE/IbPuOAHJUPP+VPzlWkVtiPjbyaNdJP29j6chTJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709131741; c=relaxed/simple;
-	bh=MR+jh3Jc65T/XDWjd68f1WpETwT/Q+VjVGIbPGp7HGI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mSfa7JYwVM92GNgUnKEKVlITLn2lN7xuOIZXowAc7SBDJwCI5u8HeFQUr/KPWdTJoHSONeeGrDOpgwf0cQr7wZV2e9rPgx1+PGsv0ot0G/3010gI6ZKZRdVMIwXyElfuN9Mmup72jKUwO9WjDTBhi25e4in7Kz7+2apktd8jYi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nwuz6L4N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 530D2C433F1;
-	Wed, 28 Feb 2024 14:49:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709131740;
-	bh=MR+jh3Jc65T/XDWjd68f1WpETwT/Q+VjVGIbPGp7HGI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Nwuz6L4NiVZn8ZZ26EKn8pGiqcvoSZoFIYvI03BqgJ4gShCksiCW+bqI7bLbzst+G
-	 0RnbUc4jb9H0/9Kb/7+8mYy1eIQw/AhnzaU4l9i1GxzZl3E7skzaLG2BzTR/s+jY2J
-	 CyhA6AxoGhpv/UHhKo/YZ74pijG5MnPGP7Z1RklsptEHDWs8Vb0gd1mOWqIn6ieGpn
-	 2ZSXarTOXsygzzuaBSAyoz5MFjqI8hRygW16kbgedLnbc5LHinR5wZVsJYqhZclVa9
-	 1tep1V3nHbAvv7r448j4P+BoU0ZGd/wDSO7EhyLupeAgjQLMrbhiemRy+QaLQfhveg
-	 uVL9CVeavmGvg==
-Date: Wed, 28 Feb 2024 06:48:59 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- <netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>, David Ahern
- <dsahern@kernel.org>, <mlxsw@nvidia.com>
-Subject: Re: [PATCH net-next 2/7] net: nexthop: Add NHA_OP_FLAGS
-Message-ID: <20240228064859.423a7c5e@kernel.org>
-In-Reply-To: <877cioq1c6.fsf@nvidia.com>
-References: <cover.1709057158.git.petrm@nvidia.com>
-	<4a99466c61566e562db940ea62905199757e7ef4.1709057158.git.petrm@nvidia.com>
-	<20240227193458.38a79c56@kernel.org>
-	<877cioq1c6.fsf@nvidia.com>
+	s=arc-20240116; t=1709132084; c=relaxed/simple;
+	bh=Y+7/5mhPZBptJeNuYZtHzu66OCEsCfP5b3mZFAVJEho=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=jkrmX/unszqe8TKuC4fQFhTNHytOw6sQZQi3w0yBHEZs2WTCH0GU5cYwyHSPnIbZhaZ2ZId08ueqv6Oo6nAcsMeOx8VKaQv/ueiVa/Q852a47kHIBZeQk0qYbtYvJnyMQBQOI9rbvc1hu5lR02qB4DU4/rOIScLTAasFAcPDoNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=TBlzutj3; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RWWbvqQ/; arc=none smtp.client-ip=66.111.4.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id 6DB5E5C049D;
+	Wed, 28 Feb 2024 09:54:41 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Wed, 28 Feb 2024 09:54:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1709132081; x=1709218481; bh=p2oBXCBPa5
+	Te8eYjdkY/VrzwmmeYD1hEdZ5hF+LH8JI=; b=TBlzutj3JSlO5koSP5xw7k+irJ
+	0hZavVqjKWnu7v2MYhHuOMiUE3fIFRzqi/rBPpvjGbntcg3uMyPAft+32ddXjmNX
+	5zBABph+FZaN1gFRDTXCFJAwRFtoM8/mE7BOsPsdpNeqq6DDyjSbftV8OfFdiB0V
+	+d+Aq8TQuSMnlzCje3325683suFGsnegn/tbIEAgQyrUuYnm0Hd3Xce2P4wnaPRp
+	+YOjeuvW98qaV6cLgZHG06L1VIeerPOZ5lU1b9cA3ZEK8jAwBrjQKfEJWkqqXHKC
+	E05U+vvmDT+ALjvya75BAn9NNId9lbH3kaKw+kI0y8ysAg5+4tSubv2EL/Mw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1709132081; x=1709218481; bh=p2oBXCBPa5Te8eYjdkY/VrzwmmeY
+	D1hEdZ5hF+LH8JI=; b=RWWbvqQ/Ne/Biv7H2HA1/RgmZ4nNcBwSykwsBTU2KoKD
+	ENkzfIfAoi6RE0EqYAw2132pO/DFf1FuS6lx6B1j0hkxuHwHqnt46HAxJ3m3xnGS
+	ALsmHSC8Fjs7je8qJDodeWMDKb3mNL7+pKA1X+3KL5Dzt/3j/OcCPCNU5OhhXbHr
+	GbEoo3YWw2CPeGccgjwtHVQgS+aw6y1wRy/FEAHcS2QGhQZ/KXoe0iuao70gL4cx
+	1/dKdJjjzHz0C29vhAiFJDFW2ADPC53PHcr6vJXv2jbB198vQhU0H0noSI2ZUDqv
+	48Pi6NVQil6gE1OVy18zxChcd/s9sYee0ZsJn+TKvA==
+X-ME-Sender: <xms:MUnfZb7jHSrWyVsdUu3ZM3yG53hbGTTR3Gv0pTrxwJ1i-x3q1MJkDQ>
+    <xme:MUnfZQ7IdMi_NiixLikw6lfiygDu99L3A_orvyzjLKE1KGJG2tVCvaJH5krmgCzn_
+    f0qt5YUbqikCW7-iW8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrgeejgdeiiecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
+    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
+    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
+    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
+    hnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:MUnfZScavs01mZ8Cf7658uCEK5eKltpRUhbtWb9JyTxkd1Lhci-KOA>
+    <xmx:MUnfZcKYR5hJQLUnXr4xCTf5SLNLrN_tNVVZlv2emQBriYftASweYQ>
+    <xmx:MUnfZfIa1nQBXZKdNMaziTKaRCsm4OVK_exJq_cO-GUAf2YGSGhO6g>
+    <xmx:MUnfZRyjBj4OCu_Q8XXzsjSr5g-FhUdrSE9p_hKxuQbcE9rr7WSz8Q>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 20E56B6008D; Wed, 28 Feb 2024 09:54:41 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-182-gaab6630818-fm-20240222.002-gaab66308
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Message-Id: <debdd4e5-d3f2-4199-a2f7-825e37b212da@app.fastmail.com>
+In-Reply-To: 
+ <CAA93jw50D5Kqi4=ze4qn1TUswWtmEao9=FBtH=4W_g9CnBf=AA@mail.gmail.com>
+References: <20240228140413.1862310-1-arnd@kernel.org>
+ <CAA93jw50D5Kqi4=ze4qn1TUswWtmEao9=FBtH=4W_g9CnBf=AA@mail.gmail.com>
+Date: Wed, 28 Feb 2024 15:54:19 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Dave Taht" <dave.taht@gmail.com>, "Arnd Bergmann" <arnd@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Breno Leitao" <leitao@debian.org>,
+ "Roger Quadros" <rogerq@kernel.org>,
+ "Siddharth Vadapalli" <s-vadapalli@ti.com>,
+ "Grygorii Strashko" <grygorii.strashko@ti.com>,
+ "Dan Carpenter" <dan.carpenter@linaro.org>, Netdev <netdev@vger.kernel.org>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ethernet: ti: am65-cpsw-qos: fix non-bql configs
+Content-Type: text/plain
 
-On Wed, 28 Feb 2024 11:50:33 +0100 Petr Machata wrote:
-> > Why bitfiled? You never use the mask.
-> > bitfield gives you the ability to do RMW "atomically" on object fields.
-> > For op flags I don't think it makes much sense.  
-> 
-> Mostly because we get flag validation for free, whereas it would need to
-> be hand-rolled for u32. 
+On Wed, Feb 28, 2024, at 15:44, Dave Taht wrote:
+> but why do you want to disable BQL?
 
-NLA_POLICY_MASK() ?
+I have no idea, I'm just doing randconfig build tests.
 
-> But also I don't know what will be useful in the
-> future. It would be silly to have to add another flags attribute as
-> bitfield because this time we actually care about toggling single bits
-> of an object.
+I assume Breno has an answer for that, at least he
+sent the patch that triggered the regression, see below.
 
-IDK how you can do RMW on operation flags, that only makes sense if
-you're modifying something. Besides you're not using BITFIELD right,
-you're ignoring the mask completely now.
+     Arnd
+
+commit ea7f3cfaa58873bbe271577efa800647e30f18bd
+Author: Breno Leitao <leitao@debian.org>
+Date:   Thu Feb 15 09:05:07 2024 -0800
+
+    net: bql: allow the config to be disabled
+    
+    It is impossible to disable BQL individually today, since there is no
+    prompt for the Kconfig entry, so, the BQL is always enabled if SYSFS is
+    enabled.
+    
+    Create a prompt entry for BQL, so, it could be enabled or disabled at
+    build time independently of SYSFS.
+    
+    Signed-off-by: Breno Leitao <leitao@debian.org>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+diff --git a/net/Kconfig b/net/Kconfig
+index 4adc47d0c9c2..3e57ccf0da27 100644
+--- a/net/Kconfig
++++ b/net/Kconfig
+@@ -331,6 +331,7 @@ config NET_RX_BUSY_POLL
+ 
+ config BQL
+        bool
++       prompt "Enable Byte Queue Limits"
+        depends on SYSFS
+        select DQL
+        default y
 
