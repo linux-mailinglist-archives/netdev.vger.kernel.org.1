@@ -1,127 +1,145 @@
-Return-Path: <netdev+bounces-75686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BAA486AE83
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:00:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4014886AE9E
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:02:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D22361F2521E
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:00:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71B971C20E00
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A83E26CDC5;
-	Wed, 28 Feb 2024 11:57:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A4457351E;
+	Wed, 28 Feb 2024 12:02:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hsG8VPCk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CzQN76Pb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D90F7351E;
-	Wed, 28 Feb 2024 11:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70CD73511;
+	Wed, 28 Feb 2024 12:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709121445; cv=none; b=dkFNxGKj4FpsPAoiiMiQdxEdlU2wydykgDlwMEcEcXygI/mDPgEpJX5peAXo65+Tcxdr+8qyY9OQgJRiH+993K50d5rSvH8wCCDdJxjQVdjmJ1aNDqgc44YWDYpdC2Q0F9H2dIxthFO1aLZa52oroQV425D0DhIlZJl/0Bn4FWk=
+	t=1709121735; cv=none; b=IG03B6f0w5Dw+7A7DHhqI6v/vGSvrpg5A03YcZe4DuiOBLhedsYDLHbbEzjvXckJXr+qs9dU5EmmfA5XT7zzm7K46f4R4G/kJEGb5S3ohkmBnqXOdh4pzNs2O2zqrCJ6p1oCBtT/KAr5cAlneUzCrHFbs2xGX30Ho0ulX6UF9CA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709121445; c=relaxed/simple;
-	bh=rcSNTBiRF+f+3t3RzyuU+qKQ8ru2QZn9y+YmrmBALig=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SHQFyOBcuAtYP28Fh7tew2DmU6xhYzIRWEtwwgbhGbu10PyPIVDfkL67J1wleYfKdH2vwL3YCQYedcUjOtDCYMpwdwb0iqRM5NSt9on4b5iXUN1vZ54Z5dboH5HqornVy8HZhaMd4Jy7I5Oh/zFi1hjeIibIJ/17554pcggpl6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hsG8VPCk; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1709121735; c=relaxed/simple;
+	bh=6V9fLnX4djEHIHnxWds6qMnJtXmi2aPHUDNuD/uxng8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uLhMlUk54Xz/xGKyJCdq8gMsGyaaccNnRuLi7bLLDWSaCsHTSrfpDT6sOe/q2MU8tzK6kH5Zx9u16rnUbUNpboVptl7vG1qQ8yhtVNq4W1kFYyDvrxMAIR/P/1urbKKp+Q/UUfq4JDCatPJ/8A/4O5v7PC9CkZKE+7uEqKDy2FE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CzQN76Pb; arc=none smtp.client-ip=209.85.166.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1dcc7f4717fso7467195ad.0;
-        Wed, 28 Feb 2024 03:57:23 -0800 (PST)
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-7c78b520bc3so198155039f.0;
+        Wed, 28 Feb 2024 04:02:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709121443; x=1709726243; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ANLYUYqTJ5NOkYuF+uWmj+L6Rv2c3OMTBVV8U8yPtxY=;
-        b=hsG8VPCkQ4SPnzuYE5BesN9VIC7c2/XUIqQraZGAOZhuVqTHdYVW1Q9fypO3Fzc5kR
-         GI7X88eVsFVSl+45kvJNx6YJHulGv8Vs96p+v4kAaw/xIwULrwJMYkR3Vm833BqHb2VA
-         dnr0lQEk1UocIdnLIDXFKVqlQ52Is8E7IlASrAz5bWgMFpEjpD67HlYXTNmQJImtUyOY
-         Bvs4F3qnh4DbWWB0+D0stcJVJtDn5g9IcgbSQR0S6NMrkk/Csp+w8lKbnLyJof8fakBO
-         mODL7BWEBSTiNwdXIvZHH5bV/FOfQnKNJQ5QBhwK/Eosgs91m60DP5jn8XyWvNNI5QjM
-         YhsA==
+        d=gmail.com; s=20230601; t=1709121733; x=1709726533; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9EbFg5rAlApTq4Ur/KjS2tqf+My7HKA0PMj35gGR2V8=;
+        b=CzQN76PbicNYox5671sKJwQOrvfML0r/Fea/aETK+pyRWmd9Y2vrrMz5j3kPRu4Z4P
+         UFioKOr8S7NbF3lQhCztNh5DFhPCdm1kEPffgzmQ7aMRzByOXBWeQXzqP2skm3p7UIS3
+         ARj1zjNyzuWgKzoNlpwdaxuA16UvQt0vY+Hd5srfFpkNAHX2lMOMN+Dxjc/duX0t6TsL
+         jIag1/dsLOhwfoP7BCQm87a/Hh0bvZdo1gTUeo42S2Xd5/+8/i6eaDldWYmT5E4ZJruV
+         qdKlMnhg1ufXurQMbfhnJCdkUlD0yymPSlVLY6X21PUxyZKSrqiUfECeNHcPAFkB5DfF
+         xN1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709121443; x=1709726243;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ANLYUYqTJ5NOkYuF+uWmj+L6Rv2c3OMTBVV8U8yPtxY=;
-        b=cbzsVkB4E72TYKHymJY42M2gP6JpximJk2raPmni0IDfownt8hx56qo2cR22Pf45MA
-         P2wvwgLZJpcjewf2JjAgOI2muDOmWO79pDxSwP1eqbRL50VU0Vw+7bYqv/Dt+9PbJfB1
-         ag2UNX7tHbfZyH9h0leYR+146EHR779Ta4ibx/EKA5tuRmvJwQ6DuVbPO8/FYxUaGt6J
-         gBZXvUY43go8oIGkC0Hzd4UcFUzVq43oYjZaBubZVcQuEPwgI0yNdReNfV3wpxLkN2wg
-         ZhYQbuUzkNLvghtIn4JLSPz1DVVwOUnhc5UT2f9Na6F0z3y2204RP64UnbvHhHuPvI5a
-         wypQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWmX/XG9AC4RQwsAFqLojI4xD8koj85hLgIvvZTBPm7ahuH+GHOxlg2Im57POwceXnTPsnDzY1S1YQbQhdB9GiqgoFJJ6b5rcDKAChASIarpciGb382phznsvotATD3dL+EXJOkr//VYRMNdCV7
-X-Gm-Message-State: AOJu0YwCl7AIH4FKCG4oQMF/9h2W17jzV4VdE56zJV9uk+O7hsXEBbGk
-	T9i6nmk6Mu4pVEx1B0JKcKYAgx1yXiLYfQQ1rK4rqkyRIBnB3Cqk
-X-Google-Smtp-Source: AGHT+IF51RV9A4dYFGcyQ378LWI5tKCNm6KT+pRauZgzs8Pdzqw0S11E1x9Hv/cyW2/s+TaVikNpyg==
-X-Received: by 2002:a17:902:fc87:b0:1db:4941:f703 with SMTP id mf7-20020a170902fc8700b001db4941f703mr14753116plb.15.1709121443368;
-        Wed, 28 Feb 2024 03:57:23 -0800 (PST)
-Received: from localhost.localdomain ([115.99.206.243])
-        by smtp.gmail.com with ESMTPSA id l8-20020a17090270c800b001dc23e877c9sm3141647plt.106.2024.02.28.03.57.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 03:57:22 -0800 (PST)
-From: Prabhav Kumar Vaish <pvkumar5749404@gmail.com>
-To: shuah@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	petrm@nvidia.com,
-	idosch@nvidia.com,
-	Prabhav Kumar Vaish <pvkumar5749404@gmail.com>
-Subject: [PATCH net-next] Correct couple of spelling mistakes
-Date: Wed, 28 Feb 2024 17:27:07 +0530
-Message-Id: <20240228115707.420200-1-pvkumar5749404@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1709121733; x=1709726533;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9EbFg5rAlApTq4Ur/KjS2tqf+My7HKA0PMj35gGR2V8=;
+        b=Td8DXD5tctQrA2UdCKlYB5uQU4d+94CBx9z29H//zlCCvD0+zrXNYicl3ZutV9Sp22
+         113BhHOn6Se3TyKisakTQmDeaY9rwzxdYcTICktWuHdKlZtzVVJzHvBbSackLNKWas7Y
+         KMKomuvAeJOQEyIsTHOkDZ6lFDCcL10JpXFsxnse/l6kHObY2txEWkCcsterg1Z1sbb3
+         ZW2u+N1z8sSpYZJKVqBdwDDm8f9lsejtM5d6t/D1kFYj+is8grFri+n8MHXir7/STRAR
+         xaDU7Qk2rIjYxU91mOV/u3QFxyK+HWrjSTZST9bDIBjLPKo2jfcvGNZajAdsuLeVp3fy
+         U8ug==
+X-Forwarded-Encrypted: i=1; AJvYcCWHMpfcs6BgJbfm86O4Na4a8iUmL1lSaBlhZ6p6DhCZ5vAmslCXNGj9UiQluMQn3/holcNNnBACb+7TtyXQeSm0iFh1hJ5vwlnNZeBIo7mu7Kw7YzG9LTGwTfZyeyM9VdgGjlD/
+X-Gm-Message-State: AOJu0YwyYr7OiVTdq0lKKgCMG5C3V65tjgQB9R2DNOzS8I1SOMq8B2EF
+	A0OSh3idWntMlyvWrUcV8FcQ+AOWPvOWLhH8bcIEckUkdYZr1x70
+X-Google-Smtp-Source: AGHT+IHQ2x000uqQolclyzQgafNQ9xKVlzClv2eZYrTcDX5jTDSRh0RJ/VLEbKeg09C1QMdrtitnjA==
+X-Received: by 2002:a05:6602:358:b0:7c4:61e7:9d77 with SMTP id w24-20020a056602035800b007c461e79d77mr15494595iou.19.1709121732669;
+        Wed, 28 Feb 2024 04:02:12 -0800 (PST)
+Received: from [192.168.0.107] ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id c8-20020a62e808000000b006e4625a0f0dsm7596575pfi.169.2024.02.28.04.02.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Feb 2024 04:02:12 -0800 (PST)
+Message-ID: <b2b21bca-9c99-4df5-9947-29d19abd89e6@gmail.com>
+Date: Wed, 28 Feb 2024 19:02:03 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: Network performance regression in Linux kernel 6.6 for small
+ socket size test cases
+Content-Language: en-US
+To: Linux regressions mailing list <regressions@lists.linux.dev>,
+ Abdul Anshad Azeez <abdul-anshad.azeez@broadcom.com>, edumazet@google.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+ dsahern@kernel.org, Linux Networking <netdev@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Boon Ang <boon.ang@broadcom.com>, John Savanyo
+ <john.savanyo@broadcom.com>, Peter Jonasson <peter.jonasson@broadcom.com>,
+ Rajender M <rajender.m@broadcom.com>
+References: <CALkn8kLOozs5UO52SQa9PR-CiKx_mqW8VF9US94qN+ixyqnkdQ@mail.gmail.com>
+ <Zd7vqSnT6ocYLuZ4@archie.me>
+ <8015b1f0-d37b-45de-bd24-12fc21cbf83d@leemhuis.info>
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+In-Reply-To: <8015b1f0-d37b-45de-bd24-12fc21cbf83d@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Changes :
-	- "excercise" is corrected to "exercise" in drivers/net/mlxsw/spectrum-2/tc_flower.sh
-	- "mutliple" is corrected to "multiple" in drivers/net/netdevsim/ethtool-fec.sh
+On 2/28/24 16:09, Linux regression tracking (Thorsten Leemhuis) wrote:
+> On 28.02.24 09:32, Bagas Sanjaya wrote:
+>> [also Cc: regressions ML]
+>>
+>> On Wed, Feb 28, 2024 at 12:13:27PM +0530, Abdul Anshad Azeez wrote:
+>>> During performance regression workload execution of the Linux
+>>> kernel we observed up to 30% performance decrease in a specific networking
+>>> workload on the 6.6 kernel compared to 6.5 (details below). The regression is
+>>> reproducible in both Linux VMs running on ESXi and bare metal Linux.
+>>>
+>>> [...]
+>>>
+>>> We would like to know if there are any opportunities for optimization in
+>>> the test cases with small socket sizes.
+>>
+>> Can you verify the regression on current mainline (v6.8-rc6)?
+> 
+> Bagas, I know that you are trying to help, but this is not helpful at
+> all (and indirectly puts regression tracking and the kernel development
+> community into a bad light).
+> 
+> Asking that question can be the right thing sometimes, for example in a
+> bugzilla ticket where the reporter is clearly reporting their first bug.
+> But the quoted report above clearly does not fall into that category for
+> various obvious reasons.
+> 
+> If you want to ensure that reports like that are acted upon, wait at
+> least two or three work days and see if there is a reply from a
+> developer. In case there is none (which happens, but I assume for a bug
+> report like this is likely rare) prodding a bit can be okay. But even
+> then you definitely want to use a more friendly tone. Maybe something
+> like "None of the developers reacted yet; maybe none of them bothered to
+> take a closer look because it's unclear if the problem still happens
+> with the latest code. You thus might want to verify and report back if
+> the problem happens with latest mainline, maybe then someone will take a
+> closer look".
+> 
+> Okay, that has way too many "maybe" in it, but I'm sure you'll get the
+> idea. :-D
+> 
 
-Signed-off-by: Prabhav Kumar Vaish <pvkumar5749404@gmail.com>
----
- .../testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh | 2 +-
- tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh    | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Oops, I'm always impatient (and forgot to privately mail you) in this case.
+Sorry for inconvenience.
 
-diff --git a/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh b/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh
-index 616d3581419c..31252bc8775e 100755
---- a/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh
-+++ b/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh
-@@ -869,7 +869,7 @@ bloom_simple_test()
- bloom_complex_test()
- {
- 	# Bloom filter index computation is affected from region ID, eRP
--	# ID and from the region key size. In order to excercise those parts
-+	# ID and from the region key size. In order to exercise those parts
- 	# of the Bloom filter code, use a series of regions, each with a
- 	# different key size and send packet that should hit all of them.
- 	local index
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh b/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
-index 7d7829f57550..6c52ce1b0450 100755
---- a/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
-+++ b/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
-@@ -49,7 +49,7 @@ for o in llrs rs; do
- Active FEC encoding: ${o^^}"
- done
- 
--# Test mutliple bits
-+# Test multiple bits
- $ETHTOOL --set-fec $NSIM_NETDEV encoding rs llrs
- check $?
- s=$($ETHTOOL --show-fec $NSIM_NETDEV | tail -2)
 -- 
-2.34.1
+An old man doll... just what I always wanted! - Clara
 
 
