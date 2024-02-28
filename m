@@ -1,145 +1,120 @@
-Return-Path: <netdev+bounces-75595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C67FF86AA4D
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:42:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B45F86AA52
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:44:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D1461F24AF3
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:42:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A63E1F22873
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A882CCB3;
-	Wed, 28 Feb 2024 08:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD162D044;
+	Wed, 28 Feb 2024 08:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cdhYCy1B"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="sur7Hj1K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048282D622;
-	Wed, 28 Feb 2024 08:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3132CCB3;
+	Wed, 28 Feb 2024 08:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709109738; cv=none; b=PeZGbZOyzOKUZHt9Fr2g7xjrOkdfJxqVF8BN8TW0Zh2B6LeBYEhWqUbxgFzd45ZJzHIrcnIbCrqLisSRHu/KXYi5f/jpOC+4+cgmBgMlBR1FE6nZW75VmlpP4kvVfu5aL6qS9L8H91XXUnNt67HPkRGdB9Mhi4kFNKZ0HGIl0oc=
+	t=1709109852; cv=none; b=uzIKTXhopsWeO/25E9dnbaHd7S3VT+rTpveLcE1LNhc7pTDnymTz0/xiQKK7GBVQnP0+mLOnPAn+UfvZ/aYwVPtHM6hFOMZcpkUpyOwVTTD4SRmGGClPnbsKjkfJLWY1BtGohTDzVgJHF8jZuarLxjDpzpQMH3Ewv6KMn8jHIJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709109738; c=relaxed/simple;
-	bh=DKje+K8ippA0ZYfJntuI0R7Vbe0XtsQE0B+iMwY1OGI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZzxWcOwjdbZ3O/7O/Yk5RN+TppKEkZBGaMtgrrI0RC44mSjR5ySKDML3rluhlAHlJEmrR++0/KDKuvx0iM711WB9VfyFTrl/DXC1ZQum/oex42ChV0jN8NdrX4Yni73ZTTWDvP1OUc9iqVVvkNuzMDNl8Vw6Zv+ZrE3actuV0e4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cdhYCy1B; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-565a3910f86so5863803a12.3;
-        Wed, 28 Feb 2024 00:42:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709109735; x=1709714535; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j/Z7R/WO7svFjmJZnbr0mJ+YCtxsZi714lKpVsB3CcM=;
-        b=cdhYCy1BcrCdUPa7udojTVvrSWDD+75lTtba8w1X5khpZBSHe2bZwY4zBYRfJUxAhU
-         k/klnnPvzWT+vcfDTmT6wriP25aF5Gw9Y1DWHv6GhQA4Bq8nnoPHMHY0/6eInice6A7/
-         XjY84lqefh7KBem8SbsL4Lx8WnIwd9Wpcedxbj5OUNmupjCiz7cQToaisqzTTOKkQfpB
-         IQU/t/ys4kg5LCVKdfQvo0ZuUIFNU7B8lYdBD2Nu+h4frSh8WfA1moec7ea4YKg4cNQH
-         /WRxyk7JWd+5frAPLi/VNtokkB97LS+83ldO2vWcn+ikNkPHgHd0hj/a3TmQaOMNzhOh
-         Vbog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709109735; x=1709714535;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=j/Z7R/WO7svFjmJZnbr0mJ+YCtxsZi714lKpVsB3CcM=;
-        b=MP8BSnkGXE2RZMQqtfkOUNdAaZRcCNoAmPbv28L+KVXYdPChSaXO6G6Y9Jty6gNg4q
-         4Lzfhr7jber82+/K4v05OjEKIS0oK6IetGnxYbxe48cM3RFQtAeQYENs9gx14pPFXg4G
-         gTcSHsodpC7GjKsDlNsB8UbIUqwAn/FymVdtUTB2JlEPOhNIA+6fhFWD77+48oy7eX9U
-         QyeFQHfrIPfcMih9eI7y2O2949zIRlJTWKeHWWZ7p/XGXBQRILfpbVizJKZF2XlVULyh
-         UpsMJwDPUVP5O237kz/mdu56ipKqE20eZKNX1IQHlvB791p3wZvIPvSL78ythw/BsTrz
-         rtvA==
-X-Forwarded-Encrypted: i=1; AJvYcCUsXoc8aWYDzxQjDSw+S+/wTK9lX5jyHV/3PUI+kEAO4mmbo/WCsuZEQNJgGTRQ1RSFVcDGgg1lpVHDH25N2b4ybPi5gN49A/mlSwGt8Xi0l0W+hoxIFt4s4jCpAn8i4BAH/dKcbfKIj/3ESy9RT0A28urt3XW/WdELt9Av002jX5Dw4/xO
-X-Gm-Message-State: AOJu0YwsFjtoeDjSgIScd4ed7cJx9EXS2/MdLPeCyJ82JMD/O2oEvZt4
-	QmjTOXV9Ht6p9drXAkydlmnKDYEgPl8IKo7Wp4vRaR8dbd+0pDuuC+T6nGHS/Hj/nphEYpL2N4f
-	NNUqdVnaK8mB1fopu643PLM6fhUA=
-X-Google-Smtp-Source: AGHT+IF7MgqUj7NAYok7BIhuXjGbhI85Yb/h9+YNKq9JCA25YqjK4vUmRdjvJNQXIXwX80fcdNu+pXkNi4gpR5CYAtg=
-X-Received: by 2002:a05:6402:e9a:b0:565:af1d:7416 with SMTP id
- h26-20020a0564020e9a00b00565af1d7416mr8007975eda.5.1709109735183; Wed, 28 Feb
- 2024 00:42:15 -0800 (PST)
+	s=arc-20240116; t=1709109852; c=relaxed/simple;
+	bh=cHIS1svXb6d/RpoB/Li5PbPLE1lQzEq1C87i6qaodzY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ld/fNsJfMTWcK9b5yO75ksZLZbd5BECrNJ41/jJeqStBm4TyQFonVXjngNIu0qreraB1U023sMQoOfos1ZxXjnKOzxYze0/EdjRoHlbgzGrf4qQ61HHH5vOj1gmU1WBuqOD5FcrmfgM9TWpPkI8YQDEAkn5J/Yu7glLDBcFODLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=sur7Hj1K; arc=none smtp.client-ip=212.227.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1709109826; x=1709714626; i=markus.elfring@web.de;
+	bh=cHIS1svXb6d/RpoB/Li5PbPLE1lQzEq1C87i6qaodzY=;
+	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
+	 In-Reply-To;
+	b=sur7Hj1Kl1YB2neskONQG2q7PC6AzVx2JuxowRHZCqh9yJMYM9sd4A+K1jEF3nKO
+	 +0ftNVar+jSf0OaUH92joGYT+MKdMaYJaQ54MOWE6mBP/rMpZ3+vFhX25Fq50iCap
+	 EkkksCvUihJDDBwq6g4drzQF7E+H+S4WbKZirKT+V2rc4a5wDc0djK7O46VDPiPWt
+	 KArIx5XwMV9/whj30Y6QvqrDeaSHO9XIwhxtYprays6ZxmRXbIXksZRh3D4k5BoR7
+	 d8sfDHu79ok7EFPoa7nSCeoikk4LNo4ia4ntAc8s3J2THdavm8wks/i0z6pX6pNNI
+	 qjR8YkDg+HOBkAZcag==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.91.95]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1N3ouw-1qx0oz11rE-00ze7P; Wed, 28
+ Feb 2024 09:43:45 +0100
+Message-ID: <99ea976a-2a37-4656-b370-53daaff54c49@web.de>
+Date: Wed, 28 Feb 2024 09:43:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240227175513.8703-1-pvkumar5749404@gmail.com> <Zd7lqr8Cz4XrNoI8@nanopsycho>
-In-Reply-To: <Zd7lqr8Cz4XrNoI8@nanopsycho>
-From: prabhav kumar <pvkumar5749404@gmail.com>
-Date: Wed, 28 Feb 2024 14:12:01 +0530
-Message-ID: <CAH8oh8U1KLxY95DQW9duU30VC5hdQd1YKs+8USuuz0k4JWtBSQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] selftests: net: Correct couple of spelling mistakes
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: shuah@kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, petrm@nvidia.com, idosch@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: net: fman: Use common error handling code in dtsec_init()
+Content-Language: en-GB
+To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jiri Pirko <jiri@resnulli.us>,
+ Madalin Bucur <madalin.bucur@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
+ Sean Anderson <sean.anderson@seco.com>
+Cc: LKML <linux-kernel@vger.kernel.org>
+References: <9b879c8d-4c28-4748-acf6-18dc69d8ebdf@web.de>
+ <20240227184657.76ec4e82@kernel.org>
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240227184657.76ec4e82@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:UEhwDiFFYhbgpCNlbJ0nMLLlJiSUwR7HvrCgVPbeGeuv1ho1Hzh
+ QP/LE3Kre6ApUfuUlw5Nn+7yogjHSg/EXBCsTU+9TVnN87aeHhjoyy3rzkHUkUumGqXQkTe
+ noa/DF3Rs6RyBKTtI6Ba3lWR2F2SHeqg3SV31381zPJpDNDNy79RaQEFds1WrB0WGi2Bmh3
+ 8m3y6T8aGHM/HAvZONfww==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:/QhjLhitUUU=;rpelHu5AhkcwITbez8ZWCQrQC7b
+ cM963v/AgxcIb1xtJ+crDhpAq5n3CRYqVV+sHvn0UPun/cNWovVu+VnOeuQxFOsYJ8MvCGAmx
+ XfoMDZo7K5lKrrncjVeUeXfFFAjaxBpzBSv0lzqgU/zuixrBNJUoX333Axca14zNmgY3yGq62
+ 4M9kY00bAqA49lwDDYQRzsPdbnrwvu9ryZBi0ph6UzoMQsIO2JnvkOh+SdiO/A8PDiGkCIy+l
+ WNEbVna/k6mqcLsgu1G6/QW/eBY8FXYAwQGOysQfsuGQVWN4sBNVo4e3TN4OChriGavyjayF4
+ JLvejHRVIAVD4pS9iEgDwVLQOhekpwbLYMYnnRganTPWeBaFyfWBaMrMCZ+ymOgsP1EsmtvbZ
+ XULtruU8D4KZ5sEkE1xQRSmr0zw2771g1XwNBZMiooc+4WJObWs3zv1r68tuOocAWfjDE29/N
+ bOluLQpIcJ0D9par2AouOalclthzqGyv42J3QuT5XjD18DFnsAum1YmV3212wWRa1r/b32EVC
+ v2tAY4NSImADiVyn9aPL/3hRXplipHUr35JQiS8KzgzuCqygh33FO4c7dcAlzSs4fMxPYIHRu
+ kOtGSGBdg+x4hqDwlxa4rMILEqhYw+sEQB2WhEzcnWi1xl1gmgsimEhtLQEjSan6O4qSfoW/W
+ foGI0QWSv8ikyH7D624KiE72UAU0GNqSE1/JJYY2+utt4pXIX4NMIGASFDvGzjfiFZDzUEDgN
+ C/qToK8EDYF
 
-On Wed, Feb 28, 2024 at 1:20=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote=
-:
+>> Adjust jump targets so that a bit of exception handling can be better
+>> reused at the end of this function implementation.
 >
-> Please fix the patch subject to include appropriate prefixes and
-> rephrase a bit like this:
+> Okay, but..
 >
-> Subject: [PATCH net-next] selftests: net: Correct couple of spelling mist=
-akes
+>>  .../net/ethernet/freescale/fman/fman_dtsec.c  | 19 +++++++++++--------
+>>  1 file changed, 11 insertions(+), 8 deletions(-)
 >
-> pw-bot: cr
->
->
-> Tue, Feb 27, 2024 at 06:55:13PM CET, pvkumar5749404@gmail.com wrote:
-> >Changes :
-> >       - "excercise" is corrected to "exercise" in drivers/net/mlxsw/spe=
-ctrum-2/tc_flower.sh
-> >       - "mutliple" is corrected to "multiple" in drivers/net/netdevsim/=
-ethtool-fec.sh
-> >
-> >Signed-off-by: Prabhav Kumar Vaish <pvkumar5749404@gmail.com>
-> >---
-> > .../testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh | 2 +-
-> > tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh    | 2 +-
-> > 2 files changed, 2 insertions(+), 2 deletions(-)
-> >
-> >diff --git a/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flo=
-wer.sh b/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh
-> >index 616d3581419c..31252bc8775e 100755
-> >--- a/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh
-> >+++ b/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh
-> >@@ -869,7 +869,7 @@ bloom_simple_test()
-> > bloom_complex_test()
-> > {
-> >       # Bloom filter index computation is affected from region ID, eRP
-> >-      # ID and from the region key size. In order to excercise those pa=
-rts
-> >+      # ID and from the region key size. In order to exercise those par=
-ts
-> >       # of the Bloom filter code, use a series of regions, each with a
-> >       # different key size and send packet that should hit all of them.
-> >       local index
-> >diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.s=
-h b/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
-> >index 7d7829f57550..6c52ce1b0450 100755
-> >--- a/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
-> >+++ b/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
-> >@@ -49,7 +49,7 @@ for o in llrs rs; do
-> > Active FEC encoding: ${o^^}"
-> > done
-> >
-> >-# Test mutliple bits
-> >+# Test multiple bits
-> > $ETHTOOL --set-fec $NSIM_NETDEV encoding rs llrs
-> > check $?
-> > s=3D$($ETHTOOL --show-fec $NSIM_NETDEV | tail -2)
-> >--
-> >2.34.1
-> >
-> >
+> ..you've added more lines than you've removed so what's the point.
+
+* Can the change acceptance grow any more for attempts to improve error ha=
+ndling
+  another bit?
+
+* Would you like to fiddle with scope-based resource management?
+  https://elixir.bootlin.com/linux/v6.8-rc6/source/include/linux/cleanup.h=
+#L8
+
+  See also:
+  Article by Jonathan Corbet from 2023-06-15
+  https://lwn.net/Articles/934679/
+
+
+> --
+> pw-bot: reject
+
+Can such an reaction be reconsidered once more?
+
+Regards,
+Markus
 
