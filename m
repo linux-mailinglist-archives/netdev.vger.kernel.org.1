@@ -1,54 +1,66 @@
-Return-Path: <netdev+bounces-75916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2A3986BAC1
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 23:31:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18A8E86BAD3
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 23:42:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 486A9B23755
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 22:31:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD7EFB25671
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 22:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516F11EEE7;
-	Wed, 28 Feb 2024 22:31:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E259170053;
+	Wed, 28 Feb 2024 22:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="riY0y4Fx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2425C16423;
-	Wed, 28 Feb 2024 22:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D90F2B9A7;
+	Wed, 28 Feb 2024 22:41:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709159466; cv=none; b=DAyld/qc+Pw9OFlLUZeDl7IY9oKiG11tRntRMyEeqRu0a2tlpR4IW/QgKROmw44AwL3CIpZTGjLPt0NeI4TrmVxgd9Ay+KXtN6MyWwSMbs2vUNT7Iq6d1zehfph9D0f7K4yw6/SDMAG5XtghQvENoQ6FaY47niU/r8/OU852a5A=
+	t=1709160110; cv=none; b=oMFSD1NVvqM3EgWERLc1UzZk4Xp6a/LCQSQwGHVFFb/rY05o3goYQZXYHugOFYKFs1RM4+ehZ5Neq6PwC9GzfvfxGnEVy+DqDWWmgwoQAmF3yxpEHs1U0tO53W/60mK39j+6GrUpNfXlTju1AjqzpN5W0V8EC+7zFs+hxjsVK/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709159466; c=relaxed/simple;
-	bh=lsoEUwVdzDJU8AO/Ssmxi6hs4UEIghre58Da9e/5tt8=;
+	s=arc-20240116; t=1709160110; c=relaxed/simple;
+	bh=tjZVW+wfEpV5hm2GKoaS8QIBTAqnujkBvNvmFWcTTLc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PqLfpTjLE5ZQCm2+i0YjLGMtL+JvdToIYuoI2j8pxiiv7cPBkVu7WZjKK7b2pxp/fNZsxtWl3KNWNOE04yWaN3miMEtqbSTqthre/flDZy59MMJHSew0SQHmDxEuRU18do82jFXarhxquycvcZwvAbhAYh+XAxT466+EuLOlAqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61490C433C7;
-	Wed, 28 Feb 2024 22:31:03 +0000 (UTC)
-Date: Wed, 28 Feb 2024 17:33:07 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: "Paul E. McKenney" <paulmck@kernel.org>
-Cc: Joel Fernandes <joel@joelfernandes.org>, Yan Zhai <yan@cloudflare.com>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, "David S.
- Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Simon Horman
- <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Coco Li <lixiaoyan@google.com>, Wei Wang
- <weiwan@google.com>, Alexander Duyck <alexanderduyck@fb.com>, Hannes
- Frederic Sowa <hannes@stressinduktion.org>, linux-kernel@vger.kernel.org,
- rcu@vger.kernel.org, bpf@vger.kernel.org, kernel-team@cloudflare.com,
- mark.rutland@arm.com, Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
-Message-ID: <20240228173307.529d11ee@gandalf.local.home>
-In-Reply-To: <ba95955d-b63d-4670-b947-e77b740b1a49@paulmck-laptop>
-References: <02913b40-7b74-48b3-b15d-53133afd3ba6@paulmck-laptop>
-	<3D27EFEF-0452-4555-8277-9159486B41BF@joelfernandes.org>
-	<ba95955d-b63d-4670-b947-e77b740b1a49@paulmck-laptop>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	 MIME-Version:Content-Type; b=qLCtoNmnyd0U9TG/tB7PNN0sW9JEMn7c5/JfaR1hnpxQ+lIE4V/i6M3KJr12Axa5l91haet2d2XYUjGQiQuo4adpiR53IE2pG0j9SrlJk/pJHdcKZND4SDOWRvWkn0D5asLsMYOCLwYY8zmg32b945j/iKa2A3dM3L+PLds669A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=riY0y4Fx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C851C433C7;
+	Wed, 28 Feb 2024 22:41:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709160110;
+	bh=tjZVW+wfEpV5hm2GKoaS8QIBTAqnujkBvNvmFWcTTLc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=riY0y4Fx+9tYTZwqjeMsvr4+CHnvM+egJckNzF8PFaNWQ4EcaJYupvlD7D/scvNCv
+	 OhTNiq2/vxp/DVYtwKstTH3GAs1WmKe8yIY1CUOu7+oAK4EjG6PWlW5nZZj/ylk/xd
+	 9Osn0CC2JXqYGhqhpjD+IOdYMgVLSQLQIgWQ8GvziuaEoSKgQ5/+gk9d5rqnvYJyKh
+	 WOn77ZDAlVWd8VC4fDQ6lEprgplYLB9xmm50yk2Fw7mM8ribnczNkB4HznWNedrKbx
+	 0Zi5KnVyCs3gsId7Prbd3CVRBlNzEzTBkG0FuvZyKyNF8B/BkVTOKkG38ds7GZgeJM
+	 RMKDJwj4vNoHg==
+Date: Wed, 28 Feb 2024 14:41:48 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Vinod Koul
+ <vkoul@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Jonathan
+ Cameron <Jonathan.Cameron@huawei.com>, Mark Brown <broonie@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, dmaengine@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
+ linux-spi@vger.kernel.org, netdev@vger.kernel.org,
+ linux-hardening@vger.kernel.org, Jonathan Cameron <jic23@kernel.org>,
+ Lars-Peter Clausen <lars@metafoo.de>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Subject: Re: [PATCH v4 7/8] net-device: Use new helpers from overflow.h in
+ netdevice APIs
+Message-ID: <20240228144148.5c227487@kernel.org>
+In-Reply-To: <202402281341.AC67EB6E35@keescook>
+References: <20240228204919.3680786-1-andriy.shevchenko@linux.intel.com>
+	<20240228204919.3680786-8-andriy.shevchenko@linux.intel.com>
+	<202402281341.AC67EB6E35@keescook>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,30 +70,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 28 Feb 2024 14:19:11 -0800
-"Paul E. McKenney" <paulmck@kernel.org> wrote:
-
-> > > 
-> > > Well, to your initial point, cond_resched() does eventually invoke
-> > > preempt_schedule_common(), so you are quite correct that as far as
-> > > Tasks RCU is concerned, cond_resched() is not a quiescent state.  
-> > 
-> >  Thanks for confirming. :-)  
+On Wed, 28 Feb 2024 13:46:10 -0800 Kees Cook wrote:
+> I really don't like hiding these trailing allocations from the compiler.
+> Why can't something like this be done (totally untested):
 > 
-> However, given that the current Tasks RCU use cases wait for trampolines
-> to be evacuated, Tasks RCU could make the choice that cond_resched()
-> be a quiescent state, for example, by adjusting rcu_all_qs() and
-> .rcu_urgent_qs accordingly.
 > 
-> But this seems less pressing given the chance that cond_resched() might
-> go away in favor of lazy preemption.
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 118c40258d07..dae6df4fb177 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -2475,6 +2475,8 @@ struct net_device {
+>  	/** @page_pools: page pools created for this netdevice */
+>  	struct hlist_head	page_pools;
+>  #endif
+> +	u32			priv_size;
+> +	u8			priv_data[] __counted_by(priv_size) __aligned(NETDEV_ALIGN);
 
-Although cond_resched() is technically a "preemption point" and not truly a
-voluntary schedule, I would be happy to state that it's not allowed to be
-called from trampolines, or their callbacks. Now the question is, does BPF
-programs ever call cond_resched()? I don't think they do.
-
-[ Added Alexei ]
-
--- Steve
+I like, FWIW, please submit! :)
 
