@@ -1,90 +1,78 @@
-Return-Path: <netdev+bounces-75544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB61586A71D
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 04:20:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B68F286A72C
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 04:24:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49800B2BB23
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:20:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72B2D2855DC
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:24:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44BE71DFF2;
-	Wed, 28 Feb 2024 03:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB7AD1EEE3;
+	Wed, 28 Feb 2024 03:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nl64v+Q2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E4A31KBm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7611DDF5;
-	Wed, 28 Feb 2024 03:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846772107;
+	Wed, 28 Feb 2024 03:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709090432; cv=none; b=Gf6QYoJ49v83VEkaruyklFpKuJg4o7Pf7l8WLeliE6Y+Mwh1ak8wpQqZzM8GVDNE0kSXnZyovKAOnKMDCZ4o9wVXileyDC3DDpDw5/FyRIMtxepJv/kiIe+ZJh+2eq/X+pDmQdiE+q09NUfShAuv8FujUf3k7jO1pCOoYt3o9mA=
+	t=1709090642; cv=none; b=mcqqPByb5/ugXNfqoaxcKacx3SbF//YCbUphUGTChrk/pE5yKn8NLyORmILE6gqifqH8IWl2O1xyM9MIVd4uO1KF4SmQQEEA1XpERC+T2t7Sp7VibTutgLv0SZX6ZJ5Y09FmqdabLhUK64snxOwf3VeDarF8IAVFV/UvsflBvec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709090432; c=relaxed/simple;
-	bh=Tie5XtoEakgyp91HZ1L/FLDkGzkh11gjzWIlmIe20PI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dzAmc5qFrc+qIhMU5xvBwZzxZr7CvLu8FWIff36Rblnip8668LJhNGbcAvKoFFiHru7rMIM+gwCfMei03wveWPH7S5C0I9CA0cHxVJbt6gh/HXCBIc+LINdcWcdtuP98EHXdcn6kmj7HJpVWT/G7ym1k1YQTDypHUmjUdKPkENQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nl64v+Q2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BCEB6C43399;
-	Wed, 28 Feb 2024 03:20:31 +0000 (UTC)
+	s=arc-20240116; t=1709090642; c=relaxed/simple;
+	bh=qjRhA/7m70o8XxVxvrScP2vkVDFa71oSPSWfBELbXys=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=siJiEYt9bEnMOaRoTuPwr58sgZOO1tsbKhMgtBIYy5joRKGcZ8YlcqA+qKKHcVTSWBvj6Nlwp+dKQ7l6rDPS9UHabU0VYtVVrMv557wHXqmZPpGDdL4MBXiKkQwn2FBPR3KU7a5kY3khmKeQ4DftOM2yJyL3QPNz9KJSTedyRJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E4A31KBm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 803E7C433C7;
+	Wed, 28 Feb 2024 03:24:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709090431;
-	bh=Tie5XtoEakgyp91HZ1L/FLDkGzkh11gjzWIlmIe20PI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nl64v+Q2q5qbUVpolMTA6ZoYHSQONZSb4ufpQnJBmEQqak2Tw8KJ9/3FvtQiG3cph
-	 C6rwwqblhrtcZdDvJEeFSx1Ysjlcy6yV3qd35i/JzO7RDv6K0KL/8eM0+b0E6KvYdB
-	 wEESqUMVdlCc/sCFnlYznOjP73U6D4zySp4e1L+XjEBDWALXfBveysYBxVYvOk8uK7
-	 ATw8dIzbGwrFftcuLkAON44CEveK/tPeGfas5/VC7nZDBGEQOYLof01UZSKK8GFT9t
-	 dWveiGGKYHXJBKcVlcEGPnOoCJa7iEBpenPttbYBEJAHxxJl96nGJoJz7z1ZtFRhFw
-	 5YzEYb4OO7WJA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9C14AD990AA;
-	Wed, 28 Feb 2024 03:20:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1709090642;
+	bh=qjRhA/7m70o8XxVxvrScP2vkVDFa71oSPSWfBELbXys=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=E4A31KBmTGU2rRX9LATdmS8xnX2Wl4RXHZPQR09a/oGzT7tkPAevLuxPnKp8keGJI
+	 vTJ2f5hsHjQLaEz5uqRCs7X5kZ24yGNuhOhP08UCbkECRrucrMZ5k2vuXTzOljpyCs
+	 0s8tOSmMi55lxSCR0oOEB+erU7MSCmcGaX9LrKBERtzq/eexk87he7aETHSdCL6eaK
+	 8LyC54cF13Fl8U4qsLGtOEu7boziqji32fHh1XsP5jP/a2UgCNAkJ13qLxHfD2/F3C
+	 DLFtu59Atjt34//wJGigH3/FkkDUbNy5yon4pUwQ/Tfn+0khjsO/nrRQOm2iXu2L3D
+	 TRbkAUniEwZMg==
+Date: Tue, 27 Feb 2024 19:24:00 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Piotr Wejman <piotrwejman90@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: stmmac: fix rx queue priority assignment
+Message-ID: <20240227192400.19f4c9cc@kernel.org>
+In-Reply-To: <20240226093144.31965-1-piotrwejman90@gmail.com>
+References: <20240226093144.31965-1-piotrwejman90@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] uapi: in6: replace temporary label with rfc9486
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170909043163.27277.7611137336558798707.git-patchwork-notify@kernel.org>
-Date: Wed, 28 Feb 2024 03:20:31 +0000
-References: <20240226124921.9097-1-justin.iurman@uliege.be>
-In-Reply-To: <20240226124921.9097-1-justin.iurman@uliege.be>
-To: Justin Iurman <justin.iurman@uliege.be>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 26 Feb 2024 10:31:44 +0100 Piotr Wejman wrote:
+> +	ctrl2 = readl(ioaddr + XGMAC_RXQ_CTRL2);
+> +	ctrl3 = readl(ioaddr + XGMAC_RXQ_CTRL3);
+> +	
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+checkpatch points out there is an unnecessary tab on this empty line
 
-On Mon, 26 Feb 2024 13:49:21 +0100 you wrote:
-> Not really a fix per se, but IPV6_TLV_IOAM is still tagged as "TEMPORARY
-> IANA allocation for IOAM", while RFC 9486 is available for some time
-> now. Just update the reference.
-> 
-> Fixes: 9ee11f0fff20 ("ipv6: ioam: Data plane support for Pre-allocated Trace")
-> Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] uapi: in6: replace temporary label with rfc9486
-    https://git.kernel.org/netdev/net/c/6a2008641920
-
-You are awesome, thank you!
+> +	/* The software must ensure that the same priority
+> +	 * is not mapped to multiple Rx queues.
+> +	 */
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
