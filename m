@@ -1,111 +1,129 @@
-Return-Path: <netdev+bounces-75839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B905D86B514
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:33:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE61F86B51E
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:38:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAF591C23EC2
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:33:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7842428C311
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:38:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14AD36EF02;
-	Wed, 28 Feb 2024 16:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A520D1E4A8;
+	Wed, 28 Feb 2024 16:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="GQldds7b"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="LdkB87zd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474221CAAB
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 16:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1006EF1E
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 16:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709138022; cv=none; b=twtmbVQ2ySXp0hXpbdUsFO9ox/8UCaNK5XJINj1D2o8WyAuyH8lnCS+FTAsoIoB/5Hlh3uT112tuegX68QDJgIp29V7UzSWYkMHM9Wl2W8lB2KHpcaMboyq8kZ0LhmC4nQ9hsqVWG39x02EbH8Z/wAbePZv8nf1sfj8Fa9LZKsg=
+	t=1709138285; cv=none; b=Fcg9nDjuZ2O916utuurUack/NPnTC5QnExVXP2js/gB1h+NllyxnxozsyenhabgFVFptt2pLbxVk2hRglgDSMM1/CxgqPOgj3ItHs6hHYVe5vH3YzakBzW3auF/MBkcC0bK/81Gi4ILLGL+ZkQrN/aKSaaTLiaUj/CQvDRX8ogQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709138022; c=relaxed/simple;
-	bh=Y3bTg4DOn26LnNJlO6NSk6Js1pYtdcYw2MEh5L8b6ZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L4u4qm9NbEXuowNLENniRSfQew1+W/+m14bhQuzRIo6ImahP/vrKxj7ahufaZaF+9ct7cfp7093ThxOGzl52KRbreWdEFfchC8mYvDA2gQs1r1McJnVtIxYZbaliqtd6RUCRqqBwK+4O0DQAw3ip71W8Sr/zjf0voGsTMiLfZCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=GQldds7b; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6e5796d01c8so258114b3a.0
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 08:33:40 -0800 (PST)
+	s=arc-20240116; t=1709138285; c=relaxed/simple;
+	bh=9PTeAYYKh6BghzUQ5SY1FEoCFtAzge8LlEvtJa+/mwI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o+cYPMuC1yg6yBg/phcdbGOTR/2zXzwfdfmSa/NZiJzh0rTBLBVi+g64MjJ8nR7x+GtDNxxvxadiyAyUz0uxkTqbWPawwDrQnSTju3ngWMMzT18LO7mSzikxEN849XCI2UPS3NRKvyiI4LSKrMsdqU2vlVJq8g+tym7HCZxPKcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=LdkB87zd; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a3f893ad5f4so797923866b.2
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 08:38:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1709138019; x=1709742819; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=cloudflare.com; s=google09082023; t=1709138282; x=1709743082; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3CXIIP5wVzmKRA9tEAeIz7Ea3NPkY6q2faPhHzJ2+Mc=;
-        b=GQldds7bACZjdIUiUHbYWb2zlxmPNwMQiuyS/vgnkmm5sCICWAUSpDpHLYeOlLVPat
-         JKu2Ca6zB0CQ8iPYASDgLqfJwOiwogRMu/Svyqd451OCwHXZv1VFvkf7zSb6ypnWASQi
-         GXHrJAZecsnQDiqaxlxdue/f5SGqPDu/uEuoa4o2QkGfKAmtyNykisZdUE2igDoNy7VO
-         PhmhpFLVunWV29OFny6aISRb3F/QCZkKla65e5paXgTHfjFXTyOQVJtdsInA2Ej84kch
-         yM3Nu+mNjpO1st226jHbSw0hs0jkoe8eZYgH/IX7gJvz5MwzUDQBLWDbC+Ehe3ZSUWBQ
-         Upyw==
+        bh=EWAQpAUpfQCDhx0rGjR9Oel5LgwsLKY+ggnWMU654+8=;
+        b=LdkB87zd/3Ey/TszPdJTjeBQW0CD8ooalvGxGuuwIAZDzqDmWaj0B/AU3vvPUzguME
+         efMh/O1i1e4AdYTsJ3LCDduY7WErH+GOcYL3Ekt+sK6CmLuLTCFWegQfToCkq+bDYAjC
+         ExlXDdy4kn7Lo124FUzyhxciy7Avg9lImGOpWtlvlk2DK1rWKQR+3x8FfYJHE1mWw477
+         IjVO27AnTPrNXoYNbzQ0lKRhYwuSxcxok561LJwnPBBkVcNrAYGKF7vy11qiqQ56HaBN
+         WD60dlG3pOb5Q0iKZKsxGKSXPkiwcJeiOVS1+KjFR/wXicr3DWprGwOJwMT5FsaH4iBW
+         wFhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709138019; x=1709742819;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1709138282; x=1709743082;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3CXIIP5wVzmKRA9tEAeIz7Ea3NPkY6q2faPhHzJ2+Mc=;
-        b=Ts0Wep/EPMub6tlRDJNs+qJwvHRHzIQL89tQk3r7gSUSYSrJQ1H1oz7auMEySwj48V
-         s4D1hBEvQjUAhOuEjrQFkRR3m3X+2HinLkqmnHWjn6KZy8yVTEM9ZxFAtgIoHa+Rq+fR
-         55Xxg0hzjRU4+IssMd4F9z6GpNyvDlfQY4qgTIVmy4HndZa1o5qfPgvWALo73xmkmwQm
-         Fluwq39m5YhyU/kJYaTbQUsnEdBx/Vvw+v2/il9IHUlTePbXXrulO+LVMIFUHRUaD1IC
-         Vk59P4LHKTBmrSBGUmoqMvQOpgBxDPA9llwNBFMrCDFVGgJFMIb1EezUE2GNwN+9Qlfd
-         DlGw==
-X-Gm-Message-State: AOJu0YxxrsB9EcsTTU7G70BMFiIGKFbaVKodifqXfuoNTU+Bfj81zsQp
-	OE68CsbeiRITjS3phqQmF0FRXoY7r+SR0taFWWMLD3GXrqZ1gd1YOthvz2JuLxM=
-X-Google-Smtp-Source: AGHT+IESXqCJZ3iNUwjVQsr9e437y944z2YksH1bTC2gzdxxkzcGTAbu/Yxqyzn1wU2Zjsn405XBaw==
-X-Received: by 2002:a05:6a21:3949:b0:1a0:817d:80d with SMTP id ac9-20020a056a21394900b001a0817d080dmr6671332pzc.45.1709138019486;
-        Wed, 28 Feb 2024 08:33:39 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id p20-20020a170902e35400b001db5079b705sm3498163plc.36.2024.02.28.08.33.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 08:33:39 -0800 (PST)
-Date: Wed, 28 Feb 2024 08:33:37 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: William Tu <witu@nvidia.com>
-Cc: <netdev@vger.kernel.org>, <jiri@nvidia.com>, <bodong@nvidia.com>,
- <tariqt@nvidia.com>, <yossiku@nvidia.com>, <kuba@kernel.org>
-Subject: Re: [PATCH RFC iproute2] devlink: Add eswitch attr option for
- shared descriptors
-Message-ID: <20240228083337.18bfc306@hermes.local>
-In-Reply-To: <20240228152548.16690-1-witu@nvidia.com>
-References: <20240228152548.16690-1-witu@nvidia.com>
+        bh=EWAQpAUpfQCDhx0rGjR9Oel5LgwsLKY+ggnWMU654+8=;
+        b=SVvFDtGx/EWwqhFMVTxGwuoMKjmdRhwauFa2A0bZD6Mrery6LThpF37ZFPPdMuPc5V
+         S1y5iml3i0DxV/AvBX7oAn8Eu6/m2DRQ71bgAM9jZEvJ2zimINyrQvxL5MqgScXTNrRF
+         e0U2k5xMrRdts4ZOYFJN/xsfvdFQI3+yOBnoLR5JZGXfwWRPkGjDptqmSTdtquHe1DfL
+         2j/3ejvrA2TnKI/jv3MlZ7b71ZnFzUhYuIgAru+fdIQc0Q06Z2NftIEku+dfJIL8ke0s
+         gn7w8bWqw3xXNBZL0tsUklPdwFkyvRMOA/rBz/bqJjdIa/W/tPtlTsUZmA+XINGX/guG
+         G0rg==
+X-Forwarded-Encrypted: i=1; AJvYcCUHNBmP30Btq+t8Mh1RxcQ8yxS6K0Fw0HZeecHUYppjbDHg5V3rn5pukx+TYJNqsZYhAnYpMUCTJ1GP3Fa+MdruHKrmnhn1
+X-Gm-Message-State: AOJu0YwxBuslu7Lo/07bHDGAJEXBgpULiL93mUZznUVNAIm060TBXEuj
+	1OKHYjQ4kmQslBoOdTr3N6+L/tjEFzy01SX2QgrQC1lH/tC0SBFhdwrpE9hXRHi0eBj9Lc1jT9u
+	1NpouMFBf638RwbML5iyH+qjgulWl4ZSvgnJFzw==
+X-Google-Smtp-Source: AGHT+IH6HQq8hzqji91OJqqxN2VkP0/oD9hn7fSXzbwfcVbmFDthP3qt0d5uMMo2K+yS0zBkR2z5gsNJJobM1iVOpOM=
+X-Received: by 2002:a17:906:e8f:b0:a43:49ca:2473 with SMTP id
+ p15-20020a1709060e8f00b00a4349ca2473mr193121ejf.0.1709138282075; Wed, 28 Feb
+ 2024 08:38:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <Zd4DXTyCf17lcTfq@debian.debian> <CANn89iJQX14C1Qb_qbTVG4yoG26Cq7Ct+2qK_8T-Ok2JDdTGEA@mail.gmail.com>
+ <d633c5b9-53a5-4cd6-9dbb-6623bb74c00b@paulmck-laptop> <f1d1e0fb-2870-4b8f-8936-881ac29a24f1@joelfernandes.org>
+In-Reply-To: <f1d1e0fb-2870-4b8f-8936-881ac29a24f1@joelfernandes.org>
+From: Yan Zhai <yan@cloudflare.com>
+Date: Wed, 28 Feb 2024 10:37:51 -0600
+Message-ID: <CAO3-Pboo32iQBBUHUELUkvvpSa=jZwUqefrwC-NBjDYx4yxYJQ@mail.gmail.com>
+Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
+To: Joel Fernandes <joel@joelfernandes.org>
+Cc: paulmck@kernel.org, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Lorenzo Bianconi <lorenzo@kernel.org>, 
+	Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>, 
+	Alexander Duyck <alexanderduyck@fb.com>, Hannes Frederic Sowa <hannes@stressinduktion.org>, 
+	linux-kernel@vger.kernel.org, rcu@vger.kernel.org, bpf@vger.kernel.org, 
+	kernel-team@cloudflare.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 28 Feb 2024 17:25:48 +0200
-William Tu <witu@nvidia.com> wrote:
+On Wed, Feb 28, 2024 at 9:37=E2=80=AFAM Joel Fernandes <joel@joelfernandes.=
+org> wrote:
+> Also optionally, I wonder if calling rcu_tasks_qs() directly is better
+> (for documentation if anything) since the issue is Tasks RCU specific. Al=
+so
+> code comment above the rcu_softirq_qs() call about cond_resched() not tak=
+ing
+> care of Tasks RCU would be great!
+>
+Yes it's quite surprising to me that cond_resched does not help here,
+I will include that comment. Raising just the task RCU QS seems
+sufficient to the problem we encountered. But according to commit
+d28139c4e967 ("rcu: Apply RCU-bh QSes to RCU-sched and RCU-preempt
+when safe"), there might be additional threat factor in __do_softirq
+that also applies to threaded poll.
 
-> Add two eswitch attrs: shrdesc_mode and shrdesc_count.
-> shrdesc_mode: to enable a sharing memory buffer for
-> representor's rx buffer, and shrdesc_count: to control the
-> number of buffers in this shared memory pool.
-> 
-> An example use case:
->   $ devlink dev eswitch show pci/0000:08:00.0
->     pci/0000:08:00.0: mode legacy inline-mode none encap-mode basic \
->     shrdesc-mode none shrdesc-count 0
->   $ devlink dev eswitch set pci/0000:08:00.0 mode switchdev \
->     shrdesc-mode basic shrdesc-count 1024
->   $ devlink dev eswitch show pci/0000:08:00.0
->     pci/0000:08:00.0: mode switchdev inline-mode none encap-mode basic \
->     shrdesc-mode basic shrdesc-count 1024
-> 
-> Signed-off-by: William Tu <witu@nvidia.com>
+Yan
 
-This needs to target iproute2-next.
 
-Please update man page for devlink as well.
+> Reviewed-by: Joel Fernandes (Google) <joel@joelfernandes.org>
+>
+> thanks,
+>
+>  - Joel
+> [1]
+> @@ -381,8 +553,10 @@ asmlinkage __visible void __softirq_entry __do_softi=
+rq(void)
+>                 pending >>=3D softirq_bit;
+>         }
+>
+> -       if (__this_cpu_read(ksoftirqd) =3D=3D current)
+> +       if (!IS_ENABLED(CONFIG_PREEMPT_RT) &&
+> +           __this_cpu_read(ksoftirqd) =3D=3D current)
+>                 rcu_softirq_qs();
+> +
+>         local_irq_disable();
 
