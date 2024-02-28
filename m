@@ -1,74 +1,70 @@
-Return-Path: <netdev+bounces-75905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F32A386B9ED
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 22:33:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1D6D86BA0F
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 22:37:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EF881F241D1
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 21:33:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 583E2283784
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 21:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CE1270036;
-	Wed, 28 Feb 2024 21:33:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F4EB70044;
+	Wed, 28 Feb 2024 21:36:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="aBN6sDQb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eL65Ly63"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C6370024
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 21:33:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C1270030;
+	Wed, 28 Feb 2024 21:36:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709155999; cv=none; b=XNNCXKwSHoaJTtaS7ZmG/8vq37ycli/bFgzprl7tP+4A6W4/xfeJIewBst4KL1QugY//ha8cbz4YHtafWDrB19uPVDo1XDvQgZWVHZmKWASylZC7PyzLjos/spxXeLiB8BiSZCUgBH1wT94Ff3cT76z8aKKzJg+JYqXmf+j/DJE=
+	t=1709156214; cv=none; b=eicFbG1g870D99iA6ULZoLEPzfdnKdGhkGM6Ku6bG6GdYOdRYm6y8r60uvrmCMX2FsY1rVc5jLCxOF+dJg7xZDabo+nniBcMsfDcwDs9Xda/OcPxfngYwJ3pyN4vJF4RBS6RbBUdnwLObiKY0UyWh95sOt6hcCZrLB4GtDZo/ZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709155999; c=relaxed/simple;
-	bh=2QplW/PSL+l5wBlz2Fhb2MD7icGVtnf5yghrdyR7zlI=;
+	s=arc-20240116; t=1709156214; c=relaxed/simple;
+	bh=8PJmKytlSsprccUo0R3nWiiL/iIqexJcXLdDR7loiNY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rmljJp7iYI3Jy6bVq/CUZ02tC1HbM3XydOEWXz4ey6+whAOLn0WTW5+vjv6l5mVE8VxinVsrei3sAAHGkdeXuTU2mkUXdCZ1GYMP5mELolEvH/M+jv0O0FjBCb7zSdYJ5eHSwF4rFYUEFnceipEPLiIY6RZm33xLIqUJU91bxcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=aBN6sDQb; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1dca8b86ee7so2550495ad.2
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 13:33:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1709155997; x=1709760797; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XLd8h0kEPBZWXG99LoXPX1j7y1LhX/a2aDKq9S3uX68=;
-        b=aBN6sDQbxrowODDrLK+SjX+fBVboj16jTtc0JmnAsYlX+IxsJR//Q78Ef229q7BVeH
-         k1loVZK1lowplOUnadJZy6JVfXerQXD8WmyZTW9TvRQjvfhk9aXLvNV/TdU3BT+CZ6AJ
-         AA8I7rfTB85C3iJawTE0geey0WYKINkco6uXQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709155997; x=1709760797;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XLd8h0kEPBZWXG99LoXPX1j7y1LhX/a2aDKq9S3uX68=;
-        b=AvIhkLDEZ513DI+bEMSF6syAZGSZPRGT5jTwpEUGHOQWZS/2T6mA687vvvKBfJbnzq
-         EtaxOdzAUfRjV0cGnH41V6Rv5dZ8of2wNOzkMiscKLdrv41LsH0v/LWHljO44j+prLGh
-         a4AvWl4178t2uZuttwxfbLj8haTSNLpivtRRPq51oqqBnxLCPTjC5eNf491dCIfaG2si
-         2iEWJ5z9Vi/4Pjss9VOBgHbGKeYv+4gvQwuvFkTFwVdNy/d65EuNd2T84WNg2s7qrZjM
-         T3Q9rP4ypqiTB/yEihZbF8h6+WyLcGrkElFWKSIyJNqYFkDTmsfP0IRKEijGhOFtUhSx
-         3SRg==
-X-Forwarded-Encrypted: i=1; AJvYcCXjXvWQKVtLqZQbNMsn43FuLar14s2q+XPjS2+ccR5zak6gRh37UiHQGvGCYy4RVwGywoqhAiKrqxKdgXNcI/tkyBOipF20
-X-Gm-Message-State: AOJu0YwZfuZMwMlPezLMJhdweoX3k3aupxmuP0n8pNet/cYivz1tqREi
-	p30k326vj6dcCbzwsdm9avTn7XfxpBtNsjRibHwsahprEHoo7BRwiDaLrn/Asw==
-X-Google-Smtp-Source: AGHT+IGO5QT2ql8Rf0ElQjy3mY7mI7ajEF2Z3zSl9mRYp9jbKdiPIbR1SfabYEntk3bTWsEUAJJ/WQ==
-X-Received: by 2002:a17:902:ce02:b0:1d9:f83e:3a54 with SMTP id k2-20020a170902ce0200b001d9f83e3a54mr192671plg.64.1709155996838;
-        Wed, 28 Feb 2024 13:33:16 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id c2-20020a170902848200b001dca997b3e3sm3729404plo.65.2024.02.28.13.33.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 13:33:15 -0800 (PST)
-Date: Wed, 28 Feb 2024 13:33:15 -0800
-From: Kees Cook <keescook@chromium.org>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ee1Bviaoz55ZgkSzfH1SWipSZPh4ypAr4UFn6T8ITL0UGB5or04ElE6X0dlLhHQruqH1MK3fo8SrSptL2Ye3sQsOW8HNUPjBI/mCDN+F+RZPN0zjDdnBTRNaWqs2v7eQXx3AHcM0kSaajYg1QkGFdld6bqQTNVamFNYOmWmbXNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eL65Ly63; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709156213; x=1740692213;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=8PJmKytlSsprccUo0R3nWiiL/iIqexJcXLdDR7loiNY=;
+  b=eL65Ly63fx4Yl7pAF6PDLA0r3v1SN7MARruIYDQxEuGA2tsDyCYr42pJ
+   ndzqbPuKWn3U0YlbauAg5MZoYGa900F2biTgNljy8yRETFnkjEfaQf8M5
+   olX2HEpAer7d7B0XBrNueOTYfJ0WnVZRzPdD3uyID+GovZswZJhL/BRyF
+   A03OTuXnWwyVTX4LT59KMrWEHToQaUOgtS/RuhIatRoop5pvmPzpU7nhP
+   DGvfn1PeC9e/H8A9+8odx3vWM4lmtE0W53X5oPJ6DdMDSKdZck+r4VKkc
+   k7FCdcat+UAe3ty2YmtOWJZo3K1mL/kvhvwseiimZ8twYgBnu9MJaLjTw
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="7371106"
+X-IronPort-AV: E=Sophos;i="6.06,191,1705392000"; 
+   d="scan'208";a="7371106"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 13:36:52 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="913961929"
+X-IronPort-AV: E=Sophos;i="6.06,191,1705392000"; 
+   d="scan'208";a="913961929"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 13:36:47 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1rfRbX-00000008VcR-2Fpg;
+	Wed, 28 Feb 2024 23:36:43 +0200
+Date: Wed, 28 Feb 2024 23:36:43 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: David Lechner <dlechner@baylibre.com>
 Cc: Vinod Koul <vkoul@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
 	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Mark Brown <broonie@kernel.org>,
+	Mark Brown <broonie@kernel.org>, Kees Cook <keescook@chromium.org>,
 	linux-arm-kernel@lists.infradead.org, dmaengine@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
 	linux-spi@vger.kernel.org, netdev@vger.kernel.org,
@@ -79,29 +75,47 @@ Cc: Vinod Koul <vkoul@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	"Gustavo A. R. Silva" <gustavoars@kernel.org>
-Subject: Re: [PATCH v4 1/8] overflow: Use POD in check_shl_overflow()
-Message-ID: <202402281332.9B2F13570@keescook>
+Subject: Re: [PATCH v4 3/8] iio: core: NULLify private pointer when there is
+ no private data
+Message-ID: <Zd-na3oVV4Chl4Ft@smile.fi.intel.com>
 References: <20240228204919.3680786-1-andriy.shevchenko@linux.intel.com>
- <20240228204919.3680786-2-andriy.shevchenko@linux.intel.com>
+ <20240228204919.3680786-4-andriy.shevchenko@linux.intel.com>
+ <CAMknhBFbQ2BmGd18wC0odO-b_bWvJEO3FCYEtpvhB1fF+MEFgg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240228204919.3680786-2-andriy.shevchenko@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMknhBFbQ2BmGd18wC0odO-b_bWvJEO3FCYEtpvhB1fF+MEFgg@mail.gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Wed, Feb 28, 2024 at 10:41:31PM +0200, Andy Shevchenko wrote:
-> The check_shl_overflow() uses u64 type that is defined in types.h.
-> Instead of including that header, just switch to use POD type
-> directly.
+On Wed, Feb 28, 2024 at 03:06:42PM -0600, David Lechner wrote:
+> On Wed, Feb 28, 2024 at 2:50 PM Andy Shevchenko
+> <andriy.shevchenko@linux.intel.com> wrote:
+
+...
+
+> > -       indio_dev->priv = (char *)iio_dev_opaque +
+> > -               ALIGN(sizeof(struct iio_dev_opaque), IIO_DMA_MINALIGN);
+> > +
+> > +       if (sizeof_priv)
+> > +               indio_dev->priv = (char *)iio_dev_opaque +
+> > +                       ALIGN(sizeof(struct iio_dev_opaque), IIO_DMA_MINALIGN);
+> > +       else
+> > +               indio_dev->priv = NULL;
 > 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Do we actually need the else branch here since we use kzalloc() and
+> therefore indio_dev->priv should already be NULL?
 
-Acked-by: Kees Cook <keescook@chromium.org>
+This is more robust, but I'm okay to drop this. Up to Jonathan.
 
 -- 
-Kees Cook
+With Best Regards,
+Andy Shevchenko
+
+
 
