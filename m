@@ -1,138 +1,85 @@
-Return-Path: <netdev+bounces-75773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4950B86B234
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:45:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E68486B24C
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:49:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03D57284247
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:45:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAE0E1F26CD9
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158A915CD78;
-	Wed, 28 Feb 2024 14:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CCB2151CD3;
+	Wed, 28 Feb 2024 14:49:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jspN0fJa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nwuz6L4N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C2A2D022;
-	Wed, 28 Feb 2024 14:44:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28EC912E1DD
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 14:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709131470; cv=none; b=dTEzg30hsyU+uLOsPKiN+I7CRFIGZqDOfuP5AGJJLHQjJSD8xGIIQJB1rxTTxj+IvUpefZL4BC11tMuI1Pm5v/2iBJn+31KSe2Pg0N7xQ8ToANoFAWtw/UAzD9PmspeBpnBDAASUAWoFbRmwemFd0F4kIz2ImA9bql7Bgf4tQyo=
+	t=1709131741; cv=none; b=e5MjGoI20PN9qj+KYhbivmz7HW48AepZeO++vQqxd2Qetx7RlJt5EkmA4SLZRG5ctl1tUIUBAtn8tbepxdMIbXfudtRLDPLu0ivYHcW1jlL8kw81mN8reLOLEIf34zHDawrwMD1vhpTQnBgUmxtahLP4Vzk58AX+Z7BfhgOZCmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709131470; c=relaxed/simple;
-	bh=olE0FXhZOWfdzamPPzy8N6YHJoFdSGjzOj/E3EkKrpA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MyBwQ9ymEh7+Ftc8j/BEg38uZj//R6Nueud5Cujx9eDbPz6m3EeZQTwNuagmItyKwdksyG6XGiql4CcbF2fzVEg2a3x6hdPZNM5/qaCngn44PO1YF6t1TbuNfAGTyxMe2VE4JybQgtjlBRNYI+t+0bpUvvG/8KSBBuZGdU+rESE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jspN0fJa; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-513143d3c42so1943303e87.3;
-        Wed, 28 Feb 2024 06:44:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709131466; x=1709736266; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QCvg3ZSTY6UsMQEo9IKBvhUq62IW9v9TIocZdUsb004=;
-        b=jspN0fJaFHko6vhampWHUyfO/aZ7gmsdsgwZwi9Q194gz8MS0wLJs5Vfknhq28gVNX
-         +/OEC445jKp/cTzlRTHyWSml9Gf1z67Qa2eM+//Z/HklPd/rDkAHYoV8yr8qkCk36j4J
-         WiKXKn1zBz+GiTHRYUKRJjB3gJQo45sCJWoH7OxbmAbrKwIBPTeGq6a5PpJCTzTd1t87
-         VyOxGbOBHIcM/gmt7RfE1Ygl8aeq37TJgqZEqC226PbBUAssYWSvTxJSrqEHejMnw9Gc
-         ZtLZKzxfrNW5l8sHWaqKRGQlQgey5VavtuJeoIawV0nzR70GXljbiS0dynqhHWePIs3B
-         MldQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709131466; x=1709736266;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QCvg3ZSTY6UsMQEo9IKBvhUq62IW9v9TIocZdUsb004=;
-        b=aheYs636pF1BIzW1GjMJHfzNcONdPKp63zcAe1BLJSNROCiP3a/XLnoUcp3b7jVRFS
-         bDUpY3u601j2O92U8rVsLRzJd7i+RDVHEWOcgDdMrWZ9xuDxAnnDy2As7W7m5DHPO7eK
-         EknZuYBCKryyuECQUBZsgH+cTZYCkc8rBxkOPrUxyV/Lpz5xgcqHxba5HhVX8FSaB35e
-         nrmtSShWsZaTztGX04VDSwo8IljhJwU3mcaBsHfu1FWuLnrzFezRVt2iGsA3SXPyoTKA
-         9owpTrafIinNlJP4GvYFVyNK3adXdeKh1NCnX2aodllw8HLgYZ8h+N58D2wnT6ibqzaw
-         jcbA==
-X-Forwarded-Encrypted: i=1; AJvYcCW4X8u96kyqgOnrt+bNHGWM9R/dE51uS4HaRAXjhkXMSSRiT67Lmo3/wbGGfccR6gjm2MQemnAYiqmY/OeJNAeatO9Qnxg2KlFOVyozbbvJk0FPEIc5pasbMImGfqsu9imXgSlq
-X-Gm-Message-State: AOJu0Yy9OlOIbB1UTdVhCyG6Z06NCMZqCxMff7DjFDCUmSnoOoR/qnTs
-	f2b7kv62zlYtkTB1ulnXANXK6O0+NkucfSC1IB4l1GeqYe90YHlVx+iNp0vXq60S+0l+EsPmblP
-	9LnUIsKtqdbrTqqhEUNGHcV8cmjVOJWCm2W64KQ==
-X-Google-Smtp-Source: AGHT+IG0+IcV8CfoxgJhKFcckn/p8vyqYDPe0ejLrcwThdxuFI5XnAzkm7y7FvlQxPYCDCBRN3hFRW0S4/rjCjKAdtM=
-X-Received: by 2002:ac2:490c:0:b0:513:19f7:951b with SMTP id
- n12-20020ac2490c000000b0051319f7951bmr1505831lfi.56.1709131466363; Wed, 28
- Feb 2024 06:44:26 -0800 (PST)
+	s=arc-20240116; t=1709131741; c=relaxed/simple;
+	bh=MR+jh3Jc65T/XDWjd68f1WpETwT/Q+VjVGIbPGp7HGI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mSfa7JYwVM92GNgUnKEKVlITLn2lN7xuOIZXowAc7SBDJwCI5u8HeFQUr/KPWdTJoHSONeeGrDOpgwf0cQr7wZV2e9rPgx1+PGsv0ot0G/3010gI6ZKZRdVMIwXyElfuN9Mmup72jKUwO9WjDTBhi25e4in7Kz7+2apktd8jYi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nwuz6L4N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 530D2C433F1;
+	Wed, 28 Feb 2024 14:49:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709131740;
+	bh=MR+jh3Jc65T/XDWjd68f1WpETwT/Q+VjVGIbPGp7HGI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Nwuz6L4NiVZn8ZZ26EKn8pGiqcvoSZoFIYvI03BqgJ4gShCksiCW+bqI7bLbzst+G
+	 0RnbUc4jb9H0/9Kb/7+8mYy1eIQw/AhnzaU4l9i1GxzZl3E7skzaLG2BzTR/s+jY2J
+	 CyhA6AxoGhpv/UHhKo/YZ74pijG5MnPGP7Z1RklsptEHDWs8Vb0gd1mOWqIn6ieGpn
+	 2ZSXarTOXsygzzuaBSAyoz5MFjqI8hRygW16kbgedLnbc5LHinR5wZVsJYqhZclVa9
+	 1tep1V3nHbAvv7r448j4P+BoU0ZGd/wDSO7EhyLupeAgjQLMrbhiemRy+QaLQfhveg
+	 uVL9CVeavmGvg==
+Date: Wed, 28 Feb 2024 06:48:59 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>, David Ahern
+ <dsahern@kernel.org>, <mlxsw@nvidia.com>
+Subject: Re: [PATCH net-next 2/7] net: nexthop: Add NHA_OP_FLAGS
+Message-ID: <20240228064859.423a7c5e@kernel.org>
+In-Reply-To: <877cioq1c6.fsf@nvidia.com>
+References: <cover.1709057158.git.petrm@nvidia.com>
+	<4a99466c61566e562db940ea62905199757e7ef4.1709057158.git.petrm@nvidia.com>
+	<20240227193458.38a79c56@kernel.org>
+	<877cioq1c6.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240228140413.1862310-1-arnd@kernel.org>
-In-Reply-To: <20240228140413.1862310-1-arnd@kernel.org>
-From: Dave Taht <dave.taht@gmail.com>
-Date: Wed, 28 Feb 2024 09:44:12 -0500
-Message-ID: <CAA93jw50D5Kqi4=ze4qn1TUswWtmEao9=FBtH=4W_g9CnBf=AA@mail.gmail.com>
-Subject: Re: [PATCH] net: ethernet: ti: am65-cpsw-qos: fix non-bql configs
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Breno Leitao <leitao@debian.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Roger Quadros <rogerq@kernel.org>, 
-	Siddharth Vadapalli <s-vadapalli@ti.com>, Grygorii Strashko <grygorii.strashko@ti.com>, 
-	Dan Carpenter <dan.carpenter@linaro.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-but why do you want to disable BQL?
+On Wed, 28 Feb 2024 11:50:33 +0100 Petr Machata wrote:
+> > Why bitfiled? You never use the mask.
+> > bitfield gives you the ability to do RMW "atomically" on object fields.
+> > For op flags I don't think it makes much sense.  
+> 
+> Mostly because we get flag validation for free, whereas it would need to
+> be hand-rolled for u32. 
 
-On Wed, Feb 28, 2024 at 9:04=E2=80=AFAM Arnd Bergmann <arnd@kernel.org> wro=
-te:
->
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> It is now possible to disable BQL, but that causes cpsw to break:
->
-> drivers/net/ethernet/ti/am65-cpsw-nuss.c:297:28: error: no member named '=
-dql' in 'struct netdev_queue'
->   297 |                    dql_avail(&netif_txq->dql),
->
-> Add an #ifdef check for CONFIG_BQL around this usage.
->
-> Fixes: ea7f3cfaa588 ("net: bql: allow the config to be disabled")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ether=
-net/ti/am65-cpsw-nuss.c
-> index 9d2f4ac783e4..3a3ec9959ee2 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> @@ -294,7 +294,11 @@ static void am65_cpsw_nuss_ndo_host_tx_timeout(struc=
-t net_device *ndev,
->                    txqueue,
->                    netif_tx_queue_stopped(netif_txq),
->                    jiffies_to_msecs(jiffies - trans_start),
-> +#ifdef CONFIG_BQL
->                    dql_avail(&netif_txq->dql),
-> +#else
-> +                  0,
-> +#endif
->                    k3_cppi_desc_pool_avail(tx_chn->desc_pool));
->
->         if (netif_tx_queue_stopped(netif_txq)) {
-> --
-> 2.39.2
->
->
+NLA_POLICY_MASK() ?
 
+> But also I don't know what will be useful in the
+> future. It would be silly to have to add another flags attribute as
+> bitfield because this time we actually care about toggling single bits
+> of an object.
 
---=20
-https://blog.cerowrt.org/post/2024_predictions/
-Dave T=C3=A4ht CSO, LibreQos
+IDK how you can do RMW on operation flags, that only makes sense if
+you're modifying something. Besides you're not using BITFIELD right,
+you're ignoring the mask completely now.
 
