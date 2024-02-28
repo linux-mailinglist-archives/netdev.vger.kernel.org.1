@@ -1,169 +1,85 @@
-Return-Path: <netdev+bounces-75516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 160AE86A3BB
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 00:33:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E309786A49C
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 01:57:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC2C3285572
-	for <lists+netdev@lfdr.de>; Tue, 27 Feb 2024 23:33:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2003E1C23ED1
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 00:57:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 243B956B68;
-	Tue, 27 Feb 2024 23:32:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0474BA5F;
+	Wed, 28 Feb 2024 00:57:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="M/9jUsDk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RFoUvcEc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF5058126
-	for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 23:32:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23EF5234;
+	Wed, 28 Feb 2024 00:57:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709076734; cv=none; b=sCFJdSHzmOjp1mcPkthrn0gVtpcBvaz98IpyFbqQ/jTD9Kn37bQyCfdoPISl1ZviUUif4id2gz6rT4gHdvLOTHluqUW8LekQSEXozyCyPoU/JkyvnCq3mM1P9U5804RDgAnm6qzf2Db+fytXgE6eK3lPgwgN8URTlvbC+G8MY5U=
+	t=1709081821; cv=none; b=Fbvk4wt7HeazdlO54Iu9F9iHvM5j0llppk7l74kdZ1KDhwtPA9+KKVH7V1E4G5+PsdJjsuYxJWK0m38i07/PhD8GXSjSuXjQ6z6OSEDFe/XMzWrK796wWB4snNl2v15NfSw5XbDWbWH7uKSM/fBiubOhSIJr5t4WCx/BJpoGOIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709076734; c=relaxed/simple;
-	bh=vuJ8723KNo7c2i4PE8+dSpAbj4FcKwCZBz13erSUw9s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YDtsYZA5dW6jdoQKFcdPN4X+Uo2cT6vOuhR1uM64eBjxtxz/gX5seUXdqOEZ+BGbxd7EXOdRTXg6p0cJy9szRJmalp+QTwiH+9Sys3Mc+Dz08PRslHlAvGTN0UxECTACHqd6emq/7JUdBWHMKIDFc41LScsp//vdjcH873T/xok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=M/9jUsDk; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-7c49c979b5dso98702039f.1
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 15:32:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1709076731; x=1709681531; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=80vE8I00zUuMjb98bapG9u6P0XhLZj80ZGaIUfonjH8=;
-        b=M/9jUsDke8TosbOh9m+Bc+Whgu6pRM/Fbw2x6KlW4NmRhBXJazX2IOizi7Kz4id8MB
-         hU89w9hUF3bF4ttXEun1OfTdOgwtJIHIFw4MIyPCCj2b0/nUPF5Ai0BQM478AYoTTTex
-         yNy9fQCWHDb6GKdtfA8eenpxpx5ccnGpMI5hc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709076731; x=1709681531;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=80vE8I00zUuMjb98bapG9u6P0XhLZj80ZGaIUfonjH8=;
-        b=u+EUOzcXjA33NH8InUOJHls0WWjgP1y2ulX1x1CxiQ7QzLBZk5fwp5UUGeKHvJCpPk
-         ROqdA+XhpvIYwItUpeDYSdObz08pTIFj29+FcGhtEHZ5Ywp4sAWp+qzTAQCfB6VLSTxy
-         IsZ//muSzCQaQvIpxpIDOvDKlgxFdhNSOHmYu/CJl8TkjdU+wU0/lJzsgLxozPvYDseo
-         cnjhURvF96dp7tQ0OAV405lAeS9HJ6hYvgYC03twwLVJEdNntQTV4j836brLROrihnJG
-         OjG9xix6K4VNTlKnG0aNpXXXQDM2xI3mV8DM/9+IYqTdWLAC+I+Et5TffAmN6B9/MTgk
-         BR/w==
-X-Forwarded-Encrypted: i=1; AJvYcCUC8UIQocAq4RZgLE7vpR0B0FsvAwd2kIdPHwO6oDnmk8eukRoyj75oRiH09PdVUOMoyVIb9Oa73PoBT8nT8A1DN63rohUR
-X-Gm-Message-State: AOJu0Yy9gQ2AoUDkyAo1c8gKk4Jg39Hu7SFgPP8EDmiB7A9BgNPbxisM
-	9sj4PyENA6L3HcUtrjB2zz6ptDUnOUxCOAjJIVnym+x0+O9GE6nok85oiWnm6IM=
-X-Google-Smtp-Source: AGHT+IG69oUodDQLtj9TB2lWzXOa+NfkxOjVRrZm5njOmm/xNqu/JAHdlHJH3zfk/5jCzDJ8f9tmVg==
-X-Received: by 2002:a05:6602:2195:b0:7c7:ce93:f532 with SMTP id b21-20020a056602219500b007c7ce93f532mr5798424iob.1.1709076731281;
-        Tue, 27 Feb 2024 15:32:11 -0800 (PST)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id s20-20020a6bd314000000b007c45ab3dc34sm1998648iob.29.2024.02.27.15.32.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Feb 2024 15:32:10 -0800 (PST)
-Message-ID: <fd438c6c-87a2-4976-aee1-b706212914c4@linuxfoundation.org>
-Date: Tue, 27 Feb 2024 16:32:09 -0700
+	s=arc-20240116; t=1709081821; c=relaxed/simple;
+	bh=vXGBstZys8+dQN0682kXjLXWYlSTcwStbsHQDVnLeqE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=e3HmGcCdTRDoKiboRlmux8B5V0FF6os5ZNo73ngjzsQtkYyfoDj9e0G5Bs8xxjJfz2quF9BeBYDO8fTdsfG/kBeDaHOrhVH3nU2pqumIykbbrR45a8m5tIZAT7yeVw4DCvYsC7fI6mTtjssOoicSNk/R0uAIjiym31a98V39lpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RFoUvcEc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E95BC433C7;
+	Wed, 28 Feb 2024 00:57:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709081821;
+	bh=vXGBstZys8+dQN0682kXjLXWYlSTcwStbsHQDVnLeqE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RFoUvcEcDyjUSkBPl6KI/gV6IOsYctdxyEf0buR6PAe3u4USI73uUYS9pRyTCnrU4
+	 LE53l59ASDrMCJZrUXu0dAOFgig4Pdn2iZmxkn2r/9Qi6LMAzENLCt0/cDZRHlLV4+
+	 Zxm9NPSmg7ZQFXsLt29I5H0SG6T+0lmYKBRKdaa7cYB2Tx8x+5ehr3MpWgIHePYIPU
+	 tGL/0h0yF3ODPWa5owrYMOm/TT9/rFnuWDrKaHMuQIACar03/LCSJ1+WwC6Ct14OQz
+	 uAIYgaxOxvsfgLxSavuxRt5P2eEminhOoBrkQAoWQHO8FVG+FU9vHM0Y6jz6TldFOH
+	 2UaV3086LTG2Q==
+Date: Tue, 27 Feb 2024 16:56:59 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight
+ <russ.weight@linux.dev>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
+ <conor+dt@kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown
+ <broonie@kernel.org>, Frank Rowand <frowand.list@gmail.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, devicetree@vger.kernel.org, Dent Project
+ <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v5 13/17] net: pse-pd: Use regulator framework
+ within PSE framework
+Message-ID: <20240227165659.76a971aa@kernel.org>
+In-Reply-To: <20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
+References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
+	<20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/9] kunit: Fix printf format specifier issues in KUnit
- assertions
-Content-Language: en-US
-To: David Gow <davidgow@google.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Guenter Roeck <linux@roeck-us.net>, Rae Moar <rmoar@google.com>,
- Matthew Auld <matthew.auld@intel.com>,
- Arunpravin Paneer Selvam <arunpravin.paneerselvam@amd.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Kees Cook <keescook@chromium.org>, =?UTF-8?Q?Ma=C3=ADra_Canal?=
- <mcanal@igalia.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Matthew Brost <matthew.brost@intel.com>,
- Willem de Bruijn <willemb@google.com>, Florian Westphal <fw@strlen.de>,
- Cassio Neri <cassio.neri@gmail.com>,
- Javier Martinez Canillas <javierm@redhat.com>,
- Arthur Grillo <arthur.grillo@usp.br>
-Cc: Brendan Higgins <brendan.higgins@linux.dev>,
- Daniel Latypov <dlatypov@google.com>, Stephen Boyd <sboyd@kernel.org>,
- David Airlie <airlied@gmail.com>, Maxime Ripard <mripard@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, dri-devel@lists.freedesktop.org,
- linux-kernel@vger.kernel.org, intel-xe@lists.freedesktop.org,
- linux-rtc@vger.kernel.org, linux-kselftest@vger.kernel.org,
- kunit-dev@googlegroups.com, linux-hardening@vger.kernel.org,
- netdev@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>
-References: <20240221092728.1281499-1-davidgow@google.com>
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20240221092728.1281499-1-davidgow@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 2/21/24 02:27, David Gow wrote:
-> KUnit has several macros which accept a log message, which can contain
-> printf format specifiers. Some of these (the explicit log macros)
-> already use the __printf() gcc attribute to ensure the format specifiers
-> are valid, but those which could fail the test, and hence used
-> __kunit_do_failed_assertion() behind the scenes, did not.
-> 
-> These include:
-> - KUNIT_EXPECT_*_MSG()
-> - KUNIT_ASSERT_*_MSG()
-> - KUNIT_FAIL()
-> 
-> This series adds the __printf() attribute, and fixes all of the issues
-> uncovered. (Or, at least, all of those I could find with an x86_64
-> allyesconfig, and the default KUnit config on a number of other
-> architectures. Please test!)
-> 
-> The issues in question basically take the following forms:
-> - int / long / long long confusion: typically a type being updated, but
->    the format string not.
-> - Use of integer format specifiers (%d/%u/%li/etc) for types like size_t
->    or pointer differences (technically ptrdiff_t), which would only work
->    on some architectures.
-> - Use of integer format specifiers in combination with PTR_ERR(), where
->    %pe would make more sense.
-> - Use of empty messages which, whilst technically not incorrect, are not
->    useful and trigger a gcc warning.
-> 
-> We'd like to get these (or equivalent) in for 6.9 if possible, so please
-> do take a look if possible.
-> 
-> Thanks,
-> -- David
-> 
-> Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
-> Closes: https://lore.kernel.org/linux-kselftest/CAHk-=wgJMOquDO5f8ShH1f4rzZwzApNVCw643m5-Yj+BfsFstA@mail.gmail.com/
-> 
-> David Gow (9):
->    kunit: test: Log the correct filter string in executor_test
->    lib/cmdline: Fix an invalid format specifier in an assertion msg
->    lib: memcpy_kunit: Fix an invalid format specifier in an assertion msg
->    time: test: Fix incorrect format specifier
->    rtc: test: Fix invalid format specifier.
->    net: test: Fix printf format specifier in skb_segment kunit test
->    drm: tests: Fix invalid printf format specifiers in KUnit tests
->    drm/xe/tests: Fix printf format specifiers in xe_migrate test
->    kunit: Annotate _MSG assertion variants with gnu printf specifiers
-> 
+On Tue, 27 Feb 2024 15:42:55 +0100 Kory Maincent wrote:
+> +	psec->ps = devm_regulator_get_exclusive(dev,
+> +						rdev_get_name(pcdev->pi[index].rdev));
+> +	if (IS_ERR(psec->ps)) {
+> +		kfree(psec);
+> +		return ERR_CAST(psec->ps);
 
-Applied all patches in this series except to linux-ksefltest kunit
-for linux 6.9-rc1
-
-drm: tests: Fix invalid printf format specifiers in KUnit tests
-
-David, as requtested in 7/9 thread, if you can send me patch on
-top pf 6.8-rc6, will apply it
-
-7-9 drm: tests: Fix invalid printf format specifiers in KUnit tests
-
-thanks,
--- Shuah
-
-
+coccinelle says: ERROR: reference preceded by free on line 458
+-- 
+pw-bot: cr
 
