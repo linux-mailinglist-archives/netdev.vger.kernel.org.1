@@ -1,178 +1,127 @@
-Return-Path: <netdev+bounces-75585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CE6386A9C5
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:23:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 435FF86A9CE
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:24:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C52FC284259
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:23:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B4A0B24464
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:24:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E572562E;
-	Wed, 28 Feb 2024 08:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB0EF2C6BB;
+	Wed, 28 Feb 2024 08:24:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="QRZ/anWH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UUe5t3SE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C42A2D03B
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 08:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764F12D042;
+	Wed, 28 Feb 2024 08:24:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709108592; cv=none; b=db3pg6aSSf2HX5WSWFBxy+bikaTsyBEw5b1VMVxiSKbTedKIYpSkLtO55z/1pGFxjsiw9+0qviCc519JLZsLRVboifMZCBch25ZvCn4Dl8evhTolGj5w7uGUDwqsibLesyte4rzfbh4yOFViZJFMDcu+Ak3r/fYWzTmJGSAPve8=
+	t=1709108676; cv=none; b=upfvdaX4cqAFbOT4snQZlNxDTDgKSdCAiQ+ltGCN0biJlpJYARooOOMtiB38TmCItPoMvaVVC8yjPQMilunaygW1I9PXLdI+yr1qgQrHHXc6FnZ0fPWsti+xAUGBMhlns24QEDd7CRZLm32qX7NflZTv91ynlXX7d5Ag6DThudI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709108592; c=relaxed/simple;
-	bh=zcAL1tz6ACOVjNFHPJlq0qKUpVxS0PmWRTLBkHyo94o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gyq9l9EI0Gea7YtnKOB5iomIMBHtd9ekeZcD5JTJvh9UhkPfAW1oqOEFdJy4DvFCHAY5p/WF/mjTsspIuC7y8U1Jo3SryUh2LuoN4Ln3rP9yKYJ538abaIejRO0FzbzncOLFNUgyR2JpK2L0PepUVm3A21vRQCqsWNGzood4ZrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=QRZ/anWH; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-512ab55fde6so7002293e87.2
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 00:23:09 -0800 (PST)
+	s=arc-20240116; t=1709108676; c=relaxed/simple;
+	bh=rcSNTBiRF+f+3t3RzyuU+qKQ8ru2QZn9y+YmrmBALig=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Bk88vVe381w7e/ce02bDOs6d0bPKfAubjauojNA8t5j7sxhFPApcy5l7Q1GIv/7pcjk4sh62x4s0GpyMcSXUA2bTZr4MyYm6WsVoZi8Wiicmayllw4hZp41H7GGRUMCHJeUga5VLqW5Foj/b2nh/M9EhgcPnteHQjIpYvZ3+S24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UUe5t3SE; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1dcc7f4717fso5899925ad.0;
+        Wed, 28 Feb 2024 00:24:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709108588; x=1709713388; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cqgLOaVURL67ftXp6v7O92fn39oSUkQDPBYPEe3/YNQ=;
-        b=QRZ/anWHgICcWsOlPXe8eHsMxTRnm3eOm2Ln0j+nFQOVkhr0bodPnc47svm7Kr+/JA
-         XDj6N0Z/kMaJ9mehUXHYIqSLYAsiOcASPTytJklg4WopzkVg+lIZxMHvVHdt4iOMk3lY
-         n5JuCnAczRw8VYOQx30k26vwS6fAsd62J1p3zXXWx6P0fZQd/qiF3RTqp6Q5OibcdCWw
-         1MKcYpQavHE9/xAigj3bVhOoQQygjA2D6X93X0+PwSbeZriYuB+57i6o4B95lNj4Dtee
-         +qwNaUSvyTmxNWCNt3hfw4TxZKSbtOP/LLg6so98WPL8zGJ7OBZMXeuyLE6+rXQ5/gOp
-         oF6g==
+        d=gmail.com; s=20230601; t=1709108675; x=1709713475; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ANLYUYqTJ5NOkYuF+uWmj+L6Rv2c3OMTBVV8U8yPtxY=;
+        b=UUe5t3SE9LR6qSHuXJperYMrG3H1rnruT7kpCj2j+orpX0XqN0lHFvM6Ng6NSJnk2T
+         4BsXDBB2ToTL7acSWjzqh4bpJAhIrzJdHqLiNTKMGbIX78ZMCWK3BL1nOhbZIi+43RY+
+         cEYFSauEvU9/8JBD3/sy+69x+pOuPJDehQVOelfHq+C17BRfS8465xD1D9IzCOwSWCWq
+         nqXBHNAwSPd5+ZWZdLYbZQSmWFz+wVwPUl7sAkt9uBrXlzcCE2rEcF6wf9nFj4GBetnV
+         AMTkUlb8YXFczp9r5B0FvQyao5tVVVNBT57RDK1dOHvxlVRb9spYqStblH5MXETbrNbn
+         5XNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709108588; x=1709713388;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cqgLOaVURL67ftXp6v7O92fn39oSUkQDPBYPEe3/YNQ=;
-        b=Pp16kb5AxNPOt6P8GH5645QY1Kt2HB9TgIxQSDi+LHr16YrA2iJTYVG663nVdufu1f
-         2q8Eb2WMo4pJDNYvuBjFthXxgUfVLu3keNabuc6CRingbX+NjeJrtPylpp5q5hYSvgiK
-         qJncpg92vJ60VXcZUx/8ZOfQiv23j1XgCzYXLAqfedqvvSDq20CJJxseXHh6a9VwES9s
-         TO7qC2De7T0Ea9ph/UJRHJD4lhxHVvuuLRyWmgUJxsl8RaTxIgGj28braBCs5gWU0h8Y
-         Zh++OO0Ufi7CfuhgElz0fCWbboDNUOTWknEyMbSNxQvB/iyUiycUp6xh4jblnwzAofC2
-         mH9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWqklpFzxKqvPTzbu9oZrbUNH9SJ2eUTvesIR/FdcKHxYktN7wFPYezsejLK1bA4TOYAxXND9qgqrbd89MNnWZrpDyjecfv
-X-Gm-Message-State: AOJu0YyABgqBOL/AFj11E5hloxgQGgq+VDQ4oaQ7c8gz9edj99nVJeSI
-	fjmHqybQLiNfZAlzS1Z9SsYQhNvAmLABurWvJObZW+z6eIhIeZC1yHDUfYC9ZdY=
-X-Google-Smtp-Source: AGHT+IEdjlYQBynczVxYHirKmQjo0oLu2GibxkoDPhBH6ojuuWCevUu//kVmNR7RzwvBkiXfRmUZVg==
-X-Received: by 2002:ac2:5ed0:0:b0:512:dfa1:6a1c with SMTP id d16-20020ac25ed0000000b00512dfa16a1cmr7280828lfq.10.1709108588092;
-        Wed, 28 Feb 2024 00:23:08 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id c3-20020adfe703000000b0033d6fe3f6absm13734962wrm.62.2024.02.28.00.23.06
+        d=1e100.net; s=20230601; t=1709108675; x=1709713475;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ANLYUYqTJ5NOkYuF+uWmj+L6Rv2c3OMTBVV8U8yPtxY=;
+        b=gYl8Dfyh2RmT5gFUd2QxhCST9ia+fgcThcrF2v9v2JULG/FZt4LEVA7YILJFwDafeS
+         g4CnOuMCQTqUmH8CT9R0yu2o8ubwOBPxA74L2+d3QpLwc0RKEB6qwO4UqVG2UAxHQfzF
+         kb22CYTPop0HywMQ3VONvN5qxHWv/wlT/SWAdZjaVSI9VIhh6Rzq0pvUKskcAEEsmDab
+         CuwGnd/wPZdvvYY1u1g+YYKAjBRrGT6NLRm2Q2xuUkQO8SxUiKQwVgTHeWYE/Pg72FGW
+         N5VZVYdb9q4kFT2gCSwbSl40DUvjunDcR+t3cnHYzXsm1iAmiyiURHbhfranV8wtf82u
+         TP5g==
+X-Forwarded-Encrypted: i=1; AJvYcCUExjF0J2VmOe7XHwuFs0w5pw4OHvuHPQXJmzxRmEvL2HBhJXEe7EgQzKJKcSKAgSFVnj1WrFHPrkV3ZMsg1oWqg5IaC5IswYuKnQmBmiVHS7bGKWGLg5HHJBhmWvWle96JDW57fIh66LbQ2Xth
+X-Gm-Message-State: AOJu0Yxo4ZS9WW6dKSwyqviRldCp8RuYQAsMQpiSUundnOAEOJMJfwPX
+	CMIiFt02z7lv40l1yIicnGJCRhDdw9QaxnIr24CiAHjtTUHY4SGyMgOmcmYz
+X-Google-Smtp-Source: AGHT+IHFSxHEnMcZZRP0fuCcTyC3jlFxQF+jQbHOTPo5GbmFmpa3QE0nYX6/CayEeXRL3zjjGsLfRw==
+X-Received: by 2002:a17:902:f54f:b0:1dc:78b6:bbcf with SMTP id h15-20020a170902f54f00b001dc78b6bbcfmr15420655plf.63.1709108674644;
+        Wed, 28 Feb 2024 00:24:34 -0800 (PST)
+Received: from localhost.localdomain ([115.99.206.243])
+        by smtp.gmail.com with ESMTPSA id je20-20020a170903265400b001db608107ecsm2752890plb.167.2024.02.28.00.24.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 00:23:07 -0800 (PST)
-Date: Wed, 28 Feb 2024 09:23:04 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Siddharth Vadapalli <s-vadapalli@ti.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, rogerq@kernel.org, andrew@lunn.ch,
-	vladimir.oltean@nxp.com, hkallweit1@gmail.com,
-	dan.carpenter@linaro.org, horms@kernel.org, yuehaibing@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, srk@ti.com
-Subject: Re: [PATCH net-next] net: ethernet: ti: am65-cpsw: Add priv-flag for
- Switch VLAN Aware mode
-Message-ID: <Zd7taFB2nEvtZh8E@nanopsycho>
-References: <20240227082815.2073826-1-s-vadapalli@ti.com>
- <Zd3YHQRMnv-ZvSWs@nanopsycho>
- <7d1496da-100a-4336-b744-33e843eba930@ti.com>
+        Wed, 28 Feb 2024 00:24:34 -0800 (PST)
+From: Prabhav Kumar Vaish <pvkumar5749404@gmail.com>
+To: shuah@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	petrm@nvidia.com,
+	idosch@nvidia.com,
+	Prabhav Kumar Vaish <pvkumar5749404@gmail.com>
+Subject: [PATCH net-next] selftests: net: Correct couple of spelling mistakes
+Date: Wed, 28 Feb 2024 13:54:16 +0530
+Message-Id: <20240228082416.416882-1-pvkumar5749404@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7d1496da-100a-4336-b744-33e843eba930@ti.com>
+Content-Transfer-Encoding: 8bit
 
-Wed, Feb 28, 2024 at 08:06:39AM CET, s-vadapalli@ti.com wrote:
->
->
->On 27/02/24 18:09, Jiri Pirko wrote:
->> Tue, Feb 27, 2024 at 09:28:15AM CET, s-vadapalli@ti.com wrote:
->>> The CPSW Ethernet Switch on TI's K3 SoCs can be configured to operate in
->>> VLAN Aware or VLAN Unaware modes of operation. This is different from
->>> the ALE being VLAN Aware and Unaware. The Ethernet Switch being VLAN Aware
->>> results in the addition/removal/replacement of VLAN tag of packets during
->>> egress as described in section "12.2.1.4.6.4.1 Transmit VLAN Processing" of
->>> the AM65x Technical Reference Manual available at:
->>> https://www.ti.com/lit/ug/spruid7e/spruid7e.pdf
->>> In VLAN Unaware mode, packets remain unmodified on egress.
->>>
->>> The driver currently configures the Ethernet Switch in VLAN Aware mode by
->>> default and there is no support to toggle this capability of the Ethernet
->>> Switch at runtime. Thus, add support to toggle the capability by exporting
->>> it via the ethtool "priv-flags" interface.
->> 
->> I don't follow. You have all the means to offload all bridge/vlan
->> configurations properly and setup your hw according to that. See mlxsw
->> for a reference. I don't see the need for any custom driver knobs.
->> 
->
->Thank you for reviewing the patch. Please note that the "VLAN Aware mode" being
->referred to here is different from ALE being VLAN aware. The hw offload of
->bridge/vlan configurations is already supported in the context of the ALE. The
->Ethernet Switch being VLAN Aware is a layer on top of that, which enables
->further processing on top of the untagged/VLAN packets. This patch aims to
->provide a method to enable the following use-cases:
->1. ALE VLAN Aware + CPSW VLAN Aware
->2. ALE VLAN Aware + CPSW VLAN Unaware
->
->All hw offloads of bridge/vlan configurations are w.r.t. ALE VLAN Aware alone.
->Currently, only use-case 1 is enabled by the driver by default and there is no
->knob to toggle to use-case 2.
->
->I am quoting sections of the Technical Reference Manual mentioned in my commit
->message, in order to clarify the CPSW VLAN Unaware and CPSW VLAN Aware terminology.
->
->CPSW VLAN Unaware:
->Transmit packets are NOT modified during switch egress.
->
->CPSW VLAN Aware:
->1. Untagged Packet Operations
->Untagged packets are all packets that are not a VLAN packet or a priority tagged
->packet. According to the CPWS0_FORCE_UNTAGGED_EGRESS_REG[1-0] MASK bit in the
->packet header the packet may exit the switch with a VLAN tag inserted or the
->packet may leave the switch unchanged....
->2. Priority Tagged Packet Operations (VLAN VID == 0 && EN_VID0_MODE ==0h)
->Priority tagged packets are packets that contain a VLAN header with VID = 0.
->According to the CPSW_ALE_FORCE_UNTAGGED_EGRESS_REG[1-0] MASK bit in the packet
->header, priority tagged packets may exit the switch with their VLAN ID and
->priority replaced or they may have their priority tag completely removed....
->3. VLAN Tagged Packet Operations (VLAN VID != 0 || (EN_VID0_MODE ==1h && VLAN
->VID ==0))
->VLAN tagged packets are packets that contain a VLAN header specifying the VLAN
->the packet belongs to
->(VID), the packet priority (PRI), and the drop eligibility indicator (CFI).
->According to the CPSW_ALE_FORCE_UNTAGGED_EGRESS_REG[1-0] MASK bit in the packet
->header, VLAN tagged packets may exit the switch with their VLAN priority
->replaced or they may have their VLAN header completely removed...
->
->I hope that this clarifies that CPSW VLAN Unaware/Aware is a layer on top of the
->hw offload-able bridge/vlan configuration.  Please let me know if there is
->anything specific that could enable this without requiring the "priv-flag" based
->implementation of this patch.
+Changes :
+	- "excercise" is corrected to "exercise" in drivers/net/mlxsw/spectrum-2/tc_flower.sh
+	- "mutliple" is corrected to "multiple" in drivers/net/netdevsim/ethtool-fec.sh
 
-I have no clue what "ALE" is. But in general. User provided
-configuration, using ip/bridge/etc tools/uapi. According to this
-configuration, kernel is bahaving. When you do offload, you should just
-make sure to mimic/mirror the kernel behaviour. With this in mind, why
-can't you do it without adding additional knob? And if you really need
-it because the know does some internal hw/fw tuning, priv flag of netdev
-is most probably not the correct place to put it. If it is, make sure
-you advocate for it properly in the patch description.
+Signed-off-by: Prabhav Kumar Vaish <pvkumar5749404@gmail.com>
+---
+ .../testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh | 2 +-
+ tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-pw-bot: cr
+diff --git a/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh b/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh
+index 616d3581419c..31252bc8775e 100755
+--- a/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh
++++ b/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh
+@@ -869,7 +869,7 @@ bloom_simple_test()
+ bloom_complex_test()
+ {
+ 	# Bloom filter index computation is affected from region ID, eRP
+-	# ID and from the region key size. In order to excercise those parts
++	# ID and from the region key size. In order to exercise those parts
+ 	# of the Bloom filter code, use a series of regions, each with a
+ 	# different key size and send packet that should hit all of them.
+ 	local index
+diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh b/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
+index 7d7829f57550..6c52ce1b0450 100755
+--- a/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
++++ b/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
+@@ -49,7 +49,7 @@ for o in llrs rs; do
+ Active FEC encoding: ${o^^}"
+ done
+ 
+-# Test mutliple bits
++# Test multiple bits
+ $ETHTOOL --set-fec $NSIM_NETDEV encoding rs llrs
+ check $?
+ s=$($ETHTOOL --show-fec $NSIM_NETDEV | tail -2)
+-- 
+2.34.1
 
-
->
->-- 
->Regards,
->Siddharth.
 
