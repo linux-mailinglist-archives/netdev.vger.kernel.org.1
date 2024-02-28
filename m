@@ -1,120 +1,144 @@
-Return-Path: <netdev+bounces-75600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74CFA86AA8D
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:57:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66F4086AA9A
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:59:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A60591C223E7
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:57:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BF1E287A7C
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:59:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8757C2D05C;
-	Wed, 28 Feb 2024 08:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889552D607;
+	Wed, 28 Feb 2024 08:58:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="XYWRf9FI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O6S2HM7Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD642E83F
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 08:57:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97F42E84F;
+	Wed, 28 Feb 2024 08:58:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709110633; cv=none; b=UnYISktSsuYKpueFlrTmPBzKeny9ppK2PZiHAH4jon7nNCLQrHHetSm1lnHaqkgT2T7uhmuc4r7xm5TIR0g/nZha7Irk818wd4JQQ1zfKfUoUAj7GntPNowb4ZJGWLe9XjBUsnpesxvhRzfifhAJwF2vAQXzOUyzwY4/BrIuNvc=
+	t=1709110738; cv=none; b=I3I6t416e+xw/LaxqChkdH/9YeRGqnclH1ldTE52rJufNhUgBUPiciQ9geOfvJ1/Da56rLqsV/jcMqMmSFEdhP9J2jaHMLXRjOc6d6B0GllFWSiTaM9rZBT1c1HqLy0czXCoFwZtk7DBgO/67htuxlLWFAgrHU+hdnVGCZ8XaII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709110633; c=relaxed/simple;
-	bh=CFmQs1hUchX1CA4A9NNW6SX0KfyqP2OlQweDEldWOWY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EObQeSlZy/ist/orPlKPhHX5yruYMdij5x3UnNye9fXZTx+8wGub7PCIvaUCGp1OfdFlfNDJId/vLFNmyE/ZSOT2g5tetLTlq/94fbIPA8CWIMZ8GT4mwXtdZxq/+os277DDw7cS7NuflK9/1ILd7NiWsY2YbBm2tGt01u2RT1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=XYWRf9FI; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 3B99587DC2;
-	Wed, 28 Feb 2024 09:57:09 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1709110629;
-	bh=LqWrJ6MXrX71B8Nztq7mqbMnfSBpJcjZJZK33jnQTfw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=XYWRf9FIwtzJkbmTCOZ5jum4FIBZ1cCmS9sl5nQPRtJrVUU3eHYaiql/ZGXXQGwzm
-	 s/NHfC4djG/8kBHZLHv+Y3T0FaGO20ZOAYoD0/RArTLN4VbTJ/v5WSi+IhdI38O9mC
-	 6O7PnqtsjjpPpWNefA+R7De1m0Y0Cwuk6jxfP2buN5tQG5R9r/u4cl1LJ72ORacbMX
-	 kMLsq+U8YmICXeTPwvpPuwAs56/bFZbou8SgRVN09ZiBKDDzm/C/meNEsGiKf0w62G
-	 N7tLThzXlQeuZKVU+XGq5g/EmoB6/RHlo1w+3t/cuH6jhBQprtSpCcNT1R/USNpCPE
-	 U/8RTFRxCrkTA==
-From: Lukasz Majewski <lukma@denx.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Tristram.Ha@microchip.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [PATCH v2] net: hsr: Use correct offset for HSR TLV values in supervisory HSR frames
-Date: Wed, 28 Feb 2024 09:56:44 +0100
-Message-Id: <20240228085644.3618044-1-lukma@denx.de>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1709110738; c=relaxed/simple;
+	bh=yIUst7+3ODvs408zwYXRT1jR3LK2s1xhcE0dmgtWszk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jO5wostoCxouUsJFR9eXPIhYjjPNki+xCIvt84ouzChUCEmWWIcsjMTu1iwTarq03WZ2EsydD9lhVVvnNTF6ADzebwg+OF4fuah9Eidtwy26VLIjluybukUquEQLwH0KwxzJRPVnrW0El9aDD1IvonbpjLd27xwXNgJomUT8MZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O6S2HM7Y; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d2305589a2so74281721fa.1;
+        Wed, 28 Feb 2024 00:58:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709110735; x=1709715535; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5A3lAAmSMgn6GRalT76bIAGFZOne7C/ohlC8xFZVbW0=;
+        b=O6S2HM7YPGgSZ1jLbxp3gFn1gZbYJMSPnj0DzE0MCZIXRvpSaxwkLEiidvOhPUo55v
+         qBmqhDBFkAJGKx12+wHsNOFXG+2wx1Ji974+uKbKBYO+fI7dfsOu2b3XGCyClITqxSB0
+         OPebrZ75j0f+AYi9P87lQ1ee676lEWHKqzDszT/p64k371FmLUgbEgn/FGzqlnCEJTd/
+         aawouxEd2agFDo6om0Vspzp3Bi9qeRlrXDF7VOmA8/rdGndD030UwNrVgP4EyFTWE50j
+         +FO5RnvUi3jmUBljipXLp7oxFpdOOeI4SmYgHIaLdyles1GRkO95wr0pN15hay8AP/ln
+         +wlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709110735; x=1709715535;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5A3lAAmSMgn6GRalT76bIAGFZOne7C/ohlC8xFZVbW0=;
+        b=h946UpZ73QSPfIHODn+qq1lMNTQ1f6DpEgKEahj/ypW2BXP/Hb1RNYDivH2GcQHKHX
+         ODmpdMdwWfY8sfbJk86bcLjrgaFZ1mTMsLPlOKL+tNooT6pAtvALlcL0TLmK9S6lg6BC
+         2beg+CiIi+4a3FDrDTqGVjpWLt8j6nBbx0vHkNIC14V4DBHEvjF8+y8MBzwRIEsPxh2O
+         qLza32hN0dLtJzua5rFQiyUSZqIBYrneylJ6vuKsOb465XBEEazo/EA/EK44RVSj7stP
+         DnrYGXNBQBBar5Ypcj6urJD1Ys7PP+8Cf528mkZ2nMVStYSRfb0YWYxeLRTTzJD+bpsM
+         ztCg==
+X-Forwarded-Encrypted: i=1; AJvYcCU5+TIOtpZkaWl8gomgBRR4q7OxxdkRK+jaMcCB24LwuITbnwrw91Gu/j8BRxOVPIjJra5SwwCRLwEta1HvuZL/Ro0JrhlqvCpqGGBw4M7KA5cTl1UdoU0Ss073m/r4Pbv2dbve
+X-Gm-Message-State: AOJu0Yxm6SI1BFftRaGgkMeCY1xiAOb7eorwOy5yaml1Vwbiy5ne/EP8
+	/14crMn08haIZUOOXzwy4zgkSdafAsY9VVYTqYyQCGINYMFUYRG6FOsSywHZGcZtEOtAfhFVbLf
+	UFNQY1MnRuLiRYnEkK17PC1W53htFM980a6HL2g==
+X-Google-Smtp-Source: AGHT+IGjoGQ3AM7Hcs5ExQngiiirhwlBbCJykaS19J2G8iJ062O1vqW4F5tgSKrBFW0xw9SvKOS5NLf9pfO6X2Uik30=
+X-Received: by 2002:a05:6512:318e:b0:512:fe1f:d3c1 with SMTP id
+ i14-20020a056512318e00b00512fe1fd3c1mr6031414lfe.58.1709110734603; Wed, 28
+ Feb 2024 00:58:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+References: <20240228074308.3623984-2-zegao@tencent.com> <CANn89iLQ8r3e7=RP9F7wO=b+bZbGucbuitOswkVwmijbd1Fzig@mail.gmail.com>
+In-Reply-To: <CANn89iLQ8r3e7=RP9F7wO=b+bZbGucbuitOswkVwmijbd1Fzig@mail.gmail.com>
+From: Ze Gao <zegao2021@gmail.com>
+Date: Wed, 28 Feb 2024 16:58:43 +0800
+Message-ID: <CAD8CoPD-TSt_twgkiHKw_rON9VSRON3vJfxaDLd9rz3PTPOWiQ@mail.gmail.com>
+Subject: Re: [RFC PATCH] net, sock.h: Make sure accesses to a fullsock when it
+ is indeed one
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Ze Gao <zegao@tencent.com>, Honglin Li <honglinli@tencent.com>, paulmck@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Current HSR implementation uses following supervisory frame (even for
-HSRv1 the HSR tag is not is not present):
+On Wed, Feb 28, 2024 at 4:34=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Wed, Feb 28, 2024 at 8:46=E2=80=AFAM Ze Gao <zegao2021@gmail.com> wrot=
+e:
+> >
+> > We know a pointer that has type struct sock* can actually points to
+> > one of some different sock types which have different memory layouts,
+> > take req_to_sk() for example, and whether a sock is full or not
+> > depends upon ->sk_state which is a shared field among them so that we
+> > see some repeated code pattern similar to this:
+> >
+> >         if (sk && sk fullsock(sk) && sk->field_not_shared)
+> >
+> > which seems to have no problem at the first glance, but it is actually
+> > unsound in a way that ->field_not_shared is likely uninitialized (or
+> > unmapped) when it's not a full sock, and a compiler is free to reorder
+> > accesses to fields of a struct sock when it can, that is, it could
+> > reorder accesses to ->field_not_shared across ->sk_state or load them
+> > all before the branch test, which leads to unexpected behavior, althoug=
+h
+> > most of them won't do this.
+> >
+> > So leave a barrier() in between and force the compiler to keep the
+> > obvious program order.
+> >
+> > Cc: Honglin Li <honglinli@tencent.com>
+> > Signed-off-by: Ze Gao <zegao@tencent.com>
+> > ---
+> >
+> > IIUC, casting a pointer to refer to a bigger object in size is
+> > technically UB, which may lead to unsound code. From the POV of
+> > a compiler, when it is allowed to assume that one struct member
+> > is valid, they all are through a pointer, and thus it's likely
+> > for the compiler to do such optimizations and reorder what we
+> > want to keep in order.
+> >
+> > Note this is not a typical way to use barrier(), which only
+> > acts an ok fix to what's already unsound, at least IMO.
+> >
+> > Comments are welcome, since I'm not an expert in C and I know
+> > most of compilers won't do this reorder, but I'm being pessimistic
+> > here.
+>
+> Well, my suggestion is to have evidence first...
 
-00000000: 01 15 4e 00 01 2d XX YY ZZ 94 77 10 88 fb 00 01
-00000010: 7e 1c 17 06 XX YY ZZ 94 77 10 1e 06 XX YY ZZ 94
-00000020: 77 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-00000030: 00 00 00 00 00 00 00 00 00 00 00 00
+Fair point!  my initial purpose is to raise my question here to check if
+there is UB here and see if C experts have insights on this.
 
-The current code adds extra two bytes (i.e. sizeof(struct hsr_sup_tlv))
-when offset for skb_pull() is calculated.
-This is wrong, as both 'struct hsrv1_ethhdr_sp' and 'hsrv0_ethhdr_sp'
-already have 'struct hsr_sup_tag' defined in them, so there is no need
-for adding extra two bytes.
+> We are not going to add barriers just because we do not trust
+> compilers handling of sequence points.
 
-This code was working correctly as with no RedBox support, the check for
-HSR_TLV_EOT (0x00) was off by two bytes, which were corresponding to
-zeroed padded bytes for minimal packet size.
+Makes sense to me as well if this is indeed not an issue here.
 
-Fixes: eafaa88b3eb7 ("net: hsr: Add support for redbox supervision frames")
-
-Signed-off-by: Lukasz Majewski <lukma@denx.de>
----
-Changes for v2:
-- Update commit message to point to correct commit in "Fixes:"
-
----
- net/hsr/hsr_forward.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
-index 2afe28712a7a..5d68cb181695 100644
---- a/net/hsr/hsr_forward.c
-+++ b/net/hsr/hsr_forward.c
-@@ -83,7 +83,7 @@ static bool is_supervision_frame(struct hsr_priv *hsr, struct sk_buff *skb)
- 		return false;
- 
- 	/* Get next tlv */
--	total_length += sizeof(struct hsr_sup_tlv) + hsr_sup_tag->tlv.HSR_TLV_length;
-+	total_length += hsr_sup_tag->tlv.HSR_TLV_length;
- 	if (!pskb_may_pull(skb, total_length))
- 		return false;
- 	skb_pull(skb, total_length);
--- 
-2.20.1
-
+Thanks,
+        -- Ze
 
