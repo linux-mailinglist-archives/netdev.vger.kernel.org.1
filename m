@@ -1,109 +1,106 @@
-Return-Path: <netdev+bounces-75540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6490F86A709
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 04:10:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3C3286A70C
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 04:13:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 953821C2479C
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:10:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17F891F2BFDC
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:13:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 888D31D54C;
-	Wed, 28 Feb 2024 03:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3729C1D6A6;
+	Wed, 28 Feb 2024 03:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="saYAPfc6"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OxgEMrqf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF931CD38;
-	Wed, 28 Feb 2024 03:10:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B071BC27
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 03:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709089803; cv=none; b=W0GOtTUbBuipUhR4gKNUejUmmeCztSt3fRKzYhTdDq6baGEJm0+l010bMsJcMcl3oMb60+Nh6mgCNEjY/cd/rB2nAexhUkIm7HEwN8b2YJRfJFDDUP9yicRCBcm/E9zFaEMW8n/ycNxMo86iQLj3zoOUF2DEf5zOetVP7Q+eh2Y=
+	t=1709089979; cv=none; b=VwbWnTfbAuviueN9nAtQ+MtUElqy0AskaAL5OBz5p3n6+sG1HPcR12GQFbnYwIg89m7H8VSaw5P4VHs9GJzGROXlf+yQeW6wZoDc8Jksf8+HtuPd+jJukqDAM4zApUSKJSw81W0xJWaYLWWc7j+V0MrBqRbPpoIdFdalQbpxljc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709089803; c=relaxed/simple;
-	bh=W1euSk2De6m04QbugcV3iEslzHM6DSXT6L5/C0cY1lk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SboPAmL40f6FqEOjsPwvIBkgXaEAk0zpKmwt8nb4/O+/IHUPRRDn85/qWQjcMPadbsP5H8q12NFYdH56q3FN/T9ZTfYIAhnF+FtYGtofOLy31+Yyi2zk6WwCdz62I3EMUgsKwLkOcdjhXmonbZfkuUZZNxtU9Qr8Jm1jGaFXdbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=saYAPfc6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0237BC433C7;
-	Wed, 28 Feb 2024 03:10:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709089802;
-	bh=W1euSk2De6m04QbugcV3iEslzHM6DSXT6L5/C0cY1lk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=saYAPfc6j4YBJ3uQBiGwbbcpxK6wAWD7rZIcajfBMzEFKrMN3l+bblAnUV57aPA/2
-	 zChRMz9ZxEb+eCnt7pg7JOFbSQWvG3n6heg88CTbymdAhsmKSPr2cQ4qLihjDtwAN5
-	 wsiZBMPv5kugTrqsAkMckFRbZJQ+7yFDdD9Kcrb1pf8TZogBhC1h/61NDaBs5eWqQr
-	 Y/GmVCZmbfc291DfsQDEmLJZZOJelD1RmdphjI/NHNV3I2BeQGqaCeDsooHE4jQxK7
-	 CPI9MbOvn4SDiLQ7e6QCpcLi42++wyIoicIQ7K/CrJMEnzSazyd7WOIkEH3QeRjcmB
-	 T1uqiCqKoxpdw==
-Date: Tue, 27 Feb 2024 19:10:01 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Paul E. McKenney" <paulmck@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, Yan Zhai <yan@cloudflare.com>,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Paolo
- Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Simon Horman
- <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Coco Li <lixiaoyan@google.com>, Wei Wang
- <weiwan@google.com>, Alexander Duyck <alexanderduyck@fb.com>, Hannes
- Frederic Sowa <hannes@stressinduktion.org>, linux-kernel@vger.kernel.org,
- rcu@vger.kernel.org, bpf@vger.kernel.org, kernel-team@cloudflare.com
-Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
-Message-ID: <20240227191001.0c521b03@kernel.org>
-In-Reply-To: <d633c5b9-53a5-4cd6-9dbb-6623bb74c00b@paulmck-laptop>
-References: <Zd4DXTyCf17lcTfq@debian.debian>
-	<CANn89iJQX14C1Qb_qbTVG4yoG26Cq7Ct+2qK_8T-Ok2JDdTGEA@mail.gmail.com>
-	<d633c5b9-53a5-4cd6-9dbb-6623bb74c00b@paulmck-laptop>
+	s=arc-20240116; t=1709089979; c=relaxed/simple;
+	bh=I/eHMEcO16yx/j3JgMMPsVzPtktZD6jAemkrCGo4SZA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=hxaNkhd5+NqXoY6i6ImNflPJvpPZDwoC8+dAaFrxOAelG3pzP9nHJJl1OeHmu6QdOFHSrzKcJQ9zQj86CPfJCNWG0pNoT4bsxRtLB1GWbDugfnOvgwR+4lTY7dPUoofkEcWQj8zJchoG9zHP7RXV6TSBAOYViGzP6KB4TStmCsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OxgEMrqf; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1709089974;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L+CfwfwwXs35+oys4wWB8aNc/E0TpV+2eGWwsWt9upU=;
+	b=OxgEMrqfMixwlftCYzgZJ2wrKqlNkNHhuZS7xYgKBnvr+QFaAbsx3OkiuJknH2SP6MMlpU
+	GmShJH7h5q+Z4fm9xp9jtrV7rhLLoNycKjx8RMiugaEmRayvn3W/Jd8L2XyeeYppnHnAW7
+	C9FwoK4hZO7bn7+dxtzm4q7WyTEnY2Y=
+From: Chengming Zhou <chengming.zhou@linux.dev>
+To: horms@kernel.org
+Cc: chuck.lever@oracle.com,
+	jlayton@kernel.org,
+	neilb@suse.de,
+	kolga@netapp.com,
+	linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Chengming Zhou <zhouchengming@bytedance.com>
+Subject: [PATCH v3] sunrpc: remove SLAB_MEM_SPREAD flag usage
+Date: Wed, 28 Feb 2024 03:12:34 +0000
+Message-Id: <20240228031234.3512969-1-chengming.zhou@linux.dev>
+In-Reply-To: <20240227171353.GE277116@kernel.org>
+References: <20240227171353.GE277116@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 27 Feb 2024 10:32:22 -0800 Paul E. McKenney wrote:
-> > > +                       if (!IS_ENABLED(CONFIG_PREEMPT_RT))
-> > > +                               rcu_softirq_qs();
-> > > +
-> > >                         local_bh_enable();
-> > >
-> > >                         if (!repoll)
-> >
-> > Hmm....
-> > Why napi_busy_loop() does not have a similar problem ?
-> > 
-> > It is unclear why rcu_all_qs() in __cond_resched() is guarded by
-> > 
-> > #ifndef CONFIG_PREEMPT_RCU
-> >      rcu_all_qs();
-> > #endif  
-> 
-> The theory is that PREEMPT_RCU kernels have preemption, and get their
-> quiescent states that way.
+From: Chengming Zhou <zhouchengming@bytedance.com>
 
-But that doesn't work well enough?
+The SLAB_MEM_SPREAD flag used to be implemented in SLAB, which was
+removed as of v6.8-rc1, so it became a dead flag since the commit
+16a1d968358a ("mm/slab: remove mm/slab.c and slab_def.h"). And the
+series[1] went on to mark it obsolete to avoid confusion for users.
+Here we can just remove all its users, which has no functional change.
 
-Assuming that's the case why don't we add it with the inverse ifdef
-condition next to the cond_resched() which follows a few lines down?
+[1] https://lore.kernel.org/all/20240223-slab-cleanup-flags-v2-1-02f1753e8303@suse.cz/
 
-			skb_defer_free_flush(sd);
-+
-+			if (!IS_ENABLED(CONFIG_PREEMPT_RT))
-+				rcu_softirq_qs();
-+
-			local_bh_enable();
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+v3:
+ - Improve the indentation, per Simon Horman.
 
-			if (!repoll)
-				break;
+v2:
+ - Update the patch description and include the related link to
+   make it clearer that SLAB_MEM_SPREAD flag is now a no-op.
+---
+ net/sunrpc/rpc_pipe.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-			cond_resched();
-		}
+diff --git a/net/sunrpc/rpc_pipe.c b/net/sunrpc/rpc_pipe.c
+index dcc2b4f49e77..b639d8eb6080 100644
+--- a/net/sunrpc/rpc_pipe.c
++++ b/net/sunrpc/rpc_pipe.c
+@@ -1490,7 +1490,7 @@ int register_rpc_pipefs(void)
+ 	rpc_inode_cachep = kmem_cache_create("rpc_inode_cache",
+ 				sizeof(struct rpc_inode),
+ 				0, (SLAB_HWCACHE_ALIGN|SLAB_RECLAIM_ACCOUNT|
+-						SLAB_MEM_SPREAD|SLAB_ACCOUNT),
++				    SLAB_ACCOUNT),
+ 				init_once);
+ 	if (!rpc_inode_cachep)
+ 		return -ENOMEM;
+-- 
+2.40.1
 
-We won't repoll majority of the time.
 
