@@ -1,252 +1,254 @@
-Return-Path: <netdev+bounces-75684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EE2786AE28
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:52:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8755A86AE5A
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:57:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3778296490
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 11:52:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BF8728FA4A
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 11:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C652214EFDB;
-	Wed, 28 Feb 2024 11:47:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBBAF136647;
+	Wed, 28 Feb 2024 11:51:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="UjPHWDIn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zxc6yBkh"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8847514A081;
-	Wed, 28 Feb 2024 11:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78D173508
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 11:50:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709120875; cv=none; b=uKFmLIxKghbSInstmk+FJmZGdp5MdlxB6MVM+GDsYe3Bwe+nQf8cN1je0qnd1ppK6mb1KmrRfqktTT/bOU9/h/JwjxbImEiEJ355Trz0XavBUEApibowLQdbDmTmIBzCeSIWnfPUqzPU3BLcFgxEyMAzRB4cLIxUquMe+mdzKgA=
+	t=1709121061; cv=none; b=ViIA4S3LtwFQmdUkYXX3Uy5tUh+PBMIpqGoD0K2P/B37GsUKNNrl8p7w0bmtNoMEKWlQNHT3B9ZqJsfYr5qr/TypYsGM6YGQz8fSYqgLKRGa4v/7CY1LA9WEcbWgR3naAYeYGT8UxYKQAZaP1T9Y5CAiv47KGgCuFbv3x4dPAA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709120875; c=relaxed/simple;
-	bh=2pT4/pGLf+Tz0FLhnlHVkpBR4vE+UlSbdiH0r9+hv34=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Il2SLn7FMZ8KgpKLaO42tRgQgy9TDfkkzGYbc+31VE6ImlGqUpqyUBsDOO9S7qvO4/qWP+pMtbHh48ctgAdfGV+Xw0EqHp67Za1WZCxq1Wc8HlpWtLr9KcvIwtVpty0ScPwzix0U/awS4/aERQz7Kuagt5tzgkOpn+tCt80cQto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UjPHWDIn; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B8AD71C0002;
-	Wed, 28 Feb 2024 11:47:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709120872;
+	s=arc-20240116; t=1709121061; c=relaxed/simple;
+	bh=NUqRZXSlaPreveGzpaaoGjZfPnYAgtt8dJUE8yNdqGk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=BVKvMI3h3Aro9MvAufxujG2P+MxgnYL+iDCYQdeTZKnIfBDhXS4ufMfY6d1OYZuswKjqQKuj8XRlfE5L7Aulp/4FXY9Cjr6LaZN6FA5MCqxO1smvqzgbduPJoV+oDt+MAZSzGBGn39p6oY0Ky8JforHz86jW35Nh57XgPTYWU7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zxc6yBkh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709121057;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=a6DcDF1gP3/YQKlktjFTFVBiDJHtK7RYsswDfQAY4Ok=;
-	b=UjPHWDInLJztlM0KU7kTJqQDs6LLKkfE+5xVwBC3iepjbttv/sf6mndddrTwOdUQw3PMNt
-	Vdtte1J+mcAGTv8idUTw89hXIjVSj/lhOUmHdx/lrhtyjtVIgzdYsEJYpkYitQ5QVnd3U5
-	u9aJl9gaizD2+/d9MiwU4PK5OZdjxPTfj8xgN89PG8WmM/4/DSFi76WWs2vpQEpu6N1Wq3
-	+t/9u4+9rTaaBWKW1i4D31RVillFpHAm+mLD6JLqaTp5rG2OWqUyvwsAGEjCHArgFUQG1c
-	rKaI2Ek7N29zWsmRWIoYU3fyiJC1eHz9sHPYioyUNt524f8aRJ+bn/5gbScv2Q==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	mwojtas@chromium.org
-Subject: [PATCH net-next v9 13/13] Documentation: networking: document phy_link_topology
-Date: Wed, 28 Feb 2024 12:47:27 +0100
-Message-ID: <20240228114728.51861-14-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20240228114728.51861-1-maxime.chevallier@bootlin.com>
-References: <20240228114728.51861-1-maxime.chevallier@bootlin.com>
+	bh=u+waIFhwixtYlk9hyKlLzfQD0m8wRi5/b3f1cwvn4VQ=;
+	b=Zxc6yBkh4JP9qWBqR5O1oXFrf05g8Kx3Z/aPm3ss9zQcZnDRYlT+4TSLEexa0JSrdKBoJB
+	aHMw6tLSwbn6/Du9YAaXtmiIOd2aREmWDetpChaWqTF2ctVNWFqB/wDGn0WaNuX4kfWQ8y
+	tN0NLJfx/OQCp6qGU7+PRZvCDsslldo=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-320-w2PJsUmzNCOh0IHIXtT1Lg-1; Wed, 28 Feb 2024 06:50:56 -0500
+X-MC-Unique: w2PJsUmzNCOh0IHIXtT1Lg-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a3ee69976dfso219994266b.3
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 03:50:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709121055; x=1709725855;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u+waIFhwixtYlk9hyKlLzfQD0m8wRi5/b3f1cwvn4VQ=;
+        b=AaEDf+oV5FRRnZexZyCzTM6OuNi+MIH5Gh4wRgokPN2uP0ZEY7JtFWWmS3rC4d3zW2
+         6e6zcZonqeLtRyVWlW0bSuUXNytMkG429Rh5vf6qTSQSHA14jj5WwdnZ+MCUa7cEbSVG
+         GhZF/fx0reIYK9gUNB5TvirmWSX0QfJYxMGa8QPo5YV8Pn/cl7FpXA6aeGRST2YKU9Bq
+         eEylJVHlS0pQH2W0Z4UhvMZwykoxidsRdeVwhKOoNiycbebKtPRM5Cj2cY7DtqlT0Sxu
+         AWy7oB6WLGDpWpHNaY7YPqOIghCUQb3FlumjQrLfCKltpB6wQsk/zisgMKD/P0Yu+GlI
+         0YPA==
+X-Forwarded-Encrypted: i=1; AJvYcCUkhIOVeJS+VISn+FdnGWAp/Hpw2Cr/h78o7aKZr/60AypWm7dOW3khHSOJ5yyUk838XSxGyFkaBUg+HgIB+vSMuNOWLMAe
+X-Gm-Message-State: AOJu0YwArK62hqfeC9fSxMjCProkWaeJ3CC0oLwYXhCIJS4q/to80xQL
+	OUT81QqNBs7Y7HYYRdA2uSv6TBi2ROAu69iBFn99wqWUyDQ6NFmyS/mtdNeX6arCCflmVmmmll3
+	t4GXwUOPKWUR88hdE8DAAYuIBhYwRrRcoBTkK6Le8vlHOJp5XYbNLUw==
+X-Received: by 2002:a17:906:38c2:b0:a43:2255:2241 with SMTP id r2-20020a17090638c200b00a4322552241mr6733856ejd.53.1709121055197;
+        Wed, 28 Feb 2024 03:50:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHQvZvyolhRnqLocsVj00UxJ4E1FTjOFdA2kV4qae3vZfPoEtr8rbrzi4ifxNrCaNvgxSYuzw==
+X-Received: by 2002:a17:906:38c2:b0:a43:2255:2241 with SMTP id r2-20020a17090638c200b00a4322552241mr6733843ejd.53.1709121054834;
+        Wed, 28 Feb 2024 03:50:54 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id vx6-20020a170907a78600b00a3edde33e7esm1765156ejc.99.2024.02.28.03.50.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 03:50:53 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 5EB1A112E709; Wed, 28 Feb 2024 12:50:53 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: paulmck@kernel.org, Eric Dumazet <edumazet@google.com>
+Cc: Yan Zhai <yan@cloudflare.com>, netdev@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Simon Horman
+ <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Coco Li <lixiaoyan@google.com>, Wei Wang
+ <weiwan@google.com>, Alexander Duyck <alexanderduyck@fb.com>, Hannes
+ Frederic Sowa <hannes@stressinduktion.org>, linux-kernel@vger.kernel.org,
+ rcu@vger.kernel.org, bpf@vger.kernel.org, kernel-team@cloudflare.com
+Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
+In-Reply-To: <d633c5b9-53a5-4cd6-9dbb-6623bb74c00b@paulmck-laptop>
+References: <Zd4DXTyCf17lcTfq@debian.debian>
+ <CANn89iJQX14C1Qb_qbTVG4yoG26Cq7Ct+2qK_8T-Ok2JDdTGEA@mail.gmail.com>
+ <d633c5b9-53a5-4cd6-9dbb-6623bb74c00b@paulmck-laptop>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 28 Feb 2024 12:50:53 +0100
+Message-ID: <87edcwerj6.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The newly introduced phy_link_topology tracks all ethernet PHYs that are
-attached to a netdevice. Document the base principle, internal and
-external APIs. As the phy_link_topology is expected to be extended, this
-documentation will hold any further improvements and additions made
-relative to topology handling.
+"Paul E. McKenney" <paulmck@kernel.org> writes:
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
-V9: No changes
-V8: No changes
-V7: No changes
-V6: No changes
-V5: Fixed a lot of typos
-V4: No changes
-V3: New patch
+> On Tue, Feb 27, 2024 at 05:44:17PM +0100, Eric Dumazet wrote:
+>> On Tue, Feb 27, 2024 at 4:44=E2=80=AFPM Yan Zhai <yan@cloudflare.com> wr=
+ote:
+>> >
+>> > We noticed task RCUs being blocked when threaded NAPIs are very busy in
+>> > production: detaching any BPF tracing programs, i.e. removing a ftrace
+>> > trampoline, will simply block for very long in rcu_tasks_wait_gp. This
+>> > ranges from hundreds of seconds to even an hour, severely harming any
+>> > observability tools that rely on BPF tracing programs. It can be
+>> > easily reproduced locally with following setup:
+>> >
+>> > ip netns add test1
+>> > ip netns add test2
+>> >
+>> > ip -n test1 link add veth1 type veth peer name veth2 netns test2
+>> >
+>> > ip -n test1 link set veth1 up
+>> > ip -n test1 link set lo up
+>> > ip -n test2 link set veth2 up
+>> > ip -n test2 link set lo up
+>> >
+>> > ip -n test1 addr add 192.168.1.2/31 dev veth1
+>> > ip -n test1 addr add 1.1.1.1/32 dev lo
+>> > ip -n test2 addr add 192.168.1.3/31 dev veth2
+>> > ip -n test2 addr add 2.2.2.2/31 dev lo
+>> >
+>> > ip -n test1 route add default via 192.168.1.3
+>> > ip -n test2 route add default via 192.168.1.2
+>> >
+>> > for i in `seq 10 210`; do
+>> >  for j in `seq 10 210`; do
+>> >     ip netns exec test2 iptables -I INPUT -s 3.3.$i.$j -p udp --dport =
+5201
+>> >  done
+>> > done
+>> >
+>> > ip netns exec test2 ethtool -K veth2 gro on
+>> > ip netns exec test2 bash -c 'echo 1 > /sys/class/net/veth2/threaded'
+>> > ip netns exec test1 ethtool -K veth1 tso off
+>> >
+>> > Then run an iperf3 client/server and a bpftrace script can trigger it:
+>> >
+>> > ip netns exec test2 iperf3 -s -B 2.2.2.2 >/dev/null&
+>> > ip netns exec test1 iperf3 -c 2.2.2.2 -B 1.1.1.1 -u -l 1500 -b 3g -t 1=
+00 >/dev/null&
+>> > bpftrace -e 'kfunc:__napi_poll{@=3Dcount();} interval:s:1{exit();}'
+>> >
+>> > Above reproduce for net-next kernel with following RCU and preempt
+>> > configuraitons:
+>> >
+>> > # RCU Subsystem
+>> > CONFIG_TREE_RCU=3Dy
+>> > CONFIG_PREEMPT_RCU=3Dy
+>> > # CONFIG_RCU_EXPERT is not set
+>> > CONFIG_SRCU=3Dy
+>> > CONFIG_TREE_SRCU=3Dy
+>> > CONFIG_TASKS_RCU_GENERIC=3Dy
+>> > CONFIG_TASKS_RCU=3Dy
+>> > CONFIG_TASKS_RUDE_RCU=3Dy
+>> > CONFIG_TASKS_TRACE_RCU=3Dy
+>> > CONFIG_RCU_STALL_COMMON=3Dy
+>> > CONFIG_RCU_NEED_SEGCBLIST=3Dy
+>> > # end of RCU Subsystem
+>> > # RCU Debugging
+>> > # CONFIG_RCU_SCALE_TEST is not set
+>> > # CONFIG_RCU_TORTURE_TEST is not set
+>> > # CONFIG_RCU_REF_SCALE_TEST is not set
+>> > CONFIG_RCU_CPU_STALL_TIMEOUT=3D21
+>> > CONFIG_RCU_EXP_CPU_STALL_TIMEOUT=3D0
+>> > # CONFIG_RCU_TRACE is not set
+>> > # CONFIG_RCU_EQS_DEBUG is not set
+>> > # end of RCU Debugging
+>> >
+>> > CONFIG_PREEMPT_BUILD=3Dy
+>> > # CONFIG_PREEMPT_NONE is not set
+>> > CONFIG_PREEMPT_VOLUNTARY=3Dy
+>> > # CONFIG_PREEMPT is not set
+>> > CONFIG_PREEMPT_COUNT=3Dy
+>> > CONFIG_PREEMPTION=3Dy
+>> > CONFIG_PREEMPT_DYNAMIC=3Dy
+>> > CONFIG_PREEMPT_RCU=3Dy
+>> > CONFIG_HAVE_PREEMPT_DYNAMIC=3Dy
+>> > CONFIG_HAVE_PREEMPT_DYNAMIC_CALL=3Dy
+>> > CONFIG_PREEMPT_NOTIFIERS=3Dy
+>> > # CONFIG_DEBUG_PREEMPT is not set
+>> > # CONFIG_PREEMPT_TRACER is not set
+>> > # CONFIG_PREEMPTIRQ_DELAY_TEST is not set
+>> >
+>> > An interesting observation is that, while tasks RCUs are blocked,
+>> > related NAPI thread is still being scheduled (even across cores)
+>> > regularly. Looking at the gp conditions, I am inclining to cond_resched
+>> > after each __napi_poll being the problem: cond_resched enters the
+>> > scheduler with PREEMPT bit, which does not account as a gp for tasks
+>> > RCUs. Meanwhile, since the thread has been frequently resched, the
+>> > normal scheduling point (no PREEMPT bit, accounted as a task RCU gp)
+>> > seems to have very little chance to kick in. Given the nature of "busy
+>> > polling" program, such NAPI thread won't have task->nvcsw or task->on_=
+rq
+>> > updated (other gp conditions), the result is that such NAPI thread is
+>> > put on RCU holdouts list for indefinitely long time.
+>> >
+>> > This is simply fixed by mirroring the ksoftirqd behavior: after
+>> > NAPI/softirq work, raise a RCU QS to help expedite the RCU period. No
+>> > more blocking afterwards for the same setup.
+>> >
+>> > Fixes: 29863d41bb6e ("net: implement threaded-able napi poll loop supp=
+ort")
+>> > Signed-off-by: Yan Zhai <yan@cloudflare.com>
+>> > ---
+>> >  net/core/dev.c | 4 ++++
+>> >  1 file changed, 4 insertions(+)
+>> >
+>> > diff --git a/net/core/dev.c b/net/core/dev.c
+>> > index 275fd5259a4a..6e41263ff5d3 100644
+>> > --- a/net/core/dev.c
+>> > +++ b/net/core/dev.c
+>> > @@ -6773,6 +6773,10 @@ static int napi_threaded_poll(void *data)
+>> >                                 net_rps_action_and_irq_enable(sd);
+>> >                         }
+>> >                         skb_defer_free_flush(sd);
+>
+> Please put a comment here stating that RCU readers cannot cross
+> this point.
+>
+> I need to add lockdep to rcu_softirq_qs() to catch placing this in an
+> RCU read-side critical section.  And a header comment noting that from
+> an RCU perspective, it acts as a momentary enabling of preemption.
 
- Documentation/networking/index.rst            |   1 +
- .../networking/phy-link-topology.rst          | 121 ++++++++++++++++++
- 2 files changed, 122 insertions(+)
- create mode 100644 Documentation/networking/phy-link-topology.rst
+OK, so one question here: for XDP, we're basically treating
+local_bh_disable/enable() as the RCU critical section, cf the discussion
+we had a few years ago that led to this being documented[0]. So why is
+it OK to have the rcu_softirq_qs() inside the bh disable/enable pair,
+but not inside an rcu_read_lock() section?
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 69f3d6dcd9fd..a2c45a75a4a6 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -88,6 +88,7 @@ Contents:
-    operstates
-    packet_mmap
-    phonet
-+   phy-link-topology
-    pktgen
-    plip
-    ppp_generic
-diff --git a/Documentation/networking/phy-link-topology.rst b/Documentation/networking/phy-link-topology.rst
-new file mode 100644
-index 000000000000..1fd8e904ef4b
---- /dev/null
-+++ b/Documentation/networking/phy-link-topology.rst
-@@ -0,0 +1,121 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=================
-+PHY link topology
-+=================
-+
-+Overview
-+========
-+
-+The PHY link topology representation in the networking stack aims at representing
-+the hardware layout for any given Ethernet link.
-+
-+An Ethernet Interface from userspace's point of view is nothing but a
-+:c:type:`struct net_device <net_device>`, which exposes configuration options
-+through the legacy ioctls and the ethool netlink commands. The base assumption
-+when designing these configuration channels were that the link looked
-+something like this ::
-+
-+  +-----------------------+        +----------+      +--------------+
-+  | Ethernet Controller / |        | Ethernet |      | Connector /  |
-+  |       MAC             | ------ |   PHY    | ---- |    Port      | ---... to LP
-+  +-----------------------+        +----------+      +--------------+
-+  struct net_device               struct phy_device
-+
-+Commands that needs to configure the PHY will go through the net_device.phydev
-+field to reach the PHY and perform the relevant configuration.
-+
-+This assumption falls apart in more complex topologies that can arise when,
-+for example, using SFP transceivers (although that's not the only specific case).
-+
-+Here, we have 2 basic scenarios. Either the MAC is able to output a serialized
-+interface, that can directly be fed to an SFP cage, such as SGMII, 1000BaseX,
-+10GBaseR, etc.
-+
-+The link topology then looks like this (when an SFP module is inserted) ::
-+
-+  +-----+  SGMII  +------------+
-+  | MAC | ------- | SFP Module |
-+  +-----+         +------------+
-+
-+Knowing that some modules embed a PHY, the actual link is more like ::
-+
-+  +-----+  SGMII   +--------------+
-+  | MAC | -------- | PHY (on SFP) |
-+  +-----+          +--------------+
-+
-+In this case, the SFP PHY is handled by phylib, and registered by phylink through
-+its SFP upstream ops.
-+
-+Now some Ethernet controllers aren't able to output a serialized interface, so
-+we can't directly connect them to an SFP cage. However, some PHYs can be used
-+as media-converters, to translate the non-serialized MAC MII interface to a
-+serialized MII interface fed to the SFP ::
-+
-+  +-----+  RGMII  +-----------------------+  SGMII  +--------------+
-+  | MAC | ------- | PHY (media converter) | ------- | PHY (on SFP) |
-+  +-----+         +-----------------------+         +--------------+
-+
-+This is where the model of having a single net_device.phydev pointer shows its
-+limitations, as we now have 2 PHYs on the link.
-+
-+The phy_link topology framework aims at providing a way to keep track of every
-+PHY on the link, for use by both kernel drivers and subsystems, but also to
-+report the topology to userspace, allowing to target individual PHYs in configuration
-+commands.
-+
-+API
-+===
-+
-+The :c:type:`struct phy_link_topology <phy_link_topology>` is a per-netdevice
-+resource, that gets initialized at netdevice creation. Once it's initialized,
-+it is then possible to register PHYs to the topology through :
-+
-+:c:func:`phy_link_topo_add_phy`
-+
-+Besides registering the PHY to the topology, this call will also assign a unique
-+index to the PHY, which can then be reported to userspace to refer to this PHY
-+(akin to the ifindex). This index is a u32, ranging from 1 to U32_MAX. The value
-+0 is reserved to indicate the PHY doesn't belong to any topology yet.
-+
-+The PHY can then be removed from the topology through
-+
-+:c:func:`phy_link_topo_del_phy`
-+
-+These function are already hooked into the phylib subsystem, so all PHYs that
-+are linked to a net_device through :c:func:`phy_attach_direct` will automatically
-+join the netdev's topology.
-+
-+PHYs that are on a SFP module will also be automatically registered IF the SFP
-+upstream is phylink (so, no media-converter).
-+
-+PHY drivers that can be used as SFP upstream need to call :c:func:`phy_sfp_attach_phy`
-+and :c:func:`phy_sfp_detach_phy`, which can be used as a
-+.attach_phy / .detach_phy implementation for the
-+:c:type:`struct sfp_upstream_ops <sfp_upstream_ops>`.
-+
-+UAPI
-+====
-+
-+There exist a set of netlink commands to query the link topology from userspace,
-+see ``Documentation/networking/ethtool-netlink.rst``.
-+
-+The whole point of having a topology representation is to assign the phyindex
-+field in :c:type:`struct phy_device <phy_device>`. This index is reported to
-+userspace using the ``ETHTOOL_MSG_PHY_GET`` ethtnl command. Performing a DUMP operation
-+will result in all PHYs from all net_device being listed. The DUMP command
-+accepts either a ``ETHTOOL_A_HEADER_DEV_INDEX`` or ``ETHTOOL_A_HEADER_DEV_NAME``
-+to be passed in the request to filter the DUMP to a single net_device.
-+
-+The retrieved index can then be passed as a request parameter using the
-+``ETHTOOL_A_HEADER_PHY_INDEX`` field in the following ethnl commands :
-+
-+* ``ETHTOOL_MSG_STRSET_GET`` to get the stats string set from a given PHY
-+* ``ETHTOOL_MSG_CABLE_TEST_ACT`` and ``ETHTOOL_MSG_CABLE_TEST_ACT``, to perform
-+  cable testing on a given PHY on the link (most likely the outermost PHY)
-+* ``ETHTOOL_MSG_PSE_SET`` and ``ETHTOOL_MSG_PSE_GET`` for PHY-controlled PoE and PSE settings
-+* ``ETHTOOL_MSG_PLCA_GET_CFG``, ``ETHTOOL_MSG_PLCA_SET_CFG`` and ``ETHTOOL_MSG_PLCA_GET_STATUS``
-+  to set the PLCA (Physical Layer Collision Avoidance) parameters
-+
-+Note that the PHY index can be passed to other requests, which will silently
-+ignore it if present and irrelevant.
--- 
-2.43.2
+Also, looking at the patch in question:
+
+>> > +                       if (!IS_ENABLED(CONFIG_PREEMPT_RT))
+>> > +                               rcu_softirq_qs();
+>> > +
+>> >                         local_bh_enable();
+
+Why does that local_bh_enable() not accomplish the same thing as the qs?
+
+-Toke
+
+[0] https://lore.kernel.org/bpf/20210624160609.292325-6-toke@redhat.com/
 
 
