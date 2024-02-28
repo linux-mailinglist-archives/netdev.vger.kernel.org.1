@@ -1,74 +1,43 @@
-Return-Path: <netdev+bounces-75860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 541E986B608
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 18:32:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D300386B61E
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 18:34:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BE54B24FD2
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:32:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F2C528879E
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B52159583;
-	Wed, 28 Feb 2024 17:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZhUeOiJx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E34B159573;
+	Wed, 28 Feb 2024 17:34:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4950C3FBA2;
-	Wed, 28 Feb 2024 17:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C2912DD9B;
+	Wed, 28 Feb 2024 17:34:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709141546; cv=none; b=ICVug/ajFT+KMryE0Y4T+5P+NMn3LgLIW26fnLUiTrUOvGeZexBduGyE4odeb/gL08eyANXjb9n1+1hK4LRBn1cLBopxdNr57CY8BWF6BdRKClEP7aXWSNUuYqvuIFLtAycAG+V6HOUHCyu7u7C2lnqpekTnCKjHPid9iuxwvjc=
+	t=1709141686; cv=none; b=o6q78753tdHRJ0m/SfaLQ6Q+3FBJBoGyp2NdbgpEUTKHnOBxdbM1C5ZbvXlDKAJFBvh9JQg/urONVjiqolsGpCvNeY8pIHnDH69CMEDUHDq7j9Ywhb2PWal/7/ITUDsUDtJI29RsMQu9ARRKlfTvOgBLK6uk2f+anges7H1NQ0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709141546; c=relaxed/simple;
-	bh=Di1LPZZculjhkYlyZeqG4jRqHH2/9Y04HKYM7VRwqTI=;
+	s=arc-20240116; t=1709141686; c=relaxed/simple;
+	bh=Chpmnn/CEklwGU7G/Mv5RUKi93wJ82uNN/EYB5Ywe5M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L0bAJg30UJRu7tlPtWOjg4eRNCFfr4b8hd+CtaQK5GSX0o0G1ZkHcJDRQRFipg+E84E060CFJ1KK/hfmQTkAyanGZw4zuEQgW9fh7N9qgRGNxE32LzMC1+vlITHwriWod0BrIHyz0rdSE0QY02H0cN1L4OZkbspZffJDexNlC8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZhUeOiJx; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-787bc61cb69so380074585a.1;
-        Wed, 28 Feb 2024 09:32:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709141544; x=1709746344; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2p3N5b0ScPGv0PAJy8f2OEufbcAe7rsvEvf1A8xZmn4=;
-        b=ZhUeOiJxfPOHziYjmP9ZXxRrKartJIJ7eoE4toAE1Yg61JkfJXhv7qOTU6PqCylDvo
-         wGOMEPiQWbAW3ZVy1PKJ9s8ZBlzBougoQSUZ0ucnEPZVOqYOwL2argO1WGv7DYWQWK3x
-         FIc4EYat+FafCbnxhKQY5xbHiBMnBRnKn7GtZnp38WD3ho7E/gJgXgr5bJCyynafLzMc
-         bpoCThSnPNMmjM56Wrg3ifdRmGodunKEKkbkdRiAhAJj2d3WAgPInY+bZfDfxC+6+GJK
-         3Bwc92BhmoJ7ZSU7zShKna35ngGH5y6SDVT8kbwosWf48B2jBSUMhEIKZ0DDD0uWCpl+
-         SL0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709141544; x=1709746344;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2p3N5b0ScPGv0PAJy8f2OEufbcAe7rsvEvf1A8xZmn4=;
-        b=fHw9rDRwcaOdN7QD//DkOAufmJNE2H+5LvwgAWEWGCUUE8LTBHcOoUJLthE5E+luwz
-         4dX+OHNxIPyBYoH+Kd+1sChMp2Oq8+4cdoOjGVtgB4QvOSDPZ0NOVL9/T6/ciwwxmfeC
-         KGHo8gVADdmjHmwGAqkbMKfbZig3cBlGTO6vMT8BMC2miUe1+H15mQigRiWjxPnTYoVI
-         uUB0g5U/uhcBVRnFLTd5iYmRAQcwBZHfOWpb7pkGB00VWVn4JqAAghcZiS16QC67uLj2
-         3+Q+KydOIYRuk1xmgRgU2FST6r13unXeNSINF+9xuiGXvYC5IibmfoPZ4GpO24NJ+4FX
-         vohA==
-X-Forwarded-Encrypted: i=1; AJvYcCVjy7hf6SVmg60TFMhqtwhJwCyqUpfg/fl8ylyCaPVtjM6acUwe45OLvf2nxUvfMDgUjVdHezB+ELbRxZ1UGrOUC0rrt4TEl0MmFgku1NxRR/l7x5x4LqBZsPYpCwXuC6DQlbOKVJgR
-X-Gm-Message-State: AOJu0Yysod5FZyAfn+1esMEG0IGa60JNoma0tex5NOZ5vDnl9YqXLTYQ
-	/704SbuBadBst7FW/aQDjVr1rOPmhfFUFIDXlnvVemdb8e6U0J3I
-X-Google-Smtp-Source: AGHT+IHOCJEsVLG0SH4MCO5uUhMA1VmZkdxhrLcPJxyi7AOAttj/k9DjX1WeAlN4qnHHs6nnBM7sig==
-X-Received: by 2002:a05:620a:10ab:b0:787:a4aa:4e1e with SMTP id h11-20020a05620a10ab00b00787a4aa4e1emr5222435qkk.55.1709141544218;
-        Wed, 28 Feb 2024 09:32:24 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id xy12-20020a05620a5dcc00b00787c142ec1fsm4763499qkn.110.2024.02.28.09.32.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Feb 2024 09:32:23 -0800 (PST)
-Message-ID: <77497701-3bd2-4f5f-9404-b32d9e91683b@gmail.com>
-Date: Wed, 28 Feb 2024 09:32:19 -0800
+	 In-Reply-To:Content-Type; b=llBaczBkH1YujkxJxoCORjdPlrxX1R0sE686927dIzijdKGr8grGHEKeK2WaJTV53jJ2RtSd0ukU0H8YQwXAjxVnWeumC6I1MmUKprysUqFTCRwSgtAZUD2xHYzp2w5Aor/tWe+kqgSFXOlR1OESo1axVh7exa615LqaucwbyBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.53] (ip5f5aedb1.dynamic.kabel-deutschland.de [95.90.237.177])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 00DCC61E5FE04;
+	Wed, 28 Feb 2024 18:33:58 +0100 (CET)
+Message-ID: <e0c35b34-a845-4221-b9d3-867d2f339f8d@molgen.mpg.de>
+Date: Wed, 28 Feb 2024 18:33:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,109 +45,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: netconsole: Add continuation line prefix to
- userdata messages
+Subject: Re: [Intel-wired-lan] [PATCH net] i40e: Fix firmware version
+ comparison function
 Content-Language: en-US
-To: Matthew Wood <thepacketgeek@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ open list <linux-kernel@vger.kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>, Breno Leitao <leitao@debian.org>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240228172948.221910-1-thepacketgeek@gmail.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20240228172948.221910-1-thepacketgeek@gmail.com>
+ "David S. Miller" <davem@davemloft.net>
+References: <20240228172603.29177-1-ivecera@redhat.com>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240228172603.29177-1-ivecera@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 2/28/24 09:29, Matthew Wood wrote:
-> Add a space (' ') prefix to every userdata line to match docs for
-> dev-kmsg. To account for this extra character in each userdata entry,
-> reduce userdata entry names (directory name) from 54 characters to 53.
+Dear Ivan,
+
+
+Thank you for your patch.
+
+Am 28.02.24 um 18:26 schrieb Ivan Vecera:
+> Helper i40e_is_fw_ver_eq() compares incorrectly given firmware version
+> as it returns true when the major version of running firmware is
+> greater than the given major version that is wrong and results in
+
+… version. That …
+
+> failure during getting of DCB configuration where this helper is used.
+> Fix the check and return true only if the running FW version is exactly
+> equals to the given version.
+
+is … equal
+
+> Reproducer:
+> 1. Load i40e driver
+> 2. Check dmesg output
 > 
-> According to the dev-kmsg docs, a space is used for subsequent lines to
-> mark them as continuation lines.
+> [root@host ~]# modprobe i40e
+> [root@host ~]# dmesg | grep 'i40e.*DCB'
+> [   74.750642] i40e 0000:02:00.0: Query for DCB configuration failed, err -EIO aq_err I40E_AQ_RC_EINVAL
+> [   74.759770] i40e 0000:02:00.0: DCB init failed -5, disabled
+> [   74.966550] i40e 0000:02:00.1: Query for DCB configuration failed, err -EIO aq_err I40E_AQ_RC_EINVAL
+> [   74.975683] i40e 0000:02:00.1: DCB init failed -5, disabled
 > 
->> A line starting with ' ', is a continuation line, adding
->> key/value pairs to the log message, which provide the machine
->> readable context of the message, for reliable processing in
->> userspace.
-> 
-> Testing for this patch::
-> 
->   cd /sys/kernel/config/netconsole && mkdir cmdline0
->   cd cmdline0
->   mkdir userdata/test && echo "hello" > userdata/test/value
->   mkdir userdata/test2 && echo "hello2" > userdata/test2/value
->   echo "message" > /dev/kmsg
-> 
-> Outputs::
-> 
->   6.8.0-rc5-virtme,12,493,231373579,-;message
->    test=hello
->    test2=hello2
-> 
-> And I confirmed all testing works as expected from the original patchset
-> 
-> Fixes: df03f830d099 ("net: netconsole: cache userdata formatted string in netconsole_target")
-> Signed-off-by: Matthew Wood <thepacketgeek@gmail.com>
+> Fixes: cf488e13221f ("i40e: Add other helpers to check version of running firmware and AQ API")
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 > ---
->   Documentation/networking/netconsole.rst | 6 +++---
->   drivers/net/netconsole.c                | 4 ++--
->   2 files changed, 5 insertions(+), 5 deletions(-)
+>   drivers/net/ethernet/intel/i40e/i40e_prototype.h | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
 > 
-> diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
-> index b28c525e5d1e..c2dec12f6060 100644
-> --- a/Documentation/networking/netconsole.rst
-> +++ b/Documentation/networking/netconsole.rst
-> @@ -197,8 +197,8 @@ Messages will now include this additional user data::
->   Sends::
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_prototype.h b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
+> index af4269330581..ce1f11b8ad65 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_prototype.h
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
+> @@ -567,8 +567,7 @@ static inline bool i40e_is_fw_ver_lt(struct i40e_hw *hw, u16 maj, u16 min)
+>    **/
+>   static inline bool i40e_is_fw_ver_eq(struct i40e_hw *hw, u16 maj, u16 min)
+>   {
+> -	return (hw->aq.fw_maj_ver > maj ||
+> -		(hw->aq.fw_maj_ver == maj && hw->aq.fw_min_ver == min));
+> +	return (hw->aq.fw_maj_ver == maj && hw->aq.fw_min_ver == min);
+>   }
 >   
->    12,607,22085407756,-;This is a message
-> - foo=bar
-> - qux=baz
-> +  foo=bar
-> +  qux=baz
->   
->   Preview the userdata that will be appended with::
->   
-> @@ -218,7 +218,7 @@ The `qux` key is omitted since it has no value::
->   
->    echo "This is a message" > /dev/kmsg
->    12,607,22085407756,-;This is a message
-> - foo=bar
-> +  foo=bar
->   
->   Delete `userdata` entries with `rmdir`::
->   
-> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> index 0de108a1c0c8..ffd3e19406b5 100644
-> --- a/drivers/net/netconsole.c
-> +++ b/drivers/net/netconsole.c
-> @@ -43,7 +43,7 @@ MODULE_DESCRIPTION("Console driver for network interfaces");
->   MODULE_LICENSE("GPL");
->   
->   #define MAX_PARAM_LENGTH	256
-> -#define MAX_USERDATA_NAME_LENGTH	54
-> +#define MAX_USERDATA_NAME_LENGTH	53 /* 256 - 200 - 3 (for ' =\n' chars)*/
+>   #endif /* _I40E_PROTOTYPE_H_ */
 
-Could we take this opportunity to define MAX_USERDATA_NAME_LENGTH based 
-upon MAX_PARAM_LENGTH - MAX_USERDATA_VALUE_LENGTH - 3 then?
+With the nits in the commit message addressed, this is
 
->   #define MAX_USERDATA_VALUE_LENGTH	200
->   #define MAX_USERDATA_ENTRY_LENGTH	256
->   #define MAX_USERDATA_ITEMS		16
-> @@ -671,7 +671,7 @@ static void update_userdata(struct netconsole_target *nt)
->   		 * checked to not exceed MAX items with child_count above
->   		 */
->   		complete_idx += scnprintf(&nt->userdata_complete[complete_idx],
-> -					  MAX_USERDATA_ENTRY_LENGTH, "%s=%s\n",
-> +					  MAX_USERDATA_ENTRY_LENGTH, " %s=%s\n",
->   					  item->ci_name, udm_item->value);
->   	}
->   	nt->userdata_length = strnlen(nt->userdata_complete,
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
--- 
-Florian
 
+Kind regards,
+
+Paul
 
