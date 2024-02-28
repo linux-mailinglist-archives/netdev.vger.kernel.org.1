@@ -1,153 +1,91 @@
-Return-Path: <netdev+bounces-75795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E042286B32C
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:33:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE0DD86B339
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:35:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 708CBB21493
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:33:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E6641F24C56
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:35:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0259B15B98C;
-	Wed, 28 Feb 2024 15:33:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DFEC15B109;
+	Wed, 28 Feb 2024 15:35:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zi2m/Hfe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FjYMzDmK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73CA42CCDF;
-	Wed, 28 Feb 2024 15:32:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40C515C8;
+	Wed, 28 Feb 2024 15:35:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709134379; cv=none; b=JfYFHcLy82oxqj9MVGSdnw2UpoFVVEK647jQMkQ7yzBLoeB1KbC9OgnGWYA5oGQTzWKnFYsVTLkvfL0M7s52de95+mTnIc6A/DhqL52vkyqEAfGTBNdBPbunQm+vPcNJxXx+c8cFCw0z+8uydbdRHTMElBHMgPOvFttGs0S1fGk=
+	t=1709134547; cv=none; b=DQWT9cJAB8zQaNkHNPtiQ/TRpl8O1gzAc+QkDKiibobV3ryjcRD5UxJEU/6/bhF48ns0+hoa2iBPHiI7DcBDlSeh0Kp/0m7PPIyfOM3eO44t3WlSAAtuTzbNSl2rL/h1TIZ20lSByCLmzdMCluDkmsox3ChNkbZ5DuREBJo6Rgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709134379; c=relaxed/simple;
-	bh=eMOXCVDBo6+1DuKmb5bWVTwZLMGsk/p0Tc8klb/hjMs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=R2ES3xsgjHXPMMQYiEG6eniBtXWW9ZSkMT411MyycVsPl0kXu528x3NkiVbkOJrElBfHMT8wDWN2YDjYH2cfVVs9OE4+gnNj66rfAjXnFdTGJ2oUCruCkV+cO3GqsqU3PlaZ7KxPAaj4D0IKYWspLTmsg4IiUXMnCoI2xAP48RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zi2m/Hfe; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6900f479e3cso26096636d6.0;
-        Wed, 28 Feb 2024 07:32:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709134377; x=1709739177; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KPdHn4gLfwbF9NBUo162FC73q3tXtmG68jirZU3UGyE=;
-        b=Zi2m/HfefMFUFaUZ1Ok/mc64Mi6OxLr+xP5k5gyko36hpcr4nc4Rt5I5a/TYpkyChf
-         ZRoHD8CAXtIQWkcrHA3Aziz1i5JEwKSjmCCIABuUa9b2SfNzgw0MCb7HnnN8n0+SXwGg
-         iRUOEfACdivYp16Fl75nw9WRoiu+QBKFJkhkBH9F1DUy/Dua3vdyaKGRykt6prnBiIKO
-         vQO69RT8oc/pwoFIxY6VfgKdtWqGmYr8V7BmpSVMLyBZJSKh+03HfmLaysT/O9va/kwh
-         Y5cSguR0QatQm66Y5ItuXEafZFvJYxmBJ+G+kgnoKpip7/WsfCTuq8cCvE5pGn1zYghw
-         PpHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709134377; x=1709739177;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=KPdHn4gLfwbF9NBUo162FC73q3tXtmG68jirZU3UGyE=;
-        b=bcd5CnUASz2oWkmBAaDsWEqT/TWSW16u8V1hZpm+NBEkdnOBH/8aoUS1sd7rKCanb6
-         G8zM2WvcBD9NGBkl5IpkcZmW2C7uy+voH+HTiQRIV5fPhHgeoICN+mnJCXF3s+8l026O
-         QAMjTYxnKkjYQv/Rzem5NclVydHyKNqsEocX+Axhn2ewTMuyfY4evczPTuO0wcRHMmE2
-         hMhfzwJrgR/kNA/IBSCtfQklVk5dnTpX9zlN7kW/4BshlO7CjvdVfoYfcDrQAm5Yz995
-         XRqpm9Ky212BZcsw9iO3ruEUj/pJIw280tqzwZF6GlR7Fs1pIJ27xffpJRkBB+XmAKOl
-         d4kA==
-X-Forwarded-Encrypted: i=1; AJvYcCU4anYRuvILkEAvn8T+jtpMU8/mKCltTLfW5WoA79/k0z6jaOW4IuHfHzk3IRP21CRQgryDhVAULaGwvfjP627BymWtdEpmvusVyl0rkW2UTc5CSofIvbyaRGrgNj6RmMzzpN1G
-X-Gm-Message-State: AOJu0YxVK3qMaVZMyKbL7JfzwH6HeLSuTqMAlsM+YS2HjgPdDeAqlOug
-	HB1tD25ppsrYBDeR7mD96iArHlprxlOXsxHsRexvYrxSh8yys3bj
-X-Google-Smtp-Source: AGHT+IESSnYnz43KE+tzOcvx5UZxfRl8t0fhKq+nDSRFt9IOaDcmUDz45Ga8zxM+kNS6h+siIdqUmA==
-X-Received: by 2002:a0c:f144:0:b0:68f:3919:ebc2 with SMTP id y4-20020a0cf144000000b0068f3919ebc2mr6014087qvl.39.1709134377262;
-        Wed, 28 Feb 2024 07:32:57 -0800 (PST)
-Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
-        by smtp.gmail.com with ESMTPSA id ks30-20020a056214311e00b0068fa4534070sm5319436qvb.83.2024.02.28.07.32.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 07:32:56 -0800 (PST)
-Date: Wed, 28 Feb 2024 10:32:56 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Marcelo Tosatti <mtosatti@redhat.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Frederic Weisbecker <frederic@kernel.org>, 
- Valentin Schneider <vschneid@redhat.com>, 
- Paolo Abeni <pabeni@redhat.com>
-Message-ID: <65df52286736b_7162829478@willemb.c.googlers.com.notmuch>
-In-Reply-To: <Zd81gp2utD9+ripX@tpad>
-References: <Zd81gp2utD9+ripX@tpad>
-Subject: Re: [PATCH -v2 net-next] net/core/dev.c: enable timestamp static key
- if CPU isolation is configured
+	s=arc-20240116; t=1709134547; c=relaxed/simple;
+	bh=Ow0oMcjP9WmZsxfrrSXHg6DV3yhPxuTY7U/vGkGDAk0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=csgnzSLVlTTcb1Cv+erbMmfOX7wxqGgzghGR5/J9/r/VvstR/b82kBRGMWVQzmawsGCmGSbEI3tdHugdlJ4rHj1kXdMKtPhX1Z9Uihh6vPPDNGXH1vb3CWYGIDgk0KUOVD90hyXZ9ReMv4Siy0z9zzz1ztOyHhcmCtHWz8tE3Tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FjYMzDmK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5059C433F1;
+	Wed, 28 Feb 2024 15:35:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709134546;
+	bh=Ow0oMcjP9WmZsxfrrSXHg6DV3yhPxuTY7U/vGkGDAk0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FjYMzDmK0IQosaEYUJyTURCigp714oQKlOA4XW/fr2d9wr8GLnE6+YlOaCtrPYr1/
+	 AyLRbs5tT5JQu/HwctS/gctasVnVJVwXuGXeNTZnQjvTSTVZxVag3mZtDxGNxs5tti
+	 HmO7dNDqYzNRe5oVx2/Wtvw/5/yy063g8AaLRgn6a7mnCM7uFY0PPePV2OEQr9gynR
+	 AP9mR9vW4/PRniAk3bZ5mzZ/3b9uZEfqnM+4y5hd14dPnqEReYjWItA7iW22h1JKcO
+	 zOGRGtY00+x1vHsKfvKN1RCp84agHNXre1rxFBqKwGFIE0J60FVW3dJnZkw9O85OC+
+	 iRT5HPXD8FyiA==
+Date: Wed, 28 Feb 2024 07:35:44 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Yan Zhai <yan@cloudflare.com>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Paolo
+ Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Simon Horman
+ <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Coco Li <lixiaoyan@google.com>, Wei Wang
+ <weiwan@google.com>, Alexander Duyck <alexanderduyck@fb.com>, Hannes
+ Frederic Sowa <hannes@stressinduktion.org>, linux-kernel@vger.kernel.org,
+ rcu@vger.kernel.org, bpf@vger.kernel.org, kernel-team@cloudflare.com
+Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
+Message-ID: <20240228073544.791ae897@kernel.org>
+In-Reply-To: <9a0052f9-b022-42c9-a5da-1d6ca3b00885@paulmck-laptop>
+References: <Zd4DXTyCf17lcTfq@debian.debian>
+	<CANn89iJQX14C1Qb_qbTVG4yoG26Cq7Ct+2qK_8T-Ok2JDdTGEA@mail.gmail.com>
+	<d633c5b9-53a5-4cd6-9dbb-6623bb74c00b@paulmck-laptop>
+	<20240227191001.0c521b03@kernel.org>
+	<66a81295-ab6f-41f4-a3da-8b5003634c6a@paulmck-laptop>
+	<20240228064343.578a5363@kernel.org>
+	<9a0052f9-b022-42c9-a5da-1d6ca3b00885@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Marcelo Tosatti wrote:
+On Wed, 28 Feb 2024 07:15:42 -0800 Paul E. McKenney wrote:
+> > > Another complication is that although CONFIG_PREEMPT_RT kernels are
+> > > built with CONFIG_PREEMPT_RCU, the reverse is not always the case.
+> > > And if we are not repolling, don't we have a high probability of doing
+> > > a voluntary context when we reach napi_thread_wait() at the beginning
+> > > of that loop?  
+> > 
+> > Very much so, which is why adding the cost of rcu_softirq_qs()
+> > for every NAPI run feels like an overkill.  
 > 
-> For systems that use CPU isolation (via nohz_full), creating or destroying
-> a socket with timestamping (SOCK_TIMESTAMPING_RX_SOFTWARE and 
-> SOF_TIMESTAMPING_OPT_TX_SWHW) might cause a
-
-Again, SOF_TIMESTAMPING_OPT_TX_SWHW is irrelevant here.
-
-See Documentation/networking/timestamping.rst for a definition of the
-various flags.
-
-> static key to be enabled/disabled. This in turn causes undesired
-> IPIs to isolated CPUs.
+> Would it be better to do the rcu_softirq_qs() only once every 1000 times
+> or some such?  Or once every HZ jiffies?
 > 
-> So enable the static key unconditionally, if CPU isolation is enabled,
-> thus avoiding the IPIs.
-> 
-> Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-> 
-> ---
-> v2: mention SOF_TIMESTAMPING_OPT_TX_SWHW in the commit log (Willem de Bruijn / Paolo Abeni)
+> Or is there a better way?
 
-I did not suggest that
-
-The subject line is slightly corrupted: net-next -v2
-
-> 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index c588808be77f..15a32f5900e6 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -155,6 +155,7 @@
->  #include <net/netdev_rx_queue.h>
->  #include <net/page_pool/types.h>
->  #include <net/page_pool/helpers.h>
-> +#include <linux/sched/isolation.h>
->  
->  #include "dev.h"
->  #include "net-sysfs.h"
-> @@ -11851,3 +11852,14 @@ static int __init net_dev_init(void)
->  }
->  
->  subsys_initcall(net_dev_init);
-> +
-> +static int __init net_dev_late_init(void)
-> +{
-> +	/* avoid static key IPIs to isolated CPUs */
-> +	if (housekeeping_enabled(HK_TYPE_MISC))
-> +		net_enable_timestamp();
-> +
-> +	return 0;
-> +}
-> +
-> +late_initcall(net_dev_late_init);
-> 
-
-
+Right, we can do that. Yan Zhai, have you measured the performance
+impact / time spent in the call?
 
