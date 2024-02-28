@@ -1,166 +1,105 @@
-Return-Path: <netdev+bounces-75703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E07E86AF43
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:37:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC07A86AF5A
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:45:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FA701C24DA1
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:37:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED2531C22DAE
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89C1613B29F;
-	Wed, 28 Feb 2024 12:37:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FWb17mhK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E6F146908;
+	Wed, 28 Feb 2024 12:45:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F0C73515;
-	Wed, 28 Feb 2024 12:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8096D14534F
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 12:45:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709123837; cv=none; b=tnMyjkA4YkPHC1H9debBhwxn37JPh2CqBOapOZdXpOCLfSlDrsjO1jX6cleq6SVffcq2GzhhU4FtMtwWEEUE+UUTVzzd0hj0hdNcZHinmzTOQVhaikgHo1tvc/VCYArRmjoPwFYEMSYyYsXoi55VFt9rH4weA0oZyipzREuqjrk=
+	t=1709124329; cv=none; b=A5XnZttXIqt8FoKupcLVFmgXF5JitSUkdJtkmTtV+zyxdCcdniJtXzx80kqAAyBhxF8Qpq6zA8Hj3Fk9Vn7v9qO7L6Qei49UtfCziPskCmLYE1e1qv0M8MFR042nn+PcBefYAXqsu6EKTZDVEoXq36qgkWQODpXphrpTiKDN9Ps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709123837; c=relaxed/simple;
-	bh=OiCrhkAImdpoKzsF7o8mkmuy5/VGiIrPcYWm0Rn/A1A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NCriiYDbLvjky63nA37+7hGNLBbbPg7crDyDGO0Jw8I5hsLb/DgAmdAeLsTYD8meQsOe5GaYDMf27tj/IL8IjctE+1Wt60huzIoeaNoL2ELiESnGvlXppCedYjko8hUuTukzVwwsoGyqF3h2PNusUqYgRQboxFVb4evtWPCITGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FWb17mhK; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-565b434f90aso4980784a12.3;
-        Wed, 28 Feb 2024 04:37:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709123834; x=1709728634; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JudlYv7kq9yuUXRQ/PvG4bnskD9Dxwze5xbPVzN+2ng=;
-        b=FWb17mhKZQNgPPNRPNCZOrIanbIj+q42DbPmuqYMF2v1EGowjqJW7QDuYC/M3tj3fy
-         G4kDoBNRSGhxIzbquKxg0S3ALjtfdwdklJB6JitRoaqJAGmdxtqMEngpmwxVhpHohpK5
-         gYWnzjJaZKGB66yMpm+1KLAZJsdSRELGel2yWumShwX4wsuSGEo0F0sj8z+DwbVm7grm
-         rNMcnN1U2U1U0H7a4FzWWoazV22bew/IGy4zEEJ5UA5Yhz/tyRr8gITgvPJLt3b3pWJL
-         QgXbEBsFK7jOh9ygR+9PHCVMphMZXL2DQHDZf218B62/3mYPO1aMjAM7e7i9L8A+sQGm
-         +Dwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709123834; x=1709728634;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JudlYv7kq9yuUXRQ/PvG4bnskD9Dxwze5xbPVzN+2ng=;
-        b=hehhtwhB0wBN3epNIMbk4PRujwIxVllVG2aNtYV2JUnYVkzQETYrtJO9BAHAPJyXbA
-         6jpVcW2AC5IYEQUnknF9GQiz6Ccz5ArcfoDDRg4v7l1y51Cq2WWIinni/WbRpb19HAzx
-         4ZybptSoFtLRq0tVd1cvRK2yf7eAlYCLn4aC8gVadFw3YGWlEr7LWFDZfdd7repRntmC
-         BtaY5fBhSS0eOpHb93XoLi1HV1uAPyJ+53EsPGXeviIaPxKDWxt9QJPDnLYzjs9wrbV+
-         DCPPWIuMr9rZWg/3PmW8cfbUb7VgGkibkFVVWvALYuqPUQkaXtiSwQbW1s95VBgmkF2T
-         J7PA==
-X-Forwarded-Encrypted: i=1; AJvYcCWYbXrw9pIFXQCLUxDpZZnKkjJCWrOSxPqqAXYp6H76uZbl1OSBQ76ifrVsYAQlhP0P+X4p33yOIovIseXZ1TIoU1SA1pSsSqUsHc9p6G8o0VNEvui/Xji2skmXWGdvFxJdUtmyn33laHoPqcfwctnFy04g0NDEqIsoouWgVWCVa+0AlvaW
-X-Gm-Message-State: AOJu0YyVXyUPgy6osRxtGXj4/P/QPDSzefFoOSC42LhlJiKkvGCIN1/W
-	vaITrDgRDioxQ46TwfWRpx+NOp4RMcx7Dt7ItmTvsYdh/Q71VDu0T5hp4t6CWU1uWMtRYIzbSWe
-	Y2lU+DBegBXdZyv5I8sQ9QrFVSdw/5Efa
-X-Google-Smtp-Source: AGHT+IE96ZWkre7JVXpJhyMlgo+IHpI1hOKcxl71SkWQaICp/+hmUTxPfiwoqMZshS5hFp43nVH0QUrSoFDjJIgAIdk=
-X-Received: by 2002:a05:6402:3126:b0:566:4e7a:fa2b with SMTP id
- dd6-20020a056402312600b005664e7afa2bmr2110728edb.36.1709123833969; Wed, 28
- Feb 2024 04:37:13 -0800 (PST)
+	s=arc-20240116; t=1709124329; c=relaxed/simple;
+	bh=Mkz/kA06QlphSdZWuuxe94smsSodU8c3TnRldfFWMiQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Fc93TVuRbCMLfRfTijZET/WUiIff9XqpLmHk29HBM2NWydOUmV41pOHuVIL/JukZMglhFiuwjPMr8PCNjrUTbBjVj157lZBqnENxg0ZXJqfI70kMTKov35AqbMprG+mUtABP6dpvD+tA9+SxoFEPb8lXKtLqMvDkQkKiLvIdK/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rfJJH-0001mR-J0; Wed, 28 Feb 2024 13:45:19 +0100
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rfJJG-003Ocn-Ca; Wed, 28 Feb 2024 13:45:18 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rfJJG-0078tb-13;
+	Wed, 28 Feb 2024 13:45:18 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: [PATCH net v1 1/1] net: lan78xx: fix runtime PM count underflow on link stop
+Date: Wed, 28 Feb 2024 13:45:17 +0100
+Message-Id: <20240228124517.1702476-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240227175513.8703-1-pvkumar5749404@gmail.com>
- <Zd7lqr8Cz4XrNoI8@nanopsycho> <CAH8oh8U1KLxY95DQW9duU30VC5hdQd1YKs+8USuuz0k4JWtBSQ@mail.gmail.com>
- <Zd79vEsSp7wlJWQy@nanopsycho>
-In-Reply-To: <Zd79vEsSp7wlJWQy@nanopsycho>
-From: prabhav kumar <pvkumar5749404@gmail.com>
-Date: Wed, 28 Feb 2024 18:07:02 +0530
-Message-ID: <CAH8oh8W9hzWV-fajb-1OoR8dZEbqhrCGL=3bcDRhaDObbacDDA@mail.gmail.com>
-Subject: Re: [PATCH net-next] selftests: net: Correct couple of spelling mistakes
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: shuah@kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, petrm@nvidia.com, idosch@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, Feb 28, 2024 at 3:02=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Prabhav, I'm not sure what you are trying to do, but you have to
-> re-submit the patch, preferably using git-send-email or another email
-> client you use.
->> Sorry for that.
->> Re-Submitted the patch.
->
->
-> Wed, Feb 28, 2024 at 09:42:01AM CET, pvkumar5749404@gmail.com wrote:
-> >On Wed, Feb 28, 2024 at 1:20=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wr=
-ote:
-> >>
-> >> Please fix the patch subject to include appropriate prefixes and
-> >> rephrase a bit like this:
-> >>
-> >> Subject: [PATCH net-next] selftests: net: Correct couple of spelling m=
-istakes
-> >>
-> >> pw-bot: cr
-> >>
-> >>
-> >> Tue, Feb 27, 2024 at 06:55:13PM CET, pvkumar5749404@gmail.com wrote:
-> >> >Changes :
-> >> >       - "excercise" is corrected to "exercise" in drivers/net/mlxsw/=
-spectrum-2/tc_flower.sh
-> >> >       - "mutliple" is corrected to "multiple" in drivers/net/netdevs=
-im/ethtool-fec.sh
-> >> >
-> >> >Signed-off-by: Prabhav Kumar Vaish <pvkumar5749404@gmail.com>
-> >> >---
-> >> > .../testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh | 2 =
-+-
-> >> > tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh    | 2 =
-+-
-> >> > 2 files changed, 2 insertions(+), 2 deletions(-)
-> >> >
-> >> >diff --git a/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_=
-flower.sh b/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.=
-sh
-> >> >index 616d3581419c..31252bc8775e 100755
-> >> >--- a/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.=
-sh
-> >> >+++ b/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.=
-sh
-> >> >@@ -869,7 +869,7 @@ bloom_simple_test()
-> >> > bloom_complex_test()
-> >> > {
-> >> >       # Bloom filter index computation is affected from region ID, e=
-RP
-> >> >-      # ID and from the region key size. In order to excercise those=
- parts
-> >> >+      # ID and from the region key size. In order to exercise those =
-parts
-> >> >       # of the Bloom filter code, use a series of regions, each with=
- a
-> >> >       # different key size and send packet that should hit all of th=
-em.
-> >> >       local index
-> >> >diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-fe=
-c.sh b/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
-> >> >index 7d7829f57550..6c52ce1b0450 100755
-> >> >--- a/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
-> >> >+++ b/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
-> >> >@@ -49,7 +49,7 @@ for o in llrs rs; do
-> >> > Active FEC encoding: ${o^^}"
-> >> > done
-> >> >
-> >> >-# Test mutliple bits
-> >> >+# Test multiple bits
-> >> > $ETHTOOL --set-fec $NSIM_NETDEV encoding rs llrs
-> >> > check $?
-> >> > s=3D$($ETHTOOL --show-fec $NSIM_NETDEV | tail -2)
-> >> >--
-> >> >2.34.1
-> >> >
-> >> >
+Current driver has some asymmetry in the runtime PM calls. On lan78xx_open()
+it will call usb_autopm_get() and unconditionally usb_autopm_put(). And
+on lan78xx_stop() it will call only usb_autopm_put(). So far, it was
+working only because this driver do not activate autosuspend by default,
+so it was visible only by warning "Runtime PM usage count underflow!".
+
+Since, with current driver, we can't use runtime PM with active link,
+execute lan78xx_open()->usb_autopm_put() only in error case. Otherwise,
+keep ref counting high as long as interface is open.
+
+Fixes: 55d7de9de6c3 ("Microchip's LAN7800 family USB 2/3 to 10/100/1000 Ethernet device driver")
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+ drivers/net/usb/lan78xx.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+index 3ff430198512..80ee4fcdfb36 100644
+--- a/drivers/net/usb/lan78xx.c
++++ b/drivers/net/usb/lan78xx.c
+@@ -3135,7 +3135,8 @@ static int lan78xx_open(struct net_device *net)
+ done:
+ 	mutex_unlock(&dev->dev_mutex);
+ 
+-	usb_autopm_put_interface(dev->intf);
++	if (ret < 0)
++		usb_autopm_put_interface(dev->intf);
+ 
+ 	return ret;
+ }
+-- 
+2.39.2
+
 
