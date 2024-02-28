@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-75848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B964A86B556
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:55:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B5F486B578
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 18:03:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F68E2849E9
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:55:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C8A11C23E2C
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:03:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE3A6200A8;
-	Wed, 28 Feb 2024 16:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8F9A1F604;
+	Wed, 28 Feb 2024 17:03:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Zyh4wDiv"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="x6+4Vun1"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A5E6EEE4
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 16:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4089F6EF11;
+	Wed, 28 Feb 2024 17:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709139328; cv=none; b=iKnPHprutLsIc+cmDJiKT+W9nU1yk2t8wwObHl3KR+qI6bfiB7BiWWAzm2UudbUJ/pjj/fxSF1TpjVzGxY+1vlusS/UOIcmh3DqOrIAwmvMCFWIHp+FHX/flF3wQsUY/FVdFry3P+BzHo0sa4UZ6gQBPzntRt1cQFNvxJELzUv0=
+	t=1709139799; cv=none; b=bqtptrPgR1Z2r/tMen8p7f/2z3cPdcl62pI7souYvXzhhLEmaCmw5nLN2m1RwMwEoZ0lqRSykg6oNNALUO+XQTq7uhw1PeT9CgUMc0VLsBI1+qGL/N3CkL0AZMxE56MllCSxkr/xsXn6dBOAftjU1oscbJRnDJxlAbVVISHYY+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709139328; c=relaxed/simple;
-	bh=k0H54fBdoUkhglwiCym9+MKNUt0fUQ5xaeqZoS9S/aE=;
+	s=arc-20240116; t=1709139799; c=relaxed/simple;
+	bh=BYXJGv7dAgJecW7P0Y0TtC6QmvDjA9vPjNKxGnXoRto=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GdtOXmdq0Ho1f1AEdpX5tcCcITTO9woj0SSlgAPearWQBQ3Bfy6P7fz4AUB07Zaq2p75i1ROvXAIVJ1vdQDZk15g/klVpOwdz+BO2AiiHmOfrODSW870i+O5Grsbpa0A+PglTajYSpSyHbBN26hR0pIiWv33euUSZ95OmsxdUF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Zyh4wDiv; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=iv/rPD1Z4wEKz4w/KPjRscCAgw1PAvhEmd6vr32EckuapIlF8eG0lwMz0JUJtF4zAfOyNuFW8YgLV9H2RSJemxvifG7VnK+5iQ2pDxixkRsAsh0gNf9AGeasI7OTmXY3/uOIyG/lh8RAo6M438qhTWelAt89ZQYy7NXlrpPKjpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=x6+4Vun1; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,19 +36,38 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ehI42BjlaSM6CR2Es80BK1Xx3zkmGJPnkbuGwV1x2wE=; b=Zyh4wDiv/3BviQaMgoj+HueyJA
-	6+HJ6LgAI27CpAlFn8hajI2VH0MiOz8YuIpKm1zwH4NpFTxO3bbvumrefOtmGSREmqWG6g9eHpbau
-	G9TAxrE9jbIuIDF/Bqtu31hjfh5IxkpHeYPcMpUIfINob3kR2EzkgfZznh15IWXJbqrY=;
+	bh=WZIwgafTAhhv1XNOq3h2R/R0NGX/4FdMgEriBHnaWc8=; b=x6+4Vun1Hd1wQAOSnoqkj2N3kJ
+	Ub86h0jXx+yPPE6dM8BsY5ZC+87HNyKdToJuy7XA2gAhO1YE8gGuAFLXzu0OM60D6HEWDSfvWlhUa
+	UF1LuhJPLeKxQCNClC+yN+UZucewwlCasgwBlHYR2eXPZ05zMyZ/HNc2Bk5sv6bJ2Ffk=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rfNDV-008y5j-Gn; Wed, 28 Feb 2024 17:55:37 +0100
-Date: Wed, 28 Feb 2024 17:55:37 +0100
+	id 1rfNKe-008y7o-6Z; Wed, 28 Feb 2024 18:03:00 +0100
+Date: Wed, 28 Feb 2024 18:03:00 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Patryk <pbiel7@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: Question regarding handling PHY
-Message-ID: <4b8413d0-272f-4e43-a699-5b3134cfbeab@lunn.ch>
-References: <CA+DkFDZPdS+r0vdFp0EU_xh=05gu5VuqOrT7G_Nj5gdjM8OOcg@mail.gmail.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Lukasz Majewski <lukma@denx.de>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Tristram.Ha@microchip.com,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ravi Gunasekaran <r-gunasekaran@ti.com>,
+	Simon Horman <horms@kernel.org>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
+	Murali Karicheri <m-karicheri2@ti.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Ziyang Xuan <william.xuanziyang@huawei.com>,
+	Kristian Overskeid <koverskeid@gmail.com>,
+	Matthieu Baerts <matttbe@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [RFC] net: hsr: Provide RedBox support
+Message-ID: <c3880444-3665-4a60-b6ec-f8ae8a9fbf8d@lunn.ch>
+References: <20240228150735.3647892-1-lukma@denx.de>
+ <20240228083115.01d4c93e@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,29 +76,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+DkFDZPdS+r0vdFp0EU_xh=05gu5VuqOrT7G_Nj5gdjM8OOcg@mail.gmail.com>
+In-Reply-To: <20240228083115.01d4c93e@hermes.local>
 
-On Wed, Feb 28, 2024 at 05:29:00PM +0100, Patryk wrote:
-> Hi, I've got a question regarding phy drivers. Supposed that I want to
-> use an ethernet phy device - in general - do I need a specific driver
-> to handle this, or is it handled by some generic eth phy layer that
-> can configure (through MDIO) and exchange data (through XMII) in a
-> generic, vendor-agnostic way?
+On Wed, Feb 28, 2024 at 08:31:15AM -0800, Stephen Hemminger wrote:
+> On Wed, 28 Feb 2024 16:07:35 +0100
+> Lukasz Majewski <lukma@denx.de> wrote:
+> 
+> >  
+> > +/* hsr_proxy_node_table_show - Formats and prints proxy node_table entries */
+> > +static int
+> > +hsr_proxy_node_table_show(struct seq_file *sfp, void *data)
+> > +{
+> > +	struct hsr_priv *priv = (struct hsr_priv *)sfp->private;
+> > +	struct hsr_node *node;
+> > +
+> > +	seq_printf(sfp, "Proxy Node Table entries for HSR device\n");
+> > +	seq_puts(sfp, "MAC-Address-SAN,        time_in\n");
+> > +	rcu_read_lock();
+> > +	list_for_each_entry_rcu(node, &priv->proxy_node_db, mac_list) {
+> > +		seq_printf(sfp, "%pM ", &node->macaddress_A[0]);
+> > +		seq_printf(sfp, "%10lx\n", node->time_in[HSR_PT_INTERLINK]);
+> > +	}
+> > +	rcu_read_unlock();
+> > +	return 0;
+> > +}
+> > +
+> >  DEFINE_SHOW_ATTRIBUTE(hsr_node_table);
+> > +DEFINE_SHOW_ATTRIBUTE(hsr_proxy_node_table);
+> 
+> NAK
+> Do not abuse sysfs to be a debug proc style output.
 
-phylib has a collection of PHY drivers for specific phys. If the board
-you have uses one of those PHYs there is nothing you need to
-do. phylib also has a basic generic fall back driver based on what PHY
-registers are defined in 802.3. For simple PHY devices, that might be
-sufficient to get a working link, but not much more. If you want to
-use all the features of the PHY, or it has non-standard registers, a
-PHY driver will be needed.
+This is actually debugfs, not sysfs.
 
-The interface to the MAC is PHY vendor-agnostic. The MAC it just told
-how to configure its side of the MII interface. It has no idea what
-the PHY on the other end of the MII interface is, or even if there is
-a PHY at the other end, since you can connect a MAC to another MAC,
-e.g. an Ethernet switch.
+However, i agree, we want information like this exported via netlink
+as the primary interface to the end user. debugfs is not suitable for
+that.
 
-    Andrew
-
+	 Andrew
 
