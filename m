@@ -1,127 +1,119 @@
-Return-Path: <netdev+bounces-75832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E8F786B4EF
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:29:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 486C986B508
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:32:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 497331F23F49
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:29:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F6A2B2C643
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:29:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452A36EF1B;
-	Wed, 28 Feb 2024 16:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584536EF18;
+	Wed, 28 Feb 2024 16:29:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Lx/con21"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WjcpS2mh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f194.google.com (mail-pf1-f194.google.com [209.85.210.194])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585966EEEC
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 16:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C431E6EEEC;
+	Wed, 28 Feb 2024 16:29:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709137785; cv=none; b=fXO6T2KeJEleb1wyK7FZoZAIv5pnvRYbjLvXWYBatZMXyfecWKrMMfUr+MXHI9JwUrKIwAWUkwTlloYPGarbHYmSphFQC/KaTgfSwv9KkhvIA2TC9pBSM8LX35OQ7gXO0sOI5hY9xNkIKhzTnOY/zwOykjl4qHTm3qOBv9vk9no=
+	t=1709137791; cv=none; b=byPwDRZ6nsJoIZRVvSYZMPnbkBbGNf/476f32P7zVtPZMlq9lslLVygJ1g/mKGNqDZZSw7q08RpbhIhE8gXNbyHYDifaonwGWMqrcEIemWwdpXCPOBzVf1y2IISB+NNGu/HqarlEhx1+ol3e56nRgz1I/TR7u7xmOeRf3bzThfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709137785; c=relaxed/simple;
-	bh=UV7R/aXcZgNkB2GVRI+H+u2L9N4UFIamsH2SzwTty+U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k7sGPvxqepl5owjhdVjcKRE5vjuqgmsGZzFkS2sIKODRZUHlOtPVVCxgPJ2z9zAQe9/+LAS/TH02GAgvO5X8DScHe2Tpl8zgq0yZvZnQPD8lNSLXJrwU6idJnJtgFLdFLSQzz4AHvstC1GXwRBInshrxFfSTKaYXH/+YTb6+QyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Lx/con21; arc=none smtp.client-ip=209.85.210.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f194.google.com with SMTP id d2e1a72fcca58-6e57ab846a1so236536b3a.3
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 08:29:42 -0800 (PST)
+	s=arc-20240116; t=1709137791; c=relaxed/simple;
+	bh=wS3cg47EfvD5VkYCZNfgMA58P2hp2/4YIQrmVXFhguQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q7jjs88ODLoCB4d4FE3muc2aJZ9gK5egjHlIxd9hhnSDHUQ43wPa5s/QE5gQ4/Htx5YZjtfBRZJFj1/CAQSNonjrYiOycBUsfQ4oQfX0cGqnEhmRi3vT7gCtT7JUqIISZAH19ADlAEV1xWeRb7iqutjX7XQ0Cl1DXdxvoXlkmWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WjcpS2mh; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-607e54b6cf5so8351407b3.0;
+        Wed, 28 Feb 2024 08:29:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1709137782; x=1709742582; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UV7R/aXcZgNkB2GVRI+H+u2L9N4UFIamsH2SzwTty+U=;
-        b=Lx/con21yf8cN+1PFAQamtt7AcTQNWs2ADfKZfZmHzivYbYPUOs4rwgINj6W89eeVb
-         5//1VeOrjFDa5E0hPWtm0yUx3TfZCz0IdfBKv6SbOY6cnnVR9Ag/yXWG7MCxcpBE95Zl
-         RWbCOz84YpDhpmNCMxjWe6BWQ6qwMtDjWQJynKTYTtGmI8f536y9b+7XNpJouwejiNSY
-         bbWZwya3g53z7UxAzUSsrjHPPcn8ESs8buX1l+bW/W2xY5uy1qeltuRA0YvIAmMX3NrI
-         MH6A3Swf59Hz+mfXtOnHqaC9IaYc2d+zDaDj8QYyv0Z3mXtpqxm0xH7GdeC6+5nan9o1
-         Co2g==
+        d=gmail.com; s=20230601; t=1709137789; x=1709742589; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kj3zQ1lBxACrFRnKWFxYbPf2tKrEF/iMipPYB2aWh/I=;
+        b=WjcpS2mhLdIqYZhn5R6jyj2N3fEvr4qWjAx6/h+M/Ol62xHehBunCP+Jn+Mwe3xemO
+         RbPQvXmBBH8s74lEweTfAxZbaXj1G7wYf2Pjxz7Es/G8FgG3fILUGUrN8xziniTBflVs
+         lAfEv9CnSWSHVU/+/Vks8gl+/Bv9cvvqvp7n7KQS8mOlZveMW+aP4RbDDI8KPvg9pXz5
+         S7VORQeCBfXF7IL7Jv7cqUshMavLfLDP/0LDhIo/UbrFjshZ+mknkbQKQmviNlhPxBOw
+         odkh9l7y2cV8Kz39UYpLc/4J6CRRlSOTar+BlMJcTCcDUWMQhp5YOPIWD21z0dI2Uib8
+         z3vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709137782; x=1709742582;
-        h=mime-version:references:in-reply-to:message-id:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UV7R/aXcZgNkB2GVRI+H+u2L9N4UFIamsH2SzwTty+U=;
-        b=Hn1463U26JFvNP0VkUPGLWPEPOePsPx+JiLgDh2t3EGr8G7xvOd6tyEZI+0tkl3NZX
-         65cNHpZ33MkCdfmpY+OVXDGhUxiQeB/HyFD9K1zB+csrp+5UrfDHB+yaCT00SFHwyDCF
-         yOMH0kxIZEF1goKzhamwI2epcEjpxsBphA0+DaD/5KdAtHeJiI0jnFxPDPV1lm5Llg4U
-         OR7wRBvY7mBRmRju6Zcn3XxGKcYenb2UcXBGjcuCsOt8t4gtpjTN/80hSPRU9oNbFRxh
-         OchEhPKeB9SJn7liiA4B9mZeZql1fZoX5FUS058y0gXv0AwkPkijG5v0r4BCnNFnQFdx
-         Molg==
-X-Forwarded-Encrypted: i=1; AJvYcCVsy0h91ZSTk2M6R5qTWEbkI3Wacz91sQs+nk/wkBYzffEVoOdc6QXUI9xKbWICY+lSrNbrRlSRwqzUCwH14gP7+sHR0d9O
-X-Gm-Message-State: AOJu0YwLMv1yeN8vNmeJpud2Wchh03PSQJixAOMDPw5PXyGg7zzkozvc
-	Y9FxItw4sjzzAqrG4AiSp+hRpxzCRKIyoDDGcfCR6+SGYMqSxwaT2PhqPtiiCkE=
-X-Google-Smtp-Source: AGHT+IHJoTy8gFeDdE2VE5kQBwxgbeLPa8ZoWjN992oDb8EwiFI7OrDyjMTjiqWADxu4nYIsLg0D5w==
-X-Received: by 2002:aa7:8b92:0:b0:6e4:7a93:b627 with SMTP id r18-20020aa78b92000000b006e47a93b627mr123196pfd.15.1709137782477;
-        Wed, 28 Feb 2024 08:29:42 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id k9-20020a63ba09000000b005cf5bf78b74sm6712875pgf.17.2024.02.28.08.29.41
+        d=1e100.net; s=20230601; t=1709137789; x=1709742589;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kj3zQ1lBxACrFRnKWFxYbPf2tKrEF/iMipPYB2aWh/I=;
+        b=L6O4sMa0Ac9RKr/PGsFYHIyTN5xpwl9vrHOxBjhLcXPUaNKkDpRyfE9YbkQr19rBlG
+         KUVOuDgJn0K8YFvX4WbiTjwA5BmTUvoDl2dr7KQeLSc2lQ58td3nV1ORIcuKyyQDO7kK
+         aaeks+XS6i1T39vVALArjZtBPhFHgfMDyL3xITOnGxrUab6NCt6b6POHvmyZnITDwQtt
+         BxIr7jW+wj5TB0T+kS5qqZvZXPT/S1mnZEqD3q81iF3MsK8QczUhBTUyHT84a+FG6EBw
+         Y/R5kj+TR9qWLJodSxwvyUn1EDOaSAVBqdp/XUYYXyQfW2fRZdbVjE/BGUCu4R5acf2O
+         8w4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWALmRI18VbLUELXIGcB7Eqj2jpyUb2QY+wHXy8SEzfoduvXcqHme/U5bWTEEheZYjZAAmHwWUEQ6xK9o2bcIUpeXU7rnPQLO3j5bHTyMJXa+IPZUtCxsqhMV1p65Eu9pY/he2DtKse5P2ciN/KolI/QeAsMjizhroAFbc9dRrsudgSAKs+jEv8SRv8/GP893zuuXvh47DpBKNVezHx
+X-Gm-Message-State: AOJu0YyIs8TnadnLtJqBST/GTcVNpD73i8TTBP7OJLdeT2QoTy71+NhC
+	97G4vp6yecSTgqkTv3pgHF3wiWznKtMwcMmv9yT+XcLsjJhy5qGd
+X-Google-Smtp-Source: AGHT+IGa1uVu1QGKwzBN/ugqWSb5R7kpDXIVH6fnycyAQSPeZdMmpMkJiKarLdELLKFo76CJJMn2/A==
+X-Received: by 2002:a81:b284:0:b0:608:cc10:f4f4 with SMTP id q126-20020a81b284000000b00608cc10f4f4mr1884717ywh.16.1709137788712;
+        Wed, 28 Feb 2024 08:29:48 -0800 (PST)
+Received: from localhost ([2601:344:8301:57f0:2256:57ae:919c:373f])
+        by smtp.gmail.com with ESMTPSA id i126-20020a0df884000000b00608a88ba3c7sm2471750ywf.79.2024.02.28.08.29.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 08:29:42 -0800 (PST)
-Date: Wed, 28 Feb 2024 08:29:39 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, Eric
- Dumazet <edumazet@google.com>, Florian Fainelli <f.fainelli@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org
-Subject: Re: [PATCH] ip link: hsr: Add support for passing information about
- INTERLINK device
-Message-ID: <20240228082939.1b9e84d6@hermes.local>
-In-Reply-To: <20240228152027.295b2d82@wsk>
-References: <20240216132114.2606777-1-lukma@denx.de>
-	<20240226124110.37892211@hermes.local>
-	<20240228152027.295b2d82@wsk>
+        Wed, 28 Feb 2024 08:29:48 -0800 (PST)
+Date: Wed, 28 Feb 2024 08:29:47 -0800
+From: Yury Norov <yury.norov@gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Alexander Potapenko <glider@google.com>,
+	Jiri Pirko <jiri@resnulli.us>, Ido Schimmel <idosch@nvidia.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Simon Horman <horms@kernel.org>, linux-btrfs@vger.kernel.org,
+	dm-devel@redhat.com, ntfs3@lists.linux.dev,
+	linux-s390@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 11/21] tools: move alignment-related macros
+ to new <linux/align.h>
+Message-ID: <Zd9fe8o9zkwoW8Cf@yury-ThinkPad>
+References: <20240201122216.2634007-1-aleksander.lobakin@intel.com>
+ <20240201122216.2634007-12-aleksander.lobakin@intel.com>
+ <Zd9fLYP0uzqqwOdO@yury-ThinkPad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/9SLmPWifhJBJsVbych=dIX5";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zd9fLYP0uzqqwOdO@yury-ThinkPad>
 
---Sig_/9SLmPWifhJBJsVbych=dIX5
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Wed, Feb 28, 2024 at 08:28:31AM -0800, Yury Norov wrote:
+> On Thu, Feb 01, 2024 at 01:22:06PM +0100, Alexander Lobakin wrote:
+> > Currently, tools have *ALIGN*() macros scattered across the unrelated
+> > headers, as there are only 3 of them and they were added separately
+> > each time on an as-needed basis.
+> > Anyway, let's make it more consistent with the kernel headers and allow
+> > using those macros outside of the mentioned headers. Create
+> > <linux/align.h> inside the tools/ folder and include it where needed.
+> > 
+> > Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> 
+> Reviewed-by: Yury Norov <yury.norov@gmail.com>
 
-On Wed, 28 Feb 2024 15:20:27 +0100
-Lukasz Majewski <lukma@denx.de> wrote:
+Sorry, please read this as: 
 
-> > No new uses of matches() allowed in iproute2. =20
->=20
-> Could you be more specific here? Is there any other function (or idiom)
-> to be used?
-
-Use strcmp.
-
---Sig_/9SLmPWifhJBJsVbych=dIX5
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEn2/DRbBb5+dmuDyPgKd/YJXN5H4FAmXfX3MACgkQgKd/YJXN
-5H7WkA//cIysKqasc9djGT1LvZuwuLdM8u/Ah2Fl75lk9y5C6CFoxBI8vWvkq6IZ
-KSPS0TFFV3IuZozQdenXL4dGoU2WXO+apP21kdlvi9O0QbitO4TS7WWEh/oA+Coq
-1Ypx4gTj2LIoCsurB6Fqi7/t+ecJjNemEUqmQhXOp/jt77rmevX43V0RMXU1CA8c
-kdoCvSi2lKHbczZFlpiChjoGR7au9b1Vy771OjgQD0GK3V+TtI0spF2MuyEn8RBO
-vsDRAg2t6UddkSUKzaTeRVWc/crmkbgkbo6PC0GAGem2cOf7DxQqn7zFsZqmTgm6
-Mvv5f8i6//T1SGXkim4E/GXDB1zg6NHf6ikv2M+UvxSFg8fOOk7ECEr8FXyiJ4ic
-BWSQrPa2zg57Yq9fLft0jOfJUXoe9pjPqFlRNYeE+7RVrJNoh0ZszQtSGK6PWBtP
-8HyCPBhZCLWRQpJlJIcXJaVpSWL3eCYimLgEc56IdsqqSMR8BigcDOyqMoujKbgX
-R+BQ2T2ZF1ksCKcXexbYo6z3SVgJ59yCNsqVvB2HBTDZkJAu48jHes+qdYDuYlW6
-Crf6tixvHMUZJN8Y0cnVcwOZLBfMEYOr9ohSKxxZ4myFPdb3m8kTOU6F53cyDfxe
-0uk5FevavKm4tH3Dl+C9fa4DIlQKKWWkWnFJb5zvcQA4ezvBmBs=
-=B3Yf
------END PGP SIGNATURE-----
-
---Sig_/9SLmPWifhJBJsVbych=dIX5--
+Signed-off-by: Yury Norov <yury.norov@gmail.com>
 
