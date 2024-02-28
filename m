@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-75706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5F1086AF62
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:48:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B183E86AF86
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:54:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6084E286138
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:48:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DF0928825C
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:54:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87288145FF8;
-	Wed, 28 Feb 2024 12:48:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6B7149000;
+	Wed, 28 Feb 2024 12:53:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hCED7HzD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DqiWmt8a"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58BCE36129;
-	Wed, 28 Feb 2024 12:48:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 233C9145B27;
+	Wed, 28 Feb 2024 12:53:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709124488; cv=none; b=pfY/jBa/48sQU4sjR5nK1baKueccR5WwtVjFNXUDOjXGk4fBhknnO89kFKNziCLRksYN2NONZQPSqWzXI+0k3nypsnWiESfyuIar9aAiAKRI/XU9pMbuUnsQhKB3d3hxWpjzipRcszUmZKu4Q3M6PKorYUI4lETC82HyQfo3W+4=
+	t=1709124832; cv=none; b=ZX3G2ORGXoDD/jJtuqWCLWrRLEi5R3OkjVCOAqr+byHskql9rIfwCCJbF+18WHt3my9WyYxlDpow68H1D36lkwxgaVSLnkFnHc7BW8WM+cb8GsKdGa1eI4Fowbj++FioiE2978rIr/V+VjamFqS6aOCRCjPx8kN9ggdUXCi5Phc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709124488; c=relaxed/simple;
-	bh=K6KGP6T+SeD5Hx1HsZoWXozDmI8OLiyMag16ZeWLf2E=;
+	s=arc-20240116; t=1709124832; c=relaxed/simple;
+	bh=hnckyr9CzJCyvSre06+L3PLt3fvc2S88cMfyIGRjMdU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NUu/h89Ah6QJAyyiM/XGIaHsv0Kb9mVkSltxacHXuOKYKv6acW1dBcqRuSMqiNktsDhDIBxj352nxJVZQYkiMc4M5FWAe2JMhftRRmb25/kFBY0gRZjZbPDmR2C0HH+PF0kObmAykRz3wYuLJRNVewIP67t/wxboP/T0MpHM4nQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hCED7HzD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25D38C433F1;
-	Wed, 28 Feb 2024 12:48:02 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ie3P8IFq/RJvOJ57pPSon9M0+Ou4WRMJfTlU7lsMqfD+Je6Eu16tNMfbUaCWfLTjv0bhStWjdm1yeAS8sSL4RfkyiK/+9N5TyaTD87+Y5Lhp92zVd3GvA2IIQ7/ZS2a9vdCgfP3ZLVTuFDZ4HnIK4zVtMq/KATYhb+/ZVfjunDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DqiWmt8a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21E50C433F1;
+	Wed, 28 Feb 2024 12:53:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709124487;
-	bh=K6KGP6T+SeD5Hx1HsZoWXozDmI8OLiyMag16ZeWLf2E=;
+	s=k20201202; t=1709124831;
+	bh=hnckyr9CzJCyvSre06+L3PLt3fvc2S88cMfyIGRjMdU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hCED7HzDG5k8ELHuyoPVxRyOYEQTXmRFY04WKTQzFUxz3sw3Xil8/pRwRReUClr8C
-	 Fy7I1c398Aa9uLvKB6m8sirKyWFn0IS2QyN7IzssOrmtI6Jf55FcAffiyV/EndLsn2
-	 aSqbUrG2vgSX0U4Iwg23IpvxLMrAHAAf9SyMNx8rgcZcIUaN2icArxDLoUL75wKQs/
-	 QEOQdj8WJjWmCOzFioRZ++C1YuXkZ0u+CJfmDnzbowesx8FwrWSf/w7eeX8CiFY6qH
-	 3KmP+YUHyB72wjm+K0o4YIeAwZuNAUr+AjphgTCPnu37XBvft7rLiiDR4QDHllkZEX
-	 ssKmzRSGXALjA==
-Date: Wed, 28 Feb 2024 12:48:01 +0000
+	b=DqiWmt8afGNGKTglMVNXTBYEU7fUZPKVfOCmzRyjEB9rnkGIawsMCpGR7XBaoKNWS
+	 nMdiNr4SpNF+zJCiJhC8aPZTkLgvuaaq9ILWgWP8Nm70Dge+L5auiBcsWE5L2kVTA0
+	 gsFDVaCiYqhD34Wpmgxoaw6SsgRnEr2LnMNa3n8xa0wufr8tcRhH2V7oKzmnRM5nwB
+	 /SkeH92K8kgx9zWFc+pDSSZzaQSy8ZJ2gX3UXQaj8tCr3/lIq02M5V2FRQdlAfhgdm
+	 re7dNUuCXvg9ilq3OVX2kQM26FhoWykZomTSV0BMSo0JpkuHeqFGg29FFuasgBrjRy
+	 303cbhKn19B+Q==
+Date: Wed, 28 Feb 2024 12:53:44 +0000
 From: Simon Horman <horms@kernel.org>
 To: Kory Maincent <kory.maincent@bootlin.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -64,11 +64,11 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
 	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v5 13/17] net: pse-pd: Use regulator framework
- within PSE framework
-Message-ID: <20240228124801.GC292522@kernel.org>
+Subject: Re: [PATCH net-next v5 17/17] net: pse-pd: Add TI TPS23881 PSE
+ controller driver
+Message-ID: <20240228125344.GD292522@kernel.org>
 References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
- <20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
+ <20240227-feature_poe-v5-17-28f0aa48246d@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,87 +77,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
+In-Reply-To: <20240227-feature_poe-v5-17-28f0aa48246d@bootlin.com>
 
-On Tue, Feb 27, 2024 at 03:42:55PM +0100, Kory Maincent wrote:
+On Tue, Feb 27, 2024 at 03:42:59PM +0100, Kory Maincent wrote:
+> Add a new driver for the TI TPS23881 I2C Power Sourcing Equipment
+> controller.
+> 
+> This patch is sponsored by Dent Project <dentproject@linuxfoundation.org>.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
 ...
 
-> diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-> index 522115cc6cef..a3e297cc2150 100644
-> --- a/include/linux/pse-pd/pse.h
-> +++ b/include/linux/pse-pd/pse.h
-> @@ -55,10 +55,10 @@ struct pse_controller_ops {
->  	int (*ethtool_get_status)(struct pse_controller_dev *pcdev,
->  		unsigned long id, struct netlink_ext_ack *extack,
->  		struct pse_control_status *status);
-> -	int (*ethtool_set_config)(struct pse_controller_dev *pcdev,
-> -		unsigned long id, struct netlink_ext_ack *extack,
-> -		const struct pse_control_config *config);
->  	int (*setup_pi_matrix)(struct pse_controller_dev *pcdev);
-> +	int (*pi_is_enabled)(struct pse_controller_dev *pcdev, int id);
-> +	int (*pi_enable)(struct pse_controller_dev *pcdev, int id);
-> +	int (*pi_disable)(struct pse_controller_dev *pcdev, int id);
+> +static int tps23881_flash_fw_part(struct i2c_client *client,
+> +				  const char *fw_name,
+> +				  const struct tps23881_fw_conf *fw_conf)
+> +{
+> +	const struct firmware *fw = NULL;
+> +	int i, ret;
+> +
+> +	ret = request_firmware(&fw, fw_name, &client->dev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	dev_info(&client->dev, "Flashing %s\n", fw_name);
+> +
+> +	/* Prepare device for RAM download */
+> +	while (fw_conf->reg) {
+> +		ret = i2c_smbus_write_byte_data(client, fw_conf->reg,
+> +						fw_conf->val);
+> +		if (ret < 0)
 
 Hi Kory,
 
-Please update the Kernel doc for struct pse_controller_ops to reflect the
-added and removed fields.
+Should fw be released here.
 
->  };
->  
->  struct module;
-> @@ -90,10 +90,14 @@ struct pse_pi_pairset {
->   *
->   * @pairset: table of the PSE PI pinout alternative for the two pairset
->   * @np: device node pointer of the PSE PI node
-> + * @rdev: regulator represented by the PSE PI
-> + * @enabled: PI enabled state
->   */
->  struct pse_pi {
->  	struct pse_pi_pairset pairset[2];
->  	struct device_node *np;
-> +	struct regulator_dev *rdev;
-> +	bool enabled;
->  };
->  
->  /**
-> @@ -107,6 +111,8 @@ struct pse_pi {
->   * @of_pse_n_cells: number of cells in PSE line specifiers
->   * @nr_lines: number of PSE controls in this controller device
->   * @lock: Mutex for serialization access to the PSE controller
-> + * @lock_owner: current owner of the mutex
-> + * @ref_cnt: mutex's reference count
+> +			return ret;
+> +
+> +		fw_conf++;
+> +	}
+> +
+> +	/* Flash the firmware file */
+> +	for (i = 0; i < fw->size; i++) {
+> +		ret = i2c_smbus_write_byte_data(client,
+> +						TPS23881_REG_SRAM_DATA,
+> +						fw->data[i]);
+> +		if (ret < 0)
 
-These newly documented fields don't seem to exist in struct
-pse_controller_dev. Perhaps this is an left over from earlier development?
+And here?
 
->   * @types: types of the PSE controller
->   * @pi: table of PSE PIs described in this controller device
->   * @of_legacy: flag set if the pse_pis devicetree node is not used
-> @@ -132,7 +138,8 @@ struct device;
->  int devm_pse_controller_register(struct device *dev,
->  				 struct pse_controller_dev *pcdev);
->  
-> -struct pse_control *of_pse_control_get(struct device_node *node);
-> +struct pse_control *of_pse_control_get(struct device *dev,
-> +				       struct device_node *node);
->  void pse_control_put(struct pse_control *psec);
->  
->  int pse_ethtool_get_status(struct pse_control *psec,
-> @@ -147,7 +154,8 @@ bool pse_has_c33(struct pse_control *psec);
->  
->  #else
->  
-> -static inline struct pse_control *of_pse_control_get(struct device_node *node)
-> +static inline struct pse_control *of_pse_control_get(struct device *dev,
-> +						     struct device_node *node)
->  {
->  	return ERR_PTR(-ENOENT);
->  }
-> 
-> -- 
-> 2.25.1
-> 
-> 
+Flagged by Smatch.
+
+> +			return ret;
+> +	}
+> +
+> +	release_firmware(fw);
+> +
+> +	return 0;
+> +}
+
+...
+
 
