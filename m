@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-75939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D543386BBC1
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 00:01:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A71386BBC5
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 00:01:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62FE01F293F2
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 23:01:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6DAC282477
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 23:01:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678587D089;
-	Wed, 28 Feb 2024 22:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CF2161B66;
+	Wed, 28 Feb 2024 22:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yy3oKL8p"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x7FQIIbi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC55D79B7D
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 22:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B6115E5B7
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 22:59:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709161159; cv=none; b=iGOMO4B5tsjmrqkgEVzNGSluFJqNqgybPdFGzbkNazLH6BjXcNfw42x9x3JjC+IVlw/PZRkOMvOjbhpV7GhSs/WR6jxqxBNMrDfwr2Xc5yTQSwBiMSwD6J6+0PD7CZRK3na+/s0WY1XSj6zW91581qQlGNzUfdiuZFbaN4DIyWE=
+	t=1709161160; cv=none; b=O08o4hNhnql9VmJS3xvF4RgpGxzFZZF/rNT+jAByE4s72j6N2RwKecGpvxNDgiB9azpdTa/sxszWIGHENgd/i8wBdB5xOzARNxJUUXdwZpKOgV4s8EaV8UorSv3k3zwbJkhXCL4NMErhXeiNVT0gLQ2PWDs3jbtVIQxd4ooxfiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709161159; c=relaxed/simple;
-	bh=Lddxx/7+zTRDdPfPCQR3m48LNdlBsdHAfzX1ldXLmxg=;
+	s=arc-20240116; t=1709161160; c=relaxed/simple;
+	bh=sByDsDMKp44vyq2pot5Hhxm/eaP0ttE9ltVB3LqVHFs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OTls7dd2bI9zNCyMCH/+UPU/YeJlDpkOgXi1gAyX/H4bnLUxddEbfivnyjtLooi+b4Y+xZhGpTLLF0G+cN0lN86c3X7MXiqeQfzN1Gk8SI0Ikjb06DQAUaH7vOyiQ32M00P86B7HbFZ2FIpPOFj3kpll2/6YYWOht72C3pXHqWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yy3oKL8p; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=QjOSvXrQMQL1cxe3LA3eDBwTC2q5fgjTUpEh3uYn+fSXv2t4Tqw2X1jPan+1lZfg5OpidmguLLERyeXKwnk97ZD557xUvGeEtiO4oUL9azTcWsJsh4qx/TF3IjwbYSmHE+1y4tUaO0X1Y9rKItlMgJapAO/pdFZ20jU2T2mqfDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x7FQIIbi; arc=none smtp.client-ip=209.85.166.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-608e88ca078so5095517b3.1
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 14:59:16 -0800 (PST)
+Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-3652d6907a1so3460725ab.3
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 14:59:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709161156; x=1709765956; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709161157; x=1709765957; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AEPqDrb3kuqBi4wlFiHmXpXFNsJMzopZPuYDXQBwtp8=;
-        b=Yy3oKL8piYhFHPFq+2GugB5MRoqsGwybvABd8XdoQflltcrnx26GGxSAUj8Izbt1pJ
-         bbClVAZJ8jx5fUkby51sufkjIlDVXNokgCtAtH6EaNNAd4KntkDzQLUTLDppCJA8piQB
-         8PmnG6+CVD6TqR5p5NEoCTPs6YoMQKILiqg9LOY89cUjEe/glER1WydyBwpA8TK+nBlp
-         RfASxJRdiEHq6Ja5r+PpKfQ/Rkua1zPAAvCZV1ir9Q08MSTCcDbwP5JRFnyPBRZqxaEt
-         xWPLjP/ShFGvNwCOgRwkeVlZ0OxfIx5boFRHSQyNlBAVDb3gdxa6FPojbO1gAuRBfNPd
-         q12w==
+        bh=YAj5OZXxeaW4sKlBVmOyaWiE/dDaeK+k40BuTuu533I=;
+        b=x7FQIIbiUTu8GEWN+AawAD1f6igoVfjJyAGlagzRpY4ZMwmrpQBQ370WbKMVvyJnip
+         p9gK4lILU51xV0OTG+Lvb10hA1fIzcOUKq6L+GZjHVlVKNTQsu+e2WUhw/Ioadiuu7Eh
+         cHiitHCRQ3PL8HP8gWrcViZIT8MUn13REIhbsGbC0ZKIVEOnTZD2pcORiLGTrWEo/GkD
+         eGT9EFaOpFMEehUh+fi65Sz02YD6f7lSAsS3ZZsVDFLO/d6TOLGpPI3Q5VMoDPM1GlVX
+         +5iksbasBiZp4rwR9GfEaYQc80Ika3S3bxBwFkR6QVLuuj66jo8A86wHRBNVFtgLPVVh
+         XMig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709161156; x=1709765956;
+        d=1e100.net; s=20230601; t=1709161157; x=1709765957;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AEPqDrb3kuqBi4wlFiHmXpXFNsJMzopZPuYDXQBwtp8=;
-        b=ZhFSPne1s9nUozSO2Y1Kqsd9WV9gmmiSDKi9uWH6DC9oYSRa+Bu6MEZBrxGUv18kMI
-         IRVF6nHyWnds4otibmh5FOJiWS+AZZHS/0J9Sy8MD+o7Lw23xGNNx/wvVkFaUphfHsoC
-         LvqzYs7S3nMyHg6/3h5RvfZwlj2rd22EubWk+Qd5wuJNvJjU9bnoVnEdirXwGuzucJ8x
-         hd+8bt0ElM68jv5DNk+q9wg9fBHvLK+rZ4rS1bI3Tbg8ZbvZFT9S0VWaBLli54uzRhKi
-         rum1U0bGl+LzIezjgsVHl9F1JY5CqreLCMwuaKCdHMJbRyOJ7/ahjGkC+uYN1QcC7hMo
-         3meQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVXVzk00JTjrjKjKFwboa9rKiyaHL8oymHQkFg2n17J6V6hOwUPRmREPQhMrZCAtQY/cooYFrXwnu0ppxokOctEIDoUdmNN
-X-Gm-Message-State: AOJu0Ywj1TIC16tXhNcsFsNGVHnjWlWXDi+cge8kDUH72r/u87BffEHN
-	GfXDybBkgt9n7Xi38VTMxbFxZyebShlrI0myF2y570oKfYJPKvidDZVYXNa8B4UsLCkrJpNK1L6
-	z3PW29EUlHqsn79pOkW+xDA==
-X-Google-Smtp-Source: AGHT+IH+AYAEjmtd2HEeqQ8tauvpcfTSBaCfiTSyn0oA8Q1wOY4uNUBXxv4dwpdfs73rhiHAaOwNYfrscLpmjQUwhA==
+        bh=YAj5OZXxeaW4sKlBVmOyaWiE/dDaeK+k40BuTuu533I=;
+        b=XC08O4IfwB4DgXT6m78zLbr6Of0W22KLOUj0RT4Ga+uDqFvmQojQ8YC59wpcM4c3Ng
+         +ZLziza0Xi7Iie+UpKSsZE6Tvi5w2B8ShzTcy8TZouwavkkkEjn7Q7BoUVYEhF7RGdOa
+         z/wTBAXgLXHULnSHDsKjkT9ag3xdOq2OvAGhBHDgivf+4wZv6NdfhLaD5wvwv6XKPQBd
+         rSWxUVzimLZBmKVE8eEGo5oi080xPuuv4PvY+NCJFoz+qb55EegWvomdU8B9Eq5UvAJv
+         NQVLrFQyxHKnA/CCar3PQklq7/i+TZsGMGcIOYPunBSmTLQkNJcQlXHYprwyfx25TWCW
+         aqWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUs7Z6iPDysZXFOHX2bL9rW5+xAqo4qktkMY7LrKSPB7mmb+xv4I/vIBFNNNPRie3d2nKK/M7gER/sr2+WsHU8b420NKHmm
+X-Gm-Message-State: AOJu0YwwiSRoZoNVCIIYHQ/6p0Btu53R6HltXa9Gdqa3MKVHdcX4u9vc
+	G1n1DWRNotqhBNpEZZ3VTjqP3z/l8/7qtAyLpUlmOyvob2Smc0tigB3AUpPYSRYR4xZuIPUZidu
+	jnMqcb3MURXx9WrMwSK+2Cw==
+X-Google-Smtp-Source: AGHT+IHoQVSAKtTKWMR9HqVfcdvMQJ5TQ9kT4Qfz/mA8h9PaGzJ6iHCM0QJAjUXmqcpaYEmHg0FOvRz7HtCHG9nbhg==
 X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a81:7947:0:b0:609:3c14:b700 with SMTP
- id u68-20020a817947000000b006093c14b700mr99395ywc.5.1709161155734; Wed, 28
- Feb 2024 14:59:15 -0800 (PST)
-Date: Wed, 28 Feb 2024 22:59:05 +0000
+ (user=justinstitt job=sendgmr) by 2002:a92:c563:0:b0:365:21f4:700d with SMTP
+ id b3-20020a92c563000000b0036521f4700dmr34184ilj.2.1709161156751; Wed, 28 Feb
+ 2024 14:59:16 -0800 (PST)
+Date: Wed, 28 Feb 2024 22:59:06 +0000
 In-Reply-To: <20240228-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v2-0-dacebd3fcfa0@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,13 +74,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240228-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v2-0-dacebd3fcfa0@google.com>
 X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1709161149; l=1839;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1709161149; l=1441;
  i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=Lddxx/7+zTRDdPfPCQR3m48LNdlBsdHAfzX1ldXLmxg=; b=4RsSr+qnPfhdDTcGycu17RdkJmrh4DmmUkOdoQw9koC5UujHTwsgQh/Uhx6IjYaCNsiCcGPX6
- S20zo9iGEmOC/bLHTndhTRmKqABL888rxYhO1DTZe+hS+pjh43d3Vza
+ bh=sByDsDMKp44vyq2pot5Hhxm/eaP0ttE9ltVB3LqVHFs=; b=MQmDO4s1joPg8qz5k1DfkUDPX+8AhggVdiQ9eJscb4HSloFwaCNCdz/nFzT/ALueyz6YmZ8NY
+ 6fbXI+QlUapD1QbsdKWY+t/Yuw1thXdsz72jHdrFaniAPlmI60I+0Zw
 X-Mailer: b4 0.12.3
-Message-ID: <20240228-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v2-5-dacebd3fcfa0@google.com>
-Subject: [PATCH v2 5/7] scsi: devinfo: replace strncpy and manual pad
+Message-ID: <20240228-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v2-6-dacebd3fcfa0@google.com>
+Subject: [PATCH v2 6/7] scsi: smartpqi: replace deprecated strncpy with strscpy
 From: Justin Stitt <justinstitt@google.com>
 To: Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>, Kashyap Desai <kashyap.desai@broadcom.com>, 
 	Sumit Saxena <sumit.saxena@broadcom.com>, Sreekanth Reddy <sreekanth.reddy@broadcom.com>, 
@@ -98,59 +98,37 @@ Cc: mpi3mr-linuxdrv.pdl@broadcom.com, linux-scsi@vger.kernel.org,
 	Justin Stitt <justinstitt@google.com>
 Content-Type: text/plain; charset="utf-8"
 
-Depending on the state of @compatible, we are going to do different
-things with our @to buffer.
-
-When @compatible is true we want a NUL-term'd and NUL-padded destination
-buffer. Conversely, if @compatible is false we just want a space-padded
-destination buffer (no NUL-term required).
-
-As per:
-/**
- * scsi_dev_info_list_add_keyed - add one dev_info list entry.
- * @compatible: if true, null terminate short strings.  Otherwise space pad.
-...
-
-Note that we can't easily use `strtomem_pad` here as the size of the @to
-buffer is unknown to the compiler due to indirection layers.
-
-Now, the intent of the code is more clear (I probably didn't even need
-to add a comment -- that's how clear it is).
+buffer->driver_version is sized 32:
+|	struct bmic_host_wellness_driver_version {
+|	...
+|		char	driver_version[32];
+... the source string "Linux " + DRIVER_VERISON is sized at 16. There's
+really no bug in the existing code since the buffers are sized
+appropriately with great care taken to manually NUL-terminate the
+destination buffer. Nonetheless, let's make the swap over to strscpy()
+for robustness' (and readability's) sake.
 
 Signed-off-by: Justin Stitt <justinstitt@google.com>
 ---
- drivers/scsi/scsi_devinfo.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ drivers/scsi/smartpqi/smartpqi_init.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/scsi/scsi_devinfo.c b/drivers/scsi/scsi_devinfo.c
-index 3fcaf10a9dfe..2d3dbce25629 100644
---- a/drivers/scsi/scsi_devinfo.c
-+++ b/drivers/scsi/scsi_devinfo.c
-@@ -293,14 +293,16 @@ static void scsi_strcpy_devinfo(char *name, char *to, size_t to_length,
- 	size_t from_length;
- 
- 	from_length = strlen(from);
--	/* This zero-pads the destination */
--	strncpy(to, from, to_length);
--	if (from_length < to_length && !compatible) {
--		/*
--		 * space pad the string if it is short.
--		 */
--		memset(&to[from_length], ' ', to_length - from_length);
--	}
-+
-+	/*
-+	 * null pad and null terminate if compatible
-+	 * otherwise space pad
-+	 */
-+	if (compatible)
-+		strscpy_pad(to, from, to_length);
-+	else
-+		memcpy_and_pad(to, to_length, from, from_length, ' ');
-+
- 	if (from_length > to_length)
- 		 printk(KERN_WARNING "%s: %s string '%s' is too long\n",
- 			__func__, name, from);
+diff --git a/drivers/scsi/smartpqi/smartpqi_init.c b/drivers/scsi/smartpqi/smartpqi_init.c
+index ceff1ec13f9e..bfe6f42e8e96 100644
+--- a/drivers/scsi/smartpqi/smartpqi_init.c
++++ b/drivers/scsi/smartpqi/smartpqi_init.c
+@@ -1041,9 +1041,8 @@ static int pqi_write_driver_version_to_host_wellness(
+ 	buffer->driver_version_tag[1] = 'V';
+ 	put_unaligned_le16(sizeof(buffer->driver_version),
+ 		&buffer->driver_version_length);
+-	strncpy(buffer->driver_version, "Linux " DRIVER_VERSION,
+-		sizeof(buffer->driver_version) - 1);
+-	buffer->driver_version[sizeof(buffer->driver_version) - 1] = '\0';
++	strscpy(buffer->driver_version, "Linux " DRIVER_VERSION,
++		sizeof(buffer->driver_version));
+ 	buffer->dont_write_tag[0] = 'D';
+ 	buffer->dont_write_tag[1] = 'W';
+ 	buffer->end_tag[0] = 'Z';
 
 -- 
 2.44.0.rc1.240.g4c46232300-goog
