@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-75800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D28086B385
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:44:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 596E386B387
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:44:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C911B268E2
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:44:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8ABBB1C25509
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E2315CD59;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A13115CD74;
 	Wed, 28 Feb 2024 15:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aonVDHv0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ikqppHLC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB6A1487DC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6731A15B99D;
 	Wed, 28 Feb 2024 15:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709135053; cv=none; b=e0uLu47Nts1zr/1OGkbs7mnlYTqihiaIhhz2S//Y4MNp7wFGMxBniDnBvELTM+pWA0+jqs3lPTpbDjdzpdIrCb771SMpNmMiiu2GKLp/qnpLzmJnVVP8zL5QYxLMcWf+jymqJvuKPgXz4eUuHNU10F6e1jY2Em0IUgXi8xuIUgE=
+	t=1709135053; cv=none; b=htNl3Hd2P7lB9gjfqLB9ZLnqhCeXnbKTvFXlegta+1q0H17AtfE30M93YwOLVKvaDfsOp934KpGDMctAs03W8nbUYdxaamPizCN5guPqTnblYFJ4CyzhVzumQTUz4qpF/OaY5ZhUqAZCHHkR8x/FsQWP0Zln8M5UAR6hzMtB2KY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709135053; c=relaxed/simple;
-	bh=EpJLYJ6b85rFa9J1XyueUdyMW3coYJ0CvhXOXMVsYvA=;
+	bh=wCq0/G0U3G5jLX6uSW1H6YvVIcliYO/6CdNqJSK4uRU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TsyfAjr8xqcxjWAveGw5yQme4sKjEhdW0TIVfeAMW2srQ16sxVxKe7xxSjhdTc9TLLCbiVTaxVJQOgWtTQJwWyOALKNWu7fe9pGO6RX/Qb29Hopntp3o0tmybYmUYLGZpA4elB7xDk5YZnNI0iMi0lhR4ktqc3ZI8BvB/Enbb+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aonVDHv0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C7E12C433C7;
+	 In-Reply-To:To:Cc; b=owbYPjfdfG4dRLt4qhDAb2qPwobVIeZD6I620WQCLTHbPlHyAKtt2zBHyxJvy+74d6Y1tBqvzTsmmYB+7X6CBacipfI6lnTHHKJzjU1wipRai59H6K+Of4nSYjxg66u33L8WgZBDu5XJJ8wiazNGtlbN9M8BVphQQ57Lp3IoFgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ikqppHLC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DDCB7C43399;
 	Wed, 28 Feb 2024 15:44:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709135052;
-	bh=EpJLYJ6b85rFa9J1XyueUdyMW3coYJ0CvhXOXMVsYvA=;
+	s=k20201202; t=1709135053;
+	bh=wCq0/G0U3G5jLX6uSW1H6YvVIcliYO/6CdNqJSK4uRU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aonVDHv0+gIs5d0kGPhHMl0GVrq1JvYpJCjkSx/6KoCHay79Kh4ev2K2T+VedOOeq
-	 AkxYnfFsQqe71Snxdkd4IMfmIiJZ55b81xRaU0s3a0DmDvLHkw/U4HJqYqRULcQ2j0
-	 /fB0fGLwYe6eGT5SxOFBoVtio2nHjtTmDsv7doLlFk5VPjUye3GdwLBoOQENduIEkf
-	 DpRX8hVhkeIgo/bi46tkFLbAHYgseOTT9o+a1n32G+UU32XNJX5yIU9UgahWK7yTuc
-	 IRiPMR05Nh2ym41CSCOgzNpF61zJze0tFud+VK6knCcB7xH1la7j4zFCzt6XLDDxkd
-	 l4y0byx/fv6kw==
+	b=ikqppHLC0brjC/lu/68aUWysFEdkRmeDneSFe+MSx6xLDSa32wQHXZfQfgFjLb49k
+	 NIE/3Xcvt+aFNBd997xeCZwtHuChJy+JNWN/yfCwg+O+TOXpYvLhHDIiabBB+lEebx
+	 VbKSn28i6oS4nV9/D51lNtTmbuIfgqcbP/jYNbHiRgsWKAdax1ScfKf4TOYPQtn9Bn
+	 Z5ZGdmd6dBLFVmd9CdW9AnouTYguFt+O0MfmQcTup66HXMrMz1HNTttZwN59y4NtLe
+	 DKE+nlFO+ZLrIXxVK2zpZI3KV4CtLsl8kjHolbVBFaYU41O8eI4fpbq7CVTD6EcjKf
+	 R3tOFOPUidJqg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A8BD4D88FAF;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BAED7C595D2;
 	Wed, 28 Feb 2024 15:44:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,17 +52,18 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 04/10] net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
+Subject: Re: [PATCH net v3 4/9] net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170913505268.28471.3417707935881083049.git-patchwork-notify@kernel.org>
+ <170913505276.28471.11477968638938529738.git-patchwork-notify@kernel.org>
 Date: Wed, 28 Feb 2024 15:44:12 +0000
-References: <20240205101400.1480521-5-leitao@debian.org>
-In-Reply-To: <20240205101400.1480521-5-leitao@debian.org>
+References: <20240208164244.3818498-5-leitao@debian.org>
+In-Reply-To: <20240208164244.3818498-5-leitao@debian.org>
 To: Breno Leitao <leitao@debian.org>
 Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
  edumazet@google.com, alex.aring@gmail.com, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, horms@kernel.org, andrew@lunn.ch,
+ f.fainelli@gmail.com, jhs@mojatatu.com, aahringo@redhat.com,
  linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
 
 Hello:
@@ -70,17 +71,18 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  5 Feb 2024 02:13:53 -0800 you wrote:
+On Thu,  8 Feb 2024 08:42:39 -0800 you wrote:
 > W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
 > Add descriptions to IPv6 over Low power Wireless Personal Area Network.
 > 
 > Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->  net/6lowpan/core.c | 1 +
->  1 file changed, 1 insertion(+)
+> Acked-by: Alexander Aring <aahringo@redhat.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> [...]
 
 Here is the summary with links:
-  - [net,04/10] net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
+  - [net,v3,4/9] net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
     https://git.kernel.org/bluetooth/bluetooth-next/c/2898f3075e6a
 
 You are awesome, thank you!
