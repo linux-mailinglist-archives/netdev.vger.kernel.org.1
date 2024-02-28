@@ -1,151 +1,281 @@
-Return-Path: <netdev+bounces-75626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14DB486AB75
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 10:38:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B820986AB7B
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 10:38:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEBF41F245AF
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:38:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1EC4B27E45
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:38:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04D782E403;
-	Wed, 28 Feb 2024 09:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 248772E85D;
+	Wed, 28 Feb 2024 09:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="vAFDuAOM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IbDqWDl+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4E9364A4
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 09:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22833364C6
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 09:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709113085; cv=none; b=FAogPkVhp5q6omnVcahSdEycIMStR9oP852730wz1590zyyK4Ttpq301H85Yi13rZBwRGHyI4dzu/qMdVLqX4MagoUNyMJGOauzl1bQH83bDnHydXsrsPvlAMBYFxHBRx+wBqcYNL7uueavNeMjZ0V+lZuap8Fb6+uMWka7lh/A=
+	t=1709113133; cv=none; b=fNzjUTnqtpK7Tqs+EqorAiGCODopsvNHDETgChaOOi/n4tkyL/zAauduUbfQqgTnOZSYp8rCw9TAFMhZdFLuPjykkHU5CVMuTqD3CWoWHOYMo2tRkKeG9i09D3moL7wFTEsHf4q7cBpIHm3iL+8ULBvBrQyWnQ1YI0QaXPLv7yI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709113085; c=relaxed/simple;
-	bh=QgIy+AhjKbi6kBVZg0TLRYJ9MziReGlesw4xPyyJCBE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SQRwWZ9Re7TS+hP1L1Q/zdu/E9AMo/UFpzBgsBCJWEfB+0mDjhnfC1NOLOO+mNvTuABUFJzQXnqO8XBrzbn2F6lfDYmxpUUZJHrPN712sIo1SoSGXxNECJObqEwzEJwQFUvgB1eHVd0BiggmhGeB+RB8duCfcU+ZO3IOIMeV21E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=vAFDuAOM; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-412ae087378so11628395e9.3
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 01:38:03 -0800 (PST)
+	s=arc-20240116; t=1709113133; c=relaxed/simple;
+	bh=aqcJTIVaVFp21PkbL9YzRb4iz4RtSFDWr/4GBKggYtA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VXK248/SzTPwmeVKcPVHzV23dEzWTA/ENfx7Z/mgw1p6IPxyTqSP4NiIqXZklil8HF3OmLYPy6Yd+JXZ1LHkTLwMJtWREKTraOdB3jdQqiAk6cRxKuww+9wbYiu9f5W/CtSS9sdg/EeVgQjG9Lp9TdfFz5JuyH5FCO05PjK3w3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IbDqWDl+; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4129a5f7b54so35045e9.1
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 01:38:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709113082; x=1709717882; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W1hMWRVBnl/gEAw/llhlBpcXQ1X9m0oJHMIf8z3WgWc=;
-        b=vAFDuAOMhv789HpMwyn2TL6aFd98083xX86F+D+U7F6jmdKepK8XPPWyiNnhJKw/6d
-         RcCqLUyazdCpi5ut9n4SOFRCmce/pxbmK58YuvWEORrLQBluQ0s9BeCl+3lnpAz/jcsm
-         EFr3oU9XXQdyRu61sWfAnV8G54x/Ynl53h7DbBAzoLF8iB7xbB58fmleG7MTY4movSq7
-         nhhvRA0xrkdruAtVhH57Rom/vkiDJTZY8z9Hb+5ur50hNE4U1rHoXFe0TLCmAE0eMD4Q
-         R+JjJgKHei6GX4c/0kAf0nQy5/i2rCnW8TZLnbPIkVM/leTmvU4/crq9gGL2XQoW3uev
-         EReA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709113082; x=1709717882;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1709113129; x=1709717929; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=W1hMWRVBnl/gEAw/llhlBpcXQ1X9m0oJHMIf8z3WgWc=;
-        b=uhv57mFIuMsCMkVBAAp4DQpQuXhdXBETQaYTB/uKZyxYzXKSmHyZ6dVyEB7llkwdNN
-         86wq/4uhDFjH5dOy7S8H+TJN2kGl1+m+3pyn2pc9hmQCjib1xq193Q0bu6U3lYRxB1me
-         lTK29xBfpqQRY1DTCok019ND0aYNVEPInjqaRdKNSk39HFgPgoN4HLa2DQx3UwSQNIOt
-         UFStl6pq5Ab94I64DR0Hq5OB2Zjhqe8zbItwmOKO3nOJeYam2wE3KoZk6e5DvOtOtrUJ
-         uI3W3JwaKwxb423vlJ4h7pbSaawVbe4b2lu77LsGyp5wzjVQsWXVX9R8xkM6b6nia+t/
-         tJbw==
-X-Forwarded-Encrypted: i=1; AJvYcCWn/NhX7qDXqyaZkyharEMbPkHC6pWogCX8BxtjJDkGCs6evs+tINUhQIyWhhkNYkVrDOqJMqfBDCrAIxaa6UFWWxKoGatq
-X-Gm-Message-State: AOJu0Yw0/eqDswgfgchTl0N1OoM94+IzROYbrdhsS1u28dqqHy8/B3Du
-	G0mlxwVJRrDQk2v1lso5hSJmWslhjj8SqxwPNDvKkMPGTmxl1EaBdX7goUspsRw=
-X-Google-Smtp-Source: AGHT+IEOxWRC6Ca+8XbgbqTWQoyUFENl9LPww7J0YEXEZZ0erws498PgvVW8RhPGdX7h1yqhcEDVMA==
-X-Received: by 2002:a05:600c:3b9d:b0:412:b623:bbcc with SMTP id n29-20020a05600c3b9d00b00412b623bbccmr497210wms.10.1709113082050;
-        Wed, 28 Feb 2024 01:38:02 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id cs2-20020a056000088200b0033e002b32a3sm1148845wrb.30.2024.02.28.01.37.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 01:38:00 -0800 (PST)
-Date: Wed, 28 Feb 2024 10:37:56 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, netdev@vger.kernel.org,
-	Oleksij Rempel <o.rempel@pengutronix.de>, richardcochran@gmail.com,
-	nathan.sullivan@ni.com, Jacob Keller <jacob.e.keller@intel.com>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: Re: [PATCH net] igb: extend PTP timestamp adjustments to i211
-Message-ID: <Zd7-9BJM_6B44nTI@nanopsycho>
-References: <20240227184942.362710-1-anthony.l.nguyen@intel.com>
+        bh=tq28pWGVy84XWsb1p63TwCaRaQ81JuSb2XPKE4tmWPY=;
+        b=IbDqWDl+MF1zmRIUtH5c1x53yHc+6fC9i8SP27oaSA17woIPwQcd9iLGLsZBut91RA
+         ySGUfDeTDyj7Pt5Txx7752gExRKeFO4Z2+BENB2FEBi/z0Xrrp+3dDtpWLECH6VaqReJ
+         jhfL4QOrHvyXpxbH3aSYZN09/jyXnBYKr+v92ZVTbRQPH3EM5s6WYXMCsuPbVprywkYW
+         i/eHZ3GJFwlr0+KvsZ1X9nRa96aNz2ns/1MEtdbum5mjivHLUzGxbIkhXv1niXGFR7VJ
+         YnQcO+/qtkB7BCQBrCacJHdMKGtUH2qkeWf/54X4r3+a5CJuNDIkvkJzcKthsbXuRQli
+         j5tA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709113129; x=1709717929;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tq28pWGVy84XWsb1p63TwCaRaQ81JuSb2XPKE4tmWPY=;
+        b=EXy1DN2hvoMGeTv15CxZ0dBi5qDH0Do9ZQCkQBwt46Gxvq90h4/imLI8UBx31+xrmz
+         2GRjCBJjTnO/n8JTGV0UiVq4wMS738P6M3x0zPHldaB9gk3dtJw8CYM58MOzmfEsMIk6
+         qb7ugX8HKPbnMU6TwkOMXn2sgzsG8r9Ldxeoro8zEju/6wTFgSS9SMlzhJ152XTJComn
+         zBQ36aFel/wjy02HZ5XPxZsymMWC+0DXmagMiM+R/mXZnvDvsfC8XCje7bcHQ2T198dw
+         MfSOy7QA9tsh19528NFdHena42UkkziIGSPup4vWsvLoiivIyJwhnkCdl7ljrOCWzoJm
+         qk5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUGkoCNrzaxL9h960dS41ly9aO6V3jdyZ4mdUtehc+aMUhDtz12xDIyBPJI9ri3y05WaLyu8XZ5Xc1TnLuFsqNxa+rSUnrq
+X-Gm-Message-State: AOJu0YysbOJAVwhtiqCjWov4clen0kehvjiIbTdwUi4xQRSSmVv18t1a
+	aqAAXWdBDVn7hSl5Vt/6yOWyMhusiIlCI7WKHD96e9Extavl3WkNQhkbVJGFSw5+TlT41bk8OsT
+	3Z3teICJ869QvUYD0nwGDx+5iz9ssjvfm7GZT
+X-Google-Smtp-Source: AGHT+IEPTOcdwuk9+XFKyavoHLMSmESCQzslFD+zeAM0Yj55ZedW9Tysi8LWYspqOCidhExFA7MbNkEpyLCISXDWoqw=
+X-Received: by 2002:a05:600c:1f14:b0:412:b66f:3d0a with SMTP id
+ bd20-20020a05600c1f1400b00412b66f3d0amr23933wmb.6.1709113129295; Wed, 28 Feb
+ 2024 01:38:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240227184942.362710-1-anthony.l.nguyen@intel.com>
+References: <CANn89iJoHDzfYfhcwVvR4m7DiVG-UfFNqm+D1WD-2wjOttk6ew@mail.gmail.com>
+ <20240227062833.7404-1-shijie@os.amperecomputing.com> <CANn89iL2a2534d8QU9Xt6Gjm8M1+wWH03+YPdjSPQCq_Q4ZGxw@mail.gmail.com>
+ <018b5652-8006-471d-94d0-d230e4aeef6d@amperemail.onmicrosoft.com>
+In-Reply-To: <018b5652-8006-471d-94d0-d230e4aeef6d@amperemail.onmicrosoft.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 28 Feb 2024 10:38:37 +0100
+Message-ID: <CANn89i+NudPMsKDswRfx3R=opyAKBTw+nxrpkMZTQsgnOGJ_DA@mail.gmail.com>
+Subject: Re: [PATCH v2] net: skbuff: set FLAG_SKB_NO_MERGE for skbuff_fclone_cache
+To: Shijie Huang <shijie@amperemail.onmicrosoft.com>
+Cc: Huang Shijie <shijie@os.amperecomputing.com>, kuba@kernel.org, 
+	patches@amperecomputing.com, davem@davemloft.net, horms@kernel.org, 
+	ast@kernel.org, dhowells@redhat.com, linyunsheng@huawei.com, 
+	aleksander.lobakin@intel.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, cl@os.amperecomputing.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Tue, Feb 27, 2024 at 07:49:41PM CET, anthony.l.nguyen@intel.com wrote:
->From: Oleksij Rempel <o.rempel@pengutronix.de>
+On Wed, Feb 28, 2024 at 8:06=E2=80=AFAM Shijie Huang
+<shijie@amperemail.onmicrosoft.com> wrote:
 >
->The i211 requires the same PTP timestamp adjustments as the i210,
->according to its datasheet. To ensure consistent timestamping across
->different platforms, this change extends the existing adjustments to
->include the i211.
 >
->The adjustment result are tested and comparable for i210 and i211 based
->systems.
+> =E5=9C=A8 2024/2/27 20:55, Eric Dumazet =E5=86=99=E9=81=93:
+> > On Tue, Feb 27, 2024 at 7:29=E2=80=AFAM Huang Shijie
+> > <shijie@os.amperecomputing.com> wrote:
+> >> Since we do not set FLAG_SKB_NO_MERGE for skbuff_fclone_cache,
+> >> the current skbuff_fclone_cache maybe not really allocated, it maybe
+> >> used an exist old kmem_cache. In NUMA, the fclone allocated by
+> >> alloc_skb_fclone() maybe in remote node.
+> > Why is this happening in the first place ? Whab about skb->head ?
 >
->Fixes: 3f544d2a4d5c ("igb: adjust PTP timestamps for Tx/Rx latency")
+> I tested the fclone firstly. I did not test others yet.
+>
+> I did not check the skb->head yet.
+>
+> But I ever checked the pfrag's page, it is okay.
+>
+>
+> >
+> > Jesper patch [1] motivation was not about NUMA., but about
+> > fragmentation and bulk allocations/freeing.
+> >
+> > TCP fclones are not bulk allocated/freed, so I do not understand what
+> > your patch is doing.
+> > You need to give more details, and experimental results.
+>
+> 1.) My NUMA machine:
+>
+>        node 0 (CPU 0 ~ CPU79):
+>
+>                       CPU 0 ~  CPU 39 are used as memcached's server
+>
+>                      CPU 40 ~  CPU 79 are used as memcached's client
+>
+>        node 1 (CPU 80 ~ CPU160):
+>
+>                       CPU 80 ~  CPU 119 are used as memcached's server
+>
+>                      CPU 120 ~  CPU 179 are used as memcached's client
+>
+>     the kernel is linux-next 20240227
+>
+>
+>   2.) My private patches:
+>
+>        patch 1 is for slub:
+>
+>        ---
+>   mm/slub.c | 1 +
+>   1 file changed, 1 insertion(+)
+>
+> diff --git a/mm/slub.c b/mm/slub.c
+> index 5d838ebfa35e..d2ab1e36fd6b 100644
+> --- a/mm/slub.c
+> +++ b/mm/slub.c
+> @@ -5691,6 +5691,7 @@ __kmem_cache_alias(const char *name, unsigned int
+> size, unsigned int align,
+>
+>          s =3D find_mergeable(size, align, flags, name, ctor);
+>          if (s) {
+> +               printk("[%s] origin:%s, shared :%s\n", __func__, name,
+> s->name);
+>                  if (sysfs_slab_alias(s, name))
+>                          return NULL;
+>
+> ---------
+>
+>    This patch is used the check which is the sharing kmem_cache for
+> "skbuff_fclone_cache".
+>
+>    I cannot find the "skbuff_fclone_cache" in /proc/slabinfo.
+>
+>    From my test, the "pool_workqueue" is the real working kmem_cache.
+>
+>    The "skbuff_fclone_cache" is just a pointer to "pool_workqueue"
+> (pwq_cache).
+>
+>
+>    The following private patch is used to record the fclone allocation:
+>
+>   ---
+>   net/ipv4/tcp.c | 19 +++++++++++++++++++
+>   1 file changed, 19 insertions(+)
+>
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index c82dc42f57c6..6f31ddcfc017 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -864,6 +864,24 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t
+> *ppos,
+>   }
+>   EXPORT_SYMBOL(tcp_splice_read);
+>
+> +unsigned long right_num, wrong_num;
+> +static void check_fclone(struct sk_buff *skb)
+> +{
+> +       int n =3D numa_mem_id(); /* current node */
+> +       int node2 =3D page_to_nid(virt_to_page((unsigned long) skb));
+> +
+> +       if (n !=3D node2) {
+> +               wrong_num++;
+> +               if ((wrong_num % 1000) =3D=3D 999)
+> +                       printk(KERN_DEBUG "[%s] current:%d, get from
+> :%d, (%ld, %ld, %ld)\n",
+> +                               __func__, n, node2, wrong_num,
+> right_num, wrong_num * 100 / (wrong_num + right_num));
+> +       } else {
+> +               right_num++;
+> +               if ((right_num % 1000000) =3D=3D 9999)
+> +                       printk("[%s] we received :%ld, %ld\n", __func__,
+> right_num, wrong_num);
+> +       }
+> +}
+> +
+>   struct sk_buff *tcp_stream_alloc_skb(struct sock *sk, gfp_t gfp,
+>                                       bool force_schedule)
+>   {
+> @@ -884,6 +902,7 @@ struct sk_buff *tcp_stream_alloc_skb(struct sock
+> *sk, gfp_t gfp,
+>                          skb_reserve(skb, MAX_TCP_HEADER);
+>                          skb->ip_summed =3D CHECKSUM_PARTIAL;
+> INIT_LIST_HEAD(&skb->tcp_tsorted_anchor);
+> +                       check_fclone(skb);
+>                          return skb;
+>                  }
+>                  __kfree_skb(skb);
+> --
+>
+>    Without this v2 patch, I can get the result after the memcached test:
+>
+> [ 1027.317645] [check_fclone] current:0, get from :1, (7112999, 9076711, =
+43)
+> [ 1027.317653] [check_fclone] current:0, get from :1, (7112999, 9076707, =
+43)
+> [ 1027.804110] [check_fclone] we received :10009999, 7113326
+>
+> It means nearly 43% fclone is allocated in the remote node.
+>
+>
+>   With this v2 patch,  I can find the "skbuff_fclone_cache" in
+> /proc/slabinfo.
+>
+> The test result shows below:
+>
+> [  503.357293] [check_fclone] we received :8009999, 0
+> [  503.357293] [check_fclone] we received :8009999, 0
+> [  503.357305] [check_fclone] we received :8009999, 0
+>
+> After v2 patch, I cannot see the wrong fclone in remote node.
+>
+>
+> >
+> > Using SLAB_NO_MERGE does not help, I am still seeing wrong allocations
+> > on a dual socket
+> > host with plenty of available memory.
+> > (either sk_buff or skb->head being allocated on the other node).
+>
+> Do you mean you still can see the wrong fclone after using SLAB_NO_MERGE?
+>
+> If so, I guess there is bug in the slub.
+>
+>
+> > fclones might be allocated from a cpu running on node A, and freed
+> > from a cpu running on node B.
+> > Maybe SLUB is not properly handling this case ?
+>
+> Maybe.
+>
+>
+>
+> > SLAB_NO_MERGE will avoid merging fclone with kmalloc-512, it does not
+> > really help.
+> >
+> > I think we need help from mm/slub experts, instead of trying to 'fix'
+> > networking stacks.
+>
+> @Christopher
+>
+> Any idea about this?
 
-IIUC, you are just extending the timestamp adjusting to another HW, not
-actually fixing any error, don't you? In that case, I don't see why not
-to rather target net-next and avoid "Fixes" tag. Or do I misunderstand
-this?
+I had a simpler bpftrace program to get an histogram of [my_node,
+node(sk_buff), node_of(skb->head)]
+and can tell that going back to linux-v6.7 and CONFIG_SLAB=3Dy solved
+all the issues for me.
 
+99.9999% of SLAB allocations were on the right node.
 
->Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
->Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
->Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
->Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
->---
-> drivers/net/ethernet/intel/igb/igb_ptp.c | 5 +++--
-> 1 file changed, 3 insertions(+), 2 deletions(-)
->
->diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/ethernet/intel/igb/igb_ptp.c
->index 319c544b9f04..f94570556120 100644
->--- a/drivers/net/ethernet/intel/igb/igb_ptp.c
->+++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
->@@ -957,7 +957,7 @@ static void igb_ptp_tx_hwtstamp(struct igb_adapter *adapter)
-> 
-> 	igb_ptp_systim_to_hwtstamp(adapter, &shhwtstamps, regval);
-> 	/* adjust timestamp for the TX latency based on link speed */
->-	if (adapter->hw.mac.type == e1000_i210) {
->+	if (hw->mac.type == e1000_i210 || hw->mac.type == e1000_i211) {
-> 		switch (adapter->link_speed) {
-> 		case SPEED_10:
-> 			adjust = IGB_I210_TX_LATENCY_10;
->@@ -1003,6 +1003,7 @@ int igb_ptp_rx_pktstamp(struct igb_q_vector *q_vector, void *va,
-> 			ktime_t *timestamp)
-> {
-> 	struct igb_adapter *adapter = q_vector->adapter;
->+	struct e1000_hw *hw = &adapter->hw;
-> 	struct skb_shared_hwtstamps ts;
-> 	__le64 *regval = (__le64 *)va;
-> 	int adjust = 0;
->@@ -1022,7 +1023,7 @@ int igb_ptp_rx_pktstamp(struct igb_q_vector *q_vector, void *va,
-> 	igb_ptp_systim_to_hwtstamp(adapter, &ts, le64_to_cpu(regval[1]));
-> 
-> 	/* adjust timestamp for the RX latency based on link speed */
->-	if (adapter->hw.mac.type == e1000_i210) {
->+	if (hw->mac.type == e1000_i210 || hw->mac.type == e1000_i211) {
-> 		switch (adapter->link_speed) {
-> 		case SPEED_10:
-> 			adjust = IGB_I210_RX_LATENCY_10;
->-- 
->2.41.0
->
->
+This looks like a SLUB bug to me.
 
