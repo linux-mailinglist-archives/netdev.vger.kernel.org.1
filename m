@@ -1,80 +1,81 @@
-Return-Path: <netdev+bounces-75730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EDC186AFF2
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:09:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71CA986B00C
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:12:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C80551F24894
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:09:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2794D1F2137F
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:12:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E23B2149E01;
-	Wed, 28 Feb 2024 13:09:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF2D149E0B;
+	Wed, 28 Feb 2024 13:12:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="xHRF6XNQ"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="uqK1EiTh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43BB0145341
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 13:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0591A14691C
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 13:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709125777; cv=none; b=QrV8g8hFyPBI1c7zZlaC+AFV51rzndr1IDnyOBMpeUpr+4XWvJ2sP+ZGazY8DPl8EiEozvcTqwwbc+vb5TD6mnii7isRwx3s3fklcodpeE86iRUJUy4qF2xRtSNvhDOtgfvJTIqb1MMuC6Hw8oqQYNd6ildSYh3ff3j+nyv58jI=
+	t=1709125944; cv=none; b=jyqqXO/R6RBVHmP5PkGF5oclcT6fUk+7RfdRTRuY7PhJn5+n1/0KMv9K/iechiPMZiND6ZOPH+vuy1HEcRjqNQNfM3Az2GwmsmCHNsdmNUeUlPpCSVXAQhsjVD8tIAWrosEJmdzaXGH8WaalfM/9J6uI005bZQwB19pWcUc8oMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709125777; c=relaxed/simple;
-	bh=2Ft3bJiWKb5wT6iuIPDRn0E5KDZP5tR5xY4D5h4a9ZE=;
+	s=arc-20240116; t=1709125944; c=relaxed/simple;
+	bh=1bD+TvbzDbXTfsdrw8BzIDHbEibgU9qHHyHfTTUEBTw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k7tp4juVyRew3l+gGOV4Lx00D4L2gAkdPYg2mnsv6+z4oObvZcvjo+Sb8QdpQEIyU8oJietoEoK98Mg40FWFymYKu4Uv6C9DvSFGk6ZkJYDcULIEc/c5ztLUoxA4uRsQW2Vs2K0FdA9e04tjrrae6RTRvEDmzGZazTHM9PtF9BU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=xHRF6XNQ; arc=none smtp.client-ip=209.85.208.177
+	 Content-Type:Content-Disposition:In-Reply-To; b=OGCOLskSXt6uKCsEwGN+2dAPKqQzzW84h7snQXAcs2wTi4BPjG1bini2mJNyYM+UJGwjOB9gvHXln40ahRQxU0dPxkuJTwCcDI+VKltB5+zTzYsYBP6s0QOCrWbg64MabKquU9O27bpkXZh6pFPygvBUSHbUOZ1CZqUHWoTOQmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=uqK1EiTh; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2d21cdbc85bso84118671fa.2
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 05:09:36 -0800 (PST)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-412aec2505dso12184765e9.2
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 05:12:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709125774; x=1709730574; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709125941; x=1709730741; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2Ft3bJiWKb5wT6iuIPDRn0E5KDZP5tR5xY4D5h4a9ZE=;
-        b=xHRF6XNQAxY19zdHQdOUBCXhFqvg9nw0+LncpnZg/0WCV1tFKM2DxOf4CiqN0P15Aw
-         bF0OlGn6NEd/eq0BmVJqfnCNKsMS6V2uTTYGp/mPPzK4lTlol24rUygt9M5lsn/OqZ1f
-         hbRRklnzvqTyxX9oQGpjEY0/EfSee5cS8UHfRy9+tvpjeqgrMLzTDtVMe7ywPA7axsVG
-         fivU9MKwltu8QhEUujK5P7fdWLynqYJAIE5Ovn9OSiTBVZrjVRRUGk9ey1990QeJmkTx
-         gkKa+Zsk6KzmZMDLgmSFBAfHqOrPEfFHRlf9z6JOHuRoqymNhujXFiucULye1pVzTqY3
-         RmXA==
+        bh=1bD+TvbzDbXTfsdrw8BzIDHbEibgU9qHHyHfTTUEBTw=;
+        b=uqK1EiTh3xel+0qm7EhNE1wrmPIkHwBuvsPN9ed1KKFieLgrMMcj875f6MPNHStiO3
+         5/tgtrcsgWS/1QpPJATY+kIh/6WGvKESqnCypzvq3Hf6u6bbQ+SwBAJ0svB4wq0CGoIs
+         JidN1OVsX66nsMI5C/qbqXNzYTz+/RrryIDTbYsg1Tp4PwvLQRfz4LWtaSE25nARWCL4
+         0HZSJmDLBaXpTd3akC45U1hXQB5dOGfNIuD7F03HDO60NSsCynekGmd88OfZplUsc7Y8
+         4RGWr3cAKne7MCn+dQhT62U5z72CHmXK/58lqkVebazcJij2xNhxnQOQOHIWDmknXI+M
+         QAOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709125774; x=1709730574;
+        d=1e100.net; s=20230601; t=1709125941; x=1709730741;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2Ft3bJiWKb5wT6iuIPDRn0E5KDZP5tR5xY4D5h4a9ZE=;
-        b=YbuEoKP4UKq7/5rBBC2Fmfg0TJEsDct9QxTh69vak8I2LYzX41IWUg3QN16aJGrPkk
-         Dlz8y+jVt8yOLnY6xUYrK56A8WS80Um8HceaktQhb/v8jSPpotuQPTUhDxrm+IijzFQW
-         UicqDMDjz/zcLvOEVUi3QD1ad5LTC7d1mpG4idfYjqZTUki26yfqDEGQbo318MPscGoi
-         /LjVCZPzyI07QOA/3KSJe0KctZLvk5UWpDJEtHU2pI/tPqucaWATGkHI8M7H3YRtbj8w
-         ndpMZB+lLBvGEDFLiKvM/yeQ13ZePVHMtYfKHDsEzCWMV/2LHel6rBC+qIpqO2NMQ3lD
-         Kfsw==
-X-Forwarded-Encrypted: i=1; AJvYcCXpj3SJV6ymrA0KQZ8Zb/0DRIqEH9mimWAEdZ79KKiz3iELpK0cYwbJheBWaanF7uM7QOceval71VCA9/smjJkd26L/tMpN
-X-Gm-Message-State: AOJu0Ywx5c5cU4R3PQD3MZLNY/HMS4wX+JSM72XyRDp4Bj99D/YaYPbq
-	HLSN+2n7U/AW6yti6kRWEJR2v8KuUE4BuUzTQ+il9ovRqBAWnvsDTd+D5NSv9AU=
-X-Google-Smtp-Source: AGHT+IEXjIeaqkm6aDYE/p8eQaQhxLsM4l93SBBtG4gumRuwRAuP9F46ubbWmhhXEYGUD/OSV2vyhw==
-X-Received: by 2002:a2e:860d:0:b0:2d2:9b00:2289 with SMTP id a13-20020a2e860d000000b002d29b002289mr3237613lji.29.1709125774294;
-        Wed, 28 Feb 2024 05:09:34 -0800 (PST)
+        bh=1bD+TvbzDbXTfsdrw8BzIDHbEibgU9qHHyHfTTUEBTw=;
+        b=Myx7ARsGBaPyMLnrkxtojIbLvF77iplwjPxP6262mEGrwF0/ipYXk2T9J986JeNcvb
+         jYt/d5KxnUoRVcbTh4f7z5GzYlGIznwVhHwi+K0Y8taeUUvO87P9KbxKZgjaHzDIDkym
+         qps8zOm4hLSqyKXSqc9r9YjkebudMJ/++yQ1KjNiwpUNTRV4Lw4kPZZcL6l3N8taLEhv
+         zf7nKULO/gIF7+kCPJFddpWYIowhv+97wSM+Js9Ptxy0vFrLexHEJmCqqvtIvydnoctV
+         K45Be0FSU65FHQFHIBS5BKKMHb4H0JeC8KtNkrn8qbUaZOVpO5uouYc+/RP3MGCxJxUk
+         Zn9w==
+X-Forwarded-Encrypted: i=1; AJvYcCUYh5gs6ztrJriTMpf4QLNRWMj2qOQYbaEeE3LPIMpJ98e2OZoBYc7vAxa5sN4Q4tZb7rT7IOuYumR7/2qO6+FkGCF09tvJ
+X-Gm-Message-State: AOJu0YxBtMdPyQuismBTMav5v9ADCBAxVfNlRP5McjCbitA+0YYswF3X
+	RF8SeaXn63z73uddG1kaIVHtaepZ03uHsRx8WVxfcau5cqxXeVu0+9tC5f64xj8=
+X-Google-Smtp-Source: AGHT+IEm2GPfTV3ssQeU4XVkZjEXwj0yIajzxFEe5Z89HZRUR1knrmaQTBO7zoB7PCjicKbgFQLtoA==
+X-Received: by 2002:a5d:698f:0:b0:33d:2d07:b567 with SMTP id g15-20020a5d698f000000b0033d2d07b567mr9499056wru.24.1709125941487;
+        Wed, 28 Feb 2024 05:12:21 -0800 (PST)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id m21-20020a05600c4f5500b00412b0ef22basm2091407wmq.10.2024.02.28.05.09.32
+        by smtp.gmail.com with ESMTPSA id eo8-20020a056000428800b0033dcac2a8dasm11954467wrb.68.2024.02.28.05.12.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 05:09:33 -0800 (PST)
-Date: Wed, 28 Feb 2024 14:09:30 +0100
+        Wed, 28 Feb 2024 05:12:21 -0800 (PST)
+Date: Wed, 28 Feb 2024 14:12:18 +0100
 From: Jiri Pirko <jiri@resnulli.us>
 To: Prabhav Kumar Vaish <pvkumar5749404@gmail.com>
 Cc: shuah@kernel.org, netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
 	petrm@nvidia.com, idosch@nvidia.com
-Subject: Re: [PATCH net-next] Correct couple of spelling mistakes
-Message-ID: <Zd8wirexgBacmsv1@nanopsycho>
-References: <20240228115707.420200-1-pvkumar5749404@gmail.com>
+Subject: Re: [PATCH net-next] selftests: net: Correct couple of spelling
+ mistakes
+Message-ID: <Zd8xMsNFaF6ZE5AS@nanopsycho>
+References: <20240228120701.422264-1-pvkumar5749404@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,11 +84,12 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240228115707.420200-1-pvkumar5749404@gmail.com>
+In-Reply-To: <20240228120701.422264-1-pvkumar5749404@gmail.com>
 
-You sent this already here:
+Again, you sent this already here:
 https://lore.kernel.org/all/20240228082416.416882-1-pvkumar5749404@gmail.com/
 
-I don't understand why you send this again. Could you slow down a bit
-please?
+Could you please avoid duplicates like this? Also, note there is 24h
+rule not to repost the same patch. Could you please read:
+https://www.kernel.org/doc/html/v6.6/process/maintainer-netdev.html#tl-dr
 
