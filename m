@@ -1,141 +1,160 @@
-Return-Path: <netdev+bounces-75819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2746986B433
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:09:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B56DD86B44C
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:11:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D61852829B3
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:09:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71DE4282EEF
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E076415D5CC;
-	Wed, 28 Feb 2024 16:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85CB515DBB9;
+	Wed, 28 Feb 2024 16:11:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FeH1tbkF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aR5LDzrK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B363115CD6E;
-	Wed, 28 Feb 2024 16:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7BDC15DBBA;
+	Wed, 28 Feb 2024 16:11:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709136539; cv=none; b=r9eF1SSzPGKvJrdTHND2AM1CKxMIgMmKce7698JGfoN52Hpxuqgnvok/GE80HDoWgc4VcTmQ0PRSYJ8FH2pyAdf4PlKBUEoHjWZFLJ3rYWhmTf9NRlUso5AMxJC/27eMZ8rze+qxGBX2lSEIG138L+V9imt7+s/xcFnNd5MZAhQ=
+	t=1709136663; cv=none; b=SItcfcQoqFm+7xWaCSabs7fQoLTJ6MhBqg97Tw+iWcP/R2CGs7xhuFWvkX/1UsVbtva9K8eIBEra8bsatlQX5oxmcQvk8uemwvtSVxZxCdWVFOtRKiqgkJ5sUwTXwZtBjqHcekzNIukvj64PkyZ8ZuKMSlep+dzhiKey9m7gUuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709136539; c=relaxed/simple;
-	bh=9vrbwp+q8XKbdPzBRfbaUnKUvH7i4vZKGrKWdjzBE5Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=eBnVaS9813iHAtpCu/KAJnb6YINxMvDkTqY77eMJRM5U1/5Zp4Iftl/i6R3XGfHQUAdcMAxJHEjijhqASpsh7a8e4gz00v1DM8lrqSfPYsTuiAsNUbhXAv8xY5jCH3vWV0a+3lLRl/1FOFFAZJE2Fb/OI9M0w7gzaNANPrZRz2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FeH1tbkF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA9B0C43390;
-	Wed, 28 Feb 2024 16:08:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709136539;
-	bh=9vrbwp+q8XKbdPzBRfbaUnKUvH7i4vZKGrKWdjzBE5Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=FeH1tbkFba5gPho1BM/W4ztL6g9/2PRyRgoT66iPVwBraKwUcRFuh99Q9v+PqXhI9
-	 gU5TRJ8pYOTffyDzgKIOfK8gdmtkfEVkz16/HCCVcBqZB3u4707ASMNpnz52M2cHdF
-	 aI9NgQ0sl6r5i2kseo/dFPkeNYLFZzwPtOa2V+zGe4Z7bz1rrKPkS0/AetmJlLJ1Sj
-	 pq4Kg0EOhmyeImROeXbifZgoDcYc+Mh9iHbTiOiFPgcdhXBfpBrsbL2zG0bwbkvudm
-	 IkpcLrq9jStlymI5uny+OQObCYmGmdgOqg9W3+y/HqQFbzXlaP1+9jQPCJlfyLUH+n
-	 xQjpbbpApm2Vg==
-Date: Wed, 28 Feb 2024 10:08:57 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Sai Krishna Gajula <saikrishnag@marvell.com>
-Cc: "bhelgaas@google.com" <bhelgaas@google.com>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"vinicius.gomes@intel.com" <vinicius.gomes@intel.com>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Geethasowjanya Akula <gakula@marvell.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Hariprasad Kelam <hkelam@marvell.com>,
-	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-	Naveen Mamindlapalli <naveenm@marvell.com>
-Subject: Re: [net-next PATCH v2] octeontx2: Add PTP clock driver for Octeon
- PTM clock.
-Message-ID: <20240228160857.GA272997@bhelgaas>
+	s=arc-20240116; t=1709136663; c=relaxed/simple;
+	bh=x4cppwy5kuHxn1Xdw/R0WLbMpw8zlt+UyW3XE5G3RSw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PeGYpb9bXkn9VdRpZbL4gxt65nXRH3hS7uIATzhvdhtOBTDlVpLsoEPhzUlpwI6YiYF6794gqOgBrmwi86vFwtOZ8vNEqHhIfB79Xid9R07nZuEnRoor1tAyZY8KOBRBashH/ZlJkLrLoxmQEN1t8mbqCQLavyBVfEOzjLzdpcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aR5LDzrK; arc=none smtp.client-ip=209.85.161.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5a0a19c9bb7so1914960eaf.3;
+        Wed, 28 Feb 2024 08:11:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709136661; x=1709741461; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UM7fB83xrY7g3CIrUJgpt+5lWVhOTXwWDbWvr1lXm3o=;
+        b=aR5LDzrKBVpQoLw5bR2v3dc+uWVkN5IFLzc7kb/OWdpF9k67QbUSzCkjLX7gDlG11o
+         gP6smNiQXiqCW3rvqs4aQoOjwF7pM4TuFbPbi/Tav6ML7ak9NY0bYOV218axG683V4vV
+         VAag+pv81zLuB7O3YAfkK1eWgm2TYZ84omougYKbYOOt39QmM+SpG03B0ZSeiPyAhSV9
+         zCYulM3PAnvcGLb7Ap/90w/OouC+Z8tVN2cN//3PXh6x2U2x0kKx+SeBXKu6CvUgRLtP
+         4Why03SmMW6geYuZvb4ztjhT7Bht+rNUXcIkb5czeyeHJMihcOxRe5IEaacIThVxtgb1
+         aX2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709136661; x=1709741461;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UM7fB83xrY7g3CIrUJgpt+5lWVhOTXwWDbWvr1lXm3o=;
+        b=G+9kmGSHVdh+qj3gTGdsWeraTgFODlHWGqfLr8FQxs5sk3m7WqMXjXbko3h6XSgC1m
+         9VqvV6CMFL8qAPEkBELJcjDCA+1G00V1umKJ3gN3u7DOkJB4c4OIknNzN9281M7LTHsr
+         K6noDvlOKOI6IfqDzQZT88yDdhHTgDVYK47RTqrCkBdVXXNZLmwL3EzOLrg70fFPO5XV
+         AcS/6v6bz03UO7/OrU4eB6IEabJo1j1LxxnHjxdEqnljbjrpJIQjlxMifjxoEDWt9+UB
+         UWE17yM5ADcbhrVkaBoz4EZazc62JtancXwa/lwn4UE2MFBXCtOa7ZvNoAEejTUdT1xu
+         6AAw==
+X-Forwarded-Encrypted: i=1; AJvYcCW2lXB9q/oa/FB+pBjxjnyyU3hvxR4Ev8dPdx5x6FOpo95I2uNMqE/GHxpmGqZCeXLFqiZuoOTkkyK2F9aSaekmoVluKvA0m6/rEZuUkhVGihBcvZQ15rF5W32rKX3qXtJFeLuuOW/i/oE57tqWIX98ol0iUoYUVi1BODnobCwAYE7eyFb9NSmR7XFg+M7XsrBHr4hs1Qr4r4hBTKCH
+X-Gm-Message-State: AOJu0YzcUMAUheJpb5q2PrywtTKcxaSE1VujbR5NqIJd31f0Gc1xxMqB
+	efk1DXtH81WvN2HQDdkashMbFtfI9Maj67AL7xDRO12XK4eXC39z
+X-Google-Smtp-Source: AGHT+IHVqmXgCjjpeT3Ayfgm29V7pLwkYccA07WjeKQIvCijKqteNCHyaFrBaReNdiJYMkPFdwfJlQ==
+X-Received: by 2002:a05:6359:4c0f:b0:178:94bc:72ef with SMTP id kj15-20020a0563594c0f00b0017894bc72efmr17459234rwc.25.1709136660774;
+        Wed, 28 Feb 2024 08:11:00 -0800 (PST)
+Received: from localhost ([2601:344:8301:57f0:2256:57ae:919c:373f])
+        by smtp.gmail.com with ESMTPSA id h8-20020a255f48000000b00dcda5ddeccasm1939107ybm.30.2024.02.28.08.10.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 08:11:00 -0800 (PST)
+Date: Wed, 28 Feb 2024 08:10:59 -0800
+From: Yury Norov <yury.norov@gmail.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Alexander Potapenko <glider@google.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Jiri Pirko <jiri@resnulli.us>, Ido Schimmel <idosch@nvidia.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Simon Horman <horms@kernel.org>, linux-btrfs@vger.kernel.org,
+	dm-devel@redhat.com, ntfs3@lists.linux.dev,
+	linux-s390@vger.kernel.org,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+	Syed Nayyar Waris <syednwaris@gmail.com>,
+	William Breathitt Gray <william.gray@linaro.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: Re: [PATCH net-next v5 01/21] lib/bitmap: add bitmap_{read,write}()
+Message-ID: <Zd9bE0Z3djvj3+As@yury-ThinkPad>
+References: <20240201122216.2634007-1-aleksander.lobakin@intel.com>
+ <20240201122216.2634007-2-aleksander.lobakin@intel.com>
+ <3f6df876-4b25-4dc8-bbac-ce678c428d86@app.fastmail.com>
+ <CAG_fn=Wb81V+axD2eLLiE9SfdbJ8yncrkhuyw8b+6OBJJ_M9Sw@mail.gmail.com>
+ <b4309c85-026c-4fc9-8c26-61689ac38fa1@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <BY3PR18MB4707DBB80B5949EA26F7ABECA0582@BY3PR18MB4707.namprd18.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b4309c85-026c-4fc9-8c26-61689ac38fa1@app.fastmail.com>
 
-On Wed, Feb 28, 2024 at 12:37:02PM +0000, Sai Krishna Gajula wrote:
-> > -----Original Message-----
-> > From: Bjorn Helgaas <helgaas@kernel.org>
-> > Sent: Monday, February 26, 2024 10:31 PM
-> ...
-> > On Mon, Feb 26, 2024 at 03:40:25PM +0000, Sai Krishna Gajula wrote:
-> > > > -----Original Message-----
-> > > > From: Bjorn Helgaas <helgaas@kernel.org>
-> > > > Sent: Wednesday, February 14, 2024 10:59 PM ...
-> > > > On Wed, Feb 14, 2024 at 06:38:53PM +0530, Sai Krishna wrote:
-> > > > > The PCIe PTM(Precision time measurement) protocol provides precise
-> > > > > coordination of events across multiple components like PCIe host
-> > > > > clock, PCIe EP PHC local clocks of PCIe devices. This patch adds
-> > > > > support for ptp clock based PTM clock. We can use this PTP device
-> > > > > to sync the PTM time with CLOCK_REALTIME or other PTP PHC devices
-> > > > > using phc2sys.
-
-> > > > > +static int __init ptp_oct_ptm_init(void) {
-> > > > > +	struct pci_dev *pdev = NULL;
-> > > > > +
-> > > > > +	pdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
-> > > > > +			      PCI_DEVID_OCTEONTX2_PTP, pdev);
-> > > >
-> > > > pci_get_device() is a sub-optimal method for a driver to claim a device.
-> > > > pci_register_driver() is the preferred method.  If you can't use
-> > > > that, a comment here explaining why not would be helpful.
-> > >
-> > > We just want to check the PTP device availability in the system as one
-> > > of the use case is to sync PTM time to PTP.
-> > 
-> > This doesn't explain why you can't use pci_register_driver().  Can
-> > you clarify that?
+On Thu, Feb 01, 2024 at 03:02:50PM +0100, Arnd Bergmann wrote:
+> On Thu, Feb 1, 2024, at 14:45, Alexander Potapenko wrote:
+> > On Thu, Feb 1, 2024 at 2:23 PM Arnd Bergmann <arnd@arndb.de> wrote:
+> >> On Thu, Feb 1, 2024, at 13:21, Alexander Lobakin wrote:
+> >>
+> >> As far as I can tell, the header ends up being included
+> >> indirectly almost everywhere, so just parsing these functions
+> >> likey adds not just dependencies but also compile time.
+> >>
+> >
+> > Removing particular functions from a header to reduce compilation time
+> > does not really scale.
+> > Do we know this case has a noticeable impact on the compilation time?
+> > If yes, maybe we need to tackle this problem in a different way (e.g.
+> > reduce the number of dependencies on it)?
 > 
-> This is not a PCI endpoint driver.  This piece of code is used to
-> identify the silicon version.  We will update the code by reading
-> the silicon version from Endpoint internal BAR register offsets.
-
-> > I assume the PCI_DEVID_OCTEONTX2_PTP device is a PCIe Endpoint,
-> > and this driver runs on the host?  I.e., this driver does not run
-> > as firmware on the Endpoint itself?  So if you run lspci on the
-> > host, you would see this device as one of the PCI devices?
-> > 
-> > If that's the case, a driver would normally operate the device via
-> > MMIO accesses to regions described by PCI BARs.  "lspci -v" would
-> > show those addresses.
+> Cleaning up the header dependencies is definitely possible in
+> theory, and there are other places we could start this, but
+> it's also a multi-year effort that several people have tried
+> without much success.
 > 
-> This driver don't run on Host but runs on the EP firmware itself.
+> All I'm asking here is to not make it worse by adding this
+> one without need. If the function is not normally inlined
+> anyway, there is no benefit to having it in the header.
+> 
+>       Arnd
 
-The "endpoint driver" terminology is a bit confusing here.  See
-Documentation/PCI/endpoint/pci-endpoint.rst for details.
+Hi Arnd,
 
-If this driver actually runs as part of the Endpoint firmware, it
-would not normally see a hierarchy of pci_devs, and I don't think
-pci_get_device() would work.
+I think Alexander has shown that the functions are normally inlined.
+If for some target that doesn't hold, we'd use __always_inline.
 
-So I suspect this driver actually runs on the host, and it looks like
-it wants to use the same device (0x177d:0xa00c) as these two drivers:
+They are very lightweight by nature - one or at max two word fetches
+followed by some shifting. We spent quite some cycles making sure
+that the generated code looks efficient, at least not worse than the
+existing bitmap_{get,set}_value8(), which is a special case of the
+bitmap_{read,write}.
 
-  drivers/net/ethernet/cavium/common/cavium_ptp.c:#define PCI_DEVICE_ID_CAVIUM_PTP        0xA00C
-  drivers/net/ethernet/marvell/octeontx2/af/ptp.c:#define PCI_DEVID_OCTEONTX2_PTP                 0xA00C
+I agree that bitmap header is overwhelmed (like many other kernel
+headers), and I'm working on unloading it.
 
-It seems like maybe it should be integrated into them?  Otherwise you
-have multiple drivers thinking they are controlling a single device.
+I checked allyesconfig build time before and after this patch, and
+I found no difference for me. So if you're concerned about compilation
+time, this patch doesn't make things worse in this department.
 
-Bjorn
+With all that, Alexander, can you please double-check that the
+functions get inlined, and if so:
+
+Signed-off-by: Yury Norov <yury.norov@gmail.com>
 
