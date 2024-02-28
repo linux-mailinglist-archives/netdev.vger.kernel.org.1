@@ -1,127 +1,171 @@
-Return-Path: <netdev+bounces-75688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D43E86AEC0
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:08:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 140D486AEE7
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:14:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCF0B28D141
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:08:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1444E1C20F29
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:14:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B85DB73536;
-	Wed, 28 Feb 2024 12:08:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3024673527;
+	Wed, 28 Feb 2024 12:14:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gt213mjL"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="mv7QAL7V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CEDA7350A;
-	Wed, 28 Feb 2024 12:08:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA977353F
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 12:14:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709122086; cv=none; b=Qv1bO9fgHnCxAfzRq+YckNfn92Lu2kiXCJpADV6OVwLQvTBiYOGPKCgjbx/vf0ylZOmp4ECMQjyZAMhKbfFgnU5iUmiMt7CKDkYBhQfu8zj98kediy91JHv+TqhCivplM1wS+FTg6MY5URtATlQGXySVHB6Hb9kRHs367I95iVU=
+	t=1709122491; cv=none; b=LS7HeUDutFMGlsGIxLya/Or8sGb5q70l2MxLy5mkv+Ua8gPgn2/naGfvmX17ntBsGLObpYJgtkA0RUgzeEof82eJPK1IVezEavSRxvA3z8sz89zPrnIL6OCKOOENnq/hmjc8Yi7rIGy5tcRHTItRXlYkzkEgy/uqLe0ls5AIVYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709122086; c=relaxed/simple;
-	bh=rcSNTBiRF+f+3t3RzyuU+qKQ8ru2QZn9y+YmrmBALig=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kd66qe3EczjkLHo7uUQhuZT3OzMgGdB3XGW2hPmm/IcsJe56QktY/vYKFbgEI5/M/2Ka4QvQYkl62ZEY0xLcg6pwt2DKlNeLkQq7HFIOPREpnStrTWdUPZ50T3h9UuiXoNQJw7gLH486eputnOZGHoWVMZEYRyJJ89n4xbeyHWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gt213mjL; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1dc49b00bdbso47891925ad.3;
-        Wed, 28 Feb 2024 04:08:04 -0800 (PST)
+	s=arc-20240116; t=1709122491; c=relaxed/simple;
+	bh=XRJuTkht8FxfCspd+iue+yvGTbmirCbnGs+3Uw3zWFQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VttcLYIfjDnsD37/qJ6aGByuwfww5hAow3Gnh1NagEwGUEEKCTcnUsfI3Sp1z8ShQleXaoSHhgsVv5Nj36y8mQZP6hEh71KFMOgiDs2gYxITRhnOG6//RwF3vEM/fWE6jMDy6to7NgYVfEv+XS8vIn+XYS0C0YlCkYis1XlZBPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=mv7QAL7V; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-564fc495d83so6337284a12.0
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 04:14:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709122084; x=1709726884; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ANLYUYqTJ5NOkYuF+uWmj+L6Rv2c3OMTBVV8U8yPtxY=;
-        b=gt213mjL+CQMFoUhYDypcjhusyE1hoH3DWWJ6DO44XBkEhx+dQ+wUcdZ2UEutNbq6p
-         0H4erylD+jmNDFvkTLPwepOkpigwa6AMtlh9VSOo4xxMiPih5yt9T227NBeKNJGy+zye
-         UwUFO+6IpsqqYvag/O071mYn6//DGVW2BwF3VLtgOmYM+4IFngWVnqOXXUsuiZd/nrbx
-         zbe+ZvKdpS2a//h6DzgI/myvelR1kwXxbRlqlh76tvOSg86RvjgRd0zBsCoWttaISVtQ
-         K1dQTD+w6tL0t3X8YotQ4PF35csEX2qVsm5Y4u0k1gRBGD04zLie8agIO4cjjdW5uWCU
-         xKBw==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709122487; x=1709727287; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yNYMykttlXrGu+y3ZcK4zIjxaM0WUhP8MC7XJIO29wk=;
+        b=mv7QAL7VImTTNEz70Ce6uwUSejXL3dgD6uLW3WhEVArww9A1a8FcQpw07C1pRD/srQ
+         sLwmsgUSK3Od4YidKCnY1d5ixQDxTITMfILYCPteXixiXDI140lwqrwwfrnrfpJuSXib
+         e1VRWM4HIUuLkuHhiyX/orREXsmgB1eJXyXL5iEdw+nBfY3MRgY0M0Fr/7pA8VUaa5Pc
+         HEj38qixmp6JnOG8FjOUexhkUBKoE/52yAdOCJTL+ys+ZRqcmFSh2GWimRIXNKZcLfCg
+         HAYCt/yUZ4QwBdsr+2L/d1EbKT0R1MOOAPQfbyqAhv7vYtf+xM06YbVj/2A/xYSdyvgx
+         U/xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709122084; x=1709726884;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ANLYUYqTJ5NOkYuF+uWmj+L6Rv2c3OMTBVV8U8yPtxY=;
-        b=EtJJlF8SPQRq/lIUN8/YaYvpn8akArxN+KbqRi6t1Wr8bmHwgeOccNpEeRW5qy1yAl
-         Q0LVeJgkMIHy0EGD8J8Uy0SIdqbSqPWOGMFY1LSWlVO7bueaiUqZc/Km51t08CfAjChv
-         lR5VPxJsyBzcrOYsMnM/cV+iHULLCzv1s/l7upUDUWCjbr9ypQiHrLBd84hAnvu+8H8J
-         UTNMHLoHO64IhnjblNQrpD5MasPJsrqwC5EBz5es9DpSJMdtkq+XaHhSJJ6eR63zijoS
-         e2CyWQlFANodZ+vILvkX3r08I+P4enL5BLDIRhgbv1qQZv3Vuy+YGfXczQ1xkfLwi9MT
-         /rcw==
-X-Forwarded-Encrypted: i=1; AJvYcCWwKsbjs71fISf7pNB5IKQWN3GtInuH/Fb+IWVundW0O2CwmYS5C10nfCOECBtLjnS9NZlTCmXaeZgqTl1X5sAaj6lkGmKFcidlnDktBrQN8tSWGCITImF1vDmmgYxnjypMAbMmox5A8hdiiJzS
-X-Gm-Message-State: AOJu0YywzRiPOj3vcj0d8wPj594/XdLbkLyR/JDuQAhOGEUaUAngmU3p
-	MRuCOmnpii9t5cRp9XvMelhPn8nHwLgONh1veH5/Yim463sUHw8R
-X-Google-Smtp-Source: AGHT+IGP42kjWB8saR6KLXiU1B9P0carRihw2Cx8tj11SQU6hGJ5c12DXyzjOvoSTq7B+P50pTbgug==
-X-Received: by 2002:a17:903:41cb:b0:1db:fad5:26b0 with SMTP id u11-20020a17090341cb00b001dbfad526b0mr13295243ple.55.1709122084392;
-        Wed, 28 Feb 2024 04:08:04 -0800 (PST)
-Received: from localhost.localdomain ([115.99.206.243])
-        by smtp.gmail.com with ESMTPSA id km8-20020a17090327c800b001d8f81ecebesm3166594plb.192.2024.02.28.04.08.01
+        d=1e100.net; s=20230601; t=1709122487; x=1709727287;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yNYMykttlXrGu+y3ZcK4zIjxaM0WUhP8MC7XJIO29wk=;
+        b=pQjMOgsZeBL7VhMaIEbYvz/dvgNpnGzCMCFApO66Swg2Z+OWmE+e+EcQ8YgAG+JIOV
+         RFTmmvAn/Q++G5BCUeKyBvNFMo2xV5D3lZyRwM8+QsWIiSE40CB8P5lyldBhZac51vGh
+         L3eQFqKpxw7xvFAvRSZr8V6a8Jo3mLuO4ZxOuzDf5Si5lMDiCevwqmH6nojvRRVSzoG0
+         0Ge3TQHX08H9SsTVFW+eyGyiyo83xP514NCeUVrB/mbB6fHo0GGk8RcSDxU/Gaz/wrEp
+         TuwoCQ7dK4J93B7JuPju4H+rtNTb06rOk+ySdrNtD4wf1LKz8FKZY5Fr65CjchygbdHQ
+         /yCg==
+X-Forwarded-Encrypted: i=1; AJvYcCUfhMIb9BSvKu/MF+h82ljfUEqcSDI2oWGsmcKz/QQtl7zciNFbsL25aWo4yjufVCquUOMqoPEjhJi8ifLXqzwUYmd1jPRI
+X-Gm-Message-State: AOJu0YwNoOjDDZQLEJQUWwdAOZQ4VEBYdU4rqDRJ+YW6XTF3gHtPo4Te
+	MVVgNrrcXOVat7nk8c2fHpjJGD2CgrNoJoujSo7QGS5XKxQwvmtLJNwjw6rk9bAR2wqLWBnbXC3
+	n
+X-Google-Smtp-Source: AGHT+IGh73Y5mwH/q9NIDOFycKr698w+3J5hP8zWoSzRrNokpqVNMgBoMAn7izajjDIbM8mozmLa+Q==
+X-Received: by 2002:aa7:d716:0:b0:564:4f6f:a7ff with SMTP id t22-20020aa7d716000000b005644f6fa7ffmr8206102edq.20.1709122486808;
+        Wed, 28 Feb 2024 04:14:46 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ec31-20020a0564020d5f00b0056650cd0156sm1048290edb.66.2024.02.28.04.14.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 04:08:03 -0800 (PST)
-From: Prabhav Kumar Vaish <pvkumar5749404@gmail.com>
-To: shuah@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	petrm@nvidia.com,
-	idosch@nvidia.com,
-	Prabhav Kumar Vaish <pvkumar5749404@gmail.com>
-Subject: [PATCH net-next] selftests: net: Correct couple of spelling mistakes
-Date: Wed, 28 Feb 2024 17:37:01 +0530
-Message-Id: <20240228120701.422264-1-pvkumar5749404@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Wed, 28 Feb 2024 04:14:46 -0800 (PST)
+Date: Wed, 28 Feb 2024 13:14:43 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Louis Peens <louis.peens@corigine.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Fei Qin <fei.qin@corigine.com>,
+	netdev@vger.kernel.org, oss-drivers@corigine.com
+Subject: Re: [PATCH net-next v2 1/4] devlink: add two info version tags
+Message-ID: <Zd8js1wsTCxSLYxy@nanopsycho>
+References: <20240228075140.12085-1-louis.peens@corigine.com>
+ <20240228075140.12085-2-louis.peens@corigine.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240228075140.12085-2-louis.peens@corigine.com>
 
-Changes :
-	- "excercise" is corrected to "exercise" in drivers/net/mlxsw/spectrum-2/tc_flower.sh
-	- "mutliple" is corrected to "multiple" in drivers/net/netdevsim/ethtool-fec.sh
+Wed, Feb 28, 2024 at 08:51:37AM CET, louis.peens@corigine.com wrote:
+>From: Fei Qin <fei.qin@corigine.com>
+>
+>Add definition and documentation for the new generic
+>info "board.model" and "part_number".
+>
+>Signed-off-by: Fei Qin <fei.qin@corigine.com>
+>Signed-off-by: Louis Peens <louis.peens@corigine.com>
+>---
+> Documentation/networking/devlink/devlink-info.rst | 10 ++++++++++
+> include/net/devlink.h                             |  5 +++++
+> 2 files changed, 15 insertions(+)
+>
+>diff --git a/Documentation/networking/devlink/devlink-info.rst b/Documentation/networking/devlink/devlink-info.rst
+>index 1242b0e6826b..e663975a6b19 100644
+>--- a/Documentation/networking/devlink/devlink-info.rst
+>+++ b/Documentation/networking/devlink/devlink-info.rst
+>@@ -146,6 +146,11 @@ board.manufacture
+> 
+> An identifier of the company or the facility which produced the part.
+> 
+>+board.model
+>+-----------
+>+
+>+Board design model.
+>+
+> fw
+> --
+> 
+>@@ -203,6 +208,11 @@ fw.bootloader
+> 
+> Version of the bootloader.
+> 
+>+part_number
+>+-----------
+>+
+>+Part number of the entire product.
+>+
+> Future work
+> ===========
+> 
+>diff --git a/include/net/devlink.h b/include/net/devlink.h
+>index 9ac394bdfbe4..edcd7a1f7068 100644
+>--- a/include/net/devlink.h
+>+++ b/include/net/devlink.h
+>@@ -605,6 +605,8 @@ enum devlink_param_generic_id {
+> #define DEVLINK_INFO_VERSION_GENERIC_BOARD_REV	"board.rev"
+> /* Maker of the board */
+> #define DEVLINK_INFO_VERSION_GENERIC_BOARD_MANUFACTURE	"board.manufacture"
+>+/* Model of the board */
+>+#define DEVLINK_INFO_VERSION_GENERIC_BOARD_MODEL       "board.model"
+> 
+> /* Part number, identifier of asic design */
+> #define DEVLINK_INFO_VERSION_GENERIC_ASIC_ID	"asic.id"
+>@@ -632,6 +634,9 @@ enum devlink_param_generic_id {
+> /* Bootloader */
+> #define DEVLINK_INFO_VERSION_GENERIC_FW_BOOTLOADER	"fw.bootloader"
+> 
+>+/* Part number for entire product */
+>+#define DEVLINK_INFO_VERSION_GENERIC_PART_NUMBER       "part_number"
 
-Signed-off-by: Prabhav Kumar Vaish <pvkumar5749404@gmail.com>
----
- .../testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh | 2 +-
- tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh    | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+/* Part number, identifier of board design */
+#define DEVLINK_INFO_VERSION_GENERIC_BOARD_ID   "board.id"
 
-diff --git a/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh b/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh
-index 616d3581419c..31252bc8775e 100755
---- a/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh
-+++ b/tools/testing/selftests/drivers/net/mlxsw/spectrum-2/tc_flower.sh
-@@ -869,7 +869,7 @@ bloom_simple_test()
- bloom_complex_test()
- {
- 	# Bloom filter index computation is affected from region ID, eRP
--	# ID and from the region key size. In order to excercise those parts
-+	# ID and from the region key size. In order to exercise those parts
- 	# of the Bloom filter code, use a series of regions, each with a
- 	# different key size and send packet that should hit all of them.
- 	local index
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh b/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
-index 7d7829f57550..6c52ce1b0450 100755
---- a/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
-+++ b/tools/testing/selftests/drivers/net/netdevsim/ethtool-fec.sh
-@@ -49,7 +49,7 @@ for o in llrs rs; do
- Active FEC encoding: ${o^^}"
- done
- 
--# Test mutliple bits
-+# Test multiple bits
- $ETHTOOL --set-fec $NSIM_NETDEV encoding rs llrs
- check $?
- s=$($ETHTOOL --show-fec $NSIM_NETDEV | tail -2)
--- 
-2.34.1
+Isn't this what you are looking for?
 
+"part_number" without domain (boards/asic/fw) does not look correct to
+me. "Product" sounds very odd.
+
+pw-bot: cr
+
+
+
+>+
+> /**
+>  * struct devlink_flash_update_params - Flash Update parameters
+>  * @fw: pointer to the firmware data to update from
+>-- 
+>2.34.1
+>
+>
 
