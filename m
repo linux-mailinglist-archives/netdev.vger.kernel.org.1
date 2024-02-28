@@ -1,129 +1,195 @@
-Return-Path: <netdev+bounces-75840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE61F86B51E
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:38:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C548D86B538
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:44:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7842428C311
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:38:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80F5028B5F2
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:44:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A520D1E4A8;
-	Wed, 28 Feb 2024 16:38:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05B61E86C;
+	Wed, 28 Feb 2024 16:43:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="LdkB87zd"
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="YmRLWnyh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1006EF1E
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 16:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A376EEFD;
+	Wed, 28 Feb 2024 16:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709138285; cv=none; b=Fcg9nDjuZ2O916utuurUack/NPnTC5QnExVXP2js/gB1h+NllyxnxozsyenhabgFVFptt2pLbxVk2hRglgDSMM1/CxgqPOgj3ItHs6hHYVe5vH3YzakBzW3auF/MBkcC0bK/81Gi4ILLGL+ZkQrN/aKSaaTLiaUj/CQvDRX8ogQ=
+	t=1709138635; cv=none; b=hunHZ4Wd/biEcZ+SI1bv8V40P2fGYoF2soZmHk27wiM5z6wAc1r5jUvHcrmNkm0+nIuhEIlabfZ46RpCZCAnHzc+sJCOyjxeOkZ4CgWyNzOXI6bHv9KF2F3sS7EEYWbxWXoemXDmixz4nf6PdTtK+au4u9YsV6rBNjgEXqnPFVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709138285; c=relaxed/simple;
-	bh=9PTeAYYKh6BghzUQ5SY1FEoCFtAzge8LlEvtJa+/mwI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o+cYPMuC1yg6yBg/phcdbGOTR/2zXzwfdfmSa/NZiJzh0rTBLBVi+g64MjJ8nR7x+GtDNxxvxadiyAyUz0uxkTqbWPawwDrQnSTju3ngWMMzT18LO7mSzikxEN849XCI2UPS3NRKvyiI4LSKrMsdqU2vlVJq8g+tym7HCZxPKcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=LdkB87zd; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a3f893ad5f4so797923866b.2
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 08:38:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1709138282; x=1709743082; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EWAQpAUpfQCDhx0rGjR9Oel5LgwsLKY+ggnWMU654+8=;
-        b=LdkB87zd/3Ey/TszPdJTjeBQW0CD8ooalvGxGuuwIAZDzqDmWaj0B/AU3vvPUzguME
-         efMh/O1i1e4AdYTsJ3LCDduY7WErH+GOcYL3Ekt+sK6CmLuLTCFWegQfToCkq+bDYAjC
-         ExlXDdy4kn7Lo124FUzyhxciy7Avg9lImGOpWtlvlk2DK1rWKQR+3x8FfYJHE1mWw477
-         IjVO27AnTPrNXoYNbzQ0lKRhYwuSxcxok561LJwnPBBkVcNrAYGKF7vy11qiqQ56HaBN
-         WD60dlG3pOb5Q0iKZKsxGKSXPkiwcJeiOVS1+KjFR/wXicr3DWprGwOJwMT5FsaH4iBW
-         wFhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709138282; x=1709743082;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EWAQpAUpfQCDhx0rGjR9Oel5LgwsLKY+ggnWMU654+8=;
-        b=SVvFDtGx/EWwqhFMVTxGwuoMKjmdRhwauFa2A0bZD6Mrery6LThpF37ZFPPdMuPc5V
-         S1y5iml3i0DxV/AvBX7oAn8Eu6/m2DRQ71bgAM9jZEvJ2zimINyrQvxL5MqgScXTNrRF
-         e0U2k5xMrRdts4ZOYFJN/xsfvdFQI3+yOBnoLR5JZGXfwWRPkGjDptqmSTdtquHe1DfL
-         2j/3ejvrA2TnKI/jv3MlZ7b71ZnFzUhYuIgAru+fdIQc0Q06Z2NftIEku+dfJIL8ke0s
-         gn7w8bWqw3xXNBZL0tsUklPdwFkyvRMOA/rBz/bqJjdIa/W/tPtlTsUZmA+XINGX/guG
-         G0rg==
-X-Forwarded-Encrypted: i=1; AJvYcCUHNBmP30Btq+t8Mh1RxcQ8yxS6K0Fw0HZeecHUYppjbDHg5V3rn5pukx+TYJNqsZYhAnYpMUCTJ1GP3Fa+MdruHKrmnhn1
-X-Gm-Message-State: AOJu0YwxBuslu7Lo/07bHDGAJEXBgpULiL93mUZznUVNAIm060TBXEuj
-	1OKHYjQ4kmQslBoOdTr3N6+L/tjEFzy01SX2QgrQC1lH/tC0SBFhdwrpE9hXRHi0eBj9Lc1jT9u
-	1NpouMFBf638RwbML5iyH+qjgulWl4ZSvgnJFzw==
-X-Google-Smtp-Source: AGHT+IH6HQq8hzqji91OJqqxN2VkP0/oD9hn7fSXzbwfcVbmFDthP3qt0d5uMMo2K+yS0zBkR2z5gsNJJobM1iVOpOM=
-X-Received: by 2002:a17:906:e8f:b0:a43:49ca:2473 with SMTP id
- p15-20020a1709060e8f00b00a4349ca2473mr193121ejf.0.1709138282075; Wed, 28 Feb
- 2024 08:38:02 -0800 (PST)
+	s=arc-20240116; t=1709138635; c=relaxed/simple;
+	bh=FYKCx/CB7lBAZml9S7q6VnA/X2Dc69iuw7PNmS0oyIY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e7I0DLjDMG3iaHDU4kN1iY0XMKltMydv6hoIDfxb4LCmHoRKjyMnq6N30n7y5YEH8HFQMFffbCeC45EomwoU5N3liNvogLlPdvGGkp+qNcChyaxNQ6eBo/YAubb3byObPiLTGpDSVwqSRoI3XJ8ZcelsSbCXQpTUJAGx5/UT9nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=YmRLWnyh; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
+Received: from localhost.ispras.ru (unknown [10.10.165.5])
+	by mail.ispras.ru (Postfix) with ESMTPSA id ABD2140B2789;
+	Wed, 28 Feb 2024 16:43:41 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru ABD2140B2789
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1709138622;
+	bh=8Kapx+kuKpDoK4A4QmaYAHOJUYLKDxYZDCpVP7uvsw8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=YmRLWnyh6WTPq/1NtKnORSTnFTdNK0XBXz/JSesuPeJ/UQOd50aBB4vhpf1sWpoPS
+	 Tr78j7iRNgy1AhFUrp4q6Rejc7APf7S8uVsxZ/fCxADORifj6TkwcgVsP3uoBXvoL/
+	 7tTwO71wdrhvoTvkiYudjlDnsw5k/KEryMG38+8U=
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+To: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Alexey Khoroshilov <khoroshilov@ispras.ru>,
+	lvc-project@linuxtesting.org,
+	stable@vger.kernel.org
+Subject: [PATCH wpan] mac802154: fix llsec key resources release in mac802154_llsec_key_del
+Date: Wed, 28 Feb 2024 19:38:39 +0300
+Message-ID: <20240228163840.6667-1-pchelkin@ispras.ru>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Zd4DXTyCf17lcTfq@debian.debian> <CANn89iJQX14C1Qb_qbTVG4yoG26Cq7Ct+2qK_8T-Ok2JDdTGEA@mail.gmail.com>
- <d633c5b9-53a5-4cd6-9dbb-6623bb74c00b@paulmck-laptop> <f1d1e0fb-2870-4b8f-8936-881ac29a24f1@joelfernandes.org>
-In-Reply-To: <f1d1e0fb-2870-4b8f-8936-881ac29a24f1@joelfernandes.org>
-From: Yan Zhai <yan@cloudflare.com>
-Date: Wed, 28 Feb 2024 10:37:51 -0600
-Message-ID: <CAO3-Pboo32iQBBUHUELUkvvpSa=jZwUqefrwC-NBjDYx4yxYJQ@mail.gmail.com>
-Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
-To: Joel Fernandes <joel@joelfernandes.org>
-Cc: paulmck@kernel.org, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Lorenzo Bianconi <lorenzo@kernel.org>, 
-	Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>, 
-	Alexander Duyck <alexanderduyck@fb.com>, Hannes Frederic Sowa <hannes@stressinduktion.org>, 
-	linux-kernel@vger.kernel.org, rcu@vger.kernel.org, bpf@vger.kernel.org, 
-	kernel-team@cloudflare.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 28, 2024 at 9:37=E2=80=AFAM Joel Fernandes <joel@joelfernandes.=
-org> wrote:
-> Also optionally, I wonder if calling rcu_tasks_qs() directly is better
-> (for documentation if anything) since the issue is Tasks RCU specific. Al=
-so
-> code comment above the rcu_softirq_qs() call about cond_resched() not tak=
-ing
-> care of Tasks RCU would be great!
->
-Yes it's quite surprising to me that cond_resched does not help here,
-I will include that comment. Raising just the task RCU QS seems
-sufficient to the problem we encountered. But according to commit
-d28139c4e967 ("rcu: Apply RCU-bh QSes to RCU-sched and RCU-preempt
-when safe"), there might be additional threat factor in __do_softirq
-that also applies to threaded poll.
+mac802154_llsec_key_del() can free resources of a key directly without
+following the RCU rules for waiting before the end of a grace period. This
+may lead to use-after-free in case llsec_lookup_key() is traversing the
+list of keys in parallel with a key deletion:
 
-Yan
+refcount_t: addition on 0; use-after-free.
+WARNING: CPU: 4 PID: 16000 at lib/refcount.c:25 refcount_warn_saturate+0x162/0x2a0
+Modules linked in:
+CPU: 4 PID: 16000 Comm: wpan-ping Not tainted 6.7.0 #19
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:refcount_warn_saturate+0x162/0x2a0
+Call Trace:
+ <TASK>
+ llsec_lookup_key.isra.0+0x890/0x9e0
+ mac802154_llsec_encrypt+0x30c/0x9c0
+ ieee802154_subif_start_xmit+0x24/0x1e0
+ dev_hard_start_xmit+0x13e/0x690
+ sch_direct_xmit+0x2ae/0xbc0
+ __dev_queue_xmit+0x11dd/0x3c20
+ dgram_sendmsg+0x90b/0xd60
+ __sys_sendto+0x466/0x4c0
+ __x64_sys_sendto+0xe0/0x1c0
+ do_syscall_64+0x45/0xf0
+ entry_SYSCALL_64_after_hwframe+0x6e/0x76
 
+Also, ieee802154_llsec_key_entry structures are not freed by
+mac802154_llsec_key_del():
 
-> Reviewed-by: Joel Fernandes (Google) <joel@joelfernandes.org>
->
-> thanks,
->
->  - Joel
-> [1]
-> @@ -381,8 +553,10 @@ asmlinkage __visible void __softirq_entry __do_softi=
-rq(void)
->                 pending >>=3D softirq_bit;
->         }
->
-> -       if (__this_cpu_read(ksoftirqd) =3D=3D current)
-> +       if (!IS_ENABLED(CONFIG_PREEMPT_RT) &&
-> +           __this_cpu_read(ksoftirqd) =3D=3D current)
->                 rcu_softirq_qs();
-> +
->         local_irq_disable();
+unreferenced object 0xffff8880613b6980 (size 64):
+  comm "iwpan", pid 2176, jiffies 4294761134 (age 60.475s)
+  hex dump (first 32 bytes):
+    78 0d 8f 18 80 88 ff ff 22 01 00 00 00 00 ad de  x.......".......
+    00 00 00 00 00 00 00 00 03 00 cd ab 00 00 00 00  ................
+  backtrace:
+    [<ffffffff81dcfa62>] __kmem_cache_alloc_node+0x1e2/0x2d0
+    [<ffffffff81c43865>] kmalloc_trace+0x25/0xc0
+    [<ffffffff88968b09>] mac802154_llsec_key_add+0xac9/0xcf0
+    [<ffffffff8896e41a>] ieee802154_add_llsec_key+0x5a/0x80
+    [<ffffffff8892adc6>] nl802154_add_llsec_key+0x426/0x5b0
+    [<ffffffff86ff293e>] genl_family_rcv_msg_doit+0x1fe/0x2f0
+    [<ffffffff86ff46d1>] genl_rcv_msg+0x531/0x7d0
+    [<ffffffff86fee7a9>] netlink_rcv_skb+0x169/0x440
+    [<ffffffff86ff1d88>] genl_rcv+0x28/0x40
+    [<ffffffff86fec15c>] netlink_unicast+0x53c/0x820
+    [<ffffffff86fecd8b>] netlink_sendmsg+0x93b/0xe60
+    [<ffffffff86b91b35>] ____sys_sendmsg+0xac5/0xca0
+    [<ffffffff86b9c3dd>] ___sys_sendmsg+0x11d/0x1c0
+    [<ffffffff86b9c65a>] __sys_sendmsg+0xfa/0x1d0
+    [<ffffffff88eadbf5>] do_syscall_64+0x45/0xf0
+    [<ffffffff890000ea>] entry_SYSCALL_64_after_hwframe+0x6e/0x76
+
+Handle the proper resource release in the RCU callback function
+mac802154_llsec_key_del_rcu().
+
+Note that if llsec_lookup_key() finds a key, it gets a refcount via
+llsec_key_get() and locally copies key id from key_entry (which is a
+list element). So it's safe to call llsec_key_put() and free the list
+entry after the RCU grace period elapses.
+
+Found by Linux Verification Center (linuxtesting.org).
+
+Fixes: 5d637d5aabd8 ("mac802154: add llsec structures and mutators")
+Cc: stable@vger.kernel.org
+Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+---
+Should the patch be targeted to "net" tree directly?
+
+ include/net/cfg802154.h |  1 +
+ net/mac802154/llsec.c   | 18 +++++++++++++-----
+ 2 files changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index cd95711b12b8..76d2cd2e2b30 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -401,6 +401,7 @@ struct ieee802154_llsec_key {
+ 
+ struct ieee802154_llsec_key_entry {
+ 	struct list_head list;
++	struct rcu_head rcu;
+ 
+ 	struct ieee802154_llsec_key_id id;
+ 	struct ieee802154_llsec_key *key;
+diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
+index 8d2eabc71bbe..f13b07ebfb98 100644
+--- a/net/mac802154/llsec.c
++++ b/net/mac802154/llsec.c
+@@ -265,19 +265,27 @@ int mac802154_llsec_key_add(struct mac802154_llsec *sec,
+ 	return -ENOMEM;
+ }
+ 
++static void mac802154_llsec_key_del_rcu(struct rcu_head *rcu)
++{
++	struct ieee802154_llsec_key_entry *pos;
++	struct mac802154_llsec_key *mkey;
++
++	pos = container_of(rcu, struct ieee802154_llsec_key_entry, rcu);
++	mkey = container_of(pos->key, struct mac802154_llsec_key, key);
++
++	llsec_key_put(mkey);
++	kfree_sensitive(pos);
++}
++
+ int mac802154_llsec_key_del(struct mac802154_llsec *sec,
+ 			    const struct ieee802154_llsec_key_id *key)
+ {
+ 	struct ieee802154_llsec_key_entry *pos;
+ 
+ 	list_for_each_entry(pos, &sec->table.keys, list) {
+-		struct mac802154_llsec_key *mkey;
+-
+-		mkey = container_of(pos->key, struct mac802154_llsec_key, key);
+-
+ 		if (llsec_key_id_equal(&pos->id, key)) {
+ 			list_del_rcu(&pos->list);
+-			llsec_key_put(mkey);
++			call_rcu(&pos->rcu, mac802154_llsec_key_del_rcu);
+ 			return 0;
+ 		}
+ 	}
+-- 
+2.43.2
+
 
