@@ -1,112 +1,183 @@
-Return-Path: <netdev+bounces-75642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00B3D86AC56
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 11:45:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2199486AC59
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 11:47:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16E561C243A5
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 10:45:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A6701F24847
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 10:47:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 589F67F47F;
-	Wed, 28 Feb 2024 10:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B92112B151;
+	Wed, 28 Feb 2024 10:47:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="NzU+m5fb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CBF7E599
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 10:45:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9F17E56C
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 10:47:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709117146; cv=none; b=AhkKkOMXVPwSc7tI5QU47SkepFlyCSB31cSlLdJAiMVfiFUGsqTvl7mVHk35qmqccZpEFWv7MmrILXTfaectk4E2ZC45T/wObvis0gxRr51+5UwigzYEx9cMwmKaKQJc58Jsw8n75bmAXOdB5m9bfNsUGX4zbw/PhPRm65g9rUs=
+	t=1709117250; cv=none; b=A4MPm5yuWtBnXjmJL7Qy+2V9B0jFGdjqm4LUl+irzpesxdx+5OjMaKuTf+cgkUxLDMnrmZRHR8qLmJ9N5Y8BID13cWIAFQWTvpGay7EI0uKL5n/X+XNEEAzAfnvLdfkXrfrJrM/TbmfejAJOByZF9y25vdJyYnwLwaKd9gdV7hQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709117146; c=relaxed/simple;
-	bh=n8uBlupi2YR0Vu1WNe5FUAMPBYUuT/RYZk5MiGM7YPc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zvi0rUialKBBXBGQrSEKl6GTC2A6C+rtCRAQaodO0koWiuusCPEFzD8WKpfo58LYuFuBYatg1j6fe32Z1YFThj8MwfYNgoVCtx0uxvP5hb8E7c3WvE6t+zcEHEZfXNySAQYaFb8gQyPDH0nCIjuEU1WahO/0Q6bTPfqN/kzi2rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.110.193])
-	by gateway (Coremail) with SMTP id _____8DxaOjVDt9lfl8SAA--.27114S3;
-	Wed, 28 Feb 2024 18:45:41 +0800 (CST)
-Received: from [192.168.100.8] (unknown [112.20.110.193])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Bx8OTUDt9li8JJAA--.65518S3;
-	Wed, 28 Feb 2024 18:45:41 +0800 (CST)
-Message-ID: <f0aca3d8-3581-44c3-9b64-348b1572807e@loongson.cn>
-Date: Wed, 28 Feb 2024 18:45:40 +0800
+	s=arc-20240116; t=1709117250; c=relaxed/simple;
+	bh=79YniYFNyG3YEwZJmfAuvVSIywECnQgPLZkG8Vpl12o=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=oLDsmDQdBlnlJ57oi4vPT3WFfEEB8P4SAxIVTeSs5EvK77REET0RpAM3VubOztT1mgdqlUrtQFKwUE7ClSEWoTVyHREQHYlz+gbHOq67gCzkQxTn29SoIC+LJKKzxtm7+rIhL2b2Q+gvnjjyRpmx7l5Fzuhes5GnS+88O02KR20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=NzU+m5fb; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-513184f69abso894041e87.0
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 02:47:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1709117246; x=1709722046; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wfRgdwzRN8mqJPSb0k4wCFiTLF5dChF82GwwW7l41yg=;
+        b=NzU+m5fbykbnLdAGdKKGwBiEthTk26pP2WU0/XHxh8BVyVaKaqalmt4OdKu4yWSWTa
+         VlMLbBLwGADsZa8NOkPDvzOfobdLsZwQEwgVqfYpYL8B8eIsLkaaypFUs3BqBje5PYMG
+         CcoFPB2BXuO6trmeGZPMi2ncAVoLq8nhoynU2bTnUSKiIbP+7liw4SOFGLE7wWbbxFPz
+         UU+SqOFpKgdjYHdoMsT4PMGpDd9Jg3RlR6HJA3EkvyjULYt3KBrvB8xLGyHiFXh/LKCW
+         a2lyHDspMBlEx4PaBHqO8xGFZvvxQt0Aw8UQQPsOs8J07xIuiJBOuk42LOB0fp+EGQso
+         myng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709117246; x=1709722046;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wfRgdwzRN8mqJPSb0k4wCFiTLF5dChF82GwwW7l41yg=;
+        b=NsdSAknxk1YGUXmfeImhw62DUb1Cgxk2NrhluKNBhUTF2ij+1ps6jdH0T9fGg9BW0H
+         f5Cn9/m4c6YS0OGzbU2wdgox0jKJeIolUVosRGFm43NFS+/3hjK2LQ0zSb8j6p7V3drb
+         Bu5yUtXSQAyHscrbxXrJqhs0lsQsWpEBn/xMYPY2cfmJERhUFdNc+aGrEEvONNMhqHtN
+         EkxTpw92ORYDB3V8sOGdwsyfzobjLL6ViZtPw2NJCUXfEQWDm4td3KSd1/Vzj1styqlG
+         itJEDrP3rF+4TD5yPIHcY65PbwGHnapUlIsQJ1AR6ahBPkJDCLKupgAZoVWOgSbmCq/q
+         xu9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVkpY8kk7dBqDGkPtnu0Vut2Oxg+EFmVoAC5l/EaQl2j7ASbQ/TYTlRBp5pYtrFArsj7yrpT1fVYY8cnhIC4jghyA6djvp+
+X-Gm-Message-State: AOJu0YxwdC43PO/Ka4wllgFjhkHfHUXdih8lS9EMqustFy8RZwTnqvxF
+	qQSgIMztzPorM/7TYRrstymU1bkrUoHgrRBp5Iq+erxsjcFiE2jxjW4xd8Dzjko=
+X-Google-Smtp-Source: AGHT+IEy97/CGn9v9VzsDZdagJYqhpkYUS09Nc5/GsIGTxPAbM5/OEzCo2i0JMjsBhnS/6+ZX8dcSw==
+X-Received: by 2002:a05:6512:11c9:b0:512:fabd:8075 with SMTP id h9-20020a05651211c900b00512fabd8075mr5191179lfr.48.1709117246014;
+        Wed, 28 Feb 2024 02:47:26 -0800 (PST)
+Received: from wkz-x13 (a124.broadband3.quicknet.se. [46.17.184.124])
+        by smtp.gmail.com with ESMTPSA id h4-20020a0565123c8400b005131f3fc893sm15009lfv.214.2024.02.28.02.47.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 02:47:25 -0800 (PST)
+From: Tobias Waldekranz <tobias@waldekranz.com>
+To: Paolo Abeni <pabeni@redhat.com>, Steven Rostedt <rostedt@goodmis.org>
+Cc: davem@davemloft.net, kuba@kernel.org, roopa@nvidia.com,
+ razor@blackwall.org, bridge@lists.linux.dev, netdev@vger.kernel.org,
+ jiri@resnulli.us, ivecera@redhat.com, mhiramat@kernel.org,
+ linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 net-next 4/4] net: switchdev: Add tracepoints
+In-Reply-To: <4838ad92a359a10944487bbcb74690a51dd0a2f8.camel@redhat.com>
+References: <20240223114453.335809-1-tobias@waldekranz.com>
+ <20240223114453.335809-5-tobias@waldekranz.com>
+ <20240223103815.35fdf430@gandalf.local.home>
+ <4838ad92a359a10944487bbcb74690a51dd0a2f8.camel@redhat.com>
+Date: Wed, 28 Feb 2024 11:47:24 +0100
+Message-ID: <87a5nkhnlv.fsf@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: stmmac: fix typo in comment
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: andrew@lunn.ch, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- davem@davemloft.net, horms@kernel.org, fancer.lancer@gmail.com,
- netdev@vger.kernel.org
-References: <20240221103514.968815-1-siyanteng@loongson.cn>
- <20240222191220.0507a4de@kernel.org>
-Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <20240222191220.0507a4de@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Bx8OTUDt9li8JJAA--.65518S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj9xXoWrKF18Ww17WFWUtFWrur13Jrc_yoWkXrc_WF
-	4a9Fn8Wan8CFWFywsxKFy5urZY9F1DWr18XF9Ygaya93y7Jws3Xryv9r95Xr1kur4fuFn8
-	Crn3tFn7J342qosvyTuYvTs0mTUanT9S1TB71UUUUjUqnTZGkaVYY2UrUUUUj1kv1TuYvT
-	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-	cSsGvfJTRUUUbfxYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
-	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1ln4kS14v26r1Y6r17M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r12
-	6r1DMcIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
-	1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
-	Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
-	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
-	cVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI
-	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v2
-	6r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jOiSdUUUUU=
+Content-Type: text/plain
 
-
-在 2024/2/23 11:12, Jakub Kicinski 写道:
-> On Wed, 21 Feb 2024 18:35:14 +0800 Yanteng Si wrote:
->> This is just a trivial fix for a typo in a comment, no functional
->> changes.
->>
->> Fixes: 48863ce5940f ("stmmac: add DMA support for GMAC 4.xx")
-> Fixes is reserved for functional bugs, let's leave it out
-> for a typo correction.
-
-OK!
-
-I will remove it.
-
-Thanks,
-
-Yanteng
-
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h
->> index 358e7dcb6a9a..9d640ba5c323 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h
->> @@ -92,7 +92,7 @@
->>   #define DMA_TBS_FTOV			BIT(0)
->>   #define DMA_TBS_DEF_FTOS		(DMA_TBS_FTOS | DMA_TBS_FTOV)
->>   
->> -/* Following DMA defines are chanels oriented */
->> +/* Following DMA defines are channels oriented */
-> I'm not a native speaker but I'd spell it "... are channel-oriented"
-> With a hyphen, channel not channels.
+On tis, feb 27, 2024 at 11:04, Paolo Abeni <pabeni@redhat.com> wrote:
+> On Fri, 2024-02-23 at 10:38 -0500, Steven Rostedt wrote:
+>> On Fri, 23 Feb 2024 12:44:53 +0100
+>> Tobias Waldekranz <tobias@waldekranz.com> wrote:
+>> 
+>> > Add a basic set of tracepoints:
+>> > 
+>> > - switchdev_defer: Fires whenever an operation is enqueued to the
+>> >   switchdev workqueue for deferred delivery.
+>> > 
+>> > - switchdev_call_{atomic,blocking}: Fires whenever a notification is
+>> >   sent to the corresponding switchdev notifier chain.
+>> > 
+>> > - switchdev_call_replay: Fires whenever a notification is sent to a
+>> >   specific driver's notifier block, in response to a replay request.
+>> > 
+>> > Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
+>> > ---
+>> >  include/trace/events/switchdev.h | 74 ++++++++++++++++++++++++++++++++
+>> >  net/switchdev/switchdev.c        | 71 +++++++++++++++++++++++++-----
+>> >  2 files changed, 135 insertions(+), 10 deletions(-)
+>> >  create mode 100644 include/trace/events/switchdev.h
+>> > 
+>> > diff --git a/include/trace/events/switchdev.h b/include/trace/events/switchdev.h
+>> > new file mode 100644
+>> > index 000000000000..dcaf6870d017
+>> > --- /dev/null
+>> > +++ b/include/trace/events/switchdev.h
+>> > @@ -0,0 +1,74 @@
+>> > +/* SPDX-License-Identifier: GPL-2.0 */
+>> > +#undef TRACE_SYSTEM
+>> > +#define TRACE_SYSTEM	switchdev
+>> > +
+>> > +#if !defined(_TRACE_SWITCHDEV_H) || defined(TRACE_HEADER_MULTI_READ)
+>> > +#define _TRACE_SWITCHDEV_H
+>> > +
+>> > +#include <linux/tracepoint.h>
+>> > +#include <net/switchdev.h>
+>> > +
+>> > +#define SWITCHDEV_TRACE_MSG_MAX 128
+>> 
+>> 128 bytes is awfully big to waste on the ring buffer. What's the average
+>> size of a string?
+>> 
+>> > +
+>> > +DECLARE_EVENT_CLASS(switchdev_call,
+>> > +	TP_PROTO(unsigned long val,
+>> > +		 const struct switchdev_notifier_info *info,
+>> > +		 int err),
+>> > +
+>> > +	TP_ARGS(val, info, err),
+>> > +
+>> > +	TP_STRUCT__entry(
+>> > +		__field(unsigned long, val)
+>> > +		__string(dev, info->dev ? netdev_name(info->dev) : "(null)")
+>> > +		__field(const struct switchdev_notifier_info *, info)
+>> > +		__field(int, err)
+>> > +		__array(char, msg, SWITCHDEV_TRACE_MSG_MAX)
+>> > +	),
+>> > +
+>> > +	TP_fast_assign(
+>> > +		__entry->val = val;
+>> > +		__assign_str(dev, info->dev ? netdev_name(info->dev) : "(null)");
+>> > +		__entry->info = info;
+>> > +		__entry->err = err;
+>> > +		switchdev_notifier_str(val, info, __entry->msg, SWITCHDEV_TRACE_MSG_MAX);
+>> 
+>> Is it possible to just store the information in the trace event and then
+>> call the above function in the read stage?
 >
->>   #define DMA_CHAN_BASE_ADDR		0x00001100
->>   #define DMA_CHAN_BASE_OFFSET		0x80
->>   
+> I agree with Steven: it looks like that with the above code the
+> tracepoint itself will become measurably costily in terms of CPU
+> cycles: we want to avoid that.
+>
+> Perhaps using different tracepoints with different notifier_block type
+> would help? so that each trace point could just copy a few specific
+> fields.
 
+This can be done, but you will end up having to duplicate the decoding
+and formatting logic from switchdev-str.c, with the additional hurdle of
+having to figure out the sizes of all referenced objects in order to
+create flattened versions of every notification type.
+
+What I like about the current approach is that when new notification and
+object types are added, switchdev_notifier_str will automatically be
+able to decode them and give you some rough idea of what is going on,
+even if no new message specific decoding logic is added. It is also
+reusable by drivers that might want to decode notifications or objects
+in error messages.
+
+Would some variant of (how I understand) Steven's suggestion to instead
+store the formatted message in a dynamic array (__assign_str()), rather
+than in the tracepoint entry, be acceptable?
 
