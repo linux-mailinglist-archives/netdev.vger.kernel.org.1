@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-75766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE3EF86B1C4
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:29:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33EBC86B1C8
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:30:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 479011F26106
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:29:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5716C1C24585
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:30:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB4E1586E9;
-	Wed, 28 Feb 2024 14:29:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BCEB1586F5;
+	Wed, 28 Feb 2024 14:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MkKK58/W"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZajjM0B5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A385D159567
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 14:29:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A73881586EF
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 14:29:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709130588; cv=none; b=cT2IHJy1ubiFTiTl+jRA8Z4EyzaajNR+3ZsWSCqi3N/PzXFh+V8KJFdnXr/Cko8T1VYxRQbwXXZXT0+stsnOCVoVrmKsUvN4I8X6LOqh/zazqx/savBBrEF7SNgyFSYbTwpTu94sgGc5pGAexV3Q6gmp+MOfuMNdhxmDlekoPKQ=
+	t=1709130596; cv=none; b=ofQsFOxtFaospKi9/lyPj+XnTUa/V8mcQ0YDCrC+ZbcOsqOlrG2XckMPeKZunFHSgNp6qQtELZWvSVB74iiGsqFZnOy5WWzhh+D2RrIZrJCVAxVF6Bq+6YwuG6MTHfGRrjGQOtOb7/24hqzvK7bsrWTkpHtAYciKiAVuCkieChk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709130588; c=relaxed/simple;
-	bh=9s3ZUwCDAbfQPtYYejA0fC0kAtQq9NuIKc9X/eS+MSU=;
+	s=arc-20240116; t=1709130596; c=relaxed/simple;
+	bh=P7L32Y7yEZ6zjFMxlRCKfmu8xnKjciPPvHU3jDbZOII=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZAtynzkCb//5yZNweyic5yHiQtsurzpduPBUyx7XsBGW75l8Ir9e7QnRObqKtoN85gpJ+AYhe+fUVqBsXUJv0FrmYzah9D273Jk6O9H7vtHpT5InMioJbgy0eJMv7X5gxKjLJ81w2tIAgIom0zGjxzVGizTTDINafPr7x58VOO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MkKK58/W; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version; b=nXhCp56luLncIjk5Kbfu7ha9rwxTE3EleHy7UcDac0c90i07+FtR8KIldiCIE1eDM6PoSYKlGkagMTBaUfSrVhhY4nPZi+UcJxhp+jsK1dR/F39TaMTw4VAwwGAS1waLcvkZmjGNIsKWzz6VRAiAWeOa0QrXT/T8Nm64UhB7hG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZajjM0B5; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709130586; x=1740666586;
+  t=1709130594; x=1740666594;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9s3ZUwCDAbfQPtYYejA0fC0kAtQq9NuIKc9X/eS+MSU=;
-  b=MkKK58/W8gdKfHCNdSpjYhCrkpfWawVlPm+q9bpqP+Zbsrv51g96cp/h
-   AV6VCp5D3uKqnJDolcuCkhcUBkG51sU4Fs3gUlnOLT0W5WF3FduL6xecM
-   D9r9uA8qw0muoY84FANcewypCIFXQHwsblqzS7UV/c+k3ZMO1W9OxeovB
-   a6mkRqdmdJR1oS9xn8IFDAlEwPM+yeP3QWhtQoZ4ytNLIZREshawysPpx
-   5HVyaevHeFE1MR3SGNbrN8RN8to10mNONgQsgJd8W5I511PADzobOQSUT
-   ADNDgmSFNE2Q21StXlDdvkGyz5HrcUL6ttsPT9quPMUo8agVLJrPSo1Ke
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="25995610"
+  bh=P7L32Y7yEZ6zjFMxlRCKfmu8xnKjciPPvHU3jDbZOII=;
+  b=ZajjM0B56I82dm+Xpb4ngWTFONKWfIzgdg6kQNe20e6dOGuQKmOSCufZ
+   vg9SopbSPt6LfrcoXKT6Ogm2w3ODCZMbGjFl9zoDlvF8NKa+6ffY2bLnA
+   +Y+t5XLs43yZgNAqJsvUShBdEYBnYGNrqq2kcALSqGXeXp6DF2QptH85V
+   xJGTrNvjNfQz4GaVJ1djNFHsYQ17D0LKCOHzG7khSJHi2CFEVhTrIJrpO
+   vgJSg20BjnW1e8KEnFoblC5LI490AlBXmghOZ8JLP5gXxaOkZf34X+PaZ
+   memrKE2kCTjyXa7fwd3NFE36LBVE5FAHY1kuJDGwmvqAMuTh75A9+FKnM
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="7354511"
 X-IronPort-AV: E=Sophos;i="6.06,190,1705392000"; 
-   d="scan'208";a="25995610"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 06:29:46 -0800
+   d="scan'208";a="7354511"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 06:29:54 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,190,1705392000"; 
-   d="scan'208";a="38281599"
+   d="scan'208";a="7658987"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa002.jf.intel.com with ESMTP; 28 Feb 2024 06:29:43 -0800
+  by fmviesa006.fm.intel.com with ESMTP; 28 Feb 2024 06:29:51 -0800
 Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 2E7FF36342;
-	Wed, 28 Feb 2024 14:29:41 +0000 (GMT)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 8882C36342;
+	Wed, 28 Feb 2024 14:29:49 +0000 (GMT)
 From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -69,9 +69,9 @@ Cc: netdev@vger.kernel.org,
 	michal.wilczynski@intel.com,
 	lukasz.czapnik@intel.com,
 	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-next v5 3/5] ice: Enable switching default Tx scheduler topology
-Date: Wed, 28 Feb 2024 09:20:52 -0500
-Message-Id: <20240228142054.474626-4-mateusz.polchlopek@intel.com>
+Subject: [Intel-wired-lan] [PATCH iwl-next v5 4/5] ice: Add tx_scheduling_layers devlink param
+Date: Wed, 28 Feb 2024 09:20:53 -0500
+Message-Id: <20240228142054.474626-5-mateusz.polchlopek@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20240228142054.474626-1-mateusz.polchlopek@intel.com>
 References: <20240228142054.474626-1-mateusz.polchlopek@intel.com>
@@ -83,166 +83,322 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Michal Wilczynski <michal.wilczynski@intel.com>
+From: Lukasz Czapnik <lukasz.czapnik@intel.com>
 
-Introduce support for Tx scheduler topology change, based on user
-selection, from default 9-layer to 5-layer.
-Change requires NVM (version 3.20 or newer) and DDP package (OS Package
-1.3.30 or newer - available for over a year in linux-firmware, since
-commit aed71f296637 in linux-firmware ("ice: Update package to 1.3.30.0"))
-https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/commit/?id=aed71f296637
+It was observed that Tx performance was inconsistent across all queues
+and/or VSIs and that it was directly connected to existing 9-layer
+topology of the Tx scheduler.
 
-Enable 5-layer topology switch in init path of the driver. To accomplish
-that upload of the DDP package needs to be delayed, until change in Tx
-topology is finished. To trigger the Tx change user selection should be
-changed in NVM using devlink. Then the platform should be rebooted.
+Introduce new private devlink param - tx_scheduling_layers. This parameter
+gives user flexibility to choose the 5-layer transmit scheduler topology
+which helps to smooth out the transmit performance.
 
-Signed-off-by: Michal Wilczynski <michal.wilczynski@intel.com>
+Allowed parameter values are 5 and 9.
+
+Example usage:
+
+Show:
+devlink dev param show pci/0000:4b:00.0 name tx_scheduling_layers
+pci/0000:4b:00.0:
+  name tx_scheduling_layers type driver-specific
+    values:
+      cmode permanent value 9
+
+Set:
+devlink dev param set pci/0000:4b:00.0 name tx_scheduling_layers value 5
+cmode permanent
+
+devlink dev param set pci/0000:4b:00.0 name tx_scheduling_layers value 9
+cmode permanent
+
+Signed-off-by: Lukasz Czapnik <lukasz.czapnik@intel.com>
 Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_main.c | 102 ++++++++++++++++++----
- 1 file changed, 83 insertions(+), 19 deletions(-)
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   8 +
+ drivers/net/ethernet/intel/ice/ice_devlink.c  | 169 ++++++++++++++++++
+ .../net/ethernet/intel/ice/ice_fw_update.c    |   7 +-
+ .../net/ethernet/intel/ice/ice_fw_update.h    |   3 +
+ drivers/net/ethernet/intel/ice/ice_nvm.c      |   7 +-
+ drivers/net/ethernet/intel/ice/ice_nvm.h      |   3 +
+ 6 files changed, 189 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 0dbbda218ec5..a04c08053e7d 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -4417,11 +4417,11 @@ static char *ice_get_opt_fw_name(struct ice_pf *pf)
- /**
-  * ice_request_fw - Device initialization routine
-  * @pf: pointer to the PF instance
-+ * @firmware: double pointer to firmware struct
-  */
--static void ice_request_fw(struct ice_pf *pf)
-+static int ice_request_fw(struct ice_pf *pf, const struct firmware **firmware)
- {
- 	char *opt_fw_filename = ice_get_opt_fw_name(pf);
--	const struct firmware *firmware = NULL;
- 	struct device *dev = ice_pf_to_dev(pf);
- 	int err = 0;
+diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+index 02102e937b30..4143b50bd15d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+@@ -1692,6 +1692,14 @@ struct ice_aqc_nvm {
+ };
  
-@@ -4430,29 +4430,91 @@ static void ice_request_fw(struct ice_pf *pf)
- 	 * and warning messages for other errors.
- 	 */
- 	if (opt_fw_filename) {
--		err = firmware_request_nowarn(&firmware, opt_fw_filename, dev);
--		if (err) {
--			kfree(opt_fw_filename);
--			goto dflt_pkg_load;
--		}
--
--		/* request for firmware was successful. Download to device */
--		ice_load_pkg(firmware, pf);
-+		err = firmware_request_nowarn(firmware, opt_fw_filename, dev);
- 		kfree(opt_fw_filename);
--		release_firmware(firmware);
--		return;
-+		if (!err)
-+			return err;
-+	}
-+	err = request_firmware(firmware, ICE_DDP_PKG_FILE, dev);
+ #define ICE_AQC_NVM_START_POINT			0
++#define ICE_AQC_NVM_TX_TOPO_MOD_ID             0x14B
++
++struct ice_aqc_nvm_tx_topo_user_sel {
++	__le16 length;
++	u8 data;
++#define ICE_AQC_NVM_TX_TOPO_USER_SEL	BIT(4)
++	u8 reserved;
++};
+ 
+ /* NVM Checksum Command (direct, 0x0706) */
+ struct ice_aqc_nvm_checksum {
+diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
+index cc717175178b..db4872990e51 100644
+--- a/drivers/net/ethernet/intel/ice/ice_devlink.c
++++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
+@@ -770,6 +770,167 @@ ice_devlink_port_unsplit(struct devlink *devlink, struct devlink_port *port,
+ 	return ice_devlink_port_split(devlink, port, 1, extack);
+ }
+ 
++/**
++ * ice_get_tx_topo_user_sel - Read user's choice from flash
++ * @pf: pointer to pf structure
++ * @layers: value read from flash will be saved here
++ *
++ * Reads user's preference for Tx Scheduler Topology Tree from PFA TLV.
++ *
++ * Returns zero when read was successful, negative values otherwise.
++ */
++static int ice_get_tx_topo_user_sel(struct ice_pf *pf, uint8_t *layers)
++{
++	struct ice_aqc_nvm_tx_topo_user_sel usr_sel = {};
++	struct ice_hw *hw = &pf->hw;
++	int err;
++
++	err = ice_acquire_nvm(hw, ICE_RES_READ);
 +	if (err)
-+		dev_err(dev, "The DDP package file was not found or could not be read. Entering Safe Mode\n");
++		return err;
++
++	err = ice_aq_read_nvm(hw, ICE_AQC_NVM_TX_TOPO_MOD_ID, 0,
++			     sizeof(usr_sel), &usr_sel, true, true, NULL);
++	if (err)
++		goto exit_release_res;
++
++	if (usr_sel.data & ICE_AQC_NVM_TX_TOPO_USER_SEL)
++		*layers = ICE_SCHED_5_LAYERS;
++       else
++		*layers = ICE_SCHED_9_LAYERS;
++
++exit_release_res:
++	ice_release_nvm(hw);
 +
 +	return err;
 +}
 +
 +/**
-+ * ice_init_tx_topology - performs Tx topology initialization
-+ * @hw: pointer to the hardware structure
-+ * @firmware: pointer to firmware structure
++ * ice_update_tx_topo_user_sel - Save user's preference in flash
++ * @pf: pointer to pf structure
++ * @layers: value to be saved in flash
++ *
++ * Variable "layers" defines user's preference about number of layers in Tx
++ * Scheduler Topology Tree. This choice should be stored in PFA TLV field
++ * and be picked up by driver, next time during init.
++ *
++ * Returns zero when save was successful, negative values otherwise.
 + */
-+static int
-+ice_init_tx_topology(struct ice_hw *hw, const struct firmware *firmware)
++static int ice_update_tx_topo_user_sel(struct ice_pf *pf, int layers)
 +{
-+	u8 num_tx_sched_layers = hw->num_tx_sched_layers;
-+	struct ice_pf *pf = hw->back;
-+	struct device *dev;
-+	u8 *buf_copy;
++	struct ice_aqc_nvm_tx_topo_user_sel usr_sel = {};
++	struct ice_hw *hw = &pf->hw;
 +	int err;
 +
-+	dev = ice_pf_to_dev(pf);
-+	/* ice_cfg_tx_topo buf argument is not a constant,
-+	 * so we have to make a copy
-+	 */
-+	buf_copy = kmemdup(firmware->data, firmware->size, GFP_KERNEL);
-+
-+	err = ice_cfg_tx_topo(hw, buf_copy, firmware->size);
-+	if (!err) {
-+		if (hw->num_tx_sched_layers > num_tx_sched_layers)
-+			dev_info(dev, "Tx scheduling layers switching feature disabled\n");
-+		else
-+			dev_info(dev, "Tx scheduling layers switching feature enabled\n");
-+		/* if there was a change in topology ice_cfg_tx_topo triggered
-+		 * a CORER and we need to re-init hw
-+		 */
-+		ice_deinit_hw(hw);
-+		err = ice_init_hw(hw);
-+
++	err = ice_acquire_nvm(hw, ICE_RES_WRITE);
++	if (err)
 +		return err;
-+	} else if (err == -EIO) {
-+		dev_info(dev, "DDP package does not support Tx scheduling layers switching feature - please update to the latest DDP package and try again\n");
++
++	err = ice_aq_read_nvm(hw, ICE_AQC_NVM_TX_TOPO_MOD_ID, 0,
++			      sizeof(usr_sel), &usr_sel, true, true, NULL);
++	if (err)
++		goto exit_release_res;
++
++	if (layers == ICE_SCHED_5_LAYERS)
++		usr_sel.data |= ICE_AQC_NVM_TX_TOPO_USER_SEL;
++	else
++		usr_sel.data &= ~ICE_AQC_NVM_TX_TOPO_USER_SEL;
++
++	err = ice_write_one_nvm_block(pf, ICE_AQC_NVM_TX_TOPO_MOD_ID, 2,
++				      sizeof(usr_sel.data), &usr_sel.data,
++				      true, NULL, NULL);
++	if (err)
++		err = -EIO;
++
++exit_release_res:
++	ice_release_nvm(hw);
++
++	return err;
++}
++
++/**
++ * ice_devlink_tx_sched_layers_get - Get tx_scheduling_layers parameter
++ * @devlink: pointer to the devlink instance
++ * @id: the parameter ID to set
++ * @ctx: context to store the parameter value
++ *
++ * Returns zero on success and negative value on failure.
++ */
++static int ice_devlink_tx_sched_layers_get(struct devlink *devlink, u32 id,
++					   struct devlink_param_gset_ctx *ctx)
++{
++	struct ice_pf *pf = devlink_priv(devlink);
++	struct device *dev = ice_pf_to_dev(pf);
++	int err;
++
++	err = ice_get_tx_topo_user_sel(pf, &ctx->val.vu8);
++	if (err) {
++		dev_warn(dev, "Failed to read Tx Scheduler Tree - User Selection data from flash\n");
++		return -EIO;
 +	}
 +
 +	return 0;
 +}
 +
 +/**
-+ * ice_init_ddp_config - DDP related configuration
-+ * @hw: pointer to the hardware structure
-+ * @pf: pointer to pf structure
++ * ice_devlink_tx_sched_layers_set - Set tx_scheduling_layers parameter
++ * @devlink: pointer to the devlink instance
++ * @id: the parameter ID to set
++ * @ctx: context to get the parameter value
 + *
-+ * This function loads DDP file from the disk, then initializes Tx
-+ * topology. At the end DDP package is loaded on the card.
++ * Returns zero on success and negative value on failure.
 + */
-+static int ice_init_ddp_config(struct ice_hw *hw, struct ice_pf *pf)
++static int ice_devlink_tx_sched_layers_set(struct devlink *devlink, u32 id,
++					   struct devlink_param_gset_ctx *ctx)
 +{
++	struct ice_pf *pf = devlink_priv(devlink);
 +	struct device *dev = ice_pf_to_dev(pf);
-+	const struct firmware *firmware = NULL;
 +	int err;
 +
-+	err = ice_request_fw(pf, &firmware);
-+	if (err) {
-+		dev_err(dev, "Fail during requesting FW: %d\n", err);
-+		return err;
- 	}
- 
--dflt_pkg_load:
--	err = request_firmware(&firmware, ICE_DDP_PKG_FILE, dev);
-+	err = ice_init_tx_topology(hw, firmware);
- 	if (err) {
--		dev_err(dev, "The DDP package file was not found or could not be read. Entering Safe Mode\n");
--		return;
-+		dev_err(dev, "Fail during initialization of Tx topology: %d\n",
-+			err);
-+		release_firmware(firmware);
-+		return err;
- 	}
- 
--	/* request for firmware was successful. Download to device */
-+	/* Download firmware to device */
- 	ice_load_pkg(firmware, pf);
- 	release_firmware(firmware);
++	err = ice_update_tx_topo_user_sel(pf, ctx->val.vu8);
++	if (err)
++		return -EIO;
++
++	dev_warn(dev, "Tx scheduling layers have been changed on this device. You must reboot the system for the change to take effect.");
 +
 +	return 0;
- }
- 
++}
++
++/**
++ * ice_devlink_tx_sched_layers_validate - Validate passed tx_scheduling_layers
++ *                                       parameter value
++ * @devlink: unused pointer to devlink instance
++ * @id: the parameter ID to validate
++ * @val: value to validate
++ * @extack: netlink extended ACK structure
++ *
++ * Supported values are:
++ * - 5 - five layers Tx Scheduler Topology Tree
++ * - 9 - nine layers Tx Scheduler Topology Tree
++ *
++ * Returns zero when passed parameter value is supported. Negative value on
++ * error.
++ */
++static int ice_devlink_tx_sched_layers_validate(struct devlink *devlink, u32 id,
++					        union devlink_param_value val,
++					        struct netlink_ext_ack *extack)
++{
++	struct ice_pf *pf = devlink_priv(devlink);
++	struct ice_hw *hw = &pf->hw;
++
++	if (!hw->func_caps.common_cap.tx_sched_topo_comp_mode_en) {
++		NL_SET_ERR_MSG_MOD(extack, "Error: Requested feature is not supported by the FW on this device. Update the FW and run this command again.");
++		return -EOPNOTSUPP;
++	}
++
++	if (val.vu8 != ICE_SCHED_5_LAYERS && val.vu8 != ICE_SCHED_9_LAYERS) {
++		NL_SET_ERR_MSG_MOD(extack, "Error: Wrong number of tx scheduler layers provided.");
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
  /**
-@@ -4625,9 +4687,11 @@ int ice_init_dev(struct ice_pf *pf)
+  * ice_tear_down_devlink_rate_tree - removes devlink-rate exported tree
+  * @pf: pf struct
+@@ -1601,6 +1762,7 @@ static int ice_devlink_loopback_validate(struct devlink *devlink, u32 id,
+ enum ice_param_id {
+ 	ICE_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
+ 	ICE_DEVLINK_PARAM_ID_LOOPBACK,
++	ICE_DEVLINK_PARAM_ID_TX_BALANCE,
+ };
  
- 	ice_init_feature_support(pf);
+ static const struct devlink_param ice_devlink_params[] = {
+@@ -1618,6 +1780,13 @@ static const struct devlink_param ice_devlink_params[] = {
+ 			     ice_devlink_loopback_get,
+ 			     ice_devlink_loopback_set,
+ 			     ice_devlink_loopback_validate),
++	DEVLINK_PARAM_DRIVER(ICE_DEVLINK_PARAM_ID_TX_BALANCE,
++			     "tx_scheduling_layers",
++			     DEVLINK_PARAM_TYPE_U8,
++			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
++			     ice_devlink_tx_sched_layers_get,
++			     ice_devlink_tx_sched_layers_set,
++			     ice_devlink_tx_sched_layers_validate),
+ };
  
--	ice_request_fw(pf);
-+	err = ice_init_ddp_config(hw, pf);
-+	if (err)
-+		return err;
+ static void ice_devlink_free(void *devlink_ptr)
+diff --git a/drivers/net/ethernet/intel/ice/ice_fw_update.c b/drivers/net/ethernet/intel/ice/ice_fw_update.c
+index 319a2d6fe26c..f81db6c107c8 100644
+--- a/drivers/net/ethernet/intel/ice/ice_fw_update.c
++++ b/drivers/net/ethernet/intel/ice/ice_fw_update.c
+@@ -286,10 +286,9 @@ ice_send_component_table(struct pldmfw *context, struct pldmfw_component *compon
+  *
+  * Returns: zero on success, or a negative error code on failure.
+  */
+-static int
+-ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
+-			u16 block_size, u8 *block, bool last_cmd,
+-			u8 *reset_level, struct netlink_ext_ack *extack)
++int ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
++			    u16 block_size, u8 *block, bool last_cmd,
++			    u8 *reset_level, struct netlink_ext_ack *extack)
+ {
+ 	u16 completion_module, completion_retval;
+ 	struct device *dev = ice_pf_to_dev(pf);
+diff --git a/drivers/net/ethernet/intel/ice/ice_fw_update.h b/drivers/net/ethernet/intel/ice/ice_fw_update.h
+index 750574885716..04b200462757 100644
+--- a/drivers/net/ethernet/intel/ice/ice_fw_update.h
++++ b/drivers/net/ethernet/intel/ice/ice_fw_update.h
+@@ -9,5 +9,8 @@ int ice_devlink_flash_update(struct devlink *devlink,
+ 			     struct netlink_ext_ack *extack);
+ int ice_get_pending_updates(struct ice_pf *pf, u8 *pending,
+ 			    struct netlink_ext_ack *extack);
++int ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
++			    u16 block_size, u8 *block, bool last_cmd,
++			    u8 *reset_level, struct netlink_ext_ack *extack);
  
--	/* if ice_request_fw fails, ICE_FLAG_ADV_FEATURES bit won't be
-+	/* if ice_init_ddp_config fails, ICE_FLAG_ADV_FEATURES bit won't be
- 	 * set in pf->state, which will cause ice_is_safe_mode to return
- 	 * true
- 	 */
+ #endif
+diff --git a/drivers/net/ethernet/intel/ice/ice_nvm.c b/drivers/net/ethernet/intel/ice/ice_nvm.c
+index d4e05d2cb30c..84eab92dc03c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_nvm.c
++++ b/drivers/net/ethernet/intel/ice/ice_nvm.c
+@@ -18,10 +18,9 @@
+  *
+  * Read the NVM using the admin queue commands (0x0701)
+  */
+-static int
+-ice_aq_read_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset, u16 length,
+-		void *data, bool last_command, bool read_shadow_ram,
+-		struct ice_sq_cd *cd)
++int ice_aq_read_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
++		    u16 length, void *data, bool last_command,
++		    bool read_shadow_ram, struct ice_sq_cd *cd)
+ {
+ 	struct ice_aq_desc desc;
+ 	struct ice_aqc_nvm *cmd;
+diff --git a/drivers/net/ethernet/intel/ice/ice_nvm.h b/drivers/net/ethernet/intel/ice/ice_nvm.h
+index 774c2317967d..63cdc6bdac58 100644
+--- a/drivers/net/ethernet/intel/ice/ice_nvm.h
++++ b/drivers/net/ethernet/intel/ice/ice_nvm.h
+@@ -14,6 +14,9 @@ struct ice_orom_civd_info {
+ 
+ int ice_acquire_nvm(struct ice_hw *hw, enum ice_aq_res_access_type access);
+ void ice_release_nvm(struct ice_hw *hw);
++int ice_aq_read_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
++		    u16 length, void *data, bool last_command,
++		    bool read_shadow_ram, struct ice_sq_cd *cd);
+ int
+ ice_read_flat_nvm(struct ice_hw *hw, u32 offset, u32 *length, u8 *data,
+ 		  bool read_shadow_ram);
 -- 
 2.38.1
 
