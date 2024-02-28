@@ -1,149 +1,210 @@
-Return-Path: <netdev+bounces-75863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 651C486B623
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 18:35:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E5A886B635
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 18:40:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96ACF1C21589
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:35:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C53B1F28120
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:40:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7224B12BF1D;
-	Wed, 28 Feb 2024 17:35:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E727815A480;
+	Wed, 28 Feb 2024 17:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="B/8VyhQl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kY8V6GZK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4491E514
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 17:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709141725; cv=none; b=H19UPhVr/rZM5rcur3qhDz/ZSUQESvRQMSWX2B8eb8ThTr1b7LASw7VqF0OWNKMziuiRO0EvHRSLhDtUxxmrwHBZCyKQ2hZvCHvQxRAxpI3td3DRnWe3UhAeITCi1Yvxuj6Eo+0jlLsb0NyzfE7Cf0t8InZzNENbiJvWFOLEmh0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709141725; c=relaxed/simple;
-	bh=gXa4lOW8w4knS3r2r0NabDz2CxrK4R8NsTAV1kcwB0w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Vl62hiZM0jK2aLU6WeLYftF9HaPcVeHDDrrnkR45UlULPEl8lTVe4+qIPGVJWPy3ktC+SiAeG0ftI+HRKIVLJrq3OiaScZa095TxM6ICQMrkLycPo0HnSG7sVMXlfEjPr/xOzksYxi9o9azCfRlJo3l5b0MUfqfTqGSQFx3GFUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=B/8VyhQl; arc=none smtp.client-ip=209.85.210.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6e4a0e80d14so2439570a34.1
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 09:35:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1709141722; x=1709746522; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bbQzTMpUl3ghDUgX0onzD8w3xC/ny2PhcoxL6ewW680=;
-        b=B/8VyhQl+eSbQEoAgqwtIzR6P/MK2AhNqAYlZZjuF9Kup3eYjQgx3LuTj+KMLyagc/
-         92sSB8ZKRiVHe6POlcbBfP/LOZaqVcyo+g8GOZa5qoC2QNkRbXZbU4TPLN/HWCjTea9n
-         foT67vQmCnQhntx+1vbadxiYdQG6WNy/UK7310hbv7z1gtvcvVCuMjWClAih5c2HPxBN
-         eCuBZqjYv4hBINSnlvUkqgm6foq/mV/3z4vnwp+zXEoaf/8I+FJfut0DF8/TlRKvsl0f
-         qqNizktppNCFaVt0HwHczIMEf3cqzaKI5ujKioDNicaqN31y6wBS7oeNSigBWvqUsZ0w
-         T6ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709141722; x=1709746522;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bbQzTMpUl3ghDUgX0onzD8w3xC/ny2PhcoxL6ewW680=;
-        b=qqdrp108xTHRlvT2waBYoDd5QJ8fbOn+TSozdt5ArrXM0XIiZVs7ZPO7j5W2o2hJr2
-         RWtFM7b5ulCj0jzv8IYWeVFR6bVWMHcCdRXLUJZnLJ+W3ZUkfI/2aaPr1irUmUxs7seH
-         xjxcR6f29K5GDVVBYy5LYUGukVWmwO/tSzgbRtc1pjjwGLB+656m8niu6b8y+j+oYzRb
-         RGa2rz4agB3x2EWESgTLQ5dsD8wpng+BHbUhYKmKmYedKsKhflTxRtw2XRv6bXZES1BO
-         7fJAdmWqpEQzB9d9uXD/ZMbe+u++5+X+D6ytrd2L4UWyr52ftClw1TTCYXwkAAUZ/MfA
-         qfJw==
-X-Forwarded-Encrypted: i=1; AJvYcCVyxS6pH+QS/+jTv9jG0TNlVEjmHPfsTPkdJLH4sYkIzS0jgp+8+UCFQdtXxNLFXmaXOKIG8MbJ0D00uzKQycqPFlzizaGu
-X-Gm-Message-State: AOJu0Yy+tVBtTumjU5fTR3sqNpy94CH5DRsA8ZsO1+pVL8yjm8MKk4IL
-	guzqclki8vqwD9BNDNJ/RSIwZv8I7FoGQbzj1pNpKGdmqQ859raUj2UtSLda7A==
-X-Google-Smtp-Source: AGHT+IHRVarG/W/3caABon1SKUI/pGhSkSr0vzVQC2HmZHrS9OyNsB/ogqu6h0vKysizr70OyadOag==
-X-Received: by 2002:a05:6830:c4:b0:6e4:8e99:5895 with SMTP id x4-20020a05683000c400b006e48e995895mr230016oto.25.1709141722515;
-        Wed, 28 Feb 2024 09:35:22 -0800 (PST)
-Received: from ?IPV6:2804:7f1:e2c2:4c5d:4b62:7f72:d1d3:62a6? ([2804:7f1:e2c2:4c5d:4b62:7f72:d1d3:62a6])
-        by smtp.gmail.com with ESMTPSA id d18-20020a63d652000000b005cfbdf71baasm6949821pgj.47.2024.02.28.09.35.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Feb 2024 09:35:22 -0800 (PST)
-Message-ID: <1562999a-05d7-4d4e-8fc0-43c5979793b8@mojatatu.com>
-Date: Wed, 28 Feb 2024 14:35:17 -0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63DB43FBA3
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 17:40:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709142008; cv=fail; b=KQ9+98ykRQuVfHWczhzDx+qRzps3JeOZBZku85ea4nykgIinEwwRmX9EtCw85zXZ/KHCvac29rQ+NPvym3b2hWHSFDNWRPOgsfaM9Z3JvQK++ma1skMVuMt9PMIPxQoF4G7f1yjS6xkBSjsoU/g5RTAQcCcKhjZwUdBlIz2Y5fs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709142008; c=relaxed/simple;
+	bh=UTvPg9q2051s0Qf8CctVT5gilA+8TjUJQNTHwAvTFts=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ba5NcNzfSoGrDAZZ74PXhCwJGBoLWZw1L1Y1i/Bh2xs4kPTswm26+MB+mS8rYoMeYGrZ52D9xgQ64HOnZfIL40dsVo44FCRJRkdASorbZrt7TLg2JmftkqVUYmzhFkg34yPmBDHFXixfe58Exyu6gsLCkQQu5H6NTfyMRZxDytk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kY8V6GZK; arc=fail smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709142004; x=1740678004;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=UTvPg9q2051s0Qf8CctVT5gilA+8TjUJQNTHwAvTFts=;
+  b=kY8V6GZK4T3o4o1kX/JgaLAQzvsnjZpMfBp/qKpbOXew12i9m6SHyikJ
+   DnemfvTfvs7Vk0AugqzFhfV7dUSXHHoGJOevs7PBRRpwnXo7K1mj8oghT
+   9B/b46I6WilWTQ85T9T+IiUa0vzJTswdaNtuOsU8lDBbgg2Kf58afTWen
+   YTvt99RjayUyPEOsRpGvmf58hqyamXMV6+bYmNNArUNr/ev3D7vI5DMhL
+   OZ8Cbcb/o6X/IAvYawbPfN6KM3omaYST/EGWXSqNgCNE0mKgh5oSqHN+T
+   mbWjsqgChZchfhWvXNhSdoaoBKOwCAvw/r4w9pD3a+E8I6FSD4VB3PSwI
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="14707090"
+X-IronPort-AV: E=Sophos;i="6.06,190,1705392000"; 
+   d="scan'208";a="14707090"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 09:40:03 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,190,1705392000"; 
+   d="scan'208";a="7453405"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Feb 2024 09:40:01 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 28 Feb 2024 09:39:59 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 28 Feb 2024 09:39:59 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 28 Feb 2024 09:39:59 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 28 Feb 2024 09:39:59 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MR86c51gulcT/ctrx2kw4ENqY+YFPryqFcxhGq2ymMC2dV/1xVIsnhV6Y3SwXSn9r2KgNJWaO1GwDD/U60RlvspYnQLQKjQntxV0LTJdOxNTz84yIkpYudzTWZsQye+7jOqQUotBhK6t4fAAlQ+YMqG71p/fPhhogAiHm4S4pGFw7Y2KT+FLNCK5TzdQMwYv9grUKTe0PlSeR0rc+eBuSCxdZqhQBPRuGdFknVAvxJHOCn0/QPi68cJCK5l8E/KJolWFnfiuBRBoh9j920xTep4AhzcNA8y64Wf5H11zMlNwU1S1ObIiz8JJ67Bj09DtOJG6b0C4OPaYNWMsp2iWNw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UTvPg9q2051s0Qf8CctVT5gilA+8TjUJQNTHwAvTFts=;
+ b=aHZwwSV+3g+MkpcfyiRSg7vwqai8Hhi83jYXrCoCDhB8h1iArVOBodjvOsWysC5OWaJuhPOgZ/q0KvoP0a4ItAml6QgqE8/0RpIA87FC/DWHkymDJeuBZLTYhA/ECFA98MziL3R0lO4BTHUk1OovnxJd+EqF52302P89DCRWJ9tQN9fPz5s3DZ+K02Q01/oQxkW28hGrrjw7izi8SNUF5wYOLQuKZ0cxarP+Okbk+mAPZq28eTRLgLT6KhlKFxXycUBfZ53l3wJ5P2xwTfwp5wg1CiDFWJbdDH6RcxrvpU3IFdtbIsKaRHCs+9b9u8twhVgBxVSMQ6RZkdKu+4TVuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5095.namprd11.prod.outlook.com (2603:10b6:510:3b::14)
+ by PH7PR11MB7571.namprd11.prod.outlook.com (2603:10b6:510:27e::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.25; Wed, 28 Feb
+ 2024 17:39:56 +0000
+Received: from PH0PR11MB5095.namprd11.prod.outlook.com
+ ([fe80::6f88:5937:df91:e4b]) by PH0PR11MB5095.namprd11.prod.outlook.com
+ ([fe80::6f88:5937:df91:e4b%7]) with mapi id 15.20.7339.024; Wed, 28 Feb 2024
+ 17:39:56 +0000
+From: "Keller, Jacob E" <jacob.e.keller@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>, mschmidt <mschmidt@redhat.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>, Richard Cochran
+	<richardcochran@gmail.com>, "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>, "Kolacinski, Karol"
+	<karol.kolacinski@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [PATCH net-next 1/3] ice: add ice_adapter for shared data across
+ PFs on the same NIC
+Thread-Topic: [PATCH net-next 1/3] ice: add ice_adapter for shared data across
+ PFs on the same NIC
+Thread-Index: AQHaaMY/vKxps3n/7EuYyM7HWuuOQLEfDCiAgAD8QiA=
+Date: Wed, 28 Feb 2024 17:39:56 +0000
+Message-ID: <PH0PR11MB5095E69C450A6E9C2E7E6C73D6582@PH0PR11MB5095.namprd11.prod.outlook.com>
+References: <20240226151125.45391-1-mschmidt@redhat.com>
+	<20240226151125.45391-2-mschmidt@redhat.com>
+ <20240227183555.01123eb7@kernel.org>
+In-Reply-To: <20240227183555.01123eb7@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5095:EE_|PH7PR11MB7571:EE_
+x-ms-office365-filtering-correlation-id: 99048fe9-f8d4-49c7-3fb6-08dc3884476f
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: tk9j0iD5GZs30WZaiqUojxZgoFmRRD1K47eopTWq6y4kSOYVMNHTKu6/Z2FuVKLpL9UBn5ecGzk0QHm/E3Xkk/f2iPG3BQGmX9p9uEUTtiwq0LDObgJBO6cuhegmxPIGXgeoL8xjszzglF6ur5zxMvtaNkavcK92V9tb02ODI5wmOwUWg5QP0nj2CSNW+j+PLckMvfiNl4X4MF3cNsN88NPfl6sqkYZlhDsiGOjj+3V/qzkblLdXe6K12HszIXw5qgnmhJ0c3ogm+HRbrR+Z+PFeZUDRF7mhm8i3yrzdo9yF0Y+a+BpNuRcOMD5vLKI7WhZsYmxVJSmlgNCF1n7PXM1G96+sOGZr1dpw6lryUJ1FJSs+d716sAf82gJ5OQCBqlAsC1Oa2nT0D/baEqscZOmHUOn4Kl5oBGJ+yL+qHGhOrte1ZKyHoYLpBVWKOo5uMhJkVDFcG8cty19+7C8tlIOQqxLKW1D4DaIYovNXjd8ncCZRAFDvewEGrIsOBF/bUEBTTrSt1dJGAyev53TCJ37fClgevgbdiTk0I3h6SNz6m3jwmucEMDBAwC9bxbsVoOdabO8rpDT335LxVwsfIz4Tr/6rpXgTy+x4Fn2RnnPmB8h4LlHloBz6PW0+DCuFlCPCK27LuSb5fk9fXdPV/P63S0qklJ35Edk55ITnmOr30mj0xoe+Pold2V/uA97ryvRu5okPOpnsGHwA/pCslhWS+fSgk/hYKb8rzDeRzRA=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5095.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?LvPbB9/8i0zC43cS2rUT/NXlrCWLRR3M+H5JsZxqI3NunEORdWLXowAzAKDc?=
+ =?us-ascii?Q?4w8Tkcrtt+lxP6JqN9nmxa/zqSYWU+PB5jw2QPg7VtUALSHqOVTu18BKfjHJ?=
+ =?us-ascii?Q?354sVbBAyuWSgGYZ3tgwKrfsTEDCl9VG9uoPmb5vGbwTnNCw3/ZjFVmEh/ZR?=
+ =?us-ascii?Q?ONGCCX8NXb5GcdW0e7Y2OBoIXK7y2U3rIz7XrZdOEAvaCmsSl7nWLkYTC8aP?=
+ =?us-ascii?Q?tiiMvVFEsWY8g3WoOcxi3qoYPEKrvs2qYqPi8IGarel4X59wmleJTSmvrVpz?=
+ =?us-ascii?Q?gEr1NpVqDx6kSIsPxEtY7XHLTdQa0gaGCtEWOepnAEcrPXrJTNrt3V71iQ/s?=
+ =?us-ascii?Q?jSdE/HgEYpfNKwK2Au49oCsyU6s9GZQdW42idvi0Ynu+yb1nCLMDkKi8Kywx?=
+ =?us-ascii?Q?XNTAsEmmkK1SgkA3TT4zUURpzwSG9jeHiy/LLZzmUv9nnhLWED7w2MKMCdY8?=
+ =?us-ascii?Q?v5qQeTXtTGCrlemXAzTfxs/eVRsXZB0sUUsl/HFb3Hqn5XgCSDGC0P2aoIp3?=
+ =?us-ascii?Q?yZ8dFrCMI5pH+XJedFdnosM/Q80RAO5LCbJL/puw7g+rxIHgJ3TCJcfnI6Y8?=
+ =?us-ascii?Q?efEk6kkrorKhgWrQ7jwm2NZaWkzHfjV1GhQuUn3OpuOfqa+FaeKSD+1mLRhd?=
+ =?us-ascii?Q?q4Gsb98FQH0AgIfvJfgjFMa9yZXNqxjyfXg5AjmnV6MJDNag1nA5g+4xJoy2?=
+ =?us-ascii?Q?7qlLY39V1Q5lsTHIVJxdnoU0VPOJGteg9lmka0MSesWksI4n8I/6GENHupTp?=
+ =?us-ascii?Q?AuC7AYNP4WGoaVaOA8dLtmcSEPf3bdJ7CIklCHXlEEfsxNxCea8IeIE6JlEO?=
+ =?us-ascii?Q?7Bes4+pZ4TzdGB6ACxX6EegKBkR6haYee3FNFDIROBwsZMVT6vRyXqVnFftQ?=
+ =?us-ascii?Q?uoGkF/I1e2Og2TaR/qsY/ThzVEl2GjgIOa/RJZIFSe9x7gjM7y2Mjh8nqban?=
+ =?us-ascii?Q?UcwSAP+jCkHQeXk4UiirLwLaGAn/X6yLz8JHaAoIKMwvuROS3RgN3TqK+E34?=
+ =?us-ascii?Q?NNgXg5Epf0p5+kTEzMnfqbmzKT5tYLwZTZ321qVaCymNEeThkE1EJiWVwOum?=
+ =?us-ascii?Q?B1iQsm2+s5dMPjclG1nRlFv/uS1QvQOIT4S/39FrNjlpNsm1r6KvboA+PzsF?=
+ =?us-ascii?Q?/3xeRqapPRcVY1HqLowai6jiMAliB7H25pDfm0r3cgvtEgr54g5eCKxjHB4G?=
+ =?us-ascii?Q?r/12e/R3VPW2fMBGAQnQLS91nPpctLNRjf1L68fDKreTjCnSD5Dbs3GvDDQK?=
+ =?us-ascii?Q?bXMMGAT12EwSxQTwX8PGCrLIfbmPaqk/wmLTp1VxSnpoDikZc7YO/QfhoTRW?=
+ =?us-ascii?Q?CUrFdJ0ZQeMhuvydudivLHy0V9Hx+tVnbQlq5S26eY88OhX2I2i6Vz7++TVv?=
+ =?us-ascii?Q?vVl9ctcvlatkQgtBFdUU59S6pDikAocAZwgXxw9R8g126wtZlPJfCq4ZhdbR?=
+ =?us-ascii?Q?MLs2zjZdF0Bw8f4d3xd/Vvz8VZTx9lULMSg923NgA7OaL7sgBRd2vMQc6kQY?=
+ =?us-ascii?Q?NtzJxFszMy2I9e54rxm9DIn0fubfQt+eaVea7mswSiTF2TVYc09nC91zhAGB?=
+ =?us-ascii?Q?eexbSvVTnxetv/wpnlrthZIbuTN7If1yeBO/zUKK?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] selftests: tc-testing: add mirred to block tdc
- tests
-To: Naresh Kamboju <naresh.kamboju@linaro.org>, kuba@kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com,
- kernel@mojatatu.com, netdev@vger.kernel.org, pabeni@redhat.com,
- pctammela@mojatatu.com, xiyou.wangcong@gmail.com,
- lkft-triage@lists.linaro.org, anders.roxell@linaro.org,
- Linux Kernel Functional Testing <lkft@linaro.org>
-References: <20240206075950.47d0bdc7@kernel.org>
- <20240228164939.150403-1-naresh.kamboju@linaro.org>
-Content-Language: en-US
-From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <20240228164939.150403-1-naresh.kamboju@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5095.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 99048fe9-f8d4-49c7-3fb6-08dc3884476f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Feb 2024 17:39:56.4450
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rGqpORdxkbD1XSIjQ4R4FZtIMVbbE+JGXoWGujViMtL8mqSiDlLqGj7WQdE+Y0mtnnE+J39QEgVQMkhS/APhXQJuJ3TG17X3gB2BJkRFg1A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7571
+X-OriginatorOrg: intel.com
 
-On 28/02/2024 13:49, Naresh Kamboju wrote:
-> LKFT tests running kselftests tc-testing noticing following run time errors
-> on Linux next master branch.
-> 
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> 
-> This is started from Linux next-20240212 with following commit,
-> 
-> f51470c5c4a0 selftests: tc-testing: add mirred to block tdc tests
-> 
-> Run log errors:
-> ----------
-> # Test e684: Delete batch of 32 mirred mirror ingress actions
-> # multiprocessing.pool.RemoteTraceback:
-> # """
-> # Traceback (most recent call last):
-> #   File "/opt/kselftests/default-in-kernel/tc-testing/./tdc.py", line 142, in call_pre_case
-> #     pgn_inst.pre_case(caseinfo, test_skip)
-> #   File "/opt/kselftests/default-in-kernel/tc-testing/plugin-lib/nsPlugin.py", line 63, in pre_case
-> #     self.prepare_test(test)
-> #   File "/opt/kselftests/default-in-kernel/tc-testing/plugin-lib/nsPlugin.py", line 36, in prepare_test
-> #     self._nl_ns_create()
-> #   File "/opt/kselftests/default-in-kernel/tc-testing/plugin-lib/nsPlugin.py", line 130, in _nl_ns_create
-> #     ip.link('add', ifname=dev1, kind='veth', peer={'ifname': dev0, 'net_ns_fd':'/proc/1/ns/net'})
-> #   File "/usr/lib/python3/dist-packages/pyroute2/iproute/linux.py", line 1593, in link
-> #     ret = self.nlm_request(msg, msg_type=msg_type, msg_flags=msg_flags)
-> #           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> #   File "/usr/lib/python3/dist-packages/pyroute2/netlink/nlsocket.py", line 403, in nlm_request
-> #     return tuple(self._genlm_request(*argv, **kwarg))
-> #            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> #   File "/usr/lib/python3/dist-packages/pyroute2/netlink/nlsocket.py", line 985, in nlm_request
-> #     for msg in self.get(
-> #                ^^^^^^^^^
-> #   File "/usr/lib/python3/dist-packages/pyroute2/netlink/nlsocket.py", line 406, in get
-> #     return tuple(self._genlm_get(*argv, **kwarg))
-> #            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> #   File "/usr/lib/python3/dist-packages/pyroute2/netlink/nlsocket.py", line 770, in get
-> #     raise msg['header']['error']
-> # pyroute2.netlink.exceptions.NetlinkError: (34, 'Numerical result out of range')
 
-It looks like the ip link add command is returning ERANGE.
-We have tested this in NIPA for sometime with 64-bit and this is the 
-first time
-we are seeing this:
 
-https://github.com/p4tc-dev/tc-executor/tree/storage/artifacts/485544
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Tuesday, February 27, 2024 6:36 PM
+> To: mschmidt <mschmidt@redhat.com>
+> Cc: intel-wired-lan@lists.osuosl.org; Brandeburg, Jesse
+> <jesse.brandeburg@intel.com>; Richard Cochran <richardcochran@gmail.com>;
+> Kubalewski, Arkadiusz <arkadiusz.kubalewski@intel.com>; Kolacinski, Karol
+> <karol.kolacinski@intel.com>; Keller, Jacob E <jacob.e.keller@intel.com>;
+> netdev@vger.kernel.org
+> Subject: Re: [PATCH net-next 1/3] ice: add ice_adapter for shared data ac=
+ross PFs
+> on the same NIC
+>=20
+> On Mon, 26 Feb 2024 16:11:23 +0100 Michal Schmidt wrote:
+> > There is a need for synchronization between ice PFs on the same physica=
+l
+> > adapter.
+> >
+> > Add a "struct ice_adapter" for holding data shared between PFs of the
+> > same multifunction PCI device. The struct is refcounted - each ice_pf
+> > holds a reference to it.
+> >
+> > Its first use will be for PTP. I expect it will be useful also to
+> > improve the ugliness that is ice_prot_id_tbl.
+>=20
+> ice doesn't support any multi-host devices?
 
-Could you give us more information on how to reproduce this?
-
-Note: This doesn't seem to be related to the patches in question.
-Seems to be a generic thing with nsPlugin itself.
+No. I guess you could try to direct-assign one PF into a VM? But otherwise =
+it doesn't have support for any multi-host. I also am not aware of any plan=
+s to add such a device to it in the future. I think all our future multi-ho=
+st stuff would be with idpf.
 
 Thanks,
-Victor
+Jake
 
