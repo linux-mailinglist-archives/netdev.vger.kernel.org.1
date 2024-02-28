@@ -1,91 +1,85 @@
-Return-Path: <netdev+bounces-75523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1878586A657
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:10:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C295886A66D
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:17:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C81C4283423
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 02:10:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76311284A0A
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 02:17:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932E5442C;
-	Wed, 28 Feb 2024 02:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B225250;
+	Wed, 28 Feb 2024 02:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lmkFQzS6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rl212AOm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA271CF81
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 02:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8012063B3;
+	Wed, 28 Feb 2024 02:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709086231; cv=none; b=pyGLnniUNz7e31/n13WkvZo8FHMp38HriTfu1PXIPD5sSVqqYbU1EGxtyt2vVyOM6pugf5YmbY5Stg05NwQTMuDAv5o7jzmQfINqeZaa/xTXsHO55AoS5r+g8taCp+MExie9xeySXa1VgQZOU5PJ435pHJW6wK3pLem9pI5kz/s=
+	t=1709086631; cv=none; b=nItMUbPlzMcBN+nC9RCpRZRVm5sPkcFRCB97nFN3MK5tOze10hixTgxUv3w1yoBcP+IfzWXNqxPe8ZDLkYqRtV93UsxL4vnWGwx1jT4AsP+KtbBrUO0+KjjizzU2AQ/662HBp2D4ga0KEq9yNSIlRqZpul+SbzzeT0ujl4HR6gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709086231; c=relaxed/simple;
-	bh=0dieHDWLgbmCHOaOJlDgKsBUWc53+jRQCGWSZ3nll+s=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SGgVsRxF0scQZLTURgSjnafgtVuQgXFNqN0mehRP07EZcb0RfTjJbuaX9LDjrwEWvVzIp4NTxOuFtGYb/5JVkGIk9g4ToUVAjAN0dUm2O43LFhbmMAM3aeHomnl+oZDe+Rxe30UeFo6hoDZe+23B7ZW5jqv9RCpDVyZLmHK5IM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lmkFQzS6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C4B93C433C7;
-	Wed, 28 Feb 2024 02:10:30 +0000 (UTC)
+	s=arc-20240116; t=1709086631; c=relaxed/simple;
+	bh=ks5mnjKC9lF0LUAQnlJGF+2i9bOqbfU8O+K3zemzvJk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WvkVwCzyu2vhMX4Nj421ooTxAk8MOoj1e/dB3rbVN6JbagGxv+7XFlUGeO4IodlGtJfLoHq4rTwNC2+jq1hMRitopVRCH76uJqyQerFy9hYuffqCgfNZs7faXk+hw4jMQizolNsTHXY4t5fh9ME2q32qf2dIyKTyvt+OEjCy47M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rl212AOm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A98EDC433C7;
+	Wed, 28 Feb 2024 02:17:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709086230;
-	bh=0dieHDWLgbmCHOaOJlDgKsBUWc53+jRQCGWSZ3nll+s=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lmkFQzS6n8eP8+XHhwRWBMGGWf2DiM6qq7bZ9ONzqB9D6eEiCdYpyRLkkXNIPYdHi
-	 WXtD5SxpjjiixHbXiIeisJ0Qo2kMxireznvMJh3HyzcAWnm687zSdNOecE4PS7ATEx
-	 6O7fSiea3m5QajNAhqBjON67aq9oDVVVMSLMMujg7+uCVGJl28Ru2zuCW0Q5/ansWH
-	 XmyWjNuRCyCKNTaNxps12hvHnkf3ltTL5ECMT5Kh5hdlCeYJmeb1rzpYmNSjDavFic
-	 rGOTSYrc3PGke9FFFSZdDQGtKdrnPXgMBFwPh5w1Yn2r730H395oVSsm/rGCBPL1Ga
-	 S2IWAZYwBan3g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A0D2FD88FB0;
-	Wed, 28 Feb 2024 02:10:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1709086631;
+	bh=ks5mnjKC9lF0LUAQnlJGF+2i9bOqbfU8O+K3zemzvJk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Rl212AOmTiAWXRGq6m9KtDJfubLQf8XcOYeUzflQGHV9enk7c3NBn9e4foLkGnOvD
+	 kM+kcM1v+Y4tmR+jJzo117y5LzDs5EuIc+JTkgdLOGobkpdLSAv7oJKiIyYnSIGXTg
+	 BvMI96gvqcATDPOcFNYPKLddT4ehvD+peNN5yw7BenmKe203eytImLWqvxLfZDUWRw
+	 +m4gNQHo7XsUe2yrgBG6zwNXBoeIV61ILqghXLGnIm7ZDr8deFwP6HFwiE5Xa1ac5j
+	 SYXDbVLcUUgXEvD/UW1oSoiPFmaoefT8FeB4hxJCWQMDKxjpSra5ZRquWjC6WTJpOD
+	 rlhuzsvamGCCw==
+Date: Tue, 27 Feb 2024 18:17:09 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Javier Carrasco <javier.carrasco.cruz@gmail.com>, Andrew Lunn
+ <andrew@lunn.ch>
+Cc: Peter Korsgaard <peter@korsgaard.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: usb: dm9601: fix wrong return value in
+ dm9601_mdio_read
+Message-ID: <20240227181709.7159d60f@kernel.org>
+In-Reply-To: <20240225-dm9601_ret_err-v1-1-02c1d959ea59@gmail.com>
+References: <20240225-dm9601_ret_err-v1-1-02c1d959ea59@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ipv6: raw: remove useless input parameter in
- rawv6_err
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170908623065.25524.13714200763658232141.git-patchwork-notify@kernel.org>
-Date: Wed, 28 Feb 2024 02:10:30 +0000
-References: <20240224084121.2479603-1-shaozhengchao@huawei.com>
-In-Reply-To: <20240224084121.2479603-1-shaozhengchao@huawei.com>
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- weiyongjun1@huawei.com, yuehaibing@huawei.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 24 Feb 2024 16:41:21 +0800 you wrote:
-> The input parameter 'opt' in rawv6_err() is not used. Therefore, remove it.
+On Sun, 25 Feb 2024 00:20:06 +0100 Javier Carrasco wrote:
+> The MII code does not check the return value of mdio_read (among
+> others), and therefore no error code should be sent. A previous fix to
+> the use of an uninitialized variable propagates negative error codes,
+> that might lead to wrong operations by the MII library.
 > 
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> ---
->  net/ipv6/raw.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+> An example of such issues is the use of mii_nway_restart by the dm9601
+> driver. The mii_nway_restart function does not check the value returned
+> by mdio_read, which in this case might be a negative number which could
+> contain the exact bit the function checks (BMCR_ANENABLE = 0x1000).
+> 
+> Return zero in case of error, as it is common practice in users of
+> mdio_read to avoid wrong uses of the return value.
 
-Here is the summary with links:
-  - [net-next] ipv6: raw: remove useless input parameter in rawv6_err
-    https://git.kernel.org/netdev/net-next/c/d75fe63a0708
+A bit odd but appears to be true, so I'll apply, thank you!
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Andrew, 
+mii.h files seem to fall under PHYLIB in MAINTAINERS, but mii.c does
+not. Is this intentional?
 
