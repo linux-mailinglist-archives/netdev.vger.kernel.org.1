@@ -1,183 +1,115 @@
-Return-Path: <netdev+bounces-75643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2199486AC59
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 11:47:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9999886AC63
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 11:50:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A6701F24847
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 10:47:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B3521F22C66
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 10:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B92112B151;
-	Wed, 28 Feb 2024 10:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B151127B4B;
+	Wed, 28 Feb 2024 10:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="NzU+m5fb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HcTcAoAm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9F17E56C
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 10:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481C05A0E9
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 10:50:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709117250; cv=none; b=A4MPm5yuWtBnXjmJL7Qy+2V9B0jFGdjqm4LUl+irzpesxdx+5OjMaKuTf+cgkUxLDMnrmZRHR8qLmJ9N5Y8BID13cWIAFQWTvpGay7EI0uKL5n/X+XNEEAzAfnvLdfkXrfrJrM/TbmfejAJOByZF9y25vdJyYnwLwaKd9gdV7hQ=
+	t=1709117434; cv=none; b=OXdjFSATsLbnhMUHZeEHE8Vn+ZT+c5zPY6sbDvEd+Dub2Yx2b7/a6qDYCOUf1TjvklTWNFXuVr/o88DWy3EoInwnBhmvzP21mPnPV4vUlz1AJWEdJMzRR47UlopMHNzihC0KeIofL3Lim+UgyVeiy5ds5XqhaC50wlxDKRfrMAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709117250; c=relaxed/simple;
-	bh=79YniYFNyG3YEwZJmfAuvVSIywECnQgPLZkG8Vpl12o=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=oLDsmDQdBlnlJ57oi4vPT3WFfEEB8P4SAxIVTeSs5EvK77REET0RpAM3VubOztT1mgdqlUrtQFKwUE7ClSEWoTVyHREQHYlz+gbHOq67gCzkQxTn29SoIC+LJKKzxtm7+rIhL2b2Q+gvnjjyRpmx7l5Fzuhes5GnS+88O02KR20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=NzU+m5fb; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-513184f69abso894041e87.0
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 02:47:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1709117246; x=1709722046; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wfRgdwzRN8mqJPSb0k4wCFiTLF5dChF82GwwW7l41yg=;
-        b=NzU+m5fbykbnLdAGdKKGwBiEthTk26pP2WU0/XHxh8BVyVaKaqalmt4OdKu4yWSWTa
-         VlMLbBLwGADsZa8NOkPDvzOfobdLsZwQEwgVqfYpYL8B8eIsLkaaypFUs3BqBje5PYMG
-         CcoFPB2BXuO6trmeGZPMi2ncAVoLq8nhoynU2bTnUSKiIbP+7liw4SOFGLE7wWbbxFPz
-         UU+SqOFpKgdjYHdoMsT4PMGpDd9Jg3RlR6HJA3EkvyjULYt3KBrvB8xLGyHiFXh/LKCW
-         a2lyHDspMBlEx4PaBHqO8xGFZvvxQt0Aw8UQQPsOs8J07xIuiJBOuk42LOB0fp+EGQso
-         myng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709117246; x=1709722046;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wfRgdwzRN8mqJPSb0k4wCFiTLF5dChF82GwwW7l41yg=;
-        b=NsdSAknxk1YGUXmfeImhw62DUb1Cgxk2NrhluKNBhUTF2ij+1ps6jdH0T9fGg9BW0H
-         f5Cn9/m4c6YS0OGzbU2wdgox0jKJeIolUVosRGFm43NFS+/3hjK2LQ0zSb8j6p7V3drb
-         Bu5yUtXSQAyHscrbxXrJqhs0lsQsWpEBn/xMYPY2cfmJERhUFdNc+aGrEEvONNMhqHtN
-         EkxTpw92ORYDB3V8sOGdwsyfzobjLL6ViZtPw2NJCUXfEQWDm4td3KSd1/Vzj1styqlG
-         itJEDrP3rF+4TD5yPIHcY65PbwGHnapUlIsQJ1AR6ahBPkJDCLKupgAZoVWOgSbmCq/q
-         xu9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVkpY8kk7dBqDGkPtnu0Vut2Oxg+EFmVoAC5l/EaQl2j7ASbQ/TYTlRBp5pYtrFArsj7yrpT1fVYY8cnhIC4jghyA6djvp+
-X-Gm-Message-State: AOJu0YxwdC43PO/Ka4wllgFjhkHfHUXdih8lS9EMqustFy8RZwTnqvxF
-	qQSgIMztzPorM/7TYRrstymU1bkrUoHgrRBp5Iq+erxsjcFiE2jxjW4xd8Dzjko=
-X-Google-Smtp-Source: AGHT+IEy97/CGn9v9VzsDZdagJYqhpkYUS09Nc5/GsIGTxPAbM5/OEzCo2i0JMjsBhnS/6+ZX8dcSw==
-X-Received: by 2002:a05:6512:11c9:b0:512:fabd:8075 with SMTP id h9-20020a05651211c900b00512fabd8075mr5191179lfr.48.1709117246014;
-        Wed, 28 Feb 2024 02:47:26 -0800 (PST)
-Received: from wkz-x13 (a124.broadband3.quicknet.se. [46.17.184.124])
-        by smtp.gmail.com with ESMTPSA id h4-20020a0565123c8400b005131f3fc893sm15009lfv.214.2024.02.28.02.47.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 02:47:25 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: Paolo Abeni <pabeni@redhat.com>, Steven Rostedt <rostedt@goodmis.org>
-Cc: davem@davemloft.net, kuba@kernel.org, roopa@nvidia.com,
- razor@blackwall.org, bridge@lists.linux.dev, netdev@vger.kernel.org,
- jiri@resnulli.us, ivecera@redhat.com, mhiramat@kernel.org,
- linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 net-next 4/4] net: switchdev: Add tracepoints
-In-Reply-To: <4838ad92a359a10944487bbcb74690a51dd0a2f8.camel@redhat.com>
-References: <20240223114453.335809-1-tobias@waldekranz.com>
- <20240223114453.335809-5-tobias@waldekranz.com>
- <20240223103815.35fdf430@gandalf.local.home>
- <4838ad92a359a10944487bbcb74690a51dd0a2f8.camel@redhat.com>
-Date: Wed, 28 Feb 2024 11:47:24 +0100
-Message-ID: <87a5nkhnlv.fsf@waldekranz.com>
+	s=arc-20240116; t=1709117434; c=relaxed/simple;
+	bh=f2hS6dwTPEXkS5+rF6yuPrl9v8otDBXWTW3zOQG+s+w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=liraoQM7hS1kZezYA7JsQq51TqZEJUcFNR+iMIgqjiVqdNriJ6MG2M/J+01sEhSY4juEzaVk82/3xKicix+LYbPyfYhl7+xtYlV1sZRyIBwt36WCToTWOK+6T872TTo7lJm7x/CercExab1Chl6mWqRFzoFYep+yYGjb4MeI3dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HcTcAoAm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D1104C433F1;
+	Wed, 28 Feb 2024 10:50:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709117433;
+	bh=f2hS6dwTPEXkS5+rF6yuPrl9v8otDBXWTW3zOQG+s+w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=HcTcAoAm6/fCYLHR+ROKWR5ZXftanBIARX6EhdyTBHGW49o6ybFQuBvKUfN5Y0sfQ
+	 t+badYUsYRoYJcTpQ/vCUGJz9g+SSvLtyx5obr+hALVUMSyjbmD5/o15CbaThMK9J/
+	 KF3UmyRCxQ2eOfpWE80soChN6ubrBj6+KYbJBZQajoT6Nap5Q2dOSj1Y+8Hav5a4Fi
+	 XDOzn+m6Cs43T3LdheeGvilfOgqh2B4713m2P2MNnNQCCRkuUrhF4r8Dxgi3FO9KKQ
+	 W4sTNYhJfG9A2so7g6++Gn8/zi5XHeSW6YqD78PdENdrcTzS8fXPbiabFkAopfn/jG
+	 C4O6MKU5yzB6A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B77A4D88FAF;
+	Wed, 28 Feb 2024 10:50:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v10 00/10] introduce drop reasons for tcp receive
+ path
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170911743374.15474.6211464866179715497.git-patchwork-notify@kernel.org>
+Date: Wed, 28 Feb 2024 10:50:33 +0000
+References: <20240226032227.15255-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20240226032227.15255-1-kerneljasonxing@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, kuniyu@amazon.com,
+ netdev@vger.kernel.org, kernelxing@tencent.com
 
-On tis, feb 27, 2024 at 11:04, Paolo Abeni <pabeni@redhat.com> wrote:
-> On Fri, 2024-02-23 at 10:38 -0500, Steven Rostedt wrote:
->> On Fri, 23 Feb 2024 12:44:53 +0100
->> Tobias Waldekranz <tobias@waldekranz.com> wrote:
->> 
->> > Add a basic set of tracepoints:
->> > 
->> > - switchdev_defer: Fires whenever an operation is enqueued to the
->> >   switchdev workqueue for deferred delivery.
->> > 
->> > - switchdev_call_{atomic,blocking}: Fires whenever a notification is
->> >   sent to the corresponding switchdev notifier chain.
->> > 
->> > - switchdev_call_replay: Fires whenever a notification is sent to a
->> >   specific driver's notifier block, in response to a replay request.
->> > 
->> > Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
->> > ---
->> >  include/trace/events/switchdev.h | 74 ++++++++++++++++++++++++++++++++
->> >  net/switchdev/switchdev.c        | 71 +++++++++++++++++++++++++-----
->> >  2 files changed, 135 insertions(+), 10 deletions(-)
->> >  create mode 100644 include/trace/events/switchdev.h
->> > 
->> > diff --git a/include/trace/events/switchdev.h b/include/trace/events/switchdev.h
->> > new file mode 100644
->> > index 000000000000..dcaf6870d017
->> > --- /dev/null
->> > +++ b/include/trace/events/switchdev.h
->> > @@ -0,0 +1,74 @@
->> > +/* SPDX-License-Identifier: GPL-2.0 */
->> > +#undef TRACE_SYSTEM
->> > +#define TRACE_SYSTEM	switchdev
->> > +
->> > +#if !defined(_TRACE_SWITCHDEV_H) || defined(TRACE_HEADER_MULTI_READ)
->> > +#define _TRACE_SWITCHDEV_H
->> > +
->> > +#include <linux/tracepoint.h>
->> > +#include <net/switchdev.h>
->> > +
->> > +#define SWITCHDEV_TRACE_MSG_MAX 128
->> 
->> 128 bytes is awfully big to waste on the ring buffer. What's the average
->> size of a string?
->> 
->> > +
->> > +DECLARE_EVENT_CLASS(switchdev_call,
->> > +	TP_PROTO(unsigned long val,
->> > +		 const struct switchdev_notifier_info *info,
->> > +		 int err),
->> > +
->> > +	TP_ARGS(val, info, err),
->> > +
->> > +	TP_STRUCT__entry(
->> > +		__field(unsigned long, val)
->> > +		__string(dev, info->dev ? netdev_name(info->dev) : "(null)")
->> > +		__field(const struct switchdev_notifier_info *, info)
->> > +		__field(int, err)
->> > +		__array(char, msg, SWITCHDEV_TRACE_MSG_MAX)
->> > +	),
->> > +
->> > +	TP_fast_assign(
->> > +		__entry->val = val;
->> > +		__assign_str(dev, info->dev ? netdev_name(info->dev) : "(null)");
->> > +		__entry->info = info;
->> > +		__entry->err = err;
->> > +		switchdev_notifier_str(val, info, __entry->msg, SWITCHDEV_TRACE_MSG_MAX);
->> 
->> Is it possible to just store the information in the trace event and then
->> call the above function in the read stage?
->
-> I agree with Steven: it looks like that with the above code the
-> tracepoint itself will become measurably costily in terms of CPU
-> cycles: we want to avoid that.
->
-> Perhaps using different tracepoints with different notifier_block type
-> would help? so that each trace point could just copy a few specific
-> fields.
+Hello:
 
-This can be done, but you will end up having to duplicate the decoding
-and formatting logic from switchdev-str.c, with the additional hurdle of
-having to figure out the sizes of all referenced objects in order to
-create flattened versions of every notification type.
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-What I like about the current approach is that when new notification and
-object types are added, switchdev_notifier_str will automatically be
-able to decode them and give you some rough idea of what is going on,
-even if no new message specific decoding logic is added. It is also
-reusable by drivers that might want to decode notifications or objects
-in error messages.
+On Mon, 26 Feb 2024 11:22:17 +0800 you wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> When I was debugging the reason about why the skb should be dropped in
+> syn cookie mode, I found out that this NOT_SPECIFIED reason is too
+> general. Thus I decided to refine it.
+> 
+> v10
+> Link: https://lore.kernel.org/netdev/20240223193321.6549-1-kuniyu@amazon.com/
+> 1. fix three nit problems (Kuniyuki)
+> 2. add reviewed-by tag (Kuniyuki)
+> 
+> [...]
 
-Would some variant of (how I understand) Steven's suggestion to instead
-store the formatted message in a dynamic array (__assign_str()), rather
-than in the tracepoint entry, be acceptable?
+Here is the summary with links:
+  - [net-next,v10,01/10] tcp: add a dropreason definitions and prepare for cookie check
+    https://git.kernel.org/netdev/net-next/c/48e4704aedb9
+  - [net-next,v10,02/10] tcp: directly drop skb in cookie check for ipv4
+    https://git.kernel.org/netdev/net-next/c/65be4393f363
+  - [net-next,v10,03/10] tcp: use drop reasons in cookie check for ipv4
+    https://git.kernel.org/netdev/net-next/c/a4a69a3719ec
+  - [net-next,v10,04/10] tcp: directly drop skb in cookie check for ipv6
+    https://git.kernel.org/netdev/net-next/c/ed43e76cdcc4
+  - [net-next,v10,05/10] tcp: use drop reasons in cookie check for ipv6
+    https://git.kernel.org/netdev/net-next/c/253541a3c1e4
+  - [net-next,v10,06/10] tcp: introduce dropreasons in receive path
+    https://git.kernel.org/netdev/net-next/c/3d359faba191
+  - [net-next,v10,07/10] tcp: add more specific possible drop reasons in tcp_rcv_synsent_state_process()
+    https://git.kernel.org/netdev/net-next/c/e615e3a24ed6
+  - [net-next,v10,08/10] tcp: add dropreasons in tcp_rcv_state_process()
+    https://git.kernel.org/netdev/net-next/c/7d6ed9afde85
+  - [net-next,v10,09/10] tcp: make the dropreason really work when calling tcp_rcv_state_process()
+    https://git.kernel.org/netdev/net-next/c/b98256959305
+  - [net-next,v10,10/10] tcp: make dropreason in tcp_child_process() work
+    https://git.kernel.org/netdev/net-next/c/ee01defe25ba
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
