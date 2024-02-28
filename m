@@ -1,85 +1,101 @@
-Return-Path: <netdev+bounces-75524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C295886A66D
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:17:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0026686A677
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 03:20:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76311284A0A
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 02:17:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF06B286A2B
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 02:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B225250;
-	Wed, 28 Feb 2024 02:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84EAF63B3;
+	Wed, 28 Feb 2024 02:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rl212AOm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jxmWfglb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8012063B3;
-	Wed, 28 Feb 2024 02:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C67F567A;
+	Wed, 28 Feb 2024 02:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709086631; cv=none; b=nItMUbPlzMcBN+nC9RCpRZRVm5sPkcFRCB97nFN3MK5tOze10hixTgxUv3w1yoBcP+IfzWXNqxPe8ZDLkYqRtV93UsxL4vnWGwx1jT4AsP+KtbBrUO0+KjjizzU2AQ/662HBp2D4ga0KEq9yNSIlRqZpul+SbzzeT0ujl4HR6gE=
+	t=1709086830; cv=none; b=Jcl9kxL7i9zkngBEX59Vl1K4MlM7uXM0enbkub/SYNTGTJfYSUnzrtoDPHQje41KPggJ9n++ZzIGlCMGZ23/uLvlbhU/xKt05mJ23+BevHX+zBYe3ENEHTGvLrnULdUSV1mAtGyzsS51qzuwLjDUPY14ejrlyQwSEojCRirItuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709086631; c=relaxed/simple;
-	bh=ks5mnjKC9lF0LUAQnlJGF+2i9bOqbfU8O+K3zemzvJk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WvkVwCzyu2vhMX4Nj421ooTxAk8MOoj1e/dB3rbVN6JbagGxv+7XFlUGeO4IodlGtJfLoHq4rTwNC2+jq1hMRitopVRCH76uJqyQerFy9hYuffqCgfNZs7faXk+hw4jMQizolNsTHXY4t5fh9ME2q32qf2dIyKTyvt+OEjCy47M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rl212AOm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A98EDC433C7;
-	Wed, 28 Feb 2024 02:17:10 +0000 (UTC)
+	s=arc-20240116; t=1709086830; c=relaxed/simple;
+	bh=l/rOErX5YaV77tJeUILtrCdkz7azE+TOycWzTxCWi7E=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pYshnhtiz3ZpsUjipXouTl+txdHqzk/R984IJ4BX067/II+dtxQycBxw8k5G/SlKAbc1WxoZVMbojKxUuAtELFIfgTYOLb66zIgmg1BxhdqYZVkC6pgI3ckTcXqln7L61WmTaxOedK204UqVzSan2uZJqJhji1ctUDceVZMicmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jxmWfglb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1C16BC43390;
+	Wed, 28 Feb 2024 02:20:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709086631;
-	bh=ks5mnjKC9lF0LUAQnlJGF+2i9bOqbfU8O+K3zemzvJk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Rl212AOmTiAWXRGq6m9KtDJfubLQf8XcOYeUzflQGHV9enk7c3NBn9e4foLkGnOvD
-	 kM+kcM1v+Y4tmR+jJzo117y5LzDs5EuIc+JTkgdLOGobkpdLSAv7oJKiIyYnSIGXTg
-	 BvMI96gvqcATDPOcFNYPKLddT4ehvD+peNN5yw7BenmKe203eytImLWqvxLfZDUWRw
-	 +m4gNQHo7XsUe2yrgBG6zwNXBoeIV61ILqghXLGnIm7ZDr8deFwP6HFwiE5Xa1ac5j
-	 SYXDbVLcUUgXEvD/UW1oSoiPFmaoefT8FeB4hxJCWQMDKxjpSra5ZRquWjC6WTJpOD
-	 rlhuzsvamGCCw==
-Date: Tue, 27 Feb 2024 18:17:09 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Javier Carrasco <javier.carrasco.cruz@gmail.com>, Andrew Lunn
- <andrew@lunn.ch>
-Cc: Peter Korsgaard <peter@korsgaard.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: usb: dm9601: fix wrong return value in
- dm9601_mdio_read
-Message-ID: <20240227181709.7159d60f@kernel.org>
-In-Reply-To: <20240225-dm9601_ret_err-v1-1-02c1d959ea59@gmail.com>
-References: <20240225-dm9601_ret_err-v1-1-02c1d959ea59@gmail.com>
+	s=k20201202; t=1709086830;
+	bh=l/rOErX5YaV77tJeUILtrCdkz7azE+TOycWzTxCWi7E=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jxmWfglbh8JgkcphXS/yahGJXam+H672eiNkCkzKPjyWub0Havva8LHtvygXBvwuP
+	 WKJRwHIo6xWqSrlP1bfJW2UQUuj2zU80oQjM+40cqALYKB0yWwBbNDKXt8fD3PTvoK
+	 ykyhXw1SuzCzbYHMQqu+fS1mzMMTpmVP+1LlM2MOtlxLjzGmkI02mTRc0jCWiw2sOu
+	 qaU6FweT/zNekJHT2wheBvq9dEOa7Di49Oz4G0d00ylMt+cSbttU8svvPZXW6T0cme
+	 iEorlW2QqB4WohigqbqbTamr+8UcptnJvoTYLogDABscD7DPsmNpqxNbKF63QzGHdn
+	 VuUorFp0GcCWg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F38D7D88FB0;
+	Wed, 28 Feb 2024 02:20:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: wwan: t7xx: Prefer struct_size over open coded
+ arithmetic
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170908682999.30494.11218571706711449846.git-patchwork-notify@kernel.org>
+Date: Wed, 28 Feb 2024 02:20:29 +0000
+References: <20240224181932.2720-1-erick.archer@gmx.com>
+In-Reply-To: <20240224181932.2720-1-erick.archer@gmx.com>
+To: Erick Archer <erick.archer@gmx.com>
+Cc: chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
+ haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com,
+ ricardo.martinez@linux.intel.com, loic.poulain@linaro.org,
+ ryazanov.s.a@gmail.com, johannes@sipsolutions.net, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ gustavoars@kernel.org, keescook@chromium.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
 
-On Sun, 25 Feb 2024 00:20:06 +0100 Javier Carrasco wrote:
-> The MII code does not check the return value of mdio_read (among
-> others), and therefore no error code should be sent. A previous fix to
-> the use of an uninitialized variable propagates negative error codes,
-> that might lead to wrong operations by the MII library.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sat, 24 Feb 2024 19:19:32 +0100 you wrote:
+> This is an effort to get rid of all multiplications from allocation
+> functions in order to prevent integer overflows [1][2].
 > 
-> An example of such issues is the use of mii_nway_restart by the dm9601
-> driver. The mii_nway_restart function does not check the value returned
-> by mdio_read, which in this case might be a negative number which could
-> contain the exact bit the function checks (BMCR_ANENABLE = 0x1000).
+> As the "port_prox" variable is a pointer to "struct port_proxy" and
+> this structure ends in a flexible array:
 > 
-> Return zero in case of error, as it is common practice in users of
-> mdio_read to avoid wrong uses of the return value.
+> struct port_proxy {
+> 	[...]
+> 	struct t7xx_port ports[];
+> };
+> 
+> [...]
 
-A bit odd but appears to be true, so I'll apply, thank you!
+Here is the summary with links:
+  - net: wwan: t7xx: Prefer struct_size over open coded arithmetic
+    https://git.kernel.org/netdev/net-next/c/848e34ca2030
 
-Andrew, 
-mii.h files seem to fall under PHYLIB in MAINTAINERS, but mii.c does
-not. Is this intentional?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
