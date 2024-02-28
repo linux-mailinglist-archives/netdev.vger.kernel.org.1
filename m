@@ -1,131 +1,118 @@
-Return-Path: <netdev+bounces-75854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DFBB86B5B9
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 18:18:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 229F886B5E3
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 18:25:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3739B21BBF
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:18:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54E6E1C23C87
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:25:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA9D0159567;
-	Wed, 28 Feb 2024 17:18:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EB9D15B10D;
+	Wed, 28 Feb 2024 17:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VAX+x29n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MK1D2lJ7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77E73FBB9;
-	Wed, 28 Feb 2024 17:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28003FBB2;
+	Wed, 28 Feb 2024 17:24:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709140726; cv=none; b=JUi7WGAsQoPh2yzLn57yXqvuNPt8zQJrbVXhIb9YeDjYgIJgW5dMejqMjmDVsYadc0thg8epEeqs7pZ5k/9bXpvzAkGyfQRipFM+86u05dgo7a7QFqnVL/vQbmHslFJP/OjBG1HYk8W+mhK4M7pOu4Ibx4jvwJY7FcO/suzxDaU=
+	t=1709141100; cv=none; b=mVNYYJS3UMuZvca6IQvkJk1c4p44nsPW/8ZzEbLRWzSLiiHdTQ90jJc4AugiUGAlMupiPLGbhrCnsKsJ3Dl0zV/VvA4clefFE/6RUJEUY8bOFSL+AkLvFEyUJ2+rkYAR/PxaoqhpunwfjNHeEFRbqRbUJyLuHD8J8pEyu8I7ND0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709140726; c=relaxed/simple;
-	bh=7Np/zr7DLGjyYYuEcCZgtLSlELCkIkd/WVEd69z0kMc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hlNhS5cv4yPn2aaKHaYgbeTUSzgNAYC11WAM7qpT5Ze5wk9Lig2uUDIlUtOFAhW+LeJBDjxvVhsR7bwN5w6H/J9/dwa9ovm8df6gOObxeIJtoa3FJx3ZZ3uCoUFAOBeSebsxLNBSK9a1JL4MsH42zhEP8O/BdTvI22Kk4+LiGO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VAX+x29n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E491C433F1;
-	Wed, 28 Feb 2024 17:18:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709140726;
-	bh=7Np/zr7DLGjyYYuEcCZgtLSlELCkIkd/WVEd69z0kMc=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=VAX+x29njD0xyB/7dX1OBluP0fZD01XLb/o6qWLQZ2NdW1DHt1rHYqynOg+cg78KY
-	 MdOE7NTHMQqZWU5MV7j2CL/6pBhnQVQYkThsu1lLFcoT9f6/oS+NE/iLkfE5MfmT5g
-	 APD05lDataW1ksboB3PUyNrEKksUgdQHHrz09vHuVrhpkr0i2ty2ZJdKY+qCL/859/
-	 R8a9UB3WItSLzZvXj2HRRqv0ydrN849cM1ZV75tfsT7nwMWfvN8vbakpXb6GqIT2bl
-	 MVOQ52AXKs/rtcGOtf7eX0I3gfZgZfcPWHQHBe6g8sjTE3fUUYT7uZJ2jM3wbTpUrM
-	 glSDi+5RaFrRQ==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id BEA77CE0350; Wed, 28 Feb 2024 09:18:45 -0800 (PST)
-Date: Wed, 28 Feb 2024 09:18:45 -0800
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Yan Zhai <yan@cloudflare.com>
-Cc: Joel Fernandes <joel@joelfernandes.org>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Hannes Frederic Sowa <hannes@stressinduktion.org>,
-	linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
-	bpf@vger.kernel.org, kernel-team@cloudflare.com,
-	rostedt@goodmis.org, mark.rutland@arm.com
-Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
-Message-ID: <e592faa3-db99-4074-9492-3f9021b4350c@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <Zd4DXTyCf17lcTfq@debian.debian>
- <CANn89iJQX14C1Qb_qbTVG4yoG26Cq7Ct+2qK_8T-Ok2JDdTGEA@mail.gmail.com>
- <d633c5b9-53a5-4cd6-9dbb-6623bb74c00b@paulmck-laptop>
- <f1d1e0fb-2870-4b8f-8936-881ac29a24f1@joelfernandes.org>
- <CAO3-Pboo32iQBBUHUELUkvvpSa=jZwUqefrwC-NBjDYx4yxYJQ@mail.gmail.com>
+	s=arc-20240116; t=1709141100; c=relaxed/simple;
+	bh=ibbZtSAB3p6iITdVB1SXa0cy+XZ4vhhCy3WP18PyyD0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q7gzYO3+uFJwEkTRZ35mBTB/F7QzDeHBIZx/AC4EQ68NTsB93e2C7RRhXKF+TGSHC4duVgo/StOwymOJ1OT0sHgXvdpi4yZ9MLHENlIO2sfgqEn4vThIzXyEqeld7ViQPUl6N+fz7gPpNZZuKy2M7LhTydkKNYQKpvToIs2VAiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MK1D2lJ7; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-563c403719cso27494a12.2;
+        Wed, 28 Feb 2024 09:24:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709141097; x=1709745897; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ggUWzI97AER97VCO5bK1ghUrgDw3VtB950on0vUkKY4=;
+        b=MK1D2lJ7BIkx9icBccLLDChbA7H1+8PayXlzXLK9b6z7z5RlI5vSMVBIQigF0Je6Ia
+         jrFTLN6Pwm5pPJPHyG3kB57C7S+eTPwpp2TJPWMrvFdE3sMAoUS4vCxBCJmS5QfN15Zd
+         1LzVYHU3teMPTatGrPV9qu4qHqYb+rDpPgZptlGN6spDkN1TsTt1n81+sQaU+ueTD/aO
+         GPFlAyfT0qgThRBqQvowiAV71XEDT2AlxkztFXpiU8k+5MOrOz4G37V1T9mnEsMBuFMl
+         FktxM5UW5OhlZfm3nQX78mDO1EVlTptexQn+5gx6hzlsX/m2DZDgpH0g0rzVgjdfC8BG
+         4qTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709141097; x=1709745897;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ggUWzI97AER97VCO5bK1ghUrgDw3VtB950on0vUkKY4=;
+        b=WD1tQ3bLE5OxR3B/lvy5qRMc5fxKCFSE2TTBRk5/80F0JMHFoMrUFUiezLI/VgXXv3
+         tT4N5MQj6mp+hKqvP0osxTIUEIxhLC1pnTuPVQcdPdDje0h/EyDbpLaXsP9qMqR/4JD8
+         AXA2xv2jc/dEJzbn2rQbu8GCVrmswTARMORdXzpI5cvVt0yAc+2O+fmHYagFd1CRekiM
+         5EJxdS57fm1YmVtmrrmmhos81HU+cyM4Kmrhs7kgl0KEp+9RXKuzE7MlfU90D9AdqErE
+         622vyaPE3d3L1Ldky3eJIF4Qwcvw0NJsnMmf6DDXRSdnPZiZU5V82CgnbPbvRdsnP3Hg
+         rFeA==
+X-Forwarded-Encrypted: i=1; AJvYcCVz+JSeFv8BGerlPToBUbD42Nbk7eo9IYqnECr+dSP6TYrxP33u5Oq+9Drgp93XWizBjohOq7a+hwS6lp7RhWT0bGUQLcENGCQudQYdoN0c3X75edfskIRY5yHLew8Lfqq2LElU/1GhIs+7AU6fQsaOcqv3evthSdfX1fBLw0ke+TylpA==
+X-Gm-Message-State: AOJu0YwsckSgFdrV8hOekII4Bq2hJx9ZOC/XSMxgQ/ryalDSDVZ7leqI
+	da4CTqYNq0lr2niHnjs1LjeP1F1CPt3puNxkDq9gkoSftchxexQs
+X-Google-Smtp-Source: AGHT+IHRtV+73O8/64MXV5GC0Imj4BFKa58Y2BDfVVmT6K5FnbrF6s0WW1PyaDtDiMh8WcLBxqZWzg==
+X-Received: by 2002:a17:906:454:b0:a3d:994a:791d with SMTP id e20-20020a170906045400b00a3d994a791dmr193000eja.59.1709141096969;
+        Wed, 28 Feb 2024 09:24:56 -0800 (PST)
+Received: from fedora.. (cpe-109-60-83-139.zg3.cable.xnet.hr. [109.60.83.139])
+        by smtp.googlemail.com with ESMTPSA id ts7-20020a170907c5c700b00a43f4722eaesm926910ejc.103.2024.02.28.09.24.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 09:24:55 -0800 (PST)
+From: Robert Marko <robimarko@gmail.com>
+To: andersson@kernel.org,
+	konrad.dybcio@linaro.org,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Robert Marko <robimarko@gmail.com>
+Subject: [PATCH net-next v2 0/2] net: phy: qcom: qca808x: fill in possible_interfaces
+Date: Wed, 28 Feb 2024 18:24:08 +0100
+Message-ID: <20240228172452.2456842-1-robimarko@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAO3-Pboo32iQBBUHUELUkvvpSa=jZwUqefrwC-NBjDYx4yxYJQ@mail.gmail.com>
 
-On Wed, Feb 28, 2024 at 10:37:51AM -0600, Yan Zhai wrote:
-> On Wed, Feb 28, 2024 at 9:37 AM Joel Fernandes <joel@joelfernandes.org> wrote:
-> > Also optionally, I wonder if calling rcu_tasks_qs() directly is better
-> > (for documentation if anything) since the issue is Tasks RCU specific. Also
-> > code comment above the rcu_softirq_qs() call about cond_resched() not taking
-> > care of Tasks RCU would be great!
-> >
-> Yes it's quite surprising to me that cond_resched does not help here,
+QCA808x does not currently fill in the possible_interfaces.
 
-In theory, it would be possible to make cond_resched() take care of
-Tasks RCU.  In practice, the lazy-preemption work is looking to get rid
-of cond_resched().  But if for some reason cond_resched() needs to stay
-around, doing that work might make sense.
+This leads to Phylink not being aware that it supports 2500Base-X as well
+so in cases where it is connected to a DSA switch like MV88E6393 it will
+limit that port to phy-mode set in the DTS.
 
-> I will include that comment. Raising just the task RCU QS seems
-> sufficient to the problem we encountered. But according to commit
-> d28139c4e967 ("rcu: Apply RCU-bh QSes to RCU-sched and RCU-preempt
-> when safe"), there might be additional threat factor in __do_softirq
-> that also applies to threaded poll.
+That means that if SGMII is used you are limited to 1G only while if
+2500Base-X was set you are limited to 2.5G only.
 
-We did look into more focused alternatives for Tasks RCU a few days ago,
-but they all had problems, for example, requiring that it be possible
-to get exact information on the instruction pointers for interrupts on
-any given CPU's stack.  The key point of Tasks RCU is to work out when
-an old tracing trampoline may safely be freed, so a better way of doing
-that would remove the need for this sort of addition to NAPI polling.
+Populating the possible_interfaces fixes this.
 
-(Adding Steve and Mark for their thoughts.)
+Changes in v2:
+* Get rid of the if/else by Russels suggestion in the helper
 
-							Thanx, Paul
+Robert Marko (2):
+  net: phy: qcom: qca808x: add helper for checking for 1G only model
+  net: phy: qcom: qca808x: fill in possible_interfaces
 
-> Yan
-> 
-> 
-> > Reviewed-by: Joel Fernandes (Google) <joel@joelfernandes.org>
-> >
-> > thanks,
-> >
-> >  - Joel
-> > [1]
-> > @@ -381,8 +553,10 @@ asmlinkage __visible void __softirq_entry __do_softirq(void)
-> >                 pending >>= softirq_bit;
-> >         }
-> >
-> > -       if (__this_cpu_read(ksoftirqd) == current)
-> > +       if (!IS_ENABLED(CONFIG_PREEMPT_RT) &&
-> > +           __this_cpu_read(ksoftirqd) == current)
-> >                 rcu_softirq_qs();
-> > +
-> >         local_irq_disable();
+ drivers/net/phy/qcom/qca808x.c | 29 ++++++++++++++++++++++++-----
+ 1 file changed, 24 insertions(+), 5 deletions(-)
+
+-- 
+2.44.0
+
 
