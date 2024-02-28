@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-75744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 304CA86B0EF
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:55:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BAC286B0F0
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:55:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08EF71C24609
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:55:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 486D21C24A8E
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:55:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB53B14F979;
-	Wed, 28 Feb 2024 13:54:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4894E15531E;
+	Wed, 28 Feb 2024 13:54:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r/vLOE2N"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v/8e8AEj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A89B15531E
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 13:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8E5157E7B
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 13:54:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709128490; cv=none; b=W+GYWSEm0n6xfQ3ZqDk3dkYZ3lVON3rQ2sZuKu8DCmIIX4vpmpIXzIqgZOpM8ULz+f37fQPjA3+zMXEcnSP5v+g70TUIDgldm7OGQu+nqXNjAubd2dfMXid4ISv8l3JTUm3D6VmVVNWxwmuAEzGp/Hw7RYk3YICR59fzxYUrG4w=
+	t=1709128492; cv=none; b=NKHvif1tn4+GY1OELenznVRwcV9GpMBCn7/3lSdbrzxQm6lznRf4lcDu1XwnP1FXHcrlwZeDK8s/iEN6DgSE1zEz5vAtoNBH5iQMOE4S6XREmEF2oSXWoCzwhf3daot1TA1NiB5wUiiLHGJdpZmmEGK712p/cAzFDLJEgGDGf9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709128490; c=relaxed/simple;
-	bh=N2hL2xaPrpeRGNwEqKwm4kjCM9F3btIkN1OscYsi5Ek=;
+	s=arc-20240116; t=1709128492; c=relaxed/simple;
+	bh=ygLg94dIps3zIcDRFubF2s7jK0F5ZmRb8SWXaOSKLXE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WihLuygtPlOmvFjDXyHA5mqrGqXgN25GARWeG39skWrBukVxYFTPwkFTKIo+0iBYqcLm5WCWkEiI0l9WrVUYE042q1h5yQqh/YNEYEjZujsuqbyyLnXMyeyhf6mVzbFMLGgFGOxSyjZnFBRuqBoZGBhoI1Dgx4P4za8gBA9Li2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r/vLOE2N; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=RPvsrQ2rJ/wk+lKBmwhisqUB0PZkWcUzek3VmZo3c9Otw4VIZmqkSi4sCxk1TZq2CoRKJWM1jt9ibvjmCCsAU9J5UIRrxaLi3b/TpsJ7UET4j2hgeK8y4l0Xui8tB3Lyznp5nWH7leYm/fwR1EG+SJn3GqXBi6jiaO+Mmj81/xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v/8e8AEj; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc64b659a9cso8663683276.3
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 05:54:48 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6b26783b4so7008038276.0
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 05:54:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709128488; x=1709733288; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709128489; x=1709733289; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OmY3dY632PH80ZQri5XOrSnftpfZoL3ED9y4hOcBys8=;
-        b=r/vLOE2NgF4tSNKkyS1FPG0kuLs0SNVtytIluL3l+LGrPUP11TIZvHlln+cFuNl/y9
-         FLt/BcYyGQgbV2SDcXAywMVnivmtNmOlum46+JlxSTi+oZtA09Pa0FA/RLByWE4KOVGU
-         Ko0N0EudMRUunpILKDyn7831v9dk6zSaKyOrzi5iezB6YRq8Hc62yWPqHOQoWd+hrlPp
-         n3uJXnN6b00P3JvERmZ2VWvmR1o+Kq6cI8rFnugppR5wK8WcssFwdkgewpSRtcaDrYpP
-         fzkzms4nZJQdfHdAc96QX4z6VnzH+BQsyFOjITFqUbX/24DKE1ZpJo4f3BWNo5+ZDb10
-         27kQ==
+        bh=L7NTXK4f/hgsidvPYAJ36SmYjWcf3wQ94jpBSeMR/q0=;
+        b=v/8e8AEjtN5P2UUJUL3vJndeKUrVSuSVGcNgSEetLBsb4MoqqOzwWsw7UEctygJHlO
+         Xpkjgos8CIsKwHY6sR5f+MDFdP+nvwMNFxcGBdd8VHnoqqrw++U1xu+uczNKwVvC6q6S
+         /nWHH4UjwWncUw2v6hzfpnxxbi8gdyIIdnaajeHUfEZV07y8qGfWya798C+8KYtXYJ2e
+         7ozC/dy/QQB2hZdX0wBt+AowQbta0IqJZMRsSasKD9GS4dxZ6NeEL3TH+IQbRFPdaeFZ
+         EhGncOW84zxwKfq78yJ2Lu6tr+ZZJfbIPgF60uW1KDmBOYb3UQQ0JWKNcnJTYUV5L/Ik
+         l30w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709128488; x=1709733288;
+        d=1e100.net; s=20230601; t=1709128489; x=1709733289;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OmY3dY632PH80ZQri5XOrSnftpfZoL3ED9y4hOcBys8=;
-        b=rAlIv9pP8EJ2iio/NeQ1XbAL/q+HqwoNeXQVD1YXldSnzU7z4pkZCNfoKBKKGy2lwN
-         ZZrWabL0ja5bGLZ3+G1J73SZlHlFbPulkm4ll7/Ap6qEEWo8TFWndQ0TDjt3lTjcdmny
-         5rm2MuyOstACy0AI/WJkLZP+BNaP/1Snmi7euBRbHQ7cM27zTMBvNc3XxxXWJLHoR1AB
-         vQrLEiX/ffJ454QdiXKyTTRUw7Zwc/2BZUhY3Gt14F8JONDaKd/KFfZJ9vS7Q2v7xhzj
-         YdSarh2FcJqoMWDMzVpaWoDbn3h1Km1Ut+QSOWsOsQOE9kn9498qVMp6kaJBfg1mvpLn
-         ZiFA==
-X-Gm-Message-State: AOJu0Yx9wcCdpswLIh33MqnArKlWCFo7CYkAovVIK33YpWPQ8wCZc7RH
-	sz5XXoyL8S5EfVkepizBNZJq68x+lhZ+SF6cf3/PMDhzQxTzPtndRQxc6SLGfHMbAdSAbVdzWrq
-	/j9qrozS5ug==
-X-Google-Smtp-Source: AGHT+IFMb+DfW/3m5L6YKEnQAj4CdBbRB8XBYmCSPn16BjfQpy4ie8k1yos7yLat6nUsKD43RVmRaJmkpvtK5A==
+        bh=L7NTXK4f/hgsidvPYAJ36SmYjWcf3wQ94jpBSeMR/q0=;
+        b=MuIKrFSK00UljPl8Ogu5n7MJmCDpLAvj8/9smnfJOjEqkRDAJTe/THHfIhnsdxl9Bj
+         ijYH1QXe21Bv4KFrE5V2Y8LeDNg91YJ2W+CCHymuP2c+O+3uUE2y2+2rMs5w7S5xPvsA
+         p6cp0MT4VEg6c/kUzepOyFKULD0AEModKcSYlr5XOBdVeEw2a68Xq7k7A3IT+GOyZ1yR
+         T13+bVmAsDrBNRzS4+ygpLCXBW6TdCGpA0SNRP5i7nBw3oLj/XishALYWpUMiGoqSfkp
+         et9h/TZ2H/r8SErZgYJzluWZH6EuiomGB5r/tkirJDzsSGUIv+HEQyQNlqxT9PRdV+Rn
+         x1Ig==
+X-Gm-Message-State: AOJu0YxsktR680DdAwL/6lBgcihG+HPfjCuYWU3XlwjednympJ1tM2zC
+	tovqxvAH+nZjJi8b3+wdrKZFH1TGxkVxlE3I0e/R6582QrT6m55Ib5+5kfKcNtS/baFUSR5qX4w
+	6BW3l/+uAIA==
+X-Google-Smtp-Source: AGHT+IEIXzUAmeELorWcDE5L855aOKhWG/XTCFSxkmmSn2v9yK8O58x9Ry+nVUridtrK8SmY9KP2J90Y8dViuA==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:d08c:0:b0:dc7:4b9:fbc6 with SMTP id
- h134-20020a25d08c000000b00dc704b9fbc6mr354156ybg.10.1709128488142; Wed, 28
- Feb 2024 05:54:48 -0800 (PST)
-Date: Wed, 28 Feb 2024 13:54:28 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1105:b0:dc6:b982:cfa2 with SMTP
+ id o5-20020a056902110500b00dc6b982cfa2mr124760ybu.8.1709128489352; Wed, 28
+ Feb 2024 05:54:49 -0800 (PST)
+Date: Wed, 28 Feb 2024 13:54:29 +0000
 In-Reply-To: <20240228135439.863861-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,102 +73,122 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240228135439.863861-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
-Message-ID: <20240228135439.863861-5-edumazet@google.com>
-Subject: [PATCH v3 net-next 04/15] ipv6: annotate data-races around cnf.mtu6
+Message-ID: <20240228135439.863861-6-edumazet@google.com>
+Subject: [PATCH v3 net-next 05/15] ipv6: annotate data-races around cnf.hop_limit
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@nvidia.com>, 
 	David Ahern <dsahern@kernel.org>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+	Eric Dumazet <edumazet@google.com>, Florian Westphal <fw@strlen.de>
 Content-Type: text/plain; charset="UTF-8"
 
-idev->cnf.mtu6 might be read locklessly, add appropriate READ_ONCE()
+idev->cnf.hop_limit and net->ipv6.devconf_all->hop_limit
+might be read locklessly, add appropriate READ_ONCE()
 and WRITE_ONCE() annotations.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
+Acked-by: Florian Westphal <fw@strlen.de> # for netfilter parts
 Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 ---
- include/net/ip6_route.h | 2 +-
- net/ipv6/addrconf.c     | 4 ++--
- net/ipv6/ndisc.c        | 4 ++--
- net/ipv6/route.c        | 6 +++---
- 4 files changed, 8 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/netronome/nfp/flower/action.c | 2 +-
+ net/ipv6/ipv6_sockglue.c                           | 2 +-
+ net/ipv6/ndisc.c                                   | 2 +-
+ net/ipv6/netfilter/nf_reject_ipv6.c                | 4 ++--
+ net/ipv6/output_core.c                             | 4 ++--
+ net/netfilter/nf_synproxy_core.c                   | 2 +-
+ 6 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/ip6_route.h b/include/net/ip6_route.h
-index 52a51c69aa9de2fe1e6d351997f5b3d94862521a..a30c6aa9e5cf3e442cd29e2d169ba0b0d46a1f46 100644
---- a/include/net/ip6_route.h
-+++ b/include/net/ip6_route.h
-@@ -332,7 +332,7 @@ static inline unsigned int ip6_dst_mtu_maybe_forward(const struct dst_entry *dst
- 	rcu_read_lock();
- 	idev = __in6_dev_get(dst->dev);
- 	if (idev)
--		mtu = idev->cnf.mtu6;
-+		mtu = READ_ONCE(idev->cnf.mtu6);
- 	rcu_read_unlock();
- 
- out:
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 9a5182a12bfd7719fa6d5f0537835e0f0bf37686..8fd2ff8510021738e6bde499cc9fae83c52b91ee 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -3671,7 +3671,7 @@ static int addrconf_notify(struct notifier_block *this, unsigned long event,
- 
- 		if (idev) {
- 			rt6_mtu_change(dev, dev->mtu);
--			idev->cnf.mtu6 = dev->mtu;
-+			WRITE_ONCE(idev->cnf.mtu6, dev->mtu);
- 			break;
+diff --git a/drivers/net/ethernet/netronome/nfp/flower/action.c b/drivers/net/ethernet/netronome/nfp/flower/action.c
+index 2b383d92d7f573b450ed3e315af3f07de56c1921..2c3f629079584024ed9d1640a980f4894b987115 100644
+--- a/drivers/net/ethernet/netronome/nfp/flower/action.c
++++ b/drivers/net/ethernet/netronome/nfp/flower/action.c
+@@ -460,7 +460,7 @@ nfp_fl_set_tun(struct nfp_app *app, struct nfp_fl_set_tun *set_tun,
+ 			set_tun->ttl = ip6_dst_hoplimit(dst);
+ 			dst_release(dst);
+ 		} else {
+-			set_tun->ttl = net->ipv6.devconf_all->hop_limit;
++			set_tun->ttl = READ_ONCE(net->ipv6.devconf_all->hop_limit);
+ 		}
+ #endif
+ 	} else {
+diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+index 56c3c467f9deb907ac6e6b84dcd33ec44bde0682..f61d977ac0528e190d901c9b5e71b1cf358096bd 100644
+--- a/net/ipv6/ipv6_sockglue.c
++++ b/net/ipv6/ipv6_sockglue.c
+@@ -1346,7 +1346,7 @@ int do_ipv6_getsockopt(struct sock *sk, int level, int optname,
  		}
  
-@@ -3763,7 +3763,7 @@ static int addrconf_notify(struct notifier_block *this, unsigned long event,
- 			if (idev->cnf.mtu6 != dev->mtu &&
- 			    dev->mtu >= IPV6_MIN_MTU) {
- 				rt6_mtu_change(dev, dev->mtu);
--				idev->cnf.mtu6 = dev->mtu;
-+				WRITE_ONCE(idev->cnf.mtu6, dev->mtu);
- 			}
- 			WRITE_ONCE(idev->tstamp, jiffies);
- 			inet6_ifinfo_notify(RTM_NEWLINK, idev);
+ 		if (val < 0)
+-			val = sock_net(sk)->ipv6.devconf_all->hop_limit;
++			val = READ_ONCE(sock_net(sk)->ipv6.devconf_all->hop_limit);
+ 		break;
+ 	}
+ 
 diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index 8523f0595b01899a9f6cf82809c1b4bcfc233202..e96d79cd34d27ca304c5f71b6db41b99d2dd8856 100644
+index e96d79cd34d27ca304c5f71b6db41b99d2dd8856..9c9c31268432ee58c1a381d0333d85a558a602e1 100644
 --- a/net/ipv6/ndisc.c
 +++ b/net/ipv6/ndisc.c
-@@ -1578,8 +1578,8 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
+@@ -1423,7 +1423,7 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
+ 	if (in6_dev->cnf.accept_ra_min_hop_limit < 256 &&
+ 	    ra_msg->icmph.icmp6_hop_limit) {
+ 		if (in6_dev->cnf.accept_ra_min_hop_limit <= ra_msg->icmph.icmp6_hop_limit) {
+-			in6_dev->cnf.hop_limit = ra_msg->icmph.icmp6_hop_limit;
++			WRITE_ONCE(in6_dev->cnf.hop_limit, ra_msg->icmph.icmp6_hop_limit);
+ 			fib6_metric_set(rt, RTAX_HOPLIMIT,
+ 					ra_msg->icmph.icmp6_hop_limit);
+ 		} else {
+diff --git a/net/ipv6/netfilter/nf_reject_ipv6.c b/net/ipv6/netfilter/nf_reject_ipv6.c
+index 196dd4ecb5e215f8a1de321bf249bec6fca6b97c..dedee264b8f6c8e5155074c6788c53fdf228ca3c 100644
+--- a/net/ipv6/netfilter/nf_reject_ipv6.c
++++ b/net/ipv6/netfilter/nf_reject_ipv6.c
+@@ -83,7 +83,7 @@ struct sk_buff *nf_reject_skb_v6_tcp_reset(struct net *net,
  
- 		if (mtu < IPV6_MIN_MTU || mtu > skb->dev->mtu) {
- 			ND_PRINTK(2, warn, "RA: invalid mtu: %d\n", mtu);
--		} else if (in6_dev->cnf.mtu6 != mtu) {
--			in6_dev->cnf.mtu6 = mtu;
-+		} else if (READ_ONCE(in6_dev->cnf.mtu6) != mtu) {
-+			WRITE_ONCE(in6_dev->cnf.mtu6, mtu);
- 			fib6_metric_set(rt, RTAX_MTU, mtu);
- 			rt6_mtu_change(skb->dev, mtu);
- 		}
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 707d65bc9c0e5e9b2900063f0ac86c3c5e299088..66c685b0b6199fee3bc39768eab5a6fb831bd2f5 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -1596,7 +1596,7 @@ static unsigned int fib6_mtu(const struct fib6_result *res)
+ 	skb_reserve(nskb, LL_MAX_HEADER);
+ 	nip6h = nf_reject_ip6hdr_put(nskb, oldskb, IPPROTO_TCP,
+-				     net->ipv6.devconf_all->hop_limit);
++				     READ_ONCE(net->ipv6.devconf_all->hop_limit));
+ 	nf_reject_ip6_tcphdr_put(nskb, oldskb, oth, otcplen);
+ 	nip6h->payload_len = htons(nskb->len - sizeof(struct ipv6hdr));
  
+@@ -124,7 +124,7 @@ struct sk_buff *nf_reject_skb_v6_unreach(struct net *net,
+ 
+ 	skb_reserve(nskb, LL_MAX_HEADER);
+ 	nip6h = nf_reject_ip6hdr_put(nskb, oldskb, IPPROTO_ICMPV6,
+-				     net->ipv6.devconf_all->hop_limit);
++				     READ_ONCE(net->ipv6.devconf_all->hop_limit));
+ 
+ 	skb_reset_transport_header(nskb);
+ 	icmp6h = skb_put_zero(nskb, sizeof(struct icmp6hdr));
+diff --git a/net/ipv6/output_core.c b/net/ipv6/output_core.c
+index b5205311f372bdaaff140d651e4b42b27a3ed805..806d4b5dd1e60b27726facbb59bbef97d6fee7f5 100644
+--- a/net/ipv6/output_core.c
++++ b/net/ipv6/output_core.c
+@@ -111,9 +111,9 @@ int ip6_dst_hoplimit(struct dst_entry *dst)
  		rcu_read_lock();
  		idev = __in6_dev_get(dev);
--		mtu = idev->cnf.mtu6;
-+		mtu = READ_ONCE(idev->cnf.mtu6);
+ 		if (idev)
+-			hoplimit = idev->cnf.hop_limit;
++			hoplimit = READ_ONCE(idev->cnf.hop_limit);
+ 		else
+-			hoplimit = dev_net(dev)->ipv6.devconf_all->hop_limit;
++			hoplimit = READ_ONCE(dev_net(dev)->ipv6.devconf_all->hop_limit);
  		rcu_read_unlock();
  	}
- 
-@@ -3249,8 +3249,8 @@ u32 ip6_mtu_from_fib6(const struct fib6_result *res,
- 
- 		mtu = IPV6_MIN_MTU;
- 		idev = __in6_dev_get(dev);
--		if (idev && idev->cnf.mtu6 > mtu)
--			mtu = idev->cnf.mtu6;
-+		if (idev)
-+			mtu = max_t(u32, mtu, READ_ONCE(idev->cnf.mtu6));
- 	}
- 
- 	mtu = min_t(unsigned int, mtu, IP6_MAX_MTU);
+ 	return hoplimit;
+diff --git a/net/netfilter/nf_synproxy_core.c b/net/netfilter/nf_synproxy_core.c
+index fbbc4fd373495b69940e29e657fde2cdc67b55db..5b140c12b7dfa40efc9bec6f2588c4350fed6bfb 100644
+--- a/net/netfilter/nf_synproxy_core.c
++++ b/net/netfilter/nf_synproxy_core.c
+@@ -800,7 +800,7 @@ synproxy_build_ip_ipv6(struct net *net, struct sk_buff *skb,
+ 	skb_reset_network_header(skb);
+ 	iph = skb_put(skb, sizeof(*iph));
+ 	ip6_flow_hdr(iph, 0, 0);
+-	iph->hop_limit	= net->ipv6.devconf_all->hop_limit;
++	iph->hop_limit	= READ_ONCE(net->ipv6.devconf_all->hop_limit);
+ 	iph->nexthdr	= IPPROTO_TCP;
+ 	iph->saddr	= *saddr;
+ 	iph->daddr	= *daddr;
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
