@@ -1,115 +1,108 @@
-Return-Path: <netdev+bounces-75697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B066E86AEFA
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:20:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 343F986AF30
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:28:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CF2E1F24F7F
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:20:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2BFF281D03
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:28:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB8C3BBC8;
-	Wed, 28 Feb 2024 12:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jy2gh12M"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC013BBC4;
+	Wed, 28 Feb 2024 12:28:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD8973511;
-	Wed, 28 Feb 2024 12:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B144D3BBDB
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 12:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709122832; cv=none; b=TmBT4tc44vDK7zWCEvQwId+1EencQYs+1Wo16ecQiUAvPjCHvqgKiAe6YFD/Hra1JhbV0laLCYDA3r0zCZSWaWN+6Zx0XLWZO1wp9VPjVTJJUV7RI5IV1/RYdB3qH/TKuBFpelgP8eF9mHA3Plwjz8ezHsFfqgwMQroK0bm/wE8=
+	t=1709123324; cv=none; b=P55rZn4ni8BXEVEc5nxF89f6fhQ+xdd+wz8y9bchlSWJmu83ZqAllysKAjO7q6Rio87A9TFvDgj6YTbW5ue8uDPqB8Nz29k3g9gA3wEA9DxgEX0Q9afb9cC1lm7JL0j9DsiDD2Gg2XuupioelptEi6G5MgmtT2GI06wqOMomEJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709122832; c=relaxed/simple;
-	bh=HJCBNKeuAAuw0Rwm5UYnlvoamIJt/suPGdB5W963k3A=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GTSvR2CePaP+Q0Evb6oix2O8rG+yjIKwkrm5sc4p0jYnAZsqGk7vIozQjN1VmjaNT60ah8rKWrchr8f4QgqF4csBT6LCj7T9S8MpUz506SeLcCshS9vlKzYzj5PokOO0Iz9ZQwW13LbVO7RkvsEdIQV9RLNF4mTymVg4KK6mnBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jy2gh12M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5051CC433C7;
-	Wed, 28 Feb 2024 12:20:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709122832;
-	bh=HJCBNKeuAAuw0Rwm5UYnlvoamIJt/suPGdB5W963k3A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Jy2gh12MpRAsyipw1H7jdt6xXzYPug/pMt7K+4lTUoldoWR76uDFtoj5GE598zSHT
-	 pyUGWeNaUkYeJ9stmhHh4mlRh2OKJb+4+dhTJlN4sMZXMN2ROE9jeyBEg7KO4+GGHL
-	 EewqdjtK3MIbD/OXixIm9OaFDO6nV2Ts/Nzw0FWnqHE8YD52Dytf/U0LU8T+RqX9kZ
-	 2P1DgoWHr92iXRbKfpBT3figX0zODB9/kqGCL8DZdOVwo9gFjOWnYRY489+O7MGW+F
-	 qJegLR6ymtfgGdlpc9mwgU0dOf4U31J0ZPjs37wCwNDrGd07WZ/M6Qm4BJprj+xQQz
-	 UmzEu/HfQX5ew==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3735CD88FAF;
-	Wed, 28 Feb 2024 12:20:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709123324; c=relaxed/simple;
+	bh=VqomBaJsbCrDWx32dDWhbU0egir/gv6ZNYqtFyQritQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LU0IX8kfs7jj58az0vvmu0HoCFQbUeem9OQyZ44ABKsGOjHAXPExhdWRbB+Bxle/zD0i7vipiXJ5ur5y4tAMhi0M8LryNfb6iq7k7xnqmYtXdOWK7XKgeS+kqYkKC09Rjkg0WI7QgHHAPqQkC5plxpeXl7oBrotwnBr7ZSqVSvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rfJ2z-0007e4-Up; Wed, 28 Feb 2024 13:28:29 +0100
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rfJ2x-003OF0-Lu; Wed, 28 Feb 2024 13:28:27 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rfJ2x-00C5Dx-1t;
+	Wed, 28 Feb 2024 13:28:27 +0100
+Date: Wed, 28 Feb 2024 13:28:27 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	netdev@vger.kernel.org, richardcochran@gmail.com,
+	nathan.sullivan@ni.com, Jacob Keller <jacob.e.keller@intel.com>,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Subject: Re: [PATCH net] igb: extend PTP timestamp adjustments to i211
+Message-ID: <Zd8m6wpondUopnFm@pengutronix.de>
+References: <20240227184942.362710-1-anthony.l.nguyen@intel.com>
+ <Zd7-9BJM_6B44nTI@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/9] drivers: net: Convert EEE handling to use
- linkmode bitmaps
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170912283221.5780.10584545658329943642.git-patchwork-notify@kernel.org>
-Date: Wed, 28 Feb 2024 12:20:32 +0000
-References: <20240226-keee-u32-cleanup-v5-0-9e7323c41c38@lunn.ch>
-In-Reply-To: <20240226-keee-u32-cleanup-v5-0-9e7323c41c38@lunn.ch>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, aelior@marvell.com, manishc@marvell.com,
- jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- horms@kernel.org, jacob.e.keller@intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Zd7-9BJM_6B44nTI@nanopsycho>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Mon, 26 Feb 2024 19:29:06 -0600 you wrote:
-> EEE has until recently been limited to lower speeds due to the use of
-> the legacy u32 for link speeds. This restriction has been lifted, with
-> the use of linkmode bitmaps, added in the following patches:
+On Wed, Feb 28, 2024 at 10:37:56AM +0100, Jiri Pirko wrote:
+> Tue, Feb 27, 2024 at 07:49:41PM CET, anthony.l.nguyen@intel.com wrote:
+> >From: Oleksij Rempel <o.rempel@pengutronix.de>
+> >
+> >The i211 requires the same PTP timestamp adjustments as the i210,
+> >according to its datasheet. To ensure consistent timestamping across
+> >different platforms, this change extends the existing adjustments to
+> >include the i211.
+> >
+> >The adjustment result are tested and comparable for i210 and i211 based
+> >systems.
+> >
+> >Fixes: 3f544d2a4d5c ("igb: adjust PTP timestamps for Tx/Rx latency")
 > 
-> 1f069de63602 ethtool: add linkmode bitmap support to struct ethtool_keee
-> 1d756ff13da6 ethtool: add suffix _u32 to legacy bitmap members of struct ethtool_keee
-> 285cc15cc555 ethtool: adjust struct ethtool_keee to kernel needs
-> 0b3100bc8fa7 ethtool: switch back from ethtool_keee to ethtool_eee for ioctl
-> d80a52335374 ethtool: replace struct ethtool_eee with a new struct ethtool_keee on kernel side
-> 
-> [...]
+> IIUC, you are just extending the timestamp adjusting to another HW, not
+> actually fixing any error, don't you? In that case, I don't see why not
+> to rather target net-next and avoid "Fixes" tag. Or do I misunderstand
+> this?
 
-Here is the summary with links:
-  - [net-next,v5,1/9] net: usb: r8152: Use linkmode helpers for EEE
-    https://git.kernel.org/netdev/net-next/c/17206c116d75
-  - [net-next,v5,2/9] net: usb: ax88179_178a: Use linkmode helpers for EEE
-    https://git.kernel.org/netdev/net-next/c/93e6da6cce4a
-  - [net-next,v5,3/9] net: qlogic: qede: Use linkmode helpers for EEE
-    https://git.kernel.org/netdev/net-next/c/9f8b8adca800
-  - [net-next,v5,4/9] net: ethernet: ixgbe: Convert EEE to use linkmodes
-    https://git.kernel.org/netdev/net-next/c/9356b6db9d05
-  - [net-next,v5,5/9] net: intel: i40e/igc: Remove setting Autoneg in EEE capabilities
-    https://git.kernel.org/netdev/net-next/c/01cf893bf0f4
-  - [net-next,v5,6/9] net: intel: e1000e: Use linkmode helpers for EEE
-    https://git.kernel.org/netdev/net-next/c/02de1741eaf1
-  - [net-next,v5,7/9] net: intel: igb: Use linkmode helpers for EEE
-    https://git.kernel.org/netdev/net-next/c/41b9797de4d6
-  - [net-next,v5,8/9] net: intel: igc: Use linkmode helpers for EEE
-    https://git.kernel.org/netdev/net-next/c/1e45b5f28a57
-  - [net-next,v5,9/9] net: ethtool: eee: Remove legacy _u32 from keee
-    https://git.kernel.org/netdev/net-next/c/292fac464b01
+From my perspective, it was an error, since two nearly identical systems
+with only one difference (one used i210 other i211) showed different PTP
+measurements. So, it would be nice if distributions would include this
+fix. On other hand, I'm ok with what ever maintainer would decide how
+to handle this patch.
 
-You are awesome, thank you!
+Regards,
+Oleksij
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
