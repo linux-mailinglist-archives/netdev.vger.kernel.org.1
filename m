@@ -1,69 +1,56 @@
-Return-Path: <netdev+bounces-75780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAE1986B296
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:04:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A5586B29A
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 16:04:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59AEFB212A7
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:04:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99749285EA5
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 15:04:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B77615B109;
-	Wed, 28 Feb 2024 15:04:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 188F215CD52;
+	Wed, 28 Feb 2024 15:04:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bTUZz3v4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W99YsBqx"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9E224B39;
-	Wed, 28 Feb 2024 15:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91FE15B116
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 15:04:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709132658; cv=none; b=Rl3otR9/UF6Of4xCJQgPwkR6u4nMqz4TvBd3kINcxbtICgeQCX5RNOgc84czynPmxg9Jx1mAVWmQIfStL1uoaUeeD0lqB9fxLQdTJATsYLhgoTU5lV2np0zsyPfSTEGq0AJ4W0Q5WYLVfpZPdhHAWjYJ3QQjGtm/BGmnux0csc8=
+	t=1709132670; cv=none; b=Nrs7tyLKpkeTtrKE3cM825pCnVlzMtu50inH9MJ6RYps68gh3quux3HR/uzuDg9ER89vA/9Ah2/r8rrUCHOoK5qbK1NqDFucIMVzzgJWHGTzHZFUeBDVI2tBmz7AxeUDFY6hv5Wtdzhkbvp24cNnCZn46rWi11rtxOEFcT3MkFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709132658; c=relaxed/simple;
-	bh=t9muqhfNN7i4XP7gG3jCRjrTS9ve2WB+DxxVMTVNZA8=;
+	s=arc-20240116; t=1709132670; c=relaxed/simple;
+	bh=bxlS65jKUcIIlPjtM8o4MKI1ryyJX5H10x4xbVKgzQg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZLkIYbq8+C8Ls3AiwU/URcwv0t20XN4ewV/guflYmq+Ot0mVkFtFJ8PKf4l1lEHz23xSVGbJGDP5w4S6J1AEav/UznGYLf6rgvC09ljSQRuP2LA1P7ISbYaujtGLcqu4EvSnQTI0ysmsBVl2FKOMZkMu2d3BlhlMtNS9p1kPCF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bTUZz3v4; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=dOocNfIFOpPF6lqMWSXAW9AMnznAJXSj9KJvDupMxYg=; b=bTUZz3v4hxXRRqqLkvtLScD7qZ
-	/WpJG7GUplG1kh3IxUbHuJznV7aCXbWselztd5/1OrNEIjX4DPWCAT3nwjZus2EnfKmMELkcf/8IJ
-	J4b7cgWKvuKSxI+sC5x58oWQ0WEsz0TGSxx/d5ZvgMMy8WpyRjH7+YsKq1ZugZII140Q=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rfLTn-008xT3-DF; Wed, 28 Feb 2024 16:04:19 +0100
-Date: Wed, 28 Feb 2024 16:04:19 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Bastien Curutchet <bastien.curutchet@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-	Lee Jones <lee@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-leds@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	herve.codina@bootlin.com, maxime.chevallier@bootlin.com,
-	christophercordahi@nanometrics.ca
-Subject: Re: [PATCH v2 3/6] net: phy: DP83640: Add LED handling
-Message-ID: <9b06003c-afc9-419a-af36-7b81aab8517e@lunn.ch>
-References: <20240227093945.21525-1-bastien.curutchet@bootlin.com>
- <20240227093945.21525-4-bastien.curutchet@bootlin.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qg8550HZNo928kZPMmm3uj1f07lPZ/paDxsjvnAmzQW9YTVsEjM6N3WIJa1QBvdfVAkzr5iVFxwdXlf4S7fnEPfvOOMzoK38K0gnSJEdXpwhH504NtOinNi2nfzWEtWJqQvQNIJCPf7Ur+zk8NmaFoj5vc01BcnPobzLNKrxT1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W99YsBqx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F207AC433C7;
+	Wed, 28 Feb 2024 15:04:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709132668;
+	bh=bxlS65jKUcIIlPjtM8o4MKI1ryyJX5H10x4xbVKgzQg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=W99YsBqxURjgSYIfPoc40LS3B3EEqf9sNAUUfWR9LYQu/yxjDsMJlnl1DUUhDOW+i
+	 nd4YekzkqIdhAfQ1lQtHW6QvwczIbplbGVMqsidCTq+F6h3xtjJ22ZQMzot9c9T7To
+	 bcCx/G59uWtEOnknJFcLnPal8OKAe1pKE0Oeplg3wgO2ij5pAKp/grlrqTa3QSLTPz
+	 kwOdmqegfcjO06DYlGD7mEjU5SQn1u7OJy36zrc5a7XJWAY8M/oYTLVBzBWxMZb+59
+	 KfWou4t+MIlg5VNcfziyEFotcQ5hsbe/MEAyXP9j+aqw+namYBrIrrbGksM/Rv09ew
+	 vMLLNvwdAfhig==
+Date: Wed, 28 Feb 2024 15:04:25 +0000
+From: Simon Horman <horms@kernel.org>
+To: Chengming Zhou <chengming.zhou@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	netdev@vger.kernel.org,
+	Chengming Zhou <zhouchengming@bytedance.com>
+Subject: Re: [PATCH v2] net: remove SLAB_MEM_SPREAD flag usage
+Message-ID: <20240228150425.GI292522@kernel.org>
+References: <20240227170937.GD277116@kernel.org>
+ <20240228030658.3512782-1-chengming.zhou@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,33 +59,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240227093945.21525-4-bastien.curutchet@bootlin.com>
+In-Reply-To: <20240228030658.3512782-1-chengming.zhou@linux.dev>
 
-> +static int dp83640_led_brightness_set(struct phy_device *phydev, u8 index,
-> +				      enum led_brightness brightness)
-> +{
-> +	int val;
-> +
-> +	if (index > DP83640_SPDLED_IDX)
-> +		return -EINVAL;
-> +
-> +	phy_write(phydev, PAGESEL, 0);
-> +
-> +	val = phy_read(phydev, LEDCR) & ~DP83640_LED_DIS(index);
-> +	val |= DP83640_LED_DRV(index);
-> +	if (brightness)
-> +		val |= DP83640_LED_VAL(index);
-> +	else
-> +		val &= ~DP83640_LED_VAL(index);
-> +	phy_write(phydev, LEDCR, val);
+On Wed, Feb 28, 2024 at 03:06:58AM +0000, Chengming Zhou wrote:
+> From: Chengming Zhou <zhouchengming@bytedance.com>
+> 
+> The SLAB_MEM_SPREAD flag used to be implemented in SLAB, which was
+> removed as of v6.8-rc1, so it became a dead flag since the commit
+> 16a1d968358a ("mm/slab: remove mm/slab.c and slab_def.h"). And the
+> series[1] went on to mark it obsolete to avoid confusion for users.
+> Here we can just remove all its users, which has no functional change.
+> 
+> [1] https://lore.kernel.org/all/20240223-slab-cleanup-flags-v2-1-02f1753e8303@suse.cz/
+> 
+> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+> ---
+> v2:
+>  - Update the patch description and include the related link to
+>    make it clearer that SLAB_MEM_SPREAD flag is now a no-op.
 
-I don't understand this driver too well, but should this be using
-ext_read() and ext_write().
+Thanks for the update.
 
-I'm also woundering if it would be good to implement the .read_page
-and .write_page members in phy_driver and then use phy_write_paged()
-and phy_write_paged() and phy_modify_paged(), which should do better
-locking.
-
-	Andrew
+Reviewed-by: Simon Horman <horms@kernel.org>
 
