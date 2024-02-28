@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-75741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A29BA86B0EC
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:55:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C002386B0ED
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 14:55:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C67D41C25BEF
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:55:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C14181C2105D
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:55:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ABF4155A45;
-	Wed, 28 Feb 2024 13:54:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA07E151CD7;
+	Wed, 28 Feb 2024 13:54:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MpH5h61r"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WTAcXtc+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A695A36132
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 13:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161EF36132
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 13:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709128485; cv=none; b=V3bIc/21su6RS34owEBe9vEwYvOdvMBHx6MJJhLHl4KFLAV34k3wYTsCP2WNzH8RId34QEv0WxMSXRscOWP2r9kP4xz48dxZ4CTx45By2Ty4t6CrNVQxYOyoTuAjTAyLAKbFKZIZehYm58v3Ikdg57h2jl81qGGqC8xtUOrMqw8=
+	t=1709128488; cv=none; b=d4gEDt4pF+aT4pJxXiR8wu6CDe1n39Qv2rs/wG/BSHVfk1qMC6Rnm339ED9SNzYGvmjHK7Jst2vYjZUOnS6xDTWnfVw2bORr9TVpwnVYABGJ7GAboa4haC8M+L8QEAt93gaMxs0zB3rLnkWJpmQislA3W0Q8ZnjXK2oKNVpB9Is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709128485; c=relaxed/simple;
-	bh=LAj1gOQrVPYZ8gqf75q3u1GU6lwBEtEOHkfujLQDOwA=;
+	s=arc-20240116; t=1709128488; c=relaxed/simple;
+	bh=pyRTrCFIF53ALj594M75v4uX/qajHVqWfX1akzaUjDk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SmvG4VZ+KzsIbBr1IWLArUqKjqUuH8ylVCmWFuqBaEv/MXsjt+9SLBIvnt8MQi1UKLFNy5QOskdJpP1P9CbU1WDp3dkWUwiwaC+I8652X4tbE7mHhDGmzDPzUTCnQ4oLN5017d6szl74uDdOVg/nhPe4z56Sr0/YqOGM4/tGCn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MpH5h61r; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=osi4MdeOMj8hn/s1wjze2M7QzfF0pQj1qEjxj4+vWY8U1kTwTvA4daGQP2BHdT2SbcKJ+8B7gMruVa3a9sbZ9vZLBTJgj9KtcP/LntAiRyRmY4gZUfgjuEJ0oJ1F+2LS/cP6qgMVyFi7Gm4yQiRihoHh/ULekodYaafVeQnFKMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WTAcXtc+; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-608cf88048eso76824787b3.0
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 05:54:43 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc74ac7d015so6997828276.0
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 05:54:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709128482; x=1709733282; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709128486; x=1709733286; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EtXCLfpS6OZMuKCZ/f5A+kqjwZnwBBWN5rfeZmgSot4=;
-        b=MpH5h61rYtyqMsOmGVOOIPvPCnWVAGqjISEZm2MYF0syaRH88IpS6D+Ttb1CocTnEa
-         ogwXBIgdlyYNiHIfzfPgEKL0aXL2j9N4kk/mRq+sDbqfwr5y5K+6tEAG8b3SYgVYPwnl
-         bTSUTQTWwYtA8RPIXzj464Kl9S18YIpBP7CvBBcHKfbmvobsQrmGO3CrG7gwWSskvt0P
-         S2ErVjINUkBYzdVDvELM6MyMawEYFJOLBhRHTfe82kxp75POCb7A66GhRRQ1d3e0gRSI
-         NY0+0B2VuKuTcf5sj9neosVXSm8AFkMk7xZPpFC9w7BUI3sF6DcDVORcqOwHuAijqUC8
-         cQYg==
+        bh=ief8H3jG8cWOh1EE+DNugp+OaUBgAgHchahPCNShsic=;
+        b=WTAcXtc+y08nwjwoYGM+145j5J02QzCguORCkzsQF554cwn1jHWSL1c4AZ9j2K0Hpr
+         +zzVs5ILGEqHsSZEfx4Umr6FhrWQ1Ej0hC3my2aeaV+gZfGzfbj93efb2LlBET5+u6W4
+         xsuXUkd4n/s6rYvqaAjBTbfIdoLByovvEy0LZQl/NuES6OiEvD31DsaOQh9StOsr74yt
+         nxBd0tN52Fkhpc8W90BoLrScoen/HZAl+lyZO/bCEqDbDwlnCtA1ByL4rLo7CF3iacpc
+         GmvOAn1VafdiCcTaG4nEnA/ALbqQJLweq727iMs6sUn64AnjBNG3s0Dt3N+Tr0qjsF7B
+         ce7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709128482; x=1709733282;
+        d=1e100.net; s=20230601; t=1709128486; x=1709733286;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EtXCLfpS6OZMuKCZ/f5A+kqjwZnwBBWN5rfeZmgSot4=;
-        b=Iyrl2D9zda8c7jr2b27RpDeed3rf9zvbXT5zMBu/l8JTEqsCn0RJqIYPdfkp0b3yfR
-         y4eOtRvbvi1uEv1Y2UWUpeISPDIOT4VB/MhxUXhsFGJdcIFUrpZgcW+EAAbIqgEl0S/G
-         VVUpD1Bt21RYm3VaYUlSmtGksWgn5AHu/nB9cYA7zkICUB8ckLi2tVZU244GxTZmKNYm
-         VCviuWiq5ogbeHO3rjfsYc1kDsA+7NTzfD/L5LBbArWeSdQrBmo2irm9D1Qe1Mn/Ol95
-         5pSQi8YIO7jmNaXmAQx4xNfYU4O9bs4naBuujaCElMp4XshN9gEaDD1cyHAtx7eVvyWK
-         zvpg==
-X-Gm-Message-State: AOJu0YzLCStuA15AkJPuM5bBIj7NpSSLGGb5Rw1g+tXubm1pgWjKlacQ
-	ceG2rJKEMGdeqANSGgVJLhIGj+OBrmmcOUIqJLgJLIzUBPGfqMpqlSgwDD27spPLktApPr9iMN+
-	vkTmAYOI/9A==
-X-Google-Smtp-Source: AGHT+IEWPolryLRbNjuX4vlQButnAeflXpzbBkjByOXThz8G8SMk5AqNplm02wrW3PiVq0hVvtaBOvMg/ZQrZg==
+        bh=ief8H3jG8cWOh1EE+DNugp+OaUBgAgHchahPCNShsic=;
+        b=NjCtWgT7ByaULzF5DaRghg4E7S5gbMeqsEBd2VfTFfUdSvZzcrpV7U84kDs8DjVx/J
+         fvt9SVTAJySgd418du2Y/DyTVS63hnH2xmfCBilsKgmsy44cQaSYcHXs6COlkRNWvjgY
+         4QQ5rGfKKtmG0j+oofR6YyEfoj3AA5jbTn2vDJ+NgpW+mm0/857tpBMI7Np7zrKCjo78
+         7Ml7fUkrIypIp65/So5z+i9duv1D7uQYNDRQsJ4E/k39iRqgBmqDHlm7SvHVhr62bodu
+         K3IfBHGpATgiSF9n5lxq4gyrphLuYvyrCDWGY4+/EJ7T5i5GGyo8vA1Adkxw8NWY3ro6
+         2Puw==
+X-Gm-Message-State: AOJu0YxSmORECSUt22Wb3FfiJ4kzjzcwwre/TBTsimBoVJItBMbKxRIi
+	msZhs4eaVZnLE4yQimtv+iOrhqebKvLp3H7YGS+3+jiqItdyVWX0v/3daZtp+AiMGLnAa63NbUG
+	Z3+BXuSkxng==
+X-Google-Smtp-Source: AGHT+IGipDaQRvhHY/rNTKkNDYB46GXzP7qMcJe9KPKYkjoKdPbNnsQRYU75TUYubrtJyCSDAZlmeqhYe4wZ1g==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a0d:d511:0:b0:609:2031:1e09 with SMTP id
- x17-20020a0dd511000000b0060920311e09mr1172510ywd.6.1709128482686; Wed, 28 Feb
- 2024 05:54:42 -0800 (PST)
-Date: Wed, 28 Feb 2024 13:54:25 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:174a:b0:dce:30f5:6bc5 with SMTP
+ id bz10-20020a056902174a00b00dce30f56bc5mr116327ybb.4.1709128484304; Wed, 28
+ Feb 2024 05:54:44 -0800 (PST)
+Date: Wed, 28 Feb 2024 13:54:26 +0000
 In-Reply-To: <20240228135439.863861-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240228135439.863861-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
-Message-ID: <20240228135439.863861-2-edumazet@google.com>
-Subject: [PATCH v3 net-next 01/15] ipv6: add ipv6_devconf_read_txrx cacheline_group
+Message-ID: <20240228135439.863861-3-edumazet@google.com>
+Subject: [PATCH v3 net-next 02/15] ipv6: annotate data-races around cnf.disable_ipv6
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,77 +83,90 @@ Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@nvidia.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-IPv6 TX and RX fast path use the following fields:
+disable_ipv6 is read locklessly, add appropriate READ_ONCE()
+and WRITE_ONCE() annotations.
 
-- disable_ipv6
-- hop_limit
-- mtu6
-- forwarding
-- disable_policy
-- proxy_ndp
-
-Place them in a group to increase data locality.
+v2: do not preload net before rtnl_trylock() in
+    addrconf_disable_ipv6() (Jiri)
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 ---
- include/linux/ipv6.h | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ net/ipv6/addrconf.c   | 9 +++++----
+ net/ipv6/ip6_input.c  | 4 ++--
+ net/ipv6/ip6_output.c | 2 +-
+ 3 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
-index ef3aa060a289ea4eecf4d6e8c1dc614101f37c3f..383a0ea2ab9131e685822e5df506582802642e84 100644
---- a/include/linux/ipv6.h
-+++ b/include/linux/ipv6.h
-@@ -3,6 +3,7 @@
- #define _IPV6_H
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index e27069ad938ca68d758ef956b8c36cb85697eeb5..9c1d141a9a343b45225658ce75f23893ff6c7426 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -4214,7 +4214,7 @@ static void addrconf_dad_work(struct work_struct *w)
+ 			if (!ipv6_generate_eui64(addr.s6_addr + 8, idev->dev) &&
+ 			    ipv6_addr_equal(&ifp->addr, &addr)) {
+ 				/* DAD failed for link-local based on MAC */
+-				idev->cnf.disable_ipv6 = 1;
++				WRITE_ONCE(idev->cnf.disable_ipv6, 1);
  
- #include <uapi/linux/ipv6.h>
-+#include <linux/cache.h>
- 
- #define ipv6_optlen(p)  (((p)->hdrlen+1) << 3)
- #define ipv6_authlen(p) (((p)->hdrlen+2) << 2)
-@@ -10,9 +11,16 @@
-  * This structure contains configuration options per IPv6 link.
-  */
- struct ipv6_devconf {
--	__s32		forwarding;
-+	/* RX & TX fastpath fields. */
-+	__cacheline_group_begin(ipv6_devconf_read_txrx);
-+	__s32		disable_ipv6;
- 	__s32		hop_limit;
- 	__s32		mtu6;
-+	__s32		forwarding;
-+	__s32		disable_policy;
-+	__s32		proxy_ndp;
-+	__cacheline_group_end(ipv6_devconf_read_txrx);
+ 				pr_info("%s: IPv6 being disabled!\n",
+ 					ifp->idev->dev->name);
+@@ -6388,7 +6388,8 @@ static void addrconf_disable_change(struct net *net, __s32 newf)
+ 		idev = __in6_dev_get(dev);
+ 		if (idev) {
+ 			int changed = (!idev->cnf.disable_ipv6) ^ (!newf);
+-			idev->cnf.disable_ipv6 = newf;
 +
- 	__s32		accept_ra;
- 	__s32		accept_redirects;
- 	__s32		autoconf;
-@@ -45,7 +53,6 @@ struct ipv6_devconf {
- 	__s32		accept_ra_rt_info_max_plen;
- #endif
- #endif
--	__s32		proxy_ndp;
- 	__s32		accept_source_route;
- 	__s32		accept_ra_from_local;
- #ifdef CONFIG_IPV6_OPTIMISTIC_DAD
-@@ -55,7 +62,6 @@ struct ipv6_devconf {
- #ifdef CONFIG_IPV6_MROUTE
- 	atomic_t	mc_forwarding;
- #endif
--	__s32		disable_ipv6;
- 	__s32		drop_unicast_in_l2_multicast;
- 	__s32		accept_dad;
- 	__s32		force_tllao;
-@@ -76,7 +82,6 @@ struct ipv6_devconf {
- #endif
- 	__u32		enhanced_dad;
- 	__u32		addr_gen_mode;
--	__s32		disable_policy;
- 	__s32           ndisc_tclass;
- 	__s32		rpl_seg_enabled;
- 	__u32		ioam6_id;
++			WRITE_ONCE(idev->cnf.disable_ipv6, newf);
+ 			if (changed)
+ 				dev_disable_change(idev);
+ 		}
+@@ -6405,7 +6406,7 @@ static int addrconf_disable_ipv6(struct ctl_table *table, int *p, int newf)
+ 
+ 	net = (struct net *)table->extra2;
+ 	old = *p;
+-	*p = newf;
++	WRITE_ONCE(*p, newf);
+ 
+ 	if (p == &net->ipv6.devconf_dflt->disable_ipv6) {
+ 		rtnl_unlock();
+@@ -6413,7 +6414,7 @@ static int addrconf_disable_ipv6(struct ctl_table *table, int *p, int newf)
+ 	}
+ 
+ 	if (p == &net->ipv6.devconf_all->disable_ipv6) {
+-		net->ipv6.devconf_dflt->disable_ipv6 = newf;
++		WRITE_ONCE(net->ipv6.devconf_dflt->disable_ipv6, newf);
+ 		addrconf_disable_change(net, newf);
+ 	} else if ((!newf) ^ (!old))
+ 		dev_disable_change((struct inet6_dev *)table->extra1);
+diff --git a/net/ipv6/ip6_input.c b/net/ipv6/ip6_input.c
+index b8378814532cead0275e8b7a656f78450993f619..1ba97933c74fbd12e21f273f0aeda2313bd608b7 100644
+--- a/net/ipv6/ip6_input.c
++++ b/net/ipv6/ip6_input.c
+@@ -168,9 +168,9 @@ static struct sk_buff *ip6_rcv_core(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	SKB_DR_SET(reason, NOT_SPECIFIED);
+ 	if ((skb = skb_share_check(skb, GFP_ATOMIC)) == NULL ||
+-	    !idev || unlikely(idev->cnf.disable_ipv6)) {
++	    !idev || unlikely(READ_ONCE(idev->cnf.disable_ipv6))) {
+ 		__IP6_INC_STATS(net, idev, IPSTATS_MIB_INDISCARDS);
+-		if (idev && unlikely(idev->cnf.disable_ipv6))
++		if (idev && unlikely(READ_ONCE(idev->cnf.disable_ipv6)))
+ 			SKB_DR_SET(reason, IPV6DISABLED);
+ 		goto drop;
+ 	}
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index 31b86fe661aa6cd94fb5d8848900406c2db110e3..0559bd0005858631f88c706f98c625ad0bfff278 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -234,7 +234,7 @@ int ip6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 	skb->protocol = htons(ETH_P_IPV6);
+ 	skb->dev = dev;
+ 
+-	if (unlikely(idev->cnf.disable_ipv6)) {
++	if (unlikely(READ_ONCE(idev->cnf.disable_ipv6))) {
+ 		IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTDISCARDS);
+ 		kfree_skb_reason(skb, SKB_DROP_REASON_IPV6DISABLED);
+ 		return 0;
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
