@@ -1,108 +1,107 @@
-Return-Path: <netdev+bounces-75698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 343F986AF30
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:28:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAF3D86AF31
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 13:30:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2BFF281D03
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:28:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5554128388E
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 12:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC013BBC4;
-	Wed, 28 Feb 2024 12:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F89214534F;
+	Wed, 28 Feb 2024 12:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="t1Yhpauh"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B144D3BBDB
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 12:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2420313B29F;
+	Wed, 28 Feb 2024 12:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.252
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709123324; cv=none; b=P55rZn4ni8BXEVEc5nxF89f6fhQ+xdd+wz8y9bchlSWJmu83ZqAllysKAjO7q6Rio87A9TFvDgj6YTbW5ue8uDPqB8Nz29k3g9gA3wEA9DxgEX0Q9afb9cC1lm7JL0j9DsiDD2Gg2XuupioelptEi6G5MgmtT2GI06wqOMomEJ8=
+	t=1709123437; cv=none; b=T9RbYD5yTaW6OBvjW4K5Ne+vMHi33pSGTY/NNhKbET1wMjX1GaE5cGe2WHazHtzkjGz5YcMUcFW5EWSNO+K88/Gql8xOC3Gi+sOtF51Kb0YtJW+HAkd6ZR1xS7XtBk74Sfs/OYUVk0G51LSVXkhPvimICYa3CXsfh16If0BkbpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709123324; c=relaxed/simple;
-	bh=VqomBaJsbCrDWx32dDWhbU0egir/gv6ZNYqtFyQritQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LU0IX8kfs7jj58az0vvmu0HoCFQbUeem9OQyZ44ABKsGOjHAXPExhdWRbB+Bxle/zD0i7vipiXJ5ur5y4tAMhi0M8LryNfb6iq7k7xnqmYtXdOWK7XKgeS+kqYkKC09Rjkg0WI7QgHHAPqQkC5plxpeXl7oBrotwnBr7ZSqVSvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rfJ2z-0007e4-Up; Wed, 28 Feb 2024 13:28:29 +0100
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rfJ2x-003OF0-Lu; Wed, 28 Feb 2024 13:28:27 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rfJ2x-00C5Dx-1t;
-	Wed, 28 Feb 2024 13:28:27 +0100
-Date: Wed, 28 Feb 2024 13:28:27 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	netdev@vger.kernel.org, richardcochran@gmail.com,
-	nathan.sullivan@ni.com, Jacob Keller <jacob.e.keller@intel.com>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: Re: [PATCH net] igb: extend PTP timestamp adjustments to i211
-Message-ID: <Zd8m6wpondUopnFm@pengutronix.de>
-References: <20240227184942.362710-1-anthony.l.nguyen@intel.com>
- <Zd7-9BJM_6B44nTI@nanopsycho>
+	s=arc-20240116; t=1709123437; c=relaxed/simple;
+	bh=hoZQVrL5u/mtK2ujnFl7+qtwb0tilnz6ZexxD8yIOM8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CqaV/c4+cblX2K/e8ApyUgES4VGd+0JXIjsan1Adj6x4ZaZ4uNdZrPqaCLXawCeVQXjAqSHLuqNoKOi+79gv+CC0WJuEfeBBKy9NpY4UyIe4ybVLyHW9HB4WfOSu1+kVVspRS1gcm+Tik6lzGtuwE+95nqURSCUvVjgfIIOpn5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=t1Yhpauh; arc=none smtp.client-ip=162.62.57.252
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1709123423;
+	bh=d0komw+WC3ouQiMH5R2F20wMoA9nbMU09H8vLZRoHKI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=t1Yhpauhd7IYU+OzJ0cT1fMkojCX1z/O6OLkLEAGCl+PHA71Dzfykw0ttZSJiuLli
+	 rCHtoXx2XCjh9/kpSDyHD0oU4sSFFBTjhzEwz+yJ+thv2AxXOeYgM587qIe2q6x7Cp
+	 Mdl/MhgxCtnTFNASbW+RP0HfDuY/fUDZbzSILfD8=
+Received: from [IPV6:2409:8961:2a02:15df:f9d1:6130:b1bb:a122] ([2409:8961:2a02:15df:f9d1:6130:b1bb:a122])
+	by newxmesmtplogicsvrsza10-0.qq.com (NewEsmtp) with SMTP
+	id 79222892; Wed, 28 Feb 2024 20:30:18 +0800
+X-QQ-mid: xmsmtpt1709123418t6g9vcb96
+Message-ID: <tencent_C8F359A66A8E9A390869923ABD8D19C1CF05@qq.com>
+X-QQ-XMAILINFO: M91SeYiYjPckNqot5gOlsgfKOFhKrZmNn+gEfhCBD6uELKtcpJmxXfIFZ+rhhb
+	 nDdIRAfYFRJ5xnYrOT0JVi4z0YbVS1ufuib4+i729ZwJVXtnaoWAX/kecbzQ6yZlv1aPsPd7hbCY
+	 pGqR3drZMZt+UoJa87P/MFywwqC+Dtte+l6lvjx9/OEyqOscbETk5mAbkFbEW0P3EFTL3QGm0OKR
+	 BW2v+L2vrcpsQBqKaLul1zGXbEc3Rx2+OcJxHyVYBo5H/MHAqlDLe0BRT8I0oJCQV0g4TRsYgUFf
+	 dAcCFjn12uJ5CScWOMdvCjQVFXHMfWiH9Heib+/GvZM1owWxe1iNjk62Mxf4dMbZoWiFK5jK0XgG
+	 wzTsEV09r3cmyTE7UVtvdCx+eng/dfUJd5o2yzMSxZcgmpxEtHvL+OOW4awRGRpua/E02i1z9oZA
+	 2HvMDTP6Q4m81TUYb0iSsWYkU9vU8sGrjTHKLA3tyzC5NSGkgT8ftLTKsbakxHCaBXISrWLhwbaU
+	 ugeaRZ8s4Yxkj+okUkK0UFYAi30hNQ5Ryr0A6C1CYw9E33U9wtudvhqUm5P8ownr+nWaIuDG5TBy
+	 Uu7W1DwTZqmZ5SXZpR+/5yeyMfQzN9/Y4leY6ec5V6XCQe2IxIVsc0s9wTgFBnqEPSwzLvLY59Mw
+	 z5szSZnqD2UCqXFvZQz3hCCK25wfiEGs9sU2raOT77epCgXl8QnwOWFAUkpWkdQ/VDh7azrrNJ0n
+	 f81Skd2SRYNxPJQHUBe6LqefhRH9QjhCLhkCd42CO9uDaNh4mDBFFY8ZfQUdRiEEc7euSHZ1nWuh
+	 Kmu7a+DPC2WL/1vqUkGZ+MqBx23/Ay8AIXEuuwF1vo9PSe93KUJQiYS0IDNZv7BsyJbSUnAeXHvF
+	 hZ30BDmTcr4KdgV+5qqmAukcWPvfnbmCTl6pX8reHG4nF6vLDlRS1+/1dpJU98okNoSKLt8XcudJ
+	 WFYPqI8xV/lYXP8E/IfI5EnoNaza8jGEVkVLjZGNauYbWRDlCWMPtJHzGlEsXldv+C3wITwYQeaw
+	 XsJrsCLc9Y6KZMaui/Csgg4YsWBh6+fkS5eKkszFwoOnLJ++Aqf5rL+8KnDYCrmeNzq+4LNlDMCr
+	 kFov5bApK3+NrP2lH+SupGscb/XA==
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-OQ-MSGID: <8e960a57-cbc9-c30e-43f8-90779865373a@foxmail.com>
+Date: Wed, 28 Feb 2024 20:30:17 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Zd7-9BJM_6B44nTI@nanopsycho>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 0/8] introduce sysctl SYSCTL_U8_MAX and
+ SYSCTL_LONG_S32_MAX
+To: Jakub Kicinski <kuba@kernel.org>,
+ "Eric W. Biederman" <ebiederm@xmission.com>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <keescook@chromium.org>,
+ Joel Granados <j.granados@samsung.com>,
+ Christian Brauner <brauner@kernel.org>, davem@davemloft.net,
+ David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <tencent_275FF7F351D515B570D0F82447BA30F3AA06@qq.com>
+ <20240226072814.1d9ab85f@kernel.org>
+Content-Language: en-US
+From: Wen Yang <wenyang.linux@foxmail.com>
+In-Reply-To: <20240226072814.1d9ab85f@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 28, 2024 at 10:37:56AM +0100, Jiri Pirko wrote:
-> Tue, Feb 27, 2024 at 07:49:41PM CET, anthony.l.nguyen@intel.com wrote:
-> >From: Oleksij Rempel <o.rempel@pengutronix.de>
-> >
-> >The i211 requires the same PTP timestamp adjustments as the i210,
-> >according to its datasheet. To ensure consistent timestamping across
-> >different platforms, this change extends the existing adjustments to
-> >include the i211.
-> >
-> >The adjustment result are tested and comparable for i210 and i211 based
-> >systems.
-> >
-> >Fixes: 3f544d2a4d5c ("igb: adjust PTP timestamps for Tx/Rx latency")
-> 
-> IIUC, you are just extending the timestamp adjusting to another HW, not
-> actually fixing any error, don't you? In that case, I don't see why not
-> to rather target net-next and avoid "Fixes" tag. Or do I misunderstand
-> this?
 
-From my perspective, it was an error, since two nearly identical systems
-with only one difference (one used i210 other i211) showed different PTP
-measurements. So, it would be nice if distributions would include this
-fix. On other hand, I'm ok with what ever maintainer would decide how
-to handle this patch.
 
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+On 2024/2/26 23:28, Jakub Kicinski wrote:
+> You provide no data on how big the reduction is.
+> Eric's suggestion to encode the values directly in the table entry
+> sounds great, please invest your time in that, instead of half measures.
+
+
+Thanks for your comments. Well, we are making modifications according to 
+Eric's suggestions, and the RFC patch series will be sent within a few 
+weeks.
+
+--
+Best wishes,
+Wen
+
 
