@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-75944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D44F86BC20
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 00:23:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDB1786BC21
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 00:23:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8B08B25FD6
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 23:23:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36ED01F21176
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 23:23:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE0C13D314;
-	Wed, 28 Feb 2024 23:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4679972932;
+	Wed, 28 Feb 2024 23:23:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="SeS7lGYT"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="aLkQgCw7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6859513D306
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 23:22:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70DC72901
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 23:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709162579; cv=none; b=qltmkZB4k79/vohwsAOS0fD3/VqKPUf2ArivVhuu5PY4zQXVeOpEuEk/Nlb/TqfI0TywAzLMs/fGQnV68CDxFR97DYfzbZzlSm627ze+EqDCLuJdW7FZ3+h8vGgKMglMhTfWuErA9CTd9wrxSLGjPXUfGzRgNDUMc5FmMTX+Aws=
+	t=1709162580; cv=none; b=gsky292SxTHJc0/iYFsZoQY2qm85RxJSC+JaVJPYV1C3FpexbInngQeNpBTvCP0o6+tkRN2cL1YnSi6eK61pR1Y1bVRAn5oN2W7GnAB2dP13YStEPIc6qZYywtdXKVOM3sXsmE/aAHZMSW4cQEMokGy66laoe7dP1Uh+NW8rwpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709162579; c=relaxed/simple;
-	bh=y1S2eetl14xWG3tddS2FMiEcu4pRLxGLIJD7nUZduQI=;
+	s=arc-20240116; t=1709162580; c=relaxed/simple;
+	bh=+3sq9lfVb5ZFktgaFs9T5aQVerTPpfw47fVxMi66gv0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DfPb65xL1qs6eJpCZu9RzCk+L5sM1cTiEdDcQXZDJcSXKxr3D/Eac6W3/H734lV88WCYkGu72gDBUK7keWVs/ddJvxfUbkoxIZrx5i3yCo3H711Dc3wlO5yY93b7V0+gcAl6yU3SJV73Y5BWvJCd/EpefrmQeT6piyN5ieqkv2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=SeS7lGYT; arc=none smtp.client-ip=209.85.128.175
+	 MIME-Version; b=SelLMqNaUJAbWb/xnvtSzc9ftOqNpQHTZwXYKX6Nx5L2A1u1MOUfCa1XuT08EG1qOexaxB5KKkr/OlFfGt5wKwvdCjhgW9hWYpTqk+EUYgAcAvlGo9JAjaM8rqa5mp3Hmbiy5s2rjJ91N8WJw7CkzE3x1ufTo3CLKtq8+HOyXE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=aLkQgCw7; arc=none smtp.client-ip=209.85.128.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-608e0b87594so3055817b3.1
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 15:22:57 -0800 (PST)
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-608e3530941so3397117b3.1
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 15:22:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1709162576; x=1709767376; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1709162578; x=1709767378; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LEoci8r9fYh9X8Ih0f8ErkspCwERkY2nhtYsuarWoIs=;
-        b=SeS7lGYTDE4wSMSylMbin+yUqEKCT2iNbVNp7MOPBQ5xsaDOvHzdPTZZkqcREAdZGT
-         XKwAE3H4CPXbKfAxPiBtcpHKNC0t2vAZuKQ6mB7v6KUxz/76gVZMt4Io4Uwp6u4WXvSm
-         LM7umvByWkZLLdJyILSTAnp2Xb6tdB8J/WruxV7IorfNcCOGqR7DyG9VEID3bRQTUufP
-         q00Ej51BPiM+d7d5nezEJ9tM97IL1nDbCm5YS0wHcUlX9CMYYvC8Ef2zQJ9TxTnOSwWH
-         1O+ru8teTpW0AvkPQ3MWihIAsXbTMg3R00zRDeibU9Vw+uCuHlJ882OHD5Sw7EaavIjt
-         4f0A==
+        bh=F6IAN7c925VSRxOVMZAdo+DB7DtBwZEdQgiiRGMzVDQ=;
+        b=aLkQgCw7o56IRNaJF8TLs2AqhodAw2dq+5sczDjjaAtNegwp6MAJA5I/73z7xkIadV
+         ar+4XegPPRh3BENQsukxnSj8R/t0HyFNr+PULr3MCBqY2GGl7Wu3tWvB6AD9rwaWOKX4
+         /jge9rWn4MZ5zMW1cd7hEerO1ZADoASkESNMepx7rhwSz1gEoZ7/SHZazXb7iY+kUaYw
+         l63W2hGSBJnmi9DnWIQs5+puff7RWKJfaUs2CravCIjbfvtYpXT7x6O97yRY4c1psaEu
+         H3SFz69ya6UiCvOg+qcBOmKXaCijhZbqkRJbxFY9+0rVr1L7HgQok8+XB5AtybOqBBY7
+         nqLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709162576; x=1709767376;
+        d=1e100.net; s=20230601; t=1709162578; x=1709767378;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LEoci8r9fYh9X8Ih0f8ErkspCwERkY2nhtYsuarWoIs=;
-        b=Eco4Cu4kBsXdwsM/i8FQiIV1zIUQCBONKKhWDX9oCN7dlLennd0xyVn86gD+32P3UL
-         gDuNwEeLg42g1rCUDDJn9JtFDA0dGgsWh3TCpm5A9MFW2RNfRpNPEnI7F21+Zh+hBwFR
-         7Oa+9UyIoLpugQI068IhZnbWwRkHPTcLhivSzzfjT/za0QHqeQCbzckDHgbGVPbjrKaM
-         oD0e/zV57MVouh1iiqugzpQwDuQKnM7YYAgAfzXaeiIN+OF9hl2is2gjNETGvxTUIORX
-         dBof7NU5lCxhrYkOJvaiYBu1irkRliQV2g1fJk4l86ZqnP+UFLPHbichDLhBa0w8hpoR
-         jbLw==
-X-Forwarded-Encrypted: i=1; AJvYcCVzyBZurdcInQuMi1Ps0Sd0I9Dh6Nghicv4wdJ3ImlLJR1h6T3SMjcyyN7p2Q8FPEl2KyzRlDjlHdZfngYO56XNSwIf5qXU
-X-Gm-Message-State: AOJu0YxI3g0MsIW5bLc+/saMxa32EF0WWhcK/WRzu1+QPUO70SAwDRxl
-	2LSzFbhcMg6ItFph7kykZeLlfpZiq/CVtshWblhM0jjEqzn+/pim7rauGLccwZo=
-X-Google-Smtp-Source: AGHT+IEWlCaGFOxfnYNme0k/rb+Q4cZUqLCOgslY6A2UP+lO1rwExTCZM94ijFoPwM3leW7RaYlq7g==
-X-Received: by 2002:a81:4742:0:b0:608:af6:afa4 with SMTP id u63-20020a814742000000b006080af6afa4mr507087ywa.39.1709162576393;
-        Wed, 28 Feb 2024 15:22:56 -0800 (PST)
-Received: from localhost (fwdproxy-prn-116.fbsv.net. [2a03:2880:ff:74::face:b00c])
-        by smtp.gmail.com with ESMTPSA id d10-20020a81e90a000000b006095684c480sm29190ywm.30.2024.02.28.15.22.55
+        bh=F6IAN7c925VSRxOVMZAdo+DB7DtBwZEdQgiiRGMzVDQ=;
+        b=plCHVxHsspGDomWC7WecPc8iL9aSB9nj6AGA1XEhGx+d7djcT2pqkduMMok4gmSq2j
+         nxCJ2INDDO0jE4d3Kx6//ZdJAiT3/VDl8XK0J0itD3JD3d1mfgYI6jukeZsMQe0g5GQ2
+         WrboHNaHnoTaXHvqmc8fw5f7+wxTRoWoEbTL4dBXhDNu32MJOS99sy3DtqRQ+PXB/pmB
+         IVVmdTnb29+sObf/yatWOjx6FgvVkkbV2UoayoqsPMFJI9mqNiSyHayX4RL73b6tqfCt
+         R9qc4k9V9ZKE8dG3QkD7QdKLba5jYE0Hnzo0qfxjKX4GYXv7g7BZ/U58ZBuZl32LAeJz
+         zX3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVW9PzC4U+sG/zeQMiQed3o3Da9cDTi2rU/pQIHcc8b66ALo5lucBLNqoNcThyAb99SEwRQfYtnAHhTG4Bjqhjh0UUkokwC
+X-Gm-Message-State: AOJu0YzXWx9Lq1k6TSwetM0Vc7oOPU/7+mNe8TUcru4bUu3hr65WHUMb
+	fpzD75m8AZ+l/dPqukmMagC5nxUYw+mpQtJqorjK73StQ7BKTpm45uoGLpAjRXk=
+X-Google-Smtp-Source: AGHT+IH7ZoVYh/UQ/uavJdvPDIydc6N55caF51UVuqCxCHB8L26v/tsCJdoa26rgE8yZs5LZGKKDhQ==
+X-Received: by 2002:a25:bc88:0:b0:dcd:2aa3:d744 with SMTP id e8-20020a25bc88000000b00dcd2aa3d744mr752770ybk.17.1709162577780;
+        Wed, 28 Feb 2024 15:22:57 -0800 (PST)
+Received: from localhost (fwdproxy-prn-119.fbsv.net. [2a03:2880:ff:77::face:b00c])
+        by smtp.gmail.com with ESMTPSA id t17-20020a252d11000000b00dcbce4abc32sm14351ybt.36.2024.02.28.15.22.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 15:22:56 -0800 (PST)
+        Wed, 28 Feb 2024 15:22:57 -0800 (PST)
 From: David Wei <dw@davidwei.uk>
 To: Jakub Kicinski <kuba@kernel.org>,
 	Jiri Pirko <jiri@resnulli.us>,
@@ -77,9 +77,9 @@ To: Jakub Kicinski <kuba@kernel.org>,
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH v14 1/5] netdevsim: allow two netdevsim ports to be connected
-Date: Wed, 28 Feb 2024 15:22:49 -0800
-Message-ID: <20240228232253.2875900-2-dw@davidwei.uk>
+Subject: [PATCH v14 2/5] netdevsim: forward skbs from one connected port to another
+Date: Wed, 28 Feb 2024 15:22:50 -0800
+Message-ID: <20240228232253.2875900-3-dw@davidwei.uk>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240228232253.2875900-1-dw@davidwei.uk>
 References: <20240228232253.2875900-1-dw@davidwei.uk>
@@ -91,232 +91,109 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add two netdevsim bus attribute to sysfs:
-/sys/bus/netdevsim/link_device
-/sys/bus/netdevsim/unlink_device
+Forward skbs sent from one netdevsim port to its connected netdevsim
+port using dev_forward_skb, in a spirit similar to veth.
 
-Writing "A M B N" to link_device will link netdevsim M in netnsid A with
-netdevsim N in netnsid B.
+Add a tx_dropped variable to struct netdevsim, tracking the number of
+skbs that could not be forwarded using dev_forward_skb().
 
-Writing "A M" to unlink_device will unlink netdevsim M in netnsid A from
-its peer, if any.
+The xmit() function accessing the peer ptr is protected by an RCU read
+critical section. The rcu_read_lock() is functionally redundant as since
+v5.0 all softirqs are implicitly RCU read critical sections; but it is
+useful for human readers.
 
-rtnl_lock is taken to ensure nothing changes during the linking.
+If another CPU is concurrently in nsim_destroy(), then it will first set
+the peer ptr to NULL. This does not affect any existing readers that
+dereferenced a non-NULL peer. Then, in unregister_netdevice(), there is
+a synchronize_rcu() before the netdev is actually unregistered and
+freed. This ensures that any readers i.e. xmit() that got a non-NULL
+peer will complete before the netdev is freed.
+
+Any readers after the RCU_INIT_POINTER() but before synchronize_rcu()
+will dereference NULL, making it safe.
+
+The codepath to nsim_destroy() and nsim_create() takes both the newly
+added nsim_dev_list_lock and rtnl_lock. This makes it safe with
+concurrent calls to linking two netdevsims together.
 
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- drivers/net/netdevsim/bus.c       | 145 ++++++++++++++++++++++++++++++
- drivers/net/netdevsim/netdev.c    |  10 +++
- drivers/net/netdevsim/netdevsim.h |   2 +
- 3 files changed, 157 insertions(+)
+ drivers/net/netdevsim/netdev.c    | 27 ++++++++++++++++++++++-----
+ drivers/net/netdevsim/netdevsim.h |  1 +
+ 2 files changed, 23 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/netdevsim/bus.c b/drivers/net/netdevsim/bus.c
-index 0c5aff63d242..64c0cdd31bf8 100644
---- a/drivers/net/netdevsim/bus.c
-+++ b/drivers/net/netdevsim/bus.c
-@@ -232,9 +232,154 @@ del_device_store(const struct bus_type *bus, const char *buf, size_t count)
- }
- static BUS_ATTR_WO(del_device);
- 
-+static ssize_t link_device_store(const struct bus_type *bus, const char *buf, size_t count)
-+{
-+	struct netdevsim *nsim_a, *nsim_b, *peer;
-+	struct net_device *dev_a, *dev_b;
-+	unsigned int ifidx_a, ifidx_b;
-+	int netnsfd_a, netnsfd_b, err;
-+	struct net *ns_a, *ns_b;
-+
-+	err = sscanf(buf, "%d:%u %d:%u", &netnsfd_a, &ifidx_a, &netnsfd_b,
-+		     &ifidx_b);
-+	if (err != 4) {
-+		pr_err("Format for linking two devices is \"netnsfd_a:ifidx_a netnsfd_b:ifidx_b\" (int uint int uint).\n");
-+		return -EINVAL;
-+	}
-+
-+	ns_a = get_net_ns_by_fd(netnsfd_a);
-+	if (IS_ERR(ns_a)) {
-+		pr_err("Could not find netns with fd: %d\n", netnsfd_a);
-+		return -EINVAL;
-+	}
-+
-+	ns_b = get_net_ns_by_fd(netnsfd_b);
-+	if (IS_ERR(ns_b)) {
-+		pr_err("Could not find netns with fd: %d\n", netnsfd_b);
-+		put_net(ns_a);
-+		return -EINVAL;
-+	}
-+
-+	err = -EINVAL;
-+	rtnl_lock();
-+	dev_a = __dev_get_by_index(ns_a, ifidx_a);
-+	if (!dev_a) {
-+		pr_err("Could not find device with ifindex %u in netnsfd %d\n",
-+		       ifidx_a, netnsfd_a);
-+		goto out_err;
-+	}
-+
-+	if (!netdev_is_nsim(dev_a)) {
-+		pr_err("Device with ifindex %u in netnsfd %d is not a netdevsim\n",
-+		       ifidx_a, netnsfd_a);
-+		goto out_err;
-+	}
-+
-+	dev_b = __dev_get_by_index(ns_b, ifidx_b);
-+	if (!dev_b) {
-+		pr_err("Could not find device with ifindex %u in netnsfd %d\n",
-+		       ifidx_b, netnsfd_b);
-+		goto out_err;
-+	}
-+
-+	if (!netdev_is_nsim(dev_b)) {
-+		pr_err("Device with ifindex %u in netnsfd %d is not a netdevsim\n",
-+		       ifidx_b, netnsfd_b);
-+		goto out_err;
-+	}
-+
-+	if (dev_a == dev_b) {
-+		pr_err("Cannot link a netdevsim to itself\n");
-+		goto out_err;
-+	}
-+
-+	err = -EBUSY;
-+	nsim_a = netdev_priv(dev_a);
-+	peer = rtnl_dereference(nsim_a->peer);
-+	if (peer) {
-+		pr_err("Netdevsim %d:%u is already linked\n", netnsfd_a,
-+		       ifidx_a);
-+		goto out_err;
-+	}
-+
-+	nsim_b = netdev_priv(dev_b);
-+	peer = rtnl_dereference(nsim_b->peer);
-+	if (peer) {
-+		pr_err("Netdevsim %d:%u is already linked\n", netnsfd_b,
-+		       ifidx_b);
-+		goto out_err;
-+	}
-+
-+	err = 0;
-+	rcu_assign_pointer(nsim_a->peer, nsim_b);
-+	rcu_assign_pointer(nsim_b->peer, nsim_a);
-+
-+out_err:
-+	put_net(ns_b);
-+	put_net(ns_a);
-+	rtnl_unlock();
-+
-+	return !err ? count : err;
-+}
-+static BUS_ATTR_WO(link_device);
-+
-+static ssize_t unlink_device_store(const struct bus_type *bus, const char *buf, size_t count)
-+{
-+	struct netdevsim *nsim, *peer;
-+	struct net_device *dev;
-+	unsigned int ifidx;
-+	int netnsfd, err;
-+	struct net *ns;
-+
-+	err = sscanf(buf, "%u:%u", &netnsfd, &ifidx);
-+	if (err != 2) {
-+		pr_err("Format for unlinking a device is \"netnsfd:ifidx\" (int uint).\n");
-+		return -EINVAL;
-+	}
-+
-+	ns = get_net_ns_by_fd(netnsfd);
-+	if (IS_ERR(ns)) {
-+		pr_err("Could not find netns with fd: %d\n", netnsfd);
-+		return -EINVAL;
-+	}
-+
-+	err = -EINVAL;
-+	rtnl_lock();
-+	dev = __dev_get_by_index(ns, ifidx);
-+	if (!dev) {
-+		pr_err("Could not find device with ifindex %u in netnsfd %d\n",
-+		       ifidx, netnsfd);
-+		goto out_put_netns;
-+	}
-+
-+	if (!netdev_is_nsim(dev)) {
-+		pr_err("Device with ifindex %u in netnsfd %d is not a netdevsim\n",
-+		       ifidx, netnsfd);
-+		goto out_put_netns;
-+	}
-+
-+	nsim = netdev_priv(dev);
-+	peer = rtnl_dereference(nsim->peer);
-+	if (!peer)
-+		goto out_put_netns;
-+
-+	err = 0;
-+	RCU_INIT_POINTER(nsim->peer, NULL);
-+	RCU_INIT_POINTER(peer->peer, NULL);
-+
-+out_put_netns:
-+	put_net(ns);
-+	rtnl_unlock();
-+
-+	return !err ? count : err;
-+}
-+static BUS_ATTR_WO(unlink_device);
-+
- static struct attribute *nsim_bus_attrs[] = {
- 	&bus_attr_new_device.attr,
- 	&bus_attr_del_device.attr,
-+	&bus_attr_link_device.attr,
-+	&bus_attr_unlink_device.attr,
- 	NULL
- };
- ATTRIBUTE_GROUPS(nsim_bus);
 diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index 77e8250282a5..9063f4f2971b 100644
+index 9063f4f2971b..c3f3fda5fdc0 100644
 --- a/drivers/net/netdevsim/netdev.c
 +++ b/drivers/net/netdevsim/netdev.c
-@@ -413,8 +413,13 @@ nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port)
- void nsim_destroy(struct netdevsim *ns)
+@@ -29,18 +29,35 @@
+ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
  {
- 	struct net_device *dev = ns->netdev;
-+	struct netdevsim *peer;
+ 	struct netdevsim *ns = netdev_priv(dev);
++	unsigned int len = skb->len;
++	struct netdevsim *peer_ns;
  
- 	rtnl_lock();
-+	peer = rtnl_dereference(ns->peer);
-+	if (peer)
-+		RCU_INIT_POINTER(peer->peer, NULL);
-+	RCU_INIT_POINTER(ns->peer, NULL);
- 	unregister_netdevice(dev);
- 	if (nsim_dev_port_is_pf(ns->nsim_dev_port)) {
- 		nsim_macsec_teardown(ns);
-@@ -427,6 +432,11 @@ void nsim_destroy(struct netdevsim *ns)
- 	free_netdev(dev);
++	rcu_read_lock();
+ 	if (!nsim_ipsec_tx(ns, skb))
+-		goto out;
++		goto out_drop_free;
+ 
++	peer_ns = rcu_dereference(ns->peer);
++	if (!peer_ns)
++		goto out_drop_free;
++
++	skb_tx_timestamp(skb);
++	if (unlikely(dev_forward_skb(peer_ns->netdev, skb) == NET_RX_DROP))
++		goto out_drop_cnt;
++
++	rcu_read_unlock();
+ 	u64_stats_update_begin(&ns->syncp);
+ 	ns->tx_packets++;
+-	ns->tx_bytes += skb->len;
++	ns->tx_bytes += len;
+ 	u64_stats_update_end(&ns->syncp);
++	return NETDEV_TX_OK;
+ 
+-out:
++out_drop_free:
+ 	dev_kfree_skb(skb);
+-
++out_drop_cnt:
++	rcu_read_unlock();
++	u64_stats_update_begin(&ns->syncp);
++	ns->tx_dropped++;
++	u64_stats_update_end(&ns->syncp);
+ 	return NETDEV_TX_OK;
  }
  
-+bool netdev_is_nsim(struct net_device *dev)
-+{
-+	return dev->netdev_ops == &nsim_netdev_ops;
-+}
-+
- static int nsim_validate(struct nlattr *tb[], struct nlattr *data[],
- 			 struct netlink_ext_ack *extack)
- {
+@@ -70,6 +87,7 @@ nsim_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
+ 		start = u64_stats_fetch_begin(&ns->syncp);
+ 		stats->tx_bytes = ns->tx_bytes;
+ 		stats->tx_packets = ns->tx_packets;
++		stats->tx_dropped = ns->tx_dropped;
+ 	} while (u64_stats_fetch_retry(&ns->syncp, start));
+ }
+ 
+@@ -302,7 +320,6 @@ static void nsim_setup(struct net_device *dev)
+ 	eth_hw_addr_random(dev);
+ 
+ 	dev->tx_queue_len = 0;
+-	dev->flags |= IFF_NOARP;
+ 	dev->flags &= ~IFF_MULTICAST;
+ 	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE |
+ 			   IFF_NO_QUEUE;
 diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index 028c825b86db..c8b45b0d955e 100644
+index c8b45b0d955e..553c4b9b4f63 100644
 --- a/drivers/net/netdevsim/netdevsim.h
 +++ b/drivers/net/netdevsim/netdevsim.h
-@@ -125,11 +125,13 @@ struct netdevsim {
- 	} udp_ports;
+@@ -98,6 +98,7 @@ struct netdevsim {
  
- 	struct nsim_ethtool ethtool;
-+	struct netdevsim __rcu *peer;
- };
+ 	u64 tx_packets;
+ 	u64 tx_bytes;
++	u64 tx_dropped;
+ 	struct u64_stats_sync syncp;
  
- struct netdevsim *
- nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port);
- void nsim_destroy(struct netdevsim *ns);
-+bool netdev_is_nsim(struct net_device *dev);
- 
- void nsim_ethtool_init(struct netdevsim *ns);
- 
+ 	struct nsim_bus_dev *nsim_bus_dev;
 -- 
 2.43.0
 
