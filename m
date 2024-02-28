@@ -1,53 +1,69 @@
-Return-Path: <netdev+bounces-75870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72AC586B678
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 18:54:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F26986B67A
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 18:54:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2902F1F22981
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:54:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C0CE1C244AD
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 17:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F1C915F30A;
-	Wed, 28 Feb 2024 17:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB6A3160873;
+	Wed, 28 Feb 2024 17:53:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="bsR6BXXr"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cLI8IfXl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-14.smtpout.orange.fr [80.12.242.14])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 125B615E5D0
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 17:53:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.14
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3122F15E5B1
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 17:53:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709142827; cv=none; b=anLFuwHdiYEMZb15t7XEGbXVkjvvyz+u8opl1VfMDDPsEkn+Dkr6316DE8croeNhLEuKIVcWA+QEV7aD5dbAmN9AMmZSa9wQfkMUIFx7lzY9Z0E4cCSp3yRV9wPy/V2tW1R+S5v9cOy8mx3DxT80HCdqlLKLALZhQIYytVATpFk=
+	t=1709142832; cv=none; b=fGkqN6Cd6idbrG03pE3kqVyxrUISSODtIew+hCQvThpa6CQrff0CM5h4KPkJxdwpF8cLQhMP3N8tFeRxdUYmZkAqPqRl38FVUdF61XVrugeJH0p5VwnM2EkqfsBi4X2U//MLYWmbJe1epFDswdQav1EUBQNEzcBwkg1c9VXHSQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709142827; c=relaxed/simple;
-	bh=LbhXy96A+w6vpiruQUVvkg+e4nnJKaBfp0FqCDBfu6U=;
+	s=arc-20240116; t=1709142832; c=relaxed/simple;
+	bh=at+ezjvpjxs/vz6AOYC8XC4PJ5QZbtGKAQ5B+wPW0Qk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c/rcYz/O0koaaZD0ymbNo6pUp2PML2e2Gu+IMVYROf0rTtpKRunYlHqMBEK/yymGOK898oUS/GwI3IE/kKkRwcdrWQQatVI+jhkXOHXrVSNxqGeaU9fXlxcqbyrEvp7VkJ33xi9C378QVpAeAkxxrQg+GqmDO7n2njs8l5jiXBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=bsR6BXXr; arc=none smtp.client-ip=80.12.242.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.18] ([92.140.202.140])
-	by smtp.orange.fr with ESMTPA
-	id fO6Zrco9bdHY5fO6ZrJUJj; Wed, 28 Feb 2024 18:52:33 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1709142753;
-	bh=pf79XzCNz511kLy7uzOABu4V2YVxERhDVTMvZ5TxWoQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=bsR6BXXr/ORjNGiqYcwp31xeIlNipEkvHWPlujcKWjPYY91Qw5hrv4BJYkLHvicOH
-	 uS1pX8OFvf+AHnEVv9EkL6ThaznaOkXgzYGbMV/KTKvYf+ej3OXpo6qiHApJ7hDvjg
-	 dJIl9HMWE7HadwG9zEjRtWaq1oBzHTaVeYbeu3FsiXIJjpGAp+nRZAUna9/iH0rxuo
-	 m0jdomeV5P9FicFE7x1jvnHZpbH6Skfj3FFHY3LsQEek/TTmDnFDfSygrEFs+aAWM5
-	 SP+OUHqD6O9sfyKMAGlVjWuPJO4Wo48Gv1d7YkfGsSH5Pr5nerF7dSq87DB/RPkOJd
-	 DHVwEsaNkyOGQ==
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Wed, 28 Feb 2024 18:52:33 +0100
-X-ME-IP: 92.140.202.140
-Message-ID: <22bb246c-6e94-43c2-b742-38993ced9a61@wanadoo.fr>
-Date: Wed, 28 Feb 2024 18:52:30 +0100
+	 In-Reply-To:Content-Type; b=lZ0p3d9Jnvd8+gDatwx59+3tQHcREL3ZfRbyw50YmkYjrDKUblwe0GIFKuPjA6UdT+jlupr7DzO3Gn+Gk8UWFAEVLRJYcxwV/tQkohn8x0DTxpZKlmA1EVBK434BYxc0oSdeHZjq0Sahw0nQLghiUCyZN7KMtjr73IrVpL59hb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cLI8IfXl; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-787b4d1393aso1982385a.0
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 09:53:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1709142830; x=1709747630; darn=vger.kernel.org;
+        h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=7ws6yODh+/0Vq6dRPCDkCE9wtE8qwn+Ld5JJIkCB3Ck=;
+        b=cLI8IfXl4lImPYuMrKwJbvigsJJv640rcQhPungq46iHKh0R0cgFgrnX4r4GTY3PUO
+         FF+T5IKYM7TZvVeiXF6ghDlzuYRxN8dMWQOnU0mrUx21eDDmLL28qTQL3lWIxUGkFr6p
+         D3rXfaYU2a5/Z3XmpEqIGSc2znS1QZw/63qSQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709142830; x=1709747630;
+        h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7ws6yODh+/0Vq6dRPCDkCE9wtE8qwn+Ld5JJIkCB3Ck=;
+        b=ZlOUAT5KTfg/mXJ/nDUCnaXCCnn+XJiZ7hNpBsIaTja6lVYzeLCgD181t24HEsgawS
+         OIyVaoyr4oXqYxndvDtYQ5k61vpp4AnbLMMX43KlZf0jUslXN1y+MTKDxBRs4fiYOX0l
+         cZGqzns7gbsOiU96ij8w+3P6iP3kskzRZyAQyzyzsgDp89i0rnmWFrwRruTB7VpXVOCx
+         s3QH8SPP+IRsIJ+FUA4nP/Kk2BI5ilW27t5A1Lkm8JtHisb+XjI6jweqDogb8K8BTyc3
+         7tYRQ6e/OQDXQXst8kS6ywAa50AryNYFtcwtqfQA7goWmbvL/c+kL92Aje9BiQSDYEsN
+         d7lA==
+X-Gm-Message-State: AOJu0Yy50f/FOwEFcukSTYxeigZair3/RolDHhzycbt0Jp3kF+8GCxNW
+	tZe3J5a6GZQFaelbhIdCY/nxBECD7SIhjNuS16Z4HX8H/qeA9ZFW4Rgb3PJQaA==
+X-Google-Smtp-Source: AGHT+IEnX+6F0vApAHZ5lhxCAKRF2WBjxwLHXe7fE8DhEcxtSWRpEg8mW6x5OdjxmxJ0PLL9YApLqA==
+X-Received: by 2002:a05:620a:1354:b0:787:e07c:2e11 with SMTP id c20-20020a05620a135400b00787e07c2e11mr6134087qkl.57.1709142830095;
+        Wed, 28 Feb 2024 09:53:50 -0800 (PST)
+Received: from [10.69.74.12] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id op50-20020a05620a537200b00787cad5dceesm11013qkn.18.2024.02.28.09.53.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Feb 2024 09:53:49 -0800 (PST)
+Message-ID: <5b5ac624-6abd-406b-ae8a-bb6a361aee75@broadcom.com>
+Date: Wed, 28 Feb 2024 09:53:46 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,91 +71,151 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] net: tehuti: Fix a missing pci_disable_msi() in
- the error handling path of bdx_probe()
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: andy@greyhouse.net, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-References: <cover.1709066709.git.christophe.jaillet@wanadoo.fr>
- <011588ecfd6689e27237f96213acdb7a3543f981.1709066709.git.christophe.jaillet@wanadoo.fr>
- <Zd8CEAng7emsvaxg@nanopsycho>
-Content-Language: en-MW
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <Zd8CEAng7emsvaxg@nanopsycho>
+Subject: Re: [PATCH net-next v2 5/6] net: bcmasp: Keep buffers through power
+ management
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, florian.fainelli@broadcom.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, opendmb@gmail.com,
+ bcm-kernel-feedback-list@broadcom.com, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, rafal@milecki.pl, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240227185454.2767610-1-justin.chen@broadcom.com>
+ <20240227185454.2767610-6-justin.chen@broadcom.com>
+ <20240228094541.GA292522@kernel.org>
+From: Justin Chen <justin.chen@broadcom.com>
+In-Reply-To: <20240228094541.GA292522@kernel.org>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000004799ea061274d372"
+
+--0000000000004799ea061274d372
+Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Le 28/02/2024 à 10:51, Jiri Pirko a écrit :
-> Tue, Feb 27, 2024 at 09:50:55PM CET, christophe.jaillet@wanadoo.fr wrote:
->> If an error occurs after a successful call to pci_enable_msi(),
->> pci_disable_msi() should be called as already done in the remove function.
+
+
+On 2/28/24 1:45 AM, Simon Horman wrote:
+> On Tue, Feb 27, 2024 at 10:54:53AM -0800, Justin Chen wrote:
+>> There is no advantage of freeing and re-allocating buffers through
+>> suspend and resume. This waste cycles and makes suspend/resume time
+>> longer. We also open ourselves to failed allocations in systems with
+>> heavy memory fragmentation.
 >>
->> Add a new label and the missing pci_disable_msi() call.
->>
->> Fixes: 1a348ccc1047 ("[NET]: Add Tehuti network driver.")
->> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
->> ---
->> Compile tested only.
->> ---
->> drivers/net/ethernet/tehuti/tehuti.c | 9 +++++++--
->> 1 file changed, 7 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/tehuti/tehuti.c b/drivers/net/ethernet/tehuti/tehuti.c
->> index ca409515ead5..938a5caf5a3b 100644
->> --- a/drivers/net/ethernet/tehuti/tehuti.c
->> +++ b/drivers/net/ethernet/tehuti/tehuti.c
->> @@ -1965,7 +1965,7 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->> 		ndev = alloc_etherdev(sizeof(struct bdx_priv));
->> 		if (!ndev) {
->> 			err = -ENOMEM;
->> -			goto err_out_iomap;
->> +			goto err_out_disable_msi;
->> 		}
->>
->> 		ndev->netdev_ops = &bdx_netdev_ops;
->> @@ -2031,7 +2031,7 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->> 		if (bdx_read_mac(priv)) {
->> 			pr_err("load MAC address failed\n");
->> 			err = -EFAULT;
->> -			goto err_out_iomap;
->> +			goto err_out_disable_msi;
->> 		}
->> 		SET_NETDEV_DEV(ndev, &pdev->dev);
->> 		err = register_netdev(ndev);
->> @@ -2048,6 +2048,11 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->>
->> err_out_free:
->> 	free_netdev(ndev);
->> +err_out_disable_msi:
->> +#ifdef BDX_MSI
+>> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+>> Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
 > 
-> ifdef does not seem to be necessary here. The irq_type check should be
-> enough.
-
-I thought about removing it, but I left it because it how it is done in 
-the remove function.
-
-I'll send a v2 without the ifdef and will also add another patch to 
-remove it as well from the remove function.
-
-CJ
-
+> ...
 > 
-> pw-bot: cr
+>> @@ -1118,6 +1083,10 @@ static int bcmasp_open(struct net_device *dev)
+>>   
+>>   	netif_dbg(intf, ifup, dev, "bcmasp open\n");
+>>   
+>> +	ret = bcmasp_alloc_buffers(intf);
+>> +	if (ret)
+>> +		return ret;
+>> +
 > 
+> Hi Justin,
 > 
->> +	if (nic->irq_type == IRQ_MSI)
->> +		pci_disable_msi(pdev);
->> +#endif
->> err_out_iomap:
->> 	iounmap(nic->regs);
->> err_out_res:
+> Do the resources allocated by bcmasp_alloc_buffers() need
+> to be released if an error occurs in bcmasp_open() below this line?
+> 
+
+Yes good catch. Will send v3.
+
+Thanks,
+Justin
+
+>>   	ret = clk_prepare_enable(intf->parent->clk);
+>>   	if (ret)
+>>   		return ret;
 >> -- 
->> 2.43.2
->>
+>> 2.34.1
 >>
 > 
 > 
 
+--0000000000004799ea061274d372
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+NhTY3E+cXCB11wty89QStajwXdhGJTYEvUgvsq1h8CwJj9w/38ldAQf5WjhPmApYeJR2ewFrBMCM
+4lHkdRJ6TDc9nXoEkypUfjJkJHe7Eal06tosh6JpAgMBAAGjggHZMIIB1TAOBgNVHQ8BAf8EBAMC
+BaAwgaMGCCsGAQUFBwEBBIGWMIGTME4GCCsGAQUFBzAChkJodHRwOi8vc2VjdXJlLmdsb2JhbHNp
+Z24uY29tL2NhY2VydC9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcnQwQQYIKwYBBQUHMAGG
+NWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwME0G
+A1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxz
+aWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEkGA1UdHwRCMEAwPqA8oDqGOGh0dHA6Ly9j
+cmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3JsMCMGA1UdEQQc
+MBqBGGp1c3Rpbi5jaGVuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSME
+GDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUIWGeYuaTsnIada5Xx8TR3cheUbgw
+DQYJKoZIhvcNAQELBQADggEBAHNQlMqQOFYPYFO71A+8t+qWMmtOdd2iGswSOvpSZ/pmGlfw8ZvY
+dRTkl27m37la84AxRkiVMes14JyOZJoMh/g7fbgPlU14eBc6WQWkIA6AmNkduFWTr1pRezkjpeo6
+xVmdBLM4VY1TFDYj7S8H2adPuypd62uHMY/MZi+BIUys4uAFA+N3NuUBNjcVZXYPplYxxKEuIFq6
+sDL+OV16G+F9CkNMN3txsym8Nnx5WAYZb6+rBUIhMGz70V05xsHQfzvo2s7f0J1tJ5BoRlPPhL0h
+VOnWA3h71u9TfSsv+PXVm3P21TfOS2uc1hbzEqyENCP4i5XQ0rv0TmPW42GZ0o4xggJtMIICaQIB
+ATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhH
+bG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwj8BKLXNpALfemdRAwDQYJ
+YIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIHdxfSlOxbt7GO4P5GVJP6pyffJR2V+z4H8n
+s4AvoxnkMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIyODE3
+NTM1MFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
+AwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATAN
+BgkqhkiG9w0BAQEFAASCAQCF2/j11yU40SbksHykSNRg1lLzf6nuzKwmspm2i0oJWF3iAlrfDKWD
+SEg4BrmWlbVVQziQwYNo50UTk/24kU5qAddkFS/ZdBz2Oqkc0UpeD36ltPaX2VLXo5cZePIdOxIp
+VNZDTpqmVoqLpmo2xOHxTRwEAhCTa1cwJD/Bhdo0+Iv/XQarILEAu7ZwNdzq14MJZRBZ+GzdtMeJ
+zNTxdl7MBF6HGboDZrKB/JfZcGr0chwgVnl8sy//lR7fEvhBmvx4dA1H5wkWizaAyHXmNBEr6t4g
+FYhaQa3fpa4XR+Sj68UvWggJbm9RuEyuYbZ7thc1aBJyvfDCnO/uSA6i3j1B
+--0000000000004799ea061274d372--
 
