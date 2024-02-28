@@ -1,89 +1,88 @@
-Return-Path: <netdev+bounces-75569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0645C86A930
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:46:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E274586A93C
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:49:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 879041F26EE5
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 07:46:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EBB21F2556D
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 07:49:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A014525579;
-	Wed, 28 Feb 2024 07:46:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A3C2556D;
+	Wed, 28 Feb 2024 07:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BFmwNLhT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ac6NZtDw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3E122F1C
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 07:46:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5788F24B35
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 07:49:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709106369; cv=none; b=rgIC82b59KvLRX9zAGaYmJFa9TKJMm6M+2F98pgzOfvgssFvVGt0He2238uW3bQFe94+xmN+FA5S/496pw6woLRRGjLvIOJjQ+ISLtGtxzbnSs6xNEfFTq77i4dVjksqTS7N0m9hasjxyf28Jlr1OtkMOUtr0bFKh44X89waXCc=
+	t=1709106595; cv=none; b=qGGHemS4S56h2vxZBh+xTAakwZrO4mi0sapU5ZFiY9/2EQtg8V34xUKO7ADAasneNQWkygpLk3mq/bErPO+bKgwWEkVppfI3Vnnmvte4MiQ1Sae5zjmsvLX0MvlOd7X/Gaz4+dOtd/WVL5NOYLqvFo1RWHzOUucpuem6Zjl5StI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709106369; c=relaxed/simple;
-	bh=WIv/ytZPC0gZ1D50cmv4rx8mx5kZjVh5M0M7B5UUYHU=;
+	s=arc-20240116; t=1709106595; c=relaxed/simple;
+	bh=jWgiAjYxwgFXfNMLJavfOM12E6ybNKo0VQ6aB03di90=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ViVhpF/F9O8knh/25kobp5qEI4D4QGUdTV587Ngs+wAMZ4qadklQcLDBWUoh8UTGApOHiTXwy32j3WU8jPbWcVu+i3E3iosqodHw3c2dB3B/n0CFYBxI1LcQML5fwRuFMVT0XrU3yBAsk5WI5BCQBwtfZBX8GGF7J5tEygBv9rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BFmwNLhT; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:MIME-Version; b=qppCjKXQ8NX65MDMr1pooeIukZvwU/oFhwct7NPs9pO2C/JxDTfCQW6oGzTqfbHfmKpvLoKx5mR+4driWgKTkNx3OLFhvFds4HRPXHIN/2csc2XsXlpOud9JUrUMbKhi0WYmyKXpLWrO3U+UxEdzfs9a08mEEhs5H7m23B3phck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ac6NZtDw; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709106366;
+	s=mimecast20190719; t=1709106591;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=YblT7gBEcZmHTFnl8+ECuio4cmPTlV1P9r7ZheTH7lU=;
-	b=BFmwNLhTebkt/UpzQOjfNjopXd5lRMCT96qFaaHajaCGB2yiVVTXE4hFUzM8r6NJTNoY2s
-	YND7ZodtyfRjuDNfEhxtQ46tP0p6gpPH2Onxb9A+GquLOA4pvVhV59/bpZ4ac6sEGpU/ZM
-	XRXLW/miXAJs7N4JJYJbbvWZ5XIFFEk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=5G2sFwliWaXq2ToZHzHOtWA1fJ8/mRkb0fghAwp5ugE=;
+	b=ac6NZtDwSq6QWCnIgIz/qSP8Nwsar1fK300IGOlsRTlrZA2V+3nvxv1KE5c8NMcVOFWT4q
+	TukiIPp9lsErUsarU91Y4KJThBbpLYZptwU1fVn3M2HVlLoTJBhhr3PEqDfPVa+/ooRl+R
+	4QHNCu4JVwsLcgtxjIId/UQJPZLRHTw=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-654--f_JMod7M9iYGGOeK5TxGA-1; Wed, 28 Feb 2024 02:46:04 -0500
-X-MC-Unique: -f_JMod7M9iYGGOeK5TxGA-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-41293adf831so10997455e9.0
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 23:46:04 -0800 (PST)
+ us-mta-671-RECOz9RhOru9DRsSY9-Eyw-1; Wed, 28 Feb 2024 02:49:49 -0500
+X-MC-Unique: RECOz9RhOru9DRsSY9-Eyw-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-51133766a92so2138114e87.1
+        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 23:49:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709106363; x=1709711163;
+        d=1e100.net; s=20230601; t=1709106588; x=1709711388;
         h=mime-version:user-agent:content-transfer-encoding:autocrypt
          :references:in-reply-to:date:cc:to:from:subject:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YblT7gBEcZmHTFnl8+ECuio4cmPTlV1P9r7ZheTH7lU=;
-        b=VVy0ijU6dwq3lDSePu/qPPEWIFnhISitYc0RL/2WkWZMpYU4Dpy2z4OzkOStPrYmlP
-         6qEsMQLzyY7I9rXzxwpAfayFAUiAVl/lGP2X/X4KiTKgJtIWeX0Q09KOM/3TmFm55iz2
-         kThSA9GxQ72Ba15FmmNH+WgQrR1uEY/znMx1fN/VXyARmvV33SN6MPBol/oa21cG8CWT
-         zUvNo+JHb3vxs09DKNrh8nfKEwuQY4SU7jcrmH4lMvPVtrnMe+t1i+fkI7h6HGIYcXy7
-         jLLpKuOqU0Y9t98xJI+sdfjTMGfpTtW6RKKDFml7HAWOUXfUo+SJu+VlR08HZEvBQ9aG
-         stDg==
-X-Forwarded-Encrypted: i=1; AJvYcCX0ABfm3CPHw2nGVArmdRm3Em9gadgpW0e31YP+e1LvFO8hgrvQEcs94U7CT/faA0GNlFJ55mT7lUbX6SQqYXJzZ+tUooAx
-X-Gm-Message-State: AOJu0YxAaWREooijXazItKF3iWNdCOmkay+D5zxxfKERX7U9p3MmU/EL
-	rouTPdj+TXRn1oNhILxf06GVHdz1lnuvaprUOYznt+7q3i8gO/qy/spmZK9UF5vYj5QqSf29jmK
-	jm3+UyWdP2oIIk3PcVyBYf1M6lMWrq8YZ7SBJGN31d7Dsd2fFgFRaDw==
-X-Received: by 2002:a05:600c:1c08:b0:412:a0a3:cea with SMTP id j8-20020a05600c1c0800b00412a0a30ceamr6863272wms.1.1709106363363;
-        Tue, 27 Feb 2024 23:46:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH0BnP2ZjUvnIKh7NatCMX69QfUUDlTV0SbmQQVDKPzbRvX4oWrb6uARD5PFipDOtoXbdRKhQ==
-X-Received: by 2002:a05:600c:1c08:b0:412:a0a3:cea with SMTP id j8-20020a05600c1c0800b00412a0a30ceamr6863261wms.1.1709106363015;
-        Tue, 27 Feb 2024 23:46:03 -0800 (PST)
+        bh=5G2sFwliWaXq2ToZHzHOtWA1fJ8/mRkb0fghAwp5ugE=;
+        b=mKboaxnHiy/eOc+Os34fzwPE9Ai3tqWpgAnCTCz+7EANk7vWjsxO8VBlgStqQt4bOZ
+         oAA58GKjA8dVecXFKxwdbLiKy1ZQ6H9LUgU59fBUEEafzcv34/ypN1jn8VKCcSCL7Y4S
+         tt086yhzEe/oN9w2JUnXKP0qfqTCmMTB6KqraXwAeICYPAWd87KUp0nwDWL9yNQ2cNsX
+         wqOxDaMGPSdwENsGXAZTcPHjqz9YfvJmvCVHAoZr6qWl7E02WPDBroKaIR0WOqZ7O1CS
+         gnykOD+BBSW8mjsqIbvZaqvG3I69vooTkflg1FLL/x+5/FsIcLOZkn0HkuWLnF65T7aZ
+         eSwA==
+X-Forwarded-Encrypted: i=1; AJvYcCWB1KKTSyhngrh+4/4sys/yeVgw9Z0kd6rBrNDA5KgPmXEzIlHi7us+m7/6msbinD4wDaPV8mPpau3dJyAPmUvUKSuraVYh
+X-Gm-Message-State: AOJu0YxSLLd0/t7M9pBiV7WJ6ef6cgw13MicpjXWg+IQ5thQ0QlajQno
+	z4vINOqKriGk1IcG9rGjI9oO324059Q+0eGK5A8RCfBn4vbeSwTer1FTw4HGzf58fCTlAc3fajh
+	pcF8eJ4SvO0n1p76m7oMQ0ORYjxI5ydcOvu45yrfUju7QBZUkPi7Cxg==
+X-Received: by 2002:a05:6512:ea4:b0:512:fe1f:9181 with SMTP id bi36-20020a0565120ea400b00512fe1f9181mr5222036lfb.5.1709106588050;
+        Tue, 27 Feb 2024 23:49:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEWnK+soz33URra8tLo6Juu1OlSfhIuUBRMUUW3eZ5IFtibdHx3jUaPBAklqvuVNhFtAT1teQ==
+X-Received: by 2002:a05:6512:ea4:b0:512:fe1f:9181 with SMTP id bi36-20020a0565120ea400b00512fe1f9181mr5222021lfb.5.1709106587650;
+        Tue, 27 Feb 2024 23:49:47 -0800 (PST)
 Received: from gerbillo.redhat.com (146-241-246-156.dyn.eolo.it. [146.241.246.156])
-        by smtp.gmail.com with ESMTPSA id dx14-20020a05600c63ce00b004129f28e2cdsm1204524wmb.3.2024.02.27.23.46.02
+        by smtp.gmail.com with ESMTPSA id ba21-20020a0560001c1500b0033dc3fe1046sm12945881wrb.77.2024.02.27.23.49.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Feb 2024 23:46:02 -0800 (PST)
-Message-ID: <c2a73a3b11970a4aefd020764e19284ba347cc1c.camel@redhat.com>
-Subject: Re: [PATCH v3 net-next 04/14] af_unix: Bulk update
- unix_tot_inflight/unix_inflight when queuing skb.
+        Tue, 27 Feb 2024 23:49:47 -0800 (PST)
+Message-ID: <3adcdaf1bd20b37640a92593d643964bf49297c2.camel@redhat.com>
+Subject: Re: [PATCH v3 net-next 11/14] af_unix: Assign a unique index to SCC.
 From: Paolo Abeni <pabeni@redhat.com>
 To: Kuniyuki Iwashima <kuniyu@amazon.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
  kuni1840@gmail.com,  netdev@vger.kernel.org
-Date: Wed, 28 Feb 2024 08:46:01 +0100
-In-Reply-To: <20240228023445.28279-1-kuniyu@amazon.com>
-References: <d90b617800cedf03ce8d93d2df61a724f2775f56.camel@redhat.com>
-	 <20240228023445.28279-1-kuniyu@amazon.com>
+Date: Wed, 28 Feb 2024 08:49:46 +0100
+In-Reply-To: <20240228030508.31297-1-kuniyu@amazon.com>
+References: <5f13e49d7aa3fb7ce51a5bea51268882a90a32c1.camel@redhat.com>
+	 <20240228030508.31297-1-kuniyu@amazon.com>
 Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
@@ -98,46 +97,134 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Tue, 2024-02-27 at 18:34 -0800, Kuniyuki Iwashima wrote:
+On Tue, 2024-02-27 at 19:05 -0800, Kuniyuki Iwashima wrote:
 > From: Paolo Abeni <pabeni@redhat.com>
-> Date: Tue, 27 Feb 2024 11:47:23 +0100
-> > On Fri, 2024-02-23 at 13:39 -0800, Kuniyuki Iwashima wrote:
+> Date: Tue, 27 Feb 2024 12:19:40 +0100
+> > On Fri, 2024-02-23 at 13:40 -0800, Kuniyuki Iwashima wrote:
+> > > The definition of the lowlink in Tarjan's algorithm is the
+> > > smallest index of a vertex that is reachable with at most one
+> > > back-edge in SCC.  This is not useful for a cross-edge.
+> > >=20
+> > > If we start traversing from A in the following graph, the final
+> > > lowlink of D is 3.  The cross-edge here is one between D and C.
+> > >=20
+> > >   A -> B -> D   D =3D (4, 3)  (index, lowlink)
+> > >   ^    |    |   C =3D (3, 1)
+> > >   |    V    |   B =3D (2, 1)
+> > >   `--- C <--'   A =3D (1, 1)
+> > >=20
+> > > This is because the lowlink of D is updated with the index of C.
+> > >=20
+> > > In the following patch, we detect a dead SCC by checking two
+> > > conditions for each vertex.
+> > >=20
+> > >   1) vertex has no edge directed to another SCC (no bridge)
+> > >   2) vertex's out_degree is the same as the refcount of its file
+> > >=20
+> > > If 1) is false, there is a receiver of all fds of the SCC and
+> > > its ancestor SCC.
+> > >=20
+> > > To evaluate 1), we need to assign a unique index to each SCC and
+> > > assign it to all vertices in the SCC.
+> > >=20
+> > > This patch changes the lowlink update logic for cross-edge so
+> > > that in the example above, the lowlink of D is updated with the
+> > > lowlink of C.
+> > >=20
+> > >   A -> B -> D   D =3D (4, 1)  (index, lowlink)
+> > >   ^    |    |   C =3D (3, 1)
+> > >   |    V    |   B =3D (2, 1)
+> > >   `--- C <--'   A =3D (1, 1)
+> > >=20
+> > > Then, all vertices in the same SCC have the same lowlink, and we
+> > > can quickly find the bridge connecting to different SCC if exists.
+> > >=20
+> > > However, it is no longer called lowlink, so we rename it to
+> > > scc_index.  (It's sometimes called lowpoint.)
+> > >=20
+> > > Also, we add a global variable to hold the last index used in DFS
+> > > so that we do not reset the initial index in each DFS.
+> > >=20
+> > > This patch can be squashed to the SCC detection patch but is
+> > > split deliberately for anyone wondering why lowlink is not used
+> > > as used in the original Tarjan's algorithm and many reference
+> > > implementations.
+> > >=20
+> > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > > ---
+> > >  include/net/af_unix.h |  2 +-
+> > >  net/unix/garbage.c    | 15 ++++++++-------
+> > >  2 files changed, 9 insertions(+), 8 deletions(-)
+> > >=20
+> > > diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+> > > index ec040caaa4b5..696d997a5ac9 100644
+> > > --- a/include/net/af_unix.h
+> > > +++ b/include/net/af_unix.h
+> > > @@ -36,7 +36,7 @@ struct unix_vertex {
+> > >  	struct list_head scc_entry;
+> > >  	unsigned long out_degree;
+> > >  	unsigned long index;
+> > > -	unsigned long lowlink;
+> > > +	unsigned long scc_index;
+> > >  };
+> > > =20
+> > >  struct unix_edge {
 > > > diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-> > > index 96d0b1db3638..e8fe08796d02 100644
+> > > index 1d9a0498dec5..0eb1610c96d7 100644
 > > > --- a/net/unix/garbage.c
 > > > +++ b/net/unix/garbage.c
-> > > @@ -148,6 +148,7 @@ static void unix_free_vertices(struct scm_fp_list=
- *fpl)
-> > >  }
+> > > @@ -308,18 +308,18 @@ static bool unix_scc_cyclic(struct list_head *s=
+cc)
 > > > =20
-> > >  DEFINE_SPINLOCK(unix_gc_lock);
-> > > +unsigned int unix_tot_inflight;
+> > >  static LIST_HEAD(unix_visited_vertices);
+> > >  static unsigned long unix_vertex_grouped_index =3D UNIX_VERTEX_INDEX=
+_MARK2;
+> > > +static unsigned long unix_vertex_last_index =3D UNIX_VERTEX_INDEX_ST=
+ART;
 > > > =20
-> > >  void unix_add_edges(struct scm_fp_list *fpl, struct unix_sock *recei=
-ver)
+> > >  static void __unix_walk_scc(struct unix_vertex *vertex)
 > > >  {
-> > > @@ -172,7 +173,10 @@ void unix_add_edges(struct scm_fp_list *fpl, str=
-uct unix_sock *receiver)
-> > >  		unix_add_edge(fpl, edge);
-> > >  	} while (i < fpl->count_unix);
+> > > -	unsigned long index =3D UNIX_VERTEX_INDEX_START;
+> > >  	LIST_HEAD(vertex_stack);
+> > >  	struct unix_edge *edge;
+> > >  	LIST_HEAD(edge_stack);
 > > > =20
-> > > +	WRITE_ONCE(unix_tot_inflight, unix_tot_inflight + fpl->count_unix);
-> > >  out:
-> > > +	WRITE_ONCE(fpl->user->unix_inflight, fpl->user->unix_inflight + fpl=
-->count);
+> > >  next_vertex:
+> > > -	vertex->index =3D index;
+> > > -	vertex->lowlink =3D index;
+> > > -	index++;
+> > > +	vertex->index =3D unix_vertex_last_index;
+> > > +	vertex->scc_index =3D unix_vertex_last_index;
+> > > +	unix_vertex_last_index++;
+> > > =20
+> > >  	list_add(&vertex->scc_entry, &vertex_stack);
+> > > =20
+> > > @@ -342,13 +342,13 @@ static void __unix_walk_scc(struct unix_vertex =
+*vertex)
+> > > =20
+> > >  			vertex =3D edge->predecessor->vertex;
+> > > =20
+> > > -			vertex->lowlink =3D min(vertex->lowlink, next_vertex->lowlink);
+> > > +			vertex->scc_index =3D min(vertex->scc_index, next_vertex->scc_ind=
+ex);
+> > >  		} else if (next_vertex->index !=3D unix_vertex_grouped_index) {
+> > > -			vertex->lowlink =3D min(vertex->lowlink, next_vertex->index);
+> > > +			vertex->scc_index =3D min(vertex->scc_index, next_vertex->scc_ind=
+ex);
 > >=20
-> > I'm unsure if later patches will shed some light, but why the above
-> > statement is placed _after_ the 'out' label? fpl->count will be 0 in
-> > such path, and the updated not needed. Why don't you place it before
-> > the mentioned label?
+> > I guess the above will break when unix_vertex_last_index wraps around,
+> > or am I low on coffee? (I guess there is not such a thing as enough
+> > coffee to allow me reviewing this whole series at once ;)
+> >=20
+> > Can we expect a wrap around in host with (surprisingly very) long
+> > uptimes?=20
 >=20
-> fpl->count is the total number of fds in skb, and fpl->count_unix
-> is the number of AF_UNIX fds.
+> Then, the number of inflight AF_UNIX sockets is at least 2^64 - 1.
 
-Ah right you are! Sorry, I misread the variable name. This code looks
-good.
+Isn't "unix_vertex_last_index" value preserved across consecutive cg
+run? I though we could reach wrap around after a lot of gc runs...
 
-Cheers,
+Cheers,=20
 
 Paolo
 
