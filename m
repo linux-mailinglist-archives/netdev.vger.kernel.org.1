@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-75608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CD1586AAC4
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 10:03:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F7BD86AAC8
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 10:03:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E5901C26272
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:03:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AEDBFB219CE
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:03:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7CE381B9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3655381C5;
 	Wed, 28 Feb 2024 09:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a39FbhhC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TxXoc0Eo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7B02DF9D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D22531A83;
 	Wed, 28 Feb 2024 09:02:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709110947; cv=none; b=nFjhR+wxdMoZhXK+CVrz0lSn1fYR9ihYF/RcDprLXcoNgfiVPdKAXh3T02SengoycLVFeBDlUbWOsQ+nvF50n93BZEBZskW4N6e6c5ySBtJjV4jfItoOnxF8GTdbyQCxdtGSybWoh+oWPYtZsLYPHkNS89U3BVOzA5V1AF+mbNo=
+	t=1709110947; cv=none; b=dg56972apL/Ju2Dl7501nxLLVC4iUby264Fll14zjAF1w3YOwmjh56TpcnRjCJmljah5pYZ18qHMK7PfgVKeRRijUTDmGmGrk+97vFQdIu/8PXkgB1LxGeERusGnnoxtdshWXDBo0EQS6Lr6YaufiVyCz6L0YPMDVQM1M8ur89U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709110947; c=relaxed/simple;
-	bh=tOs31KYTqoxrPKz/Y05lViH2DSx10Kk1ejHawTz0Dtk=;
+	bh=AwiWhyYYPQ6J5Nsxc1RcXcfAeBDJwdSxCWFxnx8UpOE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=kA2l+/8ICXIoKYykx1OlR1K24PKStjkh+UI34CXsCptjA8oG033Iibl5N/1sbYMPfqfdOmzYDA17EGHQhkeX74W3ViGyiVgRmfycLgi4ZpPikNspHMHe3MlyaNry+Ybyb2CbqrL4+J1nQi/hqSIK38MtXny3wWY4ZQYPEpj7Uoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a39FbhhC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E08C8C4167D;
+	 In-Reply-To:To:Cc; b=L0iQA0MYenj0Gbf3zVvAlU+cIRbwAODbT3FbVCA2D3mwIhh2hjIjSczcx82BmsDHwn5Ti8TWKeIBGWHKgtuycdq7BR0aqPl54lXoCk/GDTP6cv9PB3q3jMBTbQvlNJgmI0KYDtSC2EJKZF00JL3lX8vHACnM3DWgM52XE9VLtVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TxXoc0Eo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EB21EC4167E;
 	Wed, 28 Feb 2024 09:02:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709110946;
-	bh=tOs31KYTqoxrPKz/Y05lViH2DSx10Kk1ejHawTz0Dtk=;
+	s=k20201202; t=1709110947;
+	bh=AwiWhyYYPQ6J5Nsxc1RcXcfAeBDJwdSxCWFxnx8UpOE=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=a39FbhhCU3m6ABccgExQ2FPaKnG/4JoDw7vn0E6zJK85qhFTZGu8wIHiCPS4jjNhF
-	 8WYVQBysghItmUtaFb2tCIVpQhCWohuweNlMt7LKqSpKE5xAvUUdAhLyFvruOvsDbE
-	 D90y3rp9ZAhV4Jb8tbcpIZDGq/o5wMjZ+bNpG+R9EhUD00LG25wWGinUGoOAUr5aDf
-	 oSAMAQmQao36I1N8rB44ZRkyYdvWMt3K+g/lmyNH3A+OQ8cKop4STD/P2GOONfcICp
-	 s0QtTEQD2fqwABg6eTojSioeeJLpSgQaMdB2wKeiu3PcGQ8ZB0qiIA2dbxXZw38G/K
-	 ZofJCT5rm0Txw==
+	b=TxXoc0EoB29C+ytOFAg+pPsjhb+xBC0jvwepynh3cX7mMnlIg5/h8qEs8K0KZkxjP
+	 2oO4igRgVtceE5KwMf8iTNccByS9bufsyICws3sA4d9+amE09GLLlO5+OEoFyIB2Dy
+	 +ZVG7UlY9xRxAkHfugCqz8wjENQeT8C0VUq3VBpLygLXSYU2MQR6KNi+7JK7RJtuVo
+	 GEIfuP9rXJlH5lr2rUD07ZmGwyjdC+emCItOn6G2uiniqFbG77v4/o1TcRGTzKqXwt
+	 4aO2y/aMM1H/bRAiArLEkyDLjY0iYxAoz2Om4zYD+ZcwTRA71XtsWHC+ThbqBRMlnY
+	 xv5arJzybeZHw==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE782C54E41;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB361C54E55;
 	Wed, 28 Feb 2024 09:02:26 +0000 (UTC)
 From: Yang Xiwen via B4 Relay <devnull+forbidden405.outlook.com@kernel.org>
-Date: Wed, 28 Feb 2024 17:02:30 +0800
-Subject: [PATCH net-next v6 06/11] dt-bindings: net: hisi-femac: add
- missing clocks
+Date: Wed, 28 Feb 2024 17:02:31 +0800
+Subject: [PATCH net-next v6 07/11] dt-bindings: net: hisi-femac: replace
+ deprecated phy-mode with recommended phy-connection-type
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240228-net-v6-6-6d78d3d598c1@outlook.com>
+Message-Id: <20240228-net-v6-7-6d78d3d598c1@outlook.com>
 References: <20240228-net-v6-0-6d78d3d598c1@outlook.com>
 In-Reply-To: <20240228-net-v6-0-6d78d3d598c1@outlook.com>
 To: Yisen Zhuang <yisen.zhuang@huawei.com>, 
@@ -71,11 +71,11 @@ To: Yisen Zhuang <yisen.zhuang@huawei.com>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  devicetree@vger.kernel.org, Yang Xiwen <forbidden405@outlook.com>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1709110945; l=1390;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1709110945; l=1121;
  i=forbidden405@outlook.com; s=20240228; h=from:subject:message-id;
- bh=SAqU1dlvXmk1RmH1J0egzZj4SE6kA1y4eeXVDLyRO28=;
- b=MGeGh9vcJucfrOUy4UwkspwQpi6g+ejOsZjXYNkCGbkGxi9GrfpIG3GLwKNpiugvRIWqvDzaP
- POnOPWZIkENBl/NuvWCi2MNDZF/rqcDOSrXw5JMfyzs/kW8gyXs7teC
+ bh=UkM6cazLUUcGm7V+UelgyTmRZYNnC9CwRUbl7j+gA44=;
+ b=f5Z5JfMhFzIZrioziMkhpJB/CbSksX9sZDGw/4dP0dQYJHzTEaL2jb0GFBOtYQQ1738WyKZ4X
+ GWICiPgPUFOCNGnp3xFLFHiUbPWx0lzBribGIcCjE8z3ivD+rsr8FPV
 X-Developer-Key: i=forbidden405@outlook.com; a=ed25519;
  pk=KAWv6ZzFsT54MGllOczJgFiWB+DuayEmyn24iiVVThU=
 X-Endpoint-Received:
@@ -85,43 +85,36 @@ Reply-To: <forbidden405@outlook.com>
 
 From: Yang Xiwen <forbidden405@outlook.com>
 
-A few clocks are missing in old binding file. Add them to match the real
-hardware.
+The old property "phy-mode" should be replaced with the latest
+"phy-connection-type".
 
 Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
 ---
- .../devicetree/bindings/net/hisilicon,hisi-femac.yaml         | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml b/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
-index be8e34b48243..ba207f2c9ae4 100644
+index ba207f2c9ae4..6c5888897876 100644
 --- a/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
 +++ b/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
-@@ -30,6 +30,14 @@ properties:
-   clocks:
-     items:
-       - description: MAC main clock
-+      - description: MAC bus interface clock
-+      - description: PHY clock
-+
-+  clock-names:
-+    items:
-+      - const: mac
-+      - const: macif
-+      - const: phy
+@@ -66,7 +66,7 @@ required:
+   - clocks
+   - resets
+   - reset-names
+-  - phy-mode
++  - phy-connection-type
+   - phy-handle
+   - hisilicon,phy-reset-delays-us
  
-   resets:
-     items:
-@@ -70,7 +78,8 @@ examples:
-         compatible = "hisilicon,hi3516cv300-femac", "hisilicon,hisi-femac";
-         reg = <0x10090000 0x1000>, <0x10091300 0x200>;
-         interrupts = <12>;
--        clocks = <&clk_femac>;
-+        clocks = <&clk_femac>, <&clk_femacif>, <&clk_fephy>;
-+        clock-names = "mac", "macif", "phy";
+@@ -83,7 +83,7 @@ examples:
          resets = <&crg 0xec 0>, <&crg 0xec 3>;
          reset-names = "mac", "phy";
          mac-address = [00 00 00 00 00 00];
+-        phy-mode = "mii";
++        phy-connection-type = "mii";
+         phy-handle = <&fephy>;
+         hisilicon,phy-reset-delays-us = <10000 20000 20000>;
+     };
 
 -- 
 2.43.0
