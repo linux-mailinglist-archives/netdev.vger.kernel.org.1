@@ -1,120 +1,152 @@
-Return-Path: <netdev+bounces-75596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B45F86AA52
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:44:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF2D986AA60
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 09:47:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A63E1F22873
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:44:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C36C1C21787
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD162D044;
-	Wed, 28 Feb 2024 08:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B892B2D056;
+	Wed, 28 Feb 2024 08:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="sur7Hj1K"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="PhAJvBRV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3132CCB3;
-	Wed, 28 Feb 2024 08:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08992D046
+	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 08:47:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709109852; cv=none; b=uzIKTXhopsWeO/25E9dnbaHd7S3VT+rTpveLcE1LNhc7pTDnymTz0/xiQKK7GBVQnP0+mLOnPAn+UfvZ/aYwVPtHM6hFOMZcpkUpyOwVTTD4SRmGGClPnbsKjkfJLWY1BtGohTDzVgJHF8jZuarLxjDpzpQMH3Ewv6KMn8jHIJE=
+	t=1709110049; cv=none; b=ab6hDWVicD7DmpL8a/JDpOThn5yPfd7FECpqHOWNHdP8x4gEFXkrXhUigWzNYLU5n+ZbGQQ9DqHicEnM6FTEQGBJC6VfZVd06zUgGr68SXZamf8dkR6VbYa5Qf/zjCBzxIjTWcNu/NkVQ3qtMIMA/6WS+NwQ7SNxmyuKGApZ9qY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709109852; c=relaxed/simple;
-	bh=cHIS1svXb6d/RpoB/Li5PbPLE1lQzEq1C87i6qaodzY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ld/fNsJfMTWcK9b5yO75ksZLZbd5BECrNJ41/jJeqStBm4TyQFonVXjngNIu0qreraB1U023sMQoOfos1ZxXjnKOzxYze0/EdjRoHlbgzGrf4qQ61HHH5vOj1gmU1WBuqOD5FcrmfgM9TWpPkI8YQDEAkn5J/Yu7glLDBcFODLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=sur7Hj1K; arc=none smtp.client-ip=212.227.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1709109826; x=1709714626; i=markus.elfring@web.de;
-	bh=cHIS1svXb6d/RpoB/Li5PbPLE1lQzEq1C87i6qaodzY=;
-	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
-	 In-Reply-To;
-	b=sur7Hj1Kl1YB2neskONQG2q7PC6AzVx2JuxowRHZCqh9yJMYM9sd4A+K1jEF3nKO
-	 +0ftNVar+jSf0OaUH92joGYT+MKdMaYJaQ54MOWE6mBP/rMpZ3+vFhX25Fq50iCap
-	 EkkksCvUihJDDBwq6g4drzQF7E+H+S4WbKZirKT+V2rc4a5wDc0djK7O46VDPiPWt
-	 KArIx5XwMV9/whj30Y6QvqrDeaSHO9XIwhxtYprays6ZxmRXbIXksZRh3D4k5BoR7
-	 d8sfDHu79ok7EFPoa7nSCeoikk4LNo4ia4ntAc8s3J2THdavm8wks/i0z6pX6pNNI
-	 qjR8YkDg+HOBkAZcag==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.91.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1N3ouw-1qx0oz11rE-00ze7P; Wed, 28
- Feb 2024 09:43:45 +0100
-Message-ID: <99ea976a-2a37-4656-b370-53daaff54c49@web.de>
-Date: Wed, 28 Feb 2024 09:43:35 +0100
+	s=arc-20240116; t=1709110049; c=relaxed/simple;
+	bh=Z9/wdtQ1ru6upjNXGw5IuXg0cneKdPME8aRX7+WLIaA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=l8bGYl7WN61KLtgRzlAryep7ooqOCogWsqMpsEqV86XL/DA1iHSXxcDOZVlyDdS2ob5Fef58ZA+J5eZXYt6SD9UmtZjYV1LtOUrKHaJQtzw/Nldkg6Oiu4wWbq3ZjV2j0pJHN6YUd0xNJvCQgbmz4NEsnXZr74cJi7AXaaBSTZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=PhAJvBRV; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id E07A987DC8;
+	Wed, 28 Feb 2024 09:47:19 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1709110040;
+	bh=JlgmBjz8gukCGiJ8CDDs8in+o5lRcWaw9kvgoBZtys4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PhAJvBRVXTpxrtMgo6G0bNZ7uEROXo7H7RQwh+Q8Jk50NLHRnBRPwmHPcNFpKhedC
+	 EOWiCBTGyBfuxH9hXDNIU99Ih3LrjmqUVzY93FTGAa2QsWNs7IkZF4YowUafrDno6M
+	 KN5h49PUhlvj1xUTYnTOe4rYz4KJNlmhb0QbTxSmu6f4tETmr/SBajOZw9ePjunWQB
+	 C/GB1keBDqST9nZSVAD7Y0zkowYLQz3GSFTF9ecxgIrv491VpQ9uZbon6Nhm2+4IEs
+	 B590H2OzSGt2j6TljFJylOGFxgZu7g/dbyzzjuMFW+nvLvO0cD9UYWRpwJVO8Vm20l
+	 XSxVjFyp+Sfzg==
+Date: Wed, 28 Feb 2024 09:47:13 +0100
+From: Lukasz Majewski <lukma@denx.de>
+To: Simon Horman <horms@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Florian Fainelli
+ <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, Tristram.Ha@microchip.com, Sebastian Andrzej
+ Siewior <bigeasy@linutronix.de>
+Subject: Re: [PATCH] net: hsr: Use correct offset for HSR TLV values in
+ supervisory HSR frames
+Message-ID: <20240228094713.3c82b6a0@wsk>
+In-Reply-To: <20240227174935.GJ277116@kernel.org>
+References: <20240226152447.3439219-1-lukma@denx.de>
+	<20240227174935.GJ277116@kernel.org>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: net: fman: Use common error handling code in dtsec_init()
-Content-Language: en-GB
-To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jiri Pirko <jiri@resnulli.us>,
- Madalin Bucur <madalin.bucur@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
- Sean Anderson <sean.anderson@seco.com>
-Cc: LKML <linux-kernel@vger.kernel.org>
-References: <9b879c8d-4c28-4748-acf6-18dc69d8ebdf@web.de>
- <20240227184657.76ec4e82@kernel.org>
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240227184657.76ec4e82@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed; boundary="Sig_/ldfn9Hb.1cDWZBRIkhbxHdF";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+--Sig_/ldfn9Hb.1cDWZBRIkhbxHdF
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:UEhwDiFFYhbgpCNlbJ0nMLLlJiSUwR7HvrCgVPbeGeuv1ho1Hzh
- QP/LE3Kre6ApUfuUlw5Nn+7yogjHSg/EXBCsTU+9TVnN87aeHhjoyy3rzkHUkUumGqXQkTe
- noa/DF3Rs6RyBKTtI6Ba3lWR2F2SHeqg3SV31381zPJpDNDNy79RaQEFds1WrB0WGi2Bmh3
- 8m3y6T8aGHM/HAvZONfww==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:/QhjLhitUUU=;rpelHu5AhkcwITbez8ZWCQrQC7b
- cM963v/AgxcIb1xtJ+crDhpAq5n3CRYqVV+sHvn0UPun/cNWovVu+VnOeuQxFOsYJ8MvCGAmx
- XfoMDZo7K5lKrrncjVeUeXfFFAjaxBpzBSv0lzqgU/zuixrBNJUoX333Axca14zNmgY3yGq62
- 4M9kY00bAqA49lwDDYQRzsPdbnrwvu9ryZBi0ph6UzoMQsIO2JnvkOh+SdiO/A8PDiGkCIy+l
- WNEbVna/k6mqcLsgu1G6/QW/eBY8FXYAwQGOysQfsuGQVWN4sBNVo4e3TN4OChriGavyjayF4
- JLvejHRVIAVD4pS9iEgDwVLQOhekpwbLYMYnnRganTPWeBaFyfWBaMrMCZ+ymOgsP1EsmtvbZ
- XULtruU8D4KZ5sEkE1xQRSmr0zw2771g1XwNBZMiooc+4WJObWs3zv1r68tuOocAWfjDE29/N
- bOluLQpIcJ0D9par2AouOalclthzqGyv42J3QuT5XjD18DFnsAum1YmV3212wWRa1r/b32EVC
- v2tAY4NSImADiVyn9aPL/3hRXplipHUr35JQiS8KzgzuCqygh33FO4c7dcAlzSs4fMxPYIHRu
- kOtGSGBdg+x4hqDwlxa4rMILEqhYw+sEQB2WhEzcnWi1xl1gmgsimEhtLQEjSan6O4qSfoW/W
- foGI0QWSv8ikyH7D624KiE72UAU0GNqSE1/JJYY2+utt4pXIX4NMIGASFDvGzjfiFZDzUEDgN
- C/qToK8EDYF
 
->> Adjust jump targets so that a bit of exception handling can be better
->> reused at the end of this function implementation.
->
-> Okay, but..
->
->>  .../net/ethernet/freescale/fman/fman_dtsec.c  | 19 +++++++++++--------
->>  1 file changed, 11 insertions(+), 8 deletions(-)
->
-> ..you've added more lines than you've removed so what's the point.
+Hi Simon,
 
-* Can the change acceptance grow any more for attempts to improve error ha=
-ndling
-  another bit?
+> On Mon, Feb 26, 2024 at 04:24:47PM +0100, Lukasz Majewski wrote:
+> > Current HSR implementation uses following supervisory frame (even
+> > for HSRv1 the HSR tag is not is not present):
+> >=20
+> > 00000000: 01 15 4e 00 01 2d XX YY ZZ 94 77 10 88 fb 00 01
+> > 00000010: 7e 1c 17 06 XX YY ZZ 94 77 10 1e 06 XX YY ZZ 94
+> > 00000020: 77 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> > 00000030: 00 00 00 00 00 00 00 00 00 00 00 00
+> >=20
+> > The current code adds extra two bytes (i.e. sizeof(struct
+> > hsr_sup_tlv)) when offset for skb_pull() is calculated.
+> > This is wrong, as both 'struct hsrv1_ethhdr_sp' and
+> > 'hsrv0_ethhdr_sp' already have 'struct hsr_sup_tag' defined in
+> > them, so there is no need for adding extra two bytes.
+> >=20
+> > This code was working correctly as with no RedBox support, the
+> > check for HSR_TLV_EOT (0x00) was off by two bytes, which were
+> > corresponding to zeroed padded bytes for minimal packet size.
+> >=20
+> > Fixes: f43200a2c98b ("net: hsr: Provide RedBox support") =20
+>=20
+> Hi Lukasz,
+>=20
+> The commit cited above does seem to be present in net or net-next.
+> Perhaps the tag should be:
+>=20
+>    Fixes: eafaa88b3eb7 ("net: hsr: Add support for redbox supervision
+> frames")
 
-* Would you like to fiddle with scope-based resource management?
-  https://elixir.bootlin.com/linux/v6.8-rc6/source/include/linux/cleanup.h=
-#L8
+Thanks for spotting it - I must have overlook it when preparing the
+commit message.
 
-  See also:
-  Article by Jonathan Corbet from 2023-06-15
-  https://lwn.net/Articles/934679/
+>=20
+> >=20
+> > Signed-off-by: Lukasz Majewski <lukma@denx.de> =20
+>=20
+> ...
 
 
-> --
-> pw-bot: reject
 
-Can such an reaction be reconsidered once more?
 
-Regards,
-Markus
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/ldfn9Hb.1cDWZBRIkhbxHdF
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmXe8xEACgkQAR8vZIA0
+zr0cGQgAhp+BHfbGgYVu3Zkki8LeZ+fs1PQDaMlllwt9FgjsxDAXYU6pUn+MYKZj
+n4XA9bsOKkx+K7DcPkesajJ310P0Cyl4dyuXxEGwzNrgRMD0AxlqqAtqyBp6YqUJ
+UP3EUw10/Gn8NPZmeGifvWMJQe0bufmX5rEpKflXLumqBiu7bv1P7rIbv73SjEil
+Mf00+a5ZVNC9MoRJsmkG7tutWB4N+oWTc85gaU3dFojZX76e6I6CH7W7p9/E5tmf
+3EPIhoVDRNzHcm2lChFAA09Mfkx6NRNo7tdK8436egnloHWIVsUKmmNJX1mTwdpA
+G5TNLqlK+sQv4gM7VA0tGAdBoG4mhQ==
+=LGwq
+-----END PGP SIGNATURE-----
+
+--Sig_/ldfn9Hb.1cDWZBRIkhbxHdF--
 
