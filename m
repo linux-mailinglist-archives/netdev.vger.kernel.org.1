@@ -1,145 +1,160 @@
-Return-Path: <netdev+bounces-75566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71D5386A912
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:39:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A09686A92F
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 08:46:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A34C11C21438
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 07:39:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FD311F253DC
+	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 07:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3679E24B35;
-	Wed, 28 Feb 2024 07:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4412325551;
+	Wed, 28 Feb 2024 07:46:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="FxmlMaKe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KcSaCMv/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80C52262B
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 07:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D3D250EC;
+	Wed, 28 Feb 2024 07:46:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709105953; cv=none; b=XxXS/zVtRnWgFfymiHBpzDiiYKUjEf49D/Aldati+n/4hQd74YFh6u7KjnesbyxCyz2PPcpXlRRwR/KN7Qz7WX9VZ5e+PTNveRjWUpGDOHG9SxCgYyHrJ8FnlPZ4GSFgvh3abz/a6acim00vNW+qb5YcqweP51ODhzhJGkxuOvY=
+	t=1709106369; cv=none; b=edV8lR901V5s7S9RK6C1wvmvCIev+OFvzNm7DFUOBF8xQFAJA8Nk/YZD8qYmYHMyXpgNmGagoVqHbL22iAMmmMTRoXJPN4B1DwOzCdZMxDf6E0TzXG2MGX7mhEv0N2yQDVLy5fsc69YH2iTwP1kFAcav/IjC2mdgwJagahR2PQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709105953; c=relaxed/simple;
-	bh=UyGHYrMf74qUCiBfJvfFMOlkYy6vUBLnmcAZmNA/jS8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z60+9vb3dDnDDYL87jHhkvsRGM8nU6v64xHsZHG7392CqSi3M7UpUzvJg29OQRYnSBtKciSoevGd3LtX3noD4X6kWbhh5hhfbfQUtDKpkl3aFOJZcVoyO4+Zkg6TbFt/zz4C7zm5VMaOAUpvKXBix9TaCpID8pE1iydAenSTWRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=FxmlMaKe; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-412a9457b2eso3078435e9.1
-        for <netdev@vger.kernel.org>; Tue, 27 Feb 2024 23:39:09 -0800 (PST)
+	s=arc-20240116; t=1709106369; c=relaxed/simple;
+	bh=5Z/6CMtSbIx3yZOx74skMF+HWYenssxnSGRfDluEpz4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mc+hRLl+bdhfHT2+4uxu4rw4VGXO/Q1dGhD0ey3YKUtSurmJG3W+fqWF6MfQxN29jFGe17VSePw8xnrPohzWG/ENXo8L7RKyMuj/bKVEw097jmUgIHK63oawH7VMUweEYD52DLYN0VfCxSFliFNRc4CA7HQk11agAktRn4jEd74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KcSaCMv/; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6e54b22229cso1199706b3a.3;
+        Tue, 27 Feb 2024 23:46:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709105948; x=1709710748; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sFsADf7mwY3cDNi1jerXIRz7jnZBOhNsw1I6vPZgIvE=;
-        b=FxmlMaKeIvATFOa5kwLbn+fwMkIx+t+Bdpv4PKSUa/VcZNEkNOk/OiQQZlK0l3W1Dh
-         PV/6cxwWYeF0AZmzN4qlImcxSPz8IJWo++1rLOf7d2NFk44fqaRn9jmjYZ1IEwgUky7l
-         U+JWW/nwhQEt0ufiAS+EYtvCZSLAcjTy2vCaNWYqUEF7rmu3ZU2jm7so0MS0Twfljdld
-         3/2YlQf2nQv7i0gV3+cKZLuFhJ8daks/VGNoj6HbwAkoLmLKKYsmK2qrTly1kGOMAcTI
-         +gc31CtM8GOuzrzFJkalTLxDq3ZQlNrFsdFR40hYGa1GTUc0XT6mTdCTn/RJPAE6Gnnh
-         Q8hQ==
+        d=gmail.com; s=20230601; t=1709106367; x=1709711167; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cvJd7UIv9U3gWMDc5jMBed540xPjJg8OzKp2FL2VB40=;
+        b=KcSaCMv/FLHMf3ENvztGmSHQQOpENrDWWsWh0nAzorXqIfIrFJK9FRiszOGz4Dt4YB
+         g+gbzPVt7xL95rdVkJRdlg7/BuWx1lYyY9dAvEk3f+tiM1AnjbhFZ1C96pC2InhHywKz
+         Xo8y656vMub1YAWoWQcf8yiiVLfMP16c4yH6oaR1o8GpLJk3rYovLF3KfbhQCI4Cscds
+         awXwc2g9Ai9qKdsm5BODnZozYiYWfeKvS2kQSriyhpLztekYZ8OYiEVEscX+LGH7f66l
+         iofgI9KWdEKgTJO3AozpaTmCLcH+nCqWqUDkbEn510qpQ0Ls+nmisFLrdkrssq2e4ts3
+         f3sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709105948; x=1709710748;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sFsADf7mwY3cDNi1jerXIRz7jnZBOhNsw1I6vPZgIvE=;
-        b=Fln1hPeIaI6dkUdyGW2wkXkYEHAI1yzC7Rll2nVgZve9xcGM5oaRDlTzh8yv0DLjwY
-         /JtERfyKe/NjReCYTuDl/4eOzj/VcQFRtrASfMLjvFML9Rv3nSk7r7/9OVMWObLXLsB9
-         Bdw32Bn+LKeshRDmTxDVSM2MqDr8UZwFmUYqmdKwfVL/H3do4ZRtwVERFYQplsfROSSC
-         p/EJmUWiy+QWdlPNnpyddGwHQ1o5DiVZTZefWWBQRvyhgIiqsZ5akWlRrluwMML2Ux+J
-         q/3tx7n9nnbeNfSoDiLHDPm6Zw2am7Sb4PnllRpm9QNzA4VUrlApPVVjcvcSg4Om3p9H
-         zp9w==
-X-Forwarded-Encrypted: i=1; AJvYcCV/KmSCuLeYWLwyq312e+d3q1ITsPdm/FtyvXy+i97C/2ko7dmZHzZ1uqZdzlB5TWXFIg+gkyzVkEUBPLhgLm9YqpaS7h8A
-X-Gm-Message-State: AOJu0YzRCbYd5a16jl+v90v7KCrUi/qWbOFELM6COb9MtHYSL+jmcsGd
-	C7y9E6JldVqXpCzdotpYC3Av2sIhUs+KzvfYyARj1ITIjABKHDmRbidkPQEpNkI=
-X-Google-Smtp-Source: AGHT+IGOiABdVQg0BDkgRqUsWlgtAJBYodlD248B1Ft4dU843W+c+RJwmdSu6WUXhI7nzjtTxqpcoA==
-X-Received: by 2002:a05:600c:1d04:b0:412:b659:1ac9 with SMTP id l4-20020a05600c1d0400b00412b6591ac9mr267940wms.11.1709105947855;
-        Tue, 27 Feb 2024 23:39:07 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id k7-20020a05600c0b4700b004128936b9a9sm1168900wmr.33.2024.02.27.23.39.06
+        d=1e100.net; s=20230601; t=1709106367; x=1709711167;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cvJd7UIv9U3gWMDc5jMBed540xPjJg8OzKp2FL2VB40=;
+        b=JhJsyWJuYsKYKVbxU0tCrLggmhnnvb7FRY13HOHqEPdXFEtdiYJr6UoJTr0uFpFxW5
+         rZ4qugbxcPVhS4y3GtsuCg78j+RRQRjTTzEV1esMGRdiMUBfZdfJblhzQYOoVpq58dpU
+         OKl57YdPcHeWTRW0J9NFkGxNzPtpUvbaLaQw2JAkHnWY4GfF0fMyW7DbMgQk9FK/Op7f
+         8wNpIH8Vih+UPxuNMar5n8+8xC+4RnN5fPa83CksELT9FapUQMwcdv3foMTu38E7cPb2
+         /ngrJ3rE6sLwunxAT85Oca03s3Wi2V126UJg9N2q4H9iV/lyMAyhTA1kwoEUaN81pSem
+         VtCw==
+X-Forwarded-Encrypted: i=1; AJvYcCX079VWFHMgddQOypNNJk07J5cHUeDVNCeFZMPJbnKwJD6ly7TyQ/EF2e9A5EHpt4cAe/KRZEK08NJIxWD1a48HlfM3pGn/
+X-Gm-Message-State: AOJu0YxszUXyIkEIHXymVYqKZw3bj9V0bIpW0MALUGDHIDk4CTxbf6dX
+	3s/XM05AMJHL4VxIqEZqNi3Gcsj88tHa5MD/K0xnuHUPs689oaV5AVBCtI7DSqXxjg==
+X-Google-Smtp-Source: AGHT+IFPXWp9f0vAoe8ti5FiiDra7a5x+YmuQXDVr7DTvtcjuW98NxgE9t3zciafcyEQmQDWUZFgSg==
+X-Received: by 2002:a05:6a00:8c7:b0:6e4:dfec:1b0e with SMTP id s7-20020a056a0008c700b006e4dfec1b0emr12339990pfu.19.1709106366945;
+        Tue, 27 Feb 2024 23:46:06 -0800 (PST)
+Received: from localhost.localdomain ([203.205.141.15])
+        by smtp.googlemail.com with ESMTPSA id d12-20020aa7868c000000b006e0901b71e4sm7100769pfo.48.2024.02.27.23.46.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Feb 2024 23:39:07 -0800 (PST)
-Date: Wed, 28 Feb 2024 08:39:03 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	syzbot <syzkaller@googlegroups.com>, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net-next] inet6: expand rcu_read_lock() scope in
- inet6_dump_addr()
-Message-ID: <Zd7jF8hfApfqLitR@nanopsycho>
-References: <20240227222259.4081489-1-edumazet@google.com>
+        Tue, 27 Feb 2024 23:46:06 -0800 (PST)
+From: Ze Gao <zegao2021@gmail.com>
+X-Google-Original-From: Ze Gao <zegao@tencent.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Ze Gao <zegao@tencent.com>,
+	Honglin Li <honglinli@tencent.com>
+Subject: [RFC PATCH] net, sock.h: Make sure accesses to a fullsock when it is indeed one
+Date: Wed, 28 Feb 2024 02:43:09 -0500
+Message-ID: <20240228074308.3623984-2-zegao@tencent.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240227222259.4081489-1-edumazet@google.com>
+Content-Transfer-Encoding: 8bit
 
-Tue, Feb 27, 2024 at 11:22:59PM CET, edumazet@google.com wrote:
->I missed that inet6_dump_addr() is calling in6_dump_addrs()
->from two points.
->
->First one under RTNL protection, and second one under rcu_read_lock().
->
->Since we want to remove RTNL use from inet6_dump_addr() very soon,
->no longer assume in6_dump_addrs() is protected by RTNL (even
->if this is still the case).
->
->Use rcu_read_lock() earlier to fix this lockdep splat:
->
->WARNING: suspicious RCU usage
->6.8.0-rc5-syzkaller-01618-gf8cbf6bde4c8 #0 Not tainted
->
->net/ipv6/addrconf.c:5317 suspicious rcu_dereference_check() usage!
->
->other info that might help us debug this:
->
->rcu_scheduler_active = 2, debug_locks = 1
->3 locks held by syz-executor.2/8834:
->  #0: ffff88802f554678 (nlk_cb_mutex-ROUTE){+.+.}-{3:3}, at: __netlink_dump_start+0x119/0x780 net/netlink/af_netlink.c:2338
->  #1: ffffffff8f377a88 (rtnl_mutex){+.+.}-{3:3}, at: netlink_dump+0x676/0xda0 net/netlink/af_netlink.c:2265
->  #2: ffff88807e5f0580 (&ndev->lock){++--}-{2:2}, at: in6_dump_addrs+0xb8/0x1de0 net/ipv6/addrconf.c:5279
->
->stack backtrace:
->CPU: 1 PID: 8834 Comm: syz-executor.2 Not tainted 6.8.0-rc5-syzkaller-01618-gf8cbf6bde4c8 #0
->Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
->Call Trace:
-> <TASK>
->  __dump_stack lib/dump_stack.c:88 [inline]
->  dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
->  lockdep_rcu_suspicious+0x220/0x340 kernel/locking/lockdep.c:6712
->  in6_dump_addrs+0x1b47/0x1de0 net/ipv6/addrconf.c:5317
->  inet6_dump_addr+0x1597/0x1690 net/ipv6/addrconf.c:5428
->  netlink_dump+0x6a6/0xda0 net/netlink/af_netlink.c:2266
->  __netlink_dump_start+0x59d/0x780 net/netlink/af_netlink.c:2374
->  netlink_dump_start include/linux/netlink.h:340 [inline]
->  rtnetlink_rcv_msg+0xcf7/0x10d0 net/core/rtnetlink.c:6555
->  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2547
->  netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
->  netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
->  netlink_sendmsg+0x8e0/0xcb0 net/netlink/af_netlink.c:1902
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  __sock_sendmsg+0x221/0x270 net/socket.c:745
->  ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
->  ___sys_sendmsg net/socket.c:2638 [inline]
->  __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
->
->Fixes: c3718936ec47 ("ipv6: anycast: complete RCU handling of struct ifacaddr6")
->Reported-by: syzbot <syzkaller@googlegroups.com>
->Signed-off-by: Eric Dumazet <edumazet@google.com>
->Cc: Jiri Pirko <jiri@nvidia.com>
+We know a pointer that has type struct sock* can actually points to
+one of some different sock types which have different memory layouts,
+take req_to_sk() for example, and whether a sock is full or not
+depends upon ->sk_state which is a shared field among them so that we
+see some repeated code pattern similar to this:
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+	if (sk && sk fullsock(sk) && sk->field_not_shared)
+
+which seems to have no problem at the first glance, but it is actually
+unsound in a way that ->field_not_shared is likely uninitialized (or
+unmapped) when it's not a full sock, and a compiler is free to reorder
+accesses to fields of a struct sock when it can, that is, it could
+reorder accesses to ->field_not_shared across ->sk_state or load them
+all before the branch test, which leads to unexpected behavior, although
+most of them won't do this.
+
+So leave a barrier() in between and force the compiler to keep the
+obvious program order.
+
+Cc: Honglin Li <honglinli@tencent.com>
+Signed-off-by: Ze Gao <zegao@tencent.com>
+---
+
+IIUC, casting a pointer to refer to a bigger object in size is
+technically UB, which may lead to unsound code. From the POV of
+a compiler, when it is allowed to assume that one struct member
+is valid, they all are through a pointer, and thus it's likely
+for the compiler to do such optimizations and reorder what we
+want to keep in order.
+
+Note this is not a typical way to use barrier(), which only
+acts an ok fix to what's already unsound, at least IMO.
+
+Comments are welcome, since I'm not an expert in C and I know
+most of compilers won't do this reorder, but I'm being pessimistic
+here.
+
+Happy to learn from your sage insights and better solutions (or
+no solutions at all if this is indeed not a problem in the first
+place)
+
+Regards,
+        -- Ze
+
+ include/net/sock.h | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 92f7ea62a915..f7e3960cb5fc 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2815,7 +2815,14 @@ skb_sk_is_prefetched(struct sk_buff *skb)
+  */
+ static inline bool sk_fullsock(const struct sock *sk)
+ {
+-	return (1 << sk->sk_state) & ~(TCPF_TIME_WAIT | TCPF_NEW_SYN_RECV);
++	bool ret = (1 << sk->sk_state) & ~(TCPF_TIME_WAIT | TCPF_NEW_SYN_RECV);
++
++	/*
++	 * Make sure all accesses to a full sock happens right
++	 * after ->sk_state.
++	 */
++	barrier();
++	return ret;
+ }
+ 
+ static inline bool
+-- 
+2.41.0
+
 
