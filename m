@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-76308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0DA086D364
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:40:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E289C86D365
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:40:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 671E2286DA8
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:40:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 101771C21609
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC1813F454;
-	Thu, 29 Feb 2024 19:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5B313D2ED;
+	Thu, 29 Feb 2024 19:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="pNGW0xoj"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Fke/wpsB"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2084.outbound.protection.outlook.com [40.107.220.84])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2086.outbound.protection.outlook.com [40.107.93.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3158313F429
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 19:40:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C54413F436
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 19:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.86
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709235617; cv=fail; b=gSOE77fuhCpXcdyCegCcwGRz0jzxyhClgVSNXAVi+6JiI3WcQBrE8RUvxBF22pamnVA8RUwrjX43KKVPZJDtPZjWPeKlrFEl9QnMkHbixG+kcfxFbWbgYRv4JW6vwyQLzqTWv61FJ1vY9suAMh9ZbViP/wLCQZUTZwXOjKf5eiQ=
+	t=1709235619; cv=fail; b=iBGrPAQ1lQK9UlKu6WoX0WBlXF5PJtPtVXGLAaoPsCxuUYBMh7Q7axWdzaNMp2PCz/ubXN436z+m5W7tl7Wt+U/VdzuLGPlR/CPBpazeB3pyuLvp5dwADy1frWK5EvEPmYRz/aYQKDGyIaGgOGl4BOnpvrK58jGuH1ZLKBVHD7s=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709235617; c=relaxed/simple;
-	bh=TUEr1NOF8qBW8pyP43u3LsnuwG42mr4dfo1MAkwckpc=;
+	s=arc-20240116; t=1709235619; c=relaxed/simple;
+	bh=xRzY225dHkZnDxueZg+vto6AwzRKaxOQoljTQ5koHsU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hrWAXxrIIwqPyfmhiqUpIXUA6SE+gS7h8icsn2+y5cpKh/OkLHgKJTfNE4Xo6fm/V/u7tMWMsxJlJSq5G2BsMU/NIODpZFk/RFNvpU3kZTofc7T1YbEDwpTzaxftRMU2zgdrpaVw91btgZmjXxh8AQdO8f2ua8Kshcepc1qgVgk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=pNGW0xoj; arc=fail smtp.client-ip=40.107.220.84
+	 MIME-Version:Content-Type; b=dQxfeVpRIzQeq9zitBSFZHSnHwTswBFmKCkmzNsWc6s9NC3WdhtPLhH371TKWZdjpqtmZXSl3exg3WJjbXnod+UGCkG8QD2pU2ncZebacXlnamUHICz8eH9oUAECilTJiN8ZFeekcj7TAOKxR815Bdb0MdzI64Tt2qv2DtAn/wg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Fke/wpsB; arc=fail smtp.client-ip=40.107.93.86
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q6u7PHTYnbJ2br+sy4qBLNYTfPG2YIWGNDkKW0FxsmO/1T75XoeQ6DeeFIlGuQMeNqw7J1w+bHHKrjv9XcQJq0ItIfU7kFw3nzOAc36sgWc4YX585eibcBzagzcJxz2k3VgAzYV6W32ZAudGw7iOQEsKFkXtyW3LwpAWC9oxFjIF98tl3EFRkfuLkSvzM/Ra+hB6RRxaU53PlBG9hW/SlBwEOuT9jYRm1YUibiugs2RszrwtvI1rI3bZPAs2R1Fe4l/Zf43hebAe8WOnM0TGwc79THJoU4V+fLD5dlDVA2ntL9Bimh/IsvEtFRYPJCwqsQce/lDklvg9x4RqOtCLDg==
+ b=boAiqVOj3NCloHqOFlUTWZaDy8GW+qiBDCADLpRCjcXeIrmIDfctAlYYoOX16buq0S5z0+4oUG8w/cMnVYPwzN3zGsfi+mzi2X5SzhzlS09JzSYMaotlKSgSkNp/05IX/jjtBn0iLPy7c6dVJyTIr1mBk57PeximC4CqQldQg0PeQYjyIYUvx0qK9mhS0fOy2wOpgYRwnbDfa2KYAv6HBFz9j9P3QjBT0qHbH9a7ZwD3NgVWP0yiu6Wa750uRFVOY8zMpk7UsrgEkF7lG29WFDR0gX8rs9GONaX1pw44zeFg9liOKRSgky+qBrXU5c1MIc7IriWAX5a9uwOQcmReOQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NG2DamIwnCwrsClmNBTuAj9ieyHGPtp57TQ/6ABvptQ=;
- b=hC2nAQ0oumah+hF+6IuklDqfvxcxFq3S0YDJQ8DofiGoRjZzf3SsknLiHqkqTfjLsFNVXMqx6nOr6hqzOPxmxh3FvHL6YfN0Qfmpdx8PbiROkKwDSLw0kaY8KcYtUQ4lM3doNhvEOVVH8ZnnbRhoTE9SqBsA+Wq4bsmXcSOFIPeHB7MBSsVixVMbu1d5NjxPcrWls15ZMDbowbIZvbTA6NkCPm8yaFXdGDdxasGSZaUU847DmqJAYfamOZsAQP8gvEjykU/U1WHzdFk0uVdZpnL3CN+2gmFS3oEQ4HxpExJCjvvd2DGRoPi9yhUpe4gFnnxwCc7OnFEFPRRL9Drr5Q==
+ bh=9Dl/CMxz6Oh7usgMqweG7EmUwKLbdz84WDEQF4PZTfg=;
+ b=LNxl8muldyt6/C1ioe8qfbYXTr0Nr0Ae5wxaqoLRZc5cr6tLJNM2hWc/GuIvYcP61fUwC3HVpvSzW+gCk0JJdJoyN0P80Y8JogOObMU3mp7H5ePqcVz2RtAvZQH5Y+hzJHbmaujPlAF1WVSea7X172WaBfZei+1Y99XgNDWa7/xDXVAVDK0ndGjwsUAeYjDKcFuthWzd1Bhm/rzqjAyOHtqlNry7Mg8185I7pnObqPkf8Lk74VQ7a+y48eD3EfQ42KJ4aVEbnPAF/p95ZsUT0Gl5cXKdP6Uq0AgtBw4ZHbvIVNNYgpq0ZwurDyMjy5kHhpkkpe5yLlyN7aEfnMY2xg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NG2DamIwnCwrsClmNBTuAj9ieyHGPtp57TQ/6ABvptQ=;
- b=pNGW0xojljzmGx5BQd+pZZQT6rVg3yfWOhcag2zZksoa4oCops6dzSHw9ZYr9niR/oP91Ji6LKi9buW2XUJLshF4M/n8ZNNeoMY2jyCI152P0Ylp/4DizXhxK+TdmeWMVztuubjMhPU7YG79OFa2flAvR1fgM/x1EYFS2V7Mbkw=
-Received: from BLAPR03CA0180.namprd03.prod.outlook.com (2603:10b6:208:32f::10)
- by SA0PR12MB4446.namprd12.prod.outlook.com (2603:10b6:806:71::18) with
+ bh=9Dl/CMxz6Oh7usgMqweG7EmUwKLbdz84WDEQF4PZTfg=;
+ b=Fke/wpsBfIWLUSWygJwnwWlwcaJZWAqkoNJSYEjxOB0T75pD/eLuchkBjJ4R7xknxwO00UId+JICMQO+wm1Nmpb/JvE+UDH6pweJ2Wq7isPBjCfK05a8JM8tK5LxZ7nmg82+gQzTIRo/MfPOFES1OZEg1qvm/crnT9gsHZ/QUt8=
+Received: from BLAPR03CA0164.namprd03.prod.outlook.com (2603:10b6:208:32f::20)
+ by SJ0PR12MB6942.namprd12.prod.outlook.com (2603:10b6:a03:449::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.41; Thu, 29 Feb
- 2024 19:40:13 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.39; Thu, 29 Feb
+ 2024 19:40:15 +0000
 Received: from BL02EPF0001A102.namprd05.prod.outlook.com
- (2603:10b6:208:32f:cafe::5e) by BLAPR03CA0180.outlook.office365.com
- (2603:10b6:208:32f::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.29 via Frontend
- Transport; Thu, 29 Feb 2024 19:40:13 +0000
+ (2603:10b6:208:32f:cafe::b2) by BLAPR03CA0164.outlook.office365.com
+ (2603:10b6:208:32f::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.32 via Frontend
+ Transport; Thu, 29 Feb 2024 19:40:14 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,19 +65,19 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  BL02EPF0001A102.mail.protection.outlook.com (10.167.241.134) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7292.25 via Frontend Transport; Thu, 29 Feb 2024 19:40:13 +0000
+ 15.20.7292.25 via Frontend Transport; Thu, 29 Feb 2024 19:40:14 +0000
 Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 29 Feb
- 2024 13:40:11 -0600
+ 2024 13:40:12 -0600
 From: Shannon Nelson <shannon.nelson@amd.com>
 To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>
 CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
 	<shannon.nelson@amd.com>
-Subject: [PATCH net-next 05/12] ionic: Clean up BQL logic
-Date: Thu, 29 Feb 2024 11:39:28 -0800
-Message-ID: <20240229193935.14197-6-shannon.nelson@amd.com>
+Subject: [PATCH net-next 06/12] ionic: Check stop no restart
+Date: Thu, 29 Feb 2024 11:39:29 -0800
+Message-ID: <20240229193935.14197-7-shannon.nelson@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20240229193935.14197-1-shannon.nelson@amd.com>
 References: <20240229193935.14197-1-shannon.nelson@amd.com>
@@ -92,149 +92,65 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A102:EE_|SA0PR12MB4446:EE_
-X-MS-Office365-Filtering-Correlation-Id: ead9ea62-ad33-480c-c5be-08dc395e3f85
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A102:EE_|SJ0PR12MB6942:EE_
+X-MS-Office365-Filtering-Correlation-Id: 07a81b2f-c2df-4ed2-d287-08dc395e4033
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	Dau/AdBd51T0lr6fWlhfM0P5svZzfUnSzche+1+AqpoyFKC3PbFMqf8B0/PUmVE1hVYTZ3i6M5dYloq/KTS8VkQuyqcpSpXxKL/yTwvFR4gW5+TIIuQMxbYnYQnFhfx3qjLJovRsjDWX13+I5mcmxHguogJTBCEQ0BMrEndZBgpyVtag+ObBrZddspC2zyw6FoFigKBWK1AJYGxSk35KhbpRqoC/uZGmg2ZJzN8eBw/SOJJt75dOAkwem+gB7cTtMcpHcKdHtaQt4IDdMVy9jBIyg015msTUcjrk4aMAlEQ+o3URwDPIu/TTazPniKIPSY9+OFYm5s6B+KTxrEnuanSCIrTs9yisIsBancsyb8/+MbpfpswJ3YLVn9ptjpqjKL+yLkwO+LGQkPu00RvIJS/xMs4elGqbtny5E38OMYcjdr4Sl+6qUtuHGd7kSQALScn4dj8SgT5PVu9hYyEdEszHq0tkG91Veg81wQac+AoTuMeZrY0akCIVpUHOXNk9oiTbj4WwoowZ2T126e3AS2eTBWk//+HGLKG89ADsCcBOJa3pqaRCi6TDP+VaFHHjZShmPv0iiTAPLxLfsuEIGxQir0ynb6vrqfaNKcBDw6Idk3jfjOnJ5fxJhz37w0dvxKfcpZuXonuPDUT0w8Z8kqbfAkpvQ4xjR9H64tKtNXTGcItDltIe3YSnhGJh8W2v1mlr5S93YQEUS7+rCpJDk+2idKefo0TlUfpaiap1yf7ToHKONv7psU1snOpdlaps
+	a9h2GRgDb8CXc3uoNRaY5raN73iE/TUSG7Fn7iS4J+ri28s7SBuJMKpz0dn9HyH5YByK7RLqBMwDczuaNikrfwgChDBY/z/zWc1hEjGEnFbSiCupfL86v8tnDZiLE1aNvR6TOa2kPCjcTwMLsyg+tUNt2gzkx073FdY9PU0ppWUpHOhh/8GHih2ZtdSaku+n3iPUnzBgTImYwMJLzGdAIy/+I7EGACaXmg/r+ZUrIP1VEZUuAx/KXsbBkIt9luGILp/0d6BJmfPRVeP+s9odzm9Xv9m03psnAUU/lc7J9C7XI1V3CLDLWxB0W39oNzjXOJ4/uNOdramw/6YtK1PDm+5vbj0aahL8nkwXscoF8TyT43K3hxYyobhtH1nq+UtYJmQ8YQHoq2NiR9VISOS3kVvzQ0xlxUBpAF+juCixmLEEjBn9/eyS0zwAahpxeA8oPCpnFLju/yrdGKjNvVy56iiMCsJTIZvWlhqS5B4vufR8jUqZnl//0F+3FeA6DkHTbDfPdXY8qW1VwqNaXdSpXA6f/ymRFIVNcmWTLlY/mbV/WMPZXs0U2QgtEGkZOWEZ8k0j8crD3qkb8zKjTdd+p5Z1kYpFHur+wgiNvhA1uh893+FRtcGXlezppPU5kTQEKhDP04sJG2P/wc0dqXD8RioGFnqxQZkp8cx3oPRg1ElYnV5pRnYQeHBHSJhNF+KesDf/G5CopfwEDwZ9yXqTH9672ImbnQ6Ar0GPZe1uEc9lRRM/4JGAfIgL1oJljoSu
 X-Forefront-Antispam-Report:
 	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(82310400014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Feb 2024 19:40:13.4583
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Feb 2024 19:40:14.6302
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ead9ea62-ad33-480c-c5be-08dc395e3f85
+X-MS-Exchange-CrossTenant-Network-Message-Id: 07a81b2f-c2df-4ed2-d287-08dc395e4033
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	BL02EPF0001A102.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4446
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6942
 
 From: Brett Creeley <brett.creeley@amd.com>
 
-The driver currently calls netdev_tx_completed_queue() for every
-Tx completion. However, this API is only meant to be called once
-per NAPI if any Tx work is done.  Make the necessary changes to
-support calling netdev_tx_completed_queue() only once per NAPI.
-
-Also, use the __netdev_tx_sent_queue() API, which supports the
-xmit_more functionality.
+If there is a lot of transmit traffic the driver can get into a
+situation that the device is starved due to the doorbell never
+being rung. This can happen if xmit_more is set constantly
+and __netdev_tx_sent_queue() keeps returning false. Fix this
+by checking if the queue needs to be stopped right before
+calling __netdev_tx_sent_queue(). Use MAX_SKB_FRAGS + 1 as the
+stop condition because that's the maximum number of frags
+supported for non-TSO transmit.
 
 Signed-off-by: Brett Creeley <brett.creeley@amd.com>
 Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 ---
- .../net/ethernet/pensando/ionic/ionic_txrx.c  | 36 +++++++++++--------
- 1 file changed, 21 insertions(+), 15 deletions(-)
+ drivers/net/ethernet/pensando/ionic/ionic_txrx.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-index 3da4fd322690..1397a0dcf794 100644
+index 1397a0dcf794..d9e23fc78e6b 100644
 --- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
 +++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-@@ -1235,13 +1235,14 @@ static void ionic_tx_clean(struct ionic_queue *q,
- 	napi_consume_skb(skb, 1);
- }
- 
--static bool ionic_tx_service(struct ionic_cq *cq, struct ionic_cq_info *cq_info)
-+static bool ionic_tx_service(struct ionic_cq *cq, struct ionic_cq_info *cq_info,
-+			     unsigned int *total_pkts, unsigned int *total_bytes)
- {
- 	struct ionic_queue *q = cq->bound_q;
- 	struct ionic_desc_info *desc_info;
- 	struct ionic_txq_comp *comp;
--	int bytes = 0;
--	int pkts = 0;
-+	unsigned int bytes = 0;
-+	unsigned int pkts = 0;
- 	u16 index;
- 
- 	comp = cq_info->cq_desc + cq->desc_size - sizeof(*comp);
-@@ -1266,8 +1267,8 @@ static bool ionic_tx_service(struct ionic_cq *cq, struct ionic_cq_info *cq_info)
- 		desc_info->cb_arg = NULL;
- 	} while (index != le16_to_cpu(comp->comp_index));
- 
--	if (pkts && bytes && !ionic_txq_hwstamp_enabled(q))
--		netdev_tx_completed_queue(q_to_ndq(q), pkts, bytes);
-+	(*total_pkts) += pkts;
-+	(*total_bytes) += bytes;
- 
- 	return true;
- }
-@@ -1276,12 +1277,14 @@ unsigned int ionic_tx_cq_service(struct ionic_cq *cq, unsigned int work_to_do)
- {
- 	struct ionic_cq_info *cq_info;
- 	unsigned int work_done = 0;
-+	unsigned int bytes = 0;
-+	unsigned int pkts = 0;
- 
- 	if (work_to_do == 0)
- 		return 0;
- 
- 	cq_info = &cq->info[cq->tail_idx];
--	while (ionic_tx_service(cq, cq_info)) {
-+	while (ionic_tx_service(cq, cq_info, &pkts, &bytes)) {
- 		if (cq->tail_idx == cq->num_descs - 1)
- 			cq->done_color = !cq->done_color;
- 		cq->tail_idx = (cq->tail_idx + 1) & (cq->num_descs - 1);
-@@ -1294,10 +1297,10 @@ unsigned int ionic_tx_cq_service(struct ionic_cq *cq, unsigned int work_to_do)
- 	if (work_done) {
- 		struct ionic_queue *q = cq->bound_q;
- 
--		smp_mb();	/* assure sync'd state before stopped check */
--		if (unlikely(__netif_subqueue_stopped(q->lif->netdev, q->index)) &&
--		    ionic_q_has_space(q, IONIC_TSO_DESCS_NEEDED))
--			netif_wake_subqueue(q->lif->netdev, q->index);
-+		if (!ionic_txq_hwstamp_enabled(q))
-+			netif_txq_completed_wake(q_to_ndq(q), pkts, bytes,
-+						 ionic_q_space_avail(q),
-+						 IONIC_TSO_DESCS_NEEDED);
- 	}
- 
- 	return work_done;
-@@ -1308,8 +1311,7 @@ void ionic_tx_flush(struct ionic_cq *cq)
- 	struct ionic_dev *idev = &cq->lif->ionic->idev;
- 	u32 work_done;
- 
--	work_done = ionic_cq_service(cq, cq->num_descs,
--				     ionic_tx_service, NULL, NULL);
-+	work_done = ionic_tx_cq_service(cq, cq->num_descs);
- 	if (work_done)
- 		ionic_intr_credits(idev->intr_ctrl, cq->bound_intr->index,
- 				   work_done, IONIC_INTR_CRED_RESET_COALESCE);
-@@ -1335,8 +1337,10 @@ void ionic_tx_empty(struct ionic_queue *q)
- 		desc_info->cb_arg = NULL;
- 	}
- 
--	if (pkts && bytes && !ionic_txq_hwstamp_enabled(q))
-+	if (!ionic_txq_hwstamp_enabled(q)) {
- 		netdev_tx_completed_queue(q_to_ndq(q), pkts, bytes);
-+		netdev_tx_reset_queue(q_to_ndq(q));
-+	}
- }
- 
- static int ionic_tx_tcp_inner_pseudo_csum(struct sk_buff *skb)
-@@ -1643,6 +1647,7 @@ static int ionic_tx(struct ionic_queue *q, struct sk_buff *skb)
- {
- 	struct ionic_desc_info *desc_info = &q->info[q->head_idx];
- 	struct ionic_tx_stats *stats = q_to_tx_stats(q);
-+	bool ring_dbell = true;
- 
- 	if (unlikely(ionic_tx_map_skb(q, skb, desc_info)))
- 		return -EIO;
-@@ -1661,8 +1666,9 @@ static int ionic_tx(struct ionic_queue *q, struct sk_buff *skb)
+@@ -1665,9 +1665,14 @@ static int ionic_tx(struct ionic_queue *q, struct sk_buff *skb)
+ 	stats->pkts++;
  	stats->bytes += skb->len;
  
- 	if (!ionic_txq_hwstamp_enabled(q))
--		netdev_tx_sent_queue(q_to_ndq(q), skb->len);
--	ionic_txq_post(q, !netdev_xmit_more(), ionic_tx_clean, skb);
-+		ring_dbell = __netdev_tx_sent_queue(q_to_ndq(q), skb->len,
-+						    netdev_xmit_more());
-+	ionic_txq_post(q, ring_dbell, ionic_tx_clean, skb);
+-	if (!ionic_txq_hwstamp_enabled(q))
+-		ring_dbell = __netdev_tx_sent_queue(q_to_ndq(q), skb->len,
++	if (!ionic_txq_hwstamp_enabled(q)) {
++		struct netdev_queue *ndq = q_to_ndq(q);
++
++		if (unlikely(!ionic_q_has_space(q, MAX_SKB_FRAGS + 1)))
++			netif_tx_stop_queue(ndq);
++		ring_dbell = __netdev_tx_sent_queue(ndq, skb->len,
+ 						    netdev_xmit_more());
++	}
+ 	ionic_txq_post(q, ring_dbell, ionic_tx_clean, skb);
  
  	return 0;
- }
 -- 
 2.17.1
 
