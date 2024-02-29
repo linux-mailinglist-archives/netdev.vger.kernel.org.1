@@ -1,119 +1,124 @@
-Return-Path: <netdev+bounces-76093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2037B86C4C3
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:17:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2751486C4CD
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:20:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA0FE288105
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:17:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6979288422
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B27C58AAC;
-	Thu, 29 Feb 2024 09:17:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC7359170;
+	Thu, 29 Feb 2024 09:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fUQTkMoU"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="qvyVbti5"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAEE758AA0;
-	Thu, 29 Feb 2024 09:17:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A615916A
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 09:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709198272; cv=none; b=muCpaTDwLA2aMKUmacKTzDKMXpLtfm6dHomaDs8I+mBr155NiYWONjPT8OuRg/Fdu7DKiHJuMz7QeRtrsPfxh9FROfMd9xuGeyi+Zcpn3uctNDzBZvCErybesA9735oOim0OA1Xj8Qou69smZUgRSCnarbdNZ7SR4WXNVS6+DLY=
+	t=1709198410; cv=none; b=SnVor/i8WFOrFgsS5+hKaC/RvVxeJT97tK7iCbX4YQzNfgbmFaq4HZM8eEV199rrPEkzUT+fLwL9Ynm0Q07xM58l0SvKgXIsqvsAxKJd1cEb2G6Sa6w4F1iUFqKd0W2OX/zI1uLajiUdhfVyq+5bFa9FYw7paJMr/cKoY95wI+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709198272; c=relaxed/simple;
-	bh=JC7LY6MOJvw096/9yY09D0IdT5x2U+eDx0fw6U/BXNY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BS5aoReEUFm4YDRhHIdBQwbNsVTvO4KiK1VDvQIPevNal/D0LpJ96rCWidjjyni+3PfTqcz6Owzxe/APWdQhrh4lEGUZZGpVS9A7leA8iSu45j++26e6ArUMuS+OMsrAioYDaMg7QM13rtaPsdQ1a4AKXygS8FOAidr4QbpkdaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fUQTkMoU; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 56428FF80E;
-	Thu, 29 Feb 2024 09:17:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709198262;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JC7LY6MOJvw096/9yY09D0IdT5x2U+eDx0fw6U/BXNY=;
-	b=fUQTkMoU7i26EC3kV6o8BYQnUim5Gc1EEch3UbHe1RnYryma9zTl0y8fnl62/tGu3LLFRv
-	rMK5NHv2e9Svo37t+K3eNpN2P0fvLLiiRa4siuiQtzqKuUBRflv2Wus6z20H8CYVbB9ZhM
-	DxNk7JI2nIv+8k2gqcS3Kww82Xj0h8KjqrBq1IeNoGp6Uq1A4gdXBpGUvVfnsC4JaWcDx4
-	cmMYamFSIQ4W9v2TPXmFzYxKONG2G/IPQ4zEnYVZcJ/jbpKBqdIufVZoVUDZzPbhC/dmT0
-	UfQtNxhtRJUS8GmLs0VqG59JX/srrUBzaT0khFojQW+jfpT7tXQ/6hp3gvbI6w==
-Date: Thu, 29 Feb 2024 10:17:39 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+	s=arc-20240116; t=1709198410; c=relaxed/simple;
+	bh=9ld9CHJWAVfxgUOV9rgblXkoVNbUU8Ep4EODEe+gquw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JnSeslt0uCwozqsMZivpl1ZqrbDjuY1+WHqkLoLBcKbrtSj2Wz0dfOM+d7Ogy64Zb1Xov95NZZNZ3xjDsCEiZi7VVONvoDXH3EwXF9nRc1Kaz62v79doOAoi6T/SJOuMKS0R+hs8lDIAilRDdSldF5ppaLV3wyLErdUnq5bLKg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=qvyVbti5; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a3e72ec566aso106619966b.2
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 01:20:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709198407; x=1709803207; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3WwQvPtrchQr55jMR6QmPbP1tMQ2V4TzDErrhsqCBXY=;
+        b=qvyVbti5bozXCdsuTMBIZEahD6J3GQRWEwaJu5AKhnvPrTe7KNM45nkphjeUb0GgtE
+         M46iKWGBW/Hfj7Eir6pyMJcfMMj21cj8l4XnbVb9xdqDqVapHWoa8oXMTR+qf40JCmKm
+         VPlnl9o97X/bTt8+rVMbA3iFJoYkB2xEk6kSY4lXolqzUUYppfupnwUw5WGfcheRbf+n
+         Uky4Q97DAvJD7aznUwNIr/Ju2rSpm1sMGighC8U6BopUvBEy2HO0838R0fOfh88X95s/
+         AF9etQiJdvEdbdylDsNgKs3LdnbfPPyCUjnFsNFnaQ2jLD7CVLtBgjAtGczoF4WZj35H
+         05aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709198407; x=1709803207;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3WwQvPtrchQr55jMR6QmPbP1tMQ2V4TzDErrhsqCBXY=;
+        b=mrK5zmy/2RYlPPANYy+VG/jznWx5p8WeSc039sM0XmV63wYKhr2MJNBKFt4KIB36H1
+         mtjqGXKlgpst8BJKVWtugsAdfT9AFBESiLSLy+tGIEeu0m2ZFssI4JveKNW7+SV8dhRs
+         t4bv9r0L1g77qk6VN4UUUVDx3GwU9GPZtVlYsH3+zUuplFo5m6ISVmF3DY4WRvbgscIJ
+         KSmS15EChYlX5uznGaX0CXnOKvGZZlck4zCMoHGfPq3oPELilOYrTVkmlgUkVnvQ8TMi
+         TCWW9lpUNyE/iF0wTNf4XUC3LWZkfmgZh42LQBWFFNPiIsxWwtx/bniLmJF+fcvlgvgl
+         nsyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVueB2x7DcPFSShyM3VQ4LvNKgRbnJTW/W8n3Co5Cq1XVf3ea9lH6jGbfh7p+75tXOXSsX9+PcC086KK71UIpmn8zIyzDDg
+X-Gm-Message-State: AOJu0YwxbxuFwj9tETO+Xn5AsuNLqu/A8GPdL6FtzHPCKq4jx1/2kRjc
+	d3fk7LiZLYs6O2ezLRi6UxL7huGn0TcVAONXDhbPR/X8PtS+7i9ZlpO9GJtXn9Jqi9DCIIANiXj
+	YqnQ=
+X-Google-Smtp-Source: AGHT+IH4DjWRcIUwOnrisXOgXOTPoAtgvr+Hfo1U5qDrkqpiXjsIbxHBau+xcepAx4WAx5xlZ3c19Q==
+X-Received: by 2002:a17:906:1c4b:b0:a3e:a3c3:9658 with SMTP id l11-20020a1709061c4b00b00a3ea3c39658mr1054883ejg.22.1709198407361;
+        Thu, 29 Feb 2024 01:20:07 -0800 (PST)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id s22-20020a17090699d600b00a3f4bb02bc8sm488281ejn.42.2024.02.29.01.20.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Feb 2024 01:20:06 -0800 (PST)
+Date: Thu, 29 Feb 2024 10:20:05 +0100
+From: Jiri Pirko <jiri@resnulli.us>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
- kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: Re: [PATCH net-next v9 06/13] net: Add struct
- kernel_ethtool_ts_info
-Message-ID: <20240229101739.2b1cdecb@kmaincent-XPS-13-7390>
-In-Reply-To: <20240227192737.5d834155@kernel.org>
-References: <20240226-feature_ptp_netnext-v9-0-455611549f21@bootlin.com>
-	<20240226-feature_ptp_netnext-v9-6-455611549f21@bootlin.com>
-	<20240227192737.5d834155@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Mateusz Pacuszka <mateuszx.pacuszka@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Lukasz Plachno <lukasz.plachno@intel.com>,
+	Jakub Buchocki <jakubx.buchocki@intel.com>,
+	Pawel Kaminski <pawel.kaminski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Pawel Chmielewski <pawel.chmielewski@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>
+Subject: Re: [PATCH iwl-net 0/5] ice: LLDP support for VFs
+Message-ID: <ZeBMRXUjVSwUHxU-@nanopsycho>
+References: <20240228155957.408036-1-larysa.zaremba@intel.com>
+ <20240228084745.2c0fef0e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240228084745.2c0fef0e@kernel.org>
 
-On Tue, 27 Feb 2024 19:27:37 -0800
-Jakub Kicinski <kuba@kernel.org> wrote:
+Wed, Feb 28, 2024 at 05:47:45PM CET, kuba@kernel.org wrote:
+>On Wed, 28 Feb 2024 16:59:44 +0100 Larysa Zaremba wrote:
+>> Allow to:
+>> * receive LLDP packets on a VF
+>> * transmit LLDP from a VF
+>> 
+>> Only a single VF per port can transmit LLDP packets,
+>> all trusted VFs can transmit LLDP packets.
+>> 
+>> For both functionalities to work, private flag
+>> fw-lldp-agent must be off.
+>> 
+>> I am aware that implemented way of configuration (through sysfs) can be
+>> potentially controversial and would like some feedback from outside.
+>
+>Why is the device not in switchdev mode? You can put your lldp-agent
+>priv flag on repr netdevs.
+>
 
-> On Mon, 26 Feb 2024 14:39:57 +0100 Kory Maincent wrote:
-> > In prevision to add new UAPI for hwtstamp we will be limited to the str=
-uct
-> > ethtool_ts_info that is currently passed in fixed binary format through=
- the
-> > ETHTOOL_GET_TS_INFO ethtool ioctl. It would be good if new kernel code
-> > already started operating on an extensible kernel variant of that
-> > structure, similar in concept to struct kernel_hwtstamp_config vs struct
-> > hwtstamp_config.
-> >=20
-> > Since struct ethtool_ts_info is in include/uapi/linux/ethtool.h, here
-> > we introduce the kernel-only structure in include/linux/ethtool.h.
-> > The manual copy is then made in the function called by ETHTOOL_GET_TS_I=
-NFO.
-> > =20
->=20
-> This one doesn't apply.
-> It's going to be a pain to keep rebasing it, since its a nop AFAICT -
-> do you want to post it separately to get it merged quickly?
-
-Weird, it does on my side on net-next.
-It would be great to have a review on the core of the new implementation
-beforehand. I don't want this patch to be merged but not used at all if the
-implementation does not fit what is expected. What do you think?
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+But isn't it a matter of eswitch configuration? I mean, the user should
+be free to configure filtering/forwarding of any packet, including LLDP
+ones.
 
