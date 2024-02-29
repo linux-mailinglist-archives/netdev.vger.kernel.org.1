@@ -1,120 +1,214 @@
-Return-Path: <netdev+bounces-75970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08F2D86BCF0
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 01:42:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E017D86BCFD
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 01:49:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DDDEB24A5E
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 00:42:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22043B218B6
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 00:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86AE12C6B4;
-	Thu, 29 Feb 2024 00:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4637208A9;
+	Thu, 29 Feb 2024 00:49:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HXIaQQzz"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="Rl5bViV4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from omta038.useast.a.cloudfilter.net (omta038.useast.a.cloudfilter.net [44.202.169.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EFE20335
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 00:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6EEF168B8
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 00:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709167304; cv=none; b=n5E3iIYqMjzMcIihgPJn+eP1Hk+cQ4tpWPyG3J3haB1c/cZwtQbXbqgCdKiq7FU7c0m+uF6voB8FaSLS1DxMk6YcPE4Or8JLfTdIMCyKkCTuu8itWP49Cyn8BxjVHtmZpsjX0353uwZn01R+0oe2JUdqaIZrB6r08ewGEcoEy3Y=
+	t=1709167779; cv=none; b=Wbr+EvwODiBwjwTaQqbCH5Mzoj7wBv90sPw9jpaEjxRyZiOF3AxVpEiKo4WrevPPUZtumxy83AeZkp87kzMfpQSaNvF3t1NFI0KdmkF79NqWm/I+y4OCzKn5h0+sPGhgVosZJrrPhgvHp5A731Wrbdjmkfl9nW+XTitCzGt1OsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709167304; c=relaxed/simple;
-	bh=hVx8kEWB0NM4arQBXWds0RDnWCJ5xCohgP2h1PuXIwU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aAcL9U97fklh4dLNMk5O3rk7HpJr77mj55KJKL+0ThTLWqpswVvVwS4FXg5CuXSu2+VucZsyhJpAMpXLs9hldPGTgVSeA21H3ZvzMmCkbqz8I4JvzFyF2Hneg8OJlgu4lWLTyo41DZywXSRq51NInW4uHz+IyI6cs6/h8a50G8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HXIaQQzz; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709167304; x=1740703304;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=hVx8kEWB0NM4arQBXWds0RDnWCJ5xCohgP2h1PuXIwU=;
-  b=HXIaQQzzGS48lBKtPZ0MruhTMOk58I+h9Tv6MO+Kn/0x+Dpf2LCsdI3Z
-   qQGXdJ1ELtlxtYnXoKh/PEMI/k1f0ECHBXoo8RooTRSvc1s4K5+YBiBo2
-   0m6dMvtUZeYrXVP96kNwaDronZZffKxyjObTl0uO81zrOGhUN8ZCRcaU1
-   e+q6W/9q1+0OrQguqz1xdWieyDZEtjulUqATf8udcrrJrdS4EC/F0LLO7
-   PfzyyW36q7cGfrxU+6pbhLloPjfDAfYJ8hHyUwilmtWAt6HRArXra9fSI
-   rhYTC05uNKs1y6GzyPawjNC4VXId0j2lo6p8OIngewfRLAeOfbdZe4jIs
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="3776530"
-X-IronPort-AV: E=Sophos;i="6.06,191,1705392000"; 
-   d="scan'208";a="3776530"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 16:41:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,191,1705392000"; 
-   d="scan'208";a="12281956"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa004.jf.intel.com with ESMTP; 28 Feb 2024 16:41:39 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Naama Meir <naamax.meir@linux.intel.com>
-Subject: [PATCH net-next 4/4] e1000e: Minor flow correction in e1000_shutdown function
-Date: Wed, 28 Feb 2024 16:41:32 -0800
-Message-ID: <20240229004135.741586-5-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240229004135.741586-1-anthony.l.nguyen@intel.com>
-References: <20240229004135.741586-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1709167779; c=relaxed/simple;
+	bh=eJy7526b/+zGVIKSV9uSj1O67nrOJUqsliwJDm6XgBE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q65u3wqoXPKKABAMQD7F3sCLFH8+1GBSX77Hd3ZYIptd1D/w7+1jt8CeJ7Kzvzd1e4h6OGxJZaL1S52T6VbBVKybl625HbSD5Pkz6N8WinacYI/XdqHPe3b+NscWrYROIQN+pCfyXCeL5mR38lIR7/7mwgzxEfNo7a/W+cOEU+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=Rl5bViV4; arc=none smtp.client-ip=44.202.169.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-6008a.ext.cloudfilter.net ([10.0.30.227])
+	by cmsmtp with ESMTPS
+	id fNSOratZjQr4SfUc6rE8rd; Thu, 29 Feb 2024 00:49:30 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id fUc5rIEGbz4nNfUc6rNnoi; Thu, 29 Feb 2024 00:49:30 +0000
+X-Authority-Analysis: v=2.4 cv=bPgQIu+Z c=1 sm=1 tr=0 ts=65dfd49a
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=VhncohosazJxI00KdYJ/5A==:17
+ a=IkcTkHD0fZMA:10 a=k7vzHIieQBIA:10 a=wYkD_t78qR0A:10
+ a=fHn5IWyn-i4c8q1BtbYA:9 a=QEXdDO2ut3YA:10
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Zjlg/tH38rkBMLvt/9bxLn+QRmwhVCWKNt+AkXN6Nec=; b=Rl5bViV4SrEtyy1Y3IFyKLvsG9
+	NoXIGdPO99YzGOuke1rEDMsjndNpL3tNMskf8gDdDzZDq99nndWo7lajWsZPuNaH0Mf12xnJvFpiP
+	CPIrNtDA0iIPqLxqfBqs2bBl6s8JWqDhqMsfTwu193K08NAwcfyqBPf45tmEmrrrzSYtoLfxvVXip
+	kUpIXchdNxJxiFOmFzeeF1wmZTmXI8MNa66yskG1TQVtFIz9Gu6cdUOJy1WEzbIC7P30QQsrTD+Ws
+	/jO3qhhf+nJrs6IxdAkWj/ZCBfRv5sp9A9ZGNWe3A3JMZkqlA2S7KnXjf4w+bKLtPcaKUGrh5YaKB
+	8Iq1SE7A==;
+Received: from [201.172.172.225] (port=57006 helo=[192.168.15.10])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1rfUc3-00272c-2T;
+	Wed, 28 Feb 2024 18:49:27 -0600
+Message-ID: <653bbfe8-1b35-4f5e-b89d-9e374c64e46b@embeddedor.com>
+Date: Wed, 28 Feb 2024 18:49:25 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 7/8] net-device: Use new helpers from overflow.h in
+ netdevice APIs
+Content-Language: en-US
+To: Kees Cook <keescook@chromium.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Vinod Koul <vkoul@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-iio@vger.kernel.org, linux-spi@vger.kernel.org,
+ netdev@vger.kernel.org, linux-hardening@vger.kernel.org,
+ Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, "Gustavo A. R. Silva"
+ <gustavoars@kernel.org>
+References: <20240228204919.3680786-1-andriy.shevchenko@linux.intel.com>
+ <20240228204919.3680786-8-andriy.shevchenko@linux.intel.com>
+ <202402281341.AC67EB6E35@keescook> <20240228144148.5c227487@kernel.org>
+ <202402281554.C1CEEF744@keescook>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <202402281554.C1CEEF744@keescook>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 201.172.172.225
+X-Source-L: No
+X-Exim-ID: 1rfUc3-00272c-2T
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.15.10]) [201.172.172.225]:57006
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 8
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfKawWL8KEP8OdGqvMwW7BHk6Z2cZ8tlnvpOYtmqdf6plklgL/P2w+Rev7MNXqe8/66cnEQUWvxefR0bha24EUEX/e0AguKiWgz1inSojYwKCGKMYhK8K
+ 3xbLWqbDUcEtvSYIAaUR+WD50mZ6ATkJMZU1BCgUXEdatqa3avsZXpzl0cHBMSpd6KQzpiDT6eNRubk8NMaZ0Msx9A+7JyD0HEM=
 
-From: Vitaly Lifshits <vitaly.lifshits@intel.com>
 
-Add curly braces to avoid entering to an if statement where it is not
-always required in e1000_shutdown function.
-This improves code readability and might prevent non-deterministic
-behaviour in the future.
 
-Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/e1000e/netdev.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+On 2/28/24 18:01, Kees Cook wrote:
+> On Wed, Feb 28, 2024 at 02:41:48PM -0800, Jakub Kicinski wrote:
+>> On Wed, 28 Feb 2024 13:46:10 -0800 Kees Cook wrote:
+>>> I really don't like hiding these trailing allocations from the compiler.
+>>> Why can't something like this be done (totally untested):
+>>>
+>>>
+>>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+>>> index 118c40258d07..dae6df4fb177 100644
+>>> --- a/include/linux/netdevice.h
+>>> +++ b/include/linux/netdevice.h
+>>> @@ -2475,6 +2475,8 @@ struct net_device {
+>>>   	/** @page_pools: page pools created for this netdevice */
+>>>   	struct hlist_head	page_pools;
+>>>   #endif
+>>> +	u32			priv_size;
+>>> +	u8			priv_data[] __counted_by(priv_size) __aligned(NETDEV_ALIGN);
+>>
+>> I like, FWIW, please submit! :)
+> 
+> So, I found several cases where struct net_device is included in the
+> middle of another structure, which makes my proposal more awkward. But I
+> also don't understand why it's in the _middle_. Shouldn't it always be
+> at the beginning (with priv stuff following it?)
+> Quick search and examined manually: git grep 'struct net_device [a-z0-9_]*;'
+> 
+> struct rtw89_dev
+> struct ath10k
+> etc.
+> 
+> Some even have two included (?)
+> 
+> But I still like the idea -- Gustavo has been solving these cases with
+> having two structs, e.g.:
+> 
+> struct net_device {
+> 	...unchanged...
+> };
+> 
+> struct net_device_alloc {
+> 	struct net_device	dev;
+> 	u32			priv_size;
+> 	u8			priv_data[] __counted_by(priv_size) __aligned(NETDEV_ALIGN);
+> };
+> 
+> And internals can use struct net_device_alloc...
 
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index af5d9d97a0d6..cc8c531ec3df 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -6688,14 +6688,14 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
- 	if (adapter->hw.phy.type == e1000_phy_igp_3) {
- 		e1000e_igp3_phy_powerdown_workaround_ich8lan(&adapter->hw);
- 	} else if (hw->mac.type >= e1000_pch_lpt) {
--		if (wufc && !(wufc & (E1000_WUFC_EX | E1000_WUFC_MC | E1000_WUFC_BC)))
-+		if (wufc && !(wufc & (E1000_WUFC_EX | E1000_WUFC_MC | E1000_WUFC_BC))) {
- 			/* ULP does not support wake from unicast, multicast
- 			 * or broadcast.
- 			 */
- 			retval = e1000_enable_ulp_lpt_lp(hw, !runtime);
--
--		if (retval)
--			return retval;
-+			if (retval)
-+				return retval;
-+		}
- 	}
- 
- 	/* Ensure that the appropriate bits are set in LPI_CTRL
--- 
-2.41.0
+Yep, we should really consider going with the above, otherwise we would
+have to do something like the following, to avoid having the flexible-array
+member nested in the middle of other structs:
 
+struct net_device {
+	struct_group_tagged(net_device_hdr, hdr,
+		...
+		u32			priv_size;
+	);
+	u8			priv_data[] __counted_by(priv_size) __aligned(NETDEV_ALIGN);
+}
+
+We are grouping together the members in `struct net_device`, except the
+flexible-array member, into a tagged `struct net_device_hdr`. This allows
+us to exclude the flex array from its inclusion in any other struct
+that contains `struct net_device` as a member without having to create
+a completely separate struct definition.
+
+And let's take as example `struct hfi1_netdev_rx`, where `struct net_device` is
+included in the beginning:
+
+drivers/infiniband/hw/hfi1/netdev.h:
+struct hfi1_netdev_rx {
+
+-	struct net_device rx_napi;
++       struct net_device_hdr rx_napi;
+
+
+         struct hfi1_devdata *dd;
+         struct hfi1_netdev_rxq *rxq;
+         int num_rx_q;
+         int rmt_start;
+         struct xarray dev_tbl;
+         /* count of enabled napi polls */
+         atomic_t enabled;
+         /* count of netdevs on top */
+         atomic_t netdevs;
+};
+
+Of course we would also have to update the code that access `struct net_device`
+members through `rx_napi` in `struct hfi1_netdev_rx`.
+
+I'm currently working on the above solution for all the cases where having two
+separate structs is not currently feasible. And with that we are looking to enable
+`-Wflex-array-member-not-at-end`
+
+So, if we can prevent this from the beginning it'd be really great. :)
+
+--
+Gustavo
 
