@@ -1,157 +1,192 @@
-Return-Path: <netdev+bounces-76292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E67986D260
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:32:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FE1186D26A
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:36:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59DC01C2179D
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:32:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E0551F2180B
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:36:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1DEB37A;
-	Thu, 29 Feb 2024 18:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 646AC4087F;
+	Thu, 29 Feb 2024 18:36:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="kO+egWIP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eeg5ydFc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA6D12E5B
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 18:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67F8383B0;
+	Thu, 29 Feb 2024 18:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709231525; cv=none; b=A3EMj8xyzwChHesEgpChxVfsgvdOWpg4subMQg3aBqhcfMqjEK4mGRgI64qT/+5HbuOtvmA60xPbCfV4GMKYb3Z3G+WOHUVkuDImvrUtRpDeRqer6BBJEUbOdVa12/7hs71LkG5L3Z9L9UEaPU79ncKRCyq0Dh+EQiEKey34YOw=
+	t=1709231766; cv=none; b=bR7W/DCZOfN3LqnwS9nwJ4Jo+wme+9cLFp4BUPmHW7/CJqzqsdaGSYt7vff5pneLnRPl27cGwLtH8bFLeZc5vzeUzhj+yUObMGhJjVkCACvqAkFMOF0YTgIp+IQiXwbYQWmksq/TcCbeuvXK5v6t4c9osq9hZmfxOkijdXVOHL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709231525; c=relaxed/simple;
-	bh=G9HD630sRPzPI72iuyqYlKeo7sS7I5SqO/qDADohpVk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=McpqlTgdTr7GAOw8tfFIR1pK7YjVP+C74B57qP3czZ+RzsCjIIIyRiZlTUql8f2DPq7fBZM454J5YFp2etuSlq7UsbBqlXgtauSO+14xlCXXmF4xBqioWYjLdu4z3uMh68j/Z7YPWelY452Xsbss9UUbpt5xX8j04LjhY/1einw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=kO+egWIP; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-608c40666e0so13272987b3.2
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 10:32:04 -0800 (PST)
+	s=arc-20240116; t=1709231766; c=relaxed/simple;
+	bh=MTQ2Zp10v4EFATTAdn8YTq6PqucoTKlCqk+EsJm56cU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YjSf9yGLOZVoxTFBJdvUPXGpZ1q/K/11GLNt0eMBgP038MoeZ0WYij2gUUwIt813sGjaXy2v09DaT1P5UhSe+gPxV07Z4AGkoBtRtjCehc3J6w7KvjzvY8b1aVjRmSLG/7qRimVvFRrx0d4cN8If3uTaNcd6eKUf9srNAVYiM9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Eeg5ydFc; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6e55b33ad14so815694b3a.1;
+        Thu, 29 Feb 2024 10:36:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1709231523; x=1709836323; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oaeBOT+t9mePNFUipxjmnCS7BvLCAtAwOO3iooaJWCc=;
-        b=kO+egWIPz8KaCVqAQrG//izl+reDUKAHZnn77DNpKe9143Brnuth/7iizqJVTaKEeR
-         htBZnL/YnkI1AeGWQnmOTAqWOhoQ7dYdpgIPZB1BhKmsil3nUsWGDvpghw7vbaoNH+NB
-         cMhK4X9Ka7G/Hid0gs70k7Oq2K4a0UZzLVsxd5oCPs5b7TXYOvim5SKJRB6I3IpbCvcI
-         BUOS1cYsKCJUc/UfKeD5kcYitPAjtYc9CwaGaC7Lrlkbn+AwsG6i+36CBXKVxed3OtNF
-         mN+hWUKnRowvpWdKh2uK7uJvu0FlTnDp0F2AaJju0D/pd1iwmbqHbo7QVaMyzRZxbYhM
-         Hv6g==
+        d=gmail.com; s=20230601; t=1709231764; x=1709836564; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3+gMaEJ0wh9SI3Z0iigxIJILHIqBzk3ZTRAx3N1QiYM=;
+        b=Eeg5ydFcSY54VaJ6RhfgXfB1a6w5OLQjCpzkM9P9ETX9onS+XapskhBo7cgReiEixY
+         V/zrNjvohFapiWsTwm5QXBOv+7uaRdWfnCaxczgNnm4FkbhqCfEMJShecEdzzqPRMM67
+         ZNvjn4PuYuOPUdVYbZh8TjKL1UdfA+op40GcPem4cSTY3sawObb0Cps1RZ03n3WlbDjy
+         W0rAgFBzuZrHEzuRehiuB2pbM1RjLp5Id9si/mzapnEMwI7RlXd+uYbN4I/WFYsmUE4W
+         hu3Z4PgJZglRYnNJN5hPQ55/N2TiZkNVzpKU0LPWu9LUCavvWvmcE2fu0BER8pf0Hovh
+         BAgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709231523; x=1709836323;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oaeBOT+t9mePNFUipxjmnCS7BvLCAtAwOO3iooaJWCc=;
-        b=mfwrM/zTD1djNtF1mWH/f5IzrZvjutN6vCk/ACU79pWiTQPiRKiD9v7YUqES9lrLpB
-         MTzzhbPrlBFctT5a3HxKYBwzdhuWnY4xU809d3o3w/eiEo9w6nthvrNX2w4rXN47Sx4G
-         GsCOkMS2Add127JkmqnxCcHYrxFYjQzYVY/Oafs+iY/wkuOrJp2/Myw2rfd+51zKtzA7
-         wXZJ/Mrg4YB5yuU/YkPR222zKOxr3NXBKsLD634Egba1hzeeXi1RkptEkTVFaNpZofRz
-         MaY7pqhT8ugMX7bP7SfmksdgkkZ9+WDZzwlB8RKC4r3TffsDYATa0Wg+DSSQ1SDpO+vP
-         YnQA==
-X-Gm-Message-State: AOJu0YxoijW6OZcp6Kq0i3s9z1KYnkKT3XvHkeIt4xCeEXkE47vNVIx7
-	ukwhY5YNe/2/IalHodOnMwJCQQy2y+/Ge9Abf3tWnJeXI4D2Fli+lcf39FEIngGxsqZCWUqGHmM
-	pbSsufk6U4VzNDC90kOdHeEz1p/9ecDu84YLv
-X-Google-Smtp-Source: AGHT+IGSCq77ocxd7gplB+cHpPQ+Y1JtselXqVpEOhC68LuPI6+y4CIZriULLW8UPwmIs5rFfwGFL/iGFD2xbXyZ9Hs=
-X-Received: by 2002:a81:8687:0:b0:609:2857:af0 with SMTP id
- w129-20020a818687000000b0060928570af0mr3175403ywf.25.1709231523326; Thu, 29
- Feb 2024 10:32:03 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709231764; x=1709836564;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3+gMaEJ0wh9SI3Z0iigxIJILHIqBzk3ZTRAx3N1QiYM=;
+        b=T5ZCPPqELB1h4K1gNN1D1llZsVlutTC+Yo2WG1rCT/cpGxMhncK0T5ax51Hze0VnNw
+         G+xyyCgiF/IJVeXxywRYhffXx0M4QZbruCX4NZ7xM2HWlfnazynQ66uqct67TjpWOSSE
+         hRaA60wHLGjHgtHZp5jYTQovz5PcAXFN344+IEcDRB9RsMZX5VZIlfgB5m0QAfQ1QjOr
+         RxUqmWhjLofmTMurQDKl6AkzUjQItlFouYplyhs00qEyk5oijBYRyAVxaw4+9FkjZchk
+         pATbAS+L2TThdpBNOMyKxmgtWZq32AoPAiBLSzIXGcTgXXm2doQncKKvWhn7IshHtIOh
+         H05w==
+X-Forwarded-Encrypted: i=1; AJvYcCXJnMDkLjvqkq+XC2xomdfZfqKaGDHIQQIZiodTnu/+ac8/9NP6YH78QxepvhaYpun2ewgWmfy4C8Ut1muc/1bCC8bHOPIBnb/pmJP0vJ6aUPlVIebgvJZh/UdoNa7//rIjGMOqLJ/s
+X-Gm-Message-State: AOJu0YxSj3s0gfPfczn0o2bxuoXa/uu3BTaGJk97+SP/M6d8DX+fWQZp
+	ik2sBhv67ipEwfhvJbVEyzjaEaErPWiqRiAZ10F7Uh2h0q4l1VOu
+X-Google-Smtp-Source: AGHT+IESfJPaPW4XdZ0Mu53/VQlgf7pW8jpNwrPcnJhzbPBfRKKNRO4uibv22o8d82QjfHXgqirXXQ==
+X-Received: by 2002:aa7:87d3:0:b0:6e5:5cc4:3fef with SMTP id i19-20020aa787d3000000b006e55cc43fefmr3166438pfo.11.1709231763675;
+        Thu, 29 Feb 2024 10:36:03 -0800 (PST)
+Received: from localhost ([2601:644:9381:2f20::119d])
+        by smtp.gmail.com with ESMTPSA id c2-20020a62e802000000b006e1463c18f8sm1595604pfi.37.2024.02.29.10.36.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Feb 2024 10:36:03 -0800 (PST)
+From: Matthew Wood <thepacketgeek@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Breno Leitao <leitao@debian.org>
+Cc: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2] net: netconsole: Add continuation line prefix to userdata messages
+Date: Thu, 29 Feb 2024 10:36:01 -0800
+Message-ID: <20240229183602.321747-1-thepacketgeek@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240225165447.156954-1-jhs@mojatatu.com> <20240225165447.156954-7-jhs@mojatatu.com>
- <9bb827bfc79345d02a063650990de68ce2386ddb.camel@redhat.com>
-In-Reply-To: <9bb827bfc79345d02a063650990de68ce2386ddb.camel@redhat.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 29 Feb 2024 13:31:52 -0500
-Message-ID: <CAM0EoMkrZAQx7p1=5Bq-HDEHiDgS1fYwTxT2keXOWs3GXjcNiw@mail.gmail.com>
-Subject: Re: [PATCH net-next v12 06/15] p4tc: add P4 data types
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
-	Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, tomasz.osinski@intel.com, 
-	jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, vladbu@nvidia.com, horms@kernel.org, 
-	khalidm@nvidia.com, toke@redhat.com, daniel@iogearbox.net, 
-	victor@mojatatu.com, pctammela@mojatatu.com, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 29, 2024 at 10:09=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
->
-> On Sun, 2024-02-25 at 11:54 -0500, Jamal Hadi Salim wrote:
-> > Introduce abstraction that represents P4 data types.
-> > This also introduces the Kconfig and Makefile which later patches use.
-> > Numeric types could be little, host or big endian definitions. The abst=
-raction
-> > also supports defining:
-> >
-> > a) bitstrings using P4 annotations that look like "bit<X>" where X
-> >    is the number of bits defined in a type
-> >
-> > b) bitslices such that one can define in P4 as bit<8>[0-3] and
-> >    bit<16>[4-9]. A 4-bit slice from bits 0-3 and a 6-bit slice from bit=
-s
-> >    4-9 respectively.
-> >
-> > c) speacialized types like dev (which stands for a netdev), key, etc
-> >
-> > Each type has a bitsize, a name (for debugging purposes), an ID and
-> > methods/ops. The P4 types will be used by externs, dynamic actions, pac=
-ket
-> > headers and other parts of P4TC.
-> >
-> > Each type has four ops:
-> >
-> > - validate_p4t: Which validates if a given value of a specific type
-> >   meets valid boundary conditions.
-> >
-> > - create_bitops: Which, given a bitsize, bitstart and bitend allocates =
-and
-> >   returns a mask and a shift value. For example, if we have type
-> >   bit<8>[3-3] meaning bitstart =3D 3 and bitend =3D 3, we'll create a m=
-ask
-> >   which would only give us the fourth bit of a bit8 value, that is, 0x0=
-8.
-> >   Since we are interested in the fourth bit, the bit shift value will b=
-e 3.
-> >   This is also useful if an "irregular" bitsize is used, for example,
-> >   bit24. In that case bitstart =3D 0 and bitend =3D 23. Shift will be 0=
- and
-> >   the mask will be 0xFFFFFF00 if the machine is big endian.
-> >
-> > - host_read : Which reads the value of a given type and transforms it t=
-o
-> >   host order (if needed)
-> >
-> > - host_write : Which writes a provided host order value and transforms =
-it
-> >   to the type's native order (if needed)
->
-> The type has a 'print' op, but I can't easily find where such op is
-> used and its role?!?
->
+Add a space (' ') prefix to every userdata line to match docs for
+dev-kmsg. To account for this extra character in each userdata entry,
+reduce userdata entry names (directory name) from 54 characters to 53.
 
-Thanks for catching that. We'll remove it. It was part of an
-operational debugging patch that was not submitted.
+According to the dev-kmsg docs, a space is used for subsequent lines to
+mark them as continuation lines.
 
-cheers,
-jamal
+> A line starting with ' ', is a continuation line, adding
+> key/value pairs to the log message, which provide the machine
+> readable context of the message, for reliable processing in
+> userspace.
 
-> Thanks,
->
-> Paolo
->
+Testing for this patch::
+
+ cd /sys/kernel/config/netconsole && mkdir cmdline0
+ cd cmdline0
+ mkdir userdata/test && echo "hello" > userdata/test/value
+ mkdir userdata/test2 && echo "hello2" > userdata/test2/value
+ echo "message" > /dev/kmsg
+
+Outputs::
+
+ 6.8.0-rc5-virtme,12,493,231373579,-;message
+  test=hello
+  test2=hello2
+
+And I confirmed all testing works as expected from the original patchset
+
+v1 -> v2:
+- Calculate 53 byte user data name from: entry length - formatting chars - value length
+- Update docs to reflect 53 byte limit for user data name (director)
+
+Fixes: df03f830d099 ("net: netconsole: cache userdata formatted string in netconsole_target")
+Signed-off-by: Matthew Wood <thepacketgeek@gmail.com>
+---
+ Documentation/networking/netconsole.rst | 8 ++++----
+ drivers/net/netconsole.c                | 8 +++++---
+ 2 files changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
+index b28c525e5d1e..d55c2a22ec7a 100644
+--- a/Documentation/networking/netconsole.rst
++++ b/Documentation/networking/netconsole.rst
+@@ -180,7 +180,7 @@ Custom user data can be appended to the end of messages with netconsole
+ dynamic configuration enabled. User data entries can be modified without
+ changing the "enabled" attribute of a target.
+ 
+-Directories (keys) under `userdata` are limited to 54 character length, and
++Directories (keys) under `userdata` are limited to 53 character length, and
+ data in `userdata/<key>/value` are limited to 200 bytes::
+ 
+  cd /sys/kernel/config/netconsole && mkdir cmdline0
+@@ -197,8 +197,8 @@ Messages will now include this additional user data::
+ Sends::
+ 
+  12,607,22085407756,-;This is a message
+- foo=bar
+- qux=baz
++  foo=bar
++  qux=baz
+ 
+ Preview the userdata that will be appended with::
+ 
+@@ -218,7 +218,7 @@ The `qux` key is omitted since it has no value::
+ 
+  echo "This is a message" > /dev/kmsg
+  12,607,22085407756,-;This is a message
+- foo=bar
++  foo=bar
+ 
+ Delete `userdata` entries with `rmdir`::
+ 
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index 0de108a1c0c8..46e447ea41b8 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -43,9 +43,11 @@ MODULE_DESCRIPTION("Console driver for network interfaces");
+ MODULE_LICENSE("GPL");
+ 
+ #define MAX_PARAM_LENGTH	256
+-#define MAX_USERDATA_NAME_LENGTH	54
+-#define MAX_USERDATA_VALUE_LENGTH	200
+ #define MAX_USERDATA_ENTRY_LENGTH	256
++#define MAX_USERDATA_VALUE_LENGTH	200
++#define MAX_USERDATA_NAME_LENGTH	MAX_USERDATA_ENTRY_LENGTH - \
++					MAX_USERDATA_VALUE_LENGTH - \
++					3 /* ' ' '=' '\n' characters */
+ #define MAX_USERDATA_ITEMS		16
+ #define MAX_PRINT_CHUNK		1000
+ 
+@@ -671,7 +673,7 @@ static void update_userdata(struct netconsole_target *nt)
+ 		 * checked to not exceed MAX items with child_count above
+ 		 */
+ 		complete_idx += scnprintf(&nt->userdata_complete[complete_idx],
+-					  MAX_USERDATA_ENTRY_LENGTH, "%s=%s\n",
++					  MAX_USERDATA_ENTRY_LENGTH, " %s=%s\n",
+ 					  item->ci_name, udm_item->value);
+ 	}
+ 	nt->userdata_length = strnlen(nt->userdata_complete,
+-- 
+2.44.0
+
 
