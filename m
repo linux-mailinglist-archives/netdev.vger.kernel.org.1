@@ -1,177 +1,206 @@
-Return-Path: <netdev+bounces-76095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B49586C4DA
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:21:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A259A86C4E9
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:23:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3869B1C238BA
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:21:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5458F28BFF1
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:23:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9789159B4A;
-	Thu, 29 Feb 2024 09:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776415916C;
+	Thu, 29 Feb 2024 09:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qkRXn6V0"
 X-Original-To: netdev@vger.kernel.org
-Received: from air.basealt.ru (air.basealt.ru [194.107.17.39])
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAEAE5A4D4;
-	Thu, 29 Feb 2024 09:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB98482E5
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 09:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709198425; cv=none; b=fvz7QMCerVq6grc+X6NISrKnzjePQjh5i3fe/o51/50MEwqQ0EGuX6eTDcF2KXzVRTJ3ggDbfMW9x9cMrd0WUBVUpGOM3NsBC7MjsCM6eDR/qt7hwWEueh3KbY5XyF5FQqFyrjgkycnDCAielkgA6LjYbRyLf3ymPTT6/0BQtPQ=
+	t=1709198602; cv=none; b=Q/RIrCq99ZxRMkW7JXBafFgJY0GYZt+yutem2FAnJ/oUUwcRi6Wda0VdKY5XY0exPjtRUz+GGkqRV8x066nDCXpRPhL70DQ/QFrLWQ0u+QawKF1z305rhB9plq51U+FoaDMR9gzY/ZAgSnMVRITWwo0RYgUXJiZwLWaKPVVA0+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709198425; c=relaxed/simple;
-	bh=4F/X5Z6QsULNfoSYXx+VhyVs0V627xYO/1kLOHJm/zU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=buCX5YUqJZCIEUy109cdNxk+vF5wFqHllAvu5DEmFGRBGCqM13Gxz0Smc8F2g34MlYS89m2sPtmsV4GaTeb27cvzlIK/XTPPTx28nITGD14VIbSotbDH0KyMrBy7xpZP05P5Goxae/Byjj8WwX6oJUvRwr0HU8vTLauBKF88mXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: by air.basealt.ru (Postfix, from userid 490)
-	id AF09C2F2025F; Thu, 29 Feb 2024 09:20:20 +0000 (UTC)
-X-Spam-Level: 
-Received: from [10.88.144.178] (obninsk.basealt.ru [217.15.195.17])
-	by air.basealt.ru (Postfix) with ESMTPSA id A8BA72F20251;
-	Thu, 29 Feb 2024 09:20:18 +0000 (UTC)
-Message-ID: <077c8417-03bf-8d61-5d3a-0aef91b55659@basealt.ru>
-Date: Thu, 29 Feb 2024 12:20:18 +0300
+	s=arc-20240116; t=1709198602; c=relaxed/simple;
+	bh=rKIZI8mkCW/o72vSh/5vySFXUUd1ZSZLcFoNZOCXR8w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nzGQaTKl8g4MOxDi42ZrcWcDt36UoSol+RcWmZ10Mg6SuF7kwpWRhNiKvU5VNqJ/YRhIejT7V941QR0Nx0l/2+5OjBdfm/xK8FybEOIjoEfMAaFljk2eVRsEShZkeXXa1uHrRorWeOFAgFNTsO2vkk9ELnc0b1icx91ZSXXLUoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qkRXn6V0; arc=none smtp.client-ip=95.215.58.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <3c38627e-b9b6-43a3-ae66-628976c41247@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1709198591;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wa3DRGjhE8/44KmXxGKR0TYbciJqzHu8Mu92Y7itEC4=;
+	b=qkRXn6V0Uzn+q0gu53nVJaPQ9vPvUGdQa4DZHGeM+DyrSXMWSJO3vrYCvC3rOwsvXoIMe1
+	OOJuM9XihjytofxoxWlK56KFZBLl39SGa2l47dvukD8ArCRunRmU/egG/6E/zXGs2YYKgE
+	uSB1ajAyT5+zGFNSIRg6nSRzAQPMFfE=
+Date: Thu, 29 Feb 2024 09:23:08 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH net] gtp: fix use-after-free and null-ptr-deref in
- gtp_newlink()
+Subject: Re: [PATCH net-next 2/2] bnxt_en: Retry for TX timestamp from FW
+ until timeout specified
 Content-Language: en-US
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20240228114703.465107-1-oficerovas@altlinux.org>
- <Zd_HAGqXSE6Nwcag@calendula>
-From: Vasiliy Kovalev <kovalev@altlinux.org>
-In-Reply-To: <Zd_HAGqXSE6Nwcag@calendula>
+To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew.gospodarek@broadcom.com, jiri@resnulli.us, richardcochran@gmail.com
+References: <20240229070202.107488-1-michael.chan@broadcom.com>
+ <20240229070202.107488-3-michael.chan@broadcom.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240229070202.107488-3-michael.chan@broadcom.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi,
-
-29.02.2024 02:51, Pablo Neira Ayuso wrote:
-> On Wed, Feb 28, 2024 at 02:47:03PM +0300, Alexander Ofitserov wrote:
->> The gtp_link_ops operations structure for the subsystem must be
->> registered after registering the gtp_net_ops pernet operations structure.
+On 29/02/2024 07:02, Michael Chan wrote:
+> From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 > 
-> A fix for this was already applied, see:
+> Use the ptp_tx_timeout devlink parameter introduced in the previous
+> patch to retry querying TX timestamp, up to the timeout specified.
+> Firmware supports timeout values up to 65535 microseconds.  The
+> driver will set this firmware timeout value according to the
+> ptp_tx_timeout parameter.  If the ptp_tx_timeout value exceeds
+> the maximum firmware value, the driver will retry in the context
+> of bnxt_ptp_ts_aux_work().
 > 
-> commit 136cfaca22567a03bbb3bf53a43d8cb5748b80ec
-> Author: Vasiliy Kovalev <kovalev@altlinux.org>
-> Date:   Wed Feb 14 19:27:33 2024 +0300
+> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> ---
+>   Documentation/networking/devlink/bnxt.rst     |  7 +++++++
+>   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 19 ++++++++++++++++---
+>   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  4 +++-
+>   3 files changed, 26 insertions(+), 4 deletions(-)
 > 
->      gtp: fix use-after-free and null-ptr-deref in gtp_genl_dump_pdp()
-> 
->> diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
->> index 2129ae42c7030..0ddec4cc84093 100644
->> --- a/drivers/net/gtp.c
->> +++ b/drivers/net/gtp.c
->> @@ -1903,26 +1903,26 @@ static int __init gtp_init(void)
->>   
->>   	get_random_bytes(&gtp_h_initval, sizeof(gtp_h_initval));
->>   
->> -	err = rtnl_link_register(&gtp_link_ops);
->> +	err = register_pernet_subsys(&gtp_net_ops);
->>   	if (err < 0)
->>   		goto error_out;
-> 
-> BTW, I like that this calls register_pernet_subsys() before
-> rtnl_link_register(), where a rtnetlink request could come before
-> pernet is set up.
-> 
->> -	err = register_pernet_subsys(&gtp_net_ops);
->> +	err = rtnl_link_register(&gtp_link_ops);
->>   	if (err < 0)
->> -		goto unreg_rtnl_link;
->> +		goto unreg_pernet_subsys;
->>   
->>   	err = genl_register_family(&gtp_genl_family);
->>   	if (err < 0)
->> -		goto unreg_pernet_subsys;
->> +		goto unreg_rtnl_link;
->>   
->>   	pr_info("GTP module loaded (pdp ctx size %zd bytes)\n",
->>   		sizeof(struct pdp_ctx));
->>   	return 0;
->>   
->> -unreg_pernet_subsys:
->> -	unregister_pernet_subsys(&gtp_net_ops);
->>   unreg_rtnl_link:
->>   	rtnl_link_unregister(&gtp_link_ops);
->> +unreg_pernet_subsys:
->> +	unregister_pernet_subsys(&gtp_net_ops);
->>   error_out:
->>   	pr_err("error loading GTP module loaded\n");
->>   	return err;
->> -- 
->> 2.42.1
->>
->>
+> diff --git a/Documentation/networking/devlink/bnxt.rst b/Documentation/networking/devlink/bnxt.rst
+> index a4fb27663cd6..48833c190c5b 100644
+> --- a/Documentation/networking/devlink/bnxt.rst
+> +++ b/Documentation/networking/devlink/bnxt.rst
+> @@ -41,6 +41,13 @@ parameters.
+>        - Generic Routing Encapsulation (GRE) version check will be enabled in
+>          the device. If disabled, the device will skip the version check for
+>          incoming packets.
+> +   * - ``ptp_tx_timeout``
+> +     - u32
+> +     - Runtime
+> +     - PTP Transmit timestamp timeout value in milliseconds. The default
+> +       value is 1000 and the maximum value is 5000. Use a higher value
+> +       on a busy network to prevent timeout retrieving the PTP Transmit
+> +       timestamp.
+>   
+>   Info versions
+>   =============
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+> index 4b50b07b9771..a05b50162e9e 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+> @@ -122,10 +122,14 @@ static int bnxt_hwrm_port_ts_query(struct bnxt *bp, u32 flags, u64 *ts)
+>   	req->flags = cpu_to_le32(flags);
+>   	if ((flags & PORT_TS_QUERY_REQ_FLAGS_PATH) ==
+>   	    PORT_TS_QUERY_REQ_FLAGS_PATH_TX) {
+> +		struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
+> +		u32 tmo_us = ptp->txts_tmo * 1000;
+> +
+>   		req->enables = cpu_to_le16(BNXT_PTP_QTS_TX_ENABLES);
+> -		req->ptp_seq_id = cpu_to_le32(bp->ptp_cfg->tx_seqid);
+> -		req->ptp_hdr_offset = cpu_to_le16(bp->ptp_cfg->tx_hdr_off);
+> -		req->ts_req_timeout = cpu_to_le16(BNXT_PTP_QTS_TIMEOUT);
+> +		req->ptp_seq_id = cpu_to_le32(ptp->tx_seqid);
+> +		req->ptp_hdr_offset = cpu_to_le16(ptp->tx_hdr_off);
+> +		tmo_us = min(tmo_us, BNXT_PTP_QTS_MAX_TMO_US);
 
-This patch fixes another problem, but a similar one, since the sequence 
-is incorrect when registering subsystems.
+With this logic the request will stay longer than expected. With
+BNXT_PTP_QTS_MAX_TMO_US hardcoded to 65ms (it's later in the patch),
+and TXT timestamp timeout set for 270ms, the request will wait for 325ms
+in total. It doesn't look like a blocker, but it's definitely area to
+improve given that only one TX timestamp request can be in-flight.
 
-Initially, the registration sequence in the gtp module was as follows:
+> +		req->ts_req_timeout = cpu_to_le16(tmo_us);
+>   	}
+>   	resp = hwrm_req_hold(bp, req);
+>   
+> @@ -675,6 +679,8 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
+>   	u64 ts = 0, ns = 0;
+>   	int rc;
+>   
+> +	if (!ptp->txts_pending)
+> +		ptp->abs_txts_tmo = jiffies + msecs_to_jiffies(ptp->txts_tmo);
+>   	rc = bnxt_hwrm_port_ts_query(bp, PORT_TS_QUERY_REQ_FLAGS_PATH_TX, &ts);
+>   	if (!rc) {
+>   		memset(&timestamp, 0, sizeof(timestamp));
+> @@ -684,6 +690,10 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
+>   		timestamp.hwtstamp = ns_to_ktime(ns);
+>   		skb_tstamp_tx(ptp->tx_skb, &timestamp);
+>   	} else {
+> +		if (!time_after_eq(jiffies, ptp->abs_txts_tmo)) {
+> +			ptp->txts_pending = true;
+> +			return;
+> +		}
+>   		netdev_warn_once(bp->dev,
+>   				 "TS query for TX timer failed rc = %x\n", rc);
+>   	}
+> @@ -691,6 +701,7 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
+>   	dev_kfree_skb_any(ptp->tx_skb);
+>   	ptp->tx_skb = NULL;
+>   	atomic_inc(&ptp->tx_avail);
+> +	ptp->txts_pending = false;
+>   }
+>   
+>   static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
+> @@ -714,6 +725,8 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
+>   		spin_unlock_bh(&ptp->ptp_lock);
+>   		ptp->next_overflow_check = now + BNXT_PHC_OVERFLOW_PERIOD;
+>   	}
+> +	if (ptp->txts_pending)
+> +		return 0;
+>   	return HZ;
+>   }
+>   
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+> index ee977620d33e..bfb165d2b365 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+> @@ -24,7 +24,7 @@
+>   
+>   #define BNXT_PTP_DFLT_TX_TMO	1000 /* ms */
+>   #define BNXT_PTP_MAX_TX_TMO	5000 /* ms */
+> -#define BNXT_PTP_QTS_TIMEOUT	1000
+> +#define BNXT_PTP_QTS_MAX_TMO_US	65535
+             ^^^^
+This is the request timeout definition
 
-1) rtnl_link_register();
+>   #define BNXT_PTP_QTS_TX_ENABLES	(PORT_TS_QUERY_REQ_ENABLES_PTP_SEQ_ID |	\
+>   				 PORT_TS_QUERY_REQ_ENABLES_TS_REQ_TIMEOUT | \
+>   				 PORT_TS_QUERY_REQ_ENABLES_PTP_HDR_OFFSET)
+> @@ -117,12 +117,14 @@ struct bnxt_ptp_cfg {
+>   					 BNXT_PTP_MSG_PDELAY_REQ |	\
+>   					 BNXT_PTP_MSG_PDELAY_RESP)
+>   	u8			tx_tstamp_en:1;
+> +	u8			txts_pending:1;
+>   	int			rx_filter;
+>   	u32			tstamp_filters;
+>   
+>   	u32			refclk_regs[2];
+>   	u32			refclk_mapped_regs[2];
+>   	u32			txts_tmo;
+> +	unsigned long		abs_txts_tmo;
+>   };
+>   
+>   #if BITS_PER_LONG == 32
 
-2) genl_register_family();
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
-3) register_pernet_subsys();
-
-During debugging of the module, when starting the syzkaller reproducer, 
-it turned out that after genl_register_family() (2),
-
-without waiting for register_pernet_subsys()(3), the .dumpit  event is 
-triggered, in which the data of the unregistered pernet subsystem is 
-accessed.
-
-That is, the bug was fixed by the commit
-
-136cfaca2256 ("gtp: fix use-after-free and null-ptr-deref in 
-gtp_genl_dump_pdp()") [1]
-
-and the registration sequence became as follows:
-
-1) rtnl_link_register();
-
-2) register_pernet_subsys();
-
-3) genl_register_family();
-
-However, syzkaller has discovered another problem:
-
-after registering rtnl_link_register, the .newlink event is triggered, 
-in which the data of the unregistered pernet subsystem is accessed.
-
-This problem is reproducible on current stable kernels and the latest 
-upstream kernel 6.8-rc6, in which the patch 136cfaca2256 [1] is applied.
-
-Therefore, the correct sequence should be as follows:
-
-1) register_pernet_subsys();
-
-2) rtnl_link_register();
-
-3) genl_register_family();
-
-The proposed patch is developed on top of the commit changes [1], does 
-not conflict with it and fixes the described bug.
-
-[1] 
-https://lore.kernel.org/lkml/20240220160434.29bcaf43@kernel.org/T/#mb1f72c2ad57b7ea6d47333e8616beccf8bce0e23
-
--- 
-Regards,
-Vasiliy Kovalev
 
