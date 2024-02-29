@@ -1,161 +1,638 @@
-Return-Path: <netdev+bounces-76081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7172C86C379
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:29:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B612786C3CB
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:39:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2815E2856F2
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 08:29:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45DB41F23F13
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 08:39:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8206E4F5F2;
-	Thu, 29 Feb 2024 08:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA74E51C52;
+	Thu, 29 Feb 2024 08:37:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="K9JnNayi"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linumiz.com header.i=@linumiz.com header.b="ZxtNsvT5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from omta40.uswest2.a.cloudfilter.net (omta40.uswest2.a.cloudfilter.net [35.89.44.39])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD024EB5F
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 08:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B2920312
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 08:37:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709195350; cv=none; b=O3E3jclEF1N0dV3In1d9DNZoXOZ1A9X4LtG0jVsAha5rgIgjjkl0P9YxZ5iRX4TqNddA7drXzDC3oyy33y6zTK22BNdm8anHAc/zF2RUoqfAjYMeVJ9nds1hZR97ZKjSvldQpqVU8xKfdxkgoLGj4IYts5zv+NaAgU+6ZC157oc=
+	t=1709195836; cv=none; b=OlfDRFBNax9nfypicD1yseJYZrpRiNS1NR2bPWbZkk9rTrk/rusOMB31W3gDKgi6Rg/0Qa31OcLlt87ohcdZZ36bxYovMXK8nzeT9OOMktIz9/5jaDnx6HBC9VEJ9Klz824e8s3HFWyU0ayIvUovcJeIvzDtv1qlLcePFoDnZRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709195350; c=relaxed/simple;
-	bh=ZaWFVUtbXWHU3kBKA8aCQ5Xqw2yXOUmHdmNjz8jKPKY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZvWYcYWzJCPdyxx7PYTFVqrCQay3zorjOpsEmhq0vprighr42lhEBPAT5E1c/iHJ+kJd1QliShnRqYefatAME+zNEqK88ZIzGwzl5Yanfx1PxRwh+4o6X49iyREXhn8XLZXo8IHRJej127AjvCfrVV6d4TKd7641ZzkMT1/7m7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=K9JnNayi; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a3d484a58f6so97180866b.3
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 00:29:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709195347; x=1709800147; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hOVIjRZwUi3OP0ICTb94t+OLC23i5YOcL9eCekTbZPs=;
-        b=K9JnNayi9xRtEG4c5eqXLUWxLYcPqx0ygObP7tSRcffPxj62cVrqz1z1y4p92v/sjx
-         fII8I65ixMXvDoLaCd4WBmV7BZtjSR0ufdUrAJKI1vZE0Zdes+rnAqEL6wqMO1459hJ7
-         z9kusWpKTqe8inb2haMBHnW4bAveIPXiTxAz7nJN7XLi574N2ScrWqUKEp+c0Kvo4Wu3
-         3D6tUXdxTcLf8JnyIxP+ieWfZe4WRoqHxHThotg3APPGTK6B3f1DhZWur9UhZ3kYnp6I
-         0A6WaNJN9lZHSI5hFxQLJPWdfVMpTB5I09KJ8TCTmIEpKWF7KmEKRsSniij3ozqSkp+E
-         WSYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709195347; x=1709800147;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hOVIjRZwUi3OP0ICTb94t+OLC23i5YOcL9eCekTbZPs=;
-        b=IoVXpImobLGsLrULlUII1LoIHWnHHp1/HtT7W50WJ5tMD3rQoBMz3UJCxAs/2sVa+K
-         jr2Q/QuqtRQh04JgQ/Fzc2zSu21e9Iy1Kh9fVk5/AG9FghdLPfY9T2hW7U/+BWc7YPj6
-         YUEnixHegDDyHbJFalyMWvCGh+5Efbnfquo5j3l+JKePhsbd028SmB53mG0f3cfEP8uN
-         szqsx40wONijO/KEdUjb7vqtF8TBXVSGw0fRrtTNUSY7eKLgpn2SdvwCmCU+ysS5tkdA
-         wFEbZ7VARCX9vRYuztXQ84khah6Bzh3HeDBR4qfxhcEkQFDLhw/h4fDOyllqFPF5hSzr
-         z0lg==
-X-Forwarded-Encrypted: i=1; AJvYcCU0euYMO2c83UG/kjX1m6bC960UsCUyGSR3HSQHtKI7dR5BPsN5IT/SjJHIfYZ8Q8dXmsLb9Vw2xD6iFkb4vYD4zVKDvrDc
-X-Gm-Message-State: AOJu0YxJoH0d/9ZHGZNJZDPqMrPhKC1H/nnlFepBTqx1AyyMPduVspLQ
-	BBpTb7QCG3TSdrSbGt6GCvFpQiVqnxNw14nkrQMdTosFmsFCOjnS542w7rG6PZg=
-X-Google-Smtp-Source: AGHT+IHOsykAlHp6FlMsC+tMKVUNs0F+mCLMXs6tZudAp22W3qQ8gDmpnaBgmGlInFIpQz4wgYzCEw==
-X-Received: by 2002:a17:906:f28d:b0:a43:21fb:d0db with SMTP id gu13-20020a170906f28d00b00a4321fbd0dbmr836411ejb.10.1709195347028;
-        Thu, 29 Feb 2024 00:29:07 -0800 (PST)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id ch14-20020a170906c2ce00b00a42ea946917sm430831ejb.130.2024.02.29.00.29.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 00:29:06 -0800 (PST)
-Date: Thu, 29 Feb 2024 09:29:05 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Keller, Jacob E" <jacob.e.keller@intel.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"nathan.sullivan@ni.com" <nathan.sullivan@ni.com>,
-	"Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-Subject: Re: [PATCH net] igb: extend PTP timestamp adjustments to i211
-Message-ID: <ZeBAUeuoOv3UgILE@nanopsycho>
-References: <20240227184942.362710-1-anthony.l.nguyen@intel.com>
- <Zd7-9BJM_6B44nTI@nanopsycho>
- <Zd8m6wpondUopnFm@pengutronix.de>
- <PH0PR11MB5095A06D5B78F7544E88E614D6582@PH0PR11MB5095.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1709195836; c=relaxed/simple;
+	bh=ZFn/kKszJGJ+hZv439HEvXPN0ZEFAeizsC4LEBDDlco=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r33bNkkED6+0tHKm/xWpPku9T1IikjANhwhC9aaT1JXdpkxOhZ7hCtXzD66Knb3w8xLiOt/Io6gWd1O/3xHN+YfeR6SrTs4SezIwmCjvNxvAjX3cJIVkdmC9hffwuNdUe0RNSGLCdymbKMQVuwwwvDqsBAW+b39KoeRlpyUw49U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linumiz.com; spf=pass smtp.mailfrom=linumiz.com; dkim=pass (2048-bit key) header.d=linumiz.com header.i=@linumiz.com header.b=ZxtNsvT5; arc=none smtp.client-ip=35.89.44.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linumiz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linumiz.com
+Received: from eig-obgw-5003a.ext.cloudfilter.net ([10.0.29.159])
+	by cmsmtp with ESMTPS
+	id fTFCr6kAHPM1hfbukrUUEb; Thu, 29 Feb 2024 08:37:14 +0000
+Received: from md-in-79.webhostbox.net ([43.225.55.182])
+	by cmsmtp with ESMTPS
+	id fbuhrKty7e1rDfbuirxyat; Thu, 29 Feb 2024 08:37:13 +0000
+X-Authority-Analysis: v=2.4 cv=TvrghiXh c=1 sm=1 tr=0 ts=65e04239
+ a=LfuyaZh/8e9VOkaVZk0aRw==:117 a=kofhyyBXuK/oEhdxNjf66Q==:17
+ a=IkcTkHD0fZMA:10 a=k7vzHIieQBIA:10 a=oz0wMknONp8A:10 a=vU9dKmh3AAAA:8
+ a=UXIAUNObAAAA:8 a=AaZsPGPmsafA2eLmkNAA:9 a=QEXdDO2ut3YA:10 a=bFq2RbqkfqsA:10
+ a=rsP06fVo5MYu2ilr0aT5:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=linumiz.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=AnNK+AIrGk4ngQV5dAeJdqR4QKuqPbrScoRu615KNKM=; b=ZxtNsvT5ZVcsX295+OZjSW1VfU
+	SJD+TKqRbNTcqzXBmoIGQBH5GA4mtQJuORffJ8B0oLO/uCYYzycp5LyCwghtjdLQDExyoTXrTTRUJ
+	wQxoO/Ao7CUaMRF2PoP3+zuGz5Lf1Pz2AEB61vYOnSl30/T1p5WS1SgVFSzmM06sNXwhfTKznoDxL
+	GyDtFe9ev+vt7P2lYDjqO2KiXvmb7R7A/Sqrbhq6UQOcmnJzdmRGe2JdYTwWxyCJMPbG/EsYYAWYd
+	SglWvHXxiXAdzVNBVwgWNfcIryzGoMKfRhYrdKb5irzh8Ns8YqaC9/0GEpNXpv8ZkL19GQTnFJkOc
+	A1C6XdFg==;
+Received: from [122.165.245.213] (port=45048 helo=[192.168.1.101])
+	by md-in-79.webhostbox.net with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <parthiban@linumiz.com>)
+	id 1rfbug-001KT2-26;
+	Thu, 29 Feb 2024 14:07:10 +0530
+Message-ID: <4f8287ae-acfa-447b-b9d0-d26d84d24b2d@linumiz.com>
+Date: Thu, 29 Feb 2024 14:07:06 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PH0PR11MB5095A06D5B78F7544E88E614D6582@PH0PR11MB5095.namprd11.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] arm64: dts: imx8mm: add support for compulab iot gateway
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, shawnguo@kernel.org,
+ s.hauer@pengutronix.de
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ Parthiban <parthiban@linumiz.com>
+References: <20230512055230.811421-1-parthiban@linumiz.com>
+ <e24e877e-4065-35b4-bbd2-edbbc694edf6@linaro.org>
+From: Parthiban <parthiban@linumiz.com>
+Organization: Linumiz
+In-Reply-To: <e24e877e-4065-35b4-bbd2-edbbc694edf6@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - md-in-79.webhostbox.net
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - linumiz.com
+X-BWhitelist: no
+X-Source-IP: 122.165.245.213
+X-Source-L: No
+X-Exim-ID: 1rfbug-001KT2-26
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.1.101]) [122.165.245.213]:45048
+X-Source-Auth: parthiban@linumiz.com
+X-Email-Count: 24
+X-Org: HG=dishared_whb_net_legacy;ORG=directi;
+X-Source-Cap: bGludW1jbWM7aG9zdGdhdG9yO21kLWluLTc5LndlYmhvc3Rib3gubmV0
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfFKgFD5azs7/N0hSnqrdjCAHVhAqx1pUTD0UINUSDNzUAXMK08jn5svOPyu9Ukns0+HbTRpyPmz0qHid49LkWOxHztFr4eNkXRUOfMTB3WQdPY0Z0Eby
+ bZ0NAb+OAztmYsYODVFKa2PxLQuO1xKPI9LEIbe9rQJnUQojPH0EFsOZrBxH+0fIFVGA4Qr6tiLFDCr/tio9+g58mVY3oQ2KU9w=
 
-Wed, Feb 28, 2024 at 06:43:03PM CET, jacob.e.keller@intel.com wrote:
->
->
->> -----Original Message-----
->> From: Oleksij Rempel <o.rempel@pengutronix.de>
->> Sent: Wednesday, February 28, 2024 4:28 AM
->> To: Jiri Pirko <jiri@resnulli.us>
->> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; davem@davemloft.net;
->> kuba@kernel.org; pabeni@redhat.com; edumazet@google.com;
->> netdev@vger.kernel.org; richardcochran@gmail.com; nathan.sullivan@ni.com;
->> Keller, Jacob E <jacob.e.keller@intel.com>; Pucha, HimasekharX Reddy
->> <himasekharx.reddy.pucha@intel.com>
->> Subject: Re: [PATCH net] igb: extend PTP timestamp adjustments to i211
->> 
->> On Wed, Feb 28, 2024 at 10:37:56AM +0100, Jiri Pirko wrote:
->> > Tue, Feb 27, 2024 at 07:49:41PM CET, anthony.l.nguyen@intel.com wrote:
->> > >From: Oleksij Rempel <o.rempel@pengutronix.de>
->> > >
->> > >The i211 requires the same PTP timestamp adjustments as the i210,
->> > >according to its datasheet. To ensure consistent timestamping across
->> > >different platforms, this change extends the existing adjustments to
->> > >include the i211.
->> > >
->> > >The adjustment result are tested and comparable for i210 and i211 based
->> > >systems.
->> > >
->> > >Fixes: 3f544d2a4d5c ("igb: adjust PTP timestamps for Tx/Rx latency")
->> >
->> > IIUC, you are just extending the timestamp adjusting to another HW, not
->> > actually fixing any error, don't you? In that case, I don't see why not
->> > to rather target net-next and avoid "Fixes" tag. Or do I misunderstand
->> > this?
->> 
->> From my perspective, it was an error, since two nearly identical systems
->> with only one difference (one used i210 other i211) showed different PTP
->> measurements. So, it would be nice if distributions would include this
->> fix. On other hand, I'm ok with what ever maintainer would decide how
->> to handle this patch.
->> 
->> Regards,
->> Oleksij
->
->Without this, the i211 doesn't apply the Tx/Rx latency adjustments, so the timestamps would be less accurate than if the corrections are applied. On the one hand I guess this is a "feature" and the lack of a feature isn't a bug, so maybe its not viewed as a bug fix then.
+Thanks for the review Krzysztof. I will send v2 after fixing the review comments.
 
-The behaviour of i211 is the same as it always was. I mean, 3f544d2a4d5c
-didn't cause any regression. From that perspective, it is clearly a
-feature.
+Thanks,
+Parthiban N
 
-I know that in netdev we are taking the meaning of "Fixes" quite on the
-edge often, but I think this is off the cliff :)
-
-
->
->Another interpretation is that lacking those corrections is a bug which this patch fixes.
->
->Thanks,
->Jake
->
->> --
->> Pengutronix e.K.                           |                             |
->> Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
->> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
->> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+On 5/12/23 11:47, Krzysztof Kozlowski wrote:
+> On 12/05/2023 07:52, Parthiban Nallathambi wrote:
+>> Add support for compulab for imx8mm IoT gateway with
+>> UCM-iMX8M-Mini SoM. IoT gateway comes with dual ethernet,
+>> USB and IO expansion.
+>>
+>> WLAN, Bluetooth can be part of SoM or extended over PCIE.
+>>
+>> Signed-off-by: Parthiban Nallathambi <parthiban@linumiz.com>
+>> ---
+>>  .../devicetree/bindings/arm/fsl.yaml          |   2 +
+>>  .../bindings/net/microchip,lan95xx.yaml       |   1 +
+>>  arch/arm64/boot/dts/freescale/Makefile        |   1 +
+>>  .../freescale/imx8mm-compulab-iot-gate.dts    | 315 +++++++++++
+>>  .../dts/freescale/imx8mm-compulab-ucm.dtsi    | 532 ++++++++++++++++++
+>>  5 files changed, 851 insertions(+)
+>>  create mode 100644 arch/arm64/boot/dts/freescale/imx8mm-compulab-iot-gate.dts
+>>  create mode 100644 arch/arm64/boot/dts/freescale/imx8mm-compulab-ucm.dtsi
+>>
+>> diff --git a/Documentation/devicetree/bindings/arm/fsl.yaml b/Documentation/devicetree/bindings/arm/fsl.yaml
+>> index 15d411084065..d2425c5ed4b7 100644
+>> --- a/Documentation/devicetree/bindings/arm/fsl.yaml
+>> +++ b/Documentation/devicetree/bindings/arm/fsl.yaml
+>> @@ -895,6 +895,8 @@ properties:
+>>        - description: i.MX8MM based Boards
+>>          items:
+>>            - enum:
+>> +              - compulab,imx8mm-ucm-som   # UCM-iMX8M-Mini Compulab SoM
+>> +              - compulab,iot-gate-imx8    # iMX8M IoT Compulab Gateway with UCM-iMX8M-Mini
+> 
+> Bindings are always separate patches.
+> 
+> Please run scripts/checkpatch.pl and fix reported warnings. Checkpatch
+> tells you this, so you apparently did not run it.
+> 
+> 
+>>                - beacon,imx8mm-beacon-kit  # i.MX8MM Beacon Development Kit
+>>                - boundary,imx8mm-nitrogen8mm  # i.MX8MM Nitrogen Board
+>>                - dmo,imx8mm-data-modul-edm-sbc # i.MX8MM eDM SBC
+>> diff --git a/Documentation/devicetree/bindings/net/microchip,lan95xx.yaml b/Documentation/devicetree/bindings/net/microchip,lan95xx.yaml
+>> index 0b97e14d947f..86279724695e 100644
+>> --- a/Documentation/devicetree/bindings/net/microchip,lan95xx.yaml
+>> +++ b/Documentation/devicetree/bindings/net/microchip,lan95xx.yaml
+>> @@ -22,6 +22,7 @@ properties:
+>>        - enum:
+>>            - usb424,9500   # SMSC9500 USB Ethernet Device
+>>            - usb424,9505   # SMSC9505 USB Ethernet Device
+>> +          - usb424,9514   # SMSC9514 USB Ethernet Device
+> 
+> No, really, I could understand squashing board bindings here but
+> changing drivers in the same patch is clearly too much.
+> 
+>>            - usb424,9530   # SMSC LAN9530 USB Ethernet Device
+>>            - usb424,9730   # SMSC LAN9730 USB Ethernet Device
+>>            - usb424,9900   # SMSC9500 USB Ethernet Device (SAL10)
+>> diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
+>> index ef7d17aef58f..2a613c576d29 100644
+>> --- a/arch/arm64/boot/dts/freescale/Makefile
+>> +++ b/arch/arm64/boot/dts/freescale/Makefile
+>> @@ -51,6 +51,7 @@ dtb-$(CONFIG_ARCH_LAYERSCAPE) += fsl-ls1028a-qds-9999.dtb
+>>  
+>>  dtb-$(CONFIG_ARCH_MXC) += imx8dxl-evk.dtb
+>>  dtb-$(CONFIG_ARCH_MXC) += imx8mm-beacon-kit.dtb
+>> +dtb-$(CONFIG_ARCH_MXC) += imx8mm-compulab-iot-gate.dtb
+>>  dtb-$(CONFIG_ARCH_MXC) += imx8mm-data-modul-edm-sbc.dtb
+>>  dtb-$(CONFIG_ARCH_MXC) += imx8mm-ddr4-evk.dtb
+>>  dtb-$(CONFIG_ARCH_MXC) += imx8mm-emcon-avari.dtb
+>> diff --git a/arch/arm64/boot/dts/freescale/imx8mm-compulab-iot-gate.dts b/arch/arm64/boot/dts/freescale/imx8mm-compulab-iot-gate.dts
+>> new file mode 100644
+>> index 000000000000..678a9022549f
+>> --- /dev/null
+>> +++ b/arch/arm64/boot/dts/freescale/imx8mm-compulab-iot-gate.dts
+>> @@ -0,0 +1,315 @@
+>> +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+>> +/*
+>> + * Copyright 2018 Compulab
+>> + */
+>> +
+>> +/dts-v1/;
+>> +
+>> +#include "imx8mm-compulab-ucm.dtsi"
+>> +
+>> +/ {
+>> +	model = "CompuLab IOT-GATE-iMX8 board";
+>> +	compatible = "compulab,iot-gate-imx8", "compulab,imx8mm-ucm-som", "fsl,imx8mm";
+>> +
+>> +	regulator-usbhub-ena {
+>> +		compatible = "regulator-fixed";
+>> +		regulator-name = "usbhub_ena";
+>> +		regulator-min-microvolt = <3300000>;
+>> +		regulator-max-microvolt = <3300000>;
+>> +		gpio = <&gpio4 28 GPIO_ACTIVE_HIGH>;
+>> +		regulator-always-on;
+>> +		enable-active-high;
+>> +	};
+>> +
+>> +	regulator-usbhub-rst {
+>> +		compatible = "regulator-fixed";
+>> +		regulator-name = "usbhub_rst";
+>> +		regulator-min-microvolt = <3300000>;
+>> +		regulator-max-microvolt = <3300000>;
+>> +		gpio = <&gpio3 24 GPIO_ACTIVE_HIGH>;
+>> +		regulator-always-on;
+>> +		enable-active-high;
+>> +	};
+>> +
+>> +	regulator-uart1-mode {
+>> +		compatible = "regulator-fixed";
+>> +		regulator-name = "uart1_mode";
+>> +		regulator-min-microvolt = <3300000>;
+>> +		regulator-max-microvolt = <3300000>;
+>> +		gpio = <&gpio4 26 GPIO_ACTIVE_HIGH>;
+>> +		enable-active-high;
+>> +		regulator-always-on;
+>> +	};
+>> +
+>> +	regulator-uart1-duplex {
+>> +		compatible = "regulator-fixed";
+>> +		regulator-name = "uart1_duplex";
+>> +		regulator-min-microvolt = <3300000>;
+>> +		regulator-max-microvolt = <3300000>;
+>> +		gpio = <&gpio4 27 GPIO_ACTIVE_HIGH>;
+>> +		regulator-always-on;
+>> +		enable-active-high;
+>> +	};
+>> +
+>> +	regulator-uart1-shdn {
+>> +		compatible = "regulator-fixed";
+>> +		regulator-name = "uart1_shdn";
+>> +		regulator-min-microvolt = <3300000>;
+>> +		regulator-max-microvolt = <3300000>;
+>> +		gpio = <&gpio5 5 GPIO_ACTIVE_HIGH>;
+>> +		regulator-always-on;
+>> +		enable-active-high;
+>> +	};
+>> +
+>> +	regulator-uart1-trmen {
+>> +		compatible = "regulator-fixed";
+>> +		regulator-name = "uart1_trmen";
+>> +		regulator-min-microvolt = <3300000>;
+>> +		regulator-max-microvolt = <3300000>;
+>> +		gpio = <&gpio4 25 GPIO_ACTIVE_LOW>;
+>> +		regulator-always-on;
+>> +		enable-active-low;
+>> +	};
+>> +
+>> +	regulator-usdhc2_v {
+> 
+> No underscores in node names. Fix it everywhere.
+> 
+>> +		compatible = "regulator-fixed";
+>> +		regulator-name = "usdhc2_v";
+>> +		regulator-min-microvolt = <3300000>;
+>> +		regulator-max-microvolt = <3300000>;
+>> +		gpio = <&gpio1 4 GPIO_ACTIVE_HIGH>;
+>> +		regulator-always-on;
+>> +		enable-active-high;
+>> +	};
+>> +
+>> +	reg_usdhc2_rst: regulator-usdhc2_rst {
+>> +		compatible = "regulator-fixed";
+>> +		pinctrl-names = "default";
+>> +		pinctrl-0 = <&pinctrl_reg_usdhc2_rst>;
+>> +		regulator-name = "usdhc2_rst";
+>> +		regulator-min-microvolt = <3300000>;
+>> +		regulator-max-microvolt = <3300000>;
+>> +		gpio = <&gpio2 19 GPIO_ACTIVE_HIGH>;
+>> +		startup-delay-us = <100>;
+>> +		off-on-delay-us = <12000>;
+>> +		enable-active-high;
+>> +	};
+>> +
+>> +	regulator-mpcie2_rst {
+>> +		compatible = "regulator-fixed";
+>> +		regulator-name = "mpcie2_rst";
+>> +		regulator-min-microvolt = <3300000>;
+>> +		regulator-max-microvolt = <3300000>;
+>> +		gpio = <&gpio3 22 GPIO_ACTIVE_HIGH>;
+>> +		regulator-always-on;
+>> +		enable-active-high;
+>> +	};
+>> +
+>> +	regulator-mpcie2lora_dis {
+>> +		compatible = "regulator-fixed";
+>> +		regulator-name = "mpcie2lora_dis";
+>> +		regulator-min-microvolt = <3300000>;
+>> +		regulator-max-microvolt = <3300000>;
+>> +		gpio = <&gpio3 21 GPIO_ACTIVE_HIGH>;
+>> +		regulator-always-on;
+>> +		enable-active-high;
+>> +	};
+>> +
+>> +	pcie0_refclk: pcie0-refclk {
+>> +		compatible = "fixed-clock";
+>> +		#clock-cells = <0>;
+>> +		clock-frequency = <100000000>;
+>> +	};
+>> +};
+>> +
+>> +&ethphy0 {
+>> +	status = "okay";
+>> +};
+>> +
+>> +&fec1 {
+>> +	status = "okay";
+>> +};
+>> +
+>> +&uart1 {
+>> +	pinctrl-names = "default";
+>> +	pinctrl-0 = <&pinctrl_uart1 &pinctrl_uart1_gpio>;
+>> +	assigned-clocks = <&clk IMX8MM_CLK_UART1>;
+>> +	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
+>> +	linux,rs485-enabled-at-boot-time;
+>> +	rts-gpios = <&gpio4 24 GPIO_ACTIVE_LOW>;
+>> +	status = "okay";
+>> +};
+>> +
+>> +&uart4 {
+>> +	status = "disabled";
+>> +};
+>> +
+>> +&i2c1 {
+>> +	clock-frequency = <100000>;
+>> +	pinctrl-names = "default";
+>> +	pinctrl-0 = <&pinctrl_i2c1>;
+>> +	status = "okay";
+>> +
+>> +	eeprom@54 {
+>> +		compatible = "atmel,24c08";
+>> +		reg = <0x54>;
+>> +		pagesize = <16>;
+>> +	};
+>> +};
+>> +
+>> +&ecspi1 {
+>> +	#address-cells = <1>;
+>> +	#size-cells = <0>;
+>> +	fsl,spi-num-chipselects = <1>;
+>> +	pinctrl-names = "default";
+>> +	pinctrl-0 = <&pinctrl_ecspi1 &pinctrl_ecspi1_cs>;
+>> +	cs-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
+>> +	status = "okay";
+>> +};
+>> +
+>> +&usbotg1 {
+>> +	dr_mode = "host";
+>> +	disable-over-current;
+>> +	status = "okay";
+>> +};
+>> +
+>> +&usbotg2 {
+>> +	dr_mode = "host";
+>> +	disable-over-current;
+>> +	status = "okay";
+>> +
+>> +	#address-cells = <1>;
+>> +	#size-cells = <0>;
+>> +
+>> +	usb9514@1 {
+> 
+> Node names should be generic.
+> https://devicetree-specification.readthedocs.io/en/latest/chapter2-devicetree-basics.html#generic-names-recommendation
+> 
+>> +		compatible = "usb424,9514";
+>> +		pinctrl-names = "default";
+>> +		pinctrl-0 = <&pinctrl_usb9514>;
+>> +		reg = <1>;
+> 
+> reg is always after compatible.
+> 
+>> +		#address-cells = <1>;
+>> +		#size-cells = <0>;
+>> +
+>> +		ethernet: usbether@1 {
+>> +			compatible = "usb424,ec00";
+>> +			reg = <1>;
+>> +		};
+>> +	};
+>> +};
+>> +
+>> +&usdhc1 {
+>> +	status = "disabled";
+>> +};
+>> +
+>> +&usdhc2 {
+>> +	pinctrl-names = "default";
+>> +	pinctrl-0 = <&pinctrl_usdhc2>;
+>> +	bus-width = <4>;
+>> +	mmc-ddr-1_8v;
+>> +	non-removable;
+>> +	vmmc-supply = <&reg_usdhc2_rst>;
+>> +	status = "okay";
+>> +};
+>> +
+>> +&pcie0 {
+>> +	pinctrl-names = "default";
+>> +	pinctrl-0 = <&pinctrl_pcie0>;
+>> +	reset-gpio = <&gpio3 20 GPIO_ACTIVE_LOW>;
+>> +	clocks = <&clk IMX8MM_CLK_PCIE1_ROOT>,
+>> +		 <&clk IMX8MM_CLK_PCIE1_AUX>,
+>> +		 <&clk IMX8MM_CLK_PCIE1_PHY>,
+>> +		 <&pcie0_refclk>;
+>> +	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
+>> +	assigned-clocks = <&clk IMX8MM_CLK_PCIE1_AUX>,
+>> +			  <&clk IMX8MM_CLK_PCIE1_PHY>,
+>> +			  <&clk IMX8MM_CLK_PCIE1_CTRL>;
+>> +	assigned-clock-rates = <10000000>, <100000000>, <250000000>;
+>> +	assigned-clock-parents = <&clk IMX8MM_SYS_PLL2_50M>,
+>> +				 <&clk IMX8MM_SYS_PLL2_100M>,
+>> +				 <&clk IMX8MM_SYS_PLL2_250M>;
+>> +	ext_osc = <1>;
+>> +	status = "disabled";
+>> +};
+>> +
+>> +&iomuxc {
+>> +	pinctrl-names = "default";
+>> +	pinctrl-0 = <&pinctrl_hog_sb_iotgimx8>;
+>> +
+>> +	sb-iotgimx8 {
+>> +		pinctrl_hog_sb_iotgimx8: hoggrp_sb-iotgimx8 {
+> 
+> Does not look like you tested the DTS against bindings. Please run `make
+> dtbs_check` (see Documentation/devicetree/bindings/writing-schema.rst
+> for instructions).
+> 
+>> +			fsl,pins = <
+>> +				/* mPCIe2 */
+>> +				MX8MM_IOMUXC_SAI5_RXD0_GPIO3_IO21	0x140 /* LORA_DISABLE */
+>> +				MX8MM_IOMUXC_SAI5_RXD1_GPIO3_IO22	0x140 /* PERSTn */
+>> +			>;
+>> +		};
+>> +
+>> +		pinctrl_uart1: uart1grp {
+>> +			fsl,pins = <
+>> +				MX8MM_IOMUXC_SAI2_RXC_UART1_DCE_RX	0x140
+>> +				MX8MM_IOMUXC_SAI2_RXFS_UART1_DCE_TX	0x140
+>> +				MX8MM_IOMUXC_SAI2_TXFS_GPIO4_IO24	0x140 /* RTS */
+>> +				MX8MM_IOMUXC_SAI2_RXD0_UART1_DCE_RTS_B	0x140 /* CTS */
+>> +			>;
+>> +		};
+>> +
+>> +		pinctrl_uart1_gpio: uart1gpiogrp {
+>> +			fsl,pins = <
+>> +				MX8MM_IOMUXC_SAI2_TXD0_GPIO4_IO26	0x000 /* RS_485_232_SEL */
+>> +				MX8MM_IOMUXC_SAI2_MCLK_GPIO4_IO27	0x140 /* RS_485_H/F_SEL */
+>> +				MX8MM_IOMUXC_SPDIF_EXT_CLK_GPIO5_IO5	0x140 /* SHDN */
+>> +				MX8MM_IOMUXC_SAI2_TXC_GPIO4_IO25	0x140 /* RS_485_TRMEN */
+>> +			>;
+>> +		};
+>> +
+>> +		pinctrl_i2c1: i2c1grp {
+>> +			fsl,pins = <
+>> +				MX8MM_IOMUXC_I2C1_SCL_I2C1_SCL		0x400001c3
+>> +				MX8MM_IOMUXC_I2C1_SDA_I2C1_SDA		0x400001c3
+>> +			>;
+>> +		};
+>> +
+>> +		pinctrl_ecspi1: ecspi1grp {
+>> +			fsl,pins = <
+>> +				MX8MM_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK	0x82
+>> +				MX8MM_IOMUXC_ECSPI1_MOSI_ECSPI1_MOSI	0x82
+>> +				MX8MM_IOMUXC_ECSPI1_MISO_ECSPI1_MISO	0x82
+>> +			>;
+>> +		};
+>> +
+>> +		pinctrl_ecspi1_cs: ecspi1cs {
+> 
+> Does not look like you tested the DTS against bindings. Please run `make
+> dtbs_check` (see Documentation/devicetree/bindings/writing-schema.rst
+> for instructions).
+> 
+> I guess you did not test it at all.
+> 
+>> +			fsl,pins = <
+>> +				MX8MM_IOMUXC_ECSPI1_SS0_GPIO5_IO9	0x40000
+>> +			>;
+>> +		};
+>> +
+>> +		pinctrl_usb9514: usb9514grp {
+>> +			fsl,pins = <
+>> +				MX8MM_IOMUXC_SAI3_RXFS_GPIO4_IO28	0x140 /* USB_PS_EN */
+>> +				MX8MM_IOMUXC_SAI5_RXD3_GPIO3_IO24	0x140 /* HUB_RSTn */
+>> +			>;
+>> +		};
+>> +
+>> +		pinctrl_usdhc2: usdhc2grp {
+>> +			fsl,pins = <
+>> +				MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x190
+>> +				MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD		0x1d0
+>> +				MX8MM_IOMUXC_SD2_DATA0_USDHC2_DATA0	0x1d0
+>> +				MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1	0x1d0
+>> +				MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2	0x1d0
+>> +				MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3	0x1d0
+>> +				MX8MM_IOMUXC_GPIO1_IO04_GPIO1_IO4	0x1d0 /* SD2_VSEL */
+>> +			>;
+>> +		};
+>> +
+>> +		pinctrl_reg_usdhc2_rst: usdhc2rst {
+>> +			fsl,pins = <
+>> +				MX8MM_IOMUXC_SD2_RESET_B_GPIO2_IO19	0x41  /* EMMC_RST */
+>> +			>;
+>> +		};
+>> +
+>> +		pinctrl_pcie0: pcie0grp {
+>> +			fsl,pins = <
+>> +				MX8MM_IOMUXC_SAI5_RXC_GPIO3_IO20	0x140
+>> +			>;
+>> +		};
+>> +	};
+>> +};
+>> diff --git a/arch/arm64/boot/dts/freescale/imx8mm-compulab-ucm.dtsi b/arch/arm64/boot/dts/freescale/imx8mm-compulab-ucm.dtsi
+>> new file mode 100644
+>> index 000000000000..d6cdf833744e
+>> --- /dev/null
+>> +++ b/arch/arm64/boot/dts/freescale/imx8mm-compulab-ucm.dtsi
+>> @@ -0,0 +1,532 @@
+>> +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+>> +/*
+>> + * Copyright 2018 Compulab
+>> + */
+>> +
+>> +#include "imx8mm.dtsi"
+>> +
+>> +/ {
+>> +	model = "Compulab i.MX8M-Mini UCM SoM";
+>> +	compatible = "compulab,imx8mm-ucm-som", "fsl,imx8mm";
+>> +
+>> +	aliases {
+>> +		rtc0 = &rtc0;
+>> +		rtc1 = &snvs_rtc;
+>> +	};
+>> +
+>> +	leds {
+>> +		compatible = "gpio-leds";
+>> +		pinctrl-names = "default";
+>> +		pinctrl-0 = <&pinctrl_gpio_led>;
+>> +
+>> +		heartbeat-led {
+>> +			label = "Heartbeat";
+>> +			gpios = <&gpio1 12 GPIO_ACTIVE_LOW>;
+>> +			linux,default-trigger = "heartbeat";
+>> +		};
+>> +	};
+>> +
+>> +	pmic_osc: clock-pmic {
+>> +		compatible = "fixed-clock";
+>> +		#clock-cells = <0>;
+>> +		clock-frequency = <32768>;
+>> +		clock-output-names = "pmic_osc";
+>> +	};
+>> +
+>> +	reg_ethphy: regulator-ethphy {
+>> +		compatible = "regulator-fixed";
+>> +		enable-active-high;
+>> +		gpio = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+>> +		pinctrl-names = "default";
+>> +		pinctrl-0 = <&pinctrl_reg_eth>;
+>> +		regulator-always-on;
+>> +		regulator-boot-on;
+>> +		regulator-min-microvolt = <3300000>;
+>> +		regulator-max-microvolt = <3300000>;
+>> +		regulator-name = "On-module +V3.3_ETH";
+>> +		startup-delay-us = <500>;
+>> +	};
+>> +
+>> +	reg_usdhc3_vmmc: regulator-usdhc3-vmmc {
+>> +		compatible = "regulator-fixed";
+>> +		enable-active-high;
+>> +		gpio = <&gpio3 16 GPIO_ACTIVE_HIGH>;
+>> +		pinctrl-names = "default";
+>> +		pinctrl-0 = <&pinctrl_reg_usdhc3>;
+>> +		regulator-always-on;
+>> +		regulator-min-microvolt = <3300000>;
+>> +		regulator-max-microvolt = <3300000>;
+>> +		regulator-name = "On-module +V3.3_USDHC";
+>> +	};
+>> +
+>> +	usdhc1_pwrseq: usdhc1_pwrseq {
+>> +		compatible = "mmc-pwrseq-simple";
+>> +		reset-gpios = <&gpio2 10 GPIO_ACTIVE_LOW>;
+>> +	};
+>> +};
+>> +
+>> +&fec1 {
+>> +	fsl,magic-packet;
+>> +	fsl,rgmii_rxc_dly;
+>> +	phy-handle = <&ethphy0>;
+>> +	phy-mode = "rgmii-id";
+>> +	phy-supply = <&reg_ethphy>;
+>> +	pinctrl-names = "default";
+>> +	pinctrl-0 = <&pinctrl_fec1>;
+>> +
+>> +	mdio {
+>> +		#address-cells = <1>;
+>> +		#size-cells = <0>;
+>> +
+>> +		ethphy0: ethernet-phy@0 {
+>> +			compatible = "ethernet-phy-ieee802.3-c22";
+>> +			micrel,led-mode = <0>;
+>> +			reg = <0>;
+>> +		};
+>> +	};
+>> +};
+>> +
+>> +&i2c2 {
+>> +	clock-frequency = <400000>;
+>> +	pinctrl-names = "default";
+>> +	pinctrl-0 = <&pinctrl_i2c2>;
+>> +	status = "okay";
+>> +
+>> +	rtc0: rtc@69 {
+>> +		compatible = "abracon,ab1805";
+>> +		reg = <0x69>;
+>> +	};
+>> +
+>> +	pmic: bd71837@4b {
+> 
+> Node names should be generic.
+> https://devicetree-specification.readthedocs.io/en/latest/chapter2-devicetree-basics.html#generic-names-recommendation
+> 
+> 
+> 
+> Best regards,
+> Krzysztof
+> 
 
