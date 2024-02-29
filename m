@@ -1,147 +1,114 @@
-Return-Path: <netdev+bounces-76251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0C9C86D026
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:08:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36F7186D02C
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:10:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 610541F215AE
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:08:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E37E628169A
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:10:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F154AED4;
-	Thu, 29 Feb 2024 17:07:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D1654AECD;
+	Thu, 29 Feb 2024 17:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oGT4IUcx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aJTXaBEs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE8E3839D
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 17:07:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B667516063B;
+	Thu, 29 Feb 2024 17:10:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709226473; cv=none; b=OVXW5rZ1Q7L8T12vlL2kPch7MBPhsL68KS991G4IFo3Q88BesVNdU91fGkW9f2jIAIW9mIa739xtZWOhWqLbLCYxlKku361K78n+N/fhWmaalRp0SymLPJjfFduOq+z9JPdgDyjKeHBcNuj035TthI+Lb0CzqN/86Oznvg12oHs=
+	t=1709226610; cv=none; b=UyLYQhk6c/qKxYKbGPghpnUfqwR4MktydJ4PQrkRHwymN0Py1W2jD21EUPtTmdUCl+FiB/PCV+62x+WpyDKIeic1BIUWk6ARWO7EtzIw2cuVUEuH7NOtyOZsCJ9tXI0XLn/+l8/yaeYosPvoiSoVVNz45cqqQesgq/2js3vGYJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709226473; c=relaxed/simple;
-	bh=amo0eNZtd9oU8O56/+6pIemgnDn7UMyF4LASrdgemWY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jNZZVmkDbJvWnnyuKLbv51rNGnXtBxqKYCqU+qvAO3PWdqKJIg074LYYQITP5dNFXnSJQ6ksUWHyoOgn06KMWPbj3wfrQioniG5K1fsOqQs5eNTOmT7/rf9Pryevx5FuSJM4OX9m41z4GqpgsB7lvWqcyDgtSgljo9hkCsESjO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oGT4IUcx; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-565223fd7d9so12090a12.1
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 09:07:51 -0800 (PST)
+	s=arc-20240116; t=1709226610; c=relaxed/simple;
+	bh=lyakl89C4211ReYTZ5XokugSj8rK3f4KAtClldOWu2w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SG7YaDJSxBCNDBoQrXBkcxMu/7U1AMc7qNLsOHffFdefhR3+69ur8/jlry+JesX0Hqeo6CLupaIQri6Z6KdxqFKUbHIjQV/IWaBiiX83WeIxOc1HJcoIWXQLEj4ScLzjFqopmJaaLAucGApZWxfWaHvWAnGeLnN+xwqEUhY7TDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aJTXaBEs; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6e56787e691so1479782b3a.0;
+        Thu, 29 Feb 2024 09:10:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709226470; x=1709831270; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=amo0eNZtd9oU8O56/+6pIemgnDn7UMyF4LASrdgemWY=;
-        b=oGT4IUcxCY0Qbkn5onrXbU2sUUOaNSKb9T76wH1SVAQAIiAwAS5NCLpCsKNmHhoNng
-         kVUsVHdUQ7iZDEj/JKarv/lsnPZdI3+9+99zC843Z2lrkbg/jr6AqzS11xDnGEBEPAPg
-         /5WYJIgI9PDT0IAvalRMaAmv0ulcHjbWblY6XQ7nlvU4tovHBd2Qj3v8WrHMD6Yd03IC
-         sb2UqGeUcW3dZO9kMkYedTygeenLBiWeIXMHgr1ZCvxD0hZusFIVkLm8lqoCMoLijc7E
-         MLQl0xOyfY2pxs1FFEEuKqJdItlSS90PRZMKg9Z7j5Nt4vSotD9sS//qjowqPc+/y25M
-         jzzQ==
+        d=gmail.com; s=20230601; t=1709226606; x=1709831406; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KeXgPmvZXuniNDAjs4HWs8wx0nhjzT0QjkektUHwCqk=;
+        b=aJTXaBEs6mbsiZ16zSUnU3tMXQ7mq/gZH9thonK6a/sYDluARU58RAtsyhOWQy/ZjG
+         nPFMQbka+ZB2/VKTGi2INXLptoQdXYyaeJXx6TTGsv63+4ddXg5CXlt9H6qSJLJ7VeiI
+         a4FZSAYz6IVOKN6yiz2cy4yoJwIeRab+wFhLV5uf1im6941gQhz5oXdZLij/6K403/Xl
+         /CnTtRaamO65IaVq7vl3o6vHz+ButtqZF6a4uXPD1ZlP27Z927xC0E/qMy8N4bJAvKPJ
+         g7h9aTDBZRDXJ8vZP9LUqVjkmw8YRXayq3pR27+bEnMGK9bwNJNTmeAl8uXRIP+t3fRI
+         ntoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709226470; x=1709831270;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=amo0eNZtd9oU8O56/+6pIemgnDn7UMyF4LASrdgemWY=;
-        b=mwb22Fjg6ns/zpEr3CCsGnQvQy4IO2BYfJtA4gdEVg/DyRtWJ1D+GU0PcvgjDVkCYG
-         YyRWsUUa1ECDv5NPxQyen3qRysHbRbOCETE00C2A4g9J7WH+C5b+VeLp8HwRr4fi6J/r
-         txQ6tQ/X749OcG9fpQZtpVYDTIfiO+FvSGSnA4HaFzug7fHyzL43pXahsR3T03mH+IU1
-         SQx6/VA+vq+Jlh5XUati/y12rm34pkfqVx1A3GIUTwT5PMhJ8mV6rMHFdlLD/oK4TdwQ
-         C450uh2VQrD2nX7TZrnrDt4dM4IU53+I5pR0VJ8L1tGESybwM9wr+UHsoqHqzlloJjAo
-         mdCg==
-X-Forwarded-Encrypted: i=1; AJvYcCUTvxO3I3xndUb0QMQfG7tgMwN7ZugL0yK1BT2cV7LIa0nT4mAKcL83ZDTIxxDlxKifk1AqRHRbEhBQIH4dodLRlDgCejwJ
-X-Gm-Message-State: AOJu0YyTfyevhVxj3B5KhTDZk2lT1n/5GXHbWdUEmNagCXhddfczxERp
-	3I+/c7RotlEYDfl4BNowXXC4QAkNptZoPPJRSgRStDhQw7YTH7OZnY2iLKzJKQ9aXY1XGshL3K4
-	fyQ5lEt/VF2pj9f2lgTIbFQw/MlEQ5bcN0vVZ
-X-Google-Smtp-Source: AGHT+IGjUaP2d8ryvQOL7I76Mhftue8l+Y6MKjxFwnbwPjrjVcWt+iNF8KdMk94wH9VJ9YPUvWsAk5cy4qw6oSF5Y4s=
-X-Received: by 2002:a05:6402:2227:b0:561:a93:49af with SMTP id
- cr7-20020a056402222700b005610a9349afmr120493edb.7.1709226469560; Thu, 29 Feb
- 2024 09:07:49 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709226606; x=1709831406;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KeXgPmvZXuniNDAjs4HWs8wx0nhjzT0QjkektUHwCqk=;
+        b=s2iHv0ojCPveR1v+OTK87tRNq0xQt8Sv3t20UJYLcnnFrogfolvsMMIjmK9dMayZ3v
+         swMfb/Dt4mxWWcs3OJzfJYUrC9w9B7yd43LuD0HGE3hathTkO9c5rUhghpl2X9IhIJkj
+         OnC0alhG0nJA7Oct++esn+ULfPYr874ebxgKeTE/6goPTlI09O8RpqUSRopKkooYVXRd
+         rsUvpoMWHjK/bjZciIE5ND2YCFtoEfq2JWs81aOX4Yh6PRwwOFFh/drokeAm0j7bbFSK
+         G+36Vrm2Fzgg7XuOGVmnqkgqw/i0UXp1yLj5rHYgeXDKUqzcrarpxjJUYScwpI1TyUwb
+         QwGw==
+X-Forwarded-Encrypted: i=1; AJvYcCXzOD8N7VjJup5qKvwfm/ToMBGVRHF3BLkgsETdsKbDpgyCYvsj9oCXqMuYvEWDsHhtwP/+4ShDlyR21COvME+k/rnhCyVY8nkDffg7SH5bv3GI
+X-Gm-Message-State: AOJu0YxDUOfFUxPH08g8mQ6NtvVTyeZEysdpVDE6nNipGQynKfVCkSFx
+	opixjKSWdMFkM9MIET5HVE9UpiYMlAWRTCVyiiXz6NGHfPeoyG6m
+X-Google-Smtp-Source: AGHT+IHN5/R3DRf6VckUiAohPv6m9KoSzQFQqev3/paWyl0X+7k3iovLJ1iXHZ6zTqExjueR0pRmGA==
+X-Received: by 2002:a05:6a20:3b9c:b0:1a0:8897:85f1 with SMTP id b28-20020a056a203b9c00b001a0889785f1mr2688235pzh.6.1709226605875;
+        Thu, 29 Feb 2024 09:10:05 -0800 (PST)
+Received: from KERNELXING-MB0.tencent.com ([114.253.33.234])
+        by smtp.gmail.com with ESMTPSA id b76-20020a63344f000000b005dc4829d0e1sm1558808pga.85.2024.02.29.09.10.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Feb 2024 09:10:05 -0800 (PST)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: edumazet@google.com,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	rostedt@goodmis.org
+Cc: netdev@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next 0/2] add two missing addresses when using trace
+Date: Fri,  1 Mar 2024 01:09:54 +0800
+Message-Id: <20240229170956.87290-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANn89iJoHDzfYfhcwVvR4m7DiVG-UfFNqm+D1WD-2wjOttk6ew@mail.gmail.com>
- <20240227062833.7404-1-shijie@os.amperecomputing.com> <CANn89iL2a2534d8QU9Xt6Gjm8M1+wWH03+YPdjSPQCq_Q4ZGxw@mail.gmail.com>
- <018b5652-8006-471d-94d0-d230e4aeef6d@amperemail.onmicrosoft.com> <b7825865-c368-1b72-3751-f1928443db32@linux.com>
-In-Reply-To: <b7825865-c368-1b72-3751-f1928443db32@linux.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 29 Feb 2024 18:07:36 +0100
-Message-ID: <CANn89iJpZ6udACMC9EF=zgYJU5rqLFiTuYJRf1UNA3UKu7CxJg@mail.gmail.com>
-Subject: Re: [PATCH v2] net: skbuff: set FLAG_SKB_NO_MERGE for skbuff_fclone_cache
-To: "Christoph Lameter (Ampere)" <cl@linux.com>
-Cc: Shijie Huang <shijie@amperemail.onmicrosoft.com>, 
-	Huang Shijie <shijie@os.amperecomputing.com>, kuba@kernel.org, 
-	patches@amperecomputing.com, davem@davemloft.net, horms@kernel.org, 
-	ast@kernel.org, dhowells@redhat.com, linyunsheng@huawei.com, 
-	aleksander.lobakin@intel.com, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, cl@os.amperecomputing.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 29, 2024 at 6:01=E2=80=AFPM Christoph Lameter (Ampere) <cl@linu=
-x.com> wrote:
->
-> On Wed, 28 Feb 2024, Shijie Huang wrote:
->
-> >>
-> >> Using SLAB_NO_MERGE does not help, I am still seeing wrong allocations
-> >> on a dual socket
-> >> host with plenty of available memory.
-> >> (either sk_buff or skb->head being allocated on the other node).
-> >
-> > Do you mean you still can see the wrong fclone after using SLAB_NO_MERG=
-E?
-> >
-> > If so, I guess there is bug in the slub.
->
-> Mergin has nothing to do with memory locality.
->
-> >> fclones might be allocated from a cpu running on node A, and freed
-> >> from a cpu running on node B.
-> >> Maybe SLUB is not properly handling this case ?
-> >
-> > Maybe.
->
-> Basic functionality is broken??? Really?
+From: Jason Xing <kernelxing@tencent.com>
 
-It seems so.
+When I reviewed other people's patch [1], I noticed that similar thing
+also happens in tcp_event_skb class and tcp_event_sk_skb class. They
+don't print those two addrs of skb/sk which already exist.
 
->
-> >> I think we need help from mm/slub experts, instead of trying to 'fix'
-> >> networking stacks.
-> >
-> > @Christopher
-> >
-> > Any idea about this?
->
->
-> If you want to force a local allocation then use GFP_THISNODE as a flag.
->
-> If you do not specify a node or GFP_THISNODE then the slub allocator will
-> opportunistically allocate sporadically from other nodes to avoid
-> fragmentation of slabs. The page allocator also will sporadically go off
-> node in order to avoid reclaim. The page allocator may go off node
-> extensively if there is a imbalance of allocation between node. The page
-> allocator has knobs to tune off node vs reclaim options. Doing more
-> reclaim will slow things down but give you local data.
+They are probably forgotten by the original authors, so this time I
+finish the work. Also, adding more trace about the socket/skb addr can
+help us sometime even though the chance is minor.
 
-Maybe, maybe not.
+I don't consider it is a bug, thus I chose to target net-next tree.
 
-Going back to CONFIG_SLAB=3Dy removes all mismatches, without having to
-use GFP_THISNODE at all,
-on hosts with plenty of available memory on all nodes.
+[1]
+Link: https://lore.kernel.org/netdev/CAL+tcoAhvFhXdr1WQU8mv_6ZX5nOoNpbOLAB6=C+DB-qXQ11Ew@mail.gmail.com/
 
-I think that is some kind of evidence that something is broken in SLUB land=
-.
+Jason Xing (2):
+  tcp: add tracing of skb/skaddr in tcp_event_sk_skb class
+  tcp: add tracing of skbaddr in tcp_event_skb class
+
+ include/trace/events/tcp.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+-- 
+2.37.3
+
 
