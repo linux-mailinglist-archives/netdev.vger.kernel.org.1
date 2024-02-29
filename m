@@ -1,441 +1,111 @@
-Return-Path: <netdev+bounces-76191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D96D786CB37
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 15:16:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E42F286CB4E
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 15:19:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08FCE1C21115
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 14:16:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 177511C20D18
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 14:19:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBEC7137745;
-	Thu, 29 Feb 2024 14:16:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 802321361B0;
+	Thu, 29 Feb 2024 14:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="e/zsT4nJ"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="WW+ahL4I"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0858F12C53A;
-	Thu, 29 Feb 2024 14:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE471350EC
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 14:18:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709216177; cv=none; b=EdLc8XN+KtepOHtp4/EWnhmiaVzFETcjXWNA2PYp3qAIcNFDLwpXyDrbQUELIQKEbrZ0jXiR5SUOXpoefTh5BFdLuPLJ1aMzHBb7CU67auCLIxE1JHvB3cZNQg6AxgF8BsE+n9e5zri1CYsv+fKneW4k3BAHpX+DLDA/NEulP+A=
+	t=1709216326; cv=none; b=McBYyrbm38bkYsjyJQ1feZitzxHMX3s+MamE3W9YH6hzXzd+mf/uq984Zy9tW3vJ1r+QwckoTeXhi/3n2ANOoVIgTu159kJVINseL5MJ7FB9WEaGkxocU4exY7IAonMy/KtNhyUS1shm0mkOaE3kauTrrnDaGqSEdWC0cCbXPJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709216177; c=relaxed/simple;
-	bh=W2gdnrXjuUChVznYr4WSWLCNTMqCbNot/f2IWsy4Gu0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gqKEToT5v7mMWjhsPVS5RzfubaEYoiHckpSUquIEUO6NtmlwOcaiZN2BHnPCBG6vw80Wm7ZiuK6E60IrjRS0PguHip8VF40g7l5QQM4CdEtaZh1ZjDt9usCAFAAQKcan9DOjAHUs6+IBFgF3gWEZr471f6h7EpDiCSe/hC7W+DI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=e/zsT4nJ; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPA id BEDD34000A;
-	Thu, 29 Feb 2024 14:16:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709216173;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+8ok8TG0kJuE8iBu8qNACBQYbQ3c7LdJVkKbhlZMtoA=;
-	b=e/zsT4nJuDpmvhqZpFnM2wGO+FvRTQNut1KFFCLZfwV8slgaTIXi3TbfWXS6GdEs3HglA4
-	oBsMaZBZEnyP/Rajv6poTS6FlX3AtCPigAkuG4H3iq/SsYR49cs678lJ3KMzF4bb9oS09K
-	QN+ea+N/ARlsRVNTfHXjYW+1SPGVEccbB47m2SXkWzhnULVnuWFNPjVc88dE5YBVVsBbNc
-	Srm8L01+GMGtOw3JasmfiLfTxRXpX1IR0AOlzyT7AXv3MMgE4E0C78O1i5uVKq09j0pVvN
-	9kA/VbcJ2RVey3XPfH0IukgkfO59gMM9pGQEC7Hh3USsaBytM0EKBZBrvmgF9Q==
-From: Herve Codina <herve.codina@bootlin.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Mark Brown <broonie@kernel.org>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: [PATCH v5 5/5] net: wan: fsl_qmc_hdlc: Add framer support
-Date: Thu, 29 Feb 2024 15:15:53 +0100
-Message-ID: <20240229141554.836867-6-herve.codina@bootlin.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240229141554.836867-1-herve.codina@bootlin.com>
-References: <20240229141554.836867-1-herve.codina@bootlin.com>
+	s=arc-20240116; t=1709216326; c=relaxed/simple;
+	bh=BpAV1h7vAElCeSAMfDCr5+w4VE6qrWqEnQwLWE0fDlU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HMpwe615bpXeLbyInimj4pcscnT45rHW/mRHbsbtd/bOcdZE3eQz0HTIbFyRC1K/C8q8as9RL5YQ0ieku2EWodHn7qcrCWzUPpZVFvNobKfFtqZVLON8350GUmCiHciYTK8O9doyA0lumN/mta3GEu9PmpnQFzt4fctqKEgaPkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=WW+ahL4I; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-412c2352f74so1982885e9.0
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 06:18:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709216323; x=1709821123; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8aaee8JFqOYnvrJG84IqHUBI+lXohaqSjazdLmgQKB8=;
+        b=WW+ahL4IH8GLXNmV4ZCgK8quy3KCBZTv1GOJHyTEmP7JkVEX7QKH11gmRSJGBVjm4V
+         V8Evop6Uk3dOpT7r6M2sAzOtAvXR4INzFs1w14bane2PVtLesgxnCRpzeyen9Kv08/wx
+         x/r2YF7i9qFOFjB8p8mts0foBphhdZKNS61cjN5QXjUhymL732PnS6roq3XNwQan4goO
+         TrA8IsSSWgi0liy/TiIsZoGbG2SleDhbcyr3UCat5W5TvpdwiXKgCpPt+IN1G/RNY3Oi
+         OGn7Q9EdUwSdLPBp1MX1tx5rB929rsAkk53egy928zewwS13J9gVkIMIoWjn48ok7BcQ
+         qurg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709216323; x=1709821123;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8aaee8JFqOYnvrJG84IqHUBI+lXohaqSjazdLmgQKB8=;
+        b=qA7p5AGzJCaLcbKiRgS8rINLAFPSGJDt4De7ovDMDAjhvXfr+8phg8P0D+om8Df1Rw
+         JJe5wyVzb+PoiYxgQ1k5AMC8RHZ/dBv+O4bJlCgGUjZYQXtmAFoHTBjGIq6KeEmkigMJ
+         /Dfqxx8guoM1W1k/1iplU9UqtKNncB0ofatwfg7uWXrU9bjGsuTda4O4zxBdKPEUa3oI
+         tjayUTw/kjJw5s3P2+ba5EvWA+VrswibFD8UwudOZykvX4BBdLBQ9RVmkd1CJ1eY0iKJ
+         OnkAH2wwFru/ANzgmg+ezbFrwBXuW+VbhtN7NTBdN9/zxNcqLgyahh48KVSulM2+Upqf
+         A8Ag==
+X-Forwarded-Encrypted: i=1; AJvYcCWZ0Ypyw4WhJnxo4E9ED/qhQ+Kly5g2qBkvM3Yc7DBCSolYP5NWkKgJzvRL7kMEwXNtfWzJKbZw617OjN4mvO00hc4KgWti
+X-Gm-Message-State: AOJu0YwUW4nPjK9sVZA5+goHErlzNo9RWRJ4Yp9Uk+ZKA6LXcBIpTFW3
+	pCCvfPZk3dqkuHO7513pfni6TtbdykUqnE97CTfWwJTdyQgxIv59Na5DnaW8zQE=
+X-Google-Smtp-Source: AGHT+IE7f37O3UCk+CZGUG3+ngXGyeKj8odD8yxHPGDPeUg8uafik3Fbx/aDSVyacE7BpicLkAY0Yw==
+X-Received: by 2002:a05:600c:190c:b0:412:b8cf:150b with SMTP id j12-20020a05600c190c00b00412b8cf150bmr1727204wmq.10.1709216323024;
+        Thu, 29 Feb 2024 06:18:43 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id jr18-20020a05600c561200b004127057d6b9sm5325317wmb.35.2024.02.29.06.18.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Feb 2024 06:18:42 -0800 (PST)
+Date: Thu, 29 Feb 2024 15:18:39 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@nvidia.com>, David Ahern <dsahern@kernel.org>,
+	netdev@vger.kernel.org, Florian Westphal <fw@strlen.de>,
+	eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next 0/6] inet: no longer use RTNL to protect
+ inet_dump_ifaddr()
+Message-ID: <ZeCSPyJ_5ARF35mw@nanopsycho>
+References: <20240229114016.2995906-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240229114016.2995906-1-edumazet@google.com>
 
-Add framer support in the fsl_qmc_hdlc driver in order to be able to
-signal carrier changes to the network stack based on the framer status
-Also use this framer to provide information related to the E1/T1 line
-interface on IF_GET_IFACE and configure the line interface according to
-IF_IFACE_{E1,T1} information.
+Thu, Feb 29, 2024 at 12:40:10PM CET, edumazet@google.com wrote:
+>This series convert inet so that a dump of addresses (ip -4 addr)
+>no longer requires RTNL.
+>
+>Eric Dumazet (6):
+>  inet: annotate data-races around ifa->ifa_tstamp and ifa->ifa_cstamp
+>  inet: annotate data-races around ifa->ifa_valid_lft
+>  inet: annotate data-races around ifa->ifa_preferred_lft
+>  inet: annotate data-races around ifa->ifa_flags
+>  inet: prepare inet_base_seq() to run without RTNL
+>  inet: use xa_array iterator to implement inet_dump_ifaddr()
+>
+> net/core/dev.c     |   5 +-
+> net/ipv4/devinet.c | 166 +++++++++++++++++++++------------------------
+> 2 files changed, 79 insertions(+), 92 deletions(-)
 
-Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
----
- drivers/net/wan/fsl_qmc_hdlc.c | 239 ++++++++++++++++++++++++++++++++-
- 1 file changed, 234 insertions(+), 5 deletions(-)
+Looks fine to me.
 
-diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hdlc.c
-index 80998ad89088..dd6b69a950c9 100644
---- a/drivers/net/wan/fsl_qmc_hdlc.c
-+++ b/drivers/net/wan/fsl_qmc_hdlc.c
-@@ -10,6 +10,7 @@
- #include <linux/cleanup.h>
- #include <linux/bitmap.h>
- #include <linux/dma-mapping.h>
-+#include <linux/framer/framer.h>
- #include <linux/hdlc.h>
- #include <linux/mod_devicetable.h>
- #include <linux/module.h>
-@@ -29,6 +30,9 @@ struct qmc_hdlc {
- 	struct device *dev;
- 	struct qmc_chan *qmc_chan;
- 	struct net_device *netdev;
-+	struct framer *framer;
-+	spinlock_t carrier_lock; /* Protect carrier detection */
-+	struct notifier_block nb;
- 	bool is_crc32;
- 	spinlock_t tx_lock; /* Protect tx descriptors */
- 	struct qmc_hdlc_desc tx_descs[8];
-@@ -42,6 +46,192 @@ static struct qmc_hdlc *netdev_to_qmc_hdlc(struct net_device *netdev)
- 	return dev_to_hdlc(netdev)->priv;
- }
- 
-+static int qmc_hdlc_framer_set_carrier(struct qmc_hdlc *qmc_hdlc)
-+{
-+	struct framer_status framer_status;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	guard(spinlock_irqsave)(&qmc_hdlc->carrier_lock);
-+
-+	ret = framer_get_status(qmc_hdlc->framer, &framer_status);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "get framer status failed (%d)\n", ret);
-+		return ret;
-+	}
-+	if (framer_status.link_is_on)
-+		netif_carrier_on(qmc_hdlc->netdev);
-+	else
-+		netif_carrier_off(qmc_hdlc->netdev);
-+
-+	return 0;
-+}
-+
-+static int qmc_hdlc_framer_notifier(struct notifier_block *nb, unsigned long action,
-+				    void *data)
-+{
-+	struct qmc_hdlc *qmc_hdlc = container_of(nb, struct qmc_hdlc, nb);
-+	int ret;
-+
-+	if (action != FRAMER_EVENT_STATUS)
-+		return NOTIFY_DONE;
-+
-+	ret = qmc_hdlc_framer_set_carrier(qmc_hdlc);
-+	return ret ? NOTIFY_DONE : NOTIFY_OK;
-+}
-+
-+static int qmc_hdlc_framer_start(struct qmc_hdlc *qmc_hdlc)
-+{
-+	struct framer_status framer_status;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_power_on(qmc_hdlc->framer);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer power-on failed (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	/* Be sure that get_status is supported */
-+	ret = framer_get_status(qmc_hdlc->framer, &framer_status);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "get framer status failed (%d)\n", ret);
-+		goto framer_power_off;
-+	}
-+
-+	qmc_hdlc->nb.notifier_call = qmc_hdlc_framer_notifier;
-+	ret = framer_notifier_register(qmc_hdlc->framer, &qmc_hdlc->nb);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer notifier register failed (%d)\n", ret);
-+		goto framer_power_off;
-+	}
-+
-+	return 0;
-+
-+framer_power_off:
-+	framer_power_off(qmc_hdlc->framer);
-+	return ret;
-+}
-+
-+static void qmc_hdlc_framer_stop(struct qmc_hdlc *qmc_hdlc)
-+{
-+	if (!qmc_hdlc->framer)
-+		return;
-+
-+	framer_notifier_unregister(qmc_hdlc->framer, &qmc_hdlc->nb);
-+	framer_power_off(qmc_hdlc->framer);
-+}
-+
-+static int qmc_hdlc_framer_set_iface(struct qmc_hdlc *qmc_hdlc, int if_iface,
-+				     const te1_settings *te1)
-+{
-+	struct framer_config config;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_get_config(qmc_hdlc->framer, &config);
-+	if (ret)
-+		return ret;
-+
-+	switch (if_iface) {
-+	case IF_IFACE_E1:
-+		config.iface = FRAMER_IFACE_E1;
-+		break;
-+	case IF_IFACE_T1:
-+		config.iface = FRAMER_IFACE_T1;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	switch (te1->clock_type) {
-+	case CLOCK_DEFAULT:
-+		/* Keep current value */
-+		break;
-+	case CLOCK_EXT:
-+		config.clock_type = FRAMER_CLOCK_EXT;
-+		break;
-+	case CLOCK_INT:
-+		config.clock_type = FRAMER_CLOCK_INT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	config.line_clock_rate = te1->clock_rate;
-+
-+	return framer_set_config(qmc_hdlc->framer, &config);
-+}
-+
-+static int qmc_hdlc_framer_get_iface(struct qmc_hdlc *qmc_hdlc, int *if_iface, te1_settings *te1)
-+{
-+	struct framer_config config;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer) {
-+		*if_iface = IF_IFACE_E1;
-+		return 0;
-+	}
-+
-+	ret = framer_get_config(qmc_hdlc->framer, &config);
-+	if (ret)
-+		return ret;
-+
-+	switch (config.iface) {
-+	case FRAMER_IFACE_E1:
-+		*if_iface = IF_IFACE_E1;
-+		break;
-+	case FRAMER_IFACE_T1:
-+		*if_iface = IF_IFACE_T1;
-+		break;
-+	}
-+
-+	if (!te1)
-+		return 0; /* Only iface type requested */
-+
-+	switch (config.clock_type) {
-+	case FRAMER_CLOCK_EXT:
-+		te1->clock_type = CLOCK_EXT;
-+		break;
-+	case FRAMER_CLOCK_INT:
-+		te1->clock_type = CLOCK_INT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	te1->clock_rate = config.line_clock_rate;
-+	return 0;
-+}
-+
-+static int qmc_hdlc_framer_init(struct qmc_hdlc *qmc_hdlc)
-+{
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_init(qmc_hdlc->framer);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer init failed (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static void qmc_hdlc_framer_exit(struct qmc_hdlc *qmc_hdlc)
-+{
-+	if (!qmc_hdlc->framer)
-+		return;
-+
-+	framer_exit(qmc_hdlc->framer);
-+}
-+
- static int qmc_hdlc_recv_queue(struct qmc_hdlc *qmc_hdlc, struct qmc_hdlc_desc *desc, size_t size);
- 
- #define QMC_HDLC_RX_ERROR_FLAGS				\
-@@ -291,6 +481,12 @@ static int qmc_hdlc_set_iface(struct qmc_hdlc *qmc_hdlc, int if_iface, const te1
- 
- 	qmc_hdlc->slot_map = te1->slot_map;
- 
-+	ret = qmc_hdlc_framer_set_iface(qmc_hdlc, if_iface, te1);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer set iface failed %d\n", ret);
-+		return ret;
-+	}
-+
- 	return 0;
- }
- 
-@@ -298,11 +494,16 @@ static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
- {
- 	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);
- 	te1_settings te1;
-+	int ret;
- 
- 	switch (ifs->type) {
- 	case IF_GET_IFACE:
--		ifs->type = IF_IFACE_E1;
- 		if (ifs->size < sizeof(te1)) {
-+			/* Retrieve type only */
-+			ret = qmc_hdlc_framer_get_iface(qmc_hdlc, &ifs->type, NULL);
-+			if (ret)
-+				return ret;
-+
- 			if (!ifs->size)
- 				return 0; /* only type requested */
- 
-@@ -312,6 +513,11 @@ static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
- 
- 		memset(&te1, 0, sizeof(te1));
- 
-+		/* Retrieve info from framer */
-+		ret = qmc_hdlc_framer_get_iface(qmc_hdlc, &ifs->type, &te1);
-+		if (ret)
-+			return ret;
-+
- 		/* Update slot_map */
- 		te1.slot_map = qmc_hdlc->slot_map;
- 
-@@ -345,10 +551,17 @@ static int qmc_hdlc_open(struct net_device *netdev)
- 	int ret;
- 	int i;
- 
--	ret = hdlc_open(netdev);
-+	ret = qmc_hdlc_framer_start(qmc_hdlc);
- 	if (ret)
- 		return ret;
- 
-+	ret = hdlc_open(netdev);
-+	if (ret)
-+		goto framer_stop;
-+
-+	/* Update carrier */
-+	qmc_hdlc_framer_set_carrier(qmc_hdlc);
-+
- 	chan_param.mode = QMC_HDLC;
- 	/* HDLC_MAX_MRU + 4 for the CRC
- 	 * HDLC_MAX_MRU + 4 + 8 for the CRC and some extraspace needed by the QMC
-@@ -397,6 +610,8 @@ static int qmc_hdlc_open(struct net_device *netdev)
- 	}
- hdlc_close:
- 	hdlc_close(netdev);
-+framer_stop:
-+	qmc_hdlc_framer_stop(qmc_hdlc);
- 	return ret;
- }
- 
-@@ -432,6 +647,7 @@ static int qmc_hdlc_close(struct net_device *netdev)
- 	}
- 
- 	hdlc_close(netdev);
-+	qmc_hdlc_framer_stop(qmc_hdlc);
- 	return 0;
- }
- 
-@@ -480,6 +696,7 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 
- 	qmc_hdlc->dev = dev;
- 	spin_lock_init(&qmc_hdlc->tx_lock);
-+	spin_lock_init(&qmc_hdlc->carrier_lock);
- 
- 	qmc_hdlc->qmc_chan = devm_qmc_chan_get_bychild(dev, dev->of_node);
- 	if (IS_ERR(qmc_hdlc->qmc_chan))
-@@ -502,9 +719,19 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
- 
-+	qmc_hdlc->framer = devm_framer_optional_get(dev, "fsl,framer");
-+	if (IS_ERR(qmc_hdlc->framer))
-+		return PTR_ERR(qmc_hdlc->framer);
-+
-+	ret = qmc_hdlc_framer_init(qmc_hdlc);
-+	if (ret)
-+		return ret;
-+
- 	qmc_hdlc->netdev = alloc_hdlcdev(qmc_hdlc);
--	if (!qmc_hdlc->netdev)
--		return -ENOMEM;
-+	if (!qmc_hdlc->netdev) {
-+		ret = -ENOMEM;
-+		goto framer_exit;
-+	}
- 
- 	hdlc = dev_to_hdlc(qmc_hdlc->netdev);
- 	hdlc->attach = qmc_hdlc_attach;
-@@ -519,11 +746,12 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 	}
- 
- 	platform_set_drvdata(pdev, qmc_hdlc);
--
- 	return 0;
- 
- free_netdev:
- 	free_netdev(qmc_hdlc->netdev);
-+framer_exit:
-+	qmc_hdlc_framer_exit(qmc_hdlc);
- 	return ret;
- }
- 
-@@ -533,6 +761,7 @@ static int qmc_hdlc_remove(struct platform_device *pdev)
- 
- 	unregister_hdlc_device(qmc_hdlc->netdev);
- 	free_netdev(qmc_hdlc->netdev);
-+	qmc_hdlc_framer_exit(qmc_hdlc);
- 
- 	return 0;
- }
--- 
-2.43.0
-
+set-
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
