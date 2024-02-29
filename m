@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-76262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E66B886D068
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34E6186D067
 	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:20:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A20D1285BCD
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C92FC1F227D0
 	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05F376CBE8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 017286CBE2;
 	Thu, 29 Feb 2024 17:20:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AvG+HJKC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YCLL7zn9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D17F270ACC;
-	Thu, 29 Feb 2024 17:20:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D181270ACD
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 17:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709227237; cv=none; b=XfjcCfxu6oQxispmr24xeiuBH04hGZiBOxFTrVYFiSFP0ushu0fqUpBCCWGqIJtPZfRfcy81cX9eUV7oR0fc8HV5VOq+d/beaLhSRRVDmHjQYHyF6EmplOQpNLgscniDm2n+kUrndCDYTxvi6XijMxY/eE2Ntz2e+WmEwVdzFHM=
+	t=1709227237; cv=none; b=M13xVx+LaUPMUMjTiPJ0/0wo7fjZE6/EfxTW+9UXVenRILQc8YvS8SPHYfFecnv07p6pPBUYy++bcm4GCjXaIRCtklXXae6RUiTqN+iU5o9tg9jNHHNWmCWlCWioZPlLUxkDgQQz8ZqU6IZHnYuyjazfr2T/JzLyBDf679vtXCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709227237; c=relaxed/simple;
-	bh=gvY06Xt+X0dDR328xLTg5RgB1c7LFErbiyB6OInqfV8=;
+	bh=Dz8X3abmMV2+G7xgkpkfx4bvJhdk4zHhMx648bHaRdo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oKbfxpDI786jvRTvwb0eho7mO9uKHjiQ0ZGkzQMAftM5BTkEvzgaN4wI2j/feuXOTq7cFi2pQqUDk6oI8rIHR4tPk5kKQicnBKvX+NQwhPrGGQZ9ZDGS+F+s56mVLt7FVNxC8ZyukvnDfCGfv1kg8hDik3DhUt2Rtw3lxBss/s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AvG+HJKC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7AA98C43394;
+	 In-Reply-To:To:Cc; b=sEdPByaVGHAFaRdZEFELfTTwWiCDLQDfZGdr55kaPRDkahy9/tCQ+wlc/5kGs/n1Mpq7bKluaxp4fenq+9++/9oZskDsgi5ISTCXnxrpiZhAYKngXqH1JuSqZNLrxEEDnLxBiWAtBRaHSLJOpVpZWhG2zkXWI99JyvVvHAwlMPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YCLL7zn9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 73D7AC433F1;
 	Thu, 29 Feb 2024 17:20:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709227237;
-	bh=gvY06Xt+X0dDR328xLTg5RgB1c7LFErbiyB6OInqfV8=;
+	bh=Dz8X3abmMV2+G7xgkpkfx4bvJhdk4zHhMx648bHaRdo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AvG+HJKCMbtYMFYO85Dq1Yf8t1sQYo0J/+H/PU4FJXTI6CoLPk9gAKdMv0QlzoXp2
-	 tABJyWyQP0Js8ROY+iYvNaAepI7qUACV8AjHi9tfWIifTMNgvsSA/qqyerTOxwUFQg
-	 +RIH7sZG+y55k4AvZDuhZa8xr46v6c03OJ7Q8RTonhfUhQt1KtEA+GCmnCf/A6+aC7
-	 UPTDAxNDgzmOgRXbxI6xcGZXVgQ8TwTvZRRMSlAeN0d17Da5MBNKKm11GQZ+M+YBnU
-	 Xd9poAhFlYsVziKEt7tVPaz4WU8ZsYWzxhL1IUkYaKziy5a8xeR6e60bIA+fjISv/O
-	 QVyaP5ivoadUg==
+	b=YCLL7zn9smewaXqnDOoh+fumLgRZBx7j+0FGIIOJDFXC6xbZjiqN89yKDwano2BI4
+	 DQQ05oFCJHmR++AXonWBMZ+MtUz/BFnm7Pob590VgDduLvd7132szL4prBSFXre6zw
+	 3AlLK3L1eMIkzywXkgDW4h99BbtExYU6XLp4D+rQqOkbuUcAwThSVFOklF8HLerYpg
+	 Ap2V2ptikW7msDFqeur77Ks/e4hpMWFlJ2ILUjTICFkpzwkNW7AlNSQGV6rR8AVqvZ
+	 Wzb7EKLMq5hb9xE3QI4JI5xzWbMAfK+9cg5PYN5vZ/dfpUA9bEZvuQvUFZ+W3/D3ZC
+	 7DfYwunht/WKA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 62328D84BC5;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 586C6C595D1;
 	Thu, 29 Feb 2024 17:20:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2024-02-28
+Subject: Re: [PATCH net 0/4] tls: a few more fixes for async decrypt
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170922723739.28034.4279902695429673289.git-patchwork-notify@kernel.org>
+ <170922723735.28034.3350874918349879660.git-patchwork-notify@kernel.org>
 Date: Thu, 29 Feb 2024 17:20:37 +0000
-References: <20240228145644.2269088-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240228145644.2269088-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+References: <cover.1709132643.git.sd@queasysnail.net>
+In-Reply-To: <cover.1709132643.git.sd@queasysnail.net>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, vakul.garg@nxp.com, borisp@nvidia.com,
+ john.fastabend@gmail.com, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 28 Feb 2024 09:56:43 -0500 you wrote:
-> The following changes since commit 4adfc94d4aeca1177e1188ba83c20ed581523fe1:
+On Wed, 28 Feb 2024 23:43:56 +0100 you wrote:
+> The previous patchset [1] took care of "full async". This adds a few
+> fixes for cases where only part of the crypto operations go the async
+> route, found by extending my previous debug patch [2] to do N
+> synchronous operations followed by M asynchronous ops (with N and M
+> configurable).
 > 
->   Documentations: correct net_cachelines title for struct inet_sock (2024-02-28 11:25:37 +0000)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-02-28
+> [1] https://patchwork.kernel.org/project/netdevbpf/list/?series=823784&state=*
+> [2] https://lore.kernel.org/all/9d664093b1bf7f47497b2c40b3a085b45f3274a2.1694021240.git.sd@queasysnail.net/
 > 
 > [...]
 
 Here is the summary with links:
-  - pull request: bluetooth 2024-02-28
-    https://git.kernel.org/netdev/net/c/244b96c2310e
+  - [net,1/4] tls: decrement decrypt_pending if no async completion will be called
+    https://git.kernel.org/netdev/net/c/f7fa16d49837
+  - [net,2/4] tls: fix peeking with sync+async decryption
+    https://git.kernel.org/netdev/net/c/6caaf104423d
+  - [net,3/4] tls: separate no-async decryption request handling from async
+    https://git.kernel.org/netdev/net/c/41532b785e9d
+  - [net,4/4] tls: fix use-after-free on failed backlog decryption
+    https://git.kernel.org/netdev/net/c/13114dc55430
 
 You are awesome, thank you!
 -- 
