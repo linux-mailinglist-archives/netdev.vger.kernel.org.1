@@ -1,128 +1,195 @@
-Return-Path: <netdev+bounces-76324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 328C786D457
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 21:37:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E3B786D4B5
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 21:46:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 524841C2155C
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:37:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E55F1F245DD
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:46:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13EA5144044;
-	Thu, 29 Feb 2024 20:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C66C158D81;
+	Thu, 29 Feb 2024 20:39:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cxsy7Um3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O5WV1eES"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E6A1428FC;
-	Thu, 29 Feb 2024 20:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6BA154E89;
+	Thu, 29 Feb 2024 20:39:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709239053; cv=none; b=a7jnnRGukkYjdcfw2iNXe2IcB0SpRnX4mePBTNcJbpYzFZBLdVb9GHdOyTjimqQAXT+ywH1jXnJBQlpjHYxQmeovedrVz9PIF6TgFhCLeibURvUUaQNrUaWExSuHOSmSKPi5uZGL5m5UhKWSa/SuowLuUvwbLPRKtIrahvzWqkc=
+	t=1709239180; cv=none; b=VU9M9aRqxw7C1Gc1W2B2+4HdFbrnG5cEUyIzVBIHxIKYIfPX46g8fFx8UcXjTm2bszBAsZdZSKlYYaOTowOubHDhhYdB6cKcahoD5isJMxuRgCGB4k0mitfTr/Gm+ZpN9jbdwvzN+4HjD+A1yVHeC0swTKKvVvMadEfisB26CgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709239053; c=relaxed/simple;
-	bh=ii4D7YiCreEVMR4r5RTvfhi7WZ6+lvbN3NGPlbGfYUM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CMys/j2UClzr/S2bsuj5Jw49J0KjB89bqSTei6KHe/kXSPMtPs/HszncR1M3p4jaaVQnPd8xi/JusrijgoQwizuEX5Mvk0JxPWDALoIVp/o5YY8XIScsblrKkAUJ8ndHKjL9bh30GOtoJO/MlTdZn94oxaaYEwpBHPeA1bPoBZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cxsy7Um3; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1dc96f64c10so13739325ad.1;
-        Thu, 29 Feb 2024 12:37:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709239051; x=1709843851; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=i5blMfwCgLp1FPPnA5HDVy206wgmfNgtw944me58i0A=;
-        b=cxsy7Um3pV09VqTA9KVIG9RIW297u9aObGYhimN9F3l6bWl2/9wEsJfuuKw+pGWuSw
-         VZej06F3BjGz6NP6vsFG1NqtgZGlDb51g+AYQWsALsjVDZLpCwpQwuFdkguP6V43MKFH
-         VP+5yKfDeTid7GiosH1uZdI7FysPvTQs9W9pH6F3L/1u1be/RSjJPoBy+l+ytEx7FuvJ
-         eTJZNPdkjU6dWrivxvExMXZQrePH/Yo2zOpVgyLK0Zvwcen2DDoyaymGt49kqfDNyYMy
-         lblfXP9uLlVCHqIQdiybBHd7ldiS8691qfTONlXrKTwTuc18LHTnRVMNQsoKITV5Ld+v
-         WjZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709239051; x=1709843851;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i5blMfwCgLp1FPPnA5HDVy206wgmfNgtw944me58i0A=;
-        b=Ln5UDKbzHR7gVcO3OuFN4o4Z++p59+h21bJiUV9V7vAVR7KE8m2aC6RNJSM/+VJWvp
-         VWN0vme49FnixMZpv+k6VfK/wLQbgEt5LRR/xwGU0A4Z3rp2Zg6siMWQpN/tZ7Ajkcto
-         GvraDrbgZ74cK9/dyGBZ9pnUC13aQytc9uucM60b8F3ib+eF85sM4shIQ7mOitBaYaD+
-         UOa+NLcyp0HVuJoWRCE18wbu7NAUdsLt7MBu7MaDvHTJRx5tzSLeUWdvLqNVtvRdnvTt
-         kFEDimhY3o4KzZZ85tydz68+jX6Q+ER6lhTK2TtDi0Fg9tGXbLHtmnf9oFWWEBTUBGdK
-         rZGw==
-X-Forwarded-Encrypted: i=1; AJvYcCXkJxk2JuLi1aw3d3CIqBrBC9QaP07g3LYQxCCx609IYRxkUahyfmluhzPc0RRcZ/CyARJke5d64seUMsVrWQOhJcLjyGA1Y9W3NnAY35CvPskp5lw0lrh7s+0gPtxZC6rpynpE
-X-Gm-Message-State: AOJu0YxPYdG3JjYdKMMC5XBwZ5gySF+GV+AyYoE1R5w7v7a5Nvd2yyEe
-	nFzOLksqcLMR7H/REgdSexTBg5nQ1kGVH0SQzWUd4QyoiJjCTDg0
-X-Google-Smtp-Source: AGHT+IFceYVsyf342UvaMXXreAwvaQzmHEhFmJrWZ40V54W++PEy915RjWYjmCRa7EohfqoaHubDsA==
-X-Received: by 2002:a17:902:c403:b0:1db:ecf1:3b67 with SMTP id k3-20020a170902c40300b001dbecf13b67mr4292849plk.66.1709239050771;
-        Thu, 29 Feb 2024 12:37:30 -0800 (PST)
-Received: from localhost ([2620:10d:c090:400::5:8305])
-        by smtp.gmail.com with ESMTPSA id y5-20020a170902ed4500b001dbb06b6133sm1920015plb.127.2024.02.29.12.37.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 12:37:30 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 29 Feb 2024 10:37:28 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: torvalds@linux-foundation.org, mpatocka@redhat.com,
-	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
-	msnitzer@redhat.com, ignat@cloudflare.com, damien.lemoal@wdc.com,
-	bob.liu@oracle.com, houtao1@huawei.com, peterz@infradead.org,
-	mingo@kernel.org, netdev@vger.kernel.org, allen.lkml@gmail.com,
-	kernel-team@meta.com, Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH for-6.9] workqueue: Drain BH work items on hot-unplugged
- CPUs
-Message-ID: <ZeDrCMLlzVZpvbrG@slm.duckdns.org>
-References: <20240130091300.2968534-1-tj@kernel.org>
- <20240130091300.2968534-4-tj@kernel.org>
- <ZcABypwUML6Osiec@slm.duckdns.org>
- <Zdvw0HdSXcU3JZ4g@boqun-archlinux>
- <Zd09L9DgerYjezGT@slm.duckdns.org>
+	s=arc-20240116; t=1709239180; c=relaxed/simple;
+	bh=9ho8EJ2VFT3bEroonlc5dWDoUEEhnUjuMR9yIwHc+Gs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=p0xoAMEe2X8vyjruvn0sSJ/BMWQaMJvymx7vvAHrLSXExdSE9D9dY33kfDz65gjWWpJYvC5I5jLE7TqotQYEMehJWgHllFiXxIynLkOz5i/b2KKLQVR5tgwvIWRgNHAxafgUkBTsT6xUx4gBDNWzaQVigM+cFidRt6lc/09vTzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O5WV1eES; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17911C43399;
+	Thu, 29 Feb 2024 20:39:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709239180;
+	bh=9ho8EJ2VFT3bEroonlc5dWDoUEEhnUjuMR9yIwHc+Gs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=O5WV1eESOXxWBXHsV5cUQRLhB3os2Vxv5W16RubLhGBy19AS41Z6R0zx5GhSXiOGW
+	 1K4ucejDlUaMhAn9a0z/dYzPCNYpi0ffSTViUVIMOSSro24Sew54nDbcbdl0vpei6a
+	 ce6+SbXGVaLfqH/bUk1b9yvUMZy6kTe4UYyzsIIXtU5eSITqzjVNytu1enGJFxBFQw
+	 hSdjRgKyivJm0nc2UrjZHcQuBcnb9WnOpmOl+afdITuaPD+ZUtlWyqAmH3D1lsBgNv
+	 hCFDH1g5Lzj+WAf4eEGcNIqZwu+V1uwUzHPPJ9xYTz9IDFOEwagf2zFiloa1pTFGv0
+	 KAK7V6uNrSb4A==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Leon Romanovsky <leonro@nvidia.com>,
+	Sasha Levin <sashal@kernel.org>,
+	saeedm@nvidia.com,
+	linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 03/22] RDMA/mlx5: Fix fortify source warning while accessing Eth segment
+Date: Thu, 29 Feb 2024 15:38:56 -0500
+Message-ID: <20240229203933.2861006-3-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240229203933.2861006-1-sashal@kernel.org>
+References: <20240229203933.2861006-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zd09L9DgerYjezGT@slm.duckdns.org>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.6.18
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 26, 2024 at 03:38:55PM -1000, Tejun Heo wrote:
-> Boqun pointed out that workqueues aren't handling BH work items on offlined
-> CPUs. Unlike tasklet which transfers out the pending tasks from
-> CPUHP_SOFTIRQ_DEAD, BH workqueue would just leave them pending which is
-> problematic. Note that this behavior is specific to BH workqueues as the
-> non-BH per-CPU workers just become unbound when the CPU goes offline.
-> 
-> This patch fixes the issue by draining the pending BH work items from an
-> offlined CPU from CPUHP_SOFTIRQ_DEAD. Because work items carry more context,
-> it's not as easy to transfer the pending work items from one pool to
-> another. Instead, run BH work items which execute the offlined pools on an
-> online CPU.
-> 
-> Note that this assumes that no further BH work items will be queued on the
-> offlined CPUs. This assumption is shared with tasklet and should be fine for
-> conversions. However, this issue also exists for per-CPU workqueues which
-> will just keep executing work items queued after CPU offline on unbound
-> workers and workqueue should reject per-CPU and BH work items queued on
-> offline CPUs. This will be addressed separately later.
-> 
-> Signed-off-by: Tejun Heo <tj@kernel.org>
-> Reported-by: Boqun Feng <boqun.feng@gmail.com>
-> Link: http://lkml.kernel.org/r/Zdvw0HdSXcU3JZ4g@boqun-archlinux
+From: Leon Romanovsky <leonro@nvidia.com>
 
-Applying this to wq/for-6.9.
+[ Upstream commit 4d5e86a56615cc387d21c629f9af8fb0e958d350 ]
 
-Thanks.
+ ------------[ cut here ]------------
+ memcpy: detected field-spanning write (size 56) of single field "eseg->inline_hdr.start" at /var/lib/dkms/mlnx-ofed-kernel/5.8/build/drivers/infiniband/hw/mlx5/wr.c:131 (size 2)
+ WARNING: CPU: 0 PID: 293779 at /var/lib/dkms/mlnx-ofed-kernel/5.8/build/drivers/infiniband/hw/mlx5/wr.c:131 mlx5_ib_post_send+0x191b/0x1a60 [mlx5_ib]
+ Modules linked in: 8021q garp mrp stp llc rdma_ucm(OE) rdma_cm(OE) iw_cm(OE) ib_ipoib(OE) ib_cm(OE) ib_umad(OE) mlx5_ib(OE) ib_uverbs(OE) ib_core(OE) mlx5_core(OE) pci_hyperv_intf mlxdevm(OE) mlx_compat(OE) tls mlxfw(OE) psample nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip_set nf_tables libcrc32c nfnetlink mst_pciconf(OE) knem(OE) vfio_pci vfio_pci_core vfio_iommu_type1 vfio iommufd irqbypass cuse nfsv3 nfs fscache netfs xfrm_user xfrm_algo ipmi_devintf ipmi_msghandler binfmt_misc crct10dif_pclmul crc32_pclmul polyval_clmulni polyval_generic ghash_clmulni_intel sha512_ssse3 snd_pcsp aesni_intel crypto_simd cryptd snd_pcm snd_timer joydev snd soundcore input_leds serio_raw evbug nfsd auth_rpcgss nfs_acl lockd grace sch_fq_codel sunrpc drm efi_pstore ip_tables x_tables autofs4 psmouse virtio_net net_failover failover floppy
+  [last unloaded: mlx_compat(OE)]
+ CPU: 0 PID: 293779 Comm: ssh Tainted: G           OE      6.2.0-32-generic #32~22.04.1-Ubuntu
+ Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
+ RIP: 0010:mlx5_ib_post_send+0x191b/0x1a60 [mlx5_ib]
+ Code: 0c 01 00 a8 01 75 25 48 8b 75 a0 b9 02 00 00 00 48 c7 c2 10 5b fd c0 48 c7 c7 80 5b fd c0 c6 05 57 0c 03 00 01 e8 95 4d 93 da <0f> 0b 44 8b 4d b0 4c 8b 45 c8 48 8b 4d c0 e9 49 fb ff ff 41 0f b7
+ RSP: 0018:ffffb5b48478b570 EFLAGS: 00010046
+ RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
+ RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+ RBP: ffffb5b48478b628 R08: 0000000000000000 R09: 0000000000000000
+ R10: 0000000000000000 R11: 0000000000000000 R12: ffffb5b48478b5e8
+ R13: ffff963a3c609b5e R14: ffff9639c3fbd800 R15: ffffb5b480475a80
+ FS:  00007fc03b444c80(0000) GS:ffff963a3dc00000(0000) knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: 0000556f46bdf000 CR3: 0000000006ac6003 CR4: 00000000003706f0
+ DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+ DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+ Call Trace:
+  <TASK>
+  ? show_regs+0x72/0x90
+  ? mlx5_ib_post_send+0x191b/0x1a60 [mlx5_ib]
+  ? __warn+0x8d/0x160
+  ? mlx5_ib_post_send+0x191b/0x1a60 [mlx5_ib]
+  ? report_bug+0x1bb/0x1d0
+  ? handle_bug+0x46/0x90
+  ? exc_invalid_op+0x19/0x80
+  ? asm_exc_invalid_op+0x1b/0x20
+  ? mlx5_ib_post_send+0x191b/0x1a60 [mlx5_ib]
+  mlx5_ib_post_send_nodrain+0xb/0x20 [mlx5_ib]
+  ipoib_send+0x2ec/0x770 [ib_ipoib]
+  ipoib_start_xmit+0x5a0/0x770 [ib_ipoib]
+  dev_hard_start_xmit+0x8e/0x1e0
+  ? validate_xmit_skb_list+0x4d/0x80
+  sch_direct_xmit+0x116/0x3a0
+  __dev_xmit_skb+0x1fd/0x580
+  __dev_queue_xmit+0x284/0x6b0
+  ? _raw_spin_unlock_irq+0xe/0x50
+  ? __flush_work.isra.0+0x20d/0x370
+  ? push_pseudo_header+0x17/0x40 [ib_ipoib]
+  neigh_connected_output+0xcd/0x110
+  ip_finish_output2+0x179/0x480
+  ? __smp_call_single_queue+0x61/0xa0
+  __ip_finish_output+0xc3/0x190
+  ip_finish_output+0x2e/0xf0
+  ip_output+0x78/0x110
+  ? __pfx_ip_finish_output+0x10/0x10
+  ip_local_out+0x64/0x70
+  __ip_queue_xmit+0x18a/0x460
+  ip_queue_xmit+0x15/0x30
+  __tcp_transmit_skb+0x914/0x9c0
+  tcp_write_xmit+0x334/0x8d0
+  tcp_push_one+0x3c/0x60
+  tcp_sendmsg_locked+0x2e1/0xac0
+  tcp_sendmsg+0x2d/0x50
+  inet_sendmsg+0x43/0x90
+  sock_sendmsg+0x68/0x80
+  sock_write_iter+0x93/0x100
+  vfs_write+0x326/0x3c0
+  ksys_write+0xbd/0xf0
+  ? do_syscall_64+0x69/0x90
+  __x64_sys_write+0x19/0x30
+  do_syscall_64+0x59/0x90
+  ? do_user_addr_fault+0x1d0/0x640
+  ? exit_to_user_mode_prepare+0x3b/0xd0
+  ? irqentry_exit_to_user_mode+0x9/0x20
+  ? irqentry_exit+0x43/0x50
+  ? exc_page_fault+0x92/0x1b0
+  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+ RIP: 0033:0x7fc03ad14a37
+ Code: 10 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+ RSP: 002b:00007ffdf8697fe8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+ RAX: ffffffffffffffda RBX: 0000000000008024 RCX: 00007fc03ad14a37
+ RDX: 0000000000008024 RSI: 0000556f46bd8270 RDI: 0000000000000003
+ RBP: 0000556f46bb1800 R08: 0000000000007fe3 R09: 0000000000000000
+ R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
+ R13: 0000556f46bc66b0 R14: 000000000000000a R15: 0000556f46bb2f50
+  </TASK>
+ ---[ end trace 0000000000000000 ]---
 
+Link: https://lore.kernel.org/r/8228ad34bd1a25047586270f7b1fb4ddcd046282.1706433934.git.leon@kernel.org
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/infiniband/hw/mlx5/wr.c | 2 +-
+ include/linux/mlx5/qp.h         | 5 ++++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/infiniband/hw/mlx5/wr.c b/drivers/infiniband/hw/mlx5/wr.c
+index df1d1b0a3ef72..9947feb7fb8a0 100644
+--- a/drivers/infiniband/hw/mlx5/wr.c
++++ b/drivers/infiniband/hw/mlx5/wr.c
+@@ -78,7 +78,7 @@ static void set_eth_seg(const struct ib_send_wr *wr, struct mlx5_ib_qp *qp,
+ 		 */
+ 		copysz = min_t(u64, *cur_edge - (void *)eseg->inline_hdr.start,
+ 			       left);
+-		memcpy(eseg->inline_hdr.start, pdata, copysz);
++		memcpy(eseg->inline_hdr.data, pdata, copysz);
+ 		stride = ALIGN(sizeof(struct mlx5_wqe_eth_seg) -
+ 			       sizeof(eseg->inline_hdr.start) + copysz, 16);
+ 		*size += stride / 16;
+diff --git a/include/linux/mlx5/qp.h b/include/linux/mlx5/qp.h
+index bd53cf4be7bdc..f0e55bf3ec8b5 100644
+--- a/include/linux/mlx5/qp.h
++++ b/include/linux/mlx5/qp.h
+@@ -269,7 +269,10 @@ struct mlx5_wqe_eth_seg {
+ 	union {
+ 		struct {
+ 			__be16 sz;
+-			u8     start[2];
++			union {
++				u8     start[2];
++				DECLARE_FLEX_ARRAY(u8, data);
++			};
+ 		} inline_hdr;
+ 		struct {
+ 			__be16 type;
 -- 
-tejun
+2.43.0
+
 
