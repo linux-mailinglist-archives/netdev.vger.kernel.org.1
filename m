@@ -1,211 +1,134 @@
-Return-Path: <netdev+bounces-76162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBB6686C9E1
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 14:12:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EE3986C9F7
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 14:15:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F14E1F215C3
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 13:12:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6073A1C20848
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 13:15:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D667E10D;
-	Thu, 29 Feb 2024 13:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fXI9CIzL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C477D7E10D;
+	Thu, 29 Feb 2024 13:15:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817357E58E
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 13:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFB27E0FE;
+	Thu, 29 Feb 2024 13:15:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709212331; cv=none; b=s74+/FOqjosyVjqYeTueYi/7zBMB4K8ypiYjfx0USCGR5p0SLoEtPXDTZgRGG4LTEZYANCWJ0p439I5hJxHTQRCeMSy/ZYnqp5bNIj1AIei0Avx26AygD9O5iWIPJWxfgs2tDFtMPoYlF+a5mPdOwGikXvKSFuZkrHZE3HFc/dc=
+	t=1709212512; cv=none; b=lfBafBMNJ7mAdgTz4FA1ZCacIb1akZ62pxoiCwwf3S1I3gexsSASK+sGrwcdF7DB1YmgGEtRktIQN2rL4rvgurm5Pf9XgFey4wRrNEQQd9IJjYHqDp6czwkP27k31G0MWSKjvwoxG1j9TLaDggkojFzQ0cE2cD4Zi0FEuDf3pBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709212331; c=relaxed/simple;
-	bh=oTFBH+1aNuyRcGEgK5qY1+I0JVxpTup9ufnaj4iKI8E=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=j9MqFUxfsb+xK7LYvRq9+VTa/kmYaRJ8j4B/gwodgmfqCCKfc8nrdNp2yk+5S3YndCuPn1izt+19wtCI2LKlI8dLv1MHOfJ1saBK1ipAzlTxhZrup7DxPJ/Fgt9ORvHqB8Oc8nQYkX2Xb1osEDnaAsMXzNH3elVa07u/DZSwbV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fXI9CIzL; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcdc3db67f0so2257197276.1
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 05:12:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709212328; x=1709817128; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=E6QBhT0AEzDR8oVzh0nkmW1Xh2m+b3LBhMmYhjkysfI=;
-        b=fXI9CIzLpez2M1obwvBlP64LTCRIzjHro3lae+sv/xgYejdlSmON5cbKDxkVfGh+yk
-         bf2cuoQpcRluUsTkFZCnx628nT6O1ion+lIiiZELvsk4gdl/fhUbegq1C827flIDG1zA
-         FPFUBbgHfxlu0f3bJlRsYp2ic98ExOVWAcjBf/ymJEK4mad6y+5LXmLFkLr83miUA9ke
-         kSmYeEe5/24h7kR7nTjEFC+KkZb8Q4/QD4U7QVvDhCA87rBgagGPgMU1J6u8iuf0OuEl
-         5+VjTe73B+7GvtT7UnKeUyoGYh3QQPxSQ70UlTwPEXrCDWs/1uUsb4cZ64NSs9sftMR9
-         d6KQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709212328; x=1709817128;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=E6QBhT0AEzDR8oVzh0nkmW1Xh2m+b3LBhMmYhjkysfI=;
-        b=rTEXEt3SEuGHgxkXnWkVG0KT8UW0Sm8pAJIR9Z5bZzhN6w8PCLxEAoViKbQYllkWuk
-         lONo+UEqDCOHaFntHDA8bcD/wwhKbtzZJdUTT6exOMro0TvpbAg1cOAYdqC3a68DZGvI
-         M2p/OWJXzGhyAxZQ37erB5NUDcUvoYsoZwg9GCwK0DJ+H73BcB51b6q1IbdNWQ1IkUYq
-         22zIXsbYdTmR62PM59j0MiaqPQmkSsT+UsduGKtjSyStRkljMw5pVVzC48dThJlutLp8
-         r63+6mGqZQZ3Jkn3o8otEfCvEKaDYhukju+wcUuBIjO6k8sEFh/O1nviZPeKDFyn8LW8
-         +tOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXhRf8OSy0QQEBj0Tp1Bl5j+ijETN3oK3tuOhYqltcx+ErT2SXmDuJjy4wiUlw6IGrUooWcxaOL9EVnX/akh0wnsLM82OSd
-X-Gm-Message-State: AOJu0Yz8lkJS0JOuSDnoaJ0eatedQ90nTImrtmDKTT3ovjQE01TpFaBm
-	C4Gkj1Vu2kHpzWc3t4LTIRlYhGGDyuXWfIqdK4lHYZagKnCSei9YGtZY5d34EwYgqHGEV5ummAR
-	4A75vxGUsLg==
-X-Google-Smtp-Source: AGHT+IEdXaKq04R/IYNGoCcBhANc0HFb0BSPL4I60VhGyZPsB73DUjxoZJFJK3iBqdXDLq4Vecc/ufLB9RNA2w==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:110d:b0:dc6:e884:2342 with SMTP
- id o13-20020a056902110d00b00dc6e8842342mr496654ybu.5.1709212328548; Thu, 29
- Feb 2024 05:12:08 -0800 (PST)
-Date: Thu, 29 Feb 2024 13:11:52 +0000
+	s=arc-20240116; t=1709212512; c=relaxed/simple;
+	bh=0zxbrL9dDiIjEZVQE6pZj017WOvJu+qyy6LsJ9ewYrM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=qtkqbUrDbZn7pSI2z4YMSpdLkF2SATzcFrA1/OGI5aCeYB30BaMPW7DTePG5RBMAEICNaMf/pY5uWZn7Q201MvqAll4IS30GpB5+XksK8ZZmVNu5LPpSDlY30I0BkMvdqZ54vw4JOATInobgK/ocJICy4fRcjeCE5CPt9YF8MaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Tls9W4RCjz1xpn4;
+	Thu, 29 Feb 2024 21:13:35 +0800 (CST)
+Received: from kwepemm600001.china.huawei.com (unknown [7.193.23.3])
+	by mail.maildlp.com (Postfix) with ESMTPS id EA4BF140390;
+	Thu, 29 Feb 2024 21:15:06 +0800 (CST)
+Received: from dggpemm500008.china.huawei.com (7.185.36.136) by
+ kwepemm600001.china.huawei.com (7.193.23.3) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 29 Feb 2024 21:15:06 +0800
+Received: from dggpemm500008.china.huawei.com ([7.185.36.136]) by
+ dggpemm500008.china.huawei.com ([7.185.36.136]) with mapi id 15.01.2507.035;
+ Thu, 29 Feb 2024 21:15:06 +0800
+From: wangyunjian <wangyunjian@huawei.com>
+To: Paolo Abeni <pabeni@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
+	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "bjorn@kernel.org" <bjorn@kernel.org>,
+	"magnus.karlsson@intel.com" <magnus.karlsson@intel.com>,
+	"maciej.fijalkowski@intel.com" <maciej.fijalkowski@intel.com>,
+	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>, "davem@davemloft.net"
+	<davem@davemloft.net>
+CC: "bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, xudingke
+	<xudingke@huawei.com>, "liwei (DT)" <liwei395@huawei.com>
+Subject: RE: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
+Thread-Topic: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
+Thread-Index: AQHaajYcNkJKJoTBfEqyMPzDlwSi+bEgpeYAgACiGXA=
+Date: Thu, 29 Feb 2024 13:15:06 +0000
+Message-ID: <abef895c10c74099857e2f52e8b62552@huawei.com>
+References: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
+ <7d478cb842e28094f4d6102e593e3de25ab27dfe.camel@redhat.com>
+In-Reply-To: <7d478cb842e28094f4d6102e593e3de25ab27dfe.camel@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240229131152.3159794-1-edumazet@google.com>
-Subject: [PATCH net] geneve: make sure to pull inner header in geneve_rx()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	Florian Westphal <fw@strlen.de>, eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
-	syzbot+6a1423ff3f97159aae64@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 
-syzbot triggered a bug in geneve_rx() [1]
-
-Issue is similar to the one I fixed in commit 8d975c15c0cd
-("ip6_tunnel: make sure to pull inner header in __ip6_tnl_rcv()")
-
-We have to save skb->network_header in a temporary variable
-in order to be able to recompute the network_header pointer
-after a pskb_inet_may_pull() call.
-
-pskb_inet_may_pull() makes sure the needed headers are in skb->head.
-
-[1]
-BUG: KMSAN: uninit-value in IP_ECN_decapsulate include/net/inet_ecn.h:302 [inline]
- BUG: KMSAN: uninit-value in geneve_rx drivers/net/geneve.c:279 [inline]
- BUG: KMSAN: uninit-value in geneve_udp_encap_recv+0x36f9/0x3c10 drivers/net/geneve.c:391
-  IP_ECN_decapsulate include/net/inet_ecn.h:302 [inline]
-  geneve_rx drivers/net/geneve.c:279 [inline]
-  geneve_udp_encap_recv+0x36f9/0x3c10 drivers/net/geneve.c:391
-  udp_queue_rcv_one_skb+0x1d39/0x1f20 net/ipv4/udp.c:2108
-  udp_queue_rcv_skb+0x6ae/0x6e0 net/ipv4/udp.c:2186
-  udp_unicast_rcv_skb+0x184/0x4b0 net/ipv4/udp.c:2346
-  __udp4_lib_rcv+0x1c6b/0x3010 net/ipv4/udp.c:2422
-  udp_rcv+0x7d/0xa0 net/ipv4/udp.c:2604
-  ip_protocol_deliver_rcu+0x264/0x1300 net/ipv4/ip_input.c:205
-  ip_local_deliver_finish+0x2b8/0x440 net/ipv4/ip_input.c:233
-  NF_HOOK include/linux/netfilter.h:314 [inline]
-  ip_local_deliver+0x21f/0x490 net/ipv4/ip_input.c:254
-  dst_input include/net/dst.h:461 [inline]
-  ip_rcv_finish net/ipv4/ip_input.c:449 [inline]
-  NF_HOOK include/linux/netfilter.h:314 [inline]
-  ip_rcv+0x46f/0x760 net/ipv4/ip_input.c:569
-  __netif_receive_skb_one_core net/core/dev.c:5534 [inline]
-  __netif_receive_skb+0x1a6/0x5a0 net/core/dev.c:5648
-  process_backlog+0x480/0x8b0 net/core/dev.c:5976
-  __napi_poll+0xe3/0x980 net/core/dev.c:6576
-  napi_poll net/core/dev.c:6645 [inline]
-  net_rx_action+0x8b8/0x1870 net/core/dev.c:6778
-  __do_softirq+0x1b7/0x7c5 kernel/softirq.c:553
-  do_softirq+0x9a/0xf0 kernel/softirq.c:454
-  __local_bh_enable_ip+0x9b/0xa0 kernel/softirq.c:381
-  local_bh_enable include/linux/bottom_half.h:33 [inline]
-  rcu_read_unlock_bh include/linux/rcupdate.h:820 [inline]
-  __dev_queue_xmit+0x2768/0x51c0 net/core/dev.c:4378
-  dev_queue_xmit include/linux/netdevice.h:3171 [inline]
-  packet_xmit+0x9c/0x6b0 net/packet/af_packet.c:276
-  packet_snd net/packet/af_packet.c:3081 [inline]
-  packet_sendmsg+0x8aef/0x9f10 net/packet/af_packet.c:3113
-  sock_sendmsg_nosec net/socket.c:730 [inline]
-  __sock_sendmsg net/socket.c:745 [inline]
-  __sys_sendto+0x735/0xa10 net/socket.c:2191
-  __do_sys_sendto net/socket.c:2203 [inline]
-  __se_sys_sendto net/socket.c:2199 [inline]
-  __x64_sys_sendto+0x125/0x1c0 net/socket.c:2199
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-Uninit was created at:
-  slab_post_alloc_hook mm/slub.c:3819 [inline]
-  slab_alloc_node mm/slub.c:3860 [inline]
-  kmem_cache_alloc_node+0x5cb/0xbc0 mm/slub.c:3903
-  kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
-  __alloc_skb+0x352/0x790 net/core/skbuff.c:651
-  alloc_skb include/linux/skbuff.h:1296 [inline]
-  alloc_skb_with_frags+0xc8/0xbd0 net/core/skbuff.c:6394
-  sock_alloc_send_pskb+0xa80/0xbf0 net/core/sock.c:2783
-  packet_alloc_skb net/packet/af_packet.c:2930 [inline]
-  packet_snd net/packet/af_packet.c:3024 [inline]
-  packet_sendmsg+0x70c2/0x9f10 net/packet/af_packet.c:3113
-  sock_sendmsg_nosec net/socket.c:730 [inline]
-  __sock_sendmsg net/socket.c:745 [inline]
-  __sys_sendto+0x735/0xa10 net/socket.c:2191
-  __do_sys_sendto net/socket.c:2203 [inline]
-  __se_sys_sendto net/socket.c:2199 [inline]
-  __x64_sys_sendto+0x125/0x1c0 net/socket.c:2199
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-Fixes: 2d07dc79fe04 ("John W. Linville <linville@tuxdriver.com>")
-Reported-and-tested-by: syzbot+6a1423ff3f97159aae64@syzkaller.appspotmail.com
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- drivers/net/geneve.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index 32c51c244153bd760b9f58001906c04c8b0f37ff..c4ed36c71897439fc8f6c11d069c88996e2a2a3c 100644
---- a/drivers/net/geneve.c
-+++ b/drivers/net/geneve.c
-@@ -221,7 +221,7 @@ static void geneve_rx(struct geneve_dev *geneve, struct geneve_sock *gs,
- 	struct genevehdr *gnvh = geneve_hdr(skb);
- 	struct metadata_dst *tun_dst = NULL;
- 	unsigned int len;
--	int err = 0;
-+	int nh, err = 0;
- 	void *oiph;
- 
- 	if (ip_tunnel_collect_metadata() || gs->collect_md) {
-@@ -272,9 +272,23 @@ static void geneve_rx(struct geneve_dev *geneve, struct geneve_sock *gs,
- 		skb->pkt_type = PACKET_HOST;
- 	}
- 
--	oiph = skb_network_header(skb);
-+	/* Save offset of outer header relative to skb->head,
-+	 * because we are going to reset the network header to the inner header
-+	 * and might change skb->head.
-+	 */
-+	nh = skb_network_header(skb) - skb->head;
-+
- 	skb_reset_network_header(skb);
- 
-+	if (!pskb_inet_may_pull(skb)) {
-+		DEV_STATS_INC(geneve->dev, rx_length_errors);
-+		DEV_STATS_INC(geneve->dev, rx_errors);
-+		goto drop;
-+	}
-+
-+	/* Get the outer header. */
-+	oiph = skb->head + nh;
-+
- 	if (geneve_get_sk_family(gs) == AF_INET)
- 		err = IP_ECN_decapsulate(oiph, skb);
- #if IS_ENABLED(CONFIG_IPV6)
--- 
-2.44.0.278.ge034bb2e1d-goog
-
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBBYmVuaSBbbWFpbHRv
+OnBhYmVuaUByZWRoYXQuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwgRmVicnVhcnkgMjksIDIwMjQg
+NzoxMyBQTQ0KPiBUbzogd2FuZ3l1bmppYW4gPHdhbmd5dW5qaWFuQGh1YXdlaS5jb20+OyBtc3RA
+cmVkaGF0LmNvbTsNCj4gd2lsbGVtZGVicnVpam4ua2VybmVsQGdtYWlsLmNvbTsgamFzb3dhbmdA
+cmVkaGF0LmNvbTsga3ViYUBrZXJuZWwub3JnOw0KPiBiam9ybkBrZXJuZWwub3JnOyBtYWdudXMu
+a2FybHNzb25AaW50ZWwuY29tOyBtYWNpZWouZmlqYWxrb3dza2lAaW50ZWwuY29tOw0KPiBqb25h
+dGhhbi5sZW1vbkBnbWFpbC5jb207IGRhdmVtQGRhdmVtbG9mdC5uZXQNCj4gQ2M6IGJwZkB2Z2Vy
+Lmtlcm5lbC5vcmc7IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7DQo+IGxpbnV4LWtlcm5lbEB2Z2Vy
+Lmtlcm5lbC5vcmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmc7DQo+IHZpcnR1YWxpemF0aW9uQGxpc3Rz
+LmxpbnV4LmRldjsgeHVkaW5na2UgPHh1ZGluZ2tlQGh1YXdlaS5jb20+OyBsaXdlaSAoRFQpDQo+
+IDxsaXdlaTM5NUBodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIG5ldC1uZXh0IHYy
+IDMvM10gdHVuOiBBRl9YRFAgVHggemVyby1jb3B5IHN1cHBvcnQNCj4gDQo+IE9uIFdlZCwgMjAy
+NC0wMi0yOCBhdCAxOTowNSArMDgwMCwgWXVuamlhbiBXYW5nIHdyb3RlOg0KPiA+IEBAIC0yNjYx
+LDYgKzI3NzYsNTQgQEAgc3RhdGljIGludCB0dW5fcHRyX3BlZWtfbGVuKHZvaWQgKnB0cikNCj4g
+PiAgCX0NCj4gPiAgfQ0KPiA+DQo+ID4gK3N0YXRpYyB2b2lkIHR1bl9wZWVrX3hzayhzdHJ1Y3Qg
+dHVuX2ZpbGUgKnRmaWxlKSB7DQo+ID4gKwlzdHJ1Y3QgeHNrX2J1ZmZfcG9vbCAqcG9vbDsNCj4g
+PiArCXUzMiBpLCBiYXRjaCwgYnVkZ2V0Ow0KPiA+ICsJdm9pZCAqZnJhbWU7DQo+ID4gKw0KPiA+
+ICsJaWYgKCFwdHJfcmluZ19lbXB0eSgmdGZpbGUtPnR4X3JpbmcpKQ0KPiA+ICsJCXJldHVybjsN
+Cj4gPiArDQo+ID4gKwlzcGluX2xvY2soJnRmaWxlLT5wb29sX2xvY2spOw0KPiA+ICsJcG9vbCA9
+IHRmaWxlLT54c2tfcG9vbDsNCj4gPiArCWlmICghcG9vbCkgew0KPiA+ICsJCXNwaW5fdW5sb2Nr
+KCZ0ZmlsZS0+cG9vbF9sb2NrKTsNCj4gPiArCQlyZXR1cm47DQo+ID4gKwl9DQo+ID4gKw0KPiA+
+ICsJaWYgKHRmaWxlLT5uYl9kZXNjcykgew0KPiA+ICsJCXhza190eF9jb21wbGV0ZWQocG9vbCwg
+dGZpbGUtPm5iX2Rlc2NzKTsNCj4gPiArCQlpZiAoeHNrX3VzZXNfbmVlZF93YWtldXAocG9vbCkp
+DQo+ID4gKwkJCXhza19zZXRfdHhfbmVlZF93YWtldXAocG9vbCk7DQo+ID4gKwl9DQo+ID4gKw0K
+PiA+ICsJc3Bpbl9sb2NrKCZ0ZmlsZS0+dHhfcmluZy5wcm9kdWNlcl9sb2NrKTsNCj4gPiArCWJ1
+ZGdldCA9IG1pbl90KHUzMiwgdGZpbGUtPnR4X3Jpbmcuc2l6ZSwgVFVOX1hEUF9CQVRDSCk7DQo+
+ID4gKw0KPiA+ICsJYmF0Y2ggPSB4c2tfdHhfcGVla19yZWxlYXNlX2Rlc2NfYmF0Y2gocG9vbCwg
+YnVkZ2V0KTsNCj4gPiArCWlmICghYmF0Y2gpIHsNCj4gDQo+IFRoaXMgYnJhbmNoIGxvb2tzIGxp
+a2UgYW4gdW5uZWVkZWQgIm9wdGltaXphdGlvbiIuIFRoZSBnZW5lcmljIGxvb3AgYmVsb3cNCj4g
+c2hvdWxkIGhhdmUgdGhlIHNhbWUgZWZmZWN0IHdpdGggbm8gbWVhc3VyYWJsZSBwZXJmIGRlbHRh
+IC0gYW5kIHNtYWxsZXIgY29kZS4NCj4gSnVzdCByZW1vdmUgdGhpcy4NCg0KT0ssIEkgd2lsbCB1
+cGRhdGUgaXQsIHRoYW5rcy4NCg0KPiANCj4gPiArCQl0ZmlsZS0+bmJfZGVzY3MgPSAwOw0KPiA+
+ICsJCXNwaW5fdW5sb2NrKCZ0ZmlsZS0+dHhfcmluZy5wcm9kdWNlcl9sb2NrKTsNCj4gPiArCQlz
+cGluX3VubG9jaygmdGZpbGUtPnBvb2xfbG9jayk7DQo+ID4gKwkJcmV0dXJuOw0KPiA+ICsJfQ0K
+PiA+ICsNCj4gPiArCXRmaWxlLT5uYl9kZXNjcyA9IGJhdGNoOw0KPiA+ICsJZm9yIChpID0gMDsg
+aSA8IGJhdGNoOyBpKyspIHsNCj4gPiArCQkvKiBFbmNvZGUgdGhlIFhEUCBERVNDIGZsYWcgaW50
+byBsb3dlc3QgYml0IGZvciBjb25zdW1lciB0byBkaWZmZXINCj4gPiArCQkgKiBYRFAgZGVzYyBm
+cm9tIFhEUCBidWZmZXIgYW5kIHNrX2J1ZmYuDQo+ID4gKwkJICovDQo+ID4gKwkJZnJhbWUgPSB0
+dW5feGRwX2Rlc2NfdG9fcHRyKCZwb29sLT50eF9kZXNjc1tpXSk7DQo+ID4gKwkJLyogVGhlIGJ1
+ZGdldCBtdXN0IGJlIGxlc3MgdGhhbiBvciBlcXVhbCB0byB0eF9yaW5nLnNpemUsDQo+ID4gKwkJ
+ICogc28gZW5xdWV1aW5nIHdpbGwgbm90IGZhaWwuDQo+ID4gKwkJICovDQo+ID4gKwkJX19wdHJf
+cmluZ19wcm9kdWNlKCZ0ZmlsZS0+dHhfcmluZywgZnJhbWUpOw0KPiA+ICsJfQ0KPiA+ICsJc3Bp
+bl91bmxvY2soJnRmaWxlLT50eF9yaW5nLnByb2R1Y2VyX2xvY2spOw0KPiA+ICsJc3Bpbl91bmxv
+Y2soJnRmaWxlLT5wb29sX2xvY2spOw0KPiANCj4gTW9yZSByZWxhdGVkIHRvIHRoZSBnZW5lcmFs
+IGRlc2lnbjogaXQgbG9va3Mgd3JvbmcuIFdoYXQgaWYNCj4gZ2V0X3J4X2J1ZnMoKSB3aWxsIGZh
+aWwgKEVOT0JVRikgYWZ0ZXIgc3VjY2Vzc2Z1bCBwZWVraW5nPyBXaXRoIG5vIG1vcmUNCj4gaW5j
+b21pbmcgcGFja2V0cywgbGF0ZXIgcGVlayB3aWxsIHJldHVybiAwIGFuZCBpdCBsb29rcyBsaWtl
+IHRoYXQgdGhlDQo+IGhhbGYtcHJvY2Vzc2VkIHBhY2tldHMgd2lsbCBzdGF5IGluIHRoZSByaW5n
+IGZvcmV2ZXI/Pz8NCg0KVGhlIHZob3N0X25ldF9yeF9wZWVrX2hlYWRfbGVuIGZ1bmN0aW9uIG9i
+dGFpbnMgdGhlIHBhY2tldCBsZW5ndGgNCmJ1dCBkb2VzIG5vdCBjb25zdW1lIGl0LiBUaGUgcGFj
+a2V0IGlzIHN0aWxsIGluIHRoZSByaW5nLiBUaGUgbGF0ZXIgcGVlaw0Kd2lsbCByZXVzZSBpdC4N
+Cg0KPiANCj4gSSB0aGluayB0aGUgJ3JpbmcgcHJvZHVjZScgcGFydCBzaG91bGQgYmUgbW92ZWQg
+aW50byB0dW5fZG9fcmVhZCgpLg0KDQpUaGFuayB5b3UgZm9yIHlvdXIgc3VnZ2VzdGlvbi4gSSB3
+aWxsIGNvbnNpZGVyIHRoYXQuDQoNCj4gDQo+IENoZWVycywNCj4gDQo+IFBhb2xvDQoNCg==
 
