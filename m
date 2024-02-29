@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-76061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3788B86C2A8
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 08:38:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1C7986C2A9
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 08:38:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B1221C22919
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 07:38:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 890B1284B91
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 07:38:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6973481AF;
-	Thu, 29 Feb 2024 07:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4257481DF;
+	Thu, 29 Feb 2024 07:38:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SD5F/G7T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nGBBwT5V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1013347F50
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 07:38:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51C947F62
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 07:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709192296; cv=none; b=QxqEIo/sNfkIP2SFacQjg5BORDR+a3Mei2XOdb/DfwYd2LaD1C0zBrpjfzDuOxdMS6B3p+3RKP7Z+1iU3beRLh3k9OG+X8KxqtLmxr6XKqiRWW5BqJ8suVe7HBczUOuiDPaxD7lhQhOGoQTxl/qHsUHQid9NHgpY1hMJP3fLmUk=
+	t=1709192297; cv=none; b=kLVpfzCgZ7d2rIrwI6iwpElnnIUHSilejYNed0V6pkHV0/qeqzmiokTnk0m62spsebfKE57SpdHJ3xa0jha4k0m9iNAVx0xjZX9yix3pI/EIjDTSOlJGvnL5wjRxz3ql3GG84mE6wpAEzGrXQGU+WT4BfWZQUg/kzbSI0Faxp7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709192296; c=relaxed/simple;
-	bh=NMIKz5QHqhYdI3GhBYghiGx1hUtpNs6c9rhQs5JJvg4=;
+	s=arc-20240116; t=1709192297; c=relaxed/simple;
+	bh=7nhZ0mts8SvKtOtUPWCX1yKj68lxNuDfy7a4v1OIhkI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oqn4OGXpZRfeCZ1QwObS1vCsI1jWDndvc3DD0sO8gkWqzK08Lp7PMnOi/VMBOE/FkgMVT7OBym+BZtYS/824yWxtNMe/fwAcUo0vpFVotmwkBij9AryyPOF54xO1AQjmeZ39gE9KlbCl2SSaqvZKBrdJyyibJCPf1PmIAkQ0TrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SD5F/G7T; arc=none smtp.client-ip=209.85.128.53
+	 MIME-Version; b=sxC9USUhUTkc9W5EXrlp0UXNwJtt1lWC83fsndrn4CCJvpznKOxQ6WXd0dNI1GEzE4DVkaSi0qHjdHyYL1iv4x+Q0aKICzAm/pRDjfxBnHeX7L6tQMr+TqxL1KPKYyeNtaczHPgp5s4K+jnP/pqeLXtvyQirKew1Zg0anqL/1Wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nGBBwT5V; arc=none smtp.client-ip=209.85.208.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-412b99eb5cfso3743505e9.3
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 23:38:14 -0800 (PST)
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d275e63590so6383731fa.2
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 23:38:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1709192293; x=1709797093; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=05Tv+NKy6TJEMzt+3qp0qV1SPIb8xvOpI8cA1Tmj+TY=;
-        b=SD5F/G7TC8LNGFM1MUntlp4RrSGKxfSwESASjgMH0UTmCNWq6/d+UBrGt03N2JqFo+
-         LMtSHEivPpZEPh+BEou5MKuaQr8Ss86/bPmGa3w8pUoDC7r8IFfPt6baWW/dI9rD20AL
-         wo88QpwV4qzZH0B4DR+aK/5c/7y53komiXVPNMhhqQfPnYCfEmRblDwJOtJeI59jixsX
-         mKhd/GhaSTtNJFhWM85wkg9MZ8VpJICAXTGltB/DZJDju9AL2i6R/pN2zhFE6W5R+of2
-         qrmMO1Ls9vbpuH+KOS0dnGS3uqfQZMPrE5w1qjdo0NMZuU/PGF3dRv3BRRgyurCwcpzU
-         ml4w==
+        bh=T91kWp+mr2HJ12LJOqCpCsPQpVeksUQ5n+ZkaKXmhfs=;
+        b=nGBBwT5VL8pPVNdURPLIYKUqiVDE7c/uEFNkOgsYANclcbc9TRIDq8c7joEDRPnKGo
+         1hEAEI8aTR8Xlo2WpkyViexMOP2ym5ElzxKilwsa+uCu0OyoYM0PFmhlJ3o2uX4lF9OM
+         77+AMY4K5GVq8TnB9Dtg8CmpKnLxT/QAnOl9hNxVy1Dck8Ihf/zDLwoIDIqW36PdNKGu
+         BQQ40b/ajNH7/8eG3pWmauhXTwlK9+9c80YVvNMJ6gwslJB6F4YdmA9z4o64CJ9y35qA
+         /YY0Pj2YfKqaUEm2fKsJ71198SJHP364hSuWNJEwHTFnXP3hV02h4Bmx3DvIqAeHpwiM
+         zgmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1709192293; x=1709797093;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=05Tv+NKy6TJEMzt+3qp0qV1SPIb8xvOpI8cA1Tmj+TY=;
-        b=q8sKwn1gPsr/TNkThbtiyCCyfPGSngEbYxlgaN8azBX0GFlmfs3nsVGywpDAtr/EQk
-         6CglmhBFzL1nTnB9Uf/jrpNKbOfZDhSQdMShgk6BMcud2QuXShVbbtMLfhu57q1cxWfv
-         +jZrOcOIABFAicZsYOKPGTMM+z30aSfi0T7FZvCNch+3OVRBg1A01DzC1yXMa7+rH8Ft
-         bUMnUUeBs4wUHSvXYGj4e740YpxBFw3pzH4c3mAjdEZxyp6uLl04/LpRYgHELsYQDnZg
-         reGz5dmNwI5e2nA7RnOhaCjVin3WyQqcG5eO4t4mXuNQZyTEElxJb+ltIfIHIoYVd2HG
-         rIdQ==
-X-Gm-Message-State: AOJu0Yxu6AgzMlO3jN0mmFFHiEYpwR+XjxrCVcvghtE/O3j3Ekl4vceF
-	hUHBD48LkaMmDg8CW0LqPXGcZjzq+34IKO0ZVjo8wwwl/14J0/ARMiFYdjof
-X-Google-Smtp-Source: AGHT+IHpQV9U/UcSDdOmzV7VrJA13hlpxlWUOP+wyGNb6eNn6fpGLdpAY0B25PT5x5nNZd3JxaCCMQ==
-X-Received: by 2002:a05:600c:46ce:b0:412:b7cf:9189 with SMTP id q14-20020a05600c46ce00b00412b7cf9189mr1004988wmo.36.1709192292493;
-        Wed, 28 Feb 2024 23:38:12 -0800 (PST)
+        bh=T91kWp+mr2HJ12LJOqCpCsPQpVeksUQ5n+ZkaKXmhfs=;
+        b=pSiHg/MrtmQ4NqfScYqxkZDFxOlZ44V9jBxAhJSiQ4jyw/IJQ5O0QJ8mTHItQZtu1z
+         JQlSgwAxmohjYfDbO585GO6VFucG+OeIHSeWw7iwBhkpXvlexOtZQyDK0SLH1kFOF3sk
+         jRZSAryFC9awinYSfJeCNf7l2opBRRIOhU/1WYYjglpmxFlngQqbRGq/S9OiHz7EJBzJ
+         aGLmIf1ZuSkhTZ7owd7Z/RW48g8rwRwe2kbpNg4J93TMFk/p5evWTYa8WeKLLQr+fqHK
+         uTxZybDCD7BEKJg7z0g2PGV0KOAph2/SSfiMX+wgtDX7EPgMNBtM32tRDEx/H9vnRB5D
+         ug2Q==
+X-Gm-Message-State: AOJu0Yzb9jH/xKWgesJDBed7HuSivuluF0czhLa7avWALOAP3lmrz8jE
+	Z7XayheblgGm1y4NEj4F429cnGL+JuLPJTxMVytWEtOmvB+SvMnfMtk9wFc3
+X-Google-Smtp-Source: AGHT+IHf/HzOc7gRh1CwoqaNiJPfMiPzUaKy2YjlVKMT3emOWtFu9e5PjoEZIvWeJO9BmWd2+5pRfQ==
+X-Received: by 2002:a2e:a40d:0:b0:2d3:9b4:4363 with SMTP id p13-20020a2ea40d000000b002d309b44363mr341106ljn.23.1709192293423;
+        Wed, 28 Feb 2024 23:38:13 -0800 (PST)
 Received: from localhost.localdomain (92-249-182-64.pool.digikabel.hu. [92.249.182.64])
-        by smtp.gmail.com with ESMTPSA id q16-20020a5d6590000000b0033d56aa4f45sm945017wru.112.2024.02.28.23.38.11
+        by smtp.gmail.com with ESMTPSA id q16-20020a5d6590000000b0033d56aa4f45sm945017wru.112.2024.02.28.23.38.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 28 Feb 2024 23:38:12 -0800 (PST)
 From: Balazs Scheidler <bazsi77@gmail.com>
 X-Google-Original-From: Balazs Scheidler <balazs.scheidler@axoflow.com>
 To: netdev@vger.kernel.org
 Cc: Balazs Scheidler <balazs.scheidler@axoflow.com>
-Subject: [PATCH net-next 1/2] net: port TP_STORE_ADDR_PORTS_SKB macro to be tcp/udp independent
-Date: Thu, 29 Feb 2024 08:37:59 +0100
-Message-Id: <b9b8f2ee80038707f2f237c4910c46e1cbed82cd.1709191570.git.balazs.scheidler@axoflow.com>
+Subject: [PATCH net-next 2/2] net: udp: add IP/port data to the tracepoint udp/udp_fail_queue_rcv_skb
+Date: Thu, 29 Feb 2024 08:38:00 +0100
+Message-Id: <cb07bca5faf1fe3c3d4f7629cb45dbf2adb520cb.1709191570.git.balazs.scheidler@axoflow.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <cover.1709191570.git.balazs.scheidler@axoflow.com>
 References: <cover.1709191570.git.balazs.scheidler@axoflow.com>
@@ -84,138 +84,111 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch moves TP_STORE_ADDR_PORTS_SKB() to a common header and removes
-the TCP specific implementation details.
-
-Previously the macro assumed the skb passed as an argument is a
-TCP packet, the implementation now uses an argument to the L3 header and
-uses that to extract the source/destination ports, which happen
-to be named the same in "struct tcphdr" and "struct udphdr"
+The udp_fail_queue_rcv_skb() tracepoint lacks any details on the source
+and destination IP/port whereas this information can be critical in case
+of UDP/syslog.
 
 Signed-off-by: Balazs Scheidler <balazs.scheidler@axoflow.com>
 ---
- include/trace/events/net_probe_common.h | 41 ++++++++++++++++++++++
- include/trace/events/tcp.h              | 45 ++-----------------------
- 2 files changed, 43 insertions(+), 43 deletions(-)
+ include/trace/events/udp.h | 33 +++++++++++++++++++++++++++++----
+ net/ipv4/udp.c             |  2 +-
+ net/ipv6/udp.c             |  3 ++-
+ 3 files changed, 32 insertions(+), 6 deletions(-)
 
-diff --git a/include/trace/events/net_probe_common.h b/include/trace/events/net_probe_common.h
-index 3930119cab08..50c083b5687d 100644
---- a/include/trace/events/net_probe_common.h
-+++ b/include/trace/events/net_probe_common.h
-@@ -41,4 +41,45 @@
+diff --git a/include/trace/events/udp.h b/include/trace/events/udp.h
+index 336fe272889f..cd4ae5c2fad7 100644
+--- a/include/trace/events/udp.h
++++ b/include/trace/events/udp.h
+@@ -7,24 +7,49 @@
  
- #endif
+ #include <linux/udp.h>
+ #include <linux/tracepoint.h>
++#include <trace/events/net_probe_common.h>
  
-+#define TP_STORE_ADDR_PORTS_SKB_V4(__entry, skb, protoh)		\
-+	do {								\
-+		struct sockaddr_in *v4 = (void *)__entry->saddr;	\
-+									\
-+		v4->sin_family = AF_INET;				\
-+		v4->sin_port = protoh->source;				\
-+		v4->sin_addr.s_addr = ip_hdr(skb)->saddr;		\
-+		v4 = (void *)__entry->daddr;				\
-+		v4->sin_family = AF_INET;				\
-+		v4->sin_port = protoh->dest;				\
-+		v4->sin_addr.s_addr = ip_hdr(skb)->daddr;		\
-+	} while (0)
-+
-+#if IS_ENABLED(CONFIG_IPV6)
-+
-+#define TP_STORE_ADDR_PORTS_SKB(__entry, skb, protoh)			\
-+	do {								\
-+		const struct iphdr *iph = ip_hdr(skb);			\
-+									\
-+		if (iph->version == 6) {				\
-+			struct sockaddr_in6 *v6 = (void *)__entry->saddr; \
-+									\
-+			v6->sin6_family = AF_INET6;			\
-+			v6->sin6_port = protoh->source;			\
-+			v6->sin6_addr = ipv6_hdr(skb)->saddr;		\
-+			v6 = (void *)__entry->daddr;			\
-+			v6->sin6_family = AF_INET6;			\
-+			v6->sin6_port = protoh->dest;			\
-+			v6->sin6_addr = ipv6_hdr(skb)->daddr;		\
-+		} else							\
-+			TP_STORE_ADDR_PORTS_SKB_V4(__entry, skb, protoh); \
-+	} while (0)
-+
-+#else
-+
-+#define TP_STORE_ADDR_PORTS_SKB(__entry, skb, protoh)		\
-+	TP_STORE_ADDR_PORTS_SKB_V4(__entry, skb, protoh)
-+
-+#endif
-+
-+
- #endif
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index 7b1ddffa3dfc..717f74454c17 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -295,48 +295,6 @@ TRACE_EVENT(tcp_probe,
- 		  __entry->srtt, __entry->rcv_wnd, __entry->sock_cookie)
- );
+ TRACE_EVENT(udp_fail_queue_rcv_skb,
  
--#define TP_STORE_ADDR_PORTS_SKB_V4(__entry, skb)			\
--	do {								\
--		const struct tcphdr *th = (const struct tcphdr *)skb->data; \
--		struct sockaddr_in *v4 = (void *)__entry->saddr;	\
--									\
--		v4->sin_family = AF_INET;				\
--		v4->sin_port = th->source;				\
--		v4->sin_addr.s_addr = ip_hdr(skb)->saddr;		\
--		v4 = (void *)__entry->daddr;				\
--		v4->sin_family = AF_INET;				\
--		v4->sin_port = th->dest;				\
--		v4->sin_addr.s_addr = ip_hdr(skb)->daddr;		\
--	} while (0)
--
--#if IS_ENABLED(CONFIG_IPV6)
--
--#define TP_STORE_ADDR_PORTS_SKB(__entry, skb)				\
--	do {								\
--		const struct iphdr *iph = ip_hdr(skb);			\
--									\
--		if (iph->version == 6) {				\
--			const struct tcphdr *th = (const struct tcphdr *)skb->data; \
--			struct sockaddr_in6 *v6 = (void *)__entry->saddr; \
--									\
--			v6->sin6_family = AF_INET6;			\
--			v6->sin6_port = th->source;			\
--			v6->sin6_addr = ipv6_hdr(skb)->saddr;		\
--			v6 = (void *)__entry->daddr;			\
--			v6->sin6_family = AF_INET6;			\
--			v6->sin6_port = th->dest;			\
--			v6->sin6_addr = ipv6_hdr(skb)->daddr;		\
--		} else							\
--			TP_STORE_ADDR_PORTS_SKB_V4(__entry, skb);	\
--	} while (0)
--
--#else
--
--#define TP_STORE_ADDR_PORTS_SKB(__entry, skb)		\
--	TP_STORE_ADDR_PORTS_SKB_V4(__entry, skb)
--
--#endif
--
- /*
-  * tcp event with only skb
-  */
-@@ -353,12 +311,13 @@ DECLARE_EVENT_CLASS(tcp_event_skb,
+-	TP_PROTO(int rc, struct sock *sk),
++	TP_PROTO(int rc, struct sock *sk, struct sk_buff *skb),
+ 
+-	TP_ARGS(rc, sk),
++	TP_ARGS(rc, sk, skb),
+ 
+ 	TP_STRUCT__entry(
+ 		__field(int, rc)
+ 		__field(__u16, lport)
++
++		__field(__u16, sport)
++		__field(__u16, dport)
++		__field(__u16, family)
++		__array(__u8, saddr, sizeof(struct sockaddr_in6))
++		__array(__u8, daddr, sizeof(struct sockaddr_in6))
  	),
  
  	TP_fast_assign(
-+		const struct tcphdr *th = (const struct tcphdr *)skb->data;
- 		__entry->skbaddr = skb;
- 
- 		memset(__entry->saddr, 0, sizeof(struct sockaddr_in6));
- 		memset(__entry->daddr, 0, sizeof(struct sockaddr_in6));
- 
--		TP_STORE_ADDR_PORTS_SKB(__entry, skb);
-+		TP_STORE_ADDR_PORTS_SKB(__entry, skb, th);
++		const struct inet_sock *inet = inet_sk(sk);
++		const struct udphdr *uh = (const struct udphdr *)udp_hdr(skb);
++		__be32 *p32;
++
+ 		__entry->rc = rc;
+-		__entry->lport = inet_sk(sk)->inet_num;
++		__entry->lport = inet->inet_num;
++
++		__entry->sport = ntohs(uh->source);
++		__entry->dport = ntohs(uh->dest);
++		__entry->family = sk->sk_family;
++
++		p32 = (__be32 *) __entry->saddr;
++		*p32 = inet->inet_saddr;
++
++		p32 = (__be32 *) __entry->daddr;
++		*p32 =  inet->inet_daddr;
++
++		TP_STORE_ADDR_PORTS_SKB(__entry, skb, uh);
  	),
  
- 	TP_printk("src=%pISpc dest=%pISpc", __entry->saddr, __entry->daddr)
+-	TP_printk("rc=%d port=%hu", __entry->rc, __entry->lport)
++	TP_printk("rc=%d port=%hu family=%s src=%pISpc dest=%pISpc", __entry->rc, __entry->lport,
++		  show_family_name(__entry->family),
++		  __entry->saddr, __entry->daddr)
+ );
+ 
+ #endif /* _TRACE_UDP_H */
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index a8acea17b4e5..d21a85257367 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -2051,8 +2051,8 @@ static int __udp_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
+ 			drop_reason = SKB_DROP_REASON_PROTO_MEM;
+ 		}
+ 		UDP_INC_STATS(sock_net(sk), UDP_MIB_INERRORS, is_udplite);
++		trace_udp_fail_queue_rcv_skb(rc, sk, skb);
+ 		kfree_skb_reason(skb, drop_reason);
+-		trace_udp_fail_queue_rcv_skb(rc, sk);
+ 		return -1;
+ 	}
+ 
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 3f2249b4cd5f..e5a52c4c934c 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -34,6 +34,7 @@
+ #include <linux/slab.h>
+ #include <linux/uaccess.h>
+ #include <linux/indirect_call_wrapper.h>
++#include <trace/events/udp.h>
+ 
+ #include <net/addrconf.h>
+ #include <net/ndisc.h>
+@@ -661,8 +662,8 @@ static int __udpv6_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
+ 			drop_reason = SKB_DROP_REASON_PROTO_MEM;
+ 		}
+ 		UDP6_INC_STATS(sock_net(sk), UDP_MIB_INERRORS, is_udplite);
++		trace_udp_fail_queue_rcv_skb(rc, sk, skb);
+ 		kfree_skb_reason(skb, drop_reason);
+-		trace_udp_fail_queue_rcv_skb(rc, sk);
+ 		return -1;
+ 	}
+ 
 -- 
 2.40.1
 
