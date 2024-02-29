@@ -1,112 +1,107 @@
-Return-Path: <netdev+bounces-76358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CCC586D60C
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 22:22:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AA6E86D613
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 22:23:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D24691F23328
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 21:22:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A8ED1C241C0
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 21:23:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7944316FF43;
-	Thu, 29 Feb 2024 21:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E6A06D512;
+	Thu, 29 Feb 2024 21:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="L56AT+Vm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OhvjvEUv"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4317F16FF21
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 21:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8DF16FF47
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 21:23:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709241748; cv=none; b=chvblxcE0fnJjGC68Fy7FcT7YXIZq5g/AfEMHZ4aOMFMY6em9NAcY/9aCY4ZFrpZVxAlgan9VqAzAx5eH6EMYF3QEJ5QIUh7+VJe7V8KSXoxxygUr766wHv+jPVxlmf3iw5XiiICZlmujwgc3UIUUzfqoLe3UHqYVgixrvCEpWo=
+	t=1709241813; cv=none; b=gnDVKylSjlQyyMRsfPcuHVZuiSGuAfOB/Z4MnF2XbzVsPkv8yCiusmsnAizUt/b+4LHMqsvjkJZoA1ApqscDYUhYcXy5K/aFBdPLaue/kQ0oA8JLDSPM7ETFdNiNCvATvpCNiAIflE0y6GASohRMrXIrsddjsMHshHCxWE8nTig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709241748; c=relaxed/simple;
-	bh=AUMO1dwOotqMN3ZzIy/gsYjtophrhhpUFmG8jAcKCHM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n+PudMS4eNzIrAMeKIxy9gOCjo21XW/XAR96imjc74bB1EPQJMuE1XFDrO5AmOJz8AqtUNvPH1QqEznY6RQljKB1nhS/350o1gqj6YW0KjnR8Khbt6KSVmOoxTqwFS1IrtpIWuOnXwgfWXL3xO6pByS2z7+dc5+6rJcv+bmSc+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=L56AT+Vm; arc=none smtp.client-ip=95.215.58.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f1d31561-f5b5-486f-98e4-75ccc2723131@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709241744;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fWtiOH+KHBY/X4TT5M1tf4eFBhLUFT/RMzEfrBr87E4=;
-	b=L56AT+Vm3YM6U5oK/c7HLOjPbczyAJdbj+shQMgpW8YVEfiP0Y11FK6JlWRFX6aGbwVf8a
-	mPHJPzXQfonObqIAHETU64/pVr8Hc6NSsSK2wLobzcgpOMeWh28QIwei4eAgdBn+g3CwRW
-	DN1QaCXvqWZwbEhV17bS8zHI2TFRsaU=
-Date: Thu, 29 Feb 2024 21:22:19 +0000
+	s=arc-20240116; t=1709241813; c=relaxed/simple;
+	bh=VjPiDMf6IhNaW+cu762GVEnCAc1qZeJ+AXh7xICr/eo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=UPywW64MDNEeD1AJZhxYM2kc90xWWhnjaQU130vgFZXGHcJC4S0hKzOWKqvxgdRFhcu6oTZxfO1CsHUn2os9D/R2uDfuuY+IIg81d7JT9GEPMUh7JRMTVmLNMSnvddqLBbZzAiwmn+/SeLJiW1QvV2qzaDgjtYPDSGleVU6SGHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ziweixiao.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OhvjvEUv; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ziweixiao.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dcd94cc48a1so2302243276.3
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 13:23:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709241810; x=1709846610; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fLhWwQ23CyyTvDsLOK851AhQhodJoK3lOakZm//Wnio=;
+        b=OhvjvEUv5RXKCUisVhYiqDWeUklAeaS3hGRg4KGnR2UMBDVg1Vjq/ZK0dkEnNLGsin
+         rT9+I6LUjj8o/9fYKgT0s4kmJQ8KN6YxlI7zO/Zo+rq4ELFdQCUGwX/QDDMYs4gurwcI
+         sZkWN5ns7xDV0q+JPZOYPLTro3EPHMVcWj0BhKAuZyf37uKOUN2rVoWG0J0NG5u+d68t
+         KCvGCAsW9t+aR2FlYAqZqtKu/q8ci/rZs9rgMMtLfrMUxDEKmr0VfodE8Y27yWObtgE2
+         fGuiG78jL3Lh9O0lBVMsp9D5STMXF3ySNIzOSSwnBVz+UexlLkqUdqm0HGwdK9ebflMD
+         Ticg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709241810; x=1709846610;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fLhWwQ23CyyTvDsLOK851AhQhodJoK3lOakZm//Wnio=;
+        b=gbiAt+JmocJMqFqISTmALysGVtABABaW2WoweiVj+4dFLdRUKJw+RzOe2VEkOTipSv
+         UqFf/siPWQw0ILV2s29K+xx40Lig6efzcdH/eE8qffDNjy3PE0iW8Xo0JH9DXQaw6biy
+         vhUPCOkY/SULUNLn7TG4W3wUO2Glo16aGXSpnwnpmv37UieDm1MMJcJ7KM552udJnvNe
+         Fx13TGl5vNhEhznHM205BbZY600YIjLLwh85w7Pb5vO3Uz44dLISqO3DX+Eq7jQgkz8D
+         9Tjbf3tA91DddSEZrd0+qAX2ViWW820I2zXbuf/jzNQrFlZQ5ViWr8cJEa9SSIAmg4Ac
+         7I/Q==
+X-Gm-Message-State: AOJu0YwORcj2TMwSOVye8pgh80qlyFkoLhZ4fEbbx34OYRE70tvOSyTs
+	0HJsILtL3WA7kHIDDcy/2MknX9lsVECqIJ+Wz6e0OjrA9TZNOw7pFp2GPXX04FsdKsIhqZ/vYK3
+	4ChB981VXb3ECCV8h0MNKFPMLClgaTLIJ+h1AwGFcGvtVHHZO/mbHfVFB5aVXppjIIpcaqt7Z66
+	qcq05VUMGf6U3EBVAsrTDjdFkSkQ1nsT2E3QuyjuLJMdgsLoav
+X-Google-Smtp-Source: AGHT+IFS1dty/+rJQWw2sc3jcb3WwNJDLmAlgdfa2XsO6QwyCtrMLH5+4rkAyXpzjKCLMyIlAwCimbEcA1cqqH8=
+X-Received: from ziweixiao.sea.corp.google.com ([2620:15c:11c:202:43b5:fdf3:8395:a655])
+ (user=ziweixiao job=sendgmr) by 2002:a25:abc2:0:b0:dc7:48ce:d17f with SMTP id
+ v60-20020a25abc2000000b00dc748ced17fmr800935ybi.10.1709241810564; Thu, 29 Feb
+ 2024 13:23:30 -0800 (PST)
+Date: Thu, 29 Feb 2024 13:22:33 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH net-next 1/2] bnxt_en: Introduce devlink runtime driver
- param to set ptp tx timeout
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>
-Cc: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net,
- netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
- richardcochran@gmail.com
-References: <20240229070202.107488-1-michael.chan@broadcom.com>
- <20240229070202.107488-2-michael.chan@broadcom.com>
- <ZeC61UannrX8sWDk@nanopsycho> <20240229093054.0bd96a27@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20240229093054.0bd96a27@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
+Message-ID: <20240229212236.3152897-1-ziweixiao@google.com>
+Subject: [PATCH net-next 0/3] gve: Add header split support
+From: Ziwei Xiao <ziweixiao@google.com>
+To: netdev@vger.kernel.org
+Cc: jeroendb@google.com, pkaligineedi@google.com, shailend@google.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	willemb@google.com, rushilg@google.com, jfraker@google.com, jrkim@google.com, 
+	hramamurthy@google.com, ziweixiao@google.com, horms@kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 29/02/2024 17:30, Jakub Kicinski wrote:
-> On Thu, 29 Feb 2024 18:11:49 +0100 Jiri Pirko wrote:
->> Idk. This does not look sane to me at all. Will we have custom knobs to
->> change timeout for arbitrary FW commands as this as a common thing?
->> Driver is the one to take care of timeouts of FW gracefully, he should
->> know the FW, not the user. Therefore exposing user knobs like this
->> sounds pure wrong to me.
->>
->> nack for adding this to devlink.
-> 
-> +1
-> 
-> BTW why is the documentation in a different patch that the param :(
-> 
->> If this is some maybe-to-be-common ptp thing, can that be done as part
->> of ptp api perhaps?
+Currently, the ethtool's ringparam has added a new field tcp-data-split
+for enabling and disabling header split. These three patches will
+utilize that ethtool flag to support header split in GVE driver.
 
-Jiri, do you mean extend current ioctl used to enable/disable HW
-timestamps?
+Jeroen de Borst (3):
+  gve: Add header split device option
+  gve: Add header split data path
+  gve: Add header split ethtool stats
 
-> 
-> Perhaps, but also I think it's fairly impractical. Specialized users may
-> be able to tune this, but in DC environment PTP is handled at the host
+ drivers/net/ethernet/google/gve/gve.h         | 27 +++++++-
+ drivers/net/ethernet/google/gve/gve_adminq.c  | 50 ++++++++++++--
+ drivers/net/ethernet/google/gve/gve_adminq.h  | 20 +++++-
+ drivers/net/ethernet/google/gve/gve_ethtool.c | 62 +++++++++++++----
+ drivers/net/ethernet/google/gve/gve_main.c    | 65 ++++++++++++++++--
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c  | 68 ++++++++++++++++++-
+ drivers/net/ethernet/google/gve/gve_utils.c   | 17 +++--
+ drivers/net/ethernet/google/gve/gve_utils.h   |  3 +
+ 8 files changed, 277 insertions(+), 35 deletions(-)
 
-That's correct, only 1 app is actually doing syncronization
+-- 
+2.44.0.rc1.240.g4c46232300-goog
 
-> level, and the applications come and go. So all the poor admin can do
-
-Container/VM level applications don't care about PTP packets timestamps.
-They only care about the time being synchronized.
-
-> is set this to the max value. While in the driver you can actually try
-
-Pure admin will tune it according to the host level app configuration
-which may differ because of environment.
-
-> to be a bit more intelligent. Expecting the user to tune this strikes me
-> as trying to take the easy way out..
-
-There is no actual way for application to signal down to driver that it
-gave up waiting for TX timestamp, what other kind of smartness can we
-expect here?
 
