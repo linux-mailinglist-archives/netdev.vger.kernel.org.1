@@ -1,172 +1,197 @@
-Return-Path: <netdev+bounces-76097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12E9B86C509
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:26:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF00086C513
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:27:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFE7D1F26F75
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:26:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28E381F21C8D
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DBF65B690;
-	Thu, 29 Feb 2024 09:26:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB045B5D8;
+	Thu, 29 Feb 2024 09:27:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="OqkIH365"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ra1/njjT"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976A45D747;
-	Thu, 29 Feb 2024 09:26:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CEFF5A103
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 09:27:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709198775; cv=none; b=XxbEowVOkMUGEBuEcfBA9njpT8aQ96OGIsCU7iIBgKea+w49o29RmYz82qFgkznhzhvdlWew0J7LmuCFnwBUdkIDl14DTz5ruLmiJC7eeeH96FK5+8D89Sv2RtUcBSji5DAsublksulvPpRHxky0FRdBetd2jHmNKgXskigAqws=
+	t=1709198852; cv=none; b=LIFzwOmVdDF8KZrhIjIrLwsRvjIYoFe1vEehl7VfFCNvZ3yRgUSMmCTGXtzbecPKet331YRTp9jAn6HS/DJiCGUpsrSUBpQLvkaBQJmWC0MOoXAgzg1BNaP1s9TQu+ozuxROysGGpSgbAYIpdso3gWWmliwU51OXunxJvineLXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709198775; c=relaxed/simple;
-	bh=LTz2lNXyKqAWl+OV2R4/W4e53JnuoSa6h/8g27FD3j0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=scCMuaauj5TrDjaUwCJ8+YjYnW3+kD6fzMmGXzPlZf9JDVJ3TPevReRgZgWggJHiskefvfyf0FS73rzkufqhmKFLYM9ry1cOhvlIH3uoaoUS+TY+EBuMl7fNm+2WEC/PEoWDE/vVZc7CiNc51uG2m5/G0XKyhAu9fgeJoltkK5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=OqkIH365; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 9D014880CD;
-	Thu, 29 Feb 2024 10:26:04 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1709198766;
-	bh=/3y3hwrWuyFglLG8ptOVhNQiCprvEAiPkPdCyqfV0T8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OqkIH365+dh/IZeNYGueDrwEvDTrdKquseXSwX3fPvqdjNkZ+YDAxENoLdLHQVPQL
-	 7hnoqQPcf/yHuGKSHaKTTY94f/YDXE0+IctDCvncBAefHjYqVeYz3gpJqA5UesIVF5
-	 m1kERA6heLxC2oZNTsG86Yrp+0UswTGFji4FJ+C7vvqHyjRy5tugZInpvbMfdve7sR
-	 g2k10dZ0oVgvD8GFnHsxlTjLIQgQAGQvmwqxgQwC7qczu5Mv5+fMcGuyBTZd/4URGj
-	 WyQ6+K44ZHEXxstwGaz4DJ8Hy/BTnz2KkqZ1nSe1DxZIL2e07p3U2FFx5Ar3a+KjSz
-	 0nO+C8uTaJfEw==
-Date: Thu, 29 Feb 2024 10:25:57 +0100
-From: Lukasz Majewski <lukma@denx.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, Eric Dumazet <edumazet@google.com>, Florian
- Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, Tristram.Ha@microchip.com, Sebastian Andrzej
- Siewior <bigeasy@linutronix.de>, Paolo Abeni <pabeni@redhat.com>, Ravi
- Gunasekaran <r-gunasekaran@ti.com>, Simon Horman <horms@kernel.org>,
- Wojciech Drewek <wojciech.drewek@intel.com>, Nikita Zhandarovich
- <n.zhandarovich@fintech.ru>, Murali Karicheri <m-karicheri2@ti.com>, Dan
- Carpenter <dan.carpenter@linaro.org>, Ziyang Xuan
- <william.xuanziyang@huawei.com>, Kristian Overskeid <koverskeid@gmail.com>,
- Matthieu Baerts <matttbe@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [RFC] net: hsr: Provide RedBox support
-Message-ID: <20240229102557.615c02f3@wsk>
-In-Reply-To: <c3880444-3665-4a60-b6ec-f8ae8a9fbf8d@lunn.ch>
-References: <20240228150735.3647892-1-lukma@denx.de>
-	<20240228083115.01d4c93e@hermes.local>
-	<c3880444-3665-4a60-b6ec-f8ae8a9fbf8d@lunn.ch>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1709198852; c=relaxed/simple;
+	bh=0SPq13OgUipRfdOPYl+SKSbQna1CNgdVmEQ5Vo5gwCU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K8NvSxEA/Q41OUblTO6HCpVUFABJzFNes2rYrRo5eHRbW8E/qqu/J6U/nkr4ognLoz8TDZavP2MznNaxHxxFBNYeBsbtPf38oxaty+K+GZdqTkr3BwLCSHF7MpZ1BvOIM2qEdT7nGHLhpR/MzzWw6ufVqc3AqQ32M6zUdXv9T6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ra1/njjT; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <66cb6a54-8735-4f67-9aff-0048156e0902@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1709198848;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Edbtz+f6tlHV/vi1hnDkS0KKS0V7t22PYAY0szn92QM=;
+	b=ra1/njjT/cLnWurWgFPkt23hlSY+uFOkePCnkShKzuf8UNh8mpndd37j4CLKpAsazhDzqz
+	Qn5f1dcvYbJMZQT+PRhEfW4NbpS+57wFR/udblXzYPfIarCLFlu83S86hX80C9SzJLZSzY
+	aOJRKGSd98Zeiwdhxx6wcodI31FNaxI=
+Date: Thu, 29 Feb 2024 09:27:24 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/HXhiR.+AvKxAWKdncrkr5ru";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Subject: Re: [PATCH net-next 1/2] bnxt_en: Introduce devlink runtime driver
+ param to set ptp tx timeout
+Content-Language: en-US
+To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, edumazet@google.com,
+ andrew.gospodarek@broadcom.com, jiri@resnulli.us, richardcochran@gmail.com
+References: <20240229070202.107488-1-michael.chan@broadcom.com>
+ <20240229070202.107488-2-michael.chan@broadcom.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240229070202.107488-2-michael.chan@broadcom.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
---Sig_/HXhiR.+AvKxAWKdncrkr5ru
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 29/02/2024 07:02, Michael Chan wrote:
+> From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> 
+> Sometimes, the current 1ms value that driver waits for firmware
+> to obtain a tx timestamp for a PTP packet may not be sufficient.
+> User may want the driver to wait for a longer custom period before
+> timing out.
+> 
+> Introduce a new runtime driver param for devlink "ptp_tx_timeout".
+> Using this parameter the driver can wait for up to the specified
+> time, when it is querying for a TX timestamp from firmware.  By
+> default the value is set to 1s.
+> 
+> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> ---
+>   .../net/ethernet/broadcom/bnxt/bnxt_devlink.c | 42 +++++++++++++++++++
+>   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c |  1 +
+>   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  3 ++
+>   3 files changed, 46 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
+> index ae4529c043f0..0df0baa9d18c 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
+> @@ -652,6 +652,7 @@ static const struct devlink_ops bnxt_vf_dl_ops;
+>   enum bnxt_dl_param_id {
+>   	BNXT_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
+>   	BNXT_DEVLINK_PARAM_ID_GRE_VER_CHECK,
+> +	BNXT_DEVLINK_PARAM_ID_PTP_TXTS_TMO,
+>   };
+>   
+>   static const struct bnxt_dl_nvm_param nvm_params[] = {
+> @@ -1077,6 +1078,42 @@ static int bnxt_hwrm_nvm_req(struct bnxt *bp, u32 param_id, void *msg,
+>   	return rc;
+>   }
+>   
+> +static int bnxt_dl_ptp_param_get(struct devlink *dl, u32 id,
+> +				 struct devlink_param_gset_ctx *ctx)
+> +{
+> +	struct bnxt *bp = bnxt_get_bp_from_dl(dl);
+> +
+> +	if (!bp->ptp_cfg)
+> +		return -EOPNOTSUPP;
+> +
+> +	ctx->val.vu32 = bp->ptp_cfg->txts_tmo;
+> +	return 0;
+> +}
+> +
+> +static int bnxt_dl_ptp_param_set(struct devlink *dl, u32 id,
+> +				 struct devlink_param_gset_ctx *ctx)
+> +{
+> +	struct bnxt *bp = bnxt_get_bp_from_dl(dl);
+> +
+> +	if (!bp->ptp_cfg)
+> +		return -EOPNOTSUPP;
+> +
+> +	bp->ptp_cfg->txts_tmo = ctx->val.vu32;
+> +	return 0;
+> +}
+> +
+> +static int bnxt_dl_ptp_param_validate(struct devlink *dl, u32 id,
+> +				      union devlink_param_value val,
+> +				      struct netlink_ext_ack *extack)
+> +{
+> +	if (val.vu32 > BNXT_PTP_MAX_TX_TMO) {
+> +		NL_SET_ERR_MSG_FMT_MOD(extack, "TX timeout value exceeds the maximum (%d ms)",
+> +				       BNXT_PTP_MAX_TX_TMO);
+> +		return -EINVAL;
+> +	}
+> +	return 0;
+> +}
+> +
+>   static int bnxt_dl_nvm_param_get(struct devlink *dl, u32 id,
+>   				 struct devlink_param_gset_ctx *ctx)
+>   {
+> @@ -1180,6 +1217,11 @@ static const struct devlink_param bnxt_dl_params[] = {
+>   			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
+>   			     bnxt_dl_nvm_param_get, bnxt_dl_nvm_param_set,
+>   			     NULL),
+> +	DEVLINK_PARAM_DRIVER(BNXT_DEVLINK_PARAM_ID_PTP_TXTS_TMO,
+> +			     "ptp_tx_timeout", DEVLINK_PARAM_TYPE_U32,
+> +			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+> +			     bnxt_dl_ptp_param_get, bnxt_dl_ptp_param_set,
+> +			     bnxt_dl_ptp_param_validate),
+>   	/* keep REMOTE_DEV_RESET last, it is excluded based on caps */
+>   	DEVLINK_PARAM_GENERIC(ENABLE_REMOTE_DEV_RESET,
+>   			      BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+> index cc07660330f5..4b50b07b9771 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+> @@ -965,6 +965,7 @@ int bnxt_ptp_init(struct bnxt *bp, bool phc_cfg)
+>   		spin_unlock_bh(&ptp->ptp_lock);
+>   		ptp_schedule_worker(ptp->ptp_clock, 0);
+>   	}
+> +	ptp->txts_tmo = BNXT_PTP_DFLT_TX_TMO;
+>   	return 0;
+>   
+>   out:
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+> index fce8dc39a7d0..ee977620d33e 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+> @@ -22,6 +22,8 @@
+>   #define BNXT_LO_TIMER_MASK	0x0000ffffffffUL
+>   #define BNXT_HI_TIMER_MASK	0xffff00000000UL
+>   
+> +#define BNXT_PTP_DFLT_TX_TMO	1000 /* ms */
 
-Hi Andrew,
+I'm not happy with such huge timeout, but looks like other vendors do
+expect the same timeouts, I'm ok.
 
-> On Wed, Feb 28, 2024 at 08:31:15AM -0800, Stephen Hemminger wrote:
-> > On Wed, 28 Feb 2024 16:07:35 +0100
-> > Lukasz Majewski <lukma@denx.de> wrote:
-> >  =20
-> > > =20
-> > > +/* hsr_proxy_node_table_show - Formats and prints proxy
-> > > node_table entries */ +static int
-> > > +hsr_proxy_node_table_show(struct seq_file *sfp, void *data)
-> > > +{
-> > > +	struct hsr_priv *priv =3D (struct hsr_priv *)sfp->private;
-> > > +	struct hsr_node *node;
-> > > +
-> > > +	seq_printf(sfp, "Proxy Node Table entries for HSR
-> > > device\n");
-> > > +	seq_puts(sfp, "MAC-Address-SAN,        time_in\n");
-> > > +	rcu_read_lock();
-> > > +	list_for_each_entry_rcu(node, &priv->proxy_node_db,
-> > > mac_list) {
-> > > +		seq_printf(sfp, "%pM ", &node->macaddress_A[0]);
-> > > +		seq_printf(sfp, "%10lx\n",
-> > > node->time_in[HSR_PT_INTERLINK]);
-> > > +	}
-> > > +	rcu_read_unlock();
-> > > +	return 0;
-> > > +}
-> > > +
-> > >  DEFINE_SHOW_ATTRIBUTE(hsr_node_table);
-> > > +DEFINE_SHOW_ATTRIBUTE(hsr_proxy_node_table); =20
-> >=20
-> > NAK
-> > Do not abuse sysfs to be a debug proc style output. =20
->=20
-> This is actually debugfs, not sysfs.
->=20
-> However, i agree, we want information like this exported via netlink
-> as the primary interface to the end user. debugfs is not suitable for
-> that.
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
-Am I correct, that recommended approach would be to:
+> +#define BNXT_PTP_MAX_TX_TMO	5000 /* ms */
+>   #define BNXT_PTP_QTS_TIMEOUT	1000
+>   #define BNXT_PTP_QTS_TX_ENABLES	(PORT_TS_QUERY_REQ_ENABLES_PTP_SEQ_ID |	\
+>   				 PORT_TS_QUERY_REQ_ENABLES_TS_REQ_TIMEOUT | \
+> @@ -120,6 +122,7 @@ struct bnxt_ptp_cfg {
+>   
+>   	u32			refclk_regs[2];
+>   	u32			refclk_mapped_regs[2];
+> +	u32			txts_tmo;
+>   };
+>   
+>   #if BITS_PER_LONG == 32
 
-1. Modify iproute2 to support for example:
-
-ip addr show dev hsr1 nodes {proxy} ?
-
-2. Shall the currently exported:
-
-/sys/kernel/debug/hsr/hsrX/node_table be left as it is (for legacy
-usage) or shall it be removed and replaced with netlink and iproute2 ?
-
->=20
-> 	 Andrew
-
-
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/HXhiR.+AvKxAWKdncrkr5ru
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmXgTaUACgkQAR8vZIA0
-zr166Qf+PtTfzrYXP7ThEPCaBT1z1kOq7J1fD6bGHn0jQAAafLG3Km5OkuNNObdL
-/0mxgNb7JfaPlXuY4SQtR5i1s9BZoWLpLmNQ5tCfvaVjy+e/ac5ct2YrqHCnOPdA
-IXBRCf2iZYG6Cvci4S2JJol9ssQea/jgqmHfz1ze8YqtEdwaDS91bwOZshoG1xSl
-I3Z7v80GgGGQECIkkznT8xF/sbuFzRUKgh7n4t4ynkopzjDTp6rPTmSo4fXfP4L/
-2f/zhXUbzzLsdH8/6rGLRGCcKlF2cmBZpKZbUd8LgCS5y5Rs56IayHv7Rr47FUiZ
-VfC9XqFdu2FEhEEok2EDmyXD7sfhUA==
-=3OGX
------END PGP SIGNATURE-----
-
---Sig_/HXhiR.+AvKxAWKdncrkr5ru--
 
