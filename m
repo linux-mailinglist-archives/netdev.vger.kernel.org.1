@@ -1,220 +1,195 @@
-Return-Path: <netdev+bounces-76329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FB9886D4B3
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 21:46:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D282A86D4FE
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 21:52:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB4ECB2470E
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:46:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D2632854B6
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:52:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28FBE1586E8;
-	Thu, 29 Feb 2024 20:39:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0551C145662;
+	Thu, 29 Feb 2024 20:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WV3ZPBh9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gWGaugMO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909E514BF57;
-	Thu, 29 Feb 2024 20:39:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD08E145661;
+	Thu, 29 Feb 2024 20:40:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709239180; cv=none; b=EVDvE9h9rpIr4FUFMFS5PLdrLnhIxBng2BJssz84HQPFFpKqf8IM3wTCCGSS/DakU7KrWifl0Zoqw8MKuSHS5Y/Lw0Xy7dGPEaQbvykzZ1dP3VLCVYGn4NReC56ApS5OKiBftmz1t+A+lPFSFjE5UPQIcl2W1fSPy8qyKbD2AC8=
+	t=1709239241; cv=none; b=Rvn/8cR7YLnzmWI+n0fFEonO3buqE4vEngWLX523Usi0k4DVwolJXqbsdE1BFaXqGx9GyM2IjTn4kimi7J93dP2IEgID9fTvEEoLGMhCHzw5DbBAGkSG4aRMsdsksLkkVEY/evhuDSka2gKbGb/fbog3fH4CC9yOE3VUS+nZPyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709239180; c=relaxed/simple;
-	bh=B+M+BX4GSk9XU2Zt5arn3kVSOj/DdLUCPL1b5EzPo0w=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Q1ADWFcnf4CJtiiWp+7K/9EEDUiTKzkfZLJGtIWjAWdKBFRlzMgNnvxLco2Fa9hf4f4ALe/2M0vRiLykt3y191c6e3089frJq2dmyk8tfANAawBFog3rn4DEnmGa4+hy+Cbz36gwT4yK6YdJT/u8L5xCCoDmnpCO1r3g8wWxpR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WV3ZPBh9; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1dc1ff58fe4so12207445ad.1;
-        Thu, 29 Feb 2024 12:39:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709239178; x=1709843978; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CltTZohNET3MTMYyF/2FXyGhZH7B87OJCWb5gP5mDbY=;
-        b=WV3ZPBh9v0qC2U28Y49vuxjBQ4o0ORit6kAqbbo/XdnfcRx+2L21ENKH2LORXv7OtZ
-         XI+3zE4SestjKvLkVACu2jSugOD0zlq+spM6n5fpB6QHzvaQqh58qVf+Bg7ghEj508ly
-         R9oHVzavB/F3z//3UG06GM0NPDWo2Jd3avXm1DUcZmucLUTFCLChIO21Bx2DIt3jImN+
-         ZwRkuQ+4sLGNAezTwbeTaSjbmryJTwdPMjHCvvEirWCj97qm2MeEIS+QD9m5UQ/CEnyC
-         Z6p6BvrcutcQZypkfZRjC8yEX1LWI8tF0oFfrzLRr6KcOLsHUC2TRQIcBO/9eBSr7g/5
-         x7AQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709239178; x=1709843978;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CltTZohNET3MTMYyF/2FXyGhZH7B87OJCWb5gP5mDbY=;
-        b=O6eSPGK3P5PesoyeYgVvnOlU8xmTTXf5PKVuMBB2w1TgdlET59BQQ46RC24Lk9UkNt
-         Cj9igrufMnJShVtwFibEsYn3L2+vsZR5dQqSv6lhJXAnI7oU2cZz+iQjKV7hrkvPpNuz
-         XsDjwphDy+H8kltLE5PmcbFB5ckqYT2ysn7Mpnsj7dryoEctcr37dBj2zcdUNEDrt28g
-         rlUZuRFP8qRkhD2IIlPtXELNmDPyKc6hnyVcIU0hbLxABajtD6Iq1m02g79UGD1SvQVH
-         jgva/fhKoKSlfbISjfK/ESLsX31bcQot79R90c+9RIqavKQ6SyXHO8UXwoRlBq6IhruN
-         76vw==
-X-Forwarded-Encrypted: i=1; AJvYcCWCQTYPPEnKsMVhWahm3sz/wkp0EDXiD59HNiolI0v6xrYcqRGpnQxqFrF7AWsw2F53hfC6VfG/RrQOkGO7EYo0PZne80jlcwUxTtL/oXTuX1G7u7verdc6l/5B
-X-Gm-Message-State: AOJu0YyntGgk7O29qPj5Zns/IkzETvi28HFMWWOS3ka0eBGl4Ym7L9AA
-	a7RSGFxHegzWjXbsprY7udOGSXBREdtfQVdze2pFAbuIZg/8/3hp
-X-Google-Smtp-Source: AGHT+IGF4pSLb+yBjdqoX1FoorcH2PoMUIu0ffzSSlbXs1jC4Y0owSUSF8ZRe8EghH5CgKEwuv3xWA==
-X-Received: by 2002:a17:902:da85:b0:1dc:a60f:1b6a with SMTP id j5-20020a170902da8500b001dca60f1b6amr3808783plx.13.1709239177658;
-        Thu, 29 Feb 2024 12:39:37 -0800 (PST)
-Received: from localhost ([98.97.43.160])
-        by smtp.gmail.com with ESMTPSA id w1-20020a170902d10100b001dbb14e6feesm1946248plw.189.2024.02.29.12.39.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 12:39:36 -0800 (PST)
-Date: Thu, 29 Feb 2024 12:39:35 -0800
-From: John Fastabend <john.fastabend@gmail.com>
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- "David S. Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@google.com>, 
- Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>
-Cc: syzbot+8cd36f6b65f3cafd400a@syzkaller.appspotmail.com, 
- netdev@vger.kernel.org, 
- bpf@vger.kernel.org
-Message-ID: <65e0eb87a079e_322af20886@john.notmuch>
-In-Reply-To: <87zfvj8tiz.fsf@toke.dk>
-References: <20240227152740.35120-1-toke@redhat.com>
- <65dfa50679d0a_2beb3208c8@john.notmuch>
- <87zfvj8tiz.fsf@toke.dk>
-Subject: RE: [PATCH bpf] bpf: Fix DEVMAP_HASH overflow check on 32-bit arches
+	s=arc-20240116; t=1709239241; c=relaxed/simple;
+	bh=yblZdlPa+A9wWipbOumptZlARm3EGoaVGcYsVoiSfD0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sYcpvfL3v1leAo4bopFujqY7ODVhV5T1sW/VkmChfrxWWlVkIcPXW+mf9mU3yFzygLEai7xVotxvpbbFwNmMEvpwlY03NA+v17tBEPLfPYOQd0qZlyr83Qe3mS7wCdgIizR/Em8VHWv4ibZUaaxMclUVTkXP5LX7wlTCPjTUjS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gWGaugMO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86746C43399;
+	Thu, 29 Feb 2024 20:40:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709239241;
+	bh=yblZdlPa+A9wWipbOumptZlARm3EGoaVGcYsVoiSfD0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=gWGaugMOQales+gEpRCgeKW7qlcPqn4v8S5wNel9A7NT91P2h1VJ9cDbY4BR+RDJa
+	 HhhUk7Esz+fV1brpKuKzGl2b8XJ0MzoUxJoOFhchwhtYL/fuPkXckSrNipKb/xh7FQ
+	 Jt0tPxcxGAH0LLnlXF9EoGlmGcN9ivG6OJheenuy7lpPCj4c/m+feHdlJsOyvTW7Mg
+	 VgfcQWx/k3/jGPgnz2ITDRAHiXRun8MMqonvth8Y2HPgy8ix/ksOy7hOq8+4wRxH07
+	 m8Ho9v5Jbts+7gc/FSJ7mNn0O81ktN7mvUw1r97DSnBvNPYN7wx9sUXPyI6ms8j14Y
+	 X8GIZW6B+/nPg==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Leon Romanovsky <leonro@nvidia.com>,
+	Sasha Levin <sashal@kernel.org>,
+	saeedm@nvidia.com,
+	linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 02/12] RDMA/mlx5: Fix fortify source warning while accessing Eth segment
+Date: Thu, 29 Feb 2024 15:40:24 -0500
+Message-ID: <20240229204039.2861519-2-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240229204039.2861519-1-sashal@kernel.org>
+References: <20240229204039.2861519-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.1.79
+Content-Transfer-Encoding: 8bit
 
-Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> John Fastabend <john.fastabend@gmail.com> writes:
-> =
+From: Leon Romanovsky <leonro@nvidia.com>
 
-> > Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> >> The devmap code allocates a number hash buckets equal to the next po=
-wer of two
-> >> of the max_entries value provided when creating the map. When roundi=
-ng up to the
-> >> next power of two, the 32-bit variable storing the number of buckets=
- can
-> >> overflow, and the code checks for overflow by checking if the trunca=
-ted 32-bit value
-> >> is equal to 0. However, on 32-bit arches the rounding up itself can =
-overflow
-> >> mid-way through, because it ends up doing a left-shift of 32 bits on=
- an unsigned
-> >> long value. If the size of an unsigned long is four bytes, this is u=
-ndefined
-> >> behaviour, so there is no guarantee that we'll end up with a nice an=
-d tidy
-> >> 0-value at the end.
+[ Upstream commit 4d5e86a56615cc387d21c629f9af8fb0e958d350 ]
 
-Hi Toke, dumb question where is this left-shift noted above? It looks lik=
-e fls_long
-tries to account by having a check for sizeof(l) =3D=3D 4. I'm asking mos=
-tly because
-I've found a few more spots without this check.
+ ------------[ cut here ]------------
+ memcpy: detected field-spanning write (size 56) of single field "eseg->inline_hdr.start" at /var/lib/dkms/mlnx-ofed-kernel/5.8/build/drivers/infiniband/hw/mlx5/wr.c:131 (size 2)
+ WARNING: CPU: 0 PID: 293779 at /var/lib/dkms/mlnx-ofed-kernel/5.8/build/drivers/infiniband/hw/mlx5/wr.c:131 mlx5_ib_post_send+0x191b/0x1a60 [mlx5_ib]
+ Modules linked in: 8021q garp mrp stp llc rdma_ucm(OE) rdma_cm(OE) iw_cm(OE) ib_ipoib(OE) ib_cm(OE) ib_umad(OE) mlx5_ib(OE) ib_uverbs(OE) ib_core(OE) mlx5_core(OE) pci_hyperv_intf mlxdevm(OE) mlx_compat(OE) tls mlxfw(OE) psample nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip_set nf_tables libcrc32c nfnetlink mst_pciconf(OE) knem(OE) vfio_pci vfio_pci_core vfio_iommu_type1 vfio iommufd irqbypass cuse nfsv3 nfs fscache netfs xfrm_user xfrm_algo ipmi_devintf ipmi_msghandler binfmt_misc crct10dif_pclmul crc32_pclmul polyval_clmulni polyval_generic ghash_clmulni_intel sha512_ssse3 snd_pcsp aesni_intel crypto_simd cryptd snd_pcm snd_timer joydev snd soundcore input_leds serio_raw evbug nfsd auth_rpcgss nfs_acl lockd grace sch_fq_codel sunrpc drm efi_pstore ip_tables x_tables autofs4 psmouse virtio_net net_failover failover floppy
+  [last unloaded: mlx_compat(OE)]
+ CPU: 0 PID: 293779 Comm: ssh Tainted: G           OE      6.2.0-32-generic #32~22.04.1-Ubuntu
+ Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
+ RIP: 0010:mlx5_ib_post_send+0x191b/0x1a60 [mlx5_ib]
+ Code: 0c 01 00 a8 01 75 25 48 8b 75 a0 b9 02 00 00 00 48 c7 c2 10 5b fd c0 48 c7 c7 80 5b fd c0 c6 05 57 0c 03 00 01 e8 95 4d 93 da <0f> 0b 44 8b 4d b0 4c 8b 45 c8 48 8b 4d c0 e9 49 fb ff ff 41 0f b7
+ RSP: 0018:ffffb5b48478b570 EFLAGS: 00010046
+ RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
+ RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+ RBP: ffffb5b48478b628 R08: 0000000000000000 R09: 0000000000000000
+ R10: 0000000000000000 R11: 0000000000000000 R12: ffffb5b48478b5e8
+ R13: ffff963a3c609b5e R14: ffff9639c3fbd800 R15: ffffb5b480475a80
+ FS:  00007fc03b444c80(0000) GS:ffff963a3dc00000(0000) knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: 0000556f46bdf000 CR3: 0000000006ac6003 CR4: 00000000003706f0
+ DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+ DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+ Call Trace:
+  <TASK>
+  ? show_regs+0x72/0x90
+  ? mlx5_ib_post_send+0x191b/0x1a60 [mlx5_ib]
+  ? __warn+0x8d/0x160
+  ? mlx5_ib_post_send+0x191b/0x1a60 [mlx5_ib]
+  ? report_bug+0x1bb/0x1d0
+  ? handle_bug+0x46/0x90
+  ? exc_invalid_op+0x19/0x80
+  ? asm_exc_invalid_op+0x1b/0x20
+  ? mlx5_ib_post_send+0x191b/0x1a60 [mlx5_ib]
+  mlx5_ib_post_send_nodrain+0xb/0x20 [mlx5_ib]
+  ipoib_send+0x2ec/0x770 [ib_ipoib]
+  ipoib_start_xmit+0x5a0/0x770 [ib_ipoib]
+  dev_hard_start_xmit+0x8e/0x1e0
+  ? validate_xmit_skb_list+0x4d/0x80
+  sch_direct_xmit+0x116/0x3a0
+  __dev_xmit_skb+0x1fd/0x580
+  __dev_queue_xmit+0x284/0x6b0
+  ? _raw_spin_unlock_irq+0xe/0x50
+  ? __flush_work.isra.0+0x20d/0x370
+  ? push_pseudo_header+0x17/0x40 [ib_ipoib]
+  neigh_connected_output+0xcd/0x110
+  ip_finish_output2+0x179/0x480
+  ? __smp_call_single_queue+0x61/0xa0
+  __ip_finish_output+0xc3/0x190
+  ip_finish_output+0x2e/0xf0
+  ip_output+0x78/0x110
+  ? __pfx_ip_finish_output+0x10/0x10
+  ip_local_out+0x64/0x70
+  __ip_queue_xmit+0x18a/0x460
+  ip_queue_xmit+0x15/0x30
+  __tcp_transmit_skb+0x914/0x9c0
+  tcp_write_xmit+0x334/0x8d0
+  tcp_push_one+0x3c/0x60
+  tcp_sendmsg_locked+0x2e1/0xac0
+  tcp_sendmsg+0x2d/0x50
+  inet_sendmsg+0x43/0x90
+  sock_sendmsg+0x68/0x80
+  sock_write_iter+0x93/0x100
+  vfs_write+0x326/0x3c0
+  ksys_write+0xbd/0xf0
+  ? do_syscall_64+0x69/0x90
+  __x64_sys_write+0x19/0x30
+  do_syscall_64+0x59/0x90
+  ? do_user_addr_fault+0x1d0/0x640
+  ? exit_to_user_mode_prepare+0x3b/0xd0
+  ? irqentry_exit_to_user_mode+0x9/0x20
+  ? irqentry_exit+0x43/0x50
+  ? exc_page_fault+0x92/0x1b0
+  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+ RIP: 0033:0x7fc03ad14a37
+ Code: 10 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+ RSP: 002b:00007ffdf8697fe8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+ RAX: ffffffffffffffda RBX: 0000000000008024 RCX: 00007fc03ad14a37
+ RDX: 0000000000008024 RSI: 0000556f46bd8270 RDI: 0000000000000003
+ RBP: 0000556f46bb1800 R08: 0000000000007fe3 R09: 0000000000000000
+ R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
+ R13: 0000556f46bc66b0 R14: 000000000000000a R15: 0000556f46bb2f50
+  </TASK>
+ ---[ end trace 0000000000000000 ]---
 
-> >> =
+Link: https://lore.kernel.org/r/8228ad34bd1a25047586270f7b1fb4ddcd046282.1706433934.git.leon@kernel.org
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/infiniband/hw/mlx5/wr.c | 2 +-
+ include/linux/mlx5/qp.h         | 5 ++++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-> >> Syzbot managed to turn this into a crash on arm32 by creating a DEVM=
-AP_HASH with
-> >> max_entries > 0x80000000 and then trying to update it. Fix this by m=
-oving the
-> >> overflow check to before the rounding up operation.
-> >> =
-
-> >> Fixes: 6f9d451ab1a3 ("xdp: Add devmap_hash map type for looking up d=
-evices by hashed index")
-> >> Link: https://lore.kernel.org/r/000000000000ed666a0611af6818@google.=
-com
-> >> Reported-and-tested-by: syzbot+8cd36f6b65f3cafd400a@syzkaller.appspo=
-tmail.com
-> >> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> >> ---
-> >>  kernel/bpf/devmap.c | 8 +++-----
-> >>  1 file changed, 3 insertions(+), 5 deletions(-)
-> >> =
-
-> >> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
-> >> index a936c704d4e7..9b2286f9c6da 100644
-> >> --- a/kernel/bpf/devmap.c
-> >> +++ b/kernel/bpf/devmap.c
-> >> @@ -130,13 +130,11 @@ static int dev_map_init_map(struct bpf_dtab *d=
-tab, union bpf_attr *attr)
-> >>  	bpf_map_init_from_attr(&dtab->map, attr);
-> >>  =
-
-> >>  	if (attr->map_type =3D=3D BPF_MAP_TYPE_DEVMAP_HASH) {
-> >> -		dtab->n_buckets =3D roundup_pow_of_two(dtab->map.max_entries);
-> >> -
-> >> -		if (!dtab->n_buckets) /* Overflow check */
-> >> +		if (dtab->map.max_entries > U32_MAX / 2)
-> >>  			return -EINVAL;
-> >> -	}
-> >>  =
-
-> >> -	if (attr->map_type =3D=3D BPF_MAP_TYPE_DEVMAP_HASH) {
-> >> +		dtab->n_buckets =3D roundup_pow_of_two(dtab->map.max_entries);
-> >> +
-> >>  		dtab->dev_index_head =3D dev_map_create_hash(dtab->n_buckets,
-> >>  							   dtab->map.numa_node);
-> >>  		if (!dtab->dev_index_head)
-> >> -- =
-
-> >> 2.43.2
-> >> =
-
-> >
-> > I'm fairly sure this code was just taken from the hashtab implementat=
-ion.
-> =
-
-> Yup, it was :)
-> =
-
-> > Do we also need a fix there?
-> >
-> >         /* hash table size must be power of 2 */
-> >         htab->n_buckets =3D roundup_pow_of_two(htab->map.max_entries)=
-;
-> >
-> > The u32 check in hashtab is,
-> >
-> >         /* prevent zero size kmalloc and check for u32 overflow */
-> >         if (htab->n_buckets =3D=3D 0 ||
-> >             htab->n_buckets > U32_MAX / sizeof(struct bucket))
-> >                 goto free_htab;
-> =
-
-> Yeah, I don't see any reason why this wouldn't be susceptible to the
-> same issue. I'll send a follow-up to apply the same fix there.
-
-Cool thanks one more question above.
-
-> =
-
-> -Toke
-> =
-
-
+diff --git a/drivers/infiniband/hw/mlx5/wr.c b/drivers/infiniband/hw/mlx5/wr.c
+index 855f3f4fefadd..737db67a9ce1d 100644
+--- a/drivers/infiniband/hw/mlx5/wr.c
++++ b/drivers/infiniband/hw/mlx5/wr.c
+@@ -78,7 +78,7 @@ static void set_eth_seg(const struct ib_send_wr *wr, struct mlx5_ib_qp *qp,
+ 		 */
+ 		copysz = min_t(u64, *cur_edge - (void *)eseg->inline_hdr.start,
+ 			       left);
+-		memcpy(eseg->inline_hdr.start, pdata, copysz);
++		memcpy(eseg->inline_hdr.data, pdata, copysz);
+ 		stride = ALIGN(sizeof(struct mlx5_wqe_eth_seg) -
+ 			       sizeof(eseg->inline_hdr.start) + copysz, 16);
+ 		*size += stride / 16;
+diff --git a/include/linux/mlx5/qp.h b/include/linux/mlx5/qp.h
+index 4657d5c54abef..ca0eee571ad7b 100644
+--- a/include/linux/mlx5/qp.h
++++ b/include/linux/mlx5/qp.h
+@@ -269,7 +269,10 @@ struct mlx5_wqe_eth_seg {
+ 	union {
+ 		struct {
+ 			__be16 sz;
+-			u8     start[2];
++			union {
++				u8     start[2];
++				DECLARE_FLEX_ARRAY(u8, data);
++			};
+ 		} inline_hdr;
+ 		struct {
+ 			__be16 type;
+-- 
+2.43.0
 
 
