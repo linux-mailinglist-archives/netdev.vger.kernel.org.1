@@ -1,74 +1,78 @@
-Return-Path: <netdev+bounces-76123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 373BC86C6CA
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 11:24:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9473F86C6D9
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 11:26:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 364511C21E91
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:24:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A240B25262
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1FB164A92;
-	Thu, 29 Feb 2024 10:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F4AE64CF5;
+	Thu, 29 Feb 2024 10:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QpMSc+op"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810A360BA7;
-	Thu, 29 Feb 2024 10:24:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B454F64CC0;
+	Thu, 29 Feb 2024 10:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709202292; cv=none; b=phWQ+yHtgnar1e7K2T7mAL2CNbieT8srYe4eYybTPl74ndI1dIc6SoKez2FTb62ZRHB8Jm/VATsTEXMFaxm5uEvkfQ61CwmqTIQGzaRzR6wxuCF0f4VL5AsYyKvn7jj094aGjM9A+V0lEUMZgZhQFa8PEJ6aayqWMK0m/W5sad0=
+	t=1709202372; cv=none; b=rwGTgXk8hF/ehuGaNitKG6rkOR3az78WuKOsnQJx21x1Gc5+2Bc5G6BuMpnevqEjo5QGpEmW+c3s82VHOWBf+01xwbQw8ZabEskglLSf3RgVTqj0xZlI7/Oy159bBQ8ZAlNXJFjH3Yu/tIX54qbQfBTYD2YagqMysfbNW1CPjeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709202292; c=relaxed/simple;
-	bh=hjCiYmjmUqBlBGGPp3oOg+AOV4QZY5js4NzUUHbvtPI=;
+	s=arc-20240116; t=1709202372; c=relaxed/simple;
+	bh=YWOWrb13iLVWmU3eCgGMRsxQVEI8HkV4cWq2o6HncYE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UpSpCL716rDR/Rk4lQFDYnYVRvB7PJJ1nnv8f8b6ypIdixJUDCLMPzcZGEyZifXjr3CZ+OLQ5AmEzrjD5U/eKEDGaGSImH8KK6eJigODk9q6Mgj+CXyPzzaETiG8K6YCpoJEpcj8OI7QHc6YiekXAct4cCJXIz0agyHuG7dHjWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74CE5C433C7;
-	Thu, 29 Feb 2024 10:24:45 +0000 (UTC)
-Date: Thu, 29 Feb 2024 10:24:42 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-	llvm@lists.linux.dev, Ingo Molnar <mingo@redhat.com>,
-	Bill Wendling <morbo@google.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jijie Shao <shaojijie@huawei.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Leon Romanovsky <leonro@mellanox.com>, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Michael Guralnik <michaelgur@mellanox.com>, patches@lists.linux.dev,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 4/6] arm64/io: Provide a WC friendly __iowriteXX_copy()
-Message-ID: <ZeBbamDoHIxzzfof@arm.com>
-References: <0-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
- <4-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
- <Zd27XtDg_NDzLXg-@arm.com>
- <20240228230616.GS13330@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=aAcSP1yCPHuJVQbJOpZSwl9HmAq/HkCxkrOHJzfVc3rY97rvioxEVgd3KmID8coTf6V1w6e4hspCMl7UBGC9PVhH70R3Z3io3SKYLmQ0AdBjaYUvkp2FgaENpZVk9NltwQgtyFsbITNANxcod8y35r/psiCta7Q+g9DhEwsH4fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QpMSc+op; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709202370; x=1740738370;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YWOWrb13iLVWmU3eCgGMRsxQVEI8HkV4cWq2o6HncYE=;
+  b=QpMSc+op0021pfNZpbuhiSxjWR3gcgJIfsnJbO9BtBhslYBGQI9rCLjH
+   af+KjrNK6LxehkwZPUTrT0mRKah2ms75FaLIl0DRcR6KaeoJPqrxIrUu1
+   OPsjQ3L9M6h6I0SMDdPZ2VjS3bSC/CN/FgcGOqUYvBOEXTz2OAVDW93m6
+   3UPjrl6Kify23tWGOvjcIiWA+/SHx+4b7n1jzUWYJRD4ixyzsf1biYgmb
+   1Wza6g00XqEeshKwTAAth+HAC/0VQ0TlSuKW7ryXgqDpKmNTzTbgNtLcl
+   jv7ygRenf/ctDod2PcVpNoefWzlRxzGB9mqg2uq70YXbi2wZzzCkpwLgA
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="3518803"
+X-IronPort-AV: E=Sophos;i="6.06,194,1705392000"; 
+   d="scan'208";a="3518803"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Feb 2024 02:26:10 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,194,1705392000"; 
+   d="scan'208";a="12348112"
+Received: from lkp-server02.sh.intel.com (HELO 3c78fa4d504c) ([10.239.97.151])
+  by fmviesa005.fm.intel.com with ESMTP; 29 Feb 2024 02:26:06 -0800
+Received: from kbuild by 3c78fa4d504c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rfdbf-000Crf-1q;
+	Thu, 29 Feb 2024 10:25:49 +0000
+Date: Thu, 29 Feb 2024 18:24:46 +0800
+From: kernel test robot <lkp@intel.com>
+To: Yunjian Wang <wangyunjian@huawei.com>, mst@redhat.com,
+	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	kuba@kernel.org, bjorn@kernel.org, magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
+	davem@davemloft.net
+Cc: oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	xudingke@huawei.com, liwei395@huawei.com,
+	Yunjian Wang <wangyunjian@huawei.com>
+Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
+Message-ID: <202402291828.G9c5tW50-lkp@intel.com>
+References: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,67 +81,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240228230616.GS13330@nvidia.com>
+In-Reply-To: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
 
-On Wed, Feb 28, 2024 at 07:06:16PM -0400, Jason Gunthorpe wrote:
-> On Tue, Feb 27, 2024 at 10:37:18AM +0000, Catalin Marinas wrote:
-> > On Tue, Feb 20, 2024 at 09:17:08PM -0400, Jason Gunthorpe wrote:
-> > > +/*
-> > > + * This generates a memcpy that works on a from/to address which is aligned to
-> > > + * bits. Count is in terms of the number of bits sized quantities to copy. It
-> > > + * optimizes to use the STR groupings when possible so that it is WC friendly.
-> > > + */
-> > > +#define memcpy_toio_aligned(to, from, count, bits)                        \
-> > > +	({                                                                \
-> > > +		volatile u##bits __iomem *_to = to;                       \
-> > > +		const u##bits *_from = from;                              \
-> > > +		size_t _count = count;                                    \
-> > > +		const u##bits *_end_from = _from + ALIGN_DOWN(_count, 8); \
-> > > +                                                                          \
-> > > +		for (; _from < _end_from; _from += 8, _to += 8)           \
-> > > +			__const_memcpy_toio_aligned##bits(_to, _from, 8); \
-> > > +		if ((_count % 8) >= 4) {                                  \
-> > > +			__const_memcpy_toio_aligned##bits(_to, _from, 4); \
-> > > +			_from += 4;                                       \
-> > > +			_to += 4;                                         \
-> > > +		}                                                         \
-> > > +		if ((_count % 4) >= 2) {                                  \
-> > > +			__const_memcpy_toio_aligned##bits(_to, _from, 2); \
-> > > +			_from += 2;                                       \
-> > > +			_to += 2;                                         \
-> > > +		}                                                         \
-> > > +		if (_count % 2)                                           \
-> > > +			__const_memcpy_toio_aligned##bits(_to, _from, 1); \
-> > > +	})
-> > 
-> > Do we actually need all this if count is not constant? If it's not
-> > performance critical anywhere, I'd rather copy the generic
-> > implementation, it's easier to read.
-> 
-> Which generic version?
+Hi Yunjian,
 
-The current __iowriteXX_copy() in lib/iomap_copy.c (copy them over or
-add some preprocessor reuse the generic functions).
+kernel test robot noticed the following build errors:
 
-> The point is to maximize WC effects with non-constant values, so I
-> think we do need something like this. ie we can't just fall back to
-> looping over 64 bit stores one at a time.
+[auto build test ERROR on net-next/main]
 
-If that's a case you are also targeting and have seen it in practice,
-that's fine. But I had the impression that you are mostly after the
-constant count case which is already addressed by the other part of this
-patch. For the non-constant case, we have a DGH only at the end of
-whatever buffer was copied rather than after every 64-byte increments
-you'd get for a count of 8.
+url:    https://github.com/intel-lab-lkp/linux/commits/Yunjian-Wang/xsk-Remove-non-zero-dma_page-check-in-xp_assign_dev/20240228-190840
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/1709118356-133960-1-git-send-email-wangyunjian%40huawei.com
+patch subject: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
+config: i386-randconfig-012-20240229 (https://download.01.org/0day-ci/archive/20240229/202402291828.G9c5tW50-lkp@intel.com/config)
+compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240229/202402291828.G9c5tW50-lkp@intel.com/reproduce)
 
-> Most places I know about using this are performance paths, the entire
-> iocopy infrastructure was introduced as an x86 performance
-> optimization..
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202402291828.G9c5tW50-lkp@intel.com/
 
-At least the x86 case makes sense even from a maintenance perspective,
-it's just a much simpler "rep movsl". I just want to make sure we don't
-over-complicate this code on arm64 unnecessarily.
+All errors (new ones prefixed by >>):
+
+   drivers/vhost/net.c: In function 'vhost_net_buf_peek_len':
+>> drivers/vhost/net.c:206:27: error: initialization from incompatible pointer type [-Werror=incompatible-pointer-types]
+      struct xdp_desc *desc = tun_ptr_to_xdp_desc(ptr);
+                              ^~~~~~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
+
+
+vim +206 drivers/vhost/net.c
+
+   198	
+   199	static int vhost_net_buf_peek_len(void *ptr)
+   200	{
+   201		if (tun_is_xdp_frame(ptr)) {
+   202			struct xdp_frame *xdpf = tun_ptr_to_xdp(ptr);
+   203	
+   204			return xdpf->len;
+   205		} else if (tun_is_xdp_desc_frame(ptr)) {
+ > 206			struct xdp_desc *desc = tun_ptr_to_xdp_desc(ptr);
+   207	
+   208			return desc->len;
+   209		}
+   210	
+   211		return __skb_array_len_with_tag(ptr);
+   212	}
+   213	
 
 -- 
-Catalin
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
