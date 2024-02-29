@@ -1,128 +1,171 @@
-Return-Path: <netdev+bounces-76138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD68786C7B6
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 12:09:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEEFD86C7CC
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 12:13:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE8F61C22223
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 11:09:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3111B222A1
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 11:13:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14FEB7AE4C;
-	Thu, 29 Feb 2024 11:09:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E3FB7B3C5;
+	Thu, 29 Feb 2024 11:12:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CabQp1nJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hcxGVwc6"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B386E62808;
-	Thu, 29 Feb 2024 11:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A378651BC
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 11:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709204957; cv=none; b=SRGxPYdPVlOI48yvG/qOqir2uNI5HwvFzV4Haa4r0OXDe+hNnSaP9Xvlq/wNWCc/P4yQ5AF4rHrnOaK1qqaU59rFs7w9MUuPEj8/+cVCUfW8nCRcozoNyBKqosaAtoMjL5uchC5P4jPkySMMDMp+93fscg85vyYXS7mJ0oeJmhQ=
+	t=1709205173; cv=none; b=cLBfl6yovQWFujqrVRBC8zmB8hRJYmNMgM6wdSECtcwmtecXVeWxWfWKY386Rqf3UAYCWXjPHOEAiBGeoa2rlxHDMvNcQouSlta53dog3S+yQ9CjzDCTzjNFK9GGCAYgv8U4OAwutN8JaVHlEXMu7ClndGDb5mt2tBBDxcSfHT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709204957; c=relaxed/simple;
-	bh=rZLStquWue5yNAK1HofFQEjYZk7A0wlwP3ZnA08cIUE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MDJKasRp8y1FKVzVMhliuE9OV/jVAeQCM82bXWroc4RUY+CpfSQRvHzdwHT73wo38s2m/rzyktAVvn2weycpwEBLgnk9vKzYCqxQ3QgZnTdSJNkm9nDDcv0RzfiNiBzV6dgWBAx5RFCG/e23h96bnCF/JP0X2kqTvOU17ouk3o4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CabQp1nJ; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 277532000A;
-	Thu, 29 Feb 2024 11:09:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709204946;
+	s=arc-20240116; t=1709205173; c=relaxed/simple;
+	bh=N7Mhx8vT1jnELD9+9yC9rVTfdvP/sYDILPO0ay84HGM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=MEinFZHnKllcZZCjh50XuF1ufB1KsJqL2iVsByj0KJakKESiixoCqWclOnsztL+86xvbrj9qEiMlNyX6vVTiXSeTeyMeibQnpDda5TPPrAX+GtK7jK80iebl7+kzxwmUa0ldWsuQIshnRYHNZ7g1RFSpGI+B22aKW3DjS5PHyPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hcxGVwc6; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709205170;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RH+aBH/pXXu05f9M4mzdSZ7M/454fi9vbzLuC8bcSEs=;
-	b=CabQp1nJVruJAy+rC86OljQhe9ceHgmJKPR0CvAHsHe7Kt6+7EAm6dBCfCzvJxWHjI1Ygr
-	7XYnCyubBTeml4mDicw6GsMowdlJvr/LeLjDnL1unbEeQti7j5ZWNrH5zQxlZkvMWLHg11
-	vTVZK5hTmxxbZO/67joTHG41UGu3v+LF/2voLiqYrl6ZVzYvmoUPENnMfnJOVDhW5DJ003
-	dp8KARtPj7zKGhjXuMrF2NzlkU6JLULIyB+QdQqSMCxrmS/D7cJ41JtZT26UHCQUDj5giw
-	I4IeHhwih8L/+Mb/gVxImMTGACpY9OYjEAt8inPy3pvh3JjddNrd6RoxKBeoKw==
-Date: Thu, 29 Feb 2024 12:09:03 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
- Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v5 17/17] net: pse-pd: Add TI TPS23881 PSE
- controller driver
-Message-ID: <20240229120903.2589d112@kmaincent-XPS-13-7390>
-In-Reply-To: <20240228125344.GD292522@kernel.org>
-References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
-	<20240227-feature_poe-v5-17-28f0aa48246d@bootlin.com>
-	<20240228125344.GD292522@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=J1ljLBvAKrzOfqXsdymMG4sOPRNjFy8nCCCQL/VLcRg=;
+	b=hcxGVwc6nMHXjdBmjt/M0KIFIslIKWa1AbarSNsPyZlt3AcjsPrqX14ScumIi70FAKLhDQ
+	dzwFheiCUbWv417czOzgbZnoneQF/E+rXSeg3a8BQSgxQWm8E1kmZSZSza9tuU9jhJGNfX
+	Tw87pCt4Np2YW8Y9jCb0biCPTJnyMOI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-159-Ocs60_67MTu5KHcmKM-CFA-1; Thu, 29 Feb 2024 06:12:48 -0500
+X-MC-Unique: Ocs60_67MTu5KHcmKM-CFA-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40e354aaf56so1111355e9.1
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 03:12:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709205167; x=1709809967;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=J1ljLBvAKrzOfqXsdymMG4sOPRNjFy8nCCCQL/VLcRg=;
+        b=sK9U9ScNdADA7QYcxzedKaTMrwknehgb/XeRR5yWPETbaTGmkDhoD0ksGOinuKodst
+         uscflbBmDdFQOHmtlBMi0UmVYkDIDAWNiJiDI+6tvirfbtG0iOTYNpAvMIzHLTGZ99GM
+         Yqj7X1Aqee8ofO0ZqsTZklXFzp47l8t+RFJY27UtCTDh/McZOJt6vPkIWoPoA+MiSobu
+         O2iPr2MRrAFZ5yWRQg+Nu4Yg+wIAD0Z+u5CI2D0Jdzkgiotju65+JWxuk2r3k6e8iOC2
+         Ran4CZZTMxIwmWhoXrHo+gS98hAwNl86rL73p5m1TnM4YTjlWz/u3D6UjDrIjTuZLJsx
+         +73g==
+X-Forwarded-Encrypted: i=1; AJvYcCUMarGQARMbUpVlF+EynC1l6FUjial3oRTohZgmI08ktUpEu13YdPe2sTmFFnNYOi6yS8rQRfKQZrdSWWDh+lP1OupDCZgl
+X-Gm-Message-State: AOJu0Yw4SDBdLynkDK7RbA3F51Yxj6qil76AvEBislt6ZgbqpE6G7ncz
+	V6qolBYdCPs3yb9Xybq+3CMmyUwxFDJCq1WCVZX7sRmZV2YNjFw8gqIdO5g5Fnsoc2IKyXkKL5i
+	BsZIWLdD0yPpVoq/MEZlwEJ0Hg+PHnymWIoOeWlQHtwV0G8ejIl2pCQ==
+X-Received: by 2002:a05:6000:18a9:b0:33d:9e15:12bf with SMTP id b9-20020a05600018a900b0033d9e1512bfmr1372350wri.3.1709205167117;
+        Thu, 29 Feb 2024 03:12:47 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHfKKnPq3F5LjzBgxvLGpBosG5KZdsojuxXv+y3866lEvo3VcN/Hqtb7eOfxFpQwYKS/TI+dQ==
+X-Received: by 2002:a05:6000:18a9:b0:33d:9e15:12bf with SMTP id b9-20020a05600018a900b0033d9e1512bfmr1372320wri.3.1709205166722;
+        Thu, 29 Feb 2024 03:12:46 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-250-174.dyn.eolo.it. [146.241.250.174])
+        by smtp.gmail.com with ESMTPSA id e5-20020adff345000000b0033b278cf5fesm1462888wrp.102.2024.02.29.03.12.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Feb 2024 03:12:46 -0800 (PST)
+Message-ID: <7d478cb842e28094f4d6102e593e3de25ab27dfe.camel@redhat.com>
+Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
+From: Paolo Abeni <pabeni@redhat.com>
+To: Yunjian Wang <wangyunjian@huawei.com>, mst@redhat.com, 
+	willemdebruijn.kernel@gmail.com, jasowang@redhat.com, kuba@kernel.org, 
+	bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
+	jonathan.lemon@gmail.com, davem@davemloft.net
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, xudingke@huawei.com,  liwei395@huawei.com
+Date: Thu, 29 Feb 2024 12:12:44 +0100
+In-Reply-To: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
+References: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Wed, 28 Feb 2024 12:53:44 +0000
-Simon Horman <horms@kernel.org> wrote:
+On Wed, 2024-02-28 at 19:05 +0800, Yunjian Wang wrote:
+> @@ -2661,6 +2776,54 @@ static int tun_ptr_peek_len(void *ptr)
+>  	}
+>  }
+> =20
+> +static void tun_peek_xsk(struct tun_file *tfile)
+> +{
+> +	struct xsk_buff_pool *pool;
+> +	u32 i, batch, budget;
+> +	void *frame;
+> +
+> +	if (!ptr_ring_empty(&tfile->tx_ring))
+> +		return;
+> +
+> +	spin_lock(&tfile->pool_lock);
+> +	pool =3D tfile->xsk_pool;
+> +	if (!pool) {
+> +		spin_unlock(&tfile->pool_lock);
+> +		return;
+> +	}
+> +
+> +	if (tfile->nb_descs) {
+> +		xsk_tx_completed(pool, tfile->nb_descs);
+> +		if (xsk_uses_need_wakeup(pool))
+> +			xsk_set_tx_need_wakeup(pool);
+> +	}
+> +
+> +	spin_lock(&tfile->tx_ring.producer_lock);
+> +	budget =3D min_t(u32, tfile->tx_ring.size, TUN_XDP_BATCH);
+> +
+> +	batch =3D xsk_tx_peek_release_desc_batch(pool, budget);
+> +	if (!batch) {
 
-> On Tue, Feb 27, 2024 at 03:42:59PM +0100, Kory Maincent wrote:
-> > Add a new driver for the TI TPS23881 I2C Power Sourcing Equipment
-> > controller.
-> >=20
-> > This patch is sponsored by Dent Project <dentproject@linuxfoundation.or=
-g>.
-> >=20
-> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com> =20
->=20
-> ...
->=20
-> > +static int tps23881_flash_fw_part(struct i2c_client *client,
-> > +				  const char *fw_name,
-> > +				  const struct tps23881_fw_conf *fw_conf)
-> > +{
-> > +	const struct firmware *fw =3D NULL;
-> > +	int i, ret;
-> > +
-> > +	ret =3D request_firmware(&fw, fw_name, &client->dev);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	dev_info(&client->dev, "Flashing %s\n", fw_name);
-> > +
-> > +	/* Prepare device for RAM download */
-> > +	while (fw_conf->reg) {
-> > +		ret =3D i2c_smbus_write_byte_data(client, fw_conf->reg,
-> > +						fw_conf->val);
-> > +		if (ret < 0) =20
->=20
-> Hi Kory,
->=20
-> Should fw be released here.
+This branch looks like an unneeded "optimization". The generic loop
+below should have the same effect with no measurable perf delta - and
+smaller code. Just remove this.
 
-Hello Simon,
+> +		tfile->nb_descs =3D 0;
+> +		spin_unlock(&tfile->tx_ring.producer_lock);
+> +		spin_unlock(&tfile->pool_lock);
+> +		return;
+> +	}
+> +
+> +	tfile->nb_descs =3D batch;
+> +	for (i =3D 0; i < batch; i++) {
+> +		/* Encode the XDP DESC flag into lowest bit for consumer to differ
+> +		 * XDP desc from XDP buffer and sk_buff.
+> +		 */
+> +		frame =3D tun_xdp_desc_to_ptr(&pool->tx_descs[i]);
+> +		/* The budget must be less than or equal to tx_ring.size,
+> +		 * so enqueuing will not fail.
+> +		 */
+> +		__ptr_ring_produce(&tfile->tx_ring, frame);
+> +	}
+> +	spin_unlock(&tfile->tx_ring.producer_lock);
+> +	spin_unlock(&tfile->pool_lock);
 
-Indeed I have missed it, thanks.=20
+More related to the general design: it looks wrong. What if
+get_rx_bufs() will fail (ENOBUF) after successful peeking? With no more
+incoming packets, later peek will return 0 and it looks like that the
+half-processed packets will stay in the ring forever???
 
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+I think the 'ring produce' part should be moved into tun_do_read().
+
+Cheers,
+
+Paolo
+
 
