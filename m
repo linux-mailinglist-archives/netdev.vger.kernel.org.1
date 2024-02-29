@@ -1,119 +1,111 @@
-Return-Path: <netdev+bounces-76111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B19986C5B6
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:41:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBB1486C5D7
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:44:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10BB51F27587
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:41:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38479B27905
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F213A60EF7;
-	Thu, 29 Feb 2024 09:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A07760EDF;
+	Thu, 29 Feb 2024 09:43:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BhBaekxm"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="FL8YFcIk"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C2B60BBA;
-	Thu, 29 Feb 2024 09:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE3760BA7;
+	Thu, 29 Feb 2024 09:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709199683; cv=none; b=O5h3vTMMiRH9kleXYEIIiaLxIkJKcNWBQUrdR6E1sdPtG2tWzhB8A42rAy25W3lSwj2XFvhww8Z3NyPJZUGqMiqe/i5fmqwfdd3RrrSVbVpW+r1br0VG2k1d56UNK4iK/7Lhwy3iygZfy98OvN9A8nxuMkhsWQ7FJtrg9s8EfHs=
+	t=1709199837; cv=none; b=g318xY4zm9Bdo/u4FzOvup3pScm9r+AYNTFVK9QZsQi0XvBXXsR/xJx77i5zqJAfpqJ8I/5FE4T5DpMgw0pYzlUamGp5stul7bIx5u2dwtcbiNQY4qA9hIBxhXCQm4xr1zfBpa//Hg1pPIGBvyJu7EtJlj9Ye0CW/xMYFvVDo1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709199683; c=relaxed/simple;
-	bh=sFjwo3k0DJQ95l5/XGTun+1UQyAPnjIJqK2nH7Yo7yk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pbF2wz+RYqIUpAwsLXU2cHwQaXU/g/90YSqd59KBATEjC2vWpKO3pFIwMm1noUGSwn05DvhA7RmDRi9KXKiXdfg8eULQOHGZnwWwJhXGPDJSo2ylObiEeeIgqhxKqNldiX44lxUB52pO8C3fZxKQqNssw0H55TWgRzKAXLad0SU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BhBaekxm; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CD80A20014;
-	Thu, 29 Feb 2024 09:41:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709199679;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=miimJ0QV3VvK+wNEwrpf81APPWqkbf1H8b2Er4VQt5U=;
-	b=BhBaekxmrCJddaSy/g+XrJndV/Bge++ZWK2tlct4TWoKfps2OXYAQ87mWlZtGklwjFmKdi
-	onEjlkGrcfLWp73GaAQQ8p8jT2Sabx99BJu0HkUBIA0DF8lHfIKcnaCM47Hjnn9KvxOv1S
-	+60HENXE9gWyChvcZRETgV2TdgV5Ml3VcNnCxxfQNoW1GGj2lhCDV4VIUKh8237HK9m2Fk
-	QNMSeM0vaLxPbO6itroDcXyxIwjwBT7VpXCpfgYGduksLoL1QZJAH3VdFYgbeZtcF03+U9
-	wulSUMED+0x1d5toURGHWhLbcDK31ojoM7o8S1XkOw6o0mh9n5/x7M8uU33R5w==
-Date: Thu, 29 Feb 2024 10:41:17 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
- Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v5 13/17] net: pse-pd: Use regulator framework
- within PSE framework
-Message-ID: <20240229104117.4edf96ae@kmaincent-XPS-13-7390>
-In-Reply-To: <20240228124801.GC292522@kernel.org>
-References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
-	<20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
-	<20240228124801.GC292522@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1709199837; c=relaxed/simple;
+	bh=X/vfymhnan3upoVf726nPIc8SXJCCwv4OsemoA6fj3w=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=EUVvY5pduYwXPRKBqvoEbJgnLrPHhe3EF0awVWAF2p/sLYEgoytc7obnxJV5YFqa5B2m/Z1DbHSVw/fYP8cFYrxl4z8swxr40hNT4h5J0gBOUgb0xuGTQPz68ARPhvD4wvS2aqP7D+i+yXEO0ecKdzdRwujepuP2daMq+QZWUKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=FL8YFcIk; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1709199831; h=Message-ID:Subject:Date:From:To;
+	bh=X/vfymhnan3upoVf726nPIc8SXJCCwv4OsemoA6fj3w=;
+	b=FL8YFcIkjtTuVVfANDqDzhAWfgveKdjjP7sD/Xftxg0dCigr1s7Ilblipg9h4GDAXx4nPIhbjPbCpyQGHURQqQy4xMm2g39zTi1Jexp1vovkfacEkxSLcfWqSZFv332WvAsqGg2FKkeJSxvrsRWEB961pHzJbXe2j+NYS4WWB6g=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=34;SR=0;TI=SMTPD_---0W1Sa3HZ_1709199828;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W1Sa3HZ_1709199828)
+          by smtp.aliyun-inc.com;
+          Thu, 29 Feb 2024 17:43:49 +0800
+Message-ID: <1709199778.0187387-3-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v3 00/19] virtio: drivers maintain dma info for premapped vq
+Date: Thu, 29 Feb 2024 17:42:58 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: virtualization@lists.linux.dev,
+ Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Jason Wang <jasowang@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Hans de Goede <hdegoede@redhat.com>,
+ =?utf-8?q?IlpoJ=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Vadim Pasternak <vadimp@nvidia.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Eric Farman <farman@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ linux-um@lists.infradead.org,
+ netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org,
+ linux-s390@vger.kernel.org,
+ kvm@vger.kernel.org,
+ bpf@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
+References: <20240229072044.77388-1-xuanzhuo@linux.alibaba.com>
+ <20240229031755-mutt-send-email-mst@kernel.org>
+ <1709197357.626784-1-xuanzhuo@linux.alibaba.com>
+ <20240229043238-mutt-send-email-mst@kernel.org>
+ <4825d7812ac06be3322ca4ae74e3650b2b0cd8de.camel@sipsolutions.net>
+In-Reply-To: <4825d7812ac06be3322ca4ae74e3650b2b0cd8de.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Wed, 28 Feb 2024 12:48:01 +0000
-Simon Horman <horms@kernel.org> wrote:
+On Thu, 29 Feb 2024 10:41:11 +0100, Johannes Berg <johannes@sipsolutions.net> wrote:
+> On Thu, 2024-02-29 at 04:34 -0500, Michael S. Tsirkin wrote:
+> >
+> > So the patchset is big, I guess it will take a couple of cycles to
+> > merge gradually.
+>
+> Could also do patches 7, 8, and maybe 9 separately first (which seem
+> reasonable even on their own) and get rid of CC'ing so many people and
+> lists for future iterations of the rest of the patchset :-)
 
-> On Tue, Feb 27, 2024 at 03:42:55PM +0100, Kory Maincent wrote:
->=20
-> ...
->=20
-> > diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-> > index 522115cc6cef..a3e297cc2150 100644
-> > --- a/include/linux/pse-pd/pse.h
-> > +++ b/include/linux/pse-pd/pse.h
-> > @@ -55,10 +55,10 @@ struct pse_controller_ops {
-> >  	int (*ethtool_get_status)(struct pse_controller_dev *pcdev,
-> >  		unsigned long id, struct netlink_ext_ack *extack,
-> >  		struct pse_control_status *status);
-> > -	int (*ethtool_set_config)(struct pse_controller_dev *pcdev,
-> > -		unsigned long id, struct netlink_ext_ack *extack,
-> > -		const struct pse_control_config *config);
-> >  	int (*setup_pi_matrix)(struct pse_controller_dev *pcdev);
-> > +	int (*pi_is_enabled)(struct pse_controller_dev *pcdev, int id);
-> > +	int (*pi_enable)(struct pse_controller_dev *pcdev, int id);
-> > +	int (*pi_disable)(struct pse_controller_dev *pcdev, int id); =20
->=20
-> Hi Kory,
->=20
-> Please update the Kernel doc for struct pse_controller_ops to reflect the
-> added and removed fields.
+I agree.
 
-Hello Simon,
-Sorry I totally forgot to update the kernel doc on that patch.
+@Michael How about you?
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Thanks
+
+
+>
+> johannes
 
