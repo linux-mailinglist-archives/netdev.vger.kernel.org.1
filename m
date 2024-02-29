@@ -1,141 +1,142 @@
-Return-Path: <netdev+bounces-76375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81AE886D795
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 00:15:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E83386D7B6
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 00:26:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E6B42866EA
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 23:15:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B2FF28387B
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 23:26:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E18774BE0;
-	Thu, 29 Feb 2024 23:15:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2F874BFE;
+	Thu, 29 Feb 2024 23:26:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jfncczdU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LQ+4w4K9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746C76D528;
-	Thu, 29 Feb 2024 23:15:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0CD74BF1;
+	Thu, 29 Feb 2024 23:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709248529; cv=none; b=jO6SOf0LOgTerFGH5ZsDwPjPN4Ge1BmbGABIzaguR88Sv8IV0AEUrotlSzUF698k4nRXrh4Vlh9k4DCfnqNf9LlxHLKrTOz6FACVfbaP1EryHvXNJmdZpKipTZWw2dLLhA2VvEWl7YOhs5wudObSmWQEQiwt8Vjfexk8frt/yww=
+	t=1709249160; cv=none; b=jI8TQ7OPdg5TT4e9DxoagY9e5+JzKgzUdd3jTmwxcEODHqwOAXqDX8/8KNMsgyr7uOvBe2j3nS7bqcAMcgKDQVE0Kt2qQozCBwJHKi9Nms6hAnK8/FAwlRXZSJ1TbrXEfIln0iE10GAeYRt+lloifrYAkW/bMELza6uiFCqbeNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709248529; c=relaxed/simple;
-	bh=eQSQRmoukqRbwmwbbD7/gGKavZkYvNoKAs7cayL9etU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=RIKaKVD0JJEpcgTcsj4lgudvGfjxGlkoT5MJevNE9TM3dd2kaS2hKudCOo7/k5El/vGRRW6UTh8hyuRvKCT/pmO2uSYDJPw9ylOEj1YMPMWyTBUR0ldLxNud1TQsrtRou29zxjFBdnmgaDCRriYEtf5GmTOo0+tIZ8R83lw5P4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jfncczdU; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41TMrj3x028916;
-	Thu, 29 Feb 2024 23:15:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=LO8ZHY0Ynu0zrZXt4D0P9flaCPbTF1zd0Tdg6VfkvPs=; b=jf
-	ncczdUBsEnMtFfsiVQc3Kt+sD0F1YcqD9b/ucZcntTK8Ph6WI2pNmOClwcywkKwb
-	ZReE4XHG8dtQPxmpg8bqSKx5jNEsyUW+B+Yif17Zr98DpqvZn7o4R52BzRVN20Y2
-	oI7b4gxYoBWPdUjH3NsG0d5SwXru+kUQ257M0unHW3AZJs+uZ/piP/d28tbqmtNY
-	8/bxL13y7GxhKCttJ+KzqDQM1x3RcZJKBOObFoJBbBWAuRAIsuk+Z74QtKpv1Evw
-	hYmzCXkPEg3k86TVwbaEpvLqj7i3BGVg5ih4Dt3PpB1O6OQiWtw4FPrTWibenxZZ
-	i0nikibO8bccSWtYqvvw==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wjx9y0xjq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Feb 2024 23:15:10 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41TNF93h013382
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Feb 2024 23:15:09 GMT
-Received: from [10.46.19.239] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 29 Feb
- 2024 15:15:05 -0800
-Message-ID: <a43feb58-5fa2-4b39-8aa1-04085cd5a8d6@quicinc.com>
-Date: Thu, 29 Feb 2024 15:15:04 -0800
+	s=arc-20240116; t=1709249160; c=relaxed/simple;
+	bh=QkWOLCXGjWdmYeUQ4QG/VDCFo+DPATObHhiMnUCbGgY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fuEwF7XrJJ+aM/0biFShJmunbJrcev5hVlzcYER8nM7a7qGajXD2ur5JiDSUMQ1edOjaAwyA7AASdxH+mFQDAn8p3+MCahC9nYMCQJ4UdmlfCcMHDBSMWeLojajYeUHA7EhRcv3SnMpqdioRoGjzcHGR8UACdc6es6rIgPGlOds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LQ+4w4K9; arc=none smtp.client-ip=209.85.166.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-7c7770fd687so81757739f.3;
+        Thu, 29 Feb 2024 15:25:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709249158; x=1709853958; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2Jme5oUa53ygZP5xSuXYsOtdmv088OFcYmVS1nNJAVI=;
+        b=LQ+4w4K9cZXwB69iLhCVBYKCia5S9L6dSKbi5c9UtFdSWyIt1bItWCcrtRH+eVlHUz
+         nAoPyr/s/nuNW7UskUVip9wvd7hHnQNNYS34zedbV2dUfWnOWHCghBrweX7AflmhKjND
+         RCrbRICPtpjdIgrabVrdPtF3s9Q97gxRhMsIhS1tgr8OcLtO9nXsI4YW8um8LnB3+T/x
+         gDuxy+NN607WqdndHNs22MRHwJPyKO6L/cPe6wRmme2cyMtlV0QRT3eF5aNLK4zf5FF8
+         P2wD6DoQle+4yAXtII+8L8Tf4LWP7DGxJTC8e7QTfVtTmV6BimJjAvRhiPTK6TiUjjTg
+         YMYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709249158; x=1709853958;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2Jme5oUa53ygZP5xSuXYsOtdmv088OFcYmVS1nNJAVI=;
+        b=pY2kE9O3RWbyT3nDg6Z8Pz3n04UPPpD6xzKUswKaTEnHoKIWu9a7EktED4eI0JPhif
+         bqssQf5k/l155PfkolDYLTGBazt+YSD6046W/UXLh/lBPVNzqClURY5EyCJsPkbTpSzO
+         MGyjpwoTrMvBoa4D3oUh+SbDe1tk849kFuUPNwlTwEFvQ74C/eg54jknP1tC0IUSXQ3m
+         3Kk5II40uvKrya6h/Uv7G8DrhDLAp8UU29irZ4Eimo+9CK7/cKFhvefk9jHJ4X3RiF78
+         f8MkWCXo88R0BNTvyh0vXidVE/msF2e/yYWoMN6bxu6ekPNN0keIuDtbH/4BFu51f11J
+         7hqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU2HWnvPQxGIOkNY8Gj7aiYT0iG6m0fSGu3XioGIjyeOgiQLuu1BRiUClVScZpsJ8zEnDxrAciDsQpZmwwSTZvNWmnK2SymzysVRvFc074mwZupmVa9uzJd4d5Q2WaPbvwoaoeTlG5o5bkNy6KeqXDd/a1hgdIcW+WMNIGTAQGTjTV2AoryMWkesC7Fp0ff
+X-Gm-Message-State: AOJu0Yx4KQwLziktZ3LRwU4yX8vOn6z26H5qyQSx8B1gyIw3Ay0yDA8k
+	wrM3jaWfSUPUDkIPXo1O+NHxxdCPDn2tjAJGT9r8Yjpr1dVNSnFfjrvaUGI3MM5wCsBZWZG5vNj
+	vZ9v6xHwo58rrepT+pLE4taLnrRk=
+X-Google-Smtp-Source: AGHT+IGKCstCaSOwLBpvx+2RbrH2XMhIrO0Zi1WRF9+1w4gklfec/ZYCqtFdeNIGbe3s4ZAMkKVG/Tnlq7JT4L+zUss=
+X-Received: by 2002:a92:c566:0:b0:365:1737:d74 with SMTP id
+ b6-20020a92c566000000b0036517370d74mr233262ilj.0.1709249157897; Thu, 29 Feb
+ 2024 15:25:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: Modify mono_delivery_time with
- clockid_delivery_time
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Andrew Halaney
-	<ahalaney@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        Martin KaFai Lau <martin.lau@kernel.org>,
-        Martin KaFai Lau
-	<martin.lau@linux.dev>
-CC: <kernel@quicinc.com>
-References: <20240228011219.1119105-1-quic_abchauha@quicinc.com>
- <2fc6a4f7ea0308626cfd06d95564486d187b16e0.camel@redhat.com>
-From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-In-Reply-To: <2fc6a4f7ea0308626cfd06d95564486d187b16e0.camel@redhat.com>
+References: <20240229005920.2407409-1-kuba@kernel.org> <20240229005920.2407409-13-kuba@kernel.org>
+ <871q8vm2wj.fsf@cloudflare.com>
+In-Reply-To: <871q8vm2wj.fsf@cloudflare.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 29 Feb 2024 18:25:46 -0500
+Message-ID: <CADvbK_e+JCeM9cn0Qd7JG5UdSO_-s8w5r0v40E485JevkbH4XQ@mail.gmail.com>
+Subject: Re: [PATCH v4 12/12] selftests: ip_local_port_range: use XFAIL
+ instead of SKIP
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, netdev@vger.kernel.org, 
+	edumazet@google.com, pabeni@redhat.com, shuah@kernel.org, 
+	linux-kselftest@vger.kernel.org, mic@digikod.net, 
+	linux-security-module@vger.kernel.org, keescook@chromium.org, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: rzryWo_RpJZbtw8qkxFBNMUpiyQ_SWJB
-X-Proofpoint-ORIG-GUID: rzryWo_RpJZbtw8qkxFBNMUpiyQ_SWJB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-29_06,2024-02-29_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- clxscore=1015 impostorscore=0 spamscore=0 mlxscore=0 mlxlogscore=649
- lowpriorityscore=0 priorityscore=1501 malwarescore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2402120000 definitions=main-2402290183
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 2/29/2024 1:30 AM, Paolo Abeni wrote:
-> On Tue, 2024-02-27 at 17:12 -0800, Abhishek Chauhan wrote:
->> Bridge driver today has no support to forward the userspace timestamp
->> packets and ends up resetting the timestamp. ETF qdisc checks the
->> packet coming from userspace and encounters to be 0 thereby dropping
->> time sensitive packets. These changes will allow userspace timestamps
->> packets to be forwarded from the bridge to NIC drivers.
->>
->> Existing functionality of mono_delivery_time is not altered here
->> instead just extended with userspace tstamp support for bridge
->> forwarding path.
->>
->> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
-> 
-> Since this is touching a quite sensitive code path, I think v3 would
-> deserve some paired self-tests.
-> 
-
-I did verify the existing so_txtime selftest for the same which does FQ 
-and ETF tests which sends/recieve packets with both mono and tai clocks. 
-
-OK. All tests passed (so_txtime.sh) 
-Sometimes i saw resource temporarily unavailable in RX which i believe is a 
-known issue 
-https://www.mail-archive.com/linux-kselftest@vger.kernel.org/msg06792.html
-
-Along with this i also did mqprio + etf offload testing on internal platform. 
-1. iperf3 best effort testing UDP/TCP 
-2. Sent ETF packets from userspace application just like so_txtime.c but 
-with SO_PRIORITY and added dumpstack to check the flow of packets. I saw no
-issues on internal platform.  
-3. I will mention all the testing in Tx/Rx path done for v3 patch. 
-
-> Thanks!
-> 
-> Paolo
-> 
+On Thu, Feb 29, 2024 at 3:27=E2=80=AFPM Jakub Sitnicki <jakub@cloudflare.co=
+m> wrote:
+>
+> On Wed, Feb 28, 2024 at 04:59 PM -08, Jakub Kicinski wrote:
+> > SCTP does not support IP_LOCAL_PORT_RANGE and we know it,
+> > so use XFAIL instead of SKIP.
+> >
+> > Reviewed-by: Kees Cook <keescook@chromium.org>
+> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> > ---
+> >  tools/testing/selftests/net/ip_local_port_range.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/net/ip_local_port_range.c b/tools/=
+testing/selftests/net/ip_local_port_range.c
+> > index 6ebd58869a63..193b82745fd8 100644
+> > --- a/tools/testing/selftests/net/ip_local_port_range.c
+> > +++ b/tools/testing/selftests/net/ip_local_port_range.c
+> > @@ -365,9 +365,6 @@ TEST_F(ip_local_port_range, late_bind)
+> >       __u32 range;
+> >       __u16 port;
+> >
+> > -     if (variant->so_protocol =3D=3D IPPROTO_SCTP)
+> > -             SKIP(return, "SCTP doesn't support IP_BIND_ADDRESS_NO_POR=
+T");
+> > -
+> >       fd =3D socket(variant->so_domain, variant->so_type, 0);
+> >       ASSERT_GE(fd, 0) TH_LOG("socket failed");
+> >
+> > @@ -414,6 +411,9 @@ TEST_F(ip_local_port_range, late_bind)
+> >       ASSERT_TRUE(!err) TH_LOG("close failed");
+> >  }
+> >
+> > +XFAIL_ADD(ip_local_port_range, ip4_stcp, late_bind);
+> > +XFAIL_ADD(ip_local_port_range, ip6_stcp, late_bind);
+> > +
+> >  TEST_F(ip_local_port_range, get_port_range)
+> >  {
+> >       __u16 lo, hi;
+>
+> [wrt our earlier discussion off-list]
+>
+> You were right, this test succeeds if I delete SKIP for SCTP.
+> Turns out IP_LOCAL_PORT_RANGE works for SCTP out of the box after all.
+>
+> What I didn't notice earlier is that sctp_setsockopt() delegates to
+> ip_setsockopt() when level !=3D SOL_SCTP.
+>
+> CC'ing Marcelo & Xin, to confirm that this isn't a problem.
+Yes, SCTP supports ip_local_port_range by calling
+inet_sk_get_local_port_range() in sctp_get_port(), similar to TCP/UDP.
 
