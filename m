@@ -1,149 +1,146 @@
-Return-Path: <netdev+bounces-76130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45F4586C743
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 11:49:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C683D86C759
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 11:52:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A5711C22E2E
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:49:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48FD4B2334B
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:52:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321327AE43;
-	Thu, 29 Feb 2024 10:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FBF7A705;
+	Thu, 29 Feb 2024 10:52:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z64QMlFX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qvy2HkJj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931477A737
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 10:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 888E761665;
+	Thu, 29 Feb 2024 10:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709203732; cv=none; b=icu6ad4n51i9ilxf9D9yDPJJiR/7Ix06olP2Z/ShUkam5BcFIMGVY0gwJMP07pcE1rPqnAK5l0r5ty9nN7kuQy8YlZ9jgGxXNuxqjO38MKk4ZFrw33E54YraAHs6Pkry7LwSncUDur5vDKBwm8pts56m7D0jEceKRPv8Scsbj+k=
+	t=1709203934; cv=none; b=n77K+OItrJS9+s0J6yOla48X/1VU+gISc0IGSlV1CSES2lH2vCH6cPDeIHshG/12cBkjnQ7A1KyjEc7c8xP4A4KacXgWTy6qcg+/hhwFPyfkYWbT/2rL+2Mu9K03ZZW7JYjzI3Dkmz+d7FjMmpLABhCFyPBm9sCjrhHl8fb0dmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709203732; c=relaxed/simple;
-	bh=XzS6fq+Giqw0RPzHm79wubDPq4isDpcarVDTGC+dOx0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KfJrY2agHLQipVyqO/RGZR62pR17yNTUJNU9y0ma3TwnUnxusa+OWtQYlKz/8pRqyxSWRNdt38lrjj3qeLUgJBPiyYyRqis2W2/pxH+PifP0RyW0TTQHkWEnWTpLSkdbaOXS3E25OGhk2CAzQxJfHWyizMMzw6BEUDNaCUJsbfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z64QMlFX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709203729;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=kTQNgwDYWMu50d3fX4YnqzUpTcfqlF52qDT1Uxsy8p8=;
-	b=Z64QMlFXQYLfYGMCmZ1uelNFEee9LfKRnEMg1W0lXn6RmsM1XN6wl4/lp7inDihwjoeO2J
-	jVoDsW2hgMUlVX1IbR0eZPx6UGvKGn5a9XWsv9fOYJ1/l87NG6hmIOmxTDIZOE9NrD2naD
-	7xBvPBWGbdFH2E8U13aph8U+RshMAGY=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-320-yxOBrMWIObu_Zl81wilKzQ-1; Thu, 29 Feb 2024 05:48:47 -0500
-X-MC-Unique: yxOBrMWIObu_Zl81wilKzQ-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5131cafd9d9so63770e87.1
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 02:48:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709203726; x=1709808526;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kTQNgwDYWMu50d3fX4YnqzUpTcfqlF52qDT1Uxsy8p8=;
-        b=fSdhREdYmxhQp03oWNgHZnqe9MUs6eOp1Z/t1IpiWzIw+YOPya8+Bi8O/sMQxCSbRn
-         auo16B4BwqE6cw4X/3eAx5Vd7CbUZPdP9kV5g5zuE3sOeM8WaURCjyehoOXWatg51YvS
-         2bGJB4cKnCmfSTLnL9JLRQlvEjaKd8moThgOnGQa3YJgHv51wanZLHD2mH2jyNQsaa2x
-         0hQ2I0m/OoIpEpti6ufV6QUT+sPKsqIloaPUfwMIxIK+xdrY9AHrot5JNVi7Zw9mGW8I
-         Q1YlyrFTZfjyxYN5jJC4/pnQ/rHr5EcJGv3n9yu+qETalQScyIzEeP1FhGtI0+dFaxKX
-         yRaw==
-X-Forwarded-Encrypted: i=1; AJvYcCWVrdcCYFHqWh3yskT+8LPC/AF0zHttTar1HBzSBZ188oC0Wc6wMIHLCzVbPKf4UZH2/aKPNJeJdeeWqvJzamL18J/jKgls
-X-Gm-Message-State: AOJu0YzKNCfzNU82yHDqZ4nz+L0m0XWDoWKkK5VPMq1C4Z3sMjvVoTCt
-	Sg0/1uZC80ZPX3uVf6I3I4aIKzYTeupNVh4JDjz6zgKbY4cOMOnnL+fMZM30tVAwXWNrb2KgItj
-	VejXKUhWnzkFkrVpse7vjGFQuluZNLGn8BLpbvWW3iM7eOgzF+Zcqfg==
-X-Received: by 2002:a05:6512:3b89:b0:511:9ea2:f589 with SMTP id g9-20020a0565123b8900b005119ea2f589mr1463620lfv.0.1709203726274;
-        Thu, 29 Feb 2024 02:48:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGS5gieFTKdIGG4SJuTQlGR8TPXmC/tE8BJ9sq2UItrPbXs/wsObrdj9Ky7fDTCqAnBObdqLg==
-X-Received: by 2002:a05:6512:3b89:b0:511:9ea2:f589 with SMTP id g9-20020a0565123b8900b005119ea2f589mr1463595lfv.0.1709203725888;
-        Thu, 29 Feb 2024 02:48:45 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-250-174.dyn.eolo.it. [146.241.250.174])
-        by smtp.gmail.com with ESMTPSA id bx5-20020a5d5b05000000b0033e103eaf5bsm1159217wrb.115.2024.02.29.02.48.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 02:48:45 -0800 (PST)
-Message-ID: <94bd28f625f7ca066e8f2b2686c2493cfab386bd.camel@redhat.com>
-Subject: Re: [PATCH net-next v2 2/3] vhost_net: Call peek_len when using xdp
-From: Paolo Abeni <pabeni@redhat.com>
-To: Yunjian Wang <wangyunjian@huawei.com>, mst@redhat.com, 
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com, kuba@kernel.org, 
-	bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
-	jonathan.lemon@gmail.com, davem@davemloft.net
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,  kvm@vger.kernel.org,
- virtualization@lists.linux.dev, xudingke@huawei.com,  liwei395@huawei.com
-Date: Thu, 29 Feb 2024 11:48:43 +0100
-In-Reply-To: <1709118344-127812-1-git-send-email-wangyunjian@huawei.com>
-References: <1709118344-127812-1-git-send-email-wangyunjian@huawei.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1709203934; c=relaxed/simple;
+	bh=tFIRN6AD7OJmcls33kRXGPl2Q5cmwc4WEirIvdGkHzU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cYka7F0Khmp1FEqZBeMmjC9yXUK/6bEEcJQoMtdvicDz3exwhFfNQMX4Nq5gzmZccd1zQ9QBUQPqQLEAceIJbhMAJqUhaiG4e6VRwMEjJPjzqfvlapuQvrfVg+B2qe5PoAwrbmWZDdDSW5Ahru1MJBIaGBGaaEalLLKpR4d0PZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qvy2HkJj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40C61C433C7;
+	Thu, 29 Feb 2024 10:52:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709203934;
+	bh=tFIRN6AD7OJmcls33kRXGPl2Q5cmwc4WEirIvdGkHzU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qvy2HkJjQRFvy49WbBPN6hh/2n2KJejdturTF3m9Zr0Zr6A9utMib5ESLThImKW0F
+	 9aonzpE+JIwUkl2pEbtSDK2hoiWbWKMF3dReGzkeM1B2bFt+o/Xd1DzUwiJ2Dnpf+n
+	 fobSTAdyYYl5i/4tCEzAH7ZDj8GMU3RpF7SkqDtKt08KKfzF5YD1rbQh0GFhYP5R4C
+	 Fqug2EHJQydIhLS8hYUv57Zxx/iWIn6ALQNXrLAIw7vqy9G1NZ0TjiuzCq0sNE9i65
+	 ZI4qoMYGEFm0tesRCAtTC4eMu3Xsxn7z7xR0y6MmKnZEjMdaKKRRa8956NqvhLveQN
+	 yuD7qtUtBuZuA==
+Message-ID: <0106ce78-c83f-4552-a234-1bf7a33f1ed1@kernel.org>
+Date: Thu, 29 Feb 2024 12:52:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: ethernet: ti: am65-cpsw: Add priv-flag for
+ Switch VLAN Aware mode
+Content-Language: en-US
+To: Siddharth Vadapalli <s-vadapalli@ti.com>, Andrew Lunn <andrew@lunn.ch>
+Cc: Jiri Pirko <jiri@resnulli.us>, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, vladimir.oltean@nxp.com,
+ hkallweit1@gmail.com, dan.carpenter@linaro.org, horms@kernel.org,
+ yuehaibing@huawei.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, srk@ti.com,
+ Pekka Varis <p-varis@ti.com>
+References: <20240227082815.2073826-1-s-vadapalli@ti.com>
+ <Zd3YHQRMnv-ZvSWs@nanopsycho> <7d1496da-100a-4336-b744-33e843eba930@ti.com>
+ <Zd7taFB2nEvtZh8E@nanopsycho> <49e531f7-9465-40ea-b604-22a3a7f13d62@ti.com>
+ <10287788-614a-4eef-9c9c-a0ef4039b78f@lunn.ch>
+ <0004e3d5-0f62-49dc-b51f-5a302006c303@ti.com>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <0004e3d5-0f62-49dc-b51f-5a302006c303@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 2024-02-28 at 19:05 +0800, Yunjian Wang wrote:
-> If TUN supports AF_XDP TX zero-copy, the XDP program will enqueue
-> packets to the XDP ring and wake up the vhost worker. This requires
-> the vhost worker to call peek_len(), which can be used to consume
-> XDP descriptors.
->=20
-> Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
-> ---
->  drivers/vhost/net.c | 17 ++++++++++++-----
->  1 file changed, 12 insertions(+), 5 deletions(-)
->=20
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index f2ed7167c848..077e74421558 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -207,6 +207,11 @@ static int vhost_net_buf_peek_len(void *ptr)
->  	return __skb_array_len_with_tag(ptr);
->  }
-> =20
-> +static bool vhost_sock_xdp(struct socket *sock)
-> +{
-> +	return sock_flag(sock->sk, SOCK_XDP);
-> +}
-> +
->  static int vhost_net_buf_peek(struct vhost_net_virtqueue *nvq)
->  {
->  	struct vhost_net_buf *rxq =3D &nvq->rxq;
-> @@ -214,6 +219,13 @@ static int vhost_net_buf_peek(struct vhost_net_virtq=
-ueue *nvq)
->  	if (!vhost_net_buf_is_empty(rxq))
->  		goto out;
-> =20
-> +	if (ptr_ring_empty(nvq->rx_ring)) {
-> +		struct socket *sock =3D vhost_vq_get_backend(&nvq->vq);
-> +		/* Call peek_len to consume XSK descriptors, when using xdp */
-> +		if (vhost_sock_xdp(sock) && sock->ops->peek_len)
-> +			sock->ops->peek_len(sock);
 
-This really looks like a socket API misuse. Why can't you use ptr-ring
-primitives to consume XSK descriptors? peek_len could be constified
-some day, this code will prevent such (good) thing.
 
-Cheers,
+On 29/02/2024 11:27, Siddharth Vadapalli wrote:
+> On Wed, Feb 28, 2024 at 02:36:55PM +0100, Andrew Lunn wrote:
+>>> What if there is no kernel behavior associated with it? How can it be mimicked
+>>> then?
+>>
+>> Simple. Implement the feature in software in the kernel for
+>> everybody. Then offload it to your hardware.
+>>
+>> Your hardware is an accelerator. You use it to accelerate what linux
+>> can already do. If Linux does not have the feature your accelerator
+>> has, that accelerator feature goes unused.
+> 
+> Is it acceptable to have a macro in the Ethernet Driver to conditionally
+> disable/enable the feature (via setting the corresponding bit in the
+> register)?
+> 
+> The current implementation is:
+> 
+> 	/* Control register */
+> 	writel(AM65_CPSW_CTL_P0_ENABLE | AM65_CPSW_CTL_P0_TX_CRC_REMOVE |
+> 	       AM65_CPSW_CTL_VLAN_AWARE | AM65_CPSW_CTL_P0_RX_PAD,
+> 	       common->cpsw_base + AM65_CPSW_REG_CTL);
+> 
+> which sets the "AM65_CPSW_CTL_VLAN_AWARE" bit by default.
+> 
+> Could it be changed to:
+> 
+> #define TI_K3_CPSW_VLAN_AWARE 1
+> 
+> ....
+> 
+> 	/* Control register */
+> 	val = AM65_CPSW_CTL_P0_ENABLE | AM65_CPSW_CTL_P0_TX_CRC_REMOVE |
+> 	      AM65_CPSW_CTL_P0_RX_PAD;
+> 
+> #ifdef TI_K3_CPSW_VLAN_AWARE
+> 	val |= AM65_CPSW_CTL_VLAN_AWARE;
+> #endif
+> 
+> 	writel(val, common->cpsw_base + AM65_CPSW_REG_CTL);
+> 
+> Since no additional configuration is necessary to disable/enable the
+> functionality except clearing/setting a bit in a register, I am unsure of
+> the implementation for the offloading part being suggested. Please let me
+> know if the above implementation is an acceptable alternative.
 
-Paolo
+This doesn't really solve the problem as it leaves the question open as to
+who will set TI_K3_CPSW_VLAN_AWARE. And the configuration is then fixed at build.
 
+Can you please explain in which scenario the default case does not work for you?
+Why would end user want to disable VLAN_AWARE mode?
+
+TRM states
+"Transmit packets are NOT modified during switch egress when the VLAN_AWARE bit in the
+CPSW_CONTROL_REG register is cleared to 0h. This means that the switch is not in VLAN-aware mode."
+
+The same problem would also apply to cpsw.c and cpsw_new.c correct?
+
+A bit later the driver does this
+
+        /* switch to vlan unaware mode */
+        cpsw_ale_control_set(common->ale, HOST_PORT_NUM, ALE_VLAN_AWARE, 1);
+        cpsw_ale_control_set(common->ale, HOST_PORT_NUM,
+                             ALE_PORT_STATE, ALE_PORT_STATE_FORWARD);
+
+The comment says vlan unaware but code is setting ALE_VLAN_AWARE to 1.
+Is the comment wrong?
+
+-- 
+cheers,
+-roger
 
