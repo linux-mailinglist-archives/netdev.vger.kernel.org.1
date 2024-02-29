@@ -1,148 +1,142 @@
-Return-Path: <netdev+bounces-75995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A44286BE4C
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 02:36:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D777186BE74
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 02:49:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 581751C20C68
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 01:36:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C4432853A7
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 01:49:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA6A2E63C;
-	Thu, 29 Feb 2024 01:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 548292E63C;
+	Thu, 29 Feb 2024 01:49:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="ELJO8Bj9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fZ7/Asn9"
 X-Original-To: netdev@vger.kernel.org
-Received: from omta036.useast.a.cloudfilter.net (omta036.useast.a.cloudfilter.net [44.202.169.35])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77CA52D05D
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 01:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2B023D2;
+	Thu, 29 Feb 2024 01:49:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709170590; cv=none; b=MhXH1sW3sKavALHnztBluSzUyDA/pMFONet2gVfO+s4OVhIe41wE0HLp31x/HgR1MOv6weJ8xoxaHAm03WrwLXCUgBadmE7EdlKWRipoAOUNu+J/mkrcrKUmhgCIdFCPsZsDLPlP1zzfm4tVn58eRkleNeQa3Ck8lYIwlnWSQ30=
+	t=1709171374; cv=none; b=RPe5Ly9kNNpiK0q3YbMHDxQCn1PWsFRJ+3WIK2XM3BDNZ/1ZmraxXtrfaYNxTbGbrz+aOvBWya7OpRdn8wDfiLont4U79b5cIbTWyca2vrM/1RJhaNQN6Ijx9GF0WFhnz8WIK5Le20mLlwp/74KYbUqr0kZ/5PEhO4gyn+laR5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709170590; c=relaxed/simple;
-	bh=+q2AytV+UscXohFfoUnQzX7SS5YtqNU5pYoLOmw3iMI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rAlRpsmEiyrp9/HJnjvTZJ/YICVFrudkDPmOWi/Mm4TpWRJH5ZZ/O8m8nGd7SBU9GzygswXAfwCabmjKRIcnSG3OlugU2l4xwh2mVIIfgc3OpYZnMBt47ezzN8xsMGgJe6+Pl2MC7zp/0yiw9Nkpx6edoMCxC87zvTmSMOvtNr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=ELJO8Bj9; arc=none smtp.client-ip=44.202.169.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
-Received: from eig-obgw-6010a.ext.cloudfilter.net ([10.0.30.248])
-	by cmsmtp with ESMTPS
-	id fUaTrl2bTuh6sfVLXrTRzM; Thu, 29 Feb 2024 01:36:27 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id fVLWrH5Eu9PRRfVLXrNtZT; Thu, 29 Feb 2024 01:36:27 +0000
-X-Authority-Analysis: v=2.4 cv=QpVY30yd c=1 sm=1 tr=0 ts=65dfdf9b
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=VhncohosazJxI00KdYJ/5A==:17
- a=IkcTkHD0fZMA:10 a=k7vzHIieQBIA:10 a=wYkD_t78qR0A:10
- a=kwRZLr0jWMAg0_Wj33cA:9 a=QEXdDO2ut3YA:10 a=zZCYzV9kfG8A:10
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=iICL8pgfW/eValc0KcsgShjcYjIIkOjZx3q+9YTL2YU=; b=ELJO8Bj9iMneFv7JC7NmH7UfR+
-	g3TzcaAOp/fsvnRTc0nv6FPuxXS1rmofZjAgM9xgiqmDJbxCRVeT7z4+baskZePZ5zAGQtgXwgHQu
-	JpUd4pr/VhZ+kJ7GI3K6iYAyeoPdAtuevqTXNuCNgUcY77pw2nZlDUlNd5N4gjcNQwEsDEqG5XKGQ
-	v+lCm6CmYcGG1ilpML1wGXvZYFSTc3fZhNlLZS+DTF2vbrRFYwR9/fBstubGpRgqQkbXWlwdLFVCF
-	EkuimUCvI7CTu+JWTBXZU5tyNGxXGwZFlqF6/BNo3duYtIOpN/De+o3hBnbkGy4+XX6pGfM6koybY
-	nKqEsKDA==;
-Received: from [201.172.172.225] (port=34076 helo=[192.168.15.10])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96.2)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1rfVLV-002v75-09;
-	Wed, 28 Feb 2024 19:36:25 -0600
-Message-ID: <126f4cb7-7164-43d2-bf0e-1192d1438338@embeddedor.com>
-Date: Wed, 28 Feb 2024 19:36:22 -0600
+	s=arc-20240116; t=1709171374; c=relaxed/simple;
+	bh=Z9+ZItlUKOOugftEXhTeLovJnwPdw0FTe0BJHEfOUvc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Kc/akJRDDPFJLhevAgxDz8AIRHLKKxWdYaclvWcHsSKXgUqZMJuTlbBEM/6RJmqr7djsnrOxb1PN9jFIyARW2fU890GnKB9dmqqe9Ra0G8sSGdPKvOI6J2v+EJSs7UJT4XaETX4YWoFG4Rx4gRzPKChz5eeBOitITFtuYGrGrOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fZ7/Asn9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 180F9C433C7;
+	Thu, 29 Feb 2024 01:49:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709171373;
+	bh=Z9+ZItlUKOOugftEXhTeLovJnwPdw0FTe0BJHEfOUvc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fZ7/Asn9fee487a/DT2NBXMTgVevreMAjByrP3R1pgFm9XrySx0/QyxylioN5kg5Q
+	 TlwAvaCqHNJ9nApguOtuNYt7xw99FnQL2zA5atAfdE6+UIzSd/S8iG5oGfg9hT5Sni
+	 vw9NPfzwVYHt1SRGTKCzA67NNWSWIuteEwRPt/nVU03sLVxK+ghXoP4K11IT9AsGnS
+	 VH5PacwR99K0WLfN/ev/9lfrooz9Lmsvl6njq1qH5uC9VegOL2nv6XEaXatKfVJ1AS
+	 iuWH0zSNCCzfHZUIlT8U2rH8EnHyL3u7oLpUn4WEa/ZhD5t5LtZZZ6JkUyVw1zLNST
+	 ka3MCb83MttpA==
+Date: Wed, 28 Feb 2024 17:49:32 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= via B4 Relay
+ <devnull+arinc.unal.arinc9.com@kernel.org>
+Cc: <arinc.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>, DENG
+ Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, Andrew
+ Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir
+ Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Russell King
+ <linux@armlinux.org.uk>, mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+ Bartel Eerdekens <bartel.eerdekens@constell8.be>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v2 8/8] net: dsa: mt7530: simplify link
+ operations and force link down on all ports
+Message-ID: <20240228174932.2500653d@kernel.org>
+In-Reply-To: <20240216-for-netnext-mt7530-improvements-3-v2-8-094cae3ff23b@arinc9.com>
+References: <20240216-for-netnext-mt7530-improvements-3-v2-0-094cae3ff23b@arinc9.com>
+	<20240216-for-netnext-mt7530-improvements-3-v2-8-094cae3ff23b@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 7/8] net-device: Use new helpers from overflow.h in
- netdevice APIs
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kees Cook <keescook@chromium.org>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Vinod Koul <vkoul@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org,
- dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-spi@vger.kernel.org,
- netdev@vger.kernel.org, linux-hardening@vger.kernel.org,
- Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, "Gustavo A. R. Silva"
- <gustavoars@kernel.org>
-References: <20240228204919.3680786-1-andriy.shevchenko@linux.intel.com>
- <20240228204919.3680786-8-andriy.shevchenko@linux.intel.com>
- <202402281341.AC67EB6E35@keescook> <20240228144148.5c227487@kernel.org>
- <202402281554.C1CEEF744@keescook>
- <653bbfe8-1b35-4f5e-b89d-9e374c64e46b@embeddedor.com>
- <20240228165730.3171d76c@kernel.org>
- <49f55b02-ce21-40ac-a4cc-02894cd5eb8f@embeddedor.com>
- <20240228171509.4eeb5519@kernel.org>
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <20240228171509.4eeb5519@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 201.172.172.225
-X-Source-L: No
-X-Exim-ID: 1rfVLV-002v75-09
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.15.10]) [201.172.172.225]:34076
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 28
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfKTxQb5c6kXVf16mAwmL7pk8E3ZtpaRxjDKk+BbvfgDPp21JiOTIXFkbUG+zPLDRUsFtPPb8PNyiXSHpoOP4F5uus/+8SbeFoaNK4e/lql6iI/lg4OKU
- cCM8ZYxmPrpbNx6CnAyuo0U0i8owwbi8a7iDBSoYg6Dw6d7u45aS2DKpUBjXt7wNKfxR24l6CmhDRBqAi+nJz8ZA4Y6zanz8odQ=
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, 16 Feb 2024 14:05:36 +0300 Ar=C4=B1n=C3=A7 =C3=9CNAL via B4 Relay w=
+rote:
+> From: Ar=C4=B1n=C3=A7 =C3=9CNAL <arinc.unal@arinc9.com>
+>=20
+> Currently, the link operations for switch MACs are scattered across
+> port_enable, port_disable, phylink_mac_config, phylink_mac_link_up, and
+> phylink_mac_link_down.
+>=20
+> port_enable and port_disable clears the link settings. Move that to
+> mt7530_setup() and mt7531_setup_common() which set up the switches. This
+> way, the link settings are cleared on all ports at setup, and then only
+> once with phylink_mac_link_down() when a link goes down.
+>=20
+> Enable force mode at setup to apply the force part of the link settings.
+> This ensures that only active ports will have their link up.
 
+I don't know phylink so some basic questions..
 
-On 2/28/24 19:15, Jakub Kicinski wrote:
-> On Wed, 28 Feb 2024 19:03:12 -0600 Gustavo A. R. Silva wrote:
->> On 2/28/24 18:57, Jakub Kicinski wrote:
->>> On Wed, 28 Feb 2024 18:49:25 -0600 Gustavo A. R. Silva wrote:
->>>> struct net_device {
->>>> 	struct_group_tagged(net_device_hdr, hdr,
->>>> 		...
->>>> 		u32			priv_size;
->>>> 	);
->>>> 	u8			priv_data[] __counted_by(priv_size) __aligned(NETDEV_ALIGN);
->>>> }
->>>
->>> No, no, that's not happening.
->>
->> Thanks, one less flex-struct to change. :)
-> 
-> I like the flex struct.
-> I don't like struct group around a 360LoC declaration just to avoid
-> having to fix up a handful of users.
+What's "mode" in this case?
 
-That's what I mean. If we can prevent the flex array ending up in the
-middle of a struct by any means, then I wouldn't have to change the
-flex struct.
+> Now that the bit for setting the port on force mode is done on
+> mt7530_setup() and mt7531_setup_common(), get rid of PMCR_FORCE_MODE_ID()
+> which helped determine which bit to use for the switch model.
 
---
-Gustavo
+MT7531_FORCE_MODE also includes MT7531_FORCE_LNK, doesn't that mean=20
+the link will be up?
+
+> The "MT7621 Giga Switch Programming Guide v0.3", "MT7531 Reference Manual
+> for Development Board v1.0", and "MT7988A Wi-Fi 7 Generation Router
+> Platform: Datasheet (Open Version) v0.1" documents show that these bits a=
+re
+> enabled at reset:
+>=20
+> PMCR_IFG_XMIT(1) (not part of PMCR_LINK_SETTINGS_MASK)
+> PMCR_MAC_MODE (not part of PMCR_LINK_SETTINGS_MASK)
+> PMCR_TX_EN
+> PMCR_RX_EN
+> PMCR_BACKOFF_EN (not part of PMCR_LINK_SETTINGS_MASK)
+> PMCR_BACKPR_EN (not part of PMCR_LINK_SETTINGS_MASK)
+> PMCR_TX_FC_EN
+> PMCR_RX_FC_EN
+>=20
+> These bits also don't exist on the MT7530_PMCR_P(6) register of the switch
+> on the MT7988 SoC:
+>=20
+> PMCR_IFG_XMIT()
+> PMCR_MAC_MODE
+> PMCR_BACKOFF_EN
+> PMCR_BACKPR_EN
+>=20
+> Remove the setting of the bits not part of PMCR_LINK_SETTINGS_MASK on
+> phylink_mac_config as they're already set.
+
+This should be a separate change.
+
+> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
+> Signed-off-by: Ar=C4=B1n=C3=A7 =C3=9CNAL <arinc.unal@arinc9.com>
+
+> @@ -2257,6 +2255,12 @@ mt7530_setup(struct dsa_switch *ds)
+>  	mt7530_mib_reset(ds);
+> =20
+>  	for (i =3D 0; i < MT7530_NUM_PORTS; i++) {
+> +		/* Clear link settings and enable force mode to force link down
+
+"Clear link settings to force link down" makes sense.
+Since I don't know what the mode is, the "and enable force mode"
+sounds possibly out of place. If you're only combining this
+for the convenience of RMW, keep the reasoning separate.
 
