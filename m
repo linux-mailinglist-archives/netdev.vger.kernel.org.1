@@ -1,104 +1,125 @@
-Return-Path: <netdev+bounces-76259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEA8C86D05A
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:18:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 017FB86D061
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:20:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A749C2856F7
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:18:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DCF91C213C1
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:20:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE5DA6CC01;
-	Thu, 29 Feb 2024 17:18:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75DAE6CBED;
+	Thu, 29 Feb 2024 17:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VBYTBo5T"
+	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="jF0hLxGs"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from sender4-of-o54.zoho.com (sender4-of-o54.zoho.com [136.143.188.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EDC5E082;
-	Thu, 29 Feb 2024 17:18:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709227108; cv=none; b=RKLgK5tRDyHnMYrUOb1tR53u9H/K6YXWviFFg+3Q5QHx5XI7EYe80Y8mz3jkLZMtGfJHbMOCqUcWg7kxW0IzPqiEpfNNCD0Vi4LKvT2G/UC+K49NJWeT8nNeg+Fu/L504IL/coEiYOnukRqnFyh+yzXqkfAN07NYKGG88gIr3sA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709227108; c=relaxed/simple;
-	bh=wLFkbz3gkSljFGtwkfV2wWbaprCVgevB+4kcM+B8hRM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FTLuM7qtkjK7QKrO6t9FFWYiNlp9kzyRpixL4wGzKWlDr7sCbyk4vgdfqKBCkmRvemZb90mdWK5UliFVZH6ur1HhLHK2GJA+pL+7E7HZ1fFvi9BECtRb+6y3aJsN6KH37R3GuizjAOiHFlHCkHyFDXrhBRbA6Ovsz6Br0OrhIss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VBYTBo5T; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=nDTd85D0N7TgWSzEKq+BxgNnlzgmZW1OM2gxs9VR3ZY=; b=VBYTBo5TjEwXvKL7n0GEU/Bl4R
-	qlsi7iODH1JwrBMD+xa9T0IEeF+ITk8FVf1E3AWKHXTguVNnaB0m7XV/71KwVaCTFpvn5whbFRyi2
-	EoHvxhoXmXLjV3vOjie/Uc5vH6rfpUgFw0FAOIjvKHPCX6idla2gYa/5a9CyD46UOrt4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rfk34-0093vZ-5V; Thu, 29 Feb 2024 18:18:22 +0100
-Date: Thu, 29 Feb 2024 18:18:22 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: forbidden405@outlook.com
-Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v6 07/11] dt-bindings: net: hisi-femac: replace
- deprecated phy-mode with recommended phy-connection-type
-Message-ID: <1cba5245-08c7-43b0-8ae3-11db52e036aa@lunn.ch>
-References: <20240228-net-v6-0-6d78d3d598c1@outlook.com>
- <20240228-net-v6-7-6d78d3d598c1@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9374692EA
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 17:20:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709227203; cv=pass; b=ILuvNiOj2NN0tOfkHbm2CQI5/5xpgvaXf2Av8G+6K7aWkB/gmNk8zxXFi7FJXUaymEbJSUD4ToQfFT7SqCxBLa64AXCnIyImpvqVx6TLhij0hlg8rwIWBhE40p0ioybraD02ybc24JI6ubxuBdgECg3aCa0Er6uYTym21LmRBsE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709227203; c=relaxed/simple;
+	bh=i5M53o/DdubhEIp1KeAQVUojT1EvfltUmnhagh9DB9E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q5hhkkIepNwttGoi8aMwXxE8pdB6hl8qwm2VDRP6WvyScV5cIM1R8516DaIRQ96mMHNIHsEAJJlfgROdy//JDr3WOLCbbZhxOggJWvXvvC5pmQnLV8l3y2C8Zl4iktv8KLw/tUG4/XgS1lRbaY7l7r5KbFFys3B2rWmtM2KWX40=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=jF0hLxGs; arc=pass smtp.client-ip=136.143.188.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
+ARC-Seal: i=1; a=rsa-sha256; t=1709227194; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=FdOpOA+6OJqqYCWysAsXR+pLcShbzPj/xfrBDQhfsBEEX/JG1jvGzttebeKvbUdNjgOOiqqgExE62tNun+maTmuTXhHswd5XueLQVkiMc2ykYZ63ghny4GGwoHvfmIY7gOrQTBCzggb3HET55TSnIOk+fiBMYD47rE1gFDkJbqA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1709227194; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=si+g2wDLJnmkKt5gRzfeD9+jGPyMX0UBLZAlTRZG1P4=; 
+	b=U3hZ58lNMkMW12DS4OjYT9qvgBac0Jerhkw/SnqnJ0+PuQxDZpAqBq15j3ygqYuzdAUHGP/1YFLHL1Zmv5FO/LTfs1ANLwr+slaTzuux1EnNLS82mLbT9+lUlUtToD/LvrsSgNUQQcu/zHV7PApv1hldxTYUuRoEtLpGrNAo/8A=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=machnikowski.net;
+	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
+	dmarc=pass header.from=<maciek@machnikowski.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1709227194;
+	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=si+g2wDLJnmkKt5gRzfeD9+jGPyMX0UBLZAlTRZG1P4=;
+	b=jF0hLxGsD4IWBAXr8kyXJ8ypf8UPW11pzZLj6m4fDqtJArynWsHQUdYgq5ME7Om/
+	ovpQGAkBrGB5uc3eqXtGSECe6k2uwFL3Go8aO0FwfirqBkeAJxRrOhWQc9Xf4mG3ZQx
+	ooL75ugMbG5H2cKf87+fI0LJh4yjQz/h3DU3RpWxj3yfFOEtYrWGnMyh4kbr+I5G9oa
+	gbGx9vJYLYxugFSveCTsuyyqAxFhnuX+FSmeEGIysYogC3D4eYrk3bEqa/QrieJyuZJ
+	R4X095cjbiTpRvvHQZsT0FD5SCAsv390A6sieqWTu5vvqC40LZu484XUx8xrJ5S6sa6
+	XUeT4lUpUQ==
+Received: from [192.168.5.82] (public-gprs530213.centertel.pl [31.61.190.102]) by mx.zohomail.com
+	with SMTPS id 170922719318466.1301531522455; Thu, 29 Feb 2024 09:19:53 -0800 (PST)
+Message-ID: <82a26c8f-d2d0-4479-b3b0-ec853517e2f9@machnikowski.net>
+Date: Thu, 29 Feb 2024 18:19:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240228-net-v6-7-6d78d3d598c1@outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 3/5] netdevsim: add ndo_get_iflink() implementation
+Content-Language: en-US
+To: David Wei <dw@davidwei.uk>, Jakub Kicinski <kuba@kernel.org>,
+ Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
+ horms@kernel.org, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+References: <20240228232253.2875900-1-dw@davidwei.uk>
+ <20240228232253.2875900-4-dw@davidwei.uk>
+From: Maciek Machnikowski <maciek@machnikowski.net>
+In-Reply-To: <20240228232253.2875900-4-dw@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-On Wed, Feb 28, 2024 at 05:02:31PM +0800, Yang Xiwen via B4 Relay wrote:
-> From: Yang Xiwen <forbidden405@outlook.com>
+On 29/02/2024 00:22, David Wei wrote:
+> Add an implementation for ndo_get_iflink() in netdevsim that shows the
+> ifindex of the linked peer, if any.
 > 
-> The old property "phy-mode" should be replaced with the latest
-> "phy-connection-type".
-
-In practice, phy-mode is typically used, and phy-connection-type is
-not used much. All new user tend to be phy-mode.
-
-~/linux$ grep -r phy-mode arch/* | wc
-   1561    6258  113122
-~/linux$ grep -r phy-connection-type arch/* | wc
-    372    1489   28981
-
-Most of the phy-connection-type appear in PowerPC.
-
-~/linux$ grep -r phy-connection-type arch/powerpc/* | wc
-    247     990   18335
-
-It was the early adopter of DT, long before ARM. The DT standard of
-the time, which PowerPC followed, said to use
-phy-connection-type. When ARM started using DT, it did not follow the
-standard too well, and phy-mode got used a lot. Officially, phy-mode
-is deprecated because it is not part of the standard. But practice
-does not always follow the standard.
-
-So both are O.K, all the generic code accepts both, and there is no
-real reason to change.
-
-	Andrew
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> ---
+>  drivers/net/netdevsim/netdev.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+> index c3f3fda5fdc0..8330bc0bcb7e 100644
+> --- a/drivers/net/netdevsim/netdev.c
+> +++ b/drivers/net/netdevsim/netdev.c
+> @@ -283,6 +283,21 @@ nsim_set_features(struct net_device *dev, netdev_features_t features)
+>  	return 0;
+>  }
+>  
+> +static int nsim_get_iflink(const struct net_device *dev)
+> +{
+> +	struct netdevsim *nsim, *peer;
+> +	int iflink;
+> +
+> +	nsim = netdev_priv(dev);
+> +
+> +	rcu_read_lock();
+> +	peer = rcu_dereference(nsim->peer);
+> +	iflink = peer ? READ_ONCE(peer->netdev->ifindex) : 0;
+> +	rcu_read_unlock();
+> +
+> +	return iflink;
+> +}
+> +
+>  static const struct net_device_ops nsim_netdev_ops = {
+>  	.ndo_start_xmit		= nsim_start_xmit,
+>  	.ndo_set_rx_mode	= nsim_set_rx_mode,
+> @@ -300,6 +315,7 @@ static const struct net_device_ops nsim_netdev_ops = {
+>  	.ndo_set_vf_rss_query_en = nsim_set_vf_rss_query_en,
+>  	.ndo_setup_tc		= nsim_setup_tc,
+>  	.ndo_set_features	= nsim_set_features,
+> +	.ndo_get_iflink		= nsim_get_iflink,
+>  	.ndo_bpf		= nsim_bpf,
+>  };
+>  
+Reviewed-by: Maciek Machnikowski <maciek@machnikowski.net>
 
