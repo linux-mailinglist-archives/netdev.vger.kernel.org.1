@@ -1,67 +1,61 @@
-Return-Path: <netdev+bounces-75996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D777186BE74
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 02:49:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8B1C86BE8B
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 02:52:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C4432853A7
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 01:49:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E86B1F251F3
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 01:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 548292E63C;
-	Thu, 29 Feb 2024 01:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9544036113;
+	Thu, 29 Feb 2024 01:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fZ7/Asn9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QygaAOrh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2B023D2;
-	Thu, 29 Feb 2024 01:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC412E84B;
+	Thu, 29 Feb 2024 01:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709171374; cv=none; b=RPe5Ly9kNNpiK0q3YbMHDxQCn1PWsFRJ+3WIK2XM3BDNZ/1ZmraxXtrfaYNxTbGbrz+aOvBWya7OpRdn8wDfiLont4U79b5cIbTWyca2vrM/1RJhaNQN6Ijx9GF0WFhnz8WIK5Le20mLlwp/74KYbUqr0kZ/5PEhO4gyn+laR5M=
+	t=1709171520; cv=none; b=jHYX0zuSHVBgyfOwsc7xSW/4C0GRy9KX+qGc4X8evD7yMpgNvuAdFwVaq30e5yypkeCTMFZ5BJ3KYGIGWDika513g783bamIP7deBm1U99eVXzllg/Doqj1KWQrVFw0zvHr6hkeQWaMFL9isr6cYAu4FO3IX9ROvYRg7+0DP3UE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709171374; c=relaxed/simple;
-	bh=Z9+ZItlUKOOugftEXhTeLovJnwPdw0FTe0BJHEfOUvc=;
+	s=arc-20240116; t=1709171520; c=relaxed/simple;
+	bh=Hia628mJqk0mdl+TojiKwXcdzR4GIqXVs2Civd7u4js=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kc/akJRDDPFJLhevAgxDz8AIRHLKKxWdYaclvWcHsSKXgUqZMJuTlbBEM/6RJmqr7djsnrOxb1PN9jFIyARW2fU890GnKB9dmqqe9Ra0G8sSGdPKvOI6J2v+EJSs7UJT4XaETX4YWoFG4Rx4gRzPKChz5eeBOitITFtuYGrGrOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fZ7/Asn9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 180F9C433C7;
-	Thu, 29 Feb 2024 01:49:33 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mb+YXU3mkIofY7SbPmyuA8gCoDP/K8NZPlZwPB0XjNCqxJv5Fi6aCu9gGuPE8nXl7VPoJRT/SxDQn7n+KL3KsDVOnFovvy1GPHpnCHPFdJ57gxEBiSxSP+dBdeFAilIMB1J4ZtPVYrcWnoPehM4CYsUw+ji4zmwrU/ZbngU/Ej0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QygaAOrh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94192C433C7;
+	Thu, 29 Feb 2024 01:51:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709171373;
-	bh=Z9+ZItlUKOOugftEXhTeLovJnwPdw0FTe0BJHEfOUvc=;
+	s=k20201202; t=1709171519;
+	bh=Hia628mJqk0mdl+TojiKwXcdzR4GIqXVs2Civd7u4js=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fZ7/Asn9fee487a/DT2NBXMTgVevreMAjByrP3R1pgFm9XrySx0/QyxylioN5kg5Q
-	 TlwAvaCqHNJ9nApguOtuNYt7xw99FnQL2zA5atAfdE6+UIzSd/S8iG5oGfg9hT5Sni
-	 vw9NPfzwVYHt1SRGTKCzA67NNWSWIuteEwRPt/nVU03sLVxK+ghXoP4K11IT9AsGnS
-	 VH5PacwR99K0WLfN/ev/9lfrooz9Lmsvl6njq1qH5uC9VegOL2nv6XEaXatKfVJ1AS
-	 iuWH0zSNCCzfHZUIlT8U2rH8EnHyL3u7oLpUn4WEa/ZhD5t5LtZZZ6JkUyVw1zLNST
-	 ka3MCb83MttpA==
-Date: Wed, 28 Feb 2024 17:49:32 -0800
+	b=QygaAOrhxDP/E65REvdBLymUwi8i7QPMMEbe2JehTbFs80zs6iPxQ+di+0u8SZmvQ
+	 TbJPsxrT3GyQ9/X4auIGQQcjY29hRg+BWRvLSbU5krVgWcXwcD7l/m7Fh/QN+z7xvJ
+	 nvngj1/0aOcWCKxP82VBNQAHPIM+mHhbiWGO/ADy6YKocTZVDJl+P/6fZYI67l/1R6
+	 0PiyL2Rzu9GsO26iwkRN8agZG7fzPzzc694OzLNoJVGDKJBrtCX52hDAhgp2gDrBTB
+	 RP8bfcuPwRXtLbul9T2YQPvV1Y9i+mL+sijCBH5n6JC+r1pmtS6I+ewNksvWyeqKxL
+	 BzmC1aTZ7Q39Q==
+Date: Wed, 28 Feb 2024 17:51:58 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= via B4 Relay
- <devnull+arinc.unal.arinc9.com@kernel.org>
-Cc: <arinc.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>, DENG
- Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, Andrew
- Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir
- Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Matthias
- Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, Russell King
- <linux@armlinux.org.uk>, mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2 8/8] net: dsa: mt7530: simplify link
- operations and force link down on all ports
-Message-ID: <20240228174932.2500653d@kernel.org>
-In-Reply-To: <20240216-for-netnext-mt7530-improvements-3-v2-8-094cae3ff23b@arinc9.com>
-References: <20240216-for-netnext-mt7530-improvements-3-v2-0-094cae3ff23b@arinc9.com>
-	<20240216-for-netnext-mt7530-improvements-3-v2-8-094cae3ff23b@arinc9.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, Charlie Jenkins <charlie@rivosinc.com>, Palmer
+ Dabbelt <palmer@dabbelt.com>, Erhard Furtner <erhard_f@mailbox.org>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>, "David S. Miller"
+ <davem@davemloft.net>
+Subject: Re: [PATCH net] kunit: Fix again checksum tests on big endian CPUs
+Message-ID: <20240228175158.04c0aa1b@kernel.org>
+In-Reply-To: <f0eeaab76d6386e22b88d9526ec7a53ae7e98ef5.camel@redhat.com>
+References: <73df3a9e95c2179119398ad1b4c84cdacbd8dfb6.1708684443.git.christophe.leroy@csgroup.eu>
+	<c434b94a-2072-4b74-a222-0906579a351e@csgroup.eu>
+	<f0eeaab76d6386e22b88d9526ec7a53ae7e98ef5.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,72 +65,43 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 16 Feb 2024 14:05:36 +0300 Ar=C4=B1n=C3=A7 =C3=9CNAL via B4 Relay w=
-rote:
-> From: Ar=C4=B1n=C3=A7 =C3=9CNAL <arinc.unal@arinc9.com>
+On Tue, 27 Feb 2024 10:06:41 +0100 Paolo Abeni wrote:
+> On Sat, 2024-02-24 at 07:44 +0000, Christophe Leroy wrote:
+> > Hi,
+> >=20
+> > Le 23/02/2024 =C3=A0 11:41, Christophe Leroy a =C3=A9crit=C2=A0: =20
+> > > Commit b38460bc463c ("kunit: Fix checksum tests on big endian CPUs")
+> > > fixed endianness issues with kunit checksum tests, but then
+> > > commit 6f4c45cbcb00 ("kunit: Add tests for csum_ipv6_magic and
+> > > ip_fast_csum") introduced new issues on big endian CPUs. Those issues
+> > > are once again reflected by the warnings reported by sparse.
+> > >=20
+> > > So, fix them with the same approach, perform proper conversion in
+> > > order to support both little and big endian CPUs. Once the conversions
+> > > are properly done and the right types used, the sparse warnings are
+> > > cleared as well.
+> > >=20
+> > > Reported-by: Erhard Furtner <erhard_f@mailbox.org>
+> > > Fixes: 6f4c45cbcb00 ("kunit: Add tests for csum_ipv6_magic and ip_fas=
+t_csum")
+> > > Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu> =20
+> >=20
+> > netdev checkpatch complains about "1 blamed authors not CCed:=20
+> > palmer@rivosinc.com; 1 maintainers not CCed: palmer@rivosinc.com "
+> >=20
+> > Palmer was copied but as Palmer Dabbelt <palmer@dabbelt.com>. Hope it i=
+s=20
+> > not a show stopper. =20
 >=20
-> Currently, the link operations for switch MACs are scattered across
-> port_enable, port_disable, phylink_mac_config, phylink_mac_link_up, and
-> phylink_mac_link_down.
+> No, it's not.
 >=20
-> port_enable and port_disable clears the link settings. Move that to
-> mt7530_setup() and mt7531_setup_common() which set up the switches. This
-> way, the link settings are cleared on all ports at setup, and then only
-> once with phylink_mac_link_down() when a link goes down.
+> Acked-by: Paolo Abeni <pabeni@redhat.com>
 >=20
-> Enable force mode at setup to apply the force part of the link settings.
-> This ensures that only active ports will have their link up.
-
-I don't know phylink so some basic questions..
-
-What's "mode" in this case?
-
-> Now that the bit for setting the port on force mode is done on
-> mt7530_setup() and mt7531_setup_common(), get rid of PMCR_FORCE_MODE_ID()
-> which helped determine which bit to use for the switch model.
-
-MT7531_FORCE_MODE also includes MT7531_FORCE_LNK, doesn't that mean=20
-the link will be up?
-
-> The "MT7621 Giga Switch Programming Guide v0.3", "MT7531 Reference Manual
-> for Development Board v1.0", and "MT7988A Wi-Fi 7 Generation Router
-> Platform: Datasheet (Open Version) v0.1" documents show that these bits a=
-re
-> enabled at reset:
+> I *think* this, despite the subject prefix, should go via Andrew's tree
+> to avoid conflicts.
 >=20
-> PMCR_IFG_XMIT(1) (not part of PMCR_LINK_SETTINGS_MASK)
-> PMCR_MAC_MODE (not part of PMCR_LINK_SETTINGS_MASK)
-> PMCR_TX_EN
-> PMCR_RX_EN
-> PMCR_BACKOFF_EN (not part of PMCR_LINK_SETTINGS_MASK)
-> PMCR_BACKPR_EN (not part of PMCR_LINK_SETTINGS_MASK)
-> PMCR_TX_FC_EN
-> PMCR_RX_FC_EN
->=20
-> These bits also don't exist on the MT7530_PMCR_P(6) register of the switch
-> on the MT7988 SoC:
->=20
-> PMCR_IFG_XMIT()
-> PMCR_MAC_MODE
-> PMCR_BACKOFF_EN
-> PMCR_BACKPR_EN
->=20
-> Remove the setting of the bits not part of PMCR_LINK_SETTINGS_MASK on
-> phylink_mac_config as they're already set.
+> @Andrew does the above fits you?
 
-This should be a separate change.
-
-> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
-> Signed-off-by: Ar=C4=B1n=C3=A7 =C3=9CNAL <arinc.unal@arinc9.com>
-
-> @@ -2257,6 +2255,12 @@ mt7530_setup(struct dsa_switch *ds)
->  	mt7530_mib_reset(ds);
-> =20
->  	for (i =3D 0; i < MT7530_NUM_PORTS; i++) {
-> +		/* Clear link settings and enable force mode to force link down
-
-"Clear link settings to force link down" makes sense.
-Since I don't know what the mode is, the "and enable force mode"
-sounds possibly out of place. If you're only combining this
-for the convenience of RMW, keep the reasoning separate.
+I don't see this in linux-next, so unless told otherwise I'll merge it
+and ship to Linus tomorrow.
 
