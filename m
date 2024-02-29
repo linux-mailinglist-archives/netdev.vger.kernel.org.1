@@ -1,100 +1,133 @@
-Return-Path: <netdev+bounces-76248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2033086CFFB
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:02:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6430786D022
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:07:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 511AF1C225CB
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:02:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9683B1C20A82
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:07:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 788DF38DEA;
-	Thu, 29 Feb 2024 17:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678246CBE6;
+	Thu, 29 Feb 2024 17:04:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from gentwo.org (gentwo.org [62.72.0.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4940E2E3E1;
-	Thu, 29 Feb 2024 17:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.72.0.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99D17160636;
+	Thu, 29 Feb 2024 17:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709226062; cv=none; b=dzututtrhlKqC6ZMkiul4/GHu/kRqrFZGdPcN5b6DtHZGhVECvfHhWGHw0ytcjLV2YOrQWCi8VDPgYFq4BUMOYXjzUzDRy/4N7cVi2KlajPF8IaD22iepsrypZM9MP31WBuytbaUrmWn5RtteMkaaaQbpmh98HiB58pcXMvUApM=
+	t=1709226297; cv=none; b=pBPNk/BA1L58cOusmqkHAzLWQ+K5KoRqsHfJXuOoadoZCLbGiaWPEUE0UA9zmm03/xEvpAjvp12LbroNKuygUAB3nAC/Vv4/gxuyDbKKJZFZx2HGFWzkJgcWBLhet/Mp2ZhqmWQJzCB00aRQLlFFzC8WVwtcouFJh9mGbThcwns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709226062; c=relaxed/simple;
-	bh=AJlVspfSdCAd3r0V5g9qas0SihWHSfY4bK1XQbc9yqg=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=IUEXu8EkDEKRG1Wvia1tbhRzl7TMYJjzFrjcvDna58WzaAuZ0HW7NfcKMVx0Zf864JZRLuUJefkjXV/pgV8yW2LTvwCCD3TucGIJihz8wDK2l/gfua2fP/mmFRLqu+Qe12NaYJuHMbuCM3/UEGs6mUEwZS43GbWaqFbeQaT8Elk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=fail smtp.mailfrom=linux.com; arc=none smtp.client-ip=62.72.0.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=linux.com
-Received: by gentwo.org (Postfix, from userid 1003)
-	id 86EC040B02; Thu, 29 Feb 2024 09:00:58 -0800 (PST)
-Received: from localhost (localhost [127.0.0.1])
-	by gentwo.org (Postfix) with ESMTP id 8634E40AAD;
-	Thu, 29 Feb 2024 09:00:58 -0800 (PST)
-Date: Thu, 29 Feb 2024 09:00:58 -0800 (PST)
-From: "Christoph Lameter (Ampere)" <cl@linux.com>
-To: Shijie Huang <shijie@amperemail.onmicrosoft.com>
-cc: Eric Dumazet <edumazet@google.com>, 
-    Huang Shijie <shijie@os.amperecomputing.com>, kuba@kernel.org, 
-    patches@amperecomputing.com, davem@davemloft.net, horms@kernel.org, 
-    ast@kernel.org, dhowells@redhat.com, linyunsheng@huawei.com, 
-    aleksander.lobakin@intel.com, linux-kernel@vger.kernel.org, 
-    netdev@vger.kernel.org, cl@os.amperecomputing.com
-Subject: Re: [PATCH v2] net: skbuff: set FLAG_SKB_NO_MERGE for
- skbuff_fclone_cache
-In-Reply-To: <018b5652-8006-471d-94d0-d230e4aeef6d@amperemail.onmicrosoft.com>
-Message-ID: <b7825865-c368-1b72-3751-f1928443db32@linux.com>
-References: <CANn89iJoHDzfYfhcwVvR4m7DiVG-UfFNqm+D1WD-2wjOttk6ew@mail.gmail.com> <20240227062833.7404-1-shijie@os.amperecomputing.com> <CANn89iL2a2534d8QU9Xt6Gjm8M1+wWH03+YPdjSPQCq_Q4ZGxw@mail.gmail.com>
- <018b5652-8006-471d-94d0-d230e4aeef6d@amperemail.onmicrosoft.com>
+	s=arc-20240116; t=1709226297; c=relaxed/simple;
+	bh=tTf5DGA4/EdGbxqRxWUdMDKOzj/3epteLSgwhMqPiA4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=POAuBOu6rUa2fJVeEGfVdAM0DtGH24OmVZjI8OiZ2XgvJDF2U/F/VMgS0WO0UhMBx82/QKyHffJRBYKnyMz7quUeFwJlI3X7sxaVO3bhHIUqHWOO9V0++lHrAiz8P+OPeFC9H3S1uHrwMxRnbftbGGsB2s9CJlwMOx23K8qNuas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d2fad80eacso11622911fa.2;
+        Thu, 29 Feb 2024 09:04:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709226294; x=1709831094;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=C7eSu5LAngYuG4yyZo6XzjOmxDsHUKU5MZ0QDXjzOq8=;
+        b=hnqgUKFqH7cbMuRutH5//i0o1Mym0Vf++S1Zf+x8nmZPdLdGq4TkO9aWtgFWAW3vpf
+         hPlcjLQvAIVb9DAn1yBwQpjGrvzQaocDaEPzioFYmrf4+w3bzVvFfjT4o21NexDRo3op
+         Ml1DaiP1veK4iW8aQETg/kunJjduuir1oM6sR+d3rtfqpEoX/c4pEX5WZwhxFtWkuMXP
+         Hn+6icMQDB5k7vh9t7fLaNu6sU+EswADkdfzzUbusU9oXytCVQccsmsRCCqnDiswcgpJ
+         P1HYRMmE2+iVxB1JxkVcavlofhqyTYv9+foy56IKt6y71it1HOthsbp6Cztq28U5Bmfw
+         UP7w==
+X-Forwarded-Encrypted: i=1; AJvYcCV7UUdIlJBuvkqSy8Jkqy6u2NDm6cM7nuI8BPr4HG7vK/UBjoj1h/1fCIlZFtwCfnOdvjJiKWJYHRVr70dieOre8NIbxyhnY0+188gt
+X-Gm-Message-State: AOJu0Yx1D7ccwsgJmyTnF63ZLdp3oa2d/wIiNv/czPLocl4iDpN/wT2x
+	PW+JhI7qWMLo7xQ+PXwJcalc17S3a2r6ciUsCs6n6qhWzL0Xu+0a
+X-Google-Smtp-Source: AGHT+IHVvv37XKBHxeMbPUTK+oooXHJhgULZY/r3t3cWxLlVISuKpQHZmbVYY3b2qOjj9jRkkqXl1A==
+X-Received: by 2002:a2e:8194:0:b0:2d2:c937:6fea with SMTP id e20-20020a2e8194000000b002d2c9376feamr1960270ljg.6.1709226293467;
+        Thu, 29 Feb 2024 09:04:53 -0800 (PST)
+Received: from localhost (fwdproxy-lla-118.fbsv.net. [2a03:2880:30ff:76::face:b00c])
+        by smtp.gmail.com with ESMTPSA id y16-20020a05600c365000b00412656ba919sm5599122wmq.20.2024.02.29.09.04.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Feb 2024 09:04:53 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	horms@kernel.org,
+	dsahern@kernel.org
+Subject: [PATCH net-next 1/2] net: bareudp: Do not allocate stats in the driver
+Date: Thu, 29 Feb 2024 09:04:23 -0800
+Message-ID: <20240229170425.3895238-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, 28 Feb 2024, Shijie Huang wrote:
+With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
+convert veth & vrf"), stats allocation could be done on net core
+instead of this driver.
 
->> 
->> Using SLAB_NO_MERGE does not help, I am still seeing wrong allocations
->> on a dual socket
->> host with plenty of available memory.
->> (either sk_buff or skb->head being allocated on the other node).
->
-> Do you mean you still can see the wrong fclone after using SLAB_NO_MERGE?
->
-> If so, I guess there is bug in the slub.
+With this new approach, the driver doesn't have to bother with error
+handling (allocation failure checking, making sure free happens in the
+right spot, etc). This is core responsibility now.
 
-Mergin has nothing to do with memory locality.
+Remove the allocation in the bareudp driver and leverage the network
+core allocation.
 
->> fclones might be allocated from a cpu running on node A, and freed
->> from a cpu running on node B.
->> Maybe SLUB is not properly handling this case ?
->
-> Maybe.
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ drivers/net/bareudp.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
-Basic functionality is broken??? Really?
-
->> I think we need help from mm/slub experts, instead of trying to 'fix'
->> networking stacks.
->
-> @Christopher
->
-> Any idea about this?
-
-
-If you want to force a local allocation then use GFP_THISNODE as a flag.
-
-If you do not specify a node or GFP_THISNODE then the slub allocator will 
-opportunistically allocate sporadically from other nodes to avoid 
-fragmentation of slabs. The page allocator also will sporadically go off 
-node in order to avoid reclaim. The page allocator may go off node 
-extensively if there is a imbalance of allocation between node. The page 
-allocator has knobs to tune off node vs reclaim options. Doing more 
-reclaim will slow things down but give you local data.
+diff --git a/drivers/net/bareudp.c b/drivers/net/bareudp.c
+index 4db6122c9b43..27408f0b93d6 100644
+--- a/drivers/net/bareudp.c
++++ b/drivers/net/bareudp.c
+@@ -194,15 +194,10 @@ static int bareudp_init(struct net_device *dev)
+ 	struct bareudp_dev *bareudp = netdev_priv(dev);
+ 	int err;
+ 
+-	dev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
+-	if (!dev->tstats)
+-		return -ENOMEM;
+-
+ 	err = gro_cells_init(&bareudp->gro_cells, dev);
+-	if (err) {
+-		free_percpu(dev->tstats);
++	if (err)
+ 		return err;
+-	}
++
+ 	return 0;
+ }
+ 
+@@ -211,7 +206,6 @@ static void bareudp_uninit(struct net_device *dev)
+ 	struct bareudp_dev *bareudp = netdev_priv(dev);
+ 
+ 	gro_cells_destroy(&bareudp->gro_cells);
+-	free_percpu(dev->tstats);
+ }
+ 
+ static struct socket *bareudp_create_sock(struct net *net, __be16 port)
+@@ -567,6 +561,7 @@ static void bareudp_setup(struct net_device *dev)
+ 	netif_keep_dst(dev);
+ 	dev->priv_flags |= IFF_NO_QUEUE;
+ 	dev->flags = IFF_POINTOPOINT | IFF_NOARP | IFF_MULTICAST;
++	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+ }
+ 
+ static int bareudp_validate(struct nlattr *tb[], struct nlattr *data[],
+-- 
+2.43.0
 
 
