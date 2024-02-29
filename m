@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-76268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C45686D0C1
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:33:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8434886D0CC
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:36:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACBD11F252A0
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:33:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0803E1F23723
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:36:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3619757F8;
-	Thu, 29 Feb 2024 17:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397177581D;
+	Thu, 29 Feb 2024 17:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="taU9xXE3"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QTohasf4"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D876CBE9
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 17:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51179757FD
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 17:36:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709228004; cv=none; b=f/PRwOeCT1FgftVZron/R8ly785qARJWBkFuZRX0MbyKCyWhlVBBF3jFMT0eb3OQNL4+/NkIUmn6rpvXzcF6OqwS8nf7RcNt5vcUHEtC6HqSO1gVWwJ53dA3j85wvAdOQmgs6P1DK04AnVeOTBS9MaYFGwtpq8BmqEydbOxbG84=
+	t=1709228176; cv=none; b=H8lt//pSyv/T/SsHN+qB4DQavLLzMJ70Mjio3jiOYNR+XPzmO4/WI3yk/RZOHGsuPIllA47kSKumG3pVOTlqqyRMHdfrNX59xPyJQleUwaPEwffyLUX5nnIG4+aS/ksgpfaJplyX71ETYYEg+18e0KgH4lL9mocJd8te5b8NtTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709228004; c=relaxed/simple;
-	bh=NT2aoqPD+H3UxArx7GoWp/jyurJbnP5jZY2m5x3dC6I=;
+	s=arc-20240116; t=1709228176; c=relaxed/simple;
+	bh=iLSby/jlmJK3uljHnqc3l6N1Z82nXJjM+dUciAyqBwA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hpHNu/yTLy2VWb2XzJZlt6s69LdzlQT7en+ZFm8vMDaxUr+qRvL4Bs9362M3iI9Z9K+C/EIPTWhMRYxHW6dLUQNgkUn9ly6mYCRuDkqdcfCSD0U+amH3+Z9CPCEAvoZx1pZh1/jxjDzxWKWEiSmolars1b4Mcv3HGmAwZabnitU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=taU9xXE3; arc=none smtp.client-ip=209.85.208.48
+	 In-Reply-To:Content-Type; b=O51d3eMt7il+SRr5xRcyIUmIszvRkmo3obDuCjyLUVy1xvP9q0bUrXj7RkxwrcnYoPlzmiScVVH9pXDZVUY3tjHdz6I9+aqy80wo7WPF2CHoo+zEOgCroFFoaWt1qqZwfWW8OW5QhOwEzDJ8hbmUnfFWN8RbHWshDYqSPI0kuqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QTohasf4; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-563b7b3e3ecso1997770a12.0
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 09:33:21 -0800 (PST)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5648d92919dso2237150a12.1
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 09:36:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709228000; x=1709832800; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1709228173; x=1709832973; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=g4SW9IEV1AHr8zcIVjzCtrupsEd2zmLHvwRqfkyVnQo=;
-        b=taU9xXE3feQe+ZLrcZvMjOk+xXdIbRazR4JooUeCDkDMA2WqEtp/Wttod4XXjyz6Gq
-         1D6RqjLecLyFTmrMmdcRWit2bAo8ZsTTLZsvZk/TpGldZMCU3gak5jckKuxPh83DSvmh
-         sTmngTm7hPmvIby3BW5ZoQMPmTsSMFzoPfT+o8F27JGRka0i1t8tQIcrJ/E1yqwfpEAh
-         dyFcupoNLiJ0hZHt6doN6d/3MeBUSh0XjZm5bqoxcOuGl7hwUBDKelLWfVt1ywx+p86+
-         yAdq40t49q6KgbDmqTCWCY3EH8b0+c4gu8HLHEn8ic71pp6BXMLvi0NpMlWkW5VGW91K
-         lzwA==
+        bh=iLSby/jlmJK3uljHnqc3l6N1Z82nXJjM+dUciAyqBwA=;
+        b=QTohasf4jtS6SpGH0Q+ZAApYCgobPr1UkD7faho4JHQqsaagedolIUwvfGM7b1l11X
+         NzEfdiVJcCdaptSCZEEuoMstLTGZLx/llOQj/Wd2oaVV/0jzW8cKl7xLYBj0wDNZ8uFT
+         faeFzuyuyINzUQbpQCO2ofMP5N2b6hAxQrlyb6cqCb8fhEPoop8Y9qkjaRdvmCwmKFWU
+         VWO3JwiZQx3QJQgbffFr6wtsxM8ximwbSNBBwjZJs33KBVcDDRUhpPJDva7OP3WA2w7q
+         yLOpXacaUA/Slm+9KZ1jfxzQr402q0GdYZaJ/kNndYc89XPczW3K2KbR23JqYWC/6I9x
+         qQng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709228000; x=1709832800;
+        d=1e100.net; s=20230601; t=1709228173; x=1709832973;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g4SW9IEV1AHr8zcIVjzCtrupsEd2zmLHvwRqfkyVnQo=;
-        b=QtwwcYI+wG4906kTE6mZ6IARhFsSoHasnCWelxrKESnX7KbVsUpRUW9fRUtdKfTL3/
-         mbxQbwCs/CMsnnS4QQsDq7NQYvdpT2Nw32NpRf7BITGCtv/iDjNHDK0gDHF30OTgC3DD
-         i4DMXMDoRp8ujgIM1cljgBaZ1dheU4esI+bje7pravMBV5cTy8FxvAmT9VW4QaSoGLt1
-         7Fj44dAFYht6C3HUtvNHLL4YdPE8O0Jvu0N/Mu2NEFX5VqIAM3dY8JIX/QPywsevsouV
-         oOt48a9fCl0t+DrYOmyM3jRj+EZGmIX7evB47vXA6+4PCp8eoYDvE1JTxc9/Y74TIEOD
-         bjog==
-X-Gm-Message-State: AOJu0YyDmdNwIgJ+WPu592Zc1a5elM9L3MQbUdlOZO2FQWxQXohSd2uR
-	zdv5QoEZi9gb170ZPAK4FtKmpe4iVWN0bxRTsEsl/aksh9g0XR5QXH1UPfgAKJs=
-X-Google-Smtp-Source: AGHT+IEKMsPkZ39TgyCZPSJIyfL82K1VoIXkvFpH3Et+GrJuX3JxausyV7UmalyVsNVcRwEc/HuKRQ==
-X-Received: by 2002:a50:9e4e:0:b0:565:6dde:ed2e with SMTP id z72-20020a509e4e000000b005656ddeed2emr1877940ede.33.1709228000487;
-        Thu, 29 Feb 2024 09:33:20 -0800 (PST)
+        bh=iLSby/jlmJK3uljHnqc3l6N1Z82nXJjM+dUciAyqBwA=;
+        b=DNeIPigYYDfqVJ3ccoytWJgspwRUhbGrMj1JcHbjCuha6/7m3x0+8pyqpiobhYs38H
+         hlxnY0GvfScYXiXEJt7o1thbz3WRqYcOkbhskOQmiwAX6qEChkO0MSq+EwNt64DMSkl+
+         kXqemXe56aWFKT3kYwGwbj5YeWw3nfkxvKBUONYEAq7GMtDPi2rTrU1zlpZVl5JKKrQ4
+         4vTBGHKppqGpJYoXzxIvvqVXNhjubGNGEWyoxTH0vG0s4iqbrmI0IF3xTxsLZM2mDUA3
+         gMQuStMCNdVXKVtftw4n6AudKcY7xAstIHrMQEFMtv5676ztfdIJrJWYABQEnMK/IvZp
+         JBhw==
+X-Gm-Message-State: AOJu0Yy/QCPze++PeCKO4l6TpfpGkB3tycz3ois/Qux9TFejgO1i7kjy
+	oSaOGLkZuHxi2GzOjktKKIx7H4EWEA/i3Er62tD4UGiWrZ59pNC9KM4HIBQhOao=
+X-Google-Smtp-Source: AGHT+IFywM80eZIH8bIonSuktJ0UT/SAH3nkxmpcNS14qHNuZsAbBE+CbYtErcaJ8+IkhLeN10YZcw==
+X-Received: by 2002:a05:6402:5202:b0:566:49f4:c538 with SMTP id s2-20020a056402520200b0056649f4c538mr2158771edd.34.1709228172842;
+        Thu, 29 Feb 2024 09:36:12 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.222.97])
-        by smtp.gmail.com with ESMTPSA id a10-20020a50ff0a000000b005665a6e07fcsm795398edu.30.2024.02.29.09.33.18
+        by smtp.gmail.com with ESMTPSA id m13-20020aa7d34d000000b0056486eaa669sm790762edr.50.2024.02.29.09.36.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Feb 2024 09:33:19 -0800 (PST)
-Message-ID: <e1a7ce61-016b-4052-bca6-81264269c0a2@linaro.org>
-Date: Thu, 29 Feb 2024 18:33:17 +0100
+        Thu, 29 Feb 2024 09:36:12 -0800 (PST)
+Message-ID: <64b15740-901e-4561-b42c-5fd3a0997ace@linaro.org>
+Date: Thu, 29 Feb 2024 18:36:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,7 +75,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: net: add phy-supply property for stm32
+Subject: Re: [PATCH 2/2] dt-bindings: net: add new property st,ext-phyclk in
+ documentation for stm32
 Content-Language: en-US
 To: Christophe Roullier <christophe.roullier@foss.st.com>,
  "David S . Miller" <davem@davemloft.net>, Eric Dumazet
@@ -92,7 +93,7 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-stm32@st-md-mailman.stormreply.com,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 References: <20240229134724.1353903-1-christophe.roullier@foss.st.com>
- <20240229134724.1353903-2-christophe.roullier@foss.st.com>
+ <20240229134724.1353903-3-christophe.roullier@foss.st.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -138,18 +139,24 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240229134724.1353903-2-christophe.roullier@foss.st.com>
+In-Reply-To: <20240229134724.1353903-3-christophe.roullier@foss.st.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 29/02/2024 14:47, Christophe Roullier wrote:
-> Phandle to a regulator that provides power to the PHY. This
-> regulator will be managed during the PHY power on/off sequence.
-> 
-> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
-> ---
+> Add property st,ext-phyclk to manage cases when PHY have no cristal/quartz
+> This property can be used with RMII phy without cristal 50Mhz and when we
+> want to select RCC clock instead of ETH_REF_CLK
+> Can be used also with RGMII phy with no cristal and we select RCC clock
+> instead of ETH_CLK125
+> This new property replace st,eth-clk-sel and st,eth-ref-clk-sel
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+You miss full stops everywhere. What I don't get is why you decided to
+deprecate above - no explanation why. Also no implementation and nothing
+here mentions that you document existing property, but commit msg
+actually suggests adding new property. If new, then where is any user of
+this in following patch?
+
 
 Best regards,
 Krzysztof
