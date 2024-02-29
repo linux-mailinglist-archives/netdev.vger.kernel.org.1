@@ -1,232 +1,312 @@
-Return-Path: <netdev+bounces-76255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 192E586D034
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:12:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E84A86D042
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:12:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEF902843BD
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:11:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD6F22843BD
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:12:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D5C4AEFA;
-	Thu, 29 Feb 2024 17:11:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45C9B5B1E7;
+	Thu, 29 Feb 2024 17:12:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="V7j+Fdvp"
+	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="SO+UJZ1S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-of-o54.zoho.com (sender4-of-o54.zoho.com [136.143.188.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744996CBE3
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 17:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709226719; cv=none; b=aq1d4593YVv49CvpUacmaxt3grWtKrNVh3fGmAE0yq0/zE2qmJaTyBa/VXUpxsg7ikMmv2IGHa+iDE0f6IDUQgdICNLDI1zCuRQlFzRXluOqJu9JO1MmpU94ZPP/eGhENffL+/uezeyc6CcM4MxpZrWGj7SHTKu2ilsCQC8/m0c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709226719; c=relaxed/simple;
-	bh=p86JPbWlAAq/Pr2OfGMi2zSo0jei99EzmjU+Zsm+4Yw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FoorIDCdZNy+PCitftMkU4s58IUEttumKiMBaAFhJcBDmbotlgRLJxIpUbnvuB5RnQKDpTjr3aOmSfFcdxjv46IRc76Pgs7DmUb1al/jQDG4oJoIldG0xdwpdmuIsaPWeT+d/1ZC+ymHzn3wmOZRta3F4g57ZvkyE9Gxqhe67kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=V7j+Fdvp; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-33d6f26ff33so737587f8f.0
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 09:11:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709226713; x=1709831513; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=s5eN8ce01A8BAkNdozuKOgaWIKTHka0I2pmhvQwmmHs=;
-        b=V7j+FdvpUIFwX9dCnFPY0zkWFe5LNN8reuSgzMtz8u/VKP+MoXEKa+SuW0EZZG8dUO
-         qVYKAvY5/mNup0gwUOpX4YkAFT3xLNRBFHWErifQLqEwokQCAXG6nWuLCNdwPbIzEpcm
-         8VfuRXxd9TFZKorOEuJOo1LOOgRLFmNd1//s8DM/s/lt/UNd3nStn8uTUwjUGWC3bNjM
-         63IqbgYJAOOcTCDkfvlVTbbdLeCDh9xQ6FHswl5+jgIMC2v0Ga143Ig1wBd8zyE9nBhU
-         r1PLSTTwZpR3hRjG7PzIs4lyDNj8GKoRymWerde9GuX+y3/JPzsSNSABJXdkzCu1S/B2
-         besw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709226713; x=1709831513;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s5eN8ce01A8BAkNdozuKOgaWIKTHka0I2pmhvQwmmHs=;
-        b=dToJJNZ5W19S1+0NGmBD+85Lb4WJS4nuJGaqnWFoNma4aoO4jsOTRZednkICbFk2nL
-         87VnJ9uzn61983HqC+arqWNjrsV/FLjIhGWBWqhYooBswBm+gdaeF2t0rKBPkQ5JAQzM
-         EGzPszPkkN2fpIbkYelu2i/y7SiXqyTJtkxemr++YtDBXAIkTksL+iPWG6cEErn5RRQR
-         Plin9dl+sVuwBsWbKSmUeSlhVB0j8ACaZR9y7XPR8Qe+nIXYVENyb0Er75sLBoIUztIQ
-         VKkHyNjZKynDVmqj9DQrJJv9KWhUWLqNgKVsALHWJPlM8fQx8jmZN4Cp9DOBZGzjFBMS
-         PceA==
-X-Forwarded-Encrypted: i=1; AJvYcCXJpPuT0MuiAGLcl9uFtuQxVFWLyqJH7UJ1oKpNu+iGe3+FSg8lcwrio5et4adKse2vp4PKgUYh5avKg9ydPnaAvf0z7oAC
-X-Gm-Message-State: AOJu0YzcTIBTKLiwruQwbObRT3imwzh7lwKEJxfJr85h0CoFSxNqc2Yp
-	9aDptzfs+DYtF4GMNXKTSUDPxTTG9ANzewazbq+4daqmKvd15+kWRBFlVsEnWqU=
-X-Google-Smtp-Source: AGHT+IH1zEuJ86P10M2lAIVIYyql0ngHGu3kWSlbRqz+Hk6flSRnX9pE+3LpyAZr9/9QnUzu3VoEEA==
-X-Received: by 2002:adf:e7c1:0:b0:33d:9eef:4f25 with SMTP id e1-20020adfe7c1000000b0033d9eef4f25mr1910315wrn.51.1709226713513;
-        Thu, 29 Feb 2024 09:11:53 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id i9-20020a5d6309000000b0033e122a9a91sm1645422wru.105.2024.02.29.09.11.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 09:11:52 -0800 (PST)
-Date: Thu, 29 Feb 2024 18:11:49 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com, richardcochran@gmail.com
-Subject: Re: [PATCH net-next 1/2] bnxt_en: Introduce devlink runtime driver
- param to set ptp tx timeout
-Message-ID: <ZeC61UannrX8sWDk@nanopsycho>
-References: <20240229070202.107488-1-michael.chan@broadcom.com>
- <20240229070202.107488-2-michael.chan@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B7304AEFE
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 17:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709226732; cv=pass; b=jNHs5cNhqxBq+UWlXt7C/yTQdhJft18czZFNxdY9SSkgG6AO6OZclpNSRTCNSv/1M/pQBoPQYWkoft/lHBeq8WlLpTNHV5qLAM4RM3vXE4sKPCqsn6ucu+NEP3Vagrl9Yw/yazGeswtTI232EF4ILZztLoDGhbyTNc7iI3oDkaY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709226732; c=relaxed/simple;
+	bh=tG4YaaPxND5K3iWlE+k8QNX5V8rC9uMEdxTTyWqj0NY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=acCHG41nD2ni9CyGvGufK4445AcQMLbV6D+aEDO+LVNJHo3A7pdPlNR9GuFxeIsXC0N/NeU8trreHKygXFPGrcUqgyVk/icmnhMZI4BlWyTW65GNdajxPNIXr0Ou5KpS/7IwKsC7ExpaFJMTiynp/jYbeea04MLYZYGwl0LB1hk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=SO+UJZ1S; arc=pass smtp.client-ip=136.143.188.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
+ARC-Seal: i=1; a=rsa-sha256; t=1709226720; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=kAy0KK/O5ewzmJ6KlG8fjGQIdZhyH+I4HFkxvIAtktuw35HdACnaxUpzc/SUk3DBkpu84TugPTdwlPgOWL2UOPaUrusYQUV+hijrFSqTNUV3y7SCCmn6FWpIwolbqKg7ET3NTcz4ibVjYLgnoRbIv2+lCrEvXQsYjgK2FgJGMEA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1709226720; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=SWzJLheDLhxr5qms7sm8z+sFqnKieuMiW57bGM6d79k=; 
+	b=I1mYoZ3ZdSVLusKDz7bJeMOa4nK/u48e6ZBFtH0mwCV3Nxx1MTVvONYLycaTdv+ZV4j0GDuiriCaSl92v4lEvOhxkhCiPtoRy0t/NKCE6n7LnlGA5AQeKI6pAChPJIdHJgmNxk/O5YwG5tQuLJgrvAhGpkvA8qk1bzT9gxnMZlM=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=machnikowski.net;
+	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
+	dmarc=pass header.from=<maciek@machnikowski.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1709226720;
+	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=SWzJLheDLhxr5qms7sm8z+sFqnKieuMiW57bGM6d79k=;
+	b=SO+UJZ1SPH4bSAQscDEd2POcPJLLakZDEFRGuPtJ3RMmsvdBh1T//FAsitf0zyRx
+	OisFOEYfDatO84HP6O6b6osYqiqnutS8nyLo7tSRfq2HcavcaOW1u91bJ4cEEGV7J/N
+	dpTmcltOdQJWFkqxYd5CnLErRJ5JigfgMLoK1vmpVkqO0B5PxK15dKNFlYW+F2PgFap
+	7EVaaaYVRTg1p+5xk/exolysNybY/MalSsve5IGuHRfmXurJ++lT8loMGxRs1KDPeif
+	iH7i1qIY0Xc+BZKveJIMgSSA7fZ2YtUuqdeCmxHB/Y0ke+v1pZrmvylR3toUT8eL3C1
+	vnmYQVAO/w==
+Received: from [192.168.5.82] (public-gprs530213.centertel.pl [31.61.190.102]) by mx.zohomail.com
+	with SMTPS id 1709226718459455.0042794914734; Thu, 29 Feb 2024 09:11:58 -0800 (PST)
+Message-ID: <ac3d9c05-402f-435c-a5d2-29ab4f274bf5@machnikowski.net>
+Date: Thu, 29 Feb 2024 18:11:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240229070202.107488-2-michael.chan@broadcom.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 1/5] netdevsim: allow two netdevsim ports to be
+ connected
+To: David Wei <dw@davidwei.uk>, Jakub Kicinski <kuba@kernel.org>,
+ Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
+ horms@kernel.org, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+References: <20240228232253.2875900-1-dw@davidwei.uk>
+ <20240228232253.2875900-2-dw@davidwei.uk>
+Content-Language: en-US
+From: Maciek Machnikowski <maciek@machnikowski.net>
+In-Reply-To: <20240228232253.2875900-2-dw@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-Thu, Feb 29, 2024 at 08:02:01AM CET, michael.chan@broadcom.com wrote:
->From: Pavan Chebbi <pavan.chebbi@broadcom.com>
->
->Sometimes, the current 1ms value that driver waits for firmware
->to obtain a tx timestamp for a PTP packet may not be sufficient.
->User may want the driver to wait for a longer custom period before
->timing out.
->
->Introduce a new runtime driver param for devlink "ptp_tx_timeout".
->Using this parameter the driver can wait for up to the specified
->time, when it is querying for a TX timestamp from firmware.  By
->default the value is set to 1s.
->
->Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
->Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
->Signed-off-by: Michael Chan <michael.chan@broadcom.com>
->---
-> .../net/ethernet/broadcom/bnxt/bnxt_devlink.c | 42 +++++++++++++++++++
-> drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c |  1 +
-> drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  3 ++
-> 3 files changed, 46 insertions(+)
->
->diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
->index ae4529c043f0..0df0baa9d18c 100644
->--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
->+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
->@@ -652,6 +652,7 @@ static const struct devlink_ops bnxt_vf_dl_ops;
-> enum bnxt_dl_param_id {
-> 	BNXT_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
-> 	BNXT_DEVLINK_PARAM_ID_GRE_VER_CHECK,
->+	BNXT_DEVLINK_PARAM_ID_PTP_TXTS_TMO,
-> };
+On 29/02/2024 00:22, David Wei wrote:
+> Add two netdevsim bus attribute to sysfs:
+> /sys/bus/netdevsim/link_device
+> /sys/bus/netdevsim/unlink_device
 > 
-> static const struct bnxt_dl_nvm_param nvm_params[] = {
->@@ -1077,6 +1078,42 @@ static int bnxt_hwrm_nvm_req(struct bnxt *bp, u32 param_id, void *msg,
-> 	return rc;
-> }
+> Writing "A M B N" to link_device will link netdevsim M in netnsid A with
+> netdevsim N in netnsid B.
 > 
->+static int bnxt_dl_ptp_param_get(struct devlink *dl, u32 id,
->+				 struct devlink_param_gset_ctx *ctx)
->+{
->+	struct bnxt *bp = bnxt_get_bp_from_dl(dl);
->+
->+	if (!bp->ptp_cfg)
->+		return -EOPNOTSUPP;
->+
->+	ctx->val.vu32 = bp->ptp_cfg->txts_tmo;
->+	return 0;
->+}
->+
->+static int bnxt_dl_ptp_param_set(struct devlink *dl, u32 id,
->+				 struct devlink_param_gset_ctx *ctx)
->+{
->+	struct bnxt *bp = bnxt_get_bp_from_dl(dl);
->+
->+	if (!bp->ptp_cfg)
->+		return -EOPNOTSUPP;
->+
->+	bp->ptp_cfg->txts_tmo = ctx->val.vu32;
->+	return 0;
->+}
->+
->+static int bnxt_dl_ptp_param_validate(struct devlink *dl, u32 id,
->+				      union devlink_param_value val,
->+				      struct netlink_ext_ack *extack)
->+{
->+	if (val.vu32 > BNXT_PTP_MAX_TX_TMO) {
->+		NL_SET_ERR_MSG_FMT_MOD(extack, "TX timeout value exceeds the maximum (%d ms)",
->+				       BNXT_PTP_MAX_TX_TMO);
->+		return -EINVAL;
->+	}
->+	return 0;
->+}
->+
-> static int bnxt_dl_nvm_param_get(struct devlink *dl, u32 id,
-> 				 struct devlink_param_gset_ctx *ctx)
-> {
->@@ -1180,6 +1217,11 @@ static const struct devlink_param bnxt_dl_params[] = {
-> 			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
-> 			     bnxt_dl_nvm_param_get, bnxt_dl_nvm_param_set,
-> 			     NULL),
->+	DEVLINK_PARAM_DRIVER(BNXT_DEVLINK_PARAM_ID_PTP_TXTS_TMO,
->+			     "ptp_tx_timeout", DEVLINK_PARAM_TYPE_U32,
->+			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
->+			     bnxt_dl_ptp_param_get, bnxt_dl_ptp_param_set,
->+			     bnxt_dl_ptp_param_validate),
-
-Idk. This does not look sane to me at all. Will we have custom knobs to
-change timeout for arbitrary FW commands as this as a common thing?
-Driver is the one to take care of timeouts of FW gracefully, he should
-know the FW, not the user. Therefore exposing user knobs like this
-sounds pure wrong to me.
-
-nack for adding this to devlink.
-
-If this is some maybe-to-be-common ptp thing, can that be done as part
-of ptp api perhaps?
-
-pw-bot: cr
-
-
-> 	/* keep REMOTE_DEV_RESET last, it is excluded based on caps */
-> 	DEVLINK_PARAM_GENERIC(ENABLE_REMOTE_DEV_RESET,
-> 			      BIT(DEVLINK_PARAM_CMODE_RUNTIME),
->diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
->index cc07660330f5..4b50b07b9771 100644
->--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
->+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
->@@ -965,6 +965,7 @@ int bnxt_ptp_init(struct bnxt *bp, bool phc_cfg)
-> 		spin_unlock_bh(&ptp->ptp_lock);
-> 		ptp_schedule_worker(ptp->ptp_clock, 0);
-> 	}
->+	ptp->txts_tmo = BNXT_PTP_DFLT_TX_TMO;
-> 	return 0;
+> Writing "A M" to unlink_device will unlink netdevsim M in netnsid A from
+> its peer, if any.
 > 
-> out:
->diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
->index fce8dc39a7d0..ee977620d33e 100644
->--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
->+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
->@@ -22,6 +22,8 @@
-> #define BNXT_LO_TIMER_MASK	0x0000ffffffffUL
-> #define BNXT_HI_TIMER_MASK	0xffff00000000UL
+> rtnl_lock is taken to ensure nothing changes during the linking.
 > 
->+#define BNXT_PTP_DFLT_TX_TMO	1000 /* ms */
->+#define BNXT_PTP_MAX_TX_TMO	5000 /* ms */
-> #define BNXT_PTP_QTS_TIMEOUT	1000
-> #define BNXT_PTP_QTS_TX_ENABLES	(PORT_TS_QUERY_REQ_ENABLES_PTP_SEQ_ID |	\
-> 				 PORT_TS_QUERY_REQ_ENABLES_TS_REQ_TIMEOUT | \
->@@ -120,6 +122,7 @@ struct bnxt_ptp_cfg {
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> ---
+>  drivers/net/netdevsim/bus.c       | 145 ++++++++++++++++++++++++++++++
+>  drivers/net/netdevsim/netdev.c    |  10 +++
+>  drivers/net/netdevsim/netdevsim.h |   2 +
+>  3 files changed, 157 insertions(+)
 > 
-> 	u32			refclk_regs[2];
-> 	u32			refclk_mapped_regs[2];
->+	u32			txts_tmo;
-> };
-> 
-> #if BITS_PER_LONG == 32
->-- 
->2.30.1
->
+> diff --git a/drivers/net/netdevsim/bus.c b/drivers/net/netdevsim/bus.c
+> index 0c5aff63d242..64c0cdd31bf8 100644
+> --- a/drivers/net/netdevsim/bus.c
+> +++ b/drivers/net/netdevsim/bus.c
+> @@ -232,9 +232,154 @@ del_device_store(const struct bus_type *bus, const char *buf, size_t count)
+>  }
+>  static BUS_ATTR_WO(del_device);
+>  
+> +static ssize_t link_device_store(const struct bus_type *bus, const char *buf, size_t count)
+> +{
+> +	struct netdevsim *nsim_a, *nsim_b, *peer;
+> +	struct net_device *dev_a, *dev_b;
+> +	unsigned int ifidx_a, ifidx_b;
+> +	int netnsfd_a, netnsfd_b, err;
+> +	struct net *ns_a, *ns_b;
+> +
+> +	err = sscanf(buf, "%d:%u %d:%u", &netnsfd_a, &ifidx_a, &netnsfd_b,
+> +		     &ifidx_b);
+> +	if (err != 4) {
+> +		pr_err("Format for linking two devices is \"netnsfd_a:ifidx_a netnsfd_b:ifidx_b\" (int uint int uint).\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	ns_a = get_net_ns_by_fd(netnsfd_a);
+> +	if (IS_ERR(ns_a)) {
+> +		pr_err("Could not find netns with fd: %d\n", netnsfd_a);
+> +		return -EINVAL;
+> +	}
+> +
+> +	ns_b = get_net_ns_by_fd(netnsfd_b);
+> +	if (IS_ERR(ns_b)) {
+> +		pr_err("Could not find netns with fd: %d\n", netnsfd_b);
+> +		put_net(ns_a);
+> +		return -EINVAL;
+> +	}
+> +
+> +	err = -EINVAL;
+> +	rtnl_lock();
+> +	dev_a = __dev_get_by_index(ns_a, ifidx_a);
+> +	if (!dev_a) {
+> +		pr_err("Could not find device with ifindex %u in netnsfd %d\n",
+> +		       ifidx_a, netnsfd_a);
+> +		goto out_err;
+> +	}
+> +
+> +	if (!netdev_is_nsim(dev_a)) {
+> +		pr_err("Device with ifindex %u in netnsfd %d is not a netdevsim\n",
+> +		       ifidx_a, netnsfd_a);
+> +		goto out_err;
+> +	}
+> +
+> +	dev_b = __dev_get_by_index(ns_b, ifidx_b);
+> +	if (!dev_b) {
+> +		pr_err("Could not find device with ifindex %u in netnsfd %d\n",
+> +		       ifidx_b, netnsfd_b);
+> +		goto out_err;
+> +	}
+> +
+> +	if (!netdev_is_nsim(dev_b)) {
+> +		pr_err("Device with ifindex %u in netnsfd %d is not a netdevsim\n",
+> +		       ifidx_b, netnsfd_b);
+> +		goto out_err;
+> +	}
+> +
+> +	if (dev_a == dev_b) {
+> +		pr_err("Cannot link a netdevsim to itself\n");
+> +		goto out_err;
+> +	}
+> +
+> +	err = -EBUSY;
+> +	nsim_a = netdev_priv(dev_a);
+> +	peer = rtnl_dereference(nsim_a->peer);
+> +	if (peer) {
+> +		pr_err("Netdevsim %d:%u is already linked\n", netnsfd_a,
+> +		       ifidx_a);
+> +		goto out_err;
+> +	}
+> +
+> +	nsim_b = netdev_priv(dev_b);
+> +	peer = rtnl_dereference(nsim_b->peer);
+> +	if (peer) {
+> +		pr_err("Netdevsim %d:%u is already linked\n", netnsfd_b,
+> +		       ifidx_b);
+> +		goto out_err;
+> +	}
+> +
+> +	err = 0;
+> +	rcu_assign_pointer(nsim_a->peer, nsim_b);
+> +	rcu_assign_pointer(nsim_b->peer, nsim_a);
+> +
+> +out_err:
+> +	put_net(ns_b);
+> +	put_net(ns_a);
+> +	rtnl_unlock();
+> +
+> +	return !err ? count : err;
+> +}
+> +static BUS_ATTR_WO(link_device);
+> +
+> +static ssize_t unlink_device_store(const struct bus_type *bus, const char *buf, size_t count)
+> +{
+> +	struct netdevsim *nsim, *peer;
+> +	struct net_device *dev;
+> +	unsigned int ifidx;
+> +	int netnsfd, err;
+> +	struct net *ns;
+> +
+> +	err = sscanf(buf, "%u:%u", &netnsfd, &ifidx);
+> +	if (err != 2) {
+> +		pr_err("Format for unlinking a device is \"netnsfd:ifidx\" (int uint).\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	ns = get_net_ns_by_fd(netnsfd);
+> +	if (IS_ERR(ns)) {
+> +		pr_err("Could not find netns with fd: %d\n", netnsfd);
+> +		return -EINVAL;
+> +	}
+> +
+> +	err = -EINVAL;
+> +	rtnl_lock();
+> +	dev = __dev_get_by_index(ns, ifidx);
+> +	if (!dev) {
+> +		pr_err("Could not find device with ifindex %u in netnsfd %d\n",
+> +		       ifidx, netnsfd);
+> +		goto out_put_netns;
+> +	}
+> +
+> +	if (!netdev_is_nsim(dev)) {
+> +		pr_err("Device with ifindex %u in netnsfd %d is not a netdevsim\n",
+> +		       ifidx, netnsfd);
+> +		goto out_put_netns;
+> +	}
+> +
+> +	nsim = netdev_priv(dev);
+> +	peer = rtnl_dereference(nsim->peer);
+> +	if (!peer)
+> +		goto out_put_netns;
+> +
+> +	err = 0;
+> +	RCU_INIT_POINTER(nsim->peer, NULL);
+> +	RCU_INIT_POINTER(peer->peer, NULL);
+> +
+> +out_put_netns:
+> +	put_net(ns);
+> +	rtnl_unlock();
+> +
+> +	return !err ? count : err;
+> +}
+> +static BUS_ATTR_WO(unlink_device);
+> +
+>  static struct attribute *nsim_bus_attrs[] = {
+>  	&bus_attr_new_device.attr,
+>  	&bus_attr_del_device.attr,
+> +	&bus_attr_link_device.attr,
+> +	&bus_attr_unlink_device.attr,
+>  	NULL
+>  };
+>  ATTRIBUTE_GROUPS(nsim_bus);
+> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+> index 77e8250282a5..9063f4f2971b 100644
+> --- a/drivers/net/netdevsim/netdev.c
+> +++ b/drivers/net/netdevsim/netdev.c
+> @@ -413,8 +413,13 @@ nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port)
+>  void nsim_destroy(struct netdevsim *ns)
+>  {
+>  	struct net_device *dev = ns->netdev;
+> +	struct netdevsim *peer;
+>  
+>  	rtnl_lock();
+> +	peer = rtnl_dereference(ns->peer);
+> +	if (peer)
+> +		RCU_INIT_POINTER(peer->peer, NULL);
+> +	RCU_INIT_POINTER(ns->peer, NULL);
+>  	unregister_netdevice(dev);
+>  	if (nsim_dev_port_is_pf(ns->nsim_dev_port)) {
+>  		nsim_macsec_teardown(ns);
+> @@ -427,6 +432,11 @@ void nsim_destroy(struct netdevsim *ns)
+>  	free_netdev(dev);
+>  }
+>  
+> +bool netdev_is_nsim(struct net_device *dev)
+> +{
+> +	return dev->netdev_ops == &nsim_netdev_ops;
+> +}
+> +
+>  static int nsim_validate(struct nlattr *tb[], struct nlattr *data[],
+>  			 struct netlink_ext_ack *extack)
+>  {
+> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+> index 028c825b86db..c8b45b0d955e 100644
+> --- a/drivers/net/netdevsim/netdevsim.h
+> +++ b/drivers/net/netdevsim/netdevsim.h
+> @@ -125,11 +125,13 @@ struct netdevsim {
+>  	} udp_ports;
+>  
+>  	struct nsim_ethtool ethtool;
+> +	struct netdevsim __rcu *peer;
+>  };
+>  
+>  struct netdevsim *
+>  nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port);
+>  void nsim_destroy(struct netdevsim *ns);
+> +bool netdev_is_nsim(struct net_device *dev);
+>  
+>  void nsim_ethtool_init(struct netdevsim *ns);
+>  
 
 
+Reviewed-by: Maciek Machnikowski <maciek@machnikowski.net>
 
