@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-76066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ED2986C319
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:08:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B51F586C320
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:09:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89B81B23A33
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 08:08:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9F5C1C21C57
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 08:09:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E64C481CD;
-	Thu, 29 Feb 2024 08:08:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BDE447F73;
+	Thu, 29 Feb 2024 08:09:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SWdSrF1A"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yEoI+xll"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1E647F50
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 08:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785C24E1DD
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 08:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709194083; cv=none; b=BDEtQMBIMY8Eus9CtC2R5vosQ+Pvevc7NBYNU5StETtfJSaEtlxin4Z/x1hONB82vNs9Wo35jLi+3sV056gSTGfcRvfQlNSrhzCZhJqScIYxRoDQ5ZASPJwpebuyup8PT+1iG5QrSktvXctHC1Ar2DSjoVTzafAeCAI3r7sfn1w=
+	t=1709194142; cv=none; b=Nne/vncvDj+3ynCXRC7BfyJ3UIo22enj+BjDitj6bPQS3kJY4xBBC3dEH0+IUViTh2vOpSP4GFQfM6vA7hbn+hGmp71UZtD9ppRo4lZmmpqGWvbWNXXpB1vjirkZb0sZMnDiqk4qXLrJTgIORwDvvbsTBX2j2i7ybMhqnWUFmyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709194083; c=relaxed/simple;
-	bh=kHMGpKQhXW+2bXYY7bh+G5D4IeY+qbWnD/q6QF2JZtQ=;
+	s=arc-20240116; t=1709194142; c=relaxed/simple;
+	bh=+40ir6eenrwq//MkSxIFfL9C6dIU3EfmwybzMJpuMFU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T1d/cffdkwvVxKJQ4OIWPYf3bS4njNhL9tY2v259blLrLCUGAk18vZlQd+OoqP6BEnCuI9MDyERhZ7Tl3pBqD5XSsrn0Df0uEoURqNCr6ucLSAcduof/QE8FpzZdw+tIwE1vPA6XLis11fruZDm1uVGYKTlvcllNNOVbj39aGaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SWdSrF1A; arc=none smtp.client-ip=209.85.218.41
+	 In-Reply-To:Content-Type; b=crUyrjR2Ci3bHzgwPVSK6uKgldYCwbTYHe0Vrg9k+uyPklIEP2tH22yK+ysUIzGhBofOu+bWk+9dE/dragM34950nxC4TezYwHxHCw62N8X9L/QZjs2HLZMNNuD10TA1DYrIOYA8w3FnzXvMCKnb03jMtUM3tMfVKHQ9cX5T+LQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yEoI+xll; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a3f829cde6dso95557866b.0
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 00:08:01 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-55a179f5fa1so1034361a12.0
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 00:09:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709194080; x=1709798880; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1709194139; x=1709798939; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=j/MaEs1Sl5w2PwlOY/FiwAvbnUfGpzjfLQPTSpsY/ko=;
-        b=SWdSrF1AshzHKjnDigINGHaApIqZiBRNGFMat7VM7JqlMZSktbjXyqGRLCL22zbI9J
-         9F6QmiwSobCiQvS2bTc05MnBC5XkgW3xV3E5EhFXIuchKTjd2bps2+XyYTDAN5W/EmEA
-         +NDiC6VFkrfw4vZyQeaPKY9nK/D0XS9TBcdZYZb3EmUHdEvR20Lebuaa62FtkB7fPfwW
-         PB5K4i5MWeaZGFBDuuV16wj8QAVgg07iXFyFzaG3GqSLJfimxjFkTA+DkUF5ZXBqcQn4
-         SlR1wcCrxaidvwsvMZvA7cgkePkw4grfMUqvdqZ1ms3HpGfapO8Qo8Vmm6NYcDTGdNT/
-         VbAQ==
+        bh=p0H6m48PmOmlk3bDaigs+kiwbGnFYSM66eRhJTNpOXE=;
+        b=yEoI+xlleTHXqJJbzPnsLMxHydh3S0NxEKdHiyXEbrMKDjc2FUQPLlC/fZ6GPCH15W
+         OmKcMfTZCZRF934vKD56xJw3BdP4CEsyopevy3K8OrgUy0BmI/INpK8iQmv4JHjGynj+
+         vvj89YHQb45rSuPi1eQ+mpzSEia5vqhhkK/9ho5XD8n6N2sN0qSu687iHlsZQg9K8+O9
+         E2Cx1OuLsGnLXffmtDJDop7lL/mnUwMsUy1c4nxUS+rlOeTBNh5ecPplcnQyG4+6mkdj
+         KhvO1prtlD+zG33fzDcbnKJptiF4Ck+KdWraupWFVTrKg/UU8t6MZwduT9nFBjUcAgPv
+         iuJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709194080; x=1709798880;
+        d=1e100.net; s=20230601; t=1709194139; x=1709798939;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j/MaEs1Sl5w2PwlOY/FiwAvbnUfGpzjfLQPTSpsY/ko=;
-        b=NtyHmONzSTM4Fwi30P73q8VxECg5dPXj8nZbC7CsWAVifHv0oMmPh2qH555zC6fwLc
-         +M6eT7nVe6sow3ul33TYx4uDZJ8ExgjiucqJ/NTC2+A1UqDfTCgdDOgIcsUg7h5D49ol
-         VanUiP4PNeD2rrFbRIgcV55Tr7btKw/xAPjtJ7F0VavMF7MCL6QBvRxzcQ524VMH4xab
-         rrf2Kx3hj+ubdbBG9VkYHD6/D9Y8elmr8ogBvhctUmqBiulqf0ehBRjA81t1UOoKqiOK
-         0wo0I4BX/N8iKRHEOauBGj86SJjbHHXd63kDy3GspAA6ruR8H/S1ifVgCtPx2BzyHJ7A
-         WFkw==
-X-Gm-Message-State: AOJu0Yz/3vElNyYNyEfhZDYFc+uHcTYIW8AicUzKuOvGBZciAxuoFAjf
-	+u9wNZ2biTijUOVq4X6hCdW9w131CUqWFjg1pUcFKY83eKoxxOksqaz1nNUj48k=
-X-Google-Smtp-Source: AGHT+IFNVhXbhaFY+ffTy6j1n/9kxsaYbIOGvTiEsz50BVpfxm9zdiT2qWV5IkXF7xBzUZ3lk8PcWA==
-X-Received: by 2002:a17:906:6956:b0:a44:5a3d:7877 with SMTP id c22-20020a170906695600b00a445a3d7877mr8108ejs.56.1709194080134;
-        Thu, 29 Feb 2024 00:08:00 -0800 (PST)
+        bh=p0H6m48PmOmlk3bDaigs+kiwbGnFYSM66eRhJTNpOXE=;
+        b=abqczoJZpdI5ecC2XIwoYr1yoQX+U+YHieVJxJl/KMsHN/jYIiDLtslMZ+g0G9h+7y
+         rrIDvEePmohODWElmh5vJ6t3MKQvkFM2Zw1kf5FLjoj5n/RyovPg28sUrLc5hZjprZ7e
+         wfCSdryeK2IPcpLkKY8AItyhBH9ACUny4Ki2mf89lKoevTuYjYcR/qFbok/g0p0wWmx7
+         3zTchVA9Rfp+B7wxn+RWDSkIISq5Lm/MBfkiyYCyxicpghC375sxzDcpJg1F/LmMNd9r
+         Qu0m3K+zTx2X+6+5trWAZnbGd8wq8CENXQYbaUOP8SGev3/nhXdd1/z78MeluWxE/FQI
+         dQEw==
+X-Gm-Message-State: AOJu0YxwiaIwaxF1zr99BkGZrAdljTNpcEfR0NniF6bFgfRVCXTxJXbg
+	y8700BpcQmVYjUo1nyL8BJO9OC9o61j/bAlxeVBnxkBkXCn6sfr9UpK2pjUIA/w=
+X-Google-Smtp-Source: AGHT+IGUe1WoKYO+pebt8lMkVMY1EJkfZFmXnz6pcrIHCd9pB+zYPfl80AiYpaeQK2DEABczJqtgaQ==
+X-Received: by 2002:a17:906:7ad0:b0:a3e:b869:11b3 with SMTP id k16-20020a1709067ad000b00a3eb86911b3mr911984ejo.55.1709194139032;
+        Thu, 29 Feb 2024 00:08:59 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.222.116])
-        by smtp.gmail.com with ESMTPSA id cu5-20020a170906ba8500b00a440ec600e3sm411228ejd.121.2024.02.29.00.07.57
+        by smtp.gmail.com with ESMTPSA id cu5-20020a170906ba8500b00a440ec600e3sm411228ejd.121.2024.02.29.00.08.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Feb 2024 00:07:59 -0800 (PST)
-Message-ID: <05166ff3-5359-4764-ac71-7847083ee87d@linaro.org>
-Date: Thu, 29 Feb 2024 09:07:57 +0100
+        Thu, 29 Feb 2024 00:08:58 -0800 (PST)
+Message-ID: <54d3b190-c069-4165-9191-4557845cd87c@linaro.org>
+Date: Thu, 29 Feb 2024 09:08:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,8 +75,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 06/11] dt-bindings: net: hisi-femac: add
- missing clocks
+Subject: Re: [PATCH net-next v6 07/11] dt-bindings: net: hisi-femac: replace
+ deprecated phy-mode with recommended phy-connection-type
 Content-Language: en-US
 To: forbidden405@outlook.com, Yisen Zhuang <yisen.zhuang@huawei.com>,
  Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
@@ -89,7 +89,7 @@ To: forbidden405@outlook.com, Yisen Zhuang <yisen.zhuang@huawei.com>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  devicetree@vger.kernel.org
 References: <20240228-net-v6-0-6d78d3d598c1@outlook.com>
- <20240228-net-v6-6-6d78d3d598c1@outlook.com>
+ <20240228-net-v6-7-6d78d3d598c1@outlook.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -135,18 +135,19 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240228-net-v6-6-6d78d3d598c1@outlook.com>
+In-Reply-To: <20240228-net-v6-7-6d78d3d598c1@outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 28/02/2024 10:02, Yang Xiwen via B4 Relay wrote:
 > From: Yang Xiwen <forbidden405@outlook.com>
 > 
-> A few clocks are missing in old binding file. Add them to match the real
-> hardware.
-> 
+> The old property "phy-mode" should be replaced with the latest
+> "phy-connection-type".
 
-This also can be squashed.
+Why? The old property is not deprecated.
+
+
 
 Best regards,
 Krzysztof
