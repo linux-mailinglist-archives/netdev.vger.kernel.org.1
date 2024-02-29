@@ -1,171 +1,130 @@
-Return-Path: <netdev+bounces-76139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEEFD86C7CC
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 12:13:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BEAE86C7F5
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 12:23:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3111B222A1
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 11:13:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D60A1C21A7A
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 11:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E3FB7B3C5;
-	Thu, 29 Feb 2024 11:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDD47C09C;
+	Thu, 29 Feb 2024 11:22:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hcxGVwc6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZWQWTRv5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A378651BC
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 11:12:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93EB77B3F1
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 11:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709205173; cv=none; b=cLBfl6yovQWFujqrVRBC8zmB8hRJYmNMgM6wdSECtcwmtecXVeWxWfWKY386Rqf3UAYCWXjPHOEAiBGeoa2rlxHDMvNcQouSlta53dog3S+yQ9CjzDCTzjNFK9GGCAYgv8U4OAwutN8JaVHlEXMu7ClndGDb5mt2tBBDxcSfHT4=
+	t=1709205777; cv=none; b=mle1805TADlL4ty5nKTgctsQaISWrDfa6GbUAFrLOxPl98x8LW2Z9AWA+PitwOipdDA2LNQgoxDb5qoYYtA5rDZrdDhP1T5TxAtxGdsl6GVcc49YaH9P1p591mceP4Jbyz4xly4J8yUGJrie+LiNJxsPXzy9Nq+F4NQlCJZU3gQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709205173; c=relaxed/simple;
-	bh=N7Mhx8vT1jnELD9+9yC9rVTfdvP/sYDILPO0ay84HGM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=MEinFZHnKllcZZCjh50XuF1ufB1KsJqL2iVsByj0KJakKESiixoCqWclOnsztL+86xvbrj9qEiMlNyX6vVTiXSeTeyMeibQnpDda5TPPrAX+GtK7jK80iebl7+kzxwmUa0ldWsuQIshnRYHNZ7g1RFSpGI+B22aKW3DjS5PHyPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hcxGVwc6; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1709205777; c=relaxed/simple;
+	bh=6Xm0wpBLfk1HBefMBjtWVO94B+fykzdv9FHKbIyd22Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ANmxcxi0Sbq4Zt7rT9S6ThO3+2/WNMIskUmZDo9WB6WRUi5WJdiL+zAxs5xiTQFIKrhIOiR6H6ycTl3PK6nabWVEVFyW42/yTA/PhA7WcJEg4cohd/wf7JsHJBYfyzCVjq04nIfr0nk5r5O2U1F4hc8whcoBd6xPQrplKlBEp7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZWQWTRv5; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709205170;
+	s=mimecast20190719; t=1709205774;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=J1ljLBvAKrzOfqXsdymMG4sOPRNjFy8nCCCQL/VLcRg=;
-	b=hcxGVwc6nMHXjdBmjt/M0KIFIslIKWa1AbarSNsPyZlt3AcjsPrqX14ScumIi70FAKLhDQ
-	dzwFheiCUbWv417czOzgbZnoneQF/E+rXSeg3a8BQSgxQWm8E1kmZSZSza9tuU9jhJGNfX
-	Tw87pCt4Np2YW8Y9jCb0biCPTJnyMOI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7At+Ii/grtsrpCGb+fCHoN8LAX5Jvg5wYpJeg8H4ilQ=;
+	b=ZWQWTRv5KB2rg1h3tX3j+aI0nhd/4JAy2KJZm6NruZyvWzSn0GUSU10i7Bnd25+OgTonmK
+	Xb8A95lnVQbBIe8Xoc244m8LMZ7oWqT0Kw4WAv6tCaufCxx8VTOgsqsfpjDId4ays/ufH7
+	PJX/gKmrOAMpn+LdDTxl9XYCg4B34WQ=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-159-Ocs60_67MTu5KHcmKM-CFA-1; Thu, 29 Feb 2024 06:12:48 -0500
-X-MC-Unique: Ocs60_67MTu5KHcmKM-CFA-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40e354aaf56so1111355e9.1
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 03:12:48 -0800 (PST)
+ us-mta-66-Ba6-8Q4WN7ekGONPGCPDMA-1; Thu, 29 Feb 2024 06:22:53 -0500
+X-MC-Unique: Ba6-8Q4WN7ekGONPGCPDMA-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a3e6f366aceso58154766b.3
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 03:22:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709205167; x=1709809967;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J1ljLBvAKrzOfqXsdymMG4sOPRNjFy8nCCCQL/VLcRg=;
-        b=sK9U9ScNdADA7QYcxzedKaTMrwknehgb/XeRR5yWPETbaTGmkDhoD0ksGOinuKodst
-         uscflbBmDdFQOHmtlBMi0UmVYkDIDAWNiJiDI+6tvirfbtG0iOTYNpAvMIzHLTGZ99GM
-         Yqj7X1Aqee8ofO0ZqsTZklXFzp47l8t+RFJY27UtCTDh/McZOJt6vPkIWoPoA+MiSobu
-         O2iPr2MRrAFZ5yWRQg+Nu4Yg+wIAD0Z+u5CI2D0Jdzkgiotju65+JWxuk2r3k6e8iOC2
-         Ran4CZZTMxIwmWhoXrHo+gS98hAwNl86rL73p5m1TnM4YTjlWz/u3D6UjDrIjTuZLJsx
-         +73g==
-X-Forwarded-Encrypted: i=1; AJvYcCUMarGQARMbUpVlF+EynC1l6FUjial3oRTohZgmI08ktUpEu13YdPe2sTmFFnNYOi6yS8rQRfKQZrdSWWDh+lP1OupDCZgl
-X-Gm-Message-State: AOJu0Yw4SDBdLynkDK7RbA3F51Yxj6qil76AvEBislt6ZgbqpE6G7ncz
-	V6qolBYdCPs3yb9Xybq+3CMmyUwxFDJCq1WCVZX7sRmZV2YNjFw8gqIdO5g5Fnsoc2IKyXkKL5i
-	BsZIWLdD0yPpVoq/MEZlwEJ0Hg+PHnymWIoOeWlQHtwV0G8ejIl2pCQ==
-X-Received: by 2002:a05:6000:18a9:b0:33d:9e15:12bf with SMTP id b9-20020a05600018a900b0033d9e1512bfmr1372350wri.3.1709205167117;
-        Thu, 29 Feb 2024 03:12:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHfKKnPq3F5LjzBgxvLGpBosG5KZdsojuxXv+y3866lEvo3VcN/Hqtb7eOfxFpQwYKS/TI+dQ==
-X-Received: by 2002:a05:6000:18a9:b0:33d:9e15:12bf with SMTP id b9-20020a05600018a900b0033d9e1512bfmr1372320wri.3.1709205166722;
-        Thu, 29 Feb 2024 03:12:46 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-250-174.dyn.eolo.it. [146.241.250.174])
-        by smtp.gmail.com with ESMTPSA id e5-20020adff345000000b0033b278cf5fesm1462888wrp.102.2024.02.29.03.12.45
+        d=1e100.net; s=20230601; t=1709205772; x=1709810572;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7At+Ii/grtsrpCGb+fCHoN8LAX5Jvg5wYpJeg8H4ilQ=;
+        b=Izlnavm3U61KfloSPBrVuZH5X1gzI9B8pXNnIDgKzX2PoWz7wMKRKi49I5iC4tF1d+
+         CAHG5b9NUOTh1G8WUzhE9Q5V3XQaFCIiVM1MxOdAMN6AeMnimko0UKcMIJ4Uqo1s7rE1
+         2LzEdSowQZkKfK44t7uAvOTu2POIOKVfJE3NASOnjs6IT3O853Ihq0quLfEjwVSSlScZ
+         92ROf+pUmRuE/XE4Ppnm/KEFYsiMS2Fy97KtOQZgZ2PG5oBezDeYcFYUdeowEr7HtLQi
+         22Yfq4PQri+M8lexVCfBHI7B6DHx300E4X4/wbqhsaPqc396ze0kvXbo3wILfXYU0Xiy
+         J7WA==
+X-Forwarded-Encrypted: i=1; AJvYcCWPwj6ddLHOqfJfGVQpbGsNZ12YjdUShtMA+W5AYWa+YLleZobNPlpgurcGr4qXQXRjmypRz3b3txWL0L7cLO+DqS8jJ/tJ
+X-Gm-Message-State: AOJu0YwjtBUgkXMHozCuuBbIq0jijDmEdpQ6UrVIEqv5Vf8Ab3DAEdU8
+	C/hwTstjPSi6vsX2FrSSb7rsb1KKKYS7uC0uz7i2oTSl6Tu9wwScK/eryVRhcPi2yNaFDD/HhZs
+	nzSVOmeTQ5fGjGSI3DPXgWdwW4bUAA6TRtLoRxQlG7/SxHDhuzodlBQ==
+X-Received: by 2002:a05:6402:2156:b0:565:f9c1:d925 with SMTP id bq22-20020a056402215600b00565f9c1d925mr1171205edb.0.1709205772082;
+        Thu, 29 Feb 2024 03:22:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFW5Mh+qKe9ZKENzsEqOvljF2oOzrK7eTWm8sNOJLak6DCHVU9G9ylchI20asRM3L6KA03OTQ==
+X-Received: by 2002:a05:6402:2156:b0:565:f9c1:d925 with SMTP id bq22-20020a056402215600b00565f9c1d925mr1171188edb.0.1709205771761;
+        Thu, 29 Feb 2024 03:22:51 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id y6-20020a056402358600b005645961ad39sm523690edc.47.2024.02.29.03.22.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 03:12:46 -0800 (PST)
-Message-ID: <7d478cb842e28094f4d6102e593e3de25ab27dfe.camel@redhat.com>
-Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
-From: Paolo Abeni <pabeni@redhat.com>
-To: Yunjian Wang <wangyunjian@huawei.com>, mst@redhat.com, 
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com, kuba@kernel.org, 
-	bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
-	jonathan.lemon@gmail.com, davem@davemloft.net
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,  kvm@vger.kernel.org,
- virtualization@lists.linux.dev, xudingke@huawei.com,  liwei395@huawei.com
-Date: Thu, 29 Feb 2024 12:12:44 +0100
-In-Reply-To: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
-References: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        Thu, 29 Feb 2024 03:22:51 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id F0F0B112E802; Thu, 29 Feb 2024 12:22:50 +0100 (CET)
+From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: Jesper Dangaard Brouer <brouer@redhat.com>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH bpf v2 0/2] Fix hashmap overflow checks for 32-bit arches
+Date: Thu, 29 Feb 2024 12:22:46 +0100
+Message-ID: <20240229112250.13723-1-toke@redhat.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, 2024-02-28 at 19:05 +0800, Yunjian Wang wrote:
-> @@ -2661,6 +2776,54 @@ static int tun_ptr_peek_len(void *ptr)
->  	}
->  }
-> =20
-> +static void tun_peek_xsk(struct tun_file *tfile)
-> +{
-> +	struct xsk_buff_pool *pool;
-> +	u32 i, batch, budget;
-> +	void *frame;
-> +
-> +	if (!ptr_ring_empty(&tfile->tx_ring))
-> +		return;
-> +
-> +	spin_lock(&tfile->pool_lock);
-> +	pool =3D tfile->xsk_pool;
-> +	if (!pool) {
-> +		spin_unlock(&tfile->pool_lock);
-> +		return;
-> +	}
-> +
-> +	if (tfile->nb_descs) {
-> +		xsk_tx_completed(pool, tfile->nb_descs);
-> +		if (xsk_uses_need_wakeup(pool))
-> +			xsk_set_tx_need_wakeup(pool);
-> +	}
-> +
-> +	spin_lock(&tfile->tx_ring.producer_lock);
-> +	budget =3D min_t(u32, tfile->tx_ring.size, TUN_XDP_BATCH);
-> +
-> +	batch =3D xsk_tx_peek_release_desc_batch(pool, budget);
-> +	if (!batch) {
+Syzbot managed to trigger a crash by creating a DEVMAP_HASH map with a
+large number of buckets because the overflow check relies on
+well-defined behaviour that is only correct on 64-bit arches.
 
-This branch looks like an unneeded "optimization". The generic loop
-below should have the same effect with no measurable perf delta - and
-smaller code. Just remove this.
+Fix the overflow checks to happen before values are rounded up.
 
-> +		tfile->nb_descs =3D 0;
-> +		spin_unlock(&tfile->tx_ring.producer_lock);
-> +		spin_unlock(&tfile->pool_lock);
-> +		return;
-> +	}
-> +
-> +	tfile->nb_descs =3D batch;
-> +	for (i =3D 0; i < batch; i++) {
-> +		/* Encode the XDP DESC flag into lowest bit for consumer to differ
-> +		 * XDP desc from XDP buffer and sk_buff.
-> +		 */
-> +		frame =3D tun_xdp_desc_to_ptr(&pool->tx_descs[i]);
-> +		/* The budget must be less than or equal to tx_ring.size,
-> +		 * so enqueuing will not fail.
-> +		 */
-> +		__ptr_ring_produce(&tfile->tx_ring, frame);
-> +	}
-> +	spin_unlock(&tfile->tx_ring.producer_lock);
-> +	spin_unlock(&tfile->pool_lock);
+v2:
+- Fix off-by-one error in overflow check
+- Apply the same fix to hashtab, where the devmap_hash code was copied
+  from (John)
 
-More related to the general design: it looks wrong. What if
-get_rx_bufs() will fail (ENOBUF) after successful peeking? With no more
-incoming packets, later peek will return 0 and it looks like that the
-half-processed packets will stay in the ring forever???
+Toke Høiland-Jørgensen (2):
+  bpf: Fix DEVMAP_HASH overflow check on 32-bit arches
+  bpf: Fix hashtab overflow check on 32-bit arches
 
-I think the 'ring produce' part should be moved into tun_do_read().
+ kernel/bpf/devmap.c  |  8 +++-----
+ kernel/bpf/hashtab.c | 10 +++++-----
+ 2 files changed, 8 insertions(+), 10 deletions(-)
 
-Cheers,
-
-Paolo
+-- 
+2.43.2
 
 
