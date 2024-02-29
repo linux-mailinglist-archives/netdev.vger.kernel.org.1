@@ -1,115 +1,189 @@
-Return-Path: <netdev+bounces-76118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9699486C6A4
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 11:16:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0242E86C6A6
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 11:17:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 518DD28B589
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:16:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58DAAB2A64D
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FE1063517;
-	Thu, 29 Feb 2024 10:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8348163503;
+	Thu, 29 Feb 2024 10:16:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T33rGs7U"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ettFf7a3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC776351E
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 10:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C0660EEA
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 10:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709201798; cv=none; b=JT6FughH7YgSAOCxIoTsAi/BopAMpmpjRlAkSB59Iwz2rwPrSKnJN1cRqRgEh129d/uOrLPZjtEduIFGe4N/d06VmyBCi4xv/+QGsqw0EI+61l2bqUPzWKhNwllRVg3lW08maUuEUxx6gFGpykUkEVjVixoy3UBhtZcNcx7N6G4=
+	t=1709201803; cv=none; b=Vqjfyc8Vb+L01s8Vw8A7nLcP0DI+saEOlNYI0YnZas8pY7j8htnVPkbkpizT4juWrRhG/YGEOHCe12AWZelmhYWJbkkOGe7mo3xEs2DTl81N+/4LuYxGYbjKvf+KRdsRnMFqZ2lyGCwXVhwp3ZaULk1lxulNEZ+Y1dUQGq9bviQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709201798; c=relaxed/simple;
-	bh=qnomwDP1vYp+lDFJEbp0uYqljU78IE66cOH4WBe0XNU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hNxoj6i6ie9kN6aDUU/GsUVhE/YOBB2k4BDZWKHYHMUc4v7GI7RjiAR53aADGoOE9y9OquNFgHXYt8Lju8cEHk2+78fr4N28CiTXk2nkGxC8tcEF6xqPiY9R22P53bElUrAQehDjBwGkNVnA9uqMB28I0fAWf+KdOxJ3r7KHJuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T33rGs7U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12A10C43390;
-	Thu, 29 Feb 2024 10:16:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709201797;
-	bh=qnomwDP1vYp+lDFJEbp0uYqljU78IE66cOH4WBe0XNU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=T33rGs7UI4vizLB6Ksjh5Bnp7MXdL39484EAPmsHxLFMXikMf9izitqnybbkYB+18
-	 cL+RJ37WFsDofMt25mNsoN+2Vrh27tZwqdyVniTkIZDB1W5dqCHOcikQstQr//lQZJ
-	 SAOzms6gpUG40DmxB1/WudyIZoj2wO2JbKv8wyyKSsycLm75wK+/daZ4YxR/kNV/XS
-	 G8oVbYwaSPclyGO1gkqgPD3/Am5emejlbx96XGUwGKPiwblcq519hJ2eZ0EK25BwFx
-	 CQwQfzg+uwlKdko8iga0gbPypAKYR+IbOoqNTVIa6t5JB1HtiBmN16Qj+VpP1WMccj
-	 +VORS0ugsDpnQ==
-Message-ID: <547710c1-eba3-4006-9285-f2528fac3e1b@kernel.org>
-Date: Thu, 29 Feb 2024 12:16:34 +0200
+	s=arc-20240116; t=1709201803; c=relaxed/simple;
+	bh=nHA2bLRR0w5ty/uYtl72tVBzPcVMRoNEFKKHoF2YVGk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=PpD6OSf3tCF5BWFZ9xE8KnCAQc03g8iYzU/+vt8MqF43bmVPOS2+mAtQdD/C71HsdgaWK7RUryaMsx/hlKTPetxiqhBj4bOeG9vgMC2DhvP33bk2xuypWHQ0RJ8fsux69DR1XlTl//jH/xGUQ34KhmCJ2DxBTVcSQCTAkq95jWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ettFf7a3; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709201801;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qmzyp2XtylkPDgv3PN/UwxcVjHWMqp3hAI2ypdxpxR8=;
+	b=ettFf7a35cr1Pv581Qz62IX8NyeeO0/gy927dXlLpFvw3p/D4ZkqL/m2Ki0Lryb9qoHrx9
+	DNW8GX2NHwzyhiSLqCIa2AD58+NgCFsAVljXHdHxYkevPevx6EFtr9ye3Lk1pYuRvWE3T6
+	pW1g+Xh/VC3M2logpmg4G/ihzG7b6R0=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-562-eBENkstLMM6XHofEt4h6Yg-1; Thu, 29 Feb 2024 05:16:38 -0500
+X-MC-Unique: eBENkstLMM6XHofEt4h6Yg-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-56544b5af9dso647367a12.2
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 02:16:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709201797; x=1709806597;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qmzyp2XtylkPDgv3PN/UwxcVjHWMqp3hAI2ypdxpxR8=;
+        b=mzhngWACqJ0//ZzZUpxv67mjYQvt4y3h/A1NfzDALzPfnsxv1N6os5gi8VSgFSyBWt
+         E1sEc5Fn9/zQzm6yvT706MZ5HJ4hwRpVkWsGm5Ir7Eoxn+89eSVCpz7VBmWkUPrqhAKW
+         NOdoQSq8miVM7Vfo7smQYN3KRZhW1KguUhjR/K4vYkzPO0MNBBVPn9CEyfpZUPdChgu7
+         mUV1AHaBJnZU80mXQNLkgJQkkYrX1t6hqmgaXyfR185NefHiWRgOEeV2JHuo5mKJ8YeS
+         MQdSiQkwN6zlcL2EvWpzUKTYMAOaLDVUzB1K2f/s9sojSkLybC1JTU8fQBezcY4l7atr
+         +lFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVYTzEbXnVO6jHeufoUZ3NXufP6huZX9R63LygC36uAgOKiwkHVAx8q8LwY8MyC7VZdYiQWQW64rh0gTArOil27xyRvCXYV
+X-Gm-Message-State: AOJu0YwqaELuRjl1NH8Lg7jub0qGaE7HV0a7615UBqn7TYvRauAjwxXF
+	1zaJUVsYaRYmTsezMB2ro/uPKoc+4JJdXxhl87gFYcSc9AD/uYD/f56aLD5EZ9qByakzepC4ZsA
+	S5TrK4E110G7Wxzw/lxXvs7bT/iO1uiOKFW5h7cjKt+n/GiVdF31iqw==
+X-Received: by 2002:a05:6402:350d:b0:566:adb8:33f1 with SMTP id b13-20020a056402350d00b00566adb833f1mr511456edd.28.1709201797778;
+        Thu, 29 Feb 2024 02:16:37 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGwcWt8RSAA/OU2JwuC42upbgo2f40JvcB5oEZu8GDP+PsIv0Yxwu8AFeQYVu392NKhsAYjLA==
+X-Received: by 2002:a05:6402:350d:b0:566:adb8:33f1 with SMTP id b13-20020a056402350d00b00566adb833f1mr511435edd.28.1709201797476;
+        Thu, 29 Feb 2024 02:16:37 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id ig10-20020a056402458a00b005657eefa8e9sm473070edb.4.2024.02.29.02.16.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Feb 2024 02:16:37 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 9C2CB112E7D8; Thu, 29 Feb 2024 11:16:36 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: John Fastabend <john.fastabend@gmail.com>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong
+ Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>
+Cc: syzbot+8cd36f6b65f3cafd400a@syzkaller.appspotmail.com,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: RE: [PATCH bpf] bpf: Fix DEVMAP_HASH overflow check on 32-bit arches
+In-Reply-To: <65dfa50679d0a_2beb3208c8@john.notmuch>
+References: <20240227152740.35120-1-toke@redhat.com>
+ <65dfa50679d0a_2beb3208c8@john.notmuch>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Thu, 29 Feb 2024 11:16:36 +0100
+Message-ID: <87zfvj8tiz.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 08/10] net: ti: icssg-prueth: Add functions to
- configure SR1.0 packet classifier
-Content-Language: en-US
-To: Diogo Ivo <diogo.ivo@siemens.com>, danishanwar@ti.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew@lunn.ch, dan.carpenter@linaro.org,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
-Cc: jan.kiszka@siemens.com
-References: <20240221152421.112324-1-diogo.ivo@siemens.com>
- <20240221152421.112324-9-diogo.ivo@siemens.com>
- <1963b69d-2656-40d1-9794-8d0a9a168eed@kernel.org>
- <e0ebe176-0e82-4fcf-b416-a906a897bea1@siemens.com>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <e0ebe176-0e82-4fcf-b416-a906a897bea1@siemens.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+John Fastabend <john.fastabend@gmail.com> writes:
 
+> Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> The devmap code allocates a number hash buckets equal to the next power =
+of two
+>> of the max_entries value provided when creating the map. When rounding u=
+p to the
+>> next power of two, the 32-bit variable storing the number of buckets can
+>> overflow, and the code checks for overflow by checking if the truncated =
+32-bit value
+>> is equal to 0. However, on 32-bit arches the rounding up itself can over=
+flow
+>> mid-way through, because it ends up doing a left-shift of 32 bits on an =
+unsigned
+>> long value. If the size of an unsigned long is four bytes, this is undef=
+ined
+>> behaviour, so there is no guarantee that we'll end up with a nice and ti=
+dy
+>> 0-value at the end.
+>>=20
+>> Syzbot managed to turn this into a crash on arm32 by creating a DEVMAP_H=
+ASH with
+>> max_entries > 0x80000000 and then trying to update it. Fix this by movin=
+g the
+>> overflow check to before the rounding up operation.
+>>=20
+>> Fixes: 6f9d451ab1a3 ("xdp: Add devmap_hash map type for looking up devic=
+es by hashed index")
+>> Link: https://lore.kernel.org/r/000000000000ed666a0611af6818@google.com
+>> Reported-and-tested-by: syzbot+8cd36f6b65f3cafd400a@syzkaller.appspotmai=
+l.com
+>> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+>> ---
+>>  kernel/bpf/devmap.c | 8 +++-----
+>>  1 file changed, 3 insertions(+), 5 deletions(-)
+>>=20
+>> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+>> index a936c704d4e7..9b2286f9c6da 100644
+>> --- a/kernel/bpf/devmap.c
+>> +++ b/kernel/bpf/devmap.c
+>> @@ -130,13 +130,11 @@ static int dev_map_init_map(struct bpf_dtab *dtab,=
+ union bpf_attr *attr)
+>>  	bpf_map_init_from_attr(&dtab->map, attr);
+>>=20=20
+>>  	if (attr->map_type =3D=3D BPF_MAP_TYPE_DEVMAP_HASH) {
+>> -		dtab->n_buckets =3D roundup_pow_of_two(dtab->map.max_entries);
+>> -
+>> -		if (!dtab->n_buckets) /* Overflow check */
+>> +		if (dtab->map.max_entries > U32_MAX / 2)
+>>  			return -EINVAL;
+>> -	}
+>>=20=20
+>> -	if (attr->map_type =3D=3D BPF_MAP_TYPE_DEVMAP_HASH) {
+>> +		dtab->n_buckets =3D roundup_pow_of_two(dtab->map.max_entries);
+>> +
+>>  		dtab->dev_index_head =3D dev_map_create_hash(dtab->n_buckets,
+>>  							   dtab->map.numa_node);
+>>  		if (!dtab->dev_index_head)
+>> --=20
+>> 2.43.2
+>>=20
+>
+> I'm fairly sure this code was just taken from the hashtab implementation.
 
-On 27/02/2024 14:14, Diogo Ivo wrote:
-> On 2/26/24 18:41, Roger Quadros wrote:
->>
->>
->> On 21/02/2024 17:24, Diogo Ivo wrote:
->>> Add the functions to configure the SR1.0 packet classifier.
->>>
->>> Based on the work of Roger Quadros in TI's 5.10 SDK [1].
->>>
->>> [1]: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.ti.com%2Fcgit%2Fti-linux-kernel%2Fti-linux-kernel%2Ftree%2F%3Fh%3Dti-linux-5.10.y&data=05%7C02%7Cdiogo.ivo%40siemens.com%7Ca43411e60ce048593e7408dc36fa7f73%7C38ae3bcd95794fd4addab42e1495d55a%7C1%7C0%7C638445696707314198%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=v%2B%2FkgG1q31vJYa5a%2B5zYTbdxJbq5TKVOGT0Aavnk97Q%3D&reserved=0
->>>
->>> Co-developed-by: Jan Kiszka <jan.kiszka@siemens.com>
->>> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
->>> Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
->>> ---
->>> Changes in v3:
->>>   - Replace local variables in icssg_class_add_mcast_sr1()
->>>     with eth_reserved_addr_base and eth_ipv4_mcast_addr_base
->>>
->>>   .../net/ethernet/ti/icssg/icssg_classifier.c  | 113 ++++++++++++++++--
->>>   drivers/net/ethernet/ti/icssg/icssg_prueth.c  |   2 +-
->>>   drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   6 +-
->>>   3 files changed, 110 insertions(+), 11 deletions(-)
-> 
-> ...
-> 
->> Build fails with
->>
->> drivers/net/ethernet/ti/icssg/icssg_classifier.c:428:7: error: ‘eth_ipv4_mcast_addr_base’ undeclared (first use in this function)
->>    428 |       eth_ipv4_mcast_addr_base, mask_addr);
->>        |       ^~~~~~~~~~~~~~~~~~~~~~~~
->>
->> Is there a dependency patch?
-> 
-> Yes, this patch depends on patch 02/10 of the series, apologies for not
-> mentioning it explicitly.
+Yup, it was :)
 
-You don't have to mention it explicitly. Patc 2 didn't arrive at my inbox and
-I didn't notice it. It was my bad, sorry.
+> Do we also need a fix there?
+>
+>         /* hash table size must be power of 2 */
+>         htab->n_buckets =3D roundup_pow_of_two(htab->map.max_entries);
+>
+> The u32 check in hashtab is,
+>
+>         /* prevent zero size kmalloc and check for u32 overflow */
+>         if (htab->n_buckets =3D=3D 0 ||
+>             htab->n_buckets > U32_MAX / sizeof(struct bucket))
+>                 goto free_htab;
 
--- 
-cheers,
--roger
+Yeah, I don't see any reason why this wouldn't be susceptible to the
+same issue. I'll send a follow-up to apply the same fix there.
+
+-Toke
+
 
