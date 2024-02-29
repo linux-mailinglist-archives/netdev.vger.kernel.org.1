@@ -1,228 +1,124 @@
-Return-Path: <netdev+bounces-76108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5484186C59A
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:40:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29E1486C58F
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:39:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7949F1C23FCB
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:40:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D83CD292BE2
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:39:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6165860BBF;
-	Thu, 29 Feb 2024 09:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D98A360B9A;
+	Thu, 29 Feb 2024 09:39:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="SYYcxV7L"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="35mpVu5F"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CED06086F;
-	Thu, 29 Feb 2024 09:40:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50ECB60BBE
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 09:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709199623; cv=none; b=CrTb+/sryAbcBVuNqAQL87WpQbWRmrGJ/fFwU7CcvCEtyV1KUGu12Y8VmjQtvp/uu62KwH+v3DklK2hWGRCruJS7iQ7OhOtzSTJm3cRA2ywAEIkaANtIhNP+2punfkQP44sJukeVpQR2yCdXRmFWnIzH/8LxgURuHi+JIpZmzFA=
+	t=1709199554; cv=none; b=uwe4Ld3vtUVZV8hSIRx2z/WWhfit3J7L4K3dMhJe1zHN7I11n7Y77r0Or/n8QvnMkrrxLJw1O5EaWaZ0ny3CfaCmY8nDFf5oPtX2DmHmP8S+emFsHf3ondFbaFDW2SrF27muVpddPKc23BC+fZ5Z2YDOX3gkTly/MWprOsrCXoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709199623; c=relaxed/simple;
-	bh=pDEFE5xOymVCYIBB3uxVt1HG3SbHur+9GWaRkKOzDOs=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=O1dnoPsvPVt7NpCGzo2+ZLCGhugvJTt7h2msG8WezlZG6C5aMSft9X3AWRNLgXpkr9OVAxscSXasbiKj2SgZDLwp7evlOuT6/i9d/tLD5XlR1sjF0vQoDW0EYyQdhbvccfug4i/JIRFhkrlKxv0wseJpWsF0m5ECwHnG6aL0IHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=SYYcxV7L; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1709199616; h=Message-ID:Subject:Date:From:To;
-	bh=F4AGC6LhQ8Etbmz/AgXkeOLKjk+I82HAP2LPRb2GsOc=;
-	b=SYYcxV7LM6uVJ52h16Eyav9d6N55SqUyS21WDljUFGqHau4d+cn0eqTjATBYSLrfpPMHlLcL+Bm+kvI9q/19KsUsu3irA9R89zi55TS2Si3KyVbsFFF1iKIDgmHgxTZBqiKhaD4LCQAPlKIXhWAp1czOPJoI5c1Pir9hqe4/fAg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=34;SR=0;TI=SMTPD_---0W1SfgPr_1709199614;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W1SfgPr_1709199614)
-          by smtp.aliyun-inc.com;
-          Thu, 29 Feb 2024 17:40:15 +0800
-Message-ID: <1709199386.9824007-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v3 00/19] virtio: drivers maintain dma info for premapped vq
-Date: Thu, 29 Feb 2024 17:36:26 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux.dev,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Hans de Goede <hdegoede@redhat.com>,
- =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Vadim Pasternak <vadimp@nvidia.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- linux-um@lists.infradead.org,
- netdev@vger.kernel.org,
- platform-driver-x86@vger.kernel.org,
- linux-remoteproc@vger.kernel.org,
- linux-s390@vger.kernel.org,
- kvm@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20240229072044.77388-1-xuanzhuo@linux.alibaba.com>
- <20240229031755-mutt-send-email-mst@kernel.org>
- <1709197357.626784-1-xuanzhuo@linux.alibaba.com>
- <20240229043238-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240229043238-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1709199554; c=relaxed/simple;
+	bh=hZ1mBpv/f5sQroBrC681aGrso1a12KgrnTpf/Vp5R2Y=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lYV0xqIfsLZ2pMl3DTxdfRlvrSs4WP1m2MJPD6XAyNB+SH7hBLn10te0jII+vgKX8Jxb06X4Hk8b2aBGmJzt8+knCcTiBGIAr4z6fejlniQVAd6FY3Wlob+n7PdRonZbhxM6NASaJZrD3O+FcL/Y1G1S8qIPpiTIiAJOt1i9K1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=35mpVu5F; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6b269686aso1126450276.1
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 01:39:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709199552; x=1709804352; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=GOHpqdA+QRalZl8W1KSWWcIlPsHInhoHPbfW13Qd5Xg=;
+        b=35mpVu5FU7vXh8a7knX2YqhSsYVPvzzJVavlQSC9Py4GopNntKsGfF4fkGPQdpKFoF
+         5tF3FlEefa/ATARWgzKvGgXHUt86MXs+jUMhxj/8MonRrnDXpdWSU9uJgIz0a2M45dWG
+         G7EsJavaVURkSHB9zEooezb7xedtrQTSf67+boOLSXIW88vW8W1TOythAKsSrL9xhQxC
+         PRvWXGNXWWQpeOnKyFr/71eYLud96hKZKwoD/ytVfa3WHRoB0FqkP460KG5zxw9NC8tp
+         afHUC4Im0jE31wJtQZMn4Df0vxDYPzyVXmrmPKB5PGWn6TgjGKQGpgX0gfpAfai6KWrR
+         xI+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709199552; x=1709804352;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GOHpqdA+QRalZl8W1KSWWcIlPsHInhoHPbfW13Qd5Xg=;
+        b=v5XInWz5n0E6l3ozICV7CkEUxiT/BMSuZleA8JrPFKFx5Ca5hkcT1JqWTaRsNHtQ+T
+         PQJoYktFCwN0wRGwyl9iw+u2j7j+ihUZKyqP9AAyRMGnPasIn4/NQRbRaRT/f+J6uBBH
+         Hd+8N690IvUwGux7W7Ve3FGDfrUXToWCHdlUZmtEOWnF6bDF3WaNV/x5jLPBmDIDSBhB
+         wufxW8pFlV7LlJZotthZADxroLMbBSPyFwE6ftORc9e8tPWLtydVacL/K7+GPsAAQSSl
+         PnXztU7KzGHhfd+rnhrXGKyByl8Tg6PHIw2+N36LJV5+dU1JesCvy1Vu2Nl78cPJrQbQ
+         D+ng==
+X-Gm-Message-State: AOJu0YzjGk3zaxAU2rWZwZ43+0azAKh0eKuPufYU/enjQbkVdhMFFJVN
+	PvhJIrVayR6SU+m0gqB0e69lad4OIt87tvMShaYGATpohdIPPQwwu/swIsDHV7VPcH2PRZAeOyR
+	NH56DwTTiIg==
+X-Google-Smtp-Source: AGHT+IEISdUsad7TwP5QZqBrwrDIHdB3P28cGXRXWZ5eOpXjNfgIB3Plce09B1KEzpYNT6zdNIR3bY8ISPtYAw==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:e90:b0:dcb:c2c0:b319 with SMTP
+ id dg16-20020a0569020e9000b00dcbc2c0b319mr61321ybb.9.1709199552396; Thu, 29
+ Feb 2024 01:39:12 -0800 (PST)
+Date: Thu, 29 Feb 2024 09:39:06 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
+Message-ID: <20240229093908.2534595-1-edumazet@google.com>
+Subject: [PATCH net-next 0/2] net: better use of skb helpers
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Florian Westphal <fw@strlen.de>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 29 Feb 2024 04:34:20 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Thu, Feb 29, 2024 at 05:02:37PM +0800, Xuan Zhuo wrote:
-> > On Thu, 29 Feb 2024 03:21:14 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > On Thu, Feb 29, 2024 at 03:20:25PM +0800, Xuan Zhuo wrote:
-> > > > As discussed:
-> > > > http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVmJ3rHYqRZxYg@mail.gmail.com
-> > > >
-> > > > If the virtio is premapped mode, the driver should manage the dma info by self.
-> > > > So the virtio core should not store the dma info.
-> > > > So we can release the memory used to store the dma info.
-> > > >
-> > > > But if the desc_extra has not dma info, we face a new question,
-> > > > it is hard to get the dma info of the desc with indirect flag.
-> > > > For split mode, that is easy from desc, but for the packed mode,
-> > > > it is hard to get the dma info from the desc. And for hardening
-> > > > the dma unmap is saft, we should store the dma info of indirect
-> > > > descs.
-> > > >
-> > > > So I introduce the "structure the indirect desc table" to
-> > > > allocate space to store dma info with the desc table.
-> > > >
-> > > > On the other side, we mix the descs with indirect flag
-> > > > with other descs together to share the unmap api. That
-> > > > is complex. I found if we we distinguish the descs with
-> > > > VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
-> > > >
-> > > > Because of the dma array is allocated in the find_vqs(),
-> > > > so I introduce a new parameter to find_vqs().
-> > > >
-> > > > Note:
-> > > >     this is on the top of
-> > > >         [PATCH vhost v1] virtio: packed: fix unmap leak for indirect desc table
-> > > >         http://lore.kernel.org/all/20240223071833.26095-1-xuanzhuo@linux.alibaba.com
-> > > >
-> > > > Please review.
-> > > >
-> > > > Thanks
-> > > >
-> > > > v3:
-> > > >     1. fix the conflict with the vp_modern_create_avq().
-> > >
-> > > Okay but are you going to address huge memory waste all this is causing for
-> > > - people who never do zero copy
-> > > - systems where dma unmap is a nop
-> > >
-> > > ?
-> > >
-> > > You should address all comments when you post a new version, not just
-> > > what was expedient, or alternatively tag patch as RFC and explain
-> > > in commit log that you plan to do it later.
-> >
-> >
-> > Do you miss this one?
-> > http://lore.kernel.org/all/1708997579.5613105-1-xuanzhuo@linux.alibaba.com
->
->
-> I did. The answer is that no, you don't get to regress memory usage
-> for lots of people then fix it up.
-> So the patchset is big, I guess it will take a couple of cycles to
-> merge gradually.
+First patch is a pure cleanup.
 
-I see.
+Second patch adds a DEBUG_NET_WARN_ON_ONCE() in skb_network_header_len(),
+this could help to discover old bugs.
 
-But I hope we can review the other part of this patch set.  @Jason @Michael
+Eric Dumazet (2):
+  net: adopt skb_network_offset() and similar helpers
+  net: adopt skb_network_header_len() more broadly
 
-I don't want us to give up on this plan for some other reason after I've done so
-much work.
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c   | 14 ++++++--------
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.c   |  4 ++--
+ drivers/net/ethernet/intel/i40e/i40e_main.c       |  4 ++--
+ drivers/net/ethernet/intel/iavf/iavf_main.c       |  4 ++--
+ drivers/net/ethernet/intel/igb/igb_main.c         |  2 +-
+ drivers/net/ethernet/intel/igbvf/netdev.c         |  2 +-
+ drivers/net/ethernet/intel/igc/igc_main.c         |  2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c     |  2 +-
+ drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c |  2 +-
+ drivers/net/ethernet/qlogic/qede/qede_fp.c        |  2 +-
+ drivers/net/ethernet/qlogic/qlcnic/qlcnic_io.c    |  3 +--
+ drivers/net/ethernet/sfc/siena/tx_common.c        |  5 ++---
+ drivers/net/ethernet/sfc/tx_common.c              |  5 ++---
+ drivers/net/ethernet/sfc/tx_tso.c                 |  4 ++--
+ drivers/net/ethernet/sun/sunvnet_common.c         |  4 ++--
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c       |  2 +-
+ drivers/net/wireguard/receive.c                   |  2 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/tx.c       |  3 +--
+ drivers/net/wireless/intel/iwlwifi/pcie/tx.c      |  2 +-
+ drivers/net/wireless/intel/iwlwifi/queue/tx.c     |  2 +-
+ include/linux/skbuff.h                            |  1 +
+ kernel/bpf/cgroup.c                               |  2 +-
+ net/ipv4/raw.c                                    |  2 +-
+ net/ipv4/xfrm4_input.c                            |  2 +-
+ net/ipv6/exthdrs.c                                |  4 ++--
+ net/ipv6/netfilter/nf_conntrack_reasm.c           |  4 ++--
+ net/ipv6/reassembly.c                             |  4 ++--
+ net/ipv6/xfrm6_input.c                            |  2 +-
+ 28 files changed, 43 insertions(+), 48 deletions(-)
 
-Thanks.
+-- 
+2.44.0.278.ge034bb2e1d-goog
 
-
->
-> > I asked you. But I didnot recv your answer.
-> >
-> > Thanks.
-> >
-> >
-> > >
-> > > > v2:
-> > > >     1. change the dma item of virtio-net, every item have MAX_SKB_FRAGS + 2
-> > > >         addr + len pairs.
-> > > >     2. introduce virtnet_sq_free_stats for __free_old_xmit
-> > > >
-> > > > v1:
-> > > >     1. rename transport_vq_config to vq_transport_config
-> > > >     2. virtio-net set dma meta number to (ring-size + 1)(MAX_SKB_FRGAS +2)
-> > > >     3. introduce virtqueue_dma_map_sg_attrs
-> > > >     4. separate vring_create_virtqueue to an independent commit
-> > > >
-> > > >
-> > > >
-> > > > Xuan Zhuo (19):
-> > > >   virtio_ring: introduce vring_need_unmap_buffer
-> > > >   virtio_ring: packed: remove double check of the unmap ops
-> > > >   virtio_ring: packed: structure the indirect desc table
-> > > >   virtio_ring: split: remove double check of the unmap ops
-> > > >   virtio_ring: split: structure the indirect desc table
-> > > >   virtio_ring: no store dma info when unmap is not needed
-> > > >   virtio: find_vqs: pass struct instead of multi parameters
-> > > >   virtio: vring_create_virtqueue: pass struct instead of multi
-> > > >     parameters
-> > > >   virtio: vring_new_virtqueue(): pass struct instead of multi parameters
-> > > >   virtio_ring: simplify the parameters of the funcs related to
-> > > >     vring_create/new_virtqueue()
-> > > >   virtio: find_vqs: add new parameter premapped
-> > > >   virtio_ring: export premapped to driver by struct virtqueue
-> > > >   virtio_net: set premapped mode by find_vqs()
-> > > >   virtio_ring: remove api of setting vq premapped
-> > > >   virtio_ring: introduce dma map api for page
-> > > >   virtio_ring: introduce virtqueue_dma_map_sg_attrs
-> > > >   virtio_net: unify the code for recycling the xmit ptr
-> > > >   virtio_net: rename free_old_xmit_skbs to free_old_xmit
-> > > >   virtio_net: sq support premapped mode
-> > > >
-> > > >  arch/um/drivers/virtio_uml.c             |  31 +-
-> > > >  drivers/net/virtio_net.c                 | 283 ++++++---
-> > > >  drivers/platform/mellanox/mlxbf-tmfifo.c |  24 +-
-> > > >  drivers/remoteproc/remoteproc_virtio.c   |  31 +-
-> > > >  drivers/s390/virtio/virtio_ccw.c         |  33 +-
-> > > >  drivers/virtio/virtio_mmio.c             |  30 +-
-> > > >  drivers/virtio/virtio_pci_common.c       |  59 +-
-> > > >  drivers/virtio/virtio_pci_common.h       |   9 +-
-> > > >  drivers/virtio/virtio_pci_legacy.c       |  16 +-
-> > > >  drivers/virtio/virtio_pci_modern.c       |  38 +-
-> > > >  drivers/virtio/virtio_ring.c             | 698 ++++++++++++-----------
-> > > >  drivers/virtio/virtio_vdpa.c             |  45 +-
-> > > >  include/linux/virtio.h                   |  13 +-
-> > > >  include/linux/virtio_config.h            |  48 +-
-> > > >  include/linux/virtio_ring.h              |  82 +--
-> > > >  tools/virtio/virtio_test.c               |   4 +-
-> > > >  tools/virtio/vringh_test.c               |  28 +-
-> > > >  17 files changed, 847 insertions(+), 625 deletions(-)
-> > > >
-> > > > --
-> > > > 2.32.0.3.g01195cf9f
-> > >
->
 
