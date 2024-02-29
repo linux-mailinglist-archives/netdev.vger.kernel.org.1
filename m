@@ -1,148 +1,107 @@
-Return-Path: <netdev+bounces-76213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0451886CCDD
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 16:26:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DB0A86CD13
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 16:33:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B109E1F24DFC
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 15:26:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A069CB22698
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 15:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BFFD1419A6;
-	Thu, 29 Feb 2024 15:26:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 303E4145345;
+	Thu, 29 Feb 2024 15:33:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A40QmmRk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="H80J6atU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88BA713A269;
-	Thu, 29 Feb 2024 15:26:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71977145B0B;
+	Thu, 29 Feb 2024 15:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709220384; cv=none; b=BFmDS9YGuwRnD4n2tGS362abrrwZKnKdhoLTA66ZD0/gNmQ00Jfr8SDvCvc/aSCjfqnoFjKJUNvI0KPELYCnUSDD2MQk3wKIAkYVLm62++cZJIcAZihW4Tt1X/dS1/8ZZTSpIHDJYy0Lyoe8sYuF3VlmoW8Xrz5XfiSqiV/tWNg=
+	t=1709220799; cv=none; b=l+E3WFpZZQw1qYXThZsvfXMETXiWbhqANpoMCcexXI4gqOHGEvjfIwXzLNgpn7JO0WAPOI8kLR8gTVKIAg7U+926Y8Q2rz1k2AcHF2vgbByFXRZz3tYTeHkE0enpSnpwATAv2tp/1LzgrpGO+nA9WoUfT02FsLuBVIvevVWQhNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709220384; c=relaxed/simple;
-	bh=dp25kPE3nvKMZpYYCIqRh0OUPBEE5k7Af31a9VuC7YM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=OOnKuyNc7xmEAXjnnNfW2nzY+IMpGf7taSBZzkV3r1deE4pgUEPCsUXhZ2ZtZqAfQpOuUjOhLdRsWs/F/QtaGY5pQKqmkyjt0EkoO+3VKq++WHZgDHeT8rOEco4i1ML/SGSu8ilpvQbn/5WmwU4la43haMdeVhzOYSR49/dAds0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A40QmmRk; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a443d2b78caso131599866b.1;
-        Thu, 29 Feb 2024 07:26:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709220381; x=1709825181; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fDKK+JM2Mc+u4yC69ABwMe5pRMPqiOr3x+G24kQ6OeI=;
-        b=A40QmmRkYDVd+lBnBpTcg845ptEtPTNvqn+m/gt0wcsZiBbhGtfqXc5zmKNCU+dDmY
-         IeC75gaZr8zXWW8Ft4BcqYFg7BrebIoUbcyod9ZcUkBpTHma7/OLg46eH0u84V0waLC6
-         9PW7RQPS1jrvGLoC7Hhi/WRCempfKhNjfpbYp3iwufuhMcTZUVRUJbuQKTapOIx5Shcq
-         YiginZh0+JUDWqnkGwIr5exuL3flMrlieAqH8lOcuyhDAHY/FSrm9YD0k8bYsET8FFiM
-         N++HNb55w6Jtyja4vxU2pkH/MzgfyIU6rvTw4MvNHSzmw8r4ath5/1QDPFMndfGkWAeO
-         ADpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709220381; x=1709825181;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fDKK+JM2Mc+u4yC69ABwMe5pRMPqiOr3x+G24kQ6OeI=;
-        b=egdNGsYR9BiS16sbh63NaktkBGcaLt9RQx6q4q59kvG2ghFVN//WnvC9yqccvrC8NM
-         m6GadIrawCd0r8dCYgBpoAJ1qcW4utR0Jl6lyGRzD25z49QVlyakRbUPTW1K5Iyfx/nR
-         K93mfB5KFmFGGO/9iq3Wt17NsBo6bCeoSHBpdIxw8e+NgsoYGBYdI7bHHa8cxc7oxM9/
-         ZKIWaV7G7/5yQ+++2oVzaViMjAtdlzMFNzLAIVlkC7Ka6YyE1SDwC/9WJ8WY5EcRzoHc
-         o4gTQRCPtAiwdUD7UKSohsQCNpKqV60yJPsevuqhlcnTWtvlhVEktCc8lDGvFHHbnoFy
-         VpFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVscIlGwusDkxArRVnoVe1v0hHdzioq8nWtQk+86PVgLYtoz3WvnyeIJrWJqffVh0+6WxVwrKgEaAjDjMFuzAbjZbgnqBhBUuKNWt9gnq1S0OJGTWwvSCt6RX0HQA38LthKzU7o8QL+gUBcQ3u3GXHbOAompUL4Fj9PUU+92UoTrm3RTNd0an17e9lurjTJL5W4QkZjm6RmVG4ZBuD6KRiqXKBjr9isdwEGXp0AUaEpB+RDbEYWgYFgTCsjKbzxItJqZRpAC6X4IictqKbCFgqr+uTeaVN3
-X-Gm-Message-State: AOJu0YzCegXV9T9EWHR2GZDYnyRryUQLvNCrdVx9yZRpw8AyhFvAsfWF
-	rIQ5/SPXJyV+EXJWq/6XOGdPy2Eerwn6/pv5ng9QdszxWJh3xctM
-X-Google-Smtp-Source: AGHT+IH0BbQOh/RTvu68zev6Pz52w9G6f/rWM2ZMM0vlhc9AV/MotVi8zNP8RkVgD5Lo1Htbnl8XeA==
-X-Received: by 2002:a17:906:d9c6:b0:a44:4329:c091 with SMTP id qk6-20020a170906d9c600b00a444329c091mr1418331ejb.74.1709220380765;
-        Thu, 29 Feb 2024 07:26:20 -0800 (PST)
-Received: from ?IPv6:2003:f6:ef1b:2000:15d4:fc17:481e:8afe? (p200300f6ef1b200015d4fc17481e8afe.dip0.t-ipconnect.de. [2003:f6:ef1b:2000:15d4:fc17:481e:8afe])
-        by smtp.gmail.com with ESMTPSA id vw3-20020a170907a70300b00a42ee2af521sm778203ejc.137.2024.02.29.07.26.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 07:26:20 -0800 (PST)
-Message-ID: <9519dda9acd9db009dcb43102cc9b36943b35217.camel@gmail.com>
-Subject: Re: [PATCH v4 5/8] iio: core: Use new helpers from overflow.h in
- iio_device_alloc()
-From: Nuno =?ISO-8859-1?Q?S=E1?= <noname.nuno@gmail.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Vinod Koul
- <vkoul@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Jonathan
- Cameron <Jonathan.Cameron@huawei.com>, Mark Brown <broonie@kernel.org>,
- Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org, 
- dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-iio@vger.kernel.org, linux-spi@vger.kernel.org,
- netdev@vger.kernel.org,  linux-hardening@vger.kernel.org
-Cc: Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen
- <lars@metafoo.de>,  "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, Nuno Sa
- <nuno.sa@analog.com>
-Date: Thu, 29 Feb 2024 16:29:43 +0100
-In-Reply-To: <20240228204919.3680786-6-andriy.shevchenko@linux.intel.com>
-References: <20240228204919.3680786-1-andriy.shevchenko@linux.intel.com>
-	 <20240228204919.3680786-6-andriy.shevchenko@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 
+	s=arc-20240116; t=1709220799; c=relaxed/simple;
+	bh=jcKhsTopZNl10YjkMIgoh5Owtj6TepXp5ES55FTTNl4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iA8PIfUrCMfnjPHQYPYZWGWxt7GQOII/SZxkKi7npnF2nlk2hQb4+a+SGto3+JAhMsKFs3+8dLAvTafGrFPNcV5MYzqVPi5YSQU+JzZATFaAt1r5dwfHczc004JRe+8P4k7lq+/3iadDGrqj05cBftmprrQI0kQv3lrt01vEuOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=H80J6atU; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=z0o5l+kVnqEYsDvrmqqol3BU9NWdcfLfrHl+N+cDZ70=; b=H80J6atUrwVbc0SK7ypE0N4fRv
+	Lm3dC/QDaraMBubNTH/BWiUNuA9+Agc8ao4bGCA01//H35q0QmrzEZt6XlOdnajXQMr9IBdEIpvGB
+	tL5avMolDxzGhgRZ5rAY0lQcO5E/jEHZVcrshzCrvYItWsb0PUdmxh22YLTpjVZ5p8CY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rfiPL-0093Ju-Ph; Thu, 29 Feb 2024 16:33:15 +0100
+Date: Thu, 29 Feb 2024 16:33:15 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: Roger Quadros <rogerq@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, vladimir.oltean@nxp.com, hkallweit1@gmail.com,
+	dan.carpenter@linaro.org, horms@kernel.org, yuehaibing@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, srk@ti.com,
+	Pekka Varis <p-varis@ti.com>
+Subject: Re: [PATCH net-next] net: ethernet: ti: am65-cpsw: Add priv-flag for
+ Switch VLAN Aware mode
+Message-ID: <cd2a03e6-dee2-46eb-b686-6df513324b5e@lunn.ch>
+References: <20240227082815.2073826-1-s-vadapalli@ti.com>
+ <Zd3YHQRMnv-ZvSWs@nanopsycho>
+ <7d1496da-100a-4336-b744-33e843eba930@ti.com>
+ <Zd7taFB2nEvtZh8E@nanopsycho>
+ <49e531f7-9465-40ea-b604-22a3a7f13d62@ti.com>
+ <10287788-614a-4eef-9c9c-a0ef4039b78f@lunn.ch>
+ <0004e3d5-0f62-49dc-b51f-5a302006c303@ti.com>
+ <0106ce78-c83f-4552-a234-1bf7a33f1ed1@kernel.org>
+ <389aea37-ce0f-4b65-bf7c-d00c45b80e04@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <389aea37-ce0f-4b65-bf7c-d00c45b80e04@ti.com>
 
-On Wed, 2024-02-28 at 22:41 +0200, Andy Shevchenko wrote:
-> We have two new helpers struct_size_with_data() and struct_data_pointer()
-> that we can utilize in iio_device_alloc(). Do it so.
->=20
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> Reviewed-by: Nuno Sa <nuno.sa@analog.com>
-> ---
-> =C2=A0drivers/iio/industrialio-core.c | 5 ++---
-> =C2=A01 file changed, 2 insertions(+), 3 deletions(-)
->=20
-> diff --git a/drivers/iio/industrialio-core.c b/drivers/iio/industrialio-c=
-ore.c
-> index 1986b3386307..223013725e32 100644
-> --- a/drivers/iio/industrialio-core.c
-> +++ b/drivers/iio/industrialio-core.c
-> @@ -1644,7 +1644,7 @@ struct iio_dev *iio_device_alloc(struct device *par=
-ent,
-> int sizeof_priv)
-> =C2=A0	size_t alloc_size;
-> =C2=A0
-> =C2=A0	if (sizeof_priv)
-> -		alloc_size =3D ALIGN(alloc_size, IIO_DMA_MINALIGN) +
-> sizeof_priv;
-> +		alloc_size =3D struct_size_with_data(iio_dev_opaque,
-> IIO_DMA_MINALIGN, sizeof_priv);
-> =C2=A0	else
-> =C2=A0		alloc_size =3D sizeof(struct iio_dev_opaque);
-> =C2=A0
-> @@ -1655,8 +1655,7 @@ struct iio_dev *iio_device_alloc(struct device *par=
-ent,
-> int sizeof_priv)
-> =C2=A0	indio_dev =3D &iio_dev_opaque->indio_dev;
-> =C2=A0
-> =C2=A0	if (sizeof_priv)
-> -		indio_dev->priv =3D (char *)iio_dev_opaque +
-> -			ALIGN(sizeof(struct iio_dev_opaque),
-> IIO_DMA_MINALIGN);
-> +		indio_dev->priv =3D struct_data_pointer(iio_dev_opaque,
-> IIO_DMA_MINALIGN);
+On Thu, Feb 29, 2024 at 04:37:06PM +0530, Siddharth Vadapalli wrote:
+> On Thu, Feb 29, 2024 at 12:52:07PM +0200, Roger Quadros wrote:
+> > 
+> > 
+> > On 29/02/2024 11:27, Siddharth Vadapalli wrote:
+> > > On Wed, Feb 28, 2024 at 02:36:55PM +0100, Andrew Lunn wrote:
+> > >>> What if there is no kernel behavior associated with it? How can it be mimicked
+> > >>> then?
+> > >>
+> > >> Simple. Implement the feature in software in the kernel for
+> > >> everybody. Then offload it to your hardware.
+> > >>
+> > >> Your hardware is an accelerator. You use it to accelerate what linux
+> > >> can already do. If Linux does not have the feature your accelerator
+> > >> has, that accelerator feature goes unused.
+> > > 
+> > > Is it acceptable to have a macro in the Ethernet Driver to conditionally
+> > > disable/enable the feature (via setting the corresponding bit in the
+> > > register)?
 
-I'd +1 for implementing what Kees suggested in IIO. Only thing is (I think)=
-, we
-need to move struct iio_dev indioo_dev to the end of struct iio_dev_opaque.
+Please re-read my sentence above.
 
-- Nuno S=C3=A1
+Your hardware is an accelerate for what Linux already does. That is
+the key point here. Please understand that. Once you understand that
+point, everything else becomes simple.
 
+Does linux have this feature? If yes, accelerate it. If no, you have
+something in your hardware which is currently not usable.
 
-
+	Andrew
 
