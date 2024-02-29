@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-76067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B51F586C320
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:09:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A15F86C328
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:10:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9F5C1C21C57
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 08:09:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 816C51C221CB
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 08:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BDE447F73;
-	Thu, 29 Feb 2024 08:09:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC263482E4;
+	Thu, 29 Feb 2024 08:09:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yEoI+xll"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZkcCQBAG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785C24E1DD
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 08:09:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D9C47F73
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 08:09:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709194142; cv=none; b=Nne/vncvDj+3ynCXRC7BfyJ3UIo22enj+BjDitj6bPQS3kJY4xBBC3dEH0+IUViTh2vOpSP4GFQfM6vA7hbn+hGmp71UZtD9ppRo4lZmmpqGWvbWNXXpB1vjirkZb0sZMnDiqk4qXLrJTgIORwDvvbsTBX2j2i7ybMhqnWUFmyc=
+	t=1709194175; cv=none; b=Lwv1FKtoqgV7xRC51KnVmIU5YTi/5fPzaZgUMTHeHuuZhwq+1nCmpOudgD6IAzJ1heZVAdQLJjca7k3yqGz6KtV9nWwNAlz8HOHK0VAIiuf/aKexk5ZFRRWdc7mgjfoeT04mdYb9I7o/1vIPXTcrORdsm4+BGqGsHRzUcyRr2hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709194142; c=relaxed/simple;
-	bh=+40ir6eenrwq//MkSxIFfL9C6dIU3EfmwybzMJpuMFU=;
+	s=arc-20240116; t=1709194175; c=relaxed/simple;
+	bh=EUhG088F81sZc6zApwC4MjbCo8xyKS6M1y+zYECcEHE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=crUyrjR2Ci3bHzgwPVSK6uKgldYCwbTYHe0Vrg9k+uyPklIEP2tH22yK+ysUIzGhBofOu+bWk+9dE/dragM34950nxC4TezYwHxHCw62N8X9L/QZjs2HLZMNNuD10TA1DYrIOYA8w3FnzXvMCKnb03jMtUM3tMfVKHQ9cX5T+LQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yEoI+xll; arc=none smtp.client-ip=209.85.208.41
+	 In-Reply-To:Content-Type; b=nWt2lRYhpNVnkQ07yX/ctKqhY+wKq2Z6oH1LIJ7qB211zClH2rKT02GuWhjPdE5HZAFCYHRQFz502lRBNfdOk/8jlsxbuzXsCHPGTqzaKtaYEouO23SnWP+vKKqUB06UGrcyk+uUzUgNeY0Kc/b5jnGq2kMNACeo0OBfhf7kB24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZkcCQBAG; arc=none smtp.client-ip=209.85.218.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-55a179f5fa1so1034361a12.0
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 00:09:00 -0800 (PST)
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a3e85a76fa8so78031266b.1
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 00:09:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709194139; x=1709798939; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1709194172; x=1709798972; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=p0H6m48PmOmlk3bDaigs+kiwbGnFYSM66eRhJTNpOXE=;
-        b=yEoI+xlleTHXqJJbzPnsLMxHydh3S0NxEKdHiyXEbrMKDjc2FUQPLlC/fZ6GPCH15W
-         OmKcMfTZCZRF934vKD56xJw3BdP4CEsyopevy3K8OrgUy0BmI/INpK8iQmv4JHjGynj+
-         vvj89YHQb45rSuPi1eQ+mpzSEia5vqhhkK/9ho5XD8n6N2sN0qSu687iHlsZQg9K8+O9
-         E2Cx1OuLsGnLXffmtDJDop7lL/mnUwMsUy1c4nxUS+rlOeTBNh5ecPplcnQyG4+6mkdj
-         KhvO1prtlD+zG33fzDcbnKJptiF4Ck+KdWraupWFVTrKg/UU8t6MZwduT9nFBjUcAgPv
-         iuJA==
+        bh=vjAqxaqY04Cx1TA3npZJGqF0gRjwdRewJ/gPh0sFZC0=;
+        b=ZkcCQBAG6ltCIzDGbmWjjrnyamirxykLTcmeTiarkQaaeg3zSkpKzOmxcOFlTNwdi8
+         y6pFq1k1wcINkhE8eRc5PtM1Nllprh2sAWFw3zAqurkTJ3GGdH7QWcXJjRVmgd0PRTjc
+         hRgukSSRdxYBX2aXHqkhjG9D+wVQIrRQaMZfTcSqU3vzY1xtolCx+x7ztnK2TY9w4CWn
+         TzUpvKsuwR6McCRC5vs8brrtPfL7ZdZaAQwoGjXkOum2FZb41pmlSYpER6QEiHMaIO9a
+         PX81APYEWn2F351HODYz7WHS42c7xgpfNCeMGByuFUGs7rgbqeqvWRshLsTQF2Kx7NvF
+         CqEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709194139; x=1709798939;
+        d=1e100.net; s=20230601; t=1709194172; x=1709798972;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p0H6m48PmOmlk3bDaigs+kiwbGnFYSM66eRhJTNpOXE=;
-        b=abqczoJZpdI5ecC2XIwoYr1yoQX+U+YHieVJxJl/KMsHN/jYIiDLtslMZ+g0G9h+7y
-         rrIDvEePmohODWElmh5vJ6t3MKQvkFM2Zw1kf5FLjoj5n/RyovPg28sUrLc5hZjprZ7e
-         wfCSdryeK2IPcpLkKY8AItyhBH9ACUny4Ki2mf89lKoevTuYjYcR/qFbok/g0p0wWmx7
-         3zTchVA9Rfp+B7wxn+RWDSkIISq5Lm/MBfkiyYCyxicpghC375sxzDcpJg1F/LmMNd9r
-         Qu0m3K+zTx2X+6+5trWAZnbGd8wq8CENXQYbaUOP8SGev3/nhXdd1/z78MeluWxE/FQI
-         dQEw==
-X-Gm-Message-State: AOJu0YxwiaIwaxF1zr99BkGZrAdljTNpcEfR0NniF6bFgfRVCXTxJXbg
-	y8700BpcQmVYjUo1nyL8BJO9OC9o61j/bAlxeVBnxkBkXCn6sfr9UpK2pjUIA/w=
-X-Google-Smtp-Source: AGHT+IGUe1WoKYO+pebt8lMkVMY1EJkfZFmXnz6pcrIHCd9pB+zYPfl80AiYpaeQK2DEABczJqtgaQ==
-X-Received: by 2002:a17:906:7ad0:b0:a3e:b869:11b3 with SMTP id k16-20020a1709067ad000b00a3eb86911b3mr911984ejo.55.1709194139032;
-        Thu, 29 Feb 2024 00:08:59 -0800 (PST)
+        bh=vjAqxaqY04Cx1TA3npZJGqF0gRjwdRewJ/gPh0sFZC0=;
+        b=etgdCFxKIhb56p70HPh5XXtu1/+F2SgDQBBEj8IPYFEvjporfDGw6rzvm0yAd382pT
+         mrEIC1ihit9r+3sycAdjCzNCARKqCYbcuoEVSUs0QP70QwpwSnpsT3ja/TcJu+RwH1K1
+         oe+rX+9tq8pH5Gm1HEXcM3CJ1WIqu9XUFlrUbL9Lx2+ROGu2symi/WdMvqjjWjfxNTIn
+         Gv7Rs6QUZcmGuu4kuAw4IXuEk8t9AZNu4hyz/R8DRT6UzZKZpPComJuDeW75XZWhfmV6
+         6R9rieB+GACzm+ISFYwbmYkjxh1mDpAa8M8ee03Y8hPv1eE0xW2Qv1r+edYQZF+fbIQC
+         XbgA==
+X-Gm-Message-State: AOJu0Yxj47BBpckN0gHMnceAOXnXcUDMgzW3dtFdLKlU6AvvsoCXdfMg
+	fTWE0X2b1k6iWZhwhi8bl7Mf/sLWVRGf+NHv3VXwu4nJn3Hj+0BJh1HLJPUWYWg=
+X-Google-Smtp-Source: AGHT+IHDdmMP4dIm6SQpjZtcgdRVT35i7CzzppOXgz893DEaCCiI7AL+goNyZQhvnZ/XoTK2kNNNaw==
+X-Received: by 2002:a17:906:1b1b:b0:a44:5589:c099 with SMTP id o27-20020a1709061b1b00b00a445589c099mr181818ejg.46.1709194172649;
+        Thu, 29 Feb 2024 00:09:32 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.222.116])
-        by smtp.gmail.com with ESMTPSA id cu5-20020a170906ba8500b00a440ec600e3sm411228ejd.121.2024.02.29.00.08.56
+        by smtp.gmail.com with ESMTPSA id cu5-20020a170906ba8500b00a440ec600e3sm411228ejd.121.2024.02.29.00.09.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Feb 2024 00:08:58 -0800 (PST)
-Message-ID: <54d3b190-c069-4165-9191-4557845cd87c@linaro.org>
-Date: Thu, 29 Feb 2024 09:08:56 +0100
+        Thu, 29 Feb 2024 00:09:31 -0800 (PST)
+Message-ID: <5d3abcac-450b-4774-8e58-71daf2447334@linaro.org>
+Date: Thu, 29 Feb 2024 09:09:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,8 +75,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 07/11] dt-bindings: net: hisi-femac: replace
- deprecated phy-mode with recommended phy-connection-type
+Subject: Re: [PATCH net-next v6 08/11] dt-bindings: net: hisi-femac: add
+ mandatory MDIO bus subnode
 Content-Language: en-US
 To: forbidden405@outlook.com, Yisen Zhuang <yisen.zhuang@huawei.com>,
  Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
@@ -89,7 +89,7 @@ To: forbidden405@outlook.com, Yisen Zhuang <yisen.zhuang@huawei.com>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  devicetree@vger.kernel.org
 References: <20240228-net-v6-0-6d78d3d598c1@outlook.com>
- <20240228-net-v6-7-6d78d3d598c1@outlook.com>
+ <20240228-net-v6-8-6d78d3d598c1@outlook.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -135,19 +135,21 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240228-net-v6-7-6d78d3d598c1@outlook.com>
+In-Reply-To: <20240228-net-v6-8-6d78d3d598c1@outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 28/02/2024 10:02, Yang Xiwen via B4 Relay wrote:
 > From: Yang Xiwen <forbidden405@outlook.com>
 > 
-> The old property "phy-mode" should be replaced with the latest
-> "phy-connection-type".
+> FEMAC core always has an integrated MDIO bus mapped in its address
+> space. Add required properties '#address-cells', 'size-cells', 'ranges'
+> and MDIO bus subnode.
+> 
+> Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
+> ---
 
-Why? The old property is not deprecated.
-
-
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
 Krzysztof
