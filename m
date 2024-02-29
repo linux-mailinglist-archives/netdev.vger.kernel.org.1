@@ -1,141 +1,111 @@
-Return-Path: <netdev+bounces-75953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F54E86BC5B
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 00:53:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F7FD86BC69
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 01:01:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4068A1C223B0
-	for <lists+netdev@lfdr.de>; Wed, 28 Feb 2024 23:53:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3658828739C
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 00:01:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D23B372925;
-	Wed, 28 Feb 2024 23:53:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="b/WtlF+/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2422627;
+	Thu, 29 Feb 2024 00:01:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093F570025
-	for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 23:53:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7019A179;
+	Thu, 29 Feb 2024 00:01:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709164427; cv=none; b=KOZ7rEvUv+kQg0kBRKc0/Q3bQAO1cibuz6j9fBGCJfh/vONOqIpDJ8TENwbg5Su38xeH/V0IT6ou+JuUP0xEQ0bRnufhnLxm2pv9BibYhm7RgE3qhnPDY24f7g+6uwU968QRGLiq9J7sVjhTg7A0Msvl1TzToO6XrGB7GCvczIA=
+	t=1709164911; cv=none; b=lhZv+2i3spHsIP8Gul7pEZ7asX+L/VLC454MHehu/b07BFan+C2nkk3gJ451lO1xiZ9EwXWiFim3I74VJokCr7kPc3uOFmrP5Z0VtJhKHqHGK58FOUbOVn8/YYwSwuq3Uuf7+qYVbCK5cmudAgwcH1nMfOKC6ugz0o6OLIAcMro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709164427; c=relaxed/simple;
-	bh=226C5h/Y1VCHHH/6rHYwB8j04u2Bj9Ng00Ye5vrzpe0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FtjobTTusCylTWEzEvq9uAEspC20J/tCEdlhZ6kPIKadqL/wBSOiQj9X4gmszQvWKmxna+Snc2AHA3WabZp2RNxzgXMRyfW69DtSbMt+VFrU/wA84SbLTC4ACfAzsr70nRY0rPEOO1bOmjF5nQIFTZO9tSNczzJHehEKm+BHlGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=b/WtlF+/; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-563bb51c36eso461041a12.2
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 15:53:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1709164424; x=1709769224; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LyTb/9u8Fut3XJA7s5sTKjASpumq9GMF8lzH2f5O968=;
-        b=b/WtlF+/cAuvq6M20JXmWz8A2nkQptPjwcnBQLZkV9kPBbnAW24f9bgh5o9TXc7veb
-         a3eOi5yMNeZ0hOuCQ3ljUOEqMjHWtp6/ScFlSp1ToC/hhPIiGktWzjz7Pdv3WAnYcinj
-         eCck83VpNb35lad8kW5Mqhr9VE5ZFzNOGWHUFbs76XLAQrQEScmGNMXDAz+j8u5YGIHO
-         R56D/9Cp+0iznOPm3kXRtfJh9YHYZhdss1n9vCIoVe4M5ivBNkgV0HDZyaRPF1N6UCFS
-         E9MKOTH213WGU0/R421/tyAuYheLu49B136cC2wpkd/ARaWY9L02tzb2vCoR9xRlVYaa
-         4uzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709164424; x=1709769224;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LyTb/9u8Fut3XJA7s5sTKjASpumq9GMF8lzH2f5O968=;
-        b=QN3PrIP4+50I9FAdL6FVEuNxr4mc/fkR/ZOMqP/eGsI98VuqNSz8i0X2zKNuUPSYVs
-         YL+J3t/5ABCgz2Qrwl4vuW6GK5SIaTDDMqqOFw3OEN5Vi5RhqnyYoSPgDtP0hfkd63PP
-         J7RV0O1WXDqMSakhyAbGNGONnrWeXOQNugONzmxOp2lje4st8wq6OgQdzkJfhue2ldzH
-         Zp4Ng2VzLlkGPDiLWzkknNthS/3B2CiJkLEnIhyGOp/YU39aFz5+YdOPFYq7K6fN4mhw
-         hFcsSNnWUWTtd/mAQwNII+/r961uRa66ihqKrrCsuijkp5+BqejV5jNaliSYeCg7xkfN
-         VE1w==
-X-Gm-Message-State: AOJu0YyN2MloGPLOvW0JokvL0AiA6VNdHIe/UOqBA0XRByx9lHRNyJOI
-	W0SZZvw6HVbt17KpbFZBLUNFSuRnlnNJsDAeKw9ALVL0tB0ruM/HFT6U8kggFlrtLoqBPM8IA46
-	mQXVhDSyuNFCFlDKWzIh6gELBYhVTUfIImDb/XQ==
-X-Google-Smtp-Source: AGHT+IFWoAzwjRhf4ZRQtooisu3O7UmB386nUInSxafRbB0jMnEpyJq60SxptGuNyafKn0Mhr6ixAk9Zq1h7yoTNCaY=
-X-Received: by 2002:a05:6402:b57:b0:566:414d:d724 with SMTP id
- bx23-20020a0564020b5700b00566414dd724mr253144edb.35.1709164424445; Wed, 28
- Feb 2024 15:53:44 -0800 (PST)
+	s=arc-20240116; t=1709164911; c=relaxed/simple;
+	bh=VwniBers1j1ov/NZ2S5ekbwMqneJ+aSdwcluq5ZTHA0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HYiYL8UO0tW/M2wJjvxdeUKjguBw5MtujLO+7zGS+B/l0AR8PZTNubb1IaZOfV1dbJtSUnW6K3HAO2GGtzXZh+6hXSN6Hy/qymzEJE5Igr0Tnd6xqf9yUaE0fbtl86QMkLoOu+afgYkEY7s6qxjY2GtCfkhyJg+sPuNxLq07yd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net 0/3] Netfilter fixes for net
+Date: Thu, 29 Feb 2024 01:01:32 +0100
+Message-Id: <20240229000135.8780-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Zd4DXTyCf17lcTfq@debian.debian> <CANn89iJQX14C1Qb_qbTVG4yoG26Cq7Ct+2qK_8T-Ok2JDdTGEA@mail.gmail.com>
-In-Reply-To: <CANn89iJQX14C1Qb_qbTVG4yoG26Cq7Ct+2qK_8T-Ok2JDdTGEA@mail.gmail.com>
-From: Yan Zhai <yan@cloudflare.com>
-Date: Wed, 28 Feb 2024 17:53:33 -0600
-Message-ID: <CAO3-Pbq4Fybyhodv5-36U=-rgttkjxFj6cRvAGcapvE8pZyWSQ@mail.gmail.com>
-Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>, 
-	Alexander Duyck <alexanderduyck@fb.com>, Hannes Frederic Sowa <hannes@stressinduktion.org>, 
-	linux-kernel@vger.kernel.org, rcu@vger.kernel.org, bpf@vger.kernel.org, 
-	kernel-team@cloudflare.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Eric,
+Hi,
 
-On Tue, Feb 27, 2024 at 10:44=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> Hmm....
-> Why napi_busy_loop() does not have a similar problem ?
->
-I just tried and can reproduce similar behavior on sk busy poll.
-However, the interesting thing is, this can happen if I set a super
-high polling interval but just send rare packets. In my case I had a 5
-sec polling interval (unlikely to be realistic in prod but just for
-demonstration), then used nc to send a few packets. Here is what
-bpftrace react:
+The following patchset contains Netfilter fixes for net:
 
-Normal:
-time sudo bpftrace -e 'kfunc:napi_busy_loop{@=3Dcount();}
-interval:s:1{exit();} kfunc:udp_recvmsg {printf("%ld\n",
-args->sk->sk_ll_usec);}'
-Attaching 3 probes...
+Patch #1 restores NFPROTO_INET with nft_compat, from Ignat Korchagin.
 
-@: 0
+Patch #2 fixes an issue with bridge netfilter and broadcast/multicast
+packets.
 
-real    0m1.527s
-user    0m0.073s
-sys     0m0.128s
+There is a day 0 bug in br_netfilter when used with connection tracking.
 
+Conntrack assumes that an nf_conn structure that is not yet added to
+hash table ("unconfirmed"), is only visible by the current cpu that is
+processing the sk_buff.
 
-Extra wait when polling:
-time sudo bpftrace -e 'kfunc:napi_busy_loop{@=3Dcount();}
-interval:s:1{exit();} kfunc:udp_recvmsg {printf("%ld\n",
-args->sk->sk_ll_usec);}'
-Attaching 3 probes...
-5000000
+For bridge this isn't true, sk_buff can get cloned in between, and
+clones can be processed in parallel on different cpu.
 
+This patch disables NAT and conntrack helpers for multicast packets.
 
-@: 16
+Patch #3 adds a selftest to cover for the br_netfilter bug.
 
-real    0m11.167s
-user    0m0.070s
-sys     0m0.120s
+Please, pull these changes from:
 
-So the symptoms are the same, bpftrace cannot exit despite having an
-1sec timeout. But the execution pattern for these two are probably
-different: NAPI threads would keep polling by itself, whereas sk poll
-program might only poll when there is no immediate data. When there
-are packets, it switches to process packets instead of polling any
-more.
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-02-29
 
+Thanks.
 
-Yan
+----------------------------------------------------------------
+
+The following changes since commit 359e54a93ab43d32ee1bff3c2f9f10cb9f6b6e79:
+
+  l2tp: pass correct message length to ip6_append_data (2024-02-22 10:42:17 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-24-02-29
+
+for you to fetch changes up to 6523cf516c55db164f8f73306027b1caebb5628e:
+
+  selftests: netfilter: add bridge conntrack + multicast test case (2024-02-29 00:22:48 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 24-02-29
+
+----------------------------------------------------------------
+Florian Westphal (2):
+      netfilter: bridge: confirm multicast packets before passing them up the stack
+      selftests: netfilter: add bridge conntrack + multicast test case
+
+Ignat Korchagin (1):
+      netfilter: nf_tables: allow NFPROTO_INET in nft_(match/target)_validate()
+
+ include/linux/netfilter.h                          |   1 +
+ net/bridge/br_netfilter_hooks.c                    |  96 +++++++++++
+ net/bridge/netfilter/nf_conntrack_bridge.c         |  30 ++++
+ net/netfilter/nf_conntrack_core.c                  |   1 +
+ net/netfilter/nft_compat.c                         |  20 +++
+ tools/testing/selftests/netfilter/Makefile         |   3 +-
+ .../selftests/netfilter/bridge_netfilter.sh        | 188 +++++++++++++++++++++
+ 7 files changed, 338 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/netfilter/bridge_netfilter.sh
 
