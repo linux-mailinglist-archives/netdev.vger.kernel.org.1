@@ -1,80 +1,114 @@
-Return-Path: <netdev+bounces-76103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 120E686C54B
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:32:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52D0686C564
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:35:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3676F1C215DB
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:32:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 068E2291255
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:35:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E7995D90B;
-	Thu, 29 Feb 2024 09:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF995F464;
+	Thu, 29 Feb 2024 09:34:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Ja7ilSTk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R+ic0V/N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730835D72B
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 09:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395F15EE8F
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 09:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709199127; cv=none; b=RJOB5BbQxGWAjK2abFaBJGyexmuPyuhinaKlXFN4llYS8IeUF3IGzL+J2IaIgFbbqs4E3geDpHCkzr7ce8nqauPlQbEv4T6Vv1a6h8tYtnCsF281vNPFZB8vcyNbGKFFvQFCT7L5MJ2bnM470BXNTsKo1pF8iOIsJFyoIqsVnEg=
+	t=1709199274; cv=none; b=GMMJlFpIyVblPNkey1mY/kiGafKJmQ8JXy0wlRsZF11ZDgPTi75uTigGtZ4/5UoWyjDacjIbOvUlf5aYDU+4UuJDGwIjizVkuYx5c4kNAZEjxgA4qRv/4wb1YiQ1U2udCuxyVdtuURWNfh/sjwbTj4/daYLVWQaX7BUr7XBXj+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709199127; c=relaxed/simple;
-	bh=6i2k1HfZmq0eCuNTltsb8L0/Mha/pPwS9ImAT/+P2w0=;
+	s=arc-20240116; t=1709199274; c=relaxed/simple;
+	bh=GkGAw/dbvtAPuNf/2pfICzWyjWviIwP6O5SJmj0u3KA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mr0FMtq+fjcz3am+Dx/vXdnY1VieJeWD8aayrTVDHuwfrvmXp15VcNu8JximCj+qqR9Fk14jumD38GWwEeSxdqdeVlHEwc8EU7rBSuLyHExKkvOcFqrW2lm4HTRM7USp2n7MJPh4RgfVD3j4FszUWy1aHR4BR/RfTDQmCYixz50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Ja7ilSTk; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-563cb3ba9daso900332a12.3
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 01:32:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709199123; x=1709803923; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iM6QUg9bjSZl8uSCUZVhzf0WX0iuuwwjiA47u4B1bsA=;
-        b=Ja7ilSTkeoR0r/We13xhEhr41CP/uGtsYykVhCgLq898UP5kH1s68ldlMd4MqSAHld
-         FZfK8xZCGdBFPZRQzQsTyEM92Ynag/cy1p6CqlJTFxX2b4o3JmJY8PzHnac8SrDSOw6R
-         Ik30xKniwXqOLh10h+Gx6DOPIa2gfTqXUgsOSros9uMXmJ75Rz+s2okXVvGahlZ9dEUg
-         mcF1z52TsSp12oRMjpAsLwDxRC/9fR1XBomPPLKL5Ky+9f9X8WQHjA+EzgAe5nD8iPTl
-         61TiUfvER6xCq0id1dEP4Ig03iAsF8rbcAN/UxPL0CMjxO41GAM8+57Mux3UJWwRArG1
-         HQjA==
+	 Content-Type:Content-Disposition:In-Reply-To; b=B1Z4i+r5EjgZCpbZK0m6Mwf4xgcA3PzJNOJ19MCa7D+SdcxhScqCwVSos6h/jfeCTgf7zW34JP6wXufVhgzE5BL9ZPM32n7vPAKyWkJN8YiPeesKTf5L887ozttxaDdHfPnixGTJ2jt3XBGQAm1hElAXvbg/fz5gQhj+02GtnL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R+ic0V/N; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709199271;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TZsdg3ZN0LxY9nQESQ96ahFfH0ahlO3yM9XYoF9kTdE=;
+	b=R+ic0V/NoM8GgFQi+NvpZvZqbffRRV7hW5uafPPt9ZrXzTME8zPm1Je+gLMKp+fuL/NRJM
+	4UdF/hCprvzdLrnOC/YtiuxMp51+BBg0upG5TEjf+7wp2IfOTeG4+rQ4HLuhvvJO41gIcB
+	y3wbMMluRf11jtyFx5Gi5iUF6UBgYh0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-473-YTtXEWIlPf2wD_YPmR_4ng-1; Thu, 29 Feb 2024 04:34:29 -0500
+X-MC-Unique: YTtXEWIlPf2wD_YPmR_4ng-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-412b0d34a42so3246935e9.0
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 01:34:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709199123; x=1709803923;
+        d=1e100.net; s=20230601; t=1709199268; x=1709804068;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iM6QUg9bjSZl8uSCUZVhzf0WX0iuuwwjiA47u4B1bsA=;
-        b=U/b5ucU9u6z4sgxhHErjmA8jRBVcTfvhBVjUSNiZKQH5ZksM9Cl854ywet/CT8jeLw
-         hOrIO7Fs5rHXNG/NJPP5DhuxNK92VgwUtx9jEcB7U2rRiw4FFTqAK0FvL49oQV3MnoAw
-         +BzTufJqa/Vltjl0y43wpmt8/LLBQrMV2/97QHIxGAqcEXkPPjraalwsiioilNjGcwcJ
-         srFnuTWihGgyShm96jfiHSDReqSYwtBUBpxS71wcA8mJ/CXaR7WsO8neyxBgFZvjosax
-         BKFpVaNZHqZaXDblHzQum3kiBJ/Y/uGHHkcS69fZiF4i24WQq+EHhXsOcUWDcbGccxO3
-         s9Ug==
-X-Forwarded-Encrypted: i=1; AJvYcCVU5kmHl4nLa6goLoItQGf1ceGgL1Ne+7EmnCKqrZKd2FF04Wk0oSIJmIWFRAD0ARDmjwQXTZrax66vaWjj2iUqa/Vua0U9
-X-Gm-Message-State: AOJu0YxiULrsmi1kKK7NcO0bEP1QZ1g1d2n/dDXze7MfhsJshZwK7Ym5
-	Xep2oOQwFkAixU/oSGL98ZkQwzoGUdwjr1ll1CT1axIITr0hb7S3e7D5hTEnpGs=
-X-Google-Smtp-Source: AGHT+IFbgMTA7l2LY6u7O5iqg2yN+YwDx8P8i1I1cf92NyS3RjoRIzybLhQ3EBwnL/OlWPmKmeOLuQ==
-X-Received: by 2002:a50:ef07:0:b0:566:2a1a:fe18 with SMTP id m7-20020a50ef07000000b005662a1afe18mr1034928eds.36.1709199123487;
-        Thu, 29 Feb 2024 01:32:03 -0800 (PST)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id f4-20020a05640214c400b005660742bf6bsm441622edx.52.2024.02.29.01.32.02
+        bh=TZsdg3ZN0LxY9nQESQ96ahFfH0ahlO3yM9XYoF9kTdE=;
+        b=on4R8vLgyInvdUFrX1exb4FJIauuF2T/gNwOS4Cx0DHkAH84nwqs3++Jt3R5Wm7TNn
+         OmYKRrQ++xieoqWvDgH4YvMSPsh7Fmg9XRowmHohpDUTUfQG41qA03dIXo7OBJnChR3X
+         3GDdjjownY7caTM4OlYmUKrkSEy+UsyugxwO77x3mjaqpFwOKYTWrIZknSMMM8d9nr52
+         9h+V9Bom67g2tbfEJHzCnlSU0rtwbKWd0lu+4UmjbBOgQmdZK2YUpy4l0qEBm32R7wLQ
+         hGwqsPgGp7LyQmfsUs8LdJjSHlIdMRdoDfQ7/2Kpaanb3Jicqf0z5AxY97pXHLyL6ca6
+         vGFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXUgPVkLPWvJcCTgHyoBLJ5zno3Dtcole3N6ZHAMtv9WEKYMgveNmOwYQQOrKSDiDewbKA+dGFXVawt19IeOYbDLtguXK8M
+X-Gm-Message-State: AOJu0Yyn1AckerUV257cF0htShw7iePjeKqw4h85v/38ygsswfQc6xTx
+	InP1sQV6tLeJ9hO9Dffzr6mwQKvl37zyrzd7T87YLYjTtWthb8cQEia6Q/XJPVSS5hdt+Zhojp/
+	L7wHMZ8kJeGrVSAheeiTscSdSyY/Ar9BWzZeWh/fr93CddF5/A80VuQ==
+X-Received: by 2002:a05:600c:1548:b0:412:aec6:484f with SMTP id f8-20020a05600c154800b00412aec6484fmr1414583wmg.15.1709199268315;
+        Thu, 29 Feb 2024 01:34:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEfnF8uRkHXZC7wKNnT1fDTSMQyKX3qeooc5Rt0FsbIbstjuFdW8armLc3YEo+G0sH6Cq11xQ==
+X-Received: by 2002:a05:600c:1548:b0:412:aec6:484f with SMTP id f8-20020a05600c154800b00412aec6484fmr1414542wmg.15.1709199267841;
+        Thu, 29 Feb 2024 01:34:27 -0800 (PST)
+Received: from redhat.com ([2a02:14f:178:d6b0:a21c:61c4:2098:5db])
+        by smtp.gmail.com with ESMTPSA id o17-20020adfa111000000b0033df8854f0dsm1256096wro.26.2024.02.29.01.34.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 01:32:02 -0800 (PST)
-Date: Thu, 29 Feb 2024 10:32:01 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux@armlinux.org.uk, horms@kernel.org,
-	andrew@lunn.ch, netdev@vger.kernel.org, mengyuanlou@net-swift.com
-Subject: Re: [PATCH v2] net: txgbe: fix GPIO interrupt blocking
-Message-ID: <ZeBPEYBG6y5bUP8u@nanopsycho>
-References: <20240229024237.22568-1-jiawenwu@trustnetic.com>
+        Thu, 29 Feb 2024 01:34:27 -0800 (PST)
+Date: Thu, 29 Feb 2024 04:34:20 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Vadim Pasternak <vadimp@nvidia.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	linux-um@lists.infradead.org, netdev@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org,
+	linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+	kvm@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH vhost v3 00/19] virtio: drivers maintain dma info for
+ premapped vq
+Message-ID: <20240229043238-mutt-send-email-mst@kernel.org>
+References: <20240229072044.77388-1-xuanzhuo@linux.alibaba.com>
+ <20240229031755-mutt-send-email-mst@kernel.org>
+ <1709197357.626784-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,109 +117,131 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240229024237.22568-1-jiawenwu@trustnetic.com>
+In-Reply-To: <1709197357.626784-1-xuanzhuo@linux.alibaba.com>
 
-Thu, Feb 29, 2024 at 03:42:37AM CET, jiawenwu@trustnetic.com wrote:
->There were two problems to be solved in this patch:
->
->1. The register of GPIO interrupt status is masked before MAC IRQ
->is enabled. This is because of hardware deficiency. So manually
->clear the interrupt status before using them. Otherwise, GPIO
->interrupts will never be reported again. There is a workaround for
->clearing interrupts to set GPIO EOI in txgbe_up_complete().
->
->2. GPIO EOI is not set to clear interrupt status after handling
->the interrupt. It should be done in irq_chip->irq_ack, but this
->function is not called in handle_nested_irq(). So executing
->function txgbe_gpio_irq_ack() manually in txgbe_gpio_irq_handler().
+On Thu, Feb 29, 2024 at 05:02:37PM +0800, Xuan Zhuo wrote:
+> On Thu, 29 Feb 2024 03:21:14 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > On Thu, Feb 29, 2024 at 03:20:25PM +0800, Xuan Zhuo wrote:
+> > > As discussed:
+> > > http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVmJ3rHYqRZxYg@mail.gmail.com
+> > >
+> > > If the virtio is premapped mode, the driver should manage the dma info by self.
+> > > So the virtio core should not store the dma info.
+> > > So we can release the memory used to store the dma info.
+> > >
+> > > But if the desc_extra has not dma info, we face a new question,
+> > > it is hard to get the dma info of the desc with indirect flag.
+> > > For split mode, that is easy from desc, but for the packed mode,
+> > > it is hard to get the dma info from the desc. And for hardening
+> > > the dma unmap is saft, we should store the dma info of indirect
+> > > descs.
+> > >
+> > > So I introduce the "structure the indirect desc table" to
+> > > allocate space to store dma info with the desc table.
+> > >
+> > > On the other side, we mix the descs with indirect flag
+> > > with other descs together to share the unmap api. That
+> > > is complex. I found if we we distinguish the descs with
+> > > VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
+> > >
+> > > Because of the dma array is allocated in the find_vqs(),
+> > > so I introduce a new parameter to find_vqs().
+> > >
+> > > Note:
+> > >     this is on the top of
+> > >         [PATCH vhost v1] virtio: packed: fix unmap leak for indirect desc table
+> > >         http://lore.kernel.org/all/20240223071833.26095-1-xuanzhuo@linux.alibaba.com
+> > >
+> > > Please review.
+> > >
+> > > Thanks
+> > >
+> > > v3:
+> > >     1. fix the conflict with the vp_modern_create_avq().
+> >
+> > Okay but are you going to address huge memory waste all this is causing for
+> > - people who never do zero copy
+> > - systems where dma unmap is a nop
+> >
+> > ?
+> >
+> > You should address all comments when you post a new version, not just
+> > what was expedient, or alternatively tag patch as RFC and explain
+> > in commit log that you plan to do it later.
+> 
+> 
+> Do you miss this one?
+> http://lore.kernel.org/all/1708997579.5613105-1-xuanzhuo@linux.alibaba.com
 
-Two patches then, no?
 
+I did. The answer is that no, you don't get to regress memory usage
+for lots of people then fix it up.
+So the patchset is big, I guess it will take a couple of cycles to
+merge gradually.
 
->
->Fixes: aefd013624a1 ("net: txgbe: use irq_domain for interrupt controller")
->Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
->---
-> .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  1 +
-> .../net/ethernet/wangxun/txgbe/txgbe_phy.c    | 29 +++++++++++++++++++
-> .../net/ethernet/wangxun/txgbe/txgbe_phy.h    |  1 +
-> 3 files changed, 31 insertions(+)
->
->diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
->index e67a21294158..bd4624d14ca0 100644
->--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
->+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
->@@ -81,6 +81,7 @@ static void txgbe_up_complete(struct wx *wx)
-> {
-> 	struct net_device *netdev = wx->netdev;
+> I asked you. But I didnot recv your answer.
 > 
->+	txgbe_reinit_gpio_intr(wx);
-> 	wx_control_hw(wx, true);
-> 	wx_configure_vectors(wx);
+> Thanks.
 > 
->diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
->index bae0a8ee7014..93295916b1d2 100644
->--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
->+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
->@@ -475,8 +475,10 @@ irqreturn_t txgbe_gpio_irq_handler(int irq, void *data)
-> 	gc = txgbe->gpio;
-> 	for_each_set_bit(hwirq, &gpioirq, gc->ngpio) {
-> 		int gpio = irq_find_mapping(gc->irq.domain, hwirq);
->+		struct irq_data *d = irq_get_irq_data(gpio);
-> 		u32 irq_type = irq_get_trigger_type(gpio);
 > 
->+		txgbe_gpio_irq_ack(d);
-> 		handle_nested_irq(gpio);
-> 
-> 		if ((irq_type & IRQ_TYPE_SENSE_MASK) == IRQ_TYPE_EDGE_BOTH) {
->@@ -489,6 +491,33 @@ irqreturn_t txgbe_gpio_irq_handler(int irq, void *data)
-> 	return IRQ_HANDLED;
-> }
-> 
->+void txgbe_reinit_gpio_intr(struct wx *wx)
->+{
->+	struct txgbe *txgbe = wx->priv;
->+	irq_hw_number_t hwirq;
->+	unsigned long gpioirq;
->+	struct gpio_chip *gc;
->+	unsigned long flags;
->+
->+	/* for gpio interrupt pending before irq enable */
->+	gpioirq = rd32(wx, WX_GPIO_INTSTATUS);
->+
->+	gc = txgbe->gpio;
->+	for_each_set_bit(hwirq, &gpioirq, gc->ngpio) {
->+		int gpio = irq_find_mapping(gc->irq.domain, hwirq);
->+		struct irq_data *d = irq_get_irq_data(gpio);
->+		u32 irq_type = irq_get_trigger_type(gpio);
->+
->+		txgbe_gpio_irq_ack(d);
->+
->+		if ((irq_type & IRQ_TYPE_SENSE_MASK) == IRQ_TYPE_EDGE_BOTH) {
->+			raw_spin_lock_irqsave(&wx->gpio_lock, flags);
->+			txgbe_toggle_trigger(gc, hwirq);
->+			raw_spin_unlock_irqrestore(&wx->gpio_lock, flags);
->+		}
->+	}
->+}
->+
-> static int txgbe_gpio_init(struct txgbe *txgbe)
-> {
-> 	struct gpio_irq_chip *girq;
->diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
->index 9855d44076cb..8a026d804fe2 100644
->--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
->+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
->@@ -5,6 +5,7 @@
-> #define _TXGBE_PHY_H_
-> 
-> irqreturn_t txgbe_gpio_irq_handler(int irq, void *data);
->+void txgbe_reinit_gpio_intr(struct wx *wx);
-> irqreturn_t txgbe_link_irq_handler(int irq, void *data);
-> int txgbe_init_phy(struct txgbe *txgbe);
-> void txgbe_remove_phy(struct txgbe *txgbe);
->-- 
->2.27.0
->
->
+> >
+> > > v2:
+> > >     1. change the dma item of virtio-net, every item have MAX_SKB_FRAGS + 2
+> > >         addr + len pairs.
+> > >     2. introduce virtnet_sq_free_stats for __free_old_xmit
+> > >
+> > > v1:
+> > >     1. rename transport_vq_config to vq_transport_config
+> > >     2. virtio-net set dma meta number to (ring-size + 1)(MAX_SKB_FRGAS +2)
+> > >     3. introduce virtqueue_dma_map_sg_attrs
+> > >     4. separate vring_create_virtqueue to an independent commit
+> > >
+> > >
+> > >
+> > > Xuan Zhuo (19):
+> > >   virtio_ring: introduce vring_need_unmap_buffer
+> > >   virtio_ring: packed: remove double check of the unmap ops
+> > >   virtio_ring: packed: structure the indirect desc table
+> > >   virtio_ring: split: remove double check of the unmap ops
+> > >   virtio_ring: split: structure the indirect desc table
+> > >   virtio_ring: no store dma info when unmap is not needed
+> > >   virtio: find_vqs: pass struct instead of multi parameters
+> > >   virtio: vring_create_virtqueue: pass struct instead of multi
+> > >     parameters
+> > >   virtio: vring_new_virtqueue(): pass struct instead of multi parameters
+> > >   virtio_ring: simplify the parameters of the funcs related to
+> > >     vring_create/new_virtqueue()
+> > >   virtio: find_vqs: add new parameter premapped
+> > >   virtio_ring: export premapped to driver by struct virtqueue
+> > >   virtio_net: set premapped mode by find_vqs()
+> > >   virtio_ring: remove api of setting vq premapped
+> > >   virtio_ring: introduce dma map api for page
+> > >   virtio_ring: introduce virtqueue_dma_map_sg_attrs
+> > >   virtio_net: unify the code for recycling the xmit ptr
+> > >   virtio_net: rename free_old_xmit_skbs to free_old_xmit
+> > >   virtio_net: sq support premapped mode
+> > >
+> > >  arch/um/drivers/virtio_uml.c             |  31 +-
+> > >  drivers/net/virtio_net.c                 | 283 ++++++---
+> > >  drivers/platform/mellanox/mlxbf-tmfifo.c |  24 +-
+> > >  drivers/remoteproc/remoteproc_virtio.c   |  31 +-
+> > >  drivers/s390/virtio/virtio_ccw.c         |  33 +-
+> > >  drivers/virtio/virtio_mmio.c             |  30 +-
+> > >  drivers/virtio/virtio_pci_common.c       |  59 +-
+> > >  drivers/virtio/virtio_pci_common.h       |   9 +-
+> > >  drivers/virtio/virtio_pci_legacy.c       |  16 +-
+> > >  drivers/virtio/virtio_pci_modern.c       |  38 +-
+> > >  drivers/virtio/virtio_ring.c             | 698 ++++++++++++-----------
+> > >  drivers/virtio/virtio_vdpa.c             |  45 +-
+> > >  include/linux/virtio.h                   |  13 +-
+> > >  include/linux/virtio_config.h            |  48 +-
+> > >  include/linux/virtio_ring.h              |  82 +--
+> > >  tools/virtio/virtio_test.c               |   4 +-
+> > >  tools/virtio/vringh_test.c               |  28 +-
+> > >  17 files changed, 847 insertions(+), 625 deletions(-)
+> > >
+> > > --
+> > > 2.32.0.3.g01195cf9f
+> >
+
 
