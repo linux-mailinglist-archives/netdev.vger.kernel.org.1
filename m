@@ -1,206 +1,172 @@
-Return-Path: <netdev+bounces-76096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A259A86C4E9
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:23:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12E9B86C509
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:26:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5458F28BFF1
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:23:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFE7D1F26F75
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:26:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776415916C;
-	Thu, 29 Feb 2024 09:23:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DBF65B690;
+	Thu, 29 Feb 2024 09:26:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qkRXn6V0"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="OqkIH365"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB98482E5
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 09:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976A45D747;
+	Thu, 29 Feb 2024 09:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709198602; cv=none; b=Q/RIrCq99ZxRMkW7JXBafFgJY0GYZt+yutem2FAnJ/oUUwcRi6Wda0VdKY5XY0exPjtRUz+GGkqRV8x066nDCXpRPhL70DQ/QFrLWQ0u+QawKF1z305rhB9plq51U+FoaDMR9gzY/ZAgSnMVRITWwo0RYgUXJiZwLWaKPVVA0+E=
+	t=1709198775; cv=none; b=XxbEowVOkMUGEBuEcfBA9njpT8aQ96OGIsCU7iIBgKea+w49o29RmYz82qFgkznhzhvdlWew0J7LmuCFnwBUdkIDl14DTz5ruLmiJC7eeeH96FK5+8D89Sv2RtUcBSji5DAsublksulvPpRHxky0FRdBetd2jHmNKgXskigAqws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709198602; c=relaxed/simple;
-	bh=rKIZI8mkCW/o72vSh/5vySFXUUd1ZSZLcFoNZOCXR8w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nzGQaTKl8g4MOxDi42ZrcWcDt36UoSol+RcWmZ10Mg6SuF7kwpWRhNiKvU5VNqJ/YRhIejT7V941QR0Nx0l/2+5OjBdfm/xK8FybEOIjoEfMAaFljk2eVRsEShZkeXXa1uHrRorWeOFAgFNTsO2vkk9ELnc0b1icx91ZSXXLUoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qkRXn6V0; arc=none smtp.client-ip=95.215.58.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3c38627e-b9b6-43a3-ae66-628976c41247@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709198591;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wa3DRGjhE8/44KmXxGKR0TYbciJqzHu8Mu92Y7itEC4=;
-	b=qkRXn6V0Uzn+q0gu53nVJaPQ9vPvUGdQa4DZHGeM+DyrSXMWSJO3vrYCvC3rOwsvXoIMe1
-	OOJuM9XihjytofxoxWlK56KFZBLl39SGa2l47dvukD8ArCRunRmU/egG/6E/zXGs2YYKgE
-	uSB1ajAyT5+zGFNSIRg6nSRzAQPMFfE=
-Date: Thu, 29 Feb 2024 09:23:08 +0000
+	s=arc-20240116; t=1709198775; c=relaxed/simple;
+	bh=LTz2lNXyKqAWl+OV2R4/W4e53JnuoSa6h/8g27FD3j0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=scCMuaauj5TrDjaUwCJ8+YjYnW3+kD6fzMmGXzPlZf9JDVJ3TPevReRgZgWggJHiskefvfyf0FS73rzkufqhmKFLYM9ry1cOhvlIH3uoaoUS+TY+EBuMl7fNm+2WEC/PEoWDE/vVZc7CiNc51uG2m5/G0XKyhAu9fgeJoltkK5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=OqkIH365; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 9D014880CD;
+	Thu, 29 Feb 2024 10:26:04 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1709198766;
+	bh=/3y3hwrWuyFglLG8ptOVhNQiCprvEAiPkPdCyqfV0T8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OqkIH365+dh/IZeNYGueDrwEvDTrdKquseXSwX3fPvqdjNkZ+YDAxENoLdLHQVPQL
+	 7hnoqQPcf/yHuGKSHaKTTY94f/YDXE0+IctDCvncBAefHjYqVeYz3gpJqA5UesIVF5
+	 m1kERA6heLxC2oZNTsG86Yrp+0UswTGFji4FJ+C7vvqHyjRy5tugZInpvbMfdve7sR
+	 g2k10dZ0oVgvD8GFnHsxlTjLIQgQAGQvmwqxgQwC7qczu5Mv5+fMcGuyBTZd/4URGj
+	 WyQ6+K44ZHEXxstwGaz4DJ8Hy/BTnz2KkqZ1nSe1DxZIL2e07p3U2FFx5Ar3a+KjSz
+	 0nO+C8uTaJfEw==
+Date: Thu, 29 Feb 2024 10:25:57 +0100
+From: Lukasz Majewski <lukma@denx.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, Eric Dumazet <edumazet@google.com>, Florian
+ Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, Tristram.Ha@microchip.com, Sebastian Andrzej
+ Siewior <bigeasy@linutronix.de>, Paolo Abeni <pabeni@redhat.com>, Ravi
+ Gunasekaran <r-gunasekaran@ti.com>, Simon Horman <horms@kernel.org>,
+ Wojciech Drewek <wojciech.drewek@intel.com>, Nikita Zhandarovich
+ <n.zhandarovich@fintech.ru>, Murali Karicheri <m-karicheri2@ti.com>, Dan
+ Carpenter <dan.carpenter@linaro.org>, Ziyang Xuan
+ <william.xuanziyang@huawei.com>, Kristian Overskeid <koverskeid@gmail.com>,
+ Matthieu Baerts <matttbe@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [RFC] net: hsr: Provide RedBox support
+Message-ID: <20240229102557.615c02f3@wsk>
+In-Reply-To: <c3880444-3665-4a60-b6ec-f8ae8a9fbf8d@lunn.ch>
+References: <20240228150735.3647892-1-lukma@denx.de>
+	<20240228083115.01d4c93e@hermes.local>
+	<c3880444-3665-4a60-b6ec-f8ae8a9fbf8d@lunn.ch>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 2/2] bnxt_en: Retry for TX timestamp from FW
- until timeout specified
-Content-Language: en-US
-To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew.gospodarek@broadcom.com, jiri@resnulli.us, richardcochran@gmail.com
-References: <20240229070202.107488-1-michael.chan@broadcom.com>
- <20240229070202.107488-3-michael.chan@broadcom.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20240229070202.107488-3-michael.chan@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; boundary="Sig_/HXhiR.+AvKxAWKdncrkr5ru";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On 29/02/2024 07:02, Michael Chan wrote:
-> From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> 
-> Use the ptp_tx_timeout devlink parameter introduced in the previous
-> patch to retry querying TX timestamp, up to the timeout specified.
-> Firmware supports timeout values up to 65535 microseconds.  The
-> driver will set this firmware timeout value according to the
-> ptp_tx_timeout parameter.  If the ptp_tx_timeout value exceeds
-> the maximum firmware value, the driver will retry in the context
-> of bnxt_ptp_ts_aux_work().
-> 
-> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-> ---
->   Documentation/networking/devlink/bnxt.rst     |  7 +++++++
->   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 19 ++++++++++++++++---
->   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  4 +++-
->   3 files changed, 26 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Documentation/networking/devlink/bnxt.rst b/Documentation/networking/devlink/bnxt.rst
-> index a4fb27663cd6..48833c190c5b 100644
-> --- a/Documentation/networking/devlink/bnxt.rst
-> +++ b/Documentation/networking/devlink/bnxt.rst
-> @@ -41,6 +41,13 @@ parameters.
->        - Generic Routing Encapsulation (GRE) version check will be enabled in
->          the device. If disabled, the device will skip the version check for
->          incoming packets.
-> +   * - ``ptp_tx_timeout``
-> +     - u32
-> +     - Runtime
-> +     - PTP Transmit timestamp timeout value in milliseconds. The default
-> +       value is 1000 and the maximum value is 5000. Use a higher value
-> +       on a busy network to prevent timeout retrieving the PTP Transmit
-> +       timestamp.
->   
->   Info versions
->   =============
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-> index 4b50b07b9771..a05b50162e9e 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-> @@ -122,10 +122,14 @@ static int bnxt_hwrm_port_ts_query(struct bnxt *bp, u32 flags, u64 *ts)
->   	req->flags = cpu_to_le32(flags);
->   	if ((flags & PORT_TS_QUERY_REQ_FLAGS_PATH) ==
->   	    PORT_TS_QUERY_REQ_FLAGS_PATH_TX) {
-> +		struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
-> +		u32 tmo_us = ptp->txts_tmo * 1000;
-> +
->   		req->enables = cpu_to_le16(BNXT_PTP_QTS_TX_ENABLES);
-> -		req->ptp_seq_id = cpu_to_le32(bp->ptp_cfg->tx_seqid);
-> -		req->ptp_hdr_offset = cpu_to_le16(bp->ptp_cfg->tx_hdr_off);
-> -		req->ts_req_timeout = cpu_to_le16(BNXT_PTP_QTS_TIMEOUT);
-> +		req->ptp_seq_id = cpu_to_le32(ptp->tx_seqid);
-> +		req->ptp_hdr_offset = cpu_to_le16(ptp->tx_hdr_off);
-> +		tmo_us = min(tmo_us, BNXT_PTP_QTS_MAX_TMO_US);
+--Sig_/HXhiR.+AvKxAWKdncrkr5ru
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-With this logic the request will stay longer than expected. With
-BNXT_PTP_QTS_MAX_TMO_US hardcoded to 65ms (it's later in the patch),
-and TXT timestamp timeout set for 270ms, the request will wait for 325ms
-in total. It doesn't look like a blocker, but it's definitely area to
-improve given that only one TX timestamp request can be in-flight.
+Hi Andrew,
 
-> +		req->ts_req_timeout = cpu_to_le16(tmo_us);
->   	}
->   	resp = hwrm_req_hold(bp, req);
->   
-> @@ -675,6 +679,8 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
->   	u64 ts = 0, ns = 0;
->   	int rc;
->   
-> +	if (!ptp->txts_pending)
-> +		ptp->abs_txts_tmo = jiffies + msecs_to_jiffies(ptp->txts_tmo);
->   	rc = bnxt_hwrm_port_ts_query(bp, PORT_TS_QUERY_REQ_FLAGS_PATH_TX, &ts);
->   	if (!rc) {
->   		memset(&timestamp, 0, sizeof(timestamp));
-> @@ -684,6 +690,10 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
->   		timestamp.hwtstamp = ns_to_ktime(ns);
->   		skb_tstamp_tx(ptp->tx_skb, &timestamp);
->   	} else {
-> +		if (!time_after_eq(jiffies, ptp->abs_txts_tmo)) {
-> +			ptp->txts_pending = true;
-> +			return;
-> +		}
->   		netdev_warn_once(bp->dev,
->   				 "TS query for TX timer failed rc = %x\n", rc);
->   	}
-> @@ -691,6 +701,7 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
->   	dev_kfree_skb_any(ptp->tx_skb);
->   	ptp->tx_skb = NULL;
->   	atomic_inc(&ptp->tx_avail);
-> +	ptp->txts_pending = false;
->   }
->   
->   static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
-> @@ -714,6 +725,8 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
->   		spin_unlock_bh(&ptp->ptp_lock);
->   		ptp->next_overflow_check = now + BNXT_PHC_OVERFLOW_PERIOD;
->   	}
-> +	if (ptp->txts_pending)
-> +		return 0;
->   	return HZ;
->   }
->   
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-> index ee977620d33e..bfb165d2b365 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-> @@ -24,7 +24,7 @@
->   
->   #define BNXT_PTP_DFLT_TX_TMO	1000 /* ms */
->   #define BNXT_PTP_MAX_TX_TMO	5000 /* ms */
-> -#define BNXT_PTP_QTS_TIMEOUT	1000
-> +#define BNXT_PTP_QTS_MAX_TMO_US	65535
-             ^^^^
-This is the request timeout definition
+> On Wed, Feb 28, 2024 at 08:31:15AM -0800, Stephen Hemminger wrote:
+> > On Wed, 28 Feb 2024 16:07:35 +0100
+> > Lukasz Majewski <lukma@denx.de> wrote:
+> >  =20
+> > > =20
+> > > +/* hsr_proxy_node_table_show - Formats and prints proxy
+> > > node_table entries */ +static int
+> > > +hsr_proxy_node_table_show(struct seq_file *sfp, void *data)
+> > > +{
+> > > +	struct hsr_priv *priv =3D (struct hsr_priv *)sfp->private;
+> > > +	struct hsr_node *node;
+> > > +
+> > > +	seq_printf(sfp, "Proxy Node Table entries for HSR
+> > > device\n");
+> > > +	seq_puts(sfp, "MAC-Address-SAN,        time_in\n");
+> > > +	rcu_read_lock();
+> > > +	list_for_each_entry_rcu(node, &priv->proxy_node_db,
+> > > mac_list) {
+> > > +		seq_printf(sfp, "%pM ", &node->macaddress_A[0]);
+> > > +		seq_printf(sfp, "%10lx\n",
+> > > node->time_in[HSR_PT_INTERLINK]);
+> > > +	}
+> > > +	rcu_read_unlock();
+> > > +	return 0;
+> > > +}
+> > > +
+> > >  DEFINE_SHOW_ATTRIBUTE(hsr_node_table);
+> > > +DEFINE_SHOW_ATTRIBUTE(hsr_proxy_node_table); =20
+> >=20
+> > NAK
+> > Do not abuse sysfs to be a debug proc style output. =20
+>=20
+> This is actually debugfs, not sysfs.
+>=20
+> However, i agree, we want information like this exported via netlink
+> as the primary interface to the end user. debugfs is not suitable for
+> that.
 
->   #define BNXT_PTP_QTS_TX_ENABLES	(PORT_TS_QUERY_REQ_ENABLES_PTP_SEQ_ID |	\
->   				 PORT_TS_QUERY_REQ_ENABLES_TS_REQ_TIMEOUT | \
->   				 PORT_TS_QUERY_REQ_ENABLES_PTP_HDR_OFFSET)
-> @@ -117,12 +117,14 @@ struct bnxt_ptp_cfg {
->   					 BNXT_PTP_MSG_PDELAY_REQ |	\
->   					 BNXT_PTP_MSG_PDELAY_RESP)
->   	u8			tx_tstamp_en:1;
-> +	u8			txts_pending:1;
->   	int			rx_filter;
->   	u32			tstamp_filters;
->   
->   	u32			refclk_regs[2];
->   	u32			refclk_mapped_regs[2];
->   	u32			txts_tmo;
-> +	unsigned long		abs_txts_tmo;
->   };
->   
->   #if BITS_PER_LONG == 32
+Am I correct, that recommended approach would be to:
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+1. Modify iproute2 to support for example:
 
+ip addr show dev hsr1 nodes {proxy} ?
+
+2. Shall the currently exported:
+
+/sys/kernel/debug/hsr/hsrX/node_table be left as it is (for legacy
+usage) or shall it be removed and replaced with netlink and iproute2 ?
+
+>=20
+> 	 Andrew
+
+
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/HXhiR.+AvKxAWKdncrkr5ru
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmXgTaUACgkQAR8vZIA0
+zr166Qf+PtTfzrYXP7ThEPCaBT1z1kOq7J1fD6bGHn0jQAAafLG3Km5OkuNNObdL
+/0mxgNb7JfaPlXuY4SQtR5i1s9BZoWLpLmNQ5tCfvaVjy+e/ac5ct2YrqHCnOPdA
+IXBRCf2iZYG6Cvci4S2JJol9ssQea/jgqmHfz1ze8YqtEdwaDS91bwOZshoG1xSl
+I3Z7v80GgGGQECIkkznT8xF/sbuFzRUKgh7n4t4ynkopzjDTp6rPTmSo4fXfP4L/
+2f/zhXUbzzLsdH8/6rGLRGCcKlF2cmBZpKZbUd8LgCS5y5Rs56IayHv7Rr47FUiZ
+VfC9XqFdu2FEhEEok2EDmyXD7sfhUA==
+=3OGX
+-----END PGP SIGNATURE-----
+
+--Sig_/HXhiR.+AvKxAWKdncrkr5ru--
 
