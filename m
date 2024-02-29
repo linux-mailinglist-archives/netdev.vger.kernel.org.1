@@ -1,120 +1,157 @@
-Return-Path: <netdev+bounces-76287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 082ED86D254
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:30:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E67986D260
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:32:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AFF71C220D0
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:30:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59DC01C2179D
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:32:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311C613440A;
-	Thu, 29 Feb 2024 18:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1DEB37A;
+	Thu, 29 Feb 2024 18:32:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="iM5mHmPo"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="kO+egWIP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C52132C1E
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 18:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA6D12E5B
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 18:32:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709231426; cv=none; b=t4Sbu3PdcbxNJf0ZZy0czI+5Rq+VoNtIGYdW7cxV2r/3vJHupZImOoruJUGrwoCcMZ0UogaRuyk1yOrTPkRmwIHHd8ED2ybBYaMG4aJ+CcJOm3VyOYH/LGwLypl3Cnu4CpdZxPmHGKtJe95TH63Dse7e49fg9Jpo/63NB9IZEiE=
+	t=1709231525; cv=none; b=A3EMj8xyzwChHesEgpChxVfsgvdOWpg4subMQg3aBqhcfMqjEK4mGRgI64qT/+5HbuOtvmA60xPbCfV4GMKYb3Z3G+WOHUVkuDImvrUtRpDeRqer6BBJEUbOdVa12/7hs71LkG5L3Z9L9UEaPU79ncKRCyq0Dh+EQiEKey34YOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709231426; c=relaxed/simple;
-	bh=8yy/4GV1yFJzF9sv2B95/iwZJPmwic5KkIWGzHyFdDA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mXHEtm8Aa2dp2IIE4mBscnqm8QniN3kAby0b8qppOvs+A3qPHjt+frTxOGQd4Tj79oSQ1lJSwAq7C/3IGWfGY3oRnJBOyVx3kvj9IaDOmBbq5ejyrcWwkHy2taX6rVAXW/iNpGjL57fbkHFaRtxMh1sm1sUILYgOJSFMpT9yOPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=iM5mHmPo; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1dc09556599so11587615ad.1
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 10:30:22 -0800 (PST)
+	s=arc-20240116; t=1709231525; c=relaxed/simple;
+	bh=G9HD630sRPzPI72iuyqYlKeo7sS7I5SqO/qDADohpVk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=McpqlTgdTr7GAOw8tfFIR1pK7YjVP+C74B57qP3czZ+RzsCjIIIyRiZlTUql8f2DPq7fBZM454J5YFp2etuSlq7UsbBqlXgtauSO+14xlCXXmF4xBqioWYjLdu4z3uMh68j/Z7YPWelY452Xsbss9UUbpt5xX8j04LjhY/1einw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=kO+egWIP; arc=none smtp.client-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-608c40666e0so13272987b3.2
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 10:32:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1709231422; x=1709836222; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1709231523; x=1709836323; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aYbYLgN//LB6IKshdj2UFvVMq+97XOWcZTiyLMqD288=;
-        b=iM5mHmPoziyBmXNKdfjG1EYs9RZkxqajHY0iJTm8qPwQw7XSYOaQmmExCBBqcpxL4k
-         S1mlEu61ub7ABvinLlFMWO0Aet7chIuR4vUqHYZM4CGZESNe1dTYwittwTDQi0ewrRY1
-         HPmeUJKQL/2H6rQa4zKQVPc1Z1ERlwwVXNLV8=
+        bh=oaeBOT+t9mePNFUipxjmnCS7BvLCAtAwOO3iooaJWCc=;
+        b=kO+egWIPz8KaCVqAQrG//izl+reDUKAHZnn77DNpKe9143Brnuth/7iizqJVTaKEeR
+         htBZnL/YnkI1AeGWQnmOTAqWOhoQ7dYdpgIPZB1BhKmsil3nUsWGDvpghw7vbaoNH+NB
+         cMhK4X9Ka7G/Hid0gs70k7Oq2K4a0UZzLVsxd5oCPs5b7TXYOvim5SKJRB6I3IpbCvcI
+         BUOS1cYsKCJUc/UfKeD5kcYitPAjtYc9CwaGaC7Lrlkbn+AwsG6i+36CBXKVxed3OtNF
+         mN+hWUKnRowvpWdKh2uK7uJvu0FlTnDp0F2AaJju0D/pd1iwmbqHbo7QVaMyzRZxbYhM
+         Hv6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709231422; x=1709836222;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1709231523; x=1709836323;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aYbYLgN//LB6IKshdj2UFvVMq+97XOWcZTiyLMqD288=;
-        b=pAZfbchjgrLEA4ocI2cVBAYEIA7UHyY/h8itGpsZnH+2POd00Aevt0/jmp14YdXore
-         1xZIusSPy86dguGqa1WUaXbc8HmNq7ei2n0Nt66CG494M2qNgd4yhXfbQTPo9kjjOOsL
-         hDtfOBQsX6jCwiU6mI424DvoKLWiKh/iGJyW+puf+2OLhA5NCRpWZLClZiqS3n/LFtC8
-         NIkz9w0EnK7tt0/VI/qhTEDETQWvxaGH5rr0WfxkrPCruKTXbfifAk/n1xDeaL0ya7yV
-         6ztBmhKPg/MA3+07Yv0W7YbOdtQNxbD2l7w8conzWllSgyDeW9QnnM7eKeed30QxyGW7
-         5B2A==
-X-Forwarded-Encrypted: i=1; AJvYcCUcBvKvZADUxbirqpAIwtarI9SDcq8SGUUygOm160cCXTR0SDBmFScuRjXMJvP4eBQontqA/KN6qu/WDn7UTfsCmxcg+82P
-X-Gm-Message-State: AOJu0YzETMBmEmcOkuX4QSH19tDAOTUejdHt5CdZmqHpVCHHBZ5V0Btp
-	Z8P0teLHyPZVx7SEKWdWWAmnf9EAQ3+QwlvBhzGI5DoRHtW56ZwuQDYwFNuyQw==
-X-Google-Smtp-Source: AGHT+IFZ8jcrjcQAt+MQj+2B0Sj5fw+uvOzg9P3n+GwTvGaDLn2o9jX7lXUHTKfIFeYePsmaS46Yrw==
-X-Received: by 2002:a17:902:d4c4:b0:1db:ea23:9ee6 with SMTP id o4-20020a170902d4c400b001dbea239ee6mr3615434plg.12.1709231421915;
-        Thu, 29 Feb 2024 10:30:21 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id 21-20020a170902c15500b001d93a85ae13sm1803519plj.309.2024.02.29.10.30.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 10:30:21 -0800 (PST)
-From: Kees Cook <keescook@chromium.org>
-To: Vinod Koul <vkoul@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Mark Brown <broonie@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	dmaengine@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-iio@vger.kernel.org,
-	linux-spi@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Kees Cook <keescook@chromium.org>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Lars-Peter Clausen <lars@metafoo.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>
-Subject: Re: (subset) [PATCH v4 1/8] overflow: Use POD in check_shl_overflow()
-Date: Thu, 29 Feb 2024 10:30:14 -0800
-Message-Id: <170923141241.775345.14051727895770192324.b4-ty@chromium.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240228204919.3680786-2-andriy.shevchenko@linux.intel.com>
-References: <20240228204919.3680786-1-andriy.shevchenko@linux.intel.com> <20240228204919.3680786-2-andriy.shevchenko@linux.intel.com>
+        bh=oaeBOT+t9mePNFUipxjmnCS7BvLCAtAwOO3iooaJWCc=;
+        b=mfwrM/zTD1djNtF1mWH/f5IzrZvjutN6vCk/ACU79pWiTQPiRKiD9v7YUqES9lrLpB
+         MTzzhbPrlBFctT5a3HxKYBwzdhuWnY4xU809d3o3w/eiEo9w6nthvrNX2w4rXN47Sx4G
+         GsCOkMS2Add127JkmqnxCcHYrxFYjQzYVY/Oafs+iY/wkuOrJp2/Myw2rfd+51zKtzA7
+         wXZJ/Mrg4YB5yuU/YkPR222zKOxr3NXBKsLD634Egba1hzeeXi1RkptEkTVFaNpZofRz
+         MaY7pqhT8ugMX7bP7SfmksdgkkZ9+WDZzwlB8RKC4r3TffsDYATa0Wg+DSSQ1SDpO+vP
+         YnQA==
+X-Gm-Message-State: AOJu0YxoijW6OZcp6Kq0i3s9z1KYnkKT3XvHkeIt4xCeEXkE47vNVIx7
+	ukwhY5YNe/2/IalHodOnMwJCQQy2y+/Ge9Abf3tWnJeXI4D2Fli+lcf39FEIngGxsqZCWUqGHmM
+	pbSsufk6U4VzNDC90kOdHeEz1p/9ecDu84YLv
+X-Google-Smtp-Source: AGHT+IGSCq77ocxd7gplB+cHpPQ+Y1JtselXqVpEOhC68LuPI6+y4CIZriULLW8UPwmIs5rFfwGFL/iGFD2xbXyZ9Hs=
+X-Received: by 2002:a81:8687:0:b0:609:2857:af0 with SMTP id
+ w129-20020a818687000000b0060928570af0mr3175403ywf.25.1709231523326; Thu, 29
+ Feb 2024 10:32:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20240225165447.156954-1-jhs@mojatatu.com> <20240225165447.156954-7-jhs@mojatatu.com>
+ <9bb827bfc79345d02a063650990de68ce2386ddb.camel@redhat.com>
+In-Reply-To: <9bb827bfc79345d02a063650990de68ce2386ddb.camel@redhat.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 29 Feb 2024 13:31:52 -0500
+Message-ID: <CAM0EoMkrZAQx7p1=5Bq-HDEHiDgS1fYwTxT2keXOWs3GXjcNiw@mail.gmail.com>
+Subject: Re: [PATCH net-next v12 06/15] p4tc: add P4 data types
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
+	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
+	Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, tomasz.osinski@intel.com, 
+	jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, vladbu@nvidia.com, horms@kernel.org, 
+	khalidm@nvidia.com, toke@redhat.com, daniel@iogearbox.net, 
+	victor@mojatatu.com, pctammela@mojatatu.com, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 28 Feb 2024 22:41:31 +0200, Andy Shevchenko wrote:
-> The check_shl_overflow() uses u64 type that is defined in types.h.
-> Instead of including that header, just switch to use POD type
-> directly.
-> 
-> 
+On Thu, Feb 29, 2024 at 10:09=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> On Sun, 2024-02-25 at 11:54 -0500, Jamal Hadi Salim wrote:
+> > Introduce abstraction that represents P4 data types.
+> > This also introduces the Kconfig and Makefile which later patches use.
+> > Numeric types could be little, host or big endian definitions. The abst=
+raction
+> > also supports defining:
+> >
+> > a) bitstrings using P4 annotations that look like "bit<X>" where X
+> >    is the number of bits defined in a type
+> >
+> > b) bitslices such that one can define in P4 as bit<8>[0-3] and
+> >    bit<16>[4-9]. A 4-bit slice from bits 0-3 and a 6-bit slice from bit=
+s
+> >    4-9 respectively.
+> >
+> > c) speacialized types like dev (which stands for a netdev), key, etc
+> >
+> > Each type has a bitsize, a name (for debugging purposes), an ID and
+> > methods/ops. The P4 types will be used by externs, dynamic actions, pac=
+ket
+> > headers and other parts of P4TC.
+> >
+> > Each type has four ops:
+> >
+> > - validate_p4t: Which validates if a given value of a specific type
+> >   meets valid boundary conditions.
+> >
+> > - create_bitops: Which, given a bitsize, bitstart and bitend allocates =
+and
+> >   returns a mask and a shift value. For example, if we have type
+> >   bit<8>[3-3] meaning bitstart =3D 3 and bitend =3D 3, we'll create a m=
+ask
+> >   which would only give us the fourth bit of a bit8 value, that is, 0x0=
+8.
+> >   Since we are interested in the fourth bit, the bit shift value will b=
+e 3.
+> >   This is also useful if an "irregular" bitsize is used, for example,
+> >   bit24. In that case bitstart =3D 0 and bitend =3D 23. Shift will be 0=
+ and
+> >   the mask will be 0xFFFFFF00 if the machine is big endian.
+> >
+> > - host_read : Which reads the value of a given type and transforms it t=
+o
+> >   host order (if needed)
+> >
+> > - host_write : Which writes a provided host order value and transforms =
+it
+> >   to the type's native order (if needed)
+>
+> The type has a 'print' op, but I can't easily find where such op is
+> used and its role?!?
+>
 
-Applied to for-next/hardening, thanks!
+Thanks for catching that. We'll remove it. It was part of an
+operational debugging patch that was not submitted.
 
-[1/8] overflow: Use POD in check_shl_overflow()
-      https://git.kernel.org/kees/c/4e55a75495b7
+cheers,
+jamal
 
-Take care,
-
--- 
-Kees Cook
-
+> Thanks,
+>
+> Paolo
+>
 
