@@ -1,237 +1,167 @@
-Return-Path: <netdev+bounces-76370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72D4D86D6AF
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 23:15:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A42F86D6C3
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 23:21:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 968641C226C3
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 22:15:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2783D1C22441
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 22:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04126D53E;
-	Thu, 29 Feb 2024 22:15:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11AD574BED;
+	Thu, 29 Feb 2024 22:21:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="e0yP1pzt"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qxscFPzS"
 X-Original-To: netdev@vger.kernel.org
-Received: from omta040.useast.a.cloudfilter.net (omta040.useast.a.cloudfilter.net [44.202.169.39])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2073.outbound.protection.outlook.com [40.107.223.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86BCA6D504
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 22:15:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.39
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709244919; cv=none; b=d1YIG8esWl/q9JM7fmL5/NINJ0Z+Dq1UF9Z3LFkW5LqCm4pykw5eEq4rio8QnQNF3GMohTfQj3tmIu4P+4iJl/nXwd6lTcMttFrVMbh/VvbBFECzqj6roQ9U5vTOkzqh/1tOkZO6RMP8BqEovSZFICtAmbyJwuE3ZvbgY2oPy+s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709244919; c=relaxed/simple;
-	bh=5FSiTuqHmDsjXTZPDXr3lj4oUQySDL+fFiia69OcWH4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AzOpUqEF60MMe8IPJeIsjkrr0qscpOs0ErHNnms8tmP2CwcpWSYEzqRrrvmTLkjohygnWaMnALrH1zX9oSkiKyf2DnMV6lHLD0WAvPIzkqhn4qnB+s2TCMA9LAj+9z9upu/aMxFlsyaNW9IXgbIIFOTjXeg/J8faK/BfkCCfPss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=e0yP1pzt; arc=none smtp.client-ip=44.202.169.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
-Received: from eig-obgw-6007a.ext.cloudfilter.net ([10.0.30.247])
-	by cmsmtp with ESMTPS
-	id fnAgrwOpEl9dRfogOrQHCD; Thu, 29 Feb 2024 22:15:16 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id fogNrVbrbsGJsfogNrMOnk; Thu, 29 Feb 2024 22:15:15 +0000
-X-Authority-Analysis: v=2.4 cv=fI4/34ae c=1 sm=1 tr=0 ts=65e101f3
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=VhncohosazJxI00KdYJ/5A==:17
- a=IkcTkHD0fZMA:10 a=k7vzHIieQBIA:10 a=wYkD_t78qR0A:10 a=cm27Pg_UAAAA:8
- a=VwQbUJbxAAAA:8 a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=20KFwNOVAAAA:8
- a=QyXUC8HyAAAA:8 a=xfJypzPxiScX5pcAhuAA:9 a=QEXdDO2ut3YA:10
- a=xmb-EsYY8bH0VWELuYED:22 a=AjGcO6oz07-iQ99wixmX:22 a=y1Q9-5lHfBjTkpIzbSAN:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=cf1DZ2erRbMxD8JvVLJPv18i9Hg6aww57G4W3t9Oeoc=; b=e0yP1pztbkxkhpcJxYDiCSOm9p
-	fihMzZKmaTkeqIBnkZZupDuJlp5aNCxO2ey9rO97gUBe4WSG8LzztnW4JPppdUM6t1XjnLPbt1CLP
-	bWp+VnMM7SkP+NJpbTAmj6GdeKiGJU69QxgmuFo4zx4EPNUDjrhSXLipqVR7anVOJdv9OOLDjtbDG
-	xu3x7Ww1m0CEEA1WCr5l0lDJxqPh99MM5R7NpSOKYbs4drDgFiWxObM2b2SL8JobMShCccoSZ/rc+
-	iVH/f3WVNC4K9jVImTVChD53aiFwo3zDZfX/oLxl2aD/4xQC8HIhRIX9AZ3/jdrBgBDIMelq8rgX2
-	M8Az3Fzw==;
-Received: from [201.172.172.225] (port=53434 helo=[192.168.15.10])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96.2)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1rfogM-002d6M-1s;
-	Thu, 29 Feb 2024 16:15:14 -0600
-Message-ID: <93cbd0a3-60cf-400f-a05c-f81dc3d8c75d@embeddedor.com>
-Date: Thu, 29 Feb 2024 16:15:12 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A75D6D536;
+	Thu, 29 Feb 2024 22:20:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709245261; cv=fail; b=bu5DdkSlt85VNjLjM6mpe13VDuI6qHGZPUnpGTy5zz+MpLaAHKSTxK7uSpybL7atNNDcvLBm2sqV1ix80Rblmq3jleDoZTDJAcx9YUTByRd9Y4nSmfESo4zvJIYdjPn7kICWSEQOoghvAkpeqLGetfgLpFgDb5QF3MXZvoGmx0g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709245261; c=relaxed/simple;
+	bh=+NMXZqCFScUiNU0DChWSBXhjFKWudht1XD6XNL4BIVc=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 Content-Type:MIME-Version; b=exexA8tDRONWV7JiawVpMyRH6JQfqJddnZL4jfXFAyILAY4WHFcbe2iloPFSp9Yjn+smcIy08u6IwiwBFJ4rJQbdrLRebUSt+azIykg6cl3hU+B3J7BVuDlX84Y1WnRYwne63iWTFpmLlGw+Uke9JDGIZt5ttZeF0PhQykCSm4Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qxscFPzS; arc=fail smtp.client-ip=40.107.223.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HyPgSrsNDxv4avtM38tzWLVqzT/5INldt1z/NFaVoaW8npu+3DwhDtuK5ZE9fjMCH1clFmnDUKqYtkJgwvd6J1+/mdkjK06rT1ph+2XWw3UlO6pwF3Brvhf/vRb5plBHn6vQMY80lsuM5I20jpJWGCkE0Mi4CD0rUXdQ7xwT6+LFfXZkAgj+KWYt/Fg2DPDSo2MqiNsM98SPYvVnAPIi+Awm1moiRnOWGj8O0Vgpbb3k6qZjQ4h4mCbExb/FaiiyZzSPKzV0a+Mss8d0JPXjlB2Z1zBnR7nMPhCE7IC+EEw0xKB1cfODi1sbobDhA5paPyrzw0qi6+LcVjJifGHtiw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FL9xkSJ4A1B8q9yKV+VCVvuuPAsB9sDEDfvrd+906Ew=;
+ b=Zih/8KJTFeUtP313zx9x6g5g2HgEn6Tw+Bb5q/CRaE8/3PJvPmWKO+8VUmhY63h31gC/3wSJBh67PwPxIxkofGuWjlW+ZBaoR9+qRiLcP6CKUUAT1IH9Vge/q2hB50dw6/K9sZP7ubIK/6wHoO0CnYEv9qE6E/aWtM/L9ZKLVCNikdjuCxbi+vKfcMSpDCBS06xq6C0w/VRoKT5jCcMiLV13bSDb6ocfc+HWRUUqub7c5WSLzObp3AbFM8bFQlpLM9Y3WNJB+NmZU7O0iw3k6xsDYc9M9sMpPSn3fH/IU5vIpPSvi7aWC2BTWfFcSaZUJnZN0quzTl4Db7vfOAz1Dg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FL9xkSJ4A1B8q9yKV+VCVvuuPAsB9sDEDfvrd+906Ew=;
+ b=qxscFPzSv9Y6T1/ChxdxjvaQIH1PcmS6vVlHhdby/92WLOFiKWX/5TUFtUAOaperp87A9YCjHbfMpQHlDjxxbhCpkdrm5qoEv9ggvDfqj4FnTd0E7CZ0xhEMuDndNei9BSL2So6YeDPcIuz3j+SZ/ggiMRN7ew+Srn2b2x+QYMPiIS5lUQlz3S+IdKG9ovpb+vuHDvedgCMXqao+oJYPRCYEvGNm/WSSfdtOLHcHKsZIWaoCvcC13KtGtxGKHmbKc+9f8ZP3prid3KbtmoXA2Ng/rKKaPcWC3TaX77dxcbeHI7PIIfTTLzGMHR1ZkZ5/fZdEdLdUWqn4A/wWJFvkbw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+ by DM4PR12MB6543.namprd12.prod.outlook.com (2603:10b6:8:8c::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7316.41; Thu, 29 Feb 2024 22:20:51 +0000
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::459b:b6fe:a74c:5fbf]) by BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::459b:b6fe:a74c:5fbf%6]) with mapi id 15.20.7316.039; Thu, 29 Feb 2024
+ 22:20:51 +0000
+References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
+ <20240223192658.45893-2-rrameshbabu@nvidia.com>
+ <20240228180520.5cea0f8b@kernel.org>
+User-agent: mu4e 1.10.8; emacs 28.2
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Saeed Mahameed <saeed@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Richard Cochran <richardcochran@gmail.com>, Tariq Toukan
+ <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Ahmed Zaki <ahmed.zaki@intel.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Hangbin Liu <liuhangbin@gmail.com>, Paul
+  Greenwalt <paul.greenwalt@intel.com>, Justin Stitt
+ <justinstitt@google.com>, Randy Dunlap <rdunlap@infradead.org>, Maxime
+  Chevallier <maxime.chevallier@bootlin.com>, Kory Maincent
+ <kory.maincent@bootlin.com>, Wojciech Drewek <wojciech.drewek@intel.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Jiri Pirko <jiri@resnulli.us>,
+ Jacob Keller <jacob.e.keller@intel.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Dragos
+  Tatulea <dtatulea@nvidia.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v1 1/6] ethtool: add interface to read Tx
+ hardware timestamping statistics
+Date: Thu, 29 Feb 2024 14:20:12 -0800
+In-reply-to: <20240228180520.5cea0f8b@kernel.org>
+Message-ID: <87ttlqx67z.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR03CA0274.namprd03.prod.outlook.com
+ (2603:10b6:a03:39e::9) To BYAPR12MB2743.namprd12.prod.outlook.com
+ (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] netdev: Use flexible array for trailing private bytes
-Content-Language: en-US
-To: Kees Cook <keescook@chromium.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>, netdev@vger.kernel.org,
- linux-hardening@vger.kernel.org, Simon Horman <horms@kernel.org>,
- Jiri Pirko <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>,
- Coco Li <lixiaoyan@google.com>, Amritha Nambiar <amritha.nambiar@intel.com>,
- linux-kernel@vger.kernel.org
-References: <20240229213018.work.556-kees@kernel.org>
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <20240229213018.work.556-kees@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 201.172.172.225
-X-Source-L: No
-X-Exim-ID: 1rfogM-002d6M-1s
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.15.10]) [201.172.172.225]:53434
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 8
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfMK5bS4+AiPrjaX1ori8CYyWs7tcUjiirHHEkyzN9GVx3/UD5sY1uFoDgu0nJmxhOS9zVAQcf17v862cYBEZ1EtrX9SHCqqvfYrsZfUI1mm79z1QFHk3
- Aya1dB1PuIAk1iBJokDZ0Z50yJuvuweYjdEHfyeGt78G6PnqVA3WNHflyRZocArEFeeK2AnlfjD6kXM9lnKw8SuX7g9ii3a/1jo=
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|DM4PR12MB6543:EE_
+X-MS-Office365-Filtering-Correlation-Id: 05eb0a8c-1659-448e-c475-08dc3974afcd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	uo0rDqXFIj1PPuwvTSr1QHGuKjzhwAg49CcVr3rVG+erddbeUHmj/81abIgsU4QPqqjo5DzmRLukEjszgZgue7aRaSr/4OMW8VdgR2UFa9Ch9IhOlvrzk8C2WVUI1hDlAlwAVI9la9ERQReir2bz6aCqq8PCMPACJEbMdv9aAkrT/OIoWM8he+M5U4jcudbNNix7MTZ3yUB8Gm6Lf/kZHTRoVadwK/RlvNCXEa0uHPAMo+nku3pE73q1ovhUD+ljtFk6Odt9E+iq/LDOmKGNdv8JUN6oAdERZgqCwzJ3FxESph4x2aJ743ZiOlXXi1kQgUR8F+x+SzhcvcS3GKWOC3ohDebHFsjXFkmnHjZzZ28S7psMx/Y5LKwA3HEEmpLOCxqMYoJJgNhyuJypI6avw2HK2E//GNaGY4w8iFO15VWlZpJk4kj9+d38jb4dFTe4CVegS8yqVo1aLZGKhVaZIndseOlXkcxp9BXzb0JTitJwFkP/AIR2ptacOHGgGU2VaC72PbPbUIYe9L1x7uDlE7xDzSuKpnpDRUs0DQdHqbsp2+gdmAalr2Z8BvNwXB0tl4XXRn7L48bHOpAa2CKpGcQoLk/jkdismMzNsJd+kALQYM/iBvf3+5HtJHVVAODu
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Gm+H22eaIN0oqYEg/9qa6Ia1WsHk9gGqv3kegjj2RE3DzxcmphoLQ63bJSRJ?=
+ =?us-ascii?Q?RL91+jL8TlBpUTgA8wLEZwproqin633L236qN+RGPdG66xVCsTHfRWvwMjqW?=
+ =?us-ascii?Q?psgXNKT4RT+0IrqR7NA9Nt77cm6Vy3CKZVXctkvMM1A19NIYQdkCFBDZNcYJ?=
+ =?us-ascii?Q?IYlDKrVWPAmZWgWPAbVgR47IYsG3wkb7kYeAndDVIVg+crX4kFfaJ51cyaxQ?=
+ =?us-ascii?Q?Q04XA/oHiBAHn7p8ko82JtPReIHoRm8xftKzHlfBZOIrs0+rWp2ww2nsS6+z?=
+ =?us-ascii?Q?Tga316QVRgziNqHq8RCdSJKc/HsP1oCH2lEJ8vY0kfN1jnhVRuvmstQ+oHof?=
+ =?us-ascii?Q?Y44DB5oih2G2scANLGYNKvxLmU34aZISgeV5e4iDGbqfiBRQPV4pd9TZeR4a?=
+ =?us-ascii?Q?gqIOQ9D5L3DTYVqnaqmC/951t0VMuIjK8402+JOjGfqO35g7zoXXvHirB1iI?=
+ =?us-ascii?Q?9VTWne8M5YeO4J0eeikgsHfDaUQcogSlocouKeh5PPiC56hHSIqoMncQXmLr?=
+ =?us-ascii?Q?mwC023P9c8pGobDuhRZMB23Cu9D3xzRaBU889TzShKT8JgjwBUBtMm9SGl76?=
+ =?us-ascii?Q?UgcMzXTbLCNYOF11MRJ/ynTNK14BcEhykZ+ZeC6QXUf1KS+M5M7PTUdEIgOt?=
+ =?us-ascii?Q?FXBvUUVQBQyGded1USnJAowVBNDD1Y9XJ8SHxGg7gSbvvLoO55xlfEO0oOf7?=
+ =?us-ascii?Q?NDeZH4KwYWyeRyw/ME9kk3JSmECQIPS0HXq9UPnhvAcloLCahdxVzWvS1hTS?=
+ =?us-ascii?Q?rIeRypxoNbXiaJXUvtJxLxFWHDvNtpPmU207fzlofFNwjqvaZR4yzZ/xNafY?=
+ =?us-ascii?Q?wgJGhLipDpOS7/JFEGkWH5iXgDbq39X/OwJWCRnGCCJpLtAwbbOESXyTG0N+?=
+ =?us-ascii?Q?++KzIEbRlckm5kBYxCoEX2FAQ8X3wJ5l1AQ2utoOPXvQeOMEETD/dCI9tous?=
+ =?us-ascii?Q?8p+Fu1m4tUmT7sQ1v+VvxzpeOzyilahRt3MND6Ldp4D6+Ki7MpSDmnDPWkUK?=
+ =?us-ascii?Q?i5NlBHWj/pWiQe12zFWDQYajqbbwgWc97yleZS1wVVHbTH/7hTqs9qPevGdT?=
+ =?us-ascii?Q?MFKFferxoQZ0XITPC8m24VAfMU5WEWQWQWdfgZG4kqwRL7lmz37df0QOxR9y?=
+ =?us-ascii?Q?O+STWuas/Tfa6FMxUnC5SpZ+acVqadXF7X1cLqVgjhimUkxskbmQHrha8Nkg?=
+ =?us-ascii?Q?EjRMRt3kiN6dCb01VSNqNxWo35GYnonBhGnRSWOmKhdhZ78vL4F5+CNGIXvU?=
+ =?us-ascii?Q?NT/49v68pDyPRPj9vUFgVth+9Sov62d9luiIiogDMMePj2oPUf00a5JoiwQA?=
+ =?us-ascii?Q?Q9ZSl8uxW8GLm4CGSsnAS2S2KcKTKGJddWafuXOZeFdh0km+nXgwgrxUjw1x?=
+ =?us-ascii?Q?gkbHxZIzGoxMlEBpAU+K8U77YE16pS60dcUFSaKSUN5VidR+d50c0aS/0V75?=
+ =?us-ascii?Q?2cCUbmgnmFuMSA8oED2btgeU7cC6+3xcwc34IrV4tB2Q/ioJisSFrg7XAqZ0?=
+ =?us-ascii?Q?fiCavyeAVHFmELba/V6r+HJmron236qiy447ZHmKItKbzxS0obdtDBDGngjb?=
+ =?us-ascii?Q?Ku6EgHXgf+1ZnbwBf5QAWoatV2yn4a3gpfgg78vPrCyz480cAEOLK1mA5vLU?=
+ =?us-ascii?Q?kQ=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 05eb0a8c-1659-448e-c475-08dc3974afcd
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Feb 2024 22:20:50.9580
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: b26g+M2FYsNCr3rgrkTDE22oDrvRQJWgpImOxQsBPjA/YTk/R8438DDX1FjiZJRjmXKvPQKqorDbzFmgKnB9tg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6543
 
 
+On Wed, 28 Feb, 2024 18:05:20 -0800 Jakub Kicinski <kuba@kernel.org> wrote:
+> On Fri, 23 Feb 2024 11:24:45 -0800 Rahul Rameshbabu wrote:
+>> +/**
+>> + * struct ethtool_ts_stats - HW timestamping statistics
+>> + * @layer: input field denoting whether stats should be queried from the DMA or
+>> + *        PHY timestamping layer. Defaults to the active layer for packet
+>> + *        timestamping.
+>
+> I think we're better off attaching this to an existing message in the
+> dump (using ETHTOOL_FLAG_STATS / ethtool -I), like we do for pause, 
+> fec, etc., rather than having to build a separate hierarchy and copy
+> identifiers within ETHTOOL_MSG_STATS_GET.
+>
+> Sorry if I mis-directed you this way.
 
-On 2/29/24 15:30, Kees Cook wrote:
-> Introduce a new struct net_device_priv that contains struct net_device
-> but also accounts for the commonly trailing bytes through the "size" and
-> "data" members. As many dummy struct net_device instances exist still,
-> it is non-trivial to but this flexible array inside struct net_device
-> itself. But we can add a sanity check in netdev_priv() to catch any
-> attempts to access the private data of a dummy struct.
-> 
-> Adjust allocation logic to use the new full structure.
-> 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-
-Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-[for the flex `struct net_device_priv`, `struct_size()`, `__counted_by()`,
-and the use of `container_of()` to retrieve a pointer to the flex struct
-and return pointer to flex-array member `data` in `netdev_priv()`]
-
-Thanks
---
-Gustavo
-
-> ---
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-> Cc: netdev@vger.kernel.org
-> Cc: linux-hardening@vger.kernel.org
-> ---
->   include/linux/netdevice.h | 21 ++++++++++++++++++---
->   net/core/dev.c            | 12 ++++--------
->   2 files changed, 22 insertions(+), 11 deletions(-)
-> 
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 118c40258d07..b476809d0bae 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -1815,6 +1815,8 @@ enum netdev_stat_type {
->   	NETDEV_PCPU_STAT_DSTATS, /* struct pcpu_dstats */
->   };
->   
-> +#define	NETDEV_ALIGN		32
-> +
->   /**
->    *	struct net_device - The DEVICE structure.
->    *
-> @@ -2476,6 +2478,14 @@ struct net_device {
->   	struct hlist_head	page_pools;
->   #endif
->   };
-> +
-> +struct net_device_priv {
-> +	struct net_device	dev;
-> +	u32			size;
-> +	u8			data[] __counted_by(size)
-> +				       __aligned(NETDEV_ALIGN);
-> +};
-> +
->   #define to_net_dev(d) container_of(d, struct net_device, dev)
->   
->   /*
-> @@ -2496,8 +2506,6 @@ static inline bool netif_elide_gro(const struct net_device *dev)
->   	return false;
->   }
->   
-> -#define	NETDEV_ALIGN		32
-> -
->   static inline
->   int netdev_get_prio_tc_map(const struct net_device *dev, u32 prio)
->   {
-> @@ -2665,7 +2673,14 @@ void dev_net_set(struct net_device *dev, struct net *net)
->    */
->   static inline void *netdev_priv(const struct net_device *dev)
->   {
-> -	return (char *)dev + ALIGN(sizeof(struct net_device), NETDEV_ALIGN);
-> +	struct net_device_priv *priv;
-> +
-> +	/* Dummy struct net_device have no trailing data. */
-> +	if (WARN_ON_ONCE(dev->reg_state == NETREG_DUMMY))
-> +		return NULL;
-> +
-> +	priv = container_of(dev, struct net_device_priv, dev);
-> +	return (u8 *)priv->data;
->   }
->   
->   /* Set the sysfs physical device reference for the network logical device
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index cb2dab0feee0..0fcaf6ae8486 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -10800,7 +10800,7 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
->   {
->   	struct net_device *dev;
->   	unsigned int alloc_size;
-> -	struct net_device *p;
-> +	struct net_device_priv *p;
->   
->   	BUG_ON(strlen(name) >= sizeof(dev->name));
->   
-> @@ -10814,20 +10814,16 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
->   		return NULL;
->   	}
->   
-> -	alloc_size = sizeof(struct net_device);
-> -	if (sizeof_priv) {
-> -		/* ensure 32-byte alignment of private area */
-> -		alloc_size = ALIGN(alloc_size, NETDEV_ALIGN);
-> -		alloc_size += sizeof_priv;
-> -	}
-> +	alloc_size = struct_size(p, data, sizeof_priv);
->   	/* ensure 32-byte alignment of whole construct */
->   	alloc_size += NETDEV_ALIGN - 1;
->   
->   	p = kvzalloc(alloc_size, GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFAIL);
->   	if (!p)
->   		return NULL;
-> +	p->size = sizeof_priv;
->   
-> -	dev = PTR_ALIGN(p, NETDEV_ALIGN);
-> +	dev = &PTR_ALIGN(p, NETDEV_ALIGN)->dev;
->   	dev->padded = (char *)dev - (char *)p;
->   
->   	ref_tracker_dir_init(&dev->refcnt_tracker, 128, name);
+No worries. I can do that in my v2.
 
