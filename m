@@ -1,60 +1,59 @@
-Return-Path: <netdev+bounces-76265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBEF686D0AA
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:31:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC6D386D0B1
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:32:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CAF1B2508F
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:31:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 673FE1F212D0
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 752786CC0A;
-	Thu, 29 Feb 2024 17:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A29970AC9;
+	Thu, 29 Feb 2024 17:32:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CnwAUUS3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KfpzfVLc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51DBF6CC02
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 17:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90DB6CBF3
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 17:32:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709227856; cv=none; b=rCadXWzfVeJbyDnbO1MLXzVYVi+LDuMiIc1AjTpIPW4MpFqrDXfrH3Ri4YcYaip2elIsxLZ9yWDAii8kjGYgdwsVQVttLWUtlc54EKJUjch7sm7HMFb4rj6jmcVipVO1NttpG5FHX09k9H8gOTnIPLWeqrzt/NwMacgqQGPoleM=
+	t=1709227940; cv=none; b=fy9wvH24ZmPqaHdBG9Z7J9blHC839KdCpGYMEoMT2pSoLlUl8TnfZwdJ1ofTG3vF/NkwUe459I9dyCEHqFncOmNtW2lmEdzsV2+GK4ghIzExurrqtl8yMSLpR3ZsZUb9Xv+pO899dGmgwYJfLA954qCnAqGJKGY6fxP0MIIyMug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709227856; c=relaxed/simple;
-	bh=G7v78iLu3i6MjA2J/u2To+nA+Q0OZPSFGund0Z5H1m0=;
+	s=arc-20240116; t=1709227940; c=relaxed/simple;
+	bh=6LGlImUK7rSKYWRoGsL/pBddKtG8DXuDhDX5LCAQHFw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MGn3+hDIFMgLf+rZrofOQMOWnujaHL7pvBT5tMS+It3wYg0UONYoK6h+Ey3b7fsUtkkwRZtB5u2qlWl2mpjj2oaWH2ZrxZnr7SZox9JtTx7B3wwmMKp7eZVb6csUyKaLyYddzrE/unSpmgnb72RN5TJZqmRlsHAl+YP9b/lcvBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CnwAUUS3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72AABC433C7;
-	Thu, 29 Feb 2024 17:30:55 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Lyik8NZ1OIpPp0OOcGRebnGX6zNHSm4AEE6cmqEPHwlAN5iwn9E+CX5pbSg9aZJQcjBqzdPRkFxZO/MTUsdYUntvnjQ7YkHos2xH040iOZ029WnHt11PkpLQH5JeJLLnhsMbihSJb3zOD1ju0c+l1NF96/SHL2Ygqzt3jKBbzoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KfpzfVLc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EABC9C433F1;
+	Thu, 29 Feb 2024 17:32:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709227855;
-	bh=G7v78iLu3i6MjA2J/u2To+nA+Q0OZPSFGund0Z5H1m0=;
+	s=k20201202; t=1709227940;
+	bh=6LGlImUK7rSKYWRoGsL/pBddKtG8DXuDhDX5LCAQHFw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CnwAUUS3XLlT5BwMYksV4I3lGAO7+LAXSLuexo+zWKBbp8hVpZBN6bLCPjg7cFKay
-	 aTOHbRu7KEiLfJ8HCkBdHdZ0O04PsuaY7MZ7kzt9NG3TUtbpGdOmJE5a+v/YUsPEfx
-	 jjHxgjkCIF30+0RUxmt9/PBDNVsMj4Oq2wRXZ661vedJ/SV3SeMp6/5L/NqoHym7XX
-	 rBgRwft2S83QQcWS1GjuAfbSFHHDpdueIcPsMqoqvzHausijJ8P9wWAJgESdg+uZtR
-	 GccXp3w+L4b3cij+eVSIYUq4mnX2wFMAB9rUHOJQc5CjF4TZfeTr3KLzxpZm3V/i8p
-	 R7k1RqL3xVF1w==
-Date: Thu, 29 Feb 2024 09:30:54 -0800
+	b=KfpzfVLc3zNF3jBMVnTsJ/oGW0qRnnzYQc5ahB4WtE8VdaF2Rql0PV5Q9YcG0hxy9
+	 M9XlKb+unOTgqEl8AEKPTFem+7Tuyu/s42IIwbqbwhqOIdsNQNQBpfAZZ973ys/adE
+	 XgJgRgQwjA3DwKeyMKqpaOcT6AT3hZQD8W+ZvOi/I5fS82h85nYyK6LvjQBFlC3Uha
+	 X9eMNqdImlbjK5z6osA+aKW4fiVm9Jej26lFDa66XqohE9hLsiJidUnGrOOJgklsJf
+	 v2BDNIJ/gogrxiuLjJwZkIjKtT5NPgzwNsxBNydAUlw0fBsEuW+1P4JDOMbbNvJIvY
+	 f0ravbQ5tN5Zg==
+Date: Thu, 29 Feb 2024 09:32:19 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net,
- netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
- richardcochran@gmail.com
-Subject: Re: [PATCH net-next 1/2] bnxt_en: Introduce devlink runtime driver
- param to set ptp tx timeout
-Message-ID: <20240229093054.0bd96a27@kernel.org>
-In-Reply-To: <ZeC61UannrX8sWDk@nanopsycho>
-References: <20240229070202.107488-1-michael.chan@broadcom.com>
-	<20240229070202.107488-2-michael.chan@broadcom.com>
-	<ZeC61UannrX8sWDk@nanopsycho>
+To: Aurelien Aptel <aaptel@nvidia.com>
+Cc: linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
+ sagi@grimberg.me, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
+ chaitanyak@nvidia.com, davem@davemloft.net, aurelien.aptel@gmail.com,
+ smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
+ yorayz@nvidia.com, borisp@nvidia.com, galshalom@nvidia.com,
+ mgurtovoy@nvidia.com, edumazet@google.com
+Subject: Re: [PATCH v23 00/20] nvme-tcp receive offloads
+Message-ID: <20240229093219.66d69339@kernel.org>
+In-Reply-To: <20240228125733.299384-1-aaptel@nvidia.com>
+References: <20240228125733.299384-1-aaptel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,26 +63,9 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 29 Feb 2024 18:11:49 +0100 Jiri Pirko wrote:
-> Idk. This does not look sane to me at all. Will we have custom knobs to
-> change timeout for arbitrary FW commands as this as a common thing?
-> Driver is the one to take care of timeouts of FW gracefully, he should
-> know the FW, not the user. Therefore exposing user knobs like this
-> sounds pure wrong to me.
-> 
-> nack for adding this to devlink.
+On Wed, 28 Feb 2024 12:57:13 +0000 Aurelien Aptel wrote:
+> The next iteration of our nvme-tcp receive offload series.
 
-+1
-
-BTW why is the documentation in a different patch that the param :(
-
-> If this is some maybe-to-be-common ptp thing, can that be done as part
-> of ptp api perhaps?
-
-Perhaps, but also I think it's fairly impractical. Specialized users may
-be able to tune this, but in DC environment PTP is handled at the host
-level, and the applications come and go. So all the poor admin can do
-is set this to the max value. While in the driver you can actually try
-to be a bit more intelligent. Expecting the user to tune this strikes me
-as trying to take the easy way out..
+drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp.c:1017:8-122: WARNING avoid newline at end of message in NL_SET_ERR_MSG_MOD
+drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp.c:1023:8-109: WARNING avoid newline at end of message in NL_SET_ERR_MSG_MOD
 
