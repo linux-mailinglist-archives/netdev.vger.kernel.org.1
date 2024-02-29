@@ -1,57 +1,65 @@
-Return-Path: <netdev+bounces-76336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8224A86D522
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 21:56:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3303486D534
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 21:57:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9E7FB26F08
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:56:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9075B27319
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:57:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F055915175A;
-	Thu, 29 Feb 2024 20:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B025165917;
+	Thu, 29 Feb 2024 20:41:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y1p6va8C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OndRqQVv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B1415175B;
-	Thu, 29 Feb 2024 20:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7A1165911;
+	Thu, 29 Feb 2024 20:41:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709239268; cv=none; b=InIxYspycdEAVZMPGIMAgkYPE2bAbZszndSZv9q3afyNkhfDe1QCjEU3h5jX4DiM8wq8G9IXUukHE1zHwV9SQz3TrUDY5xRrRK7auoQiha3LP5o/2gyE74EUOzADDWnx5gDLu/zw07ZcBnO4rTTSjv+ka7f0nblmWVH6+SjLcs8=
+	t=1709239279; cv=none; b=V/dN54QJPwsIn83Lpb/QMKobjDfNivnwtiqSmI3mPhyxMsIMGhPtect1xPrl4lIyIzQa3/JHmP+Hg+cZs5j2i9W/K7z4Ya4dXCwVE5AWx4dAgVcGE0cwo0Q95wq4x4rVJ0zDq3i2cXj1QHuX1ontoVbcRkENxyWRsZdP1oSE4zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709239268; c=relaxed/simple;
-	bh=Kv3JJ0pr7qHUanEQPnFTgZ/Sh7YwzAqjHxcRFJQZKTU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PLJLRf2ZOT1OCXS6jUQHK/aY/TCJRwRBkhTPmrrTe5dkh5zMyoSmhyo9yx7zzgAtBaMhLKYrdPhkq6jBtkZncli2n9/oshflur9o4Wp/IQt1q/EgZumm+8H5JXonVSjrUirNINuzsC6w5quHEnVFgTOiBCJHe29+53hWa8W11Xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y1p6va8C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77AE2C43394;
-	Thu, 29 Feb 2024 20:41:07 +0000 (UTC)
+	s=arc-20240116; t=1709239279; c=relaxed/simple;
+	bh=+L8wkVGdqLlELuYmKWeEuKakPfIif0WoiIE0dd9miA8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XbmKrrYRJzQstp3UTX/6cXKhiyN/BOkuxoB/rYIMtNhkWT9LTF5wHMPg34KXLZjCYHtsCQqYf54DQqwvvmNGKaTt4i6g7VdvDXKYQhNtq4OrYfKV0J0HKOJu8FN14fGTC7xuVpirjhM3+CoS+/Kj9aRr0GKKEdb0quV6KnIsp5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OndRqQVv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE65EC43399;
+	Thu, 29 Feb 2024 20:41:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709239268;
-	bh=Kv3JJ0pr7qHUanEQPnFTgZ/Sh7YwzAqjHxcRFJQZKTU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Y1p6va8CsdwcnO8Mi5aGsoKtw1ZirJfbCqqpSPDf6jAXo8NoX450I4BV5eBH/J0oD
-	 btLe++Mrox8vWjQFgkxJPrJiIiFEhWkMen7pPrIKJuwTTdZp0dANFrpdG0j7V2ER3d
-	 vmEObjWtEdQdXmQtSxhApy4IubslSU+u0VRLCT36afdAvwjIIcsDY8532xYpcc33tR
-	 tgKMyh8AJoTSJ1OE0GxQP7kiFtzTaI6SnZ10s7zeJTpSCnGLooD4xQvUq3kWmFydyQ
-	 8cc8cIb9l+0fsH8B4o8lNNE8vOV642awaANtu+eNdrFNEK1r/RQHF0dkFVyJ396KjX
-	 +WczOs7U4NDrQ==
+	s=k20201202; t=1709239279;
+	bh=+L8wkVGdqLlELuYmKWeEuKakPfIif0WoiIE0dd9miA8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=OndRqQVvlze3x1yuDANXwUWxTwq6IFtU6SXWL/ECRq1h9VVGuzQLwWWszlAjBoYRA
+	 qLS9BNjVfaoTMB4rF3Xu8uILPeOd3v9m95RAUs/+ZJo5LKm2aqhfR1BfTYgJDsFlXR
+	 YISNRR0C8R5JCGQ9FnbEH6NA70TyhLSsl+5JVwob1Q7C7jBXHcUdveDq3bFwkfhY1d
+	 gix2PYvAnMrhI8K8HlNpSD38JhT5snQ0CQjF9nH84VEu6nTXUPdvLKo3q1dTO5faPS
+	 vFAcVz6fQSVBDBzuHwEaHt38dosY2FqG/DJIMSQvRhjPcFplHGYSu9i8+tX79zxczF
+	 69105rmcztyzQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Leon Romanovsky <leonro@nvidia.com>,
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+	Alexandra Winter <wintera@linux.ibm.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	saeedm@nvidia.com,
-	linux-rdma@vger.kernel.org,
+	twinkler@linux.ibm.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-s390@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 1/9] RDMA/mlx5: Fix fortify source warning while accessing Eth segment
-Date: Thu, 29 Feb 2024 15:40:57 -0500
-Message-ID: <20240229204107.2861780-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 6/9] net/iucv: fix the allocation size of iucv_path_table array
+Date: Thu, 29 Feb 2024 15:41:02 -0500
+Message-ID: <20240229204107.2861780-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240229204107.2861780-1-sashal@kernel.org>
+References: <20240229204107.2861780-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,129 +71,44 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.15.149
 Content-Transfer-Encoding: 8bit
 
-From: Leon Romanovsky <leonro@nvidia.com>
+From: Alexander Gordeev <agordeev@linux.ibm.com>
 
-[ Upstream commit 4d5e86a56615cc387d21c629f9af8fb0e958d350 ]
+[ Upstream commit b4ea9b6a18ebf7f9f3a7a60f82e925186978cfcf ]
 
- ------------[ cut here ]------------
- memcpy: detected field-spanning write (size 56) of single field "eseg->inline_hdr.start" at /var/lib/dkms/mlnx-ofed-kernel/5.8/build/drivers/infiniband/hw/mlx5/wr.c:131 (size 2)
- WARNING: CPU: 0 PID: 293779 at /var/lib/dkms/mlnx-ofed-kernel/5.8/build/drivers/infiniband/hw/mlx5/wr.c:131 mlx5_ib_post_send+0x191b/0x1a60 [mlx5_ib]
- Modules linked in: 8021q garp mrp stp llc rdma_ucm(OE) rdma_cm(OE) iw_cm(OE) ib_ipoib(OE) ib_cm(OE) ib_umad(OE) mlx5_ib(OE) ib_uverbs(OE) ib_core(OE) mlx5_core(OE) pci_hyperv_intf mlxdevm(OE) mlx_compat(OE) tls mlxfw(OE) psample nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip_set nf_tables libcrc32c nfnetlink mst_pciconf(OE) knem(OE) vfio_pci vfio_pci_core vfio_iommu_type1 vfio iommufd irqbypass cuse nfsv3 nfs fscache netfs xfrm_user xfrm_algo ipmi_devintf ipmi_msghandler binfmt_misc crct10dif_pclmul crc32_pclmul polyval_clmulni polyval_generic ghash_clmulni_intel sha512_ssse3 snd_pcsp aesni_intel crypto_simd cryptd snd_pcm snd_timer joydev snd soundcore input_leds serio_raw evbug nfsd auth_rpcgss nfs_acl lockd grace sch_fq_codel sunrpc drm efi_pstore ip_tables x_tables autofs4 psmouse virtio_net net_failover failover floppy
-  [last unloaded: mlx_compat(OE)]
- CPU: 0 PID: 293779 Comm: ssh Tainted: G           OE      6.2.0-32-generic #32~22.04.1-Ubuntu
- Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
- RIP: 0010:mlx5_ib_post_send+0x191b/0x1a60 [mlx5_ib]
- Code: 0c 01 00 a8 01 75 25 48 8b 75 a0 b9 02 00 00 00 48 c7 c2 10 5b fd c0 48 c7 c7 80 5b fd c0 c6 05 57 0c 03 00 01 e8 95 4d 93 da <0f> 0b 44 8b 4d b0 4c 8b 45 c8 48 8b 4d c0 e9 49 fb ff ff 41 0f b7
- RSP: 0018:ffffb5b48478b570 EFLAGS: 00010046
- RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
- RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
- RBP: ffffb5b48478b628 R08: 0000000000000000 R09: 0000000000000000
- R10: 0000000000000000 R11: 0000000000000000 R12: ffffb5b48478b5e8
- R13: ffff963a3c609b5e R14: ffff9639c3fbd800 R15: ffffb5b480475a80
- FS:  00007fc03b444c80(0000) GS:ffff963a3dc00000(0000) knlGS:0000000000000000
- CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
- CR2: 0000556f46bdf000 CR3: 0000000006ac6003 CR4: 00000000003706f0
- DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
- DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
- Call Trace:
-  <TASK>
-  ? show_regs+0x72/0x90
-  ? mlx5_ib_post_send+0x191b/0x1a60 [mlx5_ib]
-  ? __warn+0x8d/0x160
-  ? mlx5_ib_post_send+0x191b/0x1a60 [mlx5_ib]
-  ? report_bug+0x1bb/0x1d0
-  ? handle_bug+0x46/0x90
-  ? exc_invalid_op+0x19/0x80
-  ? asm_exc_invalid_op+0x1b/0x20
-  ? mlx5_ib_post_send+0x191b/0x1a60 [mlx5_ib]
-  mlx5_ib_post_send_nodrain+0xb/0x20 [mlx5_ib]
-  ipoib_send+0x2ec/0x770 [ib_ipoib]
-  ipoib_start_xmit+0x5a0/0x770 [ib_ipoib]
-  dev_hard_start_xmit+0x8e/0x1e0
-  ? validate_xmit_skb_list+0x4d/0x80
-  sch_direct_xmit+0x116/0x3a0
-  __dev_xmit_skb+0x1fd/0x580
-  __dev_queue_xmit+0x284/0x6b0
-  ? _raw_spin_unlock_irq+0xe/0x50
-  ? __flush_work.isra.0+0x20d/0x370
-  ? push_pseudo_header+0x17/0x40 [ib_ipoib]
-  neigh_connected_output+0xcd/0x110
-  ip_finish_output2+0x179/0x480
-  ? __smp_call_single_queue+0x61/0xa0
-  __ip_finish_output+0xc3/0x190
-  ip_finish_output+0x2e/0xf0
-  ip_output+0x78/0x110
-  ? __pfx_ip_finish_output+0x10/0x10
-  ip_local_out+0x64/0x70
-  __ip_queue_xmit+0x18a/0x460
-  ip_queue_xmit+0x15/0x30
-  __tcp_transmit_skb+0x914/0x9c0
-  tcp_write_xmit+0x334/0x8d0
-  tcp_push_one+0x3c/0x60
-  tcp_sendmsg_locked+0x2e1/0xac0
-  tcp_sendmsg+0x2d/0x50
-  inet_sendmsg+0x43/0x90
-  sock_sendmsg+0x68/0x80
-  sock_write_iter+0x93/0x100
-  vfs_write+0x326/0x3c0
-  ksys_write+0xbd/0xf0
-  ? do_syscall_64+0x69/0x90
-  __x64_sys_write+0x19/0x30
-  do_syscall_64+0x59/0x90
-  ? do_user_addr_fault+0x1d0/0x640
-  ? exit_to_user_mode_prepare+0x3b/0xd0
-  ? irqentry_exit_to_user_mode+0x9/0x20
-  ? irqentry_exit+0x43/0x50
-  ? exc_page_fault+0x92/0x1b0
-  entry_SYSCALL_64_after_hwframe+0x72/0xdc
- RIP: 0033:0x7fc03ad14a37
- Code: 10 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
- RSP: 002b:00007ffdf8697fe8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
- RAX: ffffffffffffffda RBX: 0000000000008024 RCX: 00007fc03ad14a37
- RDX: 0000000000008024 RSI: 0000556f46bd8270 RDI: 0000000000000003
- RBP: 0000556f46bb1800 R08: 0000000000007fe3 R09: 0000000000000000
- R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
- R13: 0000556f46bc66b0 R14: 000000000000000a R15: 0000556f46bb2f50
-  </TASK>
- ---[ end trace 0000000000000000 ]---
+iucv_path_table is a dynamically allocated array of pointers to
+struct iucv_path items. Yet, its size is calculated as if it was
+an array of struct iucv_path items.
 
-Link: https://lore.kernel.org/r/8228ad34bd1a25047586270f7b1fb4ddcd046282.1706433934.git.leon@kernel.org
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Alexander Gordeev <agordeev@linux.ibm.com>
+Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/infiniband/hw/mlx5/wr.c | 2 +-
- include/linux/mlx5/qp.h         | 5 ++++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ net/iucv/iucv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/infiniband/hw/mlx5/wr.c b/drivers/infiniband/hw/mlx5/wr.c
-index 8841620af82f1..b81d282fb0d52 100644
---- a/drivers/infiniband/hw/mlx5/wr.c
-+++ b/drivers/infiniband/hw/mlx5/wr.c
-@@ -128,7 +128,7 @@ static void set_eth_seg(const struct ib_send_wr *wr, struct mlx5_ib_qp *qp,
- 		 */
- 		copysz = min_t(u64, *cur_edge - (void *)eseg->inline_hdr.start,
- 			       left);
--		memcpy(eseg->inline_hdr.start, pdata, copysz);
-+		memcpy(eseg->inline_hdr.data, pdata, copysz);
- 		stride = ALIGN(sizeof(struct mlx5_wqe_eth_seg) -
- 			       sizeof(eseg->inline_hdr.start) + copysz, 16);
- 		*size += stride / 16;
-diff --git a/include/linux/mlx5/qp.h b/include/linux/mlx5/qp.h
-index 61e48d459b23c..693d758f2f1c9 100644
---- a/include/linux/mlx5/qp.h
-+++ b/include/linux/mlx5/qp.h
-@@ -261,7 +261,10 @@ struct mlx5_wqe_eth_seg {
- 	union {
- 		struct {
- 			__be16 sz;
--			u8     start[2];
-+			union {
-+				u8     start[2];
-+				DECLARE_FLEX_ARRAY(u8, data);
-+			};
- 		} inline_hdr;
- 		struct {
- 			__be16 type;
+diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
+index 8efc369934fc7..68edefed79f16 100644
+--- a/net/iucv/iucv.c
++++ b/net/iucv/iucv.c
+@@ -156,7 +156,7 @@ static char iucv_error_pathid[16] = "INVALID PATHID";
+ static LIST_HEAD(iucv_handler_list);
+ 
+ /*
+- * iucv_path_table: an array of iucv_path structures.
++ * iucv_path_table: array of pointers to iucv_path structures.
+  */
+ static struct iucv_path **iucv_path_table;
+ static unsigned long iucv_max_pathid;
+@@ -544,7 +544,7 @@ static int iucv_enable(void)
+ 
+ 	cpus_read_lock();
+ 	rc = -ENOMEM;
+-	alloc_size = iucv_max_pathid * sizeof(struct iucv_path);
++	alloc_size = iucv_max_pathid * sizeof(*iucv_path_table);
+ 	iucv_path_table = kzalloc(alloc_size, GFP_KERNEL);
+ 	if (!iucv_path_table)
+ 		goto out;
 -- 
 2.43.0
 
