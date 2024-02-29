@@ -1,147 +1,107 @@
-Return-Path: <netdev+bounces-76058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F45886C284
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 08:30:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1D7486C294
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 08:32:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFC201C2194A
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 07:30:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5137BB2974A
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 07:32:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC3FD44C7B;
-	Thu, 29 Feb 2024 07:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5F345BE9;
+	Thu, 29 Feb 2024 07:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XZ2Px/DE"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VBmtnGys"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B2644C67;
-	Thu, 29 Feb 2024 07:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661E844C8C;
+	Thu, 29 Feb 2024 07:32:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709191837; cv=none; b=S1unKXtLxeX3tzl/1czwSPr/cg10KPfO1G2zC48AhoPOhFRAUofLQbFrTD9o4aYQtYGC36VKFu1kH4Y12EpbQPNEXwE7EF2VACwUohAwrQxVhm7mn4r3XwQ42ygPUfOP2gVPhcCFC6+x8td2c00eHemALpRPAZ6X0FnW2jtqJoQ=
+	t=1709191923; cv=none; b=r8TfFrcvEYtlIm9zV5NhUm/kbsCrkVLyt3kVCbK/cNcwSVK3YrbJ3OE3SwcI2WMGwvHJTZuVRL3C11R+yFC/1B86+tCs6kXy0vHz2WmcZH3tJ63sq923FT8ukK1GZF8Mey44atyvyNogDdqF4TXSa/lkjzx5F72D1o0iiawuZsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709191837; c=relaxed/simple;
-	bh=tEkNMsql6n7EmLjiIafb3HPwIpQRV25IrRm3wpHTFQ4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=ZEVxtTXST3huBClXegGDakScqQo1DDm/WaPRyhPvOJ8o1cBjaatGKU7lZXO5+1W9bO+dcJ7nlF367hIlaFO9HSf9XMyYVzf5MoSteX+fkG6J0b9tUlNM7iyJ/ipUkjmqeJx8nOkWL5F7kO8vckAS6ReW5fh8EC4a0kwAGJkyXLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XZ2Px/DE; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5648d92919dso1044823a12.1;
-        Wed, 28 Feb 2024 23:30:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709191834; x=1709796634; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DKPf0LgfDBQdcT2AOOktC0F3XZfRUjBLP/Wgrh2tUeI=;
-        b=XZ2Px/DEgNFeQNhVQM4RxnmW5aCL4w5gVzwlGT7E/e9Rip7LlrHokJ8vUbKEw5IknO
-         VPclmq7At+L3osgjNAtBqOWie4xwXi8VJ4ZEV+vusgC2wH/Uq4iIA0TEniHAgElYVHar
-         n8YelzC3gxABhtO/tqZXhsmGxzo00vvWLS1/a3S9u8yjCzuZkl1eprpf7gqhaDbPq/Z0
-         Pxa8yZNeJm4XHVWF9/tW/fAfbaFmWYbr7+8f/dQURSfWuXN2xHqyCiVyOvA8tbiLwH/l
-         vwRqt89iX/NzXy1U+ONrwrJKGmOQdiGKdnYR6UDmW/QOTtg6AcJUEjX9MXMdAWneK8Bf
-         +Hrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709191834; x=1709796634;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DKPf0LgfDBQdcT2AOOktC0F3XZfRUjBLP/Wgrh2tUeI=;
-        b=VaKfX6FDZL88N29aD6VYu6z+yL2RGiZAFKcGUbQ2clZsTD+iqFk7EbSZl+q0y9sj9D
-         Wo7qZDodAN+zl1NbHr4K5QtbpPDUiHT9nJ03FjTzmFTs6k9q8MG+g5+EVkWrhkNsA9bd
-         9mEaTRO4oEqEsxbuymSXU0FO4iIiy/Grs31x6y8O62fTH8n0B6JBEL7/+HvwXVIjUad3
-         9e4Q9n1IqwvhxDwXHzK98C1JtXwSx/CmSNDy3YhJB9puJHWKfhXfumLMYLqmlYRBAD+j
-         mOXhw4aZOWSIOceDM5keriRnRcAGKIIhSxm6M287bczpc7f1Y0TOzjTgIcMWPxlHb0Ml
-         4lVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWQ7BzjeK3aTSDr++TIH4PNIaS7ew1/GQTWBsR7rn62qACwyQavGUqOMsGSklG0gfQmuIloZeujM4EiAsVoVHzDt0kTBgVJRv68gOruVW3GFAHjBZGPC/EfEQjw2rQFFUgoJA2UxB0nieFVsTETmXqJysTyHef14p0lXPYK4d7P1jW1aFtIU+Zr
-X-Gm-Message-State: AOJu0YzFtUrWJLWy7dR4xC8DxTZlxEclD/AxcETF73q/YUn/httHHczh
-	N53+nKvkKqFvPDav9uZ+dxjAqtllz6laM2eAnGn17idY23r4YMoTw/cpCFZKPwW1R4+9j+bV2tX
-	p6W7XwACg7jDU6vjuvDangWAxh2Q=
-X-Google-Smtp-Source: AGHT+IHoCqstq7TdVZ88Dk/71bmmKf5b9RkwknQU02aYiHxGF6OjB2trJyj9jkf88TO2KWMcDdIIMvUH+yEss8vkXFE=
-X-Received: by 2002:a17:906:e20b:b0:a44:fb7:d42 with SMTP id
- gf11-20020a170906e20b00b00a440fb70d42mr774752ejb.2.1709191834050; Wed, 28 Feb
- 2024 23:30:34 -0800 (PST)
+	s=arc-20240116; t=1709191923; c=relaxed/simple;
+	bh=EHPwMRslysMH/6pBpniolRdwostS5lFMS+gutCk9a6M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NoznthfpiGt/8R3zZayGnNuspEk93gZOki+ubPl4mJYgplMs/2IV3mzSPcjt0UEql5kIyGPL+iV1lHDDfX0QtYwPJOM+yziTq9a1cmOF9NfYllnQG5ebQo2UZkq5CKJ/lZFa5x6Vpe9sSleFrn4lcRcMqp4oKVxJhV2iKnlcRvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VBmtnGys; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 19AC5E0002;
+	Thu, 29 Feb 2024 07:31:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1709191918;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zp3g25JeuYR2V66Ei5s5q+BW/ugjiuni4LeJDlsxyMQ=;
+	b=VBmtnGyszrpBELAenQD0+WWuLUQQIyvFJ2vrZ6e6QFxRbvA3fQKzuL1A06oTATq+i3m0B1
+	inCMvJTCp1osw/oOxYQAHwqRfCoakwhl3RFwU2Ajk+lfr426gwgdddW09hfH1QvyGgUvJY
+	PUQXhcgSlhv4vb1rxiG2c91hV7yU89QMezJXnNPaQfd1cAvCFuXiXVHINi+XvlNhgeKlQe
+	VpuqeWZCE0hZQzXS+wvPXS3LXy3f2ii2n87bHpZ5zD/y0Wnz+7q3TLQYeBDADBxDvWPCOV
+	cKxY2jLeD7YSd53+9nAZUld+Gcrh/8CJXjkixiV/tvKito3FsEJuv7rNbC2pDA==
+Message-ID: <c1b17410-b403-4c3a-9c00-de8f2b2b2fa7@bootlin.com>
+Date: Thu, 29 Feb 2024 08:31:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240229052813.GA23899@didi-ThinkCentre-M920t-N000>
-In-Reply-To: <20240229052813.GA23899@didi-ThinkCentre-M920t-N000>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 29 Feb 2024 15:29:56 +0800
-Message-ID: <CAL+tcoAhvFhXdr1WQU8mv_6ZX5nOoNpbOLAB6=C+DB-qXQ11Ew@mail.gmail.com>
-Subject: Re: [PATCH] tcp: Add skb addr and sock addr to arguments of
- tracepoint tcp_probe.
-To: edumazet@google.com, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	fuyuanli@didiglobal.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 6/6] net: phy: DP83640: Add fiber mode
+ enabling/disabling from device tree
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+ Lee Jones <lee@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-leds@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ herve.codina@bootlin.com, maxime.chevallier@bootlin.com,
+ christophercordahi@nanometrics.ca
+References: <20240227093945.21525-1-bastien.curutchet@bootlin.com>
+ <20240227093945.21525-7-bastien.curutchet@bootlin.com>
+ <a9c2144a-f26b-4a71-b808-ce3a94f1264d@lunn.ch>
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+In-Reply-To: <a9c2144a-f26b-4a71-b808-ce3a94f1264d@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: bastien.curutchet@bootlin.com
 
-On Thu, Feb 29, 2024 at 1:33=E2=80=AFPM fuyuanli <fuyuanli@didiglobal.com> =
-wrote:
->
-> It is useful to expose skb addr and sock addr to user in tracepoint
-> tcp_probe, so that we can get more information while monitoring
-> receiving of tcp data, by ebpf or other ways.
->
-> For example, we need to identify a packet by seq and end_seq when
-> calculate transmit latency between lay 2 and lay 4 by ebpf, but which is
-> not available in tcp_probe, so we can only use kprobe hooking
-> tcp_rcv_esatblised to get them. But we can use tcp_probe directly if skb
-> addr and sock addr are available, which is more efficient.
->
-> Signed-off-by: fuyuanli <fuyuanli@didiglobal.com>
+Hi Andrew,
 
-Please target 'net-next' in the title of your v2 patch.
+On 2/27/24 17:18, Andrew Lunn wrote:
+> On Tue, Feb 27, 2024 at 10:39:45AM +0100, Bastien Curutchet wrote:
+>> The PHY is able to use copper or fiber. The fiber mode can be enabled or
+>> disabled by hardware strap. If hardware strap is incorrect, PHY can't
+>> establish link.
+>>
+>> Add a DT attribute 'ti,fiber-mode' that can be use to override the
+>> hardware strap configuration. If the property is not present, hardware
+>> strap configuration is left as is.
+> How have you tested this? Do you have a RDK with it connected to an
+> SFP cage?
 
-> ---
->  include/trace/events/tcp.h | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-> index 7b1ddffa3dfc..096c15f64b92 100644
-> --- a/include/trace/events/tcp.h
-> +++ b/include/trace/events/tcp.h
-> @@ -258,6 +258,8 @@ TRACE_EVENT(tcp_probe,
->                 __field(__u32, srtt)
->                 __field(__u32, rcv_wnd)
->                 __field(__u64, sock_cookie)
-> +               __field(const void *, skbaddr)
-> +               __field(const void *, skaddr)
->         ),
->
->         TP_fast_assign(
-> @@ -285,6 +287,9 @@ TRACE_EVENT(tcp_probe,
->                 __entry->ssthresh =3D tcp_current_ssthresh(sk);
->                 __entry->srtt =3D tp->srtt_us >> 3;
->                 __entry->sock_cookie =3D sock_gen_cookie(sk);
-> +
-> +               __entry->skbaddr =3D skb;
-> +               __entry->skaddr =3D sk;
->         ),
->
->         TP_printk("family=3D%s src=3D%pISpc dest=3D%pISpc mark=3D%#x data=
-_len=3D%d snd_nxt=3D%#x snd_una=3D%#x snd_cwnd=3D%u ssthresh=3D%u snd_wnd=
-=3D%u srtt=3D%u rcv_wnd=3D%u sock_cookie=3D%llx",
+I did not test fiber mode as my board uses copper.
 
-If they are useful, at least you should printk those two addresses
-like what trace_kfree_skb() does.
+My use case is that I need to explicitly disable the fiber mode because 
+the strap hardware is
+misconfigured and could possibly enable fiber mode from time to time.
 
-May I ask how it could be useful if there is no more function printing
-such information in the receive path?
 
-Thanks,
-Jason
-> --
-> 2.17.1
->
->
+Best regards,
+
+Bastien
+
 
