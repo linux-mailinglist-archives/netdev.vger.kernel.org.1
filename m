@@ -1,125 +1,167 @@
-Return-Path: <netdev+bounces-76285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CCCD86D218
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:24:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5603B86D24A
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:29:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7C161F26A9D
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:24:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11785287E5A
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93E6F7A127;
-	Thu, 29 Feb 2024 18:24:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513447A12E;
+	Thu, 29 Feb 2024 18:29:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m3fyxzix"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ieoDlsIh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E7E70AFF;
-	Thu, 29 Feb 2024 18:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212C8160653;
+	Thu, 29 Feb 2024 18:29:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709231073; cv=none; b=SAccH1x7yMLbnduq4LS3ADsRuK85aN2JB3oqB3lQOp+BeyoIfOxc4JMlE0S5PUABkWKEPFZRuuEvhG671vt0hA8rBCy6RX+1RZL2jEoMCohywxiG6c53MiHldeEC1nIYD0hIwVxx5/n7jmQPnkQO/TpDNAUH6wgkbfh1b28bJkE=
+	t=1709231374; cv=none; b=MthBduCewZXEsPQFs65T0tOtS+h55Li9V/LjMWeuPPi12zu6tCKDYRkxPtvuNkXWETttZu5F3G6vWOPHO36Kg3Thes78S+ezO60srXgbQIxPpu/FnTS+L5TGJItVjvJgArXXFCW0u8n1b9jWXs7cEZfC5QTM0+Y0AEpgd0GeWI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709231073; c=relaxed/simple;
-	bh=owRtMB60N4nLYRY30ar53Jnf0Bh73JU1ENEVrBOTZpY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KDFMvrQVMPEftAijzwaJZQAa52mz97p5NBI/gMLfpgHXT9+lRFjnKv6ulAO/8tx2CvXyAotvh5kKOhvfkdL5FH4bjZa+JK8oKX2jI6aj9onbxUJ5HOOwBCWLyTzccFVWpxxnR4qOBUzsmz1EeRLlsNm03SnJS8uGLjUjar+n9is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m3fyxzix; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9641AC433C7;
-	Thu, 29 Feb 2024 18:24:28 +0000 (UTC)
+	s=arc-20240116; t=1709231374; c=relaxed/simple;
+	bh=o8/Eyjdv17Z5cxEbu17fyvIpxoYiOsECZ9JmxVF1ZH4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tJJqZ3jDHvttltZWQ3zncBkJfrHS9BxrWBgV4LykaDTtMbxqt2Ejj2y5VKUPnsAUiZ34lMNFqYXwjQH8ylYA0Nm3lxnNTNwJfy7cMAE6IwqXTDlp9Oz33QqkjiQuZcJ20LYWinKGVA9w4JFVkKRIJaOyOsmJ2rKazOfeOMBPmww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ieoDlsIh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3281AC433C7;
+	Thu, 29 Feb 2024 18:29:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709231071;
-	bh=owRtMB60N4nLYRY30ar53Jnf0Bh73JU1ENEVrBOTZpY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=m3fyxzixMWLLWuDU1VI02wsNPIrgu18PKMB3nYauh2ddFscVlK06zRyLI2hLhtGwF
-	 fEXYMn/xaMPrNBhfjsV9UxXeGFEXIWB55TZ0MEMVQXC3nwm1GPL0tBSuH/u0peEx6b
-	 qZoH9yC5iG7xOKxnNF1gVRhmvoh7sW1ol4OHPIUKmKJLUEYASYINI+mmmbz0plUApv
-	 56VWDh55xvYzVQ2e5MXkIaENwYzz1wR93hry6QZjBI20j5UKV3D2NMTSKD65EfCZKA
-	 Kvg9seACZWv0qUFscY8022irABrkHnH56rIJeMO4Mv7i8gsAqKcHIxhCzihhaIaPa2
-	 dDm3+JSAyjF2g==
-From: Conor Dooley <conor@kernel.org>
-To: netdev@vger.kernel.org
-Cc: conor@kernel.org,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Rob Herring <robh@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>,
-	Lee Jones <lee@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Sven Schwermer <sven.schwermer@disruptive-technologies.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	linux-leds@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
+	s=k20201202; t=1709231373;
+	bh=o8/Eyjdv17Z5cxEbu17fyvIpxoYiOsECZ9JmxVF1ZH4=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=ieoDlsIh3FAUltmSAPDqbZgtVAB5KFy/vexGwf7MjAV0tUeTnYVlmI0lDRS8C/wcr
+	 Vh8QhEUIaQZVc7VATakuRGEiQmJYIK8o593BYDZzvEnClq5awjK1ZdgC9APFKnXwyj
+	 3zSN9A6VDPVC1M3uPzAZTqbayG6ygJdrYVdgS8HVk7kq68E7cGXuyrs9ipcB8wDmEb
+	 wE4ZfTdMWhgQKRIGsxG3EU+LZVdTLDUtvr+0o3eRlh8cUI2CKULwEWi9ZL53TUnlvE
+	 2QJuau/UBT6ggHXI1cn4pUdTZ5GSf2Yx66yQs2ahlMtTp847PUB55th43okWrOasVJ
+	 1BlvMJyRaCMKQ==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id CCB5CCE1382; Thu, 29 Feb 2024 10:29:32 -0800 (PST)
+Date: Thu, 29 Feb 2024 10:29:32 -0800
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Joel Fernandes <joel@joelfernandes.org>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>, Yan Zhai <yan@cloudflare.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [RESEND] dt-bindings: leds: pwm-multicolour: re-allow active-low
-Date: Thu, 29 Feb 2024 18:24:00 +0000
-Message-ID: <20240229-excluding-bonelike-d8f01dcc0623@spud>
-X-Mailer: git-send-email 2.43.0
+	Network Development <netdev@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Hannes Frederic Sowa <hannes@stressinduktion.org>,
+	LKML <linux-kernel@vger.kernel.org>, rcu@vger.kernel.org,
+	bpf <bpf@vger.kernel.org>, kernel-team <kernel-team@cloudflare.com>,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
+Message-ID: <99b2ccae-07f6-4350-9c55-25ec7ae065c0@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <55900c6a-f181-4c5c-8de2-bca640c4af3e@paulmck-laptop>
+ <10FC3F5F-AA33-4F81-9EB6-87EB2D41F3EE@joelfernandes.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1756; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=VcurFTzb2TP3//4Y7vcwerf6iF/VbPf6TOYoBbN+VFE=; b=owGbwMvMwCFWscWwfUFT0iXG02pJDKkPTh/Ilpjc9kk51iF/q5HsTv0vC/UlRasdj5h0cjNNf 2WisGt7RykLgxgHg6yYIkvi7b4WqfV/XHY497yFmcPKBDKEgYtTACaydwUjwxHp95JubPmGVfJd qlvMWB/uXxa1QP3Gs5mRlnxbt234zsnIcNdXOym05d7/aZH2hY4bGDU9XONjD3FMDN27XsZ31ZQ ZXAA=
-X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <10FC3F5F-AA33-4F81-9EB6-87EB2D41F3EE@joelfernandes.org>
 
-From: Conor Dooley <conor.dooley@microchip.com>
+On Thu, Feb 29, 2024 at 12:41:55PM -0500, Joel Fernandes wrote:
+> > On Feb 29, 2024, at 11:57 AM, Paul E. McKenney <paulmck@kernel.org> wrote:
+> > ﻿On Thu, Feb 29, 2024 at 09:21:48AM -0500, Joel Fernandes wrote:
+> >>> On 2/28/2024 5:58 PM, Paul E. McKenney wrote:
+> >>> On Wed, Feb 28, 2024 at 02:48:44PM -0800, Alexei Starovoitov wrote:
+> >>>> On Wed, Feb 28, 2024 at 2:31 PM Steven Rostedt <rostedt@goodmis.org> wrote:
+> >>>>> 
+> >>>>> On Wed, 28 Feb 2024 14:19:11 -0800
+> >>>>> "Paul E. McKenney" <paulmck@kernel.org> wrote:
+> >>>>> 
+> >>>>>>>> 
+> >>>>>>>> Well, to your initial point, cond_resched() does eventually invoke
+> >>>>>>>> preempt_schedule_common(), so you are quite correct that as far as
+> >>>>>>>> Tasks RCU is concerned, cond_resched() is not a quiescent state.
+> >>>>>>> 
+> >>>>>>> Thanks for confirming. :-)
+> >>>>>> 
+> >>>>>> However, given that the current Tasks RCU use cases wait for trampolines
+> >>>>>> to be evacuated, Tasks RCU could make the choice that cond_resched()
+> >>>>>> be a quiescent state, for example, by adjusting rcu_all_qs() and
+> >>>>>> .rcu_urgent_qs accordingly.
+> >>>>>> 
+> >>>>>> But this seems less pressing given the chance that cond_resched() might
+> >>>>>> go away in favor of lazy preemption.
+> >>>>> 
+> >>>>> Although cond_resched() is technically a "preemption point" and not truly a
+> >>>>> voluntary schedule, I would be happy to state that it's not allowed to be
+> >>>>> called from trampolines, or their callbacks. Now the question is, does BPF
+> >>>>> programs ever call cond_resched()? I don't think they do.
+> >>>>> 
+> >>>>> [ Added Alexei ]
+> >>>> 
+> >>>> I'm a bit lost in this thread :)
+> >>>> Just answering the above question.
+> >>>> bpf progs never call cond_resched() directly.
+> >>>> But there are sleepable (aka faultable) bpf progs that
+> >>>> can call some helper or kfunc that may call cond_resched()
+> >>>> in some path.
+> >>>> sleepable bpf progs are protected by rcu_tasks_trace.
+> >>>> That's a very different one vs rcu_tasks.
+> >>> 
+> >>> Suppose that the various cond_resched() invocations scattered throughout
+> >>> the kernel acted as RCU Tasks quiescent states, so that as soon as a
+> >>> given task executed a cond_resched(), synchronize_rcu_tasks() might
+> >>> return or call_rcu_tasks() might invoke its callback.
+> >>> 
+> >>> Would that cause BPF any trouble?
+> >>> 
+> >>> My guess is "no", because it looks like BPF is using RCU Tasks (as you
+> >>> say, as opposed to RCU Tasks Trace) only to wait for execution to leave a
+> >>> trampoline.  But I trust you much more than I trust myself on this topic!
+> >> 
+> >> But it uses RCU Tasks Trace as well (for sleepable bpf programs), not just
+> >> Tasks? Looks like that's what Alexei said above as well, and I confirmed it in
+> >> bpf/trampoline.c
+> >> 
+> >>        /* The trampoline without fexit and fmod_ret progs doesn't call original
+> >>         * function and doesn't use percpu_ref.
+> >>         * Use call_rcu_tasks_trace() to wait for sleepable progs to finish.
+> >>         * Then use call_rcu_tasks() to wait for the rest of trampoline asm
+> >>         * and normal progs.
+> >>         */
+> >>        call_rcu_tasks_trace(&im->rcu, __bpf_tramp_image_put_rcu_tasks);
+> >> 
+> >> The code comment says it uses both.
+> > 
+> > BPF does quite a few interesting things with these.
+> > 
+> > But would you like to look at the update-side uses of RCU Tasks Rude
+> > to see if lazy preemption affects them?  I don't believe that there
+> > are any problems here, but we do need to check.
+> 
+> Sure I will be happy to. I am planning look at it in detail over the 3 day weekend. Too much fun! ;-)
 
-active-low was lifted to the common schema for leds, but it went
-unnoticed that the leds-multicolour binding had "additionalProperties:
-false" where the other users had "unevaluatedProperties: false", thereby
-disallowing active-low for multicolour leds. Explicitly permit it again.
+Thank you, and looking forward to seeing what you come up with!
 
-Fixes: c94d1783136e ("dt-bindings: net: phy: Make LED active-low property common")
-Acked-by: Rob Herring <robh@kernel.org>
-Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
----
+The canonical concern would be that someone somewhere is using either
+call_rcu_tasks_rude() or synchronize_rcu_tasks_rude() to wait for
+non-preemptible regions of code that does not account for the possibility
+of preemption in CONFIG_PREEMPT_NONE or PREEMPT_PREEMPT_VOLUNTARY kernels.
 
-This needs to go via netdev as the commit it fixes (and is based on)
-is there
+I *think* that these are used only to handle the possibility
+of tracepoints on functions on the entry/exit path and on the
+RCU-not-watching portions of the idle loop.  If so, then there is no
+difference in behavior for lazy preemption.  But who knows?
 
-CC: Pavel Machek <pavel@ucw.cz>
-CC: Lee Jones <lee@kernel.org>
-CC: Rob Herring <robh@kernel.org>
-CC: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-CC: Conor Dooley <conor+dt@kernel.org>
-CC: Sven Schwermer <sven.schwermer@disruptive-technologies.com>
-CC: Christian Marangi <ansuelsmth@gmail.com>
-CC: linux-leds@vger.kernel.org
-CC: devicetree@vger.kernel.org
-CC: linux-kernel@vger.kernel.org
-CC: "David S. Miller" <davem@davemloft.net>
-CC: Eric Dumazet <edumazet@google.com>
-CC: Jakub Kicinski <kuba@kernel.org>
-CC: Paolo Abeni <pabeni@redhat.com>
-CC: netdev@vger.kernel.org
----
- Documentation/devicetree/bindings/leds/leds-pwm-multicolor.yaml | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/Documentation/devicetree/bindings/leds/leds-pwm-multicolor.yaml b/Documentation/devicetree/bindings/leds/leds-pwm-multicolor.yaml
-index 5edfbe347341..a31a202afe5c 100644
---- a/Documentation/devicetree/bindings/leds/leds-pwm-multicolor.yaml
-+++ b/Documentation/devicetree/bindings/leds/leds-pwm-multicolor.yaml
-@@ -41,6 +41,8 @@ properties:
- 
-           pwm-names: true
- 
-+          active-low: true
-+
-           color: true
- 
-         required:
--- 
-2.43.0
-
+						Thanx, Paul
 
