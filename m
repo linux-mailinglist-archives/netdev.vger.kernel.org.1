@@ -1,263 +1,189 @@
-Return-Path: <netdev+bounces-76027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A1AE86C009
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 05:57:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2891786C025
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 06:24:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F31CF1F22C70
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 04:57:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A42E1C211AB
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 05:24:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA07E38FA6;
-	Thu, 29 Feb 2024 04:57:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C86139ACD;
+	Thu, 29 Feb 2024 05:24:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="SsBVlLBp"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="llRQktSF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2067.outbound.protection.outlook.com [40.107.93.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C6738DED;
-	Thu, 29 Feb 2024 04:57:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6051102
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 05:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.67
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709182666; cv=fail; b=dlQRkwbJqwwi2VgAvHz9HUypsAvUDirqewg18XaO9guzfB1pJpXzTKiCCR1jgpIS1hD1GmSzojt10/DK8XJQCZ6n3457eTJL0FgXwJD6Llkb1NREZbyAH/AM54V5vY9QwV5tGmoFW735LJUN6TpWcmNAvZl2Ba0BY3K/lY1f0mg=
+	t=1709184269; cv=fail; b=Zv0iovVq475c+xti33W+V6bicKnemFNgdfldHNn4e7JrSlJxqJ5YFD9LqU5xV6342H1w4Y01Mq3o/mFBr0VCIScvVEZxpm46P1St+1uZNL55MJyNJ1RJVK2mlOc42UedwG+UvmLVi8dKfq6rE6ANZGLxOvxV1dyA3IbVWCWwY1c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709182666; c=relaxed/simple;
-	bh=lDgTrsdHaTWMSwm/E0fQ8We9nVhQY5nz++pb8D483F4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=HhXgIlZXKK2y+mqjOHVjMevj/J6AFiMlKxJ3CtNvVYQ02Fr5dGYfKUaks4cey0Lo5cu130qCWeHT9RZIRDqInSYqXFpaYF0fuKCet4yDIoxESrNsFFiJ0TT9t50yY526CvKwRdYtfQyxHVWewuqegyY3qbKoTIqZ+NDDbZW2CQQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b=SsBVlLBp; arc=fail smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41T42Y0H007323;
-	Wed, 28 Feb 2024 20:57:30 -0800
-Received: from nam04-mw2-obe.outbound.protection.outlook.com (mail-mw2nam04lp2169.outbound.protection.outlook.com [104.47.73.169])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3wj8e8tqhw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 Feb 2024 20:57:30 -0800 (PST)
+	s=arc-20240116; t=1709184269; c=relaxed/simple;
+	bh=tU1S0FU3Bs4K4Ulf2OrVBWT2Kp/zdJw/wxUlLAOVTts=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=jcnfk3JZ1PMFHnbHoCI4E+ch3wBFFx4ZegAI5NhGyXaUEV78KFQoKEXhglUBrszbQBjSeey0Ao0lrJETZwqyO1HkoaUK919xxQEXn0jTfG7uE3bA9YeVbY1aondvzkn0R9TZkwBsaQ1C0jD9Zbxd2mfCwXD1ZmW2kBCbPDebPds=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=llRQktSF; arc=fail smtp.client-ip=40.107.93.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MxonM4SV6bn6PcQvpGFwj/qu7Ciq0yyhNSPsfpwsCCiinbQUmrBJMRt51ne7beO4eXo3a0v/W/3A/y812B980zHqiHWRgufYsRKrbksooshHDbQeFOCJHUn/vEVM4yrIdGJbJitDjFQytFiXHwcro/wRNo+0/WElzIlmuI3OJdfFUNHXd68zHGG7cWqKBWVw+HVHS3xOV5dwenwX5nEViOWfKwny6p3Q9nPMxa+4lwmIpZUe0UbWtCOb7MII9ePagGglwSNvcsIBfXjADdaoneMJRUqt+6m0pXLnTS6aMDNe2kil50FUjUVDSPLykWg9MMMmAdZbP0ci84ErrA9E3A==
+ b=DGyJLZwmKCDB4V92emAkVkell+fbpVV4iyGozMbrgKSUnj5ZbIwsj9+FTHREQxrTBUBaIEChLnX1BqNCh7oJOGh0xKUto/KosSFvMM7kQSAjJrJmGEBtjdzp1H0eJHxZoDaSrMQr9sU2V0m+/BgG90JKy/xBA6sN45gN0eMRHYyKPvHtD32O736zOkioBjfxb6VUYv84XjuWpqIciFddxNDBAEB/ghPD+HeJiUeq73iTH7Vvs8wYSRTqWJ9ooszhf3NQQpNFZN9AvyUx2D4WdsKbu+CTdDMbycM0rG54ievRePXKBWnmDH6H2NPVs7UdCZaeevZjKDnmvgZPznxtbQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=D9Ut48Nk9cIfP0vsaV3gMDf8Y9NEFRUrndwrauQidxg=;
- b=SuH5WHL2GlUxHmJ+iNVM/hf5/F2QzMtWFTFWRQ37m3pc/hqFnKg6NsfYBdyL4exuYYXoxSJfJmyBYXcvev5VoOAAx6qEF7wzkRER+IOPLcngRthqOegij2UdFOa+8txDb4zuFA+XVUNh19kapywc7qfUMV4ZqcY32YEfyDhpFJrqrMiVhhxROyLSBdJdJOyIRuwmVdxrYGPoe1l2VatC7gLt1ZaCaTo96warJykWX5uHdF95jcje3+EgffVUHo4QN41WsZWZYeb5RfVYtSZuBe4zx3wql2kT5o9XwjyUpoA+UK+/O6/lPunlOgfd1F/uE/at0XWfEL5xUT3qZRpVIg==
+ bh=hTzYsr+YvINQH8um83qiYzUjfavvkaGC0G7WYGNgqD8=;
+ b=KRiUJqlYx//nr+5AC0dsD5H+OXaW65AcgmxHOhGdhyGNLfW57uSCnHd3zr1xWiAwFXH/kH/HowKMCJ8w7keSyp5qWNqNfKB7q3uldBXqlWeVJT3C5S9vgd0fXPmZQMQNoP0QRlt/wBU1166djY4Em7FG+WR0SpwntFc9NaaEsPlwE/P4pi34WdZOWF/ffemhvxVjl6mimhIrWM3VFVPPpsnVQRsQChR/EOtBaprW7brwUQ65gbk36Avao02WyfLyTLcKfLhon/QJhHvhs4Oi8EDUXnvTnyqrtSIxuSOHWEhX/zeTavezIxm2ciidMCZj8xdaPizm6qGMMtwHn+hW5w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D9Ut48Nk9cIfP0vsaV3gMDf8Y9NEFRUrndwrauQidxg=;
- b=SsBVlLBpLTKsPSU2OHs8ZkgbC9gmHCvFWnBSunixHkHBMqibdC2l1ldf34p17oFessAN0xVe1wJmJOva1OeSG+sKIqe9MByTQQZZYK7a8rAbyUfaOUKOIFkEEy5A0UzONwBE3Zh5YqeBaZShvFWqF9hPJeN7nBSQ2HqcXRgFzHM=
-Received: from BY3PR18MB4707.namprd18.prod.outlook.com (2603:10b6:a03:3ca::23)
- by LV3PR18MB5801.namprd18.prod.outlook.com (2603:10b6:408:1b7::19) with
+ bh=hTzYsr+YvINQH8um83qiYzUjfavvkaGC0G7WYGNgqD8=;
+ b=llRQktSFwOpC97IfVfy11DUgjYB1wSpxIkQjw1qJvaLS35b3QhCv7lSkmSQ+A1Z0yjS9stIoEj6qr9KLhy60c6nws3ooy6oPhgJOzoEHsNw6nOabUBZInJhKBYA4zwFAZRNxTbvEBc+VsXhuzS1UfUmMJwLh13MNHsnVYTM/zPkChozUkyzz0qN8lyueowcm6moGbtYU4ErC5dajcUcOOg5LkitL4wXMGBBVAa2Oz6H5lMI0JltJh2vB51IYMRz/JLPrHZodqxu5z8tP0rsu+85OX5Fy/eUTwP/QRVw/e5x/9ESEBFQT/B/v0YAuxbN9UAMbN/cKAf3U48WVy7IHTw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from PH8PR12MB7110.namprd12.prod.outlook.com (2603:10b6:510:22e::11)
+ by CY5PR12MB6250.namprd12.prod.outlook.com (2603:10b6:930:22::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.39; Thu, 29 Feb
- 2024 04:57:27 +0000
-Received: from BY3PR18MB4707.namprd18.prod.outlook.com
- ([fe80::493a:b05c:8118:9dd4]) by BY3PR18MB4707.namprd18.prod.outlook.com
- ([fe80::493a:b05c:8118:9dd4%4]) with mapi id 15.20.7316.039; Thu, 29 Feb 2024
- 04:57:26 +0000
-From: Sai Krishna Gajula <saikrishnag@marvell.com>
-To: Bjorn Helgaas <helgaas@kernel.org>
-CC: "bhelgaas@google.com" <bhelgaas@google.com>,
-        "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>,
-        "richardcochran@gmail.com"
-	<richardcochran@gmail.com>,
-        "horms@kernel.org" <horms@kernel.org>,
-        "vinicius.gomes@intel.com" <vinicius.gomes@intel.com>,
-        "vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kuba@kernel.org"
-	<kuba@kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Sunil Kovvuri
- Goutham <sgoutham@marvell.com>,
-        Geethasowjanya Akula <gakula@marvell.com>,
-        Linu Cherian <lcherian@marvell.com>,
-        Hariprasad Kelam <hkelam@marvell.com>,
-        Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-        Naveen Mamindlapalli
-	<naveenm@marvell.com>
-Subject: Re: [net-next PATCH v2] octeontx2: Add PTP clock driver for Octeon
- PTM clock.
-Thread-Topic: [net-next PATCH v2] octeontx2: Add PTP clock driver for Octeon
- PTM clock.
-Thread-Index: AQHaasvK86DrYSiqL06CYCDK0W5VDA==
-Date: Thu, 29 Feb 2024 04:57:26 +0000
-Message-ID: 
- <BY3PR18MB4707E7764D59DF25C57CCB58A05F2@BY3PR18MB4707.namprd18.prod.outlook.com>
-References: 
- <BY3PR18MB4707DBB80B5949EA26F7ABECA0582@BY3PR18MB4707.namprd18.prod.outlook.com>
- <20240228160857.GA272997@bhelgaas>
-In-Reply-To: <20240228160857.GA272997@bhelgaas>
-Accept-Language: en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.41; Thu, 29 Feb
+ 2024 05:24:24 +0000
+Received: from PH8PR12MB7110.namprd12.prod.outlook.com
+ ([fe80::b610:d12a:cca7:703c]) by PH8PR12MB7110.namprd12.prod.outlook.com
+ ([fe80::b610:d12a:cca7:703c%4]) with mapi id 15.20.7316.035; Thu, 29 Feb 2024
+ 05:24:24 +0000
+Message-ID: <8b9ad2bc-138a-408e-8608-e9b784192649@nvidia.com>
+Date: Wed, 28 Feb 2024 21:24:21 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next RFC 1/2] devlink: Add shared descriptor eswitch
+ attr
+To: Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, jiri@nvidia.com, bodong@nvidia.com,
+ tariqt@nvidia.com, yossiku@nvidia.com, kuba@kernel.org
+References: <20240228015954.11981-1-witu@nvidia.com>
+ <20240228131249.GE292522@kernel.org> <Zd8zECmvTWF_gZO5@nanopsycho>
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BY3PR18MB4707:EE_|LV3PR18MB5801:EE_
-x-ms-office365-filtering-correlation-id: fd67817f-c281-4d63-5565-08dc38e2ecbf
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- 9+9vLN8+wQGJBBfhPRW0CLGco93foKCRaKSTL0FJ3kmwgJwZNUqDdgAep6ExmL4aDYt+6yoE2up0z6zVo1J9a02KOQgDv4WDfokxFqrs0eueP/6tj1PEB5fCX7zvD8194WMi3I377GGCnvtqLCqOG8cQzjh3px8dCdRC6f1QiBHqEfJ5qh1AwAUOtVmvTcRY7nDZPu3x50Z7Q+nnKlgtx3xoNNFfi1JE16t6saDxDh118RT3i/J94h9zM7MHYm2M8ZysQMNuwS/QpIRiQtlxdUMh8VV1JZdANv9iKhUmMVNWThecnM89d5y9dsbQmUgm7nke28ZL2qZ6SXOnSsQCVqxZpvEA1nSNFIQWRwedWjnzbPR0dgxPy7yVU0QRSuEWZPr2K/veNGrxE/8C5yDiPXke5us/R/maLYlBs0CVPIZ2mHRXyITZ9rNlIROBnDQKm4azDlnTo0yOC6NLuR+PkN82kLTrQzDLNlVHp4HhSiVwyDMWrfLHwa7mGZT+hS9adrS94cya6CzTC31RrdOGoXs3cklAWoJ9S0jYyxurEZKcmnKGImoJE4NacImXeZR/1OiR2iSzIN8NVopxSYpKa8kmh5cHdcgh0nYgeDvCNDx/ZnHXJOY1bOq8b7ZmwuXYw75RIohTWb3c2v7KYv0ID3eoZHIQ2b7pr01oHk5a9DKXaXxa195R5fwyhadquYWHibAmOgp4T0HtVbaGLRrFItcT8p8m2rtfjV4J237VzF4=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR18MB4707.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?4sQkFrovQ1/VfYyhj+wrADGUQz10C26lwn1/oH05pTocD5B/ji54nH6dytaN?=
- =?us-ascii?Q?1lrA0/VM8FAYc/0XsA+8COVsnMh7DaAwSl3wcU3SfeBowgbNyrbJkCreB+Qq?=
- =?us-ascii?Q?hDBcZayuWtslL+xYxfg5W51Y8Wb66I2rkI4qEv0Gcgq1ZqMc1TvskDIEVnRQ?=
- =?us-ascii?Q?VnAHQ/bVn720CfCQ2OwPtEgZ2busfQwZbXLJHLcGyxZrLLqrUp7/IGG3xhKl?=
- =?us-ascii?Q?esaCFb3oGOsBP0zdZ7sakS2QOpoHPp152ZVTbmtLlMLVTZfIBvnFRRukjCAt?=
- =?us-ascii?Q?x1jQmehdkTjs3iw1H8HFxS5vqbaiXVEXtOI4JOnnEj2RQH6OkIKq+JwSVvCH?=
- =?us-ascii?Q?FEUBQN+pPeHkEu//scsy5cHo9fh6nC6xUzLEdo0GNdAzpf2SSQIn0R6rhAfx?=
- =?us-ascii?Q?hq8k5pejPnoooa70s0gdPNKUzqOMJfCZVrkkjBA8fqKLhpEIvGatRNb7rWxe?=
- =?us-ascii?Q?DEbH/Q9JeiKllMObRtNeibCMt9CvYQ/Cex26buKmWsxq0iyaVtJdwGNJl00T?=
- =?us-ascii?Q?4UC3dGwOwFSatW84h1DsPlAHHqXBz8XPUQGpSTnUg3Ea8Ffzd3w/k9FvZNW9?=
- =?us-ascii?Q?synmr09TyenyYsgIeJVySDm3MCz32dCjGpCDhwACrRbbLvjfL/d4SEeyqPx2?=
- =?us-ascii?Q?gTkouZdpChD93Vzfo40GFj4YyeU2Q4UOh/vevFS0bktXn/MHgUEbjktC1Yfq?=
- =?us-ascii?Q?JJFZGwHNIlJEL9HhV6orUR7MTvNz9EH9Iu6xYvrzsUEKNwpAkAUG47MG55gI?=
- =?us-ascii?Q?IpBVPOkUMca8Xj+lEPIfE+vqnEaFNs5/yGIBlRKXt7js4zu0p/9Y8K7qSuVr?=
- =?us-ascii?Q?6Oca+ET/KYJ1pouKnnSi2II9i5DFN/Y4UrJCGWoMRcjTGvNlqlfihK5Sktkv?=
- =?us-ascii?Q?TDr5DXeiVR4ze6Ci4z8U9COxhvwxrQP/Ze7U38T8GevdJUPq4gWjnCLrZG0m?=
- =?us-ascii?Q?GqeoWOfkLXl/y7fLPaGtz4eg6tyPTvQ5qASu9Xv6BiJvLw5jYs7OQzf0w5DT?=
- =?us-ascii?Q?qRU8Gher+Iy2e+nPmCGPKbDGkUXdIiFOT2akpkzM1UfeNMtWAMNwbclXM6WO?=
- =?us-ascii?Q?PsLqYqZPuJMAPQEIHi5WMiiUb7ADn9y77yX8KU4dCqFdL/6V26hujUic9/We?=
- =?us-ascii?Q?JG3KVLHqy7pDQtYdrn2Rs3ddicMCjcxKgJ5vFgQpik8rOmRbaLxOkpPGuHaa?=
- =?us-ascii?Q?7dyDnKXb/4WN3OPY4oxENNMh0qaHHqkvgFT9h8lJujMyuTvNORaHv/28ev7S?=
- =?us-ascii?Q?YCDCQnwPEJYUclw4yMhrzBHmEA3WFIXCCQBH3Jy/gyeGs+ngyu52/WOr4OPE?=
- =?us-ascii?Q?noy2B3Zxj0cjuXTKwqNPb+p4QDgME6DCejYdkobZ6AYAaPiB1fBXcjsC3iJS?=
- =?us-ascii?Q?nR2ue9OmFZmGFh731BywZIw/mFEpCilM58eErW0ASCWTS4+DQO7qN4fgKAPw?=
- =?us-ascii?Q?mPw87863x7gZ2767KMGzakG2NwmEIFZnYYqQpsNfAwLaseI65+lBqg5F0BC5?=
- =?us-ascii?Q?5GFSb77oAJizs6Y/ZKcoD2xZMTQTflLtyOQQTyCsifyNWAUEwRUIFqkmrmzK?=
- =?us-ascii?Q?Y3szxDJBxqIMd8BuUpHdkG1Z0M6NL6Ro1/IA/AZV?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+From: William Tu <witu@nvidia.com>
+In-Reply-To: <Zd8zECmvTWF_gZO5@nanopsycho>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4P221CA0015.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:303:8b::20) To PH8PR12MB7110.namprd12.prod.outlook.com
+ (2603:10b6:510:22e::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR12MB7110:EE_|CY5PR12MB6250:EE_
+X-MS-Office365-Filtering-Correlation-Id: dd0fcfb4-d1df-4d3e-51a4-08dc38e6b0f1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	C8T4E4HMPg19b+Ptu1eRhbM/7rP2pqGg5PtVFmAsRnrbyCgwAoltm2VIOJ4wGtoBe5F5dzQTJWaLKWx8TJgOxP0oLz8yBFsoiqGA4Ejmllu/BK1ftwPMrTrNvRFlNrYVA0aKfIcRozpCFrlR9qBtz4RrYUHuQN/TX+EFwc3IUMW3WHmJZJtVD274Rfm9GzNQQIIXuy/CiwWDcMj3Id27YIYnEC8gzuHCNJu6xZubtRfcR+jFWWqSZoBdorfdRLESvkP4Z9ykn8AwaWrITyMiGb9NJhbmgrXpzk8lfOSh8OTiqBdb4MflBsxR7QVTDXUymc3CyHntqqmqFxzFvVqVceYIxXKa9oEST7PbeS6vbb1wO2EifTCbUJqNi4VImgbCd+tze17fjEAYxCpAA3ogEppquJ5zcjV2sk2egqW929NQWhOIkzONPP52ddRi9YkD5CSCCU0vCzsbCIqqhhWSaEJrwoSHeqAOZsZNARqKB3p150JXEIkg4ZjXvLYMYP2yET1fipaVCo8fv5Rwr1t6lYnwMgUPmJdOLMJ/8BrPt5R4W46Mhfv02WhtP2F7XvggX9SdiwoHwjfMIIVfgu8EQobp0yvb2N4/Z4IIsdnZ2pVKXSr7iRpIzsnaU9QrlsRm5MnRFbAkzFaSDVYo0wikYQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR12MB7110.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UjZ4R3J2WUNPaXA0MTFLOEg3bnNGcUNoM0ZFbDZwNTBGRExnK3dwQTdxVUMx?=
+ =?utf-8?B?R3NJTTNrcnFsaHdWMTRwQ0xhWEpCczFJQmgrYmR2cG02VmV5NHU1UXpCTEYx?=
+ =?utf-8?B?aGdMZXJxbnFUanIzY2RXTVRybWJXNXJ1NzVWMWs0bHlGbjdPZ29sMGlNZTA3?=
+ =?utf-8?B?aXBndVNTTTVVMk1sLzNmb1ZyenlHaXFqSWNvWHhZWlQxKzVRbW0rL2JjdTh2?=
+ =?utf-8?B?NlkvUStYRXUrTFFwUnNVbDQrbEhXd04vUlpaZ09lSUUrOGI1a2tScHFBdHNk?=
+ =?utf-8?B?OVFSdTY3Z2JtVWFKdXpxMlNqcnc2dXFMOXFEWnVoZDdLN1ZiZE00UksxdlRq?=
+ =?utf-8?B?c1lmN3RhZG41QWlKM0prS01xSDFsaHJMSzlVcmMxM2RLQm03U0QrTTdIUHJx?=
+ =?utf-8?B?NmVTWlpMSTZKd0dra0xlU1B3aTE1Ykgvc1RCWVFicDFuUmN2ak8rRHN0SXpE?=
+ =?utf-8?B?ZjEvK1lLLzFBMVkwZlNaQ0xjSFBWWk5zbnBOZ2NMeVh0L1Z1U3JhRmpHZWJ0?=
+ =?utf-8?B?VjlXcGtTWUtIck92akZudVN1RmNtTTE3TGRZV3hZZGErQWtFUHBVL2xDVnRQ?=
+ =?utf-8?B?NWJwYWk3QjVZZGIyeXgzZ2JsQ1JiV3JmZTBOR2VXc2U2dWpremZNYmxBajhI?=
+ =?utf-8?B?cVZUbUU2clk4TEFZcWdocUF2MitjKzd1UERMUVlYN3ZJeHNxT2loMUNVUkdS?=
+ =?utf-8?B?RFBEM0pOT0NneTM2QXAzK3oyNUVsMERjanlaamlzQkl1N1AvNEJVak1UM3hS?=
+ =?utf-8?B?NDgwRm85OVk5a2NDemxjS3JWa09GcUxBcEhFNXM3TzlzT28rcVJ3cm4wVkNV?=
+ =?utf-8?B?eDFUSXBhNC81L2l3TjBpSTFCcVQ3ZEhHdHcxUWhqbEpUeHVuaHFFdEN4TE1K?=
+ =?utf-8?B?MEs2bnczWS9ZZUI3ckphUU1RS3Q5Z3VBVzgrTVhzSWxzL0V3TVJxRThsMTE2?=
+ =?utf-8?B?U1E4dHdXU3pZdEh4R2ZCSElIbDcxTjlNK3lCMzNTS09IVjFITjExVXpYakhF?=
+ =?utf-8?B?NmVwL0d5WjliQjZJbG1Gd25hblprL1NHWGlMTzVVdmRiTzdDeUhlWm9vTkpY?=
+ =?utf-8?B?WVJqSUw2NXNGTTlDdGpaeFNZeFd1aHhkRm8vamtlVXlwdU1RWFVFTUt6UVZN?=
+ =?utf-8?B?RitIVnNKR0ZLVWVhRTAvQXZBQVpORzV3MkE0WC94dzVFM2xPeklKTjVuV0h2?=
+ =?utf-8?B?VFlVWi92WDBFVjdVbnArQWhIeWNBd1JGY1YvOEVUY0ZuQjZCL1dHRFFvKzN3?=
+ =?utf-8?B?NGhURlg1NjNCY2x5M2VIR3dsSlR3aExUdUVZcVkzNTBJUHNlRGgzbTBLUllK?=
+ =?utf-8?B?elRWRWxlYXNYSHdoY2xvQSsrcmFUU1E5dktJSFFHcTc4Q3pvTnFZYUErZWxx?=
+ =?utf-8?B?dUdiWlJ3djAyaE01ZGkvRVdrbXVreS9scFVXekdNTkJXcjdYdC9JNHBwZjJt?=
+ =?utf-8?B?M3ovWjlqWGNScHZRd0lRZURLQy9rYVNPaTlXcGJYL0Y0SUhTY0QrYUpWTW9m?=
+ =?utf-8?B?QTUvMzFFbm1WQWJVRXV1RHM2UCtRNUFUNzUyQXZtZUNGN0JiWEd2Y3JyekhI?=
+ =?utf-8?B?WWxvZTUwL0Nhc0cxaDJRSFJnOWNLNnA5UGNaOFNlWFNZaURZdURoQ2pNc2ZB?=
+ =?utf-8?B?MG1KdzBGVzVMam5yVDk4aDMzOERxSHVreGNFcjZmeWFzSjhCZFBOQWV6d1hq?=
+ =?utf-8?B?MjR2UVVXS2tnVzd0TWRTMk10OXFBVGg0NzdOZUVWalBVemJZM3ZGcXBaUmlo?=
+ =?utf-8?B?WjQ3Ymx6NHVkd0JNZUVZbk5IbjhzeTB0RldIQ2Z0MFdUNmMvYXNYSHhFUzRX?=
+ =?utf-8?B?eTF1VTBVMGRIdXp0eFJWM25USnJUSEJkK0dsK1NpaDRnTEEzTHpNU3F0MDRK?=
+ =?utf-8?B?dmVHa0lYVDhteFR2Y05qb25GK0pqSDhEN29QMm1wd1NXcm5hM2prSEVSMklM?=
+ =?utf-8?B?MkxuMktrK1U5eGdMSnF2L1BnSGNLZ2hLSDlNUytWbkZSOXRvV0xRa2Qva1cw?=
+ =?utf-8?B?UEltaG96cWdLMXdpL3RjeFl3blQ1VlJPd3JwNDRFb0RwdVl3L3pMMjlBS0pR?=
+ =?utf-8?B?RXdKQi9ySFhwR2xZbU5mc0M3TEVvQ0Ivai9vV3pZbGREY2pwZGhGc2hJdmVo?=
+ =?utf-8?Q?Qfz62Ayi9BMTHTJWeQUNm9fZ4?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dd0fcfb4-d1df-4d3e-51a4-08dc38e6b0f1
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR12MB7110.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY3PR18MB4707.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd67817f-c281-4d63-5565-08dc38e2ecbf
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Feb 2024 04:57:26.5431
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Feb 2024 05:24:24.3409
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 7Fah/SBUHE9z+M1nCrs4CeXVpojMEZlMvVYn7p6b+rxbtZBU4f0Mo5DqRnBx57o3EflXFiRa3hR/rJRYw8PAeQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR18MB5801
-X-Proofpoint-GUID: uD_YDwKbmSZDHXlTIVA-psUEioezzHBN
-X-Proofpoint-ORIG-GUID: uD_YDwKbmSZDHXlTIVA-psUEioezzHBN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-28_08,2024-02-27_01,2023-05-22_02
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lQbhXLgqmW8Sg1I8rwuk3IB8R0GyVL8JLc++zHmSxheizIa1syNrkyDy6Tta49dv
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6250
 
 
-> -----Original Message-----
-> From: Bjorn Helgaas <helgaas@kernel.org>
-> Sent: Wednesday, February 28, 2024 9:39 PM
-> To: Sai Krishna Gajula <saikrishnag@marvell.com>
-> Cc: bhelgaas@google.com; linux-pci@vger.kernel.org;
-> richardcochran@gmail.com; horms@kernel.org; vinicius.gomes@intel.com;
-> vadim.fedorenko@linux.dev; davem@davemloft.net; kuba@kernel.org;
-> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Sunil Kovvuri
-> Goutham <sgoutham@marvell.com>; Geethasowjanya Akula
-> <gakula@marvell.com>; Linu Cherian <lcherian@marvell.com>; Hariprasad
-> Kelam <hkelam@marvell.com>; Subbaraya Sundeep Bhatta
-> <sbhatta@marvell.com>; Naveen Mamindlapalli <naveenm@marvell.com>
-> Subject: Re: [net-next PATCH v2] octeontx2: Add PTP clock driver for
-> Octeon PTM clock.
->=20
-> On Wed, Feb 28, 2024 at 12:37:02PM +0000, Sai Krishna Gajula wrote:
-> > > -----Original Message-----
-> > > From: Bjorn Helgaas <helgaas@kernel.org>
-> > > Sent: Monday, February 26, 2024 10:31 PM
-> > ...
-> > > On Mon, Feb 26, 2024 at 03:40:25PM +0000, Sai Krishna Gajula wrote:
-> > > > > -----Original Message-----
-> > > > > From: Bjorn Helgaas <helgaas@kernel.org>
-> > > > > Sent: Wednesday, February 14, 2024 10:59 PM ...
-> > > > > On Wed, Feb 14, 2024 at 06:38:53PM +0530, Sai Krishna wrote:
-> > > > > > The PCIe PTM(Precision time measurement) protocol provides
-> > > > > > precise coordination of events across multiple components like
-> > > > > > PCIe host clock, PCIe EP PHC local clocks of PCIe devices.
-> > > > > > This patch adds support for ptp clock based PTM clock. We can
-> > > > > > use this PTP device to sync the PTM time with CLOCK_REALTIME
-> > > > > > or other PTP PHC devices using phc2sys.
->=20
-> > > > > > +static int __init ptp_oct_ptm_init(void) {
-> > > > > > +	struct pci_dev *pdev =3D NULL;
-> > > > > > +
-> > > > > > +	pdev =3D pci_get_device(PCI_VENDOR_ID_CAVIUM,
-> > > > > > +			      PCI_DEVID_OCTEONTX2_PTP, pdev);
-> > > > >
-> > > > > pci_get_device() is a sub-optimal method for a driver to claim a
-> device.
-> > > > > pci_register_driver() is the preferred method.  If you can't use
-> > > > > that, a comment here explaining why not would be helpful.
-> > > >
-> > > > We just want to check the PTP device availability in the system as
-> > > > one of the use case is to sync PTM time to PTP.
-> > >
-> > > This doesn't explain why you can't use pci_register_driver().  Can
-> > > you clarify that?
-> >
-> > This is not a PCI endpoint driver.  This piece of code is used to
-> > identify the silicon version.  We will update the code by reading the
-> > silicon version from Endpoint internal BAR register offsets.
->=20
-> > > I assume the PCI_DEVID_OCTEONTX2_PTP device is a PCIe Endpoint, and
-> > > this driver runs on the host?  I.e., this driver does not run as
-> > > firmware on the Endpoint itself?  So if you run lspci on the host,
-> > > you would see this device as one of the PCI devices?
-> > >
-> > > If that's the case, a driver would normally operate the device via
-> > > MMIO accesses to regions described by PCI BARs.  "lspci -v" would
-> > > show those addresses.
-> >
-> > This driver don't run on Host but runs on the EP firmware itself.
->=20
-> The "endpoint driver" terminology is a bit confusing here.  See
-> Documentation/PCI/endpoint/pci-endpoint.rst for details.
->=20
-> If this driver actually runs as part of the Endpoint firmware, it would n=
-ot
-> normally see a hierarchy of pci_devs, and I don't think
-> pci_get_device() would work.
->=20
-> So I suspect this driver actually runs on the host, and it looks like it =
-wants to
-> use the same device (0x177d:0xa00c) as these two drivers:
->=20
->   drivers/net/ethernet/cavium/common/cavium_ptp.c:#define
-> PCI_DEVICE_ID_CAVIUM_PTP        0xA00C
->   drivers/net/ethernet/marvell/octeontx2/af/ptp.c:#define
-> PCI_DEVID_OCTEONTX2_PTP                 0xA00C
->=20
-> It seems like maybe it should be integrated into them?  Otherwise you hav=
-e
-> multiple drivers thinking they are controlling a single device.
 
-Though this device does not appear as a PCI device on EP firmware, but ther=
-e are some other internal PCI devices that will be enumerated.=20
-We will remove the dependency of reading the PTP device to check the SoC ve=
-rsions, instead we will read the config space of this PCI device itself.
-I hope this clears your doubt whether this driver is running on Host or EP =
-device.
-
->=20
-> Bjorn
+On 2/28/24 5:20 AM, Jiri Pirko wrote:
+> External email: Use caution opening links or attachments
+>
+>
+> Wed, Feb 28, 2024 at 02:12:49PM CET, horms@kernel.org wrote:
+>> On Wed, Feb 28, 2024 at 03:59:53AM +0200, William Tu wrote:
+>>
+>> ...
+>>
+>>> diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
+>>> index c81cf2dd154f..ac8b0c7105dd 100644
+>>> --- a/net/devlink/netlink_gen.c
+>>> +++ b/net/devlink/netlink_gen.c
+>>> @@ -194,12 +194,14 @@ static const struct nla_policy devlink_eswitch_get_nl_policy[DEVLINK_ATTR_DEV_NA
+>>>   };
+>>>
+>>>   /* DEVLINK_CMD_ESWITCH_SET - do */
+>>> -static const struct nla_policy devlink_eswitch_set_nl_policy[DEVLINK_ATTR_ESWITCH_ENCAP_MODE + 1] = {
+>>> +static const struct nla_policy devlink_eswitch_set_nl_policy[DEVLINK_ATTR_ESWITCH_SHRDESC_COUNT + 1] = {
+>>>       [DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
+>>>       [DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
+>>>       [DEVLINK_ATTR_ESWITCH_MODE] = NLA_POLICY_MAX(NLA_U16, 1),
+>>>       [DEVLINK_ATTR_ESWITCH_INLINE_MODE] = NLA_POLICY_MAX(NLA_U16, 3),
+>>>       [DEVLINK_ATTR_ESWITCH_ENCAP_MODE] = NLA_POLICY_MAX(NLA_U8, 1),
+>>> +    [DEVLINK_ATTR_ESWITCH_SHRDESC_MODE] = NLA_POLICY_MAX(NLA_U8, 1),
+>>> +    [DEVLINK_ATTR_ESWITCH_SHRDESC_COUNT] = NLA_POLICY_MAX(NLA_U32, 65535),
+>>>   };
+>> Hi William,
+>>
+>> I realise this is probably not central to your purpose in sending an RFC,
+>> but my understanding is that the max value set using NLA_POLICY_MAX
+>> is of type s16, and thus 65535 is too large - it becomes -1.
+>>
+>> Flagged by W=1 build with clang-17.
+> First of all:
+> /* Do not edit directly, auto-generated from: */
+> /*      Documentation/netlink/specs/devlink.yaml */
+>
+>
+>
+Hi Jiri and Simon,
+Thanks for the feedback. Will fix it.
+William
 
