@@ -1,205 +1,252 @@
-Return-Path: <netdev+bounces-75963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A606386BC92
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 01:14:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AFBD786BC96
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 01:15:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61D9C2889DE
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 00:14:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6650828879E
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 00:15:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BAE07E5;
-	Thu, 29 Feb 2024 00:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C29AA28;
+	Thu, 29 Feb 2024 00:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ey8AOCwF"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="hGy0WtMM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4D87472;
-	Thu, 29 Feb 2024 00:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFA17FE
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 00:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709165636; cv=none; b=ANs1eFBMo9596b5SpFkb5pZsffZM+5aLBP0b2zeIvs8ANLlu3ImjFT7qYoJ58hM7gadomN+Hc7D4Wv14XM0XxoILRgPD1nfY6BBMfHeiVrSccseCU5eJf+vAy+UvQ5RpVfHuR21SyZ/qn4ha5EMtNs7bhdmT51sB8CLgMeIYXu0=
+	t=1709165739; cv=none; b=IL8OmSPx6XtA9R/SRdRJ+vUZbOf7McAPXWPa8kJuSTVknjmR5E3U3ZUDfH1EEn8Mpc6mLbR0HKQlE8k0quBU+wb4g2d2QzOn6UZpyz2j7b9DxkgijcdJa2fLYdngE7szb0jmF3OztPbJocMut0eQXLUYPohxBj6MM6RV0QQtktA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709165636; c=relaxed/simple;
-	bh=vz861hPxpNYZFTTUORtcsl551DegJCUBY8gClBSCovI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=BGl2j6Z8IymCU2p+EdCi2WbLPM/OYSz8QA3uR2z639cXQsOhdc5ZxoA7XZ+iWqJykVh1QDOEDr1xdbN5jmx+LGNLH3H/fpnNJBGm9sUIYdZN7u54TI2A8dfztboPeS8jm90oKWQUjjHQ8zqtegz6CyD/tWZhgmsuUYNU4NXvrI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ey8AOCwF; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41SMvdOd004650;
-	Thu, 29 Feb 2024 00:13:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=VhI+OggJ54GzEZCiIO6hCM/IzyW+IEc+74E31fOEAdk=; b=ey
-	8AOCwFxCm/LHKm4DQrgV1HIrattxWUBkWt/9XzY+KQth9WguqrJd+p6W97cNfzro
-	Nj7TZTM+7M7Qk5VxbnnK4dQcSIB6ZXXte8+6vg62s6vS7+OmkO3jjQ83Wx0THRNY
-	VFsFsZngoYa9+6aDKFMMDW93r0ueBtlcHDaT4pb3ALqDXGbne6tOx0t/bfd3GOJX
-	6n6stZhdCV1gIhJ/lmNPgmEQNsZlkvTJx6hmeTo6LoS9zyJKqTG2I/PY9WY0pt2k
-	Hwv/PoR9ATDOL8ocEiR4UBRDwpjl0nNWYlyZso/q8VZ0sL3RKGm4QkkcXw7tUAmF
-	1LJGVAQHoOpwGsaanJtw==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wj5wc9fee-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Feb 2024 00:13:44 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41T0Dh5b003324
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Feb 2024 00:13:43 GMT
-Received: from [10.110.100.241] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 28 Feb
- 2024 16:13:40 -0800
-Message-ID: <7b4c84ce-6cb1-4791-8821-fd0022238e48@quicinc.com>
-Date: Wed, 28 Feb 2024 16:13:39 -0800
+	s=arc-20240116; t=1709165739; c=relaxed/simple;
+	bh=KFpGHaygOWnJZs+S5tsNAPLYMttJbW5qbzuu4vmTpc4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zfbe7Z7Cp3JSk/UtL3G9sa0AicgdcO0mOy7snKIn5R7C6OC/u9UUHuObREt6NjJ1Bs5DB6OcVcJY/GzfaxH+b4/STFHpKWj9jtbtynx8nme3Pf70TwQc9m6SNzMneusBCle1UPLGl8TtOcxJqcLm4pFqhT2sawVOMLVhjo99Mrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=hGy0WtMM; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1dc3b4b9b62so2996555ad.1
+        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 16:15:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1709165737; x=1709770537; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dl/GQscns58RVf5+2mGUWDm5GmcEQAfx5f0kshMZgAg=;
+        b=hGy0WtMMyq/7SSgQO29K2djMuuvM/SiqF/PLXBkbFLcSSP3nloMA4w3gALA4ArPl7H
+         Kzan5v1wo2Ju4foH/zqAEvgv8yVAYkcSSoLe+esrg2KujTEtB6cVI53iQDu61PiLyQdx
+         39JroGTTMyfNMs0Kxk/bH0CXeNS4yowA77ru0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709165737; x=1709770537;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dl/GQscns58RVf5+2mGUWDm5GmcEQAfx5f0kshMZgAg=;
+        b=YqoJE6TYrfT4nd2XlAORCddfctewJZTzchycdtmD/S00sK7sw8sqv5Yq+w10nZ9FhJ
+         fDjGVgpQK7pUqM2dVYs1N6HCJQzUHxLNzoSp3POY6YXiCOsvPnskSxwy9o/06sBsKkaI
+         EZ0JV1iGQK2AfWtd5f2ty9LaJB0C77ypaSRYwpmNwSt099XYjU4JHxpNFouOoCW3bBk2
+         g57iY6M1i+eseKzop2AQJf2myh53lD74vDFJE2wp0rNDXfICsFLXsRg9RdX7G1mcY6hT
+         31d+MgscRlx0Ca/O30mJ3pG7K64QDfFTpOlxGKRxUqkA2EOZASGHHbyjUCd4baCLLogy
+         4wPg==
+X-Forwarded-Encrypted: i=1; AJvYcCWzGUm3eWqlszSTey/Xy/1SgpNWIGyDmMsvecIAjyojRGLJXNxPAFVnTjtDrdquKIb4RSrqprPSwOH5oHsaJ74Bmqn0YTpW
+X-Gm-Message-State: AOJu0YyLLtDyw+mS70p9KgEwH7OqH1rXvxemaVrfnJNVe0dwom7VjLLb
+	TFfsTdwFRss6ZqV5dqBc0ylCYjmpOZkQ4cnfgJkZNKPm/rJkS3humkIiyAQStw==
+X-Google-Smtp-Source: AGHT+IHzIAviZPXDsQ2a9pCkRPqaZL+hqxFBObnzqP5Kwh51sYmhd/jFpQPt/tKQjXbPEaA3tqt85A==
+X-Received: by 2002:a17:903:181:b0:1dc:cc0c:a29f with SMTP id z1-20020a170903018100b001dccc0ca29fmr507842plg.4.1709165736703;
+        Wed, 28 Feb 2024 16:15:36 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id o20-20020a170902779400b001d94e6a7685sm41728pll.234.2024.02.28.16.15.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 16:15:36 -0800 (PST)
+Date: Wed, 28 Feb 2024 16:15:35 -0800
+From: Kees Cook <keescook@chromium.org>
+To: Justin Stitt <justinstitt@google.com>
+Cc: Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Sumit Saxena <sumit.saxena@broadcom.com>,
+	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+	"James E.J. Bottomley" <jejb@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+	Ariel Elior <aelior@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saurav Kashyap <skashyap@marvell.com>,
+	Javed Hasan <jhasan@marvell.com>,
+	GR-QLogic-Storage-Upstream@marvell.com,
+	Nilesh Javali <njavali@marvell.com>,
+	Manish Rangankar <mrangankar@marvell.com>,
+	Don Brace <don.brace@microchip.com>,
+	mpi3mr-linuxdrv.pdl@broadcom.com, linux-scsi@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org,
+	MPT-FusionLinux.pdl@broadcom.com, netdev@vger.kernel.org,
+	storagedev@microchip.com
+Subject: Re: [PATCH v2 4/7] scsi: qla4xxx: replace deprecated strncpy with
+ strscpy
+Message-ID: <202402281606.199AC93A4B@keescook>
+References: <20240228-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v2-0-dacebd3fcfa0@google.com>
+ <20240228-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v2-4-dacebd3fcfa0@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: Modify mono_delivery_time with
- clockid_delivery_time
-Content-Language: en-US
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
-        "Martin
- KaFai Lau" <martin.lau@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>
-CC: <kernel@quicinc.com>
-References: <20240228011219.1119105-1-quic_abchauha@quicinc.com>
- <65df56f6ba002_7162829435@willemb.c.googlers.com.notmuch>
- <f38efc6d-20af-4cc1-9b8a-5fcb676b2845@quicinc.com>
- <65df94185a2c1_b2ad829442@willemb.c.googlers.com.notmuch>
- <8a5d15aa-96e2-4d9c-9479-bf2ba8fb2a79@quicinc.com>
- <65dfcb37844e0_ba1f8294b7@willemb.c.googlers.com.notmuch>
-From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-In-Reply-To: <65dfcb37844e0_ba1f8294b7@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: B72xc6Hx5Q_ZQW1AHoc6gGwT_HxKOWqA
-X-Proofpoint-ORIG-GUID: B72xc6Hx5Q_ZQW1AHoc6gGwT_HxKOWqA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-28_08,2024-02-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
- priorityscore=1501 mlxlogscore=743 mlxscore=0 phishscore=0 bulkscore=0
- suspectscore=0 impostorscore=0 spamscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2402120000 definitions=main-2402280190
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240228-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v2-4-dacebd3fcfa0@google.com>
 
-
-
-On 2/28/2024 4:09 PM, Willem de Bruijn wrote:
-> Abhishek Chauhan (ABC) wrote:
->>
->>
->> On 2/28/2024 12:14 PM, Willem de Bruijn wrote:
->>> Abhishek Chauhan (ABC) wrote:
->>>>
->>>>
->>>> On 2/28/2024 7:53 AM, Willem de Bruijn wrote:
->>>>> Abhishek Chauhan wrote:
->>>>>> Bridge driver today has no support to forward the userspace timestamp
->>>>>> packets and ends up resetting the timestamp. ETF qdisc checks the
->>>>>> packet coming from userspace and encounters to be 0 thereby dropping
->>>>>> time sensitive packets. These changes will allow userspace timestamps
->>>>>> packets to be forwarded from the bridge to NIC drivers.
->>>>>>
->>>>>> Existing functionality of mono_delivery_time is not altered here
->>>>>> instead just extended with userspace tstamp support for bridge
->>>>>> forwarding path.
->>>>>>
->>>>>> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
->>>>>> ---
->>>>>> Changes since v1 
->>>>>> - Changed the commit subject as i am modifying the mono_delivery_time 
->>>>>>   bit with clockid_delivery_time.
->>>>>> - Took care of suggestion mentioned by Willem to use the same bit for 
->>>>>>   userspace delivery time as there are no conflicts between TCP and 
->>>>>>   SCM_TXTIME, because explicit cmsg makes no sense for TCP and only
->>>>>>   RAW and DGRAM sockets interprets it.
->>>>>
->>>>> The variable rename churn makes it hard to spot the functional
->>>>> changes. Perhaps it makes sense just keep the variable name as is,
->>>>> even though the "mono" is not always technically correct anymore.
->>>>>
->>>>   
->>>>
->>>> I think a better approach would be to keep the variable as ease and add
->>>> comments and documentation in the header file of skbuff.h like 
->>>> how i have done in this patch. The reason why i say this is
->>>> a. We can avoid alot of code churn just to solve this basic problem of 
->>>> propagating timestamp through forwarding bridge path 
->>>> b. Re-use the same variable name and have better documentation 
->>>> c. Complexity will be as minimal as possible.
->>>>
->>>> Let me know what you think. 
->>>
->>> Agreed
->>>
->>
->> Okay i will make the changes accordingly. 
->>>>> Or else to split into two patches. One that renames the field.
->>>>> And one that adds the new behavior of setting the bit for SO_TXTIME.
->>>>>
->>>>
->>>> Regarding the sidenote. I dont see how they are using clock_id to determine 
->>>> if the skb->tstamp is set in monotonic. Please correct me or point me to 
->>>> the piece of code which is doing so.
->>>
->>> That's really out of scope of this series anyway
->>>
->>
->> Sounds good. Really appreciate your review and discussion on this topic. 
->>  
->>>>
->>>> I hope the check against sock_flag is a better implementation as 
->>>> it clearly stats and is inline with the implementation that the tstamp is 
->>>> coming from userspace. 
->>>> skb->mono_delivery_time = sock_flag(sk, SOCK_TXTIME);
->>>
->>> Enabling the socket flag is not sufficient to configure a delivery
->>> time on a packet. A transmit time must be communicated per packet
->>> with cork->transmit_time. And on top of that, it is cheaper to test.
->>
->>
->> So to re-use the same bit of mono_delivery_time. I want to set this bit 
->> when user-space sets the timestamps using SCM_TXTIME. 
->> Is it okay if i do the below when we make skb in ipv4/ipv6 and raw packets
->> to ensure that bridge doesn't reset the packet tstamp or do you have a better 
->> suggestion to set the bit so br_forward_finish does not reset the timestamp. 
->>
->> skb->mono_delivery_time = sock_flag(sk, SOCK_TXTIME);
+On Wed, Feb 28, 2024 at 10:59:04PM +0000, Justin Stitt wrote:
+> Replace 3 instances of strncpy in ql4_mbx.c
 > 
-> I already gave my suggestion.
+> No bugs exist in the current implementation as some care was taken to
+> ensure the write length was decreased by one to leave some space for a
+> NUL-byte. However, instead of using strncpy(dest, src, LEN-1) we can opt
+> for strscpy(dest, src, sizeof(dest)) which will result in
+> NUL-termination as well. It should be noted that the entire chap_table
+> is zero-allocated so the NUL-padding provided by strncpy is not needed.
 > 
-> The timestamp is passed using sockcm_cookie field transmit_time, which
-> is set from a control message of type SCM_TXTIME passed to sendmsg.
+> While here, I noticed that MIN_CHAP_SECRET_LEN was not used anywhere.
+> Since strscpy gives us the number of bytes copied into the destination
+> buffer (or an -E2BIG) we can check both for an error during copying and
+> also for a non-length compliant secret. Add a new jump label so we can
+> properly clean up our chap_table should we have to abort due to bad
+> secret.
 > 
-> Right above where you wanted to add this check is where skb->tstamp is
-> initialized from cork->transmit_time, which got it from this field. So
-> clearly that is the indication that a transmit time is set. And the
-> field is hot in the cache.
+> The third instance in this file involves some more peculiar handling of
+> strings:
+> |	uint32_t mbox_cmd[MBOX_REG_COUNT];
+> |	...
+> |	memset(&mbox_cmd, 0, sizeof(mbox_cmd));
+> |	...
+> |	mbox_cmd[0] = MBOX_CMD_SET_PARAM;
+> |	if (param == SET_DRVR_VERSION) {
+> |		mbox_cmd[1] = SET_DRVR_VERSION;
+> |		strncpy((char *)&mbox_cmd[2], QLA4XXX_DRIVER_VERSION,
+> |			MAX_DRVR_VER_LEN - 1);
+> 
+> mbox_cmd has a size of 8:
+> |	#define MBOX_REG_COUNT 8
+> ... and its type width is 4 bytes. Hence, we have 32 bytes to work with
+> here. The first 4 bytes are used as a flag for the MBOX_CMD_SET_PARAM.
+> The next 4 bytes are used for SET_DRVR_VERSION. We now have 32-8=24
+> bytes remaining -- which thankfully is what MAX_DRVR_VER_LEN is equal to
+> |	#define MAX_DRVR_VER_LEN                    24
+> 
+> ... and the thing we're copying into this pseudo-string buffer is
+> |	#define QLA4XXX_DRIVER_VERSION        "5.04.00-k6"
+> 
+> ... which is great because its less than 24 bytes (therefore we aren't
+> truncating the source).
+> 
+> All to say, there's no bug in the existing implementation (yay!) but we
+> can clean the code up a bit by using strscpy().
+> 
+> In ql4_os.c, there aren't any strncpy() uses to replace but there are
+> some existing strscpy() calls that could be made more idiomatic. Where
+> possible, use strscpy(dest, src, sizeof(dest)). Note that
+> chap_rec->password has a size of ISCSI_CHAP_AUTH_SECRET_MAX_LEN
+> |	#define ISCSI_CHAP_AUTH_SECRET_MAX_LEN	256
+> ... while the current strscpy usage uses QL4_CHAP_MAX_SECRET_LEN
+> |	#define QL4_CHAP_MAX_SECRET_LEN 100
+> ... however since chap_table->secret was set and bounded properly in its
+> string assignment its probably safe here to switch over to sizeof().
+> 
+> |	struct iscsi_chap_rec {
+> 	...
+> |		char username[ISCSI_CHAP_AUTH_NAME_MAX_LEN];
+> |		uint8_t password[ISCSI_CHAP_AUTH_SECRET_MAX_LEN];
+> 	...
+> |	};
+> 
+> |	strscpy(chap_rec->password, chap_table->secret,
+> |		QL4_CHAP_MAX_SECRET_LEN);
+> 
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
+> ---
+>  drivers/scsi/qla4xxx/ql4_mbx.c | 17 ++++++++++++-----
+>  drivers/scsi/qla4xxx/ql4_os.c  | 14 +++++++-------
+>  2 files changed, 19 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/scsi/qla4xxx/ql4_mbx.c b/drivers/scsi/qla4xxx/ql4_mbx.c
+> index 249f1d7021d4..75125d2021f5 100644
+> --- a/drivers/scsi/qla4xxx/ql4_mbx.c
+> +++ b/drivers/scsi/qla4xxx/ql4_mbx.c
+> @@ -1641,6 +1641,7 @@ int qla4xxx_set_chap(struct scsi_qla_host *ha, char *username, char *password,
+>  	struct ql4_chap_table *chap_table;
+>  	uint32_t chap_size = 0;
+>  	dma_addr_t chap_dma;
+> +	ssize_t secret_len;
+>  
+>  	chap_table = dma_pool_zalloc(ha->chap_dma_pool, GFP_KERNEL, &chap_dma);
+>  	if (chap_table == NULL) {
+> @@ -1652,9 +1653,13 @@ int qla4xxx_set_chap(struct scsi_qla_host *ha, char *username, char *password,
+>  		chap_table->flags |= BIT_6; /* peer */
+>  	else
+>  		chap_table->flags |= BIT_7; /* local */
+> -	chap_table->secret_len = strlen(password);
+> -	strncpy(chap_table->secret, password, MAX_CHAP_SECRET_LEN - 1);
+> -	strncpy(chap_table->name, username, MAX_CHAP_NAME_LEN - 1);
+> +
+> +	secret_len = strscpy(chap_table->secret, password,
+> +			     sizeof(chap_table->secret));
+> +	if (secret_len < MIN_CHAP_SECRET_LEN)
+> +		goto cleanup_chap_table;
+> +	chap_table->secret_len = (uint8_t)secret_len;
+> +	strscpy(chap_table->name, username, sizeof(chap_table->name));
+>  	chap_table->cookie = cpu_to_le16(CHAP_VALID_COOKIE);
+>  
+>  	if (is_qla40XX(ha)) {
+> @@ -1679,6 +1684,8 @@ int qla4xxx_set_chap(struct scsi_qla_host *ha, char *username, char *password,
+>  		memcpy((struct ql4_chap_table *)ha->chap_list + idx,
+>  		       chap_table, sizeof(struct ql4_chap_table));
+>  	}
+> +
+> +cleanup_chap_table:
+>  	dma_pool_free(ha->chap_dma_pool, chap_table, chap_dma);
+>  	if (rval != QLA_SUCCESS)
+>  		ret =  -EINVAL;
+> @@ -2281,8 +2288,8 @@ int qla4_8xxx_set_param(struct scsi_qla_host *ha, int param)
+>  	mbox_cmd[0] = MBOX_CMD_SET_PARAM;
+>  	if (param == SET_DRVR_VERSION) {
+>  		mbox_cmd[1] = SET_DRVR_VERSION;
+> -		strncpy((char *)&mbox_cmd[2], QLA4XXX_DRIVER_VERSION,
+> -			MAX_DRVR_VER_LEN - 1);
+> +		strscpy((char *)&mbox_cmd[2], QLA4XXX_DRIVER_VERSION,
+> +			MAX_DRVR_VER_LEN);
+>  	} else {
+>  		ql4_printk(KERN_ERR, ha, "%s: invalid parameter 0x%x\n",
+>  			   __func__, param);
+> diff --git a/drivers/scsi/qla4xxx/ql4_os.c b/drivers/scsi/qla4xxx/ql4_os.c
+> index 675332e49a7b..17cccd14765f 100644
+> --- a/drivers/scsi/qla4xxx/ql4_os.c
+> +++ b/drivers/scsi/qla4xxx/ql4_os.c
+> @@ -799,10 +799,10 @@ static int qla4xxx_get_chap_list(struct Scsi_Host *shost, uint16_t chap_tbl_idx,
+>  
+>  		chap_rec->chap_tbl_idx = i;
+>  		strscpy(chap_rec->username, chap_table->name,
+> -			ISCSI_CHAP_AUTH_NAME_MAX_LEN);
+> -		strscpy(chap_rec->password, chap_table->secret,
+> -			QL4_CHAP_MAX_SECRET_LEN);
+> -		chap_rec->password_length = chap_table->secret_len;
+> +			sizeof(chap_rec->username));
+> +		chap_rec->password_length = strscpy(chap_rec->password,
+> +						    chap_table->secret,
+> +						    sizeof(chap_rec->password));
 
-Oh i see what you are saying. I got it . I will make the changes accordingly. 
-Let me post patch set v3 after testing it internally. 
-Thanks again for all the review comments.
+This hunk took me a bit to convince myself it's safe, but yes, I agree.
+It all boils down to sizeof(chap_table->secret) being less than
+sizeof(chap_rec->password), so there's no behavioral change here.
 
+Reviewed-by: Kees Cook <keescook@chromium.org>
+
+-- 
+Kees Cook
 
