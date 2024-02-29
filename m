@@ -1,120 +1,232 @@
-Return-Path: <netdev+bounces-76254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B87686D030
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:10:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 192E586D034
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:12:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5628C281814
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:10:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEF902843BD
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:11:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FFAA6CC1A;
-	Thu, 29 Feb 2024 17:10:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D5C4AEFA;
+	Thu, 29 Feb 2024 17:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U8QZZ/d4"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="V7j+Fdvp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE836CC13;
-	Thu, 29 Feb 2024 17:10:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744996CBE3
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 17:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709226616; cv=none; b=aILAPFBRv3z0mj23vCtUbDEJWyhQIwGFzuxNrU3g2AsaOzG9OTSqrR4DunUSq8wf7U12CSp6CKg04xQGiLRtiX91vwX2N7M904rE4BAT1xtWm71tCkW/9dZrm9MgCX0WXTZIQ2qWvoF1MR801pv5sKSEljXgkMFp6zik22/g8WQ=
+	t=1709226719; cv=none; b=aq1d4593YVv49CvpUacmaxt3grWtKrNVh3fGmAE0yq0/zE2qmJaTyBa/VXUpxsg7ikMmv2IGHa+iDE0f6IDUQgdICNLDI1zCuRQlFzRXluOqJu9JO1MmpU94ZPP/eGhENffL+/uezeyc6CcM4MxpZrWGj7SHTKu2ilsCQC8/m0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709226616; c=relaxed/simple;
-	bh=hh2xGrbZZ4Dk3F5N0fj8r6Bv+x/QSzRK/Itfc4IDUvk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fziDJuGTBQttME6dZoImyRxf+tfyC8B8dW5HdUPFdBw7Rsb2KiR39z78eN6cUXDkvKYF1Am5gIN18tyv4/wiYRxczkuzX8MPWAl933FA6We03xRDvJkyYUtAIAXxHkC5B92oqHQSY2ami/GXaNz5xjHz1KwKok+iti54T83bYMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U8QZZ/d4; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6e5b1c6daa3so52711b3a.1;
-        Thu, 29 Feb 2024 09:10:14 -0800 (PST)
+	s=arc-20240116; t=1709226719; c=relaxed/simple;
+	bh=p86JPbWlAAq/Pr2OfGMi2zSo0jei99EzmjU+Zsm+4Yw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FoorIDCdZNy+PCitftMkU4s58IUEttumKiMBaAFhJcBDmbotlgRLJxIpUbnvuB5RnQKDpTjr3aOmSfFcdxjv46IRc76Pgs7DmUb1al/jQDG4oJoIldG0xdwpdmuIsaPWeT+d/1ZC+ymHzn3wmOZRta3F4g57ZvkyE9Gxqhe67kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=V7j+Fdvp; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-33d6f26ff33so737587f8f.0
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 09:11:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709226614; x=1709831414; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iNBJblrs1R1EDZXccyoLwxbpBbuOba2tv93Wdjf21h4=;
-        b=U8QZZ/d40PxcOye4v6sq+gWOqBwiCz4diGCTHBYTkgDvKKc8GFnjOyHvPUXbBWXI+C
-         wUMG6NZXK8rpXs7w0Xvp8mgeEbBIEb24nczCgyvvrjFMLEmx200ZyR+K/u74A/0t5Rg9
-         8neoctPRMU4k3TIEvgXwj4VpEmTu5DyQCE7QOnhJk9w39WRmU1v64AkwurwzDwSjWI8w
-         x2ibfRyqZhp6JDzGIT4Bvir/Q8MDis291giooHgxcofOKfj313W7dnsqDK3h6bDI9Hcd
-         JRACBERXcPcbjRTOqKuzY6SH2dXW+uLrknb5Mbopk4U+tiDTSf9M4nh9pGFaywzCT/pc
-         tFnA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709226713; x=1709831513; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=s5eN8ce01A8BAkNdozuKOgaWIKTHka0I2pmhvQwmmHs=;
+        b=V7j+FdvpUIFwX9dCnFPY0zkWFe5LNN8reuSgzMtz8u/VKP+MoXEKa+SuW0EZZG8dUO
+         qVYKAvY5/mNup0gwUOpX4YkAFT3xLNRBFHWErifQLqEwokQCAXG6nWuLCNdwPbIzEpcm
+         8VfuRXxd9TFZKorOEuJOo1LOOgRLFmNd1//s8DM/s/lt/UNd3nStn8uTUwjUGWC3bNjM
+         63IqbgYJAOOcTCDkfvlVTbbdLeCDh9xQ6FHswl5+jgIMC2v0Ga143Ig1wBd8zyE9nBhU
+         r1PLSTTwZpR3hRjG7PzIs4lyDNj8GKoRymWerde9GuX+y3/JPzsSNSABJXdkzCu1S/B2
+         besw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709226614; x=1709831414;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iNBJblrs1R1EDZXccyoLwxbpBbuOba2tv93Wdjf21h4=;
-        b=JEzKdPCXA4aylFeRYa8RUpTP8RxzrAah51b9t6q8ZBpbk1zWVooMVWdZxxh1q1l530
-         D3CRP9dPz8x6wpqgoo+YCPU9akhm5NmEnWRyE6S/kCoiLIosyhrUR0bGF0erbyspE3SO
-         8EOs3FNGqV0v5iiUi5SzDpz0M1mAy/uZZ7BpjGoAouyf5zbIYq8fiEX45vPxo4MDxDvI
-         AYmppCc9IwsXfWaBbK72oXGXgs03W0/uLtIY7kd1X9hqasX2ahKfXyjdbwo34+bjdf3I
-         YNyx+tEWikyrfeNDq34MoT7xyg01/WeCFrHeNi++FqxLn7Eb+/0chitG08SZerWv+9Xq
-         GJEw==
-X-Forwarded-Encrypted: i=1; AJvYcCXk0WpuogCqHiLeW9R3yzwg1htTwTOE2tz0zcIiVHgS7igppp72VyiHltUMMQl7DCV898zo27NEOVL5d6h1oaft8pxKhz3Urjmrwbe3GgK4qAGP
-X-Gm-Message-State: AOJu0YyJ4NetGeii1uRpcVDUGjnFnGjRj2V/UzJyw+5Of2nEGaSKsrjv
-	xo9QhVexUn/adSk4vEAIUZpgWyGdoPa0IRLWIfeWmotrnaKOKbxM
-X-Google-Smtp-Source: AGHT+IEgsMUGjZ/xDHERSGar2NO2cN8ScSIcCpDgA3qA26z2QJLBouefkVGzbmbpzX2WKH2DT67AbQ==
-X-Received: by 2002:a05:6a20:4f0f:b0:1a0:c9a5:8258 with SMTP id gi15-20020a056a204f0f00b001a0c9a58258mr2603088pzb.20.1709226613931;
-        Thu, 29 Feb 2024 09:10:13 -0800 (PST)
-Received: from KERNELXING-MB0.tencent.com ([114.253.33.234])
-        by smtp.gmail.com with ESMTPSA id b76-20020a63344f000000b005dc4829d0e1sm1558808pga.85.2024.02.29.09.10.10
+        d=1e100.net; s=20230601; t=1709226713; x=1709831513;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s5eN8ce01A8BAkNdozuKOgaWIKTHka0I2pmhvQwmmHs=;
+        b=dToJJNZ5W19S1+0NGmBD+85Lb4WJS4nuJGaqnWFoNma4aoO4jsOTRZednkICbFk2nL
+         87VnJ9uzn61983HqC+arqWNjrsV/FLjIhGWBWqhYooBswBm+gdaeF2t0rKBPkQ5JAQzM
+         EGzPszPkkN2fpIbkYelu2i/y7SiXqyTJtkxemr++YtDBXAIkTksL+iPWG6cEErn5RRQR
+         Plin9dl+sVuwBsWbKSmUeSlhVB0j8ACaZR9y7XPR8Qe+nIXYVENyb0Er75sLBoIUztIQ
+         VKkHyNjZKynDVmqj9DQrJJv9KWhUWLqNgKVsALHWJPlM8fQx8jmZN4Cp9DOBZGzjFBMS
+         PceA==
+X-Forwarded-Encrypted: i=1; AJvYcCXJpPuT0MuiAGLcl9uFtuQxVFWLyqJH7UJ1oKpNu+iGe3+FSg8lcwrio5et4adKse2vp4PKgUYh5avKg9ydPnaAvf0z7oAC
+X-Gm-Message-State: AOJu0YzcTIBTKLiwruQwbObRT3imwzh7lwKEJxfJr85h0CoFSxNqc2Yp
+	9aDptzfs+DYtF4GMNXKTSUDPxTTG9ANzewazbq+4daqmKvd15+kWRBFlVsEnWqU=
+X-Google-Smtp-Source: AGHT+IH1zEuJ86P10M2lAIVIYyql0ngHGu3kWSlbRqz+Hk6flSRnX9pE+3LpyAZr9/9QnUzu3VoEEA==
+X-Received: by 2002:adf:e7c1:0:b0:33d:9eef:4f25 with SMTP id e1-20020adfe7c1000000b0033d9eef4f25mr1910315wrn.51.1709226713513;
+        Thu, 29 Feb 2024 09:11:53 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id i9-20020a5d6309000000b0033e122a9a91sm1645422wru.105.2024.02.29.09.11.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 09:10:13 -0800 (PST)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	rostedt@goodmis.org
-Cc: netdev@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next 2/2] tcp: add tracing of skbaddr in tcp_event_skb class
-Date: Fri,  1 Mar 2024 01:09:56 +0800
-Message-Id: <20240229170956.87290-3-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240229170956.87290-1-kerneljasonxing@gmail.com>
-References: <20240229170956.87290-1-kerneljasonxing@gmail.com>
+        Thu, 29 Feb 2024 09:11:52 -0800 (PST)
+Date: Thu, 29 Feb 2024 18:11:49 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com, richardcochran@gmail.com
+Subject: Re: [PATCH net-next 1/2] bnxt_en: Introduce devlink runtime driver
+ param to set ptp tx timeout
+Message-ID: <ZeC61UannrX8sWDk@nanopsycho>
+References: <20240229070202.107488-1-michael.chan@broadcom.com>
+ <20240229070202.107488-2-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240229070202.107488-2-michael.chan@broadcom.com>
 
-From: Jason Xing <kernelxing@tencent.com>
+Thu, Feb 29, 2024 at 08:02:01AM CET, michael.chan@broadcom.com wrote:
+>From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+>
+>Sometimes, the current 1ms value that driver waits for firmware
+>to obtain a tx timestamp for a PTP packet may not be sufficient.
+>User may want the driver to wait for a longer custom period before
+>timing out.
+>
+>Introduce a new runtime driver param for devlink "ptp_tx_timeout".
+>Using this parameter the driver can wait for up to the specified
+>time, when it is querying for a TX timestamp from firmware.  By
+>default the value is set to 1s.
+>
+>Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+>Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+>Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+>---
+> .../net/ethernet/broadcom/bnxt/bnxt_devlink.c | 42 +++++++++++++++++++
+> drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c |  1 +
+> drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  3 ++
+> 3 files changed, 46 insertions(+)
+>
+>diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
+>index ae4529c043f0..0df0baa9d18c 100644
+>--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
+>+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
+>@@ -652,6 +652,7 @@ static const struct devlink_ops bnxt_vf_dl_ops;
+> enum bnxt_dl_param_id {
+> 	BNXT_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
+> 	BNXT_DEVLINK_PARAM_ID_GRE_VER_CHECK,
+>+	BNXT_DEVLINK_PARAM_ID_PTP_TXTS_TMO,
+> };
+> 
+> static const struct bnxt_dl_nvm_param nvm_params[] = {
+>@@ -1077,6 +1078,42 @@ static int bnxt_hwrm_nvm_req(struct bnxt *bp, u32 param_id, void *msg,
+> 	return rc;
+> }
+> 
+>+static int bnxt_dl_ptp_param_get(struct devlink *dl, u32 id,
+>+				 struct devlink_param_gset_ctx *ctx)
+>+{
+>+	struct bnxt *bp = bnxt_get_bp_from_dl(dl);
+>+
+>+	if (!bp->ptp_cfg)
+>+		return -EOPNOTSUPP;
+>+
+>+	ctx->val.vu32 = bp->ptp_cfg->txts_tmo;
+>+	return 0;
+>+}
+>+
+>+static int bnxt_dl_ptp_param_set(struct devlink *dl, u32 id,
+>+				 struct devlink_param_gset_ctx *ctx)
+>+{
+>+	struct bnxt *bp = bnxt_get_bp_from_dl(dl);
+>+
+>+	if (!bp->ptp_cfg)
+>+		return -EOPNOTSUPP;
+>+
+>+	bp->ptp_cfg->txts_tmo = ctx->val.vu32;
+>+	return 0;
+>+}
+>+
+>+static int bnxt_dl_ptp_param_validate(struct devlink *dl, u32 id,
+>+				      union devlink_param_value val,
+>+				      struct netlink_ext_ack *extack)
+>+{
+>+	if (val.vu32 > BNXT_PTP_MAX_TX_TMO) {
+>+		NL_SET_ERR_MSG_FMT_MOD(extack, "TX timeout value exceeds the maximum (%d ms)",
+>+				       BNXT_PTP_MAX_TX_TMO);
+>+		return -EINVAL;
+>+	}
+>+	return 0;
+>+}
+>+
+> static int bnxt_dl_nvm_param_get(struct devlink *dl, u32 id,
+> 				 struct devlink_param_gset_ctx *ctx)
+> {
+>@@ -1180,6 +1217,11 @@ static const struct devlink_param bnxt_dl_params[] = {
+> 			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
+> 			     bnxt_dl_nvm_param_get, bnxt_dl_nvm_param_set,
+> 			     NULL),
+>+	DEVLINK_PARAM_DRIVER(BNXT_DEVLINK_PARAM_ID_PTP_TXTS_TMO,
+>+			     "ptp_tx_timeout", DEVLINK_PARAM_TYPE_U32,
+>+			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+>+			     bnxt_dl_ptp_param_get, bnxt_dl_ptp_param_set,
+>+			     bnxt_dl_ptp_param_validate),
 
-Use the existing parameter and print it then. It will display
-the address of skbaddr.
+Idk. This does not look sane to me at all. Will we have custom knobs to
+change timeout for arbitrary FW commands as this as a common thing?
+Driver is the one to take care of timeouts of FW gracefully, he should
+know the FW, not the user. Therefore exposing user knobs like this
+sounds pure wrong to me.
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- include/trace/events/tcp.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+nack for adding this to devlink.
 
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index ac36067ae066..6ca3e0343666 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -362,7 +362,8 @@ DECLARE_EVENT_CLASS(tcp_event_skb,
- 		TP_STORE_ADDR_PORTS_SKB(__entry, skb);
- 	),
- 
--	TP_printk("src=%pISpc dest=%pISpc", __entry->saddr, __entry->daddr)
-+	TP_printk("skbaddr=%p src=%pISpc dest=%pISpc",
-+		  __entry->skbaddr, __entry->saddr, __entry->daddr)
- );
- 
- DEFINE_EVENT(tcp_event_skb, tcp_bad_csum,
--- 
-2.37.3
+If this is some maybe-to-be-common ptp thing, can that be done as part
+of ptp api perhaps?
+
+pw-bot: cr
+
+
+> 	/* keep REMOTE_DEV_RESET last, it is excluded based on caps */
+> 	DEVLINK_PARAM_GENERIC(ENABLE_REMOTE_DEV_RESET,
+> 			      BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+>diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+>index cc07660330f5..4b50b07b9771 100644
+>--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+>+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+>@@ -965,6 +965,7 @@ int bnxt_ptp_init(struct bnxt *bp, bool phc_cfg)
+> 		spin_unlock_bh(&ptp->ptp_lock);
+> 		ptp_schedule_worker(ptp->ptp_clock, 0);
+> 	}
+>+	ptp->txts_tmo = BNXT_PTP_DFLT_TX_TMO;
+> 	return 0;
+> 
+> out:
+>diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+>index fce8dc39a7d0..ee977620d33e 100644
+>--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+>+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+>@@ -22,6 +22,8 @@
+> #define BNXT_LO_TIMER_MASK	0x0000ffffffffUL
+> #define BNXT_HI_TIMER_MASK	0xffff00000000UL
+> 
+>+#define BNXT_PTP_DFLT_TX_TMO	1000 /* ms */
+>+#define BNXT_PTP_MAX_TX_TMO	5000 /* ms */
+> #define BNXT_PTP_QTS_TIMEOUT	1000
+> #define BNXT_PTP_QTS_TX_ENABLES	(PORT_TS_QUERY_REQ_ENABLES_PTP_SEQ_ID |	\
+> 				 PORT_TS_QUERY_REQ_ENABLES_TS_REQ_TIMEOUT | \
+>@@ -120,6 +122,7 @@ struct bnxt_ptp_cfg {
+> 
+> 	u32			refclk_regs[2];
+> 	u32			refclk_mapped_regs[2];
+>+	u32			txts_tmo;
+> };
+> 
+> #if BITS_PER_LONG == 32
+>-- 
+>2.30.1
+>
+
 
 
