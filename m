@@ -1,30 +1,31 @@
-Return-Path: <netdev+bounces-76184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 578E386CAFF
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 15:10:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC5D086CAFE
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 15:10:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B1702864D1
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 14:10:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18834B23CEF
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 14:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA6A14AD15;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4131212F58E;
 	Thu, 29 Feb 2024 14:08:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF4D1474C3
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 14:08:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF2C1419A6
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 14:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709215708; cv=none; b=rGTI/pR4Gj2cntP5nB4fElS6A3ROXEjQDzsRkOt59U09DstOTdD3LKLaFWBNUvDyCHBHWZc8m70KOrlUpXxJkPhcWn1dvxIMKcwiPIjrA632f3QOTG6HiPE7lacMU5TcBVhu0SO7xsCGLZKnLJys5z4aVwXxb8E7LjiFir6e5WE=
+	t=1709215708; cv=none; b=YdKZ91XJdIXTP/0+xf47v1H458j0iTB9mZV94hgllK7GASt5Zf8tEFls0U/rNpxoufu0u8XDFfWbgbLxjXmiXUkr20zD+2ZTYSCzo6Ztk1/vFiELzhhyB480o8yZj3YCJdpksJLRw3pT3L/NtS++TqDAbcykD/O+taUWviZxa4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709215708; c=relaxed/simple;
-	bh=ZVSqi1TRTwnHKFz1ZpV4p58yxYhpcdlkjnKW0r9Y3S4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mXchlJvi0VZvL5zvOkYAR7zcC06yjf6hqc2Ocfz76XS8gXeum8WVt0h4XOwxMbsvB6ZgG6ssC38ko/7rs40vpCQFCaqC4eSoJl0O1JPJEJOcomz1UnXk3WWq7/A00FVm7tyitsj/Qa2F/1ApqYnZvGSyKMZynKp051mNaDjKv8o=
+	bh=bnczvboHhvoEalEW9xSpju92M4P2dgF3JOLgOD2eOHI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=oqxUW/7fEJjdHy/p1iiYHdkR12RGY72Jmi3vq+7jmFF/zic4P79kiiiB9mC8GcC7BsJdxCmQ2PBvleC1P9cgH/EWeUapiIPtn4584Uamii4A/NL+JOepCiCr3kDxVY+fZHtY3crgL7+LfGgGelhg8Oil2WTVoF63x7nph82KN50=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -32,15 +33,15 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1rfh4t-0000Sr-CD; Thu, 29 Feb 2024 15:08:03 +0100
+	id 1rfh4t-0000Ss-MX; Thu, 29 Feb 2024 15:08:03 +0100
 Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ore@pengutronix.de>)
-	id 1rfh4r-003bZl-GU; Thu, 29 Feb 2024 15:08:01 +0100
+	id 1rfh4r-003bZm-J4; Thu, 29 Feb 2024 15:08:01 +0100
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1rfh4r-00ELlb-0n;
+	id 1rfh4r-00ELln-1C;
 	Thu, 29 Feb 2024 15:08:01 +0100
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: Wei Fang <wei.fang@nxp.com>,
@@ -51,17 +52,21 @@ To: Wei Fang <wei.fang@nxp.com>,
 	Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+Cc: Russell King <rmk+kernel@armlinux.org.uk>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
 	kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Shenwei Wang <shenwei.wang@nxp.com>,
 	Clark Wang <xiaoning.wang@nxp.com>,
 	NXP Linux Team <linux-imx@nxp.com>
-Subject: [PATCH net-next v7 0/8] net: ethernet: Rework EEE
-Date: Thu, 29 Feb 2024 15:07:52 +0100
-Message-Id: <20240229140800.3420180-1-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v7 1/8] net: add helpers for EEE configuration
+Date: Thu, 29 Feb 2024 15:07:53 +0100
+Message-Id: <20240229140800.3420180-2-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240229140800.3420180-1-o.rempel@pengutronix.de>
+References: <20240229140800.3420180-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,80 +79,65 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello all,
+From: Russell King <rmk+kernel@armlinux.org.uk>
 
-with Andrew's permission I'll continue mainlining this patches:
+Add helpers that phylib and phylink can use to manage EEE configuration
+and determine whether the MAC should be permitted to use LPI based on
+that configuration.
 
-==============================================================
-
-Most MAC drivers get EEE wrong. The API to the PHY is not very
-obvious, which is probably why. Rework the API, pushing most of the
-EEE handling into phylib core, leaving the MAC drivers to just
-enable/disable support for EEE in there change_link call back.
-
-MAC drivers are now expect to indicate to phylib if they support
-EEE. This will allow future patches to configure the PHY to advertise
-no EEE link modes when EEE is not supported. The information could
-also be used to enable SmartEEE if the PHY supports it.
-
-With these changes, the uAPI configuration eee_enable becomes a global
-on/off. tx-lpi must also be enabled before EEE is enabled. This fits
-the discussion here:
-
-https://lore.kernel.org/netdev/af880ce8-a7b8-138e-1ab9-8c89e662eecf@gmail.com/T/
-
-This patchset puts in place all the infrastructure, and converts one
-MAC driver to the new API. Following patchsets will convert other MAC
-drivers, extend support into phylink, and when all MAC drivers are
-converted to the new scheme, clean up some unneeded code.
-
-v7:
---
-add phy_link_down() before phy_link_up()
-rewrite comment for phy_ethtool_set_eee_noneg()
-add check for changed tx_lpi_timer
-
-v6:
---
-Reword different comments. See per patch change comments.
-
-v5:
---
-Rebase against latest netdev-next
-Use keee instead of eee struct
-
-v4
---
-Only convert one MAC driver
-Drop all phylink code
-Conform to the uAPI discision.
-
-v3
---
-Rework phylink code to add a new callback.
-Rework function to indicate clock should be stopped during LPI
-
-Andrew Lunn (7):
-  net: phy: Add phydev->enable_tx_lpi to simplify adjust link callbacks
-  net: phy: Add helper to set EEE Clock stop enable bit
-  net: phy: Keep track of EEE configuration
-  net: phy: Immediately call adjust_link if only tx_lpi_enabled changes
-  net: phy: Add phy_support_eee() indicating MAC support EEE
-  net: fec: Move fec_enet_eee_mode_set() and helper earlier
-  net: fec: Fixup EEE
-
-Russell King (1):
-  net: add helpers for EEE configuration
-
- drivers/net/ethernet/freescale/fec_main.c | 84 ++++++++++-------------
- drivers/net/phy/phy-c45.c                 | 14 +++-
- drivers/net/phy/phy.c                     | 68 +++++++++++++++++-
- drivers/net/phy/phy_device.c              | 28 ++++++++
- include/linux/phy.h                       |  9 ++-
- include/net/eee.h                         | 38 ++++++++++
- 6 files changed, 187 insertions(+), 54 deletions(-)
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+ include/net/eee.h | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
  create mode 100644 include/net/eee.h
 
+diff --git a/include/net/eee.h b/include/net/eee.h
+new file mode 100644
+index 0000000000000..1232658b32f40
+--- /dev/null
++++ b/include/net/eee.h
+@@ -0,0 +1,38 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef _EEE_H
++#define _EEE_H
++
++#include <linux/types.h>
++
++struct eee_config {
++	u32 tx_lpi_timer;
++	bool tx_lpi_enabled;
++	bool eee_enabled;
++};
++
++static inline bool eeecfg_mac_can_tx_lpi(const struct eee_config *eeecfg)
++{
++	/* eee_enabled is the master on/off */
++	if (!eeecfg->eee_enabled || !eeecfg->tx_lpi_enabled)
++		return false;
++
++	return true;
++}
++
++static inline void eeecfg_to_eee(const struct eee_config *eeecfg,
++			  struct ethtool_keee *eee)
++{
++	eee->tx_lpi_timer = eeecfg->tx_lpi_timer;
++	eee->tx_lpi_enabled = eeecfg->tx_lpi_enabled;
++	eee->eee_enabled = eeecfg->eee_enabled;
++}
++
++static inline void eee_to_eeecfg(const struct ethtool_keee *eee,
++				 struct eee_config *eeecfg)
++{
++	eeecfg->tx_lpi_timer = eee->tx_lpi_timer;
++	eeecfg->tx_lpi_enabled = eee->tx_lpi_enabled;
++	eeecfg->eee_enabled = eee->eee_enabled;
++}
++
++#endif
 -- 
 2.39.2
 
