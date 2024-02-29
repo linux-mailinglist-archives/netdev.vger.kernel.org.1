@@ -1,208 +1,191 @@
-Return-Path: <netdev+bounces-76102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C69AF86C53B
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:31:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 120E686C54B
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:32:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42D6A1F23C3D
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:31:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3676F1C215DB
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6A55CDF2;
-	Thu, 29 Feb 2024 09:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E7995D90B;
+	Thu, 29 Feb 2024 09:32:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="xTyJG0Yj"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Ja7ilSTk"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527845D90E;
-	Thu, 29 Feb 2024 09:30:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730835D72B
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 09:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709199055; cv=none; b=OUac2LAxGXxS3D72ngT5LkE0+YOEtrrBLeGBnxCQ13iTaocEEO9iev6AmxfoYGMnrBakhbuBt45tePNehyjBAQ2OxQb7bLDKpdh0uNdGz0MlOlWGF3E1sEhySdqp8q8a+QSKOOfPYb2u60KhXcQTomLNYFWN+9Z3XSBud7ecyE0=
+	t=1709199127; cv=none; b=RJOB5BbQxGWAjK2abFaBJGyexmuPyuhinaKlXFN4llYS8IeUF3IGzL+J2IaIgFbbqs4E3geDpHCkzr7ce8nqauPlQbEv4T6Vv1a6h8tYtnCsF281vNPFZB8vcyNbGKFFvQFCT7L5MJ2bnM470BXNTsKo1pF8iOIsJFyoIqsVnEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709199055; c=relaxed/simple;
-	bh=W1XkHC6kMs6fy5Z46APr+CC9gFn1z5X9mDJ/bLvAfeE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tPqfwCgX+JH20t8dU+BLxK1b0pIpNe18NG1nb16hzKziT1DZEUwwc23oYMYqH0OiC/8VTLlNYVW0TAHrhPjO8dph6cZbRhetVgDSbRhnOk2E19eV2SYNi6gQyBa8FKjjCeWxNS4tiJridQZxwXdRFgcO5JAaVErozqhNqpbbkII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=xTyJG0Yj; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id C7BDD87C56;
-	Thu, 29 Feb 2024 10:30:49 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1709199051;
-	bh=CHfO3bdBeQx9G/TpZdihSC/0QgTINu1hZYfx1ot210I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=xTyJG0Yj033yXj4MT7h9aUxGxXY6pSDTDtX4FMlRqXNGgzS634nLXLbfX6VGKnLLP
-	 eQB2cjJMcgmEUO7byVP7MEUaZRKOK9CoSYQe1dsWRG0pP7ilSWaSW4wAvA47McJF79
-	 MeoxCeO/19ke0O2Zg58H/am8n3GtugrYBl2u98rjNsE3brb8k9russdyiSCCXt2b6C
-	 jl7yrKLeV1r2odYK6RLS22g8CPiirI2B3LplBxH3kkRz3mCfGQoMQkOeXEVEeGC45j
-	 Vzxjf7rejNxhSUd7UJFGFR7qHNMZQ03vpaidTdFKuv8owsvu2qjRPgl/Ar6Ts2Ovqa
-	 0lSWBisSeRu2Q==
-Date: Thu, 29 Feb 2024 10:30:48 +0100
-From: Lukasz Majewski <lukma@denx.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Eric Dumazet
- <edumazet@google.com>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir
- Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- Tristram.Ha@microchip.com, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, Paolo Abeni <pabeni@redhat.com>, Ravi Gunasekaran
- <r-gunasekaran@ti.com>, Simon Horman <horms@kernel.org>, Wojciech Drewek
- <wojciech.drewek@intel.com>, Nikita Zhandarovich
- <n.zhandarovich@fintech.ru>, Murali Karicheri <m-karicheri2@ti.com>, Dan
- Carpenter <dan.carpenter@linaro.org>, Ziyang Xuan
- <william.xuanziyang@huawei.com>, Kristian Overskeid <koverskeid@gmail.com>,
- Matthieu Baerts <matttbe@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [RFC] net: hsr: Provide RedBox support
-Message-ID: <20240229103048.45ecc1de@wsk>
-In-Reply-To: <608850a9-966e-420b-8d16-1ab6baa65025@lunn.ch>
-References: <20240228150735.3647892-1-lukma@denx.de>
-	<608850a9-966e-420b-8d16-1ab6baa65025@lunn.ch>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1709199127; c=relaxed/simple;
+	bh=6i2k1HfZmq0eCuNTltsb8L0/Mha/pPwS9ImAT/+P2w0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mr0FMtq+fjcz3am+Dx/vXdnY1VieJeWD8aayrTVDHuwfrvmXp15VcNu8JximCj+qqR9Fk14jumD38GWwEeSxdqdeVlHEwc8EU7rBSuLyHExKkvOcFqrW2lm4HTRM7USp2n7MJPh4RgfVD3j4FszUWy1aHR4BR/RfTDQmCYixz50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Ja7ilSTk; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-563cb3ba9daso900332a12.3
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 01:32:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709199123; x=1709803923; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iM6QUg9bjSZl8uSCUZVhzf0WX0iuuwwjiA47u4B1bsA=;
+        b=Ja7ilSTkeoR0r/We13xhEhr41CP/uGtsYykVhCgLq898UP5kH1s68ldlMd4MqSAHld
+         FZfK8xZCGdBFPZRQzQsTyEM92Ynag/cy1p6CqlJTFxX2b4o3JmJY8PzHnac8SrDSOw6R
+         Ik30xKniwXqOLh10h+Gx6DOPIa2gfTqXUgsOSros9uMXmJ75Rz+s2okXVvGahlZ9dEUg
+         mcF1z52TsSp12oRMjpAsLwDxRC/9fR1XBomPPLKL5Ky+9f9X8WQHjA+EzgAe5nD8iPTl
+         61TiUfvER6xCq0id1dEP4Ig03iAsF8rbcAN/UxPL0CMjxO41GAM8+57Mux3UJWwRArG1
+         HQjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709199123; x=1709803923;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iM6QUg9bjSZl8uSCUZVhzf0WX0iuuwwjiA47u4B1bsA=;
+        b=U/b5ucU9u6z4sgxhHErjmA8jRBVcTfvhBVjUSNiZKQH5ZksM9Cl854ywet/CT8jeLw
+         hOrIO7Fs5rHXNG/NJPP5DhuxNK92VgwUtx9jEcB7U2rRiw4FFTqAK0FvL49oQV3MnoAw
+         +BzTufJqa/Vltjl0y43wpmt8/LLBQrMV2/97QHIxGAqcEXkPPjraalwsiioilNjGcwcJ
+         srFnuTWihGgyShm96jfiHSDReqSYwtBUBpxS71wcA8mJ/CXaR7WsO8neyxBgFZvjosax
+         BKFpVaNZHqZaXDblHzQum3kiBJ/Y/uGHHkcS69fZiF4i24WQq+EHhXsOcUWDcbGccxO3
+         s9Ug==
+X-Forwarded-Encrypted: i=1; AJvYcCVU5kmHl4nLa6goLoItQGf1ceGgL1Ne+7EmnCKqrZKd2FF04Wk0oSIJmIWFRAD0ARDmjwQXTZrax66vaWjj2iUqa/Vua0U9
+X-Gm-Message-State: AOJu0YxiULrsmi1kKK7NcO0bEP1QZ1g1d2n/dDXze7MfhsJshZwK7Ym5
+	Xep2oOQwFkAixU/oSGL98ZkQwzoGUdwjr1ll1CT1axIITr0hb7S3e7D5hTEnpGs=
+X-Google-Smtp-Source: AGHT+IFbgMTA7l2LY6u7O5iqg2yN+YwDx8P8i1I1cf92NyS3RjoRIzybLhQ3EBwnL/OlWPmKmeOLuQ==
+X-Received: by 2002:a50:ef07:0:b0:566:2a1a:fe18 with SMTP id m7-20020a50ef07000000b005662a1afe18mr1034928eds.36.1709199123487;
+        Thu, 29 Feb 2024 01:32:03 -0800 (PST)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id f4-20020a05640214c400b005660742bf6bsm441622edx.52.2024.02.29.01.32.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Feb 2024 01:32:02 -0800 (PST)
+Date: Thu, 29 Feb 2024 10:32:01 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux@armlinux.org.uk, horms@kernel.org,
+	andrew@lunn.ch, netdev@vger.kernel.org, mengyuanlou@net-swift.com
+Subject: Re: [PATCH v2] net: txgbe: fix GPIO interrupt blocking
+Message-ID: <ZeBPEYBG6y5bUP8u@nanopsycho>
+References: <20240229024237.22568-1-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/ugh8IGWgId5MP.WkOG54Lmt";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240229024237.22568-1-jiawenwu@trustnetic.com>
 
---Sig_/ugh8IGWgId5MP.WkOG54Lmt
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Thu, Feb 29, 2024 at 03:42:37AM CET, jiawenwu@trustnetic.com wrote:
+>There were two problems to be solved in this patch:
+>
+>1. The register of GPIO interrupt status is masked before MAC IRQ
+>is enabled. This is because of hardware deficiency. So manually
+>clear the interrupt status before using them. Otherwise, GPIO
+>interrupts will never be reported again. There is a workaround for
+>clearing interrupts to set GPIO EOI in txgbe_up_complete().
+>
+>2. GPIO EOI is not set to clear interrupt status after handling
+>the interrupt. It should be done in irq_chip->irq_ack, but this
+>function is not called in handle_nested_irq(). So executing
+>function txgbe_gpio_irq_ack() manually in txgbe_gpio_irq_handler().
 
-Hi Andrew,
-
-> >  void hsr_debugfs_rename(struct net_device *dev)
-> >  {
-> > @@ -95,6 +114,19 @@ void hsr_debugfs_init(struct hsr_priv *priv,
-> > struct net_device *hsr_dev) priv->node_tbl_root =3D NULL;
-> >  		return;
-> >  	}
-> > +
-> > +	if (!priv->redbox)
-> > +		return;
-> > +
-> > +	de =3D debugfs_create_file("proxy_node_table", S_IFREG |
-> > 0444,
-> > +				 priv->node_tbl_root, priv,
-> > +				 &hsr_proxy_node_table_fops);
-> > +	if (IS_ERR(de)) {
-> > +		pr_err("Cannot create hsr proxy node_table
-> > file\n");
-> > +		debugfs_remove(priv->node_tbl_root);
-> > +		priv->node_tbl_root =3D NULL;
-> > +		return; =20
->=20
-> You should not be checking return values from debugfs and not printing
-> error messages etc. debugfs is totally option, so you should just keep
-> going. The debugfs API should not explode because of a previous
-> failure.
->=20
-> > --- a/net/hsr/hsr_device.c
-> > +++ b/net/hsr/hsr_device.c
-> > @@ -142,30 +142,32 @@ static int hsr_dev_open(struct net_device
-> > *dev) {
-> >  	struct hsr_priv *hsr;
-> >  	struct hsr_port *port;
-> > -	char designation;
-> > +	char *designation =3D NULL; =20
->=20
-> Revere christmas tree place. When you go from RFC to a real
-> submission, issues like this need fixing. For an RFC its not so bad.
->=20
-
-Ok.
-
-> >  	hsr =3D netdev_priv(dev);
-> > -	designation =3D '\0';
-> > =20
-> >  	hsr_for_each_port(hsr, port) {
-> >  		if (port->type =3D=3D HSR_PT_MASTER)
-> >  			continue;
-> >  		switch (port->type) {
-> >  		case HSR_PT_SLAVE_A:
-> > -			designation =3D 'A';
-> > +			designation =3D "Slave A";
-> >  			break;
-> >  		case HSR_PT_SLAVE_B:
-> > -			designation =3D 'B';
-> > +			designation =3D "Slave B";
-> > +			break;
-> > +		case HSR_PT_INTERLINK:
-> > +			designation =3D "Interlink";
-> >  			break;
-> >  		default:
-> > -			designation =3D '?';
-> > +			designation =3D "Unknown";
-> >  		}
-> >  		if (!is_slave_up(port->dev))
-> > -			netdev_warn(dev, "Slave %c (%s) is not up;
-> > please bring it up to get a fully working HSR network\n",
-> > +			netdev_warn(dev, "%s (%s) is not up;
-> > please bring it up to get a fully working HSR network\n",
-> > designation, port->dev->name); }
-> > =20
-> > -	if (designation =3D=3D '\0')
-> > +	if (designation =3D=3D NULL)
-> >  		netdev_warn(dev, "No slave devices configured\n");
-> > =20
->=20
-> It would be good to split this into multiple patches. Do the A to
-> Slave A, B to Slave B, etc as one patch. Then add Interlink.
->=20
-
-Ok. This is particular one can be extracted to separate patch.
-
-> Ideally you want lots of simple patches which are obviously correct,
-> each with a good commit message explaining why the change is being
-> made.
-
-+1
-
->=20
-> 	Andrew
+Two patches then, no?
 
 
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/ugh8IGWgId5MP.WkOG54Lmt
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmXgTsgACgkQAR8vZIA0
-zr3DuQgAoKWa5XcWdNa0MSFdLtsAI/2lJu6Tfw52RJEKxtvKx12Qx0QYdyl6a8+l
-6pF4aTNIDoQtANv4nrdDBFNSkXWEgc+CYNKooBqx8SEtSQe4mz/+2v4CutXB9PBi
-m0vm4NZoVrqcmCnDEp3BfnQETfvFiE/cujMIzf9GP5eKEd0B5YzJ23QW34bMpVwy
-ku4t7ZTsgploN7Yds8Z9d8hpsPkgabpmrbxUNdjBTnsNu5k6EBaVk9sIrJkvAjml
-sos5d7oxKvKNFuZSqMktj5kNY53iCwEOhm0Ngc8GJcMG3sRs8JfhhMm9Yf88m4C+
-y5RRRLNrKl+Jw5d3HQP8bMsTxoAkyw==
-=NDUn
------END PGP SIGNATURE-----
-
---Sig_/ugh8IGWgId5MP.WkOG54Lmt--
+>
+>Fixes: aefd013624a1 ("net: txgbe: use irq_domain for interrupt controller")
+>Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+>---
+> .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  1 +
+> .../net/ethernet/wangxun/txgbe/txgbe_phy.c    | 29 +++++++++++++++++++
+> .../net/ethernet/wangxun/txgbe/txgbe_phy.h    |  1 +
+> 3 files changed, 31 insertions(+)
+>
+>diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+>index e67a21294158..bd4624d14ca0 100644
+>--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+>+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+>@@ -81,6 +81,7 @@ static void txgbe_up_complete(struct wx *wx)
+> {
+> 	struct net_device *netdev = wx->netdev;
+> 
+>+	txgbe_reinit_gpio_intr(wx);
+> 	wx_control_hw(wx, true);
+> 	wx_configure_vectors(wx);
+> 
+>diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+>index bae0a8ee7014..93295916b1d2 100644
+>--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+>+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+>@@ -475,8 +475,10 @@ irqreturn_t txgbe_gpio_irq_handler(int irq, void *data)
+> 	gc = txgbe->gpio;
+> 	for_each_set_bit(hwirq, &gpioirq, gc->ngpio) {
+> 		int gpio = irq_find_mapping(gc->irq.domain, hwirq);
+>+		struct irq_data *d = irq_get_irq_data(gpio);
+> 		u32 irq_type = irq_get_trigger_type(gpio);
+> 
+>+		txgbe_gpio_irq_ack(d);
+> 		handle_nested_irq(gpio);
+> 
+> 		if ((irq_type & IRQ_TYPE_SENSE_MASK) == IRQ_TYPE_EDGE_BOTH) {
+>@@ -489,6 +491,33 @@ irqreturn_t txgbe_gpio_irq_handler(int irq, void *data)
+> 	return IRQ_HANDLED;
+> }
+> 
+>+void txgbe_reinit_gpio_intr(struct wx *wx)
+>+{
+>+	struct txgbe *txgbe = wx->priv;
+>+	irq_hw_number_t hwirq;
+>+	unsigned long gpioirq;
+>+	struct gpio_chip *gc;
+>+	unsigned long flags;
+>+
+>+	/* for gpio interrupt pending before irq enable */
+>+	gpioirq = rd32(wx, WX_GPIO_INTSTATUS);
+>+
+>+	gc = txgbe->gpio;
+>+	for_each_set_bit(hwirq, &gpioirq, gc->ngpio) {
+>+		int gpio = irq_find_mapping(gc->irq.domain, hwirq);
+>+		struct irq_data *d = irq_get_irq_data(gpio);
+>+		u32 irq_type = irq_get_trigger_type(gpio);
+>+
+>+		txgbe_gpio_irq_ack(d);
+>+
+>+		if ((irq_type & IRQ_TYPE_SENSE_MASK) == IRQ_TYPE_EDGE_BOTH) {
+>+			raw_spin_lock_irqsave(&wx->gpio_lock, flags);
+>+			txgbe_toggle_trigger(gc, hwirq);
+>+			raw_spin_unlock_irqrestore(&wx->gpio_lock, flags);
+>+		}
+>+	}
+>+}
+>+
+> static int txgbe_gpio_init(struct txgbe *txgbe)
+> {
+> 	struct gpio_irq_chip *girq;
+>diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
+>index 9855d44076cb..8a026d804fe2 100644
+>--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
+>+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
+>@@ -5,6 +5,7 @@
+> #define _TXGBE_PHY_H_
+> 
+> irqreturn_t txgbe_gpio_irq_handler(int irq, void *data);
+>+void txgbe_reinit_gpio_intr(struct wx *wx);
+> irqreturn_t txgbe_link_irq_handler(int irq, void *data);
+> int txgbe_init_phy(struct txgbe *txgbe);
+> void txgbe_remove_phy(struct txgbe *txgbe);
+>-- 
+>2.27.0
+>
+>
 
