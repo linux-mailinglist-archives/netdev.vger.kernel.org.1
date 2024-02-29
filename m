@@ -1,828 +1,106 @@
-Return-Path: <netdev+bounces-76353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED3B486D5B4
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 22:08:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B4A886D5B9
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 22:09:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF5661C234D2
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 21:08:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C59C1C2382F
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 21:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D444154439;
-	Thu, 29 Feb 2024 20:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70532154C04;
+	Thu, 29 Feb 2024 20:56:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jNCkLwFf"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="YoDL5w8e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F049615174F
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 20:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 904C7154C1E
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 20:56:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709240172; cv=none; b=c0c2FsYM3VgLvLhvpXkO3G6GeNtpz0p19xSrP5XJzdnRjZ2u9NIBa9PvoBxTW4XSaPGsKkY4DFd3SmVjNpEMba1cmmhd5Z8eMI4ljohdx1eReztR4/Nw4ts0jlWP/J2WzAOEpxf8XTWGK+APnKzBIJFFlhVVgBbqUF923VV3IWE=
+	t=1709240202; cv=none; b=kQVWstTaxjdJzMPF0ZwlZGRJzWUaqcfKUOfqW8tPQSVwundCyJCOrt5EumF4ySArzPcsaMvmaigVY5WuUu4WHlN0T1o0PMjDlozm2ThNDoJrvSMh5we3ObABmQ5BQJgjUkcCZRiof6crL5ZV7qJfPLR9PpsVE4v38Di32JsesRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709240172; c=relaxed/simple;
-	bh=NJMD1D8DtUbTJfW8WvWP43Xac2N4idS4oxVaL8+0qfg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=a/0G/LX8XFIWlXHRr6HhK6FXZjYl9rnXkc4JYlMukWg9vPrLxEeNRRU7UaeSdaz2a9rtYIbzOK/vZgDUP0UwPQu1zKONmC7GNnnAaIlNsUSQETb8ENpNh5xrCNXne7D1dYOd9d4caQzP7TzLyCsChXnECGblc/KkYL78sChRKa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jNCkLwFf; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-365169e0938so4008985ab.0
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 12:56:08 -0800 (PST)
+	s=arc-20240116; t=1709240202; c=relaxed/simple;
+	bh=y/PBEgT7ogzDQ/urnqR6G19WU2LN1p109s1hDqmO6oM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JBTNvu42m4VgnngA2UNPZl2GZoGpZQaH/tCnlXsllKB+GYsZ6wibx32q8os5BfWaiY6SMv4F4LmZoFh919FA4zqMvzur/JbwFytuHDhW7c6XxtCRO6NGyRTzQZSzkFrVoTv61Gtp1zjwph2XSAwhVQkOpJpH4NlSM4E9VXnZYZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=YoDL5w8e; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5658082d2c4so2109435a12.1
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 12:56:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709240168; x=1709844968; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WENhthIwgjxjWI15i8GwNwNFwMFy0Kn8nH7EdPDCVlI=;
-        b=jNCkLwFfoT6ridM0JM//dt4CmR1fLfJaWp2/Kpmoa7g1MrB6+dY7G/UB51ji62t+F1
-         nQZtFsJ6PVBMJyXpKmG3QZChhtTt6CAsjjdjuGJkdEqz/NuhBT8Y0Oet0yE8BCWPtFel
-         GzEQf525fL7LoCcPXIAOHuJPIqgjp+o+pKIAklgQQq+jp/wKXk4H9TzhOrPIzd3wqksw
-         YLVE9mwYjrf90KDCTOXRNhP+qlOY+xb1qr88Q8o/nmS/wFWjI/0jAsO2e2Q8+txIjnp9
-         u/sVhFCy67QyXT8+SwxW2cLSBv+zmF0WyihZdyNZI+SBlRw3gRmKbl4Ste3Vpq8zal3S
-         XOxw==
+        d=linux-foundation.org; s=google; t=1709240199; x=1709844999; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=SbiT+3jQ0ttBc0H4Cz/BNQ+s/TCQJGrbtGrlFN7KUM0=;
+        b=YoDL5w8eGEVzYpM/2D1Cl0258V2S4xQm8Dq/FM2bOcEWUPCnbKUNk+4r619hrjhChK
+         h8csdUy0nRAXuVhMM2d0ZSC7ZRPdtC9uprW5zOUM6qM+lKreZQnIpiTFblt/87UrGdij
+         mcAXHSCbsjPAFTPPdCopJfkEF7D2rgrZvqAiY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709240168; x=1709844968;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WENhthIwgjxjWI15i8GwNwNFwMFy0Kn8nH7EdPDCVlI=;
-        b=udYRhD9TeMY5iYhsqlB09kJSp1mu1vanw9scn6kz1E2HaONqXFYrmgTiirFxqTjm3t
-         G/Nl//gzmp5BmneUV9yTrRdvKr4Hnon4CKZnM2k5ByyC8QxgsIXzIhUQ9FQTY2NovyeA
-         i+hHp1zTgYVnzfxwwRz4lV0ZRylS2i+FawszE7gFUNka3+wkQgzBqXkJw72p8gRPrJmM
-         ZIfTIbkTnSMkQPzOSZUryeb4Vl8gVYzVJ+0A1w8EZSH/8CiLCSc5fetujqN/1o9VrL7g
-         ikzyU5YCz1iVGcNXMSE01ZuSMZB6KXdkSPEKWtj6DOkm97KlkJGQxYKT6GcBM4x0mmEV
-         BB7A==
-X-Forwarded-Encrypted: i=1; AJvYcCUdpM8KvpNud96kaCPfIHcyuND0WKDo+n5Us3jDYPMkTZZE2qpDAaQuOga+LLmTVLBQyMoIS60luvA3LnkA3cll67RnkkZH
-X-Gm-Message-State: AOJu0YyziBFZGJJ0HIVGDe2PQco+zSzfmiJlOgtFpd3A77W2uot8ca3Z
-	J0xZl11kpUgd4aEWbByJqPoSd6XIRBaYYg8CYnx9bw5Ah/FRs5hIIADWiDgP91I=
-X-Google-Smtp-Source: AGHT+IGln3DWb1UK6ZMyV1p4mNExy/Fs8AYIbgVGqJLn9MlS1VH+jGk9cPXGdWKhP/QBJY6bM1REnw==
-X-Received: by 2002:a05:6e02:1d15:b0:365:42d0:2da6 with SMTP id i21-20020a056e021d1500b0036542d02da6mr20548ila.5.1709240168046;
-        Thu, 29 Feb 2024 12:56:08 -0800 (PST)
-Received: from localhost.localdomain (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
-        by smtp.gmail.com with ESMTPSA id h14-20020a056e020d4e00b003658fbcf55dsm521551ilj.72.2024.02.29.12.56.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 12:56:07 -0800 (PST)
-From: Alex Elder <elder@linaro.org>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: mka@chromium.org,
-	andersson@kernel.org,
-	quic_cpratapa@quicinc.com,
-	quic_avuyyuru@quicinc.com,
-	quic_jponduru@quicinc.com,
-	quic_subashab@quicinc.com,
-	elder@kernel.org,
-	netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 7/7] net: ipa: don't save the platform device
-Date: Thu, 29 Feb 2024 14:55:54 -0600
-Message-Id: <20240229205554.86762-8-elder@linaro.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240229205554.86762-1-elder@linaro.org>
-References: <20240229205554.86762-1-elder@linaro.org>
+        d=1e100.net; s=20230601; t=1709240199; x=1709844999;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SbiT+3jQ0ttBc0H4Cz/BNQ+s/TCQJGrbtGrlFN7KUM0=;
+        b=ckeN9WsWKJOvfE1EYBse4d/VgfDSvoPBtlpeT64oDTiW2e0IVuPv1m1zuzMoC8rKwj
+         fswGujrLravGpRO+hR1BUfvSJ9aZv9rI/Sks0keMAa+eWTs/PtRV6NzYulfhgK03sDIG
+         1BtZG32cBPC04bICISUERGbiqnHxQPBsou1YD/8Dsg48Vodw+Cji+HdYS5vXiafhcKGc
+         nDNNAn63plPOzjlh7XTS1TpvoIE/MSbRyM/QblGQMCVupo8EMpzoHD7NsPmUzih3XeVF
+         gMsZdnKuiE3hYmKNoLyA/W6+YNdrUsEBrXKdOc4eTU3KNocsztQoQf89J7j49wn8BGGT
+         olHw==
+X-Forwarded-Encrypted: i=1; AJvYcCVdjA2TdFxuvPi1t84vHk+Hxnf7d7fmGZccy/nazUGWJtxi755ud+aYh43X+w8C5b3IpF2yKu7szXUO7hMVH7MBupqJ/L9S
+X-Gm-Message-State: AOJu0Yx1PZ6Ti2sDYh9t3FvQqRmTShRp8igq/kNmzGWWHOb5LI5eDyN0
+	BvRpsEQ9gdgCl1mZnym4vQ/BUTg4qsryVFUfX3M0gjI9NQTGeHds1uSIUjlOgy+1UuZZ8HCm9VQ
+	w/pmmGA==
+X-Google-Smtp-Source: AGHT+IFvvMmaWmNh6lbegiFm+3QU+fjRkAqUqD2qsBE9Fm6HvMRIlprYX5m90oznrdIJ6TmeCcUT4g==
+X-Received: by 2002:a17:906:f88d:b0:a44:6643:a558 with SMTP id lg13-20020a170906f88d00b00a446643a558mr66186ejb.16.1709240198498;
+        Thu, 29 Feb 2024 12:56:38 -0800 (PST)
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com. [209.85.218.48])
+        by smtp.gmail.com with ESMTPSA id u1-20020a1709063b8100b00a4324ae24dbsm1033763ejf.62.2024.02.29.12.56.38
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Feb 2024 12:56:38 -0800 (PST)
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a26ed1e05c7so257038666b.2
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 12:56:38 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWGGVyqsSVFBJchIFAguUTbqPwOnEmI1pTn8D1W+ptsJ26XQ3pK3ySa+JvQWUQ0wXqZHCjobqQFCx2gN8PsG2F32d+huP+x
+X-Received: by 2002:a17:906:40d4:b0:a44:4d9b:9062 with SMTP id
+ a20-20020a17090640d400b00a444d9b9062mr58037ejk.69.1709240197809; Thu, 29 Feb
+ 2024 12:56:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240229203921.3037023-1-kuba@kernel.org>
+In-Reply-To: <20240229203921.3037023-1-kuba@kernel.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 29 Feb 2024 12:56:21 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wizM+YawbbsvdRnFXLipMXS+iwgD3fahUu4DeyQCKzSWA@mail.gmail.com>
+Message-ID: <CAHk-=wizM+YawbbsvdRnFXLipMXS+iwgD3fahUu4DeyQCKzSWA@mail.gmail.com>
+Subject: Re: [GIT PULL] Networking for v6.8-rc7
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-The IPA platform device is now only used as the structure containing
-the IPA device structure.  Replace the platform device pointer with
-a pointer to the device structure.
+On Thu, 29 Feb 2024 at 12:39, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> A few hours late, the commit on top fixes an odd "rcu_dereference()
+> needs to know full type" build issue I can't repro..
 
-Signed-off-by: Alex Elder <elder@linaro.org>
----
- drivers/net/ipa/ipa.h           |  5 ++---
- drivers/net/ipa/ipa_cmd.c       |  6 +++---
- drivers/net/ipa/ipa_endpoint.c  | 29 ++++++++++++++---------------
- drivers/net/ipa/ipa_interrupt.c |  7 +++----
- drivers/net/ipa/ipa_main.c      | 13 ++++++++-----
- drivers/net/ipa/ipa_mem.c       | 24 +++++++++++-------------
- drivers/net/ipa/ipa_modem.c     | 14 +++++++-------
- drivers/net/ipa/ipa_power.c     |  4 ++--
- drivers/net/ipa/ipa_qmi.c       | 10 +++++-----
- drivers/net/ipa/ipa_smp2p.c     | 13 ++++++-------
- drivers/net/ipa/ipa_table.c     | 18 ++++++++----------
- drivers/net/ipa/ipa_uc.c        |  9 ++++-----
- 12 files changed, 73 insertions(+), 79 deletions(-)
+Ugfh. That change literally makes a single load instruction be a
+function call. Pretty sad, particularly with all the crazy CPU
+mitigations causing that to be even more expensive than it is already.
 
-diff --git a/drivers/net/ipa/ipa.h b/drivers/net/ipa/ipa.h
-index f3355e040a9e1..334cd62cf2866 100644
---- a/drivers/net/ipa/ipa.h
-+++ b/drivers/net/ipa/ipa.h
-@@ -21,7 +21,6 @@
- struct clk;
- struct icc_path;
- struct net_device;
--struct platform_device;
- 
- struct ipa_power;
- struct ipa_smp2p;
-@@ -31,7 +30,7 @@ struct ipa_interrupt;
-  * struct ipa - IPA information
-  * @gsi:		Embedded GSI structure
-  * @version:		IPA hardware version
-- * @pdev:		Platform device
-+ * @dev:		IPA device pointer
-  * @completion:		Used to signal pipeline clear transfer complete
-  * @nb:			Notifier block used for remoteproc SSR
-  * @notifier:		Remoteproc SSR notifier
-@@ -79,7 +78,7 @@ struct ipa_interrupt;
- struct ipa {
- 	struct gsi gsi;
- 	enum ipa_version version;
--	struct platform_device *pdev;
-+	struct device *dev;
- 	struct completion completion;
- 	struct notifier_block nb;
- 	void *notifier;
-diff --git a/drivers/net/ipa/ipa_cmd.c b/drivers/net/ipa/ipa_cmd.c
-index f1419fbd776c3..39219963dbb3f 100644
---- a/drivers/net/ipa/ipa_cmd.c
-+++ b/drivers/net/ipa/ipa_cmd.c
-@@ -174,7 +174,7 @@ bool ipa_cmd_table_init_valid(struct ipa *ipa, const struct ipa_mem *mem,
- 	u32 offset_max = field_max(IP_FLTRT_FLAGS_NHASH_ADDR_FMASK);
- 	u32 size_max = field_max(IP_FLTRT_FLAGS_NHASH_SIZE_FMASK);
- 	const char *table = route ? "route" : "filter";
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	u32 size;
- 
- 	size = route ? ipa->route_count : ipa->filter_count + 1;
-@@ -204,7 +204,7 @@ bool ipa_cmd_table_init_valid(struct ipa *ipa, const struct ipa_mem *mem,
- /* Validate the memory region that holds headers */
- static bool ipa_cmd_header_init_local_valid(struct ipa *ipa)
- {
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	const struct ipa_mem *mem;
- 	u32 offset_max;
- 	u32 size_max;
-@@ -256,7 +256,7 @@ static bool ipa_cmd_register_write_offset_valid(struct ipa *ipa,
- 						const char *name, u32 offset)
- {
- 	struct ipa_cmd_register_write *payload;
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	u32 offset_max;
- 	u32 bit_count;
- 
-diff --git a/drivers/net/ipa/ipa_endpoint.c b/drivers/net/ipa/ipa_endpoint.c
-index afa1d56d9095c..dd490941615e2 100644
---- a/drivers/net/ipa/ipa_endpoint.c
-+++ b/drivers/net/ipa/ipa_endpoint.c
-@@ -233,8 +233,8 @@ static bool ipa_endpoint_data_valid_one(struct ipa *ipa, u32 count,
- 			    const struct ipa_gsi_endpoint_data *data)
- {
- 	const struct ipa_gsi_endpoint_data *other_data;
--	struct device *dev = &ipa->pdev->dev;
- 	enum ipa_endpoint_name other_name;
-+	struct device *dev = ipa->dev;
- 
- 	if (ipa_gsi_endpoint_data_empty(data))
- 		return true;
-@@ -388,7 +388,7 @@ static u32 ipa_endpoint_max(struct ipa *ipa, u32 count,
- 			    const struct ipa_gsi_endpoint_data *data)
- {
- 	const struct ipa_gsi_endpoint_data *dp = data;
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	enum ipa_endpoint_name name;
- 	u32 max;
- 
-@@ -606,7 +606,7 @@ int ipa_endpoint_modem_exception_reset_all(struct ipa *ipa)
- 	count = ipa->modem_tx_count + ipa_cmd_pipeline_clear_count();
- 	trans = ipa_cmd_trans_alloc(ipa, count);
- 	if (!trans) {
--		dev_err(&ipa->pdev->dev,
-+		dev_err(ipa->dev,
- 			"no transaction to reset modem exception endpoints\n");
- 		return -EBUSY;
- 	}
-@@ -1498,8 +1498,7 @@ ipa_endpoint_status_tag_valid(struct ipa_endpoint *endpoint, const void *data)
- 	if (endpoint_id == command_endpoint->endpoint_id) {
- 		complete(&ipa->completion);
- 	} else {
--		dev_err(&ipa->pdev->dev,
--			"unexpected tagged packet from endpoint %u\n",
-+		dev_err(ipa->dev, "unexpected tagged packet from endpoint %u\n",
- 			endpoint_id);
- 	}
- 
-@@ -1536,6 +1535,7 @@ static void ipa_endpoint_status_parse(struct ipa_endpoint *endpoint,
- 	void *data = page_address(page) + NET_SKB_PAD;
- 	u32 unused = buffer_size - total_len;
- 	struct ipa *ipa = endpoint->ipa;
-+	struct device *dev = ipa->dev;
- 	u32 resid = total_len;
- 
- 	while (resid) {
-@@ -1544,7 +1544,7 @@ static void ipa_endpoint_status_parse(struct ipa_endpoint *endpoint,
- 		u32 len;
- 
- 		if (resid < IPA_STATUS_SIZE) {
--			dev_err(&endpoint->ipa->pdev->dev,
-+			dev_err(dev,
- 				"short message (%u bytes < %zu byte status)\n",
- 				resid, IPA_STATUS_SIZE);
- 			break;
-@@ -1666,8 +1666,8 @@ void ipa_endpoint_default_route_clear(struct ipa *ipa)
-  */
- static int ipa_endpoint_reset_rx_aggr(struct ipa_endpoint *endpoint)
- {
--	struct device *dev = &endpoint->ipa->pdev->dev;
- 	struct ipa *ipa = endpoint->ipa;
-+	struct device *dev = ipa->dev;
- 	struct gsi *gsi = &ipa->gsi;
- 	bool suspended = false;
- 	dma_addr_t addr;
-@@ -1769,7 +1769,7 @@ static void ipa_endpoint_reset(struct ipa_endpoint *endpoint)
- 		gsi_channel_reset(&ipa->gsi, channel_id, true);
- 
- 	if (ret)
--		dev_err(&ipa->pdev->dev,
-+		dev_err(ipa->dev,
- 			"error %d resetting channel %u for endpoint %u\n",
- 			ret, endpoint->channel_id, endpoint->endpoint_id);
- }
-@@ -1817,7 +1817,7 @@ int ipa_endpoint_enable_one(struct ipa_endpoint *endpoint)
- 
- 	ret = gsi_channel_start(gsi, endpoint->channel_id);
- 	if (ret) {
--		dev_err(&ipa->pdev->dev,
-+		dev_err(ipa->dev,
- 			"error %d starting %cX channel %u for endpoint %u\n",
- 			ret, endpoint->toward_ipa ? 'T' : 'R',
- 			endpoint->channel_id, endpoint_id);
-@@ -1854,14 +1854,13 @@ void ipa_endpoint_disable_one(struct ipa_endpoint *endpoint)
- 	/* Note that if stop fails, the channel's state is not well-defined */
- 	ret = gsi_channel_stop(gsi, endpoint->channel_id);
- 	if (ret)
--		dev_err(&ipa->pdev->dev,
--			"error %d attempting to stop endpoint %u\n", ret,
--			endpoint_id);
-+		dev_err(ipa->dev, "error %d attempting to stop endpoint %u\n",
-+			ret, endpoint_id);
- }
- 
- void ipa_endpoint_suspend_one(struct ipa_endpoint *endpoint)
- {
--	struct device *dev = &endpoint->ipa->pdev->dev;
-+	struct device *dev = endpoint->ipa->dev;
- 	struct gsi *gsi = &endpoint->ipa->gsi;
- 	int ret;
- 
-@@ -1881,7 +1880,7 @@ void ipa_endpoint_suspend_one(struct ipa_endpoint *endpoint)
- 
- void ipa_endpoint_resume_one(struct ipa_endpoint *endpoint)
- {
--	struct device *dev = &endpoint->ipa->pdev->dev;
-+	struct device *dev = endpoint->ipa->dev;
- 	struct gsi *gsi = &endpoint->ipa->gsi;
- 	int ret;
- 
-@@ -1983,7 +1982,7 @@ void ipa_endpoint_deconfig(struct ipa *ipa)
- 
- int ipa_endpoint_config(struct ipa *ipa)
- {
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	const struct reg *reg;
- 	u32 endpoint_id;
- 	u32 hw_limit;
-diff --git a/drivers/net/ipa/ipa_interrupt.c b/drivers/net/ipa/ipa_interrupt.c
-index 26e84a5c30bff..aea69b94cf613 100644
---- a/drivers/net/ipa/ipa_interrupt.c
-+++ b/drivers/net/ipa/ipa_interrupt.c
-@@ -110,14 +110,13 @@ static irqreturn_t ipa_isr_thread(int irq, void *dev_id)
- 	struct ipa_interrupt *interrupt = dev_id;
- 	struct ipa *ipa = interrupt->ipa;
- 	u32 enabled = interrupt->enabled;
-+	struct device *dev = ipa->dev;
- 	const struct reg *reg;
--	struct device *dev;
- 	u32 pending;
- 	u32 offset;
- 	u32 mask;
- 	int ret;
- 
--	dev = &ipa->pdev->dev;
- 	ret = pm_runtime_get_sync(dev);
- 	if (WARN_ON(ret < 0))
- 		goto out_power_put;
-@@ -240,8 +239,8 @@ void ipa_interrupt_simulate_suspend(struct ipa_interrupt *interrupt)
- int ipa_interrupt_config(struct ipa *ipa)
- {
- 	struct ipa_interrupt *interrupt = ipa->interrupt;
--	struct device *dev = &ipa->pdev->dev;
- 	unsigned int irq = interrupt->irq;
-+	struct device *dev = ipa->dev;
- 	const struct reg *reg;
- 	int ret;
- 
-@@ -278,7 +277,7 @@ int ipa_interrupt_config(struct ipa *ipa)
- void ipa_interrupt_deconfig(struct ipa *ipa)
- {
- 	struct ipa_interrupt *interrupt = ipa->interrupt;
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 
- 	ipa->interrupt = NULL;
- 
-diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
-index 3125aec88e6e1..57b241417e8cd 100644
---- a/drivers/net/ipa/ipa_main.c
-+++ b/drivers/net/ipa/ipa_main.c
-@@ -7,7 +7,6 @@
- #include <linux/types.h>
- #include <linux/atomic.h>
- #include <linux/bitfield.h>
--#include <linux/device.h>
- #include <linux/bug.h>
- #include <linux/io.h>
- #include <linux/firmware.h>
-@@ -114,7 +113,7 @@ int ipa_setup(struct ipa *ipa)
- {
- 	struct ipa_endpoint *exception_endpoint;
- 	struct ipa_endpoint *command_endpoint;
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	int ret;
- 
- 	ret = gsi_setup(&ipa->gsi);
-@@ -858,7 +857,7 @@ static int ipa_probe(struct platform_device *pdev)
- 		goto err_power_exit;
- 	}
- 
--	ipa->pdev = pdev;
-+	ipa->dev = dev;
- 	dev_set_drvdata(dev, ipa);
- 	ipa->interrupt = interrupt;
- 	ipa->power = power;
-@@ -953,12 +952,16 @@ static int ipa_probe(struct platform_device *pdev)
- 
- static void ipa_remove(struct platform_device *pdev)
- {
--	struct ipa *ipa = dev_get_drvdata(&pdev->dev);
--	struct device *dev = &pdev->dev;
- 	struct ipa_interrupt *interrupt;
- 	struct ipa_power *power;
-+	struct device *dev;
-+	struct ipa *ipa;
- 	int ret;
- 
-+	ipa = dev_get_drvdata(&pdev->dev);
-+	dev = ipa->dev;
-+	WARN_ON(dev != &pdev->dev);
-+
- 	power = ipa->power;
- 	interrupt = ipa->interrupt;
- 
-diff --git a/drivers/net/ipa/ipa_mem.c b/drivers/net/ipa/ipa_mem.c
-index d7df7d340221d..709f061ede617 100644
---- a/drivers/net/ipa/ipa_mem.c
-+++ b/drivers/net/ipa/ipa_mem.c
-@@ -88,7 +88,7 @@ int ipa_mem_setup(struct ipa *ipa)
- 	 */
- 	trans = ipa_cmd_trans_alloc(ipa, 4);
- 	if (!trans) {
--		dev_err(&ipa->pdev->dev, "no transaction for memory setup\n");
-+		dev_err(ipa->dev, "no transaction for memory setup\n");
- 		return -EBUSY;
- 	}
- 
-@@ -218,8 +218,8 @@ static bool ipa_mem_id_required(struct ipa *ipa, enum ipa_mem_id mem_id)
- 
- static bool ipa_mem_valid_one(struct ipa *ipa, const struct ipa_mem *mem)
- {
--	struct device *dev = &ipa->pdev->dev;
- 	enum ipa_mem_id mem_id = mem->id;
-+	struct device *dev = ipa->dev;
- 	u16 size_multiple;
- 
- 	/* Make sure the memory region is valid for this version of IPA */
-@@ -255,7 +255,7 @@ static bool ipa_mem_valid_one(struct ipa *ipa, const struct ipa_mem *mem)
- static bool ipa_mem_valid(struct ipa *ipa, const struct ipa_mem_data *mem_data)
- {
- 	DECLARE_BITMAP(regions, IPA_MEM_COUNT) = { };
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	enum ipa_mem_id mem_id;
- 	u32 i;
- 
-@@ -291,7 +291,7 @@ static bool ipa_mem_valid(struct ipa *ipa, const struct ipa_mem_data *mem_data)
- /* Do all memory regions fit within the IPA local memory? */
- static bool ipa_mem_size_valid(struct ipa *ipa)
- {
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	u32 limit = ipa->mem_size;
- 	u32 i;
- 
-@@ -318,7 +318,7 @@ static bool ipa_mem_size_valid(struct ipa *ipa)
-  */
- int ipa_mem_config(struct ipa *ipa)
- {
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	const struct ipa_mem *mem;
- 	const struct reg *reg;
- 	dma_addr_t addr;
-@@ -394,7 +394,7 @@ int ipa_mem_config(struct ipa *ipa)
- /* Inverse of ipa_mem_config() */
- void ipa_mem_deconfig(struct ipa *ipa)
- {
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 
- 	dma_free_coherent(dev, ipa->zero_size, ipa->zero_virt, ipa->zero_addr);
- 	ipa->zero_size = 0;
-@@ -421,8 +421,7 @@ int ipa_mem_zero_modem(struct ipa *ipa)
- 	 */
- 	trans = ipa_cmd_trans_alloc(ipa, 3);
- 	if (!trans) {
--		dev_err(&ipa->pdev->dev,
--			"no transaction to zero modem memory\n");
-+		dev_err(ipa->dev, "no transaction to zero modem memory\n");
- 		return -EBUSY;
- 	}
- 
-@@ -453,7 +452,7 @@ int ipa_mem_zero_modem(struct ipa *ipa)
-  */
- static int ipa_imem_init(struct ipa *ipa, unsigned long addr, size_t size)
- {
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	struct iommu_domain *domain;
- 	unsigned long iova;
- 	phys_addr_t phys;
-@@ -486,13 +485,12 @@ static int ipa_imem_init(struct ipa *ipa, unsigned long addr, size_t size)
- 
- static void ipa_imem_exit(struct ipa *ipa)
- {
-+	struct device *dev = ipa->dev;
- 	struct iommu_domain *domain;
--	struct device *dev;
- 
- 	if (!ipa->imem_size)
- 		return;
- 
--	dev = &ipa->pdev->dev;
- 	domain = iommu_get_domain_for_dev(dev);
- 	if (domain) {
- 		size_t size;
-@@ -528,7 +526,7 @@ static void ipa_imem_exit(struct ipa *ipa)
-  */
- static int ipa_smem_init(struct ipa *ipa, u32 item, size_t size)
- {
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	struct iommu_domain *domain;
- 	unsigned long iova;
- 	phys_addr_t phys;
-@@ -595,7 +593,7 @@ static int ipa_smem_init(struct ipa *ipa, u32 item, size_t size)
- 
- static void ipa_smem_exit(struct ipa *ipa)
- {
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	struct iommu_domain *domain;
- 
- 	domain = iommu_get_domain_for_dev(dev);
-diff --git a/drivers/net/ipa/ipa_modem.c b/drivers/net/ipa/ipa_modem.c
-index 1d1be92fbebcb..c27ca3f27f7d4 100644
---- a/drivers/net/ipa/ipa_modem.c
-+++ b/drivers/net/ipa/ipa_modem.c
-@@ -58,7 +58,7 @@ static int ipa_open(struct net_device *netdev)
- 	struct device *dev;
- 	int ret;
- 
--	dev = &ipa->pdev->dev;
-+	dev = ipa->dev;
- 	ret = pm_runtime_get_sync(dev);
- 	if (ret < 0)
- 		goto err_power_put;
-@@ -94,7 +94,7 @@ static int ipa_stop(struct net_device *netdev)
- 	struct device *dev;
- 	int ret;
- 
--	dev = &ipa->pdev->dev;
-+	dev = ipa->dev;
- 	ret = pm_runtime_get_sync(dev);
- 	if (ret < 0)
- 		goto out_power_put;
-@@ -158,7 +158,7 @@ ipa_start_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	 */
- 	netif_stop_queue(netdev);
- 
--	dev = &ipa->pdev->dev;
-+	dev = ipa->dev;
- 	ret = pm_runtime_get(dev);
- 	if (ret < 1) {
- 		/* If a resume won't happen, just drop the packet */
-@@ -322,7 +322,7 @@ int ipa_modem_start(struct ipa *ipa)
- 		goto out_set_state;
- 	}
- 
--	SET_NETDEV_DEV(netdev, &ipa->pdev->dev);
-+	SET_NETDEV_DEV(netdev, ipa->dev);
- 	priv = netdev_priv(netdev);
- 	priv->ipa = ipa;
- 	priv->tx = ipa->name_map[IPA_ENDPOINT_AP_MODEM_TX];
-@@ -396,7 +396,7 @@ int ipa_modem_stop(struct ipa *ipa)
- /* Treat a "clean" modem stop the same as a crash */
- static void ipa_modem_crashed(struct ipa *ipa)
- {
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	int ret;
- 
- 	/* Prevent the modem from triggering a call to ipa_setup() */
-@@ -443,7 +443,7 @@ static int ipa_modem_notify(struct notifier_block *nb, unsigned long action,
- {
- 	struct ipa *ipa = container_of(nb, struct ipa, nb);
- 	struct qcom_ssr_notify_data *notify_data = data;
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 
- 	switch (action) {
- 	case QCOM_SSR_BEFORE_POWERUP:
-@@ -492,7 +492,7 @@ int ipa_modem_config(struct ipa *ipa)
- 
- void ipa_modem_deconfig(struct ipa *ipa)
- {
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	int ret;
- 
- 	ret = qcom_unregister_ssr_notifier(ipa->notifier, &ipa->nb);
-diff --git a/drivers/net/ipa/ipa_power.c b/drivers/net/ipa/ipa_power.c
-index 0f635b8356bfb..41ca7ef5e20fc 100644
---- a/drivers/net/ipa/ipa_power.c
-+++ b/drivers/net/ipa/ipa_power.c
-@@ -238,7 +238,7 @@ int ipa_power_setup(struct ipa *ipa)
- 
- 	ipa_interrupt_enable(ipa, IPA_IRQ_TX_SUSPEND);
- 
--	ret = device_init_wakeup(&ipa->pdev->dev, true);
-+	ret = device_init_wakeup(ipa->dev, true);
- 	if (ret)
- 		ipa_interrupt_disable(ipa, IPA_IRQ_TX_SUSPEND);
- 
-@@ -247,7 +247,7 @@ int ipa_power_setup(struct ipa *ipa)
- 
- void ipa_power_teardown(struct ipa *ipa)
- {
--	(void)device_init_wakeup(&ipa->pdev->dev, false);
-+	(void)device_init_wakeup(ipa->dev, false);
- 	ipa_interrupt_disable(ipa, IPA_IRQ_TX_SUSPEND);
- }
- 
-diff --git a/drivers/net/ipa/ipa_qmi.c b/drivers/net/ipa/ipa_qmi.c
-index f70f0a1d1cdac..65c40e207802a 100644
---- a/drivers/net/ipa/ipa_qmi.c
-+++ b/drivers/net/ipa/ipa_qmi.c
-@@ -96,7 +96,7 @@ static void ipa_server_init_complete(struct ipa_qmi *ipa_qmi)
- 				   IPA_QMI_INIT_COMPLETE_IND_SZ,
- 				   ipa_init_complete_ind_ei, &ind);
- 	if (ret)
--		dev_err(&ipa->pdev->dev,
-+		dev_err(ipa->dev,
- 			"error %d sending init complete indication\n", ret);
- 	else
- 		ipa_qmi->indication_sent = true;
-@@ -148,7 +148,7 @@ static void ipa_qmi_ready(struct ipa_qmi *ipa_qmi)
- 	ipa = container_of(ipa_qmi, struct ipa, qmi);
- 	ret = ipa_modem_start(ipa);
- 	if (ret)
--		dev_err(&ipa->pdev->dev, "error %d starting modem\n", ret);
-+		dev_err(ipa->dev, "error %d starting modem\n", ret);
- }
- 
- /* All QMI clients from the modem node are gone (modem shut down or crashed). */
-@@ -199,7 +199,7 @@ static void ipa_server_indication_register(struct qmi_handle *qmi,
- 		ipa_qmi->indication_requested = true;
- 		ipa_qmi_ready(ipa_qmi);		/* We might be ready now */
- 	} else {
--		dev_err(&ipa->pdev->dev,
-+		dev_err(ipa->dev,
- 			"error %d sending register indication response\n", ret);
- 	}
- }
-@@ -228,7 +228,7 @@ static void ipa_server_driver_init_complete(struct qmi_handle *qmi,
- 		ipa_qmi->uc_ready = true;
- 		ipa_qmi_ready(ipa_qmi);		/* We might be ready now */
- 	} else {
--		dev_err(&ipa->pdev->dev,
-+		dev_err(ipa->dev,
- 			"error %d sending init complete response\n", ret);
- 	}
- }
-@@ -417,7 +417,7 @@ static void ipa_client_init_driver_work(struct work_struct *work)
- 	qmi = &ipa_qmi->client_handle;
- 
- 	ipa = container_of(ipa_qmi, struct ipa, qmi);
--	dev = &ipa->pdev->dev;
-+	dev = ipa->dev;
- 
- 	ret = qmi_txn_init(qmi, &txn, NULL, NULL);
- 	if (ret < 0) {
-diff --git a/drivers/net/ipa/ipa_smp2p.c b/drivers/net/ipa/ipa_smp2p.c
-index 831268551d9a7..aeccce9fab727 100644
---- a/drivers/net/ipa/ipa_smp2p.c
-+++ b/drivers/net/ipa/ipa_smp2p.c
-@@ -84,15 +84,13 @@ struct ipa_smp2p {
-  */
- static void ipa_smp2p_notify(struct ipa_smp2p *smp2p)
- {
--	struct device *dev;
- 	u32 value;
- 	u32 mask;
- 
- 	if (smp2p->notified)
- 		return;
- 
--	dev = &smp2p->ipa->pdev->dev;
--	smp2p->power_on = pm_runtime_get_if_active(dev, true) > 0;
-+	smp2p->power_on = pm_runtime_get_if_active(smp2p->ipa->dev, true) > 0;
- 
- 	/* Signal whether the IPA power is enabled */
- 	mask = BIT(smp2p->enabled_bit);
-@@ -152,15 +150,16 @@ static void ipa_smp2p_panic_notifier_unregister(struct ipa_smp2p *smp2p)
- static irqreturn_t ipa_smp2p_modem_setup_ready_isr(int irq, void *dev_id)
- {
- 	struct ipa_smp2p *smp2p = dev_id;
-+	struct ipa *ipa = smp2p->ipa;
- 	struct device *dev;
- 	int ret;
- 
- 	/* Ignore any (spurious) interrupts received after the first */
--	if (smp2p->ipa->setup_complete)
-+	if (ipa->setup_complete)
- 		return IRQ_HANDLED;
- 
- 	/* Power needs to be active for setup */
--	dev = &smp2p->ipa->pdev->dev;
-+	dev = ipa->dev;
- 	ret = pm_runtime_get_sync(dev);
- 	if (ret < 0) {
- 		dev_err(dev, "error %d getting power for setup\n", ret);
-@@ -168,7 +167,7 @@ static irqreturn_t ipa_smp2p_modem_setup_ready_isr(int irq, void *dev_id)
- 	}
- 
- 	/* An error here won't cause driver shutdown, so warn if one occurs */
--	ret = ipa_setup(smp2p->ipa);
-+	ret = ipa_setup(ipa);
- 	WARN(ret != 0, "error %d from ipa_setup()\n", ret);
- 
- out_power_put:
-@@ -209,7 +208,7 @@ static void ipa_smp2p_irq_exit(struct ipa_smp2p *smp2p, u32 irq)
- /* Drop the power reference if it was taken in ipa_smp2p_notify() */
- static void ipa_smp2p_power_release(struct ipa *ipa)
- {
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 
- 	if (!ipa->smp2p->power_on)
- 		return;
-diff --git a/drivers/net/ipa/ipa_table.c b/drivers/net/ipa/ipa_table.c
-index 7b637bb8b41c8..a24ac11b8893d 100644
---- a/drivers/net/ipa/ipa_table.c
-+++ b/drivers/net/ipa/ipa_table.c
-@@ -163,7 +163,7 @@ ipa_table_mem(struct ipa *ipa, bool filter, bool hashed, bool ipv6)
- 
- bool ipa_filtered_valid(struct ipa *ipa, u64 filtered)
- {
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	u32 count;
- 
- 	if (!filtered) {
-@@ -236,8 +236,7 @@ ipa_filter_reset_table(struct ipa *ipa, bool hashed, bool ipv6, bool modem)
- 
- 	trans = ipa_cmd_trans_alloc(ipa, hweight64(ep_mask));
- 	if (!trans) {
--		dev_err(&ipa->pdev->dev,
--			"no transaction for %s filter reset\n",
-+		dev_err(ipa->dev, "no transaction for %s filter reset\n",
- 			modem ? "modem" : "AP");
- 		return -EBUSY;
- 	}
-@@ -298,8 +297,7 @@ static int ipa_route_reset(struct ipa *ipa, bool modem)
- 
- 	trans = ipa_cmd_trans_alloc(ipa, hash_support ? 4 : 2);
- 	if (!trans) {
--		dev_err(&ipa->pdev->dev,
--			"no transaction for %s route reset\n",
-+		dev_err(ipa->dev, "no transaction for %s route reset\n",
- 			modem ? "modem" : "AP");
- 		return -EBUSY;
- 	}
-@@ -327,7 +325,7 @@ static int ipa_route_reset(struct ipa *ipa, bool modem)
- 
- void ipa_table_reset(struct ipa *ipa, bool modem)
- {
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	const char *ee_name;
- 	int ret;
- 
-@@ -356,7 +354,7 @@ int ipa_table_hash_flush(struct ipa *ipa)
- 
- 	trans = ipa_cmd_trans_alloc(ipa, 1);
- 	if (!trans) {
--		dev_err(&ipa->pdev->dev, "no transaction for hash flush\n");
-+		dev_err(ipa->dev, "no transaction for hash flush\n");
- 		return -EBUSY;
- 	}
- 
-@@ -469,7 +467,7 @@ int ipa_table_setup(struct ipa *ipa)
- 	 */
- 	trans = ipa_cmd_trans_alloc(ipa, 8);
- 	if (!trans) {
--		dev_err(&ipa->pdev->dev, "no transaction for table setup\n");
-+		dev_err(ipa->dev, "no transaction for table setup\n");
- 		return -EBUSY;
- 	}
- 
-@@ -713,7 +711,7 @@ bool ipa_table_mem_valid(struct ipa *ipa, bool filter)
-  */
- int ipa_table_init(struct ipa *ipa)
- {
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	dma_addr_t addr;
- 	__le64 le_addr;
- 	__le64 *virt;
-@@ -763,7 +761,7 @@ int ipa_table_init(struct ipa *ipa)
- void ipa_table_exit(struct ipa *ipa)
- {
- 	u32 count = max_t(u32, 1 + ipa->filter_count, ipa->route_count);
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 	size_t size;
- 
- 	size = IPA_ZERO_RULE_SIZE + (1 + count) * sizeof(__le64);
-diff --git a/drivers/net/ipa/ipa_uc.c b/drivers/net/ipa/ipa_uc.c
-index 7eaa0b4ebed92..bfd5dc6dab432 100644
---- a/drivers/net/ipa/ipa_uc.c
-+++ b/drivers/net/ipa/ipa_uc.c
-@@ -127,7 +127,7 @@ static struct ipa_uc_mem_area *ipa_uc_shared(struct ipa *ipa)
- static void ipa_uc_event_handler(struct ipa *ipa)
- {
- 	struct ipa_uc_mem_area *shared = ipa_uc_shared(ipa);
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 
- 	if (shared->event == IPA_UC_EVENT_ERROR)
- 		dev_err(dev, "microcontroller error event\n");
-@@ -141,7 +141,7 @@ static void ipa_uc_event_handler(struct ipa *ipa)
- static void ipa_uc_response_hdlr(struct ipa *ipa)
- {
- 	struct ipa_uc_mem_area *shared = ipa_uc_shared(ipa);
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 
- 	/* An INIT_COMPLETED response message is sent to the AP by the
- 	 * microcontroller when it is operational.  Other than this, the AP
-@@ -191,7 +191,7 @@ void ipa_uc_config(struct ipa *ipa)
- /* Inverse of ipa_uc_config() */
- void ipa_uc_deconfig(struct ipa *ipa)
- {
--	struct device *dev = &ipa->pdev->dev;
-+	struct device *dev = ipa->dev;
- 
- 	ipa_interrupt_disable(ipa, IPA_IRQ_UC_1);
- 	ipa_interrupt_disable(ipa, IPA_IRQ_UC_0);
-@@ -208,8 +208,8 @@ void ipa_uc_deconfig(struct ipa *ipa)
- /* Take a proxy power reference for the microcontroller */
- void ipa_uc_power(struct ipa *ipa)
- {
-+	struct device *dev = ipa->dev;
- 	static bool already;
--	struct device *dev;
- 	int ret;
- 
- 	if (already)
-@@ -217,7 +217,6 @@ void ipa_uc_power(struct ipa *ipa)
- 	already = true;		/* Only do this on first boot */
- 
- 	/* This power reference dropped in ipa_uc_response_hdlr() above */
--	dev = &ipa->pdev->dev;
- 	ret = pm_runtime_get_sync(dev);
- 	if (ret < 0) {
- 		pm_runtime_put_noidle(dev);
--- 
-2.40.1
+I really don't see how that error can happen, it sounds very odd.
 
+Oh well.
+
+          Linus
 
