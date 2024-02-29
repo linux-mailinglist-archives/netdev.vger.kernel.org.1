@@ -1,158 +1,107 @@
-Return-Path: <netdev+bounces-76245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 923A386CFEF
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:01:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A373586CFF8
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 18:02:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26B06285E06
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:01:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4F772874F9
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 17:02:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E76757E5;
-	Thu, 29 Feb 2024 16:57:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FAE87A148;
+	Thu, 29 Feb 2024 16:58:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ChYI0Izp"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="N9ZbocCb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458D04AECA;
-	Thu, 29 Feb 2024 16:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D23597A13B;
+	Thu, 29 Feb 2024 16:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709225828; cv=none; b=P9MHXHKIt4g6kiEYGOPOEM7hw62/jnjDercmNhO5wio0s20CUYIb1YqhEMyg2q3FAo6aHYD9vPpRsNkHIpcbJwqFKqBCHobMyC8woZC8yC5PfC0tVNlDI+ZautRmVcrtYd3zcjHHZ/xL+AqVhbJLsRy8Vs0lt8forOLRQSMB/XQ=
+	t=1709225922; cv=none; b=jHH1bW+c9NIhd1yt/U8fa8dPlcMslK53ItJVmtixz0Vgs6lelChg2QfqAlhlfaA7LTziBCvsN/5yGueaWL6y9xou9eqF73BkziTSP/SOJL/w/Vg4ofIxUzMIQVqmrYGlGQ3h2cCSuNuxMMUl43brQPekhplGDGBpSLPf0TmHEEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709225828; c=relaxed/simple;
-	bh=Mwc8vNp+uod54n1G0L5TDfKxmF1IHGJ1xIbnsW3iay4=;
+	s=arc-20240116; t=1709225922; c=relaxed/simple;
+	bh=p6FqwOUMGbV2c5HR1BYCJhqK5gkHnO/jnmliZOTV0mY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H6qVWQ5CEVYR9+HvbSl7i/WZEXJDpBnhOcRl9ZWMrKg3AUOrMu8F3m77FVKhEt1XtvKET4lsnmOS5dzpTJy4RLofgNj4du+WFyX0l3Vgh0+9xsDKoGlkrKUlN+83pQmolp8kFhh30y/3kxhfnHEI4FLRcA0TXavWpwN/6XUtmqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ChYI0Izp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E7DAC433F1;
-	Thu, 29 Feb 2024 16:57:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709225827;
-	bh=Mwc8vNp+uod54n1G0L5TDfKxmF1IHGJ1xIbnsW3iay4=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=ChYI0Izpo0ktPuD4KG2X/yX16oi6tuLY10Q9/6jSNsqXSGeF7eaifXryORkS7c+mW
-	 cziaoYXUMWtTDW3EJAcmL1i67/U8mXCXgyjqpojAlwHpaU9Mbk0CSHw86LLa4dWa4b
-	 RpQPrsPvx56wayKNkkqAiJZgcNt2hhtKOlvUAcHBWBdmBmV8jR74rmrpWbrXmFofcJ
-	 sfdFIz14cK0wLBpjC09qmVaZ6a19d+hbql12/3zcDELL4gosCQU5gFfmWDgzn7XM48
-	 It0/2Ty27HpMKTZUQmpDwhNYNj7ZaxXMgR7VnbBlnbSKV7sDzrcjkAmp19pJUbI/G9
-	 1GwJOE0rCVxqQ==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 3BF06CE1382; Thu, 29 Feb 2024 08:57:07 -0800 (PST)
-Date: Thu, 29 Feb 2024 08:57:07 -0800
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Joel Fernandes <joel@joelfernandes.org>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>, Yan Zhai <yan@cloudflare.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Network Development <netdev@vger.kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=C6XcgzXqKw/Wcla3R3u5twDZ4Nc3PpVXTmABTZUHFRKzJTrQIpBYAdhEPgklejlDc3v61KpWXVZI4LxPSwQ5khF9KwkTzkvJm2WmjPg/ixTOh7SLGW4XFs5sAKhIfb4rokioMuRODjrqgvYOhMvUR2yaZTx8WAwhFcXbeejITBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=N9ZbocCb; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/cAast4b1moTClApH8MesOygPfzXLs7wuYy5qzSoQzM=; b=N9ZbocCbjrkXC3f/TVFZZiow7r
+	KBN807SMyg2iL4AZBkaetkYRUEGJogEhjby9l/ukSKUFudq4PgFkeQYr3CiS+OpEvk9TK3NbGGQRb
+	MyWKR4JMuMnwOguJHzsmJlyHvMfSainzvzZLOZM3YXJapOTONhS4y7ekVU+u3LRrAQ9H5qivH5xxm
+	e1DZRNdOjn7JJEAdK/paIzo+/vbWMq33Un4Z0Rquv1lzBBbg/2+MeuZwromNoUpc8G71XUWMCL9Om
+	opZfnSh+EvjifPbOYilY4QXwLFLyvYeu1r7zGNFu8yArqegaw35l6IupkKMr69+eAAQvujfzGT5h5
+	dA0w84bQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45990)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rfjjl-0000WT-0y;
+	Thu, 29 Feb 2024 16:58:25 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rfjjh-0000yS-TA; Thu, 29 Feb 2024 16:58:21 +0000
+Date: Thu, 29 Feb 2024 16:58:21 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Bastien Curutchet <bastien.curutchet@bootlin.com>,
 	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Hannes Frederic Sowa <hannes@stressinduktion.org>,
-	LKML <linux-kernel@vger.kernel.org>, rcu@vger.kernel.org,
-	bpf <bpf@vger.kernel.org>, kernel-team <kernel-team@cloudflare.com>,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
-Message-ID: <55900c6a-f181-4c5c-8de2-bca640c4af3e@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <02913b40-7b74-48b3-b15d-53133afd3ba6@paulmck-laptop>
- <3D27EFEF-0452-4555-8277-9159486B41BF@joelfernandes.org>
- <ba95955d-b63d-4670-b947-e77b740b1a49@paulmck-laptop>
- <20240228173307.529d11ee@gandalf.local.home>
- <CAADnVQ+szRDGaDJPoBFR9KyeMjwpuxOCNys=yxDaCLYZkSkyYw@mail.gmail.com>
- <8ae889cb-ee1d-4c72-9414-e21258118ce3@paulmck-laptop>
- <888d2f90-6d2f-4d4f-a9f6-fbf2f2611821@joelfernandes.org>
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+	Lee Jones <lee@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-leds@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	herve.codina@bootlin.com, maxime.chevallier@bootlin.com,
+	christophercordahi@nanometrics.ca
+Subject: Re: [PATCH v2 2/6] leds: trigger: Create a new LED netdev trigger
+ for collision
+Message-ID: <ZeC3raIM/wxGXsuz@shell.armlinux.org.uk>
+References: <20240227093945.21525-1-bastien.curutchet@bootlin.com>
+ <20240227093945.21525-3-bastien.curutchet@bootlin.com>
+ <e6351d0c-15e2-47a9-be6c-6f21aee9ae90@lunn.ch>
+ <e1936774-14bf-4ae5-9754-e21f5a0c59b3@bootlin.com>
+ <9dd1b2d0-4ba5-4d34-a892-a6cc8c01df28@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <888d2f90-6d2f-4d4f-a9f6-fbf2f2611821@joelfernandes.org>
+In-Reply-To: <9dd1b2d0-4ba5-4d34-a892-a6cc8c01df28@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Feb 29, 2024 at 09:21:48AM -0500, Joel Fernandes wrote:
-> 
-> 
-> On 2/28/2024 5:58 PM, Paul E. McKenney wrote:
-> > On Wed, Feb 28, 2024 at 02:48:44PM -0800, Alexei Starovoitov wrote:
-> >> On Wed, Feb 28, 2024 at 2:31 PM Steven Rostedt <rostedt@goodmis.org> wrote:
-> >>>
-> >>> On Wed, 28 Feb 2024 14:19:11 -0800
-> >>> "Paul E. McKenney" <paulmck@kernel.org> wrote:
-> >>>
-> >>>>>>
-> >>>>>> Well, to your initial point, cond_resched() does eventually invoke
-> >>>>>> preempt_schedule_common(), so you are quite correct that as far as
-> >>>>>> Tasks RCU is concerned, cond_resched() is not a quiescent state.
-> >>>>>
-> >>>>>  Thanks for confirming. :-)
-> >>>>
-> >>>> However, given that the current Tasks RCU use cases wait for trampolines
-> >>>> to be evacuated, Tasks RCU could make the choice that cond_resched()
-> >>>> be a quiescent state, for example, by adjusting rcu_all_qs() and
-> >>>> .rcu_urgent_qs accordingly.
-> >>>>
-> >>>> But this seems less pressing given the chance that cond_resched() might
-> >>>> go away in favor of lazy preemption.
-> >>>
-> >>> Although cond_resched() is technically a "preemption point" and not truly a
-> >>> voluntary schedule, I would be happy to state that it's not allowed to be
-> >>> called from trampolines, or their callbacks. Now the question is, does BPF
-> >>> programs ever call cond_resched()? I don't think they do.
-> >>>
-> >>> [ Added Alexei ]
-> >>
-> >> I'm a bit lost in this thread :)
-> >> Just answering the above question.
-> >> bpf progs never call cond_resched() directly.
-> >> But there are sleepable (aka faultable) bpf progs that
-> >> can call some helper or kfunc that may call cond_resched()
-> >> in some path.
-> >> sleepable bpf progs are protected by rcu_tasks_trace.
-> >> That's a very different one vs rcu_tasks.
-> > 
-> > Suppose that the various cond_resched() invocations scattered throughout
-> > the kernel acted as RCU Tasks quiescent states, so that as soon as a
-> > given task executed a cond_resched(), synchronize_rcu_tasks() might
-> > return or call_rcu_tasks() might invoke its callback.
-> > 
-> > Would that cause BPF any trouble?
-> > 
-> > My guess is "no", because it looks like BPF is using RCU Tasks (as you
-> > say, as opposed to RCU Tasks Trace) only to wait for execution to leave a
-> > trampoline.  But I trust you much more than I trust myself on this topic!
-> 
-> But it uses RCU Tasks Trace as well (for sleepable bpf programs), not just
-> Tasks? Looks like that's what Alexei said above as well, and I confirmed it in
-> bpf/trampoline.c
-> 
->         /* The trampoline without fexit and fmod_ret progs doesn't call original
->          * function and doesn't use percpu_ref.
->          * Use call_rcu_tasks_trace() to wait for sleepable progs to finish.
->          * Then use call_rcu_tasks() to wait for the rest of trampoline asm
->          * and normal progs.
->          */
->         call_rcu_tasks_trace(&im->rcu, __bpf_tramp_image_put_rcu_tasks);
-> 
-> The code comment says it uses both.
+On Thu, Feb 29, 2024 at 04:17:47PM +0100, Andrew Lunn wrote:
+> 2) LEDs are the wild west, because it is not part of 802.3. Every
+> vendor does it differently, and has their own special blinking
+> patterns. My preference is to keep it simple to what people actually
+> use. You cannot actually generate a collision, the developer who wants
+> to add support for collision. I have to ask, is collision actually
+> useful?
 
-BPF does quite a few interesting things with these.
+I'm not sure when you say "You cannot actually generate a collision"
+whether you're referring to the link or the LEDs here? Obviously, we
+can't detect a collision unless the hardware tells us that it happened.
 
-But would you like to look at the update-side uses of RCU Tasks Rude
-to see if lazy preemption affects them?  I don't believe that there
-are any problems here, but we do need to check.
-
-							Thanx, Paul
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
