@@ -1,152 +1,133 @@
-Return-Path: <netdev+bounces-76299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCAEC86D2DA
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:09:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D9BE86D33A
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:32:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81D261F23A9A
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:09:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49463285D23
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA05E13C9D7;
-	Thu, 29 Feb 2024 19:09:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="WPFTpjyi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9EF134434;
+	Thu, 29 Feb 2024 19:32:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA0213C9C3
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 19:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F577A5F;
+	Thu, 29 Feb 2024 19:32:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709233741; cv=none; b=mJ/cRuTx543FXpy9+dhrSmz0IgjN3YlTQNwPHsQTtOdfz0PDQfKGV3FgjUQD/YtW0qoHdd3usVWqVALXjZeiAsw8W3y0Col2QguizzedvJ48mUJFGZohQGwrldE+cZlPg63JWwELEfdCG3kI2jSPCZ+7kAZBf1VMPbDovO/y7Bs=
+	t=1709235159; cv=none; b=fqyAVRv6rJVegw4D4l1RUfnJbUARmv34Rn+TwruQj2LZB7UG7Tu/JszYUpcXisGy5aMC3zN1leyw7ac9dCySuMvWxrpskTKM7x0lyICcnj5VK5PO5GZPm6xGoAa2eTv8XerO9hQjWh1TJqNf3ENgpdJQHWvhEyAurY7hRniWr1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709233741; c=relaxed/simple;
-	bh=XhYVxNr3yIQGYfPBq8eZl7fW5SFxmb1whNnII5+VYe8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iNWKc/rH3F1/5XvU2EZrdmMQJ6PInESpz90VTC27Z/jiCOY7mdI6oiR7mwZ8T+zu1S1xQtfZJ/XigRqfZHA9oHnyenXYR7nsOsRaMoGEA1mEqAnajy1LVQUHID8L9ASVWMgkC3HghJguy4693v6tzinudnji6T1RUtvU4hTUw2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=WPFTpjyi; arc=none smtp.client-ip=209.85.210.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-6e480fe439aso666259a34.0
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 11:08:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1709233739; x=1709838539; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UPNx03vL5gJBUsLY5izQNSc5f5aQFQJTo3mFc1Gcb0A=;
-        b=WPFTpjyiRDs+msv4Rcc4/qQvq3jlA5SfObvFs8J1jxZ+hsqoA8y2mmS/xj0bHHmGxt
-         4RQ+Vbpb7J99vt2blfAzhImkl3cMVSnvDq/urcg/XftJn0Pc/UZqL0z2YxSQtfwPOIwG
-         q5FuNu5UmCxQohquaFF0QadN7TK8tF6YHwPZ8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709233739; x=1709838539;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UPNx03vL5gJBUsLY5izQNSc5f5aQFQJTo3mFc1Gcb0A=;
-        b=Cm94EIoBI7WEyv522sSG2qMUiSzT3pJLGfswVpR5gLtz9a/KmrNAdJKAqej2Hp0uAl
-         x5xL8yCMl84ijw8f1fic5XzIJ27uy9KeydGpy7dLjkrdJRFclIimpAiKh8Z+5FcClY03
-         ks6hRXrF9TUh4x8l9qmYJ+blVq3M1QbPehEM0HI9iXgZc2pCiLzMA2ZrNdaF901lZhlo
-         ym5Ua4qQGuIaEUTKvuHe2XcW5epbVJmHqEWM+MWvprSMUIkzX19O4wAa00otFlmXGU89
-         6AAjP2rX+2LyxUV/9wmxlMeqnPOZYOdmo6sTJ2/ioLR9jmTYyY+3h4CFQ+ku5FxpF85U
-         dzYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX/q6wKgOK4DZQdNwLDgHEBapoDgL2Y4q6FFW/tsZAtOppUDpD0+aoKCMHjenF1o4lYR0jZbRvsrcYVO7YoS5ZK7zhb48VE
-X-Gm-Message-State: AOJu0YyHczdHGuRsjZmwwm3idtENPpiQVd8Oco8kgyS/5pzuHcF2zPzR
-	kOno5dkqFrgsJCGft81bqmoSWwOhycjIrITqeKplC7Qrr8XqDRucsGvaaiJ10A==
-X-Google-Smtp-Source: AGHT+IHgyC7clemZIshyNx4SoJ7Udvxw9GwegtcRM1FBJfrzoLTLgcJeKmWLE72ksvmhiwetvndvRw==
-X-Received: by 2002:a9d:618c:0:b0:6e4:9e38:37a7 with SMTP id g12-20020a9d618c000000b006e49e3837a7mr2725366otk.23.1709233739242;
-        Thu, 29 Feb 2024 11:08:59 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id c4-20020aa78804000000b006e05c801748sm1613455pfo.199.2024.02.29.11.08.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 11:08:58 -0800 (PST)
-Date: Thu, 29 Feb 2024 11:08:58 -0800
-From: Kees Cook <keescook@chromium.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Mark Brown <broonie@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, dmaengine@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
-	linux-spi@vger.kernel.org, netdev@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	Jonathan Cameron <jic23@kernel.org>,
-	Lars-Peter Clausen <lars@metafoo.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>
-Subject: Re: [PATCH v4 7/8] net-device: Use new helpers from overflow.h in
- netdevice APIs
-Message-ID: <202402291059.491B5E03@keescook>
-References: <20240228204919.3680786-1-andriy.shevchenko@linux.intel.com>
- <20240228204919.3680786-8-andriy.shevchenko@linux.intel.com>
- <202402281341.AC67EB6E35@keescook>
- <20240228144148.5c227487@kernel.org>
- <202402281554.C1CEEF744@keescook>
- <20240228165609.06f5254a@kernel.org>
+	s=arc-20240116; t=1709235159; c=relaxed/simple;
+	bh=j4u9BHygwjjo7Ecj2eWal+ye8Cv8ztly1iJNSlqiYt8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=NQojRh26vPaSaQs/quYLoBGUUFqprYYsRK0HbB5pg7aGW+JF0UHgdrZiyXJky0+Ywi20KvwllAJCSpH4kOkc0QDZoYtdbHOFn2ot201cAVNLwDfJqSj71LB9J2+aDFPRtCLkZXfyUHAITljM+o9gJksXqiKjxEaH/jQdtKMRpS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62671C433C7;
+	Thu, 29 Feb 2024 19:32:37 +0000 (UTC)
+Date: Thu, 29 Feb 2024 14:34:44 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
+Cc: Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ vaclav.zindulka@tlapnet.cz, Jamal Hadi Salim  <jhs@mojatatu.com>, Jiri
+ Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>
+Subject: [PATCH] tracing/net_sched: Fix tracepoints that save qdisc_dev() as
+ a string
+Message-ID: <20240229143432.273b4871@gandalf.local.home>
+X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240228165609.06f5254a@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 28, 2024 at 04:56:09PM -0800, Jakub Kicinski wrote:
-> On Wed, 28 Feb 2024 16:01:49 -0800 Kees Cook wrote:
-> > So, I found several cases where struct net_device is included in the
-> > middle of another structure, which makes my proposal more awkward. But I
-> > also don't understand why it's in the _middle_. Shouldn't it always be
-> > at the beginning (with priv stuff following it?)
-> > Quick search and examined manually: git grep 'struct net_device [a-z0-9_]*;'
-> > 
-> > struct rtw89_dev
-> > struct ath10k
-> > etc.
-> 
-> Ugh, yes, the (ab)use of NAPI.
-> 
-> > Some even have two included (?)
-> 
-> And some seem to be cargo-culted from out-of-tree code and are unused :S
+From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
 
-Ah, which can I remove?
+I'm updating __assign_str() and will be removing the second parameter. To
+make sure that it does not break anything, I make sure that it matches the
+__string() field, as that is where the string is actually going to be
+saved in. To make sure there's nothing that breaks, I added a WARN_ON() to
+make sure that what was used in __string() is the same that is used in
+__assign_str().
 
-> That's... less pretty. I'd rather push the ugly into the questionable
-> users. Make them either allocate the netdev dynamically and store 
-> a pointer, or move the netdev to the end of the struct.
-> 
-> But yeah, that's a bit of a cleanup :(
+In doing this change, an error was triggered as __assign_str() now expects
+the string passed in to be a char * value. I instead had the following
+warning:
 
-So far, it's not too bad. I'm doing some test builds now.
+include/trace/events/qdisc.h: In function =E2=80=98trace_event_raw_event_qd=
+isc_reset=E2=80=99:
+include/trace/events/qdisc.h:91:35: error: passing argument 1 of 'strcmp' f=
+rom incompatible pointer type [-Werror=3Dincompatible-pointer-types]
+   91 |                 __assign_str(dev, qdisc_dev(q));
 
+That's because the qdisc_enqueue() and qdisc_reset() pass in qdisc_dev(q)
+to __assign_str() and to __string(). But that function returns a pointer
+to struct net_device and not a string.
 
-As a further aside, this code:
+It appears that these events are just saving the pointer as a string and
+then reading it as a string as well.
 
-        struct net_device *dev;
-	...
-        struct net_device *p;
-	...
-        /* ensure 32-byte alignment of whole construct */
-        alloc_size += NETDEV_ALIGN - 1;
-        p = kvzalloc(alloc_size, GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFAIL);
-	...
-        dev = PTR_ALIGN(p, NETDEV_ALIGN);
+Use qdisc_dev(q)->name to save the device instead.
 
-Really screams for a dynamic-sized (bucketed) kmem_cache_alloc
-API. Alignment constraints can be described in a regular kmem_cache
-allocator (rather than this open-coded version). I've been intending to
-build that for struct msg_msg for a while now, and here's another user. :)
+Fixes: a34dac0b90552 ("net_sched: add tracepoints for qdisc_reset() and qdi=
+sc_destroy()")
+Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+---
+ include/trace/events/qdisc.h | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
--Kees
+diff --git a/include/trace/events/qdisc.h b/include/trace/events/qdisc.h
+index a3995925cb05..1f4258308b96 100644
+--- a/include/trace/events/qdisc.h
++++ b/include/trace/events/qdisc.h
+@@ -81,14 +81,14 @@ TRACE_EVENT(qdisc_reset,
+ 	TP_ARGS(q),
+=20
+ 	TP_STRUCT__entry(
+-		__string(	dev,		qdisc_dev(q)	)
+-		__string(	kind,		q->ops->id	)
+-		__field(	u32,		parent		)
+-		__field(	u32,		handle		)
++		__string(	dev,		qdisc_dev(q)->name	)
++		__string(	kind,		q->ops->id		)
++		__field(	u32,		parent			)
++		__field(	u32,		handle			)
+ 	),
+=20
+ 	TP_fast_assign(
+-		__assign_str(dev, qdisc_dev(q));
++		__assign_str(dev, qdisc_dev(q)->name);
+ 		__assign_str(kind, q->ops->id);
+ 		__entry->parent =3D q->parent;
+ 		__entry->handle =3D q->handle;
+@@ -106,14 +106,14 @@ TRACE_EVENT(qdisc_destroy,
+ 	TP_ARGS(q),
+=20
+ 	TP_STRUCT__entry(
+-		__string(	dev,		qdisc_dev(q)	)
+-		__string(	kind,		q->ops->id	)
+-		__field(	u32,		parent		)
+-		__field(	u32,		handle		)
++		__string(	dev,		qdisc_dev(q)->name	)
++		__string(	kind,		q->ops->id		)
++		__field(	u32,		parent			)
++		__field(	u32,		handle			)
+ 	),
+=20
+ 	TP_fast_assign(
+-		__assign_str(dev, qdisc_dev(q));
++		__assign_str(dev, qdisc_dev(q)->name);
+ 		__assign_str(kind, q->ops->id);
+ 		__entry->parent =3D q->parent;
+ 		__entry->handle =3D q->handle;
+--=20
+2.43.0
 
--- 
-Kees Cook
 
