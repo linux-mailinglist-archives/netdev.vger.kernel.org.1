@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-76149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20CF086C837
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 12:40:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F89A86C875
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 12:50:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20C4D1C20DF0
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 11:40:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 970671F2251D
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 11:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E8337CF2C;
-	Thu, 29 Feb 2024 11:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CB97C6D2;
+	Thu, 29 Feb 2024 11:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZIyA9lP3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DnYTRkWU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF545EE9F;
-	Thu, 29 Feb 2024 11:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4409D7C6DF
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 11:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709206830; cv=none; b=Ox/FRqbpFieN6nn8nVzIllh18bKY2Slewx6KgBfvO2BxWtPQfV8oJLjY8bUo6Ru9+agAcj4j8dlDg5Vo26bIQRZrJPJxKYP+9gneCDfPmWBW1r6lcBAvoJyU8QjGJ18rkWIhM75kKFjxrd5kwr1ujIXeoZ7DnYsuhEq+L2YTcag=
+	t=1709207428; cv=none; b=nkgzO3FkOCLOE9uGfb2Mv2ccjRnip67efnAOG9vuu1L+Bg5wGv+FWJdIb76+fOVaEtnNCHa3ne2qoQpbWIWJSqMeAoJBTvDFB99+kPsrFGPvTHlmUQou4pkrlElCw7PVYmB5F+5AgWnHiYCf0jSFx0x8e82fZK/PSO9y641gzck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709206830; c=relaxed/simple;
-	bh=ZKXe+Qg2W4somEFKLjM7zfljrZuuLuqexiwK4tDZZ8o=;
+	s=arc-20240116; t=1709207428; c=relaxed/simple;
+	bh=lTty7I1uKhlNpAl22AtE1pus23YId2H4Hhio+4y+U0E=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=m1SptqMLKb2S0bbeAtrxLwbiz1jwRECvDzQkndMMMWXQ/CSMx1qy5oCPi7Nj5ofocUeIQ0bb0qs2DSpQeMTV1X6qPaRnugZcRJAI0nZjPON3oGO0sXOtdIqmhdTMEhwSjYx79WpfwljIhlBI1zkJ7m/u/Omtmsh8pfGz+QDNeWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZIyA9lP3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5E42CC43394;
-	Thu, 29 Feb 2024 11:40:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Er5ZDqYXVbimJtjJSykT5+cfabfkdZjX3LNv6B2mT8AKRhYtSVaaq6c85S9EydmDbi+ZRqbVk3IFnRRLfLOnuLE65HyjfZn0UoQTJ2iCmGM9205Emgjg3Rjh+utXVpM78jKtZTUcu/J4fHgQIhV8WOlRa+dnOCRsnrmJOfO4Mac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DnYTRkWU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 07FB6C43390;
+	Thu, 29 Feb 2024 11:50:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709206829;
-	bh=ZKXe+Qg2W4somEFKLjM7zfljrZuuLuqexiwK4tDZZ8o=;
+	s=k20201202; t=1709207428;
+	bh=lTty7I1uKhlNpAl22AtE1pus23YId2H4Hhio+4y+U0E=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZIyA9lP34Qhsf08b/ZBrbCwRGfVD6ZOIy4ue69Xz2M/6L9NUxZEvM3ycR0wM1qyI4
-	 gZ9yi8xDp4qOL9WrXQeClFjtEqIdQMPOJLTY4xi9Ja5pHst+4wkFuRdVFpKwuHExK6
-	 Vdgu69T41CUV4jhFLFdwB+14vdHVnt1mWKWiZSZkbaSHTDOVIM29nLPDZ5pQgBT2T0
-	 ZL4bqqJATEVQxxtgxqMYlYlX24lX88tqoaaafMYOE93ZtlFgIRQgA+kanzFX7mIq58
-	 9jKr0sMuJCo12YSD8xzdp2N1rsP1f9Y+V0gUPAtEak/r7FTJfQRfshFtwVrfjOlovT
-	 Fly6+qN1uojNA==
+	b=DnYTRkWUcSlwtaRb6MAKnhb2VNEbSqk9AayMu/c8aQ1IqtkLPlGTH8tQ9NVscHQSv
+	 OlhxD5tT3hix6OsdvLtNj1Q7Gz+8ddvuudwHw690povMEO1fNISen3wKg0HfgRM1LB
+	 0NH7I8Me4E+8L40YqNGdmoZOh2+A7Bz2d84cTfnFlxYaTmJ6lOKOI8k09i4HiuGoji
+	 7CcP6Rr2AlycUxpujhGWsUywInfPDJUFBKQlMCSIq4aTu0J2MAKdFIkJDT1CGtxg4P
+	 qHz9LACIoKlURpmtmv7vtg3ht4ZAwzASvlnOy78O4lKhDy2lbEgjBIXvyAdoEHYglG
+	 /zIbS2UGP9uqA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4820EC595D2;
-	Thu, 29 Feb 2024 11:40:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E0359C595D2;
+	Thu, 29 Feb 2024 11:50:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,45 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/3] netfilter: nf_tables: allow NFPROTO_INET in
- nft_(match/target)_validate()
+Subject: Re: [PATCH net-next v2] net: stmmac: fix typo in comment
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170920682929.10157.5213246520413080680.git-patchwork-notify@kernel.org>
-Date: Thu, 29 Feb 2024 11:40:29 +0000
-References: <20240229000135.8780-2-pablo@netfilter.org>
-In-Reply-To: <20240229000135.8780-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
+ <170920742791.15837.13508831976047731905.git-patchwork-notify@kernel.org>
+Date: Thu, 29 Feb 2024 11:50:27 +0000
+References: <20240228112447.1490926-1-siyanteng@loongson.cn>
+In-Reply-To: <20240228112447.1490926-1-siyanteng@loongson.cn>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, alexandre.torgue@foss.st.com, kuba@kernel.org,
+ joabreu@synopsys.com, davem@davemloft.net, horms@kernel.org,
+ fancer.lancer@gmail.com, netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On Thu, 29 Feb 2024 01:01:33 +0100 you wrote:
-> From: Ignat Korchagin <ignat@cloudflare.com>
+On Wed, 28 Feb 2024 19:24:47 +0800 you wrote:
+> This is just a trivial fix for a typo in a comment, no functional
+> changes.
 > 
-> Commit d0009effa886 ("netfilter: nf_tables: validate NFPROTO_* family") added
-> some validation of NFPROTO_* families in the nft_compat module, but it broke
-> the ability to use legacy iptables modules in dual-stack nftables.
-> 
-> While with legacy iptables one had to independently manage IPv4 and IPv6
-> tables, with nftables it is possible to have dual-stack tables sharing the
-> rules. Moreover, it was possible to use rules based on legacy iptables
-> match/target modules in dual-stack nftables.
+> Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> ---
+> Drop fix tag and pick Serge's Reviewed-by tag.
+> "channels oriented" -> "channel-oriented"
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] netfilter: nf_tables: allow NFPROTO_INET in nft_(match/target)_validate()
-    https://git.kernel.org/netdev/net/c/7e0f122c6591
-  - [net,2/3] netfilter: bridge: confirm multicast packets before passing them up the stack
-    https://git.kernel.org/netdev/net/c/62e7151ae3eb
-  - [net,3/3] selftests: netfilter: add bridge conntrack + multicast test case
-    https://git.kernel.org/netdev/net/c/6523cf516c55
+  - [net-next,v2] net: stmmac: fix typo in comment
+    https://git.kernel.org/netdev/net-next/c/39de85775cfb
 
 You are awesome, thank you!
 -- 
