@@ -1,75 +1,89 @@
-Return-Path: <netdev+bounces-76011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26BE986BFAD
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 04:56:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5D4B86BFBD
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 05:05:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57A8C1C219BE
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 03:56:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AB361C2108E
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 04:05:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 036FA374FE;
-	Thu, 29 Feb 2024 03:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD15376E1;
+	Thu, 29 Feb 2024 04:05:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pEPmSLcb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ku3TJ9Jv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4DC376E0;
-	Thu, 29 Feb 2024 03:56:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3501D37165;
+	Thu, 29 Feb 2024 04:05:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709178982; cv=none; b=B8jKbZPfYd16gMdYB9P3XmixVsPR9/geJnimLK1q9+TXDclwKYgY7qPC9XtBggjABuPqGPxm2WiYvY3EnhzLxE1VIs0kc19ZZiZArj6ZoomUkddpFsbdK/oKC8ed5J8IOc9UgF/ABArp2fASjXkRRTD8R2sls7l3fv009MGsaMU=
+	t=1709179518; cv=none; b=XYwwgumu2DXq2pL2GjWuG0kqQcleflO9bwXoGN9GKVz1ybZnSso3nYivB5jIrfU4Vwyvw/6U9AES2oZD8UTcrLgoFeCGr70Pg9+v/StCTvHNw3ysdXicDymoAWFFY5dlSY+0ucqbj+NbP12lkroxec3y/4wh5HKv//Ct1C3g4W8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709178982; c=relaxed/simple;
-	bh=crUt0JaOGULcTF2Mh7fFpETU3vhhak7TGdKBx2myhSQ=;
+	s=arc-20240116; t=1709179518; c=relaxed/simple;
+	bh=j4RybmKO5z0+jOU5Q3bgVmNyKqmwl5OF6DdBnB6iTOQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wr8Knla2GV798goqKMCEROj75rrrNd8ivUwjdpcscvRvQwDc9oIqV7UQDQqjcWzD4GOQPJQlzjdW4rogfBfQo7eLRPovgQZfpe3Hswrgj7yhumeLAx2Jywp7tkQ7UAC0dWBriDAdhYenw6fzq/cQOhSpGbFqm9zfom8HJD5LixE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pEPmSLcb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5808C433C7;
-	Thu, 29 Feb 2024 03:56:21 +0000 (UTC)
+	 MIME-Version:Content-Type; b=cQzHB9gRD5j8ooXb0K1OhvY3RFuX4LIQEpUQF3Wq4NkSifGS1uFAlpt51BmTHjlVu9CY+G95jQejWoo5afQK7H6erNMjQynHTi6nuYCc7y2Gn54zX3UkXLrahpLUE8RghtD6Fg3i2WVHcNUv+sel61sagQAOpD4lnpn8ax0cpFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ku3TJ9Jv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A54EC433C7;
+	Thu, 29 Feb 2024 04:05:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709178982;
-	bh=crUt0JaOGULcTF2Mh7fFpETU3vhhak7TGdKBx2myhSQ=;
+	s=k20201202; t=1709179517;
+	bh=j4RybmKO5z0+jOU5Q3bgVmNyKqmwl5OF6DdBnB6iTOQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pEPmSLcbPlc1ZABwK+YDSXKA0Qz1D4swx7+QbOYpzneMUiQfPNAwTd2yVd8wh9pZD
-	 m9/DkES57b6nvwiUI8JoKA24AcfiIgAI2aq8AJSl3EZjODRNiqV3t3IYCog87FAZNU
-	 isgGv0ie3EV1jqVT4jJ1uY1wIXalGuqdEG6nyyNkDpHbwr45uJnDxvK+WUu/B3FGpi
-	 spCl8TvOws+LiSxri/M9vA//C0Mq1m9H8wgKJCawryNAaIoZNfZ1LstbyzRwn770N8
-	 ZBRXSlEijnUOOw/uswjb4MJVMSGAPzXH3YQOqLZDhLrxnkiSFk61S/MTTeLYRmyEz4
-	 O0FyKG3BC75tA==
-Date: Wed, 28 Feb 2024 19:56:20 -0800
+	b=Ku3TJ9JvMsZRW9Y8+kYLiSuQn8yfuYHrVpOmC9k81z1UISiws/VioRMjVDK2hn/va
+	 vxHV1BYGS0IuN+rxDOxdz6pX6rl+qHmyFSWB4Nw4+IcG4IKuyEUH7Jh/OTpobXy0bA
+	 pv+8IN3wSeoNbaiMAhyccYNjxaBHKIAkvz8Hnk09C0LSs7bUmqXgSqhC+zY4P0vyXh
+	 c2IDW2EtfyvCZ5sV3PiOveKSB4LRfYTQc0RtM8WO7pylBUwwZhl6jdbFi5R8Dm/wFT
+	 XpgRgqTrQeSwwou27b8gMc1OAoauVpevfX6QtkyduMys3Nj7szSLvkQVpfAev5OGXq
+	 sRWC0GRLP3wCA==
+Date: Wed, 28 Feb 2024 20:05:16 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
- <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Florian Fainelli
- <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Jonathan
- Corbet <corbet@lwn.net>
-Subject: Re: [PATCH net-next v2 1/2] doc: sfp-phylink: update the porting
- guide with PCS handling
-Message-ID: <20240228195620.35442c0f@kernel.org>
-In-Reply-To: <20240228095755.1499577-2-maxime.chevallier@bootlin.com>
-References: <20240228095755.1499577-1-maxime.chevallier@bootlin.com>
-	<20240228095755.1499577-2-maxime.chevallier@bootlin.com>
+To: "=?UTF-8?B?U2FuanXDoW4gR2FyY8OtYSw=?= Jorge"
+ <Jorge.SanjuanGarcia@duagon.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+ <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "s-vadapalli@ti.com" <s-vadapalli@ti.com>, "r-gunasekaran@ti.com"
+ <r-gunasekaran@ti.com>, "rogerq@kernel.org" <rogerq@kernel.org>,
+ "andrew@lunn.ch" <andrew@lunn.ch>, "f.fainelli@gmail.com"
+ <f.fainelli@gmail.com>, "olteanv@gmail.com" <olteanv@gmail.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net RESEND] net: ethernet: ti: am65-cpsw: Add
+ IFF_UNICAST_FLT flag to port device
+Message-ID: <20240228200516.1166a097@kernel.org>
+In-Reply-To: <20240228111300.2516590-1-jorge.sanjuangarcia@duagon.com>
+References: <20240228111300.2516590-1-jorge.sanjuangarcia@duagon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 28 Feb 2024 10:57:53 +0100 Maxime Chevallier wrote:
-> +                struct foo_priv *priv = container_of(config, struct foo_priv, phylink_config); 
+On Wed, 28 Feb 2024 11:13:23 +0000 Sanju=C3=A1n Garc=C3=ADa, Jorge wrote:
+> Since commit 8940e6b669ca ("net: dsa: avoid call to __dev_set_promiscuity=
+()
+> while rtnl_mutex isn't held") when conecting one of this switch's port
+> to a DSA switch as the conduit interface, the network interface is set to
+> promiscuous mode by default and cannot be set to not promiscuous mode aga=
+in
+> from userspace. The reason for this is that the cpsw ports net devices
+> do not have the flag IFF_UNICAST_FLT set in their private flags.
+>=20
+> The cpsw switch should be able to set not promiscuous mode as otherwise
+> a '1' is written to bit ALE_PORT_MACONLY_CAF which makes ethernet frames
+> get an additional VLAN tag when entering the port connected to the DSA
+> switch. Setting the IFF_UNICAST_FLT flag to all ports allows us to have
+> the conduit interface on the DSA subsystem set as not promiscuous.
 
-The watchful eye of checkpatch spots a trailing space at the end of
-this line. While fixing it, perhaps wrap the line as well, it's long.
--- 
-pw-bot: cr
+It doesn't look like am65-cpsw-nuss supports unicast filtering,=20
+tho, does it? So we're lying about support to work around some=20
+CPSW weirdness (additional VLAN tag thing)?
 
