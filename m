@@ -1,125 +1,114 @@
-Return-Path: <netdev+bounces-76368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68B3886D663
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 22:51:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A27586D67B
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 23:00:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 045991F23C0E
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 21:51:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE2C4B21568
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 22:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A5646D513;
-	Thu, 29 Feb 2024 21:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25E906D53A;
+	Thu, 29 Feb 2024 22:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bnLss1W+"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F756D50B
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 21:51:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8FA66D528;
+	Thu, 29 Feb 2024 22:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709243507; cv=none; b=UoHM+FtwTsxPVX76C6dY+B8KXPg81JZctglDn0Ka36dSXzC/pJG1/JqMT2WTEJVYEBlKxnRXCfZetpz4FdGt7S8nWzyRK06XLMsaFD9NyWp6wCVoNcw5UZ5gSp6b1HgZR06lQn1pRzTRA1ahpbuFQNFzjGc3uU3JL4U7AZdv88U=
+	t=1709244035; cv=none; b=ZLM/WinsGVOxdHw/lumS5LvNhvwvTaQZV1p8BFz/Aw2vivCpR/xnomOgUZA9IaJMx/DspZwJkjIaOClir+iRtbhJdEnKaiJo706M0fEn/0crggX6heo3J7YmgR1MtPofRWo+SHXs3XLfV3SKYDK1gN1Msal1cREBY4G+IasBaEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709243507; c=relaxed/simple;
-	bh=lTSCtbIaRm6WV7aUszukfpoQOedRgGr+iyRaIZSkRn8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=oGZqTX085XO5nV9UryQaLZq5LbznVqAyxwoURlJP+K83vhUe6KVa2gdT3Uf6wnFXB3q4Ilmlki1NPqWpSSdqHi2mq9wOnImc6j+V6CVhhnRbo+3AWgp2cLD5XtEqxtiWydekj158zsHd/4nX1KkzKMKvg/rAu/Ke9PYpHa7DcGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-238-TFXAcaIDM1y3ttMNu7WjKA-1; Thu, 29 Feb 2024 21:51:36 +0000
-X-MC-Unique: TFXAcaIDM1y3ttMNu7WjKA-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 29 Feb
- 2024 21:51:35 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Thu, 29 Feb 2024 21:51:34 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Kuniyuki Iwashima' <kuniyu@amazon.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Allison Henderson
-	<allison.henderson@oracle.com>
-CC: Kuniyuki Iwashima <kuni1840@gmail.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, "rds-devel@oss.oracle.com"
-	<rds-devel@oss.oracle.com>
-Subject: RE: [PATCH v2 net 3/5] net: Convert @kern of __sock_create() to enum.
-Thread-Topic: [PATCH v2 net 3/5] net: Convert @kern of __sock_create() to
- enum.
-Thread-Index: AQHaaRoH7RruzneFAEWJZ40+AXQHpbEh3qiA
-Date: Thu, 29 Feb 2024 21:51:34 +0000
-Message-ID: <fdd655490688410497d82ff3d38da093@AcuMS.aculab.com>
-References: <20240227011041.97375-1-kuniyu@amazon.com>
- <20240227011041.97375-4-kuniyu@amazon.com>
-In-Reply-To: <20240227011041.97375-4-kuniyu@amazon.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1709244035; c=relaxed/simple;
+	bh=DKB2o2S+feMPyuNFbB3ii6e3+RACDzpX5U78cW6QHLg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=oKz4unf03JftsvKwqoofLKDuD34trVi5SowwxDHcpPOZfI5tbLoWEIGdzMVmdPvmmTgCzFjdzpZ0q0TxhJe2hE+ifLPgq7N/yObYDpPCmpSEbn1SitOjycwoouM+GapTWC3b7FLiqFOOP46d9EHLcxMm+MBiK05pGyfu6SjcznM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bnLss1W+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5E039C43399;
+	Thu, 29 Feb 2024 22:00:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709244034;
+	bh=DKB2o2S+feMPyuNFbB3ii6e3+RACDzpX5U78cW6QHLg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bnLss1W+2l/1sqZokR2ESJQoKdRvn/Bsqg1lCQJuJJ7OjMjITbQtqMUE33okDC5Um
+	 DhlusOnGWg+gyKrv+ptLGC7uBUpaWggzJrY5a1RC+vujCYwb9l+4/33MuyRXE5o22Z
+	 klYcqmYTroM2wlRmGqE8YmbFd8XCFB6JhZCCAMPS3NYP46TTm8vyqJpGbIKuhdIKlB
+	 tFQb+7QzYz0Eea/ACrmXGkRi5Csr5/BTmt0k2dTVWZK3eBkIqjXZ6fVgbXRoxUhOML
+	 NsjrQ1J8OYj+hWnQ3AO3m9Xyqt765an9OSZ3j+f4jFuqBvf2G6YZzokyY2lxYa6yW7
+	 ZiDguuIfHIVaA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3EBE5C595D1;
+	Thu, 29 Feb 2024 22:00:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v6] bpf: Replace bpf_lpm_trie_key 0-length array with flexible
+ array
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170924403425.8275.6534761971040087521.git-patchwork-notify@kernel.org>
+Date: Thu, 29 Feb 2024 22:00:34 +0000
+References: <20240222155612.it.533-kees@kernel.org>
+In-Reply-To: <20240222155612.it.533-kees@kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: daniel@iogearbox.net, mark.rutland@arm.com, gustavoars@kernel.org,
+ ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+ yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, shuah@kernel.org,
+ baihaowen@meizu.com, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ yonghong.song@linux.dev, corbet@lwn.net, davem@davemloft.net,
+ kuba@kernel.org, hawk@kernel.org, joannelkoong@gmail.com,
+ laoar.shao@gmail.com, kuifeng@meta.com, aspsk@isovalent.com,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ netdev@vger.kernel.org, linux-hardening@vger.kernel.org
 
-From: Kuniyuki Iwashima
-> Sent: 27 February 2024 01:11
-> Subject: [PATCH v2 net 3/5] net: Convert @kern of __sock_create() to enum=
-.
+Hello:
 
-Should probably be (something like):
-=09Allow __sock_create() create kernel sockets that hold a reference
-=09to the network namespace.
+This patch was applied to bpf/bpf-next.git (master)
+by Daniel Borkmann <daniel@iogearbox.net>:
 
-> Historically, syzbot has reported many use-after-free of struct
-> net by kernel sockets.
->=20
-> In most cases, the root cause was a timer kicked by a kernel socket
-> which does not hold netns refcount nor clean it up during netns
-> dismantle.
->=20
-> This patch converts the @kern argument of __sock_create() to enum
-> so that we can pass SOCKET_KERN_NET_REF and later sk_alloc() can
-> hold refcount of net for kernel sockets.
+On Thu, 22 Feb 2024 07:56:15 -0800 you wrote:
+> Replace deprecated 0-length array in struct bpf_lpm_trie_key with
+> flexible array. Found with GCC 13:
+> 
+> ../kernel/bpf/lpm_trie.c:207:51: warning: array subscript i is outside array bounds of 'const __u8[0]' {aka 'const unsigned char[]'} [-Warray-bounds=]
+>   207 |                                        *(__be16 *)&key->data[i]);
+>       |                                                   ^~~~~~~~~~~~~
+> ../include/uapi/linux/swab.h:102:54: note: in definition of macro '__swab16'
+>   102 | #define __swab16(x) (__u16)__builtin_bswap16((__u16)(x))
+>       |                                                      ^
+> ../include/linux/byteorder/generic.h:97:21: note: in expansion of macro '__be16_to_cpu'
+>    97 | #define be16_to_cpu __be16_to_cpu
+>       |                     ^~~~~~~~~~~~~
+> ../kernel/bpf/lpm_trie.c:206:28: note: in expansion of macro 'be16_to_cpu'
+>   206 |                 u16 diff = be16_to_cpu(*(__be16 *)&node->data[i]
+> ^
+>       |                            ^~~~~~~~~~~
+> In file included from ../include/linux/bpf.h:7:
+> ../include/uapi/linux/bpf.h:82:17: note: while referencing 'data'
+>    82 |         __u8    data[0];        /* Arbitrary size */
+>       |                 ^~~~
+> 
+> [...]
 
-I think you should add a 'hold netns' parameter to sock_create_kern().
-Indeed, that is likely to be used for a real connection
-(which would need the 'hold netns') and code that doesn't need it
-(because the socket is some internal housekeeping socket) could
-directly call __sock_create().
+Here is the summary with links:
+  - [v6] bpf: Replace bpf_lpm_trie_key 0-length array with flexible array
+    https://git.kernel.org/bpf/bpf-next/c/896880ff3086
 
-Fortunately both functions are exported non-gpl.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-I've this comment in a driver...
-
-    /* sock_create_kern() creates a socket that doesn't hold a reference
-     * to the namespace (they get used for sockets needed by the protocol
-     * stack code itself).
-     * We need a socket that holds a reference to the namespace, so create
-     * a 'user' socket in a specific namespace.
-     * This adds an extra security check which we should pass because all t=
-he
-     * sockets are created by kernel threads.
-     */
-    rval =3D __sock_create(net, family, type, protocol, sockp, 0);
-
-
-=09David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
 
 
