@@ -1,114 +1,237 @@
-Return-Path: <netdev+bounces-76369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A27586D67B
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 23:00:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72D4D86D6AF
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 23:15:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE2C4B21568
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 22:00:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 968641C226C3
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 22:15:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25E906D53A;
-	Thu, 29 Feb 2024 22:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04126D53E;
+	Thu, 29 Feb 2024 22:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bnLss1W+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="e0yP1pzt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from omta040.useast.a.cloudfilter.net (omta040.useast.a.cloudfilter.net [44.202.169.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8FA66D528;
-	Thu, 29 Feb 2024 22:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86BCA6D504
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 22:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709244035; cv=none; b=ZLM/WinsGVOxdHw/lumS5LvNhvwvTaQZV1p8BFz/Aw2vivCpR/xnomOgUZA9IaJMx/DspZwJkjIaOClir+iRtbhJdEnKaiJo706M0fEn/0crggX6heo3J7YmgR1MtPofRWo+SHXs3XLfV3SKYDK1gN1Msal1cREBY4G+IasBaEw=
+	t=1709244919; cv=none; b=d1YIG8esWl/q9JM7fmL5/NINJ0Z+Dq1UF9Z3LFkW5LqCm4pykw5eEq4rio8QnQNF3GMohTfQj3tmIu4P+4iJl/nXwd6lTcMttFrVMbh/VvbBFECzqj6roQ9U5vTOkzqh/1tOkZO6RMP8BqEovSZFICtAmbyJwuE3ZvbgY2oPy+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709244035; c=relaxed/simple;
-	bh=DKB2o2S+feMPyuNFbB3ii6e3+RACDzpX5U78cW6QHLg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oKz4unf03JftsvKwqoofLKDuD34trVi5SowwxDHcpPOZfI5tbLoWEIGdzMVmdPvmmTgCzFjdzpZ0q0TxhJe2hE+ifLPgq7N/yObYDpPCmpSEbn1SitOjycwoouM+GapTWC3b7FLiqFOOP46d9EHLcxMm+MBiK05pGyfu6SjcznM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bnLss1W+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5E039C43399;
-	Thu, 29 Feb 2024 22:00:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709244034;
-	bh=DKB2o2S+feMPyuNFbB3ii6e3+RACDzpX5U78cW6QHLg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bnLss1W+2l/1sqZokR2ESJQoKdRvn/Bsqg1lCQJuJJ7OjMjITbQtqMUE33okDC5Um
-	 DhlusOnGWg+gyKrv+ptLGC7uBUpaWggzJrY5a1RC+vujCYwb9l+4/33MuyRXE5o22Z
-	 klYcqmYTroM2wlRmGqE8YmbFd8XCFB6JhZCCAMPS3NYP46TTm8vyqJpGbIKuhdIKlB
-	 tFQb+7QzYz0Eea/ACrmXGkRi5Csr5/BTmt0k2dTVWZK3eBkIqjXZ6fVgbXRoxUhOML
-	 NsjrQ1J8OYj+hWnQ3AO3m9Xyqt765an9OSZ3j+f4jFuqBvf2G6YZzokyY2lxYa6yW7
-	 ZiDguuIfHIVaA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3EBE5C595D1;
-	Thu, 29 Feb 2024 22:00:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709244919; c=relaxed/simple;
+	bh=5FSiTuqHmDsjXTZPDXr3lj4oUQySDL+fFiia69OcWH4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AzOpUqEF60MMe8IPJeIsjkrr0qscpOs0ErHNnms8tmP2CwcpWSYEzqRrrvmTLkjohygnWaMnALrH1zX9oSkiKyf2DnMV6lHLD0WAvPIzkqhn4qnB+s2TCMA9LAj+9z9upu/aMxFlsyaNW9IXgbIIFOTjXeg/J8faK/BfkCCfPss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=e0yP1pzt; arc=none smtp.client-ip=44.202.169.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-6007a.ext.cloudfilter.net ([10.0.30.247])
+	by cmsmtp with ESMTPS
+	id fnAgrwOpEl9dRfogOrQHCD; Thu, 29 Feb 2024 22:15:16 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id fogNrVbrbsGJsfogNrMOnk; Thu, 29 Feb 2024 22:15:15 +0000
+X-Authority-Analysis: v=2.4 cv=fI4/34ae c=1 sm=1 tr=0 ts=65e101f3
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=VhncohosazJxI00KdYJ/5A==:17
+ a=IkcTkHD0fZMA:10 a=k7vzHIieQBIA:10 a=wYkD_t78qR0A:10 a=cm27Pg_UAAAA:8
+ a=VwQbUJbxAAAA:8 a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=20KFwNOVAAAA:8
+ a=QyXUC8HyAAAA:8 a=xfJypzPxiScX5pcAhuAA:9 a=QEXdDO2ut3YA:10
+ a=xmb-EsYY8bH0VWELuYED:22 a=AjGcO6oz07-iQ99wixmX:22 a=y1Q9-5lHfBjTkpIzbSAN:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=cf1DZ2erRbMxD8JvVLJPv18i9Hg6aww57G4W3t9Oeoc=; b=e0yP1pztbkxkhpcJxYDiCSOm9p
+	fihMzZKmaTkeqIBnkZZupDuJlp5aNCxO2ey9rO97gUBe4WSG8LzztnW4JPppdUM6t1XjnLPbt1CLP
+	bWp+VnMM7SkP+NJpbTAmj6GdeKiGJU69QxgmuFo4zx4EPNUDjrhSXLipqVR7anVOJdv9OOLDjtbDG
+	xu3x7Ww1m0CEEA1WCr5l0lDJxqPh99MM5R7NpSOKYbs4drDgFiWxObM2b2SL8JobMShCccoSZ/rc+
+	iVH/f3WVNC4K9jVImTVChD53aiFwo3zDZfX/oLxl2aD/4xQC8HIhRIX9AZ3/jdrBgBDIMelq8rgX2
+	M8Az3Fzw==;
+Received: from [201.172.172.225] (port=53434 helo=[192.168.15.10])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1rfogM-002d6M-1s;
+	Thu, 29 Feb 2024 16:15:14 -0600
+Message-ID: <93cbd0a3-60cf-400f-a05c-f81dc3d8c75d@embeddedor.com>
+Date: Thu, 29 Feb 2024 16:15:12 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v6] bpf: Replace bpf_lpm_trie_key 0-length array with flexible
- array
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170924403425.8275.6534761971040087521.git-patchwork-notify@kernel.org>
-Date: Thu, 29 Feb 2024 22:00:34 +0000
-References: <20240222155612.it.533-kees@kernel.org>
-In-Reply-To: <20240222155612.it.533-kees@kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: daniel@iogearbox.net, mark.rutland@arm.com, gustavoars@kernel.org,
- ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
- yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, shuah@kernel.org,
- baihaowen@meizu.com, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- yonghong.song@linux.dev, corbet@lwn.net, davem@davemloft.net,
- kuba@kernel.org, hawk@kernel.org, joannelkoong@gmail.com,
- laoar.shao@gmail.com, kuifeng@meta.com, aspsk@isovalent.com,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- netdev@vger.kernel.org, linux-hardening@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] netdev: Use flexible array for trailing private bytes
+Content-Language: en-US
+To: Kees Cook <keescook@chromium.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>, netdev@vger.kernel.org,
+ linux-hardening@vger.kernel.org, Simon Horman <horms@kernel.org>,
+ Jiri Pirko <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>,
+ Coco Li <lixiaoyan@google.com>, Amritha Nambiar <amritha.nambiar@intel.com>,
+ linux-kernel@vger.kernel.org
+References: <20240229213018.work.556-kees@kernel.org>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20240229213018.work.556-kees@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 201.172.172.225
+X-Source-L: No
+X-Exim-ID: 1rfogM-002d6M-1s
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.15.10]) [201.172.172.225]:53434
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 8
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfMK5bS4+AiPrjaX1ori8CYyWs7tcUjiirHHEkyzN9GVx3/UD5sY1uFoDgu0nJmxhOS9zVAQcf17v862cYBEZ1EtrX9SHCqqvfYrsZfUI1mm79z1QFHk3
+ Aya1dB1PuIAk1iBJokDZ0Z50yJuvuweYjdEHfyeGt78G6PnqVA3WNHflyRZocArEFeeK2AnlfjD6kXM9lnKw8SuX7g9ii3a/1jo=
 
-Hello:
 
-This patch was applied to bpf/bpf-next.git (master)
-by Daniel Borkmann <daniel@iogearbox.net>:
 
-On Thu, 22 Feb 2024 07:56:15 -0800 you wrote:
-> Replace deprecated 0-length array in struct bpf_lpm_trie_key with
-> flexible array. Found with GCC 13:
+On 2/29/24 15:30, Kees Cook wrote:
+> Introduce a new struct net_device_priv that contains struct net_device
+> but also accounts for the commonly trailing bytes through the "size" and
+> "data" members. As many dummy struct net_device instances exist still,
+> it is non-trivial to but this flexible array inside struct net_device
+> itself. But we can add a sanity check in netdev_priv() to catch any
+> attempts to access the private data of a dummy struct.
 > 
-> ../kernel/bpf/lpm_trie.c:207:51: warning: array subscript i is outside array bounds of 'const __u8[0]' {aka 'const unsigned char[]'} [-Warray-bounds=]
->   207 |                                        *(__be16 *)&key->data[i]);
->       |                                                   ^~~~~~~~~~~~~
-> ../include/uapi/linux/swab.h:102:54: note: in definition of macro '__swab16'
->   102 | #define __swab16(x) (__u16)__builtin_bswap16((__u16)(x))
->       |                                                      ^
-> ../include/linux/byteorder/generic.h:97:21: note: in expansion of macro '__be16_to_cpu'
->    97 | #define be16_to_cpu __be16_to_cpu
->       |                     ^~~~~~~~~~~~~
-> ../kernel/bpf/lpm_trie.c:206:28: note: in expansion of macro 'be16_to_cpu'
->   206 |                 u16 diff = be16_to_cpu(*(__be16 *)&node->data[i]
-> ^
->       |                            ^~~~~~~~~~~
-> In file included from ../include/linux/bpf.h:7:
-> ../include/uapi/linux/bpf.h:82:17: note: while referencing 'data'
->    82 |         __u8    data[0];        /* Arbitrary size */
->       |                 ^~~~
+> Adjust allocation logic to use the new full structure.
 > 
-> [...]
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-Here is the summary with links:
-  - [v6] bpf: Replace bpf_lpm_trie_key 0-length array with flexible array
-    https://git.kernel.org/bpf/bpf-next/c/896880ff3086
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+[for the flex `struct net_device_priv`, `struct_size()`, `__counted_by()`,
+and the use of `container_of()` to retrieve a pointer to the flex struct
+and return pointer to flex-array member `data` in `netdev_priv()`]
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Thanks
+--
+Gustavo
 
-
+> ---
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+> Cc: netdev@vger.kernel.org
+> Cc: linux-hardening@vger.kernel.org
+> ---
+>   include/linux/netdevice.h | 21 ++++++++++++++++++---
+>   net/core/dev.c            | 12 ++++--------
+>   2 files changed, 22 insertions(+), 11 deletions(-)
+> 
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 118c40258d07..b476809d0bae 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -1815,6 +1815,8 @@ enum netdev_stat_type {
+>   	NETDEV_PCPU_STAT_DSTATS, /* struct pcpu_dstats */
+>   };
+>   
+> +#define	NETDEV_ALIGN		32
+> +
+>   /**
+>    *	struct net_device - The DEVICE structure.
+>    *
+> @@ -2476,6 +2478,14 @@ struct net_device {
+>   	struct hlist_head	page_pools;
+>   #endif
+>   };
+> +
+> +struct net_device_priv {
+> +	struct net_device	dev;
+> +	u32			size;
+> +	u8			data[] __counted_by(size)
+> +				       __aligned(NETDEV_ALIGN);
+> +};
+> +
+>   #define to_net_dev(d) container_of(d, struct net_device, dev)
+>   
+>   /*
+> @@ -2496,8 +2506,6 @@ static inline bool netif_elide_gro(const struct net_device *dev)
+>   	return false;
+>   }
+>   
+> -#define	NETDEV_ALIGN		32
+> -
+>   static inline
+>   int netdev_get_prio_tc_map(const struct net_device *dev, u32 prio)
+>   {
+> @@ -2665,7 +2673,14 @@ void dev_net_set(struct net_device *dev, struct net *net)
+>    */
+>   static inline void *netdev_priv(const struct net_device *dev)
+>   {
+> -	return (char *)dev + ALIGN(sizeof(struct net_device), NETDEV_ALIGN);
+> +	struct net_device_priv *priv;
+> +
+> +	/* Dummy struct net_device have no trailing data. */
+> +	if (WARN_ON_ONCE(dev->reg_state == NETREG_DUMMY))
+> +		return NULL;
+> +
+> +	priv = container_of(dev, struct net_device_priv, dev);
+> +	return (u8 *)priv->data;
+>   }
+>   
+>   /* Set the sysfs physical device reference for the network logical device
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index cb2dab0feee0..0fcaf6ae8486 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -10800,7 +10800,7 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
+>   {
+>   	struct net_device *dev;
+>   	unsigned int alloc_size;
+> -	struct net_device *p;
+> +	struct net_device_priv *p;
+>   
+>   	BUG_ON(strlen(name) >= sizeof(dev->name));
+>   
+> @@ -10814,20 +10814,16 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
+>   		return NULL;
+>   	}
+>   
+> -	alloc_size = sizeof(struct net_device);
+> -	if (sizeof_priv) {
+> -		/* ensure 32-byte alignment of private area */
+> -		alloc_size = ALIGN(alloc_size, NETDEV_ALIGN);
+> -		alloc_size += sizeof_priv;
+> -	}
+> +	alloc_size = struct_size(p, data, sizeof_priv);
+>   	/* ensure 32-byte alignment of whole construct */
+>   	alloc_size += NETDEV_ALIGN - 1;
+>   
+>   	p = kvzalloc(alloc_size, GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFAIL);
+>   	if (!p)
+>   		return NULL;
+> +	p->size = sizeof_priv;
+>   
+> -	dev = PTR_ALIGN(p, NETDEV_ALIGN);
+> +	dev = &PTR_ALIGN(p, NETDEV_ALIGN)->dev;
+>   	dev->padded = (char *)dev - (char *)p;
+>   
+>   	ref_tracker_dir_init(&dev->refcnt_tracker, 128, name);
 
