@@ -1,136 +1,152 @@
-Return-Path: <netdev+bounces-76298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EF3386D2CB
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:05:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CCAEC86D2DA
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:09:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7EB01F23DB0
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:05:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81D261F23A9A
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D421361B5;
-	Thu, 29 Feb 2024 19:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA05E13C9D7;
+	Thu, 29 Feb 2024 19:09:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yo0Go+Cd"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="WPFTpjyi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A419A79933
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 19:05:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA0213C9C3
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 19:08:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709233527; cv=none; b=HedJe/cX1MAs6jsh5v7UeSy38ActvCf3WEQBpcC3SeplcfxotYRN1bMqkaxLZCrBSR0vew3js+u3fY2YYriTJHIxTzB28cRHWsbDioySB+CCLoC0ARmp9qfRtfPM4bbuZmO7Bbm5qg+N2BjBoJqp4aa0WQJTrOUSaABlNdgGKIc=
+	t=1709233741; cv=none; b=mJ/cRuTx543FXpy9+dhrSmz0IgjN3YlTQNwPHsQTtOdfz0PDQfKGV3FgjUQD/YtW0qoHdd3usVWqVALXjZeiAsw8W3y0Col2QguizzedvJ48mUJFGZohQGwrldE+cZlPg63JWwELEfdCG3kI2jSPCZ+7kAZBf1VMPbDovO/y7Bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709233527; c=relaxed/simple;
-	bh=Yj/8ylZVagQQYAg9vwLPnRlYBQO3Cl0Tj9liB1zXD2g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XaWPb85xaou73E4h1Xp7MmkeuICavmFOLTfduC5/8FCTaULHPKzBA2BeGRRMdBsohmltR7Ol+lonvPmhazkjeq8NGZWTmxRFTQhwbZLGQPbmbg3TI3dkdX6HvNVW2C8ODekaRZ0dCvHhESaT8IUeVPm/beWO09UF680w8NtKOYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yo0Go+Cd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9832DC433F1;
-	Thu, 29 Feb 2024 19:05:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709233527;
-	bh=Yj/8ylZVagQQYAg9vwLPnRlYBQO3Cl0Tj9liB1zXD2g=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Yo0Go+CdyPqtHCa6WidEFxY64/npwXWslQJfiZxESGf5QSJ4d5/frLMVcgAy6hrcb
-	 7bWdALC1tuHyIPS+vl8WPfFE+ZM3JKF2xGGIvq+xsnbPzShlE1+7Wd0tpaRuTEk4NK
-	 RzLVpSZJQs4XnVOQCnlRm/e9uVv54C+JQVVOYtzTHNm2C4FjRXUiYrrVCHqh4klpoU
-	 DzIMVhq//YhW3oO7fiXQMe8A5dntjj0gGlcys+yK3FuJWaT3OzZtnHcAr1xVR4UWeb
-	 rr4hpCEps+Ly7zdtrzOq6eVhwQraOXkalH+hsUQjTXi2tRUHgQxXlqnOGlyGB7y9z5
-	 HjZxkW+4XUnhA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	vadim.fedorenko@linux.dev,
-	arkadiusz.kubalewski@intel.com,
-	jiri@resnulli.us
-Subject: [PATCH net] dpll: fix build failure due to rcu_dereference_check() on unknown type
-Date: Thu, 29 Feb 2024 11:05:15 -0800
-Message-ID: <20240229190515.2740221-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.43.2
+	s=arc-20240116; t=1709233741; c=relaxed/simple;
+	bh=XhYVxNr3yIQGYfPBq8eZl7fW5SFxmb1whNnII5+VYe8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iNWKc/rH3F1/5XvU2EZrdmMQJ6PInESpz90VTC27Z/jiCOY7mdI6oiR7mwZ8T+zu1S1xQtfZJ/XigRqfZHA9oHnyenXYR7nsOsRaMoGEA1mEqAnajy1LVQUHID8L9ASVWMgkC3HghJguy4693v6tzinudnji6T1RUtvU4hTUw2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=WPFTpjyi; arc=none smtp.client-ip=209.85.210.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-6e480fe439aso666259a34.0
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 11:08:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1709233739; x=1709838539; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UPNx03vL5gJBUsLY5izQNSc5f5aQFQJTo3mFc1Gcb0A=;
+        b=WPFTpjyiRDs+msv4Rcc4/qQvq3jlA5SfObvFs8J1jxZ+hsqoA8y2mmS/xj0bHHmGxt
+         4RQ+Vbpb7J99vt2blfAzhImkl3cMVSnvDq/urcg/XftJn0Pc/UZqL0z2YxSQtfwPOIwG
+         q5FuNu5UmCxQohquaFF0QadN7TK8tF6YHwPZ8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709233739; x=1709838539;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UPNx03vL5gJBUsLY5izQNSc5f5aQFQJTo3mFc1Gcb0A=;
+        b=Cm94EIoBI7WEyv522sSG2qMUiSzT3pJLGfswVpR5gLtz9a/KmrNAdJKAqej2Hp0uAl
+         x5xL8yCMl84ijw8f1fic5XzIJ27uy9KeydGpy7dLjkrdJRFclIimpAiKh8Z+5FcClY03
+         ks6hRXrF9TUh4x8l9qmYJ+blVq3M1QbPehEM0HI9iXgZc2pCiLzMA2ZrNdaF901lZhlo
+         ym5Ua4qQGuIaEUTKvuHe2XcW5epbVJmHqEWM+MWvprSMUIkzX19O4wAa00otFlmXGU89
+         6AAjP2rX+2LyxUV/9wmxlMeqnPOZYOdmo6sTJ2/ioLR9jmTYyY+3h4CFQ+ku5FxpF85U
+         dzYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX/q6wKgOK4DZQdNwLDgHEBapoDgL2Y4q6FFW/tsZAtOppUDpD0+aoKCMHjenF1o4lYR0jZbRvsrcYVO7YoS5ZK7zhb48VE
+X-Gm-Message-State: AOJu0YyHczdHGuRsjZmwwm3idtENPpiQVd8Oco8kgyS/5pzuHcF2zPzR
+	kOno5dkqFrgsJCGft81bqmoSWwOhycjIrITqeKplC7Qrr8XqDRucsGvaaiJ10A==
+X-Google-Smtp-Source: AGHT+IHgyC7clemZIshyNx4SoJ7Udvxw9GwegtcRM1FBJfrzoLTLgcJeKmWLE72ksvmhiwetvndvRw==
+X-Received: by 2002:a9d:618c:0:b0:6e4:9e38:37a7 with SMTP id g12-20020a9d618c000000b006e49e3837a7mr2725366otk.23.1709233739242;
+        Thu, 29 Feb 2024 11:08:59 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id c4-20020aa78804000000b006e05c801748sm1613455pfo.199.2024.02.29.11.08.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Feb 2024 11:08:58 -0800 (PST)
+Date: Thu, 29 Feb 2024 11:08:58 -0800
+From: Kees Cook <keescook@chromium.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Mark Brown <broonie@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, dmaengine@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
+	linux-spi@vger.kernel.org, netdev@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	Jonathan Cameron <jic23@kernel.org>,
+	Lars-Peter Clausen <lars@metafoo.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>
+Subject: Re: [PATCH v4 7/8] net-device: Use new helpers from overflow.h in
+ netdevice APIs
+Message-ID: <202402291059.491B5E03@keescook>
+References: <20240228204919.3680786-1-andriy.shevchenko@linux.intel.com>
+ <20240228204919.3680786-8-andriy.shevchenko@linux.intel.com>
+ <202402281341.AC67EB6E35@keescook>
+ <20240228144148.5c227487@kernel.org>
+ <202402281554.C1CEEF744@keescook>
+ <20240228165609.06f5254a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240228165609.06f5254a@kernel.org>
 
-From: Eric Dumazet <edumazet@google.com>
+On Wed, Feb 28, 2024 at 04:56:09PM -0800, Jakub Kicinski wrote:
+> On Wed, 28 Feb 2024 16:01:49 -0800 Kees Cook wrote:
+> > So, I found several cases where struct net_device is included in the
+> > middle of another structure, which makes my proposal more awkward. But I
+> > also don't understand why it's in the _middle_. Shouldn't it always be
+> > at the beginning (with priv stuff following it?)
+> > Quick search and examined manually: git grep 'struct net_device [a-z0-9_]*;'
+> > 
+> > struct rtw89_dev
+> > struct ath10k
+> > etc.
+> 
+> Ugh, yes, the (ab)use of NAPI.
+> 
+> > Some even have two included (?)
+> 
+> And some seem to be cargo-culted from out-of-tree code and are unused :S
 
-Tasmiya reports that their compiler complains that we deref
-a pointer to unknown type with rcu_dereference_rtnl():
+Ah, which can I remove?
 
-include/linux/rcupdate.h:439:9: error: dereferencing pointer to incomplete type ‘struct dpll_pin’
+> That's... less pretty. I'd rather push the ugly into the questionable
+> users. Make them either allocate the netdev dynamically and store 
+> a pointer, or move the netdev to the end of the struct.
+> 
+> But yeah, that's a bit of a cleanup :(
 
-Unclear what compiler it is, at the moment, and we can't report
-but since DPLL can't be a module - move the code from the header
-into the source file.
+So far, it's not too bad. I'm doing some test builds now.
 
-Fixes: 0d60d8df6f49 ("dpll: rely on rcu for netdev_dpll_pin()")
-Reported-by: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-Link: https://lore.kernel.org/all/3fcf3a2c-1c1b-42c1-bacb-78fdcd700389@linux.vnet.ibm.com/
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-Sending officially the solution Eric suggested in the report
-thread. The bug is pending in the net tree, so I'd like to
-put this on an express path, to make today's PR...
 
-CC: vadim.fedorenko@linux.dev
-CC: arkadiusz.kubalewski@intel.com
-CC: jiri@resnulli.us
----
- drivers/dpll/dpll_core.c | 5 +++++
- include/linux/dpll.h     | 8 ++++----
- 2 files changed, 9 insertions(+), 4 deletions(-)
+As a further aside, this code:
 
-diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
-index 4c2bb27c99fe..507dd9cfb075 100644
---- a/drivers/dpll/dpll_core.c
-+++ b/drivers/dpll/dpll_core.c
-@@ -42,6 +42,11 @@ struct dpll_pin_registration {
- 	void *priv;
- };
- 
-+struct dpll_pin *netdev_dpll_pin(const struct net_device *dev)
-+{
-+       return rcu_dereference_rtnl(dev->dpll_pin);
-+}
-+
- struct dpll_device *dpll_device_get_by_id(int id)
- {
- 	if (xa_get_mark(&dpll_device_xa, id, DPLL_REGISTERED))
-diff --git a/include/linux/dpll.h b/include/linux/dpll.h
-index 4ec2fe9caf5a..c60591308ae8 100644
---- a/include/linux/dpll.h
-+++ b/include/linux/dpll.h
-@@ -169,13 +169,13 @@ int dpll_device_change_ntf(struct dpll_device *dpll);
- 
- int dpll_pin_change_ntf(struct dpll_pin *pin);
- 
-+#if !IS_ENABLED(CONFIG_DPLL)
- static inline struct dpll_pin *netdev_dpll_pin(const struct net_device *dev)
- {
--#if IS_ENABLED(CONFIG_DPLL)
--	return rcu_dereference_rtnl(dev->dpll_pin);
--#else
- 	return NULL;
--#endif
- }
-+#else
-+struct dpll_pin *netdev_dpll_pin(const struct net_device *dev);
-+#endif
- 
- #endif
+        struct net_device *dev;
+	...
+        struct net_device *p;
+	...
+        /* ensure 32-byte alignment of whole construct */
+        alloc_size += NETDEV_ALIGN - 1;
+        p = kvzalloc(alloc_size, GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFAIL);
+	...
+        dev = PTR_ALIGN(p, NETDEV_ALIGN);
+
+Really screams for a dynamic-sized (bucketed) kmem_cache_alloc
+API. Alignment constraints can be described in a regular kmem_cache
+allocator (rather than this open-coded version). I've been intending to
+build that for struct msg_msg for a while now, and here's another user. :)
+
+-Kees
+
 -- 
-2.43.2
-
+Kees Cook
 
