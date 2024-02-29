@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-76326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CDCC86D479
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 21:40:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F75486D487
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 21:42:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4435B22CF4
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:40:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A0DEB23115
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:42:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A8CB1504D0;
-	Thu, 29 Feb 2024 20:37:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61DD9152E1D;
+	Thu, 29 Feb 2024 20:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dN/zEQVY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ymw3dy0N"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F911504CB;
-	Thu, 29 Feb 2024 20:37:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36DEA144056;
+	Thu, 29 Feb 2024 20:38:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709239072; cv=none; b=Y5LHFc5LaOn3QYMUGcbflx2UHBZ2Is07VcvY3kxS1D0R/BU8DMnXQeoG4KbktqXuZclo4uZUFP7KshWK7Ud73dMFR6uDiavI9GDxY9qk8aGQEI/6R2Lxv6phyJGhJCpZrmdAirLiBJI6bLf6S+ptNUIzAlX+UoGFWctZd/oy2tE=
+	t=1709239082; cv=none; b=jnEKacVaWJwvgXUIgSc/Bfy9dblMp72D+GrSHgRu6ZD9cmceo4QxT2tVpXCXhWmeUq+rtIL8+j/h+ROpTTQdNT/YRELsIADuqpG7zHbA5Nwnd0caWv/vsXbapfFqLitwGy2gOiHsqhNIAuKopkKBoOaUZVfTa6cNTr5hPODzDIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709239072; c=relaxed/simple;
-	bh=I+EymkwU1C2leoNdI8aU2Kcpdiz2ujgLAG0SkJyGVXU=;
+	s=arc-20240116; t=1709239082; c=relaxed/simple;
+	bh=fCm23I8sefIMiHN4Ppc70lTcvGhr+Jve9juzMu0LdPM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DngLvbI2fN5QJ8RACyhRQDU0/9FLJA2O0A6agzNW+4iELFOdGhTP6BLxOgZmV6J5nSNmGiujakf64KU5QY1iLZXpT9k/BsdnozmDRwOnnIgk/MoVZJzi5roCSI9pwrmEHXFWkJsHES2dO82uUOL0s6qBDMfpcbb/hdWMt2g5M3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dN/zEQVY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA491C43609;
-	Thu, 29 Feb 2024 20:37:48 +0000 (UTC)
+	 MIME-Version; b=sLhRTj0rOD9dGoIy+up78KQtSoH9+5jGfppCzM68Rdiuh9gNl7Kj59CdCU95jy9jqUTycCAqpxk8NVeSaCDh/y6F7YrKbV9B0XrSzUA5O4luhCwv/rmuJVuCUgOK08vvw1QWT1yHTgTtnkBRhQV5eFIl6R9jZhHalNDZXqS9WRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ymw3dy0N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4008BC43394;
+	Thu, 29 Feb 2024 20:38:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709239070;
-	bh=I+EymkwU1C2leoNdI8aU2Kcpdiz2ujgLAG0SkJyGVXU=;
+	s=k20201202; t=1709239081;
+	bh=fCm23I8sefIMiHN4Ppc70lTcvGhr+Jve9juzMu0LdPM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dN/zEQVYbOZPa6oGopcYWjqaSLFBiMY6VUVJnZwa8iPj7QFrKeC6GyFm3vIl+A4XV
-	 owQW+31Qj98Ap3avHxowuXHZQtug3y1lEO0kPpggT4lGQRRFyMRD7jkovU3Rikzhgz
-	 S2x57O8Qd84ngQPglUhhxfRnfr7v/Sytut8gH3lrteD6z3RNWwM6YocQjapsFcPKEd
-	 mEaIz8GsoyE0obClTZXG19nQYWdfqSV4eoTWcDjNFuFh2rsnfwQ3jyA2MeU4gYW95i
-	 buMAJ5aPedFHEXHCSmUtkGnqKBnF+1fjISIGRJwWdtZwyyKTXIUHIKvGMBA0KFRA9G
-	 bhtgHJzWpRJEw==
+	b=Ymw3dy0NZQxGLBCzNXPfHQ+pdhmosVMpsiDCORPutbSpu+ERHxNtjgQzw/bNmHCQu
+	 nPZiVWOPH9V3tgfwDkmM9UH0bHGPxblh2nqck6nvGZXiJVFyjoGQGdTuk64XYqYHfk
+	 ukam37+gS720FQHbKMls+l+p15fo2jwCQDhC9dnlv7l+C6T49u6MA/e5DfNLeYPLWi
+	 PhSzuBdJMv+0VangPBibKq1VWb+NYfuXSXDgSJoCJl/Mme6xWBjRA1BISKJCMyityv
+	 MevSVOPnjbDHnSuWfAd/TniayamqPOzil39mvdgn+2fnRWcwJWhXWfOPzj/MvTFRAR
+	 vH60b+Sly3QzQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
+Cc: Kees Cook <keescook@chromium.org>,
 	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	twinkler@linux.ibm.com,
+	benve@cisco.com,
+	satishkh@cisco.com,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.7 10/24] net/iucv: fix the allocation size of iucv_path_table array
-Date: Thu, 29 Feb 2024 15:36:50 -0500
-Message-ID: <20240229203729.2860356-10-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.7 15/24] enic: Avoid false positive under FORTIFY_SOURCE
+Date: Thu, 29 Feb 2024 15:36:55 -0500
+Message-ID: <20240229203729.2860356-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240229203729.2860356-1-sashal@kernel.org>
 References: <20240229203729.2860356-1-sashal@kernel.org>
@@ -71,44 +71,41 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.7.6
 Content-Transfer-Encoding: 8bit
 
-From: Alexander Gordeev <agordeev@linux.ibm.com>
+From: Kees Cook <keescook@chromium.org>
 
-[ Upstream commit b4ea9b6a18ebf7f9f3a7a60f82e925186978cfcf ]
+[ Upstream commit 40b9385dd8e6a0515e1c9cd06a277483556b7286 ]
 
-iucv_path_table is a dynamically allocated array of pointers to
-struct iucv_path items. Yet, its size is calculated as if it was
-an array of struct iucv_path items.
+FORTIFY_SOURCE has been ignoring 0-sized destinations while the kernel
+code base has been converted to flexible arrays. In order to enforce
+the 0-sized destinations (e.g. with __counted_by), the remaining 0-sized
+destinations need to be handled. Unfortunately, struct vic_provinfo
+resists full conversion, as it contains a flexible array of flexible
+arrays, which is only possible with the 0-sized fake flexible array.
 
-Signed-off-by: Alexander Gordeev <agordeev@linux.ibm.com>
-Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+Use unsafe_memcpy() to avoid future false positives under
+CONFIG_FORTIFY_SOURCE.
+
+Signed-off-by: Kees Cook <keescook@chromium.org>
 Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/iucv/iucv.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/cisco/enic/vnic_vic.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
-index 0ed6e34d6edd1..ce33adb65afb0 100644
---- a/net/iucv/iucv.c
-+++ b/net/iucv/iucv.c
-@@ -156,7 +156,7 @@ static char iucv_error_pathid[16] = "INVALID PATHID";
- static LIST_HEAD(iucv_handler_list);
+diff --git a/drivers/net/ethernet/cisco/enic/vnic_vic.c b/drivers/net/ethernet/cisco/enic/vnic_vic.c
+index 20fcb20b42ede..66b5778353389 100644
+--- a/drivers/net/ethernet/cisco/enic/vnic_vic.c
++++ b/drivers/net/ethernet/cisco/enic/vnic_vic.c
+@@ -49,7 +49,8 @@ int vic_provinfo_add_tlv(struct vic_provinfo *vp, u16 type, u16 length,
  
- /*
-- * iucv_path_table: an array of iucv_path structures.
-+ * iucv_path_table: array of pointers to iucv_path structures.
-  */
- static struct iucv_path **iucv_path_table;
- static unsigned long iucv_max_pathid;
-@@ -544,7 +544,7 @@ static int iucv_enable(void)
+ 	tlv->type = htons(type);
+ 	tlv->length = htons(length);
+-	memcpy(tlv->value, value, length);
++	unsafe_memcpy(tlv->value, value, length,
++		      /* Flexible array of flexible arrays */);
  
- 	cpus_read_lock();
- 	rc = -ENOMEM;
--	alloc_size = iucv_max_pathid * sizeof(struct iucv_path);
-+	alloc_size = iucv_max_pathid * sizeof(*iucv_path_table);
- 	iucv_path_table = kzalloc(alloc_size, GFP_KERNEL);
- 	if (!iucv_path_table)
- 		goto out;
+ 	vp->num_tlvs = htonl(ntohl(vp->num_tlvs) + 1);
+ 	vp->length = htonl(ntohl(vp->length) +
 -- 
 2.43.0
 
