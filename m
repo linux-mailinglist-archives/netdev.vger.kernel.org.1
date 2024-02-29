@@ -1,92 +1,100 @@
-Return-Path: <netdev+bounces-76109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DE6A86C5A1
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:40:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77A3D86C5AF
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:41:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5020B1C21F44
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:40:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A30D11C21D27
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:41:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0ADB60BBA;
-	Thu, 29 Feb 2024 09:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4490F60DE5;
+	Thu, 29 Feb 2024 09:41:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RM3TI4p9"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Mg3X5mZX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8536089F
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 09:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2BE60DDC;
+	Thu, 29 Feb 2024 09:41:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709199629; cv=none; b=q7ZsUCSpXaXr3Q/BFaSrygooF5DfKA5HiTRPk/tqa2hsx1Z87iD0+hQR90eg7RgyCKuBbqa0U0qL9sVSE4mo+wUTZ4+j1U15Omix3IVFCrN3NdACkr7gxYg6MAEU8o2duQgzn4GQNHZLkBmn/QlH9a4nQdytOtb6nR9gfrU3K0s=
+	t=1709199683; cv=none; b=YLI/UrvMkOjkdklAFHEd/NpUzMdf13CpOyzH8a8g+S+vH+MySF2unjN+R4ZOuFWqzelYAgAGaZcdlZ+3wxcgrkrSQU/dkMSOVtN+lvy/3dXV0DGHeCwzCQjNt2PXjYhkENmZbpMWMH+SVuFRLKMoiHq7ywGA59sgfJx9WX5U4AU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709199629; c=relaxed/simple;
-	bh=NoowTqn55XF5VA94x0Jkp6PPEqCL6tdRBD3wXchh8N8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qw8hyS+HWrnjsCeMqjjqcbeSMyHfGhGKR0/xo8AlbbD4JtoQtqvFTsOaN7y1CuRmVt74qWLRyV14WJoJkakWd0w7/5Ul1L/iU1mGdabVuQ8H1tOPbUp4FXirTj/8IFLWHB7wZ/Eki3RdtLwco3V8OhkWdpsjP089GXO7B2S27sA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RM3TI4p9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 13EDBC43390;
-	Thu, 29 Feb 2024 09:40:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709199629;
-	bh=NoowTqn55XF5VA94x0Jkp6PPEqCL6tdRBD3wXchh8N8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RM3TI4p9EMLzb5JBUchINyVdqFm599wdLSxbKx58t/jbDvir4a4SLYjodLLwlW+yV
-	 5AElqa8Mz6ZVn5vc9trkVwZbyPdOISTGjPTg6KLxhZRNS2LZo8UHjA00YJN75L/sv0
-	 20Wk0cbJsvbsLdQVsGpWAKPTmZkln93priD5xuAkRvbVH/RpazsAwrAE6+LoOfORlG
-	 H5qTsqF0MVf404mPrDNGeg6z4uP8bREWBGSQKNXgAnjXAWkiBAU2OTzfn43qVTW+zM
-	 eBCT5JwI44FuSS7maLgEy4UaYV9o9lGl3wWKR4GV86MqBYXXVQbmqpsotXt6RX98hs
-	 45ITSCjTRj65Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EF542C3274B;
-	Thu, 29 Feb 2024 09:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709199683; c=relaxed/simple;
+	bh=OO8aoyT7wIiEkulpJ6X9uJBZ8SvU8RhO2TJweGqWu6c=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=lal2Dn+Pj1FHcaqJi97/pnEZJlXytVsdd6u/NwPE0hkCoV/rScDkjLFQHYE4oyoErAzcQ87xpXxMPrLGYJdUkPO8HgspJOfJs52y6ewSP9tomV42Zcw+WGnF3Luf63LcxpB8xR+vXgiXh9MVRKAXzvzDNrHnkeveTZ7P+njiIJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Mg3X5mZX; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=OO8aoyT7wIiEkulpJ6X9uJBZ8SvU8RhO2TJweGqWu6c=;
+	t=1709199679; x=1710409279; b=Mg3X5mZX6GA2ZQHUJR9a0c1RBdPmEFRVKTNo2EbtnZ405YE
+	O29E7V1ituQf9PtGtMp0eEsdICq/XCWoZgNPkdysdMhBt+2K+eR+ErN3+bJ8gCgjFrEUQG1gYrmra
+	9d+nR5CfXYv1IU2m28wGiynznxoa63MaKkrw017xgPzPVxzi3U4HdA3DqSda9ZrgXIVPZqEpTq4UQ
+	ux8EiWxVmSSDPHP6+g69MQyCxWMH3E8+KtGMs6Huyf9cuuAK7EtRWaQeQoLz9N99fljg9xww3QD/q
+	rvfm6/J7wmzw7EKTLl3UwO7jtW1S57vLQp+sZdFdCJyQIh0F2NTd2+fN/eVfrSog==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rfcuf-0000000DTl5-2P62;
+	Thu, 29 Feb 2024 10:41:13 +0100
+Message-ID: <4825d7812ac06be3322ca4ae74e3650b2b0cd8de.camel@sipsolutions.net>
+Subject: Re: [PATCH vhost v3 00/19] virtio: drivers maintain dma info for
+ premapped vq
+From: Johannes Berg <johannes@sipsolutions.net>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+	 <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>, 
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>, Jason Wang
+ <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Hans de Goede <hdegoede@redhat.com>, Ilpo
+ =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Vadim
+ Pasternak <vadimp@nvidia.com>, Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>, Cornelia Huck
+ <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Eric Farman
+ <farman@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik
+ <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, Christian
+ Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle
+ <svens@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>,  linux-um@lists.infradead.org,
+ netdev@vger.kernel.org,  platform-driver-x86@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org,  linux-s390@vger.kernel.org,
+ kvm@vger.kernel.org, bpf@vger.kernel.org
+Date: Thu, 29 Feb 2024 10:41:11 +0100
+In-Reply-To: <20240229043238-mutt-send-email-mst@kernel.org>
+References: <20240229072044.77388-1-xuanzhuo@linux.alibaba.com>
+	 <20240229031755-mutt-send-email-mst@kernel.org>
+	 <1709197357.626784-1-xuanzhuo@linux.alibaba.com>
+	 <20240229043238-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ipv4: raw: remove useless input parameter in
- do_raw_set/getsockopt
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170919962897.2436.3451341015068474866.git-patchwork-notify@kernel.org>
-Date: Thu, 29 Feb 2024 09:40:28 +0000
-References: <20240228072505.640550-1-shaozhengchao@huawei.com>
-In-Reply-To: <20240228072505.640550-1-shaozhengchao@huawei.com>
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- weiyongjun1@huawei.com, yuehaibing@huawei.com
+X-malware-bazaar: not-scanned
 
-Hello:
+On Thu, 2024-02-29 at 04:34 -0500, Michael S. Tsirkin wrote:
+>=20
+> So the patchset is big, I guess it will take a couple of cycles to
+> merge gradually.
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Could also do patches 7, 8, and maybe 9 separately first (which seem
+reasonable even on their own) and get rid of CC'ing so many people and
+lists for future iterations of the rest of the patchset :-)
 
-On Wed, 28 Feb 2024 15:25:05 +0800 you wrote:
-> The input parameter 'level' in do_raw_set/getsockopt() is not used.
-> Therefore, remove it.
-> 
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> ---
->  net/ipv4/raw.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-
-Here is the summary with links:
-  - [net-next] ipv4: raw: remove useless input parameter in do_raw_set/getsockopt
-    https://git.kernel.org/netdev/net-next/c/8b2b1e62cdb9
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+johannes
 
