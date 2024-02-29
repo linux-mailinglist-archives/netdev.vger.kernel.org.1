@@ -1,204 +1,136 @@
-Return-Path: <netdev+bounces-76297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B039E86D2C6
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:03:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EF3386D2CB
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:05:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AF7628204B
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:03:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7EB01F23DB0
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:05:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BECF27828A;
-	Thu, 29 Feb 2024 19:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D421361B5;
+	Thu, 29 Feb 2024 19:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yo0Go+Cd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6FCE383B0
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 19:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A419A79933
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 19:05:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709233387; cv=none; b=VQWx543P37bapvOZO2IAj+yylGqe3ytmwe82/I0idM7MHlsS8kL5ByjCK7U9eH9UXtMAYZiDhyR/sg+LLeFKWg2KF6L7qqVfpS5t8lj3os6WHyuILC6gIk5FHiuPoqasxq9eL5IdM+ayGWkTqHyJHDYNA37mc4AZvJ4WFKLJe3c=
+	t=1709233527; cv=none; b=HedJe/cX1MAs6jsh5v7UeSy38ActvCf3WEQBpcC3SeplcfxotYRN1bMqkaxLZCrBSR0vew3js+u3fY2YYriTJHIxTzB28cRHWsbDioySB+CCLoC0ARmp9qfRtfPM4bbuZmO7Bbm5qg+N2BjBoJqp4aa0WQJTrOUSaABlNdgGKIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709233387; c=relaxed/simple;
-	bh=lznppwX95aaFQNu+uWEYhsnaW/hN8Q05QrDOzbMoHmI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nOHxoQlvqzYNhm9EzYhXzixiHakyYIYnIatSsdYm7Q+OsdmznAZ7W49DLlkL6N3PnCVptr1YimOgsD7gsy0ju55/IvqevTekZ38pLRjJysP+oodJcS8uqyuBEEeYlEnApmYsL06gcEueA3Dc43lOKOLL/51KHPE/pHYyVhud4x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77C28C433F1;
-	Thu, 29 Feb 2024 19:03:06 +0000 (UTC)
-Date: Thu, 29 Feb 2024 14:05:13 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, vaclav.zindulka@tlapnet.cz, Jamal Hadi Salim
- <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>
-Subject: Re: [Patch net-next 2/5] net_sched: add tracepoints for
- qdisc_reset() and qdisc_destroy()
-Message-ID: <20240229140513.72b2795a@gandalf.local.home>
-In-Reply-To: <20200527043527.12287-3-xiyou.wangcong@gmail.com>
-References: <20200527043527.12287-1-xiyou.wangcong@gmail.com>
-	<20200527043527.12287-3-xiyou.wangcong@gmail.com>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1709233527; c=relaxed/simple;
+	bh=Yj/8ylZVagQQYAg9vwLPnRlYBQO3Cl0Tj9liB1zXD2g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XaWPb85xaou73E4h1Xp7MmkeuICavmFOLTfduC5/8FCTaULHPKzBA2BeGRRMdBsohmltR7Ol+lonvPmhazkjeq8NGZWTmxRFTQhwbZLGQPbmbg3TI3dkdX6HvNVW2C8ODekaRZ0dCvHhESaT8IUeVPm/beWO09UF680w8NtKOYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yo0Go+Cd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9832DC433F1;
+	Thu, 29 Feb 2024 19:05:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709233527;
+	bh=Yj/8ylZVagQQYAg9vwLPnRlYBQO3Cl0Tj9liB1zXD2g=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Yo0Go+CdyPqtHCa6WidEFxY64/npwXWslQJfiZxESGf5QSJ4d5/frLMVcgAy6hrcb
+	 7bWdALC1tuHyIPS+vl8WPfFE+ZM3JKF2xGGIvq+xsnbPzShlE1+7Wd0tpaRuTEk4NK
+	 RzLVpSZJQs4XnVOQCnlRm/e9uVv54C+JQVVOYtzTHNm2C4FjRXUiYrrVCHqh4klpoU
+	 DzIMVhq//YhW3oO7fiXQMe8A5dntjj0gGlcys+yK3FuJWaT3OzZtnHcAr1xVR4UWeb
+	 rr4hpCEps+Ly7zdtrzOq6eVhwQraOXkalH+hsUQjTXi2tRUHgQxXlqnOGlyGB7y9z5
+	 HjZxkW+4XUnhA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	vadim.fedorenko@linux.dev,
+	arkadiusz.kubalewski@intel.com,
+	jiri@resnulli.us
+Subject: [PATCH net] dpll: fix build failure due to rcu_dereference_check() on unknown type
+Date: Thu, 29 Feb 2024 11:05:15 -0800
+Message-ID: <20240229190515.2740221-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, 26 May 2020 21:35:24 -0700
-Cong Wang <xiyou.wangcong@gmail.com> wrote:
+From: Eric Dumazet <edumazet@google.com>
 
-> Add two tracepoints for qdisc_reset() and qdisc_destroy() to track
-> qdisc resetting and destroying.
-> 
-> Sample output:
-> 
->   tc-756   [000] ...3   138.355662: qdisc_reset: dev=ens3 kind=pfifo_fast parent=ffff:ffff handle=0:0
->   tc-756   [000] ...1   138.355720: qdisc_reset: dev=ens3 kind=pfifo_fast parent=ffff:ffff handle=0:0
->   tc-756   [000] ...1   138.355867: qdisc_reset: dev=ens3 kind=pfifo_fast parent=ffff:ffff handle=0:0
->   tc-756   [000] ...1   138.355930: qdisc_destroy: dev=ens3 kind=pfifo_fast parent=ffff:ffff handle=0:0
->   tc-757   [000] ...2   143.073780: qdisc_reset: dev=ens3 kind=fq_codel parent=ffff:ffff handle=8001:0
->   tc-757   [000] ...1   143.073878: qdisc_reset: dev=ens3 kind=fq_codel parent=ffff:ffff handle=8001:0
->   tc-757   [000] ...1   143.074114: qdisc_reset: dev=ens3 kind=fq_codel parent=ffff:ffff handle=8001:0
->   tc-757   [000] ...1   143.074228: qdisc_destroy: dev=ens3 kind=fq_codel parent=ffff:ffff handle=8001:0
-> 
-> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-> Cc: Jiri Pirko <jiri@resnulli.us>
-> Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
-> ---
->  include/trace/events/qdisc.h | 52 ++++++++++++++++++++++++++++++++++++
->  net/sched/sch_generic.c      |  4 +++
->  2 files changed, 56 insertions(+)
-> 
-> diff --git a/include/trace/events/qdisc.h b/include/trace/events/qdisc.h
-> index 0d1a9ebf55ba..2b948801afa3 100644
-> --- a/include/trace/events/qdisc.h
-> +++ b/include/trace/events/qdisc.h
-> @@ -8,6 +8,8 @@
->  #include <linux/netdevice.h>
->  #include <linux/tracepoint.h>
->  #include <linux/ftrace.h>
-> +#include <linux/pkt_sched.h>
-> +#include <net/sch_generic.h>
->  
->  TRACE_EVENT(qdisc_dequeue,
->  
-> @@ -44,6 +46,56 @@ TRACE_EVENT(qdisc_dequeue,
->  		  __entry->txq_state, __entry->packets, __entry->skbaddr )
->  );
->  
-> +TRACE_EVENT(qdisc_reset,
-> +
-> +	TP_PROTO(struct Qdisc *q),
-> +
-> +	TP_ARGS(q),
-> +
-> +	TP_STRUCT__entry(
-> +		__string(	dev,		qdisc_dev(q)	)
-> +		__string(	kind,		q->ops->id	)
-> +		__field(	u32,		parent		)
-> +		__field(	u32,		handle		)
-> +	),
-> +
-> +	TP_fast_assign(
-> +		__assign_str(dev, qdisc_dev(q));
+Tasmiya reports that their compiler complains that we deref
+a pointer to unknown type with rcu_dereference_rtnl():
 
-I'm doing updates to __assign_str() and __string() and the below errored
-out because "qdisc_dev(q)" is not a string.
+include/linux/rcupdate.h:439:9: error: dereferencing pointer to incomplete type ‘struct dpll_pin’
 
-How does the above work?
+Unclear what compiler it is, at the moment, and we can't report
+but since DPLL can't be a module - move the code from the header
+into the source file.
 
-static inline struct net_device *qdisc_dev(const struct Qdisc *qdisc)
-{
-	return qdisc->dev_queue->dev;
-}
+Fixes: 0d60d8df6f49 ("dpll: rely on rcu for netdev_dpll_pin()")
+Reported-by: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
+Link: https://lore.kernel.org/all/3fcf3a2c-1c1b-42c1-bacb-78fdcd700389@linux.vnet.ibm.com/
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+Sending officially the solution Eric suggested in the report
+thread. The bug is pending in the net tree, so I'd like to
+put this on an express path, to make today's PR...
 
-Where:
+CC: vadim.fedorenko@linux.dev
+CC: arkadiusz.kubalewski@intel.com
+CC: jiri@resnulli.us
+---
+ drivers/dpll/dpll_core.c | 5 +++++
+ include/linux/dpll.h     | 8 ++++----
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
-
-struct net_device {
-	/* Cacheline organization can be found documented in
-	 * Documentation/networking/net_cachelines/net_device.rst.
-	 * Please update the document when adding new fields.
-	 */
-
-	/* TX read-mostly hotpath */
-	__cacheline_group_begin(net_device_read_tx);
-	unsigned long long	priv_flags;
-	const struct net_device_ops *netdev_ops;
-
-What looks to be returned from qdisc_dev() is not a string??
-
-Is this a bug? You don't really expect this to work do you?
-
--- Steve
-
-
-
-> +		__assign_str(kind, q->ops->id);
-> +		__entry->parent = q->parent;
-> +		__entry->handle = q->handle;
-> +	),
-> +
-> +	TP_printk("dev=%s kind=%s parent=%x:%x handle=%x:%x", __get_str(dev),
-> +		  __get_str(kind), TC_H_MAJ(__entry->parent) >> 16, TC_H_MIN(__entry->parent),
-> +		  TC_H_MAJ(__entry->handle) >> 16, TC_H_MIN(__entry->handle))
-> +);
-> +
-> +TRACE_EVENT(qdisc_destroy,
-> +
-> +	TP_PROTO(struct Qdisc *q),
-> +
-> +	TP_ARGS(q),
-> +
-> +	TP_STRUCT__entry(
-> +		__string(	dev,		qdisc_dev(q)	)
-> +		__string(	kind,		q->ops->id	)
-> +		__field(	u32,		parent		)
-> +		__field(	u32,		handle		)
-> +	),
-> +
-> +	TP_fast_assign(
-> +		__assign_str(dev, qdisc_dev(q));
-> +		__assign_str(kind, q->ops->id);
-> +		__entry->parent = q->parent;
-> +		__entry->handle = q->handle;
-> +	),
-> +
-> +	TP_printk("dev=%s kind=%s parent=%x:%x handle=%x:%x", __get_str(dev),
-> +		  __get_str(kind), TC_H_MAJ(__entry->parent) >> 16, TC_H_MIN(__entry->parent),
-> +		  TC_H_MAJ(__entry->handle) >> 16, TC_H_MIN(__entry->handle))
-> +);
-> +
->  #endif /* _TRACE_QDISC_H */
->  
->  /* This part must be outside protection */
-> diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-> index 7a0b06001e48..abaa446ed01a 100644
-> --- a/net/sched/sch_generic.c
-> +++ b/net/sched/sch_generic.c
-> @@ -911,6 +911,8 @@ void qdisc_reset(struct Qdisc *qdisc)
->  	const struct Qdisc_ops *ops = qdisc->ops;
->  	struct sk_buff *skb, *tmp;
->  
-> +	trace_qdisc_reset(qdisc);
-> +
->  	if (ops->reset)
->  		ops->reset(qdisc);
->  
-> @@ -965,6 +967,8 @@ static void qdisc_destroy(struct Qdisc *qdisc)
->  	module_put(ops->owner);
->  	dev_put(qdisc_dev(qdisc));
->  
-> +	trace_qdisc_destroy(qdisc);
-> +
->  	call_rcu(&qdisc->rcu, qdisc_free_cb);
->  }
->  
+diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+index 4c2bb27c99fe..507dd9cfb075 100644
+--- a/drivers/dpll/dpll_core.c
++++ b/drivers/dpll/dpll_core.c
+@@ -42,6 +42,11 @@ struct dpll_pin_registration {
+ 	void *priv;
+ };
+ 
++struct dpll_pin *netdev_dpll_pin(const struct net_device *dev)
++{
++       return rcu_dereference_rtnl(dev->dpll_pin);
++}
++
+ struct dpll_device *dpll_device_get_by_id(int id)
+ {
+ 	if (xa_get_mark(&dpll_device_xa, id, DPLL_REGISTERED))
+diff --git a/include/linux/dpll.h b/include/linux/dpll.h
+index 4ec2fe9caf5a..c60591308ae8 100644
+--- a/include/linux/dpll.h
++++ b/include/linux/dpll.h
+@@ -169,13 +169,13 @@ int dpll_device_change_ntf(struct dpll_device *dpll);
+ 
+ int dpll_pin_change_ntf(struct dpll_pin *pin);
+ 
++#if !IS_ENABLED(CONFIG_DPLL)
+ static inline struct dpll_pin *netdev_dpll_pin(const struct net_device *dev)
+ {
+-#if IS_ENABLED(CONFIG_DPLL)
+-	return rcu_dereference_rtnl(dev->dpll_pin);
+-#else
+ 	return NULL;
+-#endif
+ }
++#else
++struct dpll_pin *netdev_dpll_pin(const struct net_device *dev);
++#endif
+ 
+ #endif
+-- 
+2.43.2
 
 
