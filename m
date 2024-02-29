@@ -1,120 +1,104 @@
-Return-Path: <netdev+bounces-76301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8141C86D343
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:35:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D67C786D349
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:37:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 372BF1F2402D
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:35:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84EB8284A02
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D91213C9D5;
-	Thu, 29 Feb 2024 19:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68C913C9DA;
+	Thu, 29 Feb 2024 19:37:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQJtxn7+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m+S85SBu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED5813C9E5;
-	Thu, 29 Feb 2024 19:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF8E21E499;
+	Thu, 29 Feb 2024 19:37:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709235339; cv=none; b=D+GNt0XUIPaeFxjVs2HMEOQuNJ43YKYEi0FN2d+7skLTA0HptyeHkV//Lq/SiOg6DYEvIcvhYv9vXPHflWgA0Zowebra/kQ37oNBIoUzQDqs5pzw4nAJt/TNu8CagpAB7kTP73wwGLlVJEN2jXJMaU19Bc9Polq2jYFtuf5sEhU=
+	t=1709235428; cv=none; b=X8aW52C4cT/JB60J2/BJWExVMNcSkfWLgtAlsXzrkXnDNvZtbjbmHBdETz5lekIAjZ0jPqXA/c8NWF+A9JgdwfCe5ryadXbmdSz58tR4ojZmrUuyp73KCtpcY0SQ+Vp8mFteLnxk5QYtIt5+BR7tuoTD4zy4mYMvKflxGcKJy4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709235339; c=relaxed/simple;
-	bh=z+ll6MviZxAO9oJ8WAt1UoEwqN5J4y0yQMH87Dp3Lgg=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=JcUEp3KM1HppB3rjzefgzG8g60gqFGC0j65HW4Puk8sz1x961d13FvFFzxa5iD9Oy6T3+rXT8Ogvu6ZbXtabXWJ0kzcAcrKN7E+UsUjbvF+4aVRx7BnTFcVY0icr6inAUrkGnxwJQ9uHs1/ZFKSRqp6eE+a1srVYJc753QENJOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQJtxn7+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA240C433F1;
-	Thu, 29 Feb 2024 19:35:36 +0000 (UTC)
+	s=arc-20240116; t=1709235428; c=relaxed/simple;
+	bh=HxFiMEFSmzCFY+WY5P1+X68vvWW5G5DzknMWKq1jjbw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mNVu6xBYlVv9ZSElvwGVX/eRVaoZhpy3zjIa4YGSp5ueZujzHoWNimYi8DpO541AOdEoDNnwRWmnBHr9ub0MBWY508K6l1Xs0pnYTGpMuEdyNKbogWq11O0vRtxE7lh2JnCJowyndI5ECSZZFo/th+lFQihSxT4v2jLwnZbFCNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m+S85SBu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DEB1C433C7;
+	Thu, 29 Feb 2024 19:37:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709235339;
-	bh=z+ll6MviZxAO9oJ8WAt1UoEwqN5J4y0yQMH87Dp3Lgg=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=jQJtxn7+AqbnVuE+PBx7GcVjn06hzaXhUwyYdOKDoNFmbPZii46rlwhjAdB24ZI4Q
-	 T4kZauY7MEISI8Kzd0vzFUKUC2BUzWeSbTNchV8hsy7+KVjrd8CnICSp3Hw260uLVs
-	 f/FtpHhp4apxYVCwfWB0vqs54p965NrDRxkeqHTk9W7tdGzHeJ5xcJROr/EV3Bg/kC
-	 y9dEjBdhmv6fjVosVqvXRyE2E4UxEpB1aOeLBGobOLrK098vT5B/+n6zgc/u1ExYoE
-	 IcZJLJXgbPx1v+5p4AKF2dgtK905OAM7NpixAjFItscUdjjzxK9Yz+0g1Oy7Vsgjgl
-	 vVWK5ir8KoDWw==
-From: Kalle Valo <kvalo@kernel.org>
-To: Baochen Qiang <quic_bqiang@quicinc.com>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,  "Kalle Valo
- (QUIC)" <quic_kvalo@quicinc.com>,  <ath11k@lists.infradead.org>,
-  <linux-wireless@vger.kernel.org>,  <linux-arm-msm@vger.kernel.org>,
-  <mhi@lists.linux.dev>,  <davem@davemloft.net>,  <edumazet@google.com>,
-  <kuba@kernel.org>,  <pabeni@redhat.com>,  <netdev@vger.kernel.org>
-Subject: Re: [PATCH v4 1/3] bus: mhi: host: add mhi_power_down_keep_dev()
-References: <20240228022243.17762-1-quic_bqiang@quicinc.com>
-	<20240228022243.17762-2-quic_bqiang@quicinc.com>
-	<20240229101202.GB2999@thinkpad>
-	<531daaa9-cf14-4812-8908-c617bd25bc08@quicinc.com>
-Date: Thu, 29 Feb 2024 21:35:34 +0200
-In-Reply-To: <531daaa9-cf14-4812-8908-c617bd25bc08@quicinc.com> (Baochen
-	Qiang's message of "Thu, 29 Feb 2024 18:33:43 +0800")
-Message-ID: <87le7383nd.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=k20201202; t=1709235428;
+	bh=HxFiMEFSmzCFY+WY5P1+X68vvWW5G5DzknMWKq1jjbw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=m+S85SBuV9SIHhfC9dMLCdurLg+KbyJOT0ZuQcfRPg6/ekbFXqmOI8lKWeVI4g2nw
+	 97JdaKY11cvCmY2VP/uzaRPkip8FiGVFuNfb2B7WSaGBbFwGqTbIHqmJKP0b21mGZN
+	 4rxBo1r7Ey34dexq9zLREL2HMcHe4Y9LQxt2DJ2U3/ZssUisaZIQxCcmngap2fFfQj
+	 mdcqq9sN4FjNmHPcmD7BccNs/STrWR/FblQgrW1OklBOKeUZHLOz8/Tvp1JhHgQzKW
+	 P86eMmDf0P+7+ExJ6cgkscA1xFkJWipaT9lXxCYew7am+U7hL2APqC9jwgXrIdAAgp
+	 TQLDWOn4o/u5A==
+Date: Thu, 29 Feb 2024 11:37:06 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Vinod Koul
+ <vkoul@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Jonathan
+ Cameron <Jonathan.Cameron@huawei.com>, Mark Brown <broonie@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, dmaengine@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
+ linux-spi@vger.kernel.org, netdev@vger.kernel.org,
+ linux-hardening@vger.kernel.org, Jonathan Cameron <jic23@kernel.org>,
+ Lars-Peter Clausen <lars@metafoo.de>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Subject: Re: [PATCH v4 7/8] net-device: Use new helpers from overflow.h in
+ netdevice APIs
+Message-ID: <20240229113706.42c877a1@kernel.org>
+In-Reply-To: <202402291059.491B5E03@keescook>
+References: <20240228204919.3680786-1-andriy.shevchenko@linux.intel.com>
+	<20240228204919.3680786-8-andriy.shevchenko@linux.intel.com>
+	<202402281341.AC67EB6E35@keescook>
+	<20240228144148.5c227487@kernel.org>
+	<202402281554.C1CEEF744@keescook>
+	<20240228165609.06f5254a@kernel.org>
+	<202402291059.491B5E03@keescook>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Baochen Qiang <quic_bqiang@quicinc.com> writes:
+On Thu, 29 Feb 2024 11:08:58 -0800 Kees Cook wrote:
+> > And some seem to be cargo-culted from out-of-tree code and are unused :S  
+> 
+> Ah, which can I remove?
 
-> On 2/29/2024 6:12 PM, Manivannan Sadhasivam wrote:
->> On Wed, Feb 28, 2024 at 10:22:41AM +0800, Baochen Qiang wrote:
->>> ath11k fails to resume:
->>>
->>> ath11k_pci 0000:06:00.0: timeout while waiting for restart complete
->>>
->>> This happens because when calling mhi_sync_power_up() the MHI subsystem
->>> eventually calls device_add() from mhi_create_devices() but the device
->>> creation is deferred:
->>>
->>> mhi mhi0_IPCR: Driver qcom_mhi_qrtr force probe deferral
->>>
->>> The reason for deferring device creation is explained in dpm_prepare():
->>>
->>>          /*
->>>           * It is unsafe if probing of devices will happen during suspend or
->>>           * hibernation and system behavior will be unpredictable in this case.
->>>           * So, let's prohibit device's probing here and defer their probes
->>>           * instead. The normal behavior will be restored in dpm_complete().
->>>           */
->>>
->>> Because the device probe is deferred, the qcom_mhi_qrtr_probe() is not
->>> called and thus MHI channels are not prepared:
->>>
->>> So what this means that QRTR is not delivering messages and the QMI connection
->>> is not working between ath11k and the firmware, resulting a failure in firmware
->>> initialization.
->>>
->>> To fix this add new function mhi_power_down_keep_dev() which doesn't destroy
->>> the devices for channels during power down. This way we avoid probe defer issue
->>> and finally can get ath11k hibernation working with the following patches.
->>>
->>> Tested-on: WCN6855 hw2.0 PCI WLAN.HSP.1.1-03125-QCAHSPSWPL_V1_V2_SILICONZ_LITE-3.6510.30
->>>
->>> Signed-off-by: Kalle Valo <quic_kvalo@quicinc.com>
->>
->> Did Kalle co-author this patch? If so, his Co-developed-by tag should
->> be added.
->
-> Hmm, I'm not sure...  I would like Kalle's thoughts on this.
+The one in igc.h does not seem to be referenced by anything in the igc
+directory. Pretty sure it's unused.
 
-IIRC I did only some simple cleanup before submitting the patch so I
-don't think Co-developed-by is justified. I'm also fine with removing my
-Signed-off-by.
+> As a further aside, this code:
+> 
+>         struct net_device *dev;
+> 	...
+>         struct net_device *p;
+> 	...
+>         /* ensure 32-byte alignment of whole construct */
+>         alloc_size += NETDEV_ALIGN - 1;
+>         p = kvzalloc(alloc_size, GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFAIL);
+> 	...
+>         dev = PTR_ALIGN(p, NETDEV_ALIGN);
+> 
+> Really screams for a dynamic-sized (bucketed) kmem_cache_alloc
+> API. Alignment constraints can be described in a regular kmem_cache
+> allocator (rather than this open-coded version). I've been intending to
+> build that for struct msg_msg for a while now, and here's another user. :)
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+TBH I'm not sure why we align it :S
+NETDEV_ALIGN is 32B so maybe some old cache aligning thing?
 
