@@ -1,111 +1,170 @@
-Return-Path: <netdev+bounces-76194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E42F286CB4E
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 15:19:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 963F586CB54
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 15:22:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 177511C20D18
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 14:19:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12CEC2868D0
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 14:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 802321361B0;
-	Thu, 29 Feb 2024 14:18:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F3A11361A1;
+	Thu, 29 Feb 2024 14:21:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="WW+ahL4I"
+	dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b="TbyqMLjB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE471350EC
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 14:18:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BD412E1CC
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 14:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709216326; cv=none; b=McBYyrbm38bkYsjyJQ1feZitzxHMX3s+MamE3W9YH6hzXzd+mf/uq984Zy9tW3vJ1r+QwckoTeXhi/3n2ANOoVIgTu159kJVINseL5MJ7FB9WEaGkxocU4exY7IAonMy/KtNhyUS1shm0mkOaE3kauTrrnDaGqSEdWC0cCbXPJk=
+	t=1709216515; cv=none; b=UB8xjSDmOgZyYapawLyUCuiRr/7FTz1P3Lfw4vjJTwoeBbYqdLIMQVBvzJh0NABt+m+V/2e5t297CXv9Bs/BydNt8ON9DzB9akzKT1RaWxlUOOWTOL2tEvaMVU7HJDi7Ws5v1rcXfd8itpTUsxPXxul9la3FwMy13g4z01b9b84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709216326; c=relaxed/simple;
-	bh=BpAV1h7vAElCeSAMfDCr5+w4VE6qrWqEnQwLWE0fDlU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HMpwe615bpXeLbyInimj4pcscnT45rHW/mRHbsbtd/bOcdZE3eQz0HTIbFyRC1K/C8q8as9RL5YQ0ieku2EWodHn7qcrCWzUPpZVFvNobKfFtqZVLON8350GUmCiHciYTK8O9doyA0lumN/mta3GEu9PmpnQFzt4fctqKEgaPkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=WW+ahL4I; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-412c2352f74so1982885e9.0
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 06:18:44 -0800 (PST)
+	s=arc-20240116; t=1709216515; c=relaxed/simple;
+	bh=s9koWyBOH5kffAk/ctMX8vICzTEVqUgQIoSQO1DAJ1g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h1yxeoYJF81SBaj6onEqK+4O/KsCRvmGHZ5TsQ5tVZpnzKNLQkSf6me2pQhKKpnysdj2uTSj/2Nboq+5kG1wmRk4r1EjUpRN+ElZlt6csqCtS3aCufH2oINjKXuYL98Nr0lNGez4+ZCTAeCDIPezvpIsMPrD0Vx2tb3ldZ61vVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org; spf=pass smtp.mailfrom=joelfernandes.org; dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b=TbyqMLjB; arc=none smtp.client-ip=209.85.166.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=joelfernandes.org
+Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-7c7c983157aso43771339f.3
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 06:21:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709216323; x=1709821123; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8aaee8JFqOYnvrJG84IqHUBI+lXohaqSjazdLmgQKB8=;
-        b=WW+ahL4IH8GLXNmV4ZCgK8quy3KCBZTv1GOJHyTEmP7JkVEX7QKH11gmRSJGBVjm4V
-         V8Evop6Uk3dOpT7r6M2sAzOtAvXR4INzFs1w14bane2PVtLesgxnCRpzeyen9Kv08/wx
-         x/r2YF7i9qFOFjB8p8mts0foBphhdZKNS61cjN5QXjUhymL732PnS6roq3XNwQan4goO
-         TrA8IsSSWgi0liy/TiIsZoGbG2SleDhbcyr3UCat5W5TvpdwiXKgCpPt+IN1G/RNY3Oi
-         OGn7Q9EdUwSdLPBp1MX1tx5rB929rsAkk53egy928zewwS13J9gVkIMIoWjn48ok7BcQ
-         qurg==
+        d=joelfernandes.org; s=google; t=1709216512; x=1709821312; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I7QQf86WBSLlT/8W/ge7tfKbRHIzhxvhjanWb4LCZ2Q=;
+        b=TbyqMLjBGFbW1XYlgjVchNT8LUCoGp061bxAeusS9ycHO17B69pk9QuQEIqVi7WC0X
+         Dop1CM197ycc7ib2kiUp7R8DuZcUDT67qc9LprKNzsVz4XpwfpGKFb6wEWqwgX9MTTJq
+         gDwqVGEzpcbftbs9iqIUAPuH8dbaOtFXJrE84=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709216323; x=1709821123;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8aaee8JFqOYnvrJG84IqHUBI+lXohaqSjazdLmgQKB8=;
-        b=qA7p5AGzJCaLcbKiRgS8rINLAFPSGJDt4De7ovDMDAjhvXfr+8phg8P0D+om8Df1Rw
-         JJe5wyVzb+PoiYxgQ1k5AMC8RHZ/dBv+O4bJlCgGUjZYQXtmAFoHTBjGIq6KeEmkigMJ
-         /Dfqxx8guoM1W1k/1iplU9UqtKNncB0ofatwfg7uWXrU9bjGsuTda4O4zxBdKPEUa3oI
-         tjayUTw/kjJw5s3P2+ba5EvWA+VrswibFD8UwudOZykvX4BBdLBQ9RVmkd1CJ1eY0iKJ
-         OnkAH2wwFru/ANzgmg+ezbFrwBXuW+VbhtN7NTBdN9/zxNcqLgyahh48KVSulM2+Upqf
-         A8Ag==
-X-Forwarded-Encrypted: i=1; AJvYcCWZ0Ypyw4WhJnxo4E9ED/qhQ+Kly5g2qBkvM3Yc7DBCSolYP5NWkKgJzvRL7kMEwXNtfWzJKbZw617OjN4mvO00hc4KgWti
-X-Gm-Message-State: AOJu0YwUW4nPjK9sVZA5+goHErlzNo9RWRJ4Yp9Uk+ZKA6LXcBIpTFW3
-	pCCvfPZk3dqkuHO7513pfni6TtbdykUqnE97CTfWwJTdyQgxIv59Na5DnaW8zQE=
-X-Google-Smtp-Source: AGHT+IE7f37O3UCk+CZGUG3+ngXGyeKj8odD8yxHPGDPeUg8uafik3Fbx/aDSVyacE7BpicLkAY0Yw==
-X-Received: by 2002:a05:600c:190c:b0:412:b8cf:150b with SMTP id j12-20020a05600c190c00b00412b8cf150bmr1727204wmq.10.1709216323024;
-        Thu, 29 Feb 2024 06:18:43 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id jr18-20020a05600c561200b004127057d6b9sm5325317wmb.35.2024.02.29.06.18.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 06:18:42 -0800 (PST)
-Date: Thu, 29 Feb 2024 15:18:39 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@nvidia.com>, David Ahern <dsahern@kernel.org>,
-	netdev@vger.kernel.org, Florian Westphal <fw@strlen.de>,
-	eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 0/6] inet: no longer use RTNL to protect
- inet_dump_ifaddr()
-Message-ID: <ZeCSPyJ_5ARF35mw@nanopsycho>
-References: <20240229114016.2995906-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1709216512; x=1709821312;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=I7QQf86WBSLlT/8W/ge7tfKbRHIzhxvhjanWb4LCZ2Q=;
+        b=Bg462znDnt++4D0ky9BxZ2NOrr0aohzAne1Rj7MBid0qwmR40Wt3rOGzG83gUKza5F
+         Ay6R0GM6ekK8QaCvjkUJjq9RkqO5JxqJS9JJRtUPzOW3HtxxPTmSKcS5hkgzg//gvThi
+         I4gYja5oWKaSBCdtMj4A4HPq5Mgd0Zz31rxU8hG5Hk9vsUNU2zHpR450nr6wecJo5ixD
+         gjOm5tEq5wjNMQiIiuLfy8YkVGjebkQL/awMDkSbPqzU8QglBFATSeoAb/GHmQyHGXh6
+         sahDn1Qp0R/aMLYe1xkP8qTeQC290ug5dqxm8RNlYXT01dFegfGAAbWxA6e5DgyYeAwC
+         jxnw==
+X-Forwarded-Encrypted: i=1; AJvYcCVGy8scNP+lrAVy9ljfkrTMJx5mTYYpldxR53mopwc4TsQ/7lZ3s1pH67tlbr+AxF3OD+xNcB6tiFBu8+j+ECdgF7TXku6w
+X-Gm-Message-State: AOJu0YypdEPfBw6zlOd++FWbK4BDnQeFzspOVZRc166G+N3jtZ96dWf+
+	CC/x0SeuTAGRGaTPLwxEREdGRK0oPGIhrm/tbvT7UvTu0YZGMEE3wU39mTQOZVU=
+X-Google-Smtp-Source: AGHT+IGocqJwt9KmmMr7A2O/6M57M/JbaCMv0luN5qeZx+9pAylTJ9Tny6UR5Td+4D66YZVFB9CTBQ==
+X-Received: by 2002:a05:6602:3b97:b0:7c7:9c58:c970 with SMTP id dm23-20020a0566023b9700b007c79c58c970mr2398006iob.4.1709216512347;
+        Thu, 29 Feb 2024 06:21:52 -0800 (PST)
+Received: from [10.5.0.2] ([91.196.69.76])
+        by smtp.gmail.com with ESMTPSA id a14-20020a5d9ece000000b007c8197e8473sm86044ioe.5.2024.02.29.06.21.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Feb 2024 06:21:51 -0800 (PST)
+Message-ID: <888d2f90-6d2f-4d4f-a9f6-fbf2f2611821@joelfernandes.org>
+Date: Thu, 29 Feb 2024 09:21:48 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240229114016.2995906-1-edumazet@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
+Content-Language: en-US
+To: paulmck@kernel.org, Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>, Yan Zhai <yan@cloudflare.com>,
+ Eric Dumazet <edumazet@google.com>,
+ Network Development <netdev@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+ Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Coco Li <lixiaoyan@google.com>,
+ Wei Wang <weiwan@google.com>, Alexander Duyck <alexanderduyck@fb.com>,
+ Hannes Frederic Sowa <hannes@stressinduktion.org>,
+ LKML <linux-kernel@vger.kernel.org>, rcu@vger.kernel.org,
+ bpf <bpf@vger.kernel.org>, kernel-team <kernel-team@cloudflare.com>,
+ Mark Rutland <mark.rutland@arm.com>
+References: <02913b40-7b74-48b3-b15d-53133afd3ba6@paulmck-laptop>
+ <3D27EFEF-0452-4555-8277-9159486B41BF@joelfernandes.org>
+ <ba95955d-b63d-4670-b947-e77b740b1a49@paulmck-laptop>
+ <20240228173307.529d11ee@gandalf.local.home>
+ <CAADnVQ+szRDGaDJPoBFR9KyeMjwpuxOCNys=yxDaCLYZkSkyYw@mail.gmail.com>
+ <8ae889cb-ee1d-4c72-9414-e21258118ce3@paulmck-laptop>
+From: Joel Fernandes <joel@joelfernandes.org>
+In-Reply-To: <8ae889cb-ee1d-4c72-9414-e21258118ce3@paulmck-laptop>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Thu, Feb 29, 2024 at 12:40:10PM CET, edumazet@google.com wrote:
->This series convert inet so that a dump of addresses (ip -4 addr)
->no longer requires RTNL.
->
->Eric Dumazet (6):
->  inet: annotate data-races around ifa->ifa_tstamp and ifa->ifa_cstamp
->  inet: annotate data-races around ifa->ifa_valid_lft
->  inet: annotate data-races around ifa->ifa_preferred_lft
->  inet: annotate data-races around ifa->ifa_flags
->  inet: prepare inet_base_seq() to run without RTNL
->  inet: use xa_array iterator to implement inet_dump_ifaddr()
->
-> net/core/dev.c     |   5 +-
-> net/ipv4/devinet.c | 166 +++++++++++++++++++++------------------------
-> 2 files changed, 79 insertions(+), 92 deletions(-)
 
-Looks fine to me.
 
-set-
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+On 2/28/2024 5:58 PM, Paul E. McKenney wrote:
+> On Wed, Feb 28, 2024 at 02:48:44PM -0800, Alexei Starovoitov wrote:
+>> On Wed, Feb 28, 2024 at 2:31 PM Steven Rostedt <rostedt@goodmis.org> wrote:
+>>>
+>>> On Wed, 28 Feb 2024 14:19:11 -0800
+>>> "Paul E. McKenney" <paulmck@kernel.org> wrote:
+>>>
+>>>>>>
+>>>>>> Well, to your initial point, cond_resched() does eventually invoke
+>>>>>> preempt_schedule_common(), so you are quite correct that as far as
+>>>>>> Tasks RCU is concerned, cond_resched() is not a quiescent state.
+>>>>>
+>>>>>  Thanks for confirming. :-)
+>>>>
+>>>> However, given that the current Tasks RCU use cases wait for trampolines
+>>>> to be evacuated, Tasks RCU could make the choice that cond_resched()
+>>>> be a quiescent state, for example, by adjusting rcu_all_qs() and
+>>>> .rcu_urgent_qs accordingly.
+>>>>
+>>>> But this seems less pressing given the chance that cond_resched() might
+>>>> go away in favor of lazy preemption.
+>>>
+>>> Although cond_resched() is technically a "preemption point" and not truly a
+>>> voluntary schedule, I would be happy to state that it's not allowed to be
+>>> called from trampolines, or their callbacks. Now the question is, does BPF
+>>> programs ever call cond_resched()? I don't think they do.
+>>>
+>>> [ Added Alexei ]
+>>
+>> I'm a bit lost in this thread :)
+>> Just answering the above question.
+>> bpf progs never call cond_resched() directly.
+>> But there are sleepable (aka faultable) bpf progs that
+>> can call some helper or kfunc that may call cond_resched()
+>> in some path.
+>> sleepable bpf progs are protected by rcu_tasks_trace.
+>> That's a very different one vs rcu_tasks.
+> 
+> Suppose that the various cond_resched() invocations scattered throughout
+> the kernel acted as RCU Tasks quiescent states, so that as soon as a
+> given task executed a cond_resched(), synchronize_rcu_tasks() might
+> return or call_rcu_tasks() might invoke its callback.
+> 
+> Would that cause BPF any trouble?
+> 
+> My guess is "no", because it looks like BPF is using RCU Tasks (as you
+> say, as opposed to RCU Tasks Trace) only to wait for execution to leave a
+> trampoline.  But I trust you much more than I trust myself on this topic!
+
+But it uses RCU Tasks Trace as well (for sleepable bpf programs), not just
+Tasks? Looks like that's what Alexei said above as well, and I confirmed it in
+bpf/trampoline.c
+
+        /* The trampoline without fexit and fmod_ret progs doesn't call original
+         * function and doesn't use percpu_ref.
+         * Use call_rcu_tasks_trace() to wait for sleepable progs to finish.
+         * Then use call_rcu_tasks() to wait for the rest of trampoline asm
+         * and normal progs.
+         */
+        call_rcu_tasks_trace(&im->rcu, __bpf_tramp_image_put_rcu_tasks);
+
+The code comment says it uses both.
+
+Thanks,
+
+ - Joel
 
