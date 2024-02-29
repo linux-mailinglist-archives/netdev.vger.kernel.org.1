@@ -1,131 +1,116 @@
-Return-Path: <netdev+bounces-75965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25D8086BCB5
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 01:21:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF43E86BCEC
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 01:41:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6157286832
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 00:21:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F4BE1F22D17
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 00:41:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E51BC5A4CF;
-	Thu, 29 Feb 2024 00:18:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17BE101C8;
+	Thu, 29 Feb 2024 00:41:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Zd6FsrbG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gi6KjYjo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2DD57316
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 00:18:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D6E9BE4F
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 00:41:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709165930; cv=none; b=a6zFF9yGrCT+I1ZFebeafcbd9keg1ohhc4xxKae7ffXJcFwmiluyDIADf8tb0F91D4NvL4ERlTPXQJiYX54JaddfxFcPZfKX47MoeL+cVweakEttESLTZchS520Qjl1YbhI4Skp6tdyZBZHi7mWJMQGniYJR0WmrCVWVwwpd+w0=
+	t=1709167300; cv=none; b=muxBfgfCOp/VLkiCCg1p3Qr1+28KfA4PXhDL+F2ZUqiQkyKwnMTaVWZL6HttA4x+liLtFpZcXpGYIMRQofSSwsNef/0mdyEpk7648jgyrNouC7EIs/UcgHjgBEYiNRXDGrRwlKNEFuLlxN7MjJJjy4sTlTXzwaoC/qfAy+M2qdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709165930; c=relaxed/simple;
-	bh=9DJj6YTz0ZZOl6MAUN9AsplTyADMYRPheFd4FjREcq0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TNHhjwIF/Ejr2OlRThlzitIUarV8uOCjcquy2kpNcbWBCRbptjEfM1dmCQBPEZyZAPxcvLu+YQBiMnPEkZaG1xRXsSD90Kn2oVgU8jcdCEP4jnPI66QF4HyG5LtXRp/+wqafyPR4vwbJLCtyX2mw/F/CJ2UqkyAu5vIgD3gABvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Zd6FsrbG; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-29ad73b4686so210498a91.0
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 16:18:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1709165929; x=1709770729; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K5uqn8jk7ThAKtuWvpjc6qdSbK1EvuBbH6icwTpGIW4=;
-        b=Zd6FsrbGvnNHW8S/xTkaP8iOt0/OYTPNpeWEampDlCmOtdciZpBKQacdXgA3W8WqKd
-         je2ed3pek8hzLO8jLXSAiCfElrc/dD2tOLHFMyF0P5JuV1g+AZaU0I40tkMAVPEhCjEU
-         kbIf/NuBfZz5rKsXoMemtF89f69aO0mt0e9/4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709165929; x=1709770729;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K5uqn8jk7ThAKtuWvpjc6qdSbK1EvuBbH6icwTpGIW4=;
-        b=hwaCInRiQ2LR10ajjjKN4KlSNWyxXnpUcpYX2ZLsPKuuKNBFw/yqTocYYEcSHNlejX
-         FvRut2nExe9nmJzD3sB0NGot7EQ894KIIcQa2KJWlDO91ClyT+rOB7dWrgnzGB3znBjk
-         KeVSt8vd6uJPdGuX1ebMXmKWqiI4OVD/e/+zFDMcmYYo3MUSl+AVrSox+yI/s0TIiDdH
-         LYpHFZbWm8cEg1m/Oyb32Mtpl/ZLHsff8Jkk/LgNPXMWinc4kCbo/N9RSQN0Kw4CQBEH
-         ZqeWoty7PkHdYYA3PECK5GJYP255Q+f8C2HLhWNpXs1V+LjWiSHcFBfD+c0L8zM+kHP2
-         wa3g==
-X-Forwarded-Encrypted: i=1; AJvYcCXqvPP9J854Vrb8MoHJ7/r23xQPpMTnpXbrf5UAFtf0D+FTDd/Eh6CWGWTSF6gINwmPrifDC5B2XgqWaUadAk9IvsYvxe1h
-X-Gm-Message-State: AOJu0Yy1hzqsRmlTeBtnIqEecGJW1BvJMpX6U5K1/3FHNvk7RTSYEdd9
-	UkjwuWdBEubv8GohT5PMe6tqBSeMG8fRWL1ZDhYfwsJxLGlxRgyGk70fkTgh0Q==
-X-Google-Smtp-Source: AGHT+IG9LGv7xga1c26psaW5lSQ/a3FgyK1kDrzHgkNdLgVdVr5RsO1xWGsalLcOFQ/g2GqHBPATsg==
-X-Received: by 2002:a17:90b:3905:b0:299:6848:28c1 with SMTP id ob5-20020a17090b390500b00299684828c1mr834549pjb.26.1709165928724;
-        Wed, 28 Feb 2024 16:18:48 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id su7-20020a17090b534700b002973162eca1sm2292760pjb.17.2024.02.28.16.18.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 16:18:48 -0800 (PST)
-Date: Wed, 28 Feb 2024 16:18:47 -0800
-From: Kees Cook <keescook@chromium.org>
-To: Justin Stitt <justinstitt@google.com>
-Cc: Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Sumit Saxena <sumit.saxena@broadcom.com>,
-	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-	"James E.J. Bottomley" <jejb@linux.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
-	Ariel Elior <aelior@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saurav Kashyap <skashyap@marvell.com>,
-	Javed Hasan <jhasan@marvell.com>,
-	GR-QLogic-Storage-Upstream@marvell.com,
-	Nilesh Javali <njavali@marvell.com>,
-	Manish Rangankar <mrangankar@marvell.com>,
-	Don Brace <don.brace@microchip.com>,
-	mpi3mr-linuxdrv.pdl@broadcom.com, linux-scsi@vger.kernel.org,
-	linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org,
-	MPT-FusionLinux.pdl@broadcom.com, netdev@vger.kernel.org,
-	storagedev@microchip.com
-Subject: Re: [PATCH v2 0/7] scsi: replace deprecated strncpy
-Message-ID: <202402281617.807B1B7@keescook>
-References: <20240228-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v2-0-dacebd3fcfa0@google.com>
+	s=arc-20240116; t=1709167300; c=relaxed/simple;
+	bh=4kQYd2ZHNhkclLG4l+RHqM/REIwhgGEOo6WWbm54+Cs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kqMwgoNhZKigaIep4Xh0m7JpWE8l0FBsYVxRFjS2+PpDJtnR3F9LevMs/0fu6h5kSBsvLYab3Dn0nxrmdX3cGZgdyO1v70SgQVYjQY8oQPxMqOR5O5YmbXapHj/UO4IPq1stFtVh0NhoDlcMYk6SWp9/kMk5pH8Cla9JlmbP1vU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gi6KjYjo; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709167300; x=1740703300;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4kQYd2ZHNhkclLG4l+RHqM/REIwhgGEOo6WWbm54+Cs=;
+  b=gi6KjYjoxkWv4tozEFuVS5xafaoRVb46iW3YypcqynBZIe22iIu90rDy
+   4bHd1vH6i1TsJR7FKSAckVhIheeaYVc7taPUPFQSsezoi4mkpJAfJpauH
+   iJ/P22jppVz3QURCFIfuuqWF/UNbjzbOIY8/+icKMuV+D5cCxlB4Akx03
+   dU7f4N5PCHTaerNTh48FGoELGEWYFNtBGu4cJK588uSMCq3G0beiXXtE/
+   pZ5SUPx9k1PH91pKc5wHCb07HAGmwIZhXhVpiv+J112o6HWyHdYqwARDE
+   aEWz1Mkl69zljOCpC4lE14vr2ErhzTWPzdQK7c9ThS5XSlqPQkAzLGa/U
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10998"; a="3776508"
+X-IronPort-AV: E=Sophos;i="6.06,191,1705392000"; 
+   d="scan'208";a="3776508"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2024 16:41:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,191,1705392000"; 
+   d="scan'208";a="12281943"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa004.jf.intel.com with ESMTP; 28 Feb 2024 16:41:39 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 0/4][pull request] Intel Wired LAN Driver Updates 2024-02-28 (ixgbe, igc, igb, e1000e, e100)
+Date: Wed, 28 Feb 2024 16:41:28 -0800
+Message-ID: <20240229004135.741586-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240228-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v2-0-dacebd3fcfa0@google.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 28, 2024 at 10:59:00PM +0000, Justin Stitt wrote:
-> This series contains multiple replacements of strncpy throughout the
-> scsi subsystem.
-> 
-> strncpy() is deprecated for use on NUL-terminated destination strings
-> [1] and as such we should prefer more robust and less ambiguous string
-> interfaces. The details of each replacement will be in their respective
-> patch.
-> 
-> ---
-> Changes in v2:
-> - for (1/7): change strscpy to simple const char* assignments
-> - Link to v1: https://lore.kernel.org/r/20240223-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v1-0-9cd3882f0700@google.com
+This series contains updates to ixgbe, igc, igb, e1000e, and e100
+drivers.
 
-I think you lost my tags for the later patches. I re-reviewed a few and
-then remembered I'd already reviewed these and they were unchanged. :)
+Jon Maxwell makes module parameter values readable in sysfs for ixgbe,
+igb, and e100.
 
-Please run:
+Ernesto Castellotti adds support for 1000BASE-BX on ixgbe.
 
-b4 trailers -u 20240223-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v1-0-9cd3882f0700@google.com
+Arnd Bergmann fixes build failure due to dependency issues for igc.
 
-:)
+Vitaly refactors error check to be more concise and prevent future
+issues on e1000e.
 
--Kees
+The following are changes since commit 4ac828960a604e2ae72af59ce44dafdc8b12675f:
+  Merge branch 'eee-linkmode-bitmaps'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 1GbE
+
+Arnd Bergmann (1):
+  igc: fix LEDS_CLASS dependency
+
+Ernesto Castellotti (1):
+  ixgbe: Add 1000BASE-BX support
+
+Jon Maxwell (1):
+  intel: make module parameters readable in sys filesystem
+
+Vitaly Lifshits (1):
+  e1000e: Minor flow correction in e1000_shutdown function
+
+ drivers/net/ethernet/intel/Kconfig            |  1 +
+ drivers/net/ethernet/intel/e100.c             |  4 +--
+ drivers/net/ethernet/intel/e1000e/netdev.c    |  8 ++---
+ drivers/net/ethernet/intel/igb/igb_main.c     |  2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  | 32 ++++++++++++++++---
+ 6 files changed, 37 insertions(+), 12 deletions(-)
 
 -- 
-Kees Cook
+2.41.0
+
 
