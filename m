@@ -1,58 +1,57 @@
-Return-Path: <netdev+bounces-76018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3263F86BFE4
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 05:32:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EAA386BFE7
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 05:35:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D51311F251B0
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 04:32:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55F92286BCA
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 04:35:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD664374DD;
-	Thu, 29 Feb 2024 04:32:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B01374DD;
+	Thu, 29 Feb 2024 04:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eyDJIMhy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SjBOyHpr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C8B812
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 04:32:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7FE812
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 04:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709181156; cv=none; b=T1t330tDHMl0cBQdqjkIwyYAyv7bS8r16/mTahU5Tvg2nhl3qIFQHZYellYia3vR5eCc8ftuEbPaiWwRA1c531bICZTewm181HF3/EJSbK0JWPW/FDSShLWgF0HGqeXzxoqHrW78e+I6lQmZ5jnORIinsb5lFmWlLsVLsmR6XVk=
+	t=1709181299; cv=none; b=lQIlx+ClZP9XLq0I4kOx9KA1gByTPXDVI6EMl9PL75lIH6sECTZtfM8OF2A5jamujldNoWouIgyCFDKHdzjVemgFGTDV41YuQMQw6bzVp6Mmd8I0fDkXo06PHovwD6vYVUM+3Ze1gAmpewc/NbfVPHTXec/+fP/zppLTDfREFy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709181156; c=relaxed/simple;
-	bh=6yuNG6k7RQaDZBxgdfz9+gHU2+N/xt/XGaEKpSlx19A=;
+	s=arc-20240116; t=1709181299; c=relaxed/simple;
+	bh=im9nHjJzac++4GCL+wt2hEj2xXBI86hfXDYb3AicNhk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DoocaQ13sypD7DNdoRnnxipBJhh126Q1n12cApubBIN2f5tE4PIkclBcz28z35E/GxD0P2id376q+qXRnLRDB1PvcgQ1A/ctFppvD49xjs09LeXup3+IQlI9YOV/9jQBa0zVxOdIaKDoJc1bugeTzreNHplg3OWZ/d4NLLft1uI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eyDJIMhy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7E5FC433C7;
-	Thu, 29 Feb 2024 04:32:35 +0000 (UTC)
+	 MIME-Version:Content-Type; b=rB7C9C8/X94vivjQwlCOEMGCVHOVw7O4fTQB+fZC2/j2sWejX2VK114IKy/YNzped53+iwRBX3uIjQuw2z/2h7xJSppv9cUruDdpUFTKkURiEmfZpDWlXgxx6Wbt+6aUTrwk8C3YCrUl5KRX0n74MXCJLV69haJeSbHWBG6HLIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SjBOyHpr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08626C433C7;
+	Thu, 29 Feb 2024 04:34:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709181156;
-	bh=6yuNG6k7RQaDZBxgdfz9+gHU2+N/xt/XGaEKpSlx19A=;
+	s=k20201202; t=1709181299;
+	bh=im9nHjJzac++4GCL+wt2hEj2xXBI86hfXDYb3AicNhk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eyDJIMhy/Lji1Qxl0b2VyzDTR/BJdawB9B14POwM5TqNlatVEXVqPW2HXXzdJ8IBH
-	 w7E0ZuLG55T+/JBwNFSTwplEvMcVfJF0RtLcyB0CG6MXsOf4Xf4kHbMXMaLmxW2tL0
-	 gVXYVgWkkhGmtdDPWitxohK33oEDdfpBiptiPOWNz0yMUOvFVWM/xF8fxr6iGJcFX6
-	 RsJezQ1PL5IFdYbpBgjbcIoC5Vq2EIx1ST6AXm33fSDfNz+C+C4+SnYcj+Z3r2Db7j
-	 fZ0sQ1ICmEO/lSh2/pii7BlcMe2982aDLJcCLAOfxA75foGfPVvQIShBYgpTScrMej
-	 oAUxVAA0F963Q==
-Date: Wed, 28 Feb 2024 20:32:35 -0800
+	b=SjBOyHprl+681rw6LSnlLjkwA5sXGKD8seEy65K552aXKhMBDm77FKLO11hNgZ87Y
+	 3Il1B/Z83sNdIYv9yha/bGPzyOIuDeqQXoD+zvi3NaehbJS6oRY1N1/OyVJJ+kbi3z
+	 ONkoeC8o3CfxZSxD2EUqGeo6OQzKV/EVWDq09J8cIz6Ck7hQItBnZ6Nz/NCJsHYxZY
+	 bAyqSGxSGmpYrMS6GNHY9iRJC8p3clmvW5ImZ+kc/xq5qQjhKJSNgCYZB/QhrrtcLB
+	 NWRdZUwYFfeqdV9fpchG2RaSd88RdCQ/fotobRSKzdvTdEQby50GcJ6MbLUZnCAnau
+	 SdIynwqHj6zqg==
+Date: Wed, 28 Feb 2024 20:34:58 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Louis Peens <louis.peens@corigine.com>, David Miller
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Fei Qin
- <fei.qin@corigine.com>, netdev@vger.kernel.org, oss-drivers@corigine.com
-Subject: Re: [PATCH net-next v2 1/4] devlink: add two info version tags
-Message-ID: <20240228203235.22b5f122@kernel.org>
-In-Reply-To: <Zd8js1wsTCxSLYxy@nanopsycho>
+To: Louis Peens <louis.peens@corigine.com>
+Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Fei
+ Qin <fei.qin@corigine.com>, netdev@vger.kernel.org,
+ oss-drivers@corigine.com
+Subject: Re: [PATCH net-next v2 2/4] nfp: update devlink device info output
+Message-ID: <20240228203458.4a7234f5@kernel.org>
+In-Reply-To: <20240228075140.12085-3-louis.peens@corigine.com>
 References: <20240228075140.12085-1-louis.peens@corigine.com>
-	<20240228075140.12085-2-louis.peens@corigine.com>
-	<Zd8js1wsTCxSLYxy@nanopsycho>
+	<20240228075140.12085-3-louis.peens@corigine.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,39 +61,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 28 Feb 2024 13:14:43 +0100 Jiri Pirko wrote:
-> >+/* Part number for entire product */
-> >+#define DEVLINK_INFO_VERSION_GENERIC_PART_NUMBER       "part_number"  
-> 
-> /* Part number, identifier of board design */
-> #define DEVLINK_INFO_VERSION_GENERIC_BOARD_ID   "board.id"
-> 
-> Isn't this what you are looking for?
+On Wed, 28 Feb 2024 09:51:38 +0200 Louis Peens wrote:
+> +   * - ``part_number``
+> +     - fixed
+> +     - Part number of the entire product
 
-My memory is fading but AFAIR when I added the other IDs, back in my
-Netronome days, the expectation was that they would be combined
-together to form the part number.
+Belongs in the previous patch..
 
-Not sure why they need a separate one now, maybe they lost the docs,
-maybe requirements changed. Would be good to know... :)
+>     * - ``fw.bundle_id``
+>       - stored, running
+>       - Firmware bundle id
+> diff --git a/drivers/net/ethernet/netronome/nfp/nfp_devlink.c b/drivers/net/ethernet/netronome/nfp/nfp_devlink.c
+> index 635d33c0d6d3..5b41338d55c4 100644
+> --- a/drivers/net/ethernet/netronome/nfp/nfp_devlink.c
+> +++ b/drivers/net/ethernet/netronome/nfp/nfp_devlink.c
+> @@ -159,7 +159,8 @@ static const struct nfp_devlink_versions_simple {
+>  	{ DEVLINK_INFO_VERSION_GENERIC_BOARD_ID,	"assembly.partno", },
+>  	{ DEVLINK_INFO_VERSION_GENERIC_BOARD_REV,	"assembly.revision", },
+>  	{ DEVLINK_INFO_VERSION_GENERIC_BOARD_MANUFACTURE, "assembly.vendor", },
+> -	{ "board.model", /* code name */		"assembly.model", },
+> +	{ DEVLINK_INFO_VERSION_GENERIC_BOARD_MODEL,	"assembly.model", },
 
-> "part_number" without domain (boards/asic/fw) does not look correct to
-> me. "Product" sounds very odd.
-
-I believe Part Number is what PCI VPD calls it.
-
-In addition to Jiri's questions:
-
-> +/* Model of the board */
-> +#define DEVLINK_INFO_VERSION_GENERIC_BOARD_MODEL       "board.model"
-
-What's the difference between this and:
-
- board.id
- --------
- 
- Unique identifier of the board design.
-
-? One is AMDA the other one is code name?
-You gotta provide more guidance how the two differ...
+Ah, it is the code name. I don't understand why you're trying to make
+this generic. I never seen other vendors report code names for boards.
 
