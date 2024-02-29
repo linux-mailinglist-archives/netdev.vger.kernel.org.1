@@ -1,95 +1,143 @@
-Return-Path: <netdev+bounces-76122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAC4D86C6B1
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 11:20:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 373BC86C6CA
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 11:24:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9912C1F21D96
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 364511C21E91
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 10:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5389062808;
-	Thu, 29 Feb 2024 10:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pAyTUF6m"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1FB164A92;
+	Thu, 29 Feb 2024 10:24:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B7E6214D
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 10:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810A360BA7;
+	Thu, 29 Feb 2024 10:24:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709202028; cv=none; b=dH52Kbip3Iw2hDtKHjYBUqhXR9Y3JJdpH0mMe4qYKB5F2N8JVm9rikG2cNm35KfSACArJzorI6a88BktzdU9zMDHEQF2nxTFiwy0/O3DrefmVZaEwruUTZN2rOhXQxYR8ZsnNOPEFqoOU/x2j666/fDehIrg8Nv432TvJAdLWtE=
+	t=1709202292; cv=none; b=phWQ+yHtgnar1e7K2T7mAL2CNbieT8srYe4eYybTPl74ndI1dIc6SoKez2FTb62ZRHB8Jm/VATsTEXMFaxm5uEvkfQ61CwmqTIQGzaRzR6wxuCF0f4VL5AsYyKvn7jj094aGjM9A+V0lEUMZgZhQFa8PEJ6aayqWMK0m/W5sad0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709202028; c=relaxed/simple;
-	bh=sOCRQYJkrZw9xvsJ9noJk1UbG92PjiCY1u1QbR57MaI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BMerKL/4xF85tjvh9IF3O1A6jru+CsoER+A41YVjb/gJSGxQZjzF4PZy1BIGDtFeNB0yhb8Db2kTDr2uUWF9TDK0IgGZTLbs4HQ7DZuc25GK7lEyoYXss+sLBUP1PgC1cC3K5y/KPQH9hxuMbwMePg0fnGW5Ep66rr1xlw+DZEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pAyTUF6m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 00284C43390;
-	Thu, 29 Feb 2024 10:20:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709202028;
-	bh=sOCRQYJkrZw9xvsJ9noJk1UbG92PjiCY1u1QbR57MaI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pAyTUF6msSFeZ5XeUasofBCSQspVA6txUSk0PfooNQAgTvs5VIdGi8f8QqSZTA98R
-	 N8koUzqis2uWPfy4w8NvkjaWR1yhhwXWAL0rwKPQtKJcigwnNoANM0Hn2DBc6Q2e3u
-	 5ls1Kn+uwN1szh39jGo5gq2HjnYDc8sWaLCpVu68IEIKwsnYvD9jxk90swh3SuVh12
-	 McoHDAXTXtD5UtnVMdUMs9x/ua863fuO3ac6tMv4Wv+Xlfpe+RU1Qfy4tDkZlRFdm3
-	 eI2fqzTOeUSvKVQY6LUKmMmYiQ9eN6gv4htwxXsij8pcTQ9sXjC5EkRe5SqvowQ5tF
-	 vmAiQTq6Hm7fQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DF325C3274B;
-	Thu, 29 Feb 2024 10:20:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709202292; c=relaxed/simple;
+	bh=hjCiYmjmUqBlBGGPp3oOg+AOV4QZY5js4NzUUHbvtPI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UpSpCL716rDR/Rk4lQFDYnYVRvB7PJJ1nnv8f8b6ypIdixJUDCLMPzcZGEyZifXjr3CZ+OLQ5AmEzrjD5U/eKEDGaGSImH8KK6eJigODk9q6Mgj+CXyPzzaETiG8K6YCpoJEpcj8OI7QHc6YiekXAct4cCJXIz0agyHuG7dHjWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74CE5C433C7;
+	Thu, 29 Feb 2024 10:24:45 +0000 (UTC)
+Date: Thu, 29 Feb 2024 10:24:42 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+	llvm@lists.linux.dev, Ingo Molnar <mingo@redhat.com>,
+	Bill Wendling <morbo@google.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Leon Romanovsky <leonro@mellanox.com>, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Mark Rutland <mark.rutland@arm.com>,
+	Michael Guralnik <michaelgur@mellanox.com>, patches@lists.linux.dev,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 4/6] arm64/io: Provide a WC friendly __iowriteXX_copy()
+Message-ID: <ZeBbamDoHIxzzfof@arm.com>
+References: <0-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
+ <4-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
+ <Zd27XtDg_NDzLXg-@arm.com>
+ <20240228230616.GS13330@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] net: hsr: Use correct offset for HSR TLV values in
- supervisory HSR frames
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170920202791.27512.14273215717177660905.git-patchwork-notify@kernel.org>
-Date: Thu, 29 Feb 2024 10:20:27 +0000
-References: <20240228085644.3618044-1-lukma@denx.de>
-In-Reply-To: <20240228085644.3618044-1-lukma@denx.de>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: o.rempel@pengutronix.de, andrew@lunn.ch, edumazet@google.com,
- f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- kuba@kernel.org, netdev@vger.kernel.org, Tristram.Ha@microchip.com,
- bigeasy@linutronix.de
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240228230616.GS13330@nvidia.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 28 Feb 2024 09:56:44 +0100 you wrote:
-> Current HSR implementation uses following supervisory frame (even for
-> HSRv1 the HSR tag is not is not present):
+On Wed, Feb 28, 2024 at 07:06:16PM -0400, Jason Gunthorpe wrote:
+> On Tue, Feb 27, 2024 at 10:37:18AM +0000, Catalin Marinas wrote:
+> > On Tue, Feb 20, 2024 at 09:17:08PM -0400, Jason Gunthorpe wrote:
+> > > +/*
+> > > + * This generates a memcpy that works on a from/to address which is aligned to
+> > > + * bits. Count is in terms of the number of bits sized quantities to copy. It
+> > > + * optimizes to use the STR groupings when possible so that it is WC friendly.
+> > > + */
+> > > +#define memcpy_toio_aligned(to, from, count, bits)                        \
+> > > +	({                                                                \
+> > > +		volatile u##bits __iomem *_to = to;                       \
+> > > +		const u##bits *_from = from;                              \
+> > > +		size_t _count = count;                                    \
+> > > +		const u##bits *_end_from = _from + ALIGN_DOWN(_count, 8); \
+> > > +                                                                          \
+> > > +		for (; _from < _end_from; _from += 8, _to += 8)           \
+> > > +			__const_memcpy_toio_aligned##bits(_to, _from, 8); \
+> > > +		if ((_count % 8) >= 4) {                                  \
+> > > +			__const_memcpy_toio_aligned##bits(_to, _from, 4); \
+> > > +			_from += 4;                                       \
+> > > +			_to += 4;                                         \
+> > > +		}                                                         \
+> > > +		if ((_count % 4) >= 2) {                                  \
+> > > +			__const_memcpy_toio_aligned##bits(_to, _from, 2); \
+> > > +			_from += 2;                                       \
+> > > +			_to += 2;                                         \
+> > > +		}                                                         \
+> > > +		if (_count % 2)                                           \
+> > > +			__const_memcpy_toio_aligned##bits(_to, _from, 1); \
+> > > +	})
+> > 
+> > Do we actually need all this if count is not constant? If it's not
+> > performance critical anywhere, I'd rather copy the generic
+> > implementation, it's easier to read.
 > 
-> 00000000: 01 15 4e 00 01 2d XX YY ZZ 94 77 10 88 fb 00 01
-> 00000010: 7e 1c 17 06 XX YY ZZ 94 77 10 1e 06 XX YY ZZ 94
-> 00000020: 77 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 00000030: 00 00 00 00 00 00 00 00 00 00 00 00
-> 
-> [...]
+> Which generic version?
 
-Here is the summary with links:
-  - [v2] net: hsr: Use correct offset for HSR TLV values in supervisory HSR frames
-    https://git.kernel.org/netdev/net/c/51dd4ee03722
+The current __iowriteXX_copy() in lib/iomap_copy.c (copy them over or
+add some preprocessor reuse the generic functions).
 
-You are awesome, thank you!
+> The point is to maximize WC effects with non-constant values, so I
+> think we do need something like this. ie we can't just fall back to
+> looping over 64 bit stores one at a time.
+
+If that's a case you are also targeting and have seen it in practice,
+that's fine. But I had the impression that you are mostly after the
+constant count case which is already addressed by the other part of this
+patch. For the non-constant case, we have a DGH only at the end of
+whatever buffer was copied rather than after every 64-byte increments
+you'd get for a count of 8.
+
+> Most places I know about using this are performance paths, the entire
+> iocopy infrastructure was introduced as an x86 performance
+> optimization..
+
+At least the x86 case makes sense even from a maintenance perspective,
+it's just a much simpler "rep movsl". I just want to make sure we don't
+over-complicate this code on arm64 unnecessarily.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Catalin
 
