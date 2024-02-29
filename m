@@ -1,184 +1,168 @@
-Return-Path: <netdev+bounces-76165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F5EF86CA16
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 14:20:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E82ED86CA29
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 14:22:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA69FB22048
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 13:20:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F1B9286B85
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 13:22:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DECF37E119;
-	Thu, 29 Feb 2024 13:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3435686271;
+	Thu, 29 Feb 2024 13:22:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HxxatgB/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bYNfFbex"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAED760EDC;
-	Thu, 29 Feb 2024 13:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733937F47E;
+	Thu, 29 Feb 2024 13:22:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709212828; cv=none; b=W7DHxVFyqGPmjro0Y3kooW53IR1Qju4unc6fSb5OJ2jg+Y4cw3j0KJId177FIYs53aQxi7l5ZqjilPoHgPhh6cfuhEO6BHAOOc8soVYQzQAKTZ5e4KYQe0eljicGWGfG5XYgPMP+F/r31QkT1d06ojbki8Rsio9+pQS8uw3B1VU=
+	t=1709212958; cv=none; b=DIjjAR17sGXxGfdzEf3U+SwPjSlGqQvRm9wEBRpjHeGxFNdYswYHGPY8Kmnoezsa6Qcc1jyB5N8dcKsV7pIzahmTxEiqYLMElfhH2uTYKQoW4WSrvxFo6f9kNh4d6wBWD0/6NyJSYpE3xoweZCUz18UX8/s9rML0Zu3UYjg5iK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709212828; c=relaxed/simple;
-	bh=3o9ZCKEWx1uwHV9n0/7XRzWyr48MSOodxXI+/MVbGzY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=f3GCeJznTQcmPGioiNLZlnAHcOOGl3+dQUJ8E2uEdi/kYxpGhw6y6D39W3v5T9Lbswo5FdyEwgIenLnNpRpkhB5j7W7Qoh+KSLMz6xKKe1HTaw6ANaJRR26JKlxIXRhBVQwp1f0NVFjzDURbMlfebQl9fCM6VJOC+JMwcYDPHkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HxxatgB/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0ED88C433C7;
-	Thu, 29 Feb 2024 13:20:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709212828;
-	bh=3o9ZCKEWx1uwHV9n0/7XRzWyr48MSOodxXI+/MVbGzY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HxxatgB/k9lPyz4wVFI589MyuvO6a/Pm2Nlmx/gNO3qIG+c0giYy+b4EuiOnhOsZL
-	 HR1QZJ2+4bt8L5xe/yrM/toCx1ZJIlnTjKdKX4jkwMTnEFX85kVwkRLmrUhvs9hGAS
-	 3SgfBA2ivwMyusXr++OQNuQqSX7Abh/oUMN/W1srnw1FQuoMEpygSjmvGVUMSFhNjq
-	 Y0x2iSumj3BFYoZq2wdRgzoKm152bbvauKat9HwvraUgSyxnS4gX1ieLTNQ2tcrzvB
-	 uTkOIkdQ5phSpwCr0n6+Mg+7IhY9EuFEK5qhkivTwjYnhSc7piv2Gy1FMCocYWS+LJ
-	 COp5r4cSpnVEw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E27F7D84BBA;
-	Thu, 29 Feb 2024 13:20:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709212958; c=relaxed/simple;
+	bh=t/gQZkp/mL8aUTpOBAVPj1+00+2UWc7hLQA1HfFua/0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M0QjQqp7ex19Jjg0TVAIwSeI++6B44JWvazQiYvGb23ztx3tfZdNbHk+knweZlx8+gr9kHU5m73UO1vXBcVAuY0BiDN6vMN2sb093MyfyMHPmCSXVA5e+evhJim6GJz2WTSM8ce4iwUoFa8OpsF4MR0daXbGTd39lpa8ugd8eaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bYNfFbex; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-33dcad9e3a2so598549f8f.3;
+        Thu, 29 Feb 2024 05:22:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709212954; x=1709817754; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Fp+uUnnUZzHMNBvM+VQhYNMJGX0ap5VPiBLO8+JsLNM=;
+        b=bYNfFbexp6Doc7nexgdGczt6z1gRaZEMRNpRRdHGXGhQKpehIoXI78rz63/YJCkqn0
+         Yjy62JXKO2XRDJINUtzlaatpPgqyqn/AQWqTKJQIBV+OOZtdGM1Jql3l2XAy7lGs3jeg
+         vxlOhSc4aIWpvVRjdoLVps/vxobGNyBA4aHZiIWqtHonzP9h4jpbBqF3qc4BB0SRydpx
+         TPU2cfa3oQgHaQAf/2DNuYUAcmF2lX6lwbqhZEgu0ECn/6+2SGTWjABVk+HbbgOHLM6Y
+         ZinvrYX4HbKwZbkJnLVhXW+3b6nIkZHpv27zIrprqymWu5yJlyOiLukqN8Rl7tPar7TY
+         OFkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709212954; x=1709817754;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Fp+uUnnUZzHMNBvM+VQhYNMJGX0ap5VPiBLO8+JsLNM=;
+        b=kn/wMdPCmoVY6j4YgtSg/2OwO2ts3ScsIB3lfCCuK8ra/nzdf097rIILdVir1kh0Bg
+         CDxZSvyH2Cya8q6Ekr7SOOUd3Wu8pv/srEQ9p6yw4fAwqKIEJfUEZZiPvnGgp3NfQEJx
+         U3p7DN14svdp1Qgb5ZXQ1vo421VToq81syRS6iZ7YFWTCpKp4/k+qwHfC3NT6Xd2CRqC
+         /sVxHvEILdxu7DfB88X4lKMQy5agj6ngq4ie7+DGCt9uyLM3l8LomNn+FP1VYS+xNKg6
+         6pe6W+PEK9lyntTRSpcz26n9pqONaeO3kNXm2AHhdTdQ1PX0XloW6//fBNgNt+92yj9B
+         c9Jg==
+X-Forwarded-Encrypted: i=1; AJvYcCWV7xxQV+tx044jxQFquUb0vbUgsNvFipDbsvNxWlCphVH1PtVw3iIkxuKDQU/PaQQ1YLIpbpLQsHGyxJ63F6u+H0dyHFWPMmPTgg62mMEsTFae50z+MMK4LhrXGIBQp2FSkoCDYDWp3kr7Fj/csEa83a8VAWhMTcXeZppUJkJdJ0qS1r7o
+X-Gm-Message-State: AOJu0YwGQ2zlQbdTc/zrUAoTSwTRsl1sdctdhfrTB05j+QCtRvWp61ow
+	mAykvpBtVA/5MrWraF8CXEf3mIvT04sTByoS+A2erJOfUezLzWjN
+X-Google-Smtp-Source: AGHT+IG4hAbPjfSDDmuIHLfqFc2hRkyWuJY9twtb2NiQ2LLHM5NAPwk81DlW8kF9uFjt9YOyC+P32w==
+X-Received: by 2002:a5d:4441:0:b0:33e:fd3:8f4c with SMTP id x1-20020a5d4441000000b0033e0fd38f4cmr1014350wrr.1.1709212954434;
+        Thu, 29 Feb 2024 05:22:34 -0800 (PST)
+Received: from debian ([146.70.204.204])
+        by smtp.gmail.com with ESMTPSA id v13-20020adfd04d000000b0033d202abf01sm1760299wrh.28.2024.02.29.05.22.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Feb 2024 05:22:34 -0800 (PST)
+Message-ID: <a10b6d19-232c-4b6d-bd71-eb3451675f64@gmail.com>
+Date: Thu, 29 Feb 2024 14:22:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] gtp: fix use-after-free and null-ptr-deref in
- gtp_newlink()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170921282792.3692.2017750155322648868.git-patchwork-notify@kernel.org>
-Date: Thu, 29 Feb 2024 13:20:27 +0000
-References: <20240228114703.465107-1-oficerovas@altlinux.org>
-In-Reply-To: <20240228114703.465107-1-oficerovas@altlinux.org>
-To: Alexander Ofitserov <oficerovas@altlinux.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, edumazet@google.com,
- pablo@netfilter.org, laforge@gnumonks.org, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, kovalev@altlinux.org,
- nickel@altlinux.org, dutyrok@altlinux.org, stable@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] net: gro: set {inner_,}network_header in
+ receive phase
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, shuah@kernel.org, liujian56@huawei.com,
+ horms@kernel.org, aleksander.lobakin@intel.com, linyunsheng@huawei.com,
+ therbert@google.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <e1d22505-c5f8-4c02-a997-64248480338b@gmail.com>
+ <446695cb-50b8-4187-bf11-63aedb6e9aed@gmail.com>
+ <CANn89iJxCT0Bcmqjdd1kp4VCf5i3Me7yATsZXO7SkYTPQ9BOAA@mail.gmail.com>
+From: Richard Gobert <richardbgobert@gmail.com>
+In-Reply-To: <CANn89iJxCT0Bcmqjdd1kp4VCf5i3Me7yATsZXO7SkYTPQ9BOAA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
 
-On Wed, 28 Feb 2024 14:47:03 +0300 you wrote:
-> The gtp_link_ops operations structure for the subsystem must be
-> registered after registering the gtp_net_ops pernet operations structure.
+Eric Dumazet wrote:
 > 
-> Syzkaller hit 'general protection fault in gtp_genl_dump_pdp' bug:
+> My intuition is that this patch has a high cost for normal GRO processing.
+> SW-GRO is already a bottleneck on ARM cores in smart NICS.
 > 
-> [ 1010.702740] gtp: GTP module unloaded
-> [ 1010.715877] general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] SMP KASAN NOPTI
-> [ 1010.715888] KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-> [ 1010.715895] CPU: 1 PID: 128616 Comm: a.out Not tainted 6.8.0-rc6-std-def-alt1 #1
-> [ 1010.715899] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.0-alt1 04/01/2014
-> [ 1010.715908] RIP: 0010:gtp_newlink+0x4d7/0x9c0 [gtp]
-> [ 1010.715915] Code: 80 3c 02 00 0f 85 41 04 00 00 48 8b bb d8 05 00 00 e8 ed f6 ff ff 48 89 c2 48 89 c5 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c 02 00 0f 85 4f 04 00 00 4c 89 e2 4c 8b 6d 00 48 b8 00 00 00
-> [ 1010.715920] RSP: 0018:ffff888020fbf180 EFLAGS: 00010203
-> [ 1010.715929] RAX: dffffc0000000000 RBX: ffff88800399c000 RCX: 0000000000000000
-> [ 1010.715933] RDX: 0000000000000001 RSI: ffffffff84805280 RDI: 0000000000000282
-> [ 1010.715938] RBP: 000000000000000d R08: 0000000000000001 R09: 0000000000000000
-> [ 1010.715942] R10: 0000000000000001 R11: 0000000000000001 R12: ffff88800399cc80
-> [ 1010.715947] R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000400
-> [ 1010.715953] FS:  00007fd1509ab5c0(0000) GS:ffff88805b300000(0000) knlGS:0000000000000000
-> [ 1010.715958] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 1010.715962] CR2: 0000000000000000 CR3: 000000001c07a000 CR4: 0000000000750ee0
-> [ 1010.715968] PKRU: 55555554
-> [ 1010.715972] Call Trace:
-> [ 1010.715985]  ? __die_body.cold+0x1a/0x1f
-> [ 1010.715995]  ? die_addr+0x43/0x70
-> [ 1010.716002]  ? exc_general_protection+0x199/0x2f0
-> [ 1010.716016]  ? asm_exc_general_protection+0x1e/0x30
-> [ 1010.716026]  ? gtp_newlink+0x4d7/0x9c0 [gtp]
-> [ 1010.716034]  ? gtp_net_exit+0x150/0x150 [gtp]
-> [ 1010.716042]  __rtnl_newlink+0x1063/0x1700
-> [ 1010.716051]  ? rtnl_setlink+0x3c0/0x3c0
-> [ 1010.716063]  ? is_bpf_text_address+0xc0/0x1f0
-> [ 1010.716070]  ? kernel_text_address.part.0+0xbb/0xd0
-> [ 1010.716076]  ? __kernel_text_address+0x56/0xa0
-> [ 1010.716084]  ? unwind_get_return_address+0x5a/0xa0
-> [ 1010.716091]  ? create_prof_cpu_mask+0x30/0x30
-> [ 1010.716098]  ? arch_stack_walk+0x9e/0xf0
-> [ 1010.716106]  ? stack_trace_save+0x91/0xd0
-> [ 1010.716113]  ? stack_trace_consume_entry+0x170/0x170
-> [ 1010.716121]  ? __lock_acquire+0x15c5/0x5380
-> [ 1010.716139]  ? mark_held_locks+0x9e/0xe0
-> [ 1010.716148]  ? kmem_cache_alloc_trace+0x35f/0x3c0
-> [ 1010.716155]  ? __rtnl_newlink+0x1700/0x1700
-> [ 1010.716160]  rtnl_newlink+0x69/0xa0
-> [ 1010.716166]  rtnetlink_rcv_msg+0x43b/0xc50
-> [ 1010.716172]  ? rtnl_fdb_dump+0x9f0/0x9f0
-> [ 1010.716179]  ? lock_acquire+0x1fe/0x560
-> [ 1010.716188]  ? netlink_deliver_tap+0x12f/0xd50
-> [ 1010.716196]  netlink_rcv_skb+0x14d/0x440
-> [ 1010.716202]  ? rtnl_fdb_dump+0x9f0/0x9f0
-> [ 1010.716208]  ? netlink_ack+0xab0/0xab0
-> [ 1010.716213]  ? netlink_deliver_tap+0x202/0xd50
-> [ 1010.716220]  ? netlink_deliver_tap+0x218/0xd50
-> [ 1010.716226]  ? __virt_addr_valid+0x30b/0x590
-> [ 1010.716233]  netlink_unicast+0x54b/0x800
-> [ 1010.716240]  ? netlink_attachskb+0x870/0x870
-> [ 1010.716248]  ? __check_object_size+0x2de/0x3b0
-> [ 1010.716254]  netlink_sendmsg+0x938/0xe40
-> [ 1010.716261]  ? netlink_unicast+0x800/0x800
-> [ 1010.716269]  ? __import_iovec+0x292/0x510
-> [ 1010.716276]  ? netlink_unicast+0x800/0x800
-> [ 1010.716284]  __sock_sendmsg+0x159/0x190
-> [ 1010.716290]  ____sys_sendmsg+0x712/0x880
-> [ 1010.716297]  ? sock_write_iter+0x3d0/0x3d0
-> [ 1010.716304]  ? __ia32_sys_recvmmsg+0x270/0x270
-> [ 1010.716309]  ? lock_acquire+0x1fe/0x560
-> [ 1010.716315]  ? drain_array_locked+0x90/0x90
-> [ 1010.716324]  ___sys_sendmsg+0xf8/0x170
-> [ 1010.716331]  ? sendmsg_copy_msghdr+0x170/0x170
-> [ 1010.716337]  ? lockdep_init_map_type+0x2c7/0x860
-> [ 1010.716343]  ? lockdep_hardirqs_on_prepare+0x430/0x430
-> [ 1010.716350]  ? debug_mutex_init+0x33/0x70
-> [ 1010.716360]  ? percpu_counter_add_batch+0x8b/0x140
-> [ 1010.716367]  ? lock_acquire+0x1fe/0x560
-> [ 1010.716373]  ? find_held_lock+0x2c/0x110
-> [ 1010.716384]  ? __fd_install+0x1b6/0x6f0
-> [ 1010.716389]  ? lock_downgrade+0x810/0x810
-> [ 1010.716396]  ? __fget_light+0x222/0x290
-> [ 1010.716403]  __sys_sendmsg+0xea/0x1b0
-> [ 1010.716409]  ? __sys_sendmsg_sock+0x40/0x40
-> [ 1010.716419]  ? lockdep_hardirqs_on_prepare+0x2b3/0x430
-> [ 1010.716425]  ? syscall_enter_from_user_mode+0x1d/0x60
-> [ 1010.716432]  do_syscall_64+0x30/0x40
-> [ 1010.716438]  entry_SYSCALL_64_after_hwframe+0x62/0xc7
-> [ 1010.716444] RIP: 0033:0x7fd1508cbd49
-> [ 1010.716452] Code: 00 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d ef 70 0d 00 f7 d8 64 89 01 48
-> [ 1010.716456] RSP: 002b:00007fff18872348 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
-> [ 1010.716463] RAX: ffffffffffffffda RBX: 000055f72bf0eac0 RCX: 00007fd1508cbd49
-> [ 1010.716468] RDX: 0000000000000000 RSI: 0000000020000280 RDI: 0000000000000006
-> [ 1010.716473] RBP: 00007fff18872360 R08: 00007fff18872360 R09: 00007fff18872360
-> [ 1010.716478] R10: 00007fff18872360 R11: 0000000000000202 R12: 000055f72bf0e1b0
-> [ 1010.716482] R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-> [ 1010.716491] Modules linked in: gtp(+) udp_tunnel ib_core uinput af_packet rfkill qrtr joydev hid_generic usbhid hid kvm_intel iTCO_wdt intel_pmc_bxt iTCO_vendor_support kvm snd_hda_codec_generic ledtrig_audio irqbypass crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel snd_hda_intel nls_utf8 snd_intel_dspcfg nls_cp866 psmouse aesni_intel vfat crypto_simd fat cryptd glue_helper snd_hda_codec pcspkr snd_hda_core i2c_i801 snd_hwdep i2c_smbus xhci_pci snd_pcm lpc_ich xhci_pci_renesas xhci_hcd qemu_fw_cfg tiny_power_button button sch_fq_codel vboxvideo drm_vram_helper drm_ttm_helper ttm vboxsf vboxguest snd_seq_midi snd_seq_midi_event snd_seq snd_rawmidi snd_seq_device snd_timer snd soundcore msr fuse efi_pstore dm_mod ip_tables x_tables autofs4 virtio_gpu virtio_dma_buf drm_kms_helper cec rc_core drm virtio_rng virtio_scsi rng_core virtio_balloon virtio_blk virtio_net virtio_console net_failover failover ahci libahci libata evdev scsi_mod input_leds serio_raw virtio_pci 
- intel_agp
-> [ 1010.716674]  virtio_ring intel_gtt virtio [last unloaded: gtp]
-> [ 1010.716693] ---[ end trace 04990a4ce61e174b ]---
+> I would suggest instead using parameters to give both the nhoff and thoff values
+> this would avoid many conditionals in the fast path.
 > 
-> [...]
+> ->
+> 
+> INDIRECT_CALLABLE_SCOPE int udp6_gro_complete(struct sk_buff *skb, int
+> nhoff, int thoff)
+> {
+>  const struct ipv6hdr *ipv6h = (const struct ipv6hdr *)(skb->data + nhoff);
+>  struct udphdr *uh = (struct udphdr *)(skb->data + thoff);
+> ...
+> }
+> 
+> INDIRECT_CALLABLE_SCOPE int tcp6_gro_complete(struct sk_buff *skb, int
+> nhoff, int thoff)
+> {
+>        const struct ipv6hdr *iph =  (const struct ipv6hdr *)(skb->data + nhoff);
+>        struct tcphdr *th = (struct tcphdr *)(skb->data + thoff);
+> 
+> Why storing in skb fields things that really could be propagated more
+> efficiently as function parameters ?
 
-Here is the summary with links:
-  - [net] gtp: fix use-after-free and null-ptr-deref in gtp_newlink()
-    https://git.kernel.org/netdev/net/c/616d82c3cfa2
+Hi Eric,
+Thanks for the review!
+ 
+I agree, the conditionals could be a problem and are actually not needed.
+The third commit in this patch series introduces an optimisation for
+ipv6/ipv4 using the correct {inner_}network_header. We can remove the
+conditionals; I thought about multiple ways to do so. First, remove the
+conditional in skb_gro_network_offset:
+ 
+    static inline int skb_gro_network_offset(const struct sk_buff *skb)
+    {
+        const u32 mask = NAPI_GRO_CB(skb)->encap_mark - 1;
+        return (skb_network_offset(skb) & mask) | (skb_inner_network_offset(skb) & ~mask);
+    }
+ 
+And for the conditionals in {inet,ipv6}_gro_receive I thought about two
+ideas. The first is to move set_inner_network_header to encapsulation gro
+functions like ipip_gro_receive, this way there's one less write (in
+comparison to main) in these functions:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+    static struct sk_buff *ipip_gro_receive(struct list_head *head,
+                        struct sk_buff *skb)
+    {
+        ...
+ 
+        NAPI_GRO_CB(skb)->encap_mark = 1;
+        skb_set_inner_network_header(skb, skb_gro_offset(skb));
+ 
+The second way is to always write to inner_network_header:
 
+    INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_receive(struct list_head *head,
+                                struct sk_buff *skb)
+    {
+        ...
+        skb_set_inner_network_header(skb, off);
+        ...
+ 
+What do you think is better? I think the 1st is more beneficial for the
+fast path.
 
+We could then use the {inner_}network_header separation to optimise the
+receive path, such as in the 3rd commit in this patch series.
+ 
+Regards,
+Richard
 
