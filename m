@@ -1,87 +1,131 @@
-Return-Path: <netdev+bounces-75975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-75976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB53A86BDA8
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 02:03:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 504C286BDB0
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 02:03:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8697A285CC6
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 01:03:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCB6DB26B7C
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 01:03:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ECA9364D6;
-	Thu, 29 Feb 2024 00:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E16037705;
+	Thu, 29 Feb 2024 00:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sMmm8JIO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I/7d43uu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D632DF84;
-	Thu, 29 Feb 2024 00:57:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01570381A4;
+	Thu, 29 Feb 2024 00:59:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709168252; cv=none; b=Do2/Rjd3QVPc5E/4Ute/+uEWgmil9SnOh/XpYAGfY5BotuFM3sRsOg3+t8qAs6h2tSXcr2nLWXkgDVeqrI/sTTr/bMLkn4Iz8/ncW3klyGOs0/FmkXdzqRvr0CndyYLO8u8ndGxP2i9s+KHzwR/pC2IftoM6nz6U9TsNnXZ28DY=
+	t=1709168368; cv=none; b=W/oFj4jxL8CoJSpKKuJkbpe8IDFQ1vPaJuy7wuJeYo88gI4z+WBxCJsG0K7zQfrNlBNuvQ4GFbas7mpnSE9exSDxdGYcmmGKwZnUq7k2WSJ6xdenznvotsZ2TNkby2OmtYswbdx0TM30uRB64/BtQ62lBV2QKDfBek6tphIp+L8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709168252; c=relaxed/simple;
-	bh=9KaT+6S7JZlcb2mqMqAoog9VXZWY4bx0fyUl0UJuoNs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RK0u2bUcxip1VUCWNqd6xE8ZC4pkP0/UWGM5Y15gyEh5NA98dWiwPSkahq5Lj76bIVbkxd2cc8xNg9jd7TSIL6NqgwJ8H0RVsyyBL1RQ2DIXto7adaHtrPYo/gUToZhcx2IL6wQWky+rIFDU6eQDplzASMOyUvDEnWEfRap/fRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sMmm8JIO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14B6EC433C7;
-	Thu, 29 Feb 2024 00:57:31 +0000 (UTC)
+	s=arc-20240116; t=1709168368; c=relaxed/simple;
+	bh=Q+QGIJvuOU6QgFJ3hAFW23j2UTp1o7jtrsjPxMADnEs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dEoj329HTWQnfIQ9yXqTD0JMimxb8OkuaDT0AvXRkSUq9mGzw9LFdAvPE6l8ICcsyCwyZPO973FJuXP/h8XwCjtVsRZ+6tJTusLzHF3UHU2ClG5tx+ft2oJQjdaJXiOV5EoRkkjaRzwgJzeCN65DxBT9ODU8qFTCnBnwAHXbfIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I/7d43uu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E1A0C433C7;
+	Thu, 29 Feb 2024 00:59:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709168251;
-	bh=9KaT+6S7JZlcb2mqMqAoog9VXZWY4bx0fyUl0UJuoNs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sMmm8JIOVjqOr3OrT942IjBG7UKaB6xofC8V7MI0361wtXr/2mSCLg/fKaHNzVMV0
-	 27XOpP4pciTtBcLUuvOKPKbt4NCRCZW6SZ4En0fi0cqX1zt1Tf1JOC9s/S2YlCDB5H
-	 Sb0+b8KxuZiErmAlyYOyOXgIESUQ4oJTQMD5U55ykiqhCUNAzn4RDGYgyZ+mePa58A
-	 N9EaKF6VOJncq8I34SR+Bwj84PBaL3FqbmTqh+6WRpy3Gr3Z5kGXfshMFqVMchr++B
-	 K685dDwfg4O7Qk+Si2ZCgMdMCRZNnN50dFN3ewjIbp0CjjHwfJx8idwMFqJBxnA1LN
-	 nnlsJXladKNNg==
-Date: Wed, 28 Feb 2024 16:57:30 -0800
+	s=k20201202; t=1709168367;
+	bh=Q+QGIJvuOU6QgFJ3hAFW23j2UTp1o7jtrsjPxMADnEs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=I/7d43uuLJncrhm4hIZCiqs6DLj0hpuz3DZcLNKr/Nqvp11CODCg8EqsMauyBydqd
+	 5fZ0XHJ1+2snR8z1UgrsjQEt06BIcefu0Hwm/iI9jyfdoPxZZw6WlY0jLBZZZYf3QG
+	 BN2rEpJJ/hzqEACwWjqGdJyTm3yDFBF1q5agkOHW0IkU7aI+6BwRZibA7t7uU7KzR+
+	 rNFydd11O1wNmQnT7n3Xu5SrycXEV5/wKKCildM5VtV/2tFf/XqfAfpL2wyDurlNl/
+	 UVFhmJLPLkjTB2Sdt5iNsuNDFLK0wF8G6Bd6VE4jC7MvFYl2qykZ7x/eXjGMsf6tUS
+	 ttvdlt52bK8CQ==
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Cc: Kees Cook <keescook@chromium.org>, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, Vinod Koul <vkoul@kernel.org>, Linus
- Walleij <linus.walleij@linaro.org>, Jonathan Cameron
- <Jonathan.Cameron@huawei.com>, Mark Brown <broonie@kernel.org>,
- linux-arm-kernel@lists.infradead.org, dmaengine@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
- linux-spi@vger.kernel.org, netdev@vger.kernel.org,
- linux-hardening@vger.kernel.org, Jonathan Cameron <jic23@kernel.org>,
- Lars-Peter Clausen <lars@metafoo.de>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Subject: Re: [PATCH v4 7/8] net-device: Use new helpers from overflow.h in
- netdevice APIs
-Message-ID: <20240228165730.3171d76c@kernel.org>
-In-Reply-To: <653bbfe8-1b35-4f5e-b89d-9e374c64e46b@embeddedor.com>
-References: <20240228204919.3680786-1-andriy.shevchenko@linux.intel.com>
-	<20240228204919.3680786-8-andriy.shevchenko@linux.intel.com>
-	<202402281341.AC67EB6E35@keescook>
-	<20240228144148.5c227487@kernel.org>
-	<202402281554.C1CEEF744@keescook>
-	<653bbfe8-1b35-4f5e-b89d-9e374c64e46b@embeddedor.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	mic@digikod.net,
+	linux-security-module@vger.kernel.org,
+	keescook@chromium.org,
+	jakub@cloudflare.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH v4 00/12] selftests: kselftest_harness: support using xfail
+Date: Wed, 28 Feb 2024 16:59:07 -0800
+Message-ID: <20240229005920.2407409-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, 28 Feb 2024 18:49:25 -0600 Gustavo A. R. Silva wrote:
-> struct net_device {
-> 	struct_group_tagged(net_device_hdr, hdr,
-> 		...
-> 		u32			priv_size;
-> 	);
-> 	u8			priv_data[] __counted_by(priv_size) __aligned(NETDEV_ALIGN);
-> }
+Hi!
 
-No, no, that's not happening.
+When running selftests for our subsystem in our CI we'd like all
+tests to pass. Currently some tests use SKIP for cases they
+expect to fail, because the kselftest_harness limits the return
+codes to pass/fail/skip. XFAIL which would be a great match
+here cannot be used.
+
+Remove the no_print handling and use vfork() to run the test in
+a different process than the setup. This way we don't need to
+pass "failing step" via the exit code. Further clean up the exit
+codes so that we can use all KSFT_* values. Rewrite the result
+printing to make handling XFAIL/XPASS easier. Support tests
+declaring combinations of fixture + variant they expect to fail.
+
+
+Merge plan is to put it on top of -rc6 and merge into net-next.
+That way others should be able to pull the patches without
+any networking changes.
+
+v4:
+ - rebase on top of Mickael's vfork() changes
+v3: https://lore.kernel.org/all/20240220192235.2953484-1-kuba@kernel.org/
+ - combine multiple series
+ - change to "list of expected failures" rather than SKIP()-like handling
+v2: https://lore.kernel.org/all/20240216002619.1999225-1-kuba@kernel.org/
+ - fix alignment
+follow up RFC: https://lore.kernel.org/all/20240216004122.2004689-1-kuba@kernel.org/
+v1: https://lore.kernel.org/all/20240213154416.422739-1-kuba@kernel.org/
+
+Jakub Kicinski (10):
+  selftests: kselftest_harness: use KSFT_* exit codes
+  selftests: kselftest_harness: generate test name once
+  selftests: kselftest_harness: save full exit code in metadata
+  selftests: kselftest_harness: use exit code to store skip
+  selftests: kselftest: add ksft_test_result_code(), handling all exit
+    codes
+  selftests: kselftest_harness: print test name for SKIP
+  selftests: kselftest_harness: separate diagnostic message with # in
+    ksft_test_result_code()
+  selftests: kselftest_harness: let PASS / FAIL provide diagnostic
+  selftests: kselftest_harness: support using xfail
+  selftests: ip_local_port_range: use XFAIL instead of SKIP
+
+Mickaël Salaün (2):
+  selftests/landlock: Redefine TEST_F() as TEST_F_FORK()
+  selftests/harness: Merge TEST_F_FORK() into TEST_F()
+
+ tools/testing/selftests/kselftest.h           |  45 +++++
+ tools/testing/selftests/kselftest_harness.h   | 182 +++++++++++-------
+ tools/testing/selftests/landlock/base_test.c  |   2 +-
+ tools/testing/selftests/landlock/common.h     |  58 +-----
+ tools/testing/selftests/landlock/fs_test.c    |   4 +-
+ tools/testing/selftests/landlock/net_test.c   |   4 +-
+ .../testing/selftests/landlock/ptrace_test.c  |   7 +-
+ .../selftests/net/ip_local_port_range.c       |   6 +-
+ tools/testing/selftests/net/tls.c             |   2 +-
+ tools/testing/selftests/seccomp/seccomp_bpf.c |   9 +-
+ 10 files changed, 178 insertions(+), 141 deletions(-)
+
+-- 
+2.43.2
+
 
