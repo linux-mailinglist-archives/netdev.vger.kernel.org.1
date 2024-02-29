@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-76315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 609D586D36B
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:41:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A12786D366
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 20:41:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB30A1F25CC0
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:41:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5DFB1F25A81
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 19:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB3AB142918;
-	Thu, 29 Feb 2024 19:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EEE1428F1;
+	Thu, 29 Feb 2024 19:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="5k9hNzE1"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="V1isUp0A"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2056.outbound.protection.outlook.com [40.107.212.56])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2074.outbound.protection.outlook.com [40.107.220.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEAD413F43B
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 19:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858881428E2
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 19:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.74
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709235627; cv=fail; b=HP5dleVJ/Ns1EYcITgAox9+6qPXerf9/vJ/AGONzfZLcQiyOntw5FcxmPNjLWMXImzb8hZhuJ/APpBMKYN/vcZ+Af73jMBQ9htn+qfnbSLg2k7WnHzk3RZdLJjhuSbmVZTnKxQ7yNqe4FjKz6JuOONNEjdts4DRU1jVw1/KKWIw=
+	t=1709235623; cv=fail; b=PIr1sqpC8ZWL1IsGB5ty5w9PC0SzThOsvvd8k1aPLTeMRwdGNFA1APMSV9yyUibNn0hO5tgJT0BvBR62FudpUEfwD9Qi/Ycss8JnB208+rri3tMRt8qcQvcmtvN30UKeXcwKgvaS9K5zVSCU4gLXKlUpvCxpf35h/V9WP2VIUO4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709235627; c=relaxed/simple;
-	bh=FvoBlSB8W6Avy1O7HcKx1gVevq6T2nt1xsAOBmEIs/8=;
+	s=arc-20240116; t=1709235623; c=relaxed/simple;
+	bh=4LbKgwdpuaXnkDWgx3PucuA8Nsp3Ghy/Oj/68CNAf9c=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h5gAnhL/mv0GZTXKe3DJJjaPAE4d1xLNc3TPZlh/Hh5N3d4mugF7NesO5dR3yAvFh8CnL7SiyCRV46bQVvuv3BMVivCIalgSZ83WVJVayEbMWxFzGmSp7TuXE0YauhgwKP8Vy9dEw+G44ykzwg3AL8k/qc8BjgbgyybIj5WMNwk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=5k9hNzE1; arc=fail smtp.client-ip=40.107.212.56
+	 MIME-Version:Content-Type; b=kew7eAgiGcvMlbxJe4EWiY+IZChzXOqqkpI6ZsuKAkVJpv3BRwbk5J19VlakUxmv7pRLY/QF7ajiBQrHa9hjm6H8edy2nzgw9XSszu66HXm2l0cfezlzShyrC4PwGfnGs03vuWU2nSzmlGokD3upTmQR6BeUq3xUFsjY3cxKh7U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=V1isUp0A; arc=fail smtp.client-ip=40.107.220.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WwN8TV6oX7M+Dxk03ZF3xJeaboWKRKbCT6NfpYXQ+HIixdZDJpS78luqRl5v82AAOjVtLaPiiVekl6mSEmqskRuqRZILBhkCe2MWw3+kt2Y8ke0DJl4DpkvdvPzZ4GqfVqBaXiF1pcHeNK7FoB5vSNRS2H+BnvlK/8bHJpLsQIn3FP3kF7Uk2ZHjCEkNMb6Frw9V/QJa6aLft9UMCfFwEvcmlP5GxE3ggPqWPhQWWnnKPJG8Qf3zx4Cpoqi/5q+c5gQjXH19FkzPwNJxSI0t6t3SLPD6RKOF7WA28YwIp0khWKiBAqKM1SP8zp1zqfXMm75Lkvvv8oGz7XqururpEQ==
+ b=PpLfLyneKHXvB2Dq/E3ziGYfVSlNB4tBReTICHnF0noriMGXq0smL1fVjXR5/LkUGvCMlJMaLxdVvWf9ImDc2QiowyTXPKGuD3m8f2w3dyBPNYGqndFKic4+mIuNIbzDc/xzXZoGk+dPXPYQovgHu2LjIVBu29ZRZCZNZXuoNMYiaO9caJ+S0qhL4RnQ5qiueldQ5fHZf3RcJMRcVOUfN5uG19yz97T6H1H0suMXruF1GHcZSHTM9xVRdnF/65fgvqNMOqeyp0dgbve35bm/zBjrfNlAVGEcm4r+Cp+ayYs2Qsq+zxPdUEbUKp7DRLIkByMQeeUCfEJlmGe7FAEIBQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qUDdi9cFbH2h3iOOsvPA9dd3dZ8MCNR1hY7O1igWfHc=;
- b=mBxdqaJpssvUxa4D5ZyFUBfopnpq8M/j4FkILzOUPd36TH4PHBqLVPlWNuK07/scvGbNUu1JvJJPzhq4/kapoZfWc+VR2+Y45ohlT8ZmH43dz0hcS9qrH1Bb9pvm3a9MGoLBGwK5dmAXcY6QAzToUSMdBmdF93OFLSyfG/2Ys7Sj1uQYBKBtvW96yFBuZaJB8CgVeRgXpyWuEIs+MJ5fgwKpPO+/h97qeEnrTsnUsarRQWJMQK4y2NzySnnFZDMHjAcYODG28PBs1cVKgQrzgi7J1RyV7iAbZONIZS1qly5h0jX5GkiCcsGj/zLLZimKfpyrP44xG4W7TqVd5XMhng==
+ bh=TMGUAyH0G5WjhSJieUp1NGj+VwOPq31WygzJOCGHuHs=;
+ b=Vq3NDkcHjSudH2eHzabtdJDDErtDETW9QhJCJYIMOkj9MAJv1rqnkPkqqu30F+eboiPrJRN9l9adYyE4u89hRjZJBjn82TptI4I/9ITiSna13U99o+eX392jMNDiGtiBe2q3O3z7izPzmSwni8EIKdVS0TvEbqez9d3oEhqx396EDfPfcK0fNJQZDhmofYxYUikCyReljd3wMHv4IFWuVXcVJTmehyQcC4ORqDYaww75tn4KDrO6HnH5dGFJphxDAZ+dIJhbGuz/CzkF7BmCPmpbrZNHo8O99o0+J72VuIe93Ye28B5N17xa1ubY4OJLCTEsAspuiSF/uPlWdk7R3A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qUDdi9cFbH2h3iOOsvPA9dd3dZ8MCNR1hY7O1igWfHc=;
- b=5k9hNzE1PiFve7zSZxS3wrJAKD6V2GWqPNo/DKg48SBLH+4AU7l86j1rJbvdkTmTuOPMfYEVB7OGTkeRWY+PdOqp15XbjAfmtSR2FVMUn3MkmjaChmxqTk1QAA/CVtD+7fwlINZW/bjIdF2+HF3Zm7BtS2Ynzu9qBQohfbRTZew=
-Received: from BLAPR03CA0156.namprd03.prod.outlook.com (2603:10b6:208:32f::29)
- by DS7PR12MB6216.namprd12.prod.outlook.com (2603:10b6:8:94::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7316.36; Thu, 29 Feb 2024 19:40:18 +0000
+ bh=TMGUAyH0G5WjhSJieUp1NGj+VwOPq31WygzJOCGHuHs=;
+ b=V1isUp0AF4mU48pX8n6xk9TRsllo0DPd9CyQmOZJ5V0GQp3HnbQSKxnmg7zWOQrntxI/yRNo9Bd8PFdgPNHrySgueleygEF8wKatjl4VC8F2zEZpW6elchoOR5m6Bd3P6jG0fd7NaGTSTny1RrPwIekPNewmXr96Ib40o0388ps=
+Received: from BLAPR03CA0153.namprd03.prod.outlook.com (2603:10b6:208:32f::19)
+ by SJ1PR12MB6315.namprd12.prod.outlook.com (2603:10b6:a03:456::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.41; Thu, 29 Feb
+ 2024 19:40:19 +0000
 Received: from BL02EPF0001A102.namprd05.prod.outlook.com
- (2603:10b6:208:32f:cafe::7) by BLAPR03CA0156.outlook.office365.com
- (2603:10b6:208:32f::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.32 via Frontend
- Transport; Thu, 29 Feb 2024 19:40:18 +0000
+ (2603:10b6:208:32f:cafe::58) by BLAPR03CA0153.outlook.office365.com
+ (2603:10b6:208:32f::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.30 via Frontend
+ Transport; Thu, 29 Feb 2024 19:40:19 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -64,19 +65,19 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  BL02EPF0001A102.mail.protection.outlook.com (10.167.241.134) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7292.25 via Frontend Transport; Thu, 29 Feb 2024 19:40:18 +0000
+ 15.20.7292.25 via Frontend Transport; Thu, 29 Feb 2024 19:40:19 +0000
 Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 29 Feb
- 2024 13:40:14 -0600
+ 2024 13:40:15 -0600
 From: Shannon Nelson <shannon.nelson@amd.com>
 To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>
 CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
 	<shannon.nelson@amd.com>
-Subject: [PATCH net-next 08/12] ionic: reduce the use of netdev
-Date: Thu, 29 Feb 2024 11:39:31 -0800
-Message-ID: <20240229193935.14197-9-shannon.nelson@amd.com>
+Subject: [PATCH net-next 09/12] ionic: change the hwstamp likely check
+Date: Thu, 29 Feb 2024 11:39:32 -0800
+Message-ID: <20240229193935.14197-10-shannon.nelson@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20240229193935.14197-1-shannon.nelson@amd.com>
 References: <20240229193935.14197-1-shannon.nelson@amd.com>
@@ -91,125 +92,103 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A102:EE_|DS7PR12MB6216:EE_
-X-MS-Office365-Filtering-Correlation-Id: ace3a1f7-caf6-4c77-1ba0-08dc395e42a2
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A102:EE_|SJ1PR12MB6315:EE_
+X-MS-Office365-Filtering-Correlation-Id: 533802f1-6207-4662-f0ce-08dc395e42f7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	m+xO26hZLMzuJvZYoUG1rNz4h8BGnXV9DFbHQQJoqL7c3WQgWSFu7Drx64bIxelWa0gFGXBpzCjOXNcuT3supD28ZpzyDkKHti+TtGbEiyzo2XYs4vlgw2WhndsecvheNioXR2CQVc/zPfq+VYoteWcnHsz68oFVuJf1FdOGd1HY2mhz7Ts07reDRRQfykwsGYVBirY+ITySde4p2xPJvzfj+ZpV9M+VdjAKj17IGeLPdTHmT/xG5QftUBzKcBT8WvGBIL9Z31jV3Oj/m0b+O1Icq5CuY+uPQi/VdnEDohdO9u1gxhjbvlFJKZEwvQebV0tkECgwzlAA8MfmZeNfbikkr++K0pfk8A0SjxkFoAm13YcZhRZasJ25slCrXpPEq0LHRAQjIpTew10tbkRXXHLrZZbF9aMK8m1goPjWxElheOFsDmoy5j06NU40zk8utiLsSAKFDlIggA4OGpb8llhAXqaz9gs28FBc6U4PMDW7jWnuGGzXR/+tmykS4bcEPi4pU0l+/LQecjlFp2iqxdAXH8Zo1fAHut2rVzWm6jP5N761emHG9q0+MBhk4taLXt3bKU6xmZZOEUxt8NgVF4zdc3dpdQcwI5h5EoOKEs8KiWD3DThPF0HElNesucOvOWKKGDH2mQ5VJvu1NxMtiB/ePS18My325KTTC8oJpEvaznncmJCk2l//JhcyOSrW2wiogtdL/KL3Y1crZ+LPFzJ3XS2FuNuYBe0AHTDzlXnU2LzbNjTsg1opHq3WXjOH
+	mlxdTXw5htbzP1vMXKSEVdYSv8+ZPfzeCS44oLf0zNYHZUxO/6eCYOpd+ws3lFivNAbEktOJd6F3n1bFjAVetXLjezcWMt59yv48Z0XrxibiZxswzG09wipSB1/Nvw2QUM8BJt1p1Ds5rtsnHK4D8BoKLIUYDujnG7Sdq8E/jjHskH8JjHiwgApmxCZgrdwCl/wgnjt85M4y3AG9qAYR3ySr8UUio18suFhWjJUYx/Kd8ZYDV3W5STRB5+CoP3doKQZbDE5zij1SZjtRPxpQWk+ndXPeKglofWxEE/4hfiZqjnZngM04L6P3NGZmkYmKKbhIYVr4OlTQtX9n+VtHqfJ8Y3l+Fn0NwoqgG8zsNNzMk6ru+TgbNQ82PDDc3/UOYjlIXKxIxZ4lPIelPKd/95aM87EMV6G+hWDNWckb7T0naiTgVswmqnNBMrRTWxbo/fWc2541/kkGvh72+7FQTU/iNMxCP+kNY1/fo7q+nSmDWaoqyDZAPks73nbYTYpI6ckrLVQqhPx4l0j/9ba0ET+LSoFrRx0xPmQjsEamICdcdyWGfkvUN8zFtY4KwAf+djcOzVJvae1WOYFHPL5t01Vizgd9lt9nf9V/CVugBDIwJtu9oCFWb6zLqei6k+HoOfosU6bjZOxOys3YgeK2Zvf+s++Xtm0fkCncVwqonFtUFVAMx0/EvkijAgQGk3ceaNXouq1cJCGzTzKlmCYoD3YupM2eEk/W9nRTYxXEMo48rITdhlZXcSo20ysIX5L0
 X-Forefront-Antispam-Report:
 	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(82310400014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Feb 2024 19:40:18.7084
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Feb 2024 19:40:19.2709
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ace3a1f7-caf6-4c77-1ba0-08dc395e42a2
+X-MS-Exchange-CrossTenant-Network-Message-Id: 533802f1-6207-4662-f0ce-08dc395e42f7
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	BL02EPF0001A102.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6216
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6315
 
-To help make sure we're only accessing things we really need
-to access we can cut down on the q->lif->netdev references by
-using q->dev which is already in cache.
+From: Brett Creeley <brett.creeley@amd.com>
 
-Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+An earlier change moved the hwstamp queue check into a helper
+function with an unlikely(). However, it makes more sense for
+the caller to decide if it's likely() or unlikely(), so make
+the change to support that.
+
+Signed-off-by: Brett Creeley <brett.creeley@amd.com>
 Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 ---
- .../net/ethernet/pensando/ionic/ionic_txrx.c   | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/pensando/ionic/ionic_lif.h  |  2 +-
+ drivers/net/ethernet/pensando/ionic/ionic_txrx.c | 10 +++++-----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.h b/drivers/net/ethernet/pensando/ionic/ionic_lif.h
+index 42006de8069d..b4f8692a3ead 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_lif.h
++++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.h
+@@ -327,7 +327,7 @@ static inline u32 ionic_coal_usec_to_hw(struct ionic *ionic, u32 usecs)
+ 
+ static inline bool ionic_txq_hwstamp_enabled(struct ionic_queue *q)
+ {
+-	return unlikely(q->features & IONIC_TXQ_F_HWSTAMP);
++	return q->features & IONIC_TXQ_F_HWSTAMP;
+ }
+ 
+ void ionic_link_status_check_request(struct ionic_lif *lif, bool can_sleep);
 diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-index f217b9875f1b..ed095696f67a 100644
+index ed095696f67a..89a40657c689 100644
 --- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
 +++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-@@ -123,7 +123,6 @@ static unsigned int ionic_rx_buf_size(struct ionic_buf_info *buf_info)
- static int ionic_rx_page_alloc(struct ionic_queue *q,
- 			       struct ionic_buf_info *buf_info)
- {
--	struct net_device *netdev = q->lif->netdev;
- 	struct ionic_rx_stats *stats;
- 	struct device *dev;
- 	struct page *page;
-@@ -133,14 +132,14 @@ static int ionic_rx_page_alloc(struct ionic_queue *q,
- 
- 	if (unlikely(!buf_info)) {
- 		net_err_ratelimited("%s: %s invalid buf_info in alloc\n",
--				    netdev->name, q->name);
-+				    dev_name(dev), q->name);
- 		return -EINVAL;
- 	}
- 
- 	page = alloc_pages(IONIC_PAGE_GFP_MASK, 0);
- 	if (unlikely(!page)) {
- 		net_err_ratelimited("%s: %s page alloc failed\n",
--				    netdev->name, q->name);
-+				    dev_name(dev), q->name);
- 		stats->alloc_err++;
- 		return -ENOMEM;
- 	}
-@@ -150,7 +149,7 @@ static int ionic_rx_page_alloc(struct ionic_queue *q,
- 	if (unlikely(dma_mapping_error(dev, buf_info->dma_addr))) {
- 		__free_pages(page, 0);
- 		net_err_ratelimited("%s: %s dma map failed\n",
--				    netdev->name, q->name);
-+				    dev_name(dev), q->name);
- 		stats->dma_map_err++;
- 		return -EIO;
- 	}
-@@ -164,12 +163,11 @@ static int ionic_rx_page_alloc(struct ionic_queue *q,
- static void ionic_rx_page_free(struct ionic_queue *q,
- 			       struct ionic_buf_info *buf_info)
- {
--	struct net_device *netdev = q->lif->netdev;
- 	struct device *dev = q->dev;
- 
- 	if (unlikely(!buf_info)) {
- 		net_err_ratelimited("%s: %s invalid buf_info in free\n",
--				    netdev->name, q->name);
-+				    dev_name(dev), q->name);
+@@ -1201,7 +1201,7 @@ static void ionic_tx_clean(struct ionic_queue *q,
+ 	if (!skb)
  		return;
+ 
+-	if (ionic_txq_hwstamp_enabled(q)) {
++	if (unlikely(ionic_txq_hwstamp_enabled(q))) {
+ 		if (cq_info) {
+ 			struct skb_shared_hwtstamps hwts = {};
+ 			__le64 *cq_desc_hwstamp;
+@@ -1296,7 +1296,7 @@ unsigned int ionic_tx_cq_service(struct ionic_cq *cq, unsigned int work_to_do)
+ 	if (work_done) {
+ 		struct ionic_queue *q = cq->bound_q;
+ 
+-		if (!ionic_txq_hwstamp_enabled(q))
++		if (likely(!ionic_txq_hwstamp_enabled(q)))
+ 			netif_txq_completed_wake(q_to_ndq(q->lif->netdev, q),
+ 						 pkts, bytes,
+ 						 ionic_q_space_avail(q),
+@@ -1337,7 +1337,7 @@ void ionic_tx_empty(struct ionic_queue *q)
+ 		desc_info->cb_arg = NULL;
  	}
  
-@@ -228,7 +226,7 @@ static struct sk_buff *ionic_rx_frags(struct net_device *netdev,
- 	skb = napi_get_frags(&q_to_qcq(q)->napi);
- 	if (unlikely(!skb)) {
- 		net_warn_ratelimited("%s: SKB alloc failed on %s!\n",
--				     netdev->name, q->name);
-+				     dev_name(dev), q->name);
- 		stats->alloc_err++;
- 		return NULL;
- 	}
-@@ -291,7 +289,7 @@ static struct sk_buff *ionic_rx_copybreak(struct net_device *netdev,
- 	skb = napi_alloc_skb(&q_to_qcq(q)->napi, len);
- 	if (unlikely(!skb)) {
- 		net_warn_ratelimited("%s: SKB alloc failed on %s!\n",
--				     netdev->name, q->name);
-+				     dev_name(dev), q->name);
- 		stats->alloc_err++;
- 		return NULL;
- 	}
-@@ -1086,7 +1084,7 @@ static dma_addr_t ionic_tx_map_single(struct ionic_queue *q,
- 	dma_addr = dma_map_single(dev, data, len, DMA_TO_DEVICE);
- 	if (dma_mapping_error(dev, dma_addr)) {
- 		net_warn_ratelimited("%s: DMA single map failed on %s!\n",
--				     q->lif->netdev->name, q->name);
-+				     dev_name(dev), q->name);
- 		stats->dma_map_err++;
- 		return 0;
- 	}
-@@ -1104,7 +1102,7 @@ static dma_addr_t ionic_tx_map_frag(struct ionic_queue *q,
- 	dma_addr = skb_frag_dma_map(dev, frag, offset, len, DMA_TO_DEVICE);
- 	if (dma_mapping_error(dev, dma_addr)) {
- 		net_warn_ratelimited("%s: DMA frag map failed on %s!\n",
--				     q->lif->netdev->name, q->name);
-+				     dev_name(dev), q->name);
- 		stats->dma_map_err++;
- 	}
- 	return dma_addr;
+-	if (!ionic_txq_hwstamp_enabled(q)) {
++	if (likely(!ionic_txq_hwstamp_enabled(q))) {
+ 		struct netdev_queue *ndq = q_to_ndq(q->lif->netdev, q);
+ 
+ 		netdev_tx_completed_queue(ndq, pkts, bytes);
+@@ -1419,7 +1419,7 @@ static void ionic_tx_tso_post(struct net_device *netdev, struct ionic_queue *q,
+ 
+ 	if (start) {
+ 		skb_tx_timestamp(skb);
+-		if (!ionic_txq_hwstamp_enabled(q))
++		if (likely(!ionic_txq_hwstamp_enabled(q)))
+ 			netdev_tx_sent_queue(q_to_ndq(netdev, q), skb->len);
+ 		ionic_txq_post(q, false, ionic_tx_clean, skb);
+ 	} else {
+@@ -1669,7 +1669,7 @@ static int ionic_tx(struct net_device *netdev, struct ionic_queue *q,
+ 	stats->pkts++;
+ 	stats->bytes += skb->len;
+ 
+-	if (!ionic_txq_hwstamp_enabled(q)) {
++	if (likely(!ionic_txq_hwstamp_enabled(q))) {
+ 		struct netdev_queue *ndq = q_to_ndq(netdev, q);
+ 
+ 		if (unlikely(!ionic_q_has_space(q, MAX_SKB_FRAGS + 1)))
 -- 
 2.17.1
 
