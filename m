@@ -1,140 +1,159 @@
-Return-Path: <netdev+bounces-76342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BA7986D57F
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 22:03:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4644986D585
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 22:04:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4F8428995D
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 21:03:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86D8128A1F3
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 21:04:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6543514405A;
-	Thu, 29 Feb 2024 20:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B454F144053;
+	Thu, 29 Feb 2024 20:46:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JeQWLYaZ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="iXg3gcke"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAEEC16FF4E
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 20:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393831428FC;
+	Thu, 29 Feb 2024 20:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709239355; cv=none; b=vES8OP1Yq7607JAt3PlOFshPjtdsGGHLKBixOZYY24Jfdpf63m6pS+HZGLsNpbRkQXxFnM7n69F714C8OIPRcUyAsMo+GbnEO6jFyFXG1JnWvrcJXxaIdOjWOFMnqxy1iGB3N7MyBFJ43zjYzWVM2oOK0luOGs9/ZX8zObmBAHk=
+	t=1709239586; cv=none; b=Fh9fb713hHEJ5gOnxdiCvFDw9k+cdwcdiHlAC0zGsSprjLoyEV18Y1y0LMqxLbjkjNb3TYu+Sgl0d8xjgYrC/E1hODcGwBb/Gfn454/kTh6wp1+LcdUbYsw6s+8CLypeaRojCKKBoM4eG+EDiMPwlIwxCpksV/0HYiTX22XYIpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709239355; c=relaxed/simple;
-	bh=AVaRvENjI1FocEMSJmRuRcxcAz5F56D3DWlPaQOOwus=;
+	s=arc-20240116; t=1709239586; c=relaxed/simple;
+	bh=CQx3KA2MK3LEfTY+Hogj/IbqUR7C0EreWLbSRWcjetE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kb5BzCy/k2n/KjOYLyXuniWlGQwEOT3OW1agPaVIVPNohi92RFWHdLVrCA9BkzE44ECDn1hx3i89QfJj5uh9trImfWo3q/66YDsSm9OyRDmOjB2xfq27BGhDis4yGecdNSeSi5Gd6gCZyF3IQx3UPflMdSa/UTe/rrgkXvrPMjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JeQWLYaZ; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <0aef1308-89ab-4360-b1d0-f02b82b56bf4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709239350;
+	 In-Reply-To:Content-Type; b=ljFYra1fD5OLjWy3ssrc5gE6NSjom5U4jvlrOMag1MJXm6ABsk4/Ys/5xDvRmkiGSRexWeg4k9LV6FHO1NKtaD03iTZkkoYVuL48JrPQW+JyfeCwnzU73K2SZ2z391KmDXFrHlsCLDP/n4D/AwxHi+ZqZUM9BHAU9aZhl6di89w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=iXg3gcke; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3CEC6C0003;
+	Thu, 29 Feb 2024 20:46:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1709239575;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=snJzf/AqOBQ7RXAlzVnG3S7res3RqhanWErcNaLggZ8=;
-	b=JeQWLYaZ+1UuOS2o8Xa40m4aCYrJyN1jwnwWk3qUoAYgXZDEbxqipYsmJmcBDK5dhSO8Jp
-	RxGuxbZB1VQPcSCPL6iKbKkl4ige9nORHudvb4NjTQdU6wvv+j4OfQrDDn/fm5osshHnYK
-	L3hxeTndDHmrRC04+k9lu+LMMWZfDOU=
-Date: Thu, 29 Feb 2024 20:42:23 +0000
+	bh=2yC2KEk65Ak+51VQmZ/7ETdOjptWIvVuBFVWdWXcNv0=;
+	b=iXg3gckeA+D8GH8kI4v8U3j0+bfu1iHOWuJtk5jarRNr/NgM0PDJ4S2oQ3F6WaS7CrSvV2
+	8dBJhguouJNfQB/IzuGqHhXyBkk9820M7UZkdY/abhHDqncX1F6EzrknR9OKDE1nnR3G+B
+	3w5z7vVKLv5Y2NcGCexFa3HZolQAfYnNPHKB6kTsPEikSZFuIn7pBp7W8Cv/0O1ylSZlyi
+	Vex4u1xlJP5CMcZxE89tOUcz/exHS2v9pwyNxp8CTC2TPDfT3ohwLmBqhCvNkx+ahJ9mng
+	CDoP7BYzrC3Bwsk76Gf2+YdV6apZLRie7MpqDDEllVSxTz1dh1YMcuE8TQsuIA==
+Message-ID: <860648fa-11f5-4e0d-ac4e-e81ea111ef31@bootlin.com>
+Date: Thu, 29 Feb 2024 21:46:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] dpll: fix build failure due to
- rcu_dereference_check() on unknown type
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/3] dt-bindings: net: dp83822: support
+ configuring RMII master/slave mode
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>,
- arkadiusz.kubalewski@intel.com, jiri@resnulli.us
-References: <20240229190515.2740221-1-kuba@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20240229190515.2740221-1-kuba@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Andrew Davis <afd@ti.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, =?UTF-8?Q?Miqu=C3=A8l_Raynal?=
+ <miquel.raynal@bootlin.com>, Yen-Mei Goh <yen-mei.goh@keysight.com>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>
+References: <20240222103117.526955-1-jeremie.dautheribes@bootlin.com>
+ <20240222103117.526955-2-jeremie.dautheribes@bootlin.com>
+ <d14ba685-dc7e-4f99-a21e-bae9f3e6bc79@lunn.ch>
+From: =?UTF-8?B?SsOpcsOpbWllIERhdXRoZXJpYmVz?=
+ <jeremie.dautheribes@bootlin.com>
+In-Reply-To: <d14ba685-dc7e-4f99-a21e-bae9f3e6bc79@lunn.ch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-GND-Sasl: jeremie.dautheribes@bootlin.com
 
-On 29/02/2024 19:05, Jakub Kicinski wrote:
-> From: Eric Dumazet <edumazet@google.com>
-> 
-> Tasmiya reports that their compiler complains that we deref
-> a pointer to unknown type with rcu_dereference_rtnl():
-> 
-> include/linux/rcupdate.h:439:9: error: dereferencing pointer to incomplete type ‘struct dpll_pin’
-> 
-> Unclear what compiler it is, at the moment, and we can't report
-> but since DPLL can't be a module - move the code from the header
-> into the source file.
-> 
-> Fixes: 0d60d8df6f49 ("dpll: rely on rcu for netdev_dpll_pin()")
-> Reported-by: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-> Link: https://lore.kernel.org/all/3fcf3a2c-1c1b-42c1-bacb-78fdcd700389@linux.vnet.ibm.com/
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> Sending officially the solution Eric suggested in the report
-> thread. The bug is pending in the net tree, so I'd like to
-> put this on an express path, to make today's PR...
-> 
-> CC: vadim.fedorenko@linux.dev
-> CC: arkadiusz.kubalewski@intel.com
-> CC: jiri@resnulli.us
-> ---
->   drivers/dpll/dpll_core.c | 5 +++++
->   include/linux/dpll.h     | 8 ++++----
->   2 files changed, 9 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
-> index 4c2bb27c99fe..507dd9cfb075 100644
-> --- a/drivers/dpll/dpll_core.c
-> +++ b/drivers/dpll/dpll_core.c
-> @@ -42,6 +42,11 @@ struct dpll_pin_registration {
->   	void *priv;
->   };
->   
-> +struct dpll_pin *netdev_dpll_pin(const struct net_device *dev)
-> +{
-> +       return rcu_dereference_rtnl(dev->dpll_pin);
-> +}
-> +
->   struct dpll_device *dpll_device_get_by_id(int id)
->   {
->   	if (xa_get_mark(&dpll_device_xa, id, DPLL_REGISTERED))
-> diff --git a/include/linux/dpll.h b/include/linux/dpll.h
-> index 4ec2fe9caf5a..c60591308ae8 100644
-> --- a/include/linux/dpll.h
-> +++ b/include/linux/dpll.h
-> @@ -169,13 +169,13 @@ int dpll_device_change_ntf(struct dpll_device *dpll);
->   
->   int dpll_pin_change_ntf(struct dpll_pin *pin);
->   
-> +#if !IS_ENABLED(CONFIG_DPLL)
->   static inline struct dpll_pin *netdev_dpll_pin(const struct net_device *dev)
->   {
-> -#if IS_ENABLED(CONFIG_DPLL)
-> -	return rcu_dereference_rtnl(dev->dpll_pin);
-> -#else
->   	return NULL;
-> -#endif
->   }
-> +#else
-> +struct dpll_pin *netdev_dpll_pin(const struct net_device *dev);
-> +#endif
->   
->   #endif
+Hi Andrew,
 
-That also works (as well as void *),
+On 26/02/2024 16:28, Andrew Lunn wrote:
+> On Thu, Feb 22, 2024 at 11:31:15AM +0100, Jérémie Dautheribes wrote:
+>> Add property ti,rmii-mode to support selecting the RMII operation mode
+>> between:
+>> 	- master mode (PHY operates from a 25MHz clock reference)
+>> 	- slave mode (PHY operates from a 50MHz clock reference)
+>>
+>> If not set, the operation mode is configured by hardware straps.
+>>
+>> Signed-off-by: Jérémie Dautheribes <jeremie.dautheribes@bootlin.com>
+>> ---
+>>   .../devicetree/bindings/net/ti,dp83822.yaml      | 16 ++++++++++++++++
+>>   1 file changed, 16 insertions(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/ti,dp83822.yaml b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+>> index 8f4350be689c..8f23254c0458 100644
+>> --- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+>> +++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+>> @@ -80,6 +80,22 @@ properties:
+>>              10625, 11250, 11875, 12500, 13125, 13750, 14375, 15000]
+>>       default: 10000
+>>   
+>> +  ti,rmii-mode:
+>> +    description: |
+>> +       If present, select the RMII operation mode. Two modes are
+>> +       available:
+>> +         - RMII master, where the PHY operates from a 25MHz clock reference,
+>> +         provided by a crystal or a CMOS-level oscillator
+>> +         - RMII slave, where the PHY operates from a 50MHz clock reference,
+>> +         provided by a CMOS-level oscillator
+> 
+> What has master and slave got to do with this?
+> 
+> Sometimes, the MAC provides a clock to the PHY, and all data transfer
+> over the RMII bus is timed by that.
+> 
+> Sometimes, the PHY provides a clock to the MAC, and all data transfer
+> over the RMII bus is timed by that.
+> 
+> Here there is a clear master/slave relationship, who is providing the
+> clock, who is consuming the clock. However, what you describe does not
+> fit that. Maybe look at other PHY bindings, and copy what they do for
+> clocks.
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In fact, I hesitated a lot before choosing this master/slave designation 
+because of the same reasoning as you. But the TI DP83826 datasheet [1] 
+uses this name for two orthogonal yet connected meanings, here's a copy 
+of the corresponding § (in section 9.3.10):
 
+"The DP83826 offers two types of RMII operations: RMII Slave and RMII 
+Master. In RMII Master operation, the DP83826 operates from either a 
+25-MHz CMOS-level oscillator connected to XI pin, a 25-MHz crystal 
+connected across XI and XO pins. A 50-MHz output clock referenced from 
+DP83826 can be connected to the MAC. In RMII Slave operation, the 
+DP83826 operates from a 50-MHz CMOS-level oscillator connected to the XI 
+pin and shares the same clock as the MAC. Alternatively, in RMII slave 
+mode, the PHY can operate from a 50-MHz clock provided by the Host MAC."
+
+So it seems that in some cases this also fits the master/slave 
+relationship you describe.
+
+That said, would you like me to include this description (or some parts) 
+in the binding in addition to what I've already written? Or would you 
+prefer me to use a more meaningful property name?
+
+BTW, this series has already been merged into the net-next tree, I'm not 
+sure what procedure to follow in such cases.
+
+
+Best regards,
+
+Jérémie
+
+[1] 
+https://www.ti.com/lit/ds/symlink/dp83826i.pdf?ts=1708075771406&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FDP83826I
 
