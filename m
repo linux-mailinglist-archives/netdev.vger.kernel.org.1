@@ -1,302 +1,186 @@
-Return-Path: <netdev+bounces-76035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D46686C18F
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 08:02:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B136586C1D5
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 08:21:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 713941C215CB
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 07:02:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3ADC1C22E0E
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 07:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0658B42A9F;
-	Thu, 29 Feb 2024 07:02:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355EB44C63;
+	Thu, 29 Feb 2024 07:20:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RYIZ9pXx"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Me1OytPb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B42136123
-	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 07:02:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7E84594C;
+	Thu, 29 Feb 2024 07:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709190139; cv=none; b=L+FZyBDvY+5zhNUoFHZcCpk4syG17rEpx43zKL3UzpKYVqyHVEDlfWXw/K4pVjGcglHPmNepPkg2+8PXRRZy2AM6wPy/Ci4/hYBZGmD4rJWurtrfEOwN8BjyewM5uEE70Am40Y9MtDc+UzckU4IGNpSkRvbNcweIx1+EtS0PeYY=
+	t=1709191254; cv=none; b=Z9gRp3z4gujyRPryYCnLQxRp95zjxF1z6wo+2MLPXhN8UWKqy5yLdwK/ZgHeYTFQlC5O/BmM23BS8kxo9u3Fr5/BPpzyrNyFA7xyChXvld0aeQyqn8mqz3pyuFiJ8186yWTzn3ymZhPEJNb4veM8arDrR6evGN+uDPA5mklmqmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709190139; c=relaxed/simple;
-	bh=xOnSuaW66z4dGR4cynLvOvlF6HmlAMwc0YiJVCr/cTg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=suCHid+HPi8ibK8el2Xheu70Hw+wIcZ3bg8q7c6TL0ojBVj2IDhI2FEg4SYH2hMfpr1i5K1ETKbiRBXtnYbkJVq6jX6jnbmjd6YzCtVNVp9Wmu+18mF3bF5Hoy8Yg0U3PgCL8kKZ7kugKM09OvPuyrl3XUJuFVGcbuifWjMRMgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RYIZ9pXx; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-787bc61cb69so32644485a.1
-        for <netdev@vger.kernel.org>; Wed, 28 Feb 2024 23:02:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1709190137; x=1709794937; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/rwIP8xtWkp7FKwXUuCASNZ2Kzby28YNechfEiqpq1w=;
-        b=RYIZ9pXxMuftl7re2LawAvAiu0uEkOHg15PzIKDu+IxJDQ1T6EsFZmaXys0kR5K2XV
-         QZqq7gHp+HJidkNoOXOQH49QtAmKmq/Ed0g2Fd2XNofiHdfh7EafFrtE1GbLvckUzNkS
-         bA7w4YV5PB5BF9aSxPJZLc+gBVxorjyZyAzoc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709190137; x=1709794937;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/rwIP8xtWkp7FKwXUuCASNZ2Kzby28YNechfEiqpq1w=;
-        b=q1SnW3l7ttFMRPgXDr33i1XlOvohO6+rDMz8ObrC6qARpAwujQW+efJWFx5+MbXkaS
-         RnhH2hjZODqERqBvXuSugO3jovBo5qHfrnPlAi0t7EURLOoqfajX/udUuHwpap5gNKt1
-         g65wL3CWvENamW0KpgZGP4YvPZnU2pwjYLiLIpzQ4Kcvcs2uljpuQl6xPzEUwQYYrDto
-         U4n9n6KOfmpEreHriDujIH7u3rf6V+duejUQ0CG4xCMjwPTcfpqwPCsHiYaMtj5VB6jx
-         Iewl+ecrK9hVvEstEDhFqv/2oBcRi/isfvFoo01mnUXmvcGXKke7DXucVVebbFxpvHym
-         efnQ==
-X-Gm-Message-State: AOJu0Yx8tIhHpV3XoCTn42vZaL8+r2pANKDUBVIGzhE9qBci5wYfUpjm
-	BjoOjudC4AJ7MOXwBadm9nZsRHGn8x1rA8jVw+e27XQsl8uO56np0g56jW8mqZdBWD39IIuhjSE
-	=
-X-Google-Smtp-Source: AGHT+IG3K3RCZUSi6z0p2ytT5KZMRy6NHcEEpO5r6Pzjxuo6TWc9d9ygmglODUNGXv6Ly2Jezo9bBw==
-X-Received: by 2002:a0c:e808:0:b0:68f:8e3a:51e9 with SMTP id y8-20020a0ce808000000b0068f8e3a51e9mr1441359qvn.35.1709190136867;
-        Wed, 28 Feb 2024 23:02:16 -0800 (PST)
-Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id mv1-20020a056214338100b0068f75622543sm435545qvb.1.2024.02.28.23.02.15
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 28 Feb 2024 23:02:16 -0800 (PST)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	jiri@resnulli.us,
-	richardcochran@gmail.com
-Subject: [PATCH net-next 2/2] bnxt_en: Retry for TX timestamp from FW until timeout specified
-Date: Wed, 28 Feb 2024 23:02:02 -0800
-Message-Id: <20240229070202.107488-3-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20240229070202.107488-1-michael.chan@broadcom.com>
-References: <20240229070202.107488-1-michael.chan@broadcom.com>
+	s=arc-20240116; t=1709191254; c=relaxed/simple;
+	bh=qY2zjoKkbsZeRD1Y+OCc6Pdzxlt3kkl73iuZcnkSngk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rRa1BKEjFu3A/nWWuSgnNXc9a4sy6CrAWmerZifniqFyt7IqFFaoQGmhHIF3w97btMbgxuBbBCj6y4JKN3XPhCyLAC37EvYp3NOWruBdwhAv5abutdrpuEtuIOk1G1jTRGzC2tBF3srpK9DqY4OpGt8FItBZEJB9eyWHaFXMY60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Me1OytPb; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1709191247; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=V/QiwEFi+hLqHtGYF26e8Bge+srwrBYJXlThf9c9akc=;
+	b=Me1OytPbWjVx37Rae6s0RIRGDf8cihLvJXiZYUEJH7KTxoG9Lnxqxl4TONMfDQevrNoi5i9JPHanyuxy47s04xxt1BE+ikQdXzy4wliPeEKoN6HWSLZ0NY/AaSlyPshZjkfD5WLeXpAdWcS4gnCFPopBItmZlZvBOZg7ziF4Cpo=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R621e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=35;SR=0;TI=SMTPD_---0W1SCLWW_1709191244;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W1SCLWW_1709191244)
+          by smtp.aliyun-inc.com;
+          Thu, 29 Feb 2024 15:20:45 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: virtualization@lists.linux.dev
+Cc: Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Hans de Goede <hdegoede@redhat.com>,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Vadim Pasternak <vadimp@nvidia.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	linux-um@lists.infradead.org,
+	netdev@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org,
+	linux-remoteproc@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	kvm@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH vhost v3 00/19] virtio: drivers maintain dma info for premapped vq
+Date: Thu, 29 Feb 2024 15:20:25 +0800
+Message-Id: <20240229072044.77388-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000fe44a506127fd6e3"
-
---000000000000fe44a506127fd6e3
+X-Git-Hash: e3a3e51d6b70
 Content-Transfer-Encoding: 8bit
 
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+As discussed:
+http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVmJ3rHYqRZxYg@mail.gmail.com
 
-Use the ptp_tx_timeout devlink parameter introduced in the previous
-patch to retry querying TX timestamp, up to the timeout specified.
-Firmware supports timeout values up to 65535 microseconds.  The
-driver will set this firmware timeout value according to the
-ptp_tx_timeout parameter.  If the ptp_tx_timeout value exceeds
-the maximum firmware value, the driver will retry in the context
-of bnxt_ptp_ts_aux_work().
+If the virtio is premapped mode, the driver should manage the dma info by self.
+So the virtio core should not store the dma info.
+So we can release the memory used to store the dma info.
 
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
- Documentation/networking/devlink/bnxt.rst     |  7 +++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 19 ++++++++++++++++---
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  4 +++-
- 3 files changed, 26 insertions(+), 4 deletions(-)
+But if the desc_extra has not dma info, we face a new question,
+it is hard to get the dma info of the desc with indirect flag.
+For split mode, that is easy from desc, but for the packed mode,
+it is hard to get the dma info from the desc. And for hardening
+the dma unmap is saft, we should store the dma info of indirect
+descs.
 
-diff --git a/Documentation/networking/devlink/bnxt.rst b/Documentation/networking/devlink/bnxt.rst
-index a4fb27663cd6..48833c190c5b 100644
---- a/Documentation/networking/devlink/bnxt.rst
-+++ b/Documentation/networking/devlink/bnxt.rst
-@@ -41,6 +41,13 @@ parameters.
-      - Generic Routing Encapsulation (GRE) version check will be enabled in
-        the device. If disabled, the device will skip the version check for
-        incoming packets.
-+   * - ``ptp_tx_timeout``
-+     - u32
-+     - Runtime
-+     - PTP Transmit timestamp timeout value in milliseconds. The default
-+       value is 1000 and the maximum value is 5000. Use a higher value
-+       on a busy network to prevent timeout retrieving the PTP Transmit
-+       timestamp.
- 
- Info versions
- =============
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-index 4b50b07b9771..a05b50162e9e 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-@@ -122,10 +122,14 @@ static int bnxt_hwrm_port_ts_query(struct bnxt *bp, u32 flags, u64 *ts)
- 	req->flags = cpu_to_le32(flags);
- 	if ((flags & PORT_TS_QUERY_REQ_FLAGS_PATH) ==
- 	    PORT_TS_QUERY_REQ_FLAGS_PATH_TX) {
-+		struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
-+		u32 tmo_us = ptp->txts_tmo * 1000;
-+
- 		req->enables = cpu_to_le16(BNXT_PTP_QTS_TX_ENABLES);
--		req->ptp_seq_id = cpu_to_le32(bp->ptp_cfg->tx_seqid);
--		req->ptp_hdr_offset = cpu_to_le16(bp->ptp_cfg->tx_hdr_off);
--		req->ts_req_timeout = cpu_to_le16(BNXT_PTP_QTS_TIMEOUT);
-+		req->ptp_seq_id = cpu_to_le32(ptp->tx_seqid);
-+		req->ptp_hdr_offset = cpu_to_le16(ptp->tx_hdr_off);
-+		tmo_us = min(tmo_us, BNXT_PTP_QTS_MAX_TMO_US);
-+		req->ts_req_timeout = cpu_to_le16(tmo_us);
- 	}
- 	resp = hwrm_req_hold(bp, req);
- 
-@@ -675,6 +679,8 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
- 	u64 ts = 0, ns = 0;
- 	int rc;
- 
-+	if (!ptp->txts_pending)
-+		ptp->abs_txts_tmo = jiffies + msecs_to_jiffies(ptp->txts_tmo);
- 	rc = bnxt_hwrm_port_ts_query(bp, PORT_TS_QUERY_REQ_FLAGS_PATH_TX, &ts);
- 	if (!rc) {
- 		memset(&timestamp, 0, sizeof(timestamp));
-@@ -684,6 +690,10 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
- 		timestamp.hwtstamp = ns_to_ktime(ns);
- 		skb_tstamp_tx(ptp->tx_skb, &timestamp);
- 	} else {
-+		if (!time_after_eq(jiffies, ptp->abs_txts_tmo)) {
-+			ptp->txts_pending = true;
-+			return;
-+		}
- 		netdev_warn_once(bp->dev,
- 				 "TS query for TX timer failed rc = %x\n", rc);
- 	}
-@@ -691,6 +701,7 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
- 	dev_kfree_skb_any(ptp->tx_skb);
- 	ptp->tx_skb = NULL;
- 	atomic_inc(&ptp->tx_avail);
-+	ptp->txts_pending = false;
- }
- 
- static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
-@@ -714,6 +725,8 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
- 		spin_unlock_bh(&ptp->ptp_lock);
- 		ptp->next_overflow_check = now + BNXT_PHC_OVERFLOW_PERIOD;
- 	}
-+	if (ptp->txts_pending)
-+		return 0;
- 	return HZ;
- }
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-index ee977620d33e..bfb165d2b365 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-@@ -24,7 +24,7 @@
- 
- #define BNXT_PTP_DFLT_TX_TMO	1000 /* ms */
- #define BNXT_PTP_MAX_TX_TMO	5000 /* ms */
--#define BNXT_PTP_QTS_TIMEOUT	1000
-+#define BNXT_PTP_QTS_MAX_TMO_US	65535
- #define BNXT_PTP_QTS_TX_ENABLES	(PORT_TS_QUERY_REQ_ENABLES_PTP_SEQ_ID |	\
- 				 PORT_TS_QUERY_REQ_ENABLES_TS_REQ_TIMEOUT | \
- 				 PORT_TS_QUERY_REQ_ENABLES_PTP_HDR_OFFSET)
-@@ -117,12 +117,14 @@ struct bnxt_ptp_cfg {
- 					 BNXT_PTP_MSG_PDELAY_REQ |	\
- 					 BNXT_PTP_MSG_PDELAY_RESP)
- 	u8			tx_tstamp_en:1;
-+	u8			txts_pending:1;
- 	int			rx_filter;
- 	u32			tstamp_filters;
- 
- 	u32			refclk_regs[2];
- 	u32			refclk_mapped_regs[2];
- 	u32			txts_tmo;
-+	unsigned long		abs_txts_tmo;
- };
- 
- #if BITS_PER_LONG == 32
--- 
-2.30.1
+So I introduce the "structure the indirect desc table" to
+allocate space to store dma info with the desc table.
+
+On the other side, we mix the descs with indirect flag
+with other descs together to share the unmap api. That
+is complex. I found if we we distinguish the descs with
+VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
+
+Because of the dma array is allocated in the find_vqs(),
+so I introduce a new parameter to find_vqs().
+
+Note:
+    this is on the top of
+        [PATCH vhost v1] virtio: packed: fix unmap leak for indirect desc table
+        http://lore.kernel.org/all/20240223071833.26095-1-xuanzhuo@linux.alibaba.com
+
+Please review.
+
+Thanks
+
+v3:
+    1. fix the conflict with the vp_modern_create_avq().
+
+v2:
+    1. change the dma item of virtio-net, every item have MAX_SKB_FRAGS + 2
+        addr + len pairs.
+    2. introduce virtnet_sq_free_stats for __free_old_xmit
+
+v1:
+    1. rename transport_vq_config to vq_transport_config
+    2. virtio-net set dma meta number to (ring-size + 1)(MAX_SKB_FRGAS +2)
+    3. introduce virtqueue_dma_map_sg_attrs
+    4. separate vring_create_virtqueue to an independent commit
 
 
---000000000000fe44a506127fd6e3
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEII8eRwQhGuuhb0MapVCBEc9eQ/HzrfBe
-QU/hNKKRN2gFMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIy
-OTA3MDIxN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAxHiphMexOkwHISWtkK9fcNWk9htY2uWqrP+MQszelCOG8yG8k
-W6LaNHhkKdPmGVptZ0UCQ2EUBbpVva8r360H5zFBn4yBkP9HjxQ4XM2EbeUQi2g4cuMEt23iqJCh
-26Y8dvYGV3sEAbNXh4MjwUBs3+OaJihADarFmBeyoGLsugxJFKV2hS3tLLqvOSRh9QctZk0jNBof
-+mQUQd4YEcmZkOcDna03pQF+nXX35+CvEykdLzeeXEn7kzf3VInvf58xVoQKrXHUueudI5xH4hs1
-tGQ1ADLfBw4ZeAVKK5aa/ujUPc3J1RhHkcyvA1hq1BsxVQZtRTLEoF8mz6YkLL+L
---000000000000fe44a506127fd6e3--
+Xuan Zhuo (19):
+  virtio_ring: introduce vring_need_unmap_buffer
+  virtio_ring: packed: remove double check of the unmap ops
+  virtio_ring: packed: structure the indirect desc table
+  virtio_ring: split: remove double check of the unmap ops
+  virtio_ring: split: structure the indirect desc table
+  virtio_ring: no store dma info when unmap is not needed
+  virtio: find_vqs: pass struct instead of multi parameters
+  virtio: vring_create_virtqueue: pass struct instead of multi
+    parameters
+  virtio: vring_new_virtqueue(): pass struct instead of multi parameters
+  virtio_ring: simplify the parameters of the funcs related to
+    vring_create/new_virtqueue()
+  virtio: find_vqs: add new parameter premapped
+  virtio_ring: export premapped to driver by struct virtqueue
+  virtio_net: set premapped mode by find_vqs()
+  virtio_ring: remove api of setting vq premapped
+  virtio_ring: introduce dma map api for page
+  virtio_ring: introduce virtqueue_dma_map_sg_attrs
+  virtio_net: unify the code for recycling the xmit ptr
+  virtio_net: rename free_old_xmit_skbs to free_old_xmit
+  virtio_net: sq support premapped mode
+
+ arch/um/drivers/virtio_uml.c             |  31 +-
+ drivers/net/virtio_net.c                 | 283 ++++++---
+ drivers/platform/mellanox/mlxbf-tmfifo.c |  24 +-
+ drivers/remoteproc/remoteproc_virtio.c   |  31 +-
+ drivers/s390/virtio/virtio_ccw.c         |  33 +-
+ drivers/virtio/virtio_mmio.c             |  30 +-
+ drivers/virtio/virtio_pci_common.c       |  59 +-
+ drivers/virtio/virtio_pci_common.h       |   9 +-
+ drivers/virtio/virtio_pci_legacy.c       |  16 +-
+ drivers/virtio/virtio_pci_modern.c       |  38 +-
+ drivers/virtio/virtio_ring.c             | 698 ++++++++++++-----------
+ drivers/virtio/virtio_vdpa.c             |  45 +-
+ include/linux/virtio.h                   |  13 +-
+ include/linux/virtio_config.h            |  48 +-
+ include/linux/virtio_ring.h              |  82 +--
+ tools/virtio/virtio_test.c               |   4 +-
+ tools/virtio/vringh_test.c               |  28 +-
+ 17 files changed, 847 insertions(+), 625 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
+
 
