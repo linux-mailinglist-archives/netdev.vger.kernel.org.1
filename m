@@ -1,237 +1,167 @@
-Return-Path: <netdev+bounces-76001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E5D286BEED
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 03:30:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5393F86BF1A
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 03:45:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB367286A79
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 02:30:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85CA11C21653
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 02:45:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE6701802E;
-	Thu, 29 Feb 2024 02:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="iQfdAyOZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C396B286A7;
+	Thu, 29 Feb 2024 02:44:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0148BA5F;
-	Thu, 29 Feb 2024 02:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BADAA364C0
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 02:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709173829; cv=none; b=UHl8VbE25BEZTEfL+9wldeEArPbrIQxxLMKuocKGdmknSHSISF7q+6yka8ZDvB6qFExDgOZqNsDm512aFR1kn+p2PA987teEpOwpVioj27myCmJNHQWGNPu1AB2S9mL5podYMpB+ZvGef/BBqMPn9ODI+9GajE+7+xqSSSvMow8=
+	t=1709174667; cv=none; b=rAddBnc7H2DupnZl86jlMnQ3bVEwI8CgV6iXJasagxYCSCmQfsf7d/IldZcHPcNTsHelEmxC7taUkcSeq/SqsS1gW/5FtmIowXrUvocjfSvnlMWVxOFvsDtl8mO6q8DA3Fd7vu55ZZ0xUbLAxTqeqFephg1sOcWGzoEBzHku+4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709173829; c=relaxed/simple;
-	bh=KhLL1Qqe/ranCX4jPUDTrZJCslOyFCtVGuTGjX2JrsU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=sLjnLJW9V1UUoQx3WqCovi0CEgwqHVeep/BPqpvhg2Padq/ntQrG7YTIlviMR5sYtg38qPGi2e2ou5pdayN7cupYJCMbQux/0uISsjemAhiXa1Wsfr/SS7cIzm8Dm+Bl6U+XMiuLLUGclbmXx+m9/f3jBTbNnCco5x7mLe8NCjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=iQfdAyOZ; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41T1mfQd007940;
-	Thu, 29 Feb 2024 02:30:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=0/+C9tGIWpwPDFX0nUJBfhs5juresADDoCaZ7B+HQJM=; b=iQ
-	fdAyOZy4J3CmN9WqWJmFLtxKex91dvUNix40Bu5eWdto7YFP6Rvdr80VMX/uQxqQ
-	VQ6ZO05jwWZMsmX2BkOgW9D7d/BDSP8Yl+tLyy3k7ejQEZqVjq/eSvLQN7MEmQvq
-	8cXfy6gfz6k5/xtT1JS92Fs2HTi3WIOTM+MIoSZ/odeyHetsvLgw14kZRn7vr+6K
-	NR3dNfOSSJjrutEdoBj1qY5CBgY6O+cnHqm9vUselJhvGAkhhLInx3DvRsgp32Th
-	ShNja+SZzuEcfTe5Hfs7okzEBYyi30PbaRYStGYfdMqdhFh4UdZ+FkyaSdTiBJ/z
-	zzmas5Ib3xfymCkdMhUA==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wj6en9mf1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Feb 2024 02:30:11 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41T2U9gv007702
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Feb 2024 02:30:09 GMT
-Received: from [10.253.39.33] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 28 Feb
- 2024 18:30:06 -0800
-Message-ID: <60d9970b-b397-4c3d-b3cb-9d90866acebf@quicinc.com>
-Date: Thu, 29 Feb 2024 10:30:04 +0800
+	s=arc-20240116; t=1709174667; c=relaxed/simple;
+	bh=yi0kYK8Fm3sY5IO7qLLlx0iTzEujjf+30ngYKY5ely4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sGqYJmdEw5U1U7oH4J9a5Jhf2pGLuTo1jkAC0rd4zL7Hw758guypIJjIFq/lXn9Jx65ERRYS9MPrtR2ZgoS93s+4VPEkCen2vkx8BOGAiikhrNceOLS4O9FOvnSv9tzjdSZDQjrRsAsdDFwIV14wcUjuFcx5f8N5JIDmITkK0vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: bizesmtp75t1709174562t4qj3ora
+X-QQ-Originating-IP: 650xBhqzwoX7cCPGZtn69t6Am9NYAklg/IR0DWHoi+0=
+Received: from lap-jiawenwu.trustnetic.com ( [220.184.149.201])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 29 Feb 2024 10:42:40 +0800 (CST)
+X-QQ-SSF: 01400000000000L0Z000000A0000000
+X-QQ-FEAT: dKvkn8qoLrHMFTxmEHOqLxtNkwUIkSX7yJ8/ibNqj8DiSZSqh5/YlRxoXOoP9
+	vkxqrL0lsAcNwkxvulksuVZQc0piz8kmvkxczpGBGNqjzfPaW4ehMePVPFDF7ZgKGcZ3AP3
+	KgcCSb/fAL634ComX02BNsiPhjcxkjtWmh2OM7TFYlNJ/xown9dEE+XWXozrycPGd2ljamm
+	JLHaCyQ97CVDKqSMF3Boy45cSm3env419M4EHZFBND0YtBNQjpDsfHPocMzaeY94Yw3muSx
+	t07vDHow3cOFww65ptSN/C6CWwnCLbgGJaAaTfCDtPAs5ukp7Z7fbqaaKCk7GCzqtepC9FM
+	Ix0MGSjff3ZHzbHuhVCctBA4FvWxwYbPUJNP/gAi1mC698Q2dnQrME75kzdrA==
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 16484643689901370740
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux@armlinux.org.uk,
+	horms@kernel.org,
+	andrew@lunn.ch,
+	netdev@vger.kernel.org
+Cc: mengyuanlou@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH v2] net: txgbe: fix GPIO interrupt blocking
+Date: Thu, 29 Feb 2024 10:42:37 +0800
+Message-Id: <20240229024237.22568-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/3] wifi: ath11k: support hibernation
-Content-Language: en-US
-To: Jeff Johnson <quic_jjohnson@quicinc.com>, <ath11k@lists.infradead.org>,
-        <manivannan.sadhasivam@linaro.org>
-CC: <linux-wireless@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <mhi@lists.linux.dev>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>
-References: <20240228022243.17762-1-quic_bqiang@quicinc.com>
- <20240228022243.17762-4-quic_bqiang@quicinc.com>
- <ae3ec744-2157-4a8c-aa1b-38a22dc18042@quicinc.com>
-From: Baochen Qiang <quic_bqiang@quicinc.com>
-In-Reply-To: <ae3ec744-2157-4a8c-aa1b-38a22dc18042@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: B3EbC9YNp5quH_dD_zn2pm_Byq4raZCR
-X-Proofpoint-ORIG-GUID: B3EbC9YNp5quH_dD_zn2pm_Byq4raZCR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-28_08,2024-02-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 spamscore=0 adultscore=0 lowpriorityscore=0 mlxscore=0
- suspectscore=0 impostorscore=0 bulkscore=0 mlxlogscore=999 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2402120000 definitions=main-2402290018
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
+There were two problems to be solved in this patch:
 
+1. The register of GPIO interrupt status is masked before MAC IRQ
+is enabled. This is because of hardware deficiency. So manually
+clear the interrupt status before using them. Otherwise, GPIO
+interrupts will never be reported again. There is a workaround for
+clearing interrupts to set GPIO EOI in txgbe_up_complete().
 
-On 2/28/2024 11:31 PM, Jeff Johnson wrote:
-> On 2/27/2024 6:22 PM, Baochen Qiang wrote:
->> Now that all infrastructure is in place and ath11k is fixed to handle all the
->> corner cases, power down the ath11k firmware during suspend and power it back
->> up during resume. This fixes the problem when using hibernation with ath11k PCI
->> devices.
->>
->> For suspend, two conditions needs to be satisfied:
->>          1. since MHI channel unprepare would be done in late suspend stage,
->>             ath11k needs to get all QMI-dependent things done before that stage.
->>          2. and because unprepare MHI channels requires a working MHI stack,
->>             ath11k is not allowed to call mhi_power_down() until that finishes.
->> So the original suspend callback is separated into two parts: the first part
->> handles all QMI-dependent things in suspend callback; while the second part
->> powers down MHI in suspend_late callback. This is valid because kernel calls
->> ath11k's suspend callback before all suspend_late callbacks, making the first
->> condition happy. And because MHI devices are children of ath11k device
->> (ab->dev), kernel guarantees that ath11k's suspend_late callback is called
->> after QRTR's suspend_late callback, this satisfies the second condition.
->>
->> Above analysis also applies to resume process. so the original resume
->> callback is separated into two parts: the first part powers up MHI stack
->> in resume_early callback, this guarantees MHI stack is working when
->> QRTR tries to prepare MHI channels (kernel calls QRTR's resume_early callback
->> after ath11k's resume_early callback, due to the child-father relationship);
->> the second part waits for the completion of restart, which won't fail now
->> since MHI channels are ready for use by QMI.
->>
->> Another notable change is in power down path, we tell mhi_power_down() to not
->> to destroy MHI devices, making it possible for QRTR to help unprepare/prepare
->> MHI channels, and finally get us rid of the probe-defer issue when resume.
->>
->> Also change related code due to interface changes.
->>
->> Tested-on: WCN6855 hw2.0 PCI WLAN.HSP.1.1-03125-QCAHSPSWPL_V1_V2_SILICONZ_LITE-3.6510.30
->>
->> Tested-by: Takashi Iwai <tiwai@suse.de>
->> Signed-off-by: Kalle Valo <quic_kvalo@quicinc.com>
->> Signed-off-by: Baochen Qiang <quic_bqiang@quicinc.com>
->> ---
->>   drivers/net/wireless/ath/ath11k/ahb.c  |   6 +-
->>   drivers/net/wireless/ath/ath11k/core.c | 105 +++++++++++++++++--------
->>   drivers/net/wireless/ath/ath11k/core.h |   6 +-
->>   drivers/net/wireless/ath/ath11k/hif.h  |  14 +++-
->>   drivers/net/wireless/ath/ath11k/mhi.c  |  12 ++-
->>   drivers/net/wireless/ath/ath11k/mhi.h  |   5 +-
->>   drivers/net/wireless/ath/ath11k/pci.c  |  44 +++++++++--
->>   drivers/net/wireless/ath/ath11k/qmi.c  |   2 +-
->>   8 files changed, 142 insertions(+), 52 deletions(-)
-> ...snip...
->> +int ath11k_core_resume_early(struct ath11k_base *ab)
->> +{
->> +	int ret;
->> +	struct ath11k_pdev *pdev;
->> +	struct ath11k *ar;
->> +
->> +	if (!ab->hw_params.supports_suspend)
->> +		return -EOPNOTSUPP;
->> +
->> +	/* so far signle_pdev_only chips have supports_suspend as true
-> 
-> nit: s/signle/single/
-> 
->> +	 * and only the first pdev is valid.
->> +	 */
->> +	pdev = ath11k_core_get_single_pdev(ab);
->> +	ar = pdev->ar;
->> +	if (!ar || ar->state != ATH11K_STATE_OFF)
->> +		return 0;
->> +
->> +	reinit_completion(&ab->restart_completed);
->> +	ret = ath11k_hif_power_up(ab);
->> +	if (ret)
->> +		ath11k_warn(ab, "failed to power up hif during resume: %d\n", ret);
->> +
->> +	return ret;
->> +}
->> +EXPORT_SYMBOL(ath11k_core_resume_early);
->>   
->>   int ath11k_core_resume(struct ath11k_base *ab)
->>   {
->>   	int ret;
->>   	struct ath11k_pdev *pdev;
->>   	struct ath11k *ar;
->> +	long time_left;
->>   
->>   	if (!ab->hw_params.supports_suspend)
->>   		return -EOPNOTSUPP;
->> @@ -940,29 +990,19 @@ int ath11k_core_resume(struct ath11k_base *ab)
->>   	if (!ar || ar->state != ATH11K_STATE_OFF)
->>   		return 0;
->>   
->> -	ret = ath11k_hif_resume(ab);
->> -	if (ret) {
->> -		ath11k_warn(ab, "failed to resume hif during resume: %d\n", ret);
->> -		return ret;
->> +	time_left = wait_for_completion_timeout(&ab->restart_completed,
->> +						ATH11K_RESET_TIMEOUT_HZ);
->> +	if (time_left == 0) {
->> +		ath11k_warn(ab, "timeout while waiting for restart complete");
->> +		return -ETIMEDOUT;
->>   	}
->>   
->> -	ath11k_hif_ce_irq_enable(ab);
->> -	ath11k_hif_irq_enable(ab);
-> 
-> these are disabled in suspend_late()
-> do you need to enable in resume_early()?
-> or are they expected to be enabled via ath11k_wow_op_resume()?
-> 
-> and if that is the case, why isn't the disable in
-> ath11k_wow_op_suspend() sufficient? can the disables in suspend_late()
-> be removed?
-There are two user cases here:
-1. if WoWLAN is enabled, IRQ enable/disable only happens in 
-ath11k_wow_op_suspend()/resume(), ath11k_core_suspend()/late_suspend() 
-and ath11k_core_resume()/early_resume() do nothing but return directly 
-due to below check:
-		if (!ar || ar->state != ATH11K_STATE_OFF)
-			return 0;
-so this is symmetric and no issues here.
+2. GPIO EOI is not set to clear interrupt status after handling
+the interrupt. It should be done in irq_chip->irq_ack, but this
+function is not called in handle_nested_irq(). So executing
+function txgbe_gpio_irq_ack() manually in txgbe_gpio_irq_handler().
 
-2. if WoWLAN is disabled, ath11k_wow_op_suspend()/resume() won't get 
-called, see the check on 'local->wowlan' in __ieee80211_suspend(). Then 
-IRQ is disabled in ath11k_core_suspend_late(). The reason why IRQ is not 
-enabled in ath11k_core_resume()/early_resume() is because in this case 
-we power down/up firmware, and during power up we go the reset path 
-where IRQ would be enabled back in below calls:
-	CE irqs: ath11k_core_qmi_firmware_ready() -> ath11k_core_start() -> 
-ath11k_hif_start() -> ath11k_pci_start() -> ath11k_pcic_start() -> 
-ath11k_pcic_ce_irqs_enable()
-	DP irqs: ath11k_core_qmi_firmware_ready() -> ath11k_hif_irq_enable()
-> 
-> just concerned about the lack of symmetry here
-Yes, also noticed it but didn't figure out a better way.
+Fixes: aefd013624a1 ("net: txgbe: use irq_domain for interrupt controller")
+Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+---
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  1 +
+ .../net/ethernet/wangxun/txgbe/txgbe_phy.c    | 29 +++++++++++++++++++
+ .../net/ethernet/wangxun/txgbe/txgbe_phy.h    |  1 +
+ 3 files changed, 31 insertions(+)
 
-> 
-> /jeff
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+index e67a21294158..bd4624d14ca0 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+@@ -81,6 +81,7 @@ static void txgbe_up_complete(struct wx *wx)
+ {
+ 	struct net_device *netdev = wx->netdev;
+ 
++	txgbe_reinit_gpio_intr(wx);
+ 	wx_control_hw(wx, true);
+ 	wx_configure_vectors(wx);
+ 
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+index bae0a8ee7014..93295916b1d2 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+@@ -475,8 +475,10 @@ irqreturn_t txgbe_gpio_irq_handler(int irq, void *data)
+ 	gc = txgbe->gpio;
+ 	for_each_set_bit(hwirq, &gpioirq, gc->ngpio) {
+ 		int gpio = irq_find_mapping(gc->irq.domain, hwirq);
++		struct irq_data *d = irq_get_irq_data(gpio);
+ 		u32 irq_type = irq_get_trigger_type(gpio);
+ 
++		txgbe_gpio_irq_ack(d);
+ 		handle_nested_irq(gpio);
+ 
+ 		if ((irq_type & IRQ_TYPE_SENSE_MASK) == IRQ_TYPE_EDGE_BOTH) {
+@@ -489,6 +491,33 @@ irqreturn_t txgbe_gpio_irq_handler(int irq, void *data)
+ 	return IRQ_HANDLED;
+ }
+ 
++void txgbe_reinit_gpio_intr(struct wx *wx)
++{
++	struct txgbe *txgbe = wx->priv;
++	irq_hw_number_t hwirq;
++	unsigned long gpioirq;
++	struct gpio_chip *gc;
++	unsigned long flags;
++
++	/* for gpio interrupt pending before irq enable */
++	gpioirq = rd32(wx, WX_GPIO_INTSTATUS);
++
++	gc = txgbe->gpio;
++	for_each_set_bit(hwirq, &gpioirq, gc->ngpio) {
++		int gpio = irq_find_mapping(gc->irq.domain, hwirq);
++		struct irq_data *d = irq_get_irq_data(gpio);
++		u32 irq_type = irq_get_trigger_type(gpio);
++
++		txgbe_gpio_irq_ack(d);
++
++		if ((irq_type & IRQ_TYPE_SENSE_MASK) == IRQ_TYPE_EDGE_BOTH) {
++			raw_spin_lock_irqsave(&wx->gpio_lock, flags);
++			txgbe_toggle_trigger(gc, hwirq);
++			raw_spin_unlock_irqrestore(&wx->gpio_lock, flags);
++		}
++	}
++}
++
+ static int txgbe_gpio_init(struct txgbe *txgbe)
+ {
+ 	struct gpio_irq_chip *girq;
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
+index 9855d44076cb..8a026d804fe2 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
+@@ -5,6 +5,7 @@
+ #define _TXGBE_PHY_H_
+ 
+ irqreturn_t txgbe_gpio_irq_handler(int irq, void *data);
++void txgbe_reinit_gpio_intr(struct wx *wx);
+ irqreturn_t txgbe_link_irq_handler(int irq, void *data);
+ int txgbe_init_phy(struct txgbe *txgbe);
+ void txgbe_remove_phy(struct txgbe *txgbe);
+-- 
+2.27.0
+
 
