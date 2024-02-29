@@ -1,174 +1,226 @@
-Return-Path: <netdev+bounces-76073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA08C86C33F
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:15:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF06586C353
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 09:21:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 732921F233A8
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 08:15:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A79A1F22F02
+	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 08:21:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F23594879E;
-	Thu, 29 Feb 2024 08:15:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D5184DA0C;
+	Thu, 29 Feb 2024 08:21:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="eiH9/h2z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b2G9eWwb"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01olkn2035.outbound.protection.outlook.com [40.92.53.35])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174D245941;
-	Thu, 29 Feb 2024 08:15:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.53.35
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709194506; cv=fail; b=fXm7Yjtc+Xbt0ehOD1sUA+by1QZfO+8h3MSYXk0L725crqsT+PuFmrvPMkKwUq1MEsaQl9LHIiker720PoM2erb6fIrKnaKwdM2PCDnE73W35KJzMDUoBC0d7HrpvOrJjZNbdgMO5G2sqvSDwugKCd+qy3UB2O+gmdECow6D5fw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709194506; c=relaxed/simple;
-	bh=XsopYNnvsIeKc7cVR/gv/ZBoxAKHig2UsJixac9kNw8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=B1h+sFlI3NpdOTKoDKcLAtJhWtGJ1LYRsQ8iuerd0QEXRVDhbtBnEpfmDd0icZI/r71c/GhDVjTGv2prZ38D5Dgf8JGY5dxJXF7wvXjdJgEILo1yM/mt/RCClBY9xsCfJzi8T3jNKsEtbeBjZfU8B/tpqw+VYJHeonmQmXNBFhE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=eiH9/h2z; arc=fail smtp.client-ip=40.92.53.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VgFp7KDuqhuKPHR3F4zgWMp+yp7seewkssgP2NelbQybK5aYnun3wb9ex+yjnRzaMQm8FvtaiN7GqTW9VfRC/8qFpWEdrBXccknPfUXKdlABoUk+I8qiluETO1rt7O6P6X7hMLW862QCCJg3DQPrn5cuDFDOsI00nH7qK0DrPEyggcyht/jkXaS2bujpw3RgK+wRu/lFyXn75cVHbDn4a6CMXFENxBq6VFmf8b53OinIU2djstCrE2t50QTqhpX9/Ml8e261s3GfQwiwnh5yfQ2V/uaSojavRBtuIs1AKxZDKkpCIbtR7lslultgE3V0yYL9U6dswC37xhjp5vDEwQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=32+pgeBc/5zAt+7DN1XE5dsSbvUBiD8pgQKBmM4fp9Y=;
- b=C8cc4kdd3wG4Yji1Y9I1Uez+1wiQDw1FEIU5a1kTGJmBEM9bVRAMT2zm8DXM0gZE1qSD0tsfZbJ4FqftTlQEgJ8ANi2RL8y7XEJNE/WamV54YTuyXUsGaeByEUIddh4E0byRraagX0xRK1xsU1+UXF3Gzn3hdc1rDF+hIwGhzhNlPElYp+7gdhP4DOAQVmTTmHbFghE3Xe1txiBTbuyqUIR8WghJIvc7ehb5Zg5334/TJRnVev/ISYkZDdBdolHh85GDJUa5leRtYdXIaNtWiDkOGGGOFsKzoXN18TaSzvzxI9xq3FxyITvQADkW5WCbYkMRQg+TZniFPt02ZbJ3eA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=32+pgeBc/5zAt+7DN1XE5dsSbvUBiD8pgQKBmM4fp9Y=;
- b=eiH9/h2z5vPUKxoSKKUVV+d64H6uPNUW4uKPwEm06fg05jiv2DqT+wIXfNhMzXGmwqh+vx2PaXiKfJhVYudxuUKx/padx0ffGkSf6kFPXEglG27pcfYiMaWbVuh47e9rmsnogD27J/cF/diTI6PZVi6ZgDsPkV8UhiAFX1VI6TXEH5tAP1ipShuJUEf8hVxN9utaT7WNckLGDarX3rsHdOqdOu0nAbJ0rv3uyRrS6iynaIuk+Hy3OaWwdAbsBSMwrliEo8pqm+iGijQ4knyldqqlxWC3uQUJakOetkDjD1sepANJqy6Jq2pzChIUTEOeV5PD0zWc0Yj3cy/mJTvBXQ==
-Received: from KL1PR06MB6964.apcprd06.prod.outlook.com (2603:1096:820:121::11)
- by JH0PR06MB7351.apcprd06.prod.outlook.com (2603:1096:990:a8::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.41; Thu, 29 Feb
- 2024 08:14:59 +0000
-Received: from KL1PR06MB6964.apcprd06.prod.outlook.com
- ([fe80::bdb1:3c40:b3e8:1f15]) by KL1PR06MB6964.apcprd06.prod.outlook.com
- ([fe80::bdb1:3c40:b3e8:1f15%7]) with mapi id 15.20.7316.034; Thu, 29 Feb 2024
- 08:14:59 +0000
-Message-ID:
- <KL1PR06MB69645ED79CED22F5BB1DE45C965F2@KL1PR06MB6964.apcprd06.prod.outlook.com>
-Date: Thu, 29 Feb 2024 16:14:54 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 11/11] net: hisi_femac: add support for
- hisi_femac core on Hi3798MV200
-Content-Language: en-US
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
- <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org
-References: <20240228-net-v6-0-6d78d3d598c1@outlook.com>
- <20240228-net-v6-11-6d78d3d598c1@outlook.com>
- <7c171041-30cd-41a1-8b8a-00168d112cc5@linaro.org>
-From: Yang Xiwen <forbidden405@outlook.com>
-In-Reply-To: <7c171041-30cd-41a1-8b8a-00168d112cc5@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TMN: [4O0ddLx7Ij6eyrwPId9oOhyiJhpWG8TGvlVj50oNd3xlZEGiHmIHNyqbqCHyLg0n]
-X-ClientProxiedBy: SI2PR02CA0039.apcprd02.prod.outlook.com
- (2603:1096:4:196::9) To KL1PR06MB6964.apcprd06.prod.outlook.com
- (2603:1096:820:121::11)
-X-Microsoft-Original-Message-ID:
- <348bb853-adf1-4168-a370-ed39c9b2f2e5@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160974D9E8
+	for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 08:21:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709194891; cv=none; b=I4OEehhOXxvrQ2hEhuEqRE8BNH2nzUf5c0LKaHNzG5WXENXNQqanda8MhqWOPKOVk2+FmWRb0HpPNN1rC8hq9BNzmN1rHpkmlK3of8lsQQFZI0A0i5/URBrtONN9hhVOkwzdb653fRSnyofTQeUo/bsTUYmOOoM26ci1I19QoCg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709194891; c=relaxed/simple;
+	bh=WU7ffeSphhs/r9s6sbUYBG4gjwSJ/QhbvB2NXAEgqLU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XTzRO5dwb9Og2pLfwub2vMYIgt/5uogvYBSB8lR5oooTspgDieYM3EqHgR/P28EEHLPENMg2NmzWlwbYz2kZmtbUJTBq1rsHrD2FN9yLLVsVTF4j8G2VbGLyD9pBy+IkGwHt2vxSp8xYfWIP2i4k67vL+ErCbTDmxwUBez5r7hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b2G9eWwb; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709194887;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yYWjbn49/FOaKnxv8tY8E/wAWpBZLZbrgSR43I6LPzc=;
+	b=b2G9eWwbOiaP+u+r7Y1X5I7GNP4K9WUvUhqAU0zunEL82nXmk7qIMh8N5A5/42poEC8vYI
+	9wff97xzbf3y5DYqtPEBzLE2JPcVDnI5VkPqJ/WgbM4ZVmqc/CR+ES24G5FoudcWRuVKo2
+	yW0GaAvb1BeqW4DTA2KjWUkTdLiuazA=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-98-H-fljDzeMNe0vqxMmpdGjg-1; Thu, 29 Feb 2024 03:21:26 -0500
+X-MC-Unique: H-fljDzeMNe0vqxMmpdGjg-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2d2509eaa7fso4709471fa.0
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 00:21:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709194883; x=1709799683;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yYWjbn49/FOaKnxv8tY8E/wAWpBZLZbrgSR43I6LPzc=;
+        b=TPi+uIWWbcix0WaHvPxK/p8vQnxt8Tpzv2r+749TpVlQ5wFsHqsK/8jW17cjaBShgs
+         10U3do8y/IGPvPJxXNnzQPSuD1/TjwUODSQD2rneBk/Ddll01Cdm6Alf0w/sUoe+xNUx
+         K+jMWTaWetOhpiYRsbRbc6TNaJ+oh+2XKlYN5gln8Z1baVnI9aKZp6uIzk8D4tu2gCS/
+         23uFe/bjSmS+ToPgGqgkBZtneoWpgUXM+Ppb997Nw///NHzWPcUfh2HD1Kd40IagF3fO
+         +W0GMwjaHZFSDcj97yGCyPXzekDE98PNuio7lsz2MkT8Rgb92tVE5nB/wpBJBNV5I5Bo
+         Sp0A==
+X-Forwarded-Encrypted: i=1; AJvYcCXNRMUgFxnoyivrRUsINOTSmPdP9pRK/T2tPpXOUg/Hhj0W63nc4l4sqcus/XqGFObis7TnLAZjUI1iw1YSsINYpHKvCtq6
+X-Gm-Message-State: AOJu0Yy+4MH8LL1Fy/2JXunvtsrPX7qEzy8XjojJfFU22G77ckSLTsSD
+	ATPtR6hQtnsbQa9HjH5A2HoNGfqA/nq4EDLn5TDiEry0TthQqj+Uy76OIVJK/Fcb018DQ/iaCqU
+	GqcaqShkHVPbrQAe9EGvqBRXkJwzKNtYXBXX7K+U6tmatg/Pn9flg8ASbgViqEA==
+X-Received: by 2002:a05:6512:2388:b0:513:26e7:440c with SMTP id c8-20020a056512238800b0051326e7440cmr679740lfv.61.1709194883534;
+        Thu, 29 Feb 2024 00:21:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHnM+zAIJHxVsYzJ0TLR9J0gKcOujhg4JzZrjGf+sjNfANqyY2DOR0YHjNv8O6HjvN3PHqhFQ==
+X-Received: by 2002:a05:6512:2388:b0:513:26e7:440c with SMTP id c8-20020a056512238800b0051326e7440cmr679694lfv.61.1709194883093;
+        Thu, 29 Feb 2024 00:21:23 -0800 (PST)
+Received: from redhat.com ([2a02:14f:178:d6b0:a21c:61c4:2098:5db])
+        by smtp.gmail.com with ESMTPSA id bt6-20020a056000080600b0033db9383e70sm1078294wrb.81.2024.02.29.00.21.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Feb 2024 00:21:22 -0800 (PST)
+Date: Thu, 29 Feb 2024 03:21:14 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Vadim Pasternak <vadimp@nvidia.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	linux-um@lists.infradead.org, netdev@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org,
+	linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+	kvm@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH vhost v3 00/19] virtio: drivers maintain dma info for
+ premapped vq
+Message-ID: <20240229031755-mutt-send-email-mst@kernel.org>
+References: <20240229072044.77388-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: KL1PR06MB6964:EE_|JH0PR06MB7351:EE_
-X-MS-Office365-Filtering-Correlation-Id: a1ebb8ec-c22e-4c19-bb3c-08dc38fe8567
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	BS9QWZ6pUSC4qTzsnzeNX1qvzTqodTaSB6R1hRo1o5A6sI6IJ9mggIemHwcB2eJMT12aTfA2xFB2dSyboYpt1Gq5zQudW64NZV43xn4WnMDWDKoMLdakJ9S8MmqcqKS7I2fTXtNonccem95P7oiIUfvogvUSHDZsyWdOX47Oza2DSOeeMxmzGBzc4+o+zDtxb0Oa47G8ErVkcAq9j/hasMT0JHYIvGZiGtSCt0eyMzXZinji4+bTT06pBnsjIy0BzmCY7f+rZcFDmAw+ivyDVopwfeBPyqpbKMCm+FOmSMgIgOSeonY9xVujuEA+1R1cVlOEpJeTqjoP9YOkvfVLb95mSu1U86wl6+/NAc0C7bF39SXQZjZjQrH+cYRJ7dqKo8iZs4LHjd+s9oLBQn3yhK7kRVkeTgfFJR8A0nce16YeaBK4NeAIW5QWGi0ogeIncX9VmPSoMtXAaRBWkTPfeR9cVls2dTgKDsGXGa4AzvfpIbRq7K2DILEcjov2jTfPzIL+D1iSUcdUuJ/eMCjslsEDQIDFLgMl0BHHmac0SqQqUehnc0mRIGbZa/vKiz76
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?QTQrSG1ydml6N0tXZFo1a0R3am4vNjE0dnJaZHF6SitKdzhjeHpEUE52OTFT?=
- =?utf-8?B?SCtJakN3US9MTW1McGNQQ2FLcXJPVU85cnFzMFZxaXhsSDVzZkxaS0QwemM0?=
- =?utf-8?B?L3ZaanIySDZDSkYwUVdJZ0ZhNTE2dkdvbG5TL0xPemlMTkdJUmhJcUQxQWwy?=
- =?utf-8?B?dWRYR2FsYmZXZ0lXQ3NUaGpLMzFGejNPYnF4b3BEdHhQVmtnQ1lhS2h1ZGk1?=
- =?utf-8?B?SU9QZWNEdEJMUDlDSUtOdzRYWjlCT0lkMjI5QlZQY21YdVA4V0UwK2F5M2h6?=
- =?utf-8?B?UlJQWnRKdGhTTGp0TkpqWU5LNS9jbGJiWm04UjhZUlpqR2dPcVppUXNBK2Mz?=
- =?utf-8?B?T1VCY0NINjNMbzNUYVAxUElqb1Z4Y1RZVmtQcGxmdlZqdFM2MjBkSWwwd3Yw?=
- =?utf-8?B?NTMycWZIaytyck5EM2ptZnlEL1dGMUUrelV3aklOTUFYVTE2YWIyRFN4N3hP?=
- =?utf-8?B?dkVIeXpRdHp1MUxUWWRDZ1dyL3N4aEJ6d1VyY1hXTmk5Nk9KNy80TlREUUJo?=
- =?utf-8?B?M3F4TU5ZN2pVWllGTURubVZ0cStycGF1d0dLZHlnbFlCN1lOUDBTZzJwVTly?=
- =?utf-8?B?YUREYjBaSWxiZ0JpVlExUnhnajZaM21mNzZHSlBSRVl6WHpNQXV5VVFLcm0x?=
- =?utf-8?B?Y2p5TlN2TDRCM2FKZWVMdHk4NFJ6Yyt2RldMZUxmbGE3SDZyVXE0VUJiOVVT?=
- =?utf-8?B?N2xKcUs3WUEwaUs5cGZLWVpndTkweFF4R05kWkZZOGU0dHd0a25kWGd6TXJp?=
- =?utf-8?B?citySzFOZkVOYitFOHpXOGhHaml5MHVxVU5rTjJlTjlua1lwYkNnUFBFaHJD?=
- =?utf-8?B?SkdEK2RMSm8zWThra1M4dlZYc0VCWlg1a2NoQWMxZUM5QjRJVFNRS2ZHbGk5?=
- =?utf-8?B?RGtaZlR3U3VZZEZZazUweU02cFp6RW5NUGZWN2xReTROZ3RiR1hpckx1anBs?=
- =?utf-8?B?ODBUdmpvaHkwWVlwK3dIcUtnMVZMTnBFWjNQMnNPTVoxTXIzbzJKanhvQXhx?=
- =?utf-8?B?U2ltYmtFdXhkZjBWSFdEU0svcTRURUJNWHl0ZGo4UEV3SHBVRlFrZzNHTURs?=
- =?utf-8?B?L1k3dzdmWTZMaVM2eFViZjR4VEdGMUpQM0NKVzFnQjg2dktFZEVkUkNUc0h3?=
- =?utf-8?B?dVo5NE1qZXFBYURRQ3Z3TERTNzhNN0did3VhNm1WQzRUMzdNZDJlSXdkZGpw?=
- =?utf-8?B?dS9QQUtvZW0va1BXSWpIeCtGS0pCRVdDbGJDWEZOMlhrTWNHalYvenoxM3I3?=
- =?utf-8?B?WGw4amx6OWwrOGp0bjRMUFVDcXVBVzNoU21Ud0xoems1bUpRZHhFVFpkaUxw?=
- =?utf-8?B?MDRRSmRzMW1Uemk0UU1Za1lvUDRvRzRFa3piNjhWQUNFUDMwbnJlanNKUkhO?=
- =?utf-8?B?dmt4ekYvenRFa3NKalZVekxqMS9QR3l2LzErRlc1S2lma29ENzlhY0VHOUFk?=
- =?utf-8?B?Q0NvMDhkaU9zd1NCMnd4UzB4V0VkUy80THFvcG5tWE05R3l0ekJ4am9MZDZx?=
- =?utf-8?B?bzNJZTZTU1pCTTNRRGxvNUUvNEs0ZHFvN3pzTDNCUFlNWFVKODNqVnlvL05z?=
- =?utf-8?B?emRERmR3WFRGQno3VzNpbCt5T1Zza2xoY3hvK1ZjUzNML2dobHU1RHB2V3ph?=
- =?utf-8?B?d1JVMHNhZ3pFNEFYcEdVT1ArSVhGc1hDazVMa2k5VkNkVXk5djl2RUxaNnRP?=
- =?utf-8?B?K0V0NEFMU01JR21MaXQzdlluQS9mbSsrZkRhalgrdkNsZy9rN3RTR1Y2ZzB6?=
- =?utf-8?Q?4i1L4YyFv+/pB/L45HEOHFWM5fvVs6OP0a365yQ?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a1ebb8ec-c22e-4c19-bb3c-08dc38fe8567
-X-MS-Exchange-CrossTenant-AuthSource: KL1PR06MB6964.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Feb 2024 08:14:59.1968
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: JH0PR06MB7351
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240229072044.77388-1-xuanzhuo@linux.alibaba.com>
 
-On 2/29/2024 4:10 PM, Krzysztof Kozlowski wrote:
-> On 28/02/2024 10:02, Yang Xiwen via B4 Relay wrote:
->> From: Yang Xiwen <forbidden405@outlook.com>
->>
->> Register the sub MDIO bus if it is found. Also implement the internal
->> PHY reset procedure as needed.
->>
+On Thu, Feb 29, 2024 at 03:20:25PM +0800, Xuan Zhuo wrote:
+> As discussed:
+> http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVmJ3rHYqRZxYg@mail.gmail.com
 > 
+> If the virtio is premapped mode, the driver should manage the dma info by self.
+> So the virtio core should not store the dma info.
+> So we can release the memory used to store the dma info.
 > 
->>  
->> @@ -947,6 +992,7 @@ static int hisi_femac_drv_resume(struct platform_device *pdev)
->>  static const struct of_device_id hisi_femac_match[] = {
->>  	{.compatible = "hisilicon,hisi-femac",},
->>  	{.compatible = "hisilicon,hi3516cv300-femac",},
->> +	{.compatible = "hisilicon,hi3798mv200-femac",},
+> But if the desc_extra has not dma info, we face a new question,
+> it is hard to get the dma info of the desc with indirect flag.
+> For split mode, that is easy from desc, but for the packed mode,
+> it is hard to get the dma info from the desc. And for hardening
+> the dma unmap is saft, we should store the dma info of indirect
+> descs.
 > 
-> No, it does not make any sense. Why do you keep growing this table?
+> So I introduce the "structure the indirect desc table" to
+> allocate space to store dma info with the desc table.
+> 
+> On the other side, we mix the descs with indirect flag
+> with other descs together to share the unmap api. That
+> is complex. I found if we we distinguish the descs with
+> VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
+> 
+> Because of the dma array is allocated in the find_vqs(),
+> so I introduce a new parameter to find_vqs().
+> 
+> Note:
+>     this is on the top of
+>         [PATCH vhost v1] virtio: packed: fix unmap leak for indirect desc table
+>         http://lore.kernel.org/all/20240223071833.26095-1-xuanzhuo@linux.alibaba.com
+> 
+> Please review.
+> 
+> Thanks
+> 
+> v3:
+>     1. fix the conflict with the vp_modern_create_avq().
 
-So do I only have to keep the generic compatible "hisilicon,hisi-femac"
-or the two SoC compatibles?
+Okay but are you going to address huge memory waste all this is causing for
+- people who never do zero copy
+- systems where dma unmap is a nop
 
-> 
-> Best regards,
-> Krzysztof
-> 
+?
 
--- 
-Best regards,
-Yang Xiwen
+You should address all comments when you post a new version, not just
+what was expedient, or alternatively tag patch as RFC and explain
+in commit log that you plan to do it later.
+
+> v2:
+>     1. change the dma item of virtio-net, every item have MAX_SKB_FRAGS + 2
+>         addr + len pairs.
+>     2. introduce virtnet_sq_free_stats for __free_old_xmit
+> 
+> v1:
+>     1. rename transport_vq_config to vq_transport_config
+>     2. virtio-net set dma meta number to (ring-size + 1)(MAX_SKB_FRGAS +2)
+>     3. introduce virtqueue_dma_map_sg_attrs
+>     4. separate vring_create_virtqueue to an independent commit
+> 
+> 
+> 
+> Xuan Zhuo (19):
+>   virtio_ring: introduce vring_need_unmap_buffer
+>   virtio_ring: packed: remove double check of the unmap ops
+>   virtio_ring: packed: structure the indirect desc table
+>   virtio_ring: split: remove double check of the unmap ops
+>   virtio_ring: split: structure the indirect desc table
+>   virtio_ring: no store dma info when unmap is not needed
+>   virtio: find_vqs: pass struct instead of multi parameters
+>   virtio: vring_create_virtqueue: pass struct instead of multi
+>     parameters
+>   virtio: vring_new_virtqueue(): pass struct instead of multi parameters
+>   virtio_ring: simplify the parameters of the funcs related to
+>     vring_create/new_virtqueue()
+>   virtio: find_vqs: add new parameter premapped
+>   virtio_ring: export premapped to driver by struct virtqueue
+>   virtio_net: set premapped mode by find_vqs()
+>   virtio_ring: remove api of setting vq premapped
+>   virtio_ring: introduce dma map api for page
+>   virtio_ring: introduce virtqueue_dma_map_sg_attrs
+>   virtio_net: unify the code for recycling the xmit ptr
+>   virtio_net: rename free_old_xmit_skbs to free_old_xmit
+>   virtio_net: sq support premapped mode
+> 
+>  arch/um/drivers/virtio_uml.c             |  31 +-
+>  drivers/net/virtio_net.c                 | 283 ++++++---
+>  drivers/platform/mellanox/mlxbf-tmfifo.c |  24 +-
+>  drivers/remoteproc/remoteproc_virtio.c   |  31 +-
+>  drivers/s390/virtio/virtio_ccw.c         |  33 +-
+>  drivers/virtio/virtio_mmio.c             |  30 +-
+>  drivers/virtio/virtio_pci_common.c       |  59 +-
+>  drivers/virtio/virtio_pci_common.h       |   9 +-
+>  drivers/virtio/virtio_pci_legacy.c       |  16 +-
+>  drivers/virtio/virtio_pci_modern.c       |  38 +-
+>  drivers/virtio/virtio_ring.c             | 698 ++++++++++++-----------
+>  drivers/virtio/virtio_vdpa.c             |  45 +-
+>  include/linux/virtio.h                   |  13 +-
+>  include/linux/virtio_config.h            |  48 +-
+>  include/linux/virtio_ring.h              |  82 +--
+>  tools/virtio/virtio_test.c               |   4 +-
+>  tools/virtio/vringh_test.c               |  28 +-
+>  17 files changed, 847 insertions(+), 625 deletions(-)
+> 
+> --
+> 2.32.0.3.g01195cf9f
 
 
