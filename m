@@ -1,116 +1,91 @@
-Return-Path: <netdev+bounces-76494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0671D86DF38
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 11:28:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5B6986DF46
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 11:33:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38AD31C21348
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:28:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CFF1281D6E
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:33:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C7466A8DC;
-	Fri,  1 Mar 2024 10:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 607802E842;
+	Fri,  1 Mar 2024 10:33:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oHVyS9RI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tYYN1dmp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BACB6BB39
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 10:28:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0D316FF46
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 10:33:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709288891; cv=none; b=blmio+tJFBJBRe8zVbZh1VYONy1WHwMmgbZQ4wNimDGDhOQVGUliUooLpHOz14LoaSIpt0m4w1bo1jhPbfBc5GpAaI97LKDl+qvjiyVHhs/sQ/rvDWsLcfylhFjl7NB3Zhc+aYoIqMRjKc+GUqFgRAUuj/k2K2lj9Etqcd8CBtc=
+	t=1709289229; cv=none; b=QByvXVme9M9BeRWJ42L6DiXJRMG/I0TI0hJ/O/l8105G+l6zXxdPUGt9bDM+89M8dQ5WpDsTIkep6QYoCjmy9fj5vqIokkJ8lylc9igi2sMtY9FKBsDL8d1yyXxOjmP6OthkHvBY2LzOTA4/JCBNa2fsNk54ei1hdxdVsAOcgMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709288891; c=relaxed/simple;
-	bh=ZFUvqVo1lT37K+8NimNwFnn1EIPrImNJyzm+T+5iP48=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H0gD+dhR5NmOZjI57WtM6jz08tkHntYN3bP5JAXV6/YyVFtPUkL6FUkr9yu8prIgN5fgNYtv64QXkKZZ1UbxOUI8WrjmkNqM2EKraYdFseXfx6OygOmYOCDMdWakVfrYIZ2/iGgRKW/exf27LDodx/4oQ3oFfzlSW+AhG+GFcrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=oHVyS9RI; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2d33986dbc0so5301111fa.2
-        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 02:28:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709288887; x=1709893687; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6I1gRYzxfTJHfTTS+4YUgGUdEjo0E1Z3WWe3oLF96Wk=;
-        b=oHVyS9RIYmhXvuB1drEIOt/A36CuYQE7dYx4m2GTbFOlUjhjFyBG5VnTuKrfK0ax8g
-         JTkLCuyyxrXxeSRejtUq+hBuud2zWyA434PfiO1T3U9IKX52YhHBj+wLbvM4hUgm3FoT
-         BjMIJoLjZK9mGRLIUCN49sCjc91WgHK5RECKws+GqCRLanEFa72VWOmsMZF79Hc5C011
-         x9hvSOifxNz+MK+tTaulCzWOB9w4jCJYlNW0taTcSkXfTr/9Ck6n6qOxCgJ0MOZaci29
-         H+vNIU9FtlGntLn9aLL4O+yllRBVfhiTvcT46J1OVujSQ6JdF930DvuysORYtUnAl/uK
-         Q3GQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709288887; x=1709893687;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6I1gRYzxfTJHfTTS+4YUgGUdEjo0E1Z3WWe3oLF96Wk=;
-        b=PW8LfNneGexTK5XIU/ZPEPqzp06+r3SSmva44CZfo8gzu5UgfJAiiQKqhaoADs9j1W
-         naffBaprvWEEkQ6nWH90blmcuKtGV0NFTlNfmB3SpBACxe0Doqwl9JSB8MoGmpEzCHN3
-         5c0mi7YoarQLSOS7dICvOX4AhWWlgQZAjwrqV3m1Aii3pobaXyx0mzWblWuAk6oslzeW
-         NrNW5bqZuYIziv792GHhZdaewotUwECzOjtrT2JL5EtLVRl7wkpoBoqxlzvQ3Nk3rHBO
-         IvsdcOIQy7R5+SwRaqGBZ4JhH5of/M0rcwVaBvlo+4TrDkqoBM3gtaALF3H/eMjexaH4
-         NJgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWCczuycCj3n4p2U58xuRoOQNVDXo7Wpa1xwRUAeSRO1FfZRbwYHwB08lso+Ys1iewZR5rmYwXiVkMAfOvOJqvBMocrzple
-X-Gm-Message-State: AOJu0Yx90VAuSuV17l2dmvZcWrrvKnQGCF5nzu//fXfSIMtAb1h2nK71
-	rhvb3hrfurVoC9lvHttR/mZj58+IKmzIGVZTxyAydufYOgt3BrOjgEtoq7lErxzaFaV5To4SyUa
-	bEV84+cW6SQLSJi7THs5Zsyqgw6Kko6FLdZwuCg==
-X-Google-Smtp-Source: AGHT+IEY2BlVnMl9VRkGSiL35s6fB9JHHMJ+cWRH3F8O9x9VZ0yWHdNXfA3aqjSKQv2NrFo8rDm/gPLU5FrRbnC8GuA=
-X-Received: by 2002:a05:6512:3c9a:b0:512:d7e8:7046 with SMTP id
- h26-20020a0565123c9a00b00512d7e87046mr1111983lfv.42.1709288887550; Fri, 01
- Mar 2024 02:28:07 -0800 (PST)
+	s=arc-20240116; t=1709289229; c=relaxed/simple;
+	bh=acrL0owb1LKEQ9fuH71H0Yaa2wp47+hqfMOi6EkvQTs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QljPIgQfnxxsYakyxZFCFN8W4w39V3DadNeCTiQfjrAiIuvxE/OP6BDEXS812YVkwobI11j4eFJMwcXxD/UE2RxeHEiflIWlXRHldYpcElfWlLm3E9wOQBBS+RJvy4+JgRk5zX+HkijP65lLx49dlZSOScvCF85Dh35CxHSgzb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tYYN1dmp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19D3EC433F1;
+	Fri,  1 Mar 2024 10:33:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709289228;
+	bh=acrL0owb1LKEQ9fuH71H0Yaa2wp47+hqfMOi6EkvQTs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tYYN1dmpGtlkeVkkGd5O0rHjPvJcGBF6uuQ8H2wH/z/JpbVLgZuPjjxdrVy2WJ3vI
+	 MdbFg4pwOhXWy0Nat7i5/7aQeU9A1cAH7O5WCjk5qD5jjTpfNWLEwpwCaXi/6unyfq
+	 NlziVMUpEK/ob2nJTnzxaLNdr7allENW+5DeWrNDvuCoQQiJ9Hs9mnVrPSLIdi7fGc
+	 bwI14gtQAvHIYfo3eCWTz4YWu28FR5SY8fsQy/0t4197kLN79OjS4jQrgGC2/yNO9J
+	 at9Icvtj6jxkCqpsElMQNi7gaYbGWmGRNDxvnPoX8ks8CX9io+mn1+KW++ROUso+b/
+	 KOS7EeOf0qLCQ==
+Message-ID: <d3047f5c-673e-4891-94b6-f2448c5385dd@kernel.org>
+Date: Fri, 1 Mar 2024 11:33:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: page_pool: make page_pool_create inline
+Content-Language: en-US
+To: Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ lorenzo.bianconi@redhat.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com
 References: <499bc85ca1d96ec1f7daff6b7df4350dc50e9256.1707931443.git.lorenzo@kernel.org>
  <20240214101450.25ee7e5d@kernel.org> <Zc0RIWXBnS1TXOnM@lore-desk>
-In-Reply-To: <Zc0RIWXBnS1TXOnM@lore-desk>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Fri, 1 Mar 2024 12:27:31 +0200
-Message-ID: <CAC_iWj+5TMe8ixXrLM3DUS+RAmDu+gmb1rfcHiU04re8phQVDA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: page_pool: make page_pool_create inline
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, lorenzo.bianconi@redhat.com, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, hawk@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+ <CAC_iWj+5TMe8ixXrLM3DUS+RAmDu+gmb1rfcHiU04re8phQVDA@mail.gmail.com>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <CAC_iWj+5TMe8ixXrLM3DUS+RAmDu+gmb1rfcHiU04re8phQVDA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Lorenzo,
 
-On Wed, 14 Feb 2024 at 21:14, Lorenzo Bianconi <lorenzo@kernel.org> wrote:
->
-> > On Wed, 14 Feb 2024 19:01:28 +0100 Lorenzo Bianconi wrote:
-> > > Make page_pool_create utility routine inline a remove exported symbol.
-> >
-> > But why? If you add the kdoc back the LoC saved will be 1.
->
-> I would remove the symbol exported since it is just a wrapper for
-> page_pool_create_percpu()
 
-I don't mind either. But the explanation above must be part of the
-commit message.
+On 01/03/2024 11.27, Ilias Apalodimas wrote:
+> 
+> On Wed, 14 Feb 2024 at 21:14, Lorenzo Bianconi <lorenzo@kernel.org> wrote:
+>>
+>>> On Wed, 14 Feb 2024 19:01:28 +0100 Lorenzo Bianconi wrote:
+>>>> Make page_pool_create utility routine inline a remove exported symbol.
+>>>
+>>> But why? If you add the kdoc back the LoC saved will be 1.
+>>
+>> I would remove the symbol exported since it is just a wrapper for
+>> page_pool_create_percpu()
+> 
+> I don't mind either. But the explanation above must be part of the
+> commit message.
 
-Thanks
-/Ilias
->
-> >
-> > >  include/net/page_pool/types.h |  6 +++++-
-> > >  net/core/page_pool.c          | 10 ----------
-> > >  2 files changed, 5 insertions(+), 11 deletions(-)
-> >
-> > No strong opinion, but if you want to do it please put the helper
-> > in helpers.h  Let's keep the static inlines clearly separated.
->
-> ack, fine to me. I put it there since we already have some inlines in
-> page_pool/types.h.
->
-> Regards,
-> Lorenzo
+I hope my benchmark module will still work...
+
+https://github.com/netoptimizer/prototype-kernel/blob/master/kernel/lib/bench_page_pool_simple.c#L181
+
+
+--Jesper
 
