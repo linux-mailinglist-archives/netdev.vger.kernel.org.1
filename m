@@ -1,91 +1,142 @@
-Return-Path: <netdev+bounces-76495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5B6986DF46
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 11:33:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D61686DF4D
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 11:37:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CFF1281D6E
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:33:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD8DF1F25E0C
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:37:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 607802E842;
-	Fri,  1 Mar 2024 10:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFAAF67E74;
+	Fri,  1 Mar 2024 10:37:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tYYN1dmp"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="glQ0TZE6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0D316FF46
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 10:33:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF72339B1;
+	Fri,  1 Mar 2024 10:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709289229; cv=none; b=QByvXVme9M9BeRWJ42L6DiXJRMG/I0TI0hJ/O/l8105G+l6zXxdPUGt9bDM+89M8dQ5WpDsTIkep6QYoCjmy9fj5vqIokkJ8lylc9igi2sMtY9FKBsDL8d1yyXxOjmP6OthkHvBY2LzOTA4/JCBNa2fsNk54ei1hdxdVsAOcgMs=
+	t=1709289438; cv=none; b=MFvli8ksd4cJOOHkURPw8x6bIx+KEJIA5s2hFq4xsX78SvuWG2bAqqantm38W8dONeRHB6I0WGNn9yumkvNJ4D6UAvo+aqp447IAN7e9bHQ/AfPVntIxUFtdDXJx0F4GrFcgUARm1h1TBEROMGLlQ6eoeFUawRYRlNJL0VMvQ38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709289229; c=relaxed/simple;
-	bh=acrL0owb1LKEQ9fuH71H0Yaa2wp47+hqfMOi6EkvQTs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QljPIgQfnxxsYakyxZFCFN8W4w39V3DadNeCTiQfjrAiIuvxE/OP6BDEXS812YVkwobI11j4eFJMwcXxD/UE2RxeHEiflIWlXRHldYpcElfWlLm3E9wOQBBS+RJvy4+JgRk5zX+HkijP65lLx49dlZSOScvCF85Dh35CxHSgzb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tYYN1dmp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19D3EC433F1;
-	Fri,  1 Mar 2024 10:33:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709289228;
-	bh=acrL0owb1LKEQ9fuH71H0Yaa2wp47+hqfMOi6EkvQTs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=tYYN1dmpGtlkeVkkGd5O0rHjPvJcGBF6uuQ8H2wH/z/JpbVLgZuPjjxdrVy2WJ3vI
-	 MdbFg4pwOhXWy0Nat7i5/7aQeU9A1cAH7O5WCjk5qD5jjTpfNWLEwpwCaXi/6unyfq
-	 NlziVMUpEK/ob2nJTnzxaLNdr7allENW+5DeWrNDvuCoQQiJ9Hs9mnVrPSLIdi7fGc
-	 bwI14gtQAvHIYfo3eCWTz4YWu28FR5SY8fsQy/0t4197kLN79OjS4jQrgGC2/yNO9J
-	 at9Icvtj6jxkCqpsElMQNi7gaYbGWmGRNDxvnPoX8ks8CX9io+mn1+KW++ROUso+b/
-	 KOS7EeOf0qLCQ==
-Message-ID: <d3047f5c-673e-4891-94b6-f2448c5385dd@kernel.org>
-Date: Fri, 1 Mar 2024 11:33:45 +0100
+	s=arc-20240116; t=1709289438; c=relaxed/simple;
+	bh=kj0GX5JufiTvFSbGnjmfOxouxBSD5J1fiq7Z+9gQtfM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SvY0+XcFq/eH923wiX4kn1gkRgb0Qrfgh6ce/sVrSfKGu2iI02XayaWQ3YymruzWcVQQTycPBIL4qOg/Duqxusmdazr1PeJsf86UioIIMYofkB4dknhW7IBoajE1p8H6weyXEfiYYbnSrLhTC+5hqnNYEifn6H/F/6eUv8d5Hfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=glQ0TZE6; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0B01660003;
+	Fri,  1 Mar 2024 10:37:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1709289427;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qZXbs8FJ1qVx7PbdKrlgZ1XNtd19xUWerbxWOLhwuM0=;
+	b=glQ0TZE6LDyKscIZPFD/F5LAelaLJlBUHfnT3OffYX0JJcO2E5GvADW4hECiweYiGAqQyi
+	FYSrBk/Eo+deS7wUAQ14J6OWmE/tIScxkmKtJVYYh6fROC26mn+qkvf7pc2lru5N4g4+bZ
+	Y3joigwZSh52q4dD7inLW2TCAPKWllF5lj9pn86gxUvpDsorhSsUr0gLHYEAJevIp64QRn
+	lY5rb611L2WOTFCm5W4bkaQWvsY5S8IGJXICo5JYGFiDk/lDdBOTBt8h/UOogKkO5WXQsh
+	siefTxO9I2nQiRKpv8knknePhM/GmF2HdjwRjQGf7meP2FHLmpq0e0GRSOa0WQ==
+Date: Fri, 1 Mar 2024 11:37:03 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Bastien Curutchet <bastien.curutchet@bootlin.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>, Richard Cochran
+ <richardcochran@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Russell
+ King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-leds@vger.kernel.org, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, herve.codina@bootlin.com,
+ christophercordahi@nanometrics.ca
+Subject: Re: [PATCH v2 6/6] net: phy: DP83640: Add fiber mode
+ enabling/disabling from device tree
+Message-ID: <20240301113703.102bbad0@device-28.home>
+In-Reply-To: <c6840f8f-7d9c-49e8-b689-2af04605b99c@lunn.ch>
+References: <20240227093945.21525-1-bastien.curutchet@bootlin.com>
+	<20240227093945.21525-7-bastien.curutchet@bootlin.com>
+	<a9c2144a-f26b-4a71-b808-ce3a94f1264d@lunn.ch>
+	<c1b17410-b403-4c3a-9c00-de8f2b2b2fa7@bootlin.com>
+	<c6840f8f-7d9c-49e8-b689-2af04605b99c@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: page_pool: make page_pool_create inline
-Content-Language: en-US
-To: Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- lorenzo.bianconi@redhat.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com
-References: <499bc85ca1d96ec1f7daff6b7df4350dc50e9256.1707931443.git.lorenzo@kernel.org>
- <20240214101450.25ee7e5d@kernel.org> <Zc0RIWXBnS1TXOnM@lore-desk>
- <CAC_iWj+5TMe8ixXrLM3DUS+RAmDu+gmb1rfcHiU04re8phQVDA@mail.gmail.com>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <CAC_iWj+5TMe8ixXrLM3DUS+RAmDu+gmb1rfcHiU04re8phQVDA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
+Hi Bastien, Andrew,
 
+On Thu, 29 Feb 2024 16:23:59 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-On 01/03/2024 11.27, Ilias Apalodimas wrote:
+> On Thu, Feb 29, 2024 at 08:31:55AM +0100, Bastien Curutchet wrote:
+> > Hi Andrew,
+> > 
+> > On 2/27/24 17:18, Andrew Lunn wrote:  
+> > > On Tue, Feb 27, 2024 at 10:39:45AM +0100, Bastien Curutchet wrote:  
+> > > > The PHY is able to use copper or fiber. The fiber mode can be enabled or
+> > > > disabled by hardware strap. If hardware strap is incorrect, PHY can't
+> > > > establish link.
+> > > > 
+> > > > Add a DT attribute 'ti,fiber-mode' that can be use to override the
+> > > > hardware strap configuration. If the property is not present, hardware
+> > > > strap configuration is left as is.  
+> > > How have you tested this? Do you have a RDK with it connected to an
+> > > SFP cage?  
+> > 
+> > I did not test fiber mode as my board uses copper.
+> > 
+> > My use case is that I need to explicitly disable the fiber mode because the
+> > strap hardware is
+> > misconfigured and could possibly enable fiber mode from time to time.  
 > 
-> On Wed, 14 Feb 2024 at 21:14, Lorenzo Bianconi <lorenzo@kernel.org> wrote:
->>
->>> On Wed, 14 Feb 2024 19:01:28 +0100 Lorenzo Bianconi wrote:
->>>> Make page_pool_create utility routine inline a remove exported symbol.
->>>
->>> But why? If you add the kdoc back the LoC saved will be 1.
->>
->> I would remove the symbol exported since it is just a wrapper for
->> page_pool_create_percpu()
+> O.K. So lets refocus this is little. Rather than support fibre mode,
+> just support disabling fibre mode. But leave a clear path for somebody
+> to add fibre support sometime in the future.
 > 
-> I don't mind either. But the explanation above must be part of the
-> commit message.
+> Looking at the current code, do you think fibre mode actually works
+> today? If you think it cannot actually work today in fibre mode, one
+> option would be to hard code it to copper mode. Leave the
+> configuration between fibre and copper mode to the future when
+> somebody actually implements fibre mode.
 
-I hope my benchmark module will still work...
+Looking at the driver and the datasheet, it's hard to say that the
+fiber mode can't work in the current state. It's configured either
+through straps or an overriding register, and it's enough to get the
+scrambler/descrambler automatically setup according to that single
+strap. 
 
-https://github.com/netoptimizer/prototype-kernel/blob/master/kernel/lib/bench_page_pool_simple.c#L181
+So it's hard to say that defaulting to copper won't break anything :(
 
+OTOH there's no SFP support in this PHY, in terms of register config,
+some aneg modes won't work in 100BaseFX, which the driver doesn't account for,
+So nothing would indicate that the fiber mode was ever used.
 
---Jesper
+There's the DP83822 driver that can accept the "ti,fiber-mode"
+property, so adding that would at least be coherent with other DP83xxx
+PHYs but it has the opposite logic we want, so doesn't prevent any
+possible regression for existing fiber users.
+
+All in all, do you think that defaulting to copper and leaving users an
+option to implement "ti,fiber-mode" is an acceptable risk to take ?
+
+Maxime
+
 
