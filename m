@@ -1,132 +1,143 @@
-Return-Path: <netdev+bounces-76521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40B3F86E090
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 12:42:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 12F6186E094
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 12:46:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D28651F23AF0
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 11:42:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DA691F25185
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 11:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22FCD6CDA1;
-	Fri,  1 Mar 2024 11:41:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Gk5wWgCH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD0476CDC0;
+	Fri,  1 Mar 2024 11:45:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF07C6A8AD;
-	Fri,  1 Mar 2024 11:41:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1FF20315;
+	Fri,  1 Mar 2024 11:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709293316; cv=none; b=FtN6xE5Xrww0Q2nqCSrA4H4Nle14MaftEWr5tFuvU2hpUKzPwoXdEX5R3Wq/+7n5yQkl/tM0WJUCXpBAy8bYXbLdnomLyes4cLkCjbMTWoWS6dhz6ak1oe6AVYGkOJAGU4cfDijhEGOeTJf8Roig3oANvXhVSYqkqMBzmCuB8sE=
+	t=1709293559; cv=none; b=rbTQTgUwOhBNvo0Chqe9TUA8svX0a3TbAJ4m3MBOOwtSDhY+Ae5++MoZLKcQLcIb8fhhYwEl5AVRqguS2casJAR1sSXJpUjvA9aPGrSodOxgKJpEeBmLjfkCHZUn4SnkACXjc6oHpooityF4GOcs/E5PNFrPcBE9YDD3+pO3my0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709293316; c=relaxed/simple;
-	bh=EYQzIq2XsHbxPP8KNQSmIBCmBUS5ay1BMmtHwbbusNM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hP1uR7wkR7oOCpfHeHMM4+xTvWwlV4Gf7dH0Y82ury6w691dZgO2Xdtzf+B6DWA7FY33nKO7RyCofAvl0KgRFv1gSqUj8Go9houKsGdtbZzJevdtq+AfJzhLp35NzBe4u3k/lljb2Kt86OCwxAzFsBK65fVQBGPF9fbUSUr5fII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Gk5wWgCH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1844C433F1;
-	Fri,  1 Mar 2024 11:41:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1709293315;
-	bh=EYQzIq2XsHbxPP8KNQSmIBCmBUS5ay1BMmtHwbbusNM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Gk5wWgCH0TPmRkvJzdQpj9C5HIOw9GHZ+3Xpk/EcNAXBRZVJ5Fw3FxLONXKuj5lkB
-	 6CIO+Dwed/IhqsJjXS98AEknok9SQGO616enLsGTrYrv8yJtKNq+xtS7xnpBPemYdQ
-	 /MLyValKXQBsFurOwXvc+NUHaSUu9MhYEFH7l1Os=
-Date: Fri, 1 Mar 2024 12:41:52 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kees Cook <keescook@chromium.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	netdev@vger.kernel.org, linux-hardening@vger.kernel.org,
-	Simon Horman <horms@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Coco Li <lixiaoyan@google.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netdev: Use flexible array for trailing private bytes
-Message-ID: <2024030121-starring-party-7e34@gregkh>
-References: <20240229213018.work.556-kees@kernel.org>
- <20240229225910.79e224cf@kernel.org>
+	s=arc-20240116; t=1709293559; c=relaxed/simple;
+	bh=7euRu9gC1qZwJ0nCZHbyU4FyH2aqHWlDJQgi7OX/OZw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=qvTtws3jJwIrnkmONS0/Y9E9ekLMl70iOhjF7HtYjVhCavohUXlSsRivPWrSrnxTji1/PINW8ewoxjN4e/hmywDd6QJ9j17G/daz9XGIottzWxBz1pOEaMlmUhmDjquEVMDfmu3mLVyK9K/Aev7rCsqOamARon8/fd38TtkpmmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TmR7D5q2Bz2Bf5g;
+	Fri,  1 Mar 2024 19:43:36 +0800 (CST)
+Received: from kwepemd100001.china.huawei.com (unknown [7.221.188.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 95F5514011A;
+	Fri,  1 Mar 2024 19:45:53 +0800 (CST)
+Received: from kwepemd100012.china.huawei.com (7.221.188.214) by
+ kwepemd100001.china.huawei.com (7.221.188.240) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 1 Mar 2024 19:45:53 +0800
+Received: from dggpemm500008.china.huawei.com (7.185.36.136) by
+ kwepemd100012.china.huawei.com (7.221.188.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 1 Mar 2024 19:45:52 +0800
+Received: from dggpemm500008.china.huawei.com ([7.185.36.136]) by
+ dggpemm500008.china.huawei.com ([7.185.36.136]) with mapi id 15.01.2507.035;
+ Fri, 1 Mar 2024 19:45:52 +0800
+From: wangyunjian <wangyunjian@huawei.com>
+To: Paolo Abeni <pabeni@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
+	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "bjorn@kernel.org" <bjorn@kernel.org>,
+	"magnus.karlsson@intel.com" <magnus.karlsson@intel.com>,
+	"maciej.fijalkowski@intel.com" <maciej.fijalkowski@intel.com>,
+	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>, "davem@davemloft.net"
+	<davem@davemloft.net>
+CC: "bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, xudingke
+	<xudingke@huawei.com>, "liwei (DT)" <liwei395@huawei.com>
+Subject: RE: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
+Thread-Topic: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
+Thread-Index: AQHaajYcNkJKJoTBfEqyMPzDlwSi+bEgpeYAgAIJPRA=
+Date: Fri, 1 Mar 2024 11:45:52 +0000
+Message-ID: <223aeca6435342ec8a4d57c959c23303@huawei.com>
+References: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
+ <7d478cb842e28094f4d6102e593e3de25ab27dfe.camel@redhat.com>
+In-Reply-To: <7d478cb842e28094f4d6102e593e3de25ab27dfe.camel@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240229225910.79e224cf@kernel.org>
 
-On Thu, Feb 29, 2024 at 10:59:10PM -0800, Jakub Kicinski wrote:
-> On Thu, 29 Feb 2024 13:30:22 -0800 Kees Cook wrote:
-> > Introduce a new struct net_device_priv that contains struct net_device
-> > but also accounts for the commonly trailing bytes through the "size" and
-> > "data" members.
-> 
-> I'm a bit unclear on the benefit. Perhaps I'm unaccustomed to "safe C".
-> 
-> > As many dummy struct net_device instances exist still,
-> > it is non-trivial to but this flexible array inside struct net_device
-> 
-> put
-> 
-> Non-trivial, meaning what's the challenge?
-> We also do somewhat silly things with netdev lifetime, because we can't
-> assume netdev gets freed by netdev_free(). Cleaning up the "embedders"
-> would be beneficial for multiple reasons.
-> 
-> > itself. But we can add a sanity check in netdev_priv() to catch any
-> > attempts to access the private data of a dummy struct.
-> > 
-> > Adjust allocation logic to use the new full structure.
-> > 
-> > Signed-off-by: Kees Cook <keescook@chromium.org>
-> 
-> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> > index 118c40258d07..b476809d0bae 100644
-> > --- a/include/linux/netdevice.h
-> > +++ b/include/linux/netdevice.h
-> > @@ -1815,6 +1815,8 @@ enum netdev_stat_type {
-> >  	NETDEV_PCPU_STAT_DSTATS, /* struct pcpu_dstats */
-> >  };
-> >  
-> > +#define	NETDEV_ALIGN		32
-> 
-> Unless someone knows what this is for it should go.
-> Align priv to cacheline size.
-> 
-> >  /**
-> >   *	struct net_device - The DEVICE structure.
-> >   *
-> 
-> > @@ -2665,7 +2673,14 @@ void dev_net_set(struct net_device *dev, struct net *net)
-> >   */
-> >  static inline void *netdev_priv(const struct net_device *dev)
-> >  {
-> > -	return (char *)dev + ALIGN(sizeof(struct net_device), NETDEV_ALIGN);
-> > +	struct net_device_priv *priv;
-> > +
-> > +	/* Dummy struct net_device have no trailing data. */
-> > +	if (WARN_ON_ONCE(dev->reg_state == NETREG_DUMMY))
-> > +		return NULL;
-> 
-> This is a static inline with roughly 11,000 call sites, according to 
-> a quick grep. Aren't WARN_ONCE() in static inlines creating a "once"
-> object in every compilation unit where they get used?
-
-It also, if this every trips, will reboot the box for those that run
-with panic-on-warn set, is that something that you all really want?
-
-thanks,
-
-greg k-h
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBBYmVuaSBbbWFpbHRv
+OnBhYmVuaUByZWRoYXQuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwgRmVicnVhcnkgMjksIDIwMjQg
+NzoxMyBQTQ0KPiBUbzogd2FuZ3l1bmppYW4gPHdhbmd5dW5qaWFuQGh1YXdlaS5jb20+OyBtc3RA
+cmVkaGF0LmNvbTsNCj4gd2lsbGVtZGVicnVpam4ua2VybmVsQGdtYWlsLmNvbTsgamFzb3dhbmdA
+cmVkaGF0LmNvbTsga3ViYUBrZXJuZWwub3JnOw0KPiBiam9ybkBrZXJuZWwub3JnOyBtYWdudXMu
+a2FybHNzb25AaW50ZWwuY29tOyBtYWNpZWouZmlqYWxrb3dza2lAaW50ZWwuY29tOw0KPiBqb25h
+dGhhbi5sZW1vbkBnbWFpbC5jb207IGRhdmVtQGRhdmVtbG9mdC5uZXQNCj4gQ2M6IGJwZkB2Z2Vy
+Lmtlcm5lbC5vcmc7IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7DQo+IGxpbnV4LWtlcm5lbEB2Z2Vy
+Lmtlcm5lbC5vcmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmc7DQo+IHZpcnR1YWxpemF0aW9uQGxpc3Rz
+LmxpbnV4LmRldjsgeHVkaW5na2UgPHh1ZGluZ2tlQGh1YXdlaS5jb20+OyBsaXdlaSAoRFQpDQo+
+IDxsaXdlaTM5NUBodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIG5ldC1uZXh0IHYy
+IDMvM10gdHVuOiBBRl9YRFAgVHggemVyby1jb3B5IHN1cHBvcnQNCj4gDQo+IE9uIFdlZCwgMjAy
+NC0wMi0yOCBhdCAxOTowNSArMDgwMCwgWXVuamlhbiBXYW5nIHdyb3RlOg0KPiA+IEBAIC0yNjYx
+LDYgKzI3NzYsNTQgQEAgc3RhdGljIGludCB0dW5fcHRyX3BlZWtfbGVuKHZvaWQgKnB0cikNCj4g
+PiAgCX0NCj4gPiAgfQ0KPiA+DQo+ID4gK3N0YXRpYyB2b2lkIHR1bl9wZWVrX3hzayhzdHJ1Y3Qg
+dHVuX2ZpbGUgKnRmaWxlKSB7DQo+ID4gKwlzdHJ1Y3QgeHNrX2J1ZmZfcG9vbCAqcG9vbDsNCj4g
+PiArCXUzMiBpLCBiYXRjaCwgYnVkZ2V0Ow0KPiA+ICsJdm9pZCAqZnJhbWU7DQo+ID4gKw0KPiA+
+ICsJaWYgKCFwdHJfcmluZ19lbXB0eSgmdGZpbGUtPnR4X3JpbmcpKQ0KPiA+ICsJCXJldHVybjsN
+Cj4gPiArDQo+ID4gKwlzcGluX2xvY2soJnRmaWxlLT5wb29sX2xvY2spOw0KPiA+ICsJcG9vbCA9
+IHRmaWxlLT54c2tfcG9vbDsNCj4gPiArCWlmICghcG9vbCkgew0KPiA+ICsJCXNwaW5fdW5sb2Nr
+KCZ0ZmlsZS0+cG9vbF9sb2NrKTsNCj4gPiArCQlyZXR1cm47DQo+ID4gKwl9DQo+ID4gKw0KPiA+
+ICsJaWYgKHRmaWxlLT5uYl9kZXNjcykgew0KPiA+ICsJCXhza190eF9jb21wbGV0ZWQocG9vbCwg
+dGZpbGUtPm5iX2Rlc2NzKTsNCj4gPiArCQlpZiAoeHNrX3VzZXNfbmVlZF93YWtldXAocG9vbCkp
+DQo+ID4gKwkJCXhza19zZXRfdHhfbmVlZF93YWtldXAocG9vbCk7DQo+ID4gKwl9DQo+ID4gKw0K
+PiA+ICsJc3Bpbl9sb2NrKCZ0ZmlsZS0+dHhfcmluZy5wcm9kdWNlcl9sb2NrKTsNCj4gPiArCWJ1
+ZGdldCA9IG1pbl90KHUzMiwgdGZpbGUtPnR4X3Jpbmcuc2l6ZSwgVFVOX1hEUF9CQVRDSCk7DQo+
+ID4gKw0KPiA+ICsJYmF0Y2ggPSB4c2tfdHhfcGVla19yZWxlYXNlX2Rlc2NfYmF0Y2gocG9vbCwg
+YnVkZ2V0KTsNCj4gPiArCWlmICghYmF0Y2gpIHsNCj4gDQo+IFRoaXMgYnJhbmNoIGxvb2tzIGxp
+a2UgYW4gdW5uZWVkZWQgIm9wdGltaXphdGlvbiIuIFRoZSBnZW5lcmljIGxvb3AgYmVsb3cNCj4g
+c2hvdWxkIGhhdmUgdGhlIHNhbWUgZWZmZWN0IHdpdGggbm8gbWVhc3VyYWJsZSBwZXJmIGRlbHRh
+IC0gYW5kIHNtYWxsZXIgY29kZS4NCj4gSnVzdCByZW1vdmUgdGhpcy4NCj4gDQo+ID4gKwkJdGZp
+bGUtPm5iX2Rlc2NzID0gMDsNCj4gPiArCQlzcGluX3VubG9jaygmdGZpbGUtPnR4X3JpbmcucHJv
+ZHVjZXJfbG9jayk7DQo+ID4gKwkJc3Bpbl91bmxvY2soJnRmaWxlLT5wb29sX2xvY2spOw0KPiA+
+ICsJCXJldHVybjsNCj4gPiArCX0NCj4gPiArDQo+ID4gKwl0ZmlsZS0+bmJfZGVzY3MgPSBiYXRj
+aDsNCj4gPiArCWZvciAoaSA9IDA7IGkgPCBiYXRjaDsgaSsrKSB7DQo+ID4gKwkJLyogRW5jb2Rl
+IHRoZSBYRFAgREVTQyBmbGFnIGludG8gbG93ZXN0IGJpdCBmb3IgY29uc3VtZXIgdG8gZGlmZmVy
+DQo+ID4gKwkJICogWERQIGRlc2MgZnJvbSBYRFAgYnVmZmVyIGFuZCBza19idWZmLg0KPiA+ICsJ
+CSAqLw0KPiA+ICsJCWZyYW1lID0gdHVuX3hkcF9kZXNjX3RvX3B0cigmcG9vbC0+dHhfZGVzY3Nb
+aV0pOw0KPiA+ICsJCS8qIFRoZSBidWRnZXQgbXVzdCBiZSBsZXNzIHRoYW4gb3IgZXF1YWwgdG8g
+dHhfcmluZy5zaXplLA0KPiA+ICsJCSAqIHNvIGVucXVldWluZyB3aWxsIG5vdCBmYWlsLg0KPiA+
+ICsJCSAqLw0KPiA+ICsJCV9fcHRyX3JpbmdfcHJvZHVjZSgmdGZpbGUtPnR4X3JpbmcsIGZyYW1l
+KTsNCj4gPiArCX0NCj4gPiArCXNwaW5fdW5sb2NrKCZ0ZmlsZS0+dHhfcmluZy5wcm9kdWNlcl9s
+b2NrKTsNCj4gPiArCXNwaW5fdW5sb2NrKCZ0ZmlsZS0+cG9vbF9sb2NrKTsNCj4gDQo+IE1vcmUg
+cmVsYXRlZCB0byB0aGUgZ2VuZXJhbCBkZXNpZ246IGl0IGxvb2tzIHdyb25nLiBXaGF0IGlmDQo+
+IGdldF9yeF9idWZzKCkgd2lsbCBmYWlsIChFTk9CVUYpIGFmdGVyIHN1Y2Nlc3NmdWwgcGVla2lu
+Zz8gV2l0aCBubyBtb3JlDQo+IGluY29taW5nIHBhY2tldHMsIGxhdGVyIHBlZWsgd2lsbCByZXR1
+cm4gMCBhbmQgaXQgbG9va3MgbGlrZSB0aGF0IHRoZQ0KPiBoYWxmLXByb2Nlc3NlZCBwYWNrZXRz
+IHdpbGwgc3RheSBpbiB0aGUgcmluZyBmb3JldmVyPz8/DQo+IA0KPiBJIHRoaW5rIHRoZSAncmlu
+ZyBwcm9kdWNlJyBwYXJ0IHNob3VsZCBiZSBtb3ZlZCBpbnRvIHR1bl9kb19yZWFkKCkuDQoNCkN1
+cnJlbnRseSwgdGhlIHZob3N0LW5ldCBvYnRhaW5zIGEgYmF0Y2ggZGVzY3JpcHRvcnMvc2tfYnVm
+ZnMgZnJvbSB0aGUNCnB0cl9yaW5nIGFuZCBlbnF1ZXVlIHRoZSBiYXRjaCBkZXNjcmlwdG9ycy9z
+a19idWZmcyB0byB0aGUgdmlydHF1ZXVlJ3F1ZXVlLA0KYW5kIHRoZW4gY29uc3VtZXMgdGhlIGRl
+c2NyaXB0b3JzL3NrX2J1ZmZzIGZyb20gdGhlIHZpcnRxdWV1ZSdxdWV1ZSBpbg0Kc2VxdWVuY2Uu
+IEFzIGEgcmVzdWx0LCBUVU4gZG9lcyBub3Qga25vdyB3aGV0aGVyIHRoZSBiYXRjaCBkZXNjcmlw
+dG9ycyBoYXZlDQpiZWVuIHVzZWQgdXAsIGFuZCB0aHVzIGRvZXMgbm90IGtub3cgd2hlbiB0byBy
+ZXR1cm4gdGhlIGJhdGNoIGRlc2NyaXB0b3JzLg0KDQpTbywgSSB0aGluayBpdCdzIHJlYXNvbmFi
+bGUgdGhhdCB3aGVuIHZob3N0LW5ldCBjaGVja3MgcHRyX3JpbmcgaXMgZW1wdHksDQppdCBjYWxs
+cyBwZWVrX2xlbiB0byBnZXQgbmV3IHhzaydzIGRlc2NzIGFuZCByZXR1cm4gdGhlIGRlc2NyaXB0
+b3JzLg0KDQpUaGFua3MNCj4gDQo+IENoZWVycywNCj4gDQo+IFBhb2xvDQoNCg==
 
