@@ -1,148 +1,90 @@
-Return-Path: <netdev+bounces-76475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACFE886DE3A
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:27:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D672286DE48
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:29:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 660F028B8A0
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:27:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E2C9281263
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD886A337;
-	Fri,  1 Mar 2024 09:26:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D7D26A337;
+	Fri,  1 Mar 2024 09:29:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dip+FC0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4CD6BB21;
-	Fri,  1 Mar 2024 09:26:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD922EB0E
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 09:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709285202; cv=none; b=e62GUgS78jEM6BKLfST2m6JYmuMhQ6EivEvWY9ZBuAQ3lQmpg9Y5tirEl8eztALZhCho6UsrYR7CiiNFxl1urJK7DVFcfK82HY0sx5Me4CclbclAMayNYiB5VxcAIIZ0wUZX6j5KxcB5v2cRqX97JBJPTJrYyrYoxu8bTp4i2bo=
+	t=1709285365; cv=none; b=QgSfBhwJ4sPqsfjsmzc1VqsVRGN6B9UQPNwhfwTmT529aZEJpPYQJQ2Gas955ze2j5qEg1LoCWnkgNOp4+0jeWACSz3MS9y3U9O/Tkahp0pyT6zc/0k2yz/uvnFvSPdZpqxm68hNyf5mlrymiIXPXb6PwQ4Kx/ZiQi3MwjQfPX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709285202; c=relaxed/simple;
-	bh=0wdFpKbEyNhuu/RpjYvuz8KPZKT0kttiGp+cGiKwHZk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Uq1Uhv/kX4HOYZfg2hSTmyY5DZtbb94XbzEPjtnO78rFUI/jWwbWzLhTutYhh9QfQcpkEdLCYoGOZWBLdj5eM1lGMRjupXZx1CrUqcQKdj1DUuEsk8sxRjzJeYxrIc/gqhfjtkpy9NdqR2hCVC/9dtJBfC9BY6D/bMzu9biuVcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-5c6bd3100fcso1429749a12.3;
-        Fri, 01 Mar 2024 01:26:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709285201; x=1709890001;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7fp76SLNrOitLz2IPJZxtYaUARyA39f42XEHvT3cwYM=;
-        b=wrjuv3Wk9FR/qzOMrvkBV0U6QMzH5WI7lDVlldaTvJWOaD3jqq3UxdtKAaY4Jc40TN
-         3llrQ+Ka9uGMkYxulCTW+3lNz9ZDIJqh5GTnKOS/PXfY9b5cXY0+LPvQ/iDxPn9Gz4Ie
-         9UBnHmhPXl38olLNqUQTHQcK5fcEu+PKAuuN75GItuJAufhjMMMtgmOLyJwiA7yiUTkv
-         3Z777iBLYVu4dIrbbKQ5adrDD+P3kKt0GGKyGL0F64pXH4tWD9DQ9L4nEe5F5i6Cndqv
-         dWjo8oT7NAR14xkxcDTZR9vq7ToDyvitTS46Z/zPwXT9+Jg3Z1RNNotdO58EG6jjibdj
-         jXAA==
-X-Forwarded-Encrypted: i=1; AJvYcCWyAUSugSMcnDGMbY8YXlwSSzzfpejMofz9LLlv+aYn9QmY77cRxNo85zkzbrC3sDm1H5hGrWOKFQ7qM0zzJyewJOb7hUUHpMpgCGqHVxVn0xffC4BQigRP9PKcCeuMnCur3j+nnNP/d5fySnyc93DY6TxXFQvvURSSWpnuFzx3Wdy6
-X-Gm-Message-State: AOJu0Yym9L/5af98h0T37gnOgjiS/7dd8+6l4tocN3iQF6lB53VIMNQj
-	vPKOAt76ssIIKWOnv7jjTF9HGkk35WG1SFYR4dxI+fyiNOuXnTrZ
-X-Google-Smtp-Source: AGHT+IFzP30XgcgRz16jjeqSQMfVBbG9kjUBn2FuxIWeyBnM+Cs+BqPA7eeqULcAd7TXur4Xy4bBMg==
-X-Received: by 2002:a05:6a20:7343:b0:1a1:2f17:1bc2 with SMTP id v3-20020a056a20734300b001a12f171bc2mr989042pzc.35.1709285200822;
-        Fri, 01 Mar 2024 01:26:40 -0800 (PST)
-Received: from liuwe-devbox-debian-v2 ([20.69.120.36])
-        by smtp.gmail.com with ESMTPSA id d11-20020a170902cecb00b001d739667fc3sm2947317plg.207.2024.03.01.01.26.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 01:26:40 -0800 (PST)
-Date: Fri, 1 Mar 2024 09:26:38 +0000
-From: Wei Liu <wei.liu@kernel.org>
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, mhklinux@outlook.com,
-	linux-hyperv@vger.kernel.org, gregkh@linuxfoundation.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	kirill.shutemov@linux.intel.com, dave.hansen@linux.intel.com,
-	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-	sathyanarayanan.kuppuswamy@linux.intel.com,
-	elena.reshetova@intel.com
-Subject: Re: [RFC RFT PATCH 1/4] hv: Leak pages if set_memory_encrypted()
- fails
-Message-ID: <ZeGfTtlx0JOj9gVS@liuwe-devbox-debian-v2>
-References: <20240222021006.2279329-1-rick.p.edgecombe@intel.com>
- <20240222021006.2279329-2-rick.p.edgecombe@intel.com>
+	s=arc-20240116; t=1709285365; c=relaxed/simple;
+	bh=fS4gMp0xIvUnIK1yMcnq0c3usucpTMO/KzzLNrOSvhs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Mts1nDTjVTQvvHBOMbpIgqLCF7GiECVUW0/ux1uWO+Uq5pj9UpFxUR0GaSwvxYJlUVSaaf6x0su9UaHL7/7Y7JXPjcm94KFs3OnjT5hE5hDQPWCbiS/+AXPCzqYHd6iVfcV+LvbZHKn5xBocmgvmhaDPcPIQYdkWXL39KEixaQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dip+FC0n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACB22C433C7;
+	Fri,  1 Mar 2024 09:29:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709285364;
+	bh=fS4gMp0xIvUnIK1yMcnq0c3usucpTMO/KzzLNrOSvhs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Dip+FC0n8pJM5We2H9b3r7I26RtV6/FQrR/vq0S7Yv+AEN8RI6OvniGhp51dHTWLd
+	 FvjXlW7EBbuYpbYNoyrI0vu9BsbAG5BUwG37KbFi+QQ+Qh03QKVQNHzD34a32pTmHD
+	 jMQQLP6uLeo/viv0Kb+xL4BFZiaGgxWeBLNkZV0lkxgvB26PFFHOtRctbdQeAYoX2d
+	 sGBGNblX6ozgfUYpmisoKedJiNzyume7I2jNwb/yRBKaog2NO/jsNfAdHSOhO/CuKU
+	 gU1wnWrT6w2WErfafwV5CP7+Set0SqPkqHWHLrWFgUmbczRYEAwCKXAnTTEeQLVEr0
+	 u29hrNqCNuRsA==
+Date: Fri, 1 Mar 2024 10:29:19 +0100
+From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Frank Wunderlich"
+ <frank-w@public-files.de>, Daniel Golle <daniel@makrotopia.org>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 4/6] net: phy: realtek: Add driver
+ instances for rtl8221b/8251b via Clause 45
+Message-ID: <20240301102919.6c858bb1@dellmb>
+In-Reply-To: <20240227075151.793496-5-ericwouds@gmail.com>
+References: <20240227075151.793496-1-ericwouds@gmail.com>
+	<20240227075151.793496-5-ericwouds@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.39; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240222021006.2279329-2-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 21, 2024 at 06:10:03PM -0800, Rick Edgecombe wrote:
-> On TDX it is possible for the untrusted host to cause
-> set_memory_encrypted() or set_memory_decrypted() to fail such that an
-> error is returned and the resulting memory is shared. Callers need to take
-> care to handle these errors to avoid returning decrypted (shared) memory to
-> the page allocator, which could lead to functional or security issues.
+On Tue, 27 Feb 2024 08:51:49 +0100
+Eric Woudstra <ericwouds@gmail.com> wrote:
+
+> Add driver instances for Clause 45 communication with the RTL8221B/8251B.
 > 
-> Hyperv could free decrypted/shared pages if set_memory_encrypted() fails.
-
-"Hyper-V" throughout.
-
-> Leak the pages if this happens.
+> This is used by Clause 45 only accessible PHY's on several sfp modules,
+> which are using RollBall protocol.
 > 
-> Only compile tested.
-> 
-> Cc: "K. Y. Srinivasan" <kys@microsoft.com>
-> Cc: Haiyang Zhang <haiyangz@microsoft.com>
-> Cc: Wei Liu <wei.liu@kernel.org>
-> Cc: Dexuan Cui <decui@microsoft.com>
-> Cc: linux-hyperv@vger.kernel.org
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> ---
->  drivers/hv/connection.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/hv/connection.c b/drivers/hv/connection.c
-> index 3cabeeabb1ca..e39493421bbb 100644
-> --- a/drivers/hv/connection.c
-> +++ b/drivers/hv/connection.c
-> @@ -315,6 +315,7 @@ int vmbus_connect(void)
->  
->  void vmbus_disconnect(void)
->  {
-> +	int ret;
->  	/*
->  	 * First send the unload request to the host.
->  	 */
-> @@ -337,11 +338,13 @@ void vmbus_disconnect(void)
->  		vmbus_connection.int_page = NULL;
->  	}
->  
-> -	set_memory_encrypted((unsigned long)vmbus_connection.monitor_pages[0], 1);
-> -	set_memory_encrypted((unsigned long)vmbus_connection.monitor_pages[1], 1);
-> +	ret = set_memory_encrypted((unsigned long)vmbus_connection.monitor_pages[0], 1);
-> +	ret |= set_memory_encrypted((unsigned long)vmbus_connection.monitor_pages[1], 1);
->  
-> -	hv_free_hyperv_page(vmbus_connection.monitor_pages[0]);
-> -	hv_free_hyperv_page(vmbus_connection.monitor_pages[1]);
-> +	if (!ret) {
-> +		hv_free_hyperv_page(vmbus_connection.monitor_pages[0]);
-> +		hv_free_hyperv_page(vmbus_connection.monitor_pages[1]);
-> +	}
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
 
-This silently leaks the pages if set_memory_encrypted() fails.  I think
-there should print some warning or error messages here.
+Hi Eric,
 
-Thanks,
-Wei.
+this patch seems to be a squash of patches 10, 11 and 12 from my series
+  https://lore.kernel.org/netdev/20231220155518.15692-1-kabel@kernel.org/
+and then modified, if I am looking correctly.
 
->  	vmbus_connection.monitor_pages[0] = NULL;
->  	vmbus_connection.monitor_pages[1] = NULL;
->  }
-> -- 
-> 2.34.1
-> 
+If that is the case, please set me as the author and add a mention of
+how you changed it before your signed-off-by line, similar to how it is
+done in patch 1/6.
+
+Marek
 
