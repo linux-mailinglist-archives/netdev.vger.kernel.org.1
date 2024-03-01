@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-76647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D11AE86E6FA
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:15:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C18D386E6FB
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:15:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDF6F1C228C3
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:14:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 479BE287B0E
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69A5EBE76;
-	Fri,  1 Mar 2024 17:14:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60AA0F500;
+	Fri,  1 Mar 2024 17:14:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QBWHhVZF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JE+AAosB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9418E883B
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 17:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF956FC3
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 17:14:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709313285; cv=none; b=mAdvCrOVe7OWorkb90eKex/a3j47cC+pYooZJ0423pzVV8CS+dcEXjARNmBLeN3fTj9OhSvY/IPvQEDWqzhNO8ZREIRTFZeqIpX5fGlAxEuw9/1BTUnV54P3bO8SrD44eYYdQ17l541wyh4t7Eo3SnqbFPCjfxmE9xCd7wRiqaE=
+	t=1709313286; cv=none; b=M6ZFy7HR98yBbORWn9ZDWvPlZrA9jnvi1bfbxq2rKW4p+o0Vt4zlL4XHb9j6h3+dPdF/9ndVTQX1SV8XvV8CVpsiwz/pKjQCIfkusyRa2QwEuzRTdzkVapHCwdxyHvzeUZhlnagUzUMDcnDYOB0pE5jt+PgAF9LT5YleMtO/ziQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709313285; c=relaxed/simple;
-	bh=ITuzUrJ3LP04wRnLQqcNN+gf5uuq5gxvhzZLVz1+Jo8=;
+	s=arc-20240116; t=1709313286; c=relaxed/simple;
+	bh=xkaHrcLkpSmNxGh5grebGCaGBvNuRiuDh19PT8gcvII=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gdFRPqTcb9m27YvVIehEDzcve1BBax4HL1Sj2gsqVnrHoiD01+7P5pdzW794T4RrW9RPjZsxS1nDxvzLb0VIzwWUbmLsji2AqwJQD2lEQ5J/DrHseCy6heO00T6XrguokNtQ0xx9W0VRQDGiZviZEkhLBfYvmBtbdj+R0WJ0GUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QBWHhVZF; arc=none smtp.client-ip=209.85.128.48
+	 MIME-Version; b=gxgqfjJgSHt/3N6rKc0VD/HinJbUeBxMPjqyFwnICtt84hzLRbwj/jWK9nX5uEyXS/snq4ZpaObjANXEXsGz4jfWucZ+E56siOvkewGGWcpaKfCq0pchMNw2TCsgLjOkMLRZLPNC6/XVYOw7a1o5jPa1andvxzGDoAhLf/XwX58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JE+AAosB; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-412a9e9c776so21170015e9.0
-        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 09:14:43 -0800 (PST)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-412c23551e2so10548535e9.1
+        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 09:14:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709313281; x=1709918081; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1709313282; x=1709918082; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3dwjYerr/y8Vv41J2to9nLIRNF2G1qLwh4ctTCr/G/o=;
-        b=QBWHhVZFKtp0j1w0QFxr9+3o+H5eIPd9+uddJ280BSa8VLuZPjxDt0yziV06qHGBRx
-         77PewdJZbXXxmzQCt7k585iEEwx57a/QtDEJB1GYFGFrHbjvsP5ZG6W9Bmf/e7LrE5s1
-         odUlzfaJZLSFd733z2z8v5Xs16ICL8cfspJrRx3szZXfDvT0cRuiP2ePfqjKdeY2fjtt
-         tM1LY60KCkCEUMXoMiWoBptvEN9md9S04jPbhCK8vV7fDqOfPWb4dBLkYyOCsDlo8VEK
-         2mL9gwqybY/pOFQenQ+toh9XFJeO8IvWiGuI1YBLIikyq1FkEQITl3aRicuOXd1CpEQz
-         bIoA==
+        bh=0DQDjaCr/OkAn7DTXR1QZoJd6CRz/IrrXKz+pjcqAdU=;
+        b=JE+AAosB3UANmJyPO6mHGHtXve/0lgtc9sax93qas4QQgd2tAyUX3x91JPF2NnpLJ9
+         RpHRzdznWxuwPMw0geHqX1VSYQXU2k/HVzuxrcfxKK6IxxP7pGlJ63MG09aqJ9l2OrkP
+         TlWJeaiMIiodIEcO1VBaZlFrBZ3YX+bxW5EmwwyYZ8RDf6dLw3MrcHgZMwXWsMEiqGp6
+         pQ+VbWPeApsD8AL3hxPL7ELvoB3GuvIgqDZDP/Mwzm3UfnCf7p4cTHDUrqsgEmqgG/8U
+         FUCaX+bjYFCWVN4/2eFRzkxr+VJj4bHAJwBkSNzr7OPeylpGRJtbjem0wsWJYaHQd1H4
+         Wj+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709313281; x=1709918081;
+        d=1e100.net; s=20230601; t=1709313282; x=1709918082;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3dwjYerr/y8Vv41J2to9nLIRNF2G1qLwh4ctTCr/G/o=;
-        b=irqM1GBWnpaRI3T8n9xEdsHEppkow7KF6uF7PvXVVjv/Pas+inkF7BqO0Py1yuP5In
-         GEFDxxEXbsMYwQIkaChlSJoJqNnrLDM6ASBa7VDtXaNDryTxAhOgsVVNQSWm8/dzI7Eu
-         OP+6i3x5h19EqfudqiwF8uDmhYcOGc9HxobNJ3i5FUPp/B8IRuzcURwQOElremqa3WMD
-         YsZwUD20pEYDXSfqdex9eBiFQJ0Jrvqof2rUsTOcx8wQayq+ChdCJcypjSx5SRXBp8Fn
-         mKWVmHLphF2NAY+uRrWf2mdvOXrvJDZvdHbdB/D3nQBCIyREpHtUY9JeG0EbibAesnJL
-         nxFA==
-X-Gm-Message-State: AOJu0YxmXJOagobi6o2aWZHDqD0T7hhOR2v1Scm3LeFmp2/VofOTRco1
-	ac0nrFZJMgYCDHZfoZr/9kUyM1EsOEFDeGAk8xr357Vbzgxn9I65GIaA/xfJJRE=
-X-Google-Smtp-Source: AGHT+IHbXytC+GSMu9Y0ikZKwWS7Wf+ypPJ4inCvhoA2hs+gCwLkTgKX+oheVUizuTeSvGOYOg0Dtw==
-X-Received: by 2002:a05:600c:4fc6:b0:412:b237:346e with SMTP id o6-20020a05600c4fc600b00412b237346emr2744383wmq.20.1709313281564;
-        Fri, 01 Mar 2024 09:14:41 -0800 (PST)
+        bh=0DQDjaCr/OkAn7DTXR1QZoJd6CRz/IrrXKz+pjcqAdU=;
+        b=LjNGXi+nZQi6Hc5djmDPW/CIf8aGo5VSryjZ7fmhP/juHyNTTdAcG34vZQFK1H2IqI
+         pAbezXguXs3WcysDE4P3P+21P8K0w2FQSqFeFTthGCBGkndeoJPNvGm2fVcRh5ZrBOMM
+         USxwFaYn4Bo0iovU9QeCMXJC0/zEqaU5xW5anFfQgxOxcBP8Oldhvga7vLWWGvmplGIW
+         3uCHI28WGoA1vsRPEu7jjosjTimFRsImdzeBmTddq04aKMZdbOoGMqOdF9LKFrRL8Ehz
+         6DDOfwJGjTzFlwXKaLZ0UaOcVnoy6twXWIb9rVfkncgxe0K4JnhbxOeRaGMoD9sWMAwT
+         lOSw==
+X-Gm-Message-State: AOJu0YyWcXtaVx72eC9ZC1FAzwgMAWa/HgE2fzyoX0spN4Sxss5/uQoe
+	64Sx2jwcBofobdnxJKrg4JXAFJ7EmVuK2EfqMhItYIxDzQTG33oqV/Ksa3tgjBU=
+X-Google-Smtp-Source: AGHT+IHl9bpJZBXE57H3kE82DYOhYbh1INMXrBvv8KoZzIGE9RIQiVRL3nKx5W2shqNBsOp6xzIA1A==
+X-Received: by 2002:a05:600c:474d:b0:412:c285:1091 with SMTP id w13-20020a05600c474d00b00412c2851091mr2864680wmo.7.1709313282507;
+        Fri, 01 Mar 2024 09:14:42 -0800 (PST)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:c06e:e547:41d1:e2b2])
-        by smtp.gmail.com with ESMTPSA id b8-20020a05600003c800b0033e17ff60e4sm3387556wrg.7.2024.03.01.09.14.40
+        by smtp.gmail.com with ESMTPSA id b8-20020a05600003c800b0033e17ff60e4sm3387556wrg.7.2024.03.01.09.14.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 09:14:40 -0800 (PST)
+        Fri, 01 Mar 2024 09:14:42 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -77,9 +77,9 @@ To: netdev@vger.kernel.org,
 	Stanislav Fomichev <sdf@google.com>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1 3/4] tools/net/ynl: Extend array-nest for multi level nesting
-Date: Fri,  1 Mar 2024 17:14:30 +0000
-Message-ID: <20240301171431.65892-4-donald.hunter@gmail.com>
+Subject: [PATCH net-next v1 4/4] doc/netlink/specs: Add spec for nlctrl netlink family
+Date: Fri,  1 Mar 2024 17:14:31 +0000
+Message-ID: <20240301171431.65892-5-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240301171431.65892-1-donald.hunter@gmail.com>
 References: <20240301171431.65892-1-donald.hunter@gmail.com>
@@ -91,84 +91,221 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The nlctrl family uses 2 levels of array nesting for policy attributes.
-Add a 'nest-depth' property to genetlink-legacy and extend ynl to use
-it.
+Add a spec for the nlctrl family.
+
+Example usage:
+
+./tools/net/ynl/cli.py \
+    --spec Documentation/netlink/specs/nlctrl.yaml \
+    --do getfamily --json '{"family-name": "nlctrl"}'
+
+./tools/net/ynl/cli.py \
+    --spec Documentation/netlink/specs/nlctrl.yaml \
+    --dump getpolicy --json '{"family-name": "nlctrl"}'
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- Documentation/netlink/genetlink-legacy.yaml | 3 +++
- tools/net/ynl/lib/nlspec.py                 | 2 ++
- tools/net/ynl/lib/ynl.py                    | 9 ++++++---
- 3 files changed, 11 insertions(+), 3 deletions(-)
+ Documentation/netlink/specs/nlctrl.yaml | 191 ++++++++++++++++++++++++
+ 1 file changed, 191 insertions(+)
+ create mode 100644 Documentation/netlink/specs/nlctrl.yaml
 
-diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
-index 938703088306..872c76065f1b 100644
---- a/Documentation/netlink/genetlink-legacy.yaml
-+++ b/Documentation/netlink/genetlink-legacy.yaml
-@@ -261,6 +261,9 @@ properties:
-               struct:
-                 description: Name of the struct type used for the attribute.
-                 type: string
-+              nest-depth:
-+                description: Depth of nesting for an array-nest, defaults to 1.
-+                type: integer
-               # End genetlink-legacy
- 
-       # Make sure name-prefix does not appear in subsets (subsets inherit naming)
-diff --git a/tools/net/ynl/lib/nlspec.py b/tools/net/ynl/lib/nlspec.py
-index fbce52395b3b..50e8447f089a 100644
---- a/tools/net/ynl/lib/nlspec.py
-+++ b/tools/net/ynl/lib/nlspec.py
-@@ -161,6 +161,7 @@ class SpecAttr(SpecElement):
-         sub_message   string, name of sub message type
-         selector      string, name of attribute used to select
-                       sub-message type
-+        nest_depth    integer, depth of array nesting
- 
-         is_auto_scalar bool, attr is a variable-size scalar
-     """
-@@ -178,6 +179,7 @@ class SpecAttr(SpecElement):
-         self.display_hint = yaml.get('display-hint')
-         self.sub_message = yaml.get('sub-message')
-         self.selector = yaml.get('selector')
-+        self.nest_depth = yaml.get('nest-depth', 1)
- 
-         self.is_auto_scalar = self.type == "sint" or self.type == "uint"
- 
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 29262505a3f2..efceea9433f2 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -556,14 +556,17 @@ class YnlFamily(SpecFamily):
-                 decoded = self._formatted_string(decoded, attr_spec.display_hint)
-         return decoded
- 
--    def _decode_array_nest(self, attr, attr_spec):
-+    def _decode_array_nest(self, attr, attr_spec, depth):
-         decoded = []
-         offset = 0
-         while offset < len(attr.raw):
-             item = NlAttr(attr.raw, offset)
-             offset += item.full_len
- 
--            subattrs = self._decode(NlAttrs(item.raw), attr_spec['nested-attributes'])
-+            if depth > 1:
-+                subattrs = self._decode_array_nest(item, attr_spec, depth - 1)
-+            else:
-+                subattrs = self._decode(NlAttrs(item.raw), attr_spec['nested-attributes'])
-             decoded.append({ item.type: subattrs })
-         return decoded
- 
-@@ -649,7 +652,7 @@ class YnlFamily(SpecFamily):
-                 if 'enum' in attr_spec:
-                     decoded = self._decode_enum(decoded, attr_spec)
-             elif attr_spec["type"] == 'array-nest':
--                decoded = self._decode_array_nest(attr, attr_spec)
-+                decoded = self._decode_array_nest(attr, attr_spec, attr_spec.nest_depth)
-             elif attr_spec["type"] == 'bitfield32':
-                 value, selector = struct.unpack("II", attr.raw)
-                 if 'enum' in attr_spec:
+diff --git a/Documentation/netlink/specs/nlctrl.yaml b/Documentation/netlink/specs/nlctrl.yaml
+new file mode 100644
+index 000000000000..9b35a390ae96
+--- /dev/null
++++ b/Documentation/netlink/specs/nlctrl.yaml
+@@ -0,0 +1,191 @@
++# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
++
++name: nlctrl
++
++protocol: genetlink-legacy
++
++doc: |
++  Genetlink control.
++
++definitions:
++  -
++    name: op-flags
++    type: flags
++    entries:
++      - admin-perm
++      - cmd-cap-do
++      - cmd-cap-dump
++      - cmd-cap-haspol
++      - uns-admin-perm
++  -
++    name: attr-type
++    type: enum
++    entries:
++      - flag
++      - u8
++      - u16
++      - u32
++      - u64
++      - s8
++      - s16
++      - s32
++      - s64
++      - binary
++      - string
++      - nul-string
++      - nested
++      - nested-array
++      - bitfield32
++      - sint
++      - uint
++
++attribute-sets:
++  -
++    name: ctrl-attrs
++    attributes:
++      -
++        name: family-id
++        type: u16
++      -
++        name: family-name
++        type: string
++      -
++        name: version
++        type: u32
++      -
++        name: hdrsize
++        type: u32
++      -
++        name: maxattr
++        type: u32
++      -
++        name: ops
++        type: array-nest
++        nested-attributes: op-attrs
++      -
++        name: mcast-groups
++        type: array-nest
++        nested-attributes: mcast-group-attrs
++      -
++        name: policy
++        type: array-nest
++        nest-depth: 2
++        nested-attributes: policy-attrs
++      -
++        name: op-policy
++        type: array-nest
++        nested-attributes: op-policy-attrs
++      -
++        name: op
++        type: u32
++  -
++    name: mcast-group-attrs
++    attributes:
++      -
++        name: name
++        type: string
++      -
++        name: id
++        type: u32
++  -
++    name: op-attrs
++    attributes:
++      -
++        name: id
++        type: u32
++      -
++        name: flags
++        type: u32
++        enum: op-flags
++        enum-as-flags: true
++  -
++    name: policy-attrs
++    attributes:
++      -
++        name: type
++        type: u32
++        enum: attr-type
++      -
++        name: min-value-s
++        type: s64
++      -
++        name: max-value-s
++        type: s64
++      -
++        name: min-value-u
++        type: u64
++      -
++        name: max-value-u
++        type: u64
++      -
++        name: min-length
++        type: u32
++      -
++        name: max-length
++        type: u32
++      -
++        name: policy-idx
++        type: u32
++      -
++        name: policy-maxtype
++        type: u32
++      -
++        name: bitfield32-mask
++        type: u32
++      -
++        name: mask
++        type: u64
++      -
++        name: pad
++        type: pad
++  -
++    name: op-policy-attrs
++    attributes:
++      -
++        name: do
++        type: u32
++      -
++        name: dump
++        type: u32
++
++operations:
++  enum-model: directional
++  list:
++    -
++      name: getfamily
++      doc: Get / dump genetlink families
++      attribute-set: ctrl-attrs
++      do:
++        request:
++          value: 3
++          attributes:
++            - family-name
++        reply: &all_attrs
++          value: 1
++          attributes:
++            - family-id
++            - family-name
++            - hdrsize
++            - maxattr
++            - mcast-groups
++            - ops
++            - version
++      dump:
++        reply: *all_attrs
++    -
++      name: getpolicy
++      doc: Get / dump genetlink policies
++      attribute-set: ctrl-attrs
++      dump:
++        request:
++          value: 10
++          attributes:
++            - family-name
++            - family-id
++            - op
++        reply:
++          value: 10
++          attributes:
++            - family-id
++            - op-policy
++            - policy
 -- 
 2.42.0
 
