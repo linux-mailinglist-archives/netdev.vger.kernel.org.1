@@ -1,143 +1,206 @@
-Return-Path: <netdev+bounces-76522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12F6186E094
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 12:46:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E026486E0B5
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 12:53:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DA691F25185
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 11:46:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51C1B2830E3
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 11:53:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD0476CDC0;
-	Fri,  1 Mar 2024 11:45:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F1F26D1B4;
+	Fri,  1 Mar 2024 11:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QF12nm7S"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1FF20315;
-	Fri,  1 Mar 2024 11:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5E020315
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 11:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709293559; cv=none; b=rbTQTgUwOhBNvo0Chqe9TUA8svX0a3TbAJ4m3MBOOwtSDhY+Ae5++MoZLKcQLcIb8fhhYwEl5AVRqguS2casJAR1sSXJpUjvA9aPGrSodOxgKJpEeBmLjfkCHZUn4SnkACXjc6oHpooityF4GOcs/E5PNFrPcBE9YDD3+pO3my0=
+	t=1709293996; cv=none; b=rr4XsJO1N11CflzzOvuP3kRZsvV2b5n0tQtv8C6DMf4GMCCZmqyZzK6JDvsWDrWmNNYGynbMDMpxkh/eQO1Ta1ZFL/tHobgh8a3JXnAimRCxPoR9b6PJU/0YQ+Ynec/NPcMCQUd1tZZkveM8j2cLF/Yr1Qjw5XHBpDFexxEQTp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709293559; c=relaxed/simple;
-	bh=7euRu9gC1qZwJ0nCZHbyU4FyH2aqHWlDJQgi7OX/OZw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=qvTtws3jJwIrnkmONS0/Y9E9ekLMl70iOhjF7HtYjVhCavohUXlSsRivPWrSrnxTji1/PINW8ewoxjN4e/hmywDd6QJ9j17G/daz9XGIottzWxBz1pOEaMlmUhmDjquEVMDfmu3mLVyK9K/Aev7rCsqOamARon8/fd38TtkpmmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TmR7D5q2Bz2Bf5g;
-	Fri,  1 Mar 2024 19:43:36 +0800 (CST)
-Received: from kwepemd100001.china.huawei.com (unknown [7.221.188.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 95F5514011A;
-	Fri,  1 Mar 2024 19:45:53 +0800 (CST)
-Received: from kwepemd100012.china.huawei.com (7.221.188.214) by
- kwepemd100001.china.huawei.com (7.221.188.240) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 1 Mar 2024 19:45:53 +0800
-Received: from dggpemm500008.china.huawei.com (7.185.36.136) by
- kwepemd100012.china.huawei.com (7.221.188.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 1 Mar 2024 19:45:52 +0800
-Received: from dggpemm500008.china.huawei.com ([7.185.36.136]) by
- dggpemm500008.china.huawei.com ([7.185.36.136]) with mapi id 15.01.2507.035;
- Fri, 1 Mar 2024 19:45:52 +0800
-From: wangyunjian <wangyunjian@huawei.com>
-To: Paolo Abeni <pabeni@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
+	s=arc-20240116; t=1709293996; c=relaxed/simple;
+	bh=WpidZeAtZ+YgQaVLdxWuklMA1DRtSXB3dUMvzxcxpvM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RTl0ONMXUzDPZ65pgRcuJXSWHzBzm1azA/KMytDpyQOV0x/iQV84mbigIboJYeKAeFeSaQA82utkT+ZvaoHsDWAZ4+xNRkgaXmhzDbJURDkIgji+fXthV9/7Ywb66ynalkZdT0ywyn4i9L5bqeIei8YFTLmmmeY3ZBPAcJSjeDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QF12nm7S; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709293993;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sXYuCfdTj1urbCJSi5THRKssGZntXNDUJ+IF7YDUqaY=;
+	b=QF12nm7S/cKwqW20/nXJE60YJXzcXAAho4dTRwOaN7KZfLwYh0rtusqAnwZENQ8B1Wkl95
+	pR6KqGSt9e/tAW4E4SoH3orJNkLnyqtcJtSnscyPIQoBTab6LA0TtXwd9lhMm7ci273uuS
+	d+mrVg3c8pgBozX1PeWKvA/lRkoN88Y=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-504-mTj14_O-NAOCNg3mqUzQrA-1; Fri, 01 Mar 2024 06:53:11 -0500
+X-MC-Unique: mTj14_O-NAOCNg3mqUzQrA-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-559391de41bso2169189a12.3
+        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 03:53:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709293991; x=1709898791;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sXYuCfdTj1urbCJSi5THRKssGZntXNDUJ+IF7YDUqaY=;
+        b=wMnIF0GG4qQ4A1e15/KQsjQ808NhLpNxjo/ATExf4/22BYEYUCA7MrjlPIY0tTsKTV
+         ELqWZF2Dvs2qHCikBihOPZu+hhN9AMEMbskm8qC+kNk0U8LHR8/vyUi9wej/ysOs1NtL
+         EzdDhyK+PFCgSjC1GnX8e373Br+siM0w/nwG6EDQ4lJu6hfo2PBt1JoMvRYLKh+hfS3k
+         jFo4TkftHInYHor+YNHy+O3PynjKY1BlJZhEFDFRw7UG3eavi3rHw4028S3kKmfUvJ6+
+         4gB5TySXtrvn4OWSW+4VrvbN3Utw4K7H16ldLC7QC34janxy/qZTtbM0gEKTELwfzv+a
+         Y1UQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVa70vfW4uns/6dEc3GecLI6ahgJcDYpoBMZBVvN23jeOC7JBBg+4HCXnyAZANq14lunAVGsqLXlw1lkI0PrMEA0qIwGVpp
+X-Gm-Message-State: AOJu0YzRLPQTE9zo+XlPOH9v3ZTW7dAkGaoQuNIPBM58Vgu2Y39GP1c9
+	M4ymIaaKDX0jrd4frYI6slkexzl4ukIndL90WiNJDSpCvbuWulZQ++ypmIO/vCOtvDIlKnhBSTx
+	8VRwHtJ8mK+Gdc0Z8CHBJfD9G53jqJ3pcaAm5+TOJPPsJJ4QLblbd9w==
+X-Received: by 2002:a50:a411:0:b0:566:47ee:b8b4 with SMTP id u17-20020a50a411000000b0056647eeb8b4mr1225110edb.17.1709293990834;
+        Fri, 01 Mar 2024 03:53:10 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE1vmpvGelrIAwSR9YtmqYMH53YWKi9ocFIRHHKWtTOAKDOP50IotWgGwt5cBRTSNWEE/hvcg==
+X-Received: by 2002:a50:a411:0:b0:566:47ee:b8b4 with SMTP id u17-20020a50a411000000b0056647eeb8b4mr1225097edb.17.1709293990541;
+        Fri, 01 Mar 2024 03:53:10 -0800 (PST)
+Received: from redhat.com ([2.52.158.48])
+        by smtp.gmail.com with ESMTPSA id d18-20020a056402001200b00566d43ed4dasm439183edu.68.2024.03.01.03.53.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Mar 2024 03:53:09 -0800 (PST)
+Date: Fri, 1 Mar 2024 06:53:05 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: wangyunjian <wangyunjian@huawei.com>
+Cc: Paolo Abeni <pabeni@redhat.com>,
 	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "bjorn@kernel.org" <bjorn@kernel.org>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"bjorn@kernel.org" <bjorn@kernel.org>,
 	"magnus.karlsson@intel.com" <magnus.karlsson@intel.com>,
 	"maciej.fijalkowski@intel.com" <maciej.fijalkowski@intel.com>,
-	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>, "davem@davemloft.net"
-	<davem@davemloft.net>
-CC: "bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, xudingke
-	<xudingke@huawei.com>, "liwei (DT)" <liwei395@huawei.com>
-Subject: RE: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
-Thread-Topic: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
-Thread-Index: AQHaajYcNkJKJoTBfEqyMPzDlwSi+bEgpeYAgAIJPRA=
-Date: Fri, 1 Mar 2024 11:45:52 +0000
-Message-ID: <223aeca6435342ec8a4d57c959c23303@huawei.com>
+	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	xudingke <xudingke@huawei.com>, "liwei (DT)" <liwei395@huawei.com>
+Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
+Message-ID: <20240301065141-mutt-send-email-mst@kernel.org>
 References: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
  <7d478cb842e28094f4d6102e593e3de25ab27dfe.camel@redhat.com>
-In-Reply-To: <7d478cb842e28094f4d6102e593e3de25ab27dfe.camel@redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ <223aeca6435342ec8a4d57c959c23303@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <223aeca6435342ec8a4d57c959c23303@huawei.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBBYmVuaSBbbWFpbHRv
-OnBhYmVuaUByZWRoYXQuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwgRmVicnVhcnkgMjksIDIwMjQg
-NzoxMyBQTQ0KPiBUbzogd2FuZ3l1bmppYW4gPHdhbmd5dW5qaWFuQGh1YXdlaS5jb20+OyBtc3RA
-cmVkaGF0LmNvbTsNCj4gd2lsbGVtZGVicnVpam4ua2VybmVsQGdtYWlsLmNvbTsgamFzb3dhbmdA
-cmVkaGF0LmNvbTsga3ViYUBrZXJuZWwub3JnOw0KPiBiam9ybkBrZXJuZWwub3JnOyBtYWdudXMu
-a2FybHNzb25AaW50ZWwuY29tOyBtYWNpZWouZmlqYWxrb3dza2lAaW50ZWwuY29tOw0KPiBqb25h
-dGhhbi5sZW1vbkBnbWFpbC5jb207IGRhdmVtQGRhdmVtbG9mdC5uZXQNCj4gQ2M6IGJwZkB2Z2Vy
-Lmtlcm5lbC5vcmc7IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7DQo+IGxpbnV4LWtlcm5lbEB2Z2Vy
-Lmtlcm5lbC5vcmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmc7DQo+IHZpcnR1YWxpemF0aW9uQGxpc3Rz
-LmxpbnV4LmRldjsgeHVkaW5na2UgPHh1ZGluZ2tlQGh1YXdlaS5jb20+OyBsaXdlaSAoRFQpDQo+
-IDxsaXdlaTM5NUBodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIG5ldC1uZXh0IHYy
-IDMvM10gdHVuOiBBRl9YRFAgVHggemVyby1jb3B5IHN1cHBvcnQNCj4gDQo+IE9uIFdlZCwgMjAy
-NC0wMi0yOCBhdCAxOTowNSArMDgwMCwgWXVuamlhbiBXYW5nIHdyb3RlOg0KPiA+IEBAIC0yNjYx
-LDYgKzI3NzYsNTQgQEAgc3RhdGljIGludCB0dW5fcHRyX3BlZWtfbGVuKHZvaWQgKnB0cikNCj4g
-PiAgCX0NCj4gPiAgfQ0KPiA+DQo+ID4gK3N0YXRpYyB2b2lkIHR1bl9wZWVrX3hzayhzdHJ1Y3Qg
-dHVuX2ZpbGUgKnRmaWxlKSB7DQo+ID4gKwlzdHJ1Y3QgeHNrX2J1ZmZfcG9vbCAqcG9vbDsNCj4g
-PiArCXUzMiBpLCBiYXRjaCwgYnVkZ2V0Ow0KPiA+ICsJdm9pZCAqZnJhbWU7DQo+ID4gKw0KPiA+
-ICsJaWYgKCFwdHJfcmluZ19lbXB0eSgmdGZpbGUtPnR4X3JpbmcpKQ0KPiA+ICsJCXJldHVybjsN
-Cj4gPiArDQo+ID4gKwlzcGluX2xvY2soJnRmaWxlLT5wb29sX2xvY2spOw0KPiA+ICsJcG9vbCA9
-IHRmaWxlLT54c2tfcG9vbDsNCj4gPiArCWlmICghcG9vbCkgew0KPiA+ICsJCXNwaW5fdW5sb2Nr
-KCZ0ZmlsZS0+cG9vbF9sb2NrKTsNCj4gPiArCQlyZXR1cm47DQo+ID4gKwl9DQo+ID4gKw0KPiA+
-ICsJaWYgKHRmaWxlLT5uYl9kZXNjcykgew0KPiA+ICsJCXhza190eF9jb21wbGV0ZWQocG9vbCwg
-dGZpbGUtPm5iX2Rlc2NzKTsNCj4gPiArCQlpZiAoeHNrX3VzZXNfbmVlZF93YWtldXAocG9vbCkp
-DQo+ID4gKwkJCXhza19zZXRfdHhfbmVlZF93YWtldXAocG9vbCk7DQo+ID4gKwl9DQo+ID4gKw0K
-PiA+ICsJc3Bpbl9sb2NrKCZ0ZmlsZS0+dHhfcmluZy5wcm9kdWNlcl9sb2NrKTsNCj4gPiArCWJ1
-ZGdldCA9IG1pbl90KHUzMiwgdGZpbGUtPnR4X3Jpbmcuc2l6ZSwgVFVOX1hEUF9CQVRDSCk7DQo+
-ID4gKw0KPiA+ICsJYmF0Y2ggPSB4c2tfdHhfcGVla19yZWxlYXNlX2Rlc2NfYmF0Y2gocG9vbCwg
-YnVkZ2V0KTsNCj4gPiArCWlmICghYmF0Y2gpIHsNCj4gDQo+IFRoaXMgYnJhbmNoIGxvb2tzIGxp
-a2UgYW4gdW5uZWVkZWQgIm9wdGltaXphdGlvbiIuIFRoZSBnZW5lcmljIGxvb3AgYmVsb3cNCj4g
-c2hvdWxkIGhhdmUgdGhlIHNhbWUgZWZmZWN0IHdpdGggbm8gbWVhc3VyYWJsZSBwZXJmIGRlbHRh
-IC0gYW5kIHNtYWxsZXIgY29kZS4NCj4gSnVzdCByZW1vdmUgdGhpcy4NCj4gDQo+ID4gKwkJdGZp
-bGUtPm5iX2Rlc2NzID0gMDsNCj4gPiArCQlzcGluX3VubG9jaygmdGZpbGUtPnR4X3JpbmcucHJv
-ZHVjZXJfbG9jayk7DQo+ID4gKwkJc3Bpbl91bmxvY2soJnRmaWxlLT5wb29sX2xvY2spOw0KPiA+
-ICsJCXJldHVybjsNCj4gPiArCX0NCj4gPiArDQo+ID4gKwl0ZmlsZS0+bmJfZGVzY3MgPSBiYXRj
-aDsNCj4gPiArCWZvciAoaSA9IDA7IGkgPCBiYXRjaDsgaSsrKSB7DQo+ID4gKwkJLyogRW5jb2Rl
-IHRoZSBYRFAgREVTQyBmbGFnIGludG8gbG93ZXN0IGJpdCBmb3IgY29uc3VtZXIgdG8gZGlmZmVy
-DQo+ID4gKwkJICogWERQIGRlc2MgZnJvbSBYRFAgYnVmZmVyIGFuZCBza19idWZmLg0KPiA+ICsJ
-CSAqLw0KPiA+ICsJCWZyYW1lID0gdHVuX3hkcF9kZXNjX3RvX3B0cigmcG9vbC0+dHhfZGVzY3Nb
-aV0pOw0KPiA+ICsJCS8qIFRoZSBidWRnZXQgbXVzdCBiZSBsZXNzIHRoYW4gb3IgZXF1YWwgdG8g
-dHhfcmluZy5zaXplLA0KPiA+ICsJCSAqIHNvIGVucXVldWluZyB3aWxsIG5vdCBmYWlsLg0KPiA+
-ICsJCSAqLw0KPiA+ICsJCV9fcHRyX3JpbmdfcHJvZHVjZSgmdGZpbGUtPnR4X3JpbmcsIGZyYW1l
-KTsNCj4gPiArCX0NCj4gPiArCXNwaW5fdW5sb2NrKCZ0ZmlsZS0+dHhfcmluZy5wcm9kdWNlcl9s
-b2NrKTsNCj4gPiArCXNwaW5fdW5sb2NrKCZ0ZmlsZS0+cG9vbF9sb2NrKTsNCj4gDQo+IE1vcmUg
-cmVsYXRlZCB0byB0aGUgZ2VuZXJhbCBkZXNpZ246IGl0IGxvb2tzIHdyb25nLiBXaGF0IGlmDQo+
-IGdldF9yeF9idWZzKCkgd2lsbCBmYWlsIChFTk9CVUYpIGFmdGVyIHN1Y2Nlc3NmdWwgcGVla2lu
-Zz8gV2l0aCBubyBtb3JlDQo+IGluY29taW5nIHBhY2tldHMsIGxhdGVyIHBlZWsgd2lsbCByZXR1
-cm4gMCBhbmQgaXQgbG9va3MgbGlrZSB0aGF0IHRoZQ0KPiBoYWxmLXByb2Nlc3NlZCBwYWNrZXRz
-IHdpbGwgc3RheSBpbiB0aGUgcmluZyBmb3JldmVyPz8/DQo+IA0KPiBJIHRoaW5rIHRoZSAncmlu
-ZyBwcm9kdWNlJyBwYXJ0IHNob3VsZCBiZSBtb3ZlZCBpbnRvIHR1bl9kb19yZWFkKCkuDQoNCkN1
-cnJlbnRseSwgdGhlIHZob3N0LW5ldCBvYnRhaW5zIGEgYmF0Y2ggZGVzY3JpcHRvcnMvc2tfYnVm
-ZnMgZnJvbSB0aGUNCnB0cl9yaW5nIGFuZCBlbnF1ZXVlIHRoZSBiYXRjaCBkZXNjcmlwdG9ycy9z
-a19idWZmcyB0byB0aGUgdmlydHF1ZXVlJ3F1ZXVlLA0KYW5kIHRoZW4gY29uc3VtZXMgdGhlIGRl
-c2NyaXB0b3JzL3NrX2J1ZmZzIGZyb20gdGhlIHZpcnRxdWV1ZSdxdWV1ZSBpbg0Kc2VxdWVuY2Uu
-IEFzIGEgcmVzdWx0LCBUVU4gZG9lcyBub3Qga25vdyB3aGV0aGVyIHRoZSBiYXRjaCBkZXNjcmlw
-dG9ycyBoYXZlDQpiZWVuIHVzZWQgdXAsIGFuZCB0aHVzIGRvZXMgbm90IGtub3cgd2hlbiB0byBy
-ZXR1cm4gdGhlIGJhdGNoIGRlc2NyaXB0b3JzLg0KDQpTbywgSSB0aGluayBpdCdzIHJlYXNvbmFi
-bGUgdGhhdCB3aGVuIHZob3N0LW5ldCBjaGVja3MgcHRyX3JpbmcgaXMgZW1wdHksDQppdCBjYWxs
-cyBwZWVrX2xlbiB0byBnZXQgbmV3IHhzaydzIGRlc2NzIGFuZCByZXR1cm4gdGhlIGRlc2NyaXB0
-b3JzLg0KDQpUaGFua3MNCj4gDQo+IENoZWVycywNCj4gDQo+IFBhb2xvDQoNCg==
+On Fri, Mar 01, 2024 at 11:45:52AM +0000, wangyunjian wrote:
+> > -----Original Message-----
+> > From: Paolo Abeni [mailto:pabeni@redhat.com]
+> > Sent: Thursday, February 29, 2024 7:13 PM
+> > To: wangyunjian <wangyunjian@huawei.com>; mst@redhat.com;
+> > willemdebruijn.kernel@gmail.com; jasowang@redhat.com; kuba@kernel.org;
+> > bjorn@kernel.org; magnus.karlsson@intel.com; maciej.fijalkowski@intel.com;
+> > jonathan.lemon@gmail.com; davem@davemloft.net
+> > Cc: bpf@vger.kernel.org; netdev@vger.kernel.org;
+> > linux-kernel@vger.kernel.org; kvm@vger.kernel.org;
+> > virtualization@lists.linux.dev; xudingke <xudingke@huawei.com>; liwei (DT)
+> > <liwei395@huawei.com>
+> > Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
+> > 
+> > On Wed, 2024-02-28 at 19:05 +0800, Yunjian Wang wrote:
+> > > @@ -2661,6 +2776,54 @@ static int tun_ptr_peek_len(void *ptr)
+> > >  	}
+> > >  }
+> > >
+> > > +static void tun_peek_xsk(struct tun_file *tfile) {
+> > > +	struct xsk_buff_pool *pool;
+> > > +	u32 i, batch, budget;
+> > > +	void *frame;
+> > > +
+> > > +	if (!ptr_ring_empty(&tfile->tx_ring))
+> > > +		return;
+> > > +
+> > > +	spin_lock(&tfile->pool_lock);
+> > > +	pool = tfile->xsk_pool;
+> > > +	if (!pool) {
+> > > +		spin_unlock(&tfile->pool_lock);
+> > > +		return;
+> > > +	}
+> > > +
+> > > +	if (tfile->nb_descs) {
+> > > +		xsk_tx_completed(pool, tfile->nb_descs);
+> > > +		if (xsk_uses_need_wakeup(pool))
+> > > +			xsk_set_tx_need_wakeup(pool);
+> > > +	}
+> > > +
+> > > +	spin_lock(&tfile->tx_ring.producer_lock);
+> > > +	budget = min_t(u32, tfile->tx_ring.size, TUN_XDP_BATCH);
+> > > +
+> > > +	batch = xsk_tx_peek_release_desc_batch(pool, budget);
+> > > +	if (!batch) {
+> > 
+> > This branch looks like an unneeded "optimization". The generic loop below
+> > should have the same effect with no measurable perf delta - and smaller code.
+> > Just remove this.
+> > 
+> > > +		tfile->nb_descs = 0;
+> > > +		spin_unlock(&tfile->tx_ring.producer_lock);
+> > > +		spin_unlock(&tfile->pool_lock);
+> > > +		return;
+> > > +	}
+> > > +
+> > > +	tfile->nb_descs = batch;
+> > > +	for (i = 0; i < batch; i++) {
+> > > +		/* Encode the XDP DESC flag into lowest bit for consumer to differ
+> > > +		 * XDP desc from XDP buffer and sk_buff.
+> > > +		 */
+> > > +		frame = tun_xdp_desc_to_ptr(&pool->tx_descs[i]);
+> > > +		/* The budget must be less than or equal to tx_ring.size,
+> > > +		 * so enqueuing will not fail.
+> > > +		 */
+> > > +		__ptr_ring_produce(&tfile->tx_ring, frame);
+> > > +	}
+> > > +	spin_unlock(&tfile->tx_ring.producer_lock);
+> > > +	spin_unlock(&tfile->pool_lock);
+> > 
+> > More related to the general design: it looks wrong. What if
+> > get_rx_bufs() will fail (ENOBUF) after successful peeking? With no more
+> > incoming packets, later peek will return 0 and it looks like that the
+> > half-processed packets will stay in the ring forever???
+> > 
+> > I think the 'ring produce' part should be moved into tun_do_read().
+> 
+> Currently, the vhost-net obtains a batch descriptors/sk_buffs from the
+> ptr_ring and enqueue the batch descriptors/sk_buffs to the virtqueue'queue,
+> and then consumes the descriptors/sk_buffs from the virtqueue'queue in
+> sequence. As a result, TUN does not know whether the batch descriptors have
+> been used up, and thus does not know when to return the batch descriptors.
+> 
+> So, I think it's reasonable that when vhost-net checks ptr_ring is empty,
+> it calls peek_len to get new xsk's descs and return the descriptors.
+> 
+> Thanks
+
+What you need to think about is that if you peek, another call
+in parallel can get the same value at the same time.
+
+
+> > 
+> > Cheers,
+> > 
+> > Paolo
+> 
+
 
