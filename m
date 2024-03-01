@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-76646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D17886E6F9
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:14:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D11AE86E6FA
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:15:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFEAB1C21861
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:14:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDF6F1C228C3
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:14:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C2F4C9C;
-	Fri,  1 Mar 2024 17:14:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69A5EBE76;
+	Fri,  1 Mar 2024 17:14:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C8nOQpb6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QBWHhVZF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B195663
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 17:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9418E883B
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 17:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709313284; cv=none; b=O2TJ+grvEYsqNOs9iY+ksS+yYnqI/BJjwJwNEs2RDbxY6iukuvwZaYnOqlGJUN1T6T9lswOtrJt/r3TQCMeh/Nviw4qr1tOpNsRdaj4inwnEREaJ65udJnobNlezVTK3SWMblWFHR7AtmjNJG0eW/HmbXpppvfl/If03gKTyerk=
+	t=1709313285; cv=none; b=mAdvCrOVe7OWorkb90eKex/a3j47cC+pYooZJ0423pzVV8CS+dcEXjARNmBLeN3fTj9OhSvY/IPvQEDWqzhNO8ZREIRTFZeqIpX5fGlAxEuw9/1BTUnV54P3bO8SrD44eYYdQ17l541wyh4t7Eo3SnqbFPCjfxmE9xCd7wRiqaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709313284; c=relaxed/simple;
-	bh=bMK+HuEPPslYD2gVKITnQmNcq1JK/b+mMe9FIMAJg9E=;
+	s=arc-20240116; t=1709313285; c=relaxed/simple;
+	bh=ITuzUrJ3LP04wRnLQqcNN+gf5uuq5gxvhzZLVz1+Jo8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=llhdWWDlxPOF3ARjF9FxrU2/Fdr8mJuFfxuEqPDWEQD84tWGDlJHL5BxDZtLG7z3HdtglKEdZJj7xjB1jwKkjXzy9LWFnKQ4GFzhERS8pPCxlZpImUDezfteliwY5IMJHC0QPPLWADuX9OMdnJkCfQH2ZN2cwzaddP3Athu0vv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C8nOQpb6; arc=none smtp.client-ip=209.85.208.178
+	 MIME-Version; b=gdFRPqTcb9m27YvVIehEDzcve1BBax4HL1Sj2gsqVnrHoiD01+7P5pdzW794T4RrW9RPjZsxS1nDxvzLb0VIzwWUbmLsji2AqwJQD2lEQ5J/DrHseCy6heO00T6XrguokNtQ0xx9W0VRQDGiZviZEkhLBfYvmBtbdj+R0WJ0GUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QBWHhVZF; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d28464c554so29509191fa.3
-        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 09:14:42 -0800 (PST)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-412a9e9c776so21170015e9.0
+        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 09:14:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709313280; x=1709918080; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1709313281; x=1709918081; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oGy7I9gmi30fpuWsigLrpycA1+OS7TEwTIlqse2LMjo=;
-        b=C8nOQpb6MjXI29PBOhYPcqwRkAv6ddBYD/M2zUg80hBEz3uh5CaR88P0dLAO0Q5p7q
-         wSk918AIIgcSQf3IUOK8YKUuf0qEItdIwnJcjT3+D4KxdBDpBO2jro80vzqgPufHDKw+
-         5rSZjo+xIFhP3/BaPsAMY3QJ/4q+tW3Ze6r/1yX6f0dF2ycWfoWKypCUnEJiREctz8qm
-         nCTiU0cO9VA2nUt3zONYDkcxt2sHcO8hlN91PWpPDu/MM4Y9go681i3/Qak195bsvgEu
-         gXj5SIB5qBRfaZ5UhYu9zrBZpXN5uqvqP13bznkxi6ztvfsoNtOldo7BxbnXJEek/mE+
-         ll7A==
+        bh=3dwjYerr/y8Vv41J2to9nLIRNF2G1qLwh4ctTCr/G/o=;
+        b=QBWHhVZFKtp0j1w0QFxr9+3o+H5eIPd9+uddJ280BSa8VLuZPjxDt0yziV06qHGBRx
+         77PewdJZbXXxmzQCt7k585iEEwx57a/QtDEJB1GYFGFrHbjvsP5ZG6W9Bmf/e7LrE5s1
+         odUlzfaJZLSFd733z2z8v5Xs16ICL8cfspJrRx3szZXfDvT0cRuiP2ePfqjKdeY2fjtt
+         tM1LY60KCkCEUMXoMiWoBptvEN9md9S04jPbhCK8vV7fDqOfPWb4dBLkYyOCsDlo8VEK
+         2mL9gwqybY/pOFQenQ+toh9XFJeO8IvWiGuI1YBLIikyq1FkEQITl3aRicuOXd1CpEQz
+         bIoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709313280; x=1709918080;
+        d=1e100.net; s=20230601; t=1709313281; x=1709918081;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oGy7I9gmi30fpuWsigLrpycA1+OS7TEwTIlqse2LMjo=;
-        b=o88EhL2BsvK4G343OLuDvCiNXabshSbmvNFf82FWA2SL2x/uE4jP/28M1lTYOflQXO
-         ziIJDmXy20HqjRKd6KHWNVNthuC9qRmeMbmZpQiyUgFoZDmd6Z+b2HLxHLUvVx/zZyVk
-         DbVg7Gbsz9qf43dhb22d2NrHO+eVMXk1Q03MxNmUDzOUxbAEwqIDnNVTecSnuNKLmibX
-         4E9f+l0v0ejOAgiFgSQHmzaL/LW4ENW2CPR6lA3r8nUQoWa+o97/ULS5usJfylp7q7Jf
-         2OFhNpaR341UqCyu1l3WMsykQr9FeQTDdgswvErJwjj5b4DthyXKo+NawqDy22c20dHC
-         1pow==
-X-Gm-Message-State: AOJu0YwkXFHPR+tv8VPBmNUXMjlk/iIE/O5kRmst/xW0kxToel05Rj0Q
-	83b/w5a4tcwvtGMyrMGscAUSVU/4JB+BpUh5ata1aupT16rq5jLD8cF+H/UE7vs=
-X-Google-Smtp-Source: AGHT+IGHHRJLCV5hig7J/bNCn6D6U4DT15uN3Pn9+pvs/vLYBayJtfG/SUM11jQ21jVDQN3knB6tLw==
-X-Received: by 2002:a05:651c:10d4:b0:2d2:d0ba:2586 with SMTP id l20-20020a05651c10d400b002d2d0ba2586mr1676036ljn.24.1709313280222;
-        Fri, 01 Mar 2024 09:14:40 -0800 (PST)
+        bh=3dwjYerr/y8Vv41J2to9nLIRNF2G1qLwh4ctTCr/G/o=;
+        b=irqM1GBWnpaRI3T8n9xEdsHEppkow7KF6uF7PvXVVjv/Pas+inkF7BqO0Py1yuP5In
+         GEFDxxEXbsMYwQIkaChlSJoJqNnrLDM6ASBa7VDtXaNDryTxAhOgsVVNQSWm8/dzI7Eu
+         OP+6i3x5h19EqfudqiwF8uDmhYcOGc9HxobNJ3i5FUPp/B8IRuzcURwQOElremqa3WMD
+         YsZwUD20pEYDXSfqdex9eBiFQJ0Jrvqof2rUsTOcx8wQayq+ChdCJcypjSx5SRXBp8Fn
+         mKWVmHLphF2NAY+uRrWf2mdvOXrvJDZvdHbdB/D3nQBCIyREpHtUY9JeG0EbibAesnJL
+         nxFA==
+X-Gm-Message-State: AOJu0YxmXJOagobi6o2aWZHDqD0T7hhOR2v1Scm3LeFmp2/VofOTRco1
+	ac0nrFZJMgYCDHZfoZr/9kUyM1EsOEFDeGAk8xr357Vbzgxn9I65GIaA/xfJJRE=
+X-Google-Smtp-Source: AGHT+IHbXytC+GSMu9Y0ikZKwWS7Wf+ypPJ4inCvhoA2hs+gCwLkTgKX+oheVUizuTeSvGOYOg0Dtw==
+X-Received: by 2002:a05:600c:4fc6:b0:412:b237:346e with SMTP id o6-20020a05600c4fc600b00412b237346emr2744383wmq.20.1709313281564;
+        Fri, 01 Mar 2024 09:14:41 -0800 (PST)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:c06e:e547:41d1:e2b2])
-        by smtp.gmail.com with ESMTPSA id b8-20020a05600003c800b0033e17ff60e4sm3387556wrg.7.2024.03.01.09.14.39
+        by smtp.gmail.com with ESMTPSA id b8-20020a05600003c800b0033e17ff60e4sm3387556wrg.7.2024.03.01.09.14.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 09:14:39 -0800 (PST)
+        Fri, 01 Mar 2024 09:14:40 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -77,9 +77,9 @@ To: netdev@vger.kernel.org,
 	Stanislav Fomichev <sdf@google.com>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1 2/4] tools/net/ynl: Report netlink errors without stacktrace
-Date: Fri,  1 Mar 2024 17:14:29 +0000
-Message-ID: <20240301171431.65892-3-donald.hunter@gmail.com>
+Subject: [PATCH net-next v1 3/4] tools/net/ynl: Extend array-nest for multi level nesting
+Date: Fri,  1 Mar 2024 17:14:30 +0000
+Message-ID: <20240301171431.65892-4-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240301171431.65892-1-donald.hunter@gmail.com>
 References: <20240301171431.65892-1-donald.hunter@gmail.com>
@@ -91,89 +91,84 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ynl does not handle NlError exceptions so they get reported like program
-failures. Handle the NlError exceptions and report the netlink errors
-more cleanly.
-
-Example now:
-
-Netlink error: No such file or directory
-nl_len = 44 (28) nl_flags = 0x300 nl_type = 2
-	error: -2	extack: {'bad-attr': '.op'}
-
-Example before:
-
-Traceback (most recent call last):
-  File "/home/donaldh/net-next/./tools/net/ynl/cli.py", line 81, in <module>
-    main()
-  File "/home/donaldh/net-next/./tools/net/ynl/cli.py", line 69, in main
-    reply = ynl.dump(args.dump, attrs)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/donaldh/net-next/tools/net/ynl/lib/ynl.py", line 906, in dump
-    return self._op(method, vals, [], dump=True)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/donaldh/net-next/tools/net/ynl/lib/ynl.py", line 872, in _op
-    raise NlError(nl_msg)
-lib.ynl.NlError: Netlink error: No such file or directory
-nl_len = 44 (28) nl_flags = 0x300 nl_type = 2
-	error: -2	extack: {'bad-attr': '.op'}
+The nlctrl family uses 2 levels of array nesting for policy attributes.
+Add a 'nest-depth' property to genetlink-legacy and extend ynl to use
+it.
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- tools/net/ynl/cli.py          | 18 +++++++++++-------
- tools/net/ynl/lib/__init__.py |  4 ++--
- 2 files changed, 13 insertions(+), 9 deletions(-)
+ Documentation/netlink/genetlink-legacy.yaml | 3 +++
+ tools/net/ynl/lib/nlspec.py                 | 2 ++
+ tools/net/ynl/lib/ynl.py                    | 9 ++++++---
+ 3 files changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/tools/net/ynl/cli.py b/tools/net/ynl/cli.py
-index 0f8239979670..cccf4d801b76 100755
---- a/tools/net/ynl/cli.py
-+++ b/tools/net/ynl/cli.py
-@@ -6,7 +6,7 @@ import json
- import pprint
- import time
+diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
+index 938703088306..872c76065f1b 100644
+--- a/Documentation/netlink/genetlink-legacy.yaml
++++ b/Documentation/netlink/genetlink-legacy.yaml
+@@ -261,6 +261,9 @@ properties:
+               struct:
+                 description: Name of the struct type used for the attribute.
+                 type: string
++              nest-depth:
++                description: Depth of nesting for an array-nest, defaults to 1.
++                type: integer
+               # End genetlink-legacy
  
--from lib import YnlFamily, Netlink
-+from lib import YnlFamily, Netlink, NlError
+       # Make sure name-prefix does not appear in subsets (subsets inherit naming)
+diff --git a/tools/net/ynl/lib/nlspec.py b/tools/net/ynl/lib/nlspec.py
+index fbce52395b3b..50e8447f089a 100644
+--- a/tools/net/ynl/lib/nlspec.py
++++ b/tools/net/ynl/lib/nlspec.py
+@@ -161,6 +161,7 @@ class SpecAttr(SpecElement):
+         sub_message   string, name of sub message type
+         selector      string, name of attribute used to select
+                       sub-message type
++        nest_depth    integer, depth of array nesting
  
+         is_auto_scalar bool, attr is a variable-size scalar
+     """
+@@ -178,6 +179,7 @@ class SpecAttr(SpecElement):
+         self.display_hint = yaml.get('display-hint')
+         self.sub_message = yaml.get('sub-message')
+         self.selector = yaml.get('selector')
++        self.nest_depth = yaml.get('nest-depth', 1)
  
- class YnlEncoder(json.JSONEncoder):
-@@ -61,12 +61,16 @@ def main():
-     if args.sleep:
-         time.sleep(args.sleep)
+         self.is_auto_scalar = self.type == "sint" or self.type == "uint"
  
--    if args.do:
--        reply = ynl.do(args.do, attrs, args.flags)
--        output(reply)
--    if args.dump:
--        reply = ynl.dump(args.dump, attrs)
--        output(reply)
-+    try:
-+        if args.do:
-+            reply = ynl.do(args.do, attrs, args.flags)
-+            output(reply)
-+        if args.dump:
-+            reply = ynl.dump(args.dump, attrs)
-+            output(reply)
-+    except NlError as e:
-+        print(e)
-+        exit(1)
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index 29262505a3f2..efceea9433f2 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -556,14 +556,17 @@ class YnlFamily(SpecFamily):
+                 decoded = self._formatted_string(decoded, attr_spec.display_hint)
+         return decoded
  
-     if args.ntf:
-         ynl.check_ntf()
-diff --git a/tools/net/ynl/lib/__init__.py b/tools/net/ynl/lib/__init__.py
-index f7eaa07783e7..9137b83e580a 100644
---- a/tools/net/ynl/lib/__init__.py
-+++ b/tools/net/ynl/lib/__init__.py
-@@ -2,7 +2,7 @@
+-    def _decode_array_nest(self, attr, attr_spec):
++    def _decode_array_nest(self, attr, attr_spec, depth):
+         decoded = []
+         offset = 0
+         while offset < len(attr.raw):
+             item = NlAttr(attr.raw, offset)
+             offset += item.full_len
  
- from .nlspec import SpecAttr, SpecAttrSet, SpecEnumEntry, SpecEnumSet, \
-     SpecFamily, SpecOperation
--from .ynl import YnlFamily, Netlink
-+from .ynl import YnlFamily, Netlink, NlError
+-            subattrs = self._decode(NlAttrs(item.raw), attr_spec['nested-attributes'])
++            if depth > 1:
++                subattrs = self._decode_array_nest(item, attr_spec, depth - 1)
++            else:
++                subattrs = self._decode(NlAttrs(item.raw), attr_spec['nested-attributes'])
+             decoded.append({ item.type: subattrs })
+         return decoded
  
- __all__ = ["SpecAttr", "SpecAttrSet", "SpecEnumEntry", "SpecEnumSet",
--           "SpecFamily", "SpecOperation", "YnlFamily", "Netlink"]
-+           "SpecFamily", "SpecOperation", "YnlFamily", "Netlink", "NlError"]
+@@ -649,7 +652,7 @@ class YnlFamily(SpecFamily):
+                 if 'enum' in attr_spec:
+                     decoded = self._decode_enum(decoded, attr_spec)
+             elif attr_spec["type"] == 'array-nest':
+-                decoded = self._decode_array_nest(attr, attr_spec)
++                decoded = self._decode_array_nest(attr, attr_spec, attr_spec.nest_depth)
+             elif attr_spec["type"] == 'bitfield32':
+                 value, selector = struct.unpack("II", attr.raw)
+                 if 'enum' in attr_spec:
 -- 
 2.42.0
 
