@@ -1,109 +1,129 @@
-Return-Path: <netdev+bounces-76626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7632786E61B
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:50:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1781186E669
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:57:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1774DB2649B
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:50:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 481121C22904
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FFB03B780;
-	Fri,  1 Mar 2024 16:43:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lyZvkbYa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CA35631;
+	Fri,  1 Mar 2024 16:49:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45B479FD;
-	Fri,  1 Mar 2024 16:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71FA833C0
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 16:49:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709311398; cv=none; b=AoeqGHBLpJkRk3tQ+hrlSCEmLcaogvnpB8HVvrhzcZM9Nkj8mBbDJOiZf5K0YNTXi+wd4KQ4HW9k4Jffdn+MxxbA72oc28xWCMXUvv+i7tKPOTZ5MgkT3rfpORmdrjoe5DthYK4N52oZMptTlY5DiuaMDqZy4mkCHNS8OLB+n9M=
+	t=1709311751; cv=none; b=hffq2j1pWez8Wkbbx4/Um6lokwt8eYAsqPGDw7YXhzAwtPIR9kK/ecgO9hCnT1HLp0MB4z+wjFGJpcRiTDGhone8QzNOoLibJ5WA+qmvpwZrexT+VCR+JEB0nMT1y7HzJj/S515vthhwo9iqsYy2M8lZoPaC9vSETE8oSnOVZVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709311398; c=relaxed/simple;
-	bh=7+yPGbyypKfVMjlezs3o4R5gwncoRyCHS/svquRSpl0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B/gYCb7ul0g6rwAFyx/4rvreVxFlHgUae09Kn7iuiAaxT4Wi7cqVPgKKhWI/xoEnODHz3J532aszkXAb5afW25jH3YvnuqBOaA0zneNbi1DcrUpAg97JPC8asEM8g29XkwFribtTAZrT4FUaVSZWAGFgJ9uWOkGQNk1W3b0Qe1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lyZvkbYa; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7EA47240009;
-	Fri,  1 Mar 2024 16:43:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709311393;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=u/Hp6QCsVR3lVDylsB1ijKVlNWSb0JM4K1x2f3hSJP4=;
-	b=lyZvkbYab/ryfg7rK0v4vcwr71SvChQQkG7kVQN9+DsImWVuVuJXR4jm+LK/i3T7GmSM0K
-	tfJIvzPgPoPQrglouEeTLrU3eTU38ITPMVQtZUUkwSeAIaCwNXNzdWI0X487pz3uHdpZS3
-	o0CZKIQaGkJo1q7rMMV4VKZkKHlln6yr4P6A4ibwd3hxwdhDAxp1aYLpZqNUluSwGICMLt
-	FyKC2SuHaQ22bgJXN1p5wuKnDuCVYCZ2ukfFT0pf9RGOT9Zo4xiTRQwbUGNHoVqPsZY8+c
-	VSvBTx4n9z9sS6As4csz9iRHnCraOKBFn5KsYjIOpl5XIzUFDtXw7JXngQQUEQ==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1709311751; c=relaxed/simple;
+	bh=2U+NFf8VzBL7i5JecqNdGXv70qAxb5ESPa2lPEXW6Jw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t4737Rb9kRzHWj2S6amikGno5o9wA4Hxwomvsz/jdTqtGKRAXiyKuKfOGDpvM4RDElP9bIM5HIkSR8NTvYbzpgrkJRNZjbcGzhbBZVlxhzOpDlC+v45GgVB/SZyse9u7B9d+xeZbqqSmhBLcD7vSvEpA2XGJZQvkEuNU6luOetU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rg63j-0005DY-Vp; Fri, 01 Mar 2024 17:48:32 +0100
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rg63i-003ofQ-4h; Fri, 01 Mar 2024 17:48:30 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rg63i-00F8ob-06;
+	Fri, 01 Mar 2024 17:48:30 +0100
+Date: Fri, 1 Mar 2024 17:48:30 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: [PATCH net-next v3 2/2] net: phylink: clean the pcs_get_state documentation
-Date: Fri,  1 Mar 2024 17:43:08 +0100
-Message-ID: <20240301164309.3643849-3-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20240301164309.3643849-1-maxime.chevallier@bootlin.com>
-References: <20240301164309.3643849-1-maxime.chevallier@bootlin.com>
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v5 10/17] net: pse-pd: Add support for PSE PIs
+Message-ID: <ZeIG3rsLJg2rgV58@pengutronix.de>
+References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
+ <20240227-feature_poe-v5-10-28f0aa48246d@bootlin.com>
+ <ZeHlB8DLEqWxBRYH@pengutronix.de>
+ <20240301171005.43188d02@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+In-Reply-To: <20240301171005.43188d02@kmaincent-XPS-13-7390>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-commit 4d72c3bb60dd ("net: phylink: strip out pre-March 2020 legacy code")
-dropped the mac_pcs_get_state ops in phylink_mac_ops in favor of
-dedicated PCS operation pcs_get_state. However, the documentation for
-the pcs_get_state ops was incorrectly converted and now self-references.
+Hay Köry,
 
-Drop the extra comment.
+On Fri, Mar 01, 2024 at 05:10:05PM +0100, Köry Maincent wrote:
+> Hello Oleskij,
+> 
+> Thanks you for the review.
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
-V3: No changes
-V2: No changes
+I'll try to review more at weekend.
 
- include/linux/phylink.h | 3 ---
- 1 file changed, 3 deletions(-)
+> > > +		/* Legacy OF description of PSE PIs */
+> > > +		pcdev->of_legacy = true;  
+> > 
+> > It is not "legacy" :) PoDL do not providing definition of PSE PI since there
+> > is only one pair. May be: single_pair, no_pse_pi or any other idea.
+> 
+> You right it is not needed for PoDL. Maybe no_pse_pi is better according to the
+> following thoughts.
+> 
+> Just wondering, how a pse controller that support PoE and PoDL simultaneously
+> would be exposed in the binding. In that case I suppose all the PIs (PoE and
+> PoDL) need to use the pse-pi subnode. Then the "alternative pinout" and
+> "polarity" parameter would not be requested for PoDL PIs.
 
-diff --git a/include/linux/phylink.h b/include/linux/phylink.h
-index 6ba411732a0d..9a57deefcb07 100644
---- a/include/linux/phylink.h
-+++ b/include/linux/phylink.h
-@@ -480,9 +480,6 @@ void pcs_disable(struct phylink_pcs *pcs);
-  * negotiation completion state in @state->an_complete, and link up state
-  * in @state->link. If possible, @state->lp_advertising should also be
-  * populated.
-- *
-- * When present, this overrides pcs_get_state() in &struct
-- * phylink_pcs_ops.
-  */
- void pcs_get_state(struct phylink_pcs *pcs,
- 		   struct phylink_link_state *state);
+In case of hybrid device I would expect that we will have an 4 pair
+connector where only one pair will be used. In this case we will need to
+know what pair and polarity is supported or can be configured for PoDL.
+It will be full blown PSE PI node with PoDL specific extras.
+
+Don't worry about it right now.
+
+Regards,
+Oleksij
 -- 
-2.43.2
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
