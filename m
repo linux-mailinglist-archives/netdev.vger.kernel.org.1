@@ -1,113 +1,113 @@
-Return-Path: <netdev+bounces-76455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6634F86DCA9
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:04:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C474D86DCAB
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:06:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9190D1C22978
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 08:04:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58C021F2562E
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 08:06:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0448169D0E;
-	Fri,  1 Mar 2024 08:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ABB269974;
+	Fri,  1 Mar 2024 08:06:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D00CdYJs"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="mZSWsqbI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D67669D01
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 08:04:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE996930E;
+	Fri,  1 Mar 2024 08:06:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709280249; cv=none; b=IXNCHettupnhgMvgfLXrtx3wz6qFS4KyZ6DEtmxZ7sDaEN91ypvYYvLQQqgOtdUUCc7N8Gs4jKM6E5XAmIyCdc89swmL6a5HGhMRWVSfIQOIcemWPWo1FDiRg3WUqHBPPnC4tzmv6UQ1MAvBk0HVyO0Kp41BBxTGcNuyCFJjsrA=
+	t=1709280379; cv=none; b=fDRcopBhw7rBkJfKFvOXNZZz8RHgEyeSDIG0/0MX05iuRhgHXP8nhSaeam4a9c1ylEX1o+ZPPCAr0mCoL0xTk7H5P1FdfKnvOB9oiyefn474tDu06D0qvmooWNjYDcaXLGYkogBuWnLEB7CZmpMD/CpdOb9g0DBZD3jV01JuWMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709280249; c=relaxed/simple;
-	bh=n4spHHvJLlMGZHVr7fqI5nbP9JLbO0KC62LA3csKOP0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nCT1a5NLA6AD8Xyq5wDM0TqBUhdgr/lcrxKSiLmQTU7MbcwsaVjoEx7AyofbUUaQ9KaMQwE7zpg3X36EZDateQjmVEaBqfhtW/b2w0Ob2uOTGaWpR8JSR8NkrKoRF8/Kl+FbWzA3AXoQOWeckDl5vwR69t8mRsKytFKWfrzje7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D00CdYJs; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-565223fd7d9so3919a12.1
-        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 00:04:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709280246; x=1709885046; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7X4wFyOx0wdvgK1yfOcV9T4++P8vIrbb+J2WByTndeM=;
-        b=D00CdYJsA9JWtnjZ+C9vhCytHtPJvdidm7Kmln0Yh9V3K45PHW9z6eQD5FM/eZaCwG
-         1tLHQNUQdSFbLS8kOrs58u5rCu25bpdSeV8r0sOxk+ThaikPu1IkkPcefUYUTQG7jjpZ
-         oIkZ0ZXfhTyJuT4sM1pneWLgZ0irXjNn9KWfvvnzdeb8OkRhjmWIjwjShu4FG+9tPiYW
-         3pNq6dF4B4LVpoFI3kpxObmQUyfl9P0VoeeIlYDJoaA1XY5HLQkyhwTKmiRcMJ8g14oB
-         BhSWHA3X0PojcKTXayhDAwRx96FhThlmBp9NGTJJ14mQriggwzqK1kxTltdq/IBtRBCp
-         qmhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709280246; x=1709885046;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7X4wFyOx0wdvgK1yfOcV9T4++P8vIrbb+J2WByTndeM=;
-        b=uZx7EnHiOS9haGGqsPi9hEyvBCGsF29331cdgE+eaoYTuekine92GGrO7KPR1a97oi
-         Y3PYgio3g1pQP04tcadIF4ov4PJZrzmmalOsQv/Q3cQxR8iJgvSs5ILKwL7aLtMUwqSi
-         A+HtziraAqj8kpiPbjPqPkbAOW+v0FhKnWdEwguG1nUe4OoynoRw3BsjFaOzIIU6Kjo2
-         s7QDCuA3FhkVnCox9uIYdSorRt8NyjGxmHeo/8lvbA2E7AM0Mi1cUAuHk1uyWpbRp5jp
-         V19peLtY75t+dI2RFrwJT+bPrPuvq5vGqlQfOqWHXtoXsuez1s2capSKnYB/b2FsqsnQ
-         umLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUG4X+X9r+Ra/5ZuweVOuwo8fHswAXRyLELIxIcin8TQQnVPqldUxriws/DVns/12sM0mnRioDXdWUtyjb67C6B/B08H2TG
-X-Gm-Message-State: AOJu0Yy6avnb/aJ0moMkK3kPZybrV7UhZrDjLRR71KqD6IOriDTfJURT
-	1zy1VRhEJTZvLV8hpdjTH3m/KY2NTCKsRECJm4TL8zYlUeFIpoxOZ2xOuqy26dkFwurx4bb0pEh
-	trHQQwdmPTfj0klX70HYTHWTWSZoBwScU/ZKe
-X-Google-Smtp-Source: AGHT+IFOvZyHykyduIz94CdHCof11T2iEVmpeMxGsKXRX8OsG8eBWy5K5UWwwoNyQqGC7PCA+EV0NmT93gNYH1arh0I=
-X-Received: by 2002:a05:6402:5244:b0:565:4f70:6ed with SMTP id
- t4-20020a056402524400b005654f7006edmr109469edd.6.1709280246294; Fri, 01 Mar
- 2024 00:04:06 -0800 (PST)
+	s=arc-20240116; t=1709280379; c=relaxed/simple;
+	bh=yI37i87UqneOzVmTClYz+I31zKh2W/A+wihChWmk0Kk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ddGvE1SkM8WztxgUmaREEPAj+kGUmY4reYNkLThiTJSSClM1BI6/64iU9/3z0c+sl2WA/PHQ61FqjhQJQblyolf2SYIU3ZUueJh+woecBSMLQ4skrXNsE3T2pjQtTfJmjU0M5rEfPLvpfXTNpauTNb14rX+bZaZKpoaZgSeqJ0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=mZSWsqbI; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1709280377; x=1740816377;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=yI37i87UqneOzVmTClYz+I31zKh2W/A+wihChWmk0Kk=;
+  b=mZSWsqbI/Upxee9fzIGcrL2jQO5mBjMhO4ItNufEUUXs/7Z6zvLMiPAf
+   3pZpWg37+MBXeJWB3TFXDfRyZkDqpe60gTGTr3RQ8oXCuKtz+YIdg+ei6
+   ALdy9qVtaaow9T/G/uT/KGglu/XPx+WR6I43X8xg7fbdrcjGEpjIG7lo1
+   JAGnyaw72B/u5oj+MoEJq2RFMq6dFq4/XACfDcvBEFhL+3u5/2s2EytC2
+   j75b3eCMVT7TVlSsmXBChOpmg7/x+qnaUHIOB3dV3MC4y2hULOt2uBuSk
+   RFsbBn8CbDGt9lCIxeCVeLozTqpvxlVE7qsJzDou2pErWaxlt7xrT3tQ3
+   w==;
+X-CSE-ConnectionGUID: KhfOYgZRQh2P8hw7PiCldA==
+X-CSE-MsgGUID: 1AUvhw2rQpqUKBk3Czq4Hg==
+X-IronPort-AV: E=Sophos;i="6.06,195,1705388400"; 
+   d="scan'208";a="18668063"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Mar 2024 01:06:15 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 1 Mar 2024 01:06:14 -0700
+Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Fri, 1 Mar 2024 01:06:12 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <lars.povlsen@microchip.com>,
+	<Steen.Hegelund@microchip.com>, <daniel.machon@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <bjarni.jonasson@microchip.com>
+CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, Horatiu Vultur <horatiu.vultur@microchip.com>
+Subject: [PATCH net] net: sparx5: Fix use after free inside sparx5_del_mact_entry
+Date: Fri, 1 Mar 2024 09:06:08 +0100
+Message-ID: <20240301080608.3053468-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240229213018.work.556-kees@kernel.org> <20240229225910.79e224cf@kernel.org>
-In-Reply-To: <20240229225910.79e224cf@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 1 Mar 2024 09:03:55 +0100
-Message-ID: <CANn89iKeJGvhY0K=kLhhR39NVbaizP2UBk0Vk0r_XCe2XMBZHg@mail.gmail.com>
-Subject: Re: [PATCH] netdev: Use flexible array for trailing private bytes
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kees Cook <keescook@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
-	Paolo Abeni <pabeni@redhat.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, netdev@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Jiri Pirko <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>, Coco Li <lixiaoyan@google.com>, 
-	Amritha Nambiar <amritha.nambiar@intel.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Fri, Mar 1, 2024 at 7:59=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Thu, 29 Feb 2024 13:30:22 -0800 Kees Cook wrote:
+Based on the static analyzis of the code it looks like when an entry
+from the MAC table was removed, the entry was still used after being
+freed. More precise the vid of the mac_entry was used after calling
+devm_kfree on the mac_entry.
+The fix consists in first using the vid of the mac_entry to delete the
+entry from the HW and after that to free it.
 
-> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> > index 118c40258d07..b476809d0bae 100644
-> > --- a/include/linux/netdevice.h
-> > +++ b/include/linux/netdevice.h
-> > @@ -1815,6 +1815,8 @@ enum netdev_stat_type {
-> >       NETDEV_PCPU_STAT_DSTATS, /* struct pcpu_dstats */
-> >  };
-> >
-> > +#define      NETDEV_ALIGN            32
->
-> Unless someone knows what this is for it should go.
-> Align priv to cacheline size.
+Fixes: b37a1bae742f ("net: sparx5: add mactable support")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+---
+ drivers/net/ethernet/microchip/sparx5/sparx5_mactable.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-+2
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_mactable.c b/drivers/net/ethernet/microchip/sparx5/sparx5_mactable.c
+index 4af285918ea2a..75868b3f548ec 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_mactable.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_mactable.c
+@@ -347,10 +347,10 @@ int sparx5_del_mact_entry(struct sparx5 *sparx5,
+ 				 list) {
+ 		if ((vid == 0 || mact_entry->vid == vid) &&
+ 		    ether_addr_equal(addr, mact_entry->mac)) {
++			sparx5_mact_forget(sparx5, addr, mact_entry->vid);
++
+ 			list_del(&mact_entry->list);
+ 			devm_kfree(sparx5->dev, mact_entry);
+-
+-			sparx5_mact_forget(sparx5, addr, mact_entry->vid);
+ 		}
+ 	}
+ 	mutex_unlock(&sparx5->mact_lock);
+-- 
+2.34.1
 
-#define NETDEV_ALIGN    L1_CACHE_BYTES
-
-or a general replacement of NETDEV_ALIGN....
 
