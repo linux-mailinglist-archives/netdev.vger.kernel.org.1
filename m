@@ -1,147 +1,122 @@
-Return-Path: <netdev+bounces-76691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF7DC86E863
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 19:28:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AD5486E8A3
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 19:45:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BD9F1C21137
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:28:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47EC2B2D627
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 893FD20DC5;
-	Fri,  1 Mar 2024 18:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A643538DE0;
+	Fri,  1 Mar 2024 18:40:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V7sN3gOA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GcCepP+9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F451CA98
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 18:28:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B731224D0;
+	Fri,  1 Mar 2024 18:40:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709317701; cv=none; b=o7psZjKHx+Q2miHmplN8NJw7/UidhWTL4McPwzenEQeJOo5LPQqPebbv9W/8dfWrE0uqspsS98WQYdh4etJyInRZNiC8dDsZ9BQnAEG2S/ztFY2e544glhyUGXD9AhsZFZuRVht8xMZlHcNDis8VstVnjKEes58++G6oyOUaDNI=
+	t=1709318449; cv=none; b=MUgmfJ83cBwlOr1gZPRsjDdlFEpBtZWzH9fiHJjxVpQqJI0/smv7MhNQdY5B3mSnWwC44PkNV8nDr3wlS2PlUPK50f+rq6bKvSZgqbgyCbhLNYEoAnNN5mcA3eepkbj1E542rJiqspyS1lCEHibafxGgxb8I+aR3a0WGImLd8dA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709317701; c=relaxed/simple;
-	bh=gKnBsvJL+Rlqj45zIhXN0kOtWX68tNTT+TRkUrzgaTo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k+eY7NEdsK1ydfxiZbTfjs7hQJMgQ0UDd3RArQgyd34c66kVF2TfXdsbXcJWNQDfUrcZFsF9V0uDoBQ8h5diaut77W3ahaFTLwfO3wDlz2HfPghWIXPMNIZY2Lc2gcHjo81RrRmB2wGucZeMSs7j0gBmslRR74Bat+cvyyzIs0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V7sN3gOA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57720C433C7;
-	Fri,  1 Mar 2024 18:28:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709317701;
-	bh=gKnBsvJL+Rlqj45zIhXN0kOtWX68tNTT+TRkUrzgaTo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=V7sN3gOA29+iTau9CUWlthkny4oJdspBiBCA4kDTyxOcxz2QXmpQWUr+/mXNS3jlY
-	 G9clYV0Wc7nul4wdzy1schx3yADsVdNQW5iZoFvQxD4e7WRz73iYz2DZ9dUeh72Hpt
-	 EO4XF9Zl8C5TIFa5/O78D8tyIvCL6j/2TKj5CmUe6ic4ttbDswbP8CxA/9OhaFsx2U
-	 7J0gPY6WZhi9aCqO3M6ywH2PcA62AuCrMMQ1Rd3caiXRNOuJCLMoA3aRsRj0leyzRZ
-	 rqxjNn73aWTvBDeHoBXH1tAno2EMFKVMP6tn1XfxlUOYDlj+ZpwxggyJ8wRIP2aP+p
-	 M+1ePvETqT7hA==
-From: javi.merino@kernel.org
-To: netdev@vger.kernel.org
-Cc: intel-wired-lan@lists.osuosl.org,
-	Ross Lagerwall <ross.lagerwall@citrix.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Javi Merino <javi.merino@kernel.org>
-Subject: [PATCH] ice: Fix enabling SR-IOV with Xen
-Date: Fri,  1 Mar 2024 18:28:10 +0000
-Message-ID: <20240301182810.9808-1-javi.merino@kernel.org>
-X-Mailer: git-send-email 2.43.1
+	s=arc-20240116; t=1709318449; c=relaxed/simple;
+	bh=GhGyYeMcg+ZkjHYxc/VcT9ZUA/XQeHgcdI1Kai7omcM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=gGW+3e+VQo/OPH7XMDcDjgVlTk6KhKVh3PqhXocY5ftQBCYKNvcS10Hs0j7knuuShZvdVi8htCqPm9hhzibq5ss+1JCTvPzn4jEQI2iWmPXfIB5AvTsYgLVNoTw+2Me5cymi7eoXNZH/u8IXQTYmm4orvVvNXsS0yJbK6trEN5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GcCepP+9; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6905b62ed2aso2585936d6.1;
+        Fri, 01 Mar 2024 10:40:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709318447; x=1709923247; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D+DSHj2O6nyP38vAO2Q5xeXvc8PasKQXCBn1/ZiY0e0=;
+        b=GcCepP+9w+t03flxOi1THh5uHotgWTDkL6tyh3feBLm88DDbn6PBqm+480sRyT9M1R
+         //AeXkaWpiHCWAOHVREC6hbyiSf58fVnxwAJXNcuQIi4EQbbhf+VWamlCtgrH/gu2HAi
+         61Bc1E8qm0k4HX9TYWPSJdmLIKCAzKlfg1lfa+/ne2J5BukDH+9BktyQc0noT1Q54xSu
+         MDtYV0n0T0PFe/iKysrMvw7vDIjdDbaksYQ4T8xAeQtcEeekIZJpITjsUknI9NQ2x9T9
+         PTRt8Nk6a4DfvNiXhB5ftWV+VMo3N/FjNkATfoYE5MpQyu2327CHdpAVFv4+sV+oXlUB
+         vk1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709318447; x=1709923247;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=D+DSHj2O6nyP38vAO2Q5xeXvc8PasKQXCBn1/ZiY0e0=;
+        b=xLiv0aqxV1ht9d84ONZWxqkOPSgaXoWEZOD06O9n2ocGz/dNl/JtQB0MTXHKiRDSzU
+         gqJGdvzckHFGwFv00gdF0+F/glbcitFgUVNRrSPegvxhF/YuV5pHLWEoGlQSQ9+IBzLK
+         ThKjtDsqQ1FI6J/WxTe4goGN6yC7XHPz/YYXxLQyKKYhyrQgCkro2svXiPDIgrI6lj90
+         3oYp5+ZfkwMUt7ALJ0OhfF86OPaSTjhCYKsB4C6wKiPijZucF8OpMMjX5uFj1oMg2Ows
+         QSWzJAJvhPFIJV9Wjuc52XYVGq3W4XmRx5UIrxs0QR9PWxreRCMhf6DvcCkyIRRCi64D
+         rGuA==
+X-Forwarded-Encrypted: i=1; AJvYcCUIPnU2bWbggIcD4fqSZXr3Av4KRKsgEy9PHqBKKz1XJZMxTJxutFA7mtl9Z8S5TaYDcLElV8ecAk9G+HVXaU407YW6dTutlIKUL7SgH/jM/datYdxq5qPGGdeRZ42Dv04w5rMuPaL/BrkabGJOg0ZzZVt4/ETHUl3k6cQcTvGzsiEiUcbDDxtm6vqfpeeX
+X-Gm-Message-State: AOJu0Yy3ojvGTID5VqY8XU/J4LG9kpNrRC4dHmfkZLMwllJ9mx+INVSV
+	G0IRH48NR9apP91dVMfDMyGdjAAxnXu9m0i1EsBV6gP1vHsXuiBl
+X-Google-Smtp-Source: AGHT+IEHn5c+uVkAgjlwPDH96t0yuU+j7oeVXqnt5aR1eMRI0HHontd/eYJbeRcpsU+nl4/66M8uhg==
+X-Received: by 2002:a0c:ed30:0:b0:68f:4d2d:3f38 with SMTP id u16-20020a0ced30000000b0068f4d2d3f38mr2632279qvq.46.1709318447133;
+        Fri, 01 Mar 2024 10:40:47 -0800 (PST)
+Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
+        by smtp.gmail.com with ESMTPSA id qp11-20020a056214598b00b0068fef74fdb3sm2137813qvb.59.2024.03.01.10.40.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Mar 2024 10:40:46 -0800 (PST)
+Date: Fri, 01 Mar 2024 13:40:46 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+ Yunjian Wang <wangyunjian@huawei.com>
+Cc: mst@redhat.com, 
+ willemdebruijn.kernel@gmail.com, 
+ jasowang@redhat.com, 
+ kuba@kernel.org, 
+ bjorn@kernel.org, 
+ magnus.karlsson@intel.com, 
+ jonathan.lemon@gmail.com, 
+ davem@davemloft.net, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ kvm@vger.kernel.org, 
+ virtualization@lists.linux.dev, 
+ xudingke@huawei.com, 
+ liwei395@huawei.com
+Message-ID: <65e2212e66769_158220294f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <ZeHiBm/frFvioIIt@boxer>
+References: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
+ <ZeHiBm/frFvioIIt@boxer>
+Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Maciej Fijalkowski wrote:
+> On Wed, Feb 28, 2024 at 07:05:56PM +0800, Yunjian Wang wrote:
+> > This patch set allows TUN to support the AF_XDP Tx zero-copy feature,
+> > which can significantly reduce CPU utilization for XDP programs.
+> 
+> Why no Rx ZC support though? What will happen if I try rxdrop xdpsock
+> against tun with this patch? You clearly allow for that.
 
-When the PCI functions are created, Xen is informed about them and
-caches the number of MSI-X entries each function has.  However, the
-number of MSI-X entries is not set until after the hardware has been
-configured and the VFs have been started. This prevents
-PCI-passthrough from working because Xen rejects mapping MSI-X
-interrupts to domains because it thinks the MSI-X interrupts don't
-exist.
+This is AF_XDP receive zerocopy, right?
 
-Fix this by moving the call to pci_enable_sriov() later so that the
-number of MSI-X entries is set correctly in hardware by the time Xen
-reads it.
+The naming is always confusing with tun, but even though from a tun
+PoV this happens on ndo_start_xmit, it is the AF_XDP equivalent to
+tun_put_user.
 
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
-Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
-Signed-off-by: Javi Merino <javi.merino@kernel.org>
----
+So the implementation is more like other device's Rx ZC.
 
-I'm unsure about the error path if `pci_enable_sriov()` fails.  Do we
-have to undo what `ice_start_vfs()` has started?  I can see that
-`ice_start_vfs()` has a teardown at the end, so maybe we need the same
-code if `pci_enable_sriov()` fails?
-
- drivers/net/ethernet/intel/ice/ice_sriov.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-index a94a1c48c3de..8a9c8a2fe834 100644
---- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-@@ -878,24 +878,20 @@ static int ice_ena_vfs(struct ice_pf *pf, u16 num_vfs)
- 	set_bit(ICE_OICR_INTR_DIS, pf->state);
- 	ice_flush(hw);
- 
--	ret = pci_enable_sriov(pf->pdev, num_vfs);
--	if (ret)
--		goto err_unroll_intr;
--
- 	mutex_lock(&pf->vfs.table_lock);
- 
- 	ret = ice_set_per_vf_res(pf, num_vfs);
- 	if (ret) {
- 		dev_err(dev, "Not enough resources for %d VFs, err %d. Try with fewer number of VFs\n",
- 			num_vfs, ret);
--		goto err_unroll_sriov;
-+		goto err_unroll_intr;
- 	}
- 
- 	ret = ice_create_vf_entries(pf, num_vfs);
- 	if (ret) {
- 		dev_err(dev, "Failed to allocate VF entries for %d VFs\n",
- 			num_vfs);
--		goto err_unroll_sriov;
-+		goto err_unroll_intr;
- 	}
- 
- 	ice_eswitch_reserve_cp_queues(pf, num_vfs);
-@@ -906,6 +902,10 @@ static int ice_ena_vfs(struct ice_pf *pf, u16 num_vfs)
- 		goto err_unroll_vf_entries;
- 	}
- 
-+	ret = pci_enable_sriov(pf->pdev, num_vfs);
-+	if (ret)
-+		goto err_unroll_vf_entries;
-+
- 	clear_bit(ICE_VF_DIS, pf->state);
- 
- 	/* rearm global interrupts */
-@@ -918,10 +918,8 @@ static int ice_ena_vfs(struct ice_pf *pf, u16 num_vfs)
- 
- err_unroll_vf_entries:
- 	ice_free_vf_entries(pf);
--err_unroll_sriov:
--	mutex_unlock(&pf->vfs.table_lock);
--	pci_disable_sriov(pf->pdev);
- err_unroll_intr:
-+	mutex_unlock(&pf->vfs.table_lock);
- 	/* rearm interrupts here */
- 	ice_irq_dynamic_ena(hw, NULL, NULL);
- 	clear_bit(ICE_OICR_INTR_DIS, pf->state);
--- 
-2.43.1
-
+I would have preferred that name, but I think Jason asked for this
+and given tun's weird status, there is something bo said for either.
 
