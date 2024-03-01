@@ -1,161 +1,129 @@
-Return-Path: <netdev+bounces-76461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5220B86DCEC
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:20:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B80F786DD1E
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:30:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 458001C2153A
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 08:20:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F2E91F22887
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 08:30:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4812D796;
-	Fri,  1 Mar 2024 08:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF1ED69DFC;
+	Fri,  1 Mar 2024 08:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rrRD0e0/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rGXprctB"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D035369D13
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 08:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 364AA1E886
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 08:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709281229; cv=none; b=AxBfN3uCEo5zZMgO4toiIiBGmpLc7dS2tKzVbbxHpxVSporaSDEK3U8mGpB8Xcgw4yISvSAI0JwQZXHGNDGaXxZE6uNvsid4NkFPYjYUaHEDAzHHXI/GiXf/uCcZTlns82wpKugYjG39aBMYfiA55nEWwCJbn3cYSHnMW+6mmCQ=
+	t=1709281846; cv=none; b=mXZoaDEAhMs6HKwg0U6ZRjbyw0ApRlA0Yp1GDnxopFsgN05r9sW3Lup6jYIyxY6UEp2DfIeE/GBMegFIN5CjqE2ktzJZwtc5skBkuM7ENLtrWZERimizNyiy7yX1nAMQ+t8dWDmFAz3mM3DXZFcylttVskGJZ7omAtgMILo+XcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709281229; c=relaxed/simple;
-	bh=hxU1kjptECmUNGWaYfUf7xbpONi96j0oNHRgoVMF5SU=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=acPjz50BrBbbJzh5cxLU8Hs7cSb8zYFsWXJxAJ3DMkLHUo6WSrYehovS/RtKjlQkxbgcjDpTySoYAjn7abqtfqkahtYqfWoC7ORYAm8TQvPeClwDozUoXGbi28u/kXwLz/vQIrnBYX5b1KpZcE/Clq8ztdf+AxUdhcbtHcEi4O8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=rrRD0e0/; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-	To:Subject:From:MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=W3Wt5PydOMBj1d+7oPLYJK2mUZttz46r2N8loTO1eA0=; b=rrRD0e0/Iy5M+krXYCNXumLFm7
-	k0j5RJmTRqF7QdgO/lzDw6jrIQc71gc2VGG72gOArf6aLwzs3eTctmP3LHpSiaV6qsxvWsvK98ylS
-	qectZQswAlK51lWESw3mQwI0uDkh5CxLjYODzdeDYwUs/hquEoOIS1PBaUxKOL0y96aIOzZShM6Rl
-	fhG4Bmu4yFYxfQkep5XI5QiFepFTjJxSTokvobg7G0eCt2hlwr0tWBouBZhoof+MfKLFuCzxCAD1a
-	tiwPNeDaT12pLqRfpAqczsET3Pv0wZJUai4U7ccLokp86h0q0c+5ayjJU53udc7250wV4I3rH/KlA
-	5qhEpC4A==;
-Received: from fpd2fa7e2a.ap.nuro.jp ([210.250.126.42] helo=[192.168.1.6])
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rfy7v-0000000AM7H-0Apo;
-	Fri, 01 Mar 2024 08:20:19 +0000
-Message-ID: <ddb7f076-06a7-45df-ae98-b4120d9dc275@infradead.org>
-Date: Fri, 1 Mar 2024 17:20:11 +0900
+	s=arc-20240116; t=1709281846; c=relaxed/simple;
+	bh=kmXMD5wxosP4C0HytvGYV8f6rRp1M0hxu3/wjfE2CJ8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BDd6k2oL9Vp0EB5SGyIlaqWQefIgk6OpPodr9FiaSeil2O03/dwqeudOQj075Z59BVrn5hwl6lg5+NKL5yCwGofIWN4me35tgGiceImMB3a6L/jtesTHuLmXc2IpFKnPUit7o0hdZng6KD5Vd5wgIVep7Fphn6MsK1umjmxJ+Dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rGXprctB; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-565223fd7d9so4036a12.1
+        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 00:30:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709281843; x=1709886643; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kmXMD5wxosP4C0HytvGYV8f6rRp1M0hxu3/wjfE2CJ8=;
+        b=rGXprctBDcRXELGRZjuJjUglDPm4/EGZQqkhXTQ/CVqpVjQ1vO9ClIB8VJjDsvvzP1
+         tHuX1uKzcss99uesUQNo9NHEU9IyAb9Shd9sh/E2QYacSWlO6ZzpeUxa4+7s2f3lkUv6
+         uQr7OSexv1DfIFUVmSmu95u9vPNExqqW55M57ibHkpn1sLBhaT62BIm+Rrm3mM9IVCwh
+         bKpWGSSKogKIJo+g+yM20PUXg8Qmx0NQvWzXdFNTQUdvETtkym/AJrv12ylTlsF2IinR
+         S5kIL44DHvqujGfOKlT0HHV7EH7j3nYIASHUxNMZ2a6DIV/G6WJarQI/8oo18olAoMni
+         MALA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709281843; x=1709886643;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kmXMD5wxosP4C0HytvGYV8f6rRp1M0hxu3/wjfE2CJ8=;
+        b=xRcYopbwYJeys8NEUwBC1RAStDvPhzsG3N6MOz4yWqoHGv3VYgrilSOzbEJAFPgi4o
+         39JZ6iHVBpwVY8qBWNOtacHuYb01L7e36YqYlqUD45CdlKe6sTi2gy0jOfIlSo5/Y0AJ
+         UbVJbiNEo80kehLB3v6VI7tWVUAzRUtxj5sY1W2aCDEBz2fo4RLFysRNPSDlcc+jEbTY
+         qpC/Xp0tkwp2aqKkDGExmav67G9kQ4jTuDth7FearKmzGZ8NX6bzHsBauWMwKkT1ClG1
+         gLQb3tKgspDPdzjKor228uzjLN7f2mLV5JQ5HSQCX2LYG7UE5jcioF+AezDLfvdHbMAv
+         qMJg==
+X-Gm-Message-State: AOJu0YzFsPOEQkoC/H8cG288ml/Bm4Kd4u07Iw+Ojq+M2oiBBnaNGapT
+	RBLnl+e/FreuDqgvJXp2EXLQQZj2oAAYeK3/Q0LDxtXu4GBCn4RXcV3wVJ+C/Tz2yjyAotgKf5n
+	krWMKvOskNbrWtiplEe+m9STQHgnMVO6jlGQH
+X-Google-Smtp-Source: AGHT+IEwf1M0NlR4bQMpE6O2swlKwBptVLThyMgoIRxdaxLQgX35Cs6YnZnFaBd9av2rZ/03Z91FM2azqVxy5Ou4Vt8=
+X-Received: by 2002:a05:6402:b10:b0:565:ad42:b97d with SMTP id
+ bm16-20020a0564020b1000b00565ad42b97dmr90989edb.0.1709281843426; Fri, 01 Mar
+ 2024 00:30:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Geoff Levand <geoff@infradead.org>
-Subject: [PATCH net-next v1] ps3_gelic_net: Use napi routines for RX SKB
-To: "David S. Miller" <davem@davemloft.net>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <ZeFPz4D121TgvCje@debian.debian> <CAO3-PboqKqjqrAScqzu6aB8d+fOq97_Wuz8b7d5uoMKT-+-WvQ@mail.gmail.com>
+In-Reply-To: <CAO3-PboqKqjqrAScqzu6aB8d+fOq97_Wuz8b7d5uoMKT-+-WvQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 1 Mar 2024 09:30:32 +0100
+Message-ID: <CANn89iLCv0f3vBYt8W+_ZDuNeOY1jDLDBfMbOj7Hzi8s0xQCZA@mail.gmail.com>
+Subject: Re: [PATCH v2] net: raise RCU qs after each threaded NAPI poll
+To: Yan Zhai <yan@cloudflare.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>, 
+	Alexander Duyck <alexanderduyck@fb.com>, Hannes Frederic Sowa <hannes@stressinduktion.org>, 
+	linux-kernel@vger.kernel.org, rcu@vger.kernel.org, bpf@vger.kernel.org, 
+	kernel-team@cloudflare.com, Joel Fernandes <joel@joelfernandes.org>, 
+	"Paul E. McKenney" <paulmck@kernel.org>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, mark.rutland@arm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Convert the PS3 Gelic network driver's RX SK buffers over to
-use the napi_alloc_frag_align and napi_build_skb routines.
+On Fri, Mar 1, 2024 at 4:50=E2=80=AFAM Yan Zhai <yan@cloudflare.com> wrote:
+>
+> On Thu, Feb 29, 2024 at 9:47=E2=80=AFPM Yan Zhai <yan@cloudflare.com> wro=
+te:
+> >
+> > We noticed task RCUs being blocked when threaded NAPIs are very busy at
+> > workloads: detaching any BPF tracing programs, i.e. removing a ftrace
+> > trampoline, will simply block for very long in rcu_tasks_wait_gp. This
+> > ranges from hundreds of seconds to even an hour, severely harming any
+...
+> >
+> > Fixes: 29863d41bb6e ("net: implement threaded-able napi poll loop suppo=
+rt")
+> > Suggested-by: Paul E. McKenney <paulmck@kernel.org>
+> > Reviewed-by: Joel Fernandes (Google) <joel@joelfernandes.org>
+> > Signed-off-by: Yan Zhai <yan@cloudflare.com>
+> > ---
+> > v1->v2: moved rcu_softirq_qs out from bh critical section, and only
+> > raise it after a second of repolling. Added some brief perf test result=
+.
+> >
+> Link to v1: https://lore.kernel.org/netdev/Zd4DXTyCf17lcTfq@debian.debian=
+/T/#u
+> And I apparently forgot to rename the subject since it's not raising
+> after every poll (let me know if it is prefered to send a V3 to fix
+> it)
+>
 
-Signed-off-by: Geoff Levand <geoff@infradead.org>
+I could not see the reason for 1sec (HZ) delays.
 
-diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-index 5ee8e8980393..fb5c015851b8 100644
---- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-+++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-@@ -375,14 +375,14 @@ static int gelic_card_init_chain(struct gelic_card *card,
- static int gelic_descr_prepare_rx(struct gelic_card *card,
- 				  struct gelic_descr *descr)
- {
--	static const unsigned int rx_skb_size =
--		ALIGN(GELIC_NET_MAX_FRAME, GELIC_NET_RXBUF_ALIGN) +
--		GELIC_NET_RXBUF_ALIGN - 1;
-+	static const unsigned int napi_buff_size =
-+		round_up(GELIC_NET_MAX_FRAME, GELIC_NET_RXBUF_ALIGN);
-+	struct device *dev = ctodev(card);
- 	dma_addr_t cpu_addr;
--	int offset;
-+	void *napi_buff;
- 
- 	if (gelic_descr_get_status(descr) !=  GELIC_DESCR_DMA_NOT_IN_USE)
--		dev_info(ctodev(card), "%s: ERROR status\n", __func__);
-+		dev_info(dev, "%s: ERROR status\n", __func__);
- 
- 	descr->hw_regs.dmac_cmd_status = 0;
- 	descr->hw_regs.result_size = 0;
-@@ -390,31 +390,34 @@ static int gelic_descr_prepare_rx(struct gelic_card *card,
- 	descr->hw_regs.data_error = 0;
- 	descr->hw_regs.payload.dev_addr = 0;
- 	descr->hw_regs.payload.size = 0;
-+	descr->skb = NULL;
-+
-+	napi_buff = napi_alloc_frag_align(napi_buff_size,
-+					  GELIC_NET_RXBUF_ALIGN);
-+
-+	if (unlikely(!napi_buff))
-+		return -ENOMEM;
- 
--	descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
--	if (!descr->skb) {
--		descr->hw_regs.payload.dev_addr = 0; /* tell DMAC don't touch memory */
-+	descr->skb = napi_build_skb(napi_buff, napi_buff_size);
-+
-+	if (unlikely(!descr->skb)) {
-+		skb_free_frag(napi_buff);
- 		return -ENOMEM;
- 	}
- 
--	offset = ((unsigned long)descr->skb->data) &
--		(GELIC_NET_RXBUF_ALIGN - 1);
--	if (offset)
--		skb_reserve(descr->skb, GELIC_NET_RXBUF_ALIGN - offset);
--	/* io-mmu-map the skb */
--	cpu_addr = dma_map_single(ctodev(card), descr->skb->data,
--				  GELIC_NET_MAX_FRAME, DMA_FROM_DEVICE);
--	descr->hw_regs.payload.dev_addr = cpu_to_be32(cpu_addr);
--	if (dma_mapping_error(ctodev(card), cpu_addr)) {
--		dev_kfree_skb_any(descr->skb);
-+	cpu_addr = dma_map_single(dev, napi_buff, napi_buff_size,
-+				  DMA_FROM_DEVICE);
-+
-+	if (dma_mapping_error(dev, cpu_addr)) {
-+		skb_free_frag(napi_buff);
- 		descr->skb = NULL;
--		dev_info(ctodev(card),
--			 "%s:Could not iommu-map rx buffer\n", __func__);
-+		dev_err_once(dev, "%s:Could not iommu-map rx buffer\n",
-+			     __func__);
- 		gelic_descr_set_status(descr, GELIC_DESCR_DMA_NOT_IN_USE);
- 		return -ENOMEM;
- 	}
- 
--	descr->hw_regs.payload.size = cpu_to_be32(GELIC_NET_MAX_FRAME);
-+	descr->hw_regs.payload.size = cpu_to_be32(napi_buff_size);
- 	descr->hw_regs.payload.dev_addr = cpu_to_be32(cpu_addr);
- 
- 	gelic_descr_set_status(descr, GELIC_DESCR_DMA_CARDOWNED);
-diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.h b/drivers/net/ethernet/toshiba/ps3_gelic_net.h
-index f7d7931e51b7..e8f7de8e7e9b 100644
---- a/drivers/net/ethernet/toshiba/ps3_gelic_net.h
-+++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.h
-@@ -19,10 +19,10 @@
- #define GELIC_NET_RX_DESCRIPTORS        128 /* num of descriptors */
- #define GELIC_NET_TX_DESCRIPTORS        128 /* num of descriptors */
- 
--#define GELIC_NET_MAX_FRAME             2312
-+#define GELIC_NET_MAX_FRAME             2312U
- #define GELIC_NET_MAX_MTU               2294
- #define GELIC_NET_MIN_MTU               64
--#define GELIC_NET_RXBUF_ALIGN           128
-+#define GELIC_NET_RXBUF_ALIGN           128U
- #define GELIC_CARD_RX_CSUM_DEFAULT      1 /* hw chksum */
- #define GELIC_NET_WATCHDOG_TIMEOUT      5*HZ
- #define GELIC_NET_BROADCAST_ADDR        0xffffffffffffL
+Would calling rcu_softirq_qs() every ~10ms instead be a serious issue ?
+
+In anycase, if this all about rcu_tasks, I would prefer using a macro
+defined in kernel/rcu/tasks.h
+instead of having a hidden constant in a networking core function.
+
+Thanks.
 
