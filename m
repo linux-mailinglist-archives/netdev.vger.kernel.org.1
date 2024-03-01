@@ -1,109 +1,98 @@
-Return-Path: <netdev+bounces-76422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B2886DA30
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 04:37:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93F4E86DA4B
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 04:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B80D28215F
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 03:37:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 034D328708A
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 03:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A88752F7D;
-	Fri,  1 Mar 2024 03:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E52E94655F;
+	Fri,  1 Mar 2024 03:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ayq0m4fm"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="qjXaY9vq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5BC482D8;
-	Fri,  1 Mar 2024 03:36:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D1B47F54
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 03:39:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709264161; cv=none; b=GTU45Yt1aSNSU2kr1rXry1fnXoRUF8lr6gM3NGA7jcSQTcuuXo1Pvq5Z3m/7Ut6CCUO9cd1sRwVHV+u7vU3Aoncv/Isr3ZuY1a3CE0UANR7CWRc4oHuDK2neCioBQi0rJiddXbDPsqoUZ0ybB6j7TrxUHz02PvTWfSJFOPswU44=
+	t=1709264377; cv=none; b=HPzIEAJ+CBfqR+nHCZfChk7tsBJ/Q83VYN26ylJZ+2ENvlyVozZD8ActQ5UGYEOdPfs7zeb4lDvxfq9d+vFX42EW8G/TrweyhGxjPy2Um22fUBOlQ1TgbuN+wLbB9BFrcnlIJakgJ0DC5lES1naJp1Xj669nRklF7BYrvHHIvOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709264161; c=relaxed/simple;
-	bh=7MMrpaeosl/HNUkEmXL5fvfi4arjsMc5l6Z2bn8XT50=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=NQsosUpjqYUlGdt473/+Ksmwp1T72qdDANGxUss7POqYSeMZF7HUOcUAWxzHYZmCqqN3KB6R8gVnjGIzTybY4392FVg9E2T87MLOZ+FeOvnfto02PTzolkpB/I8jB/ipjqI1ScL+egIJ3yd2pI/NJfBl6F57cRFtoqHG/tgVLv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ayq0m4fm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D02F9C32781;
-	Fri,  1 Mar 2024 03:36:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709264160;
-	bh=7MMrpaeosl/HNUkEmXL5fvfi4arjsMc5l6Z2bn8XT50=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=ayq0m4fmc3kYLRBYiF0XcKRP60Pq/NpI3LwNabcyvSP9sxAA9SWZ9yKMSY8Y66Omy
-	 IkVAxVe7I7/v5H2s+2xMSfXnHYqDSwU7QHz+BkONawbrcSiCuupV5Oc1oSuULoxxHm
-	 6DwjUOewXUPs5nUI3XK50DjaXZ/qmo98QXWfHDHNV8GggYv2adZkHIZmodhjiCw/5I
-	 hQRJXii3JA3B/I3GRWX30X3bJxiI3+K/912tTv+Xj7AomvG4KwqebH6tKd2k12s8bW
-	 RG6JZ9qmSe4uPiSrEkqn4Agw+9MbRb2UJXCj/RV+yjg4VJYmavKDn0XAm4w2o716Uk
-	 Tp0kMJwJPrw1Q==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B911FC54E4A;
-	Fri,  1 Mar 2024 03:36:00 +0000 (UTC)
-From: Yang Xiwen via B4 Relay <devnull+forbidden405.outlook.com@kernel.org>
-Date: Fri, 01 Mar 2024 11:36:02 +0800
-Subject: [PATCH net-next v7 9/9] net: hisi_femac: remove unused
- MODULE_ALIAS()
+	s=arc-20240116; t=1709264377; c=relaxed/simple;
+	bh=Dmz/DGRvWnv4CEjsyjiUFQiR6kp7ajYMGs2yRdXygqU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jP56IuKl33LTz3L0uDl5TZlpI8tlRtWu8ccXi4ljR2FQdqyGpihQekpEzWtDZcE/SsaNfx6pyPiL7ynCBZXPejpsjjZNlbghHj0anPupUW45fsqd6aCE4YS8jWHNlJabFhUtxJ83/5by+vf3etAd2+pcSh7WcrQlGGTyxAIwPQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=qjXaY9vq; arc=none smtp.client-ip=209.85.167.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3bd4e6a7cb0so1085002b6e.3
+        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 19:39:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1709264375; x=1709869175; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HnOWlJzPxGoGnQ3YfJQSxaiznXm6JlCSXYm85veUwgk=;
+        b=qjXaY9vqWp++NvSEZwUV8r76i4E99cStuMRH1j0OL0GxjCxgzkQHSq7kzGlm3vQxM1
+         4ctiU+YAhOZ7ksztyijrSIwEoLgEq0+1rgYZ5rXqpeE7KWsP+IIiLSSnj1NX8aWn+3sE
+         w8WDnaVHzH4SLloESUkyv8d7nOwYNRyJDlZdvDZ/FPtvm+3l3IXFVLfAKfA6HsSVHIds
+         YyQLeBt34dQaBITixmHaS7Y9VxZYgoOIg8xuRQSxkziPj6IiBXpzYKEBE624bvAuXtvN
+         CXNqwfIDHUWnvh99EzTrjYnLt1WQN0ngAY9ezqJn6SjE53WJdVpCKgDW5/bDsJpVo75n
+         JEgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709264375; x=1709869175;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HnOWlJzPxGoGnQ3YfJQSxaiznXm6JlCSXYm85veUwgk=;
+        b=cq5mZyhf0oO+rFH2TeL+Pvr/VbHYGioYJ5XlRUxK3unZp4/HaKFUTZcYYm/wVRBjvF
+         +tAHg+ZzEn8OcrM0JD0cJeWl5DDMF92QU6APNUSN7DdOIrQ3majPkepSiihOTa6/YWQc
+         pyFSrFLjn4AbMtGzDu2uEcLfrrPT7ifldla3qqbAhtzwLqkQq+C7mN1r76sTg2V/bA8j
+         hD9ufrKbo0tNSv/4edj77S8P3wWRXBSlT3Px/aOCz5FX5oCpsCzVkyxlzeA4SZZAj/Z2
+         +whUUB34zIueOo2aXn9gbKbjl52F6nmCxe3MpbXosPMSNIwP5t9X7RzfJoUMlqWYji24
+         R58Q==
+X-Gm-Message-State: AOJu0Yy0tlSSWmKilxM1gRH9mXH/ZXJAHPSPUehiyPqu8Ss5AE6IttzM
+	d/0NPFSUYrLrDejsUBhHnAZkkdSVrX3dWKN0x7HvcBHGObE8YYFk4fHWzOylVfk=
+X-Google-Smtp-Source: AGHT+IH1aVmaoCG9TpsS5C6gK2yDiyOYj9QhA+Gg9vchJd8DOKXZVqOf3GZyIogpw7LrdsMsMkKNJg==
+X-Received: by 2002:a05:6808:1412:b0:3c1:c2cf:87e6 with SMTP id w18-20020a056808141200b003c1c2cf87e6mr724389oiv.6.1709264375022;
+        Thu, 29 Feb 2024 19:39:35 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id b29-20020aa78edd000000b006e08da9c29csm963433pfr.54.2024.02.29.19.39.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Feb 2024 19:39:34 -0800 (PST)
+Date: Thu, 29 Feb 2024 19:39:33 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: William Tu <witu@nvidia.com>
+Cc: <netdev@vger.kernel.org>, <jiri@nvidia.com>, <bodong@nvidia.com>,
+ <tariqt@nvidia.com>, <yossiku@nvidia.com>, <kuba@kernel.org>
+Subject: Re: [PATCH RFC v2 iproute2-next] devlink: Add eswitch attr option
+ for shared descriptors
+Message-ID: <20240229193933.38e0bf32@hermes.local>
+In-Reply-To: <20240301020214.8122-1-witu@nvidia.com>
+References: <20240301020214.8122-1-witu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240301-net-v7-9-45823597d4d4@outlook.com>
-References: <20240301-net-v7-0-45823597d4d4@outlook.com>
-In-Reply-To: <20240301-net-v7-0-45823597d4d4@outlook.com>
-To: Yisen Zhuang <yisen.zhuang@huawei.com>, 
- Salil Mehta <salil.mehta@huawei.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh+dt@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- devicetree@vger.kernel.org, Yang Xiwen <forbidden405@outlook.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1709264157; l=755;
- i=forbidden405@outlook.com; s=20240228; h=from:subject:message-id;
- bh=+34jZ1SKVkOv2MrXgtbQ7Xmywsr8EdEjQMnJi4ShHRs=;
- b=I7cBEABnNwTuWfyboWMHMrZ5qaVqOs8glzX8mOuOV5IRCw7VivfzHePoyU78v02FUskRZLEem
- O1rRHgJyGypDAQI1kDtYciXwYi+W6dSPdgr/KOMqPKvqNY49d25sYk8
-X-Developer-Key: i=forbidden405@outlook.com; a=ed25519;
- pk=KAWv6ZzFsT54MGllOczJgFiWB+DuayEmyn24iiVVThU=
-X-Endpoint-Received:
- by B4 Relay for forbidden405@outlook.com/20240228 with auth_id=136
-X-Original-From: Yang Xiwen <forbidden405@outlook.com>
-Reply-To: <forbidden405@outlook.com>
 
-From: Yang Xiwen <forbidden405@outlook.com>
+On Fri, 1 Mar 2024 04:02:14 +0200
+William Tu <witu@nvidia.com> wrote:
 
-We already have MODULE_DEVICE_TABLE(), so this MODULE_ALIAS() has no use
-and should be removed.
+> +		} else if ((dl_argv_match(dl, "shrdesc-mode")) &&
 
-Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
----
- drivers/net/ethernet/hisilicon/hisi_femac.c | 1 -
- 1 file changed, 1 deletion(-)
+So devlink has its own match problem.
 
-diff --git a/drivers/net/ethernet/hisilicon/hisi_femac.c b/drivers/net/ethernet/hisilicon/hisi_femac.c
-index 22a4697e0dde..2ecc10a9ca28 100644
---- a/drivers/net/ethernet/hisilicon/hisi_femac.c
-+++ b/drivers/net/ethernet/hisilicon/hisi_femac.c
-@@ -1014,4 +1014,3 @@ module_platform_driver(hisi_femac_driver);
- MODULE_DESCRIPTION("Hisilicon Fast Ethernet MAC driver");
- MODULE_AUTHOR("Dongpo Li <lidongpo@hisilicon.com>");
- MODULE_LICENSE("GPL v2");
--MODULE_ALIAS("platform:hisi-femac");
-
--- 
-2.43.0
-
+We stopped allowing new match arguments because they create
+ordering conflicts. For example in your new code if "shrdesc" is
+passed it matches the mode field.
 
