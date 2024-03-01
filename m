@@ -1,121 +1,129 @@
-Return-Path: <netdev+bounces-76699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAD0D86E8BA
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 19:51:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A4AB86E8C8
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 19:53:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB4961C25CDD
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:51:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 463211C22E68
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03F053B198;
-	Fri,  1 Mar 2024 18:49:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CaNnz3ew"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155CB38F99;
+	Fri,  1 Mar 2024 18:52:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718FF3A8E1
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 18:49:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFAB38C1B;
+	Fri,  1 Mar 2024 18:52:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709318949; cv=none; b=ilxEzaaKkavTNSh7dWbD4RYxs6W4GJHsErhfTtEO701GqwIAdzJcseMIZJDmzUcXfd6n2S3avM2B2HAahYpyr809qi16arTYPqsJnBJYtzg0dz9imx8h/GAj3qG0Q+fnuu1NSgU8UKZ8TIJif+vwIPZbHBA3wQNI2BK7Lf4o3Xk=
+	t=1709319162; cv=none; b=cheF4U6b+hRQQ2NiIR09czDVxD3LrZYDzQyVF9O4/T+xrKNHbZsEpKHAdFMhJv4x8pQ6sQSCXyKqIMbNmo6dTQ2v7cFAxOnRr3xdhMY6Ij8UAbmY8EnEsjaaGNCj6kdY/ZXUASELI4dEHRs0yDnVkvV9BTgAQ09i5viSrqNuv/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709318949; c=relaxed/simple;
-	bh=hVx8kEWB0NM4arQBXWds0RDnWCJ5xCohgP2h1PuXIwU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FvKX8yOKXkQ84NQrRn/RT+L4oRTl4aC+Xa3zPRi1XxGvkiPrHNpgRX6qK5zXeYGLFtwrOEY0ar2ZYo8Bl1N976OfKL5dY01PZzlntOHtxx3K+55+dmgx+w7U4wGBMu+KV8Ti4IfCuqEUMOsSiI2EUZzuIOL6v0XdMY3Z/0QrSWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CaNnz3ew; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709318948; x=1740854948;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=hVx8kEWB0NM4arQBXWds0RDnWCJ5xCohgP2h1PuXIwU=;
-  b=CaNnz3ewdOuAsqn/O4Nt5EunHsuyrwplYGIyHnBz2zMabk3qqvoNmEQb
-   NcMNFXCRsB4nW6xYWUMNWvxJ3tKymOiA+71UziPo3jK9fTrL5dc43AN5S
-   Cpz16mj35Y7H6fFMZ+LeXI40u0IrgeWbeNODbuwXMvpoEfpS4anVNzu4O
-   r/euHooM5SQ81cdwU/PCG/RK2J3yli12D2w5DOrOoEuFNvCoQ6RQjoAgG
-   pioCvCfcMapEllJLUdTyN/Iqzke59NEApiMG+WD7Vby1HXwvpjrqPRzDw
-   BBpqKvjg1bA+Liy8kpJINL65Izx4XwmwUQXEmqKJPGnUGtD9rHxyGjo5/
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11000"; a="15303351"
-X-IronPort-AV: E=Sophos;i="6.06,196,1705392000"; 
-   d="scan'208";a="15303351"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2024 10:49:06 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,196,1705392000"; 
-   d="scan'208";a="8205871"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa009.fm.intel.com with ESMTP; 01 Mar 2024 10:49:05 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>,
-	anthony.l.nguyen@intel.com,
-	sasha.neftin@intel.com,
-	Naama Meir <naamax.meir@linux.intel.com>
-Subject: [PATCH net-next v2 4/4] e1000e: Minor flow correction in e1000_shutdown function
-Date: Fri,  1 Mar 2024 10:48:05 -0800
-Message-ID: <20240301184806.2634508-5-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240301184806.2634508-1-anthony.l.nguyen@intel.com>
-References: <20240301184806.2634508-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1709319162; c=relaxed/simple;
+	bh=44S/7fMa4t3C3sreMd4jk5F0uk+BmeF1MV2xSiGfrrA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QjwjDv1rQGT/oFdo6ZeSv9Aua86UiMp76PljyAdWAEo41kSiEKd+3HrOMOoI3hwxoXnqVPHdpQ4KUcM4xkx6uzHh9mb+zOnNpGyCTfv8NgEE7fVYurG9FQ/4B1bb91VnKlVgzNeNaaK9HwTs0Ox43iWqrzGP339drIvLebFhPkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04C1AC433F1;
+	Fri,  1 Mar 2024 18:52:34 +0000 (UTC)
+Date: Fri, 1 Mar 2024 18:52:32 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+	llvm@lists.linux.dev, Ingo Molnar <mingo@redhat.com>,
+	Bill Wendling <morbo@google.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Leon Romanovsky <leonro@mellanox.com>, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Mark Rutland <mark.rutland@arm.com>,
+	Michael Guralnik <michaelgur@mellanox.com>, patches@lists.linux.dev,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 4/6] arm64/io: Provide a WC friendly __iowriteXX_copy()
+Message-ID: <ZeIj8HtdbKS3eqG6@arm.com>
+References: <0-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
+ <4-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
 
-From: Vitaly Lifshits <vitaly.lifshits@intel.com>
+On Tue, Feb 20, 2024 at 09:17:08PM -0400, Jason Gunthorpe wrote:
+> The kernel provides driver support for using write combining IO memory
+> through the __iowriteXX_copy() API which is commonly used as an optional
+> optimization to generate 16/32/64 byte MemWr TLPs in a PCIe environment.
+> 
+> iomap_copy.c provides a generic implementation as a simple 4/8 byte at a
+> time copy loop that has worked well with past ARM64 CPUs, giving a high
+> frequency of large TLPs being successfully formed.
+> 
+> However modern ARM64 CPUs are quite sensitive to how the write combining
+> CPU HW is operated and a compiler generated loop with intermixed
+> load/store is not sufficient to frequently generate a large TLP. The CPUs
+> would like to see the entire TLP generated by consecutive store
+> instructions from registers. Compilers like gcc tend to intermix loads and
+> stores and have poor code generation, in part, due to the ARM64 situation
+> that writeq() does not codegen anything other than "[xN]". However even
+> with that resolved compilers like clang still do not have good code
+> generation.
+> 
+> This means on modern ARM64 CPUs the rate at which __iowriteXX_copy()
+> successfully generates large TLPs is very small (less than 1 in 10,000)
+> tries), to the point that the use of WC is pointless.
+> 
+> Implement __iowrite32/64_copy() specifically for ARM64 and use inline
+> assembly to build consecutive blocks of STR instructions. Provide direct
+> support for 64/32/16 large TLP generation in this manner. Optimize for
+> common constant lengths so that the compiler can directly inline the store
+> blocks.
+> 
+> This brings the frequency of large TLP generation up to a high level that
+> is comparable with older CPU generations.
+> 
+> As the __iowriteXX_copy() family of APIs is intended for use with WC
+> incorporate the DGH hint directly into the function.
+> 
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: linux-arch@vger.kernel.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Add curly braces to avoid entering to an if statement where it is not
-always required in e1000_shutdown function.
-This improves code readability and might prevent non-deterministic
-behaviour in the future.
+Apart from the slightly more complicated code, I don't expect it to make
+things worse on any of the existing hardware.
 
-Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/e1000e/netdev.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+So, with the typo fix that Will mentioned:
 
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index af5d9d97a0d6..cc8c531ec3df 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -6688,14 +6688,14 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
- 	if (adapter->hw.phy.type == e1000_phy_igp_3) {
- 		e1000e_igp3_phy_powerdown_workaround_ich8lan(&adapter->hw);
- 	} else if (hw->mac.type >= e1000_pch_lpt) {
--		if (wufc && !(wufc & (E1000_WUFC_EX | E1000_WUFC_MC | E1000_WUFC_BC)))
-+		if (wufc && !(wufc & (E1000_WUFC_EX | E1000_WUFC_MC | E1000_WUFC_BC))) {
- 			/* ULP does not support wake from unicast, multicast
- 			 * or broadcast.
- 			 */
- 			retval = e1000_enable_ulp_lpt_lp(hw, !runtime);
--
--		if (retval)
--			return retval;
-+			if (retval)
-+				return retval;
-+		}
- 	}
- 
- 	/* Ensure that the appropriate bits are set in LPI_CTRL
--- 
-2.41.0
-
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 
