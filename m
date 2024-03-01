@@ -1,175 +1,205 @@
-Return-Path: <netdev+bounces-76480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7444D86DE5A
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:35:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8778986DE5F
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:37:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE4CEB22DBD
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:35:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A716D1C210A3
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:37:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F7D36A35C;
-	Fri,  1 Mar 2024 09:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC70E6A8A1;
+	Fri,  1 Mar 2024 09:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="MTpq8QL3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F816A354;
-	Fri,  1 Mar 2024 09:35:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49E423BD;
+	Fri,  1 Mar 2024 09:37:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709285751; cv=none; b=BuS8B0cG0d77O0EOBDtcaNqFoaZ1hdjHnVEObLHEFnuQESxVS72/e8QihArcDQ92ILADlIj5qxdKn1Rxdzi0VCy+YA1f6wVwydqx7xhlIXQxg/IVDyvHcI9sFCEWz9URiaNCFKxfdJNVdJWTyKbWqGoTVdAqOHX+1Fgn7W+tUIg=
+	t=1709285842; cv=none; b=QDp6XcWNn7aOm2PxJVxhms75vBppuKau+zBMq9tELcJ1fs1NTgkxiEAqqsDux/wAaqnG9jly+2bUV4WGsR3uioL4JWJxwQF4DepYfXLmiMKtOBpmliQoYn3Rm/cSikIWhfcNHIGCNXsZ5IqMxpXci5BYTaYqkScF90JcxxkB/vk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709285751; c=relaxed/simple;
-	bh=8bNhQxbcCbIomd4dt6eew7xOLqapH0ekcPWsALbORUA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HCyJesxh9n05Ov6rKtkRTa9Yq8T6jGR/jAOfYOcKiIXDlHF2BIx42W9ORpqDtSynPCspYqlDVfyhFEj/hnI9MxkM71GfBpbEd1ovNpWXpLpioe9jdOm2srgQXFF0HVWUkAS0wqBeTRJvtjLEoUux3lGjYTku21Z00EOcFEPKU1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-412bfacd146so8595005e9.0;
-        Fri, 01 Mar 2024 01:35:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709285748; x=1709890548;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1gjhUQtfjcW3P/Ik/3eAaSYAXs9I9SaEMNpWMrhksnk=;
-        b=V3wlWE9A9SjUqw0U9Dy/QqJm1wzspZv+ebCUApw2ayNwUmvlP/YEkQbfcHXdngSMai
-         nnxfkOvkghXCW5jdq59Yd5Urv7wCMVbdsOt2SLaya8NDVdjNXVSa7xV7Pzfo/STVV4vI
-         ONgweYrd0ggtsCe9JOkX8XWDEHmn11tfhlgUIhTBzfHeuNlRx/KdzL1GNpTFVIO4k/T0
-         9T5yCCNlSEPbwNZqZziyHclu/CgLB6I1rNEj5KoLJAa8rRZ/z892KM2ZvhHWcv9al+X9
-         MoEblBnW2fgezQ88tIBRq8z7gc0zckhDJUqLi5LuuDXi2pj6ah4FyLveOULL4Y2sK3UG
-         fklg==
-X-Forwarded-Encrypted: i=1; AJvYcCWxPjUkIo49xcvq2/2gYPzMFmG8NE1s5ReW+7EVc/IRDicjYaVxnHKFjqu9RvgA7DPR23SAkdd8NHVD+VrbuIDmY9BkJ8DXFJOaXj+DaKC88oYw/wsM+vrgpH47PKP1WKbwoLN3BmL6gwj/h+QYGy2jZm0TB0MXUODWibJdJUAo
-X-Gm-Message-State: AOJu0Yw2ejJZf3VYwmNTGlCXInLsX8aAuQTIyFoODWKXn3X9VA/osxM7
-	a4AjzlScfiXUnSX6xtCqdpHaRPqqzqG3NA8LQS83YnBV8/eGUQvGydQCtXIn
-X-Google-Smtp-Source: AGHT+IHJDI/TzDartf8NY/ZhFuVhtyIPZkGhPS1hZ/O9GtvpENuTyWbmh0D26/bAjBhR+zHpTBrJoA==
-X-Received: by 2002:a05:600c:154f:b0:412:bca4:6a00 with SMTP id f15-20020a05600c154f00b00412bca46a00mr1546337wmg.18.1709285747492;
-        Fri, 01 Mar 2024 01:35:47 -0800 (PST)
-Received: from gmail.com (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 1-20020a05600c024100b0040fddaf9ff4sm7830123wmj.40.2024.03.01.01.35.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 01:35:47 -0800 (PST)
-Date: Fri, 1 Mar 2024 01:35:44 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Matthew Wood <thepacketgeek@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: netconsole: Add continuation line
- prefix to userdata messages
-Message-ID: <ZeGhcN/C7h1KWcTO@gmail.com>
-References: <20240229183602.321747-1-thepacketgeek@gmail.com>
+	s=arc-20240116; t=1709285842; c=relaxed/simple;
+	bh=UmCaLfTDgVu9H3AdRuLN0U4ks9rrBGcqfM0mq0kvurc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u64Nd0eSe5QMeAjpaHWIyvB+KzOjHiAJ80hiw9sUlbbM8tjMuSg7GkXDG2Dbj3wVqPoP4JaGPteAJg3+3icC2GIQZgpPSy3/ATkOi+QZOJXfMrVeE0YwpfOQHHXibAXMKI44q40nXViZHPubjTI9cvnoUu/zxK3C9tde5EeeHww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=MTpq8QL3; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id DF0B388125;
+	Fri,  1 Mar 2024 10:37:11 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1709285833;
+	bh=OUCLiwUxgrW9Y1OI4sLD33zS7d7BRB5TAcfygrVCJfg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MTpq8QL3psHv2+KpKA8HhThm8sISWomYvr0L5JDechSCIV+eLlG2Ixlvllauh77kh
+	 WLgPhqGc+kFxZ3xVV3StAVo/p4pQvxNHSogZX4oMgMqvOumJ3zxLvtWPbTnOkVYOxX
+	 rLVeEqsR3XWEcq2z2gKU5K9wFgiTY7CJ6jdw8+7jQ2hz8Kxgz4xSp7FMpQQvO5I/Zd
+	 uxbBk6LdjagJa1E7498KJj5CvDm1BIgZDD7+b/hi/kcDFADq90E2gNG9Kyfs9nPwKa
+	 4+x6ifr3KFMWqxF43CVBtSSWto1hX1b2Sxe7uqU95WtRXl6FWkuoS+osl1TUxx0Tcd
+	 jS2sgAByg0acg==
+Date: Fri, 1 Mar 2024 10:37:05 +0100
+From: Lukasz Majewski <lukma@denx.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, Eric Dumazet <edumazet@google.com>, Florian
+ Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, Tristram.Ha@microchip.com, Sebastian Andrzej
+ Siewior <bigeasy@linutronix.de>, Paolo Abeni <pabeni@redhat.com>, Ravi
+ Gunasekaran <r-gunasekaran@ti.com>, Simon Horman <horms@kernel.org>,
+ Wojciech Drewek <wojciech.drewek@intel.com>, Nikita Zhandarovich
+ <n.zhandarovich@fintech.ru>, Murali Karicheri <m-karicheri2@ti.com>, Dan
+ Carpenter <dan.carpenter@linaro.org>, Ziyang Xuan
+ <william.xuanziyang@huawei.com>, Kristian Overskeid <koverskeid@gmail.com>,
+ Matthieu Baerts <matttbe@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [RFC] net: hsr: Provide RedBox support
+Message-ID: <20240301103705.2f308b83@wsk>
+In-Reply-To: <399bf6c2-c9be-4f41-8df5-8d9655e34003@lunn.ch>
+References: <20240228150735.3647892-1-lukma@denx.de>
+	<20240228083115.01d4c93e@hermes.local>
+	<c3880444-3665-4a60-b6ec-f8ae8a9fbf8d@lunn.ch>
+	<20240229102557.615c02f3@wsk>
+	<399bf6c2-c9be-4f41-8df5-8d9655e34003@lunn.ch>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240229183602.321747-1-thepacketgeek@gmail.com>
+Content-Type: multipart/signed; boundary="Sig_/gYCWTCB/.I.6xagM6ho1gyQ";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Thu, Feb 29, 2024 at 10:36:01AM -0800, Matthew Wood wrote:
-> Add a space (' ') prefix to every userdata line to match docs for
-> dev-kmsg. To account for this extra character in each userdata entry,
-> reduce userdata entry names (directory name) from 54 characters to 53.
-> 
-> According to the dev-kmsg docs, a space is used for subsequent lines to
-> mark them as continuation lines.
-> 
-> > A line starting with ' ', is a continuation line, adding
-> > key/value pairs to the log message, which provide the machine
-> > readable context of the message, for reliable processing in
-> > userspace.
-> 
-> Testing for this patch::
-> 
->  cd /sys/kernel/config/netconsole && mkdir cmdline0
->  cd cmdline0
->  mkdir userdata/test && echo "hello" > userdata/test/value
->  mkdir userdata/test2 && echo "hello2" > userdata/test2/value
->  echo "message" > /dev/kmsg
-> 
-> Outputs::
-> 
->  6.8.0-rc5-virtme,12,493,231373579,-;message
->   test=hello
->   test2=hello2
-> 
-> And I confirmed all testing works as expected from the original patchset
-> 
-> v1 -> v2:
-> - Calculate 53 byte user data name from: entry length - formatting chars - value length
-> - Update docs to reflect 53 byte limit for user data name (director)
+--Sig_/gYCWTCB/.I.6xagM6ho1gyQ
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I think the changelog needs to come after the --- below, but I will
-defer that to the maintainers.
+Hi Andrew,
 
-> Fixes: df03f830d099 ("net: netconsole: cache userdata formatted string in netconsole_target")
-> Signed-off-by: Matthew Wood <thepacketgeek@gmail.com>
-> ---
->  Documentation/networking/netconsole.rst | 8 ++++----
->  drivers/net/netconsole.c                | 8 +++++---
->  2 files changed, 9 insertions(+), 7 deletions(-)
-> 
-> diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
-> index b28c525e5d1e..d55c2a22ec7a 100644
-> --- a/Documentation/networking/netconsole.rst
-> +++ b/Documentation/networking/netconsole.rst
-> @@ -180,7 +180,7 @@ Custom user data can be appended to the end of messages with netconsole
->  dynamic configuration enabled. User data entries can be modified without
->  changing the "enabled" attribute of a target.
->  
-> -Directories (keys) under `userdata` are limited to 54 character length, and
-> +Directories (keys) under `userdata` are limited to 53 character length, and
->  data in `userdata/<key>/value` are limited to 200 bytes::
->  
->   cd /sys/kernel/config/netconsole && mkdir cmdline0
-> @@ -197,8 +197,8 @@ Messages will now include this additional user data::
->  Sends::
->  
->   12,607,22085407756,-;This is a message
-> - foo=bar
-> - qux=baz
-> +  foo=bar
-> +  qux=baz
->  
->  Preview the userdata that will be appended with::
->  
-> @@ -218,7 +218,7 @@ The `qux` key is omitted since it has no value::
->  
->   echo "This is a message" > /dev/kmsg
->   12,607,22085407756,-;This is a message
-> - foo=bar
-> +  foo=bar
->  
->  Delete `userdata` entries with `rmdir`::
->  
-> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> index 0de108a1c0c8..46e447ea41b8 100644
-> --- a/drivers/net/netconsole.c
-> +++ b/drivers/net/netconsole.c
-> @@ -43,9 +43,11 @@ MODULE_DESCRIPTION("Console driver for network interfaces");
->  MODULE_LICENSE("GPL");
->  
->  #define MAX_PARAM_LENGTH	256
-> -#define MAX_USERDATA_NAME_LENGTH	54
-> -#define MAX_USERDATA_VALUE_LENGTH	200
->  #define MAX_USERDATA_ENTRY_LENGTH	256
-> +#define MAX_USERDATA_VALUE_LENGTH	200
-> +#define MAX_USERDATA_NAME_LENGTH	MAX_USERDATA_ENTRY_LENGTH - \
-> +					MAX_USERDATA_VALUE_LENGTH - \
-> +					3 /* ' ' '=' '\n' characters */
+> On Thu, Feb 29, 2024 at 10:25:57AM +0100, Lukasz Majewski wrote:
+> > Hi Andrew,
+> >  =20
+> > > On Wed, Feb 28, 2024 at 08:31:15AM -0800, Stephen Hemminger
+> > > wrote: =20
+> > > > On Wed, 28 Feb 2024 16:07:35 +0100
+> > > > Lukasz Majewski <lukma@denx.de> wrote:
+> > > >    =20
+> > > > > =20
+> > > > > +/* hsr_proxy_node_table_show - Formats and prints proxy
+> > > > > node_table entries */ +static int
+> > > > > +hsr_proxy_node_table_show(struct seq_file *sfp, void *data)
+> > > > > +{
+> > > > > +	struct hsr_priv *priv =3D (struct hsr_priv
+> > > > > *)sfp->private;
+> > > > > +	struct hsr_node *node;
+> > > > > +
+> > > > > +	seq_printf(sfp, "Proxy Node Table entries for HSR
+> > > > > device\n");
+> > > > > +	seq_puts(sfp, "MAC-Address-SAN,        time_in\n");
+> > > > > +	rcu_read_lock();
+> > > > > +	list_for_each_entry_rcu(node, &priv->proxy_node_db,
+> > > > > mac_list) {
+> > > > > +		seq_printf(sfp, "%pM ",
+> > > > > &node->macaddress_A[0]);
+> > > > > +		seq_printf(sfp, "%10lx\n",
+> > > > > node->time_in[HSR_PT_INTERLINK]);
+> > > > > +	}
+> > > > > +	rcu_read_unlock();
+> > > > > +	return 0;
+> > > > > +}
+> > > > > +
+> > > > >  DEFINE_SHOW_ATTRIBUTE(hsr_node_table);
+> > > > > +DEFINE_SHOW_ATTRIBUTE(hsr_proxy_node_table);   =20
+> > > >=20
+> > > > NAK
+> > > > Do not abuse sysfs to be a debug proc style output.   =20
+> > >=20
+> > > This is actually debugfs, not sysfs.
+> > >=20
+> > > However, i agree, we want information like this exported via
+> > > netlink as the primary interface to the end user. debugfs is not
+> > > suitable for that. =20
+> >=20
+> > Am I correct, that recommended approach would be to:
+> >=20
+> > 1. Modify iproute2 to support for example:
+> >=20
+> > ip addr show dev hsr1 nodes {proxy} ? =20
+>=20
+> Something like that. iproute2 is more than the ip command. There is
+> also bridge, dcb, vdpa, etc. So you need to decide where it fits best.
+> Maybe as part of bridge? Or even a command of its own.
 
-This is not beautiful even for my standards. I think something like the
-code below makes more sense, even if checkpatch is not happy.
+IMHO, 'bridge' is not the best place for hsr output, as 'NodeTable' can
+(and should) be provided for non-redbox communication.
 
-/* The number three below comes from ' ' + '=' + '\n' characters */
-#define MAX_USERDATA_NAME_LENGTH 	MAX_USERDATA_ENTRY_LENGTH - MAX_USERDATA_VALUE_LENGTH - 3 
+For now the ip looks like the best place.
+
+>=20
+> > 2. Shall the currently exported:
+> >=20
+> > /sys/kernel/debug/hsr/hsrX/node_table be left as it is (for legacy
+> > usage) or shall it be removed and replaced with netlink and
+> > iproute2 ? =20
+>=20
+> There is no legacy usage. debugfs is unstable, it is not KAPI. Nothing
+> is expected to use it, because it could disappear at any time, its
+> format can change, etc. For a long time, debugfs was not liked in
+> networking, because it was abused and tools built on top of it, often
+> vendor tools. We much prefer well defined interfaces such as
+> netlink. But it seems like things are becoming a little bit more
+> loose.
+
+Ok. Thanks for the explanation.
+
+> If you have a well defined netlink API making debugfs
+> pointless, you can probably keep the debugfs code :-) But you can also
+> remove it.
+
+I would prefer to keep the code.
+
+>=20
+> 	   Andrew
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/gYCWTCB/.I.6xagM6ho1gyQ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmXhocEACgkQAR8vZIA0
+zr2XfggAt937GNfSLjMdbOOgWXh+2zIDkuWIoTWrbQ98heJ2eDIDXpK/mUWIxcWl
+7aJMN6FEQhSKbSpqyFjVFOfGjtgEwHccWaQeQhifC/ta4aSXVd+1kTnGLRTw0pL9
+Gyz/6R8kAphE+V7ZqToGDS/lkWA4OpRg4j/rKTwLhSj0skfNi8WYBKufz6fmygK1
+843tUkfw87CzbHhp4zfIAG2dGTm9nrLt7MHiw6Vb7lYuOD9Vb6fCDCKh4C3TI/Gb
+bNC41T4kUkZ9KAzT8Z4Z4CMXSwuIYitxoHB7iOgstrDKOK9qTXuz1cGEiSJoXbrJ
+xj0e+eZ+DLhH2UnVb+GZeShJNfFLiA==
+=xtnk
+-----END PGP SIGNATURE-----
+
+--Sig_/gYCWTCB/.I.6xagM6ho1gyQ--
 
