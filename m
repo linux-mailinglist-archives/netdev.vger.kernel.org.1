@@ -1,158 +1,163 @@
-Return-Path: <netdev+bounces-76543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E7E886E174
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 14:02:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5494886E1F0
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 14:26:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0ACC281C03
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 13:02:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0BA0B210D5
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 13:26:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83D43EA76;
-	Fri,  1 Mar 2024 13:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C5496CDD6;
+	Fri,  1 Mar 2024 13:25:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MWKMRoLG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B+Q2+3Fy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF35A3D
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 13:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA9F6BB4B
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 13:25:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709298174; cv=none; b=J7TywsWMKYPWjGYt9GWZvr783fkHKP4R4ttyLI4x4gOIlA9Ohfw8OZzeOD3s8swSA/no2atfHYSSwMmEGvVYpawgBMEliEWcXvmbA+v1pyvWAwMGCb0ZqqNynETDVBFtWJgh22MhpZi1rnwm8y3GjskntDu/Xs8RZzh4WPSx2no=
+	t=1709299555; cv=none; b=uyFZY4RiUYRmbPRWzMkEv2krKjWjDy8E5hPsZbppR7dQDAwID4Xxt8za9Vtm5ciaL8Pl+wce976IenP9F7EEc8Ul1+aXBOoYNPntjuuGaISwAT1gaM0ONbbbarpJ60/wqVVxb2VTtFCyBcF4NBb9QlGSrx9YdqnJXd6COfs9A64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709298174; c=relaxed/simple;
-	bh=OvG24BkvEaqe8OrzbXeOdqfA7nREK6xO/wJ3GgykDvw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=T82s8si6VBSKRa0qKPAakQyWOsS3GVJPHNTKogdDCG4+drqjHPhpWknmCplJhmIuzUuLzY/8yETJt8uClei9FlUe60RX0VOLUbFFBHbEcMEaUelkzq+g9e2ISeYDMJzE+0zaZCFBwV29IdHSqGRpqJBYmZNfNszCTSUSuqv8hSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MWKMRoLG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709298172;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e/riObx+6pHnsV2QvL7phojFIfjcIVe9zNsMuHpkwW4=;
-	b=MWKMRoLGKe1JHTl4i+gY5H6Kzk5yy69TPjI4Ds34miK5LRnHPnVxLbjRwbCC4ZbO0w7Ouw
-	ZY/85tPbq/w/dxY8c+gp2pPI2J2U1HwDM31KVFbl/xocPP9h/oE3lSPOkMfg0wJ6v9ekie
-	YJO1Zau8uv3Ud10vQ28ABqdn87vGVPs=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-103-avY1m2XiM4emvsDytep0cw-1; Fri, 01 Mar 2024 08:02:50 -0500
-X-MC-Unique: avY1m2XiM4emvsDytep0cw-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a431a294ebeso154220566b.0
-        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 05:02:50 -0800 (PST)
+	s=arc-20240116; t=1709299555; c=relaxed/simple;
+	bh=JHWldWA6nNHKcTRlr05zV/nwVzVNIlbYVSMFB9iJlos=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XBKe1p4UzdedMrg2VqmHE5bujpGnUj2ZHK0aRoXR9sL2+wv2MCycgMZxC3Ni5EoJ1AbFcp4n65qVohGsQk0X0v+wY1UeG8xM+UB23YJZFydG4Z0gK2OqlxWCh05fDvJlAzgi6a9B6ra9/4MxrynF0cl4kW8loRBrdxz4/dTuXB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B+Q2+3Fy; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-565223fd7d9so5946a12.1
+        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 05:25:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709299552; x=1709904352; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+1teAiWc1jVGCssi6rgN3jeMMtmC7N9NmiOj97TQSRI=;
+        b=B+Q2+3FyhzzHOF8F2GLt2wkZhMidxgsedxhsBtInm8nvf198JXT1DWUuF0u/356Wxn
+         bHie3f4Uu/XHdrg+Vfa953FWhqx8oTkSxkHOqiW2KnCzAx7R4cD2NPj2TsXquakIjDcE
+         76UQQglv9A6OGSz2uwzZkR8KRPH8tPj4ZZe2hogP5p7bxSCh5+f3aUvhHjuq5MZHp8P7
+         7M2KrYJhNfbtyRCQP89PQJ/FD9VfpkinyagzG8V2v+DAKiZ7P84LOwrPvC5bXiBAILiy
+         Ra0kWb1lgODBF7kJQfvGMA3m9OzYX4TpQbrPd4MRKf2eJIzvsx2D4eOV8BvrxHB8P7Su
+         094A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709298170; x=1709902970;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1709299552; x=1709904352;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=e/riObx+6pHnsV2QvL7phojFIfjcIVe9zNsMuHpkwW4=;
-        b=fT2TLpgAov1dHhd+++qSoKLexZmRxayZuYC6gEZBDvzSb3VR8khOia8vKQcGKoM1AB
-         8xX7PuXFfbqWNOOezyNM2P4Y9wtsTbjYZbNE0whfPytASTDLdsadAJwXZ/VJnAkcwny7
-         e2PP3RreO/U+ClmKZdKj0SGpZ72cry5NMtaX+2ENbE3GIu+g40B/AmWE7dVdGETObqkc
-         mfXpvEh8esqayxEk13Uy8YV71xDfZyzKiTiqAPBLjpPgTMz0cboLJZMcp9V1yvoxWH6g
-         pI9eb1oWPIAkUbFjFue79IljEAOl+ytgbyG5o8n411jq4eq3s1Jf1XUzj7gFtued4/nq
-         OMJw==
-X-Forwarded-Encrypted: i=1; AJvYcCVsXsijK6KHwGuWcXF5MhRMsr6O8jh1SVjodIgsbyMkUa2w0YBn2IgjsyomCyhdF091fN2PXj0VQ8gqxSII6Syl22vvSJ+f
-X-Gm-Message-State: AOJu0YyGYj/PEaO2s/p4q0mR7XUzuJNOEWT22/tz3970gs2h7l628Bpj
-	frVoYSzH2gqDi+nT4HFg95f8t0DJkb8HMW7C8kt3hwO/C38XBpjsTZbiGRlonXytzlzohhu5Dcl
-	J7bcAZ0lpqcz+J0INQhC0ZgOwLOaTDWmDTr2VZZWFNrsTTx1owG6Ziw==
-X-Received: by 2002:a17:906:b84e:b0:a44:511d:606b with SMTP id ga14-20020a170906b84e00b00a44511d606bmr1060268ejb.8.1709298169762;
-        Fri, 01 Mar 2024 05:02:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGYznp1w3lq4gy1tqCaCFYEfvS6l+yqp5A3bkph6XMD0U/Y7N/yG9456IKgIoYlVfBgSzV/4w==
-X-Received: by 2002:a17:906:b84e:b0:a44:511d:606b with SMTP id ga14-20020a170906b84e00b00a44511d606bmr1060245ejb.8.1709298169388;
-        Fri, 01 Mar 2024 05:02:49 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id mc18-20020a170906eb5200b00a3f28bf94f8sm1682191ejb.199.2024.03.01.05.02.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 05:02:49 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id BF100112E96B; Fri,  1 Mar 2024 14:02:48 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: John Fastabend <john.fastabend@gmail.com>, John Fastabend
- <john.fastabend@gmail.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer
- <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Andrii
- Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
- Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>
-Cc: syzbot+8cd36f6b65f3cafd400a@syzkaller.appspotmail.com,
- netdev@vger.kernel.org, bpf@vger.kernel.org
-Subject: RE: [PATCH bpf] bpf: Fix DEVMAP_HASH overflow check on 32-bit arches
-In-Reply-To: <65e0eb87a079e_322af20886@john.notmuch>
-References: <20240227152740.35120-1-toke@redhat.com>
- <65dfa50679d0a_2beb3208c8@john.notmuch> <87zfvj8tiz.fsf@toke.dk>
- <65e0eb87a079e_322af20886@john.notmuch>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 01 Mar 2024 14:02:48 +0100
-Message-ID: <875xy6ayvb.fsf@toke.dk>
+        bh=+1teAiWc1jVGCssi6rgN3jeMMtmC7N9NmiOj97TQSRI=;
+        b=Yf6mvItgAbF9j7+84UpuQJ0PQuimpqa3zeFmlSz65MNP+bG7NBdUuN8qGeIRqXEBds
+         DM8PJ9y1JJFZ9AWEg71XiulcbDsyMDkmNoSsgK1AVMnbUzDae/OI0EJKsGgxbTCai669
+         7XTGZS+ykw8kVKatP7wTAEcsetDSjiV39DblYqjKWMh1/fe+WBngljefx2cK3ni7OII/
+         WH2cFYZBOMTXj0cFYAt6wFeqUCRwkcifB+p1IjQqU+woYIeIOILGrXM6NqFcBtSbgiS6
+         pOwyIGVL66rfHHWzRXWR7f1W+0oCUNckwOncjqO2zYSE+hxm+uDqjwpPWBCisADK14Xe
+         QgzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUR79kvy38lNTBZgKrAyHhN4E3zBdf8qGS8YjL1g3cest4M1FZ33cufF8hLAfWVtZACTL8TelFq90onXtWgd9Ka/2+Rf/z9
+X-Gm-Message-State: AOJu0YwGYU4ek6Z0EWQ+OnhNlULRPqb++bSe/+dV2QWkw5mIVlJAsiJf
+	p5DDQsUxOWBp30sUf4IrHnbdo0iUo86eoAAPhlkLADjH9m8notnKEF2/6cMwb/pZZtfV5c5CwSc
+	jTcTZ3TZp8NFvnoG2Gyh4bxIjPc0eZLOqCTyd
+X-Google-Smtp-Source: AGHT+IHAr/zt6nB351plwUC26OzlBDCvnjhX4XuWJqRSF9vysrKL8/mndZ7DIMKjrKSevJ2zGGPoqI2B9cbCF0OdxRw=
+X-Received: by 2002:a05:6402:350e:b0:563:f48a:aa03 with SMTP id
+ b14-20020a056402350e00b00563f48aaa03mr141224edd.2.1709299551406; Fri, 01 Mar
+ 2024 05:25:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20240229213018.work.556-kees@kernel.org> <20240229225910.79e224cf@kernel.org>
+ <CANn89iKeJGvhY0K=kLhhR39NVbaizP2UBk0Vk0r_XCe2XMBZHg@mail.gmail.com> <9050bdec-b34a-4133-8ba5-021dfd4b1c75@intel.com>
+In-Reply-To: <9050bdec-b34a-4133-8ba5-021dfd4b1c75@intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 1 Mar 2024 14:25:37 +0100
+Message-ID: <CANn89iLSLPn5PyXNQcA2HO0e5jGYvHKhTh_9_EMmfbTJKZPfbg@mail.gmail.com>
+Subject: Re: [PATCH] netdev: Use flexible array for trailing private bytes
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Kees Cook <keescook@chromium.org>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>, netdev@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Jiri Pirko <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>, Coco Li <lixiaoyan@google.com>, 
+	Amritha Nambiar <amritha.nambiar@intel.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-John Fastabend <john.fastabend@gmail.com> writes:
-
-> Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> John Fastabend <john.fastabend@gmail.com> writes:
->>=20
->> > Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> >> The devmap code allocates a number hash buckets equal to the next pow=
-er of two
->> >> of the max_entries value provided when creating the map. When roundin=
-g up to the
->> >> next power of two, the 32-bit variable storing the number of buckets =
-can
->> >> overflow, and the code checks for overflow by checking if the truncat=
-ed 32-bit value
->> >> is equal to 0. However, on 32-bit arches the rounding up itself can o=
-verflow
->> >> mid-way through, because it ends up doing a left-shift of 32 bits on =
-an unsigned
->> >> long value. If the size of an unsigned long is four bytes, this is un=
-defined
->> >> behaviour, so there is no guarantee that we'll end up with a nice and=
- tidy
->> >> 0-value at the end.
+On Fri, Mar 1, 2024 at 1:59=E2=80=AFPM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
 >
-> Hi Toke, dumb question where is this left-shift noted above? It looks
-> like fls_long tries to account by having a check for sizeof(l) =3D=3D 4.
-> I'm asking mostly because I've found a few more spots without this
-> check.
+> From: Eric Dumazet <edumazet@google.com>
+> Date: Fri, 1 Mar 2024 09:03:55 +0100
+>
+> > On Fri, Mar 1, 2024 at 7:59=E2=80=AFAM Jakub Kicinski <kuba@kernel.org>=
+ wrote:
+> >>
+> >> On Thu, 29 Feb 2024 13:30:22 -0800 Kees Cook wrote:
+>
+> Re WARN_ONCE() in netdev_priv(): netdev_priv() is VERY hot, I'm not sure
+> we want to add checks there. Maybe under CONFIG_DEBUG_NET?
+>
+> >
+> >>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> >>> index 118c40258d07..b476809d0bae 100644
+> >>> --- a/include/linux/netdevice.h
+> >>> +++ b/include/linux/netdevice.h
+> >>> @@ -1815,6 +1815,8 @@ enum netdev_stat_type {
+> >>>       NETDEV_PCPU_STAT_DSTATS, /* struct pcpu_dstats */
+> >>>  };
+> >>>
+> >>> +#define      NETDEV_ALIGN            32
+> >>
+> >> Unless someone knows what this is for it should go.
+> >> Align priv to cacheline size.
+> >
+> > +2
+> >
+>
+> Maybe
+>
+> > #define NETDEV_ALIGN    L1_CACHE_BYTES
+>
+> #define NETDEV_ALIGN    max(SMP_CACHE_BYTES, 32)
 
-That check in fls_long only switches between too different
-implementations of the fls op itself (fls() vs fls64()). AFAICT this is
-mostly meaningful for the generic (non-ASM) version that iterates over
-the bits instead of just emitting a single instruction.
+Why would we care if some arches have a very small SMP_CACHE_BYTES ?
+Bet it !
 
-The shift is in the caller:
+IMO nothing in networking mandates this minimal 32 byte alignment.
 
-static inline __attribute__((const))
-unsigned long __roundup_pow_of_two(unsigned long n)
-{
-	return 1UL << fls_long(n - 1);
-}
+>
+> ?
+>
+> (or even max(1 << INTERNODE_CACHE_SHIFT, 32))
 
-If this is called with a value > 0x80000000, fls_long() will (correctly)
-return 32, leading to the ub[0] shift when sizeof(unsigned long) =3D=3D 4.
+I do not think so.
 
--Toke
+INTERNODE_CACHE_SHIFT is a bit extreme on allyesconfig on x86 :/
+(with CONFIG_X86_VSMP=3Dy)
 
-[0] https://wiki.sei.cmu.edu/confluence/display/c/int34-c.+do+not+shift+an+=
-expression+by+a+negative+number+of+bits+or+by+greater+than+or+equal+to+the+=
-number+of+bits+that+exist+in+the+operand
 
+>
+> >
+> > or a general replacement of NETDEV_ALIGN....
+> >
+> >
+>
+> + I'd align both struct net_device AND its private space to
+> %NETDEV_ALIGN and remove this weird PTR_ALIGN. {k,v}malloc ensures
+> natural alignment of allocations for at least a couple years already
+> (IOW if struct net_device is aligned to 64, {k,v}malloc will *always*
+> return a 64-byte aligned address).
+
+I think that with SLAB or SLOB in the past with some DEBUG options
+there was no such guarantee.
+
+But this is probably no longer the case, and heavy DEBUG options these
+days (KASAN, KFENCE...)
+do not expect fast networking anyway.
 
