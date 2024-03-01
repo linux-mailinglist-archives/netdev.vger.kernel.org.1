@@ -1,113 +1,134 @@
-Return-Path: <netdev+bounces-76584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D229F86E48E
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:40:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A51F86E49F
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:46:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 724D0B24127
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 15:40:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09FDCB23E65
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 15:46:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DEBF40BE5;
-	Fri,  1 Mar 2024 15:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E0136FBB8;
+	Fri,  1 Mar 2024 15:45:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="XvanUWxU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W7ncAmeT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F41E3A8E3
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 15:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF7C3984A
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 15:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709307635; cv=none; b=TB33uSmmLp3JCZHZ3e4OmZr7OOZ4Kd9+Y5LbvNpK14gdgQy5Snf8jPKwSRT6bZSaOf7IPqGtSKI5a3BxMi06SeNqcWM1Ti8OKQci/GeNh+DlXsaPxcV8D7gxcZMyLero9X8lfC9QAcasmJZrCdPvoEg0gXksWKPGvEchta04Kvg=
+	t=1709307955; cv=none; b=JaqgPNxX/tx4FLr2mDXHI66W6z4HDluR7Ttlq1tm59M+iUas6fLuNk8WRhfZs852i4bR5URZK+Z0jmngZEMP/2QXKXBX32lLb5PVhK0xDjq6F1KbhXKQHK2GdibGliZP+R+vLg9BNKeRDzzb4fCpmP8AQ5DhO9Va/NP/QsofMYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709307635; c=relaxed/simple;
-	bh=ubl8WDkwRwz9VAn/qi4hksfJ7hM26ZV4VhFXq4nQGyo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MuF6KgaLcvcUpuyekCtk330iD54uINcUZKoLf9JK9bkAqDXP0XRfQXwVPlQobxT2t739N3qHOnnOlddTuKjsmwfPIR8ZvmQopUhL9yCqINYB7b2329+kemkh6oJzJS827nIdMyh0vhhu/E4NyRVcGj4pYRylsv56Hwdjqenelrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=XvanUWxU; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-412cd73ca83so1585525e9.2
-        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 07:40:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709307631; x=1709912431; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ubl8WDkwRwz9VAn/qi4hksfJ7hM26ZV4VhFXq4nQGyo=;
-        b=XvanUWxUeFLnKPROmX1l7ccuiwuuCmRccL1oqM5CUFvgAw7NBQBGDiiGjauBtAJFKS
-         RwpfH3EAeyYaci9Amlq7AgFrnGcoy8d7hNA3ep43Hld6wi7bBaLxRrjj4o7xoivVxqYP
-         CA4rVGITgnURRFoabzSrZ2WEWiSG1OUAHJmTggPKaiew9FEp2EuhCOk3DF722m7U33p1
-         Q0mEUoqAn7nE/Q81IkrMOFWC72Dnb7HBP7hEiYSxcR33BJ4RBGsPIpsXhsyFbqbNdw5V
-         n+fZM6n02wLezgaqbn0gmxt0CGmuzG+/It4EurU8lgPpnVjre3n2CwKS1if3iVgLOqA9
-         lw7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709307631; x=1709912431;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ubl8WDkwRwz9VAn/qi4hksfJ7hM26ZV4VhFXq4nQGyo=;
-        b=b//S3Tm3tiopz3bmWOQnOhqwxUJqcGOhiWhMen/JqFUwC5ee0dzC9d5PwQehGHhZKs
-         wvlBHnWD/3gKe5BXYJaNmYHQ+me8Ze4noiI4otMMTswqEzamlza4LgaJLIl908yVAJt7
-         Y21t77RV67jl/8Una8mDxTU7ckn1O1dr8Kuc1cx4K5jQiLtYw7/cFjp+EkArNxSk4qz/
-         al8YMzhfF5CgiKiWO4O/D9rlT14YkBkq1vF5yK88P1xvqllnghJ0JFIl6PmL2DbxSaJC
-         7FTFf6KVeFPJABP1gTPBcNF0+fBHxFOUMaUZ4Rb1LRiwjnSiRWUSRctwgUCg0KwMRFri
-         jBxw==
-X-Forwarded-Encrypted: i=1; AJvYcCXy5C6L1lWwTFmazJDtQnHu0V9u8CrjsQX2Y5s0pin1mdv7ZxjpFlBu45VY3MI+JcKpkPkrJDGkh1QY/psORbzn6izVnZ2I
-X-Gm-Message-State: AOJu0YxTZsWWXL9f5QkVHJLL4rIg/TU6FyDVt7vYF+AAX2ABIBqvNdJY
-	CMnXmCLmpC86POI9bAbV9PK/8KB8ANieULwM3VZqwstW+efq0vERbLG9zFP/Oaw=
-X-Google-Smtp-Source: AGHT+IE7iHX86WUR/fjnmt5Vs7vscSE4rQkydrRZuojOYy2b4SXCbAC8OlkxZVfayGT9PxjcHlsmTg==
-X-Received: by 2002:a5d:4806:0:b0:33b:131b:d8c1 with SMTP id l6-20020a5d4806000000b0033b131bd8c1mr1594298wrq.66.1709307630962;
-        Fri, 01 Mar 2024 07:40:30 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id p18-20020adf9d92000000b0033e18f5714esm2786131wre.59.2024.03.01.07.40.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 07:40:29 -0800 (PST)
-Date: Fri, 1 Mar 2024 16:40:26 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, vadim.fedorenko@linux.dev,
-	arkadiusz.kubalewski@intel.com
-Subject: Re: [PATCH net-next] dpll: avoid multiple function calls to dump
- netdev info
-Message-ID: <ZeH26t7WPkfwUnhs@nanopsycho>
-References: <20240301001607.2925706-1-kuba@kernel.org>
+	s=arc-20240116; t=1709307955; c=relaxed/simple;
+	bh=TXN8VR/wzdTCJTFQ7BBfkXr2DPBqsUmIzXETket0NO8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IQM9nhQwjl+7I7h4qUYY1cw1DRWOPdDwuAXuKrpUnTPyk09bzeYtyVulXmwa8Dv9j1Yvoq0ps9N5YNI+e0O7OEyBdTn9hZMzscClflfZU2Wpi4jEiC9rDsyaCBxQNUTWOnKMWsc/cjNzuFFrih6xDVV8V5UOyu2ofG0Lmmg5Jw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W7ncAmeT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE237C433C7;
+	Fri,  1 Mar 2024 15:45:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709307954;
+	bh=TXN8VR/wzdTCJTFQ7BBfkXr2DPBqsUmIzXETket0NO8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=W7ncAmeTDZaQRTcnnXqxDFACER6JxdEUd+ib91K2MdxXkwT1vQuufQKZnSzxWQYjs
+	 6K2OlSY/g8WCcQ2BjSAZwoc9QhugoGsCh5Oc0s86n+BjBmMcL7bMRZVX0HSVe91ju0
+	 RRYVEVvehYmrKIc15kxF0P9g3woFOhRQ84uZU45FRRa5M4/h6bCnqbeeexojSAbtvr
+	 Jiy9Saaix8c8ZldqtfdfcG2QDRtoFa7T9IDtoGDNRcY8nKiqtWuxBy3jvwe1gSMZrz
+	 mWF4rWoyBjw6dDdIycB1qvCnPdp+8CNhg+m/LL9WaDccUh6+wkC1hD6FXH8EVke7Yq
+	 daoEEbUA7mpzg==
+Message-ID: <148968b2-6d8e-476b-afee-5f1b15713c7e@kernel.org>
+Date: Fri, 1 Mar 2024 08:45:52 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240301001607.2925706-1-kuba@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 4/7] net: nexthop: Expose nexthop group stats
+ to user space
+Content-Language: en-US
+To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: Ido Schimmel <idosch@nvidia.com>, Simon Horman <horms@kernel.org>,
+ mlxsw@nvidia.com
+References: <cover.1709217658.git.petrm@nvidia.com>
+ <223614cb8fbe91c6050794762becdd9a3c3b689a.1709217658.git.petrm@nvidia.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <223614cb8fbe91c6050794762becdd9a3c3b689a.1709217658.git.petrm@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Fri, Mar 01, 2024 at 01:16:07AM CET, kuba@kernel.org wrote:
->Due to compiler oddness and because struct dpll_pin is defined
->in a private header we have to call into dpll code to get
->the handle for the pin associated with a netdev.
->Combine getting the pin pointer and getting the info into
->a single function call by having the helpers take a netdev
->pointer, rather than expecting a pin.
->
->The exports are note needed, networking core can't be a module.
->
->Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On 2/29/24 11:16 AM, Petr Machata wrote:
+> From: Ido Schimmel <idosch@nvidia.com>
+> 
+> Add netlink support for reading NH group stats.
+> 
+> This data is only for statistics of the traffic in the SW datapath. HW
+> nexthop group statistics will be added in the following patches.
+> 
+> Emission of the stats is keyed to a new op_stats flag to avoid cluttering
+> the netlink message with stats if the user doesn't need them:
+> NHA_OP_FLAG_DUMP_STATS.
+> 
+> Co-developed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+> 
+> Notes:
+>     v2:
+>     - Use uint to encode NHA_GROUP_STATS_ENTRY_PACKETS
+>     - Rename jump target in nla_put_nh_group_stats() to avoid
+>       having to rename further in the patchset.
+> 
+>  include/uapi/linux/nexthop.h | 30 ++++++++++++
+>  net/ipv4/nexthop.c           | 92 ++++++++++++++++++++++++++++++++----
+>  2 files changed, 114 insertions(+), 8 deletions(-)
+> 
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
+> @@ -104,4 +109,29 @@ enum {
+>  
+>  #define NHA_RES_BUCKET_MAX	(__NHA_RES_BUCKET_MAX - 1)
+>  
+> +enum {
+> +	NHA_GROUP_STATS_UNSPEC,
+> +
+> +	/* nested; nexthop group entry stats */
+> +	NHA_GROUP_STATS_ENTRY,
+> +
+> +	__NHA_GROUP_STATS_MAX,
+> +};
+> +
+> +#define NHA_GROUP_STATS_MAX	(__NHA_GROUP_STATS_MAX - 1)
+> +
+> +enum {
+> +	NHA_GROUP_STATS_ENTRY_UNSPEC,
+> +
+> +	/* u32; nexthop id of the nexthop group entry */
+> +	NHA_GROUP_STATS_ENTRY_ID,
+> +
+> +	/* uint; number of packets forwarded via the nexthop group entry */
 
->---
->BTW is the empty nest if the netdev has no pin intentional?
+why not make it a u64?
 
-The user can tell if this is or is not supported by kernel easily.
+> +	NHA_GROUP_STATS_ENTRY_PACKETS,
+> +
+> +	__NHA_GROUP_STATS_ENTRY_MAX,
+> +};
+> +
+> +#define NHA_GROUP_STATS_ENTRY_MAX	(__NHA_GROUP_STATS_ENTRY_MAX - 1)
+> +
+>  #endif
 
->Should we add a comment explaining why it's there?
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-Yeah.
 
 
