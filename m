@@ -1,155 +1,182 @@
-Return-Path: <netdev+bounces-76655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E7F986E722
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:24:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11C8886E727
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:25:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F1D51F22505
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:24:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B890928503C
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:25:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5F06FC3;
-	Fri,  1 Mar 2024 17:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B419A8832;
+	Fri,  1 Mar 2024 17:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="EJCqF+xs"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2064.outbound.protection.outlook.com [40.107.243.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01F646A4
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 17:24:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709313885; cv=none; b=LymygdJtmWgr9JLnY7VrVVeZ2C9QhGj3d9971RZvCc1ireFbUFJW2T7j76DBF5abTZhxBob8B+yLmct3vrhWooMBds8NPknqNweAa0U242QQGNCQ+K7cke79IRbJ/uC4Hr0TTq0rIX9mObLykjGnZDlfcCwImW1xR31XF/m4XdY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709313885; c=relaxed/simple;
-	bh=h58DFjaPojLEK3fLX4+ixq3XIVk5I8uJifwq7HQg9ig=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=IPkCSVSMePBErOX3jer5HpzKH4ket3RQQ8oATQj20hYNdudNDbmQJ0regcP0fSGHSYEhyJECcxX/lorwCYgDc1FmVb4U/DAgyw1jpENNosfiYS+75/tF2U5quUdV9Bn0WAu9nNvC8oZWyDgh4IBExfs2wqsBpVpvyxnADX6Gs9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-208-tXp_pUJVPlyy9kGWfCrWjw-1; Fri, 01 Mar 2024 17:24:41 +0000
-X-MC-Unique: tXp_pUJVPlyy9kGWfCrWjw-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 1 Mar
- 2024 17:24:39 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Fri, 1 Mar 2024 17:24:39 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Charlie Jenkins' <charlie@rivosinc.com>, Christophe Leroy
-	<christophe.leroy@csgroup.eu>
-CC: Guenter Roeck <linux@roeck-us.net>, Palmer Dabbelt <palmer@dabbelt.com>,
-	Andrew Morton <akpm@linux-foundation.org>, Helge Deller <deller@gmx.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Parisc List
-	<linux-parisc@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, "Geert
- Uytterhoeven" <geert@linux-m68k.org>, Russell King <linux@armlinux.org.uk>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Palmer Dabbelt
-	<palmer@rivosinc.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH v11] lib: checksum: Use aligned accesses for ip_fast_csum
- and csum_ipv6_magic tests
-Thread-Topic: [PATCH v11] lib: checksum: Use aligned accesses for ip_fast_csum
- and csum_ipv6_magic tests
-Thread-Index: AQHaa/sz2G6zh0QEYUOonhCQoX0NCrEjHqIg
-Date: Fri, 1 Mar 2024 17:24:39 +0000
-Message-ID: <3e0e2b25ea2d4ab99e78aff04af94b69@AcuMS.aculab.com>
-References: <20240229-fix_sparse_errors_checksum_tests-v11-1-f608d9ec7574@rivosinc.com>
- <41a5d1e8-6f30-4907-ba63-8a7526e71e04@csgroup.eu> <ZeILu9x+/STqWVy+@ghost>
-In-Reply-To: <ZeILu9x+/STqWVy+@ghost>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2844D8813
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 17:25:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709313928; cv=fail; b=eqG7QbIupCiXg8olN0ftioelkUNpCjdW6yVIWKrzNHminzYHXlWZAup4kxYf44r+hn3HGJq97njJYJlbNQzC1tfwrdvS+0u38n1s+fXklN9z8qxVJDSkYuIQW1l/WsxFne3lVRhufcUJidadVtBPCzHG/9K7AhKZnFldztcm7FM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709313928; c=relaxed/simple;
+	bh=/Aklh84lD0IUIr4/1ythCZ/oGGZ/wgZTtpzdTmfpf7Y=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=maGq1h5HcIPq33/AQFqV+04fbsgFTkaPnEZvjUIdQ+j+hIX7yrRuhn50b/wDXBhAqEOVtRWEQZJux6EICU9muscUttYh/a4W8aq8bpRRU0biwnJHZfceLkJ93H+4WLclML8ajZA4trGAMC8LVIuNLW8TIqm5R4A0DCtLYkmx01o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=EJCqF+xs; arc=fail smtp.client-ip=40.107.243.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bx0oNho+PNmvSHq0PoFyFJo79wQ/tZd7rhhRVrcLXfldhdpxuoGlNwhJPpiGlYsbxeXMCEObm9WxogzZg10pKaF0KGZVqaQcQKA9GGis9jVtjfLL8RZjRXUxaX5P/F9VJmBzGMj9+DXcV1JNheOm740w5mSR1bB9gKiyQmpwAx6/887bbLbIAKsc0a3URkpNA51QdyiE+7phMJmhJt2C2niALCpIDvPOh2T9OMMcQe3Hvm+/1EWVV8RCebafsv3Z5nLbh8dQcAFezz+7GlZJNck9os1JtFBrTtTEc+IT90PwuV2QLYqhGj/9jEmvXUvr28NPYVYEeuLQjjjStXozrQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rJrNoa5JYl/RoGh0AWaI3uovSXB8dh1/Tm7gBVkJVJ4=;
+ b=jXB/kMTjkPih8+czagxXuabsd4DxM0ETZ1jimIMJ4iOSdCd1wdbKblV4bZit5NzEKVvg4IIo9q7OGnA+zakaQp41GdkTcUQqagip2CYUfqAJpnhSw3ojCA1khHrCSRoFPzvpPLP8l/m+n1dTyx7cHjumLIjdk50Yf+1iTPKbO0DurUbMDlV2FSlTh3y023QFrYgeIa2K4Gj4OyyYkqYrrCBRRvEkkbYu1nrKSaaLfttGfQMBoPqkvgnHKxwcCR+GdymNGrviFLI6GlpkvAkaJpygxYrU70RanDHQSO6N5/T069Rij2qJZFY1E3UYR28C55qL4p4JCpAz+CIiCo3nxg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rJrNoa5JYl/RoGh0AWaI3uovSXB8dh1/Tm7gBVkJVJ4=;
+ b=EJCqF+xsfSHButfxcWSUQJjataDkvNubwB+suOH15c9SUucUIdhEhsfrDGGQ0a+3t4HVJ5l6gHfUr33ShnhmVb3T8uir10oS27QIUSCzVlPM6Xlaeo07tbY7GyKoZBGQxWynHKTD3Zw0IzTFdAeKkoFP3ajkZGum2e6qUzpwYswp7Ci2F7A9DXq0YVJeEj/hBPA9j32MJH38C5AICIrEGekQru84YEaZJxWSS3ucQlHct7qYMqPfdoFKeyOc9vorzuyThfVw/2oprY+fs81b0/OPHGhgvwiiuSvDsHdxPMJBWYNoI0xdOu7DLsGuzJiPEE/sDC9HLZSEixgV9uG/dg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from PH8PR12MB7110.namprd12.prod.outlook.com (2603:10b6:510:22e::11)
+ by IA1PR12MB8496.namprd12.prod.outlook.com (2603:10b6:208:446::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.41; Fri, 1 Mar
+ 2024 17:25:23 +0000
+Received: from PH8PR12MB7110.namprd12.prod.outlook.com
+ ([fe80::b610:d12a:cca7:703c]) by PH8PR12MB7110.namprd12.prod.outlook.com
+ ([fe80::b610:d12a:cca7:703c%4]) with mapi id 15.20.7316.035; Fri, 1 Mar 2024
+ 17:25:23 +0000
+Message-ID: <b25bfe54-f3c7-44a2-8c39-d32a0d5f3d47@nvidia.com>
+Date: Fri, 1 Mar 2024 09:25:20 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v2 net-next 1/2] devlink: Add shared descriptor
+ eswitch attr
+To: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, netdev@vger.kernel.org
+Cc: jiri@nvidia.com, bodong@nvidia.com, tariqt@nvidia.com,
+ yossiku@nvidia.com, kuba@kernel.org
+References: <20240301011119.3267-1-witu@nvidia.com>
+ <91629dbc-8fce-4f58-bd9b-b37293c220b8@intel.com>
+Content-Language: en-US
+From: William Tu <witu@nvidia.com>
+In-Reply-To: <91629dbc-8fce-4f58-bd9b-b37293c220b8@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DS7PR03CA0145.namprd03.prod.outlook.com
+ (2603:10b6:5:3b4::30) To PH8PR12MB7110.namprd12.prod.outlook.com
+ (2603:10b6:510:22e::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR12MB7110:EE_|IA1PR12MB8496:EE_
+X-MS-Office365-Filtering-Correlation-Id: b5637dbe-e55b-47e8-f4e7-08dc3a149408
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	shuQYP17EY4i9cVmLtIvx2HvjCmmJGUBklYVm4zeemSGJTvQIetKcWhZXyUDASKooUFNv3+Fr+b9lSa/EROep+iMGUBn4GVQQAGf3Ct8s0ojK9bPnCKpFZ+inNx+1XQgeKaMpxsG/M3OcAONNfAvZnM1ktYirUx/60w8/z3mpyRz9YgE5sErkMZlvH5xxgQdFFhkDgPNHVwmjJlH0RdOB7OBD001z2y++ggbcwTDDfZdd7DkD9mx9reuyBfOczm3w9HYTYmOcrBFamkUEeTkydZOH/kwrm2/qN8zRKaxrGiHTGOW+3x1QkcYm24Oi5u0ejlKEHHeNWlHklq+S/Y3hxa7YGyke++Ak8kbrYwAViRTNgUWHJjGOe6Qrb0Osc6dsB5Qo1tQIZb4DCAf3DJFrOp4kSdsYyhxn1awnvRoQzVhSU5hXw+03ONjRtGkJFiGUmb0jsKoORfzoIs2YWckH9zYmoGI9se5H+LvtJCTYWtBIfRBA/hrFY2u6Ui5MAMJgDuwwKfQHycub1wVP/DBZn4Y2xrTm+YuXvPpGgZcUmixknliAGLeOvnz2MpwxyGaxdCOOVDkWsM9nvsecFLrOwF8AR5aHcMBAIIeO9l/Dl2FPziwlmt+l7HaNNsY7cvvwZhGtSLe9zqwKeOrj7wbHQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR12MB7110.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UWR2aXZVNWYzQ3doNk52cExkV0hxRldaUldEUE9jRkhxa1lqbG56Mm0yUllt?=
+ =?utf-8?B?OEVsUUdvL2lIQTVjeHhVWFZ4SzdLYmVwdnVyMXNJR21DcXpNQ1ZwdXo5b09y?=
+ =?utf-8?B?L241M1YwRVY0Y1FWZTgrRTcwdHR0MTR5MkdmbjR0Q1JDTWEyMFJrWlc2VDBr?=
+ =?utf-8?B?SC9DQm41YXpidmdjOUh6bFp5Y0FlQkllNjdoWURmdWRIMFAvV3BCeEk3Tktz?=
+ =?utf-8?B?dUpZSTlwODM5bTY0RUg0Wk9xVEh6Q2VKUGREWHFxZ0VDUG5UbHRCZGo2RmxT?=
+ =?utf-8?B?Y1lwTlJPWGVCQm5DRmtqc1RhdXgya2wybk1Ha3VML2xhc0s3Zy9xc2JMV0VM?=
+ =?utf-8?B?V1ZjdmRhU2NybHFpWEpFendmbUZPTXA3aFQwS2Rtb2pxSDRjeHhKSUprcW1u?=
+ =?utf-8?B?OUljSjVFRU83M3g1UFV5ckJhQ3NGWGdCZVhxd3BRMUtnMmYzS25tMkh0OWJD?=
+ =?utf-8?B?YXhBU2pMSUY1Z0ZEWm9WMXZ6WVQyRFg2SENndVdIMkhpYXN0SHpOOFNqMFg4?=
+ =?utf-8?B?UkhESWcySmJ0UUZ4R3lTaFY0eWN2TkMwSk9CTGV2ZlRkZUQ3dU14OXM0bnVt?=
+ =?utf-8?B?VG1XUzBQQW1MYUQzWWc5Z2wwNHdnc1RIT0c4dGYxUkxyOUROT01LZlpGd1Y5?=
+ =?utf-8?B?enZZZ2J4K2dHMWdMWkErbmxmMm80MjJGMkloY2hjQ0o0R1ZodEVxQzVVUS9F?=
+ =?utf-8?B?YUk1ZWk2WW9HeWxlRzBYOXNjcGF2NHNBMkxsZElLaFRwQ2I1TklFVjhpT1pB?=
+ =?utf-8?B?K3p2c1Z4bzhFWFc5MEJ4R09MV0NYbWdKRnVLaFdscTdaSU1TRWdycUlRc01h?=
+ =?utf-8?B?RlByaVE1N0FjMkxuSEVJMzFwZFUzYWFTemRCdkJOWE4yTjJqZkI4NkoyMGRW?=
+ =?utf-8?B?L1NBSjkwRGJka3IvSm9LeFR3K2l1WXlzdWRaVlNjeTR0OFhxK1lXRTZLenZx?=
+ =?utf-8?B?TnAxNEQvM2p6L2ZCMnhkUmZwK1M0RjZBSUNYWjJGeHhGWHN5dS8wWkxWN0tm?=
+ =?utf-8?B?R21USHhCemVMNTlMWjhORVNNdEZlSkthS0k1VW55RXIwb2ZDbW5EdGpwVC9u?=
+ =?utf-8?B?cm1pSWp5QWtQSENUQWhiNnpOQ3dlbEhFa1NtRTlxK3d1b2FXSGhhMitHNDhj?=
+ =?utf-8?B?bkpJTW83NFV1RHJDZUNTanA0Y0o0VzlpTnk3MExmTnQ0djcwTHlQTUtVOHgv?=
+ =?utf-8?B?c2RUWUo1TzR6RWJaVUN6OEpEZGc4RWZLUzk3eCtKM0c0alllTnRicnBaYXVL?=
+ =?utf-8?B?anVHNDJMN2tvdFN0d0ZJRzRKRTVUVENtM3lGR2ZvOEY4UldKQkNOcEVOU3lG?=
+ =?utf-8?B?ZU9pVmxjamtkNkpHc1JFOEhhbWhSSFVqdDNMcHRZM2JZRTZ3QU1hVzNMcXIv?=
+ =?utf-8?B?NXFMRkRORk5JS0JNQXlRVmltaEIrdlA3d2FoYU1ic1IrZ1NUb0RBWnBMeTd0?=
+ =?utf-8?B?OGZNak1FRWdPZnpFTXRYdHNIMVR6UjJlNkw1MFh2Mng3aHAzejM3eUlDUVVG?=
+ =?utf-8?B?VE9VQUNmWWVTWWkyRERhbkhEai9KUGF4V1RETVlkYVlJdXR4MGtWZHhyNWd5?=
+ =?utf-8?B?YUxsZ01wcERjVTRlSnZDRWJCUjZ1RlFrYkg1L3FVVjBXeHFaNHJQWGRJWDJF?=
+ =?utf-8?B?MzBLZEFkdjdMd0o1K2hvV2E3bTgrNElkMDN3a2pEcVlZSFdlZ3kwSmdneU5p?=
+ =?utf-8?B?cGJYcUFReFcwOVRRbkJEQ3RIVVdUOWFMMk56WnByZDRzb2NUSUhCd0FRSzJ2?=
+ =?utf-8?B?dGVmUjB5czhsSS9lRXZQR1VJQ2JGSThBYjZYc3c1T015eEpMMGJqRHRicFR0?=
+ =?utf-8?B?cXc3U0VnZUhweHExWmt3MVZpQytBcDhRaHBuN3MrNGJGSVJta0UvTXZ6RGRX?=
+ =?utf-8?B?L0Q5U0daUDg0UVVTSndIMEpsNzJhZzlSOXJWT2xWaE9UY2NEUjdsK1FmZ29D?=
+ =?utf-8?B?Vk9wZ1ZieUU0d0FTSkhyeXlPQkVQSWc0QnM0eHp5ZmpObk9ya3A0RHdOOEd4?=
+ =?utf-8?B?R0FNeHZ5WXZ6aXJHNGZ5MkkwNUo0THlEejdJZXVQdTNlcEYvL2ljTklIa3du?=
+ =?utf-8?B?RUtPQ1FHVTB5WWxnbmtUODdnWVFnRHRPb1JGN01DMUwwOG5GcUltY3RXWVBY?=
+ =?utf-8?Q?weersKy1T5bttxxEE9NoKpl6I?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b5637dbe-e55b-47e8-f4e7-08dc3a149408
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR12MB7110.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Mar 2024 17:25:23.8614
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: slxznmJiXShxp/zCFPQu1aLd0ptJ8HuyJgpq9OnkTsK0etLf7Grec0zK04o7Tz99
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8496
 
-From: Charlie Jenkins
-> Sent: 01 March 2024 17:09
->=20
-> On Fri, Mar 01, 2024 at 07:17:38AM +0000, Christophe Leroy wrote:
-> > +CC netdev ARM Russell
-> >
-> > Le 29/02/2024 =C3=A0 23:46, Charlie Jenkins a =C3=A9crit=C2=A0:
-> > > The test cases for ip_fast_csum and csum_ipv6_magic were not properly
-> > > aligning the IP header, which were causing failures on architectures
-> > > that do not support misaligned accesses like some ARM platforms. To
-> > > solve this, align the data along (14 + NET_IP_ALIGN) bytes which is t=
-he
-> > > standard alignment of an IP header and must be supported by the
-> > > architecture.
-> >
-> > In your description, please provide more details on platforms that have
-> > a problem, what the problem is exactly (Failed calculation, slowliness,
-> > kernel Oops, panic, ....) on each platform.
-> >
-> > And please copy maintainers and lists of platforms your are specificall=
-y
-> > addressing with this change. And as this is network related, netdev lis=
-t
-> > should have been copied as well.
-> >
-> > I still think that your patch is not the good approach, it looks like
-> > you are ignoring all the discussion. Below is a quote of what Geert sai=
-d
-> > and I fully agree with that:
-> >
-> > =09IMHO the tests should validate the expected functionality.  If a tes=
-t
-> > =09fails, either functionality is missing or behaves wrong, or the test
-> > =09is wrong.
-> >
-> > =09What is the point of writing tests for a core functionality like net=
-work
-> > =09checksumming that do not match the expected functionality?
-> >
-> >
-> > So we all agree that there is something to fix, because today's test
-> > does odd-address accesses which is unexpected for those functions, but
-> > 2-byte alignments should be supported hence tested by the test. Limitin=
-g
-> > the test to a 16-bytes alignment deeply reduces the usefullness of the =
-test.
-> >
->=20
-> Maybe I am lost in the conversations. This isn't limited to 16-bytes
-> alignment? It aligns along 14 + NET_IP_ALIGN. That is 16 on some
-> platforms and 14 on platforms where unaligned accesses are desired.
-> These functions are expected to be called with this offset. Testing with
-> any other alignment is not the expected behavior. These tests are
-> testing the expected functionality.
 
-Aligned received frames can have a 4 byte VLAN header (or two) removed.
-So the alignment of the IP header is either 4n or 4n+2.
-If the cpu fault misaligned accesses you really want the alignment
-to be 4n.
 
-You pretty much never want to trap and fixup a misaligned access.
-Especially in the network stack.
-I suspect it is better to do a realignment copy of the entire frame.
-At some point the data will be copied again, although you may want
-a CBU (crystal ball unit) to decide whether to align on an 8n
-or 8n+4 boundary to optimise a later copy.
+On 2/29/24 5:46 PM, Samudrala, Sridhar wrote:
+> External email: Use caution opening links or attachments
+>
+>
+> On 2/29/2024 7:11 PM, William Tu wrote:
+>> Add two eswitch attrs: shrdesc_mode and shrdesc_count.
+>>
+>> 1. shrdesc_mode: to enable a sharing memory buffer for
+>> representor's rx buffer, and 2. shrdesc_count: to control the
+>> number of buffers in this shared memory pool.
+>>
+>> When using switchdev mode, the representor ports handles the slow path
+>> traffic, the traffic that can't be offloaded will be redirected to the
+>> representor port for processing. Memory consumption of the representor
+>> port's rx buffer can grow to several GB when scaling to 1k VFs reps.
+>> For example, in mlx5 driver, each RQ, with a typical 1K descriptors,
+>> consumes 3MB of DMA memory for packet buffer in WQEs, and with four
+>> channels, it consumes 4 * 3MB * 1024 = 12GB of memory. And since rep
+>> ports are for slow path traffic, most of these rx DMA memory are idle.
+>>
+>> Add shrdesc_mode configuration, allowing multiple representors
+>> to share a rx memory buffer pool. When enabled, individual representor
+>> doesn't need to allocate its dedicated rx buffer, but just pointing
+>> its rq to the memory pool. This could make the memory being better
+>
+> I guess the rx buffers are allocated from a page_pool. Does it mean that
+> a page pool is now shared across multiple rx queues belonging to
+> multiple netdevs?  Do they all share the same napi?
 
-CPU that support misaligned transfers just make coders sloppy :-)
+yes. The basic sharing scheme is to have all representor netdevs' rx 
+queue N sharing 1 pool.
+And packets are proceeded by uplink netdev, so they share the same napi.
+More detail here:
+https://lore.kernel.org/netdev/20240125223617.7298-1-witu@nvidia.com/
 
-=09David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
 
 
