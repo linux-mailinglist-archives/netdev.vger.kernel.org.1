@@ -1,55 +1,59 @@
-Return-Path: <netdev+bounces-76382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2F6986D891
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 02:13:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1265786D8C4
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 02:31:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72870B223A0
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 01:13:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A806AB2168B
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 01:31:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9602B9B3;
-	Fri,  1 Mar 2024 01:13:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE672376E2;
+	Fri,  1 Mar 2024 01:31:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JuT/u2Jx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s+gHwnk0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4532AD2A
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 01:13:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF402B9DE
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 01:31:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709255616; cv=none; b=jwEmLl2StzNSZ08tB4A5gsVGK5k9I6g3ldQqdbNdcKRDtp58zIGG/7Jp07QUlG/lBuqkpJMcIHqj/2gwLklYniFBOJCH9D3xtfLIzRQ5vQhjV5rXNzPPizTXxDb3gIEFLPRTKrFwj/wzCW/VGVUo4GpR5+BZgw4J8TcfxEx+/dU=
+	t=1709256691; cv=none; b=upFHkKiE8hp6vcd8L3NQ+icnWbMYX3qSe/1XLyrCQY/HlMPdMywbgVTrfJzVvS82qPEbTW2ybYnHFtGyq95gbZTX5hNGi+ApuJY7mXPuUBmRUM9y37z6d5xJ49+o3HKaD3OO2p7vCaX4G0ZAnbSYfQGqq5EWfTJqHkFTzw1vdVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709255616; c=relaxed/simple;
-	bh=Cjdxju0o9i2QRy125ykTauGACSC+6yKkOGCKKsWsln4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TsIfDajYSDrgGtb+sFOtdLD58KC6/zmNzaMdm8hUQ6hlmeUBVH02/KIu3hqdmrcUA6dBovJmJ13Sbe43i7oJn/X8++pRZ0FqICu2xE+UPbsk0tKZzWQMp4EpfFhmUF7fSYmQMGU6k3fkby5e6uNJPz88y/CrGbB3iQvJt6tJ5Eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JuT/u2Jx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74A06C433C7;
-	Fri,  1 Mar 2024 01:13:35 +0000 (UTC)
+	s=arc-20240116; t=1709256691; c=relaxed/simple;
+	bh=C0waZBjgNSQR4ZcQbvAJRhLQhGMRfqJFKRUcOaVOFYM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NyeXETgIkvajMm0qyY5iV59uWNswGIHSKiED3+LcmRnbAjesi/NzJ/I4oW5WaXVzH3VDFIZ5etehCO4b+2q5uZYJpLbB/kRRBjU/DkioGZRhUvn+XEooVrNwmt+YFMxQjrNUC3T0m/bunn+Bc16OGazkS0vN6WPYxZGSaBKGPVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s+gHwnk0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7CFEC433F1;
+	Fri,  1 Mar 2024 01:31:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709255615;
-	bh=Cjdxju0o9i2QRy125ykTauGACSC+6yKkOGCKKsWsln4=;
+	s=k20201202; t=1709256691;
+	bh=C0waZBjgNSQR4ZcQbvAJRhLQhGMRfqJFKRUcOaVOFYM=;
 	h=From:To:Cc:Subject:Date:From;
-	b=JuT/u2JxDVwg85MoRG3vWR4LTZ5n2Mfi0dlo3PZ4fisH64CY3x2trv19LytSEop/W
-	 BPUgeIv016LDtHkn4KzW7mg6paSkH+5GYkYCoE04QHFq2AZyOPYDu1qyjWENUp/ZqB
-	 LNEaXMmR/Rr0hiAMc4rahkENhlVSmiMZmAYRY2GonLajtOZyp1pEjdxkGSt5934FiJ
-	 1bTlObbZojre+mq7VzZXmPbNrHD05/eyJOqw7oaDTseLUZ3fLQsipLSAePmmo7GCDl
-	 /K6vHnLN2mCly5x7xgfRaS0ZDHwBRh9j1idbvwiSiEBMD5ZL7mpQob2/2LtYwEtBWM
-	 ZFuifUWwCZA/g==
+	b=s+gHwnk0Mj6g9Y8ovuy2Zq8GeHLWdaHP6u/vhBYvYSDsA3ETMqbAvHvToNINW8YlL
+	 XiF/Y4f0qyHlFodwBpgTiDn1/36vox1DuqANu8ReC4uLgQiRNCR5J5kQkKhJS73nLa
+	 Ukbe+Mh138BIiFiOxrlVnSO+puZ3GWeqxUjiTf+qaSVYpRfW0QjMlexMvTwu4ima8d
+	 wWejNAIuKHHslP9+cmSmQUWVinh3raNY2VnBm86vlq+rF+b049nfSF7w3WtoduqXIs
+	 R5CtP/it/ASvbXnQ45GSw5IR6VI5eWb+6WxoFdeYcs1jDgAt8Tu3lZh32oD5OHQKmx
+	 golNRkowtpmgA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	hawk@kernel.org
-Subject: [PATCH net] page_pool: fix netlink dump stop/resume
-Date: Thu, 29 Feb 2024 17:13:31 -0800
-Message-ID: <20240301011331.2945115-1-kuba@kernel.org>
+	johannes@sipsolutions.net,
+	fw@strlen.de,
+	pablo@netfilter.org,
+	idosch@nvidia.com,
+	jiri@resnulli.us,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 0/3] netlink: handle EMSGSIZE errors in the core
+Date: Thu, 29 Feb 2024 17:28:42 -0800
+Message-ID: <20240301012845.2951053-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,40 +63,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If message fills up we need to stop writing. 'break' will
-only get us out of the iteration over pools of a single
-netdev, we need to also stop walking netdevs.
+Ido discovered some time back that we usually force NLMSG_DONE
+to be delivered in a separate recv() syscall, even if it would
+fit into the same skb as data messages. He made nexthop try
+to fit DONE with data in commit 8743aeff5bc4 ("nexthop: Fix
+infinite nexthop bucket dump when using maximum nexthop ID"),
+and nobody has complained so far.
 
-This results in either infinite dump, or missing pools,
-depending on whether message full happens on the last
-netdev (infinite dump) or non-last (missing pools).
+We have since also tried to follow the same pattern in new
+genetlink families, but explaining to people, or even remembering
+the correct handling ourselves is tedious.
 
-Fixes: 950ab53b77ab ("net: page_pool: implement GET in the netlink API")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: hawk@kernel.org
----
- net/core/page_pool_user.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Let the netlink socket layer consume -EMSGSIZE errors.
+Practically speaking most families use this error code
+as "dump needs more space", anyway.
 
-diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-index ffe5244e5597..278294aca66a 100644
---- a/net/core/page_pool_user.c
-+++ b/net/core/page_pool_user.c
-@@ -94,11 +94,12 @@ netdev_nl_page_pool_get_dump(struct sk_buff *skb, struct netlink_callback *cb,
- 			state->pp_id = pool->user.id;
- 			err = fill(skb, pool, info);
- 			if (err)
--				break;
-+				goto out;
- 		}
- 
- 		state->pp_id = 0;
- 	}
-+out:
- 	mutex_unlock(&page_pools_lock);
- 	rtnl_unlock();
- 
+Jakub Kicinski (3):
+  netlink: handle EMSGSIZE errors in the core
+  netdev: let netlink core handle -EMSGSIZE errors
+  genetlink: fit NLMSG_DONE into same read() as families
+
+ net/core/netdev-genl.c    | 15 +++------------
+ net/core/page_pool_user.c |  2 --
+ net/netlink/af_netlink.c  |  9 +++++++++
+ net/netlink/genetlink.c   | 12 +++++++-----
+ 4 files changed, 19 insertions(+), 19 deletions(-)
+
 -- 
 2.43.2
 
