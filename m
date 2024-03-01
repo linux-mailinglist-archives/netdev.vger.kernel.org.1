@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-76755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6A0586EC9E
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 00:05:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7E3086EC9F
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 00:05:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D979287FB8
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 23:05:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59DF0288099
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 23:05:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 396865EE7A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC7845EE83;
 	Fri,  1 Mar 2024 23:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jZxg0Mne"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hZmN6IIp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134353C48C
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 23:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F3E5EE80
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 23:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709334352; cv=none; b=tkcMOoupZTaDCq9Wpu4Zp2r0QIca4fMLdpdNVQTddw3rjcDQ3d9DZAkxHEIqMGybMGhmfr3op20IL9BWcGgF091ohT2enk6ILNzJJFQ5Dxv5duHHMOf+0OXRiKOM3go8EGHo5555XA+fPbFTvEdGW0vpY2mk0R+1Vm3G8oftMgs=
+	t=1709334352; cv=none; b=tbuXsyZw4RxzYbrZMvS4ihgVInKN509b/dnwOAwIH71BrDc3EHNJ0hecNJcSFQFaiCCpno0faqGMU/vw3lFUlh4/YRbvhncRGser6ZmW6fsnD7klNrV29IH0QckHO88PS+jz8y+xrbd7mN+E2FRmJ980elfN5j8nmbLbt7E5RYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709334352; c=relaxed/simple;
-	bh=go0iCHAUzwcSWi6XnBLDemwVxjy2B9YoD44U0zrbntQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cd/51sIehGEuYQ84C5ZYdMshN0BKt/XhqZdkhZny/JwwymtP+5JNsETZyz1qbBh1BUgetUl2JfoVh36by/0h9NEbVz1x/pGMGIUzkeWmwCBKyJb26pFMh5wbzVm+KQlgH19msuy7QYanr/fN2lfpsGvB8/WhqjIJnKHL1O0k2hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jZxg0Mne; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64836C433C7;
+	bh=Pg8IKvu6C9U4914HAOepP2IYBPxebyo2cAjVTXugOP4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=o7KSxbFi3D4qDe51h39sKJkYI2PbpwZ6NQLMkzkXO9F8jePl7XT5OZ3V5BdcCBp8Qz5iIKdjSkeuYVaYL7Mx/lTlBTuBJoTc5wPzTHrXbtUESw43vmEsQEfcFwqR7yvYpInm4HUzBcG/9PbHNzuvw4Q0sYvtIQAP2eIU5ADP5Ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hZmN6IIp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C46A4C43390;
 	Fri,  1 Mar 2024 23:05:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709334351;
-	bh=go0iCHAUzwcSWi6XnBLDemwVxjy2B9YoD44U0zrbntQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=jZxg0MnehBUbHbfOE0rk1Igfj2TZfOR8TmeFA4EQ4iLVsou3zagHbVv40jVfIJoZg
-	 4EL3yxZlj4f+OQ7LZqsgj19V0U0uSC7A48SRtw2gJB/48B9C3Uy77wG4jnlWomHpYz
-	 Gf0EtWqD5WVLWT3m0Ur+3Oux8GzvWNa2Vm/HMB5z2t6KpYpFhO9yrWuRy5tgB928jT
-	 Dn9+udgm+6B4CG/uKm9q3qtaywVM6/DCk8oYuQB9XOgPyjqzk2u/EZUEvjDpjFKGv5
-	 cI4yugujw7yfolaKOiWVuJtegeu66EOLyALxvsZxcbWdCiizhdjl2FxrMjXHwZ92Vq
-	 SGjE5TvI8qPYA==
+	s=k20201202; t=1709334352;
+	bh=Pg8IKvu6C9U4914HAOepP2IYBPxebyo2cAjVTXugOP4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=hZmN6IIpo44YlMY7cNjViakLe8R/53FfdZqDTu22Abd7SM2OsanzcTfwzEPKuRDsO
+	 J7K4XVfbKbRIwioKg2fOHeIeAD7NuPFW1rUfpnz8pk9w6K/hGSwcQgKd/ODFQlrDUm
+	 elOGouFzpOh/ipbiAM8hEM1ugn8AacDiSil0eBqbFpBHBRBOBWieZYRSZ0+yIIShDe
+	 4xBqqQs4SmkIQuJYKJ79T0dR5iNQF8vXu8Pd8SDFLLY2jpxskvx8L0boyKoLDQVSOq
+	 Pu73SRGlt/pBK3d7KkCn+KK6ivFJMmblfgfDIOyGntDiDOW/R5fm82lkkO5EfhkwL8
+	 qrJOpVzc6ZssQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -48,10 +49,12 @@ Cc: netdev@vger.kernel.org,
 	jiri@resnulli.us,
 	donald.hunter@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 0/4] tools: ynl: add --dbg-small-recv for easier kernel testing
-Date: Fri,  1 Mar 2024 15:05:38 -0800
-Message-ID: <20240301230542.116823-1-kuba@kernel.org>
+Subject: [PATCH net-next 1/4] tools: ynl: move the new line in NlMsg __repr__
+Date: Fri,  1 Mar 2024 15:05:39 -0800
+Message-ID: <20240301230542.116823-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240301230542.116823-1-kuba@kernel.org>
+References: <20240301230542.116823-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,68 +63,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When testing netlink dumps I usually hack some user space up
-to constrain its user space buffer size (iproute2, ethtool or ynl).
-Netlink will try to fill the messages up, so since these apps use
-large buffers by default, the dumps are rarely fragmented.
+We add the new line even if message has no error or extack,
+which leads to print(nl_msg) ending with two new lines.
 
-I was hoping to figure out a way to create a selftest for dump
-testing, but so far I have no idea how to do that in a useful
-and generic way.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ tools/net/ynl/lib/ynl.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Until someone does that, make manual dump testing easier with YNL.
-Create a special option for limiting the buffer size, so I don't
-have to make the same edits each time, and maybe others will benefit,
-too :)
-
-Example:
-
-  $ ./cli.py [...] --dbg-small-recv >/dev/null
-  Recv: read 3712 bytes, 29 messages
-     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
-    [...]
-     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
-  Recv: read 3968 bytes, 31 messages
-     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
-    [...]
-     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
-  Recv: read 532 bytes, 5 messages
-     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
-    [...]
-     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
-     nl_len = 20 (4) nl_flags = 0x2 nl_type = 3
-
-Now let's make the DONE not fit in the last message:
-
-  $ ./cli.py [...] --dbg-small-recv 4499 >/dev/null
-  Recv: read 3712 bytes, 29 messages
-     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
-    [...]
-     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
-  Recv: read 4480 bytes, 35 messages
-     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
-    [...]
-     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
-  Recv: read 20 bytes, 1 messages
-     nl_len = 20 (4) nl_flags = 0x2 nl_type = 3
-
-
-A real test would also have to check the messages are complete
-and not duplicated. That part has to be done manually right now.
-
-Note that the first message is always conservatively sized by the kernel.
-Still, I think this is good enough to be useful.
-
-Jakub Kicinski (4):
-  tools: ynl: move the new line in NlMsg __repr__
-  tools: ynl: allow setting recv() size
-  tools: ynl: support debug printing messages
-  tools: ynl: add --dbg-small-recv for easier kernel testing
-
- tools/net/ynl/cli.py     |  7 ++++++-
- tools/net/ynl/lib/ynl.py | 42 ++++++++++++++++++++++++++++++++++------
- 2 files changed, 42 insertions(+), 7 deletions(-)
-
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index ac55aa5a3083..92ade9105f31 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -213,11 +213,11 @@ from .nlspec import SpecFamily
+         return self.nl_type
+ 
+     def __repr__(self):
+-        msg = f"nl_len = {self.nl_len} ({len(self.raw)}) nl_flags = 0x{self.nl_flags:x} nl_type = {self.nl_type}\n"
++        msg = f"nl_len = {self.nl_len} ({len(self.raw)}) nl_flags = 0x{self.nl_flags:x} nl_type = {self.nl_type}"
+         if self.error:
+-            msg += '\terror: ' + str(self.error)
++            msg += '\n\terror: ' + str(self.error)
+         if self.extack:
+-            msg += '\textack: ' + repr(self.extack)
++            msg += '\n\textack: ' + repr(self.extack)
+         return msg
+ 
+ 
 -- 
 2.44.0
 
