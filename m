@@ -1,158 +1,164 @@
-Return-Path: <netdev+bounces-76500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91C7486DF6D
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 11:42:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45B7586DF71
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 11:43:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78BB41F2321C
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:42:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF4AE1F23413
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:43:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 693A46A8CD;
-	Fri,  1 Mar 2024 10:42:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1C16BB5D;
+	Fri,  1 Mar 2024 10:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="S7B+XxgQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZG7xcID6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6CE20319
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 10:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2894067E74;
+	Fri,  1 Mar 2024 10:42:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709289724; cv=none; b=COdUOVlkms/1se3G6VJAlibPV33tjqpqCLf33sYul770BYDB1zNI+FRFYzIAGSwRyje6QiAP8mC3PBOm6wzcVJAo5mAI8UsCP1l2sRRlrgmZJ5TqsHz2iOY8X2BavggYhP13wYu2z5wDwXymVGVSLyG/qdVKhCWDNJivhPaGetY=
+	t=1709289779; cv=none; b=IQSvi8iIrmO0GHCIcSYFjEDFE/vAE5NlFg1xaVapPWspkVh1G0gY7pAVizdphpUJzyxOQXVNQ6OxRCB7+YE9lyImgR4q+F9oc53JcoI+8OASbnSgns1A4TJlgNNtKDT9o/l9UO/6ZCoAG1b4oywbe39nVONzYxKpOQwU8/T/pdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709289724; c=relaxed/simple;
-	bh=MyzEAkBZuIpR892vDJgDwyTBmBXyBAiXWmQvk35TtYY=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=RUYMwRU86IyR0Ps4Poy+68f7icwPoMfqlY9Z2uJ+M6jU4ZAp3KdsRjiIt9LiNKuqtYGIkfy9D8wUxq/AdbYbjZ6cMm6SXgU7eV6tCb/8ZBKCUITlw9MtgHLFmTI5gTszm/jr1lDCB5rkePzck0kM8GBOFwcxf33Gw7q6veGxw4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=S7B+XxgQ; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-565d1656c12so3438240a12.1
-        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 02:42:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1709289721; x=1709894521; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3FUsAED/lmxCoWoKnQG3JtYsXIKOmckCJxzG1hZ6f9c=;
-        b=S7B+XxgQr4MJMxukZ+TsmEkO0cEaU26VkSsgs6gy7pfebgwfScrzlT/13uHPYF1W6A
-         Jmdgqgc5/1SzAdN20oSUPA2MeaRytnrjezOfODG/orN/dLJ3Q4vHDEC6TlpeXDZECdYu
-         BqZArM7R4VVQZhhW4ylSSJqrGseGMImPgO4Ek3XAFTuRWNU8MkiWamVzAyRgFwisRmLy
-         U5h5bioHIzjrphuXjX9DjK3yhGQl+z7Uf/hI6gVaRQl3Tk/9o+esnWPmT55OsSrq/28x
-         Mm6Ws01btgOOes5LlRE9S17APyLrO04FwB9I0hmjPgWxEq3eeS3Ty5aTLmMQW7j7GnO0
-         iYZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709289721; x=1709894521;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=3FUsAED/lmxCoWoKnQG3JtYsXIKOmckCJxzG1hZ6f9c=;
-        b=oKM4mfnwOIYCW7tfd/sT3LMd5MkN6bXvfaHvM94pzupVqkAPEi+OhCLYcwoH02AXIH
-         y9+FTEhaK0QPsr9QD6gWIPVEcxqxcEqThDgjWw3SWCT0ITckgXVHOFJLQ+SjAmasvCH8
-         GE5UnL6mGD5LNKKqPXSGSzj5JwjDHJMPSEmgOzm2Qs+avWlm/M3MRWYfVsl75tfe3ie1
-         wgZ+aFxgcoizluUlrbqxt+JIRhOAvh+FZhfsX4lSAS/hzKZ2yVtIiYP1R0SaDwTTVkgl
-         mSqKknr9WWuyeS8JUeB4vwmFRFdtqTKYGQYLNH0HA+ApoJH4H5n+HoD0vtPZKV0i/+D4
-         e7gw==
-X-Forwarded-Encrypted: i=1; AJvYcCXj2EvUvxaIL8t1peIfqcqt6XcRLMb3sW8NrvBsh3CG9ruUQnASs5S2D1G5LKqO6kZzN4HgOTpGQe0mt5J1V4FKIrHtALV+
-X-Gm-Message-State: AOJu0Yyo2vh/R4cJ3sVIJ66a9dlsox+9s0h85JeOh19W0FWYqQyCYrKe
-	k89ReKvUZmRXgIVtLmnzgUbzJ+qVXFNxjg8Pm6mRjn1QiA0ul962vcBX6B5o9jw=
-X-Google-Smtp-Source: AGHT+IFsNGzvNzeIMp+c2vln39bwQZyElm675FddMfJSSFuv8gtyc69SUsSkQMp66ZVqG55y2w4wkw==
-X-Received: by 2002:a05:6402:28af:b0:566:6c13:82fd with SMTP id eg47-20020a05640228af00b005666c1382fdmr884994edb.21.1709289720923;
-        Fri, 01 Mar 2024 02:42:00 -0800 (PST)
-Received: from cloudflare.com (79.184.121.65.ipv4.supernova.orange.pl. [79.184.121.65])
-        by smtp.gmail.com with ESMTPSA id w20-20020a50fa94000000b005668c6837ecsm1421669edr.32.2024.03.01.02.41.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 02:42:00 -0800 (PST)
-References: <20240229005920.2407409-1-kuba@kernel.org>
- <20240229005920.2407409-13-kuba@kernel.org>
- <871q8vm2wj.fsf@cloudflare.com>
- <CADvbK_e+JCeM9cn0Qd7JG5UdSO_-s8w5r0v40E485JevkbH4XQ@mail.gmail.com>
-User-agent: mu4e 1.6.10; emacs 29.2
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
- netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, mic@digikod.net,
- linux-security-module@vger.kernel.org, keescook@chromium.org, Marcelo
- Ricardo Leitner <marcelo.leitner@gmail.com>
-Subject: Re: [PATCH v4 12/12] selftests: ip_local_port_range: use XFAIL
- instead of SKIP
-Date: Fri, 01 Mar 2024 11:40:45 +0100
-In-reply-to: <CADvbK_e+JCeM9cn0Qd7JG5UdSO_-s8w5r0v40E485JevkbH4XQ@mail.gmail.com>
-Message-ID: <87wmqmkzd4.fsf@cloudflare.com>
+	s=arc-20240116; t=1709289779; c=relaxed/simple;
+	bh=ZJKLgZ4Q+W8RC6y4mRrQuRCA9QBqTIit+Yam4i3YxuY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=OaKa8g8bIQnrdycbEKcA9Zcrhnwbrd71TxuQcxERqWRkcXVA90Pjo4kEQ7LXsBHWzSW7PR0dlt7ao51gMJE8GgHUJrNMWGb2oHemPQTUm/i5cC+fCjQK6aHmOntgFgAMamA50RWEaq6i0bQ0YhkhxESlzqsIY+8+NKeRbYjxzE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZG7xcID6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AFAD5C433F1;
+	Fri,  1 Mar 2024 10:42:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709289778;
+	bh=ZJKLgZ4Q+W8RC6y4mRrQuRCA9QBqTIit+Yam4i3YxuY=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=ZG7xcID6XznKMNSRiAc8WHXKKIM2FJGHSIaYWolY7h4F3uncVrz0hkW5WAd4TTlwk
+	 4Ih4uYsr9+oCVRf8pdBjwcQ94kCXHJqAe0IzCb1aL5iuyIOOdgNlJkfiq/g5ETXBmR
+	 +I3HW0JGTLIuJYVyOKmAGYgoguejSkTC44IvDo+uvmGjKsg2sw5ZI2m7DWHLreTEn+
+	 HKccR6EaiJ3xDcKMsUJECIxin30Fh15ncfkHWE54lOijh0NAOVeOkzumjsw720jhUn
+	 hMFsJQBuE7SUbjXTOZl5D2aCidgbJ1JuG3gGSYs+8CDEUZEx/ngRFWhTCnfdfbrKSj
+	 ODfrrcpi5Oupw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92B5EC5478C;
+	Fri,  1 Mar 2024 10:42:58 +0000 (UTC)
+From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= via B4 Relay
+ <devnull+arinc.unal.arinc9.com@kernel.org>
+Subject: [PATCH net-next v3 0/9] MT7530 DSA Subdriver Improvements Act III
+Date: Fri, 01 Mar 2024 12:42:56 +0200
+Message-Id:
+ <20240301-for-netnext-mt7530-improvements-3-v3-0-449f4f166454@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIADCx4WUC/42NvQ7CIBRGX8Uwew1/tdbJ9zAOeHtRhkIDhNQ0f
+ XeRSTfHLyffOStLFB0ldt6tLFJxyQVfh9rvGD6NfxC4sW4mudRcKAE2RPCUPS0Zptx3ioOb5hg
+ KTeRzAgXmZFAPo7Y9SlY9cyTrlta4snqFz5fdKnm6lEN8tXgRjbeO5Kc/OkUAh7FHgXbsuERzM
+ dF5HA4YpqYv8kspjv8oZVXyQaMhZa1U9x/ltm1vtty9ajABAAA=
+To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: mithat.guner@xeront.com, erkin.bozoglu@xeront.com, 
+ Bartel Eerdekens <bartel.eerdekens@constell8.be>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, 
+ =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1709289776; l=2904;
+ i=arinc.unal@arinc9.com; s=arinc9-Xeront; h=from:subject:message-id;
+ bh=ZJKLgZ4Q+W8RC6y4mRrQuRCA9QBqTIit+Yam4i3YxuY=;
+ b=ZjlR+JK6Wc12fpxCA0Z/UmD0nT/C3mkcQQ+Tv284Gx7ntuu0OjsWGUmA+Sd7h72x3BjBCTzXz
+ buk1reF6htoDmrx3gmAhh3y41FPGdaDJeoGS1YvwrKMBxHsB4L+60zu
+X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
+ pk=z49tLn29CyiL4uwBTrqH9HO1Wu3sZIuRp4DaLZvtP9M=
+X-Endpoint-Received:
+ by B4 Relay for arinc.unal@arinc9.com/arinc9-Xeront with auth_id=137
+X-Original-From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Reply-To: <arinc.unal@arinc9.com>
 
-On Thu, Feb 29, 2024 at 06:25 PM -05, Xin Long wrote:
-> On Thu, Feb 29, 2024 at 3:27=E2=80=AFPM Jakub Sitnicki <jakub@cloudflare.=
-com> wrote:
->>
->> On Wed, Feb 28, 2024 at 04:59 PM -08, Jakub Kicinski wrote:
->> > SCTP does not support IP_LOCAL_PORT_RANGE and we know it,
->> > so use XFAIL instead of SKIP.
->> >
->> > Reviewed-by: Kees Cook <keescook@chromium.org>
->> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
->> > ---
->> >  tools/testing/selftests/net/ip_local_port_range.c | 6 +++---
->> >  1 file changed, 3 insertions(+), 3 deletions(-)
->> >
->> > diff --git a/tools/testing/selftests/net/ip_local_port_range.c b/tools=
-/testing/selftests/net/ip_local_port_range.c
->> > index 6ebd58869a63..193b82745fd8 100644
->> > --- a/tools/testing/selftests/net/ip_local_port_range.c
->> > +++ b/tools/testing/selftests/net/ip_local_port_range.c
->> > @@ -365,9 +365,6 @@ TEST_F(ip_local_port_range, late_bind)
->> >       __u32 range;
->> >       __u16 port;
->> >
->> > -     if (variant->so_protocol =3D=3D IPPROTO_SCTP)
->> > -             SKIP(return, "SCTP doesn't support IP_BIND_ADDRESS_NO_PO=
-RT");
->> > -
->> >       fd =3D socket(variant->so_domain, variant->so_type, 0);
->> >       ASSERT_GE(fd, 0) TH_LOG("socket failed");
->> >
->> > @@ -414,6 +411,9 @@ TEST_F(ip_local_port_range, late_bind)
->> >       ASSERT_TRUE(!err) TH_LOG("close failed");
->> >  }
->> >
->> > +XFAIL_ADD(ip_local_port_range, ip4_stcp, late_bind);
->> > +XFAIL_ADD(ip_local_port_range, ip6_stcp, late_bind);
->> > +
->> >  TEST_F(ip_local_port_range, get_port_range)
->> >  {
->> >       __u16 lo, hi;
->>
->> [wrt our earlier discussion off-list]
->>
->> You were right, this test succeeds if I delete SKIP for SCTP.
->> Turns out IP_LOCAL_PORT_RANGE works for SCTP out of the box after all.
->>
->> What I didn't notice earlier is that sctp_setsockopt() delegates to
->> ip_setsockopt() when level !=3D SOL_SCTP.
->>
->> CC'ing Marcelo & Xin, to confirm that this isn't a problem.
-> Yes, SCTP supports ip_local_port_range by calling
-> inet_sk_get_local_port_range() in sctp_get_port(), similar to TCP/UDP.
+Hello!
 
-Well, that's embarassing.
+This is the third patch series with the goal of simplifying the MT7530 DSA
+subdriver and improving support for MT7530, MT7531, and the switch on the
+MT7988 SoC.
 
-I see that I've updated sctp stack to use inet_sk_get_local_port_range()
-in 91d0b78c5177 ("inet: Add IP_LOCAL_PORT_RANGE socket option").
+I have done a simple ping test to confirm basic communication on all switch
+ports on MCM and standalone MT7530, and MT7531 switch with this patch
+series applied.
 
-Thanks for confirming, Xin.
+MT7621 Unielec, MCM MT7530:
 
-It's clearly an overside on my side. That SKIP in tests should have
-never been there. I will send a fixup.
+rgmii-only-gmac0-mt7621-unielec-u7621-06-16m.dtb
+gmac0-and-gmac1-mt7621-unielec-u7621-06-16m.dtb
+
+tftpboot 0x80008000 mips-uzImage.bin; tftpboot 0x83000000 mips-rootfs.cpio.uboot; tftpboot 0x83f00000 $dtb; bootm 0x80008000 0x83000000 0x83f00000
+
+MT7622 Bananapi, MT7531:
+
+gmac0-and-gmac1-mt7622-bananapi-bpi-r64.dtb
+
+tftpboot 0x40000000 arm64-Image; tftpboot 0x45000000 arm64-rootfs.cpio.uboot; tftpboot 0x4a000000 $dtb; booti 0x40000000 0x45000000 0x4a000000
+
+MT7623 Bananapi, standalone MT7530:
+
+rgmii-only-gmac0-mt7623n-bananapi-bpi-r2.dtb
+gmac0-and-gmac1-mt7623n-bananapi-bpi-r2.dtb
+
+tftpboot 0x80008000 arm-zImage; tftpboot 0x83000000 arm-rootfs.cpio.uboot; tftpboot 0x83f00000 $dtb; bootz 0x80008000 0x83000000 0x83f00000
+
+This patch series is the continuation of the patch series linked below.
+
+https://lore.kernel.org/r/20230522121532.86610-1-arinc.unal@arinc9.com
+
+Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+---
+Changes in v3:
+- Patch 8
+  - Explain properly the behaviour of setting link down on all ports at
+    setup.
+  - Split the changes for simplifying the link settings operations out to
+    another patch.
+- Link to v2: https://lore.kernel.org/r/20240216-for-netnext-mt7530-improvements-3-v2-0-094cae3ff23b@arinc9.com
+
+Changes in v2:
+- Patch 8
+  - Use a single mt7530_rmw() instead of two mt7530_clear() and
+    mt7530_set() commands.
+- Link to v1: https://lore.kernel.org/r/20240208-for-netnext-mt7530-improvements-3-v1-0-d7c1cfd502ca@arinc9.com
+
+---
+Arınç ÜNAL (9):
+      net: dsa: mt7530: remove .mac_port_config for MT7988 and make it optional
+      net: dsa: mt7530: set interrupt register only for MT7530
+      net: dsa: mt7530: do not use SW_PHY_RST to reset MT7531 switch
+      net: dsa: mt7530: get rid of useless error returns on phylink code path
+      net: dsa: mt7530: get rid of priv->info->cpu_port_config()
+      net: dsa: mt7530: get rid of mt753x_mac_config()
+      net: dsa: mt7530: put initialising PCS devices code back to original order
+      net: dsa: mt7530: sort link settings ops and force link down on all ports
+      net: dsa: mt7530: simplify link operations
+
+ drivers/net/dsa/mt7530.c | 259 ++++++++---------------------------------------
+ drivers/net/dsa/mt7530.h |  19 +---
+ 2 files changed, 47 insertions(+), 231 deletions(-)
+---
+base-commit: b6b614558ed5b2ca50edacc0f2fbf5f52158c86c
+change-id: 20240131-for-netnext-mt7530-improvements-3-a8ac49d4f7c2
+
+Best regards,
+-- 
+Arınç ÜNAL <arinc.unal@arinc9.com>
+
 
