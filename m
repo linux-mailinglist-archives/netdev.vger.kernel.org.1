@@ -1,289 +1,187 @@
-Return-Path: <netdev+bounces-76438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A04486DBDC
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 08:09:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CF5686DBFC
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 08:17:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C416AB21E85
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 07:09:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E564628AC66
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 07:17:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE1169319;
-	Fri,  1 Mar 2024 07:09:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E42B6931B;
+	Fri,  1 Mar 2024 07:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Vx+h9Zso"
+	dkim=pass (2048-bit key) header.d=csgroup.eu header.i=@csgroup.eu header.b="A/MzIoev"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from FRA01-MR2-obe.outbound.protection.outlook.com (mail-mr2fra01on2139.outbound.protection.outlook.com [40.107.9.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EECB6930A
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 07:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709276978; cv=none; b=bv58F+v3ydnU6siE9Xj5HvuQKP8/6Vw+srwyBOVMgYdfN3tJL9oZi7QVmySJ+dyD6mUjEi/N3+Qou5SZf0iBfgqlqVSvzJuoW8JhShIry1v27IBvhVuijoA6OgnAQJjDfP+BOB7Y0wsD/gcwE1c378APA6ECRTW0KTJht3H9d7U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709276978; c=relaxed/simple;
-	bh=kgk2nvusG+z+3AvVHeRTkQo6J8AXdDSEWPdDUgX44Lw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s1yR+p4cToJ30i0B4c1f/lGNp/mbM1722feRcoa3tsyMwskodbj77ERnx4bN5hA8vTzgszlWIHQWTp1o60UUn6p7GrXE9OaZx5XYZIc5jnWeUFJVBzfHgcxTrEiulk2MkPQyt/jus9n/omQhqnAUDjC4oWbsUtfZRRulMjvhnWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Vx+h9Zso; arc=none smtp.client-ip=209.85.214.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-1dc1ff58fe4so15515585ad.1
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 23:09:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1709276976; x=1709881776; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JOssgKB7XaCifvuhcs7Kh7kifGJ3OYhTaXeLDavmy28=;
-        b=Vx+h9ZsoPuEpEmGoSQU8ElyYS+Dk5qQH6BToVTVXT88euHmEBLKdbzXi5LffI01qEE
-         VrO6eV49aYbmlJoyzxSN9BITf1EQXQ8UDHRpvbGEqD4/f28Hv9o89rN6a+C/8dBEbUrx
-         s4GEAoag4P50ziwOolPU0uR8V2UO+qTmTf5K8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709276976; x=1709881776;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JOssgKB7XaCifvuhcs7Kh7kifGJ3OYhTaXeLDavmy28=;
-        b=oAVVp4JE5oG1DBY58/cZfJ9XI/9ywwjkjJeL1cSO/PwsDM3wMfD+hjjuT5+sfLc83T
-         lJF0ws0ek7jlm/nz7Y9trR1aeKU4tdZh3e4dfn4UYeWUCl75mqW+TAULEQTY1/wY2Alg
-         uIM3FHHMEGGETO/T0w8H8CcST+usJFabid0X9Hsn1Y7oFgGpkmS4/xcMGe+8ssYR5j39
-         K67S37bwiA/rpJVZAoeGfJ2OR/lWn324GB5s4THTfY93MtFAZvYJawG24lj2DwyGeTv2
-         v4LNF09jy61zwGoh1kMSxdupycClrXygItPp3wCgLQuf/psXwnnDNfU6IGZVqgHv7322
-         DQ+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUBgIdGEhY5c++kICNeUTvqhfAGbLHodenymQ5kF5jRK3QWZFiw6jsfReY+IfmLIUid32SipxePxHtAUFKZ/ea8KtDoSLj3
-X-Gm-Message-State: AOJu0Yx9n/y+0gOcyk2PpcQX/PspWGZ4GVop6580RpBpiXLH5E7GOISy
-	Fw0GZmluS21EXYD/QQYoVspY3Ds1+KfvV0G+nAJSXS1kvu6UWB/28ify1tRm0w==
-X-Google-Smtp-Source: AGHT+IHTEsA3e1i6SOlIOf+6B+BFRqXmFi6kvtybw6I/ClAabVS8Q+xiDWe6nx9BZ4DGBfTrEPcM9w==
-X-Received: by 2002:a17:902:ed54:b0:1dc:1379:213b with SMTP id y20-20020a170902ed5400b001dc1379213bmr742125plb.35.1709276976205;
-        Thu, 29 Feb 2024 23:09:36 -0800 (PST)
-Received: from fedora.eng.vmware.com ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id i9-20020a170902c94900b001dcc09487e8sm2673428pla.50.2024.02.29.23.09.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 23:09:35 -0800 (PST)
-From: Vamsi Krishna Brahmajosyula <vamsi-krishna.brahmajosyula@broadcom.com>
-To: stable@vger.kernel.org,
-	gregkh@linuxfoundation.org
-Cc: mike.kravetz@oracle.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	kafai@fb.com,
-	songliubraving@fb.com,
-	yhs@fb.com,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	dhowells@redhat.com,
-	viro@zeniv.linux.org.uk,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	vasavi.sirnapalli@broadcom.com,
-	Oscar Salvador <osalvador@suse.de>,
-	Michal Hocko <mhocko@suse.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Vamsi Krishna Brahmajosyula <vamsi-krishna.brahmajosyula@broadcom.com>
-Subject: [PATCH v5.15-v5.4] fs,hugetlb: fix NULL pointer dereference in hugetlbs_fill_super
-Date: Fri,  1 Mar 2024 01:09:10 -0600
-Message-ID: <20240301070910.1287862-1-vamsi-krishna.brahmajosyula@broadcom.com>
-X-Mailer: git-send-email 2.44.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8E66930F;
+	Fri,  1 Mar 2024 07:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.9.139
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709277463; cv=fail; b=uOoqa6Nl3Q4Kf7H9sIbt6dKdyUEzX4cfoMRmW3mFzjrTrUj0L3PW2RoUb944Z+GVz//3PwZrkoFHcxATljShJgnfP0H3YjWn3BfdpPMT5m36+5MUe8M99kz+0idLAp1lQrGEEZUepr/Qiy96ZDsvMuT2QAijCERuf2mZ61R0I2U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709277463; c=relaxed/simple;
+	bh=Q7YloBPmXXBoVNNpWXooP1uWjIpxNfbBB9wRaih7XhA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=g7qi9gY6WTrCebBGGq6tOMCDoYiNAUmUntBkRbyPGsm+Op0GPmu0bmxN3hI/A2aS4zzzhUojeAnvmYyNo2xgvk6J9Kee9xO0WD34I5ZTAVHjd7KxyEXoFBiaUFul+eH2UEYZwZSvPiPzGzBsUzGYIAeZq1GeQd6Gx3zQSiZkBHc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; dkim=pass (2048-bit key) header.d=csgroup.eu header.i=@csgroup.eu header.b=A/MzIoev; arc=fail smtp.client-ip=40.107.9.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EOEetsty0kM7OWjKNLcDjBE5sRaNVi8gXYU+C0d3ym/0bPr9EuTFK/O9i583xF42n7lYwq16Ms7T5dVYHShOojdlykbKvN7P/h39tmjuGonISM3Aj3VlmUoHFzoz5E1ECDSKYgDT8k6+baQ3YxekIdd3NyWiukLQXH/54H1aoNgNdjniYvN/U4jit6El40mEs/j/4JASf1tyZwlhaq+7MAxWaczFu8cIwXVqFU/+PVa4xjaaFpVzJV1qQS0vaSaZGpx2bp9XfNucBZdvADXYsCTIvt9jGL2CwpPzg9qreKWt1/wej/nt5wVLQKrqM+wMmY932AvRWKo8Ov4l2ie1BQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Q7YloBPmXXBoVNNpWXooP1uWjIpxNfbBB9wRaih7XhA=;
+ b=ZyfDrA/CfY7rhFSQXc87fNfADhWM3THnV9HHhEmkLFFlJO44n0TX6BqQrNKRilkzBTqvTDo1GjFwgyyEFlXEA3BAl3WCNVwVaF9UFieD9QGpXPQ/6D6kHWj7g7UDQEH2gqH/uNqohUKQ8y9SHsN3AM3CUF/zfNjpG2WSYNNx06QFthiA2jiO62pb+T+4u4Ba9NABZ7Tn97Z++PG8ZnNdvJBH2rZftNc8ANfJGZj+51rJJPNPmyfIUxKOj3dL/3z5ajDt1iT0Z8QZzzh9+X6ciYJJb//am7ipbqhmamsoupHP4fxkGhnVnH7rIGJE/C+xKKBHXjqZIJ5FtnQ9oXC4Tw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=csgroup.eu; dmarc=pass action=none header.from=csgroup.eu;
+ dkim=pass header.d=csgroup.eu; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=csgroup.eu;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Q7YloBPmXXBoVNNpWXooP1uWjIpxNfbBB9wRaih7XhA=;
+ b=A/MzIoev62waZC/3yvdSqM3yzocFZP88RDCivDVyQlHPtvkrk3mzmaxW399in96Pa9wyNDoTAqujHtifdBhYpD961xiFJ1U48VJeQEkq84KJTZLJwE5Z5NM/LndmnpnmfpzlwWIG0w/9AAyMmreLP/6s9HXvV4GOFhKCfAaHbDKqVBmGF3dDz9BbYyH7/DBKixQhhqPKOaFo+ybwMtik/2sFh5Z8cPh9eKvoQszxWOVcu6JT+u7eZ/kZ/QJwHRPWU5B1/jb773i5560S52a8erkR0nbZ2PySh2QEcp7CfFDB8ezZvYnOt7FIcvU9tlK5ogbDpxeS99IDXG+S67Ge2Q==
+Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM (2603:10a6:501:31::15)
+ by PAYP264MB3437.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:125::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.36; Fri, 1 Mar
+ 2024 07:17:38 +0000
+Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
+ ([fe80::c192:d40f:1c33:1f4e]) by MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
+ ([fe80::c192:d40f:1c33:1f4e%6]) with mapi id 15.20.7316.039; Fri, 1 Mar 2024
+ 07:17:38 +0000
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: Charlie Jenkins <charlie@rivosinc.com>, Guenter Roeck
+	<linux@roeck-us.net>, David Laight <David.Laight@aculab.com>, Palmer Dabbelt
+	<palmer@dabbelt.com>, Andrew Morton <akpm@linux-foundation.org>, Helge Deller
+	<deller@gmx.de>, "James E.J. Bottomley"
+	<James.Bottomley@hansenpartnership.com>, Parisc List
+	<linux-parisc@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Geert
+ Uytterhoeven <geert@linux-m68k.org>, Russell King <linux@armlinux.org.uk>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Palmer
+ Dabbelt <palmer@rivosinc.com>, Linux ARM
+	<linux-arm-kernel@lists.infradead.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH v11] lib: checksum: Use aligned accesses for ip_fast_csum
+ and csum_ipv6_magic tests
+Thread-Topic: [PATCH v11] lib: checksum: Use aligned accesses for ip_fast_csum
+ and csum_ipv6_magic tests
+Thread-Index: AQHaa2FN/UPATTv23UaTwsptpp4BsbEiek8A
+Date: Fri, 1 Mar 2024 07:17:38 +0000
+Message-ID: <41a5d1e8-6f30-4907-ba63-8a7526e71e04@csgroup.eu>
+References:
+ <20240229-fix_sparse_errors_checksum_tests-v11-1-f608d9ec7574@rivosinc.com>
+In-Reply-To:
+ <20240229-fix_sparse_errors_checksum_tests-v11-1-f608d9ec7574@rivosinc.com>
+Accept-Language: fr-FR, en-US
+Content-Language: fr-FR
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=csgroup.eu;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MRZP264MB2988:EE_|PAYP264MB3437:EE_
+x-ms-office365-filtering-correlation-id: dd18d9a5-e93a-4082-50a7-08dc39bfacfc
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ gOS25O9ulV2kloinNp0e0GZyobkXhnIVR/TfBoqQmYVRM3Ju5Tc9mPgbzBiJwskB9RUZxgtYmkB7eFq6KBiD6yIshb0nyaWLQMjmvY9OXUOKpZDMTqIkKLOY1rxNdPTepQxlG9TcqVvOENsXMz94q5tYKJsKAKqtCaEN7sQNhDQQipfSYn9iNNKfifZXdBoiVTCXl8oyBzOuyOoA/IeHaonJNnx2lOUuwRlZGRmo9NKteFqK4NXyCZQ8OQwn6zBrZftrJn01uQRkpJ9hn0r9bwur0haLtp2tjmsBUmvtRp8OeZD/fe+aldoJiF+ImC3y24d37ktoINiW7yyRREokrSDcaFCuY1zPILi3CyZepPx8yVVDtlPYU3mhBX8OSQYsYrWYG8AREbX0A1R0BWCUGRafklU+yeP2cnINsO+4mBBapeH5s48cTD5UOy46mT6kMMUmV+EF4K2aPcuyttruLCKEDA5uBQDiH+hw/uTCB5VclCwTdy5m2dQHmPxNt2LnBwKKxn/1Q4wlIiyrxrHFjd5Tl5XasYUmgfGi8N2j0K1mTjniiN8IMfGO8h8d0Iifs3Aspi3OdHfGn/zE5GseaVGk6iUs62rr2Nwc1U+BXqNumaFRLkc4OwWpPouDfdHzAWjKqpVAaMsjRn9N1xDCmSWO2KhnfvwTbvX7yCYJ8talmO7Vzqjrx5YUuzin6LqNUEt1R8qq5r6IVC2ESgX4oPnU6TNhKQzHpKnXteRLWQk=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(38070700009)(921011);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?TTJSYm1ZZEZoKy9TSy9YaVk0Qy9Ca0JacU5sZ29vdUVzcDdpN2c5RnYxQ003?=
+ =?utf-8?B?RGJpbTFaR0xNUGtmQU5PN2hsdGhhRDBzZXJiOExIQmZ2Uy9yZ0hOOTk5Nk5Z?=
+ =?utf-8?B?SW9QZmMzWTViSlJuMlFiRmQyVGJLQlIvTGlkdWN6VStrV0gwMkgvZzU4bnJp?=
+ =?utf-8?B?VklOUnF5aWl4V1BzTkJwRHA5RUJKN1ZjL1BQMDMrQzV0U0xIL2NRUkxncEZ0?=
+ =?utf-8?B?ZE5SMjRLUDl4S09RQ1NOUGs1V3NHTW1Ibi9qZ2JPcW9YMVRkcHV1MS8vWkVr?=
+ =?utf-8?B?T2lLUytyaGx1SmxwNWM1M21NZUs0SWE4Y1gxVnphak5LNVpuRUQ0N1NmMHlI?=
+ =?utf-8?B?VUliQnIwMGsrTTh3YTYrdlpKTGFmdTg2QW9DUTZyUnBrajZLdS8zYWZkbU1o?=
+ =?utf-8?B?V3FFVHcxV012aDdvM3FEdCt6dGNXRHVaSTBycERpSDhsYWZhOWdFUDdoNzJh?=
+ =?utf-8?B?KzdnczF6RVBOTEQ4b1JtTXpBWkNWVXpUU0czY0c1Tk9SVWdQUkZrMXcvQmVH?=
+ =?utf-8?B?WFRXeXl2bEM0R2RIejNYMWwvQ1M0UDlxNzNTOFFYeHlUcGF4RnhtNG56bkRr?=
+ =?utf-8?B?SjhhUjF5Q0k0dUloR2RtdzAzNXJ0VmFKcjJpMmJwZGw1MFRuZDNRZHQrOEZ0?=
+ =?utf-8?B?bTloZFRZOEtGVVlWdml6ZG1xVndOVUlkSUdxeTNGd0syRXdpSWtHQmdVU1BB?=
+ =?utf-8?B?RzRyV2ZXSnhZMEc2QXBEbmlpdzk1aUF3QUVNczZCdnBud3RsZDNRU2ZSSkc2?=
+ =?utf-8?B?UXFSUmt4blU2Y3dESVdQTFRxMkpadGZZRlIxUHVxS2Y0RWxuUFd4MXZRM1VE?=
+ =?utf-8?B?a3IyWURqTytoazVyMUVoaDdaY1hjM0RTV3djaFd2VENXNjMwZWRMNmEwSlpw?=
+ =?utf-8?B?UXBiaXVhelRnSTBjSEtBblRVUDc2OTNUengvb3pVaEFJdWNNQ3BBZCtOZkU3?=
+ =?utf-8?B?UEtuUC9pdEdybXJKVC9iTTBQTzNtR0RKb3hGTHQ5QWhzLzlVSWowR0cxeDQw?=
+ =?utf-8?B?bW9paVFXSXZFMVRxUTZTUkIzNlFRaE1uWURwZ0gyVFh2UlY5UzNtZXQ3OTll?=
+ =?utf-8?B?SXhHZVBSUkh0OGg2cFA2MlNkNGNDTUNMS0tRdUdHK0I0NVVuVlEwMzFtWER1?=
+ =?utf-8?B?bkhncnkvYkY3UWdxNFJRZTFQbENHeG4yUTZkZlVMTnh5RHFsaS8zYUhXbDhx?=
+ =?utf-8?B?WmtJZjVzWURoM3p6NnBua2tacmlUeFVpWi81bDFtM1FpYVZuN0h6RUhMb2Zw?=
+ =?utf-8?B?Y3pTVzlJSzdFaDc0a3Jza0xYOWFVM3NWQkR4MlNuUmxvbW9va29ROCtyVGFM?=
+ =?utf-8?B?VTFIYWRwdm5jWFl2V0kxRk9QeEl0M3lHRGt4cWdSekRad3M5Y3M5WStrVkhW?=
+ =?utf-8?B?ZGhDdGtQNmVKcTJrTXlzblFjZkE1OUhTWngrSkd3U0V5cklqOU5yazlTb2hD?=
+ =?utf-8?B?T1IwSWRyelZHeDRoRVJPd3FoR1c2ZlV6TzRDQ29laWUrUjhtenZTUkFoNVBU?=
+ =?utf-8?B?eVhaV3JXOXk5QVhGUHF3YnMxMVVlekd6U2JxMnpNb3VlaEVFUEdOZFFLQXN2?=
+ =?utf-8?B?cHpzUThOWXA1V3BXaldyR1pXT1lqSkxUQWJmMmlJSmVQN2h3c1B1eDRhZ3NQ?=
+ =?utf-8?B?dXhlbG9yWGlpN2JtKzB1bzlZcjQ1UVhiNzdOdHZjaU9YeVR0c2NkT0kwbUVi?=
+ =?utf-8?B?OXB0Q21Ra0pDNFZVQVZ2dTc1R3FKTk1USG5WcldOSDVXRHc1bHVkbCtibEwx?=
+ =?utf-8?B?UFNqaDA2Z0tpVk9uUVRTZnZwS2N2ZTB6TW9ZalVBakUyb3RReDQ0OWRWR1Ar?=
+ =?utf-8?B?SW1ja0xDRmNSbW5Ic0I3SG5vcWw5Y1BzT0hQcEhlRDhsWXFmMDBBVXVnOVZl?=
+ =?utf-8?B?WGlobGpVV0dDU3pLSS9DbzBsTm53OVpTSG53N0RiRllGRmJSK0xicEh1Zklv?=
+ =?utf-8?B?RlUvc2VBVXp3eEpsSjFHNGg5bWpyMkgzU2RQYWtVa3pqR21wV1dEaVVyMmFQ?=
+ =?utf-8?B?czgvWDRwV0hJbzR5RGprcW5jVzlLNlpZQ0J6anFWOVIwK0dqQnRtZUsxcmwz?=
+ =?utf-8?B?S0diTzFFMEJsSGFDa1MwaDI5WnVlZXc5L0pQcENiakNlN05iTkNXWXB3QUhv?=
+ =?utf-8?B?ek52UmwyYytOY05iZ1ZQZkwvUU5JSlI2VGZXcjJIK1pGRFFJN3ZBaVM1RzRn?=
+ =?utf-8?B?UlE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3637626EFEFE5D4F9AE8EDDB58C79DB7@FRAP264.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: csgroup.eu
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: dd18d9a5-e93a-4082-50a7-08dc39bfacfc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Mar 2024 07:17:38.3393
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 9914def7-b676-4fda-8815-5d49fb3b45c8
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hD6BJzFRu6P14ObApDc1rqrAvHfKsg8WbaPSOpk8UWFNIcepClajTR1pK97AB/UFQXrzW2OSQFn6DnvB7R6IyqDJEw13+k/qy+f+PpBBHkM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAYP264MB3437
 
-From: Oscar Salvador <osalvador@suse.de>
-
-commit 79d72c68c58784a3e1cd2378669d51bfd0cb7498 upstream.
-
-When configuring a hugetlb filesystem via the fsconfig() syscall, there is
-a possible NULL dereference in hugetlbfs_fill_super() caused by assigning
-NULL to ctx->hstate in hugetlbfs_parse_param() when the requested pagesize
-is non valid.
-
-E.g: Taking the following steps:
-
-     fd =3D fsopen("hugetlbfs", FSOPEN_CLOEXEC);
-     fsconfig(fd, FSCONFIG_SET_STRING, "pagesize", "1024", 0);
-     fsconfig(fd, FSCONFIG_CMD_CREATE, NULL, NULL, 0);
-
-Given that the requested "pagesize" is invalid, ctxt->hstate will be replac=
-ed
-with NULL, losing its previous value, and we will print an error:
-
- ...
- ...
- case Opt_pagesize:
- ps =3D memparse(param->string, &rest);
- ctx->hstate =3D h;
- if (!ctx->hstate) {
-         pr_err("Unsupported page size %lu MB\n", ps / SZ_1M);
-         return -EINVAL;
- }
- return 0;
- ...
- ...
-
-This is a problem because later on, we will dereference ctxt->hstate in
-hugetlbfs_fill_super()
-
- ...
- ...
- sb->s_blocksize =3D huge_page_size(ctx->hstate);
- ...
- ...
-
-Causing below Oops.
-
-Fix this by replacing cxt->hstate value only when then pagesize is known
-to be valid.
-
- kernel: hugetlbfs: Unsupported page size 0 MB
- kernel: BUG: kernel NULL pointer dereference, address: 0000000000000028
- kernel: #PF: supervisor read access in kernel mode
- kernel: #PF: error_code(0x0000) - not-present page
- kernel: PGD 800000010f66c067 P4D 800000010f66c067 PUD 1b22f8067 PMD 0
- kernel: Oops: 0000 [#1] PREEMPT SMP PTI
- kernel: CPU: 4 PID: 5659 Comm: syscall Tainted: G            E      6.8.0-=
-rc2-default+ #22 5a47c3fef76212addcc6eb71344aabc35190ae8f
- kernel: Hardware name: Intel Corp. GROVEPORT/GROVEPORT, BIOS GVPRCRB1.86B.=
-0016.D04.1705030402 05/03/2017
- kernel: RIP: 0010:hugetlbfs_fill_super+0xb4/0x1a0
- kernel: Code: 48 8b 3b e8 3e c6 ed ff 48 85 c0 48 89 45 20 0f 84 d6 00 00 =
-00 48 b8 ff ff ff ff ff ff ff 7f 4c 89 e7 49 89 44 24 20 48 8b 03 <8b> 48 2=
-8 b8 00 10 00 00 48 d3 e0 49 89 44 24 18 48 8b 03 8b 40 28
- kernel: RSP: 0018:ffffbe9960fcbd48 EFLAGS: 00010246
- kernel: RAX: 0000000000000000 RBX: ffff9af5272ae780 RCX: 0000000000372004
- kernel: RDX: ffffffffffffffff RSI: ffffffffffffffff RDI: ffff9af555e9b000
- kernel: RBP: ffff9af52ee66b00 R08: 0000000000000040 R09: 0000000000370004
- kernel: R10: ffffbe9960fcbd48 R11: 0000000000000040 R12: ffff9af555e9b000
- kernel: R13: ffffffffa66b86c0 R14: ffff9af507d2f400 R15: ffff9af507d2f400
- kernel: FS:  00007ffbc0ba4740(0000) GS:ffff9b0bd7000000(0000) knlGS:000000=
-0000000000
- kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
- kernel: CR2: 0000000000000028 CR3: 00000001b1ee0000 CR4: 00000000001506f0
- kernel: Call Trace:
- kernel:  <TASK>
- kernel:  ? __die_body+0x1a/0x60
- kernel:  ? page_fault_oops+0x16f/0x4a0
- kernel:  ? search_bpf_extables+0x65/0x70
- kernel:  ? fixup_exception+0x22/0x310
- kernel:  ? exc_page_fault+0x69/0x150
- kernel:  ? asm_exc_page_fault+0x22/0x30
- kernel:  ? __pfx_hugetlbfs_fill_super+0x10/0x10
- kernel:  ? hugetlbfs_fill_super+0xb4/0x1a0
- kernel:  ? hugetlbfs_fill_super+0x28/0x1a0
- kernel:  ? __pfx_hugetlbfs_fill_super+0x10/0x10
- kernel:  vfs_get_super+0x40/0xa0
- kernel:  ? __pfx_bpf_lsm_capable+0x10/0x10
- kernel:  vfs_get_tree+0x25/0xd0
- kernel:  vfs_cmd_create+0x64/0xe0
- kernel:  __x64_sys_fsconfig+0x395/0x410
- kernel:  do_syscall_64+0x80/0x160
- kernel:  ? syscall_exit_to_user_mode+0x82/0x240
- kernel:  ? do_syscall_64+0x8d/0x160
- kernel:  ? syscall_exit_to_user_mode+0x82/0x240
- kernel:  ? do_syscall_64+0x8d/0x160
- kernel:  ? exc_page_fault+0x69/0x150
- kernel:  entry_SYSCALL_64_after_hwframe+0x6e/0x76
- kernel: RIP: 0033:0x7ffbc0cb87c9
- kernel: Code: 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 90 48 89 f8 =
-48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 0=
-1 f0 ff ff 73 01 c3 48 8b 0d 97 96 0d 00 f7 d8 64 89 01 48
- kernel: RSP: 002b:00007ffc29d2f388 EFLAGS: 00000206 ORIG_RAX: 000000000000=
-01af
- kernel: RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007ffbc0cb87c9
- kernel: RDX: 0000000000000000 RSI: 0000000000000006 RDI: 0000000000000003
- kernel: RBP: 00007ffc29d2f3b0 R08: 0000000000000000 R09: 0000000000000000
- kernel: R10: 0000000000000000 R11: 0000000000000206 R12: 0000000000000000
- kernel: R13: 00007ffc29d2f4c0 R14: 0000000000000000 R15: 0000000000000000
- kernel:  </TASK>
- kernel: Modules linked in: rpcsec_gss_krb5(E) auth_rpcgss(E) nfsv4(E) dns_=
-resolver(E) nfs(E) lockd(E) grace(E) sunrpc(E) netfs(E) af_packet(E) bridge=
-(E) stp(E) llc(E) iscsi_ibft(E) iscsi_boot_sysfs(E) intel_rapl_msr(E) intel=
-_rapl_common(E) iTCO_wdt(E) intel_pmc_bxt(E) sb_edac(E) iTCO_vendor_support=
-(E) x86_pkg_temp_thermal(E) intel_powerclamp(E) coretemp(E) kvm_intel(E) rf=
-kill(E) ipmi_ssif(E) kvm(E) acpi_ipmi(E) irqbypass(E) pcspkr(E) igb(E) ipmi=
-_si(E) mei_me(E) i2c_i801(E) joydev(E) intel_pch_thermal(E) i2c_smbus(E) dc=
-a(E) lpc_ich(E) mei(E) ipmi_devintf(E) ipmi_msghandler(E) acpi_pad(E) tiny_=
-power_button(E) button(E) fuse(E) efi_pstore(E) configfs(E) ip_tables(E) x_=
-tables(E) ext4(E) mbcache(E) jbd2(E) hid_generic(E) usbhid(E) sd_mod(E) t10=
-_pi(E) crct10dif_pclmul(E) crc32_pclmul(E) crc32c_intel(E) polyval_clmulni(=
-E) ahci(E) xhci_pci(E) polyval_generic(E) gf128mul(E) ghash_clmulni_intel(E=
-) sha512_ssse3(E) sha256_ssse3(E) xhci_pci_renesas(E) libahci(E) ehci_pci(E=
-) sha1_ssse3(E) xhci_hcd(E) ehci_hcd(E) libata(E)
- kernel:  mgag200(E) i2c_algo_bit(E) usbcore(E) wmi(E) sg(E) dm_multipath(E=
-) dm_mod(E) scsi_dh_rdac(E) scsi_dh_emc(E) scsi_dh_alua(E) scsi_mod(E) scsi=
-_common(E) aesni_intel(E) crypto_simd(E) cryptd(E)
- kernel: Unloaded tainted modules: acpi_cpufreq(E):1 fjes(E):1
- kernel: CR2: 0000000000000028
- kernel: ---[ end trace 0000000000000000 ]---
- kernel: RIP: 0010:hugetlbfs_fill_super+0xb4/0x1a0
- kernel: Code: 48 8b 3b e8 3e c6 ed ff 48 85 c0 48 89 45 20 0f 84 d6 00 00 =
-00 48 b8 ff ff ff ff ff ff ff 7f 4c 89 e7 49 89 44 24 20 48 8b 03 <8b> 48 2=
-8 b8 00 10 00 00 48 d3 e0 49 89 44 24 18 48 8b 03 8b 40 28
- kernel: RSP: 0018:ffffbe9960fcbd48 EFLAGS: 00010246
- kernel: RAX: 0000000000000000 RBX: ffff9af5272ae780 RCX: 0000000000372004
- kernel: RDX: ffffffffffffffff RSI: ffffffffffffffff RDI: ffff9af555e9b000
- kernel: RBP: ffff9af52ee66b00 R08: 0000000000000040 R09: 0000000000370004
- kernel: R10: ffffbe9960fcbd48 R11: 0000000000000040 R12: ffff9af555e9b000
- kernel: R13: ffffffffa66b86c0 R14: ffff9af507d2f400 R15: ffff9af507d2f400
- kernel: FS:  00007ffbc0ba4740(0000) GS:ffff9b0bd7000000(0000) knlGS:000000=
-0000000000
- kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
- kernel: CR2: 0000000000000028 CR3: 00000001b1ee0000 CR4: 00000000001506f0
-
-Link: https://lkml.kernel.org/r/20240130210418.3771-1-osalvador@suse.de
-Fixes: 32021982a324 ("hugetlbfs: Convert to fs_context")
-Signed-off-by: Michal Hocko <mhocko@suse.com>
-Signed-off-by: Oscar Salvador <osalvador@suse.de>
-Acked-by: Muchun Song <muchun.song@linux.dev>
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
-Signed-off-by: Vamsi Krishna Brahmajosyula <vamsi-krishna.brahmajosyula@bro=
-adcom.com>
----
- fs/hugetlbfs/inode.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/fs/hugetlbfs/inode.c b/fs/hugetlbfs/inode.c
-index 54379ee573b1..9b6004bc96de 100644
---- a/fs/hugetlbfs/inode.c
-+++ b/fs/hugetlbfs/inode.c
-@@ -1234,6 +1234,7 @@ static int hugetlbfs_parse_param(struct fs_context *f=
-c, struct fs_parameter *par
- {
- 	struct hugetlbfs_fs_context *ctx =3D fc->fs_private;
- 	struct fs_parse_result result;
-+	struct hstate *h;
- 	char *rest;
- 	unsigned long ps;
- 	int opt;
-@@ -1278,11 +1279,12 @@ static int hugetlbfs_parse_param(struct fs_context =
-*fc, struct fs_parameter *par
-=20
- 	case Opt_pagesize:
- 		ps =3D memparse(param->string, &rest);
--		ctx->hstate =3D size_to_hstate(ps);
--		if (!ctx->hstate) {
-+		h =3D size_to_hstate(ps);
-+		if (!h) {
- 			pr_err("Unsupported page size %lu MB\n", ps >> 20);
- 			return -EINVAL;
- 		}
-+		ctx->hstate =3D h;
- 		return 0;
-=20
- 	case Opt_min_size:
---=20
-2.43.2
-
+K0NDIG5ldGRldiBBUk0gUnVzc2VsbA0KDQpMZSAyOS8wMi8yMDI0IMOgIDIzOjQ2LCBDaGFybGll
+IEplbmtpbnMgYSDDqWNyaXTCoDoNCj4gVGhlIHRlc3QgY2FzZXMgZm9yIGlwX2Zhc3RfY3N1bSBh
+bmQgY3N1bV9pcHY2X21hZ2ljIHdlcmUgbm90IHByb3Blcmx5DQo+IGFsaWduaW5nIHRoZSBJUCBo
+ZWFkZXIsIHdoaWNoIHdlcmUgY2F1c2luZyBmYWlsdXJlcyBvbiBhcmNoaXRlY3R1cmVzDQo+IHRo
+YXQgZG8gbm90IHN1cHBvcnQgbWlzYWxpZ25lZCBhY2Nlc3NlcyBsaWtlIHNvbWUgQVJNIHBsYXRm
+b3Jtcy4gVG8NCj4gc29sdmUgdGhpcywgYWxpZ24gdGhlIGRhdGEgYWxvbmcgKDE0ICsgTkVUX0lQ
+X0FMSUdOKSBieXRlcyB3aGljaCBpcyB0aGUNCj4gc3RhbmRhcmQgYWxpZ25tZW50IG9mIGFuIElQ
+IGhlYWRlciBhbmQgbXVzdCBiZSBzdXBwb3J0ZWQgYnkgdGhlDQo+IGFyY2hpdGVjdHVyZS4NCg0K
+SW4geW91ciBkZXNjcmlwdGlvbiwgcGxlYXNlIHByb3ZpZGUgbW9yZSBkZXRhaWxzIG9uIHBsYXRm
+b3JtcyB0aGF0IGhhdmUgDQphIHByb2JsZW0sIHdoYXQgdGhlIHByb2JsZW0gaXMgZXhhY3RseSAo
+RmFpbGVkIGNhbGN1bGF0aW9uLCBzbG93bGluZXNzLCANCmtlcm5lbCBPb3BzLCBwYW5pYywgLi4u
+Likgb24gZWFjaCBwbGF0Zm9ybS4NCg0KQW5kIHBsZWFzZSBjb3B5IG1haW50YWluZXJzIGFuZCBs
+aXN0cyBvZiBwbGF0Zm9ybXMgeW91ciBhcmUgc3BlY2lmaWNhbGx5IA0KYWRkcmVzc2luZyB3aXRo
+IHRoaXMgY2hhbmdlLiBBbmQgYXMgdGhpcyBpcyBuZXR3b3JrIHJlbGF0ZWQsIG5ldGRldiBsaXN0
+IA0Kc2hvdWxkIGhhdmUgYmVlbiBjb3BpZWQgYXMgd2VsbC4NCg0KSSBzdGlsbCB0aGluayB0aGF0
+IHlvdXIgcGF0Y2ggaXMgbm90IHRoZSBnb29kIGFwcHJvYWNoLCBpdCBsb29rcyBsaWtlIA0KeW91
+IGFyZSBpZ25vcmluZyBhbGwgdGhlIGRpc2N1c3Npb24uIEJlbG93IGlzIGEgcXVvdGUgb2Ygd2hh
+dCBHZWVydCBzYWlkIA0KYW5kIEkgZnVsbHkgYWdyZWUgd2l0aCB0aGF0Og0KDQoJSU1ITyB0aGUg
+dGVzdHMgc2hvdWxkIHZhbGlkYXRlIHRoZSBleHBlY3RlZCBmdW5jdGlvbmFsaXR5LiAgSWYgYSB0
+ZXN0DQoJZmFpbHMsIGVpdGhlciBmdW5jdGlvbmFsaXR5IGlzIG1pc3Npbmcgb3IgYmVoYXZlcyB3
+cm9uZywgb3IgdGhlIHRlc3QNCglpcyB3cm9uZy4NCg0KCVdoYXQgaXMgdGhlIHBvaW50IG9mIHdy
+aXRpbmcgdGVzdHMgZm9yIGEgY29yZSBmdW5jdGlvbmFsaXR5IGxpa2UgbmV0d29yaw0KCWNoZWNr
+c3VtbWluZyB0aGF0IGRvIG5vdCBtYXRjaCB0aGUgZXhwZWN0ZWQgZnVuY3Rpb25hbGl0eT8NCg0K
+DQpTbyB3ZSBhbGwgYWdyZWUgdGhhdCB0aGVyZSBpcyBzb21ldGhpbmcgdG8gZml4LCBiZWNhdXNl
+IHRvZGF5J3MgdGVzdCANCmRvZXMgb2RkLWFkZHJlc3MgYWNjZXNzZXMgd2hpY2ggaXMgdW5leHBl
+Y3RlZCBmb3IgdGhvc2UgZnVuY3Rpb25zLCBidXQgDQoyLWJ5dGUgYWxpZ25tZW50cyBzaG91bGQg
+YmUgc3VwcG9ydGVkIGhlbmNlIHRlc3RlZCBieSB0aGUgdGVzdC4gTGltaXRpbmcgDQp0aGUgdGVz
+dCB0byBhIDE2LWJ5dGVzIGFsaWdubWVudCBkZWVwbHkgcmVkdWNlcyB0aGUgdXNlZnVsbG5lc3Mg
+b2YgdGhlIHRlc3QuDQoNCkNocmlzdG9waGUNCg==
 
