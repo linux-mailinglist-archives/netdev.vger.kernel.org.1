@@ -1,113 +1,107 @@
-Return-Path: <netdev+bounces-76456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C474D86DCAB
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:06:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 188DD86DCC1
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:10:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58C021F2562E
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 08:06:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD10B1F26C60
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 08:10:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ABB269974;
-	Fri,  1 Mar 2024 08:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="mZSWsqbI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EECA69D09;
+	Fri,  1 Mar 2024 08:10:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.actia.se (mail.actia.se [212.181.117.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE996930E;
-	Fri,  1 Mar 2024 08:06:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9887A6996C;
+	Fri,  1 Mar 2024 08:10:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.181.117.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709280379; cv=none; b=fDRcopBhw7rBkJfKFvOXNZZz8RHgEyeSDIG0/0MX05iuRhgHXP8nhSaeam4a9c1ylEX1o+ZPPCAr0mCoL0xTk7H5P1FdfKnvOB9oiyefn474tDu06D0qvmooWNjYDcaXLGYkogBuWnLEB7CZmpMD/CpdOb9g0DBZD3jV01JuWMA=
+	t=1709280643; cv=none; b=dG77kF18ml2QeV1alMkbt+iEIWJ9Hn6BQCReWSrG4WJcH4aGcv+Ap7Ues+PF6aZgTFfRNcNpWq4WA3ONfKdip6pQvI3XySW7YYtyLpAcqHkPDqGYbo/yahFWssWidvj1rZToaq2ngpsZEb5gAiKj+GD6fKVBP5VozrNGfsU0/QE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709280379; c=relaxed/simple;
-	bh=yI37i87UqneOzVmTClYz+I31zKh2W/A+wihChWmk0Kk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ddGvE1SkM8WztxgUmaREEPAj+kGUmY4reYNkLThiTJSSClM1BI6/64iU9/3z0c+sl2WA/PHQ61FqjhQJQblyolf2SYIU3ZUueJh+woecBSMLQ4skrXNsE3T2pjQtTfJmjU0M5rEfPLvpfXTNpauTNb14rX+bZaZKpoaZgSeqJ0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=mZSWsqbI; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1709280377; x=1740816377;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=yI37i87UqneOzVmTClYz+I31zKh2W/A+wihChWmk0Kk=;
-  b=mZSWsqbI/Upxee9fzIGcrL2jQO5mBjMhO4ItNufEUUXs/7Z6zvLMiPAf
-   3pZpWg37+MBXeJWB3TFXDfRyZkDqpe60gTGTr3RQ8oXCuKtz+YIdg+ei6
-   ALdy9qVtaaow9T/G/uT/KGglu/XPx+WR6I43X8xg7fbdrcjGEpjIG7lo1
-   JAGnyaw72B/u5oj+MoEJq2RFMq6dFq4/XACfDcvBEFhL+3u5/2s2EytC2
-   j75b3eCMVT7TVlSsmXBChOpmg7/x+qnaUHIOB3dV3MC4y2hULOt2uBuSk
-   RFsbBn8CbDGt9lCIxeCVeLozTqpvxlVE7qsJzDou2pErWaxlt7xrT3tQ3
-   w==;
-X-CSE-ConnectionGUID: KhfOYgZRQh2P8hw7PiCldA==
-X-CSE-MsgGUID: 1AUvhw2rQpqUKBk3Czq4Hg==
-X-IronPort-AV: E=Sophos;i="6.06,195,1705388400"; 
-   d="scan'208";a="18668063"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Mar 2024 01:06:15 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 1 Mar 2024 01:06:14 -0700
-Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Fri, 1 Mar 2024 01:06:12 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <lars.povlsen@microchip.com>,
-	<Steen.Hegelund@microchip.com>, <daniel.machon@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <bjarni.jonasson@microchip.com>
-CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, Horatiu Vultur <horatiu.vultur@microchip.com>
-Subject: [PATCH net] net: sparx5: Fix use after free inside sparx5_del_mact_entry
-Date: Fri, 1 Mar 2024 09:06:08 +0100
-Message-ID: <20240301080608.3053468-1-horatiu.vultur@microchip.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1709280643; c=relaxed/simple;
+	bh=S8/J6+YHq56KnBE4b4E6WPfyDyd+FRbl9UMTwvu0hdc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=H5BRKGEkIp+pSRDODRSy420N81kNKMxdKa0S7CWl9IiBo+25d+X58oulXkrAV7Zq/DpjkHytNqQzuXBDdiIjuTM9QBre7EY2ESJX0mL7xBJcUbohqfOlvArU98eNiWBKL57jqijiPcPf5MXeRXguJiY66uZWaALZUjskaWW25DA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=actia.se; spf=pass smtp.mailfrom=actia.se; arc=none smtp.client-ip=212.181.117.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=actia.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=actia.se
+Received: from S036ANL.actianordic.se (10.12.31.117) by S035ANL.actianordic.se
+ (10.12.31.116) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 1 Mar
+ 2024 09:10:34 +0100
+Received: from S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69]) by
+ S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69%4]) with mapi id
+ 15.01.2507.035; Fri, 1 Mar 2024 09:10:34 +0100
+From: John Ernberg <john.ernberg@actia.se>
+To: Wei Fang <wei.fang@nxp.com>
+CC: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	dl-linux-imx <linux-imx@nxp.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Lunn
+	<andrew@lunn.ch>
+Subject: Re: [PATCH net v2 2/2] net: fec: Suspend and resume the PHY
+Thread-Topic: [PATCH net v2 2/2] net: fec: Suspend and resume the PHY
+Thread-Index: AQHaav1/Ffv5x8jH7kmxx77YLYL/oLEiG6+ggABdcQA=
+Date: Fri, 1 Mar 2024 08:10:34 +0000
+Message-ID: <8b667fc6-27e6-4c14-8e76-346371cf9eec@actia.se>
+References: <20240229105256.2903095-1-john.ernberg@actia.se>
+ <20240229105256.2903095-3-john.ernberg@actia.se>
+ <DB6PR04MB314117D7D5473B31FCA47495885E2@DB6PR04MB3141.eurprd04.prod.outlook.com>
+In-Reply-To: <DB6PR04MB314117D7D5473B31FCA47495885E2@DB6PR04MB3141.eurprd04.prod.outlook.com>
+Accept-Language: en-US, sv-SE
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-esetresult: clean, is OK
+x-esetid: 37303A2921D72955637D64
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <150CA7A1B7BFA94889AEA6A159AACCA4@actia.se>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-Based on the static analyzis of the code it looks like when an entry
-from the MAC table was removed, the entry was still used after being
-freed. More precise the vid of the mac_entry was used after calling
-devm_kfree on the mac_entry.
-The fix consists in first using the vid of the mac_entry to delete the
-entry from the HW and after that to free it.
-
-Fixes: b37a1bae742f ("net: sparx5: add mactable support")
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
----
- drivers/net/ethernet/microchip/sparx5/sparx5_mactable.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_mactable.c b/drivers/net/ethernet/microchip/sparx5/sparx5_mactable.c
-index 4af285918ea2a..75868b3f548ec 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_mactable.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_mactable.c
-@@ -347,10 +347,10 @@ int sparx5_del_mact_entry(struct sparx5 *sparx5,
- 				 list) {
- 		if ((vid == 0 || mact_entry->vid == vid) &&
- 		    ether_addr_equal(addr, mact_entry->mac)) {
-+			sparx5_mact_forget(sparx5, addr, mact_entry->vid);
-+
- 			list_del(&mact_entry->list);
- 			devm_kfree(sparx5->dev, mact_entry);
--
--			sparx5_mact_forget(sparx5, addr, mact_entry->vid);
- 		}
- 	}
- 	mutex_unlock(&sparx5->mact_lock);
--- 
-2.34.1
-
+SGkgV2VpLA0KDQpPbiAzLzEvMjQgMDI6NDksIFdlaSBGYW5nIHdyb3RlOg0KPj4gLS0tLS1Pcmln
+aW5hbCBNZXNzYWdlLS0tLS0NCj4+IEZyb206IEpvaG4gRXJuYmVyZyA8am9obi5lcm5iZXJnQGFj
+dGlhLnNlPg0KPj4gU2VudDogMjAyNOW5tDLmnIgyOeaXpSAxODo1Mw0KPj4gVG86IFdlaSBGYW5n
+IDx3ZWkuZmFuZ0BueHAuY29tPg0KPj4gQ2M6IFNoZW53ZWkgV2FuZyA8c2hlbndlaS53YW5nQG54
+cC5jb20+OyBDbGFyayBXYW5nDQo+PiA8eGlhb25pbmcud2FuZ0BueHAuY29tPjsgZGwtbGludXgt
+aW14IDxsaW51eC1pbXhAbnhwLmNvbT47IERhdmlkIFMuDQo+PiBNaWxsZXIgPGRhdmVtQGRhdmVt
+bG9mdC5uZXQ+OyBFcmljIER1bWF6ZXQgPGVkdW1hemV0QGdvb2dsZS5jb20+Ow0KPj4gSmFrdWIg
+S2ljaW5za2kgPGt1YmFAa2VybmVsLm9yZz47IFBhb2xvIEFiZW5pIDxwYWJlbmlAcmVkaGF0LmNv
+bT47DQo+PiBIZWluZXIgS2FsbHdlaXQgPGhrYWxsd2VpdDFAZ21haWwuY29tPjsgbmV0ZGV2QHZn
+ZXIua2VybmVsLm9yZzsNCj4+IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IEpvaG4gRXJu
+YmVyZyA8am9obi5lcm5iZXJnQGFjdGlhLnNlPg0KPj4gU3ViamVjdDogW1BBVENIIG5ldCB2MiAy
+LzJdIG5ldDogZmVjOiBTdXNwZW5kIGFuZCByZXN1bWUgdGhlIFBIWQ0KPj4NCj4+IFBIWXMgdGhh
+dCBhcmUgYWx3YXlzLW9uIHdpbGwgbm90IGVudGVyIHRoZWlyIGxvdyBwb3dlciBtb2RlcyBvdGhl
+cndpc2UgYXMNCj4+IHRoZXkgaGF2ZSBubyByZWd1bGF0b3IgdG8gYmUgcG93ZXJlZCBvZmYgd2l0
+aC4NCj4+DQo+PiBTaW5jZSB0aGUgUEhZIGlzIHBpY2tlZCB1cCB2aWEge29mXyx9cGh5X2Nvbm5l
+Y3QoKSBhbmQgZHJvcHBlZCB3aXRoDQo+PiBwaHlfZGlzY29ubmVjdCgpIHdoZW4gdGhlIGxpbmsg
+aXMgYnJvdWdodCB1cCBhbmQgZG93biByZXNwZWN0aXZlbHkgdGhlIG9ubHkNCj4+IGNhc2VzIHdl
+cmUgcG0gaXMgbmVlZGVkIGlzIHdoZW4gdGhlIG5ldGlmIGlzIHJ1bm5pbmcgb3Igb3Igd2hlbiB0
+aGUgbGluaw0KPiBuaXQ6IHdoZXJlDQo+IA0KPj4gaGFzIG5ldmVyIGJlZW4gdXAuDQo+Pg0KPj4g
+VG8gZGVhbCB3aXRoIHRoZSBsYXR0ZXIgY2FzZSB0aGUgUEhZIGlzIHN1c3BlbmRlZCBvbiBkaXNj
+b3ZlcnkgaW4gcHJvYmUsDQo+PiBzaW5jZSBpdCB3b24ndCBiZSBuZWVkZWQgdW50aWwgbGluayB1
+cC4NCj4+DQo+PiBGaXhlczogNTU3ZDVkYzgzZjY4ICgibmV0OiBmZWM6IHVzZSBtYWMtbWFuYWdl
+ZCBQSFkgUE0iKQ0KPiBJJ20gbm90IHN1cmUgd2hldGhlciB0aGlzIGNvbW1pdCBzaG91bGQgYmUg
+YmxhbWVkLiBBZnRlciBjaGVja2luZyBteSBsb2NhbA0KPiBjb2RlIChub3QgdGhlIHJlY2VudCB1
+cHN0cmVhbSBjb2RlKSwgZmVjX3N1c3BlbmQoKSB3aWxsIG1ha2UgdGhlIFBIWSBlbnRlcg0KPiBz
+dXNwZW5kIG1vZGUgd2hlbiBjYWxsaW5nIHBoeV9zdG9wKCksIHRoZSBzcGVjaWZpYyBsb2dpYyBp
+cyBmZWNfc3VzcGVuZCgpIC0tPg0KPiBwaHlfc3RvcCgpIC0tPiBwaHlfc3RhdGVfbWFjaGluZSgp
+IC0tPiBwaHlfc3VzcGVuZCAoKS4gQnV0IHRoZSBsYXRlc3QgdXBzdHJlYW0NCj4gY29kZSBtYXkg
+aGF2ZSBjaGFuZ2VkIHRoaXMgbG9naWMuIEknbSBzb3JyeSB0aGF0IEkgZG9uJ3QgaGF2ZSB0aW1l
+IHRvIHNpdCBkb3duDQo+IGFuZCBsb29rIGF0IHRoZSBsYXRlc3QgY29kZS4NCg0KSSBtaXNzZWQg
+dGhpcyBmbG93LCBhbmQgYWxzbyBkaWRuJ3Qgc2VlIGl0IHRha2UgcGxhY2Ugd2hlbiBJIGxvb2sg
+YXQgdGhlIA0KTURJTyB0cmFmZmljLiBCdXQgdGhlIGNvZGUgaGFzIGJlZW4gdGhlcmUgc2luY2Ug
+MjAxMy4NCg0KSSB3aWxsIGNoZWNrIHdoeSB0aGF0IGlzbid0IGhhcHBlbmluZy4NCg0KVGhhbmtz
+ISAvLyBKb2huIEVybmJlcmc=
 
