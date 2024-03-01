@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-76550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0203786E302
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 15:09:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7472286E309
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 15:10:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 324191C20F69
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 14:09:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FAE21C21599
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 14:10:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71586E60C;
-	Fri,  1 Mar 2024 14:09:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41DA96EF1D;
+	Fri,  1 Mar 2024 14:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="QGz6NdFg"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Yn0vncsx"
 X-Original-To: netdev@vger.kernel.org
 Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469BC386;
-	Fri,  1 Mar 2024 14:09:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40306EB65;
+	Fri,  1 Mar 2024 14:10:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709302175; cv=none; b=gzcfjZaVru3Lc4weCdj+B3mUwMnXvZmMD/QIYZBkUjHNyldTSkko1/Txsy4ap8Jt6R3cr8Egz1Y6i7jkf/E9GzvaCcnq385W8LU8hLqTUmw75ev9zTxDxmWzKm/vu2AYyfbUOc8GWRBTrzcrV9eGrkr/6JKRwH3mZIAN8Ix19nA=
+	t=1709302208; cv=none; b=AhEH3EAO66zZbA5mRlvMtqyKwAZ4v1Zojj160lbYr8rWWVMoMUnxisYYn46BGXIsieJ85OAMD0C/LCQ+ofZEzFpzvQk9n3zYcLyDElNWp+qNJPGyQ6onyBgB1ztVK1LOY/yMVqa7+osRr1h1AUKfIfIJp1YyqFHZYDgwp7a6nww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709302175; c=relaxed/simple;
-	bh=RaYNpGmrVadiHjqa16S0TTjuebrAS0T3s84R9QGXsZo=;
+	s=arc-20240116; t=1709302208; c=relaxed/simple;
+	bh=Yn8PAVQZDEahDI1C6nYRu+1FfTfzyoG3NcBHlImQJyE=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=U8TGNWD9U9JFyxQMNYLpUCk91BaiRCvbTT8qEc781HODSC9yiGM7WltVAjnzl4Ts2Bwaq0YQPl6GIR7NhJlwVWmTSLN1s3+OmpJnZEYFL6qSDEjL1Jr3m4T3+ClyKu0DWl/eLLxGf+0MsgWFKSQFS/dHYhKJbt1wra6Cw9fFFb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=QGz6NdFg; arc=none smtp.client-ip=213.133.104.62
+	 In-Reply-To:Content-Type; b=WOlbCPXNOIq7t3S/M5TThkF5Yv4eAwTsjbhZyehYjaVXzJUF9L39wnr5hvspMKLzzhwJxZY8rZestHHuN/jkTjANU6PTZBTRp5bbDrYgzxJx40l77XRkjgq1MHC/sHOBXj1joEatfr3lQwXifvnPJJ/xIAN8J+9BlYLWGpSnArU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Yn0vncsx; arc=none smtp.client-ip=213.133.104.62
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -36,32 +36,33 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
 	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=M4txhvSoqzm+pQ0oJBM9dOgmsCgm4a9Qa3DtNoGHbl8=; b=QGz6NdFgYOJt6tyCh20RZL3OL5
-	sEMIMP92ICXLgsQuF8pGcqbqEzKIjWJ0azwGAV2iTdJ9p5l85rBSdMYDxPtZlWMKZUXxJjxTF5qKL
-	AJq0wBUBp5Fge74uA6laM8P+8u/yyUQFF2IRntQKDhCmXyoBbpKxOmaQNdloYfvX2Iit3eBhpZsd2
-	Bhal+N9Z6PBwfMSkH3JFm+rw2n3fAA93Wq3TOWCDFWj/6pBGbCB6p/ndn9m0cZCinZooiLYYwvXN3
-	EOgwkKsfUiVLoG/DjjtPpPkIREYdR0kqntuF6gTJXhUf219agrMAZd1nGtEUQ7m4bvlPPGrYs6Tqw
-	jSADs/FA==;
+	bh=cNKCv7n4aGUPwLauAKt9/n/pHUv3rMRFBlgrU2nAOu0=; b=Yn0vncsxVYYZlrt6tekcx9JowO
+	D8kGNVctfs1NZQbNncdP/xdlGllhL+aO+f/+ghO+GHS7cL1OmfcIqFrHgR80cnubm+9NLsugfs5uo
+	8qKX0s5kpY7R2w5X65HRAfPMEwy/9h5Q/XNPlR/B8k8VkruUNgY8FGEv+DLe+tGDm+fLgQ1xIr6JR
+	BTyx1zm50pH4Ltw+792bUpE59l2/sTCT96tJTNeeCUaCk8vucSre6FjkM6+H0rNWVqPVtP5QuBgc7
+	YaFOj+C2k3Txgm4S4pVE2l/GmzStmFB9I7ZKP2PPXXrVADA6F2DjmXICNpwAPm0jbWQbpLLnasmcd
+	ARs4J9TA==;
 Received: from sslproxy01.your-server.de ([78.46.139.224])
 	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <daniel@iogearbox.net>)
-	id 1rg3Zb-000B7a-Ru; Fri, 01 Mar 2024 15:09:15 +0100
+	id 1rg3aE-000BB0-NS; Fri, 01 Mar 2024 15:09:54 +0100
 Received: from [178.197.248.31] (helo=linux.home)
 	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <daniel@iogearbox.net>)
-	id 1rg3Zb-0009dA-36;
-	Fri, 01 Mar 2024 15:09:15 +0100
-Subject: Re: [PATCH net-next 1/2] net: nlmon: Remove init and uninit functions
+	id 1rg3aE-000DLL-2o;
+	Fri, 01 Mar 2024 15:09:54 +0100
+Subject: Re: [PATCH net-next 2/2] net: nlmon: Simplify nlmon_get_stats64
 To: Breno Leitao <leitao@debian.org>, kuba@kernel.org, davem@davemloft.net,
  pabeni@redhat.com, edumazet@google.com
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org,
  dsahern@kernel.org
 References: <20240301134215.1264416-1-leitao@debian.org>
+ <20240301134215.1264416-2-leitao@debian.org>
 From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <79d68292-6491-4664-3de2-b8ea6c21e515@iogearbox.net>
-Date: Fri, 1 Mar 2024 15:09:14 +0100
+Message-ID: <b284da00-1eda-a352-8062-a2d81cdc24f2@iogearbox.net>
+Date: Fri, 1 Mar 2024 15:09:53 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 Precedence: bulk
@@ -70,7 +71,7 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240301134215.1264416-1-leitao@debian.org>
+In-Reply-To: <20240301134215.1264416-2-leitao@debian.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,16 +79,10 @@ X-Authenticated-Sender: daniel@iogearbox.net
 X-Virus-Scanned: Clear (ClamAV 0.103.10/27201/Fri Mar  1 10:25:20 2024)
 
 On 3/1/24 2:42 PM, Breno Leitao wrote:
-> With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
-> convert veth & vrf"), stats allocation could be done on net core
-> instead of this driver.
+> Do not set rtnl_link_stats64 fields to zero, since they are zeroed
+> before ops->ndo_get_stats64 is called in core dev_get_stats() function.
 > 
-> With this new approach, the driver doesn't have to bother with error
-> handling (allocation failure checking, making sure free happens in the
-> right spot, etc). This is core responsibility now.
-> 
-> Remove the allocation in the nlmon driver and leverage the network
-> core allocation.
+> Also, simplify the data collection by removing the temporary variable.
 > 
 > Signed-off-by: Breno Leitao <leitao@debian.org>
 
