@@ -1,228 +1,213 @@
-Return-Path: <netdev+bounces-76567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6376F86E414
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:12:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DBAB86E43C
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:23:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16273285C6E
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 15:12:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 785D5B22D18
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 15:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88CA46997C;
-	Fri,  1 Mar 2024 15:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7092A6D528;
+	Fri,  1 Mar 2024 15:23:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="dnoVt7ID";
-	dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b="a8uwyFdn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AzDfJPgx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88125622;
-	Fri,  1 Mar 2024 15:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=60.244.123.138
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709305954; cv=fail; b=Rij/BqIRGmoabyH1uOZT+5sHgg5MKmnQla6oeyE8/vd8mfcrquBRcnFmqynjNlkAK4ENiic6IzaXhj0QAq5s6vqMYOy+nbx54Y2CmO4zChM71lYb/xCq3oWcKCT94RJGxN30MHQGl7KIzSzhtoaqUopzzgczNA5cWG2UQmzlqm8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709305954; c=relaxed/simple;
-	bh=IZUR4MyqRKiOvrqP/zVjb0oSt5npYT/jGrlpJcuxHvo=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=sPD5TsMCjbyzKKerxrJyiEKbC+esVTFWNbU7YLoI9uKfc/nHBDO4AXI6oDib/W1X0cb6UOtw5CqqH1B8NGC/yyg3hJ7Uv8+2syzWTbqTfJHpHTCSZfHxt3UDuuphJWLla7uEDLGDZux0yQDij9pZguw4ESDJEheNPs3quuH82pM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=dnoVt7ID; dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b=a8uwyFdn; arc=fail smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: 1df943b8d7de11eeb8927bc1f75efef4-20240301
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=MIME-Version:Content-Transfer-Encoding:Content-ID:Content-Type:Message-ID:Date:Subject:CC:To:From; bh=IZUR4MyqRKiOvrqP/zVjb0oSt5npYT/jGrlpJcuxHvo=;
-	b=dnoVt7IDFApCGwqs84NdJ5qZ71Q2YyMSZ5EXLSu3hYiXtfqot3CNdOLjClPrcRDIGbaVVaU9LbGjh8v20HXeRK/38mdCWrKCk+NA/yJjfQU+ONg4brhaVQUpCCiBRJ64tyWzl8uFpFVS2IKxMl+uu+We1ZARS+uknjDcSzY4wXk=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.37,REQID:a2fb74b0-9f62-40eb-a297-db7a7f984288,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:6f543d0,CLOUDID:7f6be88f-e2c0-40b0-a8fe-7c7e47299109,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
-X-UUID: 1df943b8d7de11eeb8927bc1f75efef4-20240301
-Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw01.mediatek.com
-	(envelope-from <lena.wang@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1912379308; Fri, 01 Mar 2024 23:12:28 +0800
-Received: from mtkmbs10n1.mediatek.inc (172.21.101.34) by
- mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 1 Mar 2024 23:12:26 +0800
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (172.21.101.237)
- by mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Fri, 1 Mar 2024 23:12:26 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kTnoCllAr8vBZt0CtHR/2SmCJRDWFJ5iFC1pMk1Og0+13aHnH+MsUw0fninpF0r6FOXTiQIPluk5/qyU/Lo2Kd+LJk3gO0alKJG+RUbbk7+h435kzxpw/Qqfg62FR4EzQRb8YxJxAcjhOTCKXFhYjcXKcdrhNfP4+aFCSlGxx53F8/lCqeMBYq9kBGf/6frKLeKKLKlXOz+udwG/MBTH9EB18mRldztP2iKPKydJ/D90jzua2vbgBkvkktaRHflhUyRg66M4bNGbCIotEg8pMPpo0Vi2QjP9GEsYVCOckJIPlo4noJQ3/6ANgiL857vbfYnQlJAgKMcIf/+DUr044A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IZUR4MyqRKiOvrqP/zVjb0oSt5npYT/jGrlpJcuxHvo=;
- b=JCveFP9VP3uzQDPduMkA5+lkoE4xsKf1d6cbbYq8bUvsr/VFGulyQ3tYKGUqdhRI6pKFytSHGqphzKPmUITxVdK/BurDPZ4nDyFloIVuSQq2s0/ppSWg3nqHsraJRCtfvHDbmyNtMXdPoFyZ8ERzRm9jsoQivRVmyA/ZPqo+pJpzlqBVtMpPS8bVTvAyR2VzLdNInqr9z8mPKprNS1T1zT+OFU3ZiMII3PAyVYZXSo13w000ZHdp8UEee0JkRAXiL8yHPusDIXQVp4gcgSa/NrczNVy1aZX97YsjAY/lw+7z95hqbYvIRlXu2v0wHOycgEL1/GtJJA0zdtrvizBYxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mediatek.com; dmarc=pass action=none header.from=mediatek.com;
- dkim=pass header.d=mediatek.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D9F1E502;
+	Fri,  1 Mar 2024 15:23:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709306587; cv=none; b=NqihhBPZnTvOKK7rFyTFqoPhQQC3OmizAw3i84+RdvitY4pNNvH4eeWx+4DwWwhVzrfMFfp/e8+PA2BHU36D1eFbVV9M6e/fNycwmZNKTgoplI7dmwWOkk8wryGyAQzeHuXcTYzSQ1LgxbUee1rwiaTEwITKUc0A4c0X//Lydao=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709306587; c=relaxed/simple;
+	bh=ykhuC16a76yujuSJcnRYVP2DAtHkeVZK76VXBYnaUCM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z2u27mBnbF8atyqhg1YVl/TbgGYg4m6Ee+Goc4kMdC53JfgEnApZDmym+TsEtpzDj5X47+Po2Hjw0F/quT78eQ1MCwwWeodwpwyD4XFYesOa+tW3dpphxLNI4Q2kjmN3hin69Wigunc/VouNlTt2KDFKrWqvWCIbOaTCmiJNvjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AzDfJPgx; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5654f700705so3444012a12.1;
+        Fri, 01 Mar 2024 07:23:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mediateko365.onmicrosoft.com; s=selector2-mediateko365-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IZUR4MyqRKiOvrqP/zVjb0oSt5npYT/jGrlpJcuxHvo=;
- b=a8uwyFdnKEEPslr21daQrh/MTEGuhb/Kw/rXewJjuN6thlIefYla/TpcgAwWEyreZYW2jg+L6cu0eqnNniI5uqPFAs4+3bU2C6N6a0FDCMhtXH0q2hnknEbyJ+tDUPkXP68rDusgHffr3TOkpFHcJ2peoaROjVjI1cozFqzPKB0=
-Received: from SEZPR03MB6466.apcprd03.prod.outlook.com (2603:1096:101:4a::8)
- by JH0PR03MB8667.apcprd03.prod.outlook.com (2603:1096:990:91::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.36; Fri, 1 Mar
- 2024 15:12:24 +0000
-Received: from SEZPR03MB6466.apcprd03.prod.outlook.com
- ([fe80::3b7d:ad2c:b2cf:def7]) by SEZPR03MB6466.apcprd03.prod.outlook.com
- ([fe80::3b7d:ad2c:b2cf:def7%6]) with mapi id 15.20.7339.033; Fri, 1 Mar 2024
- 15:12:24 +0000
-From: =?utf-8?B?TGVuYSBXYW5nICjnjovlqJwp?= <Lena.Wang@mediatek.com>
-To: "fw@strlen.de" <fw@strlen.de>, "davem@davemloft.net"
-	<davem@davemloft.net>, "pablo@netfilter.org" <pablo@netfilter.org>,
-	"kadlec@netfilter.org" <kadlec@netfilter.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>
-Subject: [PATCH net v2] netfilter: Add protection for bmp length out of range
-Thread-Topic: [PATCH net v2] netfilter: Add protection for bmp length out of
- range
-Thread-Index: AQHaa+rdzH5Tz/8ipEqlkF6sbjThfg==
-Date: Fri, 1 Mar 2024 15:12:24 +0000
-Message-ID: <d2b63acc5cd76db46132eb6ebd106f159fc5132d.camel@mediatek.com>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=mediatek.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SEZPR03MB6466:EE_|JH0PR03MB8667:EE_
-x-ms-office365-filtering-correlation-id: 22fe3f85-c2f9-4397-bb0c-08dc3a02001f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: gCmwC7CmLsiXBdCBRKzdR4WjJIndjvELigEhKISsxNuTA1A2vMtVWxSPDTOYAQLUmCDLckl4SMNAJpoUDyiyz9BOyYvoxki8IDTk4CJvcx+1IvQaRBS4PdINKRikhEv92wIE/GyQ1UypRKBLw/UuvWrjTFQEpfNGTmcG+LxYfxhGvKrwtA9RPodzf+Pn/0+oaDyJXktTGHwp1PEx5Yf7WVJlkM+2Ln3HZRMj82kIEpvPTMQb+vmHPUrdrZWt48D7+x7w3Cj7+Bm/TIRtbO/r4wakeJiX/Il/mhn49pot32dp+c+19gHuTGM2zGfEJOMF9Ada0bHnaHc13vfd5f5IqT1pjtq6iBO1VtUrAA2pYiqY/e3fKmIeeKj8PJMnKFtktCQ8VJkeql+KvZMeGtkTXBNnMocBxSy1UhPbPwf6sC0BmdnMF6vQ6E+zAIMoYQhjsGqTN+PIOv8amiObdpOTrSC39y+yUXz7idW99go0a60nQgobUgJoHVsP+bMmYSXX6VCArjheUR0U0V84khGqZOdwj0NCNaomg93LKit0/Mneasmhy7zbHXu2y2LUsw+q/Tx/TlQV3poZUHByxrYxQQV6XOm6NcPqHjaSOzcIoobpCNEu0BuCRCm/tC8S00ZWm2F9p4Zej7WFavCTv6EON9tTrcDoYtQMAI451Jt7uI9p0tohDBNfosavcmNSv8SGa6wzbx3D3dfkzu+GW23fsdPCoDE7OmkcA9QjVfpPWAw=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEZPR03MB6466.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?bVVrOVVkSm9nN3Vyam1ZY0pSUVk4aEdXc2s0NkRuZkZUVTIwbGlFYUtvTjh5?=
- =?utf-8?B?emoyQzQ0Z3NRUDgvY28vUlZBOUdNeVVpRmE2N0dEbFhRaTJRWFVvckxxUWdE?=
- =?utf-8?B?TWpjWi9rcWpmcjFMaXZKN1gvbWlmMk1qcVBLblE5SXdzd0JpZ0psbnJ5MGph?=
- =?utf-8?B?WU9LSUlkdG4xUm9sNzIyNlQ2R0NNRXFBendnNHVLcTFVZVZRU0FKbXdnbEY0?=
- =?utf-8?B?Q09FeTdYbGVNSFZxWUcycHpLRUFzLzc4QnE4L2JlMU1Fci8rb3ZoTWhuMUlM?=
- =?utf-8?B?K0dKWlBBcE83U1VVazVNbnJpK1RmT25Jdm4wc0hiR3hteUdDcFFuVVIrdjhU?=
- =?utf-8?B?TVYvZS9KYUpHNW5PWGczREJXWDQrS2xwV04yQ3lMdWxBbjB3Wk9UUmVjdlhR?=
- =?utf-8?B?dGgrYkRiZzM5WGxpdTdUNVdOSWdmWVVLcUZWVS9XUC85SmFpTm83Zjl3Y3hE?=
- =?utf-8?B?c1pZRWtJUFpnMXNXYUVBcDg5UDVDNGticStOSTh5ekRaNTV2MGNHTjFtR3pB?=
- =?utf-8?B?cHhDQThoSGFvV3l6Vm83UjM5Vm9BUmdCd2F0RFdRaDRKOVErUXRVaEVpT08r?=
- =?utf-8?B?enBZajIzY0NHaFFCSndQbS9BbEI4TWIvSjUzUkJ4QVV4Q2ViSWQ5cjZEbnh5?=
- =?utf-8?B?MXdVa1IyOWN5UGF3OXJoR2gvSVU0RTA1b3JIcUNISXphSFV5dU56L0hXTGhp?=
- =?utf-8?B?YldoSkUyR0J1SjZlN0lYdVFQbnZyaHZ6bkxQZW5wWFVWN3Z0c0RTQmlpbkJX?=
- =?utf-8?B?N2NuM0ozMnhPSGV0NFd6VU1zN1g2WElpRVhHV1VMbXBkMTNnMmo4bE00TEtF?=
- =?utf-8?B?cjNabGVzWEFrekl5NmxSMzFXLzZzRnM3d1diWkJJQ2VFcTlxWHBrdzI0Nmto?=
- =?utf-8?B?b2FDOHhZN2IzYVFaK2NlUGo0MWw0bityYU11L1dzN3dKaXNHUWJRL2RaNC9u?=
- =?utf-8?B?eXduWFZCRkhPVHFzdmd4bUNJU1ZxQS9nbS85QSt6WFdzTmM1NUVWWEl2MVJ3?=
- =?utf-8?B?V3RINzdCeXkzeExVYkVqTzVhZ2V2SXE3RzF5ZzlKdTJDb1AzVEFKWWxrVGpQ?=
- =?utf-8?B?VXpqZS90L3Y4N0wxOVpjYVdxbVV0b2QyUFdqaWx0NVNVVmhQMG5Mc01PRmtv?=
- =?utf-8?B?eUVnbm5VNVpySnRqd1Q5SWp5WUwybnd5eFQ3TUhGWnhXSkplY2dzc2lmSHgr?=
- =?utf-8?B?UWZhYUlJd3RYcVp2RG8rQjFwL0M0Vm5pNDNkdjAzclVvUk1obkVVcTlSV3M0?=
- =?utf-8?B?Q1FLY3oxem8yT2ZwMmN4N1VtZ3dvVW1sbkRRanZHVXpjWERwM0pJT2E2amRv?=
- =?utf-8?B?VmZxMVRWM0J0bm5UZ2oxQktZRXJsemtFNEFSc2lqTnJDWTJHdHpBSWUvcm5r?=
- =?utf-8?B?YmxOdUxnOUxYRk9QQ3VZb2tzUlhiQ2VhYXBxRjIrRkk5SDFKMDhkdUIrS05t?=
- =?utf-8?B?ZGF5a0lYR1liZFBCQVZ4cVRZSlJpYjUzSVA2eVVkWXJBTjkya3VsWjFTcjg4?=
- =?utf-8?B?Y1VIbk9maUVXckMvOTNoekpNWStDaVVpQzB0dFZGVU1pSUZvR1BvRGZyWGdM?=
- =?utf-8?B?QjczZW4yK2xKTUx4S1NPNHRXcXFpd1ZvRURTZXVLQzdwcGg0YzVMNUJISUFU?=
- =?utf-8?B?Q1E1SGhTd25XRFloRzVNeHB5Nmg4c25JZklySFI2M1lMYm9YQnZmVmdURXNv?=
- =?utf-8?B?MmsxTzA3M21ScVUvTmNKeUtkSytVeHUwbXA4cE84d0UvaTM4TXpUVUdYd21J?=
- =?utf-8?B?RGFyb3E2d0lLT05MSUJiQTAwb2kyVFpKTmZqV290VzMxeEJObjE5eHFxWGFx?=
- =?utf-8?B?MjhiMHpEd2ZDR0xQSE5TK0tyZ3JQM000YkxJS3FmYTNvdnBFUWJUSlhZcU4x?=
- =?utf-8?B?bkwyYTRhUC90S1FsU3ZudStQa0JrMEtlb2lxelIzd2dvWGFsSUNCNGFOaXZC?=
- =?utf-8?B?NTJMQlZCK2gxMlB4eS81YzRNQ1kySmZuSzNJK05lVG9xVmQzTmtpM3d2RGJs?=
- =?utf-8?B?TVJuM2JHYzVZY1NyNzNyb3BlNVhtZXZDM2dPS244MHd1Zi9VNTRjaW1YbFVZ?=
- =?utf-8?B?M0JNWFRZY2JLQU5jWWxGQTUwUzYxbHFJUTB4MGxpdklyZk1JMTZnaWlBQ1ln?=
- =?utf-8?B?Q0l2NXhoZ0hzWDUzbk0zOGVSVGlEemVrbkgvY0tKcm5EanRNTGhlY3plcFNF?=
- =?utf-8?B?YWc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <58EC96C7AF4993409323F1161E908462@apcprd03.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        d=gmail.com; s=20230601; t=1709306584; x=1709911384; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PGYGLhQjLfLZEOyb1D9gwK3Rj1wkJrl/wQOZICqbfXA=;
+        b=AzDfJPgxZ/4BmwfFcxxAqboy6KTHo2bczWT+LNrrBlG0F4pFvpxIwds2dciU1OJvhQ
+         ZY4ooWv3xIuyotjSDD0VPaBDs/VeeRCzLnOx+aKn5Tnax1aY6taXevtvFJ4R81hxt2hY
+         SIkXU5BzCH4wMsyUq574na+VrXj21s2vPygAHJNOhgyTO5h4V3gA4+/bamHombHxqWt/
+         07ju7eXAcEv/wDhxg98XnerzfeIrNIvEoXJbjLcPLfIMV1SeXv8oqhuSsw9jp0USqshk
+         l/yC10QxH0YroTXUW93kjy15smJVOXXUDd2vSPFVvBeG9btpU4AZOaBdNILvQPq3SDns
+         bDCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709306584; x=1709911384;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PGYGLhQjLfLZEOyb1D9gwK3Rj1wkJrl/wQOZICqbfXA=;
+        b=H9QM0AsbOGEyGDB/8YZ+6weeAFV3wmrUxMIddCDtk0qv8LRDlZlJgrY3JA79ICuDct
+         4zj+Sf2PNqgPQ991sLJXTKeFR5o8HaX0+sC2qxMjX6N6mDbyXhzbpHTH2CBdIiJNYkkd
+         p19nwbTfQoyYgka4GXtfFYNfWkh2I5JNP9crNKynWuF+uxMff2GEeSrtV3dcHjbCfd50
+         WGkAMC6ZdtcC7O/QBO9+aKD2UMplNZmX+di/H00huOuump3FW+RpzMYdIc3dQayHv/Nm
+         NY2OKK8PoDTQGTYlKtlWv0ICYqjUcHv0jsf8Pg7tot8cQx2qKMwehoVFpTbgH9RB9Y1Z
+         i6mw==
+X-Forwarded-Encrypted: i=1; AJvYcCVk8YJFUEBqDxY5TA7eQH5Senv/BlRjUnATcLEUW7unn3mgyfTqksEpbUb/P+cdkpPNF2l5M11i+0sLTh0ccvoNUREc0cUBZ/0PT3l0
+X-Gm-Message-State: AOJu0YzL2jJ/D15RApWkZFoIBBhFiGr+5HuHswrqNKlPhNK1Dq0aFY7Z
+	411c8loT9eW8VRor0CdDusFCRAMs2BVLGc6uvOvKllbvZTRAzXMZXrIGdLPvHSwvtIcZNwDjTaP
+	3EDQcX0xWTg/nGT6ZL6cgSZ0TXDY=
+X-Google-Smtp-Source: AGHT+IHr7VOi3yAOcZydge4+g5vfQ3rGPgeEq42SLoi5c87OORqbVObUEpabG425dNBSs8TGAVVGXeJtNkY5HuAwxOo=
+X-Received: by 2002:a17:906:130a:b0:a44:2278:7a62 with SMTP id
+ w10-20020a170906130a00b00a4422787a62mr1729019ejb.41.1709306583678; Fri, 01
+ Mar 2024 07:23:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SEZPR03MB6466.apcprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22fe3f85-c2f9-4397-bb0c-08dc3a02001f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Mar 2024 15:12:24.5603
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a7687ede-7a6b-4ef6-bace-642f677fbe31
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +49DUi/B2zXFowf9QvbEATGncTfLvbfNDGL2Kn9gZuvDL33UeiAL9rnbrUj2ZNxmpRL6QjitzibCQLHqygOW+Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: JH0PR03MB8667
-X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-AS-Result: No-10--5.079800-8.000000
-X-TMASE-MatchedRID: cWqVi5YGo5wIAPmAuSvJ8Yzb2GR6Ttd3X5TqQagR07dLBxm1Vv3RsJ93
-	TfvULFt2/5f0y/6L/68GwOiwlwYHMkeBpfM21lfTmsge4JmkzOX/wK4D5v9hhLIPyqeQTeKk0nE
-	XIG9RfVfgRfDXjOa2sgN6C4LgNZr9EJHpQ2Y9lUQD2WXLXdz+Ae3+iQEtoSj4hj0Um3z4RXl18v
-	vd24eboroaAxIVVU84kZOl7WKIImrS77Co4bNJXQtuKBGekqUpbGVEmIfjf3te9apuqjZI/X8It
-	2Uf4xrQeAvJK1GayvDGMaxYwdXC1VGkx04md/ow
-X-TM-AS-User-Approved-Sender: No
-X-TM-AS-User-Blocked-Sender: No
-X-TMASE-Result: 10--5.079800-8.000000
-X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-SNTS-SMTP:
-	27A67240241F6D061C0090B4B511A7A6468764F22637FE828506653D67D770242000:8
+References: <CAEkJfYPz+xZvczwEnsv1eGsNmv8rtLmyw5WV_rDz_Zui0cNd4Q@mail.gmail.com>
+ <CANn89iJt1Ke=chUSd7JSNSdCEN4ghjivg2j902Wqa5pSQdrdeQ@mail.gmail.com>
+In-Reply-To: <CANn89iJt1Ke=chUSd7JSNSdCEN4ghjivg2j902Wqa5pSQdrdeQ@mail.gmail.com>
+From: Sam Sun <samsun1006219@gmail.com>
+Date: Fri, 1 Mar 2024 23:22:52 +0800
+Message-ID: <CAEkJfYM9PZ7Py6aeHOf5YgD8KiczthM5_opEOXDjp2rE=3ry+Q@mail.gmail.com>
+Subject: Re: [Kernel bug] KASAN: slab-out-of-bounds Read in in4_pton
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, j.vosburgh@gmail.com, 
+	andy@greyhouse.net, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	syzkaller@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-RnJvbTogTGVuYSBXYW5nIDxsZW5hLndhbmdAbWVkaWF0ZWsuY29tPg0KDQpVQlNBTiBsb2FkIHJl
-cG9ydHMgYW4gZXhjZXB0aW9uIG9mIEJSSyM1NTE1IFNISUZUX0lTU1VFOkJpdHdpc2Ugc2hpZnRz
-DQp0aGF0IGFyZSBvdXQgb2YgYm91bmRzIGZvciB0aGVpciBkYXRhIHR5cGUuDQoNCnZtbGludXgg
-ICBnZXRfYml0bWFwKGI9NzUpICsgNzEyDQo8bmV0L25ldGZpbHRlci9uZl9jb25udHJhY2tfaDMy
-M19hc24xLmM6MD4NCnZtbGludXggICBkZWNvZGVfc2VxKGJzPTB4RkZGRkZGRDAwODAzNzAwMCwg
-Zj0weEZGRkZGRkQwMDgwMzcwMTgsDQpsZXZlbD0xMzQ0NDMxMDApICsgMTk1Ng0KPG5ldC9uZXRm
-aWx0ZXIvbmZfY29ubnRyYWNrX2gzMjNfYXNuMS5jOjU5Mj4NCnZtbGludXggICBkZWNvZGVfY2hv
-aWNlKGJhc2U9MHhGRkZGRkZEMDA4MDM3MEYwLCBsZXZlbD0yMzg0MzYzNikgKyAxMjE2DQo8bmV0
-L25ldGZpbHRlci9uZl9jb25udHJhY2tfaDMyM19hc24xLmM6ODE0Pg0Kdm1saW51eCAgIGRlY29k
-ZV9zZXEoZj0weEZGRkZGRkQwMDgwMzcxQTgsIGxldmVsPTEzNDQ0MzUwMCkgKyA4MTINCjxuZXQv
-bmV0ZmlsdGVyL25mX2Nvbm50cmFja19oMzIzX2FzbjEuYzo1NzY+DQp2bWxpbnV4ICAgZGVjb2Rl
-X2Nob2ljZShiYXNlPTB4RkZGRkZGRDAwODAzNzI4MCwgbGV2ZWw9MCkgKyAxMjE2DQo8bmV0L25l
-dGZpbHRlci9uZl9jb25udHJhY2tfaDMyM19hc24xLmM6ODE0Pg0Kdm1saW51eCAgIERlY29kZVJh
-c01lc3NhZ2UoKSArIDMwNA0KPG5ldC9uZXRmaWx0ZXIvbmZfY29ubnRyYWNrX2gzMjNfYXNuMS5j
-OjgzMz4NCnZtbGludXggICByYXNfaGVscCgpICsgNjg0DQo8bmV0L25ldGZpbHRlci9uZl9jb25u
-dHJhY2tfaDMyM19tYWluLmM6MTcyOD4NCnZtbGludXggICBuZl9jb25maXJtKCkgKyAxODgNCjxu
-ZXQvbmV0ZmlsdGVyL25mX2Nvbm50cmFja19wcm90by5jOjEzNz4NCg0KRHVlIHRvIGFibm9ybWFs
-IGRhdGEgaW4gc2tiLT5kYXRhLCB0aGUgZXh0ZW5zaW9uIGJpdG1hcCBsZW5ndGgNCmV4Y2VlZHMg
-MzIgd2hlbiBkZWNvZGluZyByYXMgbWVzc2FnZS4gVGhlbiBnZXRfYml0bWFwIHVzZXMgdGhlDQps
-ZW5ndGggdG8gbWFrZSBhIHNoaWZ0IG9wZXJhdGlvbi4gSXQgd2lsbCBjaGFuZ2UgaW50byBuZWdh
-dGl2ZQ0KYWZ0ZXIgc2V2ZXJhbCBsb29wLg0KDQpVQlNBTiBsb2FkIGNhbiBkZXRlY3QgYSBuZWdh
-dGl2ZSBzaGlmdCBhcyBhbiB1bmRlZmluZWQgYmVoYXZpb3VyDQphbmQgcmVwb3J0cyBhbiBleGNl
-cHRpb24uDQoNClNvIHdlIHNob3VsZCBhZGQgdGhlIHByb3RlY3Rpb24gdG8gYXZvaWQgdGhlIGxl
-bmd0aCBleGNlZWRpbmcgMzIuDQpJZiBpdCBleGNlZWRzIGl0IHdpbGwgcmV0dXJuIG91dCBvZiBy
-YW5nZSBlcnJvciBhbmQgc3RvcCBkZWNvZGluZw0KcmFzIG1lc3NhZ2UuDQoNClNpZ25lZC1vZmYt
-Ynk6IExlbmEgV2FuZyA8bGVuYS53YW5nQG1lZGlhdGVrLmNvbT4NCi0tLQ0KdjI6DQogIC0gYWRk
-IGxlbmd0aCBwcm90ZWN0b24gZm9yIGFub3RoZXIgZ2V0X2JpdG1hcCBjYWxsLg0KICAtIHVwZGF0
-ZSBjb21taXQgbWVzc2FnZSB0byB0cmltIHN0YWNrdHJhY2UuDQotLS0NCi0tLQ0KIG5ldC9uZXRm
-aWx0ZXIvbmZfY29ubnRyYWNrX2gzMjNfYXNuMS5jIHwgNCArKysrDQogMSBmaWxlIGNoYW5nZWQs
-IDQgaW5zZXJ0aW9ucygrKQ0KDQpkaWZmIC0tZ2l0IGEvbmV0L25ldGZpbHRlci9uZl9jb25udHJh
-Y2tfaDMyM19hc24xLmMNCmIvbmV0L25ldGZpbHRlci9uZl9jb25udHJhY2tfaDMyM19hc24xLmMN
-CmluZGV4IGU2OTdhODI0YjAwMS4uNTQwZDk3NzE1YmQyIDEwMDY0NA0KLS0tIGEvbmV0L25ldGZp
-bHRlci9uZl9jb25udHJhY2tfaDMyM19hc24xLmMNCisrKyBiL25ldC9uZXRmaWx0ZXIvbmZfY29u
-bnRyYWNrX2gzMjNfYXNuMS5jDQpAQCAtNTMzLDYgKzUzMyw4IEBAIHN0YXRpYyBpbnQgZGVjb2Rl
-X3NlcShzdHJ1Y3QgYml0c3RyICpicywgY29uc3QNCnN0cnVjdCBmaWVsZF90ICpmLA0KIAkvKiBH
-ZXQgZmllbGRzIGJpdG1hcCAqLw0KIAlpZiAobmZfaDMyM19lcnJvcl9ib3VuZGFyeShicywgMCwg
-Zi0+c3opKQ0KIAkJcmV0dXJuIEgzMjNfRVJST1JfQk9VTkQ7DQorCWlmIChmLT5zeiA+IDMyKQ0K
-KwkJcmV0dXJuIEgzMjNfRVJST1JfUkFOR0U7DQogCWJtcCA9IGdldF9iaXRtYXAoYnMsIGYtPnN6
-KTsNCiAJaWYgKGJhc2UpDQogCQkqKHVuc2lnbmVkIGludCAqKWJhc2UgPSBibXA7DQpAQCAtNTg5
-LDYgKzU5MSw4IEBAIHN0YXRpYyBpbnQgZGVjb2RlX3NlcShzdHJ1Y3QgYml0c3RyICpicywgY29u
-c3QNCnN0cnVjdCBmaWVsZF90ICpmLA0KIAlibXAyX2xlbiA9IGdldF9iaXRzKGJzLCA3KSArIDE7
-DQogCWlmIChuZl9oMzIzX2Vycm9yX2JvdW5kYXJ5KGJzLCAwLCBibXAyX2xlbikpDQogCQlyZXR1
-cm4gSDMyM19FUlJPUl9CT1VORDsNCisJaWYgKGJtcDJfbGVuID4gMzIpDQorCQlyZXR1cm4gSDMy
-M19FUlJPUl9SQU5HRTsNCiAJYm1wMiA9IGdldF9iaXRtYXAoYnMsIGJtcDJfbGVuKTsNCiAJYm1w
-IHw9IGJtcDIgPj4gZi0+c3o7DQogCWlmIChiYXNlKQ0KLS0gDQoyLjE4LjANCg==
+On Fri, Mar 1, 2024 at 4:18=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> On Fri, Mar 1, 2024 at 3:41=E2=80=AFAM Sam Sun <samsun1006219@gmail.com> =
+wrote:
+> >
+> > Dear developers and maintainers,
+> >
+> > We found a bug through our modified Syzkaller. Kernel version is b401b6=
+21758,
+> > Linux 6.8-rc5. The C reproducer and kernel config are attached.
+> >
+> > KASAN report is listed below
+> >
+> > ```
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > BUG: KASAN: slab-out-of-bounds in strlen+0x7d/0xa0 lib/string.c:418
+> > Read of size 1 at addr ffff8881119c4781 by task syz-executor665/8107
+> >
+> > CPU: 1 PID: 8107 Comm: syz-executor665 Not tainted 6.7.0-rc7 #1
+> > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04=
+/01/2014
+> > Call Trace:
+> >  <TASK>
+> >  __dump_stack lib/dump_stack.c:88 [inline]
+> >  dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
+> >  print_address_description mm/kasan/report.c:364 [inline]
+> >  print_report+0xc1/0x5e0 mm/kasan/report.c:475
+> >  kasan_report+0xbe/0xf0 mm/kasan/report.c:588
+> >  strlen+0x7d/0xa0 lib/string.c:418
+> >  __fortify_strlen include/linux/fortify-string.h:210 [inline]
+> >  in4_pton+0xa3/0x3f0 net/core/utils.c:130
+> >  bond_option_arp_ip_targets_set+0xc2/0x910 drivers/net/bonding/bond_opt=
+ions.c:1201
+> >  __bond_opt_set+0x2a4/0x1030 drivers/net/bonding/bond_options.c:767
+> >  __bond_opt_set_notify+0x48/0x150 drivers/net/bonding/bond_options.c:79=
+2
+> >  bond_opt_tryset_rtnl+0xda/0x160 drivers/net/bonding/bond_options.c:817
+> >  bonding_sysfs_store_option+0xa1/0x120 drivers/net/bonding/bond_sysfs.c=
+:156
+> >  dev_attr_store+0x54/0x80 drivers/base/core.c:2366
+> >  sysfs_kf_write+0x114/0x170 fs/sysfs/file.c:136
+> >  kernfs_fop_write_iter+0x337/0x500 fs/kernfs/file.c:334
+> >  call_write_iter include/linux/fs.h:2020 [inline]
+> >  new_sync_write fs/read_write.c:491 [inline]
+> >  vfs_write+0x96a/0xd80 fs/read_write.c:584
+> >  ksys_write+0x122/0x250 fs/read_write.c:637
+> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+> >  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> > RIP: 0033:0x7f797835cfcd
+> > Code: 28 c3 e8 46 1e 00 00 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48 89=
+ f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 =
+ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> > RSP: 002b:00007ffff464ffb8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+> > RAX: ffffffffffffffda RBX: 00007ffff46501b8 RCX: 00007f797835cfcd
+> > RDX: 00000000000000f5 RSI: 0000000020000140 RDI: 0000000000000003
+> > RBP: 0000000000000001 R08: 0000000000000000 R09: 00007ffff46501b8
+> > R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+> > R13: 00007ffff46501a8 R14: 00007f79783da530 R15: 0000000000000001
+> >  </TASK>
+> >
+> > All
+>
+>
+> >
+> > We analyzed the cause of this bug. In the function "bond_option_arp_ip_=
+targets_set" in
+> > drivers/net/bonding/bond_options.c, newval->string can be controlled by=
+ users. If string
+> >
+> > is empty, newval->string+1 points to the address after newval->string, =
+causing potential
+> >
+> > info leak.
+> >
+> > One possible fix is to check before calling in4_pton, whether strnlen(n=
+ewval->string) > 1.
+> >
+> > If you have any questions or require more information, please feel
+> > free to contact us.
+> >
+> > Reported by Yue Sun <samsun1006219@gmail.com>
+> >
+>
+> Thanks for the report and analysis.
+>
+> Are you willing to provide a patch ?
+>
+> You would get more credits than a "Reported-by:" tag :)
+>
+> Thanks
+
+Dear Eric,
+
+Thanks for letting me provide a patch! One possible patch
+is listed below.
+
+diff --git a/drivers/net/bonding/bond_options.c
+b/drivers/net/bonding/bond_options.c
+index f3f27f0bd2a6..a6d01055f455 100644
+--- a/drivers/net/bonding/bond_options.c
++++ b/drivers/net/bonding/bond_options.c
+@@ -1198,7 +1198,7 @@ static int bond_option_arp_ip_targets_set(struct
+bonding *bond,
+     __be32 target;
+
+     if (newval->string) {
+-        if (!in4_pton(newval->string+1, -1, (u8 *)&target, -1, NULL)) {
++        if (!strlen(newval->string) || !in4_pton(newval->string+1,
+-1, (u8 *)&target, -1, NULL)) {
+             netdev_err(bond->dev, "invalid ARP target %pI4 specified\n",
+                    &target);
+             return ret;
+
+This patch was tested on kernel commit b401b621758,
+tag Linux 6.8-rc5 against the C repro listed in previous
+email.
+
+If you have any questions, please contact us.
+
+Best Regards,
+Yue
 
