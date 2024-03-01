@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-76695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9D2D86E8BB
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 19:51:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B10B286E8B7
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 19:51:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71FF1B2EFF7
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:51:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 287EC1F26D89
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:51:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E6A839AF3;
-	Fri,  1 Mar 2024 18:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3E33A8C5;
+	Fri,  1 Mar 2024 18:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IIC+y6V7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZmDKWogF"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E3139AE3
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 18:49:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DBEC39AEA
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 18:49:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709318947; cv=none; b=nsB4bjzfcD2EeNe33wDfoZb/nEqzCd3yAlBqrr1fvZGCl0otEZTU85/5C7RcEBe9iPUzeXoyxDKzhcJJ0ghBZ8NM9SR4PurXinAJmz8td1AvK33Y4OekB92YgpcxjE2qrisHuHy3tWuPRoF9a9kQH7/eyYtfUvK6y7Ob+2DdQNU=
+	t=1709318948; cv=none; b=k3w986GbjK2iQWCLOewNu5tK9U8HoQU3Lnjpb3XIoDpvhl4nJbsuuV4dF+vQhhpjeCdqwCPQd+a7G/+HR37R1GkpypUtHsLzZtoUAhkSnkh+2X5H3tBbm6+F7fcI4DULfL1CauD7rzmHfbxIiDbtPifxGs362VGrAlsK4/ywDpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709318947; c=relaxed/simple;
-	bh=2lF0MSBLx/YAl5oiFheH1nxkcVZUNKuUKpLkuCxysXo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mEMTZj2Azo1DNQyaBflp1x/7M818D3j3C/2NJghNP+kcGRUDy/LNNJC7HCScBPaJQW7ihtoYaPflmM2g06yihrOwSjOO9OY8IVxD7wlpJT5qboLZgj031Bv4w2fqV65u0U6G0n2ntu2JMLU+U4dp7ypxqNPz722YkkkB9LFb8pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IIC+y6V7; arc=none smtp.client-ip=198.175.65.12
+	s=arc-20240116; t=1709318948; c=relaxed/simple;
+	bh=diKTYoM9EX0EsS81vwzbZ/W/nLmiOB0HhoflRmzB4zQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ROIoyhb312cr0sXezyf13giJqXfIt6TyYTF/teQ/YS+hdQUGd51G9URuyXwMyy2AiObAX7LfQcHJH88IiD6ysf8fuzG1nZuZWt5QCJYIwbj1QciUkzA876wLUvMj7dgG8f6WflshRGp5Db6oE80yhjg73eq+rdn4MpkAfb5KFh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZmDKWogF; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709318945; x=1740854945;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=2lF0MSBLx/YAl5oiFheH1nxkcVZUNKuUKpLkuCxysXo=;
-  b=IIC+y6V7Yq+XHNFDvHGU6YMCCCNxfwCUAQzlloh5XGu2Tn6rppJQtR4/
-   3rwAoqmv0yrUjlX1Hehh9zJHDR4DEAz0fNE9sgSWGl4FCkmgtTa6Ia2J5
-   qTmhl+IuPWg5SCtluGEZq9oyqtLPPQpPQQ40r6ilpu0Ym1hnGHkKpL3pn
-   QKqLIr8EkfABfKDTH1JXpSqOkcTwpkbHS4iNwYfmSun84tD7lJVxxTBdh
-   Zx92MQxW/T8vcrL4F7D5IgL1DhxhYMZUYKA4BeRyX4JU8SVeroP0noWU6
-   4z5yTCqt4ChYpD/9VL6yaehYayx9m75urOOyJoGKStaPNwjx20YAC9IDA
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11000"; a="15303319"
+  t=1709318946; x=1740854946;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=diKTYoM9EX0EsS81vwzbZ/W/nLmiOB0HhoflRmzB4zQ=;
+  b=ZmDKWogFWeSH9OMSoVTsXCWeJsxLdvHNK1q86K7TBgdB3VerUbEUrCsw
+   OV5171Eed+PmEYkK4USZdevlZQTRLX0sROVZ4hVNM+nx6k/wxlVVmFMus
+   S+dl+D8z+yIk7bm5Pp80MOi4Csca8oIq/l1tLBSvAD9FQSSFZ4ofILN51
+   IwVJNOT2lu04orkc2l2OSO83V0l+9B5QPU94K0bYvENPO8epR+dX9DwnB
+   S67qBoSTjS9Iu8KxPuV+nF2XEN6XVwK8V1Bc8SExEeSFpF4/J10MpVW65
+   4wqP7dj4ZuT9EE1cIQb5olCEHLQs6xowzzDvC4Vv/62dIhe9rfdacL21E
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11000"; a="15303326"
 X-IronPort-AV: E=Sophos;i="6.06,196,1705392000"; 
-   d="scan'208";a="15303319"
+   d="scan'208";a="15303326"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2024 10:49:04 -0800
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2024 10:49:05 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,196,1705392000"; 
-   d="scan'208";a="8205835"
+   d="scan'208";a="8205845"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa009.fm.intel.com with ESMTP; 01 Mar 2024 10:49:04 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -59,11 +60,16 @@ To: davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
-Subject: [PATCH net-next v2 0/4][pull request] Intel Wired LAN Driver Updates 2024-02-28 (ixgbe, igc, igb, e1000e, e100)
-Date: Fri,  1 Mar 2024 10:48:01 -0800
-Message-ID: <20240301184806.2634508-1-anthony.l.nguyen@intel.com>
+Cc: Jon Maxwell <jmaxwell37@gmail.com>,
+	anthony.l.nguyen@intel.com,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Subject: [PATCH net-next v2 1/4] intel: make module parameters readable in sys filesystem
+Date: Fri,  1 Mar 2024 10:48:02 -0800
+Message-ID: <20240301184806.2634508-2-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20240301184806.2634508-1-anthony.l.nguyen@intel.com>
+References: <20240301184806.2634508-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,64 +78,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series contains updates to ixgbe, igc, igb, e1000e, and e100
-drivers.
+From: Jon Maxwell <jmaxwell37@gmail.com>
 
-Jon Maxwell makes module parameter values readable in sysfs for ixgbe,
-igb, and e100.
+Linux users sometimes need an easy way to check current values of module
+parameters. For example the module may be manually reloaded with different
+parameters. Make these visible and readable in the /sys filesystem to allow
+that. But don't make the "debug" module parameter visible as debugging is
+enabled via ethtool msglvl.
 
-Ernesto Castellotti adds support for 1000BASE-BX on ixgbe.
-
-Arnd Bergmann fixes build failure due to dependency issues for igc.
-
-Vitaly refactors error check to be more concise and prevent future
-issues on e1000e.
+Signed-off-by: Jon Maxwell <jmaxwell37@gmail.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
-v2:
-- Restore missing portions from original patch (patch 2)
+ drivers/net/ethernet/intel/e100.c             | 4 ++--
+ drivers/net/ethernet/intel/igb/igb_main.c     | 2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-v1: https://lore.kernel.org/netdev/20240229004135.741586-1-anthony.l.nguyen@intel.com/
-
-The following are changes since commit 4ac828960a604e2ae72af59ce44dafdc8b12675f:
-  Merge branch 'eee-linkmode-bitmaps'
-and are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 1GbE
-
-Arnd Bergmann (1):
-  igc: fix LEDS_CLASS dependency
-
-Ernesto Castellotti (1):
-This series contains updates to
-
-The following are changes since commit e960825709330cb199d209740326cec37e8c419d:
-  Merge branch 'inet_dump_ifaddr-no-rtnl'
-and are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 1GbE
-
-Arnd Bergmann (1):
-  igc: fix LEDS_CLASS dependency
-
-Ernesto Castellotti (1):
-  ixgbe: Add 1000BASE-BX support
-
-Jon Maxwell (1):
-  intel: make module parameters readable in sys filesystem
-
-Vitaly Lifshits (1):
-  e1000e: Minor flow correction in e1000_shutdown function
-
- drivers/net/ethernet/intel/Kconfig            |  1 +
- drivers/net/ethernet/intel/e100.c             |  4 +--
- drivers/net/ethernet/intel/e1000e/netdev.c    |  8 ++---
- drivers/net/ethernet/intel/igb/igb_main.c     |  2 +-
- .../net/ethernet/intel/ixgbe/ixgbe_82599.c    |  4 ++-
- .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |  2 ++
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  | 32 ++++++++++++++++---
- drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h  |  2 ++
- drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |  3 ++
- 10 files changed, 47 insertions(+), 13 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/e100.c b/drivers/net/ethernet/intel/e100.c
+index 01f0f12035ca..3fcb8daaa243 100644
+--- a/drivers/net/ethernet/intel/e100.c
++++ b/drivers/net/ethernet/intel/e100.c
+@@ -171,8 +171,8 @@ static int debug = 3;
+ static int eeprom_bad_csum_allow = 0;
+ static int use_io = 0;
+ module_param(debug, int, 0);
+-module_param(eeprom_bad_csum_allow, int, 0);
+-module_param(use_io, int, 0);
++module_param(eeprom_bad_csum_allow, int, 0444);
++module_param(use_io, int, 0444);
+ MODULE_PARM_DESC(debug, "Debug level (0=none,...,16=all)");
+ MODULE_PARM_DESC(eeprom_bad_csum_allow, "Allow bad eeprom checksums");
+ MODULE_PARM_DESC(use_io, "Force use of i/o access mode");
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index cebb44f51d5f..244d50cbcc4b 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -202,7 +202,7 @@ static struct notifier_block dca_notifier = {
+ #endif
+ #ifdef CONFIG_PCI_IOV
+ static unsigned int max_vfs;
+-module_param(max_vfs, uint, 0);
++module_param(max_vfs, uint, 0444);
+ MODULE_PARM_DESC(max_vfs, "Maximum number of virtual functions to allocate per physical function");
+ #endif /* CONFIG_PCI_IOV */
+ 
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index e23c3614fb10..6d8268be01d4 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -153,7 +153,7 @@ MODULE_PARM_DESC(max_vfs,
+ #endif /* CONFIG_PCI_IOV */
+ 
+ static bool allow_unsupported_sfp;
+-module_param(allow_unsupported_sfp, bool, 0);
++module_param(allow_unsupported_sfp, bool, 0444);
+ MODULE_PARM_DESC(allow_unsupported_sfp,
+ 		 "Allow unsupported and untested SFP+ modules on 82599-based adapters");
+ 
 -- 
 2.41.0
 
