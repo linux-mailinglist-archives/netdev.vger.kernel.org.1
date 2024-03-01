@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-76633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB99286E6A1
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:03:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FE3A86E6A4
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:03:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AEA81F28E65
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:03:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54BD01F292C4
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B79D9101D4;
-	Fri,  1 Mar 2024 17:02:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0911B200D6;
+	Fri,  1 Mar 2024 17:02:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WThNEJ/L"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NU43KbUI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238D38825
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 17:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3664EF4F6
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 17:02:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709312572; cv=none; b=KHmH3G2C0hrHASFZLmdEhH2ic0QXPc+MXHOnaHPGWKdV/95OOqHHqU7aKEO8LOu5mAm560Ju7cfVn65eXBOZnbCiqTC84Uz8vwE16An8oV3B3aH5Ic6AmycOHT8CSrGPvU5yKNdB4h2/pzjfTrwfqkXsybvZ2paFsDOK5Dl4UhU=
+	t=1709312573; cv=none; b=CBLsp6gvGlCs8nbfjY4xdoEup79heaWF+CdCpa33BvME0EDt/enAAAAgsVfqgf2JeAI3c41XfOB/vEoqF7tnllPyd+h3O3Tj81qRo5skotMi3uoWaMWmnwg26PNyEnuAU6gW4I82hnR1lCWgWQ6rQ7mqEW5FRpzn5IS7lmqxC0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709312572; c=relaxed/simple;
-	bh=XwGOf1MLWzPXiuaGkXStpdLvB4FPo5vk4nLwFw1ga6k=;
+	s=arc-20240116; t=1709312573; c=relaxed/simple;
+	bh=C4WEfnReplN0gQTzXkMZmEt442ImK4xT7st2F/By4dE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PInpO1sBD2pNJkUkc6tEaNHIY5YjpIpKy2SwimRaTQiXhZU7dIqGKT0Hcv/yhj3oWu8kAm6Jf3klnkfPklIlD76xZqx7WoGjo6bObhJJC2JtXQNmB3RnbUWmbE+294RFfLWfN0uxbZljcQTa/Eam+Pz3pwtaaK+RBh3bjp6ZzBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WThNEJ/L; arc=none smtp.client-ip=209.85.166.53
+	 MIME-Version; b=RB+rpFu8iVrWfr77Xi+1YHvP5KM96VpBjJE0nu+GxJ0FgNU2lr7QijZbU3UlfLkSCA+Yiwc1dhI8Y7iHq1B6oizQvvVYe9Pphww79rOzrOAUTcyBF9R91xzaL+CA+Bjd3BgWziP8wE0QFHyMEBYaVqnTPuD9CcfIHK0TCA0NiFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NU43KbUI; arc=none smtp.client-ip=209.85.166.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-7c81764c2e7so98685539f.0
-        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 09:02:50 -0800 (PST)
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-36540b9885cso8505755ab.1
+        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 09:02:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709312570; x=1709917370; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1709312571; x=1709917371; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TGWJjaxvrYhNIssQekJJrsQHyV2VIpv1G8S6HOh3hAI=;
-        b=WThNEJ/L2qGEsrsSRQ5Ki6mTeXizAM7+MZh1SXDqsmKktz8dkDGUXXBgw1ydz5Eprh
-         JXzQSoOMm/8NEZqvlEr0rWF6uMQNAK+XXIMTxDGrbuCWt7YP2YBbXLtUufi4BuVrbNgm
-         1qkcD27ENItsobns+2pybMXBxyDqYKJ/KKkmuqy/V65e/B1QllGk3lQQHly1QDc6Pn28
-         v7hWZgauQSLXFDMolNLfIifY8V9fLN+EazdVewMMRn31khryiXKdiITFZEedkpspzLhO
-         DbI8Xo9SlGoEmB/51gkmZlzC4kodcGaVa8BK03ghQl8kJRWqTvA6WLbp3/60OfVF2nHH
-         iB9w==
+        bh=c1od9Mf5e1UrqV2FcK9CW+GpeCIGbA7ZM3UP+zHhMOk=;
+        b=NU43KbUI3qj5J1dqdZ+CXUQJpf5ZEmFXgF9iI2pkqDNFLzJKgQXfCNje/IqqjUKvHa
+         HXDeMo0/7B9dSNEM1dZO//om7aqdw0DqEDHAc+fJcIUKhuC2Nn8w2n+rZvZk9l82IJa/
+         we90sqP0QsaqqdL50LftNLWe8hRwspNsNOXiu0s/T84WXxsS4ZKpkxLwaxw0gUxhwfwZ
+         m9zZGjI4dAKvXlwNeWgs7xn2e4UxR1eUfyWThPFO4u4XAw7J0q/q06AKqi9WSVv1PXje
+         /1YpLZLCZ7omRltFggNhW/986ed2f5uRkTvRj/CrhyElQEgLjh9MlRq2BtX2Iz+jH4M9
+         UZ8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709312570; x=1709917370;
+        d=1e100.net; s=20230601; t=1709312571; x=1709917371;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=TGWJjaxvrYhNIssQekJJrsQHyV2VIpv1G8S6HOh3hAI=;
-        b=wpNDhNLTeOleAecA7nA0Wtpl3kx+FMKKiQe1/mM/rAH030A1C/V5PCiLA64IGBn3Vf
-         HJCI1N0l+6HSGE5n+/i6ByHRAN0iSlfalNQg4kxFjokfVqmTNjfQXpu3CWm870EXaxJm
-         e7Ds3x8L6sUlsPgOjYa574hFhIx1x5ajHBV1G8vU28Pu0RfIkwC8Vf4MptOG4W8LZl4/
-         bi2tj6sz+CJcULUQL98TvS0mmQwGj5lu5kfBthThVdaGJNxZPRFL2wlZYkn41IWz12ph
-         ydy1Dp5D0WUZJbBeZjMghNWilRsSRF6ipgzC2A44zZ0uld0rjVYb2JSnPX5oOX03SeG8
-         iL7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXaa/rGPVN3cStiBtAP9nGt3iitLXYBkJkOX9dGE0p7Uymo4mk9ynSCPc7CDLGG6DoeynQTk3+DK7jFyh9bXyhNyqeFB/AQ
-X-Gm-Message-State: AOJu0YxjEHtNvXCnnfMOLr1eMoAPtv+m6Z0QpSPSsPGwqgzs27yHu+Jq
-	OCoq10Zg8DrHkVh9CJq7RNjdqlaB/eyhWm86BQtkYxre+5831LuSW4tMcv6rSQg=
-X-Google-Smtp-Source: AGHT+IFuF5YM0vSwjoMxJ/sucKgi07FMEwtC0vCsj/aKhS2iBQBSGrnHVpzotqrIOWbx7KwjP8VSpA==
-X-Received: by 2002:a05:6e02:152b:b0:365:4004:83bc with SMTP id i11-20020a056e02152b00b00365400483bcmr2366487ilu.14.1709312570335;
-        Fri, 01 Mar 2024 09:02:50 -0800 (PST)
+        bh=c1od9Mf5e1UrqV2FcK9CW+GpeCIGbA7ZM3UP+zHhMOk=;
+        b=HQijIK7f1AeobX0tZqx3oia+StdETYFCc/X6YwN+i3Gc1nfHwnF/1XFguo/XD+6XzF
+         YpkcoqJ5zQSWF4clkfyz0bN24CnpNE4VItoaoxykNpTWtEDFwMnO4xJVELbdjXxYcIl7
+         maVdDFm/cKTUiMuGD9TmoizKVvtj6em3UYLq5FUkgZePswHUJ8XOteGBjR0NCmcKBeNG
+         MWeUMJ264OhJUzOj5kyILRFHQ8NSfDibiv3YKOLoUnC2Outj6gYDb5PgZlj2P/nrau2C
+         kKvz5SbYwHNUCel0+oLxNbNtiV9EjxRYix0fBzjYvT2R2t3Ql+j+vutXZpvWmpHJXmVP
+         WrRA==
+X-Forwarded-Encrypted: i=1; AJvYcCWueMekApczqCItMXmcQE97TnuEQGp/R99/7mc25xZaYgt/+FKrSdEIySdoAuQUqQt+ZXYtHzbGgympgwe7W8d1kQ3aC7yc
+X-Gm-Message-State: AOJu0YwGrSbZdr0t+03Azwgu6MlNsBoqIt+hm7u8XfIXUGC/Z3yknFoR
+	P3fakB2ULLSJuScVs/+CfRgraUVCw17osuibFXhXyTnHr5ynkgAFEijOPT1WFuc=
+X-Google-Smtp-Source: AGHT+IFKq3ninjSPbxfeCsVJ+HOfQBqUgzK6ZYXi5n/KtwuSbZFpzhfNQAP2pp2m3ZB3TD1gzESWIQ==
+X-Received: by 2002:a05:6e02:1d13:b0:365:2445:ffd6 with SMTP id i19-20020a056e021d1300b003652445ffd6mr1369615ila.13.1709312571464;
+        Fri, 01 Mar 2024 09:02:51 -0800 (PST)
 Received: from localhost.localdomain (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
-        by smtp.gmail.com with ESMTPSA id o2-20020a92dac2000000b0036581060910sm991430ilq.6.2024.03.01.09.02.49
+        by smtp.gmail.com with ESMTPSA id o2-20020a92dac2000000b0036581060910sm991430ilq.6.2024.03.01.09.02.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 09:02:49 -0800 (PST)
+        Fri, 01 Mar 2024 09:02:51 -0800 (PST)
 From: Alex Elder <elder@linaro.org>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -83,9 +83,9 @@ Cc: horms@kernel.org,
 	netdev@vger.kernel.org,
 	linux-arm-msm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 3/7] net: ipa: pass a platform device to ipa_reg_init()
-Date: Fri,  1 Mar 2024 11:02:38 -0600
-Message-Id: <20240301170242.243703-4-elder@linaro.org>
+Subject: [PATCH net-next v2 4/7] net: ipa: pass a platform device to ipa_mem_init()
+Date: Fri,  1 Mar 2024 11:02:39 -0600
+Message-Id: <20240301170242.243703-5-elder@linaro.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240301170242.243703-1-elder@linaro.org>
 References: <20240301170242.243703-1-elder@linaro.org>
@@ -98,85 +98,105 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 Rather than using the platform device pointer field in the IPA
-pointer, pass a platform device pointer to ipa_reg_init().  Use
+pointer, pass a platform device pointer to ipa_mem_init().  Use
 that pointer throughout that function.
 
 Signed-off-by: Alex Elder <elder@linaro.org>
 ---
- drivers/net/ipa/ipa_main.c | 2 +-
- drivers/net/ipa/ipa_reg.c  | 8 ++++----
- drivers/net/ipa/ipa_reg.h  | 4 +++-
- 3 files changed, 8 insertions(+), 6 deletions(-)
+ drivers/net/ipa/ipa_main.c |  2 +-
+ drivers/net/ipa/ipa_mem.c  | 13 +++++++------
+ drivers/net/ipa/ipa_mem.h  |  5 ++++-
+ 3 files changed, 12 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
-index 6cf5c1280aa4e..5c9c1b0ef8de5 100644
+index 5c9c1b0ef8de5..17ee075370ce6 100644
 --- a/drivers/net/ipa/ipa_main.c
 +++ b/drivers/net/ipa/ipa_main.c
-@@ -866,7 +866,7 @@ static int ipa_probe(struct platform_device *pdev)
- 	ipa->modem_route_count = data->modem_route_count;
- 	init_completion(&ipa->completion);
- 
--	ret = ipa_reg_init(ipa);
-+	ret = ipa_reg_init(ipa, pdev);
+@@ -870,7 +870,7 @@ static int ipa_probe(struct platform_device *pdev)
  	if (ret)
  		goto err_kfree_ipa;
  
-diff --git a/drivers/net/ipa/ipa_reg.c b/drivers/net/ipa/ipa_reg.c
-index 6a3203ae6f1ef..98625956e0bb4 100644
---- a/drivers/net/ipa/ipa_reg.c
-+++ b/drivers/net/ipa/ipa_reg.c
-@@ -4,6 +4,7 @@
-  * Copyright (C) 2019-2023 Linaro Ltd.
-  */
+-	ret = ipa_mem_init(ipa, data->mem_data);
++	ret = ipa_mem_init(ipa, pdev, data->mem_data);
+ 	if (ret)
+ 		goto err_reg_exit;
  
+diff --git a/drivers/net/ipa/ipa_mem.c b/drivers/net/ipa/ipa_mem.c
+index 694960537ecda..d7df7d340221d 100644
+--- a/drivers/net/ipa/ipa_mem.c
++++ b/drivers/net/ipa/ipa_mem.c
+@@ -9,6 +9,7 @@
+ #include <linux/bug.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/iommu.h>
 +#include <linux/platform_device.h>
  #include <linux/io.h>
+ #include <linux/soc/qcom/smem.h>
  
- #include "ipa.h"
-@@ -132,9 +133,9 @@ static const struct regs *ipa_regs(enum ipa_version version)
- 	}
+@@ -75,9 +76,9 @@ ipa_mem_zero_region_add(struct gsi_trans *trans, enum ipa_mem_id mem_id)
+ int ipa_mem_setup(struct ipa *ipa)
+ {
+ 	dma_addr_t addr = ipa->zero_addr;
+-	const struct reg *reg;
+ 	const struct ipa_mem *mem;
+ 	struct gsi_trans *trans;
++	const struct reg *reg;
+ 	u32 offset;
+ 	u16 size;
+ 	u32 val;
+@@ -615,9 +616,10 @@ static void ipa_smem_exit(struct ipa *ipa)
  }
  
--int ipa_reg_init(struct ipa *ipa)
-+int ipa_reg_init(struct ipa *ipa, struct platform_device *pdev)
+ /* Perform memory region-related initialization */
+-int ipa_mem_init(struct ipa *ipa, const struct ipa_mem_data *mem_data)
++int ipa_mem_init(struct ipa *ipa, struct platform_device *pdev,
++		 const struct ipa_mem_data *mem_data)
  {
 -	struct device *dev = &ipa->pdev->dev;
 +	struct device *dev = &pdev->dev;
- 	const struct regs *regs;
  	struct resource *res;
+ 	int ret;
  
-@@ -146,8 +147,7 @@ int ipa_reg_init(struct ipa *ipa)
+@@ -634,14 +636,13 @@ int ipa_mem_init(struct ipa *ipa, const struct ipa_mem_data *mem_data)
+ 	if (!ipa_table_mem_valid(ipa, true))
  		return -EINVAL;
  
- 	/* Setup IPA register memory  */
+-	ret = dma_set_mask_and_coherent(&ipa->pdev->dev, DMA_BIT_MASK(64));
++	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
+ 	if (ret) {
+ 		dev_err(dev, "error %d setting DMA mask\n", ret);
+ 		return ret;
+ 	}
+ 
 -	res = platform_get_resource_byname(ipa->pdev, IORESOURCE_MEM,
--					   "ipa-reg");
-+	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "ipa-reg");
+-					   "ipa-shared");
++	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "ipa-shared");
  	if (!res) {
- 		dev_err(dev, "DT error getting \"ipa-reg\" memory property\n");
- 		return -ENODEV;
-diff --git a/drivers/net/ipa/ipa_reg.h b/drivers/net/ipa/ipa_reg.h
-index 2998f115f12c7..62c62495b7968 100644
---- a/drivers/net/ipa/ipa_reg.h
-+++ b/drivers/net/ipa/ipa_reg.h
-@@ -12,6 +12,8 @@
- #include "ipa_version.h"
- #include "reg.h"
+ 		dev_err(dev,
+ 			"DT error getting \"ipa-shared\" memory property\n");
+diff --git a/drivers/net/ipa/ipa_mem.h b/drivers/net/ipa/ipa_mem.h
+index 868e9c20e8c41..28aad00a151da 100644
+--- a/drivers/net/ipa/ipa_mem.h
++++ b/drivers/net/ipa/ipa_mem.h
+@@ -6,6 +6,8 @@
+ #ifndef _IPA_MEM_H_
+ #define _IPA_MEM_H_
  
 +struct platform_device;
 +
  struct ipa;
+ struct ipa_mem_data;
  
- /**
-@@ -643,7 +645,7 @@ extern const struct regs ipa_regs_v5_5;
+@@ -100,7 +102,8 @@ int ipa_mem_setup(struct ipa *ipa);	/* No ipa_mem_teardown() needed */
  
- const struct reg *ipa_reg(struct ipa *ipa, enum ipa_reg_id reg_id);
+ int ipa_mem_zero_modem(struct ipa *ipa);
  
--int ipa_reg_init(struct ipa *ipa);
-+int ipa_reg_init(struct ipa *ipa, struct platform_device *pdev);
- void ipa_reg_exit(struct ipa *ipa);
+-int ipa_mem_init(struct ipa *ipa, const struct ipa_mem_data *mem_data);
++int ipa_mem_init(struct ipa *ipa, struct platform_device *pdev,
++		 const struct ipa_mem_data *mem_data);
+ void ipa_mem_exit(struct ipa *ipa);
  
- #endif /* _IPA_REG_H_ */
+ #endif /* _IPA_MEM_H_ */
 -- 
 2.40.1
 
