@@ -1,207 +1,386 @@
-Return-Path: <netdev+bounces-76389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B06086D925
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 02:49:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C50C86D952
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 03:02:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C99FE1F21929
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 01:49:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A77461F21C8A
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 02:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E40B2E632;
-	Fri,  1 Mar 2024 01:49:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA80383A5;
+	Fri,  1 Mar 2024 02:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="T8S/N7OX"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aXPJqW8U"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-db5eur01on2053.outbound.protection.outlook.com [40.107.15.53])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2067.outbound.protection.outlook.com [40.107.243.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C287F2F5B;
-	Fri,  1 Mar 2024 01:49:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.15.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39432B9B6
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 02:02:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.67
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709257781; cv=fail; b=WTvtucwzP3XDznWDJnWvTs3tZJWKUcuJQ8lmPrqCfZ9Fe2NfhsNVwK05HdYuti6IsXgMwiXUlUlFHPegSU/Kg407+bjSydC7/JcHPH/wPR77QBCnLCgAy3nQmmz7jNi9Ylpbr+M/G/M/SKv1bHfujZuPbEUiPAXHrYCAMVHdCo4=
+	t=1709258557; cv=fail; b=R05JNLbpN8lNoZNbp8Q/fl6xJxXJgJM+MZ7D5I8GMXTbIKmgNLoxUeRBVfoSMmXsO4S0WjnKQUxMR8jJT/mxCRcrcRxX/3sNek9MsYDvBFl5J1MkPtGdFm6Y5+YNZ4dgcvfvTHHo6cpN6Tl01+EP8v7nm2UBbQw43b0HwaqR8lE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709257781; c=relaxed/simple;
-	bh=4mO+ES9KKsjWe2b5DQD1IM378IpxZIYnKSecmtEzdZI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=eQB9tRq27YLYS7iJONFp8a6Mr17qhGD5XGmCJ0lWFDJBDVwRLfFCrnLTBIbhVPuYRTGg/bdt0v+ZX3kVKaKc/rE5Hn0yRZ8UAo1V/Uw2jpH1rngjU4T5rwVNmQcxyGK0ICqV7K+sq248YaKfgzomfS75psP7j031xVC3XYAAg6A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=T8S/N7OX; arc=fail smtp.client-ip=40.107.15.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	s=arc-20240116; t=1709258557; c=relaxed/simple;
+	bh=EY5XIcGe1tc9ThWdoyXH/kddpbMnT7o76TVsaaPgwgs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LcTzdiZBk4hNz5BdJsk+A98ytNIOf4XCCjWdHnj6Yh/XTz6DUNhdgsCQTJbOHhVRTCrIWfCitjrycVlqkDUd0riTs4c/LuwXKcgaQq4qZWU+MJ8/FWbSGRW5A422cHmI3/pG+G1khid3XdI4igvuC4O+ox2+HTIEzxWD6yiVifI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aXPJqW8U; arc=fail smtp.client-ip=40.107.243.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=djbjpQutxHMHuXm56J1tVCoGpgv74XvMQ14qKcpamT78j4sMLqGCPwUdsAn+oXGp/tsxWz1YONpewu/6HMG05ackVgZWZQ3arI4teQpiN7dj+BODb4Tk5E2af2STcoaD7ntV8vlBRzdIU+tpr8Xxr+FC0EeQ4cUIEPwgB3/MMC2t2QSgljAAqJ72EEoG3wNelmusurSzVPUb1sLUeFjJXPNC/0yuFhLtzQLpSF2U4GAGuygvdnpe8ckjWQbXAk9q7f4s5eELGdVN91IeAiDc19xoiSdqoHjtHqtUQNnjDdySiy0nO6pJaDbz/FM1q8W8Eu8u95hnaLhEqpAhd8mecQ==
+ b=NXEI1jJTjX+zToOsKyi374gJp020nHeTP2j6+S9D0qb2x8XLABRpd7XvbYHhJEFS6cda8AtQQtreQYC8V7aryw3oN10jYrY5VMHWq3KiqxSCJoaApm6PGpFcFKLi/v+6d6LFMf0ee3xGsSetGeM6QbXKx0f8NgkS6rg4uKySc+5PdVvuS2uw66/cn180XbDGUbmKnGY7MBwaSCnyRJHlc6fAQ9Q2ISz/doaqn+EKJdbKhJHpiSthskbRsk6gNgaK3sYuGnPvFLMfPiiO/HUhA5z6yDsCLPATzkXL//ZCcBxnifjlEK2KHZ/LWv/GqmYA91wXGt223/ZqpIBs983AeA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4mO+ES9KKsjWe2b5DQD1IM378IpxZIYnKSecmtEzdZI=;
- b=X5jPij+X3FbRi4S+7T2N9BRVot3sEYVo6MBA/s9XIu+9j6hXdgl11E0pSR4psNUAriaq4VLavBsLp7DXNd8anpmPXOin91YejLm/ej/eq2l32pK8q7FY6QsHhY7LLySFxDmteu15ZTfN8qO0am6sxU7n4WxVxKbwjQuy95FQOMsukndntz+5UrjDX9PBn4sakwBg+Hsv0hCFQ6gpaQJAZB9iM+vzQ9a+5Amx4BBxQboPlzXdj45QxxQeZJJixJEAVlP9nEKXxaj+LMvYSEfPxNxklgUA52LoYxjPcxIQXWnsmjo4566adpxrOI42QA82HDTgMugpIVc+Rnh2Y0I3tQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ bh=Y9HBjckWW8zq8s8g/IFNLOsmnP4Kh0GjxKoM6P4I5mM=;
+ b=P1rRxkdEijGQ6U4c43DAjjzgnsHrZWGtDtuX8giPnoXXlBoZJXvsGorSyHlELlu5ycHcSayVQAJTrDEyRcnmuHr5WSktMPz6SeWqxDulsTetE93hoOg4huh6/FkbKeoAdf7PXOc+06tqqpioV9491IfvPy8bYmfW3rWyfekRAoUi7awJ51vHuTdneAJnrEQQM31PDEk9fNwtZKT5zBmpG/lzdyImiMKW0DIAebl9ZWxfEWzbhZi3ydhKDNCATlsIWr50hjtWei5lrNoL+9/J+S3/8MxXcLv94B3lG08kMIdGWvoqbdHunLzPJQl6iUIkQaklTWHoKfVN4pHvtcx98g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4mO+ES9KKsjWe2b5DQD1IM378IpxZIYnKSecmtEzdZI=;
- b=T8S/N7OXo9RgnbA6TJ7DFqM40klsLyntbfHmsbFG1SHRqn9uCZW1KsiSMus73dNSwRm6VCgwJt5Y6UeC1ltNQ7Gir3AiYWlQC7fcy1jVLEpmtM1OG3lvv7Z5/aEHMWhTB6Oj7/Qvixxz1D34PP2ghHNkvj1CvEcd7WEpCz0hOUY=
-Received: from DB6PR04MB3141.eurprd04.prod.outlook.com (2603:10a6:6:c::21) by
- AS8PR04MB9208.eurprd04.prod.outlook.com (2603:10a6:20b:44f::20) with
+ bh=Y9HBjckWW8zq8s8g/IFNLOsmnP4Kh0GjxKoM6P4I5mM=;
+ b=aXPJqW8U0baYn2uo/Y+sKXTaNaPFC/IMODTfFFd1M9NJMuPb9OX8H8/bId38qPUJjtHSOxfrsTzJOxBqfgkU9eNi/tqfsUEjiKfKukEs/JnrC5ficxugp/jLbJ3fk0Sb3kjWt/BpcXY73vl7XaCcHKFyEAtI/tfvomSeD3ikXcjAo4EPqQNqBbgJSx+8MCQr7Sd4YjO38yrD+GNFGVws0G+vyZhcM66nv6fkHwUQvMP0Eb56RTpqjV2sXvvIYh7gD8gVrdrdKclbKjVUmjAvGweaUyYfkO5T5P+eBy0wH45/dx84a40EvpPPYnE45UGnNA+eTo/wa4jidTercJSalQ==
+Received: from SJ0PR03CA0075.namprd03.prod.outlook.com (2603:10b6:a03:331::20)
+ by DS0PR12MB7747.namprd12.prod.outlook.com (2603:10b6:8:138::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.39; Fri, 1 Mar
- 2024 01:49:36 +0000
-Received: from DB6PR04MB3141.eurprd04.prod.outlook.com
- ([fe80::4c4f:6b0f:3a10:f5d5]) by DB6PR04MB3141.eurprd04.prod.outlook.com
- ([fe80::4c4f:6b0f:3a10:f5d5%4]) with mapi id 15.20.7316.023; Fri, 1 Mar 2024
- 01:49:35 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: John Ernberg <john.ernberg@actia.se>
-CC: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	dl-linux-imx <linux-imx@nxp.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Lunn
-	<andrew@lunn.ch>
-Subject: RE: [PATCH net v2 2/2] net: fec: Suspend and resume the PHY
-Thread-Topic: [PATCH net v2 2/2] net: fec: Suspend and resume the PHY
-Thread-Index: AQHaav1/Ffv5x8jH7kmxx77YLYL/oLEiG6+g
-Date: Fri, 1 Mar 2024 01:49:35 +0000
-Message-ID:
- <DB6PR04MB314117D7D5473B31FCA47495885E2@DB6PR04MB3141.eurprd04.prod.outlook.com>
-References: <20240229105256.2903095-1-john.ernberg@actia.se>
- <20240229105256.2903095-3-john.ernberg@actia.se>
-In-Reply-To: <20240229105256.2903095-3-john.ernberg@actia.se>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DB6PR04MB3141:EE_|AS8PR04MB9208:EE_
-x-ms-office365-filtering-correlation-id: 39cf8ca1-f74c-416c-5726-08dc3991d955
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- hGO7ESiY0yDScUwWRbiEQ2NUjTv+XDto+rtpHfEOJFEZwOru0ktlFxUhtoXVAs+sAZfGQr+kHhGkGTXFZbzMi96x/+jQFmySwlh46JpNeYKt1rTOnnqR3WnyYJ2DtjPT5PpLAlDe+8JEnHG2heK4OKMFud7olpNdBmm30fFQkKHdcAwRuzEmToBHV/RV1gaoGSzBu1JXkJPEH2yMXwAvckHMwjYdOmrYORL9v+Eb+oQ215r+qIm+sBJCX3C3IPP29FbzcgJGVwO1kJjVPflWg/eE7YnGbjbjL3qp2xC3HnHUebT4wbJKyTTktuwm7ckQqdnlxvd3Mvs7GoU7F6l1XL4pIqQ1l+pC/FJFc6ZvzHYuYSdNjpWOukpxtHRUcmb5EQ3cDPg0LPvSO1NIAPTblUd4khFCgMvFaXovWl1ckl60hWY/ZOtBpiIx0hetSB7FfepbMi0qgFj6imGd9I6MoUFR10vFHkbQHZD8XAq5fQCGZp9KAhPFDcQNdbVOWabgCcAdldGKwNrddiwQnHq404Yo5lZnsUyu/mxkqBEfi7sjD1EPs5ixtuQZ6PaUPvknf66cdcq1JE+bADxIDDdt6ICJrnWU7Ik+VYEEqGF7ALbNRUJCnQ5c/vO86t1ljsX0fCFMzZlN376Rq3COwdMIAg4+N0WaX5amzKGE7Nbp4O0pHC8wB3iYApfgNBDiq/DLLD2ZY+dx9o9H3iprawNJBuLqpaeo7C+dP5Pxo5DVuwA=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:zh-cn;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB6PR04MB3141.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?gb2312?B?WFc2VDZKNk1hcW1hNFdOWU80WktkUjErbW1SdWpuRnh5QlNsZmI5aEhOZlkr?=
- =?gb2312?B?KzhUSXlKZm1VLzBBK1NHS3o3VTNITW1UZ29XUXBjRVRMTDUvbEhCTkNlZkdk?=
- =?gb2312?B?WWlNaEtGaXhwZTkwYVEzRGx6ZEVSRzhVUDE4YzFYSjRlWi90WGI5VzVCZkNn?=
- =?gb2312?B?RHptenNBWHBtOGpiSkZLTmtvcXVrbmVad0NkOFlBM014Z0d3TFRZRzRqa0NQ?=
- =?gb2312?B?TEw5eUJPTnhmMXlCalNpd2t2d2JEN3ZabHVEOXVGK3VtaEFvTlF3eDhWOVNG?=
- =?gb2312?B?cjlaelhSQ3lpTlAxR1BjeXlTOXlqSE1CZUpMWjBpeDdVV3BRMzNQYSttVVUy?=
- =?gb2312?B?Y1FycHBpUVcyVGx0NkVyMFVMYndJVTkrOXVycjgxQ043Nml0c0VtNDZ4ekVs?=
- =?gb2312?B?c1lWNndiZzJYcVR4UzZxYmkvdTUvWHc0L1BRbUEwMmc5Mm45SGxhZGtjcExl?=
- =?gb2312?B?aHlrczNmNGtEVnhpV1ZmUkJyWEVkRlY4QU5pcHlOcDdqOEJYRUlLbHE4RDhQ?=
- =?gb2312?B?cXg3a2h1QmYzdHlxenpuc0lmOXRQMVQ5WFBoSEhGajhUS2Y0NktBZnBNTnRC?=
- =?gb2312?B?RWNjTWV4djM0N1FEL2JsLzNBb3NwTTlabFpBUmdodnFJRjlHUjN5aW9ZZFRm?=
- =?gb2312?B?Q0w1MzlySGUyUm05Ykc5TWl0RHRhTDlIUEp6NVhLbTRVYXpJTnZrQkhVM3Rx?=
- =?gb2312?B?N01YbVJHQ1NTWWhnQ1hOYWFkUnFsSmRUbWgvZS96MDNibGErZ3AzMzNZdnhV?=
- =?gb2312?B?SU1hSkNVdzZodHZQejVabGdHL01INU14TXJSZFJQZkxnNlU2REx1bzVSZWo5?=
- =?gb2312?B?cm5UdXBSNHp6d3dwNDN4Zm51M2gzMjBKU29tdi9KTmNqbVNsN3pJS0xCdng4?=
- =?gb2312?B?T0R6dDR6M3k1NmYycDhpV0ZtYjd1UXg5VHRIWTdCTEVva1RvQWx1RVFrTGFa?=
- =?gb2312?B?cDNYSzFxSzgzZUR3THV1OXRaUVdPZDRFajI3Yy9jMWJUa1kwa1ZUajZjVVhu?=
- =?gb2312?B?MHdlU2o0bXEyZTFjWGptWjhVUmVOUXBVaFBjU2VudUIrNE5jZ0FnY1l0ZUJW?=
- =?gb2312?B?ZXhLTlgrcUFoUHNoY0JlWklBYmhNdjhVNFNwWlNwR3BMNTBrU0t2VzRKWjNm?=
- =?gb2312?B?TXNkU0EwNk9OUnlEai9rQnZ1UWd6dEJwcXpkdm9nZXEra3Q3a2VuYWRxZVV0?=
- =?gb2312?B?YVJncHZnL2JrQ0ZIUktZajlROExhVm5qekhWalJFSlRTMndHUXB5ZnNyTC9E?=
- =?gb2312?B?TjJmOU9SMUIxb1UycE9LSXJaSWQ0eVpHS1BLNW5scU1PU2l6ZzhSb0JMZFZ0?=
- =?gb2312?B?SlduRi8yNW5TUUJaa3RUUHB2eFl4a2luaVhDUmEyR2hLQ2h1NGdXZ1ptWTFl?=
- =?gb2312?B?bk1YaFVZdHdmMkVkcVVrclVxRFkvVlBCR1grSEhjcmZFaFVEZTk1bUtWV1Nx?=
- =?gb2312?B?Z25KMy93TU5wZGZzcTJMRENienhxVzFsRUlxUkJqTmRSL0krS0cvV1JyVEpJ?=
- =?gb2312?B?SVJyVkpKcEhQSGFLOGtrTnZ0N0xiOWNHbDJtdnlZbUVpZldkT0NrNDlvZWR1?=
- =?gb2312?B?SWJlZ25YazRvaVozdDd3RkJhNHRkRWRabTJZb01uOG9Lb1B6RUhZWnVycEFM?=
- =?gb2312?B?dSszRmd3dnV6VVVTbGdWbENXdGlzY0U4VGE5WDY4UG5ROU12WHBCcFQ3WGhX?=
- =?gb2312?B?VTZQYXZYdUlvbnRYNGtsRU9kemt3ZkVBb05EVlJ4aFdoYjdvZFVKRjFTOVdm?=
- =?gb2312?B?UXFlZkJEQmFnY0N5NHo5OFYwVXFKY3JUM1lmb1kxd2c1UGo2TUxxbEdQWWRY?=
- =?gb2312?B?aDFoT3R6Y2IraXRhczBObjdDdGk3RS9UdjB0bkU4NnJLdTJlNnRlaU1QSVJX?=
- =?gb2312?B?Z0FrRHd6S3Vwd0g2UnBKS0VMY0d4aEhPaHpDNnJWK1h6OTVNVy8zUHF4bVJU?=
- =?gb2312?B?eWpFeVNLUlNnSXpROFhVR1g0VUFMUTR2M2phd3d4RCtWUG1RS0piYmlJRVRR?=
- =?gb2312?B?TVg4L21yTms4T2lrUjh1VnZsTXM4MTJZQzd6b3FMQXNKS3RiV2MrRjl6ZXRk?=
- =?gb2312?B?RG9RUDFxbG5GL1NPclBadyt0NVdNTXE0eXpXekRaVlNQUC9GTmNuaUVmaUU1?=
- =?gb2312?Q?DC98=3D?=
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.41; Fri, 1 Mar
+ 2024 02:02:32 +0000
+Received: from CO1PEPF000042A7.namprd03.prod.outlook.com
+ (2603:10b6:a03:331:cafe::2f) by SJ0PR03CA0075.outlook.office365.com
+ (2603:10b6:a03:331::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.32 via Frontend
+ Transport; Fri, 1 Mar 2024 02:02:31 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ CO1PEPF000042A7.mail.protection.outlook.com (10.167.243.36) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7292.25 via Frontend Transport; Fri, 1 Mar 2024 02:02:29 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 29 Feb
+ 2024 18:02:20 -0800
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Thu, 29 Feb 2024 18:02:19 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
+ Transport; Thu, 29 Feb 2024 18:02:17 -0800
+From: William Tu <witu@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <jiri@nvidia.com>, <bodong@nvidia.com>, <tariqt@nvidia.com>,
+	<yossiku@nvidia.com>, <kuba@kernel.org>, <witu@nvidia.com>
+Subject: [PATCH RFC v2 iproute2-next] devlink: Add eswitch attr option for shared descriptors
+Date: Fri, 1 Mar 2024 04:02:14 +0200
+Message-ID: <20240301020214.8122-1-witu@nvidia.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DB6PR04MB3141.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 39cf8ca1-f74c-416c-5726-08dc3991d955
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Mar 2024 01:49:35.8641
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000042A7:EE_|DS0PR12MB7747:EE_
+X-MS-Office365-Filtering-Correlation-Id: fcc71992-f128-4899-b4d1-08dc3993a6c0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	b8yAXAcvZcKDRh7GlJ5bTrNdXmvphYqzGNUTvggbf2U5MW4sjhVptxWQ+Hw5zHu6YegbkTAXPDLXqexY5ScHDCh0lA3iValYogJ3xJ/u3gmtkJuJTgx46rp1hAXaESOK8+6UrK0uJ3IrnhvRD7fFvu9xI4Q52E0v/L1VDaPh0qx7mMnkGmN7mOxf6s1dvyto34qBHzIwFxXxN3Iwlo9JlIpLOQTDfo8RRn+daonz8pXl05MRooJunHfY67u8ZdQy2VhoAnsi2O7hbKWOS1sb0yawJDTfK9IM3l6uk17S9jA/Axuz/Nb+Nr7DfDiT8QZhR+JbW2Lkio9JR0FBzSIaQWVzALhZuBZEsVP2yEGeSreOaAfREEU/nJLXRXhFv4bPV7YpklXdcVeThN5ioyhJNcm28GgsUcl5TKZu7yx6a4z5JWHCp+RNGMlz42Oh5JdH3bTZv8yYJD6u9rwDkXD0c993vHFcDpySg2AF/1GtjMLJvCj+I9ZgveFnpjriN1HiA3aN/soT0enGp0P2UC+GgRmA0e49PZq0EUa6OEIL5lDuUXhf/fRws+VXur+FSqGRReJKgBSk5Rpl9Y++TrA16F0UnuR1iw9C7CXwiKhllT8qXKDkO5JnkqYCxUmjN+l8FPOcWnuYCPOQ3YXH/ktXjYux2+jLYOH7+y+lc/rLcxlgILbwDHHpsgTPmUYH94HQjoSLI+pMff99mEg/w9uMMnARellk1yQL4dA7nIYTL1sZKDS16+jzeJf9NgMoSzcu
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(82310400014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Mar 2024 02:02:29.9609
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xSISWma6+tWY5wZtU92bn7sOkbqEAldW4HhXUq2l0RT5qT94pv9U5Tw9ZdQfzNCULqSsjF1bsuF/5jR77fSVeA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB9208
+X-MS-Exchange-CrossTenant-Network-Message-Id: fcc71992-f128-4899-b4d1-08dc3993a6c0
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000042A7.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7747
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKb2huIEVybmJlcmcgPGpvaG4u
-ZXJuYmVyZ0BhY3RpYS5zZT4NCj4gU2VudDogMjAyNMTqMtTCMjnI1SAxODo1Mw0KPiBUbzogV2Vp
-IEZhbmcgPHdlaS5mYW5nQG54cC5jb20+DQo+IENjOiBTaGVud2VpIFdhbmcgPHNoZW53ZWkud2Fu
-Z0BueHAuY29tPjsgQ2xhcmsgV2FuZw0KPiA8eGlhb25pbmcud2FuZ0BueHAuY29tPjsgZGwtbGlu
-dXgtaW14IDxsaW51eC1pbXhAbnhwLmNvbT47IERhdmlkIFMuDQo+IE1pbGxlciA8ZGF2ZW1AZGF2
-ZW1sb2Z0Lm5ldD47IEVyaWMgRHVtYXpldCA8ZWR1bWF6ZXRAZ29vZ2xlLmNvbT47DQo+IEpha3Vi
-IEtpY2luc2tpIDxrdWJhQGtlcm5lbC5vcmc+OyBQYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5j
-b20+Ow0KPiBIZWluZXIgS2FsbHdlaXQgPGhrYWxsd2VpdDFAZ21haWwuY29tPjsgbmV0ZGV2QHZn
-ZXIua2VybmVsLm9yZzsNCj4gbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgSm9obiBFcm5i
-ZXJnIDxqb2huLmVybmJlcmdAYWN0aWEuc2U+DQo+IFN1YmplY3Q6IFtQQVRDSCBuZXQgdjIgMi8y
-XSBuZXQ6IGZlYzogU3VzcGVuZCBhbmQgcmVzdW1lIHRoZSBQSFkNCj4gDQo+IFBIWXMgdGhhdCBh
-cmUgYWx3YXlzLW9uIHdpbGwgbm90IGVudGVyIHRoZWlyIGxvdyBwb3dlciBtb2RlcyBvdGhlcndp
-c2UgYXMNCj4gdGhleSBoYXZlIG5vIHJlZ3VsYXRvciB0byBiZSBwb3dlcmVkIG9mZiB3aXRoLg0K
-PiANCj4gU2luY2UgdGhlIFBIWSBpcyBwaWNrZWQgdXAgdmlhIHtvZl8sfXBoeV9jb25uZWN0KCkg
-YW5kIGRyb3BwZWQgd2l0aA0KPiBwaHlfZGlzY29ubmVjdCgpIHdoZW4gdGhlIGxpbmsgaXMgYnJv
-dWdodCB1cCBhbmQgZG93biByZXNwZWN0aXZlbHkgdGhlIG9ubHkNCj4gY2FzZXMgd2VyZSBwbSBp
-cyBuZWVkZWQgaXMgd2hlbiB0aGUgbmV0aWYgaXMgcnVubmluZyBvciBvciB3aGVuIHRoZSBsaW5r
-DQpuaXQ6IHdoZXJlDQoNCj4gaGFzIG5ldmVyIGJlZW4gdXAuDQo+IA0KPiBUbyBkZWFsIHdpdGgg
-dGhlIGxhdHRlciBjYXNlIHRoZSBQSFkgaXMgc3VzcGVuZGVkIG9uIGRpc2NvdmVyeSBpbiBwcm9i
-ZSwNCj4gc2luY2UgaXQgd29uJ3QgYmUgbmVlZGVkIHVudGlsIGxpbmsgdXAuDQo+IA0KPiBGaXhl
-czogNTU3ZDVkYzgzZjY4ICgibmV0OiBmZWM6IHVzZSBtYWMtbWFuYWdlZCBQSFkgUE0iKQ0KSSdt
-IG5vdCBzdXJlIHdoZXRoZXIgdGhpcyBjb21taXQgc2hvdWxkIGJlIGJsYW1lZC4gQWZ0ZXIgY2hl
-Y2tpbmcgbXkgbG9jYWwNCmNvZGUgKG5vdCB0aGUgcmVjZW50IHVwc3RyZWFtIGNvZGUpLCBmZWNf
-c3VzcGVuZCgpIHdpbGwgbWFrZSB0aGUgUEhZIGVudGVyIA0Kc3VzcGVuZCBtb2RlIHdoZW4gY2Fs
-bGluZyBwaHlfc3RvcCgpLCB0aGUgc3BlY2lmaWMgbG9naWMgaXMgZmVjX3N1c3BlbmQoKSAtLT4N
-CnBoeV9zdG9wKCkgLS0+IHBoeV9zdGF0ZV9tYWNoaW5lKCkgLS0+IHBoeV9zdXNwZW5kICgpLiBC
-dXQgdGhlIGxhdGVzdCB1cHN0cmVhbQ0KY29kZSBtYXkgaGF2ZSBjaGFuZ2VkIHRoaXMgbG9naWMu
-IEknbSBzb3JyeSB0aGF0IEkgZG9uJ3QgaGF2ZSB0aW1lIHRvIHNpdCBkb3duDQphbmQgbG9vayBh
-dCB0aGUgbGF0ZXN0IGNvZGUuDQoNCj4gU2lnbmVkLW9mZi1ieTogSm9obiBFcm5iZXJnIDxqb2hu
-LmVybmJlcmdAYWN0aWEuc2U+DQo+IC0tLQ0KPiANCj4gdjI6IE5ldyBwYXRjaA0KPiAtLS0NCj4g
-IGRyaXZlcnMvbmV0L2V0aGVybmV0L2ZyZWVzY2FsZS9mZWNfbWFpbi5jIHwgNiArKysrKy0NCj4g
-IDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4gDQo+IGRp
-ZmYgLS1naXQgYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9mcmVlc2NhbGUvZmVjX21haW4uYw0KPiBi
-L2RyaXZlcnMvbmV0L2V0aGVybmV0L2ZyZWVzY2FsZS9mZWNfbWFpbi5jDQo+IGluZGV4IDhkZWNi
-MWIwNzJjNS4uYzUzOTRhNGQ4NDkxIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL25ldC9ldGhlcm5l
-dC9mcmVlc2NhbGUvZmVjX21haW4uYw0KPiArKysgYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9mcmVl
-c2NhbGUvZmVjX21haW4uYw0KPiBAQCAtMjUzOSw4ICsyNTM5LDEwIEBAIHN0YXRpYyBpbnQgZmVj
-X2VuZXRfbWlpX2luaXQoc3RydWN0DQo+IHBsYXRmb3JtX2RldmljZSAqcGRldikNCj4gIAkvKiBm
-aW5kIGFsbCB0aGUgUEhZIGRldmljZXMgb24gdGhlIGJ1cyBhbmQgc2V0IG1hY19tYW5hZ2VkX3Bt
-IHRvIHRydWUNCj4gKi8NCj4gIAlmb3IgKGFkZHIgPSAwOyBhZGRyIDwgUEhZX01BWF9BRERSOyBh
-ZGRyKyspIHsNCj4gIAkJcGh5ZGV2ID0gbWRpb2J1c19nZXRfcGh5KGZlcC0+bWlpX2J1cywgYWRk
-cik7DQo+IC0JCWlmIChwaHlkZXYpDQo+ICsJCWlmIChwaHlkZXYpIHsNCj4gIAkJCXBoeWRldi0+
-bWFjX21hbmFnZWRfcG0gPSB0cnVlOw0KPiArCQkJcGh5X3N1c3BlbmQocGh5ZGV2KTsNCj4gKwkJ
-fQ0KPiAgCX0NCj4gDQo+ICAJbWlpX2NudCsrOw0KPiBAQCAtNDYzMSw2ICs0NjMzLDcgQEAgc3Rh
-dGljIGludCBfX21heWJlX3VudXNlZCBmZWNfc3VzcGVuZChzdHJ1Y3QNCj4gZGV2aWNlICpkZXYp
-DQo+ICAJCWlmIChmZXAtPndvbF9mbGFnICYgRkVDX1dPTF9GTEFHX0VOQUJMRSkNCj4gIAkJCWZl
-cC0+d29sX2ZsYWcgfD0gRkVDX1dPTF9GTEFHX1NMRUVQX09OOw0KPiAgCQlwaHlfc3RvcChuZGV2
-LT5waHlkZXYpOw0KPiArCQlwaHlfc3VzcGVuZChuZGV2LT5waHlkZXYpOw0KQXMgSSBhZm9yZW1l
-bnRpb25lZCwgaWYgcGh5X3N0b3AoKSBkb2VzIG5vdCBzdXNwZW5kIHRoZSBQSFkgaW4gdGhlIGxh
-dGVzdA0KY29kZSwgaXMgaXQgbW9yZSBnZW5lcmFsIHRvIHJlc3RvcmUgdGhlIHN1c3BlbmQgb3Bl
-cmF0aW9uIGluIHBoeV9zdG9wKCk/DQoNCj4gIAkJbmFwaV9kaXNhYmxlKCZmZXAtPm5hcGkpOw0K
-PiAgCQluZXRpZl90eF9sb2NrX2JoKG5kZXYpOw0KPiAgCQluZXRpZl9kZXZpY2VfZGV0YWNoKG5k
-ZXYpOw0KPiBAQCAtNDcxNiw2ICs0NzE5LDcgQEAgc3RhdGljIGludCBfX21heWJlX3VudXNlZCBm
-ZWNfcmVzdW1lKHN0cnVjdA0KPiBkZXZpY2UgKmRldikNCj4gIAkJbmV0aWZfdHhfdW5sb2NrX2Jo
-KG5kZXYpOw0KPiAgCQluYXBpX2VuYWJsZSgmZmVwLT5uYXBpKTsNCj4gIAkJcGh5X2luaXRfaHco
-bmRldi0+cGh5ZGV2KTsNCj4gKwkJcGh5X3Jlc3VtZShuZGV2LT5waHlkZXYpOw0KPiAgCQlwaHlf
-c3RhcnQobmRldi0+cGh5ZGV2KTsNCj4gIAl9DQo+ICAJcnRubF91bmxvY2soKTsNCj4gLS0NCj4g
-Mi40My4wDQo=
+Add two eswitch attrs: shrdesc_mode and shrdesc_count.
+shrdesc_mode: to enable a sharing memory buffer for
+representor's rx buffer, and shrdesc_count: to control the
+number of buffers in this shared memory pool.
+
+An example use case:
+  $ devlink dev eswitch show pci/0000:08:00.0
+    pci/0000:08:00.0: mode legacy inline-mode none encap-mode basic \
+    shrdesc-mode none shrdesc-count 0
+  $ devlink dev eswitch set pci/0000:08:00.0 mode switchdev \
+    shrdesc-mode basic shrdesc-count 1024
+  $ devlink dev eswitch show pci/0000:08:00.0
+    pci/0000:08:00.0: mode switchdev inline-mode none encap-mode basic \
+    shrdesc-mode basic shrdesc-count 1024
+
+Signed-off-by: William Tu <witu@nvidia.com>
+---
+Discussions:
+https://lore.kernel.org/netdev/20240201193050.3b19111b@kernel.org/
+
+Corresponding kernel code:
+https://lore.kernel.org/netdev/20240228015954.11981-1-witu@nvidia.com/
+
+v2: feedback from Stephen
+- add man page, send to iproute2-next
+---
+ devlink/devlink.c            | 83 +++++++++++++++++++++++++++++++++++-
+ include/uapi/linux/devlink.h |  7 +++
+ man/man8/devlink-dev.8       | 18 ++++++++
+ 3 files changed, 106 insertions(+), 2 deletions(-)
+
+diff --git a/devlink/devlink.c b/devlink/devlink.c
+index dbeb6e397e8e..affc29eb7cad 100644
+--- a/devlink/devlink.c
++++ b/devlink/devlink.c
+@@ -53,6 +53,9 @@
+ #define ESWITCH_ENCAP_MODE_NONE "none"
+ #define ESWITCH_ENCAP_MODE_BASIC "basic"
+ 
++#define ESWITCH_SHRDESC_MODE_NONE "none"
++#define ESWITCH_SHRDESC_MODE_BASIC "basic"
++
+ #define PARAM_CMODE_RUNTIME_STR "runtime"
+ #define PARAM_CMODE_DRIVERINIT_STR "driverinit"
+ #define PARAM_CMODE_PERMANENT_STR "permanent"
+@@ -309,6 +312,8 @@ static int ifname_map_update(struct ifname_map *ifname_map, const char *ifname)
+ #define DL_OPT_PORT_FN_RATE_TX_PRIORITY	BIT(55)
+ #define DL_OPT_PORT_FN_RATE_TX_WEIGHT	BIT(56)
+ #define DL_OPT_PORT_FN_CAPS	BIT(57)
++#define DL_OPT_ESWITCH_SHRDESC_MODE	BIT(58)
++#define DL_OPT_ESWITCH_SHRDESC_COUNT	BIT(59)
+ 
+ struct dl_opts {
+ 	uint64_t present; /* flags of present items */
+@@ -375,6 +380,8 @@ struct dl_opts {
+ 	const char *linecard_type;
+ 	bool selftests_opt[DEVLINK_ATTR_SELFTEST_ID_MAX + 1];
+ 	struct nla_bitfield32 port_fn_caps;
++	enum devlink_eswitch_shrdesc_mode eswitch_shrdesc_mode;
++	uint32_t eswitch_shrdesc_count;
+ };
+ 
+ struct dl {
+@@ -630,6 +637,8 @@ static const enum mnl_attr_data_type devlink_policy[DEVLINK_ATTR_MAX + 1] = {
+ 	[DEVLINK_ATTR_ESWITCH_MODE] = MNL_TYPE_U16,
+ 	[DEVLINK_ATTR_ESWITCH_INLINE_MODE] = MNL_TYPE_U8,
+ 	[DEVLINK_ATTR_ESWITCH_ENCAP_MODE] = MNL_TYPE_U8,
++	[DEVLINK_ATTR_ESWITCH_SHRDESC_MODE] = MNL_TYPE_U8,
++	[DEVLINK_ATTR_ESWITCH_SHRDESC_COUNT] = MNL_TYPE_U32,
+ 	[DEVLINK_ATTR_DPIPE_TABLES] = MNL_TYPE_NESTED,
+ 	[DEVLINK_ATTR_DPIPE_TABLE] = MNL_TYPE_NESTED,
+ 	[DEVLINK_ATTR_DPIPE_TABLE_NAME] = MNL_TYPE_STRING,
+@@ -1464,6 +1473,21 @@ eswitch_encap_mode_get(const char *typestr,
+ 	return 0;
+ }
+ 
++static int
++eswitch_shrdesc_mode_get(const char *typestr,
++			 enum devlink_eswitch_shrdesc_mode *p_shrdesc_mode)
++{
++	if (strcmp(typestr, ESWITCH_SHRDESC_MODE_NONE) == 0) {
++		*p_shrdesc_mode = DEVLINK_ESWITCH_SHRDESC_MODE_NONE;
++	} else if (strcmp(typestr, ESWITCH_SHRDESC_MODE_BASIC) == 0) {
++		*p_shrdesc_mode = DEVLINK_ESWITCH_SHRDESC_MODE_BASIC;
++	} else {
++		pr_err("Unknown eswitch shrdesc mode \"%s\"\n", typestr);
++		return -EINVAL;
++	}
++	return 0;
++}
++
+ static int flash_overwrite_section_get(const char *sectionstr, uint32_t *mask)
+ {
+ 	if (strcmp(sectionstr, "settings") == 0) {
+@@ -1672,6 +1696,8 @@ static const struct dl_args_metadata dl_args_required[] = {
+ 	{DL_OPT_LINECARD,	      "Linecard index expected."},
+ 	{DL_OPT_LINECARD_TYPE,	      "Linecard type expected."},
+ 	{DL_OPT_SELFTESTS,            "Test name is expected"},
++	{DL_OPT_ESWITCH_SHRDESC_MODE, "E-Switch shared descriptors option expected."},
++	{DL_OPT_ESWITCH_SHRDESC_COUNT,"E-Switch shared descriptors count expected."},
+ };
+ 
+ static int dl_args_finding_required_validate(uint64_t o_required,
+@@ -1895,6 +1921,26 @@ static int dl_argv_parse(struct dl *dl, uint64_t o_required,
+ 			if (err)
+ 				return err;
+ 			o_found |= DL_OPT_ESWITCH_ENCAP_MODE;
++		} else if ((dl_argv_match(dl, "shrdesc-mode")) &&
++			   (o_all & DL_OPT_ESWITCH_SHRDESC_MODE)) {
++			const char *typestr;
++
++			dl_arg_inc(dl);
++			err = dl_argv_str(dl, &typestr);
++			if (err)
++				return err;
++			err = eswitch_shrdesc_mode_get(typestr,
++						       &opts->eswitch_shrdesc_mode);
++			if (err)
++				return err;
++			o_found |= DL_OPT_ESWITCH_SHRDESC_MODE;
++		} else if (dl_argv_match(dl, "shrdesc-count") &&
++			   (o_all & DL_OPT_ESWITCH_SHRDESC_COUNT)) {
++			dl_arg_inc(dl);
++			err = dl_argv_uint32_t(dl, &opts->eswitch_shrdesc_count);
++			if (err)
++				return err;
++			o_found |= DL_OPT_ESWITCH_SHRDESC_COUNT;
+ 		} else if (dl_argv_match(dl, "path") &&
+ 			   (o_all & DL_OPT_RESOURCE_PATH)) {
+ 			dl_arg_inc(dl);
+@@ -2547,6 +2593,12 @@ static void dl_opts_put(struct nlmsghdr *nlh, struct dl *dl)
+ 	if (opts->present & DL_OPT_ESWITCH_ENCAP_MODE)
+ 		mnl_attr_put_u8(nlh, DEVLINK_ATTR_ESWITCH_ENCAP_MODE,
+ 				opts->eswitch_encap_mode);
++	if (opts->present & DL_OPT_ESWITCH_SHRDESC_MODE)
++		mnl_attr_put_u8(nlh, DEVLINK_ATTR_ESWITCH_SHRDESC_MODE,
++				opts->eswitch_shrdesc_mode);
++	if (opts->present & DL_OPT_ESWITCH_SHRDESC_COUNT)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_ESWITCH_SHRDESC_COUNT,
++				 opts->eswitch_shrdesc_count);
+ 	if ((opts->present & DL_OPT_RESOURCE_PATH) && opts->resource_id_valid)
+ 		mnl_attr_put_u64(nlh, DEVLINK_ATTR_RESOURCE_ID,
+ 				 opts->resource_id);
+@@ -2707,6 +2759,8 @@ static void cmd_dev_help(void)
+ 	pr_err("       devlink dev eswitch set DEV [ mode { legacy | switchdev } ]\n");
+ 	pr_err("                               [ inline-mode { none | link | network | transport } ]\n");
+ 	pr_err("                               [ encap-mode { none | basic } ]\n");
++	pr_err("                               [ shrdesc-mode { none | basic } ]\n");
++	pr_err("                               [ shrdesc-count { VALUE } ]\n");
+ 	pr_err("       devlink dev eswitch show DEV\n");
+ 	pr_err("       devlink dev param set DEV name PARAMETER value VALUE cmode { permanent | driverinit | runtime }\n");
+ 	pr_err("       devlink dev param show [DEV name PARAMETER]\n");
+@@ -3172,6 +3226,18 @@ static const char *eswitch_encap_mode_name(uint32_t mode)
+ 	}
+ }
+ 
++static const char *eswitch_shrdesc_mode_name(uint8_t mode)
++{
++	switch (mode) {
++	case DEVLINK_ESWITCH_SHRDESC_MODE_NONE:
++		return ESWITCH_SHRDESC_MODE_NONE;
++	case DEVLINK_ESWITCH_SHRDESC_MODE_BASIC:
++		return ESWITCH_SHRDESC_MODE_BASIC;
++	default:
++		return "<unknown mode>";
++	}
++}
++
+ static void pr_out_eswitch(struct dl *dl, struct nlattr **tb)
+ {
+ 	__pr_out_handle_start(dl, tb, true, false);
+@@ -3194,7 +3260,18 @@ static void pr_out_eswitch(struct dl *dl, struct nlattr **tb)
+ 			     eswitch_encap_mode_name(mnl_attr_get_u8(
+ 				    tb[DEVLINK_ATTR_ESWITCH_ENCAP_MODE])));
+ 	}
+-
++	if (tb[DEVLINK_ATTR_ESWITCH_SHRDESC_MODE]) {
++		check_indent_newline(dl);
++		print_string(PRINT_ANY, "shrdesc-mode", "shrdesc-mode %s",
++			     eswitch_shrdesc_mode_name(mnl_attr_get_u8(
++				    tb[DEVLINK_ATTR_ESWITCH_SHRDESC_MODE])));
++	}
++	if (tb[DEVLINK_ATTR_ESWITCH_SHRDESC_COUNT]) {
++		check_indent_newline(dl);
++		print_uint(PRINT_ANY, "shrdesc-count", "shrdesc-count %u",
++			   mnl_attr_get_u32(
++				    tb[DEVLINK_ATTR_ESWITCH_SHRDESC_COUNT]));
++	}
+ 	pr_out_handle_end(dl);
+ }
+ 
+@@ -3239,7 +3316,9 @@ static int cmd_dev_eswitch_set(struct dl *dl)
+ 	err = dl_argv_parse(dl, DL_OPT_HANDLE,
+ 			    DL_OPT_ESWITCH_MODE |
+ 			    DL_OPT_ESWITCH_INLINE_MODE |
+-			    DL_OPT_ESWITCH_ENCAP_MODE);
++			    DL_OPT_ESWITCH_ENCAP_MODE |
++			    DL_OPT_ESWITCH_SHRDESC_MODE |
++			    DL_OPT_ESWITCH_SHRDESC_COUNT);
+ 	if (err)
+ 		return err;
+ 
+diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+index e77170199815..494a4b61f917 100644
+--- a/include/uapi/linux/devlink.h
++++ b/include/uapi/linux/devlink.h
+@@ -195,6 +195,11 @@ enum devlink_eswitch_encap_mode {
+ 	DEVLINK_ESWITCH_ENCAP_MODE_BASIC,
+ };
+ 
++enum devlink_eswitch_shrdesc_mode {
++	DEVLINK_ESWITCH_SHRDESC_MODE_NONE,
++	DEVLINK_ESWITCH_SHRDESC_MODE_BASIC,
++};
++
+ enum devlink_port_flavour {
+ 	DEVLINK_PORT_FLAVOUR_PHYSICAL, /* Any kind of a port physically
+ 					* facing the user.
+@@ -614,6 +619,8 @@ enum devlink_attr {
+ 
+ 	DEVLINK_ATTR_REGION_DIRECT,		/* flag */
+ 
++	DEVLINK_ATTR_ESWITCH_SHRDESC_MODE,      /* u8 */
++	DEVLINK_ATTR_ESWITCH_SHRDESC_COUNT,     /* u32 */
+ 	/* add new attributes above here, update the policy in devlink.c */
+ 
+ 	__DEVLINK_ATTR_MAX,
+diff --git a/man/man8/devlink-dev.8 b/man/man8/devlink-dev.8
+index e9d091df48d8..4df055778868 100644
+--- a/man/man8/devlink-dev.8
++++ b/man/man8/devlink-dev.8
+@@ -34,6 +34,10 @@ devlink-dev \- devlink device configuration
+ .BR inline-mode " { " none " | " link " | " network " | " transport " } "
+ ] [
+ .BR encap-mode " { " none " | " basic " } "
++] [
++.BR shrdesc-mode " { " none " | " basic " } "
++] [
++.BR shrdesc-count " { COUNT } "
+ ]
+ 
+ .ti -8
+@@ -151,6 +155,20 @@ Set eswitch encapsulation support
+ .I basic
+ - Enable encapsulation support
+ 
++.TP
++.BR shrdesc-mode " { " none " | " basic " } "
++Set eswitch shared descriptor support for eswitch representors.
++
++.I none
++- Disable shared descriptor support for eswitch representor's rx ring.
++
++.I basic
++- Enable shared descriptor support for eswitch representor's rx ring.
++
++.TP
++.BR shrdesc-count " COUNT"
++Set the number of entries in shared descriptor pool.
++
+ .SS devlink dev param set  - set new value to devlink device configuration parameter
+ 
+ .TP
+-- 
+2.38.1
+
 
