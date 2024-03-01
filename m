@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-76558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8F7986E3BC
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 15:50:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CB1986E3BF
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 15:53:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 143A41C22A09
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 14:50:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4590C28787E
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 14:53:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A123985A;
-	Fri,  1 Mar 2024 14:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6723A39879;
+	Fri,  1 Mar 2024 14:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tUADbGwv"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Tx+ZUBH7"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAF63987D;
-	Fri,  1 Mar 2024 14:50:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73EF93A8CD;
+	Fri,  1 Mar 2024 14:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709304604; cv=none; b=iVc/ytKW9p5rTr2wXrEsRBhF5C1KtmWXXHUTvWmPJ/V3IzUxoxYMnym/zNaFFX4TB/bHO4IoMHX2P8T5lHC9j7+fmjhBmDuQJd4ggn1gzanYSrvuQ2XKiq15a2MnklBTFRH0XS68twIyDKkzNT6xzlxIm9ZktzfKsGZ4djrYNhE=
+	t=1709304792; cv=none; b=BVwJdlKL6nIGHV3k0LuxRw7qkNLaWPH6BRPSIN9e9Hb/y0DeGCpL6W9Yu93cHwukEL+1YZYD34YYBIRb6jQc494qNu9hyJZFICAJp4TZRjZ32B2fhTIzEvuxPFwp9kjKe2AAcIqMfRpE4ac0SPagu1yDTUgiWaZnRFNE+MORmHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709304604; c=relaxed/simple;
-	bh=PDHQCj4dKUL8VGBu7R8FZ4rplBEM7DCMytyrNrWGZ6E=;
+	s=arc-20240116; t=1709304792; c=relaxed/simple;
+	bh=0rqGQ/mRJgX9xBzI0NJWqEosNzR6bw1GqPDwNMKQOaE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hLRvMxKTviw1P/+9mz9E8Bb197crJhihjS53rW1ry+etNeWzIb51quy7bcyfVau2rrkzQlDFih1nM8heNo9WfeXxx5t7S6cKUkiFr6Tj96OwwO5AWGEJHpjSQzgqcOSChU7wk+grGCyj9Chotpr9G3vfh22LaFravvcZBw2g17E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=tUADbGwv; arc=none smtp.client-ip=78.32.30.218
+	 Content-Type:Content-Disposition:In-Reply-To; b=VEwcUMhWKfGYXFeT8uQgpf1VrgWFUVw64p4xuiFl9nlvFC8bVy8jfObdUt3BT5yzncXrkdgH78aStohVKVBDtk1haW4haX02IVnzHjsUvCN3Yj4eSPOa7tVh9MwTLrCw1giBFdbPE1Gr70GTyDcgBi3TmxqQoHojX6mXpB/q5aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Tx+ZUBH7; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,22 +37,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=yYU2P/XionBukymtyfAivEvDMyJYX93BV07iZlCfOYE=; b=tUADbGwvT+bsqxHHRHjijlFIck
-	/MxOPOG46qCY9h2+BenQw2uzIhrLdYBDgLxjbu8yWYH7flCOABA55iFsEg9N7dxj1gxDw59UDU9r8
-	tpqrWyKZV+yEY4ka3CG07cwSmMkGzDPsTgzkpHKtgWR+Y8lFiTbSGPB0p7OpjA9uwLcjTIUElDlks
-	ja7yEhTbbw+CbXM14OppCextPo810gFu2NaEQ4z/wCi/q2sXlu6fcoA+6HJjhcx78eVS5akivlXgA
-	zxJ8PntBaP2UA2YMn5sWKulvyHNYylCYIl7lcOiwUkvMT+PrbAOxz2jt8n+ke4U0TaQWDMmgriaer
-	3WJOsdqA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49086)
+	bh=AT6eJ8FbJZluUkWHSqnmRN5cAns9tdGhp7LuFi8TsNQ=; b=Tx+ZUBH7Yrwr3nkLWDaTULDEJ3
+	ICj4TMORGivcz/D+6rFRv5mH5+pZsJVWjKSi5ZPeIcRFRHmYaLc+JzlCMZrOrlB3fjOJjUkhB8B/t
+	4Ia2B54fKKGPXCUbg+S+KtQfXYxCVeqlX/u+C/XSSrbCyLCS8F5OVkEqqT8zK/qZPBLgAOQLg87ow
+	Z+S536rHtuUMoKK/WlknGstZu/xZlOfdpLWHVhfVDFD3jBPasQ8BmYHdUadVSP1B/TivhV+g6F3bC
+	QNpfCRso7XT9B6QB5nFN4fLMsNWefbIsWTMmgBgso9/EMjj+MJErx+ngaTpu/MLwKlKYrWUhLiDHk
+	nGA4riYg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51756)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1rg4Cj-0001iq-1A;
-	Fri, 01 Mar 2024 14:49:41 +0000
+	id 1rg4Fv-0001jG-2K;
+	Fri, 01 Mar 2024 14:52:59 +0000
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rg4Cc-0001p9-1m; Fri, 01 Mar 2024 14:49:34 +0000
-Date: Fri, 1 Mar 2024 14:49:33 +0000
+	id 1rg4Fu-0001pG-Ac; Fri, 01 Mar 2024 14:52:58 +0000
+Date: Fri, 1 Mar 2024 14:52:58 +0000
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
 To: arinc.unal@arinc9.com
 Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
@@ -69,11 +69,11 @@ Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v3 1/9] net: dsa: mt7530: remove
- .mac_port_config for MT7988 and make it optional
-Message-ID: <ZeHq/ZoVqMD9BojD@shell.armlinux.org.uk>
+Subject: Re: [PATCH net-next v3 4/9] net: dsa: mt7530: get rid of useless
+ error returns on phylink code path
+Message-ID: <ZeHrykYQd1SWJIN/@shell.armlinux.org.uk>
 References: <20240301-for-netnext-mt7530-improvements-3-v3-0-449f4f166454@arinc9.com>
- <20240301-for-netnext-mt7530-improvements-3-v3-1-449f4f166454@arinc9.com>
+ <20240301-for-netnext-mt7530-improvements-3-v3-4-449f4f166454@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,30 +83,32 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240301-for-netnext-mt7530-improvements-3-v3-1-449f4f166454@arinc9.com>
+In-Reply-To: <20240301-for-netnext-mt7530-improvements-3-v3-4-449f4f166454@arinc9.com>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Mar 01, 2024 at 12:42:57PM +0200, Arınç ÜNAL via B4 Relay wrote:
+On Fri, Mar 01, 2024 at 12:43:00PM +0200, Arınç ÜNAL via B4 Relay wrote:
 > From: Arınç ÜNAL <arinc.unal@arinc9.com>
 > 
-> For the switch on the MT7988 SoC, the mac_port_config member for ID_MT7988
-> in mt753x_table is not needed as the interfaces of all MACs are already
-> handled on mt7988_mac_port_get_caps().
+> Remove error returns on the cases where they are already handled with the
+> function the mac_port_get_caps member in mt753x_table points to.
 > 
-> Therefore, remove the mac_port_config member from ID_MT7988 in
-> mt753x_table. Before calling priv->info->mac_port_config(), if there's no
-> mac_port_config member in mt753x_table, exit mt753x_mac_config()
-> successfully.
+> mt7531_mac_config() is also called from mt7531_cpu_port_config() outside of
+> phylink but the port and interface modes are already handled there.
 > 
-> Remove calling priv->info->mac_port_config() from the sanity check as the
-> sanity check requires a pointer to a mac_port_config function to be
-> non-NULL. This will fail for MT7988 as mac_port_config won't be a member of
-> its info table.
+> Change the functions and the mac_port_config function pointer to void now
+> that there're no error returns anymore.
 > 
-> Co-developed-by: Daniel Golle <daniel@makrotopia.org>
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> Remove mt753x_is_mac_port() that used to help the said error returns.
+> 
+> On mt7531_mac_config(), switch to if statements to simplify the code.
+> 
+> Remove internal phy cases from mt753x_phylink_mac_config(), there is no
+> need to check the interface mode as that's already handled with the
+> function the mac_port_get_caps member in mt753x_table points to.
+> 
+> Acked-by: Daniel Golle <daniel@makrotopia.org>
+> Tested-by: Daniel Golle <daniel@makrotopia.org>
 > Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
 Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
