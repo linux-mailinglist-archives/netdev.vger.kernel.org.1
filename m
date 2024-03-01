@@ -1,329 +1,127 @@
-Return-Path: <netdev+bounces-76434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 622DF86DBB8
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 07:53:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07C5486DBBF
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 07:59:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 563501C23758
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 06:53:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96624B251C7
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 06:59:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 389C669951;
-	Fri,  1 Mar 2024 06:53:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3207692FE;
+	Fri,  1 Mar 2024 06:59:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lrTdj711"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VcS3hDub"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E5D69310
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 06:53:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3DA18464;
+	Fri,  1 Mar 2024 06:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709276000; cv=none; b=fZoc9vl6aqAgBEZh6mOPj30y6guyhdWir30IMhsCKNxvkM80YvzAHWCRkmfg1k8PPkWXNMWfwIv5iJfMo/FJwE6+AvKIlEpikXued/mobaDmEteoTdvMHcle5Q9fe79W3WAwFjERGXlHJerHjH8Ht+mPN4R8824LeA92hVdO8UA=
+	t=1709276352; cv=none; b=YYiWMho4ncPBrKmR7qBDE+LiG/Q4AFohxtav2IWSVEsQo2t7Fh98b/+9kGQybx68kBGxP+l8qUiB2Fap1Ys8D9+Yjbk9cobOtNPzIXpBlTqZJ2gf0wGwrs3YDcKq8gcbNLkgiFraovhHueyVq8dmzMORz/oYg4aVC2FsAfcO6fY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709276000; c=relaxed/simple;
-	bh=e+pGzNnI82Ylax5Vbf1gmtIlH2eMeT6fQCrZkrOgc3s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NuLDHE8sQy2KiU8nkCNRSEmlWhmgXS83HKLj9Ii2/7E2Y8oC0t4b/2sE/KIZ4GXEOE+yHt2hCRxb9CMwkuyYQdqR5xI4gNVyk3B277gHpE3SwtGfbOa2r26ePSeVz4AEImgxMdPIqd5JcpXbzeSPkdba+4gs0pg5e+XV/h5c1PI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lrTdj711; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9eff9a51-a945-48f6-9d14-a484b7c0d04c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709275992;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wo9twMGICbdoOxyQ6GLsYx/nQhq0DMpbpqjiav0rSys=;
-	b=lrTdj711iELnXJBNzGvwxNdbSk16vCcaQrbncv69xaOFDBMKIMXBxhJTACubpXq1M9uUyH
-	zDj+sQjm/0RjnjAUv0oVd60P/CTE1hwivpSLfxsnNnJoNs8IeJqfMkLSpy/s0zP50LwsZh
-	R37/rgQZhRRUcnHYS1yLVz5nVCrpeR8=
-Date: Thu, 29 Feb 2024 22:53:01 -0800
+	s=arc-20240116; t=1709276352; c=relaxed/simple;
+	bh=jL1paCHEOa9QLVRu5Ik8YUZsHarWWAgotaMOmfcOHv0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tFPzhGCzLnLm8p/2zRqmYJfhdVUsTsWB1lmO+JlseHzD4a0H2HVy6oZd4XZED+MTNduIuzhKrz6+KHHmYTUOLU/eECkhGEJVJplS++CAYt4M2h+APejmTpCh2C/hCOt8ED3UHVjCkMRUcmw8zkQtMaXtVm1zvLoahROo7iLG8bI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VcS3hDub; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95CD6C433C7;
+	Fri,  1 Mar 2024 06:59:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709276352;
+	bh=jL1paCHEOa9QLVRu5Ik8YUZsHarWWAgotaMOmfcOHv0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VcS3hDub6/Yc/PAbRjoUwgS8EtjeYp8Fw7QbenSaHDgjcV2ngKGKtCWzx4IS1E0pn
+	 ZTm3hvXBHI0TI4h/yNEVKEBnwC1v3YDu8QO0BY4tsRzKs0w42F73XhNf4Zb9aC3A8v
+	 LQPnh8BaZqjOfUN7N+Jml5NF5iAxW2YOLAHy0wb4MQIXcSaDkljxuKmuYPPgdh5D+i
+	 2rY6QXASkRSPICmAcCph2Ha7GQp2DreG8P2pQqXlU2OOEOgueZPUDUmMIcTCIYGjzN
+	 guFkKnFmP2ths4UFOjhbHqbFaSvcO6AOTNH+gROcGZB+4yGVi2W3uysUiR8UclLZ/7
+	 cU0nJSpFlf1CQ==
+Date: Thu, 29 Feb 2024 22:59:10 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, "Gustavo A. R. Silva"
+ <gustavoars@kernel.org>, netdev@vger.kernel.org,
+ linux-hardening@vger.kernel.org, Simon Horman <horms@kernel.org>, Jiri
+ Pirko <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>, Coco Li
+ <lixiaoyan@google.com>, Amritha Nambiar <amritha.nambiar@intel.com>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] netdev: Use flexible array for trailing private bytes
+Message-ID: <20240229225910.79e224cf@kernel.org>
+In-Reply-To: <20240229213018.work.556-kees@kernel.org>
+References: <20240229213018.work.556-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v12 14/15] p4tc: add set of P4TC table kfuncs
-Content-Language: en-US
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: deb.chatterjee@intel.com, anjali.singhai@intel.com,
- namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com,
- Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, tomasz.osinski@intel.com,
- jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com,
- horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, daniel@iogearbox.net,
- victor@mojatatu.com, pctammela@mojatatu.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240225165447.156954-1-jhs@mojatatu.com>
- <20240225165447.156954-15-jhs@mojatatu.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20240225165447.156954-15-jhs@mojatatu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 2/25/24 8:54 AM, Jamal Hadi Salim wrote:
-> +struct p4tc_table_entry_act_bpf_params {
+On Thu, 29 Feb 2024 13:30:22 -0800 Kees Cook wrote:
+> Introduce a new struct net_device_priv that contains struct net_device
+> but also accounts for the commonly trailing bytes through the "size" and
+> "data" members.
 
-Will this struct be extended in the future?
+I'm a bit unclear on the benefit. Perhaps I'm unaccustomed to "safe C".
 
-> +	u32 pipeid;
-> +	u32 tblid;
-> +};
-> +
-> +struct p4tc_table_entry_create_bpf_params {
-> +	u32 profile_id;
-> +	u32 pipeid;
-> +	u32 tblid;
-> +};
-> +
+> As many dummy struct net_device instances exist still,
+> it is non-trivial to but this flexible array inside struct net_device
 
-[ ... ]
+put
 
-> diff --git a/include/net/tc_act/p4tc.h b/include/net/tc_act/p4tc.h
-> index c5256d821..155068de0 100644
-> --- a/include/net/tc_act/p4tc.h
-> +++ b/include/net/tc_act/p4tc.h
-> @@ -13,10 +13,26 @@ struct tcf_p4act_params {
->   	u32 tot_params_sz;
->   };
->   
-> +#define P4TC_MAX_PARAM_DATA_SIZE 124
-> +
-> +struct p4tc_table_entry_act_bpf {
-> +	u32 act_id;
-> +	u32 hit:1,
-> +	    is_default_miss_act:1,
-> +	    is_default_hit_act:1;
-> +	u8 params[P4TC_MAX_PARAM_DATA_SIZE];
-> +} __packed;
-> +
-> +struct p4tc_table_entry_act_bpf_kern {
-> +	struct rcu_head rcu;
-> +	struct p4tc_table_entry_act_bpf act_bpf;
-> +};
-> +
->   struct tcf_p4act {
->   	struct tc_action common;
->   	/* Params IDR reference passed during runtime */
->   	struct tcf_p4act_params __rcu *params;
-> +	struct p4tc_table_entry_act_bpf_kern __rcu *act_bpf;
->   	u32 p_id;
->   	u32 act_id;
->   	struct list_head node;
-> @@ -24,4 +40,39 @@ struct tcf_p4act {
->   
->   #define to_p4act(a) ((struct tcf_p4act *)a)
->   
-> +static inline struct p4tc_table_entry_act_bpf *
-> +p4tc_table_entry_act_bpf(struct tc_action *action)
-> +{
-> +	struct p4tc_table_entry_act_bpf_kern *act_bpf;
-> +	struct tcf_p4act *p4act = to_p4act(action);
-> +
-> +	act_bpf = rcu_dereference(p4act->act_bpf);
-> +
-> +	return &act_bpf->act_bpf;
-> +}
-> +
-> +static inline int
-> +p4tc_table_entry_act_bpf_change_flags(struct tc_action *action, u32 hit,
-> +				      u32 dflt_miss, u32 dflt_hit)
-> +{
-> +	struct p4tc_table_entry_act_bpf_kern *act_bpf, *act_bpf_old;
-> +	struct tcf_p4act *p4act = to_p4act(action);
-> +
-> +	act_bpf = kzalloc(sizeof(*act_bpf), GFP_KERNEL);
+Non-trivial, meaning what's the challenge?
+We also do somewhat silly things with netdev lifetime, because we can't
+assume netdev gets freed by netdev_free(). Cleaning up the "embedders"
+would be beneficial for multiple reasons.
 
+> itself. But we can add a sanity check in netdev_priv() to catch any
+> attempts to access the private data of a dummy struct.
+> 
+> Adjust allocation logic to use the new full structure.
+> 
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-[ ... ]
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 118c40258d07..b476809d0bae 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -1815,6 +1815,8 @@ enum netdev_stat_type {
+>  	NETDEV_PCPU_STAT_DSTATS, /* struct pcpu_dstats */
+>  };
+>  
+> +#define	NETDEV_ALIGN		32
 
-> +__bpf_kfunc static struct p4tc_table_entry_act_bpf *
-> +bpf_p4tc_tbl_read(struct __sk_buff *skb_ctx,
+Unless someone knows what this is for it should go.
+Align priv to cacheline size.
 
-The argument could be "struct sk_buff *skb" instead of __sk_buff. Take a look at 
-commit 2f4643934670.
+>  /**
+>   *	struct net_device - The DEVICE structure.
+>   *
 
-> +		  struct p4tc_table_entry_act_bpf_params *params,
-> +		  void *key, const u32 key__sz)
-> +{
-> +	struct sk_buff *skb = (struct sk_buff *)skb_ctx;
-> +	struct net *caller_net;
+> @@ -2665,7 +2673,14 @@ void dev_net_set(struct net_device *dev, struct net *net)
+>   */
+>  static inline void *netdev_priv(const struct net_device *dev)
+>  {
+> -	return (char *)dev + ALIGN(sizeof(struct net_device), NETDEV_ALIGN);
+> +	struct net_device_priv *priv;
 > +
-> +	caller_net = skb->dev ? dev_net(skb->dev) : sock_net(skb->sk);
-> +
-> +	return __bpf_p4tc_tbl_read(caller_net, params, key, key__sz);
-> +}
-> +
-> +__bpf_kfunc static struct p4tc_table_entry_act_bpf *
-> +xdp_p4tc_tbl_read(struct xdp_md *xdp_ctx,
-> +		  struct p4tc_table_entry_act_bpf_params *params,
-> +		  void *key, const u32 key__sz)
-> +{
-> +	struct xdp_buff *ctx = (struct xdp_buff *)xdp_ctx;
-> +	struct net *caller_net;
-> +
-> +	caller_net = dev_net(ctx->rxq->dev);
-> +
-> +	return __bpf_p4tc_tbl_read(caller_net, params, key, key__sz);
-> +}
-> +
-> +static int
-> +__bpf_p4tc_entry_create(struct net *net,
-> +			struct p4tc_table_entry_create_bpf_params *params,
-> +			void *key, const u32 key__sz,
-> +			struct p4tc_table_entry_act_bpf *act_bpf)
-> +{
-> +	struct p4tc_table_entry_key *entry_key = key;
-> +	struct p4tc_pipeline *pipeline;
-> +	struct p4tc_table *table;
-> +
-> +	if (!params || !key)
-> +		return -EINVAL;
-> +	if (key__sz != P4TC_ENTRY_KEY_SZ_BYTES(entry_key->keysz))
-> +		return -EINVAL;
-> +
-> +	pipeline = p4tc_pipeline_find_byid(net, params->pipeid);
-> +	if (!pipeline)
-> +		return -ENOENT;
-> +
-> +	table = p4tc_tbl_cache_lookup(net, params->pipeid, params->tblid);
-> +	if (!table)
-> +		return -ENOENT;
-> +
-> +	if (entry_key->keysz != table->tbl_keysz)
-> +		return -EINVAL;
-> +
-> +	return p4tc_table_entry_create_bpf(pipeline, table, entry_key, act_bpf,
-> +					   params->profile_id);
+> +	/* Dummy struct net_device have no trailing data. */
+> +	if (WARN_ON_ONCE(dev->reg_state == NETREG_DUMMY))
+> +		return NULL;
 
-My understanding is this kfunc will allocate a "struct 
-p4tc_table_entry_act_bpf_kern" object. If the bpf_p4tc_entry_delete() kfunc is 
-never called and the bpf prog is unloaded, how the act_bpf object will be 
-cleaned up?
+This is a static inline with roughly 11,000 call sites, according to 
+a quick grep. Aren't WARN_ONCE() in static inlines creating a "once"
+object in every compilation unit where they get used?
 
-> +}
-> +
-> +__bpf_kfunc static int
-> +bpf_p4tc_entry_create(struct __sk_buff *skb_ctx,
-> +		      struct p4tc_table_entry_create_bpf_params *params,
-> +		      void *key, const u32 key__sz,
-> +		      struct p4tc_table_entry_act_bpf *act_bpf)
-> +{
-> +	struct sk_buff *skb = (struct sk_buff *)skb_ctx;
-> +	struct net *net;
-> +
-> +	net = skb->dev ? dev_net(skb->dev) : sock_net(skb->sk);
-> +
-> +	return __bpf_p4tc_entry_create(net, params, key, key__sz, act_bpf);
-> +}
-> +
-> +__bpf_kfunc static int
-> +xdp_p4tc_entry_create(struct xdp_md *xdp_ctx,
-> +		      struct p4tc_table_entry_create_bpf_params *params,
-> +		      void *key, const u32 key__sz,
-> +		      struct p4tc_table_entry_act_bpf *act_bpf)
-> +{
-> +	struct xdp_buff *ctx = (struct xdp_buff *)xdp_ctx;
-> +	struct net *net;
-> +
-> +	net = dev_net(ctx->rxq->dev);
-> +
-> +	return __bpf_p4tc_entry_create(net, params, key, key__sz, act_bpf);
-> +}
-> +
-> +__bpf_kfunc static int
-> +bpf_p4tc_entry_create_on_miss(struct __sk_buff *skb_ctx,
-> +			      struct p4tc_table_entry_create_bpf_params *params,
-> +			      void *key, const u32 key__sz,
-> +			      struct p4tc_table_entry_act_bpf *act_bpf)
-> +{
-> +	struct sk_buff *skb = (struct sk_buff *)skb_ctx;
-> +	struct net *net;
-> +
-> +	net = skb->dev ? dev_net(skb->dev) : sock_net(skb->sk);
-> +
-> +	return __bpf_p4tc_entry_create(net, params, key, key__sz, act_bpf);
-> +}
-> +
-> +__bpf_kfunc static int
-> +xdp_p4tc_entry_create_on_miss(struct xdp_md *xdp_ctx,
-
-Same here. "struct xdp_buff *xdp".
-
-> +			      struct p4tc_table_entry_create_bpf_params *params,
-> +			      void *key, const u32 key__sz,
-> +			      struct p4tc_table_entry_act_bpf *act_bpf)
-> +{
-> +	struct xdp_buff *ctx = (struct xdp_buff *)xdp_ctx;
-> +	struct net *net;
-> +
-> +	net = dev_net(ctx->rxq->dev);
-> +
-> +	return __bpf_p4tc_entry_create(net, params, key, key__sz, act_bpf);
-> +}
-> +
-
-[ ... ]
-
-> +__bpf_kfunc static int
-> +bpf_p4tc_entry_delete(struct __sk_buff *skb_ctx,
-> +		      struct p4tc_table_entry_create_bpf_params *params,
-> +		      void *key, const u32 key__sz)
-> +{
-> +	struct sk_buff *skb = (struct sk_buff *)skb_ctx;
-> +	struct net *net;
-> +
-> +	net = skb->dev ? dev_net(skb->dev) : sock_net(skb->sk);
-> +
-> +	return __bpf_p4tc_entry_delete(net, params, key, key__sz);
-> +}
-> +
-> +__bpf_kfunc static int
-> +xdp_p4tc_entry_delete(struct xdp_md *xdp_ctx,
-> +		      struct p4tc_table_entry_create_bpf_params *params,
-> +		      void *key, const u32 key__sz)
-> +{
-> +	struct xdp_buff *ctx = (struct xdp_buff *)xdp_ctx;
-> +	struct net *net;
-> +
-> +	net = dev_net(ctx->rxq->dev);
-> +
-> +	return __bpf_p4tc_entry_delete(net, params, key, key__sz);
-> +}
-> +
-> +BTF_SET8_START(p4tc_kfunc_check_tbl_set_skb)
-
-This soon will be broken with the latest change in bpf-next. It is replaced by 
-BTF_KFUNCS_START. commit a05e90427ef6.
-
-What is the plan on the selftest ?
-
-> +BTF_ID_FLAGS(func, bpf_p4tc_tbl_read, KF_RET_NULL);
-> +BTF_ID_FLAGS(func, bpf_p4tc_entry_create);
-> +BTF_ID_FLAGS(func, bpf_p4tc_entry_create_on_miss);
-> +BTF_ID_FLAGS(func, bpf_p4tc_entry_update);
-> +BTF_ID_FLAGS(func, bpf_p4tc_entry_delete);
-> +BTF_SET8_END(p4tc_kfunc_check_tbl_set_skb)
-> +
-> +static const struct btf_kfunc_id_set p4tc_kfunc_tbl_set_skb = {
-> +	.owner = THIS_MODULE,
-> +	.set = &p4tc_kfunc_check_tbl_set_skb,
-> +};
-> +
-> +BTF_SET8_START(p4tc_kfunc_check_tbl_set_xdp)
-> +BTF_ID_FLAGS(func, xdp_p4tc_tbl_read, KF_RET_NULL);
-> +BTF_ID_FLAGS(func, xdp_p4tc_entry_create);
-> +BTF_ID_FLAGS(func, xdp_p4tc_entry_create_on_miss);
-> +BTF_ID_FLAGS(func, xdp_p4tc_entry_update);
-> +BTF_ID_FLAGS(func, xdp_p4tc_entry_delete);
-> +BTF_SET8_END(p4tc_kfunc_check_tbl_set_xdp)
-
+> +	priv = container_of(dev, struct net_device_priv, dev);
+> +	return (u8 *)priv->data;
+>  }
 
