@@ -1,114 +1,89 @@
-Return-Path: <netdev+bounces-76548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1D9D86E28A
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 14:44:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 469CF86E2E3
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 15:00:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80D111F22209
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 13:44:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2EFA1F25E20
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 14:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E693872922;
-	Fri,  1 Mar 2024 13:42:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED7B6EB6F;
+	Fri,  1 Mar 2024 14:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VEsMCUKB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400296EB6A;
-	Fri,  1 Mar 2024 13:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB765F84C;
+	Fri,  1 Mar 2024 14:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709300547; cv=none; b=sVMyC8EFXpLan7KxbWLF5qOd1H04xl8PPV2iARBwBL0Qp4DeMt2RkIHhYAQqiMCvDqKz5paH1IHfzz7M0yIV7CW/9iyqDvuK36gZoTyHENwQm9WwKr7bIBEm60Mn5ynx34blMMcZVVhuVmhZQLN9EObybH2WyNPsHmXd/5uXzBw=
+	t=1709301619; cv=none; b=HDXnAXBHMPghVPaXnPaFR2qmc0Z9acSWPhh5FBsZVUumPPakh7gEfA/gbo3fwmkyVKGorScUMDe2xViIqSVLGbUn26cJJRs3/T1T3VBFRw8WbVMaJIe8IE78i5JO0hjKDmcJ1qS5wc9fv5MlaeWu8SB2GO45c/qWW3/SB0zSr6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709300547; c=relaxed/simple;
-	bh=WPXkIQwvRLQBSZhlUEDaUobW7M6LNr8BRk9mM4f2BSs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qkaMxve4bheHau4yGT12nRw1gdRmNr2pwgShD/NfolngE47miP1h0Rf1m9sqoo323oPzgsJp01fQ52CDpCoF61EMMxLA+vN+9A2AvN7r+R0Vc86lHpn8zMACDFqvC/dNXf2UM5hsN2vTINZ4t6MIGYWXX4IYDPzxLv7zRWdp+ZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-33e12916565so1025153f8f.1;
-        Fri, 01 Mar 2024 05:42:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709300544; x=1709905344;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9taPaBKehcb4ahcbhUFAwNa2TaUPUJg1amPsCfHtP5k=;
-        b=MpIX4non/LMKiLaU66ydg4JilGV7bm5WE+ADT/H1K04Gz+8iuireYOihZvQoiC9iv0
-         GxaedYG210leRlAm1KBqdw+k7lsqasyBH/gCOW/2MoyhzlvtRpP3eJyx2VwEsXLDSLDC
-         6y1vRu3IMJ1Q8PPHYrg+58D/oooADk5wYImQqUKctB/PDaJv7WYW/STp+ILnf2HNPu7h
-         X+katRJL6j8VmSnZ/4ogmbbOcDb5C/7u9daYKxWzzS5ffQZ++V7DSkFYRmygcd36nlvw
-         NFCK1v6Gs0skSejy81LAvfegJoTK+wt7fHZgZmfIiJY8rtqM8spAWauHIwvqlNKpTZBk
-         cyzg==
-X-Forwarded-Encrypted: i=1; AJvYcCVo4gpZEPypHW7kyGSl43SSgxMWecYYXGKASXlEA7MW9MAWSzNRBq5nefyG5CONqfoeAwp/Uqf4JZzZBWa/2GnmmLuwWJlS4N5hA4xw
-X-Gm-Message-State: AOJu0YyHS3RnB+dsQkK0t6VNqiKydWdonchVM5sS7obMgzpwhqCx58Ch
-	AKpWDpxBzUsq/E3FXi70R3Rg3KZFJCL5QfXss0ZY5HloeeNc60iK
-X-Google-Smtp-Source: AGHT+IHzIiy9v4vwPr6VmiqOFz7HYvjY/fmfmHEVTMCH9mgfJsbTDkShaFD2LVCoDT3cBw9Td0uqPA==
-X-Received: by 2002:a5d:4152:0:b0:33d:d793:a20f with SMTP id c18-20020a5d4152000000b0033dd793a20fmr2027753wrq.27.1709300544344;
-        Fri, 01 Mar 2024 05:42:24 -0800 (PST)
-Received: from localhost (fwdproxy-lla-003.fbsv.net. [2a03:2880:30ff:3::face:b00c])
-        by smtp.gmail.com with ESMTPSA id v6-20020a5d59c6000000b0033d926bf7b5sm4772895wry.76.2024.03.01.05.42.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 05:42:23 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-To: kuba@kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	horms@kernel.org,
-	dsahern@kernel.org
-Subject: [PATCH net-next 2/2] net: nlmon: Simplify nlmon_get_stats64
-Date: Fri,  1 Mar 2024 05:42:14 -0800
-Message-ID: <20240301134215.1264416-2-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240301134215.1264416-1-leitao@debian.org>
-References: <20240301134215.1264416-1-leitao@debian.org>
+	s=arc-20240116; t=1709301619; c=relaxed/simple;
+	bh=Uwm4z9If+tkCUKr8I6N3lywyOJRH6O9UKwPft2Dlxs0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iwmd8loJ1F06dRDhlAGbCNdRv9cmnFi6BKSJbPk30kw5I3rxmfesGu48n9Leptavgs4TjfN3xmU1oLr4RH/rACC79ut5lh5/cdVfY7KDCtUIl4q+Ne0KWP+HSYpk8EaVdi7l6LG/w5e+fbzLrdMFFVE3AzR3Xf18kKVj/fart9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VEsMCUKB; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=lt7udYsocuVhKxHFS4ifPlstkCMspm0P7cqn/fPP8AU=; b=VEsMCUKB+WhD2pxB/+erGT/mHN
+	IvTI5J2+LH0v2cRGGXVk3E051GWncATp6v5s1ZgNynJhqXaclaud3WIfIXV3KToDE+hUv85jfqDVB
+	02zFW4w4eQX7GMzCAufwskR/ZUX5OruKoN96GbOzTrJx3nW5b2acVijbV6uBqpzLgBU4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rg3R0-0098kj-Tr; Fri, 01 Mar 2024 15:00:22 +0100
+Date: Fri, 1 Mar 2024 15:00:22 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Bastien Curutchet <bastien.curutchet@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+	Lee Jones <lee@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-leds@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	herve.codina@bootlin.com, christophercordahi@nanometrics.ca
+Subject: Re: [PATCH v2 6/6] net: phy: DP83640: Add fiber mode
+ enabling/disabling from device tree
+Message-ID: <7d70e512-ce6f-43ca-b297-fd3397469276@lunn.ch>
+References: <20240227093945.21525-1-bastien.curutchet@bootlin.com>
+ <20240227093945.21525-7-bastien.curutchet@bootlin.com>
+ <a9c2144a-f26b-4a71-b808-ce3a94f1264d@lunn.ch>
+ <c1b17410-b403-4c3a-9c00-de8f2b2b2fa7@bootlin.com>
+ <c6840f8f-7d9c-49e8-b689-2af04605b99c@lunn.ch>
+ <20240301113703.102bbad0@device-28.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240301113703.102bbad0@device-28.home>
 
-Do not set rtnl_link_stats64 fields to zero, since they are zeroed
-before ops->ndo_get_stats64 is called in core dev_get_stats() function.
+> All in all, do you think that defaulting to copper and leaving users an
+> option to implement "ti,fiber-mode" is an acceptable risk to take ?
 
-Also, simplify the data collection by removing the temporary variable.
+Yes, lets do that. But try to make it easy to revert the change if
+anybody complains about a regression.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/nlmon.c | 10 +---------
- 1 file changed, 1 insertion(+), 9 deletions(-)
-
-diff --git a/drivers/net/nlmon.c b/drivers/net/nlmon.c
-index e026bfc83757..e5a0987a263e 100644
---- a/drivers/net/nlmon.c
-+++ b/drivers/net/nlmon.c
-@@ -40,15 +40,7 @@ static int nlmon_close(struct net_device *dev)
- static void
- nlmon_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
- {
--	u64 packets, bytes;
--
--	dev_lstats_read(dev, &packets, &bytes);
--
--	stats->rx_packets = packets;
--	stats->tx_packets = 0;
--
--	stats->rx_bytes = bytes;
--	stats->tx_bytes = 0;
-+	dev_lstats_read(dev, &stats->rx_packets, &stats->rx_bytes);
- }
- 
- static u32 always_on(struct net_device *dev)
--- 
-2.43.0
-
+	Andrew
 
