@@ -1,131 +1,134 @@
-Return-Path: <netdev+bounces-76589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F86986E4B2
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:50:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68A7E86E4C3
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:55:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0191286D99
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 15:50:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7E07288FD8
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 15:55:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C154170CB0;
-	Fri,  1 Mar 2024 15:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD0870CAF;
+	Fri,  1 Mar 2024 15:55:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DYYzBIUr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZgZQ4aR/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E15070CAE;
-	Fri,  1 Mar 2024 15:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8EF70CA8
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 15:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709308203; cv=none; b=lWbBd+maU8eV6EncGB8FVpkpM7eJVsU9tIhm1nw89KN6zkWuiB32Ifa8hXmgllUSpe0lex1IRIOs+sQO+O8DAeS5YeO1W3K06WqqSvixJrl9WkImWTSfvkboAPPqAeiJuUYydK+26walsnE+djbnuyca3XKWC/c5p2b0/C90Ie0=
+	t=1709308533; cv=none; b=mUPJ4FirD0P8gOiYm0xZfzW+inYtJLlSCovhFOzHiRqQGS4vTrdXfVBQev6wsSxCOugNbW7qFTjCgjvTDAbW1AEibZUyusFV6lKLhlmKR2L02amq6zMfEn4xeeo1Zzc+Z/GAuAi/3R2i6w4a1R1yd5kZFpOuDB9spscGDkGLk3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709308203; c=relaxed/simple;
-	bh=XItwrjtV3hvnmFR69chzCPc6dcE/80sccqPKn/LdoS0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DQaOOqPJNYEcmAtIYyR5ucQ9ff8+reTZlqckEZvbS+GydHk4x0O5BsE7tz5fOfQeuCGIyv6uZNiThBJDzML4VvekgC21KTdU8tkfA66Zs+f0Y+ZYfIurq5hWRaBosePOcNDiH4uQ0AiPInzuncEVZqRHLyl5Jdh8/b0fk8TqhE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DYYzBIUr; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a3e552eff09so313340966b.3;
-        Fri, 01 Mar 2024 07:50:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709308200; x=1709913000; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=KjS+ikwQmfyolO6cKdEt9cJp/PblUq1A5JzypvMz5Ok=;
-        b=DYYzBIUrJ1BTZxFy8LNV2tf0g8k6Ey0do0lmSv+Us9bkbG5QdrOrBm5r+qQ3sw1ACL
-         kmk6ZGsiqjNil0Sk0vy6g6VZg0SSY6+S3YMzo4zFHJ4mxk7oBHtIpaXxpd6XFXvcga4d
-         8USvGHf+1QO7YYxEG6E4IN1/Pq2rKzGLZxxTcw0WYHqu+oWKhEVkCyuHr4V+qVQV/Lcy
-         5iQuhOQ+JTTr4uvB6gJVAXLRtERs/lcBpW7B6ZxKdKnfTZKYoEGqkadfkDso9HWyb/g3
-         NCOnxc5vimpoCA3J57CVtP+9UhHVmmXqOzM14tx4WLa3R7/NOqrLMvpbYJXACj7nN423
-         1D6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709308200; x=1709913000;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KjS+ikwQmfyolO6cKdEt9cJp/PblUq1A5JzypvMz5Ok=;
-        b=PHZLGXGdiUhHSgr9xv+iOG9UyuUb2SiyzxpQBtlZhLC3ewJQOJhC9YBUpphjT+10V0
-         0UTGprBFd4Q2sMFfK2WZ4MZSllPu+IcNXyRgKSlcAJypBtRSPaQhr9Q98TmfZ+SYJu8S
-         mAjSxh0iYHl0VQ7ZZGI67ep5Fq9Cw/3FNUAZYOhJ85xvq2tfveOLdrYRenUl8ImnY2MM
-         le8LTaslLtZfjHn1BTa6XHRRzDtWHwF1uFWxvdv7Q0MXUPQ7uxZr6SkyBNyTXWsYXfl0
-         aLr34ShNBY5RNn5osmM+ujeV5YSktaselscuHoXTxaVdwubVexdAOmvCyLcSp/aeLiz7
-         HZpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVihyljcfJa8ubj6RTxJTcJfnNXrk0UFpZsIO9zMtt6LoBWqbORy5O05h6BYWeq4TAaHKc3yPVVpJpeHkNCmZUGnj3PNS/F1eUD0JncwAwko1Xw0mOjUCZ82Hq1+nwI3pjdCHNE
-X-Gm-Message-State: AOJu0YztZEjpkOjiBzvRT7X4tu+XfBU+ClteD4ik7BEvFSUH4Vgc4yLJ
-	vOvqtJUhMk87BMj5n43RK0Vx/jLvU421ZAiqWS3q71gbToLTNUJA
-X-Google-Smtp-Source: AGHT+IHvm1GBJ8J2+MUD2LNgnzmTnjkDC0xWxpm5RSn9D5dRqN7kFFuEijXRx7sXSMyV1bT5OsJxYA==
-X-Received: by 2002:a17:906:e08d:b0:a44:731c:bace with SMTP id gh13-20020a170906e08d00b00a44731cbacemr1824851ejb.35.1709308199989;
-        Fri, 01 Mar 2024 07:49:59 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d207:f600::b2c])
-        by smtp.gmail.com with ESMTPSA id ty24-20020a170907c71800b00a42eb84c7c2sm1821478ejc.142.2024.03.01.07.49.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 07:49:59 -0800 (PST)
-Date: Fri, 1 Mar 2024 17:49:57 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Ravi Gunasekaran <r-gunasekaran@ti.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	=?utf-8?B?U2FuanXDoW4gR2FyY8OtYSw=?= Jorge <Jorge.SanjuanGarcia@duagon.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"s-vadapalli@ti.com" <s-vadapalli@ti.com>,
-	"rogerq@kernel.org" <rogerq@kernel.org>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net RESEND] net: ethernet: ti: am65-cpsw: Add
- IFF_UNICAST_FLT flag to port device
-Message-ID: <20240301154957.xex75zuijptswcf3@skbuf>
-References: <20240228111300.2516590-1-jorge.sanjuangarcia@duagon.com>
- <20240228200516.1166a097@kernel.org>
- <03bf515c-9f90-487c-ecfa-90d407dc5d86@ti.com>
+	s=arc-20240116; t=1709308533; c=relaxed/simple;
+	bh=c0Y5s3hakvePLjsoF32IA/VPnJGfXvrmicIb0uuXJMg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gOdWrHg64GonN/jjA8h6tWxRdZG4k8kkeekrhdzRtJl4v5cn9ZB29I1sTEpptp5UmJuwONh3XzYxL0yyh7gjAHGlyBTpJ5+E5pBD+gAUlDMfSSgJ4Q6KbG8L6ucpw4k5EgMKvy0hF6nl8EjP8V2MjonsGVVfV2EVxL3AQiqKYf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZgZQ4aR/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9A9CC433F1;
+	Fri,  1 Mar 2024 15:55:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709308532;
+	bh=c0Y5s3hakvePLjsoF32IA/VPnJGfXvrmicIb0uuXJMg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZgZQ4aR/DQC5/CpUh9RxNAjtqf5NVHGO5Hb6szcBKhcmmIfZwNj/7N4pF7/1i9omG
+	 Zkq+ew4jLMhRoeVbJbJVWcpY/ox+9/pxnUZaxggP8ahfDm+fG/fMAHPrThicm3wju2
+	 anqs6k/8ZsRNH3RgevBowfsjWAtGUMLn+AuJshelStiChQsDu/cw4JoPIOvRCqxi/B
+	 CGmdPoY8T5LZyzz4Q/XgkcJ+aKDhdoEWKOwasgGc9BBdv6cJqHey5ZBzty/HcF2yR0
+	 liWnLFn5ic/tPew3m9haDhqEpxgS6//hoVpSNcADdGiFxAXgFu0UtZmf/lV2Q1l5Yt
+	 p7C2cUvQ3TVkg==
+Message-ID: <386b5f4d-2228-4e57-a4b3-fb17facf9029@kernel.org>
+Date: Fri, 1 Mar 2024 08:55:30 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <03bf515c-9f90-487c-ecfa-90d407dc5d86@ti.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 7/7] net: nexthop: Expose nexthop group HW
+ stats to user space
+Content-Language: en-US
+To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: Ido Schimmel <idosch@nvidia.com>, Simon Horman <horms@kernel.org>,
+ mlxsw@nvidia.com, Kees Cook <keescook@chromium.org>
+References: <cover.1709217658.git.petrm@nvidia.com>
+ <f35433867d7bab05bbe0a1b4a09c3454cdefeb7b.1709217658.git.petrm@nvidia.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <f35433867d7bab05bbe0a1b4a09c3454cdefeb7b.1709217658.git.petrm@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 01, 2024 at 04:39:50PM +0530, Ravi Gunasekaran wrote:
-> On 2/29/24 9:35 AM, Jakub Kicinski wrote:
-> > On Wed, 28 Feb 2024 11:13:23 +0000 Sanjuán García, Jorge wrote:
-> >> Since commit 8940e6b669ca ("net: dsa: avoid call to __dev_set_promiscuity()
-> >> while rtnl_mutex isn't held") when conecting one of this switch's port
-> >> to a DSA switch as the conduit interface, the network interface is set to
-> >> promiscuous mode by default and cannot be set to not promiscuous mode again
-> >> from userspace. The reason for this is that the cpsw ports net devices
-> >> do not have the flag IFF_UNICAST_FLT set in their private flags.
-> >>
-> >> The cpsw switch should be able to set not promiscuous mode as otherwise
-> >> a '1' is written to bit ALE_PORT_MACONLY_CAF which makes ethernet frames
-> >> get an additional VLAN tag when entering the port connected to the DSA
-> >> switch. Setting the IFF_UNICAST_FLT flag to all ports allows us to have
-> >> the conduit interface on the DSA subsystem set as not promiscuous.
-> > 
-> > It doesn't look like am65-cpsw-nuss supports unicast filtering, 
-> > tho, does it? So we're lying about support to work around some 
-> > CPSW weirdness (additional VLAN tag thing)?
+On 2/29/24 11:16 AM, Petr Machata wrote:
+> From: Ido Schimmel <idosch@nvidia.com>
 > 
-> CPSW driver does not support unicast filtering. 
+> Add netlink support for reading NH group hardware stats.
+> 
+> Stats collection is done through a new notifier,
+> NEXTHOP_EVENT_HW_STATS_REPORT_DELTA. Drivers that implement HW counters for
+> a given NH group are thereby asked to collect the stats and report back to
+> core by calling nh_grp_hw_stats_report_delta(). This is similar to what
+> netdevice L3 stats do.
+> 
+> Besides exposing number of packets that passed in the HW datapath, also
+> include information on whether any driver actually realizes the counters.
+> The core can tell based on whether it got any _report_delta() reports from
+> the drivers. This allows enabling the statistics at the group at any time,
+> with drivers opting into supporting them. This is also in line with what
+> netdevice L3 stats are doing.
+> 
+> So as not to waste time and space, tie the collection and reporting of HW
+> stats with a new op flag, NHA_OP_FLAG_DUMP_HW_STATS.
+> 
+> Co-developed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> Reviewed-by: Kees Cook <keescook@chromium.org> # For the __counted_by bits
+> ---
+> 
+> Notes:
+>     v2:
+>     - Use uint to encode NHA_GROUP_STATS_ENTRY_PACKETS_HW
+>     - Do not cancel outside of nesting in nla_put_nh_group_stats()
+> 
+>  include/net/nexthop.h        |  18 +++++
+>  include/uapi/linux/nexthop.h |   9 +++
+>  net/ipv4/nexthop.c           | 133 ++++++++++++++++++++++++++++++++---
+>  3 files changed, 151 insertions(+), 9 deletions(-)
+> 
 
-Then the driver can't declare IFF_UNICAST_FLT.
 
-Why does enabling promiscuous mode cause Ethernet frames to get an
-additional VLAN tag? 802.3 clause 4.2.4.1.1 Address recognition only
-says "The MAC sublayer may also provide the capability of operating in
-the promiscuous receive mode. In this mode of operation, the MAC
-sublayer recognizes and accepts all valid frames, regardless of their
-Destination Address field values.". Absolutely nothing about VLAN.
+> diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+> index 15f108c440ae..169a003cc855 100644
+> --- a/net/ipv4/nexthop.c
+> +++ b/net/ipv4/nexthop.c
+> @@ -43,7 +43,8 @@ static const struct nla_policy rtm_nh_policy_new[] = {
+>  static const struct nla_policy rtm_nh_policy_get[] = {
+>  	[NHA_ID]		= { .type = NLA_U32 },
+>  	[NHA_OP_FLAGS]		= NLA_POLICY_MASK(NLA_U32,
+> -						  NHA_OP_FLAG_DUMP_STATS),
+> +						  NHA_OP_FLAG_DUMP_STATS |
+> +						  NHA_OP_FLAG_DUMP_HW_STATS),
+>  };
+>  
+>  static const struct nla_policy rtm_nh_policy_del[] = {
+> @@ -56,7 +57,8 @@ static const struct nla_policy rtm_nh_policy_dump[] = {
+>  	[NHA_MASTER]		= { .type = NLA_U32 },
+>  	[NHA_FDB]		= { .type = NLA_FLAG },
+>  	[NHA_OP_FLAGS]		= NLA_POLICY_MASK(NLA_U32,
+> -						  NHA_OP_FLAG_DUMP_STATS),
+> +						  NHA_OP_FLAG_DUMP_STATS |
+> +						  NHA_OP_FLAG_DUMP_HW_STATS),
+
+2 instances of the same mask; worth giving it a name.
+
+Reviewed-by: David Ahern <dsahern@kernel.org>
+
+
 
