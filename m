@@ -1,96 +1,132 @@
-Return-Path: <netdev+bounces-76452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2A9486DC98
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 08:59:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B49F86DC9B
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 08:59:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4BAC1C21964
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 07:59:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C9C01C22CB3
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 07:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26AD169970;
-	Fri,  1 Mar 2024 07:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE0A569D03;
+	Fri,  1 Mar 2024 07:59:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pG2fSYIw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FbzCC1GB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2A11E879
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 07:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91EBB69943;
+	Fri,  1 Mar 2024 07:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709279965; cv=none; b=hM4zcVDc5nu4YoW41tqDIYynk+RNOSr1xsfSmveLyu1k+g1uiYib171dBj+iTPnvNjwQC2LMxpfpFa+NxrPY2KbZWAIQ+VuDeuC5NqjAWx5JVTayHl8ivhNDwZUJn3qjZkvkQZRd1/UBTNLv7PBzbwUTjzX716mPm/JGS3ILYQo=
+	t=1709279981; cv=none; b=LmoDwE7F7NRctIF317SrFViRPLSkpUJSrKR5tJ/ezTOoLL6JUQyVk1r3C7s3/NJvl3xhGWdkUzG03PeWmB2Sh+Mh7pyW6a1mpaIDm4iOPyQp2xqwtMkCEU8Rgxet6Y9XdsdMc/enHtFWanARYM3NTITsK71x7jSbjfdlFBpfoZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709279965; c=relaxed/simple;
-	bh=zr17gvSSYZaVH9ib6UrODiLALqn6xS5V58WYpS0qdvY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZzPjCRb2ZDZ5pAN8aO9C8icClupkl3xRWi6KOfWpb0kAjEWTkC7NLVMfBpn+KXde5KtMESJBc+leZVsXzarJ57kIlLqbPE/QfiM8bka02am54du5OqsbB6qi6dgf9XawO8ONzeNwUhjt2w8xaJcnYISW+GM7Ig/qHR3bI5riBWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pG2fSYIw; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-565223fd7d9so3883a12.1
-        for <netdev@vger.kernel.org>; Thu, 29 Feb 2024 23:59:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709279962; x=1709884762; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zr17gvSSYZaVH9ib6UrODiLALqn6xS5V58WYpS0qdvY=;
-        b=pG2fSYIwRqvMpQ1poPIv6mMnFyBiBZoelnmcFA6cWpeFis+lYY1mZkiQWTLq7wREbY
-         VcaDtl5OuqJUanzy5Pj9F2iyz5c0AF6EMpBmJM4TV2qUQpCCpeAykPLbrfhg8zXQD121
-         5YpN8SnwN9SOb4bp5qwmB0jI8oVQghEDaqFNZhBSwy6VCrvWQBcYj9CY9y0e6oZ/0W56
-         apCXWbXkVhInI8Wb7FH6rYI/CG74UJToBB1Oew7cyM9jUl24fxlhiBD2VEa7pljjppxA
-         t8YOyi/qQQVyJj2QNz94ghuRM4XN/oSBdvYHMsO7EMxdmaLEg65+ZWbmaJ7flT9xuLwB
-         PVyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709279962; x=1709884762;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zr17gvSSYZaVH9ib6UrODiLALqn6xS5V58WYpS0qdvY=;
-        b=rMXpbeqhNdOL/w+uWsXa+ga/XFWNyEEyq0jknbJH4hzVjRxYwLKA6BpX+vcpRDDaF/
-         jzZHWCmj4toy2ybAGROvctBkcWwiHngTGlI/hWH6bt9FRRbknoSUbDwSwLgAODcCO2J3
-         2D0B6r71VoEQXOJ7WQcJXfnbZcMBZDKI068CdAnvrlODRufu/82WNC6NtWSK8vjTInC6
-         CRxlk4jXU04372+Wcfff2Rnp/AqJZ55y4GlxmGfCkjrvdPQbv+vvcxBbCXCZT+s/KszI
-         TMwOSem9ewpkI0CREvRF03SecD8c6KZk4K9LHuUAhwhrDLMAUO7UgmB99xIA4r2/dTT8
-         dHbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVrLU7wO4eATUICU9rI6/Vbkpos8tIGxVcL1j9iRM4RV/SSc+W+sCwoev0uWK9sTBbwDh6g+1qrDG2fKaMvRsArvictNNdT
-X-Gm-Message-State: AOJu0Yy4nAC4r7CWX8SOAF/mEaXdUnM+YC//E8PyOgAPT1fTiV0SfupX
-	m/YQHy+SsJbKBWFv2+Ag6nkBiFbOzWXC/iPDsCATLWCAJGNzbNJ7W5tS1H4tVsmnko6bdFND9/6
-	Dayo9RDuRmuKfhqb/L5ywtkF0ji0S/8dm8MYW
-X-Google-Smtp-Source: AGHT+IEEtSCK29cB4p97aeoYbUpC06LMrOwaksjc/s10E3lC10NxKJ6xZCv2MJVmnqAp0S0aKLTElVjqSLOxSH4+Kag=
-X-Received: by 2002:a05:6402:350e:b0:563:f48a:aa03 with SMTP id
- b14-20020a056402350e00b00563f48aaa03mr113930edd.2.1709279961492; Thu, 29 Feb
- 2024 23:59:21 -0800 (PST)
+	s=arc-20240116; t=1709279981; c=relaxed/simple;
+	bh=onhMwfZHRvjdKu0c6UrVflIw+f+gEw3QbIuux2iitqE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ooXge5sYe6+cAh39M/uqO3pLJtTs7p0yiGaAlaspWA0CaM0fPSRlGrxdE2T7Dt+w9nfW7mMh3i16lWg+Wm5CGYMAnwNzbuN/SpncEFXjw9f6kHLfp5p2QCaWtrEVvZQ/z3KPtVjt//blvYa/dJHYQV6w+7wI9QUsX99FQziNg4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FbzCC1GB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C4FAC433F1;
+	Fri,  1 Mar 2024 07:59:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709279981;
+	bh=onhMwfZHRvjdKu0c6UrVflIw+f+gEw3QbIuux2iitqE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FbzCC1GBYi9leoX1nhtVp36bYagTlNOwxnVIfgRnttcQVhkkUIIxCXnAvOp4vBfmJ
+	 qpUAEi2oIB35VMOzv+Xuq3Xvwrk5UMoyNC8RA07NeKvv8gnasMgBKmx8om3YYA8RiD
+	 7HE80TZahJVTAF2PWbL/NSe4+0m+RQVYt7o5w/zP8xi9m/6UR0Ovo17Y4iCvrtX5wI
+	 7HGNJzZT13KCgJYTQimVGNDVC6sDsTVpHTWm4c76oZpo62GwsZEPdQeqmpYufkISPt
+	 8AE6ouORoLczdGX4oSDaeCYrl9x2bFZhEJXBBv1z0aG6DkcEYY0wufI6IFdfREWrsK
+	 DubPyYcNVcGtg==
+Date: Fri, 1 Mar 2024 07:59:35 +0000
+From: Lee Jones <lee@kernel.org>
+To: Conor Dooley <conor@kernel.org>
+Cc: netdev@vger.kernel.org, Conor Dooley <conor.dooley@microchip.com>,
+	Rob Herring <robh@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Sven Schwermer <sven.schwermer@disruptive-technologies.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [RESEND] dt-bindings: leds: pwm-multicolour: re-allow active-low
+Message-ID: <20240301075935.GD1209090@google.com>
+References: <20240229-excluding-bonelike-d8f01dcc0623@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240301070255.3108375-1-kuba@kernel.org>
-In-Reply-To: <20240301070255.3108375-1-kuba@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 1 Mar 2024 08:59:08 +0100
-Message-ID: <CANn89iLhOWFaW-iLw77LcgZ-Lzbput9XQt=GtsC_V9yV56_jwg@mail.gmail.com>
-Subject: Re: [PATCH net-next] eth: igc: remove unused embedded struct net_device
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
-	intel-wired-lan@lists.osuosl.org, jesse.brandeburg@intel.com, 
-	anthony.l.nguyen@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240229-excluding-bonelike-d8f01dcc0623@spud>
 
-On Fri, Mar 1, 2024 at 8:03=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> struct net_device poll_dev in struct igc_q_vector was added
-> in one of the initial commits, but never used.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Thu, 29 Feb 2024, Conor Dooley wrote:
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+> From: Conor Dooley <conor.dooley@microchip.com>
+> 
+> active-low was lifted to the common schema for leds, but it went
+> unnoticed that the leds-multicolour binding had "additionalProperties:
+> false" where the other users had "unevaluatedProperties: false", thereby
+> disallowing active-low for multicolour leds. Explicitly permit it again.
+> 
+> Fixes: c94d1783136e ("dt-bindings: net: phy: Make LED active-low property common")
+> Acked-by: Rob Herring <robh@kernel.org>
+> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+> ---
+> 
+> This needs to go via netdev as the commit it fixes (and is based on)
+> is there
+> 
+> CC: Pavel Machek <pavel@ucw.cz>
+> CC: Lee Jones <lee@kernel.org>
+> CC: Rob Herring <robh@kernel.org>
+> CC: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+> CC: Conor Dooley <conor+dt@kernel.org>
+> CC: Sven Schwermer <sven.schwermer@disruptive-technologies.com>
+> CC: Christian Marangi <ansuelsmth@gmail.com>
+> CC: linux-leds@vger.kernel.org
+> CC: devicetree@vger.kernel.org
+> CC: linux-kernel@vger.kernel.org
+> CC: "David S. Miller" <davem@davemloft.net>
+> CC: Eric Dumazet <edumazet@google.com>
+> CC: Jakub Kicinski <kuba@kernel.org>
+> CC: Paolo Abeni <pabeni@redhat.com>
+> CC: netdev@vger.kernel.org
+> ---
+>  Documentation/devicetree/bindings/leds/leds-pwm-multicolor.yaml | 2 ++
+>  1 file changed, 2 insertions(+)
+
+Please take this via netdev.
+
+Acked-by: Lee Jones <lee@kernel.org>
+
+> diff --git a/Documentation/devicetree/bindings/leds/leds-pwm-multicolor.yaml b/Documentation/devicetree/bindings/leds/leds-pwm-multicolor.yaml
+> index 5edfbe347341..a31a202afe5c 100644
+> --- a/Documentation/devicetree/bindings/leds/leds-pwm-multicolor.yaml
+> +++ b/Documentation/devicetree/bindings/leds/leds-pwm-multicolor.yaml
+> @@ -41,6 +41,8 @@ properties:
+>  
+>            pwm-names: true
+>  
+> +          active-low: true
+> +
+>            color: true
+>  
+>          required:
+> -- 
+> 2.43.0
+> 
+> 
+
+-- 
+Lee Jones [李琼斯]
 
