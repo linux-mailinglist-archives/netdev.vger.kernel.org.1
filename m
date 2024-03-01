@@ -1,116 +1,135 @@
-Return-Path: <netdev+bounces-76751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6221686EBCA
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 23:23:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23ACF86EBD7
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 23:29:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C26CAB2739F
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 22:23:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDE4A28AB4B
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 22:29:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191D159155;
-	Fri,  1 Mar 2024 22:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5FC59169;
+	Fri,  1 Mar 2024 22:29:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gv3Aatpn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZyKTYPwx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBE859B52;
-	Fri,  1 Mar 2024 22:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D71C3BB33;
+	Fri,  1 Mar 2024 22:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709331697; cv=none; b=ZLiDAz6uFc7CBgxcDB601PTpq5knGc+UBYqrlec/aQPIiVxadTy7nDnhJf7RNOQoRr67Akzu+zBvf+m2cddccYA5x6wtix0v2X4vDUEuHTDrU+ehbFKTVcWKUp79ydNwryJ5qOU25CdnRxFT/CmtZCYz6Lw32Xqy4twkICVnR8g=
+	t=1709332165; cv=none; b=t1ONf4TQukZ4fIZGzWadO9Zos2+UrWIbQM2P5QCCvPLwFe58tXnaG4echmR6NHu988MxyPUhDoPpmhxdhaAc0Ue9WBEP/9sqwrmIuSKVrn9QTijA6z9/c1HaYy4w1v30ws3OmBiwxSiMrNSzv30obf8lFgOWyeRqwXJhxnpO3q4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709331697; c=relaxed/simple;
-	bh=QHD6wdc2FcjJAuPr9twXZPAxgmO6Qo4sSe6LZC/0f8Y=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=qLoFKDrH1D1V+RXwWRkh1119p5XpEGdv9ZhNeSuRoRxBH5JeIqL3lGsDINC7zgI5GN5/0Cgoqmoa4F2WtVAB16bH80TNNDiOf6eqPsE8Ytnnx60ctFRrPWR3ODeZ+YTPYy8tFNKen2Qyt5lkq7znY3vQZK09O7iwb2LvsU/X81Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gv3Aatpn; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-42ea808d0f8so18426241cf.0;
-        Fri, 01 Mar 2024 14:21:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709331694; x=1709936494; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z7JfMhQCQePfKKf1uRWjRuFfK5uAA07CGHpzBysCxmM=;
-        b=gv3Aatpnyzjx9YuW+U6KWZBdYkauwPCd/ZVVsksPKK4xAXnXH2rLcRUeN3ZhHOILVY
-         idaLPQWTMdxhvh1q9LZA2SUAd9TmbiaNpNRFAeJqHWRX1LVRT6CV8JOA8UZqcA23YbF5
-         ivhgslC0Ihl2yaCDsqcbN+u+vQ2s9ffUHLAjOpW3p2IOPGcRkGEO7u7RxXW5LD0ms4Nh
-         ji3AjGeon8tCrj7wx6eWbNsh18drmvZZ+w4W1cuHQOYV4a3PhiaLYM2dvHJIlQxxEaqU
-         1OyPEk4cQZE9RXbFgGvEgj4hDXHnAdt1qixtH0wkSZR5dhMniNp5XsrAe7LuD37zQYjk
-         CL6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709331694; x=1709936494;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Z7JfMhQCQePfKKf1uRWjRuFfK5uAA07CGHpzBysCxmM=;
-        b=VmJSaoxmiheRLmZPOD0BkMo7+0kQboTvrBtOmOHXQbbABDhM9xOaGbWd4svdtdQSyH
-         jj854btLguT69MMrVh3XqWAwBi4Pm5FYak+p2vtMNinGgezDDwhrJqrkaySvytNqMZ9P
-         BMWQ0vt/XsncoGOjpFUrHPUaki5aFkYJ6YXsSRFbP8lWvbpVCG8dih/DGDyJejUNhzOE
-         ZpMg3BaJgOXgKVBvApFMd18ImVTUJYnUj07+4mRIQK4yBQ7QNNjjonmi0COunHRiQrfy
-         wUCfHyRO0k+eAwH4xtyfKiEwN6dzwzo1JAKGhuPNNAUl2Bgn3/j5NVNKXATx0y0II2vZ
-         LfMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUa9RlWnBGs+MK8S3YuniImmfx54t/Ij52QsX7qKWNSbURsiIApFJIG2tdI1DlCeTLatRmqSnVc5v2gyK713bPA9h0+CdOmjOuz+lmYwO/aIKt4ETJVds1kHG6XmL6VA5nk8Vkv
-X-Gm-Message-State: AOJu0Yw3t9NXWkkDHpXjdd1Qbc4FLT3D5pSU7o5RZwGg7XVRZdFgr7Cm
-	XFcyuvwg/h4PuY33hkCAs+YgyLcDnyuIcYEuNFn9xLB8mTD83n3O
-X-Google-Smtp-Source: AGHT+IEMamr5yhLIGtxKwdhU5Qrbui94T6NRT6UrZ40ZHM5rj/1zsN5YOMk/Iqb49nY4xzg3m29UlA==
-X-Received: by 2002:ac8:5715:0:b0:42e:dad2:fc58 with SMTP id 21-20020ac85715000000b0042edad2fc58mr89942qtw.5.1709331694494;
-        Fri, 01 Mar 2024 14:21:34 -0800 (PST)
-Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
-        by smtp.gmail.com with ESMTPSA id m15-20020ac8688f000000b0042eae33debfsm2081296qtq.89.2024.03.01.14.21.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 14:21:34 -0800 (PST)
-Date: Fri, 01 Mar 2024 17:21:33 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Andrew Halaney <ahalaney@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Martin KaFai Lau <martin.lau@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>
-Cc: kernel@quicinc.com
-Message-ID: <65e254edea4d2_15e0d629462@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
-References: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
-Subject: Re: [PATCH net-next v4] net: Re-use and set mono_delivery_time bit
- for userspace tstamp packets
+	s=arc-20240116; t=1709332165; c=relaxed/simple;
+	bh=5Xj1ur1qN0aF23NjoAtLbU1HDSoN1Q1krN4IozUzHS8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tkTn8UjOwT3VKhOUSUPugmpmDb6iv5nGWNPc5/bhj8+IidKhIdA4JjVANuAnpjmx9rhnd3+TiwGW6YdAHZih9Xfbn7L8+c4r9upb0hj5yEJu5J+Y1BEL+tBh/qJLEU3uNjdqLy/bNrzrZ376CsCBIrc8v9NWx+FZbZvC7itrgnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZyKTYPwx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96062C433C7;
+	Fri,  1 Mar 2024 22:29:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709332164;
+	bh=5Xj1ur1qN0aF23NjoAtLbU1HDSoN1Q1krN4IozUzHS8=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=ZyKTYPwxbK8Wo4eDEQ4y1DTJrke0mAEg32I1SIdrsksERipv9lSZGApGvsRLPh/DG
+	 RY4vXU1etymGhG88U97Lnl1v5N1Z+MAVrvcOGrxh8DaOxsDDDSQjRR0hbDUntXNqg9
+	 cPibmPieh7K5sJW3jMHndyT0EkYCBC3t6BAyGdZUDtb6hL6rpyf7kkN9ZUVKtdUlAN
+	 eCTdhMJoemcPGfDWc8PbRXfiAFTbe/S6AvIV0TYF8h78CyjtBYjAX8MZyon9sCBJUI
+	 TID3yvumGoT79UVsrpmoXELbPTu2q8Pxnwjgl+m+BZm3zg7Q6SwmvEaj4WY81uIpOC
+	 xhLSx1/hnZPCQ==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 2B6AFCE140C; Fri,  1 Mar 2024 14:29:19 -0800 (PST)
+Date: Fri, 1 Mar 2024 14:29:19 -0800
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Yan Zhai <yan@cloudflare.com>
+Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Hannes Frederic Sowa <hannes@stressinduktion.org>,
+	linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
+	bpf@vger.kernel.org, kernel-team@cloudflare.com,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>, mark.rutland@arm.com
+Subject: Re: [PATCH v2] net: raise RCU qs after each threaded NAPI poll
+Message-ID: <ed57b5fa-8b44-48de-904e-fe8da1939292@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <ZeFPz4D121TgvCje@debian.debian>
+ <CAO3-PboqKqjqrAScqzu6aB8d+fOq97_Wuz8b7d5uoMKT-+-WvQ@mail.gmail.com>
+ <CANn89iLCv0f3vBYt8W+_ZDuNeOY1jDLDBfMbOj7Hzi8s0xQCZA@mail.gmail.com>
+ <CAO3-PboZwTiSmVxVFFfAm94o+LgK=rnm1vbJvMhzSGep+RYzaQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAO3-PboZwTiSmVxVFFfAm94o+LgK=rnm1vbJvMhzSGep+RYzaQ@mail.gmail.com>
 
-Abhishek Chauhan wrote:
-> Bridge driver today has no support to forward the userspace timestamp
-> packets and ends up resetting the timestamp. ETF qdisc checks the
-> packet coming from userspace and encounters to be 0 thereby dropping
-> time sensitive packets. These changes will allow userspace timestamps
-> packets to be forwarded from the bridge to NIC drivers.
+On Fri, Mar 01, 2024 at 11:30:29AM -0600, Yan Zhai wrote:
+> Hi Eric,
 > 
-> Setting the same bit (mono_delivery_time) to avoid dropping of
-> userspace tstamp packets in the forwarding path.
+> On Fri, Mar 1, 2024 at 2:30 AM Eric Dumazet <edumazet@google.com> wrote:
+> >
+> > I could not see the reason for 1sec (HZ) delays.
+> >
+> > Would calling rcu_softirq_qs() every ~10ms instead be a serious issue ?
+> >
+> The trouble scenarios are often when we need to detach an ad-hoc BPF
+> tracing program, or restart a monitoring service. It is fine as long
+> as they do not block for 10+ seconds or even completely stall under
+> heavy traffic. Raising a QS every few ms or HZ both work in such
+> cases.
 > 
-> Existing functionality of mono_delivery_time remains unaltered here,
-> instead just extended with userspace tstamp support for bridge
-> forwarding path.
+> > In anycase, if this all about rcu_tasks, I would prefer using a macro
+> > defined in kernel/rcu/tasks.h
+> > instead of having a hidden constant in a networking core function.
 > 
-> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
+> Paul E. McKenney was suggesting either current form or
+> 
+>          local_bh_enable();
+>          if (!IS_ENABLED(CONFIG_PREEMPT_RT))
+>                  rcu_softirq_qs_enable(local_bh_enable());
+>          else
+>                  local_bh_enable();
+> 
+> With an interval it might have to be
+> "rcu_softirq_qs_enable(local_bh_enable(), &next_qs);" to avoid an
+> unnecessary extern/static var. Will it make more sense to you?
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+I was thinking in terms of something like this (untested):
+
+	#define rcu_softirq_qs_enable(enable_stmt, oldj) \
+	do { \
+		if (!IS_ENABLED(CONFIG_PREEMPT_RT) && \
+		    time_after(oldj + HZ / 10, jiffies) { \
+			rcu_softirq_qs(); \
+			(oldj) = jiffies; \
+		} \
+		do  { enable_stmt; } while (0) \
+	} while (0)
+
+Then the call could be "rcu_softirq_qs_enable(local_bh_enable(), last_qs)",
+where last_qs is initialized by the caller to jiffies.
+
+The reason for putting "enable_stmt;" into anothor do-while loop is
+in case someone typos an "else" as the first part of the "enable_stmt"
+argument.
+
+Would that work?
+
+							Thanx, Paul
 
