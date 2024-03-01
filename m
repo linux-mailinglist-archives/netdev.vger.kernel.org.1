@@ -1,111 +1,175 @@
-Return-Path: <netdev+bounces-76477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C840086DE4B
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:30:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7444D86DE5A
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:35:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8145F282596
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:30:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE4CEB22DBD
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A237B6A345;
-	Fri,  1 Mar 2024 09:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tl5jns5Y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F7D36A35C;
+	Fri,  1 Mar 2024 09:35:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790DA69DEA;
-	Fri,  1 Mar 2024 09:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F816A354;
+	Fri,  1 Mar 2024 09:35:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709285432; cv=none; b=ivONRxQcT3LWEk5D7UF65BqDL/QowIt19ydH2WR6WBzyzrVdD8u8XBppPKtj7d+g5tBeZMReWvrs1GQzEFxuWLcP6B8EjfuvqEbkBbBmuVoX9AH7rPA4MUU72SNmsb2U+DbJ4bjwp2NdC6ftmX+bi3T0xz/ra5ZpGAD1oB8z/BA=
+	t=1709285751; cv=none; b=BuS8B0cG0d77O0EOBDtcaNqFoaZ1hdjHnVEObLHEFnuQESxVS72/e8QihArcDQ92ILADlIj5qxdKn1Rxdzi0VCy+YA1f6wVwydqx7xhlIXQxg/IVDyvHcI9sFCEWz9URiaNCFKxfdJNVdJWTyKbWqGoTVdAqOHX+1Fgn7W+tUIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709285432; c=relaxed/simple;
-	bh=TpiIC487q0AstORpwvTUdNDZ7Z2PIWOGZ4se6WsW4qY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WQvNqhNRqvd3gL4bOLQh8A6v4/kXNAh4uqvzepszBYcYq1qg01SolIIoVGV/ldZJMsDHQlrVXl/4+O5zu64896R6agcXg8c6L37kTPthURLuvvZmsvK6uvq1fzi5Ok2ZS3fhqXFRib8mPqvOBYsDqCSJP5vxFegDFRBgRcN6o6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tl5jns5Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E83DCC43390;
-	Fri,  1 Mar 2024 09:30:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709285432;
-	bh=TpiIC487q0AstORpwvTUdNDZ7Z2PIWOGZ4se6WsW4qY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Tl5jns5YG73wbwINUVlg5Lc9oFCBSAbYUuUj3C0yEveZwPMLn60JHf6krDOY+VBf/
-	 r6jp04vPBe1uuipDX+57/zMQuOkbi9xdyjxbGmTOVEgnWrEbeBCD1V6+zcvRK5lok/
-	 VArLD3/USL6ZlQ+KcYiksyLT8Fz80xYzapNLo422pCOYIsKY+8FOqscIrgvGTPQIQD
-	 +9N8ZXNL0fts6d2kkwvFjrsuQHTMVqEHr7NzvptZuEzM4OXoz3D9yMBGjQd9R5RcoL
-	 k5SwZvsmB6VnquhzpEhGGVZfOO6VJiSFoBrRMM1VQal+zbDXzCPzUS2ImZVEH+nydl
-	 Hkh1o6tVXUWrg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CB7DBD990AE;
-	Fri,  1 Mar 2024 09:30:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709285751; c=relaxed/simple;
+	bh=8bNhQxbcCbIomd4dt6eew7xOLqapH0ekcPWsALbORUA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HCyJesxh9n05Ov6rKtkRTa9Yq8T6jGR/jAOfYOcKiIXDlHF2BIx42W9ORpqDtSynPCspYqlDVfyhFEj/hnI9MxkM71GfBpbEd1ovNpWXpLpioe9jdOm2srgQXFF0HVWUkAS0wqBeTRJvtjLEoUux3lGjYTku21Z00EOcFEPKU1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-412bfacd146so8595005e9.0;
+        Fri, 01 Mar 2024 01:35:49 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709285748; x=1709890548;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1gjhUQtfjcW3P/Ik/3eAaSYAXs9I9SaEMNpWMrhksnk=;
+        b=V3wlWE9A9SjUqw0U9Dy/QqJm1wzspZv+ebCUApw2ayNwUmvlP/YEkQbfcHXdngSMai
+         nnxfkOvkghXCW5jdq59Yd5Urv7wCMVbdsOt2SLaya8NDVdjNXVSa7xV7Pzfo/STVV4vI
+         ONgweYrd0ggtsCe9JOkX8XWDEHmn11tfhlgUIhTBzfHeuNlRx/KdzL1GNpTFVIO4k/T0
+         9T5yCCNlSEPbwNZqZziyHclu/CgLB6I1rNEj5KoLJAa8rRZ/z892KM2ZvhHWcv9al+X9
+         MoEblBnW2fgezQ88tIBRq8z7gc0zckhDJUqLi5LuuDXi2pj6ah4FyLveOULL4Y2sK3UG
+         fklg==
+X-Forwarded-Encrypted: i=1; AJvYcCWxPjUkIo49xcvq2/2gYPzMFmG8NE1s5ReW+7EVc/IRDicjYaVxnHKFjqu9RvgA7DPR23SAkdd8NHVD+VrbuIDmY9BkJ8DXFJOaXj+DaKC88oYw/wsM+vrgpH47PKP1WKbwoLN3BmL6gwj/h+QYGy2jZm0TB0MXUODWibJdJUAo
+X-Gm-Message-State: AOJu0Yw2ejJZf3VYwmNTGlCXInLsX8aAuQTIyFoODWKXn3X9VA/osxM7
+	a4AjzlScfiXUnSX6xtCqdpHaRPqqzqG3NA8LQS83YnBV8/eGUQvGydQCtXIn
+X-Google-Smtp-Source: AGHT+IHJDI/TzDartf8NY/ZhFuVhtyIPZkGhPS1hZ/O9GtvpENuTyWbmh0D26/bAjBhR+zHpTBrJoA==
+X-Received: by 2002:a05:600c:154f:b0:412:bca4:6a00 with SMTP id f15-20020a05600c154f00b00412bca46a00mr1546337wmg.18.1709285747492;
+        Fri, 01 Mar 2024 01:35:47 -0800 (PST)
+Received: from gmail.com (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 1-20020a05600c024100b0040fddaf9ff4sm7830123wmj.40.2024.03.01.01.35.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Mar 2024 01:35:47 -0800 (PST)
+Date: Fri, 1 Mar 2024 01:35:44 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Matthew Wood <thepacketgeek@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: netconsole: Add continuation line
+ prefix to userdata messages
+Message-ID: <ZeGhcN/C7h1KWcTO@gmail.com>
+References: <20240229183602.321747-1-thepacketgeek@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/6] Support for ASP 2.2 and optimizations
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170928543182.25294.16027114391338365355.git-patchwork-notify@kernel.org>
-Date: Fri, 01 Mar 2024 09:30:31 +0000
-References: <20240228225400.3509156-1-justin.chen@broadcom.com>
-In-Reply-To: <20240228225400.3509156-1-justin.chen@broadcom.com>
-To: Justin Chen <justin.chen@broadcom.com>
-Cc: netdev@vger.kernel.org, horms@kernel.org,
- bcm-kernel-feedback-list@broadcom.com, florian.fainelli@broadcom.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- opendmb@gmail.com, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, rafal@milecki.pl, devicetree@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240229183602.321747-1-thepacketgeek@gmail.com>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Wed, 28 Feb 2024 14:53:54 -0800 you wrote:
-> ASP 2.2 adds some power savings during low power modes.
+On Thu, Feb 29, 2024 at 10:36:01AM -0800, Matthew Wood wrote:
+> Add a space (' ') prefix to every userdata line to match docs for
+> dev-kmsg. To account for this extra character in each userdata entry,
+> reduce userdata entry names (directory name) from 54 characters to 53.
 > 
-> Also make various improvements when entering low power modes and
-> reduce MDIO traffic by hooking up interrupts.
+> According to the dev-kmsg docs, a space is used for subsequent lines to
+> mark them as continuation lines.
 > 
-> Justin Chen (6):
->   dt-bindings: net: brcm,unimac-mdio: Add asp-v2.2
->   dt-bindings: net: brcm,asp-v2.0: Add asp-v2.2
->   net: bcmasp: Add support for ASP 2.2
->   net: phy: mdio-bcm-unimac: Add asp v2.2 support
->   net: bcmasp: Keep buffers through power management
->   net: bcmasp: Add support for PHY interrupts
+> > A line starting with ' ', is a continuation line, adding
+> > key/value pairs to the log message, which provide the machine
+> > readable context of the message, for reliable processing in
+> > userspace.
 > 
-> [...]
+> Testing for this patch::
+> 
+>  cd /sys/kernel/config/netconsole && mkdir cmdline0
+>  cd cmdline0
+>  mkdir userdata/test && echo "hello" > userdata/test/value
+>  mkdir userdata/test2 && echo "hello2" > userdata/test2/value
+>  echo "message" > /dev/kmsg
+> 
+> Outputs::
+> 
+>  6.8.0-rc5-virtme,12,493,231373579,-;message
+>   test=hello
+>   test2=hello2
+> 
+> And I confirmed all testing works as expected from the original patchset
+> 
+> v1 -> v2:
+> - Calculate 53 byte user data name from: entry length - formatting chars - value length
+> - Update docs to reflect 53 byte limit for user data name (director)
 
-Here is the summary with links:
-  - [net-next,v3,1/6] dt-bindings: net: brcm,unimac-mdio: Add asp-v2.2
-    https://git.kernel.org/netdev/net-next/c/edac4b113297
-  - [net-next,v3,2/6] dt-bindings: net: brcm,asp-v2.0: Add asp-v2.2
-    https://git.kernel.org/netdev/net-next/c/5682a878e7f1
-  - [net-next,v3,3/6] net: bcmasp: Add support for ASP 2.2
-    https://git.kernel.org/netdev/net-next/c/1d472eb5b670
-  - [net-next,v3,4/6] net: phy: mdio-bcm-unimac: Add asp v2.2 support
-    https://git.kernel.org/netdev/net-next/c/9112fc0109fc
-  - [net-next,v3,5/6] net: bcmasp: Keep buffers through power management
-    https://git.kernel.org/netdev/net-next/c/4688f4f41cfa
-  - [net-next,v3,6/6] net: bcmasp: Add support for PHY interrupts
-    https://git.kernel.org/netdev/net-next/c/cc7f105e7604
+I think the changelog needs to come after the --- below, but I will
+defer that to the maintainers.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> Fixes: df03f830d099 ("net: netconsole: cache userdata formatted string in netconsole_target")
+> Signed-off-by: Matthew Wood <thepacketgeek@gmail.com>
+> ---
+>  Documentation/networking/netconsole.rst | 8 ++++----
+>  drivers/net/netconsole.c                | 8 +++++---
+>  2 files changed, 9 insertions(+), 7 deletions(-)
+> 
+> diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
+> index b28c525e5d1e..d55c2a22ec7a 100644
+> --- a/Documentation/networking/netconsole.rst
+> +++ b/Documentation/networking/netconsole.rst
+> @@ -180,7 +180,7 @@ Custom user data can be appended to the end of messages with netconsole
+>  dynamic configuration enabled. User data entries can be modified without
+>  changing the "enabled" attribute of a target.
+>  
+> -Directories (keys) under `userdata` are limited to 54 character length, and
+> +Directories (keys) under `userdata` are limited to 53 character length, and
+>  data in `userdata/<key>/value` are limited to 200 bytes::
+>  
+>   cd /sys/kernel/config/netconsole && mkdir cmdline0
+> @@ -197,8 +197,8 @@ Messages will now include this additional user data::
+>  Sends::
+>  
+>   12,607,22085407756,-;This is a message
+> - foo=bar
+> - qux=baz
+> +  foo=bar
+> +  qux=baz
+>  
+>  Preview the userdata that will be appended with::
+>  
+> @@ -218,7 +218,7 @@ The `qux` key is omitted since it has no value::
+>  
+>   echo "This is a message" > /dev/kmsg
+>   12,607,22085407756,-;This is a message
+> - foo=bar
+> +  foo=bar
+>  
+>  Delete `userdata` entries with `rmdir`::
+>  
+> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> index 0de108a1c0c8..46e447ea41b8 100644
+> --- a/drivers/net/netconsole.c
+> +++ b/drivers/net/netconsole.c
+> @@ -43,9 +43,11 @@ MODULE_DESCRIPTION("Console driver for network interfaces");
+>  MODULE_LICENSE("GPL");
+>  
+>  #define MAX_PARAM_LENGTH	256
+> -#define MAX_USERDATA_NAME_LENGTH	54
+> -#define MAX_USERDATA_VALUE_LENGTH	200
+>  #define MAX_USERDATA_ENTRY_LENGTH	256
+> +#define MAX_USERDATA_VALUE_LENGTH	200
+> +#define MAX_USERDATA_NAME_LENGTH	MAX_USERDATA_ENTRY_LENGTH - \
+> +					MAX_USERDATA_VALUE_LENGTH - \
+> +					3 /* ' ' '=' '\n' characters */
 
+This is not beautiful even for my standards. I think something like the
+code below makes more sense, even if checkpatch is not happy.
 
+/* The number three below comes from ' ' + '=' + '\n' characters */
+#define MAX_USERDATA_NAME_LENGTH 	MAX_USERDATA_ENTRY_LENGTH - MAX_USERDATA_VALUE_LENGTH - 3 
 
