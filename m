@@ -1,121 +1,104 @@
-Return-Path: <netdev+bounces-76511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF0EA86DF99
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 11:49:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 570D886DF9B
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 11:50:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 915401F21725
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:49:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6881E1C20C2E
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DFBF6BB4C;
-	Fri,  1 Mar 2024 10:48:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B8246A8D4;
+	Fri,  1 Mar 2024 10:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Kbd27LkD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o8EcMWQz"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4896313B;
-	Fri,  1 Mar 2024 10:48:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57FEB69E0B
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 10:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709290137; cv=none; b=Sn0PH+gzkvWh7TPQ17ZDsw3g7N0rUtmMlBxMWFtLg/IRSWlVlJn0Z/WRwKRninBlwr4POmNgLs6aHhsrqudrZ2/AxTOyzu1Go2Dz+aBuitphblRHOJ2XDTUbU0sXjGYeApYjW8lZWEh4BzPT+/8o/HEnMmJFFY3mmxgkO0CWAdM=
+	t=1709290228; cv=none; b=FAdQMJLiZdk7GnUt7RNgVF0iomaecnZ5NupKCFVe+tGqw2gwMvKVJFsvxrR7h2Mnexb7krJ3onARiv20p5Bwk2/04TCUxM8lwtOPggcqI52XYfjHYkL41KoujepQzCTSVTAzqKv9NI3gWE6aTxe7gW9wkOv1nvTdmp6HdcRzbmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709290137; c=relaxed/simple;
-	bh=I2WiRK3nrdrTe9uyfgCck5MP1oAIB84gwGFx4QScLe8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=LinUg0izuVIElPI4C8hUEXIrF5WxR0+pjUrowLNohyIiS9n+MXagKu3+ANA/22AMk2vNb9RFaatGhZFxqLW5oeIkSC/eIfCr+7oqdNq1DkxQIROwiiwS8nULBfuhvdHbm43BrkrbSKKfz8/M3ONVdQtFth9NH1c5vQdG0Z0Zs7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Kbd27LkD; arc=none smtp.client-ip=198.47.19.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 421Ambrn047013;
-	Fri, 1 Mar 2024 04:48:37 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1709290117;
-	bh=xELjhiYnnXVmlP5XfKnRq9b6+5i1JLw3KEziD4K6Wng=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=Kbd27LkDkM3Xg34xNynadmm6CpIq9p/ZqlZJvqDrlhJdKxh3Zo6b7Iq6lqHae7JMg
-	 on5wPhd+7MdicRB/NgywZEjMOLM+OvX2ri/nxwixnvbZTd+IghIijYB4IM0d4A+Lze
-	 BZ3gLdUy+kQ+SICQSLeCIuSvSvlKc7PYNj3R3Ewg=
-Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 421AmbA5016819
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 1 Mar 2024 04:48:37 -0600
-Received: from DLEE108.ent.ti.com (157.170.170.38) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 1
- Mar 2024 04:48:37 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE108.ent.ti.com
- (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 1 Mar 2024 04:48:37 -0600
-Received: from [172.24.227.220] (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.227.220])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 421AmX86095109;
-	Fri, 1 Mar 2024 04:48:34 -0600
-Message-ID: <ef948e8e-b1ae-476f-b07f-4bda6d33c51b@ti.com>
-Date: Fri, 1 Mar 2024 16:18:32 +0530
+	s=arc-20240116; t=1709290228; c=relaxed/simple;
+	bh=lbw76u/KGztqhf0Az8PVkf3TeIzv6sT2oR7maztF+FI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=tclwN+CtcJiZZB/UHuiCInkuFp5XKxYMwgw0mIljKTDUsa8y8Ti/RiolGLMkGY7BaSkcKoO7jG5Nw+BmR/zm8GL2hYrisKGAVW8jjChu6bnO4X5+U3isrYGoy+Ed9Po+ruwlQUnDtZQtBcsYqTinLOiXhmirhSZ5itwyaymhPHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o8EcMWQz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 20080C43390;
+	Fri,  1 Mar 2024 10:50:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709290228;
+	bh=lbw76u/KGztqhf0Az8PVkf3TeIzv6sT2oR7maztF+FI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=o8EcMWQzrM7M/8sxUvmk1vvxgT/SBehEjJKAmZhlY0U4m+TfwXH/OHrFjAVjmCbkX
+	 L8q6pQZXdSlMCFHjYntbeFBB6QLCydjV2/16UJ4SpOURH88pSaLHDWuTsZKdUqf1QP
+	 IVGJEeZBhrOi0R26umtsOjdIgdZTUg4VqIdvmrv95zSU5wGbEArKWhNb0tqQ9Vydc/
+	 dRtVjIKiIU8ZvRBYbuxYCu9FkQXvFVBkhoeWnOEqCAI5w+Pp4tvAd9d8nSb5SdrcmX
+	 I9Np3WHP7Av6ACPt8JZK+4hnqgjDsHPgqvZ6SYk+UTKCjsHhfaKnSa1+CeRRnmNsNv
+	 VCefZ66Lgh2pA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F4224C595C4;
+	Fri,  1 Mar 2024 10:50:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: ethernet: ti: am65-cpsw: Enable RX HW
- timestamp only for PTP packets
-Content-Language: en-US
-To: Jacob Keller <jacob.e.keller@intel.com>,
-        Dan Carpenter
-	<dan.carpenter@linaro.org>,
-        Roger Quadros <rogerq@kernel.org>,
-        Siddharth
- Vadapalli <s-vadapalli@ti.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        Eric
- Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-References: <20240215110953.3225099-1-c-vankar@ti.com>
- <20240215110953.3225099-2-c-vankar@ti.com>
- <3e81297c-2821-4af4-b13d-dc33ae8f85cc@intel.com>
-From: Chintan Vankar <c-vankar@ti.com>
-In-Reply-To: <3e81297c-2821-4af4-b13d-dc33ae8f85cc@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v14 0/5] netdevsim: link and forward skbs between ports
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170929022799.7574.1862024190631622134.git-patchwork-notify@kernel.org>
+Date: Fri, 01 Mar 2024 10:50:27 +0000
+References: <20240228232253.2875900-1-dw@davidwei.uk>
+In-Reply-To: <20240228232253.2875900-1-dw@davidwei.uk>
+To: David Wei <dw@davidwei.uk>
+Cc: kuba@kernel.org, jiri@resnulli.us, sd@queasysnail.net,
+ maciek@machnikowski.net, horms@kernel.org, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com
 
+Hello:
 
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-On 17/02/24 03:51, Jacob Keller wrote:
+On Wed, 28 Feb 2024 15:22:48 -0800 you wrote:
+> This patchset adds the ability to link two netdevsim ports together and
+> forward skbs between them, similar to veth. The goal is to use netdevsim
+> for testing features e.g. zero copy Rx using io_uring.
 > 
+> This feature was tested locally on QEMU, and a selftest is included.
 > 
-> On 2/15/2024 3:09 AM, Chintan Vankar wrote:
->> The CPSW peripherals on J7AHP, J7VCL, J7AEP, J7ES, AM64 SoCs have
->> an errata i2401 "CPSW: Host Timestamps Cause CPSW Port to Lock up".
->>
+> I ran netdev selftests CI style and all tests but the following passed:
+> - gro.sh
+> - l2tp.sh
+> - ip_local_port_range.sh
 > 
-> What's different about timestamping only PTP packets that prevents this
-> port lock up?
+> [...]
 
-The difference is the way we are timestamping the packets. Instead of
-getting the timestamp from CPTS module, we are getting the timestamp
-from CPTS Event FIFO.
+Here is the summary with links:
+  - [v14,1/5] netdevsim: allow two netdevsim ports to be connected
+    https://git.kernel.org/netdev/net-next/c/f532957d76de
+  - [v14,2/5] netdevsim: forward skbs from one connected port to another
+    https://git.kernel.org/netdev/net-next/c/9eb95228a741
+  - [v14,3/5] netdevsim: add ndo_get_iflink() implementation
+    https://git.kernel.org/netdev/net-next/c/8debcf5832c3
+  - [v14,4/5] netdevsim: add selftest for forwarding skb between connected ports
+    https://git.kernel.org/netdev/net-next/c/dfb429ea4f2d
+  - [v14,5/5] netdevsim: fix rtnetlink.sh selftest
+    https://git.kernel.org/netdev/net-next/c/8ee60f9c41fb
 
-In the current mechanism of timestamping, am65-cpsw-nuss driver
-timestamps all received packets by setting the TSTAMP_EN bit in
-CPTS_CONTROL register, which directs the CPTS module to timestamp all
-received packets, followed by passing timestamp via DMA descriptors.
-This mechanism was responsible for the CPSW port to lock up in certain
-condition. We are preventing port lock up by disabling TSTAMP_EN bit in
-CPTS_CONTROL register.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-The mechanism we are following in this patch, utilizes the CPTS Event
-FIFO that records timestamps corresponding to certain events, with one
-such event being the reception of an Ethernet packet with EtherType
-field set to PTP.
+
 
