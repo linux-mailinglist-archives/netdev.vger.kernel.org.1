@@ -1,142 +1,239 @@
-Return-Path: <netdev+bounces-76376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E83386D7B6
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 00:26:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3563C86D842
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 01:16:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B2FF28387B
-	for <lists+netdev@lfdr.de>; Thu, 29 Feb 2024 23:26:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 619D6B21CD1
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 00:16:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2F874BFE;
-	Thu, 29 Feb 2024 23:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC64464B;
+	Fri,  1 Mar 2024 00:16:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LQ+4w4K9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JbttejEv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0CD74BF1;
-	Thu, 29 Feb 2024 23:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FBE365
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 00:16:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709249160; cv=none; b=jI8TQ7OPdg5TT4e9DxoagY9e5+JzKgzUdd3jTmwxcEODHqwOAXqDX8/8KNMsgyr7uOvBe2j3nS7bqcAMcgKDQVE0Kt2qQozCBwJHKi9Nms6hAnK8/FAwlRXZSJ1TbrXEfIln0iE10GAeYRt+lloifrYAkW/bMELza6uiFCqbeNs=
+	t=1709252172; cv=none; b=SKYx/KAwPqDTz6i8M+WCrKHZg/LKLR4EQ60C2hrvHhVN6Qh04OWh6z88W3d7reB3h6epjLA06jHQKDWpuwBdDFTmlZH/rvzlos5VG0vz0qE+rYCoKbtURb4MYiIV4ew8Skmah7blEy00XBAXS5P6d8bnEn3p0ophY+hGsZZdtMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709249160; c=relaxed/simple;
-	bh=QkWOLCXGjWdmYeUQ4QG/VDCFo+DPATObHhiMnUCbGgY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fuEwF7XrJJ+aM/0biFShJmunbJrcev5hVlzcYER8nM7a7qGajXD2ur5JiDSUMQ1edOjaAwyA7AASdxH+mFQDAn8p3+MCahC9nYMCQJ4UdmlfCcMHDBSMWeLojajYeUHA7EhRcv3SnMpqdioRoGjzcHGR8UACdc6es6rIgPGlOds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LQ+4w4K9; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-7c7770fd687so81757739f.3;
-        Thu, 29 Feb 2024 15:25:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709249158; x=1709853958; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2Jme5oUa53ygZP5xSuXYsOtdmv088OFcYmVS1nNJAVI=;
-        b=LQ+4w4K9cZXwB69iLhCVBYKCia5S9L6dSKbi5c9UtFdSWyIt1bItWCcrtRH+eVlHUz
-         nAoPyr/s/nuNW7UskUVip9wvd7hHnQNNYS34zedbV2dUfWnOWHCghBrweX7AflmhKjND
-         RCrbRICPtpjdIgrabVrdPtF3s9Q97gxRhMsIhS1tgr8OcLtO9nXsI4YW8um8LnB3+T/x
-         gDuxy+NN607WqdndHNs22MRHwJPyKO6L/cPe6wRmme2cyMtlV0QRT3eF5aNLK4zf5FF8
-         P2wD6DoQle+4yAXtII+8L8Tf4LWP7DGxJTC8e7QTfVtTmV6BimJjAvRhiPTK6TiUjjTg
-         YMYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709249158; x=1709853958;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2Jme5oUa53ygZP5xSuXYsOtdmv088OFcYmVS1nNJAVI=;
-        b=pY2kE9O3RWbyT3nDg6Z8Pz3n04UPPpD6xzKUswKaTEnHoKIWu9a7EktED4eI0JPhif
-         bqssQf5k/l155PfkolDYLTGBazt+YSD6046W/UXLh/lBPVNzqClURY5EyCJsPkbTpSzO
-         MGyjpwoTrMvBoa4D3oUh+SbDe1tk849kFuUPNwlTwEFvQ74C/eg54jknP1tC0IUSXQ3m
-         3Kk5II40uvKrya6h/Uv7G8DrhDLAp8UU29irZ4Eimo+9CK7/cKFhvefk9jHJ4X3RiF78
-         f8MkWCXo88R0BNTvyh0vXidVE/msF2e/yYWoMN6bxu6ekPNN0keIuDtbH/4BFu51f11J
-         7hqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU2HWnvPQxGIOkNY8Gj7aiYT0iG6m0fSGu3XioGIjyeOgiQLuu1BRiUClVScZpsJ8zEnDxrAciDsQpZmwwSTZvNWmnK2SymzysVRvFc074mwZupmVa9uzJd4d5Q2WaPbvwoaoeTlG5o5bkNy6KeqXDd/a1hgdIcW+WMNIGTAQGTjTV2AoryMWkesC7Fp0ff
-X-Gm-Message-State: AOJu0Yx4KQwLziktZ3LRwU4yX8vOn6z26H5qyQSx8B1gyIw3Ay0yDA8k
-	wrM3jaWfSUPUDkIPXo1O+NHxxdCPDn2tjAJGT9r8Yjpr1dVNSnFfjrvaUGI3MM5wCsBZWZG5vNj
-	vZ9v6xHwo58rrepT+pLE4taLnrRk=
-X-Google-Smtp-Source: AGHT+IGKCstCaSOwLBpvx+2RbrH2XMhIrO0Zi1WRF9+1w4gklfec/ZYCqtFdeNIGbe3s4ZAMkKVG/Tnlq7JT4L+zUss=
-X-Received: by 2002:a92:c566:0:b0:365:1737:d74 with SMTP id
- b6-20020a92c566000000b0036517370d74mr233262ilj.0.1709249157897; Thu, 29 Feb
- 2024 15:25:57 -0800 (PST)
+	s=arc-20240116; t=1709252172; c=relaxed/simple;
+	bh=GUG5P6IPCFAXBVQRjeHpjmbdaAFnnclF/+A/w2B2Jp4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q/WxibMWX8v1o7xGJ9vt1r/vaaAv8YdFDBwYl23VvN98b0Hl8vt2c9DCLyjxddaQjnPNs6O8AvZgH9SfthJYpNS3LzBge9ZZK5nycwc7ZJhKm5G3gYNn4ePFRDIxVvmLf26MDAxpwaC1Dyb0K8+Buov03WY9tLPVmVrlJ0Cy76k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JbttejEv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A687C43394;
+	Fri,  1 Mar 2024 00:16:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709252171;
+	bh=GUG5P6IPCFAXBVQRjeHpjmbdaAFnnclF/+A/w2B2Jp4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JbttejEvi5w2r+u8WZPxMWsEdVzGZBQkp570chu+zDLxXjrCldfvBM6XGULXfxrCK
+	 h+joFOvFhuZa/t3YvNqRriX65KovsoAbuPb1wxHkAJx6OftLAeKsJcBZjJfLD0UOJq
+	 sC/Dj1yx9uQmlwnTPcQf6v8e+MIVZP8V8nCRT/aYlVe8bYN8qWylXqIaurrgv1GA1J
+	 AcHpwTeG8UaAo1S7B+8ycYA57hbyyxJ95DOZ/abCrC93zMHYcWofJG7U24I0wGHWDC
+	 BRbRLPJ4dsNJOGBIVtj7WC8Hsg5w6qiXKpZ2oBiqSg4vupbSYSr01nSbdNbyE2amSS
+	 0ku7v1WX+R4HA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	vadim.fedorenko@linux.dev,
+	arkadiusz.kubalewski@intel.com,
+	jiri@resnulli.us
+Subject: [PATCH net-next] dpll: avoid multiple function calls to dump netdev info
+Date: Thu, 29 Feb 2024 16:16:07 -0800
+Message-ID: <20240301001607.2925706-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240229005920.2407409-1-kuba@kernel.org> <20240229005920.2407409-13-kuba@kernel.org>
- <871q8vm2wj.fsf@cloudflare.com>
-In-Reply-To: <871q8vm2wj.fsf@cloudflare.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 29 Feb 2024 18:25:46 -0500
-Message-ID: <CADvbK_e+JCeM9cn0Qd7JG5UdSO_-s8w5r0v40E485JevkbH4XQ@mail.gmail.com>
-Subject: Re: [PATCH v4 12/12] selftests: ip_local_port_range: use XFAIL
- instead of SKIP
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, netdev@vger.kernel.org, 
-	edumazet@google.com, pabeni@redhat.com, shuah@kernel.org, 
-	linux-kselftest@vger.kernel.org, mic@digikod.net, 
-	linux-security-module@vger.kernel.org, keescook@chromium.org, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 29, 2024 at 3:27=E2=80=AFPM Jakub Sitnicki <jakub@cloudflare.co=
-m> wrote:
->
-> On Wed, Feb 28, 2024 at 04:59 PM -08, Jakub Kicinski wrote:
-> > SCTP does not support IP_LOCAL_PORT_RANGE and we know it,
-> > so use XFAIL instead of SKIP.
-> >
-> > Reviewed-by: Kees Cook <keescook@chromium.org>
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> > ---
-> >  tools/testing/selftests/net/ip_local_port_range.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/net/ip_local_port_range.c b/tools/=
-testing/selftests/net/ip_local_port_range.c
-> > index 6ebd58869a63..193b82745fd8 100644
-> > --- a/tools/testing/selftests/net/ip_local_port_range.c
-> > +++ b/tools/testing/selftests/net/ip_local_port_range.c
-> > @@ -365,9 +365,6 @@ TEST_F(ip_local_port_range, late_bind)
-> >       __u32 range;
-> >       __u16 port;
-> >
-> > -     if (variant->so_protocol =3D=3D IPPROTO_SCTP)
-> > -             SKIP(return, "SCTP doesn't support IP_BIND_ADDRESS_NO_POR=
-T");
-> > -
-> >       fd =3D socket(variant->so_domain, variant->so_type, 0);
-> >       ASSERT_GE(fd, 0) TH_LOG("socket failed");
-> >
-> > @@ -414,6 +411,9 @@ TEST_F(ip_local_port_range, late_bind)
-> >       ASSERT_TRUE(!err) TH_LOG("close failed");
-> >  }
-> >
-> > +XFAIL_ADD(ip_local_port_range, ip4_stcp, late_bind);
-> > +XFAIL_ADD(ip_local_port_range, ip6_stcp, late_bind);
-> > +
-> >  TEST_F(ip_local_port_range, get_port_range)
-> >  {
-> >       __u16 lo, hi;
->
-> [wrt our earlier discussion off-list]
->
-> You were right, this test succeeds if I delete SKIP for SCTP.
-> Turns out IP_LOCAL_PORT_RANGE works for SCTP out of the box after all.
->
-> What I didn't notice earlier is that sctp_setsockopt() delegates to
-> ip_setsockopt() when level !=3D SOL_SCTP.
->
-> CC'ing Marcelo & Xin, to confirm that this isn't a problem.
-Yes, SCTP supports ip_local_port_range by calling
-inet_sk_get_local_port_range() in sctp_get_port(), similar to TCP/UDP.
+Due to compiler oddness and because struct dpll_pin is defined
+in a private header we have to call into dpll code to get
+the handle for the pin associated with a netdev.
+Combine getting the pin pointer and getting the info into
+a single function call by having the helpers take a netdev
+pointer, rather than expecting a pin.
+
+The exports are note needed, networking core can't be a module.
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+BTW is the empty nest if the netdev has no pin intentional?
+Should we add a comment explaining why it's there?
+
+CC: vadim.fedorenko@linux.dev
+CC: arkadiusz.kubalewski@intel.com
+CC: jiri@resnulli.us
+---
+ drivers/dpll/dpll_core.c    |  5 -----
+ drivers/dpll/dpll_netlink.c | 38 +++++++++++++++++++++++--------------
+ include/linux/dpll.h        | 19 ++++++-------------
+ net/core/rtnetlink.c        |  4 ++--
+ 4 files changed, 32 insertions(+), 34 deletions(-)
+
+diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+index 12fcd420396e..a87bf95216c1 100644
+--- a/drivers/dpll/dpll_core.c
++++ b/drivers/dpll/dpll_core.c
+@@ -44,11 +44,6 @@ struct dpll_pin_registration {
+ 	void *priv;
+ };
+ 
+-struct dpll_pin *netdev_dpll_pin(const struct net_device *dev)
+-{
+-	return rcu_dereference_rtnl(dev->dpll_pin);
+-}
+-
+ struct dpll_device *dpll_device_get_by_id(int id)
+ {
+ 	if (xa_get_mark(&dpll_device_xa, id, DPLL_REGISTERED))
+diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+index 1419fd0d241c..9be4ae35fea2 100644
+--- a/drivers/dpll/dpll_netlink.c
++++ b/drivers/dpll/dpll_netlink.c
+@@ -8,6 +8,7 @@
+  */
+ #include <linux/module.h>
+ #include <linux/kernel.h>
++#include <linux/netdevice.h>
+ #include <net/genetlink.h>
+ #include "dpll_core.h"
+ #include "dpll_netlink.h"
+@@ -47,18 +48,6 @@ dpll_msg_add_dev_parent_handle(struct sk_buff *msg, u32 id)
+ 	return 0;
+ }
+ 
+-/**
+- * dpll_msg_pin_handle_size - get size of pin handle attribute for given pin
+- * @pin: pin pointer
+- *
+- * Return: byte size of pin handle attribute for given pin.
+- */
+-size_t dpll_msg_pin_handle_size(struct dpll_pin *pin)
+-{
+-	return pin ? nla_total_size(4) : 0; /* DPLL_A_PIN_ID */
+-}
+-EXPORT_SYMBOL_GPL(dpll_msg_pin_handle_size);
+-
+ /**
+  * dpll_msg_add_pin_handle - attach pin handle attribute to a given message
+  * @msg: pointer to sk_buff message to attach a pin handle
+@@ -68,7 +57,7 @@ EXPORT_SYMBOL_GPL(dpll_msg_pin_handle_size);
+  * * 0 - success
+  * * -EMSGSIZE - no space in message to attach pin handle
+  */
+-int dpll_msg_add_pin_handle(struct sk_buff *msg, struct dpll_pin *pin)
++static int dpll_msg_add_pin_handle(struct sk_buff *msg, struct dpll_pin *pin)
+ {
+ 	if (!pin)
+ 		return 0;
+@@ -76,7 +65,28 @@ int dpll_msg_add_pin_handle(struct sk_buff *msg, struct dpll_pin *pin)
+ 		return -EMSGSIZE;
+ 	return 0;
+ }
+-EXPORT_SYMBOL_GPL(dpll_msg_add_pin_handle);
++
++static struct dpll_pin *netdev_dpll_pin(const struct net_device *dev)
++{
++	return rcu_dereference_rtnl(dev->dpll_pin);
++}
++
++/**
++ * dpll_netdev_pin_handle_size - get size of pin handle attribute of a netdev
++ * @dev: netdev from which to get the pin
++ *
++ * Return: byte size of pin handle attribute, or 0 if @dev has no pin.
++ */
++size_t dpll_netdev_pin_handle_size(const struct net_device *dev)
++{
++	return netdev_dpll_pin(dev) ? nla_total_size(4) : 0; /* DPLL_A_PIN_ID */
++}
++
++int dpll_netdev_add_pin_handle(struct sk_buff *msg,
++			       const struct net_device *dev)
++{
++	return dpll_msg_add_pin_handle(msg, netdev_dpll_pin(dev));
++}
+ 
+ static int
+ dpll_msg_add_mode(struct sk_buff *msg, struct dpll_device *dpll,
+diff --git a/include/linux/dpll.h b/include/linux/dpll.h
+index e3abde993244..ff14d1e88f87 100644
+--- a/include/linux/dpll.h
++++ b/include/linux/dpll.h
+@@ -123,15 +123,17 @@ struct dpll_pin_properties {
+ };
+ 
+ #if IS_ENABLED(CONFIG_DPLL)
+-size_t dpll_msg_pin_handle_size(struct dpll_pin *pin);
+-int dpll_msg_add_pin_handle(struct sk_buff *msg, struct dpll_pin *pin);
++size_t dpll_netdev_pin_handle_size(const struct net_device *dev);
++int dpll_netdev_add_pin_handle(struct sk_buff *msg,
++			       const struct net_device *dev);
+ #else
+-static inline size_t dpll_msg_pin_handle_size(struct dpll_pin *pin)
++static inline size_t dpll_netdev_pin_handle_size(const struct net_device *dev)
+ {
+ 	return 0;
+ }
+ 
+-static inline int dpll_msg_add_pin_handle(struct sk_buff *msg, struct dpll_pin *pin)
++static inline int
++dpll_netdev_add_pin_handle(struct sk_buff *msg, const struct net_device *dev)
+ {
+ 	return 0;
+ }
+@@ -170,13 +172,4 @@ int dpll_device_change_ntf(struct dpll_device *dpll);
+ 
+ int dpll_pin_change_ntf(struct dpll_pin *pin);
+ 
+-#if !IS_ENABLED(CONFIG_DPLL)
+-static inline struct dpll_pin *netdev_dpll_pin(const struct net_device *dev)
+-{
+-	return NULL;
+-}
+-#else
+-struct dpll_pin *netdev_dpll_pin(const struct net_device *dev);
+-#endif
+-
+ #endif
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 780b330f8ef9..e0353487c57e 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -1056,7 +1056,7 @@ static size_t rtnl_dpll_pin_size(const struct net_device *dev)
+ {
+ 	size_t size = nla_total_size(0); /* nest IFLA_DPLL_PIN */
+ 
+-	size += dpll_msg_pin_handle_size(netdev_dpll_pin(dev));
++	size += dpll_netdev_pin_handle_size(dev);
+ 
+ 	return size;
+ }
+@@ -1793,7 +1793,7 @@ static int rtnl_fill_dpll_pin(struct sk_buff *skb,
+ 	if (!dpll_pin_nest)
+ 		return -EMSGSIZE;
+ 
+-	ret = dpll_msg_add_pin_handle(skb, netdev_dpll_pin(dev));
++	ret = dpll_netdev_add_pin_handle(skb, dev);
+ 	if (ret < 0)
+ 		goto nest_cancel;
+ 
+-- 
+2.43.2
+
 
