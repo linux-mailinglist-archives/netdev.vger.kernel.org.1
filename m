@@ -1,127 +1,100 @@
-Return-Path: <netdev+bounces-76435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07C5486DBBF
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 07:59:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4289786DBCA
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 08:02:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96624B251C7
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 06:59:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C08D728199F
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 07:02:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3207692FE;
-	Fri,  1 Mar 2024 06:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46A68692FE;
+	Fri,  1 Mar 2024 07:02:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VcS3hDub"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RTpWJTxJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3DA18464;
-	Fri,  1 Mar 2024 06:59:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2698C69312
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 07:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709276352; cv=none; b=YYiWMho4ncPBrKmR7qBDE+LiG/Q4AFohxtav2IWSVEsQo2t7Fh98b/+9kGQybx68kBGxP+l8qUiB2Fap1Ys8D9+Yjbk9cobOtNPzIXpBlTqZJ2gf0wGwrs3YDcKq8gcbNLkgiFraovhHueyVq8dmzMORz/oYg4aVC2FsAfcO6fY=
+	t=1709276565; cv=none; b=PkXcjc34foADQxgulcnGhFgDdnboLYRpiInnC9PJ/j6DXuaqsp3Tbafuv/kOUVERGiUHkVZClArKuiyhw5od5cVdRXKQBbnMcNi9btDpiZqYwWVoktzu2Q0gCq2wGmC2SUMjT/9gF2h+g0bCitIhUj72l/L5lE5A/YvCKgEsCmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709276352; c=relaxed/simple;
-	bh=jL1paCHEOa9QLVRu5Ik8YUZsHarWWAgotaMOmfcOHv0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tFPzhGCzLnLm8p/2zRqmYJfhdVUsTsWB1lmO+JlseHzD4a0H2HVy6oZd4XZED+MTNduIuzhKrz6+KHHmYTUOLU/eECkhGEJVJplS++CAYt4M2h+APejmTpCh2C/hCOt8ED3UHVjCkMRUcmw8zkQtMaXtVm1zvLoahROo7iLG8bI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VcS3hDub; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95CD6C433C7;
-	Fri,  1 Mar 2024 06:59:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709276352;
-	bh=jL1paCHEOa9QLVRu5Ik8YUZsHarWWAgotaMOmfcOHv0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VcS3hDub6/Yc/PAbRjoUwgS8EtjeYp8Fw7QbenSaHDgjcV2ngKGKtCWzx4IS1E0pn
-	 ZTm3hvXBHI0TI4h/yNEVKEBnwC1v3YDu8QO0BY4tsRzKs0w42F73XhNf4Zb9aC3A8v
-	 LQPnh8BaZqjOfUN7N+Jml5NF5iAxW2YOLAHy0wb4MQIXcSaDkljxuKmuYPPgdh5D+i
-	 2rY6QXASkRSPICmAcCph2Ha7GQp2DreG8P2pQqXlU2OOEOgueZPUDUmMIcTCIYGjzN
-	 guFkKnFmP2ths4UFOjhbHqbFaSvcO6AOTNH+gROcGZB+4yGVi2W3uysUiR8UclLZ/7
-	 cU0nJSpFlf1CQ==
-Date: Thu, 29 Feb 2024 22:59:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, "Gustavo A. R. Silva"
- <gustavoars@kernel.org>, netdev@vger.kernel.org,
- linux-hardening@vger.kernel.org, Simon Horman <horms@kernel.org>, Jiri
- Pirko <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>, Coco Li
- <lixiaoyan@google.com>, Amritha Nambiar <amritha.nambiar@intel.com>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netdev: Use flexible array for trailing private bytes
-Message-ID: <20240229225910.79e224cf@kernel.org>
-In-Reply-To: <20240229213018.work.556-kees@kernel.org>
-References: <20240229213018.work.556-kees@kernel.org>
+	s=arc-20240116; t=1709276565; c=relaxed/simple;
+	bh=eeYjzCOa3IHlOQ8XQgZ9V2FFRichH88AUSu1oEmFwlQ=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Z2aiyX/kMVqt9I2mi25Ct2TTQAmeyEeNkRraNFrmt8b9/YME3c3prt9+VgIMD8uo72Udkoc1A+6ahAFSOm3mwLign0w6xWpZzJEDg12jNQDi10+Y1V9Auqw4gE+xQc118ihCY+7Rp57WEY/vZOLNBX8NzwJCPP8vrb5XXP0jfdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RTpWJTxJ; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <332c7a04-edc8-40bd-9e8f-69c5d297e845@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1709276561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q+R57nlgNYlzh5ejQpgKXMR5auAQmldU7vEvlXc/LJs=;
+	b=RTpWJTxJA5PpIDyFqQhsIHUDBP6OBgyYRlRjbhnVmTPzQqTU98gEk7vq02aXlOeh0aS8eP
+	0UcavUVdrAOe9EDraWCo/YT3cRL4fMh+NYf9fNTEQKDYoYpLq2kBEb70+PNrBqSRvmGw6D
+	69BzLaH0iLLwV+gxwbo0MsBXUDhvVFY=
+Date: Thu, 29 Feb 2024 23:02:31 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Subject: Re: [PATCH net-next v12 00/15] Introducing P4TC (series 1)
+To: John Fastabend <john.fastabend@gmail.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: deb.chatterjee@intel.com, anjali.singhai@intel.com,
+ namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com,
+ Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, tomasz.osinski@intel.com,
+ jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com,
+ horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, daniel@iogearbox.net,
+ victor@mojatatu.com, pctammela@mojatatu.com, dan.daly@intel.com,
+ andy.fingerhut@gmail.com, chris.sommers@keysight.com, mattyk@nvidia.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20240225165447.156954-1-jhs@mojatatu.com>
+ <65df6935db67e_2a12e2083b@john.notmuch>
+Content-Language: en-US
+In-Reply-To: <65df6935db67e_2a12e2083b@john.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 29 Feb 2024 13:30:22 -0800 Kees Cook wrote:
-> Introduce a new struct net_device_priv that contains struct net_device
-> but also accounts for the commonly trailing bytes through the "size" and
-> "data" members.
+On 2/28/24 9:11 AM, John Fastabend wrote:
+>   - The kfuncs are mostly duplicates of map ops we already have in BPF API.
+>     The motivation by my read is to use netlink instead of bpf commands. I
 
-I'm a bit unclear on the benefit. Perhaps I'm unaccustomed to "safe C".
+I also have similar thought on the kfuncs (create/update/delete) which is mostly 
+bpf map ops. It could have one single kfunc to allocate a kernel specific p4 
+entry/object and then store that in a bpf map. With the bpf_rbtree, bpf_list, 
+and other recent advancements, it should be able to describe them in a bpf map. 
+The reply in v9 was that the p4 table will also be used in the future HW 
+piece/driver but the HW piece is not ready yet, bpf is the only consumer of the 
+kernel p4 table now and this makes mimicking the bpf map api to kfuncs not 
+convincing. bpf "tc / xdp" program uses netlink to attach/detach and the policy 
+also stays in the bpf map.
 
-> As many dummy struct net_device instances exist still,
-> it is non-trivial to but this flexible array inside struct net_device
+When there is a HW piece that consumes the p4 table, that will be a better time 
+to discuss the kfunc interface.
 
-put
+>     don't agree with this, optimizing for some low level debug a developer
+>     uses is the wrong design space. Actual users should not be deploying
+>     this via ssh into boxes. The workflow will not scale and really we need
+>     tooling and infra to land P4 programs across the network. This is orders
+>     of more pain if its an endpoint solution and not a middlebox/switch
+>     solution. As a switch solution I don't see how p4tc sw scales to even TOR
+>     packet rates. So you need tooling on top and user interact with the
+>     tooling not the Linux widget/debugger at the bottom.
 
-Non-trivial, meaning what's the challenge?
-We also do somewhat silly things with netdev lifetime, because we can't
-assume netdev gets freed by netdev_free(). Cleaning up the "embedders"
-would be beneficial for multiple reasons.
-
-> itself. But we can add a sanity check in netdev_priv() to catch any
-> attempts to access the private data of a dummy struct.
-> 
-> Adjust allocation logic to use the new full structure.
-> 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 118c40258d07..b476809d0bae 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -1815,6 +1815,8 @@ enum netdev_stat_type {
->  	NETDEV_PCPU_STAT_DSTATS, /* struct pcpu_dstats */
->  };
->  
-> +#define	NETDEV_ALIGN		32
-
-Unless someone knows what this is for it should go.
-Align priv to cacheline size.
-
->  /**
->   *	struct net_device - The DEVICE structure.
->   *
-
-> @@ -2665,7 +2673,14 @@ void dev_net_set(struct net_device *dev, struct net *net)
->   */
->  static inline void *netdev_priv(const struct net_device *dev)
->  {
-> -	return (char *)dev + ALIGN(sizeof(struct net_device), NETDEV_ALIGN);
-> +	struct net_device_priv *priv;
-> +
-> +	/* Dummy struct net_device have no trailing data. */
-> +	if (WARN_ON_ONCE(dev->reg_state == NETREG_DUMMY))
-> +		return NULL;
-
-This is a static inline with roughly 11,000 call sites, according to 
-a quick grep. Aren't WARN_ONCE() in static inlines creating a "once"
-object in every compilation unit where they get used?
-
-> +	priv = container_of(dev, struct net_device_priv, dev);
-> +	return (u8 *)priv->data;
->  }
 
