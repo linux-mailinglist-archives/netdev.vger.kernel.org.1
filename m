@@ -1,84 +1,177 @@
-Return-Path: <netdev+bounces-76663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E6FA86E769
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:37:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B7D786E783
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:43:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 996111C231DB
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:37:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC83AB2DE16
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:40:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 309FF101D4;
-	Fri,  1 Mar 2024 17:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28ADD8C1B;
+	Fri,  1 Mar 2024 17:40:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WkaA+sqq"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="px9EOQVF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0440B36120;
-	Fri,  1 Mar 2024 17:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42FF58C17
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 17:40:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709314519; cv=none; b=kvehxK6uKTKDwi4DdZuHFtFggwplhphCjofMfuoBQ5nwnNO5LKkAsvDItG0s0vbjuAplnOFeaNZHCmdsQhMOA0CHqq76eJWCS6CqvAAi2jbtRp2edSnPKz75PK7ei4ld8GPtMkyfVwxbAUl0OPknGFaAk+u9Ia4rcoOTNNwIDos=
+	t=1709314811; cv=none; b=db1q6e6eVfNEL59JZEj/9E1K36f9UJZn6qQA/e3sNDCwUDmFBQZAVHM+xCjHZUlw3AujQmVjHX/6FEEj69efUxSAScewM09CpeoSnobN8EeFsLLQTH/bMjDK+F9qdP4k9yWe4PTKMhTYHA4mQGC+LiSx6KUkAPWxgkE0ChQ7lw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709314519; c=relaxed/simple;
-	bh=EIj/hPN+ik4qmCHTNuVgjY4pQTRSkTwciabO+oM1s/E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CYuzTJ34sX42gmHxchW+1S2tu6VywUBbprr7flxEqXoNZLgwleUPaFrXSKq1dGd2YffE9pq5knit4x8Bt5zP4DNZh200PvVZvN8Nvr5oIhm+KOw2y8om+4nl4jrCxx8QpA3AsAJOUg1tcmpvK5MYu1C0cfd4woWLCE0XzhE9cfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WkaA+sqq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DFFEC433F1;
-	Fri,  1 Mar 2024 17:35:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709314518;
-	bh=EIj/hPN+ik4qmCHTNuVgjY4pQTRSkTwciabO+oM1s/E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WkaA+sqqt5Aprf/+ou7cadfG7bxUeTKvsb5UJe29yaHjEOEn6Xl888m3O2bwtLr6m
-	 kBnYkXlU4+7VoH2QtqxJ2DRwKn4HrRYX/16b57ztkG+ZAN5A7ICLi58/9rswLl8Rti
-	 Qya+bELvvD8OVl4sCXqtzQPB9dso+1CAesx2eAHVWtsvAi9GaHYbTxtlvVIJpoiDA4
-	 HGxm3AyZ6Y6hdoDZTywToy6Jb+RstK9GbEzAfhoKabwFkPa/JSDS1rDfY+xGrfXWMR
-	 bbS/FfN63kTeEybMi4gMbgSLSzIloMpSLLJwly7c9dmfhbFWPlDNskqEs2w7TbRgra
-	 bOOWtop18STRw==
-Date: Fri, 1 Mar 2024 09:35:17 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Eric Dumazet <edumazet@google.com>, Kees Cook <keescook@chromium.org>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>, "Gustavo A. R. Silva"
- <gustavoars@kernel.org>, <netdev@vger.kernel.org>,
- <linux-hardening@vger.kernel.org>, Simon Horman <horms@kernel.org>, "Jiri
- Pirko" <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>, Coco Li
- <lixiaoyan@google.com>, Amritha Nambiar <amritha.nambiar@intel.com>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] netdev: Use flexible array for trailing private bytes
-Message-ID: <20240301093517.428e5b5d@kernel.org>
-In-Reply-To: <77d3f074-8cb6-466b-ab31-a7b0bac659d0@intel.com>
-References: <20240229213018.work.556-kees@kernel.org>
-	<20240229225910.79e224cf@kernel.org>
-	<CANn89iKeJGvhY0K=kLhhR39NVbaizP2UBk0Vk0r_XCe2XMBZHg@mail.gmail.com>
-	<9050bdec-b34a-4133-8ba5-021dfd4b1c75@intel.com>
-	<CANn89iLSLPn5PyXNQcA2HO0e5jGYvHKhTh_9_EMmfbTJKZPfbg@mail.gmail.com>
-	<77d3f074-8cb6-466b-ab31-a7b0bac659d0@intel.com>
+	s=arc-20240116; t=1709314811; c=relaxed/simple;
+	bh=UB3/57HFBauwLv+012N6zNdwHb3m9tv4hQ3fEEnCH+0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hylkq2ZAmuYyts29/rn7Cxcp5M6NPWTfHdoQiCyhtZLVjz9r+4YlBn/sIREG6mrNv8f6W4jlxUxuZFG4RymvEWg5fbRtuyw1hVEBHoWp3kZGBCtWiKgtEntnTWaGL2x0iexhlzES/LkuunICOGQ8DLGQ6HM7gYN/uVl23f8EbOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=px9EOQVF; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-607e60d01b2so15647357b3.1
+        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 09:40:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1709314808; x=1709919608; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KKuoTII8owMqXxc9bXrPH4tQcPB3RC2Q+SoMsJFiE6E=;
+        b=px9EOQVFODT7Lk+tRSIpIFN2b+V1F/K2HVwxmkp9MS8WbtjupqQQTGH3nhAaLBSP0o
+         UnOnrQxSfVCoNwtP2/oP6m9AjVnaemkmO8N+nWsWi/Gevt9aHGiY/dbzFm9oMRdwRC8N
+         1zOfYYdU5+G8EEH0OT8dCFjY213VdEcAylPdZr7yiTXLCLbetIXyjcOw8fTleD+ff6nf
+         LgR7uNYyNRv5rBe51Wlt6vBjWnku580NzqSBYxhDIT6IzMIL2MYp9j7pD0mTboqSLKYe
+         eKpevhpc5iOQRoA2U23lC4lLcva7hanXuddJGuZlQiCQd7bDKTRCvs4al5PJ9v382/mO
+         E1aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709314808; x=1709919608;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KKuoTII8owMqXxc9bXrPH4tQcPB3RC2Q+SoMsJFiE6E=;
+        b=SQerfmtGDRol+2DaZkiPavk9YN1+R/jQ9ahWMX8DQSobtOG2Jm4HA5Eagy0Lsa5fBl
+         dpMf8TzXjPF24VzHeo8XpX1/kyYCDgnKDhqv+I3U7SeJaAbf2nI2rX7PrAj3STxRcWo3
+         eHpVdVaHnqLfnMgKkyFi91kOTBXa4bfsToDmJ6tOpy32m8FwKh4cugDLbzKSNpl/APTm
+         XFx76BQJDs5UqcofrjywH7iewq/97LbuOCG0Bksd6SKoTeq6hrxj6OuiIhhAwBPvbQnv
+         rC8cjSV0UrzLZatSkT8XR6DwvcUg9hrFfGHGooJF/OzvQMIeY+8PPTWPG+8cnkbd37XC
+         aopQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXO0vsjrabs9LjoHvdK4UkK/yvMcA+dgR7VyxGFY6nyKkdBKKyymeG6ijQFfSHKbTNXWQUVMlIKQQ232Y+5MyLytnUL2YDg
+X-Gm-Message-State: AOJu0YxGLSY6XT0Y+g3YpdSqHrhJ3mbJlY7mMNneRGXrU+t0+VlzD5//
+	4vQPn7XnQqwAZ0HPplBACcBt/C+EejJzwFYp8Yl64Pr5qZgI2rhO0eRQfI73zzITStmkpqhcWSi
+	rpBHUOY4qP6dStdaUKZ91AqlpF2bGY8FjpvLY
+X-Google-Smtp-Source: AGHT+IGMv1I8lsnSEM98Q7RwuIprQg6WXktaBL5cN+m4nAwoC6lB1l1TJqrjSknlIJcOsn1qmvc77M/Y/IIks77lNrw=
+X-Received: by 2002:a81:a196:0:b0:609:2c2a:1115 with SMTP id
+ y144-20020a81a196000000b006092c2a1115mr2484668ywg.30.1709314807947; Fri, 01
+ Mar 2024 09:40:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240225165447.156954-1-jhs@mojatatu.com> <b28f2f7900dc7bad129ad67621b2f7746c3b2e18.camel@redhat.com>
+ <CO1PR11MB49931E501B20F32681F917CD935F2@CO1PR11MB4993.namprd11.prod.outlook.com>
+ <65e106305ad8b_43ad820892@john.notmuch> <CAM0EoM=r1UDnkp-csPdrz6nBt7o3fHUncXKnO7tB_rcZAcbrDg@mail.gmail.com>
+ <CAOuuhY8qbsYCjdUYUZv8J3jz8HGXmtxLmTDP6LKgN5uRVZwMnQ@mail.gmail.com> <20240301090020.7c9ebc1d@kernel.org>
+In-Reply-To: <20240301090020.7c9ebc1d@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 1 Mar 2024 12:39:56 -0500
+Message-ID: <CAM0EoM=-hzSNxOegHqhAQD7qoAR2CS3Dyh-chRB+H7C7TQzmow@mail.gmail.com>
+Subject: Re: [PATCH net-next v12 00/15] Introducing P4TC (series 1)
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tom Herbert <tom@sipanda.io>, John Fastabend <john.fastabend@gmail.com>, 
+	"Singhai, Anjali" <anjali.singhai@intel.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>, "Chatterjee, Deb" <deb.chatterjee@intel.com>, 
+	"Limaye, Namrata" <namrata.limaye@intel.com>, mleitner@redhat.com, Mahesh.Shirshyad@amd.com, 
+	Vipin.Jain@amd.com, "Osinski, Tomasz" <tomasz.osinski@intel.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"David S . Miller" <davem@davemloft.net>, edumazet@google.com, Vlad Buslov <vladbu@nvidia.com>, 
+	horms@kernel.org, khalidm@nvidia.com, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Victor Nogueira <victor@mojatatu.com>, 
+	"Tammela, Pedro" <pctammela@mojatatu.com>, "Daly, Dan" <dan.daly@intel.com>, andy.fingerhut@gmail.com, 
+	"Sommers, Chris" <chris.sommers@keysight.com>, mattyk@nvidia.com, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 1 Mar 2024 15:30:03 +0100 Alexander Lobakin wrote:
-> I like the idea of declaring priv explicitly rather than doing size +
-> ptr magic. But maybe we could just add this flex array to struct
-> net_device and avoid introducing a new structure.
+On Fri, Mar 1, 2024 at 12:00=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 29 Feb 2024 19:00:50 -0800 Tom Herbert wrote:
+> > > I want to emphasize again these patches are about the P4 s/w pipeline
+> > > that is intended to work seamlessly with hw offload. If you are
+> > > interested in h/w offload and want to contribute just show up at the
+> > > meetings - they are open to all. The current offloadable piece is the
+> > > match-action tables. The P4 specs may change to include parsers in th=
+e
+> > > future or other objects etc (but not sure why we should discuss this
+> > > in the thread).
+> >
+> > Pardon my ignorance, but doesn't P4 want to be compiled to a backend
+> > target? How does going through TC make this seamless?
+>
+> +1
+>
 
-100% I should have linked to the thread that led to Kees's work.
-Adding directly to net_device would be way better but there's
-a handful of drivers which embed the struct.
-If we can switch them to dynamic allocation, that'd be great.
-And, as you may be alluding to, it removes the need for the WARN_ON()
-entirely as well.
+I should clarify what i meant by "seamless". It means the same control
+API is used for s/w or h/w. This is a feature of tc, and is not being
+introduced by P4TC. P4 control only deals with Match-action tables -
+just as TC does.
+
+> My intuition is that for offload the device would be programmed at
+> start-of-day / probe. By loading the compiled P4 from /lib/firmware.
+> Then the _device_ tells the kernel what tables and parser graph it's
+> got.
+>
+
+BTW: I just want to say that these patches are about s/w - not
+offload. Someone asked about offload so as in normal discussions we
+steered in that direction. The hardware piece will require additional
+patchsets which still require discussions. I hope we dont steer off
+too much, otherwise i can start a new thread just to discuss current
+view of the h/w.
+
+Its not the device telling the kernel what it has. Its the other way around=
+.
+From the P4 program you generate the s/w (the ebpf code and other
+auxillary stuff) and h/w pieces using a compiler.
+You compile ebpf, etc, then load.
+
+The current point of discussion is the hw binary is to be "activated"
+through the same tc filter that does the s/w. So one could say:
+
+tc filter add block 22 ingress protocol all prio 1 p4 pname simple_l3
+\
+   prog type hw filename "simple_l3.o" ... \
+   action bpf obj $PARSER.o section p4tc/parser \
+   action bpf obj $PROGNAME.o section p4tc/main
+
+And that would through tc driver callbacks signal to the driver to
+find the binary possibly via  /lib/firmware
+Some of the original discussion was to use devlink for loading the
+binary - but that went nowhere.
+
+Once you have this in place then netlink with tc skip_sw/hw. This is
+what i meant by "seamless"
+
+> Plus, if we're talking about offloads, aren't we getting back into
+> the same controversies we had when merging OvS (not that I was around).
+> The "standalone stack to the side" problem. Some of the tables in the
+> pipeline may be for routing, not ACLs. Should they be fed from the
+> routing stack? How is that integration going to work? The parsing
+> graph feels a bit like global device configuration, not a piece of
+> functionality that should sit under sub-sub-system in the corner.
+
+The current (maybe i should say initial) thought is the P4 program
+does not touch the existing kernel infra such as fdb etc.
+Of course we can model the kernel datapath using P4 but you wont be
+using "ip route add..." or "bridge fdb...".
+In the future, P4 extern could be used to model existing infra and we
+should be able to use the same tooling. That is a discussion that
+comes on/off (i think it did in the last meeting).
+
+cheers,
+jamal
 
