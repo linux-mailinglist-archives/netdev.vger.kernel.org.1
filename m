@@ -1,123 +1,107 @@
-Return-Path: <netdev+bounces-76516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A58BC86DFDF
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 12:11:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF42786E008
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 12:20:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60F84B22D8E
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 11:11:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4C4DB2238B
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 11:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E2436CBE1;
-	Fri,  1 Mar 2024 11:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55B4E6995C;
+	Fri,  1 Mar 2024 11:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="PAZ7hQ7k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QV8+MMkK"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882846EB7B;
-	Fri,  1 Mar 2024 11:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EDC020E6
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 11:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709291411; cv=none; b=k9H+jNqqZ9tPuau+6z+Hpd+vb3ZSw9iwOi15xcblBN+JCThAJbR8uT9iH6LZnZDZ6wm6RJXT0+0MFT/D42uofU54a3s9336lfw6uaOtseBAmjD/vw+Vtjfv85o2BYVvezfCn05iiyJ4h0O+K6Jodg4D3B54kXKxXHqoukx6BQWk=
+	t=1709292029; cv=none; b=CWdVI4VIWNIUmya5j7nfl8/zEdcBWnxDFma40lpRS/9fwYNlX73DiEEdWgw2phomHMt/jFFFDLlvQr5J2oMkcaSCfHfLNmm1P6OjuqHngaV2HU1/0rsnvv4WtNPhW4a5uiLBlSfv13cFFaXkiuduf/XxUmcwae9q/telmk3Oe1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709291411; c=relaxed/simple;
-	bh=QRbExAMvXdH77Tuwests8b8zj5ZvrcJ6Ix6vLJ+34M8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=CkdupNdAWLWvt4iNv6BXZ3yzM5IqHzTnYKoD958DvLxKEvd6DEAgBeB9KA9e8z3rQcpi445KESc31hqZYw8nP7thG8mu400W8NM6YQ9y5Xs1AlzkOjQWN1220M1zV701c5egtVdod1fSma3OD0JnvMbGCcWvtXF5jLtT+tuaymk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=PAZ7hQ7k; arc=none smtp.client-ip=198.47.23.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 421B9tBL120075;
-	Fri, 1 Mar 2024 05:09:55 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1709291395;
-	bh=WthVMSlBC04LR7tfpauZDWEDm6N7t/Hgl+E1wPR/kR4=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=PAZ7hQ7kUNUaI1reBgkk8AFHWJ4SvLVGUkTqhxIpDJd++wVWfRoOpW24dN1AeFRQN
-	 tfzcx2UJiUy48RQ/17pmLYaG+N7qApykx3i3JVOgFCh4M/KkNiB703kIb2ufU0ZdhA
-	 tP/yRxbZD2DcOBzLZIA2Xb/zeYsY+TlouBKIjB6k=
-Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 421B9txW099588
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 1 Mar 2024 05:09:55 -0600
-Received: from DLEE104.ent.ti.com (157.170.170.34) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 1
- Mar 2024 05:09:55 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 1 Mar 2024 05:09:55 -0600
-Received: from [172.24.227.88] (uda0500640.dhcp.ti.com [172.24.227.88])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 421B9odN124584;
-	Fri, 1 Mar 2024 05:09:51 -0600
-Message-ID: <03bf515c-9f90-487c-ecfa-90d407dc5d86@ti.com>
-Date: Fri, 1 Mar 2024 16:39:50 +0530
+	s=arc-20240116; t=1709292029; c=relaxed/simple;
+	bh=ghxJTct4E94fafL37TnFIxwVxqrMVue4dkxdJNN1beg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=oUXrClId30fWwQ3oPGkvG2ghfxziFg8E/a7KCH3mG4Ivh5nXJVgAURAJR4w7VjO01KXqUk/PCXGCOlE1/uVeZlnL0pYX1w1hF40H9TXDvYKbhlBoHqjk/A57HwlXpnhwu+04F082o74FYCHAFuxEy45bnM0KVXhitJxL1/hlF1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QV8+MMkK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8C630C43390;
+	Fri,  1 Mar 2024 11:20:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709292028;
+	bh=ghxJTct4E94fafL37TnFIxwVxqrMVue4dkxdJNN1beg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QV8+MMkKxXvsjbTWI4h5rlRGf/tcoT6pVlfOqMDoKcJSF8n4H4m66b8wRWRXA/tLQ
+	 YU1UJG9U0cN/gD4BYHX/7G1pVW4QOELLsRFVYayAkVhXShNASwdqXP3xaxPmsKbrH7
+	 nW62ESZFcXQ+pCUMI3Y7dUZeH72WVJ852l8zyAgF6Dd1gZnvwvAlOREjXK/tIoOeYN
+	 H49/spMEpLrDpBsiHhFHjAo6zb5nGDtou/ucxmSdNXUYK8Go0VY2eTte5oGko9mYYm
+	 FuQxYunVKdOfa4y0mt7CI6w1pvqaS7opgb0f+mb+LCuMq0ZnDrocdYv4vl9FOpdU2Q
+	 7Yxv6r/qY69fA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 72055C595C4;
+	Fri,  1 Mar 2024 11:20:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH net RESEND] net: ethernet: ti: am65-cpsw: Add
- IFF_UNICAST_FLT flag to port device
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>,
-        =?UTF-8?B?U2FuanXDoW4gR2FyY8OtYSwgSm9yZ2U=?= <Jorge.SanjuanGarcia@duagon.com>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "s-vadapalli@ti.com" <s-vadapalli@ti.com>,
-        "rogerq@kernel.org"
-	<rogerq@kernel.org>,
-        "andrew@lunn.ch" <andrew@lunn.ch>,
-        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-        "olteanv@gmail.com"
-	<olteanv@gmail.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Ravi
- Gunasekaran <r-gunasekaran@ti.com>
-References: <20240228111300.2516590-1-jorge.sanjuangarcia@duagon.com>
- <20240228200516.1166a097@kernel.org>
-From: Ravi Gunasekaran <r-gunasekaran@ti.com>
-In-Reply-To: <20240228200516.1166a097@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Subject: Re: [PATCH net-next 0/6] inet: no longer use RTNL to protect
+ inet_dump_ifaddr()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170929202845.24139.9397794618694346159.git-patchwork-notify@kernel.org>
+Date: Fri, 01 Mar 2024 11:20:28 +0000
+References: <20240229114016.2995906-1-edumazet@google.com>
+In-Reply-To: <20240229114016.2995906-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, jiri@nvidia.com,
+ dsahern@kernel.org, netdev@vger.kernel.org, fw@strlen.de,
+ eric.dumazet@gmail.com
 
+Hello:
 
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-On 2/29/24 9:35 AM, Jakub Kicinski wrote:
-> On Wed, 28 Feb 2024 11:13:23 +0000 Sanjuán García, Jorge wrote:
->> Since commit 8940e6b669ca ("net: dsa: avoid call to __dev_set_promiscuity()
->> while rtnl_mutex isn't held") when conecting one of this switch's port
->> to a DSA switch as the conduit interface, the network interface is set to
->> promiscuous mode by default and cannot be set to not promiscuous mode again
->> from userspace. The reason for this is that the cpsw ports net devices
->> do not have the flag IFF_UNICAST_FLT set in their private flags.
->>
->> The cpsw switch should be able to set not promiscuous mode as otherwise
->> a '1' is written to bit ALE_PORT_MACONLY_CAF which makes ethernet frames
->> get an additional VLAN tag when entering the port connected to the DSA
->> switch. Setting the IFF_UNICAST_FLT flag to all ports allows us to have
->> the conduit interface on the DSA subsystem set as not promiscuous.
+On Thu, 29 Feb 2024 11:40:10 +0000 you wrote:
+> This series convert inet so that a dump of addresses (ip -4 addr)
+> no longer requires RTNL.
 > 
-> It doesn't look like am65-cpsw-nuss supports unicast filtering, 
-> tho, does it? So we're lying about support to work around some 
-> CPSW weirdness (additional VLAN tag thing)?
+> Eric Dumazet (6):
+>   inet: annotate data-races around ifa->ifa_tstamp and ifa->ifa_cstamp
+>   inet: annotate data-races around ifa->ifa_valid_lft
+>   inet: annotate data-races around ifa->ifa_preferred_lft
+>   inet: annotate data-races around ifa->ifa_flags
+>   inet: prepare inet_base_seq() to run without RTNL
+>   inet: use xa_array iterator to implement inet_dump_ifaddr()
+> 
+> [...]
 
-CPSW driver does not support unicast filtering. 
+Here is the summary with links:
+  - [net-next,1/6] inet: annotate data-races around ifa->ifa_tstamp and ifa->ifa_cstamp
+    https://git.kernel.org/netdev/net-next/c/3cd3e72ccb3a
+  - [net-next,2/6] inet: annotate data-races around ifa->ifa_valid_lft
+    https://git.kernel.org/netdev/net-next/c/a5fcf74d80be
+  - [net-next,3/6] inet: annotate data-races around ifa->ifa_preferred_lft
+    https://git.kernel.org/netdev/net-next/c/9f6fa3c4e722
+  - [net-next,4/6] inet: annotate data-races around ifa->ifa_flags
+    https://git.kernel.org/netdev/net-next/c/3ddc2231c810
+  - [net-next,5/6] inet: prepare inet_base_seq() to run without RTNL
+    https://git.kernel.org/netdev/net-next/c/590e92cdc835
+  - [net-next,6/6] inet: use xa_array iterator to implement inet_dump_ifaddr()
+    https://git.kernel.org/netdev/net-next/c/cdb2f80f1c10
 
+You are awesome, thank you!
 -- 
-Regards,
-Ravi
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
