@@ -1,133 +1,89 @@
-Return-Path: <netdev+bounces-76572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62DE186E452
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:29:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C113E86E45E
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:31:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9164A1C22FE6
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 15:29:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C8671F267F8
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 15:31:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9AAE6F07D;
-	Fri,  1 Mar 2024 15:29:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4787C3A8F8;
+	Fri,  1 Mar 2024 15:31:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="y/Ct6uB6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fAbSTR2Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAAD267E77
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 15:29:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246B7368
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 15:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709306973; cv=none; b=Sgp1aQoiNqr+WaiK13ANFwGg+CMQkEUlJV0MbFwYlfC200E3BUwiLuBSksmkPSLzitQFfHygX0mfTzACYj2Y/oWB4rxVLqrWZJ5JDg/34b6yvkPl1P2XovUZBvpaa+G3ceq9U2yKkLPDvKQKgy/CcDmR7RsAUXnWPtmG7XzYNhc=
+	t=1709307087; cv=none; b=ojM/44o/bbhkk0XIjlWSDVwrZhes1S/ZyffJOx7IEFvoK2yL848BWfP3Xn13lDBwwdEgm1yey+1kjL0IhyJ/TFBFNCS9gjTuWiBNWnCL7uIz5cFrKFPO6fAeoX2ThQGrTEEfva/1kQnm1p6fs+8lQG1ppW5fEGC9/MKIKktOCXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709306973; c=relaxed/simple;
-	bh=UpbU7hO7PgZpThGtfOUVUaIkjG5Jg/+Nv9/mNDW/57U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XaaomZuQmo/E3rQHmaZoEFLwZzI0knOhXeGCmVo12q7JNGQSrmoqapcoSqG1JM2trsr+XBBwsmwwPw9xbspCTsmHrRaPvNs7v3IKTuscDA5z+e8NXIRKbDB9/oTMwQlFWh7qJlEnLOwKf+2vSdAks7TdydJ59D8o52Mif2fvP0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=y/Ct6uB6; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-56648955ac5so3174419a12.3
-        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 07:29:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709306969; x=1709911769; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2MZ2yOTO+KIB8siKuGMOdBUlhOc6wSKQHzvOaxRX3JU=;
-        b=y/Ct6uB6QO5j8G6f2bPb6YwNXYIzuJNLWxoeYPlpjHNrmJoc8ZuHRhN3bSkCNL795m
-         P38GwsgUAQbhhD9JkicHvT37H3ApLU/Ngu9lnJb+N7pp8BNuFygp0+Pm6/cHLcqE/bsZ
-         2h7sRgnY3Rxu2Kfb8gmvn2LhfCPr8QDAoL/qPW/lxA5XRecYBJc+o7TIG5T1qH9Q/7Ph
-         87XUT2jtjyOUrptYcLxBTv9pTON441DGM0ktxZnfH22BRlWpwycU6JKkz7WHj1UdktLx
-         6ISJLRK5K+fhwYarQKLptGwxg3bVXaSCl9zT/XGXXil/n5DtoidfuVgm99yU1Jv8yh2w
-         iR/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709306969; x=1709911769;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2MZ2yOTO+KIB8siKuGMOdBUlhOc6wSKQHzvOaxRX3JU=;
-        b=Meb6xXs7EGpS2N6rzF4ap0rNHmQC+V+VzxBjsY9jiI9qXxTqwGyfOL/I/t8ZIzCtjm
-         ckAF2Af+xwgIvLSGqm7AbWEmyhQ1+OEn00JFCWBzFKZCedWr5/JxISV2PObBCbihRSqN
-         Xxpn9Rhjnq5STVubkY9DZmvwALNGtMTY3ZAvCUV5HJAHLAtyLvLDS1KXXE21CwQn8c0h
-         uMlLPbVlrlMNd/aMsOYTNoI4wVNoNy6gnzONckDkiNcZU1kdjb1WVIS4JasUZdJP5zeQ
-         TNDpQJMF1mxWrOEiA4bYGO9qtHxvr7A5tfuo2ir2K1fARYah60oGzw7oEFvTxFspZTEe
-         2YdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVE07btaPpUM606wMTnC9DisDost2DatkdIWoZQFxEBpKsp8D6V7L3vyfVVdPG5+4aseNBcgqzlfOyAPhLJLUESKq+LG0SD
-X-Gm-Message-State: AOJu0Yx8bzU479P5k1x9YfiQtcfc5DuHPS9/T05P3NBNvmwauPDrTdyX
-	3+edLN+h75NG4LUavmpQoLP8ZFG/n9kN83T9fiLkhsVVwU3TOhikh05vgbcSrag=
-X-Google-Smtp-Source: AGHT+IGXmTvmpDOBogei2NKEGeBxe8GHXKdXl6gK0nD5jHjKOOE0e/RY97L7Ob9/n6gWA62fsQQ0Ug==
-X-Received: by 2002:a05:6402:3493:b0:566:f67e:3f72 with SMTP id v19-20020a056402349300b00566f67e3f72mr131359edc.12.1709306969059;
-        Fri, 01 Mar 2024 07:29:29 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id fe1-20020a056402390100b00566a1b8614esm1579691edb.58.2024.03.01.07.29.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 07:29:28 -0800 (PST)
-Date: Fri, 1 Mar 2024 16:29:25 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Lena Wang =?utf-8?B?KOeOi+WonCk=?= <Lena.Wang@mediatek.com>
-Cc: "fw@strlen.de" <fw@strlen.de>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"pablo@netfilter.org" <pablo@netfilter.org>,
-	"kadlec@netfilter.org" <kadlec@netfilter.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>
-Subject: Re: [PATCH net v2] netfilter: Add protection for bmp length out of
- range
-Message-ID: <ZeH0VdU-q_UyX0t0@nanopsycho>
-References: <d2b63acc5cd76db46132eb6ebd106f159fc5132d.camel@mediatek.com>
+	s=arc-20240116; t=1709307087; c=relaxed/simple;
+	bh=viezeGugz2LJgldOnHz+wogHTf5L9GjPJZBdofrGTls=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uvngS2r92/ouH44fffMqc2heiW58uFh8lgHkpp3np2//hF4j0yoPL9C6L38wrmCsi7i7ULe2q8LIqEEwKi5ozqnWz2ohVfF5nkPTRoMr8EplQnLsmTlII4WXwHazmVupkwy+ts+02dMBeufXB7UcmIlDaUMx7SKxU8G+U8xO5UM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fAbSTR2Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 124FFC433C7;
+	Fri,  1 Mar 2024 15:31:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709307086;
+	bh=viezeGugz2LJgldOnHz+wogHTf5L9GjPJZBdofrGTls=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fAbSTR2ZFzwHrtKR8sEkPHI7bvgQe0wSnv70y/fT6GOCngChDiX2myJIBwgLYIVuX
+	 +nUY+KhC4a8QY6ffgvUTXKXm6wdj425NO2Lv4K5hZIo6tIse7RJ+CA2QGzy3t3nCRI
+	 0x5APC++W1I3gqOSlJB+2WCsmsDTrXfy4NN352qo9bqDYGMMOqDVw7h+b60PIRW6Ae
+	 qsXOJtFln1zydHsGAm8cUybgvJRunGHe6R9CBY0Mr0DN7IWZD2/FJkz3TkX0EEHeNh
+	 AxfGnLyYKn9Atmxa5jjEg19CWjNIOYwvH9YJI89emJ7bb3EgPrNmphea9Ppe0Xcgiy
+	 Po8QqYGUDcviA==
+Message-ID: <ab3af787-d44f-43b8-b90a-5520d4df3686@kernel.org>
+Date: Fri, 1 Mar 2024 08:31:24 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d2b63acc5cd76db46132eb6ebd106f159fc5132d.camel@mediatek.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/7] net: nexthop: Adjust netlink policy
+ parsing for a new attribute
+Content-Language: en-US
+To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: Ido Schimmel <idosch@nvidia.com>, Simon Horman <horms@kernel.org>,
+ mlxsw@nvidia.com
+References: <cover.1709217658.git.petrm@nvidia.com>
+ <410a56b273484e34ece228e9aec0008ece6b96b3.1709217658.git.petrm@nvidia.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <410a56b273484e34ece228e9aec0008ece6b96b3.1709217658.git.petrm@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Fri, Mar 01, 2024 at 04:12:24PM CET, Lena.Wang@mediatek.com wrote:
->From: Lena Wang <lena.wang@mediatek.com>
->
->UBSAN load reports an exception of BRK#5515 SHIFT_ISSUE:Bitwise shifts
->that are out of bounds for their data type.
->
->vmlinux   get_bitmap(b=75) + 712
-><net/netfilter/nf_conntrack_h323_asn1.c:0>
->vmlinux   decode_seq(bs=0xFFFFFFD008037000, f=0xFFFFFFD008037018,
->level=134443100) + 1956
-><net/netfilter/nf_conntrack_h323_asn1.c:592>
->vmlinux   decode_choice(base=0xFFFFFFD0080370F0, level=23843636) + 1216
-><net/netfilter/nf_conntrack_h323_asn1.c:814>
->vmlinux   decode_seq(f=0xFFFFFFD0080371A8, level=134443500) + 812
-><net/netfilter/nf_conntrack_h323_asn1.c:576>
->vmlinux   decode_choice(base=0xFFFFFFD008037280, level=0) + 1216
-><net/netfilter/nf_conntrack_h323_asn1.c:814>
->vmlinux   DecodeRasMessage() + 304
-><net/netfilter/nf_conntrack_h323_asn1.c:833>
->vmlinux   ras_help() + 684
-><net/netfilter/nf_conntrack_h323_main.c:1728>
->vmlinux   nf_confirm() + 188
-><net/netfilter/nf_conntrack_proto.c:137>
->
->Due to abnormal data in skb->data, the extension bitmap length
->exceeds 32 when decoding ras message. Then get_bitmap uses the
->length to make a shift operation. It will change into negative
->after several loop.
->
->UBSAN load can detect a negative shift as an undefined behaviour
->and reports an exception.
->
->So we should add the protection to avoid the length exceeding 32.
->If it exceeds it will return out of range error and stop decoding
->ras message.
->
->Signed-off-by: Lena Wang <lena.wang@mediatek.com>
+On 2/29/24 11:16 AM, Petr Machata wrote:
+> A following patch will introduce a new attribute, op-specific flags to
+> adjust the behavior of an operation. Different operations will recognize
+> different flags.
+> 
+> - To make the differentiation possible, stop sharing the policies for get
+>   and del operations.
+> 
+> - To allow querying for presence of the attribute, have all the attribute
+>   arrays sized to NHA_MAX, regardless of what is permitted by policy, and
+>   pass the corresponding value to nlmsg_parse() as well.
+> 
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
+> ---
+>  net/ipv4/nexthop.c | 58 ++++++++++++++++++++++------------------------
+>  1 file changed, 28 insertions(+), 30 deletions(-)
+> 
 
-Missing "Fixes" tag, again...
+Reviewed-by: David Ahern <dsahern@kernel.org>
+
 
 
