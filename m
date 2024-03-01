@@ -1,112 +1,115 @@
-Return-Path: <netdev+bounces-76596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC0F286E56E
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:25:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4109386E581
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:27:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9164A2879FA
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:25:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE2BB282857
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:27:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A834B73184;
-	Fri,  1 Mar 2024 16:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2581270CC0;
+	Fri,  1 Mar 2024 16:26:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q2DlQAsC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g8HHwUey"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D260171723
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 16:24:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4DD70CB6;
+	Fri,  1 Mar 2024 16:26:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709310264; cv=none; b=nyNHmgtJSfl8m3fIMO3UbujtDrbQH9GvDoo4p9J0GJsI+sZhoBDKRE0zY6AsjskIaMn5KPDqFBWxh5DzPRrJmg/pe0eX5dsEgj8I40WFtExtlRZW4kNpLMjwxL4QpHqhkN6qP8WCKeOlQpYaJ+MAEMelWsKQVtt0bqSmtx7Hf+M=
+	t=1709310394; cv=none; b=aW0EKNvaikv7hmaEeNFwFDoDY0FTrL5KX8Z3rqh5BO/kOR3FYse6ktfcoSsG9i2jkIAj0x9Dh6D1j3PZF+u+mGFueOH1KSgaXKjQLvfL2fD6n7s4M8JRZeXlry6KwpR+WO39529tMB5dvBLK/7XIfavjcAYuFBD4LH2E7JzbPwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709310264; c=relaxed/simple;
-	bh=JbldwAtTNrdXdciqQBqsHbLDwNNz8QFF5ynv32RmltY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GaG7GPDMPm0Y5xehU2AnsAjfvtklpce38o3nIPJy32AbSYDSkfXw0s5cRbk2/hRVAjt0iULI2zgII3VY51HJX7YCiBsNw+md4LjsaKQYIb2qGtuumAOPDi4JGlqmsvTPvfwLa/muJfU7rdjIRdC4zjIRf5yEYVDbdbumsIhwrK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q2DlQAsC; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-565223fd7d9so7945a12.1
-        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 08:24:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709310261; x=1709915061; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JbldwAtTNrdXdciqQBqsHbLDwNNz8QFF5ynv32RmltY=;
-        b=Q2DlQAsCdXaTkI/IFP/zIMOBTQJXWopMrz8++1fNfgoLYvXBS9vOEKjtg4WcoydywU
-         SJK0PTgmCbwMT04v/a+Ea8m2qaxgEugFW/cK8ZsDgUDK/XsaOZMFh6qFf87stYhAh252
-         tGIEKp9mIADMxAsAsH17mhKhygdbcaW/xm3nBOQRFOH70kObXt6TLQ7sI6l8MRZdz7zI
-         WnNq6He49HJJJm+lnWKH6PHuzFuG7eOVY5ZTLCTEezwEbCcvylmzHc1GwTnrOxKRXeXq
-         EbvNx+1qV79Xy6wYksdVwJTYpdtcihiGrNGW7CncbOjAcuwwK6mckxuz0kH5mwrDbyE2
-         BnJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709310261; x=1709915061;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JbldwAtTNrdXdciqQBqsHbLDwNNz8QFF5ynv32RmltY=;
-        b=itKwpmx5apC9EtWiRaYCR1VsSLTf6vMd3r6fdv8fhryjvzcmxVyKqSTabvHV8cnmrY
-         9u8wk7nq19w+cj12PXSGAHJnI9mHU5YaZ4nUKO6LQ82HgsTzp/Qh3InapHZdpu4VlRGD
-         ztyseXcYfleNqd5phRS7V1qzxdcWW62fDuwUoCCNY0QFSp0igeIclwyG1wUwe2v8Qi4Z
-         HlzlAxoCK0HwIywuAsjNuxy3dcSGNPTsPsuYFbvCUk2T65V4H6tGVMCKbK97wbzKEO32
-         MbSxVC2dx+WCdrrd76Xif9zPbFDCPbekvujVBIjawf5JxGO5MIjYHAk0mhHjrnTXubwu
-         /irA==
-X-Forwarded-Encrypted: i=1; AJvYcCVNHOPQ+q/WH7ZtrQ2abOraHHv4uhscuOHI93cqamPtNIdMzpjwsPO+3CH0DAiYQnQvhSTU3kJpZpER1Sm3bqqwzxPldNko
-X-Gm-Message-State: AOJu0YzRdGCpaJMsbgj3eoyRPo/suwCzpGAC3dr3FW5ayuIRxiAAzAe/
-	S5MKnLqOHIqWm6R0T6OYc3ou0uXDl46e48kP/nkgYCEvppB6i84kjawOpJEa57toYUlFUnRrJmB
-	/SB59pla9xCHj51ehwVTDujImkQFZ0kwLvvrBbRvW0OuyKXOnCA==
-X-Google-Smtp-Source: AGHT+IGIgyVyBs3Ou7ZSB7lbjeCL9elrPBAUAYl1tAyTI+Bm2e4e9i25q5rXIGID2Atmb48ROfgkLE1K4EdgOGgMbZQ=
-X-Received: by 2002:a05:6402:5215:b0:566:f626:229b with SMTP id
- s21-20020a056402521500b00566f626229bmr10150edd.7.1709310261006; Fri, 01 Mar
- 2024 08:24:21 -0800 (PST)
+	s=arc-20240116; t=1709310394; c=relaxed/simple;
+	bh=TvXH6saXNfgndMe7jdShDcIe/NSIB7gQ2yk9JpkDGn4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Udo85MAu0kPkUPseCr4Rmv5xqRxy/u/3D9beze16/GYCiALQ8fSdKVKm2EyeOIlT0SneMeMjQ+eYVN/I0jIhnfgkDaZfTP6BD1hV1W2wc7A5qQBEbYD7KkLn655EAdVe/iUJS3/3owT6wceCH2++f1u+kdxwWHVxM3ov1HQpKrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g8HHwUey; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FDB6C433F1;
+	Fri,  1 Mar 2024 16:26:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709310393;
+	bh=TvXH6saXNfgndMe7jdShDcIe/NSIB7gQ2yk9JpkDGn4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=g8HHwUeyo9sVtVc/RAO1ayTmbaD3Z23Oo0ITl1vz9T/FMJwRzvbqazR+e2aFvjBeW
+	 wadUfFc0+uTrOVOIYHYn+F4gXQHT4nBKav4nJYrpzOhfJKEXSijHQbrDHe9ruF3rf5
+	 nPZiCQr9p6vpFqmDLwYVp2xdbLmuqyvGNz+jDfMz5O5q/e7DsNk4FJxEJrdX/fa9px
+	 vj7JamfrK1La7K9tCvG2xx6frkXRcItzx9Wwj1dcdIqod9s5hrYAUli+1RPvduLMIN
+	 dJRIwzbCTAkUlOoqqqlD1w/Kmb4wdEEbA8V7/976bGB9iGev7Lahvd5NfCRh16tvxC
+	 3rckRK2qKInYA==
+Date: Fri, 1 Mar 2024 16:26:28 +0000
+From: Simon Horman <horms@kernel.org>
+To: Alex Elder <elder@linaro.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, mka@chromium.org, andersson@kernel.org,
+	quic_cpratapa@quicinc.com, quic_avuyyuru@quicinc.com,
+	quic_jponduru@quicinc.com, quic_subashab@quicinc.com,
+	elder@kernel.org, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/7] net: ipa: change ipa_interrupt_config()
+ prototype
+Message-ID: <20240301162628.GF403078@kernel.org>
+References: <20240229205554.86762-1-elder@linaro.org>
+ <20240229205554.86762-2-elder@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240301001607.2925706-1-kuba@kernel.org> <ZeH26t7WPkfwUnhs@nanopsycho>
-In-Reply-To: <ZeH26t7WPkfwUnhs@nanopsycho>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 1 Mar 2024 17:24:07 +0100
-Message-ID: <CANn89iLcOE7aJ6SSjCSixLOQd4CsMdmE1UQZWBsp6UgufA2pwQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] dpll: avoid multiple function calls to dump
- netdev info
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, netdev@vger.kernel.org, 
-	pabeni@redhat.com, vadim.fedorenko@linux.dev, arkadiusz.kubalewski@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240229205554.86762-2-elder@linaro.org>
 
-On Fri, Mar 1, 2024 at 4:40=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote:
->
-> Fri, Mar 01, 2024 at 01:16:07AM CET, kuba@kernel.org wrote:
-> >Due to compiler oddness and because struct dpll_pin is defined
-> >in a private header we have to call into dpll code to get
-> >the handle for the pin associated with a netdev.
-> >Combine getting the pin pointer and getting the info into
-> >a single function call by having the helpers take a netdev
-> >pointer, rather than expecting a pin.
-> >
-> >The exports are note needed, networking core can't be a module.
-> >
-> >Signed-off-by: Jakub Kicinski <kuba@kernel.org>
->
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
->
->
-> >---
-> >BTW is the empty nest if the netdev has no pin intentional?
->
-> The user can tell if this is or is not supported by kernel easily.
+On Thu, Feb 29, 2024 at 02:55:48PM -0600, Alex Elder wrote:
+> Change the return type of ipa_interrupt_config() to be an error
+> code rather than an IPA interrupt structure pointer, and assign the
+> the pointer within that function.
+> 
+> Change ipa_interrupt_deconfig() to take the IPA pointer as argument
+> and have it invalidate the ipa->interrupt pointer.
+> 
+> Signed-off-by: Alex Elder <elder@linaro.org>
+> ---
+>  drivers/net/ipa/ipa_interrupt.c | 15 ++++++++++-----
+>  drivers/net/ipa/ipa_interrupt.h | 10 +++++-----
+>  drivers/net/ipa/ipa_main.c      | 13 ++++---------
+>  3 files changed, 19 insertions(+), 19 deletions(-)
+> 
+> diff --git a/drivers/net/ipa/ipa_interrupt.c b/drivers/net/ipa/ipa_interrupt.c
+> index 4d80bf77a5323..a298d922dd871 100644
+> --- a/drivers/net/ipa/ipa_interrupt.c
+> +++ b/drivers/net/ipa/ipa_interrupt.c
+> @@ -236,7 +236,7 @@ void ipa_interrupt_simulate_suspend(struct ipa_interrupt *interrupt)
+>  }
+>  
+>  /* Configure the IPA interrupt framework */
+> -struct ipa_interrupt *ipa_interrupt_config(struct ipa *ipa)
+> +int ipa_interrupt_config(struct ipa *ipa)
 
-This is a high cost for hosts with hundreds of devices :/
+Hi Alex,
 
-Was it the reason you did not want me to remove zero IFLA_MAP ?
+There are two cases where this function still returns a pointer.
+
+Around line 250:
+
+	ret = platform_get_irq_byname(ipa->pdev, "ipa");
+	if (ret <= 0) {
+		dev_err(dev, "DT error %d getting \"ipa\" IRQ property\n",
+			ret);
+		return ERR_PTR(ret ? : -EINVAL);
+	}
+
+And around line 280:
+
+	return interrupt;
+
+This does seem to be resolved in patch 2/7.
+But as it is, this patch breaks bisection.
+
+...
 
