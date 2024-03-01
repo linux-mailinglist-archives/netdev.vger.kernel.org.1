@@ -1,435 +1,197 @@
-Return-Path: <netdev+bounces-76412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9212E86D9BD
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 03:29:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0000986D9A8
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 03:24:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EE051F2372A
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 02:29:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 619D71F22144
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 02:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4E63A8DB;
-	Fri,  1 Mar 2024 02:29:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DCBF3B2BD;
+	Fri,  1 Mar 2024 02:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="jHEjNrTE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JryiBxbt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D640D3C00
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 02:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709260157; cv=none; b=TxQdDknznHSNrfSKFwsFcq7brGsGo7OFlOBeYoBdLoAywcGWSjC2OXavD0dfFhfl8qlT7ffYRpqPrxqKKEHMpIpOWJaS0WgS3OM3vsG73kkOk9hlcei+4aLa+xB/rM81ZvP3fdm/1rpGn2PTM4AuC+PYuvPHCdeWDeqdim8pOUw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709260157; c=relaxed/simple;
-	bh=ZuRdZHLz50uFNXbgNZaAm/C6KqlpRhYt39V0cu7ic4E=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pdHyjnbjZGNMf/UsbURSJUZpYudifsr6lyCHU5ujrkHBSoeqMQ/5pmvBVKQyDQoFb7bXmOJvUCzt/gvw9RmSngy1zL7zsbhGEoLfe3vd1VDSHHxhJPecKboK8mSMQ6teqQzWtvZ8Ukr8LQcHOjjH8vJpG3ldyt5hPvsExUnJK6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=jHEjNrTE; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1709260156; x=1740796156;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Iq/zFFFJ8V14KK9QW8av9KdokGOaG8yduusDkCXibtE=;
-  b=jHEjNrTEf4u3wYS4YeZNmiHoiEFhHtXCfeIGkHYlN326s+BxTeoUER2p
-   kNNJMJ1H6epSCQobPWjy46pZxsZFdvlrGFhFHvHiczm2xut1sFtJ8bt8D
-   yOyDR0zMpx9KCvo35DdRyMHKkkEisgcXEoszTuHzaIyfXcmcXJFHa1904
-   g=;
-X-IronPort-AV: E=Sophos;i="6.06,194,1705363200"; 
-   d="scan'208";a="188440441"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2024 02:29:15 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:27334]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.44.165:2525] with esmtp (Farcaster)
- id cde0b19d-31d4-4c29-ad9c-bc699e3877f4; Fri, 1 Mar 2024 02:29:13 +0000 (UTC)
-X-Farcaster-Flow-ID: cde0b19d-31d4-4c29-ad9c-bc699e3877f4
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5226C3B78E
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 02:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709259794; cv=fail; b=JYQpvN5Zy4JjQHkN/kyAfF8D6+B68NSUd5CCQhddz2ERBjQCAp0OSPS33zV986Qpsky8uSc+a2VV2HfQxijpEa7HUUPSvX84ibMp1lSBDxtxhiCtbSVkAO2C0m0wI75++iI0KoAt09Zir5OKUL7v65xQ0t3K9hyCaISeCmn2+zY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709259794; c=relaxed/simple;
+	bh=op1G0vqR/6BfW2Qy10+LogZxwSgMnh8m2pPLPf2R6Rw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=kh7i0+GmHp6guZ3pJoFh7PCtf6J6YjPCaYS8ZOFHCuY5lI/C9mKnWlPIr6WEBIs22g/g15NDrUMn0lMkiWzhsegw4xz4Sw6SemliD4NoTBaZOxw7vzQedZBbfxHEGdF7DIFzcH9l9V78rq3+dg3PtDDHoFTzvRAuTpiVlaWPydg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JryiBxbt; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709259793; x=1740795793;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=op1G0vqR/6BfW2Qy10+LogZxwSgMnh8m2pPLPf2R6Rw=;
+  b=JryiBxbtcmubX7SN3iIDWQAcm87/A7AiohmsgXWZiZjTqPbMkJtkGOTs
+   aHOUn7dEbc70Adw/2Gd/6GfJTbvmmNGkSfGu0EBjgm4Z82gW0gYuSzSfZ
+   7VHjKpp7mtNYIl0g88QVaePNOh+J/8oSUm6CHmGYUjukL8TQarst5XE8X
+   2tTXFCjQh18r/3hkBYCbqaa7elehbzaKBnhEdfJVbXuUXvyxXSgLuOhbu
+   8SWINSCW/ks401n0v+cyQSIfWfFIFfBPHK8PoKicBCLNiLI+g4OKpHlQz
+   tr2lQiP6VAqh5MEuDlFz9ZlwXbUYOGS3NYY+voOaX3yBHBNLiLs9JBKv+
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10999"; a="15215475"
+X-IronPort-AV: E=Sophos;i="6.06,194,1705392000"; 
+   d="scan'208";a="15215475"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Feb 2024 18:23:12 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,194,1705392000"; 
+   d="scan'208";a="31227400"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Feb 2024 18:23:11 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 29 Feb 2024 18:23:10 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 29 Feb 2024 18:23:10 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 1 Mar 2024 02:29:13 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.101.48) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 1 Mar 2024 02:29:10 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v4 net-next 15/15] selftest: af_unix: Test GC for SCM_RIGHTS.
-Date: Thu, 29 Feb 2024 18:22:43 -0800
-Message-ID: <20240301022243.73908-16-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240301022243.73908-1-kuniyu@amazon.com>
-References: <20240301022243.73908-1-kuniyu@amazon.com>
+ 15.1.2507.35; Thu, 29 Feb 2024 18:23:10 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UUFgy22X3ykymsA74mpPgxcii9lgpNalBDPEbq+wnTZItrBfkk+2XIT/M4byh2q/ytzK+d7mXA+Yg7h25IedrBZf4//JiCKp5amo4j30pFsRcACryl6WCiBCUs8CGEeCd5BzZAau5zKgYPlwqsSbamcbqohvlgffe6WFVqEQPt0JNB8neGfJD0ZT1GapsmVaZjc8goVZ2zUsfrPOV8kF/PrYaLmg4Nb+GfWFmvNO+7HTFtA1OrBCOai4gl6V3njZVxqDdMjCxMxzcbA/mKXQ9ztPfIHdzdcfgPXpKL6BmtOf5AhFtuLSJw9wOfKWkjFqyFQOmJkr1F0ARxjq/WoRDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=op1G0vqR/6BfW2Qy10+LogZxwSgMnh8m2pPLPf2R6Rw=;
+ b=Dh6xQCTZhStUYGY8BWV/TRsBHHCMrNjBBsOA0SVYSd6MCAdyo7F6bhU7iddK8lE+e1jjD3MeRTyUozejTk9qHFSHgr2gyk50/fIjGNZnmNO7adrUp5CgK2gSRRWwI0/SmPUxTrAYzWHDxy/7KBiV9TZWoPDVfiz7lJge6RUogxmgID46BAePcwwHnvKFnoUOlLZb0YYhTrLUi54wmwKw9VebSpt8jqYz+p5UnierkPrwj4hslmSuld57C+RiE2lkqFsh7O0pB+oLEtT8o8ym0FLDuwJ83MuMYuWl7VPgfTmt0PeSP7wkY2zFaOYp0mhT77FfbbUDw6vjHyd7yVn+0A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CH3PR11MB8313.namprd11.prod.outlook.com (2603:10b6:610:17c::15)
+ by MW5PR11MB5810.namprd11.prod.outlook.com (2603:10b6:303:192::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.23; Fri, 1 Mar
+ 2024 02:23:08 +0000
+Received: from CH3PR11MB8313.namprd11.prod.outlook.com
+ ([fe80::d738:fa64:675d:8dbb]) by CH3PR11MB8313.namprd11.prod.outlook.com
+ ([fe80::d738:fa64:675d:8dbb%7]) with mapi id 15.20.7316.037; Fri, 1 Mar 2024
+ 02:23:08 +0000
+From: "Rout, ChandanX" <chandanx.rout@intel.com>
+To: "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Karlsson, Magnus" <magnus.karlsson@intel.com>,
+	"Kuruvinakunnel, George" <george.kuruvinakunnel@intel.com>, "Nagraj, Shravan"
+	<shravan.nagraj@intel.com>, "Pandey, Atul" <atul.pandey@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net 2/3] i40e: disable NAPI right
+ after disabling irqs when handling xsk_pool
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net 2/3] i40e: disable NAPI right
+ after disabling irqs when handling xsk_pool
+Thread-Index: AQHaZEZdODU5XssvX0e2YNR257030bEiNgcQ
+Date: Fri, 1 Mar 2024 02:23:07 +0000
+Message-ID: <CH3PR11MB8313DEB3A77E9341E86D8FC6EA5E2@CH3PR11MB8313.namprd11.prod.outlook.com>
+References: <20240220214553.714243-1-maciej.fijalkowski@intel.com>
+ <20240220214553.714243-3-maciej.fijalkowski@intel.com>
+In-Reply-To: <20240220214553.714243-3-maciej.fijalkowski@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH3PR11MB8313:EE_|MW5PR11MB5810:EE_
+x-ms-office365-filtering-correlation-id: 323c9ed0-73b6-48eb-2e16-08dc39968895
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 76a+OjeILffoRhSDKCssHcgkJ7QlFWDkGYORJ8XSAuE6dFI8plCuixqfarf/v8QNT2S++s5lvinpA2NdIkgYKzUrKQXEzo920wbQHq2L7JwjUoh2C25YzR8EQvPTsttNH6ehZwaJ/f+DPOpsY4efC/ChMcvZ+KbRwvaroY6lAnAAO1p/wW3oASjSyrpOfuBNjDac8B1WY0ZHA54bRJeLBrp0hGX2HBtmlwzU1DnE5MuLnoKkNTDvcobVg9Hw2BSL8gNH0604GRTpVRlzEkoJRQyFvsO6JHAjG7DcptC0rs2+4MjGDbqsqXJfKlxEaIv5OBo9JAP7iBd3ce2rsCubR0hXoIFxvNF/c9u8goTgRgx9CKMR2ddN8H6fv3FpjDPufXCmXeiRjNeXPE8dAiFVhpaxjLFBtjrPT1RSbssAaT5Skd7HiCAm368xRg91xcncNvzBsOPvP+TRR+4q6UnMWHaZ8U5d/9AAAN8olWsoPoHE7DKhIW2QFL6Q6dJDqggiVPcVjAAcGQ7jivNngdskxoDuCKp38CMuWbDMvn/69AiqR3sAqx4yw84Vy5mh7128jCtwsVi9zJLoFeEYUKYqmikrl8t1mxvCwoUZ8AUP5YbVRBOZad7hNpO9Px6w8+t3yPPT8xbVyyg88UNSm5T5G2xMpkqDIiZo4prZ3Rmd07RNhPHz+AHO7SbUye4b+bTac6fA6oHnvUlM8jc3CLj7xwPlXFB4N9Oajo0K3TJ1/Jc=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8313.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?pJ77fza5BuwhEqfn5GmDth3qcv8HBsnx/kSyHeMycivr3gZn+fN2khzHECR8?=
+ =?us-ascii?Q?yyqDSIuuLRhsFeVSci4PqyoKb6TuXAxRs7mA5QF1smKVXaz0rTaRH9HFqw+G?=
+ =?us-ascii?Q?5omXEU+GgG4OSfuAvjGGTv7fmEvGhSfgOHED8nI+DN1SsnbrVSXrCmgAAqwr?=
+ =?us-ascii?Q?ByaBuQIZuBMuxBFSlr6OaUNb7KH7YHCjHmA+WNWlQaS/diEhDlJbMJG3Yf0p?=
+ =?us-ascii?Q?StYJT6gdqCJjft7wgh+TgxdFH2BWCKsxAPgqknjHs2P2LMQA98QqXsnShxDY?=
+ =?us-ascii?Q?QguaF1HckyfKuvAv0cBT+0U8ROytuIkuHc5tKxnAkFQxs3h7+/fLmQbq+oy5?=
+ =?us-ascii?Q?jEjhAf/2QZ7G6oPkLGe45aO0U4xnVjp1N+4vIuDYESirneHCU++kVyalGEIt?=
+ =?us-ascii?Q?i+UmwAQQU4ucnCzb+0YEfwECLXecqC0tjuVH2V0DIVglNa3daA+76uIb0h4F?=
+ =?us-ascii?Q?LtllL1Ba2AAc6v1h5qq2mUmu8ZW2MGSdOB/E591o9Qyz0hYz7mtfV1UnwTg9?=
+ =?us-ascii?Q?BYGhV8/LBA3M27DJ7MvRuKbzSYc/3XWyaYw7QstSmv1oQ4At2aabEq+6mCJR?=
+ =?us-ascii?Q?rayTB4qIWi+RBf1jL0qIDwItveWStCJEqA8Ag8y7Tfkvg0VWjPARlgdxQupV?=
+ =?us-ascii?Q?x59ssnJXm0FfEqkXyH9KQhkpfunzOOfpEq8zKiMzIpNyA9aaxK9pzbxjiN6+?=
+ =?us-ascii?Q?czCptF72ktJ6s9hr4itmck9+SNbT6Dt4Pc9JEzCGF0AauwfdCoCxhkqNvDL9?=
+ =?us-ascii?Q?F276GjTK/JnGDKmKt1BBstYTe08OFEWm+qQ87jGEJg7gVlOUPowpDAZXKc/o?=
+ =?us-ascii?Q?udB6ScjGRakKdgraPrWoycQCEDtfMvKRPbFbQK7IKkJR9fdFMvXmy5IbCgLp?=
+ =?us-ascii?Q?Sw3tFiIKP9+TIDAV1EeOl+Q6GpVvrj3tiuDUMaQC36FOkMzC7csRRAF4+ELe?=
+ =?us-ascii?Q?DZTcT/qEfdLyiRF3h4YTzKiBck60qafF3akzbpkK2AeDOAprp1M8vtDPAuxZ?=
+ =?us-ascii?Q?YteZHt8z3JGfQiaTv4CTyAN6PymNvISjva6QUWlyGv+vNDkInemsDTo+CLkQ?=
+ =?us-ascii?Q?bMU2Qrne0X0dbsFsgLRcJJHKMqDMXPZs3ZHxNx7Bzh7UNjDtiLx/Yj7I3GvO?=
+ =?us-ascii?Q?ih6BuuWOUI6Hm61nyfKGQWdtTqxc4+32QixdOTqrevQDR45zQe7CF7zFpJ40?=
+ =?us-ascii?Q?s2xghwhs4iwDZCqHQ/pHdoZFzA4z1Hhun4dimwMk6h6VdRZRR/2ksSioCJxg?=
+ =?us-ascii?Q?iW9JP002Kr+OUsPH0ODOhLkpVaC7fDGVNPXdUJcNZH7Q5/Tbj2m3gqb6cMru?=
+ =?us-ascii?Q?iaOoR+D8h+jyMF3oKnAIFbvTGKVxr0sFMEhj5zl5Kc/Ku+SggCJzs1n3UXfT?=
+ =?us-ascii?Q?Px6p87MXirzdue+LrgFQsfQEgyHvYgadi4/4exWuSbHYTKIX+h4ouPFV5Y+4?=
+ =?us-ascii?Q?nRMjTesRTnFORoHHXMQg1b+gxh3+8uoaWtDnNL87dQ8tNgOyIsqd4SfHGjLS?=
+ =?us-ascii?Q?4DR2IbCly9kC640emTUq2Zj3RNpUjwQ0TaBDLj2lFiSEChFdJ92ZvCOGfAX0?=
+ =?us-ascii?Q?Pi33a17twOOXtlknYqFYmgRnzS2LBKiwlfXibtE/?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWA003.ant.amazon.com (10.13.139.47) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8313.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 323c9ed0-73b6-48eb-2e16-08dc39968895
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Mar 2024 02:23:07.8998
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: O+Wa4nPzm60Ma9lyOQBHXVXdAMTXme1ng0d93+bUvIQYpcPL3ZjISXdN2chC12fkYVD0ZosHyow7/llzkkwLpw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5810
+X-OriginatorOrg: intel.com
 
-This patch adds test cases to verify the new GC.
 
-We run each test for the following cases:
 
-  * SOCK_DGRAM
-  * SOCK_STREAM without embryo socket
-  * SOCK_STREAM without embryo socket + MSG_OOB
-  * SOCK_STREAM with embryo sockets
-  * SOCK_STREAM with embryo sockets + MSG_OOB
+>-----Original Message-----
+>From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+>Fijalkowski, Maciej
+>Sent: Wednesday, February 21, 2024 3:16 AM
+>To: intel-wired-lan@lists.osuosl.org
+>Cc: netdev@vger.kernel.org; Fijalkowski, Maciej
+><maciej.fijalkowski@intel.com>; Nguyen, Anthony L
+><anthony.l.nguyen@intel.com>; Karlsson, Magnus
+><magnus.karlsson@intel.com>
+>Subject: [Intel-wired-lan] [PATCH iwl-net 2/3] i40e: disable NAPI right af=
+ter
+>disabling irqs when handling xsk_pool
+>
+>Disable NAPI before shutting down queues that this particular NAPI contain=
+s so
+>that the order of actions in i40e_queue_pair_disable() mirrors what we do =
+in
+>i40e_queue_pair_enable().
+>
+>Fixes: 123cecd427b6 ("i40e: added queue pair disable/enable functions")
+>Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+>---
+> drivers/net/ethernet/intel/i40e/i40e_main.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
 
-Before and after running each test case, we ensure that there is
-no AF_UNIX socket left in the netns by reading /proc/net/protocols.
-
-We cannot use /proc/net/unix and UNIX_DIAG because the embryo socket
-does not show up there.
-
-Each test creates multiple sockets in an array.  We pass sockets in
-the even index using the peer sockets in the odd index.
-
-So, send_fd(0, 1) actually sends fd[0] to fd[2] via fd[0 + 1].
-
-  Test 1 : A <-> A
-  Test 2 : A <-> B
-  Test 3 : A -> B -> C <- D
-           ^.___|___.'    ^
-                `---------'
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- tools/testing/selftests/net/.gitignore        |   1 +
- tools/testing/selftests/net/af_unix/Makefile  |   2 +-
- .../selftests/net/af_unix/scm_rights.c        | 286 ++++++++++++++++++
- 3 files changed, 288 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/net/af_unix/scm_rights.c
-
-diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
-index 2f9d378edec3..d996a0ab0765 100644
---- a/tools/testing/selftests/net/.gitignore
-+++ b/tools/testing/selftests/net/.gitignore
-@@ -31,6 +31,7 @@ reuseport_dualstack
- rxtimestamp
- sctp_hello
- scm_pidfd
-+scm_rights
- sk_bind_sendto_listen
- sk_connect_zero_addr
- socket
-diff --git a/tools/testing/selftests/net/af_unix/Makefile b/tools/testing/selftests/net/af_unix/Makefile
-index 221c387a7d7f..3b83c797650d 100644
---- a/tools/testing/selftests/net/af_unix/Makefile
-+++ b/tools/testing/selftests/net/af_unix/Makefile
-@@ -1,4 +1,4 @@
- CFLAGS += $(KHDR_INCLUDES)
--TEST_GEN_PROGS := diag_uid test_unix_oob unix_connect scm_pidfd
-+TEST_GEN_PROGS := diag_uid test_unix_oob unix_connect scm_pidfd scm_rights
- 
- include ../../lib.mk
-diff --git a/tools/testing/selftests/net/af_unix/scm_rights.c b/tools/testing/selftests/net/af_unix/scm_rights.c
-new file mode 100644
-index 000000000000..bab606c9f1eb
---- /dev/null
-+++ b/tools/testing/selftests/net/af_unix/scm_rights.c
-@@ -0,0 +1,286 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright Amazon.com Inc. or its affiliates. */
-+#define _GNU_SOURCE
-+#include <sched.h>
-+
-+#include <stdio.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <sys/types.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+
-+#include "../../kselftest_harness.h"
-+
-+FIXTURE(scm_rights)
-+{
-+	int fd[16];
-+};
-+
-+FIXTURE_VARIANT(scm_rights)
-+{
-+	char name[16];
-+	int type;
-+	int flags;
-+	bool test_listener;
-+};
-+
-+FIXTURE_VARIANT_ADD(scm_rights, dgram)
-+{
-+	.name = "UNIX ",
-+	.type = SOCK_DGRAM,
-+	.flags = 0,
-+	.test_listener = false,
-+};
-+
-+FIXTURE_VARIANT_ADD(scm_rights, stream)
-+{
-+	.name = "UNIX-STREAM ",
-+	.type = SOCK_STREAM,
-+	.flags = 0,
-+	.test_listener = false,
-+};
-+
-+FIXTURE_VARIANT_ADD(scm_rights, stream_oob)
-+{
-+	.name = "UNIX-STREAM ",
-+	.type = SOCK_STREAM,
-+	.flags = MSG_OOB,
-+	.test_listener = false,
-+};
-+
-+FIXTURE_VARIANT_ADD(scm_rights, stream_listener)
-+{
-+	.name = "UNIX-STREAM ",
-+	.type = SOCK_STREAM,
-+	.flags = 0,
-+	.test_listener = true,
-+};
-+
-+FIXTURE_VARIANT_ADD(scm_rights, stream_listener_oob)
-+{
-+	.name = "UNIX-STREAM ",
-+	.type = SOCK_STREAM,
-+	.flags = MSG_OOB,
-+	.test_listener = true,
-+};
-+
-+static int count_sockets(struct __test_metadata *_metadata,
-+			 const FIXTURE_VARIANT(scm_rights) *variant)
-+{
-+	int sockets = -1, len, ret;
-+	char *line = NULL;
-+	size_t unused;
-+	FILE *f;
-+
-+	f = fopen("/proc/net/protocols", "r");
-+	ASSERT_NE(NULL, f);
-+
-+	len = strlen(variant->name);
-+
-+	while (getline(&line, &unused, f) != -1) {
-+		int unused2;
-+
-+		if (strncmp(line, variant->name, len))
-+			continue;
-+
-+		ret = sscanf(line + len, "%d %d", &unused2, &sockets);
-+		ASSERT_EQ(2, ret);
-+
-+		break;
-+	}
-+
-+	free(line);
-+
-+	ret = fclose(f);
-+	ASSERT_EQ(0, ret);
-+
-+	return sockets;
-+}
-+
-+FIXTURE_SETUP(scm_rights)
-+{
-+	int ret;
-+
-+	ret = unshare(CLONE_NEWNET);
-+	ASSERT_EQ(0, ret);
-+
-+	ret = count_sockets(_metadata, variant);
-+	ASSERT_EQ(0, ret);
-+}
-+
-+FIXTURE_TEARDOWN(scm_rights)
-+{
-+	int ret;
-+
-+	sleep(1);
-+
-+	ret = count_sockets(_metadata, variant);
-+	ASSERT_EQ(0, ret);
-+}
-+
-+static void create_listeners(struct __test_metadata *_metadata,
-+			     FIXTURE_DATA(scm_rights) *self,
-+			     int n)
-+{
-+	struct sockaddr_un addr = {
-+		.sun_family = AF_UNIX,
-+	};
-+	socklen_t addrlen;
-+	int i, ret;
-+
-+	for (i = 0; i < n * 2; i += 2) {
-+		self->fd[i] = socket(AF_UNIX, SOCK_STREAM, 0);
-+		ASSERT_LE(0, self->fd[i]);
-+
-+		addrlen = sizeof(addr.sun_family);
-+		ret = bind(self->fd[i], (struct sockaddr *)&addr, addrlen);
-+		ASSERT_EQ(0, ret);
-+
-+		ret = listen(self->fd[i], -1);
-+		ASSERT_EQ(0, ret);
-+
-+		addrlen = sizeof(addr);
-+		ret = getsockname(self->fd[i], (struct sockaddr *)&addr, &addrlen);
-+		ASSERT_EQ(0, ret);
-+
-+		self->fd[i + 1] = socket(AF_UNIX, SOCK_STREAM, 0);
-+		ASSERT_LE(0, self->fd[i + 1]);
-+
-+		ret = connect(self->fd[i + 1], (struct sockaddr *)&addr, addrlen);
-+		ASSERT_EQ(0, ret);
-+	}
-+}
-+
-+static void create_socketpairs(struct __test_metadata *_metadata,
-+			       FIXTURE_DATA(scm_rights) *self,
-+			       const FIXTURE_VARIANT(scm_rights) *variant,
-+			       int n)
-+{
-+	int i, ret;
-+
-+	ASSERT_GE(sizeof(self->fd) / sizeof(int), n);
-+
-+	for (i = 0; i < n * 2; i += 2) {
-+		ret = socketpair(AF_UNIX, variant->type, 0, self->fd + i);
-+		ASSERT_EQ(0, ret);
-+	}
-+}
-+
-+static void __create_sockets(struct __test_metadata *_metadata,
-+			     FIXTURE_DATA(scm_rights) *self,
-+			     const FIXTURE_VARIANT(scm_rights) *variant,
-+			     int n)
-+{
-+	if (variant->test_listener)
-+		create_listeners(_metadata, self, n);
-+	else
-+		create_socketpairs(_metadata, self, variant, n);
-+}
-+
-+static void __close_sockets(struct __test_metadata *_metadata,
-+			    FIXTURE_DATA(scm_rights) *self,
-+			    int n)
-+{
-+	int i, ret;
-+
-+	ASSERT_GE(sizeof(self->fd) / sizeof(int), n);
-+
-+	for (i = 0; i < n * 2; i++) {
-+		ret = close(self->fd[i]);
-+		ASSERT_EQ(0, ret);
-+	}
-+}
-+
-+void __send_fd(struct __test_metadata *_metadata,
-+	       const FIXTURE_DATA(scm_rights) *self,
-+	       const FIXTURE_VARIANT(scm_rights) *variant,
-+	       int inflight, int receiver)
-+{
-+#define MSG "nop"
-+#define MSGLEN 3
-+	struct {
-+		struct cmsghdr cmsghdr;
-+		int fd[2];
-+	} cmsg = {
-+		.cmsghdr = {
-+			.cmsg_len = CMSG_LEN(sizeof(cmsg.fd)),
-+			.cmsg_level = SOL_SOCKET,
-+			.cmsg_type = SCM_RIGHTS,
-+		},
-+		.fd = {
-+			self->fd[inflight * 2],
-+			self->fd[inflight * 2],
-+		},
-+	};
-+	struct iovec iov = {
-+		.iov_base = MSG,
-+		.iov_len = MSGLEN,
-+	};
-+	struct msghdr msg = {
-+		.msg_name = NULL,
-+		.msg_namelen = 0,
-+		.msg_iov = &iov,
-+		.msg_iovlen = 1,
-+		.msg_control = &cmsg,
-+		.msg_controllen = CMSG_SPACE(sizeof(cmsg.fd)),
-+	};
-+	int ret;
-+
-+	ret = sendmsg(self->fd[receiver * 2 + 1], &msg, variant->flags);
-+	ASSERT_EQ(MSGLEN, ret);
-+}
-+
-+#define create_sockets(n)					\
-+	__create_sockets(_metadata, self, variant, n)
-+#define close_sockets(n)					\
-+	__close_sockets(_metadata, self, n)
-+#define send_fd(inflight, receiver)				\
-+	__send_fd(_metadata, self, variant, inflight, receiver)
-+
-+TEST_F(scm_rights, self_ref)
-+{
-+	create_sockets(2);
-+
-+	send_fd(0, 0);
-+
-+	send_fd(1, 1);
-+
-+	close_sockets(2);
-+}
-+
-+TEST_F(scm_rights, triangle)
-+{
-+	create_sockets(6);
-+
-+	send_fd(0, 1);
-+	send_fd(1, 2);
-+	send_fd(2, 0);
-+
-+	send_fd(3, 4);
-+	send_fd(4, 5);
-+	send_fd(5, 3);
-+
-+	close_sockets(6);
-+}
-+
-+TEST_F(scm_rights, cross_edge)
-+{
-+	create_sockets(8);
-+
-+	send_fd(0, 1);
-+	send_fd(1, 2);
-+	send_fd(2, 0);
-+	send_fd(1, 3);
-+	send_fd(3, 2);
-+
-+	send_fd(4, 5);
-+	send_fd(5, 6);
-+	send_fd(6, 4);
-+	send_fd(5, 7);
-+	send_fd(7, 6);
-+
-+	close_sockets(8);
-+}
-+
-+TEST_HARNESS_MAIN
--- 
-2.30.2
-
+Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com> (A Contingent Worke=
+r at Intel)
 
