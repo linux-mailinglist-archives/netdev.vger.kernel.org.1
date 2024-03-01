@@ -1,176 +1,144 @@
-Return-Path: <netdev+bounces-76440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD9B786DBFE
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 08:18:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC70E86DC11
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 08:28:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0066A1C20A24
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 07:18:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE2D01C2286A
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 07:28:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B3C069943;
-	Fri,  1 Mar 2024 07:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3760C6994B;
+	Fri,  1 Mar 2024 07:28:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="QbgeyEDU"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="btE9baPG"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1793169940;
-	Fri,  1 Mar 2024 07:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094BA69943;
+	Fri,  1 Mar 2024 07:28:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709277488; cv=none; b=EEr+WAF3pQc2hAePFvk1AiBPWgsquEO+63DRT4JWvga37+7MqvNxZw7O2OA6XLs1aaeGLsbu1Cci/2XIzdVbOLBogyKPedVhmsPl3ZJboNFGWJqNFKfURLEaHwK0gC7Wp5Qyzlgo3koi1IuPsZZshRWnKpvsNunmCCAYlfy8lAQ=
+	t=1709278116; cv=none; b=csHF9tv9by9/h9HnMzw0a/HeL7zhWls8M1AtlCU1lOoXvxbF5w6mG/siFR/XCQIwIzZmzZbWGV13OEFMWm+f1+TZwYCa1CazCBXI3nRPAlKYjpQlXurElBiR5O6A5IJV6LCoPfg7BM0f6I5w1YVlL/eDVWQt7mHTRzyqWL4S11g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709277488; c=relaxed/simple;
-	bh=GbVSxdxOcXrMNMtwoCnXVKLHEXl3QoXDvb9SPjJL/Go=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rXJsRijSqsBAbf05quOwh4OHdSe/tmJ0Y4y0CQR2YeizkxWg96flcETtcwNmvpYzfgmPJttqmgusHEWU9RS2D6t4fByJiJSk2C2awQNcrzydYCkccmWDAUrxUZvo1toorTXpkXgBdaKxT199xHIjxtOpOfNK4a02VP72WM7yG4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=QbgeyEDU; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1C9E21C0006;
-	Fri,  1 Mar 2024 07:17:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1709277478;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lrWsSClDpsgyGzHOaL8tpqRTFE2Qs26x3Fav87hKIS4=;
-	b=QbgeyEDUeUMQOAPAbUNPlZUfudRBI8YM9TORjlY7M2cJeot2oDtllAcd0MjXUEnr5ZIZX1
-	p7KyYE+yeIDFTQ8yQPM/ufRM8qE/cq+c2eNJ85dh0mpaStnBthX56nTPnApoRI0AihsDkF
-	2/9EUpOLnnYTX/kKXISnEy6CzgF93YcJS+IzWLbfHW3wbZdVCVMkFOY9DGnPRrcWHktCq+
-	pnHg5rPZD9FjXi0nAkhUqTYBfKx3j0DXH1Rhl+1pCFfYQkJSE8jq3RrkdY+VYmv+1rcD3M
-	zlFgosSPF0xqqFX/CJ9MPl/p7Oqr645ldbp9SG2lOxBi/QZUBeIm20G6rHL0zA==
-Message-ID: <ac5feb1c-602d-4562-9aed-d949670dd0f0@arinc9.com>
-Date: Fri, 1 Mar 2024 09:17:52 +0200
+	s=arc-20240116; t=1709278116; c=relaxed/simple;
+	bh=5Wo4A9EYlwGdKNreUXFNN5bH68g9TKK3N9CXPyoeV/c=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EucSLHF9xmJzGsdyELhtZEgYtVJTN1Catoq/A9A1DCPEloZLPVnZ1Wy2XkFczlBNHEqKpGNBq+LAZPjQgeB1CwY4OazE+IKBnUMpePHYqaehslnmcW8ZRJ6KBx24cRn2z3hvoRm2hwFjzl9JQb8+pOppBvXOeqJmHRP9N4G7xk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=btE9baPG; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1709278113; x=1740814113;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5Wo4A9EYlwGdKNreUXFNN5bH68g9TKK3N9CXPyoeV/c=;
+  b=btE9baPGL4YmNkGcItvkIXK6BebgHSbYgH9SfhLlCa7iKt6gCyzn0+s2
+   8hQglb3VXRKmljC2lVJRTHCWsZgNZC7cVrgJpCm6IcSlDU7N9oDNsbkBl
+   HG/foOe6vUwc2xpCwHo8Ozl1E1p842wUwq5wzYdXmXdWY7ikOf0bvRUpH
+   vJEF+3aK7QBGSIXKgcNyzYst11LF5qbflcQ9X9frhiKKNiRJgHNTcbs2x
+   BSikmaRxiqo6I0arXkckTonyBVyv0yZpg1rgcqkOcYF6gIZv1L6XFc5AZ
+   PUgZwO8mr8rlzZpgOBMf7NJqDxDRnCBNStudE2bQs2jwglRy99bEObbz5
+   A==;
+X-CSE-ConnectionGUID: QIh6ZxERSHmcNpB1+yhVqw==
+X-CSE-MsgGUID: OdpqcaD5QC+dTdXc8FBstA==
+X-IronPort-AV: E=Sophos;i="6.06,195,1705388400"; 
+   d="scan'208";a="184328210"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Mar 2024 00:28:32 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 1 Mar 2024 00:27:59 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Fri, 1 Mar 2024 00:27:59 -0700
+Date: Fri, 1 Mar 2024 08:27:57 +0100
+From: Horatiu Vultur - M31836 <Horatiu.Vultur@microchip.com>
+To: Arun Ramadoss - I17769 <Arun.Ramadoss@microchip.com>
+CC: "andrew@lunn.ch" <andrew@lunn.ch>, "linux@armlinux.org.uk"
+	<linux@armlinux.org.uk>, "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"wojciech.drewek@intel.com" <wojciech.drewek@intel.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, UNGLinuxDriver <UNGLinuxDriver@microchip.com>
+Subject: Re: [PATCH net-next v2 2/2] net: phy: micrel: lan8814 cable
+ improvement errata
+Message-ID: <20240301072757.t36qqf47erk4jygr@DEN-DL-M31836.microchip.com>
+References: <20240229195220.2673049-1-horatiu.vultur@microchip.com>
+ <20240229195220.2673049-3-horatiu.vultur@microchip.com>
+ <80bea3ec2ec86d2e75002f849da174f50e0b846b.camel@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 8/8] net: dsa: mt7530: simplify link
- operations and force link down on all ports
-To: Jakub Kicinski <kuba@kernel.org>,
- =?UTF-8?B?QXLEsW7DpyDDnE5BTCB2aWEgQjQgUmVsYXk=?=
- <devnull+arinc.unal.arinc9.com@kernel.org>
-Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Russell King <linux@armlinux.org.uk>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, Bartel Eerdekens <bartel.eerdekens@constell8.be>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <20240216-for-netnext-mt7530-improvements-3-v2-0-094cae3ff23b@arinc9.com>
- <20240216-for-netnext-mt7530-improvements-3-v2-8-094cae3ff23b@arinc9.com>
- <20240228174932.2500653d@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <20240228174932.2500653d@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <80bea3ec2ec86d2e75002f849da174f50e0b846b.camel@microchip.com>
 
-Thanks for looking over this patch series Jakub!
+The 03/01/2024 03:27, Arun Ramadoss - I17769 wrote:
+> Hi Horatiu,
 
-On 29/02/2024 03:49, Jakub Kicinski wrote:
-> On Fri, 16 Feb 2024 14:05:36 +0300 Arınç ÜNAL via B4 Relay wrote:
->> From: Arınç ÜNAL <arinc.unal@arinc9.com>
->>
->> Currently, the link operations for switch MACs are scattered across
->> port_enable, port_disable, phylink_mac_config, phylink_mac_link_up, and
->> phylink_mac_link_down.
->>
->> port_enable and port_disable clears the link settings. Move that to
->> mt7530_setup() and mt7531_setup_common() which set up the switches. This
->> way, the link settings are cleared on all ports at setup, and then only
->> once with phylink_mac_link_down() when a link goes down.
->>
->> Enable force mode at setup to apply the force part of the link settings.
->> This ensures that only active ports will have their link up.
-> 
-> I don't know phylink so some basic questions..
-> 
-> What's "mode" in this case?
-
-The mode here represents whether we will configure properties of the link
-manually (force mode), or by polling the PHY. The driver is supposed to
-configure the properties so we enable force mode on the port MAC registers.
-
-MT7530 has a single bit for this, PMCR_FORCE_MODE. MT7531 has multiple
-bits, MT7531_FORCE_MODE, each of them enabling the force mode for a certain
-property of the link.
+Hi Arun,
 
 > 
->> Now that the bit for setting the port on force mode is done on
->> mt7530_setup() and mt7531_setup_common(), get rid of PMCR_FORCE_MODE_ID()
->> which helped determine which bit to use for the switch model.
+> On Thu, 2024-02-29 at 20:52 +0100, Horatiu Vultur wrote:
+> > When the length of the cable is more than 100m and the lan8814 is
+> > configured to run in 1000Base-T Slave then the register of the device
+> > needs to be optimized.
+> > 
+> > Workaround this by setting the measure time to a value of 0xb. This
+> > value can be set regardless of the configuration.
+> > 
+> > This issue is described in 'LAN8814 Silicon Errata and Data Sheet
+> > Clarification' and according to that, this will not be corrected in a
+> > future silicon revision.
+> > 
+> > Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+> > ---
+> >  drivers/net/phy/micrel.c | 19 +++++++++++++++++++
+> >  1 file changed, 19 insertions(+)
+> > 
+> > diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+> > index 88cc03982bb78..788fdd54fd22d 100644
+> > --- a/drivers/net/phy/micrel.c
+> > +++ b/drivers/net/phy/micrel.c
+> > @@ -117,6 +117,10 @@
+> >  #define LAN8814_EEE_STATE			0x38
+> >  #define LAN8814_EEE_STATE_MASK2P5P		BIT(10)
+> >  
+> > +#define LAN8814_PD_CONTROLS			0x9d
+> > +#define LAN8814_PD_CONTROLS_PD_MEAS_TIME_MASK_	GENMASK(3, 0)
+> > +#define LAN8814_PD_CONTROLS_PD_MEAS_TIME_VAL_	0xb
 > 
-> MT7531_FORCE_MODE also includes MT7531_FORCE_LNK, doesn't that mean
-> the link will be up?
+> nitpick: TIME_VAL macro is very generic if it can end with specific
+> like TIME_VAL_100M or something similar will gives more readability.
 
-No, that one enables force mode for the link status property. The bit for
-setting the link status is PMCR_FORCE_LNK.
+Actually I prefer to keep it like this the name if it is possible..
+Because the VAL_ represents the value and MASK_ represents the mask
+value. Therefore the actual bits name of the register is
+LAN8814_PD_CONTROLS_PD_MEAS_TIME.
 
-I know the current naming of the bits is confusing. I have patch for this
-on my next patch series to improve it.
+I am trying to have a naming convetion about how to define names in this
+file:
+<TARGET>_<REG_NAME>_<REG_BITS_NAME>
 
-> 
->> The "MT7621 Giga Switch Programming Guide v0.3", "MT7531 Reference Manual
->> for Development Board v1.0", and "MT7988A Wi-Fi 7 Generation Router
->> Platform: Datasheet (Open Version) v0.1" documents show that these bits are
->> enabled at reset:
->>
->> PMCR_IFG_XMIT(1) (not part of PMCR_LINK_SETTINGS_MASK)
->> PMCR_MAC_MODE (not part of PMCR_LINK_SETTINGS_MASK)
->> PMCR_TX_EN
->> PMCR_RX_EN
->> PMCR_BACKOFF_EN (not part of PMCR_LINK_SETTINGS_MASK)
->> PMCR_BACKPR_EN (not part of PMCR_LINK_SETTINGS_MASK)
->> PMCR_TX_FC_EN
->> PMCR_RX_FC_EN
->>
->> These bits also don't exist on the MT7530_PMCR_P(6) register of the switch
->> on the MT7988 SoC:
->>
->> PMCR_IFG_XMIT()
->> PMCR_MAC_MODE
->> PMCR_BACKOFF_EN
->> PMCR_BACKPR_EN
->>
->> Remove the setting of the bits not part of PMCR_LINK_SETTINGS_MASK on
->> phylink_mac_config as they're already set.
-> 
-> This should be a separate change.
-
-Sure, will do.
+In this way it way it is easier to find in the datasheet to what it
+refers to.
 
 > 
->> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
->> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> 
->> @@ -2257,6 +2255,12 @@ mt7530_setup(struct dsa_switch *ds)
->>   	mt7530_mib_reset(ds);
->>   
->>   	for (i = 0; i < MT7530_NUM_PORTS; i++) {
->> +		/* Clear link settings and enable force mode to force link down
-> 
-> "Clear link settings to force link down" makes sense.
-> Since I don't know what the mode is, the "and enable force mode"
-> sounds possibly out of place. If you're only combining this
-> for the convenience of RMW, keep the reasoning separate.
+> > +
+> > 
 
-No. Force mode must be enabled so that we can manually set the link state.
-Then, clearing the link settings achieves setting the link status to down.
-
-Arınç
+-- 
+/Horatiu
 
