@@ -1,257 +1,158 @@
-Return-Path: <netdev+bounces-76483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2AC186DEAB
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:56:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12F2786DEC8
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 11:04:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20D871C21089
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:56:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD55E1F237E9
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C396A8BA;
-	Fri,  1 Mar 2024 09:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="md+BSHWV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C056E616;
+	Fri,  1 Mar 2024 10:02:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E4E69D28;
-	Fri,  1 Mar 2024 09:55:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4946BB40
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 10:02:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709286962; cv=none; b=UcXKFpW2UbgrAfg6zNlnN0tv16edHSq03AHyJxLH0SoT/i9Laiu3IEj93K94NuCxDeRZudkLcibLR+rYqLygi7fndqsJEOOPmvL2Jh1OmSzls90Jb/EToxDu9t2DdutQZZJLPAQHlSMO97TfppKQIuoxvGhd8Ut7O4LICHvMJSA=
+	t=1709287332; cv=none; b=fVqiC4FUJSdcClYHsya9+40vGMUFvYOHZGL3KkLaFZ6XfvFvnzDfxfOhUTCzSs6/rH0WKm6HNOXBWxV1kULKKGuFsSFYKbk5F6eAK0a5R/Uqi18F68Z9SGo09NU3aukHerp91Qt78/FFiquEIgKCvnvW/9dkBha9INkofTnNEMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709286962; c=relaxed/simple;
-	bh=nB4RoPzo73ug6c/YARrBpRfTTCLpVLkR1rpzscqqvgM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k4g2TJyw8wpU6EEjlOvqgvl6/6drJrK6D79Pw4qWGwHTElb5LoOCXIsuyTgITnA2TDBs2+X+GKFzGuxXBmoqKcJCt+JW0I+gwiknZPpxFvbODYXd2BZlPjT+qEcjqFz6viTCFzs3unhhSK9dLCD70FmFqMd/wwsL72ydSJ2mBfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=md+BSHWV; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 9342088129;
-	Fri,  1 Mar 2024 10:55:56 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1709286957;
-	bh=ehYEHbfNMu0NChRHIbLyuBBhUQ+KLNUH2S3I+Evt6mw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=md+BSHWVhlHlIUcLhpNsX8Sen20evAEtzBgResu8ktPoVX0nOA/ZD6V4avVaikqdv
-	 xiQMPoRWzT5oOKpLcXsyt4G2K1F9h24gRZ6moGOBx+zNfNXDlGB5ww0qf0k9hLU+Vm
-	 0o5CZs/fC4N7hXugfc4TU39IFY+CcVduudBeRTWXpWATOYF/quBPjAAXbbx6aqB2eH
-	 1YSePGlanb5PAwZ1WsCzmIfSMgXV3208O+fSUwp8962OThkN5rxtWXVH/BjvTOIjQq
-	 lzxsIkWoFSdRsMZ/qpBc05/K5wpumvlu/MTV0mYgRPLkrUgQCrsvusPW4BTFURv+B/
-	 MapNhPolb6Ccg==
-Date: Fri, 1 Mar 2024 10:55:50 +0100
-From: Lukasz Majewski <lukma@denx.de>
-To: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, "Florian Fainelli"
- <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- <netdev@vger.kernel.org>, <Tristram.Ha@microchip.com>, "Sebastian Andrzej
- Siewior" <bigeasy@linutronix.de>, Paolo Abeni <pabeni@redhat.com>, "Ravi
- Gunasekaran" <r-gunasekaran@ti.com>, Simon Horman <horms@kernel.org>,
- "Wojciech Drewek" <wojciech.drewek@intel.com>, Nikita Zhandarovich
- <n.zhandarovich@fintech.ru>, Murali Karicheri <m-karicheri2@ti.com>, "Dan
- Carpenter" <dan.carpenter@linaro.org>, Kristian Overskeid
- <koverskeid@gmail.com>, Matthieu Baerts <matttbe@kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC] net: hsr: Provide RedBox support
-Message-ID: <20240301105550.26de5271@wsk>
-In-Reply-To: <64ddec9f-42a8-089a-fb4a-a49a2e80337c@huawei.com>
-References: <20240228150735.3647892-1-lukma@denx.de>
-	<64ddec9f-42a8-089a-fb4a-a49a2e80337c@huawei.com>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1709287332; c=relaxed/simple;
+	bh=Hey8MTEQ+kiZtaoQeCMuLmIe0okdIVTManbNr6MNuIs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JdyDdjBcUWW5/Bl5w4lrW9DZmPrYB2vZbknUGLFnkitnjHdcVHCMh2+yqgzSnJXUC9riEMzP+zvDuipSDVW3MXjjz4EWQ7OqF6hOSK4m+MeIsL2Y+V5mx55lbIjnuZNEp3tziaN1HmPoQtoxeXwBBAYj6swrteE77btvspKak8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rfziG-0003oc-BA; Fri, 01 Mar 2024 11:01:56 +0100
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rfziE-003kq2-Fy; Fri, 01 Mar 2024 11:01:54 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rfziE-003tMA-1M;
+	Fri, 01 Mar 2024 11:01:54 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Wei Fang <wei.fang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>
+Subject: [PATCH net-next v7 0/8] net: ethernet: Rework EEE
+Date: Fri,  1 Mar 2024 11:01:45 +0100
+Message-Id: <20240301100153.927743-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/FQHjZg_Cf39XqB1x9daHbJ/";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
---Sig_/FQHjZg_Cf39XqB1x9daHbJ/
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hello all,
 
-Hi William,
+with Andrew's permission I'll continue mainlining this patches:
 
-> Give opinions only from the code level.
->=20
-> > =20
-> >  void hsr_debugfs_rename(struct net_device *dev)
-> >  {
-> > @@ -95,6 +114,19 @@ void hsr_debugfs_init(struct hsr_priv *priv,
-> > struct net_device *hsr_dev) priv->node_tbl_root =3D NULL;
-> >  		return;
-> >  	}
-> > +
-> > +	if (!priv->redbox)
-> > +		return;
-> > +
-> > +	de =3D debugfs_create_file("proxy_node_table", S_IFREG |
-> > 0444,
-> > +				 priv->node_tbl_root, priv,
-> > +				 &hsr_proxy_node_table_fops);
-> > +	if (IS_ERR(de)) {
-> > +		pr_err("Cannot create hsr proxy node_table
-> > file\n");
-> > +		debugfs_remove(priv->node_tbl_root);
-> > +		priv->node_tbl_root =3D NULL;
-> > +		return;
-> > +	} =20
-> I think we can use "goto label" to reduce duplicate codes for error
-> handling.
+==============================================================
 
-This code is already NAK'ed from network maintainers, as debugfs is not
-acceptable to give any "API like" information.
+Most MAC drivers get EEE wrong. The API to the PHY is not very
+obvious, which is probably why. Rework the API, pushing most of the
+EEE handling into phylib core, leaving the MAC drivers to just
+enable/disable support for EEE in there change_link call back.
 
-Instead the "netlink" API shall be used to provide this information.
+MAC drivers are now expect to indicate to phylib if they support
+EEE. This will allow future patches to configure the PHY to advertise
+no EEE link modes when EEE is not supported. The information could
+also be used to enable SmartEEE if the PHY supports it.
 
->=20
-> >  }
-> > =20
-> > @@ -296,6 +298,7 @@ static void send_hsr_supervision_frame(struct
-> > hsr_port *master, struct hsr_priv *hsr =3D master->hsr;
-> >  	__u8 type =3D HSR_TLV_LIFE_CHECK;
-> >  	struct hsr_sup_payload *hsr_sp;
-> > +	struct hsr_sup_tlv *hsr_stlv;
-> >  	struct hsr_sup_tag *hsr_stag;
-> >  	struct sk_buff *skb;
-> > =20
-> > @@ -335,6 +338,16 @@ static void send_hsr_supervision_frame(struct
-> > hsr_port *master, hsr_sp =3D skb_put(skb, sizeof(struct
-> > hsr_sup_payload)); ether_addr_copy(hsr_sp->macaddress_A,
-> > master->dev->dev_addr);=20
-> > +	if (hsr->redbox) {
-> > +		hsr_stlv =3D skb_put(skb, sizeof(struct
-> > hsr_sup_tlv));
-> > +		hsr_stlv->HSR_TLV_type =3D PRP_TLV_REDBOX_MAC;
-> > +		hsr_stlv->HSR_TLV_length =3D sizeof(struct
-> > hsr_sup_payload); +
-> > +		/* Payload: MacAddressRedBox */
-> > +		hsr_sp =3D skb_put(skb, sizeof(struct
-> > hsr_sup_payload));
-> > +		ether_addr_copy(hsr_sp->macaddress_A,
-> > hsr->macaddress_redbox);
-> > +	} =20
-> If hsr->redbox is true, hsr_sp->macaddress_A will be covered. Do
-> ether_addr_copy() twice. Is it better like this:
->=20
-> hsr_sp =3D skb_put(skb, sizeof(struct hsr_sup_payload));
->=20
-> if (hsr->redbox) {
-> 	...
-> 	ether_addr_copy(hsr_sp->macaddress_A, hsr->macaddress_redbox);
-> } else {
-> 	ether_addr_copy(hsr_sp->macaddress_A, master->dev->dev_addr);
-> }
+With these changes, the uAPI configuration eee_enable becomes a global
+on/off. tx-lpi must also be enabled before EEE is enabled. This fits
+the discussion here:
 
-It may be a bit misleading, as the hsr_sp is the payload for TLV fields
-in HSR supervisory frames.
+https://lore.kernel.org/netdev/af880ce8-a7b8-138e-1ab9-8c89e662eecf@gmail.com/T/
 
-It shall be done as in the code as:
+This patchset puts in place all the infrastructure, and converts one
+MAC driver to the new API. Following patchsets will convert other MAC
+drivers, extend support into phylink, and when all MAC drivers are
+converted to the new scheme, clean up some unneeded code.
 
-1. First you need to send this HSR "node" MAC address (the
-ether_addr_copy(hsr_sp->macaddress_A, master->dev->dev_addr))
-
-2. If the box is a RedBox, then this supervisory frame shall have
-_appended_ another TLV with RedBox mac address (it can be the same
-as the HSR node in the special case).
-
-The hsr_sp->macaddress_A holds the address to the V (value) field of
-the TLV.
-
->=20
-> > +
-> >  	if (skb_put_padto(skb, ETH_ZLEN)) {
-> >  		spin_unlock_bh(&hsr->seqnr_lock);
-> >  		return; =20
->=20
-> > =20
-> > @@ -448,13 +455,14 @@ static void hsr_forward_do(struct
-> > hsr_frame_info *frame) }
-> > =20
-> >  		/* Check if frame is to be dropped. Eg. for PRP no
-> > forward
-> > -		 * between ports.
-> > +		 * between ports, or sending HSR supervision to
-> > RedBox. */
-> >  		if (hsr->proto_ops->drop_frame &&
-> >  		    hsr->proto_ops->drop_frame(frame, port))
-> >  			continue;
-> > =20
-> > -		if (port->type !=3D HSR_PT_MASTER)
-> > +		if (port->type =3D=3D HSR_PT_SLAVE_A ||
-> > +		    port->type =3D=3D HSR_PT_SLAVE_B) =20
->=20
-> (port->type !=3D HSR_PT_MASTER) is not equivalent to (port->type =3D=3D
-> HSR_PT_SLAVE_A || port->type =3D=3D HSR_PT_SLAVE_B). port->type may be
-> HSR_PT_INTERLINK or others. Or here is a bugfix? Please check.
-
-Without Redbox support you don't use HSR_PT_INTERLINK. This port shall
-behave in similar way to HSR_PT_MASTER - e.g. it will send/receive HSR
-untagged frames. That is why the condition has been altered to only
-prepare HSR tagged frames for HSR ring port A/B.
-
->=20
-> >  			skb =3D
-> > hsr->proto_ops->create_tagged_frame(frame, port); else
-> >  			skb =3D
-> > hsr->proto_ops->get_untagged_frame(frame, port); @@ -469,7 +477,9
-> > @@ static void hsr_forward_do(struct hsr_frame_info *frame)
-> > hsr_deliver_master(skb, port->dev, frame->node_src); } else {
-> >  			if (!hsr_xmit(skb, port, frame))
-> > -				sent =3D true;
-> > +				if (port->type =3D=3D HSR_PT_SLAVE_A ||
-> > +				    port->type =3D=3D HSR_PT_SLAVE_B)
-> > +					sent =3D true;
-> >  		}
-> >  	}
-> >  } =20
->=20
-> If my opinions be accepted, Can you add "Reviewed-by: Ziyang Xuan
-> <william.xuanziyang@huawei.com>" at next version of patch?
-
-I will add your Reviewed-by: tag, no problem.
-
-Thanks for the input :-)
-
-Best regards,
-
-Lukasz Majewski
-
+v8:
 --
+update phydev->link value before phy_link_down/up cycle
 
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+v7:
+--
+add phy_link_down() before phy_link_up()
+rewrite comment for phy_ethtool_set_eee_noneg()
+add check for changed tx_lpi_timer
 
---Sig_/FQHjZg_Cf39XqB1x9daHbJ/
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+v6:
+--
+Reword different comments. See per patch change comments.
 
------BEGIN PGP SIGNATURE-----
+v5:
+--
+Rebase against latest netdev-next
+Use keee instead of eee struct
 
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmXhpiYACgkQAR8vZIA0
-zr3S1gf/WjpsxibQboT9bZVmYqBI42CusZQPAtv+BKCCQPIAKeU+uxZJYFNdY9X1
-1RvPcYudaPtPYdz7MXbVOjFojxHh46PltWoUM3SH+B7NvHFTdFHibnjE//GvDxP1
-zEJ3yf2Yk24L9U/F6gc0l4aXAbIlIwF3ptTxUFZBaEEC51XEvPpU+f6PEeABHiK6
-seqRQGq6nlU6YUAFpPpvmSTjIx8RYNem/nMApysdVynQeY5J5WyAFNb2Rh2bN6KY
-m9wFDWUzXH81aj+nyZ65h11QqIkh5XLhv10AcSFjHpswgbUNZCV5G/zQ8N37mLRX
-yxUR5tYuntWOhUG6A6QzcyDp0CNkfw==
-=xyoM
------END PGP SIGNATURE-----
+v4
+--
+Only convert one MAC driver
+Drop all phylink code
+Conform to the uAPI discision.
 
---Sig_/FQHjZg_Cf39XqB1x9daHbJ/--
+v3
+--
+Rework phylink code to add a new callback.
+Rework function to indicate clock should be stopped during LPI
+
+Andrew Lunn (7):
+  net: phy: Add phydev->enable_tx_lpi to simplify adjust link callbacks
+  net: phy: Add helper to set EEE Clock stop enable bit
+  net: phy: Keep track of EEE configuration
+  net: phy: Immediately call adjust_link if only tx_lpi_enabled changes
+  net: phy: Add phy_support_eee() indicating MAC support EEE
+  net: fec: Move fec_enet_eee_mode_set() and helper earlier
+  net: fec: Fixup EEE
+
+Russell King (1):
+  net: add helpers for EEE configuration
+
+ drivers/net/ethernet/freescale/fec_main.c | 84 ++++++++++-------------
+ drivers/net/phy/phy-c45.c                 | 14 +++-
+ drivers/net/phy/phy.c                     | 70 ++++++++++++++++++-
+ drivers/net/phy/phy_device.c              | 28 ++++++++
+ include/linux/phy.h                       |  9 ++-
+ include/net/eee.h                         | 38 ++++++++++
+ 6 files changed, 189 insertions(+), 54 deletions(-)
+ create mode 100644 include/net/eee.h
+
+-- 
+2.39.2
+
 
