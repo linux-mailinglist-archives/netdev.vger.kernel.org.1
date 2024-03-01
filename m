@@ -1,125 +1,113 @@
-Return-Path: <netdev+bounces-76454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C64A886DCA5
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:01:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6634F86DCA9
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:04:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C171B230D5
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 08:01:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9190D1C22978
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 08:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719F969D05;
-	Fri,  1 Mar 2024 08:01:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0448169D0E;
+	Fri,  1 Mar 2024 08:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NYXOROii"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D00CdYJs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420A367E6C;
-	Fri,  1 Mar 2024 08:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D67669D01
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 08:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709280083; cv=none; b=iEU6uWdnG4KLFdlf6q7nOEQV5EBILtazLZTe/SgWv8D+Z5a+M/0msBQV4raoQK1mVdCaS++Xe0wPXdBCVDIllpm7LARlS/jdx22F+lFNj3HLRxtNU5DFHTrO5niak1hiIJ12WYRKbLxUi1vBGQCyrxX56s2Gf/BCm7c6lnd48MA=
+	t=1709280249; cv=none; b=IXNCHettupnhgMvgfLXrtx3wz6qFS4KyZ6DEtmxZ7sDaEN91ypvYYvLQQqgOtdUUCc7N8Gs4jKM6E5XAmIyCdc89swmL6a5HGhMRWVSfIQOIcemWPWo1FDiRg3WUqHBPPnC4tzmv6UQ1MAvBk0HVyO0Kp41BBxTGcNuyCFJjsrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709280083; c=relaxed/simple;
-	bh=jMRWjjBb3WoG96heiGE+SbBHlPWqedM9ZSLpfueiMU8=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=WxwVmu/dG9MKnzTmMBt4fBd+39N6m7SVf1bsD5FBZ2N0RMuLDlEvpNFaBdYHT45gY3PihYDMSx1hKlbIbcR6hPWjo34Xz71rXVv+Lm4aCQEd1oR3xvIU9GweDZc9qaDlljAS7YPRkmcDvRGi7R0UPWNqWGOoBM3v78D8L++06TU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NYXOROii; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06746C433C7;
-	Fri,  1 Mar 2024 08:01:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709280082;
-	bh=jMRWjjBb3WoG96heiGE+SbBHlPWqedM9ZSLpfueiMU8=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=NYXOROiiPwwVhYxx1fbNDxcpy1ncuwsxP3IJmfH3QY4e9lqXC5mcmHEFwLekftNje
-	 HdPvpXFl6MuYkRR+Dfj6GtbgTEKlYB9UH3l/RbRuSX/0okn+jTeVDtHyODc8LX/3Gd
-	 AMQelHir1f7Nh0yNghqmyI1UhM6pXRNUEqQPlumhjtthx8wh8D2LDcu0etWNaUhNnc
-	 h/PYPpr43thxVRBRjuPZ0DgbPuDlNfDGqOdclU4s6Ikxm3oOULyAMLohqdtohzALz/
-	 Yjb8O3lflw7vPwKeej6m09O5t2iFHNoHj8yLsi6swrrIwx6xZXLk/NUgtli0Yob3zp
-	 GbGLT+UfGyS7A==
-From: Kalle Valo <kvalo@kernel.org>
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: Jeff Johnson <quic_jjohnson@quicinc.com>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Rob Herring
- <robh+dt@kernel.org>,  Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley <conor+dt@kernel.org>,
-  Bjorn Andersson <andersson@kernel.org>,  Konrad Dybcio
- <konrad.dybcio@linaro.org>,  ath10k@lists.infradead.org,
-  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
-  devicetree@vger.kernel.org,  linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH RFC 2/4] wifi: ath10k: support board-specific firmware
- overrides
-References: <20240130-wcn3990-firmware-path-v1-0-826b93202964@linaro.org>
-	<20240130-wcn3990-firmware-path-v1-2-826b93202964@linaro.org>
-Date: Fri, 01 Mar 2024 10:01:17 +0200
-In-Reply-To: <20240130-wcn3990-firmware-path-v1-2-826b93202964@linaro.org>
-	(Dmitry Baryshkov's message of "Tue, 30 Jan 2024 18:38:38 +0200")
-Message-ID: <87h6hq8joy.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1709280249; c=relaxed/simple;
+	bh=n4spHHvJLlMGZHVr7fqI5nbP9JLbO0KC62LA3csKOP0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nCT1a5NLA6AD8Xyq5wDM0TqBUhdgr/lcrxKSiLmQTU7MbcwsaVjoEx7AyofbUUaQ9KaMQwE7zpg3X36EZDateQjmVEaBqfhtW/b2w0Ob2uOTGaWpR8JSR8NkrKoRF8/Kl+FbWzA3AXoQOWeckDl5vwR69t8mRsKytFKWfrzje7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D00CdYJs; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-565223fd7d9so3919a12.1
+        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 00:04:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709280246; x=1709885046; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7X4wFyOx0wdvgK1yfOcV9T4++P8vIrbb+J2WByTndeM=;
+        b=D00CdYJsA9JWtnjZ+C9vhCytHtPJvdidm7Kmln0Yh9V3K45PHW9z6eQD5FM/eZaCwG
+         1tLHQNUQdSFbLS8kOrs58u5rCu25bpdSeV8r0sOxk+ThaikPu1IkkPcefUYUTQG7jjpZ
+         oIkZ0ZXfhTyJuT4sM1pneWLgZ0irXjNn9KWfvvnzdeb8OkRhjmWIjwjShu4FG+9tPiYW
+         3pNq6dF4B4LVpoFI3kpxObmQUyfl9P0VoeeIlYDJoaA1XY5HLQkyhwTKmiRcMJ8g14oB
+         BhSWHA3X0PojcKTXayhDAwRx96FhThlmBp9NGTJJ14mQriggwzqK1kxTltdq/IBtRBCp
+         qmhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709280246; x=1709885046;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7X4wFyOx0wdvgK1yfOcV9T4++P8vIrbb+J2WByTndeM=;
+        b=uZx7EnHiOS9haGGqsPi9hEyvBCGsF29331cdgE+eaoYTuekine92GGrO7KPR1a97oi
+         Y3PYgio3g1pQP04tcadIF4ov4PJZrzmmalOsQv/Q3cQxR8iJgvSs5ILKwL7aLtMUwqSi
+         A+HtziraAqj8kpiPbjPqPkbAOW+v0FhKnWdEwguG1nUe4OoynoRw3BsjFaOzIIU6Kjo2
+         s7QDCuA3FhkVnCox9uIYdSorRt8NyjGxmHeo/8lvbA2E7AM0Mi1cUAuHk1uyWpbRp5jp
+         V19peLtY75t+dI2RFrwJT+bPrPuvq5vGqlQfOqWHXtoXsuez1s2capSKnYB/b2FsqsnQ
+         umLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUG4X+X9r+Ra/5ZuweVOuwo8fHswAXRyLELIxIcin8TQQnVPqldUxriws/DVns/12sM0mnRioDXdWUtyjb67C6B/B08H2TG
+X-Gm-Message-State: AOJu0Yy6avnb/aJ0moMkK3kPZybrV7UhZrDjLRR71KqD6IOriDTfJURT
+	1zy1VRhEJTZvLV8hpdjTH3m/KY2NTCKsRECJm4TL8zYlUeFIpoxOZ2xOuqy26dkFwurx4bb0pEh
+	trHQQwdmPTfj0klX70HYTHWTWSZoBwScU/ZKe
+X-Google-Smtp-Source: AGHT+IFOvZyHykyduIz94CdHCof11T2iEVmpeMxGsKXRX8OsG8eBWy5K5UWwwoNyQqGC7PCA+EV0NmT93gNYH1arh0I=
+X-Received: by 2002:a05:6402:5244:b0:565:4f70:6ed with SMTP id
+ t4-20020a056402524400b005654f7006edmr109469edd.6.1709280246294; Fri, 01 Mar
+ 2024 00:04:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240229213018.work.556-kees@kernel.org> <20240229225910.79e224cf@kernel.org>
+In-Reply-To: <20240229225910.79e224cf@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 1 Mar 2024 09:03:55 +0100
+Message-ID: <CANn89iKeJGvhY0K=kLhhR39NVbaizP2UBk0Vk0r_XCe2XMBZHg@mail.gmail.com>
+Subject: Re: [PATCH] netdev: Use flexible array for trailing private bytes
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Kees Cook <keescook@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Paolo Abeni <pabeni@redhat.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>, netdev@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Jiri Pirko <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>, Coco Li <lixiaoyan@google.com>, 
+	Amritha Nambiar <amritha.nambiar@intel.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Dmitry Baryshkov <dmitry.baryshkov@linaro.org> writes:
-
-> Different Qualcomm platforms using WCN3990 WiFI chip use SoC-specific
-> firmware versions with different features. For example firmware for
-> SDM845 doesn't use single-chan-info-per-channel feature, while firmware
-> for QRB2210 / QRB4210 requires that feature. Allow board DT files to
-> override the subdir of the fw dir used to lookup the firmware-N.bin file
-> decribing corresponding WiFi firmware.
+On Fri, Mar 1, 2024 at 7:59=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
 >
-> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+> On Thu, 29 Feb 2024 13:30:22 -0800 Kees Cook wrote:
 
-Sorry for the delay, too many drivers... But this looks good to me, few
-small comments.
+> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > index 118c40258d07..b476809d0bae 100644
+> > --- a/include/linux/netdevice.h
+> > +++ b/include/linux/netdevice.h
+> > @@ -1815,6 +1815,8 @@ enum netdev_stat_type {
+> >       NETDEV_PCPU_STAT_DSTATS, /* struct pcpu_dstats */
+> >  };
+> >
+> > +#define      NETDEV_ALIGN            32
+>
+> Unless someone knows what this is for it should go.
+> Align priv to cacheline size.
 
-In the commit message it would it would be good to have an example of
-the new firmware path. And also mention that board file (board-2.bin)
-handling is not affected, at least that's how understood from reading
-the code.
++2
 
-> --- a/drivers/net/wireless/ath/ath10k/core.c
-> +++ b/drivers/net/wireless/ath/ath10k/core.c
-> @@ -942,11 +942,20 @@ static const struct firmware *ath10k_fetch_fw_file(struct ath10k *ar,
->  	if (dir == NULL)
->  		dir = ".";
->  
-> +	if (ar->board_name) {
-> +		snprintf(filename, sizeof(filename), "%s/%s/%s",
-> +			 dir, ar->board_name, file);
-> +		ret = firmware_request_nowarn(&fw, filename, ar->dev);
-> +		ath10k_dbg(ar, ATH10K_DBG_BOOT, "boot fw request '%s': %d\n",
-> +			   filename, ret);
-> +		if (!ret)
-> +			return fw;
-> +	}
+#define NETDEV_ALIGN    L1_CACHE_BYTES
 
-So here you test if ar->board_name is NULL.
-
-> --- a/drivers/net/wireless/ath/ath10k/snoc.c
-> +++ b/drivers/net/wireless/ath/ath10k/snoc.c
-> @@ -1337,6 +1337,9 @@ static void ath10k_snoc_quirks_init(struct ath10k *ar)
->  	struct ath10k_snoc *ar_snoc = ath10k_snoc_priv(ar);
->  	struct device *dev = &ar_snoc->dev->dev;
->  
-> +	/* ignore errors, default to empty string */
-> +	of_property_read_string(dev->of_node, "firmware-name", &ar->board_name);
-
-What do you mean with empty string in this case, "\n" (with length of 1)
-or NULL? Should we also test for strlen(0) in ath10k_fetch_fw_file()?
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+or a general replacement of NETDEV_ALIGN....
 
