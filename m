@@ -1,230 +1,209 @@
-Return-Path: <netdev+bounces-76669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE22586E78D
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:45:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88FBD86E7D1
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 18:54:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AE5F287B2C
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:45:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB0E21F27B5F
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:54:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65FAF38F9D;
-	Fri,  1 Mar 2024 17:44:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB6E134CB;
+	Fri,  1 Mar 2024 17:54:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U+0SQCYO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OYI2KflC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3F339AF8;
-	Fri,  1 Mar 2024 17:44:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B273848E;
+	Fri,  1 Mar 2024 17:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709315058; cv=none; b=u3Wr4B8CwQWAwsmHsCRr2mNsMaN4NxjHDaBXvIoKI5jY2rLMgbohhLEBIB1Pimj10ioORApwsQ68wAvDk8hMM8binm3tKH8W915f7iZJ06z7wXE+NWIZ9fi3B7pNZHV48cY+RtCnZ0j1ZVt6EEvtlWrBRXSIe1oUOmj/tITwaWY=
+	t=1709315678; cv=none; b=q7mHG0uh2wBkH49UFsc0RhSpyp44mNVf+QJeZIFb5kLAFj/TkbDHSe3RnYz2ASqVNA+JJFMQ+wdUM27H5ubmGcvdxsEueSVtx+VPnNfhRSGTV2SbJ/iMM1gGC+Hw8yV+tbhwZdeEft/SLrvMyRQ/EUUtAFVteJIKuhXhpIllwkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709315058; c=relaxed/simple;
-	bh=EdDtedg5CZVRBqB3FVjkepFcu7D4qjE49o9Ec5jvrkM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=LLsVxBeSGitQsh2ktqPa3m+GJ49gVvcLFiMiRiwAfBk8YqBp6zRrm/qqobIkna25tBY26KlOs3EWT+IXmgtoYVl0ldnmCrqeXSK75c5dMwJwC2B5MkJ1HNXsfPtDbXa7pQKR7X+WyQAMhCuhN+Sjl/u4m+NWNM4EmLOc4WpHOkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U+0SQCYO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1945C43394;
-	Fri,  1 Mar 2024 17:44:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709315057;
-	bh=EdDtedg5CZVRBqB3FVjkepFcu7D4qjE49o9Ec5jvrkM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=U+0SQCYOW2Fqxz64HPq0sjdCWZEYhrkEWIt0/Agtsr3QHKLuV2FyeXzaLLONCXssw
-	 yAAeF3r1yKAX+THjQHy4AKoWO2/8zApeGkDaWcS2C2T2PEoj61bkUin3iGBGG/bkVP
-	 fRdAL44UnSYX6fiIxgCZMu1Rk9gmL9BRl6mCWsu4Ci62R8pw6SL7aXaqPQxHScVAn3
-	 U7PRtfOI/oDQ0jzRjcWCL9tVnKPpxcv7svaAKtZpQM2Yo7LHY016LEYulr36peBHyn
-	 Kbz0xuFHXuwANR5J62blx4x1rGhtI2FhpHkKoemjpkD8pv88FruM/EgdYCIKnRhzUs
-	 kOuY8l2mUMN/w==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 01 Mar 2024 18:43:47 +0100
-Subject: [PATCH net-next 4/4] mptcp: cleanup SOL_TCP handling
+	s=arc-20240116; t=1709315678; c=relaxed/simple;
+	bh=aqeIwwGa/fkHnXgNw3wwR4I8Nh8KUDC4YHT40u34iyA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=E52AdwJUzG3Ym37M2varCH1ZjIe4Q7RKy0WxZ9kXFP10ReERLYns2IowaJKuHkcgbqbPomv/FXPebEpqXilRRzWADW7tS5IkNIWCyVNqmzF5H2xfhemb4zofe9oYv0vxL3J7pwqbbyI/cRpMrBhp0HOsfhlFzSUje+bWak4Pv0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OYI2KflC; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1dccb2edc6dso22096815ad.3;
+        Fri, 01 Mar 2024 09:54:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709315677; x=1709920477; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nTu8BntRycqg7yt21AHZn8UXSjkjplk0BJ11/qY4XBE=;
+        b=OYI2KflC/BHZoPPAx+AtLH6bp56OD8ve8wV6+O0rPklItMqmbqVgihDSr5jQfbWQ44
+         EZJj4PnEigZ/S46/pvJtxTSzxqlqZ0hmi9UUB4uN2mzdu1U8b4A0A+467MkXymnfqmDv
+         gw7g0JhbGqK+E+wu54Y4XN0WrEr6eFsaK0i8fS1rIhi+IA8EPnD2Ik1/g/jAuRkMewIy
+         itJUlFbCaCznyla60T27UaV6YljTwLi/r9aOYg/FoIZEKcADn9yVndddIf6tnOz6RfAR
+         i2l8brRKjIapJg27/0C/75hcxM0JpytYC67Jb8Org6JgVpztWqgGby7r1iGC4AGfRE1k
+         9tEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709315677; x=1709920477;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=nTu8BntRycqg7yt21AHZn8UXSjkjplk0BJ11/qY4XBE=;
+        b=SmlQzAMB9eraWLDiQzmkj9cCGfwtUlinADdDdbfY8/Jso8hYrNiD5fletVDY74nebl
+         oDAv8BmjPYx67UFNzjv2dkHmB+u3k5s0VSOh57+VOrAoMk/nosbyBupmTYTI0vScubjm
+         Ua/FWr4q5cbPr7sB+GTfymI7NhvKp39APyAlkSi4I1aO30IsByCC+QTyc9b0bvXDJMRp
+         Q6b4JdhgM/9ohcfdQs1bWmRAzN1gLf/IqX4Jiwt4MeoCICYgav2b/j/aX2g7JFGEStud
+         Mdj9hTxT2Y8nsBQWNKGW/R03hsNcHcOvq4hwzpzL3mgxywRWIrMmU2PPZEsC+nWg+GXJ
+         jdnA==
+X-Forwarded-Encrypted: i=1; AJvYcCVHEjst3RAt81fhtSbBWj5GTGAb/KHr7op+n7lcIfaJrG14W0eIvlJyC8ojZabbl0yyi7Xb/l9klnkNe+/edqrt6AFRfh/xTrIisBh6Iii1jVa30+eoHVYiAyQAHliL3SGrJMBTfB7nZ0b2HqENuEYME668Wo8tXN5tbI8aPAUyZrdm51VLGdzun3ZLbU4XwQ0KIkU0lE/CQQW+
+X-Gm-Message-State: AOJu0YwewP5URYAQLD6UHCPJ5Hub0bDL6Y2W/PbrMfXvaDWnatVCvn/1
+	AWWUKZRak34aZIWttyPiR4m9GvhKvL25MWJh6FzYt5he3ku/2mCh
+X-Google-Smtp-Source: AGHT+IE9csmqmhCHH7CB4+0CxfUKKrr/8xABmiG0iw4SYFgI5JFB+8TUoh0+dZcVBRLvK/L83PLtYQ==
+X-Received: by 2002:a17:903:8c6:b0:1dc:d515:79ca with SMTP id lk6-20020a17090308c600b001dcd51579camr2747683plb.5.1709315676554;
+        Fri, 01 Mar 2024 09:54:36 -0800 (PST)
+Received: from localhost ([98.97.43.160])
+        by smtp.gmail.com with ESMTPSA id e8-20020a170902784800b001da001aed18sm3800862pln.54.2024.03.01.09.54.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Mar 2024 09:54:35 -0800 (PST)
+Date: Fri, 01 Mar 2024 09:54:34 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Song Yoong Siang <yoong.siang.song@intel.com>, 
+ Jesse Brandeburg <jesse.brandeburg@intel.com>, 
+ Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Stanislav Fomichev <sdf@google.com>, 
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
+ Florian Bezdeka <florian.bezdeka@siemens.com>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Eduard Zingerman <eddyz87@gmail.com>, 
+ Mykola Lysenko <mykolal@fb.com>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ KP Singh <kpsingh@kernel.org>, 
+ Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: intel-wired-lan@lists.osuosl.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ xdp-hints@xdp-project.net
+Message-ID: <65e2165a89ed0_5dcfe20823@john.notmuch>
+In-Reply-To: <20240301162348.898619-3-yoong.siang.song@intel.com>
+References: <20240301162348.898619-1-yoong.siang.song@intel.com>
+ <20240301162348.898619-3-yoong.siang.song@intel.com>
+Subject: RE: [PATCH iwl-next,v2 2/2] igc: Add Tx hardware timestamp request
+ for AF_XDP zero-copy packet
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240301-upstream-net-next-20240301-mptcp-tcp_notsent_lowat-v1-4-415f0e8ed0e1@kernel.org>
-References: <20240301-upstream-net-next-20240301-mptcp-tcp_notsent_lowat-v1-0-415f0e8ed0e1@kernel.org>
-In-Reply-To: <20240301-upstream-net-next-20240301-mptcp-tcp_notsent_lowat-v1-0-415f0e8ed0e1@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4108; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=JOhIkA1LLYA8cGzrNasgxXO6BcQPIlXJLYVTAJAF5uE=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBl4hPlZzS9ixLKjsUkekt8wgU9lZeee8d4BgCjg
- GS/R9Hs8uaJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZeIT5QAKCRD2t4JPQmmg
- c5lmD/9sHqCD959Q30Wnmmxl/tk4DCC/yXJjSphpIt4NGK/jNXVeS9Xy3sXR3Rxv77l/oGa8AX+
- 6cBZ61OYVCfZyBGG8C23TEKje189vY6geqp6A1Bv3qAaq7spQ80rNEUdtfOOFJlIDZ8EbiRZqw+
- zWE9hGuEwNLZqEVvAR4pgPFDj7dG9NMVtILgi+T0rR539uYwp/1UFjGB2bqKertAY4D3riqKmjh
- JGLdU23eDtl2jZsPXZQcGvU/kodiO5ovABWY3D7nBvIcK+azJ/qx9eIxD0Cj2Mlx9bEtWpOj5WQ
- GVck/w/syaJjkUfCEYK4eW+HAHtnptyLv8/BGf/epFLd4ezAZ9QTFN5DZoe7Wufq6CV1lhAhJLt
- BY/YmiMVQ/s90SodCGibd8mqalo8iVxmqu9+fuGaH9ucgHct76DYTNYKy0r1UjsrBdfIxQSkes+
- CBvrmXJHx/eMQP1LIKTPKloX99ND95FiAZQPeUEhsfZTpXB7TaJnDbgDbPmXzpsuCEyK/jZ4QQG
- lt0XTy5s4YJ1RWY0+ch5fib8PhDItjoUf8CGo1/mRQ+tiuMCMSoCgAgIv3KM7l9jD+gO41OthVY
- FLSWOGqysrrY8hvueESkPfVNDzFoOD5d5wm5A+FCE6eYWhguWsdunrjT1VBBj6sNuNcCU5I0946
- x1jxsFrGCJyh5Qw==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-From: Paolo Abeni <pabeni@redhat.com>
+Song Yoong Siang wrote:
+> This patch adds support to per-packet Tx hardware timestamp request to
+> AF_XDP zero-copy packet via XDP Tx metadata framework. Please note that
+> user needs to enable Tx HW timestamp capability via igc_ioctl() with
+> SIOCSHWTSTAMP cmd before sending xsk Tx hardware timestamp request.
+> 
+> Same as implementation in RX timestamp XDP hints kfunc metadata, Timer 0
+> (adjustable clock) is used in xsk Tx hardware timestamp. i225/i226 have
+> four sets of timestamping registers. Both *skb and *xsk_tx_buffer pointers
+> are used to indicate whether the timestamping register is already occupied.
+> 
+> Furthermore, a boolean variable named xsk_pending_ts is used to hold the
+> transmit completion until the tx hardware timestamp is ready. This is
+> because, for i225/i226, the timestamp notification event comes some time
+> after the transmit completion event. The driver will retrigger hardware irq
+> to clean the packet after retrieve the tx hardware timestamp.
+> 
+> Besides, xsk_meta is added into struct igc_tx_timestamp_request as a hook
+> to the metadata location of the transmit packet. When the Tx timestamp
+> interrupt is fired, the interrupt handler will copy the value of Tx hwts
+> into metadata location via xsk_tx_metadata_complete().
+> 
+> Co-developed-by: Lai Peter Jun Ann <jun.ann.lai@intel.com>
+> Signed-off-by: Lai Peter Jun Ann <jun.ann.lai@intel.com>
+> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
+> ---
 
-Most TCP-level socket options get an integer from user space, and
-set the corresponding field under the msk-level socket lock.
+[...]
 
-Reduce the code duplication moving such operations in the common code.
+>  
+> +static void igc_xsk_request_timestamp(void *_priv)
+> +{
+> +	struct igc_metadata_request *meta_req = _priv;
+> +	struct igc_ring *tx_ring = meta_req->tx_ring;
+> +	struct igc_tx_timestamp_request *tstamp;
+> +	u32 tx_flags = IGC_TX_FLAGS_TSTAMP;
+> +	struct igc_adapter *adapter;
+> +	unsigned long lock_flags;
+> +	bool found = false;
+> +	int i;
+> +
+> +	if (test_bit(IGC_RING_FLAG_TX_HWTSTAMP, &tx_ring->flags)) {
+> +		adapter = netdev_priv(tx_ring->netdev);
+> +
+> +		spin_lock_irqsave(&adapter->ptp_tx_lock, lock_flags);
+> +
+> +		/* Search for available tstamp regs */
+> +		for (i = 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
+> +			tstamp = &adapter->tx_tstamp[i];
+> +
+> +			if (tstamp->skb)
+> +				continue;
+> +
+> +			found = true;
+> +			break;
 
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/sockopt.c | 75 +++++++++++++++++++++--------------------------------
- 1 file changed, 30 insertions(+), 45 deletions(-)
+Not how I would have written this loop construct seems a bit odd
+to default break but it works.
 
-diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-index 1b38dac70719..dcd1c76d2a3b 100644
---- a/net/mptcp/sockopt.c
-+++ b/net/mptcp/sockopt.c
-@@ -624,18 +624,11 @@ static int mptcp_setsockopt_sol_tcp_congestion(struct mptcp_sock *msk, sockptr_t
- 	return ret;
- }
- 
--static int mptcp_setsockopt_sol_tcp_cork(struct mptcp_sock *msk, sockptr_t optval,
--					 unsigned int optlen)
-+static int __mptcp_setsockopt_sol_tcp_cork(struct mptcp_sock *msk, int val)
- {
- 	struct mptcp_subflow_context *subflow;
- 	struct sock *sk = (struct sock *)msk;
--	int val, ret;
- 
--	ret = mptcp_get_int_option(msk, optval, optlen, &val);
--	if (ret)
--		return ret;
--
--	lock_sock(sk);
- 	sockopt_seq_inc(msk);
- 	msk->cork = !!val;
- 	mptcp_for_each_subflow(msk, subflow) {
-@@ -647,23 +640,15 @@ static int mptcp_setsockopt_sol_tcp_cork(struct mptcp_sock *msk, sockptr_t optva
- 	}
- 	if (!val)
- 		mptcp_check_and_set_pending(sk);
--	release_sock(sk);
- 
- 	return 0;
- }
- 
--static int mptcp_setsockopt_sol_tcp_nodelay(struct mptcp_sock *msk, sockptr_t optval,
--					    unsigned int optlen)
-+static int __mptcp_setsockopt_sol_tcp_nodelay(struct mptcp_sock *msk, int val)
- {
- 	struct mptcp_subflow_context *subflow;
- 	struct sock *sk = (struct sock *)msk;
--	int val, ret;
- 
--	ret = mptcp_get_int_option(msk, optval, optlen, &val);
--	if (ret)
--		return ret;
--
--	lock_sock(sk);
- 	sockopt_seq_inc(msk);
- 	msk->nodelay = !!val;
- 	mptcp_for_each_subflow(msk, subflow) {
-@@ -675,8 +660,6 @@ static int mptcp_setsockopt_sol_tcp_nodelay(struct mptcp_sock *msk, sockptr_t op
- 	}
- 	if (val)
- 		mptcp_check_and_set_pending(sk);
--	release_sock(sk);
--
- 	return 0;
- }
- 
-@@ -799,35 +782,10 @@ static int mptcp_setsockopt_sol_tcp(struct mptcp_sock *msk, int optname,
- 	int ret, val;
- 
- 	switch (optname) {
--	case TCP_INQ:
--		ret = mptcp_get_int_option(msk, optval, optlen, &val);
--		if (ret)
--			return ret;
--		if (val < 0 || val > 1)
--			return -EINVAL;
--
--		lock_sock(sk);
--		msk->recvmsg_inq = !!val;
--		release_sock(sk);
--		return 0;
- 	case TCP_ULP:
- 		return -EOPNOTSUPP;
--	case TCP_NOTSENT_LOWAT:
--		ret = mptcp_get_int_option(msk, optval, optlen, &val);
--		if (ret)
--			return ret;
--
--		lock_sock(sk);
--		WRITE_ONCE(msk->notsent_lowat, val);
--		mptcp_write_space(sk);
--		release_sock(sk);
--		return 0;
- 	case TCP_CONGESTION:
- 		return mptcp_setsockopt_sol_tcp_congestion(msk, optval, optlen);
--	case TCP_CORK:
--		return mptcp_setsockopt_sol_tcp_cork(msk, optval, optlen);
--	case TCP_NODELAY:
--		return mptcp_setsockopt_sol_tcp_nodelay(msk, optval, optlen);
- 	case TCP_DEFER_ACCEPT:
- 		/* See tcp.c: TCP_DEFER_ACCEPT does not fail */
- 		mptcp_setsockopt_first_sf_only(msk, SOL_TCP, optname, optval, optlen);
-@@ -840,7 +798,34 @@ static int mptcp_setsockopt_sol_tcp(struct mptcp_sock *msk, int optname,
- 						      optval, optlen);
- 	}
- 
--	return -EOPNOTSUPP;
-+	ret = mptcp_get_int_option(msk, optval, optlen, &val);
-+	if (ret)
-+		return ret;
-+
-+	lock_sock(sk);
-+	switch (optname) {
-+	case TCP_INQ:
-+		if (val < 0 || val > 1)
-+			ret = -EINVAL;
-+		else
-+			msk->recvmsg_inq = !!val;
-+		break;
-+	case TCP_NOTSENT_LOWAT:
-+		WRITE_ONCE(msk->notsent_lowat, val);
-+		mptcp_write_space(sk);
-+		break;
-+	case TCP_CORK:
-+		ret = __mptcp_setsockopt_sol_tcp_cork(msk, val);
-+		break;
-+	case TCP_NODELAY:
-+		ret = __mptcp_setsockopt_sol_tcp_nodelay(msk, val);
-+		break;
-+	default:
-+		ret = -ENOPROTOOPT;
-+	}
-+
-+	release_sock(sk);
-+	return ret;
- }
- 
- int mptcp_setsockopt(struct sock *sk, int level, int optname,
+> +		}
+> +
+> +		/* Return if no available tstamp regs */
+> +		if (!found) {
+> +			adapter->tx_hwtstamp_skipped++;
+> +			spin_unlock_irqrestore(&adapter->ptp_tx_lock,
+> +					       lock_flags);
+> +			return;
+> +		}
 
--- 
-2.43.0
+[...]
 
+>  
+> +static void igc_ptp_free_tx_buffer(struct igc_adapter *adapter,
+> +				   struct igc_tx_timestamp_request *tstamp)
+> +{
+> +	if (tstamp->buffer_type == IGC_TX_BUFFER_TYPE_XSK) {
+> +		/* Release the transmit completion */
+> +		tstamp->xsk_tx_buffer->xsk_pending_ts = false;
+> +		tstamp->xsk_tx_buffer = NULL;
+> +		tstamp->buffer_type = 0;
+> +
+> +		/* Trigger txrx interrupt for transmit completion */
+> +		igc_xsk_wakeup(adapter->netdev, tstamp->xsk_queue_index, 0);
+
+Just curious because I didn't find it. Fairly sure I just need to look more,
+but don't you want to still 'tstamp->skb = NULL' in this path somewhere?
+It looks like triggering the tx interrupt again with buffer_type == 0 wouldn't
+do the null.
+
+I suspect I just missed it.
 
