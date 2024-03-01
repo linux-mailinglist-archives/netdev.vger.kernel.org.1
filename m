@@ -1,146 +1,150 @@
-Return-Path: <netdev+bounces-76538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A74A86E11C
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 13:33:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F27E186E121
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 13:36:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22B9D288BA0
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 12:33:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A33E1F2634C
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 12:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40729A3D;
-	Fri,  1 Mar 2024 12:33:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 466B2138C;
+	Fri,  1 Mar 2024 12:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="tbFR8c0j"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="vmk0uPHp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4992C10F5
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 12:33:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72E51115
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 12:36:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709296411; cv=none; b=CUWfcpy0vUOP5t8dksksyQLsOjxBGWGSN7qrr2xNsdpZCXpLkN2PDK1E3QUNzmU0jkq09MRTNFbC4Dl4X75m8noRHqLHrOxmSDgggCirW99sFEk4/D83ZTCaD/eX+7f2FufTAbdznxPxVKXkQF1T4ednYzCn249Wmka2JepMdz4=
+	t=1709296587; cv=none; b=idqLoIGxG7IsJ6jADhtgYpgkOMxncwqstYtxR02j2uj81SCeUzk56gAhyNT+2w1aKWNNlb0g/4hURu09Ox7YRvwk0Mf5SzIuU16pyeAsVI5aPek+AR41V3yHG2Ic0wEgnuEea+IEH8bE3ouX8jk88diEpw1SL8EsHW0KYyspjr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709296411; c=relaxed/simple;
-	bh=FeUwJNvZLqN+PAfhgJW29KpmVoFmadZsne5JXGJE3H4=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Gbn5JgDiztchEEF/cFzd6Wrw/1GoSGTLU0axBTx5SeBgSd8AoR5MI0ZwtqrUrpMbTZtblbsLH0VqnQpvwvIjNThCoBmMi7B9MPm+1/mpmabJbQc3a4Ww7pipsrTthWozcDyiYKEuKn0FuxASmYqCbHXZrcBIZi78iRnuAInyadI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=tbFR8c0j; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-33dcad9e3a2so1157743f8f.3
-        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 04:33:27 -0800 (PST)
+	s=arc-20240116; t=1709296587; c=relaxed/simple;
+	bh=xsrGECSjGw1PlPZBoDn2pZPeXK4cECiDUMPDj/cTlLU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QNt0IWKzmv6oHc2pmiraFbU/gwtZlJy14po0D0mdrdyiVlBaFsoGyRvn80/dMyjcUNy2bxE14Qwb6MwSvijPNtfh4iueMinDsZd5h58im2VZbQWZZ8Pa/33bn8iP25SvX6f5X/py1wySU6QWRn5gJGHPeOvdSN3SDan3qb5E/Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=vmk0uPHp; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-60925d20af0so21837067b3.2
+        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 04:36:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1709296406; x=1709901206; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IUcm996RZ4SgzjYF372yvBWMKSI/r3D08qTtqD5lahI=;
-        b=tbFR8c0jnl4TD/k2HPvZs0uSScAV0KRInqAx1GcK9B9PVBoUrOaFYIMgQQjk3MTYLH
-         D+I/IjH8id1h8kBTtzANdlohvYMTADMaDmoqMqRxGJrcxXm/hhgdlHtbyz0O4p4ndYD0
-         DolJ2z4KtV58R7pDGW/ITqdK2TOjMR0kgPsZcBXCQEgxyh0U37ZfgLTHjMJYBiNQlqT8
-         62Q8p8Ynle2fv4pju6Cdob0kYXysqL9JDXBl/QFTjCM/7TiqYYgnKq1bhMNtG/79yDH9
-         Ql3mWbrSXNLd1ArI2OUVUDdCY11JHjURhQ+pzYjR6PU0lEoA32u0lj4M4KKH0qYJLvhx
-         Ze/Q==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1709296585; x=1709901385; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H7HlSWsC5oSq1BRA+xkgQmaElcXOjSddWi6PBJxJbmc=;
+        b=vmk0uPHpXoKieYzNOUfPpzRqjNi9vb3jfaCs3dkWMUPb/POvHQxLKF8TsOqH8Ty4Gw
+         FbHnoGNx8MEoqOGucuPAPMTGKZYasl1ecemwUmXIL+LySnCVoDBqJB40sU/eDIGTuMec
+         BrguVZktMSjm8zOmaQV1GIiJoPSAS8YM0rmIboV4q1To9QSa7qTiL7iVNWKRAawbFE6g
+         uhEUAMekN+PdEZIiqjr1xlZotrY3TWkj6BXbJkmY5LSBq5fE1CAF/ecQyyZPfcO2KTov
+         a7JQRTKw/co29zejoJqGs3NV0mWHlpPf2MTFHPOLY2IkzQ6rkk8bbNtR1PpJblLKj9tY
+         Gp+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709296406; x=1709901206;
-        h=content-disposition:mime-version:message-id:subject:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IUcm996RZ4SgzjYF372yvBWMKSI/r3D08qTtqD5lahI=;
-        b=Wdcj0pbeSnUuQLOHPa/EKT75KdzTzhAF1UjP3U5ofbmPOmRoRLFI/8OmNxGdjX3FQ1
-         gzpBHhz6fePyziaAGN//C0ao4K3OcUz4iNCUhf3Gx38lZkrqvM5G3ds1bra2rFOZgX72
-         fVKA9CLLJW3I5KUxCsag37XX1qHuyeHfuzoOnZV9WH3DEuo0qygCt5X7hhx4rmFfQsE6
-         C58sC8r8B0O0TDFrSEkEhvfSwb6jVgdUKkUtQq9koMQNWHF83714DCk859h3Yo0Y1vZ3
-         h8+ULqKn6zFgWsmgHPlAscmWbpPXZwbaTbBjFV+Xyk4PX85qelJnKcAUcO71chugdZq2
-         piPA==
-X-Gm-Message-State: AOJu0YzYBqkxU3XHUgFFrbGIOb6Q7AFFHiZD7iqxJZynsx4YRVWtytKu
-	d9R3lXENxSqK0WJcpelIfWITidf8UpI7XM2sKLXI6A0VZCaRp3Xv/vt9W5ibQGZ7pSMIfdbd1Ix
-	3
-X-Google-Smtp-Source: AGHT+IERmGk0MtznexxFI0Fd7PubHmvANWGUV2G2dW9kPHnARk3U21jYehlUucQdcqvnFbMF5yQp8Q==
-X-Received: by 2002:a5d:4144:0:b0:33d:d2bc:bf41 with SMTP id c4-20020a5d4144000000b0033dd2bcbf41mr1249619wrq.31.1709296406082;
-        Fri, 01 Mar 2024 04:33:26 -0800 (PST)
-Received: from grappa.linbit (62-99-137-214.static.upcbusiness.at. [62.99.137.214])
-        by smtp.gmail.com with ESMTPSA id e13-20020a5d594d000000b0033e12b2e567sm3709597wri.35.2024.03.01.04.33.25
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Mar 2024 04:33:25 -0800 (PST)
-Date: Fri, 1 Mar 2024 13:33:24 +0100
-From: Lars Ellenberg <lars.ellenberg@linbit.com>
-To: netdev@vger.kernel.org
-Subject: [PATCH] ss: fix output of MD5 signature keys configured on TCP
- sockets
-Message-ID: <ZeHLFNX7f5x1M10/@grappa.linbit>
+        d=1e100.net; s=20230601; t=1709296585; x=1709901385;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=H7HlSWsC5oSq1BRA+xkgQmaElcXOjSddWi6PBJxJbmc=;
+        b=gE1zYwhkEyuq9eJvTRtBeyf1SfmljKC+CX2F/l9u9oXh3Moc/kUd00L7luflKOwzUg
+         KH4ur7X5SBjaMLyeSCrDRJaL70T2bQFXGa+eJ94cvQyo52XLDdEDgJZdlsbvNv934Rg4
+         ChZngHZh+/ufw9hWTaDKN8V0DiV/W2nyDYL7x9AwjxU1IdzCtJFNuH8rrus853jqaIu8
+         dEcaDosoeQjNA6hcjxKRnKCHH9hoO/3O4x+cyFWemaJ2CqsQ1TePvNQJFAm3qIGE6Pth
+         d95p/36HisNbeWKN13V8V9VDB+Euwr/STZ9AlXvQtqin9rHpKDA3O0/UOhjSuXN/pr2f
+         IN+A==
+X-Forwarded-Encrypted: i=1; AJvYcCX9nL0zT9F4mxHPxS4jOH2QeJh/Ts9IsrevCnZLODj5MVumYPmJ48UhPlyF1BeHkOegc61cxiSHEXfc5JZE7p/f0omDZ4jW
+X-Gm-Message-State: AOJu0YzQUytAPGZHU3E0ng8wmPtFMFBqf5qrmVHb6IVYRL+F4PQrGPvE
+	wr8NT4LtC0nVfmflre6gzH+Gqb2i5DO5/ry2e9zi3Ppfp4O1Xai9JZuT/qqI4qmzd5Lf+vSuN7j
+	nIuvihFAbfuw2EjHtb6Ep1DSo94AvZz3DxDdu
+X-Google-Smtp-Source: AGHT+IFzQEHDrZJKA1ImxAnOZIIUl0fPrAIdNzwGCOHKyBujENqIVsntijpQvJDrpV7rHwvh0G4w/Z8jE0GEncvX1Mw=
+X-Received: by 2002:a0d:df8e:0:b0:608:b83a:992c with SMTP id
+ i136-20020a0ddf8e000000b00608b83a992cmr1413327ywe.23.1709296584805; Fri, 01
+ Mar 2024 04:36:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20240225165447.156954-1-jhs@mojatatu.com> <65df6935db67e_2a12e2083b@john.notmuch>
+ <332c7a04-edc8-40bd-9e8f-69c5d297e845@linux.dev>
+In-Reply-To: <332c7a04-edc8-40bd-9e8f-69c5d297e845@linux.dev>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 1 Mar 2024 07:36:13 -0500
+Message-ID: <CAM0EoMmw25Kye4TTdFMAe8w-VgH++NkbNHcZcsfKR3diS28fSg@mail.gmail.com>
+Subject: Re: [PATCH net-next v12 00/15] Introducing P4TC (series 1)
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: John Fastabend <john.fastabend@gmail.com>, deb.chatterjee@intel.com, 
+	anjali.singhai@intel.com, namrata.limaye@intel.com, tom@sipanda.io, 
+	mleitner@redhat.com, Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, 
+	tomasz.osinski@intel.com, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, 
+	daniel@iogearbox.net, victor@mojatatu.com, pctammela@mojatatu.com, 
+	dan.daly@intel.com, andy.fingerhut@gmail.com, chris.sommers@keysight.com, 
+	mattyk@nvidia.com, bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-da9cc6ab introduced printing of MD5 signature keys when found.
-But when changing printf() to out() calls with 90351722,
-the implicit printf call in print_escape_buf() was overlooked.
-That results in a funny output in the first line:
-"<all-your-tcp-signature-keys-concatenated>State"
-and ambiguity as to which of those bytes belong to which socket.
+On Fri, Mar 1, 2024 at 2:02=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.d=
+ev> wrote:
+>
+> On 2/28/24 9:11 AM, John Fastabend wrote:
+> >   - The kfuncs are mostly duplicates of map ops we already have in BPF =
+API.
+> >     The motivation by my read is to use netlink instead of bpf commands=
+. I
+>
+> I also have similar thought on the kfuncs (create/update/delete) which is=
+ mostly
+> bpf map ops. It could have one single kfunc to allocate a kernel specific=
+ p4
+> entry/object and then store that in a bpf map. With the bpf_rbtree, bpf_l=
+ist,
+> and other recent advancements, it should be able to describe them in a bp=
+f map.
+> The reply in v9 was that the p4 table will also be used in the future HW
+> piece/driver but the HW piece is not ready yet, bpf is the only consumer =
+of the
+> kernel p4 table now and this makes mimicking the bpf map api to kfuncs no=
+t
+> convincing. bpf "tc / xdp" program uses netlink to attach/detach and the =
+policy
+> also stays in the bpf map.
+>
 
-Add a static void out_escape_buf() immediately before we use it.
+It's a lot more complex than just attaching/detaching. Our control
+plane uses netlink (regardless of whether it is offloaded or not) for
+all object controls (not just table entries) for the many reasons that
+have been stated in the cover letters since the beginning. I
+unfortunately took out some of the text after v10 to try and shorten
+the text. I will be adding it back. If you cant find it i could
+cutnpaste and send privately.
 
-da9cc6ab (ss: print MD5 signature keys configured on TCP sockets, 2017-10-06)
-90351722 (ss: Replace printf() calls for "main" output by calls to helper, 2017-12-12)
+cheers,
+jamal
 
-Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
----
- misc/ss.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
-
-diff --git a/misc/ss.c b/misc/ss.c
-index 5296cabe..fb560a55 100644
---- a/misc/ss.c
-+++ b/misc/ss.c
-@@ -24,6 +24,7 @@
- #include <stdbool.h>
- #include <limits.h>
- #include <stdarg.h>
-+#include <ctype.h>
- 
- #include "ss_util.h"
- #include "utils.h"
-@@ -2891,6 +2892,20 @@ static void print_skmeminfo(struct rtattr *tb[], int attrtype)
- 	out(")");
- }
- 
-+/* like lib/utils.c print_escape_buf(), but use out(), not printf()! */
-+static void out_escape_buf(const __u8 *buf, size_t len, const char *escape)
-+{
-+	size_t i;
-+
-+	for (i = 0; i < len; ++i) {
-+		if (isprint(buf[i]) && buf[i] != '\\' &&
-+		    !strchr(escape, buf[i]))
-+			out("%c", buf[i]);
-+		else
-+			out("\\%03o", buf[i]);
-+	}
-+}
-+
- static void print_md5sig(struct tcp_diag_md5sig *sig)
- {
- 	out("%s/%d=",
-@@ -2898,7 +2913,7 @@ static void print_md5sig(struct tcp_diag_md5sig *sig)
- 			sig->tcpm_family == AF_INET6 ? 16 : 4,
- 			&sig->tcpm_addr),
- 	    sig->tcpm_prefixlen);
--	print_escape_buf(sig->tcpm_key, sig->tcpm_keylen, " ,");
-+	out_escape_buf(sig->tcpm_key, sig->tcpm_keylen, " ,");
- }
- 
- static void tcp_tls_version(struct rtattr *attr)
--- 
-2.34.1
-
+> When there is a HW piece that consumes the p4 table, that will be a bette=
+r time
+> to discuss the kfunc interface.
+>
+> >     don't agree with this, optimizing for some low level debug a develo=
+per
+> >     uses is the wrong design space. Actual users should not be deployin=
+g
+> >     this via ssh into boxes. The workflow will not scale and really we =
+need
+> >     tooling and infra to land P4 programs across the network. This is o=
+rders
+> >     of more pain if its an endpoint solution and not a middlebox/switch
+> >     solution. As a switch solution I don't see how p4tc sw scales to ev=
+en TOR
+> >     packet rates. So you need tooling on top and user interact with the
+> >     tooling not the Linux widget/debugger at the bottom.
+>
 
