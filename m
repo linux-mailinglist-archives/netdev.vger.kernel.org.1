@@ -1,51 +1,48 @@
-Return-Path: <netdev+bounces-76565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45BAD86E403
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:05:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAC0386E40D
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:10:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBFEF1F218E6
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 15:05:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F341B2124C
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 15:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965F66F523;
-	Fri,  1 Mar 2024 15:04:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0703AC0C;
+	Fri,  1 Mar 2024 15:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="kB0AcZcq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iLnL8Z7g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.3])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08FEF3A8E3;
-	Fri,  1 Mar 2024 15:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C33F3A8CD;
+	Fri,  1 Mar 2024 15:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709305492; cv=none; b=boStXpE3+EqKnevvRjjAeE1bGa9AlKBY4oEuey2tIzomjndNNC/CtsWjwQD2acxiWxdz+6D0YgXEzxkFwQErvMwxLyPN66fLR8qbT7WJbFeS3wCmjh+IJWpUtIhJJja7CwYBtNywI4XlG1F9qYjkpIBbQBudsoU49bJk8QEawMo=
+	t=1709305826; cv=none; b=S7JfKODTr6CavD2WG/kl0qmSC75XLEGA2lJMCbT7JLgBnfOifSH+/Nej/S3OiWzKXI+qzJiNjzq3VoFH9Nb6VMCYIYL+W26SdaWtezbUd6N5gPQSTeB4AtrgzpbaC+97lkw6/XJsHB+0eXodaAJ2JHD2NXHkBwhRs1PC1bUxREs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709305492; c=relaxed/simple;
-	bh=AfZgX4PFBnRALIWRND3UH5sbBTC68YgJey8bmNSd1Gs=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=Vg6Y4oWloRv/uNM3fq/RhVnpLiO0eZ6TX6SZQw6slBpjQseFhrZDNCtLrif4A5x5cos0H5elRK9J6hHesalgfAw6jlEVCjTofNxjp1UZHP9bfirOFYfucA0q/FICUqIPqUj15nrbIpsDPi6iPFyeem/8d8hf1bN09MfDRW3IYI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=kB0AcZcq; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1709305453; x=1709910253; i=markus.elfring@web.de;
-	bh=AfZgX4PFBnRALIWRND3UH5sbBTC68YgJey8bmNSd1Gs=;
-	h=X-UI-Sender-Class:Date:To:Cc:From:Subject;
-	b=kB0AcZcqRZbdRoRrzDoJeHiCdbwVp3/Vk4xRpQz1btthq8uEUSqqq8vpKxmc4eOx
-	 gQ6IMkGjXILh/SgPG/Num9rPpd1+31wAsJ/FLzEY8V8Y1vyEMiIjpjtZ/BrLawcFT
-	 ma3Z0dBCr/rVJe4h7Gwou8YFKhCQc1MEHTFW5m5uGV9JxNh3ROp2fwvWlxEKHn0O5
-	 OYqMqJVsZOvULV5VxESoaylgu3xeFOSXlHJXw1i0c553QLsT095qa6FqHqz5eMn/h
-	 Fw1lbq7u+PF2IxlaxshFKovge8CvTPMDiMcOzEd+ZwJ/mhhdUS6rPKfDzTPwzamtl
-	 4Zg5ctsHIaLzOKaTzQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.86.95]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1N2SL5-1qjnKk1Y1n-013yV0; Fri, 01
- Mar 2024 16:04:13 +0100
-Message-ID: <9a2e5053-07ec-4a11-bef4-7a8b0f80f740@web.de>
-Date: Fri, 1 Mar 2024 16:04:07 +0100
+	s=arc-20240116; t=1709305826; c=relaxed/simple;
+	bh=+G4AW/6yXtQOUgRz2hVRiWkp+8osvIQwdjKysTmxqSs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IIrloJ9Boz1n/tA5HtKpquGgXYJJkfHFC6Sb0CIK1P3ogAKk/MkL5AmlGD0avSIWnMDnw+Vjs/kX3fpusL9U81LAp6d+LJhKgvitA6i+cpzppIc/6FxWejqcYMfErm9Of9zTEWFbexwJGhKHAB+MxL0YZFH4LZ/kYQT9doTYLmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iLnL8Z7g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE850C433F1;
+	Fri,  1 Mar 2024 15:10:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709305826;
+	bh=+G4AW/6yXtQOUgRz2hVRiWkp+8osvIQwdjKysTmxqSs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=iLnL8Z7gevW+mpwmIK+qXYOTMlVi5ZTI/gf1i69nJ1WIgY88IzXMFFbAr0a64B3Bi
+	 t+un5Ga1Zgb0NRYgfGiti2dLcTNiI7+lf6dO2gj2yqXUN5IsSnvi9V1FwUvTcu6Vfj
+	 AlyvT8Bk8J/xJ21A/XVLB4FuWZdDuxPGy3C7RKFOHpGXQGXiNSnP/2xoyVnyz+bapK
+	 7vNBQEYguDA2QmKQNnzgwRw5lLAoeJSQVX2IxWULVzLkJQ6RqlG5ND7ixO7NJJ/vAI
+	 13QuxcB0TPhV2YigmYaZAzXantyBxJoqphl4DqrKi0FFQ7aU0b5qP+rrTGXIZkdsz6
+	 V1Rff0ihrLArg==
+Message-ID: <09046dcc-a388-4703-83bb-9fa0c36af861@kernel.org>
+Date: Fri, 1 Mar 2024 16:10:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,93 +50,103 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+Subject: Re: [PATCH net 10/10] selftests: mptcp: explicitly trigger the
+ listener diag code-path
+Content-Language: en-GB, fr-BE
+To: Jakub Kicinski <kuba@kernel.org>, Mat Martineau <martineau@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: mptcp@lists.linux.dev, Geliang Tang <geliang@kernel.org>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Jijie Shao <shaojijie@huawei.com>,
- Paolo Abeni <pabeni@redhat.com>, Salil Mehta <salil.mehta@huawei.com>,
- Wojciech Drewek <wojciech.drewek@intel.com>,
- Yisen Zhuang <yisen.zhuang@huawei.com>, Yonglong Liu <liuyonglong@huawei.com>
-Content-Language: en-GB
-Cc: LKML <linux-kernel@vger.kernel.org>
-From: Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH] net: hns: Use common error handling code in hns_mac_init()
+ Florian Westphal <fw@strlen.de>, Kishen Maloor <kishen.maloor@intel.com>,
+ Shuah Khan <shuah@kernel.org>, Peter Krystad
+ <peter.krystad@linux.intel.com>, Christoph Paasch <cpaasch@apple.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20240223-upstream-net-20240223-misc-fixes-v1-0-162e87e48497@kernel.org>
+ <20240223-upstream-net-20240223-misc-fixes-v1-10-162e87e48497@kernel.org>
+ <20240301063754.2ecefecf@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240301063754.2ecefecf@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:g/zMKCWXPxqqIkYYxVNWWZBfee+4OeC3/qmzN2FMrL1NfKaGZqe
- KY8HnAlhIcoVZSvmAK1KFTZJN8S8cQXau9bTbnjlHnQCSSbBz/mwT3M0roMmr0dlVnWUaVu
- UCI3sGgoykx072KGYcOGYAXVgqZaDtzzffG94L3CK++C65Fo31Td19w+aEmzL4Pogdgi9pb
- VRJ8OvwC4EoKWR9bSYmOg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:TE01qw5ckh4=;A0WHE5wXuRiOqFiUs6hqO50bKta
- 8f9mN9shdG5P4elUuXaLtvwSRKFv4UNq3Ylyx2yJXlJBdWeRknqHyMMN2H6xM+SdlgcUkjw6W
- qc9XHEE3VM6b5I+4orgzEvn2Vr1wsX9mVvkpDCphCMd7GtB3NAVGxqwMkSRmEebcUoUyTsfnU
- DygQ13QK+xSZi1a7BRsP730efadTXmqd5zXRaXlCBrYIOSJ3tSBfMt3RaftBDBwS+QOFjVq1J
- GKCSOhs4NwRzpVnz+5/WJkkfgCsVNPU6br9QdSjI3KrXEW6wT6RNUdz0GswDJ9LBRAxKbZV9G
- l2zGqtd+L7gqvKdSY3lLQE9bHTH5cHwKxJpHdJ3IFZ1aquTzs3kUDrIXbEFbjnqKbnqIOLhr0
- r3NSazBpvw+PU2pDu/EBrKMsTqciBL97IgJlD4gfXTtcRcaFSC9qwr16CWZC88siCTGK2GZr6
- VNYkBeIy/rGKH3L7MX+bp762higr/y/cqjvpSVt1SrmHkQw05A4m2v0uq2te698arC0RgDcZ6
- ZxWcHKdhpB/p3pRY7sIr/YqY8Si2nrl6ioCAMnzgra/BEDELqp3l/+gXvM6n4TAmjOmLzHhYR
- oFEcyWEzYGTUiDY7Kge7h99faS3P4+lEmJGX1xK2Vkq81eQNqDp3CigyO7Mv1X/po1s6dr/nh
- uL+dB2UBWmggr/GCAe4xbaDeGjKVoFqGMKkTEFBQSaWmpwi3xxVkV+jQFtnGfC30W1QMRllJb
- 1iQoCSpJ07x8qBLB7j9eHFJHC6yEmjtCrPNoSpYImHB8zRlBbXz2VbhzNUB3JhNtI5J3N3z7v
- l/IWRf+7yls15iRGg39lBVSbqcDFL9JT9Bepiu1bmCmAg=
+Content-Transfer-Encoding: 7bit
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Fri, 1 Mar 2024 15:48:25 +0100
+Hi Jakub,
 
-Add a jump target so that a bit of exception handling can be better reused
-at the end of this function implementation.
+On 01/03/2024 15:37, Jakub Kicinski wrote:
+> On Fri, 23 Feb 2024 17:14:20 +0100 Matthieu Baerts (NGI0) wrote:
+>> From: Paolo Abeni <pabeni@redhat.com>
+>>
+>> The mptcp diag interface already experienced a few locking bugs
+>> that lockdep and appropriate coverage have detected in advance.
+>>
+>> Let's add a test-case triggering the relevant code path, to prevent
+>> similar issues in the future.
+>>
+>> Be careful to cope with very slow environments.
+>>
+>> Note that we don't need an explicit timeout on the mptcp_connect
+>> subprocess to cope with eventual bug/hang-up as the final cleanup
+>> terminating the child processes will take care of that.
+> 
+> Hi!
+> 
+> There's a failure in CI under debug after merging net and net-next 
+> in diag.sh. Maybe because of the patch which lowered timeout?
+> https://lore.kernel.org/all/20240223-upstream-net-next-20240223-misc-improvements-v1-8-b6c8a10396bd@kernel.org/
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- drivers/net/ethernet/hisilicon/hns/hns_dsaf_mac.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+Thank you for this message!
 
-diff --git a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_mac.c b/drivers/n=
-et/ethernet/hisilicon/hns/hns_dsaf_mac.c
-index f75668c47935..a4919aad45b6 100644
-=2D-- a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_mac.c
-+++ b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_mac.c
-@@ -1094,22 +1094,21 @@ int hns_mac_init(struct dsaf_device *dsaf_dev)
- 	device_for_each_child_node(dsaf_dev->dev, child) {
- 		ret =3D fwnode_property_read_u32(child, "reg", &port_id);
- 		if (ret) {
--			fwnode_handle_put(child);
- 			dev_err(dsaf_dev->dev,
- 				"get reg fail, ret=3D%d!\n", ret);
--			return ret;
-+			goto put_fwnode;
- 		}
- 		if (port_id >=3D max_port_num) {
--			fwnode_handle_put(child);
- 			dev_err(dsaf_dev->dev,
- 				"reg(%u) out of range!\n", port_id);
--			return -EINVAL;
-+			ret =3D -EINVAL;
-+			goto put_fwnode;
- 		}
- 		mac_cb =3D devm_kzalloc(dsaf_dev->dev, sizeof(*mac_cb),
- 				      GFP_KERNEL);
- 		if (!mac_cb) {
--			fwnode_handle_put(child);
--			return -ENOMEM;
-+			ret =3D -ENOMEM;
-+			goto put_fwnode;
- 		}
- 		mac_cb->fw_port =3D child;
- 		mac_cb->mac_id =3D (u8)port_id;
-@@ -1148,6 +1147,10 @@ int hns_mac_init(struct dsaf_device *dsaf_dev)
- 	}
+I didn't have this error on my side, even without '-d SLUB_DEBUG_ON' we
+do on top of the debug kconfig, but I see I can reproduce it on slower
+environments. Indeed, it looks like it can be caused by that
+modification. I will send a fix ASAP!
 
- 	return 0;
-+
-+put_fwnode:
-+	fwnode_handle_put(child);
-+	return ret;
- }
-
- void hns_mac_uninit(struct dsaf_device *dsaf_dev)
-=2D-
-2.44.0
-
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
