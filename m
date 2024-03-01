@@ -1,120 +1,128 @@
-Return-Path: <netdev+bounces-76754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0530B86EBF2
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 23:38:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6A0586EC9E
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 00:05:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20BA31C21810
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 22:38:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D979287FB8
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 23:05:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 701175E3AF;
-	Fri,  1 Mar 2024 22:38:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 396865EE7A;
+	Fri,  1 Mar 2024 23:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5hnCEe7J"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jZxg0Mne"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4FE58AA2;
-	Fri,  1 Mar 2024 22:38:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134353C48C
+	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 23:05:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709332725; cv=none; b=u00/ACCAWAI1ux9QIwttASM/pnuqq+FqDKGeVRdoOgmHPR18jC7J11doudQw6mR+X2YftmoajJlrZ6pnseJW3XZPfhWVzhVagRAOHhHFiB+pQrfhuloI6drEFUXO+549w+Dq6Qtcth/pjN7qx7Uiz9poIBsJhtPP7nBT0D2NaTE=
+	t=1709334352; cv=none; b=tkcMOoupZTaDCq9Wpu4Zp2r0QIca4fMLdpdNVQTddw3rjcDQ3d9DZAkxHEIqMGybMGhmfr3op20IL9BWcGgF091ohT2enk6ILNzJJFQ5Dxv5duHHMOf+0OXRiKOM3go8EGHo5555XA+fPbFTvEdGW0vpY2mk0R+1Vm3G8oftMgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709332725; c=relaxed/simple;
-	bh=C9fObou1QGzt4uneeySbp7ggNXccPusKJQusLbBhhqQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GO6ius2D6Oj0EkvHyIEkeqj1a3GEORJUgv9Jq51xuqMGBRCVwhzehEXmmiXmMZmTL+ZyKZplKCpumzsCoGPY10UuNH9Tfion4ukqMa4HOhSQmhrXBF0zrOIM/5H8WNlInOWPqywQ7SwKYjg5c+ew2d822V8FkzQm6yoed6zdSmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5hnCEe7J; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=aMBepLHt9KOhTSKMxp2ZxKrSNDdYzAaav19hviKd2ZM=; b=5hnCEe7Jji8OQXYRKU/4Ea439+
-	Di/8AOpweoRL8bL/alOpkLjpeyzVmkiqmWCgpjKZpvYiZVvcuTgnvtS1R5EK/EagR76WHJa1KLIon
-	RpNh5NKPO3r6fDeAB79pbCLYL2qvWOZLq06SAWacPCdYsmA23u3tm+xh+INa5n2PExjA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rgBWm-009B3c-Ip; Fri, 01 Mar 2024 23:38:52 +0100
-Date: Fri, 1 Mar 2024 23:38:52 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Wei Fang <wei.fang@nxp.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>
-Subject: Re: [PATCH net-next v8 5/8] net: phy: Immediately call adjust_link
- if only tx_lpi_enabled changes
-Message-ID: <8cafe975-e898-4f6a-9389-0a655d6dae22@lunn.ch>
-References: <20240301100153.927743-1-o.rempel@pengutronix.de>
- <20240301100153.927743-6-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1709334352; c=relaxed/simple;
+	bh=go0iCHAUzwcSWi6XnBLDemwVxjy2B9YoD44U0zrbntQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cd/51sIehGEuYQ84C5ZYdMshN0BKt/XhqZdkhZny/JwwymtP+5JNsETZyz1qbBh1BUgetUl2JfoVh36by/0h9NEbVz1x/pGMGIUzkeWmwCBKyJb26pFMh5wbzVm+KQlgH19msuy7QYanr/fN2lfpsGvB8/WhqjIJnKHL1O0k2hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jZxg0Mne; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64836C433C7;
+	Fri,  1 Mar 2024 23:05:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709334351;
+	bh=go0iCHAUzwcSWi6XnBLDemwVxjy2B9YoD44U0zrbntQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jZxg0MnehBUbHbfOE0rk1Igfj2TZfOR8TmeFA4EQ4iLVsou3zagHbVv40jVfIJoZg
+	 4EL3yxZlj4f+OQ7LZqsgj19V0U0uSC7A48SRtw2gJB/48B9C3Uy77wG4jnlWomHpYz
+	 Gf0EtWqD5WVLWT3m0Ur+3Oux8GzvWNa2Vm/HMB5z2t6KpYpFhO9yrWuRy5tgB928jT
+	 Dn9+udgm+6B4CG/uKm9q3qtaywVM6/DCk8oYuQB9XOgPyjqzk2u/EZUEvjDpjFKGv5
+	 cI4yugujw7yfolaKOiWVuJtegeu66EOLyALxvsZxcbWdCiizhdjl2FxrMjXHwZ92Vq
+	 SGjE5TvI8qPYA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	jiri@resnulli.us,
+	donald.hunter@gmail.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 0/4] tools: ynl: add --dbg-small-recv for easier kernel testing
+Date: Fri,  1 Mar 2024 15:05:38 -0800
+Message-ID: <20240301230542.116823-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240301100153.927743-6-o.rempel@pengutronix.de>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 01, 2024 at 11:01:50AM +0100, Oleksij Rempel wrote:
-> From: Andrew Lunn <andrew@lunn.ch>
-> 
-> The MAC driver changes its EEE hardware configuration in its
-> adjust_link callback. This is called when auto-neg
-> completes. Disabling EEE via eee_enabled false will trigger an
-> autoneg, and as a result the adjust_link callback will be called with
-> phydev->enable_tx_lpi set to false. Similarly, eee_enabled set to true
-> and with a change of advertised link modes will result in a new
-> autoneg, and a call the adjust_link call.
-> 
-> If set_eee is called with only a change to tx_lpi_enabled which does
-> not trigger an auto-neg, it is necessary to call the adjust_link
-> callback so that the MAC is reconfigured to take this change into
-> account.
-> 
-> When setting phydev->enable_tx_lpi, take both eee_enabled and
-> tx_lpi_enabled into account, so the MAC drivers just needs to act on
-> phydev->enable_tx_lpi and not the whole EEE configuration.
-> The same check should be done for tx_lpi_timer too.
-> 
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+When testing netlink dumps I usually hack some user space up
+to constrain its user space buffer size (iproute2, ethtool or ynl).
+Netlink will try to fill the messages up, so since these apps use
+large buffers by default, the dumps are rarely fragmented.
 
-> +static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
-> +				      struct ethtool_keee *data)
-> +{
-> +	if (phydev->eee_cfg.tx_lpi_enabled != data->tx_lpi_enabled ||
-> +	    phydev->eee_cfg.tx_lpi_timer != data->tx_lpi_timer) {
-> +		eee_to_eeecfg(data, &phydev->eee_cfg);
-> +		phydev->enable_tx_lpi = eeecfg_mac_can_tx_lpi(&phydev->eee_cfg);
-> +		if (phydev->link) {
-> +			phydev->link = false;
-> +			phy_link_down(phydev);
-> +			phydev->link = true;
-> +			phy_link_up(phydev);
-> +		}
-> +	}
-> +}
-> +
+I was hoping to figure out a way to create a selftest for dump
+testing, but so far I have no idea how to do that in a useful
+and generic way.
 
-Thanks
+Until someone does that, make manual dump testing easier with YNL.
+Create a special option for limiting the buffer size, so I don't
+have to make the same edits each time, and maybe others will benefit,
+too :)
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Example:
 
-    Andrew
+  $ ./cli.py [...] --dbg-small-recv >/dev/null
+  Recv: read 3712 bytes, 29 messages
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+    [...]
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+  Recv: read 3968 bytes, 31 messages
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+    [...]
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+  Recv: read 532 bytes, 5 messages
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+    [...]
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+     nl_len = 20 (4) nl_flags = 0x2 nl_type = 3
+
+Now let's make the DONE not fit in the last message:
+
+  $ ./cli.py [...] --dbg-small-recv 4499 >/dev/null
+  Recv: read 3712 bytes, 29 messages
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+    [...]
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+  Recv: read 4480 bytes, 35 messages
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+    [...]
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+  Recv: read 20 bytes, 1 messages
+     nl_len = 20 (4) nl_flags = 0x2 nl_type = 3
+
+
+A real test would also have to check the messages are complete
+and not duplicated. That part has to be done manually right now.
+
+Note that the first message is always conservatively sized by the kernel.
+Still, I think this is good enough to be useful.
+
+Jakub Kicinski (4):
+  tools: ynl: move the new line in NlMsg __repr__
+  tools: ynl: allow setting recv() size
+  tools: ynl: support debug printing messages
+  tools: ynl: add --dbg-small-recv for easier kernel testing
+
+ tools/net/ynl/cli.py     |  7 ++++++-
+ tools/net/ynl/lib/ynl.py | 42 ++++++++++++++++++++++++++++++++++------
+ 2 files changed, 42 insertions(+), 7 deletions(-)
+
+-- 
+2.44.0
+
 
