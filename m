@@ -1,198 +1,257 @@
-Return-Path: <netdev+bounces-76482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 366D486DEA7
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:54:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2AC186DEAB
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 10:56:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF1D22866E9
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:54:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20D871C21089
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 09:56:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEE1D6BB2F;
-	Fri,  1 Mar 2024 09:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C396A8BA;
+	Fri,  1 Mar 2024 09:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="STKB+k3p"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="md+BSHWV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA12F6995C
-	for <netdev@vger.kernel.org>; Fri,  1 Mar 2024 09:54:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E4E69D28;
+	Fri,  1 Mar 2024 09:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709286877; cv=none; b=b3e/GWk5t4afT+bX/mVIyLlI0ttXVKIfk441mLFBMzRRwPrXOOKMd9OD9xvESrdiG8DGRYadhS+X2mi9OtcHE/b/bapU8KO7obsfblg7tEVA5bnca+PZB5jWdUJU2nmkPy3jkJkYnEVDfolMMr2ix6SolqpiocOvkO/RhtVg/S8=
+	t=1709286962; cv=none; b=UcXKFpW2UbgrAfg6zNlnN0tv16edHSq03AHyJxLH0SoT/i9Laiu3IEj93K94NuCxDeRZudkLcibLR+rYqLygi7fndqsJEOOPmvL2Jh1OmSzls90Jb/EToxDu9t2DdutQZZJLPAQHlSMO97TfppKQIuoxvGhd8Ut7O4LICHvMJSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709286877; c=relaxed/simple;
-	bh=XlFSQmLoyKEKApC1BXa+78A5Gq0xaC5YgOEm6bH/AYo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Kjuj8BjzIC83KLMsHevLKKPLRUs1fpp0Hkcs2W2/yYAxJZO8fGxnv5za1CofcZT6Ywj60gAx97jKAAzZYk73gC6nHsVOpHmAUPXaSA6ano6HSmsl6Ny30jqmSWqQI9L4RPrjuSpeXAoeVVEKWPh4MSG946AUKtLTfunUMkYd7fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=STKB+k3p; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5654ef0c61fso9274a12.0
-        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 01:54:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709286874; x=1709891674; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d3IcY2AWDZM/o4uocVm/qTXRkmDcY4LreF8rf3+er4Y=;
-        b=STKB+k3pZenod8TIdvHiRffqS6eBm7EftMBV/jTyJQXZK+hlEpBOaw1MksWNw1vIvT
-         g499nCZ1/PMsbZIEjm+GnFwke2uMT3hsHwDgFi/4YCqTU2hKqw4FIgd2Y6rKPHzHjs5r
-         Psr90jQ8dZVyh7A3pghvL+ZkD8oNmV+EmXMJCj+4oLuHUpuemegLDhfyNYTY21kAodI9
-         MhgiqHuCejROpphPdCz+ioe4Rq1SF6KR1aF3WA1HX6L5FxwImHi7u5ov97JgQ9Jghx6Z
-         +SphZdKFHTssdUFfhi27raybfTwAl3HcbJZd/NcF6tyJYY9xGzuIN1yQXBYlRbzKzo6x
-         Qw9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709286874; x=1709891674;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d3IcY2AWDZM/o4uocVm/qTXRkmDcY4LreF8rf3+er4Y=;
-        b=s7RGNGl44r6Y2IrGQwnOwxMSGBLxdL8SiJzO0S92luSF7PK0J4SlY3/KmSHUlnW1VB
-         q3Dn/iOVlIgInJD8oLXgWDqBfzx5NDkaz0J+YfAdH+2PjdBy1gW5carGU1VRYp535NLQ
-         IoKOBebwwDF+icKmbU7NIFZb83ZXaYqxnxbeDSJ67v4aXLVz6Igo4dQkKO0SHMHQkBMo
-         O2UjnRijLXCYBLZ05p4Y6UMf2XjdsMwd3KiqSmS2QJz86KOcG9XTwS6YrJgeCae8GtcD
-         WpGUocVnsOZ+qt+Fi1jpRpgIrAdZAkSJ4qTFPJb+QPvzVfH7wlIt4z+DZgGXabgfmgRI
-         NfGw==
-X-Forwarded-Encrypted: i=1; AJvYcCWu1Crri+zbwy6kzRXmepu048HGoRdBvKC+74R6kTPS1589mHEIFC3/O2wD7Zj0NqbgxQQyxBioDd1A9CzHPoY0rurzlbqF
-X-Gm-Message-State: AOJu0YyMKs1zF7ZkR5Jj+aMWdeIfqFmH0bFyUU3HGpQtZPRA943p/5SJ
-	K3ERJoTGZqhCsFbxVyg4/SB9gXyGLCzs/ePGxG8jviwaZj2AuUO5j7vhsOrWZNtKnyqlRq4+OJJ
-	4g6GpYK7BRWnA9OHJgoLGDJdOPOiOOV/P1DH4
-X-Google-Smtp-Source: AGHT+IH0j1FMjPnFtCgzvOaqhTTv78rOtrbXeAAhMppFFm3NZtNVJfdcRuK2VQASYHZqcq/2eBr5Q5S8swbazxxp1w4=
-X-Received: by 2002:a05:6402:26d4:b0:566:9818:af4c with SMTP id
- x20-20020a05640226d400b005669818af4cmr132529edd.4.1709286873819; Fri, 01 Mar
- 2024 01:54:33 -0800 (PST)
+	s=arc-20240116; t=1709286962; c=relaxed/simple;
+	bh=nB4RoPzo73ug6c/YARrBpRfTTCLpVLkR1rpzscqqvgM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k4g2TJyw8wpU6EEjlOvqgvl6/6drJrK6D79Pw4qWGwHTElb5LoOCXIsuyTgITnA2TDBs2+X+GKFzGuxXBmoqKcJCt+JW0I+gwiknZPpxFvbODYXd2BZlPjT+qEcjqFz6viTCFzs3unhhSK9dLCD70FmFqMd/wwsL72ydSJ2mBfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=md+BSHWV; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 9342088129;
+	Fri,  1 Mar 2024 10:55:56 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1709286957;
+	bh=ehYEHbfNMu0NChRHIbLyuBBhUQ+KLNUH2S3I+Evt6mw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=md+BSHWVhlHlIUcLhpNsX8Sen20evAEtzBgResu8ktPoVX0nOA/ZD6V4avVaikqdv
+	 xiQMPoRWzT5oOKpLcXsyt4G2K1F9h24gRZ6moGOBx+zNfNXDlGB5ww0qf0k9hLU+Vm
+	 0o5CZs/fC4N7hXugfc4TU39IFY+CcVduudBeRTWXpWATOYF/quBPjAAXbbx6aqB2eH
+	 1YSePGlanb5PAwZ1WsCzmIfSMgXV3208O+fSUwp8962OThkN5rxtWXVH/BjvTOIjQq
+	 lzxsIkWoFSdRsMZ/qpBc05/K5wpumvlu/MTV0mYgRPLkrUgQCrsvusPW4BTFURv+B/
+	 MapNhPolb6Ccg==
+Date: Fri, 1 Mar 2024 10:55:50 +0100
+From: Lukasz Majewski <lukma@denx.de>
+To: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, "Florian Fainelli"
+ <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ <netdev@vger.kernel.org>, <Tristram.Ha@microchip.com>, "Sebastian Andrzej
+ Siewior" <bigeasy@linutronix.de>, Paolo Abeni <pabeni@redhat.com>, "Ravi
+ Gunasekaran" <r-gunasekaran@ti.com>, Simon Horman <horms@kernel.org>,
+ "Wojciech Drewek" <wojciech.drewek@intel.com>, Nikita Zhandarovich
+ <n.zhandarovich@fintech.ru>, Murali Karicheri <m-karicheri2@ti.com>, "Dan
+ Carpenter" <dan.carpenter@linaro.org>, Kristian Overskeid
+ <koverskeid@gmail.com>, Matthieu Baerts <matttbe@kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC] net: hsr: Provide RedBox support
+Message-ID: <20240301105550.26de5271@wsk>
+In-Reply-To: <64ddec9f-42a8-089a-fb4a-a49a2e80337c@huawei.com>
+References: <20240228150735.3647892-1-lukma@denx.de>
+	<64ddec9f-42a8-089a-fb4a-a49a2e80337c@huawei.com>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240301121108.5d39e4f9@canb.auug.org.au> <CANn89iKpsHTQ9Zqz4cbCGOuj8sp5CCYGHe3Wvk2cyQL4HPADkw@mail.gmail.com>
-In-Reply-To: <CANn89iKpsHTQ9Zqz4cbCGOuj8sp5CCYGHe3Wvk2cyQL4HPADkw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 1 Mar 2024 10:54:19 +0100
-Message-ID: <CANn89iKsbT_qAdAiP6R6HRxic1YE3J6afMhWzF27Pbn2ifeCyg@mail.gmail.com>
-Subject: Re: linux-next: build failure after merge of the net-next tree
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>, Jiri Pirko <jiri@nvidia.com>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/FQHjZg_Cf39XqB1x9daHbJ/";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+--Sig_/FQHjZg_Cf39XqB1x9daHbJ/
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 1, 2024 at 10:09=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Fri, Mar 1, 2024 at 2:11=E2=80=AFAM Stephen Rothwell <sfr@canb.auug.or=
-g.au> wrote:
-> >
-> > Hi all,
-> >
-> > After merging the net-next tree, today's linux-next build (arm
-> > multi_v7_defconfig) failed like this:
-> >
-> > In file included from <command-line>:
-> > In function 'tcp_struct_check',
-> >     inlined from 'tcp_init' at net/ipv4/tcp.c:4700:2:
-> > include/linux/compiler_types.h:442:45: error: call to '__compiletime_as=
-sert_940' declared with attribute error: BUILD_BUG_ON failed: offsetof(stru=
-ct tcp_sock, __cacheline_group_end__tcp_sock_write_rx) - offsetofend(struct=
- tcp_sock, __cacheline_group_begin__tcp_sock_write_rx) > 99
-> >   442 |         _compiletime_assert(condition, msg, __compiletime_asser=
-t_, __COUNTER__)
-> >       |                                             ^
-> > include/linux/compiler_types.h:423:25: note: in definition of macro '__=
-compiletime_assert'
-> >   423 |                         prefix ## suffix();                    =
-         \
-> >       |                         ^~~~~~
-> > include/linux/compiler_types.h:442:9: note: in expansion of macro '_com=
-piletime_assert'
-> >   442 |         _compiletime_assert(condition, msg, __compiletime_asser=
-t_, __COUNTER__)
-> >       |         ^~~~~~~~~~~~~~~~~~~
-> > include/linux/build_bug.h:39:37: note: in expansion of macro 'compileti=
-me_assert'
-> >    39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond),=
- msg)
-> >       |                                     ^~~~~~~~~~~~~~~~~~
-> > include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_=
-ON_MSG'
-> >    50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #co=
-ndition)
-> >       |         ^~~~~~~~~~~~~~~~
-> > include/linux/cache.h:108:9: note: in expansion of macro 'BUILD_BUG_ON'
-> >   108 |         BUILD_BUG_ON(offsetof(TYPE, __cacheline_group_end__##GR=
-OUP) - \
-> >       |         ^~~~~~~~~~~~
-> > net/ipv4/tcp.c:4687:9: note: in expansion of macro 'CACHELINE_ASSERT_GR=
-OUP_SIZE'
-> >  4687 |         CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_w=
-rite_rx, 99);
-> >       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >
-> > Caused by commit
-> >
-> >   99123622050f ("tcp: remove some holes in struct tcp_sock")
-> >
-> > I have reverted that commit for today.
-> >
->
-> I have no idea. Maybe this arch has some unusual alignments on
-> u64/u32/u16 fields ?
->
-> The patch should not have changed tcp_sock_write_rx group...
->
-> My patch reduced tcp_sock_write_tx on x86_64 from 113 to 105 bytes but
-> I did not bother changing the assert,
-> because the assertion triggers if the size of the group is bigger than
-> the numerical value.
->
+Hi William,
 
-OK, I think the issue is caused by a hole at the start of
-tcp_sock_write_rx group
+> Give opinions only from the code level.
+>=20
+> > =20
+> >  void hsr_debugfs_rename(struct net_device *dev)
+> >  {
+> > @@ -95,6 +114,19 @@ void hsr_debugfs_init(struct hsr_priv *priv,
+> > struct net_device *hsr_dev) priv->node_tbl_root =3D NULL;
+> >  		return;
+> >  	}
+> > +
+> > +	if (!priv->redbox)
+> > +		return;
+> > +
+> > +	de =3D debugfs_create_file("proxy_node_table", S_IFREG |
+> > 0444,
+> > +				 priv->node_tbl_root, priv,
+> > +				 &hsr_proxy_node_table_fops);
+> > +	if (IS_ERR(de)) {
+> > +		pr_err("Cannot create hsr proxy node_table
+> > file\n");
+> > +		debugfs_remove(priv->node_tbl_root);
+> > +		priv->node_tbl_root =3D NULL;
+> > +		return;
+> > +	} =20
+> I think we can use "goto label" to reduce duplicate codes for error
+> handling.
 
-I will send this patch for review, thanks !
+This code is already NAK'ed from network maintainers, as debugfs is not
+acceptable to give any "API like" information.
 
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index 988a30ef6bfe956fa573f1f18c8284aa382dc1cc..55399ee2a57e736b55ed067fc06=
-ea620bbe62fd3
-100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -304,7 +304,7 @@ struct tcp_sock {
-        __cacheline_group_end(tcp_sock_write_txrx);
+Instead the "netlink" API shall be used to provide this information.
 
-        /* RX read-write hotpath cache lines */
--       __cacheline_group_begin(tcp_sock_write_rx);
-+       __cacheline_group_begin(tcp_sock_write_rx) __aligned(8);
-        u64     bytes_received;
-                                /* RFC4898 tcpEStatsAppHCThruOctetsReceived
-                                 * sum(delta(rcv_nxt)), or how many bytes
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index c82dc42f57c65df112f79080ff407cd98d11ce68..7e1b848398d04f2da2a91c3af97=
-b1e2e3895b8ee
-100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -4651,7 +4651,7 @@ static void __init tcp_struct_check(void)
-        CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock,
-tcp_sock_write_tx, tsorted_sent_queue);
-        CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock,
-tcp_sock_write_tx, highest_sack);
-        CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock,
-tcp_sock_write_tx, ecn_flags);
--       CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_tx, 113=
-);
-+       CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_tx, 105=
-);
+>=20
+> >  }
+> > =20
+> > @@ -296,6 +298,7 @@ static void send_hsr_supervision_frame(struct
+> > hsr_port *master, struct hsr_priv *hsr =3D master->hsr;
+> >  	__u8 type =3D HSR_TLV_LIFE_CHECK;
+> >  	struct hsr_sup_payload *hsr_sp;
+> > +	struct hsr_sup_tlv *hsr_stlv;
+> >  	struct hsr_sup_tag *hsr_stag;
+> >  	struct sk_buff *skb;
+> > =20
+> > @@ -335,6 +338,16 @@ static void send_hsr_supervision_frame(struct
+> > hsr_port *master, hsr_sp =3D skb_put(skb, sizeof(struct
+> > hsr_sup_payload)); ether_addr_copy(hsr_sp->macaddress_A,
+> > master->dev->dev_addr);=20
+> > +	if (hsr->redbox) {
+> > +		hsr_stlv =3D skb_put(skb, sizeof(struct
+> > hsr_sup_tlv));
+> > +		hsr_stlv->HSR_TLV_type =3D PRP_TLV_REDBOX_MAC;
+> > +		hsr_stlv->HSR_TLV_length =3D sizeof(struct
+> > hsr_sup_payload); +
+> > +		/* Payload: MacAddressRedBox */
+> > +		hsr_sp =3D skb_put(skb, sizeof(struct
+> > hsr_sup_payload));
+> > +		ether_addr_copy(hsr_sp->macaddress_A,
+> > hsr->macaddress_redbox);
+> > +	} =20
+> If hsr->redbox is true, hsr_sp->macaddress_A will be covered. Do
+> ether_addr_copy() twice. Is it better like this:
+>=20
+> hsr_sp =3D skb_put(skb, sizeof(struct hsr_sup_payload));
+>=20
+> if (hsr->redbox) {
+> 	...
+> 	ether_addr_copy(hsr_sp->macaddress_A, hsr->macaddress_redbox);
+> } else {
+> 	ether_addr_copy(hsr_sp->macaddress_A, master->dev->dev_addr);
+> }
 
-        /* TXRX read-write hotpath cache lines */
-        CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock,
-tcp_sock_write_txrx, pred_flags);
+It may be a bit misleading, as the hsr_sp is the payload for TLV fields
+in HSR supervisory frames.
+
+It shall be done as in the code as:
+
+1. First you need to send this HSR "node" MAC address (the
+ether_addr_copy(hsr_sp->macaddress_A, master->dev->dev_addr))
+
+2. If the box is a RedBox, then this supervisory frame shall have
+_appended_ another TLV with RedBox mac address (it can be the same
+as the HSR node in the special case).
+
+The hsr_sp->macaddress_A holds the address to the V (value) field of
+the TLV.
+
+>=20
+> > +
+> >  	if (skb_put_padto(skb, ETH_ZLEN)) {
+> >  		spin_unlock_bh(&hsr->seqnr_lock);
+> >  		return; =20
+>=20
+> > =20
+> > @@ -448,13 +455,14 @@ static void hsr_forward_do(struct
+> > hsr_frame_info *frame) }
+> > =20
+> >  		/* Check if frame is to be dropped. Eg. for PRP no
+> > forward
+> > -		 * between ports.
+> > +		 * between ports, or sending HSR supervision to
+> > RedBox. */
+> >  		if (hsr->proto_ops->drop_frame &&
+> >  		    hsr->proto_ops->drop_frame(frame, port))
+> >  			continue;
+> > =20
+> > -		if (port->type !=3D HSR_PT_MASTER)
+> > +		if (port->type =3D=3D HSR_PT_SLAVE_A ||
+> > +		    port->type =3D=3D HSR_PT_SLAVE_B) =20
+>=20
+> (port->type !=3D HSR_PT_MASTER) is not equivalent to (port->type =3D=3D
+> HSR_PT_SLAVE_A || port->type =3D=3D HSR_PT_SLAVE_B). port->type may be
+> HSR_PT_INTERLINK or others. Or here is a bugfix? Please check.
+
+Without Redbox support you don't use HSR_PT_INTERLINK. This port shall
+behave in similar way to HSR_PT_MASTER - e.g. it will send/receive HSR
+untagged frames. That is why the condition has been altered to only
+prepare HSR tagged frames for HSR ring port A/B.
+
+>=20
+> >  			skb =3D
+> > hsr->proto_ops->create_tagged_frame(frame, port); else
+> >  			skb =3D
+> > hsr->proto_ops->get_untagged_frame(frame, port); @@ -469,7 +477,9
+> > @@ static void hsr_forward_do(struct hsr_frame_info *frame)
+> > hsr_deliver_master(skb, port->dev, frame->node_src); } else {
+> >  			if (!hsr_xmit(skb, port, frame))
+> > -				sent =3D true;
+> > +				if (port->type =3D=3D HSR_PT_SLAVE_A ||
+> > +				    port->type =3D=3D HSR_PT_SLAVE_B)
+> > +					sent =3D true;
+> >  		}
+> >  	}
+> >  } =20
+>=20
+> If my opinions be accepted, Can you add "Reviewed-by: Ziyang Xuan
+> <william.xuanziyang@huawei.com>" at next version of patch?
+
+I will add your Reviewed-by: tag, no problem.
+
+Thanks for the input :-)
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/FQHjZg_Cf39XqB1x9daHbJ/
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmXhpiYACgkQAR8vZIA0
+zr3S1gf/WjpsxibQboT9bZVmYqBI42CusZQPAtv+BKCCQPIAKeU+uxZJYFNdY9X1
+1RvPcYudaPtPYdz7MXbVOjFojxHh46PltWoUM3SH+B7NvHFTdFHibnjE//GvDxP1
+zEJ3yf2Yk24L9U/F6gc0l4aXAbIlIwF3ptTxUFZBaEEC51XEvPpU+f6PEeABHiK6
+seqRQGq6nlU6YUAFpPpvmSTjIx8RYNem/nMApysdVynQeY5J5WyAFNb2Rh2bN6KY
+m9wFDWUzXH81aj+nyZ65h11QqIkh5XLhv10AcSFjHpswgbUNZCV5G/zQ8N37mLRX
+yxUR5tYuntWOhUG6A6QzcyDp0CNkfw==
+=xyoM
+-----END PGP SIGNATURE-----
+
+--Sig_/FQHjZg_Cf39XqB1x9daHbJ/--
 
