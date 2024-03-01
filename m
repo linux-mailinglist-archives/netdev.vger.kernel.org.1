@@ -1,157 +1,201 @@
-Return-Path: <netdev+bounces-76593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88B8486E507
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:10:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D921686E56B
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 17:25:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 418BA281F7A
-	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:10:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 903E9287937
+	for <lists+netdev@lfdr.de>; Fri,  1 Mar 2024 16:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88AA70CB1;
-	Fri,  1 Mar 2024 16:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2C587316A;
+	Fri,  1 Mar 2024 16:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Pbva1Ex4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YIIDja/+"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41E941C7A;
-	Fri,  1 Mar 2024 16:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74F773164;
+	Fri,  1 Mar 2024 16:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709309413; cv=none; b=jnC3xb1aGJJHHRUh9EaRqYP/abv4+8D+r3HSiFamID3x8E95ssWu6e9CVAWQXo/71dnqhD+Uv0UjgnGkrFrNuNxCZoJlQbAzLwc3snLML/QC5TvAu2FkA+amdlXTqH5IJiLCv/MULxBuUFTnn/ENQc+eLoKp2bS+QwmVwq7dBnM=
+	t=1709310263; cv=none; b=nH0uCIeB2gADUwEcvw66eFc1L6ChdKlf7VIwLyFvUQZMxw+FX9v8GdQ6wOJP5xttzFbiZ4KY7Oo6un4Ig1l3uzWj+cmoQ6IkWm1Yb4pFodFIq8Svgv0Ea4qQIpUi/6+BqNzlSarhuTzrtmEBWWu/lgUgKOaVWhVXFArrbV+pXyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709309413; c=relaxed/simple;
-	bh=ZfWPAHRMQ4AV1/EmBLZZvxi+ZiKHtDAYbU0vxjHvS+Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iYVRmzOmebzyS4EUjH4tzfU3RlPkSqQQk0wRXrlBdW2inVp/AOt6C8LLO3kmhMdix7EOLdNmXcLfTJBid1eMK/ogaNNrK2bBCRC8WUgaj0QMHdNUEbiHo4uI8D0f2YKlI6+9LpaIBOcqlbco1ArxIcduQmF51gsDC+F/wZYzezU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Pbva1Ex4; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 116C620008;
-	Fri,  1 Mar 2024 16:10:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709309408;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7Y/1rcI5WNB1I1M/cu+SE5UCu5kGQ0fc3QK9NH0VpIo=;
-	b=Pbva1Ex4/Wg84CrwIHwBfQh1USib/V/EEcBXecMJuMXt7tVkm1STF5m+fqMDRtGu/ysDbc
-	tuzEbouoCe5W2iDBywLAuOMaj6d+b5hsFyMJW731CcttscM3uXPKcKTy9mEqRTY3c1A8IW
-	lswFTLcOod9Cwy9OYwEmmF5m+8iOxd0yAGCKnhXmb/au1eDyHvGisDwsqlvapDFtTeZ0dJ
-	drn3E7U7sPKY0VO0jdLiqdzH3oxZ9Dt1M9MQ6D2Da+uz+VvWYNU/hninzYICa9ulnyiWBb
-	WabfSaCHltjbwwxg5uQGxRlk3ijBuDGHxv0zhoVN18B63gENMr6BeE1cKCVmPw==
-Date: Fri, 1 Mar 2024 17:10:05 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Mark Brown <broonie@kernel.org>, Frank Rowand <frowand.list@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v5 10/17] net: pse-pd: Add support for PSE PIs
-Message-ID: <20240301171005.43188d02@kmaincent-XPS-13-7390>
-In-Reply-To: <ZeHlB8DLEqWxBRYH@pengutronix.de>
-References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
-	<20240227-feature_poe-v5-10-28f0aa48246d@bootlin.com>
-	<ZeHlB8DLEqWxBRYH@pengutronix.de>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1709310263; c=relaxed/simple;
+	bh=PNkeetFswFigbWxmUl6UYDRRkyJ69Qs5VVQ+Oc2ktWc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cSb6aYGdHa2zatfm0+tFurWXUxOBUmNzL5gqxqKYGOyNosfX65NhPbWeKcxL9D9q1sy3F9PbadWfaex0PbrBMSRQGqN3tK6bfqTeODMyxuB5I3f3c+fPnuOGbZKwGrXav2gUuiI/wFjh8xh/u3tgpX1jtO6kSKKUAbl5XawXPGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YIIDja/+; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709310259; x=1740846259;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=PNkeetFswFigbWxmUl6UYDRRkyJ69Qs5VVQ+Oc2ktWc=;
+  b=YIIDja/+ndeq38tuTuQWsMCfF3EQr2OmPL35pOcNEw+ed8nd8xLcv3HI
+   t1EeSVgmPzKytYFNZV6XLbtffT4SJxKBAwsSQ1EHMm8r72A2nOkn7mrLs
+   Qs5G40hAZWYBHed1gu9Q9zEnPRUaBVWZP3J5nWvuDNxRw4WMpYbSPxELL
+   4n7YImbI3MTBV3m1Q1B1zFWYfJG02Q96GLDpPZaknLSL6VRMeQUIxigmw
+   JsICDk0AevoWEG5K0uCRylYhjiO2N08qexWTQYmMsEy37NJuEfYwHsVAV
+   wvv7vuypkp5DZAZDRFtRrlAj+qey39EHJZBzkAohdrQE6Sm6iW1wona61
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11000"; a="7673225"
+X-IronPort-AV: E=Sophos;i="6.06,196,1705392000"; 
+   d="scan'208";a="7673225"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2024 08:24:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,196,1705392000"; 
+   d="scan'208";a="8139509"
+Received: from p12ill20yoongsia.png.intel.com ([10.88.227.28])
+  by fmviesa007.fm.intel.com with ESMTP; 01 Mar 2024 08:24:11 -0800
+From: Song Yoong Siang <yoong.siang.song@intel.com>
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@google.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Florian Bezdeka <florian.bezdeka@siemens.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	xdp-hints@xdp-project.net
+Subject: [PATCH iwl-next,v2 0/2] XDP Tx Hardware Timestamp for igc driver
+Date: Sat,  2 Mar 2024 00:23:46 +0800
+Message-Id: <20240301162348.898619-1-yoong.siang.song@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-Hello Oleskij,
+Implemented XDP transmit hardware timestamp metadata for igc driver.
 
-Thanks you for the review.
+This patchset is tested with tools/testing/selftests/bpf/xdp_hw_metadata
+on Intel ADL-S platform. Below are the test steps and results.
 
-On Fri, 1 Mar 2024 15:24:07 +0100
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+Test Step 1: Run xdp_hw_metadata app
+ sudo ./xdp_hw_metadata <iface> > /dev/shm/result.log
 
-> > -static int of_pse_simple_xlate(struct pse_controller_dev *pcdev,
-> > -			       const struct of_phandle_args *pse_spec)
-> > +static int of_load_pse_pis(struct pse_controller_dev *pcdev)
-> >  {
-> > -	if (pse_spec->args[0] >=3D pcdev->nr_lines)
-> > -		return -EINVAL;
-> > +	struct device_node *np =3D pcdev->dev->of_node;
-> > +	struct device_node *node, *pis;
-> > +	int ret, i;
-> > =20
-> > -	return pse_spec->args[0];
-> > +	if (!np)
-> > +		return -ENODEV;
-> > +
-> > +	pcdev->pi =3D kcalloc(pcdev->nr_lines, sizeof(*pcdev->pi),
-> > GFP_KERNEL);
-> > +	if (!pcdev->pi)
-> > +		return -ENOMEM;
-> > +
-> > +	pis =3D of_get_child_by_name(np, "pse-pis");
-> > +	if (!pis) { =20
->=20
-> Do we need to allocate pcdev->pi if there are no pse-pis?
+Test Step 2: Enable Tx hardware timestamp
+ sudo hwstamp_ctl -i <iface> -t 1 -r 1
 
-In fact it is not needed in this patch but in the patch 13 which use regula=
-tor
-framework, as the regulator is described on each pi structure.
+Test Step 3: Run ptp4l and phc2sys for time synchronization
 
-I will update them accordingly.
+Test Step 4: Generate 1000 UDP packets with 1ms interval
+ sudo trafgen --dev <iface> '{eth(da=<mac addr>), udp(dp=9091)}' -t 1ms -n 1000
 
-> > +		/* Legacy OF description of PSE PIs */
-> > +		pcdev->of_legacy =3D true; =20
->=20
-> It is not "legacy" :) PoDL do not providing definition of PSE PI since th=
-ere
-> is only one pair. May be: single_pair, no_pse_pi or any other idea.
+Result of last 3 packets:
+poll: 1 (0) skip=50 fail=0 redir=998
+xsk_ring_cons__peek: 1
+0x55d7e76a02d0: rx_desc[997]->addr=96110 addr=96110 comp_addr=96110 EoP
+rx_hash: 0x11A51182 with RSS type:0x1
+HW RX-time:   1677795020447895823 (sec:1677795020.4479) delta to User RX-time sec:0.0000 (16.309 usec)
+XDP RX-time:   1677795020447906552 (sec:1677795020.4479) delta to User RX-time sec:0.0000 (5.580 usec)
+No rx_vlan_tci or rx_vlan_proto, err=-95
+0x55d7e76a02d0: ping-pong with csum=ab19 (want 315b) csum_start=34 csum_offset=6
+0x55d7e76a02d0: complete tx idx=997 addr=65010
+HW TX-complete-time:   1677795020447961519 (sec:1677795020.4480) delta to User TX-complete-time sec:0.0001 (79.979 usec)
+XDP RX-time:   1677795020447906552 (sec:1677795020.4479) delta to User TX-complete-time sec:0.0001 (134.946 usec)
+HW RX-time:   1677795020447895823 (sec:1677795020.4479) delta to HW TX-complete-time sec:0.0001 (65.696 usec)
+0x55d7e76a02d0: complete rx idx=1125 addr=96110
 
-You right it is not needed for PoDL. Maybe no_pse_pi is better according to=
- the
-following thoughts.
+poll: 1 (0) skip=50 fail=0 redir=999
+xsk_ring_cons__peek: 1
+0x55d7e76a02d0: rx_desc[998]->addr=98110 addr=98110 comp_addr=98110 EoP
+rx_hash: 0x11A51182 with RSS type:0x1
+HW RX-time:   1677795020448904440 (sec:1677795020.4489) delta to User RX-time sec:0.0000 (15.920 usec)
+XDP RX-time:   1677795020448915139 (sec:1677795020.4489) delta to User RX-time sec:0.0000 (5.221 usec)
+No rx_vlan_tci or rx_vlan_proto, err=-95
+0x55d7e76a02d0: ping-pong with csum=ab19 (want 315b) csum_start=34 csum_offset=6
+0x55d7e76a02d0: complete tx idx=998 addr=66010
+HW TX-complete-time:   1677795020448969442 (sec:1677795020.4490) delta to User TX-complete-time sec:0.0001 (80.163 usec)
+XDP RX-time:   1677795020448915139 (sec:1677795020.4489) delta to User TX-complete-time sec:0.0001 (134.466 usec)
+HW RX-time:   1677795020448904440 (sec:1677795020.4489) delta to HW TX-complete-time sec:0.0001 (65.002 usec)
+0x55d7e76a02d0: complete rx idx=1126 addr=98110
 
-Just wondering, how a pse controller that support PoE and PoDL simultaneous=
-ly
-would be exposed in the binding. In that case I suppose all the PIs (PoE and
-PoDL) need to use the pse-pi subnode. Then the "alternative pinout" and
-"polarity" parameter would not be requested for PoDL PIs.
+poll: 1 (0) skip=50 fail=0 redir=1000
+xsk_ring_cons__peek: 1
+0x55d7e76a02d0: rx_desc[999]->addr=99110 addr=99110 comp_addr=99110 EoP
+rx_hash: 0x11A51182 with RSS type:0x1
+HW RX-time:   1677795020449912415 (sec:1677795020.4499) delta to User RX-time sec:0.0000 (16.441 usec)
+XDP RX-time:   1677795020449923362 (sec:1677795020.4499) delta to User RX-time sec:0.0000 (5.494 usec)
+No rx_vlan_tci or rx_vlan_proto, err=-95
+0x55d7e76a02d0: ping-pong with csum=ab19 (want 315b) csum_start=34 csum_offset=6
+0x55d7e76a02d0: complete tx idx=999 addr=67010
+HW TX-complete-time:   1677795020449977468 (sec:1677795020.4500) delta to User TX-complete-time sec:0.0001 (81.036 usec)
+XDP RX-time:   1677795020449923362 (sec:1677795020.4499) delta to User TX-complete-time sec:0.0001 (135.142 usec)
+HW RX-time:   1677795020449912415 (sec:1677795020.4499) delta to HW TX-complete-time sec:0.0001 (65.053 usec)
+0x55d7e76a02d0: complete rx idx=1127 addr=99110
 
-> > +			dev_err(pcdev->dev, "wrong id of pse pi: %u\n",
-> > +				id);
-> > +			ret =3D -EINVAL;
-> > +			goto out;
-> > +		}
-> > +
-> > +		ret =3D of_property_count_strings(node, "pairset-names");
-> > +		if (ret <=3D 0) =20
->=20
-> if (ret < 0)
->    error: can't get "pairset-names" property: %pe
-> if (ret < 1 || ret > 2)
->    error: wrong number of pairset-names. Should be 1 or 2, got %i
+Besides, this patchset is tested with iperf3 to check the impact of holding tx completion.
+Based on results below, the impact is not observable.
 
-Need to modify this to be able to have PoDL PIs without pairset description.
+Result of iperf3 without trafgen command in step 4:
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-100.00 sec  27.4 GBytes  2.35 Gbits/sec    0             sender
+[  5]   0.00-100.04 sec  27.4 GBytes  2.35 Gbits/sec                  receiver
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Result of iperf3 running parallel with trafgen command in step 4:
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-100.00 sec  27.4 GBytes  2.35 Gbits/sec    0             sender
+[  5]   0.00-100.04 sec  27.4 GBytes  2.35 Gbits/sec                  receiver
+
+V1: https://patchwork.kernel.org/project/netdevbpf/patch/20231215162158.951925-1-yoong.siang.song@intel.com/
+
+changelog:
+V1 -> V2
+- In struct igc_tx_timestamp_request, keep a pointer to igc_tx_buffer,
+  instead of pointing xsk_pending_ts (Vinicius).
+- In struct igc_tx_timestamp_request, introduce buffer_type to indicate
+  whether skb or igc_tx_buffer pointer should be use (Vinicius).
+- In struct igc_metadata_request, remove igc_adapter pointer (Vinicius).
+- When request tx hwts, copy the value of cmd_type, instead of using
+  pointer (Vinicius).
+- For boolean variable, use true and false, instead of 1 and 0 (Vinicius).
+- In igc_xsk_request_timestamp(), make an early return if none of the 4 ts
+  registers is available (Vinicius).
+- Create helper functions to clear tx buffer and skb for tstamp (John).
+- Perform throughput test with mix traffic (Vinicius & John).
+
+Song Yoong Siang (2):
+  selftests/bpf: xdp_hw_metadata reduce sleep interval
+  igc: Add Tx hardware timestamp request for AF_XDP zero-copy packet
+
+ drivers/net/ethernet/intel/igc/igc.h          |  71 +++++++-----
+ drivers/net/ethernet/intel/igc/igc_main.c     | 108 +++++++++++++++++-
+ drivers/net/ethernet/intel/igc/igc_ptp.c      |  40 +++++--
+ tools/testing/selftests/bpf/xdp_hw_metadata.c |   2 +-
+ 4 files changed, 180 insertions(+), 41 deletions(-)
+
+-- 
+2.34.1
+
 
