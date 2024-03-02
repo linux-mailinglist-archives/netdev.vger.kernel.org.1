@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-76848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0233886F22C
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 20:54:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4EC186F292
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 22:36:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB5741F21E63
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 19:54:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BD3F1F224D2
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 21:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 493D745010;
-	Sat,  2 Mar 2024 19:53:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A64A440C0C;
+	Sat,  2 Mar 2024 21:36:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA82340876
-	for <netdev@vger.kernel.org>; Sat,  2 Mar 2024 19:53:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3EDE42073
+	for <netdev@vger.kernel.org>; Sat,  2 Mar 2024 21:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709409203; cv=none; b=WdEx8p5ABYIUhZ4HKZHgCEkjtlsOhIZq+ENE+DRwyV8MVXs9gaayXf81YJGioXfoUiTnRy49CaF+ZafJArYJQJjZtwAwy7RFLcfbOrNX8Xwsflthf2VuT65TvBse5ZKahJZgJ5Cz+3lx4iS2y4inmhLaLlYind5j6Bl63wUp4rQ=
+	t=1709415388; cv=none; b=N5ifvDMDo6yB2wX1l6KOs/W1wMDhh5QLt2oQmOyYlzCG3zpVYZYMdIb5Nii/eBKygC2yRMqYjr6a8AsH1ln2/28cNh0kBKEalxF3p93Jc2VZK1m33+QGhzvJMNWwpZty4djKJIaF5RENc3EOXT1gyplhjD66+mCMOmiPFYNsrMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709409203; c=relaxed/simple;
-	bh=VwqUETHkMr9Jr4MpYgf8mhr2gN0RvJdCzWv8zQr3mPU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=B6bMHOR+Ge6d/RmKEk3GeiEJd+xX75BSALd8Y0yBZIxRMJVEqig2Uo6gqcLanFrSTgHtA+kJUbZz1YJhINM9v7RDGHOf2pVljE3m4Ccz0m51ytxtNLbMs/1kM1M+RD+y7kiWLMDteI3jgZxptnweHRi31FPYbXSATbbrRkE646Q=
+	s=arc-20240116; t=1709415388; c=relaxed/simple;
+	bh=af46Yr3Vb2hiX+yZOFs27VKI6N5KKu4Ek9FA6gmL6Vg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=agJszakpcEFCaFFJ99HJL6t3SuJOEIEkCkHm5+nn1jOxMAXJkN0HU7ZXr6xyLA4QHgzv97ILJ14IptU5L1W+5KJWJSU049GkrpMR3ovfErcpnlvnikFDQzaOtxk3+7Yrw4L2+1VuPCN9U+yQy9e1zbOIQNrVGr/MJPNM6eczzm0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,157 +33,234 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1rgVPx-0007Gz-Ln; Sat, 02 Mar 2024 20:53:09 +0100
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	id 1rgX1R-0008Jm-5w; Sat, 02 Mar 2024 22:35:57 +0100
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ore@pengutronix.de>)
-	id 1rgVPv-0041mM-S9; Sat, 02 Mar 2024 20:53:07 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	id 1rgX1M-0042gf-JN; Sat, 02 Mar 2024 22:35:52 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1rgVPv-00DSV2-2W;
-	Sat, 02 Mar 2024 20:53:07 +0100
+	id 1rgX1M-00Gf66-1a;
+	Sat, 02 Mar 2024 22:35:52 +0100
+Date: Sat, 2 Mar 2024 22:35:52 +0100
 From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Wei Fang <wei.fang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>
-Subject: [PATCH net-next v9 7/7] net: fec: Fixup EEE
-Date: Sat,  2 Mar 2024 20:53:06 +0100
-Message-Id: <20240302195306.3207716-8-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240302195306.3207716-1-o.rempel@pengutronix.de>
-References: <20240302195306.3207716-1-o.rempel@pengutronix.de>
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v5 13/17] net: pse-pd: Use regulator framework
+ within PSE framework
+Message-ID: <ZeObuKHkPN3tiWz_@pengutronix.de>
+References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
+ <20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
 X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Andrew Lunn <andrew@lunn.ch>
+On Tue, Feb 27, 2024 at 03:42:55PM +0100, Kory Maincent wrote:
+> Integrate the regulator framework to the PSE framework for enhanced
+> access to features such as voltage, power measurement, and limits, which
+> are akin to regulators. Additionally, PSE features like port priorities
+> could potentially enhance the regulator framework. Note that this
+> integration introduces some implementation complexity, including wrapper
+> callbacks and nested locks, but the potential benefits make it worthwhile.
+> 
+> Regulator are using enable counter with specific behavior.
+> Two calls to regulator_disable will trigger kernel warnings.
+> If the counter exceeds one, regulator_disable call won't disable the
+> PSE PI. These behavior isn't suitable for PSE control.
+> Added a boolean 'enabled' state to prevent multiple calls to
 
-The enabling/disabling of EEE in the MAC should happen as a result of
-auto negotiation. So move the enable/disable into
-fec_enet_adjust_link() which gets called by phylib when there is a
-change in link status.
+Please rename rename "enabled" to "admin_state_enabled". This variable
+do not reflect real device state, it reflects only user configuration.
 
-fec_enet_set_eee() now just stores away the LPI timer value.
-Everything else is passed to phylib, so it can correctly setup the
-PHY.
+...  
+> @@ -120,15 +118,9 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
+>  	u32 phy_id;
+>  	int rc;
+>  
+> -	psec = fwnode_find_pse_control(child);
+> -	if (IS_ERR(psec))
+> -		return PTR_ERR(psec);
+> -
+>  	mii_ts = fwnode_find_mii_timestamper(child);
+> -	if (IS_ERR(mii_ts)) {
+> -		rc = PTR_ERR(mii_ts);
+> -		goto clean_pse;
+> -	}
+> +	if (IS_ERR(mii_ts))
+> +		return PTR_ERR(mii_ts);
+>  
+>  	is_c45 = fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45");
+>  	if (is_c45 || fwnode_get_phy_id(child, &phy_id))
+> @@ -161,6 +153,12 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
+>  			goto clean_phy;
+>  	}
+>  
+> +	psec = dev_find_pse_control(&phy->mdio.dev);
+> +	if (IS_ERR(psec)) {
+> +		rc = PTR_ERR(psec);
+> +		goto unregister_phy;
+> +	}
+> +
 
-fec_enet_get_eee() relies on phylib doing most of the work,
-the MAC driver just adds the LPI timer value.
+I do not think it is a good idea to make PSE controller depend on
+phy->mdio.dev. The only reason why we have fwnode_find_pse_control()
+here was the missing port abstraction.
 
-Call phy_support_eee() if the quirk is present to indicate the MAC
-actually supports EEE.
+...
+> +static int
+> +devm_pse_pi_regulator_register(struct pse_controller_dev *pcdev,
+> +			       char *name, int id)
+> +{
+> +	struct regulator_config rconfig = {0};
+> +	struct regulator_desc *rdesc;
+> +	struct regulator_dev *rdev;
+> +
+> +	rdesc = devm_kzalloc(pcdev->dev, sizeof(*rdesc), GFP_KERNEL);
+> +	if (!rdesc)
+> +		return -ENOMEM;
+> +
+> +	/* Regulator descriptor id have to be the same as its associated
+> +	 * PSE PI id for the well functioning of the PSE controls.
+> +	 */
+> +	rdesc->id = id;
+> +	rdesc->name = name;
+> +	rdesc->type = REGULATOR_CURRENT;
+> +	rdesc->ops = &pse_pi_ops;
+> +	rdesc->owner = pcdev->owner;
+> +
+> +	rconfig.dev = pcdev->dev;
+> +	rconfig.driver_data = pcdev;
+> +	rconfig.init_data = &pse_pi_initdata;
 
-Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-Tested-by: Oleksij Rempel <o.rempel@pengutronix.de> (On iMX8MP debix)
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Reviewed-by: Wei Fang <wei.fang@nxp.com>
----
-v2: Only call fec_enet_eee_mode_set for those that support EEE
-v7: update against kernel v6.8-rc4
----
- drivers/net/ethernet/freescale/fec_main.c | 23 +++++------------------
- 1 file changed, 5 insertions(+), 18 deletions(-)
+Please add input supply to track all dependencies:
+        if (of_property_present(np, "vin-supply"))                                                                    
+	                config->input_supply = "vin";
 
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index a2c786550342f..d7693fdf640d5 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -2033,13 +2033,8 @@ static int fec_enet_eee_mode_set(struct net_device *ndev, bool enable)
- 	struct fec_enet_private *fep = netdev_priv(ndev);
- 	struct ethtool_keee *p = &fep->eee;
- 	unsigned int sleep_cycle, wake_cycle;
--	int ret = 0;
- 
- 	if (enable) {
--		ret = phy_init_eee(ndev->phydev, false);
--		if (ret)
--			return ret;
--
- 		sleep_cycle = fec_enet_us_to_tx_cycle(ndev, p->tx_lpi_timer);
- 		wake_cycle = sleep_cycle;
- 	} else {
-@@ -2047,8 +2042,6 @@ static int fec_enet_eee_mode_set(struct net_device *ndev, bool enable)
- 		wake_cycle = 0;
- 	}
- 
--	p->tx_lpi_enabled = enable;
--
- 	writel(sleep_cycle, fep->hwp + FEC_LPI_SLEEP);
- 	writel(wake_cycle, fep->hwp + FEC_LPI_WAKE);
- 
-@@ -2094,6 +2087,8 @@ static void fec_enet_adjust_link(struct net_device *ndev)
- 			netif_tx_unlock_bh(ndev);
- 			napi_enable(&fep->napi);
- 		}
-+		if (fep->quirks & FEC_QUIRK_HAS_EEE)
-+			fec_enet_eee_mode_set(ndev, phy_dev->enable_tx_lpi);
- 	} else {
- 		if (fep->link) {
- 			netif_stop_queue(ndev);
-@@ -2453,6 +2448,9 @@ static int fec_enet_mii_probe(struct net_device *ndev)
- 	else
- 		phy_set_max_speed(phy_dev, 100);
- 
-+	if (fep->quirks & FEC_QUIRK_HAS_EEE)
-+		phy_support_eee(phy_dev);
-+
- 	fep->link = 0;
- 	fep->full_duplex = 0;
- 
-@@ -3172,7 +3170,6 @@ fec_enet_get_eee(struct net_device *ndev, struct ethtool_keee *edata)
- 		return -ENETDOWN;
- 
- 	edata->tx_lpi_timer = p->tx_lpi_timer;
--	edata->tx_lpi_enabled = p->tx_lpi_enabled;
- 
- 	return phy_ethtool_get_eee(ndev->phydev, edata);
- }
-@@ -3182,7 +3179,6 @@ fec_enet_set_eee(struct net_device *ndev, struct ethtool_keee *edata)
- {
- 	struct fec_enet_private *fep = netdev_priv(ndev);
- 	struct ethtool_keee *p = &fep->eee;
--	int ret = 0;
- 
- 	if (!(fep->quirks & FEC_QUIRK_HAS_EEE))
- 		return -EOPNOTSUPP;
-@@ -3192,15 +3188,6 @@ fec_enet_set_eee(struct net_device *ndev, struct ethtool_keee *edata)
- 
- 	p->tx_lpi_timer = edata->tx_lpi_timer;
- 
--	if (!edata->eee_enabled || !edata->tx_lpi_enabled ||
--	    !edata->tx_lpi_timer)
--		ret = fec_enet_eee_mode_set(ndev, false);
--	else
--		ret = fec_enet_eee_mode_set(ndev, true);
--
--	if (ret)
--		return ret;
--
- 	return phy_ethtool_set_eee(ndev->phydev, edata);
- }
- 
+May be better to make it not optional...
+
+Should be tested, but if, instead of "vin-supply", we will use
+"pse-supply" it will make most part of pse_regulator.c obsolete.
+
+....  
+> @@ -310,6 +452,20 @@ pse_control_get_internal(struct pse_controller_dev *pcdev, unsigned int index)
+>  		return ERR_PTR(-ENODEV);
+>  	}
+>  
+> +	psec->ps = devm_regulator_get_exclusive(dev,
+> +						rdev_get_name(pcdev->pi[index].rdev));
+> +	if (IS_ERR(psec->ps)) {
+> +		kfree(psec);
+> +		return ERR_CAST(psec->ps);
+> +	}
+> +
+> +	ret = regulator_is_enabled(psec->ps);
+> +	if (ret < 0) {
+> +		kfree(psec);
+> +		return ERR_PTR(ret);
+> +	}
+> +	pcdev->pi[index].enabled = ret;
+
+If I see it correctly, it will prevent us to refcount a request from
+user space. So, the runtime PM may suspend PI.
+
+> +
+>  	psec->pcdev = pcdev;
+>  	list_add(&psec->list, &pcdev->pse_control_head);
+>  	psec->id = index;
+> @@ -344,7 +500,8 @@ static int psec_id_legacy_xlate(struct pse_controller_dev *pcdev,
+>  	return pse_spec->args[0];
+>  }
+>  
+> -struct pse_control *of_pse_control_get(struct device_node *node)
+> +struct pse_control *of_pse_control_get(struct device *dev,
+> +				       struct device_node *node)
+>  {
+>  	struct pse_controller_dev *r, *pcdev;
+>  	struct of_phandle_args args;
+> @@ -394,7 +551,7 @@ struct pse_control *of_pse_control_get(struct device_node *node)
+>  	}
+>  
+>  	/* pse_list_mutex also protects the pcdev's pse_control list */
+> -	psec = pse_control_get_internal(pcdev, psec_id);
+> +	psec = pse_control_get_internal(dev, pcdev, psec_id);
+>  
+>  out:
+>  	mutex_unlock(&pse_list_mutex);
+> @@ -443,21 +600,24 @@ int pse_ethtool_set_config(struct pse_control *psec,
+>  			   struct netlink_ext_ack *extack,
+>  			   const struct pse_control_config *config)
+>  {
+> -	const struct pse_controller_ops *ops;
+> -	int err;
+> -
+> -	ops = psec->pcdev->ops;
+> +	int err = 0;
+>  
+> -	if (!ops->ethtool_set_config) {
+> -		NL_SET_ERR_MSG(extack,
+> -			       "PSE driver does not configuration");
+> -		return -EOPNOTSUPP;
+> +	/* Look at enabled status to not call regulator_enable or
+> +	 * regulator_disable twice creating a regulator counter mismatch
+> +	 */
+> +	switch (config->c33_admin_control) {
+> +	case ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED:
+> +		if (!psec->pcdev->pi[psec->id].enabled)
+> +			err = regulator_enable(psec->ps);
+> +		break;
+> +	case ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED:
+> +		if (psec->pcdev->pi[psec->id].enabled)
+> +			err = regulator_disable(psec->ps);
+> +		break;
+> +	default:
+> +		err = -EOPNOTSUPP;
+>  	}
+
+This change seems to break PoDL support
+
+> -	mutex_lock(&psec->pcdev->lock);
+> -	err = ops->ethtool_set_config(psec->pcdev, psec->id, extack, config);
+> -	mutex_unlock(&psec->pcdev->lock);
+> -
+>  	return err;
+
+Regards,
+Oleksij
 -- 
-2.39.2
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
