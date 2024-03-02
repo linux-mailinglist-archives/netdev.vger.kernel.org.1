@@ -1,111 +1,136 @@
-Return-Path: <netdev+bounces-76814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DC8B86EFD6
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 10:36:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8FDD86EFDB
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 10:37:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10E612846F3
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 09:36:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26DEA1C212E6
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 09:37:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA88F12E52;
-	Sat,  2 Mar 2024 09:36:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="QZjgqXYX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33DEC13FFA;
+	Sat,  2 Mar 2024 09:37:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8A91FC8
-	for <netdev@vger.kernel.org>; Sat,  2 Mar 2024 09:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E25168BD;
+	Sat,  2 Mar 2024 09:37:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709372182; cv=none; b=bK+IUPfXUneirDhUUSg+IC3AGtHknR3Ya9YhXQuP7G1U8gZ0pMvSBb/O53dON4JBzlDJS5Q1DPC+xNmR6NYRe6MH/AijVW+In4ppgsLmPGF8nFPeguvm1etKADPtLvNMenOC5nl2NbzKzRknSvzE0cd5qNMjVRxj1rnXCo21ipE=
+	t=1709372243; cv=none; b=ay+sf4gXQzDgzoAChcsjEdyG4G+9vrsXGdzkKdNNQgPvu/NC1PT+Y43cgcimCn3pgl8tQ6p5u4LIYWVZlctomoIE7fOgtdhc0A/Twf2HYW4PZzpetc2kD2HNdFw8YULo9v/UB3Kw7/sd9SXWP+nWq5bh75VPXFJpleylbuFk358=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709372182; c=relaxed/simple;
-	bh=B256r5zEmIOiTuXLBBBmOaIxhLjEb9CS3AnBdn/wqE8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n82LMkb4MsUdEt1T00UExO+OcMZgfrXypuF5H+YSCs/daJnEzPIk/u9bduELC9bkJZouGm7P2+yleGaylHKmU4axxphToM0WQeJPXdUJda+JrwL0XrtPSo/PMSEc5rB332sKaYNYquM0k+N06O6Pxw7oSgQqo7MrBeeMSIVaiWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=QZjgqXYX; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5640fef9fa6so4027764a12.0
-        for <netdev@vger.kernel.org>; Sat, 02 Mar 2024 01:36:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709372178; x=1709976978; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uBR8jTmgqloeC9Yb/CqEXV702gGyCkKiZC9/i73Gnt8=;
-        b=QZjgqXYXRMSui7yCyD3qaofFZ+gGz06n89hAkNCGab3wta9iCGT4w9qYCZ9EUwl7MB
-         HLON5pylst/ghmbqVi8FNsk7MyJSLLb6APTc9DaQ9ZfPp8iWCowRu3hjATNkYNYsiPJ3
-         DMKft2R8mc1zzxowcDy8zYzTuloEjaehUljsvJr61zR1un7Orjoo36CfeA76beBiPqWU
-         Vwl1jVX3KudmRvoubtzuLcktp019x5Ww8jkZQeMtosSn24lH8tvbzCe04HwBKomoJXES
-         taCydoIFL4pYHynKQ3z0aiW6u6L/Q6xo4lOLSzcsqSjzQn3vsWKQwQoGupMhuLf3EdHd
-         +PWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709372178; x=1709976978;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uBR8jTmgqloeC9Yb/CqEXV702gGyCkKiZC9/i73Gnt8=;
-        b=WKotoJD7AhF1vGDgAXA3tqOZ51RakT0LNtbuvvTURXFHs37P6F1l0qpd3Qo5zIGE1K
-         TMwV2NPgQ8PO7qtf1QUsiuKex00AgqItaMKKFlD0lda8xF13SawLnDHsF9lCYHHtJVtt
-         xXY8TSkGnaFk0I4a9qslwZbP5MtwruOvuTJTYWSViT34DyHql5xJnHw+NPDjZMPp0FHs
-         SNo9PKLbNKJBhBZ++PLKYbes4G0B9DHGGm89E6gLkPXu09sZeaBRaHwM6hJKARYgAUJ9
-         1r7R2vYsF3J7XiYlG8Y03qNdlsykh6+Dwo0rE9HmONkdzm4st3AHUlQ/JdOfl/qdSzNL
-         jFWg==
-X-Forwarded-Encrypted: i=1; AJvYcCX3s7Iqgt3GVM59j86zzrk5eglEkrWq0dweNmi16f96g1676NIWRznVV1hcNgtLUKMfDsQTGdg2IBpepqnogMSIJL6ilcZe
-X-Gm-Message-State: AOJu0YzH3707+jCLB0ZkpjJZLAoYlWWj9fjBfN86rtYxEHnaM5cEoyc0
-	p5BgP612d1oC8hnfdI9NSQkPNEqfIYT6dg3Dsmt2rwGE7iE1YFXOScG8uvHkoyI=
-X-Google-Smtp-Source: AGHT+IH7l5mn8VM9fliWodgit9CoqXbIrIFtbPY44s4b+8rNBmbrbiwT7eCceWY9DwfmX3DetILkrA==
-X-Received: by 2002:a05:6402:2894:b0:566:16e3:65a8 with SMTP id eg20-20020a056402289400b0056616e365a8mr2962788edb.18.1709372178372;
-        Sat, 02 Mar 2024 01:36:18 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id d40-20020a056402402800b00565671fd23asm2388813eda.22.2024.03.02.01.36.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Mar 2024 01:36:17 -0800 (PST)
-Date: Sat, 2 Mar 2024 10:36:14 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	vadim.fedorenko@linux.dev, arkadiusz.kubalewski@intel.com
-Subject: Re: [PATCH net-next] dpll: avoid multiple function calls to dump
- netdev info
-Message-ID: <ZeLzDhuhTeI2YBtT@nanopsycho>
-References: <20240301001607.2925706-1-kuba@kernel.org>
- <ZeH26t7WPkfwUnhs@nanopsycho>
- <CANn89iLcOE7aJ6SSjCSixLOQd4CsMdmE1UQZWBsp6UgufA2pwQ@mail.gmail.com>
- <20240301093128.18722960@kernel.org>
+	s=arc-20240116; t=1709372243; c=relaxed/simple;
+	bh=8kiw5+UWs4a9+DdGKdL4oMotwww+LKy0HwEZtFqYFjk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=fgcLco1fYD7WvY4YxgQUNFK0LR6MO5nnBzvcO1hfqB5bo8n0ontevk+iih/HjAFm2FZFNU64fbVCejfnzag9zaavgoKks8gMH1oZXENW4QQ9L5rRx4lFOy9h1t4+dBhhOppiPy4NtDOl0wOJHI1BxdIY9CdCTiveTVmdr03tqfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Tn0Gx2Hwtz1FLPY;
+	Sat,  2 Mar 2024 17:37:13 +0800 (CST)
+Received: from kwepemm600017.china.huawei.com (unknown [7.193.23.234])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0DE711A016B;
+	Sat,  2 Mar 2024 17:37:17 +0800 (CST)
+Received: from [10.174.179.234] (10.174.179.234) by
+ kwepemm600017.china.huawei.com (7.193.23.234) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Sat, 2 Mar 2024 17:37:15 +0800
+Message-ID: <f914a48b-741c-e3fe-c971-510a07eefb91@huawei.com>
+Date: Sat, 2 Mar 2024 17:37:15 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240301093128.18722960@kernel.org>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [bug report] dead loop in generic_perform_write() //Re: [PATCH v7
+ 07/12] iov_iter: Convert iterate*() to inline funcs
+To: Linus Torvalds <torvalds@linux-foundation.org>, Al Viro <viro@kernel.org>
+CC: David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Christian Brauner <christian@brauner.io>,
+	David Laight <David.Laight@aculab.com>, Matthew Wilcox <willy@infradead.org>,
+	Jeff Layton <jlayton@kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<linux-block@vger.kernel.org>, <linux-mm@kvack.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Kefeng Wang
+	<wangkefeng.wang@huawei.com>
+References: <20230925120309.1731676-1-dhowells@redhat.com>
+ <20230925120309.1731676-8-dhowells@redhat.com>
+ <4e80924d-9c85-f13a-722a-6a5d2b1c225a@huawei.com>
+ <CAHk-=whG+4ag+QLU9RJn_y47f1DBaK6b0qYq_6_eLkO=J=Mkmw@mail.gmail.com>
+ <CAHk-=wjSjuDrS9gc191PTEDDow7vHy6Kd3DKDaG+KVH0NQ3v=w@mail.gmail.com>
+ <e985429e-5fc4-a175-0564-5bb4ca8f662c@huawei.com>
+ <CAHk-=wh06M-1c9h7wZzZ=1KqooAmazy_qESh2oCcv7vg-sY6NQ@mail.gmail.com>
+ <CAHk-=wiBJRgA3iNqihR7uuft=5rog425X_b3uvgroG3fBhktwQ@mail.gmail.com>
+From: Tong Tiangen <tongtiangen@huawei.com>
+In-Reply-To: <CAHk-=wiBJRgA3iNqihR7uuft=5rog425X_b3uvgroG3fBhktwQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600017.china.huawei.com (7.193.23.234)
 
-Fri, Mar 01, 2024 at 06:31:28PM CET, kuba@kernel.org wrote:
->On Fri, 1 Mar 2024 17:24:07 +0100 Eric Dumazet wrote:
->> > >BTW is the empty nest if the netdev has no pin intentional?  
->> >
->> > The user can tell if this is or is not supported by kernel easily.  
->
->Seems legit, although user can also do:
->
->$ genl ctrl list | grep dpll
->Name: dpll
 
-True.
 
->
->> This is a high cost for hosts with hundreds of devices :/
->
->right, a bit high cost for a relatively rare feature :(
+在 2024/3/2 10:59, Linus Torvalds 写道:
+> On Thu, 29 Feb 2024 at 09:32, Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+>>
+>> One option might be to make a failed memcpy_from_iter_mc() set another
+>> flag in the iter, and then make fault_in_iov_iter_readable() test that
+>> flag and return 'len' if that flag is set.
+>>
+>> Something like that (wild handwaving) should get the right error handling.
+>>
+>> The simpler alternative is maybe something like the attached.
+>> COMPLETELY UNTESTED. Maybe I've confused myself with all the different
+>> indiraction mazes in the iov_iter code.
+> 
+> Actually, I think the right model is to get rid of that horrendous
+> .copy_mc field entirely.
+> 
+> We only have one single place that uses it - that nasty core dumping
+> code. And that code is *not* performance critical.
+> 
+> And not only isn't it performance-critical, it already does all the
+> core dumping one page at a time because it doesn't want to write pages
+> that were never mapped into user space.
+> 
+> So what we can do is
+> 
+>   (a) make the core dumping code *copy* the page to a good location
+> with copy_mc_to_kernel() first
+> 
+>   (b) remove this horrendous .copy_mc crap entirely from iov_iter
 
-I agree. Let's remove the empty nest then.
+I think this solution has two impacts:
+1. Although it is not a performance-critical path, the CPU usage may be
+affected by one more memory copy in some large-memory applications.
+2. If a hardware memory error occurs in "good location" and the
+".copy_mc" is removed, the kernel will panic.
+
+I would prefer to use the previous solution(modify the implementation of
+memcpy_from_iter_mc()).
+
+Thanks,
+Tong.
+
+> 
+> This is slightly complicated by the fact that copy_mc_to_kernel() may
+> not even exist, and architectures that don't have it don't want the
+> silly extra copy. So we need to abstract the "copy to temporary page"
+> code a bit. But that's probably a good thing anyway in that it forces
+> us to have nice interfaces.
+> 
+> End result: something like the attached.
+> 
+> AGAIN: THIS IS ENTIRELY UNTESTED.
+> 
+> But hey, so was clearly all the .copy_mc code too that this removes, so...
+> 
+>                 Linus
 
