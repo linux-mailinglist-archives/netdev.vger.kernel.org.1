@@ -1,191 +1,69 @@
-Return-Path: <netdev+bounces-76823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A371E86F03A
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 12:23:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 437B786F05C
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 12:52:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 529A728495D
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 11:23:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F352C2846EA
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 11:52:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C956815EA2;
-	Sat,  2 Mar 2024 11:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ITZAyO9M"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D8315EB0;
+	Sat,  2 Mar 2024 11:52:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.219])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E2E15E9C;
-	Sat,  2 Mar 2024 11:23:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.219
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8B6E10A21;
+	Sat,  2 Mar 2024 11:52:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709378633; cv=none; b=Szf5GvlJCYKrixjE7f6VrBPqiyYN8tjcqRsD5FGGPEn6vus3QMqLDxpuB0RvW1uqPLRKSzBMQhjnUZu2B8Buk1wfV+9Fj4PaOWriuq6kTeNvQr8HRehTt1V77GEUgWpVNMisXBzp1Ralf9wMIshU8GeXfTMOMMHyeXZTcI/3HJ8=
+	t=1709380373; cv=none; b=nVOkQkEa/VEKIkwMcX8vwLNgpb0U0E8CRKLYjHfrbw0XH+AjgqKJ4oFaiTcIlj7f49vzJjfCK9sZL5XdLuArjeLKcrCMzCpLh/VHa2nhhne/sni+vtyuSrErSBCosqXBgjTBmGEtBuoiBiI0Rs23KEEAoG5MK/Mo0GfZ8TnfqiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709378633; c=relaxed/simple;
-	bh=vz0STiFuGpGIPB7MVHeAstWUf1yFWHgemuVe+gtmqWU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=czsRsQS0MPzjYJLmaGMkd+wuNivq6/0Qigw8pltkodyyViBevIfr4+JEA7OJ8Sw2eil3kGl3y3nxy8jDlHc/CG1x6iJu0uBxck+g1LaTmE+WxA+LoDkYUx8QpjQ9ZBpr36j50bi43pNG3kKVEMb1MxzLpNqnacMv0F9wRWOlhBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ITZAyO9M; arc=none smtp.client-ip=45.254.50.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=txL5b
-	BbeQ7LPGE1ean4mj7MJFW+6ma0NRx/geVN9Ohg=; b=ITZAyO9Mi5oRSYWvIU5Cj
-	ouxPJsiPzLkYVzJpaNC5ncmbR9bMxeh+e9Lrg9upHMdaxL5SZvrKpb2cqaqROQyZ
-	UZkd9luMTsi9zgpKxe1YSSs0HuoX/VDNnm8WsmkwmcAczWGr64yY9+Zn49Sme1Ah
-	nXrIlsSfjWo0GUpZ2nlpb0=
-Received: from hpl-virtual-machine.. (unknown [117.173.176.146])
-	by gzga-smtp-mta-g0-5 (Coremail) with SMTP id _____wD3H9nlC+NloshVFA--.24235S2;
-	Sat, 02 Mar 2024 19:22:13 +0800 (CST)
-From: He Peilin <peilinhe2020@163.com>
-To: rostedt@goodmis.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	he.peilin@zte.com.cn,
-	jiang.xuexin@zte.com.cn,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	liu.chun2@zte.com.cn,
-	mhiramat@kernel.org,
-	netdev@vger.kernel.org,
-	xu.xin16@zte.com.cn,
-	yang.yang29@zte.com.cn,
-	zhang.yunkai@zte.com.cn
-Subject: Re: Re: [PATCH] net/ipv4: add tracepoint for icmp_send
-Date: Sat,  2 Mar 2024 06:22:12 -0500
-Message-Id: <20240302112212.8962-1-peilinhe2020@163.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240227090705.1ed08b64@gandalf.local.home>
-References: <20240227090705.1ed08b64@gandalf.local.home>
+	s=arc-20240116; t=1709380373; c=relaxed/simple;
+	bh=8xHNwMMQvUphpw7xYtBL3c+lR7+sHEAbXvlGd+ihcF4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OIe/CkqD6etmlHc9ThNC/lhB9detF15EOOP/1nUbQuMaAei5ST8Ad9Mn1hU04jBqgNvSb0HSj6sqtPPICyj/Z+OBA87zK2/nh+XWP1e3zrIBjDjdWCMO+acOFbDHqoDPjt5Fd3gGu7Qvi4+pO3U4wPN3wFp/MqG6yPmEZK3pck4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1rgNuz-00027B-Jh; Sat, 02 Mar 2024 12:52:41 +0100
+Date: Sat, 2 Mar 2024 12:52:41 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Lena Wang =?utf-8?B?KOeOi+WonCk=?= <Lena.Wang@mediatek.com>,
+	"fw@strlen.de" <fw@strlen.de>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"kadlec@netfilter.org" <kadlec@netfilter.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>
+Subject: Re: [PATCH net v2] netfilter: Add protection for bmp length out of
+ range
+Message-ID: <20240302115241.GA7494@breakpoint.cc>
+References: <d2b63acc5cd76db46132eb6ebd106f159fc5132d.camel@mediatek.com>
+ <ZeL1_-Pdq6Kw0NIO@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3H9nlC+NloshVFA--.24235S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxAw4fWFWUur43WF4kGr43trb_yoW5AF15pF
-	1DAFZYgFZ7Jr47uw1Svw1ft3ZIv348uryUKr42ga4jk3Z2yr1xJr4qgr90kF95Ars0kryY
-	vF42v3sxG3WYqrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jf0ePUUUUU=
-X-CM-SenderInfo: xshlzxhqkhjiisq6il2tof0z/1tbiGAuVsWVOBFnVRQAAsR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZeL1_-Pdq6Kw0NIO@calendula>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-> >  include/trace/events/icmp.h | 57 +++++++++++++++++++++++++++++++++++++++++++++
-> >  net/ipv4/icmp.c             |  4 ++++
-> >  2 files changed, 61 insertions(+)
-> >  create mode 100644 include/trace/events/icmp.h
-> > 
-> > diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
-> > new file mode 100644
-> > index 000000000000..3d9af5769bc3
-> > --- /dev/null
-> > +++ b/include/trace/events/icmp.h
-> > @@ -0,0 +1,57 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +#undef TRACE_SYSTEM
-> > +#define TRACE_SYSTEM icmp
-> > +
-> > +#if !defined(_TRACE_ICMP_H) || defined(TRACE_HEADER_MULTI_READ)
-> > +#define _TRACE_ICMP_H
-> > +
-> > +#include <linux/icmp.h>
-> > +#include <linux/tracepoint.h>
-> > +
-> > +TRACE_EVENT(icmp_send,
-> > +
-> > +		TP_PROTO(const struct sk_buff *skb, int type, int code),
-> > +
-> > +		TP_ARGS(skb, type, code),
-> > +
-> > +		TP_STRUCT__entry(
-> > +				__field(__u16, sport)
+Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+> > +	if (f->sz > 32)
+> > +		return H323_ERROR_RANGE;
 > 
-> 2 bytes
-> 
-> > +				__field(__u16, dport)
-> 
-> 2 bytes
-> 
-> > +				__field(unsigned short, ulen)
-> 
-> 2 bytes
-> 
-> [ 2 byte hole for alignment ]
-> 
-> > +				__field(const void *, skbaddr)
-> 
-> 4/8 bytes
-> 
-> It's best to keep the holes at the end of the TP_STRUCT__entry().
-> 
-> That is, I would move ulen to the end of the structure. It doesn't affect
-> anything else.
-> 
-> -- Steve
-Thank you for pointing that out. The next step is to move __field(unsigned short, ulen) to the end of TP_STRUCT__entry().
+> Could you possibly place this in get_bitmap()? IIRC these are the only
+> two calls to this function.
 
-> 
-> > +				__field(int, type)
-> > +				__field(int, code)
-> > +				__array(__u8, saddr, 4)
-> > +				__array(__u8, daddr, 4)
-> > +		),
-> > +
-> > +		TP_fast_assign(
-> > +				// Get UDP header
-> > +				struct udphdr *uh = udp_hdr(skb);
-> > +				struct iphdr *iph = ip_hdr(skb);
-> > +				__be32 *p32;
-> > +
-> > +				__entry->sport = ntohs(uh->source);
-> > +				__entry->dport = ntohs(uh->dest);
-> > +				__entry->ulen = ntohs(uh->len);
-> > +				__entry->skbaddr = skb;
-> > +				__entry->type = type;
-> > +				__entry->code = code;
-> > +
-> > +				p32 = (__be32 *) __entry->saddr;
-> > +				*p32 = iph->saddr;
-> > +
-> > +				p32 = (__be32 *) __entry->daddr;
-> > +				*p32 =  iph->daddr;
-> > +		),
-> > +
-> > +		TP_printk("icmp_send: type=%d, code=%d. From %pI4:%u to %pI4:%u ulen=%d skbaddr=%p",
-> > +			__entry->type, __entry->code,
-> > +			__entry->saddr, __entry->sport, __entry->daddr,
-> > +			__entry->dport, __entry->ulen, __entry->skbaddr)
-> > +);
-> > +
-> > +#endif /* _TRACE_ICMP_H */
-> > +
-> > +/* This part must be outside protection */
-> > +#include <trace/define_trace.h>
-> > diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-> > index e63a3bf99617..437bdb7e2650 100644
-> > --- a/net/ipv4/icmp.c
-> > +++ b/net/ipv4/icmp.c
-> > @@ -92,6 +92,8 @@
-> >  #include <net/inet_common.h>
-> >  #include <net/ip_fib.h>
-> >  #include <net/l3mdev.h>
-> > +#define CREATE_TRACE_POINTS
-> > +#include <trace/events/icmp.h>
-> > 
-> >  /*
-> >   *	Build xmit assembly blocks
-> > @@ -599,6 +601,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
-> >  	struct net *net;
-> >  	struct sock *sk;
-> > 
-> > +	trace_icmp_send(skb_in, type, code);
-> > +
-> >  	if (!rt)
-> >  		goto out;
-> >  
-
+How would you signal the error?  I think this patch is fine as-is.
 
