@@ -1,90 +1,264 @@
-Return-Path: <netdev+bounces-76771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D881886EE2C
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 03:45:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 363BE86EE3D
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 03:59:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70551B24416
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 02:45:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2296F1C20C62
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 02:59:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B284C384;
-	Sat,  2 Mar 2024 02:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98286AD6;
+	Sat,  2 Mar 2024 02:59:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOG4lS83"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="OH5lXw0L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4CE7489
-	for <netdev@vger.kernel.org>; Sat,  2 Mar 2024 02:45:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8A3110A
+	for <netdev@vger.kernel.org>; Sat,  2 Mar 2024 02:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709347529; cv=none; b=ZweerKqX2V8pOQTVS1ZciUwqbWVUgaWNJ5+K/TcLBBYXT2vemN6Kh4YUUm7lShKo0esgvNIY5eN0/HqTP+vSvtUlDA+vqYgGfugMVwJ822bTm13RY9JHO+HRIT7yiaAqEkO4ag1gPOaKEAaj60bSBL5DYbmXB+yBoSIzuW/FewM=
+	t=1709348374; cv=none; b=ZUAzoELAhWvTJNOoExWWD0Pv45kIF6PsAIuoI0VhqOf3ihA+96X0V192siVa1CE/bQMs36XknEVMY/zQs6ilDad1YMR0SQTf7xJovC9JL6Fn3PJ+BiN58BmKzS0aEZ1TDjvV0ZmdteU5nJ+Gjf1+tezkQ7qICSgj9FBeriYOUZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709347529; c=relaxed/simple;
-	bh=rKXLQnMKbF0M34iUUqa8hY7lC1O2aT46MrNGMq0lmcg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=grNyvMuySqdGgn2Bl2IvVjZPqIgBGZybaMmOc7uuRqqdDHt7XlsbLe1lcHXJV2/OYHrfA7FfjWP4zXalrk6p8Ba0b6v6yJMBLU2cKu0giit1zlg9h3TFj14IFGJpkyT/td1AV4W1GkCxgLJG/QpNHcfOOAdZ7oWK5tLuJJzND40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOG4lS83; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77542C433C7;
-	Sat,  2 Mar 2024 02:45:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709347529;
-	bh=rKXLQnMKbF0M34iUUqa8hY7lC1O2aT46MrNGMq0lmcg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=oOG4lS83DjlgxhXwCcJlQKwaVcSlagxpKTEZf2SKKL3hbHoNHr6Pcj7M3T+ylBiQF
-	 h/vpaXn6Ed2r1azyMetsc+Qr64VdhBqQTKw5xxz/xAl5Gaok6N4QowOh5UrCT7AjAp
-	 6NnNrd9+rY4W3Eo2mZXTmm5/+uGC/4inA0mFYtd9d2zNWtPvM2syNaU5t79gpW5P0t
-	 QYxkKAqxjwPtXV/pbeqDRWBsrBlW8hQA4KeUOlRBIUzTjhHeJhMzEPAH8c8ZV8iTHv
-	 N1QbjCCAbGGbA4F/Go22xt6ST2Ea0f+BMQEEocfRlWwjvwYFLDBsxCHN0VKhODsTN6
-	 HFtA5toKQdyIA==
-Message-ID: <ce6e8ffa-c4c6-4080-a54f-7acc4371c81d@kernel.org>
-Date: Fri, 1 Mar 2024 19:45:27 -0700
+	s=arc-20240116; t=1709348374; c=relaxed/simple;
+	bh=PJojuRK2UQ2s1juHjnuAteI986hOH8f8iIypONHM95s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BdP9L/1O5w55PkXP9tb3VHXwvYSClUGzbDeWPKJgbv7PS+w3G4S+ET4iBIEjJy+DVlYjoo9IU7dXPcwRih8rX7/0e9MW8DxbSG8Rde3TdHEeQq2LaZcuMqfl2W/3VcFGb4LMlvE0cHGNrKCGpfAMG1w2Z6FK7a2kSOFCyyAsARE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=OH5lXw0L; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-608342633b8so28420347b3.1
+        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 18:59:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1709348371; x=1709953171; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1U/Hzl/nP419sc3U29JHguCJujbZDse52KbGi5DVDrc=;
+        b=OH5lXw0LWXkNEH/2rIyyru+ZGLgZkF8WpiA9NzxPNjrB8RPeEn/FcfoXOiyRy31Q7g
+         ZWu6mpOc48uLm5UAC1WVWorRBAN+iIA+ttyldFeYYULESq3FjMVo8cLVyqUxncaBRNpm
+         mdmvydzepjVCEtHQCha66akEW8D9tjfRqUbopiFg34AtEn87gmfDLFT2XSe46SY7uW4Q
+         XmlKm7L7sII+cxnmdaUlxUxQP523baesXcM3KnUGV0De46Xen3KRSkfzcN97VntNgbG5
+         h8AWa1FK2zx6OEvHa7ZUMKeexnUCs2jI62hNszNabur/D9UATHB+mK2QqEvpwhR+vyuO
+         VHJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709348371; x=1709953171;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1U/Hzl/nP419sc3U29JHguCJujbZDse52KbGi5DVDrc=;
+        b=GkUk8NraS6HLBZEJG+z4lPjEE/6tDcwdnB9bODsBniq9OFOYdLE73Z2o8vKnn0eWNu
+         QbbJP6IYE78ZnTTwIdb/4f+qn/2vVNkbygRk8YdRv0vXNvwXrvTAAudxlEnxvihvI+ky
+         Hv6Mb3ZMxTGxdiW/iaMCMsw0LP7ge2N5U2lGSZXY3ry5UPj4laAJUePoUuMGbWi2SndR
+         VjlDFEybSlMX2Ox1KFvjZOV83+E+MB/N7uHgcqWEV8o2QdsYDDC8uAE6S3hHZW6t1hN8
+         yHMBpIdvsU6yS5rKxq4UKmw4MQSNMhICztUVE1pTl3dyXehqI5Rz/w87Js7B/580ZSvr
+         9GaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWTuYLL8nlEk2CWQOGMD2tOn9kzKrWfeM0MH2Jr2//guqWVc3WTN7EvhtZ10uvrrATKTvRWpUKyGKyaMH+hBDV8zdM6BmYd
+X-Gm-Message-State: AOJu0YyISX9cXhvS7mtPCaRkdhOSwv/cA3M5KVs2Eeai5WwUOa9aH8K4
+	B5VEX/QxgTJ5TEou1YOdiQfXCNEjs71Cmc3b7tm5yeIzSxwBwTs6HPgQmlsV9AAlNLIZd+Vx9Ic
+	OvVvlzzYS1XaTw9h0ukpzsAfLohCENNdxKDLO
+X-Google-Smtp-Source: AGHT+IGNuTlZO1FU43f2kK2IQYwty1kYNM0qJOpZKVlBIoqgV07eXIe9AKuixCD/d7kWGfXWGSlEkPglT+LYutW4KxM=
+X-Received: by 2002:a05:690c:398:b0:609:3c37:a624 with SMTP id
+ bh24-20020a05690c039800b006093c37a624mr4151017ywb.35.1709348371514; Fri, 01
+ Mar 2024 18:59:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 4/7] net: nexthop: Expose nexthop group stats
- to user space
-Content-Language: en-US
+References: <20240225165447.156954-1-jhs@mojatatu.com> <b28f2f7900dc7bad129ad67621b2f7746c3b2e18.camel@redhat.com>
+ <CO1PR11MB49931E501B20F32681F917CD935F2@CO1PR11MB4993.namprd11.prod.outlook.com>
+ <65e106305ad8b_43ad820892@john.notmuch> <CAM0EoM=r1UDnkp-csPdrz6nBt7o3fHUncXKnO7tB_rcZAcbrDg@mail.gmail.com>
+ <CAOuuhY8qbsYCjdUYUZv8J3jz8HGXmtxLmTDP6LKgN5uRVZwMnQ@mail.gmail.com>
+ <20240301090020.7c9ebc1d@kernel.org> <CAM0EoM=-hzSNxOegHqhAQD7qoAR2CS3Dyh-chRB+H7C7TQzmow@mail.gmail.com>
+ <20240301173214.3d95e22b@kernel.org>
+In-Reply-To: <20240301173214.3d95e22b@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 1 Mar 2024 21:59:20 -0500
+Message-ID: <CAM0EoM=NEB25naGtz=YaOt6BDoiv4RpDw27Y=btMZAMGeYB5bg@mail.gmail.com>
+Subject: Hardware Offload discussion WAS(Re: [PATCH net-next v12 00/15]
+ Introducing P4TC (series 1)
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
- Simon Horman <horms@kernel.org>, mlxsw@nvidia.com
-References: <cover.1709217658.git.petrm@nvidia.com>
- <223614cb8fbe91c6050794762becdd9a3c3b689a.1709217658.git.petrm@nvidia.com>
- <148968b2-6d8e-476b-afee-5f1b15713c7e@kernel.org>
- <20240301092813.4cb44934@kernel.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240301092813.4cb44934@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Cc: Tom Herbert <tom@sipanda.io>, John Fastabend <john.fastabend@gmail.com>, 
+	"Singhai, Anjali" <anjali.singhai@intel.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>, "Chatterjee, Deb" <deb.chatterjee@intel.com>, 
+	"Limaye, Namrata" <namrata.limaye@intel.com>, Marcelo Ricardo Leitner <mleitner@redhat.com>, 
+	"Shirshyad, Mahesh" <Mahesh.Shirshyad@amd.com>, "Jain, Vipin" <Vipin.Jain@amd.com>, 
+	"Osinski, Tomasz" <tomasz.osinski@intel.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>, 
+	Khalid Manaa <khalidm@nvidia.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Victor Nogueira <victor@mojatatu.com>, 
+	"Tammela, Pedro" <pctammela@mojatatu.com>, "Daly, Dan" <dan.daly@intel.com>, 
+	Andy Fingerhut <andy.fingerhut@gmail.com>, "Sommers, Chris" <chris.sommers@keysight.com>, 
+	Matty Kadosh <mattyk@nvidia.com>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/1/24 10:28 AM, Jakub Kicinski wrote:
-> On Fri, 1 Mar 2024 08:45:52 -0700 David Ahern wrote:
->>> +	/* uint; number of packets forwarded via the nexthop group entry */  
->>
->> why not make it a u64?
-> 
-> I think it should be our default type. Explicit length should only 
-> be picked if there's a clear reason. Too many review cycles wasted
-> steering people onto correct types...
-> 
-> Now, I'm not sure Pablo merged the sint/uint support into libmnl,
-> I can share the patches to handle them in iproute2, if that helps.
-> Or just copy/paste from YNL.
-> 
-> I need to find the courage to ask you how we can start using YNL
-> in iproute2, I really worry that we're not getting CLI tools written
-> for new families any more :(
+On Fri, Mar 1, 2024 at 8:32=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Fri, 1 Mar 2024 12:39:56 -0500 Jamal Hadi Salim wrote:
+> > On Fri, Mar 1, 2024 at 12:00=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
+> wrote:
+> > > > Pardon my ignorance, but doesn't P4 want to be compiled to a backen=
+d
+> > > > target? How does going through TC make this seamless?
+> > >
+> > > +1
+> >
+> > I should clarify what i meant by "seamless". It means the same control
+> > API is used for s/w or h/w. This is a feature of tc, and is not being
+> > introduced by P4TC. P4 control only deals with Match-action tables -
+> > just as TC does.
+>
+> Right, and the compiled P4 pipeline is tacked onto that API.
+> Loading that presumably implies a pipeline reset. There's
+> no precedent for loading things into TC resulting a device
+> datapath reset.
 
-I need to find time to play around with the cli tool more; my attempts
-last weekend were a bit rough hunting for the right syntax.
+Ive changed the subject to reflect this discussion is about h/w
+offload so we dont drift too much from the intent of the patches.
+
+AFAIK, all these devices have some HA built in to do program
+replacement. i.e. afaik, no device reset.
+I believe the tofino switch in the earlier generations may have needed
+resets which caused a few packet drops in a live environment update.
+Granted there may be devices (not that i am aware) that may not be
+able to do HA. All this needs to be considered for offloads.
+
+> > > My intuition is that for offload the device would be programmed at
+> > > start-of-day / probe. By loading the compiled P4 from /lib/firmware.
+> > > Then the _device_ tells the kernel what tables and parser graph it's
+> > > got.
+> >
+> > BTW: I just want to say that these patches are about s/w - not
+> > offload. Someone asked about offload so as in normal discussions we
+> > steered in that direction. The hardware piece will require additional
+> > patchsets which still require discussions. I hope we dont steer off
+> > too much, otherwise i can start a new thread just to discuss current
+> > view of the h/w.
+> >
+> > Its not the device telling the kernel what it has. Its the other way ar=
+ound.
+>
+> Yes, I'm describing how I'd have designed it :) If it was the same
+> as what you've already implemented - why would I be typing it into
+> an email.. ? :)
+>
+
+I think i misunderstood you and thought I needed to provide context.
+The P4 pipelines are meant to be able to be re-programmed multiple
+times in a live environment. IOW, I should be able to delete/create a
+pipeline while another is running. Some hardware may require that the
+parser is shared etc, but you can certainly replace the match action
+tables or add an entirely new logic. In any case this is all still
+under discussion and can be further refined.
+
+> > From the P4 program you generate the s/w (the ebpf code and other
+> > auxillary stuff) and h/w pieces using a compiler.
+> > You compile ebpf, etc, then load.
+>
+> That part is fine.
+>
+> > The current point of discussion is the hw binary is to be "activated"
+> > through the same tc filter that does the s/w. So one could say:
+> >
+> > tc filter add block 22 ingress protocol all prio 1 p4 pname simple_l3
+> > \
+> >    prog type hw filename "simple_l3.o" ... \
+> >    action bpf obj $PARSER.o section p4tc/parser \
+> >    action bpf obj $PROGNAME.o section p4tc/main
+> >
+> > And that would through tc driver callbacks signal to the driver to
+> > find the binary possibly via  /lib/firmware
+> > Some of the original discussion was to use devlink for loading the
+> > binary - but that went nowhere.
+>
+> Back to the device reset, unless the load has no impact on inflight
+> traffic the loading doesn't belong in TC, IMO. Plus you're going to
+> run into (what IIRC was Jiri's complaint) that you're loading arbitrary
+> binary blobs, opaque to the kernel.
+>
+
+And you said at that time binary blobs are already a way of life.
+Let's take DDP as a use case:  They load the firmware (via ethtool)
+and we were recently discussing whether they should use flower or u32
+etc.  I would say this is in the same spirit. Doing ethtool may be a
+bit disconnected. But that is up for discussion as well.
+There has been concern that we need to have some authentication in
+some of the discussions. Is that what you mean?
+
+> > Once you have this in place then netlink with tc skip_sw/hw. This is
+> > what i meant by "seamless"
+> >
+> > > Plus, if we're talking about offloads, aren't we getting back into
+> > > the same controversies we had when merging OvS (not that I was around=
+).
+> > > The "standalone stack to the side" problem. Some of the tables in the
+> > > pipeline may be for routing, not ACLs. Should they be fed from the
+> > > routing stack? How is that integration going to work? The parsing
+> > > graph feels a bit like global device configuration, not a piece of
+> > > functionality that should sit under sub-sub-system in the corner.
+> >
+> > The current (maybe i should say initial) thought is the P4 program
+> > does not touch the existing kernel infra such as fdb etc.
+>
+> It's off to the side thing. Ignoring the fact that *all*, networking
+> devices already have parsers which would benefit from being accurately
+> described.
+>
+
+I am not following this point.
+
+> > Of course we can model the kernel datapath using P4 but you wont be
+> > using "ip route add..." or "bridge fdb...".
+> > In the future, P4 extern could be used to model existing infra and we
+> > should be able to use the same tooling. That is a discussion that
+> > comes on/off (i think it did in the last meeting).
+>
+> Maybe, IDK. I thought prevailing wisdom, at least for offloads,
+> is to offload the existing networking stack, and fill in the gaps.
+> Not build a completely new implementation from scratch, and "integrate
+> later". Or at least "fill in the gaps" is how I like to think.
+>
+> I can't quite fit together in my head how this is okay, but OvS
+> was not allowed to add their offload API. And what's supposed to
+> be part of TC and what isn't, where you only expect to have one
+> filter here, and create a whole new object universe inside TC.
+>
+
+I was there.
+Ovs matched what tc already had functionally, 10 years after tc
+existed, and they were busy rewriting what tc offered. So naturally we
+pushed for them to use what TC had. You still need to write whatever
+extensions needed into the kernel etc in order to support what the
+hardware can offer.
+
+I hope i am not stating the obvious: P4 provides a more malleable
+approach. Assume a blank template in h/w and s/w and where you specify
+what you need then both the s/w and hardware support it. Flower is
+analogous to a "fixed pipeline" meaning you can extend flower by
+changing the kernel and datapath. Often it is not covering all
+potential hw match actions engines and often we see patches to do one
+more thing requiring more kernel changes.  If you replace flower with
+P4 you remove the need to update the kernel, user space etc for the
+same features that flower needs to be extended for today. You just
+tell the compiler what you need (within hardware capacity of course).
+So i dont see P4 as "offload the existing kernel infra aka flower" but
+rather remove the limitations that flower constrains us with today. As
+far as other kernel infra (fdb etc), that can be added as i stated -
+it is just not a starting point.
+
+cheers,
+jamal
+
+
+> But that's just my opinions. The way things work we may wake up one
+> day and find out that Dave has applied this :)
 
