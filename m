@@ -1,46 +1,45 @@
-Return-Path: <netdev+bounces-76795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7543686EF0C
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 08:10:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FBF186EF14
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 08:23:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E110285F2C
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 07:10:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9E3D1F225D7
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 07:23:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0FB12B8D;
-	Sat,  2 Mar 2024 07:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262C91171D;
+	Sat,  2 Mar 2024 07:23:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SWrCkBza"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JV1ysydK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B982A12B81
-	for <netdev@vger.kernel.org>; Sat,  2 Mar 2024 07:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0291C749F
+	for <netdev@vger.kernel.org>; Sat,  2 Mar 2024 07:23:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709363435; cv=none; b=RAdn8eRQLzr6UP013RLpOD7gY5kkpI1gaD6QWIMpuXtjihyjzdpM7Sl5V0t0lBF1K1w+1zZaZzScbxDHguoFg7SyMAGz2Hb1yJ8C/dqkgFvDAw7oOu+keFtvFGSc+uiU04cRKTzJnmluSbpzMU1Ya79u/1Sm3Elra0fqtSDDNHE=
+	t=1709364196; cv=none; b=Ef8pPYArBlN9lm2VKjJKfqQs5+lrnx1KgcFQYBdN25gWQijuUSTU1C2LB+DkFK5VHGKFiYBwWF/7T6/H3vAcV44NDGiBy6J5Scr/eEOVWEQCE71HVzluJuAEFRbFsNdZNsUt9MUTWMgEcKXJiPl83rAvuk8jqQfiYXoOWti7D9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709363435; c=relaxed/simple;
-	bh=QILZuWBaR8rQwjMtzDdN+jV8tsTG/BqqLdc5vEV3Ne0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aPsub/VJo5asALHbTbAHy2oOUjZ/U/wIYw2k2DHrLgVFzDi6f6+pwywllr19TwsUcW2HCIAbgNjKnDT6XA21Age38lX3IraGi5B4GdJDHRGdX/2ev3p3nyby33isOy6DEh3Y0bht2+3EzrvyqJUQtkfLROovlUsbJtTknu75C5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SWrCkBza; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EACFC43390;
-	Sat,  2 Mar 2024 07:10:35 +0000 (UTC)
+	s=arc-20240116; t=1709364196; c=relaxed/simple;
+	bh=PmzYu8WLjpFuzH+FjJLfxa0LUyWc2VkNyRvipjUskv0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jSuxi7C7J2oZRxXFCXTjggDdy9uDWgD1eegvouLkkUU8fW/+NUHpVmbWW+IfupTKFtZU8/aWqAExLUo7QRiy4aepzQ55LgojJZB7uGlzH3o6eaPtjxkZ1a7zuoeRC41AF+PJ/zVxMwr+OqK0lZzqmNrVNVyochiM3/k2qDMn5mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JV1ysydK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F38EC433C7;
+	Sat,  2 Mar 2024 07:23:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709363435;
-	bh=QILZuWBaR8rQwjMtzDdN+jV8tsTG/BqqLdc5vEV3Ne0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SWrCkBza8x1/GEWNWBFKUkcYUu4akpvap1p2DVTBbHNi2S0t131ph78Ubrcp28Qbb
-	 a9d6Ntzny3vd6QxcoTVYHVnn9BrdMCJr6Skb/MAeCRaQ5arBXuZJ7XbhbIkYNus/Ru
-	 s5GQAgfXLKrQj94iLjIk/UeAjggWVptHKJAGQv6vj22ZglekBhujcnzlBPBQ0X3LKe
-	 CVOI1QEDje8BXhwc5V3GUTzvSWZ3UwKG1IDmmtx0FprNwEsp/HbzB1NrVQI8UAqTgn
-	 4CLOPG+7ZZfVTr6lOcDF2U/I+BovY1wRhrhoIpQHJ7c/jNRp0JxHZCShmbYVYP3ANA
-	 NIBtYlKI2UaoQ==
+	s=k20201202; t=1709364195;
+	bh=PmzYu8WLjpFuzH+FjJLfxa0LUyWc2VkNyRvipjUskv0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JV1ysydKDfax0tAuGVLqHNn7D0oxcxDh05u8oqehVN0633pU8kZouiKxeLwOs9noG
+	 b+PmE619moaaS1egYL0nXaDbREuLdIBEfkTC83D658TXl0y/ottrr3vr8qcAJWeaIS
+	 qe1zfqHI58/SN1Cn9Kma3VtFBROfAUteiYhinzVrRsTJhEWYG1C6X9P2AnZZSX8zLU
+	 7Y0/eN819Ys7fwJkcx655LBK80S0fek0f+SA22hIcU5A5gStMjw0AQu02tc8gEJ5kB
+	 WsFJ8vsE+rikRWD3KSeXfDPmwRVgJjEU7yRA9sYRgJz1QF53rwcB9O+r1LZt82Kw7o
+	 e3vtp97uFW19Q==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -51,14 +50,14 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Vadim Fedorenko <vadfed@meta.com>
-Subject: [net V2 9/9] net/mlx5e: Switch to using _bh variant of of spinlock API in port timestamping NAPI poll context
-Date: Fri,  1 Mar 2024 23:10:28 -0800
-Message-ID: <20240302071028.63879-4-saeed@kernel.org>
+	sridhar.samudrala@intel.com,
+	Jay Vosburgh <jay.vosburgh@canonical.com>,
+	Jiri Pirko <jiri@nvidia.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [pull request][net-next V4 00/15] mlx5 socket direct (Multi-PF)
+Date: Fri,  1 Mar 2024 23:22:30 -0800
+Message-ID: <20240302072246.67920-1-saeed@kernel.org>
 X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240302070318.62997-1-saeed@kernel.org>
-References: <20240302070318.62997-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,66 +66,139 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-The NAPI poll context is a softirq context. Do not use normal spinlock API
-in this context to prevent concurrency issues.
+Support Socket-Direct multi-dev netdev.
 
-Fixes: 3178308ad4ca ("net/mlx5e: Make tx_port_ts logic resilient to out-of-order CQEs")
-Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-CC: Vadim Fedorenko <vadfed@meta.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+V4:
+- Improve documentation for better user observability and understanding
+  of the feature, in terms of queues and their expected NUMA/CPU/IRQ
+  affinity.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-index 078f56a3cbb2..ca05b3252a1b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-@@ -42,9 +42,9 @@ mlx5e_ptp_port_ts_cqe_list_add(struct mlx5e_ptp_port_ts_cqe_list *list, u8 metad
- 
- 	WARN_ON_ONCE(tracker->inuse);
- 	tracker->inuse = true;
--	spin_lock(&list->tracker_list_lock);
-+	spin_lock_bh(&list->tracker_list_lock);
- 	list_add_tail(&tracker->entry, &list->tracker_list_head);
--	spin_unlock(&list->tracker_list_lock);
-+	spin_unlock_bh(&list->tracker_list_lock);
- }
- 
- static void
-@@ -54,9 +54,9 @@ mlx5e_ptp_port_ts_cqe_list_remove(struct mlx5e_ptp_port_ts_cqe_list *list, u8 me
- 
- 	WARN_ON_ONCE(!tracker->inuse);
- 	tracker->inuse = false;
--	spin_lock(&list->tracker_list_lock);
-+	spin_lock_bh(&list->tracker_list_lock);
- 	list_del(&tracker->entry);
--	spin_unlock(&list->tracker_list_lock);
-+	spin_unlock_bh(&list->tracker_list_lock);
- }
- 
- void mlx5e_ptpsq_track_metadata(struct mlx5e_ptpsq *ptpsq, u8 metadata)
-@@ -155,7 +155,7 @@ static void mlx5e_ptpsq_mark_ts_cqes_undelivered(struct mlx5e_ptpsq *ptpsq,
- 	struct mlx5e_ptp_metadata_map *metadata_map = &ptpsq->metadata_map;
- 	struct mlx5e_ptp_port_ts_cqe_tracker *pos, *n;
- 
--	spin_lock(&cqe_list->tracker_list_lock);
-+	spin_lock_bh(&cqe_list->tracker_list_lock);
- 	list_for_each_entry_safe(pos, n, &cqe_list->tracker_list_head, entry) {
- 		struct sk_buff *skb =
- 			mlx5e_ptp_metadata_map_lookup(metadata_map, pos->metadata_id);
-@@ -170,7 +170,7 @@ static void mlx5e_ptpsq_mark_ts_cqes_undelivered(struct mlx5e_ptpsq *ptpsq,
- 		pos->inuse = false;
- 		list_del(&pos->entry);
- 	}
--	spin_unlock(&cqe_list->tracker_list_lock);
-+	spin_unlock_bh(&cqe_list->tracker_list_lock);
- }
- 
- #define PTP_WQE_CTR2IDX(val) ((val) & ptpsq->ts_cqe_ctr_mask)
--- 
-2.44.0
+V3:
+- Fix documentation per Jakubs feedback.
+- Fix typos
+- Link new documentation in the networking index.rst
 
+V2:
+- Add documentation in a new patch.
+- Add debugfs in a new patch.
+- Add mlx5_ifc bit for MPIR cap check and use it before query.
+
+For more information please see tag log below.
+
+Please pull and let me know if there is any problem.
+
+Thanks,
+Saeed.
+
+
+The following changes since commit e960825709330cb199d209740326cec37e8c419d:
+
+  Merge branch 'inet_dump_ifaddr-no-rtnl' (2024-03-01 11:09:40 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-socket-direct-v3
+
+for you to fetch changes up to 63b64788540b36113c80b2718a8ca6cb40d2201a:
+
+  Documentation: networking: Add description for multi-pf netdev (2024-03-01 23:19:34 -0800)
+
+----------------------------------------------------------------
+Support Multi-PF netdev (Socket Direct)
+
+This series adds support for combining multiple devices (PFs) of the
+same port under one netdev instance. Passing traffic through different
+devices belonging to different NUMA sockets saves cross-numa traffic and
+allows apps running on the same netdev from different numas to still
+feel a sense of proximity to the device and achieve improved
+performance.
+
+We achieve this by grouping PFs together, and creating the netdev only
+once all group members are probed. Symmetrically, we destroy the netdev
+once any of the PFs is removed.
+
+The channels are distributed between all devices, a proper configuration
+would utilize the correct close numa when working on a certain app/cpu.
+
+We pick one device to be a primary (leader), and it fills a special
+role.  The other devices (secondaries) are disconnected from the network
+in the chip level (set to silent mode). All RX/TX traffic is steered
+through the primary to/from the secondaries.
+
+Currently, we limit the support to PFs only, and up to two devices
+(sockets).
+
+V4:
+- Improve documentation for better user observability and understanding
+  of the feature, in terms of queues and their expected NUMA/CPU/IRQ
+  affinity.
+
+V3:
+- Fix documentation per Jakubs feedback.
+- Fix typos
+- Link new documentation in the networking index.rst
+
+V2:
+- Add documentation in a new patch.
+- Add debugfs in a new patch.
+- Add mlx5_ifc bit for MPIR cap check and use it before query.
+
+----------------------------------------------------------------
+Tariq Toukan (15):
+      net/mlx5: Add MPIR bit in mcam_access_reg
+      net/mlx5: SD, Introduce SD lib
+      net/mlx5: SD, Implement basic query and instantiation
+      net/mlx5: SD, Implement devcom communication and primary election
+      net/mlx5: SD, Implement steering for primary and secondaries
+      net/mlx5: SD, Add informative prints in kernel log
+      net/mlx5: SD, Add debugfs
+      net/mlx5e: Create single netdev per SD group
+      net/mlx5e: Create EN core HW resources for all secondary devices
+      net/mlx5e: Let channels be SD-aware
+      net/mlx5e: Support cross-vhca RSS
+      net/mlx5e: Support per-mdev queue counter
+      net/mlx5e: Block TLS device offload on combined SD netdev
+      net/mlx5: Enable SD feature
+      Documentation: networking: Add description for multi-pf netdev
+
+ Documentation/networking/index.rst                 |   1 +
+ Documentation/networking/multi-pf-netdev.rst       | 177 +++++++
+ drivers/net/ethernet/mellanox/mlx5/core/Makefile   |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en.h       |   9 +-
+ .../net/ethernet/mellanox/mlx5/core/en/channels.c  |  10 +-
+ .../net/ethernet/mellanox/mlx5/core/en/channels.h  |   6 +-
+ .../ethernet/mellanox/mlx5/core/en/monitor_stats.c |  48 +-
+ .../net/ethernet/mellanox/mlx5/core/en/params.c    |   9 +-
+ .../net/ethernet/mellanox/mlx5/core/en/params.h    |   3 -
+ drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c   |  12 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/qos.c   |   8 +-
+ .../ethernet/mellanox/mlx5/core/en/reporter_rx.c   |   4 +-
+ .../ethernet/mellanox/mlx5/core/en/reporter_tx.c   |   3 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/rqt.c   | 123 ++++-
+ drivers/net/ethernet/mellanox/mlx5/core/en/rqt.h   |   9 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/rss.c   |  17 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/rss.h   |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/en/rx_res.c    |  62 ++-
+ .../net/ethernet/mellanox/mlx5/core/en/rx_res.h    |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/en/trap.c  |  11 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xsk/pool.c  |   6 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xsk/setup.c |   8 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ktls.c    |   2 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ktls.h    |   4 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c |   6 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c  | 176 +++++--
+ drivers/net/ethernet/mellanox/mlx5/core/en_stats.c |  39 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/lib/devcom.h   |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/lib/mlx5.h |  12 +
+ drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c   | 524 +++++++++++++++++++++
+ drivers/net/ethernet/mellanox/mlx5/core/lib/sd.h   |  38 ++
+ include/linux/mlx5/driver.h                        |   1 +
+ include/linux/mlx5/mlx5_ifc.h                      |   4 +-
+ 34 files changed, 1171 insertions(+), 173 deletions(-)
+ create mode 100644 Documentation/networking/multi-pf-netdev.rst
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/sd.h
 
