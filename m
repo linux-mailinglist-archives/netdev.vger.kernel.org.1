@@ -1,234 +1,227 @@
-Return-Path: <netdev+bounces-76769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32F4086EE1A
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 03:20:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51FC586EE23
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 03:24:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E43E1C211F1
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 02:20:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 838FE287083
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 02:24:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF2487489;
-	Sat,  2 Mar 2024 02:20:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B371B79EA;
+	Sat,  2 Mar 2024 02:24:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipanda-io.20230601.gappssmtp.com header.i=@sipanda-io.20230601.gappssmtp.com header.b="qHJZAlFc"
+	dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b="ndJiAJi0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF767462
-	for <netdev@vger.kernel.org>; Sat,  2 Mar 2024 02:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02DB79CB
+	for <netdev@vger.kernel.org>; Sat,  2 Mar 2024 02:24:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709346050; cv=none; b=uNh/keNQhCDlsidNhVLeIyKgKs/wJn8gOi1oIIazXcPbdDzmAgvkqSIUVIHF4by/8tKJfgZwVn4BGwNcfdeojWJizTtfNscWnye+gqqXea6NwyHvGxpZFExBJ1i3Y2DWCCV0JJsat7Lhc0Lbz2qiAdFlxQchdHMPJk3co/eXt2o=
+	t=1709346274; cv=none; b=ZBPJB1ua8hnoj8hZ56f/aGUViRnjQkwYqzNhl4ogeDOWC2Hwh9eTCebb/evHPx+mnRmqQ9za9LFTF7DHP7aoQA8LUmctuPK9ghlAs+mH08mBvugKAanE7Xi1U1KawY8kBXmolaGdVQlABJzfp3HjH344fuio0Ft4kqBQFokyDA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709346050; c=relaxed/simple;
-	bh=nNUuC81I50TyEXSlAZ66QYvJm6ui8/+1WLOvBBHhSC8=;
+	s=arc-20240116; t=1709346274; c=relaxed/simple;
+	bh=ZbRjRfGgsE7JtMXZ7+GBMuqAIJuCRArBk/R4UQi4fa8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lqyz321QHwHIbVV07+y4lN7qeW+CyJ1ZRm6a6W6C8kBCvp87dTZel9cOAfSXDTPZ7UFRiTUvwje1O2dYQFNgPtR89Ga8IvdFY1L3sp23lEdCjn6TPGtloeEmPFxNQHmfPapPBMOoK+9OVGExcFBSmtmpE+yThLYCDkT4M+M2+pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sipanda.io; spf=pass smtp.mailfrom=sipanda.io; dkim=pass (2048-bit key) header.d=sipanda-io.20230601.gappssmtp.com header.i=@sipanda-io.20230601.gappssmtp.com header.b=qHJZAlFc; arc=none smtp.client-ip=209.85.160.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sipanda.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipanda.io
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-21fa6e04835so894847fac.1
-        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 18:20:48 -0800 (PST)
+	 To:Cc:Content-Type; b=E5QnDjFncTZNW/aIoqBT4sN6xsqa7GzIe2ho7VUl58gcECrvx66v05Hn0FajTCmZVrt3NV4hll1nYyYuFiCbjOPrvGmpt8EB9pDwcCUKRaZNf1951pIhJqkmX1YEDqgyfhNMJ/CETvX/wCPDTqSDm1t6HPYQAfcI+j+pJoZhSH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org; spf=pass smtp.mailfrom=joelfernandes.org; dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b=ndJiAJi0; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=joelfernandes.org
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d27fef509eso36143661fa.3
+        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 18:24:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sipanda-io.20230601.gappssmtp.com; s=20230601; t=1709346048; x=1709950848; darn=vger.kernel.org;
+        d=joelfernandes.org; s=google; t=1709346271; x=1709951071; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=i77Xvo6PHlwMh9HzlSvsJgMugVHF6UjPPPjubRdR2b8=;
-        b=qHJZAlFchAjA4sH76CiJjA30H/TYsU25FetFheQvek+AGGOhvdMXUjxaZvsMBeFh0l
-         wJAHBpXnOJisGiQxg2+PBVhJLGIHkrW5IHePLs+kjdv5Y2W24Q9SE80EeympbbTdeTtx
-         BZXjkZFvYJQsl7kV0WYJ0dHFksCnOhISg//aU58Yd1LyziZPKGmnkpULnO+LAZaM4ysn
-         wtSFIMb1MtxDs/eofOA0HfC/XMnvwf6OlMZetr+hpvee+VVZ9zqHgpUcxpCq8ZwNWCKP
-         MEHbmUXtWGyBya6NmR8RYAx8lrPovSi9QfUtgfxcK9bspj+xHeRuk7V6tYMKC9leAZDS
-         0GEQ==
+        bh=0BPRTmka5fJv1/6kKHd7XoCtkBtwYqpJPZBGmWQG3Mo=;
+        b=ndJiAJi0ZLdzKkVqWLckKAG83dKa+i7ZKFjdJe0u7P+lBwSBg8A9ySV49jg0W+LXCr
+         jhS0IXEegG6x7obSBiB1C5eX0qcVW2NRK7Su0qxhn4iLl1Oix6ukPLVDGNtc5XPDXyrU
+         qgvwY52pPfR9IhbMgXGZvX+1Cn5WkakYmhBQQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709346048; x=1709950848;
+        d=1e100.net; s=20230601; t=1709346271; x=1709951071;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=i77Xvo6PHlwMh9HzlSvsJgMugVHF6UjPPPjubRdR2b8=;
-        b=mUCdq5sgamrUpM7eDKTeqGPH4knvrrqfcXcYseza/Tyoy5qzBUDliL+Hv4+XcuIs7m
-         Lu7ygU8VdM5A8ilgifrqYb8nHWisXe59FLd+moIYOMeAjd3HXgt+MZft3NDE1Zm3Pc9n
-         MrjLGm0zx2DefJqb6FJRgbnkJFuJPXF2ehnBJowzx1JvolW/NPpQS/aJI9KQTnUrVJPx
-         pI6ozjWCPTMCEI+kBeihlJChDrmaJyhxg5zWm+Fmksu8nOi2tyJbl07fkL6Tc8FFZZ5L
-         Z1BWwli26ZkA0Fp3SB31nxZ8zFOZkyUI7ITUImkNr+FWKerZPsxo0EuUHvag+lwYidmf
-         nVDw==
-X-Forwarded-Encrypted: i=1; AJvYcCX2xfkeEcT05rYCzPw8qDugrxOxNKJiYSzL/jRTRVVY+M2M+SGlLwP+tB16xaRJ8un7JzM8ux+w8Zp++6HUwOVMbN4Wx5JI
-X-Gm-Message-State: AOJu0YwqOzyXd8z9CLsDr6AVHlQbGGtnPDEIsYcEnedQCJGw7s0Q0fq2
-	GVSnwFqw1vNRRUuL9lDfa0SwI37ybG7/TyoIPmbDAt8zNuNxpzQCBUsKeus7TpW+vSDA4ujL2uu
-	9RLwJFB5AYlnom82a1n4L1ez44jdtr5nsUcazbg==
-X-Google-Smtp-Source: AGHT+IGxKAMIM/TGlrxWrh6qd7LCPB1amVq6z9F118r/yOfNVwGlXAZy901Q/U5tvAgPF3AGtRUf5ANUCWJ160rIpPc=
-X-Received: by 2002:a05:6871:64f:b0:21e:858f:ec9a with SMTP id
- x15-20020a056871064f00b0021e858fec9amr3255628oan.30.1709346047843; Fri, 01
- Mar 2024 18:20:47 -0800 (PST)
+        bh=0BPRTmka5fJv1/6kKHd7XoCtkBtwYqpJPZBGmWQG3Mo=;
+        b=gtKXnm0WDeQ50XI/F9Y6uOkdWQ+pYYb/7chb6ZyaeSJDjCG121q2aKTYeNFgUWSoDr
+         zCdX9/7yrFHZUnygkWuymihT4rO/AwUdewKC3lgOlI5/I/s/ZrkbH70oM0/BMQfedDTD
+         OL6/0BGI1mrnj74Sfs3t/hzdLQP4bb/6bN1q8uNUpMly0VSj32H64EPMVRtXSM5Bi5Kl
+         ycv1orfWDaOcx4Gqz4u3Wym9DYVxhZtYvzPGXcfJXCWxEJwYrpEPqPmA8IbX8/wFtoON
+         ZwZIkkmHI39HCXhWr7UvDOMGvi1WTr/1QWtSGnaOoL+74rg/oAbYnArrk1+0Ll1Ik+Kg
+         2NAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUb+Qmgks/v5NHzS2B4H8jIMJ1hkpwqoSRTabOG6dV6T3DIq/t+16HtLSqNpiB0/x94/5oZV62MMlCnPRvBarMgnGK14s8G
+X-Gm-Message-State: AOJu0YwINBgve+byomyesYXLgh+BxzAm3Vr1elzDnOIBaBO3pRbHQDpa
+	hxjr+ItUBYZAdfBjeBl9qLxBr24A7m83cA+pfUlAG+WIf+zsPVcPXp1obEUA+SGE4zogIZbEjQV
+	olRdQSA8BvIPyZxz9TxqstfN2ZOTGMK4Gxx72Hg==
+X-Google-Smtp-Source: AGHT+IH98YLZnMxBAG59okgQ+PyTSyL2rsPj7i9rV8TY6srfxIhgylxvaw0NdCb2O9sVvrFMBArv71G6Pgzuxs54Gso=
+X-Received: by 2002:a2e:a688:0:b0:2d2:a9d6:c435 with SMTP id
+ q8-20020a2ea688000000b002d2a9d6c435mr2033116lje.34.1709346270566; Fri, 01 Mar
+ 2024 18:24:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240225165447.156954-1-jhs@mojatatu.com> <b28f2f7900dc7bad129ad67621b2f7746c3b2e18.camel@redhat.com>
- <CO1PR11MB49931E501B20F32681F917CD935F2@CO1PR11MB4993.namprd11.prod.outlook.com>
- <65e106305ad8b_43ad820892@john.notmuch> <CAM0EoM=r1UDnkp-csPdrz6nBt7o3fHUncXKnO7tB_rcZAcbrDg@mail.gmail.com>
- <CAOuuhY8qbsYCjdUYUZv8J3jz8HGXmtxLmTDP6LKgN5uRVZwMnQ@mail.gmail.com>
- <20240301090020.7c9ebc1d@kernel.org> <CAM0EoM=-hzSNxOegHqhAQD7qoAR2CS3Dyh-chRB+H7C7TQzmow@mail.gmail.com>
- <20240301173214.3d95e22b@kernel.org>
-In-Reply-To: <20240301173214.3d95e22b@kernel.org>
-From: Tom Herbert <tom@sipanda.io>
-Date: Fri, 1 Mar 2024 18:20:36 -0800
-Message-ID: <CAOuuhY8fnpEEBb8z-1mQmvHtfZQwgQnXk3=op-Xk108Pts8ohA@mail.gmail.com>
-Subject: Re: [PATCH net-next v12 00/15] Introducing P4TC (series 1)
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, John Fastabend <john.fastabend@gmail.com>, 
-	"Singhai, Anjali" <anjali.singhai@intel.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>, "Chatterjee, Deb" <deb.chatterjee@intel.com>, 
-	"Limaye, Namrata" <namrata.limaye@intel.com>, mleitner@redhat.com, Mahesh.Shirshyad@amd.com, 
-	Vipin.Jain@amd.com, "Osinski, Tomasz" <tomasz.osinski@intel.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, edumazet@google.com, Vlad Buslov <vladbu@nvidia.com>, 
-	horms@kernel.org, khalidm@nvidia.com, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Victor Nogueira <victor@mojatatu.com>, 
-	"Tammela, Pedro" <pctammela@mojatatu.com>, "Daly, Dan" <dan.daly@intel.com>, andy.fingerhut@gmail.com, 
-	"Sommers, Chris" <chris.sommers@keysight.com>, mattyk@nvidia.com, bpf@vger.kernel.org
+References: <55900c6a-f181-4c5c-8de2-bca640c4af3e@paulmck-laptop>
+ <10FC3F5F-AA33-4F81-9EB6-87EB2D41F3EE@joelfernandes.org> <99b2ccae-07f6-4350-9c55-25ec7ae065c0@paulmck-laptop>
+In-Reply-To: <99b2ccae-07f6-4350-9c55-25ec7ae065c0@paulmck-laptop>
+From: Joel Fernandes <joel@joelfernandes.org>
+Date: Fri, 1 Mar 2024 21:24:15 -0500
+Message-ID: <CAEXW_YQ+40a1-hk5ZP+QJ54xniSutosC7MjMscJJy8fen-gU9Q@mail.gmail.com>
+Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
+To: paulmck@kernel.org
+Cc: Steven Rostedt <rostedt@goodmis.org>, Network Development <netdev@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, rcu@vger.kernel.org, 
+	kernel-team <kernel-team@cloudflare.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 1, 2024 at 5:32=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+(Shrinking CC a bit)
+
+On Thu, Feb 29, 2024 at 1:29=E2=80=AFPM Paul E. McKenney <paulmck@kernel.or=
+g> wrote:
+>
+> On Thu, Feb 29, 2024 at 12:41:55PM -0500, Joel Fernandes wrote:
+> > > On Feb 29, 2024, at 11:57=E2=80=AFAM, Paul E. McKenney <paulmck@kerne=
+l.org> wrote:
+> > > =EF=BB=BFOn Thu, Feb 29, 2024 at 09:21:48AM -0500, Joel Fernandes wro=
 te:
->
-> On Fri, 1 Mar 2024 12:39:56 -0500 Jamal Hadi Salim wrote:
-> > On Fri, Mar 1, 2024 at 12:00=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> > > > Pardon my ignorance, but doesn't P4 want to be compiled to a backen=
-d
-> > > > target? How does going through TC make this seamless?
+> > >>> On 2/28/2024 5:58 PM, Paul E. McKenney wrote:
+> > >>> On Wed, Feb 28, 2024 at 02:48:44PM -0800, Alexei Starovoitov wrote:
+> > >>>> On Wed, Feb 28, 2024 at 2:31=E2=80=AFPM Steven Rostedt <rostedt@go=
+odmis.org> wrote:
+> > >>>>>
+> > >>>>> On Wed, 28 Feb 2024 14:19:11 -0800
+> > >>>>> "Paul E. McKenney" <paulmck@kernel.org> wrote:
+> > >>>>>
+> > >>>>>>>>
+> > >>>>>>>> Well, to your initial point, cond_resched() does eventually in=
+voke
+> > >>>>>>>> preempt_schedule_common(), so you are quite correct that as fa=
+r as
+> > >>>>>>>> Tasks RCU is concerned, cond_resched() is not a quiescent stat=
+e.
+> > >>>>>>>
+> > >>>>>>> Thanks for confirming. :-)
+> > >>>>>>
+> > >>>>>> However, given that the current Tasks RCU use cases wait for tra=
+mpolines
+> > >>>>>> to be evacuated, Tasks RCU could make the choice that cond_resch=
+ed()
+> > >>>>>> be a quiescent state, for example, by adjusting rcu_all_qs() and
+> > >>>>>> .rcu_urgent_qs accordingly.
+> > >>>>>>
+> > >>>>>> But this seems less pressing given the chance that cond_resched(=
+) might
+> > >>>>>> go away in favor of lazy preemption.
+> > >>>>>
+> > >>>>> Although cond_resched() is technically a "preemption point" and n=
+ot truly a
+> > >>>>> voluntary schedule, I would be happy to state that it's not allow=
+ed to be
+> > >>>>> called from trampolines, or their callbacks. Now the question is,=
+ does BPF
+> > >>>>> programs ever call cond_resched()? I don't think they do.
+> > >>>>>
+> > >>>>> [ Added Alexei ]
+> > >>>>
+> > >>>> I'm a bit lost in this thread :)
+> > >>>> Just answering the above question.
+> > >>>> bpf progs never call cond_resched() directly.
+> > >>>> But there are sleepable (aka faultable) bpf progs that
+> > >>>> can call some helper or kfunc that may call cond_resched()
+> > >>>> in some path.
+> > >>>> sleepable bpf progs are protected by rcu_tasks_trace.
+> > >>>> That's a very different one vs rcu_tasks.
+> > >>>
+> > >>> Suppose that the various cond_resched() invocations scattered throu=
+ghout
+> > >>> the kernel acted as RCU Tasks quiescent states, so that as soon as =
+a
+> > >>> given task executed a cond_resched(), synchronize_rcu_tasks() might
+> > >>> return or call_rcu_tasks() might invoke its callback.
+> > >>>
+> > >>> Would that cause BPF any trouble?
+> > >>>
+> > >>> My guess is "no", because it looks like BPF is using RCU Tasks (as =
+you
+> > >>> say, as opposed to RCU Tasks Trace) only to wait for execution to l=
+eave a
+> > >>> trampoline.  But I trust you much more than I trust myself on this =
+topic!
+> > >>
+> > >> But it uses RCU Tasks Trace as well (for sleepable bpf programs), no=
+t just
+> > >> Tasks? Looks like that's what Alexei said above as well, and I confi=
+rmed it in
+> > >> bpf/trampoline.c
+> > >>
+> > >>        /* The trampoline without fexit and fmod_ret progs doesn't ca=
+ll original
+> > >>         * function and doesn't use percpu_ref.
+> > >>         * Use call_rcu_tasks_trace() to wait for sleepable progs to =
+finish.
+> > >>         * Then use call_rcu_tasks() to wait for the rest of trampoli=
+ne asm
+> > >>         * and normal progs.
+> > >>         */
+> > >>        call_rcu_tasks_trace(&im->rcu, __bpf_tramp_image_put_rcu_task=
+s);
+> > >>
+> > >> The code comment says it uses both.
 > > >
-> > > +1
+> > > BPF does quite a few interesting things with these.
+> > >
+> > > But would you like to look at the update-side uses of RCU Tasks Rude
+> > > to see if lazy preemption affects them?  I don't believe that there
+> > > are any problems here, but we do need to check.
 > >
-> > I should clarify what i meant by "seamless". It means the same control
-> > API is used for s/w or h/w. This is a feature of tc, and is not being
-> > introduced by P4TC. P4 control only deals with Match-action tables -
-> > just as TC does.
+> > Sure I will be happy to. I am planning look at it in detail over the 3 =
+day weekend. Too much fun! ;-)
 >
-> Right, and the compiled P4 pipeline is tacked onto that API.
-> Loading that presumably implies a pipeline reset. There's
-> no precedent for loading things into TC resulting a device
-> datapath reset.
+> Thank you, and looking forward to seeing what you come up with!
 >
-> > > My intuition is that for offload the device would be programmed at
-> > > start-of-day / probe. By loading the compiled P4 from /lib/firmware.
-> > > Then the _device_ tells the kernel what tables and parser graph it's
-> > > got.
-> >
-> > BTW: I just want to say that these patches are about s/w - not
-> > offload. Someone asked about offload so as in normal discussions we
-> > steered in that direction. The hardware piece will require additional
-> > patchsets which still require discussions. I hope we dont steer off
-> > too much, otherwise i can start a new thread just to discuss current
-> > view of the h/w.
-> >
-> > Its not the device telling the kernel what it has. Its the other way ar=
-ound.
+> The canonical concern would be that someone somewhere is using either
+> call_rcu_tasks_rude() or synchronize_rcu_tasks_rude() to wait for
+> non-preemptible regions of code that does not account for the possibility
+> of preemption in CONFIG_PREEMPT_NONE or PREEMPT_PREEMPT_VOLUNTARY kernels=
+.
 >
-> Yes, I'm describing how I'd have designed it :) If it was the same
-> as what you've already implemented - why would I be typing it into
-> an email.. ? :)
->
-> > From the P4 program you generate the s/w (the ebpf code and other
-> > auxillary stuff) and h/w pieces using a compiler.
-> > You compile ebpf, etc, then load.
->
-> That part is fine.
->
-> > The current point of discussion is the hw binary is to be "activated"
-> > through the same tc filter that does the s/w. So one could say:
-> >
-> > tc filter add block 22 ingress protocol all prio 1 p4 pname simple_l3
-> > \
-> >    prog type hw filename "simple_l3.o" ... \
-> >    action bpf obj $PARSER.o section p4tc/parser \
-> >    action bpf obj $PROGNAME.o section p4tc/main
-> >
-> > And that would through tc driver callbacks signal to the driver to
-> > find the binary possibly via  /lib/firmware
-> > Some of the original discussion was to use devlink for loading the
-> > binary - but that went nowhere.
->
-> Back to the device reset, unless the load has no impact on inflight
-> traffic the loading doesn't belong in TC, IMO. Plus you're going to
-> run into (what IIRC was Jiri's complaint) that you're loading arbitrary
-> binary blobs, opaque to the kernel.
->
-> > Once you have this in place then netlink with tc skip_sw/hw. This is
-> > what i meant by "seamless"
-> >
-> > > Plus, if we're talking about offloads, aren't we getting back into
-> > > the same controversies we had when merging OvS (not that I was around=
-).
-> > > The "standalone stack to the side" problem. Some of the tables in the
-> > > pipeline may be for routing, not ACLs. Should they be fed from the
-> > > routing stack? How is that integration going to work? The parsing
-> > > graph feels a bit like global device configuration, not a piece of
-> > > functionality that should sit under sub-sub-system in the corner.
-> >
-> > The current (maybe i should say initial) thought is the P4 program
-> > does not touch the existing kernel infra such as fdb etc.
->
-> It's off to the side thing. Ignoring the fact that *all*, networking
-> devices already have parsers which would benefit from being accurately
-> described.
+> I *think* that these are used only to handle the possibility
+> of tracepoints on functions on the entry/exit path and on the
+> RCU-not-watching portions of the idle loop.  If so, then there is no
+> difference in behavior for lazy preemption.  But who knows?
 
-Jakub,
+Hi Paul, regarding CONFIG_PREEMPT_AUTO, for Tasks RCU rude, I think
+the following patch will address your concern about quiescent states
+on CPUs spinning away in kernel mode:
 
-This is configurability versus programmability. The table driven
-approach as input (configurability) might work fine for generic
-match-action tables up to the point that tables are expressive enough
-to satisfy the requirements. But parsing doesn't fall into the table
-driven paradigm: parsers want to be *programmed*. This is why we
-removed kParser from this patch set and fell back to eBPF for parsing.
-But the problem we quickly hit that eBPF is not offloadable to network
-devices, for example when we compile P4 in an eBPF parser we've lost
-the declarative representation that parsers in the devices could
-consume (they're not CPUs running eBPF).
+"sched/fair: handle tick expiry under lazy preemption"
+Link: https://lore.kernel.org/all/20240213055554.1802415-24-ankur.a.arora@o=
+racle.com/
 
-I think the key here is what we mean by kernel offload. When we do
-kernel offload, is it the kernel implementation or the kernel
-functionality that's being offloaded? If it's the latter then we have
-a lot more flexibility. What we'd need is a safe and secure way to
-synchronize with that offload device that precisely supports the
-kernel functionality we'd like to offload. This can be done if both
-the kernel bits and programmed offload are derived from the same
-source (i.e. tag source code with a sha-1). For example, if someone
-writes a parser in P4, we can compile that into both eBPF and a P4
-backend using independent tool chains and program download. At
-runtime, the kernel can safely offload the functionality of the eBPF
-parser to the device if it matches the hash to that reported by the
-device
+In this patch Ankur makes sure that the scheduling-clock interrupt
+will reschedule the CPU after a tick and not let queued tasks starve
+due to lazy re-scheduling. So my impression is the
+"schedule_on_each_cpu()" should schedule a worker thread in time to
+apply the implied Tasks RCU quiescent state even if the rescheduling
+was a LAZY-reschedule.
 
-Tom
+Also, not sure if the "voluntary mode" of CONFIG_PREEMPT_AUTO behaves
+differently. My feeling is regardless of preemption mode,
+CONFIG_PREEMPT_AUTO should always preempt after a tick if something
+else needs to run. It just will not preempt immediately like before
+(although CFS did already have some wakeup preemption logic to slow it
+down a bit). I am reviewing Ankur's patches more to confirm that and
+also reviewing his patches more to see how it could affect.
 
->
-> > Of course we can model the kernel datapath using P4 but you wont be
-> > using "ip route add..." or "bridge fdb...".
-> > In the future, P4 extern could be used to model existing infra and we
-> > should be able to use the same tooling. That is a discussion that
-> > comes on/off (i think it did in the last meeting).
->
-> Maybe, IDK. I thought prevailing wisdom, at least for offloads,
-> is to offload the existing networking stack, and fill in the gaps.
-> Not build a completely new implementation from scratch, and "integrate
-> later". Or at least "fill in the gaps" is how I like to think.
->
-> I can't quite fit together in my head how this is okay, but OvS
-> was not allowed to add their offload API. And what's supposed to
-> be part of TC and what isn't, where you only expect to have one
-> filter here, and create a whole new object universe inside TC.
->
-> But that's just my opinions. The way things work we may wake up one
-> day and find out that Dave has applied this :)
+thanks,
+
+ - Joel
 
