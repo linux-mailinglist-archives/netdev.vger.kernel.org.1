@@ -1,100 +1,145 @@
-Return-Path: <netdev+bounces-76812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D56186EF29
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 08:31:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D74B086EF79
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 09:20:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 085C228661E
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 07:31:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15B0A1C20298
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 08:20:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8F9C2E6;
-	Sat,  2 Mar 2024 07:31:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W91It+lY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48DBC12B9A;
+	Sat,  2 Mar 2024 08:20:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC6513FFA
-	for <netdev@vger.kernel.org>; Sat,  2 Mar 2024 07:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F8B12B83;
+	Sat,  2 Mar 2024 08:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709364700; cv=none; b=RWQ1tMO49LAUN2qfp8nK6eoNbEHIfdn2NBwjWOSrYTWW2XHGpxkVFZsEtvcYUEGGhq37QaUsNIi85JXtgFJK3yKeSedl650f6MtBWVNPLZW3Zm+I3FqHOWeDVMmUiHzcsqcDBiOK8AghK+GmbRT3FlIJcruHn7xdMlbyi58/85g=
+	t=1709367612; cv=none; b=lDa4O5KNgKL6tjXXGyRdgog1bH9vhRk4hoWr441ZQ5q0P6I8EOdug99aib6QE/C+l+NFFN9agmOnaGYPDbrjiJhgHrNx02Zld3C6KSlewX/qAHLPlhVz1f20RhBpzxKF2+GRRBkKa2lLae7LGYeBkgdT61ySMm49WX+ZqOdgze4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709364700; c=relaxed/simple;
-	bh=/KQEDQX00ejozObwsLavACXQxNmmPnqp6duLlmaR8z8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ni8JO8WIYuE6nNcUBosdzn8zRV32nbU0h2nz9019AaPhB5ZwMkc/dcNg1MVHuV7ZVcarNInyJzlQ0jSk4V/t51bzVXtSkh3UXZpeFmnFaSRwuyOEKzinSWaDFJgzMjdA7hz8zeWwZvlNjQENIvP0c/5k1QCEBlogezyzy6jkpQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W91It+lY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 984C9C433C7;
-	Sat,  2 Mar 2024 07:31:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709364699;
-	bh=/KQEDQX00ejozObwsLavACXQxNmmPnqp6duLlmaR8z8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=W91It+lYu37tbGlR1p76L4s3Wy1EouDNMZ6k0naFH/2e5EsykYMhlHeHLH5+P+mQz
-	 64Ouqq+p1GG2SEucj+FniB9uG0lZ2644VU8aDstA92uNP6/8D810roDrd0gEv8co0R
-	 egXMNhaXWg8qo1nHCu+G+mKlW8I3r2I6qXRv2+NgXzY/BPIQ/debEvd0BYe0rQoKPg
-	 V2fh3x789zhhHLtlbMhaxhp1I4tiBtjDhkT4NPIxVo/ethkYvh/6tggkse7vLEphTT
-	 Fo4AP1sxVtEU168hI1AP7R/PC63baON9x9TlopA44An9K3CVY3mbiaIVdltvCNStLL
-	 qV2SVDe4BmGLA==
-Date: Fri, 1 Mar 2024 23:31:38 -0800
-From: Saeed Mahameed <saeed@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>,
-	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Tariq Toukan <ttoukan.linux@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, jay.vosburgh@canonical.com
-Subject: Re: [net-next V3 15/15] Documentation: networking: Add description
- for multi-pf netdev
-Message-ID: <ZeLV2s_nU8DZ-4WG@x130>
-References: <f3e1a1c2-f757-4150-a633-d4da63bacdcd@gmail.com>
- <20240220173309.4abef5af@kernel.org>
- <2024022214-alkalize-magnetize-dbbc@gregkh>
- <20240222150030.68879f04@kernel.org>
- <de852162-faad-40fa-9a73-c7cf2e710105@intel.com>
- <ZdhnGeYVB00pLIhO@nanopsycho>
- <20240227180619.7e908ac4@kernel.org>
- <Zd7rRTSSLO9-DM2t@nanopsycho>
- <20240228090604.66c17088@kernel.org>
- <20240228094312.75dde221@kernel.org>
+	s=arc-20240116; t=1709367612; c=relaxed/simple;
+	bh=HlGnkN+gyjOOzDLmS5VehlLSLAGxnQMbjYYBTtTaveA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HLlQoFJ0BknlZJ8meoJylVm4FJzlk+LJOF8f0gCiIaTZmASHOwqIWd6a/a86JYqUJQ10PxLNDiLlT128RfXM5DXuG/x7oT/k6dtFCUMsIRGeLEh8FH4T2xecyzxQmwT6jCTXp+3WaQO819GzUr9BUUTfgxp79FdMfHx0HKSn0ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.224] (ip5f5aeb37.dynamic.kabel-deutschland.de [95.90.235.55])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id BAD2661E5FE05;
+	Sat,  2 Mar 2024 09:19:06 +0100 (CET)
+Message-ID: <51b6c48b-a33e-46cd-9b00-5568ccc529ca@molgen.mpg.de>
+Date: Sat, 2 Mar 2024 09:19:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240228094312.75dde221@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH Linux-6.8-rc5 1/1] ixgbevf: start
+ negotiate with api version 1.4
+To: Yifei Liu <yifei.l.liu@oracle.com>
+Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, lihong.yang@intel.com, harshit.m.mogalapalli@oracle.com,
+ linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ jack.vogel@oracle.com, netdev@vger.kernel.org,
+ ramanan.govindarajan@oracle.com
+References: <20240301235837.3741422-1-yifei.l.liu@oracle.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240301235837.3741422-1-yifei.l.liu@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 28 Feb 09:43, Jakub Kicinski wrote:
->On Wed, 28 Feb 2024 09:06:04 -0800 Jakub Kicinski wrote:
->> > >Yes, looks RDMA-centric. RDMA being infamously bonding-challenged.
->> >
->> > Not really. It's just needed to consider all usecases, not only netdev.
->>
->> All use cases or lowest common denominator, depends on priorities.
->
->To be clear, I'm not trying to shut down this proposal, I think both
->have disadvantages. This one is better for RDMA and iperf, the explicit
->netdevs are better for more advanced TCP apps. All I want is clear docs
->so users are not confused, and vendors don't diverge pointlessly.
+Dear Yifei,
 
-Just posted v4 with updated documentation that should cover the basic
-feature which we believe is the most basic that all vendors should
-implement, mlx5 implementation won't change much if we decide later to move
-to some sort of a "generic netdev" interface, we don't agree it should be a
-new kind of bond, as bond was meant for actual link aggregation of
-multi-port devices, but again the mlx5 implementation will remain the same
-regardless of any future extension of the feature, the defaults are well
-documented and carefully selected for best user expectations.
+
+Thank you very much for your patch.
+
+Am 02.03.24 um 00:58 schrieb Yifei Liu:
+> ixgbevf updates to api version to 1.5 via
+> 	commit 339f28964147d ("ixgbevf: Add support for new mailbox
+> 	communication between PF and VF")
+> while the pf side is not updated to 1.5 properly. It will lead to a
+> failure of negotiation of api version 1.5 This commit will enforce
+> the negotiation to start with 1.4 which is working fine.
+> 
+> Normally the pf and vf side should be updated together. Example:
+> 	commit adef9a26d6c39 ("ixgbevf: add defines for IPsec offload request")
+> 	commit 7269824046376 ("ixgbe: add VF IPsec offload request message handling")
+
+Why can’t the PF side not be updated to version 1.5 too?
+
+If you don’t mind, I’d format the commit message like below.
+
+Commit 339f28964147d ("ixgbevf: Add support for new mailbox communication
+between PF and VF") updates the driver ixgbevf to API version 1.5 while the
+pf side is not updated to 1.5 properly. This leads to a negotiation failure
+of api version 1.5. So, enforce the negotiation to start with 1.4 which is
+working fine.
+
+Normally the pf and vf side should be updated together. Example:
+
+1.  commit adef9a26d6c39 ("ixgbevf: add defines for IPsec offload request")
+2.  commit 7269824046376 ("ixgbe: add VF IPsec offload request message 
+handling")
+
+> Reported-by: Manjunatha Gowda <manjunatha.gowda@oracle.com>
+> Signed-off-by: Yifei Liu <yifei.l.liu@oracle.com>
+> Reviewed-by: Jack Vogel <jack.vogel@oracle.com>
+
+Please add a Fixes: tag.
+
+Fixes: 39f28964147d ("ixgbevf: Add support for new mailbox communication 
+between PF and VF")
+
+Unfortunately, I am unable to find this commit hash. What archive/tree 
+is it from?
+
+> ---
+>   drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c | 6 ++++++
+>   1 file changed, 6 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
+> index a44e4bd56142..a1b9b789d1d4 100644
+> --- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
+> +++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
+> @@ -2286,6 +2286,12 @@ static void ixgbevf_negotiate_api(struct ixgbevf_adapter *adapter)
+>   
+>   	spin_lock_bh(&adapter->mbx_lock);
+>   
+> +	/* There is no corresponding drivers in pf for
+> +	 * api version 1.5. Try to negociate with version
+
+negotiate
+
+> +	 * 1.5 will always fail. Start to negociate with
+> +	 * version 1.4.
+
+Could you please use the fully allowed line length, so less lines are used?
+
+> +	 */
+> +	idx = 1; >   	while (api[idx] != ixgbe_mbox_api_unknown) {
+>   		err = hw->mac.ops.negotiate_api_version(hw, api[idx]);
+>   		if (!err)
+
+Where is `idx` set before?
+
+Unrelated to the problem at hand, but enums or macros should be used for 
+the API version.
+
+
+Kind regards,
+
+Paul
 
