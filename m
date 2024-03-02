@@ -1,283 +1,100 @@
-Return-Path: <netdev+bounces-76811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5C0686EF23
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 08:24:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D56186EF29
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 08:31:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D603CB20AF7
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 07:24:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 085C228661E
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 07:31:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570AE1799A;
-	Sat,  2 Mar 2024 07:23:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8F9C2E6;
+	Sat,  2 Mar 2024 07:31:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QgMLd0Un"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W91It+lY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B7B17994
-	for <netdev@vger.kernel.org>; Sat,  2 Mar 2024 07:23:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC6513FFA
+	for <netdev@vger.kernel.org>; Sat,  2 Mar 2024 07:31:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709364218; cv=none; b=JWH71+8G5j8pqqq/u4oJTBP4DgackuZLEhpAVIAwJhODGyNjBi6GZydqTi56qKmx+qygmsVEdK1Bq0mZzBdl14uz6aGcDvHsLTWZXp6LHiscjWUPI80CTqU9rXzSl6PAeDYPpHw26mx/4XD0xi/yHaiX3WdcXU1cmBNVD9aCcSQ=
+	t=1709364700; cv=none; b=RWQ1tMO49LAUN2qfp8nK6eoNbEHIfdn2NBwjWOSrYTWW2XHGpxkVFZsEtvcYUEGGhq37QaUsNIi85JXtgFJK3yKeSedl650f6MtBWVNPLZW3Zm+I3FqHOWeDVMmUiHzcsqcDBiOK8AghK+GmbRT3FlIJcruHn7xdMlbyi58/85g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709364218; c=relaxed/simple;
-	bh=mONrsMWtBVQze93xqX6PmhVpQnpWcUb1eNSz04ANTyY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eH4m+HG9kTTJyThxbEafGjRoxKJtCSHefuzxqguiJfH9/VnMdwIV20TcD7wqpvB+mdoX1QuXcc5/lOIUQIfAg93zGp+RWJ9yPRsmbhBpF3LM5AeN8RbxhPs9qVmd7WVx2WEOYnP8vT2/n9AkNKZ4LhreUqvZIAcvemLBQHjPlqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QgMLd0Un; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1C24C43394;
-	Sat,  2 Mar 2024 07:23:37 +0000 (UTC)
+	s=arc-20240116; t=1709364700; c=relaxed/simple;
+	bh=/KQEDQX00ejozObwsLavACXQxNmmPnqp6duLlmaR8z8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ni8JO8WIYuE6nNcUBosdzn8zRV32nbU0h2nz9019AaPhB5ZwMkc/dcNg1MVHuV7ZVcarNInyJzlQ0jSk4V/t51bzVXtSkh3UXZpeFmnFaSRwuyOEKzinSWaDFJgzMjdA7hz8zeWwZvlNjQENIvP0c/5k1QCEBlogezyzy6jkpQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W91It+lY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 984C9C433C7;
+	Sat,  2 Mar 2024 07:31:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709364218;
-	bh=mONrsMWtBVQze93xqX6PmhVpQnpWcUb1eNSz04ANTyY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QgMLd0UnkRbL6aWVsYMrKFPOTRKfQ0T/EeS6fsOb8hSLdZKwjIW41Ia7AyU5KnGiF
-	 ilfkBOwdmnWCUnMCsqhPl4AKWyVTrg7SObAJkaMvZFJJjAnayPfXz1zmN74wmZvrBd
-	 GGxaZL/gS05dGpxbOKXxF4a/wD4CCgfNBS2QQ31KNsfPZsH60Yg+JNU4R2eOYKkaJy
-	 hgos9BmxRZnXdEw23fmk3I+b0kKUaESpfbFkKht0rrvPsatJvftwL8inUr632vB54I
-	 +cjzIXWHkh/8zIvOj11bwJYb4psYKrEcKrsQJOHCtG+r8woviWgPTr3XHuzJ/fVk8s
-	 xrPSfdvaW3Tjw==
+	s=k20201202; t=1709364699;
+	bh=/KQEDQX00ejozObwsLavACXQxNmmPnqp6duLlmaR8z8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=W91It+lYu37tbGlR1p76L4s3Wy1EouDNMZ6k0naFH/2e5EsykYMhlHeHLH5+P+mQz
+	 64Ouqq+p1GG2SEucj+FniB9uG0lZ2644VU8aDstA92uNP6/8D810roDrd0gEv8co0R
+	 egXMNhaXWg8qo1nHCu+G+mKlW8I3r2I6qXRv2+NgXzY/BPIQ/debEvd0BYe0rQoKPg
+	 V2fh3x789zhhHLtlbMhaxhp1I4tiBtjDhkT4NPIxVo/ethkYvh/6tggkse7vLEphTT
+	 Fo4AP1sxVtEU168hI1AP7R/PC63baON9x9TlopA44An9K3CVY3mbiaIVdltvCNStLL
+	 qV2SVDe4BmGLA==
+Date: Fri, 1 Mar 2024 23:31:38 -0800
 From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	sridhar.samudrala@intel.com,
-	Jay Vosburgh <jay.vosburgh@canonical.com>,
-	Jiri Pirko <jiri@nvidia.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [net-next V4 15/15] Documentation: networking: Add description for multi-pf netdev
-Date: Fri,  1 Mar 2024 23:22:45 -0800
-Message-ID: <20240302072246.67920-16-saeed@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240302072246.67920-1-saeed@kernel.org>
-References: <20240302072246.67920-1-saeed@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jiri Pirko <jiri@resnulli.us>,
+	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Tariq Toukan <ttoukan.linux@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, jay.vosburgh@canonical.com
+Subject: Re: [net-next V3 15/15] Documentation: networking: Add description
+ for multi-pf netdev
+Message-ID: <ZeLV2s_nU8DZ-4WG@x130>
+References: <f3e1a1c2-f757-4150-a633-d4da63bacdcd@gmail.com>
+ <20240220173309.4abef5af@kernel.org>
+ <2024022214-alkalize-magnetize-dbbc@gregkh>
+ <20240222150030.68879f04@kernel.org>
+ <de852162-faad-40fa-9a73-c7cf2e710105@intel.com>
+ <ZdhnGeYVB00pLIhO@nanopsycho>
+ <20240227180619.7e908ac4@kernel.org>
+ <Zd7rRTSSLO9-DM2t@nanopsycho>
+ <20240228090604.66c17088@kernel.org>
+ <20240228094312.75dde221@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20240228094312.75dde221@kernel.org>
 
-From: Tariq Toukan <tariqt@nvidia.com>
+On 28 Feb 09:43, Jakub Kicinski wrote:
+>On Wed, 28 Feb 2024 09:06:04 -0800 Jakub Kicinski wrote:
+>> > >Yes, looks RDMA-centric. RDMA being infamously bonding-challenged.
+>> >
+>> > Not really. It's just needed to consider all usecases, not only netdev.
+>>
+>> All use cases or lowest common denominator, depends on priorities.
+>
+>To be clear, I'm not trying to shut down this proposal, I think both
+>have disadvantages. This one is better for RDMA and iperf, the explicit
+>netdevs are better for more advanced TCP apps. All I want is clear docs
+>so users are not confused, and vendors don't diverge pointlessly.
 
-Add documentation for the multi-pf netdev feature.
-Describe the mlx5 implementation and design decisions.
-
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
----
- Documentation/networking/index.rst           |   1 +
- Documentation/networking/multi-pf-netdev.rst | 177 +++++++++++++++++++
- 2 files changed, 178 insertions(+)
- create mode 100644 Documentation/networking/multi-pf-netdev.rst
-
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 69f3d6dcd9fd..473d72c36d61 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -74,6 +74,7 @@ Contents:
-    mpls-sysctl
-    mptcp-sysctl
-    multiqueue
-+   multi-pf-netdev
-    napi
-    net_cachelines/index
-    netconsole
-diff --git a/Documentation/networking/multi-pf-netdev.rst b/Documentation/networking/multi-pf-netdev.rst
-new file mode 100644
-index 000000000000..f6f782374b71
---- /dev/null
-+++ b/Documentation/networking/multi-pf-netdev.rst
-@@ -0,0 +1,177 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+.. include:: <isonum.txt>
-+
-+===============
-+Multi-PF Netdev
-+===============
-+
-+Contents
-+========
-+
-+- `Background`_
-+- `Overview`_
-+- `mlx5 implementation`_
-+- `Channels distribution`_
-+- `Observability`_
-+- `Steering`_
-+- `Mutually exclusive features`_
-+
-+Background
-+==========
-+
-+The advanced Multi-PF NIC technology enables several CPUs within a multi-socket server to
-+connect directly to the network, each through its own dedicated PCIe interface. Through either a
-+connection harness that splits the PCIe lanes between two cards or by bifurcating a PCIe slot for a
-+single card. This results in eliminating the network traffic traversing over the internal bus
-+between the sockets, significantly reducing overhead and latency, in addition to reducing CPU
-+utilization and increasing network throughput.
-+
-+Overview
-+========
-+
-+The feature adds support for combining multiple PFs of the same port in a Multi-PF environment under
-+one netdev instance. It is implemented in the netdev layer. Lower-layer instances like pci func,
-+sysfs entry, devlink) are kept separate.
-+Passing traffic through different devices belonging to different NUMA sockets saves cross-numa
-+traffic and allows apps running on the same netdev from different numas to still feel a sense of
-+proximity to the device and achieve improved performance.
-+
-+mlx5 implementation
-+===================
-+
-+Multi-PF or Socket-direct in mlx5 is achieved by grouping PFs together which belong to the same
-+NIC and has the socket-direct property enabled, once all PFS are probed, we create a single netdev
-+to represent all of them, symmetrically, we destroy the netdev whenever any of the PFs is removed.
-+
-+The netdev network channels are distributed between all devices, a proper configuration would utilize
-+the correct close numa node when working on a certain app/cpu.
-+
-+We pick one PF to be a primary (leader), and it fills a special role. The other devices
-+(secondaries) are disconnected from the network at the chip level (set to silent mode). In silent
-+mode, no south <-> north traffic flowing directly through a secondary PF. It needs the assistance of
-+the leader PF (east <-> west traffic) to function. All RX/TX traffic is steered through the primary
-+to/from the secondaries.
-+
-+Currently, we limit the support to PFs only, and up to two PFs (sockets).
-+
-+Channels distribution
-+=====================
-+
-+We distribute the channels between the different PFs to achieve local NUMA node performance
-+on multiple NUMA nodes.
-+
-+Each combined channel works against one specific PF, creating all its datapath queues against it. We
-+distribute channels to PFs in a round-robin policy.
-+
-+::
-+
-+        Example for 2 PFs and 5 channels:
-+        +--------+--------+
-+        | ch idx | PF idx |
-+        +--------+--------+
-+        |    0   |    0   |
-+        |    1   |    1   |
-+        |    2   |    0   |
-+        |    3   |    1   |
-+        |    4   |    0   |
-+        +--------+--------+
-+
-+
-+We prefer this round-robin distribution policy over another suggested intuitive distribution, in
-+which we first distribute one half of the channels to PF0 and then the second half to PF1.
-+
-+The reason we prefer round-robin is, it is less influenced by changes in the number of channels. The
-+mapping between a channel index and a PF is fixed, no matter how many channels the user configures.
-+As the channel stats are persistent across channel's closure, changing the mapping every single time
-+would turn the accumulative stats less representing of the channel's history.
-+
-+This is achieved by using the correct core device instance (mdev) in each channel, instead of them
-+all using the same instance under "priv->mdev".
-+
-+Observability
-+=============
-+The relation between PF, irq, napi, and queue can be observed via netlink spec:
-+
-+$ ./cli.py --spec ../../../Documentation/netlink/specs/netdev.yaml --dump queue-get --json='{"ifindex": 13}'
-+[{'id': 0, 'ifindex': 13, 'napi-id': 539, 'type': 'rx'},
-+ {'id': 1, 'ifindex': 13, 'napi-id': 540, 'type': 'rx'},
-+ {'id': 2, 'ifindex': 13, 'napi-id': 541, 'type': 'rx'},
-+ {'id': 3, 'ifindex': 13, 'napi-id': 542, 'type': 'rx'},
-+ {'id': 4, 'ifindex': 13, 'napi-id': 543, 'type': 'rx'},
-+ {'id': 0, 'ifindex': 13, 'napi-id': 539, 'type': 'tx'},
-+ {'id': 1, 'ifindex': 13, 'napi-id': 540, 'type': 'tx'},
-+ {'id': 2, 'ifindex': 13, 'napi-id': 541, 'type': 'tx'},
-+ {'id': 3, 'ifindex': 13, 'napi-id': 542, 'type': 'tx'},
-+ {'id': 4, 'ifindex': 13, 'napi-id': 543, 'type': 'tx'}]
-+
-+$ ./cli.py --spec ../../../Documentation/netlink/specs/netdev.yaml --dump napi-get --json='{"ifindex": 13}'
-+[{'id': 543, 'ifindex': 13, 'irq': 42},
-+ {'id': 542, 'ifindex': 13, 'irq': 41},
-+ {'id': 541, 'ifindex': 13, 'irq': 40},
-+ {'id': 540, 'ifindex': 13, 'irq': 39},
-+ {'id': 539, 'ifindex': 13, 'irq': 36}]
-+
-+Here you can clearly observe our channels distribution policy:
-+
-+$ ls /proc/irq/{36,39,40,41,42}/mlx5* -d -1
-+/proc/irq/36/mlx5_comp1@pci:0000:08:00.0
-+/proc/irq/39/mlx5_comp1@pci:0000:09:00.0
-+/proc/irq/40/mlx5_comp2@pci:0000:08:00.0
-+/proc/irq/41/mlx5_comp2@pci:0000:09:00.0
-+/proc/irq/42/mlx5_comp3@pci:0000:08:00.0
-+
-+Steering
-+========
-+Secondary PFs are set to "silent" mode, meaning they are disconnected from the network.
-+
-+In RX, the steering tables belong to the primary PF only, and it is its role to distribute incoming
-+traffic to other PFs, via cross-vhca steering capabilities. Nothing special about the RSS table
-+content, except that it needs a capable device to point to the receive queues of a different PF.
-+
-+In TX, the primary PF creates a new TX flow table, which is aliased by the secondaries, so they can
-+go out to the network through it.
-+
-+In addition, we set default XPS configuration that, based on the cpu, selects an SQ belonging to the
-+PF on the same node as the cpu.
-+
-+XPS default config example:
-+
-+NUMA node(s):          2
-+NUMA node0 CPU(s):     0-11
-+NUMA node1 CPU(s):     12-23
-+
-+PF0 on node0, PF1 on node1.
-+
-+- /sys/class/net/eth2/queues/tx-0/xps_cpus:000001
-+- /sys/class/net/eth2/queues/tx-1/xps_cpus:001000
-+- /sys/class/net/eth2/queues/tx-2/xps_cpus:000002
-+- /sys/class/net/eth2/queues/tx-3/xps_cpus:002000
-+- /sys/class/net/eth2/queues/tx-4/xps_cpus:000004
-+- /sys/class/net/eth2/queues/tx-5/xps_cpus:004000
-+- /sys/class/net/eth2/queues/tx-6/xps_cpus:000008
-+- /sys/class/net/eth2/queues/tx-7/xps_cpus:008000
-+- /sys/class/net/eth2/queues/tx-8/xps_cpus:000010
-+- /sys/class/net/eth2/queues/tx-9/xps_cpus:010000
-+- /sys/class/net/eth2/queues/tx-10/xps_cpus:000020
-+- /sys/class/net/eth2/queues/tx-11/xps_cpus:020000
-+- /sys/class/net/eth2/queues/tx-12/xps_cpus:000040
-+- /sys/class/net/eth2/queues/tx-13/xps_cpus:040000
-+- /sys/class/net/eth2/queues/tx-14/xps_cpus:000080
-+- /sys/class/net/eth2/queues/tx-15/xps_cpus:080000
-+- /sys/class/net/eth2/queues/tx-16/xps_cpus:000100
-+- /sys/class/net/eth2/queues/tx-17/xps_cpus:100000
-+- /sys/class/net/eth2/queues/tx-18/xps_cpus:000200
-+- /sys/class/net/eth2/queues/tx-19/xps_cpus:200000
-+- /sys/class/net/eth2/queues/tx-20/xps_cpus:000400
-+- /sys/class/net/eth2/queues/tx-21/xps_cpus:400000
-+- /sys/class/net/eth2/queues/tx-22/xps_cpus:000800
-+- /sys/class/net/eth2/queues/tx-23/xps_cpus:800000
-+
-+Mutually exclusive features
-+===========================
-+
-+The nature of Multi-PF, where different channels work with different PFs, conflicts with
-+stateful features where the state is maintained in one of the PFs.
-+For example, in the TLS device-offload feature, special context objects are created per connection
-+and maintained in the PF.  Transitioning between different RQs/SQs would break the feature. Hence,
-+we disable this combination for now.
--- 
-2.44.0
-
+Just posted v4 with updated documentation that should cover the basic
+feature which we believe is the most basic that all vendors should
+implement, mlx5 implementation won't change much if we decide later to move
+to some sort of a "generic netdev" interface, we don't agree it should be a
+new kind of bond, as bond was meant for actual link aggregation of
+multi-port devices, but again the mlx5 implementation will remain the same
+regardless of any future extension of the feature, the defaults are well
+documented and carefully selected for best user expectations.
 
