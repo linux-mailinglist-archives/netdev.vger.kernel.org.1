@@ -1,145 +1,111 @@
-Return-Path: <netdev+bounces-76813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D74B086EF79
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 09:20:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DC8B86EFD6
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 10:36:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15B0A1C20298
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 08:20:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10E612846F3
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 09:36:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48DBC12B9A;
-	Sat,  2 Mar 2024 08:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA88F12E52;
+	Sat,  2 Mar 2024 09:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="QZjgqXYX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F8B12B83;
-	Sat,  2 Mar 2024 08:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8A91FC8
+	for <netdev@vger.kernel.org>; Sat,  2 Mar 2024 09:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709367612; cv=none; b=lDa4O5KNgKL6tjXXGyRdgog1bH9vhRk4hoWr441ZQ5q0P6I8EOdug99aib6QE/C+l+NFFN9agmOnaGYPDbrjiJhgHrNx02Zld3C6KSlewX/qAHLPlhVz1f20RhBpzxKF2+GRRBkKa2lLae7LGYeBkgdT61ySMm49WX+ZqOdgze4=
+	t=1709372182; cv=none; b=bK+IUPfXUneirDhUUSg+IC3AGtHknR3Ya9YhXQuP7G1U8gZ0pMvSBb/O53dON4JBzlDJS5Q1DPC+xNmR6NYRe6MH/AijVW+In4ppgsLmPGF8nFPeguvm1etKADPtLvNMenOC5nl2NbzKzRknSvzE0cd5qNMjVRxj1rnXCo21ipE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709367612; c=relaxed/simple;
-	bh=HlGnkN+gyjOOzDLmS5VehlLSLAGxnQMbjYYBTtTaveA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HLlQoFJ0BknlZJ8meoJylVm4FJzlk+LJOF8f0gCiIaTZmASHOwqIWd6a/a86JYqUJQ10PxLNDiLlT128RfXM5DXuG/x7oT/k6dtFCUMsIRGeLEh8FH4T2xecyzxQmwT6jCTXp+3WaQO819GzUr9BUUTfgxp79FdMfHx0HKSn0ZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.224] (ip5f5aeb37.dynamic.kabel-deutschland.de [95.90.235.55])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id BAD2661E5FE05;
-	Sat,  2 Mar 2024 09:19:06 +0100 (CET)
-Message-ID: <51b6c48b-a33e-46cd-9b00-5568ccc529ca@molgen.mpg.de>
-Date: Sat, 2 Mar 2024 09:19:05 +0100
+	s=arc-20240116; t=1709372182; c=relaxed/simple;
+	bh=B256r5zEmIOiTuXLBBBmOaIxhLjEb9CS3AnBdn/wqE8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n82LMkb4MsUdEt1T00UExO+OcMZgfrXypuF5H+YSCs/daJnEzPIk/u9bduELC9bkJZouGm7P2+yleGaylHKmU4axxphToM0WQeJPXdUJda+JrwL0XrtPSo/PMSEc5rB332sKaYNYquM0k+N06O6Pxw7oSgQqo7MrBeeMSIVaiWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=QZjgqXYX; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5640fef9fa6so4027764a12.0
+        for <netdev@vger.kernel.org>; Sat, 02 Mar 2024 01:36:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709372178; x=1709976978; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uBR8jTmgqloeC9Yb/CqEXV702gGyCkKiZC9/i73Gnt8=;
+        b=QZjgqXYXRMSui7yCyD3qaofFZ+gGz06n89hAkNCGab3wta9iCGT4w9qYCZ9EUwl7MB
+         HLON5pylst/ghmbqVi8FNsk7MyJSLLb6APTc9DaQ9ZfPp8iWCowRu3hjATNkYNYsiPJ3
+         DMKft2R8mc1zzxowcDy8zYzTuloEjaehUljsvJr61zR1un7Orjoo36CfeA76beBiPqWU
+         Vwl1jVX3KudmRvoubtzuLcktp019x5Ww8jkZQeMtosSn24lH8tvbzCe04HwBKomoJXES
+         taCydoIFL4pYHynKQ3z0aiW6u6L/Q6xo4lOLSzcsqSjzQn3vsWKQwQoGupMhuLf3EdHd
+         +PWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709372178; x=1709976978;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uBR8jTmgqloeC9Yb/CqEXV702gGyCkKiZC9/i73Gnt8=;
+        b=WKotoJD7AhF1vGDgAXA3tqOZ51RakT0LNtbuvvTURXFHs37P6F1l0qpd3Qo5zIGE1K
+         TMwV2NPgQ8PO7qtf1QUsiuKex00AgqItaMKKFlD0lda8xF13SawLnDHsF9lCYHHtJVtt
+         xXY8TSkGnaFk0I4a9qslwZbP5MtwruOvuTJTYWSViT34DyHql5xJnHw+NPDjZMPp0FHs
+         SNo9PKLbNKJBhBZ++PLKYbes4G0B9DHGGm89E6gLkPXu09sZeaBRaHwM6hJKARYgAUJ9
+         1r7R2vYsF3J7XiYlG8Y03qNdlsykh6+Dwo0rE9HmONkdzm4st3AHUlQ/JdOfl/qdSzNL
+         jFWg==
+X-Forwarded-Encrypted: i=1; AJvYcCX3s7Iqgt3GVM59j86zzrk5eglEkrWq0dweNmi16f96g1676NIWRznVV1hcNgtLUKMfDsQTGdg2IBpepqnogMSIJL6ilcZe
+X-Gm-Message-State: AOJu0YzH3707+jCLB0ZkpjJZLAoYlWWj9fjBfN86rtYxEHnaM5cEoyc0
+	p5BgP612d1oC8hnfdI9NSQkPNEqfIYT6dg3Dsmt2rwGE7iE1YFXOScG8uvHkoyI=
+X-Google-Smtp-Source: AGHT+IH7l5mn8VM9fliWodgit9CoqXbIrIFtbPY44s4b+8rNBmbrbiwT7eCceWY9DwfmX3DetILkrA==
+X-Received: by 2002:a05:6402:2894:b0:566:16e3:65a8 with SMTP id eg20-20020a056402289400b0056616e365a8mr2962788edb.18.1709372178372;
+        Sat, 02 Mar 2024 01:36:18 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id d40-20020a056402402800b00565671fd23asm2388813eda.22.2024.03.02.01.36.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 02 Mar 2024 01:36:17 -0800 (PST)
+Date: Sat, 2 Mar 2024 10:36:14 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	vadim.fedorenko@linux.dev, arkadiusz.kubalewski@intel.com
+Subject: Re: [PATCH net-next] dpll: avoid multiple function calls to dump
+ netdev info
+Message-ID: <ZeLzDhuhTeI2YBtT@nanopsycho>
+References: <20240301001607.2925706-1-kuba@kernel.org>
+ <ZeH26t7WPkfwUnhs@nanopsycho>
+ <CANn89iLcOE7aJ6SSjCSixLOQd4CsMdmE1UQZWBsp6UgufA2pwQ@mail.gmail.com>
+ <20240301093128.18722960@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH Linux-6.8-rc5 1/1] ixgbevf: start
- negotiate with api version 1.4
-To: Yifei Liu <yifei.l.liu@oracle.com>
-Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, lihong.yang@intel.com, harshit.m.mogalapalli@oracle.com,
- linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- jack.vogel@oracle.com, netdev@vger.kernel.org,
- ramanan.govindarajan@oracle.com
-References: <20240301235837.3741422-1-yifei.l.liu@oracle.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240301235837.3741422-1-yifei.l.liu@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240301093128.18722960@kernel.org>
 
-Dear Yifei,
+Fri, Mar 01, 2024 at 06:31:28PM CET, kuba@kernel.org wrote:
+>On Fri, 1 Mar 2024 17:24:07 +0100 Eric Dumazet wrote:
+>> > >BTW is the empty nest if the netdev has no pin intentional?  
+>> >
+>> > The user can tell if this is or is not supported by kernel easily.  
+>
+>Seems legit, although user can also do:
+>
+>$ genl ctrl list | grep dpll
+>Name: dpll
 
+True.
 
-Thank you very much for your patch.
+>
+>> This is a high cost for hosts with hundreds of devices :/
+>
+>right, a bit high cost for a relatively rare feature :(
 
-Am 02.03.24 um 00:58 schrieb Yifei Liu:
-> ixgbevf updates to api version to 1.5 via
-> 	commit 339f28964147d ("ixgbevf: Add support for new mailbox
-> 	communication between PF and VF")
-> while the pf side is not updated to 1.5 properly. It will lead to a
-> failure of negotiation of api version 1.5 This commit will enforce
-> the negotiation to start with 1.4 which is working fine.
-> 
-> Normally the pf and vf side should be updated together. Example:
-> 	commit adef9a26d6c39 ("ixgbevf: add defines for IPsec offload request")
-> 	commit 7269824046376 ("ixgbe: add VF IPsec offload request message handling")
-
-Why can’t the PF side not be updated to version 1.5 too?
-
-If you don’t mind, I’d format the commit message like below.
-
-Commit 339f28964147d ("ixgbevf: Add support for new mailbox communication
-between PF and VF") updates the driver ixgbevf to API version 1.5 while the
-pf side is not updated to 1.5 properly. This leads to a negotiation failure
-of api version 1.5. So, enforce the negotiation to start with 1.4 which is
-working fine.
-
-Normally the pf and vf side should be updated together. Example:
-
-1.  commit adef9a26d6c39 ("ixgbevf: add defines for IPsec offload request")
-2.  commit 7269824046376 ("ixgbe: add VF IPsec offload request message 
-handling")
-
-> Reported-by: Manjunatha Gowda <manjunatha.gowda@oracle.com>
-> Signed-off-by: Yifei Liu <yifei.l.liu@oracle.com>
-> Reviewed-by: Jack Vogel <jack.vogel@oracle.com>
-
-Please add a Fixes: tag.
-
-Fixes: 39f28964147d ("ixgbevf: Add support for new mailbox communication 
-between PF and VF")
-
-Unfortunately, I am unable to find this commit hash. What archive/tree 
-is it from?
-
-> ---
->   drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c | 6 ++++++
->   1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-> index a44e4bd56142..a1b9b789d1d4 100644
-> --- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-> +++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-> @@ -2286,6 +2286,12 @@ static void ixgbevf_negotiate_api(struct ixgbevf_adapter *adapter)
->   
->   	spin_lock_bh(&adapter->mbx_lock);
->   
-> +	/* There is no corresponding drivers in pf for
-> +	 * api version 1.5. Try to negociate with version
-
-negotiate
-
-> +	 * 1.5 will always fail. Start to negociate with
-> +	 * version 1.4.
-
-Could you please use the fully allowed line length, so less lines are used?
-
-> +	 */
-> +	idx = 1; >   	while (api[idx] != ixgbe_mbox_api_unknown) {
->   		err = hw->mac.ops.negotiate_api_version(hw, api[idx]);
->   		if (!err)
-
-Where is `idx` set before?
-
-Unrelated to the problem at hand, but enums or macros should be used for 
-the API version.
-
-
-Kind regards,
-
-Paul
+I agree. Let's remove the empty nest then.
 
