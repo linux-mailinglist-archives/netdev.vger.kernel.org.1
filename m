@@ -1,129 +1,160 @@
-Return-Path: <netdev+bounces-76764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 893B986ED28
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 01:01:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36FE886ED38
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 01:09:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AC0D1C21CE3
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 00:01:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4AD61F22BF6
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 00:09:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB7FEDC;
-	Sat,  2 Mar 2024 00:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B21B77E9;
+	Sat,  2 Mar 2024 00:09:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kdA8FGru"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MOuTRwXE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A47EA12E40;
-	Sat,  2 Mar 2024 00:01:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F9E613A
+	for <netdev@vger.kernel.org>; Sat,  2 Mar 2024 00:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709337713; cv=none; b=ZdPEnFuCKMZmLNO1RXPPnwP1ac+h0hSHWK2QplJQGQk80ZEQSX0woAm9assIw3S0q1kOBPh9bS8d0qb+YTY7AA07vuI3yirOUzYfRG9jcm73i1U0NqmSHcAqnZ+2+8mTc0fpowvyD0txdnGfnSu4QnKyqIEhHSpVvDYWLPiwSwU=
+	t=1709338173; cv=none; b=ii0cBlRnc+kuQMKjLVlnwA5mNYUBGNyzBWypMv8alGu6rjQuAAuVG6VE0HS0pUvKQENWi8rI+IDSHLEK37dm+zTGbWlIBQ25FN1O5xtODj9USFTkh6a3i4wpwF0xQ2VtjSgO8CW61OTyKfqJdU0h+3ceBdpfmbHD2G0fRL81HQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709337713; c=relaxed/simple;
-	bh=arBEGhBteVO4RjPz9tkU04LZ/Jgo6OcNUGZs76IOUR4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jlLoteLvgJBMqIjlx4BxAmPhbhUZOzhpSBUJaYGEQj01WTpAy0UGp9MTJJ2ExE9VJ37Y4dId+Xjqj2pRtNVH4BpHFV/9mKGjlMyO6aus/dGN+XrnHV7LpGsw3AkMZ+mDOJWdcnQ9cVr7y538RTeIII46AGJ9X3Cw/OvFaXEWjwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=kdA8FGru; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 421Lhnt8026634;
-	Sat, 2 Mar 2024 00:01:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2023-11-20; bh=vKDPVMXw44ehTbUTyV9p12c9dr4eCzluThD8Tq6MyeU=;
- b=kdA8FGruOG9ZjTI7oQ2CYF9M2Gf1ziYDgoa/3325BIrQ396s1qxs8v40B6/1+t6ZKqml
- hbNE9lVrV6RgwIx6tZuRUOyKuMaHMixlGtB734LBqo6EW6CP8iUxUKbJAnmU0kPNoUQb
- hshaljT6Zwkr+A8VpZ//L0023zqeeoCOf87HYbFJnbZZZiCKVOsy9lWuj1aikEjcLicz
- C/kU8fHItDHTo5JbKRE3ND3YT+LSjAg1nJjGPdYFHAhYIvCr01oKiV0HyN/anNpRsJP0
- BlJk+q02iw+dqopsww5VMF9jWLWn7FtbU1KZxlwLt+B1kC/wHQFgmMjjY6UfGDcoeL0y vg== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3wf722t5av-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 02 Mar 2024 00:01:36 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 421M2Rdi005715;
-	Sat, 2 Mar 2024 00:01:35 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3wjrrct3pc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 02 Mar 2024 00:01:35 +0000
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42201YFC037587;
-	Sat, 2 Mar 2024 00:01:34 GMT
-Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3wjrrct3ne-1;
-	Sat, 02 Mar 2024 00:01:34 +0000
-From: Yifei Liu <yifei.l.liu@oracle.com>
-To: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com
-Cc: yifei.l.liu@oracle.com, harshit.m.mogalapalli@oracle.com,
-        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jack.vogel@oracle.com,
-        lihong.yang@intel.com, ramanan.govindarajan@oracle.com
-Subject: [PATCH Linux-6.8-rc5 1/1] ixgbevf: start negotiate with api version 1.4
-Date: Fri,  1 Mar 2024 15:58:37 -0800
-Message-ID: <20240301235837.3741422-1-yifei.l.liu@oracle.com>
-X-Mailer: git-send-email 2.42.0
+	s=arc-20240116; t=1709338173; c=relaxed/simple;
+	bh=dH+R3CHq13HZg3o2FiRpD3Sc4l20ml1BM78TmQhj43s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gof6HQHa6V3t6sJa1AYwdM1ZT++GdR3DaXzMsW4Ft3vtAp57Xkikqz5Z/nC0A3S8/GzdopkNdg1t5vOkmDpbASh/SrLhvteHg3Zr7Ebyx6S6xCOExaJebwsDC4QuDhfXLCLO2YBDtLRM/sCzu+6QwhQJ1zen5Mr2JMwuIQ5lovE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=MOuTRwXE; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5e4613f2b56so2418625a12.1
+        for <netdev@vger.kernel.org>; Fri, 01 Mar 2024 16:09:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1709338171; x=1709942971; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PlEMlXrKVoQ/VI5q1b4zpBL3OsqlVw7CAlvaBiVG6mY=;
+        b=MOuTRwXEhIPRWgSif23piWeAVFPc+vdnbxKruPntORcbsZe7Ootk7sViJ1qaDdgx2M
+         F3cD09TiuqgzusAKPhmQtslpHuPNr8SczIuJMXdnnZ9haIVfdI5Vs3KAVlvjNTx8pfTd
+         yhjULxFjOZValpASY13e1gED6NXKg4FVa6fj8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709338171; x=1709942971;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PlEMlXrKVoQ/VI5q1b4zpBL3OsqlVw7CAlvaBiVG6mY=;
+        b=BCh0O+rm2k3xjmcTjPjM0C+K2bO6ev7YurPqRHx/Qip5HHi8szFkgvkVVU7ldRl78/
+         cgfbrrs30vqF3DtGtjRTqePkEjjwqD2h0U9w6jmrvvUwKOyKg5iy8MXUnT+nRvHZ+jym
+         bh+0KFDntmt9Z2mZQsVYck5WruhwNNmByu0F11q0QVYPT7lQzVTQUoepbkaGjKQi4h+J
+         dmEbE6OFXeYTgGDfY3zvl4ch+1Saz9HrJXzd3PI/mrzJvUW+kKr4dAMUV7NKJCmT2nzQ
+         ffNVWxZrJwpVTyyPQwOLyH2+MVnkECXYM9NGBSvP2v5VuG0QCk3Lf9/+uzTrd08dF/Gk
+         w2vQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWPpajyBq2Zdo24KFXwzfpaGELozii4tGBE6g0urDO7ZcSS7D3qMkNtOqWJBy6o0Sj71mnmcmq+bJE/HKBsuHwl9f11CXqx
+X-Gm-Message-State: AOJu0Yzjc4yl9np8c/nbslHv6jV8LA/EBs0DuffY/7J4P03PDy3ic0A7
+	bHcs0+7VQLX+hfrtDPbKY+02nF6LQomLpFhedIW0i7gspDeD7cT/L6SvEaIq3g==
+X-Google-Smtp-Source: AGHT+IHKe06QTxKDNmVjUj7y4VmLN7+kjewYOtUfSzwCo6UhE83ZK5FaGcdZDV0lptWbQ2W8F/RMaA==
+X-Received: by 2002:a05:6a20:6a22:b0:1a1:461a:36ac with SMTP id p34-20020a056a206a2200b001a1461a36acmr494126pzk.11.1709338171344;
+        Fri, 01 Mar 2024 16:09:31 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id x11-20020aa784cb000000b006e45c5d7720sm3611474pfn.93.2024.03.01.16.09.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Mar 2024 16:09:30 -0800 (PST)
+Date: Fri, 1 Mar 2024 16:09:29 -0800
+From: Kees Cook <keescook@chromium.org>
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH][next] net/smc: Avoid -Wflex-array-member-not-at-end
+ warnings
+Message-ID: <202403011607.8E903049@keescook>
+References: <ZeIhOT44ON5rjPiP@neat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-01_23,2024-03-01_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0
- mlxlogscore=999 malwarescore=0 spamscore=0 mlxscore=0 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2403010197
-X-Proofpoint-ORIG-GUID: sROpH13LIyOES2ZB_47V_jY2iDavSJKo
-X-Proofpoint-GUID: sROpH13LIyOES2ZB_47V_jY2iDavSJKo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZeIhOT44ON5rjPiP@neat>
 
-ixgbevf updates to api version to 1.5 via
-	commit 339f28964147d ("ixgbevf: Add support for new mailbox
-	communication between PF and VF")
-while the pf side is not updated to 1.5 properly. It will lead to a
-failure of negotiation of api version 1.5 This commit will enforce
-the negotiation to start with 1.4 which is working fine.
+On Fri, Mar 01, 2024 at 12:40:57PM -0600, Gustavo A. R. Silva wrote:
+> -Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
+> ready to enable it globally.
+> 
+> There are currently a couple of objects in `struct smc_clc_msg_proposal_area`
+> that contain a couple of flexible structures:
+> 
+> struct smc_clc_msg_proposal_area {
+> 	...
+> 	struct smc_clc_v2_extension             pclc_v2_ext;
+> 	...
+> 	struct smc_clc_smcd_v2_extension        pclc_smcd_v2_ext;
+> 	...
+> };
+> 
+> So, in order to avoid ending up with a couple of flexible-array members
+> in the middle of a struct, we use the `struct_group_tagged()` helper to
+> separate the flexible array from the rest of the members in the flexible
+> structure:
+> 
+> struct smc_clc_smcd_v2_extension {
+>         struct_group_tagged(smc_clc_smcd_v2_extension_hdr, hdr,
+>                             u8 system_eid[SMC_MAX_EID_LEN];
+>                             u8 reserved[16];
+>         );
+>         struct smc_clc_smcd_gid_chid gidchid[];
+> };
+> 
+> With the change described above, we now declare objects of the type of
+> the tagged struct without embedding flexible arrays in the middle of
+> another struct:
+> 
+> struct smc_clc_msg_proposal_area {
+>         ...
+>         struct smc_clc_v2_extension_hdr		pclc_v2_ext;
+>         ...
+>         struct smc_clc_smcd_v2_extension_hdr	pclc_smcd_v2_ext;
+>         ...
+> };
+> 
+> We also use `container_of()` when we need to retrieve a pointer to the
+> flexible structures.
+> 
+> So, with these changes, fix the following warnings:
+> 
+> In file included from net/smc/af_smc.c:42:
+> net/smc/smc_clc.h:186:49: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+>   186 |         struct smc_clc_v2_extension             pclc_v2_ext;
+>       |                                                 ^~~~~~~~~~~
+> net/smc/smc_clc.h:188:49: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+>   188 |         struct smc_clc_smcd_v2_extension        pclc_smcd_v2_ext;
+>       |                                                 ^~~~~~~~~~~~~~~~
+> 
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
-Normally the pf and vf side should be updated together. Example:
-	commit adef9a26d6c39 ("ixgbevf: add defines for IPsec offload request")
-	commit 7269824046376 ("ixgbe: add VF IPsec offload request message handling")
+I think this is a nice way to deal with these flex-array cases. Using
+the struct_group() and container_of() means there is very little
+collateral impact. Since this is isolated to a single file, I wonder if
+it's easy to check that there are no binary differences too? I wouldn't
+expect any -- container_of() is all constant expressions, so the
+assignment offsets should all be the same, etc.
 
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-Reported-by: Manjunatha Gowda <manjunatha.gowda@oracle.com>
-Signed-off-by: Yifei Liu <yifei.l.liu@oracle.com>
-Reviewed-by: Jack Vogel <jack.vogel@oracle.com>
----
- drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+-Kees
 
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-index a44e4bd56142..a1b9b789d1d4 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-@@ -2286,6 +2286,12 @@ static void ixgbevf_negotiate_api(struct ixgbevf_adapter *adapter)
- 
- 	spin_lock_bh(&adapter->mbx_lock);
- 
-+	/* There is no corresponding drivers in pf for
-+	 * api version 1.5. Try to negociate with version
-+	 * 1.5 will always fail. Start to negociate with
-+	 * version 1.4.
-+	 */
-+	idx = 1;
- 	while (api[idx] != ixgbe_mbox_api_unknown) {
- 		err = hw->mac.ops.negotiate_api_version(hw, api[idx]);
- 		if (!err)
 -- 
-2.42.0
-
+Kees Cook
 
