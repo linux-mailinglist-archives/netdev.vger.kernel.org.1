@@ -1,167 +1,90 @@
-Return-Path: <netdev+bounces-76817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36DBE86EFFF
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 11:07:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7876B86F01F
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 11:55:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E04452833FB
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 10:07:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33102283A2A
+	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 10:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A1414284;
-	Sat,  2 Mar 2024 10:07:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oxBVSXwW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E252B107B4;
+	Sat,  2 Mar 2024 10:55:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AAE013FF1
-	for <netdev@vger.kernel.org>; Sat,  2 Mar 2024 10:07:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+Received: from mx10.didiglobal.com (mx10.didiglobal.com [111.202.70.125])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id D84A56AD6;
+	Sat,  2 Mar 2024 10:55:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.202.70.125
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709374068; cv=none; b=fMxye99EyIfL3YVrOwCCjJg5RlIx2kK264iGjI8PrurG5lo/dDTzVYnxLanH+uRMzrWt6OjEjTjIYzSumm6h4A6vfsgU4u6E/slGOjtmNXYa/ytqSGqSGBqQVUk5zfGrIxIB2kOG+zPDMyRr6quhScuraPz/1rB4k6UDm8V6ecw=
+	t=1709376944; cv=none; b=dk8ZzPzVQ9PW9R3EzqJYMRGpO6wzOSs9EQuY0YEUro88RoCeVmH5efsuekkoUIEJb4RN7Tg7oVkYJvnDZ9ivcqnQJfLlfD9YbOX9T4Nnlp50yx5EMk5RL62r3XcByhMk66SDI3MYuzU8MMTmkEX8ErvUNIDP4pGDFiSnXauHnpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709374068; c=relaxed/simple;
-	bh=FTYx5qez++KkUv5yDK2jAqM9mqDamcYB51Z6/Y1FNQY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Mry7NglcE3RrCg/B0Ajn0WxmLfJlD9dP3gh/5H2r5bTFPKJnXDUe+/tzEB166vz6q5E7TiFb96Wbrv+oWCgbQbHBmMInhmvDFNSejVdBz5JKSTinFE0qzBfhodriSC0MVBxdOMaTd/9+8hIrJEMc8I5E7/wfA0d6kkS+T6+WMAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oxBVSXwW; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbf618042daso4497878276.0
-        for <netdev@vger.kernel.org>; Sat, 02 Mar 2024 02:07:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709374066; x=1709978866; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pHDDdxJ+oSK0bRwd/e4P7FdFaAyR5yWe3wl+pUciMSs=;
-        b=oxBVSXwWRbNEKAKPUjtp8hOUTYTVQl4y6Sicy1lv0jsfKgP56bcuqNsDxU7XXuQOiH
-         PsMinvZ7wyjxhkY92wZ3oE2RaXTeqnYl53+vsQmgxgqVOGhjF7aahrPABPjnnIeQ+p66
-         21TOyIzxlBM3l8pWn4YUsQXQP3AyhhqXWZgE/sHIUurGx/yC2OvHh3jmCA5KIt1cdzyR
-         uihIYsYM1oXvTisWvc3+VikCNiJxA73iVoj8Lj6TBlYMdfiGkwhomzR3X2xbaGfmfelk
-         yX1EzYwCNS2mpFaG4YntwQV8luOIpubDP6s/8E/5Eko7trhQs4A/b4zqrTUFePfxk9i8
-         N/lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709374066; x=1709978866;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pHDDdxJ+oSK0bRwd/e4P7FdFaAyR5yWe3wl+pUciMSs=;
-        b=v3KIYXpGki6LT/W7NLrBe+HB5mGaqWvyIOnFqtpzCotn735XkwFJB9MBoTNe1CyjxB
-         fj1MPbAxFHIdmWzSjjFzICMbg0gapCRn40RGTkMdl1Ob4quxuladcV3tZVqemFseDLU+
-         X1l6V73xvCH35veLvfIrCgKPNWfLQDfE3RFK5TO/mjsIbh5LKND+kQ7OjxHN9BAP9iHU
-         r5fh8kFtjD0uv2XY6wJnIpCGTEdtuPhnno/QHH7HmbWs3AJygHJO6P+VXFv8Ob3QL7UW
-         E/8Wk0zEVb6CPDukUL7BHqdMQcCLhHTxokdFlHmpl1/WWoEhKYq0YiMgy8RlJVUi6Z6z
-         h89Q==
-X-Gm-Message-State: AOJu0YwMxJfWdcTRb+/nbgl34kRNJiuN4RqxxglFuISW0y/XapBFHqEv
-	qtZnNiq1bSnDrszCDfMCGYM4aDMmDzjwdEScUgtHjUmlewj2XiK02PPoUvl7c3weWnschszjRvK
-	xd4KRwqWK4A==
-X-Google-Smtp-Source: AGHT+IFGUjVt8lOwgsqY3g9t07YH8rJUMC7tH7zWb8768Lk6+BUsu1BcmjeAvpT5aEw8Yp4EW97z6Jfz1BGmcw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:690c:fce:b0:609:e1f:5a42 with SMTP id
- dg14-20020a05690c0fce00b006090e1f5a42mr816245ywb.2.1709374066155; Sat, 02 Mar
- 2024 02:07:46 -0800 (PST)
-Date: Sat,  2 Mar 2024 10:07:44 +0000
+	s=arc-20240116; t=1709376944; c=relaxed/simple;
+	bh=3XioTpY8UndFIGe5+xld28+YcpEE3AwYivnNJ176usg=;
+	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Ql455zOUIxmYB479Er+jiemCHw4HuZ5tMlzIZJx+Ui/+jxyTDi6Lk856FWk8pn1TbMWkG3GunoiSFYkM3QSTXpiGmaJqJ2mBP3IW2L4JUlfsasIZtG4b9mjvTP6WwRo2KeAvX4M+bDLU+MYijsL/6Q9315/LqOD4dA8PLZTYsYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=didiglobal.com; spf=pass smtp.mailfrom=didiglobal.com; arc=none smtp.client-ip=111.202.70.125
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=didiglobal.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=didiglobal.com
+Received: from mail.didiglobal.com (unknown [10.79.65.12])
+	by mx10.didiglobal.com (MailData Gateway V2.8.8) with ESMTPS id 9CBCC18B4B6941;
+	Sat,  2 Mar 2024 18:52:30 +0800 (CST)
+Received: from didi-ThinkCentre-M920t-N000 (10.79.64.101) by
+ ZJY02-ACTMBX-02.didichuxing.com (10.79.65.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sat, 2 Mar 2024 18:52:29 +0800
+Date: Sat, 2 Mar 2024 18:52:24 +0800
+X-MD-Sfrom: fuyuanli@didiglobal.com
+X-MD-SrcIP: 10.79.65.12
+From: fuyuanli <fuyuanli@didiglobal.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<fuyuanli@didiglobal.com>
+Subject: [PATCH net-next] net/nlmon: Cancel setting filelds of statistics to
+ zero.
+Message-ID: <20240302105224.GA7223@didi-ThinkCentre-M920t-N000>
+Mail-Followup-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, fuyuanli@didiglobal.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240302100744.3868021-1-edumazet@google.com>
-Subject: [PATCH net-next] net/smc: reduce rtnl pressure in smc_pnet_create_pnetids_list()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
-	Jan Karcher <jaka@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>, 
-	Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: ZJY02-PUBMBX-01.didichuxing.com (10.79.65.31) To
+ ZJY02-ACTMBX-02.didichuxing.com (10.79.65.12)
 
-Many syzbot reports show extreme rtnl pressure, and many of them hint
-that smc acquires rtnl in netns creation for no good reason [1]
+Since filelds of rtnl_link_stats64 have been set to zero in previous
+dev_get_stats function, there is no need to set again in ndo_get_stats64
+function.
 
-This patch returns early from smc_pnet_net_init()
-if there is no netdevice yet.
-
-I am not even sure why smc_pnet_create_pnetids_list() even exists,
-because smc_pnet_netdev_event() is also calling
-smc_pnet_add_base_pnetid() when handling NETDEV_UP event.
-
-[1] extract of typical syzbot reports
-
-2 locks held by syz-executor.3/12252:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.4/12253:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.1/12257:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.2/12261:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.0/12265:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.3/12268:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.4/12271:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.1/12274:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-2 locks held by syz-executor.2/12280:
-  #0: ffffffff8f369610 (pernet_ops_rwsem){++++}-{3:3}, at: copy_net_ns+0x4c7/0x7b0 net/core/net_namespace.c:491
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_create_pnetids_list net/smc/smc_pnet.c:809 [inline]
-  #1: ffffffff8f375b88 (rtnl_mutex){+.+.}-{3:3}, at: smc_pnet_net_init+0x10a/0x1e0 net/smc/smc_pnet.c:878
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: Jan Karcher <jaka@linux.ibm.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: Tony Lu <tonylu@linux.alibaba.com>
-Cc: Wen Gu <guwen@linux.alibaba.com>
+Signed-off-by: fuyuanli <fuyuanli@didiglobal.com>
 ---
- net/smc/smc_pnet.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ drivers/net/nlmon.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
-index 9f2c58c5a86b7d78cdd07a996e6f7c3766d6886c..2adb92b8c4699c592eddeefb4222f70713d13895 100644
---- a/net/smc/smc_pnet.c
-+++ b/net/smc/smc_pnet.c
-@@ -806,6 +806,16 @@ static void smc_pnet_create_pnetids_list(struct net *net)
- 	u8 ndev_pnetid[SMC_MAX_PNETID_LEN];
- 	struct net_device *dev;
+diff --git a/drivers/net/nlmon.c b/drivers/net/nlmon.c
+index 5e19a6839dea..9b205b152734 100644
+--- a/drivers/net/nlmon.c
++++ b/drivers/net/nlmon.c
+@@ -56,10 +56,8 @@ nlmon_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
+ 	dev_lstats_read(dev, &packets, &bytes);
  
-+	/* Newly created netns do not have devices.
-+	 * Do not even acquire rtnl.
-+	 */
-+	if (list_empty(&net->dev_base_head))
-+		return;
-+
-+	/* Note: This might not be needed, because smc_pnet_netdev_event()
-+	 * is also calling smc_pnet_add_base_pnetid() when handling
-+	 * NETDEV_UP event.
-+	 */
- 	rtnl_lock();
- 	for_each_netdev(net, dev)
- 		smc_pnet_add_base_pnetid(net, dev, ndev_pnetid);
+ 	stats->rx_packets = packets;
+-	stats->tx_packets = 0;
+ 
+ 	stats->rx_bytes = bytes;
+-	stats->tx_bytes = 0;
+ }
+ 
+ static u32 always_on(struct net_device *dev)
 -- 
-2.44.0.278.ge034bb2e1d-goog
+2.17.1
 
 
