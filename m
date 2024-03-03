@@ -1,252 +1,224 @@
-Return-Path: <netdev+bounces-76918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5080786F683
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 18:51:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6630086F688
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 19:11:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 741FE1C209D7
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 17:51:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4FF91F21072
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 18:11:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A4E476416;
-	Sun,  3 Mar 2024 17:51:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5EC7641E;
+	Sun,  3 Mar 2024 18:11:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="6bNE7rnA"
+	dkim=pass (2048-bit key) header.d=sipanda-io.20230601.gappssmtp.com header.i=@sipanda-io.20230601.gappssmtp.com header.b="g2Dv1F21"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DC776415;
-	Sun,  3 Mar 2024 17:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FF097605C
+	for <netdev@vger.kernel.org>; Sun,  3 Mar 2024 18:11:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709488314; cv=none; b=X2RA+KE5vrKEn2f8+dyAeEsp5y9ERTMcEp22OcDpCnNXLk9j57noKYFSdY3uyNpfcskR/NMGWUSrXq/m4po5aMWDkA3Me8kiM6O9r5V6gWacSde7qajbbWxCirpXhVfYrWLAfF6w8ba3yEKbjaQBh7zdYbspzuVeDoDutacJBn8=
+	t=1709489467; cv=none; b=FPadY9X58/I7Kkpw/dbuf/H4/uRGden/F+eCa7dyycS4QhLGd+4SFRdzQBmPKxBMED3CEv8CnqCTdUckiH6WzZDOnabOIHPeqnknMARhF4jOgw1oWNai4ptHLJZx/fTBcRJmiucl0F0t++UPbNwtAI7rEvs0m0yVbGEBmF/iPFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709488314; c=relaxed/simple;
-	bh=wboIMxMQE+RVFJ6PEzPpe+q7KTasSURe6mXLsQ7Toz0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JxqFsz4rBLZUhcw9Si2d38nt64VDVUHtPgx7mgCbcQUDKFsK8HUd4JJ7ME2SHa43xwbB1DECglTlt/Sxq9Bb1s9P6PKxkYlJRaiMPbLlxvvx9otD+wzg/Yzh+g780oU/G2879POY1IL/I3QnYYt34ortiynnn1cc9YAWjyFksg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=6bNE7rnA; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=IjGJCSeONurj7PDmNjN0yS4ZGFr8/GiNUyaQ3Bs6l00=; b=6bNE7rnAiwA2lV7SQibMlTInKb
-	6axOKfVlax2Viupd+nzjYWcF1b/jf36BnnTi1yo6NCL8WVW8Vjb2aSXz9oShwtZtHqdgf88WUFi3X
-	JpjZjUU2OdV4UvBkHeU7G4AZL7N2n9mUwtdnWiHYSrvMWIdla16u48FlMW9xwrpDjmqM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rgq0A-009FAx-RP; Sun, 03 Mar 2024 18:51:54 +0100
-Date: Sun, 3 Mar 2024 18:51:54 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Lucien Jheng <lucien.jheng@airoha.com>,
-	Zhi-Jun You <hujy652@protonmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 2/2] net: phy: air_en8811h: Add the Airoha
- EN8811H PHY driver
-Message-ID: <e056b4ac-fffb-41d9-a357-898e35e6d451@lunn.ch>
-References: <20240302183835.136036-1-ericwouds@gmail.com>
- <20240302183835.136036-3-ericwouds@gmail.com>
+	s=arc-20240116; t=1709489467; c=relaxed/simple;
+	bh=d3ilUZHVXqccTa4nuolP8oFgdKje9LdymyI05oYzUoY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HMtrrCPM+sVKoE0urWlBEZhInuwdYXjB7zuqdZTZigFbdxb7jP7R4/t1dpxnMXwGGdt2sRuy2LBpvf6nSACDQ6pI3cudVwqC/6Kr055NEbR6hmWcgsoCZET2fWZ0ZQRX2OkphDO1tCWIC9ZlX3GqtnP4QdA6+UiWlY9Iv9x33ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sipanda.io; spf=pass smtp.mailfrom=sipanda.io; dkim=pass (2048-bit key) header.d=sipanda-io.20230601.gappssmtp.com header.i=@sipanda-io.20230601.gappssmtp.com header.b=g2Dv1F21; arc=none smtp.client-ip=209.85.210.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sipanda.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipanda.io
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6e4d2ba940dso766062a34.3
+        for <netdev@vger.kernel.org>; Sun, 03 Mar 2024 10:11:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sipanda-io.20230601.gappssmtp.com; s=20230601; t=1709489463; x=1710094263; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0h1sFuFMOTp+w/vSJygUlgoMZyE2IQrnfWCMK6O9dBA=;
+        b=g2Dv1F21lPyphezsXwVzFlzGf4sjF3zp0z27lZxPPTz6IqQKETxaHPfqvP0ccU06ZP
+         /5qzLIQn0zoNC+UwktUot43No58gtxpkCoJI5yCt20bWiS2RzG61Lulu8U3WoF+RYVxp
+         kP7cPQcMsWqj3saC6iG9szImDeY+VLMl9XuESID8aw50YRBu6b89AU+ei5lZJLbLLNSB
+         wIGY63VhE8qwnPv3czsZSZU2L+bK464c5C+H9uPTnuR0v2blArK6F6Yz1jjSEdPMoERj
+         FfKzTFvrxZFjROd+NOiT9ib0RvofTZvMhV0MMGtynSnUqj/n38ku3BRicvJofh+iTNbD
+         zEYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709489463; x=1710094263;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0h1sFuFMOTp+w/vSJygUlgoMZyE2IQrnfWCMK6O9dBA=;
+        b=YPFAE7m6Hc6ITqwypJ6VU2ez+xV29LQz5Z+hauFB7wOP/05agcbdLQg21/TCFp9nQq
+         LyOQQxJYamDe1brXfl9hV0TjvQzHibS0gW/N+WDcCcw1ocjzwS3Yi01afmvqW6GhBbmq
+         g49CuNPmjps8XTQwIrp0hSUWqXxIJGK4g3a3pxzGnUWjRIYIGgqi09hHHdHpZaLSJxnm
+         6mjmgrLV7ZHPKvDzx4ZNNEgmSLafGGUor2h484Zie+wW8NJ3ZcFqmH2XgLUtCVLxe7zr
+         NBesLI61OZ6ZDpbLEjAbk4KGsoc+aOQGCnn8aPmhAfN7THxNG9srP5L/NUVe5yfdjUAD
+         CIsA==
+X-Forwarded-Encrypted: i=1; AJvYcCVkiC2z2UksCD7S62A1wZqTO9+BrNIvdhjREJtSL/22yFxN6F69/iOAfS2kxp5QwvrH7FdwEY5TEQVzawDpvcUQkZOBgiOA
+X-Gm-Message-State: AOJu0YzkgH1lzp5byofe3IBIAsCOPeUjltAXZg0x2un8V6O3Ja2z1p0O
+	MgSpGsLj9LVo79pF7ZmR/Jc7Z7888zt8bl+voiu2CT//R0p2FIwcOg1slffoFnYirT0SOrVJhaN
+	QMo/8iRaurwD5fm0ZotFn/xRahXRbCA7LEdrd2Q==
+X-Google-Smtp-Source: AGHT+IHHpzcVEcNhspYRl8UdSexWw2zFjflLUoB7Hhl7y4gOEyKCmAHeZwv+F0ItAN4TwM029MAFbVo8mzYup8wNxoE=
+X-Received: by 2002:a9d:3e11:0:b0:6e4:dbb4:8f49 with SMTP id
+ a17-20020a9d3e11000000b006e4dbb48f49mr3365305otd.9.1709489463495; Sun, 03 Mar
+ 2024 10:11:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240302183835.136036-3-ericwouds@gmail.com>
+References: <20240225165447.156954-1-jhs@mojatatu.com> <b28f2f7900dc7bad129ad67621b2f7746c3b2e18.camel@redhat.com>
+ <CO1PR11MB49931E501B20F32681F917CD935F2@CO1PR11MB4993.namprd11.prod.outlook.com>
+ <65e106305ad8b_43ad820892@john.notmuch> <CAM0EoM=r1UDnkp-csPdrz6nBt7o3fHUncXKnO7tB_rcZAcbrDg@mail.gmail.com>
+ <CAOuuhY8qbsYCjdUYUZv8J3jz8HGXmtxLmTDP6LKgN5uRVZwMnQ@mail.gmail.com>
+ <20240301090020.7c9ebc1d@kernel.org> <CAM0EoM=-hzSNxOegHqhAQD7qoAR2CS3Dyh-chRB+H7C7TQzmow@mail.gmail.com>
+ <20240301173214.3d95e22b@kernel.org> <CAM0EoM=NEB25naGtz=YaOt6BDoiv4RpDw27Y=btMZAMGeYB5bg@mail.gmail.com>
+ <CAM0EoM=8GG-zCaopaUDMkvqemrZQUtaVRTMrWA6z=xrdYxG9+g@mail.gmail.com>
+ <20240302192747.371684fb@kernel.org> <CAM0EoMncuPvUsRwE+Ajojgg-8JD+1oJ7j2Rw+7oN60MjjAHV-g@mail.gmail.com>
+In-Reply-To: <CAM0EoMncuPvUsRwE+Ajojgg-8JD+1oJ7j2Rw+7oN60MjjAHV-g@mail.gmail.com>
+From: Tom Herbert <tom@sipanda.io>
+Date: Sun, 3 Mar 2024 10:10:52 -0800
+Message-ID: <CAOuuhY8pgxqCg5uTXzetTt5sd8RzOfLPYF8ksLjoUhkKyqr56w@mail.gmail.com>
+Subject: Re: Hardware Offload discussion WAS(Re: [PATCH net-next v12 00/15]
+ Introducing P4TC (series 1)
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	"Singhai, Anjali" <anjali.singhai@intel.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>, "Chatterjee, Deb" <deb.chatterjee@intel.com>, 
+	"Limaye, Namrata" <namrata.limaye@intel.com>, Marcelo Ricardo Leitner <mleitner@redhat.com>, 
+	"Shirshyad, Mahesh" <Mahesh.Shirshyad@amd.com>, "Jain, Vipin" <Vipin.Jain@amd.com>, 
+	"Osinski, Tomasz" <tomasz.osinski@intel.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>, 
+	Khalid Manaa <khalidm@nvidia.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Victor Nogueira <victor@mojatatu.com>, 
+	"Tammela, Pedro" <pctammela@mojatatu.com>, "Daly, Dan" <dan.daly@intel.com>, 
+	Andy Fingerhut <andy.fingerhut@gmail.com>, "Sommers, Chris" <chris.sommers@keysight.com>, 
+	Matty Kadosh <mattyk@nvidia.com>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> +static int en8811h_config_init(struct phy_device *phydev)
-> +{
-> +	struct en8811h_priv *priv = phydev->priv;
-> +	struct device *dev = &phydev->mdio.dev;
-> +	int ret, pollret, reg_value;
-> +	u32 pbus_value;
-> +
-> +	if (!priv->firmware_version)
-> +		ret = en8811h_load_firmware(phydev);
+On Sun, Mar 3, 2024 at 9:00=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com> =
+wrote:
+>
+> On Sat, Mar 2, 2024 at 10:27=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > On Sat, 2 Mar 2024 09:36:53 -0500 Jamal Hadi Salim wrote:
+> > > 2) Your point on:  "integrate later", or at least "fill in the gaps"
+> > > This part i am probably going to mumble on. I am going to consider
+> > > more than just doing ACLs/MAT via flower/u32 for the sake of
+> > > discussion.
+> > > True, "fill the gaps" has been our model so far. It requires kernel
+> > > changes, user space code changes etc justifiably so because most of
+> > > the time such datapaths are subject to standardization via IETF, IEEE=
+,
+> > > etc and new extensions come in on a regular basis.  And sometimes we
+> > > do add features that one or two users or a single vendor has need for
+> > > at the cost of kernel and user/control extension. Given our work
+> > > process, any features added this way take a long time to make it to
+> > > the end user.
+> >
+> > What I had in mind was more of a DDP model. The device loads it binary
+> > blob FW in whatever way it does, then it tells the kernel its parser
+> > graph, and tables. The kernel exposes those tables to user space.
+> > All dynamic, no need to change the kernel for each new protocol.
+> >
+> > But that's different in two ways:
+> >  1. the device tells kernel the tables, no "dynamic reprogramming"
+> >  2. you don't need the SW side, the only use of the API is to interact
+> >     with the device
+> >
+> > User can still do BPF kfuncs to look up in the tables (like in FIB),
+> > but call them from cls_bpf.
+> >
+>
+> This is not far off from what is envisioned today in the discussions.
+> The main issue is who loads the binary? We went from devlink to the
+> filter doing the loading. DDP is ethtool. We still need to tie a PCI
+> device/tc block to the "program" so we can do skip_sw and it works.
+> Meaning a device that is capable of handling multiple programs can
+> have multiple blobs loaded. A "program" is mapped to a tc filter and
+> MAT control works the same way as it does today (netlink/tc ndo).
+>
+> A program in P4 has a name, ID and people have been suggesting a sha1
+> identity (or a signature of some kind should be generated by the
+> compiler). So the upward propagation could be tied to discovering
+> these 3 tuples from the driver. Then the control plane targets a
+> program via those tuples via netlink (as we do currently).
+>
+> I do note, using the DDP sample space, currently whatever gets loaded
+> is "trusted" and really you need to have human knowledge of what the
+> NIC's parsing + MAT is to send the control. With P4 that is all
+> visible/programmable by the end user (i am not a proponent of vendors
+> "shipping" things or calling them for support) - so should be
+> sufficient to just discover what is in the binary and send the correct
+> control messages down.
+>
+> > I think in P4 terms that may be something more akin to only providing
+> > the runtime API? I seem to recall they had some distinction...
+>
+> There are several solutions out there (ex: TDI, P4runtime) - our API
+> is netlink and those could be written on top of netlink, there's no
+> controversy there.
+> So the starting point is defining the datapath using P4, generating
+> the binary blob and whatever constraints needed using the vendor
+> backend and for s/w equivalent generating the eBPF datapath.
+>
+> > > At the cost of this sounding controversial, i am going
+> > > to call things like fdb, fib, etc which have fixed datapaths in the
+> > > kernel "legacy". These "legacy" datapaths almost all the time have
+> >
+> > The cynic in me sometimes thinks that the biggest problem with "legacy"
+> > protocols is that it's hard to make money on them :)
+>
+> That's a big motivation without a doubt, but also there are people
+> that want to experiment with things. One of the craziest examples we
+> have is someone who created a P4 program for "in network calculator",
+> essentially a calculator in the datapath. You send it two operands and
+> an operator using custom headers, it does the math and responds with a
+> result in a new header. By itself this program is a toy but it
+> demonstrates that if one wanted to, they could have something custom
+> in hardware and/or kernel datapath.
 
-How long does this take for your hardware?
+Jamal,
 
-We have a phylib design issue with loading firmware. It would be
-better if it happened during probe, but it might not be finished by
-the time the MAC driver tries to attach to the PHY and so that fails.
-This is the second PHY needing this, so maybe we need to think about
-adding a thread kicked off in probe to download the firmware? But
-probably later, not part of this patchset.
+Given how long P4 has been around it's surprising that the best
+publicly available code example is "the network calculator" toy. At
+this point in its lifetime, eBPF had far more examples of real world
+use cases publically available. That being said, there's nothing
+unique about P4 supporting the network calculator. We could just as
+easily write this in eBPF (either plain C or P4)  and "offload" it to
+an ARM core on a SmartNIC.
 
-> +	else
-> +		ret = en8811h_restart_host(phydev);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	/* Because of mdio-lock, may have to wait for multiple loads */
-> +	pollret = phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
-> +					    EN8811H_PHY_FW_STATUS, reg_value,
-> +					    reg_value == EN8811H_PHY_READY,
-> +					    20000, 7500000, true);
-> +
-> +	ret = air_buckpbus_reg_read(phydev, EN8811H_FW_VERSION, &pbus_value);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	if (pollret || !pbus_value) {
-> +		phydev_err(phydev, "Firmware not ready: 0x%x\n", reg_value);
-> +		return -ENODEV;
-> +	}
-> +
-> +	if (!priv->firmware_version) {
-> +		phydev_info(phydev, "MD32 firmware version: %08x\n", pbus_value);
-> +		priv->firmware_version = pbus_value;
-> +	}
-> +
-> +	/* Select mode 1, the only mode supported */
+If we are going to support programmable device offload in the Linux
+kernel then I maintain it should be a generic mechanism that's
+agnostic to *both* the frontend programming language as well as the
+backend target. For frontend languages we want to let the user program
+in a language that's convenient for *them*, which honestly in most
+cases isn't going to be a narrow use case DSL (i.e. typically users
+want to code in C/C++, Python, Rust, etc.). For the backend it's the
+same story, maybe we're compiling to run in host, maybe we're
+offloading to P4 runtime, maybe we're offloading to another CPU, maybe
+we're offloading some other programmable NPU. The only real
+requirement is a compiler that can take the frontend code and compile
+for the desired backend target, but above all we want this to be easy
+for the programmer, the compiler needs to do the heavy lifting and we
+should never require the user to understand the nuances of a target.
 
-Maybe a comment about what mode 1 actually is?
+IMO, the model we want for programmable kernel offload is "write once,
+run anywhere, run well". Which is the Java tagline amended with "run
+well". Users write one program for their datapath processing, it runs
+on various targets, for any given target we run to run at the highest
+performance levels possible given the target's capabilities.
 
-> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, AIR_PHY_HOST_CMD_1,
-> +			    AIR_PHY_HOST_CMD_1_MODE1);
-> +	if (ret < 0)
-> +		return ret;
-> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, AIR_PHY_HOST_CMD_2,
-> +			    AIR_PHY_HOST_CMD_2_MODE1);
-> +	if (ret < 0)
-> +		return ret;
-> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, AIR_PHY_HOST_CMD_3,
-> +			    AIR_PHY_HOST_CMD_3_MODE1);
-> +	if (ret < 0)
-> +		return ret;
-> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, AIR_PHY_HOST_CMD_4,
-> +			    AIR_PHY_HOST_CMD_4_MODE1);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	/* Serdes polarity */
-> +	pbus_value = 0;
-> +	if (device_property_read_bool(dev, "airoha,pnswap-rx"))
-> +		pbus_value |=  EN8811H_POLARITY_RX_REVERSE;
-> +	else
-> +		pbus_value &= ~EN8811H_POLARITY_RX_REVERSE;
-> +	if (device_property_read_bool(dev, "airoha,pnswap-tx"))
-> +		pbus_value &= ~EN8811H_POLARITY_TX_NORMAL;
-> +	else
-> +		pbus_value |=  EN8811H_POLARITY_TX_NORMAL;
-> +	ret = air_buckpbus_reg_modify(phydev, EN8811H_POLARITY,
-> +				      EN8811H_POLARITY_RX_REVERSE |
-> +				      EN8811H_POLARITY_TX_NORMAL, pbus_value);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	ret = air_leds_init(phydev, EN8811H_LED_COUNT, AIR_PHY_LED_DUR,
-> +			    AIR_LED_MODE_USER_DEFINE);
-> +	if (ret < 0) {
-> +		phydev_err(phydev, "Failed to initialize leds: %d\n", ret);
-> +		return ret;
-> +	}
-> +
-> +	ret = air_buckpbus_reg_modify(phydev, EN8811H_GPIO_OUTPUT,
-> +				      EN8811H_GPIO_OUTPUT_345,
-> +				      EN8811H_GPIO_OUTPUT_345);
+Tom
 
-What does this do? Configure them as inputs? Hopefully they are inputs
-by default, or at least Hi-Z.
-
-> +static int en8811h_get_features(struct phy_device *phydev)
-> +{
-> +	linkmode_set_bit_array(phy_basic_ports_array,
-> +			       ARRAY_SIZE(phy_basic_ports_array),
-> +			       phydev->supported);
-> +
-> +	return genphy_c45_pma_read_abilities(phydev);
-> +}
-> +
-
-> +static int en8811h_config_aneg(struct phy_device *phydev)
-> +{
-> +	bool changed = false;
-> +	int ret;
-> +	u32 adv;
-> +
-> +	adv = linkmode_adv_to_mii_10gbt_adv_t(phydev->advertising);
-> +
-> +	ret = phy_modify_mmd_changed(phydev, MDIO_MMD_AN, MDIO_AN_10GBT_CTRL,
-> +				     MDIO_AN_10GBT_CTRL_ADV2_5G, adv);
-> +	if (ret < 0)
-> +		return ret;
-> +	if (ret > 0)
-> +		changed = true;
-> +
-> +	return __genphy_config_aneg(phydev, changed);
-
-There was a comment that it does not support forced link mode, only
-auto-neg? It would be good to test the configuration here and return
-EOPNOTSUPP, or EINVAL if auto-neg is turned off.
-
-> +}
-> +
-> +static int en8811h_read_status(struct phy_device *phydev)
-> +{
-> +	struct en8811h_priv *priv = phydev->priv;
-> +	u32 pbus_value;
-> +	int ret, val;
-> +
-> +	ret = genphy_update_link(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	phydev->master_slave_get = MASTER_SLAVE_CFG_UNSUPPORTED;
-> +	phydev->master_slave_state = MASTER_SLAVE_STATE_UNSUPPORTED;
-> +	phydev->speed = SPEED_UNKNOWN;
-> +	phydev->duplex = DUPLEX_UNKNOWN;
-> +	phydev->pause = 0;
-> +	phydev->asym_pause = 0;
-> +
-> +	ret = genphy_read_master_slave(phydev);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	ret = genphy_read_lpa(phydev);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	/* Get link partner 2.5GBASE-T ability from vendor register */
-> +	ret = air_buckpbus_reg_read(phydev, EN8811H_2P5G_LPA, &pbus_value);
-> +	if (ret < 0)
-> +		return ret;
-> +	linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
-> +			 phydev->lp_advertising,
-> +			 pbus_value & EN8811H_2P5G_LPA_2P5G);
-> +
-> +	if (phydev->autoneg == AUTONEG_ENABLE && phydev->autoneg_complete)
-
-Is the first part of that expression needed? I thought you could not
-turn auto-neg off?
-
-> +
-> +	/* Only supports full duplex */
-> +	phydev->duplex = DUPLEX_FULL;
-
-What does en8811h_get_features() indicate the PHY can do? Are any 1/2
-duplex modes listed?
-
-       Andrew
+>
+> cheers,
+> jamal
 
