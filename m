@@ -1,82 +1,134 @@
-Return-Path: <netdev+bounces-76867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF20886F397
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 05:05:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6386B86F3A1
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 05:27:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46CA6B2245F
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 04:05:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B06F6B2302A
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 04:27:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C0F45CB5;
-	Sun,  3 Mar 2024 04:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8AE66FBF;
+	Sun,  3 Mar 2024 04:27:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iV5j7oEi"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="ospqSB5k"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out203-205-251-73.mail.qq.com (out203-205-251-73.mail.qq.com [203.205.251.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC63F7F
-	for <netdev@vger.kernel.org>; Sun,  3 Mar 2024 04:05:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42026FA8;
+	Sun,  3 Mar 2024 04:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.251.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709438737; cv=none; b=mwrXfJDjgYJsfX1yjQ47IMO3g9uNbLfzymL/zu5hK88OtlWaYPwd5PSEu2xZB12GYMUu215k7LFBNdwEffXr71Wu4prpUlsGl4emhOI/PpwCLA5xoxwEg3JztQ4EdBR5+xPViqjP94P84N+AAO/kBtcWsVmOcGPkk3UoDrU9ORI=
+	t=1709440049; cv=none; b=pjGf/vDOC0QXylhNnUAt4hvjjCrafjicZOiTcRf/7D7HI0DN3tYvJNidKnj9UYYMqn2K+/q7k1R39pBYLvo+PApWQRZeBetvwHzD3NH/bKS8cfQLyGUHInXEsevK6iiwesbDAuCZKs0TOTBkiYptR/PzfTqqdB08UX9SdIWzQYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709438737; c=relaxed/simple;
-	bh=u/saMj8GznZwiXUgGDU83DQkfqLGJRKcTVxQ6qbwnZM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IGagd24W1SriYDU3ysos2fjw5YELGqPFxD28XHO2f9N/DOUjtNT9oTVXEEZh2/6P5xITuP1s5ZvxBc2TuD6xbJDy6wRQ/jOHbj4dDzui8zOvFYHZBDKKvNWzpe2kDjiCeAkmCfc94C8QaCEJ0/sWSMVsFCEWepgkgKTknUA+JqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iV5j7oEi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D8D0C433F1;
-	Sun,  3 Mar 2024 04:05:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709438737;
-	bh=u/saMj8GznZwiXUgGDU83DQkfqLGJRKcTVxQ6qbwnZM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iV5j7oEilJ0T9xfr3n7ZNEMwJj55Qz6L7jysMGm0RbUB1AQ6X4K1qo4pI+mifXz5m
-	 JfaW+KOEao2OGt2LOWYJYn6m0CiffjcHPK3vOs02MyM7t9gB8Oet0QVIHiKw6KzUud
-	 +1wjX6ayjOUHx/P8s4t1hVd0fcsMq6/6kPyzoO1qm/FLE8/O7Qjyh+Hvb0xiWOSKDQ
-	 +/OE72ECKCdM1HoVoXi4rDkzPeC5PDKN4Qw/wMv/tBt1p9WDFnrzvv4u9z1yz5YK3v
-	 T1kQRc0apYEICf/MDF1IbnJ3rkWE8l97PQQoOL7PDeKmWbm0jEejHDwPNah2Ofouzi
-	 bYevDHFRLD8dg==
-Date: Sat, 2 Mar 2024 20:05:36 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jacob
- Keller <jacob.e.keller@intel.com>, Jiri Pirko <jiri@resnulli.us>, Stanislav
- Fomichev <sdf@google.com>, donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1 3/4] tools/net/ynl: Extend array-nest for
- multi level nesting
-Message-ID: <20240302200536.511a5078@kernel.org>
-In-Reply-To: <20240301171431.65892-4-donald.hunter@gmail.com>
-References: <20240301171431.65892-1-donald.hunter@gmail.com>
-	<20240301171431.65892-4-donald.hunter@gmail.com>
+	s=arc-20240116; t=1709440049; c=relaxed/simple;
+	bh=tgkxv0wJipx7iT6D8udnhav/UB2N8Ez2CrQrfJ3/1Fk=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=RgkrrUfNJusT1Pfc5R39fnlUKpS6wMZAFHUO2VJnrAyrqzt4ZHpuMmeTfpvxoMmTPI//n3TN8iKLHE4polsZVuI+sUMVeEET37LoBvIjJPpDKAcHL/7DqrWSqHwY+Nm4nB7E5YFJYgbChcLWkEyaQgNDEUYtjGRApoSpORHMYJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=ospqSB5k; arc=none smtp.client-ip=203.205.251.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1709440038; bh=aS+G9OyqYa6igSB8+oaADpXxrUcRmnnV1ukdP5ZUw40=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=ospqSB5kzogVUhsCSraNkPwC0bVgRVkHNZ+PZrlqmJxfE0N5jWvKBtfb2tLmafeZ9
+	 /h7mjK4NhfMvsDx21laMMxI/eEuquDM2MVDJxpJ90nnw8YLjCbTl6GuOnpAvKWUQZ/
+	 oRl6sxxB65urwq0EdeCmsA+6ECd8aptVAQgwS7V0=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.140])
+	by newxmesmtplogicsvrsza10-0.qq.com (NewEsmtp) with SMTP
+	id 4B91820F; Sun, 03 Mar 2024 12:18:57 +0800
+X-QQ-mid: xmsmtpt1709439537tv7yagi3y
+Message-ID: <tencent_25067C49AB2EDF6EE5CC95A7FA86C992F806@qq.com>
+X-QQ-XMAILINFO: MyIXMys/8kCtrKzo+WwWQUCutSBfQRboT1XAuuTchFnlDdd28/APvRLxK7ln2S
+	 RDVzZtWZJqG9hKC2xWGS5+4d6sgY7dts/L42PLnF5ySVCZWnppoD3fk+RoEDgs3O881WKyhBMb33
+	 mRBnAj8LgaAk2tTijlN0fFof8RdAvD8HwT9Tvm0tMOQoMPS/CKtOPl/ooaSC/2rM7AXF7ZrRkWJx
+	 CToej6NhIINDxPeCjhOEjmuJToRByK7AmZGrplDIggmnkMTe1n9edwzQqBPtZtl8byLVkYPJxHAz
+	 SVNsN3/Gg3MqiN0F+qApukqKRCUqAr10jQwKDEv092B/LbaSO4p5sHCFMw9yOaWNFwPr5Ip5lNus
+	 Qu/htmJprUzq+CPVfKnwO51FIJrBcmQpxXZK8f+DbDnZeENGxbHa/Scz4MF7RvfYRPzW82Vcftt1
+	 gRiHoiJYMaz2cJKK+4ToFJb7IK0LhOhg2aqtXjwD7xeb+/O+3zvWIBQEWejB/KkIlNlJ0NfXIR/G
+	 rP8VLdybv/C9MujLrQqQ77cpFGWg9we8a70OJg/KPYtWZvA9UjdVUHpvf2VCdtpMBrT9uLjJF1nW
+	 qFj7oWw+p2BCMdV4IRIOLBJS0YKFxxfj0CXGH2WSTCn/QpcrRrDtBmxc0plGWMWwwo0/jBCgEeAz
+	 gLvZNSFr5peqIe7qFURSD7xx/7fvOqrOtPjClIyoNVwIx9zrFej4dqWAs56qzMJdKCO/P+1m/4aD
+	 HbGOZJgPTPEYIv09CmdTzFH7/eE0YQwG7wrurhaoQtBcRchLwqA8jjm2xdwubj71j/7EnYQn94AA
+	 fw8ZTU6NLLqkwFKBrqLkmsmZosa/HBrcHyF5SqOMmgSMrEb2aQmjcOVvytxD9Ypw/boj8BSvZbCb
+	 2t3w0AGKdjNBALPBF+eughIKO5GR0OihUz7N3hXThLeKPoTUVSLpd3yUQFLexPsPRq/f/+sZ0iO6
+	 6zsm8mg/2m1U2EbeCAp2K/2sz0v/tpYB4cFmzdMoKllNEyBZ4vsisp3YAQpLBnHoRSQk+jOf4Ib9
+	 /H/dRYmw==
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+d4faee732755bba9838e@syzkaller.appspotmail.com
+Cc: allison.henderson@oracle.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	rds-devel@oss.oracle.com,
+	santosh.shilimkar@oracle.com,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH] net/rds: fix WARNING in rds_conn_connect_if_down
+Date: Sun,  3 Mar 2024 12:18:57 +0800
+X-OQ-MSGID: <20240303041856.31749-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <000000000000c0550506125e4118@google.com>
+References: <000000000000c0550506125e4118@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Fri,  1 Mar 2024 17:14:30 +0000 Donald Hunter wrote:
-> The nlctrl family uses 2 levels of array nesting for policy attributes.
-> Add a 'nest-depth' property to genetlink-legacy and extend ynl to use
-> it.
+If connection isn't established yet, get_mr() will fail, trigger connection after
+get_mr().
 
-Hm, I'm 90% sure we don't need this... because nlctrl is basically what
-the legacy level was written for, initially. The spec itself wasn't
-sent, because the C codegen for it was quite painful. And the Python
-CLI was an afterthought.
+Fixes: 584a8279a44a ("RDS: RDMA: return appropriate error on rdma map failures") 
+Reported-and-tested-by: syzbot+d4faee732755bba9838e@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ net/rds/rdma.c | 3 +++
+ net/rds/send.c | 6 +-----
+ 2 files changed, 4 insertions(+), 5 deletions(-)
 
-Could you describe what nesting you're trying to cover here?
-Isn't it a type-value?
+diff --git a/net/rds/rdma.c b/net/rds/rdma.c
+index fba82d36593a..a4e3c5de998b 100644
+--- a/net/rds/rdma.c
++++ b/net/rds/rdma.c
+@@ -301,6 +301,9 @@ static int __rds_rdma_map(struct rds_sock *rs, struct rds_get_mr_args *args,
+ 			kfree(sg);
+ 		}
+ 		ret = PTR_ERR(trans_private);
++		/* Trigger connection so that its ready for the next retry */
++		if (ret == -ENODEV)
++			rds_conn_connect_if_down(cp->cp_conn);
+ 		goto out;
+ 	}
+ 
+diff --git a/net/rds/send.c b/net/rds/send.c
+index 5e57a1581dc6..fa1640628b2f 100644
+--- a/net/rds/send.c
++++ b/net/rds/send.c
+@@ -1313,12 +1313,8 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
+ 
+ 	/* Parse any control messages the user may have included. */
+ 	ret = rds_cmsg_send(rs, rm, msg, &allocated_mr, &vct);
+-	if (ret) {
+-		/* Trigger connection so that its ready for the next retry */
+-		if (ret ==  -EAGAIN)
+-			rds_conn_connect_if_down(conn);
++	if (ret) 
+ 		goto out;
+-	}
+ 
+ 	if (rm->rdma.op_active && !conn->c_trans->xmit_rdma) {
+ 		printk_ratelimited(KERN_NOTICE "rdma_op %p conn xmit_rdma %p\n",
+-- 
+2.43.0
 
-BTW we'll also need to deal with the C codegen situation somehow.
-Try making it work, if it's not a simple matter of fixing up the 
-names to match the header - we can grep nlctrl out in the Makefile.
 
