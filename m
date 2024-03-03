@@ -1,302 +1,328 @@
-Return-Path: <netdev+bounces-76923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2571786F721
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 22:08:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEF1F86F722
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 22:09:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF79F28164D
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 21:08:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DF311C20952
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 21:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FFB26CDB6;
-	Sun,  3 Mar 2024 21:08:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F348379B74;
+	Sun,  3 Mar 2024 21:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="BGuQZ4m1"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6030C1CA8F
-	for <netdev@vger.kernel.org>; Sun,  3 Mar 2024 21:08:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105CBA957
+	for <netdev@vger.kernel.org>; Sun,  3 Mar 2024 21:09:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709500114; cv=none; b=apwrvV2+mCeziyQIvy2KoS7dzAyDLOmszhPS8UgKwBePlL8J/sT7ZKykwK0dWLzOvJ7Z4qsFoCQ9DRXMkHs+0vxc2XeDbpFW+PTy+jixrMal1vTjr5xhpmblA+fQbOTK5fQKdbPFcJLumHc3EUA/XWuRRTmEuRTvTccJFZUL6cA=
+	t=1709500153; cv=none; b=dYPfNgW3TsKutvVznwj04bckqEraBBMiiHQbuomzFDTfPRdp3l+P+l+o0C6FLY/gyju+lNcIEzHzgE6xJoKB4F/A04Dvo932Yr7+mpEuyBNKt5meTFRN8Aall+Y5p1q2bQxFFFHGE0kSriv3VV6Uvn3ETv/sZsZdhkH7GavZYtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709500114; c=relaxed/simple;
-	bh=HMLg9fV5aXSTpdq2V5aSd8uXpHHP2iUbRrqUK1VoXAw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eLwyBBqYrJwQr/qzlXwM788dd5Y2gcGO+KikSJMdKQe7dYUTFtWv35j6netOrXI8JFyN59zKCN7oHEgmP1ZuEIfI5JwSi2EJlVs3MIbly7I57n4qdT+uaebUWs5Gn/HmbhFIfJme5YMc3mYX7zQSANdGDhwylCleQk/D4vHEAzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1rgt4E-0006mV-3D;
-	Sun, 03 Mar 2024 21:08:19 +0000
-Date: Sun, 3 Mar 2024 21:08:15 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Eric Woudstra <ericwouds@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
-	Alexander Couzens <lynxis@fe80.eu>
-Subject: Re: [PATCH v2 net-next 1/7] net: phy: realtek: configure SerDes mode
- for rtl822x/8251b PHYs
-Message-ID: <ZeTmv0S9cbqFOUPS@makrotopia.org>
-References: <20240303102848.164108-1-ericwouds@gmail.com>
- <20240303102848.164108-2-ericwouds@gmail.com>
- <f587013b-8f2c-4ae1-83b8-0c69ba99f3ea@gmail.com>
+	s=arc-20240116; t=1709500153; c=relaxed/simple;
+	bh=vtVR9ZOMBU7ygXJHsZw/nVmNbARzHuZTuf0r3kXaugE=;
+	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=QWnGQHR2LIXmQI9OKDuTDQi/JTaMdWnQtidfgq+2OT7DsmQG5+lmH0bU9FQHLS8qYdJy45ROZ0S7Lmay1YwsxItQTpE8UPSVWNMGVSo4/o7YVCT2Fyn5r63iZyGrulBFM7vHtK5WOhNI3zMwYSBES+eTGPDgR9sezwukvnGJOww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=BGuQZ4m1; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 587E120612;
+	Sun,  3 Mar 2024 22:09:02 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id JkRAQEp-Yr-4; Sun,  3 Mar 2024 22:09:01 +0100 (CET)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 7F46720519;
+	Sun,  3 Mar 2024 22:09:01 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 7F46720519
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1709500141;
+	bh=vKDYsU72XYUKNO3py3OJoh81K51tZZrdrKSYXFEM2Ec=;
+	h=Date:From:To:CC:Subject:Reply-To:From;
+	b=BGuQZ4m1dY0hPWJ6hoSTfmI71J1Cg+7CnXfnfrNjuJeHHmztFKee/FIBQYQ9Dl0dV
+	 LF3G4hCnLpqBPdPhRNt2kMBYWirDzm19RhxLF7fs/wcEBFSFuZgadHT9KPHC5M2viL
+	 SUhpaRgN4ASKCKGLRjyaPlZREFTKnMamPNNq5ICC4xEVxKSfKPEs28eARuSrQKd+vT
+	 uafCOCf0WY7ZCBU5NNMJvgiN7WnJ7SLXRVG2BuZ9kJ0izEk4VRI51rr0tCJccX9AO8
+	 2iJx/Q3oBpdmBFOpgjSwPGqMXE5U9eN9KqRMrHc+vO+cCaTCbtRV5LB95Lx7+1vFJ0
+	 63dpGU88xZ0Gg==
+Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
+	by mailout1.secunet.com (Postfix) with ESMTP id 6CA4080004A;
+	Sun,  3 Mar 2024 22:09:01 +0100 (CET)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sun, 3 Mar 2024 22:09:01 +0100
+Received: from moon.secunet.de (172.18.149.1) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Sun, 3 Mar
+ 2024 22:09:00 +0100
+Date: Sun, 3 Mar 2024 22:08:41 +0100
+From: Antony Antony <antony.antony@secunet.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>
+CC: <netdev@vger.kernel.org>, <devel@linux-ipsec.org>
+Subject: [PATCH ipsec-next] xfrm: Add Direction to the SA in or out
+Message-ID: <d84a02e019ef188c4295089f6134af67ef7e7452.1709498351.git.antony.antony@secunet.com>
+Reply-To: <antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f587013b-8f2c-4ae1-83b8-0c69ba99f3ea@gmail.com>
+Precedence: first-class
+Priority: normal
+Organization: secunet
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On Sun, Mar 03, 2024 at 09:42:31PM +0100, Heiner Kallweit wrote:
-> On 03.03.2024 11:28, Eric Woudstra wrote:
-> > From: Alexander Couzens <lynxis@fe80.eu>
-> > 
-> > The rtl822x series and rtl8251b support switching SerDes mode between
-> > 2500base-x and sgmii based on the negotiated copper speed.
-> > 
-> > Configure this switching mode according to SerDes modes supported by
-> > host.
-> > 
-> > There is an additional datasheet for RTL8226B/RTL8221B called
-> > "SERDES MODE SETTING FLOW APPLICATION NOTE" where this sequence to
-> > setup interface and rate adapter mode.
-> > 
-> > However, there is no documentation about the meaning of registers
-> > and bits, it's literally just magic numbers and pseudo-code.
-> > 
-> > Signed-off-by: Alexander Couzens <lynxis@fe80.eu>
-> > [ refactored, dropped HiSGMII mode and changed commit message ]
-> > Signed-off-by: Marek Behún <kabel@kernel.org>
-> > [ changed rtl822x_update_interface() to use vendor register ]
-> > [ always fill in possible interfaces ]
-> > Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
-> > ---
-> >  drivers/net/phy/realtek.c | 99 ++++++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 97 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-> > index 1fa70427b2a2..8a876e003774 100644
-> > --- a/drivers/net/phy/realtek.c
-> > +++ b/drivers/net/phy/realtek.c
-> > @@ -54,6 +54,16 @@
-> >  						 RTL8201F_ISR_LINK)
-> >  #define RTL8201F_IER				0x13
-> >  
-> > +#define RTL822X_VND1_SERDES_OPTION			0x697a
-> > +#define RTL822X_VND1_SERDES_OPTION_MODE_MASK		GENMASK(5, 0)
-> > +#define RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX_SGMII		0
-> > +#define RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX		2
-> > +
-> > +#define RTL822X_VND1_SERDES_CTRL3			0x7580
-> > +#define RTL822X_VND1_SERDES_CTRL3_MODE_MASK		GENMASK(5, 0)
-> > +#define RTL822X_VND1_SERDES_CTRL3_MODE_SGMII			0x02
-> > +#define RTL822X_VND1_SERDES_CTRL3_MODE_2500BASEX		0x16
-> > +
-> >  #define RTL8366RB_POWER_SAVE			0x15
-> >  #define RTL8366RB_POWER_SAVE_ON			BIT(12)
-> >  
-> > @@ -659,6 +669,60 @@ static int rtl822x_write_mmd(struct phy_device *phydev, int devnum, u16 regnum,
-> >  	return ret;
-> >  }
-> >  
-> > +static int rtl822x_config_init(struct phy_device *phydev)
-> > +{
-> > +	bool has_2500, has_sgmii;
-> > +	u16 mode;
-> > +	int ret;
-> > +
-> > +	has_2500 = test_bit(PHY_INTERFACE_MODE_2500BASEX,
-> > +			    phydev->host_interfaces) ||
-> > +		   phydev->interface == PHY_INTERFACE_MODE_2500BASEX;
-> > +
-> > +	has_sgmii = test_bit(PHY_INTERFACE_MODE_SGMII,
-> > +			     phydev->host_interfaces) ||
-> > +		    phydev->interface == PHY_INTERFACE_MODE_SGMII;
-> > +
-> > +	/* fill in possible interfaces */
-> > +	__assign_bit(PHY_INTERFACE_MODE_2500BASEX, phydev->possible_interfaces,
-> > +		     has_2500);
-> > +	__assign_bit(PHY_INTERFACE_MODE_SGMII, phydev->possible_interfaces,
-> > +		     has_sgmii);
-> > +
-> > +	if (!has_2500 && !has_sgmii)
-> > +		return 0;
-> > +
-> > +	/* determine SerDes option mode */
-> > +	if (has_2500 && !has_sgmii)
-> > +		mode = RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX;
-> > +	else
-> > +		mode = RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX_SGMII;
-> > +
-> > +	/* the following sequence with magic numbers sets up the SerDes
-> > +	 * option mode
-> > +	 */
-> > +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x75f3, 0);
-> > +	if (ret < 0)
-> > +		return ret;
-> > +
-> > +	ret = phy_modify_mmd_changed(phydev, MDIO_MMD_VEND1,
-> > +				     RTL822X_VND1_SERDES_OPTION,
-> > +				     RTL822X_VND1_SERDES_OPTION_MODE_MASK,
-> > +				     mode);
-> > +	if (ret < 0)
-> > +		return ret;
-> > +
-> > +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x6a04, 0x0503);
-> > +	if (ret < 0)
-> > +		return ret;
-> > +
-> > +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x6f10, 0xd455);
-> > +	if (ret < 0)
-> > +		return ret;
-> > +
-> > +	return phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x6f11, 0x8020);
-> > +}
-> > +
-> >  static int rtl822x_get_features(struct phy_device *phydev)
-> >  {
-> >  	int val;
-> > @@ -695,6 +759,28 @@ static int rtl822x_config_aneg(struct phy_device *phydev)
-> >  	return __genphy_config_aneg(phydev, ret);
-> >  }
-> >  
-> > +static void rtl822x_update_interface(struct phy_device *phydev)
-> > +{
-> > +	int val;
-> > +
-> > +	if (!phydev->link)
-> > +		return;
-> > +
-> > +	/* Change interface according to serdes mode */
-> > +	val = phy_read_mmd(phydev, MDIO_MMD_VEND1, RTL822X_VND1_SERDES_CTRL3);
-> > +	if (val < 0)
-> > +		return;
-> > +
-> > +	switch (val & RTL822X_VND1_SERDES_CTRL3_MODE_MASK) {
-> > +	case RTL822X_VND1_SERDES_CTRL3_MODE_2500BASEX:
-> > +		phydev->interface = PHY_INTERFACE_MODE_2500BASEX;
-> > +		break;
-> > +	case RTL822X_VND1_SERDES_CTRL3_MODE_SGMII:
-> > +		phydev->interface = PHY_INTERFACE_MODE_SGMII;
-> > +		break;
-> > +	}
-> > +}
-> > +
-> >  static int rtl822x_read_status(struct phy_device *phydev)
-> >  {
-> >  	int ret;
-> > @@ -709,11 +795,13 @@ static int rtl822x_read_status(struct phy_device *phydev)
-> >  						  lpadv);
-> >  	}
-> >  
-> > -	ret = genphy_read_status(phydev);
-> > +	ret = rtlgen_read_status(phydev);
-> >  	if (ret < 0)
-> >  		return ret;
-> >  
-> > -	return rtlgen_get_speed(phydev);
-> > +	rtl822x_update_interface(phydev);
-> > +
-> > +	return 0;
-> >  }
-> >  
-> >  static bool rtlgen_supports_2_5gbps(struct phy_device *phydev)
-> > @@ -976,6 +1064,7 @@ static struct phy_driver realtek_drvs[] = {
-> >  		.match_phy_device = rtl8226_match_phy_device,
-> >  		.get_features	= rtl822x_get_features,
-> >  		.config_aneg	= rtl822x_config_aneg,
-> > +		.config_init    = rtl822x_config_init,
-> 
-> Did you test this (and the rest of the series) on RTL8125A, where
-> MMD register access for the integrated 2.5G PHY isn't supported?
+This patch introduces the 'dir' attribute, 'in' or 'out', to the
+xfrm_state, SA, enhancing usability by delineating the scope of values
+based on direction. An input SA will now exclusively encompass values
+pertinent to input, effectively segregating them from output-related
+values. This change aims to streamline the configuration process and
+improve the overall clarity of SA attributes.
 
-None of this should be done on RealTek NICs, and the easiest way to
-prevent that is to test if phydev->phylink is NULL or not (as the NIC
-driver doesn't use phylink but rather just calls phy_connect_direct()).
+Signed-off-by: Antony Antony <antony.antony@secunet.com>
+---
+ include/net/xfrm.h        |  1 +
+ include/uapi/linux/xfrm.h |  8 ++++++++
+ net/xfrm/xfrm_compat.c    |  6 ++++--
+ net/xfrm/xfrm_device.c    |  5 +++++
+ net/xfrm/xfrm_state.c     |  1 +
+ net/xfrm/xfrm_user.c      | 43 +++++++++++++++++++++++++++++++++++----
+ 6 files changed, 58 insertions(+), 6 deletions(-)
 
-Also note that the datasheet with the magic SerDes config sequences
-lists only 2nd generation 2.5G PHYs as supported:
-RTL8226B
-RTL8221B(I)
-RTL8221B(I)-VB
-RTL8221B(I)-VM
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 1d107241b901..91348a03469c 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -289,6 +289,7 @@ struct xfrm_state {
+ 	/* Private data of this transformer, format is opaque,
+ 	 * interpreted by xfrm_type methods. */
+ 	void			*data;
++	enum xfrm_sa_dir	dir;
+ };
+ 
+ static inline struct net *xs_net(struct xfrm_state *x)
+diff --git a/include/uapi/linux/xfrm.h b/include/uapi/linux/xfrm.h
+index 6a77328be114..2f1d67239301 100644
+--- a/include/uapi/linux/xfrm.h
++++ b/include/uapi/linux/xfrm.h
+@@ -141,6 +141,13 @@ enum {
+ 	XFRM_POLICY_MAX	= 3
+ };
+ 
++enum xfrm_sa_dir {
++	XFRM_SA_DIR_UNSET = 0,
++	XFRM_SA_DIR_IN	= 1,
++	XFRM_SA_DIR_OUT	= 2,
++	XFRM_SA_DIR_MAX = 3,
++};
++
+ enum {
+ 	XFRM_SHARE_ANY,		/* No limitations */
+ 	XFRM_SHARE_SESSION,	/* For this session only */
+@@ -315,6 +322,7 @@ enum xfrm_attr_type_t {
+ 	XFRMA_SET_MARK_MASK,	/* __u32 */
+ 	XFRMA_IF_ID,		/* __u32 */
+ 	XFRMA_MTIMER_THRESH,	/* __u32 in seconds for input SA */
++	XFRMA_SA_DIR,		/* __u8 */
+ 	__XFRMA_MAX
+ 
+ #define XFRMA_OUTPUT_MARK XFRMA_SET_MARK	/* Compatibility */
+diff --git a/net/xfrm/xfrm_compat.c b/net/xfrm/xfrm_compat.c
+index 655fe4ff8621..de0e1508f870 100644
+--- a/net/xfrm/xfrm_compat.c
++++ b/net/xfrm/xfrm_compat.c
+@@ -129,6 +129,7 @@ static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
+ 	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
+ 	[XFRMA_IF_ID]		= { .type = NLA_U32 },
+ 	[XFRMA_MTIMER_THRESH]	= { .type = NLA_U32 },
++	[XFRMA_SA_DIR]		= { .type = NLA_U8 },
+ };
+ 
+ static struct nlmsghdr *xfrm_nlmsg_put_compat(struct sk_buff *skb,
+@@ -277,9 +278,10 @@ static int xfrm_xlate64_attr(struct sk_buff *dst, const struct nlattr *src)
+ 	case XFRMA_SET_MARK_MASK:
+ 	case XFRMA_IF_ID:
+ 	case XFRMA_MTIMER_THRESH:
++	case XFRMA_SA_DIR:
+ 		return xfrm_nla_cpy(dst, src, nla_len(src));
+ 	default:
+-		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
++		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
+ 		pr_warn_once("unsupported nla_type %d\n", src->nla_type);
+ 		return -EOPNOTSUPP;
+ 	}
+@@ -434,7 +436,7 @@ static int xfrm_xlate32_attr(void *dst, const struct nlattr *nla,
+ 	int err;
+ 
+ 	if (type > XFRMA_MAX) {
+-		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
++		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
+ 		NL_SET_ERR_MSG(extack, "Bad attribute");
+ 		return -EOPNOTSUPP;
+ 	}
+diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+index 3784534c9185..11339d7d7140 100644
+--- a/net/xfrm/xfrm_device.c
++++ b/net/xfrm/xfrm_device.c
+@@ -253,6 +253,11 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
+ 		return -EINVAL;
+ 	}
+ 
++	if (xuo->flags & XFRM_OFFLOAD_INBOUND && x->dir != XFRM_SA_DIR_IN) {
++		NL_SET_ERR_MSG(extack, "Mismatch in SA and offload direction");
++		return -EINVAL;
++	}
++
+ 	is_packet_offload = xuo->flags & XFRM_OFFLOAD_PACKET;
+ 
+ 	/* We don't yet support UDP encapsulation and TFC padding. */
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index bda5327bf34d..0d6f5a49002f 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -1744,6 +1744,7 @@ static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig,
+ 	x->lastused = orig->lastused;
+ 	x->new_mapping = 0;
+ 	x->new_mapping_sport = 0;
++	x->dir = orig->dir;
+ 
+ 	return x;
+ 
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index ad01997c3aa9..fe4576e96dd4 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -360,6 +360,16 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
+ 		}
+ 	}
+ 
++	if (attrs[XFRMA_SA_DIR]) {
++		u8 sa_dir = nla_get_u8(attrs[XFRMA_SA_DIR]);
++
++		if (!sa_dir || sa_dir >= XFRM_SA_DIR_MAX)  {
++			NL_SET_ERR_MSG(extack, "XFRMA_SA_DIR attribute is out of range");
++			err = -EINVAL;
++			goto out;
++		}
++	}
++
+ out:
+ 	return err;
+ }
+@@ -627,6 +637,7 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
+ 	struct nlattr *et = attrs[XFRMA_ETIMER_THRESH];
+ 	struct nlattr *rt = attrs[XFRMA_REPLAY_THRESH];
+ 	struct nlattr *mt = attrs[XFRMA_MTIMER_THRESH];
++	struct nlattr *dir = attrs[XFRMA_SA_DIR];
+ 
+ 	if (re && x->replay_esn && x->preplay_esn) {
+ 		struct xfrm_replay_state_esn *replay_esn;
+@@ -661,6 +672,9 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
+ 
+ 	if (mt)
+ 		x->mapping_maxage = nla_get_u32(mt);
++
++	if (dir)
++		x->dir = nla_get_u8(dir);
+ }
+ 
+ static void xfrm_smark_init(struct nlattr **attrs, struct xfrm_mark *m)
+@@ -1182,8 +1196,13 @@ static int copy_to_user_state_extra(struct xfrm_state *x,
+ 		if (ret)
+ 			goto out;
+ 	}
+-	if (x->mapping_maxage)
++	if (x->mapping_maxage) {
+ 		ret = nla_put_u32(skb, XFRMA_MTIMER_THRESH, x->mapping_maxage);
++		if (ret)
++			goto out;
++	}
++	if (x->dir)
++		ret = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
+ out:
+ 	return ret;
+ }
+@@ -2399,7 +2418,8 @@ static inline unsigned int xfrm_aevent_msgsize(struct xfrm_state *x)
+ 	       + nla_total_size_64bit(sizeof(struct xfrm_lifetime_cur))
+ 	       + nla_total_size(sizeof(struct xfrm_mark))
+ 	       + nla_total_size(4) /* XFRM_AE_RTHR */
+-	       + nla_total_size(4); /* XFRM_AE_ETHR */
++	       + nla_total_size(4) /* XFRM_AE_ETHR */
++	       + nla_total_size(sizeof(x->dir)); /* XFRMA_SA_DIR */
+ }
+ 
+ static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
+@@ -2453,6 +2473,11 @@ static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct
+ 		goto out_cancel;
+ 
+ 	err = xfrm_if_id_put(skb, x->if_id);
++	if (err)
++		goto out_cancel;
++	if (x->dir)
++		err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
++
+ 	if (err)
+ 		goto out_cancel;
+ 
+@@ -3046,6 +3071,7 @@ const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
+ 	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
+ 	[XFRMA_IF_ID]		= { .type = NLA_U32 },
+ 	[XFRMA_MTIMER_THRESH]   = { .type = NLA_U32 },
++	[XFRMA_SA_DIR]		= { .type = NLA_U8 },
+ };
+ EXPORT_SYMBOL_GPL(xfrma_policy);
+ 
+@@ -3186,8 +3212,9 @@ static void xfrm_netlink_rcv(struct sk_buff *skb)
+ 
+ static inline unsigned int xfrm_expire_msgsize(void)
+ {
+-	return NLMSG_ALIGN(sizeof(struct xfrm_user_expire))
+-	       + nla_total_size(sizeof(struct xfrm_mark));
++	return NLMSG_ALIGN(sizeof(struct xfrm_user_expire)) +
++	       nla_total_size(sizeof(struct xfrm_mark)) +
++	       nla_total_size(sizeof_field(struct xfrm_state, dir));
+ }
+ 
+ static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
+@@ -3214,6 +3241,11 @@ static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct
+ 	if (err)
+ 		return err;
+ 
++	if (x->dir)
++		err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
++	if (err)
++		return err;
++
+ 	nlmsg_end(skb, nlh);
+ 	return 0;
+ }
+@@ -3321,6 +3353,9 @@ static inline unsigned int xfrm_sa_len(struct xfrm_state *x)
+ 	if (x->mapping_maxage)
+ 		l += nla_total_size(sizeof(x->mapping_maxage));
+ 
++	if (x->dir)
++		l += nla_total_size(sizeof(x->dir));
++
+ 	return l;
+ }
+ 
+-- 
+2.30.2
 
-So RTL8226 and RTL8226-CG are **not** listed there and being from the
-1st generation of RealTek 2.5G PHYs I would assume that it won't
-support setting up the SerDes mode in this way.
-
-Afaik those anyway were only used in early RealTek-based 2.5G switches
-and maybe NICs, I'm pretty sure you won't find them inside SFP modules
-or as part non-RealTek-based routers or switches -- hence switching
-SerDes mode most likely anyway will never be required for those.
-
-> 
-> >  		.read_status	= rtl822x_read_status,
-> >  		.suspend	= genphy_suspend,
-> >  		.resume		= rtlgen_resume,
-> > @@ -988,6 +1077,7 @@ static struct phy_driver realtek_drvs[] = {
-> >  		.name		= "RTL8226B_RTL8221B 2.5Gbps PHY",
-> >  		.get_features	= rtl822x_get_features,
-> >  		.config_aneg	= rtl822x_config_aneg,
-> > +		.config_init    = rtl822x_config_init,
-> >  		.read_status	= rtl822x_read_status,
-> >  		.suspend	= genphy_suspend,
-> >  		.resume		= rtlgen_resume,
-> > @@ -1000,6 +1090,7 @@ static struct phy_driver realtek_drvs[] = {
-> >  		.name           = "RTL8226-CG 2.5Gbps PHY",
-> >  		.get_features   = rtl822x_get_features,
-> >  		.config_aneg    = rtl822x_config_aneg,
-> > +		.config_init    = rtl822x_config_init,
-> >  		.read_status    = rtl822x_read_status,
-> >  		.suspend        = genphy_suspend,
-> >  		.resume         = rtlgen_resume,
-> > @@ -1010,6 +1101,7 @@ static struct phy_driver realtek_drvs[] = {
-> >  		.name           = "RTL8226B-CG_RTL8221B-CG 2.5Gbps PHY",
-> >  		.get_features   = rtl822x_get_features,
-> >  		.config_aneg    = rtl822x_config_aneg,
-> > +		.config_init    = rtl822x_config_init,
-> >  		.read_status    = rtl822x_read_status,
-> >  		.suspend        = genphy_suspend,
-> >  		.resume         = rtlgen_resume,
-> > @@ -1019,6 +1111,7 @@ static struct phy_driver realtek_drvs[] = {
-> >  		PHY_ID_MATCH_EXACT(0x001cc849),
-> >  		.name           = "RTL8221B-VB-CG 2.5Gbps PHY",
-> >  		.get_features   = rtl822x_get_features,
-> > +		.config_init    = rtl822x_config_init,
-> >  		.config_aneg    = rtl822x_config_aneg,
-> >  		.read_status    = rtl822x_read_status,
-> >  		.suspend        = genphy_suspend,
-> > @@ -1030,6 +1123,7 @@ static struct phy_driver realtek_drvs[] = {
-> >  		.name           = "RTL8221B-VM-CG 2.5Gbps PHY",
-> >  		.get_features   = rtl822x_get_features,
-> >  		.config_aneg    = rtl822x_config_aneg,
-> > +		.config_init    = rtl822x_config_init,
-> >  		.read_status    = rtl822x_read_status,
-> >  		.suspend        = genphy_suspend,
-> >  		.resume         = rtlgen_resume,
-> > @@ -1040,6 +1134,7 @@ static struct phy_driver realtek_drvs[] = {
-> >  		.name           = "RTL8251B 5Gbps PHY",
-> >  		.get_features   = rtl822x_get_features,
-> >  		.config_aneg    = rtl822x_config_aneg,
-> > +		.config_init    = rtl822x_config_init,
-> >  		.read_status    = rtl822x_read_status,
-> >  		.suspend        = genphy_suspend,
-> >  		.resume         = rtlgen_resume,
-> 
 
