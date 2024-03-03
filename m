@@ -1,130 +1,78 @@
-Return-Path: <netdev+bounces-76872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3508786F3B5
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 06:24:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC5DE86F3B7
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 06:26:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6380A1C20DA0
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 05:24:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0136AB23061
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 05:26:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2074C9455;
-	Sun,  3 Mar 2024 05:24:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A4466FD5;
+	Sun,  3 Mar 2024 05:26:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="koiAoZXS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QUbyNXba"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02068F5D
-	for <netdev@vger.kernel.org>; Sun,  3 Mar 2024 05:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 410E11C2E;
+	Sun,  3 Mar 2024 05:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709443461; cv=none; b=YmxCIf2pzYCp4WkCaV3r0YFQwcPg66ZcBmPl7oNuEtccZ9/fY7kuAgc4sPRI4sJZBnVXGmbYq+rzQk1je3+YIuR8q+FubroES6EjXX9swvgkIEJjyjLLGEKr3ifZDtNXDcMKGeBaRNPnevLwe8+Ed++/kRWFc/UTYG6fKWI5Ehw=
+	t=1709443577; cv=none; b=PG3SivbG9KMZlUuPQ0BXtiVhnetxAlYMRe4cdlrpDXhBXsK6TH8CZJIICE7hspOsMzfAjGpK74YmCgCvjk/I62x/U5POhWjNqgnnZVGl1yeG6WCGnZIfmN+i+C+Vb2kOUY03OAjp4uKa0nQRcqgjyFSdQOhyFzAUeOEDX17CdvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709443461; c=relaxed/simple;
-	bh=erMYHEtKWk5YhkMUaQk9snyW7OqcL8kOFfm6TWUKMnI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gsP6wVFTxnsdFY/bAI8Gaq55Rsid0v+5bPmTjI8g6bx+fzBTy60+Gr8JQM5H8dukQWZpUztEiL73AXp+MvFkaJOd0zpM71KbgVbkaG6opDIV84U/UUTTpD9L+il228gBtWJfVMpFf/YzKuzi1y4OlOEi+vBpf7TCIeUISBVYLbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=koiAoZXS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1410DC433B2;
-	Sun,  3 Mar 2024 05:24:20 +0000 (UTC)
+	s=arc-20240116; t=1709443577; c=relaxed/simple;
+	bh=pDTqr75VrTenhrZ7T1mxLvCoeWHL+hc6thSbvXACcuQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GDJnwF7J39WE2xK+7XSFyEIkSpYjnZD8oBguYAFOEEhw5Yzn5XIp5fX5brv+VkaM0Rg5EDkm06HHIe7GATEyLqTQO9kdL4iQC+Ajd7EFgr16fWFsAqiZgy0gvHHophwGEswet9wmT/BrrJ466WuOKRm8rzvfvV5nnCNWCkQq6U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QUbyNXba; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F7FDC433F1;
+	Sun,  3 Mar 2024 05:26:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709443460;
-	bh=erMYHEtKWk5YhkMUaQk9snyW7OqcL8kOFfm6TWUKMnI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=koiAoZXSvUpEuZv4YHS1omz5gC2z2WF26azKq6Ot77Zm20Lg7EyLT8uuyLP0uL0Tb
-	 MDCLHA1/p7mhfHeQ2vMHaBLpkbedzI4kV9nHxdy/JaN8F4jmm0W5Jf/6979gxAhsFQ
-	 VMR8CAou2qZqgnvzs25dcy+k+42t+L9MyEhHxKC3zzqACR+gXbtTzlqgmKJjVgzrj0
-	 xoy/rjMXIxlPeEBAkqJW6iN834ajVuJMi2Ip8MBjKPjU5sxz6ukyCuXfW5tKiCpSTC
-	 DqCR70RPmkleR6EFwAkGAKe7G7z6LkOYQeyegtXYrQpnBThOFRIFY6UmQNE5I6GIG7
-	 ReLeVffjl1DYA==
+	s=k20201202; t=1709443576;
+	bh=pDTqr75VrTenhrZ7T1mxLvCoeWHL+hc6thSbvXACcuQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QUbyNXbaTyYF1KDMsPa4TbrSyBOX0xx/gnZUZi4SuDKF5r7E9EV97lYwRkpXYaF1L
+	 pADr96LkXEmMKKNx88n/AD0Y3wKlqgUOOTsfka8xTD6G3wP4F8ru0YepbIC6OUfC41
+	 eOhVxeo3NPCjU3K+6ioUBuakT34fPX0HZH/FzIv65Wo/dIbAfi484xB8/p7Jo+nYgR
+	 pmOWKavyMJ9KNPhRCv3r+9gg03PoZcyKaG1SESzVkighvnzv+hiFJql10Fimy1ALMC
+	 5+0C4jMZcLLtn6ko3i/3Ut9QwU1eGfhLe83RKDWEErP8O3U1H/2hwd9qPmv+l0y86g
+	 ivSE9pe/955+Q==
+Date: Sat, 2 Mar 2024 21:26:15 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	jiri@resnulli.us,
-	idosch@idosch.org,
-	johannes@sipsolutions.net,
-	fw@strlen.de,
-	pablo@netfilter.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 3/3] genetlink: fit NLMSG_DONE into same read() as families
-Date: Sat,  2 Mar 2024 21:24:08 -0800
-Message-ID: <20240303052408.310064-4-kuba@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240303052408.310064-1-kuba@kernel.org>
-References: <20240303052408.310064-1-kuba@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, linux-afs@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 13/21] rxrpc: Use rxrpc_txbuf::kvec[0] instead
+ of rxrpc_txbuf::wire
+Message-ID: <20240302212615.310678df@kernel.org>
+In-Reply-To: <20240301163807.385573-14-dhowells@redhat.com>
+References: <20240301163807.385573-1-dhowells@redhat.com>
+	<20240301163807.385573-14-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Make sure ctrl_fill_info() returns sensible error codes and
-propagate them out to netlink core. Let netlink core decide
-when to return skb->len and when to treat the exit as an
-error. Netlink core does better job at it, if we always
-return skb->len the core doesn't know when we're done
-dumping and NLMSG_DONE ends up in a separate read().
+On Fri,  1 Mar 2024 16:37:45 +0000 David Howells wrote:
+> Use rxrpc_txbuf::kvec[0] instead of rxrpc_txbuf::wire to gain access to the
+> Rx protocol header.  In future, the wire header will be stored in a page
+> frag, not in the rxrpc_txbuf struct making it possible to use
+> MSG_SPLICE_PAGES when sending it.
+> 
+> Similarly, access the ack header as being immediately after the wire header
+> when filling out an ACK packet.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: jiri@resnulli.us
----
- net/netlink/genetlink.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
-index 50ec599a5cff..3b7666944b11 100644
---- a/net/netlink/genetlink.c
-+++ b/net/netlink/genetlink.c
-@@ -1232,7 +1232,7 @@ static int ctrl_fill_info(const struct genl_family *family, u32 portid, u32 seq,
- 
- 	hdr = genlmsg_put(skb, portid, seq, &genl_ctrl, flags, cmd);
- 	if (hdr == NULL)
--		return -1;
-+		return -EMSGSIZE;
- 
- 	if (nla_put_string(skb, CTRL_ATTR_FAMILY_NAME, family->name) ||
- 	    nla_put_u16(skb, CTRL_ATTR_FAMILY_ID, family->id) ||
-@@ -1355,6 +1355,7 @@ static int ctrl_dumpfamily(struct sk_buff *skb, struct netlink_callback *cb)
- 	struct net *net = sock_net(skb->sk);
- 	int fams_to_skip = cb->args[0];
- 	unsigned int id;
-+	int err = 0;
- 
- 	idr_for_each_entry(&genl_fam_idr, rt, id) {
- 		if (!rt->netnsok && !net_eq(net, &init_net))
-@@ -1363,16 +1364,17 @@ static int ctrl_dumpfamily(struct sk_buff *skb, struct netlink_callback *cb)
- 		if (n++ < fams_to_skip)
- 			continue;
- 
--		if (ctrl_fill_info(rt, NETLINK_CB(cb->skb).portid,
--				   cb->nlh->nlmsg_seq, NLM_F_MULTI,
--				   skb, CTRL_CMD_NEWFAMILY) < 0) {
-+		err = ctrl_fill_info(rt, NETLINK_CB(cb->skb).portid,
-+				     cb->nlh->nlmsg_seq, NLM_F_MULTI,
-+				     skb, CTRL_CMD_NEWFAMILY);
-+		if (err) {
- 			n--;
- 			break;
- 		}
- 	}
- 
- 	cb->args[0] = n;
--	return skb->len;
-+	return err;
- }
- 
- static struct sk_buff *ctrl_build_family_msg(const struct genl_family *family,
--- 
-2.44.0
-
+net/rxrpc/output.c:263:28: warning: unused variable 'whdr' [-Wunused-variable]
+  263 |         struct rxrpc_wire_header *whdr;
+      |                                   ^~~~
 
