@@ -1,74 +1,92 @@
-Return-Path: <netdev+bounces-76874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D42DC86F3B9
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 06:27:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE95486F3BB
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 06:30:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11CDFB23374
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 05:27:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5644D1F22185
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 05:30:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5AE3749C;
-	Sun,  3 Mar 2024 05:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043B379CF;
+	Sun,  3 Mar 2024 05:30:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aLrj/do7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J/IYm6iJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD58A7494;
-	Sun,  3 Mar 2024 05:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE276FD0;
+	Sun,  3 Mar 2024 05:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709443624; cv=none; b=RY1XqDO36yvi+bQOPpOjJrv25NHpMapxtJBS2e3W3yejT7uZ394mucdzkYjJqtBQUrpdpAcsgQSz5s+8ByK8P7FKSHAxqQf/VpNvU5CKSywkmO7DCBbwnuMORwA0D5FxyPb9JA5hFuyTvl4SvWsIDU3n2FoBhAokRChv+1ISPDw=
+	t=1709443841; cv=none; b=dmMBMfqziiSlnmhxmNA+n/9cDI+fZVegOgkFegZxCDOEiKcVuxdKUTaRbWsvW6urDuT5gUIySW+NmjcJGrUoZ0Onqlm7A4UgYKcuqS2Lqir9qr3zOZONvPyLtF36B+C2LBEU5BqI9ixZu3LsbP275hoTfwZLdraYJ2G0dBrQkk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709443624; c=relaxed/simple;
-	bh=SbwC5DYIzEhEfg+itSOhS1E+hnKBAn/SGhRX9oPjDyI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SKwdPGyA79ioZObMPD1SVNagJS84d+fTIkscafB945xttYhU80jJaMbs9HcqEbZFqH0mETZkcjqzeMaILki7obpYHEh28GySTFk/fZNNkHCPfxS0dO4X+tKn4mxAx/g64e5SxnQfLJ0MW3oOnQUINInVCn7VKzRdw5miQIwGJR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aLrj/do7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D668EC433F1;
-	Sun,  3 Mar 2024 05:27:03 +0000 (UTC)
+	s=arc-20240116; t=1709443841; c=relaxed/simple;
+	bh=00Q7Kzu5atxiBG6Za4Wq/Rml8/sI+Zq8FeRJiLHevVc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=q3oqzukaOBx3qp/M9oQhZaSC51wg1jF3T/FFiM13RE6pzsNOuG3TjZcLhQOPthQi/KJy5KNtTvIPWFAkE0h0YLTB5UrFSeP94zXVRofEswNdLsB1s6YZGBpSOcivUw7y09vgauQ3HVapTKTZYw5dOtLsyw2KXZO7czoBpICwtWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J/IYm6iJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3AB2FC43390;
+	Sun,  3 Mar 2024 05:30:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709443624;
-	bh=SbwC5DYIzEhEfg+itSOhS1E+hnKBAn/SGhRX9oPjDyI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aLrj/do7VCBv0e1MON7hI+DYAAz93a6PKNkU5r24/IZVdWCvC6l5N7TKMPGz3n7TU
-	 rmkHetrx+6voNx+b00ljuTs/AJkNdbAKi7ELrgvu0nt+TyCJui9nuu7yBWv2BS95H1
-	 uK2/4mDacsXKyFtPHto+q6r2flGUywNGMME+czeLuRGx61IkRZqKgUYmz9/zvfR3QG
-	 QIA59+7Idy/jlAcRThzlL/W99rsDoCN09cKf7s5YJ9G9sWPUlLjpa469I0W/teWmRi
-	 Nk9d8krOA+9ESAJ9I4MO8J0piU6woetqPrURsmh6eu1dfwwvhFKuYEL6inMmbWqhWE
-	 Ajnld+mHKj1Nw==
-Date: Sat, 2 Mar 2024 21:27:02 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, linux-afs@lists.infradead.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 18/21] rxrpc: Use ktimes for call timeout
- tracking and set the timer lazily
-Message-ID: <20240302212702.15b04552@kernel.org>
-In-Reply-To: <20240301163807.385573-19-dhowells@redhat.com>
-References: <20240301163807.385573-1-dhowells@redhat.com>
-	<20240301163807.385573-19-dhowells@redhat.com>
+	s=k20201202; t=1709443841;
+	bh=00Q7Kzu5atxiBG6Za4Wq/Rml8/sI+Zq8FeRJiLHevVc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=J/IYm6iJtyoOy47emxGb8xVKMFNNAs0csvrDM0MQKsBG1u2ABZ1nwx58E/vA6FXL3
+	 4vUD+6JOJHhhmf7eEv7wvPKn/b7/H1QB5luEtXSuVCHzVGz/4YJIJrYxWJ0MRtUOZv
+	 6c4/YcVVEXpXx34+bQWqTqxJ3O+DbEboo7kN7T+Q+DQV7rkrvTvGyVJWtMOKpm56fb
+	 J42y1do4LCdiJ6MPhbrCPEBDj1C8t/wxEfrhno1oFzTMuatV862o2KvtgrOa2j7oqC
+	 HYnLHQujvRdVpn5mOpSaplHqnX7Q3Xl0f1ZmDpST+jXN7LwWYjNyR7MmFAXIpkl9Hu
+	 T4DIG0/vWE4KA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 21347D8C9A2;
+	Sun,  3 Mar 2024 05:30:41 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: bpf-next 2024-02-29
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170944384113.12792.13367807354811123419.git-patchwork-notify@kernel.org>
+Date: Sun, 03 Mar 2024 05:30:41 +0000
+References: <20240301001625.8800-1-daniel@iogearbox.net>
+In-Reply-To: <20240301001625.8800-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
-On Fri,  1 Mar 2024 16:37:50 +0000 David Howells wrote:
-> Track the call timeouts as ktimes rather than jiffies as the latter's
-> granularity is too high and only set the timer at the end of the event
-> handling function.
+Hello:
 
-This one has a 64b div somewhere, breaks 32b builds.
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri,  1 Mar 2024 01:16:25 +0100 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
+> 
+> The following pull-request contains BPF updates for your *net-next* tree.
+> 
+> We've added 119 non-merge commits during the last 32 day(s) which contain
+> a total of 150 files changed, 3589 insertions(+), 995 deletions(-).
+> 
+> [...]
+
+Here is the summary with links:
+  - pull-request: bpf-next 2024-02-29
+    https://git.kernel.org/netdev/net-next/c/4b2765ae410a
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
