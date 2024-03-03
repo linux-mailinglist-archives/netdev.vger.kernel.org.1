@@ -1,270 +1,279 @@
-Return-Path: <netdev+bounces-76857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D40B086F33C
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 02:01:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C926D86F341
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 02:33:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A3BB1F21D50
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 01:01:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DD5228439F
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 01:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147A317FD;
-	Sun,  3 Mar 2024 01:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 202EC7E6;
+	Sun,  3 Mar 2024 01:32:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b="EIAxIjc0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pKNI81nI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB16FEC3
-	for <netdev@vger.kernel.org>; Sun,  3 Mar 2024 01:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9D117F7
+	for <netdev@vger.kernel.org>; Sun,  3 Mar 2024 01:32:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709427695; cv=none; b=R+i+lwFuBQrqW2Y9NC0NMk+yoMqTWXMFfCTFavRksS2LQzlmuKi2KywBwrXsULJPgMWpf1XOhHvFwdAsDuDNJjYVtrPDChqzxVzBL46pO06L2KEnYHunFveU0Liw8knjGwpQE+F7efmG6T418SN0p4hzuzmx07BP8CY5+9cuakc=
+	t=1709429579; cv=none; b=ps/hFrHld0EWBGMnmKQ4PfkO+ccArZdFDK4ij1PsfqH2zpuXKzMnGVZf7h1q8WjF/cLRW13zLgVlMG8uHELU/sLXUh15o0js0bdxw6Pt6S5DsOGoQc/xMuDEdtybyf7eVQJXh3LbA1wo/CGmGdDq1nvytgLZ6c0Ar5NTPrfcFn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709427695; c=relaxed/simple;
-	bh=kIXyRTIheW7ZeVYQZD41JGEbBEjgiU19M0BAP0U2QJA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QA82njAzj7FP6tUrmwtS9H3KNxbTAZo+qOedJyD8pp+AhDzKxIryGdmMH4wSf7TnVrAk3UJ+twcYMrDkMHLLXz3S3a7jmzgD8J09+pdsgi1Fav17YxT/9LgVhvz/Ib9lB3wPbZ2jXoSxkoSSiX9JeGI4ecpCmVT9e0RQZ61qAO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org; spf=pass smtp.mailfrom=joelfernandes.org; dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b=EIAxIjc0; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=joelfernandes.org
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d09cf00214so39559491fa.0
-        for <netdev@vger.kernel.org>; Sat, 02 Mar 2024 17:01:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=joelfernandes.org; s=google; t=1709427691; x=1710032491; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=joa1LH9MBDp25VLscx4rPOI2230OoGotm5+cSIxVkNA=;
-        b=EIAxIjc0XikoTa8rpaCWWmpfbkzVK31sGz+PjpKmVCcrnH4SnKYD5a1tnwVbPsEv5u
-         H4P3ErQj+vxeI0lggyngdpxAbgWCKDC1yp+HxoP6t3FibAvrjt/pfNoz6+iQsGixcRil
-         9zi9iJHatOs5ClMSDGXtOFN/bIA8a3nckvImg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709427691; x=1710032491;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=joa1LH9MBDp25VLscx4rPOI2230OoGotm5+cSIxVkNA=;
-        b=SPwGHjsR9kp/dVktaTj8bkD7iSc9NfqBaKDiyQMTz+0htdnxltHH6411cqrurPt8+C
-         r+4KJwG60y4XuJSOmgVu7KbGy4YBfgXe2bettgPVV4UELXdJhuU89Ggrs1RAvs8ozMV2
-         svi9XP6LpK9Qr9UEZjIPxgUenqc8DT3fJ91cRtjPUDIGOyQpArk3hCMSbhQll7srryAs
-         E9wz/AKHvfV5bREqyHwJM+Q9Ud4T0/cj8PWB3UAifz6WsLcaDi8sWIsdYnQJV3PExjcb
-         qFkLCaCDdYBbSbo6WkuoOw1r/vJUGVGc6J34xKRwxkxqgGhj9ryyLyakK+21yGoDH6vR
-         1k2w==
-X-Forwarded-Encrypted: i=1; AJvYcCWvc6aum87e6NEj9Ti1b0WQgGGpGF8k65IsoqdMcTWCYPvh59fdL8+G/DBw+fMkK8pEPklcw+NQeE109iT0GUWKPHc65F8J
-X-Gm-Message-State: AOJu0Yw4AF/8euVoLvLxWzCaARALJtLeFgxHlDup3DbQrFSKvPakEsJS
-	9VqgbazU8/Uq2y/QCyGdjeaRaG1pCLFzQgjgCIUmzsoAiXjntrnmOyMBl+1OxDUex/7gRrIiwyq
-	jRAti2TxD855WXR2BbxBLdMDi0YJD+mOGSRgAYA==
-X-Google-Smtp-Source: AGHT+IGpsRZlFb7ThLxfwGQ8f0sDqxs5T64NxP5PsODKh4v+wub/0s09gPwXLnLHwiB3rWd8MWfdqiK7hIczLcG98QI=
-X-Received: by 2002:a2e:320d:0:b0:2d2:6227:d30a with SMTP id
- y13-20020a2e320d000000b002d26227d30amr4089990ljy.2.1709427690661; Sat, 02 Mar
- 2024 17:01:30 -0800 (PST)
+	s=arc-20240116; t=1709429579; c=relaxed/simple;
+	bh=IylH3m+cHRJZ4YXYafo3lkVoSQgVcmUJ7A+fcaZpHlw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CBbeNdno9sl9zw8381Ev8j8bQgsFt4qMdD0jw/3KRBBklglQhTIi4vnXOYiJCfHO3iEpTsIK/xr6aLzqPlGx5pdPrVYR8b8AnrFRNqS8D7OnwQ9YEMvLgVSXjHTAKwGObvm7aYTlkhfrfSnBdOHXUqTo83gCUM1qF/uF/FLPZkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pKNI81nI; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <f88b5f65-957e-4b5d-8959-d16e79372658@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1709429573;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/EYWu62tI2U5I+uQtQ7jK0OywLWaXMVjw053AZzpVQE=;
+	b=pKNI81nI3zL9rwQIIFVyYvg9FaTzITPuv1EyaU3BO+1aSDZ7jlsZywv6M6/lovMVw/PVeQ
+	78mT+NuihMLsUZDEo16X+PfRw0/mseQCors9VyqkJDO3sKvKhsGdfJCOsMueFmMg2k3keD
+	aIyALcwxCn3QpvmU0b1lqOBLDfPfdGs=
+Date: Sat, 2 Mar 2024 17:32:42 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <55900c6a-f181-4c5c-8de2-bca640c4af3e@paulmck-laptop>
- <10FC3F5F-AA33-4F81-9EB6-87EB2D41F3EE@joelfernandes.org> <99b2ccae-07f6-4350-9c55-25ec7ae065c0@paulmck-laptop>
- <CAEXW_YQ+40a1-hk5ZP+QJ54xniSutosC7MjMscJJy8fen-gU9Q@mail.gmail.com> <f1e77cd2-18b2-4ab1-8ce3-da2c6babbd53@paulmck-laptop>
-In-Reply-To: <f1e77cd2-18b2-4ab1-8ce3-da2c6babbd53@paulmck-laptop>
-From: Joel Fernandes <joel@joelfernandes.org>
-Date: Sat, 2 Mar 2024 20:01:17 -0500
-Message-ID: <CAEXW_YRDiTXJ_GwK5soSVno73yN9FUA5GjLYAOcCTtqQvPGcFA@mail.gmail.com>
-Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
-To: paulmck@kernel.org
-Cc: Steven Rostedt <rostedt@goodmis.org>, Network Development <netdev@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, rcu@vger.kernel.org, 
-	kernel-team <kernel-team@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next v12 14/15] p4tc: add set of P4TC table kfuncs
+Content-Language: en-US
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: deb.chatterjee@intel.com, anjali.singhai@intel.com,
+ namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com,
+ Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, tomasz.osinski@intel.com,
+ jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com,
+ horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, daniel@iogearbox.net,
+ victor@mojatatu.com, pctammela@mojatatu.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240225165447.156954-1-jhs@mojatatu.com>
+ <20240225165447.156954-15-jhs@mojatatu.com>
+ <9eff9a51-a945-48f6-9d14-a484b7c0d04c@linux.dev>
+ <CAM0EoMniOaKn4W_WN9rmQZ1JY3qCugn34mmqCy9UdCTAj_tuTQ@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAM0EoMniOaKn4W_WN9rmQZ1JY3qCugn34mmqCy9UdCTAj_tuTQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, Mar 2, 2024 at 7:25=E2=80=AFPM Paul E. McKenney <paulmck@kernel.org=
-> wrote:
->
-> On Fri, Mar 01, 2024 at 09:24:15PM -0500, Joel Fernandes wrote:
-> > (Shrinking CC a bit)
-> >
-> > On Thu, Feb 29, 2024 at 1:29=E2=80=AFPM Paul E. McKenney <paulmck@kerne=
-l.org> wrote:
-> > >
-> > > On Thu, Feb 29, 2024 at 12:41:55PM -0500, Joel Fernandes wrote:
-> > > > > On Feb 29, 2024, at 11:57=E2=80=AFAM, Paul E. McKenney <paulmck@k=
-ernel.org> wrote:
-> > > > > =EF=BB=BFOn Thu, Feb 29, 2024 at 09:21:48AM -0500, Joel Fernandes=
- wrote:
-> > > > >>> On 2/28/2024 5:58 PM, Paul E. McKenney wrote:
-> > > > >>> On Wed, Feb 28, 2024 at 02:48:44PM -0800, Alexei Starovoitov wr=
-ote:
-> > > > >>>> On Wed, Feb 28, 2024 at 2:31=E2=80=AFPM Steven Rostedt <rosted=
-t@goodmis.org> wrote:
-> > > > >>>>>
-> > > > >>>>> On Wed, 28 Feb 2024 14:19:11 -0800
-> > > > >>>>> "Paul E. McKenney" <paulmck@kernel.org> wrote:
-> > > > >>>>>
-> > > > >>>>>>>>
-> > > > >>>>>>>> Well, to your initial point, cond_resched() does eventuall=
-y invoke
-> > > > >>>>>>>> preempt_schedule_common(), so you are quite correct that a=
-s far as
-> > > > >>>>>>>> Tasks RCU is concerned, cond_resched() is not a quiescent =
-state.
-> > > > >>>>>>>
-> > > > >>>>>>> Thanks for confirming. :-)
-> > > > >>>>>>
-> > > > >>>>>> However, given that the current Tasks RCU use cases wait for=
- trampolines
-> > > > >>>>>> to be evacuated, Tasks RCU could make the choice that cond_r=
-esched()
-> > > > >>>>>> be a quiescent state, for example, by adjusting rcu_all_qs()=
- and
-> > > > >>>>>> .rcu_urgent_qs accordingly.
-> > > > >>>>>>
-> > > > >>>>>> But this seems less pressing given the chance that cond_resc=
-hed() might
-> > > > >>>>>> go away in favor of lazy preemption.
-> > > > >>>>>
-> > > > >>>>> Although cond_resched() is technically a "preemption point" a=
-nd not truly a
-> > > > >>>>> voluntary schedule, I would be happy to state that it's not a=
-llowed to be
-> > > > >>>>> called from trampolines, or their callbacks. Now the question=
- is, does BPF
-> > > > >>>>> programs ever call cond_resched()? I don't think they do.
-> > > > >>>>>
-> > > > >>>>> [ Added Alexei ]
-> > > > >>>>
-> > > > >>>> I'm a bit lost in this thread :)
-> > > > >>>> Just answering the above question.
-> > > > >>>> bpf progs never call cond_resched() directly.
-> > > > >>>> But there are sleepable (aka faultable) bpf progs that
-> > > > >>>> can call some helper or kfunc that may call cond_resched()
-> > > > >>>> in some path.
-> > > > >>>> sleepable bpf progs are protected by rcu_tasks_trace.
-> > > > >>>> That's a very different one vs rcu_tasks.
-> > > > >>>
-> > > > >>> Suppose that the various cond_resched() invocations scattered t=
-hroughout
-> > > > >>> the kernel acted as RCU Tasks quiescent states, so that as soon=
- as a
-> > > > >>> given task executed a cond_resched(), synchronize_rcu_tasks() m=
-ight
-> > > > >>> return or call_rcu_tasks() might invoke its callback.
-> > > > >>>
-> > > > >>> Would that cause BPF any trouble?
-> > > > >>>
-> > > > >>> My guess is "no", because it looks like BPF is using RCU Tasks =
-(as you
-> > > > >>> say, as opposed to RCU Tasks Trace) only to wait for execution =
-to leave a
-> > > > >>> trampoline.  But I trust you much more than I trust myself on t=
-his topic!
-> > > > >>
-> > > > >> But it uses RCU Tasks Trace as well (for sleepable bpf programs)=
-, not just
-> > > > >> Tasks? Looks like that's what Alexei said above as well, and I c=
-onfirmed it in
-> > > > >> bpf/trampoline.c
-> > > > >>
-> > > > >>        /* The trampoline without fexit and fmod_ret progs doesn'=
-t call original
-> > > > >>         * function and doesn't use percpu_ref.
-> > > > >>         * Use call_rcu_tasks_trace() to wait for sleepable progs=
- to finish.
-> > > > >>         * Then use call_rcu_tasks() to wait for the rest of tram=
-poline asm
-> > > > >>         * and normal progs.
-> > > > >>         */
-> > > > >>        call_rcu_tasks_trace(&im->rcu, __bpf_tramp_image_put_rcu_=
-tasks);
-> > > > >>
-> > > > >> The code comment says it uses both.
-> > > > >
-> > > > > BPF does quite a few interesting things with these.
-> > > > >
-> > > > > But would you like to look at the update-side uses of RCU Tasks R=
-ude
-> > > > > to see if lazy preemption affects them?  I don't believe that the=
-re
-> > > > > are any problems here, but we do need to check.
-> > > >
-> > > > Sure I will be happy to. I am planning look at it in detail over th=
-e 3 day weekend. Too much fun! ;-)
-> > >
-> > > Thank you, and looking forward to seeing what you come up with!
-> > >
-> > > The canonical concern would be that someone somewhere is using either
-> > > call_rcu_tasks_rude() or synchronize_rcu_tasks_rude() to wait for
-> > > non-preemptible regions of code that does not account for the possibi=
-lity
-> > > of preemption in CONFIG_PREEMPT_NONE or PREEMPT_PREEMPT_VOLUNTARY ker=
-nels.
-> > >
-> > > I *think* that these are used only to handle the possibility
-> > > of tracepoints on functions on the entry/exit path and on the
-> > > RCU-not-watching portions of the idle loop.  If so, then there is no
-> > > difference in behavior for lazy preemption.  But who knows?
-> >
-> > Hi Paul, regarding CONFIG_PREEMPT_AUTO, for Tasks RCU rude, I think
-> > the following patch will address your concern about quiescent states
-> > on CPUs spinning away in kernel mode:
-> >
-> > "sched/fair: handle tick expiry under lazy preemption"
-> > Link: https://lore.kernel.org/all/20240213055554.1802415-24-ankur.a.aro=
-ra@oracle.com/
-> >
-> > In this patch Ankur makes sure that the scheduling-clock interrupt
-> > will reschedule the CPU after a tick and not let queued tasks starve
-> > due to lazy re-scheduling. So my impression is the
-> > "schedule_on_each_cpu()" should schedule a worker thread in time to
-> > apply the implied Tasks RCU quiescent state even if the rescheduling
-> > was a LAZY-reschedule.
-> >
-> > Also, not sure if the "voluntary mode" of CONFIG_PREEMPT_AUTO behaves
-> > differently. My feeling is regardless of preemption mode,
-> > CONFIG_PREEMPT_AUTO should always preempt after a tick if something
-> > else needs to run. It just will not preempt immediately like before
-> > (although CFS did already have some wakeup preemption logic to slow it
-> > down a bit). I am reviewing Ankur's patches more to confirm that and
-> > also reviewing his patches more to see how it could affect.
->
-> Thank you for the info!
->
-> As you noted, one thing that Ankur's series changes is that preemption
-> can occur anywhere that it is not specifically disabled in kernels
-> built with CONFIG_PREEMPT_NONE=3Dy or CONFIG_PREEMPT_VOLUNTARY=3Dy.  This=
- in
-> turn changes Tasks Rude RCU's definition of a quiescent state for these
-> kernels, adding all code regions where preemption is not specifically
-> disabled to the list of such quiescent states.
->
-> Although from what I know, this is OK, it would be good to check the
-> calls to call_rcu_tasks_rude() or synchronize_rcu_tasks_rude() are set
-> up so as to expect these new quiescent states.  One example where it
-> would definitely be OK is if there was a call to synchronize_rcu_tasks()
-> right before or after that call to synchronize_rcu_tasks_rude().
->
-> Would you be willing to check the call sites to verify that they
-> are OK with this change in semantics?
+On 3/1/24 4:31 AM, Jamal Hadi Salim wrote:
+> On Fri, Mar 1, 2024 at 1:53 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>
+>> On 2/25/24 8:54 AM, Jamal Hadi Salim wrote:
+>>> +struct p4tc_table_entry_act_bpf_params {
+>>
+>> Will this struct be extended in the future?
+>>
+>>> +     u32 pipeid;
+>>> +     u32 tblid;
+>>> +};
+>>> +
+> 
+> Not that i can think of. We probably want to have the option to do so
+> if needed. Do you see any harm if we were to make changes for whatever
+> reason in the future?
 
-Yes, I will analyze and make sure those users did not unexpectedly
-assume something about AUTO (i.e. preempt enabled sections using
-readers).
+It will be useful to add an argument named with "__sz" suffix to the kfunc.
+Take a look at how the kfunc in nf_conntrack_bpf.c is handling the "opts" and 
+"opts__sz" argument in its kfunc.
 
-Btw, as I think you mentioned, with Ankur's patch even with
-CONFIG_PREEMPT_NONE=3Dy, a preemption on the tick boundary can occur (in
-preempt=3Dnone mode)!
+> 
+>>> +struct p4tc_table_entry_create_bpf_params {
+>>> +     u32 profile_id;
+>>> +     u32 pipeid;
+>>> +     u32 tblid;
+>>> +};
+>>> +
+>>
+>> [ ... ]
+>>
+>>> diff --git a/include/net/tc_act/p4tc.h b/include/net/tc_act/p4tc.h
+>>> index c5256d821..155068de0 100644
+>>> --- a/include/net/tc_act/p4tc.h
+>>> +++ b/include/net/tc_act/p4tc.h
+>>> @@ -13,10 +13,26 @@ struct tcf_p4act_params {
+>>>        u32 tot_params_sz;
+>>>    };
+>>>
+>>> +#define P4TC_MAX_PARAM_DATA_SIZE 124
+>>> +
+>>> +struct p4tc_table_entry_act_bpf {
+>>> +     u32 act_id;
+>>> +     u32 hit:1,
+>>> +         is_default_miss_act:1,
+>>> +         is_default_hit_act:1;
+>>> +     u8 params[P4TC_MAX_PARAM_DATA_SIZE];
+>>> +} __packed;
+>>> +
+>>> +struct p4tc_table_entry_act_bpf_kern {
+>>> +     struct rcu_head rcu;
+>>> +     struct p4tc_table_entry_act_bpf act_bpf;
+>>> +};
+>>> +
+>>>    struct tcf_p4act {
+>>>        struct tc_action common;
+>>>        /* Params IDR reference passed during runtime */
+>>>        struct tcf_p4act_params __rcu *params;
+>>> +     struct p4tc_table_entry_act_bpf_kern __rcu *act_bpf;
+>>>        u32 p_id;
+>>>        u32 act_id;
+>>>        struct list_head node;
+>>> @@ -24,4 +40,39 @@ struct tcf_p4act {
+>>>
+>>>    #define to_p4act(a) ((struct tcf_p4act *)a)
+>>>
+>>> +static inline struct p4tc_table_entry_act_bpf *
+>>> +p4tc_table_entry_act_bpf(struct tc_action *action)
+>>> +{
+>>> +     struct p4tc_table_entry_act_bpf_kern *act_bpf;
+>>> +     struct tcf_p4act *p4act = to_p4act(action);
+>>> +
+>>> +     act_bpf = rcu_dereference(p4act->act_bpf);
+>>> +
+>>> +     return &act_bpf->act_bpf;
+>>> +}
+>>> +
+>>> +static inline int
+>>> +p4tc_table_entry_act_bpf_change_flags(struct tc_action *action, u32 hit,
+>>> +                                   u32 dflt_miss, u32 dflt_hit)
+>>> +{
+>>> +     struct p4tc_table_entry_act_bpf_kern *act_bpf, *act_bpf_old;
+>>> +     struct tcf_p4act *p4act = to_p4act(action);
+>>> +
+>>> +     act_bpf = kzalloc(sizeof(*act_bpf), GFP_KERNEL);
+>>
+>>
+>> [ ... ]
+>>
+>>> +__bpf_kfunc static struct p4tc_table_entry_act_bpf *
+>>> +bpf_p4tc_tbl_read(struct __sk_buff *skb_ctx,
+>>
+>> The argument could be "struct sk_buff *skb" instead of __sk_buff. Take a look at
+>> commit 2f4643934670.
+> 
+> We'll make that change.
+> 
+>>
+>>> +               struct p4tc_table_entry_act_bpf_params *params,
+>>> +               void *key, const u32 key__sz)
+>>> +{
+>>> +     struct sk_buff *skb = (struct sk_buff *)skb_ctx;
+>>> +     struct net *caller_net;
+>>> +
+>>> +     caller_net = skb->dev ? dev_net(skb->dev) : sock_net(skb->sk);
+>>> +
+>>> +     return __bpf_p4tc_tbl_read(caller_net, params, key, key__sz);
+>>> +}
+>>> +
+>>> +__bpf_kfunc static struct p4tc_table_entry_act_bpf *
+>>> +xdp_p4tc_tbl_read(struct xdp_md *xdp_ctx,
+>>> +               struct p4tc_table_entry_act_bpf_params *params,
+>>> +               void *key, const u32 key__sz)
+>>> +{
+>>> +     struct xdp_buff *ctx = (struct xdp_buff *)xdp_ctx;
+>>> +     struct net *caller_net;
+>>> +
+>>> +     caller_net = dev_net(ctx->rxq->dev);
+>>> +
+>>> +     return __bpf_p4tc_tbl_read(caller_net, params, key, key__sz);
+>>> +}
+>>> +
+>>> +static int
+>>> +__bpf_p4tc_entry_create(struct net *net,
+>>> +                     struct p4tc_table_entry_create_bpf_params *params,
+>>> +                     void *key, const u32 key__sz,
+>>> +                     struct p4tc_table_entry_act_bpf *act_bpf)
+>>> +{
+>>> +     struct p4tc_table_entry_key *entry_key = key;
+>>> +     struct p4tc_pipeline *pipeline;
+>>> +     struct p4tc_table *table;
+>>> +
+>>> +     if (!params || !key)
+>>> +             return -EINVAL;
+>>> +     if (key__sz != P4TC_ENTRY_KEY_SZ_BYTES(entry_key->keysz))
+>>> +             return -EINVAL;
+>>> +
+>>> +     pipeline = p4tc_pipeline_find_byid(net, params->pipeid);
+>>> +     if (!pipeline)
+>>> +             return -ENOENT;
+>>> +
+>>> +     table = p4tc_tbl_cache_lookup(net, params->pipeid, params->tblid);
+>>> +     if (!table)
+>>> +             return -ENOENT;
+>>> +
+>>> +     if (entry_key->keysz != table->tbl_keysz)
+>>> +             return -EINVAL;
+>>> +
+>>> +     return p4tc_table_entry_create_bpf(pipeline, table, entry_key, act_bpf,
+>>> +                                        params->profile_id);
+>>
+>> My understanding is this kfunc will allocate a "struct
+>> p4tc_table_entry_act_bpf_kern" object. If the bpf_p4tc_entry_delete() kfunc is
+>> never called and the bpf prog is unloaded, how the act_bpf object will be
+>> cleaned up?
+>>
+> 
+> The TC code takes care of this. Unloading the bpf prog does not affect
+> the deletion, it is the TC control side that will take care of it. If
+> we delete the pipeline otoh then not just this entry but all entries
+> will be flushed.
 
-Btw, For RUDE - If we wish to preempt sooner on "preempt=3Dvoluntary" of
-future CONFIG_PREEMPT_AUTO=3Dy kernels, then we can potentially replace
-the schedule_on_each_cpu() with a higher priority (higher class)
-per-CPU threads like RT. Then wake them all up and waiting till the
-next tick is not needed for a CPU to be marked quiescent. Would
-something like that be of interest?
+It looks like the "struct p4tc_table_entry_act_bpf_kern" object is allocated by 
+the bpf prog through kfunc and will only be useful for the bpf prog but not 
+other parts of the kernel. However, if the bpf prog is unloaded, these bpf 
+specific objects will be left over in the kernel until the tc pipeline (where 
+the act_bpf_kern object resided) is gone.
 
-Thanks.
+It is the expectation on bpf prog (not only tc/xdp bpf prog) about resources 
+clean up that these bpf objects will be gone after unloading the bpf prog and 
+unpinning its bpf map.
+
+[ ... ]
+
+>>> +BTF_SET8_START(p4tc_kfunc_check_tbl_set_skb)
+>>
+>> This soon will be broken with the latest change in bpf-next. It is replaced by
+>> BTF_KFUNCS_START. commit a05e90427ef6.
+
+It has already been included in the latest bpf-next pull-request, so should 
+reach net-next soon.
+
+>>
+> 
+> Ok, this wasnt in net-next when we pushed. We base our changes on
+> net-next. When do you plan to merge that into net-next?
+> 
+>> What is the plan on the selftest ?
+>>
+> 
+> We may need some guidance. How do you see us writing a selftest for this?
+> We have extensive testing on the control side which is netlink (not
+> part of the current series).
+
+There are examples in tools/testing/selftests/bpf, e.g. the test_bpf_nf.c to 
+test the kfuncs in nf_conntrack_bpf mentioned above. There are also selftests 
+doing netlink to setup the test. The bpf/test_progs tries to avoid external 
+dependency as much as possible, so linking to an extra external library and 
+using an extra tool/binary will be unacceptable.
+and only the bpf/test_progs binary will be run by bpf CI.
+
+The selftest does not have to be complicated. It can exercise the kfunc and show 
+how the new struct (e.g. struct p4tc_table_entry_bpf_*) will be used. There is 
+BPF_PROG_RUN for the tc and xdp prog, so should be quite doable.
+
 
