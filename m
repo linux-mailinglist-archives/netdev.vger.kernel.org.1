@@ -1,164 +1,151 @@
-Return-Path: <netdev+bounces-76884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CD7986F442
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 11:00:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D0FD86F461
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 11:29:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FCD91F2145C
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 10:00:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CEE71C208C4
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 10:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3228A95C;
-	Sun,  3 Mar 2024 10:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B63B66B;
+	Sun,  3 Mar 2024 10:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wc5UeZYy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3284CBA46;
-	Sun,  3 Mar 2024 10:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44109B664
+	for <netdev@vger.kernel.org>; Sun,  3 Mar 2024 10:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709460018; cv=none; b=AbOOcRGppEMxOlvVooy+rIiNpzzexBRyNrA8zqzJsAuqrb7SwxG9zG+H5Asxsl/rKy69cr+rb+ETvyGs4Cq4ZkLf8P5DDj78yRZ4+uGrhsjaOPFR0CjnnU0crr2DFUv3VBItNaRTLhg91+o0EYECDDv0fwLCxfVFVY8tKTPPZjM=
+	t=1709461737; cv=none; b=UOogG3qEPgFsHBLynOr119bzeyovztRlzipmLhBskqC8GnnwgzQ3ti2qGT1mBAHmkKTUt58b8PE7fbkY9AC9ky6sTfEkO+hqDhfcDuIRao1a625dnTzggHkQs9ec5S+PbGhYUtV0jbndgpdli2i7QqLm+yea8Tj9/DKX5ZU3ckQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709460018; c=relaxed/simple;
-	bh=wgl5aL/m0dsPvCZP1EwQWBYv9ZzqR9ONYKmI7fIHflo=;
-	h=From:Subject:To:CC:References:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=bXd7+lUNcALONggVxEdNjsARE0KCkR3Eg6tW5ci2LzLCMIo0chF3uefywJFl19cy2L9y2p2H8tg9Kp1jllUSwxKPoqf71nB1ysShEt82LLlR4H5FZmwBlVl6QgYCR1v8w4HcbngYvFfofNgqnFAu0eekRWmjRYPRJKleiwfoeoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.74.177) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sun, 3 Mar
- 2024 13:00:08 +0300
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: Re: [net-next,v2 6/6] ravb: Unify Rx ring maintenance code paths
-To: =?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Biju Das
-	<biju.das.jz@bp.renesas.com>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
-	<yoshihiro.shimoda.uh@renesas.com>, <netdev@vger.kernel.org>
-CC: <linux-renesas-soc@vger.kernel.org>
-References: <20240227223305.910452-1-niklas.soderlund+renesas@ragnatech.se>
- <20240227223305.910452-7-niklas.soderlund+renesas@ragnatech.se>
-Organization: Open Mobile Platform
-Message-ID: <7fb71160-a0b5-d4e9-7c83-271754ba98a9@omp.ru>
-Date: Sun, 3 Mar 2024 13:00:08 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1709461737; c=relaxed/simple;
+	bh=d/P4inDsFvyDRXgyPXJe5Z0RZSBIzPDk7yHSbj0fJWw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CGYmR4cGKwuwH4bGyoHJt1P2gNUyhSiZsrVEhEODVfXrLnDIFn6x/PU43Cxtjwnezhl5X5RhIBONz3a2MlnmzAOg9nEEteBYVLxqTwxYL60fl6K7u5VoX4dIxFyNeUC6bu2ToTxymCUEiAe2mTaN1m/f9ScKZuDw1KEfui26lS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wc5UeZYy; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a44ad785a44so220769266b.3
+        for <netdev@vger.kernel.org>; Sun, 03 Mar 2024 02:28:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709461734; x=1710066534; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bJCuNryDI/h57BzepsAAGIlxjX0nOA3DaJDgnhgdd5E=;
+        b=Wc5UeZYy/rBRt8sW032e/jWGYNO2wSvQLptZud6+yXHYsUaWYJ73ilOrpteztdEadh
+         loiKjQ8en5OsHIIsBTOC7g+zLop5HCOuRmVN7fchzFapDSXDUwn6AvDWPBFxdr9/7N8k
+         4Od0799FGEYu4Y0xnB1/CYaCB4LZCin2WcS5FmIJhEKdcl62lFEsxAccIn6iqD9i/zwm
+         pjGK/1Re0zBsFXqIknsOmbbYxBYcBt00PU7TK1ZsK5tLLT0h+GrtWZzbBTaxsOZgGqYs
+         hoQHj4H+iK2TFzoQuGYErcjycBEleQEdFQdDT92YhCadfg58Of6ub44nYABuifbKD0w4
+         /VMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709461734; x=1710066534;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bJCuNryDI/h57BzepsAAGIlxjX0nOA3DaJDgnhgdd5E=;
+        b=RArSud2j7brVQZ4jp0haFBIW6h9wICGs+/PXFXvMsth1x1J3bnXHxDHMrJ9WJmTrGP
+         eaxkCd0ryL1bXh9iy/0qpBEyVanGcFwamSLjom2QeMk0ZZPEhOQpx8cUwdfSpZhMz7x4
+         qx1XWxiBCitwx2aCFOqMoFihXqnLCXzoRaZskG+ie+duZ8HFeKWTZIZGZnPxMKdO3epq
+         KPno2fbMW9jaiZdj39b7NtF/UffvtZFpJw/21+wd9Ts0CxtEe1/WHg2ASNJlBh48rR+Z
+         W+HqKh7EhFERSYTYPxZ64SfrM87anUIw/uTqMv5HJLBg0+9nH72IXl+rotX4YZmQmtDr
+         TUjg==
+X-Gm-Message-State: AOJu0Yzq+Oj4gkIJM8RPIbeb+8ybKyrAc3lqqTJyE/06TTXSrdQC/LkR
+	prdMY0GHNG6d6pHd75jQaBFadBuq043Zj2csZ25cFbzWeggZGJZz
+X-Google-Smtp-Source: AGHT+IHGS7OzvTvR9v+ougXLfFreU54pMGoEsixzDazthE6YeaN6cUUwWJ5rLOTE+7R6DsRCmsu/Wg==
+X-Received: by 2002:a17:906:19cf:b0:a43:ab98:d376 with SMTP id h15-20020a17090619cf00b00a43ab98d376mr4595617ejd.15.1709461734387;
+        Sun, 03 Mar 2024 02:28:54 -0800 (PST)
+Received: from corebook.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id um9-20020a170906cf8900b00a44d01aff81sm1530759ejb.97.2024.03.03.02.28.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 Mar 2024 02:28:54 -0800 (PST)
+From: Eric Woudstra <ericwouds@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	"Frank Wunderlich" <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>
+Cc: netdev@vger.kernel.org,
+	Eric Woudstra <ericwouds@gmail.com>
+Subject: [PATCH v2 net-next 0/7] rtl8221b/8251b add C45 instances and SerDes switching
+Date: Sun,  3 Mar 2024 11:28:41 +0100
+Message-ID: <20240303102848.164108-1-ericwouds@gmail.com>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240227223305.910452-7-niklas.soderlund+renesas@ragnatech.se>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 03/03/2024 09:46:06
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183905 [Mar 03 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.177 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2;178.176.74.177:7.4.1,7.7.3
-X-KSE-AntiSpam-Info: {cloud_iprep_silent}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.74.177
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/03/2024 09:51:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/3/2024 4:38:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 2/28/24 1:33 AM, Niklas Söderlund wrote:
+Based on the comments in [PATCH net-next]
+"Realtek RTL822x PHY rework to c45 and SerDes interface switching"
 
-> The R-Car and RZ/G2L Rx code paths was split in two separate
+Adds SerDes switching interface between 2500base-x and sgmii for
+rtl822x and rtl8251b.
 
-   s/was/were/.
+Add get_rate_matching() for rtl822x and rtl8251b, reading the serdes
+mode from phy.
 
-> implementations when support for RZ/G2L was added due to the fact that
-> R-Car uses the extended descriptor format while RZ/G2L uses normal
-> descriptors. This has lead to a duplication of Rx logic with the only
+Driver instances are added for rtl8221b and rtl8251b for Clause 45
+access only. The existing code is not touched, they use newly added
+functions. They also use the same rtl822x_config_init() and
+rtl822x_get_rate_matching() as these functions also can be used for
+direct Clause 45 access. Also Adds definition of MMC 31 registers,
+which cannot be used through C45-over-C22, only when phydev->is_c45
+is set.
 
-   s/lead/led/.
+Change rtlgen_get_speed() so the register value is passed as argument.
+Using Clause 45 access, this value is retrieved differently.
+Rename it to rtlgen_decode_speed() and add a call to it in
+rtl822x_c45_read_status().
 
-> difference being the different Rx descriptors types used. The
-> implementation however neglects to take into account that extended
-> descriptors are normal descriptors with additional metadata at the end
-> to carry hardware timestamp information.
-> 
-> The hardware timestamps information is only consumed in the R-Car Rx
+Add rtl822x_c45_get_features() to set supported ports.
 
-   Timestamp, as above...
+Then 2 quirks are added for sfp modules known to have a rtl8221b
+behind RollBall, Clause 45 only, protocol.
 
-> loop and all the maintenance code around the Rx ring can be shared
-> between the two implementations if the difference in descriptor length
-> is carefully considered.
-> 
-> This change merges the two implementations for Rx ring maintenance by
-> adding a method to access both types of descriptors as normal
-> descriptors, as this part covers all the fields needed for Rx ring
-> maintenance the only difference between using normal or extended
-> descriptor is the size of the memory region to allocate/free and the
-> step size between each descriptor in the ring.
-> 
-> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+Changed in PATCH v2:
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+* Set author to Marek for the commit of the new C45 instances
+* Separate commit for setting supported ports
+* Renamed rtlgen_get_speed to rtlgen_decode_speed
+* Always fill in possible interfaces
+* Renamed sfp_fixup_oem_2_5g to sfp_fixup_oem_2_5gbaset
+* Only update phydev->interface when link is up
 
-[...]
+Alexander Couzens (1):
+  net: phy: realtek: configure SerDes mode for rtl822x/8251b PHYs
 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 4ef4be9e152e..fa48ff4aba2d 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -202,6 +202,13 @@ static const struct mdiobb_ops bb_ops = {
->  	.get_mdio_data = ravb_get_mdio_data,
->  };
->  
-> +static struct ravb_rx_desc *
-> +ravb_rx_get_desc(struct ravb_private *priv, unsigned int q,
+Eric Woudstra (4):
+  net: phy: realtek: add get_rate_matching() for rtl822x/8251b PHYs
+  net: phy: realtek: Change rtlgen_get_speed() to rtlgen_decode_speed()
+  net: phy: realtek: add rtl822x_c45_get_features() to set supported
+    ports
+  net: sfp: Fixup for OEM SFP-2.5G-T module
 
-   Please make it 'int q' for consistency. We can change the q's type
-universally later...
+Marek Behún (2):
+  net: phy: realtek: Add driver instances for rtl8221b/8251b via Clause
+    45
+  net: sfp: add quirk for another multigig RollBall transceiver
 
-[...]
-> @@ -202,6 +202,13 @@ static const struct mdiobb_ops bb_ops = {
->  	.get_mdio_data = ravb_get_mdio_data,
->  };
->  
-> +static struct ravb_rx_desc *
+ drivers/net/phy/realtek.c | 325 +++++++++++++++++++++++++++++++++++---
+ drivers/net/phy/sfp.c     |  10 +-
+ 2 files changed, 312 insertions(+), 23 deletions(-)
 
-   Not 'void *'?
+-- 
+2.42.1
 
-[...]
-
-MBR, Sergey
 
