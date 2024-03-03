@@ -1,207 +1,157 @@
-Return-Path: <netdev+bounces-76897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9BFD86F4F9
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 14:09:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D0FA186F513
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 14:24:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EA0D282900
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 13:09:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F8DB281C0F
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 13:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E55BAD26B;
-	Sun,  3 Mar 2024 13:09:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC666CA73;
+	Sun,  3 Mar 2024 13:24:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TFS4Wcld"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="eBPo8idw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out203-205-221-249.mail.qq.com (out203-205-221-249.mail.qq.com [203.205.221.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A105EC121;
-	Sun,  3 Mar 2024 13:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41A6101E3;
+	Sun,  3 Mar 2024 13:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709471386; cv=none; b=u8B0MbfN3Vkk0L/lSHn7zNlV5JfE/wZOfj+fwvbjeUaG3RhXsSGpLQkp0GTOP2h82UIRCgCnjKcACOIf2pQ1G2XYDp/LEUjY92ycj3a7k+97SnoJU/Dd5J5w/TvoOyO3gXCKoFne+JY3sEju8WeBz5PkJLNOpxDo1h0kJQQMqqM=
+	t=1709472247; cv=none; b=nLObS+pQP9lJ6XfBOLmedPMjyzySJwjJzGmVTfjQuRn2i9uJo3Fs2GLebc+3Tcvyy8b3sfA87aPbBsZkT9hrz6c4hUKZw43kZa7Qhkjla2B2YKYWw9eJxMvlpY9IiT0a6UcWZbSzI2Q6yW/n2VoYupP9rdLYVWiMXNAjfzt/tJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709471386; c=relaxed/simple;
-	bh=vrYalRsEVZ5fLjX42yXSYdIo9++d6kZ4+2yqiD07orw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o0oH6VrDhaJSXMKlqcEMWIxmVVK9gqOipHOgH+705Yt1lfvgtd49IpeeWJkXncn7U8qYJNF10wWtir1C8KeXpjh2WnGknwBhja3rhqgwziYbdchdvAlQlGyv0iBR33f4x60+Z9U6MrexS29fJxMWB96fRy8VcF8q7O6xAPTL5vU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TFS4Wcld; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CDD6C433C7;
-	Sun,  3 Mar 2024 13:09:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709471386;
-	bh=vrYalRsEVZ5fLjX42yXSYdIo9++d6kZ4+2yqiD07orw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TFS4WclduKBieWz1UkcNTKSuCZDyLEdTgFUGthkob7mjSQrWCfm9HvCnDfnyY6qtW
-	 MkNYLN/+XpB8K5gsWQPw9jLMIA09LfI+cLBVXF39xCggrkuXWM8et+8sLHBUbBJRqI
-	 xDrdrgOWWfgXvxEDr6Gh1WcJHxAOynrX5AmOLrn8EPti9G+E7lNvw6MrWX7xS3wt1a
-	 iR5kSIXQa3DC4H0bDcBa/OR87oQv//6vdDCNA27zEcdCrWAQ4BNq4xlKYmmDjJ2gJs
-	 prN85/sJhYV3U+JYiPlVPjJGOFuu9uyRmpGARyS0QvQrrLnM99LERQnKwoZHA2+avH
-	 8Vgq+BsIhZqhA==
-Date: Sun, 3 Mar 2024 13:09:28 +0000
-From: Jonathan Cameron <jic23@kernel.org>
-To: Nuno =?UTF-8?B?U8Oh?= <noname.nuno@gmail.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Vinod Koul
- <vkoul@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Jonathan
- Cameron <Jonathan.Cameron@huawei.com>, Mark Brown <broonie@kernel.org>,
- Kees Cook <keescook@chromium.org>, linux-arm-kernel@lists.infradead.org,
- dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-spi@vger.kernel.org,
- netdev@vger.kernel.org, linux-hardening@vger.kernel.org, Lars-Peter Clausen
- <lars@metafoo.de>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, Nuno Sa
- <nuno.sa@analog.com>
-Subject: Re: [PATCH v4 5/8] iio: core: Use new helpers from overflow.h in
- iio_device_alloc()
-Message-ID: <20240303130928.0c2fea09@jic23-huawei>
-In-Reply-To: <9519dda9acd9db009dcb43102cc9b36943b35217.camel@gmail.com>
-References: <20240228204919.3680786-1-andriy.shevchenko@linux.intel.com>
-	<20240228204919.3680786-6-andriy.shevchenko@linux.intel.com>
-	<9519dda9acd9db009dcb43102cc9b36943b35217.camel@gmail.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1709472247; c=relaxed/simple;
+	bh=G/uUIcpfGezZClHWnrZDD9K0NYrXcF/UXKZ/8huSANM=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=lBOw/uDlgxnekWKLmZWgAsGq041Vk1YDLVWw1kPWA2nQ/tLUJDq6cS81ImppwIiDYE4XdpbJ2nL9TnYYZIXv029QjSrzzSRsHlEZZhbZ4gz0eTjZ4dtsD7k/DM646oRux3zC9EQDQrB0UbKV4Mo+JREO6wMPTeRW+O/ZDnkwaEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=eBPo8idw; arc=none smtp.client-ip=203.205.221.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1709472241; bh=Uo6+rVGqUfEBi3BWpquQslrkKBAv6/iFpXZsRLuvnJM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=eBPo8idwVoLhTJ7X/bqvn7JnBbFiyJiyoNYw7fNldKYN1UcFh33Gkkp6vIgdCa024
+	 bU5JedGe+MaGryxQ5y+doWoUSAfrXoGyoeR4YNYToAVwXEIkpBTVqA5JZHBnERFgjR
+	 KuZIaMgFErJ9+CE+qw4nfoe5grhCvaEf9xfKE0ms=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.140])
+	by newxmesmtplogicsvrszc5-0.qq.com (NewEsmtp) with SMTP
+	id 5FA2D2AD; Sun, 03 Mar 2024 21:23:58 +0800
+X-QQ-mid: xmsmtpt1709472238t63b8jqob
+Message-ID: <tencent_ECF3CC90A7DB86E312FF464F09BF2EEAAE06@qq.com>
+X-QQ-XMAILINFO: M/NR0wiIuy70vNwuqXnPcAATd38i+Hrt5nu5F7SU8jslSYo5IjGQa9TJ1wQdik
+	 Oun75WagS/8ZoK0TZ7S1N26r7C7sQE3LlrldG+1Ni9cHqmW/1dtGJmFd7UNuMZXRX03nR6tjf6nA
+	 BnnVJPZa2IoJlmcNLillPdbFwsQOwMDh9kyCqBQG/msZVSusQJvScF4tHHYlu/2IfLMBIIvUn5zs
+	 u2Nok8SVFOhjq7ThRqQJXlQGzDE18FVcc2e4NZ0+AT80PawnfU6XqBpXgAK9lCe4Ui12sCoBt+xJ
+	 SRhCDFF/EZn3F9tLhtpDb97HlKYOWtD2XiGBBvK6dXX0WXh5oTqA/+5R2XzHW4ORYsdPVEfFeEQc
+	 zlURosOWssYK+doMORe7kF2mpYo5atBOdIniDzcnmdnhh5FPoyo5xknvGSXj7kRSaqzNOIj4kwjg
+	 bAQoXWnD3MWFghthM8RIdD/BJ2RqM47nkak/qSS9QTU8m/UTg4YD0he5Cbzlt8dkm4jQU3X1Ujg/
+	 glXwh8TTz5zbpCAlqUDmSPanlfwYwMrlQ6GM7H0vu9CYQIm6SoP+kXBBjmMmQwRI5G0j0MyoY4xN
+	 /yvSmoRZEIkVUzyAZ/21MmcqQzRzhvvJXvO3vGD+z9hUFRHiyvK/hczX4tk3cNgpx3g3pZcMIlg5
+	 433FZruVXIFy3NhdSe5VX4/eQ9dBqzxXQgECQKWtiSw35fPcNrZ3qONr/wk8rIsbs4Vy86fZgFCi
+	 75cxqlmiJydXeQ6tbx18hWcPgIvt/eQaUV71fUs3BpIRlhWONxsJ0AuXsW8e7beuuec2jS316bAd
+	 UNn7g4SuVUbUK7ERPTH8UHsd/3Jx4od6GXy1w/UPe0sqhGtMaNDadVn9ju131bMEFNVcOCS6x2k5
+	 1AY3RHKTYJ3MhCUWEQ8gvV4daC84OVxywA0W6PaWBZZUOKIaQ0dAw1gNkPEuGmGwW+/eSL1UDa2J
+	 TW1DCnPf99xozrFY+0mPKrqjkmOCdlTgBc5lXrlHS3/Nplmen0p/yVRQJ0R6nc
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+f770ce3566e60e5573ac@syzkaller.appspotmail.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-hams@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	ralf@linux-mips.org,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH] skbuff: fix uninit-value in nr_route_frame
+Date: Sun,  3 Mar 2024 21:23:59 +0800
+X-OQ-MSGID: <20240303132358.639892-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <000000000000b69bf20612bf586e@google.com>
+References: <000000000000b69bf20612bf586e@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, 29 Feb 2024 16:29:43 +0100
-Nuno S=C3=A1 <noname.nuno@gmail.com> wrote:
+[Syzbot reported]
+BUG: KMSAN: uninit-value in nr_route_frame+0x4a9/0xfc0 net/netrom/nr_route.c:787
+ nr_route_frame+0x4a9/0xfc0 net/netrom/nr_route.c:787
+ nr_xmit+0x5a/0x1c0 net/netrom/nr_dev.c:144
+ __netdev_start_xmit include/linux/netdevice.h:4980 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4994 [inline]
+ xmit_one net/core/dev.c:3547 [inline]
+ dev_hard_start_xmit+0x244/0xa10 net/core/dev.c:3563
+ __dev_queue_xmit+0x33ed/0x51c0 net/core/dev.c:4351
+ dev_queue_xmit include/linux/netdevice.h:3171 [inline]
+ raw_sendmsg+0x64e/0xc10 net/ieee802154/socket.c:299
+ ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+ __sys_sendmsg net/socket.c:2667 [inline]
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-> On Wed, 2024-02-28 at 22:41 +0200, Andy Shevchenko wrote:
-> > We have two new helpers struct_size_with_data() and struct_data_pointer=
-()
-> > that we can utilize in iio_device_alloc(). Do it so.
-> >=20
-> > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> > Reviewed-by: Nuno Sa <nuno.sa@analog.com>
-> > ---
-> > =C2=A0drivers/iio/industrialio-core.c | 5 ++---
-> > =C2=A01 file changed, 2 insertions(+), 3 deletions(-)
-> >=20
-> > diff --git a/drivers/iio/industrialio-core.c b/drivers/iio/industrialio=
--core.c
-> > index 1986b3386307..223013725e32 100644
-> > --- a/drivers/iio/industrialio-core.c
-> > +++ b/drivers/iio/industrialio-core.c
-> > @@ -1644,7 +1644,7 @@ struct iio_dev *iio_device_alloc(struct device *p=
-arent,
-> > int sizeof_priv)
-> > =C2=A0	size_t alloc_size;
-> > =C2=A0
-> > =C2=A0	if (sizeof_priv)
-> > -		alloc_size =3D ALIGN(alloc_size, IIO_DMA_MINALIGN) +
-> > sizeof_priv;
-> > +		alloc_size =3D struct_size_with_data(iio_dev_opaque,
-> > IIO_DMA_MINALIGN, sizeof_priv);
-> > =C2=A0	else
-> > =C2=A0		alloc_size =3D sizeof(struct iio_dev_opaque);
-> > =C2=A0
-> > @@ -1655,8 +1655,7 @@ struct iio_dev *iio_device_alloc(struct device *p=
-arent,
-> > int sizeof_priv)
-> > =C2=A0	indio_dev =3D &iio_dev_opaque->indio_dev;
-> > =C2=A0
-> > =C2=A0	if (sizeof_priv)
-> > -		indio_dev->priv =3D (char *)iio_dev_opaque +
-> > -			ALIGN(sizeof(struct iio_dev_opaque),
-> > IIO_DMA_MINALIGN);
-> > +		indio_dev->priv =3D struct_data_pointer(iio_dev_opaque,
-> > IIO_DMA_MINALIGN); =20
->=20
-> I'd +1 for implementing what Kees suggested in IIO. Only thing is (I thin=
-k), we
-> need to move struct iio_dev indioo_dev to the end of struct iio_dev_opaqu=
-e.
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:3819 [inline]
+ slab_alloc_node mm/slub.c:3860 [inline]
+ kmem_cache_alloc_node+0x5cb/0xbc0 mm/slub.c:3903
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
+ __alloc_skb+0x352/0x790 net/core/skbuff.c:651
+ alloc_skb include/linux/skbuff.h:1296 [inline]
+ alloc_skb_with_frags+0xc8/0xbd0 net/core/skbuff.c:6394
+ sock_alloc_send_pskb+0xa80/0xbf0 net/core/sock.c:2783
+ sock_alloc_send_skb include/net/sock.h:1855 [inline]
+ raw_sendmsg+0x367/0xc10 net/ieee802154/socket.c:282
+ ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+ __sys_sendmsg net/socket.c:2667 [inline]
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-That is going to be messy and without horrible hacks (I think) add more pad=
-ding we
-don't need.  At the moment the struct iio_dev and the struct iio_dev_opaque
-are aligned as at the start of the structure.
+[Fix]
+Let's clear all skb data at alloc time.
 
-The priv data is aligned by padding the larger struct iio_dev_opaque,
-so if you want the priv handle to be to data defined in struct iio_dev you =
-would
-need to add additional padding so that
+Reported-and-tested-by: syzbot+f770ce3566e60e5573ac@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ net/core/skbuff.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-struct iio_dev_opaque {
-	stuff...
-	// this next __aligned() is implicit anyway because of the rules for
-	// a structure always being aligned to the alignment of it's max aligned
-	// element.
-	struct iio_dev __aligned (IIO_DMA_ALIGN) { =20
-		stuff
-		u8 priv[] __aligned(IIO_DMA_ALIGN);
-	}
-}
-
-How about using what Kees suggests on the iio_dev_opaque (which think is cl=
-eaner
-anyway as that's what we are allocating) and keeping the magic pointer to p=
-riv
-in the struct iio_dev; The compiler looses some visibility for iio_priv() a=
-ccesses
-but can it do much with those anyway? They always get cast to a struct driv=
-er_specific *
-and getting the original allocation wrong is not easy to do as we pass
-that struct size in.  Note, for others not aware of what is going on here, =
-the
-priv pointer in iio_dev is to allow efficient static inline iio_priv() call=
-s without
-needing to either make a function call, or expose the internals of the opaq=
-ue
-structure in which the iio_dev and the priv data are embedded.
-
-Standard pattern is:
-
-struct driver_specific *bob;
-struct iio_dev *indio_dev =3D dev_iio_device_alloc(dev, sizeof(*bob));
-// which allocates the iio_dev_opaque, but returns the contained iio_dev
-bob =3D iio_priv(indio_dev);
-
-So
-
-struct iio_dev_opaque {
-	struct iio_dev indio_dev {
-		stuff..
-		void *priv;=09
-	};
-	stuff..
-	int priv_count;
-	u8 priv[] __aligned(IIO_DMA_ALIGN) __counted_by(priv_count);
-}
-with indio_dev->priv =3D iio_dev_opaque->dev?
-
-This cleanups up a few IIO core bits but no impact outside them.
-Nice to have those cleanups.
-
-Is there any way to have that internal iio_dev->priv pointer associated with
-a __counted_by even though it's pointing elsewhere than a local variable si=
-zed
-trailing element? =20
-
-struct iio_dev {
-	stuff
-
-	u32 count;
-	void *priv __counted_by(count);
-}
-compiles with gcc but without digging further I have no idea if it does any=
-thing useful!
-
-Jonathan
-
->=20
-> - Nuno S=C3=A1
->=20
->=20
->=20
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index edbbef563d4d..5ca5a608daec 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -656,6 +656,7 @@ struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
+ 	 * to allow max possible filling before reallocation.
+ 	 */
+ 	prefetchw(data + SKB_WITH_OVERHEAD(size));
++	memset(data, 0, size);
+ 
+ 	/*
+ 	 * Only clear those fields we need to clear, not those that we will
+-- 
+2.43.0
 
 
