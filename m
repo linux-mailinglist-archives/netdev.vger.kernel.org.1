@@ -1,240 +1,275 @@
-Return-Path: <netdev+bounces-76920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E5B286F6A4
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 20:03:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F44586F6A9
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 20:04:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87A2A1F213CA
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 19:03:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3F8C1F21473
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 19:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F272768E1;
-	Sun,  3 Mar 2024 19:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A0BF7994B;
+	Sun,  3 Mar 2024 19:04:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kh41KAoW"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="GnPQlLcL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC5D1DFD8;
-	Sun,  3 Mar 2024 19:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4595276417
+	for <netdev@vger.kernel.org>; Sun,  3 Mar 2024 19:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709492627; cv=none; b=JPSVned//soGLeXQtPXnN7T2KhVEoqh/40iSEbpE/08h4Dwcks4K5I8MrhvKE3SqJIDNrhCQQN9Z2j8TvCT+70XP70StgPXO3fCSLsjTsr8ORPVeVvpT2rphTxZQV0c1eQB3sQnJNvn1QQJHSwQ33wU892t6P9JkhFZWSkDV95o=
+	t=1709492666; cv=none; b=PpE/YUddPwliHjj+jQSToTSUnUcvWshVBTHHmA9rS2wAcZ1Lfammv+BGK8w8kRTHy0mPyNeBSIG9JEYyHyTLU0Z3QGwvQWNoxVBwR9WLikSC7k6rAHvlKWeCc/jCgIRh/hw1McUCJOFdQtxQYg/k8JUHgTr6nGQRhA066unFOwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709492627; c=relaxed/simple;
-	bh=iTOfN+tgqF6RXUgkv5aPdbWw0doQRHF+0VQ+rOX/H74=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=s5a+L6r3Eas4Nh6t522dvwx2b3glx69JAi2voVwYL3RtHXt3wyHegMoYdproOag4aNWq3uAicgG8b0xUNAjtyg11Q513KpevcBsQpSzFdeGODyKD47+QJcYJ/SE2KftrArvRGERmINUPYjHasV8Wkl2V8ziEH2a7whem3JUYki8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kh41KAoW; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-412e22315d8so2547175e9.1;
-        Sun, 03 Mar 2024 11:03:44 -0800 (PST)
+	s=arc-20240116; t=1709492666; c=relaxed/simple;
+	bh=XqppKbV7x+ci9o0Cub5vVukerfIj86prevOCdxI9aTI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mEvBOgLbextkNQ7+6+lEEWtX914MOoPyb5AIq4BnDK/M08gFbQWNUIZCKfN6oicDZF2p5Pv8UR9M3XAVf6v4OGLas7ZwO7888MSGrzjTqldo/bBaLGR41e8dNCOfU1ClyL3Vt0mlpUev9iZOhsbd/Humy1tJyVc/bx94pv9Vlcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=GnPQlLcL; arc=none smtp.client-ip=209.85.219.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-dc742543119so3734551276.0
+        for <netdev@vger.kernel.org>; Sun, 03 Mar 2024 11:04:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709492623; x=1710097423; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Q6tqq+YHMrtRDD0QwVDNeMhXDLukwoqe/1azYB8u5U=;
-        b=Kh41KAoW9MeIsawH3KrleaRw4MBuce0SVIH6iXmpAvkUfmhtKkjKBiDgjzBEFj9YAD
-         eL+k26UjyTQWnpkmw6DPRLkbXEd5JuFgnuuaqiiLOweyWXjRll6ZqqSwCYMde6tjKM4M
-         NNDMOK557dzie9EuTigVDgQD2b+vrhOymvXJxOFL3iJshQlrERF+0ubIaHl4JIrF0cvx
-         zzEhbQi+12BVFOP+1kBOMDluoHBBIGbbHguni/ae6jasOybr8ps8HyTwqBiVRvd2h652
-         qdgHoy7zqdM9z2oeQ0M0s5rpVesxFmEDXaCO0WOS2IlAEF+L0Nja7KyXnrocSkaLSCv5
-         QG4w==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1709492663; x=1710097463; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RqNgFnLKTP93PR6cVdZ6fNlJHYat8XSThRpAWagOMXQ=;
+        b=GnPQlLcLfO626b/YaQ+ADbyTziWSljoeBjNu267mTsLq/oGHOHAKhBZHIL/hNHOYSb
+         1SRb9ZihpIzq3vnH/jl2EVh3bDPeX+8U/RMBwgd9Lz1aTrleFP4EsqedvbBJEeixJ9yq
+         CJpve1Kd96ZEVkqTvJbn5ksa52oK3yV8+K1l9F/uhKndaEO5I77onqW0YIGFWmiiaBN8
+         +XMaIVYIsliUy6A7ZaYnICLrtuk4CrURkPhqyZoqMqtMKuqGpWvzyRVKTl5E3K9zSBxS
+         UT4AMSI96NjYKg+mz4TO08cf/+1VQDfrl6ORZiuzWF69vyBWbY7yFu3ukymKD9PxEPDV
+         iMCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709492623; x=1710097423;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+Q6tqq+YHMrtRDD0QwVDNeMhXDLukwoqe/1azYB8u5U=;
-        b=fDSsXsTS786W/qAsYjeXIuaoc7yRG7F0oWG91BgCYIgzdGfqhD3KbTrM1km7WuxoCc
-         JTNiYhAFOgZwCZ8DqsiwtCUbKGsJJV6AcpZLuXrDkVxsylzRbCS765F0PmTnIhdnnEbq
-         VTDB8XMyqLbcOj1y0GXAE7s4VAMvqtwoOMjVh37+Jg4nR6B4PNdXP1OsFu6intKqcZsu
-         VauFO/rimpUtQZbzvH2hW/NCggcwmjo2Mu5Evc1vlZwt/qaqUamwU/nXdoJl+5lRyk7d
-         RKOWVMzpNBGdXXi4u5m6lpzOaU893n7FyUEp5T2X5zKRCwontyqAy2RM/9K9HjxUPl1m
-         QQ1g==
-X-Forwarded-Encrypted: i=1; AJvYcCXX3I9ZknNkrxbDxhXNrHzT8ElTtVgzbaDpgnrJGmLi3R5jMdiJVIX8NNCHLm7IGN9lcK2B33gkkgbbPLDw5NZCbRd0ceZGDqtkfSpJYsachf1MqWiEstCPSMVRx/IyFyVBPWEL
-X-Gm-Message-State: AOJu0Ywc/whg3edjpLOODBjqHjAEndr2MjsQNt1yG2OBxhX/I9R5w9v6
-	tznvUVGghgTGjAvjE/IBawmSWhJCDihPupdijZk4rUGiG3m9rvnvmy9xryW3FfE=
-X-Google-Smtp-Source: AGHT+IGg4+GTgKpcocRSHWqddDrc+rrpm/34o839Hkj+OJRCyujj5Z/0OpTcDzfW6PMDiFO0ZbZYoA==
-X-Received: by 2002:a05:600c:354b:b0:412:bca2:1680 with SMTP id i11-20020a05600c354b00b00412bca21680mr5891715wmq.35.1709492623332;
-        Sun, 03 Mar 2024 11:03:43 -0800 (PST)
-Received: from localhost.localdomain ([2a01:e0a:a92:c660:e318:3b1a:c27a:9905])
-        by smtp.gmail.com with ESMTPSA id fk6-20020a05600c0cc600b00412e2ccdc97sm1265674wmb.17.2024.03.03.11.03.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Mar 2024 11:03:42 -0800 (PST)
-From: Piotr Wejman <piotrwejman90@gmail.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Piotr Wejman <piotrwejman90@gmail.com>
-Subject: [PATCH v3] net: stmmac: fix rx queue priority assignment
-Date: Sun,  3 Mar 2024 20:03:38 +0100
-Message-Id: <20240303190339.52496-1-piotrwejman90@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        d=1e100.net; s=20230601; t=1709492663; x=1710097463;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RqNgFnLKTP93PR6cVdZ6fNlJHYat8XSThRpAWagOMXQ=;
+        b=VcmcSK1r0vrUBLVFyGNGlgJDiFEwCUy9GUVZo/WHeo/F9zmtSipcagUZETWaLCB+/P
+         phSurGkssQqBOptHUjOgm/9ppSRc2wglIQnhQmB7fVbzA3BrWA2a5ACTDj07VU8p+Pzy
+         OZN8ANTXvdsGaeKtTS10jGq/MmEMOf3bI7gBzXHsbh/b2+/g0P4cIfsntICUTI9EGefm
+         N6EDmMIfPS/KX1Gy2oME8c5viwWhxT+eMkNaulXIEWoOBJv8MvBG6mKInqezLxgesk/8
+         SZUFvOdwqJf3E/TX3atOogdoNkeVcTLaCgKtlgr4/gV+x+CNNnI/F7TM6sQ8LbqrOK1F
+         wOKw==
+X-Forwarded-Encrypted: i=1; AJvYcCVKNLfb8XNl9gwMPYU4D0XM5gGeBeVgUJnx0bzD6aGjKtMW1oyKHt/uzNNvQrg0nINrxtqeqMZCpWoDIkJ6UEFctXd0gNXJ
+X-Gm-Message-State: AOJu0YxPsHl7iwk5PaPm+PFTyed67Pup8Y46VQd6Abro2cPnh05xmYdn
+	EUUVTZGxnZ0gF+31OlemMMwNMAnLYFhYvIROnYXISusr7kxnnWzhCXQ8BITXGSKq6AsLwfhT1RB
+	S5kgTOzEXG//0Wxo1s2f87KDhbGmv5RZEgBtK
+X-Google-Smtp-Source: AGHT+IEXYHwCWf7tKmk+LIkt9xBmoryKDpFjJ5oxsQxMZt9/0PsKn73bkhvRdIcyYXwMPp+nyv4nWA6GqQISNE/l6mw=
+X-Received: by 2002:a25:d892:0:b0:dcc:a446:551 with SMTP id
+ p140-20020a25d892000000b00dcca4460551mr4093063ybg.52.1709492663143; Sun, 03
+ Mar 2024 11:04:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240225165447.156954-1-jhs@mojatatu.com> <b28f2f7900dc7bad129ad67621b2f7746c3b2e18.camel@redhat.com>
+ <CO1PR11MB49931E501B20F32681F917CD935F2@CO1PR11MB4993.namprd11.prod.outlook.com>
+ <65e106305ad8b_43ad820892@john.notmuch> <CAM0EoM=r1UDnkp-csPdrz6nBt7o3fHUncXKnO7tB_rcZAcbrDg@mail.gmail.com>
+ <CAOuuhY8qbsYCjdUYUZv8J3jz8HGXmtxLmTDP6LKgN5uRVZwMnQ@mail.gmail.com>
+ <20240301090020.7c9ebc1d@kernel.org> <CAM0EoM=-hzSNxOegHqhAQD7qoAR2CS3Dyh-chRB+H7C7TQzmow@mail.gmail.com>
+ <20240301173214.3d95e22b@kernel.org> <CAM0EoM=NEB25naGtz=YaOt6BDoiv4RpDw27Y=btMZAMGeYB5bg@mail.gmail.com>
+ <CAM0EoM=8GG-zCaopaUDMkvqemrZQUtaVRTMrWA6z=xrdYxG9+g@mail.gmail.com>
+ <20240302192747.371684fb@kernel.org> <CAM0EoMncuPvUsRwE+Ajojgg-8JD+1oJ7j2Rw+7oN60MjjAHV-g@mail.gmail.com>
+ <CAOuuhY8pgxqCg5uTXzetTt5sd8RzOfLPYF8ksLjoUhkKyqr56w@mail.gmail.com>
+In-Reply-To: <CAOuuhY8pgxqCg5uTXzetTt5sd8RzOfLPYF8ksLjoUhkKyqr56w@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Sun, 3 Mar 2024 14:04:11 -0500
+Message-ID: <CAM0EoMnpZuC_fdzXj5+seXo3GT9rrf1txc45tB=gie4cf-Zqeg@mail.gmail.com>
+Subject: Re: Hardware Offload discussion WAS(Re: [PATCH net-next v12 00/15]
+ Introducing P4TC (series 1)
+To: Tom Herbert <tom@sipanda.io>
+Cc: Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	"Singhai, Anjali" <anjali.singhai@intel.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>, "Chatterjee, Deb" <deb.chatterjee@intel.com>, 
+	"Limaye, Namrata" <namrata.limaye@intel.com>, Marcelo Ricardo Leitner <mleitner@redhat.com>, 
+	"Shirshyad, Mahesh" <Mahesh.Shirshyad@amd.com>, "Jain, Vipin" <Vipin.Jain@amd.com>, 
+	"Osinski, Tomasz" <tomasz.osinski@intel.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>, 
+	Khalid Manaa <khalidm@nvidia.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Victor Nogueira <victor@mojatatu.com>, 
+	"Tammela, Pedro" <pctammela@mojatatu.com>, "Daly, Dan" <dan.daly@intel.com>, 
+	Andy Fingerhut <andy.fingerhut@gmail.com>, "Sommers, Chris" <chris.sommers@keysight.com>, 
+	Matty Kadosh <mattyk@nvidia.com>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The driver should ensure that same priority is not mapped to multiple
-rx queues. Currently rx_queue_priority() function is adding
-priorities for a queue without clearing them from others.
+On Sun, Mar 3, 2024 at 1:11=E2=80=AFPM Tom Herbert <tom@sipanda.io> wrote:
+>
+> On Sun, Mar 3, 2024 at 9:00=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com=
+> wrote:
+> >
+> > On Sat, Mar 2, 2024 at 10:27=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
+> wrote:
+> > >
+> > > On Sat, 2 Mar 2024 09:36:53 -0500 Jamal Hadi Salim wrote:
+> > > > 2) Your point on:  "integrate later", or at least "fill in the gaps=
+"
+> > > > This part i am probably going to mumble on. I am going to consider
+> > > > more than just doing ACLs/MAT via flower/u32 for the sake of
+> > > > discussion.
+> > > > True, "fill the gaps" has been our model so far. It requires kernel
+> > > > changes, user space code changes etc justifiably so because most of
+> > > > the time such datapaths are subject to standardization via IETF, IE=
+EE,
+> > > > etc and new extensions come in on a regular basis.  And sometimes w=
+e
+> > > > do add features that one or two users or a single vendor has need f=
+or
+> > > > at the cost of kernel and user/control extension. Given our work
+> > > > process, any features added this way take a long time to make it to
+> > > > the end user.
+> > >
+> > > What I had in mind was more of a DDP model. The device loads it binar=
+y
+> > > blob FW in whatever way it does, then it tells the kernel its parser
+> > > graph, and tables. The kernel exposes those tables to user space.
+> > > All dynamic, no need to change the kernel for each new protocol.
+> > >
+> > > But that's different in two ways:
+> > >  1. the device tells kernel the tables, no "dynamic reprogramming"
+> > >  2. you don't need the SW side, the only use of the API is to interac=
+t
+> > >     with the device
+> > >
+> > > User can still do BPF kfuncs to look up in the tables (like in FIB),
+> > > but call them from cls_bpf.
+> > >
+> >
+> > This is not far off from what is envisioned today in the discussions.
+> > The main issue is who loads the binary? We went from devlink to the
+> > filter doing the loading. DDP is ethtool. We still need to tie a PCI
+> > device/tc block to the "program" so we can do skip_sw and it works.
+> > Meaning a device that is capable of handling multiple programs can
+> > have multiple blobs loaded. A "program" is mapped to a tc filter and
+> > MAT control works the same way as it does today (netlink/tc ndo).
+> >
+> > A program in P4 has a name, ID and people have been suggesting a sha1
+> > identity (or a signature of some kind should be generated by the
+> > compiler). So the upward propagation could be tied to discovering
+> > these 3 tuples from the driver. Then the control plane targets a
+> > program via those tuples via netlink (as we do currently).
+> >
+> > I do note, using the DDP sample space, currently whatever gets loaded
+> > is "trusted" and really you need to have human knowledge of what the
+> > NIC's parsing + MAT is to send the control. With P4 that is all
+> > visible/programmable by the end user (i am not a proponent of vendors
+> > "shipping" things or calling them for support) - so should be
+> > sufficient to just discover what is in the binary and send the correct
+> > control messages down.
+> >
+> > > I think in P4 terms that may be something more akin to only providing
+> > > the runtime API? I seem to recall they had some distinction...
+> >
+> > There are several solutions out there (ex: TDI, P4runtime) - our API
+> > is netlink and those could be written on top of netlink, there's no
+> > controversy there.
+> > So the starting point is defining the datapath using P4, generating
+> > the binary blob and whatever constraints needed using the vendor
+> > backend and for s/w equivalent generating the eBPF datapath.
+> >
+> > > > At the cost of this sounding controversial, i am going
+> > > > to call things like fdb, fib, etc which have fixed datapaths in the
+> > > > kernel "legacy". These "legacy" datapaths almost all the time have
+> > >
+> > > The cynic in me sometimes thinks that the biggest problem with "legac=
+y"
+> > > protocols is that it's hard to make money on them :)
+> >
+> > That's a big motivation without a doubt, but also there are people
+> > that want to experiment with things. One of the craziest examples we
+> > have is someone who created a P4 program for "in network calculator",
+> > essentially a calculator in the datapath. You send it two operands and
+> > an operator using custom headers, it does the math and responds with a
+> > result in a new header. By itself this program is a toy but it
+> > demonstrates that if one wanted to, they could have something custom
+> > in hardware and/or kernel datapath.
+>
+> Jamal,
+>
+> Given how long P4 has been around it's surprising that the best
+> publicly available code example is "the network calculator" toy.
 
-From DesignWare Cores Ethernet Quality-of-Service
-Databook, section 17.1.29 MAC_RxQ_Ctrl2:
-"[...]The software must ensure that the content of this field is
-mutually exclusive to the PSRQ fields for other queues, that is,
-the same priority is not mapped to multiple Rx queues[...]"
+Come on Tom ;-> That was just an example of something "crazy" to
+demonstrate freedom. I can run that in any of the P4 friendly NICs
+today. You are probably being facetious - There are some serious
+publicly available projects out there, some of which I quote on the
+cover letter (like DASH).
 
-After this patch, rx_queue_priority() function will:
-- assign desired priorities to a queue
-- remove those priorities from all other queues
-The write sequence of CTRL2 and CTRL3 registers is done in the way to
-ensure this order.
+> At
+> this point in its lifetime, eBPF had far more examples of real world
+> use cases publically available. That being said, there's nothing
+> unique about P4 supporting the network calculator. We could just as
+> easily write this in eBPF (either plain C or P4)  and "offload" it to
+> an ARM core on a SmartNIC.
 
-Signed-off-by: Piotr Wejman <piotrwejman90@gmail.com>
----
-Changes in v2:
-  - Add some comments
-  - Apply same changes to dwxgmac2_rx_queue_prio()
-  - Revert "Rename prio argument to prio_mask"
-  - Link to v1: https://lore.kernel.org/netdev/20240219102405.32015-1-piotrwejman90@gmail.com/T/#u
+With current port speeds hitting 800gbps you want to use Arm cores as
+your offload engine?;-> Running the generated ebpf on the arm core is
+a valid P4 target.  i.e there is no contradiction.
+Note: P4 is a DSL specialized for datapath definition; it is not a
+competition to ebpf, two different worlds. I see ebpf as an
+infrastructure tool, nothing more.
 
-Changes in v3:
-  - Fix trailing whitespace
-  - Link to v2: https://lore.kernel.org/netdev/20240226093144.31965-1-piotrwejman90@gmail.com/
+> If we are going to support programmable device offload in the Linux
+> kernel then I maintain it should be a generic mechanism that's
+> agnostic to *both* the frontend programming language as well as the
+> backend target. For frontend languages we want to let the user program
+> in a language that's convenient for *them*, which honestly in most
+> cases isn't going to be a narrow use case DSL (i.e. typically users
+> want to code in C/C++, Python, Rust, etc.).
 
- .../net/ethernet/stmicro/stmmac/dwmac4_core.c | 42 +++++++++++++++----
- .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 40 ++++++++++++++----
- 2 files changed, 66 insertions(+), 16 deletions(-)
+You and I have never agreed philosophically on this point, ever.
+Developers are expensive and not economically scalable. IOW, In the
+era of automation (generative AI, etc) tooling is king. Let's build
+the right tooling. Whenever you make this statement  i get the vision
+of Steve Balmer ranting on the stage with "developers! developers!
+developers!" but that was eons ago. To use your strong view: Learn
+compilers! And the future is probably to replace compilers with AI.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-index 6b6d0de09619..a0e6d33ca87e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-@@ -92,19 +92,43 @@ static void dwmac4_rx_queue_priority(struct mac_device_info *hw,
- 				     u32 prio, u32 queue)
- {
- 	void __iomem *ioaddr = hw->pcsr;
--	u32 base_register;
--	u32 value;
-+	u32 clear_mask = 0;
-+	u32 ctrl2, ctrl3;
-+	int i;
- 
--	base_register = (queue < 4) ? GMAC_RXQ_CTRL2 : GMAC_RXQ_CTRL3;
--	if (queue >= 4)
--		queue -= 4;
-+	ctrl2 = readl(ioaddr + GMAC_RXQ_CTRL2);
-+	ctrl3 = readl(ioaddr + GMAC_RXQ_CTRL3);
- 
--	value = readl(ioaddr + base_register);
-+	/* The software must ensure that the same priority
-+	 * is not mapped to multiple Rx queues.
-+	 */
-+	for (i = 0; i < 4; i++)
-+		clear_mask |= ((prio << GMAC_RXQCTRL_PSRQX_SHIFT(i)) &
-+						GMAC_RXQCTRL_PSRQX_MASK(i));
-+
-+	ctrl2 &= ~clear_mask;
-+	ctrl3 &= ~clear_mask;
-+
-+	/* Assign new priorities to a queue and
-+	 * clear them from others queues.
-+	 * The CTRL2 and CTRL3 registers write sequence is done
-+	 * in the way to ensure this order.
-+	 */
-+	if (queue < 4) {
-+		ctrl2 |= (prio << GMAC_RXQCTRL_PSRQX_SHIFT(queue)) &
-+						GMAC_RXQCTRL_PSRQX_MASK(queue);
- 
--	value &= ~GMAC_RXQCTRL_PSRQX_MASK(queue);
--	value |= (prio << GMAC_RXQCTRL_PSRQX_SHIFT(queue)) &
-+		writel(ctrl2, ioaddr + GMAC_RXQ_CTRL2);
-+		writel(ctrl3, ioaddr + GMAC_RXQ_CTRL3);
-+	} else {
-+		queue -= 4;
-+
-+		ctrl3 |= (prio << GMAC_RXQCTRL_PSRQX_SHIFT(queue)) &
- 						GMAC_RXQCTRL_PSRQX_MASK(queue);
--	writel(value, ioaddr + base_register);
-+
-+		writel(ctrl3, ioaddr + GMAC_RXQ_CTRL3);
-+		writel(ctrl2, ioaddr + GMAC_RXQ_CTRL2);
-+	}
- }
- 
- static void dwmac4_tx_queue_priority(struct mac_device_info *hw,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-index 1af2f89a0504..d15752823d93 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-@@ -105,17 +105,43 @@ static void dwxgmac2_rx_queue_prio(struct mac_device_info *hw, u32 prio,
- 				   u32 queue)
- {
- 	void __iomem *ioaddr = hw->pcsr;
--	u32 value, reg;
-+	u32 clear_mask = 0;
-+	u32 ctrl2, ctrl3;
-+	int i;
- 
--	reg = (queue < 4) ? XGMAC_RXQ_CTRL2 : XGMAC_RXQ_CTRL3;
--	if (queue >= 4)
-+	ctrl2 = readl(ioaddr + XGMAC_RXQ_CTRL2);
-+	ctrl3 = readl(ioaddr + XGMAC_RXQ_CTRL3);
-+
-+	/* The software must ensure that the same priority
-+	 * is not mapped to multiple Rx queues.
-+	 */
-+	for (i = 0; i < 4; i++)
-+		clear_mask |= ((prio << XGMAC_PSRQ_SHIFT(i)) &
-+						XGMAC_PSRQ(i));
-+
-+	ctrl2 &= ~clear_mask;
-+	ctrl3 &= ~clear_mask;
-+
-+	/* Assign new priorities to a queue and
-+	 * clear them from others queues.
-+	 * The CTRL2 and CTRL3 registers write sequence is done
-+	 * in the way to ensure this order.
-+	 */
-+	if (queue < 4) {
-+		ctrl2 |= (prio << XGMAC_PSRQ_SHIFT(queue)) &
-+						XGMAC_PSRQ(queue);
-+
-+		writel(ctrl2, ioaddr + XGMAC_RXQ_CTRL2);
-+		writel(ctrl3, ioaddr + XGMAC_RXQ_CTRL3);
-+	} else {
- 		queue -= 4;
- 
--	value = readl(ioaddr + reg);
--	value &= ~XGMAC_PSRQ(queue);
--	value |= (prio << XGMAC_PSRQ_SHIFT(queue)) & XGMAC_PSRQ(queue);
-+		ctrl3 |= (prio << XGMAC_PSRQ_SHIFT(queue)) &
-+						XGMAC_PSRQ(queue);
- 
--	writel(value, ioaddr + reg);
-+		writel(ctrl3, ioaddr + XGMAC_RXQ_CTRL3);
-+		writel(ctrl2, ioaddr + XGMAC_RXQ_CTRL2);
-+	}
- }
- 
- static void dwxgmac2_tx_queue_prio(struct mac_device_info *hw, u32 prio,
--- 
-2.25.1
+> For the backend it's the
+> same story, maybe we're compiling to run in host, maybe we're
+> offloading to P4 runtime, maybe we're offloading to another CPU, maybe
+> we're offloading some other programmable NPU. The only real
+> requirement is a compiler that can take the frontend code and compile
+> for the desired backend target, but above all we want this to be easy
+> for the programmer, the compiler needs to do the heavy lifting and we
+> should never require the user to understand the nuances of a target.
+>
 
+Agreed, it is possible to use other languages in the frontend. It is
+also possible to extend P4.
+
+> IMO, the model we want for programmable kernel offload is "write once,
+> run anywhere, run well". Which is the Java tagline amended with "run
+> well". Users write one program for their datapath processing, it runs
+> on various targets, for any given target we run to run at the highest
+> performance levels possible given the target's capabilities.
+>
+
+I would like to emphasize: Our target is P4 - vendors have put out
+hardware, people are deploying and evolving things. It is real today
+with deployments, not some science project. I am not arguing you cant
+do what you suggested but we want to initially focus on P4. Neither am
+i saying we cant influence P4 to be more Linux friendly. But none of
+that matters. We are only concerned about P4.
+
+cheers,
+jamal
+
+
+
+> Tom
+>
+> >
+> > cheers,
+> > jamal
 
