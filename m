@@ -1,157 +1,286 @@
-Return-Path: <netdev+bounces-76898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0FA186F513
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 14:24:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63F6086F520
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 14:30:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F8DB281C0F
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 13:24:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E574B22254
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 13:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC666CA73;
-	Sun,  3 Mar 2024 13:24:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="eBPo8idw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1B84F9C1;
+	Sun,  3 Mar 2024 13:30:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-249.mail.qq.com (out203-205-221-249.mail.qq.com [203.205.221.249])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41A6101E3;
-	Sun,  3 Mar 2024 13:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C966CC8E0
+	for <netdev@vger.kernel.org>; Sun,  3 Mar 2024 13:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709472247; cv=none; b=nLObS+pQP9lJ6XfBOLmedPMjyzySJwjJzGmVTfjQuRn2i9uJo3Fs2GLebc+3Tcvyy8b3sfA87aPbBsZkT9hrz6c4hUKZw43kZa7Qhkjla2B2YKYWw9eJxMvlpY9IiT0a6UcWZbSzI2Q6yW/n2VoYupP9rdLYVWiMXNAjfzt/tJU=
+	t=1709472625; cv=none; b=dMxn2iVIssYf2EFC30CsrjTs3D6+soG7lxt6dAOwgSoaGzh9VZHdC0ViLc5RufWMTSRBaSRwo4+Z56Vvbm9gFy7YC7PiwxT8ub/MqeP6RAD9W2ArMh6QRFS0K0xpGWLPPfOySvr9D5KKLapq/nY/E5l/0mfiBBZ5j7Dt/NP4pkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709472247; c=relaxed/simple;
-	bh=G/uUIcpfGezZClHWnrZDD9K0NYrXcF/UXKZ/8huSANM=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=lBOw/uDlgxnekWKLmZWgAsGq041Vk1YDLVWw1kPWA2nQ/tLUJDq6cS81ImppwIiDYE4XdpbJ2nL9TnYYZIXv029QjSrzzSRsHlEZZhbZ4gz0eTjZ4dtsD7k/DM646oRux3zC9EQDQrB0UbKV4Mo+JREO6wMPTeRW+O/ZDnkwaEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=eBPo8idw; arc=none smtp.client-ip=203.205.221.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1709472241; bh=Uo6+rVGqUfEBi3BWpquQslrkKBAv6/iFpXZsRLuvnJM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=eBPo8idwVoLhTJ7X/bqvn7JnBbFiyJiyoNYw7fNldKYN1UcFh33Gkkp6vIgdCa024
-	 bU5JedGe+MaGryxQ5y+doWoUSAfrXoGyoeR4YNYToAVwXEIkpBTVqA5JZHBnERFgjR
-	 KuZIaMgFErJ9+CE+qw4nfoe5grhCvaEf9xfKE0ms=
-Received: from pek-lxu-l1.wrs.com ([111.198.228.140])
-	by newxmesmtplogicsvrszc5-0.qq.com (NewEsmtp) with SMTP
-	id 5FA2D2AD; Sun, 03 Mar 2024 21:23:58 +0800
-X-QQ-mid: xmsmtpt1709472238t63b8jqob
-Message-ID: <tencent_ECF3CC90A7DB86E312FF464F09BF2EEAAE06@qq.com>
-X-QQ-XMAILINFO: M/NR0wiIuy70vNwuqXnPcAATd38i+Hrt5nu5F7SU8jslSYo5IjGQa9TJ1wQdik
-	 Oun75WagS/8ZoK0TZ7S1N26r7C7sQE3LlrldG+1Ni9cHqmW/1dtGJmFd7UNuMZXRX03nR6tjf6nA
-	 BnnVJPZa2IoJlmcNLillPdbFwsQOwMDh9kyCqBQG/msZVSusQJvScF4tHHYlu/2IfLMBIIvUn5zs
-	 u2Nok8SVFOhjq7ThRqQJXlQGzDE18FVcc2e4NZ0+AT80PawnfU6XqBpXgAK9lCe4Ui12sCoBt+xJ
-	 SRhCDFF/EZn3F9tLhtpDb97HlKYOWtD2XiGBBvK6dXX0WXh5oTqA/+5R2XzHW4ORYsdPVEfFeEQc
-	 zlURosOWssYK+doMORe7kF2mpYo5atBOdIniDzcnmdnhh5FPoyo5xknvGSXj7kRSaqzNOIj4kwjg
-	 bAQoXWnD3MWFghthM8RIdD/BJ2RqM47nkak/qSS9QTU8m/UTg4YD0he5Cbzlt8dkm4jQU3X1Ujg/
-	 glXwh8TTz5zbpCAlqUDmSPanlfwYwMrlQ6GM7H0vu9CYQIm6SoP+kXBBjmMmQwRI5G0j0MyoY4xN
-	 /yvSmoRZEIkVUzyAZ/21MmcqQzRzhvvJXvO3vGD+z9hUFRHiyvK/hczX4tk3cNgpx3g3pZcMIlg5
-	 433FZruVXIFy3NhdSe5VX4/eQ9dBqzxXQgECQKWtiSw35fPcNrZ3qONr/wk8rIsbs4Vy86fZgFCi
-	 75cxqlmiJydXeQ6tbx18hWcPgIvt/eQaUV71fUs3BpIRlhWONxsJ0AuXsW8e7beuuec2jS316bAd
-	 UNn7g4SuVUbUK7ERPTH8UHsd/3Jx4od6GXy1w/UPe0sqhGtMaNDadVn9ju131bMEFNVcOCS6x2k5
-	 1AY3RHKTYJ3MhCUWEQ8gvV4daC84OVxywA0W6PaWBZZUOKIaQ0dAw1gNkPEuGmGwW+/eSL1UDa2J
-	 TW1DCnPf99xozrFY+0mPKrqjkmOCdlTgBc5lXrlHS3/Nplmen0p/yVRQJ0R6nc
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-From: Edward Adam Davis <eadavis@qq.com>
-To: syzbot+f770ce3566e60e5573ac@syzkaller.appspotmail.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-hams@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	ralf@linux-mips.org,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH] skbuff: fix uninit-value in nr_route_frame
-Date: Sun,  3 Mar 2024 21:23:59 +0800
-X-OQ-MSGID: <20240303132358.639892-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <000000000000b69bf20612bf586e@google.com>
-References: <000000000000b69bf20612bf586e@google.com>
+	s=arc-20240116; t=1709472625; c=relaxed/simple;
+	bh=Ya0QUUNzV6b9+YF0UynShN9DuphKcrGT10A31NOpI9s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WouAPhPPRnv9ZNgW8LLR27R9XaPiHowGMlr+4u+orliuD/yjXqPlYzQ9qWUEAgnbKwBgv9WHySHCfOWEF1aY9HSUjGktXFx9vuBLBws9XXM35uloZswn3jY7i+y3oKXxEBbQ9oBntiAFiMqOJfRd9mZnCeFZ0zBuVLrTKKW8jcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1rgluq-0005O6-0F;
+	Sun, 03 Mar 2024 13:30:08 +0000
+Date: Sun, 3 Mar 2024 13:29:58 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
+	Alexander Couzens <lynxis@fe80.eu>
+Subject: Re: [PATCH v2 net-next 1/7] net: phy: realtek: configure SerDes mode
+ for rtl822x/8251b PHYs
+Message-ID: <ZeR7Vs8als7yaWax@makrotopia.org>
+References: <20240303102848.164108-1-ericwouds@gmail.com>
+ <20240303102848.164108-2-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240303102848.164108-2-ericwouds@gmail.com>
 
-[Syzbot reported]
-BUG: KMSAN: uninit-value in nr_route_frame+0x4a9/0xfc0 net/netrom/nr_route.c:787
- nr_route_frame+0x4a9/0xfc0 net/netrom/nr_route.c:787
- nr_xmit+0x5a/0x1c0 net/netrom/nr_dev.c:144
- __netdev_start_xmit include/linux/netdevice.h:4980 [inline]
- netdev_start_xmit include/linux/netdevice.h:4994 [inline]
- xmit_one net/core/dev.c:3547 [inline]
- dev_hard_start_xmit+0x244/0xa10 net/core/dev.c:3563
- __dev_queue_xmit+0x33ed/0x51c0 net/core/dev.c:4351
- dev_queue_xmit include/linux/netdevice.h:3171 [inline]
- raw_sendmsg+0x64e/0xc10 net/ieee802154/socket.c:299
- ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
+On Sun, Mar 03, 2024 at 11:28:42AM +0100, Eric Woudstra wrote:
+> From: Alexander Couzens <lynxis@fe80.eu>
+> 
+> The rtl822x series and rtl8251b support switching SerDes mode between
+> 2500base-x and sgmii based on the negotiated copper speed.
+> 
+> Configure this switching mode according to SerDes modes supported by
+> host.
+> 
+> There is an additional datasheet for RTL8226B/RTL8221B called
+> "SERDES MODE SETTING FLOW APPLICATION NOTE" where this sequence to
+> setup interface and rate adapter mode.
 
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:3819 [inline]
- slab_alloc_node mm/slub.c:3860 [inline]
- kmem_cache_alloc_node+0x5cb/0xbc0 mm/slub.c:3903
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
- __alloc_skb+0x352/0x790 net/core/skbuff.c:651
- alloc_skb include/linux/skbuff.h:1296 [inline]
- alloc_skb_with_frags+0xc8/0xbd0 net/core/skbuff.c:6394
- sock_alloc_send_pskb+0xa80/0xbf0 net/core/sock.c:2783
- sock_alloc_send_skb include/net/sock.h:1855 [inline]
- raw_sendmsg+0x367/0xc10 net/ieee802154/socket.c:282
- ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
+Gramar doesn't parse, missing verb.
 
-[Fix]
-Let's clear all skb data at alloc time.
+> 
+> However, there is no documentation about the meaning of registers
+> and bits, it's literally just magic numbers and pseudo-code.
+> 
+> Signed-off-by: Alexander Couzens <lynxis@fe80.eu>
+> [ refactored, dropped HiSGMII mode and changed commit message ]
+> Signed-off-by: Marek Behún <kabel@kernel.org>
+> [ changed rtl822x_update_interface() to use vendor register ]
+> [ always fill in possible interfaces ]
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+> ---
+>  drivers/net/phy/realtek.c | 99 ++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 97 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+> index 1fa70427b2a2..8a876e003774 100644
+> --- a/drivers/net/phy/realtek.c
+> +++ b/drivers/net/phy/realtek.c
+> @@ -54,6 +54,16 @@
+>  						 RTL8201F_ISR_LINK)
+>  #define RTL8201F_IER				0x13
+>  
+> +#define RTL822X_VND1_SERDES_OPTION			0x697a
+> +#define RTL822X_VND1_SERDES_OPTION_MODE_MASK		GENMASK(5, 0)
+> +#define RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX_SGMII		0
+> +#define RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX		2
+> +
+> +#define RTL822X_VND1_SERDES_CTRL3			0x7580
+> +#define RTL822X_VND1_SERDES_CTRL3_MODE_MASK		GENMASK(5, 0)
+> +#define RTL822X_VND1_SERDES_CTRL3_MODE_SGMII			0x02
+> +#define RTL822X_VND1_SERDES_CTRL3_MODE_2500BASEX		0x16
+> +
+>  #define RTL8366RB_POWER_SAVE			0x15
+>  #define RTL8366RB_POWER_SAVE_ON			BIT(12)
+>  
+> @@ -659,6 +669,60 @@ static int rtl822x_write_mmd(struct phy_device *phydev, int devnum, u16 regnum,
+>  	return ret;
+>  }
+>  
+> +static int rtl822x_config_init(struct phy_device *phydev)
+> +{
+> +	bool has_2500, has_sgmii;
+> +	u16 mode;
+> +	int ret;
+> +
+> +	has_2500 = test_bit(PHY_INTERFACE_MODE_2500BASEX,
+> +			    phydev->host_interfaces) ||
+> +		   phydev->interface == PHY_INTERFACE_MODE_2500BASEX;
+> +
+> +	has_sgmii = test_bit(PHY_INTERFACE_MODE_SGMII,
+> +			     phydev->host_interfaces) ||
+> +		    phydev->interface == PHY_INTERFACE_MODE_SGMII;
+> +
+> +	/* fill in possible interfaces */
+> +	__assign_bit(PHY_INTERFACE_MODE_2500BASEX, phydev->possible_interfaces,
+> +		     has_2500);
+> +	__assign_bit(PHY_INTERFACE_MODE_SGMII, phydev->possible_interfaces,
+> +		     has_sgmii);
+> +
+> +	if (!has_2500 && !has_sgmii)
+> +		return 0;
+> +
+> +	/* determine SerDes option mode */
+> +	if (has_2500 && !has_sgmii)
+> +		mode = RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX;
+> +	else
+> +		mode = RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX_SGMII;
+> +
+> +	/* the following sequence with magic numbers sets up the SerDes
+> +	 * option mode
+> +	 */
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x75f3, 0);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = phy_modify_mmd_changed(phydev, MDIO_MMD_VEND1,
+> +				     RTL822X_VND1_SERDES_OPTION,
+> +				     RTL822X_VND1_SERDES_OPTION_MODE_MASK,
+> +				     mode);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x6a04, 0x0503);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x6f10, 0xd455);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	return phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x6f11, 0x8020);
+> +}
+> +
+>  static int rtl822x_get_features(struct phy_device *phydev)
+>  {
+>  	int val;
+> @@ -695,6 +759,28 @@ static int rtl822x_config_aneg(struct phy_device *phydev)
+>  	return __genphy_config_aneg(phydev, ret);
+>  }
+>  
+> +static void rtl822x_update_interface(struct phy_device *phydev)
+> +{
+> +	int val;
+> +
+> +	if (!phydev->link)
+> +		return;
+> +
+> +	/* Change interface according to serdes mode */
+> +	val = phy_read_mmd(phydev, MDIO_MMD_VEND1, RTL822X_VND1_SERDES_CTRL3);
+> +	if (val < 0)
+> +		return;
+> +
+> +	switch (val & RTL822X_VND1_SERDES_CTRL3_MODE_MASK) {
+> +	case RTL822X_VND1_SERDES_CTRL3_MODE_2500BASEX:
+> +		phydev->interface = PHY_INTERFACE_MODE_2500BASEX;
+> +		break;
+> +	case RTL822X_VND1_SERDES_CTRL3_MODE_SGMII:
+> +		phydev->interface = PHY_INTERFACE_MODE_SGMII;
+> +		break;
+> +	}
+> +}
+> +
+>  static int rtl822x_read_status(struct phy_device *phydev)
+>  {
+>  	int ret;
+> @@ -709,11 +795,13 @@ static int rtl822x_read_status(struct phy_device *phydev)
+>  						  lpadv);
+>  	}
+>  
+> -	ret = genphy_read_status(phydev);
+> +	ret = rtlgen_read_status(phydev);
+>  	if (ret < 0)
+>  		return ret;
+>  
+> -	return rtlgen_get_speed(phydev);
+> +	rtl822x_update_interface(phydev);
+> +
+> +	return 0;
+>  }
+>  
+>  static bool rtlgen_supports_2_5gbps(struct phy_device *phydev)
+> @@ -976,6 +1064,7 @@ static struct phy_driver realtek_drvs[] = {
+>  		.match_phy_device = rtl8226_match_phy_device,
+>  		.get_features	= rtl822x_get_features,
+>  		.config_aneg	= rtl822x_config_aneg,
+> +		.config_init    = rtl822x_config_init,
+>  		.read_status	= rtl822x_read_status,
+>  		.suspend	= genphy_suspend,
+>  		.resume		= rtlgen_resume,
+> @@ -988,6 +1077,7 @@ static struct phy_driver realtek_drvs[] = {
+>  		.name		= "RTL8226B_RTL8221B 2.5Gbps PHY",
+>  		.get_features	= rtl822x_get_features,
+>  		.config_aneg	= rtl822x_config_aneg,
+> +		.config_init    = rtl822x_config_init,
+>  		.read_status	= rtl822x_read_status,
+>  		.suspend	= genphy_suspend,
+>  		.resume		= rtlgen_resume,
+> @@ -1000,6 +1090,7 @@ static struct phy_driver realtek_drvs[] = {
+>  		.name           = "RTL8226-CG 2.5Gbps PHY",
+>  		.get_features   = rtl822x_get_features,
+>  		.config_aneg    = rtl822x_config_aneg,
+> +		.config_init    = rtl822x_config_init,
+>  		.read_status    = rtl822x_read_status,
+>  		.suspend        = genphy_suspend,
+>  		.resume         = rtlgen_resume,
+> @@ -1010,6 +1101,7 @@ static struct phy_driver realtek_drvs[] = {
+>  		.name           = "RTL8226B-CG_RTL8221B-CG 2.5Gbps PHY",
+>  		.get_features   = rtl822x_get_features,
+>  		.config_aneg    = rtl822x_config_aneg,
+> +		.config_init    = rtl822x_config_init,
+>  		.read_status    = rtl822x_read_status,
+>  		.suspend        = genphy_suspend,
+>  		.resume         = rtlgen_resume,
+> @@ -1019,6 +1111,7 @@ static struct phy_driver realtek_drvs[] = {
+>  		PHY_ID_MATCH_EXACT(0x001cc849),
+>  		.name           = "RTL8221B-VB-CG 2.5Gbps PHY",
+>  		.get_features   = rtl822x_get_features,
+> +		.config_init    = rtl822x_config_init,
+>  		.config_aneg    = rtl822x_config_aneg,
+>  		.read_status    = rtl822x_read_status,
+>  		.suspend        = genphy_suspend,
+> @@ -1030,6 +1123,7 @@ static struct phy_driver realtek_drvs[] = {
+>  		.name           = "RTL8221B-VM-CG 2.5Gbps PHY",
+>  		.get_features   = rtl822x_get_features,
+>  		.config_aneg    = rtl822x_config_aneg,
+> +		.config_init    = rtl822x_config_init,
+>  		.read_status    = rtl822x_read_status,
+>  		.suspend        = genphy_suspend,
+>  		.resume         = rtlgen_resume,
+> @@ -1040,6 +1134,7 @@ static struct phy_driver realtek_drvs[] = {
+>  		.name           = "RTL8251B 5Gbps PHY",
+>  		.get_features   = rtl822x_get_features,
+>  		.config_aneg    = rtl822x_config_aneg,
+> +		.config_init    = rtl822x_config_init,
 
-Reported-and-tested-by: syzbot+f770ce3566e60e5573ac@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
- net/core/skbuff.c | 1 +
- 1 file changed, 1 insertion(+)
+Have you tested this on RTL8251B?
+This PHY usually uses 5GBase-R link mode with rate-adapter mode for
+lower speeds. Hence I'm pretty sure that also setting up SerDes mode
+register will be a bit different.
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index edbbef563d4d..5ca5a608daec 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -656,6 +656,7 @@ struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
- 	 * to allow max possible filling before reallocation.
- 	 */
- 	prefetchw(data + SKB_WITH_OVERHEAD(size));
-+	memset(data, 0, size);
- 
- 	/*
- 	 * Only clear those fields we need to clear, not those that we will
--- 
-2.43.0
-
+>  		.read_status    = rtl822x_read_status,
+>  		.suspend        = genphy_suspend,
+>  		.resume         = rtlgen_resume,
+> -- 
+> 2.42.1
+> 
 
