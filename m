@@ -1,134 +1,203 @@
-Return-Path: <netdev+bounces-76855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFEE986F319
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 00:19:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 842E886F338
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 01:25:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A18F91F220B5
-	for <lists+netdev@lfdr.de>; Sat,  2 Mar 2024 23:19:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C0C31C20886
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 00:25:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98D05380C;
-	Sat,  2 Mar 2024 23:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EB91197;
+	Sun,  3 Mar 2024 00:25:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J8WsILe/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WlRJQD1d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E981EB3F;
-	Sat,  2 Mar 2024 23:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DEE7F;
+	Sun,  3 Mar 2024 00:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709421588; cv=none; b=AzFRuI2MVDY/WYVv50KfZJuDI/YVfKSP3izAaKA1jIsCnweDiUlo6nntlIImqv6zLfkHPtRsCqRnQgCAmPoX0m8lwrYuYllQ0PhsUlodaYf/DVElPI9hZsCIlzg+Q+zTr435/joFZT3eJqu1P5UGNAo1yFdpvZSspfMoAeKPyLE=
+	t=1709425520; cv=none; b=rNSWQKVV4V3LRia0Hv8xS7EBXMWTl0Mmxt5Zj259zO2N2CJz/0FzPM7I4GlQhUI+53Wrv15wDcaU0a9VbhRCGiInoAGq6xq2f4XWesZLf4MZdBSAubWip1ontyhzdmfMUY3o2a3wX9m3RvmvE4W6vr+cJFj1eJcvPG2l95hY9fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709421588; c=relaxed/simple;
-	bh=vPP3p9GGRRGZegKNSobm2wNf5DV/YCF3ypsLBCmSIdw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=oD3U0fWO6G1+sYnaKxQUxROftZk7qo1jCsVgCQS9vzmiUlMwK+1w0VCuu3Mc/gsdn5wAtF0bLr3PcVPcMtoje3opjt2hCttQ94zUQMwm2XBajVS005p5uDms4Ol1pbuepRtkcQ49WG4kvQDbsxF/Z/tYQDqG2VTZ8jI2rkYGm8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J8WsILe/; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-42e78c39ff0so39808111cf.0;
-        Sat, 02 Mar 2024 15:19:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709421586; x=1710026386; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yl9YhJ9Pat9I4841GAOwQcUbovZDN591i7vJgihLH04=;
-        b=J8WsILe/c0lxtcCKQQ/0R2OH3stc/HlsnH+PpbuTa3bzXSbYECsURyZ9OYW12x193e
-         f0uR1c0q4NgkE0SrCDCWa9kKZLTvsiHVmkQ+n611oGCbAH0aQ3LRV/zVP0AzugW93MsE
-         ybDVfU0BNnB2XZJUrzQhnZgWI5PmOmXMM3qy5w8OEPYFPIpZKt/wgssVnsUBi79mTi8r
-         MZo0SiwfIu7C9HdwrQlV5LJRr8abFTPQnKabX3CwZC2bGoZpCozPzWahQLmirNGDtUkD
-         97u2n6cqunBELdpH8ZaIgXuGI0h8wWxcxN2orgxPfu2CoDtZiLj9Lm6f8RPQ/hgz0Sas
-         GNFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709421586; x=1710026386;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yl9YhJ9Pat9I4841GAOwQcUbovZDN591i7vJgihLH04=;
-        b=j6I6xnSKVPZNL29TptI0XvNw2fTmKReDia9KZLcO7xIXpNuWdcdQL1QimqiVicreWf
-         MVC81wgHR1OBuofdmKMeHAZXqts7yJrhQ5WjT2mZkkm+H4dknm0YEnU12sTx9eL37ZgX
-         DZJSbD4zPai9CdcfwftAKG6RzVdwSxTObZAf2/2uLtQRw+XpMKEVu1A9S8hFgQRXiQTY
-         JTW3bCpph4I4DwysjPipOm53c/YNzdMK/ERfSHNMUdzMZlwpMyvPDtfChOBoxwKYSlim
-         iMha+KEDtPCFy8Q+4YsCT8W8nHT8bMH8/KrR2F0felmzZVkMEGX5NBpJkW7Aryx28AE5
-         UD2A==
-X-Forwarded-Encrypted: i=1; AJvYcCX4rvRFQ2It8hC7Y4NzpLyGG7Gy9hvC+VK3O8pEX+yieGQ7tonRZI14MsxkNVx76Qdt/bLhVJuzZ+CyeT7Uu8FxzjEUHF9RxFAdd3wBh2Hdmto2YoRQUWMl7sCNZsqNBFfu
-X-Gm-Message-State: AOJu0YwkOdO9kqhP1a9R8hRiQLrHMHhmNjePFLGjAFJVfoyT7UrT+KdC
-	KNjtzYla7hI94F9+HDVHoE4jLQV3hxrJfMGHj8LK2JFNw3auySN9wmOYPAT7
-X-Google-Smtp-Source: AGHT+IF2R0RJsIJvVpl1bvm8wghq1conzqkpFu40cOsz9Pou4iTg2Ord2Jc4YemBxx9LHR+Lm28KYA==
-X-Received: by 2002:ac8:5a41:0:b0:42e:ca55:e89a with SMTP id o1-20020ac85a41000000b0042eca55e89amr8281122qta.34.1709421585966;
-        Sat, 02 Mar 2024 15:19:45 -0800 (PST)
-Received: from localhost ([2601:8c:502:14f0:acdd:1182:de4a:7f88])
-        by smtp.gmail.com with ESMTPSA id nw5-20020a0562143a0500b0068f2d2f64d1sm3422697qvb.32.2024.03.02.15.19.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Mar 2024 15:19:45 -0800 (PST)
-Date: Sat, 2 Mar 2024 13:19:42 -0500
-From: Oliver Crumrine <ozlinuxc@gmail.com>
-To: alx@kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-man@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: [PATCH] ip.7: Add not supported by SOCK_STREAM to socket options
-Message-ID: <hxiq3upwxs3j5mc5arwlx4jriqm7fq5z54wroc4h4kqcq4gq7m@uwnoq2vnkhup>
+	s=arc-20240116; t=1709425520; c=relaxed/simple;
+	bh=oe4tv+sWsVINy3pdkPlCqyC4weGlijmdXnLiY7j84L0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f3VtXBAP4qJi2zzb47yx3BZw45hEygHD29Jy39bHPNHEHi1Ge9l5YZ4zc+/Et3P0brvlEyp+F9SFsuSDML8du+VjuRX+PzD58L00qE7L+y4wUlI7BbyexPO/IDcWDnxiBLOCnK6cn4YVusKSkfi+yUke/ppe8tlds0yG73cvMFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WlRJQD1d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A43AC433C7;
+	Sun,  3 Mar 2024 00:25:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709425519;
+	bh=oe4tv+sWsVINy3pdkPlCqyC4weGlijmdXnLiY7j84L0=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=WlRJQD1dSrsqDKkuIavjqmlcjMtD1dcK3vTLYZzVBqExvISIFOK0RfOoP1KX+e7cD
+	 k0ImZC0aXI1Wkim/1NCOT+vS292ylVz1ADz48kChVQ6YJRlYpn9+XU/VOZlRdUPiJW
+	 Bc4a5Xin7Oa0uSF0xxI3YK9blzgjckl/VNaWOSZkV5h1PH/btQEpJqzeNK9epopadG
+	 BW1SJjHooPlr45S3KS3ZYSgdhgpEy0BYxaPeo649Dv1lqrSXl5bzN/1zB9CoiKjqB9
+	 W/rW6QsFHcZr8duE9hhudetxCprtNYcW27Kh56xSSbOtinDjrUMgJkF6BHRo0u16Ih
+	 rQAngpljkbNaQ==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 3A805CE08FA; Sat,  2 Mar 2024 16:25:19 -0800 (PST)
+Date: Sat, 2 Mar 2024 16:25:19 -0800
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Joel Fernandes <joel@joelfernandes.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>,
+	Network Development <netdev@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>, rcu@vger.kernel.org,
+	kernel-team <kernel-team@cloudflare.com>
+Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
+Message-ID: <f1e77cd2-18b2-4ab1-8ce3-da2c6babbd53@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <55900c6a-f181-4c5c-8de2-bca640c4af3e@paulmck-laptop>
+ <10FC3F5F-AA33-4F81-9EB6-87EB2D41F3EE@joelfernandes.org>
+ <99b2ccae-07f6-4350-9c55-25ec7ae065c0@paulmck-laptop>
+ <CAEXW_YQ+40a1-hk5ZP+QJ54xniSutosC7MjMscJJy8fen-gU9Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEXW_YQ+40a1-hk5ZP+QJ54xniSutosC7MjMscJJy8fen-gU9Q@mail.gmail.com>
 
-It was not made clear in several socket options that they were not
-supported by SOCK_STREAM; this patch fixes that.
+On Fri, Mar 01, 2024 at 09:24:15PM -0500, Joel Fernandes wrote:
+> (Shrinking CC a bit)
+> 
+> On Thu, Feb 29, 2024 at 1:29 PM Paul E. McKenney <paulmck@kernel.org> wrote:
+> >
+> > On Thu, Feb 29, 2024 at 12:41:55PM -0500, Joel Fernandes wrote:
+> > > > On Feb 29, 2024, at 11:57 AM, Paul E. McKenney <paulmck@kernel.org> wrote:
+> > > > ﻿On Thu, Feb 29, 2024 at 09:21:48AM -0500, Joel Fernandes wrote:
+> > > >>> On 2/28/2024 5:58 PM, Paul E. McKenney wrote:
+> > > >>> On Wed, Feb 28, 2024 at 02:48:44PM -0800, Alexei Starovoitov wrote:
+> > > >>>> On Wed, Feb 28, 2024 at 2:31 PM Steven Rostedt <rostedt@goodmis.org> wrote:
+> > > >>>>>
+> > > >>>>> On Wed, 28 Feb 2024 14:19:11 -0800
+> > > >>>>> "Paul E. McKenney" <paulmck@kernel.org> wrote:
+> > > >>>>>
+> > > >>>>>>>>
+> > > >>>>>>>> Well, to your initial point, cond_resched() does eventually invoke
+> > > >>>>>>>> preempt_schedule_common(), so you are quite correct that as far as
+> > > >>>>>>>> Tasks RCU is concerned, cond_resched() is not a quiescent state.
+> > > >>>>>>>
+> > > >>>>>>> Thanks for confirming. :-)
+> > > >>>>>>
+> > > >>>>>> However, given that the current Tasks RCU use cases wait for trampolines
+> > > >>>>>> to be evacuated, Tasks RCU could make the choice that cond_resched()
+> > > >>>>>> be a quiescent state, for example, by adjusting rcu_all_qs() and
+> > > >>>>>> .rcu_urgent_qs accordingly.
+> > > >>>>>>
+> > > >>>>>> But this seems less pressing given the chance that cond_resched() might
+> > > >>>>>> go away in favor of lazy preemption.
+> > > >>>>>
+> > > >>>>> Although cond_resched() is technically a "preemption point" and not truly a
+> > > >>>>> voluntary schedule, I would be happy to state that it's not allowed to be
+> > > >>>>> called from trampolines, or their callbacks. Now the question is, does BPF
+> > > >>>>> programs ever call cond_resched()? I don't think they do.
+> > > >>>>>
+> > > >>>>> [ Added Alexei ]
+> > > >>>>
+> > > >>>> I'm a bit lost in this thread :)
+> > > >>>> Just answering the above question.
+> > > >>>> bpf progs never call cond_resched() directly.
+> > > >>>> But there are sleepable (aka faultable) bpf progs that
+> > > >>>> can call some helper or kfunc that may call cond_resched()
+> > > >>>> in some path.
+> > > >>>> sleepable bpf progs are protected by rcu_tasks_trace.
+> > > >>>> That's a very different one vs rcu_tasks.
+> > > >>>
+> > > >>> Suppose that the various cond_resched() invocations scattered throughout
+> > > >>> the kernel acted as RCU Tasks quiescent states, so that as soon as a
+> > > >>> given task executed a cond_resched(), synchronize_rcu_tasks() might
+> > > >>> return or call_rcu_tasks() might invoke its callback.
+> > > >>>
+> > > >>> Would that cause BPF any trouble?
+> > > >>>
+> > > >>> My guess is "no", because it looks like BPF is using RCU Tasks (as you
+> > > >>> say, as opposed to RCU Tasks Trace) only to wait for execution to leave a
+> > > >>> trampoline.  But I trust you much more than I trust myself on this topic!
+> > > >>
+> > > >> But it uses RCU Tasks Trace as well (for sleepable bpf programs), not just
+> > > >> Tasks? Looks like that's what Alexei said above as well, and I confirmed it in
+> > > >> bpf/trampoline.c
+> > > >>
+> > > >>        /* The trampoline without fexit and fmod_ret progs doesn't call original
+> > > >>         * function and doesn't use percpu_ref.
+> > > >>         * Use call_rcu_tasks_trace() to wait for sleepable progs to finish.
+> > > >>         * Then use call_rcu_tasks() to wait for the rest of trampoline asm
+> > > >>         * and normal progs.
+> > > >>         */
+> > > >>        call_rcu_tasks_trace(&im->rcu, __bpf_tramp_image_put_rcu_tasks);
+> > > >>
+> > > >> The code comment says it uses both.
+> > > >
+> > > > BPF does quite a few interesting things with these.
+> > > >
+> > > > But would you like to look at the update-side uses of RCU Tasks Rude
+> > > > to see if lazy preemption affects them?  I don't believe that there
+> > > > are any problems here, but we do need to check.
+> > >
+> > > Sure I will be happy to. I am planning look at it in detail over the 3 day weekend. Too much fun! ;-)
+> >
+> > Thank you, and looking forward to seeing what you come up with!
+> >
+> > The canonical concern would be that someone somewhere is using either
+> > call_rcu_tasks_rude() or synchronize_rcu_tasks_rude() to wait for
+> > non-preemptible regions of code that does not account for the possibility
+> > of preemption in CONFIG_PREEMPT_NONE or PREEMPT_PREEMPT_VOLUNTARY kernels.
+> >
+> > I *think* that these are used only to handle the possibility
+> > of tracepoints on functions on the entry/exit path and on the
+> > RCU-not-watching portions of the idle loop.  If so, then there is no
+> > difference in behavior for lazy preemption.  But who knows?
+> 
+> Hi Paul, regarding CONFIG_PREEMPT_AUTO, for Tasks RCU rude, I think
+> the following patch will address your concern about quiescent states
+> on CPUs spinning away in kernel mode:
+> 
+> "sched/fair: handle tick expiry under lazy preemption"
+> Link: https://lore.kernel.org/all/20240213055554.1802415-24-ankur.a.arora@oracle.com/
+> 
+> In this patch Ankur makes sure that the scheduling-clock interrupt
+> will reschedule the CPU after a tick and not let queued tasks starve
+> due to lazy re-scheduling. So my impression is the
+> "schedule_on_each_cpu()" should schedule a worker thread in time to
+> apply the implied Tasks RCU quiescent state even if the rescheduling
+> was a LAZY-reschedule.
+> 
+> Also, not sure if the "voluntary mode" of CONFIG_PREEMPT_AUTO behaves
+> differently. My feeling is regardless of preemption mode,
+> CONFIG_PREEMPT_AUTO should always preempt after a tick if something
+> else needs to run. It just will not preempt immediately like before
+> (although CFS did already have some wakeup preemption logic to slow it
+> down a bit). I am reviewing Ankur's patches more to confirm that and
+> also reviewing his patches more to see how it could affect.
 
-Socket options not supported by SOCK_STREAM are handled in the
-ip_cmsg_recv_offset function in net/ipv4/ip_sockglue.c. The function is
-called for udp sockets, and indirectly by ping and raw sockets, but not
-for TCP sockets, as they don't support these options.
+Thank you for the info!
 
-Signed-off-by: Oliver Crumrine <ozlinuxc@gmail.com>
----
- man7/ip.7 | 9 +++++++++
- 1 file changed, 9 insertions(+)
+As you noted, one thing that Ankur's series changes is that preemption
+can occur anywhere that it is not specifically disabled in kernels
+built with CONFIG_PREEMPT_NONE=y or CONFIG_PREEMPT_VOLUNTARY=y.  This in
+turn changes Tasks Rude RCU's definition of a quiescent state for these
+kernels, adding all code regions where preemption is not specifically
+disabled to the list of such quiescent states.
 
-diff --git a/man7/ip.7 b/man7/ip.7
-index 2b4b06324..104e65feb 100644
---- a/man7/ip.7
-+++ b/man7/ip.7
-@@ -828,6 +828,9 @@ is not zero, the primary local address of the interface specified by the
- index overwrites
- .I ipi_spec_dst
- for the routing table lookup.
-+Not supported for
-+.B SOCK_STREAM
-+sockets.
- .TP
- .BR IP_RECVERR " (since Linux 2.2)"
- .\" Precisely: since Linux 2.1.15
-@@ -989,6 +992,9 @@ in which the kernel returns the original destination address
- of the datagram being received.
- The ancillary message contains a
- .IR "struct sockaddr_in" .
-+Not supported for
-+.B SOCK_STREAM
-+sockets.
- .TP
- .BR IP_RECVTOS " (since Linux 2.2)"
- .\" Precisely: since Linux 2.1.68
-@@ -998,6 +1004,9 @@ ancillary message is passed with incoming packets.
- It contains a byte which specifies the Type of Service/Precedence
- field of the packet header.
- Expects a boolean integer flag.
-+Not supported for
-+.B SOCK_STREAM
-+sockets.
- .TP
- .BR IP_RECVTTL " (since Linux 2.2)"
- .\" Precisely: since Linux 2.1.68
--- 
-2.44.0
+Although from what I know, this is OK, it would be good to check the
+calls to call_rcu_tasks_rude() or synchronize_rcu_tasks_rude() are set
+up so as to expect these new quiescent states.  One example where it
+would definitely be OK is if there was a call to synchronize_rcu_tasks()
+right before or after that call to synchronize_rcu_tasks_rude().
 
+Would you be willing to check the call sites to verify that they
+are OK with this change in semantics?
+
+							Thanx, Paul
 
