@@ -1,180 +1,105 @@
-Return-Path: <netdev+bounces-76910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9B0A86F619
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 17:31:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 532A086F62C
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 17:42:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C14CB24855
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 16:31:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66D601C2205E
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 16:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEBE76D52F;
-	Sun,  3 Mar 2024 16:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C820D6BB44;
+	Sun,  3 Mar 2024 16:42:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipanda-io.20230601.gappssmtp.com header.i=@sipanda-io.20230601.gappssmtp.com header.b="gXgPcIyh"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="D8BD8Bjs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C351E6E2B3
-	for <netdev@vger.kernel.org>; Sun,  3 Mar 2024 16:31:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680CF7493;
+	Sun,  3 Mar 2024 16:42:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709483486; cv=none; b=HlBBI5Dh4l0nY5WqFXkUx3LlSLNfEoWCBXqnekbU6ntnoVoxWqzI8ZvFw0k+lrNZ+9PolTTZQtAnUrpJsqDjaZewfXa86viVk/h4gVlZnvRO/XZiBHph8esg19lXQMfGoiRO/CfqGxu54sIXRbJFUjFRGWppQewnO7RHrSzRHBg=
+	t=1709484121; cv=none; b=dRU4RJrrGjSP8+/CXpVKdesR2CwoIURmg9ACAJleD71Np7su5nkCnYxAIEVZ1tkuNg0MuTWps1bw6fSZrw6U0aUMg7I/dB8Rr5DUxHpWDXeU7LEdhuCWX2ouVwKj7NLz1UYwMNm1aUO1TMBmYaoqHNKF38mO1mwqJaIbqpBSwxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709483486; c=relaxed/simple;
-	bh=M4CH3FnjamkLjBU9rjNyNRsPEYihXS/mhC+4kUHl38o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rtBIWc4MGOGJtTFaCXO8XxJBvlDhPOL8VCCsAbRh5R7EgXLQ8oJInLP4zr+KGyYeDP/Csf3eJUoXznYJ2bnVluqs8GrpXoEwh1mMPeQr57uAOTzp/QbGR1x6N4XH3wYgQP49sCtnyzCdmren0gOHMN+A8Cc7PJIihq/2FcVXrsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sipanda.io; spf=pass smtp.mailfrom=sipanda.io; dkim=pass (2048-bit key) header.d=sipanda-io.20230601.gappssmtp.com header.i=@sipanda-io.20230601.gappssmtp.com header.b=gXgPcIyh; arc=none smtp.client-ip=209.85.210.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sipanda.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipanda.io
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-6e4de6fb7f9so741230a34.0
-        for <netdev@vger.kernel.org>; Sun, 03 Mar 2024 08:31:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sipanda-io.20230601.gappssmtp.com; s=20230601; t=1709483483; x=1710088283; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M4CH3FnjamkLjBU9rjNyNRsPEYihXS/mhC+4kUHl38o=;
-        b=gXgPcIyhHQ6/B/36pNevfN0WcPz3VWytukLrNUZNNdLnZLT8GUgO+ZpcPlcHGGJw1D
-         VmdACIcnhohP0xrdFgKWvKA6abfs35L8gr1A4aFi/PZUi9OBbZeSabMpFSE28lVHqhJY
-         dwq5ytTFDoCmRxgjy7rcukQuMp4V8PlqD5GYkCXijE7h8fGC483IbhjLVpl/eDp4k1ug
-         qiewFmXgj0yEykUFK0kuWmb1Sm2jkbguyO6UGUN23uJYypUgZAKupDzmes8FH7HY19C6
-         TUCnrCdDqCa1Tv+0gTto5+FTZSdYA0J9Uuphn8hPwD10QBbMAtzKLF0P5GMOy4R6LGBl
-         5Spw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709483483; x=1710088283;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M4CH3FnjamkLjBU9rjNyNRsPEYihXS/mhC+4kUHl38o=;
-        b=v1CNkdhvjnE7NFOHKy+wLlUWpiPaWrHAc1LERCuW0UhMCTJ6E7vwZiu4RqIRj+Tm+N
-         R1q+fgLtOlsthx0lfseF8DTKfdvuxUQZpLYl3bR3AhAlTxynJ0fV0lcZ2GK9/1QAPzvP
-         S3qReybDRjA3laLe2AU7AMR5hO+uz8URCCTy2okPSVQy0UmoNJpRTR0VUMtXLCww6Lhl
-         OaODvYQDvQx4uQni9Z5AxuUahSQGqeF2oWPvsCDxIERKD/vRBY89pkioERHnJ2aTf7A0
-         UGiaUUaE3ZbqG+5SerCj7PtiWxijzcq6aV9oM8NhybeVn49BR5EiclXSlKY9mmlgxfpL
-         4dPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUnla4bAANbNHsd3VUzOxZpPQ4fhIsl5ieWN6yvoPPR/u/aAjkWWycs6SXex0a2Jm2wuBocbKh3NGeS4r5OAsuVxaPtA2Yz
-X-Gm-Message-State: AOJu0YwgupouSIOD93ZTXGe241w6E3bn5Sva5JpJQH7thmNM7TCpwtzr
-	82LpBNuNWzm/G6tLqW9dEwSBx7037xm2cMNkyxE05UMsSqPM1vQVuEddewlozl2FRvbKaPKqRJB
-	SVFqa4EDDcbcMnaRy+y8rU+VhzdERXuQN3Kklgw==
-X-Google-Smtp-Source: AGHT+IHXPYgX24IKlsJON9UI1ZIU4CDHT+FjkldDEdDndBggEN9zJs3yuLfiltg9eaMhPWaHk8ApMO5/GwJcw85FXuA=
-X-Received: by 2002:a9d:73cc:0:b0:6e4:d884:40d0 with SMTP id
- m12-20020a9d73cc000000b006e4d88440d0mr3383074otk.0.1709483482934; Sun, 03 Mar
- 2024 08:31:22 -0800 (PST)
+	s=arc-20240116; t=1709484121; c=relaxed/simple;
+	bh=Gwzzy7hNAaV1D/F6nWxqZu6+TdQiyQjvihiT7l0ydOg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YwK6Zkaztx52TeHjbLzIxHwCLYpRRNP4TrWOERfzxCU9Mxibc+nB0ZGBPDTz/CD0Ejl1k9zHxvUJaEoSCvp/OGA2f7ewowMUVY0S/vKZfY74A8B26QAGCP3FirzUNiA5G/2PL+QpXIrlg6HNJ5AyHnRPNnXYNnrNrX1xAG0dPGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=D8BD8Bjs; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=b4d/3tR4nX8imA7O6QUupWdB/X3IAtMGfLXRBaowLV0=; b=D8BD8BjsGOn7hEIlSgGYc8xXPq
+	O3Oudq1XubTYyx97XtSsdXlSLQgSF5sM8Tkg9Wq7ZI1TdwxdIVVrfp/aB/34cWJ4jgvbf35we063g
+	BkIbRdNklaMdHeiDTH4RsEUEoFlib97fIEGD/YyPpNPD1KQG3ojm0EmMrEPz02goIleClNBawuPT3
+	l0Q8Sscio79vgjRCXk2yKhFJfF/XtDmjQwurROGV2IekoLpTkYy23kHG0qQDdn5mKzj7Tjbi+WswM
+	yg6KVXYqdmqKpC2mOGJjC6h23vcvSlCaQ0JuFPMO1EtlJsrlHW1fKa+NnMqxwHskFosw8uYTFiTfj
+	nG82Eo5Q==;
+Received: from [50.53.50.0] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rgouT-00000006J2t-0uGx;
+	Sun, 03 Mar 2024 16:41:57 +0000
+Message-ID: <120c265e-dde5-454e-8e0b-72a1361912b6@infradead.org>
+Date: Sun, 3 Mar 2024 08:41:56 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240225165447.156954-1-jhs@mojatatu.com> <b28f2f7900dc7bad129ad67621b2f7746c3b2e18.camel@redhat.com>
- <CO1PR11MB49931E501B20F32681F917CD935F2@CO1PR11MB4993.namprd11.prod.outlook.com>
- <65e106305ad8b_43ad820892@john.notmuch> <CAM0EoM=r1UDnkp-csPdrz6nBt7o3fHUncXKnO7tB_rcZAcbrDg@mail.gmail.com>
- <CAOuuhY8qbsYCjdUYUZv8J3jz8HGXmtxLmTDP6LKgN5uRVZwMnQ@mail.gmail.com>
- <20240301090020.7c9ebc1d@kernel.org> <CAM0EoM=-hzSNxOegHqhAQD7qoAR2CS3Dyh-chRB+H7C7TQzmow@mail.gmail.com>
- <20240301173214.3d95e22b@kernel.org> <CAOuuhY8fnpEEBb8z-1mQmvHtfZQwgQnXk3=op-Xk108Pts8ohA@mail.gmail.com>
- <20240302191530.22353670@kernel.org>
-In-Reply-To: <20240302191530.22353670@kernel.org>
-From: Tom Herbert <tom@sipanda.io>
-Date: Sun, 3 Mar 2024 08:31:11 -0800
-Message-ID: <CAOuuhY_senZbdC2cVU9kfDww_bT+a_VkNaDJYRk4_fMbJW17sQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v12 00/15] Introducing P4TC (series 1)
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, John Fastabend <john.fastabend@gmail.com>, 
-	"Singhai, Anjali" <anjali.singhai@intel.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>, "Chatterjee, Deb" <deb.chatterjee@intel.com>, 
-	"Limaye, Namrata" <namrata.limaye@intel.com>, mleitner@redhat.com, Mahesh.Shirshyad@amd.com, 
-	Vipin.Jain@amd.com, "Osinski, Tomasz" <tomasz.osinski@intel.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, edumazet@google.com, Vlad Buslov <vladbu@nvidia.com>, 
-	horms@kernel.org, khalidm@nvidia.com, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Victor Nogueira <victor@mojatatu.com>, 
-	"Tammela, Pedro" <pctammela@mojatatu.com>, "Daly, Dan" <dan.daly@intel.com>, andy.fingerhut@gmail.com, 
-	"Sommers, Chris" <chris.sommers@keysight.com>, mattyk@nvidia.com, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Removed inputq,namedq field description to prevent kernel
+ doc warnings.
+Content-Language: en-US
+To: R SUNDAR <prosunofficial@gmail.com>, jmaloy@redhat.com,
+ ying.xue@windriver.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+ linux-kernel@vger.kernel.org
+References: <20240303143919.6903-1-prosunofficial@gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20240303143919.6903-1-prosunofficial@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, Mar 2, 2024 at 7:15=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Fri, 1 Mar 2024 18:20:36 -0800 Tom Herbert wrote:
-> > This is configurability versus programmability. The table driven
-> > approach as input (configurability) might work fine for generic
-> > match-action tables up to the point that tables are expressive enough
-> > to satisfy the requirements. But parsing doesn't fall into the table
-> > driven paradigm: parsers want to be *programmed*. This is why we
-> > removed kParser from this patch set and fell back to eBPF for parsing.
-> > But the problem we quickly hit that eBPF is not offloadable to network
-> > devices, for example when we compile P4 in an eBPF parser we've lost
-> > the declarative representation that parsers in the devices could
-> > consume (they're not CPUs running eBPF).
-> >
-> > I think the key here is what we mean by kernel offload. When we do
-> > kernel offload, is it the kernel implementation or the kernel
-> > functionality that's being offloaded? If it's the latter then we have
-> > a lot more flexibility. What we'd need is a safe and secure way to
-> > synchronize with that offload device that precisely supports the
-> > kernel functionality we'd like to offload. This can be done if both
-> > the kernel bits and programmed offload are derived from the same
-> > source (i.e. tag source code with a sha-1). For example, if someone
-> > writes a parser in P4, we can compile that into both eBPF and a P4
-> > backend using independent tool chains and program download. At
-> > runtime, the kernel can safely offload the functionality of the eBPF
-> > parser to the device if it matches the hash to that reported by the
-> > device
->
-> Good points. If I understand you correctly you're saying that parsers
-> are more complex than just a basic parsing tree a'la u32.
+Hi,
 
-Yes. Parsing things like TLVs, GRE flag field, or nested protobufs
-isn't conducive to u32. We also want the advantages of compiler
-optimizations to unroll loops, squash nodes in the parse graph, etc.
+On 3/3/24 06:39, R SUNDAR wrote:
+> /net/tipc/node.c:150: warning: Excess struct member 'inputq' description in 'tipc_node'
+> /net/tipc/node.c:150: warning: Excess struct member 'namedq' description in 'tipc_node'
+> 
+> Signed-off-by: R SUNDAR <prosunofficial@gmail.com>
 
-> Then we can take this argument further. P4 has grown to encompass a lot
-> of functionality of quite complex devices. How do we square that with
-> the kernel functionality offload model. If the entire device is modeled,
-> including f.e. TSO, an offload would mean that the user has to write
-> a TSO implementation which they then load into TC? That seems odd.
->
-> IOW I don't quite know how to square in my head the "total
-> functionality" with being a TC-based "plugin".
+This is already fixed in linux-next and net-next, as was another one of your
+patches.
+I suggest that you focus more on the -next trees for such patch targets.
 
-Hi Jakub,
+Thanks.
 
-I believe the solution is to replace kernel code with eBPF in cases
-where we need programmability. This effectively means that we would
-ship eBPF code as part of the kernel. So in the case of TSO, the
-kernel would include a standard implementation in eBPF that could be
-compiled into the kernel by default. The restricted C source code is
-tagged with a hash, so if someone wants to offload TSO they could
-compile the source into their target and retain the hash. At runtime
-it's a matter of querying the driver to see if the device supports the
-TSO program the kernel is running by comparing hash values. Scaling
-this, a device could support a catalogue of programs: TSO, LRO,
-parser, IPtables, etc., If the kernel can match the hash of its eBPF
-code to one reported by the driver then it can assume functionality is
-offloadable. This is an elaboration of "device features", but instead
-of the device telling us they think they support an adequate GRO
-implementation by reporting NETIF_F_GRO, the device would tell the
-kernel that they not only support GRO but they provide identical
-functionality of the kernel GRO (which IMO is the first requirement of
-kernel offload).
+> ---
+>  net/tipc/node.c | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/net/tipc/node.c b/net/tipc/node.c
+> index 3105abe97bb9..c1e890a82434 100644
+> --- a/net/tipc/node.c
+> +++ b/net/tipc/node.c
+> @@ -86,8 +86,6 @@ struct tipc_bclink_entry {
+>   * @lock: rwlock governing access to structure
+>   * @net: the applicable net namespace
+>   * @hash: links to adjacent nodes in unsorted hash chain
+> - * @inputq: pointer to input queue containing messages for msg event
+> - * @namedq: pointer to name table input queue with name table messages
+>   * @active_links: bearer ids of active links, used as index into links[] array
+>   * @links: array containing references to all links to node
+>   * @bc_entry: broadcast link entry
 
-Even before considering hardware offload, I think this approach
-addresses a more fundamental problem to make the kernel programmable.
-Since the code is in eBPF, the kernel can be reprogrammed at runtime
-which could be controlled by TC. This allows local customization of
-kernel features, but also is the simplest way to "patch" the kernel
-with security and bug fixes (nobody is ever excited to do a kernel
-rebase in their datacenter!). Flow dissector is a prime candidate for
-this, and I am still planning to replace it with an all eBPF program
-(https://netdevconf.info/0x15/slides/16/Flow%20dissector_PANDA%20parser.pdf=
-).
-
-Tom
+-- 
+#Randy
 
