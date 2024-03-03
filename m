@@ -1,105 +1,107 @@
-Return-Path: <netdev+bounces-76911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 532A086F62C
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 17:42:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5600886F631
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 17:47:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66D601C2205E
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 16:42:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03F211F2306E
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 16:47:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C820D6BB44;
-	Sun,  3 Mar 2024 16:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C816E6BB46;
+	Sun,  3 Mar 2024 16:47:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="D8BD8Bjs"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yhOjDkKu"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680CF7493;
-	Sun,  3 Mar 2024 16:42:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5785C41A80;
+	Sun,  3 Mar 2024 16:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709484121; cv=none; b=dRU4RJrrGjSP8+/CXpVKdesR2CwoIURmg9ACAJleD71Np7su5nkCnYxAIEVZ1tkuNg0MuTWps1bw6fSZrw6U0aUMg7I/dB8Rr5DUxHpWDXeU7LEdhuCWX2ouVwKj7NLz1UYwMNm1aUO1TMBmYaoqHNKF38mO1mwqJaIbqpBSwxc=
+	t=1709484459; cv=none; b=A5iSX7rUu63T/CTQt5XJwsVPrDbZU5Bfhm0m1OX3hUYl2At9N7dSJIOg8VAte4dqsJKFgdfvJA+mBoT2bYqoBYiBPOd2PLCt+ahy0lNzidRKdUAeHZkwwgO+gJDawQvJTkGDRIvGYSot6vEw1acL24eBl/Os4HwR+c2mPz4tXGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709484121; c=relaxed/simple;
-	bh=Gwzzy7hNAaV1D/F6nWxqZu6+TdQiyQjvihiT7l0ydOg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YwK6Zkaztx52TeHjbLzIxHwCLYpRRNP4TrWOERfzxCU9Mxibc+nB0ZGBPDTz/CD0Ejl1k9zHxvUJaEoSCvp/OGA2f7ewowMUVY0S/vKZfY74A8B26QAGCP3FirzUNiA5G/2PL+QpXIrlg6HNJ5AyHnRPNnXYNnrNrX1xAG0dPGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=D8BD8Bjs; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=b4d/3tR4nX8imA7O6QUupWdB/X3IAtMGfLXRBaowLV0=; b=D8BD8BjsGOn7hEIlSgGYc8xXPq
-	O3Oudq1XubTYyx97XtSsdXlSLQgSF5sM8Tkg9Wq7ZI1TdwxdIVVrfp/aB/34cWJ4jgvbf35we063g
-	BkIbRdNklaMdHeiDTH4RsEUEoFlib97fIEGD/YyPpNPD1KQG3ojm0EmMrEPz02goIleClNBawuPT3
-	l0Q8Sscio79vgjRCXk2yKhFJfF/XtDmjQwurROGV2IekoLpTkYy23kHG0qQDdn5mKzj7Tjbi+WswM
-	yg6KVXYqdmqKpC2mOGJjC6h23vcvSlCaQ0JuFPMO1EtlJsrlHW1fKa+NnMqxwHskFosw8uYTFiTfj
-	nG82Eo5Q==;
-Received: from [50.53.50.0] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rgouT-00000006J2t-0uGx;
-	Sun, 03 Mar 2024 16:41:57 +0000
-Message-ID: <120c265e-dde5-454e-8e0b-72a1361912b6@infradead.org>
-Date: Sun, 3 Mar 2024 08:41:56 -0800
+	s=arc-20240116; t=1709484459; c=relaxed/simple;
+	bh=OPL1aIQTuGKgwQhRKtlPzp2Ss/iXbgK7g9IxNTuNO5w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IFnAsNuTij3Or9uoX8Yr55m1s+qXdz/zV9E2+Ec8bG3zeMAKdAFGduxqVwleT6srO1b2/6O+IT1yqi9olfrzZIu2vrKrYbNIwg/S4WldvQKyaW2Decnz2HAp8cmfy5zyyFXohtCmjc9sQ4vGFOho6JMc1m62RjDz1eqChgQPbTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yhOjDkKu; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=uOF+7FX2GYrjfEFD+K8IzTHJDjYcWidj50Q1BAozO0I=; b=yhOjDkKuzg82ykFIHZ43wKvG0G
+	7Ab6m39xlYjSJW5j9TqtUpFHLZUCRYG3308rRjomQ4hd/lfBjPgQlF5F6BAHBhBVDQOaAJRSoxK3+
+	AxJgIPvPxRgdRba9R+eDhMCBJpORc6ymCY03C29NU9/pwnU/gKUKRGNcHveOuvKq3tYc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rgozk-009F1k-VU; Sun, 03 Mar 2024 17:47:24 +0100
+Date: Sun, 3 Mar 2024 17:47:24 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Eric Woudstra <ericwouds@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Lucien Jheng <lucien.jheng@airoha.com>,
+	Zhi-Jun You <hujy652@protonmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 2/2] net: phy: air_en8811h: Add the Airoha
+ EN8811H PHY driver
+Message-ID: <d29b171b-c03a-44db-8e0d-15f9bd35c4b5@lunn.ch>
+References: <20240302183835.136036-1-ericwouds@gmail.com>
+ <20240302183835.136036-3-ericwouds@gmail.com>
+ <ZePicFOrsr5wTE_n@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Removed inputq,namedq field description to prevent kernel
- doc warnings.
-Content-Language: en-US
-To: R SUNDAR <prosunofficial@gmail.com>, jmaloy@redhat.com,
- ying.xue@windriver.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
- linux-kernel@vger.kernel.org
-References: <20240303143919.6903-1-prosunofficial@gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20240303143919.6903-1-prosunofficial@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZePicFOrsr5wTE_n@makrotopia.org>
 
-Hi,
-
-On 3/3/24 06:39, R SUNDAR wrote:
-> /net/tipc/node.c:150: warning: Excess struct member 'inputq' description in 'tipc_node'
-> /net/tipc/node.c:150: warning: Excess struct member 'namedq' description in 'tipc_node'
+> > +/* u32 (DWORD) component macros */
+> > +#define LOWORD(d) ((u16)(u32)(d))
+> > +#define HIWORD(d) ((u16)(((u32)(d)) >> 16))
 > 
-> Signed-off-by: R SUNDAR <prosunofficial@gmail.com>
+> You could use the existing macros in wordpart.h instead.
 
-This is already fixed in linux-next and net-next, as was another one of your
-patches.
-I suggest that you focus more on the -next trees for such patch targets.
+I was also asking myself the question, is there a standard set of
+macros for this.
 
-Thanks.
+But
 
-> ---
->  net/tipc/node.c | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/net/tipc/node.c b/net/tipc/node.c
-> index 3105abe97bb9..c1e890a82434 100644
-> --- a/net/tipc/node.c
-> +++ b/net/tipc/node.c
-> @@ -86,8 +86,6 @@ struct tipc_bclink_entry {
->   * @lock: rwlock governing access to structure
->   * @net: the applicable net namespace
->   * @hash: links to adjacent nodes in unsorted hash chain
-> - * @inputq: pointer to input queue containing messages for msg event
-> - * @namedq: pointer to name table input queue with name table messages
->   * @active_links: bearer ids of active links, used as index into links[] array
->   * @links: array containing references to all links to node
->   * @bc_entry: broadcast link entry
+~/linux$ find . -name word*.h
+./tools/testing/selftests/powerpc/primitives/word-at-a-time.h
+./include/asm-generic/word-at-a-time.h
+./arch/arm64/include/asm/word-at-a-time.h
+./arch/powerpc/include/asm/word-at-a-time.h
+./arch/s390/include/asm/word-at-a-time.h
+./arch/xtensa/include/generated/asm/word-at-a-time.h
+./arch/riscv/include/asm/word-at-a-time.h
+./arch/arc/include/generated/asm/word-at-a-time.h
+./arch/arm/include/asm/word-at-a-time.h
+./arch/sh/include/asm/word-at-a-time.h
+./arch/alpha/include/asm/word-at-a-time.h
+./arch/x86/include/asm/word-at-a-time.h
 
--- 
-#Randy
+No wordpart.h
+
+	Andrew
 
