@@ -1,487 +1,1271 @@
-Return-Path: <netdev+bounces-76879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC29986F40B
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 09:33:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8261A86F415
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 09:40:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A631282E9A
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 08:33:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23753281156
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 08:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24320A94C;
-	Sun,  3 Mar 2024 08:33:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9704D8821;
+	Sun,  3 Mar 2024 08:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dUVnFeNB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cqUBFtVq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D05C121;
-	Sun,  3 Mar 2024 08:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A461945A;
+	Sun,  3 Mar 2024 08:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709454792; cv=none; b=O5oZIBarBezlKgEFdLbf5cP8JIOK+yjY2eHpIFBrLqSQ3FGizd7SbU2nCuDb3Wl24jaPDxjKQdaoyTQGhjQiQED/PTWCMu6ppAIqtquqEev882NJGSRhLYadAMkWD9mZ0dUxZcCq4S9Jp440UPTDi0rIfhFlkny7hDvVywr4NY8=
+	t=1709455199; cv=none; b=eCUKT7/qNF0K2qFes21fyjxbPwRmHec+kxRh3re+zZVCz4TlPfzJFd4YyRnClaMPizkjXO+D2DyHr60jPgrpQMUZlWHC582v+ahbf5UtWBuddRWyhknrKkGcqX+xtezKEKmBRECT4IzPlMDqRDHzw6tvpquTucpPjpTK6/FtuiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709454792; c=relaxed/simple;
-	bh=eTaGu64SyGS3gKBVXLNsxJQRQVSOp1YXkVvDRmL1Os4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=d+C0wstsZ2RpJAQ42k/SpEY+3K2egHi7MoTM5+XR9xHeYLpxCPU+rvVQ740JQorkxubyc+dsxYgYzwei1zl0pAvc3qF+sHG+UnX+f3cAZUiZdwdm9JT9DYfT3Kbwy+3Qx9+ocOqxzt/ZHumBXy415Fo1YVUG3NpyIkbrD83CeVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dUVnFeNB; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709454791; x=1740990791;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=eTaGu64SyGS3gKBVXLNsxJQRQVSOp1YXkVvDRmL1Os4=;
-  b=dUVnFeNBMaKbUWKynd5jP6CQYrU2ESrfPw2BC/Be1nbI3qKgcmQTkwBa
-   bnGlus1eLWllALJlCYWz9tp9qHUjFfVPFi3wsiBjm4yN5X6iwmTHpFEnH
-   /N8bT8jwjySL/8EsMoDkS5WN6mIn5nRwEI1sP4sT5pF9nu0mk+/IWWN6u
-   LgwBo0XkMTSGUcIdeCi/DBc58ujChSH4lCjCFIh6CjQmDAWJ8j9gObZXs
-   wKGqaMMcKgZS7LmOyHN4XwxrriaxIAbAoXTsTKwf88mHE7vGfPU3Y7AI1
-   3ApSq7xJ3Z577146f/1qZsACZ0zsfQT/y6BUF4NnpduNvwHQ8g7aVqWiJ
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11001"; a="7769345"
-X-IronPort-AV: E=Sophos;i="6.06,200,1705392000"; 
-   d="scan'208";a="7769345"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2024 00:33:11 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,200,1705392000"; 
-   d="scan'208";a="13357207"
-Received: from p12ill20yoongsia.png.intel.com ([10.88.227.28])
-  by orviesa005.jf.intel.com with ESMTP; 03 Mar 2024 00:33:02 -0800
-From: Song Yoong Siang <yoong.siang.song@intel.com>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@google.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Florian Bezdeka <florian.bezdeka@siemens.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	xdp-hints@xdp-project.net
-Subject: [PATCH iwl-next,v3 2/2] igc: Add Tx hardware timestamp request for AF_XDP zero-copy packet
-Date: Sun,  3 Mar 2024 16:32:25 +0800
-Message-Id: <20240303083225.1184165-3-yoong.siang.song@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240303083225.1184165-1-yoong.siang.song@intel.com>
-References: <20240303083225.1184165-1-yoong.siang.song@intel.com>
+	s=arc-20240116; t=1709455199; c=relaxed/simple;
+	bh=I5I52CJQfgiE/f8H5CnV7qmntBUwXKA7cTcOtACRPXo=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=HWvBt21AEAXqFNbSwp+xr4ifNe/a0c8Q5p7uKCwBnM47qkF4XxyrdVpgDU2eMnpLT5jMqN4RCg1/uETk66KuF3nvtAucdNEV02CJxY6t8QfYfo7SfGhWKQUO3QYjOtVvKv2NU6hgsNUzbYuBZGyZZdLCf5vy2gQY4uvjTVFLp/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cqUBFtVq; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6e55731af5cso2680780b3a.0;
+        Sun, 03 Mar 2024 00:39:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709455196; x=1710059996; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SDFn8FtjgB6ZarUzfH7BDH/p953563mbGONoy9Rg7hI=;
+        b=cqUBFtVqguVeTtN3NU8FUxATAJuoUIFN5NZEnVqwfi/oKdz0sazcdtltSKOdvMi5jV
+         pAJCNKuQNowHj4tTQxFWcLSYvDpA9ihLyZBKkjw4ZttVHX/qsFH0MWF5W9updtR0GYMz
+         CWCLBE8LM5OrWuWT9gfFKNf7bx7MEZbkzD/vCgE/T+vwypmB8l6z0ygZ79MiOvwTXZZz
+         EjzBfTfGRUkMWDNTct3S7j4AwuVSWgXvQmDlmHCZObu1lDYxl7scdTdGiXQR9xPt7dCF
+         R5afpWKJPXN43ZRsJdsHVA8v09D7cHbcQResn67s1YZ4gfDOdt7mluFmoKUAlKpVikQA
+         9ZQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709455196; x=1710059996;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SDFn8FtjgB6ZarUzfH7BDH/p953563mbGONoy9Rg7hI=;
+        b=i0aeN0PDKSMWsz8HjyNu4kjBdoYBwiCc9UkWZDfjJzYU5LKpDVGKlCGW8GQgznsZdR
+         db/ItPXZ2LCiDH6KU8ypFhidXOBAGUI78tqznnVNCvi1LfD7mIrDK8xu0AAWhggENhS2
+         c2zsNujI0bYemRrmg7cnzqTfdhKzn4hVYcbCF3tTd2NaadJh/AUharrm5lthkMfjBAyD
+         kd0Mokj+n82C6NxZXeJigR/ZRE3GkfHzdFFTLWGP7k8FvfJbojHraoOuRK7ZgnUVPURJ
+         Nd1JDiRpOPt1DAa0GSvuges42eCq4rB3ixmdriyEUeVpix5CnzbXiVAQjERGQ64a62LN
+         vbxA==
+X-Forwarded-Encrypted: i=1; AJvYcCXtYhR89LLDpHkX8bIon8SuZ/EZt01f4Ru/I35HzFsNwfny2ZDldoDddPnao+qYJyAPGcBCv+4NtsiB9xAoZdvvC3XNmH88L7jK42GmzEHvQlvVYZ2OY536+fPbVcrYwGaNXBys
+X-Gm-Message-State: AOJu0YytVOL6j6/Sg7K0U0uj9D49DZ+oIUcNmOZG2qnY34qAq1FzqfFl
+	xWavFi9MKUdRvZ+dCmjkTGJrkSuZmXbu/yNso8pYTIB7BaQfRlyiN12+NX2PHlWJ023PstHMSzM
+	9Pil7hZbnn67FQeLj6XCRZ088a2c=
+X-Google-Smtp-Source: AGHT+IG+zCFaFGQkrucsB0tRPkTcne0KaNqAV3O9goWIaQ7K7LWMPeHl3W6DdTD05CEspf2RP1XAvYIx/u73tI/0zdQ=
+X-Received: by 2002:a05:6a21:3118:b0:1a1:42fb:af59 with SMTP id
+ yz24-20020a056a21311800b001a142fbaf59mr3448768pzb.37.1709455196033; Sun, 03
+ Mar 2024 00:39:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: xingwei lee <xrivendell7@gmail.com>
+Date: Sun, 3 Mar 2024 16:39:44 +0800
+Message-ID: <CABOYnLzO7WRFhd69XydHPu1VA8FzSBitew_ktj-unEqHTxa3ug@mail.gmail.com>
+Subject: Re: [syzbot] [net?] possible deadlock in team_port_change_check (2)
+To: xingwei lee <xrivendell7@gmail.com>
+Cc: davem@davemloft.net, Eric Dumazet <edumazet@google.com>, jiri@resnulli.us, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzbot+3c47b5843403a45aef57@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-This patch adds support to per-packet Tx hardware timestamp request to
-AF_XDP zero-copy packet via XDP Tx metadata framework. Please note that
-user needs to enable Tx HW timestamp capability via igc_ioctl() with
-SIOCSHWTSTAMP cmd before sending xsk Tx hardware timestamp request.
+Hello, I found a more stable reproducer
 
-Same as implementation in RX timestamp XDP hints kfunc metadata, Timer 0
-(adjustable clock) is used in xsk Tx hardware timestamp. i225/i226 have
-four sets of timestamping registers. Both *skb and *xsk_tx_buffer pointers
-are used to indicate whether the timestamping register is already occupied.
+=* repro.txt =*
+r0 = socket$netlink(0x10, 0x3, 0x0)
+writev(r0, &(0x7f0000000040)=[{&(0x7f0000000080)="3900000013000b4600bb65e1c3e4fffff9ffff7f37000000560000022500000019000a001000000007fd17e5ffff080004000000000000000a",
+0x39}], 0x1)
+r1 = socket$netlink(0x10, 0x3, 0x0)
+writev(r1, &(0x7f0000000040)=[{&(0x7f0000000080)="3900000013000b4600bb65e1c3e4ffff0100000036000000560000022500000019000a001000000007fd17e5ffff080004000000000000000a",
+0x39}], 0x1)
 
-Furthermore, a boolean variable named xsk_pending_ts is used to hold the
-transmit completion until the tx hardware timestamp is ready. This is
-because, for i225/i226, the timestamp notification event comes some time
-after the transmit completion event. The driver will retrigger hardware irq
-to clean the packet after retrieve the tx hardware timestamp.
+=* repro.c =*
+#define _GNU_SOURCE
 
-Besides, xsk_meta is added into struct igc_tx_timestamp_request as a hook
-to the metadata location of the transmit packet. When the Tx timestamp
-interrupt is fired, the interrupt handler will copy the value of Tx hwts
-into metadata location via xsk_tx_metadata_complete().
+#include <arpa/inet.h>
+#include <endian.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <net/if.h>
+#include <net/if_arp.h>
+#include <netinet/in.h>
+#include <sched.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/mount.h>
+#include <sys/prctl.h>
+#include <sys/resource.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/syscall.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
-Co-developed-by: Lai Peter Jun Ann <jun.ann.lai@intel.com>
-Signed-off-by: Lai Peter Jun Ann <jun.ann.lai@intel.com>
-Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
-Acked-by: John Fastabend <john.fastabend@gmail.com>
----
- drivers/net/ethernet/intel/igc/igc.h      |  71 ++++++++------
- drivers/net/ethernet/intel/igc/igc_main.c | 113 ++++++++++++++++++++--
- drivers/net/ethernet/intel/igc/igc_ptp.c  |  45 +++++++--
- 3 files changed, 189 insertions(+), 40 deletions(-)
+#include <linux/capability.h>
+#include <linux/genetlink.h>
+#include <linux/if_addr.h>
+#include <linux/if_ether.h>
+#include <linux/if_link.h>
+#include <linux/if_tun.h>
+#include <linux/in6.h>
+#include <linux/ip.h>
+#include <linux/neighbour.h>
+#include <linux/net.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <linux/tcp.h>
+#include <linux/veth.h>
 
-diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-index cfa6baccec55..22bb4f245240 100644
---- a/drivers/net/ethernet/intel/igc/igc.h
-+++ b/drivers/net/ethernet/intel/igc/igc.h
-@@ -72,13 +72,46 @@ struct igc_rx_packet_stats {
- 	u64 other_packets;
- };
- 
-+enum igc_tx_buffer_type {
-+	IGC_TX_BUFFER_TYPE_SKB,
-+	IGC_TX_BUFFER_TYPE_XDP,
-+	IGC_TX_BUFFER_TYPE_XSK,
-+};
-+
-+/* wrapper around a pointer to a socket buffer,
-+ * so a DMA handle can be stored along with the buffer
-+ */
-+struct igc_tx_buffer {
-+	union igc_adv_tx_desc *next_to_watch;
-+	unsigned long time_stamp;
-+	enum igc_tx_buffer_type type;
-+	union {
-+		struct sk_buff *skb;
-+		struct xdp_frame *xdpf;
-+	};
-+	unsigned int bytecount;
-+	u16 gso_segs;
-+	__be16 protocol;
-+
-+	DEFINE_DMA_UNMAP_ADDR(dma);
-+	DEFINE_DMA_UNMAP_LEN(len);
-+	u32 tx_flags;
-+	bool xsk_pending_ts;
-+};
-+
- struct igc_tx_timestamp_request {
--	struct sk_buff *skb;   /* reference to the packet being timestamped */
-+	union {                /* reference to the packet being timestamped */
-+		struct sk_buff *skb;
-+		struct igc_tx_buffer *xsk_tx_buffer;
-+	};
-+	enum igc_tx_buffer_type buffer_type;
- 	unsigned long start;   /* when the tstamp request started (jiffies) */
- 	u32 mask;              /* _TSYNCTXCTL_TXTT_{X} bit for this request */
- 	u32 regl;              /* which TXSTMPL_{X} register should be used */
- 	u32 regh;              /* which TXSTMPH_{X} register should be used */
- 	u32 flags;             /* flags that should be added to the tx_buffer */
-+	u8 xsk_queue_index;    /* Tx queue which requesting timestamp */
-+	struct xsk_tx_metadata_compl xsk_meta;	/* ref to xsk Tx metadata */
- };
- 
- struct igc_inline_rx_tstamps {
-@@ -322,6 +355,9 @@ void igc_disable_tx_ring(struct igc_ring *ring);
- void igc_enable_tx_ring(struct igc_ring *ring);
- int igc_xsk_wakeup(struct net_device *dev, u32 queue_id, u32 flags);
- 
-+/* AF_XDP TX metadata operations */
-+extern const struct xsk_tx_metadata_ops igc_xsk_tx_metadata_ops;
-+
- /* igc_dump declarations */
- void igc_rings_dump(struct igc_adapter *adapter);
- void igc_regs_dump(struct igc_adapter *adapter);
-@@ -507,32 +543,6 @@ enum igc_boards {
- #define TXD_USE_COUNT(S)	DIV_ROUND_UP((S), IGC_MAX_DATA_PER_TXD)
- #define DESC_NEEDED	(MAX_SKB_FRAGS + 4)
- 
--enum igc_tx_buffer_type {
--	IGC_TX_BUFFER_TYPE_SKB,
--	IGC_TX_BUFFER_TYPE_XDP,
--	IGC_TX_BUFFER_TYPE_XSK,
--};
--
--/* wrapper around a pointer to a socket buffer,
-- * so a DMA handle can be stored along with the buffer
-- */
--struct igc_tx_buffer {
--	union igc_adv_tx_desc *next_to_watch;
--	unsigned long time_stamp;
--	enum igc_tx_buffer_type type;
--	union {
--		struct sk_buff *skb;
--		struct xdp_frame *xdpf;
--	};
--	unsigned int bytecount;
--	u16 gso_segs;
--	__be16 protocol;
--
--	DEFINE_DMA_UNMAP_ADDR(dma);
--	DEFINE_DMA_UNMAP_LEN(len);
--	u32 tx_flags;
--};
--
- struct igc_rx_buffer {
- 	union {
- 		struct {
-@@ -556,6 +566,13 @@ struct igc_xdp_buff {
- 	struct igc_inline_rx_tstamps *rx_ts; /* data indication bit IGC_RXDADV_STAT_TSIP */
- };
- 
-+struct igc_metadata_request {
-+	struct igc_tx_buffer *tx_buffer;
-+	struct xsk_tx_metadata *meta;
-+	struct igc_ring *tx_ring;
-+	u32 cmd_type;
-+};
-+
- struct igc_q_vector {
- 	struct igc_adapter *adapter;    /* backlink */
- 	void __iomem *itr_register;
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 3af52d238f3b..bfa51ecdf8ec 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -2878,6 +2878,89 @@ static void igc_update_tx_stats(struct igc_q_vector *q_vector,
- 	q_vector->tx.total_packets += packets;
- }
- 
-+static void igc_xsk_request_timestamp(void *_priv)
-+{
-+	struct igc_metadata_request *meta_req = _priv;
-+	struct igc_ring *tx_ring = meta_req->tx_ring;
-+	struct igc_tx_timestamp_request *tstamp;
-+	u32 tx_flags = IGC_TX_FLAGS_TSTAMP;
-+	struct igc_adapter *adapter;
-+	unsigned long lock_flags;
-+	bool found = false;
-+	int i;
-+
-+	if (test_bit(IGC_RING_FLAG_TX_HWTSTAMP, &tx_ring->flags)) {
-+		adapter = netdev_priv(tx_ring->netdev);
-+
-+		spin_lock_irqsave(&adapter->ptp_tx_lock, lock_flags);
-+
-+		/* Search for available tstamp regs */
-+		for (i = 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
-+			tstamp = &adapter->tx_tstamp[i];
-+
-+			/* tstamp->skb and tstamp->xsk_tx_buffer are in union.
-+			 * When tstamp->skb is equal to NULL,
-+			 * tstamp->xsk_tx_buffer is equal to NULL as well.
-+			 * This condition means that the particular tstamp reg
-+			 * is not occupied by other packet.
-+			 */
-+			if (!tstamp->skb) {
-+				found = true;
-+				break;
-+			}
-+		}
-+
-+		/* Return if no available tstamp regs */
-+		if (!found) {
-+			adapter->tx_hwtstamp_skipped++;
-+			spin_unlock_irqrestore(&adapter->ptp_tx_lock,
-+					       lock_flags);
-+			return;
-+		}
-+
-+		tstamp->start = jiffies;
-+		tstamp->xsk_queue_index = tx_ring->queue_index;
-+		tstamp->xsk_tx_buffer = meta_req->tx_buffer;
-+		tstamp->buffer_type = IGC_TX_BUFFER_TYPE_XSK;
-+
-+		/* Hold the transmit completion until timestamp is ready */
-+		meta_req->tx_buffer->xsk_pending_ts = true;
-+
-+		/* Keep the pointer to tx_timestamp, which is located in XDP
-+		 * metadata area. It is the location to store the value of
-+		 * tx hardware timestamp.
-+		 */
-+		xsk_tx_metadata_to_compl(meta_req->meta, &tstamp->xsk_meta);
-+
-+		/* Set timestamp bit based on the _TSTAMP(_X) bit. */
-+		tx_flags |= tstamp->flags;
-+		meta_req->cmd_type |= IGC_SET_FLAG(tx_flags,
-+						   IGC_TX_FLAGS_TSTAMP,
-+						   (IGC_ADVTXD_MAC_TSTAMP));
-+		meta_req->cmd_type |= IGC_SET_FLAG(tx_flags,
-+						   IGC_TX_FLAGS_TSTAMP_1,
-+						   (IGC_ADVTXD_TSTAMP_REG_1));
-+		meta_req->cmd_type |= IGC_SET_FLAG(tx_flags,
-+						   IGC_TX_FLAGS_TSTAMP_2,
-+						   (IGC_ADVTXD_TSTAMP_REG_2));
-+		meta_req->cmd_type |= IGC_SET_FLAG(tx_flags,
-+						   IGC_TX_FLAGS_TSTAMP_3,
-+						   (IGC_ADVTXD_TSTAMP_REG_3));
-+
-+		spin_unlock_irqrestore(&adapter->ptp_tx_lock, lock_flags);
-+	}
-+}
-+
-+static u64 igc_xsk_fill_timestamp(void *_priv)
-+{
-+	return *(u64 *)_priv;
-+}
-+
-+const struct xsk_tx_metadata_ops igc_xsk_tx_metadata_ops = {
-+	.tmo_request_timestamp		= igc_xsk_request_timestamp,
-+	.tmo_fill_timestamp		= igc_xsk_fill_timestamp,
-+};
-+
- static void igc_xdp_xmit_zc(struct igc_ring *ring)
- {
- 	struct xsk_buff_pool *pool = ring->xsk_pool;
-@@ -2899,24 +2982,34 @@ static void igc_xdp_xmit_zc(struct igc_ring *ring)
- 	budget = igc_desc_unused(ring);
- 
- 	while (xsk_tx_peek_desc(pool, &xdp_desc) && budget--) {
--		u32 cmd_type, olinfo_status;
-+		struct igc_metadata_request meta_req;
-+		struct xsk_tx_metadata *meta = NULL;
- 		struct igc_tx_buffer *bi;
-+		u32 olinfo_status;
- 		dma_addr_t dma;
- 
--		cmd_type = IGC_ADVTXD_DTYP_DATA | IGC_ADVTXD_DCMD_DEXT |
--			   IGC_ADVTXD_DCMD_IFCS | IGC_TXD_DCMD |
--			   xdp_desc.len;
-+		meta_req.cmd_type = IGC_ADVTXD_DTYP_DATA |
-+				    IGC_ADVTXD_DCMD_DEXT |
-+				    IGC_ADVTXD_DCMD_IFCS |
-+				    IGC_TXD_DCMD | xdp_desc.len;
- 		olinfo_status = xdp_desc.len << IGC_ADVTXD_PAYLEN_SHIFT;
- 
- 		dma = xsk_buff_raw_get_dma(pool, xdp_desc.addr);
-+		meta = xsk_buff_get_metadata(pool, xdp_desc.addr);
- 		xsk_buff_raw_dma_sync_for_device(pool, dma, xdp_desc.len);
-+		bi = &ring->tx_buffer_info[ntu];
-+
-+		meta_req.tx_ring = ring;
-+		meta_req.tx_buffer = bi;
-+		meta_req.meta = meta;
-+		xsk_tx_metadata_request(meta, &igc_xsk_tx_metadata_ops,
-+					&meta_req);
- 
- 		tx_desc = IGC_TX_DESC(ring, ntu);
--		tx_desc->read.cmd_type_len = cpu_to_le32(cmd_type);
-+		tx_desc->read.cmd_type_len = cpu_to_le32(meta_req.cmd_type);
- 		tx_desc->read.olinfo_status = cpu_to_le32(olinfo_status);
- 		tx_desc->read.buffer_addr = cpu_to_le64(dma);
- 
--		bi = &ring->tx_buffer_info[ntu];
- 		bi->type = IGC_TX_BUFFER_TYPE_XSK;
- 		bi->protocol = 0;
- 		bi->bytecount = xdp_desc.len;
-@@ -2979,6 +3072,13 @@ static bool igc_clean_tx_irq(struct igc_q_vector *q_vector, int napi_budget)
- 		if (!(eop_desc->wb.status & cpu_to_le32(IGC_TXD_STAT_DD)))
- 			break;
- 
-+		/* Hold the completions while there's a pending tx hardware
-+		 * timestamp request from XDP Tx metadata.
-+		 */
-+		if (tx_buffer->type == IGC_TX_BUFFER_TYPE_XSK &&
-+		    tx_buffer->xsk_pending_ts)
-+			break;
-+
- 		/* clear next_to_watch to prevent false hangs */
- 		tx_buffer->next_to_watch = NULL;
- 
-@@ -6818,6 +6918,7 @@ static int igc_probe(struct pci_dev *pdev,
- 
- 	netdev->netdev_ops = &igc_netdev_ops;
- 	netdev->xdp_metadata_ops = &igc_xdp_metadata_ops;
-+	netdev->xsk_tx_metadata_ops = &igc_xsk_tx_metadata_ops;
- 	igc_ethtool_set_ops(netdev);
- 	netdev->watchdog_timeo = 5 * HZ;
- 
-diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c b/drivers/net/ethernet/intel/igc/igc_ptp.c
-index 885faaa7b9de..e81b850c035e 100644
---- a/drivers/net/ethernet/intel/igc/igc_ptp.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
-@@ -11,6 +11,7 @@
- #include <linux/ktime.h>
- #include <linux/delay.h>
- #include <linux/iopoll.h>
-+#include <net/xdp_sock.h>
- 
- #define INCVALUE_MASK		0x7fffffff
- #define ISGN			0x80000000
-@@ -545,6 +546,30 @@ static void igc_ptp_enable_rx_timestamp(struct igc_adapter *adapter)
- 	wr32(IGC_TSYNCRXCTL, val);
- }
- 
-+static void igc_ptp_free_tx_buffer(struct igc_adapter *adapter,
-+				   struct igc_tx_timestamp_request *tstamp)
-+{
-+	if (tstamp->buffer_type == IGC_TX_BUFFER_TYPE_XSK) {
-+		/* Release the transmit completion */
-+		tstamp->xsk_tx_buffer->xsk_pending_ts = false;
-+
-+		/* Note: tstamp->skb and tstamp->xsk_tx_buffer are in union.
-+		 * By setting tstamp->xsk_tx_buffer to NULL, tstamp->skb will
-+		 * become NULL as well.
-+		 */
-+		tstamp->xsk_tx_buffer = NULL;
-+		tstamp->buffer_type = 0;
-+
-+		/* Trigger txrx interrupt for transmit completion */
-+		igc_xsk_wakeup(adapter->netdev, tstamp->xsk_queue_index, 0);
-+
-+		return;
-+	}
-+
-+	dev_kfree_skb_any(tstamp->skb);
-+	tstamp->skb = NULL;
-+}
-+
- static void igc_ptp_clear_tx_tstamp(struct igc_adapter *adapter)
- {
- 	unsigned long flags;
-@@ -555,8 +580,8 @@ static void igc_ptp_clear_tx_tstamp(struct igc_adapter *adapter)
- 	for (i = 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
- 		struct igc_tx_timestamp_request *tstamp = &adapter->tx_tstamp[i];
- 
--		dev_kfree_skb_any(tstamp->skb);
--		tstamp->skb = NULL;
-+		if (tstamp->skb)
-+			igc_ptp_free_tx_buffer(adapter, tstamp);
- 	}
- 
- 	spin_unlock_irqrestore(&adapter->ptp_tx_lock, flags);
-@@ -657,8 +682,9 @@ static int igc_ptp_set_timestamp_mode(struct igc_adapter *adapter,
- static void igc_ptp_tx_timeout(struct igc_adapter *adapter,
- 			       struct igc_tx_timestamp_request *tstamp)
- {
--	dev_kfree_skb_any(tstamp->skb);
--	tstamp->skb = NULL;
-+	if (tstamp->skb)
-+		igc_ptp_free_tx_buffer(adapter, tstamp);
-+
- 	adapter->tx_hwtstamp_timeouts++;
- 
- 	netdev_warn(adapter->netdev, "Tx timestamp timeout\n");
-@@ -729,10 +755,15 @@ static void igc_ptp_tx_reg_to_stamp(struct igc_adapter *adapter,
- 	shhwtstamps.hwtstamp =
- 		ktime_add_ns(shhwtstamps.hwtstamp, adjust);
- 
--	tstamp->skb = NULL;
-+	/* Copy the tx hardware timestamp into xdp metadata or skb */
-+	if (tstamp->buffer_type == IGC_TX_BUFFER_TYPE_XSK)
-+		xsk_tx_metadata_complete(&tstamp->xsk_meta,
-+					 &igc_xsk_tx_metadata_ops,
-+					 &shhwtstamps.hwtstamp);
-+	else
-+		skb_tstamp_tx(skb, &shhwtstamps);
- 
--	skb_tstamp_tx(skb, &shhwtstamps);
--	dev_kfree_skb_any(skb);
-+	igc_ptp_free_tx_buffer(adapter, tstamp);
- }
- 
- /**
--- 
-2.34.1
+static unsigned long long procid;
 
+static bool write_file(const char* file, const char* what, ...) {
+  char buf[1024];
+  va_list args;
+  va_start(args, what);
+  vsnprintf(buf, sizeof(buf), what, args);
+  va_end(args);
+  buf[sizeof(buf) - 1] = 0;
+  int len = strlen(buf);
+  int fd = open(file, O_WRONLY | O_CLOEXEC);
+  if (fd == -1)
+    return false;
+  if (write(fd, buf, len) != len) {
+    int err = errno;
+    close(fd);
+    errno = err;
+    return false;
+  }
+  close(fd);
+  return true;
+}
+
+struct nlmsg {
+  char* pos;
+  int nesting;
+  struct nlattr* nested[8];
+  char buf[4096];
+};
+
+static void netlink_init(struct nlmsg* nlmsg,
+                         int typ,
+                         int flags,
+                         const void* data,
+                         int size) {
+  memset(nlmsg, 0, sizeof(*nlmsg));
+  struct nlmsghdr* hdr = (struct nlmsghdr*)nlmsg->buf;
+  hdr->nlmsg_type = typ;
+  hdr->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK | flags;
+  memcpy(hdr + 1, data, size);
+  nlmsg->pos = (char*)(hdr + 1) + NLMSG_ALIGN(size);
+}
+
+static void netlink_attr(struct nlmsg* nlmsg,
+                         int typ,
+                         const void* data,
+                         int size) {
+  struct nlattr* attr = (struct nlattr*)nlmsg->pos;
+  attr->nla_len = sizeof(*attr) + size;
+  attr->nla_type = typ;
+  if (size > 0)
+    memcpy(attr + 1, data, size);
+  nlmsg->pos += NLMSG_ALIGN(attr->nla_len);
+}
+
+static void netlink_nest(struct nlmsg* nlmsg, int typ) {
+  struct nlattr* attr = (struct nlattr*)nlmsg->pos;
+  attr->nla_type = typ;
+  nlmsg->pos += sizeof(*attr);
+  nlmsg->nested[nlmsg->nesting++] = attr;
+}
+
+static void netlink_done(struct nlmsg* nlmsg) {
+  struct nlattr* attr = nlmsg->nested[--nlmsg->nesting];
+  attr->nla_len = nlmsg->pos - (char*)attr;
+}
+
+static int netlink_send_ext(struct nlmsg* nlmsg,
+                            int sock,
+                            uint16_t reply_type,
+                            int* reply_len,
+                            bool dofail) {
+  if (nlmsg->pos > nlmsg->buf + sizeof(nlmsg->buf) || nlmsg->nesting)
+    exit(1);
+  struct nlmsghdr* hdr = (struct nlmsghdr*)nlmsg->buf;
+  hdr->nlmsg_len = nlmsg->pos - nlmsg->buf;
+  struct sockaddr_nl addr;
+  memset(&addr, 0, sizeof(addr));
+  addr.nl_family = AF_NETLINK;
+  ssize_t n = sendto(sock, nlmsg->buf, hdr->nlmsg_len, 0,
+                     (struct sockaddr*)&addr, sizeof(addr));
+  if (n != (ssize_t)hdr->nlmsg_len) {
+    if (dofail)
+      exit(1);
+    return -1;
+  }
+  n = recv(sock, nlmsg->buf, sizeof(nlmsg->buf), 0);
+  if (reply_len)
+    *reply_len = 0;
+  if (n < 0) {
+    if (dofail)
+      exit(1);
+    return -1;
+  }
+  if (n < (ssize_t)sizeof(struct nlmsghdr)) {
+    errno = EINVAL;
+    if (dofail)
+      exit(1);
+    return -1;
+  }
+  if (hdr->nlmsg_type == NLMSG_DONE)
+    return 0;
+  if (reply_len && hdr->nlmsg_type == reply_type) {
+    *reply_len = n;
+    return 0;
+  }
+  if (n < (ssize_t)(sizeof(struct nlmsghdr) + sizeof(struct nlmsgerr))) {
+    errno = EINVAL;
+    if (dofail)
+      exit(1);
+    return -1;
+  }
+  if (hdr->nlmsg_type != NLMSG_ERROR) {
+    errno = EINVAL;
+    if (dofail)
+      exit(1);
+    return -1;
+  }
+  errno = -((struct nlmsgerr*)(hdr + 1))->error;
+  return -errno;
+}
+
+static int netlink_send(struct nlmsg* nlmsg, int sock) {
+  return netlink_send_ext(nlmsg, sock, 0, NULL, true);
+}
+
+static int netlink_query_family_id(struct nlmsg* nlmsg,
+                                   int sock,
+                                   const char* family_name,
+                                   bool dofail) {
+  struct genlmsghdr genlhdr;
+  memset(&genlhdr, 0, sizeof(genlhdr));
+  genlhdr.cmd = CTRL_CMD_GETFAMILY;
+  netlink_init(nlmsg, GENL_ID_CTRL, 0, &genlhdr, sizeof(genlhdr));
+  netlink_attr(nlmsg, CTRL_ATTR_FAMILY_NAME, family_name,
+               strnlen(family_name, GENL_NAMSIZ - 1) + 1);
+  int n = 0;
+  int err = netlink_send_ext(nlmsg, sock, GENL_ID_CTRL, &n, dofail);
+  if (err < 0) {
+    return -1;
+  }
+  uint16_t id = 0;
+  struct nlattr* attr = (struct nlattr*)(nlmsg->buf + NLMSG_HDRLEN +
+                                         NLMSG_ALIGN(sizeof(genlhdr)));
+  for (; (char*)attr < nlmsg->buf + n;
+       attr = (struct nlattr*)((char*)attr + NLMSG_ALIGN(attr->nla_len))) {
+    if (attr->nla_type == CTRL_ATTR_FAMILY_ID) {
+      id = *(uint16_t*)(attr + 1);
+      break;
+    }
+  }
+  if (!id) {
+    errno = EINVAL;
+    return -1;
+  }
+  recv(sock, nlmsg->buf, sizeof(nlmsg->buf), 0);
+  return id;
+}
+
+static int netlink_next_msg(struct nlmsg* nlmsg,
+                            unsigned int offset,
+                            unsigned int total_len) {
+  struct nlmsghdr* hdr = (struct nlmsghdr*)(nlmsg->buf + offset);
+  if (offset == total_len || offset + hdr->nlmsg_len > total_len)
+    return -1;
+  return hdr->nlmsg_len;
+}
+
+static void netlink_add_device_impl(struct nlmsg* nlmsg,
+                                    const char* type,
+                                    const char* name,
+                                    bool up) {
+  struct ifinfomsg hdr;
+  memset(&hdr, 0, sizeof(hdr));
+  if (up)
+    hdr.ifi_flags = hdr.ifi_change = IFF_UP;
+  netlink_init(nlmsg, RTM_NEWLINK, NLM_F_EXCL | NLM_F_CREATE, &hdr,
+               sizeof(hdr));
+  if (name)
+    netlink_attr(nlmsg, IFLA_IFNAME, name, strlen(name));
+  netlink_nest(nlmsg, IFLA_LINKINFO);
+  netlink_attr(nlmsg, IFLA_INFO_KIND, type, strlen(type));
+}
+
+static void netlink_add_device(struct nlmsg* nlmsg,
+                               int sock,
+                               const char* type,
+                               const char* name) {
+  netlink_add_device_impl(nlmsg, type, name, false);
+  netlink_done(nlmsg);
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_veth(struct nlmsg* nlmsg,
+                             int sock,
+                             const char* name,
+                             const char* peer) {
+  netlink_add_device_impl(nlmsg, "veth", name, false);
+  netlink_nest(nlmsg, IFLA_INFO_DATA);
+  netlink_nest(nlmsg, VETH_INFO_PEER);
+  nlmsg->pos += sizeof(struct ifinfomsg);
+  netlink_attr(nlmsg, IFLA_IFNAME, peer, strlen(peer));
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_xfrm(struct nlmsg* nlmsg, int sock, const char* name) {
+  netlink_add_device_impl(nlmsg, "xfrm", name, true);
+  netlink_nest(nlmsg, IFLA_INFO_DATA);
+  int if_id = 1;
+  netlink_attr(nlmsg, 2, &if_id, sizeof(if_id));
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_hsr(struct nlmsg* nlmsg,
+                            int sock,
+                            const char* name,
+                            const char* slave1,
+                            const char* slave2) {
+  netlink_add_device_impl(nlmsg, "hsr", name, false);
+  netlink_nest(nlmsg, IFLA_INFO_DATA);
+  int ifindex1 = if_nametoindex(slave1);
+  netlink_attr(nlmsg, IFLA_HSR_SLAVE1, &ifindex1, sizeof(ifindex1));
+  int ifindex2 = if_nametoindex(slave2);
+  netlink_attr(nlmsg, IFLA_HSR_SLAVE2, &ifindex2, sizeof(ifindex2));
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_linked(struct nlmsg* nlmsg,
+                               int sock,
+                               const char* type,
+                               const char* name,
+                               const char* link) {
+  netlink_add_device_impl(nlmsg, type, name, false);
+  netlink_done(nlmsg);
+  int ifindex = if_nametoindex(link);
+  netlink_attr(nlmsg, IFLA_LINK, &ifindex, sizeof(ifindex));
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_vlan(struct nlmsg* nlmsg,
+                             int sock,
+                             const char* name,
+                             const char* link,
+                             uint16_t id,
+                             uint16_t proto) {
+  netlink_add_device_impl(nlmsg, "vlan", name, false);
+  netlink_nest(nlmsg, IFLA_INFO_DATA);
+  netlink_attr(nlmsg, IFLA_VLAN_ID, &id, sizeof(id));
+  netlink_attr(nlmsg, IFLA_VLAN_PROTOCOL, &proto, sizeof(proto));
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  int ifindex = if_nametoindex(link);
+  netlink_attr(nlmsg, IFLA_LINK, &ifindex, sizeof(ifindex));
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_macvlan(struct nlmsg* nlmsg,
+                                int sock,
+                                const char* name,
+                                const char* link) {
+  netlink_add_device_impl(nlmsg, "macvlan", name, false);
+  netlink_nest(nlmsg, IFLA_INFO_DATA);
+  uint32_t mode = MACVLAN_MODE_BRIDGE;
+  netlink_attr(nlmsg, IFLA_MACVLAN_MODE, &mode, sizeof(mode));
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  int ifindex = if_nametoindex(link);
+  netlink_attr(nlmsg, IFLA_LINK, &ifindex, sizeof(ifindex));
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_geneve(struct nlmsg* nlmsg,
+                               int sock,
+                               const char* name,
+                               uint32_t vni,
+                               struct in_addr* addr4,
+                               struct in6_addr* addr6) {
+  netlink_add_device_impl(nlmsg, "geneve", name, false);
+  netlink_nest(nlmsg, IFLA_INFO_DATA);
+  netlink_attr(nlmsg, IFLA_GENEVE_ID, &vni, sizeof(vni));
+  if (addr4)
+    netlink_attr(nlmsg, IFLA_GENEVE_REMOTE, addr4, sizeof(*addr4));
+  if (addr6)
+    netlink_attr(nlmsg, IFLA_GENEVE_REMOTE6, addr6, sizeof(*addr6));
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+#define IFLA_IPVLAN_FLAGS 2
+#define IPVLAN_MODE_L3S 2
+#undef IPVLAN_F_VEPA
+#define IPVLAN_F_VEPA 2
+
+static void netlink_add_ipvlan(struct nlmsg* nlmsg,
+                               int sock,
+                               const char* name,
+                               const char* link,
+                               uint16_t mode,
+                               uint16_t flags) {
+  netlink_add_device_impl(nlmsg, "ipvlan", name, false);
+  netlink_nest(nlmsg, IFLA_INFO_DATA);
+  netlink_attr(nlmsg, IFLA_IPVLAN_MODE, &mode, sizeof(mode));
+  netlink_attr(nlmsg, IFLA_IPVLAN_FLAGS, &flags, sizeof(flags));
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  int ifindex = if_nametoindex(link);
+  netlink_attr(nlmsg, IFLA_LINK, &ifindex, sizeof(ifindex));
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_device_change(struct nlmsg* nlmsg,
+                                  int sock,
+                                  const char* name,
+                                  bool up,
+                                  const char* master,
+                                  const void* mac,
+                                  int macsize,
+                                  const char* new_name) {
+  struct ifinfomsg hdr;
+  memset(&hdr, 0, sizeof(hdr));
+  if (up)
+    hdr.ifi_flags = hdr.ifi_change = IFF_UP;
+  hdr.ifi_index = if_nametoindex(name);
+  netlink_init(nlmsg, RTM_NEWLINK, 0, &hdr, sizeof(hdr));
+  if (new_name)
+    netlink_attr(nlmsg, IFLA_IFNAME, new_name, strlen(new_name));
+  if (master) {
+    int ifindex = if_nametoindex(master);
+    netlink_attr(nlmsg, IFLA_MASTER, &ifindex, sizeof(ifindex));
+  }
+  if (macsize)
+    netlink_attr(nlmsg, IFLA_ADDRESS, mac, macsize);
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static int netlink_add_addr(struct nlmsg* nlmsg,
+                            int sock,
+                            const char* dev,
+                            const void* addr,
+                            int addrsize) {
+  struct ifaddrmsg hdr;
+  memset(&hdr, 0, sizeof(hdr));
+  hdr.ifa_family = addrsize == 4 ? AF_INET : AF_INET6;
+  hdr.ifa_prefixlen = addrsize == 4 ? 24 : 120;
+  hdr.ifa_scope = RT_SCOPE_UNIVERSE;
+  hdr.ifa_index = if_nametoindex(dev);
+  netlink_init(nlmsg, RTM_NEWADDR, NLM_F_CREATE | NLM_F_REPLACE, &hdr,
+               sizeof(hdr));
+  netlink_attr(nlmsg, IFA_LOCAL, addr, addrsize);
+  netlink_attr(nlmsg, IFA_ADDRESS, addr, addrsize);
+  return netlink_send(nlmsg, sock);
+}
+
+static void netlink_add_addr4(struct nlmsg* nlmsg,
+                              int sock,
+                              const char* dev,
+                              const char* addr) {
+  struct in_addr in_addr;
+  inet_pton(AF_INET, addr, &in_addr);
+  int err = netlink_add_addr(nlmsg, sock, dev, &in_addr, sizeof(in_addr));
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_addr6(struct nlmsg* nlmsg,
+                              int sock,
+                              const char* dev,
+                              const char* addr) {
+  struct in6_addr in6_addr;
+  inet_pton(AF_INET6, addr, &in6_addr);
+  int err = netlink_add_addr(nlmsg, sock, dev, &in6_addr, sizeof(in6_addr));
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_neigh(struct nlmsg* nlmsg,
+                              int sock,
+                              const char* name,
+                              const void* addr,
+                              int addrsize,
+                              const void* mac,
+                              int macsize) {
+  struct ndmsg hdr;
+  memset(&hdr, 0, sizeof(hdr));
+  hdr.ndm_family = addrsize == 4 ? AF_INET : AF_INET6;
+  hdr.ndm_ifindex = if_nametoindex(name);
+  hdr.ndm_state = NUD_PERMANENT;
+  netlink_init(nlmsg, RTM_NEWNEIGH, NLM_F_EXCL | NLM_F_CREATE, &hdr,
+               sizeof(hdr));
+  netlink_attr(nlmsg, NDA_DST, addr, addrsize);
+  netlink_attr(nlmsg, NDA_LLADDR, mac, macsize);
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static struct nlmsg nlmsg;
+
+static int tunfd = -1;
+
+#define TUN_IFACE "syz_tun"
+#define LOCAL_MAC 0xaaaaaaaaaaaa
+#define REMOTE_MAC 0xaaaaaaaaaabb
+#define LOCAL_IPV4 "172.20.20.170"
+#define REMOTE_IPV4 "172.20.20.187"
+#define LOCAL_IPV6 "fe80::aa"
+#define REMOTE_IPV6 "fe80::bb"
+
+#define IFF_NAPI 0x0010
+
+static void initialize_tun(void) {
+  tunfd = open("/dev/net/tun", O_RDWR | O_NONBLOCK);
+  if (tunfd == -1) {
+    printf("tun: can't open /dev/net/tun: please enable CONFIG_TUN=y\n");
+    printf("otherwise fuzzing or reproducing might not work as intended\n");
+    return;
+  }
+  const int kTunFd = 200;
+  if (dup2(tunfd, kTunFd) < 0)
+    exit(1);
+  close(tunfd);
+  tunfd = kTunFd;
+  struct ifreq ifr;
+  memset(&ifr, 0, sizeof(ifr));
+  strncpy(ifr.ifr_name, TUN_IFACE, IFNAMSIZ);
+  ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
+  if (ioctl(tunfd, TUNSETIFF, (void*)&ifr) < 0) {
+    exit(1);
+  }
+  char sysctl[64];
+  sprintf(sysctl, "/proc/sys/net/ipv6/conf/%s/accept_dad", TUN_IFACE);
+  write_file(sysctl, "0");
+  sprintf(sysctl, "/proc/sys/net/ipv6/conf/%s/router_solicitations", TUN_IFACE);
+  write_file(sysctl, "0");
+  int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+  if (sock == -1)
+    exit(1);
+  netlink_add_addr4(&nlmsg, sock, TUN_IFACE, LOCAL_IPV4);
+  netlink_add_addr6(&nlmsg, sock, TUN_IFACE, LOCAL_IPV6);
+  uint64_t macaddr = REMOTE_MAC;
+  struct in_addr in_addr;
+  inet_pton(AF_INET, REMOTE_IPV4, &in_addr);
+  netlink_add_neigh(&nlmsg, sock, TUN_IFACE, &in_addr, sizeof(in_addr),
+                    &macaddr, ETH_ALEN);
+  struct in6_addr in6_addr;
+  inet_pton(AF_INET6, REMOTE_IPV6, &in6_addr);
+  netlink_add_neigh(&nlmsg, sock, TUN_IFACE, &in6_addr, sizeof(in6_addr),
+                    &macaddr, ETH_ALEN);
+  macaddr = LOCAL_MAC;
+  netlink_device_change(&nlmsg, sock, TUN_IFACE, true, 0, &macaddr, ETH_ALEN,
+                        NULL);
+  close(sock);
+}
+
+#define DEVLINK_FAMILY_NAME "devlink"
+
+#define DEVLINK_CMD_PORT_GET 5
+#define DEVLINK_ATTR_BUS_NAME 1
+#define DEVLINK_ATTR_DEV_NAME 2
+#define DEVLINK_ATTR_NETDEV_NAME 7
+
+static struct nlmsg nlmsg2;
+
+static void initialize_devlink_ports(const char* bus_name,
+                                     const char* dev_name,
+                                     const char* netdev_prefix) {
+  struct genlmsghdr genlhdr;
+  int len, total_len, id, err, offset;
+  uint16_t netdev_index;
+  int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+  if (sock == -1)
+    exit(1);
+  int rtsock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+  if (rtsock == -1)
+    exit(1);
+  id = netlink_query_family_id(&nlmsg, sock, DEVLINK_FAMILY_NAME, true);
+  if (id == -1)
+    goto error;
+  memset(&genlhdr, 0, sizeof(genlhdr));
+  genlhdr.cmd = DEVLINK_CMD_PORT_GET;
+  netlink_init(&nlmsg, id, NLM_F_DUMP, &genlhdr, sizeof(genlhdr));
+  netlink_attr(&nlmsg, DEVLINK_ATTR_BUS_NAME, bus_name, strlen(bus_name) + 1);
+  netlink_attr(&nlmsg, DEVLINK_ATTR_DEV_NAME, dev_name, strlen(dev_name) + 1);
+  err = netlink_send_ext(&nlmsg, sock, id, &total_len, true);
+  if (err < 0) {
+    goto error;
+  }
+  offset = 0;
+  netdev_index = 0;
+  while ((len = netlink_next_msg(&nlmsg, offset, total_len)) != -1) {
+    struct nlattr* attr = (struct nlattr*)(nlmsg.buf + offset + NLMSG_HDRLEN +
+                                           NLMSG_ALIGN(sizeof(genlhdr)));
+    for (; (char*)attr < nlmsg.buf + offset + len;
+         attr = (struct nlattr*)((char*)attr + NLMSG_ALIGN(attr->nla_len))) {
+      if (attr->nla_type == DEVLINK_ATTR_NETDEV_NAME) {
+        char* port_name;
+        char netdev_name[IFNAMSIZ];
+        port_name = (char*)(attr + 1);
+        snprintf(netdev_name, sizeof(netdev_name), "%s%d", netdev_prefix,
+                 netdev_index);
+        netlink_device_change(&nlmsg2, rtsock, port_name, true, 0, 0, 0,
+                              netdev_name);
+        break;
+      }
+    }
+    offset += len;
+    netdev_index++;
+  }
+error:
+  close(rtsock);
+  close(sock);
+}
+
+#define DEV_IPV4 "172.20.20.%d"
+#define DEV_IPV6 "fe80::%02x"
+#define DEV_MAC 0x00aaaaaaaaaa
+
+static void netdevsim_add(unsigned int addr, unsigned int port_count) {
+  write_file("/sys/bus/netdevsim/del_device", "%u", addr);
+  if (write_file("/sys/bus/netdevsim/new_device", "%u %u", addr, port_count)) {
+    char buf[32];
+    snprintf(buf, sizeof(buf), "netdevsim%d", addr);
+    initialize_devlink_ports("netdevsim", buf, "netdevsim");
+  }
+}
+
+#define WG_GENL_NAME "wireguard"
+enum wg_cmd {
+  WG_CMD_GET_DEVICE,
+  WG_CMD_SET_DEVICE,
+};
+enum wgdevice_attribute {
+  WGDEVICE_A_UNSPEC,
+  WGDEVICE_A_IFINDEX,
+  WGDEVICE_A_IFNAME,
+  WGDEVICE_A_PRIVATE_KEY,
+  WGDEVICE_A_PUBLIC_KEY,
+  WGDEVICE_A_FLAGS,
+  WGDEVICE_A_LISTEN_PORT,
+  WGDEVICE_A_FWMARK,
+  WGDEVICE_A_PEERS,
+};
+enum wgpeer_attribute {
+  WGPEER_A_UNSPEC,
+  WGPEER_A_PUBLIC_KEY,
+  WGPEER_A_PRESHARED_KEY,
+  WGPEER_A_FLAGS,
+  WGPEER_A_ENDPOINT,
+  WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL,
+  WGPEER_A_LAST_HANDSHAKE_TIME,
+  WGPEER_A_RX_BYTES,
+  WGPEER_A_TX_BYTES,
+  WGPEER_A_ALLOWEDIPS,
+  WGPEER_A_PROTOCOL_VERSION,
+};
+enum wgallowedip_attribute {
+  WGALLOWEDIP_A_UNSPEC,
+  WGALLOWEDIP_A_FAMILY,
+  WGALLOWEDIP_A_IPADDR,
+  WGALLOWEDIP_A_CIDR_MASK,
+};
+
+static void netlink_wireguard_setup(void) {
+  const char ifname_a[] = "wg0";
+  const char ifname_b[] = "wg1";
+  const char ifname_c[] = "wg2";
+  const char private_a[] =
+      "\xa0\x5c\xa8\x4f\x6c\x9c\x8e\x38\x53\xe2\xfd\x7a\x70\xae\x0f\xb2\x0f\xa1"
+      "\x52\x60\x0c\xb0\x08\x45\x17\x4f\x08\x07\x6f\x8d\x78\x43";
+  const char private_b[] =
+      "\xb0\x80\x73\xe8\xd4\x4e\x91\xe3\xda\x92\x2c\x22\x43\x82\x44\xbb\x88\x5c"
+      "\x69\xe2\x69\xc8\xe9\xd8\x35\xb1\x14\x29\x3a\x4d\xdc\x6e";
+  const char private_c[] =
+      "\xa0\xcb\x87\x9a\x47\xf5\xbc\x64\x4c\x0e\x69\x3f\xa6\xd0\x31\xc7\x4a\x15"
+      "\x53\xb6\xe9\x01\xb9\xff\x2f\x51\x8c\x78\x04\x2f\xb5\x42";
+  const char public_a[] =
+      "\x97\x5c\x9d\x81\xc9\x83\xc8\x20\x9e\xe7\x81\x25\x4b\x89\x9f\x8e\xd9\x25"
+      "\xae\x9f\x09\x23\xc2\x3c\x62\xf5\x3c\x57\xcd\xbf\x69\x1c";
+  const char public_b[] =
+      "\xd1\x73\x28\x99\xf6\x11\xcd\x89\x94\x03\x4d\x7f\x41\x3d\xc9\x57\x63\x0e"
+      "\x54\x93\xc2\x85\xac\xa4\x00\x65\xcb\x63\x11\xbe\x69\x6b";
+  const char public_c[] =
+      "\xf4\x4d\xa3\x67\xa8\x8e\xe6\x56\x4f\x02\x02\x11\x45\x67\x27\x08\x2f\x5c"
+      "\xeb\xee\x8b\x1b\xf5\xeb\x73\x37\x34\x1b\x45\x9b\x39\x22";
+  const uint16_t listen_a = 20001;
+  const uint16_t listen_b = 20002;
+  const uint16_t listen_c = 20003;
+  const uint16_t af_inet = AF_INET;
+  const uint16_t af_inet6 = AF_INET6;
+  const struct sockaddr_in endpoint_b_v4 = {
+      .sin_family = AF_INET,
+      .sin_port = htons(listen_b),
+      .sin_addr = {htonl(INADDR_LOOPBACK)}};
+  const struct sockaddr_in endpoint_c_v4 = {
+      .sin_family = AF_INET,
+      .sin_port = htons(listen_c),
+      .sin_addr = {htonl(INADDR_LOOPBACK)}};
+  struct sockaddr_in6 endpoint_a_v6 = {.sin6_family = AF_INET6,
+                                       .sin6_port = htons(listen_a)};
+  endpoint_a_v6.sin6_addr = in6addr_loopback;
+  struct sockaddr_in6 endpoint_c_v6 = {.sin6_family = AF_INET6,
+                                       .sin6_port = htons(listen_c)};
+  endpoint_c_v6.sin6_addr = in6addr_loopback;
+  const struct in_addr first_half_v4 = {0};
+  const struct in_addr second_half_v4 = {(uint32_t)htonl(128 << 24)};
+  const struct in6_addr first_half_v6 = {{{0}}};
+  const struct in6_addr second_half_v6 = {{{0x80}}};
+  const uint8_t half_cidr = 1;
+  const uint16_t persistent_keepalives[] = {1, 3, 7, 9, 14, 19};
+  struct genlmsghdr genlhdr = {.cmd = WG_CMD_SET_DEVICE, .version = 1};
+  int sock;
+  int id, err;
+  sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+  if (sock == -1) {
+    return;
+  }
+  id = netlink_query_family_id(&nlmsg, sock, WG_GENL_NAME, true);
+  if (id == -1)
+    goto error;
+  netlink_init(&nlmsg, id, 0, &genlhdr, sizeof(genlhdr));
+  netlink_attr(&nlmsg, WGDEVICE_A_IFNAME, ifname_a, strlen(ifname_a) + 1);
+  netlink_attr(&nlmsg, WGDEVICE_A_PRIVATE_KEY, private_a, 32);
+  netlink_attr(&nlmsg, WGDEVICE_A_LISTEN_PORT, &listen_a, 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGDEVICE_A_PEERS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGPEER_A_PUBLIC_KEY, public_b, 32);
+  netlink_attr(&nlmsg, WGPEER_A_ENDPOINT, &endpoint_b_v4,
+               sizeof(endpoint_b_v4));
+  netlink_attr(&nlmsg, WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL,
+               &persistent_keepalives[0], 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGPEER_A_ALLOWEDIPS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &first_half_v4,
+               sizeof(first_half_v4));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet6, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &first_half_v6,
+               sizeof(first_half_v6));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGPEER_A_PUBLIC_KEY, public_c, 32);
+  netlink_attr(&nlmsg, WGPEER_A_ENDPOINT, &endpoint_c_v6,
+               sizeof(endpoint_c_v6));
+  netlink_attr(&nlmsg, WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL,
+               &persistent_keepalives[1], 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGPEER_A_ALLOWEDIPS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &second_half_v4,
+               sizeof(second_half_v4));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet6, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &second_half_v6,
+               sizeof(second_half_v6));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  err = netlink_send(&nlmsg, sock);
+  if (err < 0) {
+  }
+  netlink_init(&nlmsg, id, 0, &genlhdr, sizeof(genlhdr));
+  netlink_attr(&nlmsg, WGDEVICE_A_IFNAME, ifname_b, strlen(ifname_b) + 1);
+  netlink_attr(&nlmsg, WGDEVICE_A_PRIVATE_KEY, private_b, 32);
+  netlink_attr(&nlmsg, WGDEVICE_A_LISTEN_PORT, &listen_b, 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGDEVICE_A_PEERS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGPEER_A_PUBLIC_KEY, public_a, 32);
+  netlink_attr(&nlmsg, WGPEER_A_ENDPOINT, &endpoint_a_v6,
+               sizeof(endpoint_a_v6));
+  netlink_attr(&nlmsg, WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL,
+               &persistent_keepalives[2], 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGPEER_A_ALLOWEDIPS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &first_half_v4,
+               sizeof(first_half_v4));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet6, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &first_half_v6,
+               sizeof(first_half_v6));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGPEER_A_PUBLIC_KEY, public_c, 32);
+  netlink_attr(&nlmsg, WGPEER_A_ENDPOINT, &endpoint_c_v4,
+               sizeof(endpoint_c_v4));
+  netlink_attr(&nlmsg, WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL,
+               &persistent_keepalives[3], 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGPEER_A_ALLOWEDIPS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &second_half_v4,
+               sizeof(second_half_v4));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet6, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &second_half_v6,
+               sizeof(second_half_v6));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  err = netlink_send(&nlmsg, sock);
+  if (err < 0) {
+  }
+  netlink_init(&nlmsg, id, 0, &genlhdr, sizeof(genlhdr));
+  netlink_attr(&nlmsg, WGDEVICE_A_IFNAME, ifname_c, strlen(ifname_c) + 1);
+  netlink_attr(&nlmsg, WGDEVICE_A_PRIVATE_KEY, private_c, 32);
+  netlink_attr(&nlmsg, WGDEVICE_A_LISTEN_PORT, &listen_c, 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGDEVICE_A_PEERS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGPEER_A_PUBLIC_KEY, public_a, 32);
+  netlink_attr(&nlmsg, WGPEER_A_ENDPOINT, &endpoint_a_v6,
+               sizeof(endpoint_a_v6));
+  netlink_attr(&nlmsg, WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL,
+               &persistent_keepalives[4], 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGPEER_A_ALLOWEDIPS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &first_half_v4,
+               sizeof(first_half_v4));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet6, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &first_half_v6,
+               sizeof(first_half_v6));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGPEER_A_PUBLIC_KEY, public_b, 32);
+  netlink_attr(&nlmsg, WGPEER_A_ENDPOINT, &endpoint_b_v4,
+               sizeof(endpoint_b_v4));
+  netlink_attr(&nlmsg, WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL,
+               &persistent_keepalives[5], 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGPEER_A_ALLOWEDIPS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &second_half_v4,
+               sizeof(second_half_v4));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet6, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &second_half_v6,
+               sizeof(second_half_v6));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  err = netlink_send(&nlmsg, sock);
+  if (err < 0) {
+  }
+
+error:
+  close(sock);
+}
+
+static void initialize_netdevices(void) {
+  char netdevsim[16];
+  sprintf(netdevsim, "netdevsim%d", (int)procid);
+  struct {
+    const char* type;
+    const char* dev;
+  } devtypes[] = {
+      {"ip6gretap", "ip6gretap0"}, {"bridge", "bridge0"}, {"vcan", "vcan0"},
+      {"bond", "bond0"},           {"team", "team0"},     {"dummy", "dummy0"},
+      {"nlmon", "nlmon0"},         {"caif", "caif0"},     {"batadv", "batadv0"},
+      {"vxcan", "vxcan1"},         {"veth", 0},           {"wireguard", "wg0"},
+      {"wireguard", "wg1"},        {"wireguard", "wg2"},
+  };
+  const char* devmasters[] = {"bridge", "bond", "team", "batadv"};
+  struct {
+    const char* name;
+    int macsize;
+    bool noipv6;
+  } devices[] = {
+      {"lo", ETH_ALEN},
+      {"sit0", 0},
+      {"bridge0", ETH_ALEN},
+      {"vcan0", 0, true},
+      {"tunl0", 0},
+      {"gre0", 0},
+      {"gretap0", ETH_ALEN},
+      {"ip_vti0", 0},
+      {"ip6_vti0", 0},
+      {"ip6tnl0", 0},
+      {"ip6gre0", 0},
+      {"ip6gretap0", ETH_ALEN},
+      {"erspan0", ETH_ALEN},
+      {"bond0", ETH_ALEN},
+      {"veth0", ETH_ALEN},
+      {"veth1", ETH_ALEN},
+      {"team0", ETH_ALEN},
+      {"veth0_to_bridge", ETH_ALEN},
+      {"veth1_to_bridge", ETH_ALEN},
+      {"veth0_to_bond", ETH_ALEN},
+      {"veth1_to_bond", ETH_ALEN},
+      {"veth0_to_team", ETH_ALEN},
+      {"veth1_to_team", ETH_ALEN},
+      {"veth0_to_hsr", ETH_ALEN},
+      {"veth1_to_hsr", ETH_ALEN},
+      {"hsr0", 0},
+      {"dummy0", ETH_ALEN},
+      {"nlmon0", 0},
+      {"vxcan0", 0, true},
+      {"vxcan1", 0, true},
+      {"caif0", ETH_ALEN},
+      {"batadv0", ETH_ALEN},
+      {netdevsim, ETH_ALEN},
+      {"xfrm0", ETH_ALEN},
+      {"veth0_virt_wifi", ETH_ALEN},
+      {"veth1_virt_wifi", ETH_ALEN},
+      {"virt_wifi0", ETH_ALEN},
+      {"veth0_vlan", ETH_ALEN},
+      {"veth1_vlan", ETH_ALEN},
+      {"vlan0", ETH_ALEN},
+      {"vlan1", ETH_ALEN},
+      {"macvlan0", ETH_ALEN},
+      {"macvlan1", ETH_ALEN},
+      {"ipvlan0", ETH_ALEN},
+      {"ipvlan1", ETH_ALEN},
+      {"veth0_macvtap", ETH_ALEN},
+      {"veth1_macvtap", ETH_ALEN},
+      {"macvtap0", ETH_ALEN},
+      {"macsec0", ETH_ALEN},
+      {"veth0_to_batadv", ETH_ALEN},
+      {"veth1_to_batadv", ETH_ALEN},
+      {"batadv_slave_0", ETH_ALEN},
+      {"batadv_slave_1", ETH_ALEN},
+      {"geneve0", ETH_ALEN},
+      {"geneve1", ETH_ALEN},
+      {"wg0", 0},
+      {"wg1", 0},
+      {"wg2", 0},
+  };
+  int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+  if (sock == -1)
+    exit(1);
+  unsigned i;
+  for (i = 0; i < sizeof(devtypes) / sizeof(devtypes[0]); i++)
+    netlink_add_device(&nlmsg, sock, devtypes[i].type, devtypes[i].dev);
+  for (i = 0; i < sizeof(devmasters) / (sizeof(devmasters[0])); i++) {
+    char master[32], slave0[32], veth0[32], slave1[32], veth1[32];
+    sprintf(slave0, "%s_slave_0", devmasters[i]);
+    sprintf(veth0, "veth0_to_%s", devmasters[i]);
+    netlink_add_veth(&nlmsg, sock, slave0, veth0);
+    sprintf(slave1, "%s_slave_1", devmasters[i]);
+    sprintf(veth1, "veth1_to_%s", devmasters[i]);
+    netlink_add_veth(&nlmsg, sock, slave1, veth1);
+    sprintf(master, "%s0", devmasters[i]);
+    netlink_device_change(&nlmsg, sock, slave0, false, master, 0, 0, NULL);
+    netlink_device_change(&nlmsg, sock, slave1, false, master, 0, 0, NULL);
+  }
+  netlink_add_xfrm(&nlmsg, sock, "xfrm0");
+  netlink_device_change(&nlmsg, sock, "bridge_slave_0", true, 0, 0, 0, NULL);
+  netlink_device_change(&nlmsg, sock, "bridge_slave_1", true, 0, 0, 0, NULL);
+  netlink_add_veth(&nlmsg, sock, "hsr_slave_0", "veth0_to_hsr");
+  netlink_add_veth(&nlmsg, sock, "hsr_slave_1", "veth1_to_hsr");
+  netlink_add_hsr(&nlmsg, sock, "hsr0", "hsr_slave_0", "hsr_slave_1");
+  netlink_device_change(&nlmsg, sock, "hsr_slave_0", true, 0, 0, 0, NULL);
+  netlink_device_change(&nlmsg, sock, "hsr_slave_1", true, 0, 0, 0, NULL);
+  netlink_add_veth(&nlmsg, sock, "veth0_virt_wifi", "veth1_virt_wifi");
+  netlink_add_linked(&nlmsg, sock, "virt_wifi", "virt_wifi0",
+                     "veth1_virt_wifi");
+  netlink_add_veth(&nlmsg, sock, "veth0_vlan", "veth1_vlan");
+  netlink_add_vlan(&nlmsg, sock, "vlan0", "veth0_vlan", 0, htons(ETH_P_8021Q));
+  netlink_add_vlan(&nlmsg, sock, "vlan1", "veth0_vlan", 1, htons(ETH_P_8021AD));
+  netlink_add_macvlan(&nlmsg, sock, "macvlan0", "veth1_vlan");
+  netlink_add_macvlan(&nlmsg, sock, "macvlan1", "veth1_vlan");
+  netlink_add_ipvlan(&nlmsg, sock, "ipvlan0", "veth0_vlan", IPVLAN_MODE_L2, 0);
+  netlink_add_ipvlan(&nlmsg, sock, "ipvlan1", "veth0_vlan", IPVLAN_MODE_L3S,
+                     IPVLAN_F_VEPA);
+  netlink_add_veth(&nlmsg, sock, "veth0_macvtap", "veth1_macvtap");
+  netlink_add_linked(&nlmsg, sock, "macvtap", "macvtap0", "veth0_macvtap");
+  netlink_add_linked(&nlmsg, sock, "macsec", "macsec0", "veth1_macvtap");
+  char addr[32];
+  sprintf(addr, DEV_IPV4, 14 + 10);
+  struct in_addr geneve_addr4;
+  if (inet_pton(AF_INET, addr, &geneve_addr4) <= 0)
+    exit(1);
+  struct in6_addr geneve_addr6;
+  if (inet_pton(AF_INET6, "fc00::01", &geneve_addr6) <= 0)
+    exit(1);
+  netlink_add_geneve(&nlmsg, sock, "geneve0", 0, &geneve_addr4, 0);
+  netlink_add_geneve(&nlmsg, sock, "geneve1", 1, 0, &geneve_addr6);
+  netdevsim_add((int)procid, 4);
+  netlink_wireguard_setup();
+  for (i = 0; i < sizeof(devices) / (sizeof(devices[0])); i++) {
+    char addr[32];
+    sprintf(addr, DEV_IPV4, i + 10);
+    netlink_add_addr4(&nlmsg, sock, devices[i].name, addr);
+    if (!devices[i].noipv6) {
+      sprintf(addr, DEV_IPV6, i + 10);
+      netlink_add_addr6(&nlmsg, sock, devices[i].name, addr);
+    }
+    uint64_t macaddr = DEV_MAC + ((i + 10ull) << 40);
+    netlink_device_change(&nlmsg, sock, devices[i].name, true, 0, &macaddr,
+                          devices[i].macsize, NULL);
+  }
+  close(sock);
+}
+static void initialize_netdevices_init(void) {
+  int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+  if (sock == -1)
+    exit(1);
+  struct {
+    const char* type;
+    int macsize;
+    bool noipv6;
+    bool noup;
+  } devtypes[] = {
+      {"nr", 7, true},
+      {"rose", 5, true, true},
+  };
+  unsigned i;
+  for (i = 0; i < sizeof(devtypes) / sizeof(devtypes[0]); i++) {
+    char dev[32], addr[32];
+    sprintf(dev, "%s%d", devtypes[i].type, (int)procid);
+    sprintf(addr, "172.30.%d.%d", i, (int)procid + 1);
+    netlink_add_addr4(&nlmsg, sock, dev, addr);
+    if (!devtypes[i].noipv6) {
+      sprintf(addr, "fe88::%02x:%02x", i, (int)procid + 1);
+      netlink_add_addr6(&nlmsg, sock, dev, addr);
+    }
+    int macsize = devtypes[i].macsize;
+    uint64_t macaddr = 0xbbbbbb +
+                       ((unsigned long long)i << (8 * (macsize - 2))) +
+                       (procid << (8 * (macsize - 1)));
+    netlink_device_change(&nlmsg, sock, dev, !devtypes[i].noup, 0, &macaddr,
+                          macsize, NULL);
+  }
+  close(sock);
+}
+
+static void setup_common() {
+  if (mount(0, "/sys/fs/fuse/connections", "fusectl", 0, 0)) {
+  }
+}
+
+static void setup_binderfs() {
+  if (mkdir("/dev/binderfs", 0777)) {
+  }
+  if (mount("binder", "/dev/binderfs", "binder", 0, NULL)) {
+  }
+  if (symlink("/dev/binderfs", "./binderfs")) {
+  }
+}
+
+static void loop();
+
+static void sandbox_common() {
+  prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0);
+  setsid();
+  struct rlimit rlim;
+  rlim.rlim_cur = rlim.rlim_max = (200 << 20);
+  setrlimit(RLIMIT_AS, &rlim);
+  rlim.rlim_cur = rlim.rlim_max = 32 << 20;
+  setrlimit(RLIMIT_MEMLOCK, &rlim);
+  rlim.rlim_cur = rlim.rlim_max = 136 << 20;
+  setrlimit(RLIMIT_FSIZE, &rlim);
+  rlim.rlim_cur = rlim.rlim_max = 1 << 20;
+  setrlimit(RLIMIT_STACK, &rlim);
+  rlim.rlim_cur = rlim.rlim_max = 128 << 20;
+  setrlimit(RLIMIT_CORE, &rlim);
+  rlim.rlim_cur = rlim.rlim_max = 256;
+  setrlimit(RLIMIT_NOFILE, &rlim);
+  if (unshare(CLONE_NEWNS)) {
+  }
+  if (mount(NULL, "/", NULL, MS_REC | MS_PRIVATE, NULL)) {
+  }
+  if (unshare(CLONE_NEWIPC)) {
+  }
+  if (unshare(0x02000000)) {
+  }
+  if (unshare(CLONE_NEWUTS)) {
+  }
+  if (unshare(CLONE_SYSVSEM)) {
+  }
+  typedef struct {
+    const char* name;
+    const char* value;
+  } sysctl_t;
+  static const sysctl_t sysctls[] = {
+      {"/proc/sys/kernel/shmmax", "16777216"},
+      {"/proc/sys/kernel/shmall", "536870912"},
+      {"/proc/sys/kernel/shmmni", "1024"},
+      {"/proc/sys/kernel/msgmax", "8192"},
+      {"/proc/sys/kernel/msgmni", "1024"},
+      {"/proc/sys/kernel/msgmnb", "1024"},
+      {"/proc/sys/kernel/sem", "1024 1048576 500 1024"},
+  };
+  unsigned i;
+  for (i = 0; i < sizeof(sysctls) / sizeof(sysctls[0]); i++)
+    write_file(sysctls[i].name, sysctls[i].value);
+}
+
+static int wait_for_loop(int pid) {
+  if (pid < 0)
+    exit(1);
+  int status = 0;
+  while (waitpid(-1, &status, __WALL) != pid) {
+  }
+  return WEXITSTATUS(status);
+}
+
+static void drop_caps(void) {
+  struct __user_cap_header_struct cap_hdr = {};
+  struct __user_cap_data_struct cap_data[2] = {};
+  cap_hdr.version = _LINUX_CAPABILITY_VERSION_3;
+  cap_hdr.pid = getpid();
+  if (syscall(SYS_capget, &cap_hdr, &cap_data))
+    exit(1);
+  const int drop = (1 << CAP_SYS_PTRACE) | (1 << CAP_SYS_NICE);
+  cap_data[0].effective &= ~drop;
+  cap_data[0].permitted &= ~drop;
+  cap_data[0].inheritable &= ~drop;
+  if (syscall(SYS_capset, &cap_hdr, &cap_data))
+    exit(1);
+}
+
+static int do_sandbox_none(void) {
+  if (unshare(CLONE_NEWPID)) {
+  }
+  int pid = fork();
+  if (pid != 0)
+    return wait_for_loop(pid);
+  setup_common();
+  sandbox_common();
+  drop_caps();
+  initialize_netdevices_init();
+  if (unshare(CLONE_NEWNET)) {
+  }
+  write_file("/proc/sys/net/ipv4/ping_group_range", "0 65535");
+  initialize_tun();
+  initialize_netdevices();
+  setup_binderfs();
+  loop();
+  exit(1);
+}
+
+uint64_t r[2] = {0xffffffffffffffff, 0xffffffffffffffff};
+
+void loop(void) {
+  intptr_t res = 0;
+  res = syscall(__NR_socket, /*domain=*/0x10ul, /*type=*/3ul, /*proto=*/0);
+  if (res != -1)
+    r[0] = res;
+  *(uint64_t*)0x20000040 = 0x20000080;
+  memcpy((void*)0x20000080,
+         "\x39\x00\x00\x00\x13\x00\x0b\x46\x00\xbb\x65\xe1\xc3\xe4\xff\xff\xf9"
+         "\xff\xff\x7f\x37\x00\x00\x00\x56\x00\x00\x02\x25\x00\x00\x00\x19\x00"
+         "\x0a\x00\x10\x00\x00\x00\x07\xfd\x17\xe5\xff\xff\x08\x00\x04\x00\x00"
+         "\x00\x00\x00\x00\x00\x0a",
+         57);
+  *(uint64_t*)0x20000048 = 0x39;
+  syscall(__NR_writev, /*fd=*/r[0], /*vec=*/0x20000040ul, /*vlen=*/1ul);
+  res = syscall(__NR_socket, /*domain=*/0x10ul, /*type=*/3ul, /*proto=*/0);
+  if (res != -1)
+    r[1] = res;
+  *(uint64_t*)0x20000040 = 0x20000080;
+  memcpy((void*)0x20000080,
+         "\x39\x00\x00\x00\x13\x00\x0b\x46\x00\xbb\x65\xe1\xc3\xe4\xff\xff\x01"
+         "\x00\x00\x00\x36\x00\x00\x00\x56\x00\x00\x02\x25\x00\x00\x00\x19\x00"
+         "\x0a\x00\x10\x00\x00\x00\x07\xfd\x17\xe5\xff\xff\x08\x00\x04\x00\x00"
+         "\x00\x00\x00\x00\x00\x0a",
+         57);
+  *(uint64_t*)0x20000048 = 0x39;
+  syscall(__NR_writev, /*fd=*/r[1], /*vec=*/0x20000040ul, /*vlen=*/1ul);
+}
+int main(void) {
+  syscall(__NR_mmap, /*addr=*/0x1ffff000ul, /*len=*/0x1000ul, /*prot=*/0ul,
+          /*flags=*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
+  syscall(__NR_mmap, /*addr=*/0x20000000ul, /*len=*/0x1000000ul, /*prot=*/7ul,
+          /*flags=*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
+  syscall(__NR_mmap, /*addr=*/0x21000000ul, /*len=*/0x1000ul, /*prot=*/0ul,
+          /*flags=*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
+  do_sandbox_none();
+  return 0;
+}
+
+
+and also https://gist.github.com/xrivendell7/dea2d84fe5efdb17eedcdb3e17297ffe
+
+I hope it helps.
+Best regards
+xingwei Lee
 
