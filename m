@@ -1,126 +1,115 @@
-Return-Path: <netdev+bounces-76903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B5C986F587
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 15:33:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8415086F58D
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 15:39:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06125281733
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 14:33:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CE0F285BFB
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 14:39:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 997B166B5F;
-	Sun,  3 Mar 2024 14:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC9867A04;
+	Sun,  3 Mar 2024 14:39:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SfCXDPdj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gu1QKHX+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE10E3EA68
-	for <netdev@vger.kernel.org>; Sun,  3 Mar 2024 14:33:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570623EA68;
+	Sun,  3 Mar 2024 14:39:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709476418; cv=none; b=LHy36xhGFQ9mtTG/IRTrZ0hWqDtxBR+JrpBFtscr1pNJju3irm/dHjxjJki3W5IG/A1BuYbOKdi+0j/av1SzUQaONGP33WPFZ7gsCIIt98ltxCBOwS6mPvwPH/mrchCzXiZFlf1L6n6Z4S1SYTIyOZTUQKd1QkUz6+7nkbNT9wo=
+	t=1709476767; cv=none; b=MAH19cZAmFSYGcY/pdl+LqeGM/udmKDHhdqL91mOQuiXy9nBzNI+eSpNqf9PhcRCbhbAVNf9yjN1EDOOoDPgRnXbNmsbNrBXTcoOx5r2GfZb7pQTUVLx6uVIktdc8O684/VatZTklUdehFWjnWsw0507KPal9/gD0pNYkmq1f6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709476418; c=relaxed/simple;
-	bh=MlredJzGlSKF4+t4LdnWrIVSOJ/rnD1IODaAWRuip6Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WMuMGst+IMSf6fXNIAl9N5opV67WdCs0fN9xKquF1C25XbCGf9PtXyQWK1UTsM3UJXW/PiQEjPVbxgv5bd4ll3UYVUuSX099Jol+IvUkicfp2ZOLl/YrEo8Qh8xEJZa/6p1WRU89/cgx8SMCSzCEdnULYGfpdi69J+1LSigNvHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SfCXDPdj; arc=none smtp.client-ip=209.85.208.43
+	s=arc-20240116; t=1709476767; c=relaxed/simple;
+	bh=oCakb96QHj+YOMxqbYWwKD2Ni7U3lWwRqWAP8GUBnP8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YsKWKkeWMBsBSieMDR3KiezN1jPAwUg2Mr5DhsWzOxvYo0j2fSNT78vYgPul375usKCaWcbOYljBPV839g7O3jL8mEwxm60LwTFsekjAZTn9/EpaIR6+pWq0T1KOXDR0+20j+TB7dVrewghxf/Tye9AO8MGfj7lILy+k7ufT78I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gu1QKHX+; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-56454c695e6so6073422a12.0
-        for <netdev@vger.kernel.org>; Sun, 03 Mar 2024 06:33:36 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1dc29f1956cso28707655ad.0;
+        Sun, 03 Mar 2024 06:39:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709476415; x=1710081215; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZM96sY+GWG6sHv9ROrgNJq0nit09goqTRZIr3uxP76Q=;
-        b=SfCXDPdjbICTg1MramCxMwhSgcptW2nI02xRzh8V7THdeBzcpuFV5ioIGzQbNeGpu4
-         40JlTvbhJ+cb9Avw1qrSnxCCsuUkCWIBhZEsJlcgBj/KtQgfejzCVjl/7l/qwFbneLoH
-         ouhbHH1f+hpzZgrwkeeBZc/YXWpeMEr5tp53uD8f3jzl6/Hizuo8fY1G+93SgZ/XRaso
-         yWqi8qK5R0UYeFselFq+BkPaI2DckqztMzXbAYwrgvWEdp3Km6MuzY/sN63S8fWofOhM
-         BtXHLvJSbGyajDShVN9oFQi2YwN+4TAkjO7KhMf2uVDdVYaghdJTlLyd9qIMzxMADkEA
-         XbtQ==
+        d=gmail.com; s=20230601; t=1709476765; x=1710081565; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oBbfEkG98FnEmlg0aeqk2gdgPye0efTyg1ck9DlRbYM=;
+        b=gu1QKHX+PhqEOR2dX5dKd08Qc69410OxyJGS5r95uhxPmMwGo8ZgEL6l4pXr5sz96h
+         V5Ngol3oztljF20p6V7Gl85PaHviCJ9FxPJkqCk6dIeYz+ipDPc5H10sXgI0rWKBr9CR
+         gabPsiILusn7S9E2lHtgmTWUk4dEoBgVxIGdzxEFrZCMgSCve8zQ9BHax4tA+I+6g8nN
+         XHA2P9fx2VIJbKcmXFeKom8/NQ65EGj7FS3EdSWCp5HL5G8W9YpLfDwfnHoo+WsQqzST
+         XXvQqjH5B34hARRmmUVlgmOAGnHeNAyz6moeQF+c5acwBmjs793RxXkFpRydFpmBuVK7
+         7S2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709476415; x=1710081215;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZM96sY+GWG6sHv9ROrgNJq0nit09goqTRZIr3uxP76Q=;
-        b=qc4cBWYP9ZOSYOfVow30JEUHyUPHEdnTV1325FCtYanaWIaEYwYYW8d93CPQcLI8Rj
-         Yw1LS9E2/ChdxSrixN2Q90aUh+F44uSNmze6OZxWh6LCvEtQbP6Y+iqTeD39ymkDpf9E
-         6NAfspua5w/9fJuln/St8YVL2Fv4N9WAaBvyzHVX73xOL0lqm57yU7HrJbJhvNq8KFJ+
-         fVywU601uDEx5uDVx9RGnZ09CmcWqezLoMkOtEg1Dh2DTsoN4SQwpxRYRQR8C6ZG5LjZ
-         ejBjy+z2+8GVzO09wRVo3i+yUTiGCbJ/A4dQq7RVbrHfHHXMD1bisrqLXVBEbTBkBLLa
-         nn9A==
-X-Forwarded-Encrypted: i=1; AJvYcCUD6aueY74XI3IV48f363DlPNBy1jNJIPNNPs08pdUgM87qfA0eRpnUKexMXwmagjIfDRBkgKdcQktwbYB/w7SKT1+povfL
-X-Gm-Message-State: AOJu0Ywrald+cwIhjMePtYVjzrg5d/dV+WY2jBYb+7Evn9Zvs5lJ6Jiw
-	7BOZw99zx75KcDTElt9BLyiYCS3k3EJOPDLKPDM8n5rh1QAlnQjq
-X-Google-Smtp-Source: AGHT+IHgkUc2mX5b/QYFVFOnelRaj26cJ9fSzsdoHt7vg09Fbi4sVKn9sAkqPVwKucfz1XIQiajStA==
-X-Received: by 2002:a50:c8cb:0:b0:561:3b53:d0af with SMTP id k11-20020a50c8cb000000b005613b53d0afmr5078323edh.12.1709476415108;
-        Sun, 03 Mar 2024 06:33:35 -0800 (PST)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id er8-20020a056402448800b00566d7e27dccsm2435315edb.0.2024.03.03.06.33.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 03 Mar 2024 06:33:34 -0800 (PST)
-Message-ID: <3a11e745-f2ec-4c94-a847-c0627a68a166@gmail.com>
-Date: Sun, 3 Mar 2024 15:33:33 +0100
+        d=1e100.net; s=20230601; t=1709476765; x=1710081565;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oBbfEkG98FnEmlg0aeqk2gdgPye0efTyg1ck9DlRbYM=;
+        b=lP3n5UrqpHs/k+NZAdl25HaIiSHxcooXi1xEY1Femc97vd/vOdpqCb/7r3bhc/Q6/j
+         yzQRsnc+I7Zyern5RbExtoGc57qzrzxYo08cmrBjDRcUIX3xiP8IC9nyp0c30qpR3gf3
+         TtZHYAz//wqs8PybpewIvOmQ2e5eH4t6i0Ogf6Up8a63RQpWLj51jn3mrf6UzUSwihL7
+         mXxDbTuc8iIyfldaWTLvEYT/C/U5s81d82DAH70D6KoTEAZfO+KxRX/phlGxF9pTfmo0
+         YvoUxS+2CoLW8OoklFZmJ27t30FJVFodCkDeG4pOjtxAO1GAE/V7hyjaH/QQ3WpN+Nw/
+         3R/A==
+X-Forwarded-Encrypted: i=1; AJvYcCXOJlB3J/efqp6TVxrnFNI1zQmgt77HxsLXJy+1cBXDut5AnVX+psaxj11I88v1Upu/T4UOC550/YlGViO0MIRynPfU3V4RTcR+YFZa
+X-Gm-Message-State: AOJu0Ywjm17rhG0mD4Ms06dl6oCnZpYJNwXU2ZndjWmUkC6H0bv8iN6T
+	Os0zGpkGlsbIni+QVfxI+pjggkeFDegtN9wTZIjtsv2CWrMXtDCa
+X-Google-Smtp-Source: AGHT+IGfEPjP0/ggsvDoyE1PN+WfAbSxjgukfMVNrpqaVVd6NoFvNuz4EkxGB5UkwaibmrA7ZRKqCQ==
+X-Received: by 2002:a17:903:1104:b0:1dc:e26f:d8f8 with SMTP id n4-20020a170903110400b001dce26fd8f8mr6872023plh.14.1709476765635;
+        Sun, 03 Mar 2024 06:39:25 -0800 (PST)
+Received: from kernel.. ([2402:e280:214c:86:98b4:6d91:d5f4:8f27])
+        by smtp.gmail.com with ESMTPSA id mq12-20020a170902fd4c00b001dc8f1e06eesm6709746plb.291.2024.03.03.06.39.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 Mar 2024 06:39:25 -0800 (PST)
+From: R SUNDAR <prosunofficial@gmail.com>
+To: jmaloy@redhat.com,
+	ying.xue@windriver.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org,
+	R SUNDAR <prosunofficial@gmail.com>
+Subject: [PATCH] Removed inputq,namedq field description to prevent kernel doc warnings.
+Date: Sun,  3 Mar 2024 20:09:19 +0530
+Message-Id: <20240303143919.6903-1-prosunofficial@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 1/7] net: phy: realtek: configure SerDes mode
- for rtl822x/8251b PHYs
-Content-Language: en-US
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
- Alexander Couzens <lynxis@fe80.eu>
-References: <20240303102848.164108-1-ericwouds@gmail.com>
- <20240303102848.164108-2-ericwouds@gmail.com>
- <ZeR7Vs8als7yaWax@makrotopia.org>
-From: Eric Woudstra <ericwouds@gmail.com>
-In-Reply-To: <ZeR7Vs8als7yaWax@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+./net/tipc/node.c:150: warning: Excess struct member 'inputq' description in 'tipc_node'
+./net/tipc/node.c:150: warning: Excess struct member 'namedq' description in 'tipc_node'
 
+Signed-off-by: R SUNDAR <prosunofficial@gmail.com>
+---
+ net/tipc/node.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-On 3/3/24 14:29, Daniel Golle wrote:
+diff --git a/net/tipc/node.c b/net/tipc/node.c
+index 3105abe97bb9..c1e890a82434 100644
+--- a/net/tipc/node.c
++++ b/net/tipc/node.c
+@@ -86,8 +86,6 @@ struct tipc_bclink_entry {
+  * @lock: rwlock governing access to structure
+  * @net: the applicable net namespace
+  * @hash: links to adjacent nodes in unsorted hash chain
+- * @inputq: pointer to input queue containing messages for msg event
+- * @namedq: pointer to name table input queue with name table messages
+  * @active_links: bearer ids of active links, used as index into links[] array
+  * @links: array containing references to all links to node
+  * @bc_entry: broadcast link entry
+-- 
+2.34.1
 
->> There is an additional datasheet for RTL8226B/RTL8221B called
->> "SERDES MODE SETTING FLOW APPLICATION NOTE" where this sequence to
->> setup interface and rate adapter mode.
-> 
-> Gramar doesn't parse, missing verb.
-
-Thanks, I'll correct it.
-
->> +		.config_init    = rtl822x_config_init,
-> 
-> Have you tested this on RTL8251B?
-> This PHY usually uses 5GBase-R link mode with rate-adapter mode for
-> lower speeds. Hence I'm pretty sure that also setting up SerDes mode
-> register will be a bit different.
-
-Thanks, I'd better not add following lines for the rtl8251b (2x):
-
-	.config_init    = rtl822x_config_init,
-	.get_rate_matching = rtl822x_get_rate_matching,
-
-Until someone with the hardware can test it.
-
-Perhaps we can find a RollBall sfp module that has one on it and use it
-on a BPI-R4...
 
