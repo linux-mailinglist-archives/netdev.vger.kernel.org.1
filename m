@@ -1,275 +1,354 @@
-Return-Path: <netdev+bounces-76921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F44586F6A9
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 20:04:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 284AF86F711
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 21:42:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3F8C1F21473
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 19:04:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4544B1C20AF0
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 20:42:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A0BF7994B;
-	Sun,  3 Mar 2024 19:04:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF9B43AB5;
+	Sun,  3 Mar 2024 20:42:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="GnPQlLcL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m3INmaLB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4595276417
-	for <netdev@vger.kernel.org>; Sun,  3 Mar 2024 19:04:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1FDA6BFA4
+	for <netdev@vger.kernel.org>; Sun,  3 Mar 2024 20:42:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709492666; cv=none; b=PpE/YUddPwliHjj+jQSToTSUnUcvWshVBTHHmA9rS2wAcZ1Lfammv+BGK8w8kRTHy0mPyNeBSIG9JEYyHyTLU0Z3QGwvQWNoxVBwR9WLikSC7k6rAHvlKWeCc/jCgIRh/hw1McUCJOFdQtxQYg/k8JUHgTr6nGQRhA066unFOwk=
+	t=1709498554; cv=none; b=Fh0NnIaQpfsYTL4OJ4TlNFjTWt49zbPwJPvXmARVAi7xlSTTVRMnUB1WL2eJdTi9K1o0fo3fzqO8pBdMJkYbVQTec47MU3q/qfO03R+Fn06aXN2w5D38PJ26ffLtgEf2VUXWKNP9Iz8RynfLqinDhcAYOUgxWM4Ocjv3TQzSJFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709492666; c=relaxed/simple;
-	bh=XqppKbV7x+ci9o0Cub5vVukerfIj86prevOCdxI9aTI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mEvBOgLbextkNQ7+6+lEEWtX914MOoPyb5AIq4BnDK/M08gFbQWNUIZCKfN6oicDZF2p5Pv8UR9M3XAVf6v4OGLas7ZwO7888MSGrzjTqldo/bBaLGR41e8dNCOfU1ClyL3Vt0mlpUev9iZOhsbd/Humy1tJyVc/bx94pv9Vlcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=GnPQlLcL; arc=none smtp.client-ip=209.85.219.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-dc742543119so3734551276.0
-        for <netdev@vger.kernel.org>; Sun, 03 Mar 2024 11:04:24 -0800 (PST)
+	s=arc-20240116; t=1709498554; c=relaxed/simple;
+	bh=d005lyndxSj1K8DtVIV5JJRqCBlreLvb17WW1GVaqaw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NbphvlPHVnbRpGzvJFqggRtEGV9ByEItqd6wWhtSGKTk2dgOA2Op8X4PvBfBRFMrTjdp7zsiM3nOlkxLrKfJio/xpteThDl3Wylc7RGa6kkvBv6W2O8Z1pc+vtzP3focPNf3bm5FE4ndLKPeiPUlIGAskdRgG/dEgn+6xWb4p7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m3INmaLB; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-412e554635cso111155e9.0
+        for <netdev@vger.kernel.org>; Sun, 03 Mar 2024 12:42:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1709492663; x=1710097463; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RqNgFnLKTP93PR6cVdZ6fNlJHYat8XSThRpAWagOMXQ=;
-        b=GnPQlLcLfO626b/YaQ+ADbyTziWSljoeBjNu267mTsLq/oGHOHAKhBZHIL/hNHOYSb
-         1SRb9ZihpIzq3vnH/jl2EVh3bDPeX+8U/RMBwgd9Lz1aTrleFP4EsqedvbBJEeixJ9yq
-         CJpve1Kd96ZEVkqTvJbn5ksa52oK3yV8+K1l9F/uhKndaEO5I77onqW0YIGFWmiiaBN8
-         +XMaIVYIsliUy6A7ZaYnICLrtuk4CrURkPhqyZoqMqtMKuqGpWvzyRVKTl5E3K9zSBxS
-         UT4AMSI96NjYKg+mz4TO08cf/+1VQDfrl6ORZiuzWF69vyBWbY7yFu3ukymKD9PxEPDV
-         iMCg==
+        d=gmail.com; s=20230601; t=1709498551; x=1710103351; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=NttVCvUVD63bB5RfUP94PUM2AgloFFQMH3SW+/IVenI=;
+        b=m3INmaLB22cDh+9Lyu2CvM+HqTcPtMsl8UCo3vPqJQMrBBksnWPJ6mTM3DdLxa3u3t
+         dWdcz5h3OjCvOL9ouumNLKBTH+KfLDEdeskA0ZLmlEBVI+fDPFt2duV6xG93lgVRwo4/
+         OTieHJ1HsI1aqavviRCyAVjxit3PnUoEERyDNrhjSJ6yY24yvwJl4u5hyJnBotkiAJJN
+         UEkMvQvSaX01O47OrvKo0ph65DkJR1YZCA+3q4fEE5wfcx9ehBSOv3Gv1yBYimA6g7/r
+         byC8v38kqEW5fIZb3v9Zmt+KuWgWSI/ghI6fjtnm6Y9TaSE2aBy4ti6H1+NLzUxTO5KD
+         wD4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709492663; x=1710097463;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RqNgFnLKTP93PR6cVdZ6fNlJHYat8XSThRpAWagOMXQ=;
-        b=VcmcSK1r0vrUBLVFyGNGlgJDiFEwCUy9GUVZo/WHeo/F9zmtSipcagUZETWaLCB+/P
-         phSurGkssQqBOptHUjOgm/9ppSRc2wglIQnhQmB7fVbzA3BrWA2a5ACTDj07VU8p+Pzy
-         OZN8ANTXvdsGaeKtTS10jGq/MmEMOf3bI7gBzXHsbh/b2+/g0P4cIfsntICUTI9EGefm
-         N6EDmMIfPS/KX1Gy2oME8c5viwWhxT+eMkNaulXIEWoOBJv8MvBG6mKInqezLxgesk/8
-         SZUFvOdwqJf3E/TX3atOogdoNkeVcTLaCgKtlgr4/gV+x+CNNnI/F7TM6sQ8LbqrOK1F
-         wOKw==
-X-Forwarded-Encrypted: i=1; AJvYcCVKNLfb8XNl9gwMPYU4D0XM5gGeBeVgUJnx0bzD6aGjKtMW1oyKHt/uzNNvQrg0nINrxtqeqMZCpWoDIkJ6UEFctXd0gNXJ
-X-Gm-Message-State: AOJu0YxPsHl7iwk5PaPm+PFTyed67Pup8Y46VQd6Abro2cPnh05xmYdn
-	EUUVTZGxnZ0gF+31OlemMMwNMAnLYFhYvIROnYXISusr7kxnnWzhCXQ8BITXGSKq6AsLwfhT1RB
-	S5kgTOzEXG//0Wxo1s2f87KDhbGmv5RZEgBtK
-X-Google-Smtp-Source: AGHT+IEXYHwCWf7tKmk+LIkt9xBmoryKDpFjJ5oxsQxMZt9/0PsKn73bkhvRdIcyYXwMPp+nyv4nWA6GqQISNE/l6mw=
-X-Received: by 2002:a25:d892:0:b0:dcc:a446:551 with SMTP id
- p140-20020a25d892000000b00dcca4460551mr4093063ybg.52.1709492663143; Sun, 03
- Mar 2024 11:04:23 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709498551; x=1710103351;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NttVCvUVD63bB5RfUP94PUM2AgloFFQMH3SW+/IVenI=;
+        b=gsr8KJx7IYoSl4WMmKJ41gsk+CBC9GfHwVfsyhttp7QQwYEzs7jzHl3Hg2V6AAt04h
+         MgGnk6WQKUEmQnEBXFP7WM4Ty0V3UcxN/3YaOxoTpkY/gGWYiHP2hBDcNfoDbOnBIh/S
+         d4x0nAs9Ob/qjI0svUJCPIZ3V1ynoQqA/AWI0EtlIDRzXQiMhKE4A+Mz9XXRJuxLWtok
+         8FqvboUBfGEspaTB6zuIVoIPOhU3na0EQdeqYgCwJNgnU5kZvh0e+qKrmaFpuqtnu/Uu
+         kylI/aOCx1zMicRSVEjSL1pprjAJh1MA+JT519QeaKn3y5q/I2y5F1+h7veHFEl8p41i
+         Gddg==
+X-Gm-Message-State: AOJu0Yx0LPuA4h0j2NqVBdVqCNweWnqJGb3AkszjArP3O3aDzMaEv8aU
+	DTiHOSwmTratf6/VzEdKKI5AB85U/2R6ZxFZ/EDEqcEB1UBfzUM9
+X-Google-Smtp-Source: AGHT+IEfyNwBixrs9qzZk8G35qYgJrRd6Q9U9VMjsv/ILn/ZNI7xzlY60R5v9eba0p23KhrMqoFNZw==
+X-Received: by 2002:a05:600c:4f15:b0:412:6101:915c with SMTP id l21-20020a05600c4f1500b004126101915cmr4958709wmq.19.1709498550794;
+        Sun, 03 Mar 2024 12:42:30 -0800 (PST)
+Received: from ?IPV6:2a01:c22:6e8f:5600:2922:1b4d:388a:be15? (dynamic-2a01-0c22-6e8f-5600-2922-1b4d-388a-be15.c22.pool.telefonica.de. [2a01:c22:6e8f:5600:2922:1b4d:388a:be15])
+        by smtp.googlemail.com with ESMTPSA id jl24-20020a05600c6a9800b004126732390asm15494769wmb.37.2024.03.03.12.42.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 03 Mar 2024 12:42:30 -0800 (PST)
+Message-ID: <f587013b-8f2c-4ae1-83b8-0c69ba99f3ea@gmail.com>
+Date: Sun, 3 Mar 2024 21:42:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240225165447.156954-1-jhs@mojatatu.com> <b28f2f7900dc7bad129ad67621b2f7746c3b2e18.camel@redhat.com>
- <CO1PR11MB49931E501B20F32681F917CD935F2@CO1PR11MB4993.namprd11.prod.outlook.com>
- <65e106305ad8b_43ad820892@john.notmuch> <CAM0EoM=r1UDnkp-csPdrz6nBt7o3fHUncXKnO7tB_rcZAcbrDg@mail.gmail.com>
- <CAOuuhY8qbsYCjdUYUZv8J3jz8HGXmtxLmTDP6LKgN5uRVZwMnQ@mail.gmail.com>
- <20240301090020.7c9ebc1d@kernel.org> <CAM0EoM=-hzSNxOegHqhAQD7qoAR2CS3Dyh-chRB+H7C7TQzmow@mail.gmail.com>
- <20240301173214.3d95e22b@kernel.org> <CAM0EoM=NEB25naGtz=YaOt6BDoiv4RpDw27Y=btMZAMGeYB5bg@mail.gmail.com>
- <CAM0EoM=8GG-zCaopaUDMkvqemrZQUtaVRTMrWA6z=xrdYxG9+g@mail.gmail.com>
- <20240302192747.371684fb@kernel.org> <CAM0EoMncuPvUsRwE+Ajojgg-8JD+1oJ7j2Rw+7oN60MjjAHV-g@mail.gmail.com>
- <CAOuuhY8pgxqCg5uTXzetTt5sd8RzOfLPYF8ksLjoUhkKyqr56w@mail.gmail.com>
-In-Reply-To: <CAOuuhY8pgxqCg5uTXzetTt5sd8RzOfLPYF8ksLjoUhkKyqr56w@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sun, 3 Mar 2024 14:04:11 -0500
-Message-ID: <CAM0EoMnpZuC_fdzXj5+seXo3GT9rrf1txc45tB=gie4cf-Zqeg@mail.gmail.com>
-Subject: Re: Hardware Offload discussion WAS(Re: [PATCH net-next v12 00/15]
- Introducing P4TC (series 1)
-To: Tom Herbert <tom@sipanda.io>
-Cc: Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	"Singhai, Anjali" <anjali.singhai@intel.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>, "Chatterjee, Deb" <deb.chatterjee@intel.com>, 
-	"Limaye, Namrata" <namrata.limaye@intel.com>, Marcelo Ricardo Leitner <mleitner@redhat.com>, 
-	"Shirshyad, Mahesh" <Mahesh.Shirshyad@amd.com>, "Jain, Vipin" <Vipin.Jain@amd.com>, 
-	"Osinski, Tomasz" <tomasz.osinski@intel.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>, 
-	Khalid Manaa <khalidm@nvidia.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Victor Nogueira <victor@mojatatu.com>, 
-	"Tammela, Pedro" <pctammela@mojatatu.com>, "Daly, Dan" <dan.daly@intel.com>, 
-	Andy Fingerhut <andy.fingerhut@gmail.com>, "Sommers, Chris" <chris.sommers@keysight.com>, 
-	Matty Kadosh <mattyk@nvidia.com>, bpf <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 1/7] net: phy: realtek: configure SerDes mode
+ for rtl822x/8251b PHYs
+To: Eric Woudstra <ericwouds@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>
+Cc: netdev@vger.kernel.org, Alexander Couzens <lynxis@fe80.eu>
+References: <20240303102848.164108-1-ericwouds@gmail.com>
+ <20240303102848.164108-2-ericwouds@gmail.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20240303102848.164108-2-ericwouds@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sun, Mar 3, 2024 at 1:11=E2=80=AFPM Tom Herbert <tom@sipanda.io> wrote:
->
-> On Sun, Mar 3, 2024 at 9:00=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com=
-> wrote:
-> >
-> > On Sat, Mar 2, 2024 at 10:27=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> > >
-> > > On Sat, 2 Mar 2024 09:36:53 -0500 Jamal Hadi Salim wrote:
-> > > > 2) Your point on:  "integrate later", or at least "fill in the gaps=
-"
-> > > > This part i am probably going to mumble on. I am going to consider
-> > > > more than just doing ACLs/MAT via flower/u32 for the sake of
-> > > > discussion.
-> > > > True, "fill the gaps" has been our model so far. It requires kernel
-> > > > changes, user space code changes etc justifiably so because most of
-> > > > the time such datapaths are subject to standardization via IETF, IE=
-EE,
-> > > > etc and new extensions come in on a regular basis.  And sometimes w=
-e
-> > > > do add features that one or two users or a single vendor has need f=
-or
-> > > > at the cost of kernel and user/control extension. Given our work
-> > > > process, any features added this way take a long time to make it to
-> > > > the end user.
-> > >
-> > > What I had in mind was more of a DDP model. The device loads it binar=
-y
-> > > blob FW in whatever way it does, then it tells the kernel its parser
-> > > graph, and tables. The kernel exposes those tables to user space.
-> > > All dynamic, no need to change the kernel for each new protocol.
-> > >
-> > > But that's different in two ways:
-> > >  1. the device tells kernel the tables, no "dynamic reprogramming"
-> > >  2. you don't need the SW side, the only use of the API is to interac=
-t
-> > >     with the device
-> > >
-> > > User can still do BPF kfuncs to look up in the tables (like in FIB),
-> > > but call them from cls_bpf.
-> > >
-> >
-> > This is not far off from what is envisioned today in the discussions.
-> > The main issue is who loads the binary? We went from devlink to the
-> > filter doing the loading. DDP is ethtool. We still need to tie a PCI
-> > device/tc block to the "program" so we can do skip_sw and it works.
-> > Meaning a device that is capable of handling multiple programs can
-> > have multiple blobs loaded. A "program" is mapped to a tc filter and
-> > MAT control works the same way as it does today (netlink/tc ndo).
-> >
-> > A program in P4 has a name, ID and people have been suggesting a sha1
-> > identity (or a signature of some kind should be generated by the
-> > compiler). So the upward propagation could be tied to discovering
-> > these 3 tuples from the driver. Then the control plane targets a
-> > program via those tuples via netlink (as we do currently).
-> >
-> > I do note, using the DDP sample space, currently whatever gets loaded
-> > is "trusted" and really you need to have human knowledge of what the
-> > NIC's parsing + MAT is to send the control. With P4 that is all
-> > visible/programmable by the end user (i am not a proponent of vendors
-> > "shipping" things or calling them for support) - so should be
-> > sufficient to just discover what is in the binary and send the correct
-> > control messages down.
-> >
-> > > I think in P4 terms that may be something more akin to only providing
-> > > the runtime API? I seem to recall they had some distinction...
-> >
-> > There are several solutions out there (ex: TDI, P4runtime) - our API
-> > is netlink and those could be written on top of netlink, there's no
-> > controversy there.
-> > So the starting point is defining the datapath using P4, generating
-> > the binary blob and whatever constraints needed using the vendor
-> > backend and for s/w equivalent generating the eBPF datapath.
-> >
-> > > > At the cost of this sounding controversial, i am going
-> > > > to call things like fdb, fib, etc which have fixed datapaths in the
-> > > > kernel "legacy". These "legacy" datapaths almost all the time have
-> > >
-> > > The cynic in me sometimes thinks that the biggest problem with "legac=
-y"
-> > > protocols is that it's hard to make money on them :)
-> >
-> > That's a big motivation without a doubt, but also there are people
-> > that want to experiment with things. One of the craziest examples we
-> > have is someone who created a P4 program for "in network calculator",
-> > essentially a calculator in the datapath. You send it two operands and
-> > an operator using custom headers, it does the math and responds with a
-> > result in a new header. By itself this program is a toy but it
-> > demonstrates that if one wanted to, they could have something custom
-> > in hardware and/or kernel datapath.
->
-> Jamal,
->
-> Given how long P4 has been around it's surprising that the best
-> publicly available code example is "the network calculator" toy.
+On 03.03.2024 11:28, Eric Woudstra wrote:
+> From: Alexander Couzens <lynxis@fe80.eu>
+> 
+> The rtl822x series and rtl8251b support switching SerDes mode between
+> 2500base-x and sgmii based on the negotiated copper speed.
+> 
+> Configure this switching mode according to SerDes modes supported by
+> host.
+> 
+> There is an additional datasheet for RTL8226B/RTL8221B called
+> "SERDES MODE SETTING FLOW APPLICATION NOTE" where this sequence to
+> setup interface and rate adapter mode.
+> 
+> However, there is no documentation about the meaning of registers
+> and bits, it's literally just magic numbers and pseudo-code.
+> 
+> Signed-off-by: Alexander Couzens <lynxis@fe80.eu>
+> [ refactored, dropped HiSGMII mode and changed commit message ]
+> Signed-off-by: Marek Behún <kabel@kernel.org>
+> [ changed rtl822x_update_interface() to use vendor register ]
+> [ always fill in possible interfaces ]
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+> ---
+>  drivers/net/phy/realtek.c | 99 ++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 97 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+> index 1fa70427b2a2..8a876e003774 100644
+> --- a/drivers/net/phy/realtek.c
+> +++ b/drivers/net/phy/realtek.c
+> @@ -54,6 +54,16 @@
+>  						 RTL8201F_ISR_LINK)
+>  #define RTL8201F_IER				0x13
+>  
+> +#define RTL822X_VND1_SERDES_OPTION			0x697a
+> +#define RTL822X_VND1_SERDES_OPTION_MODE_MASK		GENMASK(5, 0)
+> +#define RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX_SGMII		0
+> +#define RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX		2
+> +
+> +#define RTL822X_VND1_SERDES_CTRL3			0x7580
+> +#define RTL822X_VND1_SERDES_CTRL3_MODE_MASK		GENMASK(5, 0)
+> +#define RTL822X_VND1_SERDES_CTRL3_MODE_SGMII			0x02
+> +#define RTL822X_VND1_SERDES_CTRL3_MODE_2500BASEX		0x16
+> +
+>  #define RTL8366RB_POWER_SAVE			0x15
+>  #define RTL8366RB_POWER_SAVE_ON			BIT(12)
+>  
+> @@ -659,6 +669,60 @@ static int rtl822x_write_mmd(struct phy_device *phydev, int devnum, u16 regnum,
+>  	return ret;
+>  }
+>  
+> +static int rtl822x_config_init(struct phy_device *phydev)
+> +{
+> +	bool has_2500, has_sgmii;
+> +	u16 mode;
+> +	int ret;
+> +
+> +	has_2500 = test_bit(PHY_INTERFACE_MODE_2500BASEX,
+> +			    phydev->host_interfaces) ||
+> +		   phydev->interface == PHY_INTERFACE_MODE_2500BASEX;
+> +
+> +	has_sgmii = test_bit(PHY_INTERFACE_MODE_SGMII,
+> +			     phydev->host_interfaces) ||
+> +		    phydev->interface == PHY_INTERFACE_MODE_SGMII;
+> +
+> +	/* fill in possible interfaces */
+> +	__assign_bit(PHY_INTERFACE_MODE_2500BASEX, phydev->possible_interfaces,
+> +		     has_2500);
+> +	__assign_bit(PHY_INTERFACE_MODE_SGMII, phydev->possible_interfaces,
+> +		     has_sgmii);
+> +
+> +	if (!has_2500 && !has_sgmii)
+> +		return 0;
+> +
+> +	/* determine SerDes option mode */
+> +	if (has_2500 && !has_sgmii)
+> +		mode = RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX;
+> +	else
+> +		mode = RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX_SGMII;
+> +
+> +	/* the following sequence with magic numbers sets up the SerDes
+> +	 * option mode
+> +	 */
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x75f3, 0);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = phy_modify_mmd_changed(phydev, MDIO_MMD_VEND1,
+> +				     RTL822X_VND1_SERDES_OPTION,
+> +				     RTL822X_VND1_SERDES_OPTION_MODE_MASK,
+> +				     mode);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x6a04, 0x0503);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x6f10, 0xd455);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	return phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x6f11, 0x8020);
+> +}
+> +
+>  static int rtl822x_get_features(struct phy_device *phydev)
+>  {
+>  	int val;
+> @@ -695,6 +759,28 @@ static int rtl822x_config_aneg(struct phy_device *phydev)
+>  	return __genphy_config_aneg(phydev, ret);
+>  }
+>  
+> +static void rtl822x_update_interface(struct phy_device *phydev)
+> +{
+> +	int val;
+> +
+> +	if (!phydev->link)
+> +		return;
+> +
+> +	/* Change interface according to serdes mode */
+> +	val = phy_read_mmd(phydev, MDIO_MMD_VEND1, RTL822X_VND1_SERDES_CTRL3);
+> +	if (val < 0)
+> +		return;
+> +
+> +	switch (val & RTL822X_VND1_SERDES_CTRL3_MODE_MASK) {
+> +	case RTL822X_VND1_SERDES_CTRL3_MODE_2500BASEX:
+> +		phydev->interface = PHY_INTERFACE_MODE_2500BASEX;
+> +		break;
+> +	case RTL822X_VND1_SERDES_CTRL3_MODE_SGMII:
+> +		phydev->interface = PHY_INTERFACE_MODE_SGMII;
+> +		break;
+> +	}
+> +}
+> +
+>  static int rtl822x_read_status(struct phy_device *phydev)
+>  {
+>  	int ret;
+> @@ -709,11 +795,13 @@ static int rtl822x_read_status(struct phy_device *phydev)
+>  						  lpadv);
+>  	}
+>  
+> -	ret = genphy_read_status(phydev);
+> +	ret = rtlgen_read_status(phydev);
+>  	if (ret < 0)
+>  		return ret;
+>  
+> -	return rtlgen_get_speed(phydev);
+> +	rtl822x_update_interface(phydev);
+> +
+> +	return 0;
+>  }
+>  
+>  static bool rtlgen_supports_2_5gbps(struct phy_device *phydev)
+> @@ -976,6 +1064,7 @@ static struct phy_driver realtek_drvs[] = {
+>  		.match_phy_device = rtl8226_match_phy_device,
+>  		.get_features	= rtl822x_get_features,
+>  		.config_aneg	= rtl822x_config_aneg,
+> +		.config_init    = rtl822x_config_init,
 
-Come on Tom ;-> That was just an example of something "crazy" to
-demonstrate freedom. I can run that in any of the P4 friendly NICs
-today. You are probably being facetious - There are some serious
-publicly available projects out there, some of which I quote on the
-cover letter (like DASH).
+Did you test this (and the rest of the series) on RTL8125A, where
+MMD register access for the integrated 2.5G PHY isn't supported?
 
-> At
-> this point in its lifetime, eBPF had far more examples of real world
-> use cases publically available. That being said, there's nothing
-> unique about P4 supporting the network calculator. We could just as
-> easily write this in eBPF (either plain C or P4)  and "offload" it to
-> an ARM core on a SmartNIC.
+>  		.read_status	= rtl822x_read_status,
+>  		.suspend	= genphy_suspend,
+>  		.resume		= rtlgen_resume,
+> @@ -988,6 +1077,7 @@ static struct phy_driver realtek_drvs[] = {
+>  		.name		= "RTL8226B_RTL8221B 2.5Gbps PHY",
+>  		.get_features	= rtl822x_get_features,
+>  		.config_aneg	= rtl822x_config_aneg,
+> +		.config_init    = rtl822x_config_init,
+>  		.read_status	= rtl822x_read_status,
+>  		.suspend	= genphy_suspend,
+>  		.resume		= rtlgen_resume,
+> @@ -1000,6 +1090,7 @@ static struct phy_driver realtek_drvs[] = {
+>  		.name           = "RTL8226-CG 2.5Gbps PHY",
+>  		.get_features   = rtl822x_get_features,
+>  		.config_aneg    = rtl822x_config_aneg,
+> +		.config_init    = rtl822x_config_init,
+>  		.read_status    = rtl822x_read_status,
+>  		.suspend        = genphy_suspend,
+>  		.resume         = rtlgen_resume,
+> @@ -1010,6 +1101,7 @@ static struct phy_driver realtek_drvs[] = {
+>  		.name           = "RTL8226B-CG_RTL8221B-CG 2.5Gbps PHY",
+>  		.get_features   = rtl822x_get_features,
+>  		.config_aneg    = rtl822x_config_aneg,
+> +		.config_init    = rtl822x_config_init,
+>  		.read_status    = rtl822x_read_status,
+>  		.suspend        = genphy_suspend,
+>  		.resume         = rtlgen_resume,
+> @@ -1019,6 +1111,7 @@ static struct phy_driver realtek_drvs[] = {
+>  		PHY_ID_MATCH_EXACT(0x001cc849),
+>  		.name           = "RTL8221B-VB-CG 2.5Gbps PHY",
+>  		.get_features   = rtl822x_get_features,
+> +		.config_init    = rtl822x_config_init,
+>  		.config_aneg    = rtl822x_config_aneg,
+>  		.read_status    = rtl822x_read_status,
+>  		.suspend        = genphy_suspend,
+> @@ -1030,6 +1123,7 @@ static struct phy_driver realtek_drvs[] = {
+>  		.name           = "RTL8221B-VM-CG 2.5Gbps PHY",
+>  		.get_features   = rtl822x_get_features,
+>  		.config_aneg    = rtl822x_config_aneg,
+> +		.config_init    = rtl822x_config_init,
+>  		.read_status    = rtl822x_read_status,
+>  		.suspend        = genphy_suspend,
+>  		.resume         = rtlgen_resume,
+> @@ -1040,6 +1134,7 @@ static struct phy_driver realtek_drvs[] = {
+>  		.name           = "RTL8251B 5Gbps PHY",
+>  		.get_features   = rtl822x_get_features,
+>  		.config_aneg    = rtl822x_config_aneg,
+> +		.config_init    = rtl822x_config_init,
+>  		.read_status    = rtl822x_read_status,
+>  		.suspend        = genphy_suspend,
+>  		.resume         = rtlgen_resume,
 
-With current port speeds hitting 800gbps you want to use Arm cores as
-your offload engine?;-> Running the generated ebpf on the arm core is
-a valid P4 target.  i.e there is no contradiction.
-Note: P4 is a DSL specialized for datapath definition; it is not a
-competition to ebpf, two different worlds. I see ebpf as an
-infrastructure tool, nothing more.
-
-> If we are going to support programmable device offload in the Linux
-> kernel then I maintain it should be a generic mechanism that's
-> agnostic to *both* the frontend programming language as well as the
-> backend target. For frontend languages we want to let the user program
-> in a language that's convenient for *them*, which honestly in most
-> cases isn't going to be a narrow use case DSL (i.e. typically users
-> want to code in C/C++, Python, Rust, etc.).
-
-You and I have never agreed philosophically on this point, ever.
-Developers are expensive and not economically scalable. IOW, In the
-era of automation (generative AI, etc) tooling is king. Let's build
-the right tooling. Whenever you make this statement  i get the vision
-of Steve Balmer ranting on the stage with "developers! developers!
-developers!" but that was eons ago. To use your strong view: Learn
-compilers! And the future is probably to replace compilers with AI.
-
-> For the backend it's the
-> same story, maybe we're compiling to run in host, maybe we're
-> offloading to P4 runtime, maybe we're offloading to another CPU, maybe
-> we're offloading some other programmable NPU. The only real
-> requirement is a compiler that can take the frontend code and compile
-> for the desired backend target, but above all we want this to be easy
-> for the programmer, the compiler needs to do the heavy lifting and we
-> should never require the user to understand the nuances of a target.
->
-
-Agreed, it is possible to use other languages in the frontend. It is
-also possible to extend P4.
-
-> IMO, the model we want for programmable kernel offload is "write once,
-> run anywhere, run well". Which is the Java tagline amended with "run
-> well". Users write one program for their datapath processing, it runs
-> on various targets, for any given target we run to run at the highest
-> performance levels possible given the target's capabilities.
->
-
-I would like to emphasize: Our target is P4 - vendors have put out
-hardware, people are deploying and evolving things. It is real today
-with deployments, not some science project. I am not arguing you cant
-do what you suggested but we want to initially focus on P4. Neither am
-i saying we cant influence P4 to be more Linux friendly. But none of
-that matters. We are only concerned about P4.
-
-cheers,
-jamal
-
-
-
-> Tom
->
-> >
-> > cheers,
-> > jamal
 
