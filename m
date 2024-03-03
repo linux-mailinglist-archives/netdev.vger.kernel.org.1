@@ -1,342 +1,241 @@
-Return-Path: <netdev+bounces-76916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C897486F660
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 18:21:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C8D586F66B
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 18:29:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 559E51F21065
-	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 17:21:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C131B20D2B
+	for <lists+netdev@lfdr.de>; Sun,  3 Mar 2024 17:29:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00BF76404;
-	Sun,  3 Mar 2024 17:21:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E12E76409;
+	Sun,  3 Mar 2024 17:29:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="3LjEZsVF"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pdUS7eCf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1EA141A8F
-	for <netdev@vger.kernel.org>; Sun,  3 Mar 2024 17:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1399DBA5F;
+	Sun,  3 Mar 2024 17:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709486469; cv=none; b=M3gJLbFCm1Any4/mMhWjsbEMUhRIeBIvp/nMWS1iU6Ws8CkLHRDaSZ9Nf29aJQK5+yBPv+E+U6QlZL/SOAJBdBaZeR7erMBSTf5GpfIY+VYWHmJrIolYOdqIOLHfLoEOnpxgN/j/eB9fg64Y+ohsqtgpcydwnJxCm5+47UkSwwA=
+	t=1709486956; cv=none; b=KOzeAeSV51ShsmcG2mUXxncCjlPILyKaibB01nv95lvpw6Glm1ejkj5+uDOAMbM255xQTfYnclBKLJXn7DVp/l6Nvpu5jhPE02Mkb7EClfP9vq67pQTogFdNz/dai8wVcQy8z5eik8akvJ8wKKDzPS7MmdaRLeq/iGbPT56o3D8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709486469; c=relaxed/simple;
-	bh=3I5eHzNvs4mp3G5PvpZWA4dPskcB1XImYHUKR6coKcU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aoALp/VjgJn9UDulP2B2wSKM/BMx2+7gIB1//99c6A2fmBJUE+DRjCegxu4EU4BXFfkZivQ+fznzwi0AC54sMI8ysOwv5Heb1l7kcwm2igT96XI7HGOJW9j2D1UBjcJNf9SPa1autyvfPDkh7VANHQsQcccO8HaSkRTAM1zrw78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=3LjEZsVF; arc=none smtp.client-ip=209.85.219.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-dcc80d6004bso3501098276.0
-        for <netdev@vger.kernel.org>; Sun, 03 Mar 2024 09:21:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1709486467; x=1710091267; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DGwyFCcgFqUluy+v1CeMldZr8oP4azn0JVySazjdIXo=;
-        b=3LjEZsVFwgZXPj9EPi3SmH2HHDALjJNmVuNA9yW66aVSE6Lvar1kAzltVZfzgNYG2a
-         sZXjTGUU/w7crgI8xI8Pya4qQXyneHQ71JfawziBZt/SsF8ijccM2WpHVZ62cTyjxFER
-         dmyiY225NdYDX/h0xljWbkwkW6NPN1g+IdQJVxpkIMDrExs9SV/T4kKm1L4VzPd4RvoZ
-         mCn0SW/Ta5EYN6cTXgJQddtigasPjCDxuywlxH0DsoiCo0rRA+owWfQiiSeqJaKENp0r
-         rEZpE9ZHccpDG6UwAAuUe1dguFUJZK/itSYAL3oU7uhbhQWPGLWGCUrzoX1j6ShdDE7V
-         hdRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709486467; x=1710091267;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DGwyFCcgFqUluy+v1CeMldZr8oP4azn0JVySazjdIXo=;
-        b=dG5iS1iJs9f/zbBvjwaLynJR4xJ/teaWEximSP6Auv3uNmIjRLtAwPgByc04Amb2ma
-         UmOyY+JoJb+h9I0hOQdJ5xXRPuZQUS/QYTTDNZR72WgQBlSQ4bTvJ/P/Zgvba9IUhUsW
-         jxwQKjGpc20nqMbY1/gbomJ90a308IL9CeDTk5u00TG+352UmmtncufyGmb2GT/SjM2q
-         PQ2EZMPAefJBXx33Tl2FJOCLYYSDghFzzqDFmpUYh3sfwDiPLM7H32HcnwEBF5TJyuD3
-         X5sA4pkxXKzwoOHUaLzN8GOvNdPdAFxiRrFqNen60g1T8133ZD9zCkA29UlJXOoBxrq/
-         5DbA==
-X-Forwarded-Encrypted: i=1; AJvYcCWZmOxZepWOcSbDdXZRYfVsVGfRagU1dmOUC0+ILX8Xg3b2vrclOcsfAT8KNXAarL3a+I2yy5CXJg2Od7rWpoyQWzaHfO8d
-X-Gm-Message-State: AOJu0YyoJgWqKyu2FVazn8zPsRMBlcrTsEAJgFrbjRrD7ID7hGg7nAwA
-	M2vD2wS8eE6h0LbBzFgArIbiY6CJbAHIAjsddayguIHWrXjlZuMlR2tL9hWcNNxlI1dwN+r+Kbu
-	3kwas1e+WcPTmSz2B8dGnU5e8nTM7jNlV5Bv4
-X-Google-Smtp-Source: AGHT+IFrJbKi3wbybsPj9iV9rVozN47QBHzP+s1a3tSSpObkqdCAqEO8WvmOkw1Mr0SF+UzrftVaM06VDi4hLkmHxBk=
-X-Received: by 2002:a05:6902:2201:b0:dcb:fb49:cb96 with SMTP id
- dm1-20020a056902220100b00dcbfb49cb96mr6195435ybb.31.1709486466754; Sun, 03
- Mar 2024 09:21:06 -0800 (PST)
+	s=arc-20240116; t=1709486956; c=relaxed/simple;
+	bh=rnYw+AOo8cpE6gLKNrgHSIclcBJojMCpzxczKpn2Y0k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nEfbq3KmQnqmWRxmoe91ew0mFhFNtIyV89GdlnsikP7Y3PtOAsaiF10F4FcYNSNx1POHEVB/Gf1wB6Tl+CahYRqxIR+BoOuN/l818h2qSdyboD2JXWA3NqhssIFyAOY/UH9FtyjjXrvMIVTacjXzyM4cVbaUflcZjawBHX3aH18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pdUS7eCf; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=eTGSsx2NfF37A4LhU0Ufa0dc3CdGXwjkN6RA+oF6vbw=; b=pdUS7eCfDQfBdVBXU4exTVoJTt
+	nZqV8wTfpD9weOVo5rxwA5taqmgWYFcbgnqfCOkqj8R4Bzvg4FwfX7uLxu2A4x0AvhBAbvqCstDI1
+	U0mc4/Ub4nDDF2ME3i73HrOEfDD6KaWvrzMTSVTd5Ty+qN7LIniucypq3D6kINA7wJIE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rgpeK-009F8A-Dv; Sun, 03 Mar 2024 18:29:20 +0100
+Date: Sun, 3 Mar 2024 18:29:20 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Lucien Jheng <lucien.jheng@airoha.com>,
+	Zhi-Jun You <hujy652@protonmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 2/2] net: phy: air_en8811h: Add the Airoha
+ EN8811H PHY driver
+Message-ID: <89f237e0-75d4-4690-9d43-903e087e4f46@lunn.ch>
+References: <20240302183835.136036-1-ericwouds@gmail.com>
+ <20240302183835.136036-3-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240225165447.156954-1-jhs@mojatatu.com> <20240225165447.156954-15-jhs@mojatatu.com>
- <9eff9a51-a945-48f6-9d14-a484b7c0d04c@linux.dev> <CAM0EoMniOaKn4W_WN9rmQZ1JY3qCugn34mmqCy9UdCTAj_tuTQ@mail.gmail.com>
- <f88b5f65-957e-4b5d-8959-d16e79372658@linux.dev>
-In-Reply-To: <f88b5f65-957e-4b5d-8959-d16e79372658@linux.dev>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sun, 3 Mar 2024 12:20:55 -0500
-Message-ID: <CAM0EoMk=igKT5ZEwcfdQqP6O3u8tO7VOpkNsWE1b92ia2eZVpw@mail.gmail.com>
-Subject: Re: [PATCH net-next v12 14/15] p4tc: add set of P4TC table kfuncs
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
-	Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, tomasz.osinski@intel.com, 
-	jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, 
-	horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, daniel@iogearbox.net, 
-	victor@mojatatu.com, pctammela@mojatatu.com, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240302183835.136036-3-ericwouds@gmail.com>
 
-On Sat, Mar 2, 2024 at 8:32=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.d=
-ev> wrote:
->
-> On 3/1/24 4:31 AM, Jamal Hadi Salim wrote:
-> > On Fri, Mar 1, 2024 at 1:53=E2=80=AFAM Martin KaFai Lau <martin.lau@lin=
-ux.dev> wrote:
-> >>
-> >> On 2/25/24 8:54 AM, Jamal Hadi Salim wrote:
-> >>> +struct p4tc_table_entry_act_bpf_params {
-> >>
-> >> Will this struct be extended in the future?
-> >>
-> >>> +     u32 pipeid;
-> >>> +     u32 tblid;
-> >>> +};
-> >>> +
-> >
-> > Not that i can think of. We probably want to have the option to do so
-> > if needed. Do you see any harm if we were to make changes for whatever
-> > reason in the future?
->
-> It will be useful to add an argument named with "__sz" suffix to the kfun=
-c.
-> Take a look at how the kfunc in nf_conntrack_bpf.c is handling the "opts"=
- and
-> "opts__sz" argument in its kfunc.
->
+> +enum {
+> +	AIR_PHY_LED_DUR_BLINK_32M,
+> +	AIR_PHY_LED_DUR_BLINK_64M,
+> +	AIR_PHY_LED_DUR_BLINK_128M,
+> +	AIR_PHY_LED_DUR_BLINK_256M,
+> +	AIR_PHY_LED_DUR_BLINK_512M,
+> +	AIR_PHY_LED_DUR_BLINK_1024M,
 
-Ok, will look.
+DUR meaning duration? It has a blinks on for a little over a
+kilometre? So a wave length of a little over 2 kilometres, or a
+frequency of around 0.0005Hz :-)
 
-> >
-> >>> +struct p4tc_table_entry_create_bpf_params {
-> >>> +     u32 profile_id;
-> >>> +     u32 pipeid;
-> >>> +     u32 tblid;
-> >>> +};
-> >>> +
-> >>
-> >> [ ... ]
-> >>
-> >>> diff --git a/include/net/tc_act/p4tc.h b/include/net/tc_act/p4tc.h
-> >>> index c5256d821..155068de0 100644
-> >>> --- a/include/net/tc_act/p4tc.h
-> >>> +++ b/include/net/tc_act/p4tc.h
-> >>> @@ -13,10 +13,26 @@ struct tcf_p4act_params {
-> >>>        u32 tot_params_sz;
-> >>>    };
-> >>>
-> >>> +#define P4TC_MAX_PARAM_DATA_SIZE 124
-> >>> +
-> >>> +struct p4tc_table_entry_act_bpf {
-> >>> +     u32 act_id;
-> >>> +     u32 hit:1,
-> >>> +         is_default_miss_act:1,
-> >>> +         is_default_hit_act:1;
-> >>> +     u8 params[P4TC_MAX_PARAM_DATA_SIZE];
-> >>> +} __packed;
-> >>> +
-> >>> +struct p4tc_table_entry_act_bpf_kern {
-> >>> +     struct rcu_head rcu;
-> >>> +     struct p4tc_table_entry_act_bpf act_bpf;
-> >>> +};
-> >>> +
-> >>>    struct tcf_p4act {
-> >>>        struct tc_action common;
-> >>>        /* Params IDR reference passed during runtime */
-> >>>        struct tcf_p4act_params __rcu *params;
-> >>> +     struct p4tc_table_entry_act_bpf_kern __rcu *act_bpf;
-> >>>        u32 p_id;
-> >>>        u32 act_id;
-> >>>        struct list_head node;
-> >>> @@ -24,4 +40,39 @@ struct tcf_p4act {
-> >>>
-> >>>    #define to_p4act(a) ((struct tcf_p4act *)a)
-> >>>
-> >>> +static inline struct p4tc_table_entry_act_bpf *
-> >>> +p4tc_table_entry_act_bpf(struct tc_action *action)
-> >>> +{
-> >>> +     struct p4tc_table_entry_act_bpf_kern *act_bpf;
-> >>> +     struct tcf_p4act *p4act =3D to_p4act(action);
-> >>> +
-> >>> +     act_bpf =3D rcu_dereference(p4act->act_bpf);
-> >>> +
-> >>> +     return &act_bpf->act_bpf;
-> >>> +}
-> >>> +
-> >>> +static inline int
-> >>> +p4tc_table_entry_act_bpf_change_flags(struct tc_action *action, u32 =
-hit,
-> >>> +                                   u32 dflt_miss, u32 dflt_hit)
-> >>> +{
-> >>> +     struct p4tc_table_entry_act_bpf_kern *act_bpf, *act_bpf_old;
-> >>> +     struct tcf_p4act *p4act =3D to_p4act(action);
-> >>> +
-> >>> +     act_bpf =3D kzalloc(sizeof(*act_bpf), GFP_KERNEL);
-> >>
-> >>
-> >> [ ... ]
-> >>
-> >>> +__bpf_kfunc static struct p4tc_table_entry_act_bpf *
-> >>> +bpf_p4tc_tbl_read(struct __sk_buff *skb_ctx,
-> >>
-> >> The argument could be "struct sk_buff *skb" instead of __sk_buff. Take=
- a look at
-> >> commit 2f4643934670.
-> >
-> > We'll make that change.
-> >
-> >>
-> >>> +               struct p4tc_table_entry_act_bpf_params *params,
-> >>> +               void *key, const u32 key__sz)
-> >>> +{
-> >>> +     struct sk_buff *skb =3D (struct sk_buff *)skb_ctx;
-> >>> +     struct net *caller_net;
-> >>> +
-> >>> +     caller_net =3D skb->dev ? dev_net(skb->dev) : sock_net(skb->sk)=
-;
-> >>> +
-> >>> +     return __bpf_p4tc_tbl_read(caller_net, params, key, key__sz);
-> >>> +}
-> >>> +
-> >>> +__bpf_kfunc static struct p4tc_table_entry_act_bpf *
-> >>> +xdp_p4tc_tbl_read(struct xdp_md *xdp_ctx,
-> >>> +               struct p4tc_table_entry_act_bpf_params *params,
-> >>> +               void *key, const u32 key__sz)
-> >>> +{
-> >>> +     struct xdp_buff *ctx =3D (struct xdp_buff *)xdp_ctx;
-> >>> +     struct net *caller_net;
-> >>> +
-> >>> +     caller_net =3D dev_net(ctx->rxq->dev);
-> >>> +
-> >>> +     return __bpf_p4tc_tbl_read(caller_net, params, key, key__sz);
-> >>> +}
-> >>> +
-> >>> +static int
-> >>> +__bpf_p4tc_entry_create(struct net *net,
-> >>> +                     struct p4tc_table_entry_create_bpf_params *para=
-ms,
-> >>> +                     void *key, const u32 key__sz,
-> >>> +                     struct p4tc_table_entry_act_bpf *act_bpf)
-> >>> +{
-> >>> +     struct p4tc_table_entry_key *entry_key =3D key;
-> >>> +     struct p4tc_pipeline *pipeline;
-> >>> +     struct p4tc_table *table;
-> >>> +
-> >>> +     if (!params || !key)
-> >>> +             return -EINVAL;
-> >>> +     if (key__sz !=3D P4TC_ENTRY_KEY_SZ_BYTES(entry_key->keysz))
-> >>> +             return -EINVAL;
-> >>> +
-> >>> +     pipeline =3D p4tc_pipeline_find_byid(net, params->pipeid);
-> >>> +     if (!pipeline)
-> >>> +             return -ENOENT;
-> >>> +
-> >>> +     table =3D p4tc_tbl_cache_lookup(net, params->pipeid, params->tb=
-lid);
-> >>> +     if (!table)
-> >>> +             return -ENOENT;
-> >>> +
-> >>> +     if (entry_key->keysz !=3D table->tbl_keysz)
-> >>> +             return -EINVAL;
-> >>> +
-> >>> +     return p4tc_table_entry_create_bpf(pipeline, table, entry_key, =
-act_bpf,
-> >>> +                                        params->profile_id);
-> >>
-> >> My understanding is this kfunc will allocate a "struct
-> >> p4tc_table_entry_act_bpf_kern" object. If the bpf_p4tc_entry_delete() =
-kfunc is
-> >> never called and the bpf prog is unloaded, how the act_bpf object will=
- be
-> >> cleaned up?
-> >>
-> >
-> > The TC code takes care of this. Unloading the bpf prog does not affect
-> > the deletion, it is the TC control side that will take care of it. If
-> > we delete the pipeline otoh then not just this entry but all entries
-> > will be flushed.
->
-> It looks like the "struct p4tc_table_entry_act_bpf_kern" object is alloca=
-ted by
-> the bpf prog through kfunc and will only be useful for the bpf prog but n=
-ot
-> other parts of the kernel. However, if the bpf prog is unloaded, these bp=
-f
-> specific objects will be left over in the kernel until the tc pipeline (w=
-here
-> the act_bpf_kern object resided) is gone.
->
-> It is the expectation on bpf prog (not only tc/xdp bpf prog) about resour=
-ces
-> clean up that these bpf objects will be gone after unloading the bpf prog=
- and
-> unpinning its bpf map.
->
+> +static int __air_buckpbus_reg_write(struct phy_device *phydev,
+> +				    u32 pbus_address, u32 pbus_data,
+> +				    bool set_mode)
+> +{
+> +	int ret;
+> +
+> +	if (set_mode) {
+> +		ret = __phy_write(phydev, AIR_BPBUS_MODE,
+> +				  AIR_BPBUS_MODE_ADDR_FIXED);
+> +		if (ret < 0)
+> +			return ret;
+> +	}
 
-The table (residing on the TC side) could be shared by multiple bpf
-programs. Entries are allocated on the TC side of the fence.
-IOW, the memory is not owned by the bpf prog but rather by pipeline.
-We do have a "whodunnit" field, i.e we keep track of which entity
-added an entry and we are capable of deleting all entries when we
-detect a bpf program being deleted (this would be via deleting the tc
-filter). But my thinking is we should make that a policy decision as
-opposed to something which is default.
+What does set_mode mean?
 
-> [ ... ]
->
-> >>> +BTF_SET8_START(p4tc_kfunc_check_tbl_set_skb)
-> >>
-> >> This soon will be broken with the latest change in bpf-next. It is rep=
-laced by
-> >> BTF_KFUNCS_START. commit a05e90427ef6.
->
-> It has already been included in the latest bpf-next pull-request, so shou=
-ld
-> reach net-next soon.
->
+> +static int en8811h_load_firmware(struct phy_device *phydev)
+> +{
+> +	struct device *dev = &phydev->mdio.dev;
+> +	const struct firmware *fw1, *fw2;
+> +	int ret;
+> +
+> +	ret = request_firmware_direct(&fw1, EN8811H_MD32_DM, dev);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = request_firmware_direct(&fw2, EN8811H_MD32_DSP, dev);
+> +	if (ret < 0)
+> +		goto en8811h_load_firmware_rel1;
+> +
 
-Ok, we'll wait for it.
+How big are these firmwares? This will map the entire contents into
+memory. There is an alternative interface which allows you to get the
+firmware in chunks. I the firmware is big, just getting 4K at a time
+might be better, especially if this is an OpenWRT class device.
 
->> We may need some guidance. How do you see us writing a selftest for this=
-?
->> We have extensive testing on the control side which is netlink (not
->> part of the current series).
+> +static int en8811h_restart_host(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
+> +				     EN8811H_FW_CTRL_1_START);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	return air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
+> +				     EN8811H_FW_CTRL_1_FINISH);
+> +}
 
->There are examples in tools/testing/selftests/bpf, e.g. the test_bpf_nf.c =
-to
->test the kfuncs in nf_conntrack_bpf mentioned above. There are also selfte=
-sts
->doing netlink to setup the test. The bpf/test_progs tries to avoid externa=
-l
->dependency as much as possible, so linking to an extra external library an=
-d
->using an extra tool/binary will be unacceptable.
->and only the bpf/test_progs binary will be run by bpf CI.
->
->The selftest does not have to be complicated. It can exercise the kfunc an=
-d show
->how the new struct (e.g. struct p4tc_table_entry_bpf_*) will be used. Ther=
-e is
->BPF_PROG_RUN for the tc and xdp prog, so should be quite doable.
+What is host in this context?
 
-We will look into it.
+> +static int air_led_hw_control_set(struct phy_device *phydev, u8 index,
+> +				  unsigned long rules)
+> +{
+> +	struct en8811h_priv *priv = phydev->priv;
+> +	u16 on = 0, blink = 0;
+> +	int ret;
+> +
+> +	if (index >= EN8811H_LED_COUNT)
+> +		return -EINVAL;
+> +
+> +	priv->led[index].rules = rules;
+> +
+> +	if (rules & (BIT(TRIGGER_NETDEV_LINK_10)   | BIT(TRIGGER_NETDEV_LINK))) {
+> +		on |= AIR_PHY_LED_ON_LINK10;
+> +		if (rules & BIT(TRIGGER_NETDEV_RX))
+> +			blink |= AIR_PHY_LED_BLINK_10RX;
+> +		if (rules & BIT(TRIGGER_NETDEV_TX))
+> +			blink |= AIR_PHY_LED_BLINK_10TX;
+> +	}
+> +
+> +	if (rules & (BIT(TRIGGER_NETDEV_LINK_100)  | BIT(TRIGGER_NETDEV_LINK))) {
+> +		on |= AIR_PHY_LED_ON_LINK100;
+> +		if (rules & BIT(TRIGGER_NETDEV_RX))
+> +			blink |= AIR_PHY_LED_BLINK_100RX;
+> +		if (rules & BIT(TRIGGER_NETDEV_TX))
+> +			blink |= AIR_PHY_LED_BLINK_100TX;
+> +	}
+> +
+> +	if (rules & (BIT(TRIGGER_NETDEV_LINK_1000) | BIT(TRIGGER_NETDEV_LINK))) {
+> +		on |= AIR_PHY_LED_ON_LINK1000;
+> +		if (rules & BIT(TRIGGER_NETDEV_RX))
+> +			blink |= AIR_PHY_LED_BLINK_1000RX;
+> +		if (rules & BIT(TRIGGER_NETDEV_TX))
+> +			blink |= AIR_PHY_LED_BLINK_1000TX;
+> +	}
+> +
+> +	if (rules & (BIT(TRIGGER_NETDEV_LINK_2500) | BIT(TRIGGER_NETDEV_LINK))) {
+> +		on |= AIR_PHY_LED_ON_LINK2500;
+> +		if (rules & BIT(TRIGGER_NETDEV_RX))
+> +			blink |= AIR_PHY_LED_BLINK_2500RX;
+> +		if (rules & BIT(TRIGGER_NETDEV_TX))
+> +			blink |= AIR_PHY_LED_BLINK_2500TX;
+> +	}
+> +
+> +	if (on == 0) {
+> +		if (rules & BIT(TRIGGER_NETDEV_RX)) {
+> +			blink |= AIR_PHY_LED_BLINK_10RX   |
+> +				 AIR_PHY_LED_BLINK_100RX  |
+> +				 AIR_PHY_LED_BLINK_1000RX |
+> +				 AIR_PHY_LED_BLINK_2500RX;
+> +		}
+> +		if (rules & BIT(TRIGGER_NETDEV_TX)) {
+> +			blink |= AIR_PHY_LED_BLINK_10TX   |
+> +				 AIR_PHY_LED_BLINK_100TX  |
+> +				 AIR_PHY_LED_BLINK_1000TX |
+> +				 AIR_PHY_LED_BLINK_2500TX;
+> +		}
+> +	}
 
-Thanks for your feedback.
+Vendors do like making LED control unique. I've not seen any other MAC
+or PHY where you can blink for activity at a given speed. You cannot
+have 10 and 100 at the same time, so why are there different bits for
+them?
 
-cheers,
-jamal
+I _think_ this can be simplified
+
++	if (rules & (BIT(TRIGGER_NETDEV_LINK_10)   | BIT(TRIGGER_NETDEV_LINK))) {
++		on |= AIR_PHY_LED_ON_LINK10;
++	}
++
++	if (rules & (BIT(TRIGGER_NETDEV_LINK_100)  | BIT(TRIGGER_NETDEV_LINK))) {
++		on |= AIR_PHY_LED_ON_LINK100;
++	}
++
++	if (rules & (BIT(TRIGGER_NETDEV_LINK_1000) | BIT(TRIGGER_NETDEV_LINK))) {
++		on |= AIR_PHY_LED_ON_LINK1000;
++	}
++
++	if (rules & (BIT(TRIGGER_NETDEV_LINK_2500) | BIT(TRIGGER_NETDEV_LINK))) {
++		on |= AIR_PHY_LED_ON_LINK2500;
++	}
++
++	if (rules & BIT(TRIGGER_NETDEV_RX)) {
++		blink |= AIR_PHY_LED_BLINK_10RX   |
++			 AIR_PHY_LED_BLINK_100RX  |
++			 AIR_PHY_LED_BLINK_1000RX |
++			 AIR_PHY_LED_BLINK_2500RX;
++	}
++	if (rules & BIT(TRIGGER_NETDEV_TX)) {
++		blink |= AIR_PHY_LED_BLINK_10TX   |
++			 AIR_PHY_LED_BLINK_100TX  |
++			 AIR_PHY_LED_BLINK_1000TX |
++			 AIR_PHY_LED_BLINK_2500TX;
+
+Does this work?
+
+
+    Andrew
+
+---
+pw-bot: cr
 
