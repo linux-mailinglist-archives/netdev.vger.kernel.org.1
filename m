@@ -1,311 +1,247 @@
-Return-Path: <netdev+bounces-77274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5393A8710FA
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 00:14:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEE08871107
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 00:24:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10EC628221C
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 23:14:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 178011C221C2
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 23:24:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B0F7C6C6;
-	Mon,  4 Mar 2024 23:14:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BAF97C6DB;
+	Mon,  4 Mar 2024 23:24:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a+fzMkMz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rurf5AiR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E0D27B3FA
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 23:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA637C08C
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 23:24:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709594092; cv=none; b=FK2NUXZI2pyUTUCAbTy1JQoZ3WwvNLgXKQDYOhdSXi6FT0rstlohRZd+3wHnYw6wcgWzRVfwyVaYQc5YosaVFApwfnCO9yCT5ch6R903ftCAjbwLgwekxB2UDlldM7JHOzbp+9IFXSBl3vUToSJ4y7p/koFUUmSkvtR4Eo2+ZY0=
+	t=1709594690; cv=none; b=ro9dq76Awsggj/vdFmUADNsHuB0fbPk0ADDp9M9LXspoFZ1jW9BCvijlAZs0C0ynGmsFH3YWUI7/0EhVEhCjsfvAEe7Nd2HKZ3+WYMS/B9Z5HZ619I+9m1803rExpzB6TMJ098lkQc0L31qjo2i+Uwjs96owhS5VJ9fZwWrd1Wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709594092; c=relaxed/simple;
-	bh=VHn4XdOTtPFjTDo31/wfnO57B+jM9iiwHRQdmKptEaU=;
+	s=arc-20240116; t=1709594690; c=relaxed/simple;
+	bh=UWquCOXdSTsI2tChPH6N2GVOeQkfTaMyZ8hrQ1/x5lg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dM+fcFTclAk+qWeCSa1YdQqS0TMh/ytNPBJcyNKiD279+la35b3WkFctZX04FAqVSFrV4I/buYgds8RgyOwjS2ML+yP/5Gfab6TrFx7oPQ3K208DU3CnsZNV9FSKGINo690xbSSu+eZA4U8Nu4UG24XFt7JthDUgqBHf/640qPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a+fzMkMz; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=qr6johZNPhYcDRjpsEkIX/TSMFsu+Fokp4QaKhJI6di7Otl0dDSTGREmMVzNGL3yBfxN9GXN7Js31kOVZ8kUehyGsYpLyfOX6GhfvinPpNdyPowQQKgPzF83ZptEGpvIkuiwYkmGfUB4wOR6ZTcWIdK1BoA4V0dpQWfuYhzyZeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rurf5AiR; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6e5588db705so3801305b3a.1
-        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 15:14:51 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcc05887ee9so6879267276.1
+        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 15:24:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709594090; x=1710198890; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709594687; x=1710199487; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=H2aSDUKapPJ8O+f7PfrUpvwvIiwFtwosW4yjOmWXGQY=;
-        b=a+fzMkMzY5I+iFve3bpuLbRObmF4ALj65Cnx2aaocb7PikbY0WPVnvjyjl9S2s8gUg
-         mn8K/NAsp5iIUIzNgZEFbdcBoihINY/YCnC5xpOF7+pC3lpYaIvog56ptdYV5KQdMgX5
-         NHVrVvlJq5sR8hJhsydyNElAYTR8E0r/y213PLm4R1/teKj7GKvITbTdQqeXj5y46CiD
-         JN3J/NBg+Dy/mlSmxdQPdv2V7ipD5y3KddICQG94JB2J2KkKc0TUQmpTBXg5LlL/2bIW
-         RjLotDTcUVZsL/skk19u10LMZ7fdpTEvvcDGs6sWJzgyCxV05t/PEN0xGCUY9q3i2Hn5
-         Tp4g==
+        bh=UWquCOXdSTsI2tChPH6N2GVOeQkfTaMyZ8hrQ1/x5lg=;
+        b=Rurf5AiRaZCtbMN6pDXOygiOTLjPj/U4qKrrt3SOrqMp5ZJ+NI09Mu4KablOAbqzf8
+         r6VM+GrNUg2DwLOMEIm1lCVHKWyHzNQ0rzj3lxX3K/xnZvSIGceuDn6rqdqGxu9KXFeC
+         IlITuvUKiTxXydBpikri9uS7ICN5tF5JbQEid9Pb8ls4YBO/LZFikL8/gIrY7xnd20lX
+         dog9i9Ub95UsEUlSekXCbg4CCURt7A5tKkd3W0ogFVCqZ6lCjPDJnNh3VnVJb3BWRKeR
+         OX9nqV5Ji6a3EUnc23l1B1Gv9p3M+DlkqZp97FDZJI7Lp53u1ZMhhX11E0TvO2NNGIG9
+         1DeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709594090; x=1710198890;
+        d=1e100.net; s=20230601; t=1709594687; x=1710199487;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=H2aSDUKapPJ8O+f7PfrUpvwvIiwFtwosW4yjOmWXGQY=;
-        b=RrZX69BiPzLi3e8y5xmzRliUTbhfq5oQr7P0ewtY4p3YqhIYMdwoz1te6/pdgiDjfJ
-         jWWk/YOPEVKbQovPIQZl652q7AC0hEJpeEdZeMiby1mnt7Uk0WQbElAaQKnlRBbA3etW
-         flPGNlqsXk++SIg3d7TYiEHdZKSHeKcA5Dxrf+g0d+78AvDTz0deKmHiYevQ0T5WXosp
-         NicaRqaGQOwfYQJP+o+xDttcUwvrIFMlxM57verwuVQs6rIkza+B0rV+z5A3QAHa18XE
-         QrDGCtY3ch4HVPHFTNM31egpwXZgw3xSw7fIoR43XBQRqS1d+alWVHNK2kLzQ91bn7qp
-         Y3aA==
-X-Forwarded-Encrypted: i=1; AJvYcCUzGqGrhkU0eNm/3g4+aimFGSuOTnOZHvs+DU8QYLXa2wweYUB/kBIdUphBg4Ba4OviQyiGhweFsScn/wgh+yiOJkCECXBg
-X-Gm-Message-State: AOJu0YwojtCFQFoPSRCSh8oPKtSwHozM+E2KSduDRf6q2LfHw7ggB8aa
-	YzFPXqeGS+tdfa+YLd+dOHbH07dukayIz0ysUWVmj2aRJ1UNhrVVggOTvW0GuVofpw==
-X-Google-Smtp-Source: AGHT+IGSE5jvKHhH+ixh6V1SQqQZE9dvPJ/J71kAoOxY7d1Ge9z9L4mxDozj5xfXfpfPxDndToC2HOs=
+        bh=UWquCOXdSTsI2tChPH6N2GVOeQkfTaMyZ8hrQ1/x5lg=;
+        b=n1QO6Y9NZHk8W6tdubyiI2oxC2/ns6lNkdP/bYqCoXcKu7Mvx8V7njoPqaJ5NgIjA2
+         i1cNqXfl1JKiV1FoNgzHJuUmHs/NcVRdTlhxSBWfe7GAIJl8KOf+vYtKg1SL2x48ViL7
+         yHuBH3VLHGwZ4sRepmwBUg4TpDKE4e8j0v0fNYxqXLUaCtnRdBCKVNUGR4ykttx/Bt+I
+         1OI9Lp8KUgHkUqvVO4TF5tG8SOPRAZMbzYnsFWSdNK38gu10Og3nk4fZRyzdghWCjgMl
+         YO/aOBDJHhBrZboqAE41+5CAFn4JccROTBrXQDLYFjSXqi2c+FyMJTM2ItmrJwaHNGu2
+         kXwg==
+X-Forwarded-Encrypted: i=1; AJvYcCVRb0Mbbmd9xq0N8HvIHv4ACPz3+l28yfyMj/4xYHGtHO+MSIQuTWuPgOF4gGnLg9+er/dl55rVWAxupg3JpJceYWxSvR1R
+X-Gm-Message-State: AOJu0YzbU65nJbvCvSq2+Yl5ClowaZkxj3lBK00v2Jq1jnAir/k4OUC0
+	qMSo6TIuFqpULDXyraLpa07hjJ0GpP8AAQdYJs1i+hRUqcFQTrzZTpfSbyyluiJhIg==
+X-Google-Smtp-Source: AGHT+IFJ6PJ8CB8/mMToVcJTohliDzBtwWcLZfG57Uh0k4NZFAPwz+WFaEDePKFqlcRrLFTjzIsV91w=
 X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a05:6a00:2d1a:b0:6e5:118:33cf with SMTP id
- fa26-20020a056a002d1a00b006e5011833cfmr52137pfb.2.1709594090486; Mon, 04 Mar
- 2024 15:14:50 -0800 (PST)
-Date: Mon, 4 Mar 2024 15:14:49 -0800
-In-Reply-To: <CAM0EoM=G6s-eZa2tfTdPMYufmSXTE_EBXAEgfkU84p0bRi95sQ@mail.gmail.com>
+ (user=sdf job=sendgmr) by 2002:a05:6902:70d:b0:dc6:c94e:fb85 with SMTP id
+ k13-20020a056902070d00b00dc6c94efb85mr362801ybt.2.1709594687281; Mon, 04 Mar
+ 2024 15:24:47 -0800 (PST)
+Date: Mon, 4 Mar 2024 15:24:45 -0800
+In-Reply-To: <CAOuuhY8ieZav-Bgmn5x9OqYGnG4jQgVBhpsz5mz_iBoCZLgs_A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <CAM0EoM=NEB25naGtz=YaOt6BDoiv4RpDw27Y=btMZAMGeYB5bg@mail.gmail.com>
- <CAM0EoM=8GG-zCaopaUDMkvqemrZQUtaVRTMrWA6z=xrdYxG9+g@mail.gmail.com>
- <20240302192747.371684fb@kernel.org> <CAM0EoMncuPvUsRwE+Ajojgg-8JD+1oJ7j2Rw+7oN60MjjAHV-g@mail.gmail.com>
- <CAOuuhY8pgxqCg5uTXzetTt5sd8RzOfLPYF8ksLjoUhkKyqr56w@mail.gmail.com>
- <CAM0EoMnpZuC_fdzXj5+seXo3GT9rrf1txc45tB=gie4cf-Zqeg@mail.gmail.com>
- <ZeY7TqCGFR3h36k-@google.com> <CAM0EoM=b6ymCEKs14ACanbkzscy=AdARYHSWprtexHBswD7xeg@mail.gmail.com>
- <ZeZJxzRs5ayQ03ii@google.com> <CAM0EoM=G6s-eZa2tfTdPMYufmSXTE_EBXAEgfkU84p0bRi95sQ@mail.gmail.com>
-Message-ID: <ZeZV6UE-Zf5XzTQr@google.com>
-Subject: Re: Hardware Offload discussion WAS(Re: [PATCH net-next v12 00/15]
- Introducing P4TC (series 1)
+References: <CAM0EoM=r1UDnkp-csPdrz6nBt7o3fHUncXKnO7tB_rcZAcbrDg@mail.gmail.com>
+ <CAOuuhY8qbsYCjdUYUZv8J3jz8HGXmtxLmTDP6LKgN5uRVZwMnQ@mail.gmail.com>
+ <20240301090020.7c9ebc1d@kernel.org> <CAM0EoM=-hzSNxOegHqhAQD7qoAR2CS3Dyh-chRB+H7C7TQzmow@mail.gmail.com>
+ <20240301173214.3d95e22b@kernel.org> <CAOuuhY8fnpEEBb8z-1mQmvHtfZQwgQnXk3=op-Xk108Pts8ohA@mail.gmail.com>
+ <20240302191530.22353670@kernel.org> <CAOuuhY_senZbdC2cVU9kfDww_bT+a_VkNaDJYRk4_fMbJW17sQ@mail.gmail.com>
+ <ZeY6r9cm4pdW9WNC@google.com> <CAOuuhY8ieZav-Bgmn5x9OqYGnG4jQgVBhpsz5mz_iBoCZLgs_A@mail.gmail.com>
+Message-ID: <ZeZYPWecammoABY0@google.com>
+Subject: Re: [PATCH net-next v12 00/15] Introducing P4TC (series 1)
 From: Stanislav Fomichev <sdf@google.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Tom Herbert <tom@sipanda.io>, Jakub Kicinski <kuba@kernel.org>, 
+To: Tom Herbert <tom@sipanda.io>
+Cc: Jakub Kicinski <kuba@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
 	John Fastabend <john.fastabend@gmail.com>, anjali.singhai@intel.com, 
 	Paolo Abeni <pabeni@redhat.com>, 
 	Linux Kernel Network Developers <netdev@vger.kernel.org>, deb.chatterjee@intel.com, namrata.limaye@intel.com, 
-	Marcelo Ricardo Leitner <mleitner@redhat.com>, Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, 
+	mleitner@redhat.com, Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, 
 	tomasz.osinski@intel.com, Jiri Pirko <jiri@resnulli.us>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, davem@davemloft.net, 
-	Eric Dumazet <edumazet@google.com>, Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>, 
-	Khalid Manaa <khalidm@nvidia.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, davem@davemloft.net, edumazet@google.com, 
+	Vlad Buslov <vladbu@nvidia.com>, horms@kernel.org, khalidm@nvidia.com, 
 	"Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?=" <toke@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>, 
 	Victor Nogueira <victor@mojatatu.com>, pctammela@mojatatu.com, dan.daly@intel.com, 
-	Andy Fingerhut <andy.fingerhut@gmail.com>, chris.sommers@keysight.com, 
-	Matty Kadosh <mattyk@nvidia.com>, bpf <bpf@vger.kernel.org>
+	andy.fingerhut@gmail.com, chris.sommers@keysight.com, mattyk@nvidia.com, 
+	bpf@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 03/04, Jamal Hadi Salim wrote:
-> On Mon, Mar 4, 2024 at 5:23=E2=80=AFPM Stanislav Fomichev <sdf@google.com=
+On 03/04, Tom Herbert wrote:
+> On Mon, Mar 4, 2024 at 1:19=E2=80=AFPM Stanislav Fomichev <sdf@google.com=
 > wrote:
 > >
-> > On 03/04, Jamal Hadi Salim wrote:
-> > > On Mon, Mar 4, 2024 at 4:23=E2=80=AFPM Stanislav Fomichev <sdf@google=
-.com> wrote:
+> > On 03/03, Tom Herbert wrote:
+> > > On Sat, Mar 2, 2024 at 7:15=E2=80=AFPM Jakub Kicinski <kuba@kernel.or=
+g> wrote:
 > > > >
-> > > > On 03/03, Jamal Hadi Salim wrote:
-> > > > > On Sun, Mar 3, 2024 at 1:11=E2=80=AFPM Tom Herbert <tom@sipanda.i=
-o> wrote:
-> > > > > >
-> > > > > > On Sun, Mar 3, 2024 at 9:00=E2=80=AFAM Jamal Hadi Salim <jhs@mo=
-jatatu.com> wrote:
-> > > > > > >
-> > > > > > > On Sat, Mar 2, 2024 at 10:27=E2=80=AFPM Jakub Kicinski <kuba@=
-kernel.org> wrote:
-> > > > > > > >
-> > > > > > > > On Sat, 2 Mar 2024 09:36:53 -0500 Jamal Hadi Salim wrote:
-> > > > > > > > > 2) Your point on:  "integrate later", or at least "fill i=
-n the gaps"
-> > > > > > > > > This part i am probably going to mumble on. I am going to=
- consider
-> > > > > > > > > more than just doing ACLs/MAT via flower/u32 for the sake=
- of
-> > > > > > > > > discussion.
-> > > > > > > > > True, "fill the gaps" has been our model so far. It requi=
-res kernel
-> > > > > > > > > changes, user space code changes etc justifiably so becau=
-se most of
-> > > > > > > > > the time such datapaths are subject to standardization vi=
-a IETF, IEEE,
-> > > > > > > > > etc and new extensions come in on a regular basis.  And s=
-ometimes we
-> > > > > > > > > do add features that one or two users or a single vendor =
-has need for
-> > > > > > > > > at the cost of kernel and user/control extension. Given o=
-ur work
-> > > > > > > > > process, any features added this way take a long time to =
-make it to
-> > > > > > > > > the end user.
-> > > > > > > >
-> > > > > > > > What I had in mind was more of a DDP model. The device load=
-s it binary
-> > > > > > > > blob FW in whatever way it does, then it tells the kernel i=
-ts parser
-> > > > > > > > graph, and tables. The kernel exposes those tables to user =
-space.
-> > > > > > > > All dynamic, no need to change the kernel for each new prot=
-ocol.
-> > > > > > > >
-> > > > > > > > But that's different in two ways:
-> > > > > > > >  1. the device tells kernel the tables, no "dynamic reprogr=
-amming"
-> > > > > > > >  2. you don't need the SW side, the only use of the API is =
-to interact
-> > > > > > > >     with the device
-> > > > > > > >
-> > > > > > > > User can still do BPF kfuncs to look up in the tables (like=
- in FIB),
-> > > > > > > > but call them from cls_bpf.
-> > > > > > > >
-> > > > > > >
-> > > > > > > This is not far off from what is envisioned today in the disc=
-ussions.
-> > > > > > > The main issue is who loads the binary? We went from devlink =
-to the
-> > > > > > > filter doing the loading. DDP is ethtool. We still need to ti=
-e a PCI
-> > > > > > > device/tc block to the "program" so we can do skip_sw and it =
-works.
-> > > > > > > Meaning a device that is capable of handling multiple program=
-s can
-> > > > > > > have multiple blobs loaded. A "program" is mapped to a tc fil=
-ter and
-> > > > > > > MAT control works the same way as it does today (netlink/tc n=
-do).
-> > > > > > >
-> > > > > > > A program in P4 has a name, ID and people have been suggestin=
-g a sha1
-> > > > > > > identity (or a signature of some kind should be generated by =
-the
-> > > > > > > compiler). So the upward propagation could be tied to discove=
-ring
-> > > > > > > these 3 tuples from the driver. Then the control plane target=
-s a
-> > > > > > > program via those tuples via netlink (as we do currently).
-> > > > > > >
-> > > > > > > I do note, using the DDP sample space, currently whatever get=
-s loaded
-> > > > > > > is "trusted" and really you need to have human knowledge of w=
-hat the
-> > > > > > > NIC's parsing + MAT is to send the control. With P4 that is a=
-ll
-> > > > > > > visible/programmable by the end user (i am not a proponent of=
- vendors
-> > > > > > > "shipping" things or calling them for support) - so should be
-> > > > > > > sufficient to just discover what is in the binary and send th=
-e correct
-> > > > > > > control messages down.
-> > > > > > >
-> > > > > > > > I think in P4 terms that may be something more akin to only=
- providing
-> > > > > > > > the runtime API? I seem to recall they had some distinction=
-...
-> > > > > > >
-> > > > > > > There are several solutions out there (ex: TDI, P4runtime) - =
-our API
-> > > > > > > is netlink and those could be written on top of netlink, ther=
-e's no
-> > > > > > > controversy there.
-> > > > > > > So the starting point is defining the datapath using P4, gene=
-rating
-> > > > > > > the binary blob and whatever constraints needed using the ven=
-dor
-> > > > > > > backend and for s/w equivalent generating the eBPF datapath.
-> > > > > > >
-> > > > > > > > > At the cost of this sounding controversial, i am going
-> > > > > > > > > to call things like fdb, fib, etc which have fixed datapa=
-ths in the
-> > > > > > > > > kernel "legacy". These "legacy" datapaths almost all the =
-time have
-> > > > > > > >
-> > > > > > > > The cynic in me sometimes thinks that the biggest problem w=
-ith "legacy"
-> > > > > > > > protocols is that it's hard to make money on them :)
-> > > > > > >
-> > > > > > > That's a big motivation without a doubt, but also there are p=
-eople
-> > > > > > > that want to experiment with things. One of the craziest exam=
-ples we
-> > > > > > > have is someone who created a P4 program for "in network calc=
-ulator",
-> > > > > > > essentially a calculator in the datapath. You send it two ope=
-rands and
-> > > > > > > an operator using custom headers, it does the math and respon=
-ds with a
-> > > > > > > result in a new header. By itself this program is a toy but i=
-t
-> > > > > > > demonstrates that if one wanted to, they could have something=
- custom
-> > > > > > > in hardware and/or kernel datapath.
-> > > > > >
-> > > > > > Jamal,
-> > > > > >
-> > > > > > Given how long P4 has been around it's surprising that the best
-> > > > > > publicly available code example is "the network calculator" toy=
-.
+> > > > On Fri, 1 Mar 2024 18:20:36 -0800 Tom Herbert wrote:
+> > > > > This is configurability versus programmability. The table driven
+> > > > > approach as input (configurability) might work fine for generic
+> > > > > match-action tables up to the point that tables are expressive en=
+ough
+> > > > > to satisfy the requirements. But parsing doesn't fall into the ta=
+ble
+> > > > > driven paradigm: parsers want to be *programmed*. This is why we
+> > > > > removed kParser from this patch set and fell back to eBPF for par=
+sing.
+> > > > > But the problem we quickly hit that eBPF is not offloadable to ne=
+twork
+> > > > > devices, for example when we compile P4 in an eBPF parser we've l=
+ost
+> > > > > the declarative representation that parsers in the devices could
+> > > > > consume (they're not CPUs running eBPF).
 > > > > >
-> > > > > Come on Tom ;-> That was just an example of something "crazy" to
-> > > > > demonstrate freedom. I can run that in any of the P4 friendly NIC=
-s
-> > > > > today. You are probably being facetious - There are some serious
-> > > > > publicly available projects out there, some of which I quote on t=
+> > > > > I think the key here is what we mean by kernel offload. When we d=
+o
+> > > > > kernel offload, is it the kernel implementation or the kernel
+> > > > > functionality that's being offloaded? If it's the latter then we =
+have
+> > > > > a lot more flexibility. What we'd need is a safe and secure way t=
+o
+> > > > > synchronize with that offload device that precisely supports the
+> > > > > kernel functionality we'd like to offload. This can be done if bo=
+th
+> > > > > the kernel bits and programmed offload are derived from the same
+> > > > > source (i.e. tag source code with a sha-1). For example, if someo=
+ne
+> > > > > writes a parser in P4, we can compile that into both eBPF and a P=
+4
+> > > > > backend using independent tool chains and program download. At
+> > > > > runtime, the kernel can safely offload the functionality of the e=
+BPF
+> > > > > parser to the device if it matches the hash to that reported by t=
 he
-> > > > > cover letter (like DASH).
+> > > > > device
 > > > >
-> > > > Shameless plug. I have a more crazy example with bpf:
-> > > >
-> > > > https://github.com/fomichev/xdp-btc-miner
-> > > >
+> > > > Good points. If I understand you correctly you're saying that parse=
+rs
+> > > > are more complex than just a basic parsing tree a'la u32.
 > > >
-> > > Hrm - this looks crazy interesting;-> Tempting. I guess to port this
-> > > to P4 we'd need the sha256 in h/w (which most of these vendors have
-> > > already). Is there any other acceleration would you need? Would have
-> > > been more fun if you invented you own headers too ;->
+> > > Yes. Parsing things like TLVs, GRE flag field, or nested protobufs
+> > > isn't conducive to u32. We also want the advantages of compiler
+> > > optimizations to unroll loops, squash nodes in the parse graph, etc.
+> > >
+> > > > Then we can take this argument further. P4 has grown to encompass a=
+ lot
+> > > > of functionality of quite complex devices. How do we square that wi=
+th
+> > > > the kernel functionality offload model. If the entire device is mod=
+eled,
+> > > > including f.e. TSO, an offload would mean that the user has to writ=
+e
+> > > > a TSO implementation which they then load into TC? That seems odd.
+> > > >
+> > > > IOW I don't quite know how to square in my head the "total
+> > > > functionality" with being a TC-based "plugin".
+> > >
+> > > Hi Jakub,
+> > >
+> > > I believe the solution is to replace kernel code with eBPF in cases
+> > > where we need programmability. This effectively means that we would
+> > > ship eBPF code as part of the kernel. So in the case of TSO, the
+> > > kernel would include a standard implementation in eBPF that could be
+> > > compiled into the kernel by default. The restricted C source code is
+> > > tagged with a hash, so if someone wants to offload TSO they could
+> > > compile the source into their target and retain the hash. At runtime
+> > > it's a matter of querying the driver to see if the device supports th=
+e
+> > > TSO program the kernel is running by comparing hash values. Scaling
+> > > this, a device could support a catalogue of programs: TSO, LRO,
+> > > parser, IPtables, etc., If the kernel can match the hash of its eBPF
+> > > code to one reported by the driver then it can assume functionality i=
+s
+> > > offloadable. This is an elaboration of "device features", but instead
+> > > of the device telling us they think they support an adequate GRO
+> > > implementation by reporting NETIF_F_GRO, the device would tell the
+> > > kernel that they not only support GRO but they provide identical
+> > > functionality of the kernel GRO (which IMO is the first requirement o=
+f
+> > > kernel offload).
+> > >
+> > > Even before considering hardware offload, I think this approach
+> > > addresses a more fundamental problem to make the kernel programmable.
+> > > Since the code is in eBPF, the kernel can be reprogrammed at runtime
+> > > which could be controlled by TC. This allows local customization of
+> > > kernel features, but also is the simplest way to "patch" the kernel
+> > > with security and bug fixes (nobody is ever excited to do a kernel
 > >
-> > Yeah, some way to do sha256(sha256(at_some_fixed_packet_offset + 80 byt=
-es))
+> > [..]
+> >
+> > > rebase in their datacenter!). Flow dissector is a prime candidate for
+> > > this, and I am still planning to replace it with an all eBPF program
+> > > (https://netdevconf.info/0x15/slides/16/Flow%20dissector_PANDA%20pars=
+er.pdf).
+> >
+> > So you're suggesting to bundle (and extend)
+> > tools/testing/selftests/bpf/progs/bpf_flow.c? We were thinking along
+> > similar lines here. We load this program manually right now, shipping
+> > and autoloading with the kernel will be easer.
 >=20
-> This part is straight forward.
+> Hi Stanislav,
 >=20
-> > is one thing. And the other is some way to compare that sha256 vs some
-> > hard-coded (difficulty) number (as a 256-byte uint).
+> Yes, I envision that we would have a standard implementation of
+> flow-dissector in eBPF that is shipped with the kernel and autoloaded.
+> However, for the front end source I want to move away from imperative
+> code. As I mentioned in the presentation flow_dissector.c is spaghetti
+> code and has been prone to bugs over the years especially whenever
+> someone adds support for a new fringe protocol (I take the liberty to
+> call it spaghetti code since I'm partially responsible for creating
+> this mess ;-) ).
 >=20
-> The compiler may have issues with this comparison - will have to look
-> (I am pretty sure it's fixable though).
+> The problem is that parsers are much better represented by a
+> declarative rather than an imperative representation. To that end, we
+> defined PANDA which allows constructing a parser (parse graph) in data
+> structures in C. We use the "PANDA parser" to compile C to restricted
+> C code which looks more like eBPF in imperative code. With this method
+> we abstract out all the bookkeeping that was often the source of bugs
+> (like pulling up skbufs, checking length limits, etc.). The other
+> advantage is that we're able to find a lot more optimizations if we
+> start with a right representation of the problem.
 >=20
->=20
-> >  But I have no
-> > clue how well that maps into declarative p4 language. Most likely
-> > possible if you're saying that the calculator is possible?
->=20
-> The calculator basically is written as a set of match-action tables.
-> You parse your header, construct a key based on the operator field of
-> the header (eg "+"),  invoke an action which takes the operands from
-> the headers(eg "1" and "2"), the action returns you results(3"). You
-> stash the result in a new packet and send it back to the source.
->=20
-> So my thinking is the computation you need would be modelled on an action=
-.
->=20
-> > I'm assuming that even sha256 can possibly be implemented in p4 without
-> > any extra support from the vendor? It's just a bunch of xors and
-> > rotations over a fix-sized input buffer.
+> If you're interested, the video presentation on this is in
+> https://www.youtube.com/watch?v=3DzVnmVDSEoXc.
 
-[..]
+Oh, yeah, I've seen this one. Agreed that the C implementation is not
+pleasant and generating a parser from some declarative spec is a better
+idea.
 
-> True,  and I think those would be fast. But if the h/w offers it as an
-> interface why not.
-> It's not that you are running out of instruction space - and my memory
-> is hazy - but iirc, there is sha256 support in the kernel Crypto API -
-> does it not make sense to kfunc into that?
-
-Oh yeah, that's definitely a better path if somebody were do to it
-"properly". It's still fun, though, to see how far we can push
-the bpf vm/verifier without using any extra helpers :-D
+From my pow, the biggest win we get from making bpf flow dissector
+pluggable is the fact that we can now actually write some tests for it
+(and, maybe, fuzz it?). We should also probably spend more time properly
+defining the behavior of the existing C implementation. We've seen
+some interesting bugs like this one:
+https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git/commit/?id=
+=3D9fa02892857ae2b3b699630e5ede28f72106e7e7
 
