@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-77037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9DA886FE35
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:00:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4743086FE36
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:00:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B04A1F21849
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:00:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02614281126
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49ED2224ED;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E1C224FA;
 	Mon,  4 Mar 2024 10:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V2LWzi9L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RhgmQDaW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B3418EAD
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 10:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB7D224EE;
+	Mon,  4 Mar 2024 10:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709546427; cv=none; b=pwm6RxpG/XbSk5PM7mfmqgc+84hlBrkreBxhfpm5opR55GF/1xlyfN07PrhpMJMSiHFYPWX2l9tH4nXTUaZKkuj2y0qgkuAUufNDj0DWi0K2NOFQveup7vVgWo26LagoNPGbztJDZSFqUPSHv1wVOsxMG6JtnpzkrlvrlJAjEZU=
+	t=1709546427; cv=none; b=ntT5YIZiCc8bx9Xk+sCHOOVgy1EjHCjQRjhHtg6mDjmb68ILecyciUD0Qkr5OBFwk3z3k58nQXdZQVFfoPUVLMMjP3ulWxFfw/Ok/vv4tCYdD/92kybXvBkUCqw66wj9RGwjvvDognsyAyWkcM3Hyyl9sF1J3vr69dYLZ7ROdGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709546427; c=relaxed/simple;
-	bh=/QhG5IY3S1+Bsd+z+qb/NvVEHtl9Al8c33eW84Scq6k=;
+	bh=SLyJ9jpZGtOXavO2oR1SCQeOLk04pqT/HIrfnN2FiKk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XlDOCHmjs1JMLedIyTfvTluuYQ0vPYCwnB2y+35hlOqXmVZgySHG0aBXyww9VoWK+QyNevct6utQSKP62lRQGnFayu1FMD7Vz0Boc9JSrkQXseEdbCeKMiBR6HYGXvDZl4izIB+MU/5jS1+pRuUAZajdhBui4Al+e83540MMPqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V2LWzi9L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A0EFEC43394;
+	 In-Reply-To:To:Cc; b=X8cxZaFjgMz/jenV4srBrtfK4tSkxvp0hKP+IhIjo+XqMGax5BnPbPWnHLv3Bj/b4Sj1rc0p1I6WQCdWZF8gaUE30dd2Oo6DJ7s2pKF4SxuQne8/REP1yApoDTFzpWIVRKchbZuYuwX5KKj8s4Tma6UYrlQ0PJK1C9BqehNwLE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RhgmQDaW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D5549C43330;
 	Mon,  4 Mar 2024 10:00:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709546426;
-	bh=/QhG5IY3S1+Bsd+z+qb/NvVEHtl9Al8c33eW84Scq6k=;
+	bh=SLyJ9jpZGtOXavO2oR1SCQeOLk04pqT/HIrfnN2FiKk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=V2LWzi9L2VDYUZEdiDxX3na1yKj0NcJNNT0ERByTFXqH5IlCamhGfThDuoenvvpV3
-	 vVFxK2tNRDlmR833/uUNoe5XUuWcLFOGUKOCUb4wPtpA2wL2YM3wunawuDPJFX3K9v
-	 LDDDopy4a27ogtiDts4Sfi8cJrSAWTHzNQNy3c0xOXJ9UQyq627/B0HykBzO6VHjhn
-	 SQ9lZyUqoRigoTR4PaNizWuutXYJIZbHWhL1bLrczuyXWNHZydk6bS3/Je/6uGKiyP
-	 LUsnEwPA5U4BnUC9O1dWQI3DTvbQ9MDfGEDUngZEsTegpGiCd2Dtv5zxune9GSUq6Z
-	 49HOOIfAxtLjQ==
+	b=RhgmQDaWDHNseF+UtD1FWf6GafR38sMs5UGPSDMD4NTPnONmEGC1Bl0XDq7hWnHxl
+	 xJp00nYalFFKMdSpruDbPxpf8LvxIADqmCfCMOFnBcpwOKcQw/61E5wTl7CzDvR/NK
+	 ZhviPzwKGP+8HiGYHEVQXRhZEOHPyddApGVRXq7fhLgbBNOBjSCnMnCpQrep7mv52L
+	 qV238/nikgIDRwhTJAyC4lDJt2webOxeGp9Npgbl3RU93+qbPfX9h6dBHGgGBoBiV9
+	 /mupYZqUuO/TNnNUBIXFG8amt1Qhq0WyqUhaaHQf+Fa6o/urt7cpm4/SGoUZ7YrhPg
+	 v0si3BMKwRxUQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 89216C595C4;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C3A9DD9A4B9;
 	Mon,  4 Mar 2024 10:00:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] geneve: make sure to pull inner header in geneve_rx()
+Subject: Re: [PATCH net-next] net: ip6_tunnel: Leverage core stats allocator
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170954642655.21816.5794869351787210905.git-patchwork-notify@kernel.org>
+ <170954642679.21816.8952625755887609113.git-patchwork-notify@kernel.org>
 Date: Mon, 04 Mar 2024 10:00:26 +0000
-References: <20240229131152.3159794-1-edumazet@google.com>
-In-Reply-To: <20240229131152.3159794-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- dsahern@kernel.org, netdev@vger.kernel.org, fw@strlen.de,
- eric.dumazet@gmail.com, syzbot+6a1423ff3f97159aae64@syzkaller.appspotmail.com
+References: <20240228180318.1650988-1-leitao@debian.org>
+In-Reply-To: <20240228180318.1650988-1-leitao@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, dsahern@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, horms@kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 29 Feb 2024 13:11:52 +0000 you wrote:
-> syzbot triggered a bug in geneve_rx() [1]
+On Wed, 28 Feb 2024 10:03:17 -0800 you wrote:
+> With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
+> convert veth & vrf"), stats allocation could be done on net core
+> instead of in this driver.
 > 
-> Issue is similar to the one I fixed in commit 8d975c15c0cd
-> ("ip6_tunnel: make sure to pull inner header in __ip6_tnl_rcv()")
-> 
-> We have to save skb->network_header in a temporary variable
-> in order to be able to recompute the network_header pointer
-> after a pskb_inet_may_pull() call.
+> With this new approach, the driver doesn't have to bother with error
+> handling (allocation failure checking, making sure free happens in the
+> right spot, etc). This is core responsibility now.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] geneve: make sure to pull inner header in geneve_rx()
-    https://git.kernel.org/netdev/net/c/1ca1ba465e55
+  - [net-next] net: ip6_tunnel: Leverage core stats allocator
+    https://git.kernel.org/netdev/net-next/c/6752fb18dc57
 
 You are awesome, thank you!
 -- 
