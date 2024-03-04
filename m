@@ -1,91 +1,88 @@
-Return-Path: <netdev+bounces-77046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3538686FF0B
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:29:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FB2686FF0F
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:30:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 671631C20B2A
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:29:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E513AB2165B
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:30:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7997322615;
-	Mon,  4 Mar 2024 10:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AA7825754;
+	Mon,  4 Mar 2024 10:30:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XKlktNCa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YNg4m+Oj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE375219FF
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 10:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B04C381D5
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 10:30:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709548186; cv=none; b=rK5XdbA4kA3VN3YJRR9C8P1hW5wORCwRT9rhRMr31aojq+qd7pDRxtRYMooAqzoy4RRkcMO56dbVCmefUOv2PBeTNXcrrVitDRjSZ+S55hR0ZjO10ruLkfi5LDhrRXblZmwmq1HyMChHV5GSZbTffO5Llvhm2ttEwHbdtcmleHY=
+	t=1709548253; cv=none; b=IQif6KOfpJN1Z1CuTukWUrAH4E8UEwM2asEDKuxn+NTCi0k60n0O9onrozRQ3ysX8HicYGHZf3Ja1Nen/alKAXOB0cVqzWBqNLOe7o7IA/gIb5+MawQYE5Bh2HlfR5Jc0P945bZQqehVctV/1C2wjyl2lr69L6wPg/B4/CLg9mQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709548186; c=relaxed/simple;
-	bh=sQgWgTuhNCglHTvkTInRhmSAlre8oET9TLGHoXYppSo=;
+	s=arc-20240116; t=1709548253; c=relaxed/simple;
+	bh=upJSTqnUBv1fA2t5HsgrN2ho9XIYZunRM15RfJsVHss=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=pi2FySGRWXMIlUJJP9+yf43q/ZJPmfGb/EK1o7peYO87scPuvIdma6cJuEZ+Pom19nwECWLifDGOFHmFacAU86ce42kwQqiBsirGOpV2947Z448qMXzu+QewA8qWXboqAWCXkaZ0p0a60w+3JH9lNbeAAPK+hsDvctzd5HnY2o0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XKlktNCa; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:MIME-Version; b=ZasYqoWh8aZLCNwvA9G8ZOK6akY6wwNczmNO5dBYn5vv2AyQDKBNAjdNKjyGjFZ+DeMHWGvITHp6gOwdU+U2c0Q8yuWgA3Pur6j4enLBbFHtTVQVQE5k9JHKMXy91+B+LUMq369Ys2JwbXppR5Oj3VhSNmDlQtZIJw5ncXPkrsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YNg4m+Oj; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709548183;
+	s=mimecast20190719; t=1709548250;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ZCaZuzK2lDcHPxO94zXU9VZUa4uvWdMXGopwe685ZeQ=;
-	b=XKlktNCaAOaTEJy9OGQJxc5yQOI4RDdB5bnQrdPGAjhJEy3eHXtwXXWiRNVwuWjIQHvXXj
-	5IFRAjt2r4Z1E5OKFl0BT3CkP2Qcg1Z2hbFV90gNuUio2IPHXUPch5ZJ2gbd4jPLMppzSJ
-	3Yl1bZuEvH/EQR4+XG4kIxDB5wQodo8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=AH7KmWL2S3GWCfK4O4edg2kA5r31LXAv0jt22vJYtpE=;
+	b=YNg4m+Oj9LFQxCeUUb/0e9jp7djEVluX/Y/13vVNS2FUlDzlOhERd2+KA1JbJ8LeaMWZrS
+	1U+EYFmDJ8Nvnf8oXv+d+RKZ13SxQS6BK+GSc5cf/tOdBFgG5M9ALK9iaEQNR2uFk7f9/B
+	IrXUKAbn5cxQP57Q+jbZs/Z5+Pnjjkk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-652-r2VeoOVJMDeJSfOfItn-HA-1; Mon, 04 Mar 2024 05:29:41 -0500
-X-MC-Unique: r2VeoOVJMDeJSfOfItn-HA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33d8b2a57fdso419337f8f.1
-        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 02:29:41 -0800 (PST)
+ us-mta-647-UtbzWS5zPZ-rhjyo9jnxXA-1; Mon, 04 Mar 2024 05:30:48 -0500
+X-MC-Unique: UtbzWS5zPZ-rhjyo9jnxXA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-33d8b2a57fdso419638f8f.1
+        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 02:30:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709548180; x=1710152980;
+        d=1e100.net; s=20230601; t=1709548248; x=1710153048;
         h=mime-version:user-agent:content-transfer-encoding:autocrypt
          :references:in-reply-to:date:cc:to:from:subject:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZCaZuzK2lDcHPxO94zXU9VZUa4uvWdMXGopwe685ZeQ=;
-        b=fmo/4cyUVPj3gSfYH0lIjsNgeaphT4Eiaa6JNozLle+0Bhc2bo88rd2Hb7dUxG9RYF
-         9x5roaQwJeczRxpz2dmdSpMCvL+nGkIif9V7y32RD7eb+PEOKLebMabiBgzumaQWLi9G
-         qvYj9OREed3cnBO0n/NQh3wiFCLUIPE4GD6tUtse8St/mPGp86z6YDUa1zvt+hZuS/WS
-         2Ihy9CNpR6fB/dc8k4/7FegJf60t07gf46yd4gsRQVux9K9pJjeFm6ss1oq9fCE/Ae2y
-         gbOrSjj9OzbyM85iD9mI33Wu/KVYA7kK8kt4IUZQ+tcU5LIyZc8sc0D4Us/YoOwOIO+Q
-         ciTg==
-X-Forwarded-Encrypted: i=1; AJvYcCXz/nSK4mRRT6a9sB0MgKQVFP3EcPpRoJr0dK0XIC+/N+HNyjolwoPvOWXxVkwv8hk9W5EvmqxUgPdooU0NK3rPlSP2t80D
-X-Gm-Message-State: AOJu0YzMcRDY+dn+dtjjFNdjOKuMTE6jg2G3maRqWVk0Xm93X+3HLcnJ
-	3XtTTBEXIKKFUcUuA5a8gWMxNeCV374HHTty85euVoPitkPUmTMIk5RNx1LdSe54RV1gF7YVexA
-	95Oiwwot2nSyIBepuxVXJ5nCcT3rqEz9x9UiY1LZkkpnWxA9YcwVzBQ==
-X-Received: by 2002:adf:d047:0:b0:33d:a6e8:4f7d with SMTP id v7-20020adfd047000000b0033da6e84f7dmr5849826wrh.3.1709548180497;
-        Mon, 04 Mar 2024 02:29:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEbgWBLYLL+eAzmKboSiYB1A+Yq/SpryguPv4WjeHZxlYusVC3dxcClleWNXj8KcGVXmxa6JA==
-X-Received: by 2002:adf:d047:0:b0:33d:a6e8:4f7d with SMTP id v7-20020adfd047000000b0033da6e84f7dmr5849810wrh.3.1709548180171;
-        Mon, 04 Mar 2024 02:29:40 -0800 (PST)
+        bh=AH7KmWL2S3GWCfK4O4edg2kA5r31LXAv0jt22vJYtpE=;
+        b=rJa6HOpksrexmDC3igRhqL9lVrbzY/dbIFAiDm+XIwKpyd3F6YjnWxHk8II0vEoZhf
+         NgMXkIbYA+9+LofG/TuBWRB7GQhhc8DheaCEgBvTJ7un0XLY1RQamNwb/joV7jvGJILy
+         srCazX3iW+WBfYJ3Mdh2HB2UgKCzC9j9mFbDk7MtpIEVFcit4IkEp/4WMwMz2rkKivIt
+         bmEmcleJ9OABKJLRl0+kiHm8dh5pZde4SH+iTVm52rgg2J5bC23q2HEzvX3gdCw6/Jfh
+         qI9tjgziXjkjbHJKQYIQZ4DFuX/+HXvyHGK4wtoA/I+VsGzVt0xM27OL4Xo+4Zilpi4h
+         utfA==
+X-Forwarded-Encrypted: i=1; AJvYcCUsqH5sqMmUQibaPCdKKjjCJQNnhpxvHWrarv7FQc3HqMJYFdl3wx/Xvvq1n7iHmsN6HVeQo4vv5Az4RrMziX1QvPMlm85C
+X-Gm-Message-State: AOJu0YyyEJY9wWaTETSG7NBfo3zkXx7N4hbCu1OpaZZ8ikoHxeDs74jz
+	zKelsYZR0GGOqXP2wg6VBS74s+i2t65FUyDbxWx1lsULoLaK2DRZSi98jo/drFqu060UQFfwP80
+	otW7PTZgoW6hZZLWS/c++mOI9RN9Hln4a/0jgGQTFvnxgqqS8Kjm2yw==
+X-Received: by 2002:adf:e78c:0:b0:33d:9ee1:48db with SMTP id n12-20020adfe78c000000b0033d9ee148dbmr6334272wrm.2.1709548247811;
+        Mon, 04 Mar 2024 02:30:47 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHtvzMieGK+AxrXIyxlrmhjV0cJb8plIsu84a8GgjEdZ0no2/Oqevsyay0cqOzO8sQqmqF/Zg==
+X-Received: by 2002:adf:e78c:0:b0:33d:9ee1:48db with SMTP id n12-20020adfe78c000000b0033d9ee148dbmr6334254wrm.2.1709548247426;
+        Mon, 04 Mar 2024 02:30:47 -0800 (PST)
 Received: from gerbillo.redhat.com (146-241-235-19.dyn.eolo.it. [146.241.235.19])
-        by smtp.gmail.com with ESMTPSA id bo16-20020a056000069000b0033e422d0963sm1232813wrb.41.2024.03.04.02.29.39
+        by smtp.gmail.com with ESMTPSA id bk15-20020a0560001d8f00b0033b48190e5esm12110647wrb.67.2024.03.04.02.30.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Mar 2024 02:29:39 -0800 (PST)
-Message-ID: <2b694ab0d4453df4a19898a01c35ce878e383ce7.camel@redhat.com>
-Subject: Re: [PATCH net-next 2/4] net: gro: change skb_gro_network_header()
+        Mon, 04 Mar 2024 02:30:47 -0800 (PST)
+Message-ID: <96aa26f97ae4eaf2b4b54d160da4105f254dca6b.camel@redhat.com>
+Subject: Re: [PATCH net-next 0/4] net: gro: cleanups and fast path refinement
 From: Paolo Abeni <pabeni@redhat.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>,  Richard Gobert <richardbgobert@gmail.com>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
-Date: Mon, 04 Mar 2024 11:29:38 +0100
-In-Reply-To: <CANn89i+19QU3AX=9u+x51P0xxPt6sNj-GHUh85NF0gsBChEgvg@mail.gmail.com>
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>
+Cc: Richard Gobert <richardbgobert@gmail.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Date: Mon, 04 Mar 2024 11:30:46 +0100
+In-Reply-To: <20240301193740.3436871-1-edumazet@google.com>
 References: <20240301193740.3436871-1-edumazet@google.com>
-	 <20240301193740.3436871-3-edumazet@google.com>
-	 <f8711f5c4d6dfae9d7f4bf64fdde15feaee56494.camel@redhat.com>
-	 <CANn89i+19QU3AX=9u+x51P0xxPt6sNj-GHUh85NF0gsBChEgvg@mail.gmail.com>
 Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
@@ -100,76 +97,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Mon, 2024-03-04 at 10:06 +0100, Eric Dumazet wrote:
-> On Mon, Mar 4, 2024 at 9:28=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
-> >=20
-> > On Fri, 2024-03-01 at 19:37 +0000, Eric Dumazet wrote:
-> > > Change skb_gro_network_header() to accept a const sk_buff
-> > > and to no longer check if frag0 is NULL or not.
-> > >=20
-> > > This allows to remove skb_gro_frag0_invalidate()
-> > > which is seen in profiles when header-split is enabled.
-> >=20
-> > I have a few questions to help me understanding this patchset better:
-> >=20
-> > skb_gro_frag0_invalidate() shows in profiles (for non napi_frags_skb
-> > callers?) because it's called multiple times for each aggregate packet,
-> > right? I guessed writing the same cacheline multiple times per-se
-> > should not be too much expansive.
+On Fri, 2024-03-01 at 19:37 +0000, Eric Dumazet wrote:
+> Current GRO stack has a 'fast path' for a subset of drivers,
+> users of napi_frags_skb().
 >=20
-> Apparently some (not very recent) intel cpus have issues (at least
-> with clang generated code) with
-> immediate reloads after a write.
+> With TCP zerocopy/direct uses, header split at receive is becoming
+> more important, and GRO fast path is disabled.
+>=20
+> This series makes GRO (a bit) more efficient for almost all use cases.
+>=20
+> Eric Dumazet (4):
+>   net: gro: rename skb_gro_header_hard()
+>   net: gro: change skb_gro_network_header()
+>   net: gro: enable fast path for more cases
+>   tcp: gro: micro optimizations in tcp[4]_gro_complete()
+>=20
+>  drivers/net/geneve.c   |  2 +-
+>  include/net/gro.h      | 34 ++++++++++++++++------------------
+>  net/core/gro.c         | 25 +++++++++++++++++--------
+>  net/ipv4/fou_core.c    |  2 +-
+>  net/ipv4/gre_offload.c |  2 +-
+>  net/ipv4/tcp_offload.c | 19 ++++++++++---------
+>  6 files changed, 46 insertions(+), 38 deletions(-)
 
-Ah! I *think* I have observed the same even with gcc (accessing some CB
-fields just after the initial zeroing popped-up in perf report.=20
+Many thanks, looks great!
 
-> I also saw some strange artifacts on ARM64 cpus, but it is hard to say,
-> I found perf to be not very precise on them.
->=20
-> >=20
-> > perf here did not allow me to easily observed the mentioned cost,
-> > because the function is inlined in many different places, I'm wondering
-> > how you noticed?
->=20
-> It is more about the whole patchset really, this gave me about 4%
-> improvement on saturated cpu
-> (RFS enabled, Intel(R) Xeon(R) Gold 6268L CPU @ 2.80GHz)
->=20
-> One TCP flow : (1500 MTU)
->=20
-> New profile (6,233,000 pkts per second )
->     19.76%  [kernel]       [k] gq_rx_napi_handler
->     11.19%  [kernel]       [k] dev_gro_receive
->      8.05%  [kernel]       [k] ipv6_gro_receive
->      7.98%  [kernel]       [k] tcp_gro_receive
->      7.25%  [kernel]       [k] skb_gro_receive
->      5.47%  [kernel]       [k] gq_rx_prep_buffers
->      4.39%  [kernel]       [k] skb_release_data
->      3.91%  [kernel]       [k] tcp6_gro_receive
->      3.55%  [kernel]       [k] csum_ipv6_magic
->      3.06%  [kernel]       [k] napi_gro_frags
->      2.76%  [kernel]       [k] napi_reuse_skb
->=20
-> Old profile (5,950,000 pkts per second)
->     17.92%  [kernel]       [k] gq_rx_napi_handler
->     10.22%  [kernel]       [k] dev_gro_receive
->      8.60%  [kernel]       [k] tcp_gro_receive
->      8.09%  [kernel]       [k] ipv6_gro_receive
->      8.06%  [kernel]       [k] skb_gro_receive
->      6.74%  [kernel]       [k] gq_rx_prep_buffers
->      4.82%  [kernel]       [k] skb_release_data
->      3.82%  [kernel]       [k] tcp6_gro_receive
->      3.76%  [kernel]       [k] csum_ipv6_magic
->      2.97%  [kernel]       [k] napi_gro_frags
->      2.57%  [kernel]       [k] napi_reuse_skb
-
-Thanks for the detailed info! I'll try to benchmark this on non
-napi_gro_frags enabled driver, but don't hold your breath meanwhile!
-
-Cheers,
-
-Paolo
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 
 
