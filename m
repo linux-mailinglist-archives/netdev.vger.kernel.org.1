@@ -1,115 +1,133 @@
-Return-Path: <netdev+bounces-77173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEE9E870687
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 17:06:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE15D870694
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 17:08:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F075C1C21260
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 16:06:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05CE0288D16
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 16:08:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2DDC482DF;
-	Mon,  4 Mar 2024 16:06:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mzHOxqSV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CE254CE1B;
+	Mon,  4 Mar 2024 16:07:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16D85481DE;
-	Mon,  4 Mar 2024 16:06:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6BB0487BC
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 16:07:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709568383; cv=none; b=D7wFpFnGJ20qdFAqEtlv7P+d9GsThZBiuhdmXnwD1WRp5EA+X6Mmlhn1LP3/EhmOEPOjfWPLOAHc+Z5Z3G8wZTemnm7R/TKIE4fKGpFRFQbB5OB5cwce3KXsTyr/ljUBk5RBAAztczyTuDpbh+AKkIevRcD+nYPtof/9cE7+54s=
+	t=1709568449; cv=none; b=ZK7fQ7q0KxkY7u+sfLTZhsro9NFQxhC2bEtX6F4wFoJ/RqJAI09DjbgrPeY75em1J7hbBC0kNJES50YOJzXUVAI4sEZdCBWwlsCfbxpSpdch1SFv5j7ZF/02j8gpoQcfDZefZ0sj7uSGOMmI8TNbEj0TpoHEgXAzgvUwgE1kfcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709568383; c=relaxed/simple;
-	bh=AlNDwPISgBcM6OVPgM4WaoPIp68689qJHcWCy+OYqyk=;
+	s=arc-20240116; t=1709568449; c=relaxed/simple;
+	bh=uPaTZgs5cRzUd+YyEpm2IizZ7X5Rc5zf9/l+VMieE7o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BpOvEWSpQPoe9/JzQY4AKNkVpmlAF8KFEY5FzVEFPtRw1H5QuLWewF8Qs0ogeiYrxQ3s6sqML9N9KYI4L3I6CWZjNy1RBSMNGCdStTcLAKl5hPAFLLLHWcWJTzdEylxlwS/A7ui3iGjO2Hv0R6EgmiInl3BoT1yhhbV/8VnKLBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mzHOxqSV; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8ESWzfwNLBdRiQerL5+aFQnFwsh7Ey/Kqyb4OBW7amg=; b=mzHOxqSVyQhSjRX4F5gBr6b//K
-	Z13FzT+KYEs/6y4GhaVF3Cxf3GvoUDAwYIFi2bOvk03KYDyQnzQog1PBU94N/pl4HYEfz9hQ9GMFa
-	g8UhNBtV7mfJ7oeTgjJr/9+0RaPwlq+vn3lEdEe2qlfmBEK9SOggUO/STE6swk31S/5U=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rhApo-009LBC-Gj; Mon, 04 Mar 2024 17:06:36 +0100
-Date: Mon, 4 Mar 2024 17:06:36 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?Q?J=E9r=E9mie?= Dautheribes <jeremie.dautheribes@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, Andrew Davis <afd@ti.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	=?iso-8859-1?Q?Miqu=E8l?= Raynal <miquel.raynal@bootlin.com>,
-	Yen-Mei Goh <yen-mei.goh@keysight.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next 1/3] dt-bindings: net: dp83822: support
- configuring RMII master/slave mode
-Message-ID: <d994001c-dff2-402d-bd19-7ddb0c148805@lunn.ch>
-References: <20240222103117.526955-1-jeremie.dautheribes@bootlin.com>
- <20240222103117.526955-2-jeremie.dautheribes@bootlin.com>
- <d14ba685-dc7e-4f99-a21e-bae9f3e6bc79@lunn.ch>
- <860648fa-11f5-4e0d-ac4e-e81ea111ef31@bootlin.com>
- <68112ecb-532f-4799-912d-16d6ceb9a6f3@lunn.ch>
- <021dbe50-5eb9-4552-b2bb-80d58d3eb076@bootlin.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Su89OBOYyHUiex77PQFiBZNxJeLF4/S3Sw1IJSZJXD74mcoieN2PNmMrwUD5HxiA5gQ3TeHtUxBBJIIfIRO8xb7hcIBzeLvLovIJScfdNG8e1HMzbbRKfLocfd/WJt4iBpaugpi4j6OHqQUkhzrZTKXSxllP4kXp2S8bNBWM0AQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rhAqP-0000oU-RA; Mon, 04 Mar 2024 17:07:13 +0100
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rhAqN-004NoP-UA; Mon, 04 Mar 2024 17:07:11 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rhAqN-001wSs-2h;
+	Mon, 04 Mar 2024 17:07:11 +0100
+Date: Mon, 4 Mar 2024 17:07:11 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Arun.Ramadoss@microchip.com
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+	Woojung.Huh@microchip.com, pabeni@redhat.com, edumazet@google.com,
+	f.fainelli@gmail.com, kuba@kernel.org, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net v1 1/1] net: dsa: microchip: make sure drive strength
+ configuration is not lost by soft reset
+Message-ID: <ZeXxr1qZ0ZP4U--O@pengutronix.de>
+References: <20240304135612.814404-1-o.rempel@pengutronix.de>
+ <5a830dd5c253d12d719a5e979a1d43c5fb47e011.camel@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <021dbe50-5eb9-4552-b2bb-80d58d3eb076@bootlin.com>
+In-Reply-To: <5a830dd5c253d12d719a5e979a1d43c5fb47e011.camel@microchip.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-> > We are normally interested in this 50Mhz reference clock. So i would
-> > drop all references to 25Mhz. It is not relevant to the binding, since
-> > it is nothing to do with connecting the PHY to the MAC, and it has a
-> > fixed value.
-> > 
-> > So you can simplify this down to:
-> > 
-> > RMII Master: Outputs a 50Mhz Reference clock which can be connected to the MAC.
-> > 
-> > RMII Slave: Expects a 50MHz Reference clock input, shared with the
-> > MAC.
-> > 
-> > > That said, would you like me to include this description (or some parts) in
-> > > the binding in addition to what I've already written? Or would you prefer me
-> > > to use a more meaningful property name?
-> > 
-> > We don't really have any vendor agnostic consistent naming. dp83867
-> > and dp83869 seems to call this ti,clk-output-sel. Since this is
-> > another dp83xxx device, it would be nice if there was consistency
-> > between all these TI devices. So could you check if the concept is the
-> > same, and if so, change dp83826 to follow what other TI devices do.
+Hi Arun,
+
+On Mon, Mar 04, 2024 at 02:25:54PM +0000, Arun.Ramadoss@microchip.com wrote:
+> Hi Oleksij,
 > 
+> On Mon, 2024-03-04 at 14:56 +0100, Oleksij Rempel wrote:
+> > EXTERNAL EMAIL: Do not click links or open attachments unless you
+> > know the content is safe
+> > 
+> > This driver has two separate reset sequence in different places:
+> > - gpio/HW reset on start of ksz_switch_register()
+> > - SW reset on start of ksz_setup()
+> > 
+> > The second one will overwrite drive strength configuration made in
+> > the
+> > ksz_switch_register().
+> > 
+> > To fix it, move ksz_parse_drive_strength() from ksz_switch_register()
+> > to
+> > ksz_setup().
+> > 
+> > Fixes: d67d7247f641 ("net: dsa: microchip: Add drive strength
+> > configuration")
+> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > ---
+> >  drivers/net/dsa/microchip/ksz_common.c | 10 ++++++----
+> >  1 file changed, 6 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/drivers/net/dsa/microchip/ksz_common.c
+> > b/drivers/net/dsa/microchip/ksz_common.c
+> > index d58cc685478b1..83a5936506059 100644
+> > --- a/drivers/net/dsa/microchip/ksz_common.c
+> > +++ b/drivers/net/dsa/microchip/ksz_common.c
+> > @@ -2260,6 +2260,8 @@ static int ksz_pirq_setup(struct ksz_device
+> > *dev, u8 p)
+> >         return ksz_irq_common_setup(dev, pirq);
+> >  }
+> > 
+> > +static int ksz_parse_drive_strength(struct ksz_device *dev);
+> > +
 > 
-> So I had a look at this ti,clk-output-sel property on the TI DP8386x
-> bindings, but unfortunately it does not correspond to our use case. In their
-> case, it is used to select one of the various internal clocks to output on
-> the CLK_OUT pin.
-> In our case, we would prefer to describe the direction of the clock (OUT in
-> master mode, IN in slave mode).
+> IMO: move the ksz_parse_drive_strength( ) here instead of prototype
+> alone. Since the function is used in only one place and it will be
+> logical to follow. 
 
-I would suggest we keep with the current property name, but simplify
-the description. Focus on the reference clock, and ignore the crystal.
+I fully agree, but I fear this change would be too big for stable.
 
-    Andrew
+@Jakub, what is your preference?
+
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
