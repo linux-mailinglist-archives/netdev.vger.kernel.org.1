@@ -1,71 +1,50 @@
-Return-Path: <netdev+bounces-77025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B317B86FDD0
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:39:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F2AC86FDD3
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:40:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B040B21D2C
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:39:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D849E1F21A89
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5513B1BC3D;
-	Mon,  4 Mar 2024 09:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5BE820B27;
+	Mon,  4 Mar 2024 09:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="B4wQlWFu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PSBMt4F6"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F37225A6;
-	Mon,  4 Mar 2024 09:39:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CDAE1A29F;
+	Mon,  4 Mar 2024 09:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709545179; cv=none; b=suPzyaffOaVkq8Fn5v5+3rhKEwBcwW/GGXsIIPInwwH4s7zwEdKlXcSgygcetRA8H+kuBh3c7fRm/DqjXqlAP5H6X1LMJ7QH03otBb3ZHMMtGPC+HyHnXVvH6GZwkjMVEE251rcC6Z0zSzxsqtR1rYeAZrCxiXKmPFeP9CjORD4=
+	t=1709545227; cv=none; b=qBTUTRtGo6RKBY/V8dnd3B0tCrTjrlyY7q/RgoKBCBLCiT0gmflr9C5Kb8HrNG9/FXTWWZO+diH9xBsu3E3zJWHE+o4S71t/KbO+dMnR8U7l/9L8r3VLJNtJmwo3AhyRdAUr5oFUP8/X+W8/SuhJeLNkZibEPyeedD9T9QL610s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709545179; c=relaxed/simple;
-	bh=so6Y8pkPttl1YpSq6PwnluDXvxHzVQSAipo3aqdm4rQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=soebuzgKQ686Go6zfVK385q4NAal2oMSMHdJqmvqCnl9wUHtEuTSbs2cboSisQKxnCrb0Lk4JYoQstz1/57qSq7SDzF1xq+uGa6KZxMPBws1W0IaylJmyza44jk2x9BrleSrV0RgvPJAZXUZWzA5wjZDnpRP6LT7nXvJSIxfB8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=B4wQlWFu; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 919D887F3B;
-	Mon,  4 Mar 2024 10:32:44 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1709544765;
-	bh=3mjYo148TYL75N4xxdKNBZ+5b0p2poE7mksZ1cmgcGs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=B4wQlWFu0TlrMAXRRHiJ/1D7JCdBO1NarLWib8Jp+Nk6JODFxrlROIIUmhG1zslwL
-	 vVzhbFk4FkUG4JVX42gDd7V7UA8LrUlycBjXlMeM4JCsTPPT8gpLve94Dlk9Li0S/B
-	 6txGU93/SmS2Su6kl4O5MNVqql9M9bCx6xA8g+PIHjVnkVHMVn/IL3o43k8e2QOWIQ
-	 umRoNYNWsKzxKxo2M5pSMH10UUHY7cs4X+pt+Gd0/wOWrRB1/4YXM2HlShpxogktVo
-	 tX9X5qn2A/TWwqZXX9QRDktxma70W7MIpaRpS4aZPTUtCb7hgaSTHWtldk5IaX0H/W
-	 P78wKhYTHk9KA==
-From: Lukasz Majewski <lukma@denx.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Tristram.Ha@microchip.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ravi Gunasekaran <r-gunasekaran@ti.com>,
-	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
-	Murali Karicheri <m-karicheri2@ti.com>,
-	Ziyang Xuan <william.xuanziyang@huawei.com>,
-	linux-kernel@vger.kernel.org,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [PATCH] net: hsr: Use full string description when opening HSR network device
-Date: Mon,  4 Mar 2024 10:32:20 +0100
-Message-Id: <20240304093220.4183179-1-lukma@denx.de>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1709545227; c=relaxed/simple;
+	bh=3++Vzv2/a3Eks7UzVNg8IkARrp7amDsx8Q+QmnKyHcQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lXdN9FglODelwRAyVB0deoKgF/c2w8mnTdszJj3CjZJwvw99XFbJ5jxbyd8HJ2bYArXtj5pdI/etNBFe/Rk9+pPYilLBy8KIi7y2Z5C3ggWOrTUjvjlA4/EBBUHekbXl6EYYT+q3YHYmHltiFNaJvYpuP/FTDTZrSaA+gCSUDwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PSBMt4F6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EB411C433F1;
+	Mon,  4 Mar 2024 09:40:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709545227;
+	bh=3++Vzv2/a3Eks7UzVNg8IkARrp7amDsx8Q+QmnKyHcQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PSBMt4F63+GM0hNVS7Rx8v+0oO8wSrs6YDrquvkpauWViO+JZPPTu5yOWAaS8edQS
+	 n7Dk0RUNRTTZffp+xE4nzbAAC6RfrWMH7hQE1vpfEBpdSsxLFCGoihP/9OU30YJj7X
+	 fEfN76V3hruq5vgAL0BQtMyF0D+B7RCztnvWqByooa+VrvZNOgPPXc5WhXzXQUC5N5
+	 e8swIE//XZy847kKFLjP3wU7BNmFIs7iOh6fykErncvxedw5UUp9D4GPqROmDbQqrf
+	 PEUlmDSQd6vU5FxGXxFcX5ueHYQeCWoH+l2PG0q+yaI07grDBpRqvyif4mEcSD6Mum
+	 29oS0bJn1Wr3w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D1FD3D88F87;
+	Mon,  4 Mar 2024 09:40:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,63 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Subject: Re: [PATCH] tracing/net_sched: Fix tracepoints that save qdisc_dev() as
+ a string
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170954522685.11015.14202389531025914162.git-patchwork-notify@kernel.org>
+Date: Mon, 04 Mar 2024 09:40:26 +0000
+References: <20240229143432.273b4871@gandalf.local.home>
+In-Reply-To: <20240229143432.273b4871@gandalf.local.home>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, mhiramat@kernel.org,
+ mathieu.desnoyers@efficios.com, xiyou.wangcong@gmail.com,
+ vaclav.zindulka@tlapnet.cz, jhs@mojatatu.com, jiri@resnulli.us,
+ davem@davemloft.net
 
-Up till now only single character ('A' or 'B') was used to provide
-information of HSR slave network device status.
+Hello:
 
-As it is also possible and valid, that Interlink network device may
-be supported as well, the description must be more verbose. As a result
-the full string description is now used.
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Signed-off-by: Lukasz Majewski <lukma@denx.de>
----
- net/hsr/hsr_device.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+On Thu, 29 Feb 2024 14:34:44 -0500 you wrote:
+> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+> 
+> I'm updating __assign_str() and will be removing the second parameter. To
+> make sure that it does not break anything, I make sure that it matches the
+> __string() field, as that is where the string is actually going to be
+> saved in. To make sure there's nothing that breaks, I added a WARN_ON() to
+> make sure that what was used in __string() is the same that is used in
+> __assign_str().
+> 
+> [...]
 
-diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-index 9d71b66183da..9a60489fba96 100644
---- a/net/hsr/hsr_device.c
-+++ b/net/hsr/hsr_device.c
-@@ -142,30 +142,29 @@ static int hsr_dev_open(struct net_device *dev)
- {
- 	struct hsr_priv *hsr;
- 	struct hsr_port *port;
--	char designation;
-+	char *designation = NULL;
- 
- 	hsr = netdev_priv(dev);
--	designation = '\0';
- 
- 	hsr_for_each_port(hsr, port) {
- 		if (port->type == HSR_PT_MASTER)
- 			continue;
- 		switch (port->type) {
- 		case HSR_PT_SLAVE_A:
--			designation = 'A';
-+			designation = "Slave A";
- 			break;
- 		case HSR_PT_SLAVE_B:
--			designation = 'B';
-+			designation = "Slave B";
- 			break;
- 		default:
--			designation = '?';
-+			designation = "Unknown";
- 		}
- 		if (!is_slave_up(port->dev))
--			netdev_warn(dev, "Slave %c (%s) is not up; please bring it up to get a fully working HSR network\n",
-+			netdev_warn(dev, "%s (%s) is not up; please bring it up to get a fully working HSR network\n",
- 				    designation, port->dev->name);
- 	}
- 
--	if (designation == '\0')
-+	if (!designation)
- 		netdev_warn(dev, "No slave devices configured\n");
- 
- 	return 0;
+Here is the summary with links:
+  - tracing/net_sched: Fix tracepoints that save qdisc_dev() as a string
+    https://git.kernel.org/netdev/net/c/51270d573a8d
+
+You are awesome, thank you!
 -- 
-2.20.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
