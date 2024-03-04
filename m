@@ -1,136 +1,117 @@
-Return-Path: <netdev+bounces-77002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31ECD86FC5E
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:52:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E7C686FC67
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:54:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5D3C1F21625
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 08:52:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E327A1F20F94
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 08:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A0ED22EEF;
-	Mon,  4 Mar 2024 08:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D173C1B5B2;
+	Mon,  4 Mar 2024 08:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="O/Yv4jjW"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231B7199A1;
-	Mon,  4 Mar 2024 08:45:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DF61B5BA;
+	Mon,  4 Mar 2024 08:48:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709541944; cv=none; b=GgnErBNvJcSoMc6XysZ9/z07gAMxTiJcwP5YZy72G6rp6T4nUCSXYKXkhhiSsopUS62anULH2jaCls5O+Ol6NzKFSvT21Uls/SvBCBh+ze1U5xeuh3npNxKUWuCaupD8/AD+kfE0tYMUWFrBfG23huEmoVD8DjMFpkfWV54/xHA=
+	t=1709542120; cv=none; b=Bd7pxvdRIaWCnWUOAAZLgf0Fa9kzReiCs5fCkZc/b8H3WsJ7e/IHFF2jE95X+mHnEFKZ0CmMvxNaGjGM5m+ysfQggg0Iqd5i5zUYLxCWS2OZ2sfH3dr5pU25I1R+RORdt1gF/iZrlIP8MWjhE8c77ptAS5LY6kxkQJF/IwtMH0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709541944; c=relaxed/simple;
-	bh=3INRU0FvSF5yHYj1wch7w3hifZglrOnv+QBi8Qw0ndI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Z9afsHX2yrb2dBfMHl9TF1fy2LyQr6Lm9LawJ1VZ9YTSvjs5zid7tfBJdPbRzU/nv8oMklibHsHeH2ZxCgeFQoHweJXDExq7skw2GA0QkngIyqH0A1hpEQYxIA0a0xmvASfhU/TL9qAUed0mwkmh3RE0UkzeaceLnkhbuSNFmYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4TpC0X6tGKzNlpP;
-	Mon,  4 Mar 2024 16:43:56 +0800 (CST)
-Received: from kwepemm600017.china.huawei.com (unknown [7.193.23.234])
-	by mail.maildlp.com (Postfix) with ESMTPS id CF891140415;
-	Mon,  4 Mar 2024 16:45:32 +0800 (CST)
-Received: from [10.174.179.234] (10.174.179.234) by
- kwepemm600017.china.huawei.com (7.193.23.234) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 4 Mar 2024 16:45:31 +0800
-Message-ID: <bc82e3e7-f301-3a40-cbf6-927351b6575d@huawei.com>
-Date: Mon, 4 Mar 2024 16:45:30 +0800
+	s=arc-20240116; t=1709542120; c=relaxed/simple;
+	bh=aDaQk+e4RDumn7Yg8P8fB6cB9SWjCDIX6AqVX7ZpLi8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iB7bgJgnzoR8uMN40OBOqlNX6uDWPto5FR7BFw8cKy94XOk5I73MptjavEnKhpBUOXmVh6dt6FCghKzbBXtcCz04XZZBebePpjzArLm8mfcnuyaUSiGxAOYfk6oYKqIp6iJNbE9C1BnfBP/ee5/MSNrvzgb4FuHx3mIcrpW6waU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=O/Yv4jjW; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1709542118; x=1741078118;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=aDaQk+e4RDumn7Yg8P8fB6cB9SWjCDIX6AqVX7ZpLi8=;
+  b=O/Yv4jjWM3j7Ab1ri19x9aDilLd10h7eCQgUnUmRh6V3tcUtGTmA7f/+
+   Jnb/jGzXhJ85YPCWfknPFu/9EWltUpaG5wvEKX1Sm9nZNXlEZN3eIx90E
+   7zrDMfO/wZTl7GYWYYWivttev/QG27C0eHeC2/F6d/S6/Wageh6h64iAi
+   RVhtVXsp2lvgS0hC0Gj8O+3Rhe+cBJz/Uh/eTmqwvEv7TJ9dj5P2MWps4
+   di3IlEGToRGc8XwgFRPcGVKgVvI+QinkKEz6X0MD4ypVqr1HyroQz93py
+   Xu1GwCnAmsKVt2e+EYvYtxgM7P9nen+oujDIS3dCZLtKS74ytzCLVFM7v
+   w==;
+X-CSE-ConnectionGUID: YdiFYxKvQ4qBuHr5LrHuig==
+X-CSE-MsgGUID: fvjNirW4QnitNI0pcGiNgw==
+X-IronPort-AV: E=Sophos;i="6.06,203,1705388400"; 
+   d="scan'208";a="247913449"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Mar 2024 01:48:37 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 4 Mar 2024 01:48:25 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Mon, 4 Mar 2024 01:48:25 -0700
+Date: Mon, 4 Mar 2024 09:48:24 +0100
+From: Horatiu Vultur - M31836 <Horatiu.Vultur@microchip.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Arun Ramadoss - I17769 <Arun.Ramadoss@microchip.com>, "andrew@lunn.ch"
+	<andrew@lunn.ch>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>, "wojciech.drewek@intel.com"
+	<wojciech.drewek@intel.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com"
+	<edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, UNGLinuxDriver
+	<UNGLinuxDriver@microchip.com>
+Subject: Re: [PATCH net-next v2 2/2] net: phy: micrel: lan8814 cable
+ improvement errata
+Message-ID: <20240304084824.y42djaciaeq5gqz3@DEN-DL-M31836.microchip.com>
+References: <20240229195220.2673049-1-horatiu.vultur@microchip.com>
+ <20240229195220.2673049-3-horatiu.vultur@microchip.com>
+ <80bea3ec2ec86d2e75002f849da174f50e0b846b.camel@microchip.com>
+ <20240301072757.t36qqf47erk4jygr@DEN-DL-M31836.microchip.com>
+ <20240302194041.5d8f8fad@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [bug report] dead loop in generic_perform_write() //Re: [PATCH v7
- 07/12] iov_iter: Convert iterate*() to inline funcs
-To: Linus Torvalds <torvalds@linux-foundation.org>
-CC: Al Viro <viro@kernel.org>, David Howells <dhowells@redhat.com>, Jens Axboe
-	<axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Christian Brauner
-	<christian@brauner.io>, David Laight <David.Laight@aculab.com>, Matthew
- Wilcox <willy@infradead.org>, Jeff Layton <jlayton@kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-	<linux-mm@kvack.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Kefeng Wang <wangkefeng.wang@huawei.com>
-References: <20230925120309.1731676-1-dhowells@redhat.com>
- <20230925120309.1731676-8-dhowells@redhat.com>
- <4e80924d-9c85-f13a-722a-6a5d2b1c225a@huawei.com>
- <CAHk-=whG+4ag+QLU9RJn_y47f1DBaK6b0qYq_6_eLkO=J=Mkmw@mail.gmail.com>
- <CAHk-=wjSjuDrS9gc191PTEDDow7vHy6Kd3DKDaG+KVH0NQ3v=w@mail.gmail.com>
- <e985429e-5fc4-a175-0564-5bb4ca8f662c@huawei.com>
- <CAHk-=wh06M-1c9h7wZzZ=1KqooAmazy_qESh2oCcv7vg-sY6NQ@mail.gmail.com>
- <CAHk-=wiBJRgA3iNqihR7uuft=5rog425X_b3uvgroG3fBhktwQ@mail.gmail.com>
- <f914a48b-741c-e3fe-c971-510a07eefb91@huawei.com>
- <CAHk-=whBw1EtCgfx0dS4u5piViXA3Q2fuGO64ZuGfC1eH_HNKg@mail.gmail.com>
-From: Tong Tiangen <tongtiangen@huawei.com>
-In-Reply-To: <CAHk-=whBw1EtCgfx0dS4u5piViXA3Q2fuGO64ZuGfC1eH_HNKg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600017.china.huawei.com (7.193.23.234)
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20240302194041.5d8f8fad@kernel.org>
 
-
-
-在 2024/3/3 2:06, Linus Torvalds 写道:
-> On Sat, 2 Mar 2024 at 01:37, Tong Tiangen <tongtiangen@huawei.com> wrote:
->>
->> I think this solution has two impacts:
->> 1. Although it is not a performance-critical path, the CPU usage may be
->> affected by one more memory copy in some large-memory applications.
+The 03/02/2024 19:40, Jakub Kicinski wrote:
 > 
-> Compared to the IO, the extra memory copy is a non-issue.
+> On Fri, 1 Mar 2024 08:27:57 +0100 Horatiu Vultur - M31836 wrote:
+> > > > +#define LAN8814_PD_CONTROLS                      0x9d
+> > > > +#define LAN8814_PD_CONTROLS_PD_MEAS_TIME_MASK_   GENMASK(3, 0)
+> > > > +#define LAN8814_PD_CONTROLS_PD_MEAS_TIME_VAL_    0xb
+> > >
+> > > nitpick: TIME_VAL macro is very generic if it can end with specific
+> > > like TIME_VAL_100M or something similar will gives more readability.
+> >
+> > Actually I prefer to keep it like this the name if it is possible..
+> > Because the VAL_ represents the value and MASK_ represents the mask
+> > value. Therefore the actual bits name of the register is
+> > LAN8814_PD_CONTROLS_PD_MEAS_TIME.
+> >
+> > I am trying to have a naming convetion about how to define names in this
+> > file:
+> > <TARGET>_<REG_NAME>_<REG_BITS_NAME>
 > 
-> If anything, getting rid of the "copy_mc" flag removes extra code in a
-> much more important path (ie the normal iov_iter code).
+> Why the trailing underscores, tho?
 
-Indeed. I'll test this solution. Theoretically, it should solve the problem.
+That is not really needed. I will update this in the next version.
 
 > 
->> 2. If a hardware memory error occurs in "good location" and the
->> ".copy_mc" is removed, the kernel will panic.
-> 
-> That's always true. We do not support non-recoverable machine checks
-> on kernel memory. Never have, and realistically probably never will. >
-> In fact, as far as I know, the hardware that caused all this code in
-> the first place no longer exists, and never really made it to wide
-> production.
 
-Yes. There is a low probability that the newly applied memory is faulty.
-
-Thanks,
-Tong.
-
-> 
-> The machine checks in question happened on pmem, now killed by Intel.
-> It's possible that somebody wants to use it for something else, but
-> let's hope any future implementations are less broken than the
-> unbelievable sh*tshow that caused all this code in the first place.
-> 
-> The whole copy_mc_to_kernel() mess exists mainly due to broken pmem
-> devices along with old and broken CPU's that did not deal correctly
-> with machine checks inside the regular memory copy ('rep movs') code,
-> and caused hung machines.
-> 
-> IOW, notice how 'copy_mc_to_kernel()' just becomes a regular
-> 'memcpy()' on fixed hardware, and how we have that disgusting
-> copy_mc_fragile_key that gets enabled for older CPU cores.
-> 
-> And yes, we then have copy_mc_enhanced_fast_string() which isn't
-> *that* disgusting, and that actually handles machine checks properly
-> on more modern hardware, but it's still very much "the hardware is
-> misdesiged, it has no testing, and nobody sane should depend on this"
-> 
-> In other words, it's the usual "Enterprise Hardware" situation. Looks
-> fancy on paper, costs an arm and a leg, and the reality is just sad,
-> sad, sad.
-> 
->                 Linus
-> .
+-- 
+/Horatiu
 
