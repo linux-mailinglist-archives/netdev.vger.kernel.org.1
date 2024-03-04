@@ -1,582 +1,324 @@
-Return-Path: <netdev+bounces-76952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC4A686F9E4
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 07:10:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3476F86FA4F
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 07:56:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 307D21F21426
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 06:10:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57A261C20C2C
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 06:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 595BDC14F;
-	Mon,  4 Mar 2024 06:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 938E91173D;
+	Mon,  4 Mar 2024 06:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="LMuzxFgX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H/ORWkey"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47990C15B;
-	Mon,  4 Mar 2024 06:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3583E11713
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 06:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709532609; cv=none; b=lQ0MdapaLpXpmopfCrxtkh0IJpqTxLHlIEHPrBc3Qd5jC4Hw/zJY17z5i8dCpWqj8nrsgPOSZXKPvH0KwhquJN/tpv83W6IxJ46Ue41Oa+X/axXXGtRlj8l8AnTNMXuE8j9VenB3GQTH88SFtEsfSmMeuHWLQJxpMI65/R1jPYU=
+	t=1709535370; cv=none; b=E12upREIA01dwb2Bu0+kAo4IylT+vBLpuv/pZbN+cJGp27gHk3A3keMtl6NfMdMpoEnb0jeEiD48gWCWNnriYZ/DvZrjGKiit095qXsP/QWCPV4mIgL8VXicvADMVUl7LIZHw1MQItbtrNM0i/e6lVz8blnoGyJyzG0nJmeFlP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709532609; c=relaxed/simple;
-	bh=h3vphdWcu0vmR06TXu4rfePJT0YJWwgZ/JHOwi6O2HQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mLu6IB3gaO3ommQTMUoT3dyyJmriXnp+lOS5XvrhFFG3dBC2fRs9/jHcGprpOgpmOkUF0H3NQkrvjXKRiKpBvitQ5wBS+9uN/0ifsWIu7qMymttNtDeYf5Q/qz2hJsaZaT/L3lg1coleNSDiu5hToa0NmLYtndwTu3EAYSds+0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=LMuzxFgX; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42460n8S007342;
-	Mon, 4 Mar 2024 06:09:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	qcppdkim1; bh=RilWy2oNvr6hHq8IMHwWJn3KfSy97us86F2DCd0dzC8=; b=LM
-	uzxFgXMDKr+yvn0ZvaLYDJB55wKc/W+l+G5HXM/uDcyyqIhRqaC5W6bQMXJ69s8r
-	/NEAwvQWrfrBQXz8LwcXYT+VtEevBqbOWW3Oz26XPqLrylNHRpQusPPZ61T5Lq8f
-	b1nTBn81AH76aywH7z4qzokIwZgiUdbY51BM440A+Eo3Wq+pjom5G8KuxRJKuD+i
-	G6i1/M7aUuJmuPNSfEalL9gm52IAalGeeLLztgfj2Kmz2hNoxVvDl7+Tegkb5jBX
-	eLcaL5RvlrPwWd1gATocG9hdk8TgGrZVQxDORSjaxIfgTxvvFkuNXJ3WkyzlSGSJ
-	2kong5+ECAkhdELsoA4A==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wn6qx066w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Mar 2024 06:09:55 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42469sgL030952
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 4 Mar 2024 06:09:54 GMT
-Received: from bqiang-SFF.qca.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Sun, 3 Mar 2024 22:09:51 -0800
-From: Baochen Qiang <quic_bqiang@quicinc.com>
-To: <ath11k@lists.infradead.org>, <manivannan.sadhasivam@linaro.org>
-CC: <linux-wireless@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <mhi@lists.linux.dev>, <quic_bqiang@quicinc.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v6 3/3] wifi: ath11k: support hibernation
-Date: Mon, 4 Mar 2024 14:09:32 +0800
-Message-ID: <20240304060932.80839-4-quic_bqiang@quicinc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240304060932.80839-1-quic_bqiang@quicinc.com>
-References: <20240304060932.80839-1-quic_bqiang@quicinc.com>
+	s=arc-20240116; t=1709535370; c=relaxed/simple;
+	bh=ANv7CPYWbCbdTFbaMYIWnQE0qElMaJYeiOgmdNn1AmY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k54NGZw0JYq5x/xROX/w698EWEs/sBLSwVdOPP6KgHcPyukX8yKpJv0PK3AAEsQEFuV57/eInz1tKkR9Rgd4QAA6rGbSUq3RH0TxWNZqaA2YWfoRa+SVH4J3j92xPOZuflw2ImTyd9Y3Pc1vwnI1u6dIRsVkz7c/+Jjvq66hoKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H/ORWkey; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709535367;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SnnMKJuI5h57AkdTs6wUac/zEo+KD+16W2yUuRvyBNA=;
+	b=H/ORWkeyunEmu0l+KateJcG2a5pOh5ZGKPE5y4ceJUktOEIFJEfF5zIHy7crr5YvKvFJz1
+	mBizlZ9ZgJffwdKIFRkp5CHYQwWhqYp/qbpipaDPCzAFe65Pg5WmZVFBl7LDQe0Zv+upHj
+	Pvl44SxCzWOVNaxp8v+/Z82x7GS/Qng=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-19-I8db_jeRNHeAoC324wQExw-1; Mon, 04 Mar 2024 01:56:05 -0500
+X-MC-Unique: I8db_jeRNHeAoC324wQExw-1
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-5cdfd47de98so3515012a12.1
+        for <netdev@vger.kernel.org>; Sun, 03 Mar 2024 22:56:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709535364; x=1710140164;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SnnMKJuI5h57AkdTs6wUac/zEo+KD+16W2yUuRvyBNA=;
+        b=hoUfpavCfXLNYch/7Z5SwqZykL/d9MFj4TOaAfVSolXnrr1ov3rh2vg07hjra514G+
+         eNMzJx45imUMUx0ZjGUQNZfbhySyANMtbCZYw6i6rsC4llPB8qaJAyJmowrq2FlHNMDx
+         EzH3o6woMO86e4JX+NooPekFKWlR2geC/xR6yDUPx9bDvQ+ef7j6syk9sDxVsIhqSbqN
+         v37firAK5zee/+WbVSWF2SguBccPj869efW2hDLU5tR2tfhurMHj+HyNsRlyKfNcfu9r
+         jGiarkvRUfgdiAyn/h44UpNGv9BKgdAzvu/9XxS0JfakPcfXpetLlX7AnLXJzK+iwfZH
+         QUQw==
+X-Forwarded-Encrypted: i=1; AJvYcCVtH6JOQGqP54PsjjFZgnEwJTMIS1rDSFM85ngTs8rOpzUB0LK9xC4jK4SmIOLP1M44xEItDAvzBvTw37TxwL72uapsu3ra
+X-Gm-Message-State: AOJu0Yzxv4lU/20HZZyaMg9xmunnSS2RMViO3n9203kfgTl6NIhHpuNg
+	52V1WVuNUmzPjhvGl7whtc7a5Jw5CqpA4irsMgGxdVPnvUfLlfrvEsRQQPcGfaaxU6717owW7kW
+	zjCA2wTt6atnxIWGQJOC6yv5xTAjBspWm+a+LgJoVauQIfjpy6wiEgjwNY/3K9mDVst0p/H2BWj
+	Ffp4ZuKZ91BFyfM7/7z7AyTxCP2mSb
+X-Received: by 2002:a05:6a20:9586:b0:1a1:4ed3:c088 with SMTP id iu6-20020a056a20958600b001a14ed3c088mr1655526pzb.42.1709535364708;
+        Sun, 03 Mar 2024 22:56:04 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG17yX5NcCXqq0LBQnyxMhRX1MIou6zDKDeBeLtv08Lc0fZrfsKtXRWSCIZhWjat1jdDt4spuow+7XOuBi/ai0=
+X-Received: by 2002:a05:6a20:9586:b0:1a1:4ed3:c088 with SMTP id
+ iu6-20020a056a20958600b001a14ed3c088mr1655512pzb.42.1709535364439; Sun, 03
+ Mar 2024 22:56:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: opj04voFdnYVTUKCR39bbJLi7zvC0Kro
-X-Proofpoint-ORIG-GUID: opj04voFdnYVTUKCR39bbJLi7zvC0Kro
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-04_02,2024-03-01_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- bulkscore=0 priorityscore=1501 lowpriorityscore=0 phishscore=0
- clxscore=1015 adultscore=0 spamscore=0 mlxlogscore=999 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2402120000 definitions=main-2403040044
+References: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
+In-Reply-To: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 4 Mar 2024 14:55:53 +0800
+Message-ID: <CACGkMEv+=k+RvbN2kWp85f9NWPYOPQtqkThdjvOrf5mWonBqvw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
+To: Yunjian Wang <wangyunjian@huawei.com>
+Cc: mst@redhat.com, willemdebruijn.kernel@gmail.com, kuba@kernel.org, 
+	bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
+	jonathan.lemon@gmail.com, davem@davemloft.net, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, xudingke@huawei.com, liwei395@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Now that all infrastructure is in place and ath11k is fixed to handle all the
-corner cases, power down the ath11k firmware during suspend and power it back
-up during resume. This fixes the problem when using hibernation with ath11k PCI
-devices.
+On Wed, Feb 28, 2024 at 7:06=E2=80=AFPM Yunjian Wang <wangyunjian@huawei.co=
+m> wrote:
+>
+> This patch set allows TUN to support the AF_XDP Tx zero-copy feature,
+> which can significantly reduce CPU utilization for XDP programs.
+>
+> Since commit fc72d1d54dd9 ("tuntap: XDP transmission"), the pointer
+> ring has been utilized to queue different types of pointers by encoding
+> the type into the lower bits. Therefore, we introduce a new flag,
+> TUN_XDP_DESC_FLAG(0x2UL), which allows us to enqueue XDP descriptors
+> and differentiate them from XDP buffers and sk_buffs. Additionally, a
+> spin lock is added for enabling and disabling operations on the xsk pool.
+>
+> The performance testing was performed on a Intel E5-2620 2.40GHz machine.
+> Traffic were generated/send through TUN(testpmd txonly with AF_XDP)
+> to VM (testpmd rxonly in guest).
+>
+> +------+---------+---------+---------+
+> |      |   copy  |zero-copy| speedup |
+> +------+---------+---------+---------+
+> | UDP  |   Mpps  |   Mpps  |    %    |
+> | 64   |   2.5   |   4.0   |   60%   |
+> | 512  |   2.1   |   3.6   |   71%   |
+> | 1024 |   1.9   |   3.3   |   73%   |
+> +------+---------+---------+---------+
+>
+> Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
+> ---
+>  drivers/net/tun.c      | 177 +++++++++++++++++++++++++++++++++++++++--
+>  drivers/vhost/net.c    |   4 +
+>  include/linux/if_tun.h |  32 ++++++++
+>  3 files changed, 208 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index bc80fc1d576e..7f4ff50b532c 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -63,6 +63,7 @@
+>  #include <net/rtnetlink.h>
+>  #include <net/sock.h>
+>  #include <net/xdp.h>
+> +#include <net/xdp_sock_drv.h>
+>  #include <net/ip_tunnels.h>
+>  #include <linux/seq_file.h>
+>  #include <linux/uio.h>
+> @@ -86,6 +87,7 @@ static void tun_default_link_ksettings(struct net_devic=
+e *dev,
+>                                        struct ethtool_link_ksettings *cmd=
+);
+>
+>  #define TUN_RX_PAD (NET_IP_ALIGN + NET_SKB_PAD)
+> +#define TUN_XDP_BATCH 64
+>
+>  /* TUN device flags */
+>
+> @@ -146,6 +148,9 @@ struct tun_file {
+>         struct tun_struct *detached;
+>         struct ptr_ring tx_ring;
+>         struct xdp_rxq_info xdp_rxq;
+> +       struct xsk_buff_pool *xsk_pool;
+> +       spinlock_t pool_lock;   /* Protects xsk pool enable/disable */
+> +       u32 nb_descs;
+>  };
+>
+>  struct tun_page {
+> @@ -614,6 +619,8 @@ void tun_ptr_free(void *ptr)
+>                 struct xdp_frame *xdpf =3D tun_ptr_to_xdp(ptr);
+>
+>                 xdp_return_frame(xdpf);
+> +       } else if (tun_is_xdp_desc_frame(ptr)) {
+> +               return;
+>         } else {
+>                 __skb_array_destroy_skb(ptr);
+>         }
+> @@ -631,6 +638,37 @@ static void tun_queue_purge(struct tun_file *tfile)
+>         skb_queue_purge(&tfile->sk.sk_error_queue);
+>  }
+>
+> +static void tun_set_xsk_pool(struct tun_file *tfile, struct xsk_buff_poo=
+l *pool)
+> +{
+> +       if (!pool)
+> +               return;
+> +
+> +       spin_lock(&tfile->pool_lock);
+> +       xsk_pool_set_rxq_info(pool, &tfile->xdp_rxq);
+> +       tfile->xsk_pool =3D pool;
+> +       spin_unlock(&tfile->pool_lock);
+> +}
+> +
+> +static void tun_clean_xsk_pool(struct tun_file *tfile)
+> +{
+> +       spin_lock(&tfile->pool_lock);
+> +       if (tfile->xsk_pool) {
+> +               void *ptr;
+> +
+> +               while ((ptr =3D ptr_ring_consume(&tfile->tx_ring)) !=3D N=
+ULL)
+> +                       tun_ptr_free(ptr);
+> +
+> +               if (tfile->nb_descs) {
+> +                       xsk_tx_completed(tfile->xsk_pool, tfile->nb_descs=
+);
+> +                       if (xsk_uses_need_wakeup(tfile->xsk_pool))
+> +                               xsk_set_tx_need_wakeup(tfile->xsk_pool);
+> +                       tfile->nb_descs =3D 0;
+> +               }
+> +               tfile->xsk_pool =3D NULL;
+> +       }
+> +       spin_unlock(&tfile->pool_lock);
+> +}
+> +
+>  static void __tun_detach(struct tun_file *tfile, bool clean)
+>  {
+>         struct tun_file *ntfile;
+> @@ -648,6 +686,11 @@ static void __tun_detach(struct tun_file *tfile, boo=
+l clean)
+>                 u16 index =3D tfile->queue_index;
+>                 BUG_ON(index >=3D tun->numqueues);
+>
+> +               ntfile =3D rtnl_dereference(tun->tfiles[tun->numqueues - =
+1]);
+> +               /* Stop xsk zc xmit */
+> +               tun_clean_xsk_pool(tfile);
+> +               tun_clean_xsk_pool(ntfile);
+> +
+>                 rcu_assign_pointer(tun->tfiles[index],
+>                                    tun->tfiles[tun->numqueues - 1]);
+>                 ntfile =3D rtnl_dereference(tun->tfiles[index]);
+> @@ -668,6 +711,7 @@ static void __tun_detach(struct tun_file *tfile, bool=
+ clean)
+>                 tun_flow_delete_by_queue(tun, tun->numqueues + 1);
+>                 /* Drop read queue */
+>                 tun_queue_purge(tfile);
+> +               tun_set_xsk_pool(ntfile, xsk_get_pool_from_qid(tun->dev, =
+index));
+>                 tun_set_real_num_queues(tun);
+>         } else if (tfile->detached && clean) {
+>                 tun =3D tun_enable_queue(tfile);
+> @@ -801,6 +845,7 @@ static int tun_attach(struct tun_struct *tun, struct =
+file *file,
+>
+>                 if (tfile->xdp_rxq.queue_index    !=3D tfile->queue_index=
+)
+>                         tfile->xdp_rxq.queue_index =3D tfile->queue_index=
+;
+> +               tun_set_xsk_pool(tfile, xsk_get_pool_from_qid(dev, tfile-=
+>queue_index));
+>         } else {
+>                 /* Setup XDP RX-queue info, for new tfile getting attache=
+d */
+>                 err =3D xdp_rxq_info_reg(&tfile->xdp_rxq,
+> @@ -1221,11 +1266,50 @@ static int tun_xdp_set(struct net_device *dev, st=
+ruct bpf_prog *prog,
+>         return 0;
+>  }
+>
+> +static int tun_xsk_pool_enable(struct net_device *netdev,
+> +                              struct xsk_buff_pool *pool,
+> +                              u16 qid)
+> +{
+> +       struct tun_struct *tun =3D netdev_priv(netdev);
+> +       struct tun_file *tfile;
+> +
+> +       if (qid >=3D tun->numqueues)
+> +               return -EINVAL;
+> +
+> +       tfile =3D rtnl_dereference(tun->tfiles[qid]);
+> +       tun_set_xsk_pool(tfile, pool);
+> +
+> +       return 0;
+> +}
+> +
+> +static int tun_xsk_pool_disable(struct net_device *netdev, u16 qid)
+> +{
+> +       struct tun_struct *tun =3D netdev_priv(netdev);
+> +       struct tun_file *tfile;
+> +
+> +       if (qid >=3D MAX_TAP_QUEUES)
+> +               return -EINVAL;
+> +
+> +       tfile =3D rtnl_dereference(tun->tfiles[qid]);
+> +       if (tfile)
+> +               tun_clean_xsk_pool(tfile);
+> +       return 0;
+> +}
+> +
+> +static int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buff_po=
+ol *pool,
+> +                             u16 qid)
+> +{
+> +       return pool ? tun_xsk_pool_enable(dev, pool, qid) :
+> +               tun_xsk_pool_disable(dev, qid);
+> +}
+> +
+>  static int tun_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+>  {
+>         switch (xdp->command) {
+>         case XDP_SETUP_PROG:
+>                 return tun_xdp_set(dev, xdp->prog, xdp->extack);
+> +       case XDP_SETUP_XSK_POOL:
+> +               return tun_xsk_pool_setup(dev, xdp->xsk.pool, xdp->xsk.qu=
+eue_id);
+>         default:
+>                 return -EINVAL;
+>         }
+> @@ -1330,6 +1414,19 @@ static int tun_xdp_tx(struct net_device *dev, stru=
+ct xdp_buff *xdp)
+>         return nxmit;
+>  }
+>
+> +static int tun_xsk_wakeup(struct net_device *dev, u32 qid, u32 flags)
+> +{
+> +       struct tun_struct *tun =3D netdev_priv(dev);
+> +       struct tun_file *tfile;
+> +
+> +       rcu_read_lock();
+> +       tfile =3D rcu_dereference(tun->tfiles[qid]);
+> +       if (tfile)
+> +               __tun_xdp_flush_tfile(tfile);
+> +       rcu_read_unlock();
+> +       return 0;
+> +}
 
-For suspend, two conditions needs to be satisfied:
-        1. since MHI channel unprepare would be done in late suspend stage,
-           ath11k needs to get all QMI-dependent things done before that stage.
-        2. and because unprepare MHI channels requires a working MHI stack,
-           ath11k is not allowed to call mhi_power_down() until that finishes.
-So the original suspend callback is separated into two parts: the first part
-handles all QMI-dependent things in suspend callback; while the second part
-powers down MHI in suspend_late callback. This is valid because kernel calls
-ath11k's suspend callback before all suspend_late callbacks, making the first
-condition happy. And because MHI devices are children of ath11k device
-(ab->dev), kernel guarantees that ath11k's suspend_late callback is called
-after QRTR's suspend_late callback, this satisfies the second condition.
+I may miss something but why not simply queue xdp frames into ptr ring
+then we don't need tricks for peek?
 
-Above analysis also applies to resume process. so the original resume
-callback is separated into two parts: the first part powers up MHI stack
-in resume_early callback, this guarantees MHI stack is working when
-QRTR tries to prepare MHI channels (kernel calls QRTR's resume_early callback
-after ath11k's resume_early callback, due to the child-father relationship);
-the second part waits for the completion of restart, which won't fail now
-since MHI channels are ready for use by QMI.
-
-Another notable change is in power down path, we tell mhi_power_down() to not
-to destroy MHI devices, making it possible for QRTR to help unprepare/prepare
-MHI channels, and finally get us rid of the probe-defer issue when resume.
-
-Also change related code due to interface changes.
-
-Tested-on: WCN6855 hw2.0 PCI WLAN.HSP.1.1-03125-QCAHSPSWPL_V1_V2_SILICONZ_LITE-3.6510.30
-
-Tested-by: Takashi Iwai <tiwai@suse.de>
-Signed-off-by: Kalle Valo <quic_kvalo@quicinc.com>
-Signed-off-by: Baochen Qiang <quic_bqiang@quicinc.com>
----
- drivers/net/wireless/ath/ath11k/ahb.c  |   6 +-
- drivers/net/wireless/ath/ath11k/core.c | 107 +++++++++++++++++--------
- drivers/net/wireless/ath/ath11k/core.h |   6 +-
- drivers/net/wireless/ath/ath11k/hif.h  |  14 +++-
- drivers/net/wireless/ath/ath11k/mhi.c  |  12 ++-
- drivers/net/wireless/ath/ath11k/mhi.h  |   5 +-
- drivers/net/wireless/ath/ath11k/pci.c  |  44 ++++++++--
- drivers/net/wireless/ath/ath11k/qmi.c  |   2 +-
- 8 files changed, 143 insertions(+), 53 deletions(-)
-
-diff --git a/drivers/net/wireless/ath/ath11k/ahb.c b/drivers/net/wireless/ath/ath11k/ahb.c
-index 7c0a23517949..60b4c2800a33 100644
---- a/drivers/net/wireless/ath/ath11k/ahb.c
-+++ b/drivers/net/wireless/ath/ath11k/ahb.c
-@@ -1,7 +1,7 @@
- // SPDX-License-Identifier: BSD-3-Clause-Clear
- /*
-  * Copyright (c) 2018-2019 The Linux Foundation. All rights reserved.
-- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
-+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
-  */
- 
- #include <linux/module.h>
-@@ -413,7 +413,7 @@ static int ath11k_ahb_power_up(struct ath11k_base *ab)
- 	return ret;
- }
- 
--static void ath11k_ahb_power_down(struct ath11k_base *ab)
-+static void ath11k_ahb_power_down(struct ath11k_base *ab, bool is_suspend)
- {
- 	struct ath11k_ahb *ab_ahb = ath11k_ahb_priv(ab);
- 
-@@ -1256,7 +1256,7 @@ static void ath11k_ahb_remove(struct platform_device *pdev)
- 	struct ath11k_base *ab = platform_get_drvdata(pdev);
- 
- 	if (test_bit(ATH11K_FLAG_QMI_FAIL, &ab->dev_flags)) {
--		ath11k_ahb_power_down(ab);
-+		ath11k_ahb_power_down(ab, false);
- 		ath11k_debugfs_soc_destroy(ab);
- 		ath11k_qmi_deinit_service(ab);
- 		goto qmi_fail;
-diff --git a/drivers/net/wireless/ath/ath11k/core.c b/drivers/net/wireless/ath/ath11k/core.c
-index c78bce19bd75..ca3387ff394e 100644
---- a/drivers/net/wireless/ath/ath11k/core.c
-+++ b/drivers/net/wireless/ath/ath11k/core.c
-@@ -894,12 +894,6 @@ int ath11k_core_suspend(struct ath11k_base *ab)
- 		return ret;
- 	}
- 
--	ret = ath11k_wow_enable(ab);
--	if (ret) {
--		ath11k_warn(ab, "failed to enable wow during suspend: %d\n", ret);
--		return ret;
--	}
--
- 	ret = ath11k_dp_rx_pktlog_stop(ab, false);
- 	if (ret) {
- 		ath11k_warn(ab, "failed to stop dp rx pktlog during suspend: %d\n",
-@@ -910,29 +904,85 @@ int ath11k_core_suspend(struct ath11k_base *ab)
- 	ath11k_ce_stop_shadow_timers(ab);
- 	ath11k_dp_stop_shadow_timers(ab);
- 
-+	/* PM framework skips suspend_late/resume_early callbacks
-+	 * if other devices report errors in their suspend callbacks.
-+	 * However ath11k_core_resume() would still be called because
-+	 * here we return success thus kernel put us on dpm_suspended_list.
-+	 * Since we won't go through a power down/up cycle, there is
-+	 * no chance to call complete(&ab->restart_completed) in
-+	 * ath11k_core_restart(), making ath11k_core_resume() timeout.
-+	 * So call it here to avoid this issue. This also works in case
-+	 * no error happens thus suspend_late/resume_early get called,
-+	 * because it will be reinitialized in ath11k_core_resume_early().
-+	 */
-+	complete(&ab->restart_completed);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(ath11k_core_suspend);
-+
-+int ath11k_core_suspend_late(struct ath11k_base *ab)
-+{
-+	struct ath11k_pdev *pdev;
-+	struct ath11k *ar;
-+
-+	if (!ab->hw_params.supports_suspend)
-+		return -EOPNOTSUPP;
-+
-+	/* so far single_pdev_only chips have supports_suspend as true
-+	 * and only the first pdev is valid.
-+	 */
-+	pdev = ath11k_core_get_single_pdev(ab);
-+	ar = pdev->ar;
-+	if (!ar || ar->state != ATH11K_STATE_OFF)
-+		return 0;
-+
- 	ath11k_hif_irq_disable(ab);
- 	ath11k_hif_ce_irq_disable(ab);
- 
--	ret = ath11k_hif_suspend(ab);
--	if (ret) {
--		ath11k_warn(ab, "failed to suspend hif: %d\n", ret);
--		return ret;
--	}
-+	ath11k_hif_power_down(ab, true);
- 
- 	return 0;
- }
--EXPORT_SYMBOL(ath11k_core_suspend);
-+EXPORT_SYMBOL(ath11k_core_suspend_late);
-+
-+int ath11k_core_resume_early(struct ath11k_base *ab)
-+{
-+	int ret;
-+	struct ath11k_pdev *pdev;
-+	struct ath11k *ar;
-+
-+	if (!ab->hw_params.supports_suspend)
-+		return -EOPNOTSUPP;
-+
-+	/* so far single_pdev_only chips have supports_suspend as true
-+	 * and only the first pdev is valid.
-+	 */
-+	pdev = ath11k_core_get_single_pdev(ab);
-+	ar = pdev->ar;
-+	if (!ar || ar->state != ATH11K_STATE_OFF)
-+		return 0;
-+
-+	reinit_completion(&ab->restart_completed);
-+	ret = ath11k_hif_power_up(ab);
-+	if (ret)
-+		ath11k_warn(ab, "failed to power up hif during resume: %d\n", ret);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(ath11k_core_resume_early);
- 
- int ath11k_core_resume(struct ath11k_base *ab)
- {
- 	int ret;
- 	struct ath11k_pdev *pdev;
- 	struct ath11k *ar;
-+	long time_left;
- 
- 	if (!ab->hw_params.supports_suspend)
- 		return -EOPNOTSUPP;
- 
--	/* so far signle_pdev_only chips have supports_suspend as true
-+	/* so far single_pdev_only chips have supports_suspend as true
- 	 * and only the first pdev is valid.
- 	 */
- 	pdev = ath11k_core_get_single_pdev(ab);
-@@ -940,29 +990,19 @@ int ath11k_core_resume(struct ath11k_base *ab)
- 	if (!ar || ar->state != ATH11K_STATE_OFF)
- 		return 0;
- 
--	ret = ath11k_hif_resume(ab);
--	if (ret) {
--		ath11k_warn(ab, "failed to resume hif during resume: %d\n", ret);
--		return ret;
-+	time_left = wait_for_completion_timeout(&ab->restart_completed,
-+						ATH11K_RESET_TIMEOUT_HZ);
-+	if (time_left == 0) {
-+		ath11k_warn(ab, "timeout while waiting for restart complete");
-+		return -ETIMEDOUT;
- 	}
- 
--	ath11k_hif_ce_irq_enable(ab);
--	ath11k_hif_irq_enable(ab);
--
- 	ret = ath11k_dp_rx_pktlog_start(ab);
--	if (ret) {
-+	if (ret)
- 		ath11k_warn(ab, "failed to start rx pktlog during resume: %d\n",
- 			    ret);
--		return ret;
--	}
--
--	ret = ath11k_wow_wakeup(ab);
--	if (ret) {
--		ath11k_warn(ab, "failed to wakeup wow during resume: %d\n", ret);
--		return ret;
--	}
- 
--	return 0;
-+	return ret;
- }
- EXPORT_SYMBOL(ath11k_core_resume);
- 
-@@ -2060,6 +2100,8 @@ static void ath11k_core_restart(struct work_struct *work)
- 
- 	if (!ab->is_reset)
- 		ath11k_core_post_reconfigure_recovery(ab);
-+
-+	complete(&ab->restart_completed);
- }
- 
- static void ath11k_core_reset(struct work_struct *work)
-@@ -2129,7 +2171,7 @@ static void ath11k_core_reset(struct work_struct *work)
- 	ath11k_hif_irq_disable(ab);
- 	ath11k_hif_ce_irq_disable(ab);
- 
--	ath11k_hif_power_down(ab);
-+	ath11k_hif_power_down(ab, false);
- 	ath11k_hif_power_up(ab);
- 
- 	ath11k_dbg(ab, ATH11K_DBG_BOOT, "reset started\n");
-@@ -2202,7 +2244,7 @@ void ath11k_core_deinit(struct ath11k_base *ab)
- 
- 	mutex_unlock(&ab->core_lock);
- 
--	ath11k_hif_power_down(ab);
-+	ath11k_hif_power_down(ab, false);
- 	ath11k_mac_destroy(ab);
- 	ath11k_core_soc_destroy(ab);
- 	ath11k_fw_destroy(ab);
-@@ -2255,6 +2297,7 @@ struct ath11k_base *ath11k_core_alloc(struct device *dev, size_t priv_size,
- 	timer_setup(&ab->rx_replenish_retry, ath11k_ce_rx_replenish_retry, 0);
- 	init_completion(&ab->htc_suspend);
- 	init_completion(&ab->wow.wakeup_completed);
-+	init_completion(&ab->restart_completed);
- 
- 	ab->dev = dev;
- 	ab->hif.bus = bus;
-diff --git a/drivers/net/wireless/ath/ath11k/core.h b/drivers/net/wireless/ath/ath11k/core.h
-index b3fb74a226fb..a20c29e3a227 100644
---- a/drivers/net/wireless/ath/ath11k/core.h
-+++ b/drivers/net/wireless/ath/ath11k/core.h
-@@ -1,7 +1,7 @@
- /* SPDX-License-Identifier: BSD-3-Clause-Clear */
- /*
-  * Copyright (c) 2018-2019 The Linux Foundation. All rights reserved.
-- * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
-+ * Copyright (c) 2021-2024 Qualcomm Innovation Center, Inc. All rights reserved.
-  */
- 
- #ifndef ATH11K_CORE_H
-@@ -1033,6 +1033,8 @@ struct ath11k_base {
- 		DECLARE_BITMAP(fw_features, ATH11K_FW_FEATURE_COUNT);
- 	} fw;
- 
-+	struct completion restart_completed;
-+
- #ifdef CONFIG_NL80211_TESTMODE
- 	struct {
- 		u32 data_pos;
-@@ -1232,8 +1234,10 @@ void ath11k_core_free_bdf(struct ath11k_base *ab, struct ath11k_board_data *bd);
- int ath11k_core_check_dt(struct ath11k_base *ath11k);
- int ath11k_core_check_smbios(struct ath11k_base *ab);
- void ath11k_core_halt(struct ath11k *ar);
-+int ath11k_core_resume_early(struct ath11k_base *ab);
- int ath11k_core_resume(struct ath11k_base *ab);
- int ath11k_core_suspend(struct ath11k_base *ab);
-+int ath11k_core_suspend_late(struct ath11k_base *ab);
- void ath11k_core_pre_reconfigure_recovery(struct ath11k_base *ab);
- bool ath11k_core_coldboot_cal_support(struct ath11k_base *ab);
- 
-diff --git a/drivers/net/wireless/ath/ath11k/hif.h b/drivers/net/wireless/ath/ath11k/hif.h
-index 877a4073fed6..c4c6cc09c7c1 100644
---- a/drivers/net/wireless/ath/ath11k/hif.h
-+++ b/drivers/net/wireless/ath/ath11k/hif.h
-@@ -1,7 +1,7 @@
- /* SPDX-License-Identifier: BSD-3-Clause-Clear */
- /*
-  * Copyright (c) 2019-2020 The Linux Foundation. All rights reserved.
-- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
-+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
-  */
- 
- #ifndef _HIF_H_
-@@ -18,7 +18,7 @@ struct ath11k_hif_ops {
- 	int (*start)(struct ath11k_base *ab);
- 	void (*stop)(struct ath11k_base *ab);
- 	int (*power_up)(struct ath11k_base *ab);
--	void (*power_down)(struct ath11k_base *ab);
-+	void (*power_down)(struct ath11k_base *ab, bool is_suspend);
- 	int (*suspend)(struct ath11k_base *ab);
- 	int (*resume)(struct ath11k_base *ab);
- 	int (*map_service_to_pipe)(struct ath11k_base *ab, u16 service_id,
-@@ -67,12 +67,18 @@ static inline void ath11k_hif_irq_disable(struct ath11k_base *ab)
- 
- static inline int ath11k_hif_power_up(struct ath11k_base *ab)
- {
-+	if (!ab->hif.ops->power_up)
-+		return -EOPNOTSUPP;
-+
- 	return ab->hif.ops->power_up(ab);
- }
- 
--static inline void ath11k_hif_power_down(struct ath11k_base *ab)
-+static inline void ath11k_hif_power_down(struct ath11k_base *ab, bool is_suspend)
- {
--	ab->hif.ops->power_down(ab);
-+	if (!ab->hif.ops->power_down)
-+		return;
-+
-+	ab->hif.ops->power_down(ab, is_suspend);
- }
- 
- static inline int ath11k_hif_suspend(struct ath11k_base *ab)
-diff --git a/drivers/net/wireless/ath/ath11k/mhi.c b/drivers/net/wireless/ath/ath11k/mhi.c
-index fb4ecf9a103e..90eacfe7e6d7 100644
---- a/drivers/net/wireless/ath/ath11k/mhi.c
-+++ b/drivers/net/wireless/ath/ath11k/mhi.c
-@@ -442,9 +442,17 @@ int ath11k_mhi_start(struct ath11k_pci *ab_pci)
- 	return 0;
- }
- 
--void ath11k_mhi_stop(struct ath11k_pci *ab_pci)
-+void ath11k_mhi_stop(struct ath11k_pci *ab_pci, bool is_suspend)
- {
--	mhi_power_down(ab_pci->mhi_ctrl, true);
-+	/* During suspend we need to use mhi_power_down_keep_dev()
-+	 * workaround, otherwise ath11k_core_resume() will timeout
-+	 * during resume.
-+	 */
-+	if (is_suspend)
-+		mhi_power_down_keep_dev(ab_pci->mhi_ctrl, true);
-+	else
-+		mhi_power_down(ab_pci->mhi_ctrl, true);
-+
- 	mhi_unprepare_after_power_down(ab_pci->mhi_ctrl);
- }
- 
-diff --git a/drivers/net/wireless/ath/ath11k/mhi.h b/drivers/net/wireless/ath/ath11k/mhi.h
-index f81fba2644a4..2d567705e732 100644
---- a/drivers/net/wireless/ath/ath11k/mhi.h
-+++ b/drivers/net/wireless/ath/ath11k/mhi.h
-@@ -1,7 +1,7 @@
- /* SPDX-License-Identifier: BSD-3-Clause-Clear */
- /*
-  * Copyright (c) 2020 The Linux Foundation. All rights reserved.
-- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
-+ * Copyright (c) 2022, 2024 Qualcomm Innovation Center, Inc. All rights reserved.
-  */
- #ifndef _ATH11K_MHI_H
- #define _ATH11K_MHI_H
-@@ -18,7 +18,7 @@
- #define MHICTRL_RESET_MASK			0x2
- 
- int ath11k_mhi_start(struct ath11k_pci *ar_pci);
--void ath11k_mhi_stop(struct ath11k_pci *ar_pci);
-+void ath11k_mhi_stop(struct ath11k_pci *ar_pci, bool is_suspend);
- int ath11k_mhi_register(struct ath11k_pci *ar_pci);
- void ath11k_mhi_unregister(struct ath11k_pci *ar_pci);
- void ath11k_mhi_set_mhictrl_reset(struct ath11k_base *ab);
-@@ -26,5 +26,4 @@ void ath11k_mhi_clear_vector(struct ath11k_base *ab);
- 
- int ath11k_mhi_suspend(struct ath11k_pci *ar_pci);
- int ath11k_mhi_resume(struct ath11k_pci *ar_pci);
--
- #endif
-diff --git a/drivers/net/wireless/ath/ath11k/pci.c b/drivers/net/wireless/ath/ath11k/pci.c
-index be9d2c69cc41..8d63b84d1261 100644
---- a/drivers/net/wireless/ath/ath11k/pci.c
-+++ b/drivers/net/wireless/ath/ath11k/pci.c
-@@ -638,7 +638,7 @@ static int ath11k_pci_power_up(struct ath11k_base *ab)
- 	return 0;
- }
- 
--static void ath11k_pci_power_down(struct ath11k_base *ab)
-+static void ath11k_pci_power_down(struct ath11k_base *ab, bool is_suspend)
- {
- 	struct ath11k_pci *ab_pci = ath11k_pci_priv(ab);
- 
-@@ -649,7 +649,7 @@ static void ath11k_pci_power_down(struct ath11k_base *ab)
- 
- 	ath11k_pci_msi_disable(ab_pci);
- 
--	ath11k_mhi_stop(ab_pci);
-+	ath11k_mhi_stop(ab_pci, is_suspend);
- 	clear_bit(ATH11K_FLAG_DEVICE_INIT_DONE, &ab->dev_flags);
- 	ath11k_pci_sw_reset(ab_pci->ab, false);
- }
-@@ -970,7 +970,7 @@ static void ath11k_pci_remove(struct pci_dev *pdev)
- 	ath11k_pci_set_irq_affinity_hint(ab_pci, NULL);
- 
- 	if (test_bit(ATH11K_FLAG_QMI_FAIL, &ab->dev_flags)) {
--		ath11k_pci_power_down(ab);
-+		ath11k_pci_power_down(ab, false);
- 		ath11k_debugfs_soc_destroy(ab);
- 		ath11k_qmi_deinit_service(ab);
- 		goto qmi_fail;
-@@ -998,7 +998,7 @@ static void ath11k_pci_shutdown(struct pci_dev *pdev)
- 	struct ath11k_pci *ab_pci = ath11k_pci_priv(ab);
- 
- 	ath11k_pci_set_irq_affinity_hint(ab_pci, NULL);
--	ath11k_pci_power_down(ab);
-+	ath11k_pci_power_down(ab, false);
- }
- 
- static __maybe_unused int ath11k_pci_pm_suspend(struct device *dev)
-@@ -1035,9 +1035,39 @@ static __maybe_unused int ath11k_pci_pm_resume(struct device *dev)
- 	return ret;
- }
- 
--static SIMPLE_DEV_PM_OPS(ath11k_pci_pm_ops,
--			 ath11k_pci_pm_suspend,
--			 ath11k_pci_pm_resume);
-+static __maybe_unused int ath11k_pci_pm_suspend_late(struct device *dev)
-+{
-+	struct ath11k_base *ab = dev_get_drvdata(dev);
-+	int ret;
-+
-+	ret = ath11k_core_suspend_late(ab);
-+	if (ret)
-+		ath11k_warn(ab, "failed to late suspend core: %d\n", ret);
-+
-+	/* Similar to ath11k_pci_pm_suspend(), we return success here
-+	 * even error happens, to allow system suspend/hibernation survive.
-+	 */
-+	return 0;
-+}
-+
-+static __maybe_unused int ath11k_pci_pm_resume_early(struct device *dev)
-+{
-+	struct ath11k_base *ab = dev_get_drvdata(dev);
-+	int ret;
-+
-+	ret = ath11k_core_resume_early(ab);
-+	if (ret)
-+		ath11k_warn(ab, "failed to early resume core: %d\n", ret);
-+
-+	return ret;
-+}
-+
-+static const struct dev_pm_ops __maybe_unused ath11k_pci_pm_ops = {
-+	SET_SYSTEM_SLEEP_PM_OPS(ath11k_pci_pm_suspend,
-+				ath11k_pci_pm_resume)
-+	SET_LATE_SYSTEM_SLEEP_PM_OPS(ath11k_pci_pm_suspend_late,
-+				     ath11k_pci_pm_resume_early)
-+};
- 
- static struct pci_driver ath11k_pci_driver = {
- 	.name = "ath11k_pci",
-diff --git a/drivers/net/wireless/ath/ath11k/qmi.c b/drivers/net/wireless/ath/ath11k/qmi.c
-index 5006f81f779b..d4a243b64f6c 100644
---- a/drivers/net/wireless/ath/ath11k/qmi.c
-+++ b/drivers/net/wireless/ath/ath11k/qmi.c
-@@ -2877,7 +2877,7 @@ int ath11k_qmi_fwreset_from_cold_boot(struct ath11k_base *ab)
- 	}
- 
- 	/* reset the firmware */
--	ath11k_hif_power_down(ab);
-+	ath11k_hif_power_down(ab, false);
- 	ath11k_hif_power_up(ab);
- 	ath11k_dbg(ab, ATH11K_DBG_QMI, "exit wait for cold boot done\n");
- 	return 0;
--- 
-2.25.1
+Thanks
 
 
