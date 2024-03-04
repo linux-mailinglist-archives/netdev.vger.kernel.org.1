@@ -1,175 +1,263 @@
-Return-Path: <netdev+bounces-77264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51BFC871001
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 23:20:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F49F871005
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 23:23:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CA3B1C20BC0
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 22:20:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAD401F2265C
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 22:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FF237B3DE;
-	Mon,  4 Mar 2024 22:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E7477BAE2;
+	Mon,  4 Mar 2024 22:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jDdYgZaq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oxf7Li6Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A451C687;
-	Mon,  4 Mar 2024 22:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DB47A70D
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 22:23:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709590808; cv=none; b=RmeYx7t0rN7MeoV6E2y/1UesQ2MYtiHR4ZCXEuRLpCY5kU4NTdfoGPTCy+lTohcsKbl3hRgYW+/sI2+Ck+6NbJUEhvSxMQW6Tw8pk3cH+o5wPq4EzHEM7UlvWex7regXGZb8xVKZAp2/EfLP7TIg5U68DklRxC07O70iBHPdPyo=
+	t=1709590987; cv=none; b=JLbJw+EP+qqJN9jZgwKSEvc2aEmaAdyNyrOY/Q9x88O88oTNE/SGFB+kiIDw89vKdffDh/wTb5cy3tKIUi8gZok7bCROpN6P1PEc98RgfTMZ8amrrLIx+CIoTb2IH5MCVEszWAZWlPdk3DSrlHfFxY8MU2OdxVdoNoERT6iZJVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709590808; c=relaxed/simple;
-	bh=qmXTnNqvGt/oGPfYFvQo/wwd8VyuHl2B3KGyc0VaoqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jzliQcHnTbIM81U4eV3u8YgspTXM9D8Bbz9g8sH6TRo+uHP3sJTXLnZTM04YZ06yw19LKRiKBVOojuyaNTvmPFbvJ9XvO8pXANzHPOH9pp4F2j4jp7xOA2raRo4HHc9GGOqVdWWcPiiRGnKLtDQ46O9YmUYJUWij4IBRpDRJ1sM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jDdYgZaq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06527C433F1;
-	Mon,  4 Mar 2024 22:20:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709590808;
-	bh=qmXTnNqvGt/oGPfYFvQo/wwd8VyuHl2B3KGyc0VaoqM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jDdYgZaqr6a7IMnlvahw8/3PrwYyKa/cGswY9lH/jT+2FZGkibixj8Mr0JylYmB9k
-	 9ypVf3NPzPlJ96nXtKi9kPg89ozUMwpv9J6VyI0n/6CDuy4FHxHI4OrlUQuIUmWF3H
-	 wgF6f3e0Mga+yfwdzvDqo7JDgGLrD0VTVlCUFTFqo9J2/i8ggiTGhKze4RwIgbNZK0
-	 i99nyPC762w8OxNMarTehIneVhKvUcy2xSnW3NvhoJZDpKDziP5o5u9MnaIrg+rR0c
-	 ZcfKG5VA3fLAixREyINZ7S0GBK5Ui7svIu5+mVhPvz6k0dkURJHj7Y1cY2Xm1jIhv7
-	 RhGfTq+11RVvQ==
-Date: Mon, 4 Mar 2024 22:20:03 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, shuah@kernel.org,
-	linux-kselftest@vger.kernel.org, mic@digikod.net,
-	linux-security-module@vger.kernel.org, keescook@chromium.org,
-	jakub@cloudflare.com
-Subject: Re: [PATCH v4 00/12] selftests: kselftest_harness: support using
- xfail
-Message-ID: <05f7bf89-04a5-4b65-bf59-c19456aeb1f0@sirena.org.uk>
-References: <20240229005920.2407409-1-kuba@kernel.org>
+	s=arc-20240116; t=1709590987; c=relaxed/simple;
+	bh=Owu+EWU5VJmrFcSA9IZuRrclsu7ETVzGV/OMUSG3N00=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=eYez0D1p3AOKuijzEMRmZYkWJ3GzUDRJCL+jqJjTAIeaCOF5lA49kGVWvYRcInVF2eL89+rWCHmHR9tAv9Vx68qoamnvKSl+YcUrSDVCsno+hoHCtMV8sCuSX0uHawHDB5f7Q76DgJxBK422KELzxPJszzyJoN8wR5JcXkirXP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oxf7Li6Z; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6b2682870so8140381276.0
+        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 14:23:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709590985; x=1710195785; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=D/JMENula9xdGgm/fyDT7SM2OBRhPe/r5zKCY6GLqjc=;
+        b=oxf7Li6Z+lxLEXVgRM5+qbJwVvlekOKQT/AdK3dIFuLjwCi+EnmNdYMgliwi3/Z7Q2
+         JyiYKma76nt12Hk1nEsP3w8Eznp36ILvUcNA0B3ezL0V6uDWirx4BSVk2C9746LM/MBF
+         tvJFZXjlH1n2cOHskIiOJ/hDEbFmpdAcH0akwbnsWm9F32iSUu0boI5kTDNYvnYBbBpk
+         zJLxU+Zn0MZ7k1mp4lzpmPlOawhaJ0uuFKSHAWLL87ljPXpMu3TlzuQrPoJ7BNzUw3af
+         d9h+/ko7PqX3UjZuExkMOK/lEHrhDlKl1VEmW3LxX6fS/t2rvHeLYf8SDno1DOjEZpEP
+         4icw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709590985; x=1710195785;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=D/JMENula9xdGgm/fyDT7SM2OBRhPe/r5zKCY6GLqjc=;
+        b=J8dUUeHL6wf0mPnxPQSwNCSVRtZ/lCNZo1HLpwu/2Lsk9Unt3+hcqHTS/GqSUfXI/9
+         /9fq5Thk0WWBQngK4GPGnFYWV2FzrbKPo3VCc1y100gwZqRVHKLDI1bp2/WwxYKcvcgV
+         O3qPwUJ5A/MHJTl2Ta8wgAR7SYzQuB6JlLCQ9fcFWWYhaqDUbDANrcR8YcQGFqnwMdrS
+         h9M2BnJ0VJqgYCmuberZX0vrOGuv4uhok1mLxuEcC4waN9KnPLVFZWqx2uRhbkWIo4Eb
+         VeKHY3VdFAfEPwlfApiJgkJChzAGJWKeI/OgtwoK2suM4kC3n1wo1PU55KzO/hKa3sAv
+         V9+w==
+X-Forwarded-Encrypted: i=1; AJvYcCWfmvBi59r7EblN/T1ebO+pX5H9Qo3kb0ajsRJnccuShCLaZn5pTWiOpwOE0ndvH6ThHh1LlTXRO73AakKU56x3QBTLFl6n
+X-Gm-Message-State: AOJu0YwfO++xT2EJL9nGQZB8sr7hjYNS+bjnkdrWNb/PZU/bUs6vDqB2
+	OhWiNQw3itkE7PVSACwOsJdfUUCZpqtgeqMTvtiTQWEVbuRYBq7RIYrTWu8gts4sBQ==
+X-Google-Smtp-Source: AGHT+IHYrovjugOzVRfIKRtNK1exA0iGmPE/KuPEWxxRoVwXJYULKwQaKzJnY9Sut+lG5mgf1g7+UDQ=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a05:6902:1004:b0:dc7:48ce:d17f with SMTP id
+ w4-20020a056902100400b00dc748ced17fmr2673279ybt.10.1709590985260; Mon, 04 Mar
+ 2024 14:23:05 -0800 (PST)
+Date: Mon, 4 Mar 2024 14:23:03 -0800
+In-Reply-To: <CAM0EoM=b6ymCEKs14ACanbkzscy=AdARYHSWprtexHBswD7xeg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="hO45sqC4rUaVfCUw"
-Content-Disposition: inline
-In-Reply-To: <20240229005920.2407409-1-kuba@kernel.org>
-X-Cookie: Please come again.
-
-
---hO45sqC4rUaVfCUw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mime-Version: 1.0
+References: <CAM0EoM=-hzSNxOegHqhAQD7qoAR2CS3Dyh-chRB+H7C7TQzmow@mail.gmail.com>
+ <20240301173214.3d95e22b@kernel.org> <CAM0EoM=NEB25naGtz=YaOt6BDoiv4RpDw27Y=btMZAMGeYB5bg@mail.gmail.com>
+ <CAM0EoM=8GG-zCaopaUDMkvqemrZQUtaVRTMrWA6z=xrdYxG9+g@mail.gmail.com>
+ <20240302192747.371684fb@kernel.org> <CAM0EoMncuPvUsRwE+Ajojgg-8JD+1oJ7j2Rw+7oN60MjjAHV-g@mail.gmail.com>
+ <CAOuuhY8pgxqCg5uTXzetTt5sd8RzOfLPYF8ksLjoUhkKyqr56w@mail.gmail.com>
+ <CAM0EoMnpZuC_fdzXj5+seXo3GT9rrf1txc45tB=gie4cf-Zqeg@mail.gmail.com>
+ <ZeY7TqCGFR3h36k-@google.com> <CAM0EoM=b6ymCEKs14ACanbkzscy=AdARYHSWprtexHBswD7xeg@mail.gmail.com>
+Message-ID: <ZeZJxzRs5ayQ03ii@google.com>
+Subject: Re: Hardware Offload discussion WAS(Re: [PATCH net-next v12 00/15]
+ Introducing P4TC (series 1)
+From: Stanislav Fomichev <sdf@google.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Tom Herbert <tom@sipanda.io>, Jakub Kicinski <kuba@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, anjali.singhai@intel.com, 
+	Paolo Abeni <pabeni@redhat.com>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>, deb.chatterjee@intel.com, namrata.limaye@intel.com, 
+	Marcelo Ricardo Leitner <mleitner@redhat.com>, Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, 
+	tomasz.osinski@intel.com, Jiri Pirko <jiri@resnulli.us>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, davem@davemloft.net, 
+	Eric Dumazet <edumazet@google.com>, Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>, 
+	Khalid Manaa <khalidm@nvidia.com>, 
+	"Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?=" <toke@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Victor Nogueira <victor@mojatatu.com>, pctammela@mojatatu.com, dan.daly@intel.com, 
+	Andy Fingerhut <andy.fingerhut@gmail.com>, chris.sommers@keysight.com, 
+	Matty Kadosh <mattyk@nvidia.com>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 28, 2024 at 04:59:07PM -0800, Jakub Kicinski wrote:
-
-> When running selftests for our subsystem in our CI we'd like all
-> tests to pass. Currently some tests use SKIP for cases they
-> expect to fail, because the kselftest_harness limits the return
-> codes to pass/fail/skip. XFAIL which would be a great match
-> here cannot be used.
+On 03/04, Jamal Hadi Salim wrote:
+> On Mon, Mar 4, 2024 at 4:23=E2=80=AFPM Stanislav Fomichev <sdf@google.com=
+> wrote:
+> >
+> > On 03/03, Jamal Hadi Salim wrote:
+> > > On Sun, Mar 3, 2024 at 1:11=E2=80=AFPM Tom Herbert <tom@sipanda.io> w=
+rote:
+> > > >
+> > > > On Sun, Mar 3, 2024 at 9:00=E2=80=AFAM Jamal Hadi Salim <jhs@mojata=
+tu.com> wrote:
+> > > > >
+> > > > > On Sat, Mar 2, 2024 at 10:27=E2=80=AFPM Jakub Kicinski <kuba@kern=
+el.org> wrote:
+> > > > > >
+> > > > > > On Sat, 2 Mar 2024 09:36:53 -0500 Jamal Hadi Salim wrote:
+> > > > > > > 2) Your point on:  "integrate later", or at least "fill in th=
+e gaps"
+> > > > > > > This part i am probably going to mumble on. I am going to con=
+sider
+> > > > > > > more than just doing ACLs/MAT via flower/u32 for the sake of
+> > > > > > > discussion.
+> > > > > > > True, "fill the gaps" has been our model so far. It requires =
+kernel
+> > > > > > > changes, user space code changes etc justifiably so because m=
+ost of
+> > > > > > > the time such datapaths are subject to standardization via IE=
+TF, IEEE,
+> > > > > > > etc and new extensions come in on a regular basis.  And somet=
+imes we
+> > > > > > > do add features that one or two users or a single vendor has =
+need for
+> > > > > > > at the cost of kernel and user/control extension. Given our w=
+ork
+> > > > > > > process, any features added this way take a long time to make=
+ it to
+> > > > > > > the end user.
+> > > > > >
+> > > > > > What I had in mind was more of a DDP model. The device loads it=
+ binary
+> > > > > > blob FW in whatever way it does, then it tells the kernel its p=
+arser
+> > > > > > graph, and tables. The kernel exposes those tables to user spac=
+e.
+> > > > > > All dynamic, no need to change the kernel for each new protocol=
+.
+> > > > > >
+> > > > > > But that's different in two ways:
+> > > > > >  1. the device tells kernel the tables, no "dynamic reprogrammi=
+ng"
+> > > > > >  2. you don't need the SW side, the only use of the API is to i=
+nteract
+> > > > > >     with the device
+> > > > > >
+> > > > > > User can still do BPF kfuncs to look up in the tables (like in =
+FIB),
+> > > > > > but call them from cls_bpf.
+> > > > > >
+> > > > >
+> > > > > This is not far off from what is envisioned today in the discussi=
+ons.
+> > > > > The main issue is who loads the binary? We went from devlink to t=
+he
+> > > > > filter doing the loading. DDP is ethtool. We still need to tie a =
+PCI
+> > > > > device/tc block to the "program" so we can do skip_sw and it work=
+s.
+> > > > > Meaning a device that is capable of handling multiple programs ca=
+n
+> > > > > have multiple blobs loaded. A "program" is mapped to a tc filter =
+and
+> > > > > MAT control works the same way as it does today (netlink/tc ndo).
+> > > > >
+> > > > > A program in P4 has a name, ID and people have been suggesting a =
+sha1
+> > > > > identity (or a signature of some kind should be generated by the
+> > > > > compiler). So the upward propagation could be tied to discovering
+> > > > > these 3 tuples from the driver. Then the control plane targets a
+> > > > > program via those tuples via netlink (as we do currently).
+> > > > >
+> > > > > I do note, using the DDP sample space, currently whatever gets lo=
+aded
+> > > > > is "trusted" and really you need to have human knowledge of what =
+the
+> > > > > NIC's parsing + MAT is to send the control. With P4 that is all
+> > > > > visible/programmable by the end user (i am not a proponent of ven=
+dors
+> > > > > "shipping" things or calling them for support) - so should be
+> > > > > sufficient to just discover what is in the binary and send the co=
+rrect
+> > > > > control messages down.
+> > > > >
+> > > > > > I think in P4 terms that may be something more akin to only pro=
+viding
+> > > > > > the runtime API? I seem to recall they had some distinction...
+> > > > >
+> > > > > There are several solutions out there (ex: TDI, P4runtime) - our =
+API
+> > > > > is netlink and those could be written on top of netlink, there's =
+no
+> > > > > controversy there.
+> > > > > So the starting point is defining the datapath using P4, generati=
+ng
+> > > > > the binary blob and whatever constraints needed using the vendor
+> > > > > backend and for s/w equivalent generating the eBPF datapath.
+> > > > >
+> > > > > > > At the cost of this sounding controversial, i am going
+> > > > > > > to call things like fdb, fib, etc which have fixed datapaths =
+in the
+> > > > > > > kernel "legacy". These "legacy" datapaths almost all the time=
+ have
+> > > > > >
+> > > > > > The cynic in me sometimes thinks that the biggest problem with =
+"legacy"
+> > > > > > protocols is that it's hard to make money on them :)
+> > > > >
+> > > > > That's a big motivation without a doubt, but also there are peopl=
+e
+> > > > > that want to experiment with things. One of the craziest examples=
+ we
+> > > > > have is someone who created a P4 program for "in network calculat=
+or",
+> > > > > essentially a calculator in the datapath. You send it two operand=
+s and
+> > > > > an operator using custom headers, it does the math and responds w=
+ith a
+> > > > > result in a new header. By itself this program is a toy but it
+> > > > > demonstrates that if one wanted to, they could have something cus=
+tom
+> > > > > in hardware and/or kernel datapath.
+> > > >
+> > > > Jamal,
+> > > >
+> > > > Given how long P4 has been around it's surprising that the best
+> > > > publicly available code example is "the network calculator" toy.
+> > >
+> > > Come on Tom ;-> That was just an example of something "crazy" to
+> > > demonstrate freedom. I can run that in any of the P4 friendly NICs
+> > > today. You are probably being facetious - There are some serious
+> > > publicly available projects out there, some of which I quote on the
+> > > cover letter (like DASH).
+> >
+> > Shameless plug. I have a more crazy example with bpf:
+> >
+> > https://github.com/fomichev/xdp-btc-miner
+> >
 >=20
-> Remove the no_print handling and use vfork() to run the test in
-> a different process than the setup. This way we don't need to
-> pass "failing step" via the exit code. Further clean up the exit
-> codes so that we can use all KSFT_* values. Rewrite the result
-> printing to make handling XFAIL/XPASS easier. Support tests
-> declaring combinations of fixture + variant they expect to fail.
+> Hrm - this looks crazy interesting;-> Tempting. I guess to port this
+> to P4 we'd need the sha256 in h/w (which most of these vendors have
+> already). Is there any other acceleration would you need? Would have
+> been more fun if you invented you own headers too ;->
 
-This series landed in -next today and has caused breakage on all
-platforms in the ALSA pcmtest-driver test.  When run on systems that
-don't have the driver it needs loaded the test skip but since this
-series was merged skipped tests are logged but then reported back as
-failures:
-
-# selftests: alsa: test-pcmtest-driver
-# TAP version 13
-# 1..5
-# # Starting 5 tests from 1 test cases.
-# #  RUN           pcmtest.playback ...
-# #      SKIP      Can't read patterns. Probably, module isn't loaded
-# # playback: Test failed
-# #          FAIL  pcmtest.playback
-# not ok 1 pcmtest.playback #  Can't read patterns. Probably, module isn't =
-loaded
-# #  RUN           pcmtest.capture ...
-# #      SKIP      Can't read patterns. Probably, module isn't loaded
-# # capture: Test failed
-# #          FAIL  pcmtest.capture
-# not ok 2 pcmtest.capture #  Can't read patterns. Probably, module isn't l=
-oaded
-# #  RUN           pcmtest.ni_capture ...
-# #      SKIP      Can't read patterns. Probably, module isn't loaded
-# # ni_capture: Test failed
-# #          FAIL  pcmtest.ni_capture
-# not ok 3 pcmtest.ni_capture #  Can't read patterns. Probably, module isn'=
-t loaded
-# #  RUN           pcmtest.ni_playback ...
-# #      SKIP      Can't read patterns. Probably, module isn't loaded
-# # ni_playback: Test failed
-# #          FAIL  pcmtest.ni_playback
-# not ok 4 pcmtest.ni_playback #  Can't read patterns. Probably, module isn=
-'t loaded
-# #  RUN           pcmtest.reset_ioctl ...
-# #      SKIP      Can't read patterns. Probably, module isn't loaded
-# # reset_ioctl: Test failed
-# #          FAIL  pcmtest.reset_ioctl
-# not ok 5 pcmtest.reset_ioctl #  Can't read patterns. Probably, module isn=
-'t loaded
-# # FAILED: 0 / 5 tests passed.
-# # Totals: pass:0 fail:5 xfail:0 xpass:0 skip:0 error:0
-
-I haven't completely isolated the issue due to some other breakage
-that's making it harder that it should be to test. =20
-
-A sample full log can be seen at:
-
-   https://lava.sirena.org.uk/scheduler/job/659576#L1349
-
-but there's no more context.  I'm also seeing some breakage in the
-seccomp selftests which also use kselftest-harness:
-
-# #  RUN           TRAP.dfl ...
-# # dfl: Test exited normally instead of by signal (code: 0)
-# #          FAIL  TRAP.dfl
-# not ok 56 TRAP.dfl
-# #  RUN           TRAP.ign ...
-# # ign: Test exited normally instead of by signal (code: 0)
-# #          FAIL  TRAP.ign
-# not ok 57 TRAP.ign
-
-and looks suspiciously like it might also be related.  Again, not
-drilled down fully yet or looked at the code but this series jumps out
-as most likely relevant.
-
-Full log at:
-
-   https://validation.linaro.org/scheduler/job/4046205#L6066
-
---hO45sqC4rUaVfCUw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXmSRIACgkQJNaLcl1U
-h9BhQgf/bFLmzfQuUxA6124NIKiqdndv7e/KA0FS32nG+TW6aE1QxkZxEDz8Cw41
-vdfUdr3GmkTmdx+n1H+40+1HFSEiKXG5D1CJ17nsMcCDwIr2xRXNHPevXMuyOep+
-fkhT1DhySxlHwoCMzhSWbwpkU6NVEjM0KnS5RLBjHeClNyrUd/jzNxkJml/INjG/
-H0X2ZzaRHUN+UXj3EKxhnjKECOohoymyuTVsybJkXOgycTZj04vk/0yoQDQ2sjdN
-T35tT0DQCmbHkznSUmT49IyDNdIwQufaqA3bw1M2HjYgyvRy3ir/6XVV5XJVzLUD
-WKoUYhmZFNyt8+SomPIKivgDrnjvOA==
-=PkaD
------END PGP SIGNATURE-----
-
---hO45sqC4rUaVfCUw--
+Yeah, some way to do sha256(sha256(at_some_fixed_packet_offset + 80 bytes))
+is one thing. And the other is some way to compare that sha256 vs some
+hard-coded (difficulty) number (as a 256-byte uint). But I have no
+clue how well that maps into declarative p4 language. Most likely
+possible if you're saying that the calculator is possible?
+I'm assuming that even sha256 can possibly be implemented in p4 without
+any extra support from the vendor? It's just a bunch of xors and
+rotations over a fix-sized input buffer.
 
