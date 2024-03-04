@@ -1,66 +1,70 @@
-Return-Path: <netdev+bounces-77214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2A36870B2F
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 21:08:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57845870B61
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 21:19:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E136287CAB
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 20:08:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89C011C2285B
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 20:19:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EC57AE5F;
-	Mon,  4 Mar 2024 20:07:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 202DC7BAF5;
+	Mon,  4 Mar 2024 20:18:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ps+mCZyc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B2B3YVVc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C9C7995F;
-	Mon,  4 Mar 2024 20:07:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E74847A159;
+	Mon,  4 Mar 2024 20:18:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709582869; cv=none; b=ftGs/nZ0gJ5CYhmkn0Nl8YaU4WSJYOcjjl/D6IhL7HngZMacAPWgEGNvfe2sMzrF+YEIO649a2sqt8z9z/gHhAH1SNAUOvI3o3qHTy8oTr1fVJ2EFQy2eCCBPKcJgo727NdwAdN76JOd9axUDiO3djvE1wdjt3+du3gBPW8Fd3Q=
+	t=1709583495; cv=none; b=mwn9uEhFogpa80tf8uUb1RhF0QmD6t11oj/2toIlU4JBbetbXBUe6FEjNMJNBj4Pxb4cClkAr0vBrLEtmuhw3BUR/y4IRHKeK4qx0Y7+OEFfYJu3l1IaQaSyL4tXR32OXisy9TtYwbYctj9Pn+QnAIoMvd8RKCGBsWNUoYvB128=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709582869; c=relaxed/simple;
-	bh=IxhkFb0JGseP/F6oidrp0nqH9NvZIV1ZHiC2lHFKZU8=;
+	s=arc-20240116; t=1709583495; c=relaxed/simple;
+	bh=K23JakM1P875wWRg3o7Bh9hwijeqRnaAhC1ZmI9DT6M=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L+ifn3li2VYRO6Lqdbq4ikE8/WHQMk4a+tR+LeS3UMxCtTXJ56wH5AoVagJvrMApxRmGWW+TYyCLCUvQuhx2p6T1fb/j6HLykdx7e3xgAT/26mNbH8dAsy0Lds6znhcBo52hFLGKGFsObJxL0OoV5dQW0q9KwU/kgTzEPPIgh/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ps+mCZyc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BC3CC433F1;
-	Mon,  4 Mar 2024 20:07:48 +0000 (UTC)
+	 MIME-Version:Content-Type; b=cA9aS7433uGEzdqz1TmuE3VLiy3H/h+kcHd5+/H5ZUn4Pf8D72KQ6+SBLCma90fr6bJ4leKHd4qQjfcco+C7Jn3sQafBwSdZbCPcu57WtoC+3INPi6+0bqio8u5yp1rMvw3ynP+ZuvwzL0Xd0B1VsdDADba0eDVVFJOS3q4+k0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B2B3YVVc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BA78C433C7;
+	Mon,  4 Mar 2024 20:18:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709582869;
-	bh=IxhkFb0JGseP/F6oidrp0nqH9NvZIV1ZHiC2lHFKZU8=;
+	s=k20201202; t=1709583494;
+	bh=K23JakM1P875wWRg3o7Bh9hwijeqRnaAhC1ZmI9DT6M=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ps+mCZycuYOmCI3C6RRj9rCLV/7gBs3eR1cRDiQA1BJj7gX2RCz13LiFhEuqsqj03
-	 Dw9op7fWLqMiK0YurvCC24nldP2xDYGoWeoaoqJO9KUDyrNKdc8eH2CnNvDAONdkak
-	 AHIHRd9fMuE+apQJbzG2HG6FQ5/9anpKReXNhUsgHHqcqnoyO604oKLbtg6OClMck5
-	 HcDY2rDrJkc6rmX8TSIgZ/ZliId4nC7qXBAA5k0kult4VzJuPbSIqDzMLmPU9dCI12
-	 nE6W0TlyLR3W4M+02cpgaOrKKQ9IEbjbk1WzwycTEhV4cix9wrrB4J9/jKWmTbncjl
-	 Om5vHv+2kCSow==
-Date: Mon, 4 Mar 2024 12:07:47 -0800
+	b=B2B3YVVcAg8euaTwpzEAd/U1Mfwf7tB4GGnKpAL4c6DXaH40QiIQ8sYrV5qR7+UNK
+	 C8zI9NZMUp7WlD+6qbngi8mvkFAi+XcB9ErtTWwyNV/ycwg05fSduQlzjkc0jnd0W5
+	 egCdnN3hqWDnxz8bgKq6JrPnhW7z0RvpKAbKUpeec5M7+i3bz/UBKSX9LfFYcal1ji
+	 W0+aYPH//qKinG+K2Q6nCD2ce0ihyUojtNDEwtrlHeyptlPAbV32/1cpywzyVY+lEP
+	 ddoCM8rh0mguz99kr5Uf2hJ3swvLeJgDO67JnUX90jEsAT5URs/hMALGoj8oQWVSKT
+	 6RzPIKvoD7PyQ==
+Date: Mon, 4 Mar 2024 12:18:12 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tom Herbert <tom@sipanda.io>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, John Fastabend
- <john.fastabend@gmail.com>, "Singhai, Anjali" <anjali.singhai@intel.com>,
- Paolo Abeni <pabeni@redhat.com>, Linux Kernel Network Developers
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Tom Herbert <tom@sipanda.io>, John Fastabend <john.fastabend@gmail.com>,
+ "Singhai, Anjali" <anjali.singhai@intel.com>, Paolo Abeni
+ <pabeni@redhat.com>, Linux Kernel Network Developers
  <netdev@vger.kernel.org>, "Chatterjee, Deb" <deb.chatterjee@intel.com>,
- "Limaye, Namrata" <namrata.limaye@intel.com>, mleitner@redhat.com,
- Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, "Osinski, Tomasz"
+ "Limaye, Namrata" <namrata.limaye@intel.com>, Marcelo Ricardo Leitner
+ <mleitner@redhat.com>, "Shirshyad, Mahesh" <Mahesh.Shirshyad@amd.com>,
+ "Jain, Vipin" <Vipin.Jain@amd.com>, "Osinski, Tomasz"
  <tomasz.osinski@intel.com>, Jiri Pirko <jiri@resnulli.us>, Cong Wang
- <xiyou.wangcong@gmail.com>, "David S . Miller" <davem@davemloft.net>,
- edumazet@google.com, Vlad Buslov <vladbu@nvidia.com>, horms@kernel.org,
- khalidm@nvidia.com, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=
- <toke@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>, Victor Nogueira
- <victor@mojatatu.com>, "Tammela, Pedro" <pctammela@mojatatu.com>, "Daly,
- Dan" <dan.daly@intel.com>, andy.fingerhut@gmail.com, "Sommers, Chris"
- <chris.sommers@keysight.com>, mattyk@nvidia.com, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v12 00/15] Introducing P4TC (series 1)
-Message-ID: <20240304120747.6f34ab6e@kernel.org>
-In-Reply-To: <CAOuuhY_senZbdC2cVU9kfDww_bT+a_VkNaDJYRk4_fMbJW17sQ@mail.gmail.com>
+ <xiyou.wangcong@gmail.com>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Vlad Buslov <vladbu@nvidia.com>, Simon
+ Horman <horms@kernel.org>, Khalid Manaa <khalidm@nvidia.com>, Toke
+ =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>, Daniel Borkmann
+ <daniel@iogearbox.net>, Victor Nogueira <victor@mojatatu.com>, "Tammela,
+ Pedro" <pctammela@mojatatu.com>, "Daly, Dan" <dan.daly@intel.com>, Andy
+ Fingerhut <andy.fingerhut@gmail.com>, "Sommers, Chris"
+ <chris.sommers@keysight.com>, Matty Kadosh <mattyk@nvidia.com>, bpf
+ <bpf@vger.kernel.org>
+Subject: Re: Hardware Offload discussion WAS(Re: [PATCH net-next v12 00/15]
+ Introducing P4TC (series 1)
+Message-ID: <20240304121812.450dda4c@kernel.org>
+In-Reply-To: <CAM0EoMnpZuC_fdzXj5+seXo3GT9rrf1txc45tB=gie4cf-Zqeg@mail.gmail.com>
 References: <20240225165447.156954-1-jhs@mojatatu.com>
 	<b28f2f7900dc7bad129ad67621b2f7746c3b2e18.camel@redhat.com>
 	<CO1PR11MB49931E501B20F32681F917CD935F2@CO1PR11MB4993.namprd11.prod.outlook.com>
@@ -70,9 +74,12 @@ References: <20240225165447.156954-1-jhs@mojatatu.com>
 	<20240301090020.7c9ebc1d@kernel.org>
 	<CAM0EoM=-hzSNxOegHqhAQD7qoAR2CS3Dyh-chRB+H7C7TQzmow@mail.gmail.com>
 	<20240301173214.3d95e22b@kernel.org>
-	<CAOuuhY8fnpEEBb8z-1mQmvHtfZQwgQnXk3=op-Xk108Pts8ohA@mail.gmail.com>
-	<20240302191530.22353670@kernel.org>
-	<CAOuuhY_senZbdC2cVU9kfDww_bT+a_VkNaDJYRk4_fMbJW17sQ@mail.gmail.com>
+	<CAM0EoM=NEB25naGtz=YaOt6BDoiv4RpDw27Y=btMZAMGeYB5bg@mail.gmail.com>
+	<CAM0EoM=8GG-zCaopaUDMkvqemrZQUtaVRTMrWA6z=xrdYxG9+g@mail.gmail.com>
+	<20240302192747.371684fb@kernel.org>
+	<CAM0EoMncuPvUsRwE+Ajojgg-8JD+1oJ7j2Rw+7oN60MjjAHV-g@mail.gmail.com>
+	<CAOuuhY8pgxqCg5uTXzetTt5sd8RzOfLPYF8ksLjoUhkKyqr56w@mail.gmail.com>
+	<CAM0EoMnpZuC_fdzXj5+seXo3GT9rrf1txc45tB=gie4cf-Zqeg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,14 +89,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 3 Mar 2024 08:31:11 -0800 Tom Herbert wrote:
-> Even before considering hardware offload, I think this approach
-> addresses a more fundamental problem to make the kernel programmable.
+On Sun, 3 Mar 2024 14:04:11 -0500 Jamal Hadi Salim wrote:
+> > At
+> > this point in its lifetime, eBPF had far more examples of real world
+> > use cases publically available. That being said, there's nothing
+> > unique about P4 supporting the network calculator. We could just as
+> > easily write this in eBPF (either plain C or P4)  and "offload" it to
+> > an ARM core on a SmartNIC.  
+> 
+> With current port speeds hitting 800gbps you want to use Arm cores as
+> your offload engine?;-> Running the generated ebpf on the arm core is
+> a valid P4 target.  i.e there is no contradiction.
+> Note: P4 is a DSL specialized for datapath definition; it is not a
+> competition to ebpf, two different worlds. I see ebpf as an
+> infrastructure tool, nothing more.
 
-I like some aspects of what you're describing, but my understanding
-is that it'd be a noticeable shift in direction.
-I'm not sure if merging P4TC is the most effective way of taking
-a first step in that direction. (I mean that in the literal sense
-of lack of confidence, not polite way to indicate holding a conviction
-to the contrary.)
+I wonder how much we're benefiting of calling this thing P4 and how
+much we should focus on filling in the tech gaps.
+Exactly like you said, BPF is not competition, but neither does 
+the kernel "support P4", any more than it supports bpftrace and:
+
+$ git grep --files-with-matches bpftrace
+Documentation/bpf/redirect.rst
+tools/testing/selftests/bpf/progs/test_xdp_attach_fail.c
+
+Filling in tech gaps would also help DPP, IDK how much DPP is based 
+or using P4, neither should I have to care, frankly :S
 
