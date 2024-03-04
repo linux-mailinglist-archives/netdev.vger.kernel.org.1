@@ -1,108 +1,126 @@
-Return-Path: <netdev+bounces-77095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D8608702E5
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:39:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 807468702EE
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:40:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFFFA1F269F4
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:39:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A494F1C23CCF
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9263F9E7;
-	Mon,  4 Mar 2024 13:39:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NvDyxgzk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6872A3EA91;
+	Mon,  4 Mar 2024 13:39:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E0D3F9C2
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 13:39:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E871EB2C
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 13:39:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709559545; cv=none; b=I8CoiEWuhGaUbBWQw+oa8J3imBhnw9lKbhzwLOYsM5rwr2aO5bGdZUZ7jSyURHD1Mg2NJTxbCvtjqtqNAw7P0Wmvnz0R04IJHvrp4d7e2q2lPMf7lJ8h53+L+BM3ifNSHDNTPFSDKbLnLT916BCh4n/x0YpHtk0IHY4ht54ZuIQ=
+	t=1709559580; cv=none; b=gG+P/FuVF+7HxaDzy3gjiMZpZVBRixpjXchKNotu+eaO+iwD3rm3yaRXWiXIT5ABcgGDn6VGLEsdkBXQRhWDuB0pQS3BvTJ+afxnDg0qSEpKFr1Oh/lu5rLOHbicIsXGxNa5j9nc5Nt4m8t5pHbDF2zEUUMbGjTMRrydGxFi+f4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709559545; c=relaxed/simple;
-	bh=Utp7sMlXkR1Rhlg1oXlfu09zINWNqAAiyEDBq7R8G8w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BbIy+l+G+RM4AlGoaJW24mkX08/B12Yb7qxK4nsP8COjILkWRxkRqrU4LmEhPe2KrbTSuWLFuM0l4xJ22MXyZtHTTE+gl++JlA81yDt9d/VMNMWtvsydeZsv54PZ0bT5+A3/OnGKTySwBrpn8ZMsid1lhhJSF6bOcs+EavwZLB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NvDyxgzk; arc=none smtp.client-ip=209.85.161.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5a105e55bccso1681657eaf.1
-        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 05:39:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709559543; x=1710164343; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ipLp0J2g0W5A61oKLbpF1CgtNEv/F767aFWvfPI5oTo=;
-        b=NvDyxgzky4MHya05YB157AQAhc9xJsIZPy5ZpqKc6hI8GlaeiLOKwQ0i8LrOqvOkXP
-         5HKZ+iu9jqkntlDmWjPgp48ZLfkaCYBaQbsQlEsF9kQ4HXdfd9vKORh5V3uosZaTeyTl
-         5CZWGkxTwy5tR7pSVRfknaSWdxEGEO6DFpxzYGQeon9sfOOjOKQGylcICUK9cFBrHxnE
-         0BwDsDjwMW/btbxYdbK4JR+gKGHvTYg1gFPGXs0NKwdjId+XnJFmcZxWcnSNsggddgKD
-         CdyJzTJx/ew8FLZO6JAlmVcy1ePzETc562aZVtfXsv6tPwEnndhKra01Jh3OW0rQ0htg
-         W75w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709559543; x=1710164343;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ipLp0J2g0W5A61oKLbpF1CgtNEv/F767aFWvfPI5oTo=;
-        b=Mei7sZJz4AM7bYkIv23cqo8wv9jVfM4VjuE/LozC/bVxTLqOmupb29AK9ieClodmY9
-         35tp3snhfAh4oHsuE+b6fAr4x/srFpj2tR9KycEwoXJvQXrnvrSwct13N9ENPZQxHVkC
-         7mgVC/HX78qjrkOujpLzXwAYPg5pXzZlvqvumL4q/Lw8f7TFyJHJSO/CZ9DA58JCvhiy
-         fZ7d6BAulH604vQngg2NI/4HuPqdhkKQV4s6KuMX2kWpNnx2L53tl3cYXHYFSiavpwdq
-         wefExuc2IQ3DXuFeXi9i1deIcVqH0ePwVdAOnNRor/sECJ0NM9vTcAMJb3O+Jm6oMFgU
-         Z/kA==
-X-Forwarded-Encrypted: i=1; AJvYcCVLHe613ZFk37aAU5gK/xpvUZZaJFfd9S+xAlnXxJuv3xT7ec6P9n69bMEZcDh6Zp4shMLdSWKz1IVI+h/IJmWLuEicygk3
-X-Gm-Message-State: AOJu0YwSpizfMgRXj0zvyVi6GPdXgJCvJb04kMxsmLg7HuV2fq6dv9ER
-	Xva7Dlh/X+xUMqtnYDDh+AAh8oWr5ti4yp8tHKxc0l+3gGKgl2xnPQA/80Q/qIWJ/UpCOlQX0mk
-	6XWdcN2nOpEAZ1sbra8B/+RmmQcI=
-X-Google-Smtp-Source: AGHT+IHmhJwnRLWXtixKyQnvYvKi3+Y22+375rZRv4PJFfZkVekADKcrnPcYgqRVfSUMpthoHgHGKwTOPBxgYNSazq0=
-X-Received: by 2002:a05:6871:4396:b0:21f:6d8d:67a1 with SMTP id
- lv22-20020a056871439600b0021f6d8d67a1mr11227638oab.7.1709559542894; Mon, 04
- Mar 2024 05:39:02 -0800 (PST)
+	s=arc-20240116; t=1709559580; c=relaxed/simple;
+	bh=DSO4nKZfYc4IR1qnz1wjDII1n4yFyBJMYdZUfFC8Mh0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O8ggQUKSk/k58ajscVOTtWQk6MOXy8JtVtSSq241NJVCHey8+EL41SjtWgdsNeKbmC5SWmHTsM9nCvIJc5t6DxIBo4xMSVVQKCiOefvoTEg7PorbnSOa219TvUibuMUTjLFDD+40MsCpOerHBPsb5azfWX7cR3yMgt2HEOwbbFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rh8X9-0000Pk-8L; Mon, 04 Mar 2024 14:39:11 +0100
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rh8X6-004MgH-Vs; Mon, 04 Mar 2024 14:39:08 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rh8X6-001uJD-2q;
+	Mon, 04 Mar 2024 14:39:08 +0100
+Date: Mon, 4 Mar 2024 14:39:08 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v5 13/17] net: pse-pd: Use regulator framework
+ within PSE framework
+Message-ID: <ZeXO_NhXZQajGZPr@pengutronix.de>
+References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
+ <20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
+ <ZeObuKHkPN3tiWz_@pengutronix.de>
+ <20240304102708.5bb5d95c@kmaincent-XPS-13-7390>
+ <84b300c7-8295-424b-9117-c604fb4cd73e@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240301230542.116823-1-kuba@kernel.org> <20240301230542.116823-3-kuba@kernel.org>
-In-Reply-To: <20240301230542.116823-3-kuba@kernel.org>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Mon, 4 Mar 2024 13:38:51 +0000
-Message-ID: <CAD4GDZzkVJackAf2yhG1E5vypd2J=n23HD5Huu356JK1F1oLKA@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/4] tools: ynl: allow setting recv() size
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, jiri@resnulli.us
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <84b300c7-8295-424b-9117-c604fb4cd73e@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Fri, 1 Mar 2024 at 23:05, Jakub Kicinski <kuba@kernel.org> wrote:
->
->  class YnlFamily(SpecFamily):
-> -    def __init__(self, def_path, schema=None, process_unknown=False):
-> +    def __init__(self, def_path, schema=None, process_unknown=False,
-> +                 recv_size=131072):
+On Mon, Mar 04, 2024 at 02:32:50PM +0100, Andrew Lunn wrote:
+> > > > +	psec = dev_find_pse_control(&phy->mdio.dev);
+> > > > +	if (IS_ERR(psec)) {
+> > > > +		rc = PTR_ERR(psec);
+> > > > +		goto unregister_phy;
+> > > > +	}
+> > > > +  
+> > > 
+> > > I do not think it is a good idea to make PSE controller depend on
+> > > phy->mdio.dev. The only reason why we have fwnode_find_pse_control()
+> > > here was the missing port abstraction.
+> > 
+> > I totally agree that having port abstraction would be more convenient.
+> > Maxime Chevallier is currently working on this and will post it after his
+> > multi-phy series get merged.
+> > Meanwhile, we still need a device pointer for getting the regulator. The
+> > phy->mdio.dev is the only one I can think of as a regulator consumer.
+> > Another idea?
+> 
+> Sorry, i've not been keeping up...
+> 
+> Doesn't the device tree binding determine this? Where is the consumer
+> in the tree?
 
-An aside: what is the reason for choosing a 128k receive buffer? If I
-remember correctly, netlink messages are capped at 32k.
+The real consumer is outside of the system. Withing the system, it would
+be the RJ45 port, but we have no abstraction for ports so far.
 
->          super().__init__(def_path, schema)
->
->          self.include_raw = False
-> @@ -423,6 +428,16 @@ genl_family_name_to_id = None
->          self.async_msg_ids = set()
->          self.async_msg_queue = []
->
-> +        # Note that netlink will use conservative (min) message size for
-> +        # the first dump recv() on the socket, our setting will only matter
-
-I'm curious, why does it behave like this?
-
-> +        # from the second recv() on.
-> +        self._recv_size = recv_size
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
