@@ -1,198 +1,114 @@
-Return-Path: <netdev+bounces-77048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1901086FF13
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:31:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47AA986FF2F
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:38:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D2AE1C20A2D
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:31:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79F821C20E8A
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:37:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A218625756;
-	Mon,  4 Mar 2024 10:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8D0364D5;
+	Mon,  4 Mar 2024 10:37:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="WLS91+kC"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from forward205a.mail.yandex.net (forward205a.mail.yandex.net [178.154.239.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3716E249F4
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 10:31:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E45820323;
+	Mon,  4 Mar 2024 10:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709548315; cv=none; b=Yc6UN4xnSe/h5wq9r24i2qqEygEeMpf272MBBr76ZyOYwz+Vq+8vIaye7wZuB7s/VRxvZllCmO2MW2wym0Wn9976Q6ybLuNZk8BFvESJKhflAbeoEUNZOV8hf1QKachV8n8Ukmk1z8A/b2onYgigu2nu1eFnmQEqnUwKA9fdEvo=
+	t=1709548675; cv=none; b=f+D3A9mz/urCDi7e7gt33diGfNMyML485W+jk85kfgKivVOyWGbjEX4z3Gy70mCtwx32qc/2XTvOYjb+cSnaeai48GrD1kJdoaK+gpF20P0j9r7l7c7AeLjn8JbVKvoKffmAX6jD9aOA6bb1iXna9Qgq0T6yzi3kuzX58H1VMxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709548315; c=relaxed/simple;
-	bh=FlayRBYu6A31qOHMHpZ5ejYBRbr7TX0lwoHUNTBNul8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uL5l1yRf/iYmZHOkDttj7EZdwyf6BaWABWQ808UQ44jvDQGeb9xPHY0Lm1VLy7V7cnbWho4aZPntbxcZNrCy++Q6DKCyP7hvLdwMKheaYTDlajGnrOS3Sn375wqsJ3SQOchTByoPkq9bfP44I3a2y4Jsz+mPUD9K3Ap+qE6BLFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rh5bO-00043R-0Y; Mon, 04 Mar 2024 11:31:22 +0100
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rh5bL-004Kfu-Eo; Mon, 04 Mar 2024 11:31:19 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rh5bL-001rP7-17;
-	Mon, 04 Mar 2024 11:31:19 +0100
-Date: Mon, 4 Mar 2024 11:31:19 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
-	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v5 13/17] net: pse-pd: Use regulator framework
- within PSE framework
-Message-ID: <ZeWi90H-B4XeSkFs@pengutronix.de>
-References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
- <20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
- <ZeObuKHkPN3tiWz_@pengutronix.de>
- <20240304102708.5bb5d95c@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1709548675; c=relaxed/simple;
+	bh=I2NIXsd3qA0Rg5Yi6MaVE+jWxR7B4LlOzFCHrb+wHXo=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=SeUJM1+taLyvzV5zhCVvdc9BIGtEfFdrHyD/qHWcle/Csh7g0oAfQDey1Ln/bdKK5JJnEFxbAPP4Q6kdNL+Pp9wR3Bqvw+A+ocwTMAUPafxPtNRaUHD+77Z6k3YMfk+Ywk3rPI7Dic6g438vHTGp34sYSs8K9fa39yamekoShtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=WLS91+kC; arc=none smtp.client-ip=178.154.239.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from forward102a.mail.yandex.net (forward102a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d102])
+	by forward205a.mail.yandex.net (Yandex) with ESMTPS id 0C76563A50;
+	Mon,  4 Mar 2024 13:31:41 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-39.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-39.vla.yp-c.yandex.net [IPv6:2a02:6b8:c1f:6405:0:640:589d:0])
+	by forward102a.mail.yandex.net (Yandex) with ESMTPS id 14DED60B07;
+	Mon,  4 Mar 2024 13:31:33 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-39.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id VVb2c36asqM0-xT9sI3Wt;
+	Mon, 04 Mar 2024 13:31:32 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1709548292; bh=I2NIXsd3qA0Rg5Yi6MaVE+jWxR7B4LlOzFCHrb+wHXo=;
+	h=Subject:To:From:Cc:Date:Message-ID;
+	b=WLS91+kCGsz4ZIV8+H/GRdEy9IWvx01vM37fAYI0es41Ed0ACjn6aYXPas56W1xQz
+	 dxtOcz3BDyjG5d8IbivuGVcDQs18hjRdsvLTmeNt2Db6HS0hRcKeTJ0YjuY3cVxTzg
+	 8pK5V+yoMDy1x9fhEJ4eeu8dc/B8JPssfoVCQBiM=
+Authentication-Results: mail-nwsmtp-smtp-production-main-39.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <dacadaef-4fec-4d5e-8b91-1a292ab43b37@yandex.ru>
+Date: Mon, 4 Mar 2024 13:31:31 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240304102708.5bb5d95c@kmaincent-XPS-13-7390>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+ Wen Gu <guwen@linux.alibaba.com>, "D. Wythe" <alibuda@linux.alibaba.com>,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ lvc-project@linuxtesting.org
+From: Dmitry Antipov <dmantipov@yandex.ru>
+Autocrypt: addr=dmantipov@yandex.ru; keydata=
+ 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
+ tx98MCutXbJWn55RtnVKbpIiMfBrcB8=
+Subject: Reaching official SMC maintainers
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 04, 2024 at 10:27:08AM +0100, Köry Maincent wrote:
-> Hello Oleksij,
+Jakub,
 
-> > > +	psec = dev_find_pse_control(&phy->mdio.dev);
-> > > +	if (IS_ERR(psec)) {
-> > > +		rc = PTR_ERR(psec);
-> > > +		goto unregister_phy;
-> > > +	}
-> > > +  
-> > 
-> > I do not think it is a good idea to make PSE controller depend on
-> > phy->mdio.dev. The only reason why we have fwnode_find_pse_control()
-> > here was the missing port abstraction.
-> 
-> I totally agree that having port abstraction would be more convenient.
-> Maxime Chevallier is currently working on this and will post it after his
-> multi-phy series get merged.
-> Meanwhile, we still need a device pointer for getting the regulator. The
-> phy->mdio.dev is the only one I can think of as a regulator consumer.
-> Another idea?
+could you please check whether an official maintainers of net/smc are
+actually active? I'm interesting just because there was no feedback on
+[1]. After all, it's still a kernel memory leak, and IMO should not be
+silently ignored by the maintainers (if any).
 
-I would say, in current code state, PSE controller is regulator provider and
-consumer - both are same devices. Otherwise, it will be impossible to
-unregistered PHY devices without shutting down PSE-PI. Mostly, we should
-be able to continue to provide the power even if network interface is down. 
+Thanks,
+Dmitry
 
-> > > +	rconfig.dev = pcdev->dev;
-> > > +	rconfig.driver_data = pcdev;
-> > > +	rconfig.init_data = &pse_pi_initdata;  
-> > 
-> > Please add input supply to track all dependencies:
-> >         if (of_property_present(np, "vin-supply"))
-> > config->input_supply = "vin";
-> > 
-> > May be better to make it not optional...
-> 
-> Does the "vin-supply" property be added at the pse-pi node level or the
-> pse-controller node level or at the hardware port node level or the manager node
-> level for the pd692x0?
-> Maybe better at the pse-pi node level and each PIs of the manager will get the
-> same regulator?
-> What do you think?
-
-Yes, I agree. PSE-PI should share same parent regulator. Different PSE
-managers may have different power supplies. One port (PSE PI) - not.
-
->  
-> > Should be tested, but if, instead of "vin-supply", we will use
-> > "pse-supply" it will make most part of pse_regulator.c obsolete.
-> 
-> Don't know, if it is done at the pse-pi node level it may not break
-> pse_regulator.c. Not sure about it.
-
-me too. Before your patch set, the regulator topology for PoDL PSE was
-following:
-power-source
-  fixed-regulator
-     PoDL_PSE-consumer
-
-Now it will be:
-power-source
-  fixed-regulator
-     PoDL_PSE-consumer
-       PSE-PI-provider
-         PSE-PI-consumer
-
-By porting porting PSE framework to regulator, probably it make sense to
-remove two levels of regulators?
-power-source
-  fixed-regulator
-     PSE-PI-consumer
-
-> > ....  
-> > > @@ -310,6 +452,20 @@ pse_control_get_internal(struct pse_controller_dev
-> > > *pcdev, unsigned int index) return ERR_PTR(-ENODEV);
-> > >  	}
-> > >  
-> > > +	psec->ps = devm_regulator_get_exclusive(dev,
-> > > +
-> > > rdev_get_name(pcdev->pi[index].rdev));
-> > > +	if (IS_ERR(psec->ps)) {
-> > > +		kfree(psec);
-> > > +		return ERR_CAST(psec->ps);
-> > > +	}
-> > > +
-> > > +	ret = regulator_is_enabled(psec->ps);
-> > > +	if (ret < 0) {
-> > > +		kfree(psec);
-> > > +		return ERR_PTR(ret);
-> > > +	}
-> > > +	pcdev->pi[index].enabled = ret;  
-> > 
-> > If I see it correctly, it will prevent us to refcount a request from
-> > user space. So, the runtime PM may suspend PI.
-> 
-> I don't think so as the regulator_get_exclusive() does the same and refcount it:
-> https://elixir.bootlin.com/linux/v6.7.8/source/drivers/regulator/core.c#L2268
-
-ok, thx.
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+[1] https://lore.kernel.org/netdev/20240221051608.43241-1-dmantipov@yandex.ru/
 
