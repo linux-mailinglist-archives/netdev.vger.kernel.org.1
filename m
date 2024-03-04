@@ -1,121 +1,95 @@
-Return-Path: <netdev+bounces-77258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0363870D63
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 22:33:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56641870E0D
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 22:40:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AD2728F0C4
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 21:33:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 695211C20E22
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 21:40:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C01014CE0E;
-	Mon,  4 Mar 2024 21:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A9D46BA0;
+	Mon,  4 Mar 2024 21:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ve5vbc/1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cv43hwON"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184001F60A
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 21:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E84CD1F92C;
+	Mon,  4 Mar 2024 21:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709588010; cv=none; b=LofLrgGvshhTaXTzi7HaSKGQzlwICVvH3bNIbMWK0Agk8J+kVCw+U38estlTcO770r57NA8BQb/IslRJKKVhk3dXDgCDXqbDQQ+utADa6fA0fkZlGYAMhC585j6Fd/QEiABXE7igI+hfNjhPKcmmAmUXCiooorbhpAaKRkBeJ6c=
+	t=1709588429; cv=none; b=uin3kMH5UARJ6njdLAHiyib5EIqgObqkGvILcFpFhOzsqoGRI5dwB8Nm1+JbFw49zMnCYg55KF+46ZcybVmCTcZaM2w6rzNNw9g7YuG9D7oPisYC7Bf15jjlBY4fc3JC8tD7SPaZ7c39LNGbxVECBGmdW19g1VKbJpQ+z8nJMSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709588010; c=relaxed/simple;
-	bh=OJ9yKXFi4SKO8kkUsMWs6TcUz1qXAKo1IceBHO/gC60=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=etFX+9qbtjNzUbBX7mlVGcr20k4c+7oYR8ksLamR7so6XM+EV1p9D1Z0lc2khP/Y6aSg5hl8dfKNzK27v2K96sC9jXlD82vFFKqkKaIV+FpwSeeAFvA1MMmt0PArKtLPCTNYZ2hozW91Fjwq7uyRCgUULvhT3njvfvE92tRcCCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ve5vbc/1; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=XbQu5dvnYHETOQFCs/f67uLfRKLV/9XhObKqAqOXx8Q=; b=ve5vbc/1kSHZ2dvhPBYoiC4Ynk
-	m97Z5/CHuDmrz3jUKjGc6ZX6pvFLzVN5uf+RyTrvUDzCB1pGwwM2dlTSkwXiGroy+Dsu9fR/rIznM
-	CC0RPBWO9gOUE4tFKi4IHWNgTmsMRm0aW8c/NEJFhc/3fX8Top2ueveBqUlK5LvdX0NM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rhFwW-009MDl-Rw; Mon, 04 Mar 2024 22:33:52 +0100
-Date: Mon, 4 Mar 2024 22:33:52 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next v2 04/22] ovpn: add basic interface
- creation/destruction/management routines
-Message-ID: <e89be898-bcbd-41f9-aaae-037e6f88069e@lunn.ch>
-References: <20240304150914.11444-1-antonio@openvpn.net>
- <20240304150914.11444-5-antonio@openvpn.net>
+	s=arc-20240116; t=1709588429; c=relaxed/simple;
+	bh=0yqtvKb6euEXfWCJ5BupuWOTgDwHxNA52Wph41RVxls=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=odUiJ3iuJmtTXhK8NsQhQzbWtBL4SN69aRD/CFnZMgLaiSP9TzkrvIREECws2SJyhgnfMubbmFF5sZJ3+mI9XcF3jE8iRhmCqykg7ZsIccObme2xhX5tnMzshYneDlqrDeZIeTZ15jhPR5XqlppYwTne+mVD5aCNr2BJKCtOgpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cv43hwON; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 760E9C43390;
+	Mon,  4 Mar 2024 21:40:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709588427;
+	bh=0yqtvKb6euEXfWCJ5BupuWOTgDwHxNA52Wph41RVxls=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Cv43hwONEsIKBQ2wAnPHyKgBXY3Qz4Yq5mTh4jqxkMmXkuHWyQxYPXmCcHakE9vlh
+	 AK5n9xvDKKoYcGxVaRypsGBGZcTttntFuHhJe5V6wdf6MnArXFdqJ5yIgeX6xJ25bt
+	 DjlyKmzZcGanJf/42sZmdzwgzZJGBOSr/zJNmm/Pf1XC+szC/LNoSvdlcOf2pNl6zG
+	 ZpAueehZgD4/M0O/c1hrDeeQKe8Gn5eDNOYhDoTv9X3oW5P9a/3HZUZid5HbjOPaUg
+	 W6j8lVtPdOtNRJ9bGeInbcOJPR/lKZks8MkcIXH7YYJBEMuYq3Yc8177bTw5wbngZ0
+	 uYhJVfQArBJlw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 55F16C3274B;
+	Mon,  4 Mar 2024 21:40:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240304150914.11444-5-antonio@openvpn.net>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: Add new quirk for broken read key length on
+ ATS2851
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170958842734.5292.12544056625468291768.git-patchwork-notify@kernel.org>
+Date: Mon, 04 Mar 2024 21:40:27 +0000
+References: <20240227014328.1052386-1-nukelet64@gmail.com>
+In-Reply-To: <20240227014328.1052386-1-nukelet64@gmail.com>
+To: Vinicius Peixoto <nukelet64@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, johan.hedberg@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
 
-> +int ovpn_struct_init(struct net_device *dev)
-> +{
-> +	struct ovpn_struct *ovpn = netdev_priv(dev);
-> +	int err;
-> +
-> +	memset(ovpn, 0, sizeof(*ovpn));
+Hello:
 
-Probably not required. When a netdev is created, it should of zeroed
-the priv.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-> +int ovpn_iface_create(const char *name, enum ovpn_mode mode, struct net *net)
-> +{
-> +	struct net_device *dev;
-> +	struct ovpn_struct *ovpn;
-> +	int ret;
-> +
-> +	dev = alloc_netdev(sizeof(struct ovpn_struct), name, NET_NAME_USER, ovpn_setup);
-> +
-> +	dev_net_set(dev, net);
-> +
-> +	ret = ovpn_struct_init(dev);
-> +	if (ret < 0)
-> +		goto err;
-> +
-> +	ovpn = netdev_priv(dev);
-> +	ovpn->mode = mode;
-> +
-> +	rtnl_lock();
-> +
-> +	ret = register_netdevice(dev);
-> +	if (ret < 0) {
-> +		netdev_dbg(dev, "cannot register interface %s: %d\n", dev->name, ret);
-> +		rtnl_unlock();
-> +		goto err;
-> +	}
-> +	rtnl_unlock();
-> +
-> +	return ret;
-> +
-> +err:
-> +	free_netdev(dev);
-> +	return ret;
-> +}
-> +
-> +void ovpn_iface_destruct(struct ovpn_struct *ovpn, bool unregister_netdev)
-> +{
-> +	ASSERT_RTNL();
-> +
-> +	netif_carrier_off(ovpn->dev);
+On Mon, 26 Feb 2024 22:43:26 -0300 you wrote:
+> The ATS2851 controller erroneously reports support for the "Read
+> Encryption Key Length" HCI command. This makes it unable to connect
+> to any devices, since this command is issued by the kernel during the
+> connection process in response to an "Encryption Change" HCI event.
+> 
+> Add a new quirk (HCI_QUIRK_BROKEN_ENC_KEY_SIZE) to hint that the command
+> is unsupported, preventing it from interrupting the connection process.
+> 
+> [...]
 
-You often see virtual devices turn their carrier off in there
-probe/create function, because it is unclear what state it is in after
-register_netdevice().
+Here is the summary with links:
+  - Bluetooth: Add new quirk for broken read key length on ATS2851
+    https://git.kernel.org/bluetooth/bluetooth-next/c/88f741deaa76
 
-	Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
