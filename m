@@ -1,122 +1,103 @@
-Return-Path: <netdev+bounces-77087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1153B870255
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:11:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ABB6870266
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:14:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8260286E89
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:11:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFB381F207CF
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:14:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F01FE3F8F4;
-	Mon,  4 Mar 2024 13:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B8DA3D3A8;
+	Mon,  4 Mar 2024 13:14:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PCBUGb+6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ysXUBrH0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFFB93F8E2;
-	Mon,  4 Mar 2024 13:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F8938DEA
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 13:14:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709557829; cv=none; b=uI77y4Hq5txZXQL57mQNaU16xg9t0qEub7fEoMtJ57Te8Vz90jSZtbLIkhJk6Kx2fRwi9pbBNc6r6AXC516+8ahZIvmpCaZn0+Tb/dbmW0Kp+5kyDyLdUnDSiHyav0ilHyOnPjPRBsYXgHu1LseSXtvesMwNDBSDiPjRPp7BLRI=
+	t=1709558086; cv=none; b=JqD/ew2lLCMSdzje9FZzU8efLO+z14PSUkEKjSp75c2ZTOpY0QfZYMyPP0mGnEElYrDt1go+zZRPrfqAPe8Cff6H3ClbbVboc2M+tw94V9/efywIl97hJy39pozMhW776KEjPRdLps55LyEl1zkSRDs+9qHPACNTPrhfF/Htu7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709557829; c=relaxed/simple;
-	bh=gho4GcW/2zNAdSd9bIZCOth4JZaD3rPWTtBSvYURc3c=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Kw38r+tS5AuTVx1VicpozQgg20kbSjSUlK3aRcQ/FZfEAUWCwb+fKhO4FUz6OTEpKPdzp7uiK4Y18n9NdlJp+VyaOXqIkp87053Lj7HBXWVBhfKX8+1RXH7FgogQvlXKaNqmWXlb+zYi2BbWltuTq+w74xxZza9a1+QFNIEgPAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PCBUGb+6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4BEB8C433C7;
-	Mon,  4 Mar 2024 13:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709557829;
-	bh=gho4GcW/2zNAdSd9bIZCOth4JZaD3rPWTtBSvYURc3c=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PCBUGb+6QouwuiMrNrOqddkwx/AIc+B/yy8fTBAEz3x/OW73xKA9jO1JZMx5tNGOz
-	 yQ/MiRSvXBQJ9379vNOg1/nvSesOgX4yUVAiWemA8RUik+eB+TkjPqo5n77w1NJ236
-	 k94B5U2G0b4u+pAQMDW5r2M5xskDPJX1uk6TTMA5g/UyPU6Dhb4NPf0b9pXIJSgqqe
-	 n9rGXNNR7N0rmELpg+RJMN2HMcv302WC8nKCKj28A7r2kpy0UbJPc1S4CJwd3A//OE
-	 YgRhVRSFc53HrmwyCaa6ZEV++ooaxlxZpPcTCimPTmnlPdhlcCIbgabCDkCSvkhQWn
-	 XSVSKeV1PMCXQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 38831D9A4BB;
-	Mon,  4 Mar 2024 13:10:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709558086; c=relaxed/simple;
+	bh=WiS8qWyaaK3tJD7Uq1b5M/q+bvZezVTEB3S5cj8t7uw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZYxaDTMbyiB4Nn8wSzrQ942FkxAMvjL6amEFug8jcN/zLkA4kYpo6oMl+lp3t23EoELfqUejwBD8QRp4qDHHDrzvnT2Kt/QCU62sip7UGYrMv1fLtUs+wRZNfnT3EKZCTAeLTiSWePKB8KBTJTrf1DY3lMYeMnjaCDD0AYRp4b0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ysXUBrH0; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-566b160f6eeso25561a12.1
+        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 05:14:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709558083; x=1710162883; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WiS8qWyaaK3tJD7Uq1b5M/q+bvZezVTEB3S5cj8t7uw=;
+        b=ysXUBrH0JLb0qOJ4DrHCeN0hXaZH7qF4VaZxMD7gsR8fYHLRxqtQuzYTkD6N4WbRcj
+         D3cftCgAUImr5XZcI5Qt5gkaoTwcPyS0KwbXcCyfSGedlM6Q42f2KTpVOWsj9Fr/uZc7
+         RtgVn3BmyAgQUypWAn08S8z0Lo5NHPP5Gv9HunedhWcsFIrhmjDMUj25D4udAsCFRFJe
+         XaQ4pyE75PrPIsv8TydsK9Xoe+xgL9O9DYEsMTAlldxYwngjBq8PlNgwDIwB52oqMYAT
+         q2Q9kfAjMo9LWqlCaXPs+PWnlbnvTqNHWBaDep7WK5gLsgLycCzEn6f5SkTxAszR7b8i
+         Jd8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709558083; x=1710162883;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WiS8qWyaaK3tJD7Uq1b5M/q+bvZezVTEB3S5cj8t7uw=;
+        b=sw+WY7zT4cVcDAl5q4tSSwtNGjc1dG1X8vop6ceLLOe45zLpcnfSH9vhiUVJ2GTCMT
+         KkOMsrOamdRevWDWdYJzStv93IHYNQPvzQ/r//odLoH6VoAXeIrVNvfuthuNN71PSuTr
+         3oQ1fBTwZ7GLYoStkDO6NYrJA0TFvdydhZb/H+yLYJzffZPYWezgRrcRfXFq0AnV5b89
+         Z26bb/UZApbaXZax7CTybtK2hmjjSIIdngEp3tXKT4uVA5xY4UyUFmKwpaXCLyIVsMT8
+         GJ/HcdHkH4DTiBh/6yKYAmrciL3wak8wdzkQtLkMZ4VGA+hZYdvlSdDcZ5nDjKCdqt7p
+         s3vg==
+X-Forwarded-Encrypted: i=1; AJvYcCX7b/UxxsUWnGw4qLcwSJB0y7PL0dSD9vIFMlfWz5bXBH3XXdbN5kvjAHYN4LpAH0V91wIw+ndI2pox44iVoSA7hafAgs1V
+X-Gm-Message-State: AOJu0YyKtMIYVRgS59/RvtoY0dh3g4I6px+vbN6C1aNuvAVBsR5UQR6R
+	tfckL3n989dwStudPaAR6oq5lbA1r1wRpPuLIy//f5xTGzQp24oioUpxhDjkJkxIFoYQ71Xokcc
+	FoL5QmaC2529vQLa6ZZUZ0d4kjWYMuqDKVBrd
+X-Google-Smtp-Source: AGHT+IE0blQSiGxF2suW+oA+PNDAjjTN0pKIjIC5BPfeNsYQwt9oZTn9u1J6WcEVOZLNg4Jxvqn7YpZMfXR1ypjVlIM=
+X-Received: by 2002:aa7:db58:0:b0:566:e8fc:8f83 with SMTP id
+ n24-20020aa7db58000000b00566e8fc8f83mr284665edt.7.1709558082832; Mon, 04 Mar
+ 2024 05:14:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/15] mptcp: userspace pm: 'dump addrs' and 'get
- addr'
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170955782922.9155.840057347233727619.git-patchwork-notify@kernel.org>
-Date: Mon, 04 Mar 2024 13:10:29 +0000
-References: <20240301-upstream-net-next-20240301-mptcp-userspace-pm-dump-addr-v1-0-dc30a420b3a0@kernel.org>
-In-Reply-To: <20240301-upstream-net-next-20240301-mptcp-userspace-pm-dump-addr-v1-0-dc30a420b3a0@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- shuah@kernel.org, tanggeliang@kylinos.cn, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20240301193740.3436871-1-edumazet@google.com> <20240301193740.3436871-3-edumazet@google.com>
+ <f8711f5c4d6dfae9d7f4bf64fdde15feaee56494.camel@redhat.com>
+ <CANn89i+19QU3AX=9u+x51P0xxPt6sNj-GHUh85NF0gsBChEgvg@mail.gmail.com> <55cebf59-d366-4d41-a946-94320295f5c1@gmail.com>
+In-Reply-To: <55cebf59-d366-4d41-a946-94320295f5c1@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 4 Mar 2024 14:14:28 +0100
+Message-ID: <CANn89i+atJ0BjQyP4f53jjBEGRaLhdYL=XZoHhT0LnSDEO0SmA@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/4] net: gro: change skb_gro_network_header()
+To: Richard Gobert <richardbgobert@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Mon, Mar 4, 2024 at 2:04=E2=80=AFPM Richard Gobert <richardbgobert@gmail=
+.com> wrote:
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+> Overall looks like a great gain for GRO, less code for handling frag0 :)
+>
+> Could you please share how to measure a <10% gain in pps in a stable
+> manner? While perf top is stable for me when testing CPU-bound tasks,
+> netperf pps measurements between 2 physical machines generate ~5-7%
+> noise when I try to measure.
 
-On Fri, 01 Mar 2024 19:18:24 +0100 you wrote:
-> This series from Geliang adds two new Netlink commands to the userspace
-> PM:
-> 
-> - one to dump all addresses of a specific MPTCP connection:
->   - feature added in patches 3 to 5
->   - test added in patches 7, 8 and 10
-> 
-> [...]
+The pps are measured without "perf top" running.
+"sar -n DEV 5 5" , or other non intrusive monitoring tool.
 
-Here is the summary with links:
-  - [net-next,01/15] mptcp: make pm_remove_addrs_and_subflows static
-    https://git.kernel.org/netdev/net-next/c/e38b117d7f3b
-  - [net-next,02/15] mptcp: export mptcp_genl_family & mptcp_nl_fill_addr
-    https://git.kernel.org/netdev/net-next/c/34ca91e15e69
-  - [net-next,03/15] mptcp: implement mptcp_userspace_pm_dump_addr
-    https://git.kernel.org/netdev/net-next/c/34e74a5cf3b7
-  - [net-next,04/15] mptcp: add token for get-addr in yaml
-    https://git.kernel.org/netdev/net-next/c/9e6c88e2f05b
-  - [net-next,05/15] mptcp: dump addrs in userspace pm list
-    https://git.kernel.org/netdev/net-next/c/9ae7846c4b6b
-  - [net-next,06/15] mptcp: check userspace pm flags
-    https://git.kernel.org/netdev/net-next/c/c19ee3c7e388
-  - [net-next,07/15] selftests: mptcp: add userspace pm subflow flag
-    https://git.kernel.org/netdev/net-next/c/9963b77e25c6
-  - [net-next,08/15] selftests: mptcp: add token for dump_addr
-    https://git.kernel.org/netdev/net-next/c/950c332125f6
-  - [net-next,09/15] selftests: mptcp: add mptcp_lib_check_output helper
-    https://git.kernel.org/netdev/net-next/c/2d0c1d27ea4e
-  - [net-next,10/15] selftests: mptcp: dump userspace addrs list
-    https://git.kernel.org/netdev/net-next/c/38f027fca1b7
-  - [net-next,11/15] mptcp: add userspace_pm_lookup_addr_by_id helper
-    https://git.kernel.org/netdev/net-next/c/06afe09091ee
-  - [net-next,12/15] mptcp: implement mptcp_userspace_pm_get_addr
-    https://git.kernel.org/netdev/net-next/c/d32c8fb1c881
-  - [net-next,13/15] mptcp: get addr in userspace pm list
-    https://git.kernel.org/netdev/net-next/c/564ae6794ec5
-  - [net-next,14/15] selftests: mptcp: add token for get_addr
-    https://git.kernel.org/netdev/net-next/c/b055671b3936
-  - [net-next,15/15] selftests: mptcp: userspace pm get addr tests
-    https://git.kernel.org/netdev/net-next/c/4cc5cc7ca052
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Quite often, noise comes from NUMA hosts, because the NIC has direct
+attachment to one of them.
 
