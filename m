@@ -1,158 +1,76 @@
-Return-Path: <netdev+bounces-77049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9E1486FF24
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:34:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 336A986FF6F
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:51:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FD431F210C2
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:34:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64B251C22EA1
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5873D2374B;
-	Mon,  4 Mar 2024 10:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836D639AF1;
+	Mon,  4 Mar 2024 10:49:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="yUycssvT"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="qiHA8ALo"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891D51A29F;
-	Mon,  4 Mar 2024 10:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7EA374FC;
+	Mon,  4 Mar 2024 10:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709548448; cv=none; b=We0T+BOpWXFt2UPDEcDGnaD/YRXQI10EZvBIvekL6vQPo0mV3ONNN1wyAryx26AVA2vutMp4KPZ282PSM8ffEFgrADxEssx6wwGzfjG1LWQApu2xpqBdbAUidkTt8T1MhiWLxIR8NDwWB2ZOD1AYrAu+Y3LHWyJSEnr7c56QNVA=
+	t=1709549393; cv=none; b=b7vxRratOmp3b1dSfgbezS+VkEVIjv5ws7oq+6eO+AOamXfxKrSEfMTNMMcWN4cdJdLRkyeJUZn2SfXYQLLxbH5upPxIMgwWvLiOBrZ6qKxgzBPb99xFYeyLLPywBAVCcX31vKo8f833EJn9UMhE/ZNVXmWXlsy89kOgk4lGnZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709548448; c=relaxed/simple;
-	bh=X8hStsCEoYVAZ6F/f5AhI30DQJROTSe1ABt+YDwR7qE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ha8Ry9PJe0MhdLQmebE4UxUBr1RkF2a0L1sMae/LkCiMpBgn/lBW34vw6dH4mAHMeIy6b9jJvJTJqiEvVX60448hq2QvIoR+AN6KC0IQ0wG1shIIxfxH2WVjCQ0foIl6lDP5QtOX0vmLwrMnVMmWXsGavO1QBbG3LD97jyhmjAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=yUycssvT; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 424AWsLm059411;
-	Mon, 4 Mar 2024 04:32:54 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1709548374;
-	bh=dGqTM/o/z/iQYnEvV+JIGkw/hQ9dTMU9/eegiOjtL5M=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=yUycssvT7jbKY/9r4s3Z10FR8/TIMGCoktkB2/v0KdDTs6LLJi0pLxOtSG0R9sOnW
-	 EZ8Dgq0ea3oyebO8lT74vPPmwM8i/p9fRARDo0gxbRYeUuR16QYT11t/ldjSLjzsTU
-	 rNZ1ZWKriCC6NQLJflHXzWD6FWaOq3oJbHxmpsog=
-Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 424AWsR4004236
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 4 Mar 2024 04:32:54 -0600
-Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 4
- Mar 2024 04:32:53 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE106.ent.ti.com
- (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 4 Mar 2024 04:32:53 -0600
-Received: from [172.24.227.88] (uda0500640.dhcp.ti.com [172.24.227.88])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 424AWn0D060483;
-	Mon, 4 Mar 2024 04:32:49 -0600
-Message-ID: <8d92dcbb-828d-17f4-d199-c625505e7b0c@ti.com>
-Date: Mon, 4 Mar 2024 16:02:48 +0530
+	s=arc-20240116; t=1709549393; c=relaxed/simple;
+	bh=dyvRu7sPfvPIBPjCm23KBXSnjn0QohEtsPQ0hzhgvqc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L2TpeLUD6wD4PG6FLm4+ds09JhcznVaBpYILuGGXv3VEZ/pJUbHUyn+oaaptF1cUpuN9jqRFcx9DGDPdI9MNuNzvR5WKqngCejCojfHi7qKjCy04oK9IRJrreBa9wH0Cj2qCIUlgwC1A1kj+ns5nATLtOLyz9P2ysVAnjDr0rQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=qiHA8ALo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 553A3C433F1;
+	Mon,  4 Mar 2024 10:49:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1709549392;
+	bh=dyvRu7sPfvPIBPjCm23KBXSnjn0QohEtsPQ0hzhgvqc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qiHA8ALoQGFSD4qZBk28GoChy9AAAEj7YGlagw1/gsw3uVxcZsNZBCx+07NXKM5bX
+	 GH7xjal32jFXsLXskS74rgE1UkYQq6dkjrUhuyqU4IVCwCX+Q3rJCLfwlzISo4SEtm
+	 Or1m60IiaCWOh8uL7v+T3G9jTGway2jUKfeBha6o=
+Date: Mon, 4 Mar 2024 11:49:50 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Vamsi Krishna Brahmajosyula <vamsi-krishna.brahmajosyula@broadcom.com>
+Cc: stable@vger.kernel.org, mike.kravetz@oracle.com, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com,
+	songliubraving@fb.com, yhs@fb.com, john.fastabend@gmail.com,
+	kpsingh@kernel.org, dhowells@redhat.com, viro@zeniv.linux.org.uk,
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com,
+	vasavi.sirnapalli@broadcom.com, Oscar Salvador <osalvador@suse.de>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v5.15-v5.4] fs,hugetlb: fix NULL pointer dereference in
+ hugetlbs_fill_super
+Message-ID: <2024030440-deny-console-7212@gregkh>
+References: <20240301070910.1287862-1-vamsi-krishna.brahmajosyula@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH] net: hsr: Use full string description when opening HSR
- network device
-Content-Language: en-US
-To: Lukasz Majewski <lukma@denx.de>, Oleksij Rempel <o.rempel@pengutronix.de>
-CC: Eric Dumazet <edumazet@google.com>, Vladimir Oltean <olteanv@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, <netdev@vger.kernel.org>,
-        <Tristram.Ha@microchip.com>,
-        "Sebastian Andrzej
- Siewior" <bigeasy@linutronix.de>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Nikita
- Zhandarovich" <n.zhandarovich@fintech.ru>,
-        Murali Karicheri
-	<m-karicheri2@ti.com>,
-        Ziyang Xuan <william.xuanziyang@huawei.com>,
-        <linux-kernel@vger.kernel.org>,
-        Ravi Gunasekaran <r-gunasekaran@ti.com>
-References: <20240304093220.4183179-1-lukma@denx.de>
-From: Ravi Gunasekaran <r-gunasekaran@ti.com>
-In-Reply-To: <20240304093220.4183179-1-lukma@denx.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240301070910.1287862-1-vamsi-krishna.brahmajosyula@broadcom.com>
 
-
-
-On 3/4/24 3:02 PM, Lukasz Majewski wrote:
-> Up till now only single character ('A' or 'B') was used to provide
-> information of HSR slave network device status.
+On Fri, Mar 01, 2024 at 01:09:10AM -0600, Vamsi Krishna Brahmajosyula wrote:
+> From: Oscar Salvador <osalvador@suse.de>
 > 
-> As it is also possible and valid, that Interlink network device may
-> be supported as well, the description must be more verbose. As a result
-> the full string description is now used.
-> 
-> Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> ---
->  net/hsr/hsr_device.c | 13 ++++++-------
->  1 file changed, 6 insertions(+), 7 deletions(-)
-> 
-> diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-> index 9d71b66183da..9a60489fba96 100644
-> --- a/net/hsr/hsr_device.c
-> +++ b/net/hsr/hsr_device.c
-> @@ -142,30 +142,29 @@ static int hsr_dev_open(struct net_device *dev)
->  {
->  	struct hsr_priv *hsr;
->  	struct hsr_port *port;
-> -	char designation;
-> +	char *designation = NULL;
->  
->  	hsr = netdev_priv(dev);
-> -	designation = '\0';
->  
->  	hsr_for_each_port(hsr, port) {
->  		if (port->type == HSR_PT_MASTER)
->  			continue;
->  		switch (port->type) {
->  		case HSR_PT_SLAVE_A:
-> -			designation = 'A';
-> +			designation = "Slave A";
+> commit 79d72c68c58784a3e1cd2378669d51bfd0cb7498 upstream.
 
-"designation" is now a pointer and is being assigned value
-without even allocating memory for it.
+Now queued up, thanks.
 
->  			break;
->  		case HSR_PT_SLAVE_B:
-> -			designation = 'B';
-> +			designation = "Slave B";
->  			break;
->  		default:
-> -			designation = '?';
-> +			designation = "Unknown";
->  		}
->  		if (!is_slave_up(port->dev))
-> -			netdev_warn(dev, "Slave %c (%s) is not up; please bring it up to get a fully working HSR network\n",
-> +			netdev_warn(dev, "%s (%s) is not up; please bring it up to get a fully working HSR network\n",
->  				    designation, port->dev->name);
->  	}
->  
-> -	if (designation == '\0')
-> +	if (!designation)
->  		netdev_warn(dev, "No slave devices configured\n");
->  
->  	return 0;
-
--- 
-Regards,
-Ravi
+greg k-h
 
