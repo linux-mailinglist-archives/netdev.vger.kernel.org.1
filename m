@@ -1,118 +1,147 @@
-Return-Path: <netdev+bounces-77196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D2FB87087F
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 18:42:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A61478708AF
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 18:52:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 391A7281AC0
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 17:42:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D576B1C223EB
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 17:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 216E6612F4;
-	Mon,  4 Mar 2024 17:42:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C186D61676;
+	Mon,  4 Mar 2024 17:52:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kRI8vrcT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZC4xiaJr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3636025E;
-	Mon,  4 Mar 2024 17:42:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92EDB6166E;
+	Mon,  4 Mar 2024 17:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709574151; cv=none; b=DwvZUmhgkIVjPOdAgvss99PZORKmLFHkuEnHlycr1gw2kn+9lNodDH8poNaOiGisT1h+0MDPwtDLemuDP8x0vp/jK+RmFAlolzUUFmD/2lXxLJ9GLmkmRyAEzrPz9vvsIbqnID+HFElRNWSiJj94ytvtV4CrXRNEQzWAeq/pKJY=
+	t=1709574741; cv=none; b=gQL5VwK6QqC7V0AqVcWSAzvZFlNm4Yy/CTh+BQj7ptJiJiJdukTo2+cbgGa/IxmGoOSnSfMZrqQHMS4wvO4m8oKbPSwfoG/V7KwxRbrnER95rHiAIWYWwS4gIVf6v3M4h4BV48jrizxrkSnC0iNkuBga5gv2Vb6ZhClqIyuFLFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709574151; c=relaxed/simple;
-	bh=h4x1z5kFcsXRs0S1/1xtxHnLDvLTTR1q1CynXjth2QY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DN5lHQyJF2AEGPTaZGIPihiy999yMsO26xagTccvJoba5dslBVKku5Ryjf1HRNbpVdZIod/hAC/7Ox1XNPnF6oCEB+q1TkQyPqPxK3leeDKhRdHrVH/i8GMR9zQNG/z0bql++x4Pn8AiH+oBQIR66E23DHxpNyCSoDPCMFXSYDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kRI8vrcT; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709574150; x=1741110150;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=h4x1z5kFcsXRs0S1/1xtxHnLDvLTTR1q1CynXjth2QY=;
-  b=kRI8vrcTR/5ddpBbCu98rxFZ1JcPkq8/hDa0bLfdMj77lNYhJqlVq3xk
-   X4E23X8F3wmE03HDv6vGGGeTxuVjUjT/7f10Bo+EEoOm39lXpt8es48SN
-   JB2x3zlgSQrQPMDNosdO2DGxW1/GjuOMZBveHD68D7EPgbeIiWO0Qmw+Z
-   uvPEstj+d+/unf7gTV91A6px1DaUcp6TwGXrggPcndy8ZGVFzYkV0uqY/
-   EBv33GFc/xpl4wwad/r9sOld/TBMQO/LjPFJYafx9ArhBIDUcKQGMN1S5
-   w6gN66d36oYDR2ruEOXf0JCtJubgMpJV2cGjd3mO8VNI2U4QReya2y4y6
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="4208207"
-X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
-   d="scan'208";a="4208207"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 09:42:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="937040903"
-X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
-   d="scan'208";a="937040903"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga001.fm.intel.com with ESMTP; 04 Mar 2024 09:42:24 -0800
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id AB22E15C; Mon,  4 Mar 2024 19:42:22 +0200 (EET)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
+	s=arc-20240116; t=1709574741; c=relaxed/simple;
+	bh=XsmLd6DfO7PQEwcDTEcc6uqrYp9tQ2/PbdbwVblQHkE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cUnFMX+4Rsqw0Lycp7FbruQtEudLDc4FqYBoPilzAADEZBZuV2fr7ceNoAI4PShpRDgBGGX1XU5MdOVLYYedk7+21i525Iz6wgUGE6TTow8zzv/RGdRT1U+7/SRQdvKA/LLOF5lkW8b6aqPOEDEXiMjoD1/rhxa0VUaJelFlD6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZC4xiaJr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FA6DC433C7;
+	Mon,  4 Mar 2024 17:52:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709574741;
+	bh=XsmLd6DfO7PQEwcDTEcc6uqrYp9tQ2/PbdbwVblQHkE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZC4xiaJryMbdfWazibogbn5M6jpCgylKmUZcmirvSSGRb7PUTGD4F7ZE3EV50jI/y
+	 7ZsmqhX43rVWND+xjzTI7slAHxyk9V6NWW1XxoSYZelRmgkYk3XpAT5raY1biwbv2P
+	 OlPtoQBWMDxLCuy0frnPFueteW/sm+HSyFp/DarS74SuoV4V5FXHVlkuEFO6Asctxg
+	 r7R5E27MhixIvL1KbsTwof3W5F24Bg6BPNq7rqWz1Bvfn1jxdWVktoHH7FnzaLfdXL
+	 g9dbCuB8DAwsmHbHWKmpbM8CXl5lMEHv4oXXPBAwU6dnwxNYn0DhsZyrtyenhr5JSW
+	 ZUWCMSLpybtGw==
+Date: Mon, 4 Mar 2024 17:52:16 +0000
+From: Simon Horman <horms@kernel.org>
+To: "Ricardo B. Marliere" <ricardo@marliere.net>
+Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH net-next v1 1/1] ieee802154: at86rf230: Replace of_gpio.h by proper one
-Date: Mon,  4 Mar 2024 19:42:17 +0200
-Message-ID: <20240304174218.1198411-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.43.0.rc1.1.gbec44491f096
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-ppp@vger.kernel.org,
+	Benjamin Tissoires <benjamin.tissoires@redhat.com>
+Subject: Re: [PATCH net-next 1/6] net: hns: make hnae_class constant
+Message-ID: <20240304175216.GN403078@kernel.org>
+References: <20240302-class_cleanup-net-next-v1-0-8fa378595b93@marliere.net>
+ <20240302-class_cleanup-net-next-v1-1-8fa378595b93@marliere.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240302-class_cleanup-net-next-v1-1-8fa378595b93@marliere.net>
 
-of_gpio.h is deprecated and subject to remove.
-The driver doesn't use it directly, replace it
-with what is really being used.
++ Benjamin Tissoires <benjamin.tissoires@redhat.com>
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/net/ieee802154/at86rf230.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+On Sat, Mar 02, 2024 at 02:05:57PM -0300, Ricardo B. Marliere wrote:
+> Since commit 43a7206b0963 ("driver core: class: make class_register() take
+> a const *"), the driver core allows for struct class to be in read-only
+> memory, so move the hnae_class structure to be declared at build time
+> placing it into read-only memory, instead of having to be dynamically
+> allocated at boot time.
+> 
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
 
-diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index 6212164ffb36..f632b0cfd5ae 100644
---- a/drivers/net/ieee802154/at86rf230.c
-+++ b/drivers/net/ieee802154/at86rf230.c
-@@ -11,17 +11,16 @@
-  */
- #include <linux/kernel.h>
- #include <linux/module.h>
-+#include <linux/gpio/consumer.h>
- #include <linux/hrtimer.h>
- #include <linux/jiffies.h>
- #include <linux/interrupt.h>
- #include <linux/irq.h>
--#include <linux/gpio.h>
- #include <linux/delay.h>
- #include <linux/property.h>
- #include <linux/spi/spi.h>
- #include <linux/regmap.h>
- #include <linux/skbuff.h>
--#include <linux/of_gpio.h>
- #include <linux/ieee802154.h>
- 
- #include <net/mac802154.h>
--- 
-2.43.0.rc1.1.gbec44491f096
+Reviewed-by: Simon Horman <horms@kernel.org>
 
+> ---
+>  drivers/net/ethernet/hisilicon/hns/hnae.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/hisilicon/hns/hnae.c b/drivers/net/ethernet/hisilicon/hns/hnae.c
+> index 8a1027ad340d..d4293f76d69d 100644
+> --- a/drivers/net/ethernet/hisilicon/hns/hnae.c
+> +++ b/drivers/net/ethernet/hisilicon/hns/hnae.c
+> @@ -12,7 +12,9 @@
+>  
+>  #define cls_to_ae_dev(dev) container_of(dev, struct hnae_ae_dev, cls_dev)
+>  
+> -static struct class *hnae_class;
+> +static const struct class hnae_class = {
+> +	.name = "hnae",
+> +};
+>  
+>  static void
+>  hnae_list_add(spinlock_t *lock, struct list_head *node, struct list_head *head)
+> @@ -111,7 +113,7 @@ static struct hnae_ae_dev *find_ae(const struct fwnode_handle *fwnode)
+>  
+>  	WARN_ON(!fwnode);
+>  
+> -	dev = class_find_device(hnae_class, NULL, fwnode, __ae_match);
+> +	dev = class_find_device(&hnae_class, NULL, fwnode, __ae_match);
+>  
+>  	return dev ? cls_to_ae_dev(dev) : NULL;
+>  }
+> @@ -415,7 +417,7 @@ int hnae_ae_register(struct hnae_ae_dev *hdev, struct module *owner)
+>  	hdev->owner = owner;
+>  	hdev->id = (int)atomic_inc_return(&id);
+>  	hdev->cls_dev.parent = hdev->dev;
+> -	hdev->cls_dev.class = hnae_class;
+> +	hdev->cls_dev.class = &hnae_class;
+>  	hdev->cls_dev.release = hnae_release;
+>  	(void)dev_set_name(&hdev->cls_dev, "hnae%d", hdev->id);
+>  	ret = device_register(&hdev->cls_dev);
+> @@ -448,13 +450,12 @@ EXPORT_SYMBOL(hnae_ae_unregister);
+>  
+>  static int __init hnae_init(void)
+>  {
+> -	hnae_class = class_create("hnae");
+> -	return PTR_ERR_OR_ZERO(hnae_class);
+> +	return class_register(&hnae_class);
+>  }
+>  
+>  static void __exit hnae_exit(void)
+>  {
+> -	class_destroy(hnae_class);
+> +	class_unregister(&hnae_class);
+>  }
+>  
+>  subsys_initcall(hnae_init);
+> 
+> -- 
+> 2.43.0
+> 
+> 
 
