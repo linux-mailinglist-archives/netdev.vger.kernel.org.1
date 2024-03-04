@@ -1,576 +1,230 @@
-Return-Path: <netdev+bounces-76941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1AB586F878
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 03:17:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CF2086F8D9
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 04:20:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32FACB20BD7
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 02:17:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6A47281410
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 03:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25F951854;
-	Mon,  4 Mar 2024 02:16:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F0D211C;
+	Mon,  4 Mar 2024 03:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="CKvs2tXD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ikcIF4hB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313826119;
-	Mon,  4 Mar 2024 02:16:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1AD3D6D;
+	Mon,  4 Mar 2024 03:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709518594; cv=none; b=QpWuLliaY7F1FBpeDXZlSqFRCad+xVP2vaOv1jEL1aAGUr0oCqHDK5mgXcrma9SmRNP4ynd+bGOP65eCPgZQ9Y6Dpg4Jbj5i6syCPtliFVU5WA19tlFgbPlg+4gxUjA7p1QE92mBrnW17j8Qw0TDbzeqqa4TMNgDbVRZFHS8oZ8=
+	t=1709522433; cv=none; b=HVxuSG25b9ayi3cINQPumd+I4xuLXD/Etm8uuziIrJVVAV0C/mzLHaOlnTsbR9TfTCdsNiap+8HgT+E3UzUX85ZT0eMyEzg5tt2OLP2lIua34F7/LQNbgeJHGKQOhKmb8fu4VcwHHM2aDbr7lmK+pE7EVvckw0lAa9h+cBUd2ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709518594; c=relaxed/simple;
-	bh=65apBSHJ0O3wmpKz8C3mCOLmj94FoNp0CDCcylsQ6Xo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XW5EgO3NrwBQeqGuBFh7O+NdtQTzleqgRjULm9ls6s6aGdM8FOnZ92/+GhKrVpFIyHEp/arIXip4v9qhmPnk93MTvQe+MnW8Fxb+NNsu04dvF1oEO8gRoXXvjvsCNOvznMW/6N/FJ/DwWk086mD7Dp7KM2J1U2Ybper+03FFbAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=CKvs2tXD; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4241D0O8023163;
-	Mon, 4 Mar 2024 02:16:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	qcppdkim1; bh=r7kQ1p5QNvT47nb++vA3nP7NjhLIELOXEpBbJ4AXzvo=; b=CK
-	vs2tXDr+ElNXClYxKpODLkJ3VE+UMByqjPwAdHwQnzKB24rVyeA22MKAMX/4fLgs
-	wWwwdd42/uFXe4pGKOm0xjKzpaZ2i8wKaTivqPd71ah8LDiZ/cC+cMrW1rXmXJor
-	r4FOgwd6ceqW2kILftU0iawTQa6JQo368i95QVHVs0gXFgAWEZalkgwp8OAaNsdG
-	5idt1/aXUwAGo/AmPGLGN/b2fnQTVGJSuEZofTSiLKdRMA3yf+ffnCLq4B0A7o8X
-	MF/tjvsq6vFBxNPSTR6FjKgvJcUKhlcL89dC+U/0gF9iB4RgDgU/016wgkRYXPa+
-	hnEr3nlHK29RTsCU+v/g==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wkvvm2bq2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Mar 2024 02:16:20 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 4242GKJk007344
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 4 Mar 2024 02:16:20 GMT
-Received: from bqiang-SFF.qca.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Sun, 3 Mar 2024 18:16:17 -0800
-From: Baochen Qiang <quic_bqiang@quicinc.com>
-To: <ath11k@lists.infradead.org>, <manivannan.sadhasivam@linaro.org>
-CC: <linux-wireless@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <mhi@lists.linux.dev>, <quic_bqiang@quicinc.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v5 3/3] wifi: ath11k: support hibernation
-Date: Mon, 4 Mar 2024 10:15:54 +0800
-Message-ID: <20240304021554.77782-4-quic_bqiang@quicinc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240304021554.77782-1-quic_bqiang@quicinc.com>
-References: <20240304021554.77782-1-quic_bqiang@quicinc.com>
+	s=arc-20240116; t=1709522433; c=relaxed/simple;
+	bh=unZ5pH5Vat+193wTsQ4UMHnA2tAtkmL1s97+V9DyjwQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eqViDoWoEBjYjvFpXFydyHE2HUZK2xKWYCgKJR2kucIZi8LZtxl0Ja/n3DmbCOPINhXqXf3dMVewVUyiBtiiHlG7pfJJ8JZUa6TGE7qgdDYVo7Sm4NBZSbDpMG9DpUxlnTWUQR0HiqHLWsCroJU+maHh7WD2dLvbSWuwhMWXlxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ikcIF4hB; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a4554d4cb62so37351766b.2;
+        Sun, 03 Mar 2024 19:20:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709522429; x=1710127229; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=49lhx3xPmnbWziQJHmwq4JUdh1Pf+xDaTKNLuJmhOe4=;
+        b=ikcIF4hBFVDPP4MTMRNw+Krw3lxv67u46+GbEYCeLxf6lCpawjnmXW7p8oXeNUZl5f
+         KAn9ezs7LBVWeGcRS5NmagcKlxM+yYlMiAxHm0wIy26j67/xpltLS5ykaapdnPKWEtNY
+         kGFceYxZYRpDqiXE62P4tVEShcRm7sfEVm0BZEQKv6BS2Eol0VorOR3CJvNchzXY+IG3
+         l8OL0KFKVFLAVuno7YzK/DpEQs5OyNbi0inz5j7QIlKhf6+utIMO+Q9gYqt+Ypau59V/
+         Y9ChxY6sIe+kn1MN75cKEt9Tth0NX01K+yREafXcFysQ/mwNekmmTs2NgX7h/QjJ6oje
+         W3MA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709522429; x=1710127229;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=49lhx3xPmnbWziQJHmwq4JUdh1Pf+xDaTKNLuJmhOe4=;
+        b=fWsOQr5HSzyD+Ypt2vseATQcO31HBQSIznkK0aTDE+Su3pLCWgtKWeUvxo02eXGCFE
+         Yt7Y5LKlEq8F0RJh4NLCKg5dh0HyOfdMYexcWoj8RX7ykAliEYV7k9kd8LyyS/pt+qy8
+         cNPdqbc5XPbtqehCGtMsWhbrzo3nsYiZqoFeFNL6E/bHpwbFujknGHwW2fJwKgETqNTx
+         mBB8gyF6UHBgH1paCL/HbBjfnAlghLvYC3BKdAC4xhHuOpvT2Vhl+SEVH+gEvWcDYdXE
+         OfiOorh98xLhjEzwhioQx2ZhwD5Maow4PJsTO6AMeBYiKtGwmCIJ2FuN0ddFHcx0Zz9m
+         nUIg==
+X-Forwarded-Encrypted: i=1; AJvYcCXBYcYk9hB9JZrqPMxVd7bsjUIyjEmKMvxvtM3F9vj7OgL6jrjHy+1vdeamkjWggS3Pbw6l9SInOGS4vjhBHfANQuPwzF4XQM6zvEqMvQgnpAbxFV2UxzIWMkG6YzzHI/ANHsIE
+X-Gm-Message-State: AOJu0YxLarqQkdc6sVGn7eAKY/55nf0F2fNuWiFrE+8fAGp8gAolGXRG
+	Pta9sQ9hoM3hIL8fDiliaobdGNXklvivfZ4yq/Wmydo1698NyQinmx5EqlUxv1I/QHyl317JxAe
+	957eS7uUswMcFOprZ0irzVt0SWFNq+pVt0tc=
+X-Google-Smtp-Source: AGHT+IG3NloPvcL/kxLp6eoTg4DKD5SAG7srDEOTqfEhcoP23DGKX7sSVZG5ypsnckEdo0eia+Ffa5j1kIVW3jyS0sU=
+X-Received: by 2002:a17:906:714f:b0:a3f:4596:c3c8 with SMTP id
+ z15-20020a170906714f00b00a3f4596c3c8mr4992457ejj.53.1709522429377; Sun, 03
+ Mar 2024 19:20:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: uFxl39M3CFr2ekt3j-QwuaLDMhRpoGeo
-X-Proofpoint-GUID: uFxl39M3CFr2ekt3j-QwuaLDMhRpoGeo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-04_01,2024-03-01_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 suspectscore=0 mlxscore=0 lowpriorityscore=0
- mlxlogscore=999 impostorscore=0 phishscore=0 bulkscore=0 adultscore=0
- clxscore=1015 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2402120000 definitions=main-2403040015
+References: <CAEkJfYPz+xZvczwEnsv1eGsNmv8rtLmyw5WV_rDz_Zui0cNd4Q@mail.gmail.com>
+ <CANn89iJt1Ke=chUSd7JSNSdCEN4ghjivg2j902Wqa5pSQdrdeQ@mail.gmail.com> <CAEkJfYM9PZ7Py6aeHOf5YgD8KiczthM5_opEOXDjp2rE=3ry+Q@mail.gmail.com>
+In-Reply-To: <CAEkJfYM9PZ7Py6aeHOf5YgD8KiczthM5_opEOXDjp2rE=3ry+Q@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 4 Mar 2024 11:19:52 +0800
+Message-ID: <CAL+tcoAM-xnf2d+btrW3cjz49T1fhcg3XJQPc9S2PUaUuJJ3cQ@mail.gmail.com>
+Subject: Re: [Kernel bug] KASAN: slab-out-of-bounds Read in in4_pton
+To: Sam Sun <samsun1006219@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, j.vosburgh@gmail.com, andy@greyhouse.net, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	syzkaller@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Now that all infrastructure is in place and ath11k is fixed to handle all the
-corner cases, power down the ath11k firmware during suspend and power it back
-up during resume. This fixes the problem when using hibernation with ath11k PCI
-devices.
+Hi Sam,
 
-For suspend, two conditions needs to be satisfied:
-        1. since MHI channel unprepare would be done in late suspend stage,
-           ath11k needs to get all QMI-dependent things done before that stage.
-        2. and because unprepare MHI channels requires a working MHI stack,
-           ath11k is not allowed to call mhi_power_down() until that finishes.
-So the original suspend callback is separated into two parts: the first part
-handles all QMI-dependent things in suspend callback; while the second part
-powers down MHI in suspend_late callback. This is valid because kernel calls
-ath11k's suspend callback before all suspend_late callbacks, making the first
-condition happy. And because MHI devices are children of ath11k device
-(ab->dev), kernel guarantees that ath11k's suspend_late callback is called
-after QRTR's suspend_late callback, this satisfies the second condition.
+On Fri, Mar 1, 2024 at 11:23=E2=80=AFPM Sam Sun <samsun1006219@gmail.com> w=
+rote:
+>
+> On Fri, Mar 1, 2024 at 4:18=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+> >
+> > On Fri, Mar 1, 2024 at 3:41=E2=80=AFAM Sam Sun <samsun1006219@gmail.com=
+> wrote:
+> > >
+> > > Dear developers and maintainers,
+> > >
+> > > We found a bug through our modified Syzkaller. Kernel version is b401=
+b621758,
+> > > Linux 6.8-rc5. The C reproducer and kernel config are attached.
+> > >
+> > > KASAN report is listed below
+> > >
+> > > ```
+> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > BUG: KASAN: slab-out-of-bounds in strlen+0x7d/0xa0 lib/string.c:418
+> > > Read of size 1 at addr ffff8881119c4781 by task syz-executor665/8107
+> > >
+> > > CPU: 1 PID: 8107 Comm: syz-executor665 Not tainted 6.7.0-rc7 #1
+> > > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 =
+04/01/2014
+> > > Call Trace:
+> > >  <TASK>
+> > >  __dump_stack lib/dump_stack.c:88 [inline]
+> > >  dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
+> > >  print_address_description mm/kasan/report.c:364 [inline]
+> > >  print_report+0xc1/0x5e0 mm/kasan/report.c:475
+> > >  kasan_report+0xbe/0xf0 mm/kasan/report.c:588
+> > >  strlen+0x7d/0xa0 lib/string.c:418
+> > >  __fortify_strlen include/linux/fortify-string.h:210 [inline]
+> > >  in4_pton+0xa3/0x3f0 net/core/utils.c:130
+> > >  bond_option_arp_ip_targets_set+0xc2/0x910 drivers/net/bonding/bond_o=
+ptions.c:1201
+> > >  __bond_opt_set+0x2a4/0x1030 drivers/net/bonding/bond_options.c:767
+> > >  __bond_opt_set_notify+0x48/0x150 drivers/net/bonding/bond_options.c:=
+792
+> > >  bond_opt_tryset_rtnl+0xda/0x160 drivers/net/bonding/bond_options.c:8=
+17
+> > >  bonding_sysfs_store_option+0xa1/0x120 drivers/net/bonding/bond_sysfs=
+.c:156
+> > >  dev_attr_store+0x54/0x80 drivers/base/core.c:2366
+> > >  sysfs_kf_write+0x114/0x170 fs/sysfs/file.c:136
+> > >  kernfs_fop_write_iter+0x337/0x500 fs/kernfs/file.c:334
+> > >  call_write_iter include/linux/fs.h:2020 [inline]
+> > >  new_sync_write fs/read_write.c:491 [inline]
+> > >  vfs_write+0x96a/0xd80 fs/read_write.c:584
+> > >  ksys_write+0x122/0x250 fs/read_write.c:637
+> > >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> > >  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+> > >  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> > > RIP: 0033:0x7f797835cfcd
+> > > Code: 28 c3 e8 46 1e 00 00 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48 =
+89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f=
+0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> > > RSP: 002b:00007ffff464ffb8 EFLAGS: 00000246 ORIG_RAX: 000000000000000=
+1
+> > > RAX: ffffffffffffffda RBX: 00007ffff46501b8 RCX: 00007f797835cfcd
+> > > RDX: 00000000000000f5 RSI: 0000000020000140 RDI: 0000000000000003
+> > > RBP: 0000000000000001 R08: 0000000000000000 R09: 00007ffff46501b8
+> > > R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+> > > R13: 00007ffff46501a8 R14: 00007f79783da530 R15: 0000000000000001
+> > >  </TASK>
+> > >
+> > > All
+> >
+> >
+> > >
+> > > We analyzed the cause of this bug. In the function "bond_option_arp_i=
+p_targets_set" in
+> > > drivers/net/bonding/bond_options.c, newval->string can be controlled =
+by users. If string
+> > >
+> > > is empty, newval->string+1 points to the address after newval->string=
+, causing potential
+> > >
+> > > info leak.
+> > >
+> > > One possible fix is to check before calling in4_pton, whether strnlen=
+(newval->string) > 1.
+> > >
+> > > If you have any questions or require more information, please feel
+> > > free to contact us.
+> > >
+> > > Reported by Yue Sun <samsun1006219@gmail.com>
+> > >
+> >
+> > Thanks for the report and analysis.
+> >
+> > Are you willing to provide a patch ?
+> >
+> > You would get more credits than a "Reported-by:" tag :)
+> >
+> > Thanks
+>
+> Dear Eric,
+>
+> Thanks for letting me provide a patch! One possible patch
+> is listed below.
+>
+> diff --git a/drivers/net/bonding/bond_options.c
+> b/drivers/net/bonding/bond_options.c
+> index f3f27f0bd2a6..a6d01055f455 100644
+> --- a/drivers/net/bonding/bond_options.c
+> +++ b/drivers/net/bonding/bond_options.c
+> @@ -1198,7 +1198,7 @@ static int bond_option_arp_ip_targets_set(struct
+> bonding *bond,
+>      __be32 target;
+>
+>      if (newval->string) {
+> -        if (!in4_pton(newval->string+1, -1, (u8 *)&target, -1, NULL)) {
+> +        if (!strlen(newval->string) || !in4_pton(newval->string+1,
+> -1, (u8 *)&target, -1, NULL)) {
+>              netdev_err(bond->dev, "invalid ARP target %pI4 specified\n",
+>                     &target);
+>              return ret;
 
-Above analysis also applies to resume process. so the original resume
-callback is separated into two parts: the first part powers up MHI stack
-in resume_early callback, this guarantees MHI stack is working when
-QRTR tries to prepare MHI channels (kernel calls QRTR's resume_early callback
-after ath11k's resume_early callback, due to the child-father relationship);
-the second part waits for the completion of restart, which won't fail now
-since MHI channels are ready for use by QMI.
+You could submit the patch targetting at the latest net tree on your
+own instead of replying to this thread. And then people will review it
+soon :)
 
-Another notable change is in power down path, we tell mhi_power_down() to not
-to destroy MHI devices, making it possible for QRTR to help unprepare/prepare
-MHI channels, and finally get us rid of the probe-defer issue when resume.
+Thanks,
+Jason
 
-Also change related code due to interface changes.
-
-Tested-on: WCN6855 hw2.0 PCI WLAN.HSP.1.1-03125-QCAHSPSWPL_V1_V2_SILICONZ_LITE-3.6510.30
-
-Tested-by: Takashi Iwai <tiwai@suse.de>
-Signed-off-by: Kalle Valo <quic_kvalo@quicinc.com>
-Signed-off-by: Baochen Qiang <quic_bqiang@quicinc.com>
----
- drivers/net/wireless/ath/ath11k/ahb.c  |   6 +-
- drivers/net/wireless/ath/ath11k/core.c | 105 +++++++++++++++++--------
- drivers/net/wireless/ath/ath11k/core.h |   6 +-
- drivers/net/wireless/ath/ath11k/hif.h  |  14 +++-
- drivers/net/wireless/ath/ath11k/mhi.c  |  12 ++-
- drivers/net/wireless/ath/ath11k/mhi.h  |   5 +-
- drivers/net/wireless/ath/ath11k/pci.c  |  44 +++++++++--
- drivers/net/wireless/ath/ath11k/qmi.c  |   2 +-
- 8 files changed, 142 insertions(+), 52 deletions(-)
-
-diff --git a/drivers/net/wireless/ath/ath11k/ahb.c b/drivers/net/wireless/ath/ath11k/ahb.c
-index 7c0a23517949..60b4c2800a33 100644
---- a/drivers/net/wireless/ath/ath11k/ahb.c
-+++ b/drivers/net/wireless/ath/ath11k/ahb.c
-@@ -1,7 +1,7 @@
- // SPDX-License-Identifier: BSD-3-Clause-Clear
- /*
-  * Copyright (c) 2018-2019 The Linux Foundation. All rights reserved.
-- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
-+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
-  */
- 
- #include <linux/module.h>
-@@ -413,7 +413,7 @@ static int ath11k_ahb_power_up(struct ath11k_base *ab)
- 	return ret;
- }
- 
--static void ath11k_ahb_power_down(struct ath11k_base *ab)
-+static void ath11k_ahb_power_down(struct ath11k_base *ab, bool is_suspend)
- {
- 	struct ath11k_ahb *ab_ahb = ath11k_ahb_priv(ab);
- 
-@@ -1256,7 +1256,7 @@ static void ath11k_ahb_remove(struct platform_device *pdev)
- 	struct ath11k_base *ab = platform_get_drvdata(pdev);
- 
- 	if (test_bit(ATH11K_FLAG_QMI_FAIL, &ab->dev_flags)) {
--		ath11k_ahb_power_down(ab);
-+		ath11k_ahb_power_down(ab, false);
- 		ath11k_debugfs_soc_destroy(ab);
- 		ath11k_qmi_deinit_service(ab);
- 		goto qmi_fail;
-diff --git a/drivers/net/wireless/ath/ath11k/core.c b/drivers/net/wireless/ath/ath11k/core.c
-index c78bce19bd75..8533bf3174d2 100644
---- a/drivers/net/wireless/ath/ath11k/core.c
-+++ b/drivers/net/wireless/ath/ath11k/core.c
-@@ -894,12 +894,6 @@ int ath11k_core_suspend(struct ath11k_base *ab)
- 		return ret;
- 	}
- 
--	ret = ath11k_wow_enable(ab);
--	if (ret) {
--		ath11k_warn(ab, "failed to enable wow during suspend: %d\n", ret);
--		return ret;
--	}
--
- 	ret = ath11k_dp_rx_pktlog_stop(ab, false);
- 	if (ret) {
- 		ath11k_warn(ab, "failed to stop dp rx pktlog during suspend: %d\n",
-@@ -910,24 +904,80 @@ int ath11k_core_suspend(struct ath11k_base *ab)
- 	ath11k_ce_stop_shadow_timers(ab);
- 	ath11k_dp_stop_shadow_timers(ab);
- 
-+	/* PM framework skips suspend_late/resume_early callbacks
-+	 * if other devices report errors in their suspend callbacks.
-+	 * However ath11k_core_resume() would still be called because
-+	 * here we return success thus kernel put us on dpm_suspended_list.
-+	 * Since we won't go through a power down/up cycle, there is
-+	 * no chance to call complete(&ab->restart_completed) in
-+	 * ath11k_core_restart(), making ath11k_core_resume() timeout.
-+	 * So call it here to avoid this issue. This also works in case
-+	 * no error happens thus suspend_late/resume_early get called,
-+	 * because it will be reinitialized in ath11k_core_resume_early().
-+	 */
-+	complete(&ab->restart_completed);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(ath11k_core_suspend);
-+
-+int ath11k_core_suspend_late(struct ath11k_base *ab)
-+{
-+	struct ath11k_pdev *pdev;
-+	struct ath11k *ar;
-+
-+	if (!ab->hw_params.supports_suspend)
-+		return -EOPNOTSUPP;
-+
-+	/* so far single_pdev_only chips have supports_suspend as true
-+	 * and only the first pdev is valid.
-+	 */
-+	pdev = ath11k_core_get_single_pdev(ab);
-+	ar = pdev->ar;
-+	if (!ar || ar->state != ATH11K_STATE_OFF)
-+		return 0;
-+
- 	ath11k_hif_irq_disable(ab);
- 	ath11k_hif_ce_irq_disable(ab);
- 
--	ret = ath11k_hif_suspend(ab);
--	if (ret) {
--		ath11k_warn(ab, "failed to suspend hif: %d\n", ret);
--		return ret;
--	}
-+	ath11k_hif_power_down(ab, true);
- 
- 	return 0;
- }
--EXPORT_SYMBOL(ath11k_core_suspend);
-+EXPORT_SYMBOL(ath11k_core_suspend_late);
-+
-+int ath11k_core_resume_early(struct ath11k_base *ab)
-+{
-+	int ret;
-+	struct ath11k_pdev *pdev;
-+	struct ath11k *ar;
-+
-+	if (!ab->hw_params.supports_suspend)
-+		return -EOPNOTSUPP;
-+
-+	/* so far signle_pdev_only chips have supports_suspend as true
-+	 * and only the first pdev is valid.
-+	 */
-+	pdev = ath11k_core_get_single_pdev(ab);
-+	ar = pdev->ar;
-+	if (!ar || ar->state != ATH11K_STATE_OFF)
-+		return 0;
-+
-+	reinit_completion(&ab->restart_completed);
-+	ret = ath11k_hif_power_up(ab);
-+	if (ret)
-+		ath11k_warn(ab, "failed to power up hif during resume: %d\n", ret);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(ath11k_core_resume_early);
- 
- int ath11k_core_resume(struct ath11k_base *ab)
- {
- 	int ret;
- 	struct ath11k_pdev *pdev;
- 	struct ath11k *ar;
-+	long time_left;
- 
- 	if (!ab->hw_params.supports_suspend)
- 		return -EOPNOTSUPP;
-@@ -940,29 +990,19 @@ int ath11k_core_resume(struct ath11k_base *ab)
- 	if (!ar || ar->state != ATH11K_STATE_OFF)
- 		return 0;
- 
--	ret = ath11k_hif_resume(ab);
--	if (ret) {
--		ath11k_warn(ab, "failed to resume hif during resume: %d\n", ret);
--		return ret;
-+	time_left = wait_for_completion_timeout(&ab->restart_completed,
-+						ATH11K_RESET_TIMEOUT_HZ);
-+	if (time_left == 0) {
-+		ath11k_warn(ab, "timeout while waiting for restart complete");
-+		return -ETIMEDOUT;
- 	}
- 
--	ath11k_hif_ce_irq_enable(ab);
--	ath11k_hif_irq_enable(ab);
--
- 	ret = ath11k_dp_rx_pktlog_start(ab);
--	if (ret) {
-+	if (ret)
- 		ath11k_warn(ab, "failed to start rx pktlog during resume: %d\n",
- 			    ret);
--		return ret;
--	}
--
--	ret = ath11k_wow_wakeup(ab);
--	if (ret) {
--		ath11k_warn(ab, "failed to wakeup wow during resume: %d\n", ret);
--		return ret;
--	}
- 
--	return 0;
-+	return ret;
- }
- EXPORT_SYMBOL(ath11k_core_resume);
- 
-@@ -2060,6 +2100,8 @@ static void ath11k_core_restart(struct work_struct *work)
- 
- 	if (!ab->is_reset)
- 		ath11k_core_post_reconfigure_recovery(ab);
-+
-+	complete(&ab->restart_completed);
- }
- 
- static void ath11k_core_reset(struct work_struct *work)
-@@ -2129,7 +2171,7 @@ static void ath11k_core_reset(struct work_struct *work)
- 	ath11k_hif_irq_disable(ab);
- 	ath11k_hif_ce_irq_disable(ab);
- 
--	ath11k_hif_power_down(ab);
-+	ath11k_hif_power_down(ab, false);
- 	ath11k_hif_power_up(ab);
- 
- 	ath11k_dbg(ab, ATH11K_DBG_BOOT, "reset started\n");
-@@ -2202,7 +2244,7 @@ void ath11k_core_deinit(struct ath11k_base *ab)
- 
- 	mutex_unlock(&ab->core_lock);
- 
--	ath11k_hif_power_down(ab);
-+	ath11k_hif_power_down(ab, false);
- 	ath11k_mac_destroy(ab);
- 	ath11k_core_soc_destroy(ab);
- 	ath11k_fw_destroy(ab);
-@@ -2255,6 +2297,7 @@ struct ath11k_base *ath11k_core_alloc(struct device *dev, size_t priv_size,
- 	timer_setup(&ab->rx_replenish_retry, ath11k_ce_rx_replenish_retry, 0);
- 	init_completion(&ab->htc_suspend);
- 	init_completion(&ab->wow.wakeup_completed);
-+	init_completion(&ab->restart_completed);
- 
- 	ab->dev = dev;
- 	ab->hif.bus = bus;
-diff --git a/drivers/net/wireless/ath/ath11k/core.h b/drivers/net/wireless/ath/ath11k/core.h
-index b3fb74a226fb..a20c29e3a227 100644
---- a/drivers/net/wireless/ath/ath11k/core.h
-+++ b/drivers/net/wireless/ath/ath11k/core.h
-@@ -1,7 +1,7 @@
- /* SPDX-License-Identifier: BSD-3-Clause-Clear */
- /*
-  * Copyright (c) 2018-2019 The Linux Foundation. All rights reserved.
-- * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
-+ * Copyright (c) 2021-2024 Qualcomm Innovation Center, Inc. All rights reserved.
-  */
- 
- #ifndef ATH11K_CORE_H
-@@ -1033,6 +1033,8 @@ struct ath11k_base {
- 		DECLARE_BITMAP(fw_features, ATH11K_FW_FEATURE_COUNT);
- 	} fw;
- 
-+	struct completion restart_completed;
-+
- #ifdef CONFIG_NL80211_TESTMODE
- 	struct {
- 		u32 data_pos;
-@@ -1232,8 +1234,10 @@ void ath11k_core_free_bdf(struct ath11k_base *ab, struct ath11k_board_data *bd);
- int ath11k_core_check_dt(struct ath11k_base *ath11k);
- int ath11k_core_check_smbios(struct ath11k_base *ab);
- void ath11k_core_halt(struct ath11k *ar);
-+int ath11k_core_resume_early(struct ath11k_base *ab);
- int ath11k_core_resume(struct ath11k_base *ab);
- int ath11k_core_suspend(struct ath11k_base *ab);
-+int ath11k_core_suspend_late(struct ath11k_base *ab);
- void ath11k_core_pre_reconfigure_recovery(struct ath11k_base *ab);
- bool ath11k_core_coldboot_cal_support(struct ath11k_base *ab);
- 
-diff --git a/drivers/net/wireless/ath/ath11k/hif.h b/drivers/net/wireless/ath/ath11k/hif.h
-index 877a4073fed6..c4c6cc09c7c1 100644
---- a/drivers/net/wireless/ath/ath11k/hif.h
-+++ b/drivers/net/wireless/ath/ath11k/hif.h
-@@ -1,7 +1,7 @@
- /* SPDX-License-Identifier: BSD-3-Clause-Clear */
- /*
-  * Copyright (c) 2019-2020 The Linux Foundation. All rights reserved.
-- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
-+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
-  */
- 
- #ifndef _HIF_H_
-@@ -18,7 +18,7 @@ struct ath11k_hif_ops {
- 	int (*start)(struct ath11k_base *ab);
- 	void (*stop)(struct ath11k_base *ab);
- 	int (*power_up)(struct ath11k_base *ab);
--	void (*power_down)(struct ath11k_base *ab);
-+	void (*power_down)(struct ath11k_base *ab, bool is_suspend);
- 	int (*suspend)(struct ath11k_base *ab);
- 	int (*resume)(struct ath11k_base *ab);
- 	int (*map_service_to_pipe)(struct ath11k_base *ab, u16 service_id,
-@@ -67,12 +67,18 @@ static inline void ath11k_hif_irq_disable(struct ath11k_base *ab)
- 
- static inline int ath11k_hif_power_up(struct ath11k_base *ab)
- {
-+	if (!ab->hif.ops->power_up)
-+		return -EOPNOTSUPP;
-+
- 	return ab->hif.ops->power_up(ab);
- }
- 
--static inline void ath11k_hif_power_down(struct ath11k_base *ab)
-+static inline void ath11k_hif_power_down(struct ath11k_base *ab, bool is_suspend)
- {
--	ab->hif.ops->power_down(ab);
-+	if (!ab->hif.ops->power_down)
-+		return;
-+
-+	ab->hif.ops->power_down(ab, is_suspend);
- }
- 
- static inline int ath11k_hif_suspend(struct ath11k_base *ab)
-diff --git a/drivers/net/wireless/ath/ath11k/mhi.c b/drivers/net/wireless/ath/ath11k/mhi.c
-index fb4ecf9a103e..90eacfe7e6d7 100644
---- a/drivers/net/wireless/ath/ath11k/mhi.c
-+++ b/drivers/net/wireless/ath/ath11k/mhi.c
-@@ -442,9 +442,17 @@ int ath11k_mhi_start(struct ath11k_pci *ab_pci)
- 	return 0;
- }
- 
--void ath11k_mhi_stop(struct ath11k_pci *ab_pci)
-+void ath11k_mhi_stop(struct ath11k_pci *ab_pci, bool is_suspend)
- {
--	mhi_power_down(ab_pci->mhi_ctrl, true);
-+	/* During suspend we need to use mhi_power_down_keep_dev()
-+	 * workaround, otherwise ath11k_core_resume() will timeout
-+	 * during resume.
-+	 */
-+	if (is_suspend)
-+		mhi_power_down_keep_dev(ab_pci->mhi_ctrl, true);
-+	else
-+		mhi_power_down(ab_pci->mhi_ctrl, true);
-+
- 	mhi_unprepare_after_power_down(ab_pci->mhi_ctrl);
- }
- 
-diff --git a/drivers/net/wireless/ath/ath11k/mhi.h b/drivers/net/wireless/ath/ath11k/mhi.h
-index f81fba2644a4..2d567705e732 100644
---- a/drivers/net/wireless/ath/ath11k/mhi.h
-+++ b/drivers/net/wireless/ath/ath11k/mhi.h
-@@ -1,7 +1,7 @@
- /* SPDX-License-Identifier: BSD-3-Clause-Clear */
- /*
-  * Copyright (c) 2020 The Linux Foundation. All rights reserved.
-- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
-+ * Copyright (c) 2022, 2024 Qualcomm Innovation Center, Inc. All rights reserved.
-  */
- #ifndef _ATH11K_MHI_H
- #define _ATH11K_MHI_H
-@@ -18,7 +18,7 @@
- #define MHICTRL_RESET_MASK			0x2
- 
- int ath11k_mhi_start(struct ath11k_pci *ar_pci);
--void ath11k_mhi_stop(struct ath11k_pci *ar_pci);
-+void ath11k_mhi_stop(struct ath11k_pci *ar_pci, bool is_suspend);
- int ath11k_mhi_register(struct ath11k_pci *ar_pci);
- void ath11k_mhi_unregister(struct ath11k_pci *ar_pci);
- void ath11k_mhi_set_mhictrl_reset(struct ath11k_base *ab);
-@@ -26,5 +26,4 @@ void ath11k_mhi_clear_vector(struct ath11k_base *ab);
- 
- int ath11k_mhi_suspend(struct ath11k_pci *ar_pci);
- int ath11k_mhi_resume(struct ath11k_pci *ar_pci);
--
- #endif
-diff --git a/drivers/net/wireless/ath/ath11k/pci.c b/drivers/net/wireless/ath/ath11k/pci.c
-index be9d2c69cc41..8d63b84d1261 100644
---- a/drivers/net/wireless/ath/ath11k/pci.c
-+++ b/drivers/net/wireless/ath/ath11k/pci.c
-@@ -638,7 +638,7 @@ static int ath11k_pci_power_up(struct ath11k_base *ab)
- 	return 0;
- }
- 
--static void ath11k_pci_power_down(struct ath11k_base *ab)
-+static void ath11k_pci_power_down(struct ath11k_base *ab, bool is_suspend)
- {
- 	struct ath11k_pci *ab_pci = ath11k_pci_priv(ab);
- 
-@@ -649,7 +649,7 @@ static void ath11k_pci_power_down(struct ath11k_base *ab)
- 
- 	ath11k_pci_msi_disable(ab_pci);
- 
--	ath11k_mhi_stop(ab_pci);
-+	ath11k_mhi_stop(ab_pci, is_suspend);
- 	clear_bit(ATH11K_FLAG_DEVICE_INIT_DONE, &ab->dev_flags);
- 	ath11k_pci_sw_reset(ab_pci->ab, false);
- }
-@@ -970,7 +970,7 @@ static void ath11k_pci_remove(struct pci_dev *pdev)
- 	ath11k_pci_set_irq_affinity_hint(ab_pci, NULL);
- 
- 	if (test_bit(ATH11K_FLAG_QMI_FAIL, &ab->dev_flags)) {
--		ath11k_pci_power_down(ab);
-+		ath11k_pci_power_down(ab, false);
- 		ath11k_debugfs_soc_destroy(ab);
- 		ath11k_qmi_deinit_service(ab);
- 		goto qmi_fail;
-@@ -998,7 +998,7 @@ static void ath11k_pci_shutdown(struct pci_dev *pdev)
- 	struct ath11k_pci *ab_pci = ath11k_pci_priv(ab);
- 
- 	ath11k_pci_set_irq_affinity_hint(ab_pci, NULL);
--	ath11k_pci_power_down(ab);
-+	ath11k_pci_power_down(ab, false);
- }
- 
- static __maybe_unused int ath11k_pci_pm_suspend(struct device *dev)
-@@ -1035,9 +1035,39 @@ static __maybe_unused int ath11k_pci_pm_resume(struct device *dev)
- 	return ret;
- }
- 
--static SIMPLE_DEV_PM_OPS(ath11k_pci_pm_ops,
--			 ath11k_pci_pm_suspend,
--			 ath11k_pci_pm_resume);
-+static __maybe_unused int ath11k_pci_pm_suspend_late(struct device *dev)
-+{
-+	struct ath11k_base *ab = dev_get_drvdata(dev);
-+	int ret;
-+
-+	ret = ath11k_core_suspend_late(ab);
-+	if (ret)
-+		ath11k_warn(ab, "failed to late suspend core: %d\n", ret);
-+
-+	/* Similar to ath11k_pci_pm_suspend(), we return success here
-+	 * even error happens, to allow system suspend/hibernation survive.
-+	 */
-+	return 0;
-+}
-+
-+static __maybe_unused int ath11k_pci_pm_resume_early(struct device *dev)
-+{
-+	struct ath11k_base *ab = dev_get_drvdata(dev);
-+	int ret;
-+
-+	ret = ath11k_core_resume_early(ab);
-+	if (ret)
-+		ath11k_warn(ab, "failed to early resume core: %d\n", ret);
-+
-+	return ret;
-+}
-+
-+static const struct dev_pm_ops __maybe_unused ath11k_pci_pm_ops = {
-+	SET_SYSTEM_SLEEP_PM_OPS(ath11k_pci_pm_suspend,
-+				ath11k_pci_pm_resume)
-+	SET_LATE_SYSTEM_SLEEP_PM_OPS(ath11k_pci_pm_suspend_late,
-+				     ath11k_pci_pm_resume_early)
-+};
- 
- static struct pci_driver ath11k_pci_driver = {
- 	.name = "ath11k_pci",
-diff --git a/drivers/net/wireless/ath/ath11k/qmi.c b/drivers/net/wireless/ath/ath11k/qmi.c
-index 5006f81f779b..d4a243b64f6c 100644
---- a/drivers/net/wireless/ath/ath11k/qmi.c
-+++ b/drivers/net/wireless/ath/ath11k/qmi.c
-@@ -2877,7 +2877,7 @@ int ath11k_qmi_fwreset_from_cold_boot(struct ath11k_base *ab)
- 	}
- 
- 	/* reset the firmware */
--	ath11k_hif_power_down(ab);
-+	ath11k_hif_power_down(ab, false);
- 	ath11k_hif_power_up(ab);
- 	ath11k_dbg(ab, ATH11K_DBG_QMI, "exit wait for cold boot done\n");
- 	return 0;
--- 
-2.25.1
-
+>
+> This patch was tested on kernel commit b401b621758,
+> tag Linux 6.8-rc5 against the C repro listed in previous
+> email.
+>
+> If you have any questions, please contact us.
+>
+> Best Regards,
+> Yue
+>
 
