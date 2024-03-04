@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-77031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C31986FE27
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:57:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7731386FE29
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:57:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 128E8282524
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:57:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DDAB282B16
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B762230C;
-	Mon,  4 Mar 2024 09:57:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81B4A225DF;
+	Mon,  4 Mar 2024 09:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="EsfPxXrx"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="EjkPJaTS"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2068.outbound.protection.outlook.com [40.107.93.68])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2081.outbound.protection.outlook.com [40.107.220.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25C13224E8
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 09:57:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28602225A6
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 09:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.81
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709546226; cv=fail; b=KvNXHx7x18h4qVoZlQ4Oq45iZKLkwPhgqB0QQNMrsWMtPqQhhedYLOY/eY604+C9TivTzcS/7T8uyY2SSj03KGkxzAPVR76MOXCjlkGWDly3+cexvswvDLU+VjsRWeCbrAuGyULTeIKZ7ejOavWIEbbr2t94FXtcgHQNBIbbdhY=
+	t=1709546230; cv=fail; b=M4EbnIQ9L5bUfzB+7p6qSNq8u0C9RWURnQJnQPyB5okSZS7jTuw7DZNtlLxmxs7mfjDVW2/+xzr5RSHRXOiwOHvh7Ize+/enq7hUfIQGAm7nFRFpYlo2HMkdJccoy7BTx7iadEiv7OGYZCaiC+l4MgVrp561zIQevU/qAHf/ySU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709546226; c=relaxed/simple;
-	bh=jg0pz0kyYv2hE1wf2DJfVncZJVjL2aInrBZVi3lN9D0=;
+	s=arc-20240116; t=1709546230; c=relaxed/simple;
+	bh=SA7H098RTxFVhKvjhsdmDwSKyJQjMzWUO3QZuen3ChM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=huwJPI9aKARt24VugZ/2jO+zMZknW46wUyV+oNRQIthNx4mKPJ6XxJUjG0NiBgMvnrHfR2gWhkC2vRqV4ey2eZeG4ud1zY3vykrcGrFyAAORCgNEo6Ie3MlDUlUeWs6yaUTu4Dd1YNAWtyCxyRb9GRdUaO4VJAzkY0RBZ2ww01s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=EsfPxXrx; arc=fail smtp.client-ip=40.107.93.68
+	 MIME-Version:Content-Type; b=RfLPv3OZJ6kOaKgAwtsXicuD3nBtG6EcHxHZMVGMCWDT0gfBnXX5jMbRrb9RhjzWJstmZeBxGExAQl+I9kAzEIsAzT6zrFyS/mgC55VSH8GlZ1fKiYUDSBwVftJJ6eMaGxDB0UFodp0b279BfN5bnLcyqKQUktGMaPfEL24FeqA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=EjkPJaTS; arc=fail smtp.client-ip=40.107.220.81
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Xzxsdgdf0gZmO2uAx2ZS4eqef+1M/j+3YKsFKFUmSEriTF8Oexe+BJ58JBvcm/bYdWpaBQqb4H5ICeOkfduVqJunIh3UkKPa457BC/r6dQqH7FySyK4XQgD9nJrMhexdDx0Et3nQbJaZVSjRjVpOCv5oCzBn4NOe8fBgmJAOsWR6yVdAKZs6ETVFV/gUeGnRf1XM8JBY5FrjqhlIQH7SDsLVRRaFKTesPXM4qLRzF4Gh0GI8oSSc/dUuOnW3419mzL2ZBGHFCP96v4XjKQg61P2fRFGkihbWxFo7o6NpkkLcOGppTkdwp+WjmPxA1QE8JDwqFFG/gSrrLM1yFDc3GA==
+ b=gCMNBlxIZEGKaRNZyuCXVh0Z7FZyUUFpZJDwLWr9wRdEFxAf8gnpTGR0J5BO4AS5Y+fxLE6p0rG3RAsUlgqQ76V3q7x9nvSkQWVUv3LQkwsyeAkXBiAPv4eImdYGpchohPq98mo8dAWcdAyr0bd5AJWULjXVYpBfhqwY2v8bQTM94xiWOjCjoj5Ldk3YfLXUkvnyzY/1A6nehP6UuCoF+Oozfpb6eNTcRlHvKEfMjSZjITpECT1wMwQlZ2aCmr3oAqFSi8NoTQJAgNRcOn8++tDEyMiE8GTWGUPrTiUVr1itG5o14XsQzM/3z/74gxSQCgVhotoXVz5zK9vP9D0vUA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=c7scL4UJmnMIs9hbzuXXD4YKrNY3zOYAVSDK2D7IjtQ=;
- b=GAzxy3aaR4IQMOOijFKkKgdm/MJ8PH3+UmwrysvNg+V4XFzEFZFA4mKqH4bnzrOsThuU0dv9j/CDikgerwu/Pis3KAOYjdKNh/iCVBdTkY16KsJ/opeHA/8VhGEZwp5JODSEfiZMowlvgha/2fqodTgsjiKXx80S3J1/yWzFOnvQZtbL3XF4+HyWupYJSd4fGvaCj0WYtbG28uwTkYXBy1vzixL/kB6cpDQHOtmeo8H1FX+K5adLmBzeHg+98ctFSpKiAciJrd/LZwU0ZL5yII1wuOOFSClOIy6IP4hEGFjmOuDt4pNxnYJbS8QTMBscpIUvIUKI6PGKWN+CXL+Ouw==
+ bh=iLp4RT1HjJD3MmOpm5EDNQIiZUphAlGmlUpViucm/xI=;
+ b=OeRdwG/jubMRYogn+TPmQXR9YLQF/TPwyqfMRRSBlEbLZzpOCIJpmMyYykOZmW6Q3ddF+HoIar9Sm371IY2kN9FMGavlYNgQ1XPNR2IMKSn8IjbbvDFQVEi29fySkNNR59gefLlAbO/qqMpUIRORKGPl4sGNvjcmlA8cG3vRVbHMQMUY0BGRloiVKj3Yrl6n43skiOUi14ocAEk3HMCrFK75DmKcZGb3fRmIhNNUZMfgggZbFcIbnf4OnrhW+RimrzCssGBvVpB3h29z9sdvKCl1wi1v+2lqt/+5i1xVjAU6Olhn6kgoMifzhrW/D8utIAN/Je6yjnIREhL/OZjWmw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,17 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=c7scL4UJmnMIs9hbzuXXD4YKrNY3zOYAVSDK2D7IjtQ=;
- b=EsfPxXrxavaHeDPPMO3H7CFS1D1JUx5OWOMjgCr+kr/gLEWPVGvdysPrzN6wk/47YTNiQnHcykbL717WaTqXv+1jf1YigGvyon+tgBGTuvjDkUauZvM3fFmvX2u2BH/MOJOx+S5LZGOuquNw7XNHRoaQljqMWqVdZSmOzFu1kHTYNwVKfK2omylo4/3DZIwwfLFT6N4eeTe1j1jMrjk0eZYD+vfoghr770faHL8bvI+PHYYBMKFzsgO2tjijKysgKf8bWRCY/cm4ddRMhpcs89tuDGSiykV/NgcIQgXFL/+npRqTQDaikMnI4LJB6kdSX1X0HARAFR6IH7ZwC2/NKA==
-Received: from SJ0PR13CA0182.namprd13.prod.outlook.com (2603:10b6:a03:2c3::7)
- by DM4PR12MB6304.namprd12.prod.outlook.com (2603:10b6:8:a2::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7339.38; Mon, 4 Mar 2024 09:57:01 +0000
-Received: from DS2PEPF0000343A.namprd02.prod.outlook.com
- (2603:10b6:a03:2c3:cafe::23) by SJ0PR13CA0182.outlook.office365.com
- (2603:10b6:a03:2c3::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.22 via Frontend
- Transport; Mon, 4 Mar 2024 09:57:00 +0000
+ bh=iLp4RT1HjJD3MmOpm5EDNQIiZUphAlGmlUpViucm/xI=;
+ b=EjkPJaTSoXt/Pn/LE749LBtllLO4tNqqtuFlrWKEA4Sr4+piX3560y1k0FqSQgUckeQ2lLUNIRRDDN7qmJkcUNkf3S3dzqw+gGv3cnLnGEaUujrxjzQhhICYGY+Yr1wf7Zcb2dylR8YvuJ27Cv/35Iy6/3mhk2LGidHmuI4Z7+Kd231H1KAS0Lx5HWPv2QKk+zkeigANTQIwFMOcVNQ0lEwZ5/3t8/42k0j9sVGTH4nWSx1GYupNcRCFoXnS33oMOj2OwLU9SjLMbi/fyfhtdzQUndLWYGDW2S+PPLp3UTitxSkNUKTuD9TTv0CTwO7jw3Ku8+5UkNpBdsqxwJDuPw==
+Received: from CH2PR07CA0042.namprd07.prod.outlook.com (2603:10b6:610:5b::16)
+ by DM6PR12MB4089.namprd12.prod.outlook.com (2603:10b6:5:213::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.38; Mon, 4 Mar
+ 2024 09:57:03 +0000
+Received: from DS2PEPF0000343D.namprd02.prod.outlook.com
+ (2603:10b6:610:5b:cafe::e8) by CH2PR07CA0042.outlook.office365.com
+ (2603:10b6:610:5b::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.38 via Frontend
+ Transport; Mon, 4 Mar 2024 09:57:03 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -63,25 +64,25 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- DS2PEPF0000343A.mail.protection.outlook.com (10.167.18.37) with Microsoft
+ DS2PEPF0000343D.mail.protection.outlook.com (10.167.18.40) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7362.11 via Frontend Transport; Mon, 4 Mar 2024 09:57:00 +0000
+ 15.20.7362.11 via Frontend Transport; Mon, 4 Mar 2024 09:57:03 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 4 Mar 2024
- 01:56:46 -0800
+ 01:56:49 -0800
 Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.12; Mon, 4 Mar 2024 01:56:44 -0800
+ 15.2.1258.12; Mon, 4 Mar 2024 01:56:46 -0800
 From: Ido Schimmel <idosch@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<edumazet@google.com>, <petrm@nvidia.com>, <bpoirier@nvidia.com>,
 	<shuah@kernel.org>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next 1/6] selftests: forwarding: Remove IPv6 L3 multipath hash tests
-Date: Mon, 4 Mar 2024 11:56:07 +0200
-Message-ID: <20240304095612.462900-2-idosch@nvidia.com>
+Subject: [PATCH net-next 2/6] selftests: forwarding: Parametrize mausezahn delay
+Date: Mon, 4 Mar 2024 11:56:08 +0200
+Message-ID: <20240304095612.462900-3-idosch@nvidia.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240304095612.462900-1-idosch@nvidia.com>
 References: <20240304095612.462900-1-idosch@nvidia.com>
@@ -97,295 +98,489 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF0000343A:EE_|DM4PR12MB6304:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6e0e56de-1e45-45e6-1cb8-08dc3c316fca
+X-MS-TrafficTypeDiagnostic: DS2PEPF0000343D:EE_|DM6PR12MB4089:EE_
+X-MS-Office365-Filtering-Correlation-Id: 73d93b14-e647-4968-64d8-08dc3c31719f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	gj74kgdezcT1RHe3DO6/XtI3fxG1Zh9wNCLPi2lKutFBVQ2DBjSlEUg7GqhJhINE1Z7/Rk3S1LRKztoTc/gQ9TbqfnN33+/uByct5ocOg5EH+ZF0S4XX/PIKls0wYbX6hiWkLzhodFr59BluGEn6FqVxigGdmzBj2jmUBYfebVkVoelkP1W4Ob4G7p5tP/utyhW8Ft7hk+H3fwmRSdjIML0R2eicau9jDcgHd+Ns704g/C5YUe40NFIofNJoTcWyAhHsyeOeJplVOEA+nIdDtg0obb0dQ4WRORtv6yqfYhqANWGrQ/DYl4TE3gRUXuoZIrk44pqHoNaOmyTlZaWEMmF+CeSq0PWpp3TOWKSGt1UGF2lqjpUiLikEcP+1LTIXoYwSNFcBldQFf9b7RqvLBz/ie6VbEkGEsLvObsSEDtAeIZokNPgSjR2TdM/O7AnrLi155LzlsezqVbCwhzYPFUDlp0Z0wwE2igLhFCSbqUD36amCU5OoVjq17yusNsSa4xC+ey/SZUBRgUif/3/NhM2ZDkJODesR6SekveReyjHmC6CJcn+m+kha1SFyZQznE/7o6YWJ2T4txGxFPTzqLxLHzfT8GX5hdG1NPGLeqTaKNLn0mWsfLopjSbPWaep2L9pd9KQJkO7qG61MZivJqy9Qjg1HxA7ls+P6tnLGvlw5b06y+4oC+prCzEbZNCfQNz21I5I1MXaGyTX8xRXrTVT4MGrhazkmukIK5f/z3+agq1qjEtG0ViLWGM1RllNL
+	w9cySi1axcd1KtpJydMpbHgefI9R82kNNJjTUcFgS/cwMdU4Bj0Z55TCfxuOcgdE0skAS4F9t+Gb3yvNawpsIQZqNW8EdsXegd7yJ7c6QCwOucSSwJTTsKXo9cvrz4BSqjD6bgOAkWQCNs3inzP6ig2Ue+7qwQAoS1A0YwAjNMyE+aj49WfFVK1PzGv/cHZGjKrGGqrKjFHUXmJhTbldAHJDkvnr1br9H7Ami592FMt/RvdxN9HvB48ZJVRocyfjkfU1DtUnm+qM0J+qy5IZ77CMBaEYaa2FOOGU4412joGAimegKoPtkUIYybKuIzZm6V04WNiNhyePu146SPVQG9xcVhSZSM75PmtGeea2bpOY7qiijSWh3JCgKlxlV9UX8OW7h+d5EprQRrolPbkVTi2bjVeOsFQdMMdpEiI8R4n1t0PuYGITASH4ji716R06Cs92XFhjR/DIboBXJ3guRrCzVOpK3js7KvYxGLE2Qb96SG3RuCDE3Q0s9pUUjHpc+mKU2J7CPcNKArse9a7ZLdTF1T/v3JofCrYQTBQa02zmfgFAW+ut45xGmoMLRFP/64CssZKZfo92P+t3vNpJmgfHqNWO0JFYObchw1C8pY6WF2GNOkgZLSy1z9khcKw1b3KW42mI5G9yhGd4//m1ucVl1Uh4/SbkleyW7PcEoK7bFQPFm4JS/u9v9UkQjAZmmfHpKrvyXBNSAaBbg68meNPS0WYTA11fW8kAqjy+S3ZLkuHAOWyPTivJNIgmnlLZ
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(82310400014)(36860700004);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(376005)(36860700004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2024 09:57:00.4942
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2024 09:57:03.5697
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e0e56de-1e45-45e6-1cb8-08dc3c316fca
+X-MS-Exchange-CrossTenant-Network-Message-Id: 73d93b14-e647-4968-64d8-08dc3c31719f
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS2PEPF0000343A.namprd02.prod.outlook.com
+	DS2PEPF0000343D.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6304
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4089
 
-The multipath tests currently test both the L3 and L4 multipath hash
-policies for IPv6, but only the L4 policy for IPv4. The reason is mostly
-historic: When the initial multipath test was added
-(router_multipath.sh) the IPv6 L4 policy did not exist and was later
-added to the test. The other multipath tests copied this pattern
-although there is little value in testing both policies.
+The various multipath tests use mausezahn to generate different flows
+and check how they are distributed between the available nexthops. The
+tool is currently invoked with an hard coded transmission delay of 1 ms.
+This is unnecessary when the tests are run with veth pairs and
+needlessly prolongs the tests.
 
-Align the IPv4 and IPv6 tests and only test the L4 policy. On my system,
-this reduces the run time of router_multipath.sh by 89% because of the
-repeated ping6 invocations to randomize the flow label.
+Parametrize this delay and default it to 0 us. It can be overridden
+using the forwarding.config file. On my system, this reduces the run
+time of router_multipath.sh by 93%.
 
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 ---
- .../net/forwarding/gre_multipath_nh.sh        | 37 ------------------
- .../net/forwarding/gre_multipath_nh_res.sh    | 38 ------------------
- .../net/forwarding/router_mpath_nh.sh         | 35 +----------------
- .../net/forwarding/router_multipath.sh        | 39 +------------------
- 4 files changed, 2 insertions(+), 147 deletions(-)
+ .../net/forwarding/custom_multipath_hash.sh      | 16 ++++++++--------
+ .../net/forwarding/forwarding.config.sample      |  2 ++
+ .../net/forwarding/gre_custom_multipath_hash.sh  | 16 ++++++++--------
+ .../net/forwarding/gre_inner_v4_multipath.sh     |  2 +-
+ .../net/forwarding/gre_inner_v6_multipath.sh     |  2 +-
+ .../selftests/net/forwarding/gre_multipath.sh    |  2 +-
+ .../selftests/net/forwarding/gre_multipath_nh.sh |  4 ++--
+ .../net/forwarding/gre_multipath_nh_res.sh       |  4 ++--
+ .../forwarding/ip6gre_custom_multipath_hash.sh   | 16 ++++++++--------
+ .../net/forwarding/ip6gre_inner_v4_multipath.sh  |  2 +-
+ .../net/forwarding/ip6gre_inner_v6_multipath.sh  |  2 +-
+ .../selftests/net/forwarding/ip6gre_lib.sh       |  4 ++--
+ tools/testing/selftests/net/forwarding/lib.sh    |  1 +
+ .../selftests/net/forwarding/router_mpath_nh.sh  |  4 ++--
+ .../net/forwarding/router_mpath_nh_res.sh        |  4 ++--
+ .../selftests/net/forwarding/router_multipath.sh |  4 ++--
+ 16 files changed, 44 insertions(+), 41 deletions(-)
 
+diff --git a/tools/testing/selftests/net/forwarding/custom_multipath_hash.sh b/tools/testing/selftests/net/forwarding/custom_multipath_hash.sh
+index 56eb83d1a3bd..1783c10215e5 100755
+--- a/tools/testing/selftests/net/forwarding/custom_multipath_hash.sh
++++ b/tools/testing/selftests/net/forwarding/custom_multipath_hash.sh
+@@ -183,42 +183,42 @@ send_src_ipv4()
+ {
+ 	ip vrf exec v$h1 $MZ $h1 -q -p 64 \
+ 		-A "198.51.100.2-198.51.100.253" -B 203.0.113.2 \
+-		-d 1msec -c 50 -t udp "sp=20000,dp=30000"
++		-d $MZ_DELAY -c 50 -t udp "sp=20000,dp=30000"
+ }
+ 
+ send_dst_ipv4()
+ {
+ 	ip vrf exec v$h1 $MZ $h1 -q -p 64 \
+ 		-A 198.51.100.2 -B "203.0.113.2-203.0.113.253" \
+-		-d 1msec -c 50 -t udp "sp=20000,dp=30000"
++		-d $MZ_DELAY -c 50 -t udp "sp=20000,dp=30000"
+ }
+ 
+ send_src_udp4()
+ {
+ 	ip vrf exec v$h1 $MZ $h1 -q -p 64 \
+ 		-A 198.51.100.2 -B 203.0.113.2 \
+-		-d 1msec -t udp "sp=0-32768,dp=30000"
++		-d $MZ_DELAY -t udp "sp=0-32768,dp=30000"
+ }
+ 
+ send_dst_udp4()
+ {
+ 	ip vrf exec v$h1 $MZ $h1 -q -p 64 \
+ 		-A 198.51.100.2 -B 203.0.113.2 \
+-		-d 1msec -t udp "sp=20000,dp=0-32768"
++		-d $MZ_DELAY -t udp "sp=20000,dp=0-32768"
+ }
+ 
+ send_src_ipv6()
+ {
+ 	ip vrf exec v$h1 $MZ -6 $h1 -q -p 64 \
+ 		-A "2001:db8:1::2-2001:db8:1::fd" -B 2001:db8:4::2 \
+-		-d 1msec -c 50 -t udp "sp=20000,dp=30000"
++		-d $MZ_DELAY -c 50 -t udp "sp=20000,dp=30000"
+ }
+ 
+ send_dst_ipv6()
+ {
+ 	ip vrf exec v$h1 $MZ -6 $h1 -q -p 64 \
+ 		-A 2001:db8:1::2 -B "2001:db8:4::2-2001:db8:4::fd" \
+-		-d 1msec -c 50 -t udp "sp=20000,dp=30000"
++		-d $MZ_DELAY -c 50 -t udp "sp=20000,dp=30000"
+ }
+ 
+ send_flowlabel()
+@@ -234,14 +234,14 @@ send_src_udp6()
+ {
+ 	ip vrf exec v$h1 $MZ -6 $h1 -q -p 64 \
+ 		-A 2001:db8:1::2 -B 2001:db8:4::2 \
+-		-d 1msec -t udp "sp=0-32768,dp=30000"
++		-d $MZ_DELAY -t udp "sp=0-32768,dp=30000"
+ }
+ 
+ send_dst_udp6()
+ {
+ 	ip vrf exec v$h1 $MZ -6 $h1 -q -p 64 \
+ 		-A 2001:db8:1::2 -B 2001:db8:4::2 \
+-		-d 1msec -t udp "sp=20000,dp=0-32768"
++		-d $MZ_DELAY -t udp "sp=20000,dp=0-32768"
+ }
+ 
+ custom_hash_test()
+diff --git a/tools/testing/selftests/net/forwarding/forwarding.config.sample b/tools/testing/selftests/net/forwarding/forwarding.config.sample
+index 4a546509de90..1fc4f0242fc5 100644
+--- a/tools/testing/selftests/net/forwarding/forwarding.config.sample
++++ b/tools/testing/selftests/net/forwarding/forwarding.config.sample
+@@ -28,6 +28,8 @@ PING=ping
+ PING6=ping6
+ # Packet generator. Some distributions use 'mz'.
+ MZ=mausezahn
++# mausezahn delay between transmissions in microseconds.
++MZ_DELAY=0
+ # Time to wait after interfaces participating in the test are all UP
+ WAIT_TIME=5
+ # Whether to pause on failure or not.
+diff --git a/tools/testing/selftests/net/forwarding/gre_custom_multipath_hash.sh b/tools/testing/selftests/net/forwarding/gre_custom_multipath_hash.sh
+index 0446db9c6f74..9788bd0f6e8b 100755
+--- a/tools/testing/selftests/net/forwarding/gre_custom_multipath_hash.sh
++++ b/tools/testing/selftests/net/forwarding/gre_custom_multipath_hash.sh
+@@ -278,42 +278,42 @@ send_src_ipv4()
+ {
+ 	ip vrf exec v$h1 $MZ $h1 -q -p 64 \
+ 		-A "198.51.100.2-198.51.100.253" -B 203.0.113.2 \
+-		-d 1msec -c 50 -t udp "sp=20000,dp=30000"
++		-d $MZ_DELAY -c 50 -t udp "sp=20000,dp=30000"
+ }
+ 
+ send_dst_ipv4()
+ {
+ 	ip vrf exec v$h1 $MZ $h1 -q -p 64 \
+ 		-A 198.51.100.2 -B "203.0.113.2-203.0.113.253" \
+-		-d 1msec -c 50 -t udp "sp=20000,dp=30000"
++		-d $MZ_DELAY -c 50 -t udp "sp=20000,dp=30000"
+ }
+ 
+ send_src_udp4()
+ {
+ 	ip vrf exec v$h1 $MZ $h1 -q -p 64 \
+ 		-A 198.51.100.2 -B 203.0.113.2 \
+-		-d 1msec -t udp "sp=0-32768,dp=30000"
++		-d $MZ_DELAY -t udp "sp=0-32768,dp=30000"
+ }
+ 
+ send_dst_udp4()
+ {
+ 	ip vrf exec v$h1 $MZ $h1 -q -p 64 \
+ 		-A 198.51.100.2 -B 203.0.113.2 \
+-		-d 1msec -t udp "sp=20000,dp=0-32768"
++		-d $MZ_DELAY -t udp "sp=20000,dp=0-32768"
+ }
+ 
+ send_src_ipv6()
+ {
+ 	ip vrf exec v$h1 $MZ -6 $h1 -q -p 64 \
+ 		-A "2001:db8:1::2-2001:db8:1::fd" -B 2001:db8:2::2 \
+-		-d 1msec -c 50 -t udp "sp=20000,dp=30000"
++		-d $MZ_DELAY -c 50 -t udp "sp=20000,dp=30000"
+ }
+ 
+ send_dst_ipv6()
+ {
+ 	ip vrf exec v$h1 $MZ -6 $h1 -q -p 64 \
+ 		-A 2001:db8:1::2 -B "2001:db8:2::2-2001:db8:2::fd" \
+-		-d 1msec -c 50 -t udp "sp=20000,dp=30000"
++		-d $MZ_DELAY -c 50 -t udp "sp=20000,dp=30000"
+ }
+ 
+ send_flowlabel()
+@@ -329,14 +329,14 @@ send_src_udp6()
+ {
+ 	ip vrf exec v$h1 $MZ -6 $h1 -q -p 64 \
+ 		-A 2001:db8:1::2 -B 2001:db8:2::2 \
+-		-d 1msec -t udp "sp=0-32768,dp=30000"
++		-d $MZ_DELAY -t udp "sp=0-32768,dp=30000"
+ }
+ 
+ send_dst_udp6()
+ {
+ 	ip vrf exec v$h1 $MZ -6 $h1 -q -p 64 \
+ 		-A 2001:db8:1::2 -B 2001:db8:2::2 \
+-		-d 1msec -t udp "sp=20000,dp=0-32768"
++		-d $MZ_DELAY -t udp "sp=20000,dp=0-32768"
+ }
+ 
+ custom_hash_test()
+diff --git a/tools/testing/selftests/net/forwarding/gre_inner_v4_multipath.sh b/tools/testing/selftests/net/forwarding/gre_inner_v4_multipath.sh
+index e4009f658003..efca6114a3ce 100755
+--- a/tools/testing/selftests/net/forwarding/gre_inner_v4_multipath.sh
++++ b/tools/testing/selftests/net/forwarding/gre_inner_v4_multipath.sh
+@@ -267,7 +267,7 @@ multipath4_test()
+ 
+ 	ip vrf exec v$h1 \
+ 	   $MZ $h1 -q -p 64 -A "192.0.3.2-192.0.3.62" -B "192.0.4.2-192.0.4.62" \
+-	       -d 1msec -c 50 -t udp "sp=1024,dp=1024"
++	       -d $MZ_DELAY -c 50 -t udp "sp=1024,dp=1024"
+ 	sleep 1
+ 
+ 	local t1_111=$(tc_rule_stats_get $ul32 111 ingress)
+diff --git a/tools/testing/selftests/net/forwarding/gre_inner_v6_multipath.sh b/tools/testing/selftests/net/forwarding/gre_inner_v6_multipath.sh
+index e449475c4d3e..e5e911ce1562 100755
+--- a/tools/testing/selftests/net/forwarding/gre_inner_v6_multipath.sh
++++ b/tools/testing/selftests/net/forwarding/gre_inner_v6_multipath.sh
+@@ -268,7 +268,7 @@ multipath6_test()
+ 	ip vrf exec v$h1 \
+ 	   $MZ $h1 -6 -q -p 64 -A "2001:db8:1::2-2001:db8:1::1e" \
+ 	       -B "2001:db8:2::2-2001:db8:2::1e" \
+-	       -d 1msec -c 50 -t udp "sp=1024,dp=1024"
++	       -d $MZ_DELAY -c 50 -t udp "sp=1024,dp=1024"
+ 	sleep 1
+ 
+ 	local t1_111=$(tc_rule_stats_get $ul32 111 ingress)
+diff --git a/tools/testing/selftests/net/forwarding/gre_multipath.sh b/tools/testing/selftests/net/forwarding/gre_multipath.sh
+index a8d8e8b3dc81..57531c1d884d 100755
+--- a/tools/testing/selftests/net/forwarding/gre_multipath.sh
++++ b/tools/testing/selftests/net/forwarding/gre_multipath.sh
+@@ -220,7 +220,7 @@ multipath4_test()
+ 
+ 	ip vrf exec v$h1 \
+ 	   $MZ $h1 -q -p 64 -A 192.0.2.1 -B 192.0.2.18 \
+-	       -d 1msec -t udp "sp=1024,dp=0-32768"
++	       -d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
+ 
+ 	local t1_111=$(tc_rule_stats_get $ul2 111 ingress)
+ 	local t1_222=$(tc_rule_stats_get $ul2 222 ingress)
 diff --git a/tools/testing/selftests/net/forwarding/gre_multipath_nh.sh b/tools/testing/selftests/net/forwarding/gre_multipath_nh.sh
-index d03aa2cab9fd..62281898e7a4 100755
+index 62281898e7a4..7d5b2b9cc133 100755
 --- a/tools/testing/selftests/net/forwarding/gre_multipath_nh.sh
 +++ b/tools/testing/selftests/net/forwarding/gre_multipath_nh.sh
-@@ -64,7 +64,6 @@ ALL_TESTS="
- 	ping_ipv6
- 	multipath_ipv4
- 	multipath_ipv6
--	multipath_ipv6_l4
- "
+@@ -244,7 +244,7 @@ multipath4_test()
  
- NUM_NETIFS=6
-@@ -264,34 +263,6 @@ multipath6_test()
- 	local weight1=$1; shift
- 	local weight2=$1; shift
+ 	ip vrf exec v$h1 \
+ 	   $MZ $h1 -q -p 64 -A 192.0.2.1 -B 192.0.2.18 \
+-	       -d 1msec -t udp "sp=1024,dp=0-32768"
++	       -d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
  
--	sysctl_set net.ipv6.fib_multipath_hash_policy 0
--	ip nexthop replace id 103 group 101,$weight1/102,$weight2
--
--	local t0_111=$(tc_rule_stats_get $ul2 111 ingress)
--	local t0_222=$(tc_rule_stats_get $ul2 222 ingress)
--
--	# Generate 16384 echo requests, each with a random flow label.
--	for ((i=0; i < 16384; ++i)); do
--		ip vrf exec v$h1 $PING6 2001:db8:2::2 -F 0 -c 1 -q &> /dev/null
--	done
--
--	local t1_111=$(tc_rule_stats_get $ul2 111 ingress)
--	local t1_222=$(tc_rule_stats_get $ul2 222 ingress)
--
--	local d111=$((t1_111 - t0_111))
--	local d222=$((t1_222 - t0_222))
--	multipath_eval "$what" $weight1 $weight2 $d111 $d222
--
--	ip nexthop replace id 103 group 101/102
--	sysctl_restore net.ipv6.fib_multipath_hash_policy
--}
--
--multipath6_l4_test()
--{
--	local what=$1; shift
--	local weight1=$1; shift
--	local weight2=$1; shift
--
- 	sysctl_set net.ipv6.fib_multipath_hash_policy 1
- 	ip nexthop replace id 103 group 101,$weight1/102,$weight2
+ 	local t1_111=$(tc_rule_stats_get $ul2 111 ingress)
+ 	local t1_222=$(tc_rule_stats_get $ul2 222 ingress)
+@@ -271,7 +271,7 @@ multipath6_test()
  
-@@ -339,14 +310,6 @@ multipath_ipv6()
- 	multipath6_test "Weighted MP 11:45" 11 45
- }
+ 	ip vrf exec v$h1 \
+ 		$MZ $h1 -6 -q -p 64 -A 2001:db8:1::1 -B 2001:db8:2::2 \
+-		-d 1msec -t udp "sp=1024,dp=0-32768"
++		-d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
  
--multipath_ipv6_l4()
--{
--	log_info "Running IPv6 L4 hash multipath tests"
--	multipath6_l4_test "ECMP" 1 1
--	multipath6_l4_test "Weighted MP 2:1" 2 1
--	multipath6_l4_test "Weighted MP 11:45" 11 45
--}
--
- trap cleanup EXIT
- 
- setup_prepare
+ 	local t1_111=$(tc_rule_stats_get $ul2 111 ingress)
+ 	local t1_222=$(tc_rule_stats_get $ul2 222 ingress)
 diff --git a/tools/testing/selftests/net/forwarding/gre_multipath_nh_res.sh b/tools/testing/selftests/net/forwarding/gre_multipath_nh_res.sh
-index 088b65e64d66..2085111bcd67 100755
+index 2085111bcd67..370f9925302d 100755
 --- a/tools/testing/selftests/net/forwarding/gre_multipath_nh_res.sh
 +++ b/tools/testing/selftests/net/forwarding/gre_multipath_nh_res.sh
-@@ -64,7 +64,6 @@ ALL_TESTS="
- 	ping_ipv6
- 	multipath_ipv4
- 	multipath_ipv6
--	multipath_ipv6_l4
- "
+@@ -247,7 +247,7 @@ multipath4_test()
  
- NUM_NETIFS=6
-@@ -267,35 +266,6 @@ multipath6_test()
- 	local weight1=$1; shift
- 	local weight2=$1; shift
+ 	ip vrf exec v$h1 \
+ 	   $MZ $h1 -q -p 64 -A 192.0.2.1 -B 192.0.2.18 \
+-	       -d 1msec -t udp "sp=1024,dp=0-32768"
++	       -d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
  
--	sysctl_set net.ipv6.fib_multipath_hash_policy 0
--	ip nexthop replace id 103 group 101,$weight1/102,$weight2 \
--		type resilient
--
--	local t0_111=$(tc_rule_stats_get $ul2 111 ingress)
--	local t0_222=$(tc_rule_stats_get $ul2 222 ingress)
--
--	# Generate 16384 echo requests, each with a random flow label.
--	for ((i=0; i < 16384; ++i)); do
--		ip vrf exec v$h1 $PING6 2001:db8:2::2 -F 0 -c 1 -q &> /dev/null
--	done
--
--	local t1_111=$(tc_rule_stats_get $ul2 111 ingress)
--	local t1_222=$(tc_rule_stats_get $ul2 222 ingress)
--
--	local d111=$((t1_111 - t0_111))
--	local d222=$((t1_222 - t0_222))
--	multipath_eval "$what" $weight1 $weight2 $d111 $d222
--
--	ip nexthop replace id 103 group 101/102 type resilient
--	sysctl_restore net.ipv6.fib_multipath_hash_policy
--}
--
--multipath6_l4_test()
--{
--	local what=$1; shift
--	local weight1=$1; shift
--	local weight2=$1; shift
--
- 	sysctl_set net.ipv6.fib_multipath_hash_policy 1
- 	ip nexthop replace id 103 group 101,$weight1/102,$weight2 \
- 		type resilient
-@@ -344,14 +314,6 @@ multipath_ipv6()
- 	multipath6_test "Weighted MP 11:45" 11 45
+ 	local t1_111=$(tc_rule_stats_get $ul2 111 ingress)
+ 	local t1_222=$(tc_rule_stats_get $ul2 222 ingress)
+@@ -275,7 +275,7 @@ multipath6_test()
+ 
+ 	ip vrf exec v$h1 \
+ 		$MZ $h1 -6 -q -p 64 -A 2001:db8:1::1 -B 2001:db8:2::2 \
+-		-d 1msec -t udp "sp=1024,dp=0-32768"
++		-d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
+ 
+ 	local t1_111=$(tc_rule_stats_get $ul2 111 ingress)
+ 	local t1_222=$(tc_rule_stats_get $ul2 222 ingress)
+diff --git a/tools/testing/selftests/net/forwarding/ip6gre_custom_multipath_hash.sh b/tools/testing/selftests/net/forwarding/ip6gre_custom_multipath_hash.sh
+index d40183b4eccc..2ab9eaaa5532 100755
+--- a/tools/testing/selftests/net/forwarding/ip6gre_custom_multipath_hash.sh
++++ b/tools/testing/selftests/net/forwarding/ip6gre_custom_multipath_hash.sh
+@@ -280,42 +280,42 @@ send_src_ipv4()
+ {
+ 	ip vrf exec v$h1 $MZ $h1 -q -p 64 \
+ 		-A "198.51.100.2-198.51.100.253" -B 203.0.113.2 \
+-		-d 1msec -c 50 -t udp "sp=20000,dp=30000"
++		-d $MZ_DELAY -c 50 -t udp "sp=20000,dp=30000"
  }
  
--multipath_ipv6_l4()
--{
--	log_info "Running IPv6 L4 hash multipath tests"
--	multipath6_l4_test "ECMP" 1 1
--	multipath6_l4_test "Weighted MP 2:1" 2 1
--	multipath6_l4_test "Weighted MP 11:45" 11 45
--}
--
- trap cleanup EXIT
+ send_dst_ipv4()
+ {
+ 	ip vrf exec v$h1 $MZ $h1 -q -p 64 \
+ 		-A 198.51.100.2 -B "203.0.113.2-203.0.113.253" \
+-		-d 1msec -c 50 -t udp "sp=20000,dp=30000"
++		-d $MZ_DELAY -c 50 -t udp "sp=20000,dp=30000"
+ }
  
- setup_prepare
+ send_src_udp4()
+ {
+ 	ip vrf exec v$h1 $MZ $h1 -q -p 64 \
+ 		-A 198.51.100.2 -B 203.0.113.2 \
+-		-d 1msec -t udp "sp=0-32768,dp=30000"
++		-d $MZ_DELAY -t udp "sp=0-32768,dp=30000"
+ }
+ 
+ send_dst_udp4()
+ {
+ 	ip vrf exec v$h1 $MZ $h1 -q -p 64 \
+ 		-A 198.51.100.2 -B 203.0.113.2 \
+-		-d 1msec -t udp "sp=20000,dp=0-32768"
++		-d $MZ_DELAY -t udp "sp=20000,dp=0-32768"
+ }
+ 
+ send_src_ipv6()
+ {
+ 	ip vrf exec v$h1 $MZ -6 $h1 -q -p 64 \
+ 		-A "2001:db8:1::2-2001:db8:1::fd" -B 2001:db8:2::2 \
+-		-d 1msec -c 50 -t udp "sp=20000,dp=30000"
++		-d $MZ_DELAY -c 50 -t udp "sp=20000,dp=30000"
+ }
+ 
+ send_dst_ipv6()
+ {
+ 	ip vrf exec v$h1 $MZ -6 $h1 -q -p 64 \
+ 		-A 2001:db8:1::2 -B "2001:db8:2::2-2001:db8:2::fd" \
+-		-d 1msec -c 50 -t udp "sp=20000,dp=30000"
++		-d $MZ_DELAY -c 50 -t udp "sp=20000,dp=30000"
+ }
+ 
+ send_flowlabel()
+@@ -331,14 +331,14 @@ send_src_udp6()
+ {
+ 	ip vrf exec v$h1 $MZ -6 $h1 -q -p 64 \
+ 		-A 2001:db8:1::2 -B 2001:db8:2::2 \
+-		-d 1msec -t udp "sp=0-32768,dp=30000"
++		-d $MZ_DELAY -t udp "sp=0-32768,dp=30000"
+ }
+ 
+ send_dst_udp6()
+ {
+ 	ip vrf exec v$h1 $MZ -6 $h1 -q -p 64 \
+ 		-A 2001:db8:1::2 -B 2001:db8:2::2 \
+-		-d 1msec -t udp "sp=20000,dp=0-32768"
++		-d $MZ_DELAY -t udp "sp=20000,dp=0-32768"
+ }
+ 
+ custom_hash_test()
+diff --git a/tools/testing/selftests/net/forwarding/ip6gre_inner_v4_multipath.sh b/tools/testing/selftests/net/forwarding/ip6gre_inner_v4_multipath.sh
+index a257979d3fc5..32d1461f37b7 100755
+--- a/tools/testing/selftests/net/forwarding/ip6gre_inner_v4_multipath.sh
++++ b/tools/testing/selftests/net/forwarding/ip6gre_inner_v4_multipath.sh
+@@ -266,7 +266,7 @@ multipath4_test()
+ 
+ 	ip vrf exec v$h1 \
+ 	   $MZ $h1 -q -p 64 -A "192.0.3.2-192.0.3.62" -B "192.0.4.2-192.0.4.62" \
+-	       -d 1msec -c 50 -t udp "sp=1024,dp=1024"
++	       -d $MZ_DELAY -c 50 -t udp "sp=1024,dp=1024"
+ 	sleep 1
+ 
+ 	local t1_111=$(tc_rule_stats_get $ul32 111 ingress)
+diff --git a/tools/testing/selftests/net/forwarding/ip6gre_inner_v6_multipath.sh b/tools/testing/selftests/net/forwarding/ip6gre_inner_v6_multipath.sh
+index d208f5243ade..eb4e50df5337 100755
+--- a/tools/testing/selftests/net/forwarding/ip6gre_inner_v6_multipath.sh
++++ b/tools/testing/selftests/net/forwarding/ip6gre_inner_v6_multipath.sh
+@@ -267,7 +267,7 @@ multipath6_test()
+ 	ip vrf exec v$h1 \
+ 	   $MZ $h1 -6 -q -p 64 -A "2001:db8:1::2-2001:db8:1::1e" \
+ 	       -B "2001:db8:2::2-2001:db8:2::1e" \
+-	       -d 1msec -c 50 -t udp "sp=1024,dp=1024"
++	       -d $MZ_DELAY -c 50 -t udp "sp=1024,dp=1024"
+ 	sleep 1
+ 
+ 	local t1_111=$(tc_rule_stats_get $ul32 111 ingress)
+diff --git a/tools/testing/selftests/net/forwarding/ip6gre_lib.sh b/tools/testing/selftests/net/forwarding/ip6gre_lib.sh
+index 58a3597037b1..24f4ab328bd2 100644
+--- a/tools/testing/selftests/net/forwarding/ip6gre_lib.sh
++++ b/tools/testing/selftests/net/forwarding/ip6gre_lib.sh
+@@ -356,7 +356,7 @@ test_traffic_ip4ip6()
+ 		flower $TC_FLAG dst_ip 203.0.113.1 action pass
+ 
+ 	$MZ $h1 -c 1000 -p 64 -a $h1mac -b $ol1mac -A 198.51.100.1 \
+-		-B 203.0.113.1 -t ip -q -d 1msec
++		-B 203.0.113.1 -t ip -q -d $MZ_DELAY
+ 
+ 	# Check ports after encap and after decap.
+ 	tc_check_at_least_x_packets "dev $ul1 egress" 101 1000
+@@ -389,7 +389,7 @@ test_traffic_ip6ip6()
+ 		flower $TC_FLAG dst_ip 2001:db8:2::1 action pass
+ 
+ 	$MZ -6 $h1 -c 1000 -p 64 -a $h1mac -b $ol1mac -A 2001:db8:1::1 \
+-		-B 2001:db8:2::1 -t ip -q -d 1msec
++		-B 2001:db8:2::1 -t ip -q -d $MZ_DELAY
+ 
+ 	# Check ports after encap and after decap.
+ 	tc_check_at_least_x_packets "dev $ul1 egress" 101 1000
+diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+index db3688f52888..d1bf39eaf2b3 100644
+--- a/tools/testing/selftests/net/forwarding/lib.sh
++++ b/tools/testing/selftests/net/forwarding/lib.sh
+@@ -8,6 +8,7 @@
+ PING=${PING:=ping}
+ PING6=${PING6:=ping6}
+ MZ=${MZ:=mausezahn}
++MZ_DELAY=${MZ_DELAY:=0}
+ ARPING=${ARPING:=arping}
+ TEAMD=${TEAMD:=teamd}
+ WAIT_TIME=${WAIT_TIME:=5}
 diff --git a/tools/testing/selftests/net/forwarding/router_mpath_nh.sh b/tools/testing/selftests/net/forwarding/router_mpath_nh.sh
-index a0d612e04990..2ef469ff3bc4 100755
+index 2ef469ff3bc4..982e0d098ea9 100755
 --- a/tools/testing/selftests/net/forwarding/router_mpath_nh.sh
 +++ b/tools/testing/selftests/net/forwarding/router_mpath_nh.sh
-@@ -218,7 +218,7 @@ multipath4_test()
- 	sysctl_restore net.ipv4.fib_multipath_hash_policy
- }
+@@ -204,7 +204,7 @@ multipath4_test()
+ 	t0_rp13=$(link_stats_tx_packets_get $rp13)
  
--multipath6_l4_test()
-+multipath6_test()
- {
- 	local desc="$1"
- 	local weight_rp12=$2
-@@ -251,34 +251,6 @@ multipath6_l4_test()
- 	sysctl_restore net.ipv6.fib_multipath_hash_policy
- }
+ 	ip vrf exec vrf-h1 $MZ $h1 -q -p 64 -A 192.0.2.2 -B 198.51.100.2 \
+-		-d 1msec -t udp "sp=1024,dp=0-32768"
++		-d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
  
--multipath6_test()
--{
--	local desc="$1"
--	local weight_rp12=$2
--	local weight_rp13=$3
--	local t0_rp12 t0_rp13 t1_rp12 t1_rp13
--	local packets_rp12 packets_rp13
--
--	ip nexthop replace id 106 group 104,$weight_rp12/105,$weight_rp13
--
--	t0_rp12=$(link_stats_tx_packets_get $rp12)
--	t0_rp13=$(link_stats_tx_packets_get $rp13)
--
--	# Generate 16384 echo requests, each with a random flow label.
--	for _ in $(seq 1 16384); do
--		ip vrf exec vrf-h1 $PING6 2001:db8:2::2 -F 0 -c 1 -q >/dev/null 2>&1
--	done
--
--	t1_rp12=$(link_stats_tx_packets_get $rp12)
--	t1_rp13=$(link_stats_tx_packets_get $rp13)
--
--	let "packets_rp12 = $t1_rp12 - $t0_rp12"
--	let "packets_rp13 = $t1_rp13 - $t0_rp13"
--	multipath_eval "$desc" $weight_rp12 $weight_rp13 $packets_rp12 $packets_rp13
--
--	ip nexthop replace id 106 group 104/105
--}
--
- multipath_test()
- {
- 	log_info "Running IPv4 multipath tests"
-@@ -301,11 +273,6 @@ multipath_test()
- 	multipath6_test "ECMP" 1 1
- 	multipath6_test "Weighted MP 2:1" 2 1
- 	multipath6_test "Weighted MP 11:45" 11 45
--
--	log_info "Running IPv6 L4 hash multipath tests"
--	multipath6_l4_test "ECMP" 1 1
--	multipath6_l4_test "Weighted MP 2:1" 2 1
--	multipath6_l4_test "Weighted MP 11:45" 11 45
- }
+ 	t1_rp12=$(link_stats_tx_packets_get $rp12)
+ 	t1_rp13=$(link_stats_tx_packets_get $rp13)
+@@ -237,7 +237,7 @@ multipath6_test()
+ 	t0_rp13=$(link_stats_tx_packets_get $rp13)
  
- ping_ipv4_blackhole()
+ 	$MZ $h1 -6 -q -p 64 -A 2001:db8:1::2 -B 2001:db8:2::2 \
+-		-d 1msec -t udp "sp=1024,dp=0-32768"
++		-d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
+ 
+ 	t1_rp12=$(link_stats_tx_packets_get $rp12)
+ 	t1_rp13=$(link_stats_tx_packets_get $rp13)
+diff --git a/tools/testing/selftests/net/forwarding/router_mpath_nh_res.sh b/tools/testing/selftests/net/forwarding/router_mpath_nh_res.sh
+index cb08ffe2356a..a60ff54723b7 100755
+--- a/tools/testing/selftests/net/forwarding/router_mpath_nh_res.sh
++++ b/tools/testing/selftests/net/forwarding/router_mpath_nh_res.sh
+@@ -205,7 +205,7 @@ multipath4_test()
+ 	t0_rp13=$(link_stats_tx_packets_get $rp13)
+ 
+ 	ip vrf exec vrf-h1 $MZ $h1 -q -p 64 -A 192.0.2.2 -B 198.51.100.2 \
+-		-d 1msec -t udp "sp=1024,dp=0-32768"
++		-d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
+ 
+ 	t1_rp12=$(link_stats_tx_packets_get $rp12)
+ 	t1_rp13=$(link_stats_tx_packets_get $rp13)
+@@ -235,7 +235,7 @@ multipath6_l4_test()
+ 	t0_rp13=$(link_stats_tx_packets_get $rp13)
+ 
+ 	$MZ $h1 -6 -q -p 64 -A 2001:db8:1::2 -B 2001:db8:2::2 \
+-		-d 1msec -t udp "sp=1024,dp=0-32768"
++		-d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
+ 
+ 	t1_rp12=$(link_stats_tx_packets_get $rp12)
+ 	t1_rp13=$(link_stats_tx_packets_get $rp13)
 diff --git a/tools/testing/selftests/net/forwarding/router_multipath.sh b/tools/testing/selftests/net/forwarding/router_multipath.sh
-index 464821c587a5..a4eceeb5c06e 100755
+index a4eceeb5c06e..e2be354167a1 100755
 --- a/tools/testing/selftests/net/forwarding/router_multipath.sh
 +++ b/tools/testing/selftests/net/forwarding/router_multipath.sh
-@@ -195,7 +195,7 @@ multipath4_test()
-        sysctl_restore net.ipv4.fib_multipath_hash_policy
- }
+@@ -179,7 +179,7 @@ multipath4_test()
+        t0_rp13=$(link_stats_tx_packets_get $rp13)
  
--multipath6_l4_test()
-+multipath6_test()
- {
-        local desc="$1"
-        local weight_rp12=$2
-@@ -232,38 +232,6 @@ multipath6_l4_test()
-        sysctl_restore net.ipv6.fib_multipath_hash_policy
- }
+        ip vrf exec vrf-h1 $MZ $h1 -q -p 64 -A 192.0.2.2 -B 198.51.100.2 \
+-	       -d 1msec -t udp "sp=1024,dp=0-32768"
++	       -d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
  
--multipath6_test()
--{
--       local desc="$1"
--       local weight_rp12=$2
--       local weight_rp13=$3
--       local t0_rp12 t0_rp13 t1_rp12 t1_rp13
--       local packets_rp12 packets_rp13
--
--       ip route replace 2001:db8:2::/64 vrf vrf-r1 \
--	       nexthop via fe80:2::22 dev $rp12 weight $weight_rp12 \
--	       nexthop via fe80:3::23 dev $rp13 weight $weight_rp13
--
--       t0_rp12=$(link_stats_tx_packets_get $rp12)
--       t0_rp13=$(link_stats_tx_packets_get $rp13)
--
--       # Generate 16384 echo requests, each with a random flow label.
--       for _ in $(seq 1 16384); do
--	       ip vrf exec vrf-h1 $PING6 2001:db8:2::2 -F 0 -c 1 -q &> /dev/null
--       done
--
--       t1_rp12=$(link_stats_tx_packets_get $rp12)
--       t1_rp13=$(link_stats_tx_packets_get $rp13)
--
--       let "packets_rp12 = $t1_rp12 - $t0_rp12"
--       let "packets_rp13 = $t1_rp13 - $t0_rp13"
--       multipath_eval "$desc" $weight_rp12 $weight_rp13 $packets_rp12 $packets_rp13
--
--       ip route replace 2001:db8:2::/64 vrf vrf-r1 \
--	       nexthop via fe80:2::22 dev $rp12 \
--	       nexthop via fe80:3::23 dev $rp13
--}
--
- multipath_test()
- {
- 	log_info "Running IPv4 multipath tests"
-@@ -275,11 +243,6 @@ multipath_test()
- 	multipath6_test "ECMP" 1 1
- 	multipath6_test "Weighted MP 2:1" 2 1
- 	multipath6_test "Weighted MP 11:45" 11 45
--
--	log_info "Running IPv6 L4 hash multipath tests"
--	multipath6_l4_test "ECMP" 1 1
--	multipath6_l4_test "Weighted MP 2:1" 2 1
--	multipath6_l4_test "Weighted MP 11:45" 11 45
- }
+        t1_rp12=$(link_stats_tx_packets_get $rp12)
+        t1_rp13=$(link_stats_tx_packets_get $rp13)
+@@ -216,7 +216,7 @@ multipath6_test()
+        t0_rp13=$(link_stats_tx_packets_get $rp13)
  
- setup_prepare()
+        $MZ $h1 -6 -q -p 64 -A 2001:db8:1::2 -B 2001:db8:2::2 \
+-	       -d 1msec -t udp "sp=1024,dp=0-32768"
++	       -d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
+ 
+        t1_rp12=$(link_stats_tx_packets_get $rp12)
+        t1_rp13=$(link_stats_tx_packets_get $rp13)
 -- 
 2.43.0
 
