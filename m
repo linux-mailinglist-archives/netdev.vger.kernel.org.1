@@ -1,126 +1,94 @@
-Return-Path: <netdev+bounces-77096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 807468702EE
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:40:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ECAA8702F6
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:40:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A494F1C23CCF
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:40:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D140D1C23F37
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6872A3EA91;
-	Mon,  4 Mar 2024 13:39:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4464D3E485;
+	Mon,  4 Mar 2024 13:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uAZM/pFY"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E871EB2C
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 13:39:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB8F3E476;
+	Mon,  4 Mar 2024 13:40:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709559580; cv=none; b=gG+P/FuVF+7HxaDzy3gjiMZpZVBRixpjXchKNotu+eaO+iwD3rm3yaRXWiXIT5ABcgGDn6VGLEsdkBXQRhWDuB0pQS3BvTJ+afxnDg0qSEpKFr1Oh/lu5rLOHbicIsXGxNa5j9nc5Nt4m8t5pHbDF2zEUUMbGjTMRrydGxFi+f4=
+	t=1709559611; cv=none; b=EdFCQBeoJ1WbcfAOuSjRtOLxqMFgOPonQEYswLXuA2sE5nVpok9oZfKS83BX6imN1gFxEmUT3nifLZk/EzEd2r7Kcvmrnvl+bwkaQywfXEFw3YBnWzNNyU6x3DseoWqWD7iTddWYl7oEEHxb7pZA4VXDMHbHFPSvsLqrJ1+u9mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709559580; c=relaxed/simple;
-	bh=DSO4nKZfYc4IR1qnz1wjDII1n4yFyBJMYdZUfFC8Mh0=;
+	s=arc-20240116; t=1709559611; c=relaxed/simple;
+	bh=YcWoIA2quvZzPdf1rDtO5pmxDHe7d8t9k4p3OsK8Aqc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O8ggQUKSk/k58ajscVOTtWQk6MOXy8JtVtSSq241NJVCHey8+EL41SjtWgdsNeKbmC5SWmHTsM9nCvIJc5t6DxIBo4xMSVVQKCiOefvoTEg7PorbnSOa219TvUibuMUTjLFDD+40MsCpOerHBPsb5azfWX7cR3yMgt2HEOwbbFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rh8X9-0000Pk-8L; Mon, 04 Mar 2024 14:39:11 +0100
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rh8X6-004MgH-Vs; Mon, 04 Mar 2024 14:39:08 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rh8X6-001uJD-2q;
-	Mon, 04 Mar 2024 14:39:08 +0100
-Date: Mon, 4 Mar 2024 14:39:08 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ib3wfJ1B2Kppt2qnjMgCKuyno00JJc1QYu3s5Z+L7tB8DDBtVS76XdAPjtjj0VJVOh+230xDQdYO2kKvi7+uhfrhOJTHqTgupeSY5/PIe6vyfJJxjMMBNEpYKXNndK+NYnxQ7ym3S+DX2WQQHGGtqLn9Xs+MYmppe7h34UTjAv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uAZM/pFY; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NfVSZ7fD7A6nvwirdPGvD3RgMz1Yef7wa2vWaX9NVhY=; b=uAZM/pFYUi9v5Xd7KuH0DaAESl
+	PGQAEAq/9s+GMn4cEfKQEeA+LN1lLogPJBNzYw9bgj4UdtqufAmQ7tk1ZsqeGnMENNSSBfJuTMbeZ
+	6b1F1lAFQX0bGEwv7sjH5AmgiI0ZwZG596RgbA6850pvcAmCEkCbNgCLVdIXs76xKTto=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rh8YE-009KK0-VZ; Mon, 04 Mar 2024 14:40:18 +0100
+Date: Mon, 4 Mar 2024 14:40:18 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
-	Frank Rowand <frowand.list@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
 	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v5 13/17] net: pse-pd: Use regulator framework
- within PSE framework
-Message-ID: <ZeXO_NhXZQajGZPr@pengutronix.de>
-References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
- <20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
- <ZeObuKHkPN3tiWz_@pengutronix.de>
- <20240304102708.5bb5d95c@kmaincent-XPS-13-7390>
- <84b300c7-8295-424b-9117-c604fb4cd73e@lunn.ch>
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next v5 2/7] net: phylink: add rxc_always_on flag to
+ phylink_pcs
+Message-ID: <0bdf98ac-de32-4f81-99c9-5981950883f8@lunn.ch>
+References: <20240301-rxc_bugfix-v5-0-8dac30230050@bootlin.com>
+ <20240301-rxc_bugfix-v5-2-8dac30230050@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <84b300c7-8295-424b-9117-c604fb4cd73e@lunn.ch>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20240301-rxc_bugfix-v5-2-8dac30230050@bootlin.com>
 
-On Mon, Mar 04, 2024 at 02:32:50PM +0100, Andrew Lunn wrote:
-> > > > +	psec = dev_find_pse_control(&phy->mdio.dev);
-> > > > +	if (IS_ERR(psec)) {
-> > > > +		rc = PTR_ERR(psec);
-> > > > +		goto unregister_phy;
-> > > > +	}
-> > > > +  
-> > > 
-> > > I do not think it is a good idea to make PSE controller depend on
-> > > phy->mdio.dev. The only reason why we have fwnode_find_pse_control()
-> > > here was the missing port abstraction.
-> > 
-> > I totally agree that having port abstraction would be more convenient.
-> > Maxime Chevallier is currently working on this and will post it after his
-> > multi-phy series get merged.
-> > Meanwhile, we still need a device pointer for getting the regulator. The
-> > phy->mdio.dev is the only one I can think of as a regulator consumer.
-> > Another idea?
+On Fri, Mar 01, 2024 at 04:34:59PM +0100, Romain Gantois wrote:
+> Some MAC drivers (e.g. stmmac) require a continuous receive clock signal to
+> be generated by a PCS that is handled by a standalone PCS driver.
 > 
-> Sorry, i've not been keeping up...
+> Such a PCS driver does not have access to a PHY device, thus cannot check
+> the PHY_F_RXC_ALWAYS_ON flag. They cannot check max_requires_rxc in the
+> phylink config either, since it is a private member. Therefore, a new flag
+> is needed to signal to the PCS that it should keep the RX clock signal up
+> at all times.
 > 
-> Doesn't the device tree binding determine this? Where is the consumer
-> in the tree?
+> Suggested-by: Russell King <linux@armlinux.org.uk>
+> Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
 
-The real consumer is outside of the system. Withing the system, it would
-be the RJ45 port, but we have no abstraction for ports so far.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+    Andrew
 
