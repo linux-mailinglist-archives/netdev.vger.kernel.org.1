@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-77248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B768870CEE
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 22:30:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F51A870CF0
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 22:30:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 586E21C23FD1
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 21:30:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BEDB28B4DD
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 21:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEEE85B1FE;
-	Mon,  4 Mar 2024 21:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E4D7BB1A;
+	Mon,  4 Mar 2024 21:29:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MIvD/irY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UriDvQqr"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615A77BAFD
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF737BAFF
 	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 21:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709587783; cv=none; b=MqFEK2ol2DAM800lCcSAgRABJ7wvl2UtJ/NuTAB265asMOFf15WH3gProc1euP6Mf8eclbVs9k5kOZGvCvvec5aJXQZrPUMgJyk9Qxn+zbovv7QM5QN5r8nfEbtSN5uaZyXMwo2nGHIH/UAV5ovt5KVkF0WDwCFRid3yXIqIYLY=
+	t=1709587784; cv=none; b=ryaVVLh97BrlypBnuCdGFBE0cMpULKOQG+VnXUkDrcjlg5o2S5fJh2EP0789q0kmekDnX5692Se3cEYzAAwx4RdFCDsMLgKa7dSRa/iD9puKotRUT7LMp44ZkM6BXzf+6wX1BVoTqkzdxyv+eAY0FW0bVatbdCOnY5HUMXHHDrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709587783; c=relaxed/simple;
-	bh=GZVPh96yDKnfoItbpXS7EBV7LJQ/+GSz6fmyNrnvxCg=;
+	s=arc-20240116; t=1709587784; c=relaxed/simple;
+	bh=iQNGbnb50IXM6RizV76vDqjUNRJRo+z4JF53wBTKp8U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fVw8ibZbnn3Vqrc+ULBn7dFqgn0BNgmAy74qudRDlsJhLl+p7hyir4i8I1ofnAc9BUN5NY5+G1jJTk9YqI88xhBby2/lQXr9YVDDAzdNWa4MBL2eiKfdF+LsnykemTz89mB9GyRkO0FVcMG5NqvIuuiDHoDRp3QyC96mtVbziqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MIvD/irY; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=e8rETLRCIgI6Z25jvXCXUd3LUaSY90ZA3QpKVBAdG+FaW5wr9lTaq6pLFgCJQxKzPy5sk3mnye+czC3IN2W4SEm0aR233Dst6yNxbfKXbY3IPf4ibD369QROZFQmMgZErmBvXf2dWfgf65DOP1oCqU781YxHcX69eTQ46dK+5r8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UriDvQqr; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709587782; x=1741123782;
+  t=1709587783; x=1741123783;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GZVPh96yDKnfoItbpXS7EBV7LJQ/+GSz6fmyNrnvxCg=;
-  b=MIvD/irY2i15SpLWTbBwIQjR2GDSwKBotHUN/thsYuIOtjzsjr2aeZDm
-   qxYwxpjrujZeyfzT1K1zkVkgSMp376sO/1QKYHcU3hCV++w8e/E/kyjek
-   NNY8Np3ZlbHlCFv+letCXdw/NstBT8ol72V3m+5arJR+TzLuH2Paoi9O6
-   BNsJ7ut+HzVyVHvoR1cnnB4nHXb8uMqoXJGRHXl2/BGrpVfq67vV0qMBo
-   E646VfCvECNjxtrha38ExQ4cJMOQlDc2sgLzfNhIHRei5CkULIuDNCG2J
-   /5nm14Ui0q2sxyjtVJBwYJaRbv9t/2Y9JlftjLFPARBbuwoNSz2yh3xaf
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="3968067"
+  bh=iQNGbnb50IXM6RizV76vDqjUNRJRo+z4JF53wBTKp8U=;
+  b=UriDvQqrNIy06SUSJg+YK/h/7pKj0FgZ2w9a37C04VfcU8ICfUZ1s0+O
+   Zi8sjjnR2L2l+f7LG2N8eUElr7vInqfMhYAxhgxOO2XxiUHoSe9sOmkAr
+   LI9EUE3WBcm5c4xKzeojf8ej8oHwIZDaGwQMnsOB8XmzyWuZDbGorOowc
+   CjeYtRElFQAAeiDhDHhI4vc20jIQq6P3muishrS3B3S2c3ShwDYS48f5K
+   9/7uQ9YkqlykXbQcptBrOaATlXw5TlG/bw6u4vsxQp2HM27vBs38atH3Y
+   CoJpGoD9CUtK7fRiNhCHvwJc6kejDd0R91+Xun5WAOqlSC9KQ/BKbJrHY
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="3968072"
 X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
-   d="scan'208";a="3968067"
+   d="scan'208";a="3968072"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
   by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 13:29:40 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
-   d="scan'208";a="46647872"
+   d="scan'208";a="46647875"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa001.jf.intel.com with ESMTP; 04 Mar 2024 13:29:40 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -64,9 +64,9 @@ Cc: Jacob Keller <jacob.e.keller@intel.com>,
 	anthony.l.nguyen@intel.com,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net-next 2/9] ice: remove unnecessary duplicate checks for VF VSI ID
-Date: Mon,  4 Mar 2024 13:29:23 -0800
-Message-ID: <20240304212932.3412641-3-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 3/9] ice: use relative VSI index for VFs instead of PF VSI number
+Date: Mon,  4 Mar 2024 13:29:24 -0800
+Message-ID: <20240304212932.3412641-4-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240304212932.3412641-1-anthony.l.nguyen@intel.com>
 References: <20240304212932.3412641-1-anthony.l.nguyen@intel.com>
@@ -80,45 +80,97 @@ Content-Transfer-Encoding: 8bit
 
 From: Jacob Keller <jacob.e.keller@intel.com>
 
-The ice_vc_fdir_param_check() function validates that the VSI ID of the
-virtchnl flow director command matches the VSI number of the VF. This is
-already checked by the call to ice_vc_isvalid_vsi_id() immediately
-following this.
+When initializing over virtchnl, the PF is required to pass a VSI ID to the
+VF as part of its capabilities exchange. The VF driver reports this value
+back to the PF in a variety of commands. The PF driver validates that this
+value matches the value it sent to the VF.
 
-This check is unnecessary since ice_vc_isvalid_vsi_id() already confirms
-this by checking that the VSI ID can locate the VSI associated with the VF
-structure.
+Some hardware families such as the E700 series could use this value when
+reading RSS registers or communicating directly with firmware over the
+Admin Queue.
 
-Furthermore, a following change is going to refactor the ice driver to
-report VSI IDs using a relative index for each VF instead of reporting the
-PF VSI number. This additional check would break that logic since it
-enforces that the VSI ID matches the VSI number.
+However, E800 series hardware does not support any of these interfaces and
+the VF's only use for this value is to report it back to the PF. Thus,
+there is no requirement that this value be an actual VSI ID value of any
+kind.
 
-Since this check duplicates  the logic in ice_vc_isvalid_vsi_id() and gets
-in the way of refactoring that logic, remove it.
+The PF driver already does not trust that the VF sends it a real VSI ID.
+The VSI structure is always looked up from the VF structure. The PF does
+validate that the VSI ID provided matches a VSI associated with the VF, but
+otherwise does not use the VSI ID for any purpose.
+
+Instead of reporting the VSI number relative to the PF space, report a
+fixed value of 1. When communicating with the VF over virtchnl, validate
+that the VSI number is returned appropriately.
+
+This avoids leaking information about the firmware of the PF state.
+Currently the ice driver only supplies a VF with a single VSI. However, it
+appears that virtchnl has some support for allowing multiple VSIs. I did
+not attempt to implement this. However, space is left open to allow further
+relative indexes if additional VSIs are provided in future feature
+development. For this reason, keep the ice_vc_isvalid_vsi_id function in
+place to allow extending it for multiple VSIs in the future.
+
+This change will also simplify handling of live migration in a future
+series. Since we no longer will provide a real VSI number to the VF, there
+will be no need to keep track of this number when migrating to a new host.
 
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c | 3 ---
- 1 file changed, 3 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c | 9 ++-------
+ drivers/net/ethernet/intel/ice/ice_virtchnl.h | 9 +++++++++
+ 2 files changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
-index f001553e1a1a..8e4ff3af86c6 100644
---- a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
-+++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
-@@ -94,9 +94,6 @@ ice_vc_fdir_param_check(struct ice_vf *vf, u16 vsi_id)
- 	if (!(vf->driver_caps & VIRTCHNL_VF_OFFLOAD_FDIR_PF))
- 		return -EINVAL;
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+index 3dd4e5af0b6a..6b88b9bfb51e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+@@ -506,7 +506,7 @@ static int ice_vc_get_vf_res_msg(struct ice_vf *vf, u8 *msg)
+ 	vfres->rss_lut_size = ICE_LUT_VSI_SIZE;
+ 	vfres->max_mtu = ice_vc_get_max_frame_size(vf);
  
--	if (vsi_id != vf->lan_vsi_num)
--		return -EINVAL;
+-	vfres->vsi_res[0].vsi_id = vf->lan_vsi_num;
++	vfres->vsi_res[0].vsi_id = ICE_VF_VSI_ID;
+ 	vfres->vsi_res[0].vsi_type = VIRTCHNL_VSI_SRIOV;
+ 	vfres->vsi_res[0].num_queue_pairs = vsi->num_txq;
+ 	ether_addr_copy(vfres->vsi_res[0].default_mac_addr,
+@@ -552,12 +552,7 @@ static void ice_vc_reset_vf_msg(struct ice_vf *vf)
+  */
+ bool ice_vc_isvalid_vsi_id(struct ice_vf *vf, u16 vsi_id)
+ {
+-	struct ice_pf *pf = vf->pf;
+-	struct ice_vsi *vsi;
 -
- 	if (!ice_vc_isvalid_vsi_id(vf, vsi_id))
- 		return -EINVAL;
+-	vsi = ice_find_vsi(pf, vsi_id);
+-
+-	return (vsi && (vsi->vf == vf));
++	return vsi_id == ICE_VF_VSI_ID;
+ }
  
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.h b/drivers/net/ethernet/intel/ice/ice_virtchnl.h
+index 60dfbe05980a..3a4115869153 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.h
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.h
+@@ -19,6 +19,15 @@
+ #define ICE_MAX_MACADDR_PER_VF		18
+ #define ICE_FLEX_DESC_RXDID_MAX_NUM	64
+ 
++/* VFs only get a single VSI. For ice hardware, the VF does not need to know
++ * its VSI index. However, the virtchnl interface requires a VSI number,
++ * mainly due to legacy hardware.
++ *
++ * Since the VF doesn't need this information, report a static value to the VF
++ * instead of leaking any information about the PF or hardware setup.
++ */
++#define ICE_VF_VSI_ID	1
++
+ struct ice_virtchnl_ops {
+ 	int (*get_ver_msg)(struct ice_vf *vf, u8 *msg);
+ 	int (*get_vf_res_msg)(struct ice_vf *vf, u8 *msg);
 -- 
 2.41.0
 
