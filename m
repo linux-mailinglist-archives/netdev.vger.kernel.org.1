@@ -1,176 +1,250 @@
-Return-Path: <netdev+bounces-77012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E140586FCEA
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:16:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B95986FDAC
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:30:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10AEE1C22216
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:16:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD8341F23741
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:30:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 974551B967;
-	Mon,  4 Mar 2024 09:16:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2247439861;
+	Mon,  4 Mar 2024 09:27:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b="S7cXE67V"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="TtzfGG8V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16201B943
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 09:16:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B55249FC;
+	Mon,  4 Mar 2024 09:27:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709543780; cv=none; b=h44QaXgEG0IjwDNY8E54WqKCEFd8SaBI9HY/eCQt0p8MQA84G6X5o7tEVxEVftTX2y2gp5ui7A/4SJw+38UNX+KSOPdrtrn6EAqJvKlT4tNFO/Qd0+PAccbM2x1acjYkXi2UEc6W61iue5U/R5dG4+xjAa6A2YxOCVD65eyGRXQ=
+	t=1709544444; cv=none; b=JckD8HGOSIg8pDi5ZBrbnpI9fQNOAzhYzzhw/LJHKNptoNYdzrASjmg2aPzM2ZKm6/H1kLcZr2Fll184i3z26IDCYQxunqOYcHDO9krjIQEKzhIk/exdy6XCHKUHSPhg4yAwqacF6U+XuyhTFiDXOsGD+oRHxQQLdIpxkQFysiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709543780; c=relaxed/simple;
-	bh=7/Cg7bSkP3P3KzE9IpfjIHLKep/5j0YfikDfAl96988=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=q6n8/OxX6p1eY2sxjsg60XFMOBAulFMiYjnr9k/bMLxTQKPFfC7yO8cVRsThMi/xJN+vTLhaSMxbtI9ut4AeHC8ba2u5k5ch5scNSfTN49q19+QnQ4OroGltWtpmhMad4UfBQcHp6G8rl6A395BovTn/FTJpcy9uOPK4IcUisMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org; spf=pass smtp.mailfrom=joelfernandes.org; dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b=S7cXE67V; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=joelfernandes.org
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-78822c7c77dso37595385a.3
-        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 01:16:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=joelfernandes.org; s=google; t=1709543778; x=1710148578; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AWM0i1D+FispfxeIOLK4vZoGix8afRI2zst62UErbPs=;
-        b=S7cXE67VDKzOS8oEhk2wOe1+UYaku8agA6xf2gN9Dgis7hG8ysJyI/YR1VOG1ckm0E
-         /KgB3L9GeFOmeV/rzKIkN48qvIQNwU7QNz3vDm6xG0Lu1bttYm0m/rLorUbwD9pxXs8l
-         ewSL50KVriy9aY4RCmrSDB7OXDfDBmLnhFevU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709543778; x=1710148578;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AWM0i1D+FispfxeIOLK4vZoGix8afRI2zst62UErbPs=;
-        b=ssqXIPXHLAQ6hWDW8Yi28GpV9HrGEPLAGepVas94AZG2vrOH6yQlOhANVOFofMeFXC
-         Bv8hb+5C3RLSvTl053yupydHUlJRTUCv0k6oxc9sYEzArdpQDxZQVveoozYcXdyFyM3+
-         8UepQsvAmVgFSCrUXOpHEFuwiNqniRqxxS9kxsf6TDS/tw8HLNsz8u6OZrQrvvVh8Yim
-         rECN5n6kazmqOt8D/jY+AJ2JN/kr1ScHXTsPbVJJSIBJP+2/c3KllmdU7gapUIDUauck
-         JXv3jW6ldIdT1pPbVXBm8B2PFcqf3z4qH9+SERHykHXKC0zSmNNuIANK/gGF26BaHAe1
-         NRcg==
-X-Forwarded-Encrypted: i=1; AJvYcCUXbj0/GMQcyi3bvOdWCSO9CYKwajnv8TqdXBjIJ4Gl8w9rmobFByjA0tFqNbxiQixHaVUh+RqyFZvhULWAdR7SkgLKxuX7
-X-Gm-Message-State: AOJu0YxvN/JG2iUhmDTnuB+firU4XZKpje3MFqLVVp1VOjQLXkB2fHL9
-	kxAMNc92QL3+x0pBjE5XCe4VM+ChH9yxIkvG1qJZ0Sw6KdUvM5Ku3Kn1zjGsRwI=
-X-Google-Smtp-Source: AGHT+IEm2Vy+25KaOUe7GI3ZHCTzoChFZCEpmhFYzCFLr9pJjidCxyJ165Vuq1Ldu2K64+OPrluirA==
-X-Received: by 2002:a0c:c20a:0:b0:68f:43f6:4834 with SMTP id l10-20020a0cc20a000000b0068f43f64834mr8682070qvh.26.1709543777882;
-        Mon, 04 Mar 2024 01:16:17 -0800 (PST)
-Received: from [10.5.0.2] ([91.196.69.189])
-        by smtp.gmail.com with ESMTPSA id b18-20020a0ccd12000000b0068f760929c0sm4898018qvm.71.2024.03.04.01.16.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Mar 2024 01:16:17 -0800 (PST)
-Message-ID: <f3ed94a9-e50e-4d4b-bede-cc3078d4acab@joelfernandes.org>
-Date: Mon, 4 Mar 2024 04:16:12 -0500
+	s=arc-20240116; t=1709544444; c=relaxed/simple;
+	bh=qhFdqSydGSsppwd8DaxhNL3l1o72Wmw7l9pkEKo/Koc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FjMPBMNrpFRp1xMAm5Dt6xFghtPmEjxNq37uli9C/rVrXtCfXtiQi5AXtkwDD1jcLvq3XV8UJ8VmB+lI/uANWiEHskD9rvs2vZQm6JaA2XBZeAy39ncUqI514OMPfmIRuX2PZlS0H8aYr38iScbbsJ/8JNg2U5l9q9lzJaMpFvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TtzfGG8V; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7E437FF809;
+	Mon,  4 Mar 2024 09:27:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1709544433;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wolDcJ6Q1CiVR4J5B28NP8D0LpJaueSBID98he3qx1c=;
+	b=TtzfGG8VxWH+WRUXrSiNp7K0+o+Jqpvf1s8NzHlDVWHY74G8Qo/nbyOtiyoyiytLdI0cFQ
+	pmY6ddcDPsvvsUhKv+4wnqzzoweEgr5Z1KRTRv33dOxG4LsU67FefXMgIEBVI2meEVvVHj
+	OD7jsxY5oZfb5szZ4waK7VUSCEOrtSsTkCUpsuk2/Ryz+m22awQXYLVU9moYH2pq17QGyp
+	CMaFHDpfJO7uQholWmNfS6Mixf+9LzEOUApEwfFfq3/upoV1cdHPMcY2T8yXD2XdTvh/FZ
+	pZjjBbitSPAdM8YZm86tDfUjZ6En1qLNcLfpQqu0ZPspWsZvXGu70yw6rzVGxA==
+Date: Mon, 4 Mar 2024 10:27:08 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
+ <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Mark Brown <broonie@kernel.org>, Frank Rowand <frowand.list@gmail.com>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v5 13/17] net: pse-pd: Use regulator framework
+ within PSE framework
+Message-ID: <20240304102708.5bb5d95c@kmaincent-XPS-13-7390>
+In-Reply-To: <ZeObuKHkPN3tiWz_@pengutronix.de>
+References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
+	<20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
+	<ZeObuKHkPN3tiWz_@pengutronix.de>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
-Content-Language: en-US
-From: Joel Fernandes <joel@joelfernandes.org>
-To: paulmck@kernel.org
-Cc: Steven Rostedt <rostedt@goodmis.org>,
- Network Development <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>, rcu@vger.kernel.org,
- kernel-team <kernel-team@cloudflare.com>
-References: <55900c6a-f181-4c5c-8de2-bca640c4af3e@paulmck-laptop>
- <10FC3F5F-AA33-4F81-9EB6-87EB2D41F3EE@joelfernandes.org>
- <99b2ccae-07f6-4350-9c55-25ec7ae065c0@paulmck-laptop>
- <CAEXW_YQ+40a1-hk5ZP+QJ54xniSutosC7MjMscJJy8fen-gU9Q@mail.gmail.com>
- <f1e77cd2-18b2-4ab1-8ce3-da2c6babbd53@paulmck-laptop>
- <CAEXW_YRDiTXJ_GwK5soSVno73yN9FUA5GjLYAOcCTtqQvPGcFA@mail.gmail.com>
-In-Reply-To: <CAEXW_YRDiTXJ_GwK5soSVno73yN9FUA5GjLYAOcCTtqQvPGcFA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Hi Paul,
+Hello Oleksij,
 
-On 3/2/2024 8:01 PM, Joel Fernandes wrote:
->> As you noted, one thing that Ankur's series changes is that preemption
->> can occur anywhere that it is not specifically disabled in kernels
->> built with CONFIG_PREEMPT_NONE=y or CONFIG_PREEMPT_VOLUNTARY=y.  This in
->> turn changes Tasks Rude RCU's definition of a quiescent state for these
->> kernels, adding all code regions where preemption is not specifically
->> disabled to the list of such quiescent states.
->>
->> Although from what I know, this is OK, it would be good to check the
->> calls to call_rcu_tasks_rude() or synchronize_rcu_tasks_rude() are set
->> up so as to expect these new quiescent states.  One example where it
->> would definitely be OK is if there was a call to synchronize_rcu_tasks()
->> right before or after that call to synchronize_rcu_tasks_rude().
->>
->> Would you be willing to check the call sites to verify that they
->> are OK with this change in 
-> Yes, I will analyze and make sure those users did not unexpectedly
-> assume something about AUTO (i.e. preempt enabled sections using
-> readers).
+Thanks for your review!!
 
-Other than RCU test code, there are just 3 call sites for RUDE right now, all in
-ftrace.c.
+On Sat, 2 Mar 2024 22:35:52 +0100
+Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
-(Long story short, PREEMPT_AUTO should not cause wreckage in TASKS_RCU_RUDE
-other than any preexisting wreckage that !PREEMPT_AUTO already had. Steve is on
-CC as well to CMIIW).
+> On Tue, Feb 27, 2024 at 03:42:55PM +0100, Kory Maincent wrote:
+> > Integrate the regulator framework to the PSE framework for enhanced
+> > access to features such as voltage, power measurement, and limits, which
+> > are akin to regulators. Additionally, PSE features like port priorities
+> > could potentially enhance the regulator framework. Note that this
+> > integration introduces some implementation complexity, including wrapper
+> > callbacks and nested locks, but the potential benefits make it worthwhi=
+le.
+> >=20
+> > Regulator are using enable counter with specific behavior.
+> > Two calls to regulator_disable will trigger kernel warnings.
+> > If the counter exceeds one, regulator_disable call won't disable the
+> > PSE PI. These behavior isn't suitable for PSE control.
+> > Added a boolean 'enabled' state to prevent multiple calls to =20
+>=20
+> Please rename rename "enabled" to "admin_state_enabled". This variable
+> do not reflect real device state, it reflects only user configuration.
 
-Case 1: For !CONFIG_DYNAMIC_FTRACE update of ftrace_trace_function
+Right,
 
-This config is itself expected to be slow. However seeing what it does, it is
-trying to make sure the global function pointer "ftrace_trace_function" is
-updated and any readers of that pointers would have finished reading it. I don't
-personally think preemption has to be disabled across the entirety of the
-section that calls into this function. So sensitivity to preempt disabling
-should not be relevant for this case IMO, but lets see if ftrace folks disagree
-(on CC). It has more to do with, any callers of this function pointer are no
-longer calling into the old function.
+>=20
+> ... =20
+> > @@ -120,15 +118,9 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bu=
+s,
+> >  	u32 phy_id;
+> >  	int rc;
+> > =20
+> > -	psec =3D fwnode_find_pse_control(child);
+> > -	if (IS_ERR(psec))
+> > -		return PTR_ERR(psec);
+> > -
+> >  	mii_ts =3D fwnode_find_mii_timestamper(child);
+> > -	if (IS_ERR(mii_ts)) {
+> > -		rc =3D PTR_ERR(mii_ts);
+> > -		goto clean_pse;
+> > -	}
+> > +	if (IS_ERR(mii_ts))
+> > +		return PTR_ERR(mii_ts);
+> > =20
+> >  	is_c45 =3D fwnode_device_is_compatible(child,
+> > "ethernet-phy-ieee802.3-c45"); if (is_c45 || fwnode_get_phy_id(child,
+> > &phy_id)) @@ -161,6 +153,12 @@ int fwnode_mdiobus_register_phy(struct
+> > mii_bus *bus, goto clean_phy;
+> >  	}
+> > =20
+> > +	psec =3D dev_find_pse_control(&phy->mdio.dev);
+> > +	if (IS_ERR(psec)) {
+> > +		rc =3D PTR_ERR(psec);
+> > +		goto unregister_phy;
+> > +	}
+> > + =20
+>=20
+> I do not think it is a good idea to make PSE controller depend on
+> phy->mdio.dev. The only reason why we have fwnode_find_pse_control()
+> here was the missing port abstraction.
 
-Case 2: Trampoline structures accessing
+I totally agree that having port abstraction would be more convenient.
+Maxime Chevallier is currently working on this and will post it after his
+multi-phy series get merged.
+Meanwhile, we still need a device pointer for getting the regulator. The
+phy->mdio.dev is the only one I can think of as a regulator consumer.
+Another idea?
 
-For this there is a code comment that says preemption will disabled so it should
-not be dependent on any of the preemptiblity modes, because preempt_disable()
-should disable preempt with PREEMPT_AUTO.
+> ...
+> > +static int
+> > +devm_pse_pi_regulator_register(struct pse_controller_dev *pcdev,
+> > +			       char *name, int id)
+> > +{
+> > +	struct regulator_config rconfig =3D {0};
+> > +	struct regulator_desc *rdesc;
+> > +	struct regulator_dev *rdev;
+> > +
+> > +	rdesc =3D devm_kzalloc(pcdev->dev, sizeof(*rdesc), GFP_KERNEL);
+> > +	if (!rdesc)
+> > +		return -ENOMEM;
+> > +
+> > +	/* Regulator descriptor id have to be the same as its associated
+> > +	 * PSE PI id for the well functioning of the PSE controls.
+> > +	 */
+> > +	rdesc->id =3D id;
+> > +	rdesc->name =3D name;
+> > +	rdesc->type =3D REGULATOR_CURRENT;
+> > +	rdesc->ops =3D &pse_pi_ops;
+> > +	rdesc->owner =3D pcdev->owner;
+> > +
+> > +	rconfig.dev =3D pcdev->dev;
+> > +	rconfig.driver_data =3D pcdev;
+> > +	rconfig.init_data =3D &pse_pi_initdata; =20
+>=20
+> Please add input supply to track all dependencies:
+>         if (of_property_present(np, "vin-supply"))
+> config->input_supply =3D "vin";
+>=20
+> May be better to make it not optional...
 
-		/*
-		 * We need to do a hard force of sched synchronization.
-		 * This is because we use preempt_disable() to do RCU, but
-		 * the function tracers can be called where RCU is not watching
-		 * (like before user_exit()). We can not rely on the RCU
-		 * infrastructure to do the synchronization, thus we must do it
-		 * ourselves.
-		 */
-		synchronize_rcu_tasks_rude();
-		[...]
-		ftrace_trampoline_free(ops);
+Does the "vin-supply" property be added at the pse-pi node level or the
+pse-controller node level or at the hardware port node level or the manager=
+ node
+level for the pd692x0?
+Maybe better at the pse-pi node level and each PIs of the manager will get =
+the
+same regulator?
+What do you think?
+=20
+> Should be tested, but if, instead of "vin-supply", we will use
+> "pse-supply" it will make most part of pse_regulator.c obsolete.
 
-Code comment probably needs update because it says 'can not rely on RCU..' ;-)
+Don't know, if it is done at the pse-pi node level it may not break
+pse_regulator.c. Not sure about it.
 
-My *guess* is the preempt_disable() mentioned in this case is
-ftrace_ops_trampoline() where trampoline-related datas tructures are accessed
-for stack unwinding purposes. This is a data structure protection thing AFAICS
-and nothing to do with "trampoline execution" itself which needs "Tasks RCU" to
-allow for preemption in trampolines.
+> .... =20
+> > @@ -310,6 +452,20 @@ pse_control_get_internal(struct pse_controller_dev
+> > *pcdev, unsigned int index) return ERR_PTR(-ENODEV);
+> >  	}
+> > =20
+> > +	psec->ps =3D devm_regulator_get_exclusive(dev,
+> > +
+> > rdev_get_name(pcdev->pi[index].rdev));
+> > +	if (IS_ERR(psec->ps)) {
+> > +		kfree(psec);
+> > +		return ERR_CAST(psec->ps);
+> > +	}
+> > +
+> > +	ret =3D regulator_is_enabled(psec->ps);
+> > +	if (ret < 0) {
+> > +		kfree(psec);
+> > +		return ERR_PTR(ret);
+> > +	}
+> > +	pcdev->pi[index].enabled =3D ret; =20
+>=20
+> If I see it correctly, it will prevent us to refcount a request from
+> user space. So, the runtime PM may suspend PI.
 
-Case 3: This has to do with update of function graph tracing and there is the
-same comment as case 2, where preempt will be disabled in readers, so it should
-be safe for PREEMPT_AUTO (famous last words).
+I don't think so as the regulator_get_exclusive() does the same and refcoun=
+t it:
+https://elixir.bootlin.com/linux/v6.7.8/source/drivers/regulator/core.c#L22=
+68
 
-Though I am not yet able to locate that preempt_disable() which is not an
-PREEMPT_AUTO-related issue anyway. Maybe its buried in function graph tracing
-logic somewhere?
+> > +	switch (config->c33_admin_control) {
+> > +	case ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED:
+> > +		if (!psec->pcdev->pi[psec->id].enabled)
+> > +			err =3D regulator_enable(psec->ps);
+> > +		break;
+> > +	case ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED:
+> > +		if (psec->pcdev->pi[psec->id].enabled)
+> > +			err =3D regulator_disable(psec->ps);
+> > +		break;
+> > +	default:
+> > +		err =3D -EOPNOTSUPP;
+> >  	} =20
+>=20
+> This change seems to break PoDL support
 
-Finally, my thought also was, if any of these thread usages/cases of Tasks RCU
-RUDE assume working only on a CONFIG_PREEMPT_NONE=y or
-CONFIG_PREEMPT_VOLUNTARY=y kernel, that could be worrying but AFAICS, they don't
-assume anything related to that.
+Oh that's totally true sorry for that mistake.
 
-thanks,
-
- - Joel
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
