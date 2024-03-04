@@ -1,155 +1,132 @@
-Return-Path: <netdev+bounces-77165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABF0A87053F
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 16:19:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81F05870558
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 16:23:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66FC028A1B5
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 15:19:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13839B220E7
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 15:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A63E45BF6;
-	Mon,  4 Mar 2024 15:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BBCE47A6A;
+	Mon,  4 Mar 2024 15:22:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="n6JDnEaB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tz9X1JQ3"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AE12C18D;
-	Mon,  4 Mar 2024 15:17:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5826E47A62
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 15:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709565470; cv=none; b=o9q9ybajKgB+q6RtAbtJ2CQFc8K/um1EHgeURlg8w72l43sUzRkFZ7zNmhPFFtf+byNLzBrqi35BWV1wB4m6vLUiG2+GLiXdW3gBTCaWwgagcQDyZcQ5d/gIlCD6daFBOQEXt0X2CC1wZSpEhgBwPw6+y9ZpNmS6u8LidrwKRxg=
+	t=1709565753; cv=none; b=m2xKq0BIWWKn7aIdt1SRuUVH6iUUb6hap1J0vw88t7G9eppxY9h5FDh1auG/EhR5kw1XuOljgj8TPLS11cLoPAyctmdWMV+DqOMQDSEQ07RuY606WQdIpSVWp4xzEwbWROCojPCB+vR54R1hDt4GhtQV+FrF9A9lo9ehfmfpI/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709565470; c=relaxed/simple;
-	bh=z3F2OYMszvnRIPoGc6Z6uw/DcVkCj5UXNrrtVZGh/s4=;
+	s=arc-20240116; t=1709565753; c=relaxed/simple;
+	bh=gLmLq9sNx9n01ZeImLh1aWQi0KnY0rkk/qUTDy1Ph+o=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WFpcPwApWwqKGt7/LNZtmYWCjW447LWgNzB+ZufFzmhD1G3UTxQi8JeD5OWrgiQidxEKsBKtjMqyv75BqBRyRqiqyZ8Y7e6Kva0sD8Eya4P4PTq6viDMmkvY7Kie+b++EEGFLgJvHRkjuQcByeoRRoLAZcSPUSObVCfrr5b2I38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=n6JDnEaB; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 4928787FAE;
-	Mon,  4 Mar 2024 16:17:43 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1709565465;
-	bh=SiJFFDcJ1G5N/oDqz5nfDb5RfxaofB8Dmaiikpx9tIg=;
+	 MIME-Version:Content-Type; b=Z/zJGDJ/pr8cM+Tsz3PQDMq/5zO7sax/TrejwdgJ5iqI6jxPz5ExXdvGnMaLDQufIkJ/IhNhggdlAKerz/xjvRVkKnchQdk5zTVoCfnz3B48R6viOpF0XlBvOPgaIaO4YGerRlsFQIvkiKlP0kR5JWW1IHaFglMPNJAw1cKLKkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tz9X1JQ3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5316C433F1;
+	Mon,  4 Mar 2024 15:22:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709565753;
+	bh=gLmLq9sNx9n01ZeImLh1aWQi0KnY0rkk/qUTDy1Ph+o=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=n6JDnEaBWjq1/XyKwDLyLlobhIRpkIaBTDLQGKHjJUqVTJN830/3gEVS+NkCK2Vaj
-	 91+xJVuOtkH57l81Uhsfi8OW0FeSEcchaWUVvduLvP1vC6rv7lgMNzP20MuT39xsy/
-	 xS1FGUOojm7kqVZjDDVK1iU/18FdQNTy4WVMS1yHWRlnZUYLzmU9psSoBWB/B+2Ay1
-	 F7QPte3TFIePh+CwW/oo6oqjhjyCplBXBUO5RYDywqZHrAasiW2LG3+X5MBIYdHpcJ
-	 x0zALFOm50xNwokirT2w2ROdAoXSdZvV8aGBtM446bGRjtjuootNLxx9YrSgLxr8bK
-	 gdsG2sJW+ymxA==
-Date: Mon, 4 Mar 2024 16:17:35 +0100
-From: Lukasz Majewski <lukma@denx.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Eric Dumazet
- <edumazet@google.com>, Vladimir Oltean <olteanv@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, Tristram.Ha@microchip.com, Sebastian Andrzej
- Siewior <bigeasy@linutronix.de>, Paolo Abeni <pabeni@redhat.com>, Ravi
- Gunasekaran <r-gunasekaran@ti.com>, Nikita Zhandarovich
- <n.zhandarovich@fintech.ru>, Murali Karicheri <m-karicheri2@ti.com>, Ziyang
- Xuan <william.xuanziyang@huawei.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: hsr: Use full string description when opening HSR
- network device
-Message-ID: <20240304161735.75b14548@wsk>
-In-Reply-To: <3f2fc5cb-8c79-4e8a-b72e-edcbbc78971e@lunn.ch>
-References: <20240304093220.4183179-1-lukma@denx.de>
-	<3f2fc5cb-8c79-4e8a-b72e-edcbbc78971e@lunn.ch>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	b=Tz9X1JQ3NKqZB3dTgARz/mc5cFmRskOHjPi34jJAn8O/V7cXrd2Wq6ekM9/bZerHc
+	 RNkv2Wmt/vBFx1yTMBFIHmS5rb9MrePyNEH8k8uf7DoF8URmle6mh0hK2KX0BxEU4C
+	 uPgA+9bP5b6XBOakkjXi/EFBD4NKNBS+VPu2hMK6+GOtFwTplm+QdweT2y1U2Xl2Rw
+	 e7sdFEzPGv0P90mC7Z1wIFFO5II7R68o5QKtw+XbLIb9/V43qgAiieTwiEE7aObvo+
+	 mHDv0UrzfOHQRq7uQ292rRyJw0jXvMKjzc4i+db9pdTqcoG1aVsw0VMPrynzO+g8ww
+	 iZPA9WVp0EObw==
+Date: Mon, 4 Mar 2024 07:22:31 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jacob
+ Keller <jacob.e.keller@intel.com>, Jiri Pirko <jiri@resnulli.us>, Stanislav
+ Fomichev <sdf@google.com>, donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v1 3/4] tools/net/ynl: Extend array-nest for
+ multi level nesting
+Message-ID: <20240304072231.6f21159e@kernel.org>
+In-Reply-To: <CAD4GDZwHXNM++G3xDgD_xFk1mHgxr+Bw35uJuDFG+iOchynPqw@mail.gmail.com>
+References: <20240301171431.65892-1-donald.hunter@gmail.com>
+	<20240301171431.65892-4-donald.hunter@gmail.com>
+	<20240302200536.511a5078@kernel.org>
+	<CAD4GDZwHXNM++G3xDgD_xFk1mHgxr+Bw35uJuDFG+iOchynPqw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/feukiOtbZ5tDUoJE=MvPUT/";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-
---Sig_/feukiOtbZ5tDUoJE=MvPUT/
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-Hi Andrew,
+On Sun, 3 Mar 2024 10:50:09 +0000 Donald Hunter wrote:
+> On Sun, 3 Mar 2024 at 04:05, Jakub Kicinski <kuba@kernel.org> wrote:
+> > On Fri,  1 Mar 2024 17:14:30 +0000 Donald Hunter wrote:  
+> > > The nlctrl family uses 2 levels of array nesting for policy attributes.
+> > > Add a 'nest-depth' property to genetlink-legacy and extend ynl to use
+> > > it.  
+> >
+> > Hm, I'm 90% sure we don't need this... because nlctrl is basically what
+> > the legacy level was written for, initially. The spec itself wasn't
+> > sent, because the C codegen for it was quite painful. And the Python
+> > CLI was an afterthought.
+> >
+> > Could you describe what nesting you're trying to cover here?
+> > Isn't it a type-value?  
+> 
+> I added it for getpolicy which is indexed by policy_idx and attr_idx.
+> 
+> ./tools/net/ynl/cli.py \
+>     --spec Documentation/netlink/specs/nlctrl.yaml \
+>     --dump getpolicy --json '{"family-name": "nlctrl"}'
+> [{'family-id': 16, 'op-policy': [{3: {'do': 0, 'dump': 0}}]},
+>  {'family-id': 16, 'op-policy': [{0: {'dump': 1}}]},
+>  {'family-id': 16,
+>   'policy': [{0: [{1: {'max-value-u': 65535,
+>                        'min-value-u': 0,
+>                        'type': 'u16'}}]}]},
+>  {'family-id': 16,
+>   'policy': [{0: [{2: {'max-length': 15, 'type': 'nul-string'}}]}]},
+>  {'family-id': 16,
+>   'policy': [{1: [{1: {'max-value-u': 65535,
+>                        'min-value-u': 0,
+>                        'type': 'u16'}}]}]},
+>  {'family-id': 16,
+>   'policy': [{1: [{2: {'max-length': 15, 'type': 'nul-string'}}]}]},
+>  {'family-id': 16,
+>   'policy': [{1: [{10: {'max-value-u': 4294967295,
+>                         'min-value-u': 0,
+>                         'type': 'u32'}}]}]}]
 
-> On Mon, Mar 04, 2024 at 10:32:20AM +0100, Lukasz Majewski wrote:
-> > Up till now only single character ('A' or 'B') was used to provide
-> > information of HSR slave network device status.
-> >=20
-> > As it is also possible and valid, that Interlink network device may
-> > be supported as well, the description must be more verbose. As a
-> > result the full string description is now used.
-> >=20
-> > Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> > ---
-> >  net/hsr/hsr_device.c | 13 ++++++-------
-> >  1 file changed, 6 insertions(+), 7 deletions(-)
-> >=20
-> > diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-> > index 9d71b66183da..9a60489fba96 100644
-> > --- a/net/hsr/hsr_device.c
-> > +++ b/net/hsr/hsr_device.c
-> > @@ -142,30 +142,29 @@ static int hsr_dev_open(struct net_device
-> > *dev) {
-> >  	struct hsr_priv *hsr;
-> >  	struct hsr_port *port;
-> > -	char designation;
-> > +	char *designation =3D NULL; =20
->=20
-> Thanks for splitting this into a patch.
->=20
-> Reverse Christmas tree. I know it is broken already, but we should not
-> make it worse.
->=20
-> I guess you can also add a const, since "Slave A" is probably const.
->=20
+Yeah.. look at the example I used for type-value :)
 
-Yes, "Slave A/B" would be allocated in .rodata (as it it just a string
-label).
+https://docs.kernel.org/next/userspace-api/netlink/genetlink-legacy.html#type-value
 
-const keyword added would help with the readability.=20
+> > BTW we'll also need to deal with the C codegen situation somehow.
+> > Try making it work, if it's not a simple matter of fixing up the
+> > names to match the header - we can grep nlctrl out in the Makefile.  
+> 
+> Yeah, I forgot to check codegen but saw the failures on patchwork. I
+> have fixed the names but still have a couple more things to fix.
+> 
+> BTW, this patchset was a step towards experimenting with removing the
+> hard-coded msg decoding in the Python library. Not so much for
+> genetlink families, more for the extack decoding so that I could add
+> policy attr decoding. Thinking about it some more, that might be
+> better done with a "core" spec that contains just extack-attrs and
+> policy-attrs because they don't belong to any single family - they're
+> kinda infrastructure for all families.
 
-> 	Andrew
-
-
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/feukiOtbZ5tDUoJE=MvPUT/
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmXl5g8ACgkQAR8vZIA0
-zr10bAf/W9J8h5CHGGhdey5IJgO5608R6oaCdJFoNs8kZuIWBaVVdtRQwJURCjLi
-gzj1jimxMQd0If/Ha8fqTZ1U4cIdNHM3oevkWKFAzyyhlor/jAF7m/yIKjuwhnVz
-Mo+zcf1+1nBVe0tYaHKuCAiffsVjrODDK+wWi8gBUNqW2nGmQ81v9E23YTSpdE7a
-LnkbyWprWx8VtUzMSyKbi41YIs1vQbpUfjJ/vJpvkxYntVm7ZL6O7Kb3rsGpST81
-t+Yhqs7Pdomgkj/wJLGvX3fa9LCFq/hLaPu/uIrwWXVwvMmz/KWrguOqYLcFmM4v
-mPSrHEnIrr8xmDI4WnWjq5eb1dWGdQ==
-=djua
------END PGP SIGNATURE-----
-
---Sig_/feukiOtbZ5tDUoJE=MvPUT/--
+YAML specs describe information on how to parse data YNL doesn't have
+to understand, just format correctly. The base level of netlink
+processing, applicable to all families, is a different story.
+I think hand-coding that is more than okay. The goal is not to express
+everything in YAML but to avoid duplicated work per family, if that
+makes sense.
 
