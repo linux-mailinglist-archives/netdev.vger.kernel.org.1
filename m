@@ -1,135 +1,115 @@
-Return-Path: <netdev+bounces-77172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 222C387064E
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 16:58:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEE9E870687
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 17:06:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2CB2287E97
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 15:58:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F075C1C21260
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 16:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7025947F7A;
-	Mon,  4 Mar 2024 15:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2DDC482DF;
+	Mon,  4 Mar 2024 16:06:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DKG6Dvm6"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mzHOxqSV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D025947F64
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 15:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16D85481DE;
+	Mon,  4 Mar 2024 16:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709567891; cv=none; b=SYoExcxaiVIrboJ8/MHlGjhHuIyX+bfs559e8SR9+I0/0oi8frh6htyeI3VRQwR+IXx66CUS1CsgHxodgScKliQPAaivjrMAVJ1WrRVVtPIcxkmbApaMagXzsp1g8skr8H9PFJrBHib0Vtd/N8ODFURl8/vQAEdb9Q5hCPmwqQ8=
+	t=1709568383; cv=none; b=D7wFpFnGJ20qdFAqEtlv7P+d9GsThZBiuhdmXnwD1WRp5EA+X6Mmlhn1LP3/EhmOEPOjfWPLOAHc+Z5Z3G8wZTemnm7R/TKIE4fKGpFRFQbB5OB5cwce3KXsTyr/ljUBk5RBAAztczyTuDpbh+AKkIevRcD+nYPtof/9cE7+54s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709567891; c=relaxed/simple;
-	bh=I5l6rKpK3kgfbrZ5BFEtgmZPIyOO24AwH8FwTWF53Ks=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WpdWfBFeZEnFVT6tB5d6ncpybKhcVUPW/YEXOKRhU2PBIMhIIaogO4XRvg52wtmHDnh7MkIJXr+g+zmWDZUV0sdZy4a4LQS9dbDsDFBIUITTv+JpgeTOPrpKRK+kXQAZxDOIJfPUv7j7+yGuJbREz0fY1A5MqoSf/OcIBwIvLjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DKG6Dvm6; arc=none smtp.client-ip=209.85.160.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-21f0c82e97fso2963205fac.2
-        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 07:58:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709567889; x=1710172689; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=zZYNKRnPdoZ1tECIeldEpTFG1oSq/BwaY6MeaDVPUQs=;
-        b=DKG6Dvm6krVuXX9GKGiO0Ly0HQps+5GWN0vzwwjsbXLWjN8fKc8Jd5fdFwcHk0+5BB
-         TSJKaGf6zdvDs/PY/ykV1x8bIbxX5KZwwyEu56c+z9/bUbHhCm/W0NOc8wSEl23pDeiV
-         RqVw5s0dUCtdU1jqX79vmWUenQWxjZJPbxAE2vlqk9909IWQXsCakfzrprgJp8DYIQ6P
-         VSKi4C49gogVJ+DU7av3hu92bNmUtBKsgpHrqW4QaS/VHVFHVmWyVmmSCkvSzQ7gMzHH
-         hnGxcxdF4Ds8GbxdIoHaz8E6ti52io3AjbvyKroc5UfdKo7dMCns6iY2Vk/TNBotWhq5
-         B1QQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709567889; x=1710172689;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zZYNKRnPdoZ1tECIeldEpTFG1oSq/BwaY6MeaDVPUQs=;
-        b=v9AumAzbO7rAG28PAhjLtLyHCckl1juKWVg3xGCdi7riMPi3KY2OroYGovCha8KW/j
-         QTQQ1oUpyKwq+EtsF3OazYdzHIjE1iml1iy6/MDkJaGkO+fb+px7aWPWHmPMWbPVOtiw
-         r4uKwUavY8Mge/zhZDa0ckLXjnWNXbsrwl3TyVGUahJDEpqvgaqsLNxg4/ob3gQuP/uj
-         7xMNC0SYTJG8+WQSJNfd6r6L+34zEHj2yvX0K5bVaShVo7RXjwPYJqHWWe4FbhfkhSAx
-         PaoJlAe/uJFGvK/77lJEzXs6wEbRLNXaWj3SqaWByJhYjpSxXwG7WiaCVlfvNv/dBzgN
-         esGw==
-X-Forwarded-Encrypted: i=1; AJvYcCXV/B5Is/dwXmZom5wSyBuo2jXxxAM3EKfTVIHry8iRs+F1BL7U1x2BLcOhsipUONfGHUyqWOmWLEU9lnumfm1fKK7chEik
-X-Gm-Message-State: AOJu0YztIeKmh26x5E04K14uxm9e2KruVMOwnhiSUPo8rojaMDcVEPiX
-	bj2A+ZzmSC2B1thCjEL1lPOJumQj/NyR9hl/GqeW68QnTeRXn1poKYYKRxSAQOTUwnyBFhjBgAQ
-	5Yga9K7YBeMoYED4ihcRwmc3cm+w=
-X-Google-Smtp-Source: AGHT+IG4y+7UGMGGHm1W64QtQF8CGwyPNG/Kd2NhJAqCSw/lEbCOjbai94JiDU0hT5wBnb2YUqJTjKMssa+CebwfDbo=
-X-Received: by 2002:a05:6870:7885:b0:21f:d4ee:ae01 with SMTP id
- hc5-20020a056870788500b0021fd4eeae01mr12940919oab.18.1709567888796; Mon, 04
- Mar 2024 07:58:08 -0800 (PST)
+	s=arc-20240116; t=1709568383; c=relaxed/simple;
+	bh=AlNDwPISgBcM6OVPgM4WaoPIp68689qJHcWCy+OYqyk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BpOvEWSpQPoe9/JzQY4AKNkVpmlAF8KFEY5FzVEFPtRw1H5QuLWewF8Qs0ogeiYrxQ3s6sqML9N9KYI4L3I6CWZjNy1RBSMNGCdStTcLAKl5hPAFLLLHWcWJTzdEylxlwS/A7ui3iGjO2Hv0R6EgmiInl3BoT1yhhbV/8VnKLBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mzHOxqSV; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8ESWzfwNLBdRiQerL5+aFQnFwsh7Ey/Kqyb4OBW7amg=; b=mzHOxqSVyQhSjRX4F5gBr6b//K
+	Z13FzT+KYEs/6y4GhaVF3Cxf3GvoUDAwYIFi2bOvk03KYDyQnzQog1PBU94N/pl4HYEfz9hQ9GMFa
+	g8UhNBtV7mfJ7oeTgjJr/9+0RaPwlq+vn3lEdEe2qlfmBEK9SOggUO/STE6swk31S/5U=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rhApo-009LBC-Gj; Mon, 04 Mar 2024 17:06:36 +0100
+Date: Mon, 4 Mar 2024 17:06:36 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?J=E9r=E9mie?= Dautheribes <jeremie.dautheribes@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, Andrew Davis <afd@ti.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	=?iso-8859-1?Q?Miqu=E8l?= Raynal <miquel.raynal@bootlin.com>,
+	Yen-Mei Goh <yen-mei.goh@keysight.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next 1/3] dt-bindings: net: dp83822: support
+ configuring RMII master/slave mode
+Message-ID: <d994001c-dff2-402d-bd19-7ddb0c148805@lunn.ch>
+References: <20240222103117.526955-1-jeremie.dautheribes@bootlin.com>
+ <20240222103117.526955-2-jeremie.dautheribes@bootlin.com>
+ <d14ba685-dc7e-4f99-a21e-bae9f3e6bc79@lunn.ch>
+ <860648fa-11f5-4e0d-ac4e-e81ea111ef31@bootlin.com>
+ <68112ecb-532f-4799-912d-16d6ceb9a6f3@lunn.ch>
+ <021dbe50-5eb9-4552-b2bb-80d58d3eb076@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240301230542.116823-1-kuba@kernel.org> <20240301230542.116823-3-kuba@kernel.org>
- <CAD4GDZzkVJackAf2yhG1E5vypd2J=n23HD5Huu356JK1F1oLKA@mail.gmail.com> <20240304065823.258dfabf@kernel.org>
-In-Reply-To: <20240304065823.258dfabf@kernel.org>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Mon, 4 Mar 2024 15:57:57 +0000
-Message-ID: <CAD4GDZzZrJATP9qTe235RYytfAEm+ByeucR11g+ixWMXvGnVQQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/4] tools: ynl: allow setting recv() size
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, jiri@resnulli.us
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <021dbe50-5eb9-4552-b2bb-80d58d3eb076@bootlin.com>
 
-On Mon, 4 Mar 2024 at 14:58, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Mon, 4 Mar 2024 13:38:51 +0000 Donald Hunter wrote:
-> > >  class YnlFamily(SpecFamily):
-> > > -    def __init__(self, def_path, schema=None, process_unknown=False):
-> > > +    def __init__(self, def_path, schema=None, process_unknown=False,
-> > > +                 recv_size=131072):
-> >
-> > An aside: what is the reason for choosing a 128k receive buffer? If I
-> > remember correctly, netlink messages are capped at 32k.
->
-> Attributes, not messages, right? But large messages are relatively
-> rare, this is to make dump use fewer syscalls. Dump can give us multiple
-> message on each recv().
+> > We are normally interested in this 50Mhz reference clock. So i would
+> > drop all references to 25Mhz. It is not relevant to the binding, since
+> > it is nothing to do with connecting the PHY to the MAC, and it has a
+> > fixed value.
+> > 
+> > So you can simplify this down to:
+> > 
+> > RMII Master: Outputs a 50Mhz Reference clock which can be connected to the MAC.
+> > 
+> > RMII Slave: Expects a 50MHz Reference clock input, shared with the
+> > MAC.
+> > 
+> > > That said, would you like me to include this description (or some parts) in
+> > > the binding in addition to what I've already written? Or would you prefer me
+> > > to use a more meaningful property name?
+> > 
+> > We don't really have any vendor agnostic consistent naming. dp83867
+> > and dp83869 seems to call this ti,clk-output-sel. Since this is
+> > another dp83xxx device, it would be nice if there was consistency
+> > between all these TI devices. So could you check if the concept is the
+> > same, and if so, change dp83826 to follow what other TI devices do.
+> 
+> 
+> So I had a look at this ti,clk-output-sel property on the TI DP8386x
+> bindings, but unfortunately it does not correspond to our use case. In their
+> case, it is used to select one of the various internal clocks to output on
+> the CLK_OUT pin.
+> In our case, we would prefer to describe the direction of the clock (OUT in
+> master mode, IN in slave mode).
 
-I did mean messages:
+I would suggest we keep with the current property name, but simplify
+the description. Focus on the reference clock, and ignore the crystal.
 
-https://elixir.bootlin.com/linux/latest/source/net/netlink/af_netlink.c#L1958
-
-For rt_link I see ~21 messages per recv():
-
-./tools/net/ynl/cli.py \
-    --spec Documentation/netlink/specs/rt_link.yaml \
-    --dump getlink --dbg-small-recv 131072 > /dev/null
-Recv: read 3260 bytes, 2 messages
-   nl_len = 1432 (1416) nl_flags = 0x2 nl_type = 16
-   nl_len = 1828 (1812) nl_flags = 0x2 nl_type = 16
-Recv: read 31180 bytes, 21 messages
-...
-Recv: read 31712 bytes, 22 messages
-...
-
-> > >          super().__init__(def_path, schema)
-> > >
-> > >          self.include_raw = False
-> > > @@ -423,6 +428,16 @@ genl_family_name_to_id = None
-> > >          self.async_msg_ids = set()
-> > >          self.async_msg_queue = []
-> > >
-> > > +        # Note that netlink will use conservative (min) message size for
-> > > +        # the first dump recv() on the socket, our setting will only matter
-> >
-> > I'm curious, why does it behave like this?
->
-> Dump is initiated inside a send() system call, so that we can
-> validate arguments and return any init errors directly.
-> That means we don't know what buf size will be used by subsequent
-> recv()s when we produce the first message :(
-
-Ah, makes sense.
+    Andrew
 
