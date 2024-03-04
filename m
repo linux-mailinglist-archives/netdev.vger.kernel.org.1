@@ -1,153 +1,113 @@
-Return-Path: <netdev+bounces-76974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DA8486FBBB
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:22:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BD8E86FBC2
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:23:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3592282360
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 08:22:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C3E5B21E1C
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 08:23:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68DED17BC7;
-	Mon,  4 Mar 2024 08:21:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37EC17583;
+	Mon,  4 Mar 2024 08:22:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cwEJQ/Kz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y/VsbF9A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F283218E10;
-	Mon,  4 Mar 2024 08:21:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF6317589
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 08:22:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709540490; cv=none; b=W1KsBxLOoOaMRxWekEs2L6z0T7R6eihR/wh6BpTs6c19THXBLtgFAXiLm8bd3RLr7gj7vwaU4A9vGjp+uBCoEaoYDLvBDlw0f/x30/6vqw5YaWi1FYw9tXeOBLY+2i1l8ShhXMtdypi+mRdgcCHIIkH97DrW9/LCFAlLftLJ7/A=
+	t=1709540526; cv=none; b=dudiJw8u13lZZ4NOYZE/6NrpKm5XQj2Vc5lyYRvZEl0BacmNss0iVlvt+kMqxPxrLGTRwBdpsxDlwAbft1wrQSfGExCv3GvEZnBfHP1FW4rjckMMr5RDN4xZI1CDioqSwIz5KEe/VlFkIdlrd3IlLI1kPv7r6Bno7OiGX7EWPtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709540490; c=relaxed/simple;
-	bh=iUd1+h9Zu2i16qT9+q3U3uxvtz4TxEhADLcr/8i2Ues=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Hdk2M0AijSKXX40KMNa6JbfB6lzrrKaD6ZAy8UqPRRsA4AWuba1pmZLhyTS1JGNfV333Jw88JlQeOUaBei73PI06v7JTEQfC48TboFniqEYOnO3mJH1PphqbqTZBs6Fgx7o1E9jyq8nbhWbPBoppxE9bSJatg/EV0mV7POwTGA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cwEJQ/Kz; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1dc418fa351so37844715ad.1;
-        Mon, 04 Mar 2024 00:21:28 -0800 (PST)
+	s=arc-20240116; t=1709540526; c=relaxed/simple;
+	bh=EoyygbLnI6vV+Uw7w1G/Xr29iq0XsQRIh4eFJ1Yd/oE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IqUTMJX5uXGsDFxhjJHJS3MBqnT0VgYn4rCPACptXHEBeJGxZe/8/SGoocZmkdIumeQoadt8jjUc0ADNrVqj+e5lv8H3Hc/E3wjtArMCVSZbvRwv8+rHDTWhIIdwcmGtXU0j50LUAEOKn4+MlsPJb55C+ZvKh3d+usVXOBfO2uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y/VsbF9A; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-566b160f6eeso21825a12.1
+        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 00:22:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709540488; x=1710145288; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1709540523; x=1710145323; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VZFq0Za5EFtHyYLLbHcoR4yWS/R5Nw5TqGrWr6tkvzI=;
-        b=cwEJQ/KzjnL0ZJhT4N1ZEcqEHjg69ARj3DeoCwTd8zlNJCDVLnZzC2LmjnUJHMtmwV
-         vmJabjZlJV0b5Ol4YNOtYtxnkkDHeT6y2kbl0knx3rgqJb0gicmUaqClafjRmTPor6Ad
-         Ljco42Bfgn38ros+TDGbjGXRcicU+e9mtowc8qv8qNzLufVLITCLdel0AxXBwNxHK3vp
-         +K/7OTNZAcCDqDMksSJRM8j1TIamKOIIGnwhVasDdf/8j7jfz3V5FfJLLCpRX4cBtqNL
-         vKO/0gUs9CUFbYS9YCQMgwAZAhRG3W7DGnU6uG9xZGicHOZKkfwTFjJQmqcgm8kD1jqJ
-         QB+w==
+        bh=EoyygbLnI6vV+Uw7w1G/Xr29iq0XsQRIh4eFJ1Yd/oE=;
+        b=Y/VsbF9A20ihAkwV8YKT3c/nx5nd59ScEMev+9d154lp71rI4A8qDgt9z3YNmPTnzO
+         o/bIl3trMlhXfFjKIbM2F7Clrb3qenuWSMTsG0SrSlfY6n97zqfdz7D4wHLTXP4fvdev
+         L9zBI3epAjzJXtAuw1hJEOSonunXv+mxPinRiNK+Ce5aNsYmyVuPyuPJ4M6Vu4Co8b6E
+         PW28UYTXrMo03YeXn4hYuDaO5TVSub+EkWAaUBBWurX5omeSjrGjlSp6u3vQYgHA3DCn
+         7DXPjqVXClE4RePbvZX/ekm7BXUcjUYFX4XRMHcqvN5Xce+Tna1S38PUU+4BnU9oKgTy
+         rSfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709540488; x=1710145288;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1709540523; x=1710145323;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VZFq0Za5EFtHyYLLbHcoR4yWS/R5Nw5TqGrWr6tkvzI=;
-        b=P9G4MWfRyJ9HwZYsPWoVVi6JCTxsjG35bVHsll+kXeFZ8P9yZWG5AWb9vaw8wEDz6Q
-         nKK3YurCShrDzSrWWznXZNB8uZUr5dfOL1iHmRA5t9da8jYMdYc/93nG51NIoD9JUqbQ
-         IebpFiTEJDZTQzJG0qL7yXAaAt8SeT9L6Uh9NG1/VsegB+FjLTNIwhQmuYtzTr1w6+gO
-         Ja90Q/uJ5ewxsRqZ4CErBQS9tjU+U9lExBbQIz0zwGjj/G4SgFI1D/Z9w4LTFnyY1Yqh
-         foVmhiEw3bu1MDJzagsdQdqSoViMjbYVARHDEDs9I5ul3FjcQHGGSvqwO8x95Jt3swxp
-         ZMXg==
-X-Forwarded-Encrypted: i=1; AJvYcCX4NjUtmxlbrtW6TLF2KU9KaPoXmcHrNQsBkhIiUrtGj4Dkfbt21vlGz7whgy7oee9cHdBm3IqblGZH6PwZl8jQ4WuZfBUD
-X-Gm-Message-State: AOJu0YwUiI2ICQpTm5FefEcH0D7jzjTgjBp7erM6UtA/jGkyqIoxmBve
-	Gv7PGDKHg/ynUWnyUHTCYufmengJ0d4rFqBzQPfNkWOXLr7j6J52
-X-Google-Smtp-Source: AGHT+IGS37CSlS05KVWi+6sDThEBhGRc6petPQNRDWBCTCRqWuOk6N+fdjWBmO5nIgoAeNSu6PDjsA==
-X-Received: by 2002:a17:902:f944:b0:1db:fc18:2da5 with SMTP id kx4-20020a170902f94400b001dbfc182da5mr11851000plb.30.1709540488419;
-        Mon, 04 Mar 2024 00:21:28 -0800 (PST)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.21])
-        by smtp.gmail.com with ESMTPSA id j12-20020a170902c3cc00b001dca9a6fdf1sm7897014plj.183.2024.03.04.00.21.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Mar 2024 00:21:27 -0800 (PST)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: ralf@linux-mips.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-hams@vger.kernel.org,
-	netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net 12/12] netrom: Fix data-races around sysctl_net_busy_read
-Date: Mon,  4 Mar 2024 16:20:46 +0800
-Message-Id: <20240304082046.64977-13-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240304082046.64977-1-kerneljasonxing@gmail.com>
-References: <20240304082046.64977-1-kerneljasonxing@gmail.com>
+        bh=EoyygbLnI6vV+Uw7w1G/Xr29iq0XsQRIh4eFJ1Yd/oE=;
+        b=fJEKms0kv5tcUhAx3OxI/sgxsdk+eZKh79B83XZD1hUp2kiu7Ae3RBhkF+PeHnPHid
+         ICMYEpN4OEei5UL6hYtM2QsjrOJNweWECnQQBMZAWDj0nhLpeV/iiGtLIS7Ho8k5a/mx
+         arUgRkHcDD7evBZOcU4HX8DSECZdTCoORgHy+EDEKhRnKbErdckUbq3Grvso+bWw68a/
+         l3PD+3QPd1LgsU8k5ekwIPDsaRH+mUx8kRZoSExwyy6C7E6U0ZdRW/9QeIG5t0tsX+4s
+         smxkNDcrrgOP48//f73WhYVobTeL6Ryh1dRwcYUXoSH+z4qwCMYO8wk+YHrBjXulqtMJ
+         /VKA==
+X-Forwarded-Encrypted: i=1; AJvYcCXavccUKN2WR8j3hcMkADvzs/xqx9PWFM0yodZ3lVmV5pdvXcZ6lz6wNj/T/L8NILLUIvdbac52bKeq0GqhYvyWV0zf1nCd
+X-Gm-Message-State: AOJu0YzzfUe+Q+G0Yi4dPlde8fPH/lFL8jC5XZgH8ackP4XfTAtmui+Q
+	U+3Lu7g0Z/tFDB8oy6pqqAvi8K01df6wCpeUTqhQhuehO91Pf7eLekaJupMH0ZDvp+3JQR/NvsB
+	2Owqz3aXb81OL/BCBACxJ8GdeMfBLaM3R/CIQ
+X-Google-Smtp-Source: AGHT+IHIYRhnnjPqqmA79sgEwxplLI7CJumeOF9au9GyycW28mXDL31rveCzHd+JVDxCrDIYk4Vm2YGD+UM4CRz+Dh8=
+X-Received: by 2002:a05:6402:291:b0:566:b5f5:48cc with SMTP id
+ l17-20020a056402029100b00566b5f548ccmr295449edv.5.1709540523254; Mon, 04 Mar
+ 2024 00:22:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240229170956.87290-1-kerneljasonxing@gmail.com> <CAL+tcoBJy4a_wBQbwmvWZWZP7mwaby3xHy+45x-PTEbHsGAH6A@mail.gmail.com>
+In-Reply-To: <CAL+tcoBJy4a_wBQbwmvWZWZP7mwaby3xHy+45x-PTEbHsGAH6A@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 4 Mar 2024 09:21:51 +0100
+Message-ID: <CANn89iJPZ-B5yQeNbgxeW94OSL1XTacLgfbJTu8janT8qjWSvQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/2] add two missing addresses when using trace
+To: Jason Xing <kerneljasonxing@gmail.com>, Alexei Starovoitov <ast@kernel.org>
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com, rostedt@goodmis.org, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jason Xing <kernelxing@tencent.com>
+On Mon, Mar 4, 2024 at 8:01=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.co=
+m> wrote:
+>
+> On Fri, Mar 1, 2024 at 1:10=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
+com> wrote:
+> >
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > When I reviewed other people's patch [1], I noticed that similar thing
+> > also happens in tcp_event_skb class and tcp_event_sk_skb class. They
+> > don't print those two addrs of skb/sk which already exist.
+> >
+> > They are probably forgotten by the original authors, so this time I
+> > finish the work. Also, adding more trace about the socket/skb addr can
+> > help us sometime even though the chance is minor.
+> >
+> > I don't consider it is a bug, thus I chose to target net-next tree.
+>
+> Gentle ping...No rush. Just in case this simple patchset was lost for
+> some reason.
 
-We need to protect the reader reading the sysctl value because the
-value can be changed concurrently.
+This was a conscious choice I think.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- net/netrom/af_netrom.c | 2 +-
- net/netrom/nr_in.c     | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/net/netrom/af_netrom.c b/net/netrom/af_netrom.c
-index 1671be042ffe..104a80b75477 100644
---- a/net/netrom/af_netrom.c
-+++ b/net/netrom/af_netrom.c
-@@ -954,7 +954,7 @@ int nr_rx_frame(struct sk_buff *skb, struct net_device *dev)
- 		 * G8PZT's Xrouter which is sending packets with command type 7
- 		 * as an extension of the protocol.
- 		 */
--		if (sysctl_netrom_reset_circuit &&
-+		if (READ_ONCE(sysctl_netrom_reset_circuit) &&
- 		    (frametype != NR_RESET || flags != 0))
- 			nr_transmit_reset(skb, 1);
- 
-diff --git a/net/netrom/nr_in.c b/net/netrom/nr_in.c
-index 2f084b6f69d7..97944db6b5ac 100644
---- a/net/netrom/nr_in.c
-+++ b/net/netrom/nr_in.c
-@@ -97,7 +97,7 @@ static int nr_state1_machine(struct sock *sk, struct sk_buff *skb,
- 		break;
- 
- 	case NR_RESET:
--		if (sysctl_netrom_reset_circuit)
-+		if (READ_ONCE(sysctl_netrom_reset_circuit))
- 			nr_disconnect(sk, ECONNRESET);
- 		break;
- 
-@@ -128,7 +128,7 @@ static int nr_state2_machine(struct sock *sk, struct sk_buff *skb,
- 		break;
- 
- 	case NR_RESET:
--		if (sysctl_netrom_reset_circuit)
-+		if (READ_ONCE(sysctl_netrom_reset_circuit))
- 			nr_disconnect(sk, ECONNRESET);
- 		break;
- 
-@@ -262,7 +262,7 @@ static int nr_state3_machine(struct sock *sk, struct sk_buff *skb, int frametype
- 		break;
- 
- 	case NR_RESET:
--		if (sysctl_netrom_reset_circuit)
-+		if (READ_ONCE(sysctl_netrom_reset_circuit))
- 			nr_disconnect(sk, ECONNRESET);
- 		break;
- 
--- 
-2.37.3
-
+https://yhbt.net/lore/all/20171010173821.6djxyvrggvaivqec@ast-mbp.dhcp.thef=
+acebook.com/
 
