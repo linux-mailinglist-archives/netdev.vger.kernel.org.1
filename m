@@ -1,120 +1,231 @@
-Return-Path: <netdev+bounces-76979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B4C486FBED
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:32:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0425286FC17
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:43:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6586B21C80
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 08:31:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE8E8282B84
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 08:43:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8526218E14;
-	Mon,  4 Mar 2024 08:31:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0491B598;
+	Mon,  4 Mar 2024 08:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cT14GLak"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f05vvqjL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58EE182C7;
-	Mon,  4 Mar 2024 08:31:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280E81B273
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 08:43:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709541116; cv=none; b=ANbHEuBw12Bjbin3ajpW82dUAeTQu79DBalNnOF2s0di+z9CviJIxuAboKToNURrTljG1QAD6mgyFBkfJVbMBdJUXGXTHlRrYFoFUyutWU1wQdd+/TNXOfH8Qneg6iwX5AFUf5zM/3sJgjYvVKHPeWcCWkZkmaHqg5Pb5NKCoOY=
+	t=1709541815; cv=none; b=s6KBxz1pTpb1MKoQEzLOKjvCZKbnQqfET+Coy6nqCbY108FUiSGlLSlgrX+cB/17bCMluLjn2ntRNpbh3HIadroq9e/eJ8q0o36V7HgVyUKIl9yepI2/O8DaZxC0x1XrcOLnBA6jl2ewLHfseqJMO4g8cBGYbcBnE8wnCxrIEG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709541116; c=relaxed/simple;
-	bh=ZOwa8Z7GGncP2Db0DiRMjZf/egFZkRQsVqMtf43WGvE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ELhXNtI4LMzhQ3bmSF7Mk0ydejISLie0Oi4+o0qzyLFDN1rNdtyMZPEYkzBh6lyJ+mxl//QEAKrPW0STLxEGiA3stUFJDdXF37GA5hBUhppELy16fGoXFY2i4bzPZCevbSFIaHT+SngPJqvk+ysIeouYNrdDh5ES8o8czzrdcMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cT14GLak; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a44e3176120so161622066b.1;
-        Mon, 04 Mar 2024 00:31:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709541113; x=1710145913; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZOwa8Z7GGncP2Db0DiRMjZf/egFZkRQsVqMtf43WGvE=;
-        b=cT14GLakVbo4gvPnB61623dYKC99vF5HqfFjUyA5nNaCM3/uKDaXfNmKSIvwzAEiZc
-         hx/4oSQ5RL/AWgQK9ijuJxEyE2yTIgQrPoZ+6nEdzWeItcZAdPDobVzjORucPCcpcCTk
-         69PNPw7JXuwirx9XSXT0qNoklmG1fzLgEHzWJxvkXrWONW65Wz2S3hfXIt7b8IfXmOeV
-         J9UYiKDhkx4qG545/kwY3Y0nZvnlVkfUEJMV4vCezbIk3myXhbmYQ8/RWHpQbGgX+5qG
-         FWdyQHfc2auieQHqrfyjvVbBUtuQ3CtMmWnZq2mmTwUo6rweJwsqOfpmGx9FkwHxjM1w
-         UE2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709541113; x=1710145913;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZOwa8Z7GGncP2Db0DiRMjZf/egFZkRQsVqMtf43WGvE=;
-        b=RDUxX0gmCsg2ByvbrgG4yHRzXhamsXLoSSAoyg4KhQDuVJd8ZOc46PJh92ecU5QXF2
-         3rXPginZhEnML2L81kYgQZoFLDMWjyoKVmNlkNjEnlkKqWicfMOuiuoCgcds+T2wQ6hT
-         3TeDs4BUEYqSrmPlq7WX3PRAgEdk+6gfdh3t+JLSAkJtupO4YxvOKKP2AKqrLpUe34Kd
-         nB0hSScOSY1yR9bcF06NwtQgNSwZIBG9a/xUruEkFy+n7soHRwojXbtDI/c8DUNLaBfn
-         0Ay6tbFeweiiEthKpw/75k1G3tcX8H8NkqZMbppwoAqv7WfsOLxTZ4Pp5rlroMXpIn6j
-         FkIw==
-X-Forwarded-Encrypted: i=1; AJvYcCW1zlqRx0BmLrfE1ZvO1gQVcgKIrjPQpn+80iARoBnvFRmxmJ76Swrd1/i78K7DZGj3QTw8bsyXwsnwEfexf6BWQGxWdOahfKYkD/RausEMS4AEHsSwBmCeaOob6qHjYM0sSpgWMwk4WFm6
-X-Gm-Message-State: AOJu0Ywt7O7KmbzgQX7QzKLSur8yO9Yy7MUQ0u3M9VyikgydSUMnzGFT
-	StMleaGsh9ifJ5whpQohSlIpFuedL72Fhoc3QppB08oyR9zyH5UvO2Grl85l9ILVOwUhTb6DTUh
-	wePRg0q1niT3ZPjg5CkVV+T1uoUQ=
-X-Google-Smtp-Source: AGHT+IGarN2zv2XSX/B+JgY/zICtoDmmXH4CWrWNILQD1p+GfoRNpqa5lQjZCpLQ42QpBZK0HrIIScGEJFh1CcLq0eU=
-X-Received: by 2002:a17:906:c446:b0:a3d:7532:15ad with SMTP id
- ck6-20020a170906c44600b00a3d753215admr5626408ejb.39.1709541113064; Mon, 04
- Mar 2024 00:31:53 -0800 (PST)
+	s=arc-20240116; t=1709541815; c=relaxed/simple;
+	bh=2a8e9yJluIei1FwA1D+jyuquzMDivOTglLd0lRW8Pvc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AAQ/EihlYHKhE45O1W1c33/hlr3QFwaThSdT4RSP4uLcPbllOHl4nOC91QltkwTF/JBXZHahOTNO3uyJACuvR//2REVRodz9tzqcqgWiQXff3Ba87r4tBe2t3bXdyGCaMfCuu2fxyPx14TQFuhKnzWOyhDet3ebTeVBSuNJa54o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f05vvqjL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709541810;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=i8LrRtiDs1LrFKu4I7wcrqf4WPdyvx0Cz5wdMs5DYrM=;
+	b=f05vvqjLrnbnfpfjgA8f9li5jgp3mtoBqTjbDSMU8PEJas3964gNVwMm03VBMTuBQuQf3Z
+	FOV5w0eRzFFfKZv4ZVqKjlAxKsS92B/JhTiZ51lX/DObmH1I5jLpVlOECNX3059i4j1MyR
+	Aju61QjLSCGr/T6J5DJe5qnlZaI6JRM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-168-sMGjttG8PI-cjTth81S1yQ-1; Mon, 04 Mar 2024 03:43:26 -0500
+X-MC-Unique: sMGjttG8PI-cjTth81S1yQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2ED8C85A58F;
+	Mon,  4 Mar 2024 08:43:26 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.114])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0B90EF96F8;
+	Mon,  4 Mar 2024 08:43:24 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 00/21] rxrpc: Miscellaneous changes and make use of MSG_SPLICE_PAGES
+Date: Mon,  4 Mar 2024 08:42:57 +0000
+Message-ID: <20240304084322.705539-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240229170956.87290-1-kerneljasonxing@gmail.com>
- <20240229170956.87290-2-kerneljasonxing@gmail.com> <CANn89iJcScraKAUk1GzZFoOO20RtC9iXpiJ4LSOWT5RUAC_QQA@mail.gmail.com>
-In-Reply-To: <CANn89iJcScraKAUk1GzZFoOO20RtC9iXpiJ4LSOWT5RUAC_QQA@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 4 Mar 2024 16:31:16 +0800
-Message-ID: <CAL+tcoCuyW+f2C_U0sgN=RmtjcbbaUVqpO--WZTzs_rsVWdGKw@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] tcp: add tracing of skb/skaddr in
- tcp_event_sk_skb class
-To: Eric Dumazet <edumazet@google.com>
-Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com, rostedt@goodmis.org, 
-	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>, Alexei Starovoitov <ast@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-On Mon, Mar 4, 2024 at 4:24=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Thu, Feb 29, 2024 at 6:10=E2=80=AFPM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
-> >
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Prio to this patch, the trace function doesn't print addresses
-> > which might be forgotten. As we can see, it already fetches
-> > those, use it directly and it will print like below:
-> >
-> > ...tcp_retransmit_skb: skbaddr=3DXXX skaddr=3DXXX family=3DAF_INET...
->
-> It was not forgotten, but a recommendation from Alexei
->
-> https://yhbt.net/lore/all/20171010173821.6djxyvrggvaivqec@ast-mbp.dhcp.th=
-efacebook.com/
+Here are some changes to AF_RXRPC:
 
-Thanks, Eric.
+ (1) Cache the transmission serial number of ACK and DATA packets in the
+     rxrpc_txbuf struct and log this in the retransmit tracepoint.
 
-Oh, good to see the old threads. I have to change the description. The
-other reason why I chose to add address messages is we do have some
-useful information when using trace ss another thread[1] does: it also
-ships the trace with address printing.
+ (2) Don't use atomics on rxrpc_txbuf::flags[*] and cache the intended wire
+     header flags there too to avoid duplication.
 
-[1]: https://lore.kernel.org/netdev/20240304034632.GA21357@didi-ThinkCentre=
--M920t-N000/
+ (3) Cache the wire checksum in rxrpc_txbuf to make it easier to create
+     jumbo packets in future (which will require altering the wire header
+     to a jumbo header and restoring it back again for retransmission).
 
-Thanks,
-Jason
+ (4) Fix the protocol names in the wire ACK trailer struct.
+
+ (5) Strip all the barriers and atomics out of the call timer tracking[*].
+
+ (6) Remove atomic handling from call->tx_transmitted and
+     call->acks_prev_seq[*].
+
+ (7) Don't bother resetting the DF flag after UDP packet transmission.  To
+     change it, we now call directly into UDP code, so it's quick just to
+     set it every time.
+
+ (8) Merge together the DF/non-DF branches of the DATA transmission to
+     reduce duplication in the code.
+
+ (9) Add a kvec array into rxrpc_txbuf and start moving things over to it.
+     This paves the way for using page frags.
+
+(10) Split (sub)packet preparation and timestamping out of the DATA
+     transmission function.  This helps pave the way for future jumbo
+     packet generation.
+
+(11) In rxkad, don't pick values out of the wire header stored in
+     rxrpc_txbuf, buf rather find them elsewhere so we can remove the wire
+     header from there.
+
+(12) Move rxrpc_send_ACK() to output.c so that it can be merged with
+     rxrpc_send_ack_packet().
+
+(13) Use rxrpc_txbuf::kvec[0] to access the wire header for the packet
+     rather than directly accessing the copy in rxrpc_txbuf.  This will
+     allow that to be removed to a page frag.
+
+(14) Switch from keeping the transmission buffers in rxrpc_txbuf allocated
+     in the slab to allocating them using page fragment allocators.  There
+     are separate allocators for DATA packets (which persist for a while)
+     and control packets (which are discarded immediately).
+
+     We can then turn on MSG_SPLICE_PAGES when transmitting DATA and ACK
+     packets.
+
+     We can also get rid of the RCU cleanup on rxrpc_txbufs, preferring
+     instead to release the page frags as soon as possible.
+
+(15) Parse received packets before handling timeouts as the former may
+     reset the latter.
+
+(16) Make sure we don't retransmit DATA packets after all the packets have
+     been ACK'd.
+
+(17) Differentiate traces for PING ACK transmission.
+
+(18) Switch to keeping timeouts as ktime_t rather than a number of jiffies
+     as the latter is too coarse a granularity.  Only set the call timer at
+     the end of the call event function from the aggregate of all the
+     timeouts, thereby reducing the number of timer calls made.  In future,
+     it might be possible to reduce the number of timers from one per call
+     to one per I/O thread and to use a high-precision timer.
+
+(19) Record RTT probes after successful transmission rather than recording
+     it before and then cancelling it after if unsuccessful[*].  This
+     allows a number of calls to get the current time to be removed.
+
+(20) Clean up the resend algorithm as there's now no need to walk the
+     transmission buffer under lock[*].  DATA packets can be retransmitted
+     as soon as they're found rather than being queued up and transmitted
+     when the locked is dropped.
+
+(21) When initially parsing a received ACK packet, extract some of the
+     fields from the ack info to the skbuff private data.  This makes it
+     easier to do path MTU discovery in the future when the call to which a
+     PING RESPONSE ACK refers has been deallocated.
+
+
+[*] Possible with the move of almost all code from softirq context to the
+    I/O thread.
+
+The patches are tagged here:
+
+	git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/rxrpc-iothread-20240304
+
+And can be found on this branch:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-iothread
+
+David
+
+Link: https://lore.kernel.org/r/20240301163807.385573-1-dhowells@redhat.com/ # v1
+
+Changes
+=======
+ver #2)
+ - Removed an unused variable.
+ - Use ktime_to_us() rather than dividing a ktime by 1000 in tracepoints.
+
+David Howells (21):
+  rxrpc: Record the Tx serial in the rxrpc_txbuf and retransmit trace
+  rxrpc: Convert rxrpc_txbuf::flags into a mask and don't use atomics
+  rxrpc: Note cksum in txbuf
+  rxrpc: Fix the names of the fields in the ACK trailer struct
+  rxrpc: Strip barriers and atomics off of timer tracking
+  rxrpc: Remove atomic handling on some fields only used in I/O thread
+  rxrpc: Do lazy DF flag resetting
+  rxrpc: Merge together DF/non-DF branches of data Tx function
+  rxrpc: Add a kvec[] to the rxrpc_txbuf struct
+  rxrpc: Split up the DATA packet transmission function
+  rxrpc: Don't pick values out of the wire header when setting up
+    security
+  rxrpc: Move rxrpc_send_ACK() to output.c with rxrpc_send_ack_packet()
+  rxrpc: Use rxrpc_txbuf::kvec[0] instead of rxrpc_txbuf::wire
+  rxrpc: Do zerocopy using MSG_SPLICE_PAGES and page frags
+  rxrpc: Parse received packets before dealing with timeouts
+  rxrpc: Don't permit resending after all Tx packets acked
+  rxrpc: Differentiate PING ACK transmission traces.
+  rxrpc: Use ktimes for call timeout tracking and set the timer lazily
+  rxrpc: Record probes after transmission and reduce number of time-gets
+  rxrpc: Clean up the resend algorithm
+  rxrpc: Extract useful fields from a received ACK to skb priv data
+
+ include/trace/events/rxrpc.h | 198 ++++++++--------
+ net/rxrpc/af_rxrpc.c         |  12 +-
+ net/rxrpc/ar-internal.h      |  88 ++++---
+ net/rxrpc/call_event.c       | 327 ++++++++++++--------------
+ net/rxrpc/call_object.c      |  56 ++---
+ net/rxrpc/conn_client.c      |   4 +-
+ net/rxrpc/conn_event.c       |  16 +-
+ net/rxrpc/conn_object.c      |   4 +
+ net/rxrpc/input.c            | 116 +++++----
+ net/rxrpc/insecure.c         |  11 +-
+ net/rxrpc/io_thread.c        |  11 +
+ net/rxrpc/local_object.c     |   3 +
+ net/rxrpc/misc.c             |   8 +-
+ net/rxrpc/output.c           | 441 +++++++++++++++++------------------
+ net/rxrpc/proc.c             |  10 +-
+ net/rxrpc/protocol.h         |   6 +-
+ net/rxrpc/rtt.c              |  36 +--
+ net/rxrpc/rxkad.c            |  58 ++---
+ net/rxrpc/sendmsg.c          |  63 ++---
+ net/rxrpc/sysctl.c           |  16 +-
+ net/rxrpc/txbuf.c            | 174 +++++++++++---
+ 21 files changed, 853 insertions(+), 805 deletions(-)
+
 
