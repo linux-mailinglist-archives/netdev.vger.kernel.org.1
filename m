@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-77253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38954870CF5
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 22:30:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA710870CF7
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 22:30:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E46FC28B8A0
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 21:30:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC9BE1C20358
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 21:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735637C0BA;
-	Mon,  4 Mar 2024 21:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D277CF1D;
+	Mon,  4 Mar 2024 21:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d6knu3sD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qm/ldRJX"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79C57BB1F
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 21:29:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE60D7C0A8
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 21:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709587786; cv=none; b=mIiznDrKIugSjmV2K31GeYBOaetzsxE+dQWznXEPTegVcniLtyIR1a6ovYWNUm3kGg6yBPTBrBgc3O31wJzooQPlPgFo1vQgF/+dpXJd88Z2duBhmzSbsNK8hu0djFEsZyGzBA5y+J/JNrnYcwQUZGFi7juS0K8GqqDA/FBl9m0=
+	t=1709587787; cv=none; b=ByVhu4Ymz+hUIXc+rFuGUf7TPugxI7lgoVGHzH3V5JK3kVTGMZJq2QdHKF9oJIWYZ7m9hDJKYYS7RcLtGPEOpXYbcg0exshqNGjq8VmlMS0gjB9ClGu7khRr8gZnqih6zzJ0zQxcprSYyxTpFywabFndusiahK6wJ+Iitmktnos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709587786; c=relaxed/simple;
-	bh=2hsrK/X/rWh79NAS2OqB00vWbwTPWqWMUQ3vr+tqK4Q=;
+	s=arc-20240116; t=1709587787; c=relaxed/simple;
+	bh=79K3tGmbQNGBaIekVFrb80at8Sy0ZEo5vXySWcMUxPc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UAwcFNqkoOcOnxOgFQ5Kin0FTYSHFwLy0UgWT/Zeng7dUrb3NxXlRFxKsAWo4/bWTLm9QpJUhMUG0qWjySVeR9nXXA17S1YSFs5cY7/15rFCTvVhp6LBWSPqsXhqKIpwVEBXW0luUPMwhbmRqLnaOBBBs3KNhomSy7Cw5M9j4Xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d6knu3sD; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=JlEv94QR2wyZJQ3VLZyaaVL2ozzQL/qJntzQqcesNehmCsnPmHvBpXx8AiDB4cY4iCp5H4N24Xa47uLFrJFbvFAJ2CmXBdQooQB/oH0HngalNATyPGDABJBJ/+4T1FAVKRapAebXOcr870wQa+EMzJhUwIAk8Nex8aiGBiLu4pA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qm/ldRJX; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709587784; x=1741123784;
+  t=1709587786; x=1741123786;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=2hsrK/X/rWh79NAS2OqB00vWbwTPWqWMUQ3vr+tqK4Q=;
-  b=d6knu3sDixbvyKitdQDwMNPy8JckA8AiPk8DdeZbtu2qc4T+KMdckiyl
-   EodCVT5kcTFWJ1LXcEbN5BNEOZtulUTETo2fZs0hHTb90TFa6iFT/lVzy
-   XlRFMvVzEhzXv/ZJl+/ydYb5Bl5JHDjTqbf+by3VHzmjzqdO04ke1sdw9
-   sha4hQnsI2g2+CRCxJ6yvP2pjb1ubGG6xMlS1viRWmNloSIuH6ioaM1Dc
-   DcoJzV8jsGiABC5PjUUwaWmLVZrhiOxb2lKhhStGaZPEY7iXMDw13Q1oa
-   dcsqgtkweiqtwoTfOIqSfUQDWHTyhd4DArBMPoI1Ee7DBPkQ4yPyP4xKi
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="3968086"
+  bh=79K3tGmbQNGBaIekVFrb80at8Sy0ZEo5vXySWcMUxPc=;
+  b=Qm/ldRJXEjqMJ5joSYu96qyREVhSeFys0Yz2wh2MaLIt4Rtejt8mBxhF
+   1vhz3dr0fmN3jloXSp1bafpu3SQ/GVEIIXczjbzsBx4IHCrdBHuruXiHS
+   uVPz2afRharDmssGsJ1kDKihDO0yLSSFCGPEHHhOwTiJQlshoUXmbhvbe
+   c2IWwgcwwkhxSpzl2kP5gh9FciAvuSWa/mqjW+6jIZP8nIZtLTu880dcG
+   C8YVeP4etJWDkIgDXZZ9wfWWx7VRbfMwRlaSXXJAKR6rxcwVmpV9SkDt4
+   1ShBebenQlWaPYpmMl6zL7nzXgbLt8dCxtS5krncxtbemKVipji5TX215
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="3968089"
 X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
-   d="scan'208";a="3968086"
+   d="scan'208";a="3968089"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
   by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 13:29:40 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
-   d="scan'208";a="46647884"
+   d="scan'208";a="46647887"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa001.jf.intel.com with ESMTP; 04 Mar 2024 13:29:40 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -62,11 +62,10 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org
 Cc: Jacob Keller <jacob.e.keller@intel.com>,
 	anthony.l.nguyen@intel.com,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net-next 6/9] ice: use GENMASK instead of BIT(n) - 1 in pack functions
-Date: Mon,  4 Mar 2024 13:29:27 -0800
-Message-ID: <20240304212932.3412641-7-anthony.l.nguyen@intel.com>
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH net-next 7/9] ice: cleanup line splitting for context set functions
+Date: Mon,  4 Mar 2024 13:29:28 -0800
+Message-ID: <20240304212932.3412641-8-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240304212932.3412641-1-anthony.l.nguyen@intel.com>
 References: <20240304212932.3412641-1-anthony.l.nguyen@intel.com>
@@ -80,124 +79,85 @@ Content-Transfer-Encoding: 8bit
 
 From: Jacob Keller <jacob.e.keller@intel.com>
 
-The functions used to pack the Tx and Rx context into the hardware format
-rely on using BIT() and then subtracting 1 to get a bitmask. These
-functions even have a comment about how x86 machines can't use this method
-for certain widths because the SHL instructions will not work properly.
+The indentation for ice_set_ctx and ice_write_rxq_ctx breaks the function
+name after the return type. This style of breaking is used a lot throughout
+the ice driver, even in cases where its not actually helpful for
+readability. We no longer prefer this style of line splitting in the
+driver, and new code is avoiding it.
 
-The Linux kernel already provides the GENMASK macro for generating a
-suitable bitmask. Further, GENMASK is capable of generating the mask
-including the shift_width. Since width is the total field width, take care
-to subtract one to get the final bit position.
-
-Since we now include the shifted bits as part of the mask, shift the source
-value first before applying the mask.
+Normally, I would leave this alone unless the actual function contents or
+description needed updating. However, a future change is going to add
+inverse functions for converting packed context to unpacked context
+structures. To keep this code uniform with the existing set functions, fix
+up the style to the modern format of keeping the type on the same line.
 
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_common.c | 44 ++++-----------------
- 1 file changed, 8 insertions(+), 36 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_common.c | 12 +++++-------
+ drivers/net/ethernet/intel/ice/ice_common.h | 10 ++++------
+ 2 files changed, 9 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 3622079cb506..e9e4a8ef7904 100644
+index e9e4a8ef7904..7d9315ffae57 100644
 --- a/drivers/net/ethernet/intel/ice/ice_common.c
 +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -4379,14 +4379,11 @@ static void ice_pack_ctx_byte(u8 *src_ctx, u8 *dest_ctx,
+@@ -1399,9 +1399,8 @@ static const struct ice_ctx_ele ice_rlan_ctx_info[] = {
+  * it to HW register space and enables the hardware to prefetch descriptors
+  * instead of only fetching them on demand
+  */
+-int
+-ice_write_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
+-		  u32 rxq_index)
++int ice_write_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
++		      u32 rxq_index)
+ {
+ 	u8 ctx_buf[ICE_RXQ_CTX_SZ] = { 0 };
  
- 	/* prepare the bits and mask */
- 	shift_width = ce_info->lsb % 8;
--	mask = (u8)(BIT(ce_info->width) - 1);
-+	mask = GENMASK(ce_info->width - 1 + shift_width, shift_width);
+@@ -4522,11 +4521,10 @@ static void ice_pack_ctx_qword(u8 *src_ctx, u8 *dest_ctx,
+  * @hw: pointer to the hardware structure
+  * @src_ctx:  pointer to a generic non-packed context structure
+  * @dest_ctx: pointer to memory for the packed structure
+- * @ce_info:  a description of the structure to be transformed
++ * @ce_info: List of Rx context elements
+  */
+-int
+-ice_set_ctx(struct ice_hw *hw, u8 *src_ctx, u8 *dest_ctx,
+-	    const struct ice_ctx_ele *ce_info)
++int ice_set_ctx(struct ice_hw *hw, u8 *src_ctx, u8 *dest_ctx,
++		const struct ice_ctx_ele *ce_info)
+ {
+ 	int f;
  
- 	src_byte = *from;
--	src_byte &= mask;
--
--	/* shift to correct alignment */
--	mask <<= shift_width;
- 	src_byte <<= shift_width;
-+	src_byte &= mask;
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
+index 32fd10de620c..ffb22c7ce28b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.h
++++ b/drivers/net/ethernet/intel/ice/ice_common.h
+@@ -53,9 +53,8 @@ int ice_get_caps(struct ice_hw *hw);
  
- 	/* get the current bits from the target bit string */
- 	dest = dest_ctx + (ce_info->lsb / 8);
-@@ -4419,17 +4416,14 @@ static void ice_pack_ctx_word(u8 *src_ctx, u8 *dest_ctx,
+ void ice_set_safe_mode_caps(struct ice_hw *hw);
  
- 	/* prepare the bits and mask */
- 	shift_width = ce_info->lsb % 8;
--	mask = BIT(ce_info->width) - 1;
-+	mask = GENMASK(ce_info->width - 1 + shift_width, shift_width);
+-int
+-ice_write_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
+-		  u32 rxq_index);
++int ice_write_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
++		      u32 rxq_index);
  
- 	/* don't swizzle the bits until after the mask because the mask bits
- 	 * will be in a different bit position on big endian machines
- 	 */
- 	src_word = *(u16 *)from;
--	src_word &= mask;
--
--	/* shift to correct alignment */
--	mask <<= shift_width;
- 	src_word <<= shift_width;
-+	src_word &= mask;
+ int
+ ice_aq_get_rss_lut(struct ice_hw *hw, struct ice_aq_get_set_rss_lut_params *get_params);
+@@ -72,9 +71,8 @@ bool ice_check_sq_alive(struct ice_hw *hw, struct ice_ctl_q_info *cq);
+ int ice_aq_q_shutdown(struct ice_hw *hw, bool unloading);
+ void ice_fill_dflt_direct_cmd_desc(struct ice_aq_desc *desc, u16 opcode);
+ extern const struct ice_ctx_ele ice_tlan_ctx_info[];
+-int
+-ice_set_ctx(struct ice_hw *hw, u8 *src_ctx, u8 *dest_ctx,
+-	    const struct ice_ctx_ele *ce_info);
++int ice_set_ctx(struct ice_hw *hw, u8 *src_ctx, u8 *dest_ctx,
++		const struct ice_ctx_ele *ce_info);
  
- 	/* get the current bits from the target bit string */
- 	dest = dest_ctx + (ce_info->lsb / 8);
-@@ -4462,25 +4456,14 @@ static void ice_pack_ctx_dword(u8 *src_ctx, u8 *dest_ctx,
+ extern struct mutex ice_global_cfg_lock_sw;
  
- 	/* prepare the bits and mask */
- 	shift_width = ce_info->lsb % 8;
--
--	/* if the field width is exactly 32 on an x86 machine, then the shift
--	 * operation will not work because the SHL instructions count is masked
--	 * to 5 bits so the shift will do nothing
--	 */
--	if (ce_info->width < 32)
--		mask = BIT(ce_info->width) - 1;
--	else
--		mask = (u32)~0;
-+	mask = GENMASK(ce_info->width - 1 + shift_width, shift_width);
- 
- 	/* don't swizzle the bits until after the mask because the mask bits
- 	 * will be in a different bit position on big endian machines
- 	 */
- 	src_dword = *(u32 *)from;
--	src_dword &= mask;
--
--	/* shift to correct alignment */
--	mask <<= shift_width;
- 	src_dword <<= shift_width;
-+	src_dword &= mask;
- 
- 	/* get the current bits from the target bit string */
- 	dest = dest_ctx + (ce_info->lsb / 8);
-@@ -4513,25 +4496,14 @@ static void ice_pack_ctx_qword(u8 *src_ctx, u8 *dest_ctx,
- 
- 	/* prepare the bits and mask */
- 	shift_width = ce_info->lsb % 8;
--
--	/* if the field width is exactly 64 on an x86 machine, then the shift
--	 * operation will not work because the SHL instructions count is masked
--	 * to 6 bits so the shift will do nothing
--	 */
--	if (ce_info->width < 64)
--		mask = BIT_ULL(ce_info->width) - 1;
--	else
--		mask = (u64)~0;
-+	mask = GENMASK_ULL(ce_info->width - 1 + shift_width, shift_width);
- 
- 	/* don't swizzle the bits until after the mask because the mask bits
- 	 * will be in a different bit position on big endian machines
- 	 */
- 	src_qword = *(u64 *)from;
--	src_qword &= mask;
--
--	/* shift to correct alignment */
--	mask <<= shift_width;
- 	src_qword <<= shift_width;
-+	src_qword &= mask;
- 
- 	/* get the current bits from the target bit string */
- 	dest = dest_ctx + (ce_info->lsb / 8);
 -- 
 2.41.0
 
