@@ -1,108 +1,142 @@
-Return-Path: <netdev+bounces-77073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B1718700C6
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 12:51:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 566838700DC
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 12:56:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06E7B281813
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:51:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 164621F22613
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920043B193;
-	Mon,  4 Mar 2024 11:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ADFB3C470;
+	Mon,  4 Mar 2024 11:56:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jr6uTHQ4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J2P1hJm7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67151250E2;
-	Mon,  4 Mar 2024 11:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9558F3BB3D
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 11:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709553032; cv=none; b=HX7ntXEWswMkUbLALi9DgIGWIjFX3FLaRAEDZFWhSOcKHOvc4C9LxqWTxYEapO280QskbBd/Fi2inLXsUJL2+VOO58nBhXRIqPXlUhtpuNhGD/A96Zi0nHGkRbgDKoe54zqEiNHVUMV3aU/MN1ZIDsyS09s4kQsyXB6CGiYXhak=
+	t=1709553380; cv=none; b=dPN2ok/t0/y1vSeqNR7r/dgz1dsCEdmDTfTsf7j0kUDz3+XdDOtcqoLdF3scyGGbyfuWYC8X1I2uxDMEWcf+nfUd/5pRVYGI0j9tbrb4ENYoe8CeE5kuw3OQK1/vX0y+D/Y6j/Ey5jc23wZEIo2ACcT0n2dij8pj9XNL6N5QBQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709553032; c=relaxed/simple;
-	bh=jT2/furrCydOEBIbad8LySxFMG2kvxtCTG4GzM5ZTvY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=F+co/YHLplrS6a+E9eIfGONSR4iMk4cdM7zkNaNZXWHUtMlnf8t65+P46ArYHLEV6dkXgYvZizmTOBYZ8Awcg8xXK++rAD1sH4DuZxz59ODtn7SiMGBYLG3P3YQ7tbD7nU5fjKKgP3z0iA/TI/hgOQGyOb+h+Sjb4YsjDXa+CqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jr6uTHQ4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E17C8C433F1;
-	Mon,  4 Mar 2024 11:50:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709553031;
-	bh=jT2/furrCydOEBIbad8LySxFMG2kvxtCTG4GzM5ZTvY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Jr6uTHQ4WhXGKIhfZmn0zqSIcPWcykrrWkyNGtDPdCXqXNtiFrrO3o/f3GfP2Y5w6
-	 4UGUGzOhHUeb0DGz2aQZ5bWGxkXNpKy6Q+rbHzlCR2lBfbykr3t8UvH5iM3krRGdp2
-	 4OhxwAcldDo7x3zbRZJnr+cci7TOeJyPKH8reFci1aa65Po55G8VPnepypr1YcCC6s
-	 7Fq68zt037KgbXpwhCG+y8y9xXDP2sbiPbX7qmNK0pPDH2jhKPJVzRh0epshD7qEcy
-	 fUZ82IuraZ2GQeMZomN4gZB95rKQ5KB0uyrhzyICjXG8yKDOISCXKhQ8CLtoBmchqY
-	 7txoosW5E9Leg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C8FF9D9A4BB;
-	Mon,  4 Mar 2024 11:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709553380; c=relaxed/simple;
+	bh=1pxGewzqlg410BVrMDyNZyMJwDst5u/9e4GvFoWghQ8=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=GKZxj+DaIJZx8bpxHVaf5YKzIt/jGaqSDFX8zfYce7URAjvW7iHfFIR6QmEzdZOh2pIa/fQcAAbQBkhzc/cu9a36sAqCJAtJHw9gn9HAORYRQ/Krf4FpKIN6HysV8xlNAJ7ARODhGR/dFp9J9EOpp9XRLRj4wsDAlxtA134zRYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J2P1hJm7; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709553377;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GqekJtMmWl332KPa2AiO9KOFfmzHxStTJwB9RAe/2jE=;
+	b=J2P1hJm7thmq5POfniVch255ASmvsjXiike+HIZXV2DF01CbxWRI/Om+rEU/7B5uR+w3GN
+	rcjtMwNW7SuwZ257HwnZpZKHyuHMV5MBwilYCXl2fkCVHPNb5sUHpTXNlOiCatPA7GVhyH
+	5SnEayR4ZuL7P7BIGvBBX61arI9vqH8=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-636-08FLQKdmPZGagpUscxRpgQ-1; Mon,
+ 04 Mar 2024 06:56:12 -0500
+X-MC-Unique: 08FLQKdmPZGagpUscxRpgQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 36E213816B4B;
+	Mon,  4 Mar 2024 11:56:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.114])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A53AA40C6EBA;
+	Mon,  4 Mar 2024 11:56:07 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <CAHk-=wiBJRgA3iNqihR7uuft=5rog425X_b3uvgroG3fBhktwQ@mail.gmail.com>
+References: <CAHk-=wiBJRgA3iNqihR7uuft=5rog425X_b3uvgroG3fBhktwQ@mail.gmail.com> <20230925120309.1731676-1-dhowells@redhat.com> <20230925120309.1731676-8-dhowells@redhat.com> <4e80924d-9c85-f13a-722a-6a5d2b1c225a@huawei.com> <CAHk-=whG+4ag+QLU9RJn_y47f1DBaK6b0qYq_6_eLkO=J=Mkmw@mail.gmail.com> <CAHk-=wjSjuDrS9gc191PTEDDow7vHy6Kd3DKDaG+KVH0NQ3v=w@mail.gmail.com> <e985429e-5fc4-a175-0564-5bb4ca8f662c@huawei.com> <CAHk-=wh06M-1c9h7wZzZ=1KqooAmazy_qESh2oCcv7vg-sY6NQ@mail.gmail.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: dhowells@redhat.com, Tong Tiangen <tongtiangen@huawei.com>,
+    Al Viro <viro@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+    Christoph Hellwig <hch@lst.de>,
+    Christian Brauner <christian@brauner.io>,
+    David Laight <David.Laight@aculab.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Jeff Layton <jlayton@kernel.org>, linux-fsdevel@vger.kernel.org,
+    linux-block@vger.kernel.org, linux-mm@kvack.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+    Kefeng Wang <wangkefeng.wang@huawei.com>
+Subject: Re: [bug report] dead loop in generic_perform_write() //Re: [PATCH v7 07/12] iov_iter: Convert iterate*() to inline funcs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/7] net: ipa: simplify device pointer access
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170955303081.27377.10483078205421623482.git-patchwork-notify@kernel.org>
-Date: Mon, 04 Mar 2024 11:50:30 +0000
-References: <20240301170242.243703-1-elder@linaro.org>
-In-Reply-To: <20240301170242.243703-1-elder@linaro.org>
-To: Alex Elder <elder@linaro.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, mka@chromium.org, andersson@kernel.org,
- quic_cpratapa@quicinc.com, quic_avuyyuru@quicinc.com,
- quic_jponduru@quicinc.com, quic_subashab@quicinc.com, elder@kernel.org,
- netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <769020.1709553367.1@warthog.procyon.org.uk>
+Date: Mon, 04 Mar 2024 11:56:07 +0000
+Message-ID: <769021.1709553367@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-Hello:
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Fri,  1 Mar 2024 11:02:35 -0600 you wrote:
-> This version of this patch series fixes the bugs in the first patch
-> (which were fixed in the second), where ipa_interrupt_config() had
-> two remaining spots that returned a pointer rather than an integer.
+> Actually, I think the right model is to get rid of that horrendous
+> .copy_mc field entirely.
 > 
-> Outside of initialization, all uses of the platform device pointer
-> stored in the IPA structure determine the address of device
-> structure embedded within the platform device structure.
+> We only have one single place that uses it - that nasty core dumping
+> code. And that code is *not* performance critical.
 > 
-> [...]
+> And not only isn't it performance-critical, it already does all the
+> core dumping one page at a time because it doesn't want to write pages
+> that were never mapped into user space.
+> 
+> So what we can do is
+> 
+>  (a) make the core dumping code *copy* the page to a good location
+> with copy_mc_to_kernel() first
+> 
+>  (b) remove this horrendous .copy_mc crap entirely from iov_iter
+> 
+> This is slightly complicated by the fact that copy_mc_to_kernel() may
+> not even exist, and architectures that don't have it don't want the
+> silly extra copy. So we need to abstract the "copy to temporary page"
+> code a bit. But that's probably a good thing anyway in that it forces
+> us to have nice interfaces.
+> 
+> End result: something like the attached.
+> 
+> AGAIN: THIS IS ENTIRELY UNTESTED.
+> 
+> But hey, so was clearly all the .copy_mc code too that this removes, so...
 
-Here is the summary with links:
-  - [net-next,v2,1/7] net: ipa: change ipa_interrupt_config() prototype
-    https://git.kernel.org/netdev/net-next/c/e87e4371edfc
-  - [net-next,v2,2/7] net: ipa: introduce ipa_interrupt_init()
-    https://git.kernel.org/netdev/net-next/c/ad1be80d7582
-  - [net-next,v2,3/7] net: ipa: pass a platform device to ipa_reg_init()
-    https://git.kernel.org/netdev/net-next/c/a47956e72a3e
-  - [net-next,v2,4/7] net: ipa: pass a platform device to ipa_mem_init()
-    https://git.kernel.org/netdev/net-next/c/95c54a963b24
-  - [net-next,v2,5/7] net: ipa: pass a platform device to ipa_smp2p_irq_init()
-    https://git.kernel.org/netdev/net-next/c/59622a8fb453
-  - [net-next,v2,6/7] net: ipa: pass a platform device to ipa_smp2p_init()
-    https://git.kernel.org/netdev/net-next/c/81d65f3413da
-  - [net-next,v2,7/7] net: ipa: don't save the platform device
-    https://git.kernel.org/netdev/net-next/c/5245f4fd28d1
+I like it:-)
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I've tested it by SIGQUIT'ing a number of processes and using gdb to examine
+the coredumps - which seems to work - at least without the production of any
+MCEs.  I'm not sure how I could test it with MCEs.
 
+Feel free to add:
+
+Reviewed-by: David Howells <dhowells@redhat.com>
+Tested-by: David Howells <dhowells@redhat.com>
+
+That said, I wonder if:
+
+	#ifdef copy_mc_to_kernel
+
+should be:
+
+	#ifdef CONFIG_ARCH_HAS_COPY_MC
+
+and whether it's possible to find out dynamically if MCEs can occur at all.
+
+David
 
 
