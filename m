@@ -1,139 +1,95 @@
-Return-Path: <netdev+bounces-77213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DA9C870ABF
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 20:32:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2A36870B2F
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 21:08:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C25B91C20BBC
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 19:32:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E136287CAB
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 20:08:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8144879943;
-	Mon,  4 Mar 2024 19:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EC57AE5F;
+	Mon,  4 Mar 2024 20:07:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="nHlxzap5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ps+mCZyc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-42aa.mail.infomaniak.ch (smtp-42aa.mail.infomaniak.ch [84.16.66.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1F078B57
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 19:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C9C7995F;
+	Mon,  4 Mar 2024 20:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709580730; cv=none; b=qDiKw84R/+4HQRgMRhyNN8sty6wD3gD9YExqjidsv7L7b7jJv0V0ja5h/v9x9gnT4cvdgm/7+AGWe9B1pu4sY9rcEJ47nmk3+KjeFLFgBlOEOfhcS3OFbq9ZfLPpXQNAEm7MmD4rEnk294zrJJpCE+G2bwHcNbClhr9wZb7Sqkw=
+	t=1709582869; cv=none; b=ftGs/nZ0gJ5CYhmkn0Nl8YaU4WSJYOcjjl/D6IhL7HngZMacAPWgEGNvfe2sMzrF+YEIO649a2sqt8z9z/gHhAH1SNAUOvI3o3qHTy8oTr1fVJ2EFQy2eCCBPKcJgo727NdwAdN76JOd9axUDiO3djvE1wdjt3+du3gBPW8Fd3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709580730; c=relaxed/simple;
-	bh=uHJy5cR+Cz7GNPm99CUukbZb3URnbaKBlxNZRwj9ETA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F8pIbjfmjCQTM3XbwWqy9gZZ/vjVV+nliSL3urSuK1efPQUzL+vpqmre6opoFX3cWZPrubfBPXAJRVF/TaOse7XgiVXfGzL60CeLpbCyogf7X6ln6Z4d9vqFuIbgeJvHh+GUIkSZuPuoT1F+Bel9gF+dNOM/jEXv73aSIhjzuE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=nHlxzap5; arc=none smtp.client-ip=84.16.66.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4TpTNH1PqrzMvsxB;
-	Mon,  4 Mar 2024 20:31:59 +0100 (CET)
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4TpTNG4V1bzMpnPh;
-	Mon,  4 Mar 2024 20:31:58 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1709580719;
-	bh=uHJy5cR+Cz7GNPm99CUukbZb3URnbaKBlxNZRwj9ETA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nHlxzap5dh7Hb3hyvCUhCG7qrZVTOpWrupgbjtYuF4GQSxXlxZw6zm491eJiOx2t6
-	 tlQfTp+fGl+v1Px8ZwbvyG06lURFRrDrGInj0BWmvAipNSvmgne1XxYzGIkNa1xsQl
-	 pbAVmThO6M1BHZLiDBTqIqOyh6mVEid3QuXZJv6s=
-Date: Mon, 4 Mar 2024 20:31:48 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, keescook@chromium.org, jakub@cloudflare.com, 
-	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, Will Drewry <wad@chromium.org>
-Subject: Re: [PATCH v4 02/12] selftests/harness: Merge TEST_F_FORK() into
- TEST_F()
-Message-ID: <20240304.ceje1phaiFei@digikod.net>
-References: <20240229005920.2407409-1-kuba@kernel.org>
- <20240229005920.2407409-3-kuba@kernel.org>
- <20240301.Miem9Kei4eev@digikod.net>
+	s=arc-20240116; t=1709582869; c=relaxed/simple;
+	bh=IxhkFb0JGseP/F6oidrp0nqH9NvZIV1ZHiC2lHFKZU8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L+ifn3li2VYRO6Lqdbq4ikE8/WHQMk4a+tR+LeS3UMxCtTXJ56wH5AoVagJvrMApxRmGWW+TYyCLCUvQuhx2p6T1fb/j6HLykdx7e3xgAT/26mNbH8dAsy0Lds6znhcBo52hFLGKGFsObJxL0OoV5dQW0q9KwU/kgTzEPPIgh/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ps+mCZyc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BC3CC433F1;
+	Mon,  4 Mar 2024 20:07:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709582869;
+	bh=IxhkFb0JGseP/F6oidrp0nqH9NvZIV1ZHiC2lHFKZU8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ps+mCZycuYOmCI3C6RRj9rCLV/7gBs3eR1cRDiQA1BJj7gX2RCz13LiFhEuqsqj03
+	 Dw9op7fWLqMiK0YurvCC24nldP2xDYGoWeoaoqJO9KUDyrNKdc8eH2CnNvDAONdkak
+	 AHIHRd9fMuE+apQJbzG2HG6FQ5/9anpKReXNhUsgHHqcqnoyO604oKLbtg6OClMck5
+	 HcDY2rDrJkc6rmX8TSIgZ/ZliId4nC7qXBAA5k0kult4VzJuPbSIqDzMLmPU9dCI12
+	 nE6W0TlyLR3W4M+02cpgaOrKKQ9IEbjbk1WzwycTEhV4cix9wrrB4J9/jKWmTbncjl
+	 Om5vHv+2kCSow==
+Date: Mon, 4 Mar 2024 12:07:47 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tom Herbert <tom@sipanda.io>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, John Fastabend
+ <john.fastabend@gmail.com>, "Singhai, Anjali" <anjali.singhai@intel.com>,
+ Paolo Abeni <pabeni@redhat.com>, Linux Kernel Network Developers
+ <netdev@vger.kernel.org>, "Chatterjee, Deb" <deb.chatterjee@intel.com>,
+ "Limaye, Namrata" <namrata.limaye@intel.com>, mleitner@redhat.com,
+ Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, "Osinski, Tomasz"
+ <tomasz.osinski@intel.com>, Jiri Pirko <jiri@resnulli.us>, Cong Wang
+ <xiyou.wangcong@gmail.com>, "David S . Miller" <davem@davemloft.net>,
+ edumazet@google.com, Vlad Buslov <vladbu@nvidia.com>, horms@kernel.org,
+ khalidm@nvidia.com, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=
+ <toke@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>, Victor Nogueira
+ <victor@mojatatu.com>, "Tammela, Pedro" <pctammela@mojatatu.com>, "Daly,
+ Dan" <dan.daly@intel.com>, andy.fingerhut@gmail.com, "Sommers, Chris"
+ <chris.sommers@keysight.com>, mattyk@nvidia.com, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v12 00/15] Introducing P4TC (series 1)
+Message-ID: <20240304120747.6f34ab6e@kernel.org>
+In-Reply-To: <CAOuuhY_senZbdC2cVU9kfDww_bT+a_VkNaDJYRk4_fMbJW17sQ@mail.gmail.com>
+References: <20240225165447.156954-1-jhs@mojatatu.com>
+	<b28f2f7900dc7bad129ad67621b2f7746c3b2e18.camel@redhat.com>
+	<CO1PR11MB49931E501B20F32681F917CD935F2@CO1PR11MB4993.namprd11.prod.outlook.com>
+	<65e106305ad8b_43ad820892@john.notmuch>
+	<CAM0EoM=r1UDnkp-csPdrz6nBt7o3fHUncXKnO7tB_rcZAcbrDg@mail.gmail.com>
+	<CAOuuhY8qbsYCjdUYUZv8J3jz8HGXmtxLmTDP6LKgN5uRVZwMnQ@mail.gmail.com>
+	<20240301090020.7c9ebc1d@kernel.org>
+	<CAM0EoM=-hzSNxOegHqhAQD7qoAR2CS3Dyh-chRB+H7C7TQzmow@mail.gmail.com>
+	<20240301173214.3d95e22b@kernel.org>
+	<CAOuuhY8fnpEEBb8z-1mQmvHtfZQwgQnXk3=op-Xk108Pts8ohA@mail.gmail.com>
+	<20240302191530.22353670@kernel.org>
+	<CAOuuhY_senZbdC2cVU9kfDww_bT+a_VkNaDJYRk4_fMbJW17sQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240301.Miem9Kei4eev@digikod.net>
-X-Infomaniak-Routing: alpha
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 04, 2024 at 08:27:50PM +0100, Mickaël Salaün wrote:
-> Testing the whole series, I found that some Landlock tests are flaky
-> starting with this patch.  I tried to not use the longjmp in the
-> grandchild but it didn't change.  I suspect missing volatiles but I
-> didn't find the faulty one(s) yet. :/
-> I'll continue investigating tomorrow but help would be much appreciated!
+On Sun, 3 Mar 2024 08:31:11 -0800 Tom Herbert wrote:
+> Even before considering hardware offload, I think this approach
+> addresses a more fundamental problem to make the kernel programmable.
 
-The issue is with the fs_test.c, often starting with this one:
-
-#  RUN           layout1.relative_chroot_only ...
-# fs_test.c:294:relative_chroot_only:Expected 0 (0) == umount(TMP_DIR) (-1)
-# fs_test.c:296:relative_chroot_only:Expected 0 (0) == remove_path(TMP_DIR) (16)
-# relative_chroot_only: Test failed
-#          FAIL  layout1.relative_chroot_only
-
-...or this one:
-
-#  RUN           layout3_fs.hostfs.tag_inode_dir_child ...
-# fs_test.c:4707:tag_inode_dir_child:Expected 0 (0) == mkdir(self->dir_path, 0700) (-1)
-# fs_test.c:4709:tag_inode_dir_child:Failed to create directory "tmp/dir": No such file or directory
-# fs_test.c:4724:tag_inode_dir_child:Expected 0 (0) <= fd (-1)
-# fs_test.c:4726:tag_inode_dir_child:Failed to create file "tmp/dir/file": No such file or directory
-# fs_test.c:4729:tag_inode_dir_child:Expected 0 (0) == close(fd) (-1)
-# tag_inode_dir_child: Test failed
-#          FAIL  layout3_fs.hostfs.tag_inode_dir_child
-
-
-> 
-> 
-> On Wed, Feb 28, 2024 at 04:59:09PM -0800, Jakub Kicinski wrote:
-> > From: Mickaël Salaün <mic@digikod.net>
-> > 
-> > Replace Landlock-specific TEST_F_FORK() with an improved TEST_F() which
-> > brings four related changes:
-> > 
-> > Run TEST_F()'s tests in a grandchild process to make it possible to
-> > drop privileges and delegate teardown to the parent.
-> > 
-> > Compared to TEST_F_FORK(), simplify handling of the test grandchild
-> > process thanks to vfork(2), and makes it generic (e.g. no explicit
-> > conversion between exit code and _metadata).
-> > 
-> > Compared to TEST_F_FORK(), run teardown even when tests failed with an
-> > assert thanks to commit 63e6b2a42342 ("selftests/harness: Run TEARDOWN
-> > for ASSERT failures").
-> > 
-> > Simplify the test harness code by removing the no_print and step fields
-> > which are not used.  I added this feature just after I made
-> > kselftest_harness.h more broadly available but this step counter
-> > remained even though it wasn't needed after all. See commit 369130b63178
-> > ("selftests: Enhance kselftest_harness.h to print which assert failed").
-> > 
-> > Replace spaces with tabs in one line of __TEST_F_IMPL().
-> > 
-> > Cc: Günther Noack <gnoack@google.com>
-> > Cc: Shuah Khan <shuah@kernel.org>
-> > Cc: Will Drewry <wad@chromium.org>
-> > Signed-off-by: Mickaël Salaün <mic@digikod.net>
-> > Reviewed-by: Kees Cook <keescook@chromium.org>
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> > --
-> > v4:
-> >  - GAND -> GRAND
-> >  - init child to 1, otherwise assert in setup triggers a longjmp
-> >    which in turn reads child without it ever getting initialized
-> >    (or being 0, i.e. we mistakenly assume we're in the grandchild)
-> 
-> Good catch!
+I like some aspects of what you're describing, but my understanding
+is that it'd be a noticeable shift in direction.
+I'm not sure if merging P4TC is the most effective way of taking
+a first step in that direction. (I mean that in the literal sense
+of lack of confidence, not polite way to indicate holding a conviction
+to the contrary.)
 
