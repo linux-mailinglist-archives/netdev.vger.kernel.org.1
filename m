@@ -1,70 +1,58 @@
-Return-Path: <netdev+bounces-77218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEDCD870B96
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 21:27:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CACEA870BC7
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 21:47:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FE7A1F22C8B
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 20:27:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3100EB23599
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 20:46:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D29C67A729;
-	Mon,  4 Mar 2024 20:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD168DF5B;
+	Mon,  4 Mar 2024 20:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dY+uaHpL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D454AEF9;
-	Mon,  4 Mar 2024 20:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03EA46FB5
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 20:46:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709583998; cv=none; b=pP/K3izD+KyX0rOuFsfoOdUaKS3YlkDMdymEDKw8TWn7rtyK2a7Q/KGwP7SaiGXqkM9QM17P9S6Apl1odr+3/zFi3ZsqqCrIE4m4QjyEN/v9cNJ63gAbVio1fYJ693TIFECYVM9QUagNZ4vBCMxRDpiwYr/35a5nkRqC+L4HgXc=
+	t=1709585213; cv=none; b=kiCknxqLhjsz3zZ8a1WnZD/3zWQdrDmTY+E/UHUtnPbc6FKwR4DjtAqy69DWBWpxD1avbiRie6E2eWG7dRlluDJm3u/c9CrCrMHZrL7x4/78SZLNUNrty6nhGXmSL6nnv/SVYCmWWeisGYqF4w6GGwiw0sQlloy1p5h1UBNVvKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709583998; c=relaxed/simple;
-	bh=WKR5soPbdwv5SITAS4Ia+IV6JgbXybFywnXAPKGhW0E=;
+	s=arc-20240116; t=1709585213; c=relaxed/simple;
+	bh=FxLR6v3h5alVpLzCs+/JArqifz4nAastB6qbFjTJ7Bc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZfnkMI64qo11kRev8urP05ptaUos0ubOzuoU5F+NwQ0HXQaEaolQiwHJ7lIYqWt5fyyBp4PE96lgtUEBCFgZvWb3XIAiQu7COPD1pi0Qwv0rk8p2ZO+K0Rqu8VLpFXgA+GdHwqBycdbpbuvjsFewhRU2XBLE0l832TrJyDSKURc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a3ddc13bbb3so987154766b.0;
-        Mon, 04 Mar 2024 12:26:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709583995; x=1710188795;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DOo839mPdY9UDs30ip9szN5AzGukhwe6Ypv0TWThp7k=;
-        b=E44KnzlOkAwC0BLvgNBpgSv0RRM2NuOLSmadcIUdPD7fz2DVY4/J/qzYGqLCnRZ/Xf
-         wKaKtd/iVtoC5mD7qLHIwFi1nE9LCorDWDsdBPzHFZgO9KgRqnfD5rXtdpKMu4Pye00E
-         lccUg5FIjm9axo7F+EREPHv3WUIPYDT4tnNFG+ED9kubBSZJtF1331DVNsn1eZjY7rKo
-         /a+S95bniI/fBkDhG6x9T5QacJcJYCjiUTIAN/go3LEGCKwxvuLzC9Gej1kqcsjk32Nf
-         MKsQUZHEZNhctAcRrCRdo1HBPDPg0cpZrZBiREDFMxBFQno/HgkTJv2HrulR4QxgxRO8
-         6oWw==
-X-Forwarded-Encrypted: i=1; AJvYcCWnoTIy0LiIv9tkXOqrfvAGsPHlhfR7BMzJo+fPvRuTptGHx4rxGBiexkKGGZSLMhIQhdswKYrPv0jHXkpv7HOIwfp+wbD0cGxgl1W8gPjU+RPWjbNwaMlOu6gNT4tzimGU/Dai
-X-Gm-Message-State: AOJu0Ywo1xU09oueEE0br5c7ZMkqFL/jZrC9FpBoDdei774Bp9Jouw/O
-	SWB/RFU3EkmEiYuiKIz0rvBn2XWIQUPccw+5Ml7HC/w8g8cU29fx
-X-Google-Smtp-Source: AGHT+IFD0KaCT3wff32o4BVMJ2zpcmH0sLhAjYpku7waI4dtkjH4+BQqDaLNBgJr7bXQOoS1wxZ07g==
-X-Received: by 2002:a17:906:595a:b0:a45:2678:ae55 with SMTP id g26-20020a170906595a00b00a452678ae55mr595894ejr.13.1709583995469;
-        Mon, 04 Mar 2024 12:26:35 -0800 (PST)
-Received: from gmail.com (fwdproxy-lla-119.fbsv.net. [2a03:2880:30ff:77::face:b00c])
-        by smtp.gmail.com with ESMTPSA id h20-20020a170906591400b00a3d5efc65e0sm5236070ejq.91.2024.03.04.12.26.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Mar 2024 12:26:35 -0800 (PST)
-Date: Mon, 4 Mar 2024 12:26:32 -0800
-From: Breno Leitao <leitao@debian.org>
-To: hyper <hyperlyzcs@gmail.com>
-Cc: shannon.nelson@amd.com, brett.creeley@amd.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	jitxie@tencent.com, huntazhang@tencent.com
-Subject: Re: [PATCH net V2] net: pds_core: Fix possible double free in error
- handling path
-Message-ID: <ZeYueIRasQTY1TzX@gmail.com>
-References: <333dca5e-fae7-4684-afa8-10b8fdd48bf6@amd.com>
- <20240303084954.14498-1-hyperlyzcs@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=edGUYl5q30eDVmO2+7FiEKWtsWUs5Turhor+guafgsGq52+0leRKO08SzRM4ZsvWAqBSIrRFwAiKbERFORu4oAnX61gq8o/GZZBX4EiGIGOJOo7mWaK2IUt5wlRoQXa/uirETkvEKcna5ndeoU7bCSY4aDLnE+Smj8epZxhnq98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dY+uaHpL; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=z+olHfkbhoSMJfDBHY9OBmMRX0X1Zn7hFmkv/xpIln8=; b=dY+uaHpLU3jOfj9KPJNFRbD/Rs
+	jwhDYZkentpXOT1LjroelhZyj9p7f1o6t0lOL8eQrUp9+mfXvZm0Qt/1ykjdA8FzZ9pBAomLpKpSv
+	Tc9Tm2lOjz0xi/Dy7xcuGc7stpeuxo3nhiJ0JGV4qDD3iVnOPNgcFDnMFCHyvVfq57jc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rhFDI-009M14-84; Mon, 04 Mar 2024 21:47:08 +0100
+Date: Mon, 4 Mar 2024 21:47:08 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v2 02/22] net: introduce OpenVPN Data Channel
+ Offload (ovpn)
+Message-ID: <1f63398d-7015-45b2-b7de-c6731a409a69@lunn.ch>
+References: <20240304150914.11444-1-antonio@openvpn.net>
+ <20240304150914.11444-3-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,21 +61,122 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240303084954.14498-1-hyperlyzcs@gmail.com>
+In-Reply-To: <20240304150914.11444-3-antonio@openvpn.net>
 
-On Sun, Mar 03, 2024 at 04:49:54PM +0800, hyper wrote:
-> When auxiliary_device_add() returns error and then calls
-> auxiliary_device_uninit(), Callback function pdsc_auxbus_dev_release
-> calls kfree(padev) to free memory. We shouldn't call kfree(padev)
-> again in the error handling path.
-> 
-> Fix this by cleaning up the redundant kfree() and putting
-> the error handling back to where the errors happened.
-> 
-> Fixes: 4569cce43bc6 ("pds_core: add auxiliary_bus devices")
-> Signed-off-by: hyper <hyperlyzcs@gmail.com>
+> diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
+> new file mode 100644
+> index 000000000000..a1e19402e36d
+> --- /dev/null
+> +++ b/drivers/net/ovpn/io.c
+> @@ -0,0 +1,23 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*  OpenVPN data channel offload
+> + *
+> + *  Copyright (C) 2019-2024 OpenVPN, Inc.
+> + *
+> + *  Author:	James Yonan <james@openvpn.net>
+> + *		Antonio Quartulli <antonio@openvpn.net>
+> + */
+> +
+> +#include "io.h"
+> +
+> +#include <linux/netdevice.h>
+> +#include <linux/skbuff.h>
 
-I liked this v2 better.
+It is normal to put local headers last.
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
+> diff --git a/drivers/net/ovpn/io.h b/drivers/net/ovpn/io.h
+> new file mode 100644
+> index 000000000000..0a076d14f721
+> --- /dev/null
+> +++ b/drivers/net/ovpn/io.h
+> @@ -0,0 +1,19 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/* OpenVPN data channel offload
+> + *
+> + *  Copyright (C) 2019-2024 OpenVPN, Inc.
+> + *
+> + *  Author:	James Yonan <james@openvpn.net>
+> + *		Antonio Quartulli <antonio@openvpn.net>
+> + */
+> +
+> +#ifndef _NET_OVPN_OVPN_H_
+> +#define _NET_OVPN_OVPN_H_
+> +
+> +#include <linux/netdevice.h>
+> +
+> +struct sk_buff;
+> +
+
+Once you have the headers in the normal order, you probably won't need
+this.
+
+> +netdev_tx_t ovpn_net_xmit(struct sk_buff *skb, struct net_device *dev);
+> +
+> +#endif /* _NET_OVPN_OVPN_H_ */
+> diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+> new file mode 100644
+> index 000000000000..25964eb89aac
+> --- /dev/null
+> +++ b/drivers/net/ovpn/main.c
+> @@ -0,0 +1,118 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*  OpenVPN data channel offload
+> + *
+> + *  Copyright (C) 2020-2024 OpenVPN, Inc.
+> + *
+> + *  Author:	Antonio Quartulli <antonio@openvpn.net>
+> + *		James Yonan <james@openvpn.net>
+> + */
+> +
+> +#include "main.h"
+> +#include "io.h"
+> +
+> +#include <linux/module.h>
+> +#include <linux/moduleparam.h>
+> +#include <linux/types.h>
+> +#include <linux/net.h>
+> +#include <linux/inetdevice.h>
+> +#include <linux/netdevice.h>
+> +#include <linux/version.h>
+> +
+> +
+> +/* Driver info */
+
+Double blank lines are generally not liked. I'm surprised checkpatch
+did not warn?
+
+> +#define DRV_NAME	"ovpn"
+> +#define DRV_VERSION	OVPN_VERSION
+> +#define DRV_DESCRIPTION	"OpenVPN data channel offload (ovpn)"
+> +#define DRV_COPYRIGHT	"(C) 2020-2024 OpenVPN, Inc."
+> +
+> +/* Net device open */
+> +static int ovpn_net_open(struct net_device *dev)
+> +{
+> +	struct in_device *dev_v4 = __in_dev_get_rtnl(dev);
+> +
+> +	if (dev_v4) {
+> +		/* disable redirects as Linux gets confused by ovpn handling same-LAN routing */
+
+Although Linux in general allows longer lines, netdev has kept with
+80. Please wrap.
+
+> +		IN_DEV_CONF_SET(dev_v4, SEND_REDIRECTS, false);
+> +		IPV4_DEVCONF_ALL(dev_net(dev), SEND_REDIRECTS) = false;
+
+Wireguard has the same. How is Linux getting confused? Maybe we should
+consider fixing this properly?
+
+> +#ifndef OVPN_VERSION
+> +#define OVPN_VERSION "3.0.0"
+> +#endif
+
+What could sensible define it to some other value?
+
+These version numbers are generally useless. A driver is not
+standalone. It fits within a kernel. If you get a bug report, what you
+actually want to know is the kernel version, ideally the git hash.
+
+    Andrew
 
