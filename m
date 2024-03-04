@@ -1,225 +1,208 @@
-Return-Path: <netdev+bounces-77262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E47F8870FAA
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 23:01:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87D8B870FE6
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 23:14:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AFAD282722
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 22:01:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D9C5282043
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 22:14:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7ACA79DCA;
-	Mon,  4 Mar 2024 22:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CFBF7BB17;
+	Mon,  4 Mar 2024 22:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipanda-io.20230601.gappssmtp.com header.i=@sipanda-io.20230601.gappssmtp.com header.b="RkdHbZtG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MbTf6s++"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E671B1F60A
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 22:01:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709589682; cv=none; b=iaR3Mtvk8BKbdW1FGuBAu3XYgz8W736/sFH8Ch9IjtWfStMmPpTF9c279jYdx//wnX/iNm4h+fN+JtXayrPld4LwmuczhKuCepa7bEECPztVZnzuIHUigrpEhqkEIhPoh2hRgjDgkPMXRFGHlRXPmT8v+MwWhyMKTQ2XRxnN4VI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709589682; c=relaxed/simple;
-	bh=z3q1VpKpjWS/AmxEdmIGa819Za6gXGV9rYZBZ7aLZdA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZqpzPiu307iYvC9/YYPoplEr5HJpctcbIA3yzV9z3H8NrBmPDHWThH01eb8cidIiOrznKuUX5r8AjA/FUTHEVH3fqzl/iJhWmCrW+ao/xfjt5OBPynqvj9Euq2D3ew4oiJpw2avD+W9bFk0aBMCouVPbOln9lFvU8txLNXsl/bE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sipanda.io; spf=pass smtp.mailfrom=sipanda.io; dkim=pass (2048-bit key) header.d=sipanda-io.20230601.gappssmtp.com header.i=@sipanda-io.20230601.gappssmtp.com header.b=RkdHbZtG; arc=none smtp.client-ip=209.85.222.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sipanda.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipanda.io
-Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-7dad83f225cso1452899241.2
-        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 14:01:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sipanda-io.20230601.gappssmtp.com; s=20230601; t=1709589680; x=1710194480; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z3q1VpKpjWS/AmxEdmIGa819Za6gXGV9rYZBZ7aLZdA=;
-        b=RkdHbZtGFLG+/pQ1CZaDTpUBfo90R9AE9xhnoQaKoF887Oi3LyHeIOrekbLluYI+XH
-         24K2ufNlDkBp9+gWosSNXMjDAC5CoP1NYWbg/8bw2v/SY5AAtZX/gxltccsRwxu6zaXe
-         VV+qL5ITmIz/AR+w8VgEED052njG6R4Zk+5aPaLj1vgo7vnZgQ+miWO294ks/W71o4D4
-         zgh/fYSfk6u8dySm7/+DWuyJLxcpn1PTITDzv5Yp1LzqIzm6gVAPalTFlvjZeUFSuwkG
-         9zG8QpZOrspalVCcsfkDmmK2c7xLj1ewW3ymprWcnAudL4xxSitoeLT0l49w5sbR0ccs
-         7dOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709589680; x=1710194480;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z3q1VpKpjWS/AmxEdmIGa819Za6gXGV9rYZBZ7aLZdA=;
-        b=esak10dJvAtOUy0mltoNBappA0Xz243K+bd0Z/Z8VNKP8XMaroai8HsUyT5wiNL9Im
-         qWGLwqcjk0PO+0KixY11KGuHpqPd5Y3CUIz4PATtR2dsjHLlYwXqed30o3hXQImaVwRz
-         5eg/C5BvJBKOAuiivEyHETwyHYouYaiSBAhBe5resxtGdg0v+2cwd4ESEmjcySg0zAj7
-         vyYzCktShyx3J1Sl//cJemd2Jhb8nzr3j5LEmwyBj4hogweGx1p4hDtjQvujzbeQU2LR
-         0TYMhhT9bFIePYr08VqbHUdRcVmfoAxgdiMZqREqTCI+UzX3xidolaQGlU03OTgjFA0H
-         Lbww==
-X-Forwarded-Encrypted: i=1; AJvYcCVGMZxyFPaXPbW64m+TRyjCOsdnMOFZ2OMpyu/Ml+Z0d/WpguVVUjpJOAvt9csFMU+jEqmknfIRvkgoFBZX4K1PXSHvCEkW
-X-Gm-Message-State: AOJu0YxLkflN43WRqlBWp2pWZu1YxUuQegJiaf6zthKHMuSEiJG7fIDr
-	gf2W/gLsgNSuQbNohhAPeQS+jLjYDbnZ7aqVDd6pCej4AvZiWgcWb4uWOZEbtWveokZcBGPwL5w
-	kBQeW+bW8JE5nvsrIjd6QASSCNUewjfSksf/X0g==
-X-Google-Smtp-Source: AGHT+IEPVmfr43zJCi1kyszWjOhYwMY2T0gaK5I4jrNJlu29MFc3wLhAIpRT+AMdVR220miBy+KpJTK2b6wn1m8bn4g=
-X-Received: by 2002:a05:6122:21a2:b0:4c7:7407:e8ab with SMTP id
- j34-20020a05612221a200b004c77407e8abmr13956vkd.12.1709589679774; Mon, 04 Mar
- 2024 14:01:19 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808247AE47;
+	Mon,  4 Mar 2024 22:10:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709590210; cv=fail; b=ZO4oFvNvqz5920cuCrEYhlU3pJgJWz7wk7Zjy9rqJSPFNGIVCIFZDlINY7XO+flBeNCcXWvJlqDJxpw+E2A831KQaHM9HEVmrR7jl5L+e8F3kJPfWfRFaA9pM4k2PwiyhTYpiLcxEIKVUURg6cI3Fq/g/unI/6Nh31pJFqNkrDE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709590210; c=relaxed/simple;
+	bh=UqwD2n/gx+v7cklMxC/zHKNWYI+LL1BgBHpLBhIE7A0=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=BYQECO4gLXJEHOwo9IRGYSIfppiK9c8I0UOVvOCDh6NlG/dxiS7y352i6SyRmiz32CAd5flmb/moZkKyoLYWdiRNTFBo5VAUC8dLzgpAYWg2LEMeEqhVAUeElOKI2/2yBImKTnGQ3GBCXX2i0Ul077fWE73iVopXzWKkxNiq9aA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MbTf6s++; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709590210; x=1741126210;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=UqwD2n/gx+v7cklMxC/zHKNWYI+LL1BgBHpLBhIE7A0=;
+  b=MbTf6s++1XnQPIsUOW14GfnZygd5wrHQo6wLVvgI04XrE6SqqdoxCEpQ
+   yARpTQpfsfqkSMdfU9WWLoy3H4krVEYZUbS8LgkwILedgnaAQ2+HXIcN0
+   si48z4wYjAU4+x13fgzGQT9olA17Y81rY0dGU/XBJsdnklezNmfT2g9Gh
+   ecjahRhVCle5O03pyjjUzIcTy16vmzt040u9pCu67kEiUhish5BLTRDSK
+   sGMU9Y/Jui814q+ODeXpy4hbEiVynOv4RB6CXTYXQCY17IUdVa0Z2yoXS
+   zni8PnsanGNuanVpOpu9vAlef6+E7ZLt6LI90qitfqZMNQGpp/vj3giID
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="7929076"
+X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
+   d="scan'208";a="7929076"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 14:09:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
+   d="scan'208";a="8989126"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Mar 2024 14:09:53 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 4 Mar 2024 14:09:52 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 4 Mar 2024 14:09:52 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 4 Mar 2024 14:09:52 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CF39dOq0XWR5PJxb+zWWcc2mboW2I/leH6u0PH43+DAheoFiRTPjowbZuI7BznRxRSDgkKLR5iYNz5RGkTMIdRhl9eUjdYe9vTySagqqhODgYslMvgHHN0lfIpDQIyEOAoAAf0oPM/JrBmmyW1xQ73yfF0CyJ5CiFegNHU0tsfW8fRahuqkKJS8RORT4diGKtbpmLm0BtanXEcDDT1PfjGB7XL7ybApudUJRoUtYNMUXYKNWc/uYAxeSX9V9Zp4HeL4Gj3NofhbPXikBbDULmTZeWRAKWrcT5PgDEO/qH9THZVNJsutwZkS1mu2+2wHeZVfNjjU7bKkp4aEtQdT+0w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ALnQ83HWOFVyhETRtRIp9jFjscQVbnh9kHDpA0eQ9WM=;
+ b=kOHafwhalBRoDY6fMyX8TQ36PYNWzPX+fZ8CmzZ8G7wNwXdJsj05vYRPW6dctJs57a0uNcSCycgb9KEAEBZ2j9D7angfPn3zHaAWPB0PbIUZEs2IHvOE3H5wqTaqaIRU2CYWYLSaciqHXyx4rUgPN/Op4JWtfya3JM5XmPsZ+DGcoc9R6L/g9UAOF0GKTD2Wtf2Iv/ul5dI+R647qrcks6MVgh2f/u4A3I/fgfnUob9ZXle/GuzBqccIxJ2rumonzVYHxFVKCHxpLxmUrcQCnxKDS+vqmlqT4WpnaDoDaT6TcstL4ICBll0uqSNmWB5dwmGJK8kccDhMpE6nyNGmIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
+ by PH7PR11MB8122.namprd11.prod.outlook.com (2603:10b6:510:235::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.22; Mon, 4 Mar
+ 2024 22:09:50 +0000
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::9c80:a200:48a2:b308]) by BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::9c80:a200:48a2:b308%4]) with mapi id 15.20.7362.019; Mon, 4 Mar 2024
+ 22:09:49 +0000
+Message-ID: <827d22da-fb32-1012-422d-d283b28ce5ec@intel.com>
+Date: Mon, 4 Mar 2024 14:09:46 -0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH] i40e: Prevent setting MTU if greater than MFS
+To: Erwan Velu <erwanaliasr1@gmail.com>
+CC: Erwan Velu <e.velu@criteo.com>, Jesse Brandeburg
+	<jesse.brandeburg@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240227192704.376176-1-e.velu@criteo.com>
+Content-Language: en-US
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <20240227192704.376176-1-e.velu@criteo.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0258.namprd03.prod.outlook.com
+ (2603:10b6:303:b4::23) To BL3PR11MB6435.namprd11.prod.outlook.com
+ (2603:10b6:208:3bb::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CO1PR11MB49931E501B20F32681F917CD935F2@CO1PR11MB4993.namprd11.prod.outlook.com>
- <65e106305ad8b_43ad820892@john.notmuch> <CAM0EoM=r1UDnkp-csPdrz6nBt7o3fHUncXKnO7tB_rcZAcbrDg@mail.gmail.com>
- <CAOuuhY8qbsYCjdUYUZv8J3jz8HGXmtxLmTDP6LKgN5uRVZwMnQ@mail.gmail.com>
- <20240301090020.7c9ebc1d@kernel.org> <CAM0EoM=-hzSNxOegHqhAQD7qoAR2CS3Dyh-chRB+H7C7TQzmow@mail.gmail.com>
- <20240301173214.3d95e22b@kernel.org> <CAOuuhY8fnpEEBb8z-1mQmvHtfZQwgQnXk3=op-Xk108Pts8ohA@mail.gmail.com>
- <20240302191530.22353670@kernel.org> <CAOuuhY_senZbdC2cVU9kfDww_bT+a_VkNaDJYRk4_fMbJW17sQ@mail.gmail.com>
- <ZeY6r9cm4pdW9WNC@google.com>
-In-Reply-To: <ZeY6r9cm4pdW9WNC@google.com>
-From: Tom Herbert <tom@sipanda.io>
-Date: Mon, 4 Mar 2024 14:01:08 -0800
-Message-ID: <CAOuuhY8ieZav-Bgmn5x9OqYGnG4jQgVBhpsz5mz_iBoCZLgs_A@mail.gmail.com>
-Subject: Re: [PATCH net-next v12 00/15] Introducing P4TC (series 1)
-To: Stanislav Fomichev <sdf@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	John Fastabend <john.fastabend@gmail.com>, anjali.singhai@intel.com, 
-	Paolo Abeni <pabeni@redhat.com>, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>, deb.chatterjee@intel.com, namrata.limaye@intel.com, 
-	mleitner@redhat.com, Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, 
-	tomasz.osinski@intel.com, Jiri Pirko <jiri@resnulli.us>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, davem@davemloft.net, edumazet@google.com, 
-	Vlad Buslov <vladbu@nvidia.com>, horms@kernel.org, khalidm@nvidia.com, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Victor Nogueira <victor@mojatatu.com>, pctammela@mojatatu.com, 
-	dan.daly@intel.com, andy.fingerhut@gmail.com, chris.sommers@keysight.com, 
-	mattyk@nvidia.com, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|PH7PR11MB8122:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1cec3ba3-b35e-4be9-b15e-08dc3c97cf3b
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +9r6ELQHYsclLDe8u/Ql1+ziYC+PFM3xbM7xwGIbb/TAHSjScsO+Ltn4xh1qWREpH+rixxLIAGO1LfLvT1I90Hd8NYul8kUfjlclkSlhHWyB/l6YXcR28w/nPuCejP/MRzwz2vl98azelLy8YUaQqikOBsryjqufNly+9c0xc80D0/QO0EC1nJM8D7ZdUuY4m8q/1u10MbXoA5Vz759RL2pMrknUTAaYCll3JlW93gjVpQCp7pEIPCHJ6EkHf4Vg4vtazzOitC21LX169B3PRkGvcYIhvdBSLjAR2aGfUTZiQMXwTR4E80vS1wNMH2HlpIAcmkPUwD3T9xcDsv8/YcPmbgQWpXBoxBuOGO5jSoGznlNfQ/FR6ZZ3SAcV8XXqQ+03ffrko5meKDgPvGy14zpxghOI2IFgtuI/Pj+ogcAq8RhokA7Fe/c+4Kazrv3Nwao4lp6CltWbki2v3s+TnVUi0P84n0+cxyj9O7em7bEswRo1hrKuWqLFaUbbtNjO/TS+H20HvVcf4coG3K5aenkP6xLWfpOs5SZn6G5x6fKm5V5X+SI5IxXOFElX+6n3JoItsVUbCSLNGiG0ZyWx5Kq9tXv69uXgqVOk2amdAOvRqTnC+Srtkg+xmGQlFziXlWAlzBaU/+Yq3xKGrdPDpYqjmfyM75R+qcxGHPwgIdA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Tm1XTm9yMjE3dm9oYWlQL1FZWUFFSzdCeDN5NGVzWXB6N3ZkNlJXRmJ2dkh6?=
+ =?utf-8?B?T1p2ZzRQdjZheFFhMEw4aU5HN2lLSU1ESmpjM2hEVnkrRWlpN2dxbFRNdjF0?=
+ =?utf-8?B?ZkNrMlFhUGNHTGt1MTJMVHEweE9lckJnMXBIN2x4TE8vb0ZuM2E4SFlEQ3I5?=
+ =?utf-8?B?TStwRHExNEhleTFUZGEwdVRPcEpsS3B4ZkJqWU9JTjljS1lKSDlmK3c1VkZ1?=
+ =?utf-8?B?Y2p3VklId2daRUR3WTMwZG50eHovTHpHSTBUMHZsS1ZEM3BYUWxzWjJiR3ds?=
+ =?utf-8?B?NG1PYS9pMzhXVllIbTR5N1JLYlRGMkJJVFJZQjlrYzdSMFBZQXg3bG1zMkVQ?=
+ =?utf-8?B?TVhaZXZYSXBLRzZ3VEt5RzBnL25WYkczQzBwWFB3cThsd3R3VDArVGhBeVhi?=
+ =?utf-8?B?YWpEQVl0ZllYYmcvajJydStJOXdlbm1VRFg2bHYxQ2wrMkdSSUtwTXhoVXIy?=
+ =?utf-8?B?aWpTQWgwNmJGT01JQTJCT2llbkNpQStiZjNhdXhra05tQyt2U3UyaVNwYXlU?=
+ =?utf-8?B?L0ZUazdDYjV3THFHYVNlMmdUVFNKZ1NNLy9OU1RWYk5jWnRieG9ueThsbnVW?=
+ =?utf-8?B?QjgxWlUrYVpJK0lWYmV3ckdMcWF6NkRMdlBtaFRpcUVFZG1Bb3dnQzZ5UjE3?=
+ =?utf-8?B?dTk4N1Y0TW9malNoYXhQK2piUFFXbW95MHMxWnZTRXowcGdTdnRySmZHVUF5?=
+ =?utf-8?B?MTVaV1pPQzZXeFFMYnZEVzRWZ3UxRkRHR2pvK25Udy9EQkJyZ05TRUw3QUgz?=
+ =?utf-8?B?MWhIaXU3SDZnR3IxcnJtb2QvYkpCVGlOY2Fxb2d1c0E2eWhtS0RzRnVSYzhz?=
+ =?utf-8?B?Wis2WGluTHlZZ24yVjQ1VUMvcUJ4eDFad0szVndXSTg4NkFXSlBzM3VtOTNF?=
+ =?utf-8?B?dUMreXVjY1VQVStuemgrcjJaUkd4L042ZHNWakpjM2NZN3NYN1hsYS9JRDN1?=
+ =?utf-8?B?WlgxUzlVRzkrSjYvQmp1Q0wwZG5UUVFSL3IvRkJkZFhDVEZnanB3dTg4dTdw?=
+ =?utf-8?B?T1BCNXg1dXBaY0x1QVpnbHc0WjU0QVNHd1B2Z0F6cTc1M212c29qd3NvT3dY?=
+ =?utf-8?B?RmFWY3ZIVVpydHBQQndrazFuUGdYNFBhcmRnbU10ZEM1cW1GTjFtZHlNbGdi?=
+ =?utf-8?B?QnpHOUJhZ1RPRkRzNjZTcG02VUxnVDhFUElwY0w3OHJhSC9ZSmhHQnhQamJB?=
+ =?utf-8?B?ZEtYRUF2bmpvRTNFaU56b1U2UXUzTy9sMmpLcXZPMVo0TXpQSEhCVkFXTmtF?=
+ =?utf-8?B?SS9EWWhTMGs2UjhpTTJUWVFsQk1WR0VPaTZLenNqOFowbHdoMlh6OS9FRXZC?=
+ =?utf-8?B?SlNZSTVIRXZYbDc5RFZlQjJIRHhFcE1jY01Lc2dhUDh4SVMxaEVIaHNwTjNq?=
+ =?utf-8?B?dktvZlhiU003WUErdlNwcTFuK3VPeTMrdHhZVlJSZlV5Zy9ON1QvaDBITjRa?=
+ =?utf-8?B?OHpCZ0d2aEVoWXNFeDlOcjEwUmxzWWxPblU4NnA1S1RiSnlYU1cybTFGTDFr?=
+ =?utf-8?B?bGNrSHlJWklGN09PdWs3R0dxd1N1WGJMT3Y4b2crTW4zNHVrSndIWHYraTJ6?=
+ =?utf-8?B?cGxGSG9TTlpKcVVXVlFuY3NXT0pleHVSWFcvT0JGZjcvdFdBZ2s4SlNGdU5s?=
+ =?utf-8?B?UGwxYnlkalZyUFAydjk4dVRQSko1aFJFUkVWL1lDTWVxV243M012M0hHejZE?=
+ =?utf-8?B?bFNKL3JPQWpVVzg0MmQwY1Rod3NCcUc5ci9tYSt5QUNSR0ZEaVJSNjUrZTc1?=
+ =?utf-8?B?U21wc1o4S0hHV0owcEY0MlhkdWxhYk1XRHhjbjRONEhrK09uaVhmeUZDY1ls?=
+ =?utf-8?B?OHFuS3MzSmc5M3VoS0ErWnlySllYU2pxU3l1V09zWkJjRU04SlZibnpZc2pU?=
+ =?utf-8?B?cDhTMDQwaU5jcDVyaFcreHZFbS9aMnIrQ2I5OTFaUGViQm54VU9nY1pGemZZ?=
+ =?utf-8?B?SWxxWVhaa0pvNExIUEpWYXhhejBuTHBpdGdZRWF3ZDJyNmJuNTZlR3N6Rjdp?=
+ =?utf-8?B?NlNCSjl3YUpQSEFXOERhRm9pZFFnbGRiUGpEcGRaU2NJakJSTjlJMm1lVFdk?=
+ =?utf-8?B?WmVHTG9TYm16SFZjM2t5dnp4THl4N1FSbHBiZWd2eWRDZEwveGpCLzd3VDVu?=
+ =?utf-8?B?RlFHdkRFZVU2NkJjNEtVelJUS3lXd3NzbDlWZ21obFB1V2lMbWI0U0I0cXVL?=
+ =?utf-8?B?NVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1cec3ba3-b35e-4be9-b15e-08dc3c97cf3b
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2024 22:09:49.6179
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OmI1mQ5O7uHW5kV5fqK60RmWZ2S1io1zggLXa2qHjzbbT+VZXfdkJdn0Vs6hlw0+eRVIQPIEMQXAOFDLTEU0DkE1Pi/EdbKq87Rb8E6eMNM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8122
+X-OriginatorOrg: intel.com
 
-On Mon, Mar 4, 2024 at 1:19=E2=80=AFPM Stanislav Fomichev <sdf@google.com> =
-wrote:
->
-> On 03/03, Tom Herbert wrote:
-> > On Sat, Mar 2, 2024 at 7:15=E2=80=AFPM Jakub Kicinski <kuba@kernel.org>=
- wrote:
-> > >
-> > > On Fri, 1 Mar 2024 18:20:36 -0800 Tom Herbert wrote:
-> > > > This is configurability versus programmability. The table driven
-> > > > approach as input (configurability) might work fine for generic
-> > > > match-action tables up to the point that tables are expressive enou=
-gh
-> > > > to satisfy the requirements. But parsing doesn't fall into the tabl=
-e
-> > > > driven paradigm: parsers want to be *programmed*. This is why we
-> > > > removed kParser from this patch set and fell back to eBPF for parsi=
-ng.
-> > > > But the problem we quickly hit that eBPF is not offloadable to netw=
-ork
-> > > > devices, for example when we compile P4 in an eBPF parser we've los=
-t
-> > > > the declarative representation that parsers in the devices could
-> > > > consume (they're not CPUs running eBPF).
-> > > >
-> > > > I think the key here is what we mean by kernel offload. When we do
-> > > > kernel offload, is it the kernel implementation or the kernel
-> > > > functionality that's being offloaded? If it's the latter then we ha=
-ve
-> > > > a lot more flexibility. What we'd need is a safe and secure way to
-> > > > synchronize with that offload device that precisely supports the
-> > > > kernel functionality we'd like to offload. This can be done if both
-> > > > the kernel bits and programmed offload are derived from the same
-> > > > source (i.e. tag source code with a sha-1). For example, if someone
-> > > > writes a parser in P4, we can compile that into both eBPF and a P4
-> > > > backend using independent tool chains and program download. At
-> > > > runtime, the kernel can safely offload the functionality of the eBP=
-F
-> > > > parser to the device if it matches the hash to that reported by the
-> > > > device
-> > >
-> > > Good points. If I understand you correctly you're saying that parsers
-> > > are more complex than just a basic parsing tree a'la u32.
-> >
-> > Yes. Parsing things like TLVs, GRE flag field, or nested protobufs
-> > isn't conducive to u32. We also want the advantages of compiler
-> > optimizations to unroll loops, squash nodes in the parse graph, etc.
-> >
-> > > Then we can take this argument further. P4 has grown to encompass a l=
-ot
-> > > of functionality of quite complex devices. How do we square that with
-> > > the kernel functionality offload model. If the entire device is model=
-ed,
-> > > including f.e. TSO, an offload would mean that the user has to write
-> > > a TSO implementation which they then load into TC? That seems odd.
-> > >
-> > > IOW I don't quite know how to square in my head the "total
-> > > functionality" with being a TC-based "plugin".
-> >
-> > Hi Jakub,
-> >
-> > I believe the solution is to replace kernel code with eBPF in cases
-> > where we need programmability. This effectively means that we would
-> > ship eBPF code as part of the kernel. So in the case of TSO, the
-> > kernel would include a standard implementation in eBPF that could be
-> > compiled into the kernel by default. The restricted C source code is
-> > tagged with a hash, so if someone wants to offload TSO they could
-> > compile the source into their target and retain the hash. At runtime
-> > it's a matter of querying the driver to see if the device supports the
-> > TSO program the kernel is running by comparing hash values. Scaling
-> > this, a device could support a catalogue of programs: TSO, LRO,
-> > parser, IPtables, etc., If the kernel can match the hash of its eBPF
-> > code to one reported by the driver then it can assume functionality is
-> > offloadable. This is an elaboration of "device features", but instead
-> > of the device telling us they think they support an adequate GRO
-> > implementation by reporting NETIF_F_GRO, the device would tell the
-> > kernel that they not only support GRO but they provide identical
-> > functionality of the kernel GRO (which IMO is the first requirement of
-> > kernel offload).
-> >
-> > Even before considering hardware offload, I think this approach
-> > addresses a more fundamental problem to make the kernel programmable.
-> > Since the code is in eBPF, the kernel can be reprogrammed at runtime
-> > which could be controlled by TC. This allows local customization of
-> > kernel features, but also is the simplest way to "patch" the kernel
-> > with security and bug fixes (nobody is ever excited to do a kernel
->
-> [..]
->
-> > rebase in their datacenter!). Flow dissector is a prime candidate for
-> > this, and I am still planning to replace it with an all eBPF program
-> > (https://netdevconf.info/0x15/slides/16/Flow%20dissector_PANDA%20parser=
-.pdf).
->
-> So you're suggesting to bundle (and extend)
-> tools/testing/selftests/bpf/progs/bpf_flow.c? We were thinking along
-> similar lines here. We load this program manually right now, shipping
-> and autoloading with the kernel will be easer.
+On 2/27/2024 11:27 AM, Erwan Velu wrote:
+> Commit 6871a7de705b6f6a4046f0d19da9bcd689c3bc8e from iPXE project is
+> setting the MFS to 0x600 = 1536.
+> 
+> At boot time the i40e driver complains about it with
+> the following message but continues.
+> 
+> 	MFS for port 1 has been set below the default: 600
+> 
+> If the MTU size is increased, the driver accept it but large packets will not
+> be processed by the firmware generating tx_errors. The issue is pretty
+> silent for users. i.e doing TCP in such context will generates lots of
+> retransmissions until the proper window size (below 1500) will be used.
+> 
+> To fix this case, it would have been ideal to increase the MFS,
+> via i40e_aqc_opc_set_mac_config, but I didn't found a reliable way to do it.
+> 
+> At least, this commit prevents setting up an MTU greater than the current MFS.
+> It will avoid being in the position of having an MTU set to 9000 on the
+> netdev with a firmware refusing packets larger than 1536.
+> 
+> A typical trace looks like the following :
+> [  377.548696] i40e 0000:5d:00.0 eno5: Error changing mtu to 9000 which is greater than the current mfs: 1536
+> 
+> Signed-off-by: Erwan Velu <e.velu@criteo.com>
 
-Hi Stanislav,
+The Author and Sign-off needs to be fixed; they don't match.
 
-Yes, I envision that we would have a standard implementation of
-flow-dissector in eBPF that is shipped with the kernel and autoloaded.
-However, for the front end source I want to move away from imperative
-code. As I mentioned in the presentation flow_dissector.c is spaghetti
-code and has been prone to bugs over the years especially whenever
-someone adds support for a new fringe protocol (I take the liberty to
-call it spaghetti code since I'm partially responsible for creating
-this mess ;-) ).
+WARNING: From:/Signed-off-by: email address mismatch: 'From: Erwan Velu 
+<erwanaliasr1@gmail.com>' != 'Signed-off-by: Erwan Velu <e.velu@criteo.com>'
 
-The problem is that parsers are much better represented by a
-declarative rather than an imperative representation. To that end, we
-defined PANDA which allows constructing a parser (parse graph) in data
-structures in C. We use the "PANDA parser" to compile C to restricted
-C code which looks more like eBPF in imperative code. With this method
-we abstract out all the bookkeeping that was often the source of bugs
-(like pulling up skbufs, checking length limits, etc.). The other
-advantage is that we're able to find a lot more optimizations if we
-start with a right representation of the problem.
-
-If you're interested, the video presentation on this is in
-https://www.youtube.com/watch?v=3DzVnmVDSEoXc.
-
-Tom
+Thanks,
+Tony
 
