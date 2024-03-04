@@ -1,50 +1,79 @@
-Return-Path: <netdev+bounces-77110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5E568703B9
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 15:10:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DAFA8703D0
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 15:14:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 241BA1C23568
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:10:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EE0B1F21448
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0083FE58;
-	Mon,  4 Mar 2024 14:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC0F3FB02;
+	Mon,  4 Mar 2024 14:13:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="foYRdYyx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U9MpibyB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E250B3D9E;
-	Mon,  4 Mar 2024 14:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72083D38F
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 14:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709561427; cv=none; b=N7724+S1dNq+lWxTfozZ379sw57raW3oxkrdaDS70wmM4E7Ae8ac4IpN9nFlkh32W7Fm0kEOqrelZhnrRiHh3958n6ywj8Bsw5EOjLv1VgIg5tV+r/ERBJpkokvKwXB6J2G2uIF3WkyYxGQPdGoRPfO5BtlFoRoJkwrczHZH9JU=
+	t=1709561637; cv=none; b=DwJzXq1L6qiNNRGHrIEAI+xONx0Cq1Hffa9kYPhoEqnY/u2ikQh4t4jLAexTFSCAuE5SIAEYMTq8yDMLSsucVTv5wALMXSySawqLvkpiezFm+7T/H2pHgoeA4VL/gkr59Kh+waskmHdYW57O1lBKXwYcp6+GHDOgQiAfiA3ztrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709561427; c=relaxed/simple;
-	bh=e3vwrozgYttFesjrkEkiWY1DOGCdGg097X1QMijHh14=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=S+viYT8hO8bXXRE55o85xo09yAraVOyvAly0Ne3QZ5QADpDHA6IbMs+dfKsrtbOKo5Uuh9jGx+hXLGovRUvKKgUTZKARzAK5JXT2F8rklMZ1wMsoCRzEafJlgimie39QXR7fAvvHG/VOzLVI5ij2woDdYR3GiCMBTB+sJ9z30VA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=foYRdYyx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AE089C433C7;
-	Mon,  4 Mar 2024 14:10:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709561426;
-	bh=e3vwrozgYttFesjrkEkiWY1DOGCdGg097X1QMijHh14=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=foYRdYyxuUzzlnIK0ysZ+/h7LUP5HkwK3+MztotHFXqWWcsxXxuQL0fgW7QTDWLW1
-	 JiE+/i9DxUhHjkBW0PbYjUDlGNTMNdkitPb1uftZ6yrBVA/XU7g80EDqeImTKoh9kH
-	 DzUYAyuDPYXw95glklTZ7nWh3xHQ5cKcg6jSvnh6lRpDi8tGN3hFi4PQsskNy7Bw7K
-	 5HMm0o+gpW7U2Tj6iTX1tZTHlmFFJbE6MpZhcMfHL5WWuzkOfvO3kysX9ieU5Ght+C
-	 LSAsbtMHEny5mQc99MKLsZAMX0Lf9D+C0nVjZBbbXYZ4XdSJ84ZDBDSjaJN6eNu16+
-	 8bzq4osx4vG/A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 90C7FC595C4;
-	Mon,  4 Mar 2024 14:10:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709561637; c=relaxed/simple;
+	bh=Aad7MMKGDzpxnSWvQGJ4WEEZZCX6kT2dBP2piIPGUt4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lZhcXQ8ppmOdvB0+wwQv7HLZRmnxuAI9+H48My8Q7y8mDIjJ3EIl9jRmRlWxzx5WCfgofyWcQiT3VXf7Ys762FHWGX3Na9R/X0BeeyKhtm4QtRwfs8eg0P9C6F5mAlcv2ORwkWMDX1g9h4DEgn4NnTW333Jq71W9gB1TzmLHMHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U9MpibyB; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-51327cd65beso1226266e87.1
+        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 06:13:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709561634; x=1710166434; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rF54vFix7dxyUi1kP6t1a8edrxcuKO8fcdOpKw+Ic88=;
+        b=U9MpibyBsa87A7OKwa4by6G5yY2QFoc4tBwXCieT7OmLvmmeApLuJcVdSE1yGnbdx9
+         dCLgKSBqn59ka8zbXOlVnA4KRa6Vgtsx0Qw0xb6neqviOgf+UV3rW172Si/aHx2RMN2I
+         DXFVpYAx4lmmnnkWvywZB0CXmwl/rFlNSjYzbqNTPEgCE6xyeYNr+mXFscJ3u8SOOMxn
+         E9DVQRKMI8K9Ugqib4olRjZhqmL0ZRMzlaazHz6bfgiWBNfeglINd1UPRKTXJPNGVbYu
+         beD5O38IW4IYfxNLIe2L9uoyc2hSKjo0O9SVRxuZ2+RAGl1EAOblxvlqaJW1MHPckiyL
+         aDxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709561634; x=1710166434;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rF54vFix7dxyUi1kP6t1a8edrxcuKO8fcdOpKw+Ic88=;
+        b=IcBHXYtVzTmSm39sH9Vd4maI0FtftRfjZcSd1dmNr+XRavrqF1rK+O0yCZF0PHpawD
+         JBdGYz/66PHhoCqS28zfJD2zhuLbha1FqxuFwqcI004GZPJXcFiGxa9NUdPejBhcG7YQ
+         RJfB4NqBx7n5feiZnlnmjRuBA4nN7D/x7vdkYqVq08Zjn5TqV1olGhm2OECcfbQ3HSvr
+         TFv6mquvTBFRGUU8c0TmWoJocwJXAPBOZouESamqWgI31I2WV2tgTKV+8j5mF/z9X8hk
+         ttjGPf7gh+cNgnee14X9SlCjAjaxRPW/1YWryuQWihBNH1iFPQF0yzb/Uwf8DMJV5fdw
+         I2Ag==
+X-Gm-Message-State: AOJu0YyMCWrP31aTrfta5DBGn2jw9W+Ipwagi0vlfjkgmEoqB98A3kSg
+	xSu5sMmku4DpsFdD1m4AOvKNU5b2p+yJDD6+FyiGr9irZJCHx0YCYPH1GvdQTB3MUQ==
+X-Google-Smtp-Source: AGHT+IE9WzpgIVMYlvSUtj1ajVl3lqr/gL0+StUHYga3HtsilhgsCMeUMPX7W4hBCXk759lyya5bpQ==
+X-Received: by 2002:a05:6512:3e20:b0:513:4b49:e1e5 with SMTP id i32-20020a0565123e2000b005134b49e1e5mr980084lfv.1.1709561633587;
+        Mon, 04 Mar 2024 06:13:53 -0800 (PST)
+Received: from localhost.localdomain ([83.217.198.104])
+        by smtp.gmail.com with ESMTPSA id j10-20020ac253aa000000b0051325475bb1sm1730818lfh.229.2024.03.04.06.13.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Mar 2024 06:13:53 -0800 (PST)
+From: Denis Kirjanov <kirjanov@gmail.com>
+X-Google-Original-From: Denis Kirjanov <dkirjanov@suse.de>
+To: stephen@networkplumber.org,
+	dsahern@kernel.org
+Cc: netdev@vger.kernel.org,
+	Denis Kirjanov <dkirjanov@suse.de>
+Subject: [PATCH iproute2-next v3] iproute2: move generic_proc_open into lib
+Date: Mon,  4 Mar 2024 09:13:40 -0500
+Message-Id: <20240304141340.3563-1-dkirjanov@suse.de>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,51 +81,158 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iwl-next,v3 0/2] XDP Tx Hardware Timestamp for igc driver
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170956142658.15074.12322285485014543685.git-patchwork-notify@kernel.org>
-Date: Mon, 04 Mar 2024 14:10:26 +0000
-References: <20240303083225.1184165-1-yoong.siang.song@intel.com>
-In-Reply-To: <20240303083225.1184165-1-yoong.siang.song@intel.com>
-To: Song Yoong Siang <yoong.siang.song@intel.com>
-Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, sdf@google.com,
- vinicius.gomes@intel.com, florian.bezdeka@siemens.com, andrii@kernel.org,
- eddyz87@gmail.com, mykolal@fb.com, martin.lau@linux.dev, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, haoluo@google.com,
- jolsa@kernel.org, shuah@kernel.org, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, xdp-hints@xdp-project.net
 
-Hello:
+the function has the same definition in ifstat and ss
 
-This series was applied to bpf/bpf-next.git (master)
-by Daniel Borkmann <daniel@iogearbox.net>:
+v2: fix the typo in the chagelog
+v3: rebase on master
 
-On Sun,  3 Mar 2024 16:32:23 +0800 you wrote:
-> Implemented XDP transmit hardware timestamp metadata for igc driver.
-> 
-> This patchset is tested with tools/testing/selftests/bpf/xdp_hw_metadata
-> on Intel ADL-S platform. Below are the test steps and results.
-> 
-> Test Step 1: Run xdp_hw_metadata app
->  sudo ./xdp_hw_metadata <iface> > /dev/shm/result.log
-> 
-> [...]
+Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
+---
+ include/utils.h |  2 ++
+ lib/utils.c     | 14 ++++++++++++++
+ misc/nstat.c    | 29 ++++++++---------------------
+ misc/ss.c       | 13 -------------
+ 4 files changed, 24 insertions(+), 34 deletions(-)
 
-Here is the summary with links:
-  - [iwl-next,v3,1/2] selftests/bpf: xdp_hw_metadata reduce sleep interval
-    https://git.kernel.org/bpf/bpf-next/c/01031fd47305
-  - [iwl-next,v3,2/2] igc: Add Tx hardware timestamp request for AF_XDP zero-copy packet
-    (no matching commit)
-
-You are awesome, thank you!
+diff --git a/include/utils.h b/include/utils.h
+index 9ba129b8..a2a98b9b 100644
+--- a/include/utils.h
++++ b/include/utils.h
+@@ -393,4 +393,6 @@ int proto_a2n(unsigned short *id, const char *buf,
+ const char *proto_n2a(unsigned short id, char *buf, int len,
+ 		      const struct proto *proto_tb, size_t tb_len);
+ 
++FILE *generic_proc_open(const char *env, const char *name);
++
+ #endif /* __UTILS_H__ */
+diff --git a/lib/utils.c b/lib/utils.c
+index 6c1c1a8d..deb7654a 100644
+--- a/lib/utils.c
++++ b/lib/utils.c
+@@ -2003,3 +2003,17 @@ int proto_a2n(unsigned short *id, const char *buf,
+ 
+ 	return 0;
+ }
++
++FILE *generic_proc_open(const char *env, const char *name)
++{
++	const char *p = getenv(env);
++	char store[128];
++
++	if (!p) {
++		p = getenv("PROC_ROOT") ? : "/proc";
++		snprintf(store, sizeof(store) - 1, "%s/%s", p, name);
++		p = store;
++	}
++
++	return fopen(p, "r");
++}
+diff --git a/misc/nstat.c b/misc/nstat.c
+index 7beb620b..07d010de 100644
+--- a/misc/nstat.c
++++ b/misc/nstat.c
+@@ -43,35 +43,22 @@ int npatterns;
+ char info_source[128];
+ int source_mismatch;
+ 
+-static int generic_proc_open(const char *env, const char *name)
+-{
+-	char store[128];
+-	char *p = getenv(env);
+-
+-	if (!p) {
+-		p = getenv("PROC_ROOT") ? : "/proc";
+-		snprintf(store, sizeof(store)-1, "%s/%s", p, name);
+-		p = store;
+-	}
+-	return open(p, O_RDONLY);
+-}
+-
+-static int net_netstat_open(void)
++static FILE *net_netstat_open(void)
+ {
+ 	return generic_proc_open("PROC_NET_NETSTAT", "net/netstat");
+ }
+ 
+-static int net_snmp_open(void)
++static FILE *net_snmp_open(void)
+ {
+ 	return generic_proc_open("PROC_NET_SNMP", "net/snmp");
+ }
+ 
+-static int net_snmp6_open(void)
++static FILE *net_snmp6_open(void)
+ {
+ 	return generic_proc_open("PROC_NET_SNMP6", "net/snmp6");
+ }
+ 
+-static int net_sctp_snmp_open(void)
++static FILE *net_sctp_snmp_open(void)
+ {
+ 	return generic_proc_open("PROC_NET_SCTP_SNMP", "net/sctp/snmp");
+ }
+@@ -277,7 +264,7 @@ static void load_ugly_table(FILE *fp)
+ 
+ static void load_sctp_snmp(void)
+ {
+-	FILE *fp = fdopen(net_sctp_snmp_open(), "r");
++	FILE *fp = net_sctp_snmp_open();
+ 
+ 	if (fp) {
+ 		load_good_table(fp);
+@@ -287,7 +274,7 @@ static void load_sctp_snmp(void)
+ 
+ static void load_snmp(void)
+ {
+-	FILE *fp = fdopen(net_snmp_open(), "r");
++	FILE *fp = net_snmp_open();
+ 
+ 	if (fp) {
+ 		load_ugly_table(fp);
+@@ -297,7 +284,7 @@ static void load_snmp(void)
+ 
+ static void load_snmp6(void)
+ {
+-	FILE *fp = fdopen(net_snmp6_open(), "r");
++	FILE *fp = net_snmp6_open();
+ 
+ 	if (fp) {
+ 		load_good_table(fp);
+@@ -307,7 +294,7 @@ static void load_snmp6(void)
+ 
+ static void load_netstat(void)
+ {
+-	FILE *fp = fdopen(net_netstat_open(), "r");
++	FILE *fp = net_netstat_open();
+ 
+ 	if (fp) {
+ 		load_ugly_table(fp);
+diff --git a/misc/ss.c b/misc/ss.c
+index 3ebac132..87008d7c 100644
+--- a/misc/ss.c
++++ b/misc/ss.c
+@@ -478,19 +478,6 @@ static void filter_merge_defaults(struct filter *f)
+ 	}
+ }
+ 
+-static FILE *generic_proc_open(const char *env, const char *name)
+-{
+-	const char *p = getenv(env);
+-	char store[128];
+-
+-	if (!p) {
+-		p = getenv("PROC_ROOT") ? : "/proc";
+-		snprintf(store, sizeof(store)-1, "%s/%s", p, name);
+-		p = store;
+-	}
+-
+-	return fopen(p, "r");
+-}
+ #define net_tcp_open()		generic_proc_open("PROC_NET_TCP", "net/tcp")
+ #define net_tcp6_open()		generic_proc_open("PROC_NET_TCP6", "net/tcp6")
+ #define net_udp_open()		generic_proc_open("PROC_NET_UDP", "net/udp")
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.30.2
 
 
