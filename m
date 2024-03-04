@@ -1,87 +1,117 @@
-Return-Path: <netdev+bounces-77212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECC37870AB2
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 20:29:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21BAE870AB0
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 20:29:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE7541C20ED6
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 19:29:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45DE81C20ED6
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 19:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8779879955;
-	Mon,  4 Mar 2024 19:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783BE79946;
+	Mon,  4 Mar 2024 19:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OFVmGEKn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zr6c96yD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55DD579946;
-	Mon,  4 Mar 2024 19:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1CBF61677;
+	Mon,  4 Mar 2024 19:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709580590; cv=none; b=WbjB6NogBJDxFBKh0IRVdi0Pw9xafpEGXJ0qE0xweJdtSccUwiUSXLXgUUnBbgvheo1OzmGbbceuk8C3lzfiU/MEYgH4+PoXo0jq8RzIhA9d0+QULqfkGcLah+EKPjbnwi4aUPxpQ+nLYhVBqaCqKjB3sjxEAiKRkGMkt3/RnpY=
+	t=1709580575; cv=none; b=fHnyHZ6uMVaDEzoG0+BhxUjxCZLkeCGfiEYZA92ziGnoU8R2ysv7FL7kNtXiJQ45WD4eDPrh3+t5lUTCvWGz9XJeghuweNn2kdp4WIOu6Cma3DP7TX0GYhvXEROQipAxuYURY2nLV8JnGBOj22HhqCiaRsLKWJqyPjIhfnqiHWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709580590; c=relaxed/simple;
-	bh=Mm9viwy6QqpvUGccQ4BabLbBp9gEZSSvrumFydB1Blk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=icMih2ZInNPMD72wc6qUZtnxEqsbYIS2ZfIT4/SSStJsn9Mz8ig/+8FDILiRsYLjz6QrC96SSwXTsPJYmWOd22dyIwQO9uxEyfZJL8pWjw+t0NdQWnYtVLR7D3591jdJg37er0fqmoHsgl479yn+yXzZh8BeLDiGT+lpiC99WtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OFVmGEKn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96AE3C433F1;
-	Mon,  4 Mar 2024 19:29:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709580589;
-	bh=Mm9viwy6QqpvUGccQ4BabLbBp9gEZSSvrumFydB1Blk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OFVmGEKnZl9oNM/uyxv6LIOqolwMWSVESKukMkKYYQqonADKvZtXKOJiHjRpJhj+U
-	 bb/JBfVD/O4AuddQqo0zP94eCTFAtMYPIqbntKGZ5cck9I0ereDkKyj8wYyiXfHffz
-	 TVijbKq/O4OuvI1IiAmIbxrOv29E7f36/beVyaIfi7rEcED1rSTHspfI6TMZd9EB9R
-	 w+RFUlhfg26LRwGc4y1YKHKY3QSIw3QGIF/NAxHFACjh7pKmCN2AMqDeRdp84KGt2N
-	 kl1ScWwscTJWvJBwjLIPHImaxTv9DJ7mqeAlPhj9l2I9iOk2hIxi7kK3gkVgLB9mYI
-	 DwoEBIi8Fff+g==
-Date: Mon, 4 Mar 2024 19:28:16 +0000
-From: Simon Horman <horms@kernel.org>
-To: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: Richard Cochran <richardcochran@gmail.com>,
-	Min Li <min.li.xe@renesas.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ptp: fc3: Convert to platform remove callback returning
- void
-Message-ID: <20240304192816.GS403078@kernel.org>
-References: <20240304091325.717546-2-u.kleine-koenig@pengutronix.de>
+	s=arc-20240116; t=1709580575; c=relaxed/simple;
+	bh=0Rxdcvf5MJj8GAwVkkY6TLI0UHLNrle0UYwUsx1B5sY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f4IS6Vfy5UXVnM69mD/jTHroM4X5qdWfs/ybtjidJUSPXeoLQTIdM/5GhSLf85r2cmXzxE8mFEWK+8tEmKh+z7wE/3PL5cDXBVeI85dT45UxKQtK1Drlf54TJIsiq9PSKWytc+hNP6OJIzFDo00oGEIWJ7FArOdoG06AwSH1VAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zr6c96yD; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1dca160163dso47163575ad.3;
+        Mon, 04 Mar 2024 11:29:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709580573; x=1710185373; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=qjIrkRqRqyTyxYlPtOXrJ1tbSziABTmBAS1R3KCEOG4=;
+        b=Zr6c96yDGP3cSZd0H3Jbqv7+lboeRUirk0iiJEEA/t3T7ETgCImPalQJgnXI8QY2aC
+         Q5FPXX7QGEBsgCSZQ/kxTRg/CVL4q+YZMfWItXps8sTwLiFwLNUftA50HOO6anhWU3aZ
+         77ArTV70sgVQggkJoBfcXaYolV+VECh61VA2/nY6jX8tMuNJzDQh13XgSeRJrNbzcHvg
+         cRiqGjM0brs1L2yEkAaFXd/kh9QBCsToTN2ZmANf59w2cQfKNUPvzMjOlmsfTcHyu86y
+         looclcVcjNTSp6uYr5BQ+ouT/xZZgOPOMgZdnbuvXW5IiFQUJa5jio1EJ7XAEriABYF1
+         zYWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709580573; x=1710185373;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qjIrkRqRqyTyxYlPtOXrJ1tbSziABTmBAS1R3KCEOG4=;
+        b=nhssq70BsV65EyDbecuJsofPTXi2ek9xpTNTQXtttCHu3J6GzyEJqg7ztQo2EtPbJ6
+         npWMPSJjULTheAfTKE8oEJRZH6k8fT0WJe6iSpeadeYEgLcQey0hUZmlU7JyMSGerAzY
+         nJPjYICa5i3UzlbA1XVOKKnhmgnu5mG5J6GwfExP+qeIgjHpALphB8FSCQ35ApvIBMmY
+         ukXMS5GwE1hgcrlZDEhLXeFALx7NLYKw2zCDOx0UDtdwsmZbcvbxmq7s5sLutYCZwAWC
+         XH3yJ367zu8WXEx1nMRwQbehC0Ysg6NbY/Vm5FRirSyJVTPCiGzTXe+UOJKimonaoF/c
+         i42Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWWeS4t213m2yczSP3Iassk5tgjxq4MYBa+13NMgu/PneMx9bVi3T1fLLu6f0zeErxpMea/gvlP4cvTqCrmMNzXQsGpN/DDM6ivlZxEn7X6CQswiDErpi7qmi+sAS+RJzmN4Y8oX1oQOHI5dkFjk/N4UNHGIwGdfoMMdwdNGaGfcimv/Q==
+X-Gm-Message-State: AOJu0Yzzxcw89Mtx2GhXMCIxrOy+ZbrOKGH74IBGj22kGN2scgBwyw2Q
+	E1EOb56Y1t+YMCXIg3jtOYMFM2RHnsWkvcAUPlAeP+UYonuRjIHMOZhyPVuTLMPQfnnyKrus22b
+	+3XU1D1FVFo8Fk3TGd933d4R/fMY=
+X-Google-Smtp-Source: AGHT+IEaWb1+rYOENWHnXIKl8beg74pWUwp3Z+os8HZDvK6GGmiDny+sRArLo4pcVrDDjXwqA6im5Y7UJifhs7U+qUA=
+X-Received: by 2002:a17:90b:68c:b0:29a:ce2b:7611 with SMTP id
+ m12-20020a17090b068c00b0029ace2b7611mr7400561pjz.28.1709580572920; Mon, 04
+ Mar 2024 11:29:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240304091325.717546-2-u.kleine-koenig@pengutronix.de>
+References: <20240304192244.2924407-1-robimarko@gmail.com> <ZeYglnW6/k0nvmiL@shell.armlinux.org.uk>
+In-Reply-To: <ZeYglnW6/k0nvmiL@shell.armlinux.org.uk>
+From: Robert Marko <robimarko@gmail.com>
+Date: Mon, 4 Mar 2024 20:29:21 +0100
+Message-ID: <CAOX2RU77sBWD=N7hQ+7BKQ1DOh8d=JHJBLeN6NEp-4Jv_3M7zw@mail.gmail.com>
+Subject: Re: [PATCH net] net: phy: qca807x: fix compilation when
+ CONFIG_GPIOLIB is not set
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: andersson@kernel.org, konrad.dybcio@linaro.org, andrew@lunn.ch, 
+	hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, ansuelsmth@gmail.com, 
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Mar 04, 2024 at 10:13:25AM +0100, Uwe Kleine-König wrote:
-> The .remove() callback for a platform driver returns an int which makes
-> many driver authors wrongly assume it's possible to do error handling by
-> returning an error code. However the value returned is ignored (apart
-> from emitting a warning) and this typically results in resource leaks.
-> 
-> To improve here there is a quest to make the remove callback return
-> void. In the first step of this quest all drivers are converted to
-> .remove_new(), which already returns void. Eventually after all drivers
-> are converted, .remove_new() will be renamed to .remove().
-> 
-> Trivially convert this driver from always returning zero in the remove
-> callback to the void returning variant.
-> 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> ---
-> Hello,
-> 
-> note this driver is currently only available in next.
+On Mon, 4 Mar 2024 at 20:27, Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Mon, Mar 04, 2024 at 08:21:36PM +0100, Robert Marko wrote:
+> > -     if (IS_ENABLED(CONFIG_GPIOLIB)) {
+> > +#if IS_ENABLED(CONFIG_GPIOLIB)
+> >               /* Make sure we don't have mixed leds node and gpio-controller
+> >                * to prevent registering leds and having gpio-controller usage
+> >                * conflicting with them.
+> > @@ -749,7 +749,7 @@ static int qca807x_probe(struct phy_device *phydev)
+> >                       if (ret)
+> >                               return ret;
+> >               }
+> > -     }
+> > +#endif
+>
+> I know it makes for a bigger patch, but #if is not equivalent to if()
+> in terms of indentation, so the indentation also needs to be changed.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Oh, sorry for that, it completely slipped my mind.
+I will fix it in v2, and will send it tomorrow afternoon to give
+others time to comment.
 
+Regards,
+Robert
+>
+> --
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
