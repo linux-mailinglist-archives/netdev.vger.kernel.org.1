@@ -1,87 +1,101 @@
-Return-Path: <netdev+bounces-77052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B041586FF7B
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:51:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A49AD86FFA8
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 12:00:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E11C31C22EB1
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:51:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B2921F270B3
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97A1F364C8;
-	Mon,  4 Mar 2024 10:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC3F376FD;
+	Mon,  4 Mar 2024 11:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="qFJ17syC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="opdsGvKx"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A933E20B27;
-	Mon,  4 Mar 2024 10:51:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A6E1B814;
+	Mon,  4 Mar 2024 11:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709549492; cv=none; b=pPQkZRVLSTqw/Ky7cbtp7HZb+bczoDXeO9/4fZZ382k1q8P4uQwmHyve8uHAVMqKOO3XkboxrKhlqgB2IcR0QQGZA1gy4UevifSlXVv9nQpqlcdJVQ2Dm3llucxrmtMvH7CDnQe/FAwkkwMQ52E5gD4nRD+Jr56ne33A2W/0Jg0=
+	t=1709550029; cv=none; b=AbJYiXrIcZ3vmDQBEufneRWDdlU9QsPVamys6vrNooNc3PLUCHU8wlS7yOMSx3PFvBHZnFJcx4Ddc78s5AYRAbWmR+QQYbx2/IZdoeyZBbZN5E1M0ssGKHFljm8LX1S6HeJCITqts/wPkJOpX+D+5WMJE3UKeFiQiLDTkmn1gRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709549492; c=relaxed/simple;
-	bh=IcG2Jj/dlSvolrRXXvO+UrYwe632lh44+gT5R8zxefs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ivf0BtiBA/GM5JwjThWgVqJPSuiQWN6LSSuKVDcHkbcr3WcUZwER/AMKN0jRiLAf5mzKIteOFwVedMqUDQ3hGU+mZT50baJsSzoCSN6Smwmr3296vviCp4PxS4hp0u2dE7X5caGz4UsEFlGoWKMVhCka592oaroLy/zaVek/JsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=qFJ17syC; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1709549487; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=q+eNbfqNvdJbam4DpnzZdP5ixKZD3BeB29qmHQNSuu0=;
-	b=qFJ17syCMgmysubEURa9Ks9hDSvwr/uAi6DlmkpxsWN4nAqKYiI1oTHCao1RFUrtT5Ybvu9MUbdUX4AfwGlGeLJrEYxE0yPg8K0ej6lpAZbW+lJYWclBasoRChg1kxX82zC/XGWWP8uJlOQHsY4XqKS6z2fn/IA1sIjQ52ocRkg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W1oomxl_1709549486;
-Received: from 30.221.132.253(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W1oomxl_1709549486)
-          by smtp.aliyun-inc.com;
-          Mon, 04 Mar 2024 18:51:27 +0800
-Message-ID: <cff8e035-b70a-4910-9af6-e62000c0b87e@linux.alibaba.com>
-Date: Mon, 4 Mar 2024 18:51:26 +0800
+	s=arc-20240116; t=1709550029; c=relaxed/simple;
+	bh=pIgEUVGtG1rVM4ZB5OE3Ns7LozVTw2LBn5mYhplujzw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qKhgmVuWQAYNGHcNmkaMuipxvYwtkWhGEYvzyrzIj7L3pOOvzJxqPjs+w5FXG5RNG7l1Ud5cLmmVhCIfW772xQvNAGky93tSEqIhB2HCNjUeK0c+0Wj/7gJ4pXXYl9G7CgQG92NyDiGNCt3vce45slQlB7w2MPT4lhQwQC0BY5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=opdsGvKx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A6100C43390;
+	Mon,  4 Mar 2024 11:00:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709550028;
+	bh=pIgEUVGtG1rVM4ZB5OE3Ns7LozVTw2LBn5mYhplujzw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=opdsGvKxBYYON/IyysrGR2t4nWKu1a8CJgR/jV5gG1Ue+4LrDowsw0muhNO9iC3c+
+	 ZjBiq9/bYW8KR+NzP5Fr7xFEs7FR7z5qcs82sWKE5R//176SGVd6lKIBS5PDhj9+QE
+	 RPEVrpySnbz7SgHZGyMod9xFGeAu+6ppgZn/HQ7HZT3Yp0R19mFabhngOIyVTDKZv1
+	 qJ6thtmDfh/l2jGpBZQo3uaiJ2ArTNy7ROWhdqm8JdlVz5Dq5/w7Dobaj0qtAwFWty
+	 RLXkI9ZmBtkcuIZGaWb9cN4aCNW+RTgFGijJN2eWfkrp60gSWMmicI1J4DAHUvqfKW
+	 rB4fIgVNsPpug==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 89529D88F87;
+	Mon,  4 Mar 2024 11:00:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Reaching official SMC maintainers
-To: Dmitry Antipov <dmantipov@yandex.ru>, Jakub Kicinski <kuba@kernel.org>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
- "D. Wythe" <alibuda@linux.alibaba.com>, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, lvc-project@linuxtesting.org
-References: <dacadaef-4fec-4d5e-8b91-1a292ab43b37@yandex.ru>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <dacadaef-4fec-4d5e-8b91-1a292ab43b37@yandex.ru>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/4] mptcp: add TCP_NOTSENT_LOWAT sockopt support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170955002855.28316.4147541223134809817.git-patchwork-notify@kernel.org>
+Date: Mon, 04 Mar 2024 11:00:28 +0000
+References: <20240301-upstream-net-next-20240301-mptcp-tcp_notsent_lowat-v1-0-415f0e8ed0e1@kernel.org>
+In-Reply-To: <20240301-upstream-net-next-20240301-mptcp-tcp_notsent_lowat-v1-0-415f0e8ed0e1@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
+Hello:
 
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-On 2024/3/4 18:31, Dmitry Antipov wrote:
-> Jakub,
+On Fri, 01 Mar 2024 18:43:43 +0100 you wrote:
+> Patch 3 does the magic of adding TCP_NOTSENT_LOWAT support, all the
+> other ones are minor cleanup seen along when working on the new feature.
 > 
-> could you please check whether an official maintainers of net/smc are
-> actually active? I'm interesting just because there was no feedback on
-> [1]. After all, it's still a kernel memory leak, and IMO should not be
-> silently ignored by the maintainers (if any).
+> Note that this feature relies on the existing accounting for snd_nxt.
+> Such accounting is not 110% accurate as it tracks the most recent
+> sequence number queued to any subflow, and not the actual sequence
+> number sent on the wire. Paolo experimented a lot, trying to implement
+> the latter, and in the end it proved to be both "too complex" and "not
+> necessary".
 > 
-> Thanks,
-> Dmitry
-> 
-> [1] https://lore.kernel.org/netdev/20240221051608.43241-1-dmantipov@yandex.ru/
+> [...]
 
-Hi, Dmitry, I think I have given my feedback about this, see:
+Here is the summary with links:
+  - [net-next,1/4] mptcp: cleanup writer wake-up
+    https://git.kernel.org/netdev/net-next/c/037db6ea57da
+  - [net-next,2/4] mptcp: avoid some duplicate code in socket option handling
+    https://git.kernel.org/netdev/net-next/c/a74762675f70
+  - [net-next,3/4] mptcp: implement TCP_NOTSENT_LOWAT support
+    https://git.kernel.org/netdev/net-next/c/29b5e5ef8739
+  - [net-next,4/4] mptcp: cleanup SOL_TCP handling
+    https://git.kernel.org/netdev/net-next/c/7f71a337b515
 
-https://lore.kernel.org/netdev/819353f3-f5f9-4a15-96a1-4f3a7fd6b33e@linux.alibaba.com/
-https://lore.kernel.org/netdev/19d7d71b-c911-45cc-9671-235d98720be6@linux.alibaba.com/
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-IMHO, if we want to address the problem of fasync_struct entries being
-incorrectly inserted to old socket, we may have to change the general code.
 
-Thanks.
 
