@@ -1,122 +1,112 @@
-Return-Path: <netdev+bounces-77182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40D4C8706F2
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 17:25:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DA808706F5
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 17:25:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4829280DC7
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 16:24:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE2BC28112D
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 16:25:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 208F24C61B;
-	Mon,  4 Mar 2024 16:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 078284C61D;
+	Mon,  4 Mar 2024 16:25:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mTeEzxHf"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="AC0XRdkA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E906D4AEEE;
-	Mon,  4 Mar 2024 16:24:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37EE48CD4
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 16:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709569486; cv=none; b=knlUNWlKYgVro8Obg1WB/ZWe8ejLD9QF9Jl2aO4iQ9c+OXOSWgZAXsUhHYdfM3riV/fT29c5Sj8YM17tpU+imKfkbmy2RaXchWcAag3FWN7Df6+oSogVeJcprT7tmpb60J+1fuo+ZBXx2GbdZ7AYnIIpo9k97uR8chMo1z68RL4=
+	t=1709569507; cv=none; b=azGBV1nNODhToLUbUiCEqW9+gVg6RyN9j1odVgbG+Ro75bkGroQz4d3Z0u6seF25jGbY9SQ8PNCK2jSqux+qBa47t5gGyQGCnlaAmNSbZTYWg+10MPiHnWDcDPhoHEH84QhFL59FzdmWzz2Czx5aGa8oz5ps2XyJhqTclCdngpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709569486; c=relaxed/simple;
-	bh=Yc4P1CIXlKDGFPR0/DVQiT/46JdWqiofdfkNDqPQVZI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NoRy3Ys4ngM6sODtulSZVVSrhEThSCKApBf9S7XB/S+8/nfVgaOkYaGVyy033aDEx7Gp7yI04NqYWUW3MdpfQv1QTSeIfbKd5wMAsxxBTQHqASSGD2u6fU8w3aWIOXdYLzvmBAoEx1yO1bLb0Ix9f8kYJ5x1iW5h8tqmyWRJ5l8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mTeEzxHf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44643C433F1;
-	Mon,  4 Mar 2024 16:24:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709569485;
-	bh=Yc4P1CIXlKDGFPR0/DVQiT/46JdWqiofdfkNDqPQVZI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mTeEzxHfNCuzklQWKn0MQXGpW9wqJ5wU7bMtXXE3fNVk9xkSNCPuSErh0dD0iaM66
-	 Zf/idjm7pk9j+QcMsx+CiFy9KLc4DVT269NsV+fSYoAWP7T6MQZSNh+8Q8Z/guuzET
-	 fPgLI/JpW2VumWdtsZ9LYTzB2FhR8AKOkJ44dU0ewYkcxpbnA0Z/KHgTSA1xdAdBLy
-	 Ox3nmj1Me/PuiigdHF9L5hfYMUdMhWon/P14XnXBKzCzKmflmmQKwtTPwd4tMCMkmu
-	 japN0uyQHYOVfn+D5pfavzok/zAqZJSFByDy00IT9Rw2nVXfnL5vVst2ROwEp8Hn77
-	 0ViJmGCCPQG6w==
-Date: Mon, 4 Mar 2024 10:24:43 -0600
-From: Rob Herring <robh@kernel.org>
-To: Christophe Roullier <christophe.roullier@foss.st.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] dt-bindings: net: add new property st,ext-phyclk in
- documentation for stm32
-Message-ID: <20240304162443.GA568211-robh@kernel.org>
-References: <20240229134724.1353903-1-christophe.roullier@foss.st.com>
- <20240229134724.1353903-3-christophe.roullier@foss.st.com>
+	s=arc-20240116; t=1709569507; c=relaxed/simple;
+	bh=vV7NMpe33430XQUFW+1+LdvLQnHo23DlKyDNSxZlyjE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=giJd1Lzjd2+Sk4yPBlb6tB5mxxV9vPdjnOun0H05m9eHuaLoJvhpw4qiJVWLagOWVtNjAyTi4IPHw4mjhfbc2cliqQoWPruRg7Z7e9z7eipX3xX/hsDajyA2X59oM5EiMEfLFJy/6q2SHjiEyz7aCejv23ThznbwZTlyenz18Xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=AC0XRdkA; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6e558a67f70so4117338b3a.0
+        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 08:25:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1709569505; x=1710174305; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=82/NNiMoNPeL0V7embphVs4ckpBE2jmSPsU7+oD52mE=;
+        b=AC0XRdkABjihJtLbIuSmFpGUM94BEdCDwIHOlfsPm3hZLZhhk4RoGe379LoaWLlBDv
+         po/6uFx5gIAUgus2AIhUwe5XaCgHqkSWSQTgfpHDWY2/yU+YMX7wshYI/eEvsi1Z1zkg
+         WNLPlD/bt7aL5kU96tqMOAbIiX/6w3X5K70CPcAgZnJ+OjDtRobLPO0AuT4/hVK+9PDT
+         MJWNtJJPoVVkpzdRZKlhM3LL9aZAWw7Ush4ZykyrVMUK1DRN/MngCZs4JFcyigchvsoN
+         KhPUUlOw3qzAWk6WSVCl0OJvqA+t1FMcD7EQOFJcE/Sc7yGp8WzBk3Etp1/OJlPLG3a7
+         KAuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709569505; x=1710174305;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=82/NNiMoNPeL0V7embphVs4ckpBE2jmSPsU7+oD52mE=;
+        b=sS9f1Wy8ZcwP5G9huGYl3EyEmY3YdbvIeT/v36O7l2BBY6O4d8FidpKSvjgjqf1uSI
+         D5cyhvsckBWN4CXUYv1QnrsgikuXFVYKwOE1YuqR3VQKLi7JgfPoCiU7HFd53zh5v/ve
+         ZwfWEfjRVdvGL/8de3MFwLhYMwE4AcMlsKi5ruqGIJFpfM6X0veugV7yWdHWuU1vbAv+
+         jDmRk1UpjVdfkbtwh60hZHU4Dn1Bd9MnYzM7BmpH78wO4aHhPdV59YbSRxdIooMklUP5
+         t2p38m9B42oT3eAJ2lMJhbfLISA0AQOnSyHVTf2vY7TnCEP3h8yoCK2/nsGov/R+1kzf
+         Jwlg==
+X-Gm-Message-State: AOJu0Yyj++bMKqIDGQKg8IIG3ZdbttZqAJ2Qr5fLtvZtNnScfeazFRRj
+	uLAqFfTQdY7lwDE7qjUdz/NGedD0p97VyjJJYxphURrnlMvvQQmB2vNU3Hzx0qYHGqzwCUTUuWx
+	ESvIFMw==
+X-Google-Smtp-Source: AGHT+IFXV3+3w6QE0V5mTkfl85Ptj9bqF0Rlng2+I6BHnQDuzuj2gmhHP9Deb/8caNyuQgjTEOnh4A==
+X-Received: by 2002:a05:6a20:258b:b0:1a0:d103:7030 with SMTP id k11-20020a056a20258b00b001a0d1037030mr8387503pzd.32.1709569505172;
+        Mon, 04 Mar 2024 08:25:05 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id b64-20020a62cf43000000b006e5a915a9e7sm6888353pfg.10.2024.03.04.08.25.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Mar 2024 08:25:04 -0800 (PST)
+Date: Mon, 4 Mar 2024 08:25:03 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Lars Ellenberg <lars.ellenberg@linbit.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH] ss: fix output of MD5 signature keys configured on TCP
+ sockets
+Message-ID: <20240304082503.5648447c@hermes.local>
+In-Reply-To: <ZeHLFNX7f5x1M10/@grappa.linbit>
+References: <ZeHLFNX7f5x1M10/@grappa.linbit>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240229134724.1353903-3-christophe.roullier@foss.st.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 29, 2024 at 02:47:24PM +0100, Christophe Roullier wrote:
-> Add property st,ext-phyclk to manage cases when PHY have no cristal/quartz
-> This property can be used with RMII phy without cristal 50Mhz and when we
-> want to select RCC clock instead of ETH_REF_CLK
-> Can be used also with RGMII phy with no cristal and we select RCC clock
-> instead of ETH_CLK125
-> This new property replace st,eth-clk-sel and st,eth-ref-clk-sel
+On Fri, 1 Mar 2024 13:33:24 +0100
+Lars Ellenberg <lars.ellenberg@linbit.com> wrote:
 
-That is obvious from the diff. What is not obvious is why we need a new 
-property and what is the problem with the existing ones.
-
+> da9cc6ab introduced printing of MD5 signature keys when found.
+> But when changing printf() to out() calls with 90351722,
+> the implicit printf call in print_escape_buf() was overlooked.
+> That results in a funny output in the first line:
+> "<all-your-tcp-signature-keys-concatenated>State"
+> and ambiguity as to which of those bytes belong to which socket.
 > 
-> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
+> Add a static void out_escape_buf() immediately before we use it.
+> 
+> da9cc6ab (ss: print MD5 signature keys configured on TCP sockets, 2017-10-06)
+> 90351722 (ss: Replace printf() calls for "main" output by calls to helper, 2017-12-12)
+> 
+> Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
 > ---
->  Documentation/devicetree/bindings/net/stm32-dwmac.yaml | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> index 80937b28fa046..fda23c07c1cad 100644
-> --- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> @@ -85,12 +85,21 @@ properties:
->    phy-supply:
->      description: PHY regulator
->  
-> +  st,ext-phyclk:
-> +    description:
-> +      set this property in RMII mode when you have PHY without crystal 50MHz and want to
-> +      select RCC clock instead of ETH_REF_CLK. OR in RGMII mode when you want to select
-> +      RCC clock instead of ETH_CLK125.
-> +    type: boolean
-> +
->    st,eth-clk-sel:
-> +    deprecated: true
->      description:
->        set this property in RGMII PHY when you want to select RCC clock instead of ETH_CLK125.
->      type: boolean
->  
->    st,eth-ref-clk-sel:
-> +    deprecated: true
->      description:
->        set this property in RMII mode when you have PHY without crystal 50MHz and want to
->        select RCC clock instead of ETH_REF_CLK.
-> -- 
-> 2.25.1
-> 
+
+Wonder if the out() method was really good idea in the first place.
+Would have been easier to use openstream to redirect stdio buffer and count
+bytes on the other side.
+
+But will merge this. Eventually, ss needs a bit overhaul/rewrite to be not
+one monolithic program and handle json.
 
