@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-77032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4D2C86FE28
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:57:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16FCA86FE2A
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:57:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6417C1F21DEF
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:57:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 804381F20C20
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1823C225CE;
-	Mon,  4 Mar 2024 09:57:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7F7225CF;
+	Mon,  4 Mar 2024 09:57:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="A0got25k"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gORiLPAm"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2044.outbound.protection.outlook.com [40.107.93.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B204225AA
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 09:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD08241E3
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 09:57:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709546230; cv=fail; b=I1UG7M8VXOz1wOxxsh+QSMax/XHK3dNQKILnX1DoQeDaFRe0snZuL0P2eZaJA55ke8I/JMfRNifiBCNRP7HTOznMiH/p3UbAbMET862VWYDXmcHFaxcYeZh/EZCMkC2Ld68w/mfDSls7BeiKX2QuGgz8UWo3VugPu6yP7JOralA=
+	t=1709546236; cv=fail; b=Fs+PjBNuqSa4SjvYtSw2QT+uuvNK4dt+3vqvFUlusSI5cJkli57/Vd05zJ4zyaeJeNQ0Pq8SoS5UElFniHHOlyG2tNZwPI/Pgw00j7qlcRB1LeGabUd2A2ghqGbwwSCb9Q+bbnO0/XTwxaGeZQ0y3kuUbbYhgfGvxdA/BLXBkkI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709546230; c=relaxed/simple;
-	bh=lHRgzlj0LF3R9O/Dne2BSYklSURAecIZhLsJdVJqBcs=;
+	s=arc-20240116; t=1709546236; c=relaxed/simple;
+	bh=tVm/2ZNtftrRvGvCOgsu0fhaD3aNYW+JrnH7gLCLna0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uEZY61Ynre9VmWOUE7DbdOSQfT8N/cZP91ahIyV7xUhSc553qsPOYNaaxu/t6I5iBX0/CRZ4Z8JtlZG18PxIMQ6BUj9UJnQLE10huDDh5YGRKEV7/SzVGsmsosc6rcRuowsjmigfFQbyk1PPi52sQDF4OP8L5M4z2wtXZL+YylU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=A0got25k; arc=fail smtp.client-ip=40.107.236.41
+	 MIME-Version:Content-Type; b=XmtAtCQAgGn62R+eEwOWYqOAnrosGz7fm/dMphPC8ZoysbP0k6+9SmQlv9Aa6yHaiRD+yNHdGjxIcnYth+2aFiMWi1umPPBhug+NK8vXngUUlk6I0gJ5f3ZdxePf6L536UI/NyQ8V7fTlaSHFjmllXfp3KvBnC5foyEuIXjSaIM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gORiLPAm; arc=fail smtp.client-ip=40.107.93.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e3wJYZdQ8gC4ZXXbYHDwDdlbfTdFzNKKpJO3hOKN+UrZEYkzFZy4k/G3Dr0WcwrJp9ubWdTusPYMvBAsknlSCGxTOQ4T/gbvPEsT8nS/2G2fqFdiNzS5zMmPazLdBrBhaKwkxdOQezJ2VPF5CSDUGWbdO0akZfCySeffHY+RHX46J2in1sZVVk2Rw4eBYJ9Sg3jrMqOIyJDuKSTXAK5LnicTbhDwWFAd6ICFjIoZ80hBV+vSP1d2oqGLP9CGciqwX5F74i6rNdMTRcd7nqUOjLxrFvHCb+ipUJpWnWZtYl/R4yCeFKrWmByoiBsoRMQ0NOPQ4zYqKFYfrRbu3qPPug==
+ b=f6X56cuh8wQ87gJxuknFaGdIxVLEqa9dv/xzDW2YNL3RXG0KNiDsVyrzUOgTYQBhHh80BdQ/qCvjUrZFLLi2ABZeukcAgO9v4cNeyzX7jxRlrK7To89Y9HHr1AaZN2Ri6Qw08yl2gsdpucUFMhzNNtPULTWTkoQwRDl/ToX28VSencO7dQtFJCoMLSEwcqGWL72NLEQ70P6WLG2uQkZiLdVooBFJnDnVzzgBLqM/c3hAG6l8OijmkMamcGx3zzcpuQNDcSZKKbC2n4b6JgsYGvomzVn5V+eJJuVBdpno9VArEzqjMoHznf3r24zNH4yxs/F+wg5L7KTzgj1tFfuszw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=q9bLnIQDvAYezug//eIHee4c+tzG004AullBxxsw7WA=;
- b=M9/oTjS/uGjoYFEobzZiTIHABKpHS0bUR00nync2rPL3M+wVdwBF4GfM/UABFpDy5JrHbCY8lKMSJKDTlTdatuyUJMQM08RvEtvCN6FJ3OltFH0DXN9W9BbI2Wkl5wrUkX6MyLORsRqSOuELvAfCCgYVeUBb6sdAU3E+WXih+VMiOBAGF2MVXAXohYlLsPvKT+RkQwW1FQZ1sSexvB3kySIoCInmTMK21+cNbquzirktz1X5zVICI+Z7+ZpdRBj8IloRasC7H55FTLIlmwD/leLWFBF1wWNDQAvQ8mXoqzrSZi+QT4G8lAyJTirXIdYfWvi06R0W5ljV58yj9K4P0g==
+ bh=CrOto6UWLkvqUYmGweY3EAzUe1HWWEfIi+/Ntd9ynDc=;
+ b=hdKZg4b/Q314rfQjfume7VszlvoPX+ylBLIK8QkRL3f32aU0m5h/Oo7mKjExPHn1ODB1CGxAV1q7D9dm9PY8YlmgqcYlNYSw/2LX7Co4lZKE/ULveyawx8LfqG9QfRpBd8Bcgno5Ye6H4GHEjtyaM/ZfkLyiyhB/WJ+1EPiHEupvOdEOfDebr66jJN3xINulvOlQ0I67GxFnOXeWB6HY4P/w0x0831nRoEps1t8RjEDLcJPf0hHJu6PcaspDUZ3AGNhr86j9CzkcmBygdiAqqRJvzIJqyG7HVllTLSj5tFcxTfBNfs1CxHvtlelKT7dn93e/pTnonPafhCKBeAHr4Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q9bLnIQDvAYezug//eIHee4c+tzG004AullBxxsw7WA=;
- b=A0got25kRKmp3QxWtMC5ilIEba4NqLULYP9wL+NPvQjVMWSsa+xZ8p+Wn8uwWcAuceVxkVvADwvX1EUz8z0QdyKTus4MECtxvs2DUPTbV47sSXcGcit3EsTqJNhIFT1pU901mgXIhHSBT7kWTbKwq1xmbGMQkXhtJib4BiMF4y8zzSLw+fxk1b7QnBLrQffEDo866m9hZtB/aU3nP6MX8A5o+HohNPeP8yRE5RWzDwsNeDIEhOaMhXStrg57o2OBCKwurow7OXkpH81C38V8Rg22hzeKk2Aqk0ZAh5WwfxbEzWalAVlPkG83LdrJhJhZrIcDshHrEGVPm4fuirIfaw==
-Received: from BN9PR03CA0139.namprd03.prod.outlook.com (2603:10b6:408:fe::24)
- by CH3PR12MB7737.namprd12.prod.outlook.com (2603:10b6:610:14d::15) with
+ bh=CrOto6UWLkvqUYmGweY3EAzUe1HWWEfIi+/Ntd9ynDc=;
+ b=gORiLPAmRu/lHIsD3YTFwLNn1vR8/lVZnIGuyoAEupAgchGLVTyraMJTHOzpytZ0mqU4nwUQFhmpQzN54iSCM9B6MHy9WGVltJYF0wwcZtH0iw/SUT2QcYl27OrffhbBLuBxEaAXaJ9G++Uf7YHw4b6q6yc+5KRF/VuIEOF8jR4m7qW9Pw9XoY8ESuPgeXBguJLy0qx9EwpRumCHiZMrR20ZsdPJnJjD+CnRhUPuzXGHvsy6p05uM8mOXVXHcT7FSlLvRla+JCIJ0cfosiwqxVicZBkA6302lGsbW/btCXkAt2v00H0/Tcbm7AWzHxWkxn1cj8kpxvIL/122XiQzfg==
+Received: from CH0P221CA0031.NAMP221.PROD.OUTLOOK.COM (2603:10b6:610:11d::13)
+ by CH3PR12MB9281.namprd12.prod.outlook.com (2603:10b6:610:1c8::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.39; Mon, 4 Mar
- 2024 09:57:05 +0000
-Received: from BN1PEPF00004687.namprd05.prod.outlook.com
- (2603:10b6:408:fe:cafe::e1) by BN9PR03CA0139.outlook.office365.com
- (2603:10b6:408:fe::24) with Microsoft SMTP Server (version=TLS1_2,
+ 2024 09:57:09 +0000
+Received: from DS2PEPF00003439.namprd02.prod.outlook.com
+ (2603:10b6:610:11d:cafe::3a) by CH0P221CA0031.outlook.office365.com
+ (2603:10b6:610:11d::13) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.39 via Frontend
- Transport; Mon, 4 Mar 2024 09:57:05 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ Transport; Mon, 4 Mar 2024 09:57:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN1PEPF00004687.mail.protection.outlook.com (10.167.243.132) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS2PEPF00003439.mail.protection.outlook.com (10.167.18.36) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7362.11 via Frontend Transport; Mon, 4 Mar 2024 09:57:04 +0000
+ 15.20.7362.11 via Frontend Transport; Mon, 4 Mar 2024 09:57:09 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 4 Mar 2024
- 01:56:52 -0800
+ 01:56:55 -0800
 Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.12; Mon, 4 Mar 2024 01:56:49 -0800
+ 15.2.1258.12; Mon, 4 Mar 2024 01:56:52 -0800
 From: Ido Schimmel <idosch@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<edumazet@google.com>, <petrm@nvidia.com>, <bpoirier@nvidia.com>,
 	<shuah@kernel.org>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next 3/6] selftests: forwarding: Make tc-police pass on debug kernels
-Date: Mon, 4 Mar 2024 11:56:09 +0200
-Message-ID: <20240304095612.462900-4-idosch@nvidia.com>
+Subject: [PATCH net-next 4/6] selftests: forwarding: Make vxlan-bridge-1q pass on debug kernels
+Date: Mon, 4 Mar 2024 11:56:10 +0200
+Message-ID: <20240304095612.462900-5-idosch@nvidia.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240304095612.462900-1-idosch@nvidia.com>
 References: <20240304095612.462900-1-idosch@nvidia.com>
@@ -98,121 +98,81 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00004687:EE_|CH3PR12MB7737:EE_
-X-MS-Office365-Filtering-Correlation-Id: 426f2a42-31b7-42af-d67f-08dc3c31727e
+X-MS-TrafficTypeDiagnostic: DS2PEPF00003439:EE_|CH3PR12MB9281:EE_
+X-MS-Office365-Filtering-Correlation-Id: c1104468-db8d-42c7-d6f3-08dc3c317529
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	mkiMD29oMprbGQ3GbYG8jCojXFv1IgBsCF8AGy3BBjjTk9W5LV7yd3/Bi83q6ckhaORtzRjVNgI5P4kQ7EtxYqYrZyukIG6BHS45Ldl0puFw/yUqEw/V80MiBNbChzvK3zUWD6e6GuGEVHknQhEpqD3Qy0G+AX2v5iwoWRbpB2HdFE/+0PeMvrx+Pdt82JHSuUQYqMruGqmBhzSL1Y4zU18KmNlBnUdjwGCk28XGBbhpEkKYPvCMAAd4INMkxPPUDTAtQ2sQJawP8lkb0G21POYiPVmGW21FhUtw2s1IF8V5jgmPtSgg3Q9SSK1GlbrToYvdzxFpbTuf/laWOOR/hYpr/Zo3Bg47hcM17Dj8fpiN3ejjIDeX0VMEmwHRqPaFRnzX5pstSilEbuKHTR220kZuADRk0tJKknji8LxB6K1anEiP2QDpc255Go8kYL6WdLkk46iUuc/swmdWMLPfUmYe8dyD3rxsn+TxXGADu66hqhhJNMCa0ARXX7/pFY8jI27j627UIOdFy1Ge7FhO2OI9ca/PzYqfX4NhxRtYeUVLai5TzFqkC8CsZ9aMIJ7oNPwcJBNdAUe6AQQNpRZbNaz3AICurJfXeAX9awVxUxk+jx28mOkNRoSEvgO7frRrqsiGVBdOJ1yAD++egpLXCT8n165OivtMzg7wK3/N+vv1DlAnir3wcIdBHqjZEWjmu6NERvjhs6sCn5poGqADSXzzYDJxVz77rubil6oY3AdcvTIgqrAyBDaL+gT7r8eU
+	SCivlI8bg4xsZ2jtpzGRxHKo9HJkr0c+KTkGixgvl+pXvxb0zy2FB9hNn2D7A5+6IMQQ99gNjAv6MDdJbb/092YtTAXtdqF8su/1aShNsBSD/VLXWwYjoVH8TNpvnCfmjtVpCIfzsRWwM/S8wFVyaxpp6r0RIFYzStE6ynJCG264I46y3QINK3CTb726BI+LjDjMJ/s77k6sPQmNVrxZJgyGrzxcdnBmHxtD9i49MMCtr+On1ExMPnreSh+r6neb0XO2zOEc8SFf832/XXqJzUJtuYZFn3try83GEFZsSqzedzH5oKu9uVK7zlvI0daav5K6Qq0BsVKB3Bs2uWV96mPI6qlgpLhN/eAkf2lW6l75B0aIwC13Vc30fx3symrB9tuaSGSW8L3fj0N+ttgvyADf38tnfXLAC9aHQ20wGjb6e39Oq1cn9BkHqrkJqmpTPmQuTCW0hcEhcr+rlOoFh7IAH05u3CS9UTncTIJnnsdO8iLpxmsxnbpDSui64T2kyRlKyQ+SESi5nfVJwz4SALVRFx5HwBKOX5ueGTvPR2wFB3FU27R1lPEi5USaEAqnjdQkg3G7zbw/UIJbeRPhxzQlsXmP5ANXMfNkJA73rm9NSgG0PJi7jUbL7usOpBLWE1Df4/vlEXxOCSiFxsKM65wkCEKyo6L59dTkTDoDvhVH2KouA1i3nNDrWzoD5v+waGy2z+ySEx0hn/HnUrGD1vXbsifF4LLULNltP6I78914oRinFvOVjSstGMyiz3/Q
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(36860700004)(82310400014);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(376005)(36860700004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2024 09:57:04.9715
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2024 09:57:09.4945
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 426f2a42-31b7-42af-d67f-08dc3c31727e
+X-MS-Exchange-CrossTenant-Network-Message-Id: c1104468-db8d-42c7-d6f3-08dc3c317529
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00004687.namprd05.prod.outlook.com
+	DS2PEPF00003439.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7737
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9281
 
-The test configures a policer with a rate of 80Mbps and expects to
-measure a rate close to it. This is a too high rate for debug kernels,
-causing the test to fail [1].
+The ageing time used by the test is too short for debug kernels and
+results in entries being aged out prematurely [1].
 
-Fix by reducing the rate to 10Mbps.
+Fix by increasing the ageing time.
 
 [1]
- # ./tc_police.sh
- TEST: police on rx                                                  [FAIL]
-         Expected rate 76.2Mbps, got 29.6Mbps, which is -61% off. Required accuracy is +-10%.
- TEST: police on tx                                                  [FAIL]
-         Expected rate 76.2Mbps, got 30.4Mbps, which is -60% off. Required accuracy is +-10%.
+ # ./vxlan_bridge_1q.sh
+ [...]
+ INFO: learning vlan 10
+ TEST: VXLAN: flood before learning                                  [ OK ]
+ TEST: VXLAN: show learned FDB entry                                 [ OK ]
+ TEST: VXLAN: learned FDB entry                                      [FAIL]
+         swp4: Expected to capture 0 packets, got 10.
+ RTNETLINK answers: No such file or directory
+ TEST: VXLAN: deletion of learned FDB entry                          [ OK ]
+ TEST: VXLAN: Ageing of learned FDB entry                            [FAIL]
+         swp4: Expected to capture 0 packets, got 10.
+ TEST: VXLAN: learning toggling on bridge port                       [ OK ]
+ [...]
 
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 ---
- .../selftests/net/forwarding/tc_police.sh        | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ .../selftests/net/forwarding/vxlan_bridge_1q.sh        | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/net/forwarding/tc_police.sh b/tools/testing/selftests/net/forwarding/tc_police.sh
-index 0a51eef21b9e..5103f64a71d6 100755
---- a/tools/testing/selftests/net/forwarding/tc_police.sh
-+++ b/tools/testing/selftests/net/forwarding/tc_police.sh
-@@ -140,7 +140,7 @@ police_common_test()
- 	sleep 10
- 	local t1=$(tc_rule_stats_get $h2 1 ingress .bytes)
+diff --git a/tools/testing/selftests/net/forwarding/vxlan_bridge_1q.sh b/tools/testing/selftests/net/forwarding/vxlan_bridge_1q.sh
+index a596bbf3ed6a..fb9a34cb50c6 100755
+--- a/tools/testing/selftests/net/forwarding/vxlan_bridge_1q.sh
++++ b/tools/testing/selftests/net/forwarding/vxlan_bridge_1q.sh
+@@ -750,7 +750,7 @@ __test_learning()
+ 	expects[0]=0; expects[$idx1]=10; expects[$idx2]=0
+ 	vxlan_flood_test $mac $dst $vid "${expects[@]}"
  
--	local er=$((80 * 1000 * 1000))
-+	local er=$((10 * 1000 * 1000))
- 	local nr=$(rate $t0 $t1 10)
- 	local nr_pct=$((100 * (nr - er) / er))
- 	((-10 <= nr_pct && nr_pct <= 10))
-@@ -157,7 +157,7 @@ police_rx_test()
- 	# Rule to police traffic destined to $h2 on ingress of $rp1
- 	tc filter add dev $rp1 ingress protocol ip pref 1 handle 101 flower \
- 		dst_ip 198.51.100.1 ip_proto udp dst_port 54321 \
--		action police rate 80mbit burst 16k conform-exceed drop/ok
-+		action police rate 10mbit burst 16k conform-exceed drop/ok
+-	sleep 20
++	sleep 60
  
- 	police_common_test "police on rx"
+ 	bridge fdb show brport $vx | grep $mac | grep -q self
+ 	check_fail $?
+@@ -796,11 +796,11 @@ test_learning()
+ 	local dst=192.0.2.100
+ 	local vid=10
  
-@@ -169,7 +169,7 @@ police_tx_test()
- 	# Rule to police traffic destined to $h2 on egress of $rp2
- 	tc filter add dev $rp2 egress protocol ip pref 1 handle 101 flower \
- 		dst_ip 198.51.100.1 ip_proto udp dst_port 54321 \
--		action police rate 80mbit burst 16k conform-exceed drop/ok
-+		action police rate 10mbit burst 16k conform-exceed drop/ok
+-	# Enable learning on the VxLAN devices and set ageing time to 10 seconds
+-	ip link set dev br1 type bridge ageing_time 1000
+-	ip link set dev vx10 type vxlan ageing 10
++	# Enable learning on the VxLAN devices and set ageing time to 30 seconds
++	ip link set dev br1 type bridge ageing_time 3000
++	ip link set dev vx10 type vxlan ageing 30
+ 	ip link set dev vx10 type vxlan learning
+-	ip link set dev vx20 type vxlan ageing 10
++	ip link set dev vx20 type vxlan ageing 30
+ 	ip link set dev vx20 type vxlan learning
+ 	reapply_config
  
- 	police_common_test "police on tx"
- 
-@@ -190,7 +190,7 @@ police_shared_common_test()
- 	sleep 10
- 	local t1=$(tc_rule_stats_get $h2 1 ingress .bytes)
- 
--	local er=$((80 * 1000 * 1000))
-+	local er=$((10 * 1000 * 1000))
- 	local nr=$(rate $t0 $t1 10)
- 	local nr_pct=$((100 * (nr - er) / er))
- 	((-10 <= nr_pct && nr_pct <= 10))
-@@ -211,7 +211,7 @@ police_shared_test()
- 	# Rule to police traffic destined to $h2 on ingress of $rp1
- 	tc filter add dev $rp1 ingress protocol ip pref 1 handle 101 flower \
- 		dst_ip 198.51.100.1 ip_proto udp dst_port 54321 \
--		action police rate 80mbit burst 16k conform-exceed drop/ok \
-+		action police rate 10mbit burst 16k conform-exceed drop/ok \
- 		index 10
- 
- 	# Rule to police a different flow destined to $h2 on egress of $rp2
-@@ -250,7 +250,7 @@ police_mirror_common_test()
- 	# Rule to police traffic destined to $h2 and mirror to $h3
- 	tc filter add dev $pol_if $dir protocol ip pref 1 handle 101 flower \
- 		dst_ip 198.51.100.1 ip_proto udp dst_port 54321 \
--		action police rate 80mbit burst 16k conform-exceed drop/pipe \
-+		action police rate 10mbit burst 16k conform-exceed drop/pipe \
- 		action mirred egress mirror dev $rp3
- 
- 	mausezahn $h1 -a own -b $(mac_get $rp1) -A 192.0.2.1 -B 198.51.100.1 \
-@@ -260,7 +260,7 @@ police_mirror_common_test()
- 	sleep 10
- 	local t1=$(tc_rule_stats_get $h2 1 ingress .bytes)
- 
--	local er=$((80 * 1000 * 1000))
-+	local er=$((10 * 1000 * 1000))
- 	local nr=$(rate $t0 $t1 10)
- 	local nr_pct=$((100 * (nr - er) / er))
- 	((-10 <= nr_pct && nr_pct <= 10))
-@@ -270,7 +270,7 @@ police_mirror_common_test()
- 	sleep 10
- 	local t1=$(tc_rule_stats_get $h3 1 ingress .bytes)
- 
--	local er=$((80 * 1000 * 1000))
-+	local er=$((10 * 1000 * 1000))
- 	local nr=$(rate $t0 $t1 10)
- 	local nr_pct=$((100 * (nr - er) / er))
- 	((-10 <= nr_pct && nr_pct <= 10))
 -- 
 2.43.0
 
