@@ -1,130 +1,109 @@
-Return-Path: <netdev+bounces-77105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB0BE87036F
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:56:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4564A870372
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:57:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 905C7B2832E
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:56:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D584B284F4
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:57:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A581A3F9C3;
-	Mon,  4 Mar 2024 13:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B79A93EA91;
+	Mon,  4 Mar 2024 13:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="bCWJcTC+"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0E93B797
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 13:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792A93BB3A;
+	Mon,  4 Mar 2024 13:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709560585; cv=none; b=TWEXMZzoDncrvMuSRcixYg46IgAHExJQfej3b1LRiJ0dI2ImuxBIFAmbEi4MVbk0Nlr1B7gGg7Zt9EM0SQkGhO9HlcOyR1f7A/rTOAM4JkI7qMxFYGDI254M9b3fM+iofOtmUQCo1e9nApF4uw6m8j1wDhOMkNExgzLpfRzfPyE=
+	t=1709560645; cv=none; b=ht/41+m9KZoBbHnXzVDspeOMOh+PrwM9GE3eafu0utGoQgzN65lNtQupQCrkU8jjdQk1fIJe9yLe/db90micw8kgbHq5A4UNZmt1fcKo417eGkSSwjqhKfktTUcgaUluhjYzoG84W2bv/PtNkNen/C9npst1SmJRYcHFqOAcJXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709560585; c=relaxed/simple;
-	bh=QJQ63Qy2NxLUI09eztah+cUO41gaSAxVF3u7uBvwMs4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tEPF1h/ms7uUr9141IPwcd3HyahaBoK+9LX7AehF4tScFj8Jxf2e21spZnGKuQEIk7+lmXOPLs/JBbRCJg9bvFrT+kx/r24Sba/UUbDqfSWhHq7teAw2K2DXYcDKvgmiM3VkuIKn47kJCW66MllvUoNyg4lQ8ycCR8m4mOPrWKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rh8ng-0004OE-7v; Mon, 04 Mar 2024 14:56:16 +0100
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	s=arc-20240116; t=1709560645; c=relaxed/simple;
+	bh=t4HFn7eIQvSgZ5wRMktcT8dDyGdFxF5R14Sx2I7vfPA=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=HInLCEsyXSXX4Dyr4DkWnRPjzNIxJ5vj5HrnJeSg6H6ff2jVac6yfYYA5x41whZsd8pEuqS2VCwzyxlntD5SDOUO+zpkerkBtVrJ5DXcD3B/qFfQQKi0nmozk1AbuzuIXXDTJ0UEzFbCvwvTXPcKYtWiN6XPy5y0tYtvpIWK4Xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=bCWJcTC+; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=/9y+afRjJ9gLFaGiuSXGFB7Y07dNe/W9ADUFEmL+ed8=; b=bCWJcTC+qhzGEcw0AlIPOLXZMv
+	kB99hkpaGpzUUsbTOkEnCLqlnPQxfI8zpFRheZLYeATnoe6WspE6EORRspXR0jKLkhwR7qR8asYEu
+	/NYxVOPmYlHXxaP952ZNhI5wV+7As+uLHXPPF45xksU4HyQE0+GAmr/Lzj7/KRfcKJMAn8pilpnaz
+	a5m8Y37DS84apb0+4Z2WwTJ5sFQUcfpYfpS0hSSwgF4ZrRb5Q9hhYCGaT6IskNyM6cEwy9cweuuv2
+	xuEtvH+KqwwfDn7x0ry5aoQFBY14fRKLmlBi/bYSf31Z6+0bN3EXH1TeIkWMytBVJAwLyNZchluvL
+	b932B+SQ==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rh8nf-004MiW-0Y; Mon, 04 Mar 2024 14:56:15 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rh8ne-003Prr-34;
-	Mon, 04 Mar 2024 14:56:14 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: [PATCH net v1 1/1] net: dsa: microchip: make sure drive strength configuration is not lost by soft reset
-Date: Mon,  4 Mar 2024 14:56:12 +0100
-Message-Id: <20240304135612.814404-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rh8od-0005eq-A2; Mon, 04 Mar 2024 14:57:15 +0100
+Received: from [178.197.248.27] (helo=linux.home)
+	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rh8oc-0003y7-Jh; Mon, 04 Mar 2024 14:57:14 +0100
+Subject: Re: [PATCH net-next v2] net/nlmon: Cancel setting the fields of
+ statistics to zero.
+To: Jason Xing <kerneljasonxing@gmail.com>, yuanli fu <fuyuanli0722@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ fuyuanli@didiglobal.com
+References: <20240303114139.GA11018@didi-ThinkCentre-M920t-N000>
+ <CAL+tcoDAmA4q+FxJchgA1LQ2fxhD8oRdjDOmVPeJ1-eSnkSt5Q@mail.gmail.com>
+ <CABbqxmcJ+bybv0e-Rby9Q1jVR59Na_XE9MBee+f_zu0HUTmvqA@mail.gmail.com>
+ <CAL+tcoDkTPLFksXWReGXNjujOQbgtiTKN0_-MW1f7Yhj8+CzgA@mail.gmail.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <df93a088-e8f8-3708-8009-b0560c0d07f7@iogearbox.net>
+Date: Mon, 4 Mar 2024 14:57:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <CAL+tcoDkTPLFksXWReGXNjujOQbgtiTKN0_-MW1f7Yhj8+CzgA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27204/Mon Mar  4 10:25:09 2024)
 
-This driver has two separate reset sequence in different places:
-- gpio/HW reset on start of ksz_switch_register()
-- SW reset on start of ksz_setup()
+On 3/4/24 2:25 PM, Jason Xing wrote:
+> On Mon, Mar 4, 2024 at 7:14 PM yuanli fu <fuyuanli0722@gmail.com> wrote:
+>> Jason Xing <kerneljasonxing@gmail.com> 于2024年3月4日周一 15:05写道：
+>>> On Sun, Mar 3, 2024 at 7:43 PM fuyuanli <fuyuanli@didiglobal.com> wrote:
+>>>>
+>>>> Since fields of rtnl_link_stats64 have been set to zero in the previous
+>>>> dev_get_stats function, there is no need to set them again in the
+>>>> ndo_get_stats64 function.
+>>>>
+>>>> Signed-off-by: fuyuanli <fuyuanli@didiglobal.com>
+>>>> Link: https://lore.kernel.org/netdev/20240302105224.GA7223@didi-ThinkCentre-M920t-N000/
+>>>
+>>> Suggested-by: Jason Xing <kerneljasonxing@gmail.com>
+>>> See https://lore.kernel.org/all/CAL+tcoA=FVBJi2eJgAELhWG_f+N-kwmrHc+XRfKXhYk2RJcPKg@mail.gmail.com/
+>> OK, I will submit a v3 patch which updating commit message, thanks.
+> 
+> I don't think you need to send a new version of the patch unless
+> someone points out other changes that should be made.
 
-The second one will overwrite drive strength configuration made in the
-ksz_switch_register().
+I think this patch is not needed anymore, see net-next :
 
-To fix it, move ksz_parse_drive_strength() from ksz_switch_register() to
-ksz_setup().
+4f41ce81a919 ("net: nlmon: Remove init and uninit functions")
+26b5df99bf60 ("net: nlmon: Simplify nlmon_get_stats64")
 
-Fixes: d67d7247f641 ("net: dsa: microchip: Add drive strength configuration")
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/dsa/microchip/ksz_common.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index d58cc685478b1..83a5936506059 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2260,6 +2260,8 @@ static int ksz_pirq_setup(struct ksz_device *dev, u8 p)
- 	return ksz_irq_common_setup(dev, pirq);
- }
- 
-+static int ksz_parse_drive_strength(struct ksz_device *dev);
-+
- static int ksz_setup(struct dsa_switch *ds)
- {
- 	struct ksz_device *dev = ds->priv;
-@@ -2281,6 +2283,10 @@ static int ksz_setup(struct dsa_switch *ds)
- 		return ret;
- 	}
- 
-+	ret = ksz_parse_drive_strength(dev);
-+	if (ret)
-+		return ret;
-+
- 	/* set broadcast storm protection 10% rate */
- 	regmap_update_bits(ksz_regmap_16(dev), regs[S_BROADCAST_CTRL],
- 			   BROADCAST_STORM_RATE,
-@@ -4345,10 +4351,6 @@ int ksz_switch_register(struct ksz_device *dev)
- 	for (port_num = 0; port_num < dev->info->port_cnt; ++port_num)
- 		dev->ports[port_num].interface = PHY_INTERFACE_MODE_NA;
- 	if (dev->dev->of_node) {
--		ret = ksz_parse_drive_strength(dev);
--		if (ret)
--			return ret;
--
- 		ret = of_get_phy_mode(dev->dev->of_node, &interface);
- 		if (ret == 0)
- 			dev->compat_interface = interface;
--- 
-2.39.2
-
+Thanks,
+Daniel
 
