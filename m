@@ -1,121 +1,197 @@
-Return-Path: <netdev+bounces-76947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFE8986F96B
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 06:12:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2554886F9AF
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 06:45:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 016D9B21108
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 05:12:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90E541F21206
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 05:45:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D7A96FB1;
-	Mon,  4 Mar 2024 05:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCFDCC13D;
+	Mon,  4 Mar 2024 05:45:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZaV8S7NY"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WGN3Thb5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A9628FC
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 05:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365B5BA33
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 05:45:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709529149; cv=none; b=gSTiTvKVD2qkpnBD1UB9FH6QHJqA+XG8h1ubrVzIPj4LOv8Jb/M2YrVEMMasrPdeTsm4rR7oyznxo8E4+QoE4HOVyGXl7PrnKuK6Dyq7OR3aFohZmFLX7nOcJGmTgzM1EapTvGBZtypQybV5+s/ZZMG9nBBNh1BOmxsd39KkCdE=
+	t=1709531147; cv=none; b=LqKw38xRMtaY1O8Z4OsIN8fLoOWgfaIMURbkCssmTTaq1YghCK1il2s4TfM+0wrwFlc3BvEdfIT/pkKZ2thVmLnWWQOGscFmL2zPt/k/DyS/2qmg7Rw9l1xSg8pI7+7tbbXrP0t76oYVXSGh9Y5jvOxNnxZWesJomxO8UazXe7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709529149; c=relaxed/simple;
-	bh=RkZR6AQGNumxUNeiUTcE2zH9/MxQFnrzWkHwzZzIdoo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iPwu0E6JAcdWyOCjCWsvY4h/zeqv2bjrrU33R4qFRm2oR5JH/3n7V9Kzfeqo3ak4+DmoUyUy0QD2a0hfd26t9k5uRz2apbJD4NdY68mcoG+/XWnr99+z5Aj8CDu4yJEUMX9/qy6nlDhla87v1keHVkUl8U/R+2+anpySvK6TCp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZaV8S7NY; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5654ef0c61fso22505a12.0
-        for <netdev@vger.kernel.org>; Sun, 03 Mar 2024 21:12:25 -0800 (PST)
+	s=arc-20240116; t=1709531147; c=relaxed/simple;
+	bh=Opih2PZV9gDsPvBwpspCv8TGpZmtmjlOY8SluqDWbFE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I6l6QT9fUG8m64VAD6mn8+fYY1fSWaTZNHhU30p0PLsqzlmtA6D8I6oohcRu5TNJ/Mq+Zyp97w6NvjG8X7H+xS1RUjFbRN9W24ux6k8mi3rtVsBRJDf66QbCFKGlqEcH6Wum78rBviGtQdhBjI+C8/gF23+/W9HUSbGYO0GJ9a0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WGN3Thb5; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6e58d259601so2576414b3a.3
+        for <netdev@vger.kernel.org>; Sun, 03 Mar 2024 21:45:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709529144; x=1710133944; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EUR3SXQYlMBJ+S1TsUhop+VTYRh3FUB5752NRTIEWf8=;
-        b=ZaV8S7NYxn1hackDu4FBfGIe5dr0W7lzNLYC+HxKvJW8Rv7+Z6gqkKP/z1fMQeC1dn
-         E+ffuop3JvrDNaB8h7a7lWGQrJnqNHNoyFBg4WxtXKRfrrl+nIaXOqlcCCSiYPBKgtUB
-         xHSF6/FfJPZL0Hp7Sw1ELSuz3vqvJESBp4QoWLSSp8iUxaWw0Tuw5q+cvHZBikgYbqrp
-         mYhSX1bg1mDFTq2Csop5Y2rvIHtjvH1InfrpLhKy3I/daktYp3CYZJbsLqJPEOjpLPjU
-         Y9uWWmav2sX/xCgyK1myD3ijjJbMHvoC44AdUnJfA7RPbPeRvW/yUSFV8U+zRx8lyQlH
-         4rhw==
+        d=linaro.org; s=google; t=1709531144; x=1710135944; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=nyLi8+SmSre8SLNOigrTqCqxHxWeA+jhwdAxcyOndLM=;
+        b=WGN3Thb5nCuEA604AinhfkMD+bTyPJzuGBLsOXz3YY+Rg6kckJu+iTRpqpU2il7i3P
+         ChUxgagjFlrjxQxOQGysTqSuR5hXR9WuMc4PYa68iWKmqAYSniwzZGUhRfWX95x7e3EG
+         X5ECHiQd7F3rV/AuaK5j+AtLod07cJhDE0ZZuA3EiWCX4ErSsIAS+TI/tSoWUvufdfkE
+         p+OenSJE1ga3+/AIrwnXszTcVQMOC+Iz+IHba6kdNYGStUFdGTE6Q2iE8SCKTjYji4CK
+         M4RSFwdclltEnDCH1LWEFDiLHoGvft/DpwXKux41XzqGqk4O2BA+M0pFqnyIoCWGBMw1
+         mfMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709529144; x=1710133944;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EUR3SXQYlMBJ+S1TsUhop+VTYRh3FUB5752NRTIEWf8=;
-        b=plsWSBD9oa2+zBQJ0z/kpE13UspX4Qs1LXBWRgjb4VsBy+co61cD5LwyMehaQOkKUF
-         JdGwIXN0cHpGqZaXxCqmRiaMfNXadsa6rWyNxQu5uIVEYFKjJryKmFDUCZ+6Whq+UwZy
-         iNknXnPhTwbLMKE3mZh35QYUf3Axc8Zrp1qldSOyrn5UGBHA4NabQePg0UFbePstJBpB
-         6sqlM/ld6LBJiswpxKc1xTxKXR0mLCtRQ7Ab9s/I6enmenAbBP494cmmDYNHlD/dZpkg
-         3nnjsJJPmE09WbLhQlvB/p2FBlrYS7a7FbIX75cvTMZTRVaPD4i6WHKcF+8F5cehH8D0
-         esQg==
-X-Forwarded-Encrypted: i=1; AJvYcCXHVJom3HFWTRsG6liZmmhD2QHyfyOFomkeyZTSLRDdX1BnEqB0ulLS0LQpWY6+fA/fKg2sReQIZMhc1PuEIH0xSh8l9283
-X-Gm-Message-State: AOJu0YxveL3zb6HHpVd5pdyLRJrhscuVfvnKMaeXKPkUbEYv8tDruUlR
-	SzOltiaCAfk348/V+HNr+idTDqYQmwuwuvExRC7h6C6oPOkg9BavudG+2h9OZv9198EdDQIglvr
-	+4c8faJa4VSYtCGOuV9ACc8IibECxqjKuSnE3
-X-Google-Smtp-Source: AGHT+IFk/yOw56LrMBCcjw5FkqWSmRn9c37C4hrrela5SKpQ0FiUwD8BBhxVSWUFxhxJtKdGT7I9Ik2nnrrNCi8cpxY=
-X-Received: by 2002:a05:6402:3496:b0:566:ff41:69f1 with SMTP id
- v22-20020a056402349600b00566ff4169f1mr182364edc.3.1709529144406; Sun, 03 Mar
- 2024 21:12:24 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709531144; x=1710135944;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nyLi8+SmSre8SLNOigrTqCqxHxWeA+jhwdAxcyOndLM=;
+        b=NlgasLpySCxwv+GjNJvqIaIY1DmqE5zOWffbjvZGbQTF0qlpgWQVEruMKnrxjTN7Ap
+         lq5oqdPApkSTTd2RwsIQgcFVb3d2rLfnPb9cqDhg4XpR1HVB79aEz1xJsM3aWl0KETH6
+         d1mCvZEbybKMm0hC5MEVfU8YxwE6itVUWRGUTZ5O5MG2A/XdZ8PTuanpiNMmv/M4QE9W
+         U2gW3dgExJ3DghVcoY9XqzGYXqr6AL+RKNl1RKRZgIxpT8m3GhV26YwqeoNxWsybozlB
+         uRXVD+aX6fCBe1QaBabwziTYku77LHicl64YCr51p42YagapCfCHB4vm/V6sVRWyGSjy
+         NtEg==
+X-Forwarded-Encrypted: i=1; AJvYcCWbMeF9CTR0oIZQz/6oQ1TA+BQDaa2q74hXo959QR+uGBodRfTGtaHAEQIgE0h0Fc60ZvX7raq+n6LiuY7HeQlVjXYQK503
+X-Gm-Message-State: AOJu0YyNmGIOH5jQjIjIQn/77eZzGADTlUAUUsRk2iLKUZFmP4KH95WB
+	1x7V51JEDDc9OVCveQ/G7764jsmfS42V4Pg+iU02lFD0HW/ivscXkXczlhYywg==
+X-Google-Smtp-Source: AGHT+IEb05hPzFeBZje+h75WEQQpiRcBp848ihooFqT4tnzoz+8bG6TqQJGYpSZro6DP/2UhVDknig==
+X-Received: by 2002:a05:6a00:2fd1:b0:6e5:d3b9:2d06 with SMTP id fn17-20020a056a002fd100b006e5d3b92d06mr7157632pfb.21.1709531144470;
+        Sun, 03 Mar 2024 21:45:44 -0800 (PST)
+Received: from thinkpad ([117.207.30.163])
+        by smtp.gmail.com with ESMTPSA id q4-20020a63e944000000b005dc1edf7371sm6746085pgj.9.2024.03.03.21.45.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 Mar 2024 21:45:44 -0800 (PST)
+Date: Mon, 4 Mar 2024 11:15:36 +0530
+From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+To: Baochen Qiang <quic_bqiang@quicinc.com>
+Cc: ath11k@lists.infradead.org, linux-wireless@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, mhi@lists.linux.dev,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH v5 0/3] wifi: ath11k: hibernation support
+Message-ID: <20240304054536.GA2647@thinkpad>
+References: <20240304021554.77782-1-quic_bqiang@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANn89i+fJis6omMAuEmgkFy7iND97cA8WecRSVG6P=z15DpHnQ@mail.gmail.com>
- <tencent_FD84E7D8C6D392F1C66E89816EF36ED48C06@qq.com>
-In-Reply-To: <tencent_FD84E7D8C6D392F1C66E89816EF36ED48C06@qq.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 4 Mar 2024 06:12:11 +0100
-Message-ID: <CANn89i+cfMWX_ybtP-VHX7PgLT-mwuUkYMuqsnUwZ3jki8oTcA@mail.gmail.com>
-Subject: Re: [PATCH] net/netrom: fix uninit-value in nr_route_frame
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-hams@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	ralf@linux-mips.org, syzbot+f770ce3566e60e5573ac@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240304021554.77782-1-quic_bqiang@quicinc.com>
 
-On Mon, Mar 4, 2024 at 6:05=E2=80=AFAM Edward Adam Davis <eadavis@qq.com> w=
-rote:
->
-> [Syzbot reported]
->
-> [Fix]
-> Let's clear all skb data at alloc time.
->
-> Reported-and-tested-by: syzbot+f770ce3566e60e5573ac@syzkaller.appspotmail=
-.com
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> ---
->  net/core/skbuff.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index edbbef563d4d..5ca5a608daec 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -656,6 +656,7 @@ struct sk_buff *__alloc_skb(unsigned int size, gfp_t =
-gfp_mask,
->          * to allow max possible filling before reallocation.
->          */
->         prefetchw(data + SKB_WITH_OVERHEAD(size));
-> +       memset(data, 0, size);
+On Mon, Mar 04, 2024 at 10:15:51AM +0800, Baochen Qiang wrote:
+> Currently in ath11k we keep the firmware running on the WLAN device when the
+> network interface (wlan0) is down. The problem is that this will break
+> hibernation, obviously the firmware can't be running after the whole system is
+> powered off. To power down the ath11k firmware for suspend/hibernation some
+> changes both in MHI subsystem and ath11k are needed.
+> 
+> This patchset fixes a longstanding bug report about broken hibernation support:
+> 
+> https://bugzilla.kernel.org/show_bug.cgi?id=214649
+> 
+> There already is an RFC version which has been tested by multiple users with
+> positive results:
+> 
+> https://patchwork.kernel.org/project/linux-wireless/cover/20231127162022.518834-1-kvalo@kernel.org/
+> 
+> Basically the RFC version adds two APIs to MHI stack: with the first one ath11k
+> is able to keep MHI devices when going to suspend/hibernation, getting us rid of
+> the probe deferral issue when resume back. while with the second one ath11k could
+> manually prepare/unprepare MHI channels by itself, which is needed because QRTR
+> doesn't probe those channels automatically in this case.
+> 
+> Mani, the MHI maintainer, firstly doesn't like that version and insists that an
+> MHI device should be destroyed when suspend/hibernation, according to his
+> understanding on device driver model. See
+> 
+> https://lore.kernel.org/mhi/20231127162022.518834-1-kvalo@kernel.org/
+> 
+> After a long discussion Mani thought we might need a new PM callback with which
+> ath11k is able to wait until kernel unblocks device probe and thus MHI channels
+> get probed. So we came to the kernel PM list and there Mani realized that his
+> understanding is not correct so he finally agrees to keep MHI device during
+> suspend/hibernation. See
+> 
+> https://lore.kernel.org/all/21cd2098-97e1-4947-a5bb-a97582902ead@quicinc.com/
+> 
+> Mani also pointed out that an MHI controller driver (ath11k here) should not touch
+> MHI channels directly because those channels are managed by the corresponding MHI
+> client driver (QRTR here). To address this, we come up with this version.
+> 
+> Compared with that RFC version, this version adds PM callbacks in QRTR module:
+> suspend callback unprepares MHI channels during suspend and resume callback
+> prepares those channels during resume. In this way ath11k doesn't need to do
+> unprepare/prepare work by itself so those two APIs added in RFC version are
+> removed now.
+> 
+> The power down/up procedure requires a specific sequence in which PM callbacks
+> of wiphy, ath11k and QRTR are called, this is achieved by exploiting the
+> child-father relationship between their device struct, and also the PM framework
+> which separates whole suspend/resume process into several stages. Details in
+> patch [3/3].
+> 
+> v5:
+>  - remove Kalle's s-o-b tag in patch 1/3 per Mani.
 
+Why are you not carrying review tags? I have reviewed the patches and provided
+my tags for patches 1 and 2 in v3 and v4. Now there is no tag again in v5 :(
 
-We are not going to accept such a change, for obvious performance reasons.
+You cannot expect maintainers to provide review tags in each revision.
 
-Instead, please fix net/netrom/nr_route.c
+- Mani
 
-Thank you.
+> 
+> v4:
+>  - resend v3 as v4 to CC netdev folks. No changes in patches themselves.
+> 
+> v3:
+>  - skip QRTR suspend/resume if MHI device is found to be in suspend state.
+> 
+> v2:
+>  - add comment on why destroying the device is optional in
+>    mhi_pm_disable_transition().
+>  - rename mhi_power_down_no_destroy() as mhi_power_down_keep_dev().
+>  - refine API description of mhi_power_down() and
+>    mhi_power_down_keep_dev().
+>  - add/remove __maybe_unused to QRTR PM callbacks.
+>  - remove '#ifdef CONFIG_PM'.
+>  - refine commit log of patch 1/3 and 2/3.
+> 
+> Baochen Qiang (3):
+>   bus: mhi: host: add mhi_power_down_keep_dev()
+>   net: qrtr: support suspend/hibernation
+>   wifi: ath11k: support hibernation
+> 
+>  drivers/bus/mhi/host/internal.h        |   4 +-
+>  drivers/bus/mhi/host/pm.c              |  42 ++++++++--
+>  drivers/net/wireless/ath/ath11k/ahb.c  |   6 +-
+>  drivers/net/wireless/ath/ath11k/core.c | 105 +++++++++++++++++--------
+>  drivers/net/wireless/ath/ath11k/core.h |   6 +-
+>  drivers/net/wireless/ath/ath11k/hif.h  |  14 +++-
+>  drivers/net/wireless/ath/ath11k/mhi.c  |  12 ++-
+>  drivers/net/wireless/ath/ath11k/mhi.h  |   5 +-
+>  drivers/net/wireless/ath/ath11k/pci.c  |  44 +++++++++--
+>  drivers/net/wireless/ath/ath11k/qmi.c  |   2 +-
+>  include/linux/mhi.h                    |  18 ++++-
+>  net/qrtr/mhi.c                         |  46 +++++++++++
+>  12 files changed, 244 insertions(+), 60 deletions(-)
+> 
+> 
+> base-commit: 48294c8a226d82c687b52b2eb90a075bbfbcb884
+> -- 
+> 2.25.1
+> 
+
+-- 
+மணிவண்ணன் சதாசிவம்
 
