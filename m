@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-77041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A54E386FE72
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:10:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E6DD86FE70
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:10:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 463501F23475
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:10:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 048951F21D13
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00CB224F9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97D10224DE;
 	Mon,  4 Mar 2024 10:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mjy3A1JQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TP/R0yQS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB37224DF
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 10:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7015620B33;
+	Mon,  4 Mar 2024 10:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709547028; cv=none; b=UqLHOWL1z47LzLwOkTNgnBeR+gSsVY/jVoaAtCQX3XJaeJaxT/YhZm8/m8UIdDp9lUv7YFjMZDX5VH5HFIIze/4xtB5dakeWjQYZqy98otIUOMalqyCAFONDt3rajzyxwV/ItGh6W6Udry3KebgRBb2Ft0JtrPI2Gf49zYlbkxM=
+	t=1709547028; cv=none; b=o6Qm1RuSeRIdfx3KQmhfv9864AbPbqW8sd0bwezsxLGuY34IiZp8D6VHPsVmnO9qdYwDBBTyRPDFwS4lbI7ROIWjc0ADMeX+/DDM9bP1Zmw6cMB157aSihS/tBoP5nxJwrZN2okbemnu8npEKRbzaC7WUS+lxS6X823GZjdPlvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709547028; c=relaxed/simple;
-	bh=hk8TGQMRtTxgPeCH1vivDUlZ1M0h4KszU+p66HNbbxY=;
+	bh=B826BG/LabvHzX/qTThYEXRApaxmS5m/7jaE3+DLICE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hHoopozEo2C5E9qh8GZrxBA0s5m0Iawaz2FD2pw2J2gYt/DKJ0hk82yA0vozwTx82SnfFEKUgEYSD8zUM/PzR0QV5AbapbXUJ6Hzzt0BY2s46/HNowOEatwSD3o4haYCUJkJxpXD+lUiWfBzn2WgX9L8M5Am6mG9p2bXBvVrEnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mjy3A1JQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3CE62C43390;
+	 In-Reply-To:To:Cc; b=QC1/ADCRTVorhaxDo/PMOQYei37Hu1GMwtWSPtipm2NhWOfjVN/ZwfqoQkqERRFwh4sgX2PCIAxuIbXvwcobXcrvsemiLHb0pJWlozVDEROiXuCPIJ8r1zJ2lwhIaTOT94xXI7enwYELirE+WS0pu6QH1mFFVI0cDCDOMD6MCxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TP/R0yQS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2EFC9C433C7;
 	Mon,  4 Mar 2024 10:10:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709547028;
-	bh=hk8TGQMRtTxgPeCH1vivDUlZ1M0h4KszU+p66HNbbxY=;
+	bh=B826BG/LabvHzX/qTThYEXRApaxmS5m/7jaE3+DLICE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mjy3A1JQ/CbvmRbtI13eEjVrGfvoI1hUnH0rBUKvxIQbLeV2lhzXCyshWdhvtbz3W
-	 l27nqqaTQmAgkQHeFmLVNZxPBlWnX5arwEgod4/FMCurXh/6lKcIO1I9/yzccwKago
-	 9zTTVAt0GQ4THuLBKfvAMUWAjbhhvm0ypiJLwlowsvOgv1cNOcBUBdQ5rrjLVzQl6H
-	 Y8wiZqI1JzRKb9RPEMN1AI3iO3852ywVS1uIdZ0ha//7pjlbvK6giLDDDECMdy/7LX
-	 dw9RFxTXBQ+qg0BntHZTTRIwcf6q1hKBizFheLkyRW+LDkL41cleRTiTyAigbkE0Wa
-	 v3S9nj5p38Kgw==
+	b=TP/R0yQScU7A9oo7JK2IJK6F1Cu+pbJvFHFTfd3w7ecqrW/nF3MLpLuVyEl6sus/D
+	 l3DLo9YgpIHwomCL2w8MoYH3B4hZ4fyf22JS38RYyin1BgFlIqB2oj9VbGrj6+JOXA
+	 /Yv6Gcc66KokxBxI2rzUiaMSwHOTa34MZMpHcPJPP/vxYWbNP9bxs1mvK8UqMsiTHc
+	 K8wflKdElTFX5OuqA4Ci8UGu42NaLtv88IFFkPcSNW8Kl8fW4wqwb4nP8hOPV3ZUVr
+	 Pa3W+Ni7Xb9W0CoKuRxO5fdiAhv8zzt/8HvfheAyUiDvxTaMx5tXZuoZw6RxTMFjIT
+	 tsndoi4QFvUVg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1D827D9A4B9;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 147ACD88F87;
 	Mon,  4 Mar 2024 10:10:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,37 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] eth: igc: remove unused embedded struct net_device
+Subject: Re: [PATCH net-next 0/3] gve: Add header split support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170954702811.29163.12079126596096428666.git-patchwork-notify@kernel.org>
+ <170954702808.29163.14572409164565217897.git-patchwork-notify@kernel.org>
 Date: Mon, 04 Mar 2024 10:10:28 +0000
-References: <20240301070255.3108375-1-kuba@kernel.org>
-In-Reply-To: <20240301070255.3108375-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
- jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com
+References: <20240229212236.3152897-1-ziweixiao@google.com>
+In-Reply-To: <20240229212236.3152897-1-ziweixiao@google.com>
+To: Ziwei Xiao <ziweixiao@google.com>
+Cc: netdev@vger.kernel.org, jeroendb@google.com, pkaligineedi@google.com,
+ shailend@google.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, willemb@google.com, rushilg@google.com,
+ jfraker@google.com, jrkim@google.com, hramamurthy@google.com,
+ horms@kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 29 Feb 2024 23:02:55 -0800 you wrote:
-> struct net_device poll_dev in struct igc_q_vector was added
-> in one of the initial commits, but never used.
+On Thu, 29 Feb 2024 13:22:33 -0800 you wrote:
+> Currently, the ethtool's ringparam has added a new field tcp-data-split
+> for enabling and disabling header split. These three patches will
+> utilize that ethtool flag to support header split in GVE driver.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: jesse.brandeburg@intel.com
-> CC: anthony.l.nguyen@intel.com
+> Jeroen de Borst (3):
+>   gve: Add header split device option
+>   gve: Add header split data path
+>   gve: Add header split ethtool stats
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] eth: igc: remove unused embedded struct net_device
-    https://git.kernel.org/netdev/net-next/c/c2a22688c931
+  - [net-next,1/3] gve: Add header split device option
+    https://git.kernel.org/netdev/net-next/c/0b43cf527d1d
+  - [net-next,2/3] gve: Add header split data path
+    https://git.kernel.org/netdev/net-next/c/5e37d8254e7f
+  - [net-next,3/3] gve: Add header split ethtool stats
+    https://git.kernel.org/netdev/net-next/c/056a70924a02
 
 You are awesome, thank you!
 -- 
