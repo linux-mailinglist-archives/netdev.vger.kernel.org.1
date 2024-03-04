@@ -1,184 +1,116 @@
-Return-Path: <netdev+bounces-77271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A9E48710DA
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 00:04:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D17368710D7
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 00:03:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B89831F21FA8
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 23:04:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CBE76B221CA
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 23:03:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6A47C0B8;
-	Mon,  4 Mar 2024 23:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB3987C0A8;
+	Mon,  4 Mar 2024 23:03:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cb7zGDfS"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ocl5RAEL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4C247B3FA;
-	Mon,  4 Mar 2024 23:04:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D8687B3FA
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 23:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709593453; cv=none; b=cBaBqnC3WfZtXpXx3dqnkhezR+JinPjcFM3n7214sFEDSEft6q7uDjI1TzYUo+w6X3s9aVZ5eFpRLZpxxjtIZ/fq76zrCusnP7pEz+ozSI3c01ngviurB6TqvZglXsXfnlVQCIoXhCEj5U1N/+U19DLJmdmuEgikdEsElgHQPcg=
+	t=1709593429; cv=none; b=cy0ETrXfsi/HCoAvOsL0XmwNcarfsFvf6iZEWdn/pv4DQ5XYFSU0ALAd5TzYKo6+IptZ+JI/fmZ5c26BKh77XeF+PrJPEBxwEzu49+w9dQdbfErX64AmVf4tRPPHhU4C2ZnU10F+nkMn60YzS5WVz7I6SEXU8XzQGk71q4ADxIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709593453; c=relaxed/simple;
-	bh=yuCHCk5pAXWk9zFTn51GPimxWJDaabkWYuCRAsFiCzk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X3M+x+yfLeBWdzw814ooGG1QnXIHqo2DlQ2ocMp4jWdqE/vhS2HVvwM/Zr+LNdmo9DQbTWdPV7XRVo/tFdYdp0VgdjHezk/cowSXVFMSF2khNr62RWhC6wHkOwYATcv4fQeG8aUm8b9Gv5TdPxTLmmfBUlD9IxX4AzfC2jfCGHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cb7zGDfS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00501C433C7;
-	Mon,  4 Mar 2024 23:04:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709593452;
-	bh=yuCHCk5pAXWk9zFTn51GPimxWJDaabkWYuCRAsFiCzk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cb7zGDfSF8eJ+WnXgLNsm70sNwG68ToebQ03PvaEhRbasgRdsFD7lYGpDDFj16hky
-	 gZAkDMVOhFbrkSdOjLbb5V5nxy4B0GyrLSY5HyNlg9h4p8xTB9T6Ld8Mzqhatf6TQj
-	 pACJUr+eYqcpii8SMNdZp93BsvX3vvxDobVG8l1CrS2xlARYM2HSCnDtOqbHGhY/Tc
-	 ntcCSKdMe44cQNbb9zmLvUhUzCE6PEUW4MYC+epAeJR2K3A8tzQfYQSn18SFbblLKo
-	 dKxjx4bmeqwARqzyD/UaqvZDBtbYWnPUeQFQO8JEEQtyS/b9koDaOyRU+C4hr6yx9r
-	 6Cf7E+zaRiIKg==
-Date: Mon, 4 Mar 2024 15:04:11 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mark Brown <broonie@kernel.org>, keescook@chromium.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org,
- mic@digikod.net, linux-security-module@vger.kernel.org,
- jakub@cloudflare.com
-Subject: Re: [PATCH v4 00/12] selftests: kselftest_harness: support using
- xfail
-Message-ID: <20240304150411.6a9bd50b@kernel.org>
-In-Reply-To: <05f7bf89-04a5-4b65-bf59-c19456aeb1f0@sirena.org.uk>
-References: <20240229005920.2407409-1-kuba@kernel.org>
-	<05f7bf89-04a5-4b65-bf59-c19456aeb1f0@sirena.org.uk>
+	s=arc-20240116; t=1709593429; c=relaxed/simple;
+	bh=EtDr3Y5rZ+SuQVzEWb04ywA9Iye+QIuH0OHvxenuvw8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oycAneDKO+35eEUJJP82PBg/+sU3eoevhIMKm8HKAA1MTeuMLJdMLEWFZNgoZQ/i1dqINzK2If0vBf5yDQTdBjS8k0pPemapP203OrrsYRP7nsYsmHfmR90iLUswf+77G3KY3TdKLojVh4HQjh17o6KYGWYXeqwIHeS6mxOCVKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ocl5RAEL; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=opPB80CnLjIFhJ+2AVcrH9KaVYjmH1SvaeUo+CgL66g=; b=Ocl5RAELvstgzEcqbu0Jhf49oP
+	pgEYW0fu8CGsfL995eoWIOI0in6H5pfhoBe5eXV2m71OIIvVCXT0E8tlH7uLZ+insz0dX+diDd0L1
+	oIQIRVSJQGpji1u9Rk2bvexkKxyPvlsAM+rCTNNFUHjg9Q54QSCG4IdsgsbT8c5wQ90M=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rhHLw-009MRd-0h; Tue, 05 Mar 2024 00:04:12 +0100
+Date: Tue, 5 Mar 2024 00:04:12 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v2 22/22] ovpn: add basic ethtool support
+Message-ID: <57e2274e-fa83-47c9-890b-bb3d2a62acb9@lunn.ch>
+References: <20240304150914.11444-1-antonio@openvpn.net>
+ <20240304150914.11444-23-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240304150914.11444-23-antonio@openvpn.net>
 
-On Mon, 4 Mar 2024 22:20:03 +0000 Mark Brown wrote:
-> On Wed, Feb 28, 2024 at 04:59:07PM -0800, Jakub Kicinski wrote:
+On Mon, Mar 04, 2024 at 04:09:13PM +0100, Antonio Quartulli wrote:
+> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+> ---
+>  drivers/net/ovpn/main.c | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
 > 
-> > When running selftests for our subsystem in our CI we'd like all
-> > tests to pass. Currently some tests use SKIP for cases they
-> > expect to fail, because the kselftest_harness limits the return
-> > codes to pass/fail/skip. XFAIL which would be a great match
-> > here cannot be used.
-> > 
-> > Remove the no_print handling and use vfork() to run the test in
-> > a different process than the setup. This way we don't need to
-> > pass "failing step" via the exit code. Further clean up the exit
-> > codes so that we can use all KSFT_* values. Rewrite the result
-> > printing to make handling XFAIL/XPASS easier. Support tests
-> > declaring combinations of fixture + variant they expect to fail.  
-> 
-> This series landed in -next today and has caused breakage on all
-> platforms in the ALSA pcmtest-driver test.  When run on systems that
-> don't have the driver it needs loaded the test skip but since this
-> series was merged skipped tests are logged but then reported back as
-> failures:
-> 
-> # selftests: alsa: test-pcmtest-driver
-> # TAP version 13
-> # 1..5
-> # # Starting 5 tests from 1 test cases.
-> # #  RUN           pcmtest.playback ...
-> # #      SKIP      Can't read patterns. Probably, module isn't loaded
-> # # playback: Test failed
-> # #          FAIL  pcmtest.playback
-> # not ok 1 pcmtest.playback #  Can't read patterns. Probably, module isn't loaded
-> # #  RUN           pcmtest.capture ...
-> # #      SKIP      Can't read patterns. Probably, module isn't loaded
-> # # capture: Test failed
-> # #          FAIL  pcmtest.capture
-> # not ok 2 pcmtest.capture #  Can't read patterns. Probably, module isn't loaded
-> # #  RUN           pcmtest.ni_capture ...
-> # #      SKIP      Can't read patterns. Probably, module isn't loaded
-> # # ni_capture: Test failed
-> # #          FAIL  pcmtest.ni_capture
-> # not ok 3 pcmtest.ni_capture #  Can't read patterns. Probably, module isn't loaded
-> # #  RUN           pcmtest.ni_playback ...
-> # #      SKIP      Can't read patterns. Probably, module isn't loaded
-> # # ni_playback: Test failed
-> # #          FAIL  pcmtest.ni_playback
-> # not ok 4 pcmtest.ni_playback #  Can't read patterns. Probably, module isn't loaded
-> # #  RUN           pcmtest.reset_ioctl ...
-> # #      SKIP      Can't read patterns. Probably, module isn't loaded
-> # # reset_ioctl: Test failed
-> # #          FAIL  pcmtest.reset_ioctl
-> # not ok 5 pcmtest.reset_ioctl #  Can't read patterns. Probably, module isn't loaded
-> # # FAILED: 0 / 5 tests passed.
-> # # Totals: pass:0 fail:5 xfail:0 xpass:0 skip:0 error:0
-> 
-> I haven't completely isolated the issue due to some other breakage
-> that's making it harder that it should be to test.  
-> 
-> A sample full log can be seen at:
-> 
->    https://lava.sirena.org.uk/scheduler/job/659576#L1349
+> diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+> index 95a94ccc99c1..9dfcf2580659 100644
+> --- a/drivers/net/ovpn/main.c
+> +++ b/drivers/net/ovpn/main.c
+> @@ -13,6 +13,7 @@
+>  #include "ovpnstruct.h"
+>  #include "packet.h"
+>  
+> +#include <linux/ethtool.h>
+>  #include <linux/genetlink.h>
+>  #include <linux/module.h>
+>  #include <linux/moduleparam.h>
+> @@ -83,6 +84,36 @@ static const struct net_device_ops ovpn_netdev_ops = {
+>  	.ndo_get_stats64        = dev_get_tstats64,
+>  };
+>  
+> +static int ovpn_get_link_ksettings(struct net_device *dev,
+> +				   struct ethtool_link_ksettings *cmd)
+> +{
+> +	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.supported, 0);
+> +	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.advertising, 0);
+> +	cmd->base.speed	= SPEED_1000;
+> +	cmd->base.duplex = DUPLEX_FULL;
+> +	cmd->base.port = PORT_TP;
+> +	cmd->base.phy_address = 0;
+> +	cmd->base.transceiver = XCVR_INTERNAL;
+> +	cmd->base.autoneg = AUTONEG_DISABLE;
 
-Thanks! the exit() inside the skip evaded my grep, I'm testing this:
+Why? It is a virtual device. Speed and duplex is meaningless. You
+could run this over FDDI, HIPPI, or RFC 1149? So why PORT_TP?
 
-diff --git a/tools/testing/selftests/alsa/test-pcmtest-driver.c b/tools/testing/selftests/alsa/test-pcmtest-driver.c
-index a52ecd43dbe3..7ab81d6f9e05 100644
---- a/tools/testing/selftests/alsa/test-pcmtest-driver.c
-+++ b/tools/testing/selftests/alsa/test-pcmtest-driver.c
-@@ -127,11 +127,11 @@ FIXTURE_SETUP(pcmtest) {
- 	int err;
- 
- 	if (geteuid())
--		SKIP(exit(-1), "This test needs root to run!");
-+		SKIP(exit(KSFT_SKIP), "This test needs root to run!");
- 
- 	err = read_patterns();
- 	if (err)
--		SKIP(exit(-1), "Can't read patterns. Probably, module isn't loaded");
-+		SKIP(exit(KSFT_SKIP), "Can't read patterns. Probably, module isn't loaded");
- 
- 	card_name = malloc(127);
- 	ASSERT_NE(card_name, NULL);
-diff --git a/tools/testing/selftests/mm/hmm-tests.c b/tools/testing/selftests/mm/hmm-tests.c
-index 20294553a5dd..356ba5f3b68c 100644
---- a/tools/testing/selftests/mm/hmm-tests.c
-+++ b/tools/testing/selftests/mm/hmm-tests.c
-@@ -138,7 +138,7 @@ FIXTURE_SETUP(hmm)
- 
- 	self->fd = hmm_open(variant->device_number);
- 	if (self->fd < 0 && hmm_is_coherent_type(variant->device_number))
--		SKIP(exit(0), "DEVICE_COHERENT not available");
-+		SKIP(exit(KSFT_SKIP), "DEVICE_COHERENT not available");
- 	ASSERT_GE(self->fd, 0);
- }
- 
-@@ -149,7 +149,7 @@ FIXTURE_SETUP(hmm2)
- 
- 	self->fd0 = hmm_open(variant->device_number0);
- 	if (self->fd0 < 0 && hmm_is_coherent_type(variant->device_number0))
--		SKIP(exit(0), "DEVICE_COHERENT not available");
-+		SKIP(exit(KSFT_SKIP), "DEVICE_COHERENT not available");
- 	ASSERT_GE(self->fd0, 0);
- 	self->fd1 = hmm_open(variant->device_number1);
- 	ASSERT_GE(self->fd1, 0);
+> +static void ovpn_get_drvinfo(struct net_device *dev,
+> +			     struct ethtool_drvinfo *info)
+> +{
+> +	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
+> +	strscpy(info->version, DRV_VERSION, sizeof(info->version));
 
-> but there's no more context.  I'm also seeing some breakage in the
-> seccomp selftests which also use kselftest-harness:
-> 
-> # #  RUN           TRAP.dfl ...
-> # # dfl: Test exited normally instead of by signal (code: 0)
-> # #          FAIL  TRAP.dfl
-> # not ok 56 TRAP.dfl
-> # #  RUN           TRAP.ign ...
-> # # ign: Test exited normally instead of by signal (code: 0)
-> # #          FAIL  TRAP.ign
-> # not ok 57 TRAP.ign
+Please leave version untouched. The ethtool core will then fill it in
+with something useful.
 
-Ugh, I'm guessing vfork() "eats" the signal, IOW grandchild signals,
-child exits? vfork() and signals.. I'd rather leave to Kees || Mickael.
+> +	strscpy(info->bus_info, "ovpn", sizeof(info->bus_info));
+
+This is also not accurate. There is no bus involved.
+
+     Andrew
 
