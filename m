@@ -1,65 +1,69 @@
-Return-Path: <netdev+bounces-77200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E1848708BE
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 18:53:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A193870910
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 19:05:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A692F283B94
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 17:53:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89D82B262E0
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 18:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A24161673;
-	Mon,  4 Mar 2024 17:53:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D41A561689;
+	Mon,  4 Mar 2024 18:05:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rri0PlnR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cvihbCpr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6426025B;
-	Mon,  4 Mar 2024 17:53:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4BD61685;
+	Mon,  4 Mar 2024 18:05:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709574810; cv=none; b=nETVOtwff6HU69zi5XrYPOuoxyt+K8rPprX+xrz0qlidpsHvp3FFAMmJ4i4pwgPMc/EQqjl5fEL/lGFhcFa4zZsBBZhQ8bjJI7Y/hhXjIzq/zyQ6H0u7dXMhO77H9yI7NBa0dIPSWRjd41ezGUv9QwiVXxvDjBcIk0j4hrzQ+FA=
+	t=1709575529; cv=none; b=SEsUWvXdngKiu60ndqWU0ot9VgtYx3Bw/wIH3om2FffijEk3vPzGbZuCTvD62vo7hZ6iK+KRyIPR+cQ/4TBPZ3h0IlJBnESA2uZincmbRSUrY1qetDArPCQxY5iyk9J5Rb37kMnCKYon0kX2g2+LRrxZb+DeFh7dqogUGvqcxds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709574810; c=relaxed/simple;
-	bh=MhiLXdgxGhVPx6IGPfPA0IR+hOJts0UyYWOARP4FWx8=;
+	s=arc-20240116; t=1709575529; c=relaxed/simple;
+	bh=FNCz1MqekcDwvpoaG3B+MmZNYy7vagVyj7/rnoJA9zY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BsTG3JYwEm3wHOvHSoEeEe/v2ZUD/rIN5E2e3GTV3W2VqdEzdEbFTy9D3WEQ0TX1KMFsSS93QR2zZg4S95fdgX3bL5CZ/01VnvYG1waLHyXiDmAqN1aGs1a8IV99uLarix+NdPK3sdYe5VtYNuHYS9GV1CAmqGSBgL2Rh0AZvQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rri0PlnR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C90A9C433C7;
-	Mon,  4 Mar 2024 17:53:26 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=pAwcIDRg73vqumEqCIqi7AH4Nud/GNNB5GIF0cQKl1acb2EZ6udedQ7kKd2DZe1ouWRz1j4pvFNrzszZtNTmkHFbsAwJqjrwCYgGwxGVnQDBCt6DoBi3F61Y7OuiPA+CZSflSPsQwpgvf178Tc4DzeRXlX4TOdlCmqORxqKl5S8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cvihbCpr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 925E0C433C7;
+	Mon,  4 Mar 2024 18:05:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709574809;
-	bh=MhiLXdgxGhVPx6IGPfPA0IR+hOJts0UyYWOARP4FWx8=;
+	s=k20201202; t=1709575529;
+	bh=FNCz1MqekcDwvpoaG3B+MmZNYy7vagVyj7/rnoJA9zY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Rri0PlnR+vcH/64MP4mP1VFA+RMGPuybgQsOgtN4vuJKFfSgBaXxQ7pMfOkdN3d+9
-	 IaSBoMh/4vs/DtcaqGVszfZkWMdNBt8dPQ7isAm9op2RDznvvgF7yRkj2cllb+a5o6
-	 d+Q4QsWlwcRV1ZnmxE9l2MhqveYzLIo9g9P8jJl9Bqw3UMmM/majJI/UWLXZyosHeE
-	 bKkkkWUEEjHdEq3QuWRmdFgXD0+CBqMAHPtKtnpmeePllWks0Usun0JpITRroA1moO
-	 UTXZpnFD/JGChB6lzmtk/dIaeSOAaBN0d7lvEvsqoaMx49qVOxj0RiqIAlTofI1B22
-	 5rVPJPJ6jfAzg==
-Date: Mon, 4 Mar 2024 17:53:24 +0000
+	b=cvihbCprmX7dn4CoqYA+0oELs2AmDFX241c5bEuyc/OH3jauukJNrDFNp5k7iEcUi
+	 35E9nlOoEv6XuUunNY/HjV/f+bznFqRtwAKir03aTEFAtN3U1Z6IIwlSJpf+OJOJho
+	 sPBLBtp9KufIyG8sfVjaXaFOE5ykQ7h/tNmwZgjBMuUbiz8lfGs4KL6okrvWr6pl/W
+	 GZ7qbTa3/SZpYtZ/KFxfduLd3+9LcxGH0FuTIJzoP+3Uxkb7qkeYRWBZjWtX52VeZ4
+	 ukvu4ySVsFur3eVi53O9jGnvhrnH4hLKgDkepMPJWFDBcRKcStVEo6HAgNMdEIoBv6
+	 /IaTjhppVGAWQ==
+Date: Mon, 4 Mar 2024 18:05:23 +0000
 From: Simon Horman <horms@kernel.org>
-To: "Ricardo B. Marliere" <ricardo@marliere.net>
-Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-ppp@vger.kernel.org
-Subject: Re: [PATCH net-next 6/6] nfc: core: make nfc_class constant
-Message-ID: <20240304175324.GQ403078@kernel.org>
-References: <20240302-class_cleanup-net-next-v1-0-8fa378595b93@marliere.net>
- <20240302-class_cleanup-net-next-v1-6-8fa378595b93@marliere.net>
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Lucien Jheng <lucien.jheng@airoha.com>,
+	Zhi-Jun You <hujy652@protonmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 2/2] net: phy: air_en8811h: Add the Airoha
+ EN8811H PHY driver
+Message-ID: <20240304180523.GR403078@kernel.org>
+References: <20240302183835.136036-1-ericwouds@gmail.com>
+ <20240302183835.136036-3-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,19 +72,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240302-class_cleanup-net-next-v1-6-8fa378595b93@marliere.net>
+In-Reply-To: <20240302183835.136036-3-ericwouds@gmail.com>
 
-On Sat, Mar 02, 2024 at 02:06:02PM -0300, Ricardo B. Marliere wrote:
-> Since commit 43a7206b0963 ("driver core: class: make class_register() take
-> a const *"), the driver core allows for struct class to be in read-only
-> memory, so move the nfc_class structure to be declared at build time
-> placing it into read-only memory, instead of having to be dynamically
-> allocated at boot time.
-> 
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
+On Sat, Mar 02, 2024 at 07:38:35PM +0100, Eric Woudstra wrote:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+...
 
+> +static int air_led_init(struct phy_device *phydev, u8 index, u8 state, u8 pol)
+> +{
+> +	int val;
+> +	int err;
+> +
+> +	if (index >= EN8811H_LED_COUNT)
+> +		return -EINVAL;
+
+Hi Eric,
+
+I think val needs to be initialised before it is used below.
+
+Flagged by clang-17 W=1 build.
+
+> +
+> +	if (state == AIR_LED_ENABLE)
+> +		val |= AIR_PHY_LED_ON_ENABLE;
+> +	else
+> +		val &= ~AIR_PHY_LED_ON_ENABLE;
+> +
+> +	if (pol == AIR_ACTIVE_HIGH)
+> +		val |= AIR_PHY_LED_ON_POLARITY;
+> +	else
+> +		val &= ~AIR_PHY_LED_ON_POLARITY;
+> +
+> +	err = phy_modify_mmd(phydev, MDIO_MMD_VEND2, AIR_PHY_LED_ON(index),
+> +			     AIR_PHY_LED_ON_ENABLE |
+> +			     AIR_PHY_LED_ON_POLARITY, val);
+> +
+> +	if (err < 0)
+> +		return err;
+> +
+> +	return 0;
+> +}
+
+...
 
