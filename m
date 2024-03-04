@@ -1,217 +1,95 @@
-Return-Path: <netdev+bounces-77102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93CB887031B
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:45:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91C3F870320
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:46:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC0F4B224DD
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:45:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 170D52839C3
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 165473EA69;
-	Mon,  4 Mar 2024 13:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8580C3E485;
+	Mon,  4 Mar 2024 13:45:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="n0yvI7wW"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A293E47B;
-	Mon,  4 Mar 2024 13:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ADF23F9FD;
+	Mon,  4 Mar 2024 13:45:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709559929; cv=none; b=d9AjlE5xUokvq7ej8aZbJOdIwU8+pPFTYYY875zGrpU+XjtMO63icS9OZhwY3AIhBDRgdyJq+KgJqkMyv3RunNahP1KBJSXD4XuImb6BRlQ3wx59weph8aaIEwXsATWwkfNsVx1OUnLA/IjbKqOycfkD1UBY5uVdOcrEHO9DZBE=
+	t=1709559938; cv=none; b=hfxsUajvEbG/fG01ENeXAIM8Y0NXHfLOcIugCB/ftQlwiifXpi4iATycvsOPaUMQauOextx4NYHWy93rZ5ewRI2BcZhPBx3TPrzKHFJ0IZPHmYivFQgcctgfs6kyUhUAuI3uIacJ8Ls/GwSJ495k84y5MXMI7+hoBzCZ4uZ93cg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709559929; c=relaxed/simple;
-	bh=Vogrl90LPvlwp2Ghw/yIzr9IKjNdfq8ALbuzUCNGjqc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=u24qnTVthXjCQ96hMxLu6+9HLDSXzdwmESp3N1p3duH/1tG/hDHWaev+wQl1zyaaDUCOFXrKuz77ZjmsDISIOqcwmrb2KrvOP54FlyR1+D2grm75DiQ9cHbceYgTP8kRrjFM5Fk6DhPzrV13oW/ekVtvj1jUEVaXuaWx0bSZL5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4TpKdf3B0Sz1Q9mN;
-	Mon,  4 Mar 2024 21:43:02 +0800 (CST)
-Received: from kwepemm600003.china.huawei.com (unknown [7.193.23.202])
-	by mail.maildlp.com (Postfix) with ESMTPS id 414801A016E;
-	Mon,  4 Mar 2024 21:45:22 +0800 (CST)
-Received: from dggpemm500008.china.huawei.com (7.185.36.136) by
- kwepemm600003.china.huawei.com (7.193.23.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 4 Mar 2024 21:45:21 +0800
-Received: from dggpemm500008.china.huawei.com ([7.185.36.136]) by
- dggpemm500008.china.huawei.com ([7.185.36.136]) with mapi id 15.01.2507.035;
- Mon, 4 Mar 2024 21:45:21 +0800
-From: wangyunjian <wangyunjian@huawei.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, "jasowang@redhat.com"
-	<jasowang@redhat.com>
-CC: Paolo Abeni <pabeni@redhat.com>, "willemdebruijn.kernel@gmail.com"
-	<willemdebruijn.kernel@gmail.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"bjorn@kernel.org" <bjorn@kernel.org>, "magnus.karlsson@intel.com"
-	<magnus.karlsson@intel.com>, "maciej.fijalkowski@intel.com"
-	<maciej.fijalkowski@intel.com>, "jonathan.lemon@gmail.com"
-	<jonathan.lemon@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, xudingke
-	<xudingke@huawei.com>, "liwei (DT)" <liwei395@huawei.com>
-Subject: RE: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
-Thread-Topic: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
-Thread-Index: AQHaajYcNkJKJoTBfEqyMPzDlwSi+bEgpeYAgAIJPRD//5RegIAFWUkg
-Date: Mon, 4 Mar 2024 13:45:21 +0000
-Message-ID: <ffbe60c2732842a3b81e6ae0f58d2556@huawei.com>
-References: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
- <7d478cb842e28094f4d6102e593e3de25ab27dfe.camel@redhat.com>
- <223aeca6435342ec8a4d57c959c23303@huawei.com>
- <20240301065141-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240301065141-mutt-send-email-mst@kernel.org>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1709559938; c=relaxed/simple;
+	bh=xFHy3ny7U4gLnQ0muE8V74wZ7nXlRt75NucSIY3Slbs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TXpz8d1Elp/BIvSvQkcLJXJgCJIX+ZEkjD1jjIAPTZTPgHV9jUD7fQqCHJHnv3NWYWYNNqDCb133Y9+qxVtpO95to4PshppdyrRBIJB6zmPWF9UweAwhih81KS4AFvKYsrmbJ31bfGbFoTNXbTaXWTBnvDiJP181qkhYiaRWNl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=n0yvI7wW; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=4CuK9RJoUFE9osShBaBC+MEtYr4Lrx6dWTQvApzazpo=; b=n0
+	yvI7wWmtpTh6ozGtepbm43S2CDPww3ic1yk1xzIp6tQ6hdhKdseD+jYMY3hWGGUcW7FzaY8zyfBka
+	HTIJLacJyFMYeyLJEWC9rWjhp2pKQMfmsFzFcX16jnzoD88s7Ny33ywPa39aoQAnrohk4rDknOeVG
+	MU8kK8QFq4CqeQU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rh8db-009KQc-Pb; Mon, 04 Mar 2024 14:45:51 +0100
+Date: Mon, 4 Mar 2024 14:45:51 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next v5 7/7] net: pcs: rzn1-miic: Init RX clock early
+ if MAC requires it
+Message-ID: <1ed62b95-679d-4b88-9dee-37a547ac277c@lunn.ch>
+References: <20240301-rxc_bugfix-v5-0-8dac30230050@bootlin.com>
+ <20240301-rxc_bugfix-v5-7-8dac30230050@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240301-rxc_bugfix-v5-7-8dac30230050@bootlin.com>
 
+On Fri, Mar 01, 2024 at 04:35:04PM +0100, Romain Gantois wrote:
+> The GMAC1 controller in the RZN1 IP requires the RX MII clock signal to be
+> started before it initializes its own hardware, thus before it calls
+> phylink_start.
+> 
+> Implement the pcs_pre_init() callback so that the RX clock signal can be
+> enabled early if necessary.
+> 
+> Reported-by: Clément Léger <clement.leger@bootlin.com>
+> Link: https://lore.kernel.org/linux-arm-kernel/20230116103926.276869-4-clement.leger@bootlin.com/
+> Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
 
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-> -----Original Message-----
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Friday, March 1, 2024 7:53 PM
-> To: wangyunjian <wangyunjian@huawei.com>
-> Cc: Paolo Abeni <pabeni@redhat.com>; willemdebruijn.kernel@gmail.com;
-> jasowang@redhat.com; kuba@kernel.org; bjorn@kernel.org;
-> magnus.karlsson@intel.com; maciej.fijalkowski@intel.com;
-> jonathan.lemon@gmail.com; davem@davemloft.net; bpf@vger.kernel.org;
-> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; kvm@vger.kernel.org=
-;
-> virtualization@lists.linux.dev; xudingke <xudingke@huawei.com>; liwei (DT=
-)
-> <liwei395@huawei.com>
-> Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
->=20
-> On Fri, Mar 01, 2024 at 11:45:52AM +0000, wangyunjian wrote:
-> > > -----Original Message-----
-> > > From: Paolo Abeni [mailto:pabeni@redhat.com]
-> > > Sent: Thursday, February 29, 2024 7:13 PM
-> > > To: wangyunjian <wangyunjian@huawei.com>; mst@redhat.com;
-> > > willemdebruijn.kernel@gmail.com; jasowang@redhat.com;
-> > > kuba@kernel.org; bjorn@kernel.org; magnus.karlsson@intel.com;
-> > > maciej.fijalkowski@intel.com; jonathan.lemon@gmail.com;
-> > > davem@davemloft.net
-> > > Cc: bpf@vger.kernel.org; netdev@vger.kernel.org;
-> > > linux-kernel@vger.kernel.org; kvm@vger.kernel.org;
-> > > virtualization@lists.linux.dev; xudingke <xudingke@huawei.com>;
-> > > liwei (DT) <liwei395@huawei.com>
-> > > Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy
-> > > support
-> > >
-> > > On Wed, 2024-02-28 at 19:05 +0800, Yunjian Wang wrote:
-> > > > @@ -2661,6 +2776,54 @@ static int tun_ptr_peek_len(void *ptr)
-> > > >  	}
-> > > >  }
-> > > >
-> > > > +static void tun_peek_xsk(struct tun_file *tfile) {
-> > > > +	struct xsk_buff_pool *pool;
-> > > > +	u32 i, batch, budget;
-> > > > +	void *frame;
-> > > > +
-> > > > +	if (!ptr_ring_empty(&tfile->tx_ring))
-> > > > +		return;
-> > > > +
-> > > > +	spin_lock(&tfile->pool_lock);
-> > > > +	pool =3D tfile->xsk_pool;
-> > > > +	if (!pool) {
-> > > > +		spin_unlock(&tfile->pool_lock);
-> > > > +		return;
-> > > > +	}
-> > > > +
-> > > > +	if (tfile->nb_descs) {
-> > > > +		xsk_tx_completed(pool, tfile->nb_descs);
-> > > > +		if (xsk_uses_need_wakeup(pool))
-> > > > +			xsk_set_tx_need_wakeup(pool);
-> > > > +	}
-> > > > +
-> > > > +	spin_lock(&tfile->tx_ring.producer_lock);
-> > > > +	budget =3D min_t(u32, tfile->tx_ring.size, TUN_XDP_BATCH);
-> > > > +
-> > > > +	batch =3D xsk_tx_peek_release_desc_batch(pool, budget);
-> > > > +	if (!batch) {
-> > >
-> > > This branch looks like an unneeded "optimization". The generic loop
-> > > below should have the same effect with no measurable perf delta - and
-> smaller code.
-> > > Just remove this.
-> > >
-> > > > +		tfile->nb_descs =3D 0;
-> > > > +		spin_unlock(&tfile->tx_ring.producer_lock);
-> > > > +		spin_unlock(&tfile->pool_lock);
-> > > > +		return;
-> > > > +	}
-> > > > +
-> > > > +	tfile->nb_descs =3D batch;
-> > > > +	for (i =3D 0; i < batch; i++) {
-> > > > +		/* Encode the XDP DESC flag into lowest bit for consumer to
-> differ
-> > > > +		 * XDP desc from XDP buffer and sk_buff.
-> > > > +		 */
-> > > > +		frame =3D tun_xdp_desc_to_ptr(&pool->tx_descs[i]);
-> > > > +		/* The budget must be less than or equal to tx_ring.size,
-> > > > +		 * so enqueuing will not fail.
-> > > > +		 */
-> > > > +		__ptr_ring_produce(&tfile->tx_ring, frame);
-> > > > +	}
-> > > > +	spin_unlock(&tfile->tx_ring.producer_lock);
-> > > > +	spin_unlock(&tfile->pool_lock);
-> > >
-> > > More related to the general design: it looks wrong. What if
-> > > get_rx_bufs() will fail (ENOBUF) after successful peeking? With no
-> > > more incoming packets, later peek will return 0 and it looks like
-> > > that the half-processed packets will stay in the ring forever???
-> > >
-> > > I think the 'ring produce' part should be moved into tun_do_read().
-> >
-> > Currently, the vhost-net obtains a batch descriptors/sk_buffs from the
-> > ptr_ring and enqueue the batch descriptors/sk_buffs to the
-> > virtqueue'queue, and then consumes the descriptors/sk_buffs from the
-> > virtqueue'queue in sequence. As a result, TUN does not know whether
-> > the batch descriptors have been used up, and thus does not know when to
-> return the batch descriptors.
-> >
-> > So, I think it's reasonable that when vhost-net checks ptr_ring is
-> > empty, it calls peek_len to get new xsk's descs and return the descript=
-ors.
-> >
-> > Thanks
->=20
-> What you need to think about is that if you peek, another call in paralle=
-l can get
-> the same value at the same time.
-
-Thank you. I have identified a problem. The tx_descs array was created with=
-in xsk's pool.
-When xsk is freed, the pool and tx_descs are also freed. Howerver, some des=
-cs may
-remain in the virtqueue'queue, which could lead to a use-after-free scenari=
-o. Currently,
-I do not have an idea to solve this concurrency problem and believe this sc=
-enario may
-not be appropriate for reusing the ptr_ring.
-
-Thanks
-
->=20
->=20
-> > >
-> > > Cheers,
-> > >
-> > > Paolo
-> >
-
+    Andrew
 
