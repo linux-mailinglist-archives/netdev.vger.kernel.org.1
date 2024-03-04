@@ -1,111 +1,124 @@
-Return-Path: <netdev+bounces-76961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FC1B86FB64
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:13:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFE6C86FBA1
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:21:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5066F1C21ADC
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 08:13:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0AE62B21CC8
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 08:20:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27316171AF;
-	Mon,  4 Mar 2024 08:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 212A716436;
+	Mon,  4 Mar 2024 08:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w0qt9aiB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VSC+tFpW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50CB4171BA
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 08:13:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9FE48828;
+	Mon,  4 Mar 2024 08:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709540003; cv=none; b=Rl37tXTnaDMUHjJa7jWCfvu44gwk03fZ4td6nLNVkPLKWoihAu2BIiDwFmBrmGXixebVl3/jx/LgEi4qgKxAQZONewe/9+8T9r/VdCDtxlG5scvUvk8GSYN9naStsayrcp5rIGf1IDp6Mr6pFTTEw2VO5Ym0ngsh1nueynP6IzU=
+	t=1709540455; cv=none; b=exI9W64vpPoz4E0YNEga6lMQY+zxvl18KehkAgVhQtWN/Y3yRGcz1MOi2fhJ/p9l8affm/4PN5fs8Dvq44XAzJnrqZ4TnGY/IgkyLElTvmrP/Dwbk5YLGCl73b/OqTRE4fMv/K9B1O3uIfiQx1+R9R3ICvK07BCbvWALL1Sm6Es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709540003; c=relaxed/simple;
-	bh=4t0p8fRfEFH8AtnVja0S+UMsbXd66Z0IS78pE3ll0oY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=FtGdUaa1rclCqUBG6naqELMqCZhKzCWQ0VXCJEkSOnuEUNm6se0xY6xMy5Pda9E72wo+NMfzs/a23hzmjyFoMi0NFKfoVmSq+wIHHJ58unB3AaJH1E0CrASOvUtGCLrBPtPxe3b/NZ5HAdd3lK/MVE0Qy9LTVI0CfT+jCqmBSv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w0qt9aiB; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-566b160f6eeso21720a12.1
-        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 00:13:20 -0800 (PST)
+	s=arc-20240116; t=1709540455; c=relaxed/simple;
+	bh=F3WJtqLmsRizVpz6XcoOW2IE8Hc87yyXZ/sAUXHPJgs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AchBU6GB7jD2IRiMMiKP5TVZzgHFsGhL7Bm7ibC8REfyX/xzzzWTD1o5q1zgaLbnIUCKdOz0G2xza7obbr85tEVfkD3ageqvC+hVT9V57OipBN2XRZbxsxLYVSn6RzAYR7MtRlYjaSqCnX0Fb5nbRFvejXmuHQyWc2OM+r8jMWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VSC+tFpW; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1dd10a37d68so5691455ad.2;
+        Mon, 04 Mar 2024 00:20:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709539999; x=1710144799; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4t0p8fRfEFH8AtnVja0S+UMsbXd66Z0IS78pE3ll0oY=;
-        b=w0qt9aiBR9tUq81QkwVtLbFS/NfedDF3dFMR9g4YqLjU7+x/C1u0My3Pxn9fUUTrTA
-         9UyIeDmzDv31u/jKiv1TTDSAgvG8N4jYr08xtPMsZdq2BL3ob6g+cCJ7ijNaH4CtCnSC
-         eyeZ7Jh3jlburXwO146WARBnRmL7bEhp/Ul4rXZd9kNSPiEYk+NCkFqO1OWQ9NAVFtmj
-         1XHV05ybPq5ik69tndpGm8jPpX5XZlGDjDljK6Vrj9LNrj8v/YELOu2bz/VVU5utPJn6
-         0lwKmefMnPrh7qhNJ0p5Ro/etJb0favMsd/LyYawi7jReO8BJxyF6VGSi72n+TNwkhX8
-         JYEg==
+        d=gmail.com; s=20230601; t=1709540453; x=1710145253; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HuUBQk+9lD8phx2gva6SDnvaKaQ30xTMRHshAYSfztc=;
+        b=VSC+tFpWhioWAhPAKSn0jZAgztZgmP3YeWrSZfa/OWRmj2QI3phOU+hAKU2zZNxBr7
+         Z9E7sqCaXueIGiiMiO97MLIFlqXBwzSRZPIuz4/Fyhy0azsSfYOBppKMLNvDrI/tJYg2
+         yGUgmJQtJ7EE9upQyA5EzHp9h9EiIM1sAk3K/eFr3Y34pbxGsxWbZJuiKq/PX0D8tESk
+         38vvY3hymkwtlHAlFx6KnOeyWYPXgnGJ9GBIFXNe12iKWU9wUYdfqL1Lalf7a58twHin
+         fHXm9uAM1ifTEAT25QDx+u8PR21knPMVC4K5pBrG73ubSnikEhb3sSV8TDmtkLPWlAmM
+         9nEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709539999; x=1710144799;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4t0p8fRfEFH8AtnVja0S+UMsbXd66Z0IS78pE3ll0oY=;
-        b=wrJNjTJOqgXv9jkp4qKKjWFN67kiTDxeHQtHGjHNvu8S3NoNQQ7R7nHPtLYM4VqALl
-         Lbv20we9FZOjNSIEw1xsOdxSmkUgyAGUO7zwNc9C1jlPlUOR9MIDHWKO5J1ElRmtUP2W
-         jv6NBagUV2k8J7H+Z7a5xYwshQKW9RMLoayes0UF35p0kznDKgO+OHp142FJNSnX7IR4
-         EjSPJA9umM4qkzWzyaY6PI8YIJtaRyf5ArOdaWFBZUzgAopSdpz86JxNDvPPcwd5ENqC
-         a2BRnFSE6wMEHRK/ITxo0W63WiXg4/Iy59Qv0HnbEpJr4CdrifBwYCLfCijehWp4K4uG
-         65GA==
-X-Forwarded-Encrypted: i=1; AJvYcCUMrPwK7n6YgRT6mojzpO2fjvE986A4LcMedapiDaqxvzE4vYCO0TKUnlH/s0PpY8OEdqMXjBapJVveEwnsXZgY6LpQlsB/
-X-Gm-Message-State: AOJu0YxpBhu11Ua/PXe6tJQHi4YYGvO4Hp67K3yxNxTPt2PenvT6NkaY
-	5FZzh77HWBOpzp6S0u/HfyVtPb/zKZFCVcQYzLkAleV7bJSOHVDXf8ZNu0Fb4WqyvLj5hJjA4dB
-	JaY8XE96472doSY0ofw9C9RiNXLHHUr8in9sf
-X-Google-Smtp-Source: AGHT+IFURhXGlP23AfBP73eeZ3jVdVKOw/QcQFPi4UL3YUIEMqBJf9SDBOsSV9UvqLTiivjkUj1SkyMyY3MCNRbV+Ko=
-X-Received: by 2002:a50:cb8c:0:b0:566:306:22b7 with SMTP id
- k12-20020a50cb8c000000b00566030622b7mr287915edi.1.1709539999391; Mon, 04 Mar
- 2024 00:13:19 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709540453; x=1710145253;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HuUBQk+9lD8phx2gva6SDnvaKaQ30xTMRHshAYSfztc=;
+        b=RgP7vENOrhuwJj3wdt6QD/KEKVDRDGzsLWOValuVIhFq21O4GmrrD+yyBYVeLIJCOJ
+         rLOOtAhf4hbbLe6uO9AugkQ22MWU0Mn/8jo4CmqtHztrE3SiVsmS5Ynb+U2+VRqOMYjE
+         laH3CLaz69RPrTR2MhnIDRV4kg1Fe/IXTnUpXOVfPr+J8vHXWGVl6qo+EBU6LbfVPdVK
+         +xtW5KUOXWNPxACpbcOW/PDLs6JdywyG3vHLx2RgQgj+jx5H9Hlsn1x6klZyhAmo7i5t
+         NRUZQDQIImreiE8bUbTNfcAcImrwRi2Lc2PTIMVBavASADNaRlmi7ds7neXUQawO0Smh
+         hNbA==
+X-Forwarded-Encrypted: i=1; AJvYcCXG0sUadFkEXDLJpHZPR6W0M6VZG29tH1l8DPzLpqtz8u3TBglmhxYcB4WQknvBG63FtMhWJyTSIe2Lx1KE7NtBnh0SPMu7
+X-Gm-Message-State: AOJu0Yz+vcuCTgOJly66/6YwCXIVN9K7qk3F3kG08aBbVOZgzHcBn3qA
+	eQIvbgFXr1usozxuKl3z4i0Dl/9GolfpdQlzFo4z8M/qid08IEGi
+X-Google-Smtp-Source: AGHT+IGQvcrEPWxRCSUn5r8G4sGs+ScedbkTkm8kaZlIpW3QgJGDqBK8/d1eFWaKbo3lu8NIZTbU6A==
+X-Received: by 2002:a17:902:d38d:b0:1dc:a844:a38b with SMTP id e13-20020a170902d38d00b001dca844a38bmr7738164pld.67.1709540452905;
+        Mon, 04 Mar 2024 00:20:52 -0800 (PST)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.21])
+        by smtp.gmail.com with ESMTPSA id j12-20020a170902c3cc00b001dca9a6fdf1sm7897014plj.183.2024.03.04.00.20.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Mar 2024 00:20:52 -0800 (PST)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: ralf@linux-mips.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-hams@vger.kernel.org,
+	netdev@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net 00/12] netrom: Fix all the data-races around sysctls
+Date: Mon,  4 Mar 2024 16:20:34 +0800
+Message-Id: <20240304082046.64977-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240304034632.GA21357@didi-ThinkCentre-M920t-N000>
-In-Reply-To: <20240304034632.GA21357@didi-ThinkCentre-M920t-N000>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 4 Mar 2024 09:13:06 +0100
-Message-ID: <CANn89iJ0yBH3HskjzFUANeTxso5PpihxZcQ4VudzmfsKC-8kDw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] tcp: Add skb addr and sock addr to arguments
- of tracepoint tcp_probe.
-To: edumazet@google.com, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	fuyuanli@didiglobal.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 4, 2024 at 4:46=E2=80=AFAM fuyuanli <fuyuanli@didiglobal.com> w=
-rote:
->
-> It is useful to expose skb addr and sock addr to user in tracepoint
-> tcp_probe, so that we can get more information while monitoring
-> receiving of tcp data, by ebpf or other ways.
->
-> For example, we need to identify a packet by seq and end_seq when
-> calculate transmit latency between lay 2 and lay 4 by ebpf, but which is
+From: Jason Xing <kernelxing@tencent.com>
 
-Please use "layer 2 and layer 4".
+As the title said, in this patchset I fix the data-race issues because
+the writer and the reader can manipulate the same value concurrently.
 
-> not available in tcp_probe, so we can only use kprobe hooking
-> tcp_rcv_esatblised to get them. But we can use tcp_probe directly if skb
-> addr and sock addr are available, which is more efficient.
+Jason Xing (12):
+  netrom: Fix a data-race around sysctl_netrom_default_path_quality
+  netrom: Fix a data-race around
+    sysctl_netrom_obsolescence_count_initialiser
+  netrom: Fix data-races around sysctl_netrom_network_ttl_initialiser
+  netrom: Fix a data-race around sysctl_netrom_transport_timeout
+  netrom: Fix a data-race around sysctl_netrom_transport_maximum_tries
+  netrom: Fix a data-race around
+    sysctl_netrom_transport_acknowledge_delay
+  netrom: Fix a data-race around sysctl_netrom_transport_busy_delay
+  netrom: Fix a data-race around
+    sysctl_netrom_transport_requested_window_size
+  netrom: Fix a data-race around
+    sysctl_netrom_transport_no_activity_timeout
+  netrom: Fix a data-race around sysctl_netrom_routing_control
+  netrom: Fix a data-race around sysctl_netrom_link_fails_count
+  netrom: Fix data-races around sysctl_net_busy_read
 
-Okay, but please fix the typo. Correct function name is tcp_rcv_established
+ net/netrom/af_netrom.c | 14 +++++++-------
+ net/netrom/nr_dev.c    |  2 +-
+ net/netrom/nr_in.c     |  6 +++---
+ net/netrom/nr_out.c    |  2 +-
+ net/netrom/nr_route.c  |  8 ++++----
+ net/netrom/nr_subr.c   |  5 +++--
+ 6 files changed, 19 insertions(+), 18 deletions(-)
 
->
-> Signed-off-by: fuyuanli <fuyuanli@didiglobal.com>
-> Link: https://lore.kernel.org/netdev/20240229052813.GA23899@didi-ThinkCen=
-tre-M920t-N000/
->
+-- 
+2.37.3
+
 
