@@ -1,121 +1,108 @@
-Return-Path: <netdev+bounces-77092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D19238702A1
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:26:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0699B8702CE
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:34:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE826B22167
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:26:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72555B22012
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:34:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F5F43D57C;
-	Mon,  4 Mar 2024 13:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D0183F8E6;
+	Mon,  4 Mar 2024 13:32:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cPWl5M1Z"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FtebJCye"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94323D55E;
-	Mon,  4 Mar 2024 13:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882CB3F8E0;
+	Mon,  4 Mar 2024 13:32:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709558764; cv=none; b=Z+MR5MqLxsM1wH+g+LsS1BJf6UGLbW9GtLCW3pdmuE7ENfPmJlwwmoBbYky8qYfW5tprOWJw+m4I+MjN1dquKp8/iVBUrFLocC2bWEQeNSigQ35FYbkht06iFUwIopptMRs5mIEMa//KB9NnlCfnDROc7xq4eGhaZ6QsqcV36nc=
+	t=1709559167; cv=none; b=vCVdiCkYV85Rr2n2Rbif1ro7QFCDqgypcvyGJSYTOVO40GNQjyiH6pRRpK66YoUN5DhmZ1cneZH+mDEACcbuaDvhk+lJ8LZq7GF5HAdbe5qDxOa/2mDlvBRpT3aHcyW3lF/hF1QBfo12xcxcVX7hb9YiIVj4xIh0e9Bxzd6OyVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709558764; c=relaxed/simple;
-	bh=1v0A7i2+W2cHjoJY6glR5gGnX34Ee+tCNN+/JkQeFN0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K6Yuae0OJnrIKFtSCgP4dKd6b0W9MmgxwzvZhXz6Gq5NmqftF1UzmS7tUnSZywrqb5OI1/NyJg6I1crdKpJ4hmTQvXFyQLmQh6b03mA75qrtG3MZ1d8pCuy9EkgVUkkdrxZCPA+wWoZh7n8Ud9eYrHY+RwAgQ1wihkydTzEgTvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cPWl5M1Z; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-512d19e2cb8so5258581e87.0;
-        Mon, 04 Mar 2024 05:26:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709558761; x=1710163561; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1v0A7i2+W2cHjoJY6glR5gGnX34Ee+tCNN+/JkQeFN0=;
-        b=cPWl5M1ZfMTtxaeV2ik5WCXTygplocnUUXPaiRcvEouokzc8YwDgd7Pdso79gFQ6zJ
-         ke2SX3aivo+M9i1zmN/ffPROXG+LtdzJVxg1xpuOHz449CXp+XI4r86VUs2llDhUjQ/M
-         ZSD5H6F1etd5is3wjAfbuV195RsbvqsPITRYxlFSYa4WDKinT462EDlQlGXaJZ56I074
-         tgncWVY6aKtaRD64xpDitUSrfNiNGQFmHVeyDqETD43soeWCBfaiXIbC8rhLGP/Mp1f6
-         1Ap8Sfu6F/a4+wWvef118DAj9SWJ5KwF+45PtZ83WYMWqVEmwVOsHQi2UVLofU3y14qi
-         eZGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709558761; x=1710163561;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1v0A7i2+W2cHjoJY6glR5gGnX34Ee+tCNN+/JkQeFN0=;
-        b=QkkwELC0FTJPMOh67EzGvwWg3N6D6vHJeEgMCD2hCgM0cNriZHHqIjucbNmr1ecwTD
-         +L/Bry2VtKyUde93Z51Acpj8wb2bGHEImQaojNdve+ertDxMzYtp162cAfN2utFemPeJ
-         wAlSkThJilCJmqNux3VRQCre7X8jtcxLooAJ8L2eY1qV5YpenHjyUCbq+UxRBwjkZKTf
-         fHY0u86OkPFjAEZZMlJtxcqOMoNLghkMNnbqVT7wpR32rWTGFLScArYUt4MDtHtEFr7R
-         JVJBRr6geckRz4Trg5Deqy0zBjCJiY8z88G3mi3Y4YAjTlItg2apS0Fpn6Ua9MYct8Nb
-         CK8g==
-X-Forwarded-Encrypted: i=1; AJvYcCXpuQOuGVtb3AY8Rn9ZBYj1rblm6s+aR0VnagNDUi5mAzcHruvrdUF1SbF+CvHWp2LGUdk3/VPAfYhswf3iW8fZ7FSIahKxFqLc5kSMeJi3R+Macybg5NGTJpUb0HfP5lCqYq+p
-X-Gm-Message-State: AOJu0YwwOz9eRhJ5wC/n80alisdvnRv/H0C3q238L2+Tv3QPLUD5jkUL
-	7mfNu+xRn1txf5YRmhCMRRZZ8Ld0DGXFZV26NntefhHtNb21dinPm1HxGhZJs9eYWlDOOBC3llG
-	+JFRnmSZ+pf7yC+tblSnCKvRwq24=
-X-Google-Smtp-Source: AGHT+IEsmvkbJaxwXF4IPadvIrH7L1gO8TbxPmvdmvojZtEL/J/pOP3xZiRN6cokIPtD4T0zUUAYJBti9BwB4vS7Iss=
-X-Received: by 2002:ac2:48a2:0:b0:512:f1a5:709 with SMTP id
- u2-20020ac248a2000000b00512f1a50709mr5560291lfg.41.1709558760578; Mon, 04 Mar
- 2024 05:26:00 -0800 (PST)
+	s=arc-20240116; t=1709559167; c=relaxed/simple;
+	bh=0atBaHXl1e3n7AZO5fT2Mm64OWqwf3KkX/ptCgjWNPE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ezZYGjoAWoQhifxPmGUccPFeVTpjBzdpevudypsjkY0zhqi6vlStMMsZQHi31LdSoHID6lURg9IPakdH98WQ4+RBtXmJYKLG1PeKs+UhLSCTET+lZjoJf9TyPJsKUKxbDh+j4bO8b1hPWUKkKIwz1WYv720t07jRAQ5sUAbGHgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FtebJCye; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=OZLHOEQOwrKYkhkP5YCytEcFYTUgdUuOzV0w6B1zc5w=; b=FtebJCyeTDDX8B9ncGsT+3dwiL
+	S/NRnnAK6ew7ipqWGNe7yO3T6105XYq4XD9wuBMEA9pKAL3wxp0sPSpOxvkQp+PKPAoCn4YeKijJQ
+	/TOjzehI3Xhj0WU+wlS/ZS19CRhlv4Re7nhdAmWMH6c3r46K3efgJy+SdsJPdq9Tni7s=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rh8R0-009KGP-11; Mon, 04 Mar 2024 14:32:50 +0100
+Date: Mon, 4 Mar 2024 14:32:50 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v5 13/17] net: pse-pd: Use regulator framework
+ within PSE framework
+Message-ID: <84b300c7-8295-424b-9117-c604fb4cd73e@lunn.ch>
+References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
+ <20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
+ <ZeObuKHkPN3tiWz_@pengutronix.de>
+ <20240304102708.5bb5d95c@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240303114139.GA11018@didi-ThinkCentre-M920t-N000>
- <CAL+tcoDAmA4q+FxJchgA1LQ2fxhD8oRdjDOmVPeJ1-eSnkSt5Q@mail.gmail.com> <CABbqxmcJ+bybv0e-Rby9Q1jVR59Na_XE9MBee+f_zu0HUTmvqA@mail.gmail.com>
-In-Reply-To: <CABbqxmcJ+bybv0e-Rby9Q1jVR59Na_XE9MBee+f_zu0HUTmvqA@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 4 Mar 2024 21:25:23 +0800
-Message-ID: <CAL+tcoDkTPLFksXWReGXNjujOQbgtiTKN0_-MW1f7Yhj8+CzgA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net/nlmon: Cancel setting the fields of
- statistics to zero.
-To: yuanli fu <fuyuanli0722@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	fuyuanli@didiglobal.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240304102708.5bb5d95c@kmaincent-XPS-13-7390>
 
-On Mon, Mar 4, 2024 at 7:14=E2=80=AFPM yuanli fu <fuyuanli0722@gmail.com> w=
-rote:
->
-> Jason Xing <kerneljasonxing@gmail.com> =E4=BA=8E2024=E5=B9=B43=E6=9C=884=
-=E6=97=A5=E5=91=A8=E4=B8=80 15:05=E5=86=99=E9=81=93=EF=BC=9A
-> >
-> > On Sun, Mar 3, 2024 at 7:43=E2=80=AFPM fuyuanli <fuyuanli@didiglobal.co=
-m> wrote:
-> > >
-> > > Since fields of rtnl_link_stats64 have been set to zero in the previo=
-us
-> > > dev_get_stats function, there is no need to set them again in the
-> > > ndo_get_stats64 function.
-> > >
-> > > Signed-off-by: fuyuanli <fuyuanli@didiglobal.com>
-> > > Link: https://lore.kernel.org/netdev/20240302105224.GA7223@didi-Think=
-Centre-M920t-N000/
-> >
-> > Suggested-by: Jason Xing <kerneljasonxing@gmail.com>
-> > See https://lore.kernel.org/all/CAL+tcoA=3DFVBJi2eJgAELhWG_f+N-kwmrHc+X=
-RfKXhYk2RJcPKg@mail.gmail.com/
-> OK, I will submit a v3 patch which updating commit message, thanks.
+> > > +	psec = dev_find_pse_control(&phy->mdio.dev);
+> > > +	if (IS_ERR(psec)) {
+> > > +		rc = PTR_ERR(psec);
+> > > +		goto unregister_phy;
+> > > +	}
+> > > +  
+> > 
+> > I do not think it is a good idea to make PSE controller depend on
+> > phy->mdio.dev. The only reason why we have fwnode_find_pse_control()
+> > here was the missing port abstraction.
+> 
+> I totally agree that having port abstraction would be more convenient.
+> Maxime Chevallier is currently working on this and will post it after his
+> multi-phy series get merged.
+> Meanwhile, we still need a device pointer for getting the regulator. The
+> phy->mdio.dev is the only one I can think of as a regulator consumer.
+> Another idea?
 
-I don't think you need to send a new version of the patch unless
-someone points out other changes that should be made.
+Sorry, i've not been keeping up...
 
-Thanks,
-Jason
+Doesn't the device tree binding determine this? Where is the consumer
+in the tree?
 
-> >
-> > Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-> >
+   Andrew
 
