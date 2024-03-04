@@ -1,119 +1,95 @@
-Return-Path: <netdev+bounces-77005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0744786FC90
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:00:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A420486FC95
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:00:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 386A6B21C9F
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:00:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39078281725
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11831AAD8;
-	Mon,  4 Mar 2024 09:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24EF620310;
+	Mon,  4 Mar 2024 09:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XnvsfNRn"
 X-Original-To: netdev@vger.kernel.org
-Received: from albert.telenet-ops.be (albert.telenet-ops.be [195.130.137.90])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9928619BA6
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 09:00:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.137.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1AE218057;
+	Mon,  4 Mar 2024 09:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709542811; cv=none; b=jL8sQSqM567sdNoHOs1HcjDs0lUogoXfyqGIMcCEIMd2j+7+IijAg/nK4zqBLtluUV1HPtUBvQQrkY6mLbxfuppJZxIk7emq+kVCDSeT6ARsGKwLqYsJrTY+X1faQBhQKVuMAmRjUKY3P4qhXmUM8f59Koknq98zFTILDHYl71I=
+	t=1709542829; cv=none; b=Vmbal7e8dTiMUtWs9+53K/Mbd0pwvMctiuqlZ4Qm1ri+HFWA8SuLrrZm9N1hCHxi65LHsZZculwfSrQxfo4NxXPYEtOmMs1p5OTWm9dPXmNLiWlFGMSwmCk+C0kO+lDSOg7Mef10eSmph2G1/Lj1SETjH7JbDuXCXq62PB4CJo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709542811; c=relaxed/simple;
-	bh=fkFvKS6wbb3bjx6Xi0ab716kzkSQfBfhQVCG+goLYcY=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=tZ/Ouj6cR5ORswz/cTGIT5RetJsTxYtb9fzqYxXey3ZOss/CsspDVs9ylKHBUQ3St6+mmLss1d32QFr6I6aAcO3PjjhhRv+z5Y2FG+0oAVZJgmFFtCDGiP2ThqXZ+1D0eS2Gd2aTgICgz42yEtN1l12jqGF1EjxE6iivUERNS2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.137.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
-Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed40:2716:1247:52e8:4f90])
-	by albert.telenet-ops.be with bizsmtp
-	id uZ072B00D2qflky06Z074z; Mon, 04 Mar 2024 10:00:07 +0100
-Received: from geert (helo=localhost)
-	by ramsan.of.borg with local-esmtp (Exim 4.95)
-	(envelope-from <geert@linux-m68k.org>)
-	id 1rh4B5-002H9k-C1;
-	Mon, 04 Mar 2024 10:00:07 +0100
-Date: Mon, 4 Mar 2024 10:00:07 +0100 (CET)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: linux-kernel@vger.kernel.org
-cc: sparclinux@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: Build regressions/improvements in v6.8-rc7
-In-Reply-To: <20240304083122.361773-1-geert@linux-m68k.org>
-Message-ID: <35a869c8-52e8-177-1d4d-e57578b99b6@linux-m68k.org>
-References: <CAHk-=wgwt9b3yMxAQRCVJ0Jh6-4Dz1Fgo2au7g_U9VWVxXoS6Q@mail.gmail.com> <20240304083122.361773-1-geert@linux-m68k.org>
+	s=arc-20240116; t=1709542829; c=relaxed/simple;
+	bh=lpAla7wjpZULTCy4CgRg13SFGYC/LTxCvynPKvFBgk8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=VlJ9QnG+KXMFALb2ybhcn8gAM88jk8tL7jp7ojrfjtpSBQYOc7bsAWzV4dpu7K3yYQJ13F6jO4/rCDNY37pGwmEU0oFY38roYQmuPjqSAbglF4qDmx6+MoxcOzH0qy6r29fxl8BCq8r3tHi2bFaWOg455YN7XOZnhq1qMudByjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XnvsfNRn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6B56BC433C7;
+	Mon,  4 Mar 2024 09:00:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709542828;
+	bh=lpAla7wjpZULTCy4CgRg13SFGYC/LTxCvynPKvFBgk8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XnvsfNRnh9tx/jEHrAcvA/yuL9T/HFNvTfMk0RTZm8y3C9/zHiRWhZyn9SEB8k3dw
+	 tWmc10pddGxCElPg3ZbJ8OgW3o1I8yMDzU+Zqy02/lWmOhpg+Hr59XsjA608von66v
+	 +S5ofjpQ9GZNXTUC0FBHErTwV8Pg3MgKxPN0L6DWaoC00GVbtZfZxPAD3iqeCQE67a
+	 Ojqqm6M791SZyH+e7jIS0dIUdLQyNsoQOR/Y7g6LpGTI1jU4jkggL//xcSQ7DSib+m
+	 HUbJnvhoAZSGuAdnGUeDSGQEra9S6fKw0O9tlX+Vg7un/6nERST1AMEnHu0H1Vf+WZ
+	 sOlBIu75ea8Aw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4AB5CC595C4;
+	Mon,  4 Mar 2024 09:00:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [RESEND] dt-bindings: leds: pwm-multicolour: re-allow active-low
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170954282830.2135.17625030566348982975.git-patchwork-notify@kernel.org>
+Date: Mon, 04 Mar 2024 09:00:28 +0000
+References: <20240229-excluding-bonelike-d8f01dcc0623@spud>
+In-Reply-To: <20240229-excluding-bonelike-d8f01dcc0623@spud>
+To: Conor Dooley <conor@kernel.org>
+Cc: netdev@vger.kernel.org, conor.dooley@microchip.com, robh@kernel.org,
+ pavel@ucw.cz, lee@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, sven.schwermer@disruptive-technologies.com,
+ ansuelsmth@gmail.com, linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
 
-On Mon, 4 Mar 2024, Geert Uytterhoeven wrote:
-> JFYI, when comparing v6.8-rc7[1] to v6.8-rc6[3], the summaries are:
->  - build errors: +6/-0
+Hello:
 
-   + /kisskb/src/drivers/sbus/char/bbc_envctrl.c: error: no previous prototype for 'bbc_envctrl_cleanup' [-Werror=missing-prototypes]:  => 594:6
-   + /kisskb/src/drivers/sbus/char/bbc_envctrl.c: error: no previous prototype for 'bbc_envctrl_init' [-Werror=missing-prototypes]:  => 566:5
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-sparc64-gcc13/sparc64-allmodconfig (seen before)
+On Thu, 29 Feb 2024 18:24:00 +0000 you wrote:
+> From: Conor Dooley <conor.dooley@microchip.com>
+> 
+> active-low was lifted to the common schema for leds, but it went
+> unnoticed that the leds-multicolour binding had "additionalProperties:
+> false" where the other users had "unevaluatedProperties: false", thereby
+> disallowing active-low for multicolour leds. Explicitly permit it again.
+> 
+> [...]
 
-   + /kisskb/src/include/linux/rcupdate.h: error: dereferencing pointer to incomplete type 'struct dpll_pin':  => 462:36
+Here is the summary with links:
+  - [RESEND] dt-bindings: leds: pwm-multicolour: re-allow active-low
+    https://git.kernel.org/netdev/net-next/c/df620d7fabe9
 
-arm64-gcc5/arm64-allmodconfig
-mips-gcc8/mips-allmodconfig
-powerpc-gcc5/powerpc-all{mod,yes}config
-powerpc-gcc5/{ppc32,ppc64_book3e,ppc64le}_allmodconfig
-sparc64-gcc5/sparc{,64}-allmodconfig
-x86_64-gcc8/x86-allmodconfig
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-     src/net/core/dev.c: In function 'netdev_dpll_pin_assign':
-     include/linux/rcupdate.h:462:36: error: dereferencing pointer to incomplete type 'struct dpll_pin'
-      #define RCU_INITIALIZER(v) (typeof(*(v)) __force __rcu *)(v)
- 					^~~~
-     include/asm-generic/rwonce.h:55:33: note: in definition of macro '__WRITE_ONCE'
-       *(volatile typeof(x) *)&(x) = (val);    \
- 				     ^~~
-     arch/x86/include/asm/barrier.h:67:2: note: in expansion of macro 'WRITE_ONCE'
-       WRITE_ONCE(*p, v);      \
-       ^~~~~~~~~~
-     include/asm-generic/barrier.h:172:55: note: in expansion of macro '__smp_store_release'
-      #define smp_store_release(p, v) do { kcsan_release(); __smp_store_release(p, v); } while (0)
- 							   ^~~~~~~~~~~~~~~~~~~
-     include/linux/rcupdate.h:503:3: note: in expansion of macro 'smp_store_release'
-        smp_store_release(&p, RCU_INITIALIZER((typeof(p))_r_a_p__v)); \
-        ^~~~~~~~~~~~~~~~~
-     include/linux/rcupdate.h:503:25: note: in expansion of macro 'RCU_INITIALIZER'
-        smp_store_release(&p, RCU_INITIALIZER((typeof(p))_r_a_p__v)); \
- 			     ^~~~~~~~~~~~~~~
-     net/core/dev.c:9081:2: note: in expansion of macro 'rcu_assign_pointer'
-       rcu_assign_pointer(dev->dpll_pin, dpll_pin);
-       ^~~~~~~~~~~~~~~~~~
 
-   + {standard input}: Error: invalid operands for opcode:  => 606
-   + {standard input}: Error: missing operand:  => 606
-   + {standard input}: Error: unknown pseudo-op: `.cfi_def_cfa_offse':  => 605
-
-SH ICE crickets
-
-*** WARNINGS ***
-
-> [1] http://kisskb.ellerman.id.au/kisskb/branch/linus/head/90d35da658da8cff0d4ecbb5113f5fac9d00eb72/ (138 out of 239 configs)
-
-> [3] http://kisskb.ellerman.id.au/kisskb/branch/linus/head/d206a76d7d2726f3b096037f2079ce0bd3ba329b/ (138 out of 239 configs)
-
-Gr{oetje,eeting}s,
-
- 						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
- 							    -- Linus Torvalds
 
