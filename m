@@ -1,167 +1,155 @@
-Return-Path: <netdev+bounces-77164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3351870518
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 16:15:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABF0A87053F
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 16:19:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B021B27CEB
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 15:15:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66FC028A1B5
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 15:19:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83E7A46557;
-	Mon,  4 Mar 2024 15:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A63E45BF6;
+	Mon,  4 Mar 2024 15:17:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZwIb9/L8"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="n6JDnEaB"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E843D977;
-	Mon,  4 Mar 2024 15:12:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AE12C18D;
+	Mon,  4 Mar 2024 15:17:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709565145; cv=none; b=eKcIvX2J5QXStWWLiMGMNyvBjbchTv7NaxJk5br/otN0s0SZuUqg707ag1OUnYyDUPEQI5bvhpVRoj6lJA6wu3+SxfvQXsz4dcgSMcNUgOYdZzn29YNG2dbgh+qx4OtzEHkuiW2kkzRqVcWYXNW6IO4hdEKsXfwTjIOgqd2GA0g=
+	t=1709565470; cv=none; b=o9q9ybajKgB+q6RtAbtJ2CQFc8K/um1EHgeURlg8w72l43sUzRkFZ7zNmhPFFtf+byNLzBrqi35BWV1wB4m6vLUiG2+GLiXdW3gBTCaWwgagcQDyZcQ5d/gIlCD6daFBOQEXt0X2CC1wZSpEhgBwPw6+y9ZpNmS6u8LidrwKRxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709565145; c=relaxed/simple;
-	bh=b0p50hTtt8W7peOgfISHPiGdFO1VppSjrn+SSf5nf3A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W3jwb6kVNTADS82rg1+DeNqTIYcqKuw4Zg2zLUL1bMJ4dFsMDfTnsNXWsaTl/niqzzgBR+9qz+TsxeRuWeWHNhaCOUdOOalBB4tmowsNvtkQI+qOisyYzKjrXi9AVE1F9waCEGYUEIBiAJSQnZ1Woh+FwqP6wLNsIJ8NuMhpBg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZwIb9/L8; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CB00E240003;
-	Mon,  4 Mar 2024 15:12:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709565141;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VbiwlUjr6ExtcFQ9Ws/RMeHGGDWtQPpyfYEDdyzTn7Y=;
-	b=ZwIb9/L8b9+P8hLQkwWecey4tX3uV5MxStei82bELTW70MoNAszGdfg9U+L17+0xYPJ7TV
-	mPV4eMjTgI2WQZ4XQk53YcILAVAZa+SxRbX+rcRo8ZWnDa/UIMxt+9fH65HFviksUyPyJ7
-	Dc2+1xpf6cg06BrR3nSY1A9A/clQxlyR+2Ootnefw4IiR88iJQNMviQgoQROwURKwKT2km
-	jdWYjyZgbRL5YfDuP4hq1/M4gNpMUG7WFj/5CSALNd9AjFeoC+2Eb0iEYnK+haThLWNOZ8
-	MjI/XkMV/Y6VNfSi2tohjFKhXasMgOEKmMXxSkbDmFJVIIGjjF6N8P8Tp4CCkg==
-Message-ID: <021dbe50-5eb9-4552-b2bb-80d58d3eb076@bootlin.com>
-Date: Mon, 4 Mar 2024 16:12:19 +0100
+	s=arc-20240116; t=1709565470; c=relaxed/simple;
+	bh=z3F2OYMszvnRIPoGc6Z6uw/DcVkCj5UXNrrtVZGh/s4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WFpcPwApWwqKGt7/LNZtmYWCjW447LWgNzB+ZufFzmhD1G3UTxQi8JeD5OWrgiQidxEKsBKtjMqyv75BqBRyRqiqyZ8Y7e6Kva0sD8Eya4P4PTq6viDMmkvY7Kie+b++EEGFLgJvHRkjuQcByeoRRoLAZcSPUSObVCfrr5b2I38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=n6JDnEaB; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 4928787FAE;
+	Mon,  4 Mar 2024 16:17:43 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1709565465;
+	bh=SiJFFDcJ1G5N/oDqz5nfDb5RfxaofB8Dmaiikpx9tIg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=n6JDnEaBWjq1/XyKwDLyLlobhIRpkIaBTDLQGKHjJUqVTJN830/3gEVS+NkCK2Vaj
+	 91+xJVuOtkH57l81Uhsfi8OW0FeSEcchaWUVvduLvP1vC6rv7lgMNzP20MuT39xsy/
+	 xS1FGUOojm7kqVZjDDVK1iU/18FdQNTy4WVMS1yHWRlnZUYLzmU9psSoBWB/B+2Ay1
+	 F7QPte3TFIePh+CwW/oo6oqjhjyCplBXBUO5RYDywqZHrAasiW2LG3+X5MBIYdHpcJ
+	 x0zALFOm50xNwokirT2w2ROdAoXSdZvV8aGBtM446bGRjtjuootNLxx9YrSgLxr8bK
+	 gdsG2sJW+ymxA==
+Date: Mon, 4 Mar 2024 16:17:35 +0100
+From: Lukasz Majewski <lukma@denx.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Eric Dumazet
+ <edumazet@google.com>, Vladimir Oltean <olteanv@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, Tristram.Ha@microchip.com, Sebastian Andrzej
+ Siewior <bigeasy@linutronix.de>, Paolo Abeni <pabeni@redhat.com>, Ravi
+ Gunasekaran <r-gunasekaran@ti.com>, Nikita Zhandarovich
+ <n.zhandarovich@fintech.ru>, Murali Karicheri <m-karicheri2@ti.com>, Ziyang
+ Xuan <william.xuanziyang@huawei.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: hsr: Use full string description when opening HSR
+ network device
+Message-ID: <20240304161735.75b14548@wsk>
+In-Reply-To: <3f2fc5cb-8c79-4e8a-b72e-edcbbc78971e@lunn.ch>
+References: <20240304093220.4183179-1-lukma@denx.de>
+	<3f2fc5cb-8c79-4e8a-b72e-edcbbc78971e@lunn.ch>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/3] dt-bindings: net: dp83822: support
- configuring RMII master/slave mode
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Andrew Davis <afd@ti.com>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, =?UTF-8?Q?Miqu=C3=A8l_Raynal?=
- <miquel.raynal@bootlin.com>, Yen-Mei Goh <yen-mei.goh@keysight.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-References: <20240222103117.526955-1-jeremie.dautheribes@bootlin.com>
- <20240222103117.526955-2-jeremie.dautheribes@bootlin.com>
- <d14ba685-dc7e-4f99-a21e-bae9f3e6bc79@lunn.ch>
- <860648fa-11f5-4e0d-ac4e-e81ea111ef31@bootlin.com>
- <68112ecb-532f-4799-912d-16d6ceb9a6f3@lunn.ch>
-Content-Language: en-US
-From: =?UTF-8?B?SsOpcsOpbWllIERhdXRoZXJpYmVz?=
- <jeremie.dautheribes@bootlin.com>
-In-Reply-To: <68112ecb-532f-4799-912d-16d6ceb9a6f3@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: jeremie.dautheribes@bootlin.com
+Content-Type: multipart/signed; boundary="Sig_/feukiOtbZ5tDUoJE=MvPUT/";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+--Sig_/feukiOtbZ5tDUoJE=MvPUT/
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
 Hi Andrew,
 
-On 29/02/2024 22:23, Andrew Lunn wrote:
->>>> --- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
->>>> +++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
->>>> @@ -80,6 +80,22 @@ properties:
->>>>               10625, 11250, 11875, 12500, 13125, 13750, 14375, 15000]
->>>>        default: 10000
->>>> +  ti,rmii-mode:
->>>> +    description: |
->>>> +       If present, select the RMII operation mode. Two modes are
->>>> +       available:
->>>> +         - RMII master, where the PHY operates from a 25MHz clock reference,
->>>> +         provided by a crystal or a CMOS-level oscillator
->>>> +         - RMII slave, where the PHY operates from a 50MHz clock reference,
->>>> +         provided by a CMOS-level oscillator
->>>
->>> What has master and slave got to do with this?
->>>
->>> Sometimes, the MAC provides a clock to the PHY, and all data transfer
->>> over the RMII bus is timed by that.
->>>
->>> Sometimes, the PHY provides a clock to the MAC, and all data transfer
->>> over the RMII bus is timed by that.
->>>
->>> Here there is a clear master/slave relationship, who is providing the
->>> clock, who is consuming the clock. However, what you describe does not
->>> fit that. Maybe look at other PHY bindings, and copy what they do for
->>> clocks.
->>
->> In fact, I hesitated a lot before choosing this master/slave designation
->> because of the same reasoning as you. But the TI DP83826 datasheet [1] uses
->> this name for two orthogonal yet connected meanings, here's a copy of the
->> corresponding § (in section 9.3.10):
->>
->> "The DP83826 offers two types of RMII operations: RMII Slave and RMII
->> Master. In RMII Master operation, the DP83826 operates from either a 25-MHz
->> CMOS-level oscillator connected to XI pin, a 25-MHz crystal connected across
->> XI and XO pins. A 50-MHz output clock referenced from DP83826 can be
->> connected to the MAC. In RMII Slave operation, the DP83826 operates from a
->> 50-MHz CMOS-level oscillator connected to the XI pin and shares the same
->> clock as the MAC. Alternatively, in RMII slave mode, the PHY can operate
->> from a 50-MHz clock provided by the Host MAC."
->>
->> So it seems that in some cases this also fits the master/slave relationship
->> you describe.
-> 
-> We are normally interested in this 50Mhz reference clock. So i would
-> drop all references to 25Mhz. It is not relevant to the binding, since
-> it is nothing to do with connecting the PHY to the MAC, and it has a
-> fixed value.
-> 
-> So you can simplify this down to:
-> 
-> RMII Master: Outputs a 50Mhz Reference clock which can be connected to the MAC.
-> 
-> RMII Slave: Expects a 50MHz Reference clock input, shared with the
-> MAC.
-> 
->> That said, would you like me to include this description (or some parts) in
->> the binding in addition to what I've already written? Or would you prefer me
->> to use a more meaningful property name?
-> 
-> We don't really have any vendor agnostic consistent naming. dp83867
-> and dp83869 seems to call this ti,clk-output-sel. Since this is
-> another dp83xxx device, it would be nice if there was consistency
-> between all these TI devices. So could you check if the concept is the
-> same, and if so, change dp83826 to follow what other TI devices do.
+> On Mon, Mar 04, 2024 at 10:32:20AM +0100, Lukasz Majewski wrote:
+> > Up till now only single character ('A' or 'B') was used to provide
+> > information of HSR slave network device status.
+> >=20
+> > As it is also possible and valid, that Interlink network device may
+> > be supported as well, the description must be more verbose. As a
+> > result the full string description is now used.
+> >=20
+> > Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> > ---
+> >  net/hsr/hsr_device.c | 13 ++++++-------
+> >  1 file changed, 6 insertions(+), 7 deletions(-)
+> >=20
+> > diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+> > index 9d71b66183da..9a60489fba96 100644
+> > --- a/net/hsr/hsr_device.c
+> > +++ b/net/hsr/hsr_device.c
+> > @@ -142,30 +142,29 @@ static int hsr_dev_open(struct net_device
+> > *dev) {
+> >  	struct hsr_priv *hsr;
+> >  	struct hsr_port *port;
+> > -	char designation;
+> > +	char *designation =3D NULL; =20
+>=20
+> Thanks for splitting this into a patch.
+>=20
+> Reverse Christmas tree. I know it is broken already, but we should not
+> make it worse.
+>=20
+> I guess you can also add a const, since "Slave A" is probably const.
+>=20
+
+Yes, "Slave A/B" would be allocated in .rodata (as it it just a string
+label).
+
+const keyword added would help with the readability.=20
+
+> 	Andrew
 
 
-So I had a look at this ti,clk-output-sel property on the TI DP8386x 
-bindings, but unfortunately it does not correspond to our use case. In 
-their case, it is used to select one of the various internal clocks to 
-output on the CLK_OUT pin.
-In our case, we would prefer to describe the direction of the clock (OUT 
-in master mode, IN in slave mode).
 
-Given this, should we stick to "ti,rmii-mode" which is consistent with 
-the datasheet terminology, or consider perhaps something like 
-ti,clock-dir-sel (with possible values of in/out)?"
 
 Best regards,
-Jérémie
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/feukiOtbZ5tDUoJE=MvPUT/
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmXl5g8ACgkQAR8vZIA0
+zr10bAf/W9J8h5CHGGhdey5IJgO5608R6oaCdJFoNs8kZuIWBaVVdtRQwJURCjLi
+gzj1jimxMQd0If/Ha8fqTZ1U4cIdNHM3oevkWKFAzyyhlor/jAF7m/yIKjuwhnVz
+Mo+zcf1+1nBVe0tYaHKuCAiffsVjrODDK+wWi8gBUNqW2nGmQ81v9E23YTSpdE7a
+LnkbyWprWx8VtUzMSyKbi41YIs1vQbpUfjJ/vJpvkxYntVm7ZL6O7Kb3rsGpST81
+t+Yhqs7Pdomgkj/wJLGvX3fa9LCFq/hLaPu/uIrwWXVwvMmz/KWrguOqYLcFmM4v
+mPSrHEnIrr8xmDI4WnWjq5eb1dWGdQ==
+=djua
+-----END PGP SIGNATURE-----
+
+--Sig_/feukiOtbZ5tDUoJE=MvPUT/--
 
