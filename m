@@ -1,123 +1,120 @@
-Return-Path: <netdev+bounces-76977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-76978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07C8086FBD4
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:28:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C8B886FBE4
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:30:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49755B223BD
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 08:28:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DC651C21B1D
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 08:30:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC95B17C60;
-	Mon,  4 Mar 2024 08:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4ED9BE66;
+	Mon,  4 Mar 2024 08:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KrNzCtT0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LTJvRAmZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f68.google.com (mail-oo1-f68.google.com [209.85.161.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527DA17BAC
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 08:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F88418657;
+	Mon,  4 Mar 2024 08:30:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709540897; cv=none; b=GBflvHlo10HYgmTa1H/LwX1sWCmyKL9sIVemg14ufSq6Uvnb2nN6dpJm0iphjV+tsYkiKjOyr0fLywXBg1siBvEZiwUzdRM7s0MpTz3U092dMxNlFP2BmYRV1iubPt69UnM3/BL3Rp09HIY3Fc1PpYNM4SHX3TaLGH/Waq4BFtg=
+	t=1709541031; cv=none; b=irLI16wca7JDbmE4FCHyWB6dU+ikssh/S1yfBB31aNvo+MVOKQoZenUUtlFCakeAHI+chh7nJnnnIYC8vPhcFfpclBr0uJZESE0diMwk+JdF7J3BCixU4VNP7l6dmf9s9pMjyQWRDMsSA/yS5gmhSwhyeJ8vcqtsJV33wVKfLAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709540897; c=relaxed/simple;
-	bh=lIlf4DS9C8HJR1ePL9GT9vhqUpKrevCBc6YOLqMTRK0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=pcGOl6F9untQY0kscf55dpTbzgOZdB89nyGQMCf/L6gUbOw1w+sHwDLVkkJP5B3BEkJTxCAbBlxWsZooZg/zBCuG42lgrmSI91UvpwKAl+PF83N0/0adjDz7ubE5nEqdQxGTAtWuGXAxVlApYQHnKjEnvVx2zSkXCkx2jXDbJQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KrNzCtT0; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709540895;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=lIlf4DS9C8HJR1ePL9GT9vhqUpKrevCBc6YOLqMTRK0=;
-	b=KrNzCtT0x5zIRHNJ2nkAMrDHPJIyBWOyciMb8ezInCXfZoaNJcFbINTuUNmbstvWPG0gP2
-	DZjSqz75uDa8LxDEIe0HfcukNwIhCvdqEpF0v8JC1cwn2a9vogydQYIRuB7Sc728WuzwhH
-	j+6tcACjasYClDz/0f9v7zxTvnLgnDA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-111-nSZfLV9mOxSa_jtBaEcPQw-1; Mon, 04 Mar 2024 03:28:11 -0500
-X-MC-Unique: nSZfLV9mOxSa_jtBaEcPQw-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-33d8b2a57fdso388276f8f.1
-        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 00:28:11 -0800 (PST)
+	s=arc-20240116; t=1709541031; c=relaxed/simple;
+	bh=COjzYZytZzogQjpL44Dma0WCaVOUhQ30atrZWud4MLo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gICVnLC05gsSNyQSzpiNzN+ZIHVogz1TEOrTiehXykUNQylReOw5CtlNQrfQtBXoah+KulhhfhVJlRJu7hsLRK7qI3yC9kpBke3Rxj3aKIbixuelkutoi2sLodfQ+hWQzakQUKeFPET729Ej8btljlkItQuJ4F+iH4QyxG7IZ0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LTJvRAmZ; arc=none smtp.client-ip=209.85.161.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f68.google.com with SMTP id 006d021491bc7-59fb0b5b47eso1870030eaf.3;
+        Mon, 04 Mar 2024 00:30:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709541029; x=1710145829; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=COjzYZytZzogQjpL44Dma0WCaVOUhQ30atrZWud4MLo=;
+        b=LTJvRAmZxZUT7OL5XELSP4PQbjZvp16DsfC/b/ibD+v3IhIFfuOOU8ZhKCeNyTDJkI
+         eII1Rn0hKiKKuQF2xWQ0w/mgV87hpz+PmkGlQhnvQ2acW4sA9lKlU6atNy/5Xz3NqG6w
+         u9C7Lvzsv/IQxpEiWqxpg20nDFG/NkFxe2mNpIHQdiB+vn0GHWinO5GLYQxXsSmg7V3M
+         G5we6sITw2kXnk3pij6MatuV2wXAbTHFlV7BzrTCbCuyRyyBhRN8S3JTc7WQv6S8feli
+         MG5Tcprlp/jg1OdganaPA70JEW9OyuME9zzArrGV+S0b+r6a1Ctojlx66pZ2Sel5wbgl
+         gO7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709540890; x=1710145690;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lIlf4DS9C8HJR1ePL9GT9vhqUpKrevCBc6YOLqMTRK0=;
-        b=e6xw0B7FQe828xreeByUHivuLLf9d5JhlmBvwipn+pwZdGLDYrHtcBSZN94750ffv4
-         bne/z7944rpSDdgw+u3zhGckm8+ldoLmW4SHnYczdCeAms2scfqKM35/HqD4cDeTnAYX
-         BPU/ZhbOUanX+b9ovrNYr7F/m4dOknU2JzMNTvbZil82Ftl6Y5lD7ew8gGxRQRWrLV4P
-         G+IT9BJXZfZHXdgiSyJffb4klxrCYvcnYru4Xo3TWGR1yTPpf5AA1Ig0kLxIfAWVYC4w
-         1h23k3TqxHUvxJzBV2WTI18fW9zq3zrBWPn05uZDpfuDRXHvntaUffGIfjMD4aoVKWrb
-         lLLA==
-X-Forwarded-Encrypted: i=1; AJvYcCURCMEQxdNiKPpFp4Le33Zk3P4ZWAkUC9TRfjFG/wCEaE01RbHlsWVkyS+p1P0LRCuNolrA3ORpbg5/WktljyCQA6jg9+GZ
-X-Gm-Message-State: AOJu0Yw3+bN8bsfjVUUJ+06Hdm8FRqhzEWjgYRMg+A2TTeo4LYBGrH74
-	4wU83Qr+Lb4sZAtfF7kpuqy0iTxFkTw84PeAAipR7qXC27oCXXpZJEtP+as7FOHILS7Q2VPNV9Q
-	TFTVx+filiDwthpdb0Q0gK6JClWCKqXRpi9jf2euzaQPxRt3eCXzj4Q==
-X-Received: by 2002:a05:600c:ccf:b0:412:e23d:9878 with SMTP id fk15-20020a05600c0ccf00b00412e23d9878mr1946564wmb.1.1709540890248;
-        Mon, 04 Mar 2024 00:28:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE93Y5LF9FmrblRchXTag4B80veDQuOdM7qdJDQXa/+eY5lU3HHvb6hFz3MOVHnU1f83WfyUA==
-X-Received: by 2002:a05:600c:ccf:b0:412:e23d:9878 with SMTP id fk15-20020a05600c0ccf00b00412e23d9878mr1946551wmb.1.1709540889907;
-        Mon, 04 Mar 2024 00:28:09 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-235-19.dyn.eolo.it. [146.241.235.19])
-        by smtp.gmail.com with ESMTPSA id d8-20020a05600c3ac800b00412e84e59d8sm39137wms.44.2024.03.04.00.28.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Mar 2024 00:28:09 -0800 (PST)
-Message-ID: <f8711f5c4d6dfae9d7f4bf64fdde15feaee56494.camel@redhat.com>
-Subject: Re: [PATCH net-next 2/4] net: gro: change skb_gro_network_header()
-From: Paolo Abeni <pabeni@redhat.com>
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>
-Cc: Richard Gobert <richardbgobert@gmail.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Date: Mon, 04 Mar 2024 09:28:08 +0100
-In-Reply-To: <20240301193740.3436871-3-edumazet@google.com>
-References: <20240301193740.3436871-1-edumazet@google.com>
-	 <20240301193740.3436871-3-edumazet@google.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
- 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
- iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
- sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        d=1e100.net; s=20230601; t=1709541029; x=1710145829;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=COjzYZytZzogQjpL44Dma0WCaVOUhQ30atrZWud4MLo=;
+        b=ptUFnJHZoniW0s7092duUN7xP1FM/z6ZsIHJofSSZz2pJX2rk6ai0AD0uswcF3Yvgc
+         5UvsWqABDYS01eWuWr5+ASinjaj/P5tzxIiOIzspd95VTnlIV+O3cz+9ezWR216FV7xn
+         dZr6o6TINqx4Tf4uMczQurxHBdimTy1uQGjccIeATNu/MuvdpUGgBN1vOeqbdPKvmhxu
+         g8ySPH3W8WBanfUu1l2ssEriD2bjqtCikenAuVQEd39tIzs7wjsweIPy4LEzRkB16bPA
+         7Ay4ehks0RYuZcktanqvGoAlcFpy3Da/tMOaBq7Bq6e7eljtOJTtJ8M21N+rfHoPkSdM
+         xE/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUgfT9c2Os7ls1MjQ4K4Ij/LumwuWhuc3Ll8HYreOatnb0pYI6h7lzRKiEELXKaJh3Ux3WdUfg5re4BC+UnA4ABTfK3Ws9Gr8W9Yko1FMEbV0jEr25uJKOkW+LkUrNf/R4HYw8xUz2OHqFgUqZ+KM39UE/c+9Zyjl8YKGKOwV9wTp9lX3E4tlsy
+X-Gm-Message-State: AOJu0Yx7a+b4GEka3QmPeeZMiFH2BBWRWzWEVSv2jMGX8SK/Qozp8fDK
+	u7/ODhFGF0APLVWb9mENrzlnpWX+l5/pY9m/bzwie3+QUMbj8brwRpLImZWR2aNjnhuwE0uMHmW
+	fBQe4X+RmuNbd8tPFQx71gFrqSg==
+X-Google-Smtp-Source: AGHT+IECsylHATJ4cx/6X0FI3iJsSYZ7flxxlHaIvpmNc1q0nzKSEUjUCAC4PhqkLq3BO+APndYde2eXQYyQRw+/zIQ=
+X-Received: by 2002:a05:6358:78b:b0:17c:9a3:7813 with SMTP id
+ n11-20020a056358078b00b0017c09a37813mr7634600rwj.27.1709541029382; Mon, 04
+ Mar 2024 00:30:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240304034632.GA21357@didi-ThinkCentre-M920t-N000> <CANn89iJ0yBH3HskjzFUANeTxso5PpihxZcQ4VudzmfsKC-8kDw@mail.gmail.com>
+In-Reply-To: <CANn89iJ0yBH3HskjzFUANeTxso5PpihxZcQ4VudzmfsKC-8kDw@mail.gmail.com>
+From: yuanli fu <fuyuanli0722@gmail.com>
+Date: Mon, 4 Mar 2024 16:30:16 +0800
+Message-ID: <CABbqxmc43sfNz0c=CLbYFtHy6zdMMJuKWLbCm3n1OMYE6fxjwg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] tcp: Add skb addr and sock addr to arguments
+ of tracepoint tcp_probe.
+To: Eric Dumazet <edumazet@google.com>
+Cc: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, fuyuanli@didiglobal.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2024-03-01 at 19:37 +0000, Eric Dumazet wrote:
-> Change skb_gro_network_header() to accept a const sk_buff
-> and to no longer check if frag0 is NULL or not.
->=20
-> This allows to remove skb_gro_frag0_invalidate()
-> which is seen in profiles when header-split is enabled.
-
-I have a few questions to help me understanding this patchset better:
-
-skb_gro_frag0_invalidate() shows in profiles (for non napi_frags_skb
-callers?) because it's called multiple times for each aggregate packet,
-right? I guessed writing the same cacheline multiple times per-se
-should not be too much expansive.
-
-perf here did not allow me to easily observed the mentioned cost,
-because the function is inlined in many different places, I'm wondering
-how you noticed?
-
-Thanks!
-
-Paolo
-
+Eric Dumazet <edumazet@google.com> =E4=BA=8E2024=E5=B9=B43=E6=9C=884=E6=97=
+=A5=E5=91=A8=E4=B8=80 16:13=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Mon, Mar 4, 2024 at 4:46=E2=80=AFAM fuyuanli <fuyuanli@didiglobal.com>=
+ wrote:
+> >
+> > It is useful to expose skb addr and sock addr to user in tracepoint
+> > tcp_probe, so that we can get more information while monitoring
+> > receiving of tcp data, by ebpf or other ways.
+> >
+> > For example, we need to identify a packet by seq and end_seq when
+> > calculate transmit latency between lay 2 and lay 4 by ebpf, but which i=
+s
+>
+> Please use "layer 2 and layer 4".
+>
+> > not available in tcp_probe, so we can only use kprobe hooking
+> > tcp_rcv_esatblised to get them. But we can use tcp_probe directly if sk=
+b
+> > addr and sock addr are available, which is more efficient.
+>
+> Okay, but please fix the typo. Correct function name is tcp_rcv_establish=
+ed
+>
+> >
+> > Signed-off-by: fuyuanli <fuyuanli@didiglobal.com>
+> > Link: https://lore.kernel.org/netdev/20240229052813.GA23899@didi-ThinkC=
+entre-M920t-N000/
+> >
+>
+OK, I will submit a v3 patch, thanks for your review :)
+fuyuanli
 
