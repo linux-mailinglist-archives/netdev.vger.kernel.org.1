@@ -1,126 +1,130 @@
-Return-Path: <netdev+bounces-77104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D35BC87035D
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:54:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB0BE87036F
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:56:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88B151F26442
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:54:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 905C7B2832E
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7823A3F9E1;
-	Mon,  4 Mar 2024 13:53:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BlDLhXa7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A581A3F9C3;
+	Mon,  4 Mar 2024 13:56:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEA63F9C3;
-	Mon,  4 Mar 2024 13:53:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0E93B797
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 13:56:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709560427; cv=none; b=MNY5rqruXzmBZ3ro7R69GhOtD63RaO9XdqB1Vx03Kpyzh3LN0k6SmUGP3n6eq4tk8ruicYBYrlpxwLKevHL3+m7DShPc6feNET/7zcmOm9OClbGAEHS9d9E01bTNVog7FaqXP1TDyHjfWizvv0IlM52qJ9nrabn9bd/aPGYlwn8=
+	t=1709560585; cv=none; b=TWEXMZzoDncrvMuSRcixYg46IgAHExJQfej3b1LRiJ0dI2ImuxBIFAmbEi4MVbk0Nlr1B7gGg7Zt9EM0SQkGhO9HlcOyR1f7A/rTOAM4JkI7qMxFYGDI254M9b3fM+iofOtmUQCo1e9nApF4uw6m8j1wDhOMkNExgzLpfRzfPyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709560427; c=relaxed/simple;
-	bh=c027nQXo6duzC3sChLkEYD+sefZ/bqJ5BjPU+eIda6k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P13QWWoqYTvxxRgtOVUhUmTKW1yVvyEF3PIWLvqOZgrfGIbSmUotwvB9Y68evEhsiVPZxHHKwaql2E3rmpeNOAe9gU4UKsvnPdNNekJATD5FmjUA49fqkt3n1nilIEfTHvZU3XS068a3Qsu7IHGAS7sVKVcpX18QdBYZrIB3NDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BlDLhXa7; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=GrzTZEtZxWdDNRIjLiasY3q5ubsmD0i5rvI/Q95SnuI=; b=BlDLhXa70PeAxAiugcSnp0h4xR
-	05PZfZoSo/Zsk/Zr8GodcFkqaEqOehJStj+zh55wqWw5Ymb23Gi5XbvlxmjE5ebu6ZrCS/Xz2/fvm
-	vUT18KLPrHbEGyMmdnC+Vl3IkqSyUKKXw20LhwEFHQLGJB3siSpZ/w7hSNFmF6UU+xIg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rh8lO-009KSk-Nc; Mon, 04 Mar 2024 14:53:54 +0100
-Date: Mon, 4 Mar 2024 14:53:54 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: =?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1709560585; c=relaxed/simple;
+	bh=QJQ63Qy2NxLUI09eztah+cUO41gaSAxVF3u7uBvwMs4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tEPF1h/ms7uUr9141IPwcd3HyahaBoK+9LX7AehF4tScFj8Jxf2e21spZnGKuQEIk7+lmXOPLs/JBbRCJg9bvFrT+kx/r24Sba/UUbDqfSWhHq7teAw2K2DXYcDKvgmiM3VkuIKn47kJCW66MllvUoNyg4lQ8ycCR8m4mOPrWKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rh8ng-0004OE-7v; Mon, 04 Mar 2024 14:56:16 +0100
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rh8nf-004MiW-0Y; Mon, 04 Mar 2024 14:56:15 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rh8ne-003Prr-34;
+	Mon, 04 Mar 2024 14:56:14 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
-	Frank Rowand <frowand.list@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v5 13/17] net: pse-pd: Use regulator framework
- within PSE framework
-Message-ID: <290c516e-6cf7-4db2-9b32-c9dc7200fe73@lunn.ch>
-References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
- <20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
- <ZeObuKHkPN3tiWz_@pengutronix.de>
- <20240304102708.5bb5d95c@kmaincent-XPS-13-7390>
- <84b300c7-8295-424b-9117-c604fb4cd73e@lunn.ch>
- <ZeXO_NhXZQajGZPr@pengutronix.de>
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: [PATCH net v1 1/1] net: dsa: microchip: make sure drive strength configuration is not lost by soft reset
+Date: Mon,  4 Mar 2024 14:56:12 +0100
+Message-Id: <20240304135612.814404-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZeXO_NhXZQajGZPr@pengutronix.de>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Mar 04, 2024 at 02:39:08PM +0100, Oleksij Rempel wrote:
-> On Mon, Mar 04, 2024 at 02:32:50PM +0100, Andrew Lunn wrote:
-> > > > > +	psec = dev_find_pse_control(&phy->mdio.dev);
-> > > > > +	if (IS_ERR(psec)) {
-> > > > > +		rc = PTR_ERR(psec);
-> > > > > +		goto unregister_phy;
-> > > > > +	}
-> > > > > +  
-> > > > 
-> > > > I do not think it is a good idea to make PSE controller depend on
-> > > > phy->mdio.dev. The only reason why we have fwnode_find_pse_control()
-> > > > here was the missing port abstraction.
-> > > 
-> > > I totally agree that having port abstraction would be more convenient.
-> > > Maxime Chevallier is currently working on this and will post it after his
-> > > multi-phy series get merged.
-> > > Meanwhile, we still need a device pointer for getting the regulator. The
-> > > phy->mdio.dev is the only one I can think of as a regulator consumer.
-> > > Another idea?
-> > 
-> > Sorry, i've not been keeping up...
-> > 
-> > Doesn't the device tree binding determine this? Where is the consumer
-> > in the tree?
-> 
-> The real consumer is outside of the system.
+This driver has two separate reset sequence in different places:
+- gpio/HW reset on start of ksz_switch_register()
+- SW reset on start of ksz_setup()
 
-The device on the other end of the cable?
+The second one will overwrite drive strength configuration made in the
+ksz_switch_register().
 
-> Withing the system, it would be the RJ45 port, but we have no
-> abstraction for ports so far.
+To fix it, move ksz_parse_drive_strength() from ksz_switch_register() to
+ksz_setup().
 
-A Linux regulator is generally used in a producer/consumer pair. If
-there is no consumer device, why have a producer? What is going to use
-the consumer API?
+Fixes: d67d7247f641 ("net: dsa: microchip: Add drive strength configuration")
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+ drivers/net/dsa/microchip/ksz_common.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-When we have a port representor, do we expect it to have active
-elements? Something which will consume this regulator?
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index d58cc685478b1..83a5936506059 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2260,6 +2260,8 @@ static int ksz_pirq_setup(struct ksz_device *dev, u8 p)
+ 	return ksz_irq_common_setup(dev, pirq);
+ }
+ 
++static int ksz_parse_drive_strength(struct ksz_device *dev);
++
+ static int ksz_setup(struct dsa_switch *ds)
+ {
+ 	struct ksz_device *dev = ds->priv;
+@@ -2281,6 +2283,10 @@ static int ksz_setup(struct dsa_switch *ds)
+ 		return ret;
+ 	}
+ 
++	ret = ksz_parse_drive_strength(dev);
++	if (ret)
++		return ret;
++
+ 	/* set broadcast storm protection 10% rate */
+ 	regmap_update_bits(ksz_regmap_16(dev), regs[S_BROADCAST_CTRL],
+ 			   BROADCAST_STORM_RATE,
+@@ -4345,10 +4351,6 @@ int ksz_switch_register(struct ksz_device *dev)
+ 	for (port_num = 0; port_num < dev->info->port_cnt; ++port_num)
+ 		dev->ports[port_num].interface = PHY_INTERFACE_MODE_NA;
+ 	if (dev->dev->of_node) {
+-		ret = ksz_parse_drive_strength(dev);
+-		if (ret)
+-			return ret;
+-
+ 		ret = of_get_phy_mode(dev->dev->of_node, &interface);
+ 		if (ret == 0)
+ 			dev->compat_interface = interface;
+-- 
+2.39.2
 
-	  Andrew
 
