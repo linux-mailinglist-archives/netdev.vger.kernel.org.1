@@ -1,247 +1,246 @@
-Return-Path: <netdev+bounces-77028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0312486FE04
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:52:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16E5186FE10
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:53:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79416B233DD
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:52:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 979611F22AE5
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 09:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 843AD224E0;
-	Mon,  4 Mar 2024 09:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A5D7219E2;
+	Mon,  4 Mar 2024 09:53:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XYJypDTf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L8gYRhje"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2056.outbound.protection.outlook.com [40.107.243.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7398222097;
-	Mon,  4 Mar 2024 09:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709545799; cv=fail; b=GC8I+aC9kVxPSbm2FTv42Zd/Nv2Go9hXNvfmSP0/lH2xIxwa6zmdFGw/Z9+e0IMSRR/QWrYM6Ec+hDNlPIwh9Yk/DkQjjzLPx5CSZ7tJJFekuVj7HwPYYpRoGQRIXuMdt//6UwC2CluOMzh01iLzsCqu9SEu28YUCHm0yCtjHuM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709545799; c=relaxed/simple;
-	bh=dW7I15909uvL4JCjyK36yiLHQGv5DczZ5Y5kjQ1LA68=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uk1MX0AAiZ3PRQIejn1yvUKeF4HlLDGMnf8bQ59Tf03QiMSLIUqVbt76pDLv0ogTEI1GoTgbmI0wzsBIjngIO03NrOxYukQs3vhEPbRItvRG6qVqzFvhMH8oxsEu3KPWrxlbn/M7NLN7unXFA1AjX8fW77069wcEH+0ANdP8BVw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=XYJypDTf; arc=fail smtp.client-ip=40.107.243.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HbWDRfbai5vNukS3ArdbG1wvYATG6ImMof9+6oYTGRAZfO10FfB5uU8MtLB0+l48Gy91lJIHFjevSvCQ/B+yxKAPHVvWGZcOr/z2s2PAMR+ClAdzlQzxE1gdK6UQzGrb3OJ0gAREnI06cgh2RmMYpFHL4yW2iFycjDr94x20sLvVSWUCTqN5BVXDxucCUKndYY5D1HnzHzP0GPW1TIQonzq+k/m0e96JKao8w88YXAyE69m48e22uhbOCA+69ccQtmibrfzFf5ksMo5xP65KmK+yIWeTKQTfOjWP2rg+mZH/qIb9oi+2+BZ6hgR96kTAPRZn4HMPHVc/tUs+TVyFpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ALmn7F2BvGTpSrBoF1l8sh0oiICfdLtXPeNQUFN2XCA=;
- b=LTSTKs/hOx4HQM+4NOVTkzcjZ1X+5iZwedifwqHfZGy1W57oij8MTXQMGCALUgTFgznVcy5zTsIAR9EieHz3xOx8YwaTusd7TVqVyZT8Jvv1H58mduvd7Yb1O7bChQJVRmy5F7mlW1smrI6+Cw1OIh6Od3MPQ20CduaTvT1zjQI3AX5v5orivZ4d7RI0jIZa8nWZdbUxtFZ90nE+VTNi1QZXPJKkb468e0F/XSjMVPun2+SvLopgRBHFHiQTolN9RTfKxh0FKJpJHQv/CSb1VIk5TgIWhZV4QFmiMZsNyTRjYA8n7HpvBBLr2L/D21xPLoB5mVuTHQtQtJfh6JPwXQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=secunet.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ALmn7F2BvGTpSrBoF1l8sh0oiICfdLtXPeNQUFN2XCA=;
- b=XYJypDTfjlaN2kV+6m59sAyzEez3faXNrz+kzp3Svc7UPoHkGLSAwRGjiYcU0Ix1vcSTpw77N/5z9fDmj9bKCSufKg2D2yxR+yra5K60Tw9onwmQo0R8cTzo/S8ITp3I1NRze/Qw+DdmlXZ9B4kfcagmvdScNrwJh3gFz3+LhzbD+B0kY4to819RPD8TiI++xs219yJVxKpqUMkNgxlwNORoC9OuG0QYpUzMqk0le19D2eJGObi3ltZwjNfYZX+SUd4mbtetXg6I7vr9niBjvjmx263+pFZ/ZewtFEDYy4i1Ctwp9qokni6U3vQqe/qpTdjSb4mCzWvBDzBXoX89dw==
-Received: from BN6PR17CA0042.namprd17.prod.outlook.com (2603:10b6:405:75::31)
- by CYYPR12MB8654.namprd12.prod.outlook.com (2603:10b6:930:c9::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.38; Mon, 4 Mar
- 2024 09:49:53 +0000
-Received: from BN1PEPF0000468E.namprd05.prod.outlook.com
- (2603:10b6:405:75:cafe::2b) by BN6PR17CA0042.outlook.office365.com
- (2603:10b6:405:75::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.38 via Frontend
- Transport; Mon, 4 Mar 2024 09:49:53 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BN1PEPF0000468E.mail.protection.outlook.com (10.167.243.139) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7362.11 via Frontend Transport; Mon, 4 Mar 2024 09:49:52 +0000
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 4 Mar 2024
- 01:49:36 -0800
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail203.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Mon, 4 Mar
- 2024 01:49:35 -0800
-Received: from c-237-113-200-209.mtl.labs.mlnx (10.127.8.14) by
- mail.nvidia.com (10.129.68.9) with Microsoft SMTP Server id 15.2.1258.12 via
- Frontend Transport; Mon, 4 Mar 2024 01:49:32 -0800
-From: Dragos Tatulea <dtatulea@nvidia.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
-	"David Ahern" <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
-	"Jakub Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: <leonro@nvidia.com>, <gal@nvidia.com>, Dragos Tatulea
-	<dtatulea@nvidia.com>, "Anatoli N . Chechelnickiy"
-	<Anatoli.Chechelnickiy@m.interpipe.biz>, Ian Kumlien <ian.kumlien@gmail.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [RFC] net: esp: fix bad handling of pages from page_pool
-Date: Mon, 4 Mar 2024 11:48:52 +0200
-Message-ID: <20240304094950.761233-1-dtatulea@nvidia.com>
-X-Mailer: git-send-email 2.42.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5056320B33;
+	Mon,  4 Mar 2024 09:53:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709545999; cv=none; b=Veh+nAxKX29WhabGhwnN2bI7jorrmsvD5zMqg8ZFyTaOV/Ppni0qGP/v5qbCTEA4A2cjLlwxVPl05NNQzkvhxbH1/zmfJkpLoi9LuVqUIYEDVEESZabYjtkcxSl3C5a8fjViY9MOHm4ekBVjHvy6XJ1E1ik+FGxSqiRFGuew8FI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709545999; c=relaxed/simple;
+	bh=SwJYBVWCQc/s1GHsKd1+fyA8kLw1X4cfpZ2y4tcEMwU=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=tbbUh+tgxuPtGI98cFqIZoO8Ea01don3dz3bK5VJf+CiKHbAqkyCmBC4rIiYPmZb05ZSSxpI7UHIFlrMtJnBvtmQTfp1MSs6C73edtH157s5atc+RrdN5OPbHFtGclnso2MaK3oBe8h9Z6CGbCvOegUaLMcG5PqlZj+juMPzlr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L8gYRhje; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-564fc495d83so5151693a12.0;
+        Mon, 04 Mar 2024 01:53:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709545995; x=1710150795; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tT70S1p+PH9hL091yd8+31qBGcRCEfw7ATgxMs9BG/I=;
+        b=L8gYRhjehDkUIppEFDQuTLuaCmKg144SUmBFGd6oGyUHdNsZqda1HExI74a0StVg7D
+         JwVmNtImPYnR/toaj7ijkw8rYAzBGJoIeqtGe167mT3WamdJCj9/bZAtVFD7qnsgnw2s
+         c5bMgPITFUYxUaJiGVoh5iatpKjY/8zv5tzlvZNQd4V+kf9U1vzq17/AI+S11O7Xz/cE
+         NpAUfJINez0PHpkG8cTJ9QOGRu+1dWogRaEBuXWNbDG4v8pM8keUx97WpMr92PPPaFZ8
+         6FY/Ve5g3Ig/DgmjuRtYS1hPLfJ2G94h9KH9Iga5L2GtRFgDq0+VqlIhxyKnyrkNf9TW
+         d04A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709545995; x=1710150795;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tT70S1p+PH9hL091yd8+31qBGcRCEfw7ATgxMs9BG/I=;
+        b=wKWpjhWGUUiVBsNFsbV5OYBxy6rkUVrQv/0agx791uQlvu8xMO52WCK1AwKJrpiSKq
+         fpGjPp2buVXL7eiD9jh20QfrvNC+4P5k68Vc3MKXGaGycRFuY+mL3X3z9Qscx5jPKjnO
+         /0hSj7OhdMDWUzXH52CGNOubCO4q/tvoEW/21jS2h2f670lCiI9P4SZWX3qoahaHGcO4
+         8saT//C97Q2ZALCS5KCdzX6kRbmnBkYxNWoaijC55700A4NA5xkB50WK3FiYd9HY4GHg
+         +ZXmVdbuMQVEK+ECintn4zQqrO0blsMZOYgd2/Ele4UNJhvilGz22TtpVAGO9II3PUY6
+         H76g==
+X-Gm-Message-State: AOJu0YwjnNva919Mka2SNkj7s3fA+rbJbe8adyg9QEUplmMvOXma+rgM
+	UWFZuEeILQDPdBj8Hs8NwL4rRSPAUfnDFMCjfyc7o6eyc9rcFjwDzgB3DgY7AEOo8ieqYWuqne8
+	pG7y6BLpsnR768XJoL7Gpep7bqagApDHu0JwTdBGCe20=
+X-Google-Smtp-Source: AGHT+IHD3r2nRqBLuByj4KH/VSRGl6yyQ483mWi6KKegjcjJKJVO94ku8hbcUcBPwQslZHXDAYmHxAumL5G4+oGEg5Q=
+X-Received: by 2002:a17:907:20b9:b0:a43:e550:4067 with SMTP id
+ pw25-20020a17090720b900b00a43e5504067mr4995407ejb.12.1709545995101; Mon, 04
+ Mar 2024 01:53:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF0000468E:EE_|CYYPR12MB8654:EE_
-X-MS-Office365-Filtering-Correlation-Id: ad13d58e-a77a-4cae-78f2-08dc3c30709a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	b9b3FOnViBiE1pJu3drpoZmc2QsVYhy7cEfXmxfZTqLQyQDFS7GcoB6sIzSxqiZm6G/fWAXlawpVJYoZzUdacUDz0E70hS2qL6bfYGg8DQN+m4VlIUllc13ApGFPhxkX2zfYM/b59eFXs7MiDlHai0OZgqGGo1u/H7mjE+/r2NHWu6NZYvbp/rUMlMAZr/GZaf99dsofvjRlKcPGaj2f1QAvni7aHr4U/LkudAerb3wGCkVxM91lGCWDoiwkwt46y1wEfzZRu7LrKvyA5RHIvBhX/plopl4tm7U6s9ZZ5Do/vzqQrUbcrxwLhiKayed7r2KznrmY9LtXIA6rf/pFC+CllLzj27gAz9oRBNtYbz1MUS4TdyaaePeLdyjRkfOfkV6yqawYdhqwT7G+PgxbJ729PgGPFL4ccZk7zeTZsAltJWoL3RhfpY1t29N+nj6jEa1CmbHEjxQ8jw8cu9GR0hf26hkxx9/KdhAwmDKzzr1m+qIQKEkZbTzK6YHllODcwp7IZ0nXxcnBnSuVjR7a7grCOU+6maBQHnEDDSLa0aQKXWbJmjKOmnxiDPTcjVGzXECeN2fc5cq5Ef7WlsVNRjIMBWWs/NT+TMEc3m3k4DfbWNLR5Nqoh3fMCMWCjO1n/RK+yKSrjcB02qVbyXqQXbdE9JeBSl9TcQU/OUalKRSzgQd7rLWk4f0izYybt+N0aKSj232wz8WGrv85NiiHAO68NT74Z8ln4ihN3Hp5kB/Ql8SKVgs/nBgVPFUdJwqj
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(36860700004)(82310400014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2024 09:49:52.3005
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ad13d58e-a77a-4cae-78f2-08dc3c30709a
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF0000468E.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8654
+From: Sam Sun <samsun1006219@gmail.com>
+Date: Mon, 4 Mar 2024 17:53:03 +0800
+Message-ID: <CAEkJfYP5T4Xv7vn7GZnQ7ig6_QZB8B_g-DS9dk7xhxRntYNY7g@mail.gmail.com>
+Subject: [PATCH net] drivers/net/bonding: Fix out-of-bounds read in bond_option_arp_ip_targets_set()
+To: linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org, j.vosburgh@gmail.com, andy@greyhouse.net, 
+	davem@davemloft.net, Eric Dumazet <edumazet@google.com>, kuba@kernel.org, 
+	pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-When the skb is reorganized during esp_output (!esp->inline), the pages
-coming from the original skb fragments are supposed to be released back
-to the system through put_page. But if the skb fragment pages are
-originating from a page_pool, calling put_page on them will trigger a
-page_pool leak which will eventually result in a crash.
+Dear kernel developers and maintainers,
 
-This leak can be easily observed when using CONFIG_DEBUG_VM and doing
-ipsec + gre (non offloaded) forwarding:
+We found a bug through our modified Syzkaller. In function
+bond_option_arp_ip_targets_set(), if newval->string is an empty
+string, newval->string+1 will point to the byte after the string,
+causing an out-of-bound read.  KASAN report is listed below.
 
-  BUG: Bad page state in process ksoftirqd/16  pfn:1451b6
-  page:00000000de2b8d32 refcount:0 mapcount:0 mapping:0000000000000000 index:0x1451b6000 pfn:0x1451b6
-  flags: 0x200000000000000(node=0|zone=2)
-  page_type: 0xffffffff()
-  raw: 0200000000000000 dead000000000040 ffff88810d23c000 0000000000000000
-  raw: 00000001451b6000 0000000000000001 00000000ffffffff 0000000000000000
-  page dumped because: page_pool leak
-  Modules linked in: ip_gre gre mlx5_ib mlx5_core xt_conntrack xt_MASQUERADE nf_conntrack_netlink nfnetlink iptable_nat nf_nat xt_addrtype br_netfilter rpcrdma rdma_ucm ib_iser libiscsi scsi_transport_iscsi ib_umad rdma_cm ib_ipoib iw_cm ib_cm ib_uverbs ib_core overlay zram zsmalloc fuse [last unloaded: mlx5_core]
-  CPU: 16 PID: 96 Comm: ksoftirqd/16 Not tainted 6.8.0-rc4+ #22
-  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-  Call Trace:
-   <TASK>
-   dump_stack_lvl+0x36/0x50
-   bad_page+0x70/0xf0
-   free_unref_page_prepare+0x27a/0x460
-   free_unref_page+0x38/0x120
-   esp_ssg_unref.isra.0+0x15f/0x200
-   esp_output_tail+0x66d/0x780
-   esp_xmit+0x2c5/0x360
-   validate_xmit_xfrm+0x313/0x370
-   ? validate_xmit_skb+0x1d/0x330
-   validate_xmit_skb_list+0x4c/0x70
-   sch_direct_xmit+0x23e/0x350
-   __dev_queue_xmit+0x337/0xba0
-   ? nf_hook_slow+0x3f/0xd0
-   ip_finish_output2+0x25e/0x580
-   iptunnel_xmit+0x19b/0x240
-   ip_tunnel_xmit+0x5fb/0xb60
-   ipgre_xmit+0x14d/0x280 [ip_gre]
-   dev_hard_start_xmit+0xc3/0x1c0
-   __dev_queue_xmit+0x208/0xba0
-   ? nf_hook_slow+0x3f/0xd0
-   ip_finish_output2+0x1ca/0x580
-   ip_sublist_rcv_finish+0x32/0x40
-   ip_sublist_rcv+0x1b2/0x1f0
-   ? ip_rcv_finish_core.constprop.0+0x460/0x460
-   ip_list_rcv+0x103/0x130
-   __netif_receive_skb_list_core+0x181/0x1e0
-   netif_receive_skb_list_internal+0x1b3/0x2c0
-   napi_gro_receive+0xc8/0x200
-   gro_cell_poll+0x52/0x90
-   __napi_poll+0x25/0x1a0
-   net_rx_action+0x28e/0x300
-   __do_softirq+0xc3/0x276
-   ? sort_range+0x20/0x20
-   run_ksoftirqd+0x1e/0x30
-   smpboot_thread_fn+0xa6/0x130
-   kthread+0xcd/0x100
-   ? kthread_complete_and_exit+0x20/0x20
-   ret_from_fork+0x31/0x50
-   ? kthread_complete_and_exit+0x20/0x20
-   ret_from_fork_asm+0x11/0x20
-   </TASK>
+==================================================================
+BUG: KASAN: slab-out-of-bounds in strlen+0x7d/0xa0 lib/string.c:418
+Read of size 1 at addr ffff8881119c4781 by task syz-executor665/8107
 
-The suggested fix is to use the page_pool release API first and then fallback
-to put_page.
+CPU: 1 PID: 8107 Comm: syz-executor665 Not tainted 6.7.0-rc7 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:364 [inline]
+ print_report+0xc1/0x5e0 mm/kasan/report.c:475
+ kasan_report+0xbe/0xf0 mm/kasan/report.c:588
+ strlen+0x7d/0xa0 lib/string.c:418
+ __fortify_strlen include/linux/fortify-string.h:210 [inline]
+ in4_pton+0xa3/0x3f0 net/core/utils.c:130
+ bond_option_arp_ip_targets_set+0xc2/0x910
+drivers/net/bonding/bond_options.c:1201
+ __bond_opt_set+0x2a4/0x1030 drivers/net/bonding/bond_options.c:767
+ __bond_opt_set_notify+0x48/0x150 drivers/net/bonding/bond_options.c:792
+ bond_opt_tryset_rtnl+0xda/0x160 drivers/net/bonding/bond_options.c:817
+ bonding_sysfs_store_option+0xa1/0x120 drivers/net/bonding/bond_sysfs.c:156
+ dev_attr_store+0x54/0x80 drivers/base/core.c:2366
+ sysfs_kf_write+0x114/0x170 fs/sysfs/file.c:136
+ kernfs_fop_write_iter+0x337/0x500 fs/kernfs/file.c:334
+ call_write_iter include/linux/fs.h:2020 [inline]
+ new_sync_write fs/read_write.c:491 [inline]
+ vfs_write+0x96a/0xd80 fs/read_write.c:584
+ ksys_write+0x122/0x250 fs/read_write.c:637
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7f797835cfcd
+Code: 28 c3 e8 46 1e 00 00 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48
+89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffff464ffb8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007ffff46501b8 RCX: 00007f797835cfcd
+RDX: 00000000000000f5 RSI: 0000000020000140 RDI: 0000000000000003
+RBP: 0000000000000001 R08: 0000000000000000 R09: 00007ffff46501b8
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007ffff46501a8 R14: 00007f79783da530 R15: 0000000000000001
+ </TASK>
 
-Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-Reported-by: Anatoli N.Chechelnickiy <Anatoli.Chechelnickiy@m.interpipe.biz>
-Reported-by: Ian Kumlien <ian.kumlien@gmail.com>
-Change-Id: I263cf91c1d13c2736a58927e8e0fc51296759450
----
- net/ipv4/esp4.c | 11 ++++++++---
- net/ipv6/esp6.c | 11 ++++++++---
- 2 files changed, 16 insertions(+), 6 deletions(-)
+Allocated by task 8107:
+ kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
+ kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+ ____kasan_kmalloc mm/kasan/common.c:374 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:333 [inline]
+ __kasan_kmalloc+0xa3/0xb0 mm/kasan/common.c:383
+ kasan_kmalloc include/linux/kasan.h:198 [inline]
+ __do_kmalloc_node mm/slab_common.c:1007 [inline]
+ __kmalloc_node_track_caller+0x5e/0xd0 mm/slab_common.c:1027
+ kstrndup+0x72/0x110 mm/util.c:108
+ bonding_sysfs_store_option+0x66/0x120 drivers/net/bonding/bond_sysfs.c:153
+ dev_attr_store+0x54/0x80 drivers/base/core.c:2366
+ sysfs_kf_write+0x114/0x170 fs/sysfs/file.c:136
+ kernfs_fop_write_iter+0x337/0x500 fs/kernfs/file.c:334
+ call_write_iter include/linux/fs.h:2020 [inline]
+ new_sync_write fs/read_write.c:491 [inline]
+ vfs_write+0x96a/0xd80 fs/read_write.c:584
+ ksys_write+0x122/0x250 fs/read_write.c:637
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index 4dd9e5040672..3e07d78c887d 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -112,9 +112,14 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp)
- 	/* Unref skb_frag_pages in the src scatterlist if necessary.
- 	 * Skip the first sg which comes from skb->data.
- 	 */
--	if (req->src != req->dst)
--		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
--			put_page(sg_page(sg));
-+	if (req->src != req->dst) {
-+		for (sg = sg_next(req->src); sg; sg = sg_next(sg)) {
-+			struct page *page = sg_page(sg);
-+
-+			if (!napi_pp_put_page(page, false))
-+				put_page(page);
-+		}
-+	}
- }
- 
- #ifdef CONFIG_INET_ESPINTCP
-diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
-index 6e6efe026cdc..b73f5773139d 100644
---- a/net/ipv6/esp6.c
-+++ b/net/ipv6/esp6.c
-@@ -129,9 +129,14 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp)
- 	/* Unref skb_frag_pages in the src scatterlist if necessary.
- 	 * Skip the first sg which comes from skb->data.
- 	 */
--	if (req->src != req->dst)
--		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
--			put_page(sg_page(sg));
-+	if (req->src != req->dst) {
-+		for (sg = sg_next(req->src); sg; sg = sg_next(sg)) {
-+			struct page *page = sg_page(sg);
-+
-+			if (!napi_pp_put_page(page, false))
-+				put_page(page);
-+		}
-+	}
- }
- 
- #ifdef CONFIG_INET6_ESPINTCP
--- 
-2.42.0
+The buggy address belongs to the object at ffff8881119c4780
+ which belongs to the cache kmalloc-32 of size 32
+The buggy address is located 0 bytes to the right of
+ allocated 1-byte region [ffff8881119c4780, ffff8881119c4781)
 
+The buggy address belongs to the physical page:
+page:ffffea0004467100 refcount:1 mapcount:0 mapping:0000000000000000
+index:0xffff8881119c4fc1 pfn:0x1119c4
+flags: 0x57ff00000000800(slab|node=1|zone=2|lastcpupid=0x7ff)
+page_type: 0x3f()
+raw: 057ff00000000800 ffff888013040100 ffffea000405a650 ffffea0004156b90
+raw: ffff8881119c4fc1 ffff8881119c4000 000000010000003f 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask
+0x2420c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_COMP|__GFP_THISNODE),
+pid 25, tgid 25 (kworker/u6:0), ts 73787966798, free_ts 73774684635
+ set_page_owner include/linux/page_owner.h:31 [inline]
+ post_alloc_hook+0x2d9/0x350 mm/page_alloc.c:1537
+ prep_new_page mm/page_alloc.c:1544 [inline]
+ get_page_from_freelist+0xd38/0x2fa0 mm/page_alloc.c:3312
+ __alloc_pages+0x21d/0x21f0 mm/page_alloc.c:4568
+ __alloc_pages_node include/linux/gfp.h:238 [inline]
+ kmem_getpages mm/slab.c:1356 [inline]
+ cache_grow_begin+0x9b/0x3c0 mm/slab.c:2550
+ cache_alloc_refill+0x289/0x3a0 mm/slab.c:2923
+ ____cache_alloc mm/slab.c:2999 [inline]
+ ____cache_alloc mm/slab.c:2982 [inline]
+ __do_cache_alloc mm/slab.c:3185 [inline]
+ slab_alloc_node mm/slab.c:3230 [inline]
+ __kmem_cache_alloc_node+0x374/0x420 mm/slab.c:3521
+ __do_kmalloc_node mm/slab_common.c:1006 [inline]
+ __kmalloc_node+0x50/0xd0 mm/slab_common.c:1014
+ kmalloc_array_node include/linux/slab.h:698 [inline]
+ kcalloc_node include/linux/slab.h:703 [inline]
+ memcg_alloc_slab_cgroups+0x10e/0x210 mm/memcontrol.c:2968
+ account_slab mm/slab.h:637 [inline]
+ kmem_getpages mm/slab.c:1364 [inline]
+ cache_grow_begin+0x349/0x3c0 mm/slab.c:2550
+ cache_alloc_refill+0x289/0x3a0 mm/slab.c:2923
+ ____cache_alloc mm/slab.c:2999 [inline]
+ ____cache_alloc mm/slab.c:2982 [inline]
+ __do_cache_alloc mm/slab.c:3182 [inline]
+ slab_alloc_node mm/slab.c:3230 [inline]
+ kmem_cache_alloc_node+0x3e1/0x4a0 mm/slab.c:3509
+ alloc_task_struct_node kernel/fork.c:173 [inline]
+ dup_task_struct kernel/fork.c:1110 [inline]
+ copy_process+0x3f6/0x73e0 kernel/fork.c:2332
+ kernel_clone+0xeb/0x8c0 kernel/fork.c:2907
+ user_mode_thread+0xb4/0xf0 kernel/fork.c:2985
+ call_usermodehelper_exec_work kernel/umh.c:172 [inline]
+ call_usermodehelper_exec_work+0xd0/0x180 kernel/umh.c:158
+ process_one_work+0x878/0x15c0 kernel/workqueue.c:2627
+page last free stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1137 [inline]
+ free_unref_page_prepare+0x4c5/0xa60 mm/page_alloc.c:2347
+ free_unref_page+0x33/0x3d0 mm/page_alloc.c:2487
+ rcu_do_batch kernel/rcu/tree.c:2158 [inline]
+ rcu_core+0x817/0x1670 kernel/rcu/tree.c:2431
+ __do_softirq+0x1d4/0x85e kernel/softirq.c:553
+
+Memory state around the buggy address:
+ ffff8881119c4680: fa fb fb fb fc fc fc fc 00 01 fc fc fc fc fc fc
+ ffff8881119c4700: 00 05 fc fc fc fc fc fc 00 00 00 fc fc fc fc fc
+>ffff8881119c4780: 01 fc fc fc fc fc fc fc fb fb fb fb fc fc fc fc
+                   ^
+ ffff8881119c4800: 00 01 fc fc fc fc fc fc fb fb fb fb fc fc fc fc
+ ffff8881119c4880: 00 fc fc fc fc fc fc fc 00 01 fc fc fc fc fc fc
+==================================================================
+
+We developed a patch to fix this problem. Check the string length
+first before calling in4_pton().
+
+Reported-by: Yue Sun <samsun1006219@gmail.com>
+Signed-off-by: Yue Sun <samsun1006219@gmail.com>
+
+diff --git a/drivers/net/bonding/bond_options.c
+b/drivers/net/bonding/bond_options.c
+index f3f27f0bd2a6..a6d01055f455 100644
+--- a/drivers/net/bonding/bond_options.c
++++ b/drivers/net/bonding/bond_options.c
+@@ -1198,7 +1198,7 @@ static int bond_option_arp_ip_targets_set(struct
+bonding *bond,
+     __be32 target;
+
+     if (newval->string) {
+-        if (!in4_pton(newval->string+1, -1, (u8 *)&target, -1, NULL)) {
++        if (!strlen(newval->string) || !in4_pton(newval->string+1,
+-1, (u8 *)&target, -1, NULL)) {
+             netdev_err(bond->dev, "invalid ARP target %pI4 specified\n",
+                    &target);
+             return ret;
 
