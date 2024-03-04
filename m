@@ -1,459 +1,159 @@
-Return-Path: <netdev+bounces-77060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A548086FFEC
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 12:10:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEBCA8701C9
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:45:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2E65B24427
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:10:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4339C1F220CE
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 12:45:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF0A3BB28;
-	Mon,  4 Mar 2024 11:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760813D0D5;
+	Mon,  4 Mar 2024 12:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="xXVLio2D"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="kdrZa2xN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2080.outbound.protection.outlook.com [40.107.94.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6FF3A1CE
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 11:09:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709550579; cv=none; b=EY2dTYOTdS+xseqyDJI31DLDVaZdONeGfu2CffLpfyGcTCtl5AJwhVJ/srnHHw47uPcgcTLk3rVtPWcwpOD7HMBqIiDX/bDSwaU2IzYT7+Qen0l94cjjznI0GxBGfoKdKqDHlvR+tuxp/QWGw1m0VrF7eGfFj94ExA0WKIMY8i8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709550579; c=relaxed/simple;
-	bh=hkBsZswP4SLZ0fO+1zJSWpFWs6sN6ItMQD7hvy1akIU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=seDAqHccIEtt8uz1xQNtKzkOkZwcv08UXmEcThbbatNIk1+a6ywoaurPUhnrTC+DcoaH2fnZgMZogAqjyFOvaOWeqvyAh4jRvmDtUd7apS67ShFAjDTWkDsXb+yppPSb+ZIXg7POI5f/gPgViINL2k956W+zYA1dpdrt+rosyEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=xXVLio2D; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a4515f8e13cso127518966b.3
-        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 03:09:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech.se; s=google; t=1709550576; x=1710155376; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IuI5YuZGQuQBgMJaVl9OwdG56lR7h/R4KTW+eq+jGhU=;
-        b=xXVLio2DYlkRn3jdzBQKV0HFZ00yVHeFD6q1nSm6bCUAiA0HcEDwh5YkKljDUPAprA
-         nAyyzKA+Sxq9VjLxfUjel4B/XOMGu3k25dUcZjIHtv+m8plrrfMo77fK6p3VgVlG17Xq
-         Luo4qciENIIDIBiGwTqXlF4n8O8EaNoUtFlgogM7Mhc7uPi/0KjmDTHHtsVW8gusTKSO
-         uMpfQbzbAfoOwGq254J9U8sT1C3OP56vGEnsqRLbuHmulrYJBUICwzWbhrooXUd9uVHh
-         tRnUUu5kFeG+C7ScZZxGO1Ietz+27hXm1nTJb5W2ROW2IzGYRQg7edPt31ef1iXCsSf0
-         hNtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709550576; x=1710155376;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IuI5YuZGQuQBgMJaVl9OwdG56lR7h/R4KTW+eq+jGhU=;
-        b=WVlDUbFhGnmUreNkbiLmJWo8AdpNVavu3J2DjUwclkPNrarZisgFu26TzSMymuggak
-         5U+jGQwxG1kzLV+vmcjcxUXTSPaXgkTnY1djCD3aB75kINrXlAdp6VuyuMKAx/T+FU5Z
-         rso+Kbh8WY3AYzxp9Fvcw4ZyqLBxzb+TXTGF3r0qZCRiO5c7glXvaWW69ZyNuIMdpNTy
-         PSArzNJary0rCq5MQgsKwS741JYLxNqiFJP7jcKuaAPCaJDe0xAuggqqmC141oaM4idH
-         BvvBm464iAXUZwwJ6TnHEwoKoykt0qzq/eld56yMhnysPmfbJQbFwVHmXddaLd4Lmo4o
-         WbMA==
-X-Forwarded-Encrypted: i=1; AJvYcCXck9SeeEyz2ExcgQJ3vRcaQo8oJ31X9An4KDTu9/SvA2nYV6Vz+L52wnQVUv4qpjb0sog0XTbeK/KWpgC4APgldu9QZJ5X
-X-Gm-Message-State: AOJu0YyFMyd2/2acmM3yvLLTXvLQj7QPjB8sbixdjAqZTYSqTDLktLFA
-	/5+s3uKus5OaR8ZPLrQtc6KvFupKhyPecr8jWLVxDpIkP/EkPW8Ds8vazbS9f+Q=
-X-Google-Smtp-Source: AGHT+IFxF+MX00N7Tfy1puR1P3WzdikhCh4NXrOOxjfd6GYOv9sgsDS8nIzxHAnf1hXuzQPLSDZ1DA==
-X-Received: by 2002:a17:906:894:b0:a45:5371:f0d6 with SMTP id n20-20020a170906089400b00a455371f0d6mr1218654eje.61.1709550576435;
-        Mon, 04 Mar 2024 03:09:36 -0800 (PST)
-Received: from sleipner.berto.se (p4fcc8c6a.dip0.t-ipconnect.de. [79.204.140.106])
-        by smtp.googlemail.com with ESMTPSA id v23-20020a170906565700b00a455ff77e7bsm688420ejr.88.2024.03.04.03.09.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Mar 2024 03:09:36 -0800 (PST)
-From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	netdev@vger.kernel.org
-Cc: linux-renesas-soc@vger.kernel.org,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Paul Barker <paul.barker.ct@bp.renesas.com>
-Subject: [net-next,v3 6/6] ravb: Unify Rx ring maintenance code paths
-Date: Mon,  4 Mar 2024 12:08:58 +0100
-Message-ID: <20240304110858.117100-7-niklas.soderlund+renesas@ragnatech.se>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240304110858.117100-1-niklas.soderlund+renesas@ragnatech.se>
-References: <20240304110858.117100-1-niklas.soderlund+renesas@ragnatech.se>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41CB3D0D0
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 12:45:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709556348; cv=fail; b=IGE4eRl+ttOFP9szNUWVvrW+ZAvdGsvdu1H6i9LhD/aLHOXVmLPhjUiWPo1O5FjyU1esDlXLRzEsRuVFE18zNE+2InrgqqOq/FGDI9oiZHd42NeoYD7LJmJ5Xl99ejLspSeEn8l2Mq53Y1XDOTehlrand0lqz1Kg0U7VzH8XdT0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709556348; c=relaxed/simple;
+	bh=LmEWYBAEJ2bsqeMZovzFJYC9Xm7ABJngk8LU26k7Qx4=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=AuQ4+XlSu3ooPT2Vo1IOzUA8V6CIt5TWPWfhRoLkKtnXDEsEP9Jqu3ZpNgkA1xRn5WAQC+KPtUBBzudOguMJVLyuU1pvdSSprCviRkTF3W/F5ns+WOW+CbrvvYhnqbwI8jeYpDPi2vw69GKITSH5tKbO/D2/0h1Peu6yrGFsEqw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=kdrZa2xN; arc=fail smtp.client-ip=40.107.94.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MVCPX0Lgmoskd+nD0ZTGEZaAUEQlFfJ7nVYbMKx8EjRk+EwpeHpBVchfL1AZxoEGJGqnjf2aYGmn7I2RUm0N8DiyqwIkKGn+zZB5yn8m9Bp+222Tn2hMds8qh+vAB4G8SslpdsHK9X6Heb9NzKdrWZzEux4P3tj7rEan6NN2MhebOtjCQjZwYSxT6nUf88nDJXcF91WvDmb957OQCmR/pJyzQJm6QljioWdDtQTCHPSibpeIIaUTDFXXhE7UV4mBgmWsKoopozOxen2AdJkPeEHVWFpC94qzZeterBPzmI55UGg30nvjuWCd2v3uxCJ7GVUlmVoFPw44h3sdN+YfCQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cdyWge5IMvJDpOACdgfmK+RdthH8xh6ZvZhN8gEVrec=;
+ b=iL/jf3H+rjbxhiQStcI35z69AbNDd5dd6Jc8XhVzmImxGo+CQa+Vo56gmxCWo6nmcgGfGq9eYxD/Sfe+bw7DyFVnqGKVXcoAHx3w4X2glirgN67B/ZJSkzInvE+dSCNl/ZiZUzgOqMCgF+7pmhTH9ukyBGnRV7BgE2OJ3zOvfR6GSFXiQaIF07yo81vSVHXbYe0eIT1RAjgD/BcQd6rhjFX2oaj8xoI6KyJ7GZkOl/DWJNRTu3+qwWsgZQvmHjVSB4IdO7rhlY86hdTzuyyQ6qD+FLwyb4icVywKkMmVaAbsvWBLE1E6FhE1lhoZS7YVpTTexFLlIVAJWa9wyz+jbA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cdyWge5IMvJDpOACdgfmK+RdthH8xh6ZvZhN8gEVrec=;
+ b=kdrZa2xNmKWNkyODzCzqiRiaIKyA6xCoWT54ZAs3h3rApohN8BzfSJjwMXg8s4mAMsjxlsmxsnQrGDhVTbTQinGMCh3Y5xKM91jP7mEH2ioIX/A//XI6vo00JuOwqIvd9O4aOQlhJM5ulRmKxxcE8YNFPHcADzEiwH4OpllO+C0N0AA/jNC2YXICB3xnpQ2zn13KIBJUG8scZaTQ8aryD3GRYGQx1V5C8azzP+l8u/0RgXP6JCnIghXiuFxiLWY+5NIFBlpt1Hq/rqxvzy1gSWqtJ5HFfh1JvWj4LDDjCDfuUEwT94qS+GTnMTarA2mrL+jGaTxD13ASK18WO8Ca7g==
+Received: from BN7PR06CA0071.namprd06.prod.outlook.com (2603:10b6:408:34::48)
+ by BL3PR12MB6380.namprd12.prod.outlook.com (2603:10b6:208:38d::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.39; Mon, 4 Mar
+ 2024 12:45:43 +0000
+Received: from BN1PEPF0000467F.namprd03.prod.outlook.com
+ (2603:10b6:408:34:cafe::25) by BN7PR06CA0071.outlook.office365.com
+ (2603:10b6:408:34::48) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.39 via Frontend
+ Transport; Mon, 4 Mar 2024 12:45:43 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN1PEPF0000467F.mail.protection.outlook.com (10.167.243.84) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7362.11 via Frontend Transport; Mon, 4 Mar 2024 12:45:43 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 4 Mar 2024
+ 04:45:30 -0800
+Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Mon, 4 Mar
+ 2024 04:45:25 -0800
+References: <cover.1709217658.git.petrm@nvidia.com>
+ <223614cb8fbe91c6050794762becdd9a3c3b689a.1709217658.git.petrm@nvidia.com>
+ <CANn89iLDizzEKi7u0NssSXD_rB6c8EeL==ino-O0a2_BxUN5tw@mail.gmail.com>
+User-agent: mu4e 1.8.11; emacs 28.3
+From: Petr Machata <petrm@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>
+CC: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>, David Ahern
+	<dsahern@kernel.org>, Simon Horman <horms@kernel.org>, <mlxsw@nvidia.com>
+Subject: Re: [PATCH net-next v2 4/7] net: nexthop: Expose nexthop group
+ stats to user space
+Date: Mon, 4 Mar 2024 12:09:41 +0100
+In-Reply-To: <CANn89iLDizzEKi7u0NssSXD_rB6c8EeL==ino-O0a2_BxUN5tw@mail.gmail.com>
+Message-ID: <87a5nemahr.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF0000467F:EE_|BL3PR12MB6380:EE_
+X-MS-Office365-Filtering-Correlation-Id: 543fa97f-6863-4f1a-f569-08dc3c490165
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	0fYSSbCn+AFAl2w3GviCCHEe/5qxEk1PEOoScvEAq2F+ZxRSzZ7QPPcJekgcwNiDHvl1GrBBf8nugZIIQ+4jluntBUInuxqlvc7Ddx0gppWaSGs8kvc6IMIpuYuVicYw1TbHnnXI1eHBY5S4d2G8dV/X+UhqEdl6hR1lAxnBbdZhNpoTJwxylOzRK/po9vlxhEI6TyOzukfM8R1XC2PEEsNSBEGs2HLwyAKjMgWTNDRSRftbFGefhW+w2siRy+RBD7bweS7KWjEJGeosNwie/Y0PAhsTC7UUMLfr6VwGYwIR00Q05/6FuTsHcgbNkFxegJLZu9jLlXndwXAOC6Nl9aTrmyNC0BIlY3onY0Q+K5WpgmHyXERVdCoBnUVoRu7I+ThfGq/bQR2WWEoj/+f3P4PJpYds60dDuE8OPFgfu+5bsLQ5zLCaateO5t1TncCr33orxVHladrFxR0zvhdn1cK9MM6j4uHvTyDrAA1iv/jawvr+q5XlokwA/EHpEtUG4De0Msr9dZNc5TAlWeqKgqrB36nj1jQTkq46P8sr43ruHfWd55pkw2klJ9m2K8tQUmDqpDkK8m13K7pn9t6NUadvK7KTMQta6TIcjsUJe+Sd2rehr+HSHVrYwjI+zeTMV/bhxPqhkfRFAU6OcCD7cc+GcseRfYErRvKASG8rMnOkO1feP9d944XDONPLsHXN/DuZC121ACFL0eeNSAQ9Ow+46O9t7zviHfqF+mnKA9DK1bH+RcW++953K7PKGo/R
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(36860700004)(376005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2024 12:45:43.1474
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 543fa97f-6863-4f1a-f569-08dc3c490165
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF0000467F.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6380
 
-The R-Car and RZ/G2L Rx code paths were split in two separate
-implementations when support for RZ/G2L was added due to the fact that
-R-Car uses the extended descriptor format while RZ/G2L uses normal
-descriptors. This has led to a duplication of Rx logic with the only
-difference being the different Rx descriptors types used. The
-implementation however neglects to take into account that extended
-descriptors are normal descriptors with additional metadata at the end
-to carry hardware timestamp information.
 
-The hardware timestamp information is only consumed in the R-Car Rx
-loop and all the maintenance code around the Rx ring can be shared
-between the two implementations if the difference in descriptor length
-is carefully considered.
+Eric Dumazet <edumazet@google.com> writes:
 
-This change merges the two implementations for Rx ring maintenance by
-adding a method to access both types of descriptors as normal
-descriptors, as this part covers all the fields needed for Rx ring
-maintenance the only difference between using normal or extended
-descriptor is the size of the memory region to allocate/free and the
-step size between each descriptor in the ring.
+> On Thu, Feb 29, 2024 at 7:20=E2=80=AFPM Petr Machata <petrm@nvidia.com> w=
+rote:
+>> @@ -661,8 +663,77 @@ static int nla_put_nh_group_res(struct sk_buff *skb=
+, struct nh_group *nhg)
+>>         return -EMSGSIZE;
+>>  }
+>>
+>> -static int nla_put_nh_group(struct sk_buff *skb, struct nh_group *nhg)
+>> +static void nh_grp_entry_stats_read(struct nh_grp_entry *nhge,
+>> +                                   struct nh_grp_entry_stats *stats)
+>>  {
+>> +       int i;
+>> +
+>> +       memset(stats, 0, sizeof(*stats));
+>> +       for_each_possible_cpu(i) {
+>> +               struct nh_grp_entry_stats *cpu_stats;
+>> +               unsigned int start;
+>> +               u64 packets;
+>> +
+>> +               cpu_stats =3D per_cpu_ptr(nhge->stats, i);
+>> +               do {
+>> +                       start =3D u64_stats_fetch_begin(&cpu_stats->sync=
+p);
+>> +                       packets =3D cpu_stats->packets;
+>
+> This is not safe, even on 64bit arches.
+>
+> You should use u64_stats_t, u64_stats_read(), u64_stats_add() ...
 
-Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-Reviewed-by: Paul Barker <paul.barker.ct@bp.renesas.com>
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
----
-* Changes since v1
-- Correct the ring size calculation in ravb_rx_ring_format() which was
-  not updated in v1.
-
-* Changes since v2
-- Fix spelling in commit message.
----
- drivers/net/ethernet/renesas/ravb.h      |   5 +-
- drivers/net/ethernet/renesas/ravb_main.c | 134 ++++++-----------------
- 2 files changed, 33 insertions(+), 106 deletions(-)
-
-diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
-index b12b379baf5a..b48935ec7e28 100644
---- a/drivers/net/ethernet/renesas/ravb.h
-+++ b/drivers/net/ethernet/renesas/ravb.h
-@@ -1039,9 +1039,6 @@ struct ravb_ptp {
- };
- 
- struct ravb_hw_info {
--	void (*rx_ring_free)(struct net_device *ndev, int q);
--	void (*rx_ring_format)(struct net_device *ndev, int q);
--	void *(*alloc_rx_desc)(struct net_device *ndev, int q);
- 	bool (*receive)(struct net_device *ndev, int *quota, int q);
- 	void (*set_rate)(struct net_device *ndev);
- 	int (*set_feature)(struct net_device *ndev, netdev_features_t features);
-@@ -1055,6 +1052,7 @@ struct ravb_hw_info {
- 	u32 tccr_mask;
- 	u32 rx_max_frame_size;
- 	u32 rx_max_desc_use;
-+	u32 rx_desc_size;
- 	unsigned aligned_tx: 1;
- 
- 	/* hardware features */
-@@ -1090,6 +1088,7 @@ struct ravb_private {
- 	union {
- 		struct ravb_rx_desc *desc;
- 		struct ravb_ex_rx_desc *ex_desc;
-+		void *raw;
- 	} rx_ring[NUM_RX_QUEUE];
- 	struct ravb_tx_desc *tx_ring[NUM_TX_QUEUE];
- 	void *tx_align[NUM_TX_QUEUE];
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 4ef4be9e152e..fa48ff4aba2d 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -202,6 +202,13 @@ static const struct mdiobb_ops bb_ops = {
- 	.get_mdio_data = ravb_get_mdio_data,
- };
- 
-+static struct ravb_rx_desc *
-+ravb_rx_get_desc(struct ravb_private *priv, unsigned int q,
-+		 unsigned int i)
-+{
-+	return priv->rx_ring[q].raw + priv->info->rx_desc_size * i;
-+}
-+
- /* Free TX skb function for AVB-IP */
- static int ravb_tx_free(struct net_device *ndev, int q, bool free_txed_only)
- {
-@@ -246,17 +253,17 @@ static int ravb_tx_free(struct net_device *ndev, int q, bool free_txed_only)
- 	return free_num;
- }
- 
--static void ravb_rx_ring_free_gbeth(struct net_device *ndev, int q)
-+static void ravb_rx_ring_free(struct net_device *ndev, int q)
- {
- 	struct ravb_private *priv = netdev_priv(ndev);
- 	unsigned int ring_size;
- 	unsigned int i;
- 
--	if (!priv->rx_ring[q].desc)
-+	if (!priv->rx_ring[q].raw)
- 		return;
- 
- 	for (i = 0; i < priv->num_rx_ring[q]; i++) {
--		struct ravb_rx_desc *desc = &priv->rx_ring[q].desc[i];
-+		struct ravb_rx_desc *desc = ravb_rx_get_desc(priv, q, i);
- 
- 		if (!dma_mapping_error(ndev->dev.parent,
- 				       le32_to_cpu(desc->dptr)))
-@@ -265,48 +272,21 @@ static void ravb_rx_ring_free_gbeth(struct net_device *ndev, int q)
- 					 priv->info->rx_max_frame_size,
- 					 DMA_FROM_DEVICE);
- 	}
--	ring_size = sizeof(struct ravb_rx_desc) * (priv->num_rx_ring[q] + 1);
--	dma_free_coherent(ndev->dev.parent, ring_size, priv->rx_ring[q].desc,
-+	ring_size = priv->info->rx_desc_size * (priv->num_rx_ring[q] + 1);
-+	dma_free_coherent(ndev->dev.parent, ring_size, priv->rx_ring[q].raw,
- 			  priv->rx_desc_dma[q]);
--	priv->rx_ring[q].desc = NULL;
--}
--
--static void ravb_rx_ring_free_rcar(struct net_device *ndev, int q)
--{
--	struct ravb_private *priv = netdev_priv(ndev);
--	unsigned int ring_size;
--	unsigned int i;
--
--	if (!priv->rx_ring[q].ex_desc)
--		return;
--
--	for (i = 0; i < priv->num_rx_ring[q]; i++) {
--		struct ravb_ex_rx_desc *desc = &priv->rx_ring[q].ex_desc[i];
--
--		if (!dma_mapping_error(ndev->dev.parent,
--				       le32_to_cpu(desc->dptr)))
--			dma_unmap_single(ndev->dev.parent,
--					 le32_to_cpu(desc->dptr),
--					 priv->info->rx_max_frame_size,
--					 DMA_FROM_DEVICE);
--	}
--	ring_size = sizeof(struct ravb_ex_rx_desc) *
--		    (priv->num_rx_ring[q] + 1);
--	dma_free_coherent(ndev->dev.parent, ring_size, priv->rx_ring[q].ex_desc,
--			  priv->rx_desc_dma[q]);
--	priv->rx_ring[q].ex_desc = NULL;
-+	priv->rx_ring[q].raw = NULL;
- }
- 
- /* Free skb's and DMA buffers for Ethernet AVB */
- static void ravb_ring_free(struct net_device *ndev, int q)
- {
- 	struct ravb_private *priv = netdev_priv(ndev);
--	const struct ravb_hw_info *info = priv->info;
- 	unsigned int num_tx_desc = priv->num_tx_desc;
- 	unsigned int ring_size;
- 	unsigned int i;
- 
--	info->rx_ring_free(ndev, q);
-+	ravb_rx_ring_free(ndev, q);
- 
- 	if (priv->tx_ring[q]) {
- 		ravb_tx_free(ndev, q, false);
-@@ -337,7 +317,7 @@ static void ravb_ring_free(struct net_device *ndev, int q)
- 	priv->tx_skb[q] = NULL;
- }
- 
--static void ravb_rx_ring_format_gbeth(struct net_device *ndev, int q)
-+static void ravb_rx_ring_format(struct net_device *ndev, int q)
- {
- 	struct ravb_private *priv = netdev_priv(ndev);
- 	struct ravb_rx_desc *rx_desc;
-@@ -345,12 +325,12 @@ static void ravb_rx_ring_format_gbeth(struct net_device *ndev, int q)
- 	dma_addr_t dma_addr;
- 	unsigned int i;
- 
--	rx_ring_size = sizeof(*rx_desc) * priv->num_rx_ring[q];
--	memset(priv->rx_ring[q].desc, 0, rx_ring_size);
-+	rx_ring_size = priv->info->rx_desc_size * priv->num_rx_ring[q];
-+	memset(priv->rx_ring[q].raw, 0, rx_ring_size);
- 	/* Build RX ring buffer */
- 	for (i = 0; i < priv->num_rx_ring[q]; i++) {
- 		/* RX descriptor */
--		rx_desc = &priv->rx_ring[q].desc[i];
-+		rx_desc = ravb_rx_get_desc(priv, q, i);
- 		rx_desc->ds_cc = cpu_to_le16(priv->info->rx_max_desc_use);
- 		dma_addr = dma_map_single(ndev->dev.parent, priv->rx_skb[q][i]->data,
- 					  priv->info->rx_max_frame_size,
-@@ -363,37 +343,7 @@ static void ravb_rx_ring_format_gbeth(struct net_device *ndev, int q)
- 		rx_desc->dptr = cpu_to_le32(dma_addr);
- 		rx_desc->die_dt = DT_FEMPTY;
- 	}
--	rx_desc = &priv->rx_ring[q].desc[i];
--	rx_desc->dptr = cpu_to_le32((u32)priv->rx_desc_dma[q]);
--	rx_desc->die_dt = DT_LINKFIX; /* type */
--}
--
--static void ravb_rx_ring_format_rcar(struct net_device *ndev, int q)
--{
--	struct ravb_private *priv = netdev_priv(ndev);
--	struct ravb_ex_rx_desc *rx_desc;
--	unsigned int rx_ring_size = sizeof(*rx_desc) * priv->num_rx_ring[q];
--	dma_addr_t dma_addr;
--	unsigned int i;
--
--	memset(priv->rx_ring[q].ex_desc, 0, rx_ring_size);
--	/* Build RX ring buffer */
--	for (i = 0; i < priv->num_rx_ring[q]; i++) {
--		/* RX descriptor */
--		rx_desc = &priv->rx_ring[q].ex_desc[i];
--		rx_desc->ds_cc = cpu_to_le16(priv->info->rx_max_desc_use);
--		dma_addr = dma_map_single(ndev->dev.parent, priv->rx_skb[q][i]->data,
--					  priv->info->rx_max_frame_size,
--					  DMA_FROM_DEVICE);
--		/* We just set the data size to 0 for a failed mapping which
--		 * should prevent DMA from happening...
--		 */
--		if (dma_mapping_error(ndev->dev.parent, dma_addr))
--			rx_desc->ds_cc = cpu_to_le16(0);
--		rx_desc->dptr = cpu_to_le32(dma_addr);
--		rx_desc->die_dt = DT_FEMPTY;
--	}
--	rx_desc = &priv->rx_ring[q].ex_desc[i];
-+	rx_desc = ravb_rx_get_desc(priv, q, i);
- 	rx_desc->dptr = cpu_to_le32((u32)priv->rx_desc_dma[q]);
- 	rx_desc->die_dt = DT_LINKFIX; /* type */
- }
-@@ -402,7 +352,6 @@ static void ravb_rx_ring_format_rcar(struct net_device *ndev, int q)
- static void ravb_ring_format(struct net_device *ndev, int q)
- {
- 	struct ravb_private *priv = netdev_priv(ndev);
--	const struct ravb_hw_info *info = priv->info;
- 	unsigned int num_tx_desc = priv->num_tx_desc;
- 	struct ravb_tx_desc *tx_desc;
- 	struct ravb_desc *desc;
-@@ -415,7 +364,7 @@ static void ravb_ring_format(struct net_device *ndev, int q)
- 	priv->dirty_rx[q] = 0;
- 	priv->dirty_tx[q] = 0;
- 
--	info->rx_ring_format(ndev, q);
-+	ravb_rx_ring_format(ndev, q);
- 
- 	memset(priv->tx_ring[q], 0, tx_ring_size);
- 	/* Build TX ring buffer */
-@@ -441,31 +390,18 @@ static void ravb_ring_format(struct net_device *ndev, int q)
- 	desc->dptr = cpu_to_le32((u32)priv->tx_desc_dma[q]);
- }
- 
--static void *ravb_alloc_rx_desc_gbeth(struct net_device *ndev, int q)
-+static void *ravb_alloc_rx_desc(struct net_device *ndev, int q)
- {
- 	struct ravb_private *priv = netdev_priv(ndev);
- 	unsigned int ring_size;
- 
--	ring_size = sizeof(struct ravb_rx_desc) * (priv->num_rx_ring[q] + 1);
-+	ring_size = priv->info->rx_desc_size * (priv->num_rx_ring[q] + 1);
- 
--	priv->rx_ring[q].desc = dma_alloc_coherent(ndev->dev.parent, ring_size,
--						   &priv->rx_desc_dma[q],
--						   GFP_KERNEL);
--	return priv->rx_ring[q].desc;
--}
-+	priv->rx_ring[q].raw = dma_alloc_coherent(ndev->dev.parent, ring_size,
-+						  &priv->rx_desc_dma[q],
-+						  GFP_KERNEL);
- 
--static void *ravb_alloc_rx_desc_rcar(struct net_device *ndev, int q)
--{
--	struct ravb_private *priv = netdev_priv(ndev);
--	unsigned int ring_size;
--
--	ring_size = sizeof(struct ravb_ex_rx_desc) * (priv->num_rx_ring[q] + 1);
--
--	priv->rx_ring[q].ex_desc = dma_alloc_coherent(ndev->dev.parent,
--						      ring_size,
--						      &priv->rx_desc_dma[q],
--						      GFP_KERNEL);
--	return priv->rx_ring[q].ex_desc;
-+	return priv->rx_ring[q].raw;
- }
- 
- /* Init skb and descriptor buffer for Ethernet AVB */
-@@ -502,7 +438,7 @@ static int ravb_ring_init(struct net_device *ndev, int q)
- 	}
- 
- 	/* Allocate all RX descriptors. */
--	if (!info->alloc_rx_desc(ndev, q))
-+	if (!ravb_alloc_rx_desc(ndev, q))
- 		goto error;
- 
- 	priv->dirty_rx[q] = 0;
-@@ -2679,9 +2615,6 @@ static int ravb_mdio_release(struct ravb_private *priv)
- }
- 
- static const struct ravb_hw_info ravb_gen3_hw_info = {
--	.rx_ring_free = ravb_rx_ring_free_rcar,
--	.rx_ring_format = ravb_rx_ring_format_rcar,
--	.alloc_rx_desc = ravb_alloc_rx_desc_rcar,
- 	.receive = ravb_rx_rcar,
- 	.set_rate = ravb_set_rate_rcar,
- 	.set_feature = ravb_set_features_rcar,
-@@ -2695,6 +2628,7 @@ static const struct ravb_hw_info ravb_gen3_hw_info = {
- 	.tccr_mask = TCCR_TSRQ0 | TCCR_TSRQ1 | TCCR_TSRQ2 | TCCR_TSRQ3,
- 	.rx_max_frame_size = SZ_2K,
- 	.rx_max_desc_use = SZ_2K - ETH_FCS_LEN + sizeof(__sum16),
-+	.rx_desc_size = sizeof(struct ravb_ex_rx_desc),
- 	.internal_delay = 1,
- 	.tx_counters = 1,
- 	.multi_irqs = 1,
-@@ -2705,9 +2639,6 @@ static const struct ravb_hw_info ravb_gen3_hw_info = {
- };
- 
- static const struct ravb_hw_info ravb_gen2_hw_info = {
--	.rx_ring_free = ravb_rx_ring_free_rcar,
--	.rx_ring_format = ravb_rx_ring_format_rcar,
--	.alloc_rx_desc = ravb_alloc_rx_desc_rcar,
- 	.receive = ravb_rx_rcar,
- 	.set_rate = ravb_set_rate_rcar,
- 	.set_feature = ravb_set_features_rcar,
-@@ -2721,6 +2652,7 @@ static const struct ravb_hw_info ravb_gen2_hw_info = {
- 	.tccr_mask = TCCR_TSRQ0 | TCCR_TSRQ1 | TCCR_TSRQ2 | TCCR_TSRQ3,
- 	.rx_max_frame_size = SZ_2K,
- 	.rx_max_desc_use = SZ_2K - ETH_FCS_LEN + sizeof(__sum16),
-+	.rx_desc_size = sizeof(struct ravb_ex_rx_desc),
- 	.aligned_tx = 1,
- 	.gptp = 1,
- 	.nc_queues = 1,
-@@ -2728,9 +2660,6 @@ static const struct ravb_hw_info ravb_gen2_hw_info = {
- };
- 
- static const struct ravb_hw_info ravb_rzv2m_hw_info = {
--	.rx_ring_free = ravb_rx_ring_free_rcar,
--	.rx_ring_format = ravb_rx_ring_format_rcar,
--	.alloc_rx_desc = ravb_alloc_rx_desc_rcar,
- 	.receive = ravb_rx_rcar,
- 	.set_rate = ravb_set_rate_rcar,
- 	.set_feature = ravb_set_features_rcar,
-@@ -2744,6 +2673,7 @@ static const struct ravb_hw_info ravb_rzv2m_hw_info = {
- 	.tccr_mask = TCCR_TSRQ0 | TCCR_TSRQ1 | TCCR_TSRQ2 | TCCR_TSRQ3,
- 	.rx_max_frame_size = SZ_2K,
- 	.rx_max_desc_use = SZ_2K - ETH_FCS_LEN + sizeof(__sum16),
-+	.rx_desc_size = sizeof(struct ravb_ex_rx_desc),
- 	.multi_irqs = 1,
- 	.err_mgmt_irqs = 1,
- 	.gptp = 1,
-@@ -2753,9 +2683,6 @@ static const struct ravb_hw_info ravb_rzv2m_hw_info = {
- };
- 
- static const struct ravb_hw_info gbeth_hw_info = {
--	.rx_ring_free = ravb_rx_ring_free_gbeth,
--	.rx_ring_format = ravb_rx_ring_format_gbeth,
--	.alloc_rx_desc = ravb_alloc_rx_desc_gbeth,
- 	.receive = ravb_rx_gbeth,
- 	.set_rate = ravb_set_rate_gbeth,
- 	.set_feature = ravb_set_features_gbeth,
-@@ -2769,6 +2696,7 @@ static const struct ravb_hw_info gbeth_hw_info = {
- 	.tccr_mask = TCCR_TSRQ0,
- 	.rx_max_frame_size = SZ_8K,
- 	.rx_max_desc_use = 4080,
-+	.rx_desc_size = sizeof(struct ravb_rx_desc),
- 	.aligned_tx = 1,
- 	.tx_counters = 1,
- 	.carrier_counters = 1,
--- 
-2.44.0
-
+OK.
 
