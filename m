@@ -1,160 +1,147 @@
-Return-Path: <netdev+bounces-77077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7ECF8700F2
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:08:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB5F2870116
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:16:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D3001F20597
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 12:08:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 078B61C218B4
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 12:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF093B784;
-	Mon,  4 Mar 2024 12:08:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="aysvxr+D"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D7063EA90;
+	Mon,  4 Mar 2024 12:15:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05olkn2070.outbound.protection.outlook.com [40.92.90.70])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F733B296;
-	Mon,  4 Mar 2024 12:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.90.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709554115; cv=fail; b=meHrqDzjDq5eF8q11LNqz7ICWVZkBCfrlBL//RbY7ljJv1m/2Vj3VwLxvIUmK7Mnk4tEpY3rQ8/vo/HRi4WTKItmg88DIKUqKTyAK23XNs2GIGrk2zRxT5Gppo3dvdlTqg4S1909Ozb9IpruumDd+gtaJkMLgZ1OkjLgdgcZyv8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709554115; c=relaxed/simple;
-	bh=sPpMHZi7dschW/YoNRabwqj25iFF9ki10/vkuSG76JI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=YDU1mwLTNzuZXOK+AO5hBGvk1+N7gXFkzRN5pZgdtdBZnC0gYojh8T3O9j8X3Tp9UYTeYu/g+q02BLoD0UnnqDoN7MwDWHvqn2Rs47DdMk6DUrEwdy8szdjeMJyHCzvc5DIAbsrnfEWrPC26HbaSk4NraKuSrKFH7NhWwKDWCE0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=aysvxr+D; arc=fail smtp.client-ip=40.92.90.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Nr3E971/7//B67YpiZ1oE2xTx+7ElRCMCUFtmk4059ytbzJx56yBOLG/AQLfyPk2Jh3Mx2vIKaAibUmX/dknxLAKM/Nqhkp4qpZiiozrzk1wglQctkPDuNwlwvbtW7hUZKUuiAW0tImhDzXhJ6ZFxSxH2hvNMMw6XS5iltaSBDhzxVBwveWDf7q4X1BGpefLbjEDx1ATzND6m1cREEuvN9xrk8IjqBTS0hUbXGRLvSmJBwN/weaW4c3OR61zQbbFKKuhzrOMIXHb1m17mkImVmhDC2pSc7di5i7ksSoTb+gtrDNSBginfKP64jBvb3vcfSRGwUPipQdROYmKG/nvxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aEoNqMfhLIMjWS60JemBKHbtSHZkTm251ieZoUgn1hc=;
- b=bgCxu1bUdDqsYIqszZvbwrnLjHiaJJE0HMx4V3OB4kn9C60LBE+NoXCE2zRe9ZyJ+0k++fiA1f2kqemwgcj5vLLRCl8Lcxcbg5+nc+3TIRCg48gBAHQ3jpwfF+AfjM2UAkfoDrpviPDCjJD1nZ0kqX88prb4s5BbDV6Ll7ZbWzGh4UAExb0Hs333BylLe44mxwHmJbqKuIv/7rwKqlUdAUCBBS1M8pMkr39hirQUxMOqfbuBWOY1P07zumMt9fXg5SymTZM3itL9YGt4rJ3T/+jp303VPEEJopTGK9ieJk6u8KrWxA0FPbqlai9hGIwvP+myDATzsXrL+G4FXay1XA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aEoNqMfhLIMjWS60JemBKHbtSHZkTm251ieZoUgn1hc=;
- b=aysvxr+DsW0r8YXKl1dllbpA8EpM7PuIdzv/J5CnT4gAwLrneFjh1N7j1Z8VUdxCEoB4VydVYGKsESqX9kgzFAsA1J+TrHSXNQ0fOS8+Yf3OBxFoeKoCCdQzHEeJn5ArqYMJlHJgDCKwuKSgZOMORMMhijQu72mLg9+JzAnLvmPEKMs3qHKx/nKCavCeYWtsQYlVdqdF+6bOe9Pw17Q2BQzuUzY239qwUN/8b34J20PMLBqyOxIn6H81QxWR5IMIzXtHjDXNYDlaOZvuUodg9f6UQxanfJDjgxOaegqW+5voCYGu93VuPFkQLyvDmWC+oKVqGdyz5qPrgnU+4rNwiA==
-Received: from AM6PR03MB5848.eurprd03.prod.outlook.com (2603:10a6:20b:e4::10)
- by AS2PR03MB8905.eurprd03.prod.outlook.com (2603:10a6:20b:5e5::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.32; Mon, 4 Mar
- 2024 12:08:27 +0000
-Received: from AM6PR03MB5848.eurprd03.prod.outlook.com
- ([fe80::58d5:77b7:b985:3a18]) by AM6PR03MB5848.eurprd03.prod.outlook.com
- ([fe80::58d5:77b7:b985:3a18%7]) with mapi id 15.20.7339.035; Mon, 4 Mar 2024
- 12:08:27 +0000
-Message-ID:
- <AM6PR03MB5848FE9567FCB44911E8E4D599232@AM6PR03MB5848.eurprd03.prod.outlook.com>
-Date: Mon, 4 Mar 2024 20:08:28 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] inet: Add getsockopt support for IP_ROUTER_ALERT and
- IPV6_ROUTER_ALERT
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <AM6PR03MB5848BD89913195FF68DC625599232@AM6PR03MB5848.eurprd03.prod.outlook.com>
- <CANn89iKzGS39jLrRszBLh6BMyYykX-d_n3egdDU77z_fcXbiXQ@mail.gmail.com>
-From: Juntong Deng <juntong.deng@outlook.com>
-In-Reply-To: <CANn89iKzGS39jLrRszBLh6BMyYykX-d_n3egdDU77z_fcXbiXQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TMN: [Qgai2JlTW25CZRL9duFv7m3qn+YDLvop]
-X-ClientProxiedBy: LO6P123CA0024.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:313::16) To AM6PR03MB5848.eurprd03.prod.outlook.com
- (2603:10a6:20b:e4::10)
-X-Microsoft-Original-Message-ID:
- <c17bc801-d7c7-414f-9626-8fbfa046addb@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8232D3C6BA;
+	Mon,  4 Mar 2024 12:15:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709554515; cv=none; b=lVCp/wyoftYpCGDIlTIB8AN1aRIvKNASZ2NabD97ceCiCQ1N30b5hDN+kS7twl/VQCITx8gIvOx3ZeNkJSewZjDeGwvZGl2pf4E3XZVwyzZannMFUef6jrDj/F7Y1FBOGkcI33D8WdVxuLPZqj8E4V4xxnIE0ecOtL2xijiy7nc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709554515; c=relaxed/simple;
+	bh=lwP4RibQzl0xJaFX0Gi7RsrGXSdIQk+HatR8ivh4sEw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Vb8Q9yfCVTsM36f0pNTf4Xrj5tZu161j+h8okHvVMOi3KqtOLZCo9z55EBlzEe0l5b5FNVrcwU4CQjQHW42S2VRk0x08dyii0J6HBy4TKWRDmbX0mLP7IQwXifTGbi+uiCyZe1YoxFNOLkR8wN5FESuiW+jYp7TYSe4wgYDd8z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TpHdW29K8z2Bf7Q;
+	Mon,  4 Mar 2024 20:12:47 +0800 (CST)
+Received: from kwepemm600017.china.huawei.com (unknown [7.193.23.234])
+	by mail.maildlp.com (Postfix) with ESMTPS id B4F691A016E;
+	Mon,  4 Mar 2024 20:15:06 +0800 (CST)
+Received: from [10.174.179.234] (10.174.179.234) by
+ kwepemm600017.china.huawei.com (7.193.23.234) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 4 Mar 2024 20:15:05 +0800
+Message-ID: <5c883e3c-e96c-c6ba-7797-dc48de4698ca@huawei.com>
+Date: Mon, 4 Mar 2024 20:15:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM6PR03MB5848:EE_|AS2PR03MB8905:EE_
-X-MS-Office365-Filtering-Correlation-Id: b8668c34-2473-4ed8-c61c-08dc3c43cc9c
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	GUDJBW7G7xtM8evbPAVT2R5gkcQmKsx1ODdbS36HDMET5bTtDnOnJ44aA8HGAjCGeWF7xWmAW5tntuFKV4R+w4OmkeYLxL32yQpn+hLNeakCGOFyFtCbBG78udllaJ/iCAs0NQ+KVbaqEDKoOkkP4kokuL2pKo6KaGQqmRjMVBC/KP56aJ0vij0IwZu8tdhOrhJbDhcfBIx9pKEQIPNjqc9MYAUmLQQ6eOOlb6fxtyXbRM2Rm3swTuTCpiHroobdbeYyrrF26unl4kpwh4HJ43LVSosNhPomCsxSog8XfpeIR5d3sHLSciVAsA6ehClQ3acZc5zxHlJzXgOvQE/DcvowCEurhoTWNljDnRCjpb7gSJgzHwZiJqR152ANxrFPy0KiGGOIocWz6IpdkrBRYH0qvemws2HTr706DVtEZH3wBPSq8rKRt7pyxheqAVi5qSXRsi+C33XswrdVjiaC+4CAM34x9SJwwcdGHgnOtNYatYKwpDbYnkYdIugqGHT94OsUAjfyyNdPor82hM2JHgIuECaQ2wIKN/lgT7WBzoZn4aEIwxH6ZHlzn9Q00dfJ
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RlZMRVdqdk1GbnREUndZUGpZc1VYNW5BL0tTc3JuSndjcXN5RDRTMFF6aDU4?=
- =?utf-8?B?Sm9qTm52RVpWUlk4czU0Z3NkdzFSQzNwZ0Vua3NOTEtiUWdLRWs3VVdOOEpX?=
- =?utf-8?B?UkFNVG5hdk1BalUxaW9rampDa0ZkdmxZeEJWa2tGL1l3U1V3dVJ0Y2VyZWxY?=
- =?utf-8?B?bUVuMkVRMDdqTzdMNGJTMVNJNHFoRTY5T1VwYXhMcFBJZERpMEYzU055SDBt?=
- =?utf-8?B?enhLbC95ZUM5OHZBNU5EL2JKYnNXYmhzdms1S2lpK05xSml4MmZoR0luMndn?=
- =?utf-8?B?UDlCNGVZMFFmcnBnZGU2ZDR0T1djeUpNOXZUOGcrVytjOHlodkVNUmFHY2oy?=
- =?utf-8?B?SW00UFdtQlJsV1pTNGJ5R0p5UFZBOU5VZmpadld6ekJWc09WOFFKODJ0bjh1?=
- =?utf-8?B?cGQ1OXdKOFNKWmE1QmJvd0h2OTdPc0ZnVW02WmwwZ2JuZnJ3T2F1QisyT0cv?=
- =?utf-8?B?UGR5NjdTd1RNZGRPUjQwNnNCZnJvV0p5emhmcVVXbThuNE93Qys3UkhuaTBI?=
- =?utf-8?B?Sjkwcm1XZ3hRZWRxN3pZNE1TTGFvSnkxWUVWaUhSTGlQdUZMTkZReThRbnFs?=
- =?utf-8?B?UWxqR2s1eVpVQzhSRG1CZ3MyaGJ5Nkw2YWxPeVEvTml4elh4ZUprTklVY2dk?=
- =?utf-8?B?MEkwaHozNzdpdTZDQVNsc2M1K0dpOUNoelN0dHVTTnh3MmZsNEpGWUIwMlNr?=
- =?utf-8?B?M0k5all5bU95KytMVVl0VFArQ0RzaDc3VnA4dHlVVElBTVVoZVprRXM3UktH?=
- =?utf-8?B?MzFMU0hITkgvZWEyNS8zVGFaZXBFdjU4Q28xUEV1UlhKdTNBMHc2SHhDNHdj?=
- =?utf-8?B?VnZNbWZOamVEU0FRazUyZDV1R0t1eENiMmtvQmxsMDZxYkpHNklMUmpDN1BG?=
- =?utf-8?B?NjRrU3lwWXdjZzdWd093UHQzRGZET1hnYjY2WCtHUEowZk9Tb3FGYk9Nd3lO?=
- =?utf-8?B?SkNKWWtrM1JGRDRIYXgrWGNUY3JGN25nUFNKM2ZvbXNpNjFrVzhkZTd1OERj?=
- =?utf-8?B?RXFsV2Vvd2lGR2dvZmpYakZmWlgwa1c2TXZsVUo2TWloTG5HS0N1Qyt1U21N?=
- =?utf-8?B?UGxoR1FTdU1GR2tkb24zTkNGWE1zTWlOUktEdHZTSXZOcGxSL0VyRUhSS3Fo?=
- =?utf-8?B?VC9KRHQvK3pwMGd4c1pEYUdHcWxRYytWaHhqeEdMY004MUNuWHl0U2RoL0p0?=
- =?utf-8?B?eE9hSUFPZjhiUW1xRS9qbUpJbjB5WTFiL0xHS2Z4SnBBeDJyNnJXTWJsemgx?=
- =?utf-8?B?RWVqU0tuTGhUV2FJZmFCblJrQzNocnJsN1ZieFdTMFVmcFJhZHYrL2tMSEIv?=
- =?utf-8?B?eVpiTW9lSkxlQ0tyUFRkbVBZZ2hvdndZYURGb3RaU1lOeWdqVW9PeFJmVk1J?=
- =?utf-8?B?NjlxSHByVVp4czdaUEp3UEx0MlVDM0JnQmFmNW5IY2xUcUI0VEFSbEhUZklv?=
- =?utf-8?B?dE81L0VmUUtuTGE2YkdlbTdtUG9HM3pWUmhERmhKRlJYMTJMTU00VllQM1Uz?=
- =?utf-8?B?MGVsQ29tVkJxL1hoRUs4aldZbGdUeUVqZWFoSE9YRlBQb2hxUXBVblJ0TndW?=
- =?utf-8?B?R0sxRjV0Z1pvQUVDYzBhdCtYczR4MHJNMzMva0hBQ1dmOU5CTktHN3NXVmJ0?=
- =?utf-8?B?WUUvUFg1b3djNnl6WWFSdVQ3cVZEWGhOUmdET2VWMXBuNExsczE3MWdvU000?=
- =?utf-8?Q?Khenu9ralXqGeHAY9vqz?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b8668c34-2473-4ed8-c61c-08dc3c43cc9c
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR03MB5848.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2024 12:08:27.5044
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR03MB8905
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [bug report] dead loop in generic_perform_write() //Re: [PATCH v7
+ 07/12] iov_iter: Convert iterate*() to inline funcs
+To: David Howells <dhowells@redhat.com>, Linus Torvalds
+	<torvalds@linux-foundation.org>
+CC: Al Viro <viro@kernel.org>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
+	<hch@lst.de>, Christian Brauner <christian@brauner.io>, David Laight
+	<David.Laight@aculab.com>, Matthew Wilcox <willy@infradead.org>, Jeff Layton
+	<jlayton@kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<linux-block@vger.kernel.org>, <linux-mm@kvack.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Kefeng Wang
+	<wangkefeng.wang@huawei.com>
+References: <CAHk-=wiBJRgA3iNqihR7uuft=5rog425X_b3uvgroG3fBhktwQ@mail.gmail.com>
+ <20230925120309.1731676-1-dhowells@redhat.com>
+ <20230925120309.1731676-8-dhowells@redhat.com>
+ <4e80924d-9c85-f13a-722a-6a5d2b1c225a@huawei.com>
+ <CAHk-=whG+4ag+QLU9RJn_y47f1DBaK6b0qYq_6_eLkO=J=Mkmw@mail.gmail.com>
+ <CAHk-=wjSjuDrS9gc191PTEDDow7vHy6Kd3DKDaG+KVH0NQ3v=w@mail.gmail.com>
+ <e985429e-5fc4-a175-0564-5bb4ca8f662c@huawei.com>
+ <CAHk-=wh06M-1c9h7wZzZ=1KqooAmazy_qESh2oCcv7vg-sY6NQ@mail.gmail.com>
+ <769021.1709553367@warthog.procyon.org.uk>
+From: Tong Tiangen <tongtiangen@huawei.com>
+In-Reply-To: <769021.1709553367@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600017.china.huawei.com (7.193.23.234)
 
-On 2024/3/4 19:49, Eric Dumazet wrote:
-> On Mon, Mar 4, 2024 at 12:33 PM Juntong Deng <juntong.deng@outlook.com> wrote:
->>
->> Currently getsockopt does not support IP_ROUTER_ALERT and
->> IPV6_ROUTER_ALERT, and we are unable to get the values of these two
->> socket options through getsockopt.
->>
->> This patch adds getsockopt support for IP_ROUTER_ALERT and
->> IPV6_ROUTER_ALERT.
->>
->> Signed-off-by: Juntong Deng <juntong.deng@outlook.com>
->>
+
+
+在 2024/3/4 19:56, David Howells 写道:
+> Linus Torvalds <torvalds@linux-foundation.org> wrote:
 > 
-> This looks good to me, thanks, assuming this is net-next material.
+>> Actually, I think the right model is to get rid of that horrendous
+>> .copy_mc field entirely.
+>>
+>> We only have one single place that uses it - that nasty core dumping
+>> code. And that code is *not* performance critical.
+>>
+>> And not only isn't it performance-critical, it already does all the
+>> core dumping one page at a time because it doesn't want to write pages
+>> that were never mapped into user space.
+>>
+>> So what we can do is
+>>
+>>   (a) make the core dumping code *copy* the page to a good location
+>> with copy_mc_to_kernel() first
+>>
+>>   (b) remove this horrendous .copy_mc crap entirely from iov_iter
+>>
+>> This is slightly complicated by the fact that copy_mc_to_kernel() may
+>> not even exist, and architectures that don't have it don't want the
+>> silly extra copy. So we need to abstract the "copy to temporary page"
+>> code a bit. But that's probably a good thing anyway in that it forces
+>> us to have nice interfaces.
+>>
+>> End result: something like the attached.
+>>
+>> AGAIN: THIS IS ENTIRELY UNTESTED.
+>>
+>> But hey, so was clearly all the .copy_mc code too that this removes, so...
 > 
-> Make sure next time to include the target tree (net or net-next)
+> I like it:-)
 > 
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> I've tested it by SIGQUIT'ing a number of processes and using gdb to examine
+> the coredumps - which seems to work - at least without the production of any
+> MCEs.  I'm not sure how I could test it with MCEs.
 
-Hi Eric Dumazet,
+I'm going to test the coredump with the MCE.
 
-Thanks for the review.
+> 
+> Feel free to add:
+> 
+> Reviewed-by: David Howells <dhowells@redhat.com>
+> Tested-by: David Howells <dhowells@redhat.com>
+> 
+> That said, I wonder if:
+> 
+> 	#ifdef copy_mc_to_kernel
+> 
+> should be:
+> 
+> 	#ifdef CONFIG_ARCH_HAS_COPY_MC
+> 
+> and whether it's possible to find out dynamically if MCEs can occur at all.
 
-Yes, I made this patch based on net-next.
+MCE can occur during the use of a page. So i think it occurs
+dynamically.
 
-Sorry for the oversight, I will add the target tree next time.
+Thanks,
+Tong
+
+> 
+> David
+> 
+> .
 
