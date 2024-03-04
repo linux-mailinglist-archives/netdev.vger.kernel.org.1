@@ -1,85 +1,118 @@
-Return-Path: <netdev+bounces-77195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6296870853
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 18:33:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D2FB87087F
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 18:42:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CD0FB24F4E
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 17:33:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 391A7281AC0
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 17:42:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C907E60263;
-	Mon,  4 Mar 2024 17:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 216E6612F4;
+	Mon,  4 Mar 2024 17:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NzmC7j0+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kRI8vrcT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A8D1E484;
-	Mon,  4 Mar 2024 17:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3636025E;
+	Mon,  4 Mar 2024 17:42:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709573575; cv=none; b=dPBv6i4A3Y1stKzgRP4UbbnEpgfjhvatpdWFqTDLK3w/fF8eiVzU8aeStm5uL/KhnZdDFpB3GPPLIsmlXsH/m8QRaU+sQwQ4LrnU4LDBImD/lrr5bUovS5XJCLT44ibVd9CZU13i3BJWZ53FgOZpPuTHidGaAQBnYgugFn0Rwlk=
+	t=1709574151; cv=none; b=DwvZUmhgkIVjPOdAgvss99PZORKmLFHkuEnHlycr1gw2kn+9lNodDH8poNaOiGisT1h+0MDPwtDLemuDP8x0vp/jK+RmFAlolzUUFmD/2lXxLJ9GLmkmRyAEzrPz9vvsIbqnID+HFElRNWSiJj94ytvtV4CrXRNEQzWAeq/pKJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709573575; c=relaxed/simple;
-	bh=+IW+YDKGh9GrcXOaSorNCKmwiir+EFYzEfc4h4VwKU0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IsB13FCO401X6JojnNOuJe4E9AGaRuNYd8tPnwYVl2FXwWjUrePAqAJwNbea9v/Iv2Ib5x6J4DRi6zq1Ou8ckT1Z3OfPUJ6dXcUj13jirfqhQFvb01L7a5Dg76sjpMHYn0w12vytNosf4AGlrfp66PA5Vfb28Oe8pUWt0oh+6Io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NzmC7j0+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1AA6C433F1;
-	Mon,  4 Mar 2024 17:32:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709573575;
-	bh=+IW+YDKGh9GrcXOaSorNCKmwiir+EFYzEfc4h4VwKU0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NzmC7j0+OJokakRY0jBxaQHkfCNNC65RFSyEJTJnz5/szAaOC21Cfw/CJp65qLTmi
-	 shXiKBDp+ay2AJqKT1LyauhbqfzlEuE/XAOHZbrtVz1rdme8IYsugGEiiT0qpT4X6h
-	 GRXDqcWoWXfmXg/FCH85xDW0d3wF3wL4lNs2c8xRPsJLIS2BhK9kf4XTMC5hTSk+fO
-	 UPaGhKWMg5tP7A8XEMXO7/Ew3N5kPMgJfELEfmuoAbevrtl2mi8mHbyUE9GburgCOh
-	 CiWVvTyth3ziO4h3xQJvuqjmL3D/gZsHhU1+vAuupZQbLBzW4C42/XzyMKs3JOP64Y
-	 nitu/+xXlHdvA==
-Date: Mon, 4 Mar 2024 17:32:50 +0000
-From: Simon Horman <horms@kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: R SUNDAR <prosunofficial@gmail.com>, jmaloy@redhat.com,
-	ying.xue@windriver.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Removed inputq,namedq field description to prevent
- kernel doc warnings.
-Message-ID: <20240304173250.GM403078@kernel.org>
-References: <20240303143919.6903-1-prosunofficial@gmail.com>
- <120c265e-dde5-454e-8e0b-72a1361912b6@infradead.org>
+	s=arc-20240116; t=1709574151; c=relaxed/simple;
+	bh=h4x1z5kFcsXRs0S1/1xtxHnLDvLTTR1q1CynXjth2QY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DN5lHQyJF2AEGPTaZGIPihiy999yMsO26xagTccvJoba5dslBVKku5Ryjf1HRNbpVdZIod/hAC/7Ox1XNPnF6oCEB+q1TkQyPqPxK3leeDKhRdHrVH/i8GMR9zQNG/z0bql++x4Pn8AiH+oBQIR66E23DHxpNyCSoDPCMFXSYDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kRI8vrcT; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709574150; x=1741110150;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=h4x1z5kFcsXRs0S1/1xtxHnLDvLTTR1q1CynXjth2QY=;
+  b=kRI8vrcTR/5ddpBbCu98rxFZ1JcPkq8/hDa0bLfdMj77lNYhJqlVq3xk
+   X4E23X8F3wmE03HDv6vGGGeTxuVjUjT/7f10Bo+EEoOm39lXpt8es48SN
+   JB2x3zlgSQrQPMDNosdO2DGxW1/GjuOMZBveHD68D7EPgbeIiWO0Qmw+Z
+   uvPEstj+d+/unf7gTV91A6px1DaUcp6TwGXrggPcndy8ZGVFzYkV0uqY/
+   EBv33GFc/xpl4wwad/r9sOld/TBMQO/LjPFJYafx9ArhBIDUcKQGMN1S5
+   w6gN66d36oYDR2ruEOXf0JCtJubgMpJV2cGjd3mO8VNI2U4QReya2y4y6
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="4208207"
+X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
+   d="scan'208";a="4208207"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 09:42:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="937040903"
+X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
+   d="scan'208";a="937040903"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmsmga001.fm.intel.com with ESMTP; 04 Mar 2024 09:42:24 -0800
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+	id AB22E15C; Mon,  4 Mar 2024 19:42:22 +0200 (EET)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH net-next v1 1/1] ieee802154: at86rf230: Replace of_gpio.h by proper one
+Date: Mon,  4 Mar 2024 19:42:17 +0200
+Message-ID: <20240304174218.1198411-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.43.0.rc1.1.gbec44491f096
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <120c265e-dde5-454e-8e0b-72a1361912b6@infradead.org>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Mar 03, 2024 at 08:41:56AM -0800, Randy Dunlap wrote:
-> Hi,
-> 
-> On 3/3/24 06:39, R SUNDAR wrote:
-> > /net/tipc/node.c:150: warning: Excess struct member 'inputq' description in 'tipc_node'
-> > /net/tipc/node.c:150: warning: Excess struct member 'namedq' description in 'tipc_node'
-> > 
-> > Signed-off-by: R SUNDAR <prosunofficial@gmail.com>
-> 
-> This is already fixed in linux-next and net-next, as was another one of your
-> patches.
-> I suggest that you focus more on the -next trees for such patch targets.
+of_gpio.h is deprecated and subject to remove.
+The driver doesn't use it directly, replace it
+with what is really being used.
 
-Yes, agreed. A similar patch was accepted in January.
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/net/ieee802154/at86rf230.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Link: https://git.kernel.org/netdev/net-next/c/5ca1a5153a28
-
+diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+index 6212164ffb36..f632b0cfd5ae 100644
+--- a/drivers/net/ieee802154/at86rf230.c
++++ b/drivers/net/ieee802154/at86rf230.c
+@@ -11,17 +11,16 @@
+  */
+ #include <linux/kernel.h>
+ #include <linux/module.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/hrtimer.h>
+ #include <linux/jiffies.h>
+ #include <linux/interrupt.h>
+ #include <linux/irq.h>
+-#include <linux/gpio.h>
+ #include <linux/delay.h>
+ #include <linux/property.h>
+ #include <linux/spi/spi.h>
+ #include <linux/regmap.h>
+ #include <linux/skbuff.h>
+-#include <linux/of_gpio.h>
+ #include <linux/ieee802154.h>
+ 
+ #include <net/mac802154.h>
 -- 
-pw-bot: not-applicable
+2.43.0.rc1.1.gbec44491f096
+
 
