@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-77254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0A82870CF6
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 22:30:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86FE9870CF9
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 22:30:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D6CB1F21324
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 21:30:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A22051C243E0
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 21:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510637CF08;
-	Mon,  4 Mar 2024 21:29:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426F37CF32;
+	Mon,  4 Mar 2024 21:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DLmA1mVT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qw5Ygulh"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0257C0A0
-	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 21:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB807C0BF
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 21:29:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709587787; cv=none; b=fXuPUTCnQZ/9FrmC6Ml+xKLLqErDBpX0RM8MwaI6PmCxFQ8yUZwcMsJENzHi19hEPWdK17y1wDoKoJvUf0RMcG+SggRQ0vaCOYTJEbjWfacY8+/5QUwOXNGBQGBE4FBVsPcvraOb0JWd0mCETad67lN20wJWAHRk735bBZO78uw=
+	t=1709587788; cv=none; b=Z3RxogqQpNaLvjo+HdD+ZoNsjl3xlYFJK7bk0vo6aALm5oPlWtexbi2gWauEFTCERIY3gpLmbONKWvv8d477GOzc8ZnMb810QdrdjDtnKg0uDWgpLpavnR2wCFPdbSwzNViiabrnrtngcDwY7iho8sgrHvDCgtJ251/x/dGeIWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709587787; c=relaxed/simple;
-	bh=LE+LNupttDs8R1qTaruY7FGyhWxYuP4xgT1tV0S86yU=;
+	s=arc-20240116; t=1709587788; c=relaxed/simple;
+	bh=1H2j1cyLjcTyGpYuB1ABKIMXN0GSrMdUiQNAo9qHQfE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AJ3D3fVmmcdb8kg1b1DAQtdVkuBa+je2bojPWpvIYGtvmuZggkQNMQoiy5gWeGGDGizvMGfiovDLzqx5FinutQBl7rC1SBH9E1nVN/i1DiKTA5PQqMoj4+FNjq2lfBEGymgkh+FuojFuBfh88AQHxzo41L1IIvsRReM0uFnIHZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DLmA1mVT; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=PvqZBXa00fB1o0QqK/bstl1EQzWUycH73U/BndD9ptBnaoF4HDgDTfF7coHJjRDyxnK7TuZEmo/s8WgO7aDOGLCpcRGAR6djGXsR7S+JMZhQHGR5La0ygzet5bInmoMTes30xuuPCxcbXlSSZtxPDC83tnbNf0xAscZfmCROJtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qw5Ygulh; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709587785; x=1741123785;
+  t=1709587786; x=1741123786;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=LE+LNupttDs8R1qTaruY7FGyhWxYuP4xgT1tV0S86yU=;
-  b=DLmA1mVTIuU1ZKER01T5HNyEF3BudYvaIb6yAKLpAjQ8SERz+JPa9IRu
-   IgpHBRqo4ffj2E+37WdNXLRjJNgRjb0imPvWYHmFkchJg6+cnVXCnW9LX
-   ecqYKl4Hp7Enwcd3+Dlsuz771rz6xH/Op5WEFCvSPA1h3oqtwdx9Io5F+
-   /NkxhrwWvmzJwzCvIFwmr/maln+miIZspuPnBaWcR1GL72OAkTh4rAgFi
-   jrwWREiB/qjqnSHfc8D3kmQGFyRxOhPmU3NARhHq74HqbCU2FQGsV9dvn
-   7yPUSyAR/h8mmBu++/S0XwrutFtA00s2qwFvqcpjnz6yel2OSzoOJoPdw
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="3968091"
+  bh=1H2j1cyLjcTyGpYuB1ABKIMXN0GSrMdUiQNAo9qHQfE=;
+  b=Qw5Ygulhk/V+bSe8W624eA8LkC14YJ7wUzv5g815jbU1LwsA2Qx0uhkr
+   LVEF0odoxsYiBZ+UIi9AAOpwl75fQaPkOKi2SdEEb0LEjEdaIFOwWUTan
+   413oHkokw6ZNd6y6o7RFiwZfyb0I4k3hZG2ARnPFvQFP2kdZ42GQMQLWB
+   dgLseG1Y+GqqNgCdOHKEId7WHTHiQKNDzy5D+Q873ipVYVaer5B9coda5
+   m3Zo5NFNys3fgXLz3pW7y5+Zx5ifg0td5JPPt9aLwGmM/CdRmf29ubgD9
+   h8QuOkxuGW5qk0RyEOtJBbne6K5KV9RUGsGZHsk+cGNzAQmAEfPFrGAfH
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="3968098"
 X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
-   d="scan'208";a="3968091"
+   d="scan'208";a="3968098"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 13:29:40 -0800
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 13:29:41 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
-   d="scan'208";a="46647890"
+   d="scan'208";a="46647893"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa001.jf.intel.com with ESMTP; 04 Mar 2024 13:29:41 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -62,10 +62,11 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org
 Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
 	anthony.l.nguyen@intel.com,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net-next 8/9] ice: do not disable Tx queues twice in ice_down()
-Date: Mon,  4 Mar 2024 13:29:29 -0800
-Message-ID: <20240304212932.3412641-9-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 9/9] ice: avoid unnecessary devm_ usage
+Date: Mon,  4 Mar 2024 13:29:30 -0800
+Message-ID: <20240304212932.3412641-10-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240304212932.3412641-1-anthony.l.nguyen@intel.com>
 References: <20240304212932.3412641-1-anthony.l.nguyen@intel.com>
@@ -79,156 +80,186 @@ Content-Transfer-Encoding: 8bit
 
 From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-ice_down() clears QINT_TQCTL_CAUSE_ENA_M bit twice, which is not
-necessary. First clearing happens in ice_vsi_dis_irq() and second in
-ice_vsi_stop_tx_ring() - remove the first one.
-
-While at it, make ice_vsi_dis_irq() static as ice_down() is the only
-current caller of it.
+1. pcaps are free'd right after AQ routines are done, no need for
+   devm_'s
+2. a test frame for loopback test in ethtool -t is destroyed at the end
+   of the test so we don't need devm_ here either.
 
 Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_lib.c  | 55 -----------------------
- drivers/net/ethernet/intel/ice/ice_lib.h  |  2 -
- drivers/net/ethernet/intel/ice/ice_main.c | 44 ++++++++++++++++++
- 3 files changed, 44 insertions(+), 57 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_common.c  | 34 +++++++-------------
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 10 ++----
+ 2 files changed, 14 insertions(+), 30 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 59e8a2572985..48e4c33a3550 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -2719,61 +2719,6 @@ void ice_dis_vsi(struct ice_vsi *vsi, bool locked)
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 7d9315ffae57..4d8111aeb0ff 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -1002,9 +1002,9 @@ static void ice_get_itr_intrl_gran(struct ice_hw *hw)
+  */
+ int ice_init_hw(struct ice_hw *hw)
+ {
+-	struct ice_aqc_get_phy_caps_data *pcaps;
++	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree);
++	void *mac_buf __free(kfree);
+ 	u16 mac_buf_len;
+-	void *mac_buf;
+ 	int status;
+ 
+ 	/* Set MAC type based on DeviceID */
+@@ -1082,7 +1082,7 @@ int ice_init_hw(struct ice_hw *hw)
+ 	if (status)
+ 		goto err_unroll_sched;
+ 
+-	pcaps = devm_kzalloc(ice_hw_to_dev(hw), sizeof(*pcaps), GFP_KERNEL);
++	pcaps = kzalloc(sizeof(*pcaps), GFP_KERNEL);
+ 	if (!pcaps) {
+ 		status = -ENOMEM;
+ 		goto err_unroll_sched;
+@@ -1092,7 +1092,6 @@ int ice_init_hw(struct ice_hw *hw)
+ 	status = ice_aq_get_phy_caps(hw->port_info, false,
+ 				     ICE_AQC_REPORT_TOPO_CAP_MEDIA, pcaps,
+ 				     NULL);
+-	devm_kfree(ice_hw_to_dev(hw), pcaps);
+ 	if (status)
+ 		dev_warn(ice_hw_to_dev(hw), "Get PHY capabilities failed status = %d, continuing anyway\n",
+ 			 status);
+@@ -1119,18 +1118,15 @@ int ice_init_hw(struct ice_hw *hw)
+ 
+ 	/* Get MAC information */
+ 	/* A single port can report up to two (LAN and WoL) addresses */
+-	mac_buf = devm_kcalloc(ice_hw_to_dev(hw), 2,
+-			       sizeof(struct ice_aqc_manage_mac_read_resp),
+-			       GFP_KERNEL);
+-	mac_buf_len = 2 * sizeof(struct ice_aqc_manage_mac_read_resp);
+-
++	mac_buf = kcalloc(2, sizeof(struct ice_aqc_manage_mac_read_resp),
++			  GFP_KERNEL);
+ 	if (!mac_buf) {
+ 		status = -ENOMEM;
+ 		goto err_unroll_fltr_mgmt_struct;
  	}
+ 
++	mac_buf_len = 2 * sizeof(struct ice_aqc_manage_mac_read_resp);
+ 	status = ice_aq_manage_mac_read(hw, mac_buf, mac_buf_len, NULL);
+-	devm_kfree(ice_hw_to_dev(hw), mac_buf);
+ 
+ 	if (status)
+ 		goto err_unroll_fltr_mgmt_struct;
+@@ -3276,19 +3272,14 @@ int ice_update_link_info(struct ice_port_info *pi)
+ 		return status;
+ 
+ 	if (li->link_info & ICE_AQ_MEDIA_AVAILABLE) {
+-		struct ice_aqc_get_phy_caps_data *pcaps;
+-		struct ice_hw *hw;
++		struct ice_aqc_get_phy_caps_data *pcaps __free(kfree);
+ 
+-		hw = pi->hw;
+-		pcaps = devm_kzalloc(ice_hw_to_dev(hw), sizeof(*pcaps),
+-				     GFP_KERNEL);
++		pcaps = kzalloc(sizeof(*pcaps), GFP_KERNEL);
+ 		if (!pcaps)
+ 			return -ENOMEM;
+ 
+ 		status = ice_aq_get_phy_caps(pi, false, ICE_AQC_REPORT_TOPO_CAP_MEDIA,
+ 					     pcaps, NULL);
+-
+-		devm_kfree(ice_hw_to_dev(hw), pcaps);
+ 	}
+ 
+ 	return status;
+@@ -3429,8 +3420,8 @@ ice_cfg_phy_fc(struct ice_port_info *pi, struct ice_aqc_set_phy_cfg_data *cfg,
+ int
+ ice_set_fc(struct ice_port_info *pi, u8 *aq_failures, bool ena_auto_link_update)
+ {
++	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree);
+ 	struct ice_aqc_set_phy_cfg_data cfg = { 0 };
+-	struct ice_aqc_get_phy_caps_data *pcaps;
+ 	struct ice_hw *hw;
+ 	int status;
+ 
+@@ -3440,7 +3431,7 @@ ice_set_fc(struct ice_port_info *pi, u8 *aq_failures, bool ena_auto_link_update)
+ 	*aq_failures = 0;
+ 	hw = pi->hw;
+ 
+-	pcaps = devm_kzalloc(ice_hw_to_dev(hw), sizeof(*pcaps), GFP_KERNEL);
++	pcaps = kzalloc(sizeof(*pcaps), GFP_KERNEL);
+ 	if (!pcaps)
+ 		return -ENOMEM;
+ 
+@@ -3492,7 +3483,6 @@ ice_set_fc(struct ice_port_info *pi, u8 *aq_failures, bool ena_auto_link_update)
+ 	}
+ 
+ out:
+-	devm_kfree(ice_hw_to_dev(hw), pcaps);
+ 	return status;
  }
  
--/**
-- * ice_vsi_dis_irq - Mask off queue interrupt generation on the VSI
-- * @vsi: the VSI being un-configured
-- */
--void ice_vsi_dis_irq(struct ice_vsi *vsi)
--{
--	struct ice_pf *pf = vsi->back;
--	struct ice_hw *hw = &pf->hw;
--	u32 val;
--	int i;
--
--	/* disable interrupt causation from each queue */
--	if (vsi->tx_rings) {
--		ice_for_each_txq(vsi, i) {
--			if (vsi->tx_rings[i]) {
--				u16 reg;
--
--				reg = vsi->tx_rings[i]->reg_idx;
--				val = rd32(hw, QINT_TQCTL(reg));
--				val &= ~QINT_TQCTL_CAUSE_ENA_M;
--				wr32(hw, QINT_TQCTL(reg), val);
--			}
--		}
--	}
--
--	if (vsi->rx_rings) {
--		ice_for_each_rxq(vsi, i) {
--			if (vsi->rx_rings[i]) {
--				u16 reg;
--
--				reg = vsi->rx_rings[i]->reg_idx;
--				val = rd32(hw, QINT_RQCTL(reg));
--				val &= ~QINT_RQCTL_CAUSE_ENA_M;
--				wr32(hw, QINT_RQCTL(reg), val);
--			}
--		}
--	}
--
--	/* disable each interrupt */
--	ice_for_each_q_vector(vsi, i) {
--		if (!vsi->q_vectors[i])
--			continue;
--		wr32(hw, GLINT_DYN_CTL(vsi->q_vectors[i]->reg_idx), 0);
--	}
--
--	ice_flush(hw);
--
--	/* don't call synchronize_irq() for VF's from the host */
--	if (vsi->type == ICE_VSI_VF)
--		return;
--
--	ice_for_each_q_vector(vsi, i)
--		synchronize_irq(vsi->q_vectors[i]->irq.virq);
--}
--
- /**
-  * __ice_queue_set_napi - Set the napi instance for the queue
-  * @dev: device to which NAPI and queue belong
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
-index b5a1ed7cc4b1..9cd23afe5f15 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.h
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.h
-@@ -110,8 +110,6 @@ void
- ice_write_qrxflxp_cntxt(struct ice_hw *hw, u16 pf_q, u32 rxdid, u32 prio,
- 			bool ena_ts);
+@@ -3571,7 +3561,7 @@ int
+ ice_cfg_phy_fec(struct ice_port_info *pi, struct ice_aqc_set_phy_cfg_data *cfg,
+ 		enum ice_fec_mode fec)
+ {
+-	struct ice_aqc_get_phy_caps_data *pcaps;
++	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree);
+ 	struct ice_hw *hw;
+ 	int status;
  
--void ice_vsi_dis_irq(struct ice_vsi *vsi);
--
- void ice_vsi_free_irq(struct ice_vsi *vsi);
- 
- void ice_vsi_free_rx_rings(struct ice_vsi *vsi);
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 8f73ba77e835..062b4ea8e2c3 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -7001,6 +7001,50 @@ static void ice_napi_disable_all(struct ice_vsi *vsi)
+@@ -3640,8 +3630,6 @@ ice_cfg_phy_fec(struct ice_port_info *pi, struct ice_aqc_set_phy_cfg_data *cfg,
  	}
+ 
+ out:
+-	kfree(pcaps);
+-
+ 	return status;
  }
  
-+/**
-+ * ice_vsi_dis_irq - Mask off queue interrupt generation on the VSI
-+ * @vsi: the VSI being un-configured
-+ */
-+static void ice_vsi_dis_irq(struct ice_vsi *vsi)
-+{
-+	struct ice_pf *pf = vsi->back;
-+	struct ice_hw *hw = &pf->hw;
-+	u32 val;
-+	int i;
-+
-+	/* disable interrupt causation from each Rx queue; Tx queues are
-+	 * handled in ice_vsi_stop_tx_ring()
-+	 */
-+	if (vsi->rx_rings) {
-+		ice_for_each_rxq(vsi, i) {
-+			if (vsi->rx_rings[i]) {
-+				u16 reg;
-+
-+				reg = vsi->rx_rings[i]->reg_idx;
-+				val = rd32(hw, QINT_RQCTL(reg));
-+				val &= ~QINT_RQCTL_CAUSE_ENA_M;
-+				wr32(hw, QINT_RQCTL(reg), val);
-+			}
-+		}
-+	}
-+
-+	/* disable each interrupt */
-+	ice_for_each_q_vector(vsi, i) {
-+		if (!vsi->q_vectors[i])
-+			continue;
-+		wr32(hw, GLINT_DYN_CTL(vsi->q_vectors[i]->reg_idx), 0);
-+	}
-+
-+	ice_flush(hw);
-+
-+	/* don't call synchronize_irq() for VF's from the host */
-+	if (vsi->type == ICE_VSI_VF)
-+		return;
-+
-+	ice_for_each_q_vector(vsi, i)
-+		synchronize_irq(vsi->q_vectors[i]->irq.virq);
-+}
-+
- /**
-  * ice_down - Shutdown the connection
-  * @vsi: The VSI being stopped
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index 3cc364a4d682..bb912155676e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -802,7 +802,7 @@ static int ice_lbtest_create_frame(struct ice_pf *pf, u8 **ret_data, u16 size)
+ 	if (!pf)
+ 		return -EINVAL;
+ 
+-	data = devm_kzalloc(ice_pf_to_dev(pf), size, GFP_KERNEL);
++	data = kzalloc(size, GFP_KERNEL);
+ 	if (!data)
+ 		return -ENOMEM;
+ 
+@@ -945,11 +945,9 @@ static u64 ice_loopback_test(struct net_device *netdev)
+ 	int num_frames, valid_frames;
+ 	struct ice_tx_ring *tx_ring;
+ 	struct ice_rx_ring *rx_ring;
+-	struct device *dev;
+-	u8 *tx_frame;
++	u8 *tx_frame __free(kfree);
+ 	int i;
+ 
+-	dev = ice_pf_to_dev(pf);
+ 	netdev_info(netdev, "loopback test\n");
+ 
+ 	test_vsi = ice_lb_vsi_setup(pf, pf->hw.port_info);
+@@ -994,7 +992,7 @@ static u64 ice_loopback_test(struct net_device *netdev)
+ 	for (i = 0; i < num_frames; i++) {
+ 		if (ice_diag_send(tx_ring, tx_frame, ICE_LB_FRAME_SIZE)) {
+ 			ret = 8;
+-			goto lbtest_free_frame;
++			goto remove_mac_filters;
+ 		}
+ 	}
+ 
+@@ -1004,8 +1002,6 @@ static u64 ice_loopback_test(struct net_device *netdev)
+ 	else if (valid_frames != num_frames)
+ 		ret = 10;
+ 
+-lbtest_free_frame:
+-	devm_kfree(dev, tx_frame);
+ remove_mac_filters:
+ 	if (ice_fltr_remove_mac(test_vsi, broadcast, ICE_FWD_TO_VSI))
+ 		netdev_err(netdev, "Could not remove MAC filter for the test VSI\n");
 -- 
 2.41.0
 
