@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-77093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0699B8702CE
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:34:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C1F38702D9
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 14:36:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72555B22012
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:34:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A07E81F2690C
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 13:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D0183F8E6;
-	Mon,  4 Mar 2024 13:32:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1571B3DBBE;
+	Mon,  4 Mar 2024 13:36:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FtebJCye"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="P/qGRyeH"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882CB3F8E0;
-	Mon,  4 Mar 2024 13:32:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1743DB9A;
+	Mon,  4 Mar 2024 13:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709559167; cv=none; b=vCVdiCkYV85Rr2n2Rbif1ro7QFCDqgypcvyGJSYTOVO40GNQjyiH6pRRpK66YoUN5DhmZ1cneZH+mDEACcbuaDvhk+lJ8LZq7GF5HAdbe5qDxOa/2mDlvBRpT3aHcyW3lF/hF1QBfo12xcxcVX7hb9YiIVj4xIh0e9Bxzd6OyVw=
+	t=1709559383; cv=none; b=SY6wcDJunJo8Y9Jac0X2MA2m6oFyk3C264JL9a1WZy7gGbwrN4qeEcTQX72XtT/2xm/lUONz0tqBJhsnZjDASumsekgOlOY+ofC9ixu3IXguCNdzms63VF3tNBLvr5yFGkuGMgf4otV12XEN+JWYkcWcMlys3IoBpW2Bw2FIrXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709559167; c=relaxed/simple;
-	bh=0atBaHXl1e3n7AZO5fT2Mm64OWqwf3KkX/ptCgjWNPE=;
+	s=arc-20240116; t=1709559383; c=relaxed/simple;
+	bh=U2A2rpmEQo11oi681qbIL+M5V2zTCapKL53vb0yJE3o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ezZYGjoAWoQhifxPmGUccPFeVTpjBzdpevudypsjkY0zhqi6vlStMMsZQHi31LdSoHID6lURg9IPakdH98WQ4+RBtXmJYKLG1PeKs+UhLSCTET+lZjoJf9TyPJsKUKxbDh+j4bO8b1hPWUKkKIwz1WYv720t07jRAQ5sUAbGHgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FtebJCye; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=pD0pIMoYyfn5nviFH2SAzbDi3U3GaylYauMsSGG/Y25Meb5S2w7SIvqDVjl2qR1VQ1yy6ksRCYMSLjFBcAZJBWrOn3yIg+8fc0QH+d+ARfNxGcer7oQ2sibxzqEsS5pA0d44bwZzj81X4wscwW3g5jHqRWwFwoHP7xvFAfMg2/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=P/qGRyeH; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,41 +36,35 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=OZLHOEQOwrKYkhkP5YCytEcFYTUgdUuOzV0w6B1zc5w=; b=FtebJCyeTDDX8B9ncGsT+3dwiL
-	S/NRnnAK6ew7ipqWGNe7yO3T6105XYq4XD9wuBMEA9pKAL3wxp0sPSpOxvkQp+PKPAoCn4YeKijJQ
-	/TOjzehI3Xhj0WU+wlS/ZS19CRhlv4Re7nhdAmWMH6c3r46K3efgJy+SdsJPdq9Tni7s=;
+	bh=q+5OPzz4NIQWwsOu2Ul0G/RCOG5konrpG0RHNsuPh7g=; b=P/qGRyeHr1iJbfnHWC5Jsw/Prf
+	qdzn5LRUk9hl/JiNyz3WZ/87K97J2H2fqKGMgYQTILwXOWGOXtzpLZUeC6vlShZ3Od/CWCt8aTFkM
+	dlzyALQ+5OwwicydMRoFvXE1U+HNqB2KhSdjAGZHai6XYnhUSu2/szBcPJM8qmQHNjFM=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rh8R0-009KGP-11; Mon, 04 Mar 2024 14:32:50 +0100
-Date: Mon, 4 Mar 2024 14:32:50 +0100
+	id 1rh8Ub-009KHc-FT; Mon, 04 Mar 2024 14:36:33 +0100
+Date: Mon, 4 Mar 2024 14:36:33 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
-	Frank Rowand <frowand.list@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
 	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v5 13/17] net: pse-pd: Use regulator framework
- within PSE framework
-Message-ID: <84b300c7-8295-424b-9117-c604fb4cd73e@lunn.ch>
-References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
- <20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
- <ZeObuKHkPN3tiWz_@pengutronix.de>
- <20240304102708.5bb5d95c@kmaincent-XPS-13-7390>
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next v5 1/7] net: phylink: add PHY_F_RXC_ALWAYS_ON to
+ PHY dev flags
+Message-ID: <95968657-04a3-4558-9ecb-92d7721592ff@lunn.ch>
+References: <20240301-rxc_bugfix-v5-0-8dac30230050@bootlin.com>
+ <20240301-rxc_bugfix-v5-1-8dac30230050@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,30 +73,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240304102708.5bb5d95c@kmaincent-XPS-13-7390>
+In-Reply-To: <20240301-rxc_bugfix-v5-1-8dac30230050@bootlin.com>
 
-> > > +	psec = dev_find_pse_control(&phy->mdio.dev);
-> > > +	if (IS_ERR(psec)) {
-> > > +		rc = PTR_ERR(psec);
-> > > +		goto unregister_phy;
-> > > +	}
-> > > +  
-> > 
-> > I do not think it is a good idea to make PSE controller depend on
-> > phy->mdio.dev. The only reason why we have fwnode_find_pse_control()
-> > here was the missing port abstraction.
+On Fri, Mar 01, 2024 at 04:34:58PM +0100, Romain Gantois wrote:
+> From: Russell King <linux@armlinux.org.uk>
 > 
-> I totally agree that having port abstraction would be more convenient.
-> Maxime Chevallier is currently working on this and will post it after his
-> multi-phy series get merged.
-> Meanwhile, we still need a device pointer for getting the regulator. The
-> phy->mdio.dev is the only one I can think of as a regulator consumer.
-> Another idea?
+> Some MAC controllers (e.g. stmmac) require their connected PHY to
+> continuously provide a receive clock signal. This can cause issues in two
+> cases:
+> 
+>   1. The clock signal hasn't been started yet by the time the MAC driver
+>      initializes its hardware. This can make the initialization fail, as in
+>       the case of the rzn1 GMAC1 driver.
+>   2. The clock signal is cut during a power saving event. By the time the
+>      MAC is brought back up, the clock signal is still not active since
+>      phylink_start hasn't been called yet. This brings us back to case 1.
+> 
+> If a PHY driver reads this flag, it should ensure that the receive clock
+> signal is started as soon as possible, and that it isn't brought down when
+> the PHY goes into suspend.
+> 
+> Signed-off-by: Russell King <linux@armlinux.org.uk>
+> [rgantois: commit log]
+> Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
 
-Sorry, i've not been keeping up...
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Doesn't the device tree binding determine this? Where is the consumer
-in the tree?
-
-   Andrew
+    Andrew
 
