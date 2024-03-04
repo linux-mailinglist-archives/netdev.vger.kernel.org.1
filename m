@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-77040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E6DD86FE70
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:10:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6C3886FEEC
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 11:22:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 048951F21D13
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:10:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56CE21F258EB
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 10:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97D10224DE;
-	Mon,  4 Mar 2024 10:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E3B7241E5;
+	Mon,  4 Mar 2024 10:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TP/R0yQS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="efPi1qzf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7015620B33;
-	Mon,  4 Mar 2024 10:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6EEF3A1C1
+	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 10:20:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709547028; cv=none; b=o6Qm1RuSeRIdfx3KQmhfv9864AbPbqW8sd0bwezsxLGuY34IiZp8D6VHPsVmnO9qdYwDBBTyRPDFwS4lbI7ROIWjc0ADMeX+/DDM9bP1Zmw6cMB157aSihS/tBoP5nxJwrZN2okbemnu8npEKRbzaC7WUS+lxS6X823GZjdPlvY=
+	t=1709547645; cv=none; b=AWYsodDX44BUAtdAsldQ1SzYtPRGVXFbTCTqAZp7mUCXVfwb4iNT/AJZSw0f1Y2F/szT75pBtNO+Z+996ASuMC7KE0ThHyF79Rpl/wrOUoffpa4zZWBXsGcb2pHzXbdP1Ea/H4EVEfS1i4v5TeJix/+fTrZ/PNpuHyvt/Bi6k5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709547028; c=relaxed/simple;
-	bh=B826BG/LabvHzX/qTThYEXRApaxmS5m/7jaE3+DLICE=;
+	s=arc-20240116; t=1709547645; c=relaxed/simple;
+	bh=mE6Z4TE8eVvQAqRKo3jygBk9YFKpqg6HOUFh/jqD2Z4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QC1/ADCRTVorhaxDo/PMOQYei37Hu1GMwtWSPtipm2NhWOfjVN/ZwfqoQkqERRFwh4sgX2PCIAxuIbXvwcobXcrvsemiLHb0pJWlozVDEROiXuCPIJ8r1zJ2lwhIaTOT94xXI7enwYELirE+WS0pu6QH1mFFVI0cDCDOMD6MCxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TP/R0yQS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2EFC9C433C7;
-	Mon,  4 Mar 2024 10:10:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=BfTpAQ9XolVrfgGPMSkjHDO0NHqMaSObLi+Go6tZUbxk2BeqhZxPEGWV+/OlWyhar5PGsimcIa/fOYR+x3jk0NisQQumszQpZZnvLTBhQ3bFM6qtKp2YEIkt0XTVFzxyKpJqBROonViiB3tl+Kq8Qjat7mAAgE2O9bjpQoOJCKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=efPi1qzf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 64517C433C7;
+	Mon,  4 Mar 2024 10:20:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709547028;
-	bh=B826BG/LabvHzX/qTThYEXRApaxmS5m/7jaE3+DLICE=;
+	s=k20201202; t=1709547644;
+	bh=mE6Z4TE8eVvQAqRKo3jygBk9YFKpqg6HOUFh/jqD2Z4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TP/R0yQScU7A9oo7JK2IJK6F1Cu+pbJvFHFTfd3w7ecqrW/nF3MLpLuVyEl6sus/D
-	 l3DLo9YgpIHwomCL2w8MoYH3B4hZ4fyf22JS38RYyin1BgFlIqB2oj9VbGrj6+JOXA
-	 /Yv6Gcc66KokxBxI2rzUiaMSwHOTa34MZMpHcPJPP/vxYWbNP9bxs1mvK8UqMsiTHc
-	 K8wflKdElTFX5OuqA4Ci8UGu42NaLtv88IFFkPcSNW8Kl8fW4wqwb4nP8hOPV3ZUVr
-	 Pa3W+Ni7Xb9W0CoKuRxO5fdiAhv8zzt/8HvfheAyUiDvxTaMx5tXZuoZw6RxTMFjIT
-	 tsndoi4QFvUVg==
+	b=efPi1qzfo2JzkWHOnc5/PdHVmT9p7zbFUW8bHJyltdhza3u1ZsP0kR3lM0dfw/rH8
+	 NP7Ax08NTZyrtsTQnUrjV7YNb4eMF20ylzIkVnlnJNzjtF9cPEYucPusVKNZNAPvtD
+	 8YLREfgFt4G/Zu8ZGo6jsi5209PDQSWwTwTqNk/ljKXqzFDAv58epEh6bUGv2O/Jf3
+	 YNFi6ivYLJwoqTRcPpp4vXe+G2GIKmQsiU+q3qTgMlG+RmwSSMJN05DcLSEi98SVml
+	 JGgLvpLrOjbw5zHB7kYMrCppASCO2q1UMzn5vVrjaL6NsatrkBPfsuWp3s6JeyacCR
+	 /zkdC2CGkP3AA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 147ACD88F87;
-	Mon,  4 Mar 2024 10:10:28 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 492C7D9A4B9;
+	Mon,  4 Mar 2024 10:20:44 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] gve: Add header split support
+Subject: Re: [PATCH net] page_pool: fix netlink dump stop/resume
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170954702808.29163.14572409164565217897.git-patchwork-notify@kernel.org>
-Date: Mon, 04 Mar 2024 10:10:28 +0000
-References: <20240229212236.3152897-1-ziweixiao@google.com>
-In-Reply-To: <20240229212236.3152897-1-ziweixiao@google.com>
-To: Ziwei Xiao <ziweixiao@google.com>
-Cc: netdev@vger.kernel.org, jeroendb@google.com, pkaligineedi@google.com,
- shailend@google.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, willemb@google.com, rushilg@google.com,
- jfraker@google.com, jrkim@google.com, hramamurthy@google.com,
- horms@kernel.org, linux-kernel@vger.kernel.org
+ <170954764429.3200.12395088986530153313.git-patchwork-notify@kernel.org>
+Date: Mon, 04 Mar 2024 10:20:44 +0000
+References: <20240301011331.2945115-1-kuba@kernel.org>
+In-Reply-To: <20240301011331.2945115-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, hawk@kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 29 Feb 2024 13:22:33 -0800 you wrote:
-> Currently, the ethtool's ringparam has added a new field tcp-data-split
-> for enabling and disabling header split. These three patches will
-> utilize that ethtool flag to support header split in GVE driver.
+On Thu, 29 Feb 2024 17:13:31 -0800 you wrote:
+> If message fills up we need to stop writing. 'break' will
+> only get us out of the iteration over pools of a single
+> netdev, we need to also stop walking netdevs.
 > 
-> Jeroen de Borst (3):
->   gve: Add header split device option
->   gve: Add header split data path
->   gve: Add header split ethtool stats
+> This results in either infinite dump, or missing pools,
+> depending on whether message full happens on the last
+> netdev (infinite dump) or non-last (missing pools).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/3] gve: Add header split device option
-    https://git.kernel.org/netdev/net-next/c/0b43cf527d1d
-  - [net-next,2/3] gve: Add header split data path
-    https://git.kernel.org/netdev/net-next/c/5e37d8254e7f
-  - [net-next,3/3] gve: Add header split ethtool stats
-    https://git.kernel.org/netdev/net-next/c/056a70924a02
+  - [net] page_pool: fix netlink dump stop/resume
+    https://git.kernel.org/netdev/net/c/429679dcf7d9
 
 You are awesome, thank you!
 -- 
