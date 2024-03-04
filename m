@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-77255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA710870CF7
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 22:30:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0A82870CF6
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 22:30:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC9BE1C20358
-	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 21:30:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D6CB1F21324
+	for <lists+netdev@lfdr.de>; Mon,  4 Mar 2024 21:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D277CF1D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510637CF08;
 	Mon,  4 Mar 2024 21:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qm/ldRJX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DLmA1mVT"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE60D7C0A8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0257C0A0
 	for <netdev@vger.kernel.org>; Mon,  4 Mar 2024 21:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709587787; cv=none; b=ByVhu4Ymz+hUIXc+rFuGUf7TPugxI7lgoVGHzH3V5JK3kVTGMZJq2QdHKF9oJIWYZ7m9hDJKYYS7RcLtGPEOpXYbcg0exshqNGjq8VmlMS0gjB9ClGu7khRr8gZnqih6zzJ0zQxcprSYyxTpFywabFndusiahK6wJ+Iitmktnos=
+	t=1709587787; cv=none; b=fXuPUTCnQZ/9FrmC6Ml+xKLLqErDBpX0RM8MwaI6PmCxFQ8yUZwcMsJENzHi19hEPWdK17y1wDoKoJvUf0RMcG+SggRQ0vaCOYTJEbjWfacY8+/5QUwOXNGBQGBE4FBVsPcvraOb0JWd0mCETad67lN20wJWAHRk735bBZO78uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709587787; c=relaxed/simple;
-	bh=79K3tGmbQNGBaIekVFrb80at8Sy0ZEo5vXySWcMUxPc=;
+	bh=LE+LNupttDs8R1qTaruY7FGyhWxYuP4xgT1tV0S86yU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JlEv94QR2wyZJQ3VLZyaaVL2ozzQL/qJntzQqcesNehmCsnPmHvBpXx8AiDB4cY4iCp5H4N24Xa47uLFrJFbvFAJ2CmXBdQooQB/oH0HngalNATyPGDABJBJ/+4T1FAVKRapAebXOcr870wQa+EMzJhUwIAk8Nex8aiGBiLu4pA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qm/ldRJX; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=AJ3D3fVmmcdb8kg1b1DAQtdVkuBa+je2bojPWpvIYGtvmuZggkQNMQoiy5gWeGGDGizvMGfiovDLzqx5FinutQBl7rC1SBH9E1nVN/i1DiKTA5PQqMoj4+FNjq2lfBEGymgkh+FuojFuBfh88AQHxzo41L1IIvsRReM0uFnIHZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DLmA1mVT; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709587786; x=1741123786;
+  t=1709587785; x=1741123785;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=79K3tGmbQNGBaIekVFrb80at8Sy0ZEo5vXySWcMUxPc=;
-  b=Qm/ldRJXEjqMJ5joSYu96qyREVhSeFys0Yz2wh2MaLIt4Rtejt8mBxhF
-   1vhz3dr0fmN3jloXSp1bafpu3SQ/GVEIIXczjbzsBx4IHCrdBHuruXiHS
-   uVPz2afRharDmssGsJ1kDKihDO0yLSSFCGPEHHhOwTiJQlshoUXmbhvbe
-   c2IWwgcwwkhxSpzl2kP5gh9FciAvuSWa/mqjW+6jIZP8nIZtLTu880dcG
-   C8YVeP4etJWDkIgDXZZ9wfWWx7VRbfMwRlaSXXJAKR6rxcwVmpV9SkDt4
-   1ShBebenQlWaPYpmMl6zL7nzXgbLt8dCxtS5krncxtbemKVipji5TX215
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="3968089"
+  bh=LE+LNupttDs8R1qTaruY7FGyhWxYuP4xgT1tV0S86yU=;
+  b=DLmA1mVTIuU1ZKER01T5HNyEF3BudYvaIb6yAKLpAjQ8SERz+JPa9IRu
+   IgpHBRqo4ffj2E+37WdNXLRjJNgRjb0imPvWYHmFkchJg6+cnVXCnW9LX
+   ecqYKl4Hp7Enwcd3+Dlsuz771rz6xH/Op5WEFCvSPA1h3oqtwdx9Io5F+
+   /NkxhrwWvmzJwzCvIFwmr/maln+miIZspuPnBaWcR1GL72OAkTh4rAgFi
+   jrwWREiB/qjqnSHfc8D3kmQGFyRxOhPmU3NARhHq74HqbCU2FQGsV9dvn
+   7yPUSyAR/h8mmBu++/S0XwrutFtA00s2qwFvqcpjnz6yel2OSzoOJoPdw
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="3968091"
 X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
-   d="scan'208";a="3968089"
+   d="scan'208";a="3968091"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
   by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 13:29:40 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
-   d="scan'208";a="46647887"
+   d="scan'208";a="46647890"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa001.jf.intel.com with ESMTP; 04 Mar 2024 13:29:40 -0800
+  by orviesa001.jf.intel.com with ESMTP; 04 Mar 2024 13:29:41 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
 	anthony.l.nguyen@intel.com,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH net-next 7/9] ice: cleanup line splitting for context set functions
-Date: Mon,  4 Mar 2024 13:29:28 -0800
-Message-ID: <20240304212932.3412641-8-anthony.l.nguyen@intel.com>
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Subject: [PATCH net-next 8/9] ice: do not disable Tx queues twice in ice_down()
+Date: Mon,  4 Mar 2024 13:29:29 -0800
+Message-ID: <20240304212932.3412641-9-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240304212932.3412641-1-anthony.l.nguyen@intel.com>
 References: <20240304212932.3412641-1-anthony.l.nguyen@intel.com>
@@ -77,87 +77,158 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-The indentation for ice_set_ctx and ice_write_rxq_ctx breaks the function
-name after the return type. This style of breaking is used a lot throughout
-the ice driver, even in cases where its not actually helpful for
-readability. We no longer prefer this style of line splitting in the
-driver, and new code is avoiding it.
+ice_down() clears QINT_TQCTL_CAUSE_ENA_M bit twice, which is not
+necessary. First clearing happens in ice_vsi_dis_irq() and second in
+ice_vsi_stop_tx_ring() - remove the first one.
 
-Normally, I would leave this alone unless the actual function contents or
-description needed updating. However, a future change is going to add
-inverse functions for converting packed context to unpacked context
-structures. To keep this code uniform with the existing set functions, fix
-up the style to the modern format of keeping the type on the same line.
+While at it, make ice_vsi_dis_irq() static as ice_down() is the only
+current caller of it.
 
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_common.c | 12 +++++-------
- drivers/net/ethernet/intel/ice/ice_common.h | 10 ++++------
- 2 files changed, 9 insertions(+), 13 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_lib.c  | 55 -----------------------
+ drivers/net/ethernet/intel/ice/ice_lib.h  |  2 -
+ drivers/net/ethernet/intel/ice/ice_main.c | 44 ++++++++++++++++++
+ 3 files changed, 44 insertions(+), 57 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index e9e4a8ef7904..7d9315ffae57 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -1399,9 +1399,8 @@ static const struct ice_ctx_ele ice_rlan_ctx_info[] = {
-  * it to HW register space and enables the hardware to prefetch descriptors
-  * instead of only fetching them on demand
-  */
--int
--ice_write_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
--		  u32 rxq_index)
-+int ice_write_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
-+		      u32 rxq_index)
- {
- 	u8 ctx_buf[ICE_RXQ_CTX_SZ] = { 0 };
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 59e8a2572985..48e4c33a3550 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -2719,61 +2719,6 @@ void ice_dis_vsi(struct ice_vsi *vsi, bool locked)
+ 	}
+ }
  
-@@ -4522,11 +4521,10 @@ static void ice_pack_ctx_qword(u8 *src_ctx, u8 *dest_ctx,
-  * @hw: pointer to the hardware structure
-  * @src_ctx:  pointer to a generic non-packed context structure
-  * @dest_ctx: pointer to memory for the packed structure
-- * @ce_info:  a description of the structure to be transformed
-+ * @ce_info: List of Rx context elements
-  */
--int
--ice_set_ctx(struct ice_hw *hw, u8 *src_ctx, u8 *dest_ctx,
--	    const struct ice_ctx_ele *ce_info)
-+int ice_set_ctx(struct ice_hw *hw, u8 *src_ctx, u8 *dest_ctx,
-+		const struct ice_ctx_ele *ce_info)
- {
- 	int f;
+-/**
+- * ice_vsi_dis_irq - Mask off queue interrupt generation on the VSI
+- * @vsi: the VSI being un-configured
+- */
+-void ice_vsi_dis_irq(struct ice_vsi *vsi)
+-{
+-	struct ice_pf *pf = vsi->back;
+-	struct ice_hw *hw = &pf->hw;
+-	u32 val;
+-	int i;
+-
+-	/* disable interrupt causation from each queue */
+-	if (vsi->tx_rings) {
+-		ice_for_each_txq(vsi, i) {
+-			if (vsi->tx_rings[i]) {
+-				u16 reg;
+-
+-				reg = vsi->tx_rings[i]->reg_idx;
+-				val = rd32(hw, QINT_TQCTL(reg));
+-				val &= ~QINT_TQCTL_CAUSE_ENA_M;
+-				wr32(hw, QINT_TQCTL(reg), val);
+-			}
+-		}
+-	}
+-
+-	if (vsi->rx_rings) {
+-		ice_for_each_rxq(vsi, i) {
+-			if (vsi->rx_rings[i]) {
+-				u16 reg;
+-
+-				reg = vsi->rx_rings[i]->reg_idx;
+-				val = rd32(hw, QINT_RQCTL(reg));
+-				val &= ~QINT_RQCTL_CAUSE_ENA_M;
+-				wr32(hw, QINT_RQCTL(reg), val);
+-			}
+-		}
+-	}
+-
+-	/* disable each interrupt */
+-	ice_for_each_q_vector(vsi, i) {
+-		if (!vsi->q_vectors[i])
+-			continue;
+-		wr32(hw, GLINT_DYN_CTL(vsi->q_vectors[i]->reg_idx), 0);
+-	}
+-
+-	ice_flush(hw);
+-
+-	/* don't call synchronize_irq() for VF's from the host */
+-	if (vsi->type == ICE_VSI_VF)
+-		return;
+-
+-	ice_for_each_q_vector(vsi, i)
+-		synchronize_irq(vsi->q_vectors[i]->irq.virq);
+-}
+-
+ /**
+  * __ice_queue_set_napi - Set the napi instance for the queue
+  * @dev: device to which NAPI and queue belong
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
+index b5a1ed7cc4b1..9cd23afe5f15 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_lib.h
+@@ -110,8 +110,6 @@ void
+ ice_write_qrxflxp_cntxt(struct ice_hw *hw, u16 pf_q, u32 rxdid, u32 prio,
+ 			bool ena_ts);
  
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index 32fd10de620c..ffb22c7ce28b 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.h
-+++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -53,9 +53,8 @@ int ice_get_caps(struct ice_hw *hw);
+-void ice_vsi_dis_irq(struct ice_vsi *vsi);
+-
+ void ice_vsi_free_irq(struct ice_vsi *vsi);
  
- void ice_set_safe_mode_caps(struct ice_hw *hw);
+ void ice_vsi_free_rx_rings(struct ice_vsi *vsi);
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 8f73ba77e835..062b4ea8e2c3 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -7001,6 +7001,50 @@ static void ice_napi_disable_all(struct ice_vsi *vsi)
+ 	}
+ }
  
--int
--ice_write_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
--		  u32 rxq_index);
-+int ice_write_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
-+		      u32 rxq_index);
- 
- int
- ice_aq_get_rss_lut(struct ice_hw *hw, struct ice_aq_get_set_rss_lut_params *get_params);
-@@ -72,9 +71,8 @@ bool ice_check_sq_alive(struct ice_hw *hw, struct ice_ctl_q_info *cq);
- int ice_aq_q_shutdown(struct ice_hw *hw, bool unloading);
- void ice_fill_dflt_direct_cmd_desc(struct ice_aq_desc *desc, u16 opcode);
- extern const struct ice_ctx_ele ice_tlan_ctx_info[];
--int
--ice_set_ctx(struct ice_hw *hw, u8 *src_ctx, u8 *dest_ctx,
--	    const struct ice_ctx_ele *ce_info);
-+int ice_set_ctx(struct ice_hw *hw, u8 *src_ctx, u8 *dest_ctx,
-+		const struct ice_ctx_ele *ce_info);
- 
- extern struct mutex ice_global_cfg_lock_sw;
- 
++/**
++ * ice_vsi_dis_irq - Mask off queue interrupt generation on the VSI
++ * @vsi: the VSI being un-configured
++ */
++static void ice_vsi_dis_irq(struct ice_vsi *vsi)
++{
++	struct ice_pf *pf = vsi->back;
++	struct ice_hw *hw = &pf->hw;
++	u32 val;
++	int i;
++
++	/* disable interrupt causation from each Rx queue; Tx queues are
++	 * handled in ice_vsi_stop_tx_ring()
++	 */
++	if (vsi->rx_rings) {
++		ice_for_each_rxq(vsi, i) {
++			if (vsi->rx_rings[i]) {
++				u16 reg;
++
++				reg = vsi->rx_rings[i]->reg_idx;
++				val = rd32(hw, QINT_RQCTL(reg));
++				val &= ~QINT_RQCTL_CAUSE_ENA_M;
++				wr32(hw, QINT_RQCTL(reg), val);
++			}
++		}
++	}
++
++	/* disable each interrupt */
++	ice_for_each_q_vector(vsi, i) {
++		if (!vsi->q_vectors[i])
++			continue;
++		wr32(hw, GLINT_DYN_CTL(vsi->q_vectors[i]->reg_idx), 0);
++	}
++
++	ice_flush(hw);
++
++	/* don't call synchronize_irq() for VF's from the host */
++	if (vsi->type == ICE_VSI_VF)
++		return;
++
++	ice_for_each_q_vector(vsi, i)
++		synchronize_irq(vsi->q_vectors[i]->irq.virq);
++}
++
+ /**
+  * ice_down - Shutdown the connection
+  * @vsi: The VSI being stopped
 -- 
 2.41.0
 
