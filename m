@@ -1,87 +1,165 @@
-Return-Path: <netdev+bounces-77600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D656872451
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 17:29:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9526387249B
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 17:44:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24D14B21272
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:29:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52133282B93
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19AB712F37C;
-	Tue,  5 Mar 2024 16:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3E29457;
+	Tue,  5 Mar 2024 16:44:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ru2OeMx1"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="crIKknz5"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from forward502c.mail.yandex.net (forward502c.mail.yandex.net [178.154.239.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9985B12D1E9
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 16:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA16944F;
+	Tue,  5 Mar 2024 16:44:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709656000; cv=none; b=VQ3EeNJfhP4pEjvsE4SzTHUtiJSADkmdagGagiEK2v16m4HmsyUBz2r+4bN2LK1ruCyMl/cjDJRbKVwyUbr0IqVaqab2/J024gjeeYRjYLLNGdUN7A2dlrPO0/xJqUsCay1DPhOeySIjdFgDIT9CLsOmMbzS/DYRkKC3VGZTrnM=
+	t=1709657084; cv=none; b=Qjo6Bu3ZI1/qfJEXGzKnC7yMlIjiVMLc0Igo+MP2PWilZCJplqhCc6EYYW8WEMqfhGqgu8Nhbchlf650m+I+M/v2+H4ivN6jIAqJdU7bc9FCKBgOVNW69d2/5iY4GUO7jCXU+5S0hGEAtiB2NMSn9p9/MHaf8yWkk6ic7CZKU2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709656000; c=relaxed/simple;
-	bh=bSTJlS/2J9jN7CS76dAHIyf9lmkJd+GtHf4N2KUlCrg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KG/sEAORlgcp2XLkjKuLjPhMAnYPo32L1Tx0SCwRM8qC6HLwcNRvCKtWKr67kel5kCAeR6KqybJGdEiToBA5veC2hIHP1aV6fbZNSgYbcKafdt6ZFf+atrT0QfLzvTJxF1DFpuXLV/4b/IH1iruK0ac6PavaNXe6OyutMg7PaHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ru2OeMx1; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=tc+REPklifplsm4yXfqVpSkD9sKEcjAsGBPb7sadDz0=; b=Ru2OeMx1eB15Vk9SyxUenKe4sm
-	Qz7+VOHORBnIqYd+nR+a2foVTjhVQ0s6o/MKrfhsygpssQQ4zEdM3x2UKg39SvpHQU9bsdpia6dCB
-	BZEMCyQC9bqgdkhkMd4XjUZvn+Xx6i3uS7aG8jiQ52fKCfEVrYfRcqVeD4uQcLd7rAlo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rhXdA-009RhS-LA; Tue, 05 Mar 2024 17:27:04 +0100
-Date: Tue, 5 Mar 2024 17:27:04 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next v2 04/22] ovpn: add basic interface
- creation/destruction/management routines
-Message-ID: <540ab521-5dab-44fa-b6b4-2114e376cbfa@lunn.ch>
-References: <20240304150914.11444-1-antonio@openvpn.net>
- <20240304150914.11444-5-antonio@openvpn.net>
- <e89be898-bcbd-41f9-aaae-037e6f88069e@lunn.ch>
- <48188b78-9238-44cc-ab2f-efdddad90066@openvpn.net>
+	s=arc-20240116; t=1709657084; c=relaxed/simple;
+	bh=10vkdmpV3gaRigbF8IpnK1jkrLKdE2fPvsByln69u0o=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=BBAcGqbdZVycyUeJq9bk243kYw8TRDl62gLcE7tEYFNB3D4L29UsC5pbER9TTNVWrBtt/YAxyCOD6NWfFCGFdF1MODaWFVAkjvs7+RUyY4PfvvOPYnSwYGnRlPaU6rwlwR6iMEGLH+C0nMuu9xTpFVNWdnO3+x7zR1GW6FZr9KM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=crIKknz5; arc=none smtp.client-ip=178.154.239.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-45.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-45.sas.yp-c.yandex.net [IPv6:2a02:6b8:c27:19c8:0:640:13a7:0])
+	by forward502c.mail.yandex.net (Yandex) with ESMTPS id 24D5F612B5;
+	Tue,  5 Mar 2024 19:39:14 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-45.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id BdimoxIrAeA0-HIvgkJlw;
+	Tue, 05 Mar 2024 19:39:13 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1709656753; bh=u/kIOUlFzGFVGxoC5cILoKlRfd1Ro/lYe2uW5h6MOSc=;
+	h=In-Reply-To:Subject:To:From:Cc:Date:References:Message-ID;
+	b=crIKknz5apeCS/qvNi1ieQe6nWEyrLAAi845NZEBM6rUS0e5KUHNnCnZUqULmLyfC
+	 7duN0UcowUH0yEnF/lvtdLVNvpUqc0fZL7x3AF81YUzJyudmagTvtwl2At3XjqHrR/
+	 q9GECzR87I6lUJ+JMBljhj746ZVd1VXrjRnmYHYs=
+Authentication-Results: mail-nwsmtp-smtp-production-main-45.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <625c9519-7ae6-43a3-a5d0-81164ad7fd0e@yandex.ru>
+Date: Tue, 5 Mar 2024 19:39:11 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <48188b78-9238-44cc-ab2f-efdddad90066@openvpn.net>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Wen Gu <guwen@linux.alibaba.com>
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+ "D. Wythe" <alibuda@linux.alibaba.com>, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, lvc-project@linuxtesting.org
+References: <dacadaef-4fec-4d5e-8b91-1a292ab43b37@yandex.ru>
+ <cff8e035-b70a-4910-9af6-e62000c0b87e@linux.alibaba.com>
+From: Dmitry Antipov <dmantipov@yandex.ru>
+Autocrypt: addr=dmantipov@yandex.ru; keydata=
+ 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
+ tx98MCutXbJWn55RtnVKbpIiMfBrcB8=
+Subject: Re: Reaching official SMC maintainers
+In-Reply-To: <cff8e035-b70a-4910-9af6-e62000c0b87e@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> > > +void ovpn_iface_destruct(struct ovpn_struct *ovpn, bool unregister_netdev)
-> > > +{
-> > > +	ASSERT_RTNL();
-> > > +
-> > > +	netif_carrier_off(ovpn->dev);
-> > 
-> > You often see virtual devices turn their carrier off in there
-> > probe/create function, because it is unclear what state it is in after
-> > register_netdevice().
-> 
-> Are you suggesting to turn it off both here and in the create function?
-> Or should I remove the invocation above?
+On 3/4/24 13:51, Wen Gu wrote:
 
-I noticed it in the _destruct function and went back to look at
-create. You probably want it in both, unless as part of destruct, you
-first disconnect all peers, which should set the carrier to off when
-the last peer disconnects?
+> IMHO, if we want to address the problem of fasync_struct entries being
+> incorrectly inserted to old socket, we may have to change the general code.
 
-    Andrew
+BTW what about using shared wait queue? Just to illustrate an idea:
+
+diff --git a/include/linux/net.h b/include/linux/net.h
+index c9b4a63791a4..02df64747db7 100644
+--- a/include/linux/net.h
++++ b/include/linux/net.h
+@@ -126,6 +126,7 @@ struct socket {
+  	const struct proto_ops	*ops; /* Might change with IPV6_ADDRFORM or MPTCP. */
+
+  	struct socket_wq	wq;
++	struct socket_wq	*shared_wq;
+  };
+
+  /*
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index 0f53a5c6fd9d..f04d61e316b2 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -3360,6 +3360,9 @@ static int __smc_create(struct net *net, struct socket *sock, int protocol,
+  		smc->clcsock = clcsock;
+  	}
+
++	sock->shared_wq = &smc->shared_wq;
++	smc->clcsock->shared_wq = &smc->shared_wq;
++
+  out:
+  	return rc;
+  }
+diff --git a/net/smc/smc.h b/net/smc/smc.h
+index df64efd2dee8..26e66c289d4f 100644
+--- a/net/smc/smc.h
++++ b/net/smc/smc.h
+@@ -287,6 +287,7 @@ struct smc_sock {				/* smc sock container */
+  						/* protects clcsock of a listen
+  						 * socket
+  						 * */
++	struct socket_wq	shared_wq;
+  };
+
+  #define smc_sk(ptr) container_of_const(ptr, struct smc_sock, sk)
+diff --git a/net/socket.c b/net/socket.c
+index ed3df2f749bf..9b9e6932906f 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -1437,7 +1437,8 @@ static int sock_fasync(int fd, struct file *filp, int on)
+  {
+  	struct socket *sock = filp->private_data;
+  	struct sock *sk = sock->sk;
+-	struct socket_wq *wq = &sock->wq;
++	struct socket_wq *wq = (unlikely(sock->shared_wq) ?
++				sock->shared_wq : &sock->wq);
+
+  	if (sk == NULL)
+  		return -EINVAL;
+
+Dmitry
+
 
