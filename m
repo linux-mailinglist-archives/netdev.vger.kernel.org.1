@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-77411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D3D2871A0D
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 10:56:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F026F871A1F
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:02:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0863528287D
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 09:56:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA4A7282B4B
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 10:02:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBA7D535D6;
-	Tue,  5 Mar 2024 09:56:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88AB353E03;
+	Tue,  5 Mar 2024 10:02:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Pay51SMK"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VVi1O8qY"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5494CB58;
-	Tue,  5 Mar 2024 09:56:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB9E4D9F9;
+	Tue,  5 Mar 2024 10:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709632599; cv=none; b=u8uTQFv7nrgFTwmI5qXK07RgeG1wndCoGgtevQbAhmBEpMd1z1AQrwUWFZCMNRgDm7kCJOLnxunc2Cj7hKTDb5MIvoEmxOwAw2SDwYFxPcLJ/I3nqqbg5P0HTheIO6EpsvvO3hl2dyrq3VoH7pijXCk8rsNQxEKLNEvPJqu+HWI=
+	t=1709632967; cv=none; b=WcJj0KHWqKQd3Wu6PqYF1VD0G2h5aLkQWfe9VjUv2mKB4RvxWm5KLb1m8F8gsPY7b1IiL/GGaH5y+tasjajE27r3uQbsPA8O2mQfkd+gTwHRRdTXA0BjKEadj1Ip3MwyBszKKahcuyrm8VH+LG1vZAIH/UaBWTGSzOvWEU4R1Dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709632599; c=relaxed/simple;
-	bh=nwrkN9uc9z2M1DQPXzOJOpOvm5K9UgIMGJJb5KqYuJE=;
+	s=arc-20240116; t=1709632967; c=relaxed/simple;
+	bh=D0vHsAJNAvotsrRPO6R/H2ATrWJBLX7q5KDT/CK6xHc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qWVhOE8Naco64Xs2fYnqMPJb8lng+T3O7jiv4c3uGm+hmCVciIF5/+PCVkRxHIpCiJChsLcolZIN374RnWanVFVo0MIedZSfgJy6m8Fk8qY/0qbIb4iIejNAvA4HdG2RqvDorQA+p9lP6uPcpEKtlMyrHPvroxOySmtEyE8kDqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Pay51SMK; arc=none smtp.client-ip=217.70.183.196
+	 MIME-Version:Content-Type; b=CM3BLAY4STbSB4pWrtpyy1MuOEQOXU0hz81HCLdsFW7jfW7PV0fLsHmDfH9NURUSDoiBWZSnSkmEzug8JVo6KeKCuLjYeq+841givfKyJLK+OiBBuBr/vDnWHCI948TJYKMzzC1UKg8KtKDTNOzsm7UE05veVCbGfXNMIGo6fLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VVi1O8qY; arc=none smtp.client-ip=217.70.183.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 288A9E0006;
-	Tue,  5 Mar 2024 09:56:28 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 73A50FF80D;
+	Tue,  5 Mar 2024 10:02:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709632590;
+	t=1709632957;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MX+5rMA8HaFPZvzB4A99eJcBrl7j5grxkkcSrE9QG+I=;
-	b=Pay51SMKg+MFPEZLzIkQu8WBdqJ5ufqfFfZ67MaPo3m1SJHyQp30kcP6uDAsIlKz8xoIsD
-	C9PCxELxEzvSPhuplMDuCtuw4MHAhU2AlRg0DT7pji4BNFKGEqKQCvfxeSsziNvASed6nD
-	SNb8+wdTyCK4o4zuOhZwM4GisqEU1rP1TjM6u5cPtvbyWRhpZ7eh0ahbktDJdCo+udhf3P
-	U4fVmmERduxQe9YDgUisPtiXbETzYs/D64fZzFlkdZWkcuXI8UgUOeQZ6iGX5azmN60JO2
-	M0ABVV1KXpRc8Z52N+GjYIf5MLXthaREmHacNCd8lFuyMVVf2km5j9rxxtAR1Q==
-Date: Tue, 5 Mar 2024 10:56:27 +0100
+	bh=yTaRrrhLCd6vyS/QfkqHI3GV6BwIOBGsPobf3wIDHq0=;
+	b=VVi1O8qYd5QxG5YleJVNsRGWGhyJrG2nWLJCm/HkgI2Ns2NYFG2iQh0cYziYqsrmMUHu0I
+	cgaMBRsfv5YvqfisZwq5Tei8FTxe6Zl0s9fCH9H6VPpPOjLdbw89p+9qfpOaxhONG0Pv7L
+	YDgWeY0I3MmCSQKMOvk07wo5ciZPR8nXXzOrtH+hIuVvvdqswZa7ERshUtrr2w0EodQt5P
+	RU/p/Zh/qb/Rb4RoJ6jxh0Nk+/Io904/tm/HAmHoKfZXwKigWpzqgpJpwj5e6AuFlw4fLr
+	aMpfNnNck5UUseFDRkBkqlM/Rc9Sa5MRa6EAoyPirTYyhT2Jdrj9KES9HLgDfA==
+Date: Tue, 5 Mar 2024 11:02:33 +0100
 From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
@@ -66,11 +66,12 @@ Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
  <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
 Subject: Re: [PATCH net-next v9 02/13] net: Make dev_get_hwtstamp_phylib
  accessible
-Message-ID: <20240305105627.1d277a76@kmaincent-XPS-13-7390>
-In-Reply-To: <20240304184048.1c1724fa@kernel.org>
+Message-ID: <20240305110233.2aca99f7@kmaincent-XPS-13-7390>
+In-Reply-To: <20240305105627.1d277a76@kmaincent-XPS-13-7390>
 References: <20240226-feature_ptp_netnext-v9-0-455611549f21@bootlin.com>
 	<20240226-feature_ptp_netnext-v9-2-455611549f21@bootlin.com>
 	<20240304184048.1c1724fa@kernel.org>
+	<20240305105627.1d277a76@kmaincent-XPS-13-7390>
 Organization: bootlin
 X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
@@ -83,34 +84,29 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-GND-Sasl: kory.maincent@bootlin.com
 
-On Mon, 4 Mar 2024 18:40:48 -0800
-Jakub Kicinski <kuba@kernel.org> wrote:
+On Tue, 5 Mar 2024 10:56:27 +0100
+K=C3=B6ry Maincent <kory.maincent@bootlin.com> wrote:
 
-> On Mon, 26 Feb 2024 14:39:53 +0100 Kory Maincent wrote:
-> > Make the dev_get_hwtstamp_phylib function accessible in prevision to use
-> > it from ethtool to read the hwtstamp current configuration. =20
+> > > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > > index f07c8374f29c..7f78aef73fe1 100644
+> > > --- a/include/linux/netdevice.h
+> > > +++ b/include/linux/netdevice.h
+> > > @@ -4005,6 +4005,8 @@ int generic_hwtstamp_set_lower(struct net_device
+> > > *dev, int dev_set_hwtstamp_phylib(struct net_device *dev,
+> > >  			    struct kernel_hwtstamp_config *cfg,
+> > >  			    struct netlink_ext_ack *extack);
+> > > +int dev_get_hwtstamp_phylib(struct net_device *dev,
+> > > +			    struct kernel_hwtstamp_config *cfg);   =20
+> >=20
+> > since we don't expect modules to call this, how about we move dev_set*
+> > and the new declaration to net/core/dev.h ? =20
 >=20
-> ethtool can't be a module, exports are only needed for code which ends
-> up being called from modules.=20
+> Ok for me.
 
-Ah right!
-
-> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> > index f07c8374f29c..7f78aef73fe1 100644
-> > --- a/include/linux/netdevice.h
-> > +++ b/include/linux/netdevice.h
-> > @@ -4005,6 +4005,8 @@ int generic_hwtstamp_set_lower(struct net_device =
-*dev,
-> >  int dev_set_hwtstamp_phylib(struct net_device *dev,
-> >  			    struct kernel_hwtstamp_config *cfg,
-> >  			    struct netlink_ext_ack *extack);
-> > +int dev_get_hwtstamp_phylib(struct net_device *dev,
-> > +			    struct kernel_hwtstamp_config *cfg); =20
->=20
-> since we don't expect modules to call this, how about we move dev_set*
-> and the new declaration to net/core/dev.h ?
-
-Ok for me.
+I replied to quickly.
+It seems this header in not include in ethtool part.=20
+This would imply adding #include "../core/dev.h" in the tsinfo.c file.
+Not sure this is what we want.
 
 Regards,
 --=20
