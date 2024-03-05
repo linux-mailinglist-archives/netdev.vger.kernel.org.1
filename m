@@ -1,165 +1,159 @@
-Return-Path: <netdev+bounces-77458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAB91871D29
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:14:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC0B3871CF9
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:08:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E0C42883B9
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:14:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF9D11C23141
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130F0548F3;
-	Tue,  5 Mar 2024 11:14:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25FA25490A;
+	Tue,  5 Mar 2024 11:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=osasysteme.de header.i=@osasysteme.de header.b="SQBVLuZ2"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="Y7wbjCLo"
 X-Original-To: netdev@vger.kernel.org
-Received: from secondary.pambor.com (secondary.pambor.com [46.38.233.203])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2FEC10A1B;
-	Tue,  5 Mar 2024 11:14:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.38.233.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D675256B7C
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 11:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709637278; cv=none; b=EijdlGJBOo97GmQ27RHcXNqDCKXA9HgcWXs6z3wHX9+HMfX3FHUIm+qSVM8oLn/4g3g2W/QhLzpZoVMM/OsIMJHv0Jr9nHoyoCB0kF1sy/K22OjqjQwXehEAJL5OsnRx6qYrqV8y2c6pjljh35DhpzQSh/OVlUO9c416qMF67CY=
+	t=1709636910; cv=none; b=kxwK6S5xXoi0C+mp6fWx6XkivAyD9M/j/k1bfKVJqqNYPl/INtZB9xp7KmtqCX168Ui6zR17nuV+z4hbSoaf2OeHIyXJjH+PQkmDFyFcXRU0lFuvQOetIatELWp1S/oXrOl4JSsUL8v0ToWv65ob7FUUvjQEdwQ7QNO4ydcZEak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709637278; c=relaxed/simple;
-	bh=g23TNXNaEuUBqK6ioN3KJo90x6OmVEv0VqAOHJZOjh8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tocYyC+iVWPTF0SJkyzoQ6VL8IG0oW3I0jG7ktYRx75/+CQsIQ6gJaCQRslrSnsL70SFW1rzvd2wRteWQhkQWsH6ogIa1AExSWpdPseEC0BWmZpCRGocpiLSUHtE5ayPj1OCPR1TWvrpamBmGma3EQMHAUugXdS7dnj2f4gQO+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=osasysteme.de; spf=pass smtp.mailfrom=osasysteme.de; dkim=pass (2048-bit key) header.d=osasysteme.de header.i=@osasysteme.de header.b=SQBVLuZ2; arc=none smtp.client-ip=46.38.233.203
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=osasysteme.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=osasysteme.de
-Received: from localhost (localhost [127.0.0.1])
-	by secondary.pambor.com (Postfix) with ESMTP id 5125E6F03A2;
-	Tue,  5 Mar 2024 12:07:26 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=osasysteme.de;
-	s=19022017; t=1709636846;
-	bh=g23TNXNaEuUBqK6ioN3KJo90x6OmVEv0VqAOHJZOjh8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=SQBVLuZ2tEZi2HUL+R9jkg73Fuj7PnkaaQ4lWhuhLlla1oZqyPntz5wfpouFJwEw8
-	 wTA5UTRUu3/fbpAafL/kIMtHbARhDEzdQMLgPSzXTTnfUiAb2jdyva+M9bAKotqSF7
-	 xAMDNc56rt9+1D8yMjQiVnBVTwn/b5DPvtVfvVk4ml+emx60E7r4NhXRd/aV4qrvZI
-	 o2ac2xW0PW50akDVYC63HNMH/7UAXcG5CjYjNJY9hwL7g6fftxldeOqXAi2DCt40B9
-	 fZEs0qLEdf/ZqnLlvzi77/37obRc3is5LAs4E0UvcwZtNOLa6O/hXdoMzvR9f6BzHi
-	 2aXd1Dp4OJZRw==
-X-Virus-Scanned: Debian amavisd-new at secondary.pambor.com
-Received: from secondary.pambor.com ([127.0.0.1])
-	by localhost (secondary.pambor.com [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 2Qg1vcMd3cyn; Tue,  5 Mar 2024 12:07:23 +0100 (CET)
-Received: from chromebook.fritz.box (dynamic-2a02-3100-5dd1-2001-a8cd-25c2-d6af-d5f4.310.pool.telefonica.de [IPv6:2a02:3100:5dd1:2001:a8cd:25c2:d6af:d5f4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.osasysteme.de (Postfix) with ESMTPSA id 6445C6F035F;
-	Tue,  5 Mar 2024 12:07:23 +0100 (CET)
-From: Tim Pambor <tp@osasysteme.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Dan Murphy <dmurphy@ti.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Tim Pambor <tp@osasysteme.de>
-Subject: [PATCH net-next v3] net: phy: dp83822: Fix RGMII TX delay configuration
-Date: Tue,  5 Mar 2024 12:06:08 +0100
-Message-ID: <20240305110608.104072-1-tp@osasysteme.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1709636910; c=relaxed/simple;
+	bh=AEoPkt3FD7wIqhqIzLlHWU/Ex7SJaJ7jvu1zQhoBqVo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=QLXOQri5khG4Ot6zbOxJjhpulkfJ8lAVeZRSetCUMi0UtPNX7QMV+X9cZHCmzkM3c9WabzRzUsWOk8JwckpFJ64UovegDfbDJZCPPa+HZ6gY1hePea5WbF96rhhB8wEJm502GCw+Ft9keRIVKUKNfZXVy+aaEvnIgP+TarVIITw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=Y7wbjCLo; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-412ee78edbbso2390645e9.0
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 03:08:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1709636906; x=1710241706; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2zzbGg5DxMcKg+Wn+y5TMC+EDQP0gtLCqVdY8y5cvlU=;
+        b=Y7wbjCLoPoZbQfByDrs0Bri1UM6x/QsS2EC+nVkRS8kYV7bM/fnSP5aV1GlD7/ZPnd
+         g/epayJyp83CkPN5lnnpVIl5OrLUMQaZHptdC/qg+6LoBUkb20oy5jePJ1nUUFGu0SZs
+         kKtZtce2xWdhvUCoJ5tcp3ngqLZ5HdmXxqQAUl3U+fDdSSZlFaR6soXaNBbSnVvf7GbP
+         1pkO/qzrvoZEKlGHaORd99jq1TCrwacMbvZyfiMLH7hVdnsG3H4/Sh4yLbj6JZlry0Ol
+         aAoQmVNpVJXhHhXXLa2kI7QaPyn3i3LbfmrHVSYFrhfTfve0G+34ttKEOYZORmXzIZkD
+         1m9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709636906; x=1710241706;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2zzbGg5DxMcKg+Wn+y5TMC+EDQP0gtLCqVdY8y5cvlU=;
+        b=UQyFdnw4U8htyj+Msppaku/CJ6ommBAS2J5pYsF4SG3/wC2mtWRKl7MY5IKTF88Jwf
+         QlSfdzhoOGVxLn8OUoPyuAruS/1m963bjNFUKGw7wZuCbJTQW0JCiEZE0gJSPxxO8xDz
+         xeW/5V9E74DIJQ220Z7fH1iJKo2zNSMS/RFn0yVskwbG0q7bJXzupocDBaJeEWr9/wsN
+         jjngZ0k7usjlvU1CwIAHgt6LxzWlyyR+kO0mqUwWOLqUQOj6Q4ATKfVkZt6Z0ToFS4Fj
+         K3fj8lezsh6n28sRwN0ZNlQRcsjRMjGQfzSsJApbNia1waXs3fRZ6dAsnXNbw3cJLjhX
+         ZtNg==
+X-Gm-Message-State: AOJu0Yy2dusXoftjFUnTv7yfNdtARmmvy7tLZ+yVyDmjfdfpXocMvHS8
+	TEI71a0euWfk9Q4xXECZzNXiCyRweQGI0ySDehmvaistB5/k/Wu9nVQmy/g68UM=
+X-Google-Smtp-Source: AGHT+IGRxGk+xJyDqCA5anCR8v5jNbheWp9RZkTgBpd6K3gXbnnzru7ijy8eprwWtmMtcK5CTTtdeg==
+X-Received: by 2002:adf:a4d3:0:b0:33d:76a9:89ae with SMTP id h19-20020adfa4d3000000b0033d76a989aemr7487876wrb.12.1709636906280;
+        Tue, 05 Mar 2024 03:08:26 -0800 (PST)
+Received: from [127.0.1.1] ([84.102.31.43])
+        by smtp.gmail.com with ESMTPSA id v7-20020a5d59c7000000b0033e475940fasm2190993wry.66.2024.03.05.03.08.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Mar 2024 03:08:25 -0800 (PST)
+From: Julien Panis <jpanis@baylibre.com>
+Subject: [PATCH v3 0/3] DONOTMERGE: Add minimal XDP support to TI AM65 CPSW
+ Ethernet driver
+Date: Tue, 05 Mar 2024 12:08:17 +0100
+Message-Id: <20240223-am65-cpsw-xdp-basic-v3-0-5d944a9d84a0@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACH95mUC/42OwQrCMBBEf0VydjVJa6me/A+RsruNdsWmJZGoS
+ P/d1KMH8TjDzJt5qeiCuKh2i5cKLkmUwWdRLBeKO/RnB9Jmray2pba2AOyrDfAY7/BoRyCMwlC
+ 2VNt6o2sqa5Wb2XVAAT13c/cyope4zvmmR/FX8a5Jeg6OwZ3k8Zk/HLPuJN6G8Py8SWZ2fw8nA
+ wa2J00VU4uF0XvC51UouBUPvZqRyf6BsaBBG64YkZGo+sJM0/QG4HMIbCkBAAA=
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Sumit Semwal <sumit.semwal@linaro.org>, 
+ =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, linux-media@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
+ Julien Panis <jpanis@baylibre.com>
+X-Mailer: b4 0.12.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1709636903; l=2299;
+ i=jpanis@baylibre.com; s=20230526; h=from:subject:message-id;
+ bh=AEoPkt3FD7wIqhqIzLlHWU/Ex7SJaJ7jvu1zQhoBqVo=;
+ b=HxivJ2c/NUSganuMDahxATBJ2FV7Y9CCIoAVp5MvVm3vlPH9Vacrjv2erzJ6+5qN+/Lw2SdzG
+ zuw41mWGj/2BFnwMRhepdFtJTS+jWgmue6nNtWlca6t9YrxWyNFQEIB
+X-Developer-Key: i=jpanis@baylibre.com; a=ed25519;
+ pk=8eSM4/xkiHWz2M1Cw1U3m2/YfPbsUdEJPCWY3Mh9ekQ=
 
-The logic for enabling the TX clock shift is inverse of enabling the RX
-clock shift. The TX clock shift is disabled when DP83822_TX_CLK_SHIFT is
-set. Correct the current behavior and always write the delay configuration
-to ensure consistent delay settings regardless of bootloader configuration.
+This patch adds XDP support to TI AM65 CPSW Ethernet driver.
 
-Reference: https://www.ti.com/lit/ds/symlink/dp83822i.pdf p. 69
+The following features are implemented: NETDEV_XDP_ACT_BASIC,
+NETDEV_XDP_ACT_REDIRECT, and NETDEV_XDP_ACT_NDO_XMIT.
 
-Fixes: 8095295292b5 ("net: phy: DP83822: Add setting the fixed internal delay")
-Signed-off-by: Tim Pambor <tp@osasysteme.de>
+Zero-copy and non-linear XDP buffer supports are NOT implemented.
+
+Besides, the page pool memory model is used to get better performance.
+However, additional testing with iperf3 revealed that the performance
+is worse while using page pool (that's why a DONOTMERGE tag is added
+to this v3). As mentioned in the discussion about v2, with none XDP
+traffic:
+- Before = without page pool -> 500 MBits/sec
+- After = with page pool -> 442 MBits/sec
+-> So, ~ 10% worse with page pool here.
+Note that the page pool 'dma_dir' parameter is set as DMA_BIDIRECTIONAL
+because eth0, for instance, could get an XDP program attached while eth1
+would not.
+
+Signed-off-by: Julien Panis <jpanis@baylibre.com>
 ---
 Changes in v3:
-  - Revert changes involving DP83822_RGMII_MODE_EN
-  - Rebase on net-next
-Changes in v2:
-  - Further cleanup of RGMII configuration
-  - Check for errors setting DP83822_RGMII_MODE_EN
----
- drivers/net/phy/dp83822.c | 37 ++++++++++++++++++++-----------------
- 1 file changed, 20 insertions(+), 17 deletions(-)
+- Fix a potential issue with TX buffer type, which is now set for each buffer.
+- Add benchmark numbers (with VS without page pool) in the commit description.
+- Link to v2: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v2-0-01c6caacabb6@baylibre.com
 
-diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
-index 95178e26a060..c3426a17e6d0 100644
---- a/drivers/net/phy/dp83822.c
-+++ b/drivers/net/phy/dp83822.c
-@@ -402,7 +402,7 @@ static int dp83822_config_init(struct phy_device *phydev)
- {
- 	struct dp83822_private *dp83822 = phydev->priv;
- 	struct device *dev = &phydev->mdio.dev;
--	int rgmii_delay;
-+	int rgmii_delay = 0;
- 	s32 rx_int_delay;
- 	s32 tx_int_delay;
- 	int err = 0;
-@@ -412,30 +412,33 @@ static int dp83822_config_init(struct phy_device *phydev)
- 		rx_int_delay = phy_get_internal_delay(phydev, dev, NULL, 0,
- 						      true);
- 
--		if (rx_int_delay <= 0)
--			rgmii_delay = 0;
--		else
--			rgmii_delay = DP83822_RX_CLK_SHIFT;
-+		/* Set DP83822_RX_CLK_SHIFT to enable rx clk internal delay */
-+		if (rx_int_delay > 0)
-+			rgmii_delay |= DP83822_RX_CLK_SHIFT;
- 
- 		tx_int_delay = phy_get_internal_delay(phydev, dev, NULL, 0,
- 						      false);
-+
-+		/* Set DP83822_TX_CLK_SHIFT to disable tx clk internal delay */
- 		if (tx_int_delay <= 0)
--			rgmii_delay &= ~DP83822_TX_CLK_SHIFT;
--		else
- 			rgmii_delay |= DP83822_TX_CLK_SHIFT;
- 
--		if (rgmii_delay) {
--			err = phy_set_bits_mmd(phydev, DP83822_DEVADDR,
--					       MII_DP83822_RCSR, rgmii_delay);
--			if (err)
--				return err;
--		}
-+		err = phy_modify_mmd(phydev, DP83822_DEVADDR, MII_DP83822_RCSR,
-+				     DP83822_RX_CLK_SHIFT | DP83822_TX_CLK_SHIFT, rgmii_delay);
-+		if (err)
-+			return err;
-+
-+		err = phy_set_bits_mmd(phydev, DP83822_DEVADDR,
-+				       MII_DP83822_RCSR, DP83822_RGMII_MODE_EN);
- 
--		phy_set_bits_mmd(phydev, DP83822_DEVADDR,
--					MII_DP83822_RCSR, DP83822_RGMII_MODE_EN);
-+		if (err)
-+			return err;
- 	} else {
--		phy_clear_bits_mmd(phydev, DP83822_DEVADDR,
--					MII_DP83822_RCSR, DP83822_RGMII_MODE_EN);
-+		err = phy_clear_bits_mmd(phydev, DP83822_DEVADDR,
-+					 MII_DP83822_RCSR, DP83822_RGMII_MODE_EN);
-+
-+		if (err)
-+			return err;
- 	}
- 
- 	if (dp83822->fx_enabled) {
+Changes in v2:
+- Use page pool memory model instead of MEM_TYPE_PAGE_ORDER0.
+- In am65_cpsw_alloc_skb(), release reference on the page pool page
+in case of error returned by build_skb().
+- [nit] Cleanup am65_cpsw_nuss_common_open/stop() functions.
+- [nit] Arrange local variables in reverse xmas tree order.
+- Link to v1: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v1-1-9f0b6cbda310@baylibre.com
+
+---
+Julien Panis (3):
+      net: ethernet: ti: Add accessors for struct k3_cppi_desc_pool members
+      net: ethernet: ti: Add desc_infos member to struct k3_cppi_desc_pool
+      net: ethernet: ti: am65-cpsw: Add minimal XDP support
+
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c    | 533 +++++++++++++++++++++++++---
+ drivers/net/ethernet/ti/am65-cpsw-nuss.h    |  13 +
+ drivers/net/ethernet/ti/k3-cppi-desc-pool.c |  36 ++
+ drivers/net/ethernet/ti/k3-cppi-desc-pool.h |   4 +
+ 4 files changed, 536 insertions(+), 50 deletions(-)
+---
+base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
+change-id: 20240223-am65-cpsw-xdp-basic-4db828508b48
+
+Best regards,
 -- 
-2.43.0
+Julien Panis <jpanis@baylibre.com>
 
 
