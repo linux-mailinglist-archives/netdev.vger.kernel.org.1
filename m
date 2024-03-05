@@ -1,166 +1,128 @@
-Return-Path: <netdev+bounces-77521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1613B87215D
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:21:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CED5872167
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:24:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 472EA1C23F24
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:21:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE9811C22102
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:24:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4386686637;
-	Tue,  5 Mar 2024 14:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBB128663A;
+	Tue,  5 Mar 2024 14:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hA3uTBDR"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HI2trvi5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6168662A;
-	Tue,  5 Mar 2024 14:21:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6E986122;
+	Tue,  5 Mar 2024 14:24:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709648480; cv=none; b=IyohiVyw81sAo9HUnd7hN2XZb6QepgH4v5WDnJZVrU/lM/9WcMqMGSu/VkOxJ+cai0WStIYfWaRaNqmQDpAJpTQ3IaBqvQNC4OZgBqKZXLjxFZ9F4qh2DRW2BMU6NKeUf7S+nF5+K2ehfFcwEZDCi+ITKnXaw/Gd5mq4qR2HAJI=
+	t=1709648691; cv=none; b=O+LpnM6GdxMvS863UfWRckA8x1PAD5A6D9EngsA1UY8ppQtKAp2dngE5VSZcHPn9B91rmBu+R93V6i6sEFoOfI30BjPbOrGgkt+CcK13ttGRKPP+EAHPkAIARu5QSi/ePn8GDpSgdNKVch34c9sHOsiOzTkUsGQq7ZxCiLa7IpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709648480; c=relaxed/simple;
-	bh=4wsJ1D/gACw9m0Q0mBOCLnDEJZilKXztwEPm8R1Dap4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dlwpfNwnlfC6JGpWPozjBt0zqr5dkb/KvVQPDSTg88YU3goiZ6PtDyRhbovZRVfBxUKtwNbygQUI3mY0fsivlb6clesIfDnZkwTVozsVSICbJ5MGDIpqennHviWCUCGpWdAqtwGlXs+ylu/Ixd00nekWlrKIj1n7LrJDiGKgfNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hA3uTBDR; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a2f22bfb4e6so111068966b.0;
-        Tue, 05 Mar 2024 06:21:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709648477; x=1710253277; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=v4wSy7E3YJQQeA67cWPwwJxebVYn1l0HIVjiXiLQflo=;
-        b=hA3uTBDR1ksY8Ege0wfgq7r1biweRyaGcq2wgpNuA/wJ2h8Gjk83WUMMBOKyh3pysO
-         5Thw9Twq+4/Bo2dp0XE3mnbPdAL9bQuro53SEFhWOpwFPW+2hHM/TtgsW2U/kQBZM3pw
-         sYdhsJPuwTTm3YmIkQ7voHUr+OypJk6tSw8ON9Kw+Wazm8sOqko59oDRHj7hSQKESeKi
-         8nW2VRRQErADN7lfVbz62Ufc+bSkBGGqSOchLP2gTCJbk3Nj3wkjbzLJkCIMQEhl9k3k
-         WEEkFcjjt22MdA3ueV1Qdp92ItunJgVhY+vDJMz4yLdDyAXHpKDvEdRH4XIF/fh9rDLX
-         acZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709648477; x=1710253277;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=v4wSy7E3YJQQeA67cWPwwJxebVYn1l0HIVjiXiLQflo=;
-        b=XKjRffFC11HN+HgNrTGfsmx8Vtn+Zd8TPHWNOd6Tn9+bjd/WSEg9dgxtoPv2He2r0N
-         BJDpr5Ku2Q6ED4oxLF/tfI5rPL51VwLVUN91caSJtAQoH27RgN9PJO3nEPhFkOWRfAqi
-         v/gqmzOcoJNlQrxWgGcc01guEsoUbbq5zao9cWyIIYsare3prMlMO/9DAQcKrrB6+Kxi
-         YI4f3o8ZuI5lsAwA1SCxgFr70A/AdbAXlV4UHZoRAdEAfUpeenyStO+iEpapNYGOcvlt
-         /ME9c28n+Lcsapp9AJt8H/CzNLZ7Bpk2CaA1ZD/dHIE53A9+bt9C35gRp4WbMXHBQvZG
-         mEHw==
-X-Forwarded-Encrypted: i=1; AJvYcCX/rOl8vNBpf11TWiVjepoiGsvp02Aom4F4YqqgFFuLvT0WbQ4f0S8pv+Pklcqrcz6lcyDqv/E+m10okvrvLcTBDHowECMHRSygcFR5yCxyC9ZN6S8lMczmUTI+JJ7ctoObsq46hx0nJXV/sIPf92TyJvA5L1PTXe5fduNP9jyHq4uq8Q==
-X-Gm-Message-State: AOJu0Yx0OA9+BjK2Qn8yBK8mYSbXt+WVCyV36FcrVMR2oINt+oDmCoSh
-	HbK0SZzzdohK8K6S0utk7ofG6ip4buJkNyy0uROzvACRRRFF5UT4
-X-Google-Smtp-Source: AGHT+IFUK19xyeHDaX7M9KvSwKFpva6VNgisudcPFsUdhCKxLODsoNp+jjPI+KJMcT6WSAhre3/T/A==
-X-Received: by 2002:a17:906:4ecb:b0:a44:cd5f:9762 with SMTP id i11-20020a1709064ecb00b00a44cd5f9762mr6552774ejv.54.1709648476389;
-        Tue, 05 Mar 2024 06:21:16 -0800 (PST)
-Received: from fedora.. (d-zg1-234.globalnet.hr. [213.149.36.248])
-        by smtp.googlemail.com with ESMTPSA id k13-20020a1709067acd00b00a44f3fb4f07sm3597969ejo.191.2024.03.05.06.21.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Mar 2024 06:21:15 -0800 (PST)
-From: Robert Marko <robimarko@gmail.com>
-To: andersson@kernel.org,
-	konrad.dybcio@linaro.org,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ansuelsmth@gmail.com,
-	linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Robert Marko <robimarko@gmail.com>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH net-next v3] net: phy: qca807x: fix compilation when CONFIG_GPIOLIB is not set
-Date: Tue,  5 Mar 2024 15:20:33 +0100
-Message-ID: <20240305142113.795005-1-robimarko@gmail.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1709648691; c=relaxed/simple;
+	bh=rby9JLSGTuoBcffipBf7GVYQGkuEynZiB9jSo67ZdOo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FEpORZPFBvaQ/7a0aTmg/owZTiuBmSMDqL6tvCfk1Iz2nAZYdSejSJqXvGhOWH0W1WRBLk7gcrS5meIoyTHNuEuvdOCKHtAy7TaKpttlqGVO9e9Jipl3F7lIxWhulAInZEJPXlaCluYycZwoWjo/SxSVGyo0UJJmbeRvj2nU0x0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HI2trvi5; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=y3qXUxkn6l40Cq+JpjQmhgzABt2ICxynEDg3FWDSFiE=; b=HI2trvi5YJDYdp7rbWYsNTKIEd
+	Fjjchumq/iplIylqDntUbdiA54UtAqwAA8B1KzW0BZIOzp7aLCKv9zujlB6Cms/IgwOlIOOXUdqpm
+	7oVP9SjTiOIr/USfxZb+6doIxIrFUcyA/wpUk8JfIoVEUksbizeHhvU7nTx1RKKnKnYgLaR1WU7s4
+	tO+J2hBKvHtnxlGb13jXVoJg2Fir5GzdeTJn45QRjqClf6gcWrtRtBOT6Q2z7qkfTTSTVZIv87w1f
+	csm0G+z4yyw7AJI6lbIBrwV8/1AmDEPveUm9oEfZVm9RY0We7sHdxE0/tq0lyHYETzn6GJKYhUC5d
+	4v2JM9fA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46290)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rhVia-0007F7-1z;
+	Tue, 05 Mar 2024 14:24:32 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rhViT-0005TU-7H; Tue, 05 Mar 2024 14:24:25 +0000
+Date: Tue, 5 Mar 2024 14:24:25 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Eric Woudstra <ericwouds@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Lucien Jheng <lucien.jheng@airoha.com>,
+	Zhi-Jun You <hujy652@protonmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 2/2] net: phy: air_en8811h: Add the Airoha
+ EN8811H PHY driver
+Message-ID: <ZecrGTsBZ9VgsGZ+@shell.armlinux.org.uk>
+References: <20240302183835.136036-1-ericwouds@gmail.com>
+ <20240302183835.136036-3-ericwouds@gmail.com>
+ <e056b4ac-fffb-41d9-a357-898e35e6d451@lunn.ch>
+ <aeb9f17c-ea94-4362-aeda-7d94c5845462@gmail.com>
+ <Zebf5UvqWjVyunFU@shell.armlinux.org.uk>
+ <0184291e-a3c7-4e54-8c75-5b8654d582b4@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0184291e-a3c7-4e54-8c75-5b8654d582b4@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Kernel bot has discovered that if CONFIG_GPIOLIB is not set compilation
-will fail.
+On Tue, Mar 05, 2024 at 03:06:45PM +0100, Andrew Lunn wrote:
+> > The only way I can see around this problem would be to look up the
+> > PHY in order to get a pointer to the struct phy_device in the network
+> > device's probe function, and attach the PHY there _before_ you register
+> > the network device. You can then return EPROBE_DEFER and, because you
+> > are returning it in a .probe function, the probe will be retried once
+> > other probes in the system (such as your PHY driver) have finished.
+> > This also means that userspace doesn't see the appearance of the
+> > non-functional network device until it's ready, and thus can use
+> > normal hotplug mechanisms to notice the network device.
+> 
+> What i'm thinking is we add another op to phy_driver dedicated to
+> firmware download. We let probe run as is, so the PHY is registered
+> and available. But if the firmware op is set, we start a thread and
+> call the op in it. Once the op exits, we signal a completion event.
+> phy_attach_direct() would then wait on the completion.
 
-Upon investigation the issue is that qca807x_gpio() is guarded by a
-preprocessor check but then it is called under
-if (IS_ENABLED(CONFIG_GPIOLIB)) in the probe call so the compiler will
-error out since qca807x_gpio() has not been declared if CONFIG_GPIOLIB has
-not been set.
+That's really not good, because phy_attach_direct() can be called
+from .ndo_open, which will result in the rtnl lock being held while
+we wait - so this is not much better than having the firmware load
+in .config_init.
 
-Fixes: d1cb613efbd3 ("net: phy: qcom: add support for QCA807x PHY Family")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202403031332.IGAbZzwq-lkp@intel.com/
-Signed-off-by: Robert Marko <robimarko@gmail.com>
----
-Changes in v3:
-* Target net-next tree
-Changes in v2:
-* Reduce the code indent level
+If we drop the lock, then we need to audit what the effect of that
+would be - for example, if the nic is being opened, it may mean
+that another attempt to open the nic could be started. Or it may
+mean that an attempt to configure the nic down could be started.
+Then the original open proceeds and state is now messed up.
 
- drivers/net/phy/qcom/qca807x.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+I do get the feeling that trying to work around "I don't want the
+firmware in the initramfs" is creating more problems and pain than
+it's worth.
 
-diff --git a/drivers/net/phy/qcom/qca807x.c b/drivers/net/phy/qcom/qca807x.c
-index 780c28e2e4aa..672c6929119a 100644
---- a/drivers/net/phy/qcom/qca807x.c
-+++ b/drivers/net/phy/qcom/qca807x.c
-@@ -732,24 +732,24 @@ static int qca807x_probe(struct phy_device *phydev)
- 	priv->dac_disable_bias_current_tweak = of_property_read_bool(node,
- 								     "qcom,dac-disable-bias-current-tweak");
- 
--	if (IS_ENABLED(CONFIG_GPIOLIB)) {
--		/* Make sure we don't have mixed leds node and gpio-controller
--		 * to prevent registering leds and having gpio-controller usage
--		 * conflicting with them.
--		 */
--		if (of_find_property(node, "leds", NULL) &&
--		    of_find_property(node, "gpio-controller", NULL)) {
--			phydev_err(phydev, "Invalid property detected. LEDs and gpio-controller are mutually exclusive.");
--			return -EINVAL;
--		}
-+#if IS_ENABLED(CONFIG_GPIOLIB)
-+	/* Make sure we don't have mixed leds node and gpio-controller
-+	 * to prevent registering leds and having gpio-controller usage
-+	 * conflicting with them.
-+	 */
-+	if (of_find_property(node, "leds", NULL) &&
-+	    of_find_property(node, "gpio-controller", NULL)) {
-+		phydev_err(phydev, "Invalid property detected. LEDs and gpio-controller are mutually exclusive.");
-+		return -EINVAL;
-+	}
- 
--		/* Do not register a GPIO controller unless flagged for it */
--		if (of_property_read_bool(node, "gpio-controller")) {
--			ret = qca807x_gpio(phydev);
--			if (ret)
--				return ret;
--		}
-+	/* Do not register a GPIO controller unless flagged for it */
-+	if (of_property_read_bool(node, "gpio-controller")) {
-+		ret = qca807x_gpio(phydev);
-+		if (ret)
-+			return ret;
- 	}
-+#endif
- 
- 	/* Attach SFP bus on combo port*/
- 	if (phy_read(phydev, QCA807X_CHIP_CONFIGURATION)) {
 -- 
-2.44.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
