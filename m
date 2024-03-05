@@ -1,115 +1,127 @@
-Return-Path: <netdev+bounces-77546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6163787227F
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:15:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40B8887222F
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:59:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15C2F1F2334D
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:15:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB2B1B260A5
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:59:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0F21272A2;
-	Tue,  5 Mar 2024 15:15:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2229126F11;
+	Tue,  5 Mar 2024 14:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A/uH7bWz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244734683;
-	Tue,  5 Mar 2024 15:15:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DFDD126F07
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 14:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709651718; cv=none; b=bQL+A3dB2vZibYGqW2DvJMDOMJqn847H4Zjx7cD4wzBtl6m/b0nvDgH5sbgFQcRBlRI29KSz7aR8j4JjhG0WcXJhAnDtzcXQ1Pjzt1nC+iYo9yiLSd/wynP3el2GLl68HmuSKy9DnCzWEFTt+yTDQfOaa2Ch9HiulvSV0kPkLDY=
+	t=1709650725; cv=none; b=t+J4hXVB4YgqXCYBH2mut/G5Ay7VThbxvp09aSuGxQg42t7WUAJGJ7pHQen1WdT3XphpNuAGQ54VRLY012i4rVqQj6b2eQj0K2uVDYymjxXWUWdVaR+l9oUZ5Q2+RU8kheqPK+UkvlcOSNwapZFJyeSNYQJHG4osvrT/beylHHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709651718; c=relaxed/simple;
-	bh=ErqQUkJuZVCDN+rlTHGkow9sEbDhSyeI9kVCG07KoLU=;
-	h=MIME-Version:Content-Type:Date:From:To:Cc:Subject:In-Reply-To:
-	 References:Message-ID; b=MeuccMTn5x2HuCqtswFfTy/p+v3OjXMu0toqLhhDNSylQ1MXCzcHhkCL62VJqaag7hv2mhwxDbASZwqX0IUHZ2YEXP1yD3495e0keJa3z6EDzOMDDZkcoIIzV9oP/2V+8pZ3quAVJc1r6QZMT8WPkCErmB/a4tCxiBBq8buoG9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=194.37.255.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
-Received: from [127.0.0.1] (helo=localhost)
-	by relay.expurgate.net with smtp (Exim 4.92)
-	(envelope-from <prvs=5808ba57af=ms@dev.tdt.de>)
-	id 1rhWCG-00CvxE-IF; Tue, 05 Mar 2024 15:55:12 +0100
-Received: from [195.243.126.94] (helo=securemail.tdt.de)
-	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ms@dev.tdt.de>)
-	id 1rhWCF-00Cvwq-Fi; Tue, 05 Mar 2024 15:55:11 +0100
-Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id 140A3240049;
-	Tue,  5 Mar 2024 15:55:11 +0100 (CET)
-Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id 752F9240040;
-	Tue,  5 Mar 2024 15:55:10 +0100 (CET)
-Received: from mail.dev.tdt.de (localhost [IPv6:::1])
-	by mail.dev.tdt.de (Postfix) with ESMTP id B9DE1363BE;
-	Tue,  5 Mar 2024 15:55:09 +0100 (CET)
+	s=arc-20240116; t=1709650725; c=relaxed/simple;
+	bh=rQ6RlTT0Uwq7mRxtdBk3ry0dIbPCmSAeuKHUDvJUyyg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=n38dQBzwWpZRCvJzJ/t7ndHKjTCJJSsYtdyYvUkw8v/HaRz6UFlELADNkaxvhL7wnGOFeWjXO8mGjilvZ+oYG/qmcZXmzBCwN23msdFOlENl9wXnz6ya5vR/SxGIb7RwXs7gBhCFCIGWZs9E5dVqcZ5Zv64VJrsVPdkWbmoxSF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A/uH7bWz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709650723;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=rQ6RlTT0Uwq7mRxtdBk3ry0dIbPCmSAeuKHUDvJUyyg=;
+	b=A/uH7bWzgJLpQ9hQyluSDZzEuINa3TFOTqPtgnLfNj8q2Gq0ti966IUKEJLVSWEYE3ZRNv
+	MejcKm9QK3WtWJa2/dSX2NUuM1+pLg5mFmXoV+/QvmVqSVVGSdBSaeIlwfqQ2QOdz98h6A
+	neYa0PPHEE7C6l3kvuRMsVWI5j315sY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-39-DzvHYpsKMkOstzEaib83-A-1; Tue, 05 Mar 2024 09:58:40 -0500
+X-MC-Unique: DzvHYpsKMkOstzEaib83-A-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33d8b2a57fdso705285f8f.1
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 06:58:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709650719; x=1710255519;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rQ6RlTT0Uwq7mRxtdBk3ry0dIbPCmSAeuKHUDvJUyyg=;
+        b=Ugo5DceTrorul0cjJDteldEkL9mdnk5wI4yvYfLhfXjaS/mTZrx1tS0yprccYgJJXk
+         OSm5cDBn0dqIr44qOFdBmoJqE9+tftxT+gFnEAelp/rhsCJ3SKVE4e/fe4VhOdvGDb73
+         vo+rIw9+1v+XQDPFLKAs8cr6DV17tMvM23J59wmmPVYrVlAJeIy7EIi5+9qNHXslcBwu
+         SBIjZQwGLEG4z3OMuNLnYmG+MrAJnLw9qkeVjWWfsi7we74nf+QSFQud0/BQVoz7ng4i
+         ucgbi6+6wD4tFXhSkoNE3q8jK/zDaAPsFSlG9Ff9F49muURsm8U2OHMjgvYFiIH17BAA
+         LfQw==
+X-Gm-Message-State: AOJu0Yw7CauV5lwE+/F7mHbbSz9aeJGCUGqilq0pJzELRdx2K6mGy5Zk
+	+3PAl+e24zQpBchhoLaPvoSRzEnHrvm7wR0UB3psXko053T9jwDiIqy82A2LQsh4+FjXuH5o1nr
+	rfCEyjlJr1xBQ8iiiE8sZ9B7Olcjon/NzmV4wklMCNSDxW0WIoq9x7g==
+X-Received: by 2002:adf:f1cf:0:b0:33d:9ee1:48db with SMTP id z15-20020adff1cf000000b0033d9ee148dbmr368352wro.2.1709650719359;
+        Tue, 05 Mar 2024 06:58:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHksmLfitw+fumOGO4zTHbKATLlt/0v1sLvYAEVSM4czHZ00D3LKq7hZUXrxjezsJJVWC9+cg==
+X-Received: by 2002:adf:f1cf:0:b0:33d:9ee1:48db with SMTP id z15-20020adff1cf000000b0033d9ee148dbmr368336wro.2.1709650718959;
+        Tue, 05 Mar 2024 06:58:38 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-235-19.dyn.eolo.it. [146.241.235.19])
+        by smtp.gmail.com with ESMTPSA id d15-20020a5d644f000000b0033e052be14fsm15093216wrw.98.2024.03.05.06.58.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Mar 2024 06:58:38 -0800 (PST)
+Message-ID: <9c4da99a83bceb4680aac9588151cc8190ff07e0.camel@redhat.com>
+Subject: Re: [PATCH net V2] net: pds_core: Fix possible double free in error
+ handling path
+From: Paolo Abeni <pabeni@redhat.com>
+To: hyper <hyperlyzcs@gmail.com>, shannon.nelson@amd.com,
+ brett.creeley@amd.com,  davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ jitxie@tencent.com,  huntazhang@tencent.com
+Date: Tue, 05 Mar 2024 15:58:37 +0100
+In-Reply-To: <20240303084954.14498-1-hyperlyzcs@gmail.com>
+References: <333dca5e-fae7-4684-afa8-10b8fdd48bf6@amd.com>
+	 <20240303084954.14498-1-hyperlyzcs@gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Tue, 05 Mar 2024 15:55:09 +0100
-From: Martin Schiller <ms@dev.tdt.de>
-To: Justin Swartz <justin.swartz@risingedge.co.za>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, linux-x25@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: x25: remove dead links from Kconfig
-Organization: TDT AG
-In-Reply-To: <20240305133139.29236-1-justin.swartz@risingedge.co.za>
-References: <20240305133139.29236-1-justin.swartz@risingedge.co.za>
-Message-ID: <18c63e9cba846c65b83532e3d73b9f42@dev.tdt.de>
-X-Sender: ms@dev.tdt.de
-User-Agent: Roundcube Webmail/1.3.17
-X-purgate: clean
-X-purgate-ID: 151534::1709650512-7D69FAEB-CF5D0AE6/0/0
-X-purgate-type: clean
 
-On 2024-03-05 14:31, Justin Swartz wrote:
-> Remove the "You can read more about X.25 at" links provided in
-> Kconfig as they have not pointed at any relevant pages for quite
-> a while.
-> 
-> An old copy of https://www.sangoma.com/tutorials/x25/ can be
-> retrieved via https://archive.org/web/ but nothing useful seems
-> to have been preserved for http://docwiki.cisco.com/wiki/X.25
-> 
-> For the sake of necromancy and those who really did want to
-> read more about X.25, a previous incarnation of Kconfig included
-> a link to:
-> http://www.cisco.com/univercd/cc/td/doc/product/software/ios11/cbook/cx25.htm
-> 
-> Which can still be read at:
-> https://web.archive.org/web/20071013101232/http://cisco.com/en/US/docs/ios/11_0/router/configuration/guide/cx25.html
-> 
-> Signed-off-by: Justin Swartz <justin.swartz@risingedge.co.za>
-> ---
->  net/x25/Kconfig | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/net/x25/Kconfig b/net/x25/Kconfig
-> index 68729aa3a..dc72302cb 100644
-> --- a/net/x25/Kconfig
-> +++ b/net/x25/Kconfig
-> @@ -17,8 +17,6 @@ config X25
->  	  if you want that) and the lower level data link layer protocol LAPB
->  	  (say Y to "LAPB Data Link Driver" below if you want that).
-> 
-> -	  You can read more about X.25 at 
-> <https://www.sangoma.com/tutorials/x25/> and
-> -	  <http://docwiki.cisco.com/wiki/X.25>.
->  	  Information about X.25 for Linux is contained in the files
->  	  <file:Documentation/networking/x25.rst> and
->  	  <file:Documentation/networking/x25-iface.rst>.
+On Sun, 2024-03-03 at 16:49 +0800, hyper wrote:
+> When auxiliary_device_add() returns error and then calls
+> auxiliary_device_uninit(), Callback function pdsc_auxbus_dev_release
+> calls kfree(padev) to free memory. We shouldn't call kfree(padev)
+> again in the error handling path.
+>=20
+> Fix this by cleaning up the redundant kfree() and putting
+> the error handling back to where the errors happened.
+>=20
+> Fixes: 4569cce43bc6 ("pds_core: add auxiliary_bus devices")
+> Signed-off-by: hyper <hyperlyzcs@gmail.com>
 
-Acked-by: Martin Schiller <ms@dev.tdt.de>
+Note that submitters are required to use real identity:
+
+https://elixir.bootlin.com/linux/v6.8-rc7/source/Documentation/process/subm=
+itting-patches.rst#L438
+
+Could you please repost avoiding the nick name?
+
+You can retain the already collected acks.
+
+Thanks,
+
+Paolo
+
 
