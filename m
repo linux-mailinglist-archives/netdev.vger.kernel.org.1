@@ -1,48 +1,63 @@
-Return-Path: <netdev+bounces-77312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CD488713B9
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 03:41:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A26D8713D3
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 03:46:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD8771F238A6
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 02:41:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AB991C2095D
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 02:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42EAB24B52;
-	Tue,  5 Mar 2024 02:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D86286BF;
+	Tue,  5 Mar 2024 02:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AEGsdCZ6"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QmLPtcIt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1EF28684
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 02:41:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92BABFC09;
+	Tue,  5 Mar 2024 02:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709606470; cv=none; b=CMneLo/DEp+t5kiGDM24NXmCk+rhq0/CD2jUlvn3e+wXDGWl7h+S0ShrBBbf6/bnMCC6bG+6IFmCwLExFRdRLs7tGWD0FssyLqE7IVX/797MnVgVf10wokyD5XJwu7sTcZm/LSDgSrhaXu1YgVdSblQKm+O5km5Fq7uuO++7mKA=
+	t=1709606813; cv=none; b=Mc2ODbfHAnfhjW5cAVezju2gkVjIYUplsYAqIlA6tNXtAvaDxZ0uT2biIVxrwh5PHbhx8M2zUhjII8jMCew4cZwprktaA2jkh/Djii8h5bI0BanmMhFt5gBZ5JQljXwINIeJUmIU5c+Y82omhxNBlEOOgfsjHd64yYWl0PWS/wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709606470; c=relaxed/simple;
-	bh=ajVRT0nwCB34MxHO3njsvkFSUEkust6J9s0OvJjdu90=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pxyLjjnrI1eeStoJIXGHTgt2DQ+XPidh6KxJNl/oVvyN4hg6lKoDV1Egn8xgDoEbTkvyIBgcpo1HnyfOCn7JbmbMASryh62mCOrS8tZmjYojYp87uGrEpgr7/PuEnQeV7Zzmae+ulWhezcmMblB49S5Xoe7K1vpy03otnmeBiuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AEGsdCZ6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28A31C433C7;
-	Tue,  5 Mar 2024 02:41:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709606469;
-	bh=ajVRT0nwCB34MxHO3njsvkFSUEkust6J9s0OvJjdu90=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=AEGsdCZ6bMjicU5B7bQ6g6ubutX7uGVO9cBTL4qdBAHMoZVjYaBUlCAHTDQpJkCHG
-	 YfUJ5zPC+sBKws3BgpQBZxwZdggiMXB0fKqXDXG73BWehX5FujHAwy3EgIqE2u6w/T
-	 zcpiidHHfs2CoIUos/1hIv51PF3NbuuKAd+yNBAGZXAPXfWhDIoH9JhC28rDJBXDDZ
-	 qeMOOXtjUQUfcoU8QRrVVOe/tUz11sUTT5UJFbisuFh638bTbRkNlMCZTW8QRd4D71
-	 ME3L8A+ocdh02AwDJffAma/0enAdAYQsFHIEFqPUKvi8eoMn9qTnyW2ws3pUyNj/SG
-	 cFntrsr+yjUKQ==
-Message-ID: <d0719417-e67f-48a9-ac1a-970d0c405270@kernel.org>
-Date: Mon, 4 Mar 2024 19:41:07 -0700
+	s=arc-20240116; t=1709606813; c=relaxed/simple;
+	bh=wi1O6vhp6yalvefyIniYQ56KvD98lh/d88XSIE2cHYM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=B7kzdiv6FxszdPnHnMcRLIDfZeRC04hSBd05Wy83BzdX9zF4kkMtYsJiQt824UVWKKA8gn4UNw2DZM6wCXXa5cFaxXohUug2AH9GyCfj1p9Z1+KYiK9rb4L5zh90zynxHHTUW1OIsoeTBlsvQdaj0TLnhMJUWEjB0shtBkiz+PU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=QmLPtcIt; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4251P9oS020905;
+	Tue, 5 Mar 2024 02:46:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=SPseMgNHICrE3PG4zZrb4tfldUcXoYVBpbVb9JBbf0A=; b=Qm
+	LPtcItY0+pli8PXxm6Ob0vNL5aOTGSe62SNnAo+d20x5cu3RqTj50xAkvm7Bvu1B
+	NYlRoHeRefwP8a9GXiU82+grWF3K3oTgE8BPG3YDLthhG7xJof9V8zfcA/XNrJQe
+	R7oniHUAmkOG0lokCZawIINVqOi8ncYCl/zR8ejE9NDnwNQxK4XaXbOocUUIGusk
+	kq4Jkq/e2Fs1IJNFJoDinljcW0IQyU+a2su73O8z5zaVUY2PS1lhR0r+1vsqvf1U
+	e68atX43MeKgefzXQ85VqaMLJKtIAH7JchdnJ0EiPaOzjTrGC9mOIoeWUwe1n8jr
+	MqC53YI4uRpL87lTpw8Q==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wnarj24xb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Mar 2024 02:46:37 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 4252kadZ018363
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 5 Mar 2024 02:46:37 GMT
+Received: from [10.110.86.150] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 4 Mar
+ 2024 18:46:36 -0800
+Message-ID: <2cfaec27-7b7d-4727-b625-2df5b6879da6@quicinc.com>
+Date: Mon, 4 Mar 2024 18:46:35 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,42 +65,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] selftests/net: force synchronized GC for a test.
+Subject: Re: [PATCH v7 3/3] wifi: ath11k: support hibernation
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, Kui-Feng Lee <sinquersw@gmail.com>
-Cc: Kui-Feng Lee <thinker.li@gmail.com>, netdev@vger.kernel.org,
- ast@kernel.org, martin.lau@linux.dev, kernel-team@meta.com,
- davem@davemloft.net, kuifeng@meta.com
-References: <20240223081346.2052267-1-thinker.li@gmail.com>
- <20240223182109.3cb573a2@kernel.org>
- <b1386790-905f-4bc4-8e60-c0c86030b60c@kernel.org>
- <6b73aa09-b842-4bd0-abab-7011495e7176@gmail.com>
- <d2a4bcab-4fab-4750-b856-a8a9b674a31a@gmail.com>
- <20240304074421.41726c4d@kernel.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240304074421.41726c4d@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: Baochen Qiang <quic_bqiang@quicinc.com>, <ath11k@lists.infradead.org>,
+        <manivannan.sadhasivam@linaro.org>
+CC: <linux-wireless@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <mhi@lists.linux.dev>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>
+References: <20240305021320.3367-1-quic_bqiang@quicinc.com>
+ <20240305021320.3367-4-quic_bqiang@quicinc.com>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <20240305021320.3367-4-quic_bqiang@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: As1TGrEn59R--rOTg5BDEyvIMXJUl623
+X-Proofpoint-GUID: As1TGrEn59R--rOTg5BDEyvIMXJUl623
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-04_20,2024-03-04_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=856 adultscore=0
+ spamscore=0 impostorscore=0 mlxscore=0 malwarescore=0 phishscore=0
+ suspectscore=0 bulkscore=0 priorityscore=1501 clxscore=1015
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2402120000 definitions=main-2403050019
 
-On 3/4/24 8:44 AM, Jakub Kicinski wrote:
-> On Fri, 1 Mar 2024 16:45:58 -0800 Kui-Feng Lee wrote:
->> However, some extra waiting may be added to it.
->> There are two possible extra waiting. The first one is calling
->> round_jiffies() in fib6_run_gc(), that may add 750ms at most. The second
->> one is the granularity of waiting for 5 seconds (in our case) is 512ms
->> for HZ 1000 according to the comment at the very begin of timer.c.
->> In fact, it can add 392ms for 5750ms (5000ms + 750ms). Overall, they may
->> contribute up to 1144ms.
->>
->> Does that make sense?
->>
->> Debug build is slower. So, the test scripts will be slower than normal
->> build. That means the script is actually waiting longer with a debug build.
+On 3/4/2024 6:13 PM, Baochen Qiang wrote:
+> Now that all infrastructure is in place and ath11k is fixed to handle all the
+> corner cases, power down the ath11k firmware during suspend and power it back
+> up during resume. This fixes the problem when using hibernation with ath11k PCI
+> devices.
 > 
-> Meaning bumping the wait to $((($EXPIRE + 1) * 2))
-> should be enough for the non-debug runner?
+> For suspend, two conditions needs to be satisfied:
+>         1. since MHI channel unprepare would be done in late suspend stage,
+>            ath11k needs to get all QMI-dependent things done before that stage.
+>         2. and because unprepare MHI channels requires a working MHI stack,
+>            ath11k is not allowed to call mhi_power_down() until that finishes.
+> So the original suspend callback is separated into two parts: the first part
+> handles all QMI-dependent things in suspend callback; while the second part
+> powers down MHI in suspend_late callback. This is valid because kernel calls
+> ath11k's suspend callback before all suspend_late callbacks, making the first
+> condition happy. And because MHI devices are children of ath11k device
+> (ab->dev), kernel guarantees that ath11k's suspend_late callback is called
+> after QRTR's suspend_late callback, this satisfies the second condition.
+> 
+> Above analysis also applies to resume process. so the original resume
+> callback is separated into two parts: the first part powers up MHI stack
+> in resume_early callback, this guarantees MHI stack is working when
+> QRTR tries to prepare MHI channels (kernel calls QRTR's resume_early callback
+> after ath11k's resume_early callback, due to the child-father relationship);
+> the second part waits for the completion of restart, which won't fail now
+> since MHI channels are ready for use by QMI.
+> 
+> Another notable change is in power down path, we tell mhi_power_down() to not
+> to destroy MHI devices, making it possible for QRTR to help unprepare/prepare
+> MHI channels, and finally get us rid of the probe-defer issue when resume.
+> 
+> Also change related code due to interface changes.
+> 
+> Tested-on: WCN6855 hw2.0 PCI WLAN.HSP.1.1-03125-QCAHSPSWPL_V1_V2_SILICONZ_LITE-3.6510.30
+> 
+> Tested-by: Takashi Iwai <tiwai@suse.de>
+> Signed-off-by: Baochen Qiang <quic_bqiang@quicinc.com>
+Acked-by: Jeff Johnson <quic_jjohnson@quicinc.com>
 
-I have not had time to do a deep a dive on the timing, but it seems odd
-to me that a 1 second timer can turn into 11 sec. That means for 10
-seconds (10x the time the user requested) the route survived.
 
