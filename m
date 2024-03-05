@@ -1,120 +1,80 @@
-Return-Path: <netdev+bounces-77513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C19FF872082
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:41:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D8E18720D6
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:52:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FBE71F21F8B
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:41:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E3A8B26AF0
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:52:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308AD85C70;
-	Tue,  5 Mar 2024 13:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFF685642;
+	Tue,  5 Mar 2024 13:52:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DOCvtJWD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BKM2NUpQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9594984A48;
-	Tue,  5 Mar 2024 13:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F505102B;
+	Tue,  5 Mar 2024 13:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709646101; cv=none; b=blZk2CXhQ4m2u6NRUA/u9TjZ3+8JnpeXeGLgjuis8F9wAnVYZFbFeEuMiD9TidtxOlzxA/ljiVC/5oLjAkyh9EbL2nGteH2LfFJKGfHtczB9i54fJ5PturfdpvboVq+eF65KdvtIIXPHz+7UKyG5Pq74aU7wag3klUEx8DyuAP8=
+	t=1709646762; cv=none; b=oL/CyMx1dVbFsPwKSfDS1iG3Bsx+nU5NyyBIr0FsD6/wCWP7+G65iFyS2vkDwZ4MQFKv1/sKxHlqhF8ymspeZfh2dGpa1BTQgsrQ0CgF+1xCgh1Rw73B9A7kaCcnoqQc6Ua8Lj3FmmEgYHZ7bHo4G73bozk/PE9XyBqz4kFglpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709646101; c=relaxed/simple;
-	bh=W+2nNfu/SH120fh3upXQutRAF4cFUOE0j3C5s8jvs54=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DY6Wrirn568kV0CpbgFT53TBhG+a+Qd0GZSa1Ycj+Ux0ajpyoRSy6FLut5Y1clIOu3jAauaKiXwdTh58CTfBswgFWpBrQES8ABFi0KqW5G8EvHwKh81ga1IS8yhejXxd3Gcp4MpCadfLoX4JXPgIq2xZKuayEoLSGv4VIKx/3ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DOCvtJWD; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 136191BF20B;
-	Tue,  5 Mar 2024 13:41:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709646091;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DZDyctNRQfxHIrXGUPl9xyE+ahVMXlpoMQhkMhBvw8w=;
-	b=DOCvtJWDLZSm2JIeQ9Omeu4d1Hzx3R3n13mnOKJCS0QzLpxZ+i7VVBJsa00u2c3FzBbsZr
-	TmtD2SjBYbmETmRwp/+3T5y3zzza3j1KOfQ1xoW2OUELvxf4NQMhBDz6e3XWjVquzKlEJC
-	x+dgTmKckoL+noQtiQMSS547dTOKuynN+8mmywNWdhm87b8lE8dgTk45OOlyiPZvJeeGiO
-	sNI13I1pKmRGBOTt5JmHC9Bfhf5+aR8uhvo7caHoYM7kl+4HZ7orI3kIkQCB6w2oB2q9Ld
-	LuRUyZ8zDKFaO1V3pkg+qhqKCUBUnC7667dPZPzCnsziw+PqKqwchkGgI+CMBA==
-Message-ID: <85da1b70-d3fe-4117-a87c-53559b299867@bootlin.com>
-Date: Tue, 5 Mar 2024 14:41:29 +0100
+	s=arc-20240116; t=1709646762; c=relaxed/simple;
+	bh=b/75Y8D1XYqdu9zUfIy3JxL+23E6PphPsfEVHE/48rQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZrX++itCdEZZQFKMADUi8AIPuxzkVZn1aV4Dvm2In6GsYnVG+DK6kfuf68VC1YN4bucX2IytFoqj7NcR3JzuhY6h47LeeyJRuGkNCF8C818U4eeEeGxQ9Hk67wYqcmG97BljtE66/86n7RVhGY9GS3KSjOUt+gJlVlCVi9AdaxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BKM2NUpQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36561C43390;
+	Tue,  5 Mar 2024 13:52:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709646762;
+	bh=b/75Y8D1XYqdu9zUfIy3JxL+23E6PphPsfEVHE/48rQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BKM2NUpQgft7AsZWuxoIMvwBDZF1xTbBQOEactvkwuefEM+OwKD3DPTap+WoTWa8B
+	 cXzNKMYEMeRrGqtSJSrpA12US4xNQsPmhLoKTmSSR9d/qcyrVOjLIBDUT0oIoD1MaD
+	 +0xpsat3ZTKYp1Hea9/53t67yN1/cl+725l5d4GENhJi4XqjF1/yHrXcTQSpneOFxP
+	 dhu35qRTMR+INbOyalfx3BSapim4tUggNw1gYYRIa8GZktYuhwSWCQAbgbJBCF5D2x
+	 J7Q7FF5wiEuseAavYJ+olkgBbq87qU4VBZAurt93FRw1OtIKxaaoKE5+Yvi0ZjdCak
+	 kHTMiI8mQ5Avw==
+Date: Tue, 5 Mar 2024 13:52:38 +0000
+From: Simon Horman <horms@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+	edumazet@google.com, Sabrina Dubroca <sd@queasysnail.net>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dsahern@kernel.org
+Subject: Re: [PATCH net-next] net: macsec: Leverage core stats allocator
+Message-ID: <20240305135238.GG2357@kernel.org>
+References: <20240305113728.1974944-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] dt-bindings: net: dp83822: change ti,rmii-mode
- description
-Content-Language: en-US
-To: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>,
- Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, Yen-Mei Goh <yen-mei.goh@keysight.com>,
- =?UTF-8?Q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>
-References: <20240305133137.125020-1-jeremie.dautheribes@bootlin.com>
-From: =?UTF-8?B?SsOpcsOpbWllIERhdXRoZXJpYmVz?=
- <jeremie.dautheribes@bootlin.com>
-In-Reply-To: <20240305133137.125020-1-jeremie.dautheribes@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: jeremie.dautheribes@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240305113728.1974944-1-leitao@debian.org>
 
-Sorry I forgot to include the "net-next" entry in the subject, I'm 
-sending this patch again with the correct subject.
+On Tue, Mar 05, 2024 at 03:37:27AM -0800, Breno Leitao wrote:
+> With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
+> convert veth & vrf"), stats allocation could be done on net core
+> instead of in this driver.
+> 
+> With this new approach, the driver doesn't have to bother with error
+> handling (allocation failure checking, making sure free happens in the
+> right spot, etc). This is core responsibility now.
+> 
+> Remove the allocation in the macsec driver and leverage the network
+> core allocation instead.
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-On 05/03/2024 14:31, Jérémie Dautheribes wrote:
-> Drop reference to the 25MHz clock as it has nothing to do with connecting
-> the PHY and the MAC.
-> Add info about the reference clock direction between the PHY and the MAC
-> as it depends on the selected rmii mode.
-> 
-> Suggested-by: Andrew Lunn <andrew@lunn.ch>
-> Signed-off-by: Jérémie Dautheribes <jeremie.dautheribes@bootlin.com>
-> ---
-> This patch follows on from my previous patch series [1] which has already been
-> merged into the net-next tree and which added the "ti,rmii-mode" property.
-> As suggested by Andrew Lunn, this patch updates the description of this
-> property to make it more consistent with the master/slave relationship it
-> conveys.
-> 
-> [1] https://lore.kernel.org/all/20240222103117.526955-1-jeremie.dautheribes@bootlin.com/
-> 
->   Documentation/devicetree/bindings/net/ti,dp83822.yaml | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/ti,dp83822.yaml b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-> index 8f23254c0458..784866ea392b 100644
-> --- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-> +++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-> @@ -84,10 +84,10 @@ properties:
->       description: |
->          If present, select the RMII operation mode. Two modes are
->          available:
-> -         - RMII master, where the PHY operates from a 25MHz clock reference,
-> -         provided by a crystal or a CMOS-level oscillator
-> -         - RMII slave, where the PHY operates from a 50MHz clock reference,
-> -         provided by a CMOS-level oscillator
-> +         - RMII master, where the PHY outputs a 50MHz reference clock which can
-> +         be connected to the MAC.
-> +         - RMII slave, where the PHY expects a 50MHz reference clock input
-> +         shared with the MAC.
->          The RMII operation mode can also be configured by its straps.
->          If the strap pin is not set correctly or not set at all, then this can be
->          used to configure it.
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
