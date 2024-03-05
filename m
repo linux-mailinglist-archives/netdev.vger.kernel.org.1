@@ -1,125 +1,112 @@
-Return-Path: <netdev+bounces-77401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31FDE871919
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 10:09:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C333871973
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 10:21:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E21912812F2
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 09:09:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE3B11C22824
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 09:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC1325103D;
-	Tue,  5 Mar 2024 09:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94C725102F;
+	Tue,  5 Mar 2024 09:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="M/rs/m26"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mI7zDYJ5"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F2D53370;
-	Tue,  5 Mar 2024 09:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E49250A69;
+	Tue,  5 Mar 2024 09:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709629735; cv=none; b=Il+iVfaWzthCG7obZKfqkkpO88lQ0aGT10hO8x9CuRMovHN32vI1ra29QdRxKMJ70i8NlpWQw2o4Bi4hNVsNOn5Scuv9Zd02mhQnblYZu/CAuLzPzr/SfKprbufhEmWfLBAb0ARUsKroDFyfRjTbsPi+C6LYTsMOnAt344zU4Lw=
+	t=1709630457; cv=none; b=WF3+KAZeELpnlvcnXVUT4gl+1ouz6VJHN3cEhj7D0elVXZzhrZgXa1KiiutpbznzmnFsVlpDMYow8TMGR5LnLwiSiUG+n3gfEJu4R4kO85khQHlAphEHFE9UCEfTTfCPQ9yM95MwenKSMzDRETx/Dai2CfSf8rUNCalmC9zAgmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709629735; c=relaxed/simple;
-	bh=87zO1li67o9oCjCgct+OtLhcsg2+fr4+Vxz3c7BSiRI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tWy7pGoCiADaJnYo1mzXvjLgd4MjJ5aFr5L/PVw7BnoEjY+W22WaiIyjZ/DkpAHg9mcaYUudM149JdCIIb6GVD7OqfwDG3qm1geTrBvzo/lyAV3htPFFSxKtRzjT7Aw+2P1aDPmFwsISVSgKFCN1KNBsCIM+me+H9Ev5AqUhBl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=M/rs/m26; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=zM31mjwX3JTMgX8Kh4H//nkl0RTMrwfwymox2pK/WPs=; b=M/rs/m26NRtupCMN5yiExKoG2j
-	N7INKJ7fFPJ8i2hgHkcUo1Zp03gmv6Lbi4mLvX160bfvkFWchn/z8pzCH4eRz9j52YTz0TVpInYiL
-	jBUsZezh2gAtH9OC1vig7rdh5nI9YMEDCEfaIn1+QDQwzC3s073nOdhsgEyHpNX45YsQg3vFovFPx
-	zTrpvQT5l3mvOiW26SKzfU3HGQB/g5CkmHvtKjk2F82RZWrSG49JCYiQDIHglNxLjfSx8gVee9rJa
-	pgKZCGyWNGXQYakfYQU9wvV8OYp361pvA3obncb5jh6DsxB/ghs1EHF/ZYv5XaG4K4mXMbcJOJRhj
-	WxPEKapA==;
-Received: from 38.249.197.178.dynamic.dsl-lte-bonding.lssmb00p-msn.res.cust.swisscom.ch ([178.197.249.38] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rhQn4-000Dg3-9V; Tue, 05 Mar 2024 10:08:50 +0100
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>
-Subject: [PATCH bpf 2/2] selftests/bpf: Fix up xdp bonding test wrt feature flags
-Date: Tue,  5 Mar 2024 10:08:29 +0100
-Message-Id: <20240305090829.17131-2-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20240305090829.17131-1-daniel@iogearbox.net>
-References: <20240305090829.17131-1-daniel@iogearbox.net>
+	s=arc-20240116; t=1709630457; c=relaxed/simple;
+	bh=Sgyyt8kvTxLJxurki0hYZ0igZUYEyJwo/AUa81JBIM8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=S0yuh77HzGfiLbgRiX1iOEF6ocpeE0x3Uv+fgAQwFVUsy/LEwSk5DSv+5veo/Awf5L7K5PTbjM8t8CMJuU/uLxnqJD9+iD2KMWCZr1Zn8KTPosL4MBYDzqUuxjdHD+zGMPDabhzcxYfqc5Qnvhr3XBnAWPy41WwaKnx2nWT2IhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mI7zDYJ5; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7882e94d408so120987985a.0;
+        Tue, 05 Mar 2024 01:20:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709630455; x=1710235255; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PRRM/ARae3sSFkhIeSz5op1mbTEpfUsArfGcXBHTCfc=;
+        b=mI7zDYJ5fZgq2niLF3hSsh1Ixt5T+WmzAlHCU4wyV2lr44iMu4QW3lOk3AMU+hsP0q
+         cqUL4hpG8z7zrgCDLK4L2OS6lpl4340nsa/So0dNgRPjTM1sGqjs3ZqXmlTACZIR/0Ul
+         TElZhKzxqfrp++eNQDZ/NYEiPhfOTgPcexEcfVCp6s6pU5097yuXifhOEUcFuZULLStF
+         S6Zfo4CbwHnrShKx6niF7BsJMns0t3meHGtMNbP+DgY22eJG6aUDJi1C1I0W9ThXiL3P
+         pCkj1Jaxs/ljzK21iC/b/eFIikz8lLWmLLCfsF1+2ZdcyOFi5/TsCc+tNoaKaXUp89CA
+         msBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709630455; x=1710235255;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=PRRM/ARae3sSFkhIeSz5op1mbTEpfUsArfGcXBHTCfc=;
+        b=HXCIk6ZYLDzRuwAOs3CF/tTMbJFyPm59VCjlVr+rVlmCmLC+ScdGEW7OoaML43ttZb
+         OzC4dnZDTeL6NnetiNwPfaRYuTZ4ALw0nuxrBoU+c8mMKqiAnfju2KpnSSa6DIGROrRX
+         c2IwOSakfRMGq5HXiaPWG+bEJk7AnDI4YnyjBOa96RBf5B4RrRIcB1QCmOygYstW6XJP
+         5g58miTQ0JSY/XxyT84IF06vuOtJQxgATgwHI7TlJzf6ikH/AcUlkbz+IiCOZUYg5BMC
+         oLoK9uk7CtmFhvPSZsO+emzqNT8o40Q+SCNVfC8R9mwTm4akQezcwGrOge0C8LrZGbaN
+         Ymjw==
+X-Forwarded-Encrypted: i=1; AJvYcCVrw+XdubaGCg+PjMy7PgpUu01rJvaTOMKbudwp4VCyrnzMV9Q8dVQa/QGSkEb9Ce/2YwBvjvTgErD+HNQpaEQqWHKaaCuCyV8DnHi8
+X-Gm-Message-State: AOJu0YxKRxUo834xz1yN3zR7WH/cxgPh2FbtyjWei7BV3kf6y29utLX1
+	Hhc/+jZOJZvzUIdz2tFXbsB3cCj/EI2x1uJoH8SBdvkaWiAB1yYC
+X-Google-Smtp-Source: AGHT+IHoFHlvP2YyD4zZfG0qQU+xEscrZXbwRFr/v8RhQVATagvUg9jqQOi7loyZcdnSOhqUEpiXfQ==
+X-Received: by 2002:a05:620a:1a0f:b0:788:137b:b847 with SMTP id bk15-20020a05620a1a0f00b00788137bb847mr1555482qkb.7.1709630454804;
+        Tue, 05 Mar 2024 01:20:54 -0800 (PST)
+Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
+        by smtp.gmail.com with ESMTPSA id x2-20020a05620a0b4200b007881e5a90e9sm2926930qkg.125.2024.03.05.01.20.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Mar 2024 01:20:54 -0800 (PST)
+Date: Tue, 05 Mar 2024 04:20:54 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Breno Leitao <leitao@debian.org>, 
+ kuba@kernel.org, 
+ davem@davemloft.net, 
+ pabeni@redhat.com, 
+ edumazet@google.com, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ horms@kernel.org, 
+ dsahern@kernel.org
+Message-ID: <65e6e3f62c314_3cfad29462@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240304183810.1474883-1-leitao@debian.org>
+References: <20240304183810.1474883-1-leitao@debian.org>
+Subject: Re: [PATCH net-next 1/2] net: tuntap: Leverage core stats allocator
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27204/Mon Mar  4 10:25:09 2024)
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Adjust the XDP feature flags for the bond device when no bond slave
-devices are attached. After 9b0ed890ac2a ("bonding: do not report
-NETDEV_XDP_ACT_XSK_ZEROCOPY"), the empty bond device must report 0
-as flags instead of NETDEV_XDP_ACT_MASK.
+Breno Leitao wrote:
+> With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
+> convert veth & vrf"), stats allocation could be done on net core
+> instead of in this driver.
+> 
+> With this new approach, the driver doesn't have to bother with error
+> handling (allocation failure checking, making sure free happens in the
+> right spot, etc). This is core responsibility now.
+> 
+> Remove the allocation in the tun/tap driver and leverage the network
+> core allocation instead.
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-  # ./vmtest.sh -- ./test_progs -t xdp_bond
-  [...]
-  [    3.983311] bond1 (unregistering): (slave veth1_1): Releasing backup interface
-  [    3.995434] bond1 (unregistering): Released all slaves
-  [    4.022311] bond2: (slave veth2_1): Releasing backup interface
-  #507/1   xdp_bonding/xdp_bonding_attach:OK
-  #507/2   xdp_bonding/xdp_bonding_nested:OK
-  #507/3   xdp_bonding/xdp_bonding_features:OK
-  #507/4   xdp_bonding/xdp_bonding_roundrobin:OK
-  #507/5   xdp_bonding/xdp_bonding_activebackup:OK
-  #507/6   xdp_bonding/xdp_bonding_xor_layer2:OK
-  #507/7   xdp_bonding/xdp_bonding_xor_layer23:OK
-  #507/8   xdp_bonding/xdp_bonding_xor_layer34:OK
-  #507/9   xdp_bonding/xdp_bonding_redirect_multi:OK
-  #507     xdp_bonding:OK
-  Summary: 1/9 PASSED, 0 SKIPPED, 0 FAILED
-  [    4.185255] bond2 (unregistering): Released all slaves
-  [...]
-
-Fixes: 9b0ed890ac2a ("bonding: do not report NETDEV_XDP_ACT_XSK_ZEROCOPY")
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
----
- tools/testing/selftests/bpf/prog_tests/xdp_bonding.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_bonding.c b/tools/testing/selftests/bpf/prog_tests/xdp_bonding.c
-index c3b45745cbcc..6d8b54124cb3 100644
---- a/tools/testing/selftests/bpf/prog_tests/xdp_bonding.c
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_bonding.c
-@@ -511,7 +511,7 @@ static void test_xdp_bonding_features(struct skeletons *skeletons)
- 	if (!ASSERT_OK(err, "bond bpf_xdp_query"))
- 		goto out;
- 
--	if (!ASSERT_EQ(query_opts.feature_flags, NETDEV_XDP_ACT_MASK,
-+	if (!ASSERT_EQ(query_opts.feature_flags, 0,
- 		       "bond query_opts.feature_flags"))
- 		goto out;
- 
-@@ -601,7 +601,7 @@ static void test_xdp_bonding_features(struct skeletons *skeletons)
- 	if (!ASSERT_OK(err, "bond bpf_xdp_query"))
- 		goto out;
- 
--	ASSERT_EQ(query_opts.feature_flags, NETDEV_XDP_ACT_MASK,
-+	ASSERT_EQ(query_opts.feature_flags, 0,
- 		  "bond query_opts.feature_flags");
- out:
- 	bpf_link__destroy(link);
--- 
-2.34.1
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
