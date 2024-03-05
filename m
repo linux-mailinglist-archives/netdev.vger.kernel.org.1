@@ -1,59 +1,72 @@
-Return-Path: <netdev+bounces-77344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9579871531
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 06:13:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5374871536
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 06:24:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F3251F226B5
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 05:13:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47828B20FA1
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 05:24:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B50A45D738;
-	Tue,  5 Mar 2024 05:13:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A43B446444;
+	Tue,  5 Mar 2024 05:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BOiJJHQp"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="kCACNL11"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9160E5A0E1
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 05:13:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F4945BFB;
+	Tue,  5 Mar 2024 05:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709615617; cv=none; b=NZDYZXJrvvU4OEgVbWdhD+ktNpJP2Ktd62ORUP2QPfTarBf0aWTmMwHTOA7RTQLTXVueJEdwasz5D/QHfAX5uNLYsWZeV7ksZQEtFRwG7YvkNRk5esXxQx/cYjeCaZiDiRWal0DB3E+RH7XAyN4KrjFWvGOqc9/spkvNe4kUxKE=
+	t=1709616286; cv=none; b=B0CPvYgJMpdxBaB/G4sjZySnAcM741m72MkbEt7zIbynbF8t71Wuh/wjVZ0QjjAgvQQkhLItboMgb8EPpF69oHs4LenfvE0ExTB2aI3TDjVx5lIzZ84tsZidRt1emuNRBMtWP4TMoBrzaIhgxK4IS4sogIgSuy2s4d4LpbEnWzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709615617; c=relaxed/simple;
-	bh=NBBWU1nSC/pxyRcC+A0Y/j8V8klT0MQGokbDi2j5C7g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cfxTlI+D7zk97LyO/bPGL6BR8fDLnUeCVGJXe3TikzaAkUJD6dwz9X9qJRNXk7Q41UCjoOJc8YoU3pU+6YOYh/HdjEDKifh1+VkrCg5ybe7qX+M8aiR93nr5LgndhnwcUv7cdcPyR7uOhKLnh2RP876anfpNVfq/v+ECb4TSRL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BOiJJHQp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0716C433B2;
-	Tue,  5 Mar 2024 05:13:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709615617;
-	bh=NBBWU1nSC/pxyRcC+A0Y/j8V8klT0MQGokbDi2j5C7g=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BOiJJHQpknqoI2yicNvR/4k5D9lio7x3Qta5VAz6yrsM6cvuleeXoHqJPDLHFa9Wi
-	 W1KgzeV2fN97PAW7WotGZ/JGUJbzknTw5I34Dq3i/0XMk8vZgOKJWoYtnSM8TUdTjg
-	 ZZ4GA/TkT4sUNGmM3widdRfmQhS7ayncIqbdAWwysE8D5+I3MJ8ZssUrGauVHAXURO
-	 5a0YUtO8vKMwnjhzf1HeddLhimJsr5JL1EH9HwnuAHBmMndcL2aEDHcM06jUecAbPu
-	 LXgQ3Pbg20nuufngnVZbTWt2jf1C//rrv4Vb7lS0j5hfz/LnycBJfyDKr555g27TS3
-	 AkFLgjttijWuw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	donald.hunter@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 3/3] tools: ynl: remove __pycache__ during clean
-Date: Mon,  4 Mar 2024 21:13:28 -0800
-Message-ID: <20240305051328.806892-4-kuba@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240305051328.806892-1-kuba@kernel.org>
-References: <20240305051328.806892-1-kuba@kernel.org>
+	s=arc-20240116; t=1709616286; c=relaxed/simple;
+	bh=ovMFF2p5oK8EYHVURck+QPJEApIyCDpbd/gzNOK+sI0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ItDDu5me6Ue6kw52eO3gBD+h8ZY2vPXoSa6bVDpUk5ujHCM+ZgdKhLCAk0cZNWOHZQ+ZCqg42LGyCQl3QX0M/Nubkc9GhL6XUy+wiWIIoEms+7wgW7NsYV5oudPeGt54tfV9SHXoVXeXHXuGVS5x5qhTlYrGhRItZRqd7xR0TTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=kCACNL11; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42513ex4003078;
+	Mon, 4 Mar 2024 21:24:38 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding:content-type; s=
+	pfpt0220; bh=NBR8u97z8Hokb2nrGzdEzBZWH1fBhn7WMLp1Je3wzUY=; b=kCA
+	CNL11YUluYAdzgxU/wzJw5pyMKQ4KASgI2d0RIDCMIN5PT2UIx0fitW6hm7liXrS
+	LRZ3TFQxVNIMI7tZYlsUdaYhUKvQBTlZxcf68GxT5EU9czuzm73iKxWQBjkdfnQz
+	1QpLZEx2yc+Jjoyt6XH8QKq/0xQ/U0dk/EawYrmb8SXG7tYkUMh3iCLjarhtZicz
+	uzo/masjP1Wz6th36DDVTiHOIre/JoitHZPWqM53tRDM22G5ecQxMVZtswO1TJ0o
+	yxIpLaf21dg8w+ML8mlFhZpc9wRMIX4IiO9leCwhYbmljfXIOD81FPgemzY3Kmd0
+	dEKeYhPPBs/a5xAKMbw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3wngqe2mqt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 04 Mar 2024 21:24:38 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Mon, 4 Mar 2024 21:24:37 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
+ Transport; Mon, 4 Mar 2024 21:24:37 -0800
+Received: from localhost.localdomain (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 149BA3F704E;
+	Mon,  4 Mar 2024 21:24:35 -0800 (PST)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Ratheesh Kannoth <rkannoth@marvell.com>
+Subject: Re: [PATCH v1] ps3_gelic_net: Use napi routines for RX SKB
+Date: Tue, 5 Mar 2024 10:54:21 +0530
+Message-ID: <20240305052421.1180221-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <ddb7f076-06a7-45df-ae98-b4120d9dc275@infradead.org>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,28 +74,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: _i7ui0_ej6wrQG6PMJ8Dqtz7EyIxeKRG
+X-Proofpoint-ORIG-GUID: _i7ui0_ej6wrQG6PMJ8Dqtz7EyIxeKRG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-05_02,2024-03-04_01,2023-05-22_02
 
-Build process uses python to generate the user space code.
-Remove __pycache__ on make clean.
+On 2024-03-01 at 13:50:11, Geoff Levand (geoff@infradead.org) wrote:
+> +	if (unlikely(!napi_buff))
+> +		return -ENOMEM;
+>
+> -	descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
+> -	if (!descr->skb) {
+> -		descr->hw_regs.payload.dev_addr = 0; /* tell DMAC don't touch memory */
+> +	descr->skb = napi_build_skb(napi_buff, napi_buff_size);
+> +
+> +	if (unlikely(!descr->skb)) {
+> +		skb_free_frag(napi_buff);
+>  		return -ENOMEM;
+>  	}
+>
+> -	offset = ((unsigned long)descr->skb->data) &
+> -		(GELIC_NET_RXBUF_ALIGN - 1);
+> -	if (offset)
+> -		skb_reserve(descr->skb, GELIC_NET_RXBUF_ALIGN - offset);
+> -	/* io-mmu-map the skb */
+> -	cpu_addr = dma_map_single(ctodev(card), descr->skb->data,
+> -				  GELIC_NET_MAX_FRAME, DMA_FROM_DEVICE);
+> -	descr->hw_regs.payload.dev_addr = cpu_to_be32(cpu_addr);
+> -	if (dma_mapping_error(ctodev(card), cpu_addr)) {
+> -		dev_kfree_skb_any(descr->skb);
+> +	cpu_addr = dma_map_single(dev, napi_buff, napi_buff_size,
+> +				  DMA_FROM_DEVICE);
+> +
+> +	if (dma_mapping_error(dev, cpu_addr)) {
+> +		skb_free_frag(napi_buff);
+skb->head is freed; dont you need to free skb as well ?
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/net/ynl/lib/Makefile | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/tools/net/ynl/lib/Makefile b/tools/net/ynl/lib/Makefile
-index 1507833d05c5..dfff3ecd1cba 100644
---- a/tools/net/ynl/lib/Makefile
-+++ b/tools/net/ynl/lib/Makefile
-@@ -17,6 +17,7 @@ ynl.a: $(OBJS)
- 	ar rcs $@ $(OBJS)
- clean:
- 	rm -f *.o *.d *~
-+	rm -rf __pycache__
- 
- distclean: clean
- 	rm -f *.a
--- 
-2.44.0
-
+>  		descr->skb = NULL;
 
