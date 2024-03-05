@@ -1,121 +1,166 @@
-Return-Path: <netdev+bounces-77520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D941687213B
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:14:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1613B87215D
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:21:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 084611C22782
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:14:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 472EA1C23F24
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:21:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6861D86626;
-	Tue,  5 Mar 2024 14:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4386686637;
+	Tue,  5 Mar 2024 14:21:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Egj83881"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hA3uTBDR"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF82F5676A;
-	Tue,  5 Mar 2024 14:13:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6168662A;
+	Tue,  5 Mar 2024 14:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709648040; cv=none; b=PeSlQv040EcTOiwb8A6djtEYZiJP8Lbp0LNEVSOtxsUIVXU9ppzB8QnXpUj2qaHQ7nhaEOuzcbZtppIIeMVE/j9cXML8QZ+HR2uhe9cAPRJswFmzBQhUwWwx3I5orAgXg/rDNVL4m8aXyT/w8oR/YQLXPWWZ4jSYoIZUIX6bIkI=
+	t=1709648480; cv=none; b=IyohiVyw81sAo9HUnd7hN2XZb6QepgH4v5WDnJZVrU/lM/9WcMqMGSu/VkOxJ+cai0WStIYfWaRaNqmQDpAJpTQ3IaBqvQNC4OZgBqKZXLjxFZ9F4qh2DRW2BMU6NKeUf7S+nF5+K2ehfFcwEZDCi+ITKnXaw/Gd5mq4qR2HAJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709648040; c=relaxed/simple;
-	bh=5+gfrIDfeHsmtIuk5iQveNTak8sf8ygvObNXuM3iFjY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=hrs0pXgtq/MJnaGPFYS3r5+Grik6+bM53V9NSbiieTyC7+YRMoWomVrNnzsFlD+Dfk4KFED0jbSqGJxIk7XDt0z7vDZygbh/lsz3dS3I7ipW0N+EKIOAs9/nStnXamAP0utttdADVgxrRg9DBs6GzDn48+NqJs+/VbVR0paLTdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Egj83881; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 68C3DE0006;
-	Tue,  5 Mar 2024 14:13:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709648035;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=TT5bRRrgclPHRKgI0rGkJaQyK+abn1+BXSmr76+zods=;
-	b=Egj83881srjpYjM+dfWciDSH7r1Nti0+wiIyO/dqJyBu7KV+5X/stI4ldk8dYzekWLWMGf
-	waKZtjWMVIFc3jzh5hmAGQUE0Pw746XGIxDA0B1+iKcmmKlkBclyEV5Y/gULH+2OOUKU0S
-	gt0gexb/4VapHIWJjGWJjNH+vIXKE5Fa/nI7gixbWu+Ao2aGuOM2Qgac9GjK1xaBfSc2g8
-	tv/y0aTIERdE9yimv0JY2ZfD9/PwFSaBXyLB6qQslMxl01JnqNJPapsGhpLE8xHUbX7zfS
-	Iai0zKrdjR+fJ6gaAgzFgMt44/oIxZLZ/DH+1cBuZWpcOgrCw9qw9fkJsLCPvQ==
-From: =?UTF-8?q?J=C3=A9r=C3=A9mie=20Dautheribes?= <jeremie.dautheribes@bootlin.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Davis <afd@ti.com>,
-	Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Yen-Mei Goh <yen-mei.goh@keysight.com>,
-	=?UTF-8?q?Miqu=C3=A8l=20Raynal?= <miquel.raynal@bootlin.com>,
-	=?UTF-8?q?J=C3=A9r=C3=A9mie=20Dautheribes?= <jeremie.dautheribes@bootlin.com>
-Subject: [PATCH RESEND net-next] dt-bindings: net: dp83822: change ti,rmii-mode description
-Date: Tue,  5 Mar 2024 15:13:09 +0100
-Message-Id: <20240305141309.127669-1-jeremie.dautheribes@bootlin.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1709648480; c=relaxed/simple;
+	bh=4wsJ1D/gACw9m0Q0mBOCLnDEJZilKXztwEPm8R1Dap4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dlwpfNwnlfC6JGpWPozjBt0zqr5dkb/KvVQPDSTg88YU3goiZ6PtDyRhbovZRVfBxUKtwNbygQUI3mY0fsivlb6clesIfDnZkwTVozsVSICbJ5MGDIpqennHviWCUCGpWdAqtwGlXs+ylu/Ixd00nekWlrKIj1n7LrJDiGKgfNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hA3uTBDR; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a2f22bfb4e6so111068966b.0;
+        Tue, 05 Mar 2024 06:21:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709648477; x=1710253277; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=v4wSy7E3YJQQeA67cWPwwJxebVYn1l0HIVjiXiLQflo=;
+        b=hA3uTBDR1ksY8Ege0wfgq7r1biweRyaGcq2wgpNuA/wJ2h8Gjk83WUMMBOKyh3pysO
+         5Thw9Twq+4/Bo2dp0XE3mnbPdAL9bQuro53SEFhWOpwFPW+2hHM/TtgsW2U/kQBZM3pw
+         sYdhsJPuwTTm3YmIkQ7voHUr+OypJk6tSw8ON9Kw+Wazm8sOqko59oDRHj7hSQKESeKi
+         8nW2VRRQErADN7lfVbz62Ufc+bSkBGGqSOchLP2gTCJbk3Nj3wkjbzLJkCIMQEhl9k3k
+         WEEkFcjjt22MdA3ueV1Qdp92ItunJgVhY+vDJMz4yLdDyAXHpKDvEdRH4XIF/fh9rDLX
+         acZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709648477; x=1710253277;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v4wSy7E3YJQQeA67cWPwwJxebVYn1l0HIVjiXiLQflo=;
+        b=XKjRffFC11HN+HgNrTGfsmx8Vtn+Zd8TPHWNOd6Tn9+bjd/WSEg9dgxtoPv2He2r0N
+         BJDpr5Ku2Q6ED4oxLF/tfI5rPL51VwLVUN91caSJtAQoH27RgN9PJO3nEPhFkOWRfAqi
+         v/gqmzOcoJNlQrxWgGcc01guEsoUbbq5zao9cWyIIYsare3prMlMO/9DAQcKrrB6+Kxi
+         YI4f3o8ZuI5lsAwA1SCxgFr70A/AdbAXlV4UHZoRAdEAfUpeenyStO+iEpapNYGOcvlt
+         /ME9c28n+Lcsapp9AJt8H/CzNLZ7Bpk2CaA1ZD/dHIE53A9+bt9C35gRp4WbMXHBQvZG
+         mEHw==
+X-Forwarded-Encrypted: i=1; AJvYcCX/rOl8vNBpf11TWiVjepoiGsvp02Aom4F4YqqgFFuLvT0WbQ4f0S8pv+Pklcqrcz6lcyDqv/E+m10okvrvLcTBDHowECMHRSygcFR5yCxyC9ZN6S8lMczmUTI+JJ7ctoObsq46hx0nJXV/sIPf92TyJvA5L1PTXe5fduNP9jyHq4uq8Q==
+X-Gm-Message-State: AOJu0Yx0OA9+BjK2Qn8yBK8mYSbXt+WVCyV36FcrVMR2oINt+oDmCoSh
+	HbK0SZzzdohK8K6S0utk7ofG6ip4buJkNyy0uROzvACRRRFF5UT4
+X-Google-Smtp-Source: AGHT+IFUK19xyeHDaX7M9KvSwKFpva6VNgisudcPFsUdhCKxLODsoNp+jjPI+KJMcT6WSAhre3/T/A==
+X-Received: by 2002:a17:906:4ecb:b0:a44:cd5f:9762 with SMTP id i11-20020a1709064ecb00b00a44cd5f9762mr6552774ejv.54.1709648476389;
+        Tue, 05 Mar 2024 06:21:16 -0800 (PST)
+Received: from fedora.. (d-zg1-234.globalnet.hr. [213.149.36.248])
+        by smtp.googlemail.com with ESMTPSA id k13-20020a1709067acd00b00a44f3fb4f07sm3597969ejo.191.2024.03.05.06.21.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Mar 2024 06:21:15 -0800 (PST)
+From: Robert Marko <robimarko@gmail.com>
+To: andersson@kernel.org,
+	konrad.dybcio@linaro.org,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ansuelsmth@gmail.com,
+	linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Robert Marko <robimarko@gmail.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH net-next v3] net: phy: qca807x: fix compilation when CONFIG_GPIOLIB is not set
+Date: Tue,  5 Mar 2024 15:20:33 +0100
+Message-ID: <20240305142113.795005-1-robimarko@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: jeremie.dautheribes@bootlin.com
 
-Drop reference to the 25MHz clock as it has nothing to do with connecting
-the PHY and the MAC.
-Add info about the reference clock direction between the PHY and the MAC
-as it depends on the selected rmii mode.
+Kernel bot has discovered that if CONFIG_GPIOLIB is not set compilation
+will fail.
 
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Jérémie Dautheribes <jeremie.dautheribes@bootlin.com>
+Upon investigation the issue is that qca807x_gpio() is guarded by a
+preprocessor check but then it is called under
+if (IS_ENABLED(CONFIG_GPIOLIB)) in the probe call so the compiler will
+error out since qca807x_gpio() has not been declared if CONFIG_GPIOLIB has
+not been set.
+
+Fixes: d1cb613efbd3 ("net: phy: qcom: add support for QCA807x PHY Family")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202403031332.IGAbZzwq-lkp@intel.com/
+Signed-off-by: Robert Marko <robimarko@gmail.com>
 ---
-This patch follows on from my previous patch series [1] which has already been 
-merged into the net-next tree and which added the "ti,rmii-mode" property.
-As suggested by Andrew Lunn, this patch updates the description of this 
-property to make it more consistent with the master/slave relationship it 
-conveys.
+Changes in v3:
+* Target net-next tree
+Changes in v2:
+* Reduce the code indent level
 
-[1] https://lore.kernel.org/all/20240222103117.526955-1-jeremie.dautheribes@bootlin.com/
+ drivers/net/phy/qcom/qca807x.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-Resending because I previously forgot to include the "net-next" entry in 
-the email subject.
-
- Documentation/devicetree/bindings/net/ti,dp83822.yaml | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/net/ti,dp83822.yaml b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-index 8f23254c0458..784866ea392b 100644
---- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-+++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-@@ -84,10 +84,10 @@ properties:
-     description: |
-        If present, select the RMII operation mode. Two modes are
-        available:
--         - RMII master, where the PHY operates from a 25MHz clock reference,
--         provided by a crystal or a CMOS-level oscillator
--         - RMII slave, where the PHY operates from a 50MHz clock reference,
--         provided by a CMOS-level oscillator
-+         - RMII master, where the PHY outputs a 50MHz reference clock which can
-+         be connected to the MAC.
-+         - RMII slave, where the PHY expects a 50MHz reference clock input
-+         shared with the MAC.
-        The RMII operation mode can also be configured by its straps.
-        If the strap pin is not set correctly or not set at all, then this can be
-        used to configure it.
+diff --git a/drivers/net/phy/qcom/qca807x.c b/drivers/net/phy/qcom/qca807x.c
+index 780c28e2e4aa..672c6929119a 100644
+--- a/drivers/net/phy/qcom/qca807x.c
++++ b/drivers/net/phy/qcom/qca807x.c
+@@ -732,24 +732,24 @@ static int qca807x_probe(struct phy_device *phydev)
+ 	priv->dac_disable_bias_current_tweak = of_property_read_bool(node,
+ 								     "qcom,dac-disable-bias-current-tweak");
+ 
+-	if (IS_ENABLED(CONFIG_GPIOLIB)) {
+-		/* Make sure we don't have mixed leds node and gpio-controller
+-		 * to prevent registering leds and having gpio-controller usage
+-		 * conflicting with them.
+-		 */
+-		if (of_find_property(node, "leds", NULL) &&
+-		    of_find_property(node, "gpio-controller", NULL)) {
+-			phydev_err(phydev, "Invalid property detected. LEDs and gpio-controller are mutually exclusive.");
+-			return -EINVAL;
+-		}
++#if IS_ENABLED(CONFIG_GPIOLIB)
++	/* Make sure we don't have mixed leds node and gpio-controller
++	 * to prevent registering leds and having gpio-controller usage
++	 * conflicting with them.
++	 */
++	if (of_find_property(node, "leds", NULL) &&
++	    of_find_property(node, "gpio-controller", NULL)) {
++		phydev_err(phydev, "Invalid property detected. LEDs and gpio-controller are mutually exclusive.");
++		return -EINVAL;
++	}
+ 
+-		/* Do not register a GPIO controller unless flagged for it */
+-		if (of_property_read_bool(node, "gpio-controller")) {
+-			ret = qca807x_gpio(phydev);
+-			if (ret)
+-				return ret;
+-		}
++	/* Do not register a GPIO controller unless flagged for it */
++	if (of_property_read_bool(node, "gpio-controller")) {
++		ret = qca807x_gpio(phydev);
++		if (ret)
++			return ret;
+ 	}
++#endif
+ 
+ 	/* Attach SFP bus on combo port*/
+ 	if (phy_read(phydev, QCA807X_CHIP_CONFIGURATION)) {
 -- 
-2.34.1
+2.44.0
 
 
