@@ -1,139 +1,159 @@
-Return-Path: <netdev+bounces-77459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2C58871D4D
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:20:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37C7B871DD1
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:31:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52D35B246DC
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:20:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1A0F1F2A4EE
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:31:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9038D5B053;
-	Tue,  5 Mar 2024 11:19:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E9958ADC;
+	Tue,  5 Mar 2024 11:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oTnLPty5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Buj81fX8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B27B5B5A1;
-	Tue,  5 Mar 2024 11:19:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B4F155E59
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 11:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709637550; cv=none; b=Hytz62khZs/NrlEss5IlDYw67Elhl4NqWB/xx/+LOqIucEZyEjK0t1s9sT92hi5O/t1bh2l2yrG5p2ym7UJ4/Ue0z0JJ5RuGitsQ+WYCQnq+SGyyh4fU6Tj6IXvdmyP+p+5hnYLoJj+3u3oPws8qehsS1Ev7RY2ettuVKK1lj2Q=
+	t=1709638229; cv=none; b=he1nvAIZeuE0J34pGIw6Fq8IslAEzb3U6JYF3T4bF0nNMRRALBf6Tw5ZLvH9orQo6p9k5yN1IywMx77V9dYbLkzdNIjO7eeP0ZT9Jt6bWltgvVgbt/yeGLbkW5RKUkajx/KNW1V11gSiu4r8TvRwQT3kYcLuguNq2/pIEDUwXLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709637550; c=relaxed/simple;
-	bh=Z4IBEZRKAlbU/N0SOY+SwMF12pQcVJDXcB7KTmyw/KA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hy9OALHH8kvwnerbpSoYj9Dq58dinXM15VDCD+8coB7bz548fr9f7vfDn60jK7FUoTCFFLLRJciUBGUSASJS0RprFS8hpGtm9GgkPETE242MIW0htDrqSYGqgvPC84TDySy8yDSBpExZYyNEUiGgz1+t9cnU66WMbJel3ePHWCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oTnLPty5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D602C43390;
-	Tue,  5 Mar 2024 11:19:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709637548;
-	bh=Z4IBEZRKAlbU/N0SOY+SwMF12pQcVJDXcB7KTmyw/KA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=oTnLPty5a1khzX8k8vdcade5csRGX487/YQggUreaqE4IdZBeSaK3/ZvxwI1dTXfY
-	 lMCij9GosSsZMianJnpoWlYpCViw6WJZTjlUet4Ca+E3mgmkbwImI9GnRqPIWzlcTn
-	 mJfKB3/cpYijbm/fOV4D6Rn9tKBFWefpvoXj8kImn8ADD2SoSiRoZHSarq2wOTn/6s
-	 hVhlKMoCBEVpWFc+HSni3gip/Ec9K+oeeWJHVyFg0eBoJ2tZnXNKqt9jOcCpRtYba7
-	 dUB1E9idDfn7Nc7PfXqLo+XIGEs1AfAe0N54Mz5T+RctqVO8WWhhy/an1Tsgnx+s8r
-	 Rx6Un/4ujM1Kg==
-Message-ID: <8b2b6492-d460-4981-8624-068dd766d3ac@kernel.org>
-Date: Tue, 5 Mar 2024 12:19:02 +0100
+	s=arc-20240116; t=1709638229; c=relaxed/simple;
+	bh=VTSl2wdf4yJetzl7H9Gvd1vCLYSt9TtuKh93OEuuwYo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=gvka/8RZfjP9o6PFH1AOniGyq1lvQEdQtN7Fowjj3G82a7cEzPFkXSLek5aqKbCEpp/ByaO5P+iOFV15E1kJX0DL3joNalIIEJZHSOi3ZSu1tlODPdZJz/Qeqhv7fO4RsMOn6IFNZ50dtVPgwxQJ+BAh55Q2bpArIo/DDM2g20I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Buj81fX8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709638226;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=VTSl2wdf4yJetzl7H9Gvd1vCLYSt9TtuKh93OEuuwYo=;
+	b=Buj81fX8D+g0vR3i88Wo4vqk+SGh47/2deqR5PJ+hBaQ+/RyDeBHiaLKsYgSNnl3ylVpHV
+	rhflWcaLiMDhIJ8cGcUL8lyltYJLcBQQe9GGuqdXNQCVio6xYy2nSrwa7BD1ugjm9KSczS
+	4aLV2dfVWM1iHv48/P+64cvNuwjh4sA=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-304-Hkn6Y1ztMpCwnqGrvBfiFg-1; Tue, 05 Mar 2024 06:30:24 -0500
+X-MC-Unique: Hkn6Y1ztMpCwnqGrvBfiFg-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-5131e2433d7so1746280e87.0
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 03:30:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709638223; x=1710243023;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VTSl2wdf4yJetzl7H9Gvd1vCLYSt9TtuKh93OEuuwYo=;
+        b=uxBIeCwWV5M/yo5YpVV7+g8DxtnNZUuEDiWjDUtDk0jLJpvCmQ032q2CPhzixaDg2t
+         mfyH77l5yy0kX+rqcq5qT5fWQJ+urTk0noFv1IkH9ZwWGAg6bkXmgvSxlj2bPYPWmijm
+         eR+84pJK+34Ikgq9a0OCHPWnmtYtjq5pmKgrifD0oKA7aNic/uEzUCZOUTVKTkCGDf+z
+         RPKR9T2IlN4Lvd9e35CYXUdIz0UbKmSW2/ERvpReegSn5D0YamHPSaqdHouc9AVJ0x8v
+         bVF5QXyHHS6Lf0MrThPsK+jGRp+NQwSOoCMExGLpSZZmyiSHUNFli99O4g+ChUb+KZ5E
+         zsIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW5NDDTaP0Z6wc66tGpeCFpy0hnLCWMN+6/ijwN5Lg8DlHOFTLcm+IKr56I3Mnl3i/MfvvIrBgl+jKyG+yH+Jn7i1vq2A1S
+X-Gm-Message-State: AOJu0YwgVnkXQFeBxSIdb4I3R1KCNZHbDU7qGw9AGjT1yrKm2y7GGVpd
+	vVByyQ9jZf1I7MFDEBowQM7x++RJDp0YTdmxz5hdiZcY3dWW/YldtsTIG2dfFQqdwk4yi5UMOHm
+	WVRJAvJZhQ3vXeKatX00f9EoVp8C4+E4nfOIwRXCVMmXsz6MCFjzbOy1xgHCAtA==
+X-Received: by 2002:a05:6512:747:b0:513:2cf8:8a19 with SMTP id c7-20020a056512074700b005132cf88a19mr5167112lfs.5.1709638222937;
+        Tue, 05 Mar 2024 03:30:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF3DygI6KTM/Ds0/4ckxbgxJalqBOCQG/QN+wZROW+qfifPd2gOD/p9aL2y5etU7mMYrUHzjA==
+X-Received: by 2002:a05:6512:747:b0:513:2cf8:8a19 with SMTP id c7-20020a056512074700b005132cf88a19mr5167089lfs.5.1709638222476;
+        Tue, 05 Mar 2024 03:30:22 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-235-19.dyn.eolo.it. [146.241.235.19])
+        by smtp.gmail.com with ESMTPSA id t16-20020a05600c451000b00412ee12d4absm1291426wmo.31.2024.03.05.03.30.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Mar 2024 03:30:22 -0800 (PST)
+Message-ID: <81a5d191894e6a7741d3c266079f3404def2bb07.camel@redhat.com>
+Subject: Re: [PATCH net-next v3 0/9] MT7530 DSA Subdriver Improvements Act
+ III
+From: Paolo Abeni <pabeni@redhat.com>
+To: Russell King <linux@armlinux.org.uk>
+Cc: mithat.guner@xeront.com, erkin.bozoglu@xeront.com, Bartel Eerdekens
+ <bartel.eerdekens@constell8.be>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, =?UTF-8?Q?Ar=C4=B1n=C3=A7_=C3=9CNAL?=
+ <arinc.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>, DENG
+ Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, Andrew
+ Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir
+ Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>
+Date: Tue, 05 Mar 2024 12:30:20 +0100
+In-Reply-To: <20240301-for-netnext-mt7530-improvements-3-v3-0-449f4f166454@arinc9.com>
+References: 
+	<20240301-for-netnext-mt7530-improvements-3-v3-0-449f4f166454@arinc9.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 03/13] selftests: mptcp: add
- mptcp_lib_check_output helper
-Content-Language: en-GB, fr-BE
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, Geliang Tang <tanggeliang@kylinos.cn>
-References: <20240305-upstream-net-next-20240304-selftests-mptcp-shared-code-shellcheck-v1-0-66618ea5504e@kernel.org>
- <20240305-upstream-net-next-20240304-selftests-mptcp-shared-code-shellcheck-v1-3-66618ea5504e@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20240305-upstream-net-next-20240304-selftests-mptcp-shared-code-shellcheck-v1-3-66618ea5504e@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-Hello,
+On Fri, 2024-03-01 at 12:42 +0200, Ar=C4=B1n=C3=A7 =C3=9CNAL wrote:
+> This is the third patch series with the goal of simplifying the MT7530 DS=
+A
+> subdriver and improving support for MT7530, MT7531, and the switch on the
+> MT7988 SoC.
+>=20
+> I have done a simple ping test to confirm basic communication on all swit=
+ch
+> ports on MCM and standalone MT7530, and MT7531 switch with this patch
+> series applied.
+>=20
+> MT7621 Unielec, MCM MT7530:
+>=20
+> rgmii-only-gmac0-mt7621-unielec-u7621-06-16m.dtb
+> gmac0-and-gmac1-mt7621-unielec-u7621-06-16m.dtb
+>=20
+> tftpboot 0x80008000 mips-uzImage.bin; tftpboot 0x83000000 mips-rootfs.cpi=
+o.uboot; tftpboot 0x83f00000 $dtb; bootm 0x80008000 0x83000000 0x83f00000
+>=20
+> MT7622 Bananapi, MT7531:
+>=20
+> gmac0-and-gmac1-mt7622-bananapi-bpi-r64.dtb
+>=20
+> tftpboot 0x40000000 arm64-Image; tftpboot 0x45000000 arm64-rootfs.cpio.ub=
+oot; tftpboot 0x4a000000 $dtb; booti 0x40000000 0x45000000 0x4a000000
+>=20
+> MT7623 Bananapi, standalone MT7530:
+>=20
+> rgmii-only-gmac0-mt7623n-bananapi-bpi-r2.dtb
+> gmac0-and-gmac1-mt7623n-bananapi-bpi-r2.dtb
+>=20
+> tftpboot 0x80008000 arm-zImage; tftpboot 0x83000000 arm-rootfs.cpio.uboot=
+; tftpboot 0x83f00000 $dtb; bootz 0x80008000 0x83000000 0x83f00000
+>=20
+> This patch series is the continuation of the patch series linked below.
+>=20
+> https://lore.kernel.org/r/20230522121532.86610-1-arinc.unal@arinc9.com
+>=20
+> Signed-off-by: Ar=C4=B1n=C3=A7 =C3=9CNAL <arinc.unal@arinc9.com>
 
-On 05/03/2024 11:42, Matthieu Baerts (NGI0) wrote:
-> From: Geliang Tang <tanggeliang@kylinos.cn>
-> 
-> Extract the main part of check() in pm_netlink.sh into a new helper
-> named mptcp_lib_check_output in mptcp_lib.sh.
-> 
-> This helper will be used for userspace dump addresses tests.
-
-Arf, I just noticed that when the MPTCP tree got rebased on top of
-net-next, Git didn't drop this patch, but resolved the conflicts by
-duplicating mptcp_lib_check_output() function. Of course, redefining the
-function is OK in Bash, and I didn't notice the issue when running the
-tests...
-
-I will resend this series without this patch tomorrow.
-
-Sorry for the noise :-/
-
-pw-bot: changes-requested
+@Russell, I see you went through some patches; my understanding is that
+there are no objection to this series in the current form. The series
+LGTM, so I'm going to apply it: I think it would a pity if it should
+miss this cycle.
 
 Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+
+Paolo
+
 
