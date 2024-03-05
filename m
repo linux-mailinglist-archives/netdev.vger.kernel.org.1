@@ -1,118 +1,102 @@
-Return-Path: <netdev+bounces-77414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A575871A4A
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:12:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07734871BD6
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:44:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0686DB21F99
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 10:12:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38EB31C22291
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 10:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00DD459B44;
-	Tue,  5 Mar 2024 10:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F866026D;
+	Tue,  5 Mar 2024 10:25:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Hb5413ee"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="I1MLrRmB";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="H3BEeCua"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA1B5490B;
-	Tue,  5 Mar 2024 10:10:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D368855C19
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 10:25:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709633437; cv=none; b=CQcfRCIsRRHbUW+5LE86GqfcbEeIPpxvE/ojkUGsuGt8AYLv/4izsGiORMCDOlHhsrcu1ZaqMfihQJaZmSR+2bM626rGpackSBGK4AngUyGkJbVA6Gn6EM4YcL7wPMX87ZeOk1f/ce1Za6EyhFBPThUapeKy7BW6EyiwfsVt9gk=
+	t=1709634340; cv=none; b=eivdy9eJu9hgGu8zN16XiXgMb3iRBRWpKWe/Jj2I7w4F6W4x0LWgmWujQeOBTTU6bpw5j8Yh8DhSsi0pomw77vfgzhGaxjveqJCA4U/gyRm7wiA0zjrTt/CtZWkXxVMoPRbu6/eCdIhxUKNoUxPFby1ysbVrrXWUGBkllNYrBUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709633437; c=relaxed/simple;
-	bh=OAVORbio8rX6MP7JstBR8elPmW+TfA86LMRUm++6e/M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CwS1iRCbSRBF3Oo0KI3Kac00qjP+7TocyRj+PHhADgxNuIl3OEL0p02g58McVfnl4i+ZrIkOBs3umN/06df9322EzYQP1LrOt7vfMKtM/U+7b4RfGBqcj89AV2BUGl1o2rtFMetOHAA2jxg8WEHZabV1zLHB7FwRQBhSrinNWww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Hb5413ee; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 956D76000A;
-	Tue,  5 Mar 2024 10:10:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709633426;
+	s=arc-20240116; t=1709634340; c=relaxed/simple;
+	bh=FBZoA8HT41rrelgYnH47F5Fcbqc4gNO9/ROnWyurk2M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hqVN9C6OlFAqYdcHVqMSik9kGu7yFrnHVpv6Ro+jfYP/BUTLpP8IBIH+4HaO2MAaKR4Y3EeXER+QV9KaSp0nV3kfucHvedQQ9pUslBFvUjXjQqdXqM8FajOscSObvxsIu1ODNs4n88A/gabH2RBkPY8rBwdXfij9Vp3Kbe6VZR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=I1MLrRmB; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=H3BEeCua; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Tue, 5 Mar 2024 11:25:35 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1709634337;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OAVORbio8rX6MP7JstBR8elPmW+TfA86LMRUm++6e/M=;
-	b=Hb5413eedQK0YxQ1ILt65ybaUrNRAGNuplmwg//4ZQJjbbmG62g1t5GGVso/Et3lv2+wX4
-	8T8hKdXBDXCYIW/ac983hQYxrucOUJ8QMkLOGBBVAjHIhBhdkqxvOcQ38UCp2/xXZUnYwz
-	lgGee57RS1o0nFDWciYaCRsouSfckHadobj1iJOwElo6GhuMaQiSM9g8cpu84xSUT0ddm0
-	AnqLohvyJG4BeZkLMwXhTIVdcGM7l9sPzImFcCR1gv/W8i+qVguhLVBj6qqkzmuudSZo6M
-	1tD3t8hDMcZHuNuorgTOmH0R4WEB0MaHkhjY77/jxm3N1emWCFo7rHa1yoD6zg==
-Date: Tue, 5 Mar 2024 11:10:21 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Jakub Kicinski <kuba@kernel.org>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: Re: [PATCH net-next v9 08/13] ptp: Add phc source and helpers to
- register specific PTP clock or get information
-Message-ID: <20240305111021.5c892d5a@kmaincent-XPS-13-7390>
-In-Reply-To: <ZebZpspMCqjLES/W@shell.armlinux.org.uk>
-References: <20240226-feature_ptp_netnext-v9-0-455611549f21@bootlin.com>
-	<20240226-feature_ptp_netnext-v9-8-455611549f21@bootlin.com>
-	<20240304185734.5f1a476c@kernel.org>
-	<ZebZpspMCqjLES/W@shell.armlinux.org.uk>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	bh=7lRByV/83WJQ2CHNvx77tbl9d/au9m4pfpaa9GSCYX4=;
+	b=I1MLrRmB4Y9y32zEFGxTNfUtEUii3hj3BWW6JqhgR96cq0VRMKj8NvptCutzukyb4hyfVi
+	gKVGULHxBbuulSubKcLjl5rWIEAFV2PUZjwps1hlMSrR2+/xrDY4BzGuZsM1WCsN+l4a7t
+	WqWTWuqgbCOrT3z2imlp8XZpHE3LDlvA+z5PKXK5Py4tBqXchyKQPiAjt6ZKzRDBeYUcc1
+	H/ploNUYQbn79UAxqErCNdW0cyEIyQYcXQR8Oo3F6cPq+S/ntskjDLTqWTdpr14rzg6GX4
+	eNLFGn8Pz0cpo93DJvWC4m738gRt81wjNmIkAhB2hW1Le17gJGIIcZw/B+emnw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1709634337;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7lRByV/83WJQ2CHNvx77tbl9d/au9m4pfpaa9GSCYX4=;
+	b=H3BEeCuavoAZL2iFd8Ae01Wgd8EJINhaX0L3FPiwicsyTac5p8ItwO9iGCH54ix6gjiy2I
+	KB916mk/bI8zlDCQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Wander Lairson Costa <wander@redhat.com>,
+	Yan Zhai <yan@cloudflare.com>
+Subject: Re: [PATCH v3 net-next 3/4] net: Use backlog-NAPI to clean up the
+ defer_list.
+Message-ID: <20240305102535.Mw-yj_ra@linutronix.de>
+References: <20240228121000.526645-1-bigeasy@linutronix.de>
+ <20240228121000.526645-4-bigeasy@linutronix.de>
+ <8f351363c3beaf84a3cb54643b02b0981b9e782c.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8f351363c3beaf84a3cb54643b02b0981b9e782c.camel@redhat.com>
 
-On Tue, 5 Mar 2024 08:36:54 +0000
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+On 2024-03-05 10:55:45 [+0100], Paolo Abeni wrote:
+> On Wed, 2024-02-28 at 13:05 +0100, Sebastian Andrzej Siewior wrote:
+> > @@ -4736,6 +4736,26 @@ static void napi_schedule_rps(struct softnet_data *sd)
+> >  	__napi_schedule_irqoff(&mysd->backlog);
+> >  }
+> >  
+> > +void kick_defer_list_purge(unsigned int cpu)
+> > +{
+> 
+> Minor nit: I guess passing directly 'sd' as an argument here would be
+> better, but that could be a follow-up.
 
-> On Mon, Mar 04, 2024 at 06:57:34PM -0800, Jakub Kicinski wrote:
-> > On Mon, 26 Feb 2024 14:39:59 +0100 Kory Maincent wrote: =20
-> > > Prepare for future hardware timestamp selection by adding source and
-> > > corresponding pointers to ptp_clock structure. Additionally, introduce
-> > > helpers for registering specific phydev or netdev PTP clocks, retriev=
-ing
-> > > PTP clock information such as hwtstamp source or phydev/netdev pointe=
-rs,
-> > > and obtaining the ptp_clock structure from the phc index. =20
-> >=20
-> > Can we assume there's one PHC per netdev?
-> > We both store the netdev/phydev info in the ptp clock
-> > and ptp clock in the netdev. Is there a reason for that? =20
->=20
-> No. In the case of mvpp2 + marvell PHY, the two PTP implementations are
-> entirely separate.
+I need the CPU number in the "non-backlog threaded" case for
+smp_call_function_single_async(cpu, ). sd->cpu has the CPU stored but
+only in the CONFIG_RPS case. In the theoretical case +SMP -SYSFS we
+wouldn't have RPS but would need this CPU member.
 
-Yes the PTP clock can be independent from the netdev.
-We need to know which software layer register the PHC to be able to call its
-callbacks.
+> Cheers,
+> 
+> Paolo
 
-My commit log is a bit small here. I will enhance it in the next version.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Sebastian
 
