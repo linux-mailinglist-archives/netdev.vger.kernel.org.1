@@ -1,61 +1,73 @@
-Return-Path: <netdev+bounces-77331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E9CE8714A3
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 05:21:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 697AB8714AF
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 05:23:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BC271F21E7C
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 04:21:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2659F282471
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 04:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455D63D396;
-	Tue,  5 Mar 2024 04:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 268FB3D0C6;
+	Tue,  5 Mar 2024 04:23:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FElsCGGa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lmtDUjwi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1CC6FB5;
-	Tue,  5 Mar 2024 04:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9243A2940D;
+	Tue,  5 Mar 2024 04:23:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709612466; cv=none; b=pbTlOgCU/hV+GvkBjDnAY8ssQdRQIeNpzBr7zHT1TCU0fFfLm3sh1MQ+bOE5Z1mbrpuoM5Hui9iOQHZLdjNB4gj7ZHISfnnDJkNBHcgWAmI0lFARFnsOuojjOn9ZfnLiObolb8Bz7DWhAOTr4/Vnd8qstfKYuzM6sd3EgtG1cPk=
+	t=1709612587; cv=none; b=MDJpEV5FwjlbzJanKMIJBAVmIBJmL0WnSHjGHor8865sAxS6P8ZJENdHEuhiIDH9osurIx5zLQ0b0KXI74UaOSaklHLzF1HcGEkCqw7QUGpUXecYntK2goD0uVbSy7Bkz5Xz5f6JeCSGHhb4mHtZo2oOafWQEMRv/NXlP+c4L8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709612466; c=relaxed/simple;
-	bh=1WHkQK/Ja5W+APKzZ4IYM8Vsp3euVtIzyGWw7tf7y6A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JqQROgEGxcRVgaiNv4F7+9Sb+szqrp2/qJtgloNWaNcNgSuITLlWWBKnyhZXQBKBmPJfqhGNXwHQZ8NboNOFgK0UttgNTWwR7ZqHjBTQt/HSFzGtZi87oHisXs4IXY8pVeTI/wTB7JSLIZt39jV5k+MfpM54eXjiIeCTp5uZ9bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FElsCGGa; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709612463; x=1741148463;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=1WHkQK/Ja5W+APKzZ4IYM8Vsp3euVtIzyGWw7tf7y6A=;
-  b=FElsCGGa4+8opnGv+3B2XTWr1ARr9LwLFhe8t6sp1K2RQelQNjrnkI+C
-   nwpbbNYgFFNXSQWwTfH9eSyH1vOvKSjiUEmat4swCBeDcSSs8SvxcRezw
-   XNR4DRbptPV97nfN2l/EJzC2Cyfs9ZCMGE+xWTU4AzfpwznE/9iLCqxfl
-   ktT6dKGaKgj61JZYz2do65CqZ2Xk2wDXk1HWaPZN4bhBVxKzekjjqwOxt
-   tpgmkNyQM7A/GPUzGwB7pErEEk6RdKHYUeTpB3wHKK7T7li+u11Bt8Hz8
-   rwxixG/v6bzOk5WHYezhaFUPmH19qNU56yoT4wy+3m5dCySXO5GmoH8K0
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="4300750"
-X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
-   d="scan'208";a="4300750"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 20:21:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
-   d="scan'208";a="40216302"
-Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.102.58]) ([10.247.102.58])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 20:20:55 -0800
-Message-ID: <6fbbd36a-20f5-43db-97fc-c8755a82a159@linux.intel.com>
-Date: Tue, 5 Mar 2024 12:20:39 +0800
+	s=arc-20240116; t=1709612587; c=relaxed/simple;
+	bh=yQNBbjLLiqAPFBqtBerGf1G2HRZprMYdpTiF0eQeK4k=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=ky1PmfgXoUDPXvc+q9nBKc1GJSUzgyOlaLY3unz5ogR1IEZ49944+nI8jTKrv6QOZm5uluUF1L9/+RS3w26UWnV9P5gvDTQF68wiyKali65UCXiPkYviW+tRJkQ8I24WiiJv01G6oVr5n6pC5JprVzQoJTzvQSBI7Yxf5LLl0r0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lmtDUjwi; arc=none smtp.client-ip=209.85.167.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3c1f582673bso579866b6e.2;
+        Mon, 04 Mar 2024 20:23:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709612584; x=1710217384; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fzMmBUOjgJ7iR9AaCreLenUOKeyl+lWeAI9zCHfBr1c=;
+        b=lmtDUjwi7DcyV5PGQgdtZsYF1fz07cw9n9zUeLoSRKZcpFT0c7HBQf0xhbe/Y0+3QP
+         QeTDiMXgMolcsNOyrj2q4W2mlWZtroJmbZzS8ism5LU/tViKvkVLmo+iCfo0gHFPybHb
+         e+83DFVC2QBa0wAoiQXsfC/7PELv5LcxvFpfkiS59jomrfBtye8exsAuoydW2rueftzj
+         jWgizpOY2iyReCEVmdybJX7WJAEofWHgwUESpPA7V0nrg7vQ53H1vNPYTtcGrSyRMrnr
+         YLjdcqRUxFk05xZPKxQOiwLpQaaX4jgE9ypEqFTxyRLWYez+1X46TVUR6F/GW46xCcAz
+         mKew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709612584; x=1710217384;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=fzMmBUOjgJ7iR9AaCreLenUOKeyl+lWeAI9zCHfBr1c=;
+        b=slYs+TfxmYy4eWzuswuyS56LobAXCm4SLbczxBavcMW/szcN3780zqxdhhT5NV+5W+
+         xYQSr1vrMEoOk8cypH26JprbffnJB4JM7rcIqa3YyXEmkAKmnkzZa2r98dfM4n6BU21Q
+         k5DoUgN1dFG3lo+YlT7qYS/RGKZutohr6PUyzLoRbdvmcgFWqRl3wIIK+C7kYQBctfsv
+         gsLpnVeZ3jyGxk/IBq0mbzMY6m6hjxsIQUVJvpf1EcpuHpN6MCXZPy+am5woWYpCw/b+
+         e07aneZ49+pSog9BtA+fLksSWgkY0vVlIwdY3zdnnsL3D8S9Hf5MFSCkdNg3Reu0Y9ee
+         vJrA==
+X-Forwarded-Encrypted: i=1; AJvYcCWaqsjalYf/GCJTN65E/QNEv/0omGqc+DzDo/BVLtTxozraxizsCU3UVU09sbULdUoIuiof71biaPb80QDUsMe5l0U0mknh7UNGjQS4fnPGHKgYtP4F5cjcRrhtssZo00n+t6zp0CxnUvktv8Ai9TnGiZSXiexkmq4QqMlc+1Mt
+X-Gm-Message-State: AOJu0YxF3rGoyDrWM1gu/1eSj/a8vLyQ8itUnJvHt4cKoCBcbvvOBC+Y
+	//81mko7q2zZ/3zsV2KD7uynhAxd12AUv7uY2An0aThjT7tBZA/2
+X-Google-Smtp-Source: AGHT+IFFLUatCbrLcMXVuav5X7tGY8ZmQkBrBn5N3BUtEsRTOKjsncHTzek04PM66AOZAh/JjzEGcw==
+X-Received: by 2002:a05:6808:9b6:b0:3c1:c9ad:7525 with SMTP id e22-20020a05680809b600b003c1c9ad7525mr703622oig.29.1709612584464;
+        Mon, 04 Mar 2024 20:23:04 -0800 (PST)
+Received: from [10.0.2.15] (KD106167171201.ppp-bb.dion.ne.jp. [106.167.171.201])
+        by smtp.gmail.com with ESMTPSA id x15-20020a056a00270f00b006e56d880015sm3050662pfv.140.2024.03.04.20.23.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Mar 2024 20:23:04 -0800 (PST)
+Message-ID: <e876e3c8-109d-4bc8-9916-05a4bc4ee9ac@gmail.com>
+Date: Tue, 5 Mar 2024 13:23:00 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,130 +75,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 1/9] net: phylink: provide
- mac_get_pcs_neg_mode() function
-To: "Voon, Weifeng" <weifeng.voon@intel.com>,
- Russell King <linux@armlinux.org.uk>
-Cc: Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
- David E Box <david.e.box@linux.intel.com>,
- Hans de Goede <hdegoede@redhat.com>, Mark Gross <markgross@kernel.org>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <Jose.Abreu@synopsys.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Philipp Zabel <p.zabel@pengutronix.de>, Andrew Halaney
- <ahalaney@redhat.com>, Serge Semin <fancer.lancer@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-stm32@st-md-mailman.stormreply.com"
- <linux-stm32@st-md-mailman.stormreply.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "platform-driver-x86@vger.kernel.org" <platform-driver-x86@vger.kernel.org>,
- "linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "Sit, Michael Wei Hong" <michael.wei.hong.sit@intel.com>,
- "Lai, Peter Jun Ann" <peter.jun.ann.lai@intel.com>,
- "Abdul Rahim, Faizal" <faizal.abdul.rahim@intel.com>
-References: <20240215030500.3067426-1-yong.liang.choong@linux.intel.com>
- <20240215030500.3067426-2-yong.liang.choong@linux.intel.com>
- <Zc47T/qv8Xg2SA21@shell.armlinux.org.uk>
- <PH7PR11MB65210C62342088CF5C484A2888552@PH7PR11MB6521.namprd11.prod.outlook.com>
 Content-Language: en-US
-From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-In-Reply-To: <PH7PR11MB65210C62342088CF5C484A2888552@PH7PR11MB6521.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
+Cc: Thorsten Blum <thorsten.blum@toblux.com>, Breno Leitao
+ <leitao@debian.org>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Vegard Nossum <vegard.nossum@oracle.com>,
+ Jani Nikula <jani.nikula@linux.intel.com>, Akira Yokosawa <akiyks@gmail.com>
+From: Akira Yokosawa <akiyks@gmail.com>
+Subject: [PATCH] docs: Makefile: Add dependency to $(YNL_INDEX) for targets
+ other than htmldocs
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
+Commit f061c9f7d058 ("Documentation: Document each netlink family")
+added recipes for YAML -> RST conversion.
+Then commit 7da8bdbf8f5d ("docs: Makefile: Fix make cleandocs by
+deleting generated .rst files") made sure those converted .rst files
+are cleaned by "make cleandocs".
 
+However, they took care of htmldocs build only.
 
-On 23/2/2024 2:58 pm, Voon, Weifeng wrote:
->>> For instance, if the interface switches from 2500baseX to SGMII mode,
->>> and the current link mode is MLO_AN_PHY, calling
->> 'phylink_pcs_neg_mode'
->>> would yield PHYLINK_PCS_NEG_OUTBAND. Since the MAC and PCS driver
->>> require PHYLINK_PCS_NEG_INBAND_ENABLED, the
->> 'mac_get_pcs_neg_mode'
->>> function will calculate the mode based on the interface, current link
->>> negotiation mode, and advertising link mode, returning
->>> PHYLINK_PCS_NEG_OUTBAND to enable the PCS to configure the correct
->> settings.
->>
->> This paragraph doesn't make sense - at least to me. It first talks about
->> requiring PHYLINK_PCS_NEG_INBAND_ENABLED when in SGMII mode. On
->> this:
-> 
-> The example given here is a very specific condition and that probably why there are some confusions here. Basically, this patch provides an optional function for MAC driver to change the phy interface on-the-fly without the need of reinitialize the Ethernet driver. As we know that the 2500base-x is messy, in our case the 2500base-x does not support inband. To complete the picture, we are using SGMII c37 to handle speed 10/100/1000. Hence, to enable user to switch link speed from 2500 to 1000/100/10 and vice versa on-the-fly, the phy interface need to be configured to inband SGMII for speed 10/100/1000, and outband 2500base-x for speed 2500. Lastly, the newly introduced "mac_get_pcs_neg_mode"callback function enables MAC driver to reconfigure pcs negotiation mode to inband or outband based on the interface mode, current link negotiation mode, and advertising link mode.
-> 
->>
->> 1) are you sure that the hardware can't be programmed for the SGMII
->> symbol repititions?
->>
-> 
-> No, the HW can be program for SGMII symbol repetitions.
-> 
->> 2) what happens if you're paired with a PHY (e.g. on a SFP module) which
->> uses SGMII but has no capability of providing the inband data?
->> (They do exist.) If your hardware truly does require inband data, it is going to
->> be fundamentally inoperative with these modules.
->>
-> 
-> Above explanation should have already cleared your doubts. Inband or outband capability is configured based on the phy interface.
-> 
->> Next, you then talk about returning PHYLINK_PCS_NEG_OUTBAND for the
->> "correct settings". How does this relate to the first part where you basically
->> describe the problem as SGMII requring inband? Basically the two don't
->> follow.
-> 
-> It should be a typo mistake. SGMII should return PHYLINK_PCS_NEG_INBAND_ENABLED.
-> 
->>
->> How, from a design point of view, because this fundamentally allows drivers
->> to change how the system behaves, it will allow radically different behaviours
->> for the same parameters between different drivers.
->> I am opposed to that - I want to see a situation where we have uniform
->> behaviour for the same configuration, and where hardware doesn't support
->> something, we have some way to indicate that via some form of capabilities.
->>
-> 
-> Hi Russell,
-> If I understand you correctly, MAC driver should not interfere with pcs negotiation mode and it should be standardized in the generic function, e.g., phylink_pcs_neg_mode()?
-> 
->> The issue of whether 2500base-X has inband or not is a long standing issue,
->> and there are arguments (and hardware) that take totally opposing views on
->> this. There is hardware where 2500base-X inband _must_ be used or the link
->> doesn't come up. There is also hardware where 2500base-X inband is not
->> "supported" in documentation but works in practice. There is also hardware
->> where 2500base-X inband doesn't work. The whole thing is a total mess
->> (thanks IEEE 802.3 for not getting on top of this early enough... and what's
->> now stated in 802.3 for 2500base-X is now irrelevant because they were too
->> late to the
->> party.)
->>
-> 
-> Agreed. And I have also seen some of your comments regarding the 2500SGMII and 2500BASEX.
-> 
-Hi Russell,
+If one of other targets such as latexdocs or epubdocs is built
+without building htmldocs, missing .rst files can cause additional
+WARNINGs from sphinx-build as follow:
 
-Did the previous reply clear your doubt?
+    ./Documentation/userspace-api/netlink/specs.rst:18: WARNING: undefined label: 'specs'
+    ./Documentation/userspace-api/netlink/netlink-raw.rst:64: WARNING: unknown document: '../../networking/netlink_spec/rt_link'
+    ./Documentation/userspace-api/netlink/netlink-raw.rst:64: WARNING: unknown document: '../../networking/netlink_spec/tc'
+    ./Documentation/userspace-api/netlink/index.rst:21: WARNING: undefined label: 'specs'
 
-If we understand you correctly that MAC driver should not interfere with 
-pcs negotiation mode and it should be standardized in the generic function.
-If implement what you suggested earlier that during interface mode change 
-then update the `cur_link_an_mode` but not cfg_link_an_mode: 
-https://patchwork.kernel.org/project/netdevbpf/patch/20230921121946.3025771-4-yong.liang.choong@linux.intel.com/?
+Add dependency to $(YNL_INDEX) for other targets and allow any targets
+to be built cleanly right after "make cleandocs".
 
-Would that be a better solution?
-So that 'phylink_pcs_neg_mode' function still can serve as the generic for 
-all the drivers.
+Signed-off-by: Akira Yokosawa <akiyks@gmail.com>
+Cc: stable@vger.kernel.org  # v6.7
+Cc: Thorsten Blum <thorsten.blum@toblux.com>
+Cc: Breno Leitao <leitao@debian.org>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: David S. Miller <davem@davemloft.net>
+---
+Hi,
 
-Do you have anything in mind that we can handle better for this patch series?
-or the solution can be aligned with what you are going to implement in the 
-future?
+While the first offending commit went through the -net tree, 
+I'd like Jon to pick this up provided there is no objection from
+Jakub or davem.
+
+I know there are complaints against generating files under the
+documentation source tree (thread under [1]). 
+So this is a tentative workaround until someone comes up with
+a proper way to fix the fundamental issue.
+
+I wouldn't add Fixes tags.  Almost all the people care only of
+htmldocs...
+
+[1]: https://lore.kernel.org/linux-doc/874jevjgvo.fsf@intel.com/
+
+        Thanks, Akira
+---
+ Documentation/Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/Makefile b/Documentation/Makefile
+index 4479910166fc..b68f8c816897 100644
+--- a/Documentation/Makefile
++++ b/Documentation/Makefile
+@@ -111,7 +111,9 @@ $(YNL_INDEX): $(YNL_RST_FILES)
+ $(YNL_RST_DIR)/%.rst: $(YNL_YAML_DIR)/%.yaml $(YNL_TOOL)
+ 	$(Q)$(YNL_TOOL) -i $< -o $@
+ 
+-htmldocs: $(YNL_INDEX)
++htmldocs texinfodocs latexdocs epubdocs xmldocs: $(YNL_INDEX)
++
++htmldocs:
+ 	@$(srctree)/scripts/sphinx-pre-install --version-check
+ 	@+$(foreach var,$(SPHINXDIRS),$(call loop_cmd,sphinx,html,$(var),,$(var)))
+ 
+
+base-commit: a800c6f5b0573847722c5ec70e0ce5cde6ca13dd
+-- 
+2.34.1
+
 
