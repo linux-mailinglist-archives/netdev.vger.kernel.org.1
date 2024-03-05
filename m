@@ -1,141 +1,134 @@
-Return-Path: <netdev+bounces-77435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7D70871C43
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:54:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7961B871C4E
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:54:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D2CA285875
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 10:54:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00C8EB22B64
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 10:54:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ACA05F85E;
-	Tue,  5 Mar 2024 10:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6664F55C1D;
+	Tue,  5 Mar 2024 10:46:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GPO5bVNh"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="1TKr1Kug"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756C45FB88
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 10:44:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F541DDF4
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 10:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709635454; cv=none; b=q/xR39CqGJ35Kq8elyKU9cmNJ0/QkC0XF6o46UUEU63H5TL887ezoVRjWE1ZcmmGFP2UEv2lIkDLVBBxPy/MUp2vcUEbfC9fZdT46H8OrgU8LKcevCshuDijvzDCsML2csiDCIc0KU/Es1F03GJ3alfjerCqDHzsB8kU4rUzIqY=
+	t=1709635567; cv=none; b=oYzNXfI+DOEf6D5744AAcuZ9jWCJnJ7hvTafovOXBcy9j1X+VANjsVwGPyCI7+2MQAf5/wTN11v5z2VBvM9Tjcep43hOoZEhrkJgceVs2W+ZsP5u2jyUomCrlc1C/2f2Wg8J+DhpdHfNRmFgs1H9t0FxBAzGTLGa0FFflj4hYwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709635454; c=relaxed/simple;
-	bh=VzJ1/0kBt1TfgOFz76rdhUEpO+Gc8N+NL/tKsznH7Jw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bQ69ocuKyX94XmEdmnZF6Z3YdT9+uS2D0ZY5O48Y5x1cA76QdYnUZGXuW/+n/imE18mfD0BSGVYDt7+DF/wNscprkEbrwv2CmARb+fBRCtAdkKs4mclyjS+CxBTc9J/tgeF4AbOuqIlrrpXydFPY8zFGmSfjEgdcpNSz0rQU0gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GPO5bVNh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709635452;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=VzJ1/0kBt1TfgOFz76rdhUEpO+Gc8N+NL/tKsznH7Jw=;
-	b=GPO5bVNhVW8yn1U+UMgpF/7scs98/upo9fEIn4EumpEJH/8iTUYx6+WoPTlb2wJE7CPaO3
-	IPBgM5boi16vDedaKvEgJaiZaqSj4Eqila17jYngdPc3QGIZrPdK6qNWB0JHy6vfqa7FNJ
-	Z/ZHlcEW5CgF7miVn8ihX7dQIsLEqBU=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-336-wayUTAcIPkuhhz0nyetZOw-1; Tue, 05 Mar 2024 05:44:10 -0500
-X-MC-Unique: wayUTAcIPkuhhz0nyetZOw-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-512dfa1ff28so1023324e87.1
-        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 02:44:10 -0800 (PST)
+	s=arc-20240116; t=1709635567; c=relaxed/simple;
+	bh=XklbFoUwOSii+y74bxc36aiADpTAj4ZlGh81v8WRHIE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZTs9ITIABZthauu1BY5kE+xgQ92i0up9hk+iZcWEBRagTZqOJ8Ziq5w9KZPQvITcvjo5qExBomsbpBPSIN4m59hq6014Jj3E8ov15lcbmpVNHi5j7dbZqkXrF43PavtEJVmCrbNsE80eX0veCEViHKYIr7sVlUdN7JEjA6i+dzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=1TKr1Kug; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-412e4426e32so13445815e9.2
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 02:46:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1709635563; x=1710240363; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JVA1JqDTMPvckuRaTHq5sqq6pnFxGrbQ8TF6seYnelo=;
+        b=1TKr1KugBceesEMwMGGzcf/55Y5czeuKgOSW8hUF2A4z7TvXPZbUOYgeR1XgC1W/Xg
+         fKqN5vLnGGhZQyCuRQJSNo5wDVwWgzN+wl/3+IgVxcE/a9NgkVomCTb26LqDu5keSi2p
+         ADFNs7kMiKQom8xrncsefJ69WNlttJumkg5B3ok8fALTscJr7sHXGdRQIWawG8CKkn8v
+         8NBwMQPflifIgKMGDtNLbRnndmhwfDKlJ5sP7q99z8un65B8i2ph7TBDP4NDHH1zoqVO
+         hew7XKZ4Y74A56I0i3IaOqyfe6sQq/8lYaTAN1cPZ9s5xelmmU2PJgnuMZtXFOwWpdM3
+         gOtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709635449; x=1710240249;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
+        d=1e100.net; s=20230601; t=1709635563; x=1710240363;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VzJ1/0kBt1TfgOFz76rdhUEpO+Gc8N+NL/tKsznH7Jw=;
-        b=Xnj44xi1XjH40tcbe9/ROL9xPLmRGnlxpdTAG1/6Kjt6EbXiKfsJB/Se5LdZUA9F0Y
-         2siGL9rBcsaDUaIuTIMgYb1TO3JwWr8JHborEPF8JaK9hWdGSe2t4OAllcMFqf0Ni/CM
-         wF39vAueKkHKRVQH0an3jd/LTAz0AT3/OB0EpAVxJhqQThV10LP2gXkzXVxk/rBkRVV0
-         TG5HanmF+QAJEceoaZ9cDRcfQz1lIRHNHEbfouO2QImzqfQLGjkRnhXvEJ3Us+u0721C
-         OCAPp7RPT8K+pZb6+LF/YauLBCsWCXaAJnLF+Wj1TSoLzXJbe2ON9tuLRSw9llHRtePO
-         j82w==
-X-Gm-Message-State: AOJu0YyHgGMoZ3xj5J3bB4l/Ggg2du88VU8CdvBfR+TSEoftZgXv0OC1
-	fc7qEz0mMpqdm0EkdScJweUsgNYhyolstwOhfnFBIgLPNy9JLs7XzIlrOWjlbB2n4DqksLCPNOS
-	NsSj/F1yPEZ+Vs5NDShcGgfjDT5HCLxdn62GWzAyU2YGgeDPq3e13Uw==
-X-Received: by 2002:a2e:8906:0:b0:2d2:af88:894a with SMTP id d6-20020a2e8906000000b002d2af88894amr6935557lji.1.1709635449282;
-        Tue, 05 Mar 2024 02:44:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGsnArzyvPBupUmbEAQrLyC53xjDYEaFU5OJD1ILPWWw2IvTqrhO6PoWLbeN9s7lyeAxaKSiQ==
-X-Received: by 2002:a2e:8906:0:b0:2d2:af88:894a with SMTP id d6-20020a2e8906000000b002d2af88894amr6935544lji.1.1709635448889;
-        Tue, 05 Mar 2024 02:44:08 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-235-19.dyn.eolo.it. [146.241.235.19])
-        by smtp.gmail.com with ESMTPSA id f12-20020a05600c4e8c00b00412ae4b45b3sm20960292wmq.30.2024.03.05.02.44.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Mar 2024 02:44:08 -0800 (PST)
-Message-ID: <ae886b7975751a2c148fa4addce26c456678c735.camel@redhat.com>
-Subject: Re: [PATCH v3 net-next 2/4] net: Allow to use SMP threads for
- backlog NAPI.
-From: Paolo Abeni <pabeni@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Wander Lairson Costa <wander@redhat.com>, Yan Zhai <yan@cloudflare.com>
-Date: Tue, 05 Mar 2024 11:44:06 +0100
-In-Reply-To: <20240305103530.FEVh-64E@linutronix.de>
-References: <20240228121000.526645-1-bigeasy@linutronix.de>
-	 <20240228121000.526645-3-bigeasy@linutronix.de>
-	 <c37223527d5b6bcf0ffce69c81f16fd0781fa2d6.camel@redhat.com>
-	 <20240305103530.FEVh-64E@linutronix.de>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        bh=JVA1JqDTMPvckuRaTHq5sqq6pnFxGrbQ8TF6seYnelo=;
+        b=TA/k2nq9SAB9MFfdH8hw6sv5RKZRS8h7rVwTWtXJk5XELjQ5YgbV/zXfiIP1kNT4iV
+         iLdXel6QExZNmu1n+wRCZCkRtMIcT8hlMXZlm7u8LaM2NFBMD6qeyqsLDylanKodMXTt
+         N1GLGxcdi6a/G5L07sIO0AzBlYtZGxLc4v+pyPotYZ8Co++1hjSJ+GCmW2k3IhWUI8Xf
+         XbCeIGyGDdVi0htH3WfUEC/uIq0EtOuc71uHhgHvp4I+y/nzrh2AqdRJL8e8jVhqC0/A
+         4cAwfo/X/qgY5h/Z0gHufxumaCB+ruenOuEzIzz2acys7I77K7b/RlgqBikpwRfXMia7
+         WFlw==
+X-Forwarded-Encrypted: i=1; AJvYcCX1VoE5FU9Pw576I+crBU4w/boqfUWVvacF3yye+Qxfjjn26SjBkYJ3DvKa4F8RioWlmKRAcv78dy/NYM4DsBUSDTZoVvi0
+X-Gm-Message-State: AOJu0YyMdxu5swZkL4zMZMbU5XzxhPldwtawGky//9MzPv8Qt6BgOLJs
+	vJZXLJmUiHShMqdUcmo2qbMXJH97EyrL5MyhPzjVJFCHFz24eUg2++cjX2jzHx0uGmPVNanS8+r
+	3
+X-Google-Smtp-Source: AGHT+IE/L4A6bnauZ4LpcW6naeeYuRNA8WEWJrlnt645s9ZaWVjgn/tE11DGJ0F5XhXa7k+kx2lEzw==
+X-Received: by 2002:a05:6000:1249:b0:33d:2226:a28b with SMTP id j9-20020a056000124900b0033d2226a28bmr7827513wrx.37.1709635563236;
+        Tue, 05 Mar 2024 02:46:03 -0800 (PST)
+Received: from [192.168.1.70] ([84.102.31.43])
+        by smtp.gmail.com with ESMTPSA id d15-20020a5d644f000000b0033e052be14fsm14577187wrw.98.2024.03.05.02.46.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Mar 2024 02:46:02 -0800 (PST)
+Message-ID: <3a5f3950-e47f-409a-b881-0c8545778b91@baylibre.com>
+Date: Tue, 5 Mar 2024 11:46:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] net: ethernet: ti: am65-cpsw: Add minimal XDP
+ support
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org
+References: <20240223-am65-cpsw-xdp-basic-v2-0-01c6caacabb6@baylibre.com>
+ <20240223-am65-cpsw-xdp-basic-v2-2-01c6caacabb6@baylibre.com>
+ <356f4dd4-eb0e-49fa-a9eb-4dffbe5c7e7c@lunn.ch>
+From: Julien Panis <jpanis@baylibre.com>
+In-Reply-To: <356f4dd4-eb0e-49fa-a9eb-4dffbe5c7e7c@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, 2024-03-05 at 11:35 +0100, Sebastian Andrzej Siewior wrote:
-> On 2024-03-05 11:08:35 [+0100], Paolo Abeni wrote:
-> >=20
-> > Does not apply cleanly after commit 1200097fa8f0d, please rebase and
-> > repost. Note that we are pretty close to the net-next PR, this is at
-> > risk for this cycle.
->=20
-> will do.
->=20
-> > Side note: is not 110% clear to me why the admin should want to enable
-> > the threaded backlog for the non RT case. I read that the main
-> > difference would be some small perf regression, could you clarify?
->=20
-> I am not aware of a perf regression.
+On 3/1/24 17:38, Andrew Lunn wrote:
+> On Fri, Mar 01, 2024 at 04:02:53PM +0100, Julien Panis wrote:
+>> This patch adds XDP (eXpress Data Path) support to TI AM65 CPSW
+>> Ethernet driver. The following features are implemented:
+>> - NETDEV_XDP_ACT_BASIC (XDP_PASS, XDP_TX, XDP_DROP, XDP_ABORTED)
+>> - NETDEV_XDP_ACT_REDIRECT (XDP_REDIRECT)
+>> - NETDEV_XDP_ACT_NDO_XMIT (ndo_xdp_xmit callback)
+>>
+>> The page pool memory model is used to get better performance.
+> Do you have any benchmark numbers? It should help with none XDP
+> traffic as well. So maybe iperf numbers before and after?
+>
+> 	Andrew
 
-I probably inferred too much from the udp lookback case.
+Argh...Houston, we have a problem. I checked my v3, which is ready for
+submission, with iperf3:
+1) Before = without page pool -> 500 MBits/sec
+2) After = with page pool -> 442 MBits/sec
+-> ~ 10% worse with page pool here.
 
-> Jakub was worried about a possible regression with this and while asking
-> nobody came up with an actual use case where this is used. So it is as
-> he suggested, optional for everyone but forced-enabled for RT where it
-> is required.
-> I had RH benchmarking this and based on their 25Gbe and 50Gbe NICs and
-> the results look good. If anything it looked a bit better with this on
-> the 50Gbe NICs but since those NICs have RSS=E2=80=A6
->=20
-> I have this default off so that nobody complains and yet has to
-> possibility to test and see if it leads to a problem. If not, we could
-> enable it by default and after a few cycles and then remove the IPI code
-> a few cycles later with absent complains.
+Unless the difference is not due to page pool. Maybe there's something else
+which is not good in my patch. I'm going to send the v3 which uses page pool,
+hopefully someone will find out something suspicious. Meanwhile, I'll carry on
+investigating: I'll check the results with my patch, by removing only the using of
+page pool.
 
-I think this late in the cycle is better to keep backlog threads off by
-default.
+Julien
 
-Thanks,
 
-Paolo
 
 
