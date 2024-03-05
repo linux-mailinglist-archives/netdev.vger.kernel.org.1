@@ -1,104 +1,202 @@
-Return-Path: <netdev+bounces-77575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FD97872366
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:59:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47985872370
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 17:00:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 200281F24073
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:59:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F24D2283B02
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C0F2127B7A;
-	Tue,  5 Mar 2024 15:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63933127B7F;
+	Tue,  5 Mar 2024 16:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hOX1hU/C"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="UM0OUMbD"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp-bc08.mail.infomaniak.ch (smtp-bc08.mail.infomaniak.ch [45.157.188.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3399127B67;
-	Tue,  5 Mar 2024 15:59:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DF5127B71
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 16:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709654371; cv=none; b=lQtvLcSt71L3ww8/E7uA4LE6dHiwI8YNpAGnbrB3UrVQp+vNc+QyfYTBUNfwyX6uqSSOb52qtkV0C4OXkj5eTPyTgzVtHhieNa3eP5hcZVLvrGzr41wUErYPcdlGz0kGcKVBBT1e85oJk9Ukgq6au/PRDHyt8yZe0DD8/jZu7BA=
+	t=1709654434; cv=none; b=fYxxJ5NbaCmJ7p121W0Z0yy1aoQ8VZJqX/f7jQF9NXyyUJQnedBJbUhYW8uFBYPKFw3MU0lYb1y3AGPSf98hywxkfhTHZEcuzMMC+2li5UVMO3JpP2CrfKUCbRDB+7np1zXMlQL6pXPrWEwMi+ay7UNBIhwQaLl2/Orn6fKd7tM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709654371; c=relaxed/simple;
-	bh=iItpnO9HB22l6TPSIGEjXqZsSsW0E9L1Vp5Jr3gGztU=;
+	s=arc-20240116; t=1709654434; c=relaxed/simple;
+	bh=ue1Fg+6PAqeVbOLBaqzgadL3cQSFzw3F6sfDg+/iUjA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ASVvr8xFD41C8ttjooBB2d4psE1U7WoePI8kXcl4baII0qugunOzYnY9vze65il0AJNn4dGqELh5ArzZ7iHuj2HhMPFmzKUC7ZMmp2DPszAEyt+/3mMau7oVLqSIxTiGc+cJEAjk54I6eHgMU80gdrRLuDhonqVwaPnvH7BEYfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hOX1hU/C; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5CbH98xMB39QeV6x5E8qPNDIpDvhpXOnij4KofH10cs=; b=hOX1hU/Cusfcnpy5jVYHTirOLq
-	sImBKnD+SJWuspKBwUjwVTla7ARgyYgC2892X2zHj8T9FgVBaWsZRojto0geUWrY06Q5Hf0bnAsLz
-	BounaFzet3EtjCVYCbJJOrzpiPbLZj3G+UdLc7hYOF2kUwcR5T3DNUsyyjQcWAlvBTLE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rhXCa-009RXt-F0; Tue, 05 Mar 2024 16:59:36 +0100
-Date: Tue, 5 Mar 2024 16:59:36 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Eric Woudstra <ericwouds@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Lucien Jheng <lucien.jheng@airoha.com>,
-	Zhi-Jun You <hujy652@protonmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 2/2] net: phy: air_en8811h: Add the Airoha
- EN8811H PHY driver
-Message-ID: <641f9aec-2207-455c-a2d2-e981ea55a594@lunn.ch>
-References: <20240302183835.136036-1-ericwouds@gmail.com>
- <20240302183835.136036-3-ericwouds@gmail.com>
- <e056b4ac-fffb-41d9-a357-898e35e6d451@lunn.ch>
- <aeb9f17c-ea94-4362-aeda-7d94c5845462@gmail.com>
- <Zebf5UvqWjVyunFU@shell.armlinux.org.uk>
- <0184291e-a3c7-4e54-8c75-5b8654d582b4@lunn.ch>
- <ZecrGTsBZ9VgsGZ+@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ntBEl427ywRjMGLUO8bBFbrncIOb0JzXtdcBaE83aFki7OQ6gySfoRDcb2GiFeI+MwyUDLIyTv4SWm8ek44rf6eHYMSq2wqBBsgxhVQYofNPPs7tSkZwH36tlCEFhNp6fxKLpb5PosbTpHIYNP4PJWA4SZ1dlrGe7HSt9qCaB90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=UM0OUMbD; arc=none smtp.client-ip=45.157.188.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Tq0dg1KBBzMpvMw;
+	Tue,  5 Mar 2024 17:00:23 +0100 (CET)
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4Tq0df3wLszvr;
+	Tue,  5 Mar 2024 17:00:22 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1709654423;
+	bh=ue1Fg+6PAqeVbOLBaqzgadL3cQSFzw3F6sfDg+/iUjA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UM0OUMbDmXkdN+AYlV1EP4YMfYfg/egqSlGrg+qTLzMJgsR4MEAJSTbR7Kft66jfE
+	 6pHppjeZpswTIUFhpIgYTJPW/x+5+GzAeGlxg9h6UDp19uR/7kUCdzTdrECBGD5B8f
+	 XE7TxtP61ZB7DlmrSDR/YJBon634mqZcEfSOE99M=
+Date: Tue, 5 Mar 2024 17:00:11 +0100
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Mark Brown <broonie@kernel.org>, 
+	keescook@chromium.org, davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, jakub@cloudflare.com
+Subject: Re: [PATCH v4 00/12] selftests: kselftest_harness: support using
+ xfail
+Message-ID: <20240305.hoi8ja1eeg4C@digikod.net>
+References: <20240229005920.2407409-1-kuba@kernel.org>
+ <05f7bf89-04a5-4b65-bf59-c19456aeb1f0@sirena.org.uk>
+ <20240304150411.6a9bd50b@kernel.org>
+ <7bb3b635-9fed-47ab-a640-ccac6d283b54@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZecrGTsBZ9VgsGZ+@shell.armlinux.org.uk>
+In-Reply-To: <7bb3b635-9fed-47ab-a640-ccac6d283b54@intel.com>
+X-Infomaniak-Routing: alpha
 
-> > What i'm thinking is we add another op to phy_driver dedicated to
-> > firmware download. We let probe run as is, so the PHY is registered
-> > and available. But if the firmware op is set, we start a thread and
-> > call the op in it. Once the op exits, we signal a completion event.
-> > phy_attach_direct() would then wait on the completion.
+On Tue, Mar 05, 2024 at 04:48:06PM +0100, Przemek Kitszel wrote:
+> On 3/5/24 00:04, Jakub Kicinski wrote:
+> > On Mon, 4 Mar 2024 22:20:03 +0000 Mark Brown wrote:
+> > > On Wed, Feb 28, 2024 at 04:59:07PM -0800, Jakub Kicinski wrote:
+> > > 
+> > > > When running selftests for our subsystem in our CI we'd like all
+> > > > tests to pass. Currently some tests use SKIP for cases they
+> > > > expect to fail, because the kselftest_harness limits the return
+> > > > codes to pass/fail/skip. XFAIL which would be a great match
+> > > > here cannot be used.
+> > > > 
+> > > > Remove the no_print handling and use vfork() to run the test in
+> > > > a different process than the setup. This way we don't need to
+> > > > pass "failing step" via the exit code. Further clean up the exit
+> > > > codes so that we can use all KSFT_* values. Rewrite the result
+> > > > printing to make handling XFAIL/XPASS easier. Support tests
+> > > > declaring combinations of fixture + variant they expect to fail.
+> > > 
+> > > This series landed in -next today and has caused breakage on all
+> > > platforms in the ALSA pcmtest-driver test.  When run on systems that
+> > > don't have the driver it needs loaded the test skip but since this
+> > > series was merged skipped tests are logged but then reported back as
+> > > failures:
+> > > 
+> > > # selftests: alsa: test-pcmtest-driver
+> > > # TAP version 13
+> > > # 1..5
+> > > # # Starting 5 tests from 1 test cases.
+> > > # #  RUN           pcmtest.playback ...
+> > > # #      SKIP      Can't read patterns. Probably, module isn't loaded
+> > > # # playback: Test failed
+> > > # #          FAIL  pcmtest.playback
+> > > # not ok 1 pcmtest.playback #  Can't read patterns. Probably, module isn't loaded
+> > > # #  RUN           pcmtest.capture ...
+> > > # #      SKIP      Can't read patterns. Probably, module isn't loaded
+> > > # # capture: Test failed
+> > > # #          FAIL  pcmtest.capture
+> > > # not ok 2 pcmtest.capture #  Can't read patterns. Probably, module isn't loaded
+> > > # #  RUN           pcmtest.ni_capture ...
+> > > # #      SKIP      Can't read patterns. Probably, module isn't loaded
+> > > # # ni_capture: Test failed
+> > > # #          FAIL  pcmtest.ni_capture
+> > > # not ok 3 pcmtest.ni_capture #  Can't read patterns. Probably, module isn't loaded
+> > > # #  RUN           pcmtest.ni_playback ...
+> > > # #      SKIP      Can't read patterns. Probably, module isn't loaded
+> > > # # ni_playback: Test failed
+> > > # #          FAIL  pcmtest.ni_playback
+> > > # not ok 4 pcmtest.ni_playback #  Can't read patterns. Probably, module isn't loaded
+> > > # #  RUN           pcmtest.reset_ioctl ...
+> > > # #      SKIP      Can't read patterns. Probably, module isn't loaded
+> > > # # reset_ioctl: Test failed
+> > > # #          FAIL  pcmtest.reset_ioctl
+> > > # not ok 5 pcmtest.reset_ioctl #  Can't read patterns. Probably, module isn't loaded
+> > > # # FAILED: 0 / 5 tests passed.
+> > > # # Totals: pass:0 fail:5 xfail:0 xpass:0 skip:0 error:0
+> > > 
+> > > I haven't completely isolated the issue due to some other breakage
+> > > that's making it harder that it should be to test.
+> > > 
+> > > A sample full log can be seen at:
+> > > 
+> > >     https://lava.sirena.org.uk/scheduler/job/659576#L1349
+> > 
+> > Thanks! the exit() inside the skip evaded my grep, I'm testing this:
+> > 
+> > diff --git a/tools/testing/selftests/alsa/test-pcmtest-driver.c b/tools/testing/selftests/alsa/test-pcmtest-driver.c
+> > index a52ecd43dbe3..7ab81d6f9e05 100644
+> > --- a/tools/testing/selftests/alsa/test-pcmtest-driver.c
+> > +++ b/tools/testing/selftests/alsa/test-pcmtest-driver.c
+> > @@ -127,11 +127,11 @@ FIXTURE_SETUP(pcmtest) {
+> >   	int err;
+> >   	if (geteuid())
+> > -		SKIP(exit(-1), "This test needs root to run!");
+> > +		SKIP(exit(KSFT_SKIP), "This test needs root to run!");
+> >   	err = read_patterns();
+> >   	if (err)
+> > -		SKIP(exit(-1), "Can't read patterns. Probably, module isn't loaded");
+> > +		SKIP(exit(KSFT_SKIP), "Can't read patterns. Probably, module isn't loaded");
+> >   	card_name = malloc(127);
+> >   	ASSERT_NE(card_name, NULL);
+> > diff --git a/tools/testing/selftests/mm/hmm-tests.c b/tools/testing/selftests/mm/hmm-tests.c
+> > index 20294553a5dd..356ba5f3b68c 100644
+> > --- a/tools/testing/selftests/mm/hmm-tests.c
+> > +++ b/tools/testing/selftests/mm/hmm-tests.c
+> > @@ -138,7 +138,7 @@ FIXTURE_SETUP(hmm)
+> >   	self->fd = hmm_open(variant->device_number);
+> >   	if (self->fd < 0 && hmm_is_coherent_type(variant->device_number))
+> > -		SKIP(exit(0), "DEVICE_COHERENT not available");
+> > +		SKIP(exit(KSFT_SKIP), "DEVICE_COHERENT not available");
+> >   	ASSERT_GE(self->fd, 0);
+> >   }
+> > @@ -149,7 +149,7 @@ FIXTURE_SETUP(hmm2)
+> >   	self->fd0 = hmm_open(variant->device_number0);
+> >   	if (self->fd0 < 0 && hmm_is_coherent_type(variant->device_number0))
+> > -		SKIP(exit(0), "DEVICE_COHERENT not available");
+> > +		SKIP(exit(KSFT_SKIP), "DEVICE_COHERENT not available");
+> >   	ASSERT_GE(self->fd0, 0);
+> >   	self->fd1 = hmm_open(variant->device_number1);
+> >   	ASSERT_GE(self->fd1, 0);
+> > 
+> > > but there's no more context.  I'm also seeing some breakage in the
+> > > seccomp selftests which also use kselftest-harness:
+> > > 
+> > > # #  RUN           TRAP.dfl ...
+> > > # # dfl: Test exited normally instead of by signal (code: 0)
+> > > # #          FAIL  TRAP.dfl
+> > > # not ok 56 TRAP.dfl
+> > > # #  RUN           TRAP.ign ...
+> > > # # ign: Test exited normally instead of by signal (code: 0)
+> > > # #          FAIL  TRAP.ign
+> > > # not ok 57 TRAP.ign
+> > 
+> > Ugh, I'm guessing vfork() "eats" the signal, IOW grandchild signals,
+> > child exits? vfork() and signals.. I'd rather leave to Kees || Mickael.
+> > 
 > 
-> That's really not good, because phy_attach_direct() can be called
-> from .ndo_open, which will result in the rtnl lock being held while
-> we wait - so this is not much better than having the firmware load
-> in .config_init.
+> Hi, sorry for not trying to reproduce it locally and still commenting,
+> but my vfork() man page says:
+> 
+> | The child must  not  return  from  the current  function  or  call
+> | exit(3) (which would have the effect of calling exit handlers
+> | established by the parent process and flushing the parent's stdio(3)
+> | buffers), but may call _exit(2).
+> 
+> And you still have some exit(3) calls.
 
-My guess is, most devices register their MDIO bus, causing the PHYs to
-be probed, and then do nothing for a while until user space is up and
-running, which then ifup the interfaces. So we can use that time to
-start downloading the firmware. We probably end up spending less time
-holding rtnl in .config_init. For NFS root, it won't help, although if
-you are using NFS root, you are also likely to be TFTP booting the
-kernel, so the bootloader has already downloaded the firmware to the
-PHY.
+Correct, exit(3) should be replaced with _exit(2).
 
-	Andrew
+> 
+> 
+> 
 
