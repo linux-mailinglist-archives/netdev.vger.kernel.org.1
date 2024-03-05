@@ -1,155 +1,141 @@
-Return-Path: <netdev+bounces-77434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22B71871C3B
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:53:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7D70871C43
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:54:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24DB9B2463E
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 10:53:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D2CA285875
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 10:54:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8FD562A13;
-	Tue,  5 Mar 2024 10:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ACA05F85E;
+	Tue,  5 Mar 2024 10:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z3xr6nd8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GPO5bVNh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFC262A0F;
-	Tue,  5 Mar 2024 10:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756C45FB88
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 10:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709635412; cv=none; b=feUXBZQIyGh7rAMk66Rc6W/bPbotj8awzTeYs1h00BkSerxq9Tty4ifY9Dr4yLl/KYii4E3MbEoyARN6HGfyNHZ4brsKgWmT1CwtLEeatVSSDt+y5xBRSHY0t/J+Ih5bGh4v3puTo7baD/cc0JwCfhpANyjeQIpsOiIjYnJqZMM=
+	t=1709635454; cv=none; b=q/xR39CqGJ35Kq8elyKU9cmNJ0/QkC0XF6o46UUEU63H5TL887ezoVRjWE1ZcmmGFP2UEv2lIkDLVBBxPy/MUp2vcUEbfC9fZdT46H8OrgU8LKcevCshuDijvzDCsML2csiDCIc0KU/Es1F03GJ3alfjerCqDHzsB8kU4rUzIqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709635412; c=relaxed/simple;
-	bh=TXr6T5gctPLk+weuAPDK0CvjU5ZW8VNUAi1/4q57pf4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=X5HmHNeYjad11w9aADxzAHtVI1tiYOAicIrNYcetS3t3lCpSooUJ0oKeGlkZGFdW9DSKhTtICIAXE5Uis8526Wfn4CxwXL+lbPeUcQFpz50Zb5q46l7HpmqU4BjWrz82Uij6nra7SJI2KEEVWfMV+KZx1zv4fRl+cqKdKXljDzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z3xr6nd8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0665C43390;
-	Tue,  5 Mar 2024 10:43:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709635412;
-	bh=TXr6T5gctPLk+weuAPDK0CvjU5ZW8VNUAi1/4q57pf4=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Z3xr6nd8OG2diHS35Sun6lQrVCP54cyxSEd4HvDucM4XZ7Lr8zqeqJ02UZpl2Md/x
-	 hmiIaKDefnhqvqd5uDoIsrdm+iSYJWI6HLTIey2yhv8i3sddQ0727t8qptOFucttNU
-	 e38+geUzX8IgZ0+q6POWx9Ws+b4rVsY2ildKn7Zw4wmdewBqvlNck5Y2VV5yal875O
-	 twJhRpKX52VrlX5id37RwaJQZDzXXFh+9bVPcIdIrB9vpT/vEPWNXw7/5WkW2mbto7
-	 sOLHHTw6m2LjCLDJZ5FhtV2mnicq5ZhYCjn1xm07bQzrUByaH7/dkl29wWtf+GVbsm
-	 nnpc8UlDMPZoA==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Tue, 05 Mar 2024 11:42:43 +0100
-Subject: [PATCH net-next 13/13] selftests: userspace pm: avoid relaunching
- pm events
+	s=arc-20240116; t=1709635454; c=relaxed/simple;
+	bh=VzJ1/0kBt1TfgOFz76rdhUEpO+Gc8N+NL/tKsznH7Jw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=bQ69ocuKyX94XmEdmnZF6Z3YdT9+uS2D0ZY5O48Y5x1cA76QdYnUZGXuW/+n/imE18mfD0BSGVYDt7+DF/wNscprkEbrwv2CmARb+fBRCtAdkKs4mclyjS+CxBTc9J/tgeF4AbOuqIlrrpXydFPY8zFGmSfjEgdcpNSz0rQU0gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GPO5bVNh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709635452;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=VzJ1/0kBt1TfgOFz76rdhUEpO+Gc8N+NL/tKsznH7Jw=;
+	b=GPO5bVNhVW8yn1U+UMgpF/7scs98/upo9fEIn4EumpEJH/8iTUYx6+WoPTlb2wJE7CPaO3
+	IPBgM5boi16vDedaKvEgJaiZaqSj4Eqila17jYngdPc3QGIZrPdK6qNWB0JHy6vfqa7FNJ
+	Z/ZHlcEW5CgF7miVn8ihX7dQIsLEqBU=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-336-wayUTAcIPkuhhz0nyetZOw-1; Tue, 05 Mar 2024 05:44:10 -0500
+X-MC-Unique: wayUTAcIPkuhhz0nyetZOw-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-512dfa1ff28so1023324e87.1
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 02:44:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709635449; x=1710240249;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VzJ1/0kBt1TfgOFz76rdhUEpO+Gc8N+NL/tKsznH7Jw=;
+        b=Xnj44xi1XjH40tcbe9/ROL9xPLmRGnlxpdTAG1/6Kjt6EbXiKfsJB/Se5LdZUA9F0Y
+         2siGL9rBcsaDUaIuTIMgYb1TO3JwWr8JHborEPF8JaK9hWdGSe2t4OAllcMFqf0Ni/CM
+         wF39vAueKkHKRVQH0an3jd/LTAz0AT3/OB0EpAVxJhqQThV10LP2gXkzXVxk/rBkRVV0
+         TG5HanmF+QAJEceoaZ9cDRcfQz1lIRHNHEbfouO2QImzqfQLGjkRnhXvEJ3Us+u0721C
+         OCAPp7RPT8K+pZb6+LF/YauLBCsWCXaAJnLF+Wj1TSoLzXJbe2ON9tuLRSw9llHRtePO
+         j82w==
+X-Gm-Message-State: AOJu0YyHgGMoZ3xj5J3bB4l/Ggg2du88VU8CdvBfR+TSEoftZgXv0OC1
+	fc7qEz0mMpqdm0EkdScJweUsgNYhyolstwOhfnFBIgLPNy9JLs7XzIlrOWjlbB2n4DqksLCPNOS
+	NsSj/F1yPEZ+Vs5NDShcGgfjDT5HCLxdn62GWzAyU2YGgeDPq3e13Uw==
+X-Received: by 2002:a2e:8906:0:b0:2d2:af88:894a with SMTP id d6-20020a2e8906000000b002d2af88894amr6935557lji.1.1709635449282;
+        Tue, 05 Mar 2024 02:44:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGsnArzyvPBupUmbEAQrLyC53xjDYEaFU5OJD1ILPWWw2IvTqrhO6PoWLbeN9s7lyeAxaKSiQ==
+X-Received: by 2002:a2e:8906:0:b0:2d2:af88:894a with SMTP id d6-20020a2e8906000000b002d2af88894amr6935544lji.1.1709635448889;
+        Tue, 05 Mar 2024 02:44:08 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-235-19.dyn.eolo.it. [146.241.235.19])
+        by smtp.gmail.com with ESMTPSA id f12-20020a05600c4e8c00b00412ae4b45b3sm20960292wmq.30.2024.03.05.02.44.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Mar 2024 02:44:08 -0800 (PST)
+Message-ID: <ae886b7975751a2c148fa4addce26c456678c735.camel@redhat.com>
+Subject: Re: [PATCH v3 net-next 2/4] net: Allow to use SMP threads for
+ backlog NAPI.
+From: Paolo Abeni <pabeni@redhat.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Wander Lairson Costa <wander@redhat.com>, Yan Zhai <yan@cloudflare.com>
+Date: Tue, 05 Mar 2024 11:44:06 +0100
+In-Reply-To: <20240305103530.FEVh-64E@linutronix.de>
+References: <20240228121000.526645-1-bigeasy@linutronix.de>
+	 <20240228121000.526645-3-bigeasy@linutronix.de>
+	 <c37223527d5b6bcf0ffce69c81f16fd0781fa2d6.camel@redhat.com>
+	 <20240305103530.FEVh-64E@linutronix.de>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240305-upstream-net-next-20240304-selftests-mptcp-shared-code-shellcheck-v1-13-66618ea5504e@kernel.org>
-References: <20240305-upstream-net-next-20240304-selftests-mptcp-shared-code-shellcheck-v1-0-66618ea5504e@kernel.org>
-In-Reply-To: <20240305-upstream-net-next-20240304-selftests-mptcp-shared-code-shellcheck-v1-0-66618ea5504e@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2205; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=TXr6T5gctPLk+weuAPDK0CvjU5ZW8VNUAi1/4q57pf4=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBl5vcdWvZOlF2dPM/bD8EnzbOzzLBJwJOoByS1P
- 3r1cAhJyQ+JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZeb3HQAKCRD2t4JPQmmg
- c4+5EADm9uVDUc6EJ98F/z11Xr2mgCzFqi6CL43XvSyGOX2H9WUjRqBpXarILE96pJKA0UqTBud
- 4HmdnxUonGh90yAdafBjv1euH4YvmFcXytveabyynQGhCiTlzBLYivAzRosBvMualqwYleGuyRG
- 9zidzrEbtrX/7veysAJKcmt/FL+bhPevPZiluISaVG+4RAyPcg9+t6WXOX4VEYzJoXz/3bfyWsv
- dkjliFqmtY48uUDXNo4mSZtmosKYw/T9Nc7JbkvxKYIeEUp7MnhADjl7NMUU+Og0ekR4Nilz5Ms
- jJgVfeZDqgGBsG8UFCQKlIWugY2N0VTmztjNSxc9L2XZZawoRo5kjwRab5Pnu4oLLbmPUH9AmJk
- iyMrZS81zhAAIndOYMMyihupT8qtainXlGsR23p9Ob79Kc8scwwNFO3TF3agFrBlnDM6v2bMrof
- qNBr/EYSSRyCxVZT57pijkWzAzN3wKWCkqMt+QN5VQSDvwrNYKSLNZAsgxBqpsADyYo/0fx49oR
- pJD3aU2Xm0MMooFItelhJ9TB+5tVY4qVj/g8UYwiY0iKwRe/5F6TZDmf7phc9moYHeSTcfBh61I
- K5j1PWe+gcLNGDXfPgKDGEpPlhf43E9YJLBSjgzM0YbXcxcSDFHJJmRuU91EeetOukvKlRtTEiQ
- AmeOZFiLFh7j2RA==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-'make_connection' is launched twice: once for IPv4, once for IPv6.
+On Tue, 2024-03-05 at 11:35 +0100, Sebastian Andrzej Siewior wrote:
+> On 2024-03-05 11:08:35 [+0100], Paolo Abeni wrote:
+> >=20
+> > Does not apply cleanly after commit 1200097fa8f0d, please rebase and
+> > repost. Note that we are pretty close to the net-next PR, this is at
+> > risk for this cycle.
+>=20
+> will do.
+>=20
+> > Side note: is not 110% clear to me why the admin should want to enable
+> > the threaded backlog for the non RT case. I read that the main
+> > difference would be some small perf regression, could you clarify?
+>=20
+> I am not aware of a perf regression.
 
-But then, the "pm_nl_ctl events" was launched a first time, killed, then
-relaunched after for no particular reason.
+I probably inferred too much from the udp lookback case.
 
-We can then move this code, and the generation of the temp file to
-exchange, to the init part, and remove extra conditions that no longer
-needed.
+> Jakub was worried about a possible regression with this and while asking
+> nobody came up with an actual use case where this is used. So it is as
+> he suggested, optional for everyone but forced-enabled for RT where it
+> is required.
+> I had RH benchmarking this and based on their 25Gbe and 50Gbe NICs and
+> the results look good. If anything it looked a bit better with this on
+> the 50Gbe NICs but since those NICs have RSS=E2=80=A6
+>=20
+> I have this default off so that nobody complains and yet has to
+> possibility to test and see if it leads to a problem. If not, we could
+> enable it by default and after a few cycles and then remove the IPI code
+> a few cycles later with absent complains.
 
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- tools/testing/selftests/net/mptcp/userspace_pm.sh | 29 ++++++++++-------------
- 1 file changed, 13 insertions(+), 16 deletions(-)
+I think this late in the cycle is better to keep backlog threads off by
+default.
 
-diff --git a/tools/testing/selftests/net/mptcp/userspace_pm.sh b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-index 3200d0b96d53..b0cce8f065d8 100755
---- a/tools/testing/selftests/net/mptcp/userspace_pm.sh
-+++ b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-@@ -149,17 +149,23 @@ ip -net "$ns2" addr add dead:beef:1::2/64 dev ns2eth1 nodad
- ip -net "$ns2" addr add dead:beef:2::2/64 dev ns2eth1 nodad
- ip -net "$ns2" link set ns2eth1 up
- 
-+file=$(mktemp)
-+mptcp_lib_make_file "$file" 2 1
-+
-+# Capture netlink events over the two network namespaces running
-+# the MPTCP client and server
-+client_evts=$(mktemp)
-+mptcp_lib_events "${ns2}" "${client_evts}" client_evts_pid
-+server_evts=$(mktemp)
-+mptcp_lib_events "${ns1}" "${server_evts}" server_evts_pid
-+sleep 0.5
-+
- print_title "Init"
- print_test "Created network namespaces ns1, ns2"
- test_pass
- 
- make_connection()
- {
--	if [ -z "$file" ]; then
--		file=$(mktemp)
--	fi
--	mptcp_lib_make_file "$file" 2 1
--
- 	local is_v6=$1
- 	local app_port=$app4_port
- 	local connect_addr="10.0.1.1"
-@@ -173,17 +179,8 @@ make_connection()
- 		is_v6="v4"
- 	fi
- 
--	# Capture netlink events over the two network namespaces running
--	# the MPTCP client and server
--	if [ -z "$client_evts" ]; then
--		client_evts=$(mktemp)
--	fi
--	mptcp_lib_events "${ns2}" "${client_evts}" client_evts_pid
--	if [ -z "$server_evts" ]; then
--		server_evts=$(mktemp)
--	fi
--	mptcp_lib_events "${ns1}" "${server_evts}" server_evts_pid
--	sleep 0.5
-+	:>"$client_evts"
-+	:>"$server_evts"
- 
- 	# Run the server
- 	ip netns exec "$ns1" \
+Thanks,
 
--- 
-2.43.0
+Paolo
 
 
