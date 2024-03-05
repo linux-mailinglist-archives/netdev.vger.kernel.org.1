@@ -1,124 +1,156 @@
-Return-Path: <netdev+bounces-77355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFBCD8715E5
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 07:33:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43EBB8715F3
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 07:41:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6BC58B21882
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 06:33:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 759E01C21A55
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 06:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B271B1EA6F;
-	Tue,  5 Mar 2024 06:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01F473D0B9;
+	Tue,  5 Mar 2024 06:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="TrRnU3wn"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cmTAEMHn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0892595
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 06:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398C627457
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 06:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709620416; cv=none; b=O9DqDdq68qzy4YjYeGUJsbcHiU8RXpIAvn3P0+LM5vJRkMid60xesFZHgGSVKqAbzF38/+fZb7xqMOVMosIkU4lCyttmlxh3tyreX9O88eA5uEKC9CZgAb6valFh3hsQS8ZWtZIJegwdzehgMb8Z19zU8PZXFY5+YmfcP7JHYz8=
+	t=1709620893; cv=none; b=AGHKDqeIZ1zkoCJGadyc0HSXrXzL/ak4lSp++K417fpQLJK8bqDAbqVI3wyiBNG0SkIVjSpNxAXmex+clAx5sEj7hst/4HJQCilCypkaeE+QPVXvezqHfjarFR/Ioa0h1W06FENQedlfThpac92+He8hBh23ON630nk9Mwti4pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709620416; c=relaxed/simple;
-	bh=yOKnBG+SALngK6Nq2Noi5qOW5wBRtGik6ENRyM7hsvE=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=s07Uc/vl5CoRWYeKhtCXa55rDRlAwEIE451Uxrf0m7enMz2IhmgJNv2M22Zr6e8xACErMYRU4Ia9iD+fiep+ATD759CPQK/ejnGMKJ3DrQp18Ysqc4EiOXWlk9acdARy9P+YN2F0vgjNACirbKBdwsBErvxAlemv6QhXH3sCxyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=TrRnU3wn; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 6FF923F0F8
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 06:33:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1709620410;
-	bh=hW0QObVw3h/AjNMhaZn/b9IAWdCveS+G2Us9n54lGzI=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=TrRnU3wnP6U+g+cqhPe6MCpQ29y2kLeevjxWjM8P9I1sanezjENkv8iSjmWLTHDlZ
-	 jyBgohNuDnrLPb7lzKGyXYJ1jJoOpDfcWC/cYUFRnkIJT+aVXWQmkVH0YWGR+ZXf9h
-	 e22cXi43ty2RAlP5CIherqsyuPlksyQGzIXzS+rwXOiQHoVGxas84EMI5RTcXe5MCp
-	 wcrabuxm35fb6VdvLnA+WlLswgpvVzOvGjc7xKEzEniRGq+YXZ/cbgA6ZSINb7Cy6h
-	 KNxputaKPfBxZVibcY+qavi+QO/Iefq7fbT20HDPzwIQ7XVe0scnt55DNBcWQYI491
-	 ZnND94nJxIktQ==
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1dbf8efabdeso46334675ad.3
-        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 22:33:30 -0800 (PST)
+	s=arc-20240116; t=1709620893; c=relaxed/simple;
+	bh=Ps/VJqEyp7guXeJPu2FrOwduSl73CHpkzvjzkVsVtTU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tzW1/3j2gqOBz9yy9tz5Wudl7/cvcHUyGdrS+1fdXt5YvT+YYYwcDcbCUBjKkI60O8AMuoAeOI8U7NcbDRZAbsBNjT0NP/5vLK620KOcPI8sZgnT1zrsYpWRXAPCLUHk3dj1OrVR6dQ/dsQvTcAlj2LyVfN6ndZMzvD37MasttQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cmTAEMHn; arc=none smtp.client-ip=209.85.219.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-dcc84ae94c1so5014922276.1
+        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 22:41:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1709620891; x=1710225691; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ccg/Lc70kvp90dYd+ZbmISgOfdv3HBJZ65KNlm+3N78=;
+        b=cmTAEMHnM+IvXsUZliiWRWExCL3kxOKkN5wLTtToV09GgSRz2VwJnHzzkpVzgNW/h8
+         hWJ5qvyeir3KPc9B9jtkbqfjxtvqHk1noXwdg9HV0M+Orld8w3bSE89IsQyot1AHQ1Un
+         d9GOHfzoowjdsis8t1L5ROH+xQ5bUAziO93pMUziLnuKTJ6uU5KeVoIDnYVzWykEzYtN
+         FFQsrGNLkNtX9VGYdigky1g/5mv/nDBDTP0WGq0HQBdj2NlwlRNCkEwrRFtqQK2cEW8M
+         28saLrbaWtv0goWzopKOp/9lN78g/HWU2GJWbJ7VLApQwtotb0+J0X3nTquWatMHewGo
+         6sYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709620409; x=1710225209;
-        h=message-id:date:content-id:mime-version:comments:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hW0QObVw3h/AjNMhaZn/b9IAWdCveS+G2Us9n54lGzI=;
-        b=RswnSHQDmylRm5gEn8pfUsMMtCql5IUI5104Oe+KDRYcvjovrW+kqWOx3Y1gOrtsB2
-         uMekIoVzAaX8HVNOj2mkAAUwsBjTt9jzYHA/JVds4HnhuwfrRhrDuTsqq1qKgFj1Dl4c
-         FSXfcU2/vi2/tiRf44OLeCAfLbvdvwHVXnoxITFY8Ced/GAU3Awf3+K1+jeqe6GgrONw
-         Oy0KsVV9d8/9EzoLNVN6iAqK+RpG9bUe3/Flgp3+yluvlBOyej8ITz/Jup3hQxcaV1KR
-         7Tlxet/KNcNS6OTHuwPNPSAx8evnPB8Lbchzax+3li11GX8ZFYBHHeRWMujrUuIDNEZh
-         aJlg==
-X-Gm-Message-State: AOJu0YyMTxkiGpmb6RwcKRd3LJv/dKZtrKkZGtiJnFEhkl8+O7kEJCKr
-	cpIOr8RNWnS6P/+1mWv8ETSdB8gd6SjPNRErw6WiwCvmewwNFWOmaXPTeyKzuji1NRCyZUu18jB
-	oJQTj2MGvK6fQ0SPrXw8RH9cbsRAOD81TDjk9Q+gGnI41RenQ/ED4BqOxDiPYqGNwN48k+1Xkgu
-	Rr2A==
-X-Received: by 2002:a17:903:2449:b0:1dc:b80e:5678 with SMTP id l9-20020a170903244900b001dcb80e5678mr1001281pls.23.1709620409001;
-        Mon, 04 Mar 2024 22:33:29 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG+WympTmYfZkLN1BGFxzHlq/Jpy0OqE0ZtIga5PjODgo/llHfGcRByulo3KA1g06nU0NmA/g==
-X-Received: by 2002:a17:903:2449:b0:1dc:b80e:5678 with SMTP id l9-20020a170903244900b001dcb80e5678mr1001272pls.23.1709620408678;
-        Mon, 04 Mar 2024 22:33:28 -0800 (PST)
-Received: from famine.localdomain ([50.125.80.253])
-        by smtp.gmail.com with ESMTPSA id cp6-20020a170902e78600b001dd1d7bc0f7sm2433860plb.154.2024.03.04.22.33.28
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 04 Mar 2024 22:33:28 -0800 (PST)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 9FF8E5FFF6; Mon,  4 Mar 2024 22:33:27 -0800 (PST)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 994269FAAA;
-	Mon,  4 Mar 2024 22:33:27 -0800 (PST)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-cc: netdev@vger.kernel.org
-Subject: Re: bonding: Do we need netlink events for LACP status?
-In-reply-to: <ZeaSkudOInw5rjbj@Laptop-X1>
-References: <ZeaSkudOInw5rjbj@Laptop-X1>
-Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
-   message dated "Tue, 05 Mar 2024 11:33:38 +0800."
-X-Mailer: MH-E 8.6+git; nmh 1.6; Emacs 29.0.50
+        d=1e100.net; s=20230601; t=1709620891; x=1710225691;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ccg/Lc70kvp90dYd+ZbmISgOfdv3HBJZ65KNlm+3N78=;
+        b=neftUXIq9BjBjos2bPwIaMZZZCwVqY/TD9ScFaw6+wyyLohXE8FqHeWwilpzD33dYR
+         l7an37QwR5lVEwwST2PPTsIU4DSUKD05Q6W/6P3Dj2X3it+UL20ydl8I6yFHAOnH7lQL
+         9fOLKrUkG0zT+WamL/rpay/Y6ZUlrr29+gumzpk9xik5OF0dlhXYy8TGtOcfbC/EtKGu
+         a4Xar3oj8A6Ezi/SHUv7UpPy5mB9rfwxRk9IthRfgWhzWPiYGpFTiToRBtWpdsbjUK6F
+         087J3+yfLPqn8xSC54v379bxFGCE+u81oFPrGP+PEjv78akXlza9bLzDf7eoS6jIoC/A
+         RXBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWd8EB0Dgp8hvqmGbzLv4DbPxwIlsITzPxAg69VB5JyWHkh8Ba3eCQNRsJ7bXRwhshg3viC6u+FqkidoZqqP06xoGa2H19X
+X-Gm-Message-State: AOJu0YyvJYuCQbFhCsT1RwPzXjV6zglZmmj5MJAF8Nr2/frXHlRLbCSY
+	yz16EkukLFKSqM+G6YnxPZB9Xf/oQqmScU/APH+sy2T3uNUES1x6jUzJPiSm4Z6k799R0J3yhad
+	xj0s/yTRLp2pSmxCQ3JXgTMoiQkzdz+LkTxtxLw==
+X-Google-Smtp-Source: AGHT+IGRNcWGc+ovIvoeKHsS2bsRGRrdE1GgYvwR+P/OeZcykFPfCL7rKLURH+3X2nQAEd3t1oe4qRWeuBF8ZkkOBug=
+X-Received: by 2002:a05:6902:305:b0:dcf:bc57:cd61 with SMTP id
+ b5-20020a056902030500b00dcfbc57cd61mr8363686ybs.50.1709620891239; Mon, 04 Mar
+ 2024 22:41:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <32498.1709620407.1@famine>
-Date: Mon, 04 Mar 2024 22:33:27 -0800
-Message-ID: <32499.1709620407@famine>
+References: <20240122-ipq5332-nsscc-v4-0-19fa30019770@quicinc.com>
+ <20240122-ipq5332-nsscc-v4-2-19fa30019770@quicinc.com> <7a69a68d-44c2-4589-b286-466d2f2a0809@lunn.ch>
+ <11fda059-3d8d-4030-922a-8fef16349a65@quicinc.com> <17e2400e-6881-4e9e-90c2-9c4f77a0d41d@lunn.ch>
+ <8c9ee34c-a97b-4acf-a093-9ac2afc28d0e@quicinc.com> <CAA8EJppe6aNf2WJ5BvaX8SPTbuaEwzRm74F8QKyFtbmnGQt=1w@mail.gmail.com>
+ <74f585c2-d220-4324-96eb-1a945fef9608@quicinc.com> <CAA8EJppuNRB9fhjimg4SUR2PydX7-KLWSb9H-nC-oSMYVOME-Q@mail.gmail.com>
+ <d518dbc1-41aa-46f9-b549-c95a33b06ee0@quicinc.com> <CAA8EJppP_bAPRH7Upnq8dO7__xQPOJ6F_Lc-fpRAcutKKzk0eA@mail.gmail.com>
+ <3a6d301d-16f6-4a11-8be5-6bbb6eb501f4@quicinc.com>
+In-Reply-To: <3a6d301d-16f6-4a11-8be5-6bbb6eb501f4@quicinc.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Tue, 5 Mar 2024 08:41:19 +0200
+Message-ID: <CAA8EJpq2x-1mbBApGH5CiGZqCVhdP97pveZupdJyGQGo3MT8-Q@mail.gmail.com>
+Subject: Re: [PATCH v4 2/8] clk: qcom: ipq5332: enable few nssnoc clocks in
+ driver probe
+To: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Michael Turquette <mturquette@baylibre.com>, 
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+On Fri, 23 Feb 2024 at 12:18, Kathiravan Thirumoorthy
+<quic_kathirav@quicinc.com> wrote:
+>
+>
+>
+> On 2/19/2024 3:53 PM, Dmitry Baryshkov wrote:
+> > On Sun, 18 Feb 2024 at 06:29, Kathiravan Thirumoorthy
+> > <quic_kathirav@quicinc.com> wrote:
+> >>
+> >>
+> >>
+> >> On 2/17/2024 10:15 PM, Dmitry Baryshkov wrote:
+> >>> On Sat, 17 Feb 2024 at 17:45, Kathiravan Thirumoorthy
+> >>> <quic_kathirav@quicinc.com> wrote:
+> >>>>
+> >>>>
+> >>>> <snip>
+> >>>>
+> >>>>>> Reason being, to access the NSSCC clocks, these GCC clocks
+> >>>>>> (gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk, gcc_nssnoc_nsscc_clk)
+> >>>>>> should be turned ON. But CCF disables these clocks as well due to the
+> >>>>>> lack of consumer.
+> >>>>>
+> >>>>> This means that NSSCC is also a consumer of those clocks. Please fix
+> >>>>> both DT and nsscc driver to handle NSSNOC clocks.
+> >>>>
+> >>>>
+> >>>> Thanks Dmitry. I shall include these clocks in the NSSCC DT node and
+> >>>> enable the same in the NSSCC driver probe.
+> >>>
+> >>> Or use them through pm_clk. This might be better, as the system
+> >>> doesn't need these clocks if NSSCC is suspended.
+> >>
+> >>
+> >> IPQ53XX SoC doesn't support the PM(suspend / resume) functionality, so
+> >> that, can I enable these clocks in NSSCC driver probe itself?
+> >
+> > There is a difference between PM (suspend/resume) and runtime PM.
+> >
+> >
+>
+> Thanks Dmitry. IIUC your question correctly, runtime PM for the
+> peripherals are not supported (except CPU cores which supports DVFS).
+> Since these are router based products, once system is powered on, all
+> the peripherals are configured to the required frequency and it will be
+> never go into low power modes.
+>
+> Please let me know if this answers your questions.
 
->A customer asked to add netlink event notifications for LACP bond state
->changes. With this, the network monitor could get the LACP state of bonding
->and port interfaces, and end user may change the down link port based
->on the current LACP state. Do you think if this is a reasonable case
->and do able? If yes, I will add it to my to do list.
+It seems there is a misunderstanding somewhere. Runtime PM allows the
+Linux kernel to disable temporary unused devices at runtime. E.g. if
+the NSS is switched off, the kernel can switch NSSCC off too, cutting
+the power. It has nothing to do with the frequency of the device /
+clock or with the product being a router or a mobile device.
 
-	I think I'm going to need some more detail here.
 
-	To make sure I understand, the suggestion here is to add netlink
-notifications for transitions in the LACP mux state machine (ATTACHED,
-COLLECTING, DISTRIBUTING, et al), correct?  If not, then what
-specifically do you mean?
-
-	Also, what does "change the down link port" mean?
-
-	-J
-
----
-	-Jay Vosburgh, jay.vosburgh@canonical.com
+-- 
+With best wishes
+Dmitry
 
