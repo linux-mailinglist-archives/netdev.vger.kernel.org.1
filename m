@@ -1,98 +1,100 @@
-Return-Path: <netdev+bounces-77449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDE01871CE8
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:07:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB2AB871CCC
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:04:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43B39281F42
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:07:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22761B24B1E
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:04:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4718254BD2;
-	Tue,  5 Mar 2024 11:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9CC554903;
+	Tue,  5 Mar 2024 11:02:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jRKa7Zqv"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="opIecpBf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BECC548F9
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 11:06:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDDD9566D;
+	Tue,  5 Mar 2024 11:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709636775; cv=none; b=mjVtkYArfmJfCEsc3xioDaS7ISSfWtAY/7cv7+oxG+7gzSA9e8xT6sD+5I9dz0MOsIee5/anA32yeXZsjAamxR6FmSjEoKrICFj+CBHIKf8u84rl5ldJYWrRL3n6DJ3jBaganyDzyFiU7aX4RqR3GsVksnmDKiPcekkOHOGkZ24=
+	t=1709636553; cv=none; b=Q8dpReD7F3eA51xfeFh2WTzQyLBtFFGewhSU6j09jH6aaAmurwEy6+a9OSgmKBnWvV78XX435BpPX0zT+/JZmi1xnRkzyQYU0cVE9E/pljpHqopvMIm9/21P689wLTJZii/oIMsfIPs85M4GsOdIsy8gqvQHwGsEnH/yfPzzYK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709636775; c=relaxed/simple;
-	bh=Mu000iZMKv3zclEMUmjlT2fMuGnV5pMNcJ11wZBYFl4=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=XqG4iukaXIxo+k0f3ceEAKV/6u8t0CMZ2XTNseVw5cZ4MwFiRR3IEKMYnarJTrnbJ+n2m0hF1yr7dWEmJm3jKsOnJtNqv6Ou8lnY7eeUY4GOYwu1JAuIeKEcjEHdHBzD9WfX9axJ3C1QkhcgGsjQ05Uc3Cu77TsnPvExEHHQtig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jRKa7Zqv; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-33e162b1b71so521301f8f.1
-        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 03:06:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709636772; x=1710241572; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mu000iZMKv3zclEMUmjlT2fMuGnV5pMNcJ11wZBYFl4=;
-        b=jRKa7Zqv6qop8oxgSQRBVBocJo8LUcI5nGUbaKsJLL8uHbR5Rb5igz89Kpym8iTanB
-         EuT+fojx2ORrFa6QlnApGUeDd1qnQMtp4pvYZrJfRLeH8TYWX79BRGPIN1VbLNxTt/rB
-         +TvdTPgxyaH8/WdovBDecwhBq3Jjik7igKVaWQjGoyVQQPUIuwx7iBVzgczYKmXGvbO9
-         vVqVyLTfEFvZyt4ZPWUcxNLRpEBuEeGb3ywErc9BtRrdNEeBOEpxDyNCvVvWOe+NAEzv
-         CcSDC1HbW1e1TFxWotsxr22ZnY8EPjA8jqqs2FCQrPpvMhXutnoFfw3xv8ZobCg4m57N
-         MldA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709636772; x=1710241572;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Mu000iZMKv3zclEMUmjlT2fMuGnV5pMNcJ11wZBYFl4=;
-        b=CeHBq7gaHvT68TA0MJYGwFIL3d9OdUfddTElFH/5IbR4aabOrTHL7iIgtTlwCpaY3f
-         Z3Er1pSi4n4wCuCUDtu9QX31rfSiuWHIkp5upeh1Zxs7ErweQJgsV7AiGJt+ZpVHBdqH
-         IvhElKEb5HTKaeBdfz8aOJ8S9sOAG+3wegZFFnPfzUSirqP/CII0j2zI6Z44xH40/Kig
-         OTIL60dIo2k6utJieedxHTxKBmvj9hYM1qwewD6evbeFRvOoWgI2Mw6c8pKAtuFu2aaX
-         sFnFdGDI0gbND92UKgx3IO3kyJ0tnS2m8v7xN1rkbmmI7hs8iWGxMu4YNEzqsuZWoYlp
-         cUMg==
-X-Forwarded-Encrypted: i=1; AJvYcCWFaGhPpDYsZwxO4S+L0xpyuBfsAZ4MyuwQjW9z41qzBRhZeqq5EVXVWjyYP8ANSjB+l67QEAZbz3LA4bMO73b2eJjWg/lb
-X-Gm-Message-State: AOJu0Yw9aNWT2kOTYt3k/iTPVwE57Kos2O/1rBfPuUrgeFfn1VcpDnwE
-	dggBXuBJ5+fNr2JDepwWFyYuXrojEhVNNFay035CSD26gqV3Djc4pLd/joq+
-X-Google-Smtp-Source: AGHT+IF0qzUffE9w3MBzjtK2k5e3CzHtakKHnGy1KSvZ8zN7GUdwtbzDJ4vaagHTMt7z4YBbE3xIMA==
-X-Received: by 2002:a5d:6891:0:b0:33d:3553:9427 with SMTP id h17-20020a5d6891000000b0033d35539427mr7365720wru.20.1709636771918;
-        Tue, 05 Mar 2024 03:06:11 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:554f:5337:ffae:a8cb])
-        by smtp.gmail.com with ESMTPSA id bn20-20020a056000061400b0033e43756d11sm3888015wrb.85.2024.03.05.03.06.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Mar 2024 03:06:11 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com
-Subject: Re: [PATCH net-next v2 3/3] tools: ynl: remove __pycache__ during
- clean
-In-Reply-To: <20240305051328.806892-4-kuba@kernel.org> (Jakub Kicinski's
-	message of "Mon, 4 Mar 2024 21:13:28 -0800")
-Date: Tue, 05 Mar 2024 10:56:38 +0000
-Message-ID: <m2il21hrq1.fsf@gmail.com>
-References: <20240305051328.806892-1-kuba@kernel.org>
-	<20240305051328.806892-4-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1709636553; c=relaxed/simple;
+	bh=nVV7EoAnX9/xTtj6Pid/56wBIHUiqHrmL9c5hzFc89g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rCCKxTn1YwvllPN0EN07jvsUFMTOfM5htQ9PJDFhXl0ukv+iExeU6dEVp1xsgglkRYATpIB+NUP2hJpyAeT2cIQqy0kb5tHQ1SQlfMtFwcQF0SYKM/Z+gjDH37rTtC0Yu5z/WfUMaTsrZPEBp4m4mill8ZOAjljSZd74wY2B3N4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=opIecpBf; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B66261BF20B;
+	Tue,  5 Mar 2024 11:02:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1709636549;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4LVRqDAKoWY5kgiwdLKWwQAoyIirpSfzsC5mBFQI3NA=;
+	b=opIecpBfJERWkETn/8djWi1vWsAznSKrHO2kz1tEPMGpi6juVNQu5EPhw3hKFu1TO6J32R
+	cr4c34e6d+Sbt+TpNfcTqUoifskL0+s+rCzthMikNHZEDZhzatmvo+sVjwGOXvFA/5sPbo
+	FoO461gz24lw+iKiOhkzELnP+95cNj97BgSxT1vQAhq+epdhbg48O0J41csnR4SzUGnprU
+	MeNIjQtQbVXE5OixZSIUd/2hLFZ7X6GXe14Uke8EXhiyykBYCllQ1ygLsR+tv+gcaXf+VP
+	4fwstIjNVDIvwhfbUXKo7jcKEWwZa7owmhCDTXMquoAUqPWHeLZBe5wq2K0o9w==
+Date: Tue, 5 Mar 2024 12:02:26 +0100
+From: Herve Codina <herve.codina@bootlin.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yury Norov
+ <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>, Mark Brown
+ <broonie@kernel.org>, Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v5 0/5] Add support for QMC HDLC
+Message-ID: <20240305120226.791bfe9a@bootlin.com>
+In-Reply-To: <ZeChdAsAhrC8a75t@smile.fi.intel.com>
+References: <20240229141554.836867-1-herve.codina@bootlin.com>
+	<ZeChdAsAhrC8a75t@smile.fi.intel.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Hi Andy,
 
-> Build process uses python to generate the user space code.
-> Remove __pycache__ on make clean.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Thu, 29 Feb 2024 17:23:32 +0200
+Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+...
+
+> 
+> I think it's a good series and next version will be final. The only question is
+> possible use of the returned values from bitmap_scatter()/bitmap_gather(), the
+> rest are minors.
+
+I replied about the reason why I didn't return any values from
+bitmap_{scatter,gather}() in that patch 4 discussion.
+
+Are you ok to keep them returning void in this series ?
+
+Best regards,
+Hervé
+
+-- 
+Hervé Codina, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
