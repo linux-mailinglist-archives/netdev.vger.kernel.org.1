@@ -1,127 +1,106 @@
-Return-Path: <netdev+bounces-77361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8679F87168A
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 08:16:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 363A0871699
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 08:18:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A2FA1C20383
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 07:16:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D48C6B21305
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 07:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0017CF29;
-	Tue,  5 Mar 2024 07:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1835E7D3EE;
+	Tue,  5 Mar 2024 07:18:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cP89uelx"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="phRzA5j0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4221A4500B
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 07:16:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7504C637;
+	Tue,  5 Mar 2024 07:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709623011; cv=none; b=aC7l323KIuLUDsfvBBvpifivrZe5swh6p0ieIVt3Zu7/nO5yidM2HFbOxrgC6b2NwqHOlWbd0gvAoPKjSOC8rmv8dvywHLycywbQApQAWswWIzjJUoSqOTZLvS+/MeZenhqLpV7cGp72G890oxc1J4TEUJt7NoBrYUNcFBXlRRI=
+	t=1709623085; cv=none; b=t07Qrl8MIxfCZBy2e2u34v74of2gG3KitRIRr/q/nN2GYoh97SobYwa4QnStit2zdqUrBdcLdoTLGShbeNjJgtPzRCxpKYw5c2h70jBQCIGvpOwkxg5jg48UGgMdipPvtrVxdjm+g7/QcDRuMVioo9kwZusz+lI66TtE9M1kd5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709623011; c=relaxed/simple;
-	bh=+U3wbTm1fr0u7B7uauZt02Yd7hkkHWSl3gey4+61HxA=;
-	h=From:In-Reply-To:References:To:cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=FHs4bpfjhV6aeWNL7Usqg44r1/EZ6SGEsjHri/YO6v3IWLpif5ueBq0trpH2yalimVduzTqoXjb3c6TmLv60RAJDono0G8Yud/qi6v0xm6itDaOt8/L7ES0LcI5UVnD++3LVtZw9xG5sB0tyEC0geu0qu9JCMWVgXdLynev/GtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cP89uelx; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709623009;
+	s=arc-20240116; t=1709623085; c=relaxed/simple;
+	bh=Ixi/76JR1Pv31+3D5ECr3XuT5VyFkR/xNTnNK8sh2Rk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EWLs3gqwj9uzOpWu4PDisvnFtXazalubuiqRJC2e8HXUo98MCHW1VCU8WGHvCnD+GmMR+Z24Q/R6o63dYg3sQioFsQ1KfbqJ/SaECpSLHICB63g81P73xjEp8RB18uDfYqfWe96IyTs3kMQoX8IN1fXl8V1XmT+ikQYRGwWeQMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=phRzA5j0; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9793B20002;
+	Tue,  5 Mar 2024 07:17:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1709623080;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+U3wbTm1fr0u7B7uauZt02Yd7hkkHWSl3gey4+61HxA=;
-	b=cP89uelx5m/3Awx6xCd0uNGVj49B3BNvFxgXPYskOlqG4VDdAcT9JW8w6SwOEo6pT3Ipmp
-	MCDxerXseB6oDRW6xVX+5u+lLb+g05kxK30B16MMTKmHEA2Sz0cUsxv1i6oNqGgSf8cob3
-	WhJ2aLySBNqoAAe864k8vDwQQl7OgwE=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-187-b0x9YGyTODy3NOnbBYpGEA-1; Tue,
- 05 Mar 2024 02:16:46 -0500
-X-MC-Unique: b0x9YGyTODy3NOnbBYpGEA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2E352282D3D3;
-	Tue,  5 Mar 2024 07:16:46 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.114])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id ED1FB1C060A4;
-	Tue,  5 Mar 2024 07:16:37 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20240305020153.2787423-8-almasrymina@google.com>
-References: <20240305020153.2787423-8-almasrymina@google.com> <20240305020153.2787423-1-almasrymina@google.com>
-To: Mina Almasry <almasrymina@google.com>
-cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-    linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
-    linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
-    sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-    linux-arch@vger.kernel.org, bpf@vger.kernel.org,
-    linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
-    dri-devel@lists.freedesktop.org,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-    Richard Henderson <richard.henderson@linaro.org>,
-    Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-    Matt Turner <mattst88@gmail.com>,
-    Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-    "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-    Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
-    Jesper Dangaard Brouer <hawk@kernel.org>,
-    Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-    Steven Rostedt <rostedt@goodmis.org>,
-    Masami Hiramatsu <mhiramat@kernel.org>,
-    Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-    Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
-    Daniel Borkmann <daniel@iogearbox.net>,
-    Andrii Nakryiko <andrii@kernel.org>,
-    Martin KaFai Lau <martin.lau@linux.dev>,
-    Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-    Yonghong Song <yonghong.song@linux.dev>,
-    John Fastabend <john.fastabend@gmail.com>,
-    KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-    Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-    David Ahern <dsahern@kernel.org>,
-    Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-    Shuah Khan <shuah@kernel.org>,
-    Sumit Semwal <sumit.semwal@linaro.org>,
-    =?utf-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-    Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
-    Jason Gunthorpe <jgg@ziepe.ca>,
-    Yunsheng Lin <linyunsheng@huawei.com>,
-    Shailend Chand <shailend@google.com>,
-    Harshitha Ramamurthy <hramamurthy@google.com>,
-    Shakeel Butt <shakeelb@google.com>,
-    Jeroen de Borst <jeroendb@google.com>,
-    Praveen Kaligineedi <pkaligineedi@google.com>
-Subject: Re: [RFC PATCH net-next v6 07/15] page_pool: convert to use netmem
+	bh=nh+UsJveD1Ecym5lcFf+LilE3aXKcM7NsG4y2GIHCgw=;
+	b=phRzA5j0/oSjNsnnn0j/EbWetXZsK1SKRUc5jRbru3IRKlGhfw/Ixl5MOzKc38yngt0T9W
+	lx9u3Fxk00/uHGcHc1HP8L4S3XGv2xWOYXD/M1HifH3Em+K+O978NmmjNVVLp8IiLTwpwQ
+	BwgwAWWx+QNYA7gj7simF+3mWgwXDQg2y7QI72fKLz6raikY6hk0NZsEaWEbDJqwFGz5JI
+	HCpaCsP2fQnm2KZM2dfWDAbYzLNvyRo26T+e2x0RccDk7sao8vctkDf+kFa/UDPhdq0iKU
+	oo0dnEW948LYRfd+vZup5EPOvwS9fgva5ZPN6/aOGaVqjV2I1qisqR1N6WZ9ZA==
+Date: Tue, 5 Mar 2024 08:17:57 +0100
+From: Herve Codina <herve.codina@bootlin.com>
+To: Simon Horman <horms@kernel.org>
+Cc: "Ricardo B. Marliere" <ricardo@marliere.net>, Yisen Zhuang
+ <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Loic Poulain
+ <loic.poulain@linaro.org>, Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+ Johannes Berg <johannes@sipsolutions.net>, Krzysztof Kozlowski
+ <krzysztof.kozlowski@linaro.org>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org
+Subject: Re: [PATCH net-next 2/6] net: wan: framer: make framer_class
+ constant
+Message-ID: <20240305081757.00474e37@bootlin.com>
+In-Reply-To: <20240304175246.GO403078@kernel.org>
+References: <20240302-class_cleanup-net-next-v1-0-8fa378595b93@marliere.net>
+	<20240302-class_cleanup-net-next-v1-2-8fa378595b93@marliere.net>
+	<20240304175246.GO403078@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Date: Tue, 05 Mar 2024 07:16:37 +0000
-Message-ID: <950858.1709622997@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
+Hi,
 
-Hi Mina,
+On Mon, 4 Mar 2024 17:52:46 +0000
+Simon Horman <horms@kernel.org> wrote:
 
-I recommend you cc linux-mm and Matthew Wilcox on these two patches also.
+> + Herve Codina <herve.codina@bootlin.com>
+> 
+> On Sat, Mar 02, 2024 at 02:05:58PM -0300, Ricardo B. Marliere wrote:
+> > Since commit 43a7206b0963 ("driver core: class: make class_register() take
+> > a const *"), the driver core allows for struct class to be in read-only
+> > memory, so move the framer_class structure to be declared at build time
+> > placing it into read-only memory, instead of having to be dynamically
+> > allocated at boot time.
+> > 
+> > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
 
-David
+Thanks for the patch.
 
+Acked-by: Herve Codina <herve.codina@bootlin.com>
+
+Best regards,
+Hervé
 
