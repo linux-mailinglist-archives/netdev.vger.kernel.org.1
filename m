@@ -1,176 +1,352 @@
-Return-Path: <netdev+bounces-77321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40D06871430
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 04:21:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47C9387143A
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 04:27:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE75A1F22FFB
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 03:21:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAAAD1F22D7C
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 03:27:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C98629CE9;
-	Tue,  5 Mar 2024 03:21:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A2829CF5;
+	Tue,  5 Mar 2024 03:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VorYs+JN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ubp8Qqjj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639551865C;
-	Tue,  5 Mar 2024 03:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4142F44;
+	Tue,  5 Mar 2024 03:27:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709608865; cv=none; b=gi9axCILxXl0ph2LISaIhagLxv3mF2K0Z01JR12ZHjbrdkZB+0t/PIrungvX2cNG23+vUV84iigXE0q6LFDQ1h8SI99VTRXZknqHtUAcdimfMSchUFDx92S2E/N6330uuznyA+V5PmgwPM+Jh49aMsh0mPCht3bnPCnfs1SIE9M=
+	t=1709609256; cv=none; b=Ic4qVT/Z+E+4ozh71VARHvfvA3I9xKZtj9bwZ+94YVQZosuOgMgB8ulN0LeAoFKx2metR2T/tVdel0UnO7L4oT6HPuUaiIlhUTU/Ef6iubCzkJa3vUAYwuPcUSGSp3qUggpD8Gi6L8DVXyEd7EmDdeZ2K2rNi24soFGlRofa+JI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709608865; c=relaxed/simple;
-	bh=fQxFj9FoBmTJzV/ZouAXdSy2rLJDNB1eESe76AOrgDI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m1UhsJnx8FhzO3RPvqpkDjDGq2NAsckhOpmuubF8zd9s46zUthukW1kuBvREfJFsP69TTjHc8LVd/2ej8GpY+auvprjZtk+3hlVsfHneCY0IWHWeABHULLIb1LvqP42DIAStCV0X9t1OwNDRBybK/7ycisE9T2kynUsYlrSIwxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VorYs+JN; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a44e3176120so287588366b.1;
-        Mon, 04 Mar 2024 19:21:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709608862; x=1710213662; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g5OTOZkvI1iKHRZFDGgAFNCyc+OZsWpdVdz/BEQBjP4=;
-        b=VorYs+JN2iMVeIIpUm2WyXOPxI9BqGZYMR0xb3smQhOsDa2/EwJd7uZVlZpvbX0SUy
-         EZA0bhdJgqEZi1G4blynLdm+Rw2x3W9JIVEtutBI4LwPVYhapnmOIRfeOQ4/do5cHrav
-         m+22DLIUtpiqGKrpvCFPqaXGsTa6HouZXDzfMgiuMVuZsSZEqLGgjBOQmu7u5/a3ZB1E
-         VtgdJga+VmCJH65H3uVW/UGJQ8uzlf+LoTKGDK7C8g1U//FSmqKmjEz0SikrV8GJj12t
-         VEKFGVd7QGP/oMm6thIqJ0QVJBL4bPhobG0yup0sLaEsghBZognPhC5tsbtmRwLHp4/u
-         Hhfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709608862; x=1710213662;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g5OTOZkvI1iKHRZFDGgAFNCyc+OZsWpdVdz/BEQBjP4=;
-        b=nXB2BQepfx86suOAnDWTVdQYZ3lNcjuiA5A/EZovkV85la8Ti+yYPF6ysmJqb8YYDc
-         gNmnSnsUQS0KYOvQqylSA5Up8LIzFCctqhiYzAQMItxE0ateQILLxPPpDI86piRK/fKR
-         sL4eYeqv3dyexJrPDYbxr4G3JKW2E++FGuuUnJAh82liUItmJh5wYPkuhpaEXfqjXWPs
-         y6tq4lWGyOfwD+yLMQdLv8NFSV8swKwnkTz27sFeBmhHdz3eBm4K85trHDZ4bPjVGhYH
-         7fbBxTvJAj9Wb7Fd34AtQv0rHh35yKS42qZY0x7sOVYsJAN8dG/Pz45yQZO2PzEajmnw
-         Or0w==
-X-Forwarded-Encrypted: i=1; AJvYcCWxDdfj00LLNyrRHOIWjzuQ7lX+ElQfu7Q7KDcgewjgBAI6gQK38rBdoZ0ptnfqXp0XbH71NTVDgNyRR5B72xr6WygniLeu
-X-Gm-Message-State: AOJu0YwW/cQZMjzroGrQtWGO7CF867yu+b/p6Kd1fPRNicUbDR5l1IPb
-	NrJI7Za3nciYMtrUXHQdBH4YgTqK7VuqR/0mLCbjX2WfaZhj8lGtWvPVdobaqHTlXKCwjdgqUZh
-	uzqgnPKdn7u8SZHZIFPhgCiqgonM=
-X-Google-Smtp-Source: AGHT+IGzCLorvfjl+krG6qfJI1O1/54XBrFfAYojjAa1cbuFXNug7cFrg5Gpu1as2dW/gXgop0TWPItpHFPcwFW/VFE=
-X-Received: by 2002:a17:906:695:b0:a45:1850:e6ed with SMTP id
- u21-20020a170906069500b00a451850e6edmr3968306ejb.6.1709608861517; Mon, 04 Mar
- 2024 19:21:01 -0800 (PST)
+	s=arc-20240116; t=1709609256; c=relaxed/simple;
+	bh=8eLP8q/e1Jsj+5xYLAE+n9OlktnlF9oBMjjDVgvv7hw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AnWDYtUBnrpu1KY7JGhBSbNwLyB2dUZS+yNxAcEaou9L3hwv2H3D4c1uUVzEifiZQKHkwFSL3Xz+kpbbptsRkPPEXiJ9ZbI4BSSOVrfnvKvNtlQD0NiNKhjsau3MaKaamzv+VLiGfQSZzBk9f0tW4fpM6zGDCCW5qKTIOtApgU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ubp8Qqjj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96519C433F1;
+	Tue,  5 Mar 2024 03:27:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709609255;
+	bh=8eLP8q/e1Jsj+5xYLAE+n9OlktnlF9oBMjjDVgvv7hw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ubp8Qqjj7tv+dZb1x5FxPqHtxDW+xuHwE74HM4muyhRnmhct1cpkGYFQddKpvbdhS
+	 zcbNy0vfk7aP0KlVmFtpMLTtQOBzGK8o/rzbMNWAy79GUUZYH7koCbkOV3imN9/FR8
+	 qwNZbrWjUKkq0tiek5CtVS59n5z6hjxW1K0ysjR0VFk+mQKiOZzr6li6vxWlKDfbOb
+	 aTmQXdYpIT8C1BPuYjeleRzf366Rqc5BwX2hMj3DvGhjB9UiahA2bzLB7ol++ks7J6
+	 OPakSteX6xskjrDEL1Hz+zfU6WBe7Wp0xGhIYHiW2CGkBmoyV1DoB1Vz+uAzctxPh4
+	 49fKiSvoUuVew==
+Date: Mon, 4 Mar 2024 19:27:33 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: Re: [PATCH net-next v9 12/13] net: ethtool: tsinfo: Add support for
+ hwtstamp provider and get/set hwtstamp config
+Message-ID: <20240304192733.1e8e08cc@kernel.org>
+In-Reply-To: <20240226-feature_ptp_netnext-v9-12-455611549f21@bootlin.com>
+References: <20240226-feature_ptp_netnext-v9-0-455611549f21@bootlin.com>
+	<20240226-feature_ptp_netnext-v9-12-455611549f21@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAEkJfYP5T4Xv7vn7GZnQ7ig6_QZB8B_g-DS9dk7xhxRntYNY7g@mail.gmail.com>
- <24641.1709606824@famine>
-In-Reply-To: <24641.1709606824@famine>
-From: Sam Sun <samsun1006219@gmail.com>
-Date: Tue, 5 Mar 2024 11:20:49 +0800
-Message-ID: <CAEkJfYMfU8bSrvpgSCgCG4-canwkq3dZKSUKbd0xsjLuLPGMQQ@mail.gmail.com>
-Subject: Re: [PATCH net] drivers/net/bonding: Fix out-of-bounds read in bond_option_arp_ip_targets_set()
-To: Jay Vosburgh <jay.vosburgh@canonical.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, andy@greyhouse.net, 
-	davem@davemloft.net, Eric Dumazet <edumazet@google.com>, kuba@kernel.org, 
-	pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 5, 2024 at 10:47=E2=80=AFAM Jay Vosburgh <jay.vosburgh@canonica=
-l.com> wrote:
->
-> Sam Sun <samsun1006219@gmail.com> wrote:
->
-> >Dear kernel developers and maintainers,
-> >
-> >We found a bug through our modified Syzkaller. In function
-> >bond_option_arp_ip_targets_set(), if newval->string is an empty
-> >string, newval->string+1 will point to the byte after the string,
-> >causing an out-of-bound read.  KASAN report is listed below.
->
->         Conceptually, the change here seems fine.  However, I don't
-> think including the full KASAN report adds much to the description
-> above.
->
+On Mon, 26 Feb 2024 14:40:03 +0100 Kory Maincent wrote:
+> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+> index b3f45c307301..37071929128a 100644
+> --- a/net/ethtool/common.c
+> +++ b/net/ethtool/common.c
+> @@ -426,6 +426,7 @@ const char sof_timestamping_names[][ETH_GSTRING_LEN] = {
+>  	[const_ilog2(SOF_TIMESTAMPING_OPT_TX_SWHW)]  = "option-tx-swhw",
+>  	[const_ilog2(SOF_TIMESTAMPING_BIND_PHC)]     = "bind-phc",
+>  	[const_ilog2(SOF_TIMESTAMPING_OPT_ID_TCP)]   = "option-id-tcp",
+> +	[const_ilog2(SOF_TIMESTAMPING_GHWTSTAMP)]    = "get-hwtstamp",
 
-Thanks for pointing this out! I will remove this next time when I
-submit a patch.
+What is this new SOF_TIMESTAMPING_GHWTSTAMP? If there's 
+a good reason for it to exist it should be documented in
+Documentation/networking/timestamping.rst
 
-> >We developed a patch to fix this problem. Check the string length
-> >first before calling in4_pton().
-> >
-> >Reported-by: Yue Sun <samsun1006219@gmail.com>
-> >Signed-off-by: Yue Sun <samsun1006219@gmail.com>
-> >
-> >diff --git a/drivers/net/bonding/bond_options.c
-> >b/drivers/net/bonding/bond_options.c
-> >index f3f27f0bd2a6..a6d01055f455 100644
-> >--- a/drivers/net/bonding/bond_options.c
-> >+++ b/drivers/net/bonding/bond_options.c
-> >@@ -1198,7 +1198,7 @@ static int bond_option_arp_ip_targets_set(struct
-> >bonding *bond,
-> >     __be32 target;
-> >
-> >     if (newval->string) {
-> >-        if (!in4_pton(newval->string+1, -1, (u8 *)&target, -1, NULL)) {
-> >+        if (!strlen(newval->string) || !in4_pton(newval->string+1,
-> >-1, (u8 *)&target, -1, NULL)) {
->
->         The text beginning with "-1," is a separate line, and something
-> messed up the tabs.  Also, this should be rewritten as
->
->                 if (!strlen(newval->string) ||
->                     !in4_pton(newval->string + 1, -1, (u8 *)&target, -1, =
-NULL)) {
->
->         to avoid a long line.
->
+> +const struct nla_policy ethnl_tsinfo_get_policy[ETHTOOL_A_TSINFO_MAX + 1] = {
+>  	[ETHTOOL_A_TSINFO_HEADER]		=
+>  		NLA_POLICY_NESTED(ethnl_header_policy),
+> +	[ETHTOOL_A_TSINFO_TIMESTAMPING] = { .type = NLA_NESTED },
+> +	[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_NEST] = { .type = NLA_NESTED },
 
-Yes you are right, I should have used the checkpatch script before
-submitting the patch. Sorry for the inconvenience.
+link the policy by NLA_POLICY_NESTED() so that user space can inspect
+the sub-layers via the control family.
 
->         -J
->
-> >             netdev_err(bond->dev, "invalid ARP target %pI4 specified\n"=
-,
-> >                    &target);
-> >             return ret;
-> >
->
->
-> ---
->         -Jay Vosburgh, jay.vosburgh@canonical.com
+>  };
+>  
+> +static int
+> +tsinfo_parse_request(struct ethnl_req_info *req_base, struct nlattr **tb,
+> +		     struct netlink_ext_ack *extack)
+> +{
+> +	struct nlattr *hwtst_tb[ARRAY_SIZE(ethnl_tsinfo_hwtstamp_provider_policy)];
+> +	struct tsinfo_req_info *req = TSINFO_REQINFO(req_base);
+> +	unsigned long val = 0, mask = 0;
+> +	int ret;
+> +
+> +	req->hwtst.index = -1;
+> +
+> +	if (tb[ETHTOOL_A_TSINFO_TIMESTAMPING]) {
+> +		ret = ethnl_parse_bitset(&val, &mask, __SOF_TIMESTAMPING_CNT,
+> +					 tb[ETHTOOL_A_TSINFO_TIMESTAMPING],
+> +					 sof_timestamping_names, extack);
+> +		if (ret < 0)
+> +			return ret;
+> +
+> +		if (val & SOF_TIMESTAMPING_GHWTSTAMP) {
+> +			/* We support only the get of the current hwtstamp config
+> +			 * for now.
+> +			 */
+> +			if (tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_NEST])
 
-I modified the patch and it is listed below.
+NL_SET_ERR_MSG_ATTR(...)
 
-Reported-by: Yue Sun <samsun1006219@gmail.com>
-Signed-off-by: Yue Sun <samsun1006219@gmail.com>
-diff --git a/drivers/net/bonding/bond_options.c
-b/drivers/net/bonding/bond_options.c
-index f3f27f0bd2a6..7f765b42fad4 100644
---- a/drivers/net/bonding/bond_options.c
-+++ b/drivers/net/bonding/bond_options.c
-@@ -1198,7 +1198,8 @@ static int bond_option_arp_ip_targets_set(struct
-bonding *bond,
-     __be32 target;
+> +				return -EOPNOTSUPP;
+> +
+> +			req->get_hwtstamp = true;
+> +			return 0;
+> +		}
+> +	}
+> +
+> +	if (!tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_NEST])
+> +		return 0;
+> +
+> +	ret = nla_parse_nested(hwtst_tb,
+> +			       ARRAY_SIZE(ethnl_tsinfo_hwtstamp_provider_policy) - 1,
+> +			       tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_NEST],
+> +			       ethnl_tsinfo_hwtstamp_provider_policy, extack);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	if (!hwtst_tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_INDEX] ||
+> +	    !hwtst_tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_QUALIFIER])
+> +		return -EINVAL;
 
-     if (newval->string) {
--        if (!in4_pton(newval->string+1, -1, (u8 *)&target, -1, NULL)) {
-+        if (!strlen(newval->string) ||
-+            !in4_pton(newval->string+1, -1, (u8 *)&target, -1, NULL)) {
-             netdev_err(bond->dev, "invalid ARP target %pI4 specified\n",
-                    &target);
-             return ret;
+NL_REQ_ATTR_CHECK()
 
-Best Regards,
-Yue
+> +	ret = nla_get_u32(hwtst_tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_INDEX]);
+> +	if (ret < 0)
+> +		return -EINVAL;
+
+How's the get_u32 going to return a negative value?
+That's the purpose of this check?
+The policy should contain the max expected value - NLA_POLICY_MAX().
+
+> +	req->hwtst.index = ret;
+> +
+> +	ret = nla_get_u32(hwtst_tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_QUALIFIER]);
+> +	if (ret < 0 || HWTSTAMP_PROVIDER_QUALIFIER_CNT <= ret)
+> +		return -EINVAL;
+> +	req->hwtst.qualifier = ret;
+> +
+> +	return 0;
+> +}
+> +
+>  static int tsinfo_prepare_data(const struct ethnl_req_info *req_base,
+>  			       struct ethnl_reply_data *reply_base,
+>  			       const struct genl_info *info)
+>  {
+>  	struct tsinfo_reply_data *data = TSINFO_REPDATA(reply_base);
+> +	struct tsinfo_req_info *req = TSINFO_REQINFO(req_base);
+>  	struct net_device *dev = reply_base->dev;
+>  	int ret;
+>  
+>  	ret = ethnl_ops_begin(dev);
+>  	if (ret < 0)
+>  		return ret;
+> -	ret = __ethtool_get_ts_info(dev, &data->ts_info);
+> +
+> +	if (!netif_device_present(dev)) {
+
+ ethnl_ops_begin() checks for presence
+
+> +		ret = -ENODEV;
+> +		goto out;
+> +	}
+> +
+> +	if (req->get_hwtstamp) {
+> +		struct kernel_hwtstamp_config cfg = {};
+> +
+> +		if (!dev->netdev_ops->ndo_hwtstamp_get) {
+> +			ret = -EOPNOTSUPP;
+> +			goto out;
+> +		}
+> +
+> +		ret = dev_get_hwtstamp_phylib(dev, &cfg);
+> +		data->hwtst_config.tx_type = BIT(cfg.tx_type);
+> +		data->hwtst_config.rx_filter = BIT(cfg.rx_filter);
+> +		data->hwtst_config.flags = BIT(cfg.flags);
+> +		goto out;
+> +	}
+
+This goto could be an else
+
+> +	if (req->hwtst.index != -1) {
+> +		struct hwtstamp_provider hwtstamp;
+> +
+> +		hwtstamp.ptp = ptp_clock_get_by_index(req->hwtst.index);
+> +		if (!hwtstamp.ptp) {
+> +			ret = -ENODEV;
+> +			goto out;
+> +		}
+> +		hwtstamp.qualifier = req->hwtst.qualifier;
+> +
+> +		ret = ethtool_get_ts_info_by_phc(dev, &data->ts_info,
+> +						 &hwtstamp);
+> +	} else {
+> +		ret = __ethtool_get_ts_info(dev, &data->ts_info);
+
+Not sure I grok why we need 3 forms of getting the tstamp config.
+
+Please make sure to always update
+Documentation/networking/ethtool-netlink.rst
+when extending ethtool-nl.
+
+> +	}
+> +
+> +out:
+>  	ethnl_ops_complete(dev);
+>  
+>  	return ret;
+>  }
+
+> +	if (ts_info->phc_index >= 0) {
+> +		/* _TSINFO_HWTSTAMP_PROVIDER_NEST */
+> +		len += nla_total_size(sizeof(u32) * 2);
+
+That translates to two raw u32s into a single attribute.
+Is that what you mean?
+
+>  		len += nla_total_size(sizeof(u32));	/* _TSINFO_PHC_INDEX */
+> +	}
+>  
+>  	return len;
+>  }
+>  
+
+
+> +	if (ts_info->phc_index >= 0) {
+> +		ret = nla_put_u32(skb, ETHTOOL_A_TSINFO_PHC_INDEX,
+> +				  ts_info->phc_index);
+> +		if (ret)
+> +			return -EMSGSIZE;
+> +
+> +		nest = nla_nest_start(skb, ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_NEST);
+> +		if (!nest)
+> +			return -EMSGSIZE;
+> +
+> +		ret = nla_put_u32(skb,
+> +				  ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_INDEX,
+> +				  ts_info->phc_index);
+
+You can assume nla_put_u32 only returns EMSGSIZE, so doing:
+
+if (nla_put_u32(....) ||
+    nla_put_u32(....))
+	return -EMSGSIZE;
+
+is generally considered to be fine.
+
+> +		if (ret) {
+> +			nla_nest_cancel(skb, nest);
+> +			return ret;
+> +		}
+> +
+> +		ret = nla_put_u32(skb,
+> +				  ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_QUALIFIER,
+> +				  ts_info->phc_qualifier);
+> +		if (ret) {
+> +			nla_nest_cancel(skb, nest);
+> +			return ret;
+> +		}
+> +
+> +		nla_nest_end(skb, nest);
+> +	}
+> +	return 0;
+> +}
+
+> +static int ethnl_set_tsinfo(struct ethnl_req_info *req_base,
+> +			    struct genl_info *info)
+> +{
+> +	struct nlattr *hwtst_tb[ARRAY_SIZE(ethnl_tsinfo_hwtstamp_provider_policy)];
+> +	unsigned long mask = 0, req_rx_filter, req_tx_type;
+> +	struct kernel_hwtstamp_config hwtst_config = {0};
+> +	struct net_device *dev = req_base->dev;
+> +	struct hwtstamp_provider hwtstamp;
+> +	struct nlattr **tb = info->attrs;
+> +	int ret, phc_index = 0;
+> +	bool mod = false;
+> +
+> +	BUILD_BUG_ON(__HWTSTAMP_TX_CNT > 32);
+> +	BUILD_BUG_ON(__HWTSTAMP_FILTER_CNT > 32);
+> +
+> +	if (!netif_device_present(dev))
+> +		return -ENODEV;
+> +
+> +	if (tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_NEST]) {
+> +		ret = nla_parse_nested(hwtst_tb,
+> +				       ARRAY_SIZE(ethnl_tsinfo_hwtstamp_provider_policy) - 1,
+> +				       tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_NEST],
+> +				       ethnl_tsinfo_hwtstamp_provider_policy, info->extack);
+> +		if (ret < 0)
+> +			return ret;
+> +
+> +		if (!hwtst_tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_INDEX] ||
+> +		    !hwtst_tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_QUALIFIER])
+> +			return -EINVAL;
+> +
+> +		memcpy(&hwtstamp, &dev->hwtstamp, sizeof(hwtstamp));
+> +		if (hwtstamp.ptp)
+> +			phc_index = ptp_clock_index(hwtstamp.ptp);
+> +
+> +		ethnl_update_u32(&phc_index,
+> +				 hwtst_tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_INDEX],
+> +				 &mod);
+> +		ethnl_update_u32(&hwtstamp.qualifier,
+> +				 hwtst_tb[ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER_QUALIFIER],
+> +				 &mod);
+> +
+> +		/* Does the hwtstamp supported in the netdev topology */
+> +		if (mod) {
+> +			hwtstamp.ptp = ptp_clock_get_by_index(phc_index);
+
+This just returns a pointer without any refcounting, right?
+What guarantees the ptp object doesn't disappear?
+
+> +			if (!hwtstamp.ptp)
+> +				return -ENODEV;
+> +
+> +			if (!netdev_support_hwtstamp(dev, &hwtstamp))
+> +				return -ENODEV;
+
+these need extacks
+
+> +		}
+> +	}
 
