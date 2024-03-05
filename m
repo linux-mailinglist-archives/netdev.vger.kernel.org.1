@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-77590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 177768723A0
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 17:05:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9C1C8723A1
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 17:05:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C77F5287CA6
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:05:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDCC51C218FA
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:05:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7BD312B16B;
-	Tue,  5 Mar 2024 16:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9344212B170;
+	Tue,  5 Mar 2024 16:04:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SLrvxvWI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X1xlMR8b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD04128801
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 16:04:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12528128805
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 16:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709654691; cv=none; b=XdHACwmDlrPLZaQmKrWS9sEwMpV1MOLNY0GmiqVplBaAxCW7wQcBzlWkbpHI4Fi1Lfi+3/xhdwOdpMDGn5LQOF+cyi0YsXUowtKJBmhqHrLd+KG9ETPLaBk+B7QbRzvRFHmwf+lRqlyXyIk6DTYP7SOKkYRzvMlOKKB/bLieueM=
+	t=1709654693; cv=none; b=YmON66WLhs7+BaQpKUfQvLeMmrA9xPDwU2HMnaCMzez5UcJKEJ9wEDGPuDZ/QNeYDkr2r0GcfhnMb604AScFxBgLqF+L8XtZmrAZKw/ZaeOXPBhXuKVWhV06jleJhhASQ2OApV8TmM6tWBHCwtpxg6D4Qe8knJ43R4odGPFSLdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709654691; c=relaxed/simple;
-	bh=gvy+5YrH62b/erUFJ2UXKwPrjN6eRVv04Yn7bkAJCdE=;
+	s=arc-20240116; t=1709654693; c=relaxed/simple;
+	bh=e0+PLrT73nEBv75eicC4a+8lpbZ9f7PeNh5w4yzgsKo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pd2S1ezb+b5UVZHjUMEUlKWTy2I4bOLXvaon37p2yo0QDhpVFszRBhsO0Qulo9Z+3x4WH9O4dVojq9r2hcsK9uAqEyE2HiJazZVeb1XSET9aqc2037qHhS3RNZ2Puga1BjuWWyDzgLX6mtDpNzSPQWsqs24j/It/PgTHZ6LDcuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SLrvxvWI; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=PJFC1Vo08Xu1eqcYtk1D/MJWB8sEOrydNxt2JhUTYlPJrKSVDQ4SG9F+qCzIESfp0zdpu9Ce5iZ7ipC4BkmTqQDoTNmKOxmKuWFj+6UpoLACVQ2dvv2gFbGRRsHL4Q5Hg+S+SwMHM+qShHbShO/vlbbVvFzhsP+UdPeac9DxqMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X1xlMR8b; arc=none smtp.client-ip=209.85.222.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dced704f17cso9809142276.1
-        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 08:04:35 -0800 (PST)
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-78825e47824so201372685a.1
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 08:04:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709654675; x=1710259475; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709654677; x=1710259477; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uPkfSDEDaD+ot1oycTy547baCEwC3QtbZqcPHtahwi0=;
-        b=SLrvxvWIi1doFSzEpeZWC7Z9BAZ6q7E8SQRdFoqKsfRWD//L8u14lrq7llC4uTAzFg
-         oh9c+Oy2eI/grlfyU0MR2E3aydXtalDZDQL37q2rYHroTTJa6UQLvUCuw7g2wz7i2b2h
-         XdrKE7gbxEWMS7Ij8FSLuZSxwbLMULPDRGoSTXUhQZOYaB1x5KHRVg2+ln3cQSIa6O8d
-         +UJZkHisqTLzaKXdSX2GQ+g/BvTV7BwkbQEmYr5VfSrmkI3FHKOlvFV0f5NTHxIPiEdP
-         8XnyZmTKzMQj9YsFLywhXg0mt9m0g73eKfgkfO2prQbmL6BAWmxDtdcIjbgdujLoujd+
-         6osw==
+        bh=gZ2xzFYq3fEPMpr/MUwgp+HG/Vy0UXwzCdvLWEnfl/o=;
+        b=X1xlMR8b8EsV4A9PS7+F4GVrVkY8SO8hf8PeXzTC0NK6jFKFh2fPqRYqPlrtQm4ieM
+         OKD+85MI8ym/9rEg/ZR4WqDgeoDrRgunKrgiH23tWLUOlyQANU+s7a79RNP49Ip4Y8OX
+         +zUGF0mOdI86A2ldoVBMDoCSAq0xdY06AphIqYBAZPIGPJ1hk3OwvEYGIc4pdyNayR1W
+         ggo7gQj4iLisGVp+vl8pg7hFdfIJW63tMxEoGaLlzis6v/1StpSQvDkqsK5tWgKo2LSj
+         n12lbL3JrFQMWZ+03IzQL9BkoPBYBSB1U3xdVz8q87HR62Zo6+3X0edmbT6oKYljiFvK
+         T3lA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709654675; x=1710259475;
+        d=1e100.net; s=20230601; t=1709654677; x=1710259477;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uPkfSDEDaD+ot1oycTy547baCEwC3QtbZqcPHtahwi0=;
-        b=XV5lF1aU4g5dOuEpO126MxOU8T/Zpiy/rytEd4wQQfcA3arA0/qGAVEPVonjQ388Pm
-         Jrme3b4ForaPUf29xnOqxI9/on9xRWVorrQM2aKMQIe7/ZPBlFFdGUBc7LZ/QS5jYmCp
-         ix9BjhQfFbPw/E396CGsj5wIWxBAPgra9PUbviJgF5mItSghn5YDvkt/mjjF0XCNC8hZ
-         XpJe+7uEROYjFyLlcXuW+51xnUbojmcvqXyzdQeoougAn4t+z8buHfdy/bJwo8WBwqEZ
-         GEnMEl7utiqi9rHVejahnWIoXf32SZxfrWLGfTdsu2bmRMOoo2hIgVnGqljuQoBqMJZc
-         zwaQ==
-X-Gm-Message-State: AOJu0Yze3kBhF+SEK3/qglLxFrrIkU7JxyUYPMfROLGxw3Q4h6b4cf0J
-	1oHG0QHokcveoBj9sC0rp+7yeJn2m44hVDP/n8gD+faw1IEbn7ZUN01bPGtbSlHNrMMts6Oukeg
-	qdTMYLmUOlw==
-X-Google-Smtp-Source: AGHT+IEDdaYTVAMn+9+o9ytS/uLNGtu5wGyDYhiNG1kONQkuPsByYt6TD8z4jfHVOwAm9UGpCcoQvb26418UAA==
+        bh=gZ2xzFYq3fEPMpr/MUwgp+HG/Vy0UXwzCdvLWEnfl/o=;
+        b=DPEWlQBi9gLj/1ci8kwxe0bnO0BpGmIZPfq1W/ZMEoBSGOqhTVorjj2qSFL3scc2Yz
+         yTIeA7D9zD+LoNxcGP9SR3rVdmzizo1BXwSbPjgpJxDPqyXb5HRAOCa7suEKn6hYiBDk
+         P5maXaQ40O5oAHjvll0TMeJhCFSgqXMZztbFGZVVN+80xyWAiLl6CsppIWe3cYbN3pSP
+         FNQZl6bfnmycxvq4dl7ZF7GHlBMiNu5C71Lr6vnFOL2aLBMcB3dVui3g/9sriPqqOm2r
+         1hUGW6ayfCdpBMOJqYV4podHGy/fuUPM0lNhNdQ8Gl/mb78srHWcmNHDrLMJSMJasU6G
+         n/lg==
+X-Gm-Message-State: AOJu0YzmIScF1BVPW4poFrCRziEh/OYnDCooT9egOrEPbRo+LT6guPzt
+	hWtZV1W+PuNp3n+Ime1rXrriNCEsWiEy401C4BGy+GruDCP/ST0DeFrNGggW/4AJjkJVEAEoInS
+	1uwc8fLLcNg==
+X-Google-Smtp-Source: AGHT+IGxJI2wAtvikhj+WpuERa04vwzy+AKZ+7ZxJrtW2zxWF2lTVgBoTQA2b5+vzKcHQKBHzEAVsfgOXFd1ew==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1081:b0:dcc:41ad:fb3b with SMTP
- id v1-20020a056902108100b00dcc41adfb3bmr475163ybu.10.1709654675207; Tue, 05
- Mar 2024 08:04:35 -0800 (PST)
-Date: Tue,  5 Mar 2024 16:04:08 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:620a:1a04:b0:788:13c3:dad7 with SMTP
+ id bk4-20020a05620a1a0400b0078813c3dad7mr148662qkb.8.1709654677177; Tue, 05
+ Mar 2024 08:04:37 -0800 (PST)
+Date: Tue,  5 Mar 2024 16:04:09 +0000
 In-Reply-To: <20240305160413.2231423-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240305160413.2231423-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240305160413.2231423-14-edumazet@google.com>
-Subject: [PATCH net-next 13/18] inet: move tcp_protocol and udp_protocol to net_hotdata
+Message-ID: <20240305160413.2231423-15-edumazet@google.com>
+Subject: [PATCH net-next 14/18] inet: move inet_ehash_secret and
+ udp_ehash_secret into net_hotdata
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -84,78 +85,79 @@ Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-These structures are read in rx path, move them to net_hotdata
-for better cache locality.
+"struct net_protocol" has a 32bit hole in 32bit arches.
+
+Use it to store the 32bit secret used by UDP and TCP,
+to increase cache locality in rx path.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/hotdata.h |  2 ++
- net/ipv4/af_inet.c    | 30 +++++++++++++++---------------
- 2 files changed, 17 insertions(+), 15 deletions(-)
+ include/net/hotdata.h      | 3 +++
+ include/net/protocol.h     | 1 +
+ net/ipv4/inet_hashtables.c | 3 +--
+ net/ipv4/udp.c             | 2 --
+ 4 files changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/include/net/hotdata.h b/include/net/hotdata.h
-index 97617acb75e1f2141fe7170d93c06f9813c725a3..4d1cb3c29d4edfbc18cf56c370a1e04e5fcb1cbd 100644
+index 4d1cb3c29d4edfbc18cf56c370a1e04e5fcb1cbd..4dd86be99116ff83f2524461a006565b2ade2241 100644
 --- a/include/net/hotdata.h
 +++ b/include/net/hotdata.h
-@@ -11,7 +11,9 @@ struct net_hotdata {
- #if IS_ENABLED(CONFIG_INET)
- 	struct packet_offload	ip_packet_offload;
- 	struct net_offload	tcpv4_offload;
-+	struct net_protocol	tcp_protocol;
- 	struct net_offload 	udpv4_offload;
-+	struct net_protocol	udp_protocol;
- #endif
- #if IS_ENABLED(CONFIG_IPV6)
- 	struct packet_offload	ipv6_packet_offload;
-diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index 08dda6955562ea6b89e02b8299b03ab52b342f27..6f1cfd176e7b84f23d8a5e505bf8e13b2b755f06 100644
---- a/net/ipv4/af_inet.c
-+++ b/net/ipv4/af_inet.c
-@@ -1751,19 +1751,6 @@ static const struct net_protocol igmp_protocol = {
+@@ -36,6 +36,9 @@ struct net_hotdata {
+ 	int			dev_rx_weight;
  };
+ 
++#define inet_ehash_secret	net_hotdata.tcp_protocol.secret
++#define udp_ehash_secret	net_hotdata.udp_protocol.secret
++
+ extern struct net_hotdata net_hotdata;
+ 
+ #endif /* _NET_HOTDATA_H */
+diff --git a/include/net/protocol.h b/include/net/protocol.h
+index 6aef8cb11cc8c409e5f7a2519f5e747be584c8d5..3ff26e66735cec98b08eadb1c3f129e011923cb0 100644
+--- a/include/net/protocol.h
++++ b/include/net/protocol.h
+@@ -46,6 +46,7 @@ struct net_protocol {
+ 				 * socket lookup?
+ 				 */
+ 				icmp_strict_tag_validation:1;
++	u32			secret;
+ };
+ 
+ #if IS_ENABLED(CONFIG_IPV6)
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index 308ff34002ea6b5e0620004f65ffd833087afbc1..7498af3201647fd937bf8177f04c200bea178a79 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -24,6 +24,7 @@
+ #include <net/inet6_hashtables.h>
  #endif
- 
--static const struct net_protocol tcp_protocol = {
--	.handler	=	tcp_v4_rcv,
--	.err_handler	=	tcp_v4_err,
--	.no_policy	=	1,
--	.icmp_strict_tag_validation = 1,
--};
+ #include <net/secure_seq.h>
++#include <net/hotdata.h>
+ #include <net/ip.h>
+ #include <net/tcp.h>
+ #include <net/sock_reuseport.h>
+@@ -32,8 +33,6 @@ u32 inet_ehashfn(const struct net *net, const __be32 laddr,
+ 		 const __u16 lport, const __be32 faddr,
+ 		 const __be16 fport)
+ {
+-	static u32 inet_ehash_secret __read_mostly;
 -
--static const struct net_protocol udp_protocol = {
--	.handler =	udp_rcv,
--	.err_handler =	udp_err,
--	.no_policy =	1,
--};
--
- static const struct net_protocol icmp_protocol = {
- 	.handler =	icmp_rcv,
- 	.err_handler =	icmp_err,
-@@ -1992,9 +1979,22 @@ static int __init inet_init(void)
+ 	net_get_random_once(&inet_ehash_secret, sizeof(inet_ehash_secret));
  
- 	if (inet_add_protocol(&icmp_protocol, IPPROTO_ICMP) < 0)
- 		pr_crit("%s: Cannot add ICMP protocol\n", __func__);
--	if (inet_add_protocol(&udp_protocol, IPPROTO_UDP) < 0)
-+
-+	net_hotdata.udp_protocol = (struct net_protocol) {
-+		.handler =	udp_rcv,
-+		.err_handler =	udp_err,
-+		.no_policy =	1,
-+	};
-+	if (inet_add_protocol(&net_hotdata.udp_protocol, IPPROTO_UDP) < 0)
- 		pr_crit("%s: Cannot add UDP protocol\n", __func__);
--	if (inet_add_protocol(&tcp_protocol, IPPROTO_TCP) < 0)
-+
-+	net_hotdata.tcp_protocol = (struct net_protocol) {
-+		.handler	=	tcp_v4_rcv,
-+		.err_handler	=	tcp_v4_err,
-+		.no_policy	=	1,
-+		.icmp_strict_tag_validation = 1,
-+	};
-+	if (inet_add_protocol(&net_hotdata.tcp_protocol, IPPROTO_TCP) < 0)
- 		pr_crit("%s: Cannot add TCP protocol\n", __func__);
- #ifdef CONFIG_IP_MULTICAST
- 	if (inet_add_protocol(&igmp_protocol, IPPROTO_IGMP) < 0)
+ 	return __inet_ehashfn(laddr, lport, faddr, fport,
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index a8acea17b4e5344d022ae8f8eb674d1a36f8035a..2beabf5b2d8628f1fed69a0212c57bd3cd638483 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -411,8 +411,6 @@ INDIRECT_CALLABLE_SCOPE
+ u32 udp_ehashfn(const struct net *net, const __be32 laddr, const __u16 lport,
+ 		const __be32 faddr, const __be16 fport)
+ {
+-	static u32 udp_ehash_secret __read_mostly;
+-
+ 	net_get_random_once(&udp_ehash_secret, sizeof(udp_ehash_secret));
+ 
+ 	return __inet_ehashfn(laddr, lport, faddr, fport,
 -- 
 2.44.0.278.ge034bb2e1d-goog
 
