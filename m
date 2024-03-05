@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-77690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF906872AEC
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 00:18:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2970D872B07
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 00:28:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D7E91C22DBE
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 23:18:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BF411C2489D
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 23:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18F1912D211;
-	Tue,  5 Mar 2024 23:18:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F87B12D216;
+	Tue,  5 Mar 2024 23:28:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AxC0+jyh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g2YLOl/e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A617112B17E;
-	Tue,  5 Mar 2024 23:18:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82B212D210;
+	Tue,  5 Mar 2024 23:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709680698; cv=none; b=R6tFi6zUvd1KAc0p/0uZNntKqT9CBhJWbJhMHId62dYBW13ct9SnN4oG3Q0vWujq8Oifuojs4WlPrQO2kXcUtUabf/XKj6KyDtt0CSJjlKGsWPk6V1bwX0JwT1w0szflwIFiGie10j9beKXXzA0fYS8yeFcVP7xBVF7nn3VmziU=
+	t=1709681283; cv=none; b=tsOz2EFZscd5x6JLns6j4QMkW2ksL8EtlXXeGlTwU2ZFJZPn5QhyiOE6UWSXaf3lrEFU/40mP4jOju0rSN6QtPHT2hxSvWZ8PEEJ4sLdHiHtrQvi/xWEGF7Pr8XfhFArQsYJLa8GQhxLUCh5xc44uXaibD5n0J0/yhlEMOorYIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709680698; c=relaxed/simple;
-	bh=r/FMUq0cfXtSNCvomT8MM4kqRuTVM4qx8HZFAyYd8uA=;
+	s=arc-20240116; t=1709681283; c=relaxed/simple;
+	bh=yJxdZoQL8RIgiKiQsnedGkzuTvSUAiuG0Dq+5qOhp+o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mAXQbOvBiiNe5AeduL5WAsDwnslJh4DIIjt9N0lvG1iqf4EDR5PGczgF6zL9kI+ntrFAAU2iU+Kfq9veiu3V/h/qKvRkXmfPotHb9uO7vrP7rcxx2/roicKWMKKdoMXoz8p4qi5EvxGa8aPklfIbOwDqfUwbbZoNYg0d8W4xBg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AxC0+jyh; arc=none smtp.client-ip=209.85.215.180
+	 In-Reply-To:Content-Type; b=uCV3UCJfR9ibB+BN3JSiwILMItWNyJiZdMhb5bzXKTPk7BWm4xpZidUChVYP/BDOkWig5/ipLCzH9aK0P8A6LVXLzG/+UbrDDijj29RQdbJYAoaBMySGJMXBnbQbD2No/BQNh90NTr6UhBRsvo+PCOMnu2WE7S/2JeZO25quudc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g2YLOl/e; arc=none smtp.client-ip=209.85.216.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5cdbc4334edso4405192a12.3;
-        Tue, 05 Mar 2024 15:18:16 -0800 (PST)
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-299dba8fd24so4200900a91.2;
+        Tue, 05 Mar 2024 15:28:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709680696; x=1710285496; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1709681281; x=1710286081; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ei3Ei7fZc+FJpIyukaKpwAv3ENAE9CDqDMBONWmjA38=;
-        b=AxC0+jyhRVFgoKpfVSHyODIdksH9GaKlUJ4tTLXCrUcqJ+7hqo/i0KJpkj8FPwURq6
-         XXvHHAAxOuDtaMlCk5u/ttXgligDc0sCu3lK8YnUswZgpSzCo5gj3O7M+Q4BSFG7UpQh
-         h6TIPNgDBKfBduDu0F8ojPpJqIO3qwB5/pUvK6MP6OrFz2Yt3HIwyGYdo1/729PRaGDB
-         PpSj/s9h41gkzk2TaYPcMc01fW3ZCOoVkGA81KIIherp59OnvlN6xEVfIOm+Sl2UIsHo
-         KYDb/aS/lDuY7Mnzi4dx+5GkItu24unCNbRF71/l+L4ZVkEw3A1yL9zGdAQBYt7HQRLJ
-         r6sA==
+        bh=WLF8UJAVQjlxnLZMXvpLfFuhmxKmWCuaQi8QBSFA+Bw=;
+        b=g2YLOl/e9N1C1QPAm0Unj1fFJWEtwBysRVy9fPLoSjQWTLj27JcbKxvXhecTGdFLmM
+         fpeBJC9QVBxKoVHBqK7sibhF+SLo5EckrzJ2Q6rbl5TF7zszzW2+zXcRBy/BSyc6zWyM
+         j/Ogt4nPG0XRaF7E3MpXPwvFyB/xZiOlp41i9eZt1cXlKRUsgKafPqfwDvCT0+vF6ERR
+         QMATFGiMijHkAto92oG5Pmm0pWdxNwHVRIrxUaP63FCjjXQAPazhB/UeIsBLkF1wkSRH
+         pvMwI9HGWXI0ucV5cmS9EbNCXVvM5wTn0viiGZCKNPKCTHmxckF51dDtDrCodJ4xf353
+         wrNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709680696; x=1710285496;
+        d=1e100.net; s=20230601; t=1709681281; x=1710286081;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ei3Ei7fZc+FJpIyukaKpwAv3ENAE9CDqDMBONWmjA38=;
-        b=pDbFG/127EFiqMeHQVfJWcqSMh1OMK6O8ZrTxsaABwFfpmlHHXemBuML2BrpmlkW8e
-         wkinLIo01Y2Ms7eH3/EynKIPCTLBFvfyyN10puF67Tgq6s/77Sjqn+YUXVloihfN3khN
-         vlcnvugVsGIo5TOcWuviWNB4hsCaIi4xCzC8+E3FJWbLbvVdLQCM2woYV2xPyQ9mV162
-         m3AHTeMD5ONxx7AO385N4Eho5A4jizJsotPWMKuvgWRw2qnruiJ4tgGmXenXbIN+NCaR
-         J4nvh/Uz5Pfakdj00w+FPXYViZKQBSGN1C0vRPitClB5gJsfny9y7ei1EiA3/50Xhi0t
-         Ph0w==
-X-Forwarded-Encrypted: i=1; AJvYcCVuoKUVJEZi7iMYU49pWtYECEsfeb2bEMPnHyJkpezz5auAdNe9Y7ImKNYC2K8eIa7EUgQtI+Gfl55Ws5pHtPPorJYjdk8W+ri1llOSMtx8KNiJpuSOYcNIvjl+xTi8MGRLrJpw
-X-Gm-Message-State: AOJu0YwxwpQ+zMZVo4dTR9TU67Pl4qfqdu/AtATg+5hdTgq9oX3h246d
-	UGrKLrmriANQrcIs6l1OgEJo7RoW8CmiQKfc6XLvh+/88sbye+S5
-X-Google-Smtp-Source: AGHT+IGhoVOhhDq7RFQABt9us+DmeYnLmaNu7PcxEJXe/EzZV9Iys5fbJcw8k2GYrj1L08LlxaPMcQ==
-X-Received: by 2002:a05:6a20:daa3:b0:1a0:e089:e292 with SMTP id iy35-20020a056a20daa300b001a0e089e292mr3275198pzb.3.1709680695831;
-        Tue, 05 Mar 2024 15:18:15 -0800 (PST)
+        bh=WLF8UJAVQjlxnLZMXvpLfFuhmxKmWCuaQi8QBSFA+Bw=;
+        b=lJXLjehZRbpSeKPe5Yq3xcEQ9omH6GBfAlpLTlUOU3BuS/1inVKCvGA1luQYW0JDF8
+         triRgGXo80pWCYWWQC9TbYbog9LomXZtTikkvwD1DNzVYOfnKjV/QXEAdp5cOZZ5aw+1
+         eDIVBOWGZOWuyZMeWcy1jOjLGSE9g467B2dGZFRnG/5noeu5+RiL+t/gvGe+yhjJY1Z1
+         tQusy2UMb3wm2H+nzW4vgN0ubn73RY45MQ8XJy3hVZzd0ylKnB3Yb9nm8gnSSRaJ3XSU
+         vTIdaJJOm/HMSS+XhXW0t0u0TewW+gfBi6rVcZajys6MSK6yOHYeGJD0wULRBkKlysB1
+         kPsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX6sWfR1jMyviLD+H28oKx03q+J4oIumB7wULz/tbF4lSxrtkfuGQDUSHD8wmWQ3KmNafRRRPbhKdLKus1grQq0WtSt+eeMMfaA3jgl
+X-Gm-Message-State: AOJu0YzuCaFFPIMK/Aa6fAnrVCzRM+G2xmtvLfoWfqzAPHxxpCC63QEf
+	oEXXtY3qCUIJ8FQu2+Z0kXu/O+OXcSY/zogpt9MJgrfDKud93w4d
+X-Google-Smtp-Source: AGHT+IE76685i6WlhZUOACKhQwR71itjo6rVdCsZaadvl32oaDwe/VyMQ6Q1j9gxkF7/c/OAyubp7w==
+X-Received: by 2002:a17:90b:886:b0:299:3c2e:64ca with SMTP id bj6-20020a17090b088600b002993c2e64camr10686488pjb.14.1709681280842;
+        Tue, 05 Mar 2024 15:28:00 -0800 (PST)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id r15-20020a17090a0acf00b00299332505d7sm11174919pje.26.2024.03.05.15.18.11
+        by smtp.googlemail.com with ESMTPSA id f14-20020a17090a638e00b0029b3c08508dsm613646pjj.1.2024.03.05.15.27.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Mar 2024 15:18:14 -0800 (PST)
-Message-ID: <47d7fab5-6247-403e-964c-f0b28416157a@gmail.com>
-Date: Tue, 5 Mar 2024 15:18:10 -0800
+        Tue, 05 Mar 2024 15:28:00 -0800 (PST)
+Message-ID: <51913f10-892e-42b0-b609-c4f56878c473@gmail.com>
+Date: Tue, 5 Mar 2024 15:27:55 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,36 +76,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 06/16] net: dsa: vsc73xx: add
- port_stp_state_set function
+Subject: Re: [PATCH net-next v6 00/16] net: dsa: vsc73xx: Make vsc73xx usable
 Content-Language: en-US
-To: Pawel Dembicki <paweldembicki@gmail.com>, netdev@vger.kernel.org
-Cc: Linus Walleij <linus.walleij@linaro.org>, Simon Horman
- <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+To: Linus Walleij <linus.walleij@linaro.org>,
+ Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
  Claudiu Manoil <claudiu.manoil@nxp.com>,
  Alexandre Belloni <alexandre.belloni@bootlin.com>,
  UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
  linux-kernel@vger.kernel.org
 References: <20240301221641.159542-1-paweldembicki@gmail.com>
- <20240301221641.159542-7-paweldembicki@gmail.com>
+ <CACRpkdY1QfeqRfU-doq_qss8VzgWo9jLnULQREGmHPqsgpqWaQ@mail.gmail.com>
 From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20240301221641.159542-7-paweldembicki@gmail.com>
+In-Reply-To: <CACRpkdY1QfeqRfU-doq_qss8VzgWo9jLnULQREGmHPqsgpqWaQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 3/1/24 14:16, Pawel Dembicki wrote:
-> This isn't a fully functional implementation of 802.1D, but
-> port_stp_state_set is required for a future tag8021q operations.
+On 3/5/24 14:45, Linus Walleij wrote:
+> On Fri, Mar 1, 2024 at 11:17 PM Pawel Dembicki <paweldembicki@gmail.com> wrote:
 > 
-> This implementation handles properly all states, but vsc73xx doesn't
-> forward STP packets.
+>> This patch series focuses on making vsc73xx usable.
 > 
-> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> Can't help to think it is a bit funny regarding how many units
+> of this chips are shipped in e.g. home routers.
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+How many use this particular DSA driver as opposed to an user-space SDK 
+driver though?
+
+> 
+> They all work pretty much like the in-kernel driver, or a bit
+> less than that, just hammered down spraying packets in all
+> directions.
+
+Do you have a list of devices, so I make sure I don't buy those :P?
 -- 
 Florian
 
