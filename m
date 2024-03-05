@@ -1,129 +1,139 @@
-Return-Path: <netdev+bounces-77462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3AD8871DE7
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:33:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47DB3871E0C
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:37:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B3411F2B8F6
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:33:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 790661C2239A
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:37:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729935675D;
-	Tue,  5 Mar 2024 11:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F092254F86;
+	Tue,  5 Mar 2024 11:37:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="z70saEw0"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5592E54910;
-	Tue,  5 Mar 2024 11:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37895490D;
+	Tue,  5 Mar 2024 11:37:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709638363; cv=none; b=iumTygfy42Lz7J3QtmAL+0gK/eIfPhoxqDZNvu4SSgiQ+YxmdQnN74XT5Zyhiq1U2o2nsMZBpXMdMLHyriWrvySjmvfhZTycv/ljnqHlz6I+UCXwfN5DKHdQtG2c2VO3oD7IOfoyb0slAfXqX/R7EJJVXYP9VqN4r5JD9KOVtBk=
+	t=1709638624; cv=none; b=toDemnPCqlvbiUZX9M/Y24kmlGrzTxslgOux/t/9srwPy8aJoYqjbZxMU1SP7dceuBdQCAViIRrtenGsYz347Ckt82RT1Z/ffTCy1W+njMyaaB4nyF7huCb31KzDrNeNxVfN1ozO+wVEWaCAZzTAOvIQlVoONZsovPXR0YXHLIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709638363; c=relaxed/simple;
-	bh=bKHVK+OXGBs240XYEAacLsUkQ/bCj0REuSU/eEAptk0=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=eO6VKIjXasyiqtkL8Jd4Wh7Zc/m1m36PMQZmPfXo5gQ2m+xTGxxAk8Gf7Szl1z7tMfCfJ02bVOYHXF2uI8CGUGqzhw4PIQpnLfP9eHxkBH6wY4KijN5bNgi8zNAfgwdE6BxH4VMAiFJHTK7THfc3whgVaFVkml1UMvz1wisUD1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Tptf338WYzwPFD;
-	Tue,  5 Mar 2024 19:30:19 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id DB44D1400C8;
-	Tue,  5 Mar 2024 19:32:35 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 5 Mar 2024 19:32:35 +0800
-Message-ID: <c7d9818e-37ee-4b68-8241-2ef458a5ac82@huawei.com>
-Date: Tue, 5 Mar 2024 19:32:34 +0800
+	s=arc-20240116; t=1709638624; c=relaxed/simple;
+	bh=3ayW0IhTUeNMcpww5PHJsnIajeFZZT9ny2n8rBMH1eA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=azTM0TaKKQbCiYPdv0FlZhp9AQR6iiLKOs2/2DnrwblSXXQVOemYtvb0Lx/zAYltp3v5mUSD+DzdUPSNPBrnuDcMc49iDgu83FYtHrmZcUOMb1sPrCLAQbSMDQ8A4Nu7hu1UOJ7TMBNeTG/tYfcL79oEMqJxbWAN9qFHRltV0gI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=z70saEw0; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=IrDqOCAVFnIywCjY1vOYOH9E3WkzoSBd6y1AwGw2QPk=; b=z70saEw0Uyr9DpMfHt0qmGvV1r
+	IOgrK0UzVt4WJkKKwAMA6Z+nNottmESro61dl/j3LTnq31i1c+asqMGnwzPAvYM72RaYzTTEbC3yb
+	lTUOsmvv2A3qnseBp+jV3aRZ0ZBtoU4We8+GxzKqDQtZguiRW3k53w60f8sbwQflPkz/Dj2E5bh/O
+	o/gQMWYUgydc8kAI++cxof0gKS0uuMSLzTM6nhNeyQJy1J7nTLoSuBjJ+KeF7Zv8sF9hGnxj37P7H
+	tct7YVX5TePcXBQ2NDbPInfBNBTBvsZiQ8DOJK287YDCFLkUml+LdV4SmIO7NyF6+oKRs5pXeoTtf
+	Ux9MzmpQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43258)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rhT6J-00073t-1k;
+	Tue, 05 Mar 2024 11:36:51 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rhT6D-0005NL-BL; Tue, 05 Mar 2024 11:36:45 +0000
+Date: Tue, 5 Mar 2024 11:36:45 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Subject: Re: [PATCH net-next v3 0/9] MT7530 DSA Subdriver Improvements Act III
+Message-ID: <ZecDzbAMrXgMG72Z@shell.armlinux.org.uk>
+References: <20240301-for-netnext-mt7530-improvements-3-v3-0-449f4f166454@arinc9.com>
+ <81a5d191894e6a7741d3c266079f3404def2bb07.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: hns: Use common error handling code in
- hns_mac_init()
-To: Markus Elfring <Markus.Elfring@web.de>, <netdev@vger.kernel.org>,
-	<kernel-janitors@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Salil Mehta <salil.mehta@huawei.com>, Wojciech
- Drewek <wojciech.drewek@intel.com>, Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Yonglong Liu <liuyonglong@huawei.com>
-References: <9a2e5053-07ec-4a11-bef4-7a8b0f80f740@web.de>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <9a2e5053-07ec-4a11-bef4-7a8b0f80f740@web.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <81a5d191894e6a7741d3c266079f3404def2bb07.camel@redhat.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Thanks,
-Reviewed-by: Jijie Shao<shaojijie@huawei.com>
+On Tue, Mar 05, 2024 at 12:30:20PM +0100, Paolo Abeni wrote:
+> On Fri, 2024-03-01 at 12:42 +0200, Arınç ÜNAL wrote:
+> > This is the third patch series with the goal of simplifying the MT7530 DSA
+> > subdriver and improving support for MT7530, MT7531, and the switch on the
+> > MT7988 SoC.
+> > 
+> > I have done a simple ping test to confirm basic communication on all switch
+> > ports on MCM and standalone MT7530, and MT7531 switch with this patch
+> > series applied.
+> > 
+> > MT7621 Unielec, MCM MT7530:
+> > 
+> > rgmii-only-gmac0-mt7621-unielec-u7621-06-16m.dtb
+> > gmac0-and-gmac1-mt7621-unielec-u7621-06-16m.dtb
+> > 
+> > tftpboot 0x80008000 mips-uzImage.bin; tftpboot 0x83000000 mips-rootfs.cpio.uboot; tftpboot 0x83f00000 $dtb; bootm 0x80008000 0x83000000 0x83f00000
+> > 
+> > MT7622 Bananapi, MT7531:
+> > 
+> > gmac0-and-gmac1-mt7622-bananapi-bpi-r64.dtb
+> > 
+> > tftpboot 0x40000000 arm64-Image; tftpboot 0x45000000 arm64-rootfs.cpio.uboot; tftpboot 0x4a000000 $dtb; booti 0x40000000 0x45000000 0x4a000000
+> > 
+> > MT7623 Bananapi, standalone MT7530:
+> > 
+> > rgmii-only-gmac0-mt7623n-bananapi-bpi-r2.dtb
+> > gmac0-and-gmac1-mt7623n-bananapi-bpi-r2.dtb
+> > 
+> > tftpboot 0x80008000 arm-zImage; tftpboot 0x83000000 arm-rootfs.cpio.uboot; tftpboot 0x83f00000 $dtb; bootz 0x80008000 0x83000000 0x83f00000
+> > 
+> > This patch series is the continuation of the patch series linked below.
+> > 
+> > https://lore.kernel.org/r/20230522121532.86610-1-arinc.unal@arinc9.com
+> > 
+> > Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> 
+> @Russell, I see you went through some patches; my understanding is that
+> there are no objection to this series in the current form. The series
+> LGTM, so I'm going to apply it: I think it would a pity if it should
+> miss this cycle.
 
-on 2024/3/1 23:04, Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Fri, 1 Mar 2024 15:48:25 +0100
->
-> Add a jump target so that a bit of exception handling can be better reused
-> at the end of this function implementation.
->
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-> ---
->   drivers/net/ethernet/hisilicon/hns/hns_dsaf_mac.c | 15 +++++++++------
->   1 file changed, 9 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_mac.c b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_mac.c
-> index f75668c47935..a4919aad45b6 100644
-> --- a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_mac.c
-> +++ b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_mac.c
-> @@ -1094,22 +1094,21 @@ int hns_mac_init(struct dsaf_device *dsaf_dev)
->   	device_for_each_child_node(dsaf_dev->dev, child) {
->   		ret = fwnode_property_read_u32(child, "reg", &port_id);
->   		if (ret) {
-> -			fwnode_handle_put(child);
->   			dev_err(dsaf_dev->dev,
->   				"get reg fail, ret=%d!\n", ret);
-> -			return ret;
-> +			goto put_fwnode;
->   		}
->   		if (port_id >= max_port_num) {
-> -			fwnode_handle_put(child);
->   			dev_err(dsaf_dev->dev,
->   				"reg(%u) out of range!\n", port_id);
-> -			return -EINVAL;
-> +			ret = -EINVAL;
-> +			goto put_fwnode;
->   		}
->   		mac_cb = devm_kzalloc(dsaf_dev->dev, sizeof(*mac_cb),
->   				      GFP_KERNEL);
->   		if (!mac_cb) {
-> -			fwnode_handle_put(child);
-> -			return -ENOMEM;
-> +			ret = -ENOMEM;
-> +			goto put_fwnode;
->   		}
->   		mac_cb->fw_port = child;
->   		mac_cb->mac_id = (u8)port_id;
-> @@ -1148,6 +1147,10 @@ int hns_mac_init(struct dsaf_device *dsaf_dev)
->   	}
->
->   	return 0;
-> +
-> +put_fwnode:
-> +	fwnode_handle_put(child);
-> +	return ret;
->   }
->
->   void hns_mac_uninit(struct dsaf_device *dsaf_dev)
-> --
-> 2.44.0
->
+That's fine - I did read through the entire series, but only gave my
+r-b on the ones I felt I'd done a good enough job on. You may have
+noticed I haven't submitted much network stuff this cycle... I have
+limited bandwidth at the moment.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
