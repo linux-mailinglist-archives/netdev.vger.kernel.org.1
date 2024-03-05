@@ -1,72 +1,57 @@
-Return-Path: <netdev+bounces-77345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5374871536
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 06:24:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAE2F871548
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 06:33:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47828B20FA1
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 05:24:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40F39283465
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 05:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A43B446444;
-	Tue,  5 Mar 2024 05:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C7B145BFB;
+	Tue,  5 Mar 2024 05:33:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="kCACNL11"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BZQo5t4W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F4945BFB;
-	Tue,  5 Mar 2024 05:24:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA05AD5E
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 05:33:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709616286; cv=none; b=B0CPvYgJMpdxBaB/G4sjZySnAcM741m72MkbEt7zIbynbF8t71Wuh/wjVZ0QjjAgvQQkhLItboMgb8EPpF69oHs4LenfvE0ExTB2aI3TDjVx5lIzZ84tsZidRt1emuNRBMtWP4TMoBrzaIhgxK4IS4sogIgSuy2s4d4LpbEnWzg=
+	t=1709616795; cv=none; b=CL0AjKqXyRTMNNiI2lUARxbI41EbwbDZsgYOZwtBJe5jsJN19vHUeQGOnDpWQtApW+K/xlNI7faFBb9fAclaMtr4CvieBZfnRdBVR2rwRTk/pQaAFzsOdegyaAs+RW11ahIy1AP0rrl06yYKSk4qkzB2fq41VrBwy5SoqjWxcek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709616286; c=relaxed/simple;
-	bh=ovMFF2p5oK8EYHVURck+QPJEApIyCDpbd/gzNOK+sI0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ItDDu5me6Ue6kw52eO3gBD+h8ZY2vPXoSa6bVDpUk5ujHCM+ZgdKhLCAk0cZNWOHZQ+ZCqg42LGyCQl3QX0M/Nubkc9GhL6XUy+wiWIIoEms+7wgW7NsYV5oudPeGt54tfV9SHXoVXeXHXuGVS5x5qhTlYrGhRItZRqd7xR0TTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=kCACNL11; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42513ex4003078;
-	Mon, 4 Mar 2024 21:24:38 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	pfpt0220; bh=NBR8u97z8Hokb2nrGzdEzBZWH1fBhn7WMLp1Je3wzUY=; b=kCA
-	CNL11YUluYAdzgxU/wzJw5pyMKQ4KASgI2d0RIDCMIN5PT2UIx0fitW6hm7liXrS
-	LRZ3TFQxVNIMI7tZYlsUdaYhUKvQBTlZxcf68GxT5EU9czuzm73iKxWQBjkdfnQz
-	1QpLZEx2yc+Jjoyt6XH8QKq/0xQ/U0dk/EawYrmb8SXG7tYkUMh3iCLjarhtZicz
-	uzo/masjP1Wz6th36DDVTiHOIre/JoitHZPWqM53tRDM22G5ecQxMVZtswO1TJ0o
-	yxIpLaf21dg8w+ML8mlFhZpc9wRMIX4IiO9leCwhYbmljfXIOD81FPgemzY3Kmd0
-	dEKeYhPPBs/a5xAKMbw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3wngqe2mqt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Mar 2024 21:24:38 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.12; Mon, 4 Mar 2024 21:24:37 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
- Transport; Mon, 4 Mar 2024 21:24:37 -0800
-Received: from localhost.localdomain (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 149BA3F704E;
-	Mon,  4 Mar 2024 21:24:35 -0800 (PST)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Ratheesh Kannoth <rkannoth@marvell.com>
-Subject: Re: [PATCH v1] ps3_gelic_net: Use napi routines for RX SKB
-Date: Tue, 5 Mar 2024 10:54:21 +0530
-Message-ID: <20240305052421.1180221-1-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <ddb7f076-06a7-45df-ae98-b4120d9dc275@infradead.org>
-References: 
+	s=arc-20240116; t=1709616795; c=relaxed/simple;
+	bh=ZpwwSNZp0Y4tO59tRnK+4czKwgMn6789Yp8YI0luCvw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XFNOmyCTV/ewANuBx7eulOQ3DkY0+Ub6Slj2uUDXuRmFrzAYgZKNvBNKx8oShRa3Rzmm6miJIrsYuXo+VCXJ8lWQGZHVyC+dAqMQgI8/FNQUhGgn9Qt1Ug/vIEjsvJ8eNvumqdOnv5sXtPbfRWy8CScsS5ycaD0ceaVaFIh9rh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BZQo5t4W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61299C433F1;
+	Tue,  5 Mar 2024 05:33:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709616794;
+	bh=ZpwwSNZp0Y4tO59tRnK+4czKwgMn6789Yp8YI0luCvw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BZQo5t4WiH56fIIbLWTRDsb/Lkrp0Uvs8iHpSXqQWtogYQJBslu8vT0fMyzlI1eiH
+	 IsHk1aHTM2cn+PT/pR3j7CZlMcHy9fe+vd9YaKYBZk4JKshWlNjbNJAq4vpCzLr+x1
+	 EBqsZI9nD8CfqcZIY8MJlF3FkH9yR1VNpaprPkVHLGSL3NFaU1L461X5vDoW+QfLCZ
+	 DJhSo+pfUf1ELQk1vr27LNbOGus9BabDfUeUk+6k1DZDSVFZUQsMdkXxdRzgjUZJwW
+	 KM+BIpMuFcXCdpEMyhTksQ30N/16+Ilbi0djiW/t26GwlrT93SSJRG7G03U2T0pxym
+	 WkrUHzpc8dn5Q==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	jiri@resnulli.us,
+	donald.hunter@gmail.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v2 0/4] tools: ynl: add --dbg-small-recv for easier kernel testing
+Date: Mon,  4 Mar 2024 21:33:06 -0800
+Message-ID: <20240305053310.815877-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,43 +59,77 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: _i7ui0_ej6wrQG6PMJ8Dqtz7EyIxeKRG
-X-Proofpoint-ORIG-GUID: _i7ui0_ej6wrQG6PMJ8Dqtz7EyIxeKRG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-05_02,2024-03-04_01,2023-05-22_02
 
-On 2024-03-01 at 13:50:11, Geoff Levand (geoff@infradead.org) wrote:
-> +	if (unlikely(!napi_buff))
-> +		return -ENOMEM;
->
-> -	descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
-> -	if (!descr->skb) {
-> -		descr->hw_regs.payload.dev_addr = 0; /* tell DMAC don't touch memory */
-> +	descr->skb = napi_build_skb(napi_buff, napi_buff_size);
-> +
-> +	if (unlikely(!descr->skb)) {
-> +		skb_free_frag(napi_buff);
->  		return -ENOMEM;
->  	}
->
-> -	offset = ((unsigned long)descr->skb->data) &
-> -		(GELIC_NET_RXBUF_ALIGN - 1);
-> -	if (offset)
-> -		skb_reserve(descr->skb, GELIC_NET_RXBUF_ALIGN - offset);
-> -	/* io-mmu-map the skb */
-> -	cpu_addr = dma_map_single(ctodev(card), descr->skb->data,
-> -				  GELIC_NET_MAX_FRAME, DMA_FROM_DEVICE);
-> -	descr->hw_regs.payload.dev_addr = cpu_to_be32(cpu_addr);
-> -	if (dma_mapping_error(ctodev(card), cpu_addr)) {
-> -		dev_kfree_skb_any(descr->skb);
-> +	cpu_addr = dma_map_single(dev, napi_buff, napi_buff_size,
-> +				  DMA_FROM_DEVICE);
-> +
-> +	if (dma_mapping_error(dev, cpu_addr)) {
-> +		skb_free_frag(napi_buff);
-skb->head is freed; dont you need to free skb as well ?
+When testing netlink dumps I usually hack some user space up
+to constrain its user space buffer size (iproute2, ethtool or ynl).
+Netlink will try to fill the messages up, so since these apps use
+large buffers by default, the dumps are rarely fragmented.
 
->  		descr->skb = NULL;
+I was hoping to figure out a way to create a selftest for dump
+testing, but so far I have no idea how to do that in a useful
+and generic way.
+
+Until someone does that, make manual dump testing easier with YNL.
+Create a special option for limiting the buffer size, so I don't
+have to make the same edits each time, and maybe others will benefit,
+too :)
+
+Example:
+
+  $ ./cli.py [...] --dbg-small-recv >/dev/null
+  Recv: read 3712 bytes, 29 messages
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+    [...]
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+  Recv: read 3968 bytes, 31 messages
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+    [...]
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+  Recv: read 532 bytes, 5 messages
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+    [...]
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+     nl_len = 20 (4) nl_flags = 0x2 nl_type = 3
+
+Now let's make the DONE not fit in the last message:
+
+  $ ./cli.py [...] --dbg-small-recv 4499 >/dev/null
+  Recv: read 3712 bytes, 29 messages
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+    [...]
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+  Recv: read 4480 bytes, 35 messages
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+    [...]
+     nl_len = 128 (112) nl_flags = 0x0 nl_type = 19
+  Recv: read 20 bytes, 1 messages
+     nl_len = 20 (4) nl_flags = 0x2 nl_type = 3
+
+
+A real test would also have to check the messages are complete
+and not duplicated. That part has to be done manually right now.
+
+Note that the first message is always conservatively sized by the kernel.
+Still, I think this is good enough to be useful.
+
+v2:
+ - patch 2:
+   - move the recv_size setting up
+   - change the default to 0 so that cli.py doesn't have to worry
+     what the "unset" value is
+v1: https://lore.kernel.org/all/20240301230542.116823-1-kuba@kernel.org/
+
+Jakub Kicinski (4):
+  tools: ynl: move the new line in NlMsg __repr__
+  tools: ynl: allow setting recv() size
+  tools: ynl: support debug printing messages
+  tools: ynl: add --dbg-small-recv for easier kernel testing
+
+ tools/net/ynl/cli.py     |  7 ++++++-
+ tools/net/ynl/lib/ynl.py | 42 ++++++++++++++++++++++++++++++++++------
+ 2 files changed, 42 insertions(+), 7 deletions(-)
+
+-- 
+2.44.0
+
 
