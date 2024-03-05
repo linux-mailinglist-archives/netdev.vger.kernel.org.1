@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-77559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 080158722F5
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:38:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B7858722F9
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:39:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D4B62873FC
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:38:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB9AA287739
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:39:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E5F1272D8;
-	Tue,  5 Mar 2024 15:38:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC63127B68;
+	Tue,  5 Mar 2024 15:39:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5097C85944;
-	Tue,  5 Mar 2024 15:38:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170B7127B58;
+	Tue,  5 Mar 2024 15:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709653129; cv=none; b=dkpf5OgyGeYTLbFfNVtBhcji30jb1s/hwMMl3NOsT0X8wXYTT6Q4FS40E6fy7eA5/+79BjAkhnmOSk8CTZlhxF3MEb1i3W8l7vO7B7ewxWGKjOutn7z770n+Lfrc6OOqC43utZnfuBlklcVDAMKHeoWfUKjqSA3eY+u53u9cCnc=
+	t=1709653150; cv=none; b=R3MiR/xUDxKpHbrxebgNkkSJb3bAmzm3GDP068vl4O3+Cdr5VBS+KWM2OhZGBgFtp6txIlS6C9hrVQM0Ojs8NvlK4/F3dM2PCV6PVLq+MQJ4UElAo/Cfbh7qMm6bgEX0osFfETh3km2tumuzh3MxrAr3t/28zS71EwBmLVno1tg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709653129; c=relaxed/simple;
-	bh=7ovliyzJP+HYSxeckuD6+XQkQBinbhAkZ0/wznrdJg4=;
+	s=arc-20240116; t=1709653150; c=relaxed/simple;
+	bh=BaWF9e3OkLvVaDKSKCD2UZE8oWvNbIrWZQvNULYC7tU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JOrYxK1gbo0opu3TF8u++VIWrcfDcYxEFlePqLYfTp921ghm53VCCp109U+CKaivW7b7HevzB/EuhFnVq7kDdm3PnrEBqQSciUzQl3WB131EbK7UXgYw9l5kXfUURZZq+5iqEclCjlZFouauDDIRjW+PK4jK3inPkl4g9Nmaci4=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dh1n8iqyTUkQl+0CdTsnbnubdtoD1GikLohl25vbP8XcnbVZ+GJ4xySllUyobih5WslDxW0h03Ar1veoNeq6PvEwoYEzDG9zlXaUB3vz9XyXUj7o9+n2dNquRtkGlll2koOYSVQeN/taKEIqZMbLjq+Bvi5SdmhWFOkVzP+3zuQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.33.11] (port=42874 helo=gnumonks.org)
+Received: from [78.30.33.11] (port=47632 helo=gnumonks.org)
 	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <pablo@gnumonks.org>)
-	id 1rhWsE-00E3CU-S6; Tue, 05 Mar 2024 16:38:36 +0100
-Date: Tue, 5 Mar 2024 16:38:33 +0100
+	id 1rhWsg-00E3ER-VP; Tue, 05 Mar 2024 16:39:04 +0100
+Date: Tue, 5 Mar 2024 16:39:02 +0100
 From: Pablo Neira Ayuso <pablo@netfilter.org>
 To: Breno Leitao <leitao@debian.org>
 Cc: Harald Welte <laforge@gnumonks.org>,
@@ -44,9 +44,10 @@ Cc: Harald Welte <laforge@gnumonks.org>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	horms@kernel.org, dsahern@kernel.org,
 	"open list:GTP (GPRS Tunneling Protocol)" <osmocom-net-gprs@lists.osmocom.org>
-Subject: Re: [PATCH net-next 1/3] net: gtp: Leverage core stats allocator
-Message-ID: <Zec8eY4IeTyD8NYK@calendula>
+Subject: Re: [PATCH net-next 2/3] net: gtp: Remove generic .ndo_get_stats64
+Message-ID: <Zec8ln0UnRO9UNrm@calendula>
 References: <20240305121524.2254533-1-leitao@debian.org>
+ <20240305121524.2254533-2-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,24 +56,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240305121524.2254533-1-leitao@debian.org>
+In-Reply-To: <20240305121524.2254533-2-leitao@debian.org>
 X-Spam-Score: -1.9 (-)
 
-On Tue, Mar 05, 2024 at 04:15:21AM -0800, Breno Leitao wrote:
-> With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
-> convert veth & vrf"), stats allocation could be done on net core
-> instead of in this driver.
+On Tue, Mar 05, 2024 at 04:15:22AM -0800, Breno Leitao wrote:
+> Commit 3e2f544dd8a33 ("net: get stats64 if device if driver is
+> configured") moved the callback to dev_get_tstats64() to net core, so,
+> unless the driver is doing some custom stats collection, it does not
+> need to set .ndo_get_stats64.
 > 
-> With this new approach, the driver doesn't have to bother with error
-> handling (allocation failure checking, making sure free happens in the
-> right spot, etc). This is core responsibility now.
-> 
-> Remove the allocation in the gtp driver and leverage the network
-> core allocation instead.
+> Since this driver is now relying in NETDEV_PCPU_STAT_TSTATS, then, it
+> doesn't need to set the dev_get_tstats64() generic .ndo_get_stats64
+> function pointer.
 > 
 > Signed-off-by: Breno Leitao <leitao@debian.org>
 
 Acked-by: Pablo Neira Ayuso <pablo@netfilter.org>
-
-Thanks, this was on my list.
 
