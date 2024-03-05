@@ -1,107 +1,178 @@
-Return-Path: <netdev+bounces-77683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F3F6872A53
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 23:42:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 458D1872A60
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 23:44:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25F59B2723E
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 22:42:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B38FB1F26A72
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 22:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9AE7E590;
-	Tue,  5 Mar 2024 22:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Uz30EHnX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C8C12D21D;
+	Tue,  5 Mar 2024 22:44:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18191862F
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 22:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C8712D21A
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 22:44:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709678547; cv=none; b=TxBPvod0JTfWnfw/i67eSDXp9C+3pJUuqW74pBM+EbCZ/vKRbBefD+Ie41ziJoAvIS75yXR8OffmxaHKbnVgQ6K68qDYaTPmgx4P95oIUUsVYBUFyyl/klQ7XdfY54+ILG4XT7A6P1VqmcRG5UfHa10heP63Frziay0JxQ+BJKg=
+	t=1709678663; cv=none; b=VH0+cVF5nekDab08FdhM8Sf9RUV6crR/N5SvP1vhDkoqV1u3wbtTejWZSgTVAFA6r+xT7BBvryvTwqRisa9giy1QZE8LXtiY5pRNfaaRJO333B1N0SlfxjnEWdu6hJ7K/rAftiIYHOKL3Mxv1I/sij3G5WTjCbAN7TIaKXGOa+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709678547; c=relaxed/simple;
-	bh=Kla2R5bcfkPkylWdIGVABjeBtsnshT/GLsxGridt7Qg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SaQRJVqTCtXz8sKKTbyeOmaiMSQ5capVoWWVdp70X6AevAOU9enSWycr8kXJ6JL67LFr+F7IPhkxcVa656IUiXTZtJ00rNNTc/yO+4LMO/Uu/+H4bltNd5kp5dcx3SMq5T6+jkUJIjgGcKmXzEQZUfOKkMvptJwMnxazBrJYNpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Uz30EHnX; arc=none smtp.client-ip=209.85.219.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-dc742543119so6311832276.0
-        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 14:42:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709678545; x=1710283345; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Kla2R5bcfkPkylWdIGVABjeBtsnshT/GLsxGridt7Qg=;
-        b=Uz30EHnXgL4NUZASHqK/PqkK5NhT//dXPGTvlHs7BxPo7ZOaCovK3EzbxEDFbuZJjm
-         S5ty8ErsqAnztmN482V87In5Erc6Hw+UalRdKuoI9Kg92qUzSsnCgPIU28qsBiPl2++a
-         SG1Dtcjzk6ZGRdPauq1AziXSfAUHaIX9/Q3508lPGUEp66+RS0uzLYkUzqmDMQV8QN7Q
-         BjK95qtF1S6phqRoqx6qbmldzN8/MVxnCbmm838W+xPKh/gwkIKWRY3/l/HprpGQ1SFa
-         PbAkqzarbWLbSG9JPkjiGe+ovVPCYP8fPYaE4vDYqbqE4sRJ8DyEt4WEIT07NOmrUz0C
-         nW9A==
+	s=arc-20240116; t=1709678663; c=relaxed/simple;
+	bh=jixR8QDm2e3jHNpHT8oGnNznD6mImna6mrE/DyQZhwY=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=oIAvAmhnqZsS3KXi1/HEH5sW/ZskiYWjTxzGXSaj4f1ELnxlvn50iXrLk05TvlQDK8dK1WHZQVdRmDA2ATegk1ReYRM81/0Ntn8yJCT4x5DSDVQl4+mBTwbz4A6Cfi62Z0/PxZ+3o0D/1STI6hOwjsh1IuKVRzWE1TuAeGuHPjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7bc32b2226aso123790339f.2
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 14:44:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709678545; x=1710283345;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Kla2R5bcfkPkylWdIGVABjeBtsnshT/GLsxGridt7Qg=;
-        b=d56F9HD22E1VxLauH/2NuuwDuaNVLQiiBQpikX0BtZK4AYuVob3hUQ6c6/N+SOxH2F
-         eiTxRMbKD++vh6mBiSFv7JW0vyA+7Cb6Wnte9JDL4XdbewRLmK/0npWojFSkvqLZdamf
-         hkI72VHfn8YImvDhY50sO5STyPgcf0B2U8Ofva21r9PuOBhFYNPsC0CuLGExhJn0tU59
-         1xbjFdbGz3ojFBBK2+CvIJC7hMThEjKMx5YpJGxrU8KP+tAb12SZkE5plGICFi1WTbiO
-         TiVf1dNnSqgk3bXrOSijyQCWPcUzslZ6j0anzVhTn3D/BMSpAQydEW4mK/maUS9FVFJ3
-         LZ5A==
-X-Gm-Message-State: AOJu0YxmJNGSPDSdhJE8BDKagwUxZDgO2/vPdlXOHXFj5b24g2gtcpzU
-	XSSzUh2i4UHdQCUxUnrHJf4w1Rubeo8KujjPWf0zdUxy5fmjMMKtFszB5FqTye5k1KCJqKD3Tcd
-	I8CuGYgg4/AGp+ckIREqJ4oEzinif5J/Tksr4Dw==
-X-Google-Smtp-Source: AGHT+IH4N2Owa4TsElQeWkLDp0eXqWO7MZkEd6Rq0/nmWb7dSWHk/5oMtnM56ZClu8pvW+FdTVEgJ+wxMYTmVHVRzAc=
-X-Received: by 2002:a25:9845:0:b0:dcd:df0:e672 with SMTP id
- k5-20020a259845000000b00dcd0df0e672mr9528207ybo.47.1709678544834; Tue, 05 Mar
- 2024 14:42:24 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709678661; x=1710283461;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H5Yx7pynpISvxY8YOA1v2/xHLqGOic15pvwGEm5e7yY=;
+        b=JLheGCM7309edKRq2nujxqwHrAI47amad3DKK6Zzxlae7zOtiNyYkyL/r2vb465jbA
+         NjZvcxBWHw7SPxResW8Pi/xyJSBc/I5wmGPtci9I9dhw9Uyc1y/G8cRySw2kLnp8Ytrm
+         FyEkPCMuTpygiPjXJrWbsHc7lhECUpqQX/XUrvjpCY7WAhOAO5RMfeTLHXQZplGILvJy
+         rgOrBtGhtSbE/1kBkErlUpvTBd8LRJBHrYabXEyiZsFu90+dMiticsZk9K2yZmPVlBn3
+         GBpCy+V/bZAOwukMQEGqHv50t9Fl6BBppdDheJV3jDAKoomslgh4NbEkS9ogx0/ucocq
+         7MhA==
+X-Forwarded-Encrypted: i=1; AJvYcCUm1YnyfGE53RQsNAgACmhiYewHV1PcfhNRp6q12NIjoTdG+9kC8kbydPcQlETG+3g5zs7sjb3x9ZALge6W97hm0hNMoQpw
+X-Gm-Message-State: AOJu0YxzaICbrrJLVbTaMD1rdSPxz04MEbiQBaYWFkLWJL6rNAcC+bsF
+	Puc2I1eG7SfJuZpx/GUsDZzJirsC5ocyKHarSkABe3TUVafyA/1ZoOBSy+0iXXV0ZWny9yFRq+M
+	LGlaCCuPmgX1UOGM0UOOWlhwkTKW2MM1qR51E9U/7HN5/Wra0MSOf0go=
+X-Google-Smtp-Source: AGHT+IFO702Z2izRAjJgapeupiz82wnJAa9eTQc4KZunYijjFtg2EYyHTFnK8yOJ7RUS0UAa+qEhZrzeDymbW80D+zKmHm5DkLbA
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240301221641.159542-1-paweldembicki@gmail.com> <20240301221641.159542-7-paweldembicki@gmail.com>
-In-Reply-To: <20240301221641.159542-7-paweldembicki@gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 5 Mar 2024 23:42:14 +0100
-Message-ID: <CACRpkda18OgXdbVvUVvq-un4cpi-EEfxyfjqoQas+=BScSB6OQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 06/16] net: dsa: vsc73xx: add
- port_stp_state_set function
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>, 
-	linux-kernel@vger.kernel.org
+X-Received: by 2002:a05:6638:40a3:b0:474:e82a:7cec with SMTP id
+ m35-20020a05663840a300b00474e82a7cecmr366016jam.1.1709678661395; Tue, 05 Mar
+ 2024 14:44:21 -0800 (PST)
+Date: Tue, 05 Mar 2024 14:44:21 -0800
+In-Reply-To: <000000000000a97e9f061287624c@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004af86e0612f195c7@google.com>
+Subject: Re: [syzbot] [net?] possible deadlock in team_port_change_check (2)
+From: syzbot <syzbot+3c47b5843403a45aef57@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, jiri@resnulli.us, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, xrivendell7@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 1, 2024 at 11:17=E2=80=AFPM Pawel Dembicki <paweldembicki@gmail=
-.com> wrote:
+syzbot has found a reproducer for the following issue on:
 
-> This isn't a fully functional implementation of 802.1D, but
-> port_stp_state_set is required for a future tag8021q operations.
->
-> This implementation handles properly all states, but vsc73xx doesn't
-> forward STP packets.
->
-> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+HEAD commit:    885c36e59f46 net: Re-use and set mono_delivery_time bit fo..
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=16c4c66c180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=92e06b597766606e
+dashboard link: https://syzkaller.appspot.com/bug?extid=3c47b5843403a45aef57
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15fe09f2180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=167cc5ee180000
 
-This looks like the best effort to me.
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/241b626fcf71/disk-885c36e5.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/4f0f3e287f32/vmlinux-885c36e5.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c31138ef60ba/bzImage-885c36e5.xz
 
-Yours,
-Linus Walleij
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3c47b5843403a45aef57@syzkaller.appspotmail.com
+
+netlink: 'syz-executor286': attribute type 10 has an invalid length.
+team0: Port device vlan1 added
+netlink: 'syz-executor286': attribute type 10 has an invalid length.
+veth0_vlan: left promiscuous mode
+veth0_vlan: entered promiscuous mode
+============================================
+WARNING: possible recursive locking detected
+6.8.0-rc6-syzkaller-01978-g885c36e59f46 #0 Not tainted
+--------------------------------------------
+syz-executor286/5073 is trying to acquire lock:
+ffff888077f38d00 (team->team_lock_key){+.+.}-{3:3}, at: team_port_change_check+0x51/0x1e0 drivers/net/team/team.c:2995
+
+but task is already holding lock:
+ffff888077f38d00 (team->team_lock_key){+.+.}-{3:3}, at: team_add_slave+0xad/0x2750 drivers/net/team/team.c:1973
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(team->team_lock_key);
+  lock(team->team_lock_key);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+2 locks held by syz-executor286/5073:
+ #0: ffffffff8f378f88 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8f378f88 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x842/0x10d0 net/core/rtnetlink.c:6595
+ #1: ffff888077f38d00 (team->team_lock_key){+.+.}-{3:3}, at: team_add_slave+0xad/0x2750 drivers/net/team/team.c:1973
+
+stack backtrace:
+CPU: 0 PID: 5073 Comm: syz-executor286 Not tainted 6.8.0-rc6-syzkaller-01978-g885c36e59f46 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
+ check_deadlock kernel/locking/lockdep.c:3062 [inline]
+ validate_chain+0x15c0/0x58e0 kernel/locking/lockdep.c:3856
+ __lock_acquire+0x1345/0x1fd0 kernel/locking/lockdep.c:5137
+ lock_acquire+0x1e3/0x530 kernel/locking/lockdep.c:5754
+ __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+ __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
+ team_port_change_check+0x51/0x1e0 drivers/net/team/team.c:2995
+ team_device_event+0x4e6/0x5b0 drivers/net/team/team.c:3018
+ notifier_call_chain+0x18f/0x3b0 kernel/notifier.c:93
+ __dev_notify_flags+0x207/0x400
+ dev_change_flags+0xf0/0x1a0 net/core/dev.c:8773
+ vlan_device_event+0x1b81/0x1de0 net/8021q/vlan.c:468
+ notifier_call_chain+0x18f/0x3b0 kernel/notifier.c:93
+ call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
+ call_netdevice_notifiers net/core/dev.c:2002 [inline]
+ dev_open+0x13a/0x1b0 net/core/dev.c:1471
+ team_port_add drivers/net/team/team.c:1214 [inline]
+ team_add_slave+0x9b3/0x2750 drivers/net/team/team.c:1974
+ do_set_master net/core/rtnetlink.c:2688 [inline]
+ do_setlink+0xe70/0x41f0 net/core/rtnetlink.c:2894
+ rtnl_setlink+0x40d/0x5a0 net/core/rtnetlink.c:3188
+ rtnetlink_rcv_msg+0x89b/0x10d0 net/core/rtnetlink.c:6598
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2547
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x8e0/0xcb0 net/netlink/af_netlink.c:1902
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ sock_write_iter+0x2dd/0x400 net/socket.c:1160
+ do_iter_readv_writev+0x46c/0x640
+ vfs_writev+0x395/0xbb0 fs/read_write.c:971
+ do_writev+0x1b1/0x350 fs/read_write.c:1018
+ do_syscall_64+0xf9/0x240
+ entry_SYSCALL_64_after_hwframe+0x6f/0x77
+RIP: 0033:0x7f5521197a89
+Code: 48 83 c4 28 c3 e8 d7 19 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffcaa0cf2c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000014
+RAX: ffffffffffffffda RBX: 00007f55211e53d3 RCX: 00007f5521197a89
+RDX: 0000000000000001 RSI: 0000000020000040 RDI: 0000000000000004
+RBP: 00007ffcaa0cf2f0 R08: 0000000000000001 R09: 0000000000000001
+R10: 0000000000000001 R11: 0000000000000246 R12: 00007ffcaa0cf300
+R13: 00007f55211e5004 R14: 00007ffcaa0cf2ec R15: 0000000000000003
+ </TASK>
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
