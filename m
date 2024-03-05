@@ -1,243 +1,116 @@
-Return-Path: <netdev+bounces-77631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DF7F8726E7
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 19:50:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 861C78726FA
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 19:53:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71C7B1C23086
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 18:50:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CF141F261DD
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 18:53:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66B3199B9;
-	Tue,  5 Mar 2024 18:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94DC3405DC;
+	Tue,  5 Mar 2024 18:53:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PZA8P3K1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ATSQjK+4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADFCA17997
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 18:50:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E291A38FAF
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 18:53:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709664608; cv=none; b=RRgiparOALC1UvAiRprqY+3yfSWRpg8NgiEqkVnfqJOfzWdKsXF5Z742yt4bmJuFELoMcqVkDmSkDLFPBs5ld7Czt/gDsv4eN8JLJSmBL6NPtOeR+YO9xHO1eC1AwLS+eSUtuld337JpfqWnaROfzGFqAgvFrtzNgwlWBj/wXuY=
+	t=1709664795; cv=none; b=MkO2tL6r+z1rnbAunBAh3z5KwZ2vv2cWqvVWiNndqaosZ/nSIJBuFwcgc4TDuo+DxmIdapb7zuaeaTwo11aAsflL6hGGPDioSbyLzXaK2FaHpFpDwcPxuBOmTripy+MoJACGmUbpsZMYG8dg1ovQHzu5NS4BrvcaPp2nzMCnNCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709664608; c=relaxed/simple;
-	bh=o99UXVElGQz8yNLk68PD2sr9EcYVUfPsnmz5pK5jFGQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iFrms1MhDjRICzSqShI0SxulnKOY2sAmc/89f/1qjxRdU9dp7SD+/wHdNLX3+xFGbDosCPatPz0s9vUXAqN1uMSHyjyj+SM2A7Ol3nkzLOJEeuIgygv/2z0s8K7EJCJZnRGanMbrY8ev03bc1NH9qZMLI8ba5EMyH1GXjtQ4vHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PZA8P3K1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF6B3C43390;
-	Tue,  5 Mar 2024 18:50:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709664608;
-	bh=o99UXVElGQz8yNLk68PD2sr9EcYVUfPsnmz5pK5jFGQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=PZA8P3K1UiorKf9mEaqp2KPLNJAJpLTxsBTzt++WSt6gJuQI08fxM0hJpuGRHcnLg
-	 Iw9x4N2eE4s53b9flHn79RgD7rGR9TatcGn1YWDuVffO7bxFv9iE3Sxd2ZQRJFcgBj
-	 pVuLns3Zxw4+zIc4cQFG6/w0wQlClVvT+oW3/Ak9P5+ga2smW5HcTFWkcD/eIjD3vZ
-	 YwfRwZYpzY1FZrumY/EGdIc16TSLy9VxCzUw8dkhf2ECjwxyQxHLMVGjDs1Fa+ut/s
-	 OWb3zcPu1cmSU1k0jz5wZ0woIWivov4wk44vHb/juWzBYaNWeL104BzuibgIdFUS5o
-	 xW599bsaoUklA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	nicolas.dichtel@6wind.com,
-	jiri@resnulli.us,
-	donald.hunter@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next] tools: ynl: check for overflow of constructed messages
-Date: Tue,  5 Mar 2024 10:50:00 -0800
-Message-ID: <20240305185000.964773-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1709664795; c=relaxed/simple;
+	bh=f7a4kmYD5D12cr3zCZ1I17BtEB1AzFq8VOmwRulND7w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=InorMPYPDssDzQWv1DMf6+f77WMTTN69ycLL0LwpzV+6yO1Dv7NfzenVL4AOEtFXru0DxTjw0I0AFpp5kD7drWRFOa1sFCzJ9Dhn+EnSZEi4j1wTSJtjkVuqYru/sZmIejS/wOQPniOAlt1zc2j8lV7T/420huk4xaTQdCwU0yA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ATSQjK+4; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-566b160f6eeso2085a12.1
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 10:53:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709664792; x=1710269592; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f7a4kmYD5D12cr3zCZ1I17BtEB1AzFq8VOmwRulND7w=;
+        b=ATSQjK+4hzipng71q3qJWmp2t0TgupKS9AyWilxKIh+sGv6ie+GinSuSaH9KX7ktn/
+         y9pbv5eHkRTUHJrwlYi6Zk8DvYLMcSQNEtBrEFtmz//OFySPTaR3gvJpbnwOQzgcGhvT
+         IeIkLcWkKZlc01bUqahvNQelWzNy34/z4HjjekiJWtweDw8Yf+CZghwMJ68Sp+nagqep
+         IE4souuiEkUFAurhZYZMDqxGjZHs6XZBxG0RxwgBYdgj79QAeTdpaE6LOJSJ9RLUmpwA
+         Nll2GhxiaXRNU8LQOLrUmt1PoPL951xMFeFkwdWbBE0Wc0mshmqI40GctbrF5QRP9HMu
+         cG7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709664792; x=1710269592;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f7a4kmYD5D12cr3zCZ1I17BtEB1AzFq8VOmwRulND7w=;
+        b=JNvHhbL3wjYkLf/oCfW2WoUG2EIgNkvOQS+eDHNuer1uKgq6QqzWCk77dk4FcDU8q8
+         bvELMXgEBfTNGLBPK85VKVX954yJaZWAZLqNU4h7+7Uqdd2LBwkx8UqtWkjJcgTjfBKo
+         rQ1q0o7W88JAMMkgQs4pik0iOPKk193ghWIiqD2lvi2DBz9lghE2xr5us8a0Pl3Kg/HS
+         lzjj0PBWo6/u9bcZje93w46FKHnXt+sYaznniGiDfYZ7ECXc6BizzsQ1Oi0czTY4mFBK
+         LLf2X/6On9KIm8I+J0JhSFA83KRUH6TyjCcjhC2p2pEfapGX6XJ31QfSNXPvEO36kY46
+         eo/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVu2KgMFURYVP4YkDik8cITJ4Re8m2rxbTnB5dAaSt20QCCfZSDfeUxJqvtf72ObyPIbA+l+fCWMNrd82gZyq4aWqVtDx94
+X-Gm-Message-State: AOJu0YxB4YMsz3ZrRRLYznVCdVrjZ3otjp+ZJ0TMDvBr/Dpg8NEv6/4p
+	+6840OtYRg2y/dNsgm44soeLd3y3vNxtikR0WN6EqHtRio4JixA+6hgexrRS2lPv8gTGN1gG+qU
+	qVnXcxgz2fzwNFtT/sBn5FGj0+GkdsFy+j2E0
+X-Google-Smtp-Source: AGHT+IF06frUFFAxmQuRSBzDiKgaV7kwWjb8ogk2d+6Q9QuwdhgEPvrlEBt1s7phHW/vjQ57//NDcIxjze8JE+Q0sXM=
+X-Received: by 2002:a05:6402:1c89:b0:566:e8fc:8f83 with SMTP id
+ cy9-20020a0564021c8900b00566e8fc8f83mr166500edb.7.1709664792087; Tue, 05 Mar
+ 2024 10:53:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240305013532.694866-1-kuba@kernel.org>
+In-Reply-To: <20240305013532.694866-1-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 5 Mar 2024 19:52:58 +0100
+Message-ID: <CANn89iKkzU-0WXWs1oGD9puXXOhh2-Cx2Nt_4dc2YDRKTOSd0Q@mail.gmail.com>
+Subject: Re: [PATCH net v2] dpll: move all dpll<>netdev helpers to dpll code
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	Geert Uytterhoeven <geert@linux-m68k.org>, vadim.fedorenko@linux.dev, 
+	arkadiusz.kubalewski@intel.com, jiri@resnulli.us
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Donald points out that we don't check for overflows.
-Stash the length of the message on nlmsg_pid (nlmsg_seq would
-do as well). This allows the attribute helpers to remain
-self-contained (no extra arguments). Also let the put
-helpers continue to return nothing. The error is checked
-only in (newly introduced) ynl_msg_end().
+On Tue, Mar 5, 2024 at 2:35=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> Older versions of GCC really want to know the full definition
+> of the type involved in rcu_assign_pointer().
+>
+> struct dpll_pin is defined in a local header, net/core can't
+> reach it. Move all the netdev <> dpll code into dpll, where
+> the type is known. Otherwise we'd need multiple function calls
+> to jump between the compilation units.
+>
+> This is the same problem the commit under fixes was trying to address,
+> but with rcu_assign_pointer() not rcu_dereference().
+>
+> Some of the exports are not needed, networking core can't
+> be a module, we only need exports for the helpers used by
+> drivers.
+>
+> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Link: https://lore.kernel.org/all/35a869c8-52e8-177-1d4d-e57578b99b6@linu=
+x-m68k.org/
+> Fixes: 640f41ed33b5 ("dpll: fix build failure due to rcu_dereference_chec=
+k() on unknown type")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-This was first discussed when I posted the libmnl replacement:
-https://lore.kernel.org/all/CAD4GDZzF55bkoZ_o0S784PmfW4+L_QrG2ofWg6CeQk4FCWTUiw@mail.gmail.com/
----
- tools/net/ynl/lib/ynl-priv.h | 34 ++++++++++++++++++++++++++++++----
- tools/net/ynl/lib/ynl.c      | 36 ++++++++++++++++++++++++++++++++++++
- tools/net/ynl/lib/ynl.h      |  2 ++
- 3 files changed, 68 insertions(+), 4 deletions(-)
+Oh well :)
 
-diff --git a/tools/net/ynl/lib/ynl-priv.h b/tools/net/ynl/lib/ynl-priv.h
-index a8099fab035d..6cf890080dc0 100644
---- a/tools/net/ynl/lib/ynl-priv.h
-+++ b/tools/net/ynl/lib/ynl-priv.h
-@@ -135,6 +135,8 @@ int ynl_error_parse(struct ynl_parse_arg *yarg, const char *msg);
- 
- /* Netlink message handling helpers */
- 
-+#define YNL_MSG_OVERFLOW	1
-+
- static inline struct nlmsghdr *ynl_nlmsg_put_header(void *buf)
- {
- 	struct nlmsghdr *nlh = buf;
-@@ -239,11 +241,29 @@ ynl_attr_first(const void *start, size_t len, size_t skip)
- 	return ynl_attr_if_good(start + len, attr);
- }
- 
-+static inline bool
-+__ynl_attr_put_overflow(struct nlmsghdr *nlh, size_t size)
-+{
-+	bool o;
-+
-+	/* ynl_msg_start() stashed buffer length in nlmsg_pid. */
-+	o = nlh->nlmsg_len + NLA_HDRLEN + NLMSG_ALIGN(size) > nlh->nlmsg_pid;
-+	if (o)
-+		/* YNL_MSG_OVERFLOW is < NLMSG_HDRLEN, all subsequent checks
-+		 * are guaranteed to fail.
-+		 */
-+		nlh->nlmsg_pid = YNL_MSG_OVERFLOW;
-+	return o;
-+}
-+
- static inline struct nlattr *
- ynl_attr_nest_start(struct nlmsghdr *nlh, unsigned int attr_type)
- {
- 	struct nlattr *attr;
- 
-+	if (__ynl_attr_put_overflow(nlh, 0))
-+		return ynl_nlmsg_end_addr(nlh) - NLA_HDRLEN;
-+
- 	attr = ynl_nlmsg_end_addr(nlh);
- 	attr->nla_type = attr_type | NLA_F_NESTED;
- 	nlh->nlmsg_len += NLA_HDRLEN;
-@@ -263,6 +283,9 @@ ynl_attr_put(struct nlmsghdr *nlh, unsigned int attr_type,
- {
- 	struct nlattr *attr;
- 
-+	if (__ynl_attr_put_overflow(nlh, size))
-+		return;
-+
- 	attr = ynl_nlmsg_end_addr(nlh);
- 	attr->nla_type = attr_type;
- 	attr->nla_len = NLA_HDRLEN + size;
-@@ -276,14 +299,17 @@ static inline void
- ynl_attr_put_str(struct nlmsghdr *nlh, unsigned int attr_type, const char *str)
- {
- 	struct nlattr *attr;
--	const char *end;
-+	size_t len;
-+
-+	len = strlen(str);
-+	if (__ynl_attr_put_overflow(nlh, len))
-+		return;
- 
- 	attr = ynl_nlmsg_end_addr(nlh);
- 	attr->nla_type = attr_type;
- 
--	end = stpcpy(ynl_attr_data(attr), str);
--	attr->nla_len =
--		NLA_HDRLEN + NLA_ALIGN(end - (char *)ynl_attr_data(attr));
-+	strcpy(ynl_attr_data(attr), str);
-+	attr->nla_len = NLA_HDRLEN + NLA_ALIGN(len);
- 
- 	nlh->nlmsg_len += NLMSG_ALIGN(attr->nla_len);
- }
-diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
-index 484070492b17..5c9d955d0f22 100644
---- a/tools/net/ynl/lib/ynl.c
-+++ b/tools/net/ynl/lib/ynl.c
-@@ -404,9 +404,33 @@ struct nlmsghdr *ynl_msg_start(struct ynl_sock *ys, __u32 id, __u16 flags)
- 	nlh->nlmsg_flags = flags;
- 	nlh->nlmsg_seq = ++ys->seq;
- 
-+	/* This is a local YNL hack for length checking, we put the buffer
-+	 * length in nlmsg_pid, since messages sent to the kernel always use
-+	 * PID 0. Message needs to be terminated with ynl_msg_end().
-+	 */
-+	nlh->nlmsg_pid = YNL_SOCKET_BUFFER_SIZE;
-+
- 	return nlh;
- }
- 
-+static int ynl_msg_end(struct ynl_sock *ys, struct nlmsghdr *nlh)
-+{
-+	/* We stash buffer length in nlmsg_pid. */
-+	if (nlh->nlmsg_pid == 0) {
-+		yerr(ys, YNL_ERROR_INPUT_INVALID,
-+		     "Unknwon input buffer length");
-+		return -EINVAL;
-+	}
-+	if (nlh->nlmsg_pid == YNL_MSG_OVERFLOW) {
-+		yerr(ys, YNL_ERROR_INPUT_TOO_BIG,
-+		     "Constructred message longer than internal buffer");
-+		return -EMSGSIZE;
-+	}
-+
-+	nlh->nlmsg_pid = 0;
-+	return 0;
-+}
-+
- struct nlmsghdr *
- ynl_gemsg_start(struct ynl_sock *ys, __u32 id, __u16 flags,
- 		__u8 cmd, __u8 version)
-@@ -607,6 +631,10 @@ static int ynl_sock_read_family(struct ynl_sock *ys, const char *family_name)
- 	nlh = ynl_gemsg_start_req(ys, GENL_ID_CTRL, CTRL_CMD_GETFAMILY, 1);
- 	ynl_attr_put_str(nlh, CTRL_ATTR_FAMILY_NAME, family_name);
- 
-+	err = ynl_msg_end(ys, nlh);
-+	if (err < 0)
-+		return err;
-+
- 	err = send(ys->socket, nlh, nlh->nlmsg_len, 0);
- 	if (err < 0) {
- 		perr(ys, "failed to request socket family info");
-@@ -868,6 +896,10 @@ int ynl_exec(struct ynl_sock *ys, struct nlmsghdr *req_nlh,
- {
- 	int err;
- 
-+	err = ynl_msg_end(ys, req_nlh);
-+	if (err < 0)
-+		return err;
-+
- 	err = send(ys->socket, req_nlh, req_nlh->nlmsg_len, 0);
- 	if (err < 0)
- 		return err;
-@@ -921,6 +953,10 @@ int ynl_exec_dump(struct ynl_sock *ys, struct nlmsghdr *req_nlh,
- {
- 	int err;
- 
-+	err = ynl_msg_end(ys, req_nlh);
-+	if (err < 0)
-+		return err;
-+
- 	err = send(ys->socket, req_nlh, req_nlh->nlmsg_len, 0);
- 	if (err < 0)
- 		return err;
-diff --git a/tools/net/ynl/lib/ynl.h b/tools/net/ynl/lib/ynl.h
-index dbeeef8ce91a..9842e85a8c57 100644
---- a/tools/net/ynl/lib/ynl.h
-+++ b/tools/net/ynl/lib/ynl.h
-@@ -20,6 +20,8 @@ enum ynl_error_code {
- 	YNL_ERROR_ATTR_INVALID,
- 	YNL_ERROR_UNKNOWN_NTF,
- 	YNL_ERROR_INV_RESP,
-+	YNL_ERROR_INPUT_INVALID,
-+	YNL_ERROR_INPUT_TOO_BIG,
- };
- 
- /**
--- 
-2.44.0
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
