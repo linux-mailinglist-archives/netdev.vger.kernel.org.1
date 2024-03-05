@@ -1,90 +1,62 @@
-Return-Path: <netdev+bounces-77565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AABBD872314
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:47:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF159872316
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:47:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67B99289C76
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:47:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 659F7283C1B
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DBA3127B53;
-	Tue,  5 Mar 2024 15:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2F05127B53;
+	Tue,  5 Mar 2024 15:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mn93Kep9"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="dp/pNqKv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp-8fab.mail.infomaniak.ch (smtp-8fab.mail.infomaniak.ch [83.166.143.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01728595F
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 15:47:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8B08664C;
+	Tue,  5 Mar 2024 15:47:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709653627; cv=none; b=p2MyDX6EdNi9iRH7TASn+daIOQfQgRnfmLfzxEMy0LF6bnyXHHAifkF0UISusMBQawhqnvtPWLBbpBJ5gQ8V8DWSbAO1SqYovTzzgAfalWEZMUP5gBE0uyBXjkICuM3Uu/ABBRVTLskLuL99hljldRqu6PM8PoqGWMBThDTdFqc=
+	t=1709653649; cv=none; b=nP/WxgJJoJKsgl9C78Qhx6pzIcySSV3+qiFzP7fEyJuqLKEbLY5yBf8+nilXoG+iwhzZa08NrNCJVVGUs4wHk8loCD43g8vuzxc7e2JQlYQvEKe4I0p6K9KKzSwwk70m2XZz2B33IOXrfTd1b6fP2r9XTQEneaKR+aXfX1pqWfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709653627; c=relaxed/simple;
-	bh=FEXuh7aPZCx/CSz8uFmyZcg8wFbn5WBkJuKn4llrKHA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=CHwaGKsJ7U+kKzYJXRlwlGmeaR3jxrQ0igQy4GrTWvflBk7jHD0KP3lbteMFUmL3TUzZsbbDZOhBUMIr+FEiN21QCI6C7/fMkwVfWi+Fk9k0k6I8bagcfli2hNb72wGCkCn802kbFcoOwcKWXhye9+DWBK1b7H+Ddy1mBnuKptg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mn93Kep9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709653624;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yTHTZFSSmBz46FaV6w2gu++Ghv9Cs7q4lZmhZ9Kca6Y=;
-	b=Mn93Kep9mtREBDWmlsoEOqw4INj2+mQnFi67ajRqVxvMSQkf12Pb6gug1BOPtlV6fTYB5t
-	wvAekJiS/NLdFSTn2OCj3luz+gMtWwwkkINVic21kkZibUMHl7EoxrTFbHLJyHxBH/AOmc
-	Lsa5CpufXQhrflkSiDLwaTIj+A8St0w=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-122-7n3AWmOYOhadJmz8yskmeg-1; Tue, 05 Mar 2024 10:47:03 -0500
-X-MC-Unique: 7n3AWmOYOhadJmz8yskmeg-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a457845df7aso99780766b.1
-        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 07:47:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709653622; x=1710258422;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yTHTZFSSmBz46FaV6w2gu++Ghv9Cs7q4lZmhZ9Kca6Y=;
-        b=oiC8q6ZMlWG+qs8Xe8TEjqfYHfpgRVd00beQuca+7M3xwGcw5trF+GBoguQXiROVGW
-         5O61DfCOO69ACWwr0hVHBGOKtk6bkm2WG9+bYA8pxOIMd4AqE9R6sbR90GGQrvNWO/Ye
-         XLFXqm9e/zdXT//3PnR33DPVQy1GDXbPyr8MsYD28Jm7YfY+klXwCdjBxhPww98yPILe
-         qJGJKizJfhXGr0a/dlFGEZvf82qverrOc1xgnZ/cDPl+oL23n2M1+25ePwsVxy6RZmMO
-         dphVuXStrSk+Z50/Ax4ktS2lhvc7ARm2wB8ytjUuNlFUpu39+aCneFyABeK14mgjnMO/
-         eYsA==
-X-Gm-Message-State: AOJu0YwUoy6s33RCxCNnDWGd9g9cvJ8YdpbYGNGK8PM+paGOGEW8qObX
-	cFUTYKo76jk4vrM2BMpEDMkV4hpBJcdUj0YS9QUYhbUXBWgRdnSsepeQaXd0dpHjHscm48BUFtv
-	wDQqAeyIR4SWKj0WmReqwYwjRe69Pf4hKHKw6wmkZAUs3FUPpBhOHfoi9nIOkbg==
-X-Received: by 2002:a17:906:7ca:b0:a45:aacb:349b with SMTP id m10-20020a17090607ca00b00a45aacb349bmr1338476ejc.16.1709653621779;
-        Tue, 05 Mar 2024 07:47:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFQNmbVLw++QhhSEUPNbxq+9CI0G7fV/SEn4yFqU0DB9KZsF5i2KrFJayRdLs8oJVHcwM7qYg==
-X-Received: by 2002:a17:906:7ca:b0:a45:aacb:349b with SMTP id m10-20020a17090607ca00b00a45aacb349bmr1338468ejc.16.1709653621606;
-        Tue, 05 Mar 2024 07:47:01 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id lm7-20020a170906980700b00a449fdfe27bsm4838566ejb.170.2024.03.05.07.47.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Mar 2024 07:47:01 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id D2917112EF0A; Tue,  5 Mar 2024 16:47:00 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>
-Subject: Re: [PATCH bpf 2/2] selftests/bpf: Fix up xdp bonding test wrt
- feature flags
-In-Reply-To: <20240305090829.17131-2-daniel@iogearbox.net>
-References: <20240305090829.17131-1-daniel@iogearbox.net>
- <20240305090829.17131-2-daniel@iogearbox.net>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 05 Mar 2024 16:47:00 +0100
-Message-ID: <87a5ncd6kr.fsf@toke.dk>
+	s=arc-20240116; t=1709653649; c=relaxed/simple;
+	bh=duBANKVhq58rBHhVYkw7FTlZOWm2zo4TG4uCQWF95e4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eXOwlNUGAs+UaMmlTkeEiHCF1kbzxwuulx9i7d25h6w+xS3iY7kD9HmjLLz3lpaM+gn/m+kqgzv0cHXQIapSLPoZ/EECUVtI/7X5ZPTSPKZsVP22C5Iu1SScdYLWjKsfJuBU/0Gh1nWf9KoHRHpwQMd+84gDoefM3ohpdcn1NAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=dp/pNqKv; arc=none smtp.client-ip=83.166.143.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Tq0LW5MRvz1nq;
+	Tue,  5 Mar 2024 16:47:15 +0100 (CET)
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Tq0LV6S2ZzCKN;
+	Tue,  5 Mar 2024 16:47:14 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1709653635;
+	bh=duBANKVhq58rBHhVYkw7FTlZOWm2zo4TG4uCQWF95e4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dp/pNqKvQb4HclVSuUUg/mHvDvYH+GVnYA+Lanaiuq9GbxhHsWD+YDLySuBCemll0
+	 EhCQIdpGnmW1y1mdVMbI2iQn45K5pa5GGov356x4qfxOtVrj4NJOVsG+Jf3yssjG1j
+	 4MWaL1drChA5WJrw2nwTS42luJy8+sjNrC8ERdGY=
+Date: Tue, 5 Mar 2024 16:47:04 +0100
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Jakub Kicinski <kuba@kernel.org>, Mark Brown <broonie@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, keescook@chromium.org, jakub@cloudflare.com, 
+	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, Will Drewry <wad@chromium.org>
+Subject: Re: [PATCH v4 02/12] selftests/harness: Merge TEST_F_FORK() into
+ TEST_F()
+Message-ID: <20240305.eth2Ohcawa7u@digikod.net>
+References: <20240229005920.2407409-1-kuba@kernel.org>
+ <20240229005920.2407409-3-kuba@kernel.org>
+ <20240301.Miem9Kei4eev@digikod.net>
+ <20240304.ceje1phaiFei@digikod.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,38 +64,221 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240304.ceje1phaiFei@digikod.net>
+X-Infomaniak-Routing: alpha
 
-Daniel Borkmann <daniel@iogearbox.net> writes:
+I think I fixed all reported issues with the following patch.  It always
+execute the fixture setup in the child process and execute the teardown
+in the child process by default (e.g. for seccomp tests which have
+assumptions about that). Only the Landlock teardown tests are executed
+in the parent process thanks to the new _metadata->teardown_parent
+boolean.  Child signals are always forwarded to the parent process where
+__wait_for_test() check that.  This works with seccomp and Landlock
+tests, and I think with all the others.  I'll send a v2 of the vfork
+patch.
 
-> Adjust the XDP feature flags for the bond device when no bond slave
-> devices are attached. After 9b0ed890ac2a ("bonding: do not report
-> NETDEV_XDP_ACT_XSK_ZEROCOPY"), the empty bond device must report 0
-> as flags instead of NETDEV_XDP_ACT_MASK.
->
->   # ./vmtest.sh -- ./test_progs -t xdp_bond
->   [...]
->   [    3.983311] bond1 (unregistering): (slave veth1_1): Releasing backup=
- interface
->   [    3.995434] bond1 (unregistering): Released all slaves
->   [    4.022311] bond2: (slave veth2_1): Releasing backup interface
->   #507/1   xdp_bonding/xdp_bonding_attach:OK
->   #507/2   xdp_bonding/xdp_bonding_nested:OK
->   #507/3   xdp_bonding/xdp_bonding_features:OK
->   #507/4   xdp_bonding/xdp_bonding_roundrobin:OK
->   #507/5   xdp_bonding/xdp_bonding_activebackup:OK
->   #507/6   xdp_bonding/xdp_bonding_xor_layer2:OK
->   #507/7   xdp_bonding/xdp_bonding_xor_layer23:OK
->   #507/8   xdp_bonding/xdp_bonding_xor_layer34:OK
->   #507/9   xdp_bonding/xdp_bonding_redirect_multi:OK
->   #507     xdp_bonding:OK
->   Summary: 1/9 PASSED, 0 SKIPPED, 0 FAILED
->   [    4.185255] bond2 (unregistering): Released all slaves
->   [...]
->
-> Fixes: 9b0ed890ac2a ("bonding: do not report NETDEV_XDP_ACT_XSK_ZEROCOPY")
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
+index ad49832457af..4f192904dfd6 100644
+--- a/tools/testing/selftests/kselftest_harness.h
++++ b/tools/testing/selftests/kselftest_harness.h
+@@ -382,29 +382,33 @@
+ 		/* fixture data is alloced, setup, and torn down per call. */ \
+ 		FIXTURE_DATA(fixture_name) self; \
+ 		pid_t child = 1; \
++		int status = 0; \
+ 		memset(&self, 0, sizeof(FIXTURE_DATA(fixture_name))); \
+ 		if (setjmp(_metadata->env) == 0) { \
+-			fixture_name##_setup(_metadata, &self, variant->data); \
+-			/* Let setup failure terminate early. */ \
+-			if (!_metadata->passed || _metadata->skip) \
+-				return; \
+-			_metadata->setup_completed = true; \
+ 			/* Use the same _metadata. */ \
+ 			child = vfork(); \
+ 			if (child == 0) { \
++				fixture_name##_setup(_metadata, &self, variant->data); \
++				/* Let setup failure terminate early. */ \
++				if (!_metadata->passed || _metadata->skip) \
++					_exit(0); \
++				_metadata->setup_completed = true; \
+ 				fixture_name##_##test_name(_metadata, &self, variant->data); \
+-				_exit(0); \
+-			} \
+-			if (child < 0) { \
++			} else if (child < 0 || child != waitpid(child, &status, 0)) { \
+ 				ksft_print_msg("ERROR SPAWNING TEST GRANDCHILD\n"); \
+ 				_metadata->passed = 0; \
+ 			} \
+ 		} \
+-		if (child == 0) \
+-			/* Child failed and updated the shared _metadata. */ \
++		if (child == 0) { \
++			if (_metadata->setup_completed && !_metadata->teardown_parent) \
++				fixture_name##_teardown(_metadata, &self, variant->data); \
+ 			_exit(0); \
+-		if (_metadata->setup_completed) \
++		} \
++		if (_metadata->setup_completed && _metadata->teardown_parent) \
+ 			fixture_name##_teardown(_metadata, &self, variant->data); \
++		if (!WIFEXITED(status) && WIFSIGNALED(status)) \
++			/* Forward signal to __wait_for_test(). */ \
++			kill(getpid(), WTERMSIG(status)); \
+ 		__test_check_assert(_metadata); \
+ 	} \
+ 	static struct __test_metadata \
+@@ -414,6 +418,7 @@
+ 		.fixture = &_##fixture_name##_fixture_object, \
+ 		.termsig = signal, \
+ 		.timeout = tmout, \
++		.teardown_parent = false, \
+ 	 }; \
+ 	static void __attribute__((constructor)) \
+ 			_register_##fixture_name##_##test_name(void) \
+@@ -842,6 +847,7 @@ struct __test_metadata {
+ 	bool timed_out;	/* did this test timeout instead of exiting? */
+ 	bool aborted;	/* stopped test due to failed ASSERT */
+ 	bool setup_completed; /* did setup finish? */
++	bool teardown_parent; /* run teardown in a parent process */
+ 	jmp_buf env;	/* for exiting out of test early */
+ 	struct __test_results *results;
+ 	struct __test_metadata *prev, *next;
+diff --git a/tools/testing/selftests/landlock/fs_test.c b/tools/testing/selftests/landlock/fs_test.c
+index 2d6d9b43d958..1d5952897e05 100644
+--- a/tools/testing/selftests/landlock/fs_test.c
++++ b/tools/testing/selftests/landlock/fs_test.c
+@@ -285,6 +285,8 @@ static void prepare_layout_opt(struct __test_metadata *const _metadata,
+ 
+ static void prepare_layout(struct __test_metadata *const _metadata)
+ {
++	_metadata->teardown_parent = true;
++
+ 	prepare_layout_opt(_metadata, &mnt_tmp);
+ }
+ 
+@@ -3861,9 +3863,7 @@ FIXTURE_SETUP(layout1_bind)
+ 
+ FIXTURE_TEARDOWN(layout1_bind)
+ {
+-	set_cap(_metadata, CAP_SYS_ADMIN);
+-	EXPECT_EQ(0, umount(dir_s2d2));
+-	clear_cap(_metadata, CAP_SYS_ADMIN);
++	/* umount(dir_s2d2)) is handled by namespace lifetime. */
+ 
+ 	remove_layout1(_metadata);
+ 
+@@ -4276,9 +4276,8 @@ FIXTURE_TEARDOWN(layout2_overlay)
+ 	EXPECT_EQ(0, remove_path(lower_fl1));
+ 	EXPECT_EQ(0, remove_path(lower_do1_fo2));
+ 	EXPECT_EQ(0, remove_path(lower_fo1));
+-	set_cap(_metadata, CAP_SYS_ADMIN);
+-	EXPECT_EQ(0, umount(LOWER_BASE));
+-	clear_cap(_metadata, CAP_SYS_ADMIN);
++
++	/* umount(LOWER_BASE)) is handled by namespace lifetime. */
+ 	EXPECT_EQ(0, remove_path(LOWER_BASE));
+ 
+ 	EXPECT_EQ(0, remove_path(upper_do1_fu3));
+@@ -4287,14 +4286,11 @@ FIXTURE_TEARDOWN(layout2_overlay)
+ 	EXPECT_EQ(0, remove_path(upper_do1_fo2));
+ 	EXPECT_EQ(0, remove_path(upper_fo1));
+ 	EXPECT_EQ(0, remove_path(UPPER_WORK "/work"));
+-	set_cap(_metadata, CAP_SYS_ADMIN);
+-	EXPECT_EQ(0, umount(UPPER_BASE));
+-	clear_cap(_metadata, CAP_SYS_ADMIN);
++
++	/* umount(UPPER_BASE)) is handled by namespace lifetime. */
+ 	EXPECT_EQ(0, remove_path(UPPER_BASE));
+ 
+-	set_cap(_metadata, CAP_SYS_ADMIN);
+-	EXPECT_EQ(0, umount(MERGE_DATA));
+-	clear_cap(_metadata, CAP_SYS_ADMIN);
++	/* umount(MERGE_DATA)) is handled by namespace lifetime. */
+ 	EXPECT_EQ(0, remove_path(MERGE_DATA));
+ 
+ 	cleanup_layout(_metadata);
+@@ -4691,6 +4687,8 @@ FIXTURE_SETUP(layout3_fs)
+ 		SKIP(return, "this filesystem is not supported (setup)");
+ 	}
+ 
++	_metadata->teardown_parent = true;
++
+ 	slash = strrchr(variant->file_path, '/');
+ 	ASSERT_NE(slash, NULL);
+ 	dir_len = (size_t)slash - (size_t)variant->file_path;
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
+On Mon, Mar 04, 2024 at 08:31:49PM +0100, Mickaël Salaün wrote:
+> On Mon, Mar 04, 2024 at 08:27:50PM +0100, Mickaël Salaün wrote:
+> > Testing the whole series, I found that some Landlock tests are flaky
+> > starting with this patch.  I tried to not use the longjmp in the
+> > grandchild but it didn't change.  I suspect missing volatiles but I
+> > didn't find the faulty one(s) yet. :/
+> > I'll continue investigating tomorrow but help would be much appreciated!
+> 
+> The issue is with the fs_test.c, often starting with this one:
+> 
+> #  RUN           layout1.relative_chroot_only ...
+> # fs_test.c:294:relative_chroot_only:Expected 0 (0) == umount(TMP_DIR) (-1)
+> # fs_test.c:296:relative_chroot_only:Expected 0 (0) == remove_path(TMP_DIR) (16)
+> # relative_chroot_only: Test failed
+> #          FAIL  layout1.relative_chroot_only
+> 
+> ...or this one:
+> 
+> #  RUN           layout3_fs.hostfs.tag_inode_dir_child ...
+> # fs_test.c:4707:tag_inode_dir_child:Expected 0 (0) == mkdir(self->dir_path, 0700) (-1)
+> # fs_test.c:4709:tag_inode_dir_child:Failed to create directory "tmp/dir": No such file or directory
+> # fs_test.c:4724:tag_inode_dir_child:Expected 0 (0) <= fd (-1)
+> # fs_test.c:4726:tag_inode_dir_child:Failed to create file "tmp/dir/file": No such file or directory
+> # fs_test.c:4729:tag_inode_dir_child:Expected 0 (0) == close(fd) (-1)
+> # tag_inode_dir_child: Test failed
+> #          FAIL  layout3_fs.hostfs.tag_inode_dir_child
+> 
+
+This was because the vfork() wasn't followed by a wait().
+
+> 
+> > 
+> > 
+> > On Wed, Feb 28, 2024 at 04:59:09PM -0800, Jakub Kicinski wrote:
+> > > From: Mickaël Salaün <mic@digikod.net>
+> > > 
+> > > Replace Landlock-specific TEST_F_FORK() with an improved TEST_F() which
+> > > brings four related changes:
+> > > 
+> > > Run TEST_F()'s tests in a grandchild process to make it possible to
+> > > drop privileges and delegate teardown to the parent.
+> > > 
+> > > Compared to TEST_F_FORK(), simplify handling of the test grandchild
+> > > process thanks to vfork(2), and makes it generic (e.g. no explicit
+> > > conversion between exit code and _metadata).
+> > > 
+> > > Compared to TEST_F_FORK(), run teardown even when tests failed with an
+> > > assert thanks to commit 63e6b2a42342 ("selftests/harness: Run TEARDOWN
+> > > for ASSERT failures").
+> > > 
+> > > Simplify the test harness code by removing the no_print and step fields
+> > > which are not used.  I added this feature just after I made
+> > > kselftest_harness.h more broadly available but this step counter
+> > > remained even though it wasn't needed after all. See commit 369130b63178
+> > > ("selftests: Enhance kselftest_harness.h to print which assert failed").
+> > > 
+> > > Replace spaces with tabs in one line of __TEST_F_IMPL().
+> > > 
+> > > Cc: Günther Noack <gnoack@google.com>
+> > > Cc: Shuah Khan <shuah@kernel.org>
+> > > Cc: Will Drewry <wad@chromium.org>
+> > > Signed-off-by: Mickaël Salaün <mic@digikod.net>
+> > > Reviewed-by: Kees Cook <keescook@chromium.org>
+> > > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> > > --
+> > > v4:
+> > >  - GAND -> GRAND
+> > >  - init child to 1, otherwise assert in setup triggers a longjmp
+> > >    which in turn reads child without it ever getting initialized
+> > >    (or being 0, i.e. we mistakenly assume we're in the grandchild)
+> > 
+> > Good catch!
 
