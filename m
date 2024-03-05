@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-77478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9E9B871E4B
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:52:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A251871E26
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:42:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F8461F24049
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:52:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4467D2839D3
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2ECB58123;
-	Tue,  5 Mar 2024 11:52:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C951956472;
+	Tue,  5 Mar 2024 11:42:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="o18mOHR1"
+	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="GwD1SkRc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-227.siemens.flowmailer.net (mta-64-227.siemens.flowmailer.net [185.136.64.227])
+Received: from mta-64-225.siemens.flowmailer.net (mta-64-225.siemens.flowmailer.net [185.136.64.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4FB5676D
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 11:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65859433CA
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 11:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709639542; cv=none; b=F5gW2UOWkrNNPa//J2HdwbRJ7B+xcoHIisQGUepoE+rLvtkSzNXo+Q18fZePY4N5LsBL6z982ERs2SIxGhWetsW+zUQ3Y1fMq0yt3+1KbUGheu7O/WdqV5AVqXZAcOqcBzP+TJvId9hgZV4ifW49Qkcl0VR3GxGXhZzQw3qowNs=
+	t=1709638940; cv=none; b=p4fmzNidl6YYUA+jtzGOvriEhZKvKHxRT3909EhZMu/7gMNNW+eIP7qMr12MyrHbHxYjiA/lyW0yOZnsG4l1aVD+sMvkZXxae9cFRWFxP0l6wexexkEuOHyFRYLIpzIBfVmN7YWNkhZqYQUDWbmwd8+04VzsfFq5/aiT5qMAXc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709639542; c=relaxed/simple;
-	bh=ZXkZCxy2ryW+fkb7EusDrQGzEq9I614lCyPnR6b+B0Y=;
+	s=arc-20240116; t=1709638940; c=relaxed/simple;
+	bh=ehCQzbU98PbxbRVOW1Rth3grJuDztP8ehwGPO+uBpQc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=E/2VhjBEXnJJi3RxHZWskL1KTpKlqTLaKgpWLlFfT/dDY5XDP4NefOfrPBknU++sQ8yCMurV8/ot4j37Ra7H0y6miGaOEh9W4s+ZLXu/Q3ej/J8ciLHqGvWNHZwcncmAw4d+tBtXZCyGWZZAtW3XSEf82jGhcdi5dHUuTBpnsWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=o18mOHR1; arc=none smtp.client-ip=185.136.64.227
+	 MIME-Version; b=DfzuP6fID9Q3cKlB2ycE6bV+tDi5MRLZVIGJXOg5BkQZTJG0C2bzPwIWKA+HpOzXxdKCyUEuCS6m4S6N7BRrVRAQ1NC199h9JOYltdOZeLRTGeye7n183/aPXvcjaetgYmfjto9ZPbZv3/uXa58WQve4XVYFamFrhvfFDeT51UI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=GwD1SkRc; arc=none smtp.client-ip=185.136.64.225
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-64-227.siemens.flowmailer.net with ESMTPSA id 202403051141088622610efcec8eed19
+Received: by mta-64-225.siemens.flowmailer.net with ESMTPSA id 20240305114110eabb6ca6777f2022a5
         for <netdev@vger.kernel.org>;
-        Tue, 05 Mar 2024 12:41:08 +0100
+        Tue, 05 Mar 2024 12:41:10 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
  d=siemens.com; i=diogo.ivo@siemens.com;
  h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=ptD2dLutRxUnJaepSeqWoe0hX2xcdxTnigGW82YsIzo=;
- b=o18mOHR1tZVIbFY7Y3afuI2WhQA8r+U0N4BgjDRQxRRJAGee3NMjAoxw3gSlMvwGqRTfDg
- QEXoJ33LeaLyof/x4zWEaLR7LVczxf34Z1EKu+r3YqeBhmZ9BE7znpcEfA2UiQO4mPJOVgmo
- FzpbiAuNlLDTvgmqqCMLRHLG8tfoM=;
+ bh=xwkwkmHbxfkquWdaLwL3yKkRZ08P5g4eRH5gsZUmVtI=;
+ b=GwD1SkRcc00845JkSQj5lM6zs1uuvLry24Z1hSTLuZYSKOHDi6Z874TITjjTqjz05dcCjV
+ lwoL82TUgYHT8VjG6Dqv3nlORVwDk7Z9Ea6kmmaJlBQXVAhaBHYlWU2qY5Bot/mncCjLgoWq
+ RQPqPHRp3aTvZZ2zOp07quVwwrUfY=;
 From: Diogo Ivo <diogo.ivo@siemens.com>
 To: danishanwar@ti.com,
 	rogerq@kernel.org,
@@ -49,13 +49,14 @@ To: danishanwar@ti.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	andrew@lunn.ch,
+	hkallweit1@gmail.com,
 	linux-arm-kernel@lists.infradead.org,
 	netdev@vger.kernel.org
 Cc: Diogo Ivo <diogo.ivo@siemens.com>,
 	jan.kiszka@siemens.com
-Subject: [PATCH net-next v4 06/10] net: ti: icssg-prueth: Adjust IPG configuration for SR1.0
-Date: Tue,  5 Mar 2024 11:40:26 +0000
-Message-ID: <20240305114045.388893-7-diogo.ivo@siemens.com>
+Subject: [PATCH net-next v4 07/10] net: ti: icssg-prueth: Adjust the number of TX channels for SR1.0
+Date: Tue,  5 Mar 2024 11:40:27 +0000
+Message-ID: <20240305114045.388893-8-diogo.ivo@siemens.com>
 In-Reply-To: <20240305114045.388893-1-diogo.ivo@siemens.com>
 References: <20240305114045.388893-1-diogo.ivo@siemens.com>
 Precedence: bulk
@@ -68,10 +69,11 @@ Content-Transfer-Encoding: 8bit
 X-Flowmailer-Platform: Siemens
 Feedback-ID: 519:519-1320519:519-21489:flowmailer
 
-Correctly adjust the IPG based on the Silicon Revision.
+As SR1.0 uses the current higher priority channel to send commands to
+the firmware, take this into account when setting/getting the number
+of channels to/from the user.
 
-Based on the work of Roger Quadros, Vignesh Raghavendra
-and Grygorii Strashko in TI's 5.10 SDK [1].
+Based on the work of Roger Quadros in TI's 5.10 SDK [1].
 
 [1]: https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tree/?h=ti-linux-5.10.y
 
@@ -83,55 +85,42 @@ Reviewed-by: Roger Quadros <rogerq@kernel.org>
 Changes in v4:
  - Add Reviewed-by from Roger
 
- drivers/net/ethernet/ti/icssg/icssg_config.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+Changes in v3:
+ - Address Roger's comments on SR1.0 handling
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-index 99de8a40ed60..15f2235bf90f 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_config.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-@@ -20,6 +20,8 @@
- /* IPG is in core_clk cycles */
- #define MII_RT_TX_IPG_100M	0x17
- #define MII_RT_TX_IPG_1G	0xb
-+#define MII_RT_TX_IPG_100M_SR1	0x166
-+#define MII_RT_TX_IPG_1G_SR1	0x1a
+ drivers/net/ethernet/ti/icssg/icssg_ethtool.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
+index 9a7dd7efcf69..688a148f32b4 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
+@@ -142,6 +142,9 @@ static int emac_set_channels(struct net_device *ndev,
  
- #define	ICSSG_QUEUES_MAX		64
- #define	ICSSG_QUEUE_OFFSET		0xd00
-@@ -202,23 +204,29 @@ void icssg_config_ipg(struct prueth_emac *emac)
- {
- 	struct prueth *prueth = emac->prueth;
- 	int slice = prueth_emac_slice(emac);
-+	u32 ipg;
+ 	emac->tx_ch_num = ch->tx_count;
  
- 	switch (emac->speed) {
- 	case SPEED_1000:
--		icssg_mii_update_ipg(prueth->mii_rt, slice, MII_RT_TX_IPG_1G);
-+		ipg = emac->is_sr1 ? MII_RT_TX_IPG_1G_SR1 : MII_RT_TX_IPG_1G;
- 		break;
- 	case SPEED_100:
--		icssg_mii_update_ipg(prueth->mii_rt, slice, MII_RT_TX_IPG_100M);
-+		ipg = emac->is_sr1 ? MII_RT_TX_IPG_100M_SR1 : MII_RT_TX_IPG_100M;
- 		break;
- 	case SPEED_10:
-+		/* Firmware hardcodes IPG for SR1.0 */
-+		if (emac->is_sr1)
-+			return;
- 		/* IPG for 10M is same as 100M */
--		icssg_mii_update_ipg(prueth->mii_rt, slice, MII_RT_TX_IPG_100M);
-+		ipg = MII_RT_TX_IPG_100M;
- 		break;
- 	default:
- 		/* Other links speeds not supported */
- 		netdev_err(emac->ndev, "Unsupported link speed\n");
- 		return;
- 	}
++	if (emac->is_sr1)
++		emac->tx_ch_num++;
 +
-+	icssg_mii_update_ipg(prueth->mii_rt, slice, ipg);
+ 	return 0;
  }
  
- static void emac_r30_cmd_init(struct prueth_emac *emac)
+@@ -152,8 +155,15 @@ static void emac_get_channels(struct net_device *ndev,
+ 
+ 	ch->max_rx = 1;
+ 	ch->max_tx = PRUETH_MAX_TX_QUEUES;
++
++	if (emac->is_sr1)
++		ch->max_tx--;
++
+ 	ch->rx_count = 1;
+ 	ch->tx_count = emac->tx_ch_num;
++
++	if (emac->is_sr1)
++		ch->tx_count--;
+ }
+ 
+ static const struct ethtool_rmon_hist_range emac_rmon_ranges[] = {
 -- 
 2.44.0
 
