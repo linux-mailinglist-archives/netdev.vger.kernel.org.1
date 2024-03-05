@@ -1,141 +1,100 @@
-Return-Path: <netdev+bounces-77446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7467871CE1
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:06:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38A95871CE9
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:07:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81B2F285F9D
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:06:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0B07280F7B
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:07:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 080A958131;
-	Tue,  5 Mar 2024 11:04:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E1D54917;
+	Tue,  5 Mar 2024 11:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KI7o8Snd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RAXQWLGw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F935B671;
-	Tue,  5 Mar 2024 11:04:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7F654F86
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 11:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709636692; cv=none; b=MnHxqphvn6L9BbZrcyJm6nUt9heVxAYNXbmKMKZAZ5EukDYgTsA0QfP67aYhzsMhsEGY7V2zRGCNAjrSJnGQQkvrBj2HmhoozGZJMnM4hPItGTfZXoNkrDYDr/PUpng923AxZL9uDZHInalyUolMiMr97PZgJUEj5FIEbqiWZOY=
+	t=1709636777; cv=none; b=dbXci9dkp/grC6BI3J2r1BtlQV/nJ2FnNZV1B7LfGov8zNMX6l8YNfK+3iXxUUhq4R5pxf1pTFKfv8s3dm/aff+o9IiKa/3yrrb8EDJwW5XyaQxBzkoThmXoOBkK4jEV8wkRCTV8jwDAomWe83RM4DB2Pp8cDQBGDtblAl6j2VI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709636692; c=relaxed/simple;
-	bh=VrgfVfXGL+bniwIr+Gqdl6c583H+xRtQ0rR4oYPIcrM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=JB/+MobWQqzX2+5BMgJBuDxDoPFtapMyCEGoz7wdIo4kfxX+fCkzjBdM6RpPpX6dnwIaeBRzII6hdCmBkbiVSElrv68AwJPF4D4I8ROwppehWTorQyuJZugMzi4iHhAy2OnTpTUDTjCZoW9dq1y5E+j7rJ3BFsLsxGuWMh4FTtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KI7o8Snd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6D97C43399;
-	Tue,  5 Mar 2024 11:04:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709636692;
-	bh=VrgfVfXGL+bniwIr+Gqdl6c583H+xRtQ0rR4oYPIcrM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=KI7o8SndIscczSWBa0jSe5sXWiSDqkpwTMxTvZHwnyBl2vOBXKsC7mzoELrAIJ8AP
-	 Aus7KDMJTEtC4yWqTzrTtKsjX734wFEKPepsIp/n4O6xK/dj8/Qrf6aNqy1G5HxEFK
-	 kWXboG3D5EchpXWmm4UFeX9b7ljgIYbf2ONyBWa/4qN4kndKsleTxNMyExN/kTnrwV
-	 jHQ7PkSvg1QNLQ3eee6z7ubdgK+3jFW5QtJdvNomxv6hG1JdxNXv1FOdufJXDH/xgg
-	 5FDUGqHvB+Mnz/5o3LvkkN1PlqxIgiiHlqpQdfXYhHaaTfkPFn7o4liwc/C7XcqTds
-	 aCqtndlWcFu2w==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Tue, 05 Mar 2024 12:04:33 +0100
-Subject: [PATCH net-next 4/4] mptcp: drop lookup_by_id in lookup_addr
+	s=arc-20240116; t=1709636777; c=relaxed/simple;
+	bh=x9y2SVcVyagVE1Y8KAG3rSu9SNw7TE+5whyS9ptwyZY=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=l4rUjqvGdKejjSYBcFxSonnu2CGU2EhK9hpD7VH9afctXVE2lKoV6Rc2kDEtp6swpeK1ManjAH+elVF6oLySRUGsgeINkSs9Zp9I2zSVG8tRpQ2qCIEOAuYkbhbABLskJ0E44AotiIqdZIqzv0+peTunpxCQzNVg4DnLGLcOypM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RAXQWLGw; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5135486cfccso591133e87.0
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 03:06:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709636774; x=1710241574; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=x9y2SVcVyagVE1Y8KAG3rSu9SNw7TE+5whyS9ptwyZY=;
+        b=RAXQWLGwIlK/QmlA5w/4flf0Q03YQJG/mJ8Tspzrn5ZkBfD9V3yKeND/sPQbZeAjrA
+         0XxqOHEXFjuDsL2+IBNmJt1l0ChB+wQGAGGw3H/0UuKnVpGrp1TeUSa50Ybsqx60eLJJ
+         67BXm6FlywStiF5ZuXCY+l6ZCXYeMMdqOThJIXDeX3Crj0KpwYMci8u7li4E8Yo8IxC6
+         T5C/MGmBk/2YNX2CgkvxkEhmXN+6OTsuGLjWRcSuVum7O+YmwgLLY2XhyciBEyRUJg2z
+         C4UfAeL2g+Z2gYzbRv93IpxW/SQOPIFGlInOi4GREE1nhknxQCDQ/6as1BsxTvhl6wbm
+         f2hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709636774; x=1710241574;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x9y2SVcVyagVE1Y8KAG3rSu9SNw7TE+5whyS9ptwyZY=;
+        b=U4dqNKV6n0FquuXy7E0quud+o98N7BeFbewsas5o1GOPz6HQfFxA50BO4/0yEkx28U
+         u371EO8spj9rQ5UvFUn+i5c5IMWafmt+1sqWzB2ZkV/cKl1enqrhfYFhJDwesrwKsGlD
+         7IhOv6Zv4MhbBrfG4Ren7kzxQZMFetWIJoQxU8FSGB/NlzpnfBo4rlGZDVaaCUV8mZiS
+         4sgM0E0Vz0cXKOhvl0Us9BgZL3W6rh/kYMG+dOHiCKugyCd7XkZ56vtdWpvriGYWG4OT
+         c4v4Jeg4QuhIxskQTqz4py59OfA2NDZ2wwHLAoDZoRV4gGBAyHVdooC9Rn57HxrkRu1P
+         IHvA==
+X-Forwarded-Encrypted: i=1; AJvYcCWAnIQ4EYIGU2gTmFzv0nWLewXHasBeWGavWRYHz1M3canLs8taDOq7VexXPp/egC3NNzW7L4KH8NIevOJRwrNGojd2gW0r
+X-Gm-Message-State: AOJu0YzauiRRTANUlXK/qeszc9BxQ8Sjjl5mqCVR6XC/dqDlU0QWaqJu
+	fprskuJ87LdC1nFaHH4dcko4UhPHBM4cxfR7xMl8yft9eEKfUly7qWv9Ys5g
+X-Google-Smtp-Source: AGHT+IEH8qohUYrfQcNewN4Rf5LMXSeapX7QTNKRlfiOEa2n3z+PeBIBsRHSkZOSFKyd5cfPOUUwyg==
+X-Received: by 2002:a05:6512:23a1:b0:513:54df:9573 with SMTP id c33-20020a05651223a100b0051354df9573mr865040lfv.26.1709636773288;
+        Tue, 05 Mar 2024 03:06:13 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:554f:5337:ffae:a8cb])
+        by smtp.gmail.com with ESMTPSA id g11-20020a05600c4ecb00b00412e293bee9sm6690736wmq.38.2024.03.05.03.06.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Mar 2024 03:06:12 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  jiri@resnulli.us
+Subject: Re: [PATCH net-next v2 2/4] tools: ynl: allow setting recv() size
+In-Reply-To: <20240305053310.815877-3-kuba@kernel.org> (Jakub Kicinski's
+	message of "Mon, 4 Mar 2024 21:33:08 -0800")
+Date: Tue, 05 Mar 2024 11:04:50 +0000
+Message-ID: <m2edcphrcd.fsf@gmail.com>
+References: <20240305053310.815877-1-kuba@kernel.org>
+	<20240305053310.815877-3-kuba@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240305-upstream-net-next-20240304-mptcp-misc-cleanup-v1-4-c436ba5e569b@kernel.org>
-References: <20240305-upstream-net-next-20240304-mptcp-misc-cleanup-v1-0-c436ba5e569b@kernel.org>
-In-Reply-To: <20240305-upstream-net-next-20240304-mptcp-misc-cleanup-v1-0-c436ba5e569b@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Geliang Tang <tanggeliang@kylinos.cn>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2274; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=IRouLJLzOQvuPh1nmmYUU3MxKdU5480lf2zN3s0oVSE=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBl5vxDaCTvgU0QiI3890Plw4yMOhTvTcmFlgLYX
- g0H4OYsbQeJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZeb8QwAKCRD2t4JPQmmg
- c/eFD/9U61UobHCI0eQctMtjgjY/zwtcGDFKiKx0mdpkxf70WmgWiSJIZYaqJTZYDwJQlEFzhEK
- tUs5/vXMS5KLs+1cHEzEg4gJrbuXCA5MqnfiBT8cTX0ERQTityTNiyAQbijClmBO3r32qidykpA
- b0OKdFDbu83C+pa9NYwrkPm/IDkTkgGwRYEPLLEGxUUf+znTaf6cLQCrdVHfkk6P/8Y9QSe9N2q
- xTSMEr8Z3s1MlbIvlEMztm+tvsb3tiFaUoYxdtFRiWyiFBimYdFT5B99yT4eLyJeZ59QMsT9Gdy
- fLDZZ9MG9P4zRjodU/bkZD+07B38W9Q8QfVVnTaIT3eHs6PDGLpcavRVgsLJInpRrrsilvClkLb
- SqvmQhibf0rin8ZEYvkVTMNGxY9K1Dlk9CvJydtTpz3zpLreW/WIqVWWiE5h3c9EmRaHUxKdov5
- GOgFUEQ38wP+5nR76MHCNYtar0KfLIDWTOe8oO7NO04T6EuFr3/NX7HaL0tVPRIHg4pR5prxkDD
- GgsTp1eQONh5GHeLG5oepkHMhp4ROlt1rkQ0jaSZBXdD3cyLISuxCPtrTsfGIslTxlUkR0Bq0pd
- 7GNc5+umCmR47oktMO776uqO+cAOT0zi8JDuyo02EriDQl7eNdztQ7XbJ78sXw0YfJY9nNbwrMx
- sdS/9uSd6pgV/fw==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Type: text/plain
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+Jakub Kicinski <kuba@kernel.org> writes:
 
-When the lookup_by_id parameter of __lookup_addr() is true, it's the same
-as __lookup_addr_by_id(), it can be replaced by __lookup_addr_by_id()
-directly. So drop this parameter, let __lookup_addr() only looks up address
-on the local address list by comparing addresses in it, not address ids.
+> Make the size of the buffer we use for recv() configurable.
+> The details of the buffer sizing in netlink are somewhat
+> arcane, we could spend a lot of time polishing this API.
+> Let's just leave some hopefully helpful comments for now.
+> This is a for-developers-only feature, anyway.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/pm_netlink.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
-
-diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-index 354083b8386f..5c17d39146ea 100644
---- a/net/mptcp/pm_netlink.c
-+++ b/net/mptcp/pm_netlink.c
-@@ -499,15 +499,12 @@ __lookup_addr_by_id(struct pm_nl_pernet *pernet, unsigned int id)
- }
- 
- static struct mptcp_pm_addr_entry *
--__lookup_addr(struct pm_nl_pernet *pernet, const struct mptcp_addr_info *info,
--	      bool lookup_by_id)
-+__lookup_addr(struct pm_nl_pernet *pernet, const struct mptcp_addr_info *info)
- {
- 	struct mptcp_pm_addr_entry *entry;
- 
- 	list_for_each_entry(entry, &pernet->local_addr_list, list) {
--		if ((!lookup_by_id &&
--		     mptcp_addresses_equal(&entry->addr, info, entry->addr.port)) ||
--		    (lookup_by_id && entry->addr.id == info->id))
-+		if (mptcp_addresses_equal(&entry->addr, info, entry->addr.port))
- 			return entry;
- 	}
- 	return NULL;
-@@ -537,7 +534,7 @@ static void mptcp_pm_create_subflow_or_signal_addr(struct mptcp_sock *msk)
- 
- 		mptcp_local_address((struct sock_common *)msk->first, &mpc_addr);
- 		rcu_read_lock();
--		entry = __lookup_addr(pernet, &mpc_addr, false);
-+		entry = __lookup_addr(pernet, &mpc_addr);
- 		if (entry) {
- 			__clear_bit(entry->addr.id, msk->pm.id_avail_bitmap);
- 			msk->mpc_endpoint_id = entry->addr.id;
-@@ -1918,7 +1915,8 @@ int mptcp_pm_nl_set_flags(struct sk_buff *skb, struct genl_info *info)
- 		bkup = 1;
- 
- 	spin_lock_bh(&pernet->lock);
--	entry = __lookup_addr(pernet, &addr.addr, lookup_by_id);
-+	entry = lookup_by_id ? __lookup_addr_by_id(pernet, addr.addr.id) :
-+			       __lookup_addr(pernet, &addr.addr);
- 	if (!entry) {
- 		spin_unlock_bh(&pernet->lock);
- 		GENL_SET_ERR_MSG(info, "address not found");
-
--- 
-2.43.0
-
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
