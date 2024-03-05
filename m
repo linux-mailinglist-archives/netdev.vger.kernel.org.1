@@ -1,284 +1,289 @@
-Return-Path: <netdev+bounces-77566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF159872316
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:47:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD7E6872312
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:46:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 659F7283C1B
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:47:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43749B20E87
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:46:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2F05127B53;
-	Tue,  5 Mar 2024 15:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40B61272DC;
+	Tue,  5 Mar 2024 15:46:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="dp/pNqKv"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Orf1j3Vv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-8fab.mail.infomaniak.ch (smtp-8fab.mail.infomaniak.ch [83.166.143.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8B08664C;
-	Tue,  5 Mar 2024 15:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4692E8595F
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 15:46:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709653649; cv=none; b=nP/WxgJJoJKsgl9C78Qhx6pzIcySSV3+qiFzP7fEyJuqLKEbLY5yBf8+nilXoG+iwhzZa08NrNCJVVGUs4wHk8loCD43g8vuzxc7e2JQlYQvEKe4I0p6K9KKzSwwk70m2XZz2B33IOXrfTd1b6fP2r9XTQEneaKR+aXfX1pqWfo=
+	t=1709653612; cv=none; b=M8qIDlBVz7UchTKJ1+DUKJ5Ft65C/PJ7pVSy9vBYHo8m4qSJW20vq3QhEU00ZXqKjmb9ZU2AUPsR+PpIuNKMwP3lwpyd2911glcNo605w3wTDzIDjUe730Oh6c4lUhu2n9sPzw50zti2Jzx5Jjc2ON7VRKCygkXC2oGHk1mNmjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709653649; c=relaxed/simple;
-	bh=duBANKVhq58rBHhVYkw7FTlZOWm2zo4TG4uCQWF95e4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eXOwlNUGAs+UaMmlTkeEiHCF1kbzxwuulx9i7d25h6w+xS3iY7kD9HmjLLz3lpaM+gn/m+kqgzv0cHXQIapSLPoZ/EECUVtI/7X5ZPTSPKZsVP22C5Iu1SScdYLWjKsfJuBU/0Gh1nWf9KoHRHpwQMd+84gDoefM3ohpdcn1NAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=dp/pNqKv; arc=none smtp.client-ip=83.166.143.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Tq0LW5MRvz1nq;
-	Tue,  5 Mar 2024 16:47:15 +0100 (CET)
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Tq0LV6S2ZzCKN;
-	Tue,  5 Mar 2024 16:47:14 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1709653635;
-	bh=duBANKVhq58rBHhVYkw7FTlZOWm2zo4TG4uCQWF95e4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dp/pNqKvQb4HclVSuUUg/mHvDvYH+GVnYA+Lanaiuq9GbxhHsWD+YDLySuBCemll0
-	 EhCQIdpGnmW1y1mdVMbI2iQn45K5pa5GGov356x4qfxOtVrj4NJOVsG+Jf3yssjG1j
-	 4MWaL1drChA5WJrw2nwTS42luJy8+sjNrC8ERdGY=
-Date: Tue, 5 Mar 2024 16:47:04 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Jakub Kicinski <kuba@kernel.org>, Mark Brown <broonie@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, keescook@chromium.org, jakub@cloudflare.com, 
-	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, Will Drewry <wad@chromium.org>
-Subject: Re: [PATCH v4 02/12] selftests/harness: Merge TEST_F_FORK() into
- TEST_F()
-Message-ID: <20240305.eth2Ohcawa7u@digikod.net>
-References: <20240229005920.2407409-1-kuba@kernel.org>
- <20240229005920.2407409-3-kuba@kernel.org>
- <20240301.Miem9Kei4eev@digikod.net>
- <20240304.ceje1phaiFei@digikod.net>
+	s=arc-20240116; t=1709653612; c=relaxed/simple;
+	bh=QxWb2UAPgjCHAYTGXe6Lpj4UV5UgEnVvtQObX9u8xVk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tWLr5aWbhGzSNNut9gYeWxYH1/GS4gTZsTeH/MXsHSaE0+4h6FSYo8KTdHT4wIvUZAO6jaQnQUPJ20NvUzUAF3j/ol7MxrEeJ3VbayRgrATe44uBNNsGUby3G6QxFhVlS/sUzdhtz7qItaKpxLW8Sm+EA2YT/oThfvrCUBjPm80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Orf1j3Vv; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-55a5e7fa471so8153579a12.1
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 07:46:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1709653608; x=1710258408; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=KTgpvNV1g+DhCYFo1yp9gYxMdPtAeq0mhK4Rj1a7IWU=;
+        b=Orf1j3Vvy6Hn+rvumotcJa/qq0Lg3QMThuB6T0iAleVQA1nh5bipRHqTy3XWlALcnl
+         EBbo3QI6dpYNt9iOEGmiZ/VBRz3f9KhgpKOlA7Z63bYSEgDzPqjlmFktQbW0txYp7Z1+
+         djPRm39z8eSHv8V0DXeBeDCU2BO6vrddICihZW+S9xLyYsVwgsH5EaGZ/POy3UUqgBTj
+         BAQCA7JO89F+DK2A7yf3WIn3R2LEBycpa5/CzUwmfuvBfdMEJUB5OnjyDha3a+raUpi0
+         EkybJ8gG6/Asl9jv8jBJxN0ryelxqfHqMaY12QfEcZlS7n7vnk4Ds97q5ugHFshQzIOJ
+         ZrCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709653608; x=1710258408;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KTgpvNV1g+DhCYFo1yp9gYxMdPtAeq0mhK4Rj1a7IWU=;
+        b=ZU2AyUluXeC22khz8NrtbHtK83WpHGAgotAosPlIRVm8jxgc871f6sxTUdg2z+U6NZ
+         QzkAuDChg3JO/lEbeq48HOcEQH5Ui9ad7SyDmMDVyWJHcFKiGPL7rsLlW+l/JzGNHVjf
+         LETjAOpUlqn9HupsRM8Mjm1zMnPJgSbYaP0y6613PW6LZnZxm7bI5uezxa7DRUpK8opF
+         1Os0Bkdg0eJYlwMYf5jJqObig/LQ00EkfJJ2H/dsUABWdhCoGl/18XYM/0CT8Tc0Q5Kw
+         IQvW3lpj5keys12R0kpK38BTfNEVihaLWwq5vpsK/4AGbZh52Fef7AEWWc+MXbmMHD6Z
+         ZHrA==
+X-Gm-Message-State: AOJu0Yy7Z7LeRU/h5+8iMN7ujFBLR7HDjIJmVkUlKQ2cVkmqZPnf8gon
+	3VQ3BeK9TrRxXVXJnW0Rv5QWcaQWlswsHAXjEYNfWAASZnBWi6vlD0mvuGlhQRO4iXFlOFFYJMQ
+	a
+X-Google-Smtp-Source: AGHT+IG6ipOFG6O/NT3V7nUY/hpGbN2qlxUyIGLzlt9S6yALUBxMc5vD9U4cw1r/K0WUAb94bhUyoQ==
+X-Received: by 2002:a17:906:e084:b0:a44:5589:1183 with SMTP id gh4-20020a170906e08400b00a4455891183mr8014072ejb.34.1709653608506;
+        Tue, 05 Mar 2024 07:46:48 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:0:f33:beb3:62e8:b7a? ([2001:67c:2fbc:0:f33:beb3:62e8:b7a])
+        by smtp.gmail.com with ESMTPSA id ef5-20020a17090697c500b00a449cb924dbsm4827392ejb.124.2024.03.05.07.46.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Mar 2024 07:46:46 -0800 (PST)
+Message-ID: <f546e063-a69d-4c77-81d2-045acf7e6e4f@openvpn.net>
+Date: Tue, 5 Mar 2024 16:47:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240304.ceje1phaiFei@digikod.net>
-X-Infomaniak-Routing: alpha
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 03/22] ovpn: add basic netlink support
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>
+References: <20240304150914.11444-1-antonio@openvpn.net>
+ <20240304150914.11444-4-antonio@openvpn.net>
+ <e0375bdb-8ef8-4a46-a5cf-351d77840874@lunn.ch>
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <e0375bdb-8ef8-4a46-a5cf-351d77840874@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-I think I fixed all reported issues with the following patch.  It always
-execute the fixture setup in the child process and execute the teardown
-in the child process by default (e.g. for seccomp tests which have
-assumptions about that). Only the Landlock teardown tests are executed
-in the parent process thanks to the new _metadata->teardown_parent
-boolean.  Child signals are always forwarded to the parent process where
-__wait_for_test() check that.  This works with seccomp and Landlock
-tests, and I think with all the others.  I'll send a v2 of the vfork
-patch.
+On 04/03/2024 22:20, Andrew Lunn wrote:
+> On Mon, Mar 04, 2024 at 04:08:54PM +0100, Antonio Quartulli wrote:
+>> This commit introduces basic netlink support with
+>> registration/unregistration functionalities and stub pre/post-doit.
+>>
+>> More importantly it introduces the UAPI header file that contains
+>> the attributes that are inteded to be used by the netlink API
+> 
+> intended.
+> 
+>> implementation.
+>>
+>> For convience, packet.h is also added containing some macros about
+>> the OpenVPN packet format.
+>>
+>> +/** KEYDIR policy. Can be used for configuring an encryption and a decryption key */
+>> +static const struct nla_policy ovpn_nl_policy_keydir[NUM_OVPN_A_KEYDIR] = {
+>> +	[OVPN_A_KEYDIR_CIPHER_KEY] = NLA_POLICY_MAX_LEN(U8_MAX),
+> 
+> I don't know netlink that well. Is this saying keys are limited to 256
+> bytes? How future proof is that? I'm not a crypto person, but
+> symmetric algorithms, e.g. AES, seem to have reasonably short keys, 32
+> bytes, so this seems O.K, to me.
 
-diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
-index ad49832457af..4f192904dfd6 100644
---- a/tools/testing/selftests/kselftest_harness.h
-+++ b/tools/testing/selftests/kselftest_harness.h
-@@ -382,29 +382,33 @@
- 		/* fixture data is alloced, setup, and torn down per call. */ \
- 		FIXTURE_DATA(fixture_name) self; \
- 		pid_t child = 1; \
-+		int status = 0; \
- 		memset(&self, 0, sizeof(FIXTURE_DATA(fixture_name))); \
- 		if (setjmp(_metadata->env) == 0) { \
--			fixture_name##_setup(_metadata, &self, variant->data); \
--			/* Let setup failure terminate early. */ \
--			if (!_metadata->passed || _metadata->skip) \
--				return; \
--			_metadata->setup_completed = true; \
- 			/* Use the same _metadata. */ \
- 			child = vfork(); \
- 			if (child == 0) { \
-+				fixture_name##_setup(_metadata, &self, variant->data); \
-+				/* Let setup failure terminate early. */ \
-+				if (!_metadata->passed || _metadata->skip) \
-+					_exit(0); \
-+				_metadata->setup_completed = true; \
- 				fixture_name##_##test_name(_metadata, &self, variant->data); \
--				_exit(0); \
--			} \
--			if (child < 0) { \
-+			} else if (child < 0 || child != waitpid(child, &status, 0)) { \
- 				ksft_print_msg("ERROR SPAWNING TEST GRANDCHILD\n"); \
- 				_metadata->passed = 0; \
- 			} \
- 		} \
--		if (child == 0) \
--			/* Child failed and updated the shared _metadata. */ \
-+		if (child == 0) { \
-+			if (_metadata->setup_completed && !_metadata->teardown_parent) \
-+				fixture_name##_teardown(_metadata, &self, variant->data); \
- 			_exit(0); \
--		if (_metadata->setup_completed) \
-+		} \
-+		if (_metadata->setup_completed && _metadata->teardown_parent) \
- 			fixture_name##_teardown(_metadata, &self, variant->data); \
-+		if (!WIFEXITED(status) && WIFSIGNALED(status)) \
-+			/* Forward signal to __wait_for_test(). */ \
-+			kill(getpid(), WTERMSIG(status)); \
- 		__test_check_assert(_metadata); \
- 	} \
- 	static struct __test_metadata \
-@@ -414,6 +418,7 @@
- 		.fixture = &_##fixture_name##_fixture_object, \
- 		.termsig = signal, \
- 		.timeout = tmout, \
-+		.teardown_parent = false, \
- 	 }; \
- 	static void __attribute__((constructor)) \
- 			_register_##fixture_name##_##test_name(void) \
-@@ -842,6 +847,7 @@ struct __test_metadata {
- 	bool timed_out;	/* did this test timeout instead of exiting? */
- 	bool aborted;	/* stopped test due to failed ASSERT */
- 	bool setup_completed; /* did setup finish? */
-+	bool teardown_parent; /* run teardown in a parent process */
- 	jmp_buf env;	/* for exiting out of test early */
- 	struct __test_results *results;
- 	struct __test_metadata *prev, *next;
-diff --git a/tools/testing/selftests/landlock/fs_test.c b/tools/testing/selftests/landlock/fs_test.c
-index 2d6d9b43d958..1d5952897e05 100644
---- a/tools/testing/selftests/landlock/fs_test.c
-+++ b/tools/testing/selftests/landlock/fs_test.c
-@@ -285,6 +285,8 @@ static void prepare_layout_opt(struct __test_metadata *const _metadata,
- 
- static void prepare_layout(struct __test_metadata *const _metadata)
- {
-+	_metadata->teardown_parent = true;
-+
- 	prepare_layout_opt(_metadata, &mnt_tmp);
- }
- 
-@@ -3861,9 +3863,7 @@ FIXTURE_SETUP(layout1_bind)
- 
- FIXTURE_TEARDOWN(layout1_bind)
- {
--	set_cap(_metadata, CAP_SYS_ADMIN);
--	EXPECT_EQ(0, umount(dir_s2d2));
--	clear_cap(_metadata, CAP_SYS_ADMIN);
-+	/* umount(dir_s2d2)) is handled by namespace lifetime. */
- 
- 	remove_layout1(_metadata);
- 
-@@ -4276,9 +4276,8 @@ FIXTURE_TEARDOWN(layout2_overlay)
- 	EXPECT_EQ(0, remove_path(lower_fl1));
- 	EXPECT_EQ(0, remove_path(lower_do1_fo2));
- 	EXPECT_EQ(0, remove_path(lower_fo1));
--	set_cap(_metadata, CAP_SYS_ADMIN);
--	EXPECT_EQ(0, umount(LOWER_BASE));
--	clear_cap(_metadata, CAP_SYS_ADMIN);
-+
-+	/* umount(LOWER_BASE)) is handled by namespace lifetime. */
- 	EXPECT_EQ(0, remove_path(LOWER_BASE));
- 
- 	EXPECT_EQ(0, remove_path(upper_do1_fu3));
-@@ -4287,14 +4286,11 @@ FIXTURE_TEARDOWN(layout2_overlay)
- 	EXPECT_EQ(0, remove_path(upper_do1_fo2));
- 	EXPECT_EQ(0, remove_path(upper_fo1));
- 	EXPECT_EQ(0, remove_path(UPPER_WORK "/work"));
--	set_cap(_metadata, CAP_SYS_ADMIN);
--	EXPECT_EQ(0, umount(UPPER_BASE));
--	clear_cap(_metadata, CAP_SYS_ADMIN);
-+
-+	/* umount(UPPER_BASE)) is handled by namespace lifetime. */
- 	EXPECT_EQ(0, remove_path(UPPER_BASE));
- 
--	set_cap(_metadata, CAP_SYS_ADMIN);
--	EXPECT_EQ(0, umount(MERGE_DATA));
--	clear_cap(_metadata, CAP_SYS_ADMIN);
-+	/* umount(MERGE_DATA)) is handled by namespace lifetime. */
- 	EXPECT_EQ(0, remove_path(MERGE_DATA));
- 
- 	cleanup_layout(_metadata);
-@@ -4691,6 +4687,8 @@ FIXTURE_SETUP(layout3_fs)
- 		SKIP(return, "this filesystem is not supported (setup)");
- 	}
- 
-+	_metadata->teardown_parent = true;
-+
- 	slash = strrchr(variant->file_path, '/');
- 	ASSERT_NE(slash, NULL);
- 	dir_len = (size_t)slash - (size_t)variant->file_path;
-
-
-On Mon, Mar 04, 2024 at 08:31:49PM +0100, Mickaël Salaün wrote:
-> On Mon, Mar 04, 2024 at 08:27:50PM +0100, Mickaël Salaün wrote:
-> > Testing the whole series, I found that some Landlock tests are flaky
-> > starting with this patch.  I tried to not use the longjmp in the
-> > grandchild but it didn't change.  I suspect missing volatiles but I
-> > didn't find the faulty one(s) yet. :/
-> > I'll continue investigating tomorrow but help would be much appreciated!
-> 
-> The issue is with the fs_test.c, often starting with this one:
-> 
-> #  RUN           layout1.relative_chroot_only ...
-> # fs_test.c:294:relative_chroot_only:Expected 0 (0) == umount(TMP_DIR) (-1)
-> # fs_test.c:296:relative_chroot_only:Expected 0 (0) == remove_path(TMP_DIR) (16)
-> # relative_chroot_only: Test failed
-> #          FAIL  layout1.relative_chroot_only
-> 
-> ...or this one:
-> 
-> #  RUN           layout3_fs.hostfs.tag_inode_dir_child ...
-> # fs_test.c:4707:tag_inode_dir_child:Expected 0 (0) == mkdir(self->dir_path, 0700) (-1)
-> # fs_test.c:4709:tag_inode_dir_child:Failed to create directory "tmp/dir": No such file or directory
-> # fs_test.c:4724:tag_inode_dir_child:Expected 0 (0) <= fd (-1)
-> # fs_test.c:4726:tag_inode_dir_child:Failed to create file "tmp/dir/file": No such file or directory
-> # fs_test.c:4729:tag_inode_dir_child:Expected 0 (0) == close(fd) (-1)
-> # tag_inode_dir_child: Test failed
-> #          FAIL  layout3_fs.hostfs.tag_inode_dir_child
-> 
-
-This was because the vfork() wasn't followed by a wait().
+256 bytes should be reasonably large. I don't see anything beyond this 
+size appearing anytime soon or at all.
 
 > 
-> > 
-> > 
-> > On Wed, Feb 28, 2024 at 04:59:09PM -0800, Jakub Kicinski wrote:
-> > > From: Mickaël Salaün <mic@digikod.net>
-> > > 
-> > > Replace Landlock-specific TEST_F_FORK() with an improved TEST_F() which
-> > > brings four related changes:
-> > > 
-> > > Run TEST_F()'s tests in a grandchild process to make it possible to
-> > > drop privileges and delegate teardown to the parent.
-> > > 
-> > > Compared to TEST_F_FORK(), simplify handling of the test grandchild
-> > > process thanks to vfork(2), and makes it generic (e.g. no explicit
-> > > conversion between exit code and _metadata).
-> > > 
-> > > Compared to TEST_F_FORK(), run teardown even when tests failed with an
-> > > assert thanks to commit 63e6b2a42342 ("selftests/harness: Run TEARDOWN
-> > > for ASSERT failures").
-> > > 
-> > > Simplify the test harness code by removing the no_print and step fields
-> > > which are not used.  I added this feature just after I made
-> > > kselftest_harness.h more broadly available but this step counter
-> > > remained even though it wasn't needed after all. See commit 369130b63178
-> > > ("selftests: Enhance kselftest_harness.h to print which assert failed").
-> > > 
-> > > Replace spaces with tabs in one line of __TEST_F_IMPL().
-> > > 
-> > > Cc: Günther Noack <gnoack@google.com>
-> > > Cc: Shuah Khan <shuah@kernel.org>
-> > > Cc: Will Drewry <wad@chromium.org>
-> > > Signed-off-by: Mickaël Salaün <mic@digikod.net>
-> > > Reviewed-by: Kees Cook <keescook@chromium.org>
-> > > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> > > --
-> > > v4:
-> > >  - GAND -> GRAND
-> > >  - init child to 1, otherwise assert in setup triggers a longjmp
-> > >    which in turn reads child without it ever getting initialized
-> > >    (or being 0, i.e. we mistakenly assume we're in the grandchild)
-> > 
-> > Good catch!
+>> +	[OVPN_A_KEYDIR_NONCE_TAIL] = NLA_POLICY_EXACT_LEN(NONCE_TAIL_SIZE),
+>> +};
+>> +
+>> +/** KEYCONF policy */
+>> +static const struct nla_policy ovpn_nl_policy_keyconf[NUM_OVPN_A_KEYCONF] = {
+>> +	[OVPN_A_KEYCONF_SLOT] = NLA_POLICY_RANGE(NLA_U8, __OVPN_KEY_SLOT_FIRST,
+>> +						 NUM_OVPN_KEY_SLOT - 1),
+>> +	[OVPN_A_KEYCONF_KEY_ID] = { .type = NLA_U8 },
+> 
+> Is that 256 keys globally, or just associated to one session?
+
+This is specific to one peer, however, the OpenVPN protocol uses IDs up 
+7, therefore U8 is just the smallest unit I could use to fit those few 
+values.
+
+> 
+>> +	[OVPN_A_KEYCONF_CIPHER_ALG] = { .type = NLA_U16 },
+>> +	[OVPN_A_KEYCONF_ENCRYPT_DIR] = NLA_POLICY_NESTED(ovpn_nl_policy_keydir),
+>> +	[OVPN_A_KEYCONF_DECRYPT_DIR] = NLA_POLICY_NESTED(ovpn_nl_policy_keydir),
+>> +};
+>> +
+> 
+>> +/** Generic message container policy */
+>> +static const struct nla_policy ovpn_nl_policy[NUM_OVPN_A] = {
+>> +	[OVPN_A_IFINDEX] = { .type = NLA_U32 },
+>> +	[OVPN_A_IFNAME] = NLA_POLICY_MAX_LEN(IFNAMSIZ),
+> 
+> Generally, ifnames are not passed around, only ifindex. An interface
+> can have multiple names:
+> 
+> 12: enlr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc mq master br0 state DOWN group default qlen 1000
+>      link/ether 3c:ec:ef:7e:0a:90 brd ff:ff:ff:ff:ff:ff
+>      altname enp183s0f2
+>      altname eno7
+> 
+> It is better to let userspace figure out the name from the index,
+> since the name is mostly a user space concept.
+
+This is strictly related to your next question.
+Please see my answer below.
+
+> 
+>> +	[OVPN_A_MODE] = NLA_POLICY_RANGE(NLA_U8, __OVPN_MODE_FIRST,
+>> +					 NUM_OVPN_MODE - 1),
+>> +	[OVPN_A_PEER] = NLA_POLICY_NESTED(ovpn_nl_policy_peer),
+>> +};
+> 
+>> +static int ovpn_pre_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
+>> +			 struct genl_info *info)
+>> +{
+>> +	struct net *net = genl_info_net(info);
+>> +	struct net_device *dev;
+>> +
+>> +	/* the OVPN_CMD_NEW_IFACE command is different from the rest as it
+>> +	 * just expects an IFNAME, while all the others expect an IFINDEX
+>> +	 */
+> 
+> Could you explain that some more. In general, the name should not
+> matter to the kernel, udev/systemd might rename it soon after creation
+> etc. If it gets moved into a network namespace it might need renaming
+> etc.
+
+In a previous discussion it was agreed that we should create ovpn 
+interfaces via GENL and not via RTNL.
+
+For this reason ovpn needs userspace to send the name to give the 
+interface upon creation. This name is just passed to the networking 
+stack upon creation/registration, but it is not stored anywhere else.
+
+Subsequent netlink calls are then all performed by passing an ifindex.
+
+Hence, OVPN_CMD_NEW_IFACE is the only GENL command that required the 
+IFNAME to be specified.
+
+Does it make sense?
+
+
+> 
+>> +enum ovpn_nl_peer_attrs {
+>> +	OVPN_A_PEER_UNSPEC = 0,
+>> +	OVPN_A_PEER_ID,
+>> +	OVPN_A_PEER_RX_STATS,
+>> +	OVPN_A_PEER_TX_STATS,
+> 
+> Probably answered later in the patch series: What sort of statistics
+> do you expect here. Don't overlap any of the normal network statistics
+> with this here, please use the existing kAPIs for those. Anything you
+> return here need to be very specific to ovpn.
+
+Actually you found a leftover from an old approach.
+OVPN_A_PEER_RX_STATS and OVPN_A_PEER_TX_STATS shall be removed.
+
+The actual stats we store are those below:
+
+> 
+>> +	OVPN_A_PEER_VPN_RX_BYTES,
+>> +	OVPN_A_PEER_VPN_TX_BYTES,
+>> +	OVPN_A_PEER_VPN_RX_PACKETS,
+>> +	OVPN_A_PEER_VPN_TX_PACKETS,
+>> +	OVPN_A_PEER_LINK_RX_BYTES,
+>> +	OVPN_A_PEER_LINK_TX_BYTES,
+>> +	OVPN_A_PEER_LINK_RX_PACKETS,
+>> +	OVPN_A_PEER_LINK_TX_PACKETS,
+> 
+> How do these differ to standard network statistics? e.g. what is in
+> /sys/class/net/*/statistics/ ?
+
+The first difference is that these stats are per-peer and not 
+per-device. Behind each device there might be multiple peers connected.
+
+This way ovpn is able to tell how much data was sent/received by every 
+single connected peer.
+
+LINK and VPN store different values.
+LINK stats are recorded at the transport layer (before decapsulation or 
+after encapsulation), while VPN stats are recorded at the tunnel layer 
+(after decapsulation or before encapsulation).
+
+I didn't see how to convey the same information using the standard 
+statistics.
+
+Regards,
+
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
