@@ -1,108 +1,79 @@
-Return-Path: <netdev+bounces-77549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B4B1872296
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:23:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B304872299
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:23:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40F761F22B37
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:23:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 114CE1F220DF
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:23:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 236D11272B8;
-	Tue,  5 Mar 2024 15:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 612B31272A2;
+	Tue,  5 Mar 2024 15:23:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SI8lMgAi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p/xg4Rn/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06061272B5;
-	Tue,  5 Mar 2024 15:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D5874683
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 15:23:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709652186; cv=none; b=Bu0ZsJcPuWoZKfdNnEnR06NaQQJt1AbCY0pH4mwa7ZobwtAy6Zj9MW4aaVMSZCFV3Pv55t6wy+0SDzSYgk9pjN6lgYw4xu1voWOOxBfM8nozRPCc+O41LxhFceq6fY95aMZpf4ZkWTsjOh4taILNl/d2oKCgkuEJnvTUo6MEMtI=
+	t=1709652216; cv=none; b=Fu/QlWMrYPF0rcHmOTtRf8kMBTBz70EHaOAD98WEvnGlCiS2LZG3SiWY2V+Qyca2bDYQqtpEAvW0I/T7kLN5BBOO9959KFwB2/NhDdsLTsyGPgSAwFaJJrGmoinoyLps/n06IL20Hzmg+qjwrOzivoDxRHBXywXlbfegXwCoBP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709652186; c=relaxed/simple;
-	bh=u/5zzaDrYAhEqBfIpcoPHzssod74ijgVQkh52KemZi0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hA/CD/+YRHrBwdNM+jDaFxaZN3ujgO5DHy2ni1UU++nhriIHhAfRn7TiMsw/SRyrQA1W3ETZTARN732b/wCQUDl8PwYVty3ydMsUe92oeZBsZ+pHOWX53GV3C/DmHXVbzDJnYQ7dp6qU40JnkepEtiEmzu0Kso/DCAkeTr2MUx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SI8lMgAi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E819C433F1;
-	Tue,  5 Mar 2024 15:23:03 +0000 (UTC)
+	s=arc-20240116; t=1709652216; c=relaxed/simple;
+	bh=7nVpYFxir/53x4SicgSI/QhTWhwrS0QMmdcn5eWqDWI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=G1VqCEzd/rSfVF/tLyxAvr1ppcsfYSanpAzVg+A4VNboGcm6i8HDEJKVbEr3jbMA0XwrUD4PZiiamMmDoWiNEdRzd3hmWIyabLwr95ErQIQ3f6XP3Pu6/yLz0nwPsAyq5rkJU+GjKVp5PSLUQYDSNsSEvl6nimvvM+UiJBdtoHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p/xg4Rn/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 671CDC433C7;
+	Tue,  5 Mar 2024 15:23:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709652185;
-	bh=u/5zzaDrYAhEqBfIpcoPHzssod74ijgVQkh52KemZi0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SI8lMgAiTBnI9vsotV6qtjcQI1Kwgij530JvdiJ99cTux8H3xYBdo7wbJkpVyqVpS
-	 OVFHJ+2uwkQ0Z1z7+GpMSKqQYeIiSE4rn7M55cEqfQXaNCg/burHBTw38XrBX9Kymk
-	 FYOMUvFsz7QGgSix7ETQL9q1bOD3ckqrcv0C18yMdZ8NONlkzx6IBDTyA0l16RFDHZ
-	 gRMVJBQUCymMCQKqw2NKlNWDMT3OrZaO6bOKepfBby9SKDCptYXl5Xa9GVNQL3s9HZ
-	 mUovZ1uAF6LP3NxZ0oWShfAfqaLYvBN9hhVp4R3RNeRDO8wLv6vE10GR6OP7PBSIxJ
-	 2/PrQs3p2nZmw==
-Date: Tue, 5 Mar 2024 15:23:01 +0000
-From: Simon Horman <horms@kernel.org>
-To: Lena Wang =?utf-8?B?KOeOi+WonCk=?= <Lena.Wang@mediatek.com>
-Cc: "kuba@kernel.org" <kuba@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"dsahern@kernel.org" <dsahern@kernel.org>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	Shiming Cheng =?utf-8?B?KOaIkOivl+aYjik=?= <Shiming.Cheng@mediatek.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>
-Subject: Re: [PATCH net v4] ipv6: fib6_rules: flush route cache when rule is
- changed
-Message-ID: <20240305152301.GN2357@kernel.org>
-References: <09f2ab1b7946339da5092e10aa216e07c579c60b.camel@mediatek.com>
- <20240304204511.2026a56b@kernel.org>
- <d0621b969918ef41412b26d7e9a4918aaf4023d4.camel@mediatek.com>
+	s=k20201202; t=1709652215;
+	bh=7nVpYFxir/53x4SicgSI/QhTWhwrS0QMmdcn5eWqDWI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=p/xg4Rn/m5Ci5Z9bt59m1Ze+/TGJqbGeOywzUo0/ASbkSpMYUGx62oaKXZWRvUGaK
+	 W0pKMHwtKZpT4zer4Dpv8BLtKd4U0fBRZ7DSULE4yBEX67YUcXGzOixxWqoPKPpq97
+	 4XlJmMzbAEtXnZ1+RiBCc4wfSfwNurI6Xd4WvuHzb7c9rs4p/YS0L6RmEugLyNHuLL
+	 E2J+geCERv5j09Q08PKJDaGpzGCHMr6+ZEuIFCo1l/Kc+YSAkheomPCrwCtoaBYbxl
+	 SDBqwYP74NRFNVN9Ul3rMczFDUlwX+ld1L89jwNYy9euhTCZm9Vpls4ZMltBFrRUro
+	 W/2XngkLLC6EQ==
+Date: Tue, 5 Mar 2024 07:23:34 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Wander Lairson Costa <wander@redhat.com>, Yan Zhai <yan@cloudflare.com>
+Subject: Re: [PATCH v3 net-next 2/4] net: Allow to use SMP threads for
+ backlog NAPI.
+Message-ID: <20240305072334.59819960@kernel.org>
+In-Reply-To: <20240305103530.FEVh-64E@linutronix.de>
+References: <20240228121000.526645-1-bigeasy@linutronix.de>
+	<20240228121000.526645-3-bigeasy@linutronix.de>
+	<c37223527d5b6bcf0ffce69c81f16fd0781fa2d6.camel@redhat.com>
+	<20240305103530.FEVh-64E@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d0621b969918ef41412b26d7e9a4918aaf4023d4.camel@mediatek.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 05, 2024 at 01:01:24PM +0000, Lena Wang (王娜) wrote:
-> On Mon, 2024-03-04 at 20:45 -0800, Jakub Kicinski wrote:
-> >  	 
-> > External email : Please do not click links or open attachments until
-> > you have verified the sender or the content.
-> >  On Fri, 1 Mar 2024 14:39:46 +0000 Lena Wang (王娜) wrote:
-> > > From: Shiming Cheng <shiming.cheng@mediatek.com>
-> > > 
-> > > When rule policy is changed, ipv6 socket cache is not refreshed.
-> > > The sock's skb still uses a outdated route cache and was sent to
-> > > a wrong interface.
-> > > 
-> > > To avoid this error we should update fib node's version when
-> > > rule is changed. Then skb's route will be reroute checked as
-> > > route cache version is already different with fib node version.
-> > > The route cache is refreshed to match the latest rule.
-> > 
-> > Doesn't apply, please rebase on top of latest net/main.
-> Hi Jakub,
-> I use master branch to make this patch. And it seems same with
-> main branch of kernel/git/netdev/net.git.
-> 
-> Could you tell me which branch should be used?
-> 
-> Thanks
-> Lena
+On Tue, 5 Mar 2024 11:35:30 +0100 Sebastian Andrzej Siewior wrote:
+> I had RH benchmarking this and based on their 25Gbe and 50Gbe NICs and
+> the results look good. If anything it looked a bit better with this on
+> the 50Gbe NICs but since those NICs have RSS=E2=80=A6
 
-Hi Lena,
-
-The primary branch is main these days.
-If you are using master than it may well be stale.
-
-For reference, the current HEAD commit is.
-
-4daa873133d3 ("Merge tag 'mlx5-fixes-2024-03-01' of git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux")
+TBH if y'all tested this with iperf that's pretty meaningless.
+The concern is not as much throughput on an idle system as it=20
+is the fact that we involve scheduler with it's heuristics
+for every NAPI run.
+But I recognize that your access to production workloads may=20
+be limited and you did more than most, so =F0=9F=A4=B7=EF=B8=8F
 
