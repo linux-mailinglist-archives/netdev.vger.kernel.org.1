@@ -1,240 +1,219 @@
-Return-Path: <netdev+bounces-77663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C004E872858
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 21:11:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9314B87285B
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 21:11:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3038DB2B5DC
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 20:11:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03D2FB2B7D0
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 20:11:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A4FB1292E9;
-	Tue,  5 Mar 2024 20:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A6B1272CC;
+	Tue,  5 Mar 2024 20:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="iqRjI1Dy"
+	dkim=pass (2048-bit key) header.d=marliere.net header.i=@marliere.net header.b="kepbZQeZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-190e.mail.infomaniak.ch (smtp-190e.mail.infomaniak.ch [185.125.25.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7ACC1272CC
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 20:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636D75C5FD;
+	Tue,  5 Mar 2024 20:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709669464; cv=none; b=T+5dNrJa1b4FbngL85BJsk86YHPOcJMkWfQr2siu9l2i85UUylg8jZKN/AjsHLI/HRShLT3T6fuWWzlaUk3YjZDFuWG++xSlAK9tEjZRQEnWyZblv5ZOB1WrPuWWEjx593DWrDbCGXkPeeTZ8MSI65dA0Z05aYd5sVDna6yg6v0=
+	t=1709669494; cv=none; b=pLuBLR+c30C6ZFOClftRpE6P+8X1Zwr8gKeuu/W/ZkcJ+/8lkVIOFcIloEgVFcj9YXXWIhG6xMDmQfigvskWlKoVOHiAu1NnCPKIHDSocG5vVBjNNk/uh0DiLGm7FfWRIgCEyfkOfX5AaYJtxuxPGP70hmkw1OZcDdc0QZhtoCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709669464; c=relaxed/simple;
-	bh=YagDFFA6rbmtQARJcRghj4PIMIy8y9znN8rxiNy6FWo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ocuQ8s8cHCjbn9MDGjy2pVgrDlCwPFJogdpnB5y7FIt+nwbfvWRu3rhUPy8Xqt5BiGlHtCPHA6xIr/GF3M/Tn665PL6L3UR/zxWMnJSDYjZdISipC8yhfk9SYmLrnJ16htmexTyzp1oLgIPAi+Qh0V8Q8BvXBbSwcnyu+x1PR2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=iqRjI1Dy; arc=none smtp.client-ip=185.125.25.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Tq6Bh3hBzzMqFcJ;
-	Tue,  5 Mar 2024 21:10:52 +0100 (CET)
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4Tq6Bg4Rt6z3W;
-	Tue,  5 Mar 2024 21:10:51 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1709669452;
-	bh=YagDFFA6rbmtQARJcRghj4PIMIy8y9znN8rxiNy6FWo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iqRjI1Dy24DR8Hdurm3d3isbc56yHWvmpEKMfRgZ0QEGyvKHer+cdIGDKvDQeYKas
-	 11oLvI7VsJYOxwcNZUAiNi8sfJJyapxPmMqHGWJCPMgb11x7Wk2vDMQCoG++3Tdt3x
-	 wtP9I51i9h8vpR3tiipkGYG2oxtCb/Z4Pq8eEIls=
-From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
-To: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kees Cook <keescook@chromium.org>,
-	Mark Brown <broonie@kernel.org>,
-	Shuah Khan <shuah@kernel.org>
-Cc: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
-	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
-	Will Drewry <wad@chromium.org>,
-	edumazet@google.com,
-	jakub@cloudflare.com,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH] selftests/harness: Fix TEST_F()'s vfork handling
-Date: Tue,  5 Mar 2024 21:10:29 +0100
-Message-ID: <20240305201029.1331333-1-mic@digikod.net>
-In-Reply-To: <20240305.sheeF9yain1O@digikod.net>
-References: <20240305.sheeF9yain1O@digikod.net>
+	s=arc-20240116; t=1709669494; c=relaxed/simple;
+	bh=sBMG2Sdf93554VyRVy3RWJ9u84ZlTno+zPBBKHQmVqM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=fdhCsiVBd8oU3+6xj9/kQlaX1jfcz0NIJwlPQIFns7IS8URe4PlrG+W6J1jpBUq2gJHp2rzkrz9GBh1UX1gTYIjSxcIItSF00zhUGOpnsROq2l5nTwUpDE+vLoPt3hWhjVwQpai2g6vSJULasluliVV4B5DASpTUFGQ20xelR/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=marliere.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=marliere.net header.i=@marliere.net header.b=kepbZQeZ; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=marliere.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1dc75972f25so51072195ad.1;
+        Tue, 05 Mar 2024 12:11:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709669492; x=1710274292;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:dkim-signature:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2Hssqx8a/gP1qJ3tFv3UV+u3V+2x5mG70hb0AJG6/qE=;
+        b=LnV8DVvQaRKiAvYfHdVVuxeQMLcSxzonx0l21vQVXmOR1bhoZMOzxUkg3YZ8Qf5/Uh
+         XL/i7t9SNlK+UsHGKcmUjHgAzW/Hybf3QeAF+mpWW7M7B9yYx1xhIfKI3eA/IcQEJ8Vr
+         z1g1WZBoRKFJssgaVN3vr5KO8pv5s8707sfG3HtbYeU6XpcZSyKW1Splf9KCirUZb9Xc
+         Dttb3hvPpdbhd7fztemGLHck+MRhoJ9Ys/Fe7qP2+oOqzlhIOm0Vqsq8w46tE/h4+61U
+         Ph+xuLWSv429A8ljE5cOfSzQ2fT3AlIMYP2ISXIhkWy5dJ4duRlwWbmrgw+mbLBE9jbH
+         D4rw==
+X-Forwarded-Encrypted: i=1; AJvYcCXERQbOJurjmr1NX420b980CQAQb2uM2ArOpv05EZC4X7gS0e3K7fgfebkLfpZqjOP7UCLg9lIuZllzBwCRFKZG7ylQ2Ht/OVv566HL
+X-Gm-Message-State: AOJu0YwYWm0EUHkwcLHCrn7HNIcIDNa+EbdMg3Xw+yrzESY8I6ZbkJeT
+	7TydIlCSKFXoYFhh9w8Gy5a2ZJvv62bakN469HoE9v4W9ZZQiynZ
+X-Google-Smtp-Source: AGHT+IESvt2XwY85Rot2nB1gUxXTUfdjQfryJf0lu7DyyEeeKYVDTFL5M2iRWxv2WD35uGUmeOaZsw==
+X-Received: by 2002:a17:903:11cc:b0:1dc:7fb4:20cb with SMTP id q12-20020a17090311cc00b001dc7fb420cbmr3210157plh.62.1709669492572;
+        Tue, 05 Mar 2024 12:11:32 -0800 (PST)
+Received: from mail.marliere.net ([24.199.118.162])
+        by smtp.gmail.com with ESMTPSA id f4-20020a170902684400b001dbbe6f1dc5sm11120996pln.40.2024.03.05.12.11.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Mar 2024 12:11:32 -0800 (PST)
+From: "Ricardo B. Marliere" <ricardo@marliere.net>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marliere.net;
+	s=2024; t=1709669490;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2Hssqx8a/gP1qJ3tFv3UV+u3V+2x5mG70hb0AJG6/qE=;
+	b=kepbZQeZSyt7ND4rRil76mwRz3fXglBp6lsC6VgieHMDNJMYOnmKMbFqioO//1nZVrTT1T
+	hq7YdpNwgDHD9AJGSzafa37oWw+DZvkfFrsE5y+DCtOEpzF3I3L8jVIbEx2NaP0KTgbs1w
+	Mm/lvMlW1jdiRTZLDG38UqFMNE6+7873bIiFIYHxXjMj1TjuSNOHtOkM3uRVPDMYt3B+kD
+	koJm7nIhx8wrSSuVJpGmHO4yEdYBPgkgSpjYxmw5rvcGvs/lAz7vFdJQ3CPj/4iwE0w6Jh
+	xzL7MjPzXIohI/DMGi8MQBwbtD+94gUcL1+kDcLF8vDMiuYQiC7gVQjl1HZ1iw==
+Authentication-Results: ORIGINATING;
+	auth=pass smtp.auth=ricardo@marliere.net smtp.mailfrom=ricardo@marliere.net
+Date: Tue, 05 Mar 2024 17:11:27 -0300
+Subject: [PATCH] ptp: make ptp_class constant
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240305-ptp-v1-1-ed253eb33c20@marliere.net>
+X-B4-Tracking: v=1; b=H4sIAG5852UC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDYwNT3YKSAl0zoxRDEwtDSzNLE3MloMqCotS0zAqwKdGxtbUASlJSbVU
+ AAAA=
+To: Richard Cochran <richardcochran@gmail.com>, 
+ Yangbo Lu <yangbo.lu@nxp.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Ricardo B. Marliere" <ricardo@marliere.net>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3461; i=ricardo@marliere.net;
+ h=from:subject:message-id; bh=sBMG2Sdf93554VyRVy3RWJ9u84ZlTno+zPBBKHQmVqM=;
+ b=owEBbQKS/ZANAwAKAckLinxjhlimAcsmYgBl53xvM24B2UdXp52EeONnoHNXzM18gGWh5ZAU3
+ 59SYUNxKn2JAjMEAAEKAB0WIQQDCo6eQk7jwGVXh+HJC4p8Y4ZYpgUCZed8bwAKCRDJC4p8Y4ZY
+ puy7D/41SV4zg3/dSkWGB52omGUYRCNvpYFT/ZPlM7lXiEmNw2Jc006JrM+x3VZISTYhKO2u9vX
+ CBRlG04TopN3GANwhkNnFi+jGmwcQS8ijFNd0Z694bkhKK2pwasoQ14a+Arp1e1FS57aJz3Ey4u
+ JdwbIOfh8TCnUefI4t8k35I5gytuEFrb01FjPZJrxWYWw0IYZJcvsi+UiRnUKZNxZsUwXgxRtFe
+ 17Pj8xfv/2aeMtkcfyufebi9u3nTZfM1voPBtBCajL280ATmdJcS1JBOQTp0wprvy7ReWCNVAW3
+ AfQ3pAh4br/1vXA/8RX0k7zVXtVY0Yi42jx6wCbT0YLgn7IfnYtzQA4UOSR43ivLCuua0eUYmdx
+ JDOJfDMeAWY7WAPshgF0kD3OgWw1NHWEkBSfEi63lJl8ndW952mHRj4Jrp43VYl34zxyzIperVZ
+ qBa2Yu2tDRVmKawC5LdMaXosE9IviCMnvdRLsHXgPs+u5DbyBjxR6Cn6d4y2xcvyRepEYBhMa83
+ Pgs07NWJFj52ILA5CrUp7kzg4OgwabwHC5Tz8uInYUBomiRe2wmDvnvPVvPjPFUU0H2V92zSCZX
+ WZ473j68m2ZrYPr8iYa4FcMTqJAxUpH7dKB+VgqG+COsTFKiRpYiCkDtbzgBhreu1MqJXofZQYB
+ ke2CU9As7Ip/Xpw==
+X-Developer-Key: i=ricardo@marliere.net; a=openpgp;
+ fpr=030A8E9E424EE3C0655787E1C90B8A7C638658A6
 
-Always run fixture setup in the grandchild process, and by default also
-run the teardown in the same process.  However, this change makes it
-possible to run the teardown in a parent process when
-_metadata->teardown_parent is set to true (e.g. in fixture setup).
+Since commit 43a7206b0963 ("driver core: class: make class_register() take
+a const *"), the driver core allows for struct class to be in read-only
+memory, so move the ptp_class structure to be declared at build time
+placing it into read-only memory, instead of having to be dynamically
+allocated at boot time.
 
-Fix TEST_SIGNAL() by forwarding grandchild's signal to its parent.  Fix
-seccomp tests by running the test setup in the parent of the test
-thread, as expected by the related test code.  Fix Landlock tests by
-waiting for the grandchild before processing _metadata.
-
-Use of exit(3) in tests should be OK because the environment in which
-the vfork(2) call happen is already dedicated to the running test (with
-flushed stdio, setpgrp() call), see __run_test() and the call to fork(2)
-just before running the setup/test/teardown.  Even if the test
-configures its own exit handlers, they will not be run by the parent
-because it never calls exit(3), and the test function either ends with a
-call to _exit(2) or a signal.
-
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Günther Noack <gnoack@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Mark Brown <broonie@kernel.org>
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: Will Drewry <wad@chromium.org>
-Fixes: 0710a1a73fb4 ("selftests/harness: Merge TEST_F_FORK() into TEST_F()")
-Link: https://lore.kernel.org/r/20240305201029.1331333-1-mic@digikod.net
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
 ---
- tools/testing/selftests/kselftest_harness.h | 28 +++++++++++++--------
- tools/testing/selftests/landlock/fs_test.c  | 22 ++++++++--------
- 2 files changed, 27 insertions(+), 23 deletions(-)
+ drivers/ptp/ptp_clock.c   | 18 ++++++++++--------
+ drivers/ptp/ptp_private.h |  2 +-
+ drivers/ptp/ptp_vclock.c  |  2 +-
+ 3 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
-index 634be793ad58..4fd735e48ee7 100644
---- a/tools/testing/selftests/kselftest_harness.h
-+++ b/tools/testing/selftests/kselftest_harness.h
-@@ -382,29 +382,33 @@
- 		/* fixture data is alloced, setup, and torn down per call. */ \
- 		FIXTURE_DATA(fixture_name) self; \
- 		pid_t child = 1; \
-+		int status = 0; \
- 		memset(&self, 0, sizeof(FIXTURE_DATA(fixture_name))); \
- 		if (setjmp(_metadata->env) == 0) { \
--			fixture_name##_setup(_metadata, &self, variant->data); \
--			/* Let setup failure terminate early. */ \
--			if (_metadata->exit_code) \
--				return; \
--			_metadata->setup_completed = true; \
- 			/* Use the same _metadata. */ \
- 			child = vfork(); \
- 			if (child == 0) { \
-+				fixture_name##_setup(_metadata, &self, variant->data); \
-+				/* Let setup failure terminate early. */ \
-+				if (_metadata->exit_code) \
-+					_exit(0); \
-+				_metadata->setup_completed = true; \
- 				fixture_name##_##test_name(_metadata, &self, variant->data); \
--				_exit(0); \
--			} \
--			if (child < 0) { \
-+			} else if (child < 0 || child != waitpid(child, &status, 0)) { \
- 				ksft_print_msg("ERROR SPAWNING TEST GRANDCHILD\n"); \
- 				_metadata->exit_code = KSFT_FAIL; \
- 			} \
- 		} \
--		if (child == 0) \
--			/* Child failed and updated the shared _metadata. */ \
-+		if (child == 0) { \
-+			if (_metadata->setup_completed && !_metadata->teardown_parent) \
-+				fixture_name##_teardown(_metadata, &self, variant->data); \
- 			_exit(0); \
--		if (_metadata->setup_completed) \
-+		} \
-+		if (_metadata->setup_completed && _metadata->teardown_parent) \
- 			fixture_name##_teardown(_metadata, &self, variant->data); \
-+		if (!WIFEXITED(status) && WIFSIGNALED(status)) \
-+			/* Forward signal to __wait_for_test(). */ \
-+			kill(getpid(), WTERMSIG(status)); \
- 		__test_check_assert(_metadata); \
- 	} \
- 	static struct __test_metadata \
-@@ -414,6 +418,7 @@
- 		.fixture = &_##fixture_name##_fixture_object, \
- 		.termsig = signal, \
- 		.timeout = tmout, \
-+		.teardown_parent = false, \
- 	 }; \
- 	static void __attribute__((constructor)) \
- 			_register_##fixture_name##_##test_name(void) \
-@@ -873,6 +878,7 @@ struct __test_metadata {
- 	bool timed_out;	/* did this test timeout instead of exiting? */
- 	bool aborted;	/* stopped test due to failed ASSERT */
- 	bool setup_completed; /* did setup finish? */
-+	bool teardown_parent; /* run teardown in a parent process */
- 	jmp_buf env;	/* for exiting out of test early */
- 	struct __test_results *results;
- 	struct __test_metadata *prev, *next;
-diff --git a/tools/testing/selftests/landlock/fs_test.c b/tools/testing/selftests/landlock/fs_test.c
-index 98817a14c91b..9a6036fbf289 100644
---- a/tools/testing/selftests/landlock/fs_test.c
-+++ b/tools/testing/selftests/landlock/fs_test.c
-@@ -285,6 +285,8 @@ static void prepare_layout_opt(struct __test_metadata *const _metadata,
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 15b804ba4868..00c7992fd43f 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -25,7 +25,10 @@
+ #define PTP_PPS_EVENT PPS_CAPTUREASSERT
+ #define PTP_PPS_MODE (PTP_PPS_DEFAULTS | PPS_CANWAIT | PPS_TSFMT_TSPEC)
  
- static void prepare_layout(struct __test_metadata *const _metadata)
+-struct class *ptp_class;
++const struct class ptp_class = {
++	.name = "ptp",
++	.dev_groups = ptp_groups
++};
+ 
+ /* private globals */
+ 
+@@ -322,7 +325,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	/* Initialize a new device of our class in our clock structure. */
+ 	device_initialize(&ptp->dev);
+ 	ptp->dev.devt = ptp->devid;
+-	ptp->dev.class = ptp_class;
++	ptp->dev.class = &ptp_class;
+ 	ptp->dev.parent = parent;
+ 	ptp->dev.groups = ptp->pin_attr_groups;
+ 	ptp->dev.release = ptp_clock_release;
+@@ -495,7 +498,7 @@ EXPORT_SYMBOL(ptp_cancel_worker_sync);
+ 
+ static void __exit ptp_exit(void)
  {
-+	_metadata->teardown_parent = true;
-+
- 	prepare_layout_opt(_metadata, &mnt_tmp);
+-	class_destroy(ptp_class);
++	class_unregister(&ptp_class);
+ 	unregister_chrdev_region(ptp_devt, MINORMASK + 1);
+ 	ida_destroy(&ptp_clocks_map);
  }
- 
-@@ -3861,9 +3863,7 @@ FIXTURE_SETUP(layout1_bind)
- 
- FIXTURE_TEARDOWN(layout1_bind)
+@@ -504,10 +507,10 @@ static int __init ptp_init(void)
  {
--	set_cap(_metadata, CAP_SYS_ADMIN);
--	EXPECT_EQ(0, umount(dir_s2d2));
--	clear_cap(_metadata, CAP_SYS_ADMIN);
-+	/* umount(dir_s2d2)) is handled by namespace lifetime. */
+ 	int err;
  
- 	remove_layout1(_metadata);
- 
-@@ -4276,9 +4276,8 @@ FIXTURE_TEARDOWN(layout2_overlay)
- 	EXPECT_EQ(0, remove_path(lower_fl1));
- 	EXPECT_EQ(0, remove_path(lower_do1_fo2));
- 	EXPECT_EQ(0, remove_path(lower_fo1));
--	set_cap(_metadata, CAP_SYS_ADMIN);
--	EXPECT_EQ(0, umount(LOWER_BASE));
--	clear_cap(_metadata, CAP_SYS_ADMIN);
-+
-+	/* umount(LOWER_BASE)) is handled by namespace lifetime. */
- 	EXPECT_EQ(0, remove_path(LOWER_BASE));
- 
- 	EXPECT_EQ(0, remove_path(upper_do1_fu3));
-@@ -4287,14 +4286,11 @@ FIXTURE_TEARDOWN(layout2_overlay)
- 	EXPECT_EQ(0, remove_path(upper_do1_fo2));
- 	EXPECT_EQ(0, remove_path(upper_fo1));
- 	EXPECT_EQ(0, remove_path(UPPER_WORK "/work"));
--	set_cap(_metadata, CAP_SYS_ADMIN);
--	EXPECT_EQ(0, umount(UPPER_BASE));
--	clear_cap(_metadata, CAP_SYS_ADMIN);
-+
-+	/* umount(UPPER_BASE)) is handled by namespace lifetime. */
- 	EXPECT_EQ(0, remove_path(UPPER_BASE));
- 
--	set_cap(_metadata, CAP_SYS_ADMIN);
--	EXPECT_EQ(0, umount(MERGE_DATA));
--	clear_cap(_metadata, CAP_SYS_ADMIN);
-+	/* umount(MERGE_DATA)) is handled by namespace lifetime. */
- 	EXPECT_EQ(0, remove_path(MERGE_DATA));
- 
- 	cleanup_layout(_metadata);
-@@ -4691,6 +4687,8 @@ FIXTURE_SETUP(layout3_fs)
- 		SKIP(return, "this filesystem is not supported (setup)");
+-	ptp_class = class_create("ptp");
+-	if (IS_ERR(ptp_class)) {
++	err = class_register(&ptp_class);
++	if (err) {
+ 		pr_err("ptp: failed to allocate class\n");
+-		return PTR_ERR(ptp_class);
++		return err;
  	}
  
-+	_metadata->teardown_parent = true;
-+
- 	slash = strrchr(variant->file_path, '/');
- 	ASSERT_NE(slash, NULL);
- 	dir_len = (size_t)slash - (size_t)variant->file_path;
+ 	err = alloc_chrdev_region(&ptp_devt, 0, MINORMASK + 1, "ptp");
+@@ -516,12 +519,11 @@ static int __init ptp_init(void)
+ 		goto no_region;
+ 	}
+ 
+-	ptp_class->dev_groups = ptp_groups;
+ 	pr_info("PTP clock support registered\n");
+ 	return 0;
+ 
+ no_region:
+-	class_destroy(ptp_class);
++	class_unregister(&ptp_class);
+ 	return err;
+ }
+ 
+diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
+index 45f9002a5dca..18934e28469e 100644
+--- a/drivers/ptp/ptp_private.h
++++ b/drivers/ptp/ptp_private.h
+@@ -120,7 +120,7 @@ static inline bool ptp_clock_freerun(struct ptp_clock *ptp)
+ 	return ptp_vclock_in_use(ptp);
+ }
+ 
+-extern struct class *ptp_class;
++extern const struct class ptp_class;
+ 
+ /*
+  * see ptp_chardev.c
+diff --git a/drivers/ptp/ptp_vclock.c b/drivers/ptp/ptp_vclock.c
+index dcf752c9e045..7febfdcbde8b 100644
+--- a/drivers/ptp/ptp_vclock.c
++++ b/drivers/ptp/ptp_vclock.c
+@@ -241,7 +241,7 @@ int ptp_get_vclocks_index(int pclock_index, int **vclock_index)
+ 		return num;
+ 
+ 	snprintf(name, PTP_CLOCK_NAME_LEN, "ptp%d", pclock_index);
+-	dev = class_find_device_by_name(ptp_class, name);
++	dev = class_find_device_by_name(&ptp_class, name);
+ 	if (!dev)
+ 		return num;
+ 
+
+---
+base-commit: 90d35da658da8cff0d4ecbb5113f5fac9d00eb72
+change-id: 20240305-ptp-62d148196947
+
+Best regards,
 -- 
-2.44.0
+Ricardo B. Marliere <ricardo@marliere.net>
 
 
