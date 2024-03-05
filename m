@@ -1,142 +1,169 @@
-Return-Path: <netdev+bounces-77675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E02D8872980
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 22:35:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0E9D8729AF
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 22:49:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 035CFB30B7A
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 21:32:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D642B26B34
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 21:42:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8612E12C52F;
-	Tue,  5 Mar 2024 21:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C7B412C52F;
+	Tue,  5 Mar 2024 21:42:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y+wtPBUI"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Z2vvL2+R";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LrbQnx0g"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A23C312AAD1
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 21:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D5F18AE0;
+	Tue,  5 Mar 2024 21:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709674307; cv=none; b=nuHPG2rB01QWuf5Sf6MdPfZUwClsEdAmXzIl0xSoOLwPYsEHGrUAd7O4mLfQAY3XNBl2d9Tx91mRh1lH4l40UMqeWsm5sarqrHxGpyTbQbyqU5PlZ79wVVGYE52KlaSgG8j8GQJL2eMv+ecy1tKNsa0KfQKuQZhkHox0i5vapwU=
+	t=1709674953; cv=none; b=Q749dxljae0NIK2GACMOmiWeT6sOIkxPmSbkSLwzGuCL6G2UiC4+9zxN3z4bytSSI4KitJIcFwzbC62UJ5g/ylPQBElVp4Hexyv8icbWXTx4yZ54LIKPw0EmSttGGSrYDxG94uooWJvQncq70x5t6G/XNPer4gyRi+eccnR6zcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709674307; c=relaxed/simple;
-	bh=c2tBWwf0cMAGCU9YX9FKO5lYX87Jxw0bh6LWR+bye8Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Brc7D0m7FvzCnaPnW1Ziq+MLdSx6xK0JgXpVcn9UhPrYaAIgGuLYa6Vhu/znwguIe1NLYQ9hFm0LPV4+uY7MEztPHCXqloQi/LdlRPHXe+uCJWvgoVQD32uLZapAlzmPWbFogFpCDiurqDGrzt3EmVyKfMFSqnaoSBWUPrDSkwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y+wtPBUI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709674303;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=lVAdr6UkmCrZ9tYEoFXnHSP62RXZ64wDxSuFsnLt/kI=;
-	b=Y+wtPBUI1X16ly2wt9K2DAOwGgqYva69NjYhe09Yq5l0B0a140X3QDZxkqTZqcqMdNkQfs
-	QG+a+auq6JHpag5CNSRy5hLTRUGnccoPX3LYZGjzYndQ4L8OMZwyj6o4vUwrN56gMsu//r
-	0nwMtDuq53mO2KzakI+ytJX+DKWgJCI=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-18-Lrl5keEiOiuwuN90pGBFKQ-1; Tue, 05 Mar 2024 16:31:42 -0500
-X-MC-Unique: Lrl5keEiOiuwuN90pGBFKQ-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5670ee87ca4so648837a12.2
-        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 13:31:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709674301; x=1710279101;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lVAdr6UkmCrZ9tYEoFXnHSP62RXZ64wDxSuFsnLt/kI=;
-        b=mF8RuFPRNk3ZMba1E7+9b3HnU3L0CKrNoC7zXlvxikN05jqhH/xy9xIQ6RKUcdI76N
-         hFIZ6apxjAkhTXFeIwAAk3Lxgz5oLrCanuSu1SZCww+uXnejL//dF1qc4ecYvJx1ZEjz
-         PM4ZE7aBC5Wsqm0/9syFLmsPB9Z0lRfOppZJ23vuS/nuOsWCRhzQHOOa0G6BQxDvIiIA
-         LJVmAC4vujiPyE/f/qBorYq4xULCVtoOGXFs6ir1b4nr9bnq67q5qYTFOKxm3EjqElm5
-         QFDrJQkmzM9ByoYl74hMGqTVZYWwEsJvvNv62sWCSvTigC9P7cj7c2Ezt7Hff9uZJNSG
-         dfwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVGrhAGYDbLL6zYpkuEm4Bgy5FEcFd58QRVaKjTX7K6gPj0Fj1dETZNWd0bCvTAawaIx7iIDJSfggwhW4eYs3Ez74HJlTiI
-X-Gm-Message-State: AOJu0YxLGLuRRHi3Ph+FWHNef6BU5B0YlaR5SMWVMxn13wx9yPjdI8qf
-	T/P8Y2PBQTAwciUgXf/urdJrwA77CZo+HCxqXaYogiGcdDcs6vy765Pqw1AmZYa3wTaP5dGdn7Y
-	ZZB6j6GgVAJ82Nm8FswGNbjEcWoQXfNRR2ufc0PoisHHb+GNyk2BJrw==
-X-Received: by 2002:a50:8dc5:0:b0:566:ef9:30ce with SMTP id s5-20020a508dc5000000b005660ef930cemr9515115edh.3.1709674300935;
-        Tue, 05 Mar 2024 13:31:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IETLH7GBGYVTttFWYaJGYWfbMpRh7A5ohYnvL8+4jmjv8lp9MDF8S9pzKHdvJZCo4Y9hcs9Aw==
-X-Received: by 2002:a50:8dc5:0:b0:566:ef9:30ce with SMTP id s5-20020a508dc5000000b005660ef930cemr9515108edh.3.1709674300587;
-        Tue, 05 Mar 2024 13:31:40 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id x4-20020a056402414400b005666465520dsm6244838eda.26.2024.03.05.13.31.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Mar 2024 13:31:40 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 92621112F008; Tue,  5 Mar 2024 22:31:39 +0100 (CET)
-From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	=?UTF-8?q?Tobias=20B=C3=B6hm?= <tobias@aibor.de>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH bpf] cpumap: Zero-initialise xdp_rxq_info struct before running XDP program
-Date: Tue,  5 Mar 2024 22:31:32 +0100
-Message-ID: <20240305213132.11955-1-toke@redhat.com>
-X-Mailer: git-send-email 2.43.2
+	s=arc-20240116; t=1709674953; c=relaxed/simple;
+	bh=wZkSkX9694x6IaB7S0oYpjmKV7DkKNY9dxbFCcaTTio=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=Z3Pvw4Do4DDv3xhA399z3eLzD/AUs5ZcmuJYr3Z/a2cfcVV7zF4Fq3vvys+gJNrH3jNPZFAUKG0CQgrhxsEr6jX1V43CKZDc8UE/hyZnqhHujb+VqaWVTDwismzi6iEVvnDereeLYZY4fCWowJQPDVEqGh1r6FlIJ9QWKIuxAwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Z2vvL2+R; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LrbQnx0g; arc=none smtp.client-ip=64.147.123.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.west.internal (Postfix) with ESMTP id BD3A732002E8;
+	Tue,  5 Mar 2024 16:42:28 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Tue, 05 Mar 2024 16:42:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1709674948;
+	 x=1709761348; bh=Hz9n4ApIEoOa8ewx4aHPiFWUsa7oc5PoCFR5tHWnstc=; b=
+	Z2vvL2+RHREKBnnShKno4/jb1cVWnYIk/pbKst0T9GSgO+GTD+lqnOzBt15TR/gF
+	Ov/CnFYWmAdf2IiC3orlU2Pht/2QkoWd+aGToBLtJ5AfaXhx/HX9XmU6pWQyp/X+
+	AX8T8Irot7PqLSsirVN+Fh7InwWa1J5x7mNhMtcaX5fDZac08EXHvoHM2LZIBZWE
+	LrqpFhY+rhTSVfmW7ug7d//DdSDdXHRtyxRSEkef94liSBPoxn1LSI1jugALqKP1
+	upSMHg/1B+GDecCwjhCiCzxyasjUnkQM5uqXW3kZmEcinluhig+8c4OhxN9mojCT
+	+k+1KVpJarAAbgrXrH7jNg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1709674948; x=
+	1709761348; bh=Hz9n4ApIEoOa8ewx4aHPiFWUsa7oc5PoCFR5tHWnstc=; b=L
+	rbQnx0gPIWfZS390XfNT6ZEqwXUw9civMU/UkkPBwkknC9mWgetd9fjEX4tI4MYb
+	1HJtZ/9H+AHdr5rAgDfC6agUd1WbWNzREy8a6wgtkj6IcPa/opvwMQ32XZ8Bzpcn
+	wIe75VJIaLK+cZwjeXwta/r7SEoJ78IzGmAS8+kB3cObvRTslByL0hDQo2c/fNX/
+	kKfHtGqFSumbh44rUaUFyQajtHHTbyjEoF821OxX9Qf1YN1SKnezhh1p4xsbjuM+
+	7AMju9IR0lhxNiPoiOCzS46k+Ep1m6s+HkMWNyIyl5cXiBkPfOlij12bqWS79vhO
+	k2Lf3PG8L/HB/Ikm1Z9Ng==
+X-ME-Sender: <xms:xJHnZRPebw6SNE3J8I7RkTXxbhOBak8toh3zF8ktJQh7guttCQi5yQ>
+    <xme:xJHnZT-8oCIfpkUTrmAAoz88Oo4WT-KhnfVUvTlXRl2pqsbJYpaxSNTGQzCBeHy10
+    fdJ5kIf98j7nwsumWc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrheelgddugeekucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
+    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
+    htthgvrhhnpeegfeejhedvledvffeijeeijeeivddvhfeliedvleevheejleetgedukedt
+    gfejveenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:xJHnZQQZBUvrBKK579v_A6WKxSeB1uedMzT3a4s7bznAu3LnDGU2oQ>
+    <xmx:xJHnZduqOFIFIDwXh4qZnMeRGz37J-jpTm-4aMRGoE-CNhCuLPv4pw>
+    <xmx:xJHnZZdFyZNODhjvxaepeGuFt7JrQh_o-Jhv-1b0jZ3Hjc6YxC1k2g>
+    <xmx:xJHnZTvUPetGykXHwgcz5-27tVMiNScPbnZ4eUKhFo6JKmOPuvcEjg>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 02874B6008D; Tue,  5 Mar 2024 16:42:28 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-208-g3f1d79aedb-fm-20240301.002-g3f1d79ae
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Message-Id: <037496c9-f06a-4946-b903-95d87d577b89@app.fastmail.com>
+In-Reply-To: 
+ <CAHS8izPhvRDPVHr8mY2FffPCLYjKqaazjy5NFcnJSnLK+CdyCA@mail.gmail.com>
+References: <20240305020153.2787423-1-almasrymina@google.com>
+ <20240305020153.2787423-6-almasrymina@google.com>
+ <5e2f9342-4ee9-4b30-9dcf-393e57e0f7c6@app.fastmail.com>
+ <CAHS8izPhvRDPVHr8mY2FffPCLYjKqaazjy5NFcnJSnLK+CdyCA@mail.gmail.com>
+Date: Tue, 05 Mar 2024 22:42:07 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Mina Almasry" <almasrymina@google.com>
+Cc: Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ Linux-Arch <linux-arch@vger.kernel.org>, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Jonathan Corbet" <corbet@lwn.net>,
+ "Richard Henderson" <richard.henderson@linaro.org>,
+ "Ivan Kokshaysky" <ink@jurassic.park.msu.ru>,
+ "Matt Turner" <mattst88@gmail.com>,
+ "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+ "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+ "Helge Deller" <deller@gmx.de>, "Andreas Larsson" <andreas@gaisler.com>,
+ "Jesper Dangaard Brouer" <hawk@kernel.org>,
+ "Ilias Apalodimas" <ilias.apalodimas@linaro.org>,
+ "Steven Rostedt" <rostedt@goodmis.org>,
+ "Masami Hiramatsu" <mhiramat@kernel.org>,
+ "Mathieu Desnoyers" <mathieu.desnoyers@efficios.com>,
+ "Alexei Starovoitov" <ast@kernel.org>,
+ "Daniel Borkmann" <daniel@iogearbox.net>,
+ "Andrii Nakryiko" <andrii@kernel.org>,
+ "Martin KaFai Lau" <martin.lau@linux.dev>,
+ "Eduard Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>,
+ "Yonghong Song" <yonghong.song@linux.dev>,
+ "John Fastabend" <john.fastabend@gmail.com>,
+ "KP Singh" <kpsingh@kernel.org>, "Stanislav Fomichev" <sdf@google.com>,
+ "Hao Luo" <haoluo@google.com>, "Jiri Olsa" <jolsa@kernel.org>,
+ "David Ahern" <dsahern@kernel.org>,
+ "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>,
+ shuah <shuah@kernel.org>, "Sumit Semwal" <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ "Pavel Begunkov" <asml.silence@gmail.com>, "David Wei" <dw@davidwei.uk>,
+ "Jason Gunthorpe" <jgg@ziepe.ca>,
+ "Yunsheng Lin" <linyunsheng@huawei.com>,
+ "Shailend Chand" <shailend@google.com>,
+ "Harshitha Ramamurthy" <hramamurthy@google.com>,
+ "Shakeel Butt" <shakeelb@google.com>,
+ "Jeroen de Borst" <jeroendb@google.com>,
+ "Praveen Kaligineedi" <pkaligineedi@google.com>,
+ "Willem de Bruijn" <willemb@google.com>,
+ "Kaiyuan Zhang" <kaiyuanz@google.com>
+Subject: Re: [RFC PATCH net-next v6 05/15] netdev: support binding dma-buf to netdevice
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-When running an XDP program that is attached to a cpumap entry, we don't
-initialise the xdp_rxq_info data structure being used in the xdp_buff
-that backs the XDP program invocation. Tobias noticed that this leads to
-random values being returned as the xdp_md->rx_queue_index value for XDP
-programs running in a cpumap.
+On Tue, Mar 5, 2024, at 21:00, Mina Almasry wrote:
+> On Tue, Mar 5, 2024 at 1:05=E2=80=AFAM Arnd Bergmann <arnd@arndb.de> w=
+rote:
+>> On Tue, Mar 5, 2024, at 03:01, Mina Almasry wrote:
+>
+> A key goal of this patch series is that the kernel does not try to
+> parse the skb frags that reside in the dma-buf for that precise
+> reason. This is achieved using patch "net: add support for skbs with
+> unreadable frags" which disables the kernel touching the payload in
+> these skbs, and "tcp: RX path for devmem TCP" which implements a uapi
+> where the kernel hands the data in the dmabuf to the userspace via a
+> cmsg that gives the user a pointer to the data in the dmabuf (offset +
+> size).
+>
+> So really AFACT the only restriction here is that the NIC should be
+> able to DMA into the dmabuf that we're attaching, and dma_buf_attach()
+> fails in this scenario so we're covered there.
 
-This means we're basically returning the contents of the uninitialised
-memory, which is bad. Fix this by zero-initialising the rxq data
-structure before running the XDP program.
+Ok, makes sense. Thanks for the clarification.
 
-Fixes: 9216477449f3 ("bpf: cpumap: Add the possibility to attach an eBPF program to cpumap")
-Reported-by: Tobias Böhm <tobias@aibor.de>
-Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
----
- kernel/bpf/cpumap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-index 8a0bb80fe48a..ef82ffc90cbe 100644
---- a/kernel/bpf/cpumap.c
-+++ b/kernel/bpf/cpumap.c
-@@ -178,7 +178,7 @@ static int cpu_map_bpf_prog_run_xdp(struct bpf_cpu_map_entry *rcpu,
- 				    void **frames, int n,
- 				    struct xdp_cpumap_stats *stats)
- {
--	struct xdp_rxq_info rxq;
-+	struct xdp_rxq_info rxq = {};
- 	struct xdp_buff xdp;
- 	int i, nframes = 0;
- 
--- 
-2.43.2
-
+     Arnd
 
