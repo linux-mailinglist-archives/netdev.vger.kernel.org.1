@@ -1,85 +1,109 @@
-Return-Path: <netdev+bounces-77540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7D1D87224F
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:02:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7230787225F
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:04:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EFD8B21F0E
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:02:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E4F02836C0
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:04:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A436126F11;
-	Tue,  5 Mar 2024 15:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 939061272DF;
+	Tue,  5 Mar 2024 15:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pn9a+Qkl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H25+wX40"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DE251DFF8;
-	Tue,  5 Mar 2024 15:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68346126F02;
+	Tue,  5 Mar 2024 15:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709650921; cv=none; b=Wzuhu9rBOzNqmkZpFRkBUaVo0ha6pmgFYi0R3sLTEm2k7LeHtZRrdCaVDe147bOHC6rL2o+md3mTo7y9y0Ob/zFMZdGf8oHemIi1NwOFYC4b+IZKZ+Z6Jyx66M5NXEO6wiPM+YjNNBJ9mFOhD+lSxONJREZOb4e3yWVLtd3wjC4=
+	t=1709651031; cv=none; b=gtJRKeVttmV1AvjmTnoT3tvG2HciSDoWw1CkRPMUdAJfTso/n0mFYXMXdJlUoSwoYybwMqq+eYh9YUpPPhc8NGQnxNJgVsG7bASugSBOjf+lbrHdzvOBLuHE7P8DEvXD5XDAj4Hps/k+9e37gOmwDmuL1eLlbT4Hm0idBFLVZwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709650921; c=relaxed/simple;
-	bh=EOcdUGttj2pgJNSAtD+H2tt3Qg/SJJYakNmgC0yArb0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ba5h+NMNrb8hGiR/oftmiM/3iuc+yBR7yz0As9r0x8CQocdavkIcj8KoenBjpb9t5qQjQkFecyIevu5U1PWz15RWbRHeTPMwTGYGDoClQxV1SjDiP4fChnh7QiMSR2xA5PBX6aocX70UwUpC2TOfj8ErlD3gdjEj3uTiVhs7jTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pn9a+Qkl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE193C433F1;
-	Tue,  5 Mar 2024 15:02:00 +0000 (UTC)
+	s=arc-20240116; t=1709651031; c=relaxed/simple;
+	bh=27+BJOW33H94LR/XIIVJMVaAXUoxZygcA3qpLGvJF24=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nNezikr7XiXXBy7cNonHVjFJjQBiJEJ0p9SJbl4XFXOQAkQQkEpvXLBab/UiMk6sg9Udp8h3s88P+2+7CAXdcTzPdj8QWWaFL2CDX6ZB2JZs5Yim1gu6heolqzL76uHxD/1lwBwKuouFaceQLB7ztQpzgGd4G6bBskcbHoGQDlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H25+wX40; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15F54C43394;
+	Tue,  5 Mar 2024 15:03:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709650920;
-	bh=EOcdUGttj2pgJNSAtD+H2tt3Qg/SJJYakNmgC0yArb0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pn9a+Qkl5P1TvXEHFckUSQdDz7QYx0j2N3jzMrZomlUrXn5AsHBt85zRUTRYJVZdj
-	 EO4TgOzvtmGztZrvL0XRtuUjqqFtbsvJO4smPnGu8GtIsCwsIUR3q8SiW9/dGiOADI
-	 /np9F3t8kHYTSVJrJIOHGTFsYM7EiKagUgFCQJUk3ULiY/LJXbqKjmt1+ymXjv37Mj
-	 9/aQCL5TK98jSJ71T+Ck+A60v6BqO0yOpUdXmoG01xU9aInEMU2+rso/m/ESA330b+
-	 IIJbzWdodclTqKKwRIde5GFpeiO65p+5xs39wt4r/h7d+z0kboA1m7ztOJxIXOkLAQ
-	 OzZFEADT8awbw==
-Date: Tue, 5 Mar 2024 09:01:58 -0600
-From: Rob Herring <robh@kernel.org>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Eric Dumazet <edumazet@google.com>,
-	linux-renesas-soc@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Paolo Abeni <pabeni@redhat.com>, Conor Dooley <conor+dt@kernel.org>,
-	Thanh Quan <thanh.quan.xn@renesas.com>, devicetree@vger.kernel.org,
-	Sergei Shtylyov <sergei.shtylyov@gmail.com>
-Subject: Re: [PATCH net-next] dt-bindings: net: renesas,etheravb: Add support
- for R-Car V4M
-Message-ID: <170965091827.3351332.2111894188384464471.robh@kernel.org>
-References: <0212b57ba1005bb9b5a922f8f25cc67a7bc15f30.1709631152.git.geert+renesas@glider.be>
+	s=k20201202; t=1709651031;
+	bh=27+BJOW33H94LR/XIIVJMVaAXUoxZygcA3qpLGvJF24=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=H25+wX40QDVf7LQENEsoE+hzv6k+KxHFIJFJqewncfk3zIRbstB3rhpHi0ETdlw82
+	 VEdCuqG0OxjAK6RRCJJ3dkpfXpR2Y4r0s7+eDhee5mPTBhdAhMXhhobllARcOFzmK6
+	 1x4fjSBhTzY1OUUMu1jrrKWDm6yRWRd80z4mYzaSdsI+v0W63WpHbOcnBXPc6SbqFL
+	 mWchheN01FGp1BksphhLEZ3QRJPR+WULQHOUUcHXRTFPauqoKMbLS8DOsPwbkkfj/U
+	 KaRvyVlU+xGBOSlKIkEfmGJqSINj/MUjgm3tvYiSGJ2bw+bZ/E8eyKgvqZCGwU5Xxx
+	 CYn643lXYGh+g==
+Date: Tue, 5 Mar 2024 07:03:49 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: Re: [PATCH net-next v9 07/13] ptp: Move from simple ida to xarray
+Message-ID: <20240305070349.5d1a8ff0@kernel.org>
+In-Reply-To: <20240305100259.006b3137@kmaincent-XPS-13-7390>
+References: <20240226-feature_ptp_netnext-v9-0-455611549f21@bootlin.com>
+	<20240226-feature_ptp_netnext-v9-7-455611549f21@bootlin.com>
+	<20240304184737.30cac57b@kernel.org>
+	<20240305100259.006b3137@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0212b57ba1005bb9b5a922f8f25cc67a7bc15f30.1709631152.git.geert+renesas@glider.be>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, 5 Mar 2024 10:02:59 +0100 K=C3=B6ry Maincent wrote:
+> On Mon, 4 Mar 2024 18:47:37 -0800
+> Jakub Kicinski <kuba@kernel.org> wrote:
+>=20
+> > On Mon, 26 Feb 2024 14:39:58 +0100 Kory Maincent wrote: =20
+> > > +static DEFINE_XARRAY_FLAGS(ptp_clocks_map, XA_FLAGS_LOCK_IRQ |
+> > > XA_FLAGS_ALLOC);   =20
+> >=20
+> > Why _IRQ? anything on the fastpath hopefully has a pointer to the clock
+> > already, I'd hope. And we often reserve ID 0 as invalid. =20
+>=20
+> To keep the same flag as IDA_INIT_FLAGS, I am not expert in xarray so I j=
+ust
+> keep it without questioning it. Do you think I should remove it?
 
-On Tue, 05 Mar 2024 10:37:18 +0100, Geert Uytterhoeven wrote:
-> From: Thanh Quan <thanh.quan.xn@renesas.com>
-> 
-> Document support for the Renesas Ethernet AVB (EtherAVB-IF) block in the
-> Renesas R-Car V4M (R8A779H0) SoC.
-> 
-> Signed-off-by: Thanh Quan <thanh.quan.xn@renesas.com>
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
->  Documentation/devicetree/bindings/net/renesas,etheravb.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
+Yes, I believe those defaults are just "to be safe".
 
-Acked-by: Rob Herring <robh@kernel.org>
+> ID 0 was valid for phc. IMHO makes it invalid is not a good idea, it
+> will change the phc id value for current board on the field.
 
+Ah, right, let's keep it then. We'll have to use -1 as invalid.
+
+> > BTW could be a standalone patch, Xarray conversion from IDA is an
+> > improvement in itself. =20
+>=20
+> Indeed. Do you prefer this patch to be standalone?
+
+May be a personal preference but I do feel like sending general
+improvements separately from large new features makes the process=20
+more smooth.
 
