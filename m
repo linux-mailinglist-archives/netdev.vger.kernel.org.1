@@ -1,252 +1,117 @@
-Return-Path: <netdev+bounces-77484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5F85871E6E
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:00:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C6D9871E6F
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:00:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1600E1C23281
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:00:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DE6E1C21A98
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7692C5A10C;
-	Tue,  5 Mar 2024 12:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E89A759171;
+	Tue,  5 Mar 2024 12:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="kojPfjm+";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ESDqap8f"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iX+Nvu4f"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A946E59146
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 12:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE9659146;
+	Tue,  5 Mar 2024 12:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709640023; cv=none; b=Fp6Cm3kIn2qojWswFNk2N4jGyQ2Js1Xn+8G6R0CMw1apZC97CEbsfkasKwEje/Y/bTsTJJ5k2LwLP4QWLyd9ta81xKH7OGjOjdzecnYeu06APUoNAByQwzlzvTiXmTW8gQxChPUQulS7+srDLeyibtOYkDsh/BGYK9xb6Pv3zK0=
+	t=1709640032; cv=none; b=Ktua6ZK4N4wpvkMUTWUVKebGqiKENgUlN7e7k1XL4dPbhHDkPJEl2TInGgXDROkRUvDtJEcD1dTkK0gpykg1CKcn3QCyAPunPg8DPq5Rzmo5ttCKatj6xPK1WdCoueDV3RWw96BtZxcHb8Pv+5pyj+UQ+K640JLFxfk5h8bGfgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709640023; c=relaxed/simple;
-	bh=D832GVr57Y01exTBhDLEDuJTReMKp3tLqILH3QvphRM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GiZnZlQmiuLbKUL6cgxiOvrF0izW3bs/sN5t+F3jqo7Yh2GE/CM8hm6vUzpZlPfKApniAeefAYUWwBezIxLIvHWh9aiLXUISEj868znw5QDNnc1KjY9nOKSHl1Lb43Gb+XYNrykt59NXTvpthBKzbXUh+NvwKYo+trMek8CQYhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=kojPfjm+; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ESDqap8f; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1709640020;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cClXO3t0I+B0wxp57Ht8eUggfp8rir4eXAkt7eY7veM=;
-	b=kojPfjm+wwjptPvnHUhzaKKam0Mh6ZIIVfDgueISnBzwP+8Ou+bDqmfsPvv5+LmBE5pZCs
-	Gj+MwyxRAHquFJ4Qi3ED9tqdxnMWf25oCwgRyTJa4Tr3O2Lh50/B0PGAKqLlaGd7i5VOJx
-	YRtGym9dYJKeA3cNjBoI5AikNlqT1IiXmtwDT0RXrhIBA99V4B7104VTphTUH3GaFoN3wK
-	u/s3U5lrpXKN8RGDu/xwMAL9BKeSCR+ykk+rc5vjSOffUgK8E56X7xM0XyjPrRRCfXrzOp
-	Z2VB9BSEuknQS8agWpFzloOEmuQq61eOnFYeIbec+RrCcs1bVDbOZQxEsaMpaA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1709640020;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cClXO3t0I+B0wxp57Ht8eUggfp8rir4eXAkt7eY7veM=;
-	b=ESDqap8fsB3hSqRTol8fQjrezaZ5yI4r5j7lw7QgUe7CVw5EFfiMqBbW/MgGyhP0NujERA
-	oQQS1RzSubp7Q5CQ==
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Wander Lairson Costa <wander@redhat.com>,
-	Yan Zhai <yan@cloudflare.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH v4 net-next 4/4] net: Rename rps_lock to backlog_lock.
-Date: Tue,  5 Mar 2024 12:53:22 +0100
-Message-ID: <20240305120002.1499223-5-bigeasy@linutronix.de>
-In-Reply-To: <20240305120002.1499223-1-bigeasy@linutronix.de>
-References: <20240305120002.1499223-1-bigeasy@linutronix.de>
+	s=arc-20240116; t=1709640032; c=relaxed/simple;
+	bh=dksLaDVSy6nq7bP4e4YeQwSAmypjMREMKHNjaEVWxwQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=EEafmE3INa2nAlKucUPQIf3pArdiYsw0BiTzHST6EQSONbb/FemyfNZ0VFxJFKJJslLXmv4nKWTtGX2bNb1T7bcCZu0HAF9HAzUw9DSIbulWOZAMG5ouzVWYP9kojz9m7Ik9kZ0+cfNtfXfHZBh58PRlKzHwJPjmiRlsYuVL0Ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iX+Nvu4f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 195C8C43390;
+	Tue,  5 Mar 2024 12:00:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709640032;
+	bh=dksLaDVSy6nq7bP4e4YeQwSAmypjMREMKHNjaEVWxwQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=iX+Nvu4f89MlkCTlP8LkvOL+xzTIElbLQkK1ES/qoNu9WG6d8FTflxfdESs2PSYcb
+	 WGzbhP6RIvkRXlqX/D6Tj82ZCceKF/ZGDRqYI+fCoOV52NXAMQaeWB+TqBtbHaVWPz
+	 R2DMiRBj5AreLzi9BOOhaRNqMP3owHpMvcEhp+TysDU39AWRBCsJ46aCIptK7IE87A
+	 lchgT9n01mEeXfx32D7JBZxCn1TH5LY3Ujppkfnss0DAt/z9H7iftkExyoC21Tpmvt
+	 nzPRVf8Bf+ApB0kou3XaqEH71w++ZrBPtAnEuJSdtrLoDGWF3ycurkILxu/iYkdrwr
+	 Z770SFr6giXLg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E7A59D84BDF;
+	Tue,  5 Mar 2024 12:00:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/9] MT7530 DSA Subdriver Improvements Act III
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170964003194.11081.15831016567274956859.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Mar 2024 12:00:31 +0000
+References: <20240301-for-netnext-mt7530-improvements-3-v3-0-449f4f166454@arinc9.com>
+In-Reply-To: <20240301-for-netnext-mt7530-improvements-3-v3-0-449f4f166454@arinc9.com>
+To: =?utf-8?b?QXLEsW7DpyDDnE5BTCB2aWEgQjQgUmVsYXkgPGRldm51bGwrYXJpbmMudW5hbC5h?=@codeaurora.org,
+	=?utf-8?b?cmluYzkuY29tQGtlcm5lbC5vcmc+?=@codeaurora.org
+Cc: daniel@makrotopia.org, dqfext@gmail.com, sean.wang@mediatek.com,
+ andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ linux@armlinux.org.uk, mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+ bartel.eerdekens@constell8.be, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, arinc.unal@arinc9.com
 
-The rps_lock.*() functions use the inner lock of a sk_buff_head for
-locking. This lock is used if RPS is enabled, otherwise the list is
-accessed lockless and disabling interrupts is enough for the
-synchronisation because it is only accessed CPU local. Not only the list
-is protected but also the NAPI state protected.
-With the addition of backlog threads, the lock is also needed because of
-the cross CPU access even without RPS. The clean up of the defer_list
-list is also done via backlog threads (if enabled).
+Hello:
 
-It has been suggested to rename the locking function since it is no
-longer just RPS.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Rename the rps_lock*() functions to backlog_lock*().
+On Fri, 01 Mar 2024 12:42:56 +0200 you wrote:
+> Hello!
+> 
+> This is the third patch series with the goal of simplifying the MT7530 DSA
+> subdriver and improving support for MT7530, MT7531, and the switch on the
+> MT7988 SoC.
+> 
+> I have done a simple ping test to confirm basic communication on all switch
+> ports on MCM and standalone MT7530, and MT7531 switch with this patch
+> series applied.
+> 
+> [...]
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Acked-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- net/core/dev.c | 34 +++++++++++++++++-----------------
- 1 file changed, 17 insertions(+), 17 deletions(-)
+Here is the summary with links:
+  - [net-next,v3,1/9] net: dsa: mt7530: remove .mac_port_config for MT7988 and make it optional
+    https://git.kernel.org/netdev/net-next/c/6ebe414b48cf
+  - [net-next,v3,2/9] net: dsa: mt7530: set interrupt register only for MT7530
+    https://git.kernel.org/netdev/net-next/c/804cd5f7059e
+  - [net-next,v3,3/9] net: dsa: mt7530: do not use SW_PHY_RST to reset MT7531 switch
+    https://git.kernel.org/netdev/net-next/c/a565f98d7d25
+  - [net-next,v3,4/9] net: dsa: mt7530: get rid of useless error returns on phylink code path
+    https://git.kernel.org/netdev/net-next/c/adf4ae24ba42
+  - [net-next,v3,5/9] net: dsa: mt7530: get rid of priv->info->cpu_port_config()
+    https://git.kernel.org/netdev/net-next/c/22fa10170af5
+  - [net-next,v3,6/9] net: dsa: mt7530: get rid of mt753x_mac_config()
+    https://git.kernel.org/netdev/net-next/c/1192ed898c97
+  - [net-next,v3,7/9] net: dsa: mt7530: put initialising PCS devices code back to original order
+    https://git.kernel.org/netdev/net-next/c/3a87131e3d72
+  - [net-next,v3,8/9] net: dsa: mt7530: sort link settings ops and force link down on all ports
+    https://git.kernel.org/netdev/net-next/c/6324230b3b67
+  - [net-next,v3,9/9] net: dsa: mt7530: simplify link operations
+    https://git.kernel.org/netdev/net-next/c/b04097c7a745
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 5ce16b62e1982..024d55e7af7d5 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -223,8 +223,8 @@ static bool use_backlog_threads(void)
-=20
- #endif
-=20
--static inline void rps_lock_irqsave(struct softnet_data *sd,
--				    unsigned long *flags)
-+static inline void backlog_lock_irq_save(struct softnet_data *sd,
-+					 unsigned long *flags)
- {
- 	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
- 		spin_lock_irqsave(&sd->input_pkt_queue.lock, *flags);
-@@ -232,7 +232,7 @@ static inline void rps_lock_irqsave(struct softnet_data=
- *sd,
- 		local_irq_save(*flags);
- }
-=20
--static inline void rps_lock_irq_disable(struct softnet_data *sd)
-+static inline void backlog_lock_irq_disable(struct softnet_data *sd)
- {
- 	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
- 		spin_lock_irq(&sd->input_pkt_queue.lock);
-@@ -240,8 +240,8 @@ static inline void rps_lock_irq_disable(struct softnet_=
-data *sd)
- 		local_irq_disable();
- }
-=20
--static inline void rps_unlock_irq_restore(struct softnet_data *sd,
--					  unsigned long *flags)
-+static inline void backlog_unlock_irq_restore(struct softnet_data *sd,
-+					      unsigned long *flags)
- {
- 	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
- 		spin_unlock_irqrestore(&sd->input_pkt_queue.lock, *flags);
-@@ -249,7 +249,7 @@ static inline void rps_unlock_irq_restore(struct softne=
-t_data *sd,
- 		local_irq_restore(*flags);
- }
-=20
--static inline void rps_unlock_irq_enable(struct softnet_data *sd)
-+static inline void backlog_unlock_irq_enable(struct softnet_data *sd)
- {
- 	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
- 		spin_unlock_irq(&sd->input_pkt_queue.lock);
-@@ -4742,12 +4742,12 @@ void kick_defer_list_purge(struct softnet_data *sd,=
- unsigned int cpu)
- 	unsigned long flags;
-=20
- 	if (use_backlog_threads()) {
--		rps_lock_irqsave(sd, &flags);
-+		backlog_lock_irq_save(sd, &flags);
-=20
- 		if (!__test_and_set_bit(NAPI_STATE_SCHED, &sd->backlog.state))
- 			__napi_schedule_irqoff(&sd->backlog);
-=20
--		rps_unlock_irq_restore(sd, &flags);
-+		backlog_unlock_irq_restore(sd, &flags);
-=20
- 	} else if (!cmpxchg(&sd->defer_ipi_scheduled, 0, 1)) {
- 		smp_call_function_single_async(cpu, &sd->defer_csd);
-@@ -4809,7 +4809,7 @@ static int enqueue_to_backlog(struct sk_buff *skb, in=
-t cpu,
- 	reason =3D SKB_DROP_REASON_NOT_SPECIFIED;
- 	sd =3D &per_cpu(softnet_data, cpu);
-=20
--	rps_lock_irqsave(sd, &flags);
-+	backlog_lock_irq_save(sd, &flags);
- 	if (!netif_running(skb->dev))
- 		goto drop;
- 	qlen =3D skb_queue_len(&sd->input_pkt_queue);
-@@ -4818,7 +4818,7 @@ static int enqueue_to_backlog(struct sk_buff *skb, in=
-t cpu,
- enqueue:
- 			__skb_queue_tail(&sd->input_pkt_queue, skb);
- 			input_queue_tail_incr_save(sd, qtail);
--			rps_unlock_irq_restore(sd, &flags);
-+			backlog_unlock_irq_restore(sd, &flags);
- 			return NET_RX_SUCCESS;
- 		}
-=20
-@@ -4833,7 +4833,7 @@ static int enqueue_to_backlog(struct sk_buff *skb, in=
-t cpu,
-=20
- drop:
- 	sd->dropped++;
--	rps_unlock_irq_restore(sd, &flags);
-+	backlog_unlock_irq_restore(sd, &flags);
-=20
- 	dev_core_stats_rx_dropped_inc(skb->dev);
- 	kfree_skb_reason(skb, reason);
-@@ -5898,7 +5898,7 @@ static void flush_backlog(struct work_struct *work)
- 	local_bh_disable();
- 	sd =3D this_cpu_ptr(&softnet_data);
-=20
--	rps_lock_irq_disable(sd);
-+	backlog_lock_irq_disable(sd);
- 	skb_queue_walk_safe(&sd->input_pkt_queue, skb, tmp) {
- 		if (skb->dev->reg_state =3D=3D NETREG_UNREGISTERING) {
- 			__skb_unlink(skb, &sd->input_pkt_queue);
-@@ -5906,7 +5906,7 @@ static void flush_backlog(struct work_struct *work)
- 			input_queue_head_incr(sd);
- 		}
- 	}
--	rps_unlock_irq_enable(sd);
-+	backlog_unlock_irq_enable(sd);
-=20
- 	skb_queue_walk_safe(&sd->process_queue, skb, tmp) {
- 		if (skb->dev->reg_state =3D=3D NETREG_UNREGISTERING) {
-@@ -5924,14 +5924,14 @@ static bool flush_required(int cpu)
- 	struct softnet_data *sd =3D &per_cpu(softnet_data, cpu);
- 	bool do_flush;
-=20
--	rps_lock_irq_disable(sd);
-+	backlog_lock_irq_disable(sd);
-=20
- 	/* as insertion into process_queue happens with the rps lock held,
- 	 * process_queue access may race only with dequeue
- 	 */
- 	do_flush =3D !skb_queue_empty(&sd->input_pkt_queue) ||
- 		   !skb_queue_empty_lockless(&sd->process_queue);
--	rps_unlock_irq_enable(sd);
-+	backlog_unlock_irq_enable(sd);
-=20
- 	return do_flush;
- #endif
-@@ -6046,7 +6046,7 @@ static int process_backlog(struct napi_struct *napi, =
-int quota)
-=20
- 		}
-=20
--		rps_lock_irq_disable(sd);
-+		backlog_lock_irq_disable(sd);
- 		if (skb_queue_empty(&sd->input_pkt_queue)) {
- 			/*
- 			 * Inline a custom version of __napi_complete().
-@@ -6062,7 +6062,7 @@ static int process_backlog(struct napi_struct *napi, =
-int quota)
- 			skb_queue_splice_tail_init(&sd->input_pkt_queue,
- 						   &sd->process_queue);
- 		}
--		rps_unlock_irq_enable(sd);
-+		backlog_unlock_irq_enable(sd);
- 	}
-=20
- 	return work;
---=20
-2.43.0
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
