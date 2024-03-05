@@ -1,91 +1,120 @@
-Return-Path: <netdev+bounces-77512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F27387204D
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:35:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C19FF872082
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:41:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B6312818A5
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:35:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FBE71F21F8B
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:41:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4560985C65;
-	Tue,  5 Mar 2024 13:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308AD85C70;
+	Tue,  5 Mar 2024 13:41:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cVmWNKCJ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DOCvtJWD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8278593E;
-	Tue,  5 Mar 2024 13:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9594984A48;
+	Tue,  5 Mar 2024 13:41:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709645723; cv=none; b=rEjC87wkdaEKaOzmtUS6aRJY4U+et/Z3ZlN6gWAkAdJkm2ALY+x2uLIBJ92wPGsX77sMehoty1WCRQq5qaY10/pdXF5MK/o0nTcJ+NQc1+CtVL0SFGq6fLPu7vStblPOTw9syb6gZVVzO8lEIrvhrWzYJtP3DBxqd0oS2/sJHYs=
+	t=1709646101; cv=none; b=blZk2CXhQ4m2u6NRUA/u9TjZ3+8JnpeXeGLgjuis8F9wAnVYZFbFeEuMiD9TidtxOlzxA/ljiVC/5oLjAkyh9EbL2nGteH2LfFJKGfHtczB9i54fJ5PturfdpvboVq+eF65KdvtIIXPHz+7UKyG5Pq74aU7wag3klUEx8DyuAP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709645723; c=relaxed/simple;
-	bh=oiHeawagXvJcQ1MNhjuE3hTeoiG9E8Iex70tagYEp7s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BbaV1LYqKWwQIA7ooqVq/4l6Z+AF02FjjI2O3A3DeODrqBJbcQ6vQXH+eBKkhL+eFDjlwYheDZx6bSYLg/9yfQDD5ARF/opTXIISxnRjOnMFbsWyQpGPcFNoMgVNbC4SqKMBV4yvUEerNNZ12Xz1BSJSlKy3J65SkBRha6AkK1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cVmWNKCJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 892AFC43394;
-	Tue,  5 Mar 2024 13:35:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709645722;
-	bh=oiHeawagXvJcQ1MNhjuE3hTeoiG9E8Iex70tagYEp7s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cVmWNKCJ2cTRNGR7KpwWe+kAMekLQ+tz52cwqdZBs100bjzobEtW+obocRQ15jdPr
-	 pUG34iyjoqM4AywpvaMNTevcngOdHIctILwrFMbwzRQT60S7uX4yBhpzyttWt7N16E
-	 K/wh4acQCYii6Ppjo2bseNZlSVujJkBERxWEREsemOx5qVuot/l2qfkWKM6wGPz9KP
-	 9Hyg/OTppNvQH+YCyi5P84/NK624y3Cj2PYRvjyqn+soqEKkP1I9AWwLUx9sj1PoZL
-	 VNWRX5cKCytB/46DG/QeriTAArmBGmLxy4kz/pIhn3/tyYfM/8VAjmdOgPyIswOmp5
-	 3b4aletxJg76w==
-Date: Tue, 5 Mar 2024 13:35:18 +0000
-From: Simon Horman <horms@kernel.org>
-To: Chen Ni <nichen@iscas.ac.cn>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, justinstitt@google.com, andrew@lunn.ch,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] sr9800: Add check for usbnet_get_endpoints
-Message-ID: <20240305133518.GF2357@kernel.org>
-References: <20240305075927.261284-1-nichen@iscas.ac.cn>
+	s=arc-20240116; t=1709646101; c=relaxed/simple;
+	bh=W+2nNfu/SH120fh3upXQutRAF4cFUOE0j3C5s8jvs54=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DY6Wrirn568kV0CpbgFT53TBhG+a+Qd0GZSa1Ycj+Ux0ajpyoRSy6FLut5Y1clIOu3jAauaKiXwdTh58CTfBswgFWpBrQES8ABFi0KqW5G8EvHwKh81ga1IS8yhejXxd3Gcp4MpCadfLoX4JXPgIq2xZKuayEoLSGv4VIKx/3ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DOCvtJWD; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 136191BF20B;
+	Tue,  5 Mar 2024 13:41:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1709646091;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DZDyctNRQfxHIrXGUPl9xyE+ahVMXlpoMQhkMhBvw8w=;
+	b=DOCvtJWDLZSm2JIeQ9Omeu4d1Hzx3R3n13mnOKJCS0QzLpxZ+i7VVBJsa00u2c3FzBbsZr
+	TmtD2SjBYbmETmRwp/+3T5y3zzza3j1KOfQ1xoW2OUELvxf4NQMhBDz6e3XWjVquzKlEJC
+	x+dgTmKckoL+noQtiQMSS547dTOKuynN+8mmywNWdhm87b8lE8dgTk45OOlyiPZvJeeGiO
+	sNI13I1pKmRGBOTt5JmHC9Bfhf5+aR8uhvo7caHoYM7kl+4HZ7orI3kIkQCB6w2oB2q9Ld
+	LuRUyZ8zDKFaO1V3pkg+qhqKCUBUnC7667dPZPzCnsziw+PqKqwchkGgI+CMBA==
+Message-ID: <85da1b70-d3fe-4117-a87c-53559b299867@bootlin.com>
+Date: Tue, 5 Mar 2024 14:41:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240305075927.261284-1-nichen@iscas.ac.cn>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/1] dt-bindings: net: dp83822: change ti,rmii-mode
+ description
+Content-Language: en-US
+To: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, Yen-Mei Goh <yen-mei.goh@keysight.com>,
+ =?UTF-8?Q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>
+References: <20240305133137.125020-1-jeremie.dautheribes@bootlin.com>
+From: =?UTF-8?B?SsOpcsOpbWllIERhdXRoZXJpYmVz?=
+ <jeremie.dautheribes@bootlin.com>
+In-Reply-To: <20240305133137.125020-1-jeremie.dautheribes@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: jeremie.dautheribes@bootlin.com
 
-On Tue, Mar 05, 2024 at 07:59:27AM +0000, Chen Ni wrote:
-> Add check for usbnet_get_endpoints() and return the error if it fails
-> in order to transfer the error.
+Sorry I forgot to include the "net-next" entry in the subject, I'm 
+sending this patch again with the correct subject.
+
+On 05/03/2024 14:31, Jérémie Dautheribes wrote:
+> Drop reference to the 25MHz clock as it has nothing to do with connecting
+> the PHY and the MAC.
+> Add info about the reference clock direction between the PHY and the MAC
+> as it depends on the selected rmii mode.
 > 
-> Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
-
-Hi Chen Ni,
-
-I guess that this is a bug fix and as such it should be targeted
-at the net tree and annotated as such:
-
-	Subject: [PATCH net] ...
-
-And have a fixes tag, perhaps:
-
-Fixes: 19a38d8e0aa3 ("USB2NET : SR9800 : One chip USB2.0 USB2NET SR9800 Device Driver Support")
-
-I don't think there is a need to repost to address the above,
-but please keep it in mind for future Networking patch submissions.
-
-Link: https://docs.kernel.org/process/maintainer-netdev.html
-
-The above notwithstanding, this looks good to me.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-...
+> Suggested-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Jérémie Dautheribes <jeremie.dautheribes@bootlin.com>
+> ---
+> This patch follows on from my previous patch series [1] which has already been
+> merged into the net-next tree and which added the "ti,rmii-mode" property.
+> As suggested by Andrew Lunn, this patch updates the description of this
+> property to make it more consistent with the master/slave relationship it
+> conveys.
+> 
+> [1] https://lore.kernel.org/all/20240222103117.526955-1-jeremie.dautheribes@bootlin.com/
+> 
+>   Documentation/devicetree/bindings/net/ti,dp83822.yaml | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/ti,dp83822.yaml b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+> index 8f23254c0458..784866ea392b 100644
+> --- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+> +++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+> @@ -84,10 +84,10 @@ properties:
+>       description: |
+>          If present, select the RMII operation mode. Two modes are
+>          available:
+> -         - RMII master, where the PHY operates from a 25MHz clock reference,
+> -         provided by a crystal or a CMOS-level oscillator
+> -         - RMII slave, where the PHY operates from a 50MHz clock reference,
+> -         provided by a CMOS-level oscillator
+> +         - RMII master, where the PHY outputs a 50MHz reference clock which can
+> +         be connected to the MAC.
+> +         - RMII slave, where the PHY expects a 50MHz reference clock input
+> +         shared with the MAC.
+>          The RMII operation mode can also be configured by its straps.
+>          If the strap pin is not set correctly or not set at all, then this can be
+>          used to configure it.
 
