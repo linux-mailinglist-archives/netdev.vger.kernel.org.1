@@ -1,82 +1,78 @@
-Return-Path: <netdev+bounces-77558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1CC28722F0
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:38:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 080158722F5
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:38:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1082D285092
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:38:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D4B62873FC
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:38:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C66398664C;
-	Tue,  5 Mar 2024 15:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uZNLwzzF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E5F1272D8;
+	Tue,  5 Mar 2024 15:38:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A157C85944
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 15:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5097C85944;
+	Tue,  5 Mar 2024 15:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709653098; cv=none; b=FDrSTc0HFAD/flxC1dtG4JEcaTuGcewJIweGYSszg6el5P7KF/6gzlm+D5Xz5fO3GZGG/PTUYfIySaZGWhnC8jQAZSI/SNxr7P/Xqq5BwuTh5e8/EyFNGepwfzVeYDJSGaNuTJr+u6IsIORutJxrUvpJn3OyHZ4PRZ8ZfVTow2M=
+	t=1709653129; cv=none; b=dkpf5OgyGeYTLbFfNVtBhcji30jb1s/hwMMl3NOsT0X8wXYTT6Q4FS40E6fy7eA5/+79BjAkhnmOSk8CTZlhxF3MEb1i3W8l7vO7B7ewxWGKjOutn7z770n+Lfrc6OOqC43utZnfuBlklcVDAMKHeoWfUKjqSA3eY+u53u9cCnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709653098; c=relaxed/simple;
-	bh=1kuG3QN6V2wP19+yBzVNByTin0cge+IUNACAny+DrmA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HtAptshxxRWEqWZgDykYpq8gyK6BeokvUEkbh+uiYNdR/yPtuiuxRMJw+fTPB8qoTxNPYxV2SCunPwhUnurCDVx0AQyk2nm7oQyFbtnhHd/urHbIPf4QuZhyjmoaOwEC+w+4WyRwgOHHBIiX6URR6suLDAJZdOTitPJ+CtKz4vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uZNLwzzF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B39C6C433F1;
-	Tue,  5 Mar 2024 15:38:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709653098;
-	bh=1kuG3QN6V2wP19+yBzVNByTin0cge+IUNACAny+DrmA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uZNLwzzFWsTCbDnj5zeBPammeIPvijAEC0wceOyb6uFPbV4oaBKDnaasoj0PXmy03
-	 QgQ0yeZrmfWnDPIlbc7b4M4G/TTNTw4O5aNDXRFQ+S24UcvjLtJBQMeCx1StiUYEvo
-	 ChjhkXvSKkrWyMGacp9TcYrpOqPXtXSGnWtA5UK0j5/HAPXWgdisn5RhBulcAe6emS
-	 vZaepYxMmYn7OGJYU25ACuIgDe5sZOzyAos4EIVtZSXpwhL4M3F5eT+7snRjH6jEg3
-	 OKu6nZaHzPVKgahugEso80Y5QxwWZmf+84r/ddXTCYA1guFmWt+OaxppEBZd4s2aCW
-	 3bWrwZL5bN87w==
-Message-ID: <99f281b1-76de-4a51-a303-1270ffb03405@kernel.org>
-Date: Tue, 5 Mar 2024 08:38:16 -0700
+	s=arc-20240116; t=1709653129; c=relaxed/simple;
+	bh=7ovliyzJP+HYSxeckuD6+XQkQBinbhAkZ0/wznrdJg4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JOrYxK1gbo0opu3TF8u++VIWrcfDcYxEFlePqLYfTp921ghm53VCCp109U+CKaivW7b7HevzB/EuhFnVq7kDdm3PnrEBqQSciUzQl3WB131EbK7UXgYw9l5kXfUURZZq+5iqEclCjlZFouauDDIRjW+PK4jK3inPkl4g9Nmaci4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.33.11] (port=42874 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1rhWsE-00E3CU-S6; Tue, 05 Mar 2024 16:38:36 +0100
+Date: Tue, 5 Mar 2024 16:38:33 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Harald Welte <laforge@gnumonks.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	horms@kernel.org, dsahern@kernel.org,
+	"open list:GTP (GPRS Tunneling Protocol)" <osmocom-net-gprs@lists.osmocom.org>
+Subject: Re: [PATCH net-next 1/3] net: gtp: Leverage core stats allocator
+Message-ID: <Zec8eY4IeTyD8NYK@calendula>
+References: <20240305121524.2254533-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] selftests/net: fix waiting time for ipv6_gc
- test in fib_tests.sh.
-Content-Language: en-US
-To: Kui-Feng Lee <thinker.li@gmail.com>, netdev@vger.kernel.org,
- ast@kernel.org, martin.lau@linux.dev, kernel-team@meta.com, kuba@kernel.org,
- davem@davemloft.net, pabeni@redhat.com
-Cc: sinquersw@gmail.com, kuifeng@meta.com
-References: <20240305013734.872968-1-thinker.li@gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240305013734.872968-1-thinker.li@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240305121524.2254533-1-leitao@debian.org>
+X-Spam-Score: -1.9 (-)
 
-On 3/4/24 6:37 PM, Kui-Feng Lee wrote:
-> diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-> index 3ec1050e47a2..52c5c8730879 100755
-> --- a/tools/testing/selftests/net/fib_tests.sh
-> +++ b/tools/testing/selftests/net/fib_tests.sh
-> @@ -805,7 +805,7 @@ fib6_gc_test()
->  	    $IP -6 route add 2001:20::$i \
->  		via 2001:10::2 dev dummy_10 expires $EXPIRE
->  	done
-> -	sleep $(($EXPIRE * 2 + 1))
-> +	sleep $(($EXPIRE * 2 + 2))
+On Tue, Mar 05, 2024 at 04:15:21AM -0800, Breno Leitao wrote:
+> With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
+> convert veth & vrf"), stats allocation could be done on net core
+> instead of in this driver.
+> 
+> With this new approach, the driver doesn't have to bother with error
+> handling (allocation failure checking, making sure free happens in the
+> right spot, etc). This is core responsibility now.
+> 
+> Remove the allocation in the gtp driver and leverage the network
+> core allocation instead.
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-define a local variable with the sleep timeout so future updates only
-have to update 1 place.
+Acked-by: Pablo Neira Ayuso <pablo@netfilter.org>
 
-
+Thanks, this was on my list.
 
