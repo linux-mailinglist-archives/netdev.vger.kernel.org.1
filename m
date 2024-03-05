@@ -1,137 +1,155 @@
-Return-Path: <netdev+bounces-77490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0767C871EE3
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:18:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FB03871EE7
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:18:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A44251F2165B
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:18:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE8AF288156
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71C9D5D46C;
-	Tue,  5 Mar 2024 12:15:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D00E5A11B;
+	Tue,  5 Mar 2024 12:17:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="U7aRZsBd";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="2LWVyLb7";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="U7aRZsBd";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="2LWVyLb7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76435CDCE;
-	Tue,  5 Mar 2024 12:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E0759171
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 12:17:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709640940; cv=none; b=UcUYVP6vWpSMeufg1YwFDZbSE1v/jx0GXx2FxiZ0LeNGBVnerSLM1V60S7085bQN4/EKYyzyBuwnwoFHxwwdnCcYtYSMHVA5yzW5SsnuznZdt/lj7U4Yow3uQyPOMLhRAMzz+golTdxZoRQclMBKETb4FUM7GtQSykYG9HL/1eo=
+	t=1709641058; cv=none; b=RVD4EsSNd6WOCy1qZMVA9JNLfNIBuv88i0IN76F8upMjgdhT+5dUXW99khBpzFmGqcj8Ran87nuPbCscY9aeNd/Lq5tI3K2g48wKgjZWADbgJ8Q56w7ExtNpWbEBHDfcFlZzW+ZZalBMCPq1oz83twAwwKXeFUvlII8iWcUy+so=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709640940; c=relaxed/simple;
-	bh=BbqzQ7FR84wGJYSQkkFifd7v2CBPk8tXqQd8kQ9d8zs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sMbcaWhURERLVWnIVDeVcrzEIZLd3Sotc2Psgxe+Y/8NioOo/R/hxVuMoxd0N5skk1RY+jjRuWEnmmskoKkE2Ntkd5Au5RzxJgBiA8KOx6yS894lO8TdycIetgRyfizMFmQ9I8e20NykCzZgsXsUWNAPm49adLo/d6+nEqNia9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-513382f40e9so3944731e87.2;
-        Tue, 05 Mar 2024 04:15:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709640937; x=1710245737;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PlRgBsvkdB1uk+pnCPMDoR/KGnekNC9DXpehVtGRALc=;
-        b=s8216JggPEnr9p9Y0ToNwMHMXOVt6A1JGD45Mi1o4j6m+N9rYSV03LgFfvyzbwCmVG
-         2ExXXruENzxEwib+IouXF845EtezlLfazGNDf3GaVux6HYP9+Y+S8Kumez5h3b4ynGM6
-         0ZhXKQTkoDapV0/YxF5OgVkNXUTUUxS2rtLU5ZGgcvjDbNismQTYAMzCbmiYFjPsg05O
-         kJdL/KD3DKoCVN+qEyJJbHu+HiudBs9f2Vpad2ggLmI6xjul0j2+ZRYDvl8eMIgBzZ3X
-         8Bq44yah+JTFr5bwbZwPnv3N94oL/sBR+2hYa87XNqBatr5hv7Kh+opiB/eRoEXWlmYe
-         dPVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVYgIj+Qo/BzbAeiF3rUna9Q3HQsM3/hSc6oeWG3InFTJMFqTscvT+X28+5/quONm7kjRXbGQL3EYDw47JOs0ArW1gEkI+kBtN4qVMJ
-X-Gm-Message-State: AOJu0YwxswJCbCMFe2HFVvoSJQLf444S2HZnTTmZzZ8gBSrZWF35LU41
-	kwZsMQrBakMhrI+GsNa2JqBPiJbBt94K3WUz5jxOo8RfnGJlt3+J
-X-Google-Smtp-Source: AGHT+IEXK9I278PFM2NIiTH6L6oGJxrYG3KEfyvFvNNFUTa2taVG6i2Re3nVRx86yMtHAooJDKZ7FA==
-X-Received: by 2002:ac2:4186:0:b0:512:f59d:7612 with SMTP id z6-20020ac24186000000b00512f59d7612mr1122169lfh.57.1709640936735;
-        Tue, 05 Mar 2024 04:15:36 -0800 (PST)
-Received: from localhost (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
-        by smtp.gmail.com with ESMTPSA id k3-20020a17090646c300b00a3fbca02e17sm5935394ejs.75.2024.03.05.04.15.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Mar 2024 04:15:36 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Harald Welte <laforge@gnumonks.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	horms@kernel.org,
-	dsahern@kernel.org,
-	osmocom-net-gprs@lists.osmocom.org (open list:GTP (GPRS Tunneling Protocol))
-Subject: [PATCH net-next 3/3] net: gtp: Move net_device assigned in setup
-Date: Tue,  5 Mar 2024 04:15:23 -0800
-Message-ID: <20240305121524.2254533-3-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240305121524.2254533-1-leitao@debian.org>
-References: <20240305121524.2254533-1-leitao@debian.org>
+	s=arc-20240116; t=1709641058; c=relaxed/simple;
+	bh=6rnOKdVwQI2MzdmwdMhHLrpnUs9YP1aZJ1ru0xf/YJE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jDXHwRzC5RVor2gcv7rNyDl0ZhKpyl1t1HUnakVcHe7LAXujA5RKBWfEtpexyeePNM8+aV6nP//0vFzfKQuGlivVgntqfUUuYlAuqAPWFvEsgmKOrhza3PBy4eg/BPGRQ/preHDZbtXC2cpKpGZOQiy3YebMt+cyNLOpPC+O3OM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=U7aRZsBd; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=2LWVyLb7; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=U7aRZsBd; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=2LWVyLb7; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 2915D6AF87;
+	Tue,  5 Mar 2024 12:17:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1709641055; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xTTKqT14OzUQFc7BGqNFhCR/qKYl/0QT6tHoGFcDCE0=;
+	b=U7aRZsBdYbSAIFbgaJkhE/OYsBKQodPMVZeYThqpKcNZxg94fAeMRvUG4tA4q/KgtvadeW
+	Efo4RnmUGsJa3kokoo2s66nAbpPf1UwmVEIBZLuXwPUqw0X5rOFaxw7DFA149FbgAHdEbs
+	x3ogIr4UYIRUHYjmH24fmERyFyeK/rc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1709641055;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xTTKqT14OzUQFc7BGqNFhCR/qKYl/0QT6tHoGFcDCE0=;
+	b=2LWVyLb7WnfvDOlGy8ES1Ocw7VJ5RDnZ0iuypeSYDceg1TuEVxpmmpOabrFTsOY8QJZWQL
+	0Xtf5EDUdwNYUtBg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1709641055; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xTTKqT14OzUQFc7BGqNFhCR/qKYl/0QT6tHoGFcDCE0=;
+	b=U7aRZsBdYbSAIFbgaJkhE/OYsBKQodPMVZeYThqpKcNZxg94fAeMRvUG4tA4q/KgtvadeW
+	Efo4RnmUGsJa3kokoo2s66nAbpPf1UwmVEIBZLuXwPUqw0X5rOFaxw7DFA149FbgAHdEbs
+	x3ogIr4UYIRUHYjmH24fmERyFyeK/rc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1709641055;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xTTKqT14OzUQFc7BGqNFhCR/qKYl/0QT6tHoGFcDCE0=;
+	b=2LWVyLb7WnfvDOlGy8ES1Ocw7VJ5RDnZ0iuypeSYDceg1TuEVxpmmpOabrFTsOY8QJZWQL
+	0Xtf5EDUdwNYUtBg==
+Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 7EF4213A5D;
+	Tue,  5 Mar 2024 12:17:34 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap2.dmz-prg2.suse.org with ESMTPSA
+	id oW1CGV4N52WlJgAAn2gu4w
+	(envelope-from <dkirjanov@suse.de>); Tue, 05 Mar 2024 12:17:34 +0000
+Message-ID: <6464c0d2-8610-4419-b081-fd21cd5e70b6@suse.de>
+Date: Tue, 5 Mar 2024 15:17:29 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 net-next 0/4] net: Provide SMP threads for backlog NAPI
+Content-Language: en-US
+To: Wander Lairson Costa <wander@redhat.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Yan Zhai <yan@cloudflare.com>
+References: <20240305120002.1499223-1-bigeasy@linutronix.de>
+ <3fpntlz5golidj775wfnlzecd7ksimwutcqg7e6d2efejt6sip@akexo2hmy3hb>
+From: Denis Kirjanov <dkirjanov@suse.de>
+In-Reply-To: <3fpntlz5golidj775wfnlzecd7ksimwutcqg7e6d2efejt6sip@akexo2hmy3hb>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=U7aRZsBd;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=2LWVyLb7
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-5.84 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 BAYES_HAM(-2.34)[96.95%];
+	 MIME_GOOD(-0.10)[text/plain];
+	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:98:from];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 DWL_DNSWL_MED(-2.00)[suse.de:dkim];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 DKIM_TRACE(0.00)[suse.de:+];
+	 MX_GOOD(-0.01)[];
+	 RCPT_COUNT_SEVEN(0.00)[10];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Score: -5.84
+X-Rspamd-Queue-Id: 2915D6AF87
+X-Spam-Flag: NO
 
-Assign netdev to gtp->dev at setup time, so, we can get rid of
-gtp_dev_init() completely.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/gtp.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+>>
+> 
+> Patch 0002 does not apply for me. I tried torvalds/master and
+> linux-rt-devel/linux-6.8.y-rt. Which tree should I use?
 
-diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index a279f0cd1b4d..ba4704c2c640 100644
---- a/drivers/net/gtp.c
-+++ b/drivers/net/gtp.c
-@@ -711,15 +711,6 @@ static int gtp_encap_recv(struct sock *sk, struct sk_buff *skb)
- 	return ret;
- }
- 
--static int gtp_dev_init(struct net_device *dev)
--{
--	struct gtp_dev *gtp = netdev_priv(dev);
--
--	gtp->dev = dev;
--
--	return 0;
--}
--
- static void gtp_dev_uninit(struct net_device *dev)
- {
- 	struct gtp_dev *gtp = netdev_priv(dev);
-@@ -937,7 +928,6 @@ static netdev_tx_t gtp_dev_xmit(struct sk_buff *skb, struct net_device *dev)
- }
- 
- static const struct net_device_ops gtp_netdev_ops = {
--	.ndo_init		= gtp_dev_init,
- 	.ndo_uninit		= gtp_dev_uninit,
- 	.ndo_start_xmit		= gtp_dev_xmit,
- };
-@@ -951,6 +941,7 @@ static void gtp_link_setup(struct net_device *dev)
- 	unsigned int max_gtp_header_len = sizeof(struct iphdr) +
- 					  sizeof(struct udphdr) +
- 					  sizeof(struct gtp0_header);
-+	struct gtp_dev *gtp = netdev_priv(dev);
- 
- 	dev->netdev_ops		= &gtp_netdev_ops;
- 	dev->needs_free_netdev	= true;
-@@ -970,6 +961,7 @@ static void gtp_link_setup(struct net_device *dev)
- 	netif_keep_dst(dev);
- 
- 	dev->needed_headroom	= LL_MAX_HEADER + max_gtp_header_len;
-+	gtp->dev = dev;
- }
- 
- static int gtp_hashtable_new(struct gtp_dev *gtp, int hsize);
--- 
-2.43.0
+git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
 
+> 
+> 
 
