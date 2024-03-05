@@ -1,146 +1,229 @@
-Return-Path: <netdev+bounces-77486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 383FD871E93
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:07:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19B4B871EB9
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:14:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A40F1C2173D
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:07:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9923C1F237E6
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:14:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8271F59B44;
-	Tue,  5 Mar 2024 12:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE6F35A113;
+	Tue,  5 Mar 2024 12:14:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fZXDxm8w"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LKwVHYSa"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E693E5917C
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 12:07:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B7A59B5E
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 12:14:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709640457; cv=none; b=EQd0CBDXukA7dPdAlMC+hNBUNvY6qomBZ2lIHVlV8EcwyLoL0zmvaUPhBR5rQBlHJNQ3XbEVtJxBE3NNd97QIfJ4uEs/Xt1HQGy+qMpNwKH9Yb4weOJYReeUol+zTHqLJPH4xgzta2TzL199LihFbWB3D84rJnDZZSA3iZF7F5k=
+	t=1709640860; cv=none; b=GYwFcnfzDASRS2lsU+ea+iWGw50EniDpC4iieq6Z1voVUQjAhFhuE3fWwdD0tLVFzJDOB+1C6yLlIB40W6dYPEBS+aEkfrzmnpp3ZvyRrEk8rk4SliHTq2bqvP77qZ2IN6BQGkRrOX80dlz9vrfDmQqHZ0yarGvrT+h3YkswWw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709640457; c=relaxed/simple;
-	bh=55L4paee6Jf2kzypxu8nRT59dfZZnSAHinu2nGHFAHo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HizgbAZBH19Yb8QQRPsC2XV8SEaQ965jo04qe7KrdVlEHkyz7p1MhDUDPlHW+5EuR/ePhde+OTw0ro6mm65tpfW/orZytLhWGpmieBjQylku3TK7o7agi2zFvriGPrq4Ub+0v10qkLFEOqH+hj+Hxbed7QB/l7rYVae/7424jzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fZXDxm8w; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1709640860; c=relaxed/simple;
+	bh=iUUfZ5ZCtCnqfF/mXQXgZgS5VBRFnGVcwXPjE7EqbMM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=UK3xcAn/DPrNhnc9YagR2tLe4QbmTHfrhOqk7tzbLJTyfCfTi0xP1MdTVPbiNfccL8unAQaCfSvHCuyXtZIF7bhvxoJvRytZhrfHobkctHE1YhEzBZABg1HBHG70j580xoCgKygUtJxWc1Mr+/t7RuZ1umfKmLNOpd1gGrD046Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LKwVHYSa; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709640454;
+	s=mimecast20190719; t=1709640857;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6QyIC8KPbVcnO8UHh0csU+uYuN8rUZZss5zbYqVrpg8=;
-	b=fZXDxm8wX6fhmhvQNs6on4xuoq0hY1iydBFadFtKunF2oh9V2VKb5kLaYtYrXnyveDWSeD
-	DCM4oNXs/SIOnzVhfVIOeJIkDc34UVMN3FbhznPRgBFCEFm8O23I/bZhPqTnC1p6sOGAnv
-	mQU5Nv+rb9mz3NCxQkeZR4nSSdpEHPk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=7HURfjI7Faw+R208eEH1/6yoOtyByjWguc0Ty+w+M30=;
+	b=LKwVHYSaFSDj2hWlpWYNTLNR76KXmjbT+NwggBuqA4GTitP6YNjDTsK2gfbnuwMghs6C9L
+	T+5y+8VXxEEDOeY5fMxrN1oNZkja969iwkfDqwbslA0pUwWUoFxi3R5vavsHFJuwI7Woub
+	hcHMXK4LzGJwzi293VSWTZ0vdWBEUT4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-135-R8xLdif8PLGF4ZeyJyAmLA-1; Tue, 05 Mar 2024 07:07:31 -0500
-X-MC-Unique: R8xLdif8PLGF4ZeyJyAmLA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C2925185A783;
-	Tue,  5 Mar 2024 12:07:30 +0000 (UTC)
-Received: from fedora (unknown [10.22.16.174])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id ACF1A2166AED;
-	Tue,  5 Mar 2024 12:07:27 +0000 (UTC)
-Date: Tue, 5 Mar 2024 09:07:26 -0300
-From: Wander Lairson Costa <wander@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Yan Zhai <yan@cloudflare.com>
-Subject: Re: [PATCH v4 net-next 0/4] net: Provide SMP threads for backlog NAPI
-Message-ID: <3fpntlz5golidj775wfnlzecd7ksimwutcqg7e6d2efejt6sip@akexo2hmy3hb>
-References: <20240305120002.1499223-1-bigeasy@linutronix.de>
+ us-mta-272-v7nouKvBNNC1AjkYZt6fmQ-1; Tue, 05 Mar 2024 07:14:16 -0500
+X-MC-Unique: v7nouKvBNNC1AjkYZt6fmQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3377bf95b77so643055f8f.0
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 04:14:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709640855; x=1710245655;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7HURfjI7Faw+R208eEH1/6yoOtyByjWguc0Ty+w+M30=;
+        b=VJ9lxr34Lu9y9zPlE2uAAf2EHA1UJrBXpCi+angZFXq/kb8z9NVFzomFa5Aj7ZRIIp
+         iS8d8GTSUKk7sQr+ZWiAQ+kh1wdPm6YmfPilxhPtDk9U/lFEyShwiLYcDT5KYAQqLQ6x
+         uPqj+qrCUzTsVI1NON/xDIQ8wcKVchItqOoh6Ed4YMOIm9bq+UWtc5WBUPqL32IjoWSm
+         POLRUokrLBI1ZKE8setwTTH/GUa2VCM9wUirfDvLcg/rNztM46JU3J0d+wCnOdg3pati
+         C+fuinvkhvDm5/nR5F0f4YEyuJwVg0BiFczksHxuzw+JQ6ronQOJCI/JWUAMMollGDKo
+         BDxg==
+X-Gm-Message-State: AOJu0Yy/1s6BoIh4KkGIxLE9G7vhHSj+whFurcKfBJOotKOuqfcB46lq
+	G3WzWhbiCtJgZGxX49mK8eB4F/T1l1kUalAgyyGwFaiApqO2FUMn68Zu8os8LMglVIpnwVLxF2z
+	ms6hRovi7Vltfb7rYpxjt+oFs+Lmhj6ENGNvwcNat+TUOU0q5GXhu1w==
+X-Received: by 2002:a05:600c:511c:b0:412:b2af:2632 with SMTP id o28-20020a05600c511c00b00412b2af2632mr144230wms.0.1709640855463;
+        Tue, 05 Mar 2024 04:14:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFBttRvlQntInwpccaKG5QagCN8I9mJfQO1DtnWPNVs34f9Ppf8zQnggnyzacwyc0deqs4a6g==
+X-Received: by 2002:a05:600c:511c:b0:412:b2af:2632 with SMTP id o28-20020a05600c511c00b00412b2af2632mr144211wms.0.1709640855093;
+        Tue, 05 Mar 2024 04:14:15 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-235-19.dyn.eolo.it. [146.241.235.19])
+        by smtp.gmail.com with ESMTPSA id i9-20020a5d6309000000b0033e122a9a91sm14128708wru.105.2024.03.05.04.14.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Mar 2024 04:14:14 -0800 (PST)
+Message-ID: <8a3ccdc5445d0cfda36418dd50746f13f447bdaa.camel@redhat.com>
+Subject: Re: [PATCH net-next v3] net: netconsole: Add continuation line
+ prefix to userdata messages
+From: Paolo Abeni <pabeni@redhat.com>
+To: Matthew Wood <thepacketgeek@gmail.com>, "David S. Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Breno Leitao
+	 <leitao@debian.org>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Date: Tue, 05 Mar 2024 13:14:13 +0100
+In-Reply-To: <20240301185855.944405-1-thepacketgeek@gmail.com>
+References: <20240301185855.944405-1-thepacketgeek@gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240305120002.1499223-1-bigeasy@linutronix.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-On Tue, Mar 05, 2024 at 12:53:18PM +0100, Sebastian Andrzej Siewior wrote:
-> The RPS code and "deferred skb free" both send IPI/ function call
-> to a remote CPU in which a softirq is raised. This leads to a warning on
-> PREEMPT_RT because raising softiqrs from function call led to undesired
-> behaviour in the past. I had duct tape in RT for the "deferred skb free"
-> and Wander Lairson Costa reported the RPS case.
-> 
-> This series only provides support for SMP threads for backlog NAPI, I
-> did not attach a patch to make it default and remove the IPI related
-> code to avoid confusion. I can post it for reference it asked.
-> 
-> The RedHat performance team was so kind to provide some testing here.
-> The series (with the IPI code removed) has been tested and no regression
-> vs without the series has been found. For testing iperf3 was used on 25G
-> interface, provided by mlx5, ix40e or ice driver and RPS was enabled. I
-> can provide the individual test results if needed.
-> 
-> Changes:
-> - v3…v4 https://lore.kernel.org/all/20240228121000.526645-1-bigeasy@linutronix.de/
-> 
->   - Rebase on top of current net-next, collect Acks.
-> 
->   - Add struct softnet_data as an argument to kick_defer_list_purge().
-> 
->   - Add sd_has_rps_ipi_waiting() check to napi_threaded_poll_loop() which was
->     accidentally removed.
-> 
-> - v2…v3 https://lore.kernel.org/all/20240221172032.78737-1-bigeasy@linutronix.de/
-> 
->   - Move the "if use_backlog_threads()" case into the CONFIG_RPS block
->     within napi_schedule_rps().
-> 
->   - Use __napi_schedule_irqoff() instead of napi_schedule_rps() in
->     kick_defer_list_purge().
-> 
-> - v1…v2 https://lore.kernel.org/all/20230929162121.1822900-1-bigeasy@linutronix.de/
-> 
->   - Patch #1 is new. It ensures that NAPI_STATE_SCHED_THREADED is always
->     set (instead conditional based on task state) and the smboot thread
->     logic relies on this bit now. In v1 NAPI_STATE_SCHED was used but is
->     racy.
-> 
->   - The defer list clean up is split out and also relies on
->     NAPI_STATE_SCHED_THREADED. This fixes a different race.
-> 
-> - RFC…v1 https://lore.kernel.org/all/20230814093528.117342-1-bigeasy@linutronix.de/
-> 
->    - Patch #2 has been removed. Removing the warning is still an option.
-> 
->    - There are two patches in the series:
->      - Patch #1 always creates backlog threads
->      - Patch #2 creates the backlog threads if requested at boot time,
->        mandatory on PREEMPT_RT.
->      So it is either or and I wanted to show how both look like.
-> 
->    - The kernel test robot reported a performance regression with
->      loopback (stress-ng --udp X --udp-ops Y) against the RFC version.
->      The regression is now avoided by using local-NAPI if backlog
->      processing is requested on the local CPU.
-> 
-> Sebastian
-> 
+On Fri, 2024-03-01 at 10:58 -0800, Matthew Wood wrote:
+> Add a space (' ') prefix to every userdata line to match docs for
+> dev-kmsg. To account for this extra character in each userdata entry,
+> reduce userdata entry names (directory name) from 54 characters to 53.
+>=20
+> According to the dev-kmsg docs, a space is used for subsequent lines to
+> mark them as continuation lines.
+>=20
+> > A line starting with ' ', is a continuation line, adding
+> > key/value pairs to the log message, which provide the machine
+> > readable context of the message, for reliable processing in
+> > userspace.
+>=20
+> Testing for this patch::
+>=20
+>  cd /sys/kernel/config/netconsole && mkdir cmdline0
+>  cd cmdline0
+>  mkdir userdata/test && echo "hello" > userdata/test/value
+>  mkdir userdata/test2 && echo "hello2" > userdata/test2/value
+>  echo "message" > /dev/kmsg
+>=20
+> Outputs::
+>=20
+>  6.8.0-rc5-virtme,12,493,231373579,-;message
+>   test=3Dhello
+>   test2=3Dhello2
+>=20
+> And I confirmed all testing works as expected from the original patchset
+>=20
+> Fixes: df03f830d099 ("net: netconsole: cache userdata formatted string in=
+ netconsole_target")
+> Reviewed-by: Breno Leitao <leitao@debian.org>
 
-Patch 0002 does not apply for me. I tried torvalds/master and
-linux-rt-devel/linux-6.8.y-rt. Which tree should I use?
+I guess the tag arrived off-list, because I can't see any sign of it on
+the ML?!?
+
+> Signed-off-by: Matthew Wood <thepacketgeek@gmail.com>
+> ---
+>=20
+> v1 -> v2:
+> - Calculate 53 byte user data name from: entry length - formatting chars =
+- value length
+> - Update docs to reflect 53 byte limit for user data name (director)
+> v2 -> v3:
+> - Added #define for userdata formatting character length (3)
+> - Matched all #defines indent level
+>=20
+>  Documentation/networking/netconsole.rst |  8 ++++----
+>  drivers/net/netconsole.c                | 14 +++++++++-----
+>  2 files changed, 13 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/Documentation/networking/netconsole.rst b/Documentation/netw=
+orking/netconsole.rst
+> index b28c525e5d1e..d55c2a22ec7a 100644
+> --- a/Documentation/networking/netconsole.rst
+> +++ b/Documentation/networking/netconsole.rst
+> @@ -180,7 +180,7 @@ Custom user data can be appended to the end of messag=
+es with netconsole
+>  dynamic configuration enabled. User data entries can be modified without
+>  changing the "enabled" attribute of a target.
+> =20
+> -Directories (keys) under `userdata` are limited to 54 character length, =
+and
+> +Directories (keys) under `userdata` are limited to 53 character length, =
+and
+>  data in `userdata/<key>/value` are limited to 200 bytes::
+> =20
+>   cd /sys/kernel/config/netconsole && mkdir cmdline0
+> @@ -197,8 +197,8 @@ Messages will now include this additional user data::
+>  Sends::
+> =20
+>   12,607,22085407756,-;This is a message
+> - foo=3Dbar
+> - qux=3Dbaz
+> +  foo=3Dbar
+> +  qux=3Dbaz
+> =20
+>  Preview the userdata that will be appended with::
+> =20
+> @@ -218,7 +218,7 @@ The `qux` key is omitted since it has no value::
+> =20
+>   echo "This is a message" > /dev/kmsg
+>   12,607,22085407756,-;This is a message
+> - foo=3Dbar
+> +  foo=3Dbar
+> =20
+>  Delete `userdata` entries with `rmdir`::
+> =20
+> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> index 0de108a1c0c8..8cc28aec59c8 100644
+> --- a/drivers/net/netconsole.c
+> +++ b/drivers/net/netconsole.c
+> @@ -42,12 +42,16 @@ MODULE_AUTHOR("Maintainer: Matt Mackall <mpm@selenic.=
+com>");
+>  MODULE_DESCRIPTION("Console driver for network interfaces");
+>  MODULE_LICENSE("GPL");
+> =20
+> -#define MAX_PARAM_LENGTH	256
+> -#define MAX_USERDATA_NAME_LENGTH	54
+> -#define MAX_USERDATA_VALUE_LENGTH	200
+> +#define MAX_PARAM_LENGTH		256
+> +/* characters used for formatting each userdata entry line (' ', '=3D', =
+'\n') */
+> +#define USERDATA_FORMAT_CHARS		3
+>  #define MAX_USERDATA_ENTRY_LENGTH	256
+> +#define MAX_USERDATA_VALUE_LENGTH	200
+> +#define MAX_USERDATA_NAME_LENGTH	MAX_USERDATA_ENTRY_LENGTH - \
+> +					MAX_USERDATA_VALUE_LENGTH - \
+> +					USERDATA_FORMAT_CHARS
+
+AFAICS this is not what Breno asked, and checkpatch complains
+rightfully. More importantly it's fragile: what will be the result of
+
+	MAX_USERDATA_NAME_LENGTH * 2
+
+?
+
+At least some brackets are required:
+
+#define MAX_USERDATA_NAME_LENGTH	(MAX_USERDATA_ENTRY_LENGTH -
+					 MAX_USERDATA_VALUE_LENGTH - \
+					 USERDATA_FORMAT_CHARS)
+
+Thanks,
+
+Paolo
 
 
