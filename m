@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-77643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A43F887276E
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 20:20:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2537587276F
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 20:20:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D31C28ABEA
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 19:20:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7BE728AC49
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 19:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25CDB24A1D;
-	Tue,  5 Mar 2024 19:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0903E3D0C8;
+	Tue,  5 Mar 2024 19:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tc1XtVRS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bAGitdBk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001FE23758
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 19:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D450928DDB;
+	Tue,  5 Mar 2024 19:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709666431; cv=none; b=nn4rBO6jtR88F67uZjBc2Qq0J7Vu7nZ3jtVp2vQzYEpjClzdqosd/qwKKX/t1DYOGo7LiLR0Gh6g7HZYIWc3HMLn2tMqPsz8oahyEIX9j6+aNulx6vXu+d0f8RFV2fEgiFDZZ7vvHZ1FsR/Vwu+3nu1+mNWxmqkOeWbiIpRzG7U=
+	t=1709666431; cv=none; b=H6qWi+x//cbrVZk0XkKGjUz2nuPHgv+SKyanyix9mghk+BKesDT9fvYubwb4p6iliFMY1EIsf1AFYhxbg2gg+IyxNKtl8TV6psK77ISCMEpU8Vh5S9zHvEBglfk16iR7+9b7hVczJ0/DpVa59L4wOYaiLgi5bNsdR4TEglnGOqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709666431; c=relaxed/simple;
-	bh=oXGnEOeAxG1g9hJ+yWjUadT+HzOFOuz3Nz7lLqVBMM0=;
+	bh=xzqF0FmjD3O9/gjXQ6sdofXmsm0nYugCVSlht7smMBw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=okTzFfsU1KYruCTQSlnaMRZba3BOPxFXnV4ya/e8CeUXDB4aHFT75Dn/1beExVfzgEdbbV3aZgGNdlN6I9JrmbaYYXN2wjxnYBroQNMmvzClZdgx/rp1SmB6tbVPIPmS/y8mhCxU36ezYhHI8YgrknBCy5bihe8WkDjQg0sO00U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tc1XtVRS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7308AC433C7;
-	Tue,  5 Mar 2024 19:20:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=JsoRV5pl0XM/6so4TN/5UrW0k+1fz7DWPCRi8h6r1PhbaK8f5Bizbhf1anN/oymu5h8S4GHGX3mSM7FGFadsaHyTwB6dapmKNRfTW6yy02ew3+C9/741nKwwQQhCZb9x4oRBq/N+YZ5rP4KSnb1AJuussZ/GjdC8rGv47vJTpo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bAGitdBk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5970AC43394;
+	Tue,  5 Mar 2024 19:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709666430;
-	bh=oXGnEOeAxG1g9hJ+yWjUadT+HzOFOuz3Nz7lLqVBMM0=;
+	s=k20201202; t=1709666431;
+	bh=xzqF0FmjD3O9/gjXQ6sdofXmsm0nYugCVSlht7smMBw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tc1XtVRS5dCZha1/Rp8mYoTzl5wpFsaG4WBZX9k7B3tjfULqm4N2g/vIdLBJzv3fN
-	 lpguoYLOhf4O5gMuWOojD0XdZF1kt9ci5IeoUAfSCQUEVi9eiVfl5jRZsQ585v0zTI
-	 BgWjTYQQP6F28cWF9gGECohHQ7QfVDERlt5ND2B9BZPL76Zw/ToGFlhmL0V4xEyU1s
-	 E3KejdMwz+no/cQetYmB46G6OdbqPZfgwirhoR3KAKDYTidtMnyIH/FOb/iGHDqRo4
-	 KEAdBFsqYLfzUMhY0BWpZTiFcl18a6QF3gHx/E1iI+U/zCUVeOzjTMr+qSJX8K41vV
-	 qUQm7vjw9VeOA==
+	b=bAGitdBkYFqBHEbXxNmJOc1vu45bzua63ej6k8ZUzUsOVPP2I/FDw+Fu2RkSo9bWV
+	 U0QI5HF6EefmGGub/5z1S6mlLuhwe7uG/HyYBPA7pTpvLSreZidiKjvwxtpWf6a7Zj
+	 Yyn7GPGkZGMjdP6IatVYFhFYmfoOoNf2SMDqnCo9cDLb793kvk0ThUKjxTIiEOQ3gf
+	 eiN6Ff8LrZPHcn5MfEfC4BQ8trWvv348OfRzkKP8c3ONj3L+DvMRKOPGGzzEK/c7QC
+	 I4rppZtg3UW7BH4jHoXC0Ot1psSZ4EHce6fUyGSDWP+U/dqLIqcngfEewou2qPGJ6K
+	 L1tX71Gu2CIDw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 56591D84BDF;
-	Tue,  5 Mar 2024 19:20:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 44F22D9A4BB;
+	Tue,  5 Mar 2024 19:20:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/ipv6: avoid possible UAF in ip6_route_mpath_notify()
+Subject: Re: [PATCH net-next v3 0/2] net: phy: micrel: lan8814 erratas
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170966643034.28029.5945491496744626018.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Mar 2024 19:20:30 +0000
-References: <20240303144801.702646-1-edumazet@google.com>
-In-Reply-To: <20240303144801.702646-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, syzkaller@googlegroups.com,
- dsahern@kernel.org
+ <170966643127.28029.9572611359773459427.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Mar 2024 19:20:31 +0000
+References: <20240304091548.1386022-1-horatiu.vultur@microchip.com>
+In-Reply-To: <20240304091548.1386022-1-horatiu.vultur@microchip.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ wojciech.drewek@intel.com, arun.ramadoss@microchip.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ UNGLinuxDriver@microchip.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun,  3 Mar 2024 14:48:00 +0000 you wrote:
-> syzbot found another use-after-free in ip6_route_mpath_notify() [1]
+On Mon, 4 Mar 2024 10:15:46 +0100 you wrote:
+> Add two erratas for lan8814. First one fix the led which might
+> stay on even that there is no link. The second one improves increases
+> length of the cable that can be used when used in 1000Base-T.
 > 
-> Commit f7225172f25a ("net/ipv6: prevent use after free in
-> ip6_route_mpath_notify") was not able to fix the root cause.
-> 
-> We need to defer the fib6_info_release() calls after
-> ip6_route_mpath_notify(), in the cleanup phase.
+> v2->v3:
+> - drop trailing underscore from register definitions
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net/ipv6: avoid possible UAF in ip6_route_mpath_notify()
-    https://git.kernel.org/netdev/net/c/685f7d531264
+  - [net-next,v3,1/2] net: phy: micrel: lan8814 led errata
+    https://git.kernel.org/netdev/net-next/c/e9097f8e1e76
+  - [net-next,v3,2/2] net: phy: micrel: lan8814 cable improvement errata
+    https://git.kernel.org/netdev/net-next/c/ad080db4483b
 
 You are awesome, thank you!
 -- 
