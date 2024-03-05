@@ -1,151 +1,190 @@
-Return-Path: <netdev+bounces-77649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA1F78727B4
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 20:39:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 249D88727C5
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 20:40:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90D531F28578
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 19:39:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A8D4B29E49
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 19:40:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3797D433AE;
-	Tue,  5 Mar 2024 19:39:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 068411272A2;
+	Tue,  5 Mar 2024 19:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IyV9m/Er"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="u+y5s3AA";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="bI98yQUl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from wfout5-smtp.messagingengine.com (wfout5-smtp.messagingengine.com [64.147.123.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13ED618639
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 19:39:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FDA186AC3;
+	Tue,  5 Mar 2024 19:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709667542; cv=none; b=Gn8XkZdB4nY6U6FfqG17Q3yTXQsJvZTilRvJIALe/hHV8ce96nN1uZDbpFaAHQ1q3Tjr6nKeKixFTwskO/WSGDR+1h7w0Gl5Tfvp/Pbc/LevhxY0Uoe81UpQGOQYIdabccaVsRShMYQjQliFAWPNTjBDal/ZX7gH7YqsEo2uBCY=
+	t=1709667609; cv=none; b=afjMZVwzckNYh2coLlzUPuCbz6cG1t9ei05cfSVAyEi+fQSlmPS/lyDHfUvE107h/MQcDRloGFJhYIkHbV9HoZfw/IZIssVKJ/qXSKRjBmr4MBR/97k69QDDTw3cvNBHucIzFBnq0+Q4OGeZC0/+l9dpLzSM78DhCTBqd4TMUBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709667542; c=relaxed/simple;
-	bh=e/68+VKLsC0teCsVtqhc3XV7JLXEbG/wcsE+JIedSR8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lQAmrEE5cdkVsKepNeZwIlnhSJcR4/T/aNgvNI2zJrbyVc+eXPps86tUfdtSmHboyMXZJibdkXlvgInimCVjUywg6/3wSU+gmj0b0jgBayARpVSTBTEwU1T4314RX/7X+j8+WilRRyYfowHH7iVhA2N+HhKf1bY9GEPm4FMbbTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IyV9m/Er; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5159FC433C7;
-	Tue,  5 Mar 2024 19:39:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709667541;
-	bh=e/68+VKLsC0teCsVtqhc3XV7JLXEbG/wcsE+JIedSR8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IyV9m/ErmM7hhKj1UQ/BTsgDvrkkHdm2HuBzykonB8gvPi3IJ+QxOpTpmWQNQ++rd
-	 f0j9+tV3+fUIJn6+T/eHdisY5sr9lTNnD38DoU5c42Kw+pLYFtynQzlVgu56XRIkoT
-	 NvuBdBwuryOZDD/D4ckzbDIPwl7zdBZXL6hQlfpmlfiI1GTrd0aJH2xrIvov/cJShX
-	 wqaNBKuK/0xH2AdSMTGrsljcX1pAZ5H5tYIJYr/DIDcHX1QuTZNGEkw5HxtIEQS5ih
-	 rbSPXQKFMuqqzrtL6rTxloGyIaLXFWQQF3SuKQIBMjPgQucCG6KGRQg5QWgZRR9h8Q
-	 eVeW9a34WIOtw==
-Date: Tue, 5 Mar 2024 11:39:00 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org, Sergey
- Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Eric
- Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next v2 03/22] ovpn: add basic netlink support
-Message-ID: <20240305113900.5ed37041@kernel.org>
-In-Reply-To: <d52c6ff5-dd0d-41d1-be6f-272d58ccf010@lunn.ch>
-References: <20240304150914.11444-1-antonio@openvpn.net>
-	<20240304150914.11444-4-antonio@openvpn.net>
-	<e0375bdb-8ef8-4a46-a5cf-351d77840874@lunn.ch>
-	<f546e063-a69d-4c77-81d2-045acf7e6e4f@openvpn.net>
-	<d52c6ff5-dd0d-41d1-be6f-272d58ccf010@lunn.ch>
+	s=arc-20240116; t=1709667609; c=relaxed/simple;
+	bh=UdiRxD3hjdDoNoN6V/B0gO/ecb68kq+k4lK7Gr0p4hM=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=oUKLbPoMolpxhr/3dDSfG7Ut2G79Gfoke6b3G2dS4npOCt4MyGOWkQchMJGEwAHPa4E7FuBG33F8Kq+REBH//H1aYaXHfzvsggw+egPmAPDr1KvzefpFMi4bftpLv/AXV6HlXUYWPZDOSdPTxHNqbEpOZb6+QaY83HvEFdA/oKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=u+y5s3AA; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=bI98yQUl; arc=none smtp.client-ip=64.147.123.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfout.west.internal (Postfix) with ESMTP id ABA8C1C000BF;
+	Tue,  5 Mar 2024 14:40:05 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Tue, 05 Mar 2024 14:40:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1709667605;
+	 x=1709754005; bh=/FrVbuG+NmXdRaEhMkfyj7JdlCIJB5MvqaHthubPGLI=; b=
+	u+y5s3AAcSrVGb/JG8he5PBmKDOIvxjrwOHdIL87rOvKwMJPyQiaXkgjiLGJoDmJ
+	vQ68/D+qg/6dOekc2yRJIgBeXof3hdc4KEHNBJBx1BmYQbwW2UDdDsV440l3FDm2
+	HLetPu0T1oPI74a/+7icglyS8KVKjcZ2lea/2WzWUBr+6ZQpdsP7E5OKdBmPd0Dv
+	i38PKFc65hSDD0mi7GLWvYZ+CiPBuKwyFWG+gRwbGEZMZ5Os+h186BmeCRhMHgjH
+	d3Ao67bTRY1HiP7Hx+JHdjvhO4l7aRjO95FaVqFvLZBdWyMuAfBwO6DETYuEmATL
+	Jr5hKsqqQAKwZKz9STvKqQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1709667605; x=
+	1709754005; bh=/FrVbuG+NmXdRaEhMkfyj7JdlCIJB5MvqaHthubPGLI=; b=b
+	I98yQUlraA9OEhljwZxi0xGj/KiX5jmpLe8XfDfafzNLIXrW/onPeGW4mFpbLe9i
+	3I8GN/VaGrfcercwlZmFiHf5qumPxnzUPv4W16NYSpU+wodrpmoIw6g2bIVPKtmF
+	56oLPpmTIXUr+1O8h3H+d+WwR//OiFnBWVconbGjVSi6Sqo/CaLxhoKi5LoMF+M4
+	jbgnUBVi0gMCGz1el3xvqJdob/9W3QBVEZsUXXpwYbc7Cu/rL9Ark7CH17ytR0Jn
+	BQwiewVJJQji0TFDpF61+b6TlTtWhnaIa6DyXgB+MFRzvktoyzbVdsD3fdJvGlWW
+	w0A1xatwpmxDb9UFKAxdw==
+X-ME-Sender: <xms:FXXnZeYhth3peq_cGtBp4XHfmVGv7WRv_BHKEW4-HhNAOrDUl2mSmw>
+    <xme:FXXnZRYv_0R9QNKcotBfkLapJRAb0tD9zZ0moncYZfvmrl_PDB5L5uZrDhPyTC1ag
+    gpEYS2hPvi8_ZeLK3I>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrheelgdduvdegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
+    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
+    htthgvrhhnpeegfeejhedvledvffeijeeijeeivddvhfeliedvleevheejleetgedukedt
+    gfejveenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:FXXnZY8onRjTqapG4ynsXws_5H6rKs2JW7FmlIXbY0nlhwsG4zMv1A>
+    <xmx:FXXnZQorEljARLaZfc0aAM3QVKzExsFlPELkV8jHJd6wWDRyWd4vfA>
+    <xmx:FXXnZZoT42d9mRO74wrw3ZySRYpVKA2QMduj2WBU8c3BDS5kwO8stg>
+    <xmx:FXXnZddSs7IQiaT3xvSjOg4z4lxJY0V9eTbYBMyYnrWcMBy0QRzc2cFXCpo>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id DD7D2B6008F; Tue,  5 Mar 2024 14:40:04 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-208-g3f1d79aedb-fm-20240301.002-g3f1d79ae
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Message-Id: <b7ef0a2b-40e8-4fac-8396-fe0f394bf0e3@app.fastmail.com>
+In-Reply-To: 
+ <CAHS8izPbBHz=rr65ZtCy-+OGPbXXaY66_5EFSXw2bbhfGweRWg@mail.gmail.com>
+References: <20240305020153.2787423-1-almasrymina@google.com>
+ <20240305020153.2787423-13-almasrymina@google.com>
+ <a2d926be-695a-484b-b2b5-098da47e372e@app.fastmail.com>
+ <CAHS8izPbBHz=rr65ZtCy-+OGPbXXaY66_5EFSXw2bbhfGweRWg@mail.gmail.com>
+Date: Tue, 05 Mar 2024 20:39:44 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Mina Almasry" <almasrymina@google.com>
+Cc: Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ Linux-Arch <linux-arch@vger.kernel.org>, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Jonathan Corbet" <corbet@lwn.net>,
+ "Richard Henderson" <richard.henderson@linaro.org>,
+ "Ivan Kokshaysky" <ink@jurassic.park.msu.ru>,
+ "Matt Turner" <mattst88@gmail.com>,
+ "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+ "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+ "Helge Deller" <deller@gmx.de>, "Andreas Larsson" <andreas@gaisler.com>,
+ "Jesper Dangaard Brouer" <hawk@kernel.org>,
+ "Ilias Apalodimas" <ilias.apalodimas@linaro.org>,
+ "Steven Rostedt" <rostedt@goodmis.org>,
+ "Masami Hiramatsu" <mhiramat@kernel.org>,
+ "Mathieu Desnoyers" <mathieu.desnoyers@efficios.com>,
+ "Alexei Starovoitov" <ast@kernel.org>,
+ "Daniel Borkmann" <daniel@iogearbox.net>,
+ "Andrii Nakryiko" <andrii@kernel.org>,
+ "Martin KaFai Lau" <martin.lau@linux.dev>,
+ "Eduard Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>,
+ "Yonghong Song" <yonghong.song@linux.dev>,
+ "John Fastabend" <john.fastabend@gmail.com>,
+ "KP Singh" <kpsingh@kernel.org>, "Stanislav Fomichev" <sdf@google.com>,
+ "Hao Luo" <haoluo@google.com>, "Jiri Olsa" <jolsa@kernel.org>,
+ "David Ahern" <dsahern@kernel.org>,
+ "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>,
+ shuah <shuah@kernel.org>, "Sumit Semwal" <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ "Pavel Begunkov" <asml.silence@gmail.com>, "David Wei" <dw@davidwei.uk>,
+ "Jason Gunthorpe" <jgg@ziepe.ca>,
+ "Yunsheng Lin" <linyunsheng@huawei.com>,
+ "Shailend Chand" <shailend@google.com>,
+ "Harshitha Ramamurthy" <hramamurthy@google.com>,
+ "Shakeel Butt" <shakeelb@google.com>,
+ "Jeroen de Borst" <jeroendb@google.com>,
+ "Praveen Kaligineedi" <pkaligineedi@google.com>,
+ "Willem de Bruijn" <willemb@google.com>,
+ "Kaiyuan Zhang" <kaiyuanz@google.com>
+Subject: Re: [RFC PATCH net-next v6 12/15] tcp: RX path for devmem TCP
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 5 Mar 2024 17:23:25 +0100 Andrew Lunn wrote:
-> > > > +static int ovpn_pre_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
-> > > > +			 struct genl_info *info)
-> > > > +{
-> > > > +	struct net *net = genl_info_net(info);
-> > > > +	struct net_device *dev;
-> > > > +
-> > > > +	/* the OVPN_CMD_NEW_IFACE command is different from the rest as it
-> > > > +	 * just expects an IFNAME, while all the others expect an IFINDEX
-> > > > +	 */  
-> > > 
-> > > Could you explain that some more. In general, the name should not
-> > > matter to the kernel, udev/systemd might rename it soon after creation
-> > > etc. If it gets moved into a network namespace it might need renaming
-> > > etc.  
-> > 
-> > In a previous discussion it was agreed that we should create ovpn interfaces
-> > via GENL and not via RTNL.
-> > 
-> > For this reason ovpn needs userspace to send the name to give the interface
-> > upon creation. This name is just passed to the networking stack upon
-> > creation/registration, but it is not stored anywhere else.
-> > 
-> > Subsequent netlink calls are then all performed by passing an ifindex.
-> > 
-> > Hence, OVPN_CMD_NEW_IFACE is the only GENL command that required the IFNAME
-> > to be specified.  
-> 
-> I don't really see why GENL vs RTNL makes a difference. The reply to
-> the request can contain the ifindex of the newly created interface. If
-> you set the name to "ovpn%d" before calling register_netdevice() the
-> kernel will find the next free unique ovpn interface name, race
-> free. So you could have multiple openvpn daemon running, and not have
-> to worry about races when creating interfaces.
-> 
-> Jakub has been raising questions about this recently for another
-> patchset. He might comment on this.
+On Tue, Mar 5, 2024, at 20:22, Mina Almasry wrote:
+> On Tue, Mar 5, 2024 at 12:42=E2=80=AFAM Arnd Bergmann <arnd@arndb.de> =
+wrote:
+>> On Tue, Mar 5, 2024, at 03:01, Mina Almasry wrote:
 
-FWIW using ifindex for most ops sounds like the right way to go.
-Passing the name to create sounds fine, but as Andrew said, we
-should default to "ovpn%d" instead of forcing the user to specify 
-the name (and you can echo back the allocated name in the reply
-to OVPN_CMD_NEW_IFACE).
+>>
+>> This structure requires a special compat handler to run
+>> x86-32 binaries on x86-64 because of the different alignment
+>> requirements. Any uapi-visible structures should be defined
+>> to avoid this and just have no holes in them. Maybe extend
+>> one of the __u32 members to __u64 or add another 32-bit padding field?
+>>
+>
+> Honestly the 32-bit fields as-is are somewhat comically large. I don't
+> think extending the __u32 -> __u64 is preferred because I don't see us
+> needing that much, so maybe I can add another 32-bit padding field.
+> Does this look good to you?
 
-Somewhat related - if you require an attr - GENL_REQ_ATTR_CHECK(),
-it does the extact setting for you.
+Having a reserved field works but requires that you check it for
+being zero already, so you can detect an incompatible caller.
 
-> > > > +	OVPN_A_PEER_VPN_RX_BYTES,
-> > > > +	OVPN_A_PEER_VPN_TX_BYTES,
-> > > > +	OVPN_A_PEER_VPN_RX_PACKETS,
-> > > > +	OVPN_A_PEER_VPN_TX_PACKETS,
-> > > > +	OVPN_A_PEER_LINK_RX_BYTES,
-> > > > +	OVPN_A_PEER_LINK_TX_BYTES,
-> > > > +	OVPN_A_PEER_LINK_RX_PACKETS,
-> > > > +	OVPN_A_PEER_LINK_TX_PACKETS,  
-> > > 
-> > > How do these differ to standard network statistics? e.g. what is in
-> > > /sys/class/net/*/statistics/ ?  
-> > 
-> > The first difference is that these stats are per-peer and not per-device.
-> > Behind each device there might be multiple peers connected.
-> > 
-> > This way ovpn is able to tell how much data was sent/received by every
-> > single connected peer.
-> > 
-> > LINK and VPN store different values.
-> > LINK stats are recorded at the transport layer (before decapsulation or
-> > after encapsulation), while VPN stats are recorded at the tunnel layer
-> > (after decapsulation or before encapsulation).
-> > 
-> > I didn't see how to convey the same information using the standard
-> > statistics.  
-> 
-> Right, so this in general makes sense. The only question i have now
-> is, should you be using rtnl_link_stats64. That is the standard
-> structure for interface statistics.
-> 
-> Again, Jakub likes to comment about statistics...
-> 
-> And in general, maybe add more comments. This is the UAPI, it needs to
-> be clear and unambiguous. Documentation/networking/ethtool-netlink.rst.
+> struct dmabuf_cmsg {
+>   __u64 frag_offset;
+>   __u32 frag_size;
+>   __u32 frag_token;
+>   __u32 dmabuf_id;
+>   __u32 ext; /* reserved for future flags */
+> };
 
-Or put enough docs in the YAML spec as those comments get rendered in
-the uAPI header and in HTML docs :)
+Maybe call it 'flags'?
+
+> Another option is to actually compress frag_token & dmabuf_id to be
+> 32-bit combined size if that addresses your concern. I prefer that
+> less in case they end up being too small for future use cases.
+
+I don't know what either of those fields is. Is dmabuf_id not a
+file descriptor? If it is, it has to be 32 bits wide. Otherwise
+having two 16-bit fields and a 32-bit field would indeed add up
+to a multiple of the structure alignment on all architectures and
+solve the problem.
+
+        Arnd
 
