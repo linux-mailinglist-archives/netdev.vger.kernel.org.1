@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-77588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAC0487239E
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 17:05:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 245878723A2
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 17:05:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 715D9287E59
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:05:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5211AB23AD8
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6AFD12A173;
-	Tue,  5 Mar 2024 16:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 753B912837B;
+	Tue,  5 Mar 2024 16:04:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EfWNw97Y"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RuOjrpGA"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191A512A16B
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 16:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E305012A16C
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 16:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709654686; cv=none; b=JAsdZY26qsrfRgPIkhTHUC5wREidGzRXoHbauctbJcqSXUiimQZpBXG5VIeaJ0RBcTG8fls9ZNDC7j6ZMgYoGKTauiGMVzGKXzuvTWCe/Lpp7x2RtgA7j8tT0b6VwMslsoWHITDdIR7Q0rKsg2wATI6kIjHQZkx3/tYaXB7HbEA=
+	t=1709654690; cv=none; b=USE0P5Qv9sAiEfpIQKs7KGDdrbzp75n94eqsTilN6rMtX8iJPrfEUd2MbMCULeT7956Ociw7k+Fetx5lGPMqKnI7DXvOH4tv4QD7CslscYuJNg5Iiz+YdZ1+nAe5FYukDIDFtv87a7uvxEDHN/CpGuCDnPPYvRoAIHj0FS7HzRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709654686; c=relaxed/simple;
-	bh=DYBb33Z/UVRcDZcDfSjIuQmUv3x7A0LmtslLfcKZ4z8=;
+	s=arc-20240116; t=1709654690; c=relaxed/simple;
+	bh=r+JAa2ZCZuzUlZ5+j7doFlqH2VLOA5hH0qAehVbTY/I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XTybyGk6N5B3UNF866200lyw8cySoEZHDPlB2ncGWn2BPN0uETadnguovrdjFq7bt6vk+leJVZCHopWjtbmBF0n3uUylowMbfPvTVUj69Fj5840XY7Ytvub/x0rtTqtqzaZ00sqrL3V//tvVTp3yL8T0trUBlxFWyxR2n0kmO0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EfWNw97Y; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=smiyx4MuuaA1u8AwP+T2v+ooGvLKJ2IsaR+iv4+8vSknLQGCJpnJVEChNjlVjF381PAkmGlSGwDfDToie778dl0cSMSgfB7X7KwZUKyRm0oqu9luDx6U3ZOJOATVg1L7eZ0qJsed/URfk4PZYdCsTI+lR21hS5UuyzRdeVfk2ew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RuOjrpGA; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d9a541b720aso10674395276.0
-        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 08:04:32 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6b269686aso8633254276.1
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 08:04:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709654672; x=1710259472; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709654674; x=1710259474; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ml+T6Ku/RpBJ6TPqtwbz51dgmo/A7GQ9j0i5zvMTCTc=;
-        b=EfWNw97Y8GzqyiKaEvHN2Bz4IdIqqJdw9/hsS1PV2iyhlp5fGu8W+ZCzm78cCTHN5r
-         hj9QgmqtAUq7eObH+lKduEjTtO0bX23ubK7zjNhOvusR9VM1VNBc4z7zFLROSPkzSH5i
-         n1dRJpJkIwu77OwOroU38ZgEzpeXzU0zTpbRd4kk7B3pUC4Hu4LFO2VYM0oQKOEttydD
-         PtHQallGPoLQoUL1Hg/7eUC6MHsT+AG+YmK6LRQqWDCqW/QS3DCUzVlmWo7gy4+a4+2i
-         LSi/d/VT/y48i9r3gK617WfpPkS7b2j3vPSyxuv0uUGJN4G6284Op73QI9gt2E6lu17F
-         Bmww==
+        bh=BP/NiSx0xOGEgpLnrjFAiBUOlZjPqz/JsAge1tk5TKI=;
+        b=RuOjrpGAj+G3ERObc3q/T2cjELp0hDqeYVTcicsRAQmnQwEOo7ncu5ueuAhMh9dgd3
+         R2IGa9ZIjd0lS2zZC9QmRJxuzlmfG2JxCCAkonN2Gc9CSho6cMVAV/vNmfSI3zYjVt00
+         daMPrBq8q+ZmZJIlCmbYDRkA4Evy9sIzoc2JrC+Fy6NNypLMPi1Br6O9+F9RARQ0br5u
+         MoA9NOy4NWA0JcghzVnOvZGmn23z9auzVxAAw/73cpMrMEINK7jnt4ZJP0VhpHEjDnly
+         80mzhlnAudyanuTJhylmatukG/npnUbXq7ihNaYmq5e9OV9ga4t7rya4fRI1RBPMCccz
+         9VoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709654672; x=1710259472;
+        d=1e100.net; s=20230601; t=1709654674; x=1710259474;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ml+T6Ku/RpBJ6TPqtwbz51dgmo/A7GQ9j0i5zvMTCTc=;
-        b=Yjnoxt98Oa0x/IWWk2+G4XWd85Kkrk63esu7akemnagktWxMdIN0qWkTFf3SgumlE7
-         L480FcMPBqJAUFkhrtbJ3L9j+NrDMj10YTtgzePwgd6zNzMXSMr5kI0TbuyafGOWi5n8
-         B+yCtJJFhSSyPFB42lwvI8HUm8MjTxn6W/A4Xq7be2SYpAhSX1zPwYTImS/7a/sdOm4B
-         8njdGPjReP7zXElrARRgKQTQjWdhwfwAYoMigQxMd2lnaN8wO7KgQM/yMgYN86uAMkFW
-         +j9qqvF2iS5r3sXLJnXxLzDMjVaojaZWHXZEs+MkAsjzWb3dvSgj8x4tRdEl8/KiyZqZ
-         FI+w==
-X-Gm-Message-State: AOJu0Yy0GNFwdKLYz3XQqZyClPW2clQ0OoWzyFY3mmcHTXVULlqnv2eE
-	aSiATQqxVkUxxDvAa3JbSb/EXkgp06RLzIOoEuVzkocMgRnb3yf3vxObEaNA64NED3EmDp1QqaC
-	CnMcGtP/VKA==
-X-Google-Smtp-Source: AGHT+IEhDi5G8bUSHeErNh+sj84jAoNG7jvaaXga2zkZ02i8ofaTj+I/DZTU5ouyWHqdRNjLNXhbvF0eRqc88A==
+        bh=BP/NiSx0xOGEgpLnrjFAiBUOlZjPqz/JsAge1tk5TKI=;
+        b=Tz+0uNra08Wf9OJ8P5mFYSeHtzQxU0JJwtPzyPyFmw2/CDrimHycqfD0qy3vhGwFE5
+         vxyI/g/1Unb3zaTVOhmUiJ5wZHJRzRY4gDr6uSKhguCixvEO7u/2LgYrvcKXRMeK22Np
+         Gncx0/mHhB+YVfkRayIP+MR4RODxu9E6aaCHZia8Sv9lqUj8+waQxfr8TVVL7ITTNSTK
+         wPZkTvd6yZW6fX8xnOhZz97tygKeV+ecRHKEMj5tuWeVlBY0JVw9a2ymqLEwtWpkoiRJ
+         IM9U8Wp+MzQmAROl86QNDGq0Xb4PLogYPP0ZK4EpcGojXKamnH6w+TmulcxaA077pU8W
+         kjmQ==
+X-Gm-Message-State: AOJu0YwG6s4QTnVS42KR4NW+T2AtpOwBGx3mJHxyo4eIoluCxaJ+EtSo
+	H15vwB6XIL0BAQ7GYybINW61yuvSvyMPBjc7ajIXWv6DicGFiLkF1rXSkGCcKPm+3L20qnTQvYm
+	bMamLHrt4Pg==
+X-Google-Smtp-Source: AGHT+IE3AbpGzdM17tI9UVSEIDUauX16zYWFGTSlS7ldhfccc8dKfWKhtqDDt6eGB8SCf/QUl2twx2epeiL7DQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1004:b0:dc7:42:ecd with SMTP id
- w4-20020a056902100400b00dc700420ecdmr3125522ybt.6.1709654672270; Tue, 05 Mar
- 2024 08:04:32 -0800 (PST)
-Date: Tue,  5 Mar 2024 16:04:06 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:124b:b0:dc6:dfd9:d423 with SMTP
+ id t11-20020a056902124b00b00dc6dfd9d423mr526001ybu.3.1709654673966; Tue, 05
+ Mar 2024 08:04:33 -0800 (PST)
+Date: Tue,  5 Mar 2024 16:04:07 +0000
 In-Reply-To: <20240305160413.2231423-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240305160413.2231423-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240305160413.2231423-12-edumazet@google.com>
-Subject: [PATCH net-next 11/18] udp: move udpv4_offload and udpv6_offload to net_hotdata
+Message-ID: <20240305160413.2231423-13-edumazet@google.com>
+Subject: [PATCH net-next 12/18] ipv6: move tcpv6_protocol and udpv6_protocol
+ to net_hotdata
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -84,95 +85,128 @@ Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-These structures are used in GRO and GSO paths.
-Move them to net_hodata for better cache locality.
+These structures are read in rx path, move them to net_hotdata
+for better cache locality.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/hotdata.h  |  2 ++
- net/ipv4/udp_offload.c | 17 ++++++++---------
- net/ipv6/udp_offload.c | 21 ++++++++++-----------
- 3 files changed, 20 insertions(+), 20 deletions(-)
+ include/net/hotdata.h |  2 ++
+ net/ipv6/tcp_ipv6.c   | 17 +++++++++--------
+ net/ipv6/udp.c        | 16 ++++++++--------
+ 3 files changed, 19 insertions(+), 16 deletions(-)
 
 diff --git a/include/net/hotdata.h b/include/net/hotdata.h
-index 728aee1cf07c8f0d85873d912248a99e148f84b1..086114e4d3bcc9184304b024ed93c9024888fcf1 100644
+index 086114e4d3bcc9184304b024ed93c9024888fcf1..97617acb75e1f2141fe7170d93c06f9813c725a3 100644
 --- a/include/net/hotdata.h
 +++ b/include/net/hotdata.h
-@@ -11,10 +11,12 @@ struct net_hotdata {
- #if IS_ENABLED(CONFIG_INET)
- 	struct packet_offload	ip_packet_offload;
- 	struct net_offload	tcpv4_offload;
-+	struct net_offload 	udpv4_offload;
- #endif
+@@ -16,7 +16,9 @@ struct net_hotdata {
  #if IS_ENABLED(CONFIG_IPV6)
  	struct packet_offload	ipv6_packet_offload;
  	struct net_offload	tcpv6_offload;
-+	struct net_offload	udpv6_offload;
++	struct inet6_protocol	tcpv6_protocol;
+ 	struct net_offload	udpv6_offload;
++	struct inet6_protocol	udpv6_protocol;
  #endif
  	struct list_head	offload_base;
  	struct list_head	ptype_all;
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 6c95d28d0c4a7e56d587a986113b3711f8de964c..b9880743765c6c24c28bea095f16f0cf091664ce 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -737,15 +737,14 @@ INDIRECT_CALLABLE_SCOPE int udp4_gro_complete(struct sk_buff *skb, int nhoff)
- 	return udp_gro_complete(skb, nhoff, udp4_lib_lookup_skb);
- }
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index f677f0fa51968d00c3571d55ae7850742387f2d1..3f4cba49e9ee6520987993dcea082e6065b4688b 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -58,6 +58,7 @@
+ #include <net/timewait_sock.h>
+ #include <net/inet_common.h>
+ #include <net/secure_seq.h>
++#include <net/hotdata.h>
+ #include <net/busy_poll.h>
  
--static const struct net_offload udpv4_offload = {
--	.callbacks = {
--		.gso_segment = udp4_ufo_fragment,
--		.gro_receive  =	udp4_gro_receive,
--		.gro_complete =	udp4_gro_complete,
--	},
+ #include <linux/proc_fs.h>
+@@ -2367,11 +2368,6 @@ struct proto tcpv6_prot = {
+ };
+ EXPORT_SYMBOL_GPL(tcpv6_prot);
+ 
+-static const struct inet6_protocol tcpv6_protocol = {
+-	.handler	=	tcp_v6_rcv,
+-	.err_handler	=	tcp_v6_err,
+-	.flags		=	INET6_PROTO_NOPOLICY|INET6_PROTO_FINAL,
 -};
--
- int __init udpv4_offload_init(void)
+ 
+ static struct inet_protosw tcpv6_protosw = {
+ 	.type		=	SOCK_STREAM,
+@@ -2408,7 +2404,12 @@ int __init tcpv6_init(void)
  {
--	return inet_add_offload(&udpv4_offload, IPPROTO_UDP);
-+	net_hotdata.udpv4_offload = (struct net_offload) {
-+		.callbacks = {
-+			.gso_segment = udp4_ufo_fragment,
-+			.gro_receive  =	udp4_gro_receive,
-+			.gro_complete =	udp4_gro_complete,
-+		},
+ 	int ret;
+ 
+-	ret = inet6_add_protocol(&tcpv6_protocol, IPPROTO_TCP);
++	net_hotdata.tcpv6_protocol = (struct inet6_protocol) {
++		.handler     = tcp_v6_rcv,
++		.err_handler = tcp_v6_err,
++		.flags	     = INET6_PROTO_NOPOLICY | INET6_PROTO_FINAL,
 +	};
-+	return inet_add_offload(&net_hotdata.udpv4_offload, IPPROTO_UDP);
- }
-diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
-index 6b95ba241ebe2af7e5f2760d8a9c1d78f08579c5..312bcaeea96fb78ac488124cf7795aa834392c64 100644
---- a/net/ipv6/udp_offload.c
-+++ b/net/ipv6/udp_offload.c
-@@ -192,20 +192,19 @@ INDIRECT_CALLABLE_SCOPE int udp6_gro_complete(struct sk_buff *skb, int nhoff)
- 	return udp_gro_complete(skb, nhoff, udp6_lib_lookup_skb);
++	ret = inet6_add_protocol(&net_hotdata.tcpv6_protocol, IPPROTO_TCP);
+ 	if (ret)
+ 		goto out;
+ 
+@@ -2433,7 +2434,7 @@ int __init tcpv6_init(void)
+ out_tcpv6_protosw:
+ 	inet6_unregister_protosw(&tcpv6_protosw);
+ out_tcpv6_protocol:
+-	inet6_del_protocol(&tcpv6_protocol, IPPROTO_TCP);
++	inet6_del_protocol(&net_hotdata.tcpv6_protocol, IPPROTO_TCP);
+ 	goto out;
  }
  
--static const struct net_offload udpv6_offload = {
--	.callbacks = {
--		.gso_segment	=	udp6_ufo_fragment,
--		.gro_receive	=	udp6_gro_receive,
--		.gro_complete	=	udp6_gro_complete,
--	},
+@@ -2441,5 +2442,5 @@ void tcpv6_exit(void)
+ {
+ 	unregister_pernet_subsys(&tcpv6_net_ops);
+ 	inet6_unregister_protosw(&tcpv6_protosw);
+-	inet6_del_protocol(&tcpv6_protocol, IPPROTO_TCP);
++	inet6_del_protocol(&net_hotdata.tcpv6_protocol, IPPROTO_TCP);
+ }
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 3f2249b4cd5f6a594dd9768e29f20f0d9a57faed..97d86909aabb6588d0bba901f6df1f23a4f2e561 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -1702,11 +1702,6 @@ int udpv6_getsockopt(struct sock *sk, int level, int optname,
+ 	return ipv6_getsockopt(sk, level, optname, optval, optlen);
+ }
+ 
+-static const struct inet6_protocol udpv6_protocol = {
+-	.handler	=	udpv6_rcv,
+-	.err_handler	=	udpv6_err,
+-	.flags		=	INET6_PROTO_NOPOLICY|INET6_PROTO_FINAL,
 -};
--
--int udpv6_offload_init(void)
-+int __init udpv6_offload_init(void)
+ 
+ /* ------------------------------------------------------------------------ */
+ #ifdef CONFIG_PROC_FS
+@@ -1803,7 +1798,12 @@ int __init udpv6_init(void)
  {
--	return inet6_add_offload(&udpv6_offload, IPPROTO_UDP);
-+	net_hotdata.udpv6_offload = (struct net_offload) {
-+		.callbacks = {
-+			.gso_segment	=	udp6_ufo_fragment,
-+			.gro_receive	=	udp6_gro_receive,
-+			.gro_complete	=	udp6_gro_complete,
-+		},
+ 	int ret;
+ 
+-	ret = inet6_add_protocol(&udpv6_protocol, IPPROTO_UDP);
++	net_hotdata.udpv6_protocol = (struct inet6_protocol) {
++		.handler     = udpv6_rcv,
++		.err_handler = udpv6_err,
++		.flags	     = INET6_PROTO_NOPOLICY | INET6_PROTO_FINAL,
 +	};
-+	return inet6_add_offload(&net_hotdata.udpv6_offload, IPPROTO_UDP);
++	ret = inet6_add_protocol(&net_hotdata.udpv6_protocol, IPPROTO_UDP);
+ 	if (ret)
+ 		goto out;
+ 
+@@ -1814,12 +1814,12 @@ int __init udpv6_init(void)
+ 	return ret;
+ 
+ out_udpv6_protocol:
+-	inet6_del_protocol(&udpv6_protocol, IPPROTO_UDP);
++	inet6_del_protocol(&net_hotdata.udpv6_protocol, IPPROTO_UDP);
+ 	goto out;
  }
  
- int udpv6_offload_exit(void)
+ void udpv6_exit(void)
  {
--	return inet6_del_offload(&udpv6_offload, IPPROTO_UDP);
-+	return inet6_del_offload(&net_hotdata.udpv6_offload, IPPROTO_UDP);
+ 	inet6_unregister_protosw(&udpv6_protosw);
+-	inet6_del_protocol(&udpv6_protocol, IPPROTO_UDP);
++	inet6_del_protocol(&net_hotdata.udpv6_protocol, IPPROTO_UDP);
  }
 -- 
 2.44.0.278.ge034bb2e1d-goog
