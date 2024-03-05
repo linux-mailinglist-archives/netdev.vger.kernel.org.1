@@ -1,165 +1,98 @@
-Return-Path: <netdev+bounces-77604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9526387249B
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 17:44:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB59C87247A
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 17:39:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52133282B93
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:44:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86B2B2877F1
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:39:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3E29457;
-	Tue,  5 Mar 2024 16:44:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8749E8F55;
+	Tue,  5 Mar 2024 16:39:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="crIKknz5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e+50sRCA"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward502c.mail.yandex.net (forward502c.mail.yandex.net [178.154.239.210])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA16944F;
-	Tue,  5 Mar 2024 16:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D6F8BF7;
+	Tue,  5 Mar 2024 16:39:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709657084; cv=none; b=Qjo6Bu3ZI1/qfJEXGzKnC7yMlIjiVMLc0Igo+MP2PWilZCJplqhCc6EYYW8WEMqfhGqgu8Nhbchlf650m+I+M/v2+H4ivN6jIAqJdU7bc9FCKBgOVNW69d2/5iY4GUO7jCXU+5S0hGEAtiB2NMSn9p9/MHaf8yWkk6ic7CZKU2I=
+	t=1709656781; cv=none; b=lAqHptvHMLO3/QrmVpcBh8JYnQU/sP0M5v/Zkb3c/pBI+XOtouInU3JFB4gRlbmUkMG2/jgTTZvZtykknafcYV3RfXRDut5eustL8WcP++dPWEgDHJPUa274IHUxysm9rEvfynPWnr10kGo5A67OZSoxh8T2V4CTeNvEarZ0lKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709657084; c=relaxed/simple;
-	bh=10vkdmpV3gaRigbF8IpnK1jkrLKdE2fPvsByln69u0o=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=BBAcGqbdZVycyUeJq9bk243kYw8TRDl62gLcE7tEYFNB3D4L29UsC5pbER9TTNVWrBtt/YAxyCOD6NWfFCGFdF1MODaWFVAkjvs7+RUyY4PfvvOPYnSwYGnRlPaU6rwlwR6iMEGLH+C0nMuu9xTpFVNWdnO3+x7zR1GW6FZr9KM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=crIKknz5; arc=none smtp.client-ip=178.154.239.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from mail-nwsmtp-smtp-production-main-45.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-45.sas.yp-c.yandex.net [IPv6:2a02:6b8:c27:19c8:0:640:13a7:0])
-	by forward502c.mail.yandex.net (Yandex) with ESMTPS id 24D5F612B5;
-	Tue,  5 Mar 2024 19:39:14 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-45.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id BdimoxIrAeA0-HIvgkJlw;
-	Tue, 05 Mar 2024 19:39:13 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1709656753; bh=u/kIOUlFzGFVGxoC5cILoKlRfd1Ro/lYe2uW5h6MOSc=;
-	h=In-Reply-To:Subject:To:From:Cc:Date:References:Message-ID;
-	b=crIKknz5apeCS/qvNi1ieQe6nWEyrLAAi845NZEBM6rUS0e5KUHNnCnZUqULmLyfC
-	 7duN0UcowUH0yEnF/lvtdLVNvpUqc0fZL7x3AF81YUzJyudmagTvtwl2At3XjqHrR/
-	 q9GECzR87I6lUJ+JMBljhj746ZVd1VXrjRnmYHYs=
-Authentication-Results: mail-nwsmtp-smtp-production-main-45.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <625c9519-7ae6-43a3-a5d0-81164ad7fd0e@yandex.ru>
-Date: Tue, 5 Mar 2024 19:39:11 +0300
+	s=arc-20240116; t=1709656781; c=relaxed/simple;
+	bh=7vgMXiC1hDBo2W+mPCaSNE01HYivT5LVBqveRukvTZk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PvCvnLJx2jGu8PSXs7qdYl5zNgGmY5GF/VGMiDQjR97jOrTRuDmiyTma3FrTA8KtreZ2b48AU0HthXa0W9XB/ou37e0j6nely8B96xGpYz9RKY0oEfTW4+d3DQWjPAqBOVnnDeb5dGvi4Q7kc2XKTaI/tYO4voRuryy9W0eLtlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e+50sRCA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81467C433F1;
+	Tue,  5 Mar 2024 16:39:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709656780;
+	bh=7vgMXiC1hDBo2W+mPCaSNE01HYivT5LVBqveRukvTZk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=e+50sRCAFYr9qssxAd2CCEJWSD8uQoONX21r70DvAh5vq/CV13lCDJ9kLNl/G08qi
+	 FbNe0AyeYDE4BTW6WG1J3ljJh7aOujNuPjGA6nbQRi9vyBA30MnY3m2PLTUTYms4LY
+	 gX0EUGQUBevvHchQpSM4v6ruUlfxhd0FXES/YJhbxhzLpmdzel/OCAM3LlzoNE0NaK
+	 mw9hp0COR3vTDCfGssJG8fv/Hi2mZNudmwrMzD9eo6FleRcHPbGzlR4ui7BDKYG/vT
+	 erQ4EKSrMJNEjVekC356EL2lA1/LJ0ve26ybTMK4pCfZX3V3NJhha2UD7AuNOKpXyn
+	 LXSWK5g0EXaOw==
+Date: Tue, 5 Mar 2024 08:39:38 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: Re: [PATCH net-next v9 08/13] ptp: Add phc source and helpers to
+ register specific PTP clock or get information
+Message-ID: <20240305083938.6977335f@kernel.org>
+In-Reply-To: <20240305163546.3b9f3ed9@kmaincent-XPS-13-7390>
+References: <20240226-feature_ptp_netnext-v9-0-455611549f21@bootlin.com>
+	<20240226-feature_ptp_netnext-v9-8-455611549f21@bootlin.com>
+	<20240304185734.5f1a476c@kernel.org>
+	<ZebZpspMCqjLES/W@shell.armlinux.org.uk>
+	<20240305111021.5c892d5a@kmaincent-XPS-13-7390>
+	<20240305065939.2d419ff2@kernel.org>
+	<20240305163546.3b9f3ed9@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
- "D. Wythe" <alibuda@linux.alibaba.com>, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, lvc-project@linuxtesting.org
-References: <dacadaef-4fec-4d5e-8b91-1a292ab43b37@yandex.ru>
- <cff8e035-b70a-4910-9af6-e62000c0b87e@linux.alibaba.com>
-From: Dmitry Antipov <dmantipov@yandex.ru>
-Autocrypt: addr=dmantipov@yandex.ru; keydata=
- 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
- tx98MCutXbJWn55RtnVKbpIiMfBrcB8=
-Subject: Re: Reaching official SMC maintainers
-In-Reply-To: <cff8e035-b70a-4910-9af6-e62000c0b87e@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On 3/4/24 13:51, Wen Gu wrote:
+On Tue, 5 Mar 2024 16:35:46 +0100 K=C3=B6ry Maincent wrote:
+> > Still, wouldn't it be simpler to store all accessible PTP instances=20
+> > in the netdev? =20
+>=20
+> You are talking about something like the phy topology but for the ptp?
+>=20
+> Then when asking information on a PHC (tsinfo or hwtstamp config) from et=
+htool
+> we would have to look at the PHC topology of the netdev. This could work.=
+ Not
+> sure it is much simpler, do you see other advantages that it could have?
 
-> IMHO, if we want to address the problem of fasync_struct entries being
-> incorrectly inserted to old socket, we may have to change the general code.
-
-BTW what about using shared wait queue? Just to illustrate an idea:
-
-diff --git a/include/linux/net.h b/include/linux/net.h
-index c9b4a63791a4..02df64747db7 100644
---- a/include/linux/net.h
-+++ b/include/linux/net.h
-@@ -126,6 +126,7 @@ struct socket {
-  	const struct proto_ops	*ops; /* Might change with IPV6_ADDRFORM or MPTCP. */
-
-  	struct socket_wq	wq;
-+	struct socket_wq	*shared_wq;
-  };
-
-  /*
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 0f53a5c6fd9d..f04d61e316b2 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -3360,6 +3360,9 @@ static int __smc_create(struct net *net, struct socket *sock, int protocol,
-  		smc->clcsock = clcsock;
-  	}
-
-+	sock->shared_wq = &smc->shared_wq;
-+	smc->clcsock->shared_wq = &smc->shared_wq;
-+
-  out:
-  	return rc;
-  }
-diff --git a/net/smc/smc.h b/net/smc/smc.h
-index df64efd2dee8..26e66c289d4f 100644
---- a/net/smc/smc.h
-+++ b/net/smc/smc.h
-@@ -287,6 +287,7 @@ struct smc_sock {				/* smc sock container */
-  						/* protects clcsock of a listen
-  						 * socket
-  						 * */
-+	struct socket_wq	shared_wq;
-  };
-
-  #define smc_sk(ptr) container_of_const(ptr, struct smc_sock, sk)
-diff --git a/net/socket.c b/net/socket.c
-index ed3df2f749bf..9b9e6932906f 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -1437,7 +1437,8 @@ static int sock_fasync(int fd, struct file *filp, int on)
-  {
-  	struct socket *sock = filp->private_data;
-  	struct sock *sk = sock->sk;
--	struct socket_wq *wq = &sock->wq;
-+	struct socket_wq *wq = (unlikely(sock->shared_wq) ?
-+				sock->shared_wq : &sock->wq);
-
-  	if (sk == NULL)
-  		return -EINVAL;
-
-Dmitry
-
+I was thinking just an array indexed by enum hwtstamp_source.
+But you're right, once we can express more than one phy per
+netdev we're basically back to doing similar walks. Fair.
 
