@@ -1,213 +1,194 @@
-Return-Path: <netdev+bounces-77625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 045F587266F
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 19:17:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE7D787268B
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 19:29:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FFFA1F276D4
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 18:17:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 455FE1F281E9
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 18:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF92718038;
-	Tue,  5 Mar 2024 18:17:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E216418AED;
+	Tue,  5 Mar 2024 18:29:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Ny91e9ox"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VzY/HMe3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0667E17BBA;
-	Tue,  5 Mar 2024 18:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6A217C6E
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 18:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709662657; cv=none; b=A22wCcv7iPP0/wclqvL+pV9lUQFrVEwQkmlgnFtw+dIEqVWUJDUdXMsNXwVudeQeREPhaua00QiJeNQ7o6QVGIC+6yOk7aF4xurIoiGmizOz2UjZwkuSIHN1yha1STClZHIZbfMatqXb3E9teeOI5R/o4qm3tOcHpkjHX7bwLwk=
+	t=1709663363; cv=none; b=evMD+BNqZam1WHrrExSiWmocC8iKfidlMctJR+0ny2xvmMsH18/f4uqycs+iRd4UFj0L5yU+9zl4AwFvs/XqMCQoUhCfAcxClAzzzhx0fnYqMXxkb1YcbgxSG//ARs3wjS6Qnca/Bm29erSo9qK+aqbSZ6DxSaM6LSmoP/IcpQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709662657; c=relaxed/simple;
-	bh=pKwUTjpsiCUTZE6Y7+RXqePazo0PBfe1Pm4l6OUy8aE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ig6uvTBT0fur7USTcLr1jJC7zrzgl8F43dYCdWJSxwKgkehehw6iCcEHhMnOun2LAHHTj/P7bVhkx/zAIsxzvBXgK8B8Ijaa1+ojoxyyDRawXky7WO8Puz9N1lRxPYeFvDUXHM2tMKpuzXAx5YGZbf2HQgU5nY4Ztxh8lw53swY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Ny91e9ox; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 425Dfvhx010320;
-	Tue, 5 Mar 2024 10:17:18 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=pfpt0220; bh=wUo4AMll
-	YeNPsaijKY9ERTjDT9BT1xnhIuAOleJqmzA=; b=Ny91e9oxQIOSy93pVxHhOqU+
-	EFRDt72CkiwwCOyOim2Nhi2jVwlulDm015+olrd0MY2pLisy4miVmywtOgnjCyTY
-	bTXIKM++2nHyk+R8a+22lZ1p/FJuj/gSYJpvgU8AlKqAtpgNO68zywb81smdKhj8
-	5dRLxQzKNrA+dOtoa5nqqTYest0oX+FfilNGTIUeDWo/ID29d7FJC//xZ7WZjbYZ
-	/p3ca3m+p9pOzmzF5+s67ihJuSEtUr8D5fJ7WiIzQ5MKKhZJptqhpNjf3iTkQuLH
-	Cj4LddfrY1xDv+Ke7NX5OCA9huDZHcFLWXnd3oRCC5sGLFYkMj1ucNK75NCw4w==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3wp13s230w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 05 Mar 2024 10:17:17 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.12; Tue, 5 Mar 2024 10:17:17 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
- Transport; Tue, 5 Mar 2024 10:17:17 -0800
-Received: from hyd1425.marvell.com (unknown [10.29.37.83])
-	by maili.marvell.com (Postfix) with ESMTP id 4F53D5B693B;
-	Tue,  5 Mar 2024 10:17:13 -0800 (PST)
-From: Sai Krishna <saikrishnag@marvell.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>
-CC: Sai Krishna <saikrishnag@marvell.com>
-Subject: [net-next PATCH] octeontx2-pf: Add TC flower offload support for TCP flags
-Date: Tue, 5 Mar 2024 23:46:06 +0530
-Message-ID: <20240305181606.244208-1-saikrishnag@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1709663363; c=relaxed/simple;
+	bh=d4SDYPcK3ui/iasvcVQRHJS5HLEZg5XlZdzq8LAryhA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hrnffYtrjcHQlB3LUVx9dT1NL/wARROvqwTmJjaX8lIoe75faGYXHAD7P7bUFGLrQOo5Ml8Su55IeGjr4lgfAxvS+o3l2lVTsAt+VBNSqXs3gJKtjP7s5VW4WDN7y45GxM+nat9MwCSkvqe+giJAQzjDqg2bDWL8gtsK5laW7kQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VzY/HMe3; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-412f18cd094so5155e9.1
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 10:29:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709663360; x=1710268160; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Oo5Kn86/Rxexd7CHhraCAyyooug8JvfZgqGxxt5ExJY=;
+        b=VzY/HMe3Et5r4HTnqOdd/z1iVkuxDPUi6KMCItB+PEbOeMG5i+WpgPTdd8i+8oHwXM
+         x3oG8u3J1VVOPeEOSozr1W5O8AXJpnlFvjovQWs6ujevZSpS0o338wJiDSPiHyOREDpI
+         usb0MhxDI+XhaDP+0y7br21sGVXDx7e7rLI1/7YkZsbGZPy8Aut1kmXSkPwY+P5ZtWWv
+         W5AfCNAkaTM2Fn3CE75HXMhvoyHXzQNaW8XgUnFcILv0Cnh+o0nmZOCPTTYeUjc3+RM9
+         gTHOrZmT1qW/0JGlmac589VnbHJulLNX7AHL7Py1/JZzul5h1YxrTmQT2+fgGCOIk78D
+         lCdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709663360; x=1710268160;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Oo5Kn86/Rxexd7CHhraCAyyooug8JvfZgqGxxt5ExJY=;
+        b=KG45OI9B2GHLsu7Ur20azHO5/DfcczUype4Enc2pg1j/ZkroRYWJ1sCYEWvF8OGHE/
+         qYQ9KY4x4aYY7Kr6ISvnVxeORC82RvTeG4naTkP0b93CSwqSwZopbl18gpgNs2ihwRzw
+         RUjF0mRsFtD44N3llALizUx1Ax+8LwrKIKQcDPyFzpsy7tihxYu1bIRVBpkGC1AKNZzz
+         uQpQsqU36HU3J3p3l7+S9BBJKH1hRMmn0BJaQjkQKOeO0WvuvY6MwuQE5PDP7V6GwQrq
+         AjLbUGd4DSszM50vmvi5UkGlnJX0gEGQrZZ5buqxCRFOWjrehXZKE5ADQsABZQ4W4wFB
+         th5w==
+X-Forwarded-Encrypted: i=1; AJvYcCVk+wPklJ3CuGfceZOtxbP0iOO2CpFB1nqILsZVi28c2Xxl/vW5RYQfaMUGWEpSeJyXEO3JDE8WR7pYAREf32FNZXXndc0w
+X-Gm-Message-State: AOJu0YwLlT4LcrAjsLI+QtKyuQIPws5ku2/OhSlGIUl0oWcH5P47JvpC
+	v/H42N4ewqznZGA4qUKVQ9FRpssTLGD8POv1umGMrF3ztUoQ9u6c13RsnuFa1oUW4ZCLCUZVXM8
+	0r0w2UlZEySYMxhs7uh2Diq2z0aMk5GqVd3xS
+X-Google-Smtp-Source: AGHT+IHAjs/ChCm0ueFV5Lz1VJ16EqR9k+nrijv3Tycdalr/eFS+XEmf3XjkzaNlTZxL5hE+JyE5ZOfDhIYJzMLRzGY=
+X-Received: by 2002:a05:600c:5106:b0:412:c3d0:593d with SMTP id
+ o6-20020a05600c510600b00412c3d0593dmr170650wms.5.1709663360128; Tue, 05 Mar
+ 2024 10:29:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: oEmlo3HWSwhLJgjxdPc3iVx8i_OpghL9
-X-Proofpoint-ORIG-GUID: oEmlo3HWSwhLJgjxdPc3iVx8i_OpghL9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-05_15,2024-03-05_01,2023-05-22_02
+References: <20240305160413.2231423-1-edumazet@google.com>
+In-Reply-To: <20240305160413.2231423-1-edumazet@google.com>
+From: Soheil Hassas Yeganeh <soheil@google.com>
+Date: Tue, 5 Mar 2024 13:28:42 -0500
+Message-ID: <CACSApvZcw+A_gRwFi3vErYp5WkY=v9sC7aTxFzKvY5GdtOQB+w@mail.gmail.com>
+Subject: Re: [PATCH net-next 00/18] net: group together hot data
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemb@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This patch adds TC offload support for matching TCP flags
-from TCP header.
+On Tue, Mar 5, 2024 at 11:04=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> While our recent structure reorganizations were focused
+> on increasing max throughput, there is still an
+> area where improvements are much needed.
+>
+> In many cases, a cpu handles one packet at a time,
+> instead of a nice batch.
+>
+> Hardware interrupt.
+>  -> Software interrupt.
+>    -> Network/Protocol stacks.
+>
+> If the cpu was idle or busy in other layers,
+> it has to pull many cache lines.
+>
+> This series adds a new net_hotdata structure, where
+> some critical (and read-mostly) data used in
+> rx and tx path is packed in a small number of cache lines.
+>
+> Synthetic benchmarks will not see much difference,
+> but latency of single packet should improve.
+>
+> net_hodata current size on 64bit is 416 bytes,
+> but might grow in the future.
+>
+> Also move RPS definitions to a new include file.
 
-Example usage:
-tc qdisc add dev eth0 ingress
+Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
 
-TC rule to drop the TCP SYN packets:
-tc filter add dev eth0 ingress protocol ip flower ip_proto tcp tcp_flags
-0x02/0x3f skip_sw action drop
+Nice series!
 
-Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/mbox.h      |  1 +
- drivers/net/ethernet/marvell/octeontx2/af/npc.h       |  1 +
- .../net/ethernet/marvell/octeontx2/af/rvu_debugfs.c   |  4 ++++
- .../net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c    |  8 ++++++--
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c  | 11 +++++++++++
- 5 files changed, 23 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index 94217b9981a6..cfe8a8327e1b 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -1557,6 +1557,7 @@ struct flow_msg {
- 	u32 mpls_lse[4];
- 	u8 icmp_type;
- 	u8 icmp_code;
-+	__be16 tcp_flags;
- };
- 
- struct npc_install_flow_req {
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-index 3e6de9d7dde3..d883157393ea 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-@@ -217,6 +217,7 @@ enum key_fields {
- 	NPC_MPLS4_TTL,
- 	NPC_TYPE_ICMP,
- 	NPC_CODE_ICMP,
-+	NPC_TCP_FLAGS,
- 	NPC_HEADER_FIELDS_MAX,
- 	NPC_CHAN = NPC_HEADER_FIELDS_MAX, /* Valid when Rx */
- 	NPC_PF_FUNC, /* Valid when Tx */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-index e6d7914ce61c..2500f5ba4f5a 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-@@ -2870,6 +2870,10 @@ static void rvu_dbg_npc_mcam_show_flows(struct seq_file *s,
- 			seq_printf(s, "%d ", ntohs(rule->packet.dport));
- 			seq_printf(s, "mask 0x%x\n", ntohs(rule->mask.dport));
- 			break;
-+		case NPC_TCP_FLAGS:
-+			seq_printf(s, "%d ", rule->packet.tcp_flags);
-+			seq_printf(s, "mask 0x%x\n", rule->mask.tcp_flags);
-+			break;
- 		case NPC_IPSEC_SPI:
- 			seq_printf(s, "0x%x ", ntohl(rule->packet.spi));
- 			seq_printf(s, "mask 0x%x\n", ntohl(rule->mask.spi));
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-index c75669c8fde7..c181e7aa9eb6 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-@@ -53,6 +53,7 @@ static const char * const npc_flow_names[] = {
- 	[NPC_MPLS4_TTL]     = "lse depth 4",
- 	[NPC_TYPE_ICMP] = "icmp type",
- 	[NPC_CODE_ICMP] = "icmp code",
-+	[NPC_TCP_FLAGS] = "tcp flags",
- 	[NPC_UNKNOWN]	= "unknown",
- };
- 
-@@ -530,6 +531,7 @@ do {									       \
- 	NPC_SCAN_HDR(NPC_DPORT_SCTP, NPC_LID_LD, NPC_LT_LD_SCTP, 2, 2);
- 	NPC_SCAN_HDR(NPC_TYPE_ICMP, NPC_LID_LD, NPC_LT_LD_ICMP, 0, 1);
- 	NPC_SCAN_HDR(NPC_CODE_ICMP, NPC_LID_LD, NPC_LT_LD_ICMP, 1, 1);
-+	NPC_SCAN_HDR(NPC_TCP_FLAGS, NPC_LID_LD, NPC_LT_LD_TCP, 12, 2);
- 	NPC_SCAN_HDR(NPC_ETYPE_ETHER, NPC_LID_LA, NPC_LT_LA_ETHER, 12, 2);
- 	NPC_SCAN_HDR(NPC_ETYPE_TAG1, NPC_LID_LB, NPC_LT_LB_CTAG, 4, 2);
- 	NPC_SCAN_HDR(NPC_ETYPE_TAG2, NPC_LID_LB, NPC_LT_LB_STAG_QINQ, 8, 2);
-@@ -574,7 +576,8 @@ static void npc_set_features(struct rvu *rvu, int blkaddr, u8 intf)
- 		       BIT_ULL(NPC_DPORT_TCP) | BIT_ULL(NPC_DPORT_UDP) |
- 		       BIT_ULL(NPC_SPORT_SCTP) | BIT_ULL(NPC_DPORT_SCTP) |
- 		       BIT_ULL(NPC_SPORT_SCTP) | BIT_ULL(NPC_DPORT_SCTP) |
--		       BIT_ULL(NPC_TYPE_ICMP) | BIT_ULL(NPC_CODE_ICMP);
-+		       BIT_ULL(NPC_TYPE_ICMP) | BIT_ULL(NPC_CODE_ICMP) |
-+		       BIT_ULL(NPC_TCP_FLAGS);
- 
- 	/* for tcp/udp/sctp corresponding layer type should be in the key */
- 	if (*features & proto_flags) {
-@@ -982,7 +985,8 @@ do {									      \
- 		       mask->icmp_type, 0);
- 	NPC_WRITE_FLOW(NPC_CODE_ICMP, icmp_code, pkt->icmp_code, 0,
- 		       mask->icmp_code, 0);
--
-+	NPC_WRITE_FLOW(NPC_TCP_FLAGS, tcp_flags, ntohs(pkt->tcp_flags), 0,
-+		       ntohs(mask->tcp_flags), 0);
- 	NPC_WRITE_FLOW(NPC_IPSEC_SPI, spi, ntohl(pkt->spi), 0,
- 		       ntohl(mask->spi), 0);
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-index 4fd44b6eecea..87bdb93cb066 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-@@ -638,6 +638,7 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
- 	      BIT(FLOW_DISSECTOR_KEY_IPSEC) |
- 	      BIT_ULL(FLOW_DISSECTOR_KEY_MPLS) |
- 	      BIT_ULL(FLOW_DISSECTOR_KEY_ICMP) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_TCP) |
- 	      BIT_ULL(FLOW_DISSECTOR_KEY_IP))))  {
- 		netdev_info(nic->netdev, "unsupported flow used key 0x%llx",
- 			    dissector->used_keys);
-@@ -857,6 +858,16 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
- 		}
- 	}
- 
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_TCP)) {
-+		struct flow_match_tcp match;
-+
-+		flow_rule_match_tcp(rule, &match);
-+
-+		flow_spec->tcp_flags = match.key->flags;
-+		flow_mask->tcp_flags = match.mask->flags;
-+		req->features |= BIT_ULL(NPC_TCP_FLAGS);
-+	}
-+
- 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_MPLS)) {
- 		struct flow_match_mpls match;
- 		u8 bit;
--- 
-2.25.1
-
+> Eric Dumazet (18):
+>   net: introduce struct net_hotdata
+>   net: move netdev_budget and netdev_budget to net_hotdata
+>   net: move netdev_tstamp_prequeue into net_hotdata
+>   net: move ptype_all into net_hotdata
+>   net: move netdev_max_backlog to net_hotdata
+>   net: move ip_packet_offload and ipv6_packet_offload to net_hotdata
+>   net: move tcpv4_offload and tcpv6_offload to net_hotdata
+>   net: move dev_tx_weight to net_hotdata
+>   net: move dev_rx_weight to net_hotdata
+>   net: move skbuff_cache(s) to net_hotdata
+>   udp: move udpv4_offload and udpv6_offload to net_hotdata
+>   ipv6: move tcpv6_protocol and udpv6_protocol to net_hotdata
+>   inet: move tcp_protocol and udp_protocol to net_hotdata
+>   inet: move inet_ehash_secret and udp_ehash_secret into net_hotdata
+>   ipv6: move inet6_ehash_secret and udp6_ehash_secret into net_hotdata
+>   ipv6: move tcp_ipv6_hash_secret and udp_ipv6_hash_secret to
+>     net_hotdata
+>   net: introduce include/net/rps.h
+>   net: move rps_sock_flow_table to net_hotdata
+>
+>  drivers/net/ethernet/intel/ice/ice_arfs.c     |   1 +
+>  .../net/ethernet/mellanox/mlx4/en_netdev.c    |   1 +
+>  .../net/ethernet/mellanox/mlx5/core/en_arfs.c |   1 +
+>  drivers/net/ethernet/sfc/rx_common.c          |   1 +
+>  drivers/net/ethernet/sfc/siena/rx_common.c    |   1 +
+>  drivers/net/tun.c                             |   1 +
+>  include/linux/netdevice.h                     |  88 ------------
+>  include/linux/skbuff.h                        |   1 -
+>  include/net/gro.h                             |   5 +-
+>  include/net/hotdata.h                         |  52 ++++++++
+>  include/net/protocol.h                        |   3 +
+>  include/net/rps.h                             | 125 ++++++++++++++++++
+>  include/net/sock.h                            |  35 -----
+>  kernel/bpf/cpumap.c                           |   4 +-
+>  net/bpf/test_run.c                            |   4 +-
+>  net/core/Makefile                             |   1 +
+>  net/core/dev.c                                |  58 +++-----
+>  net/core/dev.h                                |   3 -
+>  net/core/gro.c                                |  15 +--
+>  net/core/gro_cells.c                          |   3 +-
+>  net/core/gso.c                                |   4 +-
+>  net/core/hotdata.c                            |  22 +++
+>  net/core/net-procfs.c                         |   7 +-
+>  net/core/net-sysfs.c                          |   1 +
+>  net/core/skbuff.c                             |  44 +++---
+>  net/core/sysctl_net_core.c                    |  25 ++--
+>  net/core/xdp.c                                |   5 +-
+>  net/ipv4/af_inet.c                            |  49 +++----
+>  net/ipv4/inet_hashtables.c                    |   3 +-
+>  net/ipv4/tcp.c                                |   1 +
+>  net/ipv4/tcp_offload.c                        |  17 ++-
+>  net/ipv4/udp.c                                |   2 -
+>  net/ipv4/udp_offload.c                        |  17 ++-
+>  net/ipv6/af_inet6.c                           |   1 +
+>  net/ipv6/inet6_hashtables.c                   |   8 +-
+>  net/ipv6/ip6_offload.c                        |  18 +--
+>  net/ipv6/tcp_ipv6.c                           |  17 +--
+>  net/ipv6/tcpv6_offload.c                      |  16 +--
+>  net/ipv6/udp.c                                |  19 ++-
+>  net/ipv6/udp_offload.c                        |  21 ++-
+>  net/sched/sch_generic.c                       |   3 +-
+>  net/sctp/socket.c                             |   1 +
+>  net/xfrm/espintcp.c                           |   4 +-
+>  net/xfrm/xfrm_input.c                         |   3 +-
+>  44 files changed, 391 insertions(+), 320 deletions(-)
+>  create mode 100644 include/net/hotdata.h
+>  create mode 100644 include/net/rps.h
+>  create mode 100644 net/core/hotdata.c
+>
+> --
+> 2.44.0.278.ge034bb2e1d-goog
+>
 
