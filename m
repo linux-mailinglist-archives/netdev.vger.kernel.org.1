@@ -1,94 +1,191 @@
-Return-Path: <netdev+bounces-77668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EFED8728D1
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 21:36:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A4FE8728D2
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 21:40:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E76671F21E07
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 20:36:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1F421C2105E
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 20:40:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 379CE59B7A;
-	Tue,  5 Mar 2024 20:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F9D812A173;
+	Tue,  5 Mar 2024 20:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="e/e6h0dm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.rmail.be (mail.rmail.be [85.234.218.189])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D8A1B941
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 20:36:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.234.218.189
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709670968; cv=none; b=cP/OVdhBQDTrYygiI08qTSNRBo2AKKD9BNnyaXUSgc3ZydhKsbaiin93DvESddpkT+00g00CJd4vbe6Itmx1j1+ItF2Yp6L20O/QV248rxNckizIcLiHxy4F4MPy+L7GbAl4i3mtts3GZBBp5Dbn5Fpk5ErE+aQl9fmfJYVUUQM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709670968; c=relaxed/simple;
-	bh=CUDbIWJg4f3T+elSPI34EWmMZGLez6kybNXPpbp4bWU=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=BBEz36nY9IO3t5z2vnLLIrHlrOwuO5q01stducp8uHbwrNJYvLhA3Cc32Nv5QVXQ65LATfITjWyrUHC8Ywj1yZNIBZw8aeZzaVtYd6/daiEG8gyXaLC3xpWKscG7rOdvuwlaM+PTJh+Wv4vWq0mR+dd303sC0hmmncXrAet53EM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rmail.be; spf=pass smtp.mailfrom=rmail.be; arc=none smtp.client-ip=85.234.218.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rmail.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rmail.be
-Received: from mail.rmail.be (domotica.rmail.be [10.238.9.4])
-	by mail.rmail.be (Postfix) with ESMTP id EA84E4C75C;
-	Tue,  5 Mar 2024 21:36:03 +0100 (CET)
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2080.outbound.protection.outlook.com [40.107.100.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C097F128829;
+	Tue,  5 Mar 2024 20:40:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709671217; cv=fail; b=fUYr0vSaO4ZLN6iAtFUWxFYLYVHCDhO1H75blWwUfvzjWdTfZZ7zZFhKrcGp/FF06drrGbpe+zbtGSZhh3xVsH/aTgrrkxq95XXmFSvIGV7wWjFEroWfA1E0ZFl+RA9Qwld5IVA/i0F57TVheAHuJuJldjEZtWgJEdsg9bNzUmw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709671217; c=relaxed/simple;
+	bh=VZDKn5U2eJ7Q1Q+L28rmGStZLZsnFhTUv/MyqDp237g=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ba7Rtsp+4TYx0KjSx+IO0wXwBg1skYD5Pik/M0q6cr2/bdRU3R7XxjsYuxVZi5Ako459/0Fmm1xG9J1QPWl8vt3v0GCo3dRoMgYrk0xJQpMoHqK+2nYFwtXKjIBYlkblQmPWqMvNXKVzmKMKXg22lo+BaW9Y41pA2WYp+fBT6OI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=e/e6h0dm; arc=fail smtp.client-ip=40.107.100.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eWAHcHTbu7fbUm+8aNCA7Ep4yy3MzO8ppFqqfX73kTOMpxSYBhwtwbHi95jCFr0i33SbvQcZvd0Wr1XbGB3dyoFyRAFDRZbJ4E6Q8nUCdaFgfYMJLfPsZeGWxNWT5dDNTMhfT/T+G6DzCSAEGNbybrxfB0z4aysj7D8kLB6Ci0SChe8o8wQdKmXZT50i7MNXaOoycD5AzKAMB89SBwG4e9kzRq5hwnWWcKZJAjruDZCRRaF7wbr+ujRvABjWS81eP0Y4STWAEOPNMHI2L71qSCr/n3sbLIjKkyQqHZ3sDfFD6uVKFyddTxUJHiqbX6r78+Hvocc0dEWLSG2sdw99ag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MP6vWPQk/SfqfcyYTesfOpWmp8gSYQX80UDrCXBT5iU=;
+ b=Gw47zR6SdEc0XXWdtpgTEYap49pCYsNaJIpIawbqOmC3qgspvqfDrInXdtWyxG+8zuz2UwvI9efVaaZQc4xXTnh0D5eBFJmBy0SbqGE4X7uaj9fPymbmlMGU2TrndQKq87mCF4BnnpxZfGiHS3XOtpuIzik7HqI49raCKSIZoZnigruBOTmFsjXUxqFFNb9ivpbV+w5MID/rWIc9llbrkbvqREJgIxbAswbmryXiQfeaVz474TFxUg9TKN7KuA+FXcHwbETPTerdMGhQ7N7IVY4tcIoETgHVZGpD9NBbTmZg+ZsWaCGJmlwQX/4MQKOGENFCtJ/YkEUr1fM+NEdgzA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MP6vWPQk/SfqfcyYTesfOpWmp8gSYQX80UDrCXBT5iU=;
+ b=e/e6h0dmnJeqOiu3AKN64BLI7ma39f7wnkBrOKL5DBrE+539yZaqsOMWONfpRXonFXMDf59l/pbC66nH9faOZcUI6Lh097d0oKYp7wbCBw0z08gS/yMfXT8ys1XJ1q5946RPiN/MdR/3BaHnQoCiiPFW0ebdYnDzSSaNbu2UAX7gP3SH0FOKK7dFN5UyaeASijlrVK+x8u4qY50j+fRBljo+jfBmIT7Sh0prW1e+wAaVuMFNIN3LKkZUgwMCdP1nXnKc/CZEnUH8CiEWfPv+zyVXIrxUJ58onm5Rk0LRiDp8SemR8I0mzhw8J3DwCQgjKzyQIr4F92+MIvUnmhAWaQ==
+Received: from DM6PR12MB5534.namprd12.prod.outlook.com (2603:10b6:5:20b::9) by
+ PH8PR12MB7301.namprd12.prod.outlook.com (2603:10b6:510:222::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.38; Tue, 5 Mar
+ 2024 20:40:12 +0000
+Received: from DM6PR12MB5534.namprd12.prod.outlook.com
+ ([fe80::4578:4ad4:b52f:3b0]) by DM6PR12MB5534.namprd12.prod.outlook.com
+ ([fe80::4578:4ad4:b52f:3b0%7]) with mapi id 15.20.7339.035; Tue, 5 Mar 2024
+ 20:40:12 +0000
+From: David Thompson <davthompson@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Asmaa Mnebhi
+	<asmaa@nvidia.com>
+Subject: RE: [PATCH net-next v1] mlxbf_gige: add support to display pause
+ frame counters
+Thread-Topic: [PATCH net-next v1] mlxbf_gige: add support to display pause
+ frame counters
+Thread-Index: AQHabxB4RB2Az1LWjUel7zzqlypQjLEpeXOAgAAiepA=
+Date: Tue, 5 Mar 2024 20:40:11 +0000
+Message-ID:
+ <DM6PR12MB553455E2ABC9C8FFE2D324B1C7222@DM6PR12MB5534.namprd12.prod.outlook.com>
+References: <20240305151851.533-1-davthompson@nvidia.com>
+ <20240305103443.70e1f619@kernel.org>
+In-Reply-To: <20240305103443.70e1f619@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR12MB5534:EE_|PH8PR12MB7301:EE_
+x-ms-office365-filtering-correlation-id: f6f73830-dc20-4a24-ad79-08dc3d547474
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ dieciJlvJP6vxlEeitzo1g06ioMFRpeN+6HpesT6hg8hY9CMfx4vWuxYn4uJJ1EpvUdrZ9/8Vjj8W1JDOEu+JjyJuMJLrcXrXoEbrNIB+u0zimPNnwxCDzRvd5lrU10VsaUVdoGlzNVLgB+PGTozBtEEKtDETs0PT/r7SCUu48FhDkwN49WC1Eal/puPEzCW9fkQKzebvUoyq/VZrTA13lV5M1wq7dzcFH4TsF16aPWGsG3NQyqJxNHt+J8srILGcgmJeGDIvFoXtdlGDKFCYSw6AH6IWNZP1BNAP1HI0x8x8KS1u1Dn3XV7mj0FxIjibE3lJe2YauZmDRgKuXs/cXIOFIklfVo2M0Xfhy4mjTrKyUJAfuZ5XUVxo8GrPTkgU3Pe/bLq2jq4EmIAlrJgkyTjB5fiugdEhKbeon3pouKuRke9CgIGYQVyayrvPVCDSaUbm/sHdX52WvZB96czYJQiMxZ3AVoBh/X5aRbXsg3Z0iDj9GOQo8BJPWc00dfogIHxT5DtBg7mda+sxB+xn0YGoZjvcTpyXnmUFUgnf1n5xDVBxhlUM9lcpDmqFxlR6XNi/QjQYVr8YzcqcoxAa3hOB52qdPX/+++fG7hUR3w4ExJdOO66ao1wsLFadgXA47eiG6Ks6drMCQLW2/2amTIzbCQN3Lw5r3rBqltNF2XMpmsbAfbQp3unWu+0YsF2mvJ7ADPn3TnCpARK7fwlew==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB5534.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?SOYEP7cp0cT/v2YsvKB8+Yk/WLRV7ZomeW+3lb9QQjg5I2gTOiS3MbEaCaDv?=
+ =?us-ascii?Q?za7Wdy3RDoJcD4MtDzld6J0sAcawvt18NGD1wQxo4Lipg9t8I5mLWAopLiM0?=
+ =?us-ascii?Q?5boRSRhDW9xgNo1+J/11BsGLwdFbchpaL23v2URvk+ALh757laCGZ66Vxfth?=
+ =?us-ascii?Q?UZRX5Ib3DppwvAmuVinCFATInlV+UX7I9VYV1ew7+roIJREDhyqILDCG6UW5?=
+ =?us-ascii?Q?shHDVkBMJhIJYCF5xLJ8w8tg00qAFXsFg5CQKyT5qcXrLHZooS9SnWd66GOr?=
+ =?us-ascii?Q?xetNzmwb+/+sHiPROu9ULLLajEQO8G/XGJECKbrL8t63d9ftmUbqeIDa8uYC?=
+ =?us-ascii?Q?L+m7EJAmNmirLGPWE0fdUgs8jFFGlVF1CvuKcP+Lz0uaNSQ/miUxAah+uDKr?=
+ =?us-ascii?Q?LajaqITcp9GRl1/y2sfTf+eUBCQyNFQxy3TRjsvTBPJnotRyJWM3EiGv88dw?=
+ =?us-ascii?Q?AiAsptATgWUhhe78CouUlsCbZYQFdLzGJeTejdHANir+dOMnAQLFgqQW9BRl?=
+ =?us-ascii?Q?XVJp8MEEJ0t1PdGFPehpqc5c1LeJA3lMfyJUBzoxAh92R5fIdfV2kJJetpJv?=
+ =?us-ascii?Q?56Ty8ygrjJGg+CimkKSOVYKROXYK/jArgls8KDRmz+oVt9GAOj9/4JO5Ya6w?=
+ =?us-ascii?Q?lqm2VyNJwbz5EZwddgnjALsOoJjk3R8ME2D6SGSZXbBSTw0fTPGGF+G+jCaq?=
+ =?us-ascii?Q?4nF3/ZpHZ3PMCRPal2ZgULmlbNkl7fvGtUyfN0eLtNAGWB/qCahVZooYTDxV?=
+ =?us-ascii?Q?uTF4qfsKwBElbVrXHdBZHwHipuimnxijNS30OTLOc3kNn/5bR4LxdX3mBN9w?=
+ =?us-ascii?Q?yYNZ0VpFmdYxPgA1GTOdst/hd4fQRF2CVwl3TIzdYG9xdwIPhcG82SBWvE9T?=
+ =?us-ascii?Q?kA9YZldpRotyH4z1cexelAVVyLwTjoQ843kA6FX1olH69LcFjRT4hHVOcwG4?=
+ =?us-ascii?Q?RA6Yur46GYG62Cxr7uvJ0BG9UCZNT2j2k2tgWvFq+ydqGKaDnpk5TX2OuJIf?=
+ =?us-ascii?Q?T7Jjpg0nHL1Uxxutt4pTuIsZY7+8FRbJKe9bOcTqhXQYAHjml+VBXq6TWLE8?=
+ =?us-ascii?Q?oJGChP0IEetfE1COxrVwAsNVBO4b/jyV44KuoWAQeEnZPx26cywevMSNWcm5?=
+ =?us-ascii?Q?fIHCbU+ckT1ujK7K2DvJhhAuYFxhEW9bDntic0gqrJlrPoAqVs2Ag6l7e0RV?=
+ =?us-ascii?Q?VKI3W8DHt05vOiOLqtR2vTB+7WGpOZNzQ7RWRh3ScgBKCUknFq3dCs1LiUfl?=
+ =?us-ascii?Q?JpfbO2NGifvbzwmUNh18x4e/JuLW2xeEQAcxRaDEpeOQoRhf6d8ATSG89rEy?=
+ =?us-ascii?Q?aCqfjAUMvShFlyXE7lB9tDLcY19lzD0KX8jSAd40R9zjVZow9W/3GXLrb/mQ?=
+ =?us-ascii?Q?kftp8b32oLH9124gUOFhUdDIgHuC1Gtg8mcjFOZGPzANAeF72sYzJXf5Scu3?=
+ =?us-ascii?Q?AraNYIRorej7E/7OYr6o15ByI/ANmveUqbOYG9cVcGwjYudCHc5yP/MT5QLT?=
+ =?us-ascii?Q?xclozhYra5uVkDv5U3Ipma8yGJzm4XdgVn4Z4FMs1+PNMrWw7g2mZtPpKkfY?=
+ =?us-ascii?Q?aZOeyMTw0dvJnQBiad2YiWaqSN/Q9y0StRlm/mlzW0w3DEKxUpA0XdXDVBtF?=
+ =?us-ascii?Q?BmSJzqEVYLihEPH/xezp9wyTKlUMnqOpY1dqwAslDnaX?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 05 Mar 2024 21:36:03 +0100
-From: Maarten <maarten@rmail.be>
-To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, Broadcom
- internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
-Cc: Doug Berger <opendmb@gmail.com>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Phil Elwell <phil@raspberrypi.com>
-Subject: Re: [PATCH] net: bcmgenet: Reset RBUF on first open
-In-Reply-To: <20240305071321.4f522fe8@kernel.org>
-References: <20240224000025.2078580-1-maarten@rmail.be>
- <bc73b1e2-d99d-4ac2-9ae0-a55a8b271747@broadcom.com>
- <f189f3c9-0ea7-4863-aba7-1c7d0fe11ee2@gmail.com>
- <20240305071321.4f522fe8@kernel.org>
-Message-ID: <45ba80640e989541e142c32fb3520589@rmail.be>
-X-Sender: maarten@rmail.be
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB5534.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f6f73830-dc20-4a24-ad79-08dc3d547474
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Mar 2024 20:40:12.0060
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: BDGzi5Z9wlrY8jiqHliBmVManFkAJmz3eHfgxO8DFPaPcmZXMoWYXowdV38sirz9kuC7OgRIcnau1ZZc1vKcQQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7301
 
-Jakub Kicinski schreef op 2024-03-05 16:13:
-> On Mon, 26 Feb 2024 15:13:57 -0800 Doug Berger wrote:
->> I agree that the Linux driver expects the GENET core to be in a "quasi
->> power-on-reset state" and it seems likely that in both Maxime's case 
->> and
->> the one identified here that is not the case. It would appear that the
->> Raspberry Pi bootloader and/or "firmware" are likely not disabling the
->> GENET receiver after loading the kernel image and before invoking the
->> kernel. They may be disabling the DMA, but that is insufficient since
->> any received data would likely overflow the RBUF leaving it in a "bad"
->> state which this patch apparently improves.
->> 
->> So it seems likely these issues are caused by improper
->> bootloader/firmware behavior.
->> 
->> That said, I suppose it would be nice if the driver were more robust.
->> However, we both know how finicky the receive path of the GENET core 
->> can
->> be about its initialization. Therefore, I am unwilling to "bless" this
->> change for upstream without more due diligence on our side.
-> 
-> The patch has minor formatting issues (using spaces to indent).
-> Once you've gain sufficient confidence that it doesn't cause issues -
-> please mend that and repost.
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Tuesday, March 5, 2024 1:35 PM
+> To: David Thompson <davthompson@nvidia.com>
+> Cc: davem@davemloft.net; edumazet@google.com; pabeni@redhat.com;
+> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Asmaa Mnebhi
+> <asmaa@nvidia.com>
+> Subject: Re: [PATCH net-next v1] mlxbf_gige: add support to display pause=
+ frame
+> counters
+>=20
+> On Tue, 5 Mar 2024 10:18:51 -0500 David Thompson wrote:
+> > +	/* Read LLU counters only if they are enabled */
+> > +	if (mlxbf_gige_llu_counters_enabled(priv)) {
+> > +		data_lo =3D readl(priv->llu_base +
+> MLXBF_GIGE_TX_PAUSE_CNT_LO);
+> > +		data_hi =3D readl(priv->llu_base +
+> MLXBF_GIGE_TX_PAUSE_CNT_HI);
+> > +		pause_stats->tx_pause_frames =3D (data_hi << 32) | data_lo;
+> > +
+> > +		data_lo =3D readl(priv->llu_base +
+> MLXBF_GIGE_RX_PAUSE_CNT_LO);
+> > +		data_hi =3D readl(priv->llu_base +
+> MLXBF_GIGE_RX_PAUSE_CNT_HI);
+> > +		pause_stats->rx_pause_frames =3D (data_hi << 32) | data_lo;
+> > +	} else {
+> > +		pause_stats->tx_pause_frames =3D 0;
+> > +		pause_stats->rx_pause_frames =3D 0;
+>=20
+> Counters are not enabled, meaning we don't know how many frames were sent=
+?
+> Or pause frames are not enabled, therefore we know it's 0?
+>=20
+> If the latter we should add a comment clarifying that, if the former:
+>=20
+>  * @get_pause_stats: Report pause frame statistics. Drivers must not zero
+>  *	statistics which they don't report. The stats structure is initialized
+>  *	to ETHTOOL_STAT_NOT_SET indicating driver does not report statistics.
+> --
+> pw-bot: cr
 
-I'm sorry, it was blatantly obvious and I missed it :-( . I had added 
-indent-with-non-tab to git core.whitespace , but it seems to only error 
-when a full 8 spaces are present in indentation. By any chance, is there 
-something to test this? In the main time, I'll do a git show -p --raw | 
-hexdump -C to check this .
+Hi Jakub, thank you for your comments.
 
-I've fixed that on my git (and fixed some similar issues in other 
-patches) and will resend.
+In this case it's the former, so pause frames are enabled we just don't kno=
+w how
+many are sent or received.  I will update the driver patch accordingly and =
+send v2.
 
-thanks,
-
-Maarten
+Regards, Dave
 
