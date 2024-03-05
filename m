@@ -1,96 +1,110 @@
-Return-Path: <netdev+bounces-77406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A4CF8719C5
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 10:42:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AAD08719CB
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 10:43:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A81D1F21F22
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 09:42:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C7FF1C20CA8
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 09:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3615A52F68;
-	Tue,  5 Mar 2024 09:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDD852F9A;
+	Tue,  5 Mar 2024 09:43:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="DtHQdQaQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from laurent.telenet-ops.be (laurent.telenet-ops.be [195.130.137.89])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42DAA535C9
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 09:41:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.137.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC9252F68
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 09:43:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709631715; cv=none; b=J1ix+H0x9s7ZPrRIHHoGSU/3HG0aaAV3aPPSSIV7plR/CiJO5YzpvMaCHPUDLOnCMzfa2DPhXkqgqT0kwe2gNzWKoKJ9kN+GUoxx+jKzXLX1HgnjXkoAnJTxIzCGXVUEu+cuD8c38558q5eWoqWSYsLi6S+Mf3QeoCCDEglxTcU=
+	t=1709631797; cv=none; b=qbKNvFX1t2Uv99m/5KsF+iYisEoaQw/35qzQ3+SJb3dbNRzx8cdmFL+Sv38cDAypPfC5g3s69+Hrwt3rFAUHNOzajP/QGVn/CEOiyCa2byWXbWNF2mCFdFfc//vdf07fu4Zoh5efKl3z3kl7gODUNlWrI7cmip8uyefiuSviuXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709631715; c=relaxed/simple;
-	bh=dMwgmbNGxOjzag43qzzaR5zBokKVeTOGOhp5Q6wizmE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=j1+aHOMA9MqQ96l4erhqjxIozJWv1QEi+AshYbcSHHoTHppVzssYCLtwG9ijpDz+kll+JFHGOJjcAn/2/CJYOKWi9FUCb6MVHDiJQkTnAK6auzIgc0f+pRP5i0kKB6t2AfkanzYRMjSXOYqWclWrAuLTFgvrNpDZSjO2t27piUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.137.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
-Received: from ramsan.of.borg ([84.195.187.55])
-	by laurent.telenet-ops.be with bizsmtp
-	id uxhm2B00G1C8whw01xhmG6; Tue, 05 Mar 2024 10:41:51 +0100
-Received: from rox.of.borg ([192.168.97.57])
-	by ramsan.of.borg with esmtp (Exim 4.95)
-	(envelope-from <geert@linux-m68k.org>)
-	id 1rhREV-002PPO-Tg;
-	Tue, 05 Mar 2024 10:37:24 +0100
-Received: from geert by rox.of.borg with local (Exim 4.95)
-	(envelope-from <geert@linux-m68k.org>)
-	id 1rhREi-00BUN7-Ih;
-	Tue, 05 Mar 2024 10:37:24 +0100
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Sergei Shtylyov <sergei.shtylyov@gmail.com>
-Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Thanh Quan <thanh.quan.xn@renesas.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH net-next] dt-bindings: net: renesas,etheravb: Add support for R-Car V4M
-Date: Tue,  5 Mar 2024 10:37:18 +0100
-Message-Id: <0212b57ba1005bb9b5a922f8f25cc67a7bc15f30.1709631152.git.geert+renesas@glider.be>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1709631797; c=relaxed/simple;
+	bh=m15fKz5tn5qjvDx1rmcQ6eNp9BysJTSlwqR2O7YG770=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QhOOy5z/qDAKabPyy0j8Qj7zNDkVQ3fCxJyntHFlzuDpBIRgFFAgERprX7KuLa9jXcb/aTDu4ME1kP1IiZhP8WB2cXTMjb+QK4Q5Jcbk5rPX7dFCFEk4H+QZM9F0g1addNkerSe2X+rvCnafVihtLG5JRbgGLopxyd0j9dIl+6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=DtHQdQaQ; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-5c6bd3100fcso3891108a12.3
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 01:43:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1709631795; x=1710236595; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qlO9KJY2+Wev5gu1Gmg14kKqRey8tMMcaneA5J7f8gY=;
+        b=DtHQdQaQ5+evETyYfqOPmpmY/FFdEAbc1u2gNSpz7Jolc6Otib+rUIxoNttSO1tqhD
+         Ow/0pxL6Qmh+f1wZizgbUMAXnDo5sqsMZQY2SNszmMHF+gsD2YHoEc7bEpc4SGXiOX4f
+         Dkf0DM9wjAqeK9vhGjihe1kNkgu98OrxquBJ8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709631795; x=1710236595;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qlO9KJY2+Wev5gu1Gmg14kKqRey8tMMcaneA5J7f8gY=;
+        b=Rs9W5dj6cyIco8YMhCc+AydE1rgUNO3JGVWpcfD5GbJYtawnwSISadROdQLCcBru7/
+         fK5/3ZE/xtLJr9pK4A4/wRaehfGepWOKvSgPpC2EYn/7PKUF/oEnDMQiciHK5do3yRso
+         bRVQM6Sc+FI98aqSgAnSKNMWdxNuRe+T4g+OjmrkUq5dmpQXDErPjQsUUIC3QSaBkDH8
+         kcklkhmPkbgSe81aHZsIFGeu2wJOTs+gSWJohFnzKmSfSl85IwcLZTXoDurpfNUnsZnz
+         X8lh6kok5OGvGtH2ZAhFkWdG7MDh29X5h9Zg15RjKEP7GTf9GFGU9oLCgPR5g8adbReO
+         J4cg==
+X-Forwarded-Encrypted: i=1; AJvYcCWtoW/e47ANXo/1NunesevQqKbQEmjSrt0XP7SgmO5tRbC+80veW2AT45OMRw/xxS6kjHEKpDIwi7j4DzP7nZECBLotiDlm
+X-Gm-Message-State: AOJu0YwkC43+mS39N4lANLoFE79+au8IAQi7O1lCJqy7WSOBOs5HFCt0
+	e/3bEXXqmDK0BbpnIpHlP2Dh/+zole7W3njhua6OurMjLX9Q0YuVFxvsZxqxGw==
+X-Google-Smtp-Source: AGHT+IEHX7VS98PVmPfQMP1A4xGFPH1JI0XcQyxGUfAbT5ZVpEx99l+bOBaCZ6HcNRkSZQoSe7xP0g==
+X-Received: by 2002:a05:6a20:3941:b0:1a1:50d2:58d6 with SMTP id r1-20020a056a20394100b001a150d258d6mr1266291pzg.23.1709631795159;
+        Tue, 05 Mar 2024 01:43:15 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id d10-20020a170902ceca00b001db94dfc2b5sm10089983plg.107.2024.03.05.01.43.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Mar 2024 01:43:14 -0800 (PST)
+Date: Tue, 5 Mar 2024 01:43:14 -0800
+From: Kees Cook <keescook@chromium.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, mic@digikod.net,
+	linux-security-module@vger.kernel.org, jakub@cloudflare.com
+Subject: Re: [PATCH v4 00/12] selftests: kselftest_harness: support using
+ xfail
+Message-ID: <202403050141.C8B1317C9@keescook>
+References: <20240229005920.2407409-1-kuba@kernel.org>
+ <05f7bf89-04a5-4b65-bf59-c19456aeb1f0@sirena.org.uk>
+ <20240304150411.6a9bd50b@kernel.org>
+ <202403041512.402C08D@keescook>
+ <20240304153902.30cd2edd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240304153902.30cd2edd@kernel.org>
 
-From: Thanh Quan <thanh.quan.xn@renesas.com>
+On Mon, Mar 04, 2024 at 03:39:02PM -0800, Jakub Kicinski wrote:
+> On Mon, 4 Mar 2024 15:14:04 -0800 Kees Cook wrote:
+> > > Ugh, I'm guessing vfork() "eats" the signal, IOW grandchild signals,
+> > > child exits? vfork() and signals.. I'd rather leave to Kees || Mickael.  
+> > 
+> > Oh no, that does seem bad. Since Mickaël is also seeing weird issues,
+> > can we drop the vfork changes for now?
+> 
+> Seems doable, but won't be a simple revert. "drop" means we'd need 
+> to bring ->step back. More or less go back to v3.
 
-Document support for the Renesas Ethernet AVB (EtherAVB-IF) block in the
-Renesas R-Car V4M (R8A779H0) SoC.
+I think we have to -- other CIs are now showing the most of seccomp
+failing now. (And I can confirm this now -- I had only tested seccomp
+on earlier versions of the series.)
 
-Signed-off-by: Thanh Quan <thanh.quan.xn@renesas.com>
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
- Documentation/devicetree/bindings/net/renesas,etheravb.yaml | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/Documentation/devicetree/bindings/net/renesas,etheravb.yaml b/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
-index 890f7858d0dc4c79..de7ba7f345a93778 100644
---- a/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
-+++ b/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
-@@ -46,6 +46,7 @@ properties:
-           - enum:
-               - renesas,etheravb-r8a779a0     # R-Car V3U
-               - renesas,etheravb-r8a779g0     # R-Car V4H
-+              - renesas,etheravb-r8a779h0     # R-Car V4M
-           - const: renesas,etheravb-rcar-gen4 # R-Car Gen4
- 
-       - items:
 -- 
-2.34.1
-
+Kees Cook
 
