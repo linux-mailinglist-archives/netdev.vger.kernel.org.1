@@ -1,62 +1,71 @@
-Return-Path: <netdev+bounces-77509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1BB3872001
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:23:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01D3D87201C
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:28:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C8D5286D1C
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:23:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25E351C22F70
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:28:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1279885942;
-	Tue,  5 Mar 2024 13:23:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBF8E85C55;
+	Tue,  5 Mar 2024 13:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jIIavN0w"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fcCvJcgA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D756C5A7A4;
-	Tue,  5 Mar 2024 13:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF7D43AB0;
+	Tue,  5 Mar 2024 13:28:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709645012; cv=none; b=gBICQwvlYSBELwW/jn94m4jx2fCaxTPnpC4jVw9QPebK/+j5nk+GjhWL3p4mlMWXkYgdlj9H6vATK3xkafyQ1APeqgi8GjTEvPcaEjUjy0BK2gJo6ZXTA+QlKVfhClYwZq05FWfdMxrt3KbeX3lLy2BQQZgUg8KL0ZpgbMetAFs=
+	t=1709645321; cv=none; b=iQG/ovB2lVZk0N5rIwWF0IudaiuqE8rt/oxdm8XcwTyT5kVcK8Ly12E6rgC8smZYs1wlCxVqUNoaudxjJHrne/RhCmf+6QnKpognuTc1DgUVXQ0AY7QzPCVflrjJmIc32Ww0dVDMnMgkZDu48pGueTGTtvG5HHGAjBwmX8HoLvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709645012; c=relaxed/simple;
-	bh=ZjacMFRjFcKPH1OLTek2CYbT+B+oPwe4QFvsl3DXWm4=;
+	s=arc-20240116; t=1709645321; c=relaxed/simple;
+	bh=9nHBU801rt03QXGVs4K6yWHFgU//kmL7q1mSOjCjtSc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n++0Cfmbtm0NMOpOqT/TbamTPf3QN13uT/suAdYGsOGVIElP2gvXhI+BdM9FHFTAe15Zo+tMBdD7SBM9V5fRL333s9m5jiPz2f9Oa5BVvekyEJeiKFmtLr+nAzjPYsLOdox95sYje0bqmRwFN3AhTHMnkcqVExlTrJxDiNXF4oc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jIIavN0w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BAD0C43390;
-	Tue,  5 Mar 2024 13:23:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709645011;
-	bh=ZjacMFRjFcKPH1OLTek2CYbT+B+oPwe4QFvsl3DXWm4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jIIavN0waKQKcV1EyO/wpS0H1pK1jeNJn1GezqFBjIrilCwRrLz/8IxcKXDOPIJ6h
-	 y5/NRftgrdirKEByRlN0f7N3w/LBCM3m8U7lFve3SHcDDiKnP9Oq4h8yJsRKDd2qQU
-	 dl6UjOhXGDASmp/uwgIEXgamHMk8O7QkENPcwYSQawYdOJvFsTxAF1Y8WxelnNjvhK
-	 s0szFET8QHzUo/8iul8FbbxY9wTwNNbG5/pCmdac+WqtqzOiG52kd5846uzfQVHK10
-	 CAF4tqHJ4PHqLZnlgBzm+MDWgZNrZ8+LaUBkD3QED+h8DSvhDs6xhpI6w92jyXzk4n
-	 OX7hiN0Rwwccg==
-Date: Tue, 5 Mar 2024 13:23:26 +0000
-From: Simon Horman <horms@kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Abel Wu <wuyun.abel@bytedance.com>,
-	Breno Leitao <leitao@debian.org>,
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
-	David Howells <dhowells@redhat.com>, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v3] sock: Use unsafe_memcpy() for sock_copy()
-Message-ID: <20240305132326.GE2357@kernel.org>
-References: <20240304212928.make.772-kees@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kWqqNaeOQly6QjYj9M5M/lkkTZN2WDpbVpCeMy5to7yjHww8nVlsYl5s6eznTonBNl60vr0wTtYaDwCyetmhgcLPy6QeUkyb3/FphHvs2TyYrE9C6pEqC5VoAb3c1itQhYy/dKq8ykbg9zlqaoCzRZX70hcvUQkZmtPzMeZqRMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fcCvJcgA; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=2o5mFGZCvQCk7WKP/xRNSu+/KpBgcWlkfRQoWTuInbY=; b=fcCvJcgAkcMcQFOc4nYDR/Yzhv
+	Y8IiVBCtwKjUMpOh02072azemJ8Sb6tC/SVw+f74ahwPgdczkKF8WJ9UMCYkcOVxYnaoVgZ6Z3Jwt
+	iiS6/PoKPPutlUHIT5TpgkIpdugZ8H0BsYpd3BejSVa4AjBYvnRK+kDjUeDZosHHJi3Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rhUqi-009Qae-FR; Tue, 05 Mar 2024 14:28:52 +0100
+Date: Tue, 5 Mar 2024 14:28:52 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Julien Panis <jpanis@baylibre.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org
+Subject: Re: [PATCH v2 2/2] net: ethernet: ti: am65-cpsw: Add minimal XDP
+ support
+Message-ID: <be16d069-062e-489d-b8e9-19ef3ef90029@lunn.ch>
+References: <20240223-am65-cpsw-xdp-basic-v2-0-01c6caacabb6@baylibre.com>
+ <20240223-am65-cpsw-xdp-basic-v2-2-01c6caacabb6@baylibre.com>
+ <356f4dd4-eb0e-49fa-a9eb-4dffbe5c7e7c@lunn.ch>
+ <3a5f3950-e47f-409a-b881-0c8545778b91@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,34 +74,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240304212928.make.772-kees@kernel.org>
+In-Reply-To: <3a5f3950-e47f-409a-b881-0c8545778b91@baylibre.com>
 
-On Mon, Mar 04, 2024 at 01:29:31PM -0800, Kees Cook wrote:
-> While testing for places where zero-sized destinations were still showing
-> up in the kernel, sock_copy() and inet_reqsk_clone() were found, which
-> are using very specific memcpy() offsets for both avoiding a portion of
-> struct sock, and copying beyond the end of it (since struct sock is really
-> just a common header before the protocol-specific allocation). Instead
-> of trying to unravel this historical lack of container_of(), just switch
-> to unsafe_memcpy(), since that's effectively what was happening already
-> (memcpy() wasn't checking 0-sized destinations while the code base was
-> being converted away from fake flexible arrays).
+On Tue, Mar 05, 2024 at 11:46:00AM +0100, Julien Panis wrote:
+> On 3/1/24 17:38, Andrew Lunn wrote:
+> > On Fri, Mar 01, 2024 at 04:02:53PM +0100, Julien Panis wrote:
+> > > This patch adds XDP (eXpress Data Path) support to TI AM65 CPSW
+> > > Ethernet driver. The following features are implemented:
+> > > - NETDEV_XDP_ACT_BASIC (XDP_PASS, XDP_TX, XDP_DROP, XDP_ABORTED)
+> > > - NETDEV_XDP_ACT_REDIRECT (XDP_REDIRECT)
+> > > - NETDEV_XDP_ACT_NDO_XMIT (ndo_xdp_xmit callback)
+> > > 
+> > > The page pool memory model is used to get better performance.
+> > Do you have any benchmark numbers? It should help with none XDP
+> > traffic as well. So maybe iperf numbers before and after?
+> > 
+> > 	Andrew
 > 
-> Avoid the following false positive warning with future changes to
-> CONFIG_FORTIFY_SOURCE:
+> Argh...Houston, we have a problem. I checked my v3, which is ready for
+> submission, with iperf3:
+> 1) Before = without page pool -> 500 MBits/sec
+> 2) After = with page pool -> 442 MBits/sec
+> -> ~ 10% worse with page pool here.
 > 
->   memcpy: detected field-spanning write (size 3068) of destination "&nsk->__sk_common.skc_dontcopy_end" at net/core/sock.c:2057 (size 0)
-> 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
->  v3: fix inet_reqsk_clone() comment
->  v2: https://lore.kernel.org/lkml/20240216232220.it.450-kees@kernel.org
->  v1: https://lore.kernel.org/lkml/20240216204423.work.066-kees@kernel.org
+> Unless the difference is not due to page pool. Maybe there's something else
+> which is not good in my patch. I'm going to send the v3 which uses page pool,
+> hopefully someone will find out something suspicious. Meanwhile, I'll carry on
+> investigating: I'll check the results with my patch, by removing only the using of
+> page pool.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+You can also go the other way. First add page pool support. For the
+FEC, that improved its performance. Then add XDP, which i think
+decreased the performance a little. It is extra processing in the hot
+path, so a little loss is not unsurprising.
+
+What tends to be expensive with ARM is cache invalidation and
+flush. So make sure you have the lengths correct. You don't want to
+operate on more memory than necessary. No point flushing the full MTU
+for a 64 byte TCP ACK, etc.
+
+      Andrew
 
