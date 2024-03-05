@@ -1,110 +1,109 @@
-Return-Path: <netdev+bounces-77622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A97F4872640
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 19:07:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3336F872659
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 19:14:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAC011C20B12
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 18:07:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 652281C22AF6
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 18:14:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2350E17C6E;
-	Tue,  5 Mar 2024 18:07:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA13171C4;
+	Tue,  5 Mar 2024 18:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="p2dBZ8Lc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TIDrRuHA"
 X-Original-To: netdev@vger.kernel.org
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F6717BCF;
-	Tue,  5 Mar 2024 18:07:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C49417C73
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 18:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709662047; cv=none; b=RIBaPlCQrPV3qXezh3FCWoIBlFghZ05qIMUTT6DaufOXfSdG9vhXL0DH4MmgWw3HpIUpDJJECc3YGKDhO7tLWV9L2+rJLne9hie3bwlhF5LVHTIZxDMqZ9gS/LULmSNumY0aVStAuibqxVG89zzcolb2OiBQPQL7cpMdapgVEHY=
+	t=1709662459; cv=none; b=EyCudVadvZhnzLMIXSg6k+COlzJQjTKkTtctkmi69bNdD7J4QIesHn5PwwaCx2+fCl/KId7CsE8o6/C7Sv1JX52ur9HtSVgj6hCFBfZnUt2fJ85QTBOZ9Leh9vYtVTo2pI8dbfUyelCAavAtmi4PyiYZLwaYZ2useO2Hd5w131w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709662047; c=relaxed/simple;
-	bh=fRvH1A39coLysQaU+TJosea83wCh3mMgVlbTiDxoJ98=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=HaQwHzE+jHW/ugC1YK8jfipRBiU8A4ClG02J1jWBoYhzLFVEQru+JXNHBD/zAna9ctAsF/s2zSZWneOl1dQPuTjJpm8bg/mlQ+LJ/zDGhvO2OhBnBmJWnDxXtzEhjuUmeeA1+mJss+ajpCnbwk0YzwH6mmBwLke1S4LMwQHP8mY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=p2dBZ8Lc; arc=none smtp.client-ip=45.79.88.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net EF8DB418C2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1709662043; bh=nyMT7rStgBuYBzRKmK59qF223blmDdW15jaZoF38aRo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=p2dBZ8Lc8H+HbEHG1zfkxyu0zmQREynqVsaVx+w4XYQvPeB29ZRk/bNVCSy6xfhVI
-	 glaT7q/L8zzhDknyHqM2osy3F1CnbbyH6e1z+RDDheHZIpP44D/ugjWoV5OCbcRZ4s
-	 ULX/CmcRl4VwPaBeCYUmHRMV+uitORnqfcpVZeokoeJoxwM8EtHromj1LjuvUMH4gw
-	 ahLnUGFmyYX8dRDZqeiE5eNcr0wGa/xPzz0CVA8xiKVRn3w+cURJAihw89t7g+aCAy
-	 eMR6EzSyDQGWhxA8gGr48FbZGUwLLrl4U8mgM9cgGbUzIXtRZeBjw3ePDwLW25T4OJ
-	 nsV/E8jtLy+UQ==
-Received: from localhost (mdns.lwn.net [45.79.72.68])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id EF8DB418C2;
-	Tue,  5 Mar 2024 18:07:22 +0000 (UTC)
-From: Jonathan Corbet <corbet@lwn.net>
-To: Akira Yokosawa <akiyks@gmail.com>, linux-doc@vger.kernel.org
-Cc: Thorsten Blum <thorsten.blum@toblux.com>, Breno Leitao
- <leitao@debian.org>, Jakub Kicinski <kuba@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Vegard Nossum <vegard.nossum@oracle.com>,
- Jani Nikula <jani.nikula@linux.intel.com>, Akira Yokosawa
- <akiyks@gmail.com>
-Subject: Re: [PATCH] docs: Makefile: Add dependency to $(YNL_INDEX) for
- targets other than htmldocs
-In-Reply-To: <e876e3c8-109d-4bc8-9916-05a4bc4ee9ac@gmail.com>
-References: <e876e3c8-109d-4bc8-9916-05a4bc4ee9ac@gmail.com>
-Date: Tue, 05 Mar 2024 11:07:22 -0700
-Message-ID: <878r2wo8md.fsf@meer.lwn.net>
+	s=arc-20240116; t=1709662459; c=relaxed/simple;
+	bh=CLb6htEM8BQ4wkYj4Mfxot1eztyH01EK5KTKnTSNh54=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=bgpYl9lzznCBnBLWuGCbT8FACEgPl8XpMS+UZ/96+KK+JgyCPFxzY0nW2jNQr3G1x4UsWVxvY08Aza9c2X4C1jUqALuqbXzQrQKjRZodyqSig9nqLJibU8fu4kJZY3lueqAzpHJillf9MctT8ZRDcOaw4SO/ISA/HUg2Drn3EbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TIDrRuHA; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6764b9c5-b61a-4f20-a41a-125d5015a3e6@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1709662455;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4mCLjnlt6q90qUCq4m5luMROvGFxl/z1bFGYicutzgw=;
+	b=TIDrRuHAB3Fwdib4sKxYLlkNs/TwItDMIceZL4vZyE4Carkes4zEYbdAlyJQ4dcCUxPpyF
+	6rbx5Zlju5IHwZLJLPCTrfuGz8914F21k9UnY4jBL9g2kqJvjQCD3ROpdK7tcPjKdbpgRy
+	reYNOMlidxSNyyW8Jc7aInmHfsV4vK8=
+Date: Tue, 5 Mar 2024 13:14:09 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Subject: Re: [RESEND2 PATCH net v4 2/2] soc: fsl: qbman: Use raw spinlock for
+ cgr_lock
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Roy Pledge
+ <roy.pledge@nxp.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "stable@vger.kernel.org" <stable@vger.kernel.org>,
+ Li Yang <leoyang.li@nxp.com>, Scott Wood <oss@buserror.net>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Camelia Groza <camelia.groza@nxp.com>,
+ Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+References: <20240222170749.2607485-1-sean.anderson@linux.dev>
+ <20240222170749.2607485-2-sean.anderson@linux.dev>
+ <53b401d7-934c-4937-ab83-6732af47668d@csgroup.eu>
+ <34da1e7b-029e-410b-8735-a10d6d267e2b@linux.dev>
+In-Reply-To: <34da1e7b-029e-410b-8735-a10d6d267e2b@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Akira Yokosawa <akiyks@gmail.com> writes:
+Hi,
 
-> Commit f061c9f7d058 ("Documentation: Document each netlink family")
-> added recipes for YAML -> RST conversion.
-> Then commit 7da8bdbf8f5d ("docs: Makefile: Fix make cleandocs by
-> deleting generated .rst files") made sure those converted .rst files
-> are cleaned by "make cleandocs".
->
-> However, they took care of htmldocs build only.
->
-> If one of other targets such as latexdocs or epubdocs is built
-> without building htmldocs, missing .rst files can cause additional
-> WARNINGs from sphinx-build as follow:
->
->     ./Documentation/userspace-api/netlink/specs.rst:18: WARNING: undefined label: 'specs'
->     ./Documentation/userspace-api/netlink/netlink-raw.rst:64: WARNING: unknown document: '../../networking/netlink_spec/rt_link'
->     ./Documentation/userspace-api/netlink/netlink-raw.rst:64: WARNING: unknown document: '../../networking/netlink_spec/tc'
->     ./Documentation/userspace-api/netlink/index.rst:21: WARNING: undefined label: 'specs'
->
-> Add dependency to $(YNL_INDEX) for other targets and allow any targets
-> to be built cleanly right after "make cleandocs".
->
-> Signed-off-by: Akira Yokosawa <akiyks@gmail.com>
-> Cc: stable@vger.kernel.org  # v6.7
-> Cc: Thorsten Blum <thorsten.blum@toblux.com>
-> Cc: Breno Leitao <leitao@debian.org>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: David S. Miller <davem@davemloft.net>
-> ---
-> Hi,
->
-> While the first offending commit went through the -net tree, 
-> I'd like Jon to pick this up provided there is no objection from
-> Jakub or davem.
+On 2/23/24 11:02, Sean Anderson wrote:
+> On 2/23/24 00:38, Christophe Leroy wrote:
+>> Le 22/02/2024 à 18:07, Sean Anderson a écrit :
+>>> [Vous ne recevez pas souvent de courriers de sean.anderson@linux.dev. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
+>>> 
+>>> cgr_lock may be locked with interrupts already disabled by
+>>> smp_call_function_single. As such, we must use a raw spinlock to avoid
+>>> problems on PREEMPT_RT kernels. Although this bug has existed for a
+>>> while, it was not apparent until commit ef2a8d5478b9 ("net: dpaa: Adjust
+>>> queue depth on rate change") which invokes smp_call_function_single via
+>>> qman_update_cgr_safe every time a link goes up or down.
+>> 
+>> Why a raw spinlock to avoid problems on PREEMPT_RT, can you elaborate ?
+> 
+> smp_call_function always runs its callback in hard IRQ context, even on
+> PREEMPT_RT, where spinlocks can sleep. So we need to use raw spinlocks
+> to ensure we aren't waiting on a sleeping task. See the first bug report
+> for more discussion.
+> 
+> In the longer term it would be better to switch to some other
+> abstraction.
 
-Applied, thanks.
+Does this make sense to you?
 
-jon
+--Sean
+
 
