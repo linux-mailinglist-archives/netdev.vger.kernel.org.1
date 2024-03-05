@@ -1,202 +1,143 @@
-Return-Path: <netdev+bounces-77576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47985872370
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 17:00:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1605A87254F
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 18:10:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F24D2283B02
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:00:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 488061C250E8
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 17:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63933127B7F;
-	Tue,  5 Mar 2024 16:00:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79E61865B;
+	Tue,  5 Mar 2024 17:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="UM0OUMbD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RhX/3hFu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-bc08.mail.infomaniak.ch (smtp-bc08.mail.infomaniak.ch [45.157.188.8])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DF5127B71
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 16:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B0C18622
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 17:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709654434; cv=none; b=fYxxJ5NbaCmJ7p121W0Z0yy1aoQ8VZJqX/f7jQF9NXyyUJQnedBJbUhYW8uFBYPKFw3MU0lYb1y3AGPSf98hywxkfhTHZEcuzMMC+2li5UVMO3JpP2CrfKUCbRDB+7np1zXMlQL6pXPrWEwMi+ay7UNBIhwQaLl2/Orn6fKd7tM=
+	t=1709658560; cv=none; b=Qhku7FoADIk/w0Rfa7YkPNNJhm8Ns8GbpjdWoEC8SP6FFrMmrSx6CK95nFH6si6S6+8S4bj0D9aXRBZmVgDzkFfJPcrQmkCGAfyWcTBTmaMB0yW9IJar1oj1scsXjjMCr+i9V/b3K6J7CzQwKB2J8FT7QyE3tXQDnfbFFknurzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709654434; c=relaxed/simple;
-	bh=ue1Fg+6PAqeVbOLBaqzgadL3cQSFzw3F6sfDg+/iUjA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ntBEl427ywRjMGLUO8bBFbrncIOb0JzXtdcBaE83aFki7OQ6gySfoRDcb2GiFeI+MwyUDLIyTv4SWm8ek44rf6eHYMSq2wqBBsgxhVQYofNPPs7tSkZwH36tlCEFhNp6fxKLpb5PosbTpHIYNP4PJWA4SZ1dlrGe7HSt9qCaB90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=UM0OUMbD; arc=none smtp.client-ip=45.157.188.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Tq0dg1KBBzMpvMw;
-	Tue,  5 Mar 2024 17:00:23 +0100 (CET)
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4Tq0df3wLszvr;
-	Tue,  5 Mar 2024 17:00:22 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1709654423;
-	bh=ue1Fg+6PAqeVbOLBaqzgadL3cQSFzw3F6sfDg+/iUjA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UM0OUMbDmXkdN+AYlV1EP4YMfYfg/egqSlGrg+qTLzMJgsR4MEAJSTbR7Kft66jfE
-	 6pHppjeZpswTIUFhpIgYTJPW/x+5+GzAeGlxg9h6UDp19uR/7kUCdzTdrECBGD5B8f
-	 XE7TxtP61ZB7DlmrSDR/YJBon634mqZcEfSOE99M=
-Date: Tue, 5 Mar 2024 17:00:11 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Mark Brown <broonie@kernel.org>, 
-	keescook@chromium.org, davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, jakub@cloudflare.com
-Subject: Re: [PATCH v4 00/12] selftests: kselftest_harness: support using
- xfail
-Message-ID: <20240305.hoi8ja1eeg4C@digikod.net>
-References: <20240229005920.2407409-1-kuba@kernel.org>
- <05f7bf89-04a5-4b65-bf59-c19456aeb1f0@sirena.org.uk>
- <20240304150411.6a9bd50b@kernel.org>
- <7bb3b635-9fed-47ab-a640-ccac6d283b54@intel.com>
+	s=arc-20240116; t=1709658560; c=relaxed/simple;
+	bh=1Ttryv65xjQQ9A5IdThtYsIeWh9vhLYLdU8wVPWkY1s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nXQo8C+fb/FwLBdiBH8aZ7Ud+V1k9Ub/cdPS1a+WlA2EQb66cWUSAPbIVJYf/gRhsDR1aSVhzxLykl4RTR0s0n7FrTNbnPBuxerJQMr4CccwHNHpaP+yguhp54ErJuqVJGkQbZZ4h7iZPV+Hl6UaAYyLyuFM2vUJrCn8vZ+Z2uU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RhX/3hFu; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709658559; x=1741194559;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=1Ttryv65xjQQ9A5IdThtYsIeWh9vhLYLdU8wVPWkY1s=;
+  b=RhX/3hFuDS0d3yF9bpbp4fY/nVQBHPGfkl+juxCS52FrWL7k3xQgmTs2
+   qU+qQgv1zqRAanY7li1j3EUtrPHXhffcyDa0T8d08k7jmWZND8zqFVSCp
+   7Ant04C7POEMQOLQkiKbXFgiih+gRITC3+NLgHfYm3kbxjPeKXZHCtjMu
+   Pi7GtrHnyPgcQmK1IepilyknyEfDH6RaR1MmbtLDmQ8aYxY0QWdvsJ0j9
+   shx6jnCbMhWF+5IMxVhfNLqYTGXcqwYgDxSSRQpVL57V1KJkt4LRTRD2i
+   Fo2P6+aJm7MrPJHLCZSG9XlNKO6HaVxx8tSdliSutY5j3I1WAsMLV1W8o
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="4085253"
+X-IronPort-AV: E=Sophos;i="6.06,206,1705392000"; 
+   d="scan'208";a="4085253"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 09:08:36 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
+   d="scan'208";a="40324709"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa002.jf.intel.com with ESMTP; 05 Mar 2024 09:08:34 -0800
+Received: from pkitszel-desk.tendawifi.com (unknown [10.254.153.213])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 71F58397D2;
+	Tue,  5 Mar 2024 16:03:12 +0000 (GMT)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	lukasz.czapnik@intel.com,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Michal Kubiak <michal.kubiak@intel.com>
+Subject: [PATCH iwl-net] ixgbe: avoid sleeping allocation in ixgbe_ipsec_vf_add_sa()
+Date: Tue,  5 Mar 2024 17:02:02 +0100
+Message-ID: <20240305160252.68708-1-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <7bb3b635-9fed-47ab-a640-ccac6d283b54@intel.com>
-X-Infomaniak-Routing: alpha
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 05, 2024 at 04:48:06PM +0100, Przemek Kitszel wrote:
-> On 3/5/24 00:04, Jakub Kicinski wrote:
-> > On Mon, 4 Mar 2024 22:20:03 +0000 Mark Brown wrote:
-> > > On Wed, Feb 28, 2024 at 04:59:07PM -0800, Jakub Kicinski wrote:
-> > > 
-> > > > When running selftests for our subsystem in our CI we'd like all
-> > > > tests to pass. Currently some tests use SKIP for cases they
-> > > > expect to fail, because the kselftest_harness limits the return
-> > > > codes to pass/fail/skip. XFAIL which would be a great match
-> > > > here cannot be used.
-> > > > 
-> > > > Remove the no_print handling and use vfork() to run the test in
-> > > > a different process than the setup. This way we don't need to
-> > > > pass "failing step" via the exit code. Further clean up the exit
-> > > > codes so that we can use all KSFT_* values. Rewrite the result
-> > > > printing to make handling XFAIL/XPASS easier. Support tests
-> > > > declaring combinations of fixture + variant they expect to fail.
-> > > 
-> > > This series landed in -next today and has caused breakage on all
-> > > platforms in the ALSA pcmtest-driver test.  When run on systems that
-> > > don't have the driver it needs loaded the test skip but since this
-> > > series was merged skipped tests are logged but then reported back as
-> > > failures:
-> > > 
-> > > # selftests: alsa: test-pcmtest-driver
-> > > # TAP version 13
-> > > # 1..5
-> > > # # Starting 5 tests from 1 test cases.
-> > > # #  RUN           pcmtest.playback ...
-> > > # #      SKIP      Can't read patterns. Probably, module isn't loaded
-> > > # # playback: Test failed
-> > > # #          FAIL  pcmtest.playback
-> > > # not ok 1 pcmtest.playback #  Can't read patterns. Probably, module isn't loaded
-> > > # #  RUN           pcmtest.capture ...
-> > > # #      SKIP      Can't read patterns. Probably, module isn't loaded
-> > > # # capture: Test failed
-> > > # #          FAIL  pcmtest.capture
-> > > # not ok 2 pcmtest.capture #  Can't read patterns. Probably, module isn't loaded
-> > > # #  RUN           pcmtest.ni_capture ...
-> > > # #      SKIP      Can't read patterns. Probably, module isn't loaded
-> > > # # ni_capture: Test failed
-> > > # #          FAIL  pcmtest.ni_capture
-> > > # not ok 3 pcmtest.ni_capture #  Can't read patterns. Probably, module isn't loaded
-> > > # #  RUN           pcmtest.ni_playback ...
-> > > # #      SKIP      Can't read patterns. Probably, module isn't loaded
-> > > # # ni_playback: Test failed
-> > > # #          FAIL  pcmtest.ni_playback
-> > > # not ok 4 pcmtest.ni_playback #  Can't read patterns. Probably, module isn't loaded
-> > > # #  RUN           pcmtest.reset_ioctl ...
-> > > # #      SKIP      Can't read patterns. Probably, module isn't loaded
-> > > # # reset_ioctl: Test failed
-> > > # #          FAIL  pcmtest.reset_ioctl
-> > > # not ok 5 pcmtest.reset_ioctl #  Can't read patterns. Probably, module isn't loaded
-> > > # # FAILED: 0 / 5 tests passed.
-> > > # # Totals: pass:0 fail:5 xfail:0 xpass:0 skip:0 error:0
-> > > 
-> > > I haven't completely isolated the issue due to some other breakage
-> > > that's making it harder that it should be to test.
-> > > 
-> > > A sample full log can be seen at:
-> > > 
-> > >     https://lava.sirena.org.uk/scheduler/job/659576#L1349
-> > 
-> > Thanks! the exit() inside the skip evaded my grep, I'm testing this:
-> > 
-> > diff --git a/tools/testing/selftests/alsa/test-pcmtest-driver.c b/tools/testing/selftests/alsa/test-pcmtest-driver.c
-> > index a52ecd43dbe3..7ab81d6f9e05 100644
-> > --- a/tools/testing/selftests/alsa/test-pcmtest-driver.c
-> > +++ b/tools/testing/selftests/alsa/test-pcmtest-driver.c
-> > @@ -127,11 +127,11 @@ FIXTURE_SETUP(pcmtest) {
-> >   	int err;
-> >   	if (geteuid())
-> > -		SKIP(exit(-1), "This test needs root to run!");
-> > +		SKIP(exit(KSFT_SKIP), "This test needs root to run!");
-> >   	err = read_patterns();
-> >   	if (err)
-> > -		SKIP(exit(-1), "Can't read patterns. Probably, module isn't loaded");
-> > +		SKIP(exit(KSFT_SKIP), "Can't read patterns. Probably, module isn't loaded");
-> >   	card_name = malloc(127);
-> >   	ASSERT_NE(card_name, NULL);
-> > diff --git a/tools/testing/selftests/mm/hmm-tests.c b/tools/testing/selftests/mm/hmm-tests.c
-> > index 20294553a5dd..356ba5f3b68c 100644
-> > --- a/tools/testing/selftests/mm/hmm-tests.c
-> > +++ b/tools/testing/selftests/mm/hmm-tests.c
-> > @@ -138,7 +138,7 @@ FIXTURE_SETUP(hmm)
-> >   	self->fd = hmm_open(variant->device_number);
-> >   	if (self->fd < 0 && hmm_is_coherent_type(variant->device_number))
-> > -		SKIP(exit(0), "DEVICE_COHERENT not available");
-> > +		SKIP(exit(KSFT_SKIP), "DEVICE_COHERENT not available");
-> >   	ASSERT_GE(self->fd, 0);
-> >   }
-> > @@ -149,7 +149,7 @@ FIXTURE_SETUP(hmm2)
-> >   	self->fd0 = hmm_open(variant->device_number0);
-> >   	if (self->fd0 < 0 && hmm_is_coherent_type(variant->device_number0))
-> > -		SKIP(exit(0), "DEVICE_COHERENT not available");
-> > +		SKIP(exit(KSFT_SKIP), "DEVICE_COHERENT not available");
-> >   	ASSERT_GE(self->fd0, 0);
-> >   	self->fd1 = hmm_open(variant->device_number1);
-> >   	ASSERT_GE(self->fd1, 0);
-> > 
-> > > but there's no more context.  I'm also seeing some breakage in the
-> > > seccomp selftests which also use kselftest-harness:
-> > > 
-> > > # #  RUN           TRAP.dfl ...
-> > > # # dfl: Test exited normally instead of by signal (code: 0)
-> > > # #          FAIL  TRAP.dfl
-> > > # not ok 56 TRAP.dfl
-> > > # #  RUN           TRAP.ign ...
-> > > # # ign: Test exited normally instead of by signal (code: 0)
-> > > # #          FAIL  TRAP.ign
-> > > # not ok 57 TRAP.ign
-> > 
-> > Ugh, I'm guessing vfork() "eats" the signal, IOW grandchild signals,
-> > child exits? vfork() and signals.. I'd rather leave to Kees || Mickael.
-> > 
-> 
-> Hi, sorry for not trying to reproduce it locally and still commenting,
-> but my vfork() man page says:
-> 
-> | The child must  not  return  from  the current  function  or  call
-> | exit(3) (which would have the effect of calling exit handlers
-> | established by the parent process and flushing the parent's stdio(3)
-> | buffers), but may call _exit(2).
-> 
-> And you still have some exit(3) calls.
+Change kzalloc() flags used in ixgbe_ipsec_vf_add_sa() to GFP_ATOMIC, to
+avoid sleeping in IRQ context.
 
-Correct, exit(3) should be replaced with _exit(2).
+Dan Carpenter, with the help of Smatch, has found following issue:
+The patch eda0333ac293: "ixgbe: add VF IPsec management" from Aug 13,
+2018 (linux-next), leads to the following Smatch static checker
+warning: drivers/net/ethernet/intel/ixgbe/ixgbe_ipsec.c:917 ixgbe_ipsec_vf_add_sa()
+	warn: sleeping in IRQ context
 
-> 
-> 
-> 
+The call tree that Smatch is worried about is:
+ixgbe_msix_other() <- IRQ handler
+-> ixgbe_msg_task()
+   -> ixgbe_rcv_msg_from_vf()
+      -> ixgbe_ipsec_vf_add_sa()
+
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Link: https://lore.kernel.org/intel-wired-lan/db31a0b0-4d9f-4e6b-aed8-88266eb5665c@moroto.mountain
+Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
+Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ipsec.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ipsec.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ipsec.c
+index 13a6fca31004..866024f2b9ee 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ipsec.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ipsec.c
+@@ -914,7 +914,13 @@ int ixgbe_ipsec_vf_add_sa(struct ixgbe_adapter *adapter, u32 *msgbuf, u32 vf)
+ 		goto err_out;
+ 	}
+ 
+-	xs = kzalloc(sizeof(*xs), GFP_KERNEL);
++	algo = xfrm_aead_get_byname(aes_gcm_name, IXGBE_IPSEC_AUTH_BITS, 1);
++	if (unlikely(!algo)) {
++		err = -ENOENT;
++		goto err_out;
++	}
++
++	xs = kzalloc(sizeof(*xs), GFP_ATOMIC);
+ 	if (unlikely(!xs)) {
+ 		err = -ENOMEM;
+ 		goto err_out;
+@@ -930,14 +936,8 @@ int ixgbe_ipsec_vf_add_sa(struct ixgbe_adapter *adapter, u32 *msgbuf, u32 vf)
+ 		memcpy(&xs->id.daddr.a4, sam->addr, sizeof(xs->id.daddr.a4));
+ 	xs->xso.dev = adapter->netdev;
+ 
+-	algo = xfrm_aead_get_byname(aes_gcm_name, IXGBE_IPSEC_AUTH_BITS, 1);
+-	if (unlikely(!algo)) {
+-		err = -ENOENT;
+-		goto err_xs;
+-	}
+-
+ 	aead_len = sizeof(*xs->aead) + IXGBE_IPSEC_KEY_BITS / 8;
+-	xs->aead = kzalloc(aead_len, GFP_KERNEL);
++	xs->aead = kzalloc(aead_len, GFP_ATOMIC);
+ 	if (unlikely(!xs->aead)) {
+ 		err = -ENOMEM;
+ 		goto err_xs;
+
+base-commit: 9b23fceb4158a3636ce4a2bda28ab03dcfa6a26f
+-- 
+2.43.0
+
 
