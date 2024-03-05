@@ -1,312 +1,202 @@
-Return-Path: <netdev+bounces-77567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8167587231A
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:48:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5631C872323
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:50:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4C431C22F1B
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:48:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1B961F22453
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:50:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC80127B58;
-	Tue,  5 Mar 2024 15:48:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B03127B53;
+	Tue,  5 Mar 2024 15:50:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lzj6v1cB"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="LIEtn7ag"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B3D1272CB;
-	Tue,  5 Mar 2024 15:48:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709653707; cv=fail; b=T2jfE5tUGNXflk2VufCFqz/pj1IcMbG8EeXxAVjNnxEJpRSM+yJ7siXSCU49P5zvb5bXhWHB5iprjcekUsWJavOpiLcxIxVeCC+5nsa/D14mXu68MO+sC0F2lKfcNk7ciExJdn24aE35rA0JY/APpW3OodCr2BQ5FRriJVRcCs0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709653707; c=relaxed/simple;
-	bh=qHVOOWRyXenJi1vX4j08RZljDSrUMdc97LxxCpG2/RY=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=J+iz/f2it17N6anzzGSCPz0t0Bz54DFYEs3R29/q72J/rGp4d+bNGdkQsFwjkugbbV2++lOMyvyn0FHYCU/HsDsznskgCP/qTTFN6Oo1wS9OHioifiRePUW9KJgh7fb84Qh9tAK5npd5+sgAACNu6g2xkBasvBX5rGP6nkxianQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lzj6v1cB; arc=fail smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709653705; x=1741189705;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=qHVOOWRyXenJi1vX4j08RZljDSrUMdc97LxxCpG2/RY=;
-  b=lzj6v1cBN92VHIKGYGIYVgSgzxUZoSW9ppkwsm/8J1A4+Yx38CQSVp4g
-   nYYlqVB6Mn95l6njcJyMWQViMOezjVEzd/88hfAZcJihKEmve+wDoDG2s
-   Y01iNJrLvxaBxipRKDEsl4HYBSJxjF1zhTFA59KeiayL7vyu0dm7SVsmV
-   KIMz+bw6arIAOudks4UXsVpcr3m/WZHja9e8TA1P4k+EY/ehPwEBEsyQM
-   JHrhi3aI1k/f/8SKjBm+MpQlhXBIlV3GsqGXcduiHnLXJ6srg/6fJJzs+
-   bvDafv5VAh0SMi8f5Lrab1tFH7IecS6c6mPoG6dIgLGaBB85itamUTWuj
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="8022923"
-X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
-   d="scan'208";a="8022923"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 07:48:24 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
-   d="scan'208";a="13901871"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Mar 2024 07:48:23 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 5 Mar 2024 07:48:22 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 5 Mar 2024 07:48:22 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 5 Mar 2024 07:48:22 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 5 Mar 2024 07:48:21 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fsqzKtoI+Enk3Hvp/iILU0Cbozz8Wc37G+kOdsjTthYRUX/SjpH3/h+hPaoCgLdCZHH/CI5phe3lnF3sjBvqqQWngPWw5D5jHOUJeZS4DFnnUMcg9CnRFyqgDoaCUk0aiBqOjLzNEjBNPUWVdYfLZp4Eiln258G3ag0/GYNVDonwsKJdR+lBIG5VTt9O6WILHXJ8AQasGydguAZCrHWzHHD/LlvFvaOtl4ZgVxXep7RIrVqo2CfT2N/LgkbfRsaVcpcPpiCAHD6HDnVAGqiBEQz0PZuSUSJqaaofs9gcueXww+qrNlh6Bx2pDTnudx9Xks2TDWCygU8QbSSJpjx3pw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Qa0B+ruwCX6tG3ouIM72E5GqkFdn7zvnnVDOu/et/Tg=;
- b=Qx5xs1W5uQaIugFpfW6FbCgcrD20hubAcYFCdb/t9l11EhLe3zlF7Y4aR4fcZgsi/FUyHii2ECtUjYrJta+L3h1dymki5tHoJgMuK18de/t+lkiYKWIhoyXEoRy7h9xUeSBObRvXJIot/awdXQGfWIzEZ04z8MUU9JyFfvR0YBw5VLa1ajpKuRfR7dlxnade8pSlxgA9PpakMf1KFfRF7nQR00G+qskc/PkCoY8onKAw3Iw1zNoisg0JM8fhHEv0DBJHURLR7tdcMm3f0T+UpPfcFLympbFkqi3rzs9JEmLNEbCmlia/z2qBHz+29wpwnQgT2Sw8YN45SbqC/DtV1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by PH7PR11MB6698.namprd11.prod.outlook.com (2603:10b6:510:1ac::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.22; Tue, 5 Mar
- 2024 15:48:14 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::618b:b1ee:1f99:76ea]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::618b:b1ee:1f99:76ea%5]) with mapi id 15.20.7362.019; Tue, 5 Mar 2024
- 15:48:14 +0000
-Message-ID: <7bb3b635-9fed-47ab-a640-ccac6d283b54@intel.com>
-Date: Tue, 5 Mar 2024 16:48:06 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 00/12] selftests: kselftest_harness: support using
- xfail
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, Mark Brown <broonie@kernel.org>,
-	<keescook@chromium.org>
-CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <shuah@kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<mic@digikod.net>, <linux-security-module@vger.kernel.org>,
-	<jakub@cloudflare.com>
-References: <20240229005920.2407409-1-kuba@kernel.org>
- <05f7bf89-04a5-4b65-bf59-c19456aeb1f0@sirena.org.uk>
- <20240304150411.6a9bd50b@kernel.org>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20240304150411.6a9bd50b@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0251.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:f5::12) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63258662F
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 15:50:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709653848; cv=none; b=sM8ktBLFQQzjl6+1TUtWe8vJx++1kUO7AC8m0d4A/CXuQ5RfO6UQcMxMYJz+eSOUmqbtQWbr2oUuj7wtrwt9gCg9LAQCTpUTuSe5rCEwHb3dg2lv7gFvV1NNwn3H1odQi5lFTnfU9eeaYOXNlhnS8WiOJahVkt7EFG7kmCcY6gY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709653848; c=relaxed/simple;
+	bh=K91CF7B/TKu8Molwd47KN5MBBcZGC1kvBX1pBajt8sA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tBEg7uss2pqX+5WPDvcIHwRjI2A9WKVUDbwbm41vqytRPVVOE4qbmohuq8VmJNPN0Xfhs6U5WHMJWxc/VykA0ncq6pFtDL9Y5y6OGnM54bL5PF32ucxo7PSub77XFHq2xt/+VEhi8TH4IXxjw+X8rhh3LUDFbdUZ+hmWXkSWxNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=LIEtn7ag; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a26ed1e05c7so982158866b.2
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 07:50:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1709653845; x=1710258645; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=MB+bcF2mMsm2aSAUvXr3mBornRh+OQP43iYFdjMppqs=;
+        b=LIEtn7ag+etayUwDcwoOT1cQlLzyGRDgr5F0iwq1FInqxAKAyFQmw7WdjcyimIsbwt
+         G7un17Q2L5gy4X6vHMTzZfUoVINhLvrwpbOpiH/JFtFrxg9p6fgx47zcL3oBtcmqA+75
+         FmoCDYHvfIVch7RtRyngYdQyLjTh9uAsewRMd0lsMZQV4tq2tYAcyn8gAt14Vg9vEh8h
+         cFijcU1tBD3Aa74GSHUvzaxL7fkg9NeL8avJMpd+GJmhVHs0pY8sX4vMU2lm3aSKqCiO
+         Pm+MYRYY5J4bz7mZ5/48SCMnvT7+Xzhbbyy18OQcsXy02IrEUUwzKsRJY7+UsbpP7d10
+         wCaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709653845; x=1710258645;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MB+bcF2mMsm2aSAUvXr3mBornRh+OQP43iYFdjMppqs=;
+        b=ecwLZXpeVLuTWd8MruN4wkz5VH60LH9XaHu5HlmugxBGaDoEaVt+H5/g0xRCLG2CZT
+         PxNR+z8lnFoqIz73Q4sCcyFchMXb51T9Z44XcclmqVVv5DBSAtMe2Wuttdurie8wPM+j
+         7V8NncX2Nvv63ntgFRp2ESkDnRBucwBNtoF0UKUVLqETcIOZQP8Cs+7wbnyaHOUOKEP0
+         asPxw9j4JGtxFOsrQ5/nirb2JfPWUvi1/+/j/fom1papU4Nc9oN0rpTul5FrhceFQCTT
+         Uiyy0U8eiKTRLHlrlkFTLOG1Hz9l8JsFxMj1BycNS6CqD0D5laRk4bTEjUAJ0t5ktS9J
+         WOFw==
+X-Gm-Message-State: AOJu0YwdQtfiD8p4mL631hBqQW3xhefkHPT7El/FxaG3F4UcPN7Az06V
+	yqLAr1UssFoyLRCe2Ud/uuHHM4Wd/+OCneGpW3Yi/6+zJxF3c8jygiHXJSngb80=
+X-Google-Smtp-Source: AGHT+IErfmaFoRqt1WMUk/ZO6baJr5V+8DLVxJMvjnA4NgozhAagzBrmit/l+JJf5xgYfWKgTJ7Vwg==
+X-Received: by 2002:a17:906:558:b0:a45:ae87:ec09 with SMTP id k24-20020a170906055800b00a45ae87ec09mr837293eja.60.1709653844929;
+        Tue, 05 Mar 2024 07:50:44 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:0:f33:beb3:62e8:b7a? ([2001:67c:2fbc:0:f33:beb3:62e8:b7a])
+        by smtp.gmail.com with ESMTPSA id ld1-20020a170906f94100b00a451e507cfcsm3001138ejb.52.2024.03.05.07.50.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Mar 2024 07:50:42 -0800 (PST)
+Message-ID: <48188b78-9238-44cc-ab2f-efdddad90066@openvpn.net>
+Date: Tue, 5 Mar 2024 16:51:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PH7PR11MB6698:EE_
-X-MS-Office365-Filtering-Correlation-Id: ba0a6f16-0a51-41c8-5ce2-08dc3d2baae4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: uninWjlZci9D601AVmAOHatNHz/BdZ90dOLPuKb84r2qB8Bh1sGOytd9g2ZW6i+kNm5PAip+Bxpk0oS1c8Rp4QRaen6uSoSTU4ABcPAH70g8iwh0X3F4I9EB3/62CbMk3ivzBGhu2pVXqpascAOc4rXdWfkdE1szd/juY7pNEHGJqIg2jtwQz+j64tUbDRP9ECgjDcuEh5DWRA1VwQthfxmBlhKwRBIivKo1D+wQF6K+pKR8gaWmS1etLRvxUC4sfs1daAdd0wkyqg7KWGzSaF43BRWPu5QHhT0gsvaOBRQ7WWE0KQyb6d2XFlz5/eUy01acIkOGBCfEOo6zI6l6p4xtmnzMsQAR2nBnxBlp+74et9j8Me5D4KQFbWHeMVMMlZJQH6M2Ktr/BDYesVfUbOfjDdFAS040w9M/jjC/cByh+s2KkCpnaRdKmEgLsiyMTSG6phlY9tvSUNhUNph2XVv4RxT8QnjaDkyi0gvPWRxcTXeDh4aUwv3d/7SxApvqhho0fmhcA+B/mUwg4YF7EO6WA/bgkbW/Ph8dj8XhF3AhWjBH40WCo5cSw2AawDNTC5wt767taWAY94wM+eTrslNLvgKCD6tzmaSS8Xctgj0=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ejk4Nno0TDdCNktHRkg5U3FOenRrTHp2MG1CNFpqYzhoNFVCQ0grVldqTVhT?=
- =?utf-8?B?SXVWVHRxOWdqeW1ENkxISFVMMjR0VlY2NlFmZGdlNUhNTEcrd2s4K2VLaTNG?=
- =?utf-8?B?Mkg0L2J2QTN4SGd0eGxvblJSNnYzYUgwSkE5ZU5UNko2MGlYQ1o1MFJkNFFJ?=
- =?utf-8?B?N0xEUzk4MVlvM2lMcFU5bmtNSG5JWFFpQTRlcEd4cllieFVSS21Pdko1dDlY?=
- =?utf-8?B?SzhMTFVOV29vOS82SWlQRnJUMXU2R3pkSXp4MUF0TlRGTjIzTGl2U1JPcEx2?=
- =?utf-8?B?N1M1YUFkSytHNXhlTjZpMDhvTzFXUCtoSXlBTEptWmNPdzdwcDl4TFdmUUFS?=
- =?utf-8?B?ZlRROTBwU3orMy9UNFc2WmoyVjVxYm1RMElrclBiZmhHYmpQSVd3QW1TZE8x?=
- =?utf-8?B?UFh6Q05jNERpbUQyRjl0SGM5MnpNbG9jbHBhN20rVm83ZXdSNHFKRkhTK1Zq?=
- =?utf-8?B?dFQ5VXpyZmpXWDhVVEtiLyt1bURsTHR3QjVQK3MwMGxVYVF0WFlyZzI4S0px?=
- =?utf-8?B?Q1pjajVXNmFQNytMQlA1Y3lsSkU1NEp5alE0UnVBcHlQK284bkVCYnlCNlRK?=
- =?utf-8?B?bEhQaHBNZU5SM2F5ckw3Q2J6UFIyTGFQMm1pUGtueHdZV0lDdENYVFFLd1V0?=
- =?utf-8?B?UmQ0WjhldjY1R3ZTM2RTN0RpbU1FM090NklDN2F1b3BsR3BtL0sxZ3VxeGFp?=
- =?utf-8?B?NXB5WWZLSm1qZ21JOVR5SWtJbWN6RUI4V0UyQUQ5V085NENlNnlERTdNODE4?=
- =?utf-8?B?amZ2ejlEMkszNm1nZzl4NjU5aGZnTldCOHJ4bXhlSFVHZXRidkpuS0tTMWoy?=
- =?utf-8?B?SGZjMElndWNWb3VaQnZOcksrWkxqblF2NzdML1pJaDBzVDY5Slg4MjViZjNM?=
- =?utf-8?B?ekJtT25BWnJvMFhqYlRKNm04OVNmcFpLNlQ2RklBbTE5alhjUzF4NjRLWDBU?=
- =?utf-8?B?bFlhYzVZL2dQdnhhRGFVQXc4ODdiaCtsSFIwVjQrcEswOGFRUzJnQWFPcEJw?=
- =?utf-8?B?Si9QYnZORndPUy9MVVZxSzZpRWt3cjdvMlhzeDc1K09vaXVoUFFXYnJlNk42?=
- =?utf-8?B?ZjZReTlqaTBnYkdVSCs1Z1cvSm9xZmlCL0t6ZFZ2L2srSjloMlVqYmR5bm9H?=
- =?utf-8?B?Uk05Wmx2eW50bkJreFBiY2tWK3JKWTI2T0o0cG5xZFNpZ0RBSnlrc25tNGRO?=
- =?utf-8?B?TFZhWkN6UTd1NWZBSW84TGJ0ZllkYnJYbzN5ZGtjTjVDWjg0dGg0R0lUcHE0?=
- =?utf-8?B?Tlo4Qjc1SlkrTnp5d2NBMmZxNktlK1dlek82dnc2RUVDU2MrZWhWQ2JINk1I?=
- =?utf-8?B?enJUY1p5NTFUMzViSUlhTHdLUlExZ2dwM3A2Y0ovcG04L0pacEFXV0FPMCs4?=
- =?utf-8?B?bFdWVm9LaU95bW41TjMzQTFsMC9kT2lqaWExM0FtYVFka3lQNFltT2JNZXVI?=
- =?utf-8?B?VEJJd1NaSXhmdnREMnR2WCsrY2UwczlDUzgra0FTYnFaaU03VHM4QzZNVXZ4?=
- =?utf-8?B?ZzdHUElZY2lFcFdsWU5qZUNmWXFxNlo5ZU5mREFQZE5PRHBuc2FuQUxaUk5R?=
- =?utf-8?B?ZkRxTG1qdFRycHcybWovUXhlUElpY1pwMmNtUURGa1VGQmUyM09wRVc0NTRQ?=
- =?utf-8?B?QitYVlRJTzAvbE1CbGlKMzRKSVFXQndxRHJ1Q3ordHBXSUZxOTRNU2Nlbjlk?=
- =?utf-8?B?bU1iMGJvWUwzUjd4QW5tQ3RlVE0wZTRNdWdVRjZiT2xFM2RESVl5elJUMk9S?=
- =?utf-8?B?d2RwWVBoTElxSUV4S2VsYU81UjVyK25wMUVvYm1zbDBkaGV4UnNjaGw0V0FQ?=
- =?utf-8?B?dlZJYkZNbmRaZ2UwT0dZd2Q3OFpNWE8vd0RDYVJqeCtHbllBeXNUdXkyYndH?=
- =?utf-8?B?S1BCMnQ5K0pzaTc0U2wrTTNaM0hocVlvR2lvQmxuUWpaUkVDaXA4c3hBcmYx?=
- =?utf-8?B?a2E4STVrQzlHMkpxREY1NndneE9tMllCUTI1K0dVR0FteUpNT09XRE5uY1dt?=
- =?utf-8?B?SE1rTUhVV2FKejZxM25EKytEWHJnNUd2anpEbFlJSGFVcjZlalJEcHNrU3Iy?=
- =?utf-8?B?NGFhUlR4U3BPNVY2aWV6OXpyZDY5bE9FVktBbTVTNkFCZ1BTN0RkbHhSVjFh?=
- =?utf-8?B?UE8vTjF1TEhjZlNFTGlKa0RUcXBsWjdaanlieDdLRkZZOWI4V2o5QlF6Q0Zh?=
- =?utf-8?B?bWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: ba0a6f16-0a51-41c8-5ce2-08dc3d2baae4
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2024 15:48:14.1640
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DZaRZCDqK8T4sALYxGihX3UaGmOfdFQoaIOLFEDOREHt25PFCANsRS8NmzgT1DSx+UqZkgMw2iwvhJrqxTbW5q4vTzcRDedkqEB9JViznCA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6698
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 04/22] ovpn: add basic interface
+ creation/destruction/management routines
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>
+References: <20240304150914.11444-1-antonio@openvpn.net>
+ <20240304150914.11444-5-antonio@openvpn.net>
+ <e89be898-bcbd-41f9-aaae-037e6f88069e@lunn.ch>
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <e89be898-bcbd-41f9-aaae-037e6f88069e@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 3/5/24 00:04, Jakub Kicinski wrote:
-> On Mon, 4 Mar 2024 22:20:03 +0000 Mark Brown wrote:
->> On Wed, Feb 28, 2024 at 04:59:07PM -0800, Jakub Kicinski wrote:
->>
->>> When running selftests for our subsystem in our CI we'd like all
->>> tests to pass. Currently some tests use SKIP for cases they
->>> expect to fail, because the kselftest_harness limits the return
->>> codes to pass/fail/skip. XFAIL which would be a great match
->>> here cannot be used.
->>>
->>> Remove the no_print handling and use vfork() to run the test in
->>> a different process than the setup. This way we don't need to
->>> pass "failing step" via the exit code. Further clean up the exit
->>> codes so that we can use all KSFT_* values. Rewrite the result
->>> printing to make handling XFAIL/XPASS easier. Support tests
->>> declaring combinations of fixture + variant they expect to fail.
->>
->> This series landed in -next today and has caused breakage on all
->> platforms in the ALSA pcmtest-driver test.  When run on systems that
->> don't have the driver it needs loaded the test skip but since this
->> series was merged skipped tests are logged but then reported back as
->> failures:
->>
->> # selftests: alsa: test-pcmtest-driver
->> # TAP version 13
->> # 1..5
->> # # Starting 5 tests from 1 test cases.
->> # #  RUN           pcmtest.playback ...
->> # #      SKIP      Can't read patterns. Probably, module isn't loaded
->> # # playback: Test failed
->> # #          FAIL  pcmtest.playback
->> # not ok 1 pcmtest.playback #  Can't read patterns. Probably, module isn't loaded
->> # #  RUN           pcmtest.capture ...
->> # #      SKIP      Can't read patterns. Probably, module isn't loaded
->> # # capture: Test failed
->> # #          FAIL  pcmtest.capture
->> # not ok 2 pcmtest.capture #  Can't read patterns. Probably, module isn't loaded
->> # #  RUN           pcmtest.ni_capture ...
->> # #      SKIP      Can't read patterns. Probably, module isn't loaded
->> # # ni_capture: Test failed
->> # #          FAIL  pcmtest.ni_capture
->> # not ok 3 pcmtest.ni_capture #  Can't read patterns. Probably, module isn't loaded
->> # #  RUN           pcmtest.ni_playback ...
->> # #      SKIP      Can't read patterns. Probably, module isn't loaded
->> # # ni_playback: Test failed
->> # #          FAIL  pcmtest.ni_playback
->> # not ok 4 pcmtest.ni_playback #  Can't read patterns. Probably, module isn't loaded
->> # #  RUN           pcmtest.reset_ioctl ...
->> # #      SKIP      Can't read patterns. Probably, module isn't loaded
->> # # reset_ioctl: Test failed
->> # #          FAIL  pcmtest.reset_ioctl
->> # not ok 5 pcmtest.reset_ioctl #  Can't read patterns. Probably, module isn't loaded
->> # # FAILED: 0 / 5 tests passed.
->> # # Totals: pass:0 fail:5 xfail:0 xpass:0 skip:0 error:0
->>
->> I haven't completely isolated the issue due to some other breakage
->> that's making it harder that it should be to test.
->>
->> A sample full log can be seen at:
->>
->>     https://lava.sirena.org.uk/scheduler/job/659576#L1349
+
+
+On 04/03/2024 22:33, Andrew Lunn wrote:
+>> +int ovpn_struct_init(struct net_device *dev)
+>> +{
+>> +	struct ovpn_struct *ovpn = netdev_priv(dev);
+>> +	int err;
+>> +
+>> +	memset(ovpn, 0, sizeof(*ovpn));
 > 
-> Thanks! the exit() inside the skip evaded my grep, I'm testing this:
+> Probably not required. When a netdev is created, it should of zeroed
+> the priv.
+
+ACK. There is a kvzalloc() involved.
+
 > 
-> diff --git a/tools/testing/selftests/alsa/test-pcmtest-driver.c b/tools/testing/selftests/alsa/test-pcmtest-driver.c
-> index a52ecd43dbe3..7ab81d6f9e05 100644
-> --- a/tools/testing/selftests/alsa/test-pcmtest-driver.c
-> +++ b/tools/testing/selftests/alsa/test-pcmtest-driver.c
-> @@ -127,11 +127,11 @@ FIXTURE_SETUP(pcmtest) {
->   	int err;
->   
->   	if (geteuid())
-> -		SKIP(exit(-1), "This test needs root to run!");
-> +		SKIP(exit(KSFT_SKIP), "This test needs root to run!");
->   
->   	err = read_patterns();
->   	if (err)
-> -		SKIP(exit(-1), "Can't read patterns. Probably, module isn't loaded");
-> +		SKIP(exit(KSFT_SKIP), "Can't read patterns. Probably, module isn't loaded");
->   
->   	card_name = malloc(127);
->   	ASSERT_NE(card_name, NULL);
-> diff --git a/tools/testing/selftests/mm/hmm-tests.c b/tools/testing/selftests/mm/hmm-tests.c
-> index 20294553a5dd..356ba5f3b68c 100644
-> --- a/tools/testing/selftests/mm/hmm-tests.c
-> +++ b/tools/testing/selftests/mm/hmm-tests.c
-> @@ -138,7 +138,7 @@ FIXTURE_SETUP(hmm)
->   
->   	self->fd = hmm_open(variant->device_number);
->   	if (self->fd < 0 && hmm_is_coherent_type(variant->device_number))
-> -		SKIP(exit(0), "DEVICE_COHERENT not available");
-> +		SKIP(exit(KSFT_SKIP), "DEVICE_COHERENT not available");
->   	ASSERT_GE(self->fd, 0);
->   }
->   
-> @@ -149,7 +149,7 @@ FIXTURE_SETUP(hmm2)
->   
->   	self->fd0 = hmm_open(variant->device_number0);
->   	if (self->fd0 < 0 && hmm_is_coherent_type(variant->device_number0))
-> -		SKIP(exit(0), "DEVICE_COHERENT not available");
-> +		SKIP(exit(KSFT_SKIP), "DEVICE_COHERENT not available");
->   	ASSERT_GE(self->fd0, 0);
->   	self->fd1 = hmm_open(variant->device_number1);
->   	ASSERT_GE(self->fd1, 0);
+>> +int ovpn_iface_create(const char *name, enum ovpn_mode mode, struct net *net)
+>> +{
+>> +	struct net_device *dev;
+>> +	struct ovpn_struct *ovpn;
+>> +	int ret;
+>> +
+>> +	dev = alloc_netdev(sizeof(struct ovpn_struct), name, NET_NAME_USER, ovpn_setup);
+>> +
+>> +	dev_net_set(dev, net);
+>> +
+>> +	ret = ovpn_struct_init(dev);
+>> +	if (ret < 0)
+>> +		goto err;
+>> +
+>> +	ovpn = netdev_priv(dev);
+>> +	ovpn->mode = mode;
+>> +
+>> +	rtnl_lock();
+>> +
+>> +	ret = register_netdevice(dev);
+>> +	if (ret < 0) {
+>> +		netdev_dbg(dev, "cannot register interface %s: %d\n", dev->name, ret);
+>> +		rtnl_unlock();
+>> +		goto err;
+>> +	}
+>> +	rtnl_unlock();
+>> +
+>> +	return ret;
+>> +
+>> +err:
+>> +	free_netdev(dev);
+>> +	return ret;
+>> +}
+>> +
+>> +void ovpn_iface_destruct(struct ovpn_struct *ovpn, bool unregister_netdev)
+>> +{
+>> +	ASSERT_RTNL();
+>> +
+>> +	netif_carrier_off(ovpn->dev);
 > 
->> but there's no more context.  I'm also seeing some breakage in the
->> seccomp selftests which also use kselftest-harness:
->>
->> # #  RUN           TRAP.dfl ...
->> # # dfl: Test exited normally instead of by signal (code: 0)
->> # #          FAIL  TRAP.dfl
->> # not ok 56 TRAP.dfl
->> # #  RUN           TRAP.ign ...
->> # # ign: Test exited normally instead of by signal (code: 0)
->> # #          FAIL  TRAP.ign
->> # not ok 57 TRAP.ign
-> 
-> Ugh, I'm guessing vfork() "eats" the signal, IOW grandchild signals,
-> child exits? vfork() and signals.. I'd rather leave to Kees || Mickael.
-> 
+> You often see virtual devices turn their carrier off in there
+> probe/create function, because it is unclear what state it is in after
+> register_netdevice().
 
-Hi, sorry for not trying to reproduce it locally and still commenting,
-but my vfork() man page says:
+Are you suggesting to turn it off both here and in the create function?
+Or should I remove the invocation above?
 
-| The child must  not  return  from  the current  function  or  call
-| exit(3) (which would have the effect of calling exit handlers
-| established by the parent process and flushing the parent's stdio(3)
-| buffers), but may call _exit(2).
+Regards,
 
-And you still have some exit(3) calls.
-
-
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
