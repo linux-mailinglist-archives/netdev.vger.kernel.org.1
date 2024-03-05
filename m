@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-77340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68301871509
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 06:00:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 450F887150A
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 06:00:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DEDC1C22E67
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 05:00:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5178B21A09
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 05:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8535643ACF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD2343AB0;
 	Tue,  5 Mar 2024 05:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C5u6hB4j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dZCRiONi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D36E40BE7
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 05:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535C540BE5
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 05:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709614831; cv=none; b=pr9fRknMez9Mn7sMOoryEcNqRGGpGuTGi7ywF/MSsDFtNaTtIQbYAKeQGjrQW9AanfBRdTISXOC88GkVzmCR7kCkS2fz9zhTHOHLDanrqiIGz6yUT+q/3SebEGetzcX19DUVAD3LHbNc/sXZ/efpM0rYG4hoLZtkJ3Iq/1rZOmw=
+	t=1709614831; cv=none; b=f0FG77Cm7ubIAPcV7O70aIraUv0kvcw8NG5xQMpOKxajxvNwlIAOd6lNVkPTqn2ir+d4xGR2l6x/ouGC28yiZZoEGne05FmqlGu7K+bvb/EFpX+JDgQLbKCCmNVh3W23S58HS8bQX6xNg+j8XtOqRvY9sC2CF0USwxnUzHAG3f4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709614831; c=relaxed/simple;
-	bh=LwwdSeWHnVp0SndGvKGhDi7oXXZGoAOOKnSlE8tcMYM=;
+	bh=N52NIcfoeOdnmfHE44Kv4ZvhogulZHMe3YwB6vj1GQU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uufAczucFEjpHjd2M9t9TvCaFVRRdEHya0iHHzphJeCyqRiYagCu3o5v8gntHqblFRdVdJrsBWEIc4D4VjhOH3Vkm3/+E0chw28zT4YLkzSo/TqKwwFYttWZmV3B5Lxi3xfFj49g+rJFGUaz9CMiKrvY2QhUu8FBUSOI+5LzJqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C5u6hB4j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CD2ACC433F1;
+	 In-Reply-To:To:Cc; b=Js9Q87cM3Mr/n+MQtGl57cDG2sRf5UKObO/BsO4IB0+dV2eNtuC+dxiWxtCic+YQTTpNgY8baiZ4S2WBATklag78Fv0k7+6Wz3n3mByKTRLQzZh2Aw2QMiv0ECxT4kMElC3Uh+SSRU6HFAGgKF3UxsvvcYv01s5uoqBQdZGyVjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dZCRiONi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B9A05C433C7;
 	Tue,  5 Mar 2024 05:00:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709614830;
-	bh=LwwdSeWHnVp0SndGvKGhDi7oXXZGoAOOKnSlE8tcMYM=;
+	bh=N52NIcfoeOdnmfHE44Kv4ZvhogulZHMe3YwB6vj1GQU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=C5u6hB4jJABNk9bcSlH4vpevxCycMgv9osC63k2LeIBRBoYk3XJ26/zpUQyMEkHp3
-	 Q3uPTZGi7nbji1WkwQb/OVu6vmHIpGEHcz9a0R2vaii6xsi4rqJu4uaUamC2NoALz9
-	 4cND+tqRecG2SqHRM5UOqLC2DnA0dvvB5OLZYStnkTa/LbQlBQD73k0rQrLh8AcMis
-	 7E4m655bINRiD/G/HD3oTMZQiS2QT0ixXD14HGdm/W3baGCPiK86MAJoTKBVAQReuS
-	 7rFmnWIYgj0J/x7DsWV8JL5ySYGzwUltW4EqR1ARxBqMI/ZM1NYwE92uBG3Ahf2V8K
-	 eYRb6faS+ElfQ==
+	b=dZCRiONin4uXA27PLAuwayoBtX3WyVTYltPaYm5pY/remQ0T181CG1vTE65n4zYG4
+	 C1zxKLRMQfe9wSNpJj79UhmsFPC2SbVF0qKYEELkpNakaxg4AET4HFwpLzkoj/D+Nh
+	 tjSLEc7KcBVG1ThiI6NnWb9aIx47Qbd6qwsGXkdsQ/oPd3snWC7nfwV679x1ptEYjg
+	 rz5JQ46EWMgorZQf0OAopwuA7mTZAftAmyI3LOhGLcrZ0xI/r0iIoUsb9hu55eUjAZ
+	 iKgWI1F5Fb0jJN1I18dD0KgC1+2GzXc49xCvWyx7GqRTTMOuCpcctHO6CCJV8rXy7j
+	 Y5WM4CjpdaGsA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AC5EFD88F87;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A4FD4D9A4B5;
 	Tue,  5 Mar 2024 05:00:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,37 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] tcp: align tcp_sock_write_rx group
+Subject: Re: [PATCH net-next v2 0/4][pull request] Intel Wired LAN Driver Updates
+ 2024-02-28 (ixgbe, igc, igb, e1000e, e100)
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170961483070.15495.11283200986725328482.git-patchwork-notify@kernel.org>
+ <170961483067.15495.15190821240384303008.git-patchwork-notify@kernel.org>
 Date: Tue, 05 Mar 2024 05:00:30 +0000
-References: <20240301171945.2958176-1-edumazet@google.com>
-In-Reply-To: <20240301171945.2958176-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
+References: <20240301184806.2634508-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20240301184806.2634508-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, sfr@canb.auug.org.au,
- lkp@intel.com
+ edumazet@google.com, netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  1 Mar 2024 17:19:45 +0000 you wrote:
-> Stephen Rothwell and kernel test robot reported that some arches
-> (parisc, hexagon) and/or compilers would not like blamed commit.
+On Fri,  1 Mar 2024 10:48:01 -0800 you wrote:
+> This series contains updates to ixgbe, igc, igb, e1000e, and e100
+> drivers.
 > 
-> Lets make sure tcp_sock_write_rx group does not start with a hole.
+> Jon Maxwell makes module parameter values readable in sysfs for ixgbe,
+> igb, and e100.
 > 
-> While we are at it, correct tcp_sock_write_tx CACHELINE_ASSERT_GROUP_SIZE()
-> since after the blamed commit, we went to 105 bytes.
+> Ernesto Castellotti adds support for 1000BASE-BX on ixgbe.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] tcp: align tcp_sock_write_rx group
-    https://git.kernel.org/netdev/net-next/c/345a6e2631c1
+  - [net-next,v2,1/4] intel: make module parameters readable in sys filesystem
+    https://git.kernel.org/netdev/net-next/c/aa9870f5c7ef
+  - [net-next,v2,2/4] ixgbe: Add 1000BASE-BX support
+    https://git.kernel.org/netdev/net-next/c/1b43e0d20f2d
+  - [net-next,v2,3/4] igc: fix LEDS_CLASS dependency
+    https://git.kernel.org/netdev/net-next/c/30654f0eec65
+  - [net-next,v2,4/4] e1000e: Minor flow correction in e1000_shutdown function
+    https://git.kernel.org/netdev/net-next/c/662200e324da
 
 You are awesome, thank you!
 -- 
