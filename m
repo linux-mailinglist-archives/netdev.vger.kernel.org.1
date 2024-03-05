@@ -1,111 +1,125 @@
-Return-Path: <netdev+bounces-77525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5FEA8721C5
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:42:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8419D872213
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:55:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D786F1C215C0
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:42:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A4741F24034
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:55:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D80A586AC2;
-	Tue,  5 Mar 2024 14:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC30E1272A1;
+	Tue,  5 Mar 2024 14:55:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CYbZOhqS"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="PEnFEDr+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f194.google.com (mail-yb1-f194.google.com [209.85.219.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 126B486AD5;
-	Tue,  5 Mar 2024 14:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49146126F09;
+	Tue,  5 Mar 2024 14:55:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709649736; cv=none; b=P+QKrYT2ZmfHmp1Nq2hdPmybI+rTg4z8zkj1VCdjj7C4Irihm+WfJ+WGuKe/pZ/rsOx65ocEERPws5KgEKauN0nVGco6WD0WIhaG8l5TdeB26GSuvfBYf6XI0YOTKAj9oJyfzXFGfixRUe9tDtraNa0Gr4GhAEFym0ROXh29oVc=
+	t=1709650509; cv=none; b=AMvgHTxTv7ds2j9SCmg20SwAk+WBTueAqeYvWIFSnYREiBfjaJnX3/9if5z7gdSOP1Gz5unWDlEDGUEBIQNFrMVVNNmLLHyQfQ8o7/+Um65UvhEJXybuvizeYXfrThrgfCF5T076ONYrW+QoSKVhwBpaloaeWtl1YsMhQgebZAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709649736; c=relaxed/simple;
-	bh=gOkcqvkH4D3gY0n9wniKJjMcha0dhupF5N5XpLv3Ch4=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=qehryNLjs8eJF1CW0DhpR3enX5C6Ka0VUZ6oRcC9cekuVNA/c2CkKLzbRCcMS5PTchXdSTZ7CRwmQQRDIEUcbGDg9CTK+9Va3JVONymAeBUnN8pwo5zR64XvsZ2ZDSCH+Ds9HUoHHqMVj6tOLwaJOFRw8YAqWqxZWaUKa7iMmMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CYbZOhqS; arc=none smtp.client-ip=209.85.219.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f194.google.com with SMTP id 3f1490d57ef6-dcc4de7d901so5391267276.0;
-        Tue, 05 Mar 2024 06:42:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709649733; x=1710254533; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=csPhwUZ0maNDO/kaNYv8h2cWEul9MJDz344oSfBRaZ8=;
-        b=CYbZOhqSCJfaAfalrPOqAYvpwslqG6k7JsfcTVNzN5Tu9QT4Y8n1DsI9HrtzHf6kLM
-         y8/nat2+zAnUF9haQmZ/P5eQE/93sYBG9M5YESDVP3fHjRshvaNsjkhZYZERG2fck9Em
-         iw8dY+6NYCi2beOAumop6D1PFoPdK2lP4ZgXiPFfS8/gG0xHC1y6FCzy7WkYSjY2gKV/
-         WfMy25+hnVhJXo9UBZ25mo8bejI6mve+rJxwAdWLLFUKdE/xPsvRuaJC6NwVbLtw4s4k
-         labiWVETsCnEf39nokhMrl5ARcEO1t6NkpuPfmcTma6j+Yqd0Ju2q3HdeL4J38QI5hBx
-         HrFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709649733; x=1710254533;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=csPhwUZ0maNDO/kaNYv8h2cWEul9MJDz344oSfBRaZ8=;
-        b=t0EV1cEPSgPscABjceyiys2wdiEdqvjqTgYh45YO/Uo4yICmCWxvLFvanVE2EmMy+i
-         OrRrdNsAPRYZtATQGUZZAgEpF1yuj71Njlxk/KjVZDOL24OSFJevotKnWlt/JsNqUnIe
-         kiB5LMxvRtDxSELe2BoV9i+OChIUPw0bOMeXxZi62kPRrPrI9gWc7F2G5YXrzQy5XFcW
-         5Sa9OfPMV9DEYTdikOJNwEgF1bjY4PqmfMx3Ji/gnm2PU9e80uMyL84ytrKmo97FlMgH
-         23JtTaw4mX5bTou11r52AAZCzFgGtWc5gEpfCkJHMDw+NC1DqR83uF/A0Cxg3iDsG36G
-         2ccg==
-X-Forwarded-Encrypted: i=1; AJvYcCVvBI6sj1KB/0/nGFA+GhD/RIvsHF5rXI5y+EnQ2pT2HrWd6i29LesD66GcUjwAsatgBTQ4uPY5olQBuwWdx3BoUdLk98F3xcDHhDyVBG9Jgmj7xDLwilycY0Mz2pJ24OsmPEfw
-X-Gm-Message-State: AOJu0YyhbWPMrTxb/U5/P7okkGHvcljftVeYEf/CMHJgpfaMZQy+XmRR
-	g6jxM0LxnK0CiBEiqKBuvdlVX8uNF8zDDmXzRj36mfcdNcI8DTaThKfs+COiRBkjui+84kaRYcp
-	evIu32gkld2ZUwD/q8lIHfrWi1c4=
-X-Google-Smtp-Source: AGHT+IHWHDy+FAU3g6qvTuYFUmEnFnw6aA+MA+BXaZcVDBrx94Z8KwzZE6neyEITOiDh3pAIUCK5OH2PPx2cLHbFkf8=
-X-Received: by 2002:a25:b9d2:0:b0:dc7:4f61:5723 with SMTP id
- y18-20020a25b9d2000000b00dc74f615723mr8551184ybj.39.1709649733725; Tue, 05
- Mar 2024 06:42:13 -0800 (PST)
+	s=arc-20240116; t=1709650509; c=relaxed/simple;
+	bh=Q5UUfJDjrGrdHCHpViOdOzibqAZfW1sh2Z+5l0zVKm8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oDXWt+PGtzCHEXHSHRpnUM9u6uobDc1jVfF9GjfEdR3XorDtBSa5kKzUTzqPfH9R2OvbTCoGLVdfLmcQ+NdPB12O4PlI9HuqNbGAI36oRy6mwSY3vmSXbP8YjZNKcFEZnIBRi3Xej3e0TDXWh1+6iH4nTl971XgfzukHLLUh9rY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=PEnFEDr+; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id BE13A60315;
+	Tue,  5 Mar 2024 14:46:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1709650004;
+	bh=Q5UUfJDjrGrdHCHpViOdOzibqAZfW1sh2Z+5l0zVKm8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PEnFEDr+lf25mwBZVHqHaRkjyBM6A2Fu/rAeege2bTJJyKLJpFDd/HJ+BBkf32WmH
+	 LpTssFyw3bXVFTkSBA/iQ/Ndyy1UF6gZ+t9YBeuzJi8K3n0fAp7D4OJz8iEs5zFsZx
+	 OiC0+kZjb/fMpsi7iwrh6Jq/ScI7W884cFjB5JBnkFnV7Saxub01L2QsIeuFLwAZeL
+	 5ulIVlhvfK7f7HSY5tuPMXxFyORa8452Hi5mCrGqtuJY9QmWNE65dzaMWrkisDgh7Z
+	 q2HQV4pdP60Nvrn6gCoDDUJtP86wf/TWHpp+1AikW3cVfgwDXfkTF7NuWT9pu5Wzyv
+	 OH+pa719hcrpA==
+Received: by x201s (Postfix, from userid 1000)
+	id 3E3F9200A5A; Tue,  5 Mar 2024 14:44:28 +0000 (UTC)
+From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
+To: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Vlad Buslov <vladbu@nvidia.com>,
+	Marcelo Ricardo Leitner <mleitner@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	llu@fiberby.dk
+Subject: [PATCH net-next v2 0/3] make skip_sw actually skip software
+Date: Tue,  5 Mar 2024 14:43:53 +0000
+Message-ID: <20240305144404.569632-1-ast@fiberby.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Zixuan Tan <tanzixuan.me@gmail.com>
-Date: Tue, 5 Mar 2024 22:42:04 +0800
-Message-ID: <CABwm_eRuL9UXanmTaC7U820=8GLAHHwWuFP=REOpECsPR+pPvg@mail.gmail.com>
-Subject: [PATCH] net: bridge: Replace deprecated build flag HAVE_JUMP_LABEL
- with CONFIG_JUMP_LABEL
-To: Florian Westphal <fw@strlen.de>, Roopa Prabhu <roopa@nvidia.com>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: bridge@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-The build flag HAVE_JUMP_LABEL has been deprecated and removed in commit
- e9666d10a567 ("jump_label: move 'asm goto' support test to Kconfig").
-It is no longer defined or used. The correct flag to use is CONFIG_JUMP_LABEL.
+Hi,
 
-Fixes: 971502d77faa ("bridge: netfilter: unroll NF_HOOK helper in
-bridge input path")
-Signed-off-by: Zixuan Tan <tanzixuan.me@gmail.com>
----
- net/bridge/br_input.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+During development of flower-route[1], which I
+recently presented at FOSDEM[2], I noticed that
+CPU usage, would increase the more rules I installed
+into the hardware for IP forwarding offloading.
 
-diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
-index f21097e73482..3700e47ff181 100644
---- a/net/bridge/br_input.c
-+++ b/net/bridge/br_input.c
-@@ -255,7 +255,7 @@ static int nf_hook_bridge_pre(struct sk_buff *skb,
-struct sk_buff **pskb)
-    int ret;
+Since we use TC flower offload for the hottest
+prefixes, and leave the long tail to the normal (non-TC)
+Linux network stack for slow-path IP forwarding.
+We therefore need both the hardware and software
+datapath to perform well.
 
-    net = dev_net(skb->dev);
--#ifdef HAVE_JUMP_LABEL
-+#ifdef CONFIG_JUMP_LABEL
-    if (!static_key_false(&nf_hooks_needed[NFPROTO_BRIDGE][NF_BR_PRE_ROUTING]))
-        goto frame_finish;
- #endif
+I found that skip_sw rules, are quite expensive
+in the kernel datapath, since they must be evaluated
+and matched upon, before the kernel checks the
+skip_sw flag.
+
+This patchset optimizes the case where all rules
+are skip_sw, by implementing a TC bypass for these
+cases, where TC is only used as a control plane
+for the hardware path.
+
+Changes from v1:
+- Patch 1:
+  - Add Reviewed-By from Jiri Pirko
+- Patch 2:
+  - Move code, to avoid forward declaration (Jiri).
+- Patch 3
+  - Refactor to use a static key.
+  - Add performance data for trapping, or sending
+    a packet to a non-existent chain (as suggested by Marcelo).
+
+[1] flower-route
+    https://github.com/fiberby-dk/flower-route
+
+[2] FOSDEM talk
+    https://fosdem.org/2024/schedule/event/fosdem-2024-3337-flying-higher-hardware-offloading-with-bird/
+
+Asbjørn Sloth Tønnesen (3):
+  net: sched: cls_api: add skip_sw counter
+  net: sched: cls_api: add filter counter
+  net: sched: make skip_sw actually skip software
+
+ include/net/pkt_cls.h     |  9 +++++++++
+ include/net/sch_generic.h |  4 ++++
+ net/core/dev.c            | 10 ++++++++++
+ net/sched/cls_api.c       | 39 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 62 insertions(+)
+
 -- 
-2.40.1
+2.43.0
+
 
