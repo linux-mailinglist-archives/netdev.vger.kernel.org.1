@@ -1,552 +1,98 @@
-Return-Path: <netdev+bounces-77498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE30C871F43
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:31:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02C35871F79
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:50:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 082491C25394
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:31:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B5C8B22CDC
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87F6681216;
-	Tue,  5 Mar 2024 12:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBA548563A;
+	Tue,  5 Mar 2024 12:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ExEtod48"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C5b8nfyN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5569080C17
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 12:31:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709641899; cv=fail; b=ScQPqwt12XT8g8YYZu0bw0LyBzsAiael5OTBYYRDVVvzNmI4hy/pdkjtRtn5NpofQqkslXXFd8TyzNYGW8Gfr+2e53oQhAIHJs0LIqHdrFnGMqv7/9Iya1hEJx2g/zOL+aX9GOuyyxZMbcgH79+vlbRRMlAYD4Me7UNhZae9gn0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709641899; c=relaxed/simple;
-	bh=wVR0hsNalFPZjqzdHdUoewLX4/P2pRDK0VmWSSDArIE=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Bw2ISaMA16FFwvsymhLqK0TrX+X7TRjfHajFF/g9PqeJqcdeaNjdvMBEWAbNnzbfEeHV0kBRefzPVzT9v7A+X/9bpnxLd4NiihA1rUlq3TIN8NsBlfzkRgN+2kduO/euAk/+SYGi/Lpqc49eH4H8pL5uMpEClC5J7ASehRyhAb8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ExEtod48; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709641898; x=1741177898;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=wVR0hsNalFPZjqzdHdUoewLX4/P2pRDK0VmWSSDArIE=;
-  b=ExEtod488A3jL6bAd/DMGlh0BUVDQgIe78WW/B/meX8SV28L55sKW3/H
-   Vq6MtbYJ24VfoIi9x2vqOR0Tx0j5MHY68TaFaJtJB82yTCfZtToWs5SKd
-   uLITqq+eE1ue257qBCOkEDk/eN0+iYPXbICs8vDaUsZdXxu76Duc0ruR/
-   XqECHEIroanRU56Zj35r3vPKH1t6ELLy4jGkJE9/9bgMDqj2t1bng8k7h
-   xLAlB+e3vPQIGZoxXw3LoYhh2lUFIdwMpbRghNa6Lh7yMs53Ao96cre1g
-   crgY6mpwM7wlSdM7U1JnhOfkb5LsoLv91/4SiT9+c7NUoBqs1k9uvsBY+
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="4307270"
-X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
-   d="scan'208";a="4307270"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 04:31:37 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,205,1705392000"; 
-   d="scan'208";a="9472056"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Mar 2024 04:31:36 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 5 Mar 2024 04:31:35 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 5 Mar 2024 04:31:35 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 5 Mar 2024 04:31:35 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 5 Mar 2024 04:31:34 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=elCLo3h3Ui4+MuCuoK51DiHzyKFiwDpwF5mcRDUzsdzcy0GVPqo6xeqPsJTekVUObf4NQG8ID3x1Unek3Dcc0RUknfo26O+1em6Nifj07L6dFv2YoqRaCLlNb20XFIrlgPW1nVeI3LkDEYb4Ng0rDjXSAOb5nvlPVnOlLQ0s6wsLk6NfjdiCnUqIRZJwt1j6wSqXQRcmrXt9gSHMkAFT+VhzFUCHgSnRuK9jywYokpxfQTadWhOhlfXr7ZnFcAyoy4rAZlssP/QntORoAIrQQY6Y7uF9I6mjSPVlpSSN00TwcpuIGbRhjyMwtCwsG4lGOwv3OnYCvZVbxXXZvhZsiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PKcgdza9i7ts8MvxO7AwulD9CEi5cTlxwP8JZLca4YM=;
- b=Y5b1T9ZZNmSTgkQpckSeXKuLswbaeRuF6qtVMPqBNNLdwqvuCXjOjeH74aX1pchUoC7lY7eQJ3pXo8QVlduxrbsIEU2rrIOw6bTTVK4AFpx+54YLJJQLA6nKOXqPFxdKfb/EXDZ6x/D4npliOYSDp+GDq9BOZo2dBQ8xamuEt/GC4X42k/2DTYEKXifL2GQkURu98GwM9vUOYpcl+vOYLE3HFJcNbIT04ocRNHQx3BZEgl7wOjvXAL8O12jJzZ70LWjPLgkMDSPqbWfDPpfpgXYLD4DpRlTbTvsJLiszucFYyfavPG7YZvdGy51W4dtfcAVbm2eAb4+ndP6mzeu3MQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL1PR11MB5399.namprd11.prod.outlook.com (2603:10b6:208:318::12)
- by SN7PR11MB7044.namprd11.prod.outlook.com (2603:10b6:806:29b::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Tue, 5 Mar
- 2024 12:31:32 +0000
-Received: from BL1PR11MB5399.namprd11.prod.outlook.com
- ([fe80::1de2:160a:9f9e:cb68]) by BL1PR11MB5399.namprd11.prod.outlook.com
- ([fe80::1de2:160a:9f9e:cb68%3]) with mapi id 15.20.7362.019; Tue, 5 Mar 2024
- 12:31:32 +0000
-Message-ID: <803abfca-bd51-4b5e-ba4a-d253815fa63d@intel.com>
-Date: Tue, 5 Mar 2024 13:31:28 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v5 4/5] ice: Add
- tx_scheduling_layers devlink param
-To: Jiri Pirko <jiri@resnulli.us>
-CC: <andrew@lunn.ch>, <michal.wilczynski@intel.com>, <netdev@vger.kernel.org>,
-	<lukasz.czapnik@intel.com>, <victor.raj@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>, <horms@kernel.org>,
-	<przemyslaw.kitszel@intel.com>, <kuba@kernel.org>
-References: <20240228142054.474626-1-mateusz.polchlopek@intel.com>
- <20240228142054.474626-5-mateusz.polchlopek@intel.com>
- <Zd9X5GPEZEIOIyWs@nanopsycho>
- <f776a527-bfd2-45de-bace-1b1c3f9dcb68@intel.com>
- <ZeH4cpze2MPM4FAK@nanopsycho>
-Content-Language: pl
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Organization: Intel
-In-Reply-To: <ZeH4cpze2MPM4FAK@nanopsycho>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: WA2P291CA0045.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1f::19) To BL1PR11MB5399.namprd11.prod.outlook.com
- (2603:10b6:208:318::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A584958AB6
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 12:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709643031; cv=none; b=Ck8aUbKoOK0+hZFJbYdBEFWyjY8FEG5zJKpS42OmnwFRixamU3ex58OynR9o5ZljG6THuY8YHBFTilH8JGlyFxarI6ncZWsIFeTMN49IczzVatExKxnSbEa74Av4E85d8ojHfcKTNu/+YsQ5ga6413AJCtdGKrrL/1UTthDFsJw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709643031; c=relaxed/simple;
+	bh=YwI5aym865kGdrXZKdKUJgEWsEfkRO3eIsQQOg2CvMI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=mUu1WSc1jZpDoRUAuzWuCTTOxHDdALMt163kbnyvkBAp4XO1ls+yLHNhFDb1EVEuwrJatW0e/0Eiy1hqdmhA1zZikUQ0G9sRxRXJ7bmxh1uQaqjHtdPb3nbk9Gyx5ywGhVu4kC/ILeiZdaCoeHXVt6N/FtFn5dxarGO+8EJOy6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C5b8nfyN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3575BC43390;
+	Tue,  5 Mar 2024 12:50:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709643031;
+	bh=YwI5aym865kGdrXZKdKUJgEWsEfkRO3eIsQQOg2CvMI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=C5b8nfyNnlyGMopVXfC1PAKqUpz4W37CPo1TjL52mXGLBG8O7AKeEZahfAt/SkSt9
+	 fgwPtRpaNh7lyeOkB9xDwJg1BnCzKfENSwD1FMca1dHQbxdCOFUgBnZD3hCQjpMvov
+	 fCuK/pGx3h1ZobFNA9Q3gpIlJWVIhFtpYLrjc/VbMxFAdyu5XO22e34M9FQVxHH4UX
+	 MqLGXORPb3peNs2wyqrDRmAL/VW7ZiUZ6aDh631+SxuHv6mhTBdDscLa+daicuX/7y
+	 vuI+HBkvmaqbYOGxz/h41sD0UVRqj4Av+tJn1L6PI9nzrdGngqZeRrkPzGkszn1FWR
+	 IQGQNH2ft6QgA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1A288D88F80;
+	Tue,  5 Mar 2024 12:50:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5399:EE_|SN7PR11MB7044:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5a721eff-6e9d-40ca-1ec0-08dc3d1030b2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 9IHD4/49OxjiMNCismed9lGg/HWJciUU4upqd79sASeeq6kOGQCjvV+eDZUqIsfxXmBg+blwezgds8gFmCYoOcYT+4f0oBbIpnT6IChD6mz2NhtcM6UGtrehYu+uFRFWVQFr2PbzOkGIMFPaWE9Mi0+Kv8uubiL00Kag6kpmXXLcQKJHwvWRAU8adZbTd5vgP1qL1bOlOZemQiPPGR3VTeE8RpUCVA/bQ+bf/yxTHxAlPYzkO4Eoq97MMGBNVZf1kzEhP3RGx4VXmLy5QPk4CINv/rZfu+/Fdw6vmOvCeaRN4Eecz7XN8dU6tHzmLuDZZMFqxs8LdZY8NfJDlgmWPQO3X3BZXb0f7lKFPO5Fgm6LO18w3/YvAORUC/0mA9Ssp4A+5Zl4pESg5Q3oo/WuuAVU4GvF18PyIPe/nPDkxm3gIoQhUisTLA6UL+n+ituA2/RYvUg84Vt/OVawmKcQR+zWuFGuwfC6vXhr71ek+llUZbh5wlXFI1/gR6t2/0fd+JXBW1V+q2H/Dkrv5WlnlL2u+2B0fk3wz/6VTJyrO/+qJdjPZJqjNgnReizEbTuBBZ1FCW8L0hn9ay8Nv25XkyD7stYGbYd33MozO6bFbklqmQ/qyKg1CZte379V6PVUIS6ah99GV/XGndP0F1v5tkBn0Ullg4WqOQp36CSRneM=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5399.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ODRzd0lOL0d6NStoT0J3QWhFbzdCdTJXWG1QTUNBNGFGcnlDVURSZTdTVXl4?=
- =?utf-8?B?Z0xiK1kyeWtwb1cyWlhtczhhRVBoKzRhRUxlS1grcDBIbit6NFdNOUtxVWFC?=
- =?utf-8?B?ZElJbkJBR3JLMmVSZlVrQUZFd2lENDdnTXVudHdicVVlVExQc3Vtb0pYaE8w?=
- =?utf-8?B?bkdsM2R2VmRMa05DUnpsRzZ5SnBRT3ZMRFRaaVQ4TU14RlJ1ejR4NnhwSDJo?=
- =?utf-8?B?U0VINXFqZDUrWDAwbFRVclM3cDQwdEhFK1BmOVA3T001TXp4Sk9TakQraTNC?=
- =?utf-8?B?dWMvQmRWWUl0OFBpZjMxd0lXYjdRZ1p4RU0zMDE5dG5KS2VUMGdXWm5pOVUz?=
- =?utf-8?B?Q1IwSWdsZjZSYm9LWE9iOVBaTWFXMC9CdXlXZmVyalhNSnI2QmlkeENzZXUx?=
- =?utf-8?B?TzQwNXVNUHpIV1hOeldFSTBmUVV2Y1BjcVJDSHBYMmJvMWx0WnJ1UGs4c2l1?=
- =?utf-8?B?eE5hQWlhTkpTMUJPalNVN0d0TjdMZE5DMGUyYlhsb0Q2SlBKTGp6VzBWM2lT?=
- =?utf-8?B?K2hXN2lXczdKS2VJcmRkelB2elhkelBJR3YxK3FYdnRDOUlSSitzQUY3OEZR?=
- =?utf-8?B?VUJMUjA4Wm14ejhEYzJ4Qm5rYng2OWNqdTJseWlydWpUL2xxd2dNWXlIVFVl?=
- =?utf-8?B?bllsSTZaSUtYZ1d3ajZnNkViQWNrN0JyN1RndlMwOXNTdHQzbGJMQVMzbm10?=
- =?utf-8?B?TGw1YW96U1pieDdtcmlDQlFNdmttSGdKbFRlOFZRYTdHQVRnd0ZYbTh4akhx?=
- =?utf-8?B?bGtubVBBcHVLTTJlUE56Y1NsYlJuYzk4dGhMZmFUOXpQVUFUMXJ6ZXpXQmtR?=
- =?utf-8?B?R2J5QmExYlUxYjM2OU5YRHkxbU54RkNPdEEreDQvc0xMZXB0eEo2a3d5MUU2?=
- =?utf-8?B?Y0pMb1lZbDVTWUhKUWk4SnluVjU2N0w0MDFMaEVZWDVEdmpRaGRZenpKcFN2?=
- =?utf-8?B?RWhLTjRZMmpOR1pzeStLb3B1YXlzbmp3TWhTaTRrT3dUYkV5SE5hSjBjRHMy?=
- =?utf-8?B?M1pLYmVibGxWM0Ura0kzNFdMWUtrdGNNbFB4blhlU1Zta3N3ajVPenZEbEl5?=
- =?utf-8?B?Rys1amNsV2NuQlFaUkpycjF2VVZ6QjRkRVhJcCt2VENqR0NTQnJDTlVHZ1FM?=
- =?utf-8?B?eU5kZ3A5WXh2L2VOOXNsYm5XMzV2VUljOC9CZ1d4ZkxGZHc2eUN4Q2xZbXdT?=
- =?utf-8?B?MWQ2L2pvRnFoSUsvc2c2T1k5MENtcFF6a2ZYSzZad2taWEYxRHJjcDBRcHV1?=
- =?utf-8?B?SFlPY3plbm5BdUl0NFQ1aXJiZGZHVmp2NzUydlZQV2taSnlwdUpYRTVsTW5C?=
- =?utf-8?B?UmR6aTZJWVUwczRXTHk1bVB3ek1tK0ZVSWpPMGxSclorYXFaMnpRS2x6WS93?=
- =?utf-8?B?Sk5qaWk4Q2IrZlh3MWdtTXI5Rll4YjBVbGM0dEhtSFZGTzI2UDhxUkJaN1cw?=
- =?utf-8?B?dHhjOTRISnRGSldvcmM5QVZIODZZR3hxZ0ZGRUpwdnFwU2hjSlZuZm1nR0Y1?=
- =?utf-8?B?YjZFNFdxZ2t0UTlSak1ySlcvQ05yN3NUWkM1dzh6NVhqNXNxenFOajNxMW0r?=
- =?utf-8?B?Z0FxYUNlVnlrVEdBUnBkUlg1Q3pFRCtzdFE5d2pFWmlGamFJbFN4djhpdlhu?=
- =?utf-8?B?aWJwOUxRNVlyUHF1RGVreFo3UUUzMFlud012cDhpSzFzd2g5NjByK09nZjBz?=
- =?utf-8?B?UlFES2NXQ0FQMS9NTGljTERDbnlVSzNHMlJCOU05VG5LaUhkSGtxNDJjMjZ0?=
- =?utf-8?B?SEhQaUc2UGpZT3RnYnd3L0Z0UjAra045Z0tFbEFSWlBFUEdPZWwvSUhvdVEv?=
- =?utf-8?B?aWpXTi9nQmdxZ1FGdWp2anpNS2sxWXhZdWNHdkJYRHc5eEd4dmtneUo1Y1Jw?=
- =?utf-8?B?TTc0RERMdUo5MzFDTW4yaVRFUS9mSDRWcmg4ajlYVUhYaHBiVm5xVTZTWGhX?=
- =?utf-8?B?SXMzVmVpSkJ6d05Kbi9rcEI4WkMzYW9jd1hubWFTbVVZbGJlOWFYWnlWbVR0?=
- =?utf-8?B?czBhOExzdE5RYllrVk1LSEdGUjNwa0hERmZLalZJaFhCOGlBS2RnWmVaS3Zx?=
- =?utf-8?B?clFSMEdTbDFZeW9TRzlNaXh3U01xd2dvT0R5RjdlT0ZQcWthcTBHdWVzUGt4?=
- =?utf-8?B?enhuYUhzRE1jQWhBSkJnYzZ4QVViM2lON0o4THVRd2tQb3AzVUFjemdUdjhz?=
- =?utf-8?B?OXc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a721eff-6e9d-40ca-1ec0-08dc3d1030b2
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5399.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2024 12:31:32.7966
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VY0LQSpAAvSItq7h5cbUuUpgXicueied/wzcVEna6rQFdRWw0TFQJ5GgDI8AVvc6Th/vP9dSO6ep9u1Z7mikZ07JHZQAB7BmWWIPhfuCPvw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7044
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/4] net: gro: cleanups and fast path refinement
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170964303110.9176.6238299590966925699.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Mar 2024 12:50:31 +0000
+References: <20240301193740.3436871-1-edumazet@google.com>
+In-Reply-To: <20240301193740.3436871-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ richardbgobert@gmail.com, netdev@vger.kernel.org, eric.dumazet@gmail.com
+
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Fri,  1 Mar 2024 19:37:36 +0000 you wrote:
+> Current GRO stack has a 'fast path' for a subset of drivers,
+> users of napi_frags_skb().
+> 
+> With TCP zerocopy/direct uses, header split at receive is becoming
+> more important, and GRO fast path is disabled.
+> 
+> This series makes GRO (a bit) more efficient for almost all use cases.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,1/4] net: gro: rename skb_gro_header_hard()
+    https://git.kernel.org/netdev/net-next/c/93e16ea025d2
+  - [net-next,2/4] net: gro: change skb_gro_network_header()
+    https://git.kernel.org/netdev/net-next/c/bd56a29c7a4e
+  - [net-next,3/4] net: gro: enable fast path for more cases
+    https://git.kernel.org/netdev/net-next/c/c7583e9f768e
+  - [net-next,4/4] tcp: gro: micro optimizations in tcp[4]_gro_complete()
+    https://git.kernel.org/netdev/net-next/c/8f78010b701d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-On 3/1/2024 4:46 PM, Jiri Pirko wrote:
-> Fri, Mar 01, 2024 at 02:41:56PM CET, mateusz.polchlopek@intel.com wrote:
->>
->>
->> On 2/28/2024 4:57 PM, Jiri Pirko wrote:
->>> Wed, Feb 28, 2024 at 03:20:53PM CET, mateusz.polchlopek@intel.com wrote:
->>>> From: Lukasz Czapnik <lukasz.czapnik@intel.com>
->>>>
->>>> It was observed that Tx performance was inconsistent across all queues
->>>> and/or VSIs and that it was directly connected to existing 9-layer
->>>> topology of the Tx scheduler.
->>>>
->>>> Introduce new private devlink param - tx_scheduling_layers. This parameter
->>>> gives user flexibility to choose the 5-layer transmit scheduler topology
->>>> which helps to smooth out the transmit performance.
->>>>
->>>> Allowed parameter values are 5 and 9.
->>>>
->>>> Example usage:
->>>>
->>>> Show:
->>>> devlink dev param show pci/0000:4b:00.0 name tx_scheduling_layers
->>>> pci/0000:4b:00.0:
->>>>    name tx_scheduling_layers type driver-specific
->>>>      values:
->>>>        cmode permanent value 9
->>>>
->>>> Set:
->>>> devlink dev param set pci/0000:4b:00.0 name tx_scheduling_layers value 5
->>>> cmode permanent
->>>>
->>>> devlink dev param set pci/0000:4b:00.0 name tx_scheduling_layers value 9
->>>> cmode permanent
->>>>
->>>> Signed-off-by: Lukasz Czapnik <lukasz.czapnik@intel.com>
->>>> Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
->>>> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
->>>> ---
->>>> .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   8 +
->>>> drivers/net/ethernet/intel/ice/ice_devlink.c  | 169 ++++++++++++++++++
->>>> .../net/ethernet/intel/ice/ice_fw_update.c    |   7 +-
->>>> .../net/ethernet/intel/ice/ice_fw_update.h    |   3 +
->>>> drivers/net/ethernet/intel/ice/ice_nvm.c      |   7 +-
->>>> drivers/net/ethernet/intel/ice/ice_nvm.h      |   3 +
->>>> 6 files changed, 189 insertions(+), 8 deletions(-)
->>>>
->>>> diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
->>>> index 02102e937b30..4143b50bd15d 100644
->>>> --- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
->>>> +++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
->>>> @@ -1692,6 +1692,14 @@ struct ice_aqc_nvm {
->>>> };
->>>>
->>>> #define ICE_AQC_NVM_START_POINT			0
->>>> +#define ICE_AQC_NVM_TX_TOPO_MOD_ID             0x14B
->>>> +
->>>> +struct ice_aqc_nvm_tx_topo_user_sel {
->>>> +	__le16 length;
->>>> +	u8 data;
->>>> +#define ICE_AQC_NVM_TX_TOPO_USER_SEL	BIT(4)
->>>> +	u8 reserved;
->>>> +};
->>>>
->>>> /* NVM Checksum Command (direct, 0x0706) */
->>>> struct ice_aqc_nvm_checksum {
->>>> diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
->>>> index cc717175178b..db4872990e51 100644
->>>> --- a/drivers/net/ethernet/intel/ice/ice_devlink.c
->>>> +++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
->>>> @@ -770,6 +770,167 @@ ice_devlink_port_unsplit(struct devlink *devlink, struct devlink_port *port,
->>>> 	return ice_devlink_port_split(devlink, port, 1, extack);
->>>> }
->>>>
->>>> +/**
->>>> + * ice_get_tx_topo_user_sel - Read user's choice from flash
->>>> + * @pf: pointer to pf structure
->>>> + * @layers: value read from flash will be saved here
->>>> + *
->>>> + * Reads user's preference for Tx Scheduler Topology Tree from PFA TLV.
->>>> + *
->>>> + * Returns zero when read was successful, negative values otherwise.
->>>> + */
->>>> +static int ice_get_tx_topo_user_sel(struct ice_pf *pf, uint8_t *layers)
->>>> +{
->>>> +	struct ice_aqc_nvm_tx_topo_user_sel usr_sel = {};
->>>> +	struct ice_hw *hw = &pf->hw;
->>>> +	int err;
->>>> +
->>>> +	err = ice_acquire_nvm(hw, ICE_RES_READ);
->>>> +	if (err)
->>>> +		return err;
->>>> +
->>>> +	err = ice_aq_read_nvm(hw, ICE_AQC_NVM_TX_TOPO_MOD_ID, 0,
->>>> +			     sizeof(usr_sel), &usr_sel, true, true, NULL);
->>>> +	if (err)
->>>> +		goto exit_release_res;
->>>> +
->>>> +	if (usr_sel.data & ICE_AQC_NVM_TX_TOPO_USER_SEL)
->>>> +		*layers = ICE_SCHED_5_LAYERS;
->>>> +       else
->>>> +		*layers = ICE_SCHED_9_LAYERS;
->>>> +
->>>> +exit_release_res:
->>>> +	ice_release_nvm(hw);
->>>> +
->>>> +	return err;
->>>> +}
->>>> +
->>>> +/**
->>>> + * ice_update_tx_topo_user_sel - Save user's preference in flash
->>>> + * @pf: pointer to pf structure
->>>> + * @layers: value to be saved in flash
->>>> + *
->>>> + * Variable "layers" defines user's preference about number of layers in Tx
->>>> + * Scheduler Topology Tree. This choice should be stored in PFA TLV field
->>>> + * and be picked up by driver, next time during init.
->>>> + *
->>>> + * Returns zero when save was successful, negative values otherwise.
->>>> + */
->>>> +static int ice_update_tx_topo_user_sel(struct ice_pf *pf, int layers)
->>>> +{
->>>> +	struct ice_aqc_nvm_tx_topo_user_sel usr_sel = {};
->>>> +	struct ice_hw *hw = &pf->hw;
->>>> +	int err;
->>>> +
->>>> +	err = ice_acquire_nvm(hw, ICE_RES_WRITE);
->>>> +	if (err)
->>>> +		return err;
->>>> +
->>>> +	err = ice_aq_read_nvm(hw, ICE_AQC_NVM_TX_TOPO_MOD_ID, 0,
->>>> +			      sizeof(usr_sel), &usr_sel, true, true, NULL);
->>>> +	if (err)
->>>> +		goto exit_release_res;
->>>> +
->>>> +	if (layers == ICE_SCHED_5_LAYERS)
->>>> +		usr_sel.data |= ICE_AQC_NVM_TX_TOPO_USER_SEL;
->>>> +	else
->>>> +		usr_sel.data &= ~ICE_AQC_NVM_TX_TOPO_USER_SEL;
->>>> +
->>>> +	err = ice_write_one_nvm_block(pf, ICE_AQC_NVM_TX_TOPO_MOD_ID, 2,
->>>> +				      sizeof(usr_sel.data), &usr_sel.data,
->>>> +				      true, NULL, NULL);
->>>> +	if (err)
->>>> +		err = -EIO;
->>>> +
->>>> +exit_release_res:
->>>> +	ice_release_nvm(hw);
->>>> +
->>>> +	return err;
->>>> +}
->>>> +
->>>> +/**
->>>> + * ice_devlink_tx_sched_layers_get - Get tx_scheduling_layers parameter
->>>> + * @devlink: pointer to the devlink instance
->>>> + * @id: the parameter ID to set
->>>> + * @ctx: context to store the parameter value
->>>> + *
->>>> + * Returns zero on success and negative value on failure.
->>>> + */
->>>> +static int ice_devlink_tx_sched_layers_get(struct devlink *devlink, u32 id,
->>>> +					   struct devlink_param_gset_ctx *ctx)
->>>> +{
->>>> +	struct ice_pf *pf = devlink_priv(devlink);
->>>> +	struct device *dev = ice_pf_to_dev(pf);
->>>> +	int err;
->>>> +
->>>> +	err = ice_get_tx_topo_user_sel(pf, &ctx->val.vu8);
->>>> +	if (err) {
->>>> +		dev_warn(dev, "Failed to read Tx Scheduler Tree - User Selection data from flash\n");
->>>
->>> I wonder why we don't propagate extack to these callbacks. Care to add
->>> it and use it instead of dmesg please?
->>>
->>>
->>
->> Good point Jiri, but it is 'get' (in 'set' the same situation) function from
->> DEVLINK_PARAM_DRIVER which defines that in 'set'/'get' there is no extack
-> 
-> So add it.
-> 
-> 
->> parameter. From 'get' function I can probably remove this message as it is
->> not so important and just return error code...
->>
->>>> +		return -EIO;
->>>> +	}
->>>> +
->>>> +	return 0;
->>>> +}
->>>> +
->>>> +/**
->>>> + * ice_devlink_tx_sched_layers_set - Set tx_scheduling_layers parameter
->>>> + * @devlink: pointer to the devlink instance
->>>> + * @id: the parameter ID to set
->>>> + * @ctx: context to get the parameter value
->>>> + *
->>>> + * Returns zero on success and negative value on failure.
->>>> + */
->>>> +static int ice_devlink_tx_sched_layers_set(struct devlink *devlink, u32 id,
->>>> +					   struct devlink_param_gset_ctx *ctx)
->>>> +{
->>>> +	struct ice_pf *pf = devlink_priv(devlink);
->>>> +	struct device *dev = ice_pf_to_dev(pf);
->>>> +	int err;
->>>> +
->>>> +	err = ice_update_tx_topo_user_sel(pf, ctx->val.vu8);
->>>> +	if (err)
->>>> +		return -EIO;
->>>> +
->>>> +	dev_warn(dev, "Tx scheduling layers have been changed on this device. You must reboot the system for the change to take effect.");
->>>
->>> Reboot the system? Why not re-plug the whole building while you are at
->>> it? :)
->>>
->>>
->>
->> ... but what about 'set' function? The information about reboot has to stay
->> and still - there is no extack in 'set' function.
-> 
-> My point is, do you really need to "reboot"? Message like this sounds
-> very odd coming from a nic driver. Woundn't pci slot powercycle do the
-> trick for example?
-> 
-> 
->>
->>>> +
->>>> +	return 0;
->>>> +}
->>>> +
->>>> +/**
->>>> + * ice_devlink_tx_sched_layers_validate - Validate passed tx_scheduling_layers
->>>> + *                                       parameter value
->>>> + * @devlink: unused pointer to devlink instance
->>>> + * @id: the parameter ID to validate
->>>> + * @val: value to validate
->>>> + * @extack: netlink extended ACK structure
->>>> + *
->>>> + * Supported values are:
->>>> + * - 5 - five layers Tx Scheduler Topology Tree
->>>> + * - 9 - nine layers Tx Scheduler Topology Tree
->>>> + *
->>>> + * Returns zero when passed parameter value is supported. Negative value on
->>>> + * error.
->>>> + */
->>>> +static int ice_devlink_tx_sched_layers_validate(struct devlink *devlink, u32 id,
->>>> +					        union devlink_param_value val,
->>>> +					        struct netlink_ext_ack *extack)
->>>> +{
->>>> +	struct ice_pf *pf = devlink_priv(devlink);
->>>> +	struct ice_hw *hw = &pf->hw;
->>>> +
->>>> +	if (!hw->func_caps.common_cap.tx_sched_topo_comp_mode_en) {
->>>> +		NL_SET_ERR_MSG_MOD(extack, "Error: Requested feature is not supported by the FW on this device. Update the FW and run this command again.");
->>>
->>> Drop the "Error: " prefix. Does not make sense to have it. Also, "Update
->>> FW" remark looks quite odd.
->>>
->>>> +		return -EOPNOTSUPP;
->>>> +	}
->>>> +
->>>> +	if (val.vu8 != ICE_SCHED_5_LAYERS && val.vu8 != ICE_SCHED_9_LAYERS) {
->>>> +		NL_SET_ERR_MSG_MOD(extack, "Error: Wrong number of tx scheduler layers provided.");
->>>
->>> Drop the "Error: " prefix. Does not make sense to have it.
->>>
->>>
->>>> +		return -EINVAL;
->>>> +	}
->>>> +
->>>> +	return 0;
->>>> +}
->>>> +
->>>> /**
->>>>    * ice_tear_down_devlink_rate_tree - removes devlink-rate exported tree
->>>>    * @pf: pf struct
->>>> @@ -1601,6 +1762,7 @@ static int ice_devlink_loopback_validate(struct devlink *devlink, u32 id,
->>>> enum ice_param_id {
->>>> 	ICE_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
->>>> 	ICE_DEVLINK_PARAM_ID_LOOPBACK,
->>>> +	ICE_DEVLINK_PARAM_ID_TX_BALANCE,
->>>> };
->>>>
->>>> static const struct devlink_param ice_devlink_params[] = {
->>>> @@ -1618,6 +1780,13 @@ static const struct devlink_param ice_devlink_params[] = {
->>>> 			     ice_devlink_loopback_get,
->>>> 			     ice_devlink_loopback_set,
->>>> 			     ice_devlink_loopback_validate),
->>>> +	DEVLINK_PARAM_DRIVER(ICE_DEVLINK_PARAM_ID_TX_BALANCE,
->>>> +			     "tx_scheduling_layers",
->>>> +			     DEVLINK_PARAM_TYPE_U8,
->>>> +			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
->>>> +			     ice_devlink_tx_sched_layers_get,
->>>> +			     ice_devlink_tx_sched_layers_set,
->>>> +			     ice_devlink_tx_sched_layers_validate),
->>>> };
->>>>
->>>> static void ice_devlink_free(void *devlink_ptr)
->>>> diff --git a/drivers/net/ethernet/intel/ice/ice_fw_update.c b/drivers/net/ethernet/intel/ice/ice_fw_update.c
->>>> index 319a2d6fe26c..f81db6c107c8 100644
->>>> --- a/drivers/net/ethernet/intel/ice/ice_fw_update.c
->>>> +++ b/drivers/net/ethernet/intel/ice/ice_fw_update.c
->>>> @@ -286,10 +286,9 @@ ice_send_component_table(struct pldmfw *context, struct pldmfw_component *compon
->>>>    *
->>>>    * Returns: zero on success, or a negative error code on failure.
->>>>    */
->>>> -static int
->>>> -ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
->>>> -			u16 block_size, u8 *block, bool last_cmd,
->>>> -			u8 *reset_level, struct netlink_ext_ack *extack)
->>>> +int ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
->>>> +			    u16 block_size, u8 *block, bool last_cmd,
->>>> +			    u8 *reset_level, struct netlink_ext_ack *extack)
->>>> {
->>>> 	u16 completion_module, completion_retval;
->>>> 	struct device *dev = ice_pf_to_dev(pf);
->>>> diff --git a/drivers/net/ethernet/intel/ice/ice_fw_update.h b/drivers/net/ethernet/intel/ice/ice_fw_update.h
->>>> index 750574885716..04b200462757 100644
->>>> --- a/drivers/net/ethernet/intel/ice/ice_fw_update.h
->>>> +++ b/drivers/net/ethernet/intel/ice/ice_fw_update.h
->>>> @@ -9,5 +9,8 @@ int ice_devlink_flash_update(struct devlink *devlink,
->>>> 			     struct netlink_ext_ack *extack);
->>>> int ice_get_pending_updates(struct ice_pf *pf, u8 *pending,
->>>> 			    struct netlink_ext_ack *extack);
->>>> +int ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
->>>> +			    u16 block_size, u8 *block, bool last_cmd,
->>>> +			    u8 *reset_level, struct netlink_ext_ack *extack);
->>>>
->>>> #endif
->>>> diff --git a/drivers/net/ethernet/intel/ice/ice_nvm.c b/drivers/net/ethernet/intel/ice/ice_nvm.c
->>>> index d4e05d2cb30c..84eab92dc03c 100644
->>>> --- a/drivers/net/ethernet/intel/ice/ice_nvm.c
->>>> +++ b/drivers/net/ethernet/intel/ice/ice_nvm.c
->>>> @@ -18,10 +18,9 @@
->>>>    *
->>>>    * Read the NVM using the admin queue commands (0x0701)
->>>>    */
->>>> -static int
->>>> -ice_aq_read_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset, u16 length,
->>>> -		void *data, bool last_command, bool read_shadow_ram,
->>>> -		struct ice_sq_cd *cd)
->>>> +int ice_aq_read_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
->>>> +		    u16 length, void *data, bool last_command,
->>>> +		    bool read_shadow_ram, struct ice_sq_cd *cd)
->>>> {
->>>> 	struct ice_aq_desc desc;
->>>> 	struct ice_aqc_nvm *cmd;
->>>> diff --git a/drivers/net/ethernet/intel/ice/ice_nvm.h b/drivers/net/ethernet/intel/ice/ice_nvm.h
->>>> index 774c2317967d..63cdc6bdac58 100644
->>>> --- a/drivers/net/ethernet/intel/ice/ice_nvm.h
->>>> +++ b/drivers/net/ethernet/intel/ice/ice_nvm.h
->>>> @@ -14,6 +14,9 @@ struct ice_orom_civd_info {
->>>>
->>>> int ice_acquire_nvm(struct ice_hw *hw, enum ice_aq_res_access_type access);
->>>> void ice_release_nvm(struct ice_hw *hw);
->>>> +int ice_aq_read_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
->>>> +		    u16 length, void *data, bool last_command,
->>>> +		    bool read_shadow_ram, struct ice_sq_cd *cd);
->>>> int
->>>> ice_read_flat_nvm(struct ice_hw *hw, u32 offset, u32 *length, u8 *data,
->>>> 		  bool read_shadow_ram);
->>>> -- 
->>>> 2.38.1
->>>>
->>
->> Other comments will be resolved in the next version.
->> Thanks
-
-Okay, thanks Jiri. I will solve problems in next version.
 
