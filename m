@@ -1,139 +1,129 @@
-Return-Path: <netdev+bounces-77463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47DB3871E0C
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:37:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8C0A871E11
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:38:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 790661C2239A
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:37:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 651D2286B14
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:38:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F092254F86;
-	Tue,  5 Mar 2024 11:37:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="z70saEw0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A04BB54F86;
+	Tue,  5 Mar 2024 11:38:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37895490D;
-	Tue,  5 Mar 2024 11:37:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8B7F54908;
+	Tue,  5 Mar 2024 11:38:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709638624; cv=none; b=toDemnPCqlvbiUZX9M/Y24kmlGrzTxslgOux/t/9srwPy8aJoYqjbZxMU1SP7dceuBdQCAViIRrtenGsYz347Ckt82RT1Z/ffTCy1W+njMyaaB4nyF7huCb31KzDrNeNxVfN1ozO+wVEWaCAZzTAOvIQlVoONZsovPXR0YXHLIQ=
+	t=1709638687; cv=none; b=d9mRPE0VhkO2vwPtTALzAf7QAYKGekwVO9KmLoyDoda3Zf2yKk6nRCB90Bme10s0OSjfH4WPj84BO7ZaSLgiKaSU99EmtCqiHWkaUtYeUBtg9XpNW+BbgyhOXwDdDrwL6BfWZABkQc4DE0fau/U7rSpDGt34yAXhqByIwRJjxsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709638624; c=relaxed/simple;
-	bh=3ayW0IhTUeNMcpww5PHJsnIajeFZZT9ny2n8rBMH1eA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=azTM0TaKKQbCiYPdv0FlZhp9AQR6iiLKOs2/2DnrwblSXXQVOemYtvb0Lx/zAYltp3v5mUSD+DzdUPSNPBrnuDcMc49iDgu83FYtHrmZcUOMb1sPrCLAQbSMDQ8A4Nu7hu1UOJ7TMBNeTG/tYfcL79oEMqJxbWAN9qFHRltV0gI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=z70saEw0; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=IrDqOCAVFnIywCjY1vOYOH9E3WkzoSBd6y1AwGw2QPk=; b=z70saEw0Uyr9DpMfHt0qmGvV1r
-	IOgrK0UzVt4WJkKKwAMA6Z+nNottmESro61dl/j3LTnq31i1c+asqMGnwzPAvYM72RaYzTTEbC3yb
-	lTUOsmvv2A3qnseBp+jV3aRZ0ZBtoU4We8+GxzKqDQtZguiRW3k53w60f8sbwQflPkz/Dj2E5bh/O
-	o/gQMWYUgydc8kAI++cxof0gKS0uuMSLzTM6nhNeyQJy1J7nTLoSuBjJ+KeF7Zv8sF9hGnxj37P7H
-	tct7YVX5TePcXBQ2NDbPInfBNBTBvsZiQ8DOJK287YDCFLkUml+LdV4SmIO7NyF6+oKRs5pXeoTtf
-	Ux9MzmpQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43258)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rhT6J-00073t-1k;
-	Tue, 05 Mar 2024 11:36:51 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rhT6D-0005NL-BL; Tue, 05 Mar 2024 11:36:45 +0000
-Date: Tue, 5 Mar 2024 11:36:45 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Subject: Re: [PATCH net-next v3 0/9] MT7530 DSA Subdriver Improvements Act III
-Message-ID: <ZecDzbAMrXgMG72Z@shell.armlinux.org.uk>
-References: <20240301-for-netnext-mt7530-improvements-3-v3-0-449f4f166454@arinc9.com>
- <81a5d191894e6a7741d3c266079f3404def2bb07.camel@redhat.com>
+	s=arc-20240116; t=1709638687; c=relaxed/simple;
+	bh=an0mJ4yI+Taqndo6C5ZxyINal5TwXXDiYE/eX/dyfXU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ebkBXAazRcjaoia3Z416CeH2i79ASP3hhVw4ik7PVtuoe8laacfcErPNTyzWUJFlTVgiJtnQZkO4u8xFdC/JNbmxecd1HcSry0KfHOEKbT5rLH2PLqfVsVJNo5e5dsJZJW/whtWbzP7Xcc2IPAAL/ncI9a2Dl8p0FKsh/eX8K4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a3ddc13bbb3so1090130866b.0;
+        Tue, 05 Mar 2024 03:38:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709638684; x=1710243484;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PZcy/13YPJy/Q8JEq2MiymPPGsNdrglf5cJPZckjBCg=;
+        b=lKcJOcUevr9rztc+PQ7gzAo4I8r9yNwKmuwzzaDIj0Af93HCG7vEOk4WVec4IOSr8v
+         iyr/0pbZvo4u+yiNG6zLMcF5ksNnPk5xi/yXqBH4gdpBKAyMaV6kbvYiqiF4t1XixyPj
+         LMb5GmYStYz97CJu+TzTBGFKO/oFKBSz+DdySmowE/YU29deFz+DS3gU6w2+IxwKYGC2
+         xfGa19yVSNdZ8S7DAw3yxsDLYf6yyTSxjpMbJ1Fy9hRjQcplKBdE2xxfO4+bIS1QRQh7
+         5FUftRkCH02zTFVs0E+moYSoI2yEknTL0XddbKjR904W5vOO2dOQDOZbCd+dH977L67K
+         YP8g==
+X-Forwarded-Encrypted: i=1; AJvYcCWEVsvSD9vwpQvl+sasR7f2HaDZEmdkxPzUZ/1K9nldQcvXbQHcHEy1UL0UI+mFeXI9PK70Tgeb7W6pkiiZNs40DVbeYGKs0gKrdXDV
+X-Gm-Message-State: AOJu0Yy+exG89NmNFGqGAeWGH97KD9HFHTwwwEY5dSd74rdcIVOiruIV
+	WPtgsJNa246iZAHf/SRK6+y736rkCCZJEjtVRMMiCXaj5nllUPLY
+X-Google-Smtp-Source: AGHT+IGTkQxVbnlou2GMNYIIuskCZMU5vmsYsWmRfmFLbTSF1PvqcFQlaiCgE+UViH0KdyBtPT4Ztw==
+X-Received: by 2002:a17:906:340b:b0:a45:74fb:f5c3 with SMTP id c11-20020a170906340b00b00a4574fbf5c3mr2319199ejb.28.1709638683891;
+        Tue, 05 Mar 2024 03:38:03 -0800 (PST)
+Received: from localhost (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
+        by smtp.gmail.com with ESMTPSA id rp25-20020a170906d97900b00a3d665c6778sm6038509ejb.12.2024.03.05.03.38.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Mar 2024 03:38:03 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	horms@kernel.org,
+	dsahern@kernel.org
+Subject: [PATCH net-next] net: macsec: Leverage core stats allocator
+Date: Tue,  5 Mar 2024 03:37:27 -0800
+Message-ID: <20240305113728.1974944-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <81a5d191894e6a7741d3c266079f3404def2bb07.camel@redhat.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Mar 05, 2024 at 12:30:20PM +0100, Paolo Abeni wrote:
-> On Fri, 2024-03-01 at 12:42 +0200, Arınç ÜNAL wrote:
-> > This is the third patch series with the goal of simplifying the MT7530 DSA
-> > subdriver and improving support for MT7530, MT7531, and the switch on the
-> > MT7988 SoC.
-> > 
-> > I have done a simple ping test to confirm basic communication on all switch
-> > ports on MCM and standalone MT7530, and MT7531 switch with this patch
-> > series applied.
-> > 
-> > MT7621 Unielec, MCM MT7530:
-> > 
-> > rgmii-only-gmac0-mt7621-unielec-u7621-06-16m.dtb
-> > gmac0-and-gmac1-mt7621-unielec-u7621-06-16m.dtb
-> > 
-> > tftpboot 0x80008000 mips-uzImage.bin; tftpboot 0x83000000 mips-rootfs.cpio.uboot; tftpboot 0x83f00000 $dtb; bootm 0x80008000 0x83000000 0x83f00000
-> > 
-> > MT7622 Bananapi, MT7531:
-> > 
-> > gmac0-and-gmac1-mt7622-bananapi-bpi-r64.dtb
-> > 
-> > tftpboot 0x40000000 arm64-Image; tftpboot 0x45000000 arm64-rootfs.cpio.uboot; tftpboot 0x4a000000 $dtb; booti 0x40000000 0x45000000 0x4a000000
-> > 
-> > MT7623 Bananapi, standalone MT7530:
-> > 
-> > rgmii-only-gmac0-mt7623n-bananapi-bpi-r2.dtb
-> > gmac0-and-gmac1-mt7623n-bananapi-bpi-r2.dtb
-> > 
-> > tftpboot 0x80008000 arm-zImage; tftpboot 0x83000000 arm-rootfs.cpio.uboot; tftpboot 0x83f00000 $dtb; bootz 0x80008000 0x83000000 0x83f00000
-> > 
-> > This patch series is the continuation of the patch series linked below.
-> > 
-> > https://lore.kernel.org/r/20230522121532.86610-1-arinc.unal@arinc9.com
-> > 
-> > Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> 
-> @Russell, I see you went through some patches; my understanding is that
-> there are no objection to this series in the current form. The series
-> LGTM, so I'm going to apply it: I think it would a pity if it should
-> miss this cycle.
+With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
+convert veth & vrf"), stats allocation could be done on net core
+instead of in this driver.
 
-That's fine - I did read through the entire series, but only gave my
-r-b on the ones I felt I'd done a good enough job on. You may have
-noticed I haven't submitted much network stuff this cycle... I have
-limited bandwidth at the moment.
+With this new approach, the driver doesn't have to bother with error
+handling (allocation failure checking, making sure free happens in the
+right spot, etc). This is core responsibility now.
 
+Remove the allocation in the macsec driver and leverage the network
+core allocation instead.
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ drivers/net/macsec.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
+index 4b5513c9c2be..0206b84284ab 100644
+--- a/drivers/net/macsec.c
++++ b/drivers/net/macsec.c
+@@ -3519,18 +3519,13 @@ static int macsec_dev_init(struct net_device *dev)
+ 	struct net_device *real_dev = macsec->real_dev;
+ 	int err;
+ 
+-	dev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
+-	if (!dev->tstats)
+-		return -ENOMEM;
+-
+ 	err = gro_cells_init(&macsec->gro_cells, dev);
+-	if (err) {
+-		free_percpu(dev->tstats);
++	if (err)
+ 		return err;
+-	}
+ 
+ 	dev->features = real_dev->features & MACSEC_FEATURES;
+ 	dev->features |= NETIF_F_LLTX | NETIF_F_GSO_SOFTWARE;
++	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+ 
+ 	macsec_set_head_tail_room(dev);
+ 
+@@ -3550,7 +3545,6 @@ static void macsec_dev_uninit(struct net_device *dev)
+ 	struct macsec_dev *macsec = macsec_priv(dev);
+ 
+ 	gro_cells_destroy(&macsec->gro_cells);
+-	free_percpu(dev->tstats);
+ }
+ 
+ static netdev_features_t macsec_fix_features(struct net_device *dev,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
