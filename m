@@ -1,103 +1,116 @@
-Return-Path: <netdev+bounces-77388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88182871846
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 09:35:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABD13871852
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 09:37:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18720B21196
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 08:35:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 676B6282116
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 08:37:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEBCA2AF04;
-	Tue,  5 Mar 2024 08:35:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB723A1D9;
+	Tue,  5 Mar 2024 08:37:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="JcrZlHlb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="AgCIe+Wj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7908B1EEFD
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 08:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 443961EF01;
+	Tue,  5 Mar 2024 08:37:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709627720; cv=none; b=SswxzNWakY4SrI6uSSJAJGxpqYH2/0dzTN99lrJtzUza2nKARknUUt6TESCBNEphT7iaOGkKrESxdu2AzIgM5zRMoAip4kdrqqGvvIhmt+IedeMovB16lzWhkNfbO0Y0typQ5z/uMYqZzOg7bUuz3qiCqaqES5QdvKLXKdf6kvQ=
+	t=1709627865; cv=none; b=UoHCXngdC1mt5z3X8c+R+YYY++ZgD1lARk4bLD1TUCi/KYtrILj+8D7TQEBR/xVveTK67qCSXGHFfokBApiiH6o0o6F7tro8brDPP+Icj9JrXBSKNsqkNF83eTjWPcKqtlkmycDoLrHDEJ87tTEWv2/jbnsR1DdZ1DGi5NFY9SA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709627720; c=relaxed/simple;
-	bh=82vsJjoVoWmADD8rvpl3Qp5VtIdC1v3LD9anMkdwnio=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ptH0ZqkmaS4kyyQ7bVKMQWeSJRvsDp7hVtZ2DSt037vdXvPactO/7E4IKfoPzVHMFz/c0DUXpjJGjyagpxGU4zvEziOS+P7j/yekq5SHu5h8ChE31zATMLSNwAigF2R6pdEw0BV3qIDJH3IHPa0rRHP8aShdVtdy/0NN3eOVUF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=JcrZlHlb; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-56781070f38so1063429a12.0
-        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 00:35:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1709627717; x=1710232517; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=PALRyszw+AlcpDZUROc9AgnCBJMpueCSeAJq71aQVJ8=;
-        b=JcrZlHlbBLWyDeejHHJws4S/uQJyPjUy61ll/9bQ93TjkBCJ/6jF4U5dT9AcYauxME
-         5Wim+A2q8J2yLP2vMzJTwuSuVNYZFdTz5UVvKpgsylGYZQL6oz11cQGrU7Af7EXwv/K7
-         uXvkhFTmeD+hAXuhtB9An5KGdJPwhGq3d4dMXuGF9lh9cGdpndAy4YXkr7sRRV3CCqy6
-         88Z6/hJZ0h0jucrdASJ/td4hyJKDDrLb+0EmdHNrcjHZqQqf1twvbTn5TyqNHrBja9/w
-         bQMLyiSV4wFv+g+leHUvKyHGo5tfRYQ+Uoyn7zDKv87jVYwqxj0Yy5yzOggpHheek4Wi
-         m3xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709627717; x=1710232517;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PALRyszw+AlcpDZUROc9AgnCBJMpueCSeAJq71aQVJ8=;
-        b=cjxZFiLgDLeHiU3D00QuPRH3xSbDQajk8dYa0F5LDQyoV5jAsFIrlrcDYKAirPEpZF
-         P11OAG8S8InL6RiF/KTqaB2zgUODHyA7mmVlJgkuAt5c1WzQIw+oqztq52bnMZ1HqvXd
-         FQrpaxnte45ra02LqNW2mh8j4B5yLrkP8tmlRaKzI8yEm6Y1RqhZjbxOj22ozXykrrbP
-         yph6T1hQCwWTeUIAV5XFC2MbmEuyb2CNg1qEIYhMvUtEo4UY2KJsKYgttsQtDh9btOiZ
-         Dpgas9ysfR40oLBFeHVNThKdjJUuBGkjdvpAvlmhyRqiCrWMgRhC6BzxMjWGDkzb51R6
-         7j8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVXfXKEM15adIJ1oi4cAXNeHEercNWjtEN+JQ/BGC3ry9a3O3UX4lCgBECNsze7HjjvNJUsmS+udHE+glJjPzm/vqNpBKXB
-X-Gm-Message-State: AOJu0Yx+3RdwGa46dOqti2ZftK9q6utUHYh1Jc+U0JfgbN3vaJnDNPMj
-	OPHIAan/6kopxc79UctW3HDuy5rBfgTs3lhZ0/9VQD2rO+ciTRdObfl6lpfJNyg=
-X-Google-Smtp-Source: AGHT+IER8p93l0Uf/lQDwhGDEJk0Kqf+52LrfzFTfrA8CPi3Xno+ht4XI/iYhAltyL13LNun8owbZw==
-X-Received: by 2002:a17:906:d287:b0:a3f:50f0:7a0a with SMTP id ay7-20020a170906d28700b00a3f50f07a0amr2054787ejb.20.1709627716925;
-        Tue, 05 Mar 2024 00:35:16 -0800 (PST)
-Received: from ?IPV6:2001:a61:1366:6801:d8:8490:cf1a:3274? ([2001:a61:1366:6801:d8:8490:cf1a:3274])
-        by smtp.gmail.com with ESMTPSA id s21-20020a170906355500b00a44dfaf84f4sm3524870eja.153.2024.03.05.00.35.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Mar 2024 00:35:16 -0800 (PST)
-Message-ID: <a280d52a-c619-4e67-bda3-99e211b6d036@suse.com>
-Date: Tue, 5 Mar 2024 09:35:15 +0100
+	s=arc-20240116; t=1709627865; c=relaxed/simple;
+	bh=FpAGb89Nhp9Tx4qmJbXKmvYtorSULzhPc0KcYtduHzM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p4qo4LV62McUg4fmO60c2Z41ovpxy393+XZvUufM5OmianchbsWpeOBz0VjjJ7XmvulL0E+xJ2zS0JEVLRTqziPrdrkmCMPJt8Jv4pQdxWd3CznzLomEmEs+UTIIY5iSZtNbQURkpvG5yHXnv3XxrgX56AJNvw596kSqC0YmLhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=AgCIe+Wj; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=slMU9fALR2FKtthS6g2GplC/gm7hOVa33LfK6FZeUCo=; b=AgCIe+WjIze4L7uAzJboSfBRRT
+	usMNSmG6kawNKWQU4sVBqXGsijtuyTw277G0py0wCeYSN2OursIgPUd0coX/zDD+5m6REIKWYlaeT
+	jlEVhn/pdBxpfTP+ByL5JnH27FTP5ySvZilSUV53SGlHppmiKC8aJYUP+CeXxbTw73AowLPY6jfRJ
+	RcWXv63v2MN5dAmo0XOLLQHSHgmzPN9UxUkz9vEkYDxLjD/9w5jmaXX/w/iRgeQjl+3zTCFEaOdBM
+	2oMhYqcryDBIIhuLuRSnlbtuq++Qtv8XC5Tz6UWWMGHXF2RjwGePu9YA7eWzZfWS/6QvUO4cYXR3t
+	DoIa3oeg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59010)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rhQIG-0006qe-1U;
+	Tue, 05 Mar 2024 08:37:00 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rhQIA-0005Gy-FG; Tue, 05 Mar 2024 08:36:54 +0000
+Date: Tue, 5 Mar 2024 08:36:54 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: Re: [PATCH net-next v9 08/13] ptp: Add phc source and helpers to
+ register specific PTP clock or get information
+Message-ID: <ZebZpspMCqjLES/W@shell.armlinux.org.uk>
+References: <20240226-feature_ptp_netnext-v9-0-455611549f21@bootlin.com>
+ <20240226-feature_ptp_netnext-v9-8-455611549f21@bootlin.com>
+ <20240304185734.5f1a476c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] sr9800: Add check for usbnet_get_endpoints
-To: Chen Ni <nichen@iscas.ac.cn>, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, justinstitt@google.com, andrew@lunn.ch,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240305075927.261284-1-nichen@iscas.ac.cn>
-Content-Language: en-US
-From: Oliver Neukum <oneukum@suse.com>
-In-Reply-To: <20240305075927.261284-1-nichen@iscas.ac.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240304185734.5f1a476c@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 05.03.24 08:59, Chen Ni wrote:
-> Add check for usbnet_get_endpoints() and return the error if it fails
-> in order to transfer the error.
+On Mon, Mar 04, 2024 at 06:57:34PM -0800, Jakub Kicinski wrote:
+> On Mon, 26 Feb 2024 14:39:59 +0100 Kory Maincent wrote:
+> > Prepare for future hardware timestamp selection by adding source and
+> > corresponding pointers to ptp_clock structure. Additionally, introduce
+> > helpers for registering specific phydev or netdev PTP clocks, retrieving
+> > PTP clock information such as hwtstamp source or phydev/netdev pointers,
+> > and obtaining the ptp_clock structure from the phc index.
+> 
+> Can we assume there's one PHC per netdev?
+> We both store the netdev/phydev info in the ptp clock
+> and ptp clock in the netdev. Is there a reason for that?
 
-Hi,
+No. In the case of mvpp2 + marvell PHY, the two PTP implementations are
+entirely separate.
 
-thank you for the patch. The asix driver also fails
-to check for that failure. Could you make a similar patch?
-
-	Regards
-		Oliver
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
