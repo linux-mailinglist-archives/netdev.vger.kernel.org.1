@@ -1,109 +1,101 @@
-Return-Path: <netdev+bounces-77380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEED487175D
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 08:52:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3800F87178F
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 09:06:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64840281EEF
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 07:52:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E47DD282260
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 08:06:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C0180052;
-	Tue,  5 Mar 2024 07:51:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TpVVDPZN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 970A27EF0D;
+	Tue,  5 Mar 2024 08:06:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (unknown [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2ED7F476;
-	Tue,  5 Mar 2024 07:51:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8287EEE1;
+	Tue,  5 Mar 2024 08:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709625073; cv=none; b=CgrV8HjoPjND+qOBfQ6GxeSfyXm/YaezOFk/dPXRxbAZS+MNjdbAzFSDboO5QXemGw8mhujol28Njtz7GsLt8C198cyYS5eO3mmtSS3vZ7bSZNxqq5AVcFZzp5Jh6IYNNVfZd2cqo6S7jOmkXE+gNv/nspLBF6od36Y+Q5l+YLM=
+	t=1709625981; cv=none; b=sI2ABXHDV0bYftyMMOIeHhXeJuZnEx+pLZrLaxTHmlCIkyI7VVGTSy7LwOFeV2Eko3CBkHhMRD5GPgLAS2c98kCHN6R7T560CurXBCVvKww1TY6VFK6NQN6ublN326iHJAWedgoAMZcdQWM6nM0pn3jIuJHyB7C8pPcraYVA1VI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709625073; c=relaxed/simple;
-	bh=QDh37/hypKzqzSrGrTAeVEghHDvc7ycpYvDwVjDq178=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Lg/LyDcR0lpVMkSG5kF4nkOLjuC4QhztOBLMIruJuSa0fqPWPU1NZ4eUD09FzUdG0KeEE3yIpBPquxqGnPxjER8Bj03lZPgGa+1pWnAvcYxF+tpqhfLvjFnuw7P5t2zpS5ZhwJMW2L1UOhXaVfPLF5psb3SWDdkjeYY1o97evjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TpVVDPZN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A39D7C32787;
-	Tue,  5 Mar 2024 07:51:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709625072;
-	bh=QDh37/hypKzqzSrGrTAeVEghHDvc7ycpYvDwVjDq178=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=TpVVDPZNLvOWwLBiGWzMobgo8QFbD2HtIFgHNJhEFy8bfZOvEj0Fd3b8/ua919/ad
-	 KJI7Nos9ELYJxxVORm2DQGo8+ewpZe5aNr0rmfcDOkkQD5uOBDlKVJvH/ihDuQUdG8
-	 PMP625X6YUd8jqHBF4T/LGZrmJYNiasDws21uELOQUCzRJbeD3F0U9dOC2P6ostAQ+
-	 DSHWx+BgNTHTVkYE0hPsxM49Enhn55uw519hrGKLR9OEdHP0tEw2ZyS/ehBFW8jQeR
-	 ZPkBhTExPxVDoV0rps1xUkinbRu+pHpkfWE0uiTxmUXugDcwqd/xNGJ1o5xmgTssaM
-	 YdUFS283RbZcQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9361FC54E41;
-	Tue,  5 Mar 2024 07:51:12 +0000 (UTC)
-From: Yang Xiwen via B4 Relay <devnull+forbidden405.outlook.com@kernel.org>
-Date: Tue, 05 Mar 2024 15:51:18 +0800
-Subject: [PATCH net-next v8 9/9] net: hisi_femac: remove unneeded
- MODULE_ALIAS()
+	s=arc-20240116; t=1709625981; c=relaxed/simple;
+	bh=ySWIDViivnyBgPoRDA0NQG2nLO6tW6adzChOSmMQGcc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PxQT6GddQTlm7zZ7SY+J0oV9jFnXg0GemVpHaAbBt4SPHAWUjNk0ZrU6Q04X9fUBPPIHyJyTQWgU+bhWaP4/CsQY3aozVyA+/FALBh+Epe3IYQNKHSF+vNSsqkekMxS47uYDbplep4wly3PQmUL+u5hVgKVMNROX1KC4+D+4s2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost (unknown [124.16.138.129])
+	by APP-03 (Coremail) with SMTP id rQCowAD3_v7x0OZlJi1KBA--.14974S2;
+	Tue, 05 Mar 2024 15:59:45 +0800 (CST)
+From: Chen Ni <nichen@iscas.ac.cn>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	justinstitt@google.com,
+	andrew@lunn.ch,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Chen Ni <nichen@iscas.ac.cn>
+Subject: [PATCH] sr9800: Add check for usbnet_get_endpoints
+Date: Tue,  5 Mar 2024 07:59:27 +0000
+Message-Id: <20240305075927.261284-1-nichen@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240305-net-v8-9-166aaeea2107@outlook.com>
-References: <20240305-net-v8-0-166aaeea2107@outlook.com>
-In-Reply-To: <20240305-net-v8-0-166aaeea2107@outlook.com>
-To: Yisen Zhuang <yisen.zhuang@huawei.com>, 
- Salil Mehta <salil.mehta@huawei.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh+dt@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- devicetree@vger.kernel.org, Yang Xiwen <forbidden405@outlook.com>
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1709625070; l=761;
- i=forbidden405@outlook.com; s=20230724; h=from:subject:message-id;
- bh=dDYro7mR0AilpKVwze2YXBVItXvJMbJiAARD8z9wFaE=;
- b=BeUD2kK+uMFGXzTas40KU2U+vEaLDhYUP7EOP2nwDx+5ZlWez0w7QYlXS6M4ra9Pr0NV/EIQQ
- 52uVMHFo+q+BZHozbNe77BQ+Ns/oKGuptIDqIHnu+rr9Xq2eJCOG2tx
-X-Developer-Key: i=forbidden405@outlook.com; a=ed25519;
- pk=qOD5jhp891/Xzc+H/PZ8LWVSWE3O/XCQnAg+5vdU2IU=
-X-Endpoint-Received:
- by B4 Relay for forbidden405@outlook.com/20230724 with auth_id=67
-X-Original-From: Yang Xiwen <forbidden405@outlook.com>
-Reply-To: <forbidden405@outlook.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowAD3_v7x0OZlJi1KBA--.14974S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Gw4ktF17uF1UGw1kZr1rtFb_yoWxtwb_Cw
+	18uF15Wr1UGryqg39rKr4Svry3ZFs5XryxZFsYga9xZa4qqanxXry0vFn7JFn7ur1FvFnr
+	Cwn7GF95GrW8tjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbVkFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
+	0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc2xSY4AK67AK6r4xMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
+	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
+	b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
+	vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
+	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2Kf
+	nxnUUI43ZEXa7VU10tC7UUUUU==
+X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
 
-From: Yang Xiwen <forbidden405@outlook.com>
+Add check for usbnet_get_endpoints() and return the error if it fails
+in order to transfer the error.
 
-We already have MODULE_DEVICE_TABLE() that creates the correct alias.
-Remove unneeded MODULE_ALIAS().
-
-Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
+Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
 ---
- drivers/net/ethernet/hisilicon/hisi_femac.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/net/usb/sr9800.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hisi_femac.c b/drivers/net/ethernet/hisilicon/hisi_femac.c
-index a4f856710d96..ea8f60f292c1 100644
---- a/drivers/net/ethernet/hisilicon/hisi_femac.c
-+++ b/drivers/net/ethernet/hisilicon/hisi_femac.c
-@@ -1015,4 +1015,3 @@ module_platform_driver(hisi_femac_driver);
- MODULE_DESCRIPTION("Hisilicon Fast Ethernet MAC driver");
- MODULE_AUTHOR("Dongpo Li <lidongpo@hisilicon.com>");
- MODULE_LICENSE("GPL v2");
--MODULE_ALIAS("platform:hisi-femac");
-
+diff --git a/drivers/net/usb/sr9800.c b/drivers/net/usb/sr9800.c
+index 143bd4ab160d..57947a5590cc 100644
+--- a/drivers/net/usb/sr9800.c
++++ b/drivers/net/usb/sr9800.c
+@@ -737,7 +737,9 @@ static int sr9800_bind(struct usbnet *dev, struct usb_interface *intf)
+ 
+ 	data->eeprom_len = SR9800_EEPROM_LEN;
+ 
+-	usbnet_get_endpoints(dev, intf);
++	ret = usbnet_get_endpoints(dev, intf);
++	if (ret)
++		goto out;
+ 
+ 	/* LED Setting Rule :
+ 	 * AABB:CCDD
 -- 
-2.43.0
+2.25.1
 
 
