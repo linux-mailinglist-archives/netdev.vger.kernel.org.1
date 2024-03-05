@@ -1,104 +1,113 @@
-Return-Path: <netdev+bounces-77456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AAAE871D14
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:11:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F378871D1C
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:11:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16C6D2862C8
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:10:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90C261C2148F
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:11:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0418354902;
-	Tue,  5 Mar 2024 11:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 144A15A118;
+	Tue,  5 Mar 2024 11:10:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F78352F68;
-	Tue,  5 Mar 2024 11:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D79B2579
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 11:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709637026; cv=none; b=djY4dQree1sAVpjIpD9D/Ic93zyEVzz6sk34S+WqIkGjN4k3YjEadohA/uhbc0aQjBidsHa2EOnzfD4lxJC5TKAwoCH8O1hNQMyIuPCpHtnsK6z1l5OXDVaqSC/fESeHgstZC3pjLP20LjgFzhC7kCUQtts7RCGrwf5LHoHuVfk=
+	t=1709637031; cv=none; b=jfU1MknaJaku57EUbAvdz01PqBywN8aDt0p9mTPLwdLzEaseBZ5oECsQy5cRH28unHTy0Cdae5IJJb2nYqVMYJMWXIs7Puwo4SG/Zo7WIy9YkRzCvqL5QxGvRdgSsxDF3O/emxIjuMpwiXSvDDHMNNoOtGxsDy5IHHkAnHrOIrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709637026; c=relaxed/simple;
-	bh=u8BWNCh08meOM1OtGC+9EsEpkY4nW8/MgqKpE/dlJEE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I4k4VtVrcKiqP80T0EwBAiEZ4anlHwDOBD8qp/jgB6t7/L6UQ/lUA++xB9RV1L1KZqxZo1yNiDW6hoBhjYwrTRyKXUv8iJdd30HD1aKrk+9R2C1RuoeycrOiE5mQJQBRfREit47Gqh3Ky6NScxE50tnM9J2QWNOIKkiny/YL4qI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d109e82bd0so66704031fa.3;
-        Tue, 05 Mar 2024 03:10:24 -0800 (PST)
+	s=arc-20240116; t=1709637031; c=relaxed/simple;
+	bh=3aWM+91DGc9RE3bgTrHL867wjYtGysNmqDvLBzzTZaY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=B0fpl+3dJqYZIC6/p7CLrE1iNFijHamjRLXhaFH+Tvk5d0NaKcvUF09fwnn/jZtbvlR6RvsAOiLyfhsh5p9tytzy3sXU7ENMHFEFCl5XPROgd6wSyur9xA1mgsw7OXhV6NZbIQIRpqFAcYYhDmdBOOW1Xn6+PXq+sHMIrPGjlAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7c83a903014so292150939f.2
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 03:10:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709637023; x=1710241823;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xtISm0Z5C5GSK3a8VloumZ4aA+1uD6WNJU+it6M3HPw=;
-        b=W1mlUpH3P4rmcNZMHUguYG04uBOUVySTJxe2/Sy6v/VcKflRmEtaL471JQcQacRE6N
-         6+8dVnbHGaQWyfNaW4D6JLk8bJAaiBL1lgXBnNU49AUwaZr2lWa7Pdfxaompo1IT3Ti8
-         rDDEdL4t+G9A5+aSt/eZEF0hFN88AXPb2dd4+iJwjZwft6aaamMvylSbpghjtugsa57w
-         GjnVFXjAEcOst9E1TFBNT8a/6MhKhHOP2BEZL+hCVlosx9rihLWrIWqN5cRvopIHQKCZ
-         FT+4D/4CSIR6wvFFBMyBhHx7FIxgDem/gpLAJsplx1ykDbgdzPccEqbBMSLRsY6wduFl
-         btOw==
-X-Forwarded-Encrypted: i=1; AJvYcCVTQAa2zpB4HVy8BJPN+3F8kGlZt5kFjbRVoKC2Nz8DXNijN4AzIvWgT65NyKfvod9csZVty5d6F2p+eipRhfWgFmxsPOH9wYF0qQ5JxCsFbgm2IdzToo3p/EeqUFZycF9vdLjNPMXZLtpeFujDFhDv8qiissJKA3T0ZZRErTOY
-X-Gm-Message-State: AOJu0YyEsS7qnWmgjvD2vAyrUclnXuuNDGo9ZoornJXNPQwwpLOAv8Hw
-	Sw9s0FiLOspvX2yItydf8EyVVxCZOhnXBW4KiS12yfHTDTR6eOMd
-X-Google-Smtp-Source: AGHT+IH5VCvu7H5OMAWLBGBYxoUjNSI28uMv6IKIpi5MkPKL0LtsEK8KgyNYwVWHWaEKr+h4MR8kJg==
-X-Received: by 2002:a2e:980c:0:b0:2d2:c82c:b822 with SMTP id a12-20020a2e980c000000b002d2c82cb822mr981535ljj.22.1709637023131;
-        Tue, 05 Mar 2024 03:10:23 -0800 (PST)
-Received: from gmail.com (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
-        by smtp.gmail.com with ESMTPSA id i17-20020aa7c9d1000000b00567566227a5sm2016306edt.18.2024.03.05.03.10.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Mar 2024 03:10:22 -0800 (PST)
-Date: Tue, 5 Mar 2024 03:10:20 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Akira Yokosawa <akiyks@gmail.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	Thorsten Blum <thorsten.blum@toblux.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Vegard Nossum <vegard.nossum@oracle.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>
-Subject: Re: [PATCH] docs: Makefile: Add dependency to $(YNL_INDEX) for
- targets other than htmldocs
-Message-ID: <Zeb9nEgZHJvoyw7o@gmail.com>
-References: <e876e3c8-109d-4bc8-9916-05a4bc4ee9ac@gmail.com>
+        d=1e100.net; s=20230601; t=1709637028; x=1710241828;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GlbGQTRl1i1EmCVY75Q3aR01OrbCMT+99f6zJT7YSHM=;
+        b=qQCJ5nOzKRaNp6UiJIM4KE1cA2eSNqeK4OBZKOwVsE8TMmdwV17VQEi1F3r38lT/Fm
+         Xc/Rc5Qiqs7RLeQxIUqMjPyH5o6sucPIjN0m9q1WydvSQ2zZuPGvHlJPOIbSB1hid1/V
+         gaSGiOzX44nQoT4WcjxbrEtLd4S5HJYIwpO2wKEmBeXXmVQVy4UOryJQPu+l3b66k+Ke
+         jFL8cixCesCSk1NJDZuOSCOStQb4YDUNxHQ9SU39d1aRvA2Gnvfjv0cbtZK2XMsbqXYd
+         kFe0rw69+AC4VUfn++GvrDyw78acbk4LFtAtfabinUwknuNfQCbqxqfDPm/MxQNS5mXs
+         LwAg==
+X-Forwarded-Encrypted: i=1; AJvYcCU5OJI3PsONI/L8Sr7PpsRF/qdXhxx9aKflcNZ5e9e4rHDUxIc8LWOovy8RDBxZl+GYQZILqNXoU3Gz1jRq+6BLbZaYLQZ3
+X-Gm-Message-State: AOJu0YweYPTBMojEKHGq2p+6T2ZCKW8fBQ0G6toy8r4zcjgDIDMWDM4f
+	aiFM0wK6tAC91dg1sGF/gFD5S2+i/3E5v6crcA7Ny210o+WWQ8fSxquQG06oMt5h6fM4cCG8/4S
+	KAZof/n/WHPiAmpvfPbqtQkQ7AaE7kZWyMFO7aFSNymLg2wxNqBvvHsk=
+X-Google-Smtp-Source: AGHT+IHp3WS83ust8Ksdj+hUBC78IFEEyfY1HV/DLw6pXRpDzKVan7IPZBIFLya9QJyc2diwAZ/whRJPVClTM6jKlj+30It+RNUg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e876e3c8-109d-4bc8-9916-05a4bc4ee9ac@gmail.com>
+X-Received: by 2002:a92:c241:0:b0:365:1611:5d5b with SMTP id
+ k1-20020a92c241000000b0036516115d5bmr638510ilo.2.1709637028447; Tue, 05 Mar
+ 2024 03:10:28 -0800 (PST)
+Date: Tue, 05 Mar 2024 03:10:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c690fb0612e7e30f@google.com>
+Subject: [syzbot] Monthly wireless report (Mar 2024)
+From: syzbot <syzbot+list1dffa7f965b817f6f840@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Mar 05, 2024 at 01:23:00PM +0900, Akira Yokosawa wrote:
-> Commit f061c9f7d058 ("Documentation: Document each netlink family")
-> added recipes for YAML -> RST conversion.
-> Then commit 7da8bdbf8f5d ("docs: Makefile: Fix make cleandocs by
-> deleting generated .rst files") made sure those converted .rst files
-> are cleaned by "make cleandocs".
-> 
-> However, they took care of htmldocs build only.
-> 
-> If one of other targets such as latexdocs or epubdocs is built
-> without building htmldocs, missing .rst files can cause additional
-> WARNINGs from sphinx-build as follow:
-> 
->     ./Documentation/userspace-api/netlink/specs.rst:18: WARNING: undefined label: 'specs'
->     ./Documentation/userspace-api/netlink/netlink-raw.rst:64: WARNING: unknown document: '../../networking/netlink_spec/rt_link'
->     ./Documentation/userspace-api/netlink/netlink-raw.rst:64: WARNING: unknown document: '../../networking/netlink_spec/tc'
->     ./Documentation/userspace-api/netlink/index.rst:21: WARNING: undefined label: 'specs'
-> 
-> Add dependency to $(YNL_INDEX) for other targets and allow any targets
-> to be built cleanly right after "make cleandocs".
-> 
-> Signed-off-by: Akira Yokosawa <akiyks@gmail.com>
+Hello wireless maintainers/developers,
 
-Reviwed-by: Breno Leitao <leitao@debian.org>
+This is a 31-day syzbot report for the wireless subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wireless
+
+During the period, 2 new issues were detected and 1 were fixed.
+In total, 28 issues are still open and 121 have been fixed so far.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  6920    Yes   WARNING in __ieee80211_beacon_get
+                   https://syzkaller.appspot.com/bug?extid=18c783c5cf6a781e3e2c
+<2>  6045    Yes   WARNING in ieee80211_link_info_change_notify (2)
+                   https://syzkaller.appspot.com/bug?extid=de87c09cc7b964ea2e23
+<3>  4412    Yes   WARNING in __cfg80211_ibss_joined (2)
+                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
+<4>  1222    Yes   WARNING in __rate_control_send_low
+                   https://syzkaller.appspot.com/bug?extid=fdc5123366fb9c3fdc6d
+<5>  844     Yes   WARNING in ar5523_submit_rx_cmd/usb_submit_urb
+                   https://syzkaller.appspot.com/bug?extid=6101b0c732dea13ea55b
+<6>  750     Yes   WARNING in ieee80211_start_next_roc
+                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
+<7>  720     No    INFO: task hung in ath9k_hif_usb_firmware_cb (2)
+                   https://syzkaller.appspot.com/bug?extid=d5635158fb0281b27bff
+<8>  73      Yes   WARNING in ieee80211_free_ack_frame (2)
+                   https://syzkaller.appspot.com/bug?extid=ac648b0525be1feba506
+<9>  46      Yes   WARNING in carl9170_usb_submit_cmd_urb/usb_submit_urb
+                   https://syzkaller.appspot.com/bug?extid=9468df99cb63a4a4c4e1
+<10> 38      Yes   WARNING in ar5523_cmd/usb_submit_urb
+                   https://syzkaller.appspot.com/bug?extid=1bc2c2afd44f820a669f
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
