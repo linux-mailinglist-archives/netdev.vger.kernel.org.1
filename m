@@ -1,120 +1,134 @@
-Return-Path: <netdev+bounces-77466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92D00871E1F
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:41:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8042871E36
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 12:46:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36E30B20CDA
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:41:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E68AF1C23248
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 11:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C186156B8A;
-	Tue,  5 Mar 2024 11:41:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 289605A10B;
+	Tue,  5 Mar 2024 11:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="gT9ny6Ox";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="r7l5RfFf"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from fhigh5-smtp.messagingengine.com (fhigh5-smtp.messagingengine.com [103.168.172.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA6029CE9
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 11:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C8E5786E;
+	Tue,  5 Mar 2024 11:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709638860; cv=none; b=rOWt9GOubpHEkN1Xe+FoqG8yJNRyK+4qoCGtMfPlTlW3jQWH7VvO0HOm6pUQtqxOslY5K2B2dleh9xpR5p/oug4vdMBl1Dhev9wJtYZKOVtat+1SfPxwILZklCGb/qhbqFElJqRLVP3xAIpGi+R8zvfLs19jx6stsgpKbAf3a+I=
+	t=1709639157; cv=none; b=HIaKZaJFGjsTtNA2vVJ5EC6qNAkAy6XpuqgRbgyLN71CWPrByyvAcVn2Imo/zUYGzKmxbRLDyqZ5QgPmqA4bP9llECOVY9a/TS4d5Wu6u6/LBbMisPyv2CicvAyfs5fNAj4a4FbEQe0+aqXoMCS4xGbP3pScCqZB6pQH3FQRgxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709638860; c=relaxed/simple;
-	bh=z8LCb7mV8ZuqkBDjRoGIuhNi62of8CrUvDdCiwsDE24=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fyrIZi3NtRRWO9Hos/qZ6aYUA1SQWzmpiCk4vXivWgcGUYqxa3JTiG8JyPBK2e5huOlJ93OlDdf1nvnenSGpKYe+v7io3/NLmcGsSaM9jm/4C3pxRt0+ePAjYYeze5pe+joJBV3l8WiGfst8faKEqIeHjQYq8Q5CL8qZ1LXy06Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rhTA2-000719-UP; Tue, 05 Mar 2024 12:40:42 +0100
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rhTA0-004Xap-SV; Tue, 05 Mar 2024 12:40:40 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rhTA0-003N8P-2W;
-	Tue, 05 Mar 2024 12:40:40 +0100
-Date: Tue, 5 Mar 2024 12:40:40 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: tobias.jakobi.compleo@gmail.com
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: dsa: microchip: fix register write order in
- ksz8_ind_write8()
-Message-ID: <ZecEuIgttoeXkr7T@pengutronix.de>
-References: <20240304154135.161332-1-tobias.jakobi.compleo@gmail.com>
+	s=arc-20240116; t=1709639157; c=relaxed/simple;
+	bh=cvxuucTIk3cPB6Sfmo73Zpg57jG48hokZ+K6J7a310Y=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=bA43VIZWInlOjMBu9HiWbre9Hiz6JtjctMm6G7MEetmAbp7XpZ/UU4pJk9+LprBzXNclJE8zlo2UOsXxOjnHcZAtDQrDA6qRMNPieiryg0S/7sOjm72Wqf7meKMYpaI6OXBOsbILLuFpj+YS71NTje9DjK3oaBlSpwKv2eXIK4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=gT9ny6Ox; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=r7l5RfFf; arc=none smtp.client-ip=103.168.172.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id C5C811140119;
+	Tue,  5 Mar 2024 06:45:53 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Tue, 05 Mar 2024 06:45:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1709639153; x=1709725553; bh=L0V6fINBaj
+	l5FUIjF3rvm+rXcNcFq8LiVT+eqTz8+4Q=; b=gT9ny6OxXnueQI9xdCBEag7HKO
+	FdCh+erTgJFfAkSJGEeHo3o/CQSkSpNTCQIWB3qHthoZAuHpFNa3Yt2mufh5t8XM
+	RkZPoq58i8sQm7QM6k/0UeVnLtSyrqcTvMNlirly12svIohTJGyBpswiVN+4f2nu
+	a4Gdmra+RLecfGkvMKV1PStNwiBGeT1YCi3G7T9x+UOhkojR3Vckx7QDUlsLBJrh
+	GnA4Jml2c6SDIleCfF0MobGJNkiwYtCpUmXixR4ndlOM77jGOYejxIbDMc9wczNn
+	iZ7DAHPx1RtIdjt2UZe+LmMGAeDQIrSxYAiCxR8NGAxvx6HNwGSgGbrfamsA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1709639153; x=1709725553; bh=L0V6fINBajl5FUIjF3rvm+rXcNcF
+	q8LiVT+eqTz8+4Q=; b=r7l5RfFfQCs0KXaQISa21e3Vj0J8W2dG2BZKhtyZbzoa
+	xnJHRqLWqDsctD2yeVkohp91MvN0iM/utH2nrY3ZXVonoCPFgkGl4+xB8OrZ+b9C
+	XEUEZLCDl8qUJgEzjwQ9t/ozI5aWIhxa1B1Z/Q9Nji3FmFm3ig0Sr9uwe/RVW8Jv
+	iI2wHoYdoea+0rd3PPTAyAp9r8DEXTgv5b8fHO8rKJT0zYadppNqGkTzDOJXWjVE
+	X673GgaMTas3U54//gV44g6bOwkC0Ldk4+1cJ+vMpiLh2x1Ox0qVnLMvqDHdeNjm
+	wpzwqM+OQeVf29lpC0ShM8xvAcsSMVMTFeeWazTa9A==
+X-ME-Sender: <xms:8QXnZY1TKoSsgzkFqjvFm4sCKvIM8vRTCf2iLFpBW_rz77-zVucHtw>
+    <xme:8QXnZTFdCOHvudbmAbFG1q2XtwcQz8m7HePqTFkmydfa6aMZvb8xbwiMcPkBa9OSh
+    QI3wVL_IgjyfAy3WtQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrheelgddvlecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
+    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
+    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
+    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
+    hnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:8QXnZQ4M1rLZ00uUutjr9FMXuklVvsc3rxj9vS5XqKuTDeV_HGHlpw>
+    <xmx:8QXnZR0iw_m4FxVYsfGb7IBGYE9BtOm6uxR54nz4R68d3WFtuHybbQ>
+    <xmx:8QXnZbFYu30BCPH0Qo2KVS5wDMPAdKmgxzoHpEp3zyOQucxb2wTb6A>
+    <xmx:8QXnZebooVWsndEZ83Gw-Ut3TBDL0rhPgLrtWUsZkkACk0Pz3WkTrQ>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 7A6EEB6008D; Tue,  5 Mar 2024 06:45:53 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-208-g3f1d79aedb-fm-20240301.002-g3f1d79ae
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240304154135.161332-1-tobias.jakobi.compleo@gmail.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Message-Id: <b28dfaba-a5d3-4c33-a07c-9d991c0235a2@app.fastmail.com>
+In-Reply-To: <20231208005250.2910004-5-almasrymina@google.com>
+References: <20231208005250.2910004-1-almasrymina@google.com>
+ <20231208005250.2910004-5-almasrymina@google.com>
+Date: Tue, 05 Mar 2024 12:45:33 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Mina Almasry" <almasrymina@google.com>,
+ "Shailend Chand" <shailend@google.com>, Netdev <netdev@vger.kernel.org>,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ Linux-Arch <linux-arch@vger.kernel.org>, linux-kselftest@vger.kernel.org,
+ bpf@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Jonathan Corbet" <corbet@lwn.net>,
+ "Jeroen de Borst" <jeroendb@google.com>,
+ "Praveen Kaligineedi" <pkaligineedi@google.com>,
+ "Jesper Dangaard Brouer" <hawk@kernel.org>,
+ "Ilias Apalodimas" <ilias.apalodimas@linaro.org>,
+ "David Ahern" <dsahern@kernel.org>,
+ "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>,
+ shuah <shuah@kernel.org>, "Sumit Semwal" <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ "Yunsheng Lin" <linyunsheng@huawei.com>,
+ "Harshitha Ramamurthy" <hramamurthy@google.com>,
+ "Shakeel Butt" <shakeelb@google.com>
+Subject: Re: [net-next v1 04/16] gve: implement queue api
+Content-Type: text/plain
 
-On Mon, Mar 04, 2024 at 04:41:35PM +0100, tobias.jakobi.compleo@gmail.com wrote:
-> From: "Tobias Jakobi (Compleo)" <tobias.jakobi.compleo@gmail.com>
-> 
-> This bug was noticed while re-implementing parts of the kernel
-> driver in userspace using spidev. The goal was to enable some
-> of the errata workarounds that Microchip describes in their
-> errata sheet [1].
-> 
-> Both the errata sheet and the regular datasheet of e.g. the KSZ8795
-> imply that you need to do this for indirect register accesses:
-> - write a 16-bit value to a control register pair (this value
->   consists of the indirect register table, and the offset inside
->   the table)
-> - either read or write an 8-bit value from the data storage
->   register (indicated by REG_IND_BYTE in the kernel)
-> 
-> The current implementation has the order swapped. It can be
-> proven, by reading back some indirect register with known content
-> (the EEE register modified in ksz8_handle_global_errata() is one of
-> these), that this implementation does not work.
-> 
-> Private discussion with Oleksij Rempel of Pengutronix has revealed
-> that the workaround was apparantly never tested on actual hardware.
-> 
-> [1] https://ww1.microchip.com/downloads/aemDocuments/documents/OTH/ProductDocuments/Errata/KSZ87xx-Errata-DS80000687C.pdf
-> 
-> Signed-off-by: Tobias Jakobi (Compleo) <tobias.jakobi.compleo@gmail.com>
+On Fri, Dec 8, 2023, at 01:52, Mina Almasry wrote:
+> +static void *gve_rx_queue_mem_alloc(struct net_device *dev, int idx)
+> +{
+> +	struct gve_per_rx_queue_mem_dqo *gve_q_mem;
+...
+> +
+> +	gve_q_mem = kvcalloc(1, sizeof(*gve_q_mem), GFP_KERNEL);
+> +	if (!gve_q_mem)
+> +		goto err;
 
-The subject should have [PATCH net] for stable and Fixes tag:
-Fixes: 7b6e6235b664 ("net: dsa: microchip: ksz8795: handle eee specif erratum")
+[minor comment]
 
-Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+The structure does not seem overly large, even if you have
+an array here, I don't see why you would need the vmalloc
+type allocation for struct gve_per_rx_queue_mem_dqo.
 
-Thank you!
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+   Arnd
 
