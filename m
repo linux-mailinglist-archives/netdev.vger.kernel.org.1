@@ -1,134 +1,108 @@
-Return-Path: <netdev+bounces-77309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88500871372
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 03:15:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BEF66871393
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 03:23:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9DE91C224B7
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 02:15:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0E861C20A51
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 02:23:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29168182BD;
-	Tue,  5 Mar 2024 02:14:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7248F182BD;
+	Tue,  5 Mar 2024 02:22:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hGjt6YWO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KCHQ9M8s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641071805E
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 02:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEA2182A0;
+	Tue,  5 Mar 2024 02:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709604856; cv=none; b=eG1h2DI+9mPPfRVhZVxh2pQmyGYboMOf0bcx5l6yhorRHsjWKCT4iVShty88xucJ6KMt6aNxzlUb01x58lTRBhiH4boqwaXV7LMZxAQAa3UTBo0gsVxhl5MIZXeceXK1QWDajOIoYhCv87M5augju/GEPNRoxDDr6u7yjRaiFwM=
+	t=1709605377; cv=none; b=G5fCvOr3nV3nGWlThpQdbQAsPf8CaGH8AF3BV9ZCG/eEYxh3JbuSXOkvbQLY6K69XwoQITVBV5XDsb0R/xNcWR/CeviRFM4VlRIqc7IE3pymLqmRm12LzOyuUHfhMqh1NpoHD8003o4/2OMxEDVBGsobSlkn4PKju+NBXANnY5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709604856; c=relaxed/simple;
-	bh=IGZRWDazN2zylhLDLaR1zEMQEzaAe/lNYzTbi9dGg5A=;
+	s=arc-20240116; t=1709605377; c=relaxed/simple;
+	bh=lyDBQ+22yrp72E595L3mg2lYk2PEqYaqKKUdLQjHJus=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=svvKFsbyMAaY1gCmCL+LeX6FHy1Riv74kAaVk8G20C8hzzDe9+SBExoupWlStk/Wi4GDxGF9Ma03DY1ksqoQT8JCOFqOOkAN3XWlNLaR+I8CzJfHl/WhpRSqTty5tj1m83j7EC4Fb0E1rM4dwWd3GnJ4GnwSDhvEsAHujxi/xjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hGjt6YWO; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-563d32ee33aso6323966a12.2
-        for <netdev@vger.kernel.org>; Mon, 04 Mar 2024 18:14:14 -0800 (PST)
+	 To:Cc:Content-Type; b=cPwLySoI6ZOfQQkIVYwJbDPDxm66xZpZEW4pHvf9w1hksnln5RaNO2R04kAGF+jFavg9SD6QFM+e2ojiSl4mZdiXbt3+3o/vDywObLjfcsmXIglmELbEvAF/QvSC64PEw6KG8VYb9AQ0hyRRs5oIENgwnVw2OUKSt0INXsyOTgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KCHQ9M8s; arc=none smtp.client-ip=209.85.217.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-4726656a997so749586137.3;
+        Mon, 04 Mar 2024 18:22:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709604853; x=1710209653; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1709605375; x=1710210175; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j5OaE1yAPnXFqd9/rVrso6AMB2uzPejdz81y+lu6U9Y=;
-        b=hGjt6YWOrInDuoC8Wo1vU3Ig7vmwbNVSwlMBuSdDxIDcvFAfBbaahato0TJn/vQ/x+
-         PmCNVNA27BynSyBYZCJ73R+TPjabjwVKE7BKAjRLKhumQYu414viItljoR/FBq/+fZ3I
-         xo0gpoy6MzTL8rMjvRbjLfRgdpjpC79VfqJ7ULyyMhvoBykBxCoirZWo6+Tm/UkaEex7
-         RRu5f1mLcOxTwwZjYRmONvoOBgCEx0udFDgyHbJ3JhMEWrlof8E0NTmy1TN90cP9oPWA
-         BzQ/V2awqPiqVkj50XKE9q1SiW97bGKMTqs/RGo+Jm8MkY/wNGN1WT6xEXN6Fx9l5fbx
-         N38g==
+        bh=lyDBQ+22yrp72E595L3mg2lYk2PEqYaqKKUdLQjHJus=;
+        b=KCHQ9M8srG17nzn8br+B6ip1EQ98WVVa8SYBTNE2DlbjB3uRBu2jHZGVGBJBh+gLPz
+         DVUk9AN+wAS1B4ozU8TcKiDY5831konaikp0tVOE19XA1DY+dG9elFL2mvLKmmo9yVXc
+         e2KbzyK2q+fmjDSptvyGHAxSIRB1DsAWzcTWJA18ZquQGAaCfY58WsFFBazbPVOPnRAN
+         9HOzOVj6krZk0cJMohKmE2Vn0wgnEanQB0ZByzfuFKvOLzySsMNfa17Ab6/YupmAVzA2
+         7RYLa14ZDjVx62sfOUcQKJjPVfiXQu+xfYCuNaoRwEMy+zRtGhEbYbB4SEH/ixX3mYuZ
+         qCnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709604853; x=1710209653;
+        d=1e100.net; s=20230601; t=1709605375; x=1710210175;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=j5OaE1yAPnXFqd9/rVrso6AMB2uzPejdz81y+lu6U9Y=;
-        b=AklpnQ/i0mqnpxSn2EAF8BTeqtAV1pWce/EEyjG3CaXnox2LX3oedbsdJu2DSUkmxU
-         hEiG8coGjjKzVSvNeU/b2fmjTNgY/insux0p4ahTGkuSqM3r77f31SSdR7g2hzM4qERi
-         VjXXzqPM/nWyXZeTOHEZQbpbUp++dYpCYTK20j7UfsKWmz6APC25K+N58b9SxaHQuyDw
-         7yvSpFS25ITrinUQN47G77FmAPdE95XJ9X0ranioIdsSli+PSHc0GaBeSnoLMcvG5t5P
-         9lcc14A7XwczGXRZ6JQstbd0rZ4OERwcooXbdfee3uLBprkShroCrx/fiDdL/sbo3sNZ
-         iJag==
-X-Forwarded-Encrypted: i=1; AJvYcCVWxTEnfDMnBLMY5MWVOqQEo3OMel+xXbswcv0BiYi5YGXjEH2hGC1bzhhrzPiaZdk2LJ6LayzJY1yNe1hOj/nKQZb0gTqm
-X-Gm-Message-State: AOJu0YwzqNf4sL44HLoTGbYvr59qrWHGEIMICs0aD3e1AKTtsG+XmjFf
-	dEQo3fycLGzluj6oU7IUNnvAy8hvQ+g808Pi9+Acn9sg9dNRAH2sKiNiD559/RGurG2DX5vxvP/
-	ZiSDEFNvVtwBFMgETW2fXi7KhwRjOgMTwftZ6
-X-Google-Smtp-Source: AGHT+IGg9U7IbxKRNfI2fcyJJ9fkxcYFv9013ElhjEX5PDmjOmQ1/lJ8GjkyLCdPWUWtvlGnjOJvqqtv0CIc4nhukgM=
-X-Received: by 2002:a17:906:711a:b0:a44:8fa9:d36f with SMTP id
- x26-20020a170906711a00b00a448fa9d36fmr7346866ejj.41.1709604852487; Mon, 04
- Mar 2024 18:14:12 -0800 (PST)
+        bh=lyDBQ+22yrp72E595L3mg2lYk2PEqYaqKKUdLQjHJus=;
+        b=Zh1zyIKxc7YZ5o+dH0n9Th/RKurvecfhNl6So5IehC5Vok2bwAkuxHSOg799Fc+w9U
+         ny6jn/NYbRTJxsH+0rY6L5+1llfYCJu82kDwS7gME8WMMXyIn7YFJiTc9bhEV+LUwljB
+         iSRfzCqk2SgiinSudCqfygdGVlkt49D97Ft2dszCIE5ueOgw8IcBcw8wq9T46gSUOli4
+         aITPsmDizKfNb9nfrhlN3DF0DeT6Q4+IeZ6+LgpBs2FbxzXt8GOZ+E2H+eoO93Ia8uuM
+         QfJKfiUy9581YmUVvyBSX4SlGJH+iDr7fNvC/H4oNzKgQY3yU0+bkzUODrAwdGGu7H65
+         QXKg==
+X-Forwarded-Encrypted: i=1; AJvYcCUjxKE4kJWurRlQUvZIb/G86OhKJDOR0MnWonRbxxo6QvZ1nAC98SC9Sf8YSXa9dAa25vPVUPQVhzJk/t9raS/WgAuaDNOpfzTKuH2W6xMbkSj9a9tMV5VcHxbqqGHuPLs/c8k+
+X-Gm-Message-State: AOJu0Yypm/nNdYP8BSTH9CeN9CZsUy9LBJ+8RZSUnztuP+I/TvwqIp7+
+	zjqADLUFsh+93HA1lADnweYW3GgZo94+4/nSVGqq3PD5gwT8MyFJB10+Yt8P5IofAAdBobeLmIx
+	semlyjSc370F0WtNSnoqjGse2VgM=
+X-Google-Smtp-Source: AGHT+IEJjbVykwk6l7yGQdOtaLiYdeBNq/pEj+9wBlBNqTGI1CEUlzvLT+rU73oRpT1flJVazofNP8/bDQLys9OKogI=
+X-Received: by 2002:a67:efcf:0:b0:470:4454:c40e with SMTP id
+ s15-20020a67efcf000000b004704454c40emr573764vsp.14.1709605374582; Mon, 04 Mar
+ 2024 18:22:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240229212236.3152897-1-ziweixiao@google.com> <170954702808.29163.14572409164565217897.git-patchwork-notify@kernel.org>
-In-Reply-To: <170954702808.29163.14572409164565217897.git-patchwork-notify@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 4 Mar 2024 18:13:58 -0800
-Message-ID: <CAHS8izNC9-ZD-tn+FWK_uEc=50pKw3WEQosBBDg+LWxBgfy4Kw@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/3] gve: Add header split support
-To: patchwork-bot+netdevbpf@kernel.org
-Cc: Ziwei Xiao <ziweixiao@google.com>, netdev@vger.kernel.org, jeroendb@google.com, 
-	pkaligineedi@google.com, shailend@google.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, willemb@google.com, 
-	rushilg@google.com, jfraker@google.com, jrkim@google.com, 
-	hramamurthy@google.com, horms@kernel.org, linux-kernel@vger.kernel.org
+References: <20240227192704.376176-1-e.velu@criteo.com> <827d22da-fb32-1012-422d-d283b28ce5ec@intel.com>
+In-Reply-To: <827d22da-fb32-1012-422d-d283b28ce5ec@intel.com>
+From: Erwan Velu <erwanaliasr1@gmail.com>
+Date: Tue, 5 Mar 2024 03:22:43 +0100
+Message-ID: <CAL2Jzuzf54qcsCM4CAUOLaogWrBL=Mm4ma_4pRbaf8A=dZeOFQ@mail.gmail.com>
+Subject: Re: [PATCH] i40e: Prevent setting MTU if greater than MFS
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Erwan Velu <e.velu@criteo.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 4, 2024 at 2:10=E2=80=AFAM <patchwork-bot+netdevbpf@kernel.org>=
- wrote:
+Le lun. 4 mars 2024 =C3=A0 23:10, Tony Nguyen <anthony.l.nguyen@intel.com> =
+a =C3=A9crit :
+> > Signed-off-by: Erwan Velu <e.velu@criteo.com>
 >
-> Hello:
+> The Author and Sign-off needs to be fixed; they don't match.
 >
-> This series was applied to netdev/net-next.git (main)
-> by David S. Miller <davem@davemloft.net>:
->
-> On Thu, 29 Feb 2024 13:22:33 -0800 you wrote:
-> > Currently, the ethtool's ringparam has added a new field tcp-data-split
-> > for enabling and disabling header split. These three patches will
-> > utilize that ethtool flag to support header split in GVE driver.
-> >
-> > Jeroen de Borst (3):
-> >   gve: Add header split device option
-> >   gve: Add header split data path
-> >   gve: Add header split ethtool stats
-> >
-> > [...]
->
-> Here is the summary with links:
->   - [net-next,1/3] gve: Add header split device option
->     https://git.kernel.org/netdev/net-next/c/0b43cf527d1d
->   - [net-next,2/3] gve: Add header split data path
->     https://git.kernel.org/netdev/net-next/c/5e37d8254e7f
->   - [net-next,3/3] gve: Add header split ethtool stats
->     https://git.kernel.org/netdev/net-next/c/056a70924a02
->
-> You are awesome, thank you!
-> --
-> Deet-doot-dot, I am a bot.
-> https://korg.docs.kernel.org/patchwork/pwbot.html
->
+> WARNING: From:/Signed-off-by: email address mismatch: 'From: Erwan Velu
+> <erwanaliasr1@gmail.com>' !=3D 'Signed-off-by: Erwan Velu <e.velu@criteo.=
+com>'
 
-The patches have already been merged so it probably doesn't matter,
-but FWIW I was able to rebase my changes on top of these and test with
-devmem TCP and everything looks fine. So, for what it's worth:
+Yeah, I have a complicated email setup between my personal and
+professional emails.
+I'll see how I can fix that.
 
-Tested-by: Mina Almasry <almasrymina@google.com>
+I was also wondering if I shouldn't subtract I40E_PACKET_HDR_PAD from
+the mfs to be more accurate, can you confirm this ?
 
-Thanks Ziwei!
-
---=20
-Thanks,
-Mina
+If one can have a look at what is the exact procedure to fix the MFS
+size when too small, that would be lovely/ideal in addition to my
+patch.
 
