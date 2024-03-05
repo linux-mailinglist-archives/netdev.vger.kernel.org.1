@@ -1,117 +1,118 @@
-Return-Path: <netdev+bounces-77510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01D3D87201C
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:28:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 53EAB87202F
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:31:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25E351C22F70
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:28:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84DAE1C21C21
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBF8E85C55;
-	Tue,  5 Mar 2024 13:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A0CE85C65;
+	Tue,  5 Mar 2024 13:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fcCvJcgA"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LvHJImQB"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF7D43AB0;
-	Tue,  5 Mar 2024 13:28:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAEE285C51;
+	Tue,  5 Mar 2024 13:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709645321; cv=none; b=iQG/ovB2lVZk0N5rIwWF0IudaiuqE8rt/oxdm8XcwTyT5kVcK8Ly12E6rgC8smZYs1wlCxVqUNoaudxjJHrne/RhCmf+6QnKpognuTc1DgUVXQ0AY7QzPCVflrjJmIc32Ww0dVDMnMgkZDu48pGueTGTtvG5HHGAjBwmX8HoLvU=
+	t=1709645510; cv=none; b=XaXSYMNrdw1pyg9yGugEIBH3AzUFiXuMvkiFcEtOHgjJEIGiu71ofJ/mvExQHHYwATbImUnxFega3Me3czETqS/ruiRQQ1mo07WvYYLp/DtjpyMtl1qs8yCOkkXSpDKEYbfqy5Kbf7iy3lyUqkQ6bfCA2DZISamzC2CdqGuuQYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709645321; c=relaxed/simple;
-	bh=9nHBU801rt03QXGVs4K6yWHFgU//kmL7q1mSOjCjtSc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kWqqNaeOQly6QjYj9M5M/lkkTZN2WDpbVpCeMy5to7yjHww8nVlsYl5s6eznTonBNl60vr0wTtYaDwCyetmhgcLPy6QeUkyb3/FphHvs2TyYrE9C6pEqC5VoAb3c1itQhYy/dKq8ykbg9zlqaoCzRZX70hcvUQkZmtPzMeZqRMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fcCvJcgA; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=2o5mFGZCvQCk7WKP/xRNSu+/KpBgcWlkfRQoWTuInbY=; b=fcCvJcgAkcMcQFOc4nYDR/Yzhv
-	Y8IiVBCtwKjUMpOh02072azemJ8Sb6tC/SVw+f74ahwPgdczkKF8WJ9UMCYkcOVxYnaoVgZ6Z3Jwt
-	iiS6/PoKPPutlUHIT5TpgkIpdugZ8H0BsYpd3BejSVa4AjBYvnRK+kDjUeDZosHHJi3Q=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rhUqi-009Qae-FR; Tue, 05 Mar 2024 14:28:52 +0100
-Date: Tue, 5 Mar 2024 14:28:52 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Julien Panis <jpanis@baylibre.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1709645510; c=relaxed/simple;
+	bh=znYBTbuKJHdE510kzvyLEyOv9seUryxMrJpA8/nW37w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=HPbC6ZFTMKgfAo9ss0Zhrbwpmf1Q6K5sqlgoSMYf6faBQhe4bMCbY9nVDhoJ61lRmepcpmdiSq8scHl/SA752FyQuSif3yZNvFs3UCFos4V+Ibm6aIy5M5ANOOiYa0dv1Jztft4zkXL7Wb064DO4Zts2gm+P5xyYgutGpkQSCbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LvHJImQB; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 94378C0002;
+	Tue,  5 Mar 2024 13:31:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1709645505;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=q7U+cWhleujOwN6xyJzC8kzJR7mFMa0ZCOTO3ajZttI=;
+	b=LvHJImQBj1dOnQHrVx4gsvwytfe1chPKE00JMa1qWKwH9KU7x+ThgBOKsOVm1q2wPGruEB
+	FXDNMLs1nLO8ijiGeXS8cA60aS9lL8VZ+LSz5nhqI2UWLHQivC5F285AakL/bFBN6dyGfs
+	IA2KRcmIcsAiX4djfsas/x0QR6BKSKhUqyhNcyQGc66zNZMjXNE1N3i92qj5k6dkF99M1M
+	3n0j8KPIx7h1j8zjzZMmUEYauBaclStTDmgQFar+drmWOfkFkQ2qM5W6RXxLOeGlajNLgM
+	S2E1hMmzSktB2keSzRTX4/mcMJVixDA/lJIlcWG+qhvWcMr1FoQ3gkLBnudgXQ==
+From: =?UTF-8?q?J=C3=A9r=C3=A9mie=20Dautheribes?= <jeremie.dautheribes@bootlin.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org
-Subject: Re: [PATCH v2 2/2] net: ethernet: ti: am65-cpsw: Add minimal XDP
- support
-Message-ID: <be16d069-062e-489d-b8e9-19ef3ef90029@lunn.ch>
-References: <20240223-am65-cpsw-xdp-basic-v2-0-01c6caacabb6@baylibre.com>
- <20240223-am65-cpsw-xdp-basic-v2-2-01c6caacabb6@baylibre.com>
- <356f4dd4-eb0e-49fa-a9eb-4dffbe5c7e7c@lunn.ch>
- <3a5f3950-e47f-409a-b881-0c8545778b91@baylibre.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Davis <afd@ti.com>,
+	Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Yen-Mei Goh <yen-mei.goh@keysight.com>,
+	=?UTF-8?q?Miqu=C3=A8l=20Raynal?= <miquel.raynal@bootlin.com>,
+	=?UTF-8?q?J=C3=A9r=C3=A9mie=20Dautheribes?= <jeremie.dautheribes@bootlin.com>
+Subject: [PATCH 1/1] dt-bindings: net: dp83822: change ti,rmii-mode description
+Date: Tue,  5 Mar 2024 14:31:37 +0100
+Message-Id: <20240305133137.125020-1-jeremie.dautheribes@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3a5f3950-e47f-409a-b881-0c8545778b91@baylibre.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: jeremie.dautheribes@bootlin.com
 
-On Tue, Mar 05, 2024 at 11:46:00AM +0100, Julien Panis wrote:
-> On 3/1/24 17:38, Andrew Lunn wrote:
-> > On Fri, Mar 01, 2024 at 04:02:53PM +0100, Julien Panis wrote:
-> > > This patch adds XDP (eXpress Data Path) support to TI AM65 CPSW
-> > > Ethernet driver. The following features are implemented:
-> > > - NETDEV_XDP_ACT_BASIC (XDP_PASS, XDP_TX, XDP_DROP, XDP_ABORTED)
-> > > - NETDEV_XDP_ACT_REDIRECT (XDP_REDIRECT)
-> > > - NETDEV_XDP_ACT_NDO_XMIT (ndo_xdp_xmit callback)
-> > > 
-> > > The page pool memory model is used to get better performance.
-> > Do you have any benchmark numbers? It should help with none XDP
-> > traffic as well. So maybe iperf numbers before and after?
-> > 
-> > 	Andrew
-> 
-> Argh...Houston, we have a problem. I checked my v3, which is ready for
-> submission, with iperf3:
-> 1) Before = without page pool -> 500 MBits/sec
-> 2) After = with page pool -> 442 MBits/sec
-> -> ~ 10% worse with page pool here.
-> 
-> Unless the difference is not due to page pool. Maybe there's something else
-> which is not good in my patch. I'm going to send the v3 which uses page pool,
-> hopefully someone will find out something suspicious. Meanwhile, I'll carry on
-> investigating: I'll check the results with my patch, by removing only the using of
-> page pool.
+Drop reference to the 25MHz clock as it has nothing to do with connecting
+the PHY and the MAC.
+Add info about the reference clock direction between the PHY and the MAC
+as it depends on the selected rmii mode.
 
-You can also go the other way. First add page pool support. For the
-FEC, that improved its performance. Then add XDP, which i think
-decreased the performance a little. It is extra processing in the hot
-path, so a little loss is not unsurprising.
+Suggested-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Jérémie Dautheribes <jeremie.dautheribes@bootlin.com>
+---
+This patch follows on from my previous patch series [1] which has already been 
+merged into the net-next tree and which added the "ti,rmii-mode" property.
+As suggested by Andrew Lunn, this patch updates the description of this 
+property to make it more consistent with the master/slave relationship it 
+conveys.
 
-What tends to be expensive with ARM is cache invalidation and
-flush. So make sure you have the lengths correct. You don't want to
-operate on more memory than necessary. No point flushing the full MTU
-for a 64 byte TCP ACK, etc.
+[1] https://lore.kernel.org/all/20240222103117.526955-1-jeremie.dautheribes@bootlin.com/
 
-      Andrew
+ Documentation/devicetree/bindings/net/ti,dp83822.yaml | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/net/ti,dp83822.yaml b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+index 8f23254c0458..784866ea392b 100644
+--- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
++++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+@@ -84,10 +84,10 @@ properties:
+     description: |
+        If present, select the RMII operation mode. Two modes are
+        available:
+-         - RMII master, where the PHY operates from a 25MHz clock reference,
+-         provided by a crystal or a CMOS-level oscillator
+-         - RMII slave, where the PHY operates from a 50MHz clock reference,
+-         provided by a CMOS-level oscillator
++         - RMII master, where the PHY outputs a 50MHz reference clock which can
++         be connected to the MAC.
++         - RMII slave, where the PHY expects a 50MHz reference clock input
++         shared with the MAC.
+        The RMII operation mode can also be configured by its straps.
+        If the strap pin is not set correctly or not set at all, then this can be
+        used to configure it.
+-- 
+2.34.1
+
 
