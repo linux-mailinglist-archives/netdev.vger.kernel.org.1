@@ -1,98 +1,210 @@
-Return-Path: <netdev+bounces-77601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB59C87247A
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 17:39:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73661872485
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 17:40:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86B2B2877F1
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:39:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1F351F267D6
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 16:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8749E8F55;
-	Tue,  5 Mar 2024 16:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C153B9470;
+	Tue,  5 Mar 2024 16:40:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e+50sRCA"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="igNnHsgq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-bc09.mail.infomaniak.ch (smtp-bc09.mail.infomaniak.ch [45.157.188.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D6F8BF7;
-	Tue,  5 Mar 2024 16:39:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F34944F
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 16:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709656781; cv=none; b=lAqHptvHMLO3/QrmVpcBh8JYnQU/sP0M5v/Zkb3c/pBI+XOtouInU3JFB4gRlbmUkMG2/jgTTZvZtykknafcYV3RfXRDut5eustL8WcP++dPWEgDHJPUa274IHUxysm9rEvfynPWnr10kGo5A67OZSoxh8T2V4CTeNvEarZ0lKQ=
+	t=1709656806; cv=none; b=MMyk+M8meDKo/OpWlmUTU7gd4a5wsNCOg3JL6eqkHzI9624MpV2LKZ66X/a5F00wQnbX1gijQs1rtkiUJd2LU1RQik8Lg5ZFMafbbRktiLYa7k/Q/0eG6jE2UA9Zi+FiiiEs1+mw+94FSjNMIPZBZnzAUoh2r0fmEvEEs3itP4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709656781; c=relaxed/simple;
-	bh=7vgMXiC1hDBo2W+mPCaSNE01HYivT5LVBqveRukvTZk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PvCvnLJx2jGu8PSXs7qdYl5zNgGmY5GF/VGMiDQjR97jOrTRuDmiyTma3FrTA8KtreZ2b48AU0HthXa0W9XB/ou37e0j6nely8B96xGpYz9RKY0oEfTW4+d3DQWjPAqBOVnnDeb5dGvi4Q7kc2XKTaI/tYO4voRuryy9W0eLtlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e+50sRCA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81467C433F1;
-	Tue,  5 Mar 2024 16:39:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709656780;
-	bh=7vgMXiC1hDBo2W+mPCaSNE01HYivT5LVBqveRukvTZk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=e+50sRCAFYr9qssxAd2CCEJWSD8uQoONX21r70DvAh5vq/CV13lCDJ9kLNl/G08qi
-	 FbNe0AyeYDE4BTW6WG1J3ljJh7aOujNuPjGA6nbQRi9vyBA30MnY3m2PLTUTYms4LY
-	 gX0EUGQUBevvHchQpSM4v6ruUlfxhd0FXES/YJhbxhzLpmdzel/OCAM3LlzoNE0NaK
-	 mw9hp0COR3vTDCfGssJG8fv/Hi2mZNudmwrMzD9eo6FleRcHPbGzlR4ui7BDKYG/vT
-	 erQ4EKSrMJNEjVekC356EL2lA1/LJ0ve26ybTMK4pCfZX3V3NJhha2UD7AuNOKpXyn
-	 LXSWK5g0EXaOw==
-Date: Tue, 5 Mar 2024 08:39:38 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: Re: [PATCH net-next v9 08/13] ptp: Add phc source and helpers to
- register specific PTP clock or get information
-Message-ID: <20240305083938.6977335f@kernel.org>
-In-Reply-To: <20240305163546.3b9f3ed9@kmaincent-XPS-13-7390>
-References: <20240226-feature_ptp_netnext-v9-0-455611549f21@bootlin.com>
-	<20240226-feature_ptp_netnext-v9-8-455611549f21@bootlin.com>
-	<20240304185734.5f1a476c@kernel.org>
-	<ZebZpspMCqjLES/W@shell.armlinux.org.uk>
-	<20240305111021.5c892d5a@kmaincent-XPS-13-7390>
-	<20240305065939.2d419ff2@kernel.org>
-	<20240305163546.3b9f3ed9@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1709656806; c=relaxed/simple;
+	bh=gc4Q3iOrHAFdKOGbGBM7S1/lCy9aGir7g3krCSkZWGA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KBREIqVy2FXTfwuKRlWX+/cm2xklauS8OH/Cb8CitSBQizxnUI+kd+fafDwERtRUwGJ20baCFMjyzHzLrGZ9nxACI0QEeEwjiPecsPS1tFi8hc07kkiHrYefRPVAXfjl8zzGD1OWgn+YjH065ZQbCjaPXyFwDLlcciBrmtwjfoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=igNnHsgq; arc=none smtp.client-ip=45.157.188.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Tq1WJ213QzdkX;
+	Tue,  5 Mar 2024 17:39:56 +0100 (CET)
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Tq1WH2gGnzMpnPf;
+	Tue,  5 Mar 2024 17:39:55 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1709656796;
+	bh=gc4Q3iOrHAFdKOGbGBM7S1/lCy9aGir7g3krCSkZWGA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=igNnHsgqEowJBOrTNsY+ydE68SkrUDHOLYhgEDGGVoatyJmOKMt/HhHbzBb1+fYuV
+	 mXHVUHxjzWRG0zTJ5tRmmL98gxWdYNjkEGTco3K/AsI0r+5XPyW1LLw4yBQamPXP1a
+	 zlovfjSoVfJJsmvhKUnUm/DyoVJU/h+Qtkj59YCg=
+Date: Tue, 5 Mar 2024 17:39:44 +0100
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Mark Brown <broonie@kernel.org>, 
+	keescook@chromium.org, davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, jakub@cloudflare.com
+Subject: Re: [PATCH v4 00/12] selftests: kselftest_harness: support using
+ xfail
+Message-ID: <20240305.thuo4ahNaeng@digikod.net>
+References: <20240229005920.2407409-1-kuba@kernel.org>
+ <05f7bf89-04a5-4b65-bf59-c19456aeb1f0@sirena.org.uk>
+ <20240304150411.6a9bd50b@kernel.org>
+ <7bb3b635-9fed-47ab-a640-ccac6d283b54@intel.com>
+ <20240305.hoi8ja1eeg4C@digikod.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240305.hoi8ja1eeg4C@digikod.net>
+X-Infomaniak-Routing: alpha
 
-On Tue, 5 Mar 2024 16:35:46 +0100 K=C3=B6ry Maincent wrote:
-> > Still, wouldn't it be simpler to store all accessible PTP instances=20
-> > in the netdev? =20
->=20
-> You are talking about something like the phy topology but for the ptp?
->=20
-> Then when asking information on a PHC (tsinfo or hwtstamp config) from et=
-htool
-> we would have to look at the PHC topology of the netdev. This could work.=
- Not
-> sure it is much simpler, do you see other advantages that it could have?
+On Tue, Mar 05, 2024 at 05:00:13PM +0100, Mickaël Salaün wrote:
+> On Tue, Mar 05, 2024 at 04:48:06PM +0100, Przemek Kitszel wrote:
+> > On 3/5/24 00:04, Jakub Kicinski wrote:
+> > > On Mon, 4 Mar 2024 22:20:03 +0000 Mark Brown wrote:
+> > > > On Wed, Feb 28, 2024 at 04:59:07PM -0800, Jakub Kicinski wrote:
+> > > > 
+> > > > > When running selftests for our subsystem in our CI we'd like all
+> > > > > tests to pass. Currently some tests use SKIP for cases they
+> > > > > expect to fail, because the kselftest_harness limits the return
+> > > > > codes to pass/fail/skip. XFAIL which would be a great match
+> > > > > here cannot be used.
+> > > > > 
+> > > > > Remove the no_print handling and use vfork() to run the test in
+> > > > > a different process than the setup. This way we don't need to
+> > > > > pass "failing step" via the exit code. Further clean up the exit
+> > > > > codes so that we can use all KSFT_* values. Rewrite the result
+> > > > > printing to make handling XFAIL/XPASS easier. Support tests
+> > > > > declaring combinations of fixture + variant they expect to fail.
+> > > > 
+> > > > This series landed in -next today and has caused breakage on all
+> > > > platforms in the ALSA pcmtest-driver test.  When run on systems that
+> > > > don't have the driver it needs loaded the test skip but since this
+> > > > series was merged skipped tests are logged but then reported back as
+> > > > failures:
+> > > > 
+> > > > # selftests: alsa: test-pcmtest-driver
+> > > > # TAP version 13
+> > > > # 1..5
+> > > > # # Starting 5 tests from 1 test cases.
+> > > > # #  RUN           pcmtest.playback ...
+> > > > # #      SKIP      Can't read patterns. Probably, module isn't loaded
+> > > > # # playback: Test failed
+> > > > # #          FAIL  pcmtest.playback
+> > > > # not ok 1 pcmtest.playback #  Can't read patterns. Probably, module isn't loaded
+> > > > # #  RUN           pcmtest.capture ...
+> > > > # #      SKIP      Can't read patterns. Probably, module isn't loaded
+> > > > # # capture: Test failed
+> > > > # #          FAIL  pcmtest.capture
+> > > > # not ok 2 pcmtest.capture #  Can't read patterns. Probably, module isn't loaded
+> > > > # #  RUN           pcmtest.ni_capture ...
+> > > > # #      SKIP      Can't read patterns. Probably, module isn't loaded
+> > > > # # ni_capture: Test failed
+> > > > # #          FAIL  pcmtest.ni_capture
+> > > > # not ok 3 pcmtest.ni_capture #  Can't read patterns. Probably, module isn't loaded
+> > > > # #  RUN           pcmtest.ni_playback ...
+> > > > # #      SKIP      Can't read patterns. Probably, module isn't loaded
+> > > > # # ni_playback: Test failed
+> > > > # #          FAIL  pcmtest.ni_playback
+> > > > # not ok 4 pcmtest.ni_playback #  Can't read patterns. Probably, module isn't loaded
+> > > > # #  RUN           pcmtest.reset_ioctl ...
+> > > > # #      SKIP      Can't read patterns. Probably, module isn't loaded
+> > > > # # reset_ioctl: Test failed
+> > > > # #          FAIL  pcmtest.reset_ioctl
+> > > > # not ok 5 pcmtest.reset_ioctl #  Can't read patterns. Probably, module isn't loaded
+> > > > # # FAILED: 0 / 5 tests passed.
+> > > > # # Totals: pass:0 fail:5 xfail:0 xpass:0 skip:0 error:0
+> > > > 
+> > > > I haven't completely isolated the issue due to some other breakage
+> > > > that's making it harder that it should be to test.
+> > > > 
+> > > > A sample full log can be seen at:
+> > > > 
+> > > >     https://lava.sirena.org.uk/scheduler/job/659576#L1349
+> > > 
+> > > Thanks! the exit() inside the skip evaded my grep, I'm testing this:
+> > > 
+> > > diff --git a/tools/testing/selftests/alsa/test-pcmtest-driver.c b/tools/testing/selftests/alsa/test-pcmtest-driver.c
+> > > index a52ecd43dbe3..7ab81d6f9e05 100644
+> > > --- a/tools/testing/selftests/alsa/test-pcmtest-driver.c
+> > > +++ b/tools/testing/selftests/alsa/test-pcmtest-driver.c
+> > > @@ -127,11 +127,11 @@ FIXTURE_SETUP(pcmtest) {
+> > >   	int err;
+> > >   	if (geteuid())
+> > > -		SKIP(exit(-1), "This test needs root to run!");
+> > > +		SKIP(exit(KSFT_SKIP), "This test needs root to run!");
+> > >   	err = read_patterns();
+> > >   	if (err)
+> > > -		SKIP(exit(-1), "Can't read patterns. Probably, module isn't loaded");
+> > > +		SKIP(exit(KSFT_SKIP), "Can't read patterns. Probably, module isn't loaded");
+> > >   	card_name = malloc(127);
+> > >   	ASSERT_NE(card_name, NULL);
+> > > diff --git a/tools/testing/selftests/mm/hmm-tests.c b/tools/testing/selftests/mm/hmm-tests.c
+> > > index 20294553a5dd..356ba5f3b68c 100644
+> > > --- a/tools/testing/selftests/mm/hmm-tests.c
+> > > +++ b/tools/testing/selftests/mm/hmm-tests.c
+> > > @@ -138,7 +138,7 @@ FIXTURE_SETUP(hmm)
+> > >   	self->fd = hmm_open(variant->device_number);
+> > >   	if (self->fd < 0 && hmm_is_coherent_type(variant->device_number))
+> > > -		SKIP(exit(0), "DEVICE_COHERENT not available");
+> > > +		SKIP(exit(KSFT_SKIP), "DEVICE_COHERENT not available");
+> > >   	ASSERT_GE(self->fd, 0);
+> > >   }
+> > > @@ -149,7 +149,7 @@ FIXTURE_SETUP(hmm2)
+> > >   	self->fd0 = hmm_open(variant->device_number0);
+> > >   	if (self->fd0 < 0 && hmm_is_coherent_type(variant->device_number0))
+> > > -		SKIP(exit(0), "DEVICE_COHERENT not available");
+> > > +		SKIP(exit(KSFT_SKIP), "DEVICE_COHERENT not available");
+> > >   	ASSERT_GE(self->fd0, 0);
+> > >   	self->fd1 = hmm_open(variant->device_number1);
+> > >   	ASSERT_GE(self->fd1, 0);
+> > > 
+> > > > but there's no more context.  I'm also seeing some breakage in the
+> > > > seccomp selftests which also use kselftest-harness:
+> > > > 
+> > > > # #  RUN           TRAP.dfl ...
+> > > > # # dfl: Test exited normally instead of by signal (code: 0)
+> > > > # #          FAIL  TRAP.dfl
+> > > > # not ok 56 TRAP.dfl
+> > > > # #  RUN           TRAP.ign ...
+> > > > # # ign: Test exited normally instead of by signal (code: 0)
+> > > > # #          FAIL  TRAP.ign
+> > > > # not ok 57 TRAP.ign
+> > > 
+> > > Ugh, I'm guessing vfork() "eats" the signal, IOW grandchild signals,
+> > > child exits? vfork() and signals.. I'd rather leave to Kees || Mickael.
+> > > 
+> > 
+> > Hi, sorry for not trying to reproduce it locally and still commenting,
+> > but my vfork() man page says:
+> > 
+> > | The child must  not  return  from  the current  function  or  call
+> > | exit(3) (which would have the effect of calling exit handlers
+> > | established by the parent process and flushing the parent's stdio(3)
+> > | buffers), but may call _exit(2).
+> > 
+> > And you still have some exit(3) calls.
+> 
+> Correct, exit(3) should be replaced with _exit(2).
 
-I was thinking just an array indexed by enum hwtstamp_source.
-But you're right, once we can express more than one phy per
-netdev we're basically back to doing similar walks. Fair.
+Well, I think we should be good even if some exit(3) calls remain
+because the envirenment in which the vfork() call happen is already
+dedicated to the running test (with flushed stdio, setpgrp() call), see
+__run_test() and the fork() call just before running the
+fixture/test/teardown.  Even if the test configures its own exit
+handlers, they will not be run by its parent because it never calls
+exit(), and the returned function either ends with a call to _exit() or
+a signal.
 
