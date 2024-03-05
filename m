@@ -1,226 +1,164 @@
-Return-Path: <netdev+bounces-77515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B43978720E1
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:54:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 972B3872101
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:59:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E798B2716C
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:54:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 542E5282DC0
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 13:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D41085C7F;
-	Tue,  5 Mar 2024 13:54:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB93A86134;
+	Tue,  5 Mar 2024 13:59:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IG1Eho3g"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CXzJyOlS"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9918593E;
-	Tue,  5 Mar 2024 13:54:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F26CA86ACD;
+	Tue,  5 Mar 2024 13:59:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709646857; cv=none; b=kRdL+TR+RKvT2vxvv1ViqEyMlOxlslrtsZHxXEuCRxAAGIOvErM8+8toBX79NZz60YtujEH5qeeLXf0drGjzBnMhTkLortjQmEGyiZNLdxrEc1moZJxGrQjVXblT8KclaLu/e7Re3miwmPp4uq5tCTtq5TiupLQkCVNAGiydmjk=
+	t=1709647150; cv=none; b=ZzwMkbBwqcv/tQ+LUZ7ThAd3jzKbyBhgsp/FcW7eUZiujPzO6bes0tRy2NE/dRY2xMES6xCbq4P5oqA6Wg2Pyyrs4IlN+FW3Boeo4lCv1uFGXip5COBruJcjmh66gE/ebd947dSar51J/KT1pivdTfA7asDoIgVA879L7GGApco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709646857; c=relaxed/simple;
-	bh=iE+d6WHLQ8dtk72zJx79UKKdAtbVsGqE7b1/AEJKdg4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nyR1//FvkX6BGDkzIRnsDkP9R9vd8wApjXG6gZ9G38gy6T9SDCCKPeEZGLraFDrYLU/hd9SA9+PH4J6n9lPoHeJaJsKlAwY7O03268skCh4EzlnF5U8qrP09hb8IkAPDbEDk4pMcce77FCwqCIqi7LXx+cIN1X83ocyP8aRYRHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IG1Eho3g; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=whBP21HAQ3Frp1IUY6JzJ0sm0jK2Dg8CkXh4X6cnDe0=; b=IG1Eho3gmXNSip/areixddTUPD
-	IOmqwXCRipvCc312V3ZpFXAv08+39xyTeqtLLjwvc2wnSCtP/A3Le2Eq7XkDiq/Yo9Pp0jvRHZdBA
-	ibWE3m7F/a/WAZZAt//gV15LlYYo6Eao92Enj7Xt/yB8H/ZbXEvXG6HEgCM0//n9383g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rhVFL-009Qg4-42; Tue, 05 Mar 2024 14:54:19 +0100
-Date: Tue, 5 Mar 2024 14:54:19 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Lucien Jheng <lucien.jheng@airoha.com>,
-	Zhi-Jun You <hujy652@protonmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 2/2] net: phy: air_en8811h: Add the Airoha
- EN8811H PHY driver
-Message-ID: <99541533-625e-4ffb-b980-b2bcd016cfeb@lunn.ch>
-References: <20240302183835.136036-1-ericwouds@gmail.com>
- <20240302183835.136036-3-ericwouds@gmail.com>
- <89f237e0-75d4-4690-9d43-903e087e4f46@lunn.ch>
- <b27e44db-d9c5-49f0-8b81-2f55cfaacb4d@gmail.com>
+	s=arc-20240116; t=1709647150; c=relaxed/simple;
+	bh=wET7lxWL5+a6cOW+e8Hm2QP+6ArrR8fvDaiOmdw834Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uHMSbQVMREOFcP1e7JbPNU/s7KygR20vo/d4hRxqC5mY/170ZffiKUkKLTgVUHH26TuRhVOjWISNbAY06rKdhivAfrAaj2lDVUP3w127e/jzdNcG6+5Q3zgfpYzl5m4XjsqXMpQij11B65lLCHxEVUfU26jwISTtIge8TLJpZXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CXzJyOlS; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a45606c8444so249609066b.3;
+        Tue, 05 Mar 2024 05:59:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709647147; x=1710251947; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ezrez5zBjAnZtqpMJIhkt3FNVFaisJDMP2rkEI9ICVk=;
+        b=CXzJyOlSDrfQH7q0ZinhZN8W0Ccagp0O/fEPMQv2hnoxcrB0Y6NesPRTS0Samq/uDp
+         +3Ml6f98obkiAg6szccsLxw3/MpZwFsyUMgyhhm8CKu2uqORbMelB4wKebObQyMFigaK
+         +Bxn0pirB5pSRxDeNZxVmeZxqNxfF+KWmTekxIpGGAcWF4PPoDFAdRKDPVWrP6Y85+8G
+         S+/wOtXxicHJrJzkntpuJh1mcYbqlu7R98ceK+628IMz86yr7Emgu9MydaXHO2z+KSsP
+         4a1HiqnIhB8iCfedAoy+ScY3ZYXxVK2KwZ0w1npEeJMiM5yTtOCYIInudCaN6Yf1CmSp
+         fc8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709647147; x=1710251947;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ezrez5zBjAnZtqpMJIhkt3FNVFaisJDMP2rkEI9ICVk=;
+        b=KpZ27rwAdC18xldxb5ywsMQGzjJNXCnaBG+J6EOS6y2kGJJG6v7myrZURxInQmGRHf
+         cgvZPDHGW1sxvzjMglpOD/5ijnFuntGkt6n4VvQp5so+1Jqy6C+VgNFRaYrLg2ZMMiNs
+         4ntfNfK/9/yIKPfXRbs0YMI46MmSTok/Yhw/SmQKMmz/yMeJ7wUFShiw0OdmInxTE8ZP
+         H47BsMeV9Hu95mcUJDtAAT6R3k1gls1WNz+Sdmfa5Tu7MfcpnXJWLhvEm+giIcQFyY2i
+         yaNlL2u0/VXFa7DCOSWtiTVYQ4LKpKLBfH69fMMnXj5iCVW9gZkJWQhx67WC9vBdabgd
+         t9QQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWv5P3AYERmbBI9ZJLKSP3qIrSDv79v7tBpBMSfJzApELgiMYfofi+ZwMSZAhrTJQyBl0GLQopoLE1RQrK/okrHnXRG2goo7ddNT42P7i5SAj4mRzlqNGnD6nQJX7oFZweEHW9ii3jPuKlCqMYeReUvEArSYPs3cO0+jSlGRPyqyAkThA==
+X-Gm-Message-State: AOJu0YwTyAPcRScv9c1soNT+f8DsiXk90vmEedzJj3bOrNx1mbKQuPHw
+	gYe9Fty8WO3ypJMvFhBFSRKKzJPmv3hnI2E+7BtXiEjFWsP8UVxL
+X-Google-Smtp-Source: AGHT+IHrhZPJko2SywuNbpTAwYF28eOpJ53IJ0IeI8AGRN6zAa5BkcIVAS6wVzoso2hAPNesVP+Caw==
+X-Received: by 2002:a17:906:e2cc:b0:a44:dadc:654e with SMTP id gr12-20020a170906e2cc00b00a44dadc654emr6470785ejb.39.1709647147061;
+        Tue, 05 Mar 2024 05:59:07 -0800 (PST)
+Received: from fedora.. (d-zg1-234.globalnet.hr. [213.149.36.248])
+        by smtp.googlemail.com with ESMTPSA id z20-20020a170906271400b00a441cb52bfcsm6093783ejc.165.2024.03.05.05.59.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Mar 2024 05:59:06 -0800 (PST)
+From: Robert Marko <robimarko@gmail.com>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	andersson@kernel.org,
+	konrad.dybcio@linaro.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ansuelsmth@gmail.com,
+	netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Robert Marko <robimarko@gmail.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH net v2] net: phy: qca807x: fix compilation when CONFIG_GPIOLIB is not set
+Date: Tue,  5 Mar 2024 14:58:18 +0100
+Message-ID: <20240305135903.3752568-1-robimarko@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b27e44db-d9c5-49f0-8b81-2f55cfaacb4d@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 05, 2024 at 09:13:41AM +0100, Eric Woudstra wrote:
-> 
-> Hi Andrew,
-> 
-> First of all, thanks for taking the time to look at the code so
-> extensively.
-> 
-> On 3/3/24 18:29, Andrew Lunn wrote:
-> >> +enum {
-> >> +	AIR_PHY_LED_DUR_BLINK_32M,
-> >> +	AIR_PHY_LED_DUR_BLINK_64M,
-> >> +	AIR_PHY_LED_DUR_BLINK_128M,
-> >> +	AIR_PHY_LED_DUR_BLINK_256M,
-> >> +	AIR_PHY_LED_DUR_BLINK_512M,
-> >> +	AIR_PHY_LED_DUR_BLINK_1024M,
-> > 
-> > DUR meaning duration? It has a blinks on for a little over a
-> > kilometre? So a wave length of a little over 2 kilometres, or a
-> > frequency of around 0.0005Hz :-)
-> 
-> It is the M for milliseconds. I can add a comment to clarify this.
+Kernel bot has discovered that if CONFIG_GPIOLIB is not set compilation
+will fail.
 
-Or just add an S. checkpatch does not like camElcAse. So ms will call
-a warning. But from context we know it is not mega seconds.
+Upon investigation the issue is that qca807x_gpio() is guarded by a
+preprocessor check but then it is called under
+if (IS_ENABLED(CONFIG_GPIOLIB)) in the probe call so the compiler will
+error out since qca807x_gpio() has not been declared if CONFIG_GPIOLIB has
+not been set.
 
-> >> +static int __air_buckpbus_reg_write(struct phy_device *phydev,
-> >> +				    u32 pbus_address, u32 pbus_data,
-> >> +				    bool set_mode)
-> >> +{
-> >> +	int ret;
-> >> +
-> >> +	if (set_mode) {
-> >> +		ret = __phy_write(phydev, AIR_BPBUS_MODE,
-> >> +				  AIR_BPBUS_MODE_ADDR_FIXED);
-> >> +		if (ret < 0)
-> >> +			return ret;
-> >> +	}
-> > 
-> > What does set_mode mean?
-> 
-> I use this boolean to prevent writing the same value twice to the
-> AIR_BPBUS_MODE register, when doing an atomic modify operation. The
-> AIR_BPBUS_MODE is already set in the read operation, so it does not
-> need to be set again to the same value at the write operation.
-> Sadly, the address registers for read and write are different, so
-> I could not optimize the modify operation any more.
+Fixes: d1cb613efbd3 ("net: phy: qcom: add support for QCA807x PHY Family")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202403031332.IGAbZzwq-lkp@intel.com/
+Signed-off-by: Robert Marko <robimarko@gmail.com>
+---
+Changes in v2:
+* Reduce the code indent level
 
-So there is the potential to have set_mode true when not actually
-performing a read/modify/write. Maybe have a dedicated modify
-function, and don't expose set_mode?
+ drivers/net/phy/qcom/qca807x.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-> 
-> >> +static int en8811h_load_firmware(struct phy_device *phydev)
-> >> +{
-> >> +	struct device *dev = &phydev->mdio.dev;
-> >> +	const struct firmware *fw1, *fw2;
-> >> +	int ret;
-> >> +
-> >> +	ret = request_firmware_direct(&fw1, EN8811H_MD32_DM, dev);
-> >> +	if (ret < 0)
-> >> +		return ret;
-> >> +
-> >> +	ret = request_firmware_direct(&fw2, EN8811H_MD32_DSP, dev);
-> >> +	if (ret < 0)
-> >> +		goto en8811h_load_firmware_rel1;
-> >> +
-> > 
-> > How big are these firmwares? This will map the entire contents into
-> > memory. There is an alternative interface which allows you to get the
-> > firmware in chunks. I the firmware is big, just getting 4K at a time
-> > might be better, especially if this is an OpenWRT class device.
-> 
-> The file sizes are 131072 and 16384 bytes. If you think this is too big,
-> I could look into using the alternative interface.
+diff --git a/drivers/net/phy/qcom/qca807x.c b/drivers/net/phy/qcom/qca807x.c
+index 780c28e2e4aa..672c6929119a 100644
+--- a/drivers/net/phy/qcom/qca807x.c
++++ b/drivers/net/phy/qcom/qca807x.c
+@@ -732,24 +732,24 @@ static int qca807x_probe(struct phy_device *phydev)
+ 	priv->dac_disable_bias_current_tweak = of_property_read_bool(node,
+ 								     "qcom,dac-disable-bias-current-tweak");
+ 
+-	if (IS_ENABLED(CONFIG_GPIOLIB)) {
+-		/* Make sure we don't have mixed leds node and gpio-controller
+-		 * to prevent registering leds and having gpio-controller usage
+-		 * conflicting with them.
+-		 */
+-		if (of_find_property(node, "leds", NULL) &&
+-		    of_find_property(node, "gpio-controller", NULL)) {
+-			phydev_err(phydev, "Invalid property detected. LEDs and gpio-controller are mutually exclusive.");
+-			return -EINVAL;
+-		}
++#if IS_ENABLED(CONFIG_GPIOLIB)
++	/* Make sure we don't have mixed leds node and gpio-controller
++	 * to prevent registering leds and having gpio-controller usage
++	 * conflicting with them.
++	 */
++	if (of_find_property(node, "leds", NULL) &&
++	    of_find_property(node, "gpio-controller", NULL)) {
++		phydev_err(phydev, "Invalid property detected. LEDs and gpio-controller are mutually exclusive.");
++		return -EINVAL;
++	}
+ 
+-		/* Do not register a GPIO controller unless flagged for it */
+-		if (of_property_read_bool(node, "gpio-controller")) {
+-			ret = qca807x_gpio(phydev);
+-			if (ret)
+-				return ret;
+-		}
++	/* Do not register a GPIO controller unless flagged for it */
++	if (of_property_read_bool(node, "gpio-controller")) {
++		ret = qca807x_gpio(phydev);
++		if (ret)
++			return ret;
+ 	}
++#endif
+ 
+ 	/* Attach SFP bus on combo port*/
+ 	if (phy_read(phydev, QCA807X_CHIP_CONFIGURATION)) {
+-- 
+2.44.0
 
-What class of device is this? 128K for a PC is nothing. For an OpenWRT
-router with 128M of RAM, it might be worth using the other API.
-
-> 
-> >> +static int en8811h_restart_host(struct phy_device *phydev)
-> >> +{
-> >> +	int ret;
-> >> +
-> >> +	ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
-> >> +				     EN8811H_FW_CTRL_1_START);
-> >> +	if (ret < 0)
-> >> +		return ret;
-> >> +
-> >> +	return air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
-> >> +				     EN8811H_FW_CTRL_1_FINISH);
-> >> +}
-> > 
-> > What is host in this context?
-> 
-> This is the EN8811H internal host to the PHY.
-
-That is a very PHY centric view of the world. I would say the host is
-what is running Linux. I assume this is the datahsheets naming? Maybe
-cpu, or mcu is a better name?
-
-> 
-> > Vendors do like making LED control unique. I've not seen any other MAC
-> > or PHY where you can blink for activity at a given speed. You cannot
-> > have 10 and 100 at the same time, so why are there different bits for
-> > them?
-> > 
-> > I _think_ this can be simplified
-> > ...
-> > Does this work?
-> 
-> I started out with that, but the hardware can do more. It allows
-> for a setup as described:
-> 
->  100M link up triggers led0, only led0 blinking on traffic
-> 1000M link up triggers led1, only led1 blinking on traffic
-> 2500M link up triggers led0 and led1, both blinking on traffic
-> 
-> #define AIR_DEFAULT_TRIGGER_LED0 (BIT(TRIGGER_NETDEV_LINK_2500) | \
-> 				 BIT(TRIGGER_NETDEV_LINK_100)  | \
-> 				 BIT(TRIGGER_NETDEV_RX)        | \
-> 				 BIT(TRIGGER_NETDEV_TX))
-> #define AIR_DEFAULT_TRIGGER_LED1 (BIT(TRIGGER_NETDEV_LINK_2500) | \
-> 				 BIT(TRIGGER_NETDEV_LINK_1000) | \
-> 				 BIT(TRIGGER_NETDEV_RX)        | \
-> 				 BIT(TRIGGER_NETDEV_TX))
-> 
-> With the simpler code and just the slightest traffic, both leds
-> are blinking and no way to read the speed anymore from the leds.
-> 
-> So I modified it to make the most use of the possibilities of the
-> EN881H hardware. The EN8811H can then be used with a standard 2-led
-> rj45 socket.
-
-The idea is that we first have Linux blink the LEDs in software. This
-is controlled via the files in /sys/class/leds/FOO/{link|rx|tx}
-etc. If the hardware can do the same blink pattern, it can then be
-offloaded to the hardware.
-
-If you disable hardware offload, just have set brightness, can you do
-the same pattern?
-
-As i said, vendors do all sorts of odd things with LEDs. I would
-prefer we have a common subset most PHY support, and not try to
-support every strange mode.
-
-    Andrew
 
