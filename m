@@ -1,168 +1,199 @@
-Return-Path: <netdev+bounces-77391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A098A871857
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 09:40:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0EB1871871
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 09:42:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2748D1F21979
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 08:40:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 207C71C2192C
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 08:42:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 354FE4C63A;
-	Tue,  5 Mar 2024 08:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB08F4EB31;
+	Tue,  5 Mar 2024 08:42:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Gss+WfSa"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="nFCUr8mh";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MeGRT64E"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2071.outbound.protection.outlook.com [40.107.223.71])
+Received: from wfout6-smtp.messagingengine.com (wfout6-smtp.messagingengine.com [64.147.123.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B03602E40B
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 08:39:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.71
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709627997; cv=fail; b=vFcF6q1aiusu7pKG+wOFRDIjUPqoayc0JoRlzqdjpgLjCFE4JSqhB5RVprdZAN9nBBjvcd27oLuGzpu2IC27SEWyno5C9Op5+M5+Y4rwn2YwMeRCfIsnWYB3kclWLv1ykXkit6GzGaQCebPqNanqnykLioJyW07dafdW6wKh+gM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709627997; c=relaxed/simple;
-	bh=52fKUB/EWP7Wua9ylL7R4oA1/VFhzQJDexQFLliEhuU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=YjCxXCB0d9K3kfjgmbQ1aXMjDQoxe0H6xKpYGyKkRI2PYFr2RLq9IUx7zIeRXxgxr/TBIUgujStHPTYuaEzllUoonbKJFVd4pNzhwyw7qUYmzobLdluAazdNP6UGw8eyQhKnOUeysltCMNh6KcMlCZjIgBtv0vbjIbPgxMfHRYE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Gss+WfSa; arc=fail smtp.client-ip=40.107.223.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Wv6CwgUifD0wXvPncehR1fYf+UER797jDzkU9FoN9fJsiZV0StH/y0wDJIhGcei0vxh7wHD+z60/3lGMn2B9v1U1WNqTTOK40v9pRWqK//pn2PDdK+K+u2Yh5+yxwcuIQZrVKFeai/1F/xBRI9sqrBzLwkerOQRjEW/AqPhXgT1FKpmw919+176eNdjhYumZW45mKgk8znL4J/c8tHNi52jTsE6Y6hJURrz6fFSVgjnTjgtpSM8ezKDc6zk/iIl86+939gIxcmMl1WwzMG5YIkM4k7paXOJsF2fjBkZyZXjwPh2EnGv6da8LSd5kleU3NYqB4OZEGUWBbx6ZPj/t8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gn98hNWsTR9IAMjFGAfWZD9n0NN22ygP600sFCusvfc=;
- b=Xs5rurXq4Ljv3EIkC65UQMsopRA66s8eJfoZXX+ZKbAmRoYOWyqXW+IiGyAWcLDtF0abCpY5IP5I73DfECZdLiQE09V/bthSLywP1IHNgjFrQci/txN5RJ8TQNABKqdnPf2qSWgsJUmEKGkq9zQtm8bE1Lpx+ZMr3gDdcSgM/ODcj5uQ6TcaCiEvtH9jhWNdrxjJnw2f451EVXy3f3Xb9JWVQODSSh3GfP77b4olxsCfJxWgRKgTosRBdFioGbjnpp3P0RWcNmTcHgWRveYSBpXNya7A2i7sbVUlNoZkj3bmmh7BahVQXHtoBCL8Rd4vJd76kuJ/IW/X0PlUSEfAlg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gn98hNWsTR9IAMjFGAfWZD9n0NN22ygP600sFCusvfc=;
- b=Gss+WfSaYrVKdxmKFSlGFGzLyup5oVOB7girPhHTLTjyrFmmbrRtxAa51nw4aIa14U7iOnQLjF65QyzEOo4yYTBl/amlHmJQgG2HjU9i/a2v3MGI/5PiFKvRc4yilPJCPZvGScoTKRwq+RY04YxdCWmNmu+tt/f2YEK+hOkOGYhSIpSSiD66nSlLOq3igqU53asMUWyopA86rqe7FM0Si62T5xOz+iwkBk9aXBoXhUr1up4DoPa1GhnCgG9PBuYocZpJ78PBEGqGdukQzmXMpaCVWCDic40A+y4+Zpjmb+Jx1Fw+a7DR3ecYTMl5KbbzXjW9FNuQD8eRHUqJ33qelg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
- by MW6PR12MB8708.namprd12.prod.outlook.com (2603:10b6:303:242::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.38; Tue, 5 Mar
- 2024 08:39:52 +0000
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::b93d:10a3:632:c543]) by CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::b93d:10a3:632:c543%4]) with mapi id 15.20.7339.035; Tue, 5 Mar 2024
- 08:39:52 +0000
-Date: Tue, 5 Mar 2024 10:39:47 +0200
-From: Ido Schimmel <idosch@nvidia.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@kernel.org>, mlxsw@nvidia.com
-Subject: Re: [PATCH net-next v3 2/7] net: nexthop: Add NHA_OP_FLAGS
-Message-ID: <ZebaUyYfghHnwG8C@shredder>
-References: <cover.1709560395.git.petrm@nvidia.com>
- <46fd3a32ea411c65a66193b7e25833ecf8141326.1709560395.git.petrm@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <46fd3a32ea411c65a66193b7e25833ecf8141326.1709560395.git.petrm@nvidia.com>
-X-ClientProxiedBy: LO4P265CA0266.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:37c::8) To CY5PR12MB6179.namprd12.prod.outlook.com
- (2603:10b6:930:24::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C555C2E40B;
+	Tue,  5 Mar 2024 08:42:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.149
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709628140; cv=none; b=IuDCgWE0ElNh4fAngvLvjgvKNuMF3zcxJrwP62yhKRmbcuLk1t2PN4oYWRondMDEhpcCH0TCtZcCEAFthcY4gPx5lTV4KVbaxmoCloCIWQFnK/F2qIOxovHYLm80BP6aQWne3RsubB6Fz8RzAxpUBpGmmuttloD9JR9aXARK3qk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709628140; c=relaxed/simple;
+	bh=NmJCAuRJ199Nz8coLDr4s+3BbQ9AxZ5w+P+Jx63NVw4=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=KKQ27b7rQWyv1YzcEjRRSKF6uIk9CsJMtCEOwknbNukNVyrM1TulLEWP42KquIABrfI7Xav2nPz1uy6eG/99XGdLDJny/KzmRSVmEC+C18PkeUKPVz84vtmGPpBcBj4I9WcuXUXy8jeOv6T5CYR9Nq/BoKEOwHw8tLXOFt6JpEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=nFCUr8mh; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MeGRT64E; arc=none smtp.client-ip=64.147.123.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfout.west.internal (Postfix) with ESMTP id 1AD091C0009F;
+	Tue,  5 Mar 2024 03:42:16 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Tue, 05 Mar 2024 03:42:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1709628135; x=1709714535; bh=QeA3EPMJnw
+	t6NmNxY9VsOPm58VedM11auwf8kvd3l10=; b=nFCUr8mh4qirfdLiF7rJ3ln4Ee
+	ac3TZcBsBjTwt2v0sdIiovpLKYKyf84Jxe23adpiNL58TY/A6Un5jj6iESmOfBN+
+	NH3EgOLGaP2DQpO5LGujPp+1ACooTgAvYIJALYP/zB1DPOPdMHqcSl6pneGLIuSd
+	0k9KzYIWTlZUxiE5d/Z/VfhGrlYPtpIrvzzKaxh55J1YvHGR53svoOQw5rECchxc
+	E9ikW19OkQ636itot1R2TSnpEFaS+eT+JgKKFsBgMEmk8BlUWkauiXR3Ls5Vvsp5
+	YZii5Qv8k/VvvLOAqjcoX8BsdOlRwRXYH9ceE7QjJGsmut+vnb/zrjODKYag==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1709628135; x=1709714535; bh=QeA3EPMJnwt6NmNxY9VsOPm58Ved
+	M11auwf8kvd3l10=; b=MeGRT64EA+QDDWf22wqOrRSkQjCcngCXPFXQcuj7sKlb
+	fsKykmy6Wo/2udr6Dj45/3j5m0Am1YNFMh5ogK0TGmfT3J3p1lUk5UkjwIxfJ/Ci
+	Pk+CIVw/J74yah5SJbYvq+QLaOyKzQH6iNNSmcFd0y5fFCKb9E+Yfzt3yz+45LdK
+	9sFUcb6Fxl0Wjzf+1CiXDA/ghzeaVvr1VBLLs58vNnkiklddooZ4bWdiOUY+GqIR
+	hy0uslWehpOhOdN1+n7zG5X3CplnE4+mdGGx1Yzro47d/GdIV8wduDcs4mOaIpqy
+	CGRzWIXTXwbBC9s0rVJ0cHgCt/kyzi8t44pW07QIUA==
+X-ME-Sender: <xms:59rmZebHuiNKE7gBn9g7Zws1CrVENXbBVlU7KpglFLP7T_XtZaHvBg>
+    <xme:59rmZRbdHQpICUlzFZ9DMOnUcwCIgRZrUGHMk8EmzSdzq9snWlaZ46aLWKLTaTvHK
+    Cg5wi_afUGNXBIHc_8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrheekgdduvddtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
+    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:59rmZY8-Af8ZUR5f35jgIeJGVWX966qCxdxdr_0n3EPth7aYYPYY2Q>
+    <xmx:59rmZQqJc6RxhGOktKKAE7ByIoMRz8lUdJERuu3D_WLY5uFdFRGIxA>
+    <xmx:59rmZZoZzA-bUCffCtvffkklND4SVShkax7NIxvDvebcxKbcpR8E8A>
+    <xmx:59rmZdfoSPIHkIwIoZkPmTYx3CVSLM8Fpjgeg_PGly9T-_ds2f3zKnQLvGs>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 5045FB6008D; Tue,  5 Mar 2024 03:42:15 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-208-g3f1d79aedb-fm-20240301.002-g3f1d79ae
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|MW6PR12MB8708:EE_
-X-MS-Office365-Filtering-Correlation-Id: f075c3e5-c103-46e8-0bd8-08dc3cefd367
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	eb1ZHK6OmDUOcKmrVFv9VUWe3eWWb9eC+kMPLi7fUCBxfW/wTKkq3ySAk7OJwYYx0qNUy7cwURdZo9g267r7soxzscRbcjqT7z7yVhYBQudSafy5qwCBO/77AcQJ0yTT+bkqmSrTV7B5kdk4ywWc4HG7JMXcpZWWSFBedcbyVix0VMQ4QKRAV0gM+CRMJL7MdRZVfuRzE/Wo9yzuEqmD3RnO9IzEGXvXy+tlxkmXA2ZGjlM3UHLBIA1+DNI45LIQVG6sGzWRE/mGpaSYOKlDaRZkdcgsQdk5SI0WKhyiL7TauubpLRWMogmnZYBYnRte8KTSvJfxtKWv4tMTyEE58MH+Ix8wW8elzQP/oHtf4Sv6dGzN5JIvnEF2CyGioc/s3dPjbqJqY+Du3dd05jU/+eQjbB7UbHeeW5/WWCbh6y/+b36ZLW0duntoFDKntNvM4xFbMwbjoGGXcrL3Wc1Qza8n/KPsuAb7ZLMHwebE+26cy+1yYZIhss5aZEW/Cu7bwF8Er0DI69/BMARiqjfF/D9zLmypk+0N7M5iDuPWkrn6GaSEc8gvk8uBcKizLQfNiwW9DkxG1NRqzXEJ0lAnurNqoWXP00tnEHkIDSrCFvzjXn0IiBp9kPCXX31ehUbKeVwHXlPcj3L7GXUTn/ah2OkHLmjPpxSJpb3qjwVKfao=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?bLvoZGNCxT9ipMxAomG+XcY8d3G+ThC+LJTEaFGkLCuXPUumcoAW4fjAeQ+m?=
- =?us-ascii?Q?tppQzUaBNCUyRK7OjmN4DgoeMcOP1tlYTmdAF+xJEqTXGCb61TIHrpnFxNdi?=
- =?us-ascii?Q?WK5uzOSTBVPD+/rEwW6cdQI6Tp7y/1HwqeXQm4Er5IZbDimS7zDQcl2ltljC?=
- =?us-ascii?Q?la2a9mbvN86F7mdng/07qaNZY1Qy8rjJ9y0w5Dopdf1EmThpfwscXR//V4eD?=
- =?us-ascii?Q?KINn/vZoLELtaijkAhtyullwEMMJOwk1887XoEkhzMit5W1mMlJRFiLQSX8j?=
- =?us-ascii?Q?c7+3AAVVPpy0rNoPfLwgysCQnzf1Zgi1u8+pagKnY/K3jVOcVejhRhWSVec4?=
- =?us-ascii?Q?YLiil7wZHGevYhbi/p7qnDPe6/vlFdzvmhwxuSSALhoKtnTCDcdJNpT09b/V?=
- =?us-ascii?Q?/grUOt3mpdZE1Sv0eHvn55j2/D1ddkUhyolQfU6ksChhOwiqzK2l350vCM3Y?=
- =?us-ascii?Q?eUTDw4QcDSbAWTKObmARhz/uVkN7qZWqbO6Vs1jctj+cRB1Op2UiNsWiqGY7?=
- =?us-ascii?Q?8P4PuGAKKZXYUrYQj72FOEjFrBgT4yfIdd9FmP1KCZ7G1JPeL3dEgSvI/9Sc?=
- =?us-ascii?Q?z25bgWO2+lJ5PNiJlA1/ubPNzzZ3hjY+7GtLbKF1spYIfe9PdeMBHgq+rtaF?=
- =?us-ascii?Q?KcgFkYG05qx7kr5kSGAZCxNPJ6hH6fGmj0KpJzTTd8lVay6KayKlwCDms0ID?=
- =?us-ascii?Q?o1ubSu7UyluGh5jjM7c1tXiUjH5d/er3JeK7Trb1Ycwy1AIc5C4LqfsTKZOn?=
- =?us-ascii?Q?tFLIOudH7he8otmchy9vQHcgDudqmI8IpiEUTLFZE+13LC/h7X/sZjcn2FLe?=
- =?us-ascii?Q?V+TZZd/boXOTKgJM+u5ChBx7SMj6WMWuH8ND3T6tJLABYrl9Fj/bWBdtYhlG?=
- =?us-ascii?Q?incJbZo1wMlFg4/Zq2YpkoEqel+aD2fJaP6DoCH9P1AGqcQz6dvtkyTtEiTV?=
- =?us-ascii?Q?KrgJCiv1IyULdSGJ6KKR/1YJZflDKplJ90necgwdyxDNolLdAHYRf1xe8uCX?=
- =?us-ascii?Q?uyFSps9arfqzOU3gzUmD4HvmgWBl+wKqIE0SnqlGvvMw6qg+sDsexdub+Iue?=
- =?us-ascii?Q?H3Bt6PZZ2CsjC3tk4uWZlsrBM+jMqeNuBHmkDw4fVtbX1hUNd2RY2r22lDsi?=
- =?us-ascii?Q?34dcUBqVRsLu0U9yuigD/J0ti4rHTJfoytEtupSCCOZe9GT4xxjq8JIMmzi+?=
- =?us-ascii?Q?LIylNfk1plUYb3W06+jyFa+Uiy+3kW2rDC9e2BE8SY2LuDeYGvJ1uVo0HoKR?=
- =?us-ascii?Q?TlpOnItK98sppnKthwqurb2w/xG/60Q165CvIEATlwJV4LHXeRfJbJxGw2c4?=
- =?us-ascii?Q?2X8/rdac9izvF9nZU9iqd7oYnumgqxS2GiumpuiqEmNWX2/CS03p2bnS3F04?=
- =?us-ascii?Q?mFprgeBJ9q6Ufk1Jv8pU9tsz9XlXdxro6Bk4WRK9KYYkCtDSXTaumiPuud77?=
- =?us-ascii?Q?Wl+zgw2VBCg8Mit3EBtMxdi8soYqxWLxJQnc3JIVelXtXkoZZ0XbmcTBC/Gj?=
- =?us-ascii?Q?7eI+9a5XYsxCW+ILMy2hmh7+5xxhKGDbw8duSEQHqalXbpMIaVqTj7pTgV3i?=
- =?us-ascii?Q?z68R8Ew08zFmQxgvyY/+Nj4HdTL58sH3X7/LjNtE?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f075c3e5-c103-46e8-0bd8-08dc3cefd367
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2024 08:39:52.2183
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: E13uOJwrq027A+nAPa8Ygr77fJpzdjg5SJzQV58wvjh0A6ePlRiQhf1S2NppivmdpjnuIE54XrRn6p6QuN/T8g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8708
+Message-Id: <a2d926be-695a-484b-b2b5-098da47e372e@app.fastmail.com>
+In-Reply-To: <20240305020153.2787423-13-almasrymina@google.com>
+References: <20240305020153.2787423-1-almasrymina@google.com>
+ <20240305020153.2787423-13-almasrymina@google.com>
+Date: Tue, 05 Mar 2024 09:41:55 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Mina Almasry" <almasrymina@google.com>, Netdev <netdev@vger.kernel.org>,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, Linux-Arch <linux-arch@vger.kernel.org>,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Jonathan Corbet" <corbet@lwn.net>,
+ "Richard Henderson" <richard.henderson@linaro.org>,
+ "Ivan Kokshaysky" <ink@jurassic.park.msu.ru>,
+ "Matt Turner" <mattst88@gmail.com>,
+ "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+ "James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Helge Deller" <deller@gmx.de>, "Andreas Larsson" <andreas@gaisler.com>,
+ "Jesper Dangaard Brouer" <hawk@kernel.org>,
+ "Ilias Apalodimas" <ilias.apalodimas@linaro.org>,
+ "Steven Rostedt" <rostedt@goodmis.org>,
+ "Masami Hiramatsu" <mhiramat@kernel.org>,
+ "Mathieu Desnoyers" <mathieu.desnoyers@efficios.com>,
+ "Alexei Starovoitov" <ast@kernel.org>,
+ "Daniel Borkmann" <daniel@iogearbox.net>,
+ "Andrii Nakryiko" <andrii@kernel.org>,
+ "Martin KaFai Lau" <martin.lau@linux.dev>,
+ "Eduard Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>,
+ "Yonghong Song" <yonghong.song@linux.dev>,
+ "John Fastabend" <john.fastabend@gmail.com>,
+ "KP Singh" <kpsingh@kernel.org>, "Stanislav Fomichev" <sdf@google.com>,
+ "Hao Luo" <haoluo@google.com>, "Jiri Olsa" <jolsa@kernel.org>,
+ "David Ahern" <dsahern@kernel.org>,
+ "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>,
+ shuah <shuah@kernel.org>, "Sumit Semwal" <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ "Pavel Begunkov" <asml.silence@gmail.com>, "David Wei" <dw@davidwei.uk>,
+ "Jason Gunthorpe" <jgg@ziepe.ca>,
+ "Yunsheng Lin" <linyunsheng@huawei.com>,
+ "Shailend Chand" <shailend@google.com>,
+ "Harshitha Ramamurthy" <hramamurthy@google.com>,
+ "Shakeel Butt" <shakeelb@google.com>,
+ "Jeroen de Borst" <jeroendb@google.com>,
+ "Praveen Kaligineedi" <pkaligineedi@google.com>,
+ "Willem de Bruijn" <willemb@google.com>,
+ "Kaiyuan Zhang" <kaiyuanz@google.com>
+Subject: Re: [RFC PATCH net-next v6 12/15] tcp: RX path for devmem TCP
+Content-Type: text/plain
 
-On Mon, Mar 04, 2024 at 09:51:15PM +0100, Petr Machata wrote:
-> @@ -2992,6 +2994,11 @@ static int nh_valid_get_del_req(const struct nlmsghdr *nlh,
->  		return -EINVAL;
->  	}
->  
-> +	if (tb[NHA_OP_FLAGS])
-> +		*op_flags = nla_get_u32(tb[NHA_OP_FLAGS]);
-> +	else
-> +		*op_flags = 0;
-> +
->  	return 0;
->  }
+On Tue, Mar 5, 2024, at 03:01, Mina Almasry wrote:
+> --- a/arch/alpha/include/uapi/asm/socket.h
+> +++ b/arch/alpha/include/uapi/asm/socket.h
+>  #define SO_PEERPIDFD		77
+> +#define SO_DEVMEM_LINEAR	79
+> +#define SO_DEVMEM_DMABUF	80
+> --- a/arch/mips/include/uapi/asm/socket.h
+> +++ b/arch/mips/include/uapi/asm/socket.h
+>  #define SO_PEERPIDFD		77
+> +#define SO_DEVMEM_LINEAR	79
+> +#define SO_DEVMEM_DMABUF	80
+> --- a/arch/parisc/include/uapi/asm/socket.h
+> +++ b/arch/parisc/include/uapi/asm/socket.h
+>  #define SO_PEERPIDFD		0x404B
+> +#define SO_DEVMEM_LINEAR	98
+> +#define SO_DEVMEM_DMABUF	99
+> --- a/arch/sparc/include/uapi/asm/socket.h
+> +++ b/arch/sparc/include/uapi/asm/socket.h
+>  #define SO_PEERPIDFD             0x0056
+> +#define SO_DEVMEM_LINEAR         0x0058
+> +#define SO_DEVMEM_DMABUF         0x0059
+> --- a/include/uapi/asm-generic/socket.h
+> +++ b/include/uapi/asm-generic/socket.h
+> @@ -135,6 +135,11 @@
+>  #define SO_PEERPIDFD		77
+> +#define SO_DEVMEM_LINEAR	98
+> +#define SO_DEVMEM_DMABUF	99
 
-[...]
+These look inconsistent. I can see how you picked the
+alpha and mips numbers, but how did you come up with
+the generic and parisc ones? Can you follow the existing
+scheme instead?
 
-> @@ -3151,6 +3161,11 @@ static int __nh_valid_dump_req(const struct nlmsghdr *nlh, struct nlattr **tb,
->  		return -EINVAL;
->  	}
->  
-> +	if (tb[NHA_OP_FLAGS])
-> +		filter->op_flags = nla_get_bitfield32(tb[NHA_OP_FLAGS]).value;
+> diff --git a/include/uapi/linux/uio.h b/include/uapi/linux/uio.h
+> index 059b1a9147f4..ad92e37699da 100644
+> --- a/include/uapi/linux/uio.h
+> +++ b/include/uapi/linux/uio.h
+> @@ -20,6 +20,16 @@ struct iovec
+>  	__kernel_size_t iov_len; /* Must be size_t (1003.1g) */
+>  };
+> 
+> +struct dmabuf_cmsg {
+> +	__u64 frag_offset;	/* offset into the dmabuf where the frag starts.
+> +				 */
+> +	__u32 frag_size;	/* size of the frag. */
+> +	__u32 frag_token;	/* token representing this frag for
+> +				 * DEVMEM_DONTNEED.
+> +				 */
+> +	__u32  dmabuf_id;	/* dmabuf id this frag belongs to. */
+> +};
 
-Shouldn't this be:
+This structure requires a special compat handler to run
+x86-32 binaries on x86-64 because of the different alignment
+requirements. Any uapi-visible structures should be defined
+to avoid this and just have no holes in them. Maybe extend
+one of the __u32 members to __u64 or add another 32-bit padding field?
 
-filter->op_flags = nla_get_u32(tb[NHA_OP_FLAGS]);
-
-?
-
-> +	else
-> +		filter->op_flags = 0;
-> +
->  	return 0;
->  }
+       Arnd
 
