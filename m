@@ -1,418 +1,240 @@
-Return-Path: <netdev+bounces-77671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39313872943
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 22:17:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37166872953
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 22:22:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CB701C230E6
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 21:17:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA66D1F242B7
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 21:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD24D12BEBE;
-	Tue,  5 Mar 2024 21:17:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A6312B16B;
+	Tue,  5 Mar 2024 21:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f+zkeIIL"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="IUy2QBkD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2057.outbound.protection.outlook.com [40.107.220.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4BA12BE98
-	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 21:17:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709673448; cv=none; b=FE3i94MgzAztqaBvzsuHfCLKxJOwIH3H2nQp3xBQDGeSmQfSeOsrL1rKAHerhz2q0/X2eHa142bByY6KIxSPm7nqcEjRseiFoN5RKIe9EbVGY52dBAma7FtA1tKSlcQCuQGQh4gnMOwmHx3fDqghAqeDiFQxnlPQwDbJBewt6z4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709673448; c=relaxed/simple;
-	bh=Zzs14TQDrBLvAr1o9JtK6vm+FLEBbfjXCr1LPciToqM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ebpjf2s+Raiz+0l2K0u3Tn94LDqMPMfpBHoyF3PLdtKMME2maSrvAPrJE0Cfo6T2/XKzF/dx2nG7EB7w0lOEwwa3VDbKKiIRnyo/iFrglNtgiCe4utf/TOrApZg5SjajE7MjKI3P9kjxJbV+A8DmkvY9Y9gsjKdIxZ4fHhvSVYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f+zkeIIL; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a458eb7db13so22342566b.2
-        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 13:17:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709673443; x=1710278243; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LpvlKXjZceUyV7T13tDS41t/F1Xa1LPW/laeLkdBF1g=;
-        b=f+zkeIIL3MaYM5PZ+7iWNhbUPnElC1PozZSc3vG7/g0+xAiXtxTX0jGzm4OkukjKj+
-         Ewed6xKfesI0HEa5m7zQonRJ2pjlKxAUa8tBqiAUmr4RbgWi2/dbQKdauu2aIafD9DDi
-         Ghu9no2/qlPRW04bDfIx95FhJamSFgtmIL62MzhYo/wY9BAVKY4ctX4UJOFKGmUvD4B2
-         /dT+b0RVAl/VFXCxbdWtSXMiwW30ZHuxO/KNwghkR//2XF1E1t/OnGu0/kHEEYxV/ZFy
-         lYYuIyAgsMf7/qlF0Gb3IkvynzO+FN+vnrHlmF9kii3ZWz5hNnSh52TkqTYMD+AfZJnH
-         rP2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709673443; x=1710278243;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LpvlKXjZceUyV7T13tDS41t/F1Xa1LPW/laeLkdBF1g=;
-        b=Uvw4GyTKJEQ5WucsS3plguWU5e6gvFBNI29VVI12T6QPNIulJLJ2LtZk5D93zVri8b
-         0IYEbverdG6SPhMfGj4Uh4g6DAy1lNKaDJQmKBYgAAdVJeqLQBASdFiRa7OostfcAlBg
-         9VgBCQamAjCqYWENtfPcXhmisuBkL5tcOAX+esMwqaXc4MO6Ok7+ZZsi7WAASnD9IHAS
-         l4VQ3r9HNFTIszuOCOu5oSQBtK53SyvkMoPnt7YIu+sMKIv8eLz7/gGoHU6kWpMginBB
-         fZpdGFAGhs4NqQW/6brh9gU1+K2iibppl0dpMX0qA7UQUjUIL8RN0BXhpnY0+dH9wQtw
-         kEzw==
-X-Gm-Message-State: AOJu0YzPUu8/KeJAzsjUId5t8srOeXGZFE6ORyGlMvfJQMCL0xqShUX8
-	XRrTjJ6+G5bZl6t5ZUEUTER6MEr5vAWCoeXXSx3awfoO7mCjnIGzkCk9Lu/zsU4a/+BNTkgScWp
-	Y8z7MAVyPZIe4L4mF4sb0zG10ettEGJOzCvYN
-X-Google-Smtp-Source: AGHT+IHlC+vBw635Kt73+dsHbQtM7EL6jyFCQWoNIhJRg5JiyGmYfM2wu4YJxtfkn8eGdUtq4eym/8JfbCk0TV4RoFA=
-X-Received: by 2002:a17:906:3c17:b0:a43:86f3:b00b with SMTP id
- h23-20020a1709063c1700b00a4386f3b00bmr8581734ejg.0.1709673442968; Tue, 05 Mar
- 2024 13:17:22 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48ABC12B170;
+	Tue,  5 Mar 2024 21:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709673718; cv=fail; b=cxHkn1UAs37HZD0zXwLLzSNBkOezkt1mGmo1tLa3F9J29qMQsC2Mgmwmhq38SExQJyOBjImpOTcy0gGAFQOBCuZgRbuWtT0juDwAaqrJd8pEY7JUBKXc0OSh/sFGa2Em0WJbYDRMwEYZESnVZPxtbAjP6R/yTP+CSayT/3jM/kw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709673718; c=relaxed/simple;
+	bh=wihzzRQMyqRJ7LIfj3m+Fswenohlo6Msi6dna8XG2pA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CPkUoYHSs/3IzPzWsBezT/JpIjgGY3+xrwHPndJoEf6+VOG6KWHpCNYWK+dww2m/yMOqV/GqechafbEOnQNoQuIVyFAceIAFYXt3yTXtcAdKvcCctt56IKhfKWpKqY/hpa37l95w8aP4rnNxtqfgO7jk2bDiHw1j+tt1meNR/EM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=IUy2QBkD; arc=fail smtp.client-ip=40.107.220.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CSKtSJnSCzZVimLqsPW8t7+fa04jdSTjVUdpLvfLl3z+vUm6sjObJDvAaf0dEWtc6PR1qWzURIWPfTW9FDr3C7ST0ULm/7+Psnr6j9I6yv7cxamzE8GGXJRomxRbp2QseUYIo5poTLibVWgIZclB6H4L5PpmgdqOLnszkUOkvDvwHnMonQW1/4+Xf1biUBegSS33+lL66eA4uNcOhOt14G3iaLRtH9Kh3xpToh0R6sTBWgqxrSCKn69VH9Vp5GV5KCFu5r7dhkKK60eK1dIq7NVyCUDyNy5nxPJ2zzizqj9lP2xe7SDW9pVYhH3HrcKl2ZdgAux/+KMCx3rr4bUtrQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mSUNuvGsK7tOqKrD+NJgXgD6U4lfdplUnh1dvFCE2Qw=;
+ b=KND6isXqYimusqKzEeZy2vmZzswNWNU+DIeqBQIuBhL210BmPnX2vGaaGtS+Nti7QqB+lIpLoARuuHuFddGd3UyEGX+vZfJaHLObVkbwI0r2nj5jHrXkhgTs4nhgOEhODkYtHBGVtAzSgnVC2m7RqbqfbfNqWcyb3A8dSKs+neVsKEENxWyaWz1vhvywLShYyZLeDtK1JBN41BRrgMN/KisExAfy9Dvk63iqdz8foL0butOz7SgslS00kwTKrnwxCZTVG4M/3uyEhpTeD2AYXkgt3fK3TvBG6U6namR+kIMjr+NRSG9vOtKawmBOAY3nHaJALIIlM7DBAzq66jnOnQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mSUNuvGsK7tOqKrD+NJgXgD6U4lfdplUnh1dvFCE2Qw=;
+ b=IUy2QBkDSFvTvI7ckVmILwGawwrvfiHOajs6lR5BCWz/lGcc36WMvnpl2KcnfNCpiy5p4EN4x0tcexZrSYSALLZ+DVxDCcX62+TZaQZptmE/6CKTozCFRaSZ4tw+Li34TJY499j363iVnpLpt3IfaabxeFgK+2528pCmhayjeBVXoB3IDyrAc+6PI2KF9Bn+OjJ4tB4H/WkXPrAIVkw1J5EQMDqBAVUzE/QdTfYh2exrrsLOmykRPjoTFvQUNzeOVrZw3AASXJETdt18hoVZ4IgoZr2SqB2oilb8PTDbcQEwOg9hfpQLKmZ1+h0ENfUXFM1x9tox/aBmWPrWOv5h/Q==
+Received: from SJ0PR05CA0016.namprd05.prod.outlook.com (2603:10b6:a03:33b::21)
+ by DS0PR12MB7970.namprd12.prod.outlook.com (2603:10b6:8:149::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.38; Tue, 5 Mar
+ 2024 21:21:53 +0000
+Received: from SJ5PEPF000001D3.namprd05.prod.outlook.com
+ (2603:10b6:a03:33b:cafe::18) by SJ0PR05CA0016.outlook.office365.com
+ (2603:10b6:a03:33b::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.23 via Frontend
+ Transport; Tue, 5 Mar 2024 21:21:53 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ SJ5PEPF000001D3.mail.protection.outlook.com (10.167.242.55) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7362.11 via Frontend Transport; Tue, 5 Mar 2024 21:21:52 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 5 Mar 2024
+ 13:21:41 -0800
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Tue, 5 Mar 2024 13:21:40 -0800
+Received: from vdi.nvidia.com (10.127.8.9) by mail.nvidia.com (10.126.190.181)
+ with Microsoft SMTP Server id 15.2.1258.12 via Frontend Transport; Tue, 5 Mar
+ 2024 13:21:39 -0800
+From: David Thompson <davthompson@nvidia.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, David Thompson
+	<davthompson@nvidia.com>, Asmaa Mnebhi <asmaa@nvidia.com>
+Subject: [PATCH net-next v2] mlxbf_gige: add support to display pause frame counters
+Date: Tue, 5 Mar 2024 16:21:37 -0500
+Message-ID: <20240305212137.3525-1-davthompson@nvidia.com>
+X-Mailer: git-send-email 2.30.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240305020153.2787423-1-almasrymina@google.com>
- <20240305020153.2787423-6-almasrymina@google.com> <da42cea9-c169-599e-f087-d38c419e3dab@huawei.com>
-In-Reply-To: <da42cea9-c169-599e-f087-d38c419e3dab@huawei.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 5 Mar 2024 13:17:08 -0800
-Message-ID: <CAHS8izM7GbvWHrH=h9q0oG0DMU649EjT1udNEW_8F-hGeC15EQ@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 05/15] netdev: support binding dma-buf to netdevice
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D3:EE_|DS0PR12MB7970:EE_
+X-MS-Office365-Filtering-Correlation-Id: 59c2c038-08bb-4db1-a3e6-08dc3d5a470e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	ZCpJjS+XTQTmqCXWQCJ3hwcRWVc6mDvsTwzoo6JnVoOJMe91hah35IwPNiNiPZDEQoJ26+KizRPS2lz6Mfi9XtTJRlLo7aItbJ4A4iO7cSbYkhdMQDjtUy44seJTZl3YNy5uSqba2SiIrTLapXjTqcXt6XZBT547vbkc84v3wioeSm87wcaBCBOBPAb94JyreXnd/4XoRCqN9A8HzyaJDnM0+6kVvDYiVADrO3vbv6afFu0U2Qz7ZPp2sv1fk+B+LWJ7xSlm0eEtkFhx5dJ2e5/osrwG3DC6fZQUODlfV0AnkKyo0R/nfHXhZHdJyDiSIdotrgHqjJkHsEnfuquFX9ix+1+IKPdww6vIiybq4EZXi7slGXAoujDj28BaJBzGH8160olj8jtUPj2pbSYDYuaJIKvxVNruFpWRP5lUyMXFR5Vk8oR6h9OQw+neat+WhsEHSd3+FmaSN0serIFZtAhljKqSA326QDEQMYdf6By7/AtB/qAx38U1bA+RN77Na9CwnTOtnnZtE/KZlSPtPuyRYvEJdPqa6uDE1FEaYgBWe8NiWMUkS5kA0Jg3LV3YaPhzn49CzjDlz338xuM2CUgfSN1/B0bU5UnoL/n4IMs+n+4Q2RzROiPSpe8LWuhBnwvDHu0Te1N94BEWNhTuat4B8Wpz59mdjorTIJPdno59ekZZ4RkP7fk+T48uvMVw7Do3B3CpwkfrFgj6UveICOTbpQwFJs2pRou9Ma0MMzi9CvuLs7aKI7qfn63esX1w
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(82310400014)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2024 21:21:52.8104
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 59c2c038-08bb-4db1-a3e6-08dc3d5a470e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001D3.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7970
 
-On Tue, Mar 5, 2024 at 4:55=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
-> wrote:
->
-> On 2024/3/5 10:01, Mina Almasry wrote:
->
-> ...
->
-> >
-> > The netdev_dmabuf_binding struct is refcounted, and releases its
-> > resources only when all the refs are released.
-> >
-> > Signed-off-by: Willem de Bruijn <willemb@google.com>
-> > Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> >
-> > ---
-> >
-> > RFC v6:
-> > - Validate rx queue index
-> > - Refactor new functions into devmem.c (Pavel)
->
-> It seems odd that the functions or stucts in a file called devmem.c
-> are named after 'dmabuf' instead of 'devmem'.
->
+This patch updates the mlxbf_gige driver to support the
+"get_pause_stats()" callback, which enables display of
+pause frame counters via "ethtool -I -a oob_net0".
 
-So my intention with this naming that devmem.c contains all the
-functions for all devmem tcp specific support. Currently the only
-devmem we support is dmabuf. In the future, other devmem may be
-supported and it can fit nicely in devmem.c. For example, if we want
-to extend devmem TCP to support NVMe devices, we need to add support
-for p2pdma, maybe, and we can add that support under the devmem.c
-umbrella rather than add new files.
+The pause frame counters are only enabled if the "counters_en"
+bit is asserted in the LLU general config register. The driver
+will only report stats, and thus overwrite the default stats
+state of ETHTOOL_STAT_NOT_SET, if "counters_en" is asserted.
 
-But I can rename to dmabuf.c if there is strong objection to the current na=
-me.
+Reviewed-by: Asmaa Mnebhi <asmaa@nvidia.com>
+Signed-off-by: David Thompson <davthompson@nvidia.com>
+---
+v2
+a) Removed logic to report stats of zero if counters are
+   not enabled.  Instead, the default statistics state of
+   ETHTOOL_STAT_NOT_SET should be maintained since driver
+   is not actually reporting stats.
+b) Updated commit message accordingly
+---
+ .../mellanox/mlxbf_gige/mlxbf_gige_ethtool.c  | 36 +++++++++++++++++++
+ .../mellanox/mlxbf_gige/mlxbf_gige_regs.h     | 30 ++++++++++++++++
+ 2 files changed, 66 insertions(+)
 
-> >
->
-> ...
->
-> > diff --git a/include/net/netmem.h b/include/net/netmem.h
-> > index d8b810245c1d..72e932a1a948 100644
-> > --- a/include/net/netmem.h
-> > +++ b/include/net/netmem.h
-> > @@ -8,6 +8,16 @@
-> >  #ifndef _NET_NETMEM_H
-> >  #define _NET_NETMEM_H
-> >
-> > +#include <net/devmem.h>
-> > +
-> > +/* net_iov */
-> > +
-> > +struct net_iov {
-> > +     struct dmabuf_genpool_chunk_owner *owner;
-> > +};
-> > +
-> > +/* netmem */
-> > +
-> >  /**
-> >   * typedef netmem_ref - a nonexistent type marking a reference to gene=
-ric
-> >   * network memory.
-> > diff --git a/net/core/Makefile b/net/core/Makefile
-> > index 821aec06abf1..592f955c1241 100644
-> > --- a/net/core/Makefile
-> > +++ b/net/core/Makefile
-> > @@ -13,7 +13,7 @@ obj-y                    +=3D dev.o dev_addr_lists.o =
-dst.o netevent.o \
-> >                       neighbour.o rtnetlink.o utils.o link_watch.o filt=
-er.o \
-> >                       sock_diag.o dev_ioctl.o tso.o sock_reuseport.o \
-> >                       fib_notifier.o xdp.o flow_offload.o gro.o \
-> > -                     netdev-genl.o netdev-genl-gen.o gso.o
-> > +                     netdev-genl.o netdev-genl-gen.o gso.o devmem.o
-> >
-> >  obj-$(CONFIG_NETDEV_ADDR_LIST_TEST) +=3D dev_addr_lists_test.o
-> >
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index fe054cbd41e9..bbea1b252529 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -155,6 +155,9 @@
-> >  #include <net/netdev_rx_queue.h>
-> >  #include <net/page_pool/types.h>
-> >  #include <net/page_pool/helpers.h>
-> > +#include <linux/genalloc.h>
-> > +#include <linux/dma-buf.h>
-> > +#include <net/devmem.h>
-> >
-> >  #include "dev.h"
-> >  #include "net-sysfs.h"
-> > diff --git a/net/core/devmem.c b/net/core/devmem.c
-> > new file mode 100644
-> > index 000000000000..779ad990971e
-> > --- /dev/null
-> > +++ b/net/core/devmem.c
-> > @@ -0,0 +1,293 @@
-> > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > +/*
-> > + *      Devmem TCP
-> > + *
-> > + *      Authors:     Mina Almasry <almasrymina@google.com>
-> > + *                   Willem de Bruijn <willemdebruijn.kernel@gmail.com=
->
-> > + *                   Kaiyuan Zhang <kaiyuanz@google.com
-> > + */
-> > +
-> > +#include <linux/types.h>
-> > +#include <linux/mm.h>
-> > +#include <linux/netdevice.h>
-> > +#include <trace/events/page_pool.h>
-> > +#include <net/netdev_rx_queue.h>
-> > +#include <net/page_pool/types.h>
-> > +#include <net/page_pool/helpers.h>
-> > +#include <linux/genalloc.h>
-> > +#include <linux/dma-buf.h>
-> > +#include <net/devmem.h>
-> > +
-> > +/* Device memory support */
-> > +
-> > +#ifdef CONFIG_DMA_SHARED_BUFFER
->
-> I still think it is worth adding its own config for devmem or dma-buf
-> for networking, thinking about the embeded system.
->
+diff --git a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_ethtool.c b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_ethtool.c
+index 253d7ad9b809..8b63968bbee9 100644
+--- a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_ethtool.c
+@@ -124,6 +124,41 @@ static void mlxbf_gige_get_pauseparam(struct net_device *netdev,
+ 	pause->tx_pause = 1;
+ }
+ 
++static bool mlxbf_gige_llu_counters_enabled(struct mlxbf_gige *priv)
++{
++	u32 data;
++
++	if (priv->hw_version == MLXBF_GIGE_VERSION_BF2) {
++		data = readl(priv->llu_base + MLXBF_GIGE_BF2_LLU_GENERAL_CONFIG);
++		if (data & MLXBF_GIGE_BF2_LLU_COUNTERS_EN)
++			return true;
++	} else {
++		data = readl(priv->llu_base + MLXBF_GIGE_BF3_LLU_GENERAL_CONFIG);
++		if (data & MLXBF_GIGE_BF3_LLU_COUNTERS_EN)
++			return true;
++	}
++
++	return false;
++}
++
++static void mlxbf_gige_get_pause_stats(struct net_device *netdev,
++				       struct ethtool_pause_stats *pause_stats)
++{
++	struct mlxbf_gige *priv = netdev_priv(netdev);
++	u64 data_lo, data_hi;
++
++	/* Read LLU counters to provide stats only if counters are enabled */
++	if (mlxbf_gige_llu_counters_enabled(priv)) {
++		data_lo = readl(priv->llu_base + MLXBF_GIGE_TX_PAUSE_CNT_LO);
++		data_hi = readl(priv->llu_base + MLXBF_GIGE_TX_PAUSE_CNT_HI);
++		pause_stats->tx_pause_frames = (data_hi << 32) | data_lo;
++
++		data_lo = readl(priv->llu_base + MLXBF_GIGE_RX_PAUSE_CNT_LO);
++		data_hi = readl(priv->llu_base + MLXBF_GIGE_RX_PAUSE_CNT_HI);
++		pause_stats->rx_pause_frames = (data_hi << 32) | data_lo;
++	}
++}
++
+ const struct ethtool_ops mlxbf_gige_ethtool_ops = {
+ 	.get_link		= ethtool_op_get_link,
+ 	.get_ringparam		= mlxbf_gige_get_ringparam,
+@@ -134,6 +169,7 @@ const struct ethtool_ops mlxbf_gige_ethtool_ops = {
+ 	.get_ethtool_stats      = mlxbf_gige_get_ethtool_stats,
+ 	.nway_reset		= phy_ethtool_nway_reset,
+ 	.get_pauseparam		= mlxbf_gige_get_pauseparam,
++	.get_pause_stats	= mlxbf_gige_get_pause_stats,
+ 	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
+ 	.set_link_ksettings	= phy_ethtool_set_link_ksettings,
+ };
+diff --git a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_regs.h b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_regs.h
+index cd0973229c9b..98a8681c21b9 100644
+--- a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_regs.h
++++ b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_regs.h
+@@ -99,4 +99,34 @@
+ #define MLXBF_GIGE_100M_IPG_SIZE                      119
+ #define MLXBF_GIGE_10M_IPG_SIZE                       1199
+ 
++/* Offsets into OOB LLU block for pause frame counters */
++#define MLXBF_GIGE_BF2_TX_PAUSE_CNT_HI                0x33d8
++#define MLXBF_GIGE_BF2_TX_PAUSE_CNT_LO                0x33dc
++#define MLXBF_GIGE_BF2_RX_PAUSE_CNT_HI                0x3210
++#define MLXBF_GIGE_BF2_RX_PAUSE_CNT_LO                0x3214
++
++#define MLXBF_GIGE_BF3_TX_PAUSE_CNT_HI                0x3a88
++#define MLXBF_GIGE_BF3_TX_PAUSE_CNT_LO                0x3a8c
++#define MLXBF_GIGE_BF3_RX_PAUSE_CNT_HI                0x38c0
++#define MLXBF_GIGE_BF3_RX_PAUSE_CNT_LO                0x38c4
++
++#define MLXBF_GIGE_TX_PAUSE_CNT_HI ((priv->hw_version == MLXBF_GIGE_VERSION_BF2) ? \
++				    MLXBF_GIGE_BF2_TX_PAUSE_CNT_HI :    \
++				    MLXBF_GIGE_BF3_TX_PAUSE_CNT_HI)
++#define MLXBF_GIGE_TX_PAUSE_CNT_LO ((priv->hw_version == MLXBF_GIGE_VERSION_BF2) ? \
++				    MLXBF_GIGE_BF2_TX_PAUSE_CNT_LO : \
++				    MLXBF_GIGE_BF3_TX_PAUSE_CNT_LO)
++#define MLXBF_GIGE_RX_PAUSE_CNT_HI ((priv->hw_version == MLXBF_GIGE_VERSION_BF2) ? \
++				    MLXBF_GIGE_BF2_RX_PAUSE_CNT_HI : \
++				    MLXBF_GIGE_BF3_RX_PAUSE_CNT_HI)
++#define MLXBF_GIGE_RX_PAUSE_CNT_LO ((priv->hw_version == MLXBF_GIGE_VERSION_BF2) ? \
++				    MLXBF_GIGE_BF2_RX_PAUSE_CNT_LO : \
++				    MLXBF_GIGE_BF3_RX_PAUSE_CNT_LO)
++
++#define MLXBF_GIGE_BF2_LLU_GENERAL_CONFIG             0x2110
++#define MLXBF_GIGE_BF3_LLU_GENERAL_CONFIG             0x2030
++
++#define MLXBF_GIGE_BF2_LLU_COUNTERS_EN                BIT(0)
++#define MLXBF_GIGE_BF3_LLU_COUNTERS_EN                BIT(4)
++
+ #endif /* !defined(__MLXBF_GIGE_REGS_H__) */
+-- 
+2.30.1
 
-FWIW Willem did weigh on this previously and said he prefers to have
-it unguarded by a CONFIG, but I will submit to whatever the consensus
-here. It shouldn't be a huge deal to add a CONFIG technically
-speaking.
-
-> > +static void netdev_dmabuf_free_chunk_owner(struct gen_pool *genpool,
-> > +                                        struct gen_pool_chunk *chunk,
-> > +                                        void *not_used)
->
-> It seems odd to still keep the netdev_ prefix as it is not really related
-> to netdev, perhaps use 'net_' or something better.
->
-
-Yes, thanks for catching. I can change to net_devmem_ maybe or net_dmabuf_*=
-.
-
-> > +{
-> > +     struct dmabuf_genpool_chunk_owner *owner =3D chunk->owner;
-> > +
-> > +     kvfree(owner->niovs);
-> > +     kfree(owner);
-> > +}
-> > +
-> > +void __netdev_dmabuf_binding_free(struct netdev_dmabuf_binding *bindin=
-g)
-> > +{
-> > +     size_t size, avail;
-> > +
-> > +     gen_pool_for_each_chunk(binding->chunk_pool,
-> > +                             netdev_dmabuf_free_chunk_owner, NULL);
-> > +
-> > +     size =3D gen_pool_size(binding->chunk_pool);
-> > +     avail =3D gen_pool_avail(binding->chunk_pool);
-> > +
-> > +     if (!WARN(size !=3D avail, "can't destroy genpool. size=3D%lu, av=
-ail=3D%lu",
-> > +               size, avail))
-> > +             gen_pool_destroy(binding->chunk_pool);
-> > +
-> > +     dma_buf_unmap_attachment(binding->attachment, binding->sgt,
-> > +                              DMA_BIDIRECTIONAL);
->
-> For now DMA_FROM_DEVICE seems enough as tx is not supported yet.
->
-
-Yes, good catch. I suspect we want to reuse this code for TX path. But
-for now, I'll test with DMA_FROM_DEVICE and if I see no issues I'll
-apply this change.
-
-> > +     dma_buf_detach(binding->dmabuf, binding->attachment);
-> > +     dma_buf_put(binding->dmabuf);
-> > +     xa_destroy(&binding->bound_rxq_list);
-> > +     kfree(binding);
-> > +}
-> > +
-> > +static int netdev_restart_rx_queue(struct net_device *dev, int rxq_idx=
-)
-> > +{
-> > +     void *new_mem;
-> > +     void *old_mem;
-> > +     int err;
-> > +
-> > +     if (!dev || !dev->netdev_ops)
-> > +             return -EINVAL;
-> > +
-> > +     if (!dev->netdev_ops->ndo_queue_stop ||
-> > +         !dev->netdev_ops->ndo_queue_mem_free ||
-> > +         !dev->netdev_ops->ndo_queue_mem_alloc ||
-> > +         !dev->netdev_ops->ndo_queue_start)
-> > +             return -EOPNOTSUPP;
-> > +
-> > +     new_mem =3D dev->netdev_ops->ndo_queue_mem_alloc(dev, rxq_idx);
-> > +     if (!new_mem)
-> > +             return -ENOMEM;
-> > +
-> > +     err =3D dev->netdev_ops->ndo_queue_stop(dev, rxq_idx, &old_mem);
-> > +     if (err)
-> > +             goto err_free_new_mem;
-> > +
-> > +     err =3D dev->netdev_ops->ndo_queue_start(dev, rxq_idx, new_mem);
-> > +     if (err)
-> > +             goto err_start_queue;
-> > +
-> > +     dev->netdev_ops->ndo_queue_mem_free(dev, old_mem);
-> > +
-> > +     return 0;
-> > +
-> > +err_start_queue:
-> > +     dev->netdev_ops->ndo_queue_start(dev, rxq_idx, old_mem);
->
-> It might worth mentioning why queue start with old_mem will always
-> success here as the return value seems to be ignored here.
->
-
-So the old queue, we stopped it, and if we fail to bring up the new
-queue, then we want to start the old queue back up to get the queue
-back to a workable state.
-
-I don't see what we can do to recover if restarting the old queue
-fails. Seems like it should be a requirement that the driver tries as
-much as possible to keep the old queue restartable.
-
-I can improve this by at least logging or warning if restarting the
-old queue fails.
-
-> > +
-> > +err_free_new_mem:
-> > +     dev->netdev_ops->ndo_queue_mem_free(dev, new_mem);
-> > +
-> > +     return err;
-> > +}
-> > +
-> > +/* Protected by rtnl_lock() */
-> > +static DEFINE_XARRAY_FLAGS(netdev_dmabuf_bindings, XA_FLAGS_ALLOC1);
-> > +
-> > +void netdev_unbind_dmabuf(struct netdev_dmabuf_binding *binding)
-> > +{
-> > +     struct netdev_rx_queue *rxq;
-> > +     unsigned long xa_idx;
-> > +     unsigned int rxq_idx;
-> > +
-> > +     if (!binding)
-> > +             return;
-> > +
-> > +     if (binding->list.next)
-> > +             list_del(&binding->list);
->
-> The above does not seems to be a good pattern to delete a entry, is
-> there any reason having a checking before the list_del()? seems like
-> defensive programming?
->
-
-I think I needed to apply this condition to handle the case where
-netdev_unbind_dmabuf() is called when binding->list is not initialized
-or is empty.
-
-netdev_nl_bind_rx_doit() will call unbind to free a partially
-allocated binding in error paths, so, netdev_unbind_dmabuf() may be
-called with a partially initialized binding. This is why we check for
-binding->list is initialized here and check that rxq->binding =3D=3D
-binding below. The main point is that netdev_unbind_dmabuf() may be
-asked to unbind a partially bound dmabuf due to error paths.
-
-Maybe a comment here will test this better. I will double confirm the
-check is needed for the error paths in netdev_nl_bind_rx_doit().
-
-> > +
-> > +     xa_for_each(&binding->bound_rxq_list, xa_idx, rxq) {
-> > +             if (rxq->binding =3D=3D binding) {
->
-> It seems like defensive programming here too?
->
-> > +                     /* We hold the rtnl_lock while binding/unbinding
-> > +                      * dma-buf, so we can't race with another thread =
-that
-> > +                      * is also modifying this value. However, the dri=
-ver
-> > +                      * may read this config while it's creating its
-> > +                      * rx-queues. WRITE_ONCE() here to match the
-> > +                      * READ_ONCE() in the driver.
-> > +                      */
-> > +                     WRITE_ONCE(rxq->binding, NULL);
-> > +
-> > +                     rxq_idx =3D get_netdev_rx_queue_index(rxq);
-> > +
-> > +                     netdev_restart_rx_queue(binding->dev, rxq_idx);
-> > +             }
-> > +     }
-> > +
-> > +     xa_erase(&netdev_dmabuf_bindings, binding->id);
-> > +
-> > +     netdev_dmabuf_binding_put(binding);
-> > +}
-> > +
->
-
-
---=20
-Thanks,
-Mina
 
