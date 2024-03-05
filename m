@@ -1,98 +1,92 @@
-Return-Path: <netdev+bounces-77523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A87FC8721BD
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:40:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BF6D8721C3
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 15:42:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A8A21F23DAE
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:40:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE90DB2565F
+	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 14:42:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC72126F2A;
-	Tue,  5 Mar 2024 14:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E71686AD0;
+	Tue,  5 Mar 2024 14:42:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bZqIYLol"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WIglimTB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D882A126F21;
-	Tue,  5 Mar 2024 14:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E786127
+	for <netdev@vger.kernel.org>; Tue,  5 Mar 2024 14:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709649630; cv=none; b=uwFt9HS7CMKX8lUxGRdUxNnXrbhUWD6Sc39mFH6sX63fNkIeGhDByxtMb4dHYzbYhQiDC6qOcm7v/TBBMY5h5r3CadEIjmIYuvo4GzJfDqz8kXnTRWWROo/d7bVMlq0vwFUL2c1CEsj9Bi2BjmwS5BCG3yuFdnTHlH6tjOdVmIY=
+	t=1709649725; cv=none; b=ad2NprrAx9P+Msg8zcW0GmwjMAciSkPf9D3+ddtC7viZV8TZ34pBAlDWvMyw1BMho9eOKpebpoZFZ9QAB1mvgASh23j/etinMieuZve6k252L+BlulK9bmBxw4Y36P4akpsHmDuQu7bAV/ZhX35P2NdSVqV7MYE8Z50kXdBF6hQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709649630; c=relaxed/simple;
-	bh=wtfISWxuBL6gpZVIdQu65vHX1VbCAxch2sdGL2fIgRU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=IFeQ94GyBI8JC2eO2tOd+qIfS4nwU0Jo3A17GvDdiIhYS9Z9eU4XcwwDbLKN1RdEGoJJKTVBXeWUnk0lpccRE6PPD8I4RdzcJpAicpH2RuErmWqwZ/xYC+GNrnj1r9ghI9W4OYo9JXebGIeVHo2acEZsOGcMmQidj0N1JIrUOYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bZqIYLol; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 67474C433B2;
-	Tue,  5 Mar 2024 14:40:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709649630;
-	bh=wtfISWxuBL6gpZVIdQu65vHX1VbCAxch2sdGL2fIgRU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bZqIYLolH+S8k6WpYKowvufjV9ZYwQHp6XKDjO6yKoxKE+Uy1cRFo6JOs6nQd4s0d
-	 GGSHCGW4Vjsu0ZNP5sZREno8BhmS12gYNVQ+3vJ9ozQqYelIXIVrLQOGwdqi8kVEM+
-	 KHT0oOpMseHtMjRPEFpeLtLCiZNWw43Zo1ecYCJwATJIsvCCaw+uFQcz6qz758Vm3m
-	 JA7UhK9YkL3oseWnO2qMQX2rNH0ozJR+iGGSq/XH2XB9UCUcL6ERg3Zci7eSP3KBNs
-	 Bo/UgQNDBcCB8rMc1FWGqKgj+V5o+/I1vIViPEDFP+OrB4Z8fGqEqukhAZeKK2Qai5
-	 oIzZBb4nOhZKg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 502EED84BDE;
-	Tue,  5 Mar 2024 14:40:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709649725; c=relaxed/simple;
+	bh=TrUAkYYu/9i8Kf1LPrNJKlhJU/lsVi4hnJ+0gc046z0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cgZnDYvYLIQLHjLDyt9vCllV59s9XvSuvUzFg3oTa+T6gLLe+Fj/oL6enbFFSTx7tcNu/9KYbhx/Jgepo53R2LP/hQUrHVV2hN5KJZg7SAR0pNhXCaPUN7mj17xCDJpSNAKMWnmbaQ4vMd+zS5Nxjpea4h51aB1Cmdz1tu74mpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WIglimTB; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=2o1S9zIpxqw4C0Qpcfs+frgZUNLvoqgPxIESVdPsfn8=; b=WIglimTBPYH6TXNq5M8ZLnLARe
+	YXAFOc6Nw6lYymdezj7KVQWAYK2nkfWVIuvFHK7AwWZvHmlzzZ3LOnEK1/cs7nAu9Vc0Q5GOnzHEM
+	Zg1ioIL7neSULht6+TmqZLf87njriDBAv6GqXvclDJAM4hXjRFyK9jVHvnKWPAPP9VqRdQBJX0RWE
+	TgSSq6PI8xan+SSqFnlMLNbLP9AYc+tKtCnwg8hGu6P6zzGe8jSHa0+2pI8CqOzxF8N3mjyat9AZQ
+	5ov0XMSTOd8h+tfCOqU4p66M+WJ4GeHfTLJienPm48uqhRh2D1TJ8ieBzAW8KACZSCXlLMj09VBJ5
+	VgmrLvGA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44772)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rhVzK-0007GO-1V;
+	Tue, 05 Mar 2024 14:41:50 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rhVzG-0005UU-IK; Tue, 05 Mar 2024 14:41:46 +0000
+Date: Tue, 5 Mar 2024 14:41:46 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Diogo Ivo <diogo.ivo@siemens.com>
+Cc: danishanwar@ti.com, rogerq@kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	andrew@lunn.ch, linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org, jan.kiszka@siemens.com
+Subject: Re: [PATCH net-next v4 05/10] net: ti: icssg-prueth: Add
+ SR1.0-specific description bits
+Message-ID: <ZecvKo1HDAXD0n7Q@shell.armlinux.org.uk>
+References: <20240305114045.388893-1-diogo.ivo@siemens.com>
+ <20240305114045.388893-6-diogo.ivo@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/4] can: kvaser_usb: Add support for Leaf v3
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170964963032.12526.7900714399345532932.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Mar 2024 14:40:30 +0000
-References: <20240304092051.3631481-2-mkl@pengutronix.de>
-In-Reply-To: <20240304092051.3631481-2-mkl@pengutronix.de>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- linux-can@vger.kernel.org, kernel@pengutronix.de, extja@kvaser.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240305114045.388893-6-diogo.ivo@siemens.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
+On Tue, Mar 05, 2024 at 11:40:25AM +0000, Diogo Ivo wrote:
+> +struct emac_tx_ts_response_sr1 {
+> +	u32 lo_ts;
+> +	u32 hi_ts;
+> +	u32 reserved;
+> +	u32 cookie;
+> +};
 
-This series was applied to netdev/net-next.git (main)
-by Marc Kleine-Budde <mkl@pengutronix.de>:
+In patch 10, this comes from skb->data, so seems to be a packet. Is the
+data dependent on the host endian, or is it always little endian?
 
-On Mon,  4 Mar 2024 10:13:55 +0100 you wrote:
-> From: Jimmy Assarsson <extja@kvaser.com>
-> 
-> Add support for Kvaser Leaf v3, based on the hydra platform.
-> 
-> Signed-off-by: Jimmy Assarsson <extja@kvaser.com>
-> Link: https://lore.kernel.org/all/20240223095217.43783-1-extja@kvaser.com
-> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,1/4] can: kvaser_usb: Add support for Leaf v3
-    https://git.kernel.org/netdev/net-next/c/0b40cd9b4ecc
-  - [net-next,2/4] can: kvaser_pciefd: Add support for Kvaser PCIe 8xCAN
-    https://git.kernel.org/netdev/net-next/c/9b221ba452aa
-  - [net-next,3/4] can: gs_usb: gs_cmd_reset(): use cpu_to_le32() to assign mode
-    https://git.kernel.org/netdev/net-next/c/ef488e47e060
-  - [net-next,4/4] can: mcp251xfd: __mcp251xfd_get_berr_counter(): use CAN_BUS_OFF_THRESHOLD instead of open coding it
-    https://git.kernel.org/netdev/net-next/c/79f7319908fb
-
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
