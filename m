@@ -1,118 +1,201 @@
-Return-Path: <netdev+bounces-77937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA40C87380F
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:46:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F43B873818
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:48:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 636B91F248D6
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:46:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81A051C21BC9
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:48:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17929131738;
-	Wed,  6 Mar 2024 13:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DA0131742;
+	Wed,  6 Mar 2024 13:48:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="awCPkog/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ifg9OjED"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E3F13172F;
-	Wed,  6 Mar 2024 13:46:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.244.183.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E9D3131735;
+	Wed,  6 Mar 2024 13:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709732773; cv=none; b=ebeua02FF5r9c5SCDJWlC8XBJVQ7W11/A9Nk/6uCnd2CH7dmmdiUfCb+0YVYWA+1aguJoy9mAnBr8XztvogC3ArGLaKNYdPYW5hdDQAkExHo/SdBWuzrwNAQ5cRc66e2t+p0gIp/sp6lYU/8H6blFaiVK1O3HHi67noMuAfNJZU=
+	t=1709732906; cv=none; b=k6Ib7M07w/np5oWzpsHj9vwyw2yqYPPPUhOHiYbA6jkTDPacNSPr2R/MQfuOuElJ0xv/ice9zRmgMvYd1m9JtYYb7q38R5skB9U4eXObvF7S9328XC8x6crce/GDVcdXBnmQ1y44+cKtbzE+OF5BrdvMZnnJLohDYcZhBe5vtt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709732773; c=relaxed/simple;
-	bh=T4XufvKumvfjA/Mzi1v3U795CeS7EnqB34S1cub0C5Y=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=n7FXG+CxzrSgHSgCMcVTmwQbzYQWDBXBX6XRLjBagtF9T8N2uX/yGjm1tRYFcZ2j/IvcXDy6yCjZOK/dWAx8CyUyDKDR+/1ir/0ty0ypJb369H88/4hKcSH0Q7iEUp1WAD+N0tdC9cHMTXjc6FCaBSBUsxepBqoihze2h0FC/Hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=awCPkog/; arc=none smtp.client-ip=91.244.183.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infotecs.ru
-Received: from mx0.infotecs-nt (localhost [127.0.0.1])
-	by mx0.infotecs.ru (Postfix) with ESMTP id BC12F148956B;
-	Wed,  6 Mar 2024 16:46:07 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru BC12F148956B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
-	t=1709732768; bh=T4XufvKumvfjA/Mzi1v3U795CeS7EnqB34S1cub0C5Y=;
-	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=awCPkog/UsHiG65vXSzgTrIA/kznIAK7fWHki/jJb70Pt+LxTB10vD4pr6x1OHOk2
-	 sTTeWLA2YHTUreG68xGwUFwlvW1HJScFim8N48ACrVjMhazmkHIRJTodV0YN61DYSV
-	 97Czb+g/AJi389fBnDEPs6Wwk/aHOkPSRPakwT/U=
-Received: from msk-exch-01.infotecs-nt (msk-exch-01.infotecs-nt [10.0.7.191])
-	by mx0.infotecs-nt (Postfix) with ESMTP id B9582303407D;
-	Wed,  6 Mar 2024 16:46:07 +0300 (MSK)
-From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-To: Tom Parkin <tparkin@katalix.com>
-CC: James Chapman <jchapman@katalix.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "lvc-project@linuxtesting.org"
-	<lvc-project@linuxtesting.org>
-Subject: Re: [PATCH net-next] l2tp: fix incorrect parameter validation in the
- pppol2tp_getsockopt() function
-Thread-Topic: [PATCH net-next] l2tp: fix incorrect parameter validation in the
- pppol2tp_getsockopt() function
-Thread-Index: AQHab8yjjDkKg7PSKU+NNTqnqRR+7g==
-Date: Wed, 6 Mar 2024 13:46:07 +0000
-Message-ID: <c9dd0486-aacc-4263-bcce-630fad445e72@infotecs.ru>
-References: <20240306095449.1782369-1-Ilia.Gavrilov@infotecs.ru>
- <ZehsL8sHd3vgplv1@katalix.com>
-In-Reply-To: <ZehsL8sHd3vgplv1@katalix.com>
-Accept-Language: ru-RU, en-US
-Content-Language: ru-RU
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E8CDFB5F977CF94BB7781A0247BBE62D@infotecs.ru>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1709732906; c=relaxed/simple;
+	bh=VDpu+cZ5zhuVvsVsTCuRVqA9E8ZW3/PpKW/5AAaYH/4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=F0/vcK9NoiOr+VKFu7MY4oR7Gt2K3jxIbzNrFJVN48qqLv+VwjkGVJ5xzg9J95eSEPDcomxsLhX1Lj0Oz84eSO1pJiduIT+sJH7IQFbxuOz7Y/8sMev894UWHN2iSqDhr+xlffu/CjelrTb36I1mCMmg21tl5HX6VgxgxeThH8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ifg9OjED; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C44AC433C7;
+	Wed,  6 Mar 2024 13:48:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709732906;
+	bh=VDpu+cZ5zhuVvsVsTCuRVqA9E8ZW3/PpKW/5AAaYH/4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Ifg9OjEDqjVXKXLDmpO4SCEBdlsfBBcnZ8ZKk+7pZyKeRpXEo5x9Yup3aKaXnEnyj
+	 LJ8Q4G84VFcz2nG2o65TwiB3Qxnz6Er9ZJ81Mjk/8yttaBdX60g/YSu7U4/PHOmfh4
+	 O9IGCRMeZzR7BZrX/E1TR//IqLXmQffo2f82EBAia8xhjTSXRCbuhCbOfJ+/j71LY6
+	 bwXjrxCzh/yANUKzZPoUm7A5UoHxAzx8YxCdAeLpEFkaaO3QskrqqRLu2YoY7dw6Ji
+	 jwrfuUJ8PZ9czksjfAnaLt04UZ2/5vWz8IyRV6tWH3i9fr/LCji74UD7WdUgG2Xw64
+	 GdC3RFFKG2ifQ==
+Message-ID: <8a8b4320-924a-4dd3-973b-ca941489f19b@kernel.org>
+Date: Wed, 6 Mar 2024 15:48:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KLMS-Rule-ID: 5
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2024/03/06 12:45:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2024/03/06 11:20:00 #24013337
-X-KLMS-AntiVirus-Status: Clean, skipped
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net RESEND] net: ethernet: ti: am65-cpsw: Add
+ IFF_UNICAST_FLT flag to port device
+Content-Language: en-US
+To: =?UTF-8?B?U2FuanXDoW4gR2FyY8OtYSwgSm9yZ2U=?=
+ <Jorge.SanjuanGarcia@duagon.com>, "olteanv@gmail.com" <olteanv@gmail.com>,
+ "r-gunasekaran@ti.com" <r-gunasekaran@ti.com>
+Cc: "s-vadapalli@ti.com" <s-vadapalli@ti.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "andrew@lunn.ch" <andrew@lunn.ch>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
+ "kuba@kernel.org" <kuba@kernel.org>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, Pekka Varis <p-varis@ti.com>
+References: <20240228111300.2516590-1-jorge.sanjuangarcia@duagon.com>
+ <20240228200516.1166a097@kernel.org>
+ <03bf515c-9f90-487c-ecfa-90d407dc5d86@ti.com>
+ <20240301154957.xex75zuijptswcf3@skbuf>
+ <7a39e5266fa3ac781f1eda7ee0b2526bd2f164d0.camel@duagon.com>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <7a39e5266fa3ac781f1eda7ee0b2526bd2f164d0.camel@duagon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-T24gMy82LzI0IDE2OjE0LCBUb20gUGFya2luIHdyb3RlOg0KPiBPbiAgV2VkLCBNYXIgMDYsIDIw
-MjQgYXQgMDk6NTg6MTAgKzAwMDAsIEdhdnJpbG92IElsaWEgd3JvdGU6DQo+PiBkaWZmIC0tZ2l0
-IGEvbmV0L2wydHAvbDJ0cF9wcHAuYyBiL25ldC9sMnRwL2wydHBfcHBwLmMNCj4+IGluZGV4IGYw
-MTFhZjY2MDFjOS4uNjE0NmU0ZTY3YmJiIDEwMDY0NA0KPj4gLS0tIGEvbmV0L2wydHAvbDJ0cF9w
-cHAuYw0KPj4gKysrIGIvbmV0L2wydHAvbDJ0cF9wcHAuYw0KPj4gQEAgLTEzNTYsMTEgKzEzNTYs
-MTEgQEAgc3RhdGljIGludCBwcHBvbDJ0cF9nZXRzb2Nrb3B0KHN0cnVjdCBzb2NrZXQgKnNvY2ss
-IGludCBsZXZlbCwgaW50IG9wdG5hbWUsDQo+PiAgIAlpZiAoZ2V0X3VzZXIobGVuLCBvcHRsZW4p
-KQ0KPj4gICAJCXJldHVybiAtRUZBVUxUOw0KPj4gICANCj4+IC0JbGVuID0gbWluX3QodW5zaWdu
-ZWQgaW50LCBsZW4sIHNpemVvZihpbnQpKTsNCj4+IC0NCj4+ICAgCWlmIChsZW4gPCAwKQ0KPj4g
-ICAJCXJldHVybiAtRUlOVkFMOw0KPj4gICANCj4+ICsJbGVuID0gbWluX3QodW5zaWduZWQgaW50
-LCBsZW4sIHNpemVvZihpbnQpKTsNCj4+ICsNCj4+ICAgCWVyciA9IC1FTk9UQ09OTjsNCj4+ICAg
-CWlmICghc2stPnNrX3VzZXJfZGF0YSkNCj4+ICAgCQlnb3RvIGVuZDsNCj4gDQo+IEkgdGhpbmsg
-dGhpcyBjb2RlIGluIGwydHBfcHBwLmMgaGFzIHByb2JhYmx5IGJlZW4gaW5zcGlyZWQgYnkgYQ0K
-PiBzaW1pbGFyIGltcGxlbWVudGF0aW9ucyBlbHNld2hlcmUgaW4gdGhlIGtlcm5lbCAtLSBmb3Ig
-ZXhhbXBsZQ0KPiBuZXQvaXB2NC91ZHAuYyB1ZHBfbGliX2dldHNvY2tvcHQgZG9lcyB0aGUgc2Ft
-ZSB0aGluZywgYW5kIGFwcGFyZW50bHkNCj4gaGFzIGJlZW4gdGhhdCB3YXkgc2luY2UgdGhlIGRh
-d24gb2YgZ2l0IHRpbWUuDQo+IA0KPiBJIG5vdGUgaG93ZXZlciB0aGF0IHBsZW50eSBvZiBvdGhl
-ciBnZXRzb2Nrb3B0IGltcGxlbWVudGF0aW9ucyB3aGljaA0KPiBhcmUgdXNpbmcgbWluX3QodW5z
-aWduZWQgaW50LCBsZW4sIHNpemVvZihpbnQpKSBkb24ndCBjaGVjayB0aGUgbGVuZ3RoDQo+IHZh
-bHVlIGF0IGFsbDogYXMgYW4gZXhhbXBsZSwgbmV0L2lwdjYvcmF3LmMgZG9fcmF3djZfZ2V0c29j
-a29wdC4NCj4gDQo+IEFzIGl0IHN0YW5kcyByaWdodCBub3cgaW4gdGhlIGwydHBfcHBwLmMgY29k
-ZSwgSSB0aGluayB0aGUgY2hlY2sgb24NCj4gbGVuIHdpbGwgZW5kIHVwIGRvaW5nIG5vdGhpbmcs
-IGFzIHlvdSBwb2ludCBvdXQuDQo+IA0KPiBTbyBtb3ZpbmcgdGhlIGxlbiBjaGVjayB0byBiZWZv
-cmUgdGhlIG1pbl90KCkgY2FsbCBtYXkgaW4gdGhlb3J5DQo+IHBvc3NpYmx5IGNhdGNoIG91dCAo
-aW5zYW5lPykgdXNlcnNwYWNlIGNvZGUgcGFzc2luZyBpbiBuZWdhdGl2ZQ0KPiBudW1iZXJzIHdo
-aWNoIG1heSAid29yayIgd2l0aCB0aGUgY3VycmVudCBrZXJuZWwgY29kZS4NCj4gDQo+IEkgd29u
-ZGVyIHdoZXRoZXIgaXRzIHNhZmVyIHRoZXJlZm9yZSB0byByZW1vdmUgdGhlIGxlbiBjaGVjaw0K
-PiBhbHRvZ2V0aGVyPw0KDQpUaGFuayB5b3UgZm9yIGFuc3dlci4NCg0KSW4gbXkgb3Bpbmlvbiwg
-aXQgaXMgYmV0dGVyIHRvIGxlYXZlIHRoZSAnbGVuJyBjaGVjay4gVGhpcyB3YXkgaXQgd2lsbCAN
-CmJlIGVhc2llciBmb3IgdGhlIHVzZXIgdG8gdW5kZXJzdGFuZCB3aGVyZSB0aGUgZXJyb3IgaXMu
-DQo=
+
+
+On 04/03/2024 12:27, Sanjuán García, Jorge wrote:
+> On Fri, 2024-03-01 at 17:49 +0200, Vladimir Oltean wrote:
+>> [No suele recibir correo electrónico de olteanv@gmail.com. Descubra
+>> por qué esto es importante en
+>> https://aka.ms/LearnAboutSenderIdentification ]
+>>
+>> On Fri, Mar 01, 2024 at 04:39:50PM +0530, Ravi Gunasekaran wrote:
+>>> On 2/29/24 9:35 AM, Jakub Kicinski wrote:
+>>>> On Wed, 28 Feb 2024 11:13:23 +0000 Sanjuán García, Jorge wrote:
+>>>>> Since commit 8940e6b669ca ("net: dsa: avoid call to
+>>>>> __dev_set_promiscuity()
+>>>>> while rtnl_mutex isn't held") when conecting one of this
+>>>>> switch's port
+>>>>> to a DSA switch as the conduit interface, the network interface
+>>>>> is set to
+>>>>> promiscuous mode by default and cannot be set to not
+>>>>> promiscuous mode again
+>>>>> from userspace. The reason for this is that the cpsw ports net
+>>>>> devices
+>>>>> do not have the flag IFF_UNICAST_FLT set in their private
+>>>>> flags.
+>>>>>
+>>>>> The cpsw switch should be able to set not promiscuous mode as
+>>>>> otherwise
+>>>>> a '1' is written to bit ALE_PORT_MACONLY_CAF which makes
+>>>>> ethernet frames
+>>>>> get an additional VLAN tag when entering the port connected to
+>>>>> the DSA
+>>>>> switch. Setting the IFF_UNICAST_FLT flag to all ports allows us
+>>>>> to have
+>>>>> the conduit interface on the DSA subsystem set as not
+>>>>> promiscuous.
+>>>>
+>>>> It doesn't look like am65-cpsw-nuss supports unicast filtering,
+>>>> tho, does it? So we're lying about support to work around some
+>>>> CPSW weirdness (additional VLAN tag thing)?
+>>>
+>>> CPSW driver does not support unicast filtering.
+>>
+>> Then the driver can't declare IFF_UNICAST_FLT.
+>>
+>> Why does enabling promiscuous mode cause Ethernet frames to get an
+>> additional VLAN tag? 802.3 clause 4.2.4.1.1 Address recognition only
+>> says "The MAC sublayer may also provide the capability of operating
+>> in
+>> the promiscuous receive mode. In this mode of operation, the MAC
+>> sublayer recognizes and accepts all valid frames, regardless of their
+>> Destination Address field values.". Absolutely nothing about VLAN.
+> 
+> Hi,
+> 
+> Thank you all very much for the reviews. It is clear now we should not
+> add this IFF_UNICAST_FLT flag to this driver.
+> 
+> I may do some new investigations to find out exactly why this CPSW
+> driver is adding VLAN tags when set to promiscuous mode. The CPSW HW is
+> definetly adding VLAN tags whenever bit Iy_REG_Py_MACONLY of register
+> CPSW_Iy_ALE_PORTCTL0_y gets a "1". Maybe there is some extra
+
+MAC_ONLY and MAC_ONLY_CAF are different bits in the
+CPSW_ALE_PORT_CONTROL_REG_y register [1].
+
+Promiscuous mode sets the MAC_ONLY_CAF bit.
+
+From TRM [1] , MAC =
+"
+Mac Only Copy All Frames.
+When set a Mac Only port will transfer all received good frames to
+the host.
+When clear a Mac Only port will transfer packets to the host based
+on ALE destination address lookup operation (which operates more
+like an Ethernet Mac).
+A Mac Only port is a port with maconly set.
+"
+
+Since you are operating the CPSW in MAC mode I believe MAC_ONLY is
+set as well for you. That is fine.
+
+Now, from [2], the CPSW hardware seems to poke around VLAN tags
+only if VLAN_AWARE bit in CPSW_CONTROL_REG is set which seems
+to be the case by default.
+
+> static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
+> {
+>         struct am65_cpsw_host *host_p = am65_common_get_host(common);
+>         int port_idx, i, ret, tx;
+>         struct sk_buff *skb;
+>         u32 val, port_mask;
+> 
+>         if (common->usage_count)
+>                 return 0;
+> 
+>         /* Control register */
+>         writel(AM65_CPSW_CTL_P0_ENABLE | AM65_CPSW_CTL_P0_TX_CRC_REMOVE |
+>                AM65_CPSW_CTL_VLAN_AWARE | AM65_CPSW_CTL_P0_RX_PAD,
+>                common->cpsw_base + AM65_CPSW_REG_CTL);
+
+One thing you could try is to not set AM65_CPSW_CTL_VLAN_AWARE here
+and see if it resolves your case.
+
+There was a patch sent recently [3] to play around this bit but it was
+not clear why it was required. If AM65_CPSW_CTL_VLAN_AWARE is indeed the
+cause of trouble here then it should be disabled by default.
+
+[1] - https://www.ti.com/lit/pdf/spruid7
+12.2.1.6.10.12 CPSW_ALE_PORT_CONTROL_REG_y Register
+
+[2] - https://www.ti.com/lit/pdf/spruid7
+12.2.1.4.6.4.1 Transmit VLAN Processing
+
+[3] - https://lore.kernel.org/all/20240227082815.2073826-1-s-vadapalli@ti.com/
+
+> configuration needed but as far a the current am65-cpsw-nuss.c
+> implementation goes, am65_cpsw_slave_set_promisc() only sets that bit.
+> 
+> Best regards,
+> Jorge
+
+-- 
+cheers,
+-roger
 
