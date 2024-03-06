@@ -1,134 +1,351 @@
-Return-Path: <netdev+bounces-78069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EA7C873FC1
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 19:39:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16F21873FC7
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 19:40:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0F6E1C22DAD
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:39:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A8411C2312E
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:40:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DFCF143C60;
-	Wed,  6 Mar 2024 18:35:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25D8213E7F5;
+	Wed,  6 Mar 2024 18:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="EfsEePAc"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9337E143C55
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 18:35:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79BCB137922
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 18:39:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709750153; cv=none; b=I4035jUNt39w6qdpOyWj+agkX9OBRTKRrMDrj0wxmAkHYJYd+ngl39YrhU0MO4TBqbwONAuoBjx9AVyDZ9HgjO5Zk+ewQZQx1ls6suipYiYw2YI4/p77mICMExlxVwAv5wlTQ4k+8pLFq2zy466kTELAkhZ2fn0wxRDmV87qy44=
+	t=1709750362; cv=none; b=p1WTlmhmJ1gnZ5Biz2YsIZs74Hz3Y/yyET1b0gybiDnkuvTMlobN0TL2967ln0ne/jZ066hr1XO0J+E0fqrEk/JKfDhG32LqdJOC6SjSdQkRLBfCelYI0p47m0ZHAnAhMiW9n6OeUUj9i0HnP8ElsMX+Twkm26CsnJF9EvZ/Nxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709750153; c=relaxed/simple;
-	bh=1vIIlOoXQqaRL43xN9hPITwtLtN+twVOgmkPslLsNSY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AgZQEflz7NUTXkXy1dz6wY27BOezFOGbt0n5W93RNspMqdmlHXI48sxJhYe8bY7RjHvL8mUEHqlw4cO4tpyk2+0jweGC9JQD0ccAH2TqFBwjKBUvBXVHP8jK7nhV4cGJHlgG9uI3Hg/jtvYJynoxAUQ+qKCAhCK19iuRaFqR87Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rhw7D-0005KA-VB; Wed, 06 Mar 2024 19:35:43 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rhw7C-004nYD-HC; Wed, 06 Mar 2024 19:35:42 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rhw7C-000p5I-1P;
-	Wed, 06 Mar 2024 19:35:42 +0100
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	kernel@pengutronix.de
-Subject: [PATCH next] net: rfkill: gpio: Convert to platform remove callback returning void
-Date: Wed,  6 Mar 2024 19:35:38 +0100
-Message-ID: <20240306183538.88777-2-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1709750362; c=relaxed/simple;
+	bh=4GYSFtw+DSNrL4z26jMexmeJTA8eECVNcGcseKYEMyA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FW/9IV7NHQc+hTAH9/1jpW7HWyOTkLtgv4GOkQqbruwVjl8GMivheYaiwTufudBeJriEx0PfDjqbgNn8bACbQybJPB0sDo0e+g1Y5d1cUGSCyKP2i+X/wXkvszT5RLnUiYXyCbcAr/NRIVFeaQhy2kwTIj1cOgt5r/LbMZcTDVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org; spf=none smtp.mailfrom=phenome.org; dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b=EfsEePAc; arc=none smtp.client-ip=195.121.94.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=phenome.org
+X-KPN-MessageId: 8cadb367-dbe8-11ee-bfb6-005056ab378f
+Received: from smtp.kpnmail.nl (unknown [10.31.155.39])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 8cadb367-dbe8-11ee-bfb6-005056ab378f;
+	Wed, 06 Mar 2024 19:37:13 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=kpnmail.nl; s=kpnmail01;
+	h=content-type:mime-version:message-id:subject:to:from:date;
+	bh=TBzQS2gpShD9BM1H4ufqUQ5CYk2U0L9GJQHGOL0v70Q=;
+	b=EfsEePAcDG3YzchgwsOkUDz48tnjF6kmslvjOPNQWF8jCYT3ZjkCDRfX5RatPDD9Ek/lmC9XIewlH
+	 d5c/BIm/aCtrM2MScKXt1AZCW7tGp62kGlGyekjVKuSefonPBYRnQ2wvarDhH4SHc/YgtLXN54JAyr
+	 ekLthGduVX5zLYpc=
+X-KPN-MID: 33|4hUpY0HYzHPyjRlH+FXZnIa9+NG+LNqCNodxV83rsM4pV16J0/xvlZ8xNQs6r+n
+ g9/xNsWbbwJYhlZopT20Cd1Zzr3YkqbnLGI1ajmn/Z+8=
+X-KPN-VerifiedSender: No
+X-CMASSUN: 33|wEj69BV0zgmYXWpkmdAWofVolLE6gh3yORO1GloSk/LQ5FbXRv9iKfCgFZRkhPt
+ 5GHo8ZWxp06CoPL2sVU43eg==
+Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id ac70045f-dbe8-11ee-8d35-005056ab7447;
+	Wed, 06 Mar 2024 19:38:08 +0100 (CET)
+Date: Wed, 6 Mar 2024 19:38:06 +0100
+From: Antony Antony <antony@phenome.org>
+To: Eyal Birger <eyal.birger@gmail.com>
+Cc: antony.antony@secunet.com, netdev@vger.kernel.org,
+	devel@linux-ipsec.org, Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [DKIM] Re: [devel-ipsec] [PATCH ipsec-next] xfrm: Add Direction
+ to the SA in or out
+Message-ID: <Zei4DjGVpg6Tgr0P@Antony2201.local>
+References: <d84a02e019ef188c4295089f6134af67ef7e7452.1709498351.git.antony.antony@secunet.com>
+ <CAHsH6Gtx6Jrs5TWWraDqSzfAuEth=13fvC73+afXCmYJBvbm3w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2029; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=1vIIlOoXQqaRL43xN9hPITwtLtN+twVOgmkPslLsNSY=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBl6Ld6SXNQ8RTQGV6ETDKHTmfaKrEzAajOf//vI aD7Twxafl6JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZei3egAKCRCPgPtYfRL+ TliWB/4/44bcLECBDXbTYdOrnui5QJtNtr/GO/rgOMROTbzVURUfiQFiqKq2+5VFqIptqQiyyB2 yrWVWkXmXIyuvb5TDcbgoZWWwxv+zCF7SrX7S3bFOn9kWPaDEdbQKCh6trAHBsz9XZa+RVgYa8w MYoRMLTDXVcPS9p0fJKXf0CFEgjdBzod6gkiX37Oj5ur7Hm+EhdLjif6enPC42LCIw2NBwoQq4D eJZk43wPzmBA5cAmtl802rhpxI2RA9WCBHO+GibMoD/bGX/fhI9QL+PWxfBr9wFGqyltcdLc9qM 2W02UJ4z5D/p1e5u0/+zb0hJjNET5bbA9cTak6GR9MHiyMiL
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <CAHsH6Gtx6Jrs5TWWraDqSzfAuEth=13fvC73+afXCmYJBvbm3w@mail.gmail.com>
 
-The .remove() callback for a platform driver returns an int which makes
-many driver authors wrongly assume it's possible to do error handling by
-returning an error code. However the value returned is ignored (apart
-from emitting a warning) and this typically results in resource leaks.
+Hi Eyal,
 
-To improve here there is a quest to make the remove callback return
-void. In the first step of this quest all drivers are converted to
-.remove_new(), which already returns void. Eventually after all drivers
-are converted, .remove_new() will be renamed to .remove().
+On Sun, Mar 03, 2024 at 02:30:46PM -0800, Eyal Birger via Devel wrote:
+..
+> On Sun, Mar 3, 2024 at 1:09 PM Antony Antony <antony.antony@secunet.com> 
+> wrote:
+> >
+> > This patch introduces the 'dir' attribute, 'in' or 'out', to the
+> > xfrm_state, SA, enhancing usability by delineating the scope of values
+> > based on direction. An input SA will now exclusively encompass values
+> > pertinent to input, effectively segregating them from output-related
+> > values. This change aims to streamline the configuration process and
+> > improve the overall clarity of SA attributes.
+> 
+> Nice! Minor comments below.
 
-Trivially convert this driver from always returning zero in the remove
-callback to the void returning variant.
+Thanks for your feedback. See my response below. I don't understand how 
+would I add ".strict_start_type". 
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
-Hello,
+> >
+> > Signed-off-by: Antony Antony <antony.antony@secunet.com>
+> > ---
+> >  include/net/xfrm.h        |  1 +
+> >  include/uapi/linux/xfrm.h |  8 ++++++++
+> >  net/xfrm/xfrm_compat.c    |  6 ++++--
+> >  net/xfrm/xfrm_device.c    |  5 +++++
+> >  net/xfrm/xfrm_state.c     |  1 +
+> >  net/xfrm/xfrm_user.c      | 43 +++++++++++++++++++++++++++++++++++----
+> >  6 files changed, 58 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+> > index 1d107241b901..91348a03469c 100644
+> > --- a/include/net/xfrm.h
+> > +++ b/include/net/xfrm.h
+> > @@ -289,6 +289,7 @@ struct xfrm_state {
+> >         /* Private data of this transformer, format is opaque,
+> >          * interpreted by xfrm_type methods. */
+> >         void                    *data;
+> > +       enum xfrm_sa_dir        dir;
+> >  };
+> >
+> >  static inline struct net *xs_net(struct xfrm_state *x)
+> > diff --git a/include/uapi/linux/xfrm.h b/include/uapi/linux/xfrm.h
+> > index 6a77328be114..2f1d67239301 100644
+> > --- a/include/uapi/linux/xfrm.h
+> > +++ b/include/uapi/linux/xfrm.h
+> > @@ -141,6 +141,13 @@ enum {
+> >         XFRM_POLICY_MAX = 3
+> >  };
+> >
+> > +enum xfrm_sa_dir {
+> > +       XFRM_SA_DIR_UNSET = 0,
+> > +       XFRM_SA_DIR_IN  = 1,
+> > +       XFRM_SA_DIR_OUT = 2,
+> > +       XFRM_SA_DIR_MAX = 3,
+> 
+> nit: comma is redundant after a "MAX" no?
 
-this is merge window material. I'm unsure if I should put "net-next" or
-"next" or "wireless-next" into the subject line. I hope my choice
-doesn't make people angry :-)
+I removed it. Actually XFRM_SA_DIR_MAX also as Leon pointed out it is not 
+necessary.
 
-Best regards
-Uwe
+> 
+> > +};
+> > +
+> >  enum {
+> >         XFRM_SHARE_ANY,         /* No limitations */
+> >         XFRM_SHARE_SESSION,     /* For this session only */
+> > @@ -315,6 +322,7 @@ enum xfrm_attr_type_t {
+> >         XFRMA_SET_MARK_MASK,    /* __u32 */
+> >         XFRMA_IF_ID,            /* __u32 */
+> >         XFRMA_MTIMER_THRESH,    /* __u32 in seconds for input SA */
+> > +       XFRMA_SA_DIR,           /* __u8 */
+> >         __XFRMA_MAX
+> >
+> >  #define XFRMA_OUTPUT_MARK XFRMA_SET_MARK       /* Compatibility */
+> > diff --git a/net/xfrm/xfrm_compat.c b/net/xfrm/xfrm_compat.c
+> > index 655fe4ff8621..de0e1508f870 100644
+> > --- a/net/xfrm/xfrm_compat.c
+> > +++ b/net/xfrm/xfrm_compat.c
+> > @@ -129,6 +129,7 @@ static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
+> >         [XFRMA_SET_MARK_MASK]   = { .type = NLA_U32 },
+> >         [XFRMA_IF_ID]           = { .type = NLA_U32 },
+> >         [XFRMA_MTIMER_THRESH]   = { .type = NLA_U32 },
+> > +       [XFRMA_SA_DIR]          = { .type = NLA_U8 },
+> >  };
+> >
+> >  static struct nlmsghdr *xfrm_nlmsg_put_compat(struct sk_buff *skb,
+> > @@ -277,9 +278,10 @@ static int xfrm_xlate64_attr(struct sk_buff *dst, const struct nlattr *src)
+> >         case XFRMA_SET_MARK_MASK:
+> >         case XFRMA_IF_ID:
+> >         case XFRMA_MTIMER_THRESH:
+> > +       case XFRMA_SA_DIR:
+> >                 return xfrm_nla_cpy(dst, src, nla_len(src));
+> >         default:
+> > -               BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
+> > +               BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
+> >                 pr_warn_once("unsupported nla_type %d\n", src->nla_type);
+> >                 return -EOPNOTSUPP;
+> >         }
+> > @@ -434,7 +436,7 @@ static int xfrm_xlate32_attr(void *dst, const struct nlattr *nla,
+> >         int err;
+> >
+> >         if (type > XFRMA_MAX) {
+> > -               BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
+> > +               BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
+> >                 NL_SET_ERR_MSG(extack, "Bad attribute");
+> >                 return -EOPNOTSUPP;
+> >         }
+> > diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+> > index 3784534c9185..11339d7d7140 100644
+> > --- a/net/xfrm/xfrm_device.c
+> > +++ b/net/xfrm/xfrm_device.c
+> > @@ -253,6 +253,11 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
+> >                 return -EINVAL;
+> >         }
+> >
+> > +       if (xuo->flags & XFRM_OFFLOAD_INBOUND && x->dir != XFRM_SA_DIR_IN) {
+> > +               NL_SET_ERR_MSG(extack, "Mismatch in SA and offload direction");
+> > +               return -EINVAL;
+> > +       }
+> > +
+> >         is_packet_offload = xuo->flags & XFRM_OFFLOAD_PACKET;
+> >
+> >         /* We don't yet support UDP encapsulation and TFC padding. */
+> > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> > index bda5327bf34d..0d6f5a49002f 100644
+> > --- a/net/xfrm/xfrm_state.c
+> > +++ b/net/xfrm/xfrm_state.c
+> > @@ -1744,6 +1744,7 @@ static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig,
+> >         x->lastused = orig->lastused;
+> >         x->new_mapping = 0;
+> >         x->new_mapping_sport = 0;
+> > +       x->dir = orig->dir;
+> >
+> >         return x;
+> >
+> > diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+> > index ad01997c3aa9..fe4576e96dd4 100644
+> > --- a/net/xfrm/xfrm_user.c
+> > +++ b/net/xfrm/xfrm_user.c
+> > @@ -360,6 +360,16 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
+> >                 }
+> >         }
+> >
+> > +       if (attrs[XFRMA_SA_DIR]) {
+> > +               u8 sa_dir = nla_get_u8(attrs[XFRMA_SA_DIR]);
+> > +
+> > +               if (!sa_dir || sa_dir >= XFRM_SA_DIR_MAX)  {
+> > +                       NL_SET_ERR_MSG(extack, "XFRMA_SA_DIR attribute is out of range");
+> > +                       err = -EINVAL;
+> > +                       goto out;
+> > +               }
+> > +       }
+> > +
+> >  out:
+> >         return err;
+> >  }
+> > @@ -627,6 +637,7 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
+> >         struct nlattr *et = attrs[XFRMA_ETIMER_THRESH];
+> >         struct nlattr *rt = attrs[XFRMA_REPLAY_THRESH];
+> >         struct nlattr *mt = attrs[XFRMA_MTIMER_THRESH];
+> > +       struct nlattr *dir = attrs[XFRMA_SA_DIR];
+> >
+> >         if (re && x->replay_esn && x->preplay_esn) {
+> >                 struct xfrm_replay_state_esn *replay_esn;
+> > @@ -661,6 +672,9 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
+> >
+> >         if (mt)
+> >                 x->mapping_maxage = nla_get_u32(mt);
+> > +
+> > +       if (dir)
+> > +               x->dir = nla_get_u8(dir);
+> 
+> It's not clear to me why this belongs in xfrm_update_ae_params().
+> IOW, why isn't this done in xfrm_state_construct(), like if_id?
 
- net/rfkill/rfkill-gpio.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+I am in favor adding direction to all NL messages which include xfrm_state 
+for consitancy. Also when offload is enabled and xuo flags falg  
+XFRM_OFFLOAD_INBOUND is set. I am hopping in the long term offload can also 
+x->dir instead of this xuo->flags.
 
-diff --git a/net/rfkill/rfkill-gpio.c b/net/rfkill/rfkill-gpio.c
-index 4e32d659524e..84529886c2e6 100644
---- a/net/rfkill/rfkill-gpio.c
-+++ b/net/rfkill/rfkill-gpio.c
-@@ -156,14 +156,12 @@ static int rfkill_gpio_probe(struct platform_device *pdev)
- 	return ret;
- }
- 
--static int rfkill_gpio_remove(struct platform_device *pdev)
-+static void rfkill_gpio_remove(struct platform_device *pdev)
- {
- 	struct rfkill_gpio_data *rfkill = platform_get_drvdata(pdev);
- 
- 	rfkill_unregister(rfkill->rfkill_dev);
- 	rfkill_destroy(rfkill->rfkill_dev);
--
--	return 0;
- }
- 
- #ifdef CONFIG_ACPI
-@@ -183,7 +181,7 @@ MODULE_DEVICE_TABLE(of, rfkill_of_match);
- 
- static struct platform_driver rfkill_gpio_driver = {
- 	.probe = rfkill_gpio_probe,
--	.remove = rfkill_gpio_remove,
-+	.remove_new = rfkill_gpio_remove,
- 	.driver = {
- 		.name = "rfkill_gpio",
- 		.acpi_match_table = ACPI_PTR(rfkill_acpi_match),
 
-base-commit: 11afac187274a6177a7ac82997f8691c0f469e41
--- 
-2.43.0
+> >  }
+> >
+> >  static void xfrm_smark_init(struct nlattr **attrs, struct xfrm_mark *m)
+> > @@ -1182,8 +1196,13 @@ static int copy_to_user_state_extra(struct xfrm_state *x,
+> >                 if (ret)
+> >                         goto out;
+> >         }
+> > -       if (x->mapping_maxage)
+> > +       if (x->mapping_maxage) {
+> >                 ret = nla_put_u32(skb, XFRMA_MTIMER_THRESH, x->mapping_maxage);
+> > +               if (ret)
+> > +                       goto out;
+> > +       }
+> > +       if (x->dir)
+> > +               ret = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
+> >  out:
+> >         return ret;
+> >  }
+> > @@ -2399,7 +2418,8 @@ static inline unsigned int xfrm_aevent_msgsize(struct xfrm_state *x)
+> >                + nla_total_size_64bit(sizeof(struct xfrm_lifetime_cur))
+> >                + nla_total_size(sizeof(struct xfrm_mark))
+> >                + nla_total_size(4) /* XFRM_AE_RTHR */
+> > -              + nla_total_size(4); /* XFRM_AE_ETHR */
+> > +              + nla_total_size(4) /* XFRM_AE_ETHR */
+> > +              + nla_total_size(sizeof(x->dir)); /* XFRMA_SA_DIR */
+> >  }
+> >
+> >  static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
+> > @@ -2453,6 +2473,11 @@ static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct
+> >                 goto out_cancel;
+> >
+> >         err = xfrm_if_id_put(skb, x->if_id);
+> > +       if (err)
+> > +               goto out_cancel;
+> > +       if (x->dir)
+> > +               err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
+> > +
+> >         if (err)
+> >                 goto out_cancel;
+> >
+> > @@ -3046,6 +3071,7 @@ const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
+> >         [XFRMA_SET_MARK_MASK]   = { .type = NLA_U32 },
+> >         [XFRMA_IF_ID]           = { .type = NLA_U32 },
+> >         [XFRMA_MTIMER_THRESH]   = { .type = NLA_U32 },
+> > +       [XFRMA_SA_DIR]          = { .type = NLA_U8 },
+> 
+> Maybe add a ".strict_start_type"?
 
+Isn't this for the first element? I don't understand your suggestion.
+Are you advising to add to [XFRMA_SA_DIR]? Would you like explain a bit 
+more?
+
+> 
+> >
+> >  };
+> >  EXPORT_SYMBOL_GPL(xfrma_policy);
+> >
+> > @@ -3186,8 +3212,9 @@ static void xfrm_netlink_rcv(struct sk_buff *skb)
+> >
+> >  static inline unsigned int xfrm_expire_msgsize(void)
+> >  {
+> > -       return NLMSG_ALIGN(sizeof(struct xfrm_user_expire))
+> > -              + nla_total_size(sizeof(struct xfrm_mark));
+> > +       return NLMSG_ALIGN(sizeof(struct xfrm_user_expire)) +
+> > +              nla_total_size(sizeof(struct xfrm_mark)) +
+> > +              nla_total_size(sizeof_field(struct xfrm_state, dir));
+> >  }
+> >
+> >  static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
+> > @@ -3214,6 +3241,11 @@ static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct
+> >         if (err)
+> >                 return err;
+> >
+> > +       if (x->dir)
+> > +               err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
+> > +       if (err)
+> > +               return err;
+> > +
+> >         nlmsg_end(skb, nlh);
+> >         return 0;
+> >  }
+> > @@ -3321,6 +3353,9 @@ static inline unsigned int xfrm_sa_len(struct xfrm_state *x)
+> >         if (x->mapping_maxage)
+> >                 l += nla_total_size(sizeof(x->mapping_maxage));
+> >
+> > +       if (x->dir)
+> > +               l += nla_total_size(sizeof(x->dir));
+> > +
+> >         return l;
+> >  }
+> >
+> > --
+> > 2.30.2
 
