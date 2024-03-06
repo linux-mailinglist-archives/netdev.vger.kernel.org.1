@@ -1,242 +1,246 @@
-Return-Path: <netdev+bounces-77940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0D4187381A
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:48:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86A44873824
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:52:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66EA028582B
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:48:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9EAC1C20BF4
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:52:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B5A13173F;
-	Wed,  6 Mar 2024 13:48:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A1D6131E27;
+	Wed,  6 Mar 2024 13:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HFf90S45"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PLTZrmP3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6B8131735
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 13:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709732913; cv=fail; b=gOYRaQ8CJeyIRuCPfl5oR/xhWhJbjiDeWR0zbW8QN3PFffV71zoSYU6SoE5yrymST8HChBtL9uUpj1ICfy3YtKtOaSueCyqice9Kr7cHySeQA0dqCZrIbbGwZrFBDImXQPHqDQr3k08rrLKeDWdtQ5fLzfNgqjQnqghq7G0CGd0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709732913; c=relaxed/simple;
-	bh=/LlZt2taAaEo0mt4oPk0Rj1Zjo+3h5eI8gN3sRKH9cc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=CooQ2RhFe3kO0TSWo+aQVLReJ5ZKdo8WUyT1va3QN3B5tvVaGgw1OAZEs4Sdau2rKh/Tjbm7DmjfGg+m5Yzfzlt6xxRQJfJA9HBzkmyG5KSddfyRoUTkgp/P36CO2JKV+nL9HXfHuZqE+dQxqvUPqRU1vIxJSw2hl+h55qKibpg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HFf90S45; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709732911; x=1741268911;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=/LlZt2taAaEo0mt4oPk0Rj1Zjo+3h5eI8gN3sRKH9cc=;
-  b=HFf90S455inU0uvkIIUcmxSpWAwr7qsSRAWgRlaUjT+tjzXysCzxEwoS
-   RiWWnrcm1EAnsYIOJP6D+e2tI7QSmNevkbPMWlwUAyue0+5QyjWlwFmV7
-   LXBKDSqLoLH9HHDj0iH6NlgB3I/Yyvcuqe7zLszwev/RSSDsU5muPUGqt
-   JJh/ODFvFG1XSxSi1VzEF/1Yw3qBM5jRUnSOKxcgM4QeJJQqZpb+OzJ58
-   0NMoAvt7lSGV6cJmIJHpNZUIFalhgYBRRmfZ7wPxtEwDVLMR7VyqBT09a
-   XTHxmTzYOpjINOaJxupRgxr5IEg2sr8HXTYwgW5z40Xh12Gt8+tdRNQem
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="14996297"
-X-IronPort-AV: E=Sophos;i="6.06,208,1705392000"; 
-   d="scan'208";a="14996297"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 05:48:29 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,208,1705392000"; 
-   d="scan'208";a="14321465"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Mar 2024 05:48:28 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 6 Mar 2024 05:48:27 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 6 Mar 2024 05:48:27 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 6 Mar 2024 05:48:27 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 6 Mar 2024 05:48:27 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ecmrZAoRBh7gowhwhmMnG1/qfR7zaWcqIsYPiJ/6EQEIG2yesUcoEjadMhGYk0qSOyLtzxoaS9xhrIpIVd/TjHx7zy06EGgqMmqsgxpiy2emv7lTBt2Q0LmyC0D1MmiYfCCk+KqReca1ICQ1WZ5z06/jYckW1VvXc87zNf8VhqVspm5jYDqOLzbljzyl3pDbblswGdoUB/VcK/Ste7AcYEIXYxwQgD+F0zK+LiUr5VnWuwQ/skzqIePNiUQJYljcEF+8zYcTJuXLcBILihd1g3xiYOb9V69Ka7A5VJeblHK6PiCbIOYrE1W+HS1ee9X1VBF7t0kw20v5r+bNfGT7Ew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2fsf9V+xPwc5XhHdfymbBG1OD0Youj+TXW3rz62+kXQ=;
- b=bRP3dDmME04mobzXS8jd1hPBvCUOpe6TbkItOXIHncDyfBjgmXtv369cdEztWyE5lCz6prhhmK3FltwRYDa+acpFIAytVcGg/NB9/1H1s+ut9ww8ua5KhHbZWbzeuLUDWQ0UtDVrREb17O/HdH+s8TbiMRzfz07jgiR9ZIDjpRsG68oWj0qX7PBvJZa563E42IIrejVUvpqOU53Pitp6vVvv2oJtx4/pgLLLWI++1/S1KdwhYvcSkQ3UUSoCzLOiYPd2yKctOcMa5J8t/N4E6SyBSNl5NQwK7tVIWVyS+68Wat9g59975QOm/e0+TWBJXxJwNQD+pQolXssf8YEruw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB7942.namprd11.prod.outlook.com (2603:10b6:208:3fa::21)
- by PH7PR11MB6053.namprd11.prod.outlook.com (2603:10b6:510:1d1::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Wed, 6 Mar
- 2024 13:48:25 +0000
-Received: from IA1PR11MB7942.namprd11.prod.outlook.com
- ([fe80::7722:52b4:6061:a38e]) by IA1PR11MB7942.namprd11.prod.outlook.com
- ([fe80::7722:52b4:6061:a38e%3]) with mapi id 15.20.7339.024; Wed, 6 Mar 2024
- 13:48:24 +0000
-From: "Sharma, Mayank" <mayank.sharma@intel.com>
-To: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Zou, Steven" <steven.zou@intel.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Staikov, Andrii"
-	<andrii.staikov@intel.com>, "Lobakin, Aleksander"
-	<aleksander.lobakin@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "horms@kernel.org" <horms@kernel.org>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Buvaneswaran, Sujai"
-	<sujai.buvaneswaran@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next] ice: Add switch recipe reusing
- feature
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next] ice: Add switch recipe
- reusing feature
-Thread-Index: AQHaWj9RFF4lJ+IEYEuth4p3GXqMU7Eq4VkwgAABp0A=
-Date: Wed, 6 Mar 2024 13:48:24 +0000
-Message-ID: <IA1PR11MB79422EFDCA5CDD7EC60125C0F4212@IA1PR11MB7942.namprd11.prod.outlook.com>
-References: <20240208031837.11919-1-steven.zou@intel.com>
- <PH0PR11MB5013D1C2AD784512CA70173396212@PH0PR11MB5013.namprd11.prod.outlook.com>
-In-Reply-To: <PH0PR11MB5013D1C2AD784512CA70173396212@PH0PR11MB5013.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB7942:EE_|PH7PR11MB6053:EE_
-x-ms-office365-filtering-correlation-id: 3c7adb62-a080-49f7-ff22-08dc3de41840
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: b4CaWCMfTYRQ0MfS0fFxD9DGPH2OSIU4TzQxa1pwYgKQooYmq0yoKbb7FAl+3wQ+WTdhmpiZ49xH67Hopu7WRpQJKFTinoH7d53DiWy+Wt3e32WeUcWnN+k7DLUrCD5Z+IXK0/7ppSJIFcBemltvmmaEFCbRQjSFw6z1rIku9AKgxmCsV9NS52Z6NzxUkHwZVBxD3F+G+98slZDxFmy5bAPktEZUCDCdc66eSz3b3zc/+NcW6tgCor+lGSHqyVxqHIVYWNmWaXYrs2JAqhowuSeuSKg2aFLm+/F8MqUz01thwmgvxs5eM64AFhSiYIf4dg6RPXvSM5rR9FXrYLcilNDMj+nB83W+GCQfYsGRoMtofMEBvNZoJbcGq3TC1+2Gwv1/f/nfkuGF5Aj9FnpfQ62Fb7+LdokHjOFlQ6rU8evXibgV9uqxynOml3nMgpXYtBcbdoQWCEgnFeOSjYnlX1qPUXAqKhQJoGzOCiTjNjEESgs3q5SVaTKjqoUtskoL7TsQSvVt2FWZK7sXnQ/TM7IbBZg15hQQ2Zxkrfv7kLeWz0L93Q0kPS5Lvyg9NNdn3oWwSQvfxDvTzsvS6sn9CCQzvSzZdauRmCzvsMxgc+ExSB7lWW4XUiEtDWY0PYnByxbLamnIkOlX1e8bykEnAtxNKfmq8O06IxGM9uk/F/1Zh/9b+CvIGgFaAbYnB1A2k1AkcVYudlpWNCljaV0aR1/aZ2An9kolc2nRq2Ywai8=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB7942.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?jVdZm1e7lHZh3kboII9USxAklvfW2ylOfbzMAie0OE8SQWwvzh4W1OkIqzJs?=
- =?us-ascii?Q?vHAPWG0/Dhs7wdqHjUM4QXdI0mnWfJGMC6gHFg3PS42WBVIcvG5iMqIYwCKJ?=
- =?us-ascii?Q?h7W6wA3GThaOOsnFRSqYem4JA0xjjPphNMLsMjjJ8aEwiViDJoMbTWjvY1iv?=
- =?us-ascii?Q?Hntpk8a6Pn/KdNXFzyBZ5hjOYYw/kDXgtxiaOaA5ZQnfS97vtwvrvREQ+7e2?=
- =?us-ascii?Q?ChsnLgog4u+OZXjbIJsX4swSISZSkVCASaaFlkggKinQJBXOWIsEunMdapD7?=
- =?us-ascii?Q?4tJVd7U9HaEbCAy0lv3kKfRsmOB3kuGPmTpslmcylW+uSHIorLj8ORCKHGNY?=
- =?us-ascii?Q?Snsh2lASzahlIAAa4pPj8JsN8q3o6vmi0wQGndjGcbBC6TnNrKPE3Ed00Vef?=
- =?us-ascii?Q?A3eFkRIYe9uY7J9CugCQ99l0IFa4O12JvpmMMqiLEUXiAl0taj0eMl2yOtWz?=
- =?us-ascii?Q?JJctIjN4hSuVVu/BNqHmTTq0TAg9EJy0ROhRNQKKzddJV1IrzzRX2P/Ecd5x?=
- =?us-ascii?Q?i5JYv4zzSAa+N9bIeFH7gnxZKKQhAehpf2KTXK3w+gEvWK63vGFqFdWrEILU?=
- =?us-ascii?Q?7FygCP0N0LZCQdEqcJMI2ph3Hsl5kpe1WlwgigCl4Q8t7XxeKTDBaVZfBqv6?=
- =?us-ascii?Q?eASpNH4s/O/txyf81FPRVs3s1XZ1y1z5eZAzFsC81ChyXFgfeXdrgPvqELJx?=
- =?us-ascii?Q?hM695iVw+iykilfwGtOfbsnk9qqkeN7b0gyu/GQM0Li/A1A0LsDoIvW2hbbJ?=
- =?us-ascii?Q?kkzp6zmXyT51ekfbUkt4Kh3ijsDHMlCocUyV5O8SJwNjzP7lD+CDHMhaVip1?=
- =?us-ascii?Q?t75vGFVFHKtKYsqAUNzeXNn15RCJ9f6ixNYXHC8RInT9b/ReCLXhdz3B1KYZ?=
- =?us-ascii?Q?QSglXqerz9EG9jPzjX9ZxU5HWzvQQV0ApmKvHrAQq3iXxi5wsgaopGc9lv9s?=
- =?us-ascii?Q?+0v/D8Ik0NMhwHdh+fbBGIBcSf/3aVTy06ghLD+26DBniASwXF/wzIYnlY10?=
- =?us-ascii?Q?a5bIQ1poTQpvKBnn2+EuFHd3V2tbfGYtq7/XjNyTIQH9MX4fU3ZaCB3CpLBj?=
- =?us-ascii?Q?A7t9RZw/0N+OUbBdoyYmcxwWSD7Qt5bm/oR7AiA/xDhhtBEL3uokwNUFGuzu?=
- =?us-ascii?Q?u8HuLYtmYHQj81Y4EodwxUhTyz3kWw15m8QMUrsGaPxDxJ0WyvxSzSGrpsQW?=
- =?us-ascii?Q?M9AIvqL2JQJZTyZ0QFJnzmCKdN02TcM03QH+6zCklPMPtI8LkDqWPfEb/C0i?=
- =?us-ascii?Q?v9wQvgVEnVnR175dL6G67ABPrLV4MTjGE9TE0TSShIEBQgUB2mGseiaL1eKt?=
- =?us-ascii?Q?fYGuAZr1bd0uqk9vZBhhE6uyqgHf8Ta5E5pJ/FchIgx6kCDSSRaOVJkLHqKL?=
- =?us-ascii?Q?PN2Y6ncnYt+SGyQ4dPgEaMp0RapbCGMpddY20hDRjzgVoVp9pNAmiwmI7thQ?=
- =?us-ascii?Q?agrQB2FZ9iXD9yfS52nmyKUYu0SqwLmjqJXlg1JQbC6hq5k6yVJzMw34mh4z?=
- =?us-ascii?Q?XZ+8rr9yqDuYMJJb9QY3T/X5zrO0YlUhSg/0q0XHW0tGucIdL+sXmXUc+gTE?=
- =?us-ascii?Q?sAbBbTOc3IHk5LpoLul7/UJhd8kuSMe8sr4j1+Ay?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C599131735
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 13:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709733126; cv=none; b=AfjJpbl8tg9DM1aU48y2UHh8j8zMXbUkqstoozdv3G69gI5hAUUklLJ6FmcAfvtCUzN+ZJzlTXWso9ZppPVcdRfxMyGS137lxLEkEK0NPIY4nIgW0SJdtZMEVcC6S/dEb+WGksZYXvrLEQwR9bylTFuLE6R6/F+q4fctVmTtN2Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709733126; c=relaxed/simple;
+	bh=Pxuf4kWuWzCb907EKPmxfs1oR1d6VL2ka9aNysDX23s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V7hT2/Rbk+LNPW/0Dy7+3Lcn7359Ox1x1uqsN6Sncla0sp0QaqNnc8Y7EMb1KdWCWIpCH31u1otdkxBPFLihh1s1P7PxE1+Zsawo4lYMUWDOJWNtSeNekp/PGI8D5zgNk2QHhKLlRqzyKhasV8gXDdeRHUnQOu1y+whHp42lI3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PLTZrmP3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709733123;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w7Yd3qo5csWtOP+JW348rWjfTnDZ/UW2hhiQwJnJC6s=;
+	b=PLTZrmP3e48J++7hQkUF7hlt/GvLr5Y6zJkDGkce+YBTzl+4BjieKOp+y515qGOk/mTygO
+	tHHQm5PcvjPtiqAurkKE5ciJhGp9Hi4Gl1xAIiR/oraMbw/b13I0WbUyNxXXxJAH8bYfsm
+	VOODy8/+TDpt8YQ5YQW/x+zIkjHbMQU=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-463-Ao07IsZzPpuAzqW8w17ZGA-1; Wed, 06 Mar 2024 08:52:00 -0500
+X-MC-Unique: Ao07IsZzPpuAzqW8w17ZGA-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2d2a43ca538so4678031fa.1
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 05:51:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709733119; x=1710337919;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=w7Yd3qo5csWtOP+JW348rWjfTnDZ/UW2hhiQwJnJC6s=;
+        b=F2WqDikM+9yyyQPV1/areWO79uBCkRFXirE7eB6cWhqGybyGTQCuTH5K2VvIeymdI5
+         RYmNsljsCP34yiEEwPnOROu3lXWwk+mniHm3/Qp6DNAuddTSN0ArfTaILk7Hy/GVnz4c
+         dMlIwSNZY1i8SSsV9h8f8Hc5bsdJU+5Z9hgyRTJrCABFD4z3NM0GGbK9lavrYDmguKoR
+         v2C8dbQDLI2s55pYXptEpi0cGxv9oSqdVlO+iVj355vjchjCvXDe5p9FvcWbJLAWhUMZ
+         oJk1vEODCo/s72hEuiIqiUL4PcWehwKD+Er3pswOmKE9BvDhJJ7QP/x04PONuecdWcEZ
+         tQMg==
+X-Forwarded-Encrypted: i=1; AJvYcCUnwTb3nYhVyEo3euR8qwioTBOshtE5BefFYqSAGaiYqQEeHBcmFg1h/fYlxg9fbCeYrlOmxfOaG9DoLZXrzKSumQ4p13QW
+X-Gm-Message-State: AOJu0YyBosyZyD8pJS7q6OqxpO0cRN72g+OK1lpHvBi4x02MSNGc7bHp
+	jG+39JJUYbVBej2LIfEqPx5/krhu696zPmJhfLmmzda5j6pJHmtZVR2kzMMRfQLS8nipMCCbd7+
+	oJHCAZC4LAWaDw9OzFwPr+UP7ZVFjn/yQvAFB/DouRjLl77RFRuorjBLx8DY/rZkh2b8r9mA0wh
+	2m0ZEDelZQBKl1o7vzo4F4sg4+L0RL
+X-Received: by 2002:a2e:9942:0:b0:2d2:c7f5:fae2 with SMTP id r2-20020a2e9942000000b002d2c7f5fae2mr1781863ljj.26.1709733118771;
+        Wed, 06 Mar 2024 05:51:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG0kxlPv7MKqvikorSw89RvO/D/lU1MbiJt2PjJ3n+6LW2N2RMRt0xyRaqK0m7jiit7OlWGsi0pF9XihXhWeL0=
+X-Received: by 2002:a2e:9942:0:b0:2d2:c7f5:fae2 with SMTP id
+ r2-20020a2e9942000000b002d2c7f5fae2mr1781850ljj.26.1709733118291; Wed, 06 Mar
+ 2024 05:51:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB7942.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3c7adb62-a080-49f7-ff22-08dc3de41840
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Mar 2024 13:48:24.8101
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2HK9sX0Aq63B8HjSjxCDygf5dFwfBzWqQDdnY//85ixXs4kpDcUlTeZcwBL8xs5JcajHsm2nukkHO/9krRZdXA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6053
-X-OriginatorOrg: intel.com
+References: <20240228163840.6667-1-pchelkin@ispras.ru> <CAK-6q+i4v94uF9BEeZ0zNWtutOn35pzstiY7jMBetCJ0PHOD3w@mail.gmail.com>
+ <95eecd55-378c-4a55-96d8-fa74ec59e76a-pchelkin@ispras.ru>
+In-Reply-To: <95eecd55-378c-4a55-96d8-fa74ec59e76a-pchelkin@ispras.ru>
+From: Alexander Aring <aahringo@redhat.com>
+Date: Wed, 6 Mar 2024 08:51:47 -0500
+Message-ID: <CAK-6q+gwfVdVtezj+v982KQH+oUg=4F_-27Fczq-K5iVuY3MSA@mail.gmail.com>
+Subject: Re: Re: [PATCH wpan] mac802154: fix llsec key resources release in mac802154_llsec_key_del
+To: Fedor Pchelkin <pchelkin@ispras.ru>
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>, linux-wpan@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Alexey Khoroshilov <khoroshilov@ispras.ru>, lvc-project@linuxtesting.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of S=
-teven
-> Zou
-> Sent: Thursday, February 8, 2024 8:49 AM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Zou, Steven <steven.zou@intel.com>; Staikov, =
-Andrii
-> <andrii.staikov@intel.com>; Lobakin, Aleksander
-> <aleksander.lobakin@intel.com>; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>; Simon Horman <horms@kernel.org>; Kitszel,
-> Przemyslaw <przemyslaw.kitszel@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next] ice: Add switch recipe reusin=
-g feature
->=20
-> New E810 firmware supports the corresponding functionality, so the driver=
- allows
-> PFs to subscribe the same switch recipes. Then when the PF is done with a=
- switch
-> recipes, the PF can ask firmware to free that switch recipe.
->=20
-> When users configure a rule to PFn into E810 switch component, if there i=
-s no
-> existing recipe matching this rule's pattern, the driver will request fir=
-mware to
-> allocate and return a new recipe resource for the rule by calling
-> ice_add_sw_recipe() and ice_alloc_recipe(). If there is an existing recip=
-e
-> matching this rule's pattern with different key value, or this is a same =
-second rule
-> to PFm into switch component, the driver checks out this recipe by callin=
-g
-> ice_find_recp(), the driver will tell firmware to share using this same r=
-ecipe
-> resource by calling ice_subscribable_recp_shared() and ice_subscribe_reci=
-pe().
->=20
-> When firmware detects that all subscribing PFs have freed the switch reci=
-pe,
-> firmware will free the switch recipe so that it can be reused.
->=20
-> This feature also fixes a problem where all switch recipes would eventual=
-ly be
-> exhausted because switch recipes could not be freed, as freeing a shared =
-recipe
-> could potentially break other PFs that were using it.
->=20
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Andrii Staikov <andrii.staikov@intel.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Steven Zou <steven.zou@intel.com>
-> ---
->  .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   2 +
->  drivers/net/ethernet/intel/ice/ice_common.c   |   2 +
->  drivers/net/ethernet/intel/ice/ice_switch.c   | 187 ++++++++++++++++--
->  drivers/net/ethernet/intel/ice/ice_switch.h   |   1 +
->  drivers/net/ethernet/intel/ice/ice_type.h     |   2 +
->  5 files changed, 177 insertions(+), 17 deletions(-)
->=20
+Hi,
 
-We are seeing following kernel compilation error while compiling next kerne=
-l:
+On Mon, Mar 4, 2024 at 2:25=E2=80=AFAM Fedor Pchelkin <pchelkin@ispras.ru> =
+wrote:
+>
+> Hello Alexander,
+>
+> Thanks for review!
+>
+> On 24/03/03 06:19PM, Alexander Aring wrote:
+> > Hi,
+> >
+> > On Wed, Feb 28, 2024 at 11:44=E2=80=AFAM Fedor Pchelkin <pchelkin@ispra=
+s.ru> wrote:
+> > >
+> > > mac802154_llsec_key_del() can free resources of a key directly withou=
+t
+> > > following the RCU rules for waiting before the end of a grace period.=
+ This
+> > > may lead to use-after-free in case llsec_lookup_key() is traversing t=
+he
+> > > list of keys in parallel with a key deletion:
+> > >
+> > > refcount_t: addition on 0; use-after-free.
+> > > WARNING: CPU: 4 PID: 16000 at lib/refcount.c:25 refcount_warn_saturat=
+e+0x162/0x2a0
+> > > Modules linked in:
+> > > CPU: 4 PID: 16000 Comm: wpan-ping Not tainted 6.7.0 #19
+> > > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-de=
+bian-1.16.2-1 04/01/2014
+> > > RIP: 0010:refcount_warn_saturate+0x162/0x2a0
+> > > Call Trace:
+> > >  <TASK>
+> > >  llsec_lookup_key.isra.0+0x890/0x9e0
+> > >  mac802154_llsec_encrypt+0x30c/0x9c0
+> > >  ieee802154_subif_start_xmit+0x24/0x1e0
+> > >  dev_hard_start_xmit+0x13e/0x690
+> > >  sch_direct_xmit+0x2ae/0xbc0
+> > >  __dev_queue_xmit+0x11dd/0x3c20
+> > >  dgram_sendmsg+0x90b/0xd60
+> > >  __sys_sendto+0x466/0x4c0
+> > >  __x64_sys_sendto+0xe0/0x1c0
+> > >  do_syscall_64+0x45/0xf0
+> > >  entry_SYSCALL_64_after_hwframe+0x6e/0x76
+> > >
+> > > Also, ieee802154_llsec_key_entry structures are not freed by
+> > > mac802154_llsec_key_del():
+> > >
+> > > unreferenced object 0xffff8880613b6980 (size 64):
+> > >   comm "iwpan", pid 2176, jiffies 4294761134 (age 60.475s)
+> > >   hex dump (first 32 bytes):
+> > >     78 0d 8f 18 80 88 ff ff 22 01 00 00 00 00 ad de  x.......".......
+> > >     00 00 00 00 00 00 00 00 03 00 cd ab 00 00 00 00  ................
+> > >   backtrace:
+> > >     [<ffffffff81dcfa62>] __kmem_cache_alloc_node+0x1e2/0x2d0
+> > >     [<ffffffff81c43865>] kmalloc_trace+0x25/0xc0
+> > >     [<ffffffff88968b09>] mac802154_llsec_key_add+0xac9/0xcf0
+> > >     [<ffffffff8896e41a>] ieee802154_add_llsec_key+0x5a/0x80
+> > >     [<ffffffff8892adc6>] nl802154_add_llsec_key+0x426/0x5b0
+> > >     [<ffffffff86ff293e>] genl_family_rcv_msg_doit+0x1fe/0x2f0
+> > >     [<ffffffff86ff46d1>] genl_rcv_msg+0x531/0x7d0
+> > >     [<ffffffff86fee7a9>] netlink_rcv_skb+0x169/0x440
+> > >     [<ffffffff86ff1d88>] genl_rcv+0x28/0x40
+> > >     [<ffffffff86fec15c>] netlink_unicast+0x53c/0x820
+> > >     [<ffffffff86fecd8b>] netlink_sendmsg+0x93b/0xe60
+> > >     [<ffffffff86b91b35>] ____sys_sendmsg+0xac5/0xca0
+> > >     [<ffffffff86b9c3dd>] ___sys_sendmsg+0x11d/0x1c0
+> > >     [<ffffffff86b9c65a>] __sys_sendmsg+0xfa/0x1d0
+> > >     [<ffffffff88eadbf5>] do_syscall_64+0x45/0xf0
+> > >     [<ffffffff890000ea>] entry_SYSCALL_64_after_hwframe+0x6e/0x76
+> > >
+> > > Handle the proper resource release in the RCU callback function
+> > > mac802154_llsec_key_del_rcu().
+> > >
+> > > Note that if llsec_lookup_key() finds a key, it gets a refcount via
+> > > llsec_key_get() and locally copies key id from key_entry (which is a
+> > > list element). So it's safe to call llsec_key_put() and free the list
+> > > entry after the RCU grace period elapses.
+> > >
+> > > Found by Linux Verification Center (linuxtesting.org).
+> > >
+> > > Fixes: 5d637d5aabd8 ("mac802154: add llsec structures and mutators")
+> > > Cc: stable@vger.kernel.org
+> > > Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+> > > ---
+> > > Should the patch be targeted to "net" tree directly?
+> > >
+> > >  include/net/cfg802154.h |  1 +
+> > >  net/mac802154/llsec.c   | 18 +++++++++++++-----
+> > >  2 files changed, 14 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+> > > index cd95711b12b8..76d2cd2e2b30 100644
+> > > --- a/include/net/cfg802154.h
+> > > +++ b/include/net/cfg802154.h
+> > > @@ -401,6 +401,7 @@ struct ieee802154_llsec_key {
+> > >
+> > >  struct ieee802154_llsec_key_entry {
+> > >         struct list_head list;
+> > > +       struct rcu_head rcu;
+> > >
+> > >         struct ieee802154_llsec_key_id id;
+> > >         struct ieee802154_llsec_key *key;
+> > > diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
+> > > index 8d2eabc71bbe..f13b07ebfb98 100644
+> > > --- a/net/mac802154/llsec.c
+> > > +++ b/net/mac802154/llsec.c
+> > > @@ -265,19 +265,27 @@ int mac802154_llsec_key_add(struct mac802154_ll=
+sec *sec,
+> > >         return -ENOMEM;
+> > >  }
+> > >
+> > > +static void mac802154_llsec_key_del_rcu(struct rcu_head *rcu)
+> > > +{
+> > > +       struct ieee802154_llsec_key_entry *pos;
+> > > +       struct mac802154_llsec_key *mkey;
+> > > +
+> > > +       pos =3D container_of(rcu, struct ieee802154_llsec_key_entry, =
+rcu);
+> > > +       mkey =3D container_of(pos->key, struct mac802154_llsec_key, k=
+ey);
+> > > +
+> > > +       llsec_key_put(mkey);
+> > > +       kfree_sensitive(pos);
+> >
+> > I don't think this kfree is right, "struct ieee802154_llsec_key_entry"
+> > is declared as "non pointer" in "struct mac802154_llsec_key". The
+> > memory that is part of "struct ieee802154_llsec_key_entry" should be
+> > freed when llsec_key_put(), llsec_key_release() hits.
+> >
+> > Or is there something I am missing here?
+>
+> `struct ieee802154_llsec_key_entry` is not included into any other
+> struct. It is a standalone entity describing an entry in the
+> `ieee802154_llsec_table.keys` list.
+>
+> Maybe you are confusing it with `struct ieee802154_llsec_key`?
+>
 
-"error: dereferencing pointer to incomplete type 'struct dpll_pin'"
+Yes, I was confused about "ieee802154_llsec_key_entry" vs
+"ieee802154_llsec_key".
 
-Regards,
-Mayank Sharma
+Acked-by: Alexander Aring <aahringo@redhat.com>
 
+Thanks.
+
+- Alex
 
 
