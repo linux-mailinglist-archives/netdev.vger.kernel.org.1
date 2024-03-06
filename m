@@ -1,120 +1,185 @@
-Return-Path: <netdev+bounces-77943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BF248738E9
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:24:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A68B88738EC
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:24:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32F4E28381A
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:24:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA5571C213E4
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:24:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18BB1332B5;
-	Wed,  6 Mar 2024 14:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20997133994;
+	Wed,  6 Mar 2024 14:24:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rnGXafhB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.aperture-lab.de (mail.aperture-lab.de [116.203.183.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A662F130ACE;
-	Wed,  6 Mar 2024 14:24:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.183.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B211332AC
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 14:24:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709735048; cv=none; b=Guk2MgXcmU7ZtFHIJTQ/mWqjyYbSEzXY3Uh0N5UVSn7Fc1m7f4pIFa0l5s7TbLFIrjdypI7AuzIFcPZfuZ5vXHobwkqJfZ2w6GiJqKYuX1BoHy7OfrlD1uINMUXhcG9du4LKdj5cTAf+MB+bfW+XQtE3oBl8A8JFOh6K/i4vNxA=
+	t=1709735049; cv=none; b=a83fKhTYCNNB/ocH/Vt+Z5KxewVZnRQztMHxrym9O1bki3LRAr6E0T+1rnrX8GGE3Dd/oYhrmoweC8yBbrCx7IfTAKdQAvxZRz/CT5HsO8DXuID4AUP1gjHiHKt/nWbWY9ZJJqY3BXCWrCOPROIXz7YWYFEOI5Lo+bXKnl2sdUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709735048; c=relaxed/simple;
-	bh=qJ4gjt253xxum5utg91XBCGmUOduxiyObpAmLwXzzHw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BTrZxFeRlaLEvdly3bgBGFv20KFzYmVNF/w90hdQ7PZnZFOp65brtGc8hxfngHEaq3tV3fqwkrJScmk0xaZtkzQj0vwLfu8RaHo//cXXe8gddJIF/mNI/kMwmMrvYPVbS1s0C6toNl9E5H6O7jLCbuWt74+PYskbX7sfDcYz4TE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue; spf=pass smtp.mailfrom=c0d3.blue; arc=none smtp.client-ip=116.203.183.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=c0d3.blue
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CC7DA419A4;
-	Wed,  6 Mar 2024 15:18:26 +0100 (CET)
-From: =?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
-To: netfilter-devel@vger.kernel.org
-Cc: coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Dietmar Maurer <dietmar@proxmox.com>,
-	Thomas Lamprecht <t.lamprecht@proxmox.com>,
-	Wolfgang Bumiller <w.bumiller@proxmox.com>,
-	Alexandre Derumier <aderumier@odiso.com>,
-	=?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
-Subject: [PATCH net] netfilter: conntrack: fix ct-state for ICMPv6 Multicast Router Discovery
-Date: Wed,  6 Mar 2024 15:18:04 +0100
-Message-ID: <20240306141805.17679-1-linus.luessing@c0d3.blue>
-X-Mailer: git-send-email 2.42.0
+	s=arc-20240116; t=1709735049; c=relaxed/simple;
+	bh=eZpMPKa6e7jU2jBVyiXD1uP0V9gbgVlt9tlhzywS1d0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Eiraw4aO0oNxCpiTl5/1Sbla8/wHq9a7dPiHT0dFyOyWQdPCWUAUFRaRYbaqHKSPVfvOi323vxDhuvV4yjDLXTPCoqWIYuimNizgyt7Pwp+O9RukY9BOaRs7/AE1ChMe1oiZX/aPbByw7tpFmwCdd2Lz4VPfTVq2fBVxe+QVHCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rnGXafhB; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-608ccac1899so11950777b3.1
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 06:24:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1709735046; x=1710339846; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=eZpMPKa6e7jU2jBVyiXD1uP0V9gbgVlt9tlhzywS1d0=;
+        b=rnGXafhBwgZ3X2A7OmLQqrx5w0KJmp1jM8ggJm/FkaIdToXtbz2JqG8vXRnDnliy+b
+         4GUyy4fx2rXA5B9TDVbC4GMKv90EFetLO4Q7//m9Nbd/sS6UmB3ERiuF0sWRJeOKC3FN
+         fZKZ9NF6V25uga2MmVAv9YxnyHy6yI5JtT7f5/1MwsZnwAA7PLgT8cMkNXOzqXQNaLfx
+         nbkK9FxfEpi7ELYEluRBprSi+HwBwExs/+kq3UbPSHzXuHclY040y3rhuwH0vvXrd8LG
+         c7fAUFPAFRyT3Rk46cpVA8u7ehx46UPn/vgbVDPKrbcEoS86/dL9c6hUbBLXp4/wCSgI
+         nmEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709735046; x=1710339846;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eZpMPKa6e7jU2jBVyiXD1uP0V9gbgVlt9tlhzywS1d0=;
+        b=QboioaB7mS4ErRbonUNQxkaANzuhP8yea16daVzv7OSOjPsHPJDqRny68gl475oyoq
+         iET/A3vxerxScBMCjZZZhzcrf/TuqNWtcyt01og9y7N3rM6lQB6evUvQgsZtYRdkAuR0
+         ND0LerR9jdYSKT7NfQG39fQ/JyICkfBMHLtR2Z07wjMrfnAuhq3pnju3h9yF4wM3gIJH
+         uDSxBn5WAFraz8F6HYTYVDF6qGzXG4Kyl3IZKsV+/IqYkRJq6ygmfwszKKYeLBkqaQ8I
+         FwyztEiMXhTA8tBmSttR8JDb8oul2ugIq7pTZPOYLbWngZoLaqXiEedJqqC36yzbCs7y
+         JUQg==
+X-Forwarded-Encrypted: i=1; AJvYcCU5qlFl2qEXCmdi3Rx286/p5LWhdGej5bT4fQBB152oFyaycTk/BFA6Eju/eKs7aVzQTupHDZ8zFRSzoRFwtArJY6+nAE7o
+X-Gm-Message-State: AOJu0YxluWi5VzH/8KlgJQsJbyDvYi2mj6UUS/Rj0V3AXpArK+DJdYAe
+	9Yylemn/+WNT92WRmljYaJswRapPIlOu8Y9dU7HKPkP99C6+G/I49mOGlc+zeRmno1wxm/ZZ16Q
+	evLjnFbDC/MUy4K8blS/z8HsIVo3hJ9RbyhZ8pg==
+X-Google-Smtp-Source: AGHT+IFtPw7iiv+byEAcjoYdyvfBnMJrrGDYSOvTrCZtLuKlzx6HBrSrHHu558ENUxjrcYdwWnuD1V710Dta5mIdRvM=
+X-Received: by 2002:a81:85c5:0:b0:609:9171:130d with SMTP id
+ v188-20020a8185c5000000b006099171130dmr10635779ywf.19.1709735046114; Wed, 06
+ Mar 2024 06:24:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+References: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
+ <87plw7hgt4.fsf@kernel.org> <CAA8EJpr6fRfY5pNz6cXVTaNashqffy5_qLv9c35nkgjaDuSgyQ@mail.gmail.com>
+ <87cys7hard.fsf@kernel.org>
+In-Reply-To: <87cys7hard.fsf@kernel.org>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Wed, 6 Mar 2024 16:23:55 +0200
+Message-ID: <CAA8EJpowyEEbXQ4YK-GQ63wZSkJDy04qJsC2uuYCXt+aJ1HSOQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 0/4] wifi: ath10k: support board-specific firmware overrides
+To: Kalle Valo <kvalo@kernel.org>
+Cc: Jeff Johnson <quic_jjohnson@quicinc.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	ath10k@lists.infradead.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-So far Multicast Router Advertisements and Multicast Router
-Solicitations from the Multicast Router Discovery protocol (RFC4286)
-would be marked as INVALID for IPv6, even if they are in fact intact
-and adhering to RFC4286.
+On Wed, 6 Mar 2024 at 13:15, Kalle Valo <kvalo@kernel.org> wrote:
+>
+> Dmitry Baryshkov <dmitry.baryshkov@linaro.org> writes:
+>
+> > On Wed, 6 Mar 2024 at 11:04, Kalle Valo <kvalo@kernel.org> wrote:
+> >
+> >>
+> >> Dmitry Baryshkov <dmitry.baryshkov@linaro.org> writes:
+> >>
+> >> > On WCN3990 platforms actual firmware, wlanmdsp.mbn, is sideloaded to the
+> >> > modem DSP via the TQFTPserv. These MBN files are signed by the device
+> >> > vendor, can only be used with the particular SoC or device.
+> >> >
+> >> > Unfortunately different firmware versions come with different features.
+> >> > For example firmware for SDM845 doesn't use single-chan-info-per-channel
+> >> > feature, while firmware for QRB2210 / QRB4210 requires that feature.
+> >> >
+> >> > Allow board DT files to override the subdir of the fw dir used to lookup
+> >> > the firmware-N.bin file decribing corresponding WiFi firmware.
+> >> > For example, adding firmware-name = "qrb4210" property will make the
+> >> > driver look for the firmware-N.bin first in ath10k/WCN3990/hw1.0/qrb4210
+> >> > directory and then fallback to the default ath10k/WCN3990/hw1.0 dir.
+> >> >
+> >> > Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+> >> > ---
+> >> > Changes in v2:
+> >> > - Fixed the comment about the default board name being NULL (Kalle)
+> >> > - Expanded commit message to provide examples for firmware paths (Kalle)
+> >> > - Added a note regarding board-2.bin to the commit message (Kalle)
+> >> > - Link to v1:
+> >> > https://lore.kernel.org/r/20240130-wcn3990-firmware-path-v1-0-826b93202964@linaro.org
+> >>
+> >> From my point of view this looks good now but let's see what others say.
+> >> Is there a specific reason why you marked this as RFC still?
+> >
+> > No, I just forgot to remove it from the series settings, so you can
+> > consider it as final.
+>
+> Good, so let's ignore the RFC label for this v2.
+>
+> > I had one minor question in my head (but that's mostly for patches 3
+> > and 4): in linux-firmware we will have ath10k/WCN3990/hw1.0/qcm2290
+> > and make qrb4210 as a symlink to it. Is that fine from your POV?
+>
+> Yes, I think using a symlink is a good idea.
+>
+> > Or should we use sensible device names (e.g. qcom-rb1)?
+>
+> I guess 'qcom-rb1' refers to 'Qualcomm Robotics RB1' board? In other
+> words, the question is that should we use chipset specific names like
+> 'qcm2290' or product based names like 'qcom-rb1'?
+>
+> That's a good question for which I don't have a good answer :) I'm not
+> very familiar with WCN3990 hardware and SoCs to have a full picture of
+> all this, especially how the firmware images are signed or what
+> different firmware branches there are etc.
 
-This broke MRA reception and by that multicast reception on
-IPv6 multicast routers in a Proxmox managed setup, where Proxmox
-would install a rule like "-m conntrack --ctstate INVALID -j DROP"
-at the top of the FORWARD chain with br-nf-call-ip6tables enabled
-by default.
+I checked Pixel-3 data, it has wlanmdsp.mbn signed by Google.
 
-Similar to as it's done for MLDv1, MLDv2 and IPv6 Neighbor Discovery
-already, fix this issue by excluding MRD from connection tracking
-handling as MRD always uses predefined multicast destinations
-for its messages, too. This changes the ct-state for ICMPv6 MRD messages
-from INVALID to UNTRACKED.
+>
+> To be on the safe side using 'qcom-rb1' makes sense but on the other
+> hand that means we need to update linux-firmware (basically add a new
+> symlink) everytime a new product is added. But are there going to be
+> that many new ath10k based products?
+>
+> Using 'qcm2290' is easier because for a new product then there only
+> needs to be a change in DTS and no need to change anything
+> linux-firmware. But here the risk is that if there's actually two
+> different ath10k firmware branches for 'qcm2290'. If that ever happens
+> (I hope not) I guess we could solve that by adding new 'qcm2290-foo'
+> directory?
+>
+> But I don't really know, thoughts?
 
-This issue was found and fixed with the help of the mrdisc tool
-(https://github.com/troglobit/mrdisc).
+After some thought, I'd suggest to follow approach taken by the rest
+of qcom firmware:
+put a default (accepted by non-secured hardware) firmware to SoC dir
+and then put a vendor-specific firmware into subdir. If any of such
+vendors appear, we might even implement structural fallback: first
+look into sdm845/Google/blueline, then in sdm845/Google, sdm845/ and
+finally just under hw1.0.
 
-Signed-off-by: Linus Lüssing <linus.luessing@c0d3.blue>
----
- include/uapi/linux/icmpv6.h               | 1 +
- net/netfilter/nf_conntrack_proto_icmpv6.c | 4 +++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+>
+> --
+> https://patchwork.kernel.org/project/linux-wireless/list/
+>
+> https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
-diff --git a/include/uapi/linux/icmpv6.h b/include/uapi/linux/icmpv6.h
-index ecaece3af38d..4eaab89e2856 100644
---- a/include/uapi/linux/icmpv6.h
-+++ b/include/uapi/linux/icmpv6.h
-@@ -112,6 +112,7 @@ struct icmp6hdr {
- #define ICMPV6_MOBILE_PREFIX_ADV	147
- 
- #define ICMPV6_MRDISC_ADV		151
-+#define ICMPV6_MRDISC_SOL		152
- 
- #define ICMPV6_MSG_MAX          255
- 
-diff --git a/net/netfilter/nf_conntrack_proto_icmpv6.c b/net/netfilter/nf_conntrack_proto_icmpv6.c
-index 1020d67600a9..327b8059025d 100644
---- a/net/netfilter/nf_conntrack_proto_icmpv6.c
-+++ b/net/netfilter/nf_conntrack_proto_icmpv6.c
-@@ -62,7 +62,9 @@ static const u_int8_t noct_valid_new[] = {
- 	[NDISC_ROUTER_ADVERTISEMENT - 130] = 1,
- 	[NDISC_NEIGHBOUR_SOLICITATION - 130] = 1,
- 	[NDISC_NEIGHBOUR_ADVERTISEMENT - 130] = 1,
--	[ICMPV6_MLD2_REPORT - 130] = 1
-+	[ICMPV6_MLD2_REPORT - 130] = 1,
-+	[ICMPV6_MRDISC_ADV - 130] = 1,
-+	[ICMPV6_MRDISC_SOL - 130] = 1
- };
- 
- bool nf_conntrack_invert_icmpv6_tuple(struct nf_conntrack_tuple *tuple,
--- 
-2.43.0
 
+--
+With best wishes
+Dmitry
 
