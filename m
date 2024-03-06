@@ -1,155 +1,99 @@
-Return-Path: <netdev+bounces-77847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 818E88732F3
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 10:46:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61120873319
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 10:53:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B38BF1C25D57
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:46:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E970128681B
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A362860DE9;
-	Wed,  6 Mar 2024 09:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hqKIkW92"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 069455F861;
+	Wed,  6 Mar 2024 09:53:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7688960DDE;
-	Wed,  6 Mar 2024 09:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64DF95F554
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 09:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709718221; cv=none; b=btnksAWmANynmt5OLTID7WqYcqPAm7LMzDegYwZzRF3YL4Od+zCbAlDQXKfQUYwW4+ZiHissyS47Ua7fcqrYKYKmoU8jWkq8ZbSE3Alf5BFVBj3/qk+gBmXVayb1m7vD8M4YGKmVQMbo/FL+WVVKecA4iwpGdlmvA0Xzko9TV5Y=
+	t=1709718799; cv=none; b=Gg1dluuV4TBD5ylYdnK9b7o6m95W8bHEafYmgxL+wf2lPM4x67pYog+yiyuddmwZsdxFeAtMDSWE83ayUBajqfhdKRX8JJWL+jeZ//mH0ByEhrJYXIOhz2r8zvpkLuWpdmbfittK/yQPMJ0KEU9lUht1pFL3MKyR9SnhkrrGfW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709718221; c=relaxed/simple;
-	bh=TXr6T5gctPLk+weuAPDK0CvjU5ZW8VNUAi1/4q57pf4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=UzZHTPjAQuXZAq6K8GTTtaVtls/ktV6O+HDt23iUQNROl8allnwzFji8Fqv2CrBJ4vi72YeTPVUv4t2TqqtS8A/XmmBVhXtTopu58D0lrHUfLtVmxUiWA++V3sEsBJ75LA9kXxuL8lNgFqByUmg7b6wKdNGxm6hNMpkQocx9Zn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hqKIkW92; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B997AC43394;
-	Wed,  6 Mar 2024 09:43:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709718221;
-	bh=TXr6T5gctPLk+weuAPDK0CvjU5ZW8VNUAi1/4q57pf4=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=hqKIkW92n6YI3RrTE31cbQs+D4nShq9qFbUe9q0QbSeRNFoAze+VcAPg6Vh/UwhMn
-	 lhGS+YheKA4USCBL4xp0MTnoX3qa2mZi6LJuqeHjCXSKkNqs4VSEp1uHNfHs1yBdzG
-	 8Z9ZCWUx8g3HyF8zlWpAnw4EaASqz/yi22BHGNp6Hm03yeJ4wVNnIkILrYv7ODD9qN
-	 PCBlxYLAhmMPX3MIdoBFjohOKDj160MeFleBpAkvqnFTBrc/KFJHZXOHaIeyWR5qNN
-	 B+/KjXNH2l/90m6XxGhAAAnGPd4bZyjmSTceypzu4Rhem/OqY1GO9fkXVY4lgHw+Pk
-	 dF2QotIDDzguQ==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Wed, 06 Mar 2024 10:43:01 +0100
-Subject: [PATCH net-next v2 12/12] selftests: userspace pm: avoid
- relaunching pm events
+	s=arc-20240116; t=1709718799; c=relaxed/simple;
+	bh=RBKpY6uTHbNRvkc++ykcWeEmfUxZUBNwIYIcX1qKjUQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=VJPISTe0Y3bg1MRFmwPlO2RjxVXEAjPX3kVPPaoA8i7Ln5FVOJ79zbATdUB5LuUGEbpH14ZooQZMuZmN4LPeWv/AjYbQhB4Q0YFea/FRQRB94il/JQzUGK7Uuzia8ionOeqhxqKr4gDB+Lh6iTe7SjNmByH3MHMadjbKQKcO/nU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c874fb29dbso67926839f.0
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 01:53:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709718797; x=1710323597;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=J7GshgTWBC/O7D9m77niat5ipmKRovvawMUZYhZfFyw=;
+        b=GhLRfg+5P4i50DKT/ncLAg1Kd5zlR9Bw4njIcgXRlJWsXqi2WUZaOppl3usazyDqwh
+         NDMx4b6cKSVW9N+ftZuwQlzZWN1IG2Mwg6/KQ3U8E89aibzZBmLkmx4Hn/9gy/7w9ZCB
+         M27pIl31gUk1B8p5SOmAGLOFVHuiJzAPv10ZjTP+UtWoO6PT2lORB+uJjj2zOuXJKURN
+         yvEpdOeqFVzSGE8FYhtJpEs2uXyqBYjqSf+iB9kGG9Pd8ne2fL+G2jNKoXgmj2hlT7qC
+         oX/XknhaZPg1deg0JMqUOP31MlCfKFZN7ssaE1q/etvBtjVrj+R/U5x9LULG0p7mx2Ru
+         ojbA==
+X-Forwarded-Encrypted: i=1; AJvYcCVLLEfFWFmjPjDWTpe6z0uD85kgLkRQKUBpHxErH6MxVE5QQVUOVHeqYJZLrWpLsO9rIaZ/Bm0EtTJbgGqhHE8htM3585NB
+X-Gm-Message-State: AOJu0YxUMgJW1PDMYsKPgUtXRt5/IfTHpOTBdCQ8/SPrEcLP4WRHrlmm
+	2g5yC/CPqB1CfUcEzHI/40tVfzAkjwpiLeKTGP22EhhKium0YGsPOs54NAgZimgQMkhZhNSFFtq
+	q8KRVHEOGK5b7CJOKp/OhhEyYgzEhrKX0iDZa2LfiGUEggp9uOkr3z1A=
+X-Google-Smtp-Source: AGHT+IGf+1HCcLGFBTjKehh1H4T8kt4HVAo8Zc5w6ywbaml/rk3AHPWNa1CIGOXyFav/zdeME3dCRaZTyXSttRyTgaNbk7NjStYF
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240306-upstream-net-next-20240304-selftests-mptcp-shared-code-shellcheck-v2-12-bc79e6e5e6a0@kernel.org>
-References: <20240306-upstream-net-next-20240304-selftests-mptcp-shared-code-shellcheck-v2-0-bc79e6e5e6a0@kernel.org>
-In-Reply-To: <20240306-upstream-net-next-20240304-selftests-mptcp-shared-code-shellcheck-v2-0-bc79e6e5e6a0@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2205; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=TXr6T5gctPLk+weuAPDK0CvjU5ZW8VNUAi1/4q57pf4=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBl6DqnnvKD6kkrhkEHHr19YMe9Cu8g1S1GcYRAY
- 0HRl4AuWOuJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZeg6pwAKCRD2t4JPQmmg
- c2UWEACtz0bJ+al4KBOIPNZn32mKMkgA1r7et63FIYhJccg66dhsLZardA0U68Y15KAAvHBbhTQ
- EKFqGxtGP7VhuRMoeVjWqARBqLUQ5mrOVj5yvm1X5ZYE3JWEw0u40ZZFT4Qzva1UcdlCxVOAZXB
- q3m8c64PxEeReQf7qciakJAKUdROpYKCH3iA0y2QGkLye/4LSAGak4WTKwvaA9Xm5zPy+Rh4o3m
- Gg3S5axHC1sANZdn+WrrQ3I+8fNm2R0eNUqWuaCqHrCueSnRbtpe2hrrD3QCOCstKdnM5mY+gkw
- rHpKwheJsQgyn7Y8nzaw/ervviyh9TP5LkgTV8u2FownBZKIeLdrI2jEqyQ+Aglvn3nI+xfC4oE
- B9Mwn/dWszqIsYE22tqeeVyTlHDeT8rJPMTc3jC1998zcDeWPUxDS7ZXkPDdddCr4CgtsNrx6XS
- g6pYyrCF59d24rCDNr+FHVZ+qxDmBypVEmW8TrTwBwcR9uDAkN9tnKf4UqXEOEddhmzn2SZ0yuj
- usJexU5jyaxzpzFUBLpvZzNI4dfQsWiYKwvj6NgpE5CfEaPsMhBBhz/tPMxfKEwNlNr4Wow73pB
- 5oAufijlEEvmGVqNPDMHXDxknEJHmmDKHfsLdb4nKWIEAq4OyIn1xxX77b4s2AAJUxyXqFZoXaz
- Gu8avI/uJDp0MpQ==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+X-Received: by 2002:a05:6638:40a3:b0:474:e82a:7cec with SMTP id
+ m35-20020a05663840a300b00474e82a7cecmr442251jam.1.1709718797575; Wed, 06 Mar
+ 2024 01:53:17 -0800 (PST)
+Date: Wed, 06 Mar 2024 01:53:17 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009870f70612faed33@google.com>
+Subject: [syzbot] Monthly dccp report (Mar 2024)
+From: syzbot <syzbot+list41dc79b1e0e10a83fb37@syzkaller.appspotmail.com>
+To: dccp@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-'make_connection' is launched twice: once for IPv4, once for IPv6.
+Hello dccp maintainers/developers,
 
-But then, the "pm_nl_ctl events" was launched a first time, killed, then
-relaunched after for no particular reason.
+This is a 31-day syzbot report for the dccp subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/dccp
 
-We can then move this code, and the generation of the temp file to
-exchange, to the init part, and remove extra conditions that no longer
-needed.
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 4 issues are still open and 7 have been fixed so far.
 
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 102     Yes   KASAN: use-after-free Read in ccid2_hc_tx_packet_recv
+                  https://syzkaller.appspot.com/bug?extid=554ccde221001ab5479a
+<2> 51      Yes   BUG: "hc->tx_t_ipi == NUM" holds (exception!) at net/dccp/ccids/ccid3.c:LINE/ccid3_update_send_interval()
+                  https://syzkaller.appspot.com/bug?extid=94641ba6c1d768b1e35e
+<3> 17      Yes   BUG: stored value of X_recv is zero at net/dccp/ccids/ccid3.c:LINE/ccid3_first_li() (3)
+                  https://syzkaller.appspot.com/bug?extid=2ad8ef335371014d4dc7
+
 ---
- tools/testing/selftests/net/mptcp/userspace_pm.sh | 29 ++++++++++-------------
- 1 file changed, 13 insertions(+), 16 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/tools/testing/selftests/net/mptcp/userspace_pm.sh b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-index 3200d0b96d53..b0cce8f065d8 100755
---- a/tools/testing/selftests/net/mptcp/userspace_pm.sh
-+++ b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-@@ -149,17 +149,23 @@ ip -net "$ns2" addr add dead:beef:1::2/64 dev ns2eth1 nodad
- ip -net "$ns2" addr add dead:beef:2::2/64 dev ns2eth1 nodad
- ip -net "$ns2" link set ns2eth1 up
- 
-+file=$(mktemp)
-+mptcp_lib_make_file "$file" 2 1
-+
-+# Capture netlink events over the two network namespaces running
-+# the MPTCP client and server
-+client_evts=$(mktemp)
-+mptcp_lib_events "${ns2}" "${client_evts}" client_evts_pid
-+server_evts=$(mktemp)
-+mptcp_lib_events "${ns1}" "${server_evts}" server_evts_pid
-+sleep 0.5
-+
- print_title "Init"
- print_test "Created network namespaces ns1, ns2"
- test_pass
- 
- make_connection()
- {
--	if [ -z "$file" ]; then
--		file=$(mktemp)
--	fi
--	mptcp_lib_make_file "$file" 2 1
--
- 	local is_v6=$1
- 	local app_port=$app4_port
- 	local connect_addr="10.0.1.1"
-@@ -173,17 +179,8 @@ make_connection()
- 		is_v6="v4"
- 	fi
- 
--	# Capture netlink events over the two network namespaces running
--	# the MPTCP client and server
--	if [ -z "$client_evts" ]; then
--		client_evts=$(mktemp)
--	fi
--	mptcp_lib_events "${ns2}" "${client_evts}" client_evts_pid
--	if [ -z "$server_evts" ]; then
--		server_evts=$(mktemp)
--	fi
--	mptcp_lib_events "${ns1}" "${server_evts}" server_evts_pid
--	sleep 0.5
-+	:>"$client_evts"
-+	:>"$server_evts"
- 
- 	# Run the server
- 	ip netns exec "$ns1" \
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
--- 
-2.43.0
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
+You may send multiple commands in a single email message.
 
