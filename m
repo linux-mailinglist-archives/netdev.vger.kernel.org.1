@@ -1,99 +1,79 @@
-Return-Path: <netdev+bounces-78054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29481873DB1
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:46:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D3D6873DD0
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:52:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D91F2282E34
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:46:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2A49B2338C
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:52:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A5613BAD7;
-	Wed,  6 Mar 2024 17:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B031D135401;
+	Wed,  6 Mar 2024 17:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LtT7u0aU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNgkFwNj"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE58135A5B;
-	Wed,  6 Mar 2024 17:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877CD5CDE2;
+	Wed,  6 Mar 2024 17:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709747177; cv=none; b=lv3meiuCj0p9BugBFjOI4EI6btyxHcQVKZlmsB+yPUQJlMkoJN7iRjcWt7fhsoeec2h/zlnHaFX4FPlneo6FrP1HpiiyzNhL4YePY4NZqSECW76PS8n55M9DDEPViAPb55dnPnoP5PVbgVh53uyDaJisqEeBStlvnrp3toZ/rEE=
+	t=1709747526; cv=none; b=Tf9kC5jc4jXIt23wi1KQe3+Q7x6kqpN+tMDrLOKsl1Hb2pD2w1YHCPADZLo1GfQxV2I9CHNvKM4XcAaICMVZn51U+yBSJ1WGus7sfsighr1URcu2goblcmO2kQDuCWwF7i2TsjDY4ibDkBvEGse/Xw30glxHXTN8aBjtB+1AxTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709747177; c=relaxed/simple;
-	bh=VTEgi30FbwNlL4FbYg7JVPoXMEZ94IoTaaIvVhCiH2k=;
+	s=arc-20240116; t=1709747526; c=relaxed/simple;
+	bh=jgEqnyMEYTp0IrTDwRr0KVr2VswUj1JqQ0+266jhtlM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mvmSkOMg8FQLcuX9Uh2bVj99FpblqyBb3u1jeanzzdgPbWWGmILxWD4KCj/qAZJ6PiH3nih2GwBAJu0J62BUSVQSB80+aVKuWYfx7G3AypnolKEK6x6iCXWNthuzBau/AjWS3fElN9MpuebT/wMYddmvk+ONS2w9TQDsBSJwCUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LtT7u0aU; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7D73E60004;
-	Wed,  6 Mar 2024 17:46:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709747173;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Idele/8qXZRgSYp7F56voFjVrzpXCoT8VmNU5ueySCU=;
-	b=LtT7u0aUPYz/2P00L0hev/DeNZRJtF/aa0hlfQMSIWJ/xJLluah5IUILkRiNVDobjxMZz2
-	k19P5OupxpbdBocA4PFC/v6s4bDyhZc6EEh3qhk4BmQ8R66nPFINNs5T9T8JbKwnclj9dX
-	RL+4C8hpZgDDTvR51xwjWZuKp+GzK2//sbDwhcRJLDY+yhfk7q8EV8cvnSK5whU0Hoqhu6
-	VH1+bU9iG8o2foDne+gB8PI9RRwR3GhetzDj/+DLcATkoFC1Soh18En8d9N79SpS+dTq8K
-	ynJJh1sZpzRSSlYEVYn3hfss4fs+82d2lmgEYox1qUqyy1QqsMKMco7wO+TFRQ==
-Date: Wed, 6 Mar 2024 18:46:11 +0100
-From: Herve Codina <herve.codina@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
+	 MIME-Version:Content-Type; b=UjU9BbH0gbw66ay92JD9Z6MRV5dBZk+BBHs5CJ2TUBZTC4pSSzvY1VIYoXED1/+dal7BXORDRxr5bkJ6h8tQjGtw0zIzQMhb4gGxsWNEiHgjME4PhvBtV5aioRnvh0/KVNYwD3vI7Bm6GCP4aCQ71+h4j3iOKkypa3U5WLULLOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNgkFwNj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB9EAC433F1;
+	Wed,  6 Mar 2024 17:52:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709747526;
+	bh=jgEqnyMEYTp0IrTDwRr0KVr2VswUj1JqQ0+266jhtlM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SNgkFwNjM9f6hkLDbZFwtoLQAcqD7MooHi0DYcg9Q1zc0riXtyrd84D9NCPSY11Va
+	 awkyccB/VTiowgOSLD2Nbn2zkpdPCtVPhRRAd5Hpy7kKAIwIPpkrA0PITYNm3e6/78
+	 kLgHlyJrdXcfAwDdG51qSaN20KgCVH2Wc8UJVuXGv4xgPQmgWDhyMJwv2cxW+XpKMk
+	 DDHR42nKbVSF/r3/YT7OYuDqiEcq5y3xAeHprU9uTS1N8vIfTLCyEBpdwqNzxVAd2r
+	 UdYkhPY1zyDFYSZIoQ0IWVlQ4DfySJav08uy+jsvPXc3sYuxOCi8gBVJve62/rKkOO
+	 Pnq+iQwXPIHBA==
+Date: Wed, 6 Mar 2024 09:52:05 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Herve Codina <herve.codina@bootlin.com>
 Cc: Ratheesh Kannoth <rkannoth@marvell.com>, "netdev@vger.kernel.org"
  <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
  <linux-kernel@vger.kernel.org>
 Subject: Re: [EXTERNAL] Re: [PATCH v6 1/5] net: wan: Add support for QMC
  HDLC
-Message-ID: <20240306184611.0cea20af@bootlin.com>
-In-Reply-To: <20240306082230.7ecf207b@kernel.org>
+Message-ID: <20240306095205.5875d8ae@kernel.org>
+In-Reply-To: <20240306184611.0cea20af@bootlin.com>
 References: <20240306080726.167338-2-herve.codina@bootlin.com>
 	<20240306105651.1210286-1-rkannoth@marvell.com>
 	<20240306143743.5732b298@bootlin.com>
 	<MWHPR1801MB191837C8907B39F67893F0BBD3212@MWHPR1801MB1918.namprd18.prod.outlook.com>
 	<20240306082230.7ecf207b@kernel.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	<20240306184611.0cea20af@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Jakub,
-
-On Wed, 6 Mar 2024 08:22:30 -0800
-Jakub Kicinski <kuba@kernel.org> wrote:
-
-> On Wed, 6 Mar 2024 16:01:48 +0000 Ratheesh Kannoth wrote:
-> > > > > +	struct qmc_hdlc_desc *desc = context;
-> > > > > +	struct net_device *netdev = desc->netdev;
-> > > > > +	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);    
-> > > > Reverse xmas tree    
-> > > 
-> > > The reverse xmas tree order cannot be used here.
-> > > qmc_hdlc depends on netdev, netdev depends on desc.
-> > >     
-> > ACK. Usually I get comments to split declaration and assignment for
-> > my patches in upstream.   
+On Wed, 6 Mar 2024 18:46:11 +0100 Herve Codina wrote:
+> > > ACK. Usually I get comments to split declaration and assignment for
+> > > my patches in upstream.     
+> > 
+> > Yup, that's our general preference, to split the init out of 
+> > the definition.  
 > 
-> Yup, that's our general preference, to split the init out of 
-> the definition.
+> Does it mean that I need to update in a next iteration ?
 
-Does it mean that I need to update in a next iteration ?
-
-Best regards,
-Hervé
+If you'd be so kind.
 
