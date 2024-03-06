@@ -1,224 +1,417 @@
-Return-Path: <netdev+bounces-78188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA7028744A8
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:45:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29B088744C1
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:51:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B6762810E8
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:45:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D1AF1C2224B
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:51:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7809E1C6A0;
-	Wed,  6 Mar 2024 23:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DFA1CA9A;
+	Wed,  6 Mar 2024 23:51:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="jMphSLv8";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="avKLTLYi"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EqlnvMAi"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED3063C8;
-	Wed,  6 Mar 2024 23:45:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.153.233
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709768734; cv=fail; b=hfzp34Uxby6gNacUIzGnLDNBRFmK1kMcpnIZG77NriJtotv2adTOlglOSZ8DLuw2lvykutDeT8uhGuXFl1sCn/Bq+I+ULaMR2J60aKdXQ1EDGPKJGLFk3amizelD6QJwq+ByxdSftiE0sYq/5uDhhhG8gsOeoYV9JASeQ9lBD9c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709768734; c=relaxed/simple;
-	bh=tE5OHsiFMsbLNYwzG4ej22HirXLHUdBuWSXLZ1mJGHY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cbCaR/mlnDNW/bsFilpYO9qQMGOJreR1qoTfa7w9Rz7QK08cfd7qFwMDzv3noxQNpham/dc9yu1U1bDHs9S/P19dzYs6ApJqdtviiheInSYZtfcMRoyL0DUAIXfPObJHa2gwyVArTtscQZ8Z7QkevO4sdU9J8VdKkbxjPFp8zXU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=jMphSLv8; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=avKLTLYi; arc=fail smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1709768732; x=1741304732;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=tE5OHsiFMsbLNYwzG4ej22HirXLHUdBuWSXLZ1mJGHY=;
-  b=jMphSLv8DPVRiie2loBvu9iOsndqiazRzgTUmmtmJsi5dZOh6F+G9t45
-   F3/iPXhjRAgH1mZscRbrC0LQ2HrgkgSmSh6wCB69eEPXOSKknxx388fEa
-   4E6HQ349QSDdP5p3EVnfLfJNISxDrZppY5aS7ZOzIsQ3WLlivKV843Y+K
-   /OFxVJilwchyQvt0Bd1E0LpcxqhKJnO6fevBo/r2RGHvzsqzpAjgvkD88
-   5FAHdaZB53M//l5mnm29hvHXREGa0Kg7PeEh36QHPMx9mS8ZTVjfujapx
-   bOO4Pl0TEN/GDUII6F94Krca68YJICV3z9S/7xeCQLixq6XjDqjWOiQCo
-   w==;
-X-CSE-ConnectionGUID: zUgBQRS/RJ2NzHjj2oSmAQ==
-X-CSE-MsgGUID: FWPgOI+oRoiTcUu+rKvd6g==
-X-IronPort-AV: E=Sophos;i="6.06,209,1705388400"; 
-   d="scan'208";a="18967338"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Mar 2024 16:45:30 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 6 Mar 2024 16:45:00 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 6 Mar 2024 16:45:00 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LeGZf2uA+WP4zsv3YB9BMY15JetPRJ6VWSef3BDqzOQbJE4zE85EhPBwfXD23hcNudfBw/RE3nbKVm7rDOFNZudxGeYPMmagYoQ34WeR/rKw8YhhGI3DEoaRH5yK9IMceKZHla2bueVEnULOcrTosafrnVkiSZp4AQDh9m9bWOVaf+NdFlfTqyW7n4dV7yLWg4fpH+5OmYelEp4srRYzP9jTMhJ1wORkJUb6wHsTtZd2sy14a+AcgaH/KoJfR6ik3Ck3B3BEDOaxrsZBgvp61wNg1UY63QNpZLvHAo6kp/tF99kOUETe10T3hOJPaX21VZ/hPoMrtH0fooKyvxkmzA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5D/pKyx4irqtNRremVdUAz26Ax5gi4d27bbf7dGJSw0=;
- b=M8dYgt0ajkiwMtU5ETGtXUAq/nKumIl/Ium4hb4BaAvmv7PUQZHIkN0jNzeYAIVsjTOR7Ez2Qc7GG87alJwDeGZU9fIrkwxqkJDN1esIrD6sg38g/YPIJx8wFRr8gnGx0L0v57FmEpbexw5JNWZvGGFPWrZV/oHRXUQy8LjeKqWkOy6FCt5InyyL9ibUCqyLJ8WGUSrthaxgJROMmfLS1YyHYUQtgS4i/r9ynywk6gsA/5MMeKtyhTiYUyF0Lxirlor6AxnGwL/K8V0+yV0chVwFoSkjk4w24eUOn+39aSqM2BYKnKIc/iME8hlx5A2m0wj9VEBCr8paRB+QHnOBkw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5D/pKyx4irqtNRremVdUAz26Ax5gi4d27bbf7dGJSw0=;
- b=avKLTLYiA0sbHw0+ie0MpF5mBp6vQUbqt/XYiKLrGRCvG+M3EHh/7szuaO3ccJ+hYhVMIGL/CGWZgQdeARzTXAdd4madwFv+FG4LR9/waSsxKlJf9HRyJ9x/RM8uJc3HtXo1lxSoM9Wt1hFk5FN9KIrXHikamqdB/CfDUjh0zCuLTxzlYalmrmeqdugItHfsGwuoYdrjDb/rzXwsnePSGK3v0Kl6sKYBRVIaLGObAINcOZZo7vf9pykQkmXRFt+l2VhhqYmQ1HMDRl7ttrdTrlbWKVijcDWuefGjKBOie89QaCYim17NYDYyljdx/waIejlFKYnEONazcQ8J9EoTVA==
-Received: from BL0PR11MB2913.namprd11.prod.outlook.com (2603:10b6:208:79::29)
- by MN2PR11MB4598.namprd11.prod.outlook.com (2603:10b6:208:26f::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Wed, 6 Mar
- 2024 23:44:58 +0000
-Received: from BL0PR11MB2913.namprd11.prod.outlook.com
- ([fe80::dc78:62a2:5ccf:6248]) by BL0PR11MB2913.namprd11.prod.outlook.com
- ([fe80::dc78:62a2:5ccf:6248%3]) with mapi id 15.20.7362.019; Wed, 6 Mar 2024
- 23:44:58 +0000
-From: <Woojung.Huh@microchip.com>
-To: <Parthiban.Veerasooran@microchip.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<horms@kernel.org>, <saeedm@nvidia.com>, <anthony.l.nguyen@intel.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <andrew@lunn.ch>,
-	<corbet@lwn.net>, <linux-doc@vger.kernel.org>, <robh+dt@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-	<devicetree@vger.kernel.org>, <Horatiu.Vultur@microchip.com>,
-	<ruanjinjie@huawei.com>, <Steen.Hegelund@microchip.com>,
-	<vladimir.oltean@nxp.com>
-CC: <UNGLinuxDriver@microchip.com>, <Thorsten.Kummermehr@microchip.com>,
-	<Pier.Beruto@onsemi.com>, <Selvamani.Rajagopal@onsemi.com>,
-	<Nicolas.Ferre@microchip.com>, <benjamin.bigler@bernformulastudent.ch>
-Subject: RE: [PATCH net-next v3 11/12] microchip: lan865x: add driver support
- for Microchip's LAN865X MAC-PHY
-Thread-Topic: [PATCH net-next v3 11/12] microchip: lan865x: add driver support
- for Microchip's LAN865X MAC-PHY
-Thread-Index: AQHab6OpOH9fv+fH6UiUBHGHSCgdN7ErYJiQ
-Date: Wed, 6 Mar 2024 23:44:58 +0000
-Message-ID: <BL0PR11MB29133BBDC826A8B79F59FEB1E7212@BL0PR11MB2913.namprd11.prod.outlook.com>
-References: <20240306085017.21731-1-Parthiban.Veerasooran@microchip.com>
- <20240306085017.21731-12-Parthiban.Veerasooran@microchip.com>
-In-Reply-To: <20240306085017.21731-12-Parthiban.Veerasooran@microchip.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR11MB2913:EE_|MN2PR11MB4598:EE_
-x-ms-office365-filtering-correlation-id: 1702a8b2-357e-4854-1489-08dc3e376f2d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +BjkhxTUZC71ACJAZBJbToXJThA18hDULbm+/MKtGv308OxDeaPbi2Jump8/IpCZwSm2oJUTWtq/MXv0tmLzsv2mJHQScEiVbnOHHr5BpzAAftPqyFcKzfJ1P+/GAYDvT2OGT7AWPOUxRDVUJEuvuU3iY1Nx6hIqUGjQ6s8l5n8BI6/te2EpW4FetwPq4ln+iZlxT67hXTppgAOMFD6PjZtEgEdndj7dvE0WKbQ+DznKXHSz1hxsgOMv2kZrQlGoe1euawVyoAstxUeZwsDswQcCn/tv1JYutbJEnO0cLVK0Qer/wVJr+hbNA8/TlgQ09llXW+Jm+F8dKH0hwKkJJqOFwqVSSf04MEY6QaKjang/wBFq2q55AXCWklzPt6ufyRbz2mcuT4qtaZDkaOuwv6zhbizOteUCnLU8aJdm8gLCboCmxmFL81mGExWFhuLjY1+GM+KBLgGnTUQ37FDJlXTqoAhPZdPqKxB755CUByinxl7UEoug+MrxU9+0Itj6Ao/MjIqdo8wOa7DU4CtZIXvb71lJJBCmIcG93hMNZI45/bGnSB7z53F4iQjGZeoqxZzECJ2LgaNL7bz+nNWHyRJJoca8dBR2HSgkVWb2GsAupvo3f89NbAM4qRYxh/nqTg6iALzn6r0zBguDuHIPYeQB41bX+Dhdgj9yZbew03ibZOibM3Br+7UGDrNpq1f6MQCFom3hjzetBKKbMPepuRw9ZI93Ri8xZQR+Z/CPP/M=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB2913.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009)(921011);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?pMJZZl0Gr/7q60cfczeb7Qh+CWNvv6mBs+jScAbHNV018mh4ekG1qZpwJIeU?=
- =?us-ascii?Q?kwCXjHuX3WHn8qY3/S+Km+t7ePvAWWupYdNvWC4A8wEg0ykO2rj/uposi12/?=
- =?us-ascii?Q?qCEu+CUadDMaWisc4zhy4Rhx5LrTwjJ5eRkonUVb6IiIiBTQ8KtPGCF8vLn6?=
- =?us-ascii?Q?X4SMMQ2djzRDwNNGX2coVeEX8SjwBQMoJiNNb/L/SleBS36oUWz1zrwYJ5mX?=
- =?us-ascii?Q?dY57Pb6eNKokAxMtX6h1UzPG3aaTE3qwy/wjZ5o6/UOclCypm+PLmml4F2oB?=
- =?us-ascii?Q?NXZotfzfqkaWN1RQHUJduxSs284TS92wo0bhIAViMjPXkRjPWSBWUeSIhNG5?=
- =?us-ascii?Q?Pcqs7GdwyQpIqEC7dt57WdVzahaFoNOQP6U5aJh15EtErst3uhLXK3tAjkVz?=
- =?us-ascii?Q?Ur9lIA1TbATbEAw9lFsUgYpiM8stDGHy8IS0HXYxUruxwlch9Di/U+/bJ+Jk?=
- =?us-ascii?Q?kJYC9gTCal606QnzddgUntmfw3i+ppufo/0yqaFUbFAKF4aLg0wdVT0EGAQN?=
- =?us-ascii?Q?QB7SOaTbqvL6KqZ/wZ/f84gpDFTds3RWCyGsXjMsR3EnS++VCM3EmUk+NdJw?=
- =?us-ascii?Q?Bdz07T+3e32+ehIqZCp48NCFPye+mO1aaS6xrCSdqAqunP5ukdvI2oiTv9DJ?=
- =?us-ascii?Q?pYRA0QQ+W41IkD7Z7D3oFIQr6sihJsim8/u70E4AlU7cpZOS1m6d4UMg91hB?=
- =?us-ascii?Q?p5k68zj+1Yq2lJgr10rJV+kYTWiI48guidur/GAQ0exJpvzGToST8OXqw23V?=
- =?us-ascii?Q?vHdoxWYswM23baSu+JRhjtzqCN16Vx0OSrsezwTw9lhhyZL14nUd5CfqGxQz?=
- =?us-ascii?Q?UyfaBKGm5iA/WIS3Tblzqyr3cp+xjL6urk3o6hiidxGu7lFpIr3t0VV+ssXY?=
- =?us-ascii?Q?maJbVmaaRnaWGjiCO7iPvUoCf+KR6+fPcT7tF+pDAom0Gx99MP5ti0ta54Iw?=
- =?us-ascii?Q?gPl+jZbIkc7gulZdOO2uzx8YQyWv01xZqAzUPIqhP1BwOxfkWpdBh3Hth/uK?=
- =?us-ascii?Q?jmati4Nb1zvoogD041NEfTNf/4Xyjs7No32N8j9mYUaeF+ASHQWRpJ3XZdya?=
- =?us-ascii?Q?x4sbS6x2gAdQh4s8aqftDWJtzzzJGlTO/IPMFq0Bx0XRR/beNXuOXKARJ4vn?=
- =?us-ascii?Q?yQTaabFMNJBqnkVkrxu4hgwVfiDUdRHco+BFFhKXxO22mBM40o14f/WqTKUB?=
- =?us-ascii?Q?4sL6Cc4yLKleSWnSY0NiSXJiugphIP6GHTllvNmauFWxszATNH13cGv/87m7?=
- =?us-ascii?Q?vOh6gjeJ/V4odsfjmSZjWJcnVQ/lrRLBryl/Qv5zZ01clU866QCg2/+TAsO7?=
- =?us-ascii?Q?RuNgUS+66xgdB0cZ/kytRMxVX/QX88pVgeV0V0KWUZJ8WCmg8QzB7B8vP6e/?=
- =?us-ascii?Q?tITw8/xrMjLg6HOdOR/7WTudY0kIaUakYkydhMHBp5DZw2hCXyh8cD3oUDzg?=
- =?us-ascii?Q?Y0NKy6foaZ4JEc8vHUnnXLo7kOG0p/UL+I84MTB3/rj5egXCYX9N0iamKaUN?=
- =?us-ascii?Q?sRCC0LhSO+b7aDa5+2RjLph1w6xkClcEGNZ5ydBYbRxDOaC0h0t0G4WgRXbk?=
- =?us-ascii?Q?YxMr7NbKr1E6amC4Mu/F5lDA38mgZ1Y1eT/0KUCO?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896251CD16
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 23:51:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709769102; cv=none; b=XJOQS79elVEL+8i4kYVyuUYsAE7dWKmWGxPnVrtdZ/UzkFpTlbxTSFZS3EE3jxCyqT+PMn5EXmfPUIAuGyIW45m2YnZqs59TCJMyY6OdKvejoWep9DNgxAh6QmHz3KLOyHYSxE9eacb9w2YP69I3R/MSPc1pAgNl1yGPSZAXdtk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709769102; c=relaxed/simple;
+	bh=kniFRnBCwG2rtM99m/dBlmUFBoQG+cJidyFisAZSBmo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OaFp5myVXDOteKAteW5NWc8IsSixYvAnAVTIeQL8MDYnm19X8K1RDWEIzqp6/Yr0V6OJndfw5kgKKp2ONCT0EJMYxs20uTmMBpVwppPym2x8g8+1A/KBJtXfpqa2ymUwGyGBBSeiwBqSbozjJDVe44ouuwXH69B/dWDnaqzlGdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=EqlnvMAi; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1dc5d0162bcso2777715ad.0
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 15:51:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1709769100; x=1710373900; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8/qOHT0FrXz/jk25N5t4D87h17X9rY+PHleRKIhqTA0=;
+        b=EqlnvMAiH0BsW624OVVzVEhLIK2fq+9EM5QpJJhSl7kGke1eHRBCK0gFkAY2EC91Rj
+         rLZeVNT2x7aaeAHPiffMiOlLYNtiMkKwbEneWk7xfJloukNLMqQdg6VmulBYIQ9ogBJU
+         RalLgx0S0/NDpcjFPZhKyh1/k9qzWOAPcPEi8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709769100; x=1710373900;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8/qOHT0FrXz/jk25N5t4D87h17X9rY+PHleRKIhqTA0=;
+        b=RjZbYgjuhUTxomL/JnEXOoUpBY1B+dQxzF662llM1Wcpq2zev5Xf/zbqPTIQVDWWjF
+         7jgoNDOeGcuf1jiYjBrK4aHvt4f/R9KcKAWQdz6bMp/fhJaVqko/FvomEZXVK7xYUie+
+         Xsd5mzyO6YeJn/Nv/mpauaDAY5mW3ntxRwby+BCbeg0CJTlN/OBWq78ujQZRQXLOWk81
+         hBnwE7gIQSRc3WtjG/BxVPdfonv8wuCEH4DmpmwJMW9TUV/ZIE1zBYQA/DSeS1FJUuCO
+         teJW3+GbS8Y5W8gK55TjZEid30GdlWui0Env8HTBipSDiREqdEDyEgo9MW70946PeOg7
+         zkxA==
+X-Forwarded-Encrypted: i=1; AJvYcCUBbItiHrCUoWspmgDxH1Y5Kowlq3PFQB2+GmUeWizRgS0GCNVtSC5PGKJdjUovPM3xUGxsDWvm6MYddvFfiR2rme5bEncV
+X-Gm-Message-State: AOJu0YyEdBX3tDgNzMD4oqyCmqYw9ngaPiS964td0Z9I3LgOkT5SqvjH
+	4ZLtlgHoYa0XoYm/7Ocjl3ofnt2qjSDmJ4J7feSm4FUPdeuUiETOG0DOSnaqFg==
+X-Google-Smtp-Source: AGHT+IE+NKCIeOLd0oynlJyaM7Qjc9sYGTUxRdsQeKvXZf1AORTGmLID2QxlOJQ28IlrXJVJZL7wtw==
+X-Received: by 2002:a17:903:2289:b0:1dd:4064:9f2a with SMTP id b9-20020a170903228900b001dd40649f2amr3014579plh.38.1709769099655;
+        Wed, 06 Mar 2024 15:51:39 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id k11-20020a170902c40b00b001dba98889a3sm13153733plk.71.2024.03.06.15.51.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Mar 2024 15:51:39 -0800 (PST)
+From: Kees Cook <keescook@chromium.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Kees Cook <keescook@chromium.org>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] overflow: Change DEFINE_FLEX to take __counted_by member
+Date: Wed,  6 Mar 2024 15:51:36 -0800
+Message-Id: <20240306235128.it.933-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB2913.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1702a8b2-357e-4854-1489-08dc3e376f2d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Mar 2024 23:44:58.8590
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FeRyZ77ZV57Hn244y1QBakrwHT8bbdcmsbf6FWKCA9U1MEzxA/DPH0guOHfkKF3bE2/aGl/jlfIaag+1Owgm2nYxRz0gwKNSNDX+30S+l+s=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4598
+X-Developer-Signature: v=1; a=openpgp-sha256; l=13054; i=keescook@chromium.org;
+ h=from:subject:message-id; bh=kniFRnBCwG2rtM99m/dBlmUFBoQG+cJidyFisAZSBmo=;
+ b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBl6QGIq6qEj9nAtP/Hd8ILwEU+OKOpsRRqP9w8G
+ A99LVP1JseJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZekBiAAKCRCJcvTf3G3A
+ JiV/D/989Wm7nRRGUuhrbWs4Q23qF9hCTtWGHHjozWeiXXcNph/LiO7snp7NDjegFbvWGGN0q8g
+ 7z504ffBh9xBSttljWSciOKxgysSSyg8dathEyRLIJ9mLHyPC1qIb4reP7W74pYWww8bHmF23Yj
+ dESZd3Y4gJXka/ITZPhurHnIsqtXfVS6E5UHYmMu4YbPqmNfg85yvn2owKEpTMZ4KB8rrxdPEEa
+ QC06bJsVoib2ilAt/TLjHJkzVKWnr2ONGS8GCx98G1rjCiU08+q/XoKRsKjMLjOnQzeWGlZee7M
+ 6UwR43tDyBZMysUuK8FdSxDVGNYJ939ZAXVReRr+42MqEK+pnwh78GKBHB/fOTV56cgLOj17/1l
+ yLoIWJGTATYxoI+RN2CCeSC2N0JvUVJRGCzNpCNDCWj3J9H2xZXNSEy4gsP1u4WxnTRKttnqhjr
+ Tv/1764wcWBM3l3wWQnyPUMO9iY415td9XW5zMmLEB+KXAgJoUyYoB3+g4ILm9yfnsxB3Sy89NS
+ zEt0DFfKkLkR81TltumdLXKtYVJDo0SshcYbix6ocipmvovqu9qLEPBmPoVmn6uW+XfOFKLvZua
+ bVQ8z4aav9z9FNpjBvszD/ebecrdw5IzNGUyQkXSz5Ls8/4y1wOJto6T8XYjJJDLjuqxHHWueRg
+ T5P7j8 Ws8vWaEkw==
+X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 
-Hi Parthiban,
+The norm should be flexible array structures with __counted_by
+annotations, so DEFINE_FLEX() is updated to expect that. Rename
+the non-annotated version to DEFINE_RAW_FLEX(), and update the
+few existing users.
 
-> diff --git a/drivers/net/ethernet/microchip/lan865x/lan865x.c
-> b/drivers/net/ethernet/microchip/lan865x/lan865x.c
-...
-> +static void lan865x_multicast_work_handler(struct work_struct *work)
-> +{
-> +	struct lan865x_priv *priv =3D container_of(work, struct lan865x_priv,
-> +						 multicast_work);
-> +	u32 regval =3D 0;
-> +
-> +	if (priv->netdev->flags & IFF_PROMISC) {
-> +		/* Enabling promiscuous mode */
-> +		regval |=3D MAC_NET_CFG_PROMISCUOUS_MODE;
-> +		regval &=3D (~MAC_NET_CFG_MULTICAST_MODE);
-> +		regval &=3D (~MAC_NET_CFG_UNICAST_MODE);
-> +	} else if (priv->netdev->flags & IFF_ALLMULTI) {
-> +		/* Enabling all multicast mode */
-> +		regval &=3D (~MAC_NET_CFG_PROMISCUOUS_MODE);
-> +		regval |=3D MAC_NET_CFG_MULTICAST_MODE;
-> +		regval &=3D (~MAC_NET_CFG_UNICAST_MODE);
-> +	} else if (!netdev_mc_empty(priv->netdev)) {
-> +		lan865x_set_specific_multicast_addr(priv->netdev);
-> +		regval &=3D (~MAC_NET_CFG_PROMISCUOUS_MODE);
-> +		regval &=3D (~MAC_NET_CFG_MULTICAST_MODE);
-> +		regval |=3D MAC_NET_CFG_UNICAST_MODE;
-> +	} else {
-> +		/* enabling local mac address only */
-> +		if (oa_tc6_write_register(priv->tc6, LAN865X_REG_MAC_H_HASH,
-> +					  regval)) {
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org
+Cc: linux-hardening@vger.kernel.org
+ v2: swap member/counter args
+ v1: https://lore.kernel.org/lkml/20240306010746.work.678-kees@kernel.org/
+---
+ drivers/net/ethernet/intel/ice/ice_common.c |  4 +--
+ drivers/net/ethernet/intel/ice/ice_ddp.c    |  8 +++---
+ drivers/net/ethernet/intel/ice/ice_lag.c    |  6 ++---
+ drivers/net/ethernet/intel/ice/ice_lib.c    |  4 +--
+ drivers/net/ethernet/intel/ice/ice_sched.c  |  4 +--
+ drivers/net/ethernet/intel/ice/ice_switch.c | 10 ++++----
+ drivers/net/ethernet/intel/ice/ice_xsk.c    |  2 +-
+ include/linux/overflow.h                    | 27 +++++++++++++++++----
+ lib/overflow_kunit.c                        | 19 +++++++++++++++
+ 9 files changed, 60 insertions(+), 24 deletions(-)
 
-Your intention to write 0 into LAN865X_REG_MAC_H_HASH?
-If then, using 0 than regval makes more clear.
-
-> +			netdev_err(priv->netdev, "Failed to write reg_hashh");
-> +			return;
-> +		}
-> +		if (oa_tc6_write_register(priv->tc6, LAN865X_REG_MAC_L_HASH,
-> +					  regval)) {
-
-Same here.
-
-> +			netdev_err(priv->netdev, "Failed to write reg_hashl");
-> +			return;
-> +		}
-> +	}
-> +	if (oa_tc6_write_register(priv->tc6, LAN865X_REG_MAC_NET_CFG,
-> regval))
-> +		netdev_err(priv->netdev,
-> +			   "Failed to enable promiscuous/multicast/normal mode");
-> +}
-> +
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 10c32cd80fff..ce50a322daa9 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -4700,7 +4700,7 @@ ice_dis_vsi_txq(struct ice_port_info *pi, u16 vsi_handle, u8 tc, u8 num_queues,
+ 		enum ice_disq_rst_src rst_src, u16 vmvf_num,
+ 		struct ice_sq_cd *cd)
+ {
+-	DEFINE_FLEX(struct ice_aqc_dis_txq_item, qg_list, q_id, 1);
++	DEFINE_RAW_FLEX(struct ice_aqc_dis_txq_item, qg_list, q_id, 1);
+ 	u16 i, buf_size = __struct_size(qg_list);
+ 	struct ice_q_ctx *q_ctx;
+ 	int status = -ENOENT;
+@@ -4922,7 +4922,7 @@ int
+ ice_dis_vsi_rdma_qset(struct ice_port_info *pi, u16 count, u32 *qset_teid,
+ 		      u16 *q_id)
+ {
+-	DEFINE_FLEX(struct ice_aqc_dis_txq_item, qg_list, q_id, 1);
++	DEFINE_RAW_FLEX(struct ice_aqc_dis_txq_item, qg_list, q_id, 1);
+ 	u16 qg_size = __struct_size(qg_list);
+ 	struct ice_hw *hw;
+ 	int status = 0;
+diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
+index 8b7504a9df31..03efb2521ca7 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ddp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
+@@ -1934,8 +1934,8 @@ static enum ice_ddp_state ice_init_pkg_info(struct ice_hw *hw,
+  */
+ static enum ice_ddp_state ice_get_pkg_info(struct ice_hw *hw)
+ {
+-	DEFINE_FLEX(struct ice_aqc_get_pkg_info_resp, pkg_info, pkg_info,
+-		    ICE_PKG_CNT);
++	DEFINE_RAW_FLEX(struct ice_aqc_get_pkg_info_resp, pkg_info, pkg_info,
++			ICE_PKG_CNT);
+ 	u16 size = __struct_size(pkg_info);
+ 	u32 i;
+ 
+@@ -1986,8 +1986,8 @@ static enum ice_ddp_state ice_chk_pkg_compat(struct ice_hw *hw,
+ 					     struct ice_pkg_hdr *ospkg,
+ 					     struct ice_seg **seg)
+ {
+-	DEFINE_FLEX(struct ice_aqc_get_pkg_info_resp, pkg, pkg_info,
+-		    ICE_PKG_CNT);
++	DEFINE_RAW_FLEX(struct ice_aqc_get_pkg_info_resp, pkg, pkg_info,
++			ICE_PKG_CNT);
+ 	u16 size = __struct_size(pkg);
+ 	enum ice_ddp_state state;
+ 	u32 i;
+diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
+index 2a25323105e5..da38edac1c42 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lag.c
++++ b/drivers/net/ethernet/intel/ice/ice_lag.c
+@@ -470,7 +470,7 @@ static void
+ ice_lag_move_vf_node_tc(struct ice_lag *lag, u8 oldport, u8 newport,
+ 			u16 vsi_num, u8 tc)
+ {
+-	DEFINE_FLEX(struct ice_aqc_move_elem, buf, teid, 1);
++	DEFINE_RAW_FLEX(struct ice_aqc_move_elem, buf, teid, 1);
+ 	struct device *dev = ice_pf_to_dev(lag->pf);
+ 	u16 numq, valq, num_moved, qbuf_size;
+ 	u16 buf_size = __struct_size(buf);
+@@ -828,7 +828,7 @@ static void
+ ice_lag_reclaim_vf_tc(struct ice_lag *lag, struct ice_hw *src_hw, u16 vsi_num,
+ 		      u8 tc)
+ {
+-	DEFINE_FLEX(struct ice_aqc_move_elem, buf, teid, 1);
++	DEFINE_RAW_FLEX(struct ice_aqc_move_elem, buf, teid, 1);
+ 	struct device *dev = ice_pf_to_dev(lag->pf);
+ 	u16 numq, valq, num_moved, qbuf_size;
+ 	u16 buf_size = __struct_size(buf);
+@@ -1852,7 +1852,7 @@ static void
+ ice_lag_move_vf_nodes_tc_sync(struct ice_lag *lag, struct ice_hw *dest_hw,
+ 			      u16 vsi_num, u8 tc)
+ {
+-	DEFINE_FLEX(struct ice_aqc_move_elem, buf, teid, 1);
++	DEFINE_RAW_FLEX(struct ice_aqc_move_elem, buf, teid, 1);
+ 	struct device *dev = ice_pf_to_dev(lag->pf);
+ 	u16 numq, valq, num_moved, qbuf_size;
+ 	u16 buf_size = __struct_size(buf);
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 9be724291ef8..6819e95cec32 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -1805,7 +1805,7 @@ int ice_vsi_cfg_single_rxq(struct ice_vsi *vsi, u16 q_idx)
+ 
+ int ice_vsi_cfg_single_txq(struct ice_vsi *vsi, struct ice_tx_ring **tx_rings, u16 q_idx)
+ {
+-	DEFINE_FLEX(struct ice_aqc_add_tx_qgrp, qg_buf, txqs, 1);
++	DEFINE_RAW_FLEX(struct ice_aqc_add_tx_qgrp, qg_buf, txqs, 1);
+ 
+ 	if (q_idx >= vsi->alloc_txq || !tx_rings || !tx_rings[q_idx])
+ 		return -EINVAL;
+@@ -1854,7 +1854,7 @@ int ice_vsi_cfg_rxqs(struct ice_vsi *vsi)
+ static int
+ ice_vsi_cfg_txqs(struct ice_vsi *vsi, struct ice_tx_ring **rings, u16 count)
+ {
+-	DEFINE_FLEX(struct ice_aqc_add_tx_qgrp, qg_buf, txqs, 1);
++	DEFINE_RAW_FLEX(struct ice_aqc_add_tx_qgrp, qg_buf, txqs, 1);
+ 	int err = 0;
+ 	u16 q_idx;
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
+index d174a4eeb899..a1525992d14b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sched.c
++++ b/drivers/net/ethernet/intel/ice/ice_sched.c
+@@ -237,7 +237,7 @@ static int
+ ice_sched_remove_elems(struct ice_hw *hw, struct ice_sched_node *parent,
+ 		       u32 node_teid)
+ {
+-	DEFINE_FLEX(struct ice_aqc_delete_elem, buf, teid, 1);
++	DEFINE_RAW_FLEX(struct ice_aqc_delete_elem, buf, teid, 1);
+ 	u16 buf_size = __struct_size(buf);
+ 	u16 num_groups_removed = 0;
+ 	int status;
+@@ -2219,7 +2219,7 @@ int
+ ice_sched_move_nodes(struct ice_port_info *pi, struct ice_sched_node *parent,
+ 		     u16 num_items, u32 *list)
+ {
+-	DEFINE_FLEX(struct ice_aqc_move_elem, buf, teid, 1);
++	DEFINE_RAW_FLEX(struct ice_aqc_move_elem, buf, teid, 1);
+ 	u16 buf_len = __struct_size(buf);
+ 	struct ice_sched_node *node;
+ 	u16 i, grps_movd = 0;
+diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
+index f84bab80ca42..d4baae8c3b72 100644
+--- a/drivers/net/ethernet/intel/ice/ice_switch.c
++++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+@@ -1812,7 +1812,7 @@ ice_aq_alloc_free_vsi_list(struct ice_hw *hw, u16 *vsi_list_id,
+ 			   enum ice_sw_lkup_type lkup_type,
+ 			   enum ice_adminq_opc opc)
+ {
+-	DEFINE_FLEX(struct ice_aqc_alloc_free_res_elem, sw_buf, elem, 1);
++	DEFINE_RAW_FLEX(struct ice_aqc_alloc_free_res_elem, sw_buf, elem, 1);
+ 	u16 buf_len = __struct_size(sw_buf);
+ 	struct ice_aqc_res_elem *vsi_ele;
+ 	int status;
+@@ -2081,7 +2081,7 @@ ice_aq_get_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u8 *r_bitmap,
+  */
+ int ice_alloc_recipe(struct ice_hw *hw, u16 *rid)
+ {
+-	DEFINE_FLEX(struct ice_aqc_alloc_free_res_elem, sw_buf, elem, 1);
++	DEFINE_RAW_FLEX(struct ice_aqc_alloc_free_res_elem, sw_buf, elem, 1);
+ 	u16 buf_len = __struct_size(sw_buf);
+ 	int status;
+ 
+@@ -4418,7 +4418,7 @@ int
+ ice_alloc_res_cntr(struct ice_hw *hw, u8 type, u8 alloc_shared, u16 num_items,
+ 		   u16 *counter_id)
+ {
+-	DEFINE_FLEX(struct ice_aqc_alloc_free_res_elem, buf, elem, 1);
++	DEFINE_RAW_FLEX(struct ice_aqc_alloc_free_res_elem, buf, elem, 1);
+ 	u16 buf_len = __struct_size(buf);
+ 	int status;
+ 
+@@ -4446,7 +4446,7 @@ int
+ ice_free_res_cntr(struct ice_hw *hw, u8 type, u8 alloc_shared, u16 num_items,
+ 		  u16 counter_id)
+ {
+-	DEFINE_FLEX(struct ice_aqc_alloc_free_res_elem, buf, elem, 1);
++	DEFINE_RAW_FLEX(struct ice_aqc_alloc_free_res_elem, buf, elem, 1);
+ 	u16 buf_len = __struct_size(buf);
+ 	int status;
+ 
+@@ -4476,7 +4476,7 @@ ice_free_res_cntr(struct ice_hw *hw, u8 type, u8 alloc_shared, u16 num_items,
+  */
+ int ice_share_res(struct ice_hw *hw, u16 type, u8 shared, u16 res_id)
+ {
+-	DEFINE_FLEX(struct ice_aqc_alloc_free_res_elem, buf, elem, 1);
++	DEFINE_RAW_FLEX(struct ice_aqc_alloc_free_res_elem, buf, elem, 1);
+ 	u16 buf_len = __struct_size(buf);
+ 	u16 res_type;
+ 	int status;
+diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
+index 8b81a1677045..92ffa8de5171 100644
+--- a/drivers/net/ethernet/intel/ice/ice_xsk.c
++++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
+@@ -217,7 +217,7 @@ static int ice_qp_dis(struct ice_vsi *vsi, u16 q_idx)
+  */
+ static int ice_qp_ena(struct ice_vsi *vsi, u16 q_idx)
+ {
+-	DEFINE_FLEX(struct ice_aqc_add_tx_qgrp, qg_buf, txqs, 1);
++	DEFINE_RAW_FLEX(struct ice_aqc_add_tx_qgrp, qg_buf, txqs, 1);
+ 	u16 size = __struct_size(qg_buf);
+ 	struct ice_q_vector *q_vector;
+ 	struct ice_tx_ring *tx_ring;
+diff --git a/include/linux/overflow.h b/include/linux/overflow.h
+index aa691f2119b0..677b03c4c84f 100644
+--- a/include/linux/overflow.h
++++ b/include/linux/overflow.h
+@@ -396,9 +396,9 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
+  * @name: Name for a variable to define.
+  * @member: Name of the array member.
+  * @count: Number of elements in the array; must be compile-time const.
+- * @initializer: initializer expression (could be empty for no init).
++ * @initializer...: initializer expression (could be empty for no init).
+  */
+-#define _DEFINE_FLEX(type, name, member, count, initializer)			\
++#define _DEFINE_FLEX(type, name, member, count, initializer...)			\
+ 	_Static_assert(__builtin_constant_p(count),				\
+ 		       "onstack flex array members require compile-time const count"); \
+ 	union {									\
+@@ -408,8 +408,8 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
+ 	type *name = (type *)&name##_u
+ 
+ /**
+- * DEFINE_FLEX() - Define an on-stack instance of structure with a trailing
+- * flexible array member.
++ * DEFINE_RAW_FLEX() - Define an on-stack instance of structure with a trailing
++ * flexible array member, when it does not have a __counted_by annotation.
+  *
+  * @type: structure type name, including "struct" keyword.
+  * @name: Name for a variable to define.
+@@ -420,7 +420,24 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
+  * flexible array member.
+  * Use __struct_size(@name) to get compile-time size of it afterwards.
+  */
+-#define DEFINE_FLEX(type, name, member, count)			\
++#define DEFINE_RAW_FLEX(type, name, member, count)	\
+ 	_DEFINE_FLEX(type, name, member, count, = {})
+ 
++/**
++ * DEFINE_FLEX() - Define an on-stack instance of structure with a trailing
++ * flexible array member.
++ *
++ * @TYPE: structure type name, including "struct" keyword.
++ * @NAME: Name for a variable to define.
++ * @MEMBER: Name of the array member.
++ * @COUNTER: Name of the __counted_by member.
++ * @COUNT: Number of elements in the array; must be compile-time const.
++ *
++ * Define a zeroed, on-stack, instance of @TYPE structure with a trailing
++ * flexible array member.
++ * Use __struct_size(@NAME) to get compile-time size of it afterwards.
++ */
++#define DEFINE_FLEX(TYPE, NAME, MEMBER, COUNTER, COUNT)	\
++	_DEFINE_FLEX(TYPE, NAME, MEMBER, COUNT, = { .obj.COUNTER = COUNT, })
++
+ #endif /* __LINUX_OVERFLOW_H */
+diff --git a/lib/overflow_kunit.c b/lib/overflow_kunit.c
+index 65e8a72a83bf..4ef31b0bb74d 100644
+--- a/lib/overflow_kunit.c
++++ b/lib/overflow_kunit.c
+@@ -1172,6 +1172,24 @@ static void castable_to_type_test(struct kunit *test)
+ #undef TEST_CASTABLE_TO_TYPE
+ }
+ 
++struct foo {
++	int a;
++	u32 counter;
++	s16 array[] __counted_by(counter);
++};
++
++static void DEFINE_FLEX_test(struct kunit *test)
++{
++	DEFINE_RAW_FLEX(struct foo, two, array, 2);
++	DEFINE_FLEX(struct foo, eight, array, counter, 8);
++	DEFINE_FLEX(struct foo, empty, array, counter, 0);
++
++	KUNIT_EXPECT_EQ(test, __struct_size(two),
++			sizeof(struct foo) + sizeof(s16) + sizeof(s16));
++	KUNIT_EXPECT_EQ(test, __struct_size(eight), 24);
++	KUNIT_EXPECT_EQ(test, __struct_size(empty), sizeof(struct foo));
++}
++
+ static struct kunit_case overflow_test_cases[] = {
+ 	KUNIT_CASE(u8_u8__u8_overflow_test),
+ 	KUNIT_CASE(s8_s8__s8_overflow_test),
+@@ -1194,6 +1212,7 @@ static struct kunit_case overflow_test_cases[] = {
+ 	KUNIT_CASE(overflows_type_test),
+ 	KUNIT_CASE(same_type_test),
+ 	KUNIT_CASE(castable_to_type_test),
++	KUNIT_CASE(DEFINE_FLEX_test),
+ 	{}
+ };
+ 
+-- 
+2.34.1
 
 
