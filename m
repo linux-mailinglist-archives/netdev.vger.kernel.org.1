@@ -1,131 +1,115 @@
-Return-Path: <netdev+bounces-78089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4882A874098
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 20:40:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F9888740A6
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 20:42:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2A281F22E16
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 19:40:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DD0E2833A1
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 19:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4376F140365;
-	Wed,  6 Mar 2024 19:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JqH63vRq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9545F140362;
+	Wed,  6 Mar 2024 19:42:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83FA813E7C4
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 19:39:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B92A60250;
+	Wed,  6 Mar 2024 19:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709753997; cv=none; b=lIdEs2Dr8k6QmSLUpOiBRVFumwg8a5z/W17wp/VfaQqqFMQEiHtm4PbtkRqLxAgmPgd1Jc5gp3orsPs5Yp+jiM0/8iSzj4aB17Pa7Gnba+AcdUwrVWkJKMROytoZMUBA8vn9S5I6RGfc0+PJQyFNnuDyfiXqTL5olpi03waobAE=
+	t=1709754126; cv=none; b=hsIy6g6AYEnx9e8sONAiQq5Oz0RHsmgSyOnqMID4YPUIFw55BEgN7Q1m3OluEz1aU1iCZk4/jXP3hMA6MWfqV3JQvV36MC+mffQJFVxHFbQnhbxdoJ22tikJPDvoQ9ayz7J7bSZJXyrB3z8BakktjUk+ByJ2+FbA+wb/A+BjdAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709753997; c=relaxed/simple;
-	bh=OHMDUw8wZFNBqKvBPgCt+j65iaX3/ESPLB8XXqiX2R4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kwvwsZUiRF2C/fL5ZUjq7ecokI7Oll84YJeDztA5ldIpIOYapeRHD2wZMyIMK/opyCOYQpVPDbkEooab+gxOLpML9kvoHSdzAp10wYM/ZY694MydGZT1oopDuOBB2L51C5L9vtuQqM2PyfVXvdK7GlhPVYa5jBuC9KZM6o9hEDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JqH63vRq; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ztEqR5HvQk+w5JaIMAVNvY0OgOwcnEbaG9mbQ9VkILQ=; b=JqH63vRqPd7kFITknD+fCw4Fwh
-	n98F2XxVs53lCWech/4/NwyLcitudMqKaS9AHKxvsrurO7VKGXLizIcb/hvpiu60fPutq4tcj6jh8
-	N7yB5YOiulm9Tq4XCYg0yftxf0b4QvUC0LTWWFZNfpGCBUEHKXncvEjP33ptxR1+N/5s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rhx7m-009WdM-02; Wed, 06 Mar 2024 20:40:22 +0100
-Date: Wed, 6 Mar 2024 20:40:21 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next v2 22/22] ovpn: add basic ethtool support
-Message-ID: <01adab06-78c9-421e-bd3f-453e948f5bbb@lunn.ch>
-References: <20240304150914.11444-1-antonio@openvpn.net>
- <20240304150914.11444-23-antonio@openvpn.net>
- <57e2274e-fa83-47c9-890b-bb3d2a62acb9@lunn.ch>
- <25cc6fba-d8e5-46c0-8c16-f71373328e7d@openvpn.net>
+	s=arc-20240116; t=1709754126; c=relaxed/simple;
+	bh=whu07ooxW6kWeuVMdOr7djt4Zcxe2pjCyzB54JBEO24=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=YXPxFBkEmrXX00J/50kY/su3UKHnVT0/l96RlQ0IxifhnOX4S9UX3+lpIbZES4cR1gHJBP1U068p8/j2UINkHe9a2jr90eShUCbpDuRPEGHrUokpILaxrnH0ejezW9LZXJInyeCublyXxZWUCvmUKu3aROODm2VzYiZLTCntp+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (178.176.76.108) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 6 Mar
+ 2024 22:41:46 +0300
+Subject: Re: [PATCH net-next] dt-bindings: net: renesas,etheravb: Add support
+ for R-Car V4M
+To: Geert Uytterhoeven <geert+renesas@glider.be>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Sergei Shtylyov
+	<sergei.shtylyov@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, Thanh Quan <thanh.quan.xn@renesas.com>
+References: <0212b57ba1005bb9b5a922f8f25cc67a7bc15f30.1709631152.git.geert+renesas@glider.be>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <a20b154d-9d7a-9775-851a-860490be1f1f@omp.ru>
+Date: Wed, 6 Mar 2024 22:41:46 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <25cc6fba-d8e5-46c0-8c16-f71373328e7d@openvpn.net>
+In-Reply-To: <0212b57ba1005bb9b5a922f8f25cc67a7bc15f30.1709631152.git.geert+renesas@glider.be>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 03/06/2024 19:21:53
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 184012 [Mar 06 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 9 0.3.9 e923e63e431b6489f12901471775b2d1b59df0ba
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.76.108 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;127.0.0.199:7.1.2;178.176.76.108:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.76.108
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 03/06/2024 19:26:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 3/6/2024 2:00:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Wed, Mar 06, 2024 at 04:42:03PM +0100, Antonio Quartulli wrote:
-> On 05/03/2024 00:04, Andrew Lunn wrote:
-> > On Mon, Mar 04, 2024 at 04:09:13PM +0100, Antonio Quartulli wrote:
-> > > Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
-> > > ---
-> > >   drivers/net/ovpn/main.c | 32 ++++++++++++++++++++++++++++++++
-> > >   1 file changed, 32 insertions(+)
-> > > 
-> > > diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
-> > > index 95a94ccc99c1..9dfcf2580659 100644
-> > > --- a/drivers/net/ovpn/main.c
-> > > +++ b/drivers/net/ovpn/main.c
-> > > @@ -13,6 +13,7 @@
-> > >   #include "ovpnstruct.h"
-> > >   #include "packet.h"
-> > > +#include <linux/ethtool.h>
-> > >   #include <linux/genetlink.h>
-> > >   #include <linux/module.h>
-> > >   #include <linux/moduleparam.h>
-> > > @@ -83,6 +84,36 @@ static const struct net_device_ops ovpn_netdev_ops = {
-> > >   	.ndo_get_stats64        = dev_get_tstats64,
-> > >   };
-> > > +static int ovpn_get_link_ksettings(struct net_device *dev,
-> > > +				   struct ethtool_link_ksettings *cmd)
-> > > +{
-> > > +	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.supported, 0);
-> > > +	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.advertising, 0);
-> > > +	cmd->base.speed	= SPEED_1000;
-> > > +	cmd->base.duplex = DUPLEX_FULL;
-> > > +	cmd->base.port = PORT_TP;
-> > > +	cmd->base.phy_address = 0;
-> > > +	cmd->base.transceiver = XCVR_INTERNAL;
-> > > +	cmd->base.autoneg = AUTONEG_DISABLE;
-> > 
-> > Why? It is a virtual device. Speed and duplex is meaningless. You
-> > could run this over FDDI, HIPPI, or RFC 1149? So why PORT_TP?
+On 3/5/24 12:37 PM, Geert Uytterhoeven wrote:
+
+> From: Thanh Quan <thanh.quan.xn@renesas.com>
 > 
-> To be honest, I couldn't find any description to help me with deciding what
-> to set there and I just used a value I saw in other Ethernet drivers.
+> Document support for the Renesas Ethernet AVB (EtherAVB-IF) block in the
+> Renesas R-Car V4M (R8A779H0) SoC.
 > 
-> Do you have any recommendation?
-> For the other fields: do you think they make sense? The speed value is
-> always debatable...The actual speed depends on the transport interface and
-> there might be multiple involved. Maybe SPEED_UNKNOWN is more appropriate?
+> Signed-off-by: Thanh Quan <thanh.quan.xn@renesas.com>
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Turn it around. What is your use case? What is using this information?
-I would just not implement this function. But maybe you know of
-something which actually requires it?
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-> > > +	strscpy(info->bus_info, "ovpn", sizeof(info->bus_info));
-> > 
-> > This is also not accurate. There is no bus involved.
-> 
-> Should I just leave it empty then?
-> 
-> My concern is that a user expects $something and it will crash on my empty
-> string. But if empty is allowed, I will just go with it.
+[...]
 
-Empty is allowed. The bridge uses "N/A", which i would say is also
-correct. tun/tap does however use "tun", so "ovpn" is not that
-different i supposes.
-
-	Andrew
-
+MBR, Sergey
 
