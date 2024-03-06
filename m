@@ -1,112 +1,128 @@
-Return-Path: <netdev+bounces-77873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB09E873482
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 11:41:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FA898734F1
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 11:53:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED4491C2438E
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 10:41:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B85CB23C15
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 10:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8920460DCF;
-	Wed,  6 Mar 2024 10:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 477F45FDD4;
+	Wed,  6 Mar 2024 10:41:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jN53r9f8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lihvn/1/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658C9605BF
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 10:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA9B5FBB7
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 10:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709721629; cv=none; b=Ka2DlxceJFUveXY62v+m8Og1mW8+otSAYC2HcWFGPJHziBqEGS6aooqpiBWfhOyuA31BhaVNyXHOXJENNqTuHJiXayuGMP2l0L3LIQsafx6ztP+ATEbWq6diOmOsEHVBNzNEmNe1JMEGbfUL7HeBLt35HXvIwNaGrh7sHG8REnA=
+	t=1709721714; cv=none; b=i1ospEWa8rUJ7XbwID11YV3/EdOnMWzFBzOp2pgJHMjueVnEJOanXKo9Q139TrAcU3tzDMgInYcat6CgLMWyKj+3Gj1xZnc7UazpwopIG0VxxGEDUHLlZ+oBEQaPav6CU3bTrXjVQCn3WV5zS+OXs8YPIkR6En0l1teAywAYuvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709721629; c=relaxed/simple;
-	bh=zSddH8RVkJ8ppYTJy79F1SyEBzYA+EDKvNfuw87H80Q=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ojgDcn2GwuHKtm2jgmkXd88GeRR8BGX72SEIukA5xwxkjnXKbtBwjp1Knly7om2N6flk7Rh9P/EUEl+24VMLkHTs9ltLA+wW5gnD4iAxnOLn3Wj0M0Pf8wWuHurGB4/MrlttirzDg+mItVowRPu9CTaeMfARfywwGaeCl/uxGu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jN53r9f8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DCD7FC43394;
-	Wed,  6 Mar 2024 10:40:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709721628;
-	bh=zSddH8RVkJ8ppYTJy79F1SyEBzYA+EDKvNfuw87H80Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jN53r9f8upNhvpXRSNkyLE7PXXYH43YM/Yzw3LG9fyA8cXuN+45WZ7IGCttOQwuU6
-	 PXILQeFUI9NGTrFLTWTusGZQz69iWk9Bz87OF2lEC0GnMhcHpzNG4Zy/M4b+OIZQP9
-	 9rkPpiCeZvX4MIF7PFBrPqp3mOsz38gU+Uu7ZQ4wyyQN4kDz4HgBQYnZ65MEueHSN+
-	 UQtrKpvQzEO7YgHJXWH6s12KyFyUx1g/CbKkWUeuBCwlO9ecVDBAH7wld4ljzoc8KP
-	 ADW0RpNNZyxacBqnOK4zt77yjk9eiTAl3DMY9R6XjUSSZXSFByd4p4OWCSMnRKS9HH
-	 hW5Mx0xokSPQg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C2E78D84BDB;
-	Wed,  6 Mar 2024 10:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709721714; c=relaxed/simple;
+	bh=kCwidvlR/A9CZ3q+xHAYLCMO3jQlBiTdIei1p1YIerU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ps0WWJx9xOHXCWUl32gsi6rQgF8xw4lC4Z2zmIZojgYCkEy8uLcHH4f/A9/vTEExnyfZMzrs2wUDW4Zccx232x9Lfakcv02Ua2UqsQ403F2+/rfKHK8RZe7i8ublXDMWg0yqv31/CUwTFrQt3Gjj5++nMjVDj1s8hJFSjqy5P0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lihvn/1/; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-566b160f6eeso7785a12.1
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 02:41:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709721711; x=1710326511; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ac6YIjBtpRzsjYOfKs4hkAM2nX9AEZlTxzGX/yk4mrs=;
+        b=Lihvn/1/JEvvXKojUB0fIfZDbzvjdKfl837FTVMgGH5vFRFC31/LlEM04hBfxrH/7C
+         qlMNi6EnTx/JNJAnmW58f8RoGGHHALz9aVd8hn3w0FShlSj5UpkW6prA8qJXX8YizH+Z
+         NGS9vOBsCNVOUSYU3R0lsfeWf65lR9RiCugzT6xK6swXlct6ws/6ZQVKOypMrZA02hbO
+         B63hIEJIaeHpx9YaqH6eidnQg/SX7w94Qr4MwGJUb2XyVm3Hbcyjq26PS57jDnHxge9m
+         UEE/Hqw8mlo5WuX6ZnakaF0guGWCZqAayoJvhSQfivH0rqhFsOI9FvGLI8yywr7imh+x
+         KkKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709721711; x=1710326511;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ac6YIjBtpRzsjYOfKs4hkAM2nX9AEZlTxzGX/yk4mrs=;
+        b=eDmqkOfKcHHIfu9Nti5b7IKh8HMo/NadeoI5BAJwX4yo0C+hjTEO+geCMrYf8jsPrW
+         Bk0RWCrP7fr3YZrT1WRq+LocQ7cU1cjwqgiRbzhbXbRbFiwFu6ldqs9AVWpxR7DJCSbP
+         mDUFd6+MV8kHXRx6PflGtF8x31N36taxIw3t9XYFOeCYoRQvIJuH+LJM5h4C4T9rhtm2
+         rC0jTz8lMy08mZFqgVRRMEStB8vgNqh9zrP6pVzjxGxWJl67McPL7EreknuvKdImBM3x
+         tWojWYsOQSTluH7BUaXh0av4TgEQY8Gq64kq0K4toX7+RVluSK8HVqWCjIZO+O1vqV2p
+         PhbA==
+X-Forwarded-Encrypted: i=1; AJvYcCV0K/HHqHSSNXv0RSKSaAyvQrlRjqBbvB81AqO+IuYaDw31+TTm/Buzl00I5LqMRVKwXDJxSGZD9is8MzNyQoXcQBWEwJjZ
+X-Gm-Message-State: AOJu0YyOEPY/wue3IabB4jgpQji4I0rcUa/GHFVtiQMkadSxYi7QmBEZ
+	YZnbReD1wRs/J0DPJTDcF553dk4FMy7C+nF+tuECUV8s84VMhBQ8T/31z3JWWPBjxvnIDmBvjKZ
+	qSzV4PZ4SqDiPMTRDnIFlaC49EphbNQP15pCv
+X-Google-Smtp-Source: AGHT+IHxXfepDQZyEoAvpk37Sh1LodNo2JflhaLnhu/OhexAMll7TyOInFoT7Ebs7fzQA8WjKmzaZ/Kf4cdkQ/H2Vh0=
+X-Received: by 2002:a50:ef03:0:b0:566:b5f5:48cc with SMTP id
+ m3-20020a50ef03000000b00566b5f548ccmr351403eds.5.1709721710584; Wed, 06 Mar
+ 2024 02:41:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/11][pull request] idpf: refactor virtchnl messages
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170972162879.24493.15817194316412787114.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Mar 2024 10:40:28 +0000
-References: <20240304210514.3412298-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20240304210514.3412298-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, alan.brady@intel.com
+References: <CABOYnLwtfAxS7WoMw-1_uxVe3EYajXRuzZfwaQEk0+7m6-B+ug@mail.gmail.com>
+ <CANn89i+qLwyPLztPt6Mavjimyv0H_UihVVNfJXWLjcwrqOudTw@mail.gmail.com> <20240306103632.GC4420@breakpoint.cc>
+In-Reply-To: <20240306103632.GC4420@breakpoint.cc>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 6 Mar 2024 11:41:39 +0100
+Message-ID: <CANn89iLe0KGjbSim5Qxxr6o0AjJVs7-h79UvMMXKOgGKQUosiA@mail.gmail.com>
+Subject: Re: KASAN: slab-use-after-free Read in ip_finish_output
+To: Florian Westphal <fw@strlen.de>
+Cc: xingwei lee <xrivendell7@gmail.com>, pabeni@redhat.com, davem@davemloft.net, 
+	kuba@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, ralf@linux-mips.org, syzkaller-bugs@googlegroups.com, 
+	samsun1006219@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Wed, Mar 6, 2024 at 11:36=E2=80=AFAM Florian Westphal <fw@strlen.de> wro=
+te:
+>
+> Eric Dumazet <edumazet@google.com> wrote:
+> > On Wed, Mar 6, 2024 at 11:00=E2=80=AFAM xingwei lee <xrivendell7@gmail.=
+com> wrote:
+> > >
+> > > Hello, I found a new bug titled "KASAN: slab-use-after-free Read in
+> > > ip_finish_output=E2=80=9D or =E2=80=9CKASAN: slab-use-after-free in s=
+k_to_full_sk" and
+> > > confirmed it in the latest net and net-next branch. After my simple
+> > > analysis, it may be related to the net/rose or AF_PACKET/PF_PACKET
+> > > socket.
+> >
+> > I already had a syzbot report for this issue, thanks.
+> >
+> > Adding Florian to the discussion.
+> > The issue is cause by ip defrag layer, which calls skb_orphan()
+> > These were my notes, I had little time to work on it so far.
+>
+> > Calling ip_defrag() in output path is also implying skb_orphan(),
+> > which is buggy because output path relies on sk not disappearing.
+>
+> Ugh.  Thanks for your annotations and notes, this is very helpful.
+>
+> ipvlan (and two spots in ip_output.c do):
+>
+>    err =3D ip_local_out(net, skb->sk, skb);
+>
+> so skb->sk gets propagated down to __ip_finish_output(), long
+> after connrack defrag has called skb_orphan().
+>
+> No idea yet how to fix it,
 
-This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+My plan was to refine "inet: frag: Always orphan skbs inside
+ip_defrag()" and only do the skb_orphan()
+for skb added to a frag_list.
 
-On Mon,  4 Mar 2024 13:05:00 -0800 you wrote:
-> Alan Brady says:
-> 
-> The motivation for this series has two primary goals. We want to enable
-> support of multiple simultaneous messages and make the channel more
-> robust. The way it works right now, the driver can only send and receive
-> a single message at a time and if something goes really wrong, it can
-> lead to data corruption and strange bugs.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,01/11] idpf: add idpf_virtchnl.h
-    https://git.kernel.org/netdev/net-next/c/5dc283fa5cf7
-  - [net-next,02/11] idpf: implement virtchnl transaction manager
-    https://git.kernel.org/netdev/net-next/c/34c21fa894a1
-  - [net-next,03/11] idpf: refactor vport virtchnl messages
-    https://git.kernel.org/netdev/net-next/c/8c49e68f542f
-  - [net-next,04/11] idpf: refactor queue related virtchnl messages
-    https://git.kernel.org/netdev/net-next/c/52361a06d3f2
-  - [net-next,05/11] idpf: refactor remaining virtchnl messages
-    https://git.kernel.org/netdev/net-next/c/43b67308df98
-  - [net-next,06/11] idpf: add async_handler for MAC filter messages
-    https://git.kernel.org/netdev/net-next/c/41252855df77
-  - [net-next,07/11] idpf: refactor idpf_recv_mb_msg
-    https://git.kernel.org/netdev/net-next/c/e54232da1238
-  - [net-next,08/11] idpf: cleanup virtchnl cruft
-    https://git.kernel.org/netdev/net-next/c/bcbedf253e91
-  - [net-next,09/11] idpf: prevent deinit uninitialized virtchnl core
-    https://git.kernel.org/netdev/net-next/c/14696ed173af
-  - [net-next,10/11] idpf: fix minor controlq issues
-    https://git.kernel.org/netdev/net-next/c/4f5126a075c4
-  - [net-next,11/11] idpf: remove dealloc vector msg err in idpf_intr_rel
-    https://git.kernel.org/netdev/net-next/c/6009e63c57c9
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+The head skb would keep a reference to the socket.
 
