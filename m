@@ -1,118 +1,134 @@
-Return-Path: <netdev+bounces-78191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E5DD8744C6
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:53:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29D3B8744D0
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:59:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F7B01C20A69
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:52:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0BC91F23776
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577EE1C6B7;
-	Wed,  6 Mar 2024 23:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C8781CABF;
+	Wed,  6 Mar 2024 23:59:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ca4LJIyU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HJ6Lqnat"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90CBD1C290;
-	Wed,  6 Mar 2024 23:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A1311C6A5
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 23:59:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709769178; cv=none; b=rDfucHyHLlNCjCCgof4eoo5s8I4L4xY/r9ikVVj+jAKfmW3QR3GF8r5hhwiPGbcwlN+mUn7SZaQOpbMeBR7MpU2+EjV1vbRlz59ObJk++/3+KXQkz38dsA/nWoxJBEJkUMb8tccKR797iyEXXE60Dk2juohZmS0F19MnXH7qGPc=
+	t=1709769569; cv=none; b=XZFHOusoSKnossABYBIHrGvxt6yTrz1cuNtx8MksHbLaGrYMJY4gOhQ9Z2ps4/fHN0z0BhrlTKLOlWZidEgtX2a+bzC+C00ME3KvM/UbEimCb+/Z32NB+VkDfjtuMVvH9eNBB+pPOWhmyYfXfg2u2Wx6O3xbazEfKxfobpCMF7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709769178; c=relaxed/simple;
-	bh=1SvvByfg6c6eVlB8Y01vsD59/Z24m4ZoYgGxbnyuHcQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ErEniBwLARN0qoF9yHf/htPdlgogkL2GrVzyvFYunm+/WjzVi+/Vn8eT1SC2KjpKZ9zCWX1VKU1At9WpUxBYaMKsK1jEdxwyrNfuiZp6KM+CWU/k60UorVwI/rMNEDGyjG+sd0zwjGqZ4Dy0trFI1sJTpuTwUHJ0OrsT1H5YBEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ca4LJIyU; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=gZEDHlbALjwDllMhSvFGjPdmGN7A0cnrj2b74eWzH0Y=; b=Ca4LJIyU8rwcuNlFo3LnpbP7sS
-	+GOeTLwQwV8yixop6/S8l2HF+vUtF8udkY6Tz/+bB9Zo5nFo8n0y4bfh8RQWCU602uEZEtjQcNbCs
-	AECk1WWd0bNJSJOPrzfkUrnYdh+hUa334wlAt9t7MMY01u6CNu9bY+FiP9bKDya95SAs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ri14b-009Xa9-PP; Thu, 07 Mar 2024 00:53:21 +0100
-Date: Thu, 7 Mar 2024 00:53:21 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, bryan.whitehead@microchip.com,
-	richardcochran@gmail.com, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net 3/3] net: lan743x: Address problems with wake option
- flags configuration sequences
-Message-ID: <78d7e538-9fa0-490e-bcfb-0a5943ad80c9@lunn.ch>
-References: <20240226080934.46003-1-Raju.Lakkaraju@microchip.com>
- <20240226080934.46003-4-Raju.Lakkaraju@microchip.com>
+	s=arc-20240116; t=1709769569; c=relaxed/simple;
+	bh=uwk2ahz3j3nCNSoiWAgNLzF3crn2cMJrLrVycgFVLC4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mPWvxrF2mm1P93lqDny57Ll5OwF7sL+PwdyXJMRX3oO1I6Nasuv4s5o7eOwykQyJ1dTbfn0yTuL6ydnmq7BeeZkWTVUV0LIX9KIt1+BVEV30YsT7CHTefba9OOhTg8AZeQIDZwy0cPwi7NYxhTcSUGQr34MDphTzt0VuCyWiTDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HJ6Lqnat; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-608ac8c5781so5816187b3.3
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 15:59:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709769566; x=1710374366; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=NkZW2ptiTvn4uJjuK6pXF9K7rZKuDbfhR4CUsK2zUgQ=;
+        b=HJ6LqnatrgTNx8gURMkSnZ+z+6b37qOPLz2XH+Mw8E9WJRwuD0197pOt1tVA/k7W4n
+         +FgZYri4qMrxiOSQSLiza9Hn50ow2HiWzv6Myd4gfOMCmY0QzKe3aMhPWXzd+pEmJOHD
+         cVhLZ10J5praDKgc278HiXlOpzfTHevrSWX0SdwiMW7xJF65sM8++qTciJSNT8ynGS+8
+         syQ7DM87Vmmb2r98XgtYo11/2M/4pEMk63ikYG/sUIrei4HHiAhCbwNuxN/0phoifEuz
+         TodGSioYzwxceAhVKjQxdYfB4k7/50gTb84nvvizxHPOfr3kk/eipxmv/tpCgfQoWtaW
+         sMyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709769566; x=1710374366;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NkZW2ptiTvn4uJjuK6pXF9K7rZKuDbfhR4CUsK2zUgQ=;
+        b=bYYvuzVSgadllALZf1k8O2D98o6SsRPNsqZWhuBtUVoUkzgUcADuBs132/ud843I8h
+         WQ/T/2Wv6nwBwVNx5qpykNdCo2Lv5aykh7W5bEeIEOoD29hKKK9DOtOaNxuFcHIT33St
+         hI8qVc1HqSXPIs3imVEKOdpIDm+hcivD7HETM+90j2BNRFfDkwjEQzz/Fw6dZN20CNBV
+         LtFPGIoASs3mndWoJOlmu/gcpjmi9O312vZjQ40WbTbvY6WR2C4qlh3JSrvNnokOXsFS
+         6cl0a4j+kJ/QLqcRTKTnviPI9tNJumcGEZtZ/eCsX09/tRHOKbmFtXULTt2G1mi0xLhs
+         P6KA==
+X-Gm-Message-State: AOJu0Yzyrf3jNijXyDS4yPr2WJhmp56P7mrFR3mCn24zmALEJPdnl+C4
+	gux2XLzk2x/NRL70SbTslNUHIRrmFttxr5k8OPVB1b7wrDhbeWEYodLkY2AyrHOGkgEp5XgHN4n
+	yKGc4eoxae1Mr+/VqgG1xidvSAipCFsIGsugOc3Valqn0taDO5aqfzC7bLH70aSf8b50JAJp0Vb
+	K57z5iYAtf1ZT6nSTwq94OaMmx1CIqF51X61RhQsKskpDNXji8GNksmp88uc0=
+X-Google-Smtp-Source: AGHT+IHUihCzETvNdLP/gwG1C1yCXXXKV4Mr+NDAUX//1QucYmnF2QH48UYNrIxzNiW4HUIl9tfQ6FznsThujGuW1w==
+X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:daeb:5bc6:353c:6d72])
+ (user=almasrymina job=sendgmr) by 2002:a05:690c:c17:b0:608:8773:85da with
+ SMTP id cl23-20020a05690c0c1700b00608877385damr4107511ywb.0.1709769566467;
+ Wed, 06 Mar 2024 15:59:26 -0800 (PST)
+Date: Wed,  6 Mar 2024 15:59:18 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240226080934.46003-4-Raju.Lakkaraju@microchip.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
+Message-ID: <20240306235922.282781-1-almasrymina@google.com>
+Subject: [RFC PATCH net-next v1 0/2] Minor cleanups to skb frag ref/unref
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, Mirko Lindner <mlindner@marvell.com>, 
+	Stephen Hemminger <stephen@networkplumber.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Tariq Toukan <tariqt@nvidia.com>, Boris Pismenny <borisp@nvidia.com>, 
+	John Fastabend <john.fastabend@gmail.com>, Dragos Tatulea <dtatulea@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Feb 26, 2024 at 01:39:34PM +0530, Raju Lakkaraju wrote:
-> Wake options handling has been reworked as follows:
-> a. We only enable secure on magic packet when both secure and magic wol
->    options are requested together.
+This series is largely motivated by a recent discussion where there was
+some confusion on how to properly ref/unref pp pages vs non pp pages:
 
-So it appears unclear what should happen here.
+https://lore.kernel.org/netdev/CAHS8izOoO-EovwMwAm9tLYetwikNPxC0FKyVGu1TPJWSz4bGoA@mail.gmail.com/T/#t
 
-https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/bcm-phy-lib.c#L909
+There is some subtely there because pp uses page->pp_ref_count for
+refcounting, while non-pp uses get_page()/put_page() for ref counting.
+Getting the refcounting pairs wrong can lead to kernel crash.
 
-WAKE_MAGICSECURE is a standalone option. You do not need
-WAKE_MAGIC. And even i you did request both WAKE_MAGIC and
-WAKE_MAGICSECURE, the WAKE_MAGIC would be ignored.
+Additionally currently it may not be obvious to skb users unaware of
+page pool internals how to properly acquire a ref on a pp frag. It
+requires checking of skb->pp_recycle & is_pp_page() to make the correct
+calls and may require some handling at the call site aware of arguable pp
+internals.
 
-https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/dp83822.c#L153
+This series is a minor refactor with a couple of goals:
 
-WAKE_MAGICSECURE is a standalone option. You do not need
-WAKE_MAGIC. However, unlike the broadcom device, you can have both
-WAKE_MAGIC and WAKE_MAGICSECURE at the same time. They are not
-mutually exclusive.
+1. skb users should be able to ref/unref a frag using
+   [__]skb_frag_[un]ref() functions without needing to understand pp
+   concepts and pp_ref_count vs get/put_page() differences.
 
-This also looks to be true for other dp8**** devices.
+2. reference counting functions should have a mirror opposite. I.e. there
+   should be a foo_unref() to every foo_ref() with a mirror opposite
+   implementation (as much as possible).
 
-https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/mscc/mscc_main.c#L318
+This is RFC to collect feedback if this change is desirable, but also so
+that I don't race with the fix for the issue Dragos is seeing for his
+crash.
 
-WAKE_MAGICSECURE is a standalone option. You do not need
-WAKE_MAGIC. Also, you can have both WAKE_MAGIC and WAKE_MAGICSECURE at
-the same time. They are not mutually exclusive.
+https://lore.kernel.org/lkml/CAHS8izN436pn3SndrzsCyhmqvJHLyxgCeDpWXA4r1ANt3RCDLQ@mail.gmail.com/T/
 
-So i think your point a. above is questionable. Can the hardware
-support both magic and secure magic at the same time? If so, follow
-the TI way of doing it. If you cannot do both at the same time, and
-that is requested, you should probably return -EOPNOTSUPP. That is
-probably better than what the broadcom driver does, silently ignore
-WAKE_MAGIC.
+Cc: Dragos Tatulea <dtatulea@nvidia.com>
 
-> b. If secure-on magic packet had been previously enabled, and a subsequent
->    command does not include it, we add it. This was done to workaround a
->    problem with the 'pm-suspend' application which is unaware of secure-on
->    magic packet being enabled and can unintentionally disable it prior to
->    putting the system into suspend.
+Mina Almasry (2):
+  net: mirror skb frag ref/unref helpers
+  net: remove napi_frag_[un]ref
 
-The kernel should not be working around broken userspace. But i also
-suspect this is to do with it being unclear if WOL options are
-incremental or not. Since it seems that they are not incremental, it
-does not matter if "If secure-on magic packet had been previously
-enable". pm-suspend is setting Wol how it wants it, which you say is
-plain magic. So magic is what the PHY driver should do. Feel free to
-submit patches to pm-suspend to make it understand secure magic, or
-not touch WoL at all with the assumption it has already been setup by
-something else.
+ drivers/net/ethernet/marvell/sky2.c        |  2 +-
+ drivers/net/ethernet/mellanox/mlx4/en_rx.c |  2 +-
+ include/linux/skbuff.h                     | 45 +++++++++-------
+ net/core/skbuff.c                          | 60 ++++++++--------------
+ net/tls/tls_device.c                       |  2 +-
+ net/tls/tls_strp.c                         |  2 +-
+ 6 files changed, 51 insertions(+), 62 deletions(-)
 
-	  Andrew
+-- 
+2.44.0.278.ge034bb2e1d-goog
+
 
