@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-77858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F281873385
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 11:05:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF863873380
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 11:04:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A2C7281846
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 10:05:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D42F1C20CD0
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 10:04:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A775EE8E;
-	Wed,  6 Mar 2024 10:04:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C74A5F463;
+	Wed,  6 Mar 2024 10:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="v2TUdgXb"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="vvvNWYzW"
 X-Original-To: netdev@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706B35F86C
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 10:04:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64B55DF28
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 10:04:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709719499; cv=none; b=ql1n6fFQ+MdWcfwjVkTob8qQIFPoRoyrVCkRNMKdVONP08ha2WYQZ65N932SxJhRziHDImoC2xWgzvnPBaokaoPSvURmJaN7ELkRvBbNGHHwoddWM5tYjCATnCnKQwqsXxd4BiLQi2lmFL75NvGnTwOfYl1Gxvsgrs9sKdcH20E=
+	t=1709719495; cv=none; b=lyO/idZHfmQZfF6bsAF0IJ2g0NyX96LtUDOC7SRqQxivtILF9KDXUj+p766PYLui54/xyhvdKQxjQgbpB/zkv7JRQyRa4RwD4ZwTDw+l3/hMLSk3gaI5rQD8RdmK9wq7PLWOtHgpuoh7atAYdk7Km2xMpdolkJrSuZ9EIC2HBRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709719499; c=relaxed/simple;
-	bh=Rk+nnc5ZzxQrpmJ5WR+tIRNihS3t7XH+hLtKV6qcDMQ=;
+	s=arc-20240116; t=1709719495; c=relaxed/simple;
+	bh=QsJskSAwKu+28YAlY65+UaWVnI1acPgpmxxllkUe38Q=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gofq6vOFVjLfqE/hgmrYSkbkRENIuj0ZyUKNcrIJPh2bmUALSuLi/cGPtLhyy3N9ye/ggX6q0SqZVP2gVVjX+V7MxDkJmgnQgeLbtzUqmchxbB71uXG75bF9n/nZeLFz5jWMWlPtRXoyGXbsidNIMz+V+soWGOtlpvIcsylHTaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=v2TUdgXb; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=OvZlRaiVXj1ekK14J8SaV0UrZYOrL///aY0+doU3wMcta6I440WcsZtHGUrslR8fl7CvyD2fFcPxGoOc1UGC5H/MrRN0vkC78w1pzg5Qn3HMSZzs8bEGgHPrmk9pyJd+rf/FfCz5fisZ8Zxi3YSms5dQVUdC7FveNnLqU+NUacc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=vvvNWYzW; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 08BE0207D5;
-	Wed,  6 Mar 2024 11:04:56 +0100 (CET)
+	by a.mx.secunet.com (Postfix) with ESMTP id 19C4B205CD;
+	Wed,  6 Mar 2024 11:04:51 +0100 (CET)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QZsSuxuVs3lt; Wed,  6 Mar 2024 11:04:52 +0100 (CET)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	with ESMTP id qM70yqqO9Bif; Wed,  6 Mar 2024 11:04:50 +0100 (CET)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 1C5262082B;
-	Wed,  6 Mar 2024 11:04:45 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 1C5262082B
+	by a.mx.secunet.com (Postfix) with ESMTPS id 951ED20748;
+	Wed,  6 Mar 2024 11:04:44 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 951ED20748
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1709719485;
-	bh=Q3DVRpKKAb/sEgnzGNOgSTByVSBUWReZzpQe9mBepTw=;
+	s=202301; t=1709719484;
+	bh=ZeJPSvUj92F2DTfPbJ7ejUWzQlMP7SamGYTyh4qFcZY=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=v2TUdgXbXYGkcpW/3OoLDdIs2N5cLZZ1VHe1ZXQgLIC89sa4yimAmxDsJKYfPMnzj
-	 XZmzMo3tSAwPC8xLuePLoQc/MI5KCv7kun2pK7iKhf5ofH81X3IUWYqJmTMVfMWEtt
-	 Ld2VexHNz/+h0mvcZIv3JGFdK9/JJipCdPbe/64n5cgXRw0EW97+/K17H2aHcm8qQ0
-	 WJOy5M2jlCXxw8sLToond8c59WoG17/WBYQO5aAR918wBN1vsoVGySKpKz4RuYkux/
-	 bkXM0naME7Nun4B1aECwqg6ongbjkauiMYjKdwx2ULpEUN9hkKWyaz6eTuf0B4YSN8
-	 s76OqXY5Vx63g==
+	b=vvvNWYzWB0vh3NyULg+HVxKRZtYmRRTjbZgTdgA03zGltE3OWvB6MluK1Y1rh7NPI
+	 AQ1tsm/JKXmIjey0vEFLGyXtc2F3BlyEXm2xOCkDWfHPOMRA6aSvJasQjOjHlG6mxR
+	 6K5oOhjuLQoV5DzDA78DZ6B0j5GnO8R4W3qCSQfqxEshEdNJkuRu8Y6a2E3uR+D+hy
+	 LBGjAcLy2IblZMDsBMZWeIiXSUiuE0GaTn8fasBNJipOZZSfypu5NEE10D6TnCowjQ
+	 W23C8PXvbKRzWBKTkrpaJAvwsDFoy/Z648RbfYbp0nQo8P2WENQdII+2SnJbOYigs/
+	 8KbsQN7XdhkRA==
 Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout2.secunet.com (Postfix) with ESMTP id 0EBB580004A;
-	Wed,  6 Mar 2024 11:04:45 +0100 (CET)
+	by mailout1.secunet.com (Postfix) with ESMTP id 86EEB80004A;
+	Wed,  6 Mar 2024 11:04:44 +0100 (CET)
 Received: from mbx-essen-02.secunet.de (10.53.40.198) by
  cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -66,14 +66,14 @@ Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 6 Mar
  2024 11:04:44 +0100
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id D2875318297D; Wed,  6 Mar 2024 11:04:43 +0100 (CET)
+	id D66E931829AE; Wed,  6 Mar 2024 11:04:43 +0100 (CET)
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 3/5] xfrm: Avoid clang fortify warning in copy_to_user_tmpl()
-Date: Wed, 6 Mar 2024 11:04:36 +0100
-Message-ID: <20240306100438.3953516-4-steffen.klassert@secunet.com>
+Subject: [PATCH 4/5] xfrm: fix xfrm child route lookup for packet offload
+Date: Wed, 6 Mar 2024 11:04:37 +0100
+Message-ID: <20240306100438.3953516-5-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240306100438.3953516-1-steffen.klassert@secunet.com>
 References: <20240306100438.3953516-1-steffen.klassert@secunet.com>
@@ -85,60 +85,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
  mbx-essen-02.secunet.de (10.53.40.198)
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-From: Nathan Chancellor <nathan@kernel.org>
+From: Mike Yu <yumike@google.com>
 
-After a couple recent changes in LLVM, there is a warning (or error with
-CONFIG_WERROR=y or W=e) from the compile time fortify source routines,
-specifically the memset() in copy_to_user_tmpl().
+In current code, xfrm_bundle_create() always uses the matched
+SA's family type to look up a xfrm child route for the skb.
+The route returned by xfrm_dst_lookup() will eventually be
+used in xfrm_output_resume() (skb_dst(skb)->ops->local_out()).
 
-  In file included from net/xfrm/xfrm_user.c:14:
-  ...
-  include/linux/fortify-string.h:438:4: error: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror,-Wattribute-warning]
-    438 |                         __write_overflow_field(p_size_field, size);
-        |                         ^
-  1 error generated.
+If packet offload is used, the above behavior can lead to
+calling ip_local_out() for an IPv6 packet or calling
+ip6_local_out() for an IPv4 packet, which is likely to fail.
 
-While ->xfrm_nr has been validated against XFRM_MAX_DEPTH when its value
-is first assigned in copy_templates() by calling validate_tmpl() first
-(so there should not be any issue in practice), LLVM/clang cannot really
-deduce that across the boundaries of these functions. Without that
-knowledge, it cannot assume that the loop stops before i is greater than
-XFRM_MAX_DEPTH, which would indeed result a stack buffer overflow in the
-memset().
+This change fixes the behavior by checking if the matched SA
+has packet offload enabled. If not, keep the same behavior;
+if yes, use the matched SP's family type for the lookup.
 
-To make the bounds of ->xfrm_nr clear to the compiler and add additional
-defense in case copy_to_user_tmpl() is ever used in a path where
-->xfrm_nr has not been properly validated against XFRM_MAX_DEPTH first,
-add an explicit bound check and early return, which clears up the
-warning.
-
-Cc: stable@vger.kernel.org
-Link: https://github.com/ClangBuiltLinux/linux/issues/1985
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Test: verified IPv6-in-IPv4 packets on Android device with
+      IPsec packet offload enabled
+Signed-off-by: Mike Yu <yumike@google.com>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/xfrm/xfrm_user.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/xfrm/xfrm_policy.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index ad01997c3aa9..444e58bc3f44 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -2017,6 +2017,9 @@ static int copy_to_user_tmpl(struct xfrm_policy *xp, struct sk_buff *skb)
- 	if (xp->xfrm_nr == 0)
- 		return 0;
+diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+index 7351f32052dc..da6ecc6b3e15 100644
+--- a/net/xfrm/xfrm_policy.c
++++ b/net/xfrm/xfrm_policy.c
+@@ -2694,7 +2694,9 @@ static struct dst_entry *xfrm_bundle_create(struct xfrm_policy *policy,
+ 			if (xfrm[i]->props.smark.v || xfrm[i]->props.smark.m)
+ 				mark = xfrm_smark_get(fl->flowi_mark, xfrm[i]);
  
-+	if (xp->xfrm_nr > XFRM_MAX_DEPTH)
-+		return -ENOBUFS;
+-			family = xfrm[i]->props.family;
++			if (xfrm[i]->xso.type != XFRM_DEV_OFFLOAD_PACKET)
++				family = xfrm[i]->props.family;
 +
- 	for (i = 0; i < xp->xfrm_nr; i++) {
- 		struct xfrm_user_tmpl *up = &vec[i];
- 		struct xfrm_tmpl *kp = &xp->xfrm_vec[i];
+ 			oif = fl->flowi_oif ? : fl->flowi_l3mdev;
+ 			dst = xfrm_dst_lookup(xfrm[i], tos, oif,
+ 					      &saddr, &daddr, family, mark);
 -- 
 2.34.1
 
