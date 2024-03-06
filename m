@@ -1,169 +1,292 @@
-Return-Path: <netdev+bounces-78166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 814B08743C6
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:20:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05E968743E3
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:30:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC2131F25847
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:20:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 710EBB2357A
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C031C6B8;
-	Wed,  6 Mar 2024 23:20:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95811CD2D;
+	Wed,  6 Mar 2024 23:29:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="S0/jx9UK"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WSfRwRaE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2063.outbound.protection.outlook.com [40.107.92.63])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC751C6A5
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 23:20:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709767212; cv=none; b=QRrf7Bz62gAn7mh0kqzlUbMnLxFYCD61R2xDY2tSYRbICpYoe0JfHhRK+g+JMuvyp4bMyk6TqXdyeylXsDDY1swUXRarhPBhozNigR3tzCSMmuqwZrr6cZsOPwGO3b9R+inWYuK0EIENhNm8uUGDTkMtlIHWhCVbzEy5VAeGrfA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709767212; c=relaxed/simple;
-	bh=/NhOBk+BJoj/dD+kh3pmPoEgiLVTeZy+6SJZ2iMoHiY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kVZEKd/y2NlpPPbLHFSMg3u3d7aVxB3FsK7/AJovaCodeLQ9aVT4HPoPuQSycfn+fpwyxGo4pu+n0PTCY4uppQTcQeeS8A6DxbJrIiseOgzRRCYEKJqXWQ3Y2asS3RSbQMUNob2JSx3XTNlAnXuWdn0aAmNEvHuas14/JnENFsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=S0/jx9UK; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-dcbef31a9dbso182979276.1
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 15:20:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1709767210; x=1710372010; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PAVh4Azn0AZ3/Zc+NYDbaDtsTpY96I/NAS0abMjYKus=;
-        b=S0/jx9UKuAHeKPuMEygaGpvN2a+hq16AoDPqzlCvs02W1in9KDjQ/W3SqGU/lHTtA2
-         J2p6299twgcETv96iqcjSCUw6/YaCpPWQYHehaOpAyVBrWmn9dlQb8xK0ngU0Js5AG8I
-         oKh52Qafnm9o0I54Wv8Pe2r9Jq4p+HjrychSKGy8PZTDFDVt2AtBA/F3b19Oa1RnWxLC
-         zrLea+sXXXFLes+r9FbEh6TPyw65Ja/thvi075fLcu/BCMkJpJMw4jISL7rEWG6kfA1d
-         iMpFkgm/AqYfnMeailGsW9cW3i9HF8jr00vybtzBwDacE8UpkUE12TgPrnCZNPsLkjcM
-         kBIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709767210; x=1710372010;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PAVh4Azn0AZ3/Zc+NYDbaDtsTpY96I/NAS0abMjYKus=;
-        b=gCZ0Ehr6C4n3segm8PokbuXNXobyT4dkVteY2/B0q3oxITcV3RPQJSRODRjZDvq6Ei
-         R6WqkEbmcNvM6ig1qmz+5/mGXSiqaR31qiSMVqh4eqNmbzV9TnAcAh/E7vsguzU4Qo3l
-         hNnDqlS0C9gJXMDMdA5q76P+Tr/46hsZdV7J4eXhkmg2gdqOZMmDsP1GZjWGUIfsRWbC
-         9YuY3n7jfTxKwY8aHm0WJjp2J3XB6854Ewyx4RnC4O8laA7UQ8YRj+YtwHH5uRUPoTT/
-         FaFZKOJ2kRv44TAFVENq+KDmfISOYFDZvQc/6+QqQ2tJOf41Oh7xfoofAc4+MnZNVRGS
-         apVw==
-X-Forwarded-Encrypted: i=1; AJvYcCVY8frPTk89Xwb9h+Xn/q9n/sVZ/rk2bzjccWCmlT7y6bkM4hdZb4U4HMAgnGJvcJ4tJ7ih9/KEM8RCu3wsxwEJluLkxSFB
-X-Gm-Message-State: AOJu0YyhlQhQ0vDm4c7D8lq4tMPV5+SdQVphGk+6R0gTAjRA9dhEvWMN
-	Zdvz3wHVCXqCqySM2qzqXO6ZR6FjZv0qD/ra1O6kiragx7Ru5GkqeS+60+Iw45nMBg+Pb/p+R5j
-	BZaFS42UgJFXq3n6xhHd/swoU/GKrlAkUos2R
-X-Google-Smtp-Source: AGHT+IHqIPEt5dLH1JOGREq06xglvd53+wnwcqhC9A182ebQZNXP0KoYczMYTK70sZhARFifGkUfc0JmbebVUBBEG1s=
-X-Received: by 2002:a05:6902:250d:b0:dcd:5187:a032 with SMTP id
- dt13-20020a056902250d00b00dcd5187a032mr15700825ybb.43.1709767210273; Wed, 06
- Mar 2024 15:20:10 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22BD1CABD
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 23:29:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.63
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709767791; cv=fail; b=gvu0FABlQRlKv6x8SU+L1zRdKmZdZo5FxGGh4TvCAOSzt0Zi+PaP/EaQ+QIy5RqIZ+2K1x6t3ARQXqasyiT6gieJLTgvwBt2uaHVh61KBBx2BPtLx9ZSHCZa2QmmyUK69vaGTH3p4jzu1f4qmb7J/71+TPrH1XCcjn5BNEkSiWw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709767791; c=relaxed/simple;
+	bh=Vpl2E2ohH6ht9XNT2vM/Bk5x/4/gy5/M3GkHH1L8jqk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UV7apUEkTPwQFA9caE+72lvtPHpYSpr47rZPGeAN45Wf8MTyZ8irQ7CTSHE8ZQQsjJbYmkBN3I5DmlryCOXScE45FY9z1GiobNKZSrqBQvS1bsbknmjK9cAcYsL4J+UzsgjOReZWwfb+Yles/DeW6QIoyea7ycvAKg3QVdIYb6k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WSfRwRaE; arc=fail smtp.client-ip=40.107.92.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dkf29KA/dszaHsZ/jMBWI+uVg+Hk/16rc5hmXl7DSC0p8K5kmvJRvR2pUt4u1/KHPjS58yN1cYxrbxaZQfMyahpcSci0G9n6n3J/p7+JNMEBDMSN7W4JLxXuazWgZuUv8uO4H4fgqJ9slKLssyrlt2u8TfURiCysixkg13Tg5qzwA7xwMHj1MslPU0JrYQ6OuKXC8kViLHU2KgLI6HEZgsOiurVMRSV3qOH/NdfJ/eupIN2p8xKUaYyOVPssZxB2qZtHKpFR4ptoV9kt4ZeVgU45KHltQgIOLzDpCG3UFpeTHNRIgHPuCpZjp1TxsapS0dqrDy61FGDxNFbYnGUsNw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fKcwjyIl3sydbXW6x4KJDAu6bY7RT7NbF5pIiGxfLrM=;
+ b=U0cOuBo6bfGUI04CiKUVPaMH1R47cs0yKWXUxOjCuiWCT1dNVHBM8VVrbkxV9iFhDC0WdEMSIT/YZj5HPB555FH65GXgGun36HkNnNsfcYgsA+D1aaUPj89zaQOAiLfQ/E6h0scW6gdopal4/N8UZyD/SO8P95thiEZNneKU2tce+fSnCHQsEb3jGVZtarsAMsLzoAl/O87qGQsmzKGFkyAMLQyjAfv0+37G3iu3wYRGnhl9tiqBAbfYEi51olSs9DQMZyw5kjn/IPiQOSjAay68aiA/aCyUMy/iP2VD/8Q6u98G5ePEQTgrTOGa2qirkmS/m/jWuSf9uasJc65+gw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fKcwjyIl3sydbXW6x4KJDAu6bY7RT7NbF5pIiGxfLrM=;
+ b=WSfRwRaEAaSqsbT90Kie+xd/7e/fAbrB7xKwE9bJfg/F42jOoYe5osUZ2jP1fEppNwMFwX0Pxe1RTQ4yoMdFxvbgAtRYBszhjYGRilpRaKNL7AoMHP6puvNovQdRYzAeTrGYdf1HcbalRkv7gcIHQhBtYdtLcY3uZgYKPt2Sk2k712khPwwqk5hZW+RMxwFWruxlnansEWSvu02aIyQ1JZse1RLlyhj7Jqdf+isYtZUetfKWQeVTmrRQZnrdkIX9B5ru76zc3Wgue5l27ac9LoClS50AtaG+NnJp229tJV8EZNUp1TFRk2pgBww2ZZ/kUopq0rWym8SHQaHaUmFOUA==
+Received: from MW4PR04CA0190.namprd04.prod.outlook.com (2603:10b6:303:86::15)
+ by PH7PR12MB8037.namprd12.prod.outlook.com (2603:10b6:510:27d::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.20; Wed, 6 Mar
+ 2024 23:29:45 +0000
+Received: from CO1PEPF000042AB.namprd03.prod.outlook.com
+ (2603:10b6:303:86:cafe::1) by MW4PR04CA0190.outlook.office365.com
+ (2603:10b6:303:86::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.39 via Frontend
+ Transport; Wed, 6 Mar 2024 23:29:41 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CO1PEPF000042AB.mail.protection.outlook.com (10.167.243.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7362.11 via Frontend Transport; Wed, 6 Mar 2024 23:29:40 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 6 Mar 2024
+ 15:29:26 -0800
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Wed, 6 Mar 2024 15:29:26 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
+ Transport; Wed, 6 Mar 2024 15:29:24 -0800
+From: William Tu <witu@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <jiri@nvidia.com>, <bodong@nvidia.com>, <tariqt@nvidia.com>,
+	<yossiku@nvidia.com>, <kuba@kernel.org>, <witu@nvidia.com>
+Subject: [PATCH RFC v3 iproute2-next] devlink: Add shared memory pool eswitch attribute
+Date: Thu, 7 Mar 2024 01:29:22 +0200
+Message-ID: <20240306232922.8249-1-witu@nvidia.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240225165447.156954-1-jhs@mojatatu.com> <20240225165447.156954-15-jhs@mojatatu.com>
- <9eff9a51-a945-48f6-9d14-a484b7c0d04c@linux.dev> <CAM0EoMniOaKn4W_WN9rmQZ1JY3qCugn34mmqCy9UdCTAj_tuTQ@mail.gmail.com>
- <f88b5f65-957e-4b5d-8959-d16e79372658@linux.dev> <CAM0EoMk=igKT5ZEwcfdQqP6O3u8tO7VOpkNsWE1b92ia2eZVpw@mail.gmail.com>
- <496c78b7-4e16-42eb-a2f4-99472cd764fd@linux.dev> <CAM0EoMmB0s5WzZ-CgGWBF9YdaWi7O0tHEj+C8zuryGhKz7+FpA@mail.gmail.com>
- <7aaeee73-4197-4ea8-834a-2265ef078bab@linux.dev> <CAM0EoMnkJpBnD5G3CfWnGkzE1cQKDp_mz02BW+aHK4rbTnOQCQ@mail.gmail.com>
- <c5f75c8d-847f-4f9e-81d6-8297e8ca48b4@linux.dev>
-In-Reply-To: <c5f75c8d-847f-4f9e-81d6-8297e8ca48b4@linux.dev>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 6 Mar 2024 18:19:58 -0500
-Message-ID: <CAM0EoMn_c7Kbakrk08poLQOX9z9Pwv=D4AOoftuUJF4FcMRYJg@mail.gmail.com>
-Subject: Re: [PATCH net-next v12 14/15] p4tc: add set of P4TC table kfuncs
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
-	Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, tomasz.osinski@intel.com, 
-	jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, 
-	horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, daniel@iogearbox.net, 
-	victor@mojatatu.com, pctammela@mojatatu.com, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000042AB:EE_|PH7PR12MB8037:EE_
+X-MS-Office365-Filtering-Correlation-Id: 599c6eec-07f5-4aa3-f4ed-08dc3e354c14
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	PXODOqDdvxezEi6tR2IDYqZHOqH0HJXeVAAkmloRH8ZqMpcILEzLlv6l3O46S2Yw55Ij9pvgW0DlZ09QvRQfi35qODqn+580qNsbQsxjhTg2lMnZR9ki3W1SxBgElPQhV451MevJ5GEGOnUhEv+PaVrWn0zyKPx3GvqRdLOviNxPHb7R25sOrlZbzhQE0RcQUY+3y/cnOwCC/9EefY8o1GMoQqOUiQr35+FaLe7nlNUB2AgLflYY8fGOnZ2d9kWGGnmuoXI60ukIk9jDAeYYsm7joPlvmGEC9kEzE3Ywq4FoQQwZ8c9YxMvA983Qhtk4jaPJEzeXnXF/FwastKF44aG4dLWSB6RH+MxPiIRhF3EBzgkMk+jAlecWGLTdV2vyZ6gnEjgEL+SkXoVcE+UREpdH5kpIfTyAYMo2bCXxBqlKF7EuxiYJcMyA3Mrfajt8PAiDEnvMzBOzBGMFhBL6kfC22fORHZxJWiTfEGwLzvfijrVOmidaYyT0OVq943V+S+GcYlJ0nqkLfKytLeFn48X/XhNoddtr18HWx2SVctRqRq1pxS5czdP5ZXOYj69GnejZnkm9QoE3oCrE8mhFh26aOGh9qnCRKHEzReH0GcSPtDOCLp4hBLcz4Hwa1h6Yd1lkDH4J7Y91y1dc07LKVLtG6SpgS5ZfNjbCN4j1AeC50rvMt3cugssGuaDpnofVFZI8TGXaxJbMZ47HtSlEHZvxMnW2SipDKFIVEaIbTOmPh/R59dfGfLmEW88xFmOw
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(376005)(82310400014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 23:29:40.9459
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 599c6eec-07f5-4aa3-f4ed-08dc3e354c14
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000042AB.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8037
 
-On Wed, Mar 6, 2024 at 5:21=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.d=
-ev> wrote:
->
-> On 3/6/24 12:22 PM, Jamal Hadi Salim wrote:
-> >> I think my question was, who can use the act_bpf_kern object when all =
-tc bpf
-> >> prog is unloaded? If no one can use it, it should as well be cleaned u=
-p when the
-> >> bpf prog is unloaded.
-> >>
-> >> or the kernel p4 pipeline can use the act_bpf_kern object even when th=
-ere is no
-> >> bpf prog loaded?
->
-> [ ... ]
->
-> >>> I am looking at the conntrack code and i dont see how they release
-> >>> entries from the cotrack table when the bpf prog goes away.
->
-> [ ... ]
->
-> > I asked earlier about conntrack (where we took the inspiration from):
-> > How is what we are doing different from contrack? If you can help me
-> > understand that i am more than willing to make the change.
-> > Conntrack entries can be added via the kfunc(same for us). Contrack
-> > entries can also be added from the control plane and can be found by
-> > ebpf lookups(same for us). They can be deleted by the control plane,
-> > timers, entry evictions to make space for new entries, etc (same for
-> > us). Not sure if they can be deleted by ebpf side (we can). Perusing
-> > the conntrack code, I could not find anything  that indicated that
-> > entries created from ebpf are deleted when the ebpf program goes away.
-> >
-> > To re-emphasize: Maybe there's something subtle i am missing that we
-> > are not doing that conntrack is doing?
-> > Conntrack does one small thing we dont: It allocs and returns to ebpf
-> > the memory for insertion. I dont see that as particularly useful for
-> > our case (and more importantly how that results in the entries being
-> > deleted when the ebpf prog goes away)
->
-> afaik, the conntrack kfunc inserts "struct nf_conn" that can also be used=
- by
-> other kernel parts, so it is reasonable to go through the kernel existing
-> eviction logic. It is why my earlier question on "is the act_bpf_kern obj=
-ect
-> only useful for the bpf prog alone but not other kernel parts". From read=
-ing
-> patch 14, it seems to be only usable by bpf prog. When all bpf program is
-> unloaded, who will still read it and do something useful? If I mis-unders=
-tood
-> it, this will be useful to capture in the commit message to explain how i=
-t could
-> be used by other kernel parts without bpf prog running.
+Add eswitch attribute spool_size for shared memory pool size.
 
-Ok, I think i may have got the issue. Sigh. I didnt do a good job
-explaining p4tc_table_entry_act_bpf_kern which has been the crux of
-our back and forth. Sorry I know you said this several times and i was
-busy describing things around it instead.
- A multiple of these structure p4tc_table_entry_act_bpf_kern are
-preallocated(to match the P4 architecture, patch #9 describes some of
-the subtleties involved) by the p4tc control plane and put in a kernel
-pool. Their purpose is to hold the action parameters that are returned
-to ebpf when there is a successful table lookup.  When the table entry
-is deleted the act_bpf_kern is recycled to a pool to be reused for the
-next table entry. The only time the pool memory is released is when
-the pipeline is deleted. So it is not allocated via the kfunc at all.
+When using switchdev mode, the representor ports handles the slow path
+traffic, the traffic that can't be offloaded will be redirected to the
+representor port for processing. Memory consumption of the representor
+port's rx buffer can grow to several GB when scaling to 1k VFs reps.
+For example, in mlx5 driver, each RQ, with a typical 1K descriptors,
+consumes 3MB of DMA memory for packet buffer in WQEs, and with four
+channels, it consumes 4 * 3MB * 1024 = 12GB of memory. And since rep
+ports are for slow path traffic, most of these rx DMA memory are idle.
 
-I am not sure if that helps, if it does and you feel it should go in
-the commit message we can do that. If not, please a little more
-patience with me..
+Add spool_size configuration, allowing multiple representor ports
+to share a rx memory buffer pool. When enabled, individual representor
+doesn't need to allocate its dedicated rx buffer, but just pointing
+its rq to the memory pool. This could make the memory being better
+utilized. The spool_size represents the number of bytes of the memory
+pool. Users can adjust it based on how many reps, total system
+memory, or performance expectation.
 
-cheers,
-jamal
+An example use case:
+$ devlink dev eswitch set pci/0000:08:00.0 mode switchdev \
+  spool-size 4096000
+$ devlink dev eswitch show pci/0000:08:00.0
+  pci/0000:08:00.0: mode legacy inline-mode none encap-mode basic \
+  spool-size 4096000
+
+Disable the shared memory pool by setting spool_size to 0.
+
+Signed-off-by: William Tu <witu@nvidia.com>
+---
+v3:
+- change to 1 attributes and rename to spool-size
+
+v2: feedback from Stephen
+- add man page, send to iproute2-next
+---
+ devlink/devlink.c            | 25 +++++++++++++++++++++++--
+ include/uapi/linux/devlink.h |  1 +
+ man/man8/devlink-dev.8       |  6 ++++++
+ 3 files changed, 30 insertions(+), 2 deletions(-)
+
+diff --git a/devlink/devlink.c b/devlink/devlink.c
+index dbeb6e397e8e..5ad789caa934 100644
+--- a/devlink/devlink.c
++++ b/devlink/devlink.c
+@@ -309,6 +309,7 @@ static int ifname_map_update(struct ifname_map *ifname_map, const char *ifname)
+ #define DL_OPT_PORT_FN_RATE_TX_PRIORITY	BIT(55)
+ #define DL_OPT_PORT_FN_RATE_TX_WEIGHT	BIT(56)
+ #define DL_OPT_PORT_FN_CAPS	BIT(57)
++#define DL_OPT_ESWITCH_SPOOL_SIZE	BIT(58)
+ 
+ struct dl_opts {
+ 	uint64_t present; /* flags of present items */
+@@ -375,6 +376,7 @@ struct dl_opts {
+ 	const char *linecard_type;
+ 	bool selftests_opt[DEVLINK_ATTR_SELFTEST_ID_MAX + 1];
+ 	struct nla_bitfield32 port_fn_caps;
++	uint32_t eswitch_spool_size;
+ };
+ 
+ struct dl {
+@@ -630,6 +632,7 @@ static const enum mnl_attr_data_type devlink_policy[DEVLINK_ATTR_MAX + 1] = {
+ 	[DEVLINK_ATTR_ESWITCH_MODE] = MNL_TYPE_U16,
+ 	[DEVLINK_ATTR_ESWITCH_INLINE_MODE] = MNL_TYPE_U8,
+ 	[DEVLINK_ATTR_ESWITCH_ENCAP_MODE] = MNL_TYPE_U8,
++	[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE] = MNL_TYPE_U32,
+ 	[DEVLINK_ATTR_DPIPE_TABLES] = MNL_TYPE_NESTED,
+ 	[DEVLINK_ATTR_DPIPE_TABLE] = MNL_TYPE_NESTED,
+ 	[DEVLINK_ATTR_DPIPE_TABLE_NAME] = MNL_TYPE_STRING,
+@@ -1672,6 +1675,7 @@ static const struct dl_args_metadata dl_args_required[] = {
+ 	{DL_OPT_LINECARD,	      "Linecard index expected."},
+ 	{DL_OPT_LINECARD_TYPE,	      "Linecard type expected."},
+ 	{DL_OPT_SELFTESTS,            "Test name is expected"},
++	{DL_OPT_ESWITCH_SPOOL_SIZE,   "E-Switch shared memory pool size expected."},
+ };
+ 
+ static int dl_args_finding_required_validate(uint64_t o_required,
+@@ -1895,6 +1899,13 @@ static int dl_argv_parse(struct dl *dl, uint64_t o_required,
+ 			if (err)
+ 				return err;
+ 			o_found |= DL_OPT_ESWITCH_ENCAP_MODE;
++		} else if (dl_argv_match(dl, "spool-size") &&
++			   (o_all & DL_OPT_ESWITCH_SPOOL_SIZE)) {
++			dl_arg_inc(dl);
++			err = dl_argv_uint32_t(dl, &opts->eswitch_spool_size);
++			if (err)
++				return err;
++			o_found |= DL_OPT_ESWITCH_SPOOL_SIZE;
+ 		} else if (dl_argv_match(dl, "path") &&
+ 			   (o_all & DL_OPT_RESOURCE_PATH)) {
+ 			dl_arg_inc(dl);
+@@ -2547,6 +2558,9 @@ static void dl_opts_put(struct nlmsghdr *nlh, struct dl *dl)
+ 	if (opts->present & DL_OPT_ESWITCH_ENCAP_MODE)
+ 		mnl_attr_put_u8(nlh, DEVLINK_ATTR_ESWITCH_ENCAP_MODE,
+ 				opts->eswitch_encap_mode);
++	if (opts->present & DL_OPT_ESWITCH_SPOOL_SIZE)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_ESWITCH_SPOOL_SIZE,
++				 opts->eswitch_spool_size);
+ 	if ((opts->present & DL_OPT_RESOURCE_PATH) && opts->resource_id_valid)
+ 		mnl_attr_put_u64(nlh, DEVLINK_ATTR_RESOURCE_ID,
+ 				 opts->resource_id);
+@@ -2707,6 +2721,7 @@ static void cmd_dev_help(void)
+ 	pr_err("       devlink dev eswitch set DEV [ mode { legacy | switchdev } ]\n");
+ 	pr_err("                               [ inline-mode { none | link | network | transport } ]\n");
+ 	pr_err("                               [ encap-mode { none | basic } ]\n");
++	pr_err("                               [ spool-size { SIZE } ]\n");
+ 	pr_err("       devlink dev eswitch show DEV\n");
+ 	pr_err("       devlink dev param set DEV name PARAMETER value VALUE cmode { permanent | driverinit | runtime }\n");
+ 	pr_err("       devlink dev param show [DEV name PARAMETER]\n");
+@@ -3194,7 +3209,12 @@ static void pr_out_eswitch(struct dl *dl, struct nlattr **tb)
+ 			     eswitch_encap_mode_name(mnl_attr_get_u8(
+ 				    tb[DEVLINK_ATTR_ESWITCH_ENCAP_MODE])));
+ 	}
+-
++	if (tb[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE]) {
++		check_indent_newline(dl);
++		print_uint(PRINT_ANY, "spool-size", "spool-size %u",
++			   mnl_attr_get_u32(
++				    tb[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE]));
++	}
+ 	pr_out_handle_end(dl);
+ }
+ 
+@@ -3239,7 +3259,8 @@ static int cmd_dev_eswitch_set(struct dl *dl)
+ 	err = dl_argv_parse(dl, DL_OPT_HANDLE,
+ 			    DL_OPT_ESWITCH_MODE |
+ 			    DL_OPT_ESWITCH_INLINE_MODE |
+-			    DL_OPT_ESWITCH_ENCAP_MODE);
++			    DL_OPT_ESWITCH_ENCAP_MODE |
++			    DL_OPT_ESWITCH_SPOOL_SIZE);
+ 	if (err)
+ 		return err;
+ 
+diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+index e77170199815..c750e29a1c5c 100644
+--- a/include/uapi/linux/devlink.h
++++ b/include/uapi/linux/devlink.h
+@@ -614,6 +614,7 @@ enum devlink_attr {
+ 
+ 	DEVLINK_ATTR_REGION_DIRECT,		/* flag */
+ 
++	DEVLINK_ATTR_ESWITCH_SPOOL_SIZE,	/* u32 */
+ 	/* add new attributes above here, update the policy in devlink.c */
+ 
+ 	__DEVLINK_ATTR_MAX,
+diff --git a/man/man8/devlink-dev.8 b/man/man8/devlink-dev.8
+index e9d091df48d8..081cc8740f8b 100644
+--- a/man/man8/devlink-dev.8
++++ b/man/man8/devlink-dev.8
+@@ -34,6 +34,8 @@ devlink-dev \- devlink device configuration
+ .BR inline-mode " { " none " | " link " | " network " | " transport " } "
+ ] [
+ .BR encap-mode " { " none " | " basic " } "
++] [
++.BR spool-size " { SIZE } "
+ ]
+ 
+ .ti -8
+@@ -151,6 +153,10 @@ Set eswitch encapsulation support
+ .I basic
+ - Enable encapsulation support
+ 
++.TP
++.BR spool-size " SIZE"
++Set the rx shared memory pool size in bytes.
++
+ .SS devlink dev param set  - set new value to devlink device configuration parameter
+ 
+ .TP
+-- 
+2.38.1
+
 
