@@ -1,330 +1,187 @@
-Return-Path: <netdev+bounces-77723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2277E872BA0
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 01:13:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8962D872BA5
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 01:14:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 810261F2CAC3
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 00:13:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADC831C21530
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 00:14:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3014455769;
-	Wed,  6 Mar 2024 00:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2220FB677;
+	Wed,  6 Mar 2024 00:12:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LQHPpgCI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T078iEeZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3897A50A6E
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 00:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C8C846B
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 00:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709683671; cv=none; b=M/9OQKzcUptTPlRzUmhNXl9QnFgnLrrsxj+PNItO3s4UcvRSbe8mDVXI3Rwbt6A3jgaHaXm1ABGd1ZtzdVloqm+E0F+cOzsuEnJtlJTruRIPd7R6bjVmbRIgG72921nCKhyiNMfjNLR62fSh+2phEtUc3Kb2wJkrU8c2dQSpOQo=
+	t=1709683930; cv=none; b=c8ZjSYurvxHdMHQjq0xhW6XH+l8zzZIFnynjF8rDmx5OOI6xio3YioAXbnaj8hVLaCza5BA9qLW52Xy+b0whDCaxD4VeK42vpRenXRbirnoc3EDEK7kraXggPL205jIPu28k2T8t3srgDkwKZfbE/I+YsUzhc3yKr3/PIrWMOUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709683671; c=relaxed/simple;
-	bh=+YU+DFYa36t0XHlc/+xgZbyWimKd8RtBolX8Ff61bVs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WIlwoS2cxcb31ZZy5fdwtu79th2dFomkTZdosT4tlPo3KFP7x6HOp8zJ2xMEFqP24NLYPetu3jOX94m5Ti/Y7z581P+mhe4xLMxsJaSQQXdeVvyHEpn29qAdE6rk3BSsIfI43FNgtoQUHXNf8qWZYwbexcWp2yzEsDX4pbIvEbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LQHPpgCI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709683668;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x5jC1ywkJjQJ57JX0r0EDUWxh8r1trMoZVBFATzsPLw=;
-	b=LQHPpgCIgocd6Pl28qhbMuoxORw/DxKlHn5hY24W46RDuv4dkygMbLZmH/SOEbiI5Rzl/p
-	EBGTSx7xO1WddGVxl+iVFJVnXLzy4QtwGZYs76kAqLG+wOVL9ITJC/FYlIdTVQSyYx8TDB
-	MLoMdnFVyif0xFC0YF2Gjarmwq3764M=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-648-tpCmXfo6OMyqAOkqOBwxCQ-1; Tue, 05 Mar 2024 19:07:44 -0500
-X-MC-Unique: tpCmXfo6OMyqAOkqOBwxCQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 863C989C668;
-	Wed,  6 Mar 2024 00:07:43 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.114])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3CC2236FF;
-	Wed,  6 Mar 2024 00:07:42 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Simon Horman <horms@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 21/21] rxrpc: Extract useful fields from a received ACK to skb priv data
-Date: Wed,  6 Mar 2024 00:06:51 +0000
-Message-ID: <20240306000655.1100294-22-dhowells@redhat.com>
-In-Reply-To: <20240306000655.1100294-1-dhowells@redhat.com>
-References: <20240306000655.1100294-1-dhowells@redhat.com>
+	s=arc-20240116; t=1709683930; c=relaxed/simple;
+	bh=rIKkTtnsuXfhoePYJV76asTDSBmLlGQBll0nJfQ3scU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aAZvqAIvPecCGNKnGptTuj30ZhK2BrCFVFR/rUWIEQBzaQ5FCQX+6tTrm40HUwtbSfV8dIzYhMeyYSAdqM2Q+JfHb/04vyXHdzdCqwd/bnyfTot1Kp/q4IQcq5rrxdj0c7S+hpLyUV67fbwnzMomFDdsLLhF74uwKMDkwHZ21DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T078iEeZ; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709683927; x=1741219927;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=rIKkTtnsuXfhoePYJV76asTDSBmLlGQBll0nJfQ3scU=;
+  b=T078iEeZRF27v5rWIHa4bWzTt6tyminidy8ehGny0cCtZje0MW0coKgn
+   cMsu92ZRP/q9lgZlzwvk4a9DhMO3XSIEBS45SK+9DTLtM1Ozevt0ckcN1
+   66zEZd4uQESZn1AIj1yW+/NZrBWtQ/fTSxgkFzBUppaefWXky64zTFFre
+   QHBkxeiRzs+G0u/4VoLEV2140EQIVHgQuRSIGQLZJonHrRVBq9+QINgIe
+   2/hyZa7foPAnAM4E4JUUGIbo/NBte9A9giX1sPqcOvn+X/dxlXuKVvH1C
+   9t8RaACqsigmuV5M+QXSwQx5SgrqR2i6oyKzKzJf9+ZzzWcWPUjW0NzI2
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="8092127"
+X-IronPort-AV: E=Sophos;i="6.06,206,1705392000"; 
+   d="scan'208";a="8092127"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 16:12:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,206,1705392000"; 
+   d="scan'208";a="40554566"
+Received: from lkp-server01.sh.intel.com (HELO b21307750695) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 05 Mar 2024 16:12:04 -0800
+Received: from kbuild by b21307750695 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rhet7-0003ll-2O;
+	Wed, 06 Mar 2024 00:12:01 +0000
+Date: Wed, 6 Mar 2024 08:11:04 +0800
+From: kernel test robot <lkp@intel.com>
+To: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Antonio Quartulli <antonio@openvpn.net>
+Subject: Re: [PATCH net-next v2 14/22] ovpn: implement peer lookup logic
+Message-ID: <202403060715.DDWfl06q-lkp@intel.com>
+References: <20240304150914.11444-15-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240304150914.11444-15-antonio@openvpn.net>
 
-Extract useful fields from a received ACK packet into the skb private data
-early on in the process of parsing incoming packets.  This makes the ACK
-fields available even before we've matched the ACK up to a call and will
-allow us to deal with path MTU discovery probe responses even after the
-relevant call has been completed.
+Hi Antonio,
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
----
- net/rxrpc/ar-internal.h |  7 +++--
- net/rxrpc/call_event.c  |  4 +--
- net/rxrpc/input.c       | 61 ++++++++++++++++++-----------------------
- net/rxrpc/io_thread.c   | 11 ++++++++
- 4 files changed, 45 insertions(+), 38 deletions(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index 21ecac22b51d..08c0a32db8c7 100644
---- a/net/rxrpc/ar-internal.h
-+++ b/net/rxrpc/ar-internal.h
-@@ -198,8 +198,8 @@ struct rxrpc_host_header {
-  * - max 48 bytes (struct sk_buff::cb)
-  */
- struct rxrpc_skb_priv {
--	struct rxrpc_connection *conn;	/* Connection referred to (poke packet) */
- 	union {
-+		struct rxrpc_connection *conn;	/* Connection referred to (poke packet) */
- 		struct {
- 			u16		offset;		/* Offset of data */
- 			u16		len;		/* Length of data */
-@@ -208,9 +208,12 @@ struct rxrpc_skb_priv {
- 		};
- 		struct {
- 			rxrpc_seq_t	first_ack;	/* First packet in acks table */
-+			rxrpc_seq_t	prev_ack;	/* Highest seq seen */
-+			rxrpc_serial_t	acked_serial;	/* Packet in response to (or 0) */
-+			u8		reason;		/* Reason for ack */
- 			u8		nr_acks;	/* Number of acks+nacks */
- 			u8		nr_nacks;	/* Number of nacks */
--		};
-+		} ack;
- 	};
- 	struct rxrpc_host_header hdr;	/* RxRPC packet header from this packet */
- };
-diff --git a/net/rxrpc/call_event.c b/net/rxrpc/call_event.c
-index 6c5e3054209b..7bbb68504766 100644
---- a/net/rxrpc/call_event.c
-+++ b/net/rxrpc/call_event.c
-@@ -93,12 +93,12 @@ void rxrpc_resend(struct rxrpc_call *call, struct sk_buff *ack_skb)
- 		sp = rxrpc_skb(ack_skb);
- 		ack = (void *)ack_skb->data + sizeof(struct rxrpc_wire_header);
- 
--		for (i = 0; i < sp->nr_acks; i++) {
-+		for (i = 0; i < sp->ack.nr_acks; i++) {
- 			rxrpc_seq_t seq;
- 
- 			if (ack->acks[i] & 1)
- 				continue;
--			seq = sp->first_ack + i;
-+			seq = sp->ack.first_ack + i;
- 			if (after(txb->seq, transmitted))
- 				break;
- 			if (after(txb->seq, seq))
-diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
-index 09cce1d5d605..3dedb8c0618c 100644
---- a/net/rxrpc/input.c
-+++ b/net/rxrpc/input.c
-@@ -710,20 +710,19 @@ static rxrpc_seq_t rxrpc_input_check_prev_ack(struct rxrpc_call *call,
- 					      rxrpc_seq_t seq)
- {
- 	struct sk_buff *skb = call->cong_last_nack;
--	struct rxrpc_ackpacket ack;
- 	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
- 	unsigned int i, new_acks = 0, retained_nacks = 0;
--	rxrpc_seq_t old_seq = sp->first_ack;
--	u8 *acks = skb->data + sizeof(struct rxrpc_wire_header) + sizeof(ack);
-+	rxrpc_seq_t old_seq = sp->ack.first_ack;
-+	u8 *acks = skb->data + sizeof(struct rxrpc_wire_header) + sizeof(struct rxrpc_ackpacket);
- 
--	if (after_eq(seq, old_seq + sp->nr_acks)) {
--		summary->nr_new_acks += sp->nr_nacks;
--		summary->nr_new_acks += seq - (old_seq + sp->nr_acks);
-+	if (after_eq(seq, old_seq + sp->ack.nr_acks)) {
-+		summary->nr_new_acks += sp->ack.nr_nacks;
-+		summary->nr_new_acks += seq - (old_seq + sp->ack.nr_acks);
- 		summary->nr_retained_nacks = 0;
- 	} else if (seq == old_seq) {
--		summary->nr_retained_nacks = sp->nr_nacks;
-+		summary->nr_retained_nacks = sp->ack.nr_nacks;
- 	} else {
--		for (i = 0; i < sp->nr_acks; i++) {
-+		for (i = 0; i < sp->ack.nr_acks; i++) {
- 			if (acks[i] == RXRPC_ACK_TYPE_NACK) {
- 				if (before(old_seq + i, seq))
- 					new_acks++;
-@@ -736,7 +735,7 @@ static rxrpc_seq_t rxrpc_input_check_prev_ack(struct rxrpc_call *call,
- 		summary->nr_retained_nacks = retained_nacks;
- 	}
- 
--	return old_seq + sp->nr_acks;
-+	return old_seq + sp->ack.nr_acks;
- }
- 
- /*
-@@ -756,10 +755,10 @@ static void rxrpc_input_soft_acks(struct rxrpc_call *call,
- {
- 	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
- 	unsigned int i, old_nacks = 0;
--	rxrpc_seq_t lowest_nak = seq + sp->nr_acks;
-+	rxrpc_seq_t lowest_nak = seq + sp->ack.nr_acks;
- 	u8 *acks = skb->data + sizeof(struct rxrpc_wire_header) + sizeof(struct rxrpc_ackpacket);
- 
--	for (i = 0; i < sp->nr_acks; i++) {
-+	for (i = 0; i < sp->ack.nr_acks; i++) {
- 		if (acks[i] == RXRPC_ACK_TYPE_ACK) {
- 			summary->nr_acks++;
- 			if (after_eq(seq, since))
-@@ -771,7 +770,7 @@ static void rxrpc_input_soft_acks(struct rxrpc_call *call,
- 				old_nacks++;
- 			} else {
- 				summary->nr_new_nacks++;
--				sp->nr_nacks++;
-+				sp->ack.nr_nacks++;
- 			}
- 
- 			if (before(seq, lowest_nak))
-@@ -832,7 +831,6 @@ static bool rxrpc_is_ack_valid(struct rxrpc_call *call,
- static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
- {
- 	struct rxrpc_ack_summary summary = { 0 };
--	struct rxrpc_ackpacket ack;
- 	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
- 	struct rxrpc_acktrailer trailer;
- 	rxrpc_serial_t ack_serial, acked_serial;
-@@ -841,29 +839,24 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
- 
- 	_enter("");
- 
--	offset = sizeof(struct rxrpc_wire_header);
--	if (skb_copy_bits(skb, offset, &ack, sizeof(ack)) < 0)
--		return rxrpc_proto_abort(call, 0, rxrpc_badmsg_short_ack);
--	offset += sizeof(ack);
--
--	ack_serial = sp->hdr.serial;
--	acked_serial = ntohl(ack.serial);
--	first_soft_ack = ntohl(ack.firstPacket);
--	prev_pkt = ntohl(ack.previousPacket);
--	hard_ack = first_soft_ack - 1;
--	nr_acks = ack.nAcks;
--	sp->first_ack = first_soft_ack;
--	sp->nr_acks = nr_acks;
--	summary.ack_reason = (ack.reason < RXRPC_ACK__INVALID ?
--			      ack.reason : RXRPC_ACK__INVALID);
-+	offset = sizeof(struct rxrpc_wire_header) + sizeof(struct rxrpc_ackpacket);
-+
-+	ack_serial	= sp->hdr.serial;
-+	acked_serial	= sp->ack.acked_serial;
-+	first_soft_ack	= sp->ack.first_ack;
-+	prev_pkt	= sp->ack.prev_ack;
-+	nr_acks		= sp->ack.nr_acks;
-+	hard_ack	= first_soft_ack - 1;
-+	summary.ack_reason = (sp->ack.reason < RXRPC_ACK__INVALID ?
-+			      sp->ack.reason : RXRPC_ACK__INVALID);
- 
- 	trace_rxrpc_rx_ack(call, ack_serial, acked_serial,
- 			   first_soft_ack, prev_pkt,
- 			   summary.ack_reason, nr_acks);
--	rxrpc_inc_stat(call->rxnet, stat_rx_acks[ack.reason]);
-+	rxrpc_inc_stat(call->rxnet, stat_rx_acks[summary.ack_reason]);
- 
- 	if (acked_serial != 0) {
--		switch (ack.reason) {
-+		switch (summary.ack_reason) {
- 		case RXRPC_ACK_PING_RESPONSE:
- 			rxrpc_complete_rtt_probe(call, skb->tstamp, acked_serial, ack_serial,
- 						 rxrpc_rtt_rx_ping_response);
-@@ -883,7 +876,7 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
- 	 * indicates that the client address changed due to NAT.  The server
- 	 * lost the call because it switched to a different peer.
- 	 */
--	if (unlikely(ack.reason == RXRPC_ACK_EXCEEDS_WINDOW) &&
-+	if (unlikely(summary.ack_reason == RXRPC_ACK_EXCEEDS_WINDOW) &&
- 	    first_soft_ack == 1 &&
- 	    prev_pkt == 0 &&
- 	    rxrpc_is_client_call(call)) {
-@@ -896,7 +889,7 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
- 	 * indicate a change of address.  However, we can retransmit the call
- 	 * if we still have it buffered to the beginning.
- 	 */
--	if (unlikely(ack.reason == RXRPC_ACK_OUT_OF_SEQUENCE) &&
-+	if (unlikely(summary.ack_reason == RXRPC_ACK_OUT_OF_SEQUENCE) &&
- 	    first_soft_ack == 1 &&
- 	    prev_pkt == 0 &&
- 	    call->acks_hard_ack == 0 &&
-@@ -937,7 +930,7 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
- 	call->acks_first_seq = first_soft_ack;
- 	call->acks_prev_seq = prev_pkt;
- 
--	switch (ack.reason) {
-+	switch (summary.ack_reason) {
- 	case RXRPC_ACK_PING:
- 		break;
- 	default:
-@@ -994,7 +987,7 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
- 	rxrpc_congestion_management(call, skb, &summary, acked_serial);
- 
- send_response:
--	if (ack.reason == RXRPC_ACK_PING)
-+	if (summary.ack_reason == RXRPC_ACK_PING)
- 		rxrpc_send_ACK(call, RXRPC_ACK_PING_RESPONSE, ack_serial,
- 			       rxrpc_propose_ack_respond_to_ping);
- 	else if (sp->hdr.flags & RXRPC_REQUEST_ACK)
-diff --git a/net/rxrpc/io_thread.c b/net/rxrpc/io_thread.c
-index 4a3a08a0e2cd..0300baa9afcd 100644
---- a/net/rxrpc/io_thread.c
-+++ b/net/rxrpc/io_thread.c
-@@ -124,6 +124,7 @@ static bool rxrpc_extract_header(struct rxrpc_skb_priv *sp,
- 				 struct sk_buff *skb)
- {
- 	struct rxrpc_wire_header whdr;
-+	struct rxrpc_ackpacket ack;
- 
- 	/* dig out the RxRPC connection details */
- 	if (skb_copy_bits(skb, 0, &whdr, sizeof(whdr)) < 0)
-@@ -141,6 +142,16 @@ static bool rxrpc_extract_header(struct rxrpc_skb_priv *sp,
- 	sp->hdr.securityIndex	= whdr.securityIndex;
- 	sp->hdr._rsvd		= ntohs(whdr._rsvd);
- 	sp->hdr.serviceId	= ntohs(whdr.serviceId);
-+
-+	if (sp->hdr.type == RXRPC_PACKET_TYPE_ACK) {
-+		if (skb_copy_bits(skb, sizeof(whdr), &ack, sizeof(ack)) < 0)
-+			return rxrpc_bad_message(skb, rxrpc_badmsg_short_ack);
-+		sp->ack.first_ack	= ntohl(ack.firstPacket);
-+		sp->ack.prev_ack	= ntohl(ack.previousPacket);
-+		sp->ack.acked_serial	= ntohl(ack.serial);
-+		sp->ack.reason		= ack.reason;
-+		sp->ack.nr_acks		= ack.nAcks;
-+	}
- 	return true;
- }
- 
+[auto build test WARNING on net-next/main]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Antonio-Quartulli/netlink-add-NLA_POLICY_MAX_LEN-macro/20240304-232835
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240304150914.11444-15-antonio%40openvpn.net
+patch subject: [PATCH net-next v2 14/22] ovpn: implement peer lookup logic
+config: sh-allmodconfig (https://download.01.org/0day-ci/archive/20240306/202403060715.DDWfl06q-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240306/202403060715.DDWfl06q-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202403060715.DDWfl06q-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ovpn/peer.c:289: warning: Function parameter or struct member 'src' not described in 'ovpn_nexthop_lookup4'
+>> drivers/net/ovpn/peer.c:289: warning: Excess function parameter 'dst' description in 'ovpn_nexthop_lookup4'
+>> drivers/net/ovpn/peer.c:325: warning: Function parameter or struct member 'addr' not described in 'ovpn_nexthop_lookup6'
+>> drivers/net/ovpn/peer.c:325: warning: Excess function parameter 'dst' description in 'ovpn_nexthop_lookup6'
+
+
+vim +289 drivers/net/ovpn/peer.c
+
+   275	
+   276	/**
+   277	 * ovpn_nexthop_lookup4() - looks up the IP of the nexthop for the given destination
+   278	 *
+   279	 * Looks up in the IPv4 system routing table the IP of the nexthop to be used
+   280	 * to reach the destination passed as argument. If no nexthop can be found, the
+   281	 * destination itself is returned as it probably has to be used as nexthop.
+   282	 *
+   283	 * @ovpn: the private data representing the current VPN session
+   284	 * @dst: the destination to be looked up
+   285	 *
+   286	 * Return the IP of the next hop if found or the dst itself otherwise
+   287	 */
+   288	static __be32 ovpn_nexthop_lookup4(struct ovpn_struct *ovpn, __be32 src)
+ > 289	{
+   290		struct rtable *rt;
+   291		struct flowi4 fl = {
+   292			.daddr = src
+   293		};
+   294	
+   295		rt = ip_route_output_flow(dev_net(ovpn->dev), &fl, NULL);
+   296		if (IS_ERR(rt)) {
+   297			net_dbg_ratelimited("%s: no nexthop found for %pI4\n", ovpn->dev->name, &src);
+   298			/* if we end up here this packet is probably going to be
+   299			 * thrown away later
+   300			 */
+   301			return src;
+   302		}
+   303	
+   304		if (!rt->rt_uses_gateway)
+   305			goto out;
+   306	
+   307		src = rt->rt_gw4;
+   308	out:
+   309		return src;
+   310	}
+   311	
+   312	/**
+   313	 * ovpn_nexthop_lookup6() - looks up the IPv6 of the nexthop for the given destination
+   314	 *
+   315	 * Looks up in the IPv6 system routing table the IP of the nexthop to be used
+   316	 * to reach the destination passed as argument. If no nexthop can be found, the
+   317	 * destination itself is returned as it probably has to be used as nexthop.
+   318	 *
+   319	 * @ovpn: the private data representing the current VPN session
+   320	 * @dst: the destination to be looked up
+   321	 *
+   322	 * Return the IP of the next hop if found or the dst itself otherwise
+   323	 */
+   324	static struct in6_addr ovpn_nexthop_lookup6(struct ovpn_struct *ovpn, struct in6_addr addr)
+ > 325	{
+   326	#if IS_ENABLED(CONFIG_IPV6)
+   327		struct rt6_info *rt;
+   328		struct flowi6 fl = {
+   329			.daddr = addr,
+   330		};
+   331	
+   332		rt = (struct rt6_info *)ipv6_stub->ipv6_dst_lookup_flow(dev_net(ovpn->dev), NULL, &fl,
+   333									NULL);
+   334		if (IS_ERR(rt)) {
+   335			net_dbg_ratelimited("%s: no nexthop found for %pI6\n", ovpn->dev->name, &addr);
+   336			/* if we end up here this packet is probably going to be thrown away later */
+   337			return addr;
+   338		}
+   339	
+   340		if (rt->rt6i_flags & RTF_GATEWAY)
+   341			addr = rt->rt6i_gateway;
+   342	
+   343		dst_release((struct dst_entry *)rt);
+   344	#endif
+   345		return addr;
+   346	}
+   347	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
