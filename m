@@ -1,100 +1,101 @@
-Return-Path: <netdev+bounces-77891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5ED9873612
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:10:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 617F3874A6C
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:12:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E30331C20446
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 12:10:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DA9F2817E3
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:12:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783DA7FBC7;
-	Wed,  6 Mar 2024 12:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC41823BF;
+	Thu,  7 Mar 2024 09:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RPQoBUqe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cQmGF5ZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542794C6E
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 12:10:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5400D82D8A
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 09:12:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709727031; cv=none; b=JWeLboUssQWo+AuFWZjzvmUfScHWLJbnvOOsZnxIrZE7RHrlZ9QaZYiCYbP4SZ+YPYW61/hZncjHEoI0meBxV8HY6YeCzR36umls2vNnnqbaMrIXcyJhste1tlAITmxU/ukoTnzg7iPO95yOdHnir/IwegUEkP+Au7AlNWnUrBk=
+	t=1709802739; cv=none; b=io8lRo6fl6SCXXAYqGgEDMiNPgymgGdfoUkXPn8sHK95Qws6+Vp0qnZ7yjQCrMCmdOGMazD/RowIkIVpNELpxOdGvNso/AJvZBeSABZ4ULbMK23JqdbN4tGva1lU78PxssXoz4hyp3kIjJhV3ItcYLCb7EBqEnml71BJRhq/1As=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709727031; c=relaxed/simple;
-	bh=bYw/wTBXWu/q6ZaIntm2k+XQqqpRZFJKGHer+hq4C20=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=G95wZhaz46k+W4VcM4RK4tl+oK5FWSsSyRGdJfDYUeKHHcDXtQVKBGJVDJtJtu+0diiKISd1B9uArPp7OBHZOsVLii7VUVdBYbZ5kMKLzMdmUVMo1zlZcgI6G5NS402vtEuiZTm9NtH8gb2QIjit8mueBwR6fiapIrV3lP301/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RPQoBUqe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E18FEC433C7;
-	Wed,  6 Mar 2024 12:10:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709727030;
-	bh=bYw/wTBXWu/q6ZaIntm2k+XQqqpRZFJKGHer+hq4C20=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RPQoBUqedCcDMvnZ6HDJ4d/H4+LjPMC2Xr+DlNVsF69xuYIf/ZcH/YO5PIq/KWqBr
-	 sbLBFY0OS0IvDrAvcCjqBGdrXROF8/W//aXF22NKWKoslF6YjtuWTIK8bobKmk7gAU
-	 tdRnWWowQZcatRiDKOGL5rON3A0FiIzzDGE+3xZtke3CMxlTunH16bWguzYNhKG1uH
-	 GA0HcF3SuaWQ/b/W0aZIB7c9SPENRVswzL/QdB5Ezr4u+jVEWGJLmghlt1B6TENDqe
-	 tCT/2GhnKum/CsTvfHOArntsIW1A5lVIWwWJegS6YDzjPD7HDkUMrpS+ScBp9Y8jUL
-	 7iK5XseJToTZA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C1300D84BDB;
-	Wed,  6 Mar 2024 12:10:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709802739; c=relaxed/simple;
+	bh=9zcxcj/+/jwqDoQZFZMZGlm89mLjcAulqrwjQvaSNDc=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=gDQb5YGPc1X9NEv+sVw4h9ZZUZYfhxuypWSuXTV/IEU2Jezn12Wkiu67YUw3A384eoYr2wvLZcbaKFvOZ/a+c6jAfanqFkRErNm1ejfjL0czeVDDX7MA7ySxZXao/88WxaoWQdzmS2AFCoNNbQQUYlUtvoFT+ss9Pksu0bzqR1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cQmGF5ZA; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-33e162b1b71so598874f8f.1
+        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 01:12:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709802736; x=1710407536; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9zcxcj/+/jwqDoQZFZMZGlm89mLjcAulqrwjQvaSNDc=;
+        b=cQmGF5ZAgSipzFlLce8gpH8qsbn/UorXd0LrtTTrmjI2KzPZHB4kAP7Hi+KCfBtdrl
+         IZk29LSsthSGHaX0bXbz7mg3UPJmwlo+uoerhSItzhUD1+EnB3bFY5D8qQfEkzvL/N5f
+         6npXGoZJ8sI+i6lnJw/cW/FKhAM8LUJ9zH3/RB3Kpg0gNu0vjt7kjx234C15VDkrSCXA
+         7LuE58EezYoTBjuOW+H+o/fpxwuZdSo1Km3NV+AVbHKG8RZrmZ5Xe3Y0+RgzMPBrhj1x
+         Ni1hlR/cs2+0HV53R8mghlwuauBO0kNTgZITgSlRTYelNvfE8RxfsagRxlqNnNlblP6y
+         EsTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709802736; x=1710407536;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9zcxcj/+/jwqDoQZFZMZGlm89mLjcAulqrwjQvaSNDc=;
+        b=alg6T0hJsaXJZLTfWXu4WyKuG9vG1S5Uq+1PYu2bAMk/hRKtMpIuZ1NeHzImA6jfWV
+         ZlVN8Wgz+9hccQqvXtCHOrAxoHshJ18ev/GZinVU2AXLt/2CahxTeqvqaH7tGEjGFjQo
+         8+kleaCJOJPrlAVPYm4k6HSnA132161Pj64drtAj3ZbmKnbgIaBfTVIJgaC1XV1RVyBQ
+         CJUpowz47fkdxfDgNJwPSKJvgwGsBS0aJKemRKkz/2HrWHuYrIMmj4l/zZbwBgbKFUEg
+         nTjg1mKrFbA43lX//pAZdn+wNx6Yf/+O8fGTdZxCq+J51Hlx7ZV8RjPJvvyVu5GVjafz
+         Dg6w==
+X-Forwarded-Encrypted: i=1; AJvYcCUt1K2eh+fJ/wW/da00Bvj3BvoiNNlHDkOmNtlTvRWXeO+fyLre5t6RW19n6OeUura7gsmKlgH/xhXVRe8UscNHZZlJ3GjH
+X-Gm-Message-State: AOJu0YwQ2n/2loR4EELW0XszKupbw/XdnrVJHtx1fNt7US7phlNOn3CA
+	frOcHJu8Op/Gwp54oFsvADKH/nbC5oaP4oCiVKZyU6YAuUS6eZd0
+X-Google-Smtp-Source: AGHT+IEeUtPhPpaYn/k3jYckLGzfpuVIh4xBKZkl31XhGE0iOPR1urnbeh+gOFy08yh7xx720hE7+A==
+X-Received: by 2002:adf:9c86:0:b0:33d:731f:b750 with SMTP id d6-20020adf9c86000000b0033d731fb750mr11284153wre.54.1709802736298;
+        Thu, 07 Mar 2024 01:12:16 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:952f:caa6:b9c0:b4d8])
+        by smtp.gmail.com with ESMTPSA id by1-20020a056000098100b0033e22341942sm17014282wrb.78.2024.03.07.01.12.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Mar 2024 01:12:15 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  nicolas.dichtel@6wind.com,  jiri@resnulli.us
+Subject: Re: [PATCH net-next] tools: ynl: check for overflow of constructed
+ messages
+In-Reply-To: <20240305185000.964773-1-kuba@kernel.org> (Jakub Kicinski's
+	message of "Tue, 5 Mar 2024 10:50:00 -0800")
+Date: Wed, 06 Mar 2024 12:31:12 +0000
+Message-ID: <m2jzmfh78v.fsf@gmail.com>
+References: <20240305185000.964773-1-kuba@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/4] tools: ynl: add --dbg-small-recv for easier
- kernel testing
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170972703078.11436.219705901018302745.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Mar 2024 12:10:30 +0000
-References: <20240305053310.815877-1-kuba@kernel.org>
-In-Reply-To: <20240305053310.815877-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, jiri@resnulli.us, donald.hunter@gmail.com
+Content-Type: text/plain
 
-Hello:
+Jakub Kicinski <kuba@kernel.org> writes:
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+> Donald points out that we don't check for overflows.
+> Stash the length of the message on nlmsg_pid (nlmsg_seq would
+> do as well). This allows the attribute helpers to remain
+> self-contained (no extra arguments). Also let the put
+> helpers continue to return nothing. The error is checked
+> only in (newly introduced) ynl_msg_end().
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-On Mon,  4 Mar 2024 21:33:06 -0800 you wrote:
-> When testing netlink dumps I usually hack some user space up
-> to constrain its user space buffer size (iproute2, ethtool or ynl).
-> Netlink will try to fill the messages up, so since these apps use
-> large buffers by default, the dumps are rarely fragmented.
-> 
-> I was hoping to figure out a way to create a selftest for dump
-> testing, but so far I have no idea how to do that in a useful
-> and generic way.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2,1/4] tools: ynl: move the new line in NlMsg __repr__
-    https://git.kernel.org/netdev/net-next/c/7df7231d6a6b
-  - [net-next,v2,2/4] tools: ynl: allow setting recv() size
-    https://git.kernel.org/netdev/net-next/c/7c93a88785da
-  - [net-next,v2,3/4] tools: ynl: support debug printing messages
-    https://git.kernel.org/netdev/net-next/c/a6a41521f95e
-  - [net-next,v2,4/4] tools: ynl: add --dbg-small-recv for easier kernel testing
-    https://git.kernel.org/netdev/net-next/c/c0111878d45e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
