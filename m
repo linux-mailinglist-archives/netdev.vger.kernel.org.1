@@ -1,97 +1,113 @@
-Return-Path: <netdev+bounces-78138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18FB4874366
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:04:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00491874371
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:05:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AECB1C20CEE
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:04:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF465281B2D
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:05:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9939C1C298;
-	Wed,  6 Mar 2024 23:04:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55631C686;
+	Wed,  6 Mar 2024 23:05:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SWTqGsj1"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rFVGtz/+"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E065ECA4E;
-	Wed,  6 Mar 2024 23:04:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2A21C291;
+	Wed,  6 Mar 2024 23:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709766279; cv=none; b=I1ccN9WieVi5bHIvu3SbROcuHS8EaLc5PvJA41ma7XcnzxVUmrdkU3fTCStUk+8foGhE2B+TaCQzKaxFgNPGdvi6kjA0rW3jwDgWGmwb0BBHoNw+H+HgsV3GAVEixkVtBut2turBRnNvKkqmzSWPNISV0HmOogkoz5bA72MVHEw=
+	t=1709766316; cv=none; b=JqSEp4KBlp0xovbERtS4KSUM73XXDRfYYdbYJpwBq2QebZVDdLcl8b0Mb/HciWHhCPHCahDDdjV6yhWt2TKygxBY29IxO16nTuqySca5gc5ckhA2UHQRdwSad+7ZJWWV8o/lj9rPgjv2mePk9puzoyJJLcbFefdrnumJI1P1waU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709766279; c=relaxed/simple;
-	bh=0BkBoxjoUbL8I9dtSSBP//w6m324kaP3H030ANrh3d4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O12Ze/jdOMFUECO6hITxd0/JQEHm+zLaU6Rne1br6L86s9XINLHvg+FmHPr1BaXVKCi0+saTSN/P44XSDECMfQ8H8KjI5wpSMykatgPDEr87Pjr53I62pcUuXhsD/zsz47DGVSdC9FFB9OfgxM2d2ZXVzkq3qVubb0yDJ6lwmgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SWTqGsj1; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=tu+kkEy+3vhioMBzuND7fGdxFOSgZ74kUNWaXmcwZi0=; b=SWTqGsj17HGAsi2jz7pUwne5Rn
-	vpi7Fce/yxQpCEkCfCEednlu5X6urS5nPzbn5GIqgkGjJcOW+lSpN2p/BeDUIZ1OW4Qy7NwBok6JL
-	vmkO71up2W3KVX86Cw0ypk4mG1ziPUfHK11nccWbQG8ON5LegIJxuTrfqVwp2kqdbV3I=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ri0Je-009XDq-Dw; Thu, 07 Mar 2024 00:04:50 +0100
-Date: Thu, 7 Mar 2024 00:04:50 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bsp-development.geo@leica-geosystems.com, m.felsch@pengutronix.de
-Subject: Re: [PATCH net-next] net: phy: dp8382x: keep WOL setting across
- suspends
-Message-ID: <8de1d4e3-6d80-45a5-a638-48451d9b5c15@lunn.ch>
-References: <20240306171446.859750-1-catalin.popescu@leica-geosystems.com>
+	s=arc-20240116; t=1709766316; c=relaxed/simple;
+	bh=xhlIT+EZ1CJj0eq9kztu2VQgOq4D9T/87BnbZ1zDMP8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gilLqngupVU0ELV7K3TyF/IkRoHC8W+GPxiH8uAScn9ISzPPBP9TmLR1yPPAnmU85qoVjiRV4ijIWbS30gAeDJda06WXFGtwUgn37nfpTAA49y3C9mIaUQI1bPYZsEOWK5mqNPbLvcoReAj9+g9qqwMsHdFhrrrkm5Ysq4ezcrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rFVGtz/+; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1709766315; x=1741302315;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4+xazsZ8auCGyyQth/zWsKS9gvCd2G2WMpDXe9b6wJs=;
+  b=rFVGtz/+bvP+I/LSfUeSmw3YaKyjSP1PYnh3Zx/vyUufRkb0zoBb6l90
+   ckWT/zYUfCcXTJCLkSH3e2FKspO2vY8Jf7F2O2OCgX1ssKOxWmXcBP4Vg
+   y6KB0Z89TZwGkNLd2Bjcln2F8sHkXvHlBX6sK2QxKBRxMGnM5Qvn0I/LZ
+   E=;
+X-IronPort-AV: E=Sophos;i="6.06,209,1705363200"; 
+   d="scan'208";a="617908178"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 23:05:12 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:61480]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.45.183:2525] with esmtp (Farcaster)
+ id 8ecd97e6-5282-49cf-b0dc-2dad61813fcb; Wed, 6 Mar 2024 23:05:11 +0000 (UTC)
+X-Farcaster-Flow-ID: 8ecd97e6-5282-49cf-b0dc-2dad61813fcb
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 6 Mar 2024 23:05:11 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.26) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 6 Mar 2024 23:05:08 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Allison Henderson <allison.henderson@oracle.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<rds-devel@oss.oracle.com>
+Subject: [PATCH v3 net 0/2] tcp/rds: Fix use-after-free around kernel TCP reqsk.
+Date: Wed, 6 Mar 2024 15:04:56 -0800
+Message-ID: <20240306230458.28784-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240306171446.859750-1-catalin.popescu@leica-geosystems.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWB004.ant.amazon.com (10.13.139.136) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Wed, Mar 06, 2024 at 06:14:46PM +0100, Catalin Popescu wrote:
-> Unlike other ethernet PHYs from TI, PHY dp83822x has WOL enabled
-> at reset.
+syzkaller reported an warning of netns ref tracker for RDS per-netns
+TCP listener, which commit 740ea3c4a0b2 ("tcp: Clean up kernel listener's
+reqsk in inet_twsk_purge()") fixed for per-netns ehash.
 
-This is rather odd behaviour. Is this stated in the datasheet?
+This series fixes the bug in the partial fix and fixes the bug in the
+global ehash.
 
-> @@ -572,11 +584,17 @@ static int dp83826_config_init(struct phy_device *phydev)
->  			return ret;
->  	}
->  
-> +	if (dp83822->wol_enabled)
-> +		return 0;
->  	return dp8382x_disable_wol(phydev);
->  }
->  
->  static int dp8382x_config_init(struct phy_device *phydev)
->  {
-> +	struct dp83822_private *dp83822 = phydev->priv;
-> +
-> +	if (dp83822->wol_enabled)
-> +		return 0;
->  	return dp8382x_disable_wol(phydev);
 
-Since it is rather odd behaviour, there might be some BIOSes which
-disable WoL. So i would not rely on it being enabled by
-default. Explicitly enable it.
+Changes:
+  v3:
+    * Drop patch 2, 3, 5
+    * Fix UAF by purging reqsk during netns dismantle.
 
-    Andrew
+  v2: https://lore.kernel.org/netdev/20240227011041.97375-1-kuniyu@amazon.com/
+    * Add patch 1, 3, 5
+    * Use __sock_create() instead of converting socket
+    * Drop Sowmini from CC as it's bounced (patchwork may complain)
 
----
-pw-bot: cr
+  v1: https://lore.kernel.org/netdev/20240223172448.94084-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (2):
+  tcp: Restart iteration after removing reqsk in inet_twsk_purge().
+  rds: tcp: Fix use-after-free of net in reqsk_timer_handler().
+
+ net/ipv4/inet_timewait_sock.c | 4 +++-
+ net/ipv4/tcp_minisocks.c      | 4 ----
+ 2 files changed, 3 insertions(+), 5 deletions(-)
+
+-- 
+2.30.2
+
 
