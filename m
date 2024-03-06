@@ -1,75 +1,76 @@
-Return-Path: <netdev+bounces-77793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32516873068
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:16:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96AF787306C
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:17:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 573221C216C2
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:16:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C21C1F2213F
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:17:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF305D478;
-	Wed,  6 Mar 2024 08:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85BDF5D749;
+	Wed,  6 Mar 2024 08:16:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tNWmsWGn"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qd92PTgC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474885CDC2
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 08:16:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA5E5CDE8
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 08:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709713012; cv=none; b=AcSo4tm+WgSk6jHVoW+Hjf9qlQoRpcE7V1qjIgRu1rhP13utCShJzuOuBO2DWXrwPBXHX7d2r8FT26J5qqrQAr6bQoKb6DsWnIpsKSAmBcV1HfcSv1ekpgp5jJLliC+YHCc2Jp3/u9J0Ha24GCLyWUPQBxoQjwF153SnjhmGxUQ=
+	t=1709713013; cv=none; b=f8e4BoFp28caHBRZvJnqMeb2fSq4oPTHYI2XhSGqTRh8fUxADTgfjPW9EXrHfNZU4Hao8pRXa8LHizZUJItMitBqKD8RVLh9+ffufE/2zxVGT+Tko6lZZiN+2i+PlSaXL2+EUyheDt/kS8m215cX6+xOU1G6HxH1CkT3dCtBcdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709713012; c=relaxed/simple;
-	bh=/EMjKJh7RTTCREzzTjnONmH5VAO67zSYckgm8+w1p+A=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=BoiPqGpUOHDCTxLTq61cQgqRVPgLBGWuyGJN+AUEAJWA+LusbOS0ZdmRCJMA/uFiHpdY3UGQuXd+t59BAM5jxglnd94w6iOus1BdDMSBM47YEWQdMxyq6W8vW/hoeLcYIKwgZz40bS355zdiJza7yjOLi6G7WFNkmdDAN8LFmls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tNWmsWGn; arc=none smtp.client-ip=209.85.167.50
+	s=arc-20240116; t=1709713013; c=relaxed/simple;
+	bh=fe8+GtFdC9olGNH3KClNdX80yaQnD8GK4+UPZdW/CLQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=jfEY4PcIxk+Gl5rl8zAjMuWtjqkWHQ9ZrYVmeO5wFsGbkY/yVf5QkiUmbRzTcmCncEdPN5SaPvM39iwiVedfpmDnjNDtuxR7dxTou7qA+N8jU9nFZjOA98KMD3Xqxy3tSqiU8GgKGtBxGa5Z95Plf+KIU3vXzhxLSdedtUlom9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qd92PTgC; arc=none smtp.client-ip=209.85.167.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-512e39226efso6593150e87.0
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 00:16:50 -0800 (PST)
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5133d26632fso4713962e87.2
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 00:16:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709713008; x=1710317808; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IOVorbNDjmEYCRkOIJ6RfUvTGmzX7zzuHuefGqOjfNU=;
-        b=tNWmsWGnh1NK6ZECYnf8J/WvUd/OO8WK1bsOO313Q3pufAQnWZa/tV/CByAvyE0OND
-         6WTL/rhBKa3osrFcrTL3gYWhTp34dxu4x/0S5bFlIotfMLMlQmvtkLhUaHIqALUsrNk2
-         4OTGHtErnjtKXKEeqF6cBRoS1YZH4RJ28DBl2Fd7pzL8ZDDZG6oahUZ4K6oz2QtrEg8o
-         P7a1IoLURUKt1xyWN2cBWU4QPhUa5QTa2KRW1oJTXAeapjPAfxuBkAQKxqLi7TWP5Rxd
-         MGA/gG5SpNtWm+f8PFMVN31Mezd5EaBGN5EzwD7QgNvoH+/G8LnCXKEI9VZuRxVHJEwn
-         ysiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709713008; x=1710317808;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=linaro.org; s=google; t=1709713010; x=1710317810; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IOVorbNDjmEYCRkOIJ6RfUvTGmzX7zzuHuefGqOjfNU=;
-        b=qQ+W9x0gqg8INXjRUcNKJQ901l8pi3TMLKd7IkJdsWXSm9u9Cmos5zohouJU3GRj5c
-         PcpOiQEv6TyEGUaFlgNYOoVRhTb9eEq5TGwH8dnLXqFcAX+Qxn0udpVQYNEPM58bo2UF
-         JFK3eNwrHh002yk2O+enutalobNz504FqK4+w0Joi/fUj9RCaRsQ2W82a2ePjwcs4I2M
-         Z6VomquXc2+HRYT2q4OdWy5j/F1eqOWBDplFtAeHvT1phk7dx7+kwE0hvEGsHj4QjXnH
-         4tFfLzEInxtzeVBPkE/3qKVRe/p7aWnM/oCxMHpQ498FjR+0qlyblECFEi1I6HPJs49Q
-         u42g==
-X-Forwarded-Encrypted: i=1; AJvYcCUrudfSN8xednvpzX37LKa7xbUNmyh4EJ/BYocwK17CBb59WDz9+gXl+ERORrWcU5kxhL6mPnP3q6HIEyvzqntNJQHjUUF/
-X-Gm-Message-State: AOJu0YymoYucskn8lro/7RXXCQc/XhmzMo6iaek04yk0aCayRH1dINKt
-	GYubQJuf87+JPi3jm/LoFQXfMCFigI72cusvfFxSwdeRP7pFqn0AMOPGBkQsYKQ=
-X-Google-Smtp-Source: AGHT+IFoKXNcKYuZLINzFqMTqbCvqGxphCUhFBrxErlA5QFN8wPG8IihwSx3yNHj5wiOZJOAUzxEVg==
-X-Received: by 2002:a05:6512:2e8:b0:513:26e7:1b13 with SMTP id m8-20020a05651202e800b0051326e71b13mr2848069lfq.14.1709713008329;
-        Wed, 06 Mar 2024 00:16:48 -0800 (PST)
+        bh=jTS5XY8s/SB49nhKp8RUK1O5fLNMn3hDEEbsJMc9miA=;
+        b=qd92PTgCUxW0cKHTgeGFj7pOw0B7PqcFeB6K6/UdEsyi0cwon1TGAwxZEdK9wnSuKj
+         C33/rjwS3I1XK6Db1JGXcsccj80/vCQdUjD9S6FANXa7RcF+Ghj4cik6ruEYJGQPfXv0
+         5hitXQFlucxcqRNQt9w9s1ahUrIJXU2GxRWoGw5eHvlcYmDuzwBlb56+saWmimvhaVa7
+         RmpEEDwm7TQFnK7exK90lJISltp9V136zFfYhGUfJ5dGmNu9qDB4C4+z3T7u5YArdvdy
+         kTX2+M2ow2DHuHHiPq4J0xQCyVoHTST+TyCd6nfseCuIz2Dn/0ugs/aEJOMDkR1b1p8D
+         gl9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709713010; x=1710317810;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jTS5XY8s/SB49nhKp8RUK1O5fLNMn3hDEEbsJMc9miA=;
+        b=ELMEe7Dp6Sd8teupEiLtxFQ7BtZQOe22BjJpXQXzYTdp6AAlOjHLYzoZtQ+FpV33Ic
+         I34z1ksBWdQHQZx0Mmso4Moy//NVD9BDr8eLJl1vl0/9lyaaAZYEwOGkF5q1SeN2MekD
+         sg8bjKga+MDXDRx1pNaFRM5vD4uQF/6ZS1qSRxQ+KqjLT2b+S0s7uGYbbmtHTl36Ylfc
+         sd6INIa9Ert1S0CyYOQZM6+jiw45T36LMZYNCZrrRplcZEQNXQIzu5Zuas4xI6CS+MpA
+         r1KwylYWMe+QIuNasdD4E1CrbWv0QTYaE2ZuIgf1qa1YzQwR/Dhe4b2Z0aPhJlOyNyex
+         VINA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+KDjxeYScIy4aPt4Xdv0G/FdisDQEd5WS7CbrnplwZIX9O2CHPYKqpDW0IpTShzLSma8wpKTUlyOgTRdaDpQw6MlgiuKn
+X-Gm-Message-State: AOJu0Yyuj42G7U8MGTZVHyL+TSI+svHVRbxDnFbE/1yDTcvO4skdjUYV
+	ir7LWbNULn/KtbYbKPPiNwc2hZ9L1LnL/cgEIUlbQVrBwYFnNJs61D5yELZGBzo=
+X-Google-Smtp-Source: AGHT+IEgaHSdksPyWwI8qXV0kLecP/kL8C/QFpX5KJwzlk00ddfN+2+dolSWeoST46cRkr7LtXpzUA==
+X-Received: by 2002:a19:ae03:0:b0:513:46f1:f9cf with SMTP id f3-20020a19ae03000000b0051346f1f9cfmr2671834lfc.59.1709713010005;
+        Wed, 06 Mar 2024 00:16:50 -0800 (PST)
 Received: from umbar.lan ([192.130.178.91])
-        by smtp.gmail.com with ESMTPSA id s9-20020ac24649000000b00512dc23bedcsm2162366lfo.99.2024.03.06.00.16.47
+        by smtp.gmail.com with ESMTPSA id s9-20020ac24649000000b00512dc23bedcsm2162366lfo.99.2024.03.06.00.16.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Mar 2024 00:16:47 -0800 (PST)
+        Wed, 06 Mar 2024 00:16:48 -0800 (PST)
 From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Subject: [PATCH RFC v2 0/4] wifi: ath10k: support board-specific firmware
- overrides
-Date: Wed, 06 Mar 2024 10:16:44 +0200
-Message-Id: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
+Date: Wed, 06 Mar 2024 10:16:45 +0200
+Subject: [PATCH RFC v2 1/4] dt-bindings: net: wireless: ath10k: describe
+ firmware-name property
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,10 +79,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAGwm6GUC/4WNTQ6CMBCFr0Jm7ZhpQbCuTEw8gFvDomKBSbQlU
- wIawt1tuIDL9/e9BaITdhFO2QLiJo4cfBJ6l0HTW9855GfSoEkXpHLCufG5MYQty3u24nCwY4+
- VpYOlpj0qqiBtB3EtfzbuHW7XC9TJ7DmOQb7b16S26A92Ukh41OXD5KlpyuL8Ym8l7IN0UK/r+
- gNoSeg0wAAAAA==
+Message-Id: <20240306-wcn3990-firmware-path-v2-1-f89e98e71a57@linaro.org>
+References: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
+In-Reply-To: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
 To: Kalle Valo <kvalo@kernel.org>, Jeff Johnson <quic_jjohnson@quicinc.com>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -94,61 +94,49 @@ Cc: ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, 
  Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2186;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1138;
  i=dmitry.baryshkov@linaro.org; h=from:subject:message-id;
- bh=/EMjKJh7RTTCREzzTjnONmH5VAO67zSYckgm8+w1p+A=;
- b=owEBbQGS/pANAwAKAYs8ij4CKSjVAcsmYgBl6CZuucldOlm1luyQUFD+7gU157AjQNbYIEZc4
- k2wPW2lBZeJATMEAAEKAB0WIQRMcISVXLJjVvC4lX+LPIo+Aiko1QUCZegmbgAKCRCLPIo+Aiko
- 1TU9B/9j5w0jL9XNxvqu1AflOwDGcSRKyvic9ybSvcGkVtS6OUAccbDdevCYzJaPhhIiWqCpcLe
- QksNPMXw8xGef7skT3/O1H9DZvwklOXTQI43aqvqolNtv+CjZJlJCylbzry5NXZiUzdJAtRb59j
- ZYVtoFxlk0a9NvHwiJdJHoOnpMGI88ierKkEuG8duA4AjYPoQoFQoBB7nU2jyyjhWP3Y3kJATFL
- KOab5ZOrO2y7JvOw8uO3X+DkCoXLqTMrK+gmnU+12kqYDkLbw7JByEfnGAZKyYLubrCBR3iWwij
- RY109AOxtH/aMLBKqvWboM6Ypt+J2+2MQmxZZfDeEo3a/dQq
+ bh=fe8+GtFdC9olGNH3KClNdX80yaQnD8GK4+UPZdW/CLQ=;
+ b=owEBbQGS/pANAwAKAYs8ij4CKSjVAcsmYgBl6CZudY3K+ERBgn01quv3X8bd6xQuJWaIyalJA
+ c+k4QH2lX+JATMEAAEKAB0WIQRMcISVXLJjVvC4lX+LPIo+Aiko1QUCZegmbgAKCRCLPIo+Aiko
+ 1anHB/4yzEiv8VSiingmEI1JCac3UkFIWFWh+CZLWXZg7RPJ9Dyc279bV5TL7vQwqmJE1AXGG3n
+ 7dSo2z8dXpcNlJzouUEfuWljFKbWs7m6JLeZakJ68QXRIJ7iES1n6tDi3OHGmQDu+Vuo+nkTPMt
+ bRx5sgWjIc0EjSlY1M6Q+wWHW9F+vIZww+LPJ95CDO50u6M8R8jCSmYAw+Ulr4KJ08jEiXIXpkd
+ 54VuzZcg0zu8GZCrH5hwTEuXJGO0SKN0KhMDa9NGY8RCi0IM+1h7ZlXZfrNR+eIpepENSVi+k+j
+ 1/ZDr4pgr4Zqrjzc0MUvNLBgGO2iH9CMQLdr70OJgVmIOGOn
 X-Developer-Key: i=dmitry.baryshkov@linaro.org; a=openpgp;
  fpr=8F88381DD5C873E4AE487DA5199BF1243632046A
 
-On WCN3990 platforms actual firmware, wlanmdsp.mbn, is sideloaded to the
-modem DSP via the TQFTPserv. These MBN files are signed by the device
-vendor, can only be used with the particular SoC or device.
+For WCN3990 platforms we need to look for the platform / board specific
+firmware-N.mbn file which corresponds to the wlanmdsp.mbn loaded to the
+modem DSP via the TQFTPserv. Add firmware-name property describing this
+classifier.
 
-Unfortunately different firmware versions come with different features.
-For example firmware for SDM845 doesn't use single-chan-info-per-channel
-feature, while firmware for QRB2210 / QRB4210 requires that feature.
-
-Allow board DT files to override the subdir of the fw dir used to lookup
-the firmware-N.bin file decribing corresponding WiFi firmware.
-For example, adding firmware-name = "qrb4210" property will make the
-driver look for the firmware-N.bin first in ath10k/WCN3990/hw1.0/qrb4210
-directory and then fallback to the default ath10k/WCN3990/hw1.0 dir.
-
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
 ---
-Changes in v2:
-- Fixed the comment about the default board name being NULL (Kalle)
-- Expanded commit message to provide examples for firmware paths (Kalle)
-- Added a note regarding board-2.bin to the commit message (Kalle)
-- Link to v1: https://lore.kernel.org/r/20240130-wcn3990-firmware-path-v1-0-826b93202964@linaro.org
+ Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
----
-Dmitry Baryshkov (4):
-      dt-bindings: net: wireless: ath10k: describe firmware-name property
-      wifi: ath10k: support board-specific firmware overrides
-      arm64: dts: qcom: qrb2210-rb1: add firmware-name qualifier to WiFi node
-      arm64: dts: qcom: qrb4210-rb1: add firmware-name qualifier to WiFi node
+diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
+index 7758a55dd328..d978d850ce93 100644
+--- a/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
++++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
+@@ -72,6 +72,12 @@ properties:
+       - sky85703-11
+       - sky85803
+ 
++  firmware-name:
++    maxItems: 1
++    description:
++      If present, a board or platform specific string used to lookup firmware
++      files for the device.
++
+   wifi-firmware:
+     type: object
+     additionalProperties: false
 
- .../devicetree/bindings/net/wireless/qcom,ath10k.yaml         |  6 ++++++
- arch/arm64/boot/dts/qcom/qrb2210-rb1.dts                      |  1 +
- arch/arm64/boot/dts/qcom/qrb4210-rb2.dts                      |  1 +
- drivers/net/wireless/ath/ath10k/core.c                        | 11 ++++++++++-
- drivers/net/wireless/ath/ath10k/core.h                        |  2 ++
- drivers/net/wireless/ath/ath10k/snoc.c                        |  3 +++
- 6 files changed, 23 insertions(+), 1 deletion(-)
----
-base-commit: 596764183be8ebb13352b281a442a1f1151c9b06
-change-id: 20240130-wcn3990-firmware-path-7a05a0cf8107
-
-Best regards,
 -- 
-Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+2.39.2
 
 
