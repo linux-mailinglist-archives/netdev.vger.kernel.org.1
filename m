@@ -1,141 +1,142 @@
-Return-Path: <netdev+bounces-77834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B62F8732B7
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 10:41:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80C038732CE
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 10:43:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCEA91C2145C
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:41:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5598B22132
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00FD5DF29;
-	Wed,  6 Mar 2024 09:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE67B5DF2E;
+	Wed,  6 Mar 2024 09:43:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="FCVSiHNL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rk5A19O3"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB885DF1F
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 09:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB010433C5;
+	Wed,  6 Mar 2024 09:43:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709718063; cv=none; b=A6FoExQSPXF8ghxYTqCao/Aubw1Ctjz+gS6QyhxcuCf+DcZIXQRbd9EhnzBUmNMDs3GzBF4muF50lX7uxbAaj5tE4VcCOiDtX4SlcHlMMq9eLnRxr6wxvFSYLAB2plX1U6QIVvCVg+VwzeOXhkdRvxg33gcqCy2lUv3fXCMxZrg=
+	t=1709718186; cv=none; b=Yjv0OXKWUcH1p0KoRbptILFLH3AfkF5FQqZHvRjgp0YQElT6x1u1guHt2Lg/KYdJxaXVgsMUZQ3kQSTyGjbECxi8dQEqI5Dy0W2TvWzx6CKNexSkNIKgsUZG98kmolVVcZa7AErSTz5ppEVlOIvFbYnrLeKIqmSZnuy5deoRnJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709718063; c=relaxed/simple;
-	bh=HuKkNTiZyk4Zd71i9Vg6WLAsDuyNUnnPZnh/6FTXYa0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TIp0wm3rMPTtPebhzXyyGrudR9GjSrAq1+pPdMF5TZpuboQdVbdBSA4B4+2OytyuLF3QaqdyXePZq7uqGGsolNpXPfTMl1LI/GZrQocovTKalr0r5JHXRRtVDhMpbhFLTrZepOeBIKXOFt33tNpFiOOtJyrCz1vRVU4rU+hLrpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=FCVSiHNL; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 65FC387B3D;
-	Wed,  6 Mar 2024 10:40:52 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1709718053;
-	bh=r4vxK5hI9QERuH4Gca4Fpm2D/0m36xecnukYNX+OwaE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=FCVSiHNLFlxLr4uzSIONjM0XbDCbtKwfc1H/j90OKQ3f9YCwYARB+v5QXUIvAdEwZ
-	 0daelvS7MsmivK7W1PVbdHmP/hIBOYZVWpRbFL9ZqNTo/jJ3OhZfIriBydqPnsnlGQ
-	 wc1hRI3H+jZLpN/d4AX2ROSByD/n4m6qpvqq4jJUnCKlAQTqfrv5MWKJQUzckNhR3v
-	 wLAb34iCg4ytXrI45mZFYdcr6ifWvDOAassgx96Bkwp3lHHWjCB99TfJiGq5zbLvQP
-	 t698MRtTtJB86LLMLHewmUP7CQd2UWCDpsf9kpBcsMwM4sMYxpFH1OVrm5Eo3C+ijF
-	 HCAB7JxmMbB3Q==
-From: Lukasz Majewski <lukma@denx.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Tristram.Ha@microchip.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ravi Gunasekaran <r-gunasekaran@ti.com>,
-	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
-	Murali Karicheri <m-karicheri2@ti.com>,
-	Ziyang Xuan <william.xuanziyang@huawei.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [PATCH v2] net: hsr: Use full string description when opening HSR network device
-Date: Wed,  6 Mar 2024 10:40:26 +0100
-Message-Id: <20240306094026.220195-1-lukma@denx.de>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1709718186; c=relaxed/simple;
+	bh=Y6OeUIFhACV1w8LgiRWi1ucYYzz5y/Z3CdvHWuXr3tM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=FVWrL06e51u2mWaybhbr5qI1YrGnH5iv4jqQOgO31838qkzfWfJpo1RnBineTN5xOvoY2cOfHpGTVSKj83vreyyjlS3GVoUbZix4+JNs0jWjGz5rjjTp7vhn+cPWomgI6kapKFTbEJ8SfA/PyLm+xYjkRqVh3qz+mld6aDQinfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rk5A19O3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BD53C433C7;
+	Wed,  6 Mar 2024 09:43:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709718186;
+	bh=Y6OeUIFhACV1w8LgiRWi1ucYYzz5y/Z3CdvHWuXr3tM=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Rk5A19O3V7nk4YtyIQoPlY9Frr0CfHp6Sj89uJ0pGG3buLNhXLcWpM6MwA/fGKWow
+	 JMOia1ZEzl48p9Jiush0eoDNAm+b3AATId/rs39HdCXNXJdw4NOOnKQheH/z4/SIlJ
+	 2jVEY+VCsbsRhrVKRdxV2/pienzBukSCyDnsCt3v1Pa0GkAbWGvCdbjriV7EIeHjei
+	 vbDfiIMACYmMFQSMaqhx2k1yfMtbM6NVX+gMaU8KO39eX8VNjEkPJK9U1Pi7Lb4lkP
+	 pxaefT4fEW9NN08mULvMgG5uMlXH3Akzlcm7jF1wDmDzTfIrPSz9Digv7r4XFjKdDK
+	 oBlqrvWHurHJQ==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next v2 00/12] selftests: mptcp: share code and fix
+ shellcheck warnings
+Date: Wed, 06 Mar 2024 10:42:49 +0100
+Message-Id: <20240306-upstream-net-next-20240304-selftests-mptcp-shared-code-shellcheck-v2-0-bc79e6e5e6a0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJk66GUC/62OTQqDMBCFr1Jm3SnRRild9R7FhY1PDf6FTCoW8
+ e4N0vYEXQzM44P3vpUE3kLoeljJY7ZipzGG9Hgg05ZjA7ZVzJSqVKuz0vx0EjzKgUeEeEvgHxL
+ 0dYAE4cEF41ja0qNiM1WIP/retDAdJ7mqDR6ZgdYUd5xHbZfd4U7fVioiaa2Eyb92uTnZ+Wcs+
+ 4PHnLDiPM+TC8osUxq3Dn5Ef5p8Q8W2bW+0HgrDHQEAAA==
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Geliang Tang <tanggeliang@kylinos.cn>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2528; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=Y6OeUIFhACV1w8LgiRWi1ucYYzz5y/Z3CdvHWuXr3tM=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBl6DqmDh80NvIFkK0dyhBctExEu31+F6+md5WI+
+ BUY0H5bE0iJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZeg6pgAKCRD2t4JPQmmg
+ c8dDEADk/Wj5WzxLrbR8NXtfVTLBwEy9uIeUrN+Os3Heh5JplO9kA/vEq5YuLUubWN3yphFOIwJ
+ Pn7gMrnFyv0GjCc6NaD+hGXcScoWYX3cKMDde3fAe3JePZACbOjishLu7EJd4lyZvuPXF2hSxdD
+ FR9gm1TwiyRTz6vmxgEa6LOAXT7slFI1oqWIxfE2VcnF2w9QcvJl98YEpqJPDGFNtREm9VsmDHk
+ AYR0B0RwgudAJkXmI88cbfROsWAlSJnjcXgCUeoi6PFd3fYiWhfbZheadiYcs1B3YzjnCJRpB0g
+ nS80p/OlVbZdJsugfluqwChsjUZYlfnVwV+Omm4H/x+VHtodHCaXUDbyteKPNgce9gqhujBpAza
+ EVnF8ijUxdCzYexTNZKXi/csNmvJaqM0x8MLHYTfnYhUvMZ5QzP/uyl1X/Q6ZGo7jdoPB7gXrOs
+ spVCsK6S1CgLA94KooqauBVcLt+h6ofcNbRmHBWA7gDQsecHhJozQ6K88dC8QgIVgwg/7jh6RA5
+ ede2Su9ItFELZTGpzEzFiiL6IQ+J6tgri5dH0iiwr+jEUYGdfTTNOvMGfv3x9keyb+FlywqgyiM
+ 0CI1DRHfim6pFeKgC2t2XLSERVZS8j1w64k5bxpwAXKMHNU4fQdKxp1i9p7t5Uh6FmOuTvCRkTr
+ INd9JqWjxPVvMzw==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-Up till now only single character ('A' or 'B') was used to provide
-information of HSR slave network device status.
+This series cleans MPTCP selftests code.
 
-As it is also possible and valid, that Interlink network device may
-be supported as well, the description must be more verbose. As a result
-the full string description is now used.
+Patch 1 stops using 'iptables-legacy' if available, but uses 'iptables',
+which is likely 'iptables-nft' behind.
 
-Signed-off-by: Lukasz Majewski <lukma@denx.de>
+Patches 2, 4 and 6 move duplicated code to mptcp_lib.sh. Patch 3 is a
+preparation for patch 4, and patch 5 adds generic actions at the
+creation and deletion of netns.
+
+Patches 7 to 11 disable a few shellcheck warnings, and fix the rest, so
+it is easy to spot real issues later. MPTCP CI is checking that now.
+
+Patch 12 avoids redoing some actions at init time twice, e.g. restarting
+the pm events tool.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Changes in v2:
+- The former patch 3/13 ("selftests: mptcp: add mptcp_lib_check_output
+  helper") has been dropped, it was not supposed to be sent.
+- Link to v1: https://lore.kernel.org/r/20240305-upstream-net-next-20240304-selftests-mptcp-shared-code-shellcheck-v1-0-66618ea5504e@kernel.org
 
 ---
-Changes for v2:
-- Use const char * instead of char * - to assure that pointed string is
-  immutable (.rodata allocated).
----
- net/hsr/hsr_device.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+Geliang Tang (5):
+      selftests: mptcp: add mptcp_lib_check_tools helper
+      selftests: mptcp: add local variables rndh
+      selftests: mptcp: add mptcp_lib_ns_init/exit helpers
+      selftests: mptcp: more operations in ns_init/exit
+      selftests: mptcp: add mptcp_lib_events helper
 
-diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-index 9d71b66183da..904cd8f8f830 100644
---- a/net/hsr/hsr_device.c
-+++ b/net/hsr/hsr_device.c
-@@ -142,30 +142,29 @@ static int hsr_dev_open(struct net_device *dev)
- {
- 	struct hsr_priv *hsr;
- 	struct hsr_port *port;
--	char designation;
-+	const char *designation = NULL;
- 
- 	hsr = netdev_priv(dev);
--	designation = '\0';
- 
- 	hsr_for_each_port(hsr, port) {
- 		if (port->type == HSR_PT_MASTER)
- 			continue;
- 		switch (port->type) {
- 		case HSR_PT_SLAVE_A:
--			designation = 'A';
-+			designation = "Slave A";
- 			break;
- 		case HSR_PT_SLAVE_B:
--			designation = 'B';
-+			designation = "Slave B";
- 			break;
- 		default:
--			designation = '?';
-+			designation = "Unknown";
- 		}
- 		if (!is_slave_up(port->dev))
--			netdev_warn(dev, "Slave %c (%s) is not up; please bring it up to get a fully working HSR network\n",
-+			netdev_warn(dev, "%s (%s) is not up; please bring it up to get a fully working HSR network\n",
- 				    designation, port->dev->name);
- 	}
- 
--	if (designation == '\0')
-+	if (!designation)
- 		netdev_warn(dev, "No slave devices configured\n");
- 
- 	return 0;
+Matthieu Baerts (NGI0) (7):
+      selftests: mptcp: stop forcing iptables-legacy
+      selftests: mptcp: diag: fix shellcheck warnings
+      selftests: mptcp: connect: fix shellcheck warnings
+      selftests: mptcp: sockopt: fix shellcheck warnings
+      selftests: mptcp: pm netlink: fix shellcheck warnings
+      selftests: mptcp: simult flows: fix shellcheck warnings
+      selftests: userspace pm: avoid relaunching pm events
+
+ tools/testing/selftests/net/mptcp/diag.sh          |  35 +++----
+ tools/testing/selftests/net/mptcp/mptcp_connect.sh | 111 +++++++++++----------
+ tools/testing/selftests/net/mptcp/mptcp_join.sh    |  60 ++---------
+ tools/testing/selftests/net/mptcp/mptcp_lib.sh     |  68 +++++++++++++
+ tools/testing/selftests/net/mptcp/mptcp_sockopt.sh |  55 +++-------
+ tools/testing/selftests/net/mptcp/pm_netlink.sh    |  31 +++---
+ tools/testing/selftests/net/mptcp/simult_flows.sh  |  38 +++----
+ tools/testing/selftests/net/mptcp/userspace_pm.sh  |  56 +++--------
+ 8 files changed, 210 insertions(+), 244 deletions(-)
+---
+base-commit: 09fcde54776180a76e99cae7f6d51b33c4a06525
+change-id: 20240304-upstream-net-next-20240304-selftests-mptcp-shared-code-shellcheck-160fceb5ce44
+
+Best regards,
 -- 
-2.20.1
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
