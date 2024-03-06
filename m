@@ -1,304 +1,352 @@
-Return-Path: <netdev+bounces-78084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3051C874034
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 20:14:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB165874049
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 20:21:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DD881C23893
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 19:14:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEA2B1C24BCB
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 19:21:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDDCD13EFEF;
-	Wed,  6 Mar 2024 19:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6055B13F00B;
+	Wed,  6 Mar 2024 19:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ViWF+FBv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PhNVRIn+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F2413E7DB;
-	Wed,  6 Mar 2024 19:14:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C43613E7FF
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 19:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709752464; cv=none; b=loGbv408TEa9RHBx1373figaTC8c7O6QaPjoa0gSIYEpQuBCwSYVV/ge3+UFULqA5z4aWT6PKsFQMJ2C/pP7eUVt9qJ84n7/8hFeN4dD6gFrgZhJN9EWh3af7O7+H7b+3hwRlNu87xg5/pE+7kcBoMBSZBNMTbwQSHzfXe5WxXU=
+	t=1709752850; cv=none; b=BLBuTeeueRXTcwcCzucv5bhF1qaIbLlZYWy5UkQo7Wc4AZ5qGtUI9rFVPe6gY4al2HVmT0yRJYtU/470B+aLMtgcibVV1QcIv+q1ndrrLXrlXtWk7DX7GF1n9u1UULzfalCjt4DpSW3wE7AmuvDkuteT41kfQaOScAcjD9zwsRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709752464; c=relaxed/simple;
-	bh=rqeHAwxjnBJfSjkh66zxDx3278+2ytmY3CRS/ZATqfE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DFLV5EyvDJy6u9emfgK0JHs+RjibcGx/66ywUmpT32aZjdKMe/exQV7QZxpktM2bZHfd4PnkoBobh5TB+AlZjE6c/ehXFXvJGz8MyYUsCac+jrsBRU4IxSkJoZ6ZIxwkfZ+Tinve8SfZsxMmdvscm6V9p+R2V3CGUW//iDRQvMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ViWF+FBv; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a450615d1c4so23425466b.0;
-        Wed, 06 Mar 2024 11:14:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709752461; x=1710357261; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=koyC+OXWaVBitynJT4B5M9yEfbXa623u0u8Rn+ueAuI=;
-        b=ViWF+FBvFlvBOiv5PWd8lqtxy62GRdL5k8hrxoy9p20taYwc758/aHJZXCv2+nBCPv
-         qdssh2R0rkZh1yG+/oHkP+uAPqhObdc7dtJAcfG/+JVo2mQqiHzt8/NRCDv2U0/0lSdb
-         Yir14GaJjWcgTdXnrBUGNn9sr+/bBxO8CD+6AEUDeKCR/W9595868P+Oz0B0M0t0mTNM
-         oXPI11DlFkqa/vfHF8NHGachH/drmTFjNI4LepEGdDRXg6juU6KcNbDadAsxpI+gasT3
-         iLaOGZq9AaX8TQw9bzQtFfFgANzG2zhorb8B2tSAeR9If0aRdWFwjgoqjpjNHV+5uiMn
-         Jl+w==
+	s=arc-20240116; t=1709752850; c=relaxed/simple;
+	bh=mo84TLPILoTUagVyQis2ihLzQcWCoFHIXVSFmww+G/c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lGDBR5CTnZW0rzCiJCAPm3BMmWCfjqhuiulgYvsc/77QtKo2p/YgnROuviPJ581loG0T3zihT0drsYpYZ7BijMVvErzVsaToBwVVnSj+ujkagy1rvH0nEHSWY4Rg70SkLlOkrEXAks/ZyHpIba5Mc1qO8HXQZWvLAbhOdWqLMjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PhNVRIn+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709752847;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=92n/2V/ZZRBf/txj6fFiiPCDY877S/i43eKFF6hUfSc=;
+	b=PhNVRIn+FnS7j8pgEO0IuESVCmzJJAPtrmwmHpeVF7VsWy1zIs2FsWuagCec2B/pcmbII1
+	mPA0Nx8YyjlFvG/olRnZE79tkME0mmsxKfboMxPasZiugypYN/e2/pXuBf+Kh4+LsSWiLf
+	Zoh6vDzqpWDqhrSaT0ZoJhM/7LlGKk8=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-299-DOX4ml0mN3avHsmgUYcKFA-1; Wed, 06 Mar 2024 14:20:46 -0500
+X-MC-Unique: DOX4ml0mN3avHsmgUYcKFA-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-565862cc48fso113091a12.1
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 11:20:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709752461; x=1710357261;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=koyC+OXWaVBitynJT4B5M9yEfbXa623u0u8Rn+ueAuI=;
-        b=QNsR6mXmjyD8/QQ5C5PdNEXVD/GPAYuCjpnpqvK1d/PbT9sUZtRU5WyUGBRVY3fhqc
-         lUn7CYj/DS3jwHJKzKlR5Lp7va8v/TfSiHQTQDZTXeVhmZr222Z4SoQXFTnZ5tdAU1t3
-         Vt9f8lwEPbOvNra5C9P5SWwdjCzZUdGd9FuIhwB+ky0RFpeyAXys1WRahZBYnMmkwecf
-         5EzQ92KMADYp0JmxpX+LBBRkT+aPLld7gkrTqGMpP1F6Mn5TZhuhZ4ljuzeyCrh54Imo
-         JTMgWKczAcKAXfy2tlBrzAiknPHpcYF2E/PoDItJdg2QnlOYjzvWLrb/JaLRZwaY+7Lp
-         0PYw==
-X-Forwarded-Encrypted: i=1; AJvYcCVrOja2zARvneyG562nxQHrlzimwkdzbE82PK+4BZ1RToTx3C95zCrrsFaMMvT7qtQ40RNK9wHAzTJNtjC6jImSaQFcSU8/yl2snfEyEOEOSq/qHJzi9zLK4rFtMTiduFlz4QFlmNm03L6WW00aeIwf4FUKSUB9PCiFBc1/t205fvoXFZegcpVdeW2HoSueJ0FXb3dfNGlU4xOg7it6H9Jb2zq4iR7pikdM2KVhEMPIIezbJiA/X5jZwOxK9mmfBxIM3romxZji9yBiNWN4uxggMasPoi2aWERXEjv0mydV/D85z+YEw7+Xjy3FIAe/AkT90ghwcsSv8DZUVH51TQTtXvu+gXLGCIG6Pa2TZb9bxqc6yt/eFoLo2KdFCVC9LiplpZVPOvtnR5pSvGZyjJ3zKGVRXwi9AjGvOE9FWWI8+3+fYpcSSleaUi9rB/OPg8GcJV67+LgdaqiEMpZHL6Q/xS13lFswCr7JW93EAGXnw3phls+RWx6UrVZzQuuRZWBFnujYmg==
-X-Gm-Message-State: AOJu0YxhSRB0qK/UuVoXCMmPC9+K8Mkr08GGN1h2Z57fdHjEF5zxwOtD
-	TZ4l4iw7s7YCeweEjdvfjUZnH66L+rPwHCNQo+wLXxTJMb3/nK/G
-X-Google-Smtp-Source: AGHT+IFItB8heVRezTYv3CUtiqgvQIid/hRamLnrcs20FhE6FaoKpuU57YkPC1CFMKt9DanhDiASxQ==
-X-Received: by 2002:a17:906:74d:b0:a45:8b6d:42c9 with SMTP id z13-20020a170906074d00b00a458b6d42c9mr5974291ejb.23.1709752460817;
-        Wed, 06 Mar 2024 11:14:20 -0800 (PST)
-Received: from [192.168.8.100] ([148.252.132.18])
-        by smtp.gmail.com with ESMTPSA id jw11-20020a170906e94b00b00a455d78be5bsm3479312ejb.9.2024.03.06.11.14.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Mar 2024 11:14:20 -0800 (PST)
-Message-ID: <772b9ab0-c6d7-4b13-8e05-44dd312b9879@gmail.com>
-Date: Wed, 6 Mar 2024 19:12:58 +0000
+        d=1e100.net; s=20230601; t=1709752845; x=1710357645;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=92n/2V/ZZRBf/txj6fFiiPCDY877S/i43eKFF6hUfSc=;
+        b=lzovBkDEG+LCP80tdOsEUeCGidvz/8+r9O+nVR0Br0V0fYTT/OB6H8weWxwsBJ8/Ea
+         hzPdfCKxT36kaqQsKkocghwfvJYSJq9EdFmj/KpdFZ61URUkqSlnbRAEvGYt9Oso3FT9
+         yLnh0X39+5U43nkkuWB0UPN/fikC26mA9WB6uinB+vrm1ZwuquielSxgSfs4qcsr7LhZ
+         PgcjVlEK+dSQSuNDXPJfdxaOxpgJHcY2GaCTkuKeol0HG9Wsb4LI5FuNK1g5Lmg17ZhQ
+         P73hssMfoOMIEdRy5et5kRFo67ppFMwOpUTuGCIWKfSa/nPV3qaVcerv/m3ORCCmWBuu
+         E+0w==
+X-Forwarded-Encrypted: i=1; AJvYcCXiy4byBys/u8QNB/1vlEEpTDnVDnHV57sl1CPxRnqEys1Wvy+QAocS/AKdxBMadwZSA7ltkttb1ihqf3vkrf4ZOaj0iyxi
+X-Gm-Message-State: AOJu0YwqsgpezJ9FMT2HDV5t4Ndh5lpvp0zayt7r3Ef+rg6uBu2J0r2p
+	V/usQNWu9wX5Rfshy0yj2Sy1WPs+vPjtGjFGjmKC5LnALdREgRaHl9xtJ//AXTAG6jDEH5c7dgI
+	BC3xTG2zoPixOL3okegP92vUrM3bEBOT9q+uUWXiArigPxHxtftiglnaPQ/zSaYfaIrcehkxl8n
+	uUJVBuFhyWl1no80aWA5D7rZum44SPMVp+GoNK
+X-Received: by 2002:a05:6402:1e87:b0:566:d083:df68 with SMTP id f7-20020a0564021e8700b00566d083df68mr5844910edf.21.1709752844856;
+        Wed, 06 Mar 2024 11:20:44 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGJ+4MZ+S5iLviZ/Ho7O7H4DVf6nENriFc6UckU20uADT4vFV6ZITae9v4aD6avyEGzhhCiskVSQ5N4bwxtaI4=
+X-Received: by 2002:a05:6402:1e87:b0:566:d083:df68 with SMTP id
+ f7-20020a0564021e8700b00566d083df68mr5844891edf.21.1709752844530; Wed, 06 Mar
+ 2024 11:20:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v6 02/15] net: page_pool: create hooks for
- custom page providers
-Content-Language: en-US
-To: Mina Almasry <almasrymina@google.com>
-Cc: David Wei <dw@davidwei.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>,
- Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>, shakeel.butt@linux.dev
-References: <20240305020153.2787423-1-almasrymina@google.com>
- <20240305020153.2787423-3-almasrymina@google.com>
- <1b57dac2-4b04-4bec-b2d7-d0edb4fcabbc@davidwei.uk>
- <CAHS8izM5O39mnTQ8mhcQE75amDT4G-3vcgozzjcYsAdd_-he1g@mail.gmail.com>
- <417f293a-848e-4eb2-b690-c8696079b452@gmail.com>
- <CAHS8izNPtHb2GnEMviiJTFT_dPxsxgYsNw5V9s-gSC2YnJRPRg@mail.gmail.com>
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAHS8izNPtHb2GnEMviiJTFT_dPxsxgYsNw5V9s-gSC2YnJRPRg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240306162907.84247-1-mschmidt@redhat.com> <20240306162907.84247-2-mschmidt@redhat.com>
+ <ZeihFVgwBBLOZ4CL@nanopsycho>
+In-Reply-To: <ZeihFVgwBBLOZ4CL@nanopsycho>
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Wed, 6 Mar 2024 20:20:33 +0100
+Message-ID: <CADEbmW1CtULCvYxW+yyB1=PRzAkAUMOE6LYfk3v6kODJTwXcsA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/3] ice: add ice_adapter for shared data
+ across PFs on the same NIC
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesse Brandeburg <jesse.brandeburg@intel.com>, 
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, 
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/6/24 17:04, Mina Almasry wrote:
-> On Wed, Mar 6, 2024 at 6:30 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
->>
->> On 3/5/24 22:36, Mina Almasry wrote:
->>> On Tue, Mar 5, 2024 at 1:55 PM David Wei <dw@davidwei.uk> wrote:
->>>>
->>>> On 2024-03-04 18:01, Mina Almasry wrote:
->>>>> +struct memory_provider_ops {
->>>>> +     int (*init)(struct page_pool *pool);
->>>>> +     void (*destroy)(struct page_pool *pool);
->>>>> +     struct page *(*alloc_pages)(struct page_pool *pool, gfp_t gfp);
->>>>> +     bool (*release_page)(struct page_pool *pool, struct page *page);
->>>>
->>>> For ZC Rx we added a scrub() function to memory_provider_ops that is
->>>> called from page_pool_scrub(). Does TCP devmem not custom behaviour
->>>> waiting for all netmem_refs to return before destroying the page pool?
->>>> What happens if e.g. application crashes?
->>>
->>> (sorry for the long reply, but he refcounting is pretty complicated to
->>> explain and I feel like we need to agree on how things currently work)
->>>
->>> Yeah, the addition of the page_pool_scrub() function is a bit of a
->>> head scratcher for me. Here is how the (complicated) refcounting works
->>> for devmem TCP (assuming the driver is not doing its own recycling
->>> logic which complicates things further):
->>>
->>> 1. When a netmem_ref is allocated by the page_pool (from dmabuf or
->>> page), the netmem_get_pp_ref_count_ref()==1 and belongs to the page
->>> pool as long as the netmem is waiting in the pool for driver
->>> allocation.
->>>
->>> 2. When a netmem is allocated by the driver, no refcounting is
->>> changed, but the ownership of the netmem_get_pp_ref_count_ref() is
->>> implicitly transferred from the page pool to the driver. i.e. the ref
->>> now belongs to the driver until an skb is formed.
->>>
->>> 3. When the driver forms an skb using skb_rx_add_frag_netmem(), no
->>> refcounting is changed, but the ownership of the
->>> netmem_get_pp_ref_count_ref() is transferred from the driver to the
->>> TCP stack.
->>>
->>> 4. When the TCP stack hands the skb to the application, the TCP stack
->>> obtains an additional refcount, so netmem_get_pp_ref_count_ref()==2,
->>> and frees the skb using skb_frag_unref(), which drops the
->>> netmem_get_pp_ref_count_ref()==1.
->>>
->>> 5. When the user is done with the skb, the user calls the
->>> DEVMEM_DONTNEED setsockopt which calls napi_pp_put_netmem() which
->>> recycles the netmem back to the page pool. This doesn't modify any
->>> refcounting, but the refcount ownership transfers from the userspace
->>> back to the page pool, and we're back at step 1.
->>>
->>> So all in all netmem can belong either to (a) the page pool, or (b)
->>> the driver, or (c) the TCP stack, or (d) the application depending on
->>> where exactly it is in the RX path.
->>>
->>> When an application running devmem TCP crashes, the netmem that belong
->>> to the page pool or driver are not touched, because the page pool is
->>> not tied to the application in our case really. However, the TCP stack
->>> notices the devmem socket of the application close, and when it does,
->>> the TCP stack will:
->>>
->>> 1. Free all the skbs in the sockets receive queue. This is not custom
->>> behavior for devmem TCP, it's just standard for TCP to free all skbs
->>> waiting to be received by the application.
->>> 2. The TCP stack will free references that belong to the application.
->>> Since the application crashed, it will not call the DEVMEM_DONTNEED
->>> setsockopt, so we need to free those on behalf of the application.
->>> This is done in this diff:
->>>
->>> @@ -2498,6 +2498,15 @@ static void tcp_md5sig_info_free_rcu(struct
->>> rcu_head *head)
->>>    void tcp_v4_destroy_sock(struct sock *sk)
->>>    {
->>>     struct tcp_sock *tp = tcp_sk(sk);
->>> + __maybe_unused unsigned long index;
->>> + __maybe_unused void *netmem;
->>> +
->>> +#ifdef CONFIG_PAGE_POOL
->>> + xa_for_each(&sk->sk_user_frags, index, netmem)
->>> + WARN_ON_ONCE(!napi_pp_put_page((__force netmem_ref)netmem, false));
->>> +#endif
->>> +
->>> + xa_destroy(&sk->sk_user_frags);
->>>
->>>     trace_tcp_destroy_sock(sk);
->>>
->>> To be honest, I think it makes sense for the TCP stack to be
->>> responsible for putting the references that belong to it and the
->>> application. To me, it does not make much sense for the page pool to
->>> be responsible for putting the reference that belongs to the TCP stack
->>> or driver via a page_pool_scrub() function, as those references do not
->>> belong to the page pool really. I'm not sure why there is a diff
->>> between our use cases here because I'm not an io_uring expert. Why do
->>> you need to scrub all the references on page pool destruction? Don't
->>> these belong to non-page pool components like io_uring stack or TCP
->>> stack ol otherwise?
->>
->> That one is about cleaning buffers that are in b/w 4 and 5, i.e.
->> owned by the user, which devmem does at sock destruction. io_uring
->> could get by without scrub, dropping user refs while unregistering
->> ifq, but then it'd need to wait for all requests to finish so there
->> is no step 4 in the meantime. Might change, can be useful, but it
->> was much easier to hook into the pp release loop.
->>
->> Another concern is who and when can reset ifq / kill pp outside
->> of io_uring/devmem. I assume it can happen on a whim, which is
->> hard to handle gracefully.
->>
-> 
-> If this is about dropping application refs in step 4 & step 5, then
-> from devmem TCP perspective it must be done on socket close & skb
-> freeing AFAIU, and not delayed until page_pool destruction. 
+On Wed, Mar 6, 2024 at 6:00=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote:
+> Wed, Mar 06, 2024 at 05:29:05PM CET, mschmidt@redhat.com wrote:
+> >There is a need for synchronization between ice PFs on the same physical
+> >adapter.
+> >
+> >Add a "struct ice_adapter" for holding data shared between PFs of the
+> >same multifunction PCI device. The struct is refcounted - each ice_pf
+> >holds a reference to it.
+> >
+> >Its first use will be for PTP. I expect it will be useful also to
+> >improve the ugliness that is ice_prot_id_tbl.
+> >
+> >Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+> >---
+> > drivers/net/ethernet/intel/ice/Makefile      |  3 +-
+> > drivers/net/ethernet/intel/ice/ice.h         |  2 +
+> > drivers/net/ethernet/intel/ice/ice_adapter.c | 85 ++++++++++++++++++++
+> > drivers/net/ethernet/intel/ice/ice_adapter.h | 22 +++++
+> > drivers/net/ethernet/intel/ice/ice_main.c    |  8 ++
+> > 5 files changed, 119 insertions(+), 1 deletion(-)
+> > create mode 100644 drivers/net/ethernet/intel/ice/ice_adapter.c
+> > create mode 100644 drivers/net/ethernet/intel/ice/ice_adapter.h
+> >
+> >diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ether=
+net/intel/ice/Makefile
+> >index cddd82d4ca0f..4fa09c321440 100644
+> >--- a/drivers/net/ethernet/intel/ice/Makefile
+> >+++ b/drivers/net/ethernet/intel/ice/Makefile
+> >@@ -36,7 +36,8 @@ ice-y :=3D ice_main.o  \
+> >        ice_repr.o     \
+> >        ice_tc_lib.o   \
+> >        ice_fwlog.o    \
+> >-       ice_debugfs.o
+> >+       ice_debugfs.o  \
+> >+       ice_adapter.o
+> > ice-$(CONFIG_PCI_IOV) +=3D      \
+> >       ice_sriov.o             \
+> >       ice_virtchnl.o          \
+> >diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet=
+/intel/ice/ice.h
+> >index 365c03d1c462..1ffecbdd361a 100644
+> >--- a/drivers/net/ethernet/intel/ice/ice.h
+> >+++ b/drivers/net/ethernet/intel/ice/ice.h
+> >@@ -77,6 +77,7 @@
+> > #include "ice_gnss.h"
+> > #include "ice_irq.h"
+> > #include "ice_dpll.h"
+> >+#include "ice_adapter.h"
+> >
+> > #define ICE_BAR0              0
+> > #define ICE_REQ_DESC_MULTIPLE 32
+> >@@ -544,6 +545,7 @@ struct ice_agg_node {
+> >
+> > struct ice_pf {
+> >       struct pci_dev *pdev;
+> >+      struct ice_adapter *adapter;
+> >
+> >       struct devlink_region *nvm_region;
+> >       struct devlink_region *sram_region;
+> >diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/=
+ethernet/intel/ice/ice_adapter.c
+> >new file mode 100644
+> >index 000000000000..b93b4db4c04c
+> >--- /dev/null
+> >+++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
+> >@@ -0,0 +1,85 @@
+> >+// SPDX-License-Identifier: GPL-2.0-only
+> >+// SPDX-FileCopyrightText: Copyright Red Hat
+> >+
+> >+#include <linux/cleanup.h>
+> >+#include <linux/mutex.h>
+> >+#include <linux/pci.h>
+> >+#include <linux/slab.h>
+> >+#include <linux/xarray.h>
+> >+#include "ice_adapter.h"
+> >+
+> >+static DEFINE_XARRAY(ice_adapters);
+> >+
+> >+static unsigned long ice_adapter_index(const struct pci_dev *pdev)
+> >+{
+> >+      unsigned int domain =3D pci_domain_nr(pdev->bus);
+> >+
+> >+      WARN_ON((unsigned long)domain >> (BITS_PER_LONG - 13));
+> >+      return ((unsigned long)domain << 13) |
+> >+             ((unsigned long)pdev->bus->number << 5) |
+> >+             PCI_SLOT(pdev->devfn);
+> >+}
+> >+
+> >+static struct ice_adapter *ice_adapter_new(void)
+> >+{
+> >+      struct ice_adapter *a;
+> >+
+> >+      a =3D kzalloc(sizeof(*a), GFP_KERNEL);
+> >+      if (!a)
+> >+              return NULL;
+> >+
+> >+      refcount_set(&a->refcount, 1);
+> >+
+> >+      return a;
+> >+}
+> >+
+> >+static void ice_adapter_free(struct ice_adapter *a)
+> >+{
+> >+      kfree(a);
+> >+}
+> >+
+> >+DEFINE_FREE(ice_adapter_free, struct ice_adapter*, if (_T) ice_adapter_=
+free(_T))
+> >+
+> >+struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
+> >+{
+> >+      struct ice_adapter *ret, __free(ice_adapter_free) *a =3D NULL;
+> >+      unsigned long index =3D ice_adapter_index(pdev);
+> >+
+> >+      a =3D ice_adapter_new();
+>
+> Please consider some non-single-letter variable name.
 
-Right, something in the kernel should take care of it. You temporarily
-attach it to the socket, which is fine. And you could've also stored
-it in the netlink socket or some other object. In case of zcrx io_uring
-impl, it's bound to io_uring, io_uring is responsible for cleaning them
-up. And we do it before __page_pool_destroy, otherwise there would be
-a ref dependency.
+Alright, I can change the name.
 
-A side note, attaching to netlink or some other global object sounds
-conceptually better, as once you return a buffer to the user, the
-socket should not have any further business with the buffer. FWIW,
-that better resembles io_uring approach. For example allows to:
+> >+      if (!a)
+> >+              return NULL;
+> >+
+> >+      xa_lock(&ice_adapters);
+> >+      ret =3D __xa_cmpxchg(&ice_adapters, index, NULL, a, GFP_KERNEL);
+>
+> This is atomic section, can't sleep.
 
-recv(sock);
-close(sock);
-process_rx_buffers();
+It is not atomic. __xa_cmpxchg releases xa_lock before it allocates
+memory, then reacquires it.
 
-or to return (i.e. DEVMEM_DONTNEED) buffers from different sockets
-in one call. However, I don't think it's important for devmem and
-perhaps more implementation dictated.
+> >+      if (xa_is_err(ret)) {
+> >+              ret =3D NULL;
+>
+> Why don't you propagate err through ERR_PTR() ?
 
-> Think
-> about a stupid or malicious user that does something like:
-> 
-> 1. Set up dmabuf binding using netlink api.
-> 2. While (100000):
-> 3.   create devmem TCP socket.
-> 4.   receive some devmem data on TCP socket.
-> 5.   close TCP socket without calling DEVMEM_DONTNEED.
-> 6. clean up dmabuf binding using netlink api.
-> 
-> In this case, we need to drop the references in step 5 when the socket
-> is destroyed, so the memory is freed to the page pool and available
-> for the next socket in step 3. We cannot delay the freeing until step
-> 6 when the rx queue is recreated and the page pool is destroyed,
-> otherwise the net_iovs would leak in the loop and eventually the NIC
-> would fail to find available memory. The same bug would be
+It seemed unnecessary. ENOMEM is the only failure that can possibly
+happen. EINVAL could be returned only if attempting to store an
+unaligned pointer, which won't happen here.
 
-By "would leak" you probably mean until step 6, right? There are
-always many ways to shoot yourself in the leg. Even if you clean
-up in 5, the user can just leak the socket and get the same result
-with pp starvation. I see it not as a requirement but rather a
-uapi choice, that's assuming netlink would be cleaned as a normal
-socket when the task exits.
+>
+> >+              goto unlock;
+> >+      }
+> >+      if (ret) {
+> >+              refcount_inc(&ret->refcount);
+> >+              goto unlock;
+> >+      }
+> >+      ret =3D no_free_ptr(a);
+> >+unlock:
+> >+      xa_unlock(&ice_adapters);
+> >+      return ret;
+> >+}
+> >+
+> >+void ice_adapter_put(const struct pci_dev *pdev)
+> >+{
+> >+      unsigned long index =3D ice_adapter_index(pdev);
+> >+      struct ice_adapter *a;
+> >+
+> >+      xa_lock(&ice_adapters);
+> >+      a =3D xa_load(&ice_adapters, index);
+> >+      if (WARN_ON(!a))
+> >+              goto unlock;
+> >+
+> >+      if (!refcount_dec_and_test(&a->refcount))
+> >+              goto unlock;
+> >+
+> >+      WARN_ON(__xa_erase(&ice_adapters, index) !=3D a);
+>
+> Nice paranoia level :)
+>
+>
+> >+      ice_adapter_free(a);
+> >+unlock:
+> >+      xa_unlock(&ice_adapters);
+> >+}
+> >diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/=
+ethernet/intel/ice/ice_adapter.h
+> >new file mode 100644
+> >index 000000000000..cb5a02eb24c1
+> >--- /dev/null
+> >+++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
+> >@@ -0,0 +1,22 @@
+> >+/* SPDX-License-Identifier: GPL-2.0-only */
+> >+/* SPDX-FileCopyrightText: Copyright Red Hat */
+> >+
+> >+#ifndef _ICE_ADAPTER_H_
+> >+#define _ICE_ADAPTER_H_
+> >+
+> >+#include <linux/refcount_types.h>
+> >+
+> >+struct pci_dev;
+> >+
+> >+/**
+> >+ * struct ice_adapter - PCI adapter resources shared across PFs
+> >+ * @refcount: Reference count. struct ice_pf objects hold the reference=
+s.
+> >+ */
+> >+struct ice_adapter {
+> >+      refcount_t refcount;
+> >+};
+> >+
+> >+struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev);
+> >+void ice_adapter_put(const struct pci_dev *pdev);
+> >+
+> >+#endif /* _ICE_ADAPTER_H */
+> >diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/eth=
+ernet/intel/ice/ice_main.c
+> >index 8f73ba77e835..413219d81a12 100644
+> >--- a/drivers/net/ethernet/intel/ice/ice_main.c
+> >+++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> >@@ -5093,6 +5093,7 @@ static int
+> > ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unu=
+sed *ent)
+> > {
+> >       struct device *dev =3D &pdev->dev;
+> >+      struct ice_adapter *adapter;
+> >       struct ice_pf *pf;
+> >       struct ice_hw *hw;
+> >       int err;
+> >@@ -5145,7 +5146,12 @@ ice_probe(struct pci_dev *pdev, const struct pci_=
+device_id __always_unused *ent)
+> >
+> >       pci_set_master(pdev);
+> >
+> >+      adapter =3D ice_adapter_get(pdev);
+> >+      if (!adapter)
+> >+              return -ENOMEM;
+> >+
+> >       pf->pdev =3D pdev;
+> >+      pf->adapter =3D adapter;
+> >       pci_set_drvdata(pdev, pf);
+> >       set_bit(ICE_DOWN, pf->state);
+> >       /* Disable service task until DOWN bit is cleared */
+> >@@ -5196,6 +5202,7 @@ ice_probe(struct pci_dev *pdev, const struct pci_d=
+evice_id __always_unused *ent)
+> > err_load:
+> >       ice_deinit(pf);
+> > err_init:
+> >+      ice_adapter_put(pdev);
+> >       pci_disable_device(pdev);
+> >       return err;
+> > }
+> >@@ -5302,6 +5309,7 @@ static void ice_remove(struct pci_dev *pdev)
+> >       ice_setup_mc_magic_wake(pf);
+> >       ice_set_wake(pf);
+> >
+> >+      ice_adapter_put(pdev);
+> >       pci_disable_device(pdev);
+> > }
+> >
+> >--
+> >2.43.2
+> >
+>
 
-> reproducible with io_uring unless you're creating a new page pool for
-> each new io_uring socket equivalent.
-
-Surely we don't, but it's still the user's responsibility to
-return buffers back. And in case of io_uring buffers returned
-to the user are not attached to a socket, so even the
-scope / lifetime is a bit different.
-
-> But even outside of this, I think it's a bit semantically off to ask
-> the page_pool to drop references that belong to the application IMO,
-> because those references are not the page_pool's.
-
-Completely agree with you, which is why it was in a callback,
-totally controlled by io_uring.
-
--- 
-Pavel Begunkov
 
