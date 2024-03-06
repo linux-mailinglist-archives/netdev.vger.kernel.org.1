@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-77712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D1F4872B89
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 01:10:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C4E1872B86
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 01:09:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFCBC1C24B8E
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 00:10:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5828C2898E9
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 00:09:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDA9279C1;
-	Wed,  6 Mar 2024 00:07:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D38E81A5AC;
+	Wed,  6 Mar 2024 00:07:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LUP+LOvG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XslpxEFl"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AFAA1BF37
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 00:07:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0006B1BDF4
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 00:07:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709683648; cv=none; b=Eb1W0QgVyjswbW38jnKQ51IpAe6mBWAn5PGDF6eKOCXK3rBl4b1T47buhVW94lvFQHRA2bkwWsUfKfxHEagfRFCCUwIvdPEl3T7Z1YeHcvd3bhYTAcjXQllosjQtVlzsrOrVRmWjosmHi86EMUQGcIL6CnqU/Csk1t2/Uam/3sw=
+	t=1709683646; cv=none; b=I31x31/+A3ubvMdc8LIzBJjsEiduuzQ8GqJ0QXwFQGHf5cOnXoWnAV7OskuSwPi2l1DndS/aQhv1NQFypAQDBQG/6lgVT5iHjpxrezHVCDQ8H03uibC+B/SHFgjqr1+UiFKCWhLIYbVOIPt1NnImINZkk16GD6DWfXLzl6bOE8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709683648; c=relaxed/simple;
-	bh=M4d/FB7CR6JSc+NPeVGOFj1bwk3Vsnoq4ewViEAq+Rs=;
+	s=arc-20240116; t=1709683646; c=relaxed/simple;
+	bh=LvSy9gNlA8Evtz0FnjAtQm8C7Ali9u71Ylg0oxye8RI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hmm5/jAvMsTHdODXKikYqBcl1/eNdPeNQ8Js6CBBX6U0dOEvbH4lOXXnwiYCbOcNi9ZLI03ftjm/4/UZmLstTnmAZ8AlwZvhq2bUQivPbrWuxqHs4ccupDd8319jQt19WqqP0B/t6MHz6TEqoNIHQIur27F+x9WsaMvRnE9gjPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LUP+LOvG; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=sA7Cg5LPPNdfusw87bojCsWmj4lDW7sSMpUKwxPb39iMIpKMKD8OZNKhKf/20x8TdG2ilm8irtyUwhluV6K9uDoRBuM9N5dlmCsk3erYJ47K518+RDEM7cKJfO+xh5UaM/3bQQ7zPY1QdGr6FMFGb65Bvlelo52cf7w4aJ/A7IE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XslpxEFl; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
@@ -37,24 +37,24 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5EZMFPUNWrXNVbCFwmPu2Cto1pVZS1f1ESdtHsSsnJ4=;
-	b=LUP+LOvGXz7zUAjmR2D0NQrfFx2bixpTSfknc/gLk01EORdRPNmapRy8aSJdygKVaw4Nk3
-	PsVwPnnK89aiA5Hp6Am16+KmohRcHs8p+mHaGSKdwJSKnXgPoWiq5M60YCq13Xic6y3Dd9
-	EIEaVi6K/pqyQeHXzVeuMGQOK9+VlS8=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-651-vWX6O6QNMlm60D9BEIJqyQ-1; Tue,
- 05 Mar 2024 19:07:17 -0500
-X-MC-Unique: vWX6O6QNMlm60D9BEIJqyQ-1
+	bh=4F3hxevbUmT5YKtRkYbrij6YAin9EXQUXbHYdfqk2aI=;
+	b=XslpxEFlre0xYMnmBS3BftRGGf/XvdGY5HAaojXZFZOUM5JMxHwxBMKZun2KYAVmGsvJVZ
+	PJnhxayJTj4eMQi/AEcQpP2CXbnjAFwB6bhGphp8XprkOUfvxrS0XVOQFaHo0aGi4gG72O
+	S6afdL9hDWiJW0cDdZ5Yl//bPhmFsxQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-32-3dG81hJpNwKYaaFEB9J2jw-1; Tue, 05 Mar 2024 19:07:18 -0500
+X-MC-Unique: 3dG81hJpNwKYaaFEB9J2jw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0C1862825BAC;
-	Wed,  6 Mar 2024 00:07:15 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EFB5A810467;
+	Wed,  6 Mar 2024 00:07:16 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.114])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B8379111DD02;
-	Wed,  6 Mar 2024 00:07:13 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A7C93111DD02;
+	Wed,  6 Mar 2024 00:07:15 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -66,9 +66,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-afs@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 07/21] rxrpc: Do lazy DF flag resetting
-Date: Wed,  6 Mar 2024 00:06:37 +0000
-Message-ID: <20240306000655.1100294-8-dhowells@redhat.com>
+Subject: [PATCH net-next v3 08/21] rxrpc: Merge together DF/non-DF branches of data Tx function
+Date: Wed,  6 Mar 2024 00:06:38 +0000
+Message-ID: <20240306000655.1100294-9-dhowells@redhat.com>
 In-Reply-To: <20240306000655.1100294-1-dhowells@redhat.com>
 References: <20240306000655.1100294-1-dhowells@redhat.com>
 Precedence: bulk
@@ -80,12 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-Don't reset the DF flag after transmission, but rather set it when needed
-since it should be a fast op now that we call IP directly.
-
-This includes turning it off for RESPONSE packets and, for the moment, ACK
-packets.  In future, we will need to turn it on for ACK packets used to do
-path MTU discovery.
+Merge together the DF and non-DF branches of the transmission function and
+always set the flag to the right thing before transmitting.  If we see
+-EMSGSIZE from udp_sendmsg(), turn off DF and retry.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Marc Dionne <marc.dionne@auristor.com>
@@ -96,50 +93,97 @@ cc: Paolo Abeni <pabeni@redhat.com>
 cc: linux-afs@lists.infradead.org
 cc: netdev@vger.kernel.org
 ---
- net/rxrpc/output.c | 4 ++--
- net/rxrpc/rxkad.c  | 1 -
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ net/rxrpc/output.c | 54 +++++++++++++---------------------------------
+ 1 file changed, 15 insertions(+), 39 deletions(-)
 
 diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
-index 1e039b6f4494..8aa8ba32eacc 100644
+index 8aa8ba32eacc..e2c9e645fcfb 100644
 --- a/net/rxrpc/output.c
 +++ b/net/rxrpc/output.c
-@@ -231,6 +231,7 @@ int rxrpc_send_ack_packet(struct rxrpc_call *call, struct rxrpc_txbuf *txb)
- 	txb->ack.previousPacket	= htonl(call->rx_highest_seq);
+@@ -323,8 +323,9 @@ int rxrpc_send_abort_packet(struct rxrpc_call *call)
+  */
+ int rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_txbuf *txb)
+ {
+-	enum rxrpc_req_ack_trace why;
+ 	struct rxrpc_connection *conn = call->conn;
++	enum rxrpc_req_ack_trace why;
++	enum rxrpc_tx_point frag;
+ 	struct msghdr msg;
+ 	struct kvec iov[1];
+ 	size_t len;
+@@ -405,11 +406,16 @@ int rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_txbuf *txb)
  
- 	iov_iter_kvec(&msg.msg_iter, WRITE, iov, 1, len);
-+	rxrpc_local_dont_fragment(conn->local, false);
- 	ret = do_udp_sendmsg(conn->local->socket, &msg, len);
- 	call->peer->last_tx_at = ktime_get_seconds();
- 	if (ret < 0) {
-@@ -406,6 +407,7 @@ int rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_txbuf *txb)
+ 	/* send the packet with the don't fragment bit set if we currently
  	 * think it's small enough */
- 	if (txb->len >= call->peer->maxdata)
- 		goto send_fragmentable;
-+	rxrpc_local_dont_fragment(conn->local, true);
+-	if (txb->len >= call->peer->maxdata)
+-		goto send_fragmentable;
+-	rxrpc_local_dont_fragment(conn->local, true);
++	if (txb->len >= call->peer->maxdata) {
++		rxrpc_local_dont_fragment(conn->local, false);
++		frag = rxrpc_tx_point_call_data_frag;
++	} else {
++		rxrpc_local_dont_fragment(conn->local, true);
++		frag = rxrpc_tx_point_call_data_nofrag;
++	}
  
  	txb->wire.flags = txb->flags & RXRPC_TXBUF_WIRE_FLAGS;
++retry:
  	txb->last_sent = ktime_get_real();
-@@ -492,8 +494,6 @@ int rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_txbuf *txb)
- 		rxrpc_inc_stat(call->rxnet, stat_tx_data_send_frag);
- 		ret = do_udp_sendmsg(conn->local->socket, &msg, len);
- 		conn->peer->last_tx_at = ktime_get_seconds();
+ 	if (txb->flags & RXRPC_REQUEST_ACK)
+ 		rtt_slot = rxrpc_begin_rtt_probe(call, txb->serial, rxrpc_rtt_tx_data);
+@@ -435,8 +441,11 @@ int rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_txbuf *txb)
+ 	}
+ 
+ 	rxrpc_tx_backoff(call, ret);
+-	if (ret == -EMSGSIZE)
+-		goto send_fragmentable;
++	if (ret == -EMSGSIZE && frag == rxrpc_tx_point_call_data_frag) {
++		rxrpc_local_dont_fragment(conn->local, false);
++		frag = rxrpc_tx_point_call_data_frag;
++		goto retry;
++	}
+ 
+ done:
+ 	if (ret >= 0) {
+@@ -478,39 +487,6 @@ int rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_txbuf *txb)
+ 
+ 	_leave(" = %d [%u]", ret, call->peer->maxdata);
+ 	return ret;
 -
--		rxrpc_local_dont_fragment(conn->local, true);
- 		break;
+-send_fragmentable:
+-	/* attempt to send this message with fragmentation enabled */
+-	_debug("send fragment");
+-
+-	txb->last_sent = ktime_get_real();
+-	if (txb->flags & RXRPC_REQUEST_ACK)
+-		rtt_slot = rxrpc_begin_rtt_probe(call, txb->serial, rxrpc_rtt_tx_data);
+-
+-	switch (conn->local->srx.transport.family) {
+-	case AF_INET6:
+-	case AF_INET:
+-		rxrpc_local_dont_fragment(conn->local, false);
+-		rxrpc_inc_stat(call->rxnet, stat_tx_data_send_frag);
+-		ret = do_udp_sendmsg(conn->local->socket, &msg, len);
+-		conn->peer->last_tx_at = ktime_get_seconds();
+-		break;
+-
+-	default:
+-		BUG();
+-	}
+-
+-	if (ret < 0) {
+-		rxrpc_inc_stat(call->rxnet, stat_tx_data_send_fail);
+-		rxrpc_cancel_rtt_probe(call, txb->serial, rtt_slot);
+-		trace_rxrpc_tx_fail(call->debug_id, txb->serial, ret,
+-				    rxrpc_tx_point_call_data_frag);
+-	} else {
+-		trace_rxrpc_tx_packet(call->debug_id, &txb->wire,
+-				      rxrpc_tx_point_call_data_frag);
+-	}
+-	rxrpc_tx_backoff(call, ret);
+-	goto done;
+ }
  
- 	default:
-diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
-index 28c9ce763be4..e451ac90bfee 100644
---- a/net/rxrpc/rxkad.c
-+++ b/net/rxrpc/rxkad.c
-@@ -726,7 +726,6 @@ static int rxkad_send_response(struct rxrpc_connection *conn,
- 
- 	rxrpc_local_dont_fragment(conn->local, false);
- 	ret = kernel_sendmsg(conn->local->socket, &msg, iov, 3, len);
--	rxrpc_local_dont_fragment(conn->local, true);
- 	if (ret < 0) {
- 		trace_rxrpc_tx_fail(conn->debug_id, serial, ret,
- 				    rxrpc_tx_point_rxkad_response);
+ /*
 
 
