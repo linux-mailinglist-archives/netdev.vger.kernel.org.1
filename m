@@ -1,210 +1,121 @@
-Return-Path: <netdev+bounces-78048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83B79873D81
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:28:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F60F873D84
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:28:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36C7D282932
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:28:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC0E02836DB
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:28:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7342A137931;
-	Wed,  6 Mar 2024 17:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70CB13BAD4;
+	Wed,  6 Mar 2024 17:28:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZnOX00fc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mSqbE/Tc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A011013475A
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 17:27:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBBD413BAC7
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 17:28:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709746081; cv=none; b=toMJW48ixLyr4iyqedRuaipAd7mgpx/pGpd9zBYKar44d273bay1w+qWuj5rLRxiVYb0ww9CZFnL2F72GW1Ap8Z/CXPW0iITgpvmuBzjgDrOuBcfrd0BLh59/VerhJAEWI685r3v35jGKyMq+rx8UbuhcyAqqlgvZSSGnmw0B/c=
+	t=1709746106; cv=none; b=Y2Fd+7163RpvfbCruMgfQaKF79oJMtdFlz6GBZech2ECeQiCbfsKmmYELzSTZbOAhalmQfUzDkX2o/LHdboTTrORVVKFE4ZVA9AxqvOLZHttn8NVW/Hpcflb1+TcnmDwN9O+rJXl9wWToTaxtcDJN1Oaeh/arnTJTDZRGUm7jtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709746081; c=relaxed/simple;
-	bh=eX3/X50p4A7OOA8htCEucfM7TcgCP6daHV9nlBfFHEI=;
+	s=arc-20240116; t=1709746106; c=relaxed/simple;
+	bh=Ghvs4v77iQQAei2ZZ6uDRzDVbGBXuG2zwoIeqAMdXAA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gSQ5Niido9gy6+Cla+jMpNcDX8LUwx1UcO490mKtZyhjvcSRiS99zvqqU0M2o2tdNzvE2pUgDfrESWfL1GUiw6LB9Bu7EPjxygMVel5SB5CeuLTOcXPvmHVi3nwOYOXkt/PIC022zk7yj71giS7CFt5bQvKyLM4ThUamkQbSmsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZnOX00fc; arc=none smtp.client-ip=209.85.218.51
+	 To:Cc:Content-Type; b=X7f4cy1FlpLRYy0Sv07/lRnqLYpqpO6qiENOiSMjVzJhkz1K9OmWEzJSFcfLpV/RFym6i4uNKZwYoxe9JktyN3EaI/7Sqws76dY/PrSXnVpLeS006t76g2Tj/G1rh76D/r1gZm7xNcAt45Q2Azv24UIE1MFN9CeXCCEYGEjpBoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mSqbE/Tc; arc=none smtp.client-ip=209.85.208.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a293f2280c7so5055366b.1
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 09:27:59 -0800 (PST)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-566b160f6eeso15430a12.1
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 09:28:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709746078; x=1710350878; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709746103; x=1710350903; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=w94diZ9iNEVg6u9UwjKj2DUh++QG9DmeQZBnfcZOhW8=;
-        b=ZnOX00fc9GvzypiOvC+omM8G+kx9tS08LA0Xd7fF6vEC4CtUQ5R/JecEBJl8DfDho7
-         ACUKMLpS1o4Bs2X4pKduni6AfwVIXN3ijkJrmqFGcJrjJZlpR3MzeyB1HJVUqZB3Pr/J
-         UhSkYKKRXuPTkCCMNNeYf4C0W3G5EfUQpK5fyxMKPHtFYHboYLSnJZ0twFOSuIy1t36i
-         yerD9rhU1nyYW5P7IltH1utiKMehW1J8S4JTx+eEK5EIeITVvV/zvwhyP6SsGjpOiN8y
-         EDFrAXHPZ84unqUWuO1PUWUbNASJgiHVhCI7+dEWJFVNGP+0/QLWkfVFJ2exuZLh2BD2
-         gbBg==
+        bh=C9KodEne8KoAKjyIJo45iuD1jcQ25Lud0hklaomu97I=;
+        b=mSqbE/Tc3iKRKAOlNhS1KajldC+YZNhZoImFi6KIiNMJHIvV/YGRR0DvlEb1Mxesrg
+         NgYlRYfF3cBq79uEttIC9NIDLCA/CwxoIhGePjQq5eoGsys2+Xix5KpLxX0LaG7NDMib
+         /0RCD6BWgjcppnVN22iFbd30BYACPVgn6wvzlcj92zJYsU94/t/jrTx2C0oh+dtHJR2t
+         hMyUpx5fkTKD1Hy2s60BYxRnNP2cFQu3kHY2rH22OpihRwbH0mi+EpNFGNGXdAAxT8kS
+         l6KjWVKZ6T54l1xPlCBFewuagokys9TzPDrXtj6ayXuvXfIBxceD8I5+S0sZj27I1nzO
+         yrvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709746078; x=1710350878;
+        d=1e100.net; s=20230601; t=1709746103; x=1710350903;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=w94diZ9iNEVg6u9UwjKj2DUh++QG9DmeQZBnfcZOhW8=;
-        b=g16/qHf7hX6FFwID7stkelgAguXzD75zElfTkamG0UhqnCUvnOkCjJ3nSBDWI1W1XA
-         OoPGPPFxJDqBU0hgTPq/PNxOWyS0UyNXn5zmEv4hFKEV98CACSv41dUEuIRLTVCfZmTw
-         JV0ny4euDnbQFSYQy3SpEuJMWluAsHwRGqm3S0thBxKeeHegGKft+/X5l42RtGf79Zfl
-         14lcNC9YOds06yD5e7ovbr9Y8UU6Dw0Wi7t/zZkotg681BPcyyoaqMpt0E3EDeVOpdHb
-         fa1Chg0hrcL/sadGacNQQWC/yRpDmct0emiUb/JwLdzjM6nX3uyn3l9mrS/eP149ifTI
-         QDCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVRxbhZWFiTY9zDpOjRKIWbIcTpUVWBEpBBnuXHZFdSmx5eZXVpFi3vJySU+6o8RQt+It7nsfQh3voNGxw1KGXrUhmhdWVs
-X-Gm-Message-State: AOJu0YxAUmPG8tYug+7kO2WMs2GDgkHfPqg2MwBYPoOu3HHwdLxwny+M
-	vxeknNXSMEpSMPUDSp6Uta/Zw+FpdAtyeoUm8eSp2WdapLVBmY2Pk/QDZbKGGk+7jUuvJQz3+iQ
-	ljiaUB9SKKzXXLkQaDqvU9jRQ8jPReJWYFR9W
-X-Google-Smtp-Source: AGHT+IEBkMzksp0NHQ8swQKzOv58zFZ3WYJCQCTWJNk2pd57sW7vdPk0BysnKSIsx8vreleNP/wzinem9L/gnOwQfU8=
-X-Received: by 2002:a17:906:1c81:b0:a45:98f3:997e with SMTP id
- g1-20020a1709061c8100b00a4598f3997emr4847806ejh.7.1709746077588; Wed, 06 Mar
- 2024 09:27:57 -0800 (PST)
+        bh=C9KodEne8KoAKjyIJo45iuD1jcQ25Lud0hklaomu97I=;
+        b=bWABPKC3nNfqoGYwCHwwq+eDe+sf17v4k2xWSst9Q1Z/dO7W4rcYkj3u/mA52FonUL
+         RDrPhYFAJUvCNgl5eeLXhj/SNx7Qaax0ca9enwhxfxKIk8yMy/+e/2gJEcKYaQlZiSk0
+         iANiL8zBx1ucuizWPvvksTAIAXjzn5k1shQf0dWY2FZVsQVIBTQ6u3l2Eu0Zn09EpUyj
+         VildwopeiQAW3so4JnYXQ0z+D4zwO6/rAsinD2wHNfDY4qTrZkUewv3Fgu2pNGvqhth3
+         2D8MFiK9gFmK7CCC8/XYIdzkpIsuy0Pm9hn63/eHO2a2Y+UEgcsImMYZupUn10jKdZNm
+         S3YQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUz7D3ohK3AZ6n6M+YriB3R8oNMTXb60GXLDzypqFuYgwUt6lwv3jwxx1t3x6f2WRUoxnVwXy7jElHbhS6HatOzVXSc7zuh
+X-Gm-Message-State: AOJu0Yx5oCgeY6OCUunzbKQYgsKDBVIbroRia1aYfZE5itrabF4zfFz6
+	vvBtscP1fBxFrQ3/je7F9DfRaF8LkLVp1s6z8BO3VcULyNsobFkJOAWgQYbjznmogT2wqeyDoAC
+	mDjk2nP+/tOau1WUbPXY5aN74lNVaSqmApWl4
+X-Google-Smtp-Source: AGHT+IHnNtaMgf1oa5P9omQGhKnc6U5AuSPId+mAS/2wEyyxbq2B9XLRNBZ/kNpYHe8+c66dcpBJTdAzKzTpJdifaEU=
+X-Received: by 2002:aa7:d5d0:0:b0:566:a44d:2a87 with SMTP id
+ d16-20020aa7d5d0000000b00566a44d2a87mr27047eds.0.1709746103008; Wed, 06 Mar
+ 2024 09:28:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240304094950.761233-1-dtatulea@nvidia.com> <20240305190427.757b92b8@kernel.org>
- <7fc334b847dc4d90af796f84a8663de9f43ede5d.camel@nvidia.com>
- <20240306072225.4a61e57c@kernel.org> <320ef2399e48ba0a8a11a3b258b7ad88384f42fb.camel@nvidia.com>
- <20240306080931.2e24101b@kernel.org> <CAHS8izMw_hxdoNDoCZs8T7c5kmX=0Lwqw_dboSj7z1LqtS-WKA@mail.gmail.com>
- <9a78b37abdf40daafd9936299ea2c08f936ad3d5.camel@nvidia.com>
-In-Reply-To: <9a78b37abdf40daafd9936299ea2c08f936ad3d5.camel@nvidia.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 6 Mar 2024 09:27:45 -0800
-Message-ID: <CAHS8izO-dWP3sHdZYjsEZfF3XS8Qt8jhWAXmx6LU=O9PWtzoqg@mail.gmail.com>
-Subject: Re: [RFC] net: esp: fix bad handling of pages from page_pool
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "kuba@kernel.org" <kuba@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, Gal Pressman <gal@nvidia.com>, 
-	"dsahern@kernel.org" <dsahern@kernel.org>, 
-	"steffen.klassert@secunet.com" <steffen.klassert@secunet.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
-	Leon Romanovsky <leonro@nvidia.com>, "edumazet@google.com" <edumazet@google.com>, 
-	"ian.kumlien@gmail.com" <ian.kumlien@gmail.com>, 
-	"Anatoli.Chechelnickiy@m.interpipe.biz" <Anatoli.Chechelnickiy@m.interpipe.biz>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20240226022452.20558-1-adamli@os.amperecomputing.com>
+ <CANn89iLbA4_YdQrF+9Rmv2uVSb1HLhu0qXqCm923FCut1E78FA@mail.gmail.com>
+ <a8de785f-8cc3-4075-a5f2-259e20222dcb@os.amperecomputing.com>
+ <CANn89iJAKEUu_Fdh0OC-+BJ+iVY0D2y0nAakGLxWZ8TywDu=BA@mail.gmail.com> <11588267-c76d-f0ac-bf98-1875e07b58cb@os.amperecomputing.com>
+In-Reply-To: <11588267-c76d-f0ac-bf98-1875e07b58cb@os.amperecomputing.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 6 Mar 2024 18:28:09 +0100
+Message-ID: <CANn89i+SiQXeDCKp9yjTz6ReQKxfHn6vHLcWFbCjjW14BiyAbQ@mail.gmail.com>
+Subject: Re: [PATCH] net: make SK_MEMORY_PCPU_RESERV tunable
+To: "Lameter, Christopher" <cl@os.amperecomputing.com>
+Cc: Adam Li <adamli@os.amperecomputing.com>, corbet@lwn.net, davem@davemloft.net, 
+	kuba@kernel.org, pabeni@redhat.com, willemb@google.com, 
+	yangtiezhu@loongson.cn, atenart@kernel.org, kuniyu@amazon.com, 
+	wuyun.abel@bytedance.com, leitao@debian.org, alexander@mihalicyn.com, 
+	dhowells@redhat.com, paulmck@kernel.org, joel.granados@gmail.com, 
+	urezki@gmail.com, joel@joelfernandes.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	patches@amperecomputing.com, shijie@os.amperecomputing.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 6, 2024 at 9:10=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.com>=
- wrote:
+On Wed, Mar 6, 2024 at 6:01=E2=80=AFPM Lameter, Christopher
+<cl@os.amperecomputing.com> wrote:
 >
-> On Wed, 2024-03-06 at 08:40 -0800, Mina Almasry wrote:
-> > On Wed, Mar 6, 2024 at 8:09=E2=80=AFAM Jakub Kicinski <kuba@kernel.org>=
- wrote:
-> > >
-> > > On Wed, 6 Mar 2024 16:00:46 +0000 Dragos Tatulea wrote:
-> > > > > Hm, that's a judgment call.
-> > > > > Part of me wants to put it next to napi_frag_unref(), since we
-> > > > > basically need to factor out the insides of this function.
-> > > > > When you post the patch the page pool crowd will give us
-> > > > > their opinions.
-> > > >
-> > > > Why not have napi_pp_put_page simply return false if CONFIG_PAGE_PO=
-OL is not
-> > > > set?
-> > >
-> > > Without LTO it may still be a function call.
-> > > Plus, subjectively, I think that it's a bit too much logic to encode =
-in
-> > > the caller (you must also check skb->pp_recycle, AFAIU)
-> > > Maybe we should make skb_pp_recycle() take struct page and move it to
-> > > skbuff.h ? Rename it to skb_page_unref() ?
-> > >
-> >
-> > Does the caller need to check skb->pp_recycle? pp_recycle seems like a
-> > redundant bit. We can tell whether the page is pp by checking
-> > is_pp_page(page). the pages in the frag must be pp pages when
-> > skb->pp_recycle is set and must be non pp pages when the
-> > skb->pp_recycle is not set, so it all seems redundant to me.
-> >
-> AFAIU we don't have to check for pp_recycle, at least not in this specifi=
-c case.
+> On Wed, 28 Feb 2024, Eric Dumazet wrote:
 >
-> > My fix would be something like:
+> >> __sk_mem_raise_allocated() drops to 0.4%.
 > >
-> > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> > index d577e0bee18d..cc737b7b9860 100644
-> > --- a/include/linux/skbuff.h
-> > +++ b/include/linux/skbuff.h
-> > @@ -3507,17 +3507,25 @@ int skb_cow_data_for_xdp(struct page_pool
-> > *pool, struct sk_buff **pskb,
-> >  bool napi_pp_put_page(struct page *page, bool napi_safe);
-> >
-> >  static inline void
-> > -napi_frag_unref(skb_frag_t *frag, bool recycle, bool napi_safe)
-> > +napi_page_unref(struct page *page, bool napi_safe)
-> >  {
-> > -       struct page *page =3D skb_frag_page(frag);
-> > -
-> >  #ifdef CONFIG_PAGE_POOL
-> > -       if (recycle && napi_pp_put_page(page, napi_safe))
-> > +       if (napi_pp_put_page(page, napi_safe))
-> >                 return;
-> >  #endif
-> >         put_page(page);
-> >  }
-> >
-> > +static inline void
-> > +napi_frag_unref(skb_frag_t *frag, bool recycle, bool napi_safe)
-> > +{
-> > +       struct page *page =3D skb_frag_page(frag);
-> > +
-> > +       DEBUG_NET_WARN_ON(recycle !=3D is_pp_page(page));
-> > +
-> > +       napi_page_unref(page);
-> > +}
-> > +
-> >
-> > And then use napi_page_unref() in the callers to handle page pool &
-> > non-page pool gracefully without leaking page pool internals to the
-> > callers.
-> >
-> We'd also need to add is_pp_page() in the header with the changes above..=
-.
+> > I suspect some kind of flow/cpu steering issues then.
+> > Also maybe SO_RESERVE_MEM would be better for this workload.
 >
+> This is via loopback. So there is a flow steering issue in the IP
+> stack?
 
-Gah, I did not realize skbuff.h doesn't have is_pp_page(). Sorry!
+Asymmetric allocations / freeing, things that will usually have a high
+cost for payload copy anyway.
 
-> On that line of thought, unless these new APIs are useful for other use-c=
-ases,
-> why not keep it simple:
-> - Move is_pp_page() to skbuff.h.
+Maybe a hierarchical tracking would avoid false sharings if some
+arches pay a high price to them.
 
-I prefer this. is_pp_page() is a one-liner anyway.
+- One per-cpu reserve.    (X MB)
 
-> - Do a simple is_pp_page(page) ? page_pool_put_full_page(page):put_page(p=
-age) in
-> the caller? Checking skb->pp_recycle would not be needed.
->
+- One per-memory-domain reserve.  (number_of_cpu_in_this_domain * X MB)
 
-IMHO page pool internals should not leak to the callers like this.
-There should be a helper that does the right thing for pp & non-pp
-pages so that the caller can use it without worrying about subtle pp
-concepts that they may miss at some callsites, but I'm fine either way
-if there is strong disagreement from others.
+- A global reserve, with an uncertainty of number_of_cpus * X MB
 
-> Thanks,
-> Dragos
->
-> > > > Regarding stable would I need to send a separate fix that does the =
-raw pp page
-> > > > check without the API?
-> > >
-> > > You can put them in one patch, I reckon.
-> >
->
-
-
---=20
-Thanks,
-Mina
+Basically reworking lib/percpu_counter.c for better NUMA awareness.
 
