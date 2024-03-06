@@ -1,115 +1,106 @@
-Return-Path: <netdev+bounces-78122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3421874224
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 22:44:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F46F874265
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:07:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 948C1B223E9
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 21:44:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D90901F2109C
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 22:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E5B19478;
-	Wed,  6 Mar 2024 21:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B401B94F;
+	Wed,  6 Mar 2024 22:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M96e7ZzZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E851363C8;
-	Wed,  6 Mar 2024 21:44:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9391B941
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 22:07:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709761476; cv=none; b=dQE9HZpEjUlgzIzjnYDzi8weAbVOgm1WMouGgaE7AWXTlWDlGalvrArSB6bzrXj8Vji+nG1ng3dyykw3jHIqx2OseqL7UqkNfzXeeEC10Mf4p7E5zyv15f6Z7wPWRErDjlSksSe8giVLDYy4248VQ2lOkPnR1lhTLGDI3XhlQYg=
+	t=1709762823; cv=none; b=lsVITHMmjydLFRDwhdu5eMK9BTmJLIyqcw6VGVTyZ5RqnP5/Ta/XUMZ6JKfOuQsa4bCnTZHu1z9X5G8zQo9/fwz/q1TEuKVeQJKNWoq+ChqSnWKEVL1ohJOCeF9DY0bPvTQZ3ElpfIyT3VJKBnX0S8hnFB1xZwYlu3SRasnJtVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709761476; c=relaxed/simple;
-	bh=NykU08nLzEZ91K+MMjjKpK5S8+ge0fdkiC/HpzTY4is=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HUVk8frfhgt6GTahjMPK4oYL4JMbkaZ6RmuKUoNXCEouBpbMtjCW31k4aplEdmuVChdz3lmL27xpOvP4eCFmz4+0oc+BA9i/r1vavD4u4O1iiqZgM1zUR+PRYxXh02vxNjuxtmCcnnLpebTzdHRFjOeL1P9WWYDNBxl8OHpvzhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E95BC433F1;
-	Wed,  6 Mar 2024 21:44:34 +0000 (UTC)
-Date: Wed, 6 Mar 2024 16:46:26 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, kuba@kernel.org,
- roopa@nvidia.com, razor@blackwall.org, bridge@lists.linux.dev,
- netdev@vger.kernel.org, jiri@resnulli.us, ivecera@redhat.com,
- mhiramat@kernel.org, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 net-next 4/4] net: switchdev: Add tracepoints
-Message-ID: <20240306164626.5a11f3cd@gandalf.local.home>
-In-Reply-To: <874jdjgmdd.fsf@waldekranz.com>
-References: <20240223114453.335809-1-tobias@waldekranz.com>
-	<20240223114453.335809-5-tobias@waldekranz.com>
-	<20240223103815.35fdf430@gandalf.local.home>
-	<4838ad92a359a10944487bbcb74690a51dd0a2f8.camel@redhat.com>
-	<87a5nkhnlv.fsf@waldekranz.com>
-	<20240228095648.646a6f1a@gandalf.local.home>
-	<877cihhb7y.fsf@waldekranz.com>
-	<20240306101557.2c56fbc6@gandalf.local.home>
-	<874jdjgmdd.fsf@waldekranz.com>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1709762823; c=relaxed/simple;
+	bh=7j/8S1opTn499zT2EBVBHSoisT5gXUJt2jwM5haZ3QQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F5sQbFnYLuFdWBgclsXblADCFgUVj5f/OAl85CowPu6wjk8SHei6Q8vRHuWk/A/mqcb3GVzVPTPBFmebeUP6tCfg8YREE0kNGrhgUeTIAfYvkDhArF5DHszV9m2fmNNZUmVaBY+C4UUWDtS/+fcyr96FM58ZbaUY/TeQjy8nrpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M96e7ZzZ; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709762822; x=1741298822;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=7j/8S1opTn499zT2EBVBHSoisT5gXUJt2jwM5haZ3QQ=;
+  b=M96e7ZzZjrYrSIVJSLs/MrzhpqbdjwlRClOqGTIuruJdOmmQw/FvpTgH
+   RFZu7ZmMVtApCSN4WcjsTKJTW+un6FpafgcQlKcdtDwEmuCmoc/CTaRXE
+   kIGCqUw2+xlET7kie0Z7jcBa7sFZOa2aDO7WGuRqTCfKB3pEGXSY5mjek
+   iBi3ds8kTr2pKLrT1vWlbBBSgQvj+DBnOGbNysSDXyCoLicJj4YE92Jye
+   qf3vn0EZIH6X2WxRctVJgWDQd8YusPY1Z1DOUA5+EzUds6di898ERW1MH
+   tFdBjSJgywTcVlBd8kuY4RCS1mrTZaaVZ5EQxI/Z3wwj81zMtm6rsF1UR
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11005"; a="4982613"
+X-IronPort-AV: E=Sophos;i="6.06,209,1705392000"; 
+   d="scan'208";a="4982613"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 13:56:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,209,1705392000"; 
+   d="scan'208";a="9979668"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa008.fm.intel.com with ESMTP; 06 Mar 2024 13:56:19 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 0/3][pull request] Intel Wired LAN Driver Updates 2024-03-06 (iavf, i40e, ixgbe)
+Date: Wed,  6 Mar 2024 13:56:10 -0800
+Message-ID: <20240306215615.970308-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 06 Mar 2024 21:02:06 +0100
-Tobias Waldekranz <tobias@waldekranz.com> wrote:
+This series contains updates to iavf, i40e, and ixgbe drivers.
 
-> On ons, mar 06, 2024 at 10:15, Steven Rostedt <rostedt@goodmis.org> wrote:
-> > On Mon, 04 Mar 2024 23:40:49 +0100
-> > Tobias Waldekranz <tobias@waldekranz.com> wrote:
-> >  
-> >> On ons, feb 28, 2024 at 09:56, Steven Rostedt <rostedt@goodmis.org> wrote:  
-> >> > On Wed, 28 Feb 2024 11:47:24 +0100
-> >> > Tobias Waldekranz <tobias@waldekranz.com> wrote:
-> >> >  
-> >> > The "trace_seq p" is a pointer to trace_seq descriptor that can build
-> >> > strings, and then you can use it to print a custom string in the trace
-> >> > output.    
-> >> 
-> >> Yes I managed to decode the hidden variable :) I also found
-> >> trace_seq_acquire() (and its macro alter ego __get_buf()), which would
-> >> let me keep the generic stringer functions. So far, so good.
-> >> 
-> >> I think the foundational problem remains though: TP_printk() is not
-> >> executed until a user reads from the trace_pipe; at which point the
-> >> object referenced by __entry->info may already be dead and
-> >> buried. Right?  
-> >
-> > Correct. You would need to load all the information into the event data
-> > itself, at the time of the event is triggered, that is needed to determine
-> > how to display it.  
-> 
-> Given that that is quite gnarly to do for the events I'm trying to
-> trace, because of the complex object graph, would it be acceptable to
-> format the message in the assign phase and store it as dynamic data?
-> I.e., what (I think) you suggested at the end of your first response.
+Alexey Kodanev removes duplicate calls related to cloud filters on iavf
+and unnecessary null checks on i40e.
 
-It's really up to what you want to do ;-)
+Maciej adds helper functions for common code relating to updating
+statistics for ixgbe.
 
-> 
-> My thinking is:
-> 
-> - Managing a duplicate (flattened) object graph, exclusively for use by
->   these tracepoints, increases the effort to keep the tracing in sync
->   with new additions to switchdev; which I think will result in
->   developers simply avoiding it altogether. In other words: I'd rather
->   have somewhat inefficient but simple flashlight, rather than a very
->   efficient one that no one knows how to change the batteries in.
-> 
-> - This is typically not a very hot path. Most events are triggered by
->   user configuration. Otherwise when new neighbors are discovered.
-> 
-> - __entry->info is still there for use by raw tracepoint consumers from
->   userspace.
+The following are changes since commit eeb78df4063c0b162324a9408ef573b24791871f:
+  inet: Add getsockopt support for IP_ROUTER_ALERT and IPV6_ROUTER_ALERT
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 40GbE
 
-How big is this info?
+Alexey Kodanev (2):
+  iavf: drop duplicate iavf_{add|del}_cloud_filter() calls
+  i40e: remove unnecessary qv_info ptr NULL checks
 
--- Steve
+Maciej Fijalkowski (1):
+  ixgbe: pull out stats update to common routines
+
+ drivers/net/ethernet/intel/i40e/i40e_client.c |  4 --
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  4 --
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  9 ----
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 54 ++++++++++++++-----
+ .../ethernet/intel/ixgbe/ixgbe_txrx_common.h  |  7 +++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c  | 17 ++----
+ 6 files changed, 53 insertions(+), 42 deletions(-)
+
+-- 
+2.41.0
+
 
