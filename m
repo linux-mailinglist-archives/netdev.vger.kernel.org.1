@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-77766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1812872D8A
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 04:30:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23C7D872D93
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 04:40:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DF8D289E57
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 03:30:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0EF728A637
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 03:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB4D7134B2;
-	Wed,  6 Mar 2024 03:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A09B1426F;
+	Wed,  6 Mar 2024 03:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kwWl3Lfe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gqHlyNKO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A76179B2;
-	Wed,  6 Mar 2024 03:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DAC2DDA8;
+	Wed,  6 Mar 2024 03:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709695830; cv=none; b=Zhsh46DKrX+Xx9m9QA5HRfoFPMlQP1KWdT6KVck2O3CWsbqiQjZZnKLwk9Tk6DyQUUzBWJFcJig1aZ5rXr7++FkhqBEZ34GFREmEQVzSraJh7WxThZAeGRvV/C1B1k8FvJBpAhlenXfYU7/Nv5cZ3r5kjfJoK7gI15L0BjeuJD0=
+	t=1709696429; cv=none; b=TNmGF7F7z1m0TDyReeVSo/IzafvmuB31chSjXWkiQ2UEdX1C6godLr6am1vjBHMWb2AWZlfAUDUCzUf11K3vVKaB6XdMvpmRzAj5bxdFrNm4g1cT4iPjcZGnWwjHkcMtNe3x+zfSDACv3Li/SvRihkiIpmENFN1i1jouU45AY1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709695830; c=relaxed/simple;
-	bh=JarrlcOZ158Bpp5ZmGHdV9Omkh9SzTkEZsrBbSTVpms=;
+	s=arc-20240116; t=1709696429; c=relaxed/simple;
+	bh=tLUcs7AGu1cKfGjGrERuLZL6+BqOUOATWWsSl1GrJqk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=raTRhHkwvGN/LAmM4H4zyMY0bsrgeOJKLZhlSHhGzr8hYbhapL3hFYC+rw6CAeCJVbM0kvavvlmHHxjBH6T9B20y5ERPry2s4mtNut019S50u0Hv+Myejx5NoAvmX5xH7DOeRWnNvh3QbzLQVmGGjUoINjXdiR64gMv5wOz8BqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kwWl3Lfe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 427EBC43390;
-	Wed,  6 Mar 2024 03:30:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=YrJQYckOYKQXtmM8j10iJBgOv8T+PiBVLaxgU93EUNIEnXqQeDkz0bUe2FpgiGXHLHxsf+O8GQTuyUT9pasNvfIKwywzD7vBrH00sYFKPlYsWv1L69TigW94UDINCyECCeEzgr6sjoLQariX3uV9zvkCExykGmhmBf0qMHGAYbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gqHlyNKO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9B416C43390;
+	Wed,  6 Mar 2024 03:40:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709695830;
-	bh=JarrlcOZ158Bpp5ZmGHdV9Omkh9SzTkEZsrBbSTVpms=;
+	s=k20201202; t=1709696428;
+	bh=tLUcs7AGu1cKfGjGrERuLZL6+BqOUOATWWsSl1GrJqk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kwWl3LfeA2mUEG+COLw3+f/soTsSjqNUSN3dfhD9ZVNP9EBKkGzh7TMIvn0wThr43
-	 Isag6xDYxsvmwIpSaQEKoZ0WTguhPiw7yciA9ANtww7Aok91IodsWyad5xupPdrhHW
-	 uM9jqDAL9a5ri4wofgBBg5tkVY876n1q/VDzyIU0Wuktran31e1YeuaJQ3+IGia1cR
-	 m7MbJzdmF+rARUdfFr3vG+Xn5vancm+vvjlhM3nKDqPp0bgwYKJw49apSNIESLpORW
-	 BorzcAAIsPEVimh+qrDjpVtj78y37Yhh5QZwpRk6flMAYwF//2bky+lkt+xWcxgk5r
-	 qOf7uIo8+FnZA==
+	b=gqHlyNKOqgW0dSiOOdkl2I+A7x9SG70qeWm053FSiqvsdu6TJ23aWYcE/5s9nPNLU
+	 YcPWBELMNpXYVEZfjTBKVUJetzCT433lRG9liN+bQwwktxCOCcSNHbguuwMMYROUcQ
+	 mi07kqXci/SNnGD9R0QGVaN6iGXip8UyWuDfrVIfQqIdD0G1trDSI1qOWjmuRDELpu
+	 stpv0gE/MBFGiV5IX/MuZlNJ+KAI5r+cvyOXtZhR/gXnzFBFYy+zPl0PMvj6Bnrpte
+	 tpFon6mGPqcy9wzoqa5HuMn5rhQDY1RwW1Eh7GKeLj9PV7B81s9ZtBs/IpBq+Cmlso
+	 L6rGumKovAj5w==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 24CD5D9A4B9;
-	Wed,  6 Mar 2024 03:30:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7B51FD9A4B6;
+	Wed,  6 Mar 2024 03:40:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,54 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v9 0/7] net: ethernet: Rework EEE
+Subject: Re: [PATCH net-next] selftests: avoid using SKIP(exit()) in harness
+ fixure setup
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170969583014.3052.10867383001845356911.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Mar 2024 03:30:30 +0000
-References: <20240302195306.3207716-1-o.rempel@pengutronix.de>
-In-Reply-To: <20240302195306.3207716-1-o.rempel@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: wei.fang@nxp.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
- linux-imx@nxp.com
+ <170969642850.9099.14198532225350311208.git-patchwork-notify@kernel.org>
+Date: Wed, 06 Mar 2024 03:40:28 +0000
+References: <20240304233621.646054-1-kuba@kernel.org>
+In-Reply-To: <20240304233621.646054-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, broonie@kernel.org, ivan.orlov0322@gmail.com,
+ perex@perex.cz, tiwai@suse.com, shuah@kernel.org, jglisse@redhat.com,
+ akpm@linux-foundation.org, keescook@chromium.org,
+ linux-sound@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mm@kvack.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat,  2 Mar 2024 20:52:59 +0100 you wrote:
-> Hello all,
-> 
-> with Andrew's permission I'll continue mainlining this patches:
-> 
-> ==============================================================
-> 
-> Most MAC drivers get EEE wrong. The API to the PHY is not very
-> obvious, which is probably why. Rework the API, pushing most of the
-> EEE handling into phylib core, leaving the MAC drivers to just
-> enable/disable support for EEE in there change_link call back.
+On Mon,  4 Mar 2024 15:36:20 -0800 you wrote:
+> selftest harness uses various exit codes to signal test
+> results. Avoid calling exit() directly, otherwise tests
+> may get broken by harness refactoring (like the commit
+> under Fixes). SKIP() will instruct the harness that the
+> test shouldn't run, it used to not be the case, but that
+> has been fixed. So just return, no need to exit.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v9,1/7] net: add helpers for EEE configuration
-    https://git.kernel.org/netdev/net-next/c/6f2fc8584a46
-  - [net-next,v9,2/7] net: phy: Add phydev->enable_tx_lpi to simplify adjust link callbacks
-    https://git.kernel.org/netdev/net-next/c/e3b6876ab850
-  - [net-next,v9,3/7] net: phy: Keep track of EEE configuration
-    https://git.kernel.org/netdev/net-next/c/fe0d4fd9285e
-  - [net-next,v9,4/7] net: phy: Immediately call adjust_link if only tx_lpi_enabled changes
-    https://git.kernel.org/netdev/net-next/c/3e43b903da04
-  - [net-next,v9,5/7] net: phy: Add phy_support_eee() indicating MAC support EEE
-    https://git.kernel.org/netdev/net-next/c/49168d1980e2
-  - [net-next,v9,6/7] net: fec: Move fec_enet_eee_mode_set() and helper earlier
-    https://git.kernel.org/netdev/net-next/c/aff1b8c84b44
-  - [net-next,v9,7/7] net: fec: Fixup EEE
-    https://git.kernel.org/netdev/net-next/c/6a2495adc0c8
+  - [net-next] selftests: avoid using SKIP(exit()) in harness fixure setup
+    https://git.kernel.org/netdev/net-next/c/e3350ba4a5b7
 
 You are awesome, thank you!
 -- 
