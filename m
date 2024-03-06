@@ -1,112 +1,113 @@
-Return-Path: <netdev+bounces-77806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 475C68730E6
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:38:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B81D18730F1
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:40:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F23C8282C0C
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:38:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAC401C229E0
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6AB05D755;
-	Wed,  6 Mar 2024 08:38:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0568C5D74F;
+	Wed,  6 Mar 2024 08:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MYIh9gPa"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hlErZmx6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A255D730;
-	Wed,  6 Mar 2024 08:38:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A7A164A
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 08:40:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709714322; cv=none; b=gaEif7Cm0nVA0BX+NXq7nJp5xCWvtn0apKxulVLDruFRZ9aZwiEZn6KUAtwpTPD7je4iaZbgLESli1nbnjQVqQy4mVsCB3nIE/KRFh88IUg1D8Kabk1LPLOOwF9ticgOD12FOyV9P2zHH6QkvQSQtCY6pfK9ALnx+0mssVp+SD8=
+	t=1709714444; cv=none; b=Fvyrk4tcH8GUqVukpTbw1bkuOJUVJmtI85f8DADOIKGQvOR1pfRp4DL1J6vzspqBRh3wQ4OQFeoNGg/8Amf1qpxDc4Au4jqCP6QjSDhMAjxuwxp+INnxAIACrBO9I5hxQYnQFB2E9mUTKiy0lMK7RvWE7Np+lj6qw+yYVJVEbnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709714322; c=relaxed/simple;
-	bh=L6Cn4uTVTBHKqlz1yW8rNDu318FD8WsCh6wVNeDEbwk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=py43/CT1vw3kQUJPZ1qpxj7crDRCjN6DJVC/gcqT/b215nkwI7YNjlRwFXdQgSe7UgvpzKRzyQr0GAgpJcNOkJnJjLRWX8uaYoUqwYAPbgh4mRi5hs/z1NftPUHe5enGUe/qq7Jkc7xK5AJug3+x1QTa5+m5ri0O9JN4ZTUGDKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MYIh9gPa; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709714321; x=1741250321;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=L6Cn4uTVTBHKqlz1yW8rNDu318FD8WsCh6wVNeDEbwk=;
-  b=MYIh9gPa+lsUr9CMkOtLvXf2zJRusP9o/CxLdSbrkexdFrPSxntY4rM6
-   6PP94mIcTQFklmtQ6foJY1K1y1NJHCmCEOv+Rpkj17ZHHpcyaRWq5lfry
-   G9I1nfs5JYsQxV8Zq+xIsmfKOQ/9WhZr3CMYR8Zd/BxHgRAgnBSnouRNu
-   MeAog+Q4B5qnyd6d257cR9cBoSQeiyTUq4E0EgsBVP11AhKRlYEbDulA6
-   Y7iEEVxS/QnnaSUMMmvxisbIdd39ncRj0U5EabLWLl6yycjq+dwrC4+vh
-   njn9QXdTguyvom7O9bkR3HUeJ5bpowj/l7oKiyF3wK9XaryTwT+4vOvO+
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="21837365"
-X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
-   d="scan'208";a="21837365"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 00:38:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
-   d="scan'208";a="47210936"
-Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.12.48.215]) ([10.12.48.215])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 00:38:36 -0800
-Message-ID: <3d984c02-0154-4c72-92ee-16fa34d4b537@linux.intel.com>
-Date: Wed, 6 Mar 2024 10:38:33 +0200
+	s=arc-20240116; t=1709714444; c=relaxed/simple;
+	bh=fTpCsu/6ZU8FqxRTRu6JSkKCSAuqJJxd7/aHe9Dj+Hs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nkEpWXKQIwZu+HH8tUyr76KySR07l72bADIdX3TM8EFq9FQ7prZaCd9ZBiHuk5a26Trg+DlUz5d5033faji7taEkGAYwGfaq0meoYL0V76C8+wFPGXO/ChSdJpkCLWY7NY4lrrHnuNtFPd9Qu8KcD0U6bjZrGWwTn4CL7XXEljg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hlErZmx6; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dc6cbe1ac75so472014276.1
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 00:40:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1709714442; x=1710319242; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fTpCsu/6ZU8FqxRTRu6JSkKCSAuqJJxd7/aHe9Dj+Hs=;
+        b=hlErZmx6J6GPQEvmUMXt1edFiYBzJOqKoxvbhs7jlQBisypnmwbWqDtLNWh2JF2lyN
+         57127EPzsCZyZ1tKRQARit7+AL9lT4kUAItNBvUKn0kUVazoie9VfNKwtJsAOReb37Pg
+         iFlTvNA+cQblELGsFJjdxrqaMfNBafammmBTBu+tUMquFrmZaqwfN74ihj+Zv099zncz
+         nyh81as2fCXzUq7d4bZ5EeXK9117Q7IQ1Es0HFucB2few7Cu+8eRNtZ4zhOq2JmfgCAc
+         Wn7c56u9ULxxYOkJ0Mno0+4DciFeQxP8pLXarw0P5fehrHBY64bX2FnbmHHLQ4b3bVW3
+         mHIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709714442; x=1710319242;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fTpCsu/6ZU8FqxRTRu6JSkKCSAuqJJxd7/aHe9Dj+Hs=;
+        b=g2kFMyLyEx9DhLP/tEE1eTworHkkzTcT6CriSwSk86B347zXMExzBXyA+oo92ZFR0u
+         K1pmRK0mo7gfxAI/so5268nSuDp6Uu+f46UPuzZLv4JWMl116zSNzQPL/keJV3QvI8QC
+         9IM/qGn5oDM0wD2K+JrvNEXKjlYvHo6bFPMukZqb7XUlGF2i9xBBEIrqy9pPb9rOyzmB
+         9mKDixoL40oy/Nr7vgjxwfKsp1+Z/qFjAq1BEvtV1Ghzj6CePAnYQYuIwHYjZhILbIl6
+         4KDUOTpV5r2OD0+3AxUoPZX0JqYO9wMgi6bYm9iHfVPfhDqyu4jQsIHwSeyPAdmFxWFo
+         8dgQ==
+X-Gm-Message-State: AOJu0YzUjRAexOcX/b8BB0MPa9YdoYVgMN4lQ9hhiIi4KxyCvixKx/aQ
+	AsqsqLTsLwI10VtXvOJAle1IynqJ3nsioc/zaS/Q24UsKMpfyXQ3m8K5i34j2ewJI+OA0EkRNGy
+	uZLJAD8VDta9co+5GLgJP+gZiLDRaGtBtk7R2pQ==
+X-Google-Smtp-Source: AGHT+IH2IIOi4/G0T0oMvBWo97Egq4HVaVZ0DhuUsr7rB6Y6OQ2qfSF+eTVGsPw3Ib6o6D5CqXl9NLJGpCn+DMkI6UE=
+X-Received: by 2002:a5b:10f:0:b0:dc7:4265:1e92 with SMTP id
+ 15-20020a5b010f000000b00dc742651e92mr3968571ybx.23.1709714442391; Wed, 06 Mar
+ 2024 00:40:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [iwl-net v2 1/2] igc: Fix missing time sync
- events
-Content-Language: en-US
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- intel-wired-lan@lists.osuosl.org
-Cc: sasha.neftin@intel.com, netdev@vger.kernel.org, richardcochran@gmail.com,
- kurt@linutronix.de, jesse.brandeburg@intel.com,
- linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- anthony.l.nguyen@intel.com, Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>
-References: <20240220235712.241552-1-vinicius.gomes@intel.com>
- <20240220235712.241552-2-vinicius.gomes@intel.com>
-From: "naamax.meir" <naamax.meir@linux.intel.com>
-In-Reply-To: <20240220235712.241552-2-vinicius.gomes@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240301221641.159542-1-paweldembicki@gmail.com> <20240301221641.159542-3-paweldembicki@gmail.com>
+In-Reply-To: <20240301221641.159542-3-paweldembicki@gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Wed, 6 Mar 2024 09:40:31 +0100
+Message-ID: <CACRpkdbFxS_f1z=N-zZyxV_Y9kLDqHSGwwibV8kF8RgmjNLSkA@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 02/16] net: dsa: vsc73xx: convert to PHYLINK
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/21/2024 01:57, Vinicius Costa Gomes wrote:
-> Fix "double" clearing of interrupts, which can cause external events
-> or timestamps to be missed.
-> 
-> The IGC_TSIRC Time Sync Interrupt Cause register can be cleared in two
-> ways, by either reading it or by writing '1' into the specific cause
-> bit. This is documented in section 8.16.1.
-> 
-> The following flow was used:
->   1. read IGC_TSIRC into 'tsicr';
->   2. handle the interrupts present in 'tsirc' and mark them in 'ack';
->   3. write 'ack' into IGC_TSICR;
-> 
-> As both (1) and (3) will clear the interrupt cause, if the same
-> interrupt happens again between (1) and (3) it will be ignored,
-> causing events to be missed.
-> 
-> Remove the extra clear in (3).
-> 
-> Fixes: 2c344ae24501 ("igc: Add support for TX timestamping")
-> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-> Tested-by: Kurt Kanzenbach <kurt@linutronix.de> # Intel i225
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-> ---
->   drivers/net/ethernet/intel/igc/igc_main.c | 12 +-----------
->   1 file changed, 1 insertion(+), 11 deletions(-)
+On Fri, Mar 1, 2024 at 11:17=E2=80=AFPM Pawel Dembicki <paweldembicki@gmail=
+.com> wrote:
 
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+> This patch replaces the adjust_link api with the phylink apis that provid=
+e
+> equivalent functionality.
+>
+> The remaining functionality from the adjust_link is now covered in the
+> phylink_mac_link_* and phylink_mac_config.
+>
+> Removes:
+> .adjust_link
+> Adds:
+> .phylink_mac_config
+> .phylink_mac_link_up
+> .phylink_mac_link_down
+>
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+
+Yours,
+Linus Walleij
 
