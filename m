@@ -1,114 +1,145 @@
-Return-Path: <netdev+bounces-77971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 127A8873AA2
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:25:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29E48873AAB
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:29:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2CF5283BAE
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:25:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6C26288753
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:29:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A98E134733;
-	Wed,  6 Mar 2024 15:25:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91F0135412;
+	Wed,  6 Mar 2024 15:29:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="klx0W1/5"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Hbi9JiSh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EF6131E4B
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 15:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F0E1353E4
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 15:29:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709738743; cv=none; b=fCd49q0jK0zS0KxHUTVdn5O9csTvdkA7P2k6PtIivsVslei+IQL0METo6n/cVwNvOpK0AGq++KylSEo2FcNufQmpCGp26cckIpg64FlVho2n+0sSFjEyU4nL0Ky6yZ/GzmK9bUBArLqKUL0ax1M+D/s81jPsDt5p0FgbZGI4HZI=
+	t=1709738979; cv=none; b=B/GyzeZAnYdN/6NEjiH0utibz7GeXNj6NVdF7MEmc4UEBu8t8dYL8pvxCYxvAJ3ZWep/ciCppHYMEwZRCwsv9jGOrvCFBGhZMCj/e4764h+uai0oRZrY8FZponrNk013fP5WaOcTiVXk3Yy1BQ12SAKIQZhDEvgQ1ZqE4EVb7Xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709738743; c=relaxed/simple;
-	bh=oOtHYr2Eyt041TkFpTgH7RlHgJIKFbcRLDUz9Den9Ug=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nRi0G1X7qJ+VF8Czn13RPMjKNZN/MJauwjMnhSIQD79Nvqm+SBK6/CbRnGsK2Za1IuYmhHq9ztPbfLBb4y2c7EQlfS9D/FgUfMX5cjGgJHJzMrzjOmUuh46miQqLwA5kf7fGVPuEWRWthftZcIKbBxH6R2bmer5u51cYQjVS9NY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=klx0W1/5; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-33da51fd636so3792863f8f.3
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 07:25:40 -0800 (PST)
+	s=arc-20240116; t=1709738979; c=relaxed/simple;
+	bh=Jx4hfr2o983xJjBPCus4RWYk/FMZA/nAlxmKxiE+YSw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OlcnJZ+lFqgcUTMHQ7suh04s3x8ht8pHO2AYvgwkDmUSUFT/UrmQg8K+j5ABGLcuVD3pnqKUGuOLAOqH/WH9tOUNBB7q4IhTSqi+q3e+f2+6hPjGYqw6cvX1ibNK6DECHOv+Paf00La/JDf+/vlkYfaDzOpsCTrN2Ee+LGYiJfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Hbi9JiSh; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a45bdf6e9c2so80652366b.0
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 07:29:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709738739; x=1710343539; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oOtHYr2Eyt041TkFpTgH7RlHgJIKFbcRLDUz9Den9Ug=;
-        b=klx0W1/5Dokk3bFUh76jXcOxLS6+V0bCV1XL1GPETJnAmwFmaWM3umKEWso2JyrgYr
-         EtwGmDZUjvBpaJdwARFQBISRhyi9TzquZpcrKDBACV7GrzIjFDp6H3oiqGP8N/O/mt49
-         BWKd+NRGwmMsn74Laejo/Gr/sEzgPJVrf4OGhLF82LgjB0rOkT2wGUAaRJQYnC/4Jn8N
-         v4vN7JYGRkHVtmuWDaB/pkjlMN4ByPtw2311m4drZo9zhsupg9mJzHMNiZLtO5Z0IPrn
-         8DJy+RdWcjZxnKbM3UyJIqTT/EccwBMt7LZwB1hb/sB2zzFdTbP09yAa++ZNbU8Gk+Cm
-         wwlg==
+        d=openvpn.net; s=google; t=1709738976; x=1710343776; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=L9Tvmcrfc2JHsi9mZk3IH/MVcZctmaTfTWIVe4WknE0=;
+        b=Hbi9JiShpy7xKzXGC0yZVlIT9os1ibQl0ipTIvs0onXmsMLqX3MCUUU3DlA8wU7ikq
+         onFQxNMqL6cAroZhCOpjm81Zfce0tESunp5U8dfKnu4QoFo0Th2MDxRvioGAgjDQZqmA
+         4tJAzLv/0EmY80d8b+MXIkEQng56boHYSNxBWP5PYybfT26h33E5w9/TKB3W/5AALD3p
+         RRpHHTba/0WwsReMvrdOs51JSTmla2VdThVCRiRoIDUDxgFYutN76BI7XBRuo5jJFGte
+         /aR1PNtOf2eMWqq4jz9dCszflmy9kgMhfcPiXQvR4VOAsMk3NTDqD8FwQO2l58J9zhAF
+         6qKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709738739; x=1710343539;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1709738976; x=1710343776;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oOtHYr2Eyt041TkFpTgH7RlHgJIKFbcRLDUz9Den9Ug=;
-        b=Mhf2Bz7Fdo3R3S1sJqSCAo5yc0bmoki+FnI3M0ReR/x2tbUBChUDh7tcBNKT62sGve
-         HC16Wzslo2R89ENy5iRGlL6cUhrVayvC7I5bud7xwUGReuI6CZILk6Lfr8LI7UozyC8p
-         hBUdRVE/4Q2+GACWZQPb5wcmBQoDDPxHW++OL0dmBv2MVhmp0Zv+D7psmO2vwHJTKXuA
-         ITDj0See1b8TEIl+GGvLDGtuNYEczsX5aPNpgbFGluzDTBjpM4Vl1yxQ/pOyIeO3aiTO
-         XGh0Ag7H9ps9dvMmZKosLf3OYt+Ssh8idDxpI80L2Xpco4z8pGZLfIn4CM2vK3XCM3Jc
-         9sXA==
-X-Gm-Message-State: AOJu0YzWdZhq1I+nk3tO/bXxxR4j2gOp4nCDZ3was4mz+hDoViY34NT7
-	3grjLMBaieSiA5La1762/AG0hcxO4+kVezKRX9WyNOj3Dte3eQ+h1Oqx++jvbbiIe2RAnNRSgPN
-	z
-X-Google-Smtp-Source: AGHT+IH/iz3S2HxHo8Tgs2qMofZI393AmB7cOp61sqROHmlvR0c/c1WSK+regY5KJAcSjMaIraLgsA==
-X-Received: by 2002:adf:eb4c:0:b0:33d:eec0:c5 with SMTP id u12-20020adfeb4c000000b0033deec000c5mr9812581wrn.9.1709738738919;
-        Wed, 06 Mar 2024 07:25:38 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id d15-20020a5d644f000000b0033e052be14fsm17795707wrw.98.2024.03.06.07.25.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Mar 2024 07:25:38 -0800 (PST)
-Date: Wed, 6 Mar 2024 16:25:34 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, arkadiusz.kubalewski@intel.com,
-	vadim.fedorenko@linux.dev
-Subject: Re: [patch net-next] dpll: spec: use proper enum for pin
- capabilities attribute
-Message-ID: <ZeiK7gDRUZYA8378@nanopsycho>
-References: <20240306120739.1447621-1-jiri@resnulli.us>
+        bh=L9Tvmcrfc2JHsi9mZk3IH/MVcZctmaTfTWIVe4WknE0=;
+        b=u9RDtALY53AS+2OrxmVsKpuhLd4X7bJ5WB7buUXpSRmAb6IVYwuL4bG/Nbn95NVcKu
+         pN6VqJoyjoq3KPmcJddgWbU6GNQc2ryPo+s6qkAJkO873ue4wAllKEbcKPzHycmkkWF6
+         arA1bTcJ21pMBoWtEAQPGsVXYwmKWxK9a/MpwoJrW2Pnc7ovci/8UK2TJo963LVrLf/G
+         ZFwpmZ5Ux1NFFmJ64QyWdCULJMbLuXHKUUuGtcxDctJIWvuQiW1xKo3fqnfgSXdUePIt
+         +1bv8newGOtflTHP++DFGc+l7EXAlCXIC4rwOZ+VMaEoENHlH2evuYZ80gsu9Y0BC8z2
+         AcxQ==
+X-Gm-Message-State: AOJu0Yw7pAruTMPbQEiC/PVkU1ExihYrCztkdYSqv9FsVAzMfPMInLdz
+	B3RF2ggnw7wENrwbWbGCjjXjYvNVLJm0uhYbw8IrJkCK8brED7QGjrJeD9Bz8dU=
+X-Google-Smtp-Source: AGHT+IHs3SwyijX8VvDMP4TOcz9lUf3mMNUJ5yceVZ7nGNuU/aMWzkk31VdkcT3lu65mDRZ12N75WA==
+X-Received: by 2002:a17:907:20b9:b0:a43:eb29:a293 with SMTP id pw25-20020a17090720b900b00a43eb29a293mr10010525ejb.5.1709738975923;
+        Wed, 06 Mar 2024 07:29:35 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:0:2746:4b81:593e:203b? ([2001:67c:2fbc:0:2746:4b81:593e:203b])
+        by smtp.gmail.com with ESMTPSA id f9-20020a170906560900b00a449076d0dbsm6082024ejq.53.2024.03.06.07.29.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Mar 2024 07:29:35 -0800 (PST)
+Message-ID: <b9e8ca73-e89d-4e6d-80b6-65fb55ef4f10@openvpn.net>
+Date: Wed, 6 Mar 2024 16:29:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240306120739.1447621-1-jiri@resnulli.us>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 09/22] ovpn: implement basic RX path (UDP)
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>
+References: <20240304150914.11444-1-antonio@openvpn.net>
+ <20240304150914.11444-10-antonio@openvpn.net>
+ <20240305150432.GK2357@kernel.org>
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <20240305150432.GK2357@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Wed, Mar 06, 2024 at 01:07:39PM CET, jiri@resnulli.us wrote:
->From: Jiri Pirko <jiri@nvidia.com>
->
->The enum is defined, however the pin capabilities attribute does
->refer to it. Add this missing enum field.
->
->This fixes ynl cli output:
->
->Example current output:
->$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml --do pin-get --json '{"id": 0}'
->{'capabilities': 4,
-> ...
->Example new output:
->$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml --do pin-get --json '{"id": 0}'
->{'capabilities': {'state-can-change'},
-> ...
->
->Fixes: 3badff3a25d8 ("dpll: spec: Add Netlink spec in YAML")
->Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+On 05/03/2024 16:04, Simon Horman wrote:
+> 
+>       Flagged by /scripts/kernel-doc -none
 
-Note that netdev/cc_maintainers fails as I didn't cc michal.michalik@intel.com
-on purpose, as the address bounces.
+Thanks again.
+Will have a look at all issues reported by /scripts/kernel-doc.
 
-Btw, do we have a way to ignore such ccs? .get_maintainer.ignore looks
-like a good candidate, but is it okay to put closed emails there?
+Regards,
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
