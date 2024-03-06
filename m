@@ -1,120 +1,110 @@
-Return-Path: <netdev+bounces-77931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 611578737DC
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:38:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5CA58737DF
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:39:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D348B22085
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:38:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03BD91C21BDB
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:39:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C7A713249F;
-	Wed,  6 Mar 2024 13:37:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27BBF131732;
+	Wed,  6 Mar 2024 13:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O+u1Gi+F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.actia.se (mail.actia.se [212.181.117.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5258213174E;
-	Wed,  6 Mar 2024 13:37:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.181.117.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACECA131729;
+	Wed,  6 Mar 2024 13:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709732278; cv=none; b=WojMiZK9H/1qYbZSfzFU43fLaurWfkpnS48tFhHi5lIA8lNmOf9fAgmHs3wwz4+ri0lGNUhgy3LmorBplENxfjU6+6EkeKC+iYaTY97Op9myNk1T/IdoreUA5y5/379Sg6THznf5n1DfkiK1XIwOO8PPUqF11tHpqiTksuaEGl8=
+	t=1709732299; cv=none; b=pPy8WUcoydaWwWHFYemxCedzIHCsCUo5ZCL+MWVGBqHmM1uAO0SyJDR5FOQpW1X1AWTwtknDwLg+lpileXPyZroeiN3tCZlkqfaRAI2aTbi6Klb9x/eWjD5tB2Ee7aIwmYTCCgX3/pmfSVa4jTUkYhIIO/AvGCzu8px7hspRBYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709732278; c=relaxed/simple;
-	bh=zmEX1PyysnR4IfejG+xCR/9Da+bh9s0rL8ilvGkuH2s=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=m64QoLE8emtjdw/R7LDWxQT/C8ulULSNLZ2W+/AC4/QDZohUtKB0Xvt+KB9A/U3uAkscp6zJK9Vt7BJHQvdYRsTqWJg0eUbMi7aT+K9UEbRTCdUmOQDVCHQQ56JTFrW5FIFFte2TZHx6Q5bvxMWw46lPqUN8CA8B6Kcv6g4a/4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=actia.se; spf=pass smtp.mailfrom=actia.se; arc=none smtp.client-ip=212.181.117.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=actia.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=actia.se
-Received: from S036ANL.actianordic.se (10.12.31.117) by S035ANL.actianordic.se
- (10.12.31.116) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 6 Mar
- 2024 14:37:46 +0100
-Received: from S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69]) by
- S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69%4]) with mapi id
- 15.01.2507.035; Wed, 6 Mar 2024 14:37:46 +0100
-From: John Ernberg <john.ernberg@actia.se>
-To: Wei Fang <wei.fang@nxp.com>
-CC: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, John Ernberg
-	<john.ernberg@actia.se>
-Subject: [PATCH net v3 2/2] net: fec: Suspend the PHY on probe
-Thread-Topic: [PATCH net v3 2/2] net: fec: Suspend the PHY on probe
-Thread-Index: AQHab8t46xO1JP3Hxke5Lu7SCFbkbQ==
-Date: Wed, 6 Mar 2024 13:37:45 +0000
-Message-ID: <20240306133734.4144808-3-john.ernberg@actia.se>
-References: <20240306133734.4144808-1-john.ernberg@actia.se>
-In-Reply-To: <20240306133734.4144808-1-john.ernberg@actia.se>
-Accept-Language: en-US, sv-SE
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-mailer: git-send-email 2.43.0
-x-esetresult: clean, is OK
-x-esetid: 37303A2921D72955627162
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1709732299; c=relaxed/simple;
+	bh=G2rmJ+Q2gQEQNdkWWv7W1eo2pFGNMfvC8toDVdsvsyM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Aa0VModZ9X/78Xeji863swgKlvbpMmgEjPAth6bZMV/pW0Ji4IPah0jZ/DUGAnk/08jkKNmTRu1+rxw5H3aonf7+4xMm7efviUmTt4bYY887pPoq/aU6WNXufxVd/BcdseNE5VprlSVFpSu5bWgjUskX/qiVojxEgrugRa8aD8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O+u1Gi+F; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709732298; x=1741268298;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=G2rmJ+Q2gQEQNdkWWv7W1eo2pFGNMfvC8toDVdsvsyM=;
+  b=O+u1Gi+FbLxbzEb23bS2Xs0edNtHqaMwqn8VedIyHCNaKZK9LmfOvgXm
+   NGO8JjtRx81OiuFG4mz2ecQ2fdTigdbZcpB+BsqK3b6eJjk4mi7gLYktV
+   w5pudmxZSPkR8u5bSvYJBDeq1ZCTPXXSgwJC5K+B2zT2dqRovCXzJO76n
+   Fp33ceSgbHz14RbY4MZcQyMiJvOjRpKqNJh4fd+XSKFx3QHxPC0sDbDkS
+   EY6WHngKmLuoUXXrNHRd6flZO+GHxN4CmrnWuB3cbfkl8SVN3fYmZ/e/I
+   URQEXfsd/5/yOPXaHZGhJEyMNCFehoIrNtLSzcjp/+pEHNj7WZGTjdGxS
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="4207656"
+X-IronPort-AV: E=Sophos;i="6.06,208,1705392000"; 
+   d="scan'208";a="4207656"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 05:38:17 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="914178599"
+X-IronPort-AV: E=Sophos;i="6.06,208,1705392000"; 
+   d="scan'208";a="914178599"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 05:38:13 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1rhrTG-0000000AHH6-1kPA;
+	Wed, 06 Mar 2024 15:38:10 +0200
+Date: Wed, 6 Mar 2024 15:38:10 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Herve Codina <herve.codina@bootlin.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>,
+	Mark Brown <broonie@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v6 1/5] net: wan: Add support for QMC HDLC
+Message-ID: <Zehxwo2wCLkZBQzc@smile.fi.intel.com>
+References: <20240306080726.167338-1-herve.codina@bootlin.com>
+ <20240306080726.167338-2-herve.codina@bootlin.com>
+ <ZehvV6kCD3RCumAL@yury-ThinkPad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZehvV6kCD3RCumAL@yury-ThinkPad>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-Since the power management is now performed by the FEC instead of generic
-pm the PHY will not suspend until the link has been up.
+On Wed, Mar 06, 2024 at 05:27:51AM -0800, Yury Norov wrote:
+> On Wed, Mar 06, 2024 at 09:07:17AM +0100, Herve Codina wrote:
 
-Therefor suspend it on probe. It will be resumed by {of_,}phy_connect()
-when the link is brought up.
+...
 
-Since {of_,}phy_connect() and phy_disconnect() will resume and suspend the
-PHY when the link is brought up and down respectively, and phy_stop() and
-phy_start() will resume and suspend the PHY in the suspend-resume paths
-there is no need for any additional calls anywhere.
+> It's minor, but you can avoid conditionals doing something like:
+> 
+> 		netdev->stats.rx_over_errors += !!(flags & QMC_RX_FLAG_HDLC_OVF);
 
-Signed-off-by: John Ernberg <john.ernberg@actia.se>
+This is harder to read. And IIUC net subsystem dislikes the proposed one
+(I tried to submit a patch to clarify some boolean types vs. integer ones
+ and it was rejected because of the reason I have mentioned).
 
----
+-- 
+With Best Regards,
+Andy Shevchenko
 
-v3:
- - Only call phy_suspend() in probe, it is taken care of by the phy framewo=
-rk (Wei Fang)
- - Update commit message to reflect the above
- - Drop fixes tag, this is technically not a fix anymore (Wei Fang)
-    Should I re-send this for the net-next tree later, or is it still ok fo=
-r net?
 
-v2:
- - New patch
----
- drivers/net/ethernet/freescale/fec_main.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethern=
-et/freescale/fec_main.c
-index 8decb1b072c5..fb092b7bfe85 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -2539,8 +2539,10 @@ static int fec_enet_mii_init(struct platform_device =
-*pdev)
- 	/* find all the PHY devices on the bus and set mac_managed_pm to true */
- 	for (addr =3D 0; addr < PHY_MAX_ADDR; addr++) {
- 		phydev =3D mdiobus_get_phy(fep->mii_bus, addr);
--		if (phydev)
-+		if (phydev) {
- 			phydev->mac_managed_pm =3D true;
-+			phy_suspend(phydev);
-+		}
- 	}
-=20
- 	mii_cnt++;
---=20
-2.43.0
 
