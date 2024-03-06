@@ -1,113 +1,154 @@
-Return-Path: <netdev+bounces-78071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9280873FC9
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 19:40:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E8BC873FCD
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 19:41:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26F231C220EE
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:40:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E30DC1F2254F
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:41:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 192A8137C4A;
-	Wed,  6 Mar 2024 18:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD8EF13BAE9;
+	Wed,  6 Mar 2024 18:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nEx3WC8l"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q+6iQs17"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BA5133425
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 18:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3507A135418
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 18:41:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709750435; cv=none; b=G0rcqrea3Uz6wO0DGGYGpGnglqZdh3X+6qwpIwkj979TmF2vJT0m8yS38qNbrjYMpATx3WOjdIFvzrm3QQqT7saxi0ZZp1Hd3OSDVScBXz3RdQXySzeOk5n+bhWI10KZrBYKAZc+WE+XqtDpq3m1FwJpaHIriNrWK0EMEfUgSkY=
+	t=1709750488; cv=none; b=s4yjRGMC7PUW49FblOQR0o1Df3MtkgzmUggaySpxkvaADLGyTnS28gzkOAkV1i3WRJkSrXQ3SkkNCWaLZTe3R9yDu5oKeP6QAJScAxKuNfOY/eQ6fYv8ZMFkk9LYWvRLl3B+6PPoLS7A5Mxv7uzWiMpxUWd/uFg/bmjBnEWycW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709750435; c=relaxed/simple;
-	bh=U2TDEDbzI/eyW42FWVQUXblhPZOJdBmq4TZX2PR2F1Y=;
+	s=arc-20240116; t=1709750488; c=relaxed/simple;
+	bh=ArsTKsXHQof2yGqmTsW0MPeeUHyHUqiUp43CBbiEDkQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tdwGSNJBKpCnWRKHW9Ka1ktoFT5JMehdmfQAHf+BtKisF5bQGtOT+P6KEb3ph4taXrhNcOOMLzP9rUjcdxw22pF6wxobDIkfgNOMxYVvKHAj1ah3gco/zl2zECNu3VR9n5PudW/xUisxHla3Mf+8zpr9VsZKRMG11C2ItF6TXiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nEx3WC8l; arc=none smtp.client-ip=209.85.208.49
+	 To:Cc:Content-Type; b=mEa+B2PKH2bXypDLop4kTjNtos1nYebZ3XHZ2LZLIDNmCSSy67BCMeqbhFmMv3NWYtc+0z5a/zZTs1sJD8D5Wckzwbl1Vvw9shkk9rLBwSqYYd0tmX55p8hGisoBEtj/CJaS13vA8c6bD0/3fp75YvHYtp288mQ8G4ZRBfS33Jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q+6iQs17; arc=none smtp.client-ip=209.85.218.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-565223fd7d9so1149a12.1
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 10:40:33 -0800 (PST)
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a45aa7cb2b3so12847166b.3
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 10:41:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709750432; x=1710355232; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709750484; x=1710355284; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=U2TDEDbzI/eyW42FWVQUXblhPZOJdBmq4TZX2PR2F1Y=;
-        b=nEx3WC8l6f3kPzWGNcJ987KHj1s1zjfMevApEHht0zBKUYWnBrZ9UoeM6x7gO0Qzog
-         ZALn9k2O+gm1WpKjukZTziTY8JCUAJK2fdj51yYd+c7XSveneqz1yw/sFw6nhyUKxh/L
-         zTOKubkr73Y48n+PW6A6UZgiGl/W1j+VTIWE2qU/smEkCDvSjHAoHub3VlRG+d651VaR
-         zY/6HMzgNwcmPIvsHHcUKotX7/ZjKf92jxR4t9czn39sufihzlls1cSuMIE2T4nxl97S
-         M5eNuNP+Y+2EPv9OFP395JkhzSCxEQXr3NGiSkVBx0GI2zP8IlCH62Bh6A6i08Agn/8g
-         XFlw==
+        bh=ArsTKsXHQof2yGqmTsW0MPeeUHyHUqiUp43CBbiEDkQ=;
+        b=Q+6iQs170zrfY/P8rn+jj2GatlZQijQST9+JM0WzozJgwdKcrEMnRoU7B8qLpo6r04
+         8Y8xZEhtUBglYpxSl6Xksql0qqPe7fHx2PidS3H/FfUtFtWXyX4Sc/YMOR+Zyef66h4A
+         LiTYQ56O78YL+h0k5RE/t738cVduZkfU+gnocv9TGlvgCMT1tXM/j6l/gHcA/8QdXSCO
+         gaupO2yxB1wsv6Cnk2kUDaqR9ZT4sTdg9d2QeEHkExZxqHr/viOSnT8HPZWEpoH9mQps
+         R2Xx/XKfjf6HT2d2oFYXDHtlCt70YcPahh+XHccBDCRzomaEycEuCOsIKzJ0eovzmqVg
+         2xSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709750432; x=1710355232;
+        d=1e100.net; s=20230601; t=1709750484; x=1710355284;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=U2TDEDbzI/eyW42FWVQUXblhPZOJdBmq4TZX2PR2F1Y=;
-        b=FAnotlOT1yvxF6k3tG4KXGglZgG0DMgn1/Lw/9rlbB68LvQ7aLvGXQJy8gaH0nHABZ
-         w1IDjpqwUl/Ss9zFDQroVLGnmoEjBt3IRKrVWb0YicrYuQVPw1J+XcoVitNp3HMQJoPl
-         djEqKY5dsNhEX/gW2bvQjP/qzqRu2SLzOTOv/Bkuww4asnC60fUryXz7f5exOToMmUn5
-         9Y3IT5x6jo0vD0IxafTzWUCWvhMx1LKciCTURDiJlyl1KQNcNHzFPthq7VlDjWTDaUh2
-         6vekszPVLAgKlYm0PjixwVZCSP9lhmWi29qaxRtFmIHvwFYyDAFJytYoyd1jiyM5iptJ
-         nihQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXmRdEg8NOy1VAGo3jN5c686rwd0PNColr981j05B1n4eBgID+GOSLBwdYyishlyQtYGDPSlmrmLWOXBkwhQkGKdWDXh4Oa
-X-Gm-Message-State: AOJu0YwKtxNgnbtU5kGBJx7t+noNF0YnxFAeVU4a12SPexw+U/XaYzVb
-	dc0WKNuUQpTnkEWqf+DYwrNphjkel3XYOLeA192JWttO27MHEKsyLhipvblU7VIRcBiaeSf7LxV
-	NHuck/o7CHNIXnVICBpx39y0YPl28CeM+vQ6B
-X-Google-Smtp-Source: AGHT+IEGsBWFaIyhG3To35qNuslceF5Oz92VF8h4uF6xYeukj1lpnl+FsajBT35LrzZzl7anTJ5dUL6dDdco21K0/x8=
-X-Received: by 2002:a50:ee90:0:b0:565:ad42:b97d with SMTP id
- f16-20020a50ee90000000b00565ad42b97dmr48160edr.0.1709750431360; Wed, 06 Mar
- 2024 10:40:31 -0800 (PST)
+        bh=ArsTKsXHQof2yGqmTsW0MPeeUHyHUqiUp43CBbiEDkQ=;
+        b=fN+GOW6OplEhQuZ7zymWBJaNTpR2g3tEni/IZuVaB7kvEoIKOYMwwL474Xa6MHBVgt
+         p5MVCdPHBdYrxIzX27tANiHu6nL5m/dYMSxQgvNLgFV8mhbie6FwNarSnNJgRaRYP6Qu
+         8o+L8YcTgSZjQkxvN6TlwrX9DAiw13XtktKFQmXqPEFfYPDdSVK6o2UZ71FaiAD9zi/l
+         ae6Lp02q7lQzG3S/W+eQOhURdQ2PcPYHNh2MMyrqN2EjJ/3VKkG49R6lzh4FUqG24362
+         nfbmw/YnXrmLNipKiN0ljxXRNizvEFF99CEarJsXIkJnOR5/8V6gNc0jO+XbN0yHJ1cZ
+         Ssfg==
+X-Forwarded-Encrypted: i=1; AJvYcCVg0GKcX/I5zHWgkPlOqJXrBRlpcSGCrwBZZGA5EVw+iunvM79Oz418CZdzmRfmd9l0Ii2sgqqG3Pd+1D/Iay37zbNvgY5T
+X-Gm-Message-State: AOJu0YyAZdMxv3LLVx7ds4LDuxo/pDQXHd8FaKeAjDr59rg2bh8xSd19
+	HogjyBt0j0xsBlFK1/OadwvnjoMaA/Yz8gT5EQD0jRLt7psFe9hqAYu/UUJMzzBEV+1gZqPyI2n
+	82Peaa98XaSBB32RgFxvFHNFhOGgwj46Jw77B
+X-Google-Smtp-Source: AGHT+IEcj9L5XlTsUgR7NutURA5guIGFaY0Ag4iCBcd0lDLfPYQ4ZdXQa05kpAWGdG0hTeFJxeVbtTCZUKN0+egjPWQ=
+X-Received: by 2002:a17:906:d045:b0:a44:5589:c098 with SMTP id
+ bo5-20020a170906d04500b00a445589c098mr11219162ejb.7.1709750484307; Wed, 06
+ Mar 2024 10:41:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240306181117.77419-1-cpaasch@apple.com>
-In-Reply-To: <20240306181117.77419-1-cpaasch@apple.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 6 Mar 2024 19:40:16 +0100
-Message-ID: <CANn89iLrwYrKy7LEb+tpq=gSB9pn6M5jwtW_VE2LSxd6DoZL8w@mail.gmail.com>
-Subject: Re: [PATCH net-next] mpls: Do not orphan the skb
-To: Christoph Paasch <cpaasch@apple.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Roopa Prabhu <roopa@nvidia.com>, 
-	Craig Taylor <cmtaylor@apple.com>
+References: <20240304094950.761233-1-dtatulea@nvidia.com> <20240305190427.757b92b8@kernel.org>
+ <7fc334b847dc4d90af796f84a8663de9f43ede5d.camel@nvidia.com>
+ <20240306072225.4a61e57c@kernel.org> <320ef2399e48ba0a8a11a3b258b7ad88384f42fb.camel@nvidia.com>
+ <20240306080931.2e24101b@kernel.org> <CAHS8izMw_hxdoNDoCZs8T7c5kmX=0Lwqw_dboSj7z1LqtS-WKA@mail.gmail.com>
+ <9a78b37abdf40daafd9936299ea2c08f936ad3d5.camel@nvidia.com> <20240306094133.7075c39f@kernel.org>
+In-Reply-To: <20240306094133.7075c39f@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 6 Mar 2024 10:41:12 -0800
+Message-ID: <CAHS8izN436pn3SndrzsCyhmqvJHLyxgCeDpWXA4r1ANt3RCDLQ@mail.gmail.com>
+Subject: Re: [RFC] net: esp: fix bad handling of pages from page_pool
+To: Jakub Kicinski <kuba@kernel.org>, Liang Chen <liangchen.linux@gmail.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Dragos Tatulea <dtatulea@nvidia.com>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, Gal Pressman <gal@nvidia.com>, 
+	"dsahern@kernel.org" <dsahern@kernel.org>, 
+	"steffen.klassert@secunet.com" <steffen.klassert@secunet.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	Leon Romanovsky <leonro@nvidia.com>, "edumazet@google.com" <edumazet@google.com>, 
+	"ian.kumlien@gmail.com" <ian.kumlien@gmail.com>, 
+	"Anatoli.Chechelnickiy@m.interpipe.biz" <Anatoli.Chechelnickiy@m.interpipe.biz>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 6, 2024 at 7:11=E2=80=AFPM Christoph Paasch <cpaasch@apple.com>=
- wrote:
+On Wed, Mar 6, 2024 at 9:41=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
 >
-> We observed that TCP-pacing was falling back to the TCP-layer pacing
-> instead of utilizing sch_fq for the pacing. This causes significant
-> CPU-usage due to the hrtimer running on a per-TCP-connection basis.
+> On Wed, 6 Mar 2024 17:09:57 +0000 Dragos Tatulea wrote:
+> > > Does the caller need to check skb->pp_recycle? pp_recycle seems like =
+a
+> > > redundant bit. We can tell whether the page is pp by checking
+> > > is_pp_page(page). the pages in the frag must be pp pages when
+> > > skb->pp_recycle is set and must be non pp pages when the
+> > > skb->pp_recycle is not set, so it all seems redundant to me.
+> > >
+> > AFAIU we don't have to check for pp_recycle, at least not in this speci=
+fic case.
 >
-> The issue is that mpls_xmit() calls skb_orphan() and thus sets
-> skb->sk to NULL. Which implies that many of the goodies of TCP won't
-> work. Pacing falls back to TCP-layer pacing. TCP Small Queues does not
-> work, ...
+> Definitely not something we assuming in a fix that needs to go
+> to stable.
 >
-> It is safe to remove this call to skb_orphan() in mpls_xmit() as there
-> really is not reason for it to be there. It appears that this call to
-> skb_orphan comes from the very initial implementation of MPLS.
->
-> Cc: Roopa Prabhu <roopa@nvidia.com>
-> Reported-by: Craig Taylor <cmtaylor@apple.com>
-> Signed-off-by: Christoph Paasch <cpaasch@apple.com>
-> ---
+> So far, AFAIU, it's legal to have an skb without skb->pp_recycle
+> set, which holds full page refs to a PP page.
 
-This seems reasonable to me, thanks.
+Interesting. I apologize then I did not realize this combination is
+legal. But I have a follow up question: what is the ref code supposed
+to do in this combination? AFAIU:
 
-Packets are immediately sent, there is no queue.
+- skb->pp_recycle && is_pp_page()
+ref via page_pool_ref_page()
+unref via page_pool_unref_page()
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+- !skb->pp_recycle && !is_pp_page()
+ref via get_page()
+unref via put_page()
+
+- !skb->pp_recycle && is_pp_page()
+ref via ?
+unref via?
+
+Also is this combination also legal you think? and if so what to do?
+- skb->pp_recycle && !is_pp_page()
+ref via ?
+unref via?
+
+I'm asking because I'm starting to wonder if this patch has some issue in i=
+t:
+https://patchwork.kernel.org/project/netdevbpf/patch/20231215033011.12107-4=
+-liangchen.linux@gmail.com/
+
+Because in this patch, if we have a !skb->pp_recycle & is_pp_page()
+combination we end up doing in skb_try_coalesce():
+ref via page_pool_ref_page()
+unref via put_page() via eventual napi_frag_unref()
+
+which seems like an issue, no?
+
+--=20
+Thanks,
+Mina
 
