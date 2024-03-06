@@ -1,377 +1,140 @@
-Return-Path: <netdev+bounces-77729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E985872C93
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 03:12:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 774D2872CC3
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 03:29:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94836B24774
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 02:12:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E47D5B260FC
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 02:29:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B20FD518;
-	Wed,  6 Mar 2024 02:12:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73FCBDDBC;
+	Wed,  6 Mar 2024 02:28:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XSPzk3RS"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="tXzN2w3m"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC2D6FAD
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 02:12:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C62BD272
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 02:28:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709691137; cv=none; b=DLjlUKaEeGXwZnS8LTjmw8fC+HZFTSo0fuEHdCLzkuU91QCXMrJsoAYpYZ42s8rclGvGUCXOTMmZB9LcWXwhdd6GX4ZitEcqS9r/DWxxgEf+alcSPqS9zUDS5e+DZd63cGApiv+IXHYCwWxHa5RuahkTtR2RouXZATzMWcIQrWs=
+	t=1709692136; cv=none; b=n1NGd0VBQe9llzWfdiXN9jc4EFJv2V9mNJl7csHjicx6on2DrYUWFNijWViHm/Yz5Moi+c9FNyvdP177eS0kaQkCMKr598F/bpsrbMhFS60XL53wxynv6VfevbR31m7IV12OASpR3jorVqbr/JuYLwWT17cB9+5v7KSaOpQEBEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709691137; c=relaxed/simple;
-	bh=GlmCKD+xlQJlfcx2lNeOwkFvc6sYU8wmBbQJeeN5+yw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N4Sl8Zsj4KZkZcIa2FxeIp6cMzpkcmNj13mhCX4uFJFS6qZQr+WxiD+OfEl8ru++oXT8lFzWJ8UiNVD8+PQQFHbewYDfSR30Ei6nWEWuZJtsC+6kiZqjTPQLLxv6LJjoPW0aWWSw2PBmhH/YsefHRf8dVyRw6HVwmwB+ZrPEt+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XSPzk3RS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709691134;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9sbZgd4q8MukS3NmUkwfErLL+fIzH7IaTlMNRuUTYw8=;
-	b=XSPzk3RSqwq67Pkz3e0DEwxFnDB1Fyvyf6kc8Q8pqBojGHfMnss876wj32Efo1VLW4C4/L
-	s/XcXU1FewN9tTbgmsC2Jj8C1/T/wB0ILVjm3QAeM+e9ClQPrChltbThGhzsjMf4nZsZUp
-	nCzlJj8a0gf33aaNmaC2PtETV+oDO6k=
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-387-WrvFsYunNYmZEoctUxmMtw-1; Tue, 05 Mar 2024 21:12:12 -0500
-X-MC-Unique: WrvFsYunNYmZEoctUxmMtw-1
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-6e5c8030ab3so4388804b3a.1
-        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 18:12:12 -0800 (PST)
+	s=arc-20240116; t=1709692136; c=relaxed/simple;
+	bh=m/4/IJpnreuZGBCjDFZuh5CJChe0Zp0mf+/fUUyVNyY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k6mAvMKijx7370rp7k8oS85jrUZb3FzACVQdKmmkasW0Y2DVYAyUXCKtNJV74ciHmWjFkOAm72DaYozt/dMFhZZQ8vjyMGqfFaQsCIll5rg47Hy5smeGdA+fdlW0P0yD3z8JTQGTE5Abx9q6ZITB/P/Pi/+k5hX7vTE7GChguw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=tXzN2w3m; arc=none smtp.client-ip=209.85.160.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-21e6be74db4so299118fac.2
+        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 18:28:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1709692133; x=1710296933; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=n9CloCqaM+25WoaR2YknpneBnZb2s33DuZ5EXKAJgUk=;
+        b=tXzN2w3mIA42+kxiYmI+IfLVus4l/QCyp13ANiYCaN2AX0ORMGh8eFZyBZrHwi5+ui
+         zNdIkjkiBk4A/hgNMWzvhoZCVZgub5eQsDzmq3IH7LIsjQRrvMfh2CRMGVf8ialf+Rus
+         nghzApmYQfTLUlMYRSXbb4x6B6akvEuK4rNb6WwQoK4aLQOK0EG+oA4Ab7xlOOeaibDg
+         nJSUHhZ9ODRVCyFEvPMgBTKDGO9DRMtkgCfGe4EIFAsUKHZm1wpITxZLA3udaKd58MVY
+         6IouXTOA0w+XUEzqhiMWwJtLgVug5qR8dVcL0sonjarAz3MYOIYP8a1XnRJ4sV8i2/vC
+         ncEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709691131; x=1710295931;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9sbZgd4q8MukS3NmUkwfErLL+fIzH7IaTlMNRuUTYw8=;
-        b=qM+O/mkkbxA6Fb3nWVMNgDkVFVhdCcuKg2XTQr+FgCziwQCNTeGUPw6ZaM/I7WoFvQ
-         ZFz5Byr5hVIK6v4Jj+YdDvQaAr9o4KaNGGURtxtPAIfKVawiTb/l1/QAsv8jzNq4ncP1
-         yZnjfAcd+hnxG4A9rJP1T3ef33WQNDT1IyTVi/lrOgCMWzfV1nE8+lOz/TN6BHT63mSK
-         lY+Lg3dgwlwZCarsHHl5v2uWguTf6CpCOdRVBeLT2E4YIl0oOXltYDDZc/bEMbicYGy5
-         yIBGUDryB6YwaoWidpJpQQ5Yk0d/K72c8q2050aomcXZjZM/uDRVhdFSRweMriJyBJe5
-         HvwA==
-X-Forwarded-Encrypted: i=1; AJvYcCVuBU/Vd8+ae/0czEGp6/ROKmlw9YGW7Fycf90ZoTAAnOVmvM4WwgDmRD3UynavnlNdB7zCkfYZUth772xvpSWSJD+6oUbW
-X-Gm-Message-State: AOJu0YxT/ZluVn9382OxNZLsqsxBq4FQNjLTjZFkQn/UairJn+ndbgus
-	Nf/mFxhNjJ4yiQ+MCg2qN5lHmhJWB2vvmHtpPYUM8no4qE6Ysb6q8NUdITm9duIFDe/eI7B1HJs
-	EEuwo0OUgHl1HV5QCYu/ohaKqok1EDvBoRBO0oGAn8l6Igis8ZfhfDN9ld18TsIJv8xrghhIj9/
-	V7oV/rvB8Vv+7QHopVwzCLVoHJmD6M
-X-Received: by 2002:a05:6a00:2da8:b0:6e3:caa7:3038 with SMTP id fb40-20020a056a002da800b006e3caa73038mr17578682pfb.0.1709691131216;
-        Tue, 05 Mar 2024 18:12:11 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGl4PZPuFJ0olqInVg+AqysYzbnQ+rrxJBkjbXjsp25TBKsiiNedWHv7gUSdkMnZxnspiomxPm60AAem+z7c8w=
-X-Received: by 2002:a05:6a00:2da8:b0:6e3:caa7:3038 with SMTP id
- fb40-20020a056a002da800b006e3caa73038mr17578657pfb.0.1709691130621; Tue, 05
- Mar 2024 18:12:10 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709692133; x=1710296933;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n9CloCqaM+25WoaR2YknpneBnZb2s33DuZ5EXKAJgUk=;
+        b=YolUdJbcxIy6hnwFnD7UGLK9TQoSY2hg8Y4tMvNwCWhc9Y5VpNbcxZY4MxPc8MijSV
+         2kycjJT6ps+d+TVHe033PV7FcVhpGuvKxdb90IopgcDwKbeqSj5j+NImyM5KxCVE9lGr
+         nQpJluFE1kITQmrtFK7i7ex01+bb/kmluWp0K/RBUjEJadXVclImPf34GNiw8W7zfVR2
+         5fTSxS5SFcHX0iSGXM40H/cRSluze4qZjuO7k0keZWmUdfbS94K0+3MkaS42w9mWWLul
+         u48uAhfrH7afBwjHX6p+v84S3wCoghXJ2AoiaHweUdq5IcSILlg4KG7LvA0Q1xOlycFZ
+         vGvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWPcsyJfXp0yilUy88eyLV9tCpuPJ2Bxd2X2liKwMxQXrJRccrp6IvsCChnFhTZWUrBPYAJuuinDsRCqNb+XWNXPcnmFtur
+X-Gm-Message-State: AOJu0YxK6wGNpW9b0GHFA9V64bl0APrX7DudaUhD+OUuXVBMMZSNqWAC
+	d5d+pOaIXy2PViAir7793ukF+r2I7+DlIWGvq0hhoq2kLt5uDIJQEuLqKDhKKfc=
+X-Google-Smtp-Source: AGHT+IHKixed8Mkgk+0mpRfXfdBzYVdPnWZ0ptxrRYAk7Gk8YnML1zfyWGAr7RcPhYJE96tLslzelg==
+X-Received: by 2002:a05:6870:1786:b0:220:8d17:6ebd with SMTP id r6-20020a056870178600b002208d176ebdmr3863595oae.42.1709692133363;
+        Tue, 05 Mar 2024 18:28:53 -0800 (PST)
+Received: from [192.168.1.24] (71-212-18-124.tukw.qwest.net. [71.212.18.124])
+        by smtp.gmail.com with ESMTPSA id x35-20020a056a0018a300b006e5bdc19842sm7873904pfh.73.2024.03.05.18.28.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Mar 2024 18:28:52 -0800 (PST)
+Message-ID: <383c4870-167f-4123-bbf3-928db1463e01@davidwei.uk>
+Date: Tue, 5 Mar 2024 18:28:51 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
- <CACGkMEv+=k+RvbN2kWp85f9NWPYOPQtqkThdjvOrf5mWonBqvw@mail.gmail.com> <b263a27344ec4566b7b70e3165d3d918@huawei.com>
-In-Reply-To: <b263a27344ec4566b7b70e3165d3d918@huawei.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 6 Mar 2024 10:11:59 +0800
-Message-ID: <CACGkMEud8Q7fOn85GHGB0D7vcaTQihMYYhSaL=uGh=g1WHZ=HA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
-To: wangyunjian <wangyunjian@huawei.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, 
-	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, "kuba@kernel.org" <kuba@kernel.org>, 
-	"bjorn@kernel.org" <bjorn@kernel.org>, "magnus.karlsson@intel.com" <magnus.karlsson@intel.com>, 
-	"maciej.fijalkowski@intel.com" <maciej.fijalkowski@intel.com>, 
-	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, xudingke <xudingke@huawei.com>, 
-	"liwei (DT)" <liwei395@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next v6 09/15] memory-provider: dmabuf devmem
+ memory provider
+Content-Language: en-GB
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Pavel Begunkov <asml.silence@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+References: <20240305020153.2787423-1-almasrymina@google.com>
+ <20240305020153.2787423-10-almasrymina@google.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20240305020153.2787423-10-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 4, 2024 at 7:24=E2=80=AFPM wangyunjian <wangyunjian@huawei.com>=
- wrote:
->
->
->
-> > -----Original Message-----
-> > From: Jason Wang [mailto:jasowang@redhat.com]
-> > Sent: Monday, March 4, 2024 2:56 PM
-> > To: wangyunjian <wangyunjian@huawei.com>
-> > Cc: mst@redhat.com; willemdebruijn.kernel@gmail.com; kuba@kernel.org;
-> > bjorn@kernel.org; magnus.karlsson@intel.com; maciej.fijalkowski@intel.c=
-om;
-> > jonathan.lemon@gmail.com; davem@davemloft.net; bpf@vger.kernel.org;
-> > netdev@vger.kernel.org; linux-kernel@vger.kernel.org; kvm@vger.kernel.o=
-rg;
-> > virtualization@lists.linux.dev; xudingke <xudingke@huawei.com>; liwei (=
-DT)
-> > <liwei395@huawei.com>
-> > Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
-> >
-> > On Wed, Feb 28, 2024 at 7:06=E2=80=AFPM Yunjian Wang <wangyunjian@huawe=
-i.com>
-> > wrote:
-> > >
-> > > This patch set allows TUN to support the AF_XDP Tx zero-copy feature,
-> > > which can significantly reduce CPU utilization for XDP programs.
-> > >
-> > > Since commit fc72d1d54dd9 ("tuntap: XDP transmission"), the pointer
-> > > ring has been utilized to queue different types of pointers by
-> > > encoding the type into the lower bits. Therefore, we introduce a new
-> > > flag, TUN_XDP_DESC_FLAG(0x2UL), which allows us to enqueue XDP
-> > > descriptors and differentiate them from XDP buffers and sk_buffs.
-> > > Additionally, a spin lock is added for enabling and disabling operati=
-ons on the
-> > xsk pool.
-> > >
-> > > The performance testing was performed on a Intel E5-2620 2.40GHz
-> > machine.
-> > > Traffic were generated/send through TUN(testpmd txonly with AF_XDP) t=
-o
-> > > VM (testpmd rxonly in guest).
-> > >
-> > > +------+---------+---------+---------+
-> > > |      |   copy  |zero-copy| speedup |
-> > > +------+---------+---------+---------+
-> > > | UDP  |   Mpps  |   Mpps  |    %    |
-> > > | 64   |   2.5   |   4.0   |   60%   |
-> > > | 512  |   2.1   |   3.6   |   71%   |
-> > > | 1024 |   1.9   |   3.3   |   73%   |
-> > > +------+---------+---------+---------+
-> > >
-> > > Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
-> > > ---
-> > >  drivers/net/tun.c      | 177
-> > +++++++++++++++++++++++++++++++++++++++--
-> > >  drivers/vhost/net.c    |   4 +
-> > >  include/linux/if_tun.h |  32 ++++++++
-> > >  3 files changed, 208 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/drivers/net/tun.c b/drivers/net/tun.c index
-> > > bc80fc1d576e..7f4ff50b532c 100644
-> > > --- a/drivers/net/tun.c
-> > > +++ b/drivers/net/tun.c
-> > > @@ -63,6 +63,7 @@
-> > >  #include <net/rtnetlink.h>
-> > >  #include <net/sock.h>
-> > >  #include <net/xdp.h>
-> > > +#include <net/xdp_sock_drv.h>
-> > >  #include <net/ip_tunnels.h>
-> > >  #include <linux/seq_file.h>
-> > >  #include <linux/uio.h>
-> > > @@ -86,6 +87,7 @@ static void tun_default_link_ksettings(struct
-> > net_device *dev,
-> > >                                        struct
-> > ethtool_link_ksettings
-> > > *cmd);
-> > >
-> > >  #define TUN_RX_PAD (NET_IP_ALIGN + NET_SKB_PAD)
-> > > +#define TUN_XDP_BATCH 64
-> > >
-> > >  /* TUN device flags */
-> > >
-> > > @@ -146,6 +148,9 @@ struct tun_file {
-> > >         struct tun_struct *detached;
-> > >         struct ptr_ring tx_ring;
-> > >         struct xdp_rxq_info xdp_rxq;
-> > > +       struct xsk_buff_pool *xsk_pool;
-> > > +       spinlock_t pool_lock;   /* Protects xsk pool enable/disable *=
-/
-> > > +       u32 nb_descs;
-> > >  };
-> > >
-> > >  struct tun_page {
-> > > @@ -614,6 +619,8 @@ void tun_ptr_free(void *ptr)
-> > >                 struct xdp_frame *xdpf =3D tun_ptr_to_xdp(ptr);
-> > >
-> > >                 xdp_return_frame(xdpf);
-> > > +       } else if (tun_is_xdp_desc_frame(ptr)) {
-> > > +               return;
-> > >         } else {
-> > >                 __skb_array_destroy_skb(ptr);
-> > >         }
-> > > @@ -631,6 +638,37 @@ static void tun_queue_purge(struct tun_file *tfi=
-le)
-> > >         skb_queue_purge(&tfile->sk.sk_error_queue);
-> > >  }
-> > >
-> > > +static void tun_set_xsk_pool(struct tun_file *tfile, struct
-> > > +xsk_buff_pool *pool) {
-> > > +       if (!pool)
-> > > +               return;
-> > > +
-> > > +       spin_lock(&tfile->pool_lock);
-> > > +       xsk_pool_set_rxq_info(pool, &tfile->xdp_rxq);
-> > > +       tfile->xsk_pool =3D pool;
-> > > +       spin_unlock(&tfile->pool_lock); }
-> > > +
-> > > +static void tun_clean_xsk_pool(struct tun_file *tfile) {
-> > > +       spin_lock(&tfile->pool_lock);
-> > > +       if (tfile->xsk_pool) {
-> > > +               void *ptr;
-> > > +
-> > > +               while ((ptr =3D ptr_ring_consume(&tfile->tx_ring)) !=
-=3D NULL)
-> > > +                       tun_ptr_free(ptr);
-> > > +
-> > > +               if (tfile->nb_descs) {
-> > > +                       xsk_tx_completed(tfile->xsk_pool,
-> > tfile->nb_descs);
-> > > +                       if (xsk_uses_need_wakeup(tfile->xsk_pool))
-> > > +
-> > xsk_set_tx_need_wakeup(tfile->xsk_pool);
-> > > +                       tfile->nb_descs =3D 0;
-> > > +               }
-> > > +               tfile->xsk_pool =3D NULL;
-> > > +       }
-> > > +       spin_unlock(&tfile->pool_lock); }
-> > > +
-> > >  static void __tun_detach(struct tun_file *tfile, bool clean)  {
-> > >         struct tun_file *ntfile;
-> > > @@ -648,6 +686,11 @@ static void __tun_detach(struct tun_file *tfile,=
- bool
-> > clean)
-> > >                 u16 index =3D tfile->queue_index;
-> > >                 BUG_ON(index >=3D tun->numqueues);
-> > >
-> > > +               ntfile =3D rtnl_dereference(tun->tfiles[tun->numqueue=
-s -
-> > 1]);
-> > > +               /* Stop xsk zc xmit */
-> > > +               tun_clean_xsk_pool(tfile);
-> > > +               tun_clean_xsk_pool(ntfile);
-> > > +
-> > >                 rcu_assign_pointer(tun->tfiles[index],
-> > >                                    tun->tfiles[tun->numqueues - 1]);
-> > >                 ntfile =3D rtnl_dereference(tun->tfiles[index]);
-> > > @@ -668,6 +711,7 @@ static void __tun_detach(struct tun_file *tfile, =
-bool
-> > clean)
-> > >                 tun_flow_delete_by_queue(tun, tun->numqueues + 1);
-> > >                 /* Drop read queue */
-> > >                 tun_queue_purge(tfile);
-> > > +               tun_set_xsk_pool(ntfile,
-> > > + xsk_get_pool_from_qid(tun->dev, index));
-> > >                 tun_set_real_num_queues(tun);
-> > >         } else if (tfile->detached && clean) {
-> > >                 tun =3D tun_enable_queue(tfile); @@ -801,6 +845,7 @@
-> > > static int tun_attach(struct tun_struct *tun, struct file *file,
-> > >
-> > >                 if (tfile->xdp_rxq.queue_index    !=3D tfile->queue_i=
-ndex)
-> > >                         tfile->xdp_rxq.queue_index =3D
-> > > tfile->queue_index;
-> > > +               tun_set_xsk_pool(tfile, xsk_get_pool_from_qid(dev,
-> > > + tfile->queue_index));
-> > >         } else {
-> > >                 /* Setup XDP RX-queue info, for new tfile getting
-> > attached */
-> > >                 err =3D xdp_rxq_info_reg(&tfile->xdp_rxq, @@ -1221,11
-> > > +1266,50 @@ static int tun_xdp_set(struct net_device *dev, struct bpf=
-_prog
-> > *prog,
-> > >         return 0;
-> > >  }
-> > >
-> > > +static int tun_xsk_pool_enable(struct net_device *netdev,
-> > > +                              struct xsk_buff_pool *pool,
-> > > +                              u16 qid) {
-> > > +       struct tun_struct *tun =3D netdev_priv(netdev);
-> > > +       struct tun_file *tfile;
-> > > +
-> > > +       if (qid >=3D tun->numqueues)
-> > > +               return -EINVAL;
-> > > +
-> > > +       tfile =3D rtnl_dereference(tun->tfiles[qid]);
-> > > +       tun_set_xsk_pool(tfile, pool);
-> > > +
-> > > +       return 0;
-> > > +}
-> > > +
-> > > +static int tun_xsk_pool_disable(struct net_device *netdev, u16 qid) =
-{
-> > > +       struct tun_struct *tun =3D netdev_priv(netdev);
-> > > +       struct tun_file *tfile;
-> > > +
-> > > +       if (qid >=3D MAX_TAP_QUEUES)
-> > > +               return -EINVAL;
-> > > +
-> > > +       tfile =3D rtnl_dereference(tun->tfiles[qid]);
-> > > +       if (tfile)
-> > > +               tun_clean_xsk_pool(tfile);
-> > > +       return 0;
-> > > +}
-> > > +
-> > > +static int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buf=
-f_pool
-> > *pool,
-> > > +                             u16 qid) {
-> > > +       return pool ? tun_xsk_pool_enable(dev, pool, qid) :
-> > > +               tun_xsk_pool_disable(dev, qid); }
-> > > +
-> > >  static int tun_xdp(struct net_device *dev, struct netdev_bpf *xdp)  =
-{
-> > >         switch (xdp->command) {
-> > >         case XDP_SETUP_PROG:
-> > >                 return tun_xdp_set(dev, xdp->prog, xdp->extack);
-> > > +       case XDP_SETUP_XSK_POOL:
-> > > +               return tun_xsk_pool_setup(dev, xdp->xsk.pool,
-> > > + xdp->xsk.queue_id);
-> > >         default:
-> > >                 return -EINVAL;
-> > >         }
-> > > @@ -1330,6 +1414,19 @@ static int tun_xdp_tx(struct net_device *dev,
-> > struct xdp_buff *xdp)
-> > >         return nxmit;
-> > >  }
-> > >
-> > > +static int tun_xsk_wakeup(struct net_device *dev, u32 qid, u32 flags=
-)
-> > > +{
-> > > +       struct tun_struct *tun =3D netdev_priv(dev);
-> > > +       struct tun_file *tfile;
-> > > +
-> > > +       rcu_read_lock();
-> > > +       tfile =3D rcu_dereference(tun->tfiles[qid]);
-> > > +       if (tfile)
-> > > +               __tun_xdp_flush_tfile(tfile);
-> > > +       rcu_read_unlock();
-> > > +       return 0;
-> > > +}
-> >
-> > I may miss something but why not simply queue xdp frames into ptr ring =
-then
-> > we don't need tricks for peek?
->
-> The current implementation is implemented with reference to other NIC's d=
-rivers
-> (ixgbe, ice, dpaa2, mlx5), which use XDP descriptors directly.
+On 2024-03-04 18:01, Mina Almasry wrote:
+> +	if (pool->p.queue)
+> +		binding = READ_ONCE(pool->p.queue->binding);
+> +
+> +	if (binding) {
+> +		pool->mp_ops = &dmabuf_devmem_ops;
+> +		pool->mp_priv = binding;
+> +	}
 
-Well, they all do the same thing which is translate XDP descriptors to
-the vendor specific descriptor format.
+This is specific to TCP devmem. For ZC Rx we will need something more
+generic to let us pass our own memory provider backend down to the page
+pool.
 
-For TUN, the ptr_ring is the "vendor specific" format.
-
-> Converting XDP
-> descriptors to XDP frames does not seem to be very beneficial.
-
-Get rid of the trick for peek like what is done in this patch?
-
-Thanks
-
->
-> Thanks
-> >
-> > Thanks
->
-
+What about storing ops and priv void ptr in struct netdev_rx_queue
+instead? Then we can both use it.
 
