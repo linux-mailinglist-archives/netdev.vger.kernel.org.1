@@ -1,225 +1,185 @@
-Return-Path: <netdev+bounces-78129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CD8F874268
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:07:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 04CC687423A
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 22:58:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B55A8281991
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 22:07:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF2742867F3
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 21:58:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1637D1BDD8;
-	Wed,  6 Mar 2024 22:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7018D1B80B;
+	Wed,  6 Mar 2024 21:58:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="klMgy+h6"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="BUZb7EDl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36ECB1BC2C
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 22:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B1318EAB
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 21:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709762826; cv=none; b=BngqE1rxmc7l8T8J2tA9yxeWuE1EDrUr8et4u4epV6pKsbI1IoP5GknUATDCwGJ9Z7z6Xiz89y8SaIMsZfmqfhd13sOKBXINy1t0u5XOyqvPGxguXcT9irLBlwOWVSa52z5DygHmFlIKKpbb7CfbSgUNbMXEz6Ho1YCYbYSfIkk=
+	t=1709762291; cv=none; b=ozAgIm+/aLyuWWacVJeO+5BTfpF5WXIBuMMswKA8O4fQag5HSf93ZJsJ55hnrtCdCva8GWz1AfDI7Xw4NvaxbYAfO+fMccelmgBBhYn4F5TbPFZBHWbwa5w4vsSvTETvn8Kn8EU3gqHQC2jMsRJeXtR5S1rYlLtb6ORudEzio4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709762826; c=relaxed/simple;
-	bh=olhdBGhQA51rojTLB+NTNAlCwo0/WLbnmnMk/hQt4Xo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c811kYTtlSmwFfwueDzsAfSWom1nUiXuVA7aakNKyyvcZSR5FVF++C1sGhQ6FJbsZbb2s8ofsYdNsdw70ayF1hjwCLT3wcTclPQn7fhP1vh7R/hrWklnX/3qx/7eirnvV0sDbcHADZ7bCOBoxh++JK/PLrDq/isqJYMbzJkiyDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=klMgy+h6; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709762825; x=1741298825;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=olhdBGhQA51rojTLB+NTNAlCwo0/WLbnmnMk/hQt4Xo=;
-  b=klMgy+h6Pffl78+QPU/WpWFEbOqt5baTJu4UQOARAAVxKwxVHe3iXMDb
-   UzOxcEQHcpEcbo/J+yrFcHYoalurBn/2rDVK0hWeyrl2ZErvxXgPxh/Wy
-   ho44PsRS/UxNHtB8G6BaTy7Hisuon31mGAn8LPWvJJVoRUDB7gDs11JK5
-   I3l6q0WsqcP8pYqfC41OkQna4baP6ayZlAvL7NYfSeFHPxWdgDDSZDAJD
-   hl/L4yz78TPdSyL/BkPB3CT8Thqz0jYZX3dCl85YvbtmS6G/5iqI/ZrUq
-   c6/NdsDAELydSUNNyhM5DjvSu4D5GCF4vn9/KufdQp9mNR+K5Zs9n9V0e
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11005"; a="4982633"
-X-IronPort-AV: E=Sophos;i="6.06,209,1705392000"; 
-   d="scan'208";a="4982633"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 13:56:21 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,209,1705392000"; 
-   d="scan'208";a="9979678"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa008.fm.intel.com with ESMTP; 06 Mar 2024 13:56:20 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	anthony.l.nguyen@intel.com
-Subject: [PATCH net-next 3/3] ixgbe: pull out stats update to common routines
-Date: Wed,  6 Mar 2024 13:56:13 -0800
-Message-ID: <20240306215615.970308-4-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240306215615.970308-1-anthony.l.nguyen@intel.com>
-References: <20240306215615.970308-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1709762291; c=relaxed/simple;
+	bh=LjR7uSRWL7qlsepDww3UOtblylYQ0q75pleWtOAPta4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z7sLCh7O/ubJluybW6PdFLmwoVLn3haMDOJkb8kqpjY5ZDhX2MP1ryPikVWqAYPHA69meA/uXydITCYi20drjEJOIvseXYuL72fBzS9344zowdHIj7hmKvJfV/qLbN9+GRCSdh758Oh3WiukpeYKWcqEbqYdLFBLTLZsYlIdQ0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=BUZb7EDl; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56454c695e6so537563a12.0
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 13:58:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1709762288; x=1710367088; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=LjR7uSRWL7qlsepDww3UOtblylYQ0q75pleWtOAPta4=;
+        b=BUZb7EDlJh+/yW7XCiRHsX8heX5Lkw9tjkEEatvq5C6mxs/ey9ZERo4Js3RiBxp0q0
+         OupSW1AFBq/Aqy0K4nZTw5oMoAB312RpCJtYpkMLSDes3pGTe8f5nFZysFr8GHkeuETq
+         a4Lg0WEJdsbn7bxpcMu3vJUaJk8DWAnCGdMPc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709762288; x=1710367088;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LjR7uSRWL7qlsepDww3UOtblylYQ0q75pleWtOAPta4=;
+        b=rI8o0egZ8aEDAFSCRtVI+2uxGik8rtA5wftMTDCzhScL/snSN9v73BF0jGWyxvgBA7
+         I9Tf49pU6SYx9NI8jSws+cqKlxJj3upg/FI+4nPqIGlF3xOQzPFx/X0qD/wk2ix/ALvb
+         4fi0pC4+u4aDyNm2yZprRZTrzdYN+ZheYcFlxvmOG95HMT5b7Kqr7PablODPF6VDLdmx
+         GmK17PeSpT/GRcQDg9NpiixRTFaQlS+yYpFTn1P0dmLa8AIf6s0r9Umq4WWknLyI/Q/y
+         VvNMSh9oNCprJfSJDKvsXbafaRji734Ilsyd+eOmZPyP0IJjCLfVL7Dr9XURRkf4uUPk
+         D1kg==
+X-Forwarded-Encrypted: i=1; AJvYcCUAeA++GjG3K0xWB/MuUrSIc/Pxqzf/Tt+O86+GZojTplGetX1HqzZmswQPY71KG57CZkXsmPBaBzTJXuML4Vb+AIkj5QoQ
+X-Gm-Message-State: AOJu0YxV2ekJ3aHlc7zgFKJU+d3oz4iM6Ao9gkKiPozGh6iDND8zEGo5
+	7nHe4bvTIk3PhV15niH0HV8RFwMXZAkkhM0msR+E7fzBIQ0vCAbPtlYM5eS1nfCkuMxzPGSXx0i
+	bR1hLH5OsWY155fV/vZG0DBPsWDQlcOm5ipl7
+X-Google-Smtp-Source: AGHT+IFne3/T2J8WsM+QQglJEH8VKn1P/3EGiO7GbWEEAB4r3kUeFfiZXxmkiLGyoF3k6gi1fmGHdVgb38GPE2FmZtA=
+X-Received: by 2002:a05:6402:214e:b0:567:6a66:d104 with SMTP id
+ bq14-20020a056402214e00b005676a66d104mr7119373edb.15.1709762287034; Wed, 06
+ Mar 2024 13:58:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240306195509.1502746-1-kuba@kernel.org> <20240306195509.1502746-4-kuba@kernel.org>
+In-Reply-To: <20240306195509.1502746-4-kuba@kernel.org>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Wed, 6 Mar 2024 13:57:56 -0800
+Message-ID: <CACKFLinqQ8gh1j7gCAtKe9DAZfUNSPys9ZBJHWacZBS8rC+8jw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 3/3] eth: bnxt: support per-queue statistics
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, amritha.nambiar@intel.com, danielj@nvidia.com, 
+	mst@redhat.com, sdf@google.com, przemyslaw.kitszel@intel.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000d689300613050d8b"
 
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+--000000000000d689300613050d8b
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Introduce ixgbe_update_{r,t}x_ring_stats() that will be used by both
-standard and ZC datapath.
+On Wed, Mar 6, 2024 at 11:55=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Support per-queue statistics API in bnxt.
+>
+> ...
+>
+> Acked-by: Stanislav Fomichev <sdf@google.com>
+> Reviewed-by: Amritha Nambiar <amritha.nambiar@intel.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> v3: fix mapping the ring index to ring w/ XDP present
+> ---
 
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 54 ++++++++++++++-----
- .../ethernet/intel/ixgbe/ixgbe_txrx_common.h  |  7 +++
- drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c  | 17 ++----
- 3 files changed, 53 insertions(+), 25 deletions(-)
+Thanks.
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 595098a4c488..2e352bfcc401 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -1105,6 +1105,44 @@ static int ixgbe_tx_maxrate(struct net_device *netdev,
- 	return 0;
- }
- 
-+/**
-+ * ixgbe_update_tx_ring_stats - Update Tx ring specific counters
-+ * @tx_ring: ring to update
-+ * @q_vector: queue vector ring belongs to
-+ * @pkts: number of processed packets
-+ * @bytes: number of processed bytes
-+ */
-+void ixgbe_update_tx_ring_stats(struct ixgbe_ring *tx_ring,
-+				struct ixgbe_q_vector *q_vector, u64 pkts,
-+				u64 bytes)
-+{
-+	u64_stats_update_begin(&tx_ring->syncp);
-+	tx_ring->stats.bytes += bytes;
-+	tx_ring->stats.packets += pkts;
-+	u64_stats_update_end(&tx_ring->syncp);
-+	q_vector->tx.total_bytes += bytes;
-+	q_vector->tx.total_packets += pkts;
-+}
-+
-+/**
-+ * ixgbe_update_rx_ring_stats - Update Rx ring specific counters
-+ * @rx_ring: ring to update
-+ * @q_vector: queue vector ring belongs to
-+ * @pkts: number of processed packets
-+ * @bytes: number of processed bytes
-+ */
-+void ixgbe_update_rx_ring_stats(struct ixgbe_ring *rx_ring,
-+				struct ixgbe_q_vector *q_vector, u64 pkts,
-+				u64 bytes)
-+{
-+	u64_stats_update_begin(&rx_ring->syncp);
-+	rx_ring->stats.bytes += bytes;
-+	rx_ring->stats.packets += pkts;
-+	u64_stats_update_end(&rx_ring->syncp);
-+	q_vector->rx.total_bytes += bytes;
-+	q_vector->rx.total_packets += pkts;
-+}
-+
- /**
-  * ixgbe_clean_tx_irq - Reclaim resources after transmit completes
-  * @q_vector: structure containing interrupt and ring information
-@@ -1207,12 +1245,8 @@ static bool ixgbe_clean_tx_irq(struct ixgbe_q_vector *q_vector,
- 
- 	i += tx_ring->count;
- 	tx_ring->next_to_clean = i;
--	u64_stats_update_begin(&tx_ring->syncp);
--	tx_ring->stats.bytes += total_bytes;
--	tx_ring->stats.packets += total_packets;
--	u64_stats_update_end(&tx_ring->syncp);
--	q_vector->tx.total_bytes += total_bytes;
--	q_vector->tx.total_packets += total_packets;
-+	ixgbe_update_tx_ring_stats(tx_ring, q_vector, total_packets,
-+				   total_bytes);
- 	adapter->tx_ipsec += total_ipsec;
- 
- 	if (check_for_tx_hang(tx_ring) && ixgbe_check_tx_hang(tx_ring)) {
-@@ -2429,12 +2463,8 @@ static int ixgbe_clean_rx_irq(struct ixgbe_q_vector *q_vector,
- 		ixgbe_xdp_ring_update_tail_locked(ring);
- 	}
- 
--	u64_stats_update_begin(&rx_ring->syncp);
--	rx_ring->stats.packets += total_rx_packets;
--	rx_ring->stats.bytes += total_rx_bytes;
--	u64_stats_update_end(&rx_ring->syncp);
--	q_vector->rx.total_packets += total_rx_packets;
--	q_vector->rx.total_bytes += total_rx_bytes;
-+	ixgbe_update_rx_ring_stats(rx_ring, q_vector, total_rx_packets,
-+				   total_rx_bytes);
- 
- 	return total_rx_packets;
- }
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_txrx_common.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_txrx_common.h
-index f1f69ce67420..78deea5ec536 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_txrx_common.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_txrx_common.h
-@@ -46,4 +46,11 @@ bool ixgbe_clean_xdp_tx_irq(struct ixgbe_q_vector *q_vector,
- int ixgbe_xsk_wakeup(struct net_device *dev, u32 queue_id, u32 flags);
- void ixgbe_xsk_clean_tx_ring(struct ixgbe_ring *tx_ring);
- 
-+void ixgbe_update_tx_ring_stats(struct ixgbe_ring *tx_ring,
-+				struct ixgbe_q_vector *q_vector, u64 pkts,
-+				u64 bytes);
-+void ixgbe_update_rx_ring_stats(struct ixgbe_ring *rx_ring,
-+				struct ixgbe_q_vector *q_vector, u64 pkts,
-+				u64 bytes);
-+
- #endif /* #define _IXGBE_TXRX_COMMON_H_ */
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-index 59798bc33298..d34d715c59eb 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-@@ -359,12 +359,8 @@ int ixgbe_clean_rx_irq_zc(struct ixgbe_q_vector *q_vector,
- 		ixgbe_xdp_ring_update_tail_locked(ring);
- 	}
- 
--	u64_stats_update_begin(&rx_ring->syncp);
--	rx_ring->stats.packets += total_rx_packets;
--	rx_ring->stats.bytes += total_rx_bytes;
--	u64_stats_update_end(&rx_ring->syncp);
--	q_vector->rx.total_packets += total_rx_packets;
--	q_vector->rx.total_bytes += total_rx_bytes;
-+	ixgbe_update_rx_ring_stats(rx_ring, q_vector, total_rx_packets,
-+				   total_rx_bytes);
- 
- 	if (xsk_uses_need_wakeup(rx_ring->xsk_pool)) {
- 		if (failure || rx_ring->next_to_clean == rx_ring->next_to_use)
-@@ -499,13 +495,8 @@ bool ixgbe_clean_xdp_tx_irq(struct ixgbe_q_vector *q_vector,
- 	}
- 
- 	tx_ring->next_to_clean = ntc;
--
--	u64_stats_update_begin(&tx_ring->syncp);
--	tx_ring->stats.bytes += total_bytes;
--	tx_ring->stats.packets += total_packets;
--	u64_stats_update_end(&tx_ring->syncp);
--	q_vector->tx.total_bytes += total_bytes;
--	q_vector->tx.total_packets += total_packets;
-+	ixgbe_update_tx_ring_stats(tx_ring, q_vector, total_packets,
-+				   total_bytes);
- 
- 	if (xsk_frames)
- 		xsk_tx_completed(pool, xsk_frames);
--- 
-2.41.0
+--000000000000d689300613050d8b
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIB6qciJo/eLjqKkua/TYb2XVZzYvo6jI
+pF/HXfYx3wcLMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDMw
+NjIxNTgwOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQAkurfwMyHgAYi34wk4WsJabBCF1HYuz2Zuuvm9DkSS8xODqQWF
+Od6bG5/ZbSoDVI+lxtll4vfHjDEsiJqjD4uxSxkznuRjROPjxcJ9xuJcPzRbx1QG/F1qvmhJibeu
++IIrDof+ASYCg1yw8o8631ltQSd2654J79fb5v/0G/YREqtYcYlgR3sj2i0HDW6d2SeKaCU8ux/C
+PoAyKWv/get2gt5Fi0/8fFb9ftXQTMYQN1VvEPlTWXgJ340Ys6ggRBWkrBj2HnAwAYGu2ONsLdkI
+C1k/qGgzc2EAGRbjXXGqiLrELKg/iX44+02Vfxn2QSl0YY2CVcLZ3r1n8a0yl1WM
+--000000000000d689300613050d8b--
 
