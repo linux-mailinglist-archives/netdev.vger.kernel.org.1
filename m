@@ -1,201 +1,242 @@
-Return-Path: <netdev+bounces-77939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F43B873818
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:48:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0D4187381A
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:48:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81A051C21BC9
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:48:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66EA028582B
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DA0131742;
-	Wed,  6 Mar 2024 13:48:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B5A13173F;
+	Wed,  6 Mar 2024 13:48:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ifg9OjED"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HFf90S45"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E9D3131735;
-	Wed,  6 Mar 2024 13:48:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709732906; cv=none; b=k6Ib7M07w/np5oWzpsHj9vwyw2yqYPPPUhOHiYbA6jkTDPacNSPr2R/MQfuOuElJ0xv/ice9zRmgMvYd1m9JtYYb7q38R5skB9U4eXObvF7S9328XC8x6crce/GDVcdXBnmQ1y44+cKtbzE+OF5BrdvMZnnJLohDYcZhBe5vtt8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709732906; c=relaxed/simple;
-	bh=VDpu+cZ5zhuVvsVsTCuRVqA9E8ZW3/PpKW/5AAaYH/4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F0/vcK9NoiOr+VKFu7MY4oR7Gt2K3jxIbzNrFJVN48qqLv+VwjkGVJ5xzg9J95eSEPDcomxsLhX1Lj0Oz84eSO1pJiduIT+sJH7IQFbxuOz7Y/8sMev894UWHN2iSqDhr+xlffu/CjelrTb36I1mCMmg21tl5HX6VgxgxeThH8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ifg9OjED; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C44AC433C7;
-	Wed,  6 Mar 2024 13:48:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709732906;
-	bh=VDpu+cZ5zhuVvsVsTCuRVqA9E8ZW3/PpKW/5AAaYH/4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ifg9OjEDqjVXKXLDmpO4SCEBdlsfBBcnZ8ZKk+7pZyKeRpXEo5x9Yup3aKaXnEnyj
-	 LJ8Q4G84VFcz2nG2o65TwiB3Qxnz6Er9ZJ81Mjk/8yttaBdX60g/YSu7U4/PHOmfh4
-	 O9IGCRMeZzR7BZrX/E1TR//IqLXmQffo2f82EBAia8xhjTSXRCbuhCbOfJ+/j71LY6
-	 bwXjrxCzh/yANUKzZPoUm7A5UoHxAzx8YxCdAeLpEFkaaO3QskrqqRLu2YoY7dw6Ji
-	 jwrfuUJ8PZ9czksjfAnaLt04UZ2/5vWz8IyRV6tWH3i9fr/LCji74UD7WdUgG2Xw64
-	 GdC3RFFKG2ifQ==
-Message-ID: <8a8b4320-924a-4dd3-973b-ca941489f19b@kernel.org>
-Date: Wed, 6 Mar 2024 15:48:20 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6B8131735
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 13:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709732913; cv=fail; b=gOYRaQ8CJeyIRuCPfl5oR/xhWhJbjiDeWR0zbW8QN3PFffV71zoSYU6SoE5yrymST8HChBtL9uUpj1ICfy3YtKtOaSueCyqice9Kr7cHySeQA0dqCZrIbbGwZrFBDImXQPHqDQr3k08rrLKeDWdtQ5fLzfNgqjQnqghq7G0CGd0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709732913; c=relaxed/simple;
+	bh=/LlZt2taAaEo0mt4oPk0Rj1Zjo+3h5eI8gN3sRKH9cc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=CooQ2RhFe3kO0TSWo+aQVLReJ5ZKdo8WUyT1va3QN3B5tvVaGgw1OAZEs4Sdau2rKh/Tjbm7DmjfGg+m5Yzfzlt6xxRQJfJA9HBzkmyG5KSddfyRoUTkgp/P36CO2JKV+nL9HXfHuZqE+dQxqvUPqRU1vIxJSw2hl+h55qKibpg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HFf90S45; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709732911; x=1741268911;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=/LlZt2taAaEo0mt4oPk0Rj1Zjo+3h5eI8gN3sRKH9cc=;
+  b=HFf90S455inU0uvkIIUcmxSpWAwr7qsSRAWgRlaUjT+tjzXysCzxEwoS
+   RiWWnrcm1EAnsYIOJP6D+e2tI7QSmNevkbPMWlwUAyue0+5QyjWlwFmV7
+   LXBKDSqLoLH9HHDj0iH6NlgB3I/Yyvcuqe7zLszwev/RSSDsU5muPUGqt
+   JJh/ODFvFG1XSxSi1VzEF/1Yw3qBM5jRUnSOKxcgM4QeJJQqZpb+OzJ58
+   0NMoAvt7lSGV6cJmIJHpNZUIFalhgYBRRmfZ7wPxtEwDVLMR7VyqBT09a
+   XTHxmTzYOpjINOaJxupRgxr5IEg2sr8HXTYwgW5z40Xh12Gt8+tdRNQem
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="14996297"
+X-IronPort-AV: E=Sophos;i="6.06,208,1705392000"; 
+   d="scan'208";a="14996297"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 05:48:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,208,1705392000"; 
+   d="scan'208";a="14321465"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Mar 2024 05:48:28 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 6 Mar 2024 05:48:27 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 6 Mar 2024 05:48:27 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 6 Mar 2024 05:48:27 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 6 Mar 2024 05:48:27 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ecmrZAoRBh7gowhwhmMnG1/qfR7zaWcqIsYPiJ/6EQEIG2yesUcoEjadMhGYk0qSOyLtzxoaS9xhrIpIVd/TjHx7zy06EGgqMmqsgxpiy2emv7lTBt2Q0LmyC0D1MmiYfCCk+KqReca1ICQ1WZ5z06/jYckW1VvXc87zNf8VhqVspm5jYDqOLzbljzyl3pDbblswGdoUB/VcK/Ste7AcYEIXYxwQgD+F0zK+LiUr5VnWuwQ/skzqIePNiUQJYljcEF+8zYcTJuXLcBILihd1g3xiYOb9V69Ka7A5VJeblHK6PiCbIOYrE1W+HS1ee9X1VBF7t0kw20v5r+bNfGT7Ew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2fsf9V+xPwc5XhHdfymbBG1OD0Youj+TXW3rz62+kXQ=;
+ b=bRP3dDmME04mobzXS8jd1hPBvCUOpe6TbkItOXIHncDyfBjgmXtv369cdEztWyE5lCz6prhhmK3FltwRYDa+acpFIAytVcGg/NB9/1H1s+ut9ww8ua5KhHbZWbzeuLUDWQ0UtDVrREb17O/HdH+s8TbiMRzfz07jgiR9ZIDjpRsG68oWj0qX7PBvJZa563E42IIrejVUvpqOU53Pitp6vVvv2oJtx4/pgLLLWI++1/S1KdwhYvcSkQ3UUSoCzLOiYPd2yKctOcMa5J8t/N4E6SyBSNl5NQwK7tVIWVyS+68Wat9g59975QOm/e0+TWBJXxJwNQD+pQolXssf8YEruw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB7942.namprd11.prod.outlook.com (2603:10b6:208:3fa::21)
+ by PH7PR11MB6053.namprd11.prod.outlook.com (2603:10b6:510:1d1::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Wed, 6 Mar
+ 2024 13:48:25 +0000
+Received: from IA1PR11MB7942.namprd11.prod.outlook.com
+ ([fe80::7722:52b4:6061:a38e]) by IA1PR11MB7942.namprd11.prod.outlook.com
+ ([fe80::7722:52b4:6061:a38e%3]) with mapi id 15.20.7339.024; Wed, 6 Mar 2024
+ 13:48:24 +0000
+From: "Sharma, Mayank" <mayank.sharma@intel.com>
+To: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Zou, Steven" <steven.zou@intel.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Staikov, Andrii"
+	<andrii.staikov@intel.com>, "Lobakin, Aleksander"
+	<aleksander.lobakin@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "horms@kernel.org" <horms@kernel.org>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Buvaneswaran, Sujai"
+	<sujai.buvaneswaran@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next] ice: Add switch recipe reusing
+ feature
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next] ice: Add switch recipe
+ reusing feature
+Thread-Index: AQHaWj9RFF4lJ+IEYEuth4p3GXqMU7Eq4VkwgAABp0A=
+Date: Wed, 6 Mar 2024 13:48:24 +0000
+Message-ID: <IA1PR11MB79422EFDCA5CDD7EC60125C0F4212@IA1PR11MB7942.namprd11.prod.outlook.com>
+References: <20240208031837.11919-1-steven.zou@intel.com>
+ <PH0PR11MB5013D1C2AD784512CA70173396212@PH0PR11MB5013.namprd11.prod.outlook.com>
+In-Reply-To: <PH0PR11MB5013D1C2AD784512CA70173396212@PH0PR11MB5013.namprd11.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB7942:EE_|PH7PR11MB6053:EE_
+x-ms-office365-filtering-correlation-id: 3c7adb62-a080-49f7-ff22-08dc3de41840
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: b4CaWCMfTYRQ0MfS0fFxD9DGPH2OSIU4TzQxa1pwYgKQooYmq0yoKbb7FAl+3wQ+WTdhmpiZ49xH67Hopu7WRpQJKFTinoH7d53DiWy+Wt3e32WeUcWnN+k7DLUrCD5Z+IXK0/7ppSJIFcBemltvmmaEFCbRQjSFw6z1rIku9AKgxmCsV9NS52Z6NzxUkHwZVBxD3F+G+98slZDxFmy5bAPktEZUCDCdc66eSz3b3zc/+NcW6tgCor+lGSHqyVxqHIVYWNmWaXYrs2JAqhowuSeuSKg2aFLm+/F8MqUz01thwmgvxs5eM64AFhSiYIf4dg6RPXvSM5rR9FXrYLcilNDMj+nB83W+GCQfYsGRoMtofMEBvNZoJbcGq3TC1+2Gwv1/f/nfkuGF5Aj9FnpfQ62Fb7+LdokHjOFlQ6rU8evXibgV9uqxynOml3nMgpXYtBcbdoQWCEgnFeOSjYnlX1qPUXAqKhQJoGzOCiTjNjEESgs3q5SVaTKjqoUtskoL7TsQSvVt2FWZK7sXnQ/TM7IbBZg15hQQ2Zxkrfv7kLeWz0L93Q0kPS5Lvyg9NNdn3oWwSQvfxDvTzsvS6sn9CCQzvSzZdauRmCzvsMxgc+ExSB7lWW4XUiEtDWY0PYnByxbLamnIkOlX1e8bykEnAtxNKfmq8O06IxGM9uk/F/1Zh/9b+CvIGgFaAbYnB1A2k1AkcVYudlpWNCljaV0aR1/aZ2An9kolc2nRq2Ywai8=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB7942.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?jVdZm1e7lHZh3kboII9USxAklvfW2ylOfbzMAie0OE8SQWwvzh4W1OkIqzJs?=
+ =?us-ascii?Q?vHAPWG0/Dhs7wdqHjUM4QXdI0mnWfJGMC6gHFg3PS42WBVIcvG5iMqIYwCKJ?=
+ =?us-ascii?Q?h7W6wA3GThaOOsnFRSqYem4JA0xjjPphNMLsMjjJ8aEwiViDJoMbTWjvY1iv?=
+ =?us-ascii?Q?Hntpk8a6Pn/KdNXFzyBZ5hjOYYw/kDXgtxiaOaA5ZQnfS97vtwvrvREQ+7e2?=
+ =?us-ascii?Q?ChsnLgog4u+OZXjbIJsX4swSISZSkVCASaaFlkggKinQJBXOWIsEunMdapD7?=
+ =?us-ascii?Q?4tJVd7U9HaEbCAy0lv3kKfRsmOB3kuGPmTpslmcylW+uSHIorLj8ORCKHGNY?=
+ =?us-ascii?Q?Snsh2lASzahlIAAa4pPj8JsN8q3o6vmi0wQGndjGcbBC6TnNrKPE3Ed00Vef?=
+ =?us-ascii?Q?A3eFkRIYe9uY7J9CugCQ99l0IFa4O12JvpmMMqiLEUXiAl0taj0eMl2yOtWz?=
+ =?us-ascii?Q?JJctIjN4hSuVVu/BNqHmTTq0TAg9EJy0ROhRNQKKzddJV1IrzzRX2P/Ecd5x?=
+ =?us-ascii?Q?i5JYv4zzSAa+N9bIeFH7gnxZKKQhAehpf2KTXK3w+gEvWK63vGFqFdWrEILU?=
+ =?us-ascii?Q?7FygCP0N0LZCQdEqcJMI2ph3Hsl5kpe1WlwgigCl4Q8t7XxeKTDBaVZfBqv6?=
+ =?us-ascii?Q?eASpNH4s/O/txyf81FPRVs3s1XZ1y1z5eZAzFsC81ChyXFgfeXdrgPvqELJx?=
+ =?us-ascii?Q?hM695iVw+iykilfwGtOfbsnk9qqkeN7b0gyu/GQM0Li/A1A0LsDoIvW2hbbJ?=
+ =?us-ascii?Q?kkzp6zmXyT51ekfbUkt4Kh3ijsDHMlCocUyV5O8SJwNjzP7lD+CDHMhaVip1?=
+ =?us-ascii?Q?t75vGFVFHKtKYsqAUNzeXNn15RCJ9f6ixNYXHC8RInT9b/ReCLXhdz3B1KYZ?=
+ =?us-ascii?Q?QSglXqerz9EG9jPzjX9ZxU5HWzvQQV0ApmKvHrAQq3iXxi5wsgaopGc9lv9s?=
+ =?us-ascii?Q?+0v/D8Ik0NMhwHdh+fbBGIBcSf/3aVTy06ghLD+26DBniASwXF/wzIYnlY10?=
+ =?us-ascii?Q?a5bIQ1poTQpvKBnn2+EuFHd3V2tbfGYtq7/XjNyTIQH9MX4fU3ZaCB3CpLBj?=
+ =?us-ascii?Q?A7t9RZw/0N+OUbBdoyYmcxwWSD7Qt5bm/oR7AiA/xDhhtBEL3uokwNUFGuzu?=
+ =?us-ascii?Q?u8HuLYtmYHQj81Y4EodwxUhTyz3kWw15m8QMUrsGaPxDxJ0WyvxSzSGrpsQW?=
+ =?us-ascii?Q?M9AIvqL2JQJZTyZ0QFJnzmCKdN02TcM03QH+6zCklPMPtI8LkDqWPfEb/C0i?=
+ =?us-ascii?Q?v9wQvgVEnVnR175dL6G67ABPrLV4MTjGE9TE0TSShIEBQgUB2mGseiaL1eKt?=
+ =?us-ascii?Q?fYGuAZr1bd0uqk9vZBhhE6uyqgHf8Ta5E5pJ/FchIgx6kCDSSRaOVJkLHqKL?=
+ =?us-ascii?Q?PN2Y6ncnYt+SGyQ4dPgEaMp0RapbCGMpddY20hDRjzgVoVp9pNAmiwmI7thQ?=
+ =?us-ascii?Q?agrQB2FZ9iXD9yfS52nmyKUYu0SqwLmjqJXlg1JQbC6hq5k6yVJzMw34mh4z?=
+ =?us-ascii?Q?XZ+8rr9yqDuYMJJb9QY3T/X5zrO0YlUhSg/0q0XHW0tGucIdL+sXmXUc+gTE?=
+ =?us-ascii?Q?sAbBbTOc3IHk5LpoLul7/UJhd8kuSMe8sr4j1+Ay?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net RESEND] net: ethernet: ti: am65-cpsw: Add
- IFF_UNICAST_FLT flag to port device
-Content-Language: en-US
-To: =?UTF-8?B?U2FuanXDoW4gR2FyY8OtYSwgSm9yZ2U=?=
- <Jorge.SanjuanGarcia@duagon.com>, "olteanv@gmail.com" <olteanv@gmail.com>,
- "r-gunasekaran@ti.com" <r-gunasekaran@ti.com>
-Cc: "s-vadapalli@ti.com" <s-vadapalli@ti.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "andrew@lunn.ch" <andrew@lunn.ch>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
- "kuba@kernel.org" <kuba@kernel.org>,
- "edumazet@google.com" <edumazet@google.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>, Pekka Varis <p-varis@ti.com>
-References: <20240228111300.2516590-1-jorge.sanjuangarcia@duagon.com>
- <20240228200516.1166a097@kernel.org>
- <03bf515c-9f90-487c-ecfa-90d407dc5d86@ti.com>
- <20240301154957.xex75zuijptswcf3@skbuf>
- <7a39e5266fa3ac781f1eda7ee0b2526bd2f164d0.camel@duagon.com>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <7a39e5266fa3ac781f1eda7ee0b2526bd2f164d0.camel@duagon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB7942.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3c7adb62-a080-49f7-ff22-08dc3de41840
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Mar 2024 13:48:24.8101
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2HK9sX0Aq63B8HjSjxCDygf5dFwfBzWqQDdnY//85ixXs4kpDcUlTeZcwBL8xs5JcajHsm2nukkHO/9krRZdXA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6053
+X-OriginatorOrg: intel.com
+
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of S=
+teven
+> Zou
+> Sent: Thursday, February 8, 2024 8:49 AM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Zou, Steven <steven.zou@intel.com>; Staikov, =
+Andrii
+> <andrii.staikov@intel.com>; Lobakin, Aleksander
+> <aleksander.lobakin@intel.com>; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; Simon Horman <horms@kernel.org>; Kitszel,
+> Przemyslaw <przemyslaw.kitszel@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next] ice: Add switch recipe reusin=
+g feature
+>=20
+> New E810 firmware supports the corresponding functionality, so the driver=
+ allows
+> PFs to subscribe the same switch recipes. Then when the PF is done with a=
+ switch
+> recipes, the PF can ask firmware to free that switch recipe.
+>=20
+> When users configure a rule to PFn into E810 switch component, if there i=
+s no
+> existing recipe matching this rule's pattern, the driver will request fir=
+mware to
+> allocate and return a new recipe resource for the rule by calling
+> ice_add_sw_recipe() and ice_alloc_recipe(). If there is an existing recip=
+e
+> matching this rule's pattern with different key value, or this is a same =
+second rule
+> to PFm into switch component, the driver checks out this recipe by callin=
+g
+> ice_find_recp(), the driver will tell firmware to share using this same r=
+ecipe
+> resource by calling ice_subscribable_recp_shared() and ice_subscribe_reci=
+pe().
+>=20
+> When firmware detects that all subscribing PFs have freed the switch reci=
+pe,
+> firmware will free the switch recipe so that it can be reused.
+>=20
+> This feature also fixes a problem where all switch recipes would eventual=
+ly be
+> exhausted because switch recipes could not be freed, as freeing a shared =
+recipe
+> could potentially break other PFs that were using it.
+>=20
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Reviewed-by: Andrii Staikov <andrii.staikov@intel.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Steven Zou <steven.zou@intel.com>
+> ---
+>  .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   2 +
+>  drivers/net/ethernet/intel/ice/ice_common.c   |   2 +
+>  drivers/net/ethernet/intel/ice/ice_switch.c   | 187 ++++++++++++++++--
+>  drivers/net/ethernet/intel/ice/ice_switch.h   |   1 +
+>  drivers/net/ethernet/intel/ice/ice_type.h     |   2 +
+>  5 files changed, 177 insertions(+), 17 deletions(-)
+>=20
+
+We are seeing following kernel compilation error while compiling next kerne=
+l:
+
+"error: dereferencing pointer to incomplete type 'struct dpll_pin'"
+
+Regards,
+Mayank Sharma
 
 
-
-On 04/03/2024 12:27, Sanjuán García, Jorge wrote:
-> On Fri, 2024-03-01 at 17:49 +0200, Vladimir Oltean wrote:
->> [No suele recibir correo electrónico de olteanv@gmail.com. Descubra
->> por qué esto es importante en
->> https://aka.ms/LearnAboutSenderIdentification ]
->>
->> On Fri, Mar 01, 2024 at 04:39:50PM +0530, Ravi Gunasekaran wrote:
->>> On 2/29/24 9:35 AM, Jakub Kicinski wrote:
->>>> On Wed, 28 Feb 2024 11:13:23 +0000 Sanjuán García, Jorge wrote:
->>>>> Since commit 8940e6b669ca ("net: dsa: avoid call to
->>>>> __dev_set_promiscuity()
->>>>> while rtnl_mutex isn't held") when conecting one of this
->>>>> switch's port
->>>>> to a DSA switch as the conduit interface, the network interface
->>>>> is set to
->>>>> promiscuous mode by default and cannot be set to not
->>>>> promiscuous mode again
->>>>> from userspace. The reason for this is that the cpsw ports net
->>>>> devices
->>>>> do not have the flag IFF_UNICAST_FLT set in their private
->>>>> flags.
->>>>>
->>>>> The cpsw switch should be able to set not promiscuous mode as
->>>>> otherwise
->>>>> a '1' is written to bit ALE_PORT_MACONLY_CAF which makes
->>>>> ethernet frames
->>>>> get an additional VLAN tag when entering the port connected to
->>>>> the DSA
->>>>> switch. Setting the IFF_UNICAST_FLT flag to all ports allows us
->>>>> to have
->>>>> the conduit interface on the DSA subsystem set as not
->>>>> promiscuous.
->>>>
->>>> It doesn't look like am65-cpsw-nuss supports unicast filtering,
->>>> tho, does it? So we're lying about support to work around some
->>>> CPSW weirdness (additional VLAN tag thing)?
->>>
->>> CPSW driver does not support unicast filtering.
->>
->> Then the driver can't declare IFF_UNICAST_FLT.
->>
->> Why does enabling promiscuous mode cause Ethernet frames to get an
->> additional VLAN tag? 802.3 clause 4.2.4.1.1 Address recognition only
->> says "The MAC sublayer may also provide the capability of operating
->> in
->> the promiscuous receive mode. In this mode of operation, the MAC
->> sublayer recognizes and accepts all valid frames, regardless of their
->> Destination Address field values.". Absolutely nothing about VLAN.
-> 
-> Hi,
-> 
-> Thank you all very much for the reviews. It is clear now we should not
-> add this IFF_UNICAST_FLT flag to this driver.
-> 
-> I may do some new investigations to find out exactly why this CPSW
-> driver is adding VLAN tags when set to promiscuous mode. The CPSW HW is
-> definetly adding VLAN tags whenever bit Iy_REG_Py_MACONLY of register
-> CPSW_Iy_ALE_PORTCTL0_y gets a "1". Maybe there is some extra
-
-MAC_ONLY and MAC_ONLY_CAF are different bits in the
-CPSW_ALE_PORT_CONTROL_REG_y register [1].
-
-Promiscuous mode sets the MAC_ONLY_CAF bit.
-
-From TRM [1] , MAC =
-"
-Mac Only Copy All Frames.
-When set a Mac Only port will transfer all received good frames to
-the host.
-When clear a Mac Only port will transfer packets to the host based
-on ALE destination address lookup operation (which operates more
-like an Ethernet Mac).
-A Mac Only port is a port with maconly set.
-"
-
-Since you are operating the CPSW in MAC mode I believe MAC_ONLY is
-set as well for you. That is fine.
-
-Now, from [2], the CPSW hardware seems to poke around VLAN tags
-only if VLAN_AWARE bit in CPSW_CONTROL_REG is set which seems
-to be the case by default.
-
-> static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
-> {
->         struct am65_cpsw_host *host_p = am65_common_get_host(common);
->         int port_idx, i, ret, tx;
->         struct sk_buff *skb;
->         u32 val, port_mask;
-> 
->         if (common->usage_count)
->                 return 0;
-> 
->         /* Control register */
->         writel(AM65_CPSW_CTL_P0_ENABLE | AM65_CPSW_CTL_P0_TX_CRC_REMOVE |
->                AM65_CPSW_CTL_VLAN_AWARE | AM65_CPSW_CTL_P0_RX_PAD,
->                common->cpsw_base + AM65_CPSW_REG_CTL);
-
-One thing you could try is to not set AM65_CPSW_CTL_VLAN_AWARE here
-and see if it resolves your case.
-
-There was a patch sent recently [3] to play around this bit but it was
-not clear why it was required. If AM65_CPSW_CTL_VLAN_AWARE is indeed the
-cause of trouble here then it should be disabled by default.
-
-[1] - https://www.ti.com/lit/pdf/spruid7
-12.2.1.6.10.12 CPSW_ALE_PORT_CONTROL_REG_y Register
-
-[2] - https://www.ti.com/lit/pdf/spruid7
-12.2.1.4.6.4.1 Transmit VLAN Processing
-
-[3] - https://lore.kernel.org/all/20240227082815.2073826-1-s-vadapalli@ti.com/
-
-> configuration needed but as far a the current am65-cpsw-nuss.c
-> implementation goes, am65_cpsw_slave_set_promisc() only sets that bit.
-> 
-> Best regards,
-> Jorge
-
--- 
-cheers,
--roger
 
