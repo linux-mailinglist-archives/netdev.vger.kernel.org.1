@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-78018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18E39873C47
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:30:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D22B873C48
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:30:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C42A1C2395F
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:30:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3252282876
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA6B25FB86;
-	Wed,  6 Mar 2024 16:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB0A013A89D;
+	Wed,  6 Mar 2024 16:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SLFfePdi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NKSE2K7D"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE932137926
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 16:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E94A13A246
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 16:30:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709742610; cv=none; b=lkidUHFI9bdoDtyNXijVEXZUU437RgIqXcbZgzoijrRivWMw+z70vnhwJTtKlpckpPlNQMo9b2mNr1HlU03Hthc/okDY8mhwdr7+XGcltsvaAeXbQazyQ6q9VqZW3nNoGpgkO4nAohqgJEry3SImeW2lG/K451ph3QfeHuXvZ5U=
+	t=1709742611; cv=none; b=thCs0D9aU9h6Pim5Vh1ATE8iZCyRS6kQEYOp7IlEdsLzab1DNLu/gDOtRyEaL7PPS6COX2s3OqafiZOmpim1ofID00AcVMHn7jjbUTmuoXMIoCV+NVbbtGMj0WNkjBeZSbosDANfOZTctnWiSuViElu5/yTe5leMPj3Qbnb4fIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709742610; c=relaxed/simple;
-	bh=vDq4MF3/ayvqUYs7eB2tEEPF6bK9PoxK+9/o+jJ9j6s=;
+	s=arc-20240116; t=1709742611; c=relaxed/simple;
+	bh=JaXAMgruNSSbD1f4FlCgFPf1bCTVECRO/0D250xzjKk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nMqv15N9FhAAqjamyG/IS7XBbhmkqt86EE8t5iGYwKWI8xVG5rO78lBcl67zEeOh8U8d3SoI5GJTb4BYFtJs+f/UF3w+Gwa/2y9RFv1d74+USdqfgYJtJFM9wG600mtPql0Wan2k1oVx5TzYQ5kg6i+7Ud4OOQn3uP/+n0n7d60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SLFfePdi; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=A89fnZlE1jlFhU/QYFg/VCIkbGQnXO0EAdyojlbCbSIIxcivBCbm35kzOvyGlhOLiLTpVQlkLIDgvQ+Y5C6u+7shzJwYOPukzdbEn9RetB0BhmJ4Vn0kYGpZvBMr2YEFKkQEtHb9U0y0Kl16JQ75Q3wmsQ5jj5kDro7ukdHXWtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NKSE2K7D; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709742607;
+	s=mimecast20190719; t=1709742609;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=dC3cEhxqJPrUyKotNGsIqzsTqvwoKFQCMoZKNQ84muk=;
-	b=SLFfePdiEV2gxgc3rDPyenaBQIKOHVva5mqnIiqG7Q2+vacpHjuloVVyle6+q7mTT1d8jS
-	8OIvsA9r+M5p1ZJcBAsV6mM/XEnDZC1/EAzicVughUpRIPcm5a1/BTgnGY4yXBZk7kcAJi
-	pWeNv2z34oR012l0B0DZongPvT4Z9nQ=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-122-Dy8g9OdMNayLCGJVmpSb_Q-1; Wed,
- 06 Mar 2024 11:30:02 -0500
-X-MC-Unique: Dy8g9OdMNayLCGJVmpSb_Q-1
+	bh=KTGE09xtnIme6+GRFUjACMeP0HPOQDGOO8CtxR+SQkQ=;
+	b=NKSE2K7D1QMYuUl4XXrFMaX7iDIxcLF94SKrcj7TPnWRQFjgh7SBJZPsvUmoOuAdb/NMR8
+	W95NZbr60GjPls5CzfER3w2a7FjOAtslhG8fJG4z/9VEUKcMQya+FLuXa+I89PreukpA1E
+	jrGybb5fldexLBKTQio9PFr1go1enZg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-100-WXPhzIXCON29OO9j5Q-ArA-1; Wed, 06 Mar 2024 11:30:04 -0500
+X-MC-Unique: WXPhzIXCON29OO9j5Q-ArA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5B8DA3C00098;
-	Wed,  6 Mar 2024 16:30:01 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0C004800266;
+	Wed,  6 Mar 2024 16:30:04 +0000 (UTC)
 Received: from toolbox.redhat.com (unknown [10.45.224.200])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7DCEB4073510;
-	Wed,  6 Mar 2024 16:29:59 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D0C954073436;
+	Wed,  6 Mar 2024 16:30:01 +0000 (UTC)
 From: Michal Schmidt <mschmidt@redhat.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -64,9 +64,9 @@ Cc: netdev@vger.kernel.org,
 	Jesse Brandeburg <jesse.brandeburg@intel.com>,
 	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
 	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH net-next v2 2/3] ice: avoid the PTP hardware semaphore in gettimex64 path
-Date: Wed,  6 Mar 2024 17:29:06 +0100
-Message-ID: <20240306162907.84247-3-mschmidt@redhat.com>
+Subject: [PATCH net-next v2 3/3] ice: fold ice_ptp_read_time into ice_ptp_gettimex64
+Date: Wed,  6 Mar 2024 17:29:07 +0100
+Message-ID: <20240306162907.84247-4-mschmidt@redhat.com>
 In-Reply-To: <20240306162907.84247-1-mschmidt@redhat.com>
 References: <20240306162907.84247-1-mschmidt@redhat.com>
 Precedence: bulk
@@ -78,143 +78,58 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-The PTP hardware semaphore (PFTSYN_SEM) is used to synchronize
-operations that program the PTP timers. The operations involve issuing
-commands to the sideband queue. The E810 does not have a hardware
-sideband queue, so the admin queue is used. The admin queue is slow.
-I have observed delays in hundreds of milliseconds waiting for
-ice_sq_done.
-
-When phc2sys reads the time from the ice PTP clock and PFTSYN_SEM is
-held by a task performing one of the slow operations, ice_ptp_lock can
-easily time out. phc2sys gets -EBUSY and the kernel prints:
-  ice 0000:XX:YY.0: PTP failed to get time
-These messages appear once every few seconds, causing log spam.
-
-The E810 datasheet recommends an algorithm for reading the upper 64 bits
-of the GLTSYN_TIME register. It matches what's implemented in
-ice_ptp_read_src_clk_reg. It is robust against wrap-around, but not
-necessarily against the concurrent setting of the register (with
-GLTSYN_CMD_{INIT,ADJ}_TIME commands). Perhaps that's why
-ice_ptp_gettimex64 also takes PFTSYN_SEM.
-
-The race with time setters can be prevented without relying on the PTP
-hardware semaphore. Using the "ice_adapter" from the previous patch,
-we can have a common spinlock for the PFs that share the clock hardware.
-It will protect the reading and writing to the GLTSYN_TIME register.
-The writing is performed indirectly, by the hardware, as a result of
-the driver writing GLTSYN_CMD_SYNC in ice_ptp_exec_tmr_cmd. I wasn't
-sure if the ice_flush there is enough to make sure GLTSYN_TIME has been
-updated, but it works well in my testing.
-
-My test code can be seen here:
-https://gitlab.com/mschmidt2/linux/-/commits/ice-ptp-host-side-lock-8
-It consists of:
- - kernel threads reading the time in a busy loop and looking at the
-   deltas between consecutive values, reporting new maxima.
- - a shell script that sets the time repeatedly;
- - a bpftrace probe to produce a histogram of the measured deltas.
-Without the spinlock ptp_gltsyn_time_lock, it is easy to see tearing.
-Deltas in the [2G, 4G) range appear in the histograms.
-With the spinlock added, there is no tearing and the biggest delta I saw
-was in the range [1M, 2M), that is under 2 ms.
+This is a cleanup. It is unnecessary to have this function just to call
+another function.
 
 Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
 ---
- drivers/net/ethernet/intel/ice/ice_adapter.c | 2 ++
- drivers/net/ethernet/intel/ice/ice_adapter.h | 6 ++++++
- drivers/net/ethernet/intel/ice/ice_ptp.c     | 8 +-------
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c  | 3 +++
- 4 files changed, 12 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 25 +++---------------------
+ 1 file changed, 3 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
-index b93b4db4c04c..85fa2e1326af 100644
---- a/drivers/net/ethernet/intel/ice/ice_adapter.c
-+++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
-@@ -5,6 +5,7 @@
- #include <linux/mutex.h>
- #include <linux/pci.h>
- #include <linux/slab.h>
-+#include <linux/spinlock.h>
- #include <linux/xarray.h>
- #include "ice_adapter.h"
- 
-@@ -28,6 +29,7 @@ static struct ice_adapter *ice_adapter_new(void)
- 	if (!a)
- 		return NULL;
- 
-+	spin_lock_init(&a->ptp_gltsyn_time_lock);
- 	refcount_set(&a->refcount, 1);
- 
- 	return a;
-diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/ethernet/intel/ice/ice_adapter.h
-index cb5a02eb24c1..9d11014ec02f 100644
---- a/drivers/net/ethernet/intel/ice/ice_adapter.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
-@@ -4,15 +4,21 @@
- #ifndef _ICE_ADAPTER_H_
- #define _ICE_ADAPTER_H_
- 
-+#include <linux/spinlock_types.h>
- #include <linux/refcount_types.h>
- 
- struct pci_dev;
- 
- /**
-  * struct ice_adapter - PCI adapter resources shared across PFs
-+ * @ptp_gltsyn_time_lock: Spinlock protecting access to the GLTSYN_TIME
-+ *                        register of the PTP clock.
-  * @refcount: Reference count. struct ice_pf objects hold the references.
-  */
- struct ice_adapter {
-+	/* For access to the GLTSYN_TIME register */
-+	spinlock_t ptp_gltsyn_time_lock;
-+
- 	refcount_t refcount;
- };
- 
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index c11eba07283c..0875f37add78 100644
+index 0875f37add78..0f17fc1181d2 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -374,6 +374,7 @@ ice_ptp_read_src_clk_reg(struct ice_pf *pf, struct ptp_system_timestamp *sts)
- 	u8 tmr_idx;
+@@ -1166,26 +1166,6 @@ static void ice_ptp_reset_cached_phctime(struct ice_pf *pf)
+ 	ice_ptp_mark_tx_tracker_stale(&pf->ptp.port.tx);
+ }
  
- 	tmr_idx = ice_get_ptp_src_clock_index(hw);
-+	guard(spinlock)(&pf->adapter->ptp_gltsyn_time_lock);
- 	/* Read the system timestamp pre PHC read */
- 	ptp_read_system_prets(sts);
- 
-@@ -1925,15 +1926,8 @@ ice_ptp_gettimex64(struct ptp_clock_info *info, struct timespec64 *ts,
+-/**
+- * ice_ptp_read_time - Read the time from the device
+- * @pf: Board private structure
+- * @ts: timespec structure to hold the current time value
+- * @sts: Optional parameter for holding a pair of system timestamps from
+- *       the system clock. Will be ignored if NULL is given.
+- *
+- * This function reads the source clock registers and stores them in a timespec.
+- * However, since the registers are 64 bits of nanoseconds, we must convert the
+- * result to a timespec before we can return.
+- */
+-static void
+-ice_ptp_read_time(struct ice_pf *pf, struct timespec64 *ts,
+-		  struct ptp_system_timestamp *sts)
+-{
+-	u64 time_ns = ice_ptp_read_src_clk_reg(pf, sts);
+-
+-	*ts = ns_to_timespec64(time_ns);
+-}
+-
+ /**
+  * ice_ptp_write_init - Set PHC time to provided value
+  * @pf: Board private structure
+@@ -1926,9 +1906,10 @@ ice_ptp_gettimex64(struct ptp_clock_info *info, struct timespec64 *ts,
  		   struct ptp_system_timestamp *sts)
  {
  	struct ice_pf *pf = ptp_info_to_pf(info);
--	struct ice_hw *hw = &pf->hw;
++	u64 time_ns;
+ 
+-	ice_ptp_read_time(pf, ts, sts);
 -
--	if (!ice_ptp_lock(hw)) {
--		dev_err(ice_pf_to_dev(pf), "PTP failed to get time\n");
--		return -EBUSY;
--	}
- 
- 	ice_ptp_read_time(pf, ts, sts);
--	ice_ptp_unlock(hw);
- 
++	time_ns = ice_ptp_read_src_clk_reg(pf, sts);
++	*ts = ns_to_timespec64(time_ns);
  	return 0;
  }
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 187ce9b54e1a..2b9423a173bb 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -274,6 +274,9 @@ void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
-  */
- static void ice_ptp_exec_tmr_cmd(struct ice_hw *hw)
- {
-+	struct ice_pf *pf = container_of(hw, struct ice_pf, hw);
-+
-+	guard(spinlock)(&pf->adapter->ptp_gltsyn_time_lock);
- 	wr32(hw, GLTSYN_CMD_SYNC, SYNC_EXEC_CMD);
- 	ice_flush(hw);
- }
+ 
 -- 
 2.43.2
 
