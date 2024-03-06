@@ -1,153 +1,113 @@
-Return-Path: <netdev+bounces-77922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA129873799
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:20:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0E0A87378B
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:16:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6478E286BFB
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:20:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84B971F210D2
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:16:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C970E1272B9;
-	Wed,  6 Mar 2024 13:20:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="ttJ51xY0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71E2D130AC3;
+	Wed,  6 Mar 2024 13:16:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DCF41E519;
-	Wed,  6 Mar 2024 13:20:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B062F7FBAA;
+	Wed,  6 Mar 2024 13:16:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709731219; cv=none; b=Li6vj++DcLDHWc13cG42zuwfotO/ooTUICM9lhHeeFIhA0wCmnBx+riIgGofbLYWTFpq6+YUqs0BIWqR0zcqiuXG8WO0pm/EfyTAsDOsQ6u5R+GW0abNXIq2T1b35PM+XAzqqOsCHnBAzn+wFBJ+7sg1OejRl9ZMmhRPjqCPyMc=
+	t=1709730983; cv=none; b=hInI7OaA/HHKN2z6REn6neHUdBGg7o8SarNiSGgHnD1zrO6q2QqfyQDzYGXg7QeOLmoGa8Wqqxdi2m2VWP9FN7YworXcp9DoB6uXS3Erhgnd3+gOQd2U4gzyC+r9IpO+MUs3dRbKqMhgFfActasL7o3GMtCdRxD0VyM+1Iptp/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709731219; c=relaxed/simple;
-	bh=CUAADeia9xCRNvbVj33pXO7igoeK6KC1Vqe4KSLLyFo=;
+	s=arc-20240116; t=1709730983; c=relaxed/simple;
+	bh=UN5GxUcdpytO2U2Ldms6mARi4xRRCE3E9Hta9POhZ64=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XA1jEjjIEy8sXJWOTqv7/ZImW+lrThVayv8SimXDNKRzy+Eb/JAu07dJaYlGCeqDDgk304j6jhlUDDIED+VIS2iTuK0B13kD+SplIPmJytdkwf7rYjJDCb0mbU8P2J4pqI7lRruEnnUBnKV3/o4p67ib/kGSQI5BLIs0DhDxSss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=ttJ51xY0; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from localhost (unknown [IPv6:2a02:8012:909b:0:c8aa:f3f:c939:97c8])
-	(Authenticated sender: tom)
-	by mail.katalix.com (Postfix) with ESMTPSA id 666B87D94E;
-	Wed,  6 Mar 2024 13:14:23 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1709730863; bh=CUAADeia9xCRNvbVj33pXO7igoeK6KC1Vqe4KSLLyFo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Disposition:In-Reply-To:From;
-	z=Date:=20Wed,=206=20Mar=202024=2013:14:23=20+0000|From:=20Tom=20Pa
-	 rkin=20<tparkin@katalix.com>|To:=20Gavrilov=20Ilia=20<Ilia.Gavrilo
-	 v@infotecs.ru>|Cc:=20James=20Chapman=20<jchapman@katalix.com>,=0D=
-	 0A=09"David=20S.=20Miller"=20<davem@davemloft.net>,=0D=0A=09Eric=2
-	 0Dumazet=20<edumazet@google.com>,=0D=0A=09Jakub=20Kicinski=20<kuba
-	 @kernel.org>,=20Paolo=20Abeni=20<pabeni@redhat.com>,=0D=0A=09"netd
-	 ev@vger.kernel.org"=20<netdev@vger.kernel.org>,=0D=0A=09"linux-ker
-	 nel@vger.kernel.org"=20<linux-kernel@vger.kernel.org>,=0D=0A=09"lv
-	 c-project@linuxtesting.org"=20<lvc-project@linuxtesting.org>|Subje
-	 ct:=20Re:=20[PATCH=20net-next]=20l2tp:=20fix=20incorrect=20paramet
-	 er=20validation=20in=20the=0D=0A=20pppol2tp_getsockopt()=20functio
-	 n|Message-ID:=20<ZehsL8sHd3vgplv1@katalix.com>|References:=20<2024
-	 0306095449.1782369-1-Ilia.Gavrilov@infotecs.ru>|MIME-Version:=201.
-	 0|Content-Disposition:=20inline|In-Reply-To:=20<20240306095449.178
-	 2369-1-Ilia.Gavrilov@infotecs.ru>;
-	b=ttJ51xY02xPMTip2o1mIXJ1daaWJkddLTexc5aaB0lhGr7/f/BFJOrGcULMnAmnYr
-	 pX7gDdD9VDuKf0+XtRaQwbThGGrp9GLQi74k1dqBqQ/c52R3ykEDr9p240QTmzVSRK
-	 oLrG33UhCGUnhL43hdTLKNczsgfvL7yg0/SAEfSN/HukviDATtZWtikztBN3M5WYaU
-	 yK3OxI+Fk++1cWRXu3qvrPtnW87epDYNfv7A1xEskrdH8rBL5ennhXRCYaNOjd90Nu
-	 zIuY82J6mKG3brNMQkrBKgfXS4HqXyIb2kDN8QfUd12z/hzpxcpUA4UJRfNrm/FSDq
-	 Zf3kIdtH1GfmA==
-Date: Wed, 6 Mar 2024 13:14:23 +0000
-From: Tom Parkin <tparkin@katalix.com>
-To: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-Cc: James Chapman <jchapman@katalix.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
-Subject: Re: [PATCH net-next] l2tp: fix incorrect parameter validation in the
- pppol2tp_getsockopt() function
-Message-ID: <ZehsL8sHd3vgplv1@katalix.com>
-References: <20240306095449.1782369-1-Ilia.Gavrilov@infotecs.ru>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HjINBt1OtV7fXtK3CkaP0t3XJ3fQZY13iazPg3ZntdP8vsLpSkR4HILLBWmclHqFd1fg0EasczI1UXWCXKAPEsRWyQzb0/QA8XSoH0Vyzm8b/AZ6WNmH19FNnbmdoy5I8GI9thIvMMChSkr1LS5u/DMLOEXwhU14KZSGB5G+gCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a3ed9cae56fso151513166b.1;
+        Wed, 06 Mar 2024 05:16:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709730980; x=1710335780;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L/tWs4fwCFAZTFAAtDBZh8EOdci0pgq2gOC8rOm/wUU=;
+        b=WXm1vZPoK4l4oN79kgOiioPM8WcqbpiBWALVMq3iSEMtkqq+E6sNv0XPpTifs8Mrre
+         ZTrVak9EnpMVpbqaMDeughU22zqrbJ6Hp1dSqmjR14BKTJ8RMFL2oQ6L0T9FRTwjEvnz
+         h45I1KmJbE5Hab2TJYiylbt72iKoo9o9D5zVd1HncMkcJm2LZGNHitjXeah9QL4fHp+q
+         JgcuMziSNHYSepo4nrFjq3qI5s/grfjYmp+gcVyj02Vuv0LltT5kHObJLedxUCYxpvTB
+         LgyV0QycFwlwzNOOIBHsDweZzKdBZ5N6EJyo7W9cV7ljZJbYBuWgHj9jYGmF9pK6SZHG
+         yAhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVJ2v129hMhBWInqAjOHSe4fHPHHva5lU7F6Je/nDGO2BUXHeo6M5JeSGk4VKGDKSSIuLhnHI17H8F1lQ4kej/1rTlfDJQmB0hy28qHmcAyJZ2z9moyuOJOP264mB7Zk1kZbYmFosO+1f2AfUQp+QCcqKzy57D7Yi8InG6lAQNGQobpFwdZ
+X-Gm-Message-State: AOJu0YwJmPP82Xe9s4GWjGHoTV/pl65cMnft8jQuH6zu0pLrZ0HGJAyx
+	4WJnBf17slJJiUxJVDDbHuB9tz25RlpTtHwiJuqNX/rf3STcJTjS
+X-Google-Smtp-Source: AGHT+IEIJgWZ+UxwNt0E0FsQRxJuaM40G5bRPgHAbMZdVYsXZGcRQxWwzTl9LNOtD+BeAqHsNuqevw==
+X-Received: by 2002:a17:906:57d4:b0:a45:a2cc:eb93 with SMTP id u20-20020a17090657d400b00a45a2cceb93mr5652823ejr.4.1709730979709;
+        Wed, 06 Mar 2024 05:16:19 -0800 (PST)
+Received: from gmail.com (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
+        by smtp.gmail.com with ESMTPSA id k14-20020a1709063e0e00b00a45beabb104sm499441eji.159.2024.03.06.05.16.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Mar 2024 05:16:19 -0800 (PST)
+Date: Wed, 6 Mar 2024 05:16:16 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>, keescook@chromium.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	netdev@vger.kernel.org, linux-hardening@vger.kernel.org,
+	Simon Horman <horms@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Coco Li <lixiaoyan@google.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] netdev: Use flexible array for trailing private bytes
+Message-ID: <ZehsoPb/WZzUcFHa@gmail.com>
+References: <20240229213018.work.556-kees@kernel.org>
+ <20240229225910.79e224cf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="sRqq1QTNgT2eAlVi"
-Content-Disposition: inline
-In-Reply-To: <20240306095449.1782369-1-Ilia.Gavrilov@infotecs.ru>
-
-
---sRqq1QTNgT2eAlVi
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240229225910.79e224cf@kernel.org>
 
-On  Wed, Mar 06, 2024 at 09:58:10 +0000, Gavrilov Ilia wrote:
-> diff --git a/net/l2tp/l2tp_ppp.c b/net/l2tp/l2tp_ppp.c
-> index f011af6601c9..6146e4e67bbb 100644
-> --- a/net/l2tp/l2tp_ppp.c
-> +++ b/net/l2tp/l2tp_ppp.c
-> @@ -1356,11 +1356,11 @@ static int pppol2tp_getsockopt(struct socket *soc=
-k, int level, int optname,
->  	if (get_user(len, optlen))
->  		return -EFAULT;
-> =20
-> -	len =3D min_t(unsigned int, len, sizeof(int));
-> -
->  	if (len < 0)
->  		return -EINVAL;
-> =20
-> +	len =3D min_t(unsigned int, len, sizeof(int));
-> +
->  	err =3D -ENOTCONN;
->  	if (!sk->sk_user_data)
->  		goto end;
+On Thu, Feb 29, 2024 at 10:59:10PM -0800, Jakub Kicinski wrote:
+> On Thu, 29 Feb 2024 13:30:22 -0800 Kees Cook wrote:
+> > Introduce a new struct net_device_priv that contains struct net_device
+> > but also accounts for the commonly trailing bytes through the "size" and
+> > "data" members.
+> 
+> I'm a bit unclear on the benefit. Perhaps I'm unaccustomed to "safe C".
+> 
+> > As many dummy struct net_device instances exist still,
+> > it is non-trivial to but this flexible array inside struct net_device
+> 
+> put
+> 
+> Non-trivial, meaning what's the challenge?
+> We also do somewhat silly things with netdev lifetime, because we can't
+> assume netdev gets freed by netdev_free(). Cleaning up the "embedders"
+> would be beneficial for multiple reasons.
 
-I think this code in l2tp_ppp.c has probably been inspired by a
-similar implementations elsewhere in the kernel -- for example
-net/ipv4/udp.c udp_lib_getsockopt does the same thing, and apparently
-has been that way since the dawn of git time.
+I've been looking at some of these embedders as reported by Kees[1], and
+most of them are for dummy interfaces. I.e, they are basically used for
+schedule NAPI poll.
 
-I note however that plenty of other getsockopt implementations which
-are using min_t(unsigned int, len, sizeof(int)) don't check the length
-value at all: as an example, net/ipv6/raw.c do_rawv6_getsockopt.
+From that list[1], most of the driver matches with:
 
-As it stands right now in the l2tp_ppp.c code, I think the check on
-len will end up doing nothing, as you point out.
+	# git grep init_dummy_netdev
 
-So moving the len check to before the min_t() call may in theory
-possibly catch out (insane?) userspace code passing in negative
-numbers which may "work" with the current kernel code.
+That said, do you think it is still worth cleaning up embedders for
+dummy net_devices?
 
-I wonder whether its safer therefore to remove the len check
-altogether?
---=20
-Tom Parkin
-Katalix Systems Ltd
-https://katalix.com
-Catalysts for your Embedded Linux software development
-
---sRqq1QTNgT2eAlVi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEsUkgyDzMwrj81nq0lIwGZQq6i9AFAmXobCoACgkQlIwGZQq6
-i9CJ3ggAnMVBtH7FFAb+vH6t/MidRzhvkMZ4t9DE5Tt3WOwm1aN2YKKsvuUdzR5f
-32KbhH2EI2S8uEqwJBNwl5+rZ1QWmPFHdL62N0yW3juzR9K64+WpXGeGmdIFZXgS
-R0J7b0u/GvsWleVV/HNuqrMCnAxSxAs9f9FKrcyqx2zsFsi2P3cwpsbEaXOsdnkM
-W7yeGoDbx9J2BkWp9OdItzhv8y+ecb6CtgbGMVHDC7/iL3A+P9bgZqh/BFfON+s1
-IDmtSE0OJFYb3KgQLxMAybXe4B+w7jyWKcCpu30cEOwSd9waDJotoeTOktINyLSb
-8mpupV5PgGYvZzgSZ1IVQ25fZKel/w==
-=7U9S
------END PGP SIGNATURE-----
-
---sRqq1QTNgT2eAlVi--
+[1] https://lore.kernel.org/all/202402281554.C1CEEF744@keescook/
 
