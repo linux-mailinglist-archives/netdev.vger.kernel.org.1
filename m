@@ -1,128 +1,105 @@
-Return-Path: <netdev+bounces-77874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FA898734F1
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 11:53:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5D2D8734E6
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 11:51:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B85CB23C15
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 10:41:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7090828A6BB
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 10:51:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 477F45FDD4;
-	Wed,  6 Mar 2024 10:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0A8605BF;
+	Wed,  6 Mar 2024 10:51:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lihvn/1/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ZvsP4LoG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA9B5FBB7
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 10:41:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D1F605B6
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 10:51:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709721714; cv=none; b=i1ospEWa8rUJ7XbwID11YV3/EdOnMWzFBzOp2pgJHMjueVnEJOanXKo9Q139TrAcU3tzDMgInYcat6CgLMWyKj+3Gj1xZnc7UazpwopIG0VxxGEDUHLlZ+oBEQaPav6CU3bTrXjVQCn3WV5zS+OXs8YPIkR6En0l1teAywAYuvg=
+	t=1709722307; cv=none; b=SvRC/1ukyZBhR9NL37LpqZ61V7PIJG8/E0H+pvS+nHSm4TwhRdVn4H6jY22S70KFD9UJ6Fn/LVzGjXtJjEbuD2E7pL7OZK+8KzsNx16VNfQQ3+yV7L8bBeeUTjKJpgeFZGIHO0Dp2OSXZYCbuJZNd52Z5MDWmqNrPdTFepXeqtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709721714; c=relaxed/simple;
-	bh=kCwidvlR/A9CZ3q+xHAYLCMO3jQlBiTdIei1p1YIerU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ps0WWJx9xOHXCWUl32gsi6rQgF8xw4lC4Z2zmIZojgYCkEy8uLcHH4f/A9/vTEExnyfZMzrs2wUDW4Zccx232x9Lfakcv02Ua2UqsQ403F2+/rfKHK8RZe7i8ublXDMWg0yqv31/CUwTFrQt3Gjj5++nMjVDj1s8hJFSjqy5P0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lihvn/1/; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-566b160f6eeso7785a12.1
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 02:41:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709721711; x=1710326511; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ac6YIjBtpRzsjYOfKs4hkAM2nX9AEZlTxzGX/yk4mrs=;
-        b=Lihvn/1/JEvvXKojUB0fIfZDbzvjdKfl837FTVMgGH5vFRFC31/LlEM04hBfxrH/7C
-         qlMNi6EnTx/JNJAnmW58f8RoGGHHALz9aVd8hn3w0FShlSj5UpkW6prA8qJXX8YizH+Z
-         NGS9vOBsCNVOUSYU3R0lsfeWf65lR9RiCugzT6xK6swXlct6ws/6ZQVKOypMrZA02hbO
-         B63hIEJIaeHpx9YaqH6eidnQg/SX7w94Qr4MwGJUb2XyVm3Hbcyjq26PS57jDnHxge9m
-         UEE/Hqw8mlo5WuX6ZnakaF0guGWCZqAayoJvhSQfivH0rqhFsOI9FvGLI8yywr7imh+x
-         KkKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709721711; x=1710326511;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ac6YIjBtpRzsjYOfKs4hkAM2nX9AEZlTxzGX/yk4mrs=;
-        b=eDmqkOfKcHHIfu9Nti5b7IKh8HMo/NadeoI5BAJwX4yo0C+hjTEO+geCMrYf8jsPrW
-         Bk0RWCrP7fr3YZrT1WRq+LocQ7cU1cjwqgiRbzhbXbRbFiwFu6ldqs9AVWpxR7DJCSbP
-         mDUFd6+MV8kHXRx6PflGtF8x31N36taxIw3t9XYFOeCYoRQvIJuH+LJM5h4C4T9rhtm2
-         rC0jTz8lMy08mZFqgVRRMEStB8vgNqh9zrP6pVzjxGxWJl67McPL7EreknuvKdImBM3x
-         tWojWYsOQSTluH7BUaXh0av4TgEQY8Gq64kq0K4toX7+RVluSK8HVqWCjIZO+O1vqV2p
-         PhbA==
-X-Forwarded-Encrypted: i=1; AJvYcCV0K/HHqHSSNXv0RSKSaAyvQrlRjqBbvB81AqO+IuYaDw31+TTm/Buzl00I5LqMRVKwXDJxSGZD9is8MzNyQoXcQBWEwJjZ
-X-Gm-Message-State: AOJu0YyOEPY/wue3IabB4jgpQji4I0rcUa/GHFVtiQMkadSxYi7QmBEZ
-	YZnbReD1wRs/J0DPJTDcF553dk4FMy7C+nF+tuECUV8s84VMhBQ8T/31z3JWWPBjxvnIDmBvjKZ
-	qSzV4PZ4SqDiPMTRDnIFlaC49EphbNQP15pCv
-X-Google-Smtp-Source: AGHT+IHxXfepDQZyEoAvpk37Sh1LodNo2JflhaLnhu/OhexAMll7TyOInFoT7Ebs7fzQA8WjKmzaZ/Kf4cdkQ/H2Vh0=
-X-Received: by 2002:a50:ef03:0:b0:566:b5f5:48cc with SMTP id
- m3-20020a50ef03000000b00566b5f548ccmr351403eds.5.1709721710584; Wed, 06 Mar
- 2024 02:41:50 -0800 (PST)
+	s=arc-20240116; t=1709722307; c=relaxed/simple;
+	bh=QcP8yJWLf17IQe+xnQ5YEAhSrf8CNwC7dT8L6K0U420=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=Ix0Zrbg3oi/FWw3qAhcV9Vl1xTIFFT3ZpeAvbWP0b/jsx3J1veNpZ6pJARxIyPwVjecCKBsoyLYdVN/jqiJteRkfDN3pZTLZZtyAb4faIQjYzGiKj8G7grpEOQRYJGXJI+5QzoTGU4+4cpTV3HaCz3Ge+NSmqvi0taixlosNW/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ZvsP4LoG; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=UrrKmj5hrNxnqYEzpIYJHdCYNBEpE4d24Vi0vLAhXQs=; b=ZvsP4LoG8FAz0kCd6l6pWb61lI
+	ZtW1iiQR+03XmXAXsORJBhw10P0rd8f2UEXbFy+wvvjk8HiGGyXINE6evkKUehH7uvCk20HNVqrja
+	x45xJJ6xUkpii0/pMzpqUaWGReAQ5wID36OwBCBsekP4fbEmGKC3n9FA3AOO0lPCxe4qsWejyxy92
+	H9O6Oo2S/wBRu8WHY1ckhVLNKylsjLhJY1zdauw0vamTxo3WTzjWEnxvsCBOx2Hid6TIwxMji3ExI
+	3CNusWfOmmTJQoAeUGlHeBk3mXMOeIyLop9UKdhBQ9mUnc+quP6fy+rVnwmFR9XAEoDEQP6e6K16T
+	H0zMpgfQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:41248 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1rhos4-0008F2-1D;
+	Wed, 06 Mar 2024 10:51:36 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1rhos4-003yuQ-5p; Wed, 06 Mar 2024 10:51:36 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next] net: phy: marvell: add comment about
+ m88e1111_config_init_1000basex()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABOYnLwtfAxS7WoMw-1_uxVe3EYajXRuzZfwaQEk0+7m6-B+ug@mail.gmail.com>
- <CANn89i+qLwyPLztPt6Mavjimyv0H_UihVVNfJXWLjcwrqOudTw@mail.gmail.com> <20240306103632.GC4420@breakpoint.cc>
-In-Reply-To: <20240306103632.GC4420@breakpoint.cc>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 6 Mar 2024 11:41:39 +0100
-Message-ID: <CANn89iLe0KGjbSim5Qxxr6o0AjJVs7-h79UvMMXKOgGKQUosiA@mail.gmail.com>
-Subject: Re: KASAN: slab-use-after-free Read in ip_finish_output
-To: Florian Westphal <fw@strlen.de>
-Cc: xingwei lee <xrivendell7@gmail.com>, pabeni@redhat.com, davem@davemloft.net, 
-	kuba@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, ralf@linux-mips.org, syzkaller-bugs@googlegroups.com, 
-	samsun1006219@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1rhos4-003yuQ-5p@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 06 Mar 2024 10:51:36 +0000
 
-On Wed, Mar 6, 2024 at 11:36=E2=80=AFAM Florian Westphal <fw@strlen.de> wro=
-te:
->
-> Eric Dumazet <edumazet@google.com> wrote:
-> > On Wed, Mar 6, 2024 at 11:00=E2=80=AFAM xingwei lee <xrivendell7@gmail.=
-com> wrote:
-> > >
-> > > Hello, I found a new bug titled "KASAN: slab-use-after-free Read in
-> > > ip_finish_output=E2=80=9D or =E2=80=9CKASAN: slab-use-after-free in s=
-k_to_full_sk" and
-> > > confirmed it in the latest net and net-next branch. After my simple
-> > > analysis, it may be related to the net/rose or AF_PACKET/PF_PACKET
-> > > socket.
-> >
-> > I already had a syzbot report for this issue, thanks.
-> >
-> > Adding Florian to the discussion.
-> > The issue is cause by ip defrag layer, which calls skb_orphan()
-> > These were my notes, I had little time to work on it so far.
->
-> > Calling ip_defrag() in output path is also implying skb_orphan(),
-> > which is buggy because output path relies on sk not disappearing.
->
-> Ugh.  Thanks for your annotations and notes, this is very helpful.
->
-> ipvlan (and two spots in ip_output.c do):
->
->    err =3D ip_local_out(net, skb->sk, skb);
->
-> so skb->sk gets propagated down to __ip_finish_output(), long
-> after connrack defrag has called skb_orphan().
->
-> No idea yet how to fix it,
+The comment in m88e1111_config_init_1000basex() is wrong - it claims
+that Autoneg will be enabled, but this doesn't actually happen.
 
-My plan was to refine "inet: frag: Always orphan skbs inside
-ip_defrag()" and only do the skb_orphan()
-for skb added to a frag_list.
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/marvell.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-The head skb would keep a reference to the socket.
+diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
+index 1faa22f58366..42ed013385bf 100644
+--- a/drivers/net/phy/marvell.c
++++ b/drivers/net/phy/marvell.c
+@@ -919,7 +919,10 @@ static int m88e1111_config_init_1000basex(struct phy_device *phydev)
+ 	if (extsr < 0)
+ 		return extsr;
+ 
+-	/* If using copper mode, ensure 1000BaseX auto-negotiation is enabled */
++	/* If using copper mode, ensure 1000BaseX auto-negotiation is enabled.
++	 * FIXME: this does not actually enable 1000BaseX auto-negotiation if
++	 * it was previously disabled in the Fiber BMCR!
++	 */
+ 	mode = extsr & MII_M1111_HWCFG_MODE_MASK;
+ 	if (mode == MII_M1111_HWCFG_MODE_COPPER_1000X_NOAN) {
+ 		err = phy_modify(phydev, MII_M1111_PHY_EXT_SR,
+-- 
+2.30.2
+
 
