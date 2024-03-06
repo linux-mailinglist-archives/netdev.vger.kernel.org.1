@@ -1,73 +1,305 @@
-Return-Path: <netdev+bounces-78028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8923873C80
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:44:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3EF1873C87
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:46:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3E15281781
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:44:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43C121F219CF
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9E5137901;
-	Wed,  6 Mar 2024 16:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0107E5DF06;
+	Wed,  6 Mar 2024 16:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HPRwUwnN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I9smm3MO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2895D132C3D
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 16:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709743447; cv=none; b=e8g49jPivDriVa5v9zL0RB1kkWOFWTVWa1cC06idOe6VRTy25J5qdFWoaIlTRq9SnOR+rAb0M9tMmYNtzvAedZDeMi2gl5gXMy50MtSaELqg61bEMo5V4E9Y7rIwfVIhRqjNLxMurqp2iS8r8YOIL8KX7UV/fgZsrMiKXDuIsKQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709743447; c=relaxed/simple;
-	bh=ehdsWdsWSsQt/+kq1ugcbCsjXquvAeMO2E9wHeeWbrQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=fY73h5GvI/AQO5cq2htjAGLdlOcAYq+i5GXOS1aGqcFDfG/nT5+n2tyfEzObch8zhpmbsXVOKitMMtdUov73WZM8SxxflnJ0olxaI7gKlewFdRSnLLQqlgmk48Ye7MuwayQGJqOFEmvp+fxDtwJJ6qHIZ4IANhsW9qztsYp6n2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HPRwUwnN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 951B7C433C7;
-	Wed,  6 Mar 2024 16:44:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709743446;
-	bh=ehdsWdsWSsQt/+kq1ugcbCsjXquvAeMO2E9wHeeWbrQ=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=HPRwUwnNCncvTSkxdtSFrUJ3CHY7TaM3VJEsM/1mZO7NojdCm3RzqizMsDk0LJLnA
-	 Gw+o+MpSn/kZyuQoagvJZz3PDd5VEFnRt0nJeh7wbKEuBpBh+NC+sS9bbSHWVqTj1d
-	 P/ihBsnJxmHEDygLYD3BmQvTXlZDUFqjTkZJIZhV7I4JXg64ELAXk2wRGN5dp9CL3I
-	 PSrQxp+84RFP0BGEXatdTP1LRa0eQLNjjZdBmHaatKAFAGca7FqRJRT5V8fQLnZCVb
-	 A0H3hE1ZVDSAcqDNyKwNyXc8UWQUw1AMa/3zbmV9saBNKxwRNWyCmm4a9IfdX8W9yZ
-	 OmsvlypTbbWiA==
-Message-ID: <939c7e01-38e4-42f1-aa28-aaf83aae4c39@kernel.org>
-Date: Wed, 6 Mar 2024 09:44:05 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A62D534
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 16:46:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709743574; cv=fail; b=uBOz/iP25p6EHhDq8CT/NY/B41Y/JW5cypCf/HU6Q/EcTGDdSl2Cn7r1geotfHO2+tCV+dmwF/GKx1thlHGftczn+eNRxEm2Sf2ZeSWkE+yMmi2vUDRpOSnrPbieiqYRsEHQu+TH4CaCy7Hcj14fY4VdeQ9hZMtYLym562o0+0Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709743574; c=relaxed/simple;
+	bh=fquboVnU31HdpBFYeMutCIVFwFUmGUREhPKKWRri2I4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Vchb2ecPL1h+NbVlFF4nr0vnDEahMQDnTTeyFBz+MvQm/z9PlpF4zrHbk+wNJucTGg47QIj9xE8O0DVCajGAFxuA6rI9kAPONDomeI//2Zb8+aWKVzVuiNqRhs0yELy9oZ+3VZVyPocRGth9K7KNiGh66riob6+K1LbKr+XgxMQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I9smm3MO; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709743572; x=1741279572;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=fquboVnU31HdpBFYeMutCIVFwFUmGUREhPKKWRri2I4=;
+  b=I9smm3MONMNSBqQIlUdwFT/uRUNSMI8WAgGXVsKXM6Dhz5kSmxKJ11tc
+   GxoKXpLT+Nm/QJY9bbroD9ZD9Y3DaqWxcMbbcy8LaBPomT9OVDGB2lypJ
+   udEgrbdJBI4CeFm+gy+HHhLNc/10Aci/uwE+21dfY+CARyalu8QND7aqa
+   fmGdHifDKMjc5e8iIkUieTVB++A9iGXgRPEOMp7NXtNigux6aE2fXec4u
+   L+JTSpKaVZYgsTVOC5KoFSKYOI+Jgw0+ed7D9k8VJfmmsHxC/Oq2yjIan
+   pThH/VbTa2NsY0YTgWq81od8SvyTa8422SDmYcwd+lg6wMJOZtg2A7AID
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11005"; a="15088883"
+X-IronPort-AV: E=Sophos;i="6.06,208,1705392000"; 
+   d="scan'208";a="15088883"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 08:46:11 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,208,1705392000"; 
+   d="scan'208";a="14463343"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Mar 2024 08:46:12 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 6 Mar 2024 08:46:11 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 6 Mar 2024 08:46:11 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 6 Mar 2024 08:46:10 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gSA1aS6DMfD/UbZ2B3bm3OKFTzWD7HGwAPRq59BAjby5fRuDGSaJK2iJno4n095t5qRu80/qV6VAWtdSedubR/Fdr8UfzquUjF4nXiY+YrkNXu77/2t1c8tsh9vPoK6rj4omqF0fs7/4cCeWoIikuT7oDPEY9WVQmibXPYGElQ85NFjcUSYYhfgfovfawpKOQrSnRHcAfStqPT6Ei6whcOpaZNlrY/fhtR55QNawDys1AFkEUEuypLp7ukC17r+TLg/jXwWmieWFAudZnxag0N5nTOfVZEkJz3uTFIkxQlKbY2lDHEuu7ZU+pWQ5n47aCc1dqXze0UsINYKcPwa3RA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IR+FX+hgmGE7Y9G44qdCVEnvXTGQcl3gILv+Q5dM9bY=;
+ b=grad+5fk4C+ZxUxqiEJUZz7WwnXNQqskHj9e1ndfd3liq1XH9UeyFl0gpdt/CkQ52pSFqU42KnI98g3iG6IGafhVlLGGTplxH+q7pQ5igx959XwnxZ0Prikom8SiqYDib0hGsPa9cqkC9yVwul7XGDi9sVpjM1ZDgVLu0i2DlAKBz6xBkKqVFPZJ/u1SuAJ3Yc8LfQHqU1K82Veprqj6+hMT1gVy5EERwSEi3OpaUA3oMZCd7wX/ESIFZ0gF7FqGxPoIOPNp7ySqRhZ24tc9/vksOpBUDGDyk5i+/yWBU+PXXiNRyrMnp/LTTljfY5YE1NslXaJFNt6AnRL5OOGUjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ CY8PR11MB7172.namprd11.prod.outlook.com (2603:10b6:930:93::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7362.23; Wed, 6 Mar 2024 16:46:08 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::ccab:b5f4:e200:ee47]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::ccab:b5f4:e200:ee47%6]) with mapi id 15.20.7362.019; Wed, 6 Mar 2024
+ 16:46:08 +0000
+Date: Wed, 6 Mar 2024 17:46:02 +0100
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, "Robert
+ Elliott" <elliott@hpe.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH iwl-net v1] ice: fix bug with suspend and rebuild
+Message-ID: <ZeidykgnELeMx6xm@boxer>
+References: <20240304230845.14934-1-jesse.brandeburg@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240304230845.14934-1-jesse.brandeburg@intel.com>
+X-ClientProxiedBy: WA1P291CA0023.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:19::7) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next] ifstat: support 64 interface stats
-Content-Language: en-US
-To: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org
-References: <20240229043813.197892-1-stephen@networkplumber.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240229043813.197892-1-stephen@networkplumber.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|CY8PR11MB7172:EE_
+X-MS-Office365-Filtering-Correlation-Id: 64d3b616-3aba-4a59-afa2-08dc3dfcebfd
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 19CiFtZeioekA+eBApnAVRvIdr45+3pIDbnacgnVZpGOz05aG5Pg28uZzGun9K2Vvqo2llf2UhDVwYwqlDDsVitK7eWAZ0t7xkJVIdBvXZ04biuVvlquy6u/BncPr+D5pa3mjAs1d8hwQH1rY2maRIsjPQYS+O9hIL6zM4PGA7ewFK8HhUxmB5DOoB7Ws35g11SJZRWGvMO+qo8Mh4LLhvifExGDtAC0URwgHLmmDXp7L6da4d0eMOY1ldAoL3Qo13ap8RAPX4km0l1My+nDMxHGfMsrPeOLyFgy0fGURe7ipH/MiWd/nyb+FIjsfPX2fFNGNrj2iPwuKRAEyittTWMrqJJORyD+RIJ4BG4XRH7cXKu+urWkzcOYv+F33wsG/UlWkNGFA0wlbnpmB6rsKJUIN1yxliGeQ7JYB+HD4BdiEm80lmgNLeIr5ERWgNwhdJrtfueguUycBnxLQKeBTNSz+0N3+l2F9NkGqIQeazgOpoUzLfB2wRgh1HVU1QzDKEPmgCWWr71UB3cYO9j4pjuzE/hROQ7PsOJFgCyia90zCYtLrHnOYHrW1ZLfXn356IHR/GpqkJyfcPt4sdXJu/1NeuBrjGOBu9Ay0xAi3obiUG1+hRqjdh7LeDUgasYeUFwc3gwqgmgg1JgXnHUFHKCkTcjvd5bMxLWOxPTFqyo=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?6QPZWhq9Lj+rHWXjx6HglorNmzwXmvenLfla5HYYeI6Kv25ZhJHfNcIOW4Ul?=
+ =?us-ascii?Q?MF3Q9i4vf7c8KTnGlmhpIs4EYSN9l4BimnRGAmyAEHodnRIrEMOQghb9eI1u?=
+ =?us-ascii?Q?VMsjYu9KcrYbhM1Qro9qpbUwk6PMIz7B2Hve2ue+NB9cWTMAxmAyRtvz2+il?=
+ =?us-ascii?Q?DofczTj9rQmabLJ1HtK0cUlwmMRK+cQrCDf6l7XKhFlQUkTbFvM85VaX/hn+?=
+ =?us-ascii?Q?TXcuqjTHmq6nQCk9O/tFiO7MT+36vYsbsw1or3DRF7/T7HMTPB77izrTUC6p?=
+ =?us-ascii?Q?o2EVyNW57eTOggnbgmEDFs3GWIPVUgalhJvfLmVe3UcuAQ4CM6OQ+EHebOoS?=
+ =?us-ascii?Q?2O5+Tq6f56W9Cgxe1k9ORxkWW47dhaBAqh5SZJMdsLdQLk7IfPU4gJqcE3uT?=
+ =?us-ascii?Q?fqeAH8uZexBmVW/9SkGYRTt4qq/a1bBHWeZyronFkscNAiIq8bMN4HlcZiV2?=
+ =?us-ascii?Q?lSzTc3ZruGDITEHXjY3TOZjZouOyBAOEi98cYSQ5kEPUT8oPxQ85q2Usbad1?=
+ =?us-ascii?Q?ffypn647o7wg9HEDymrKd4TrJjtlrnqJpppolKaGB2L/pCagNHby2bJi2VtX?=
+ =?us-ascii?Q?hBhXWeHjUlVoKkoWc7nP20Vt1UjAXc4k75WP7IFi+ha/NC/ILK/LaPSzeVPK?=
+ =?us-ascii?Q?Aofk4uxmJ/IQKxcIMcSmb75O/jgaCjiFZu0KHg9H388ycsL2YziWVpDm/ug2?=
+ =?us-ascii?Q?tajHMSCic0orC0m/2MqFPp2iysWzsRcLlXuZXmW2i38fSC17skA/InrWv4Xh?=
+ =?us-ascii?Q?hZM/ZzlqHaQVsYb/C4H9XCvwK1K/jnNPthBmLDBOPnCPWOtmZ5a3KIkQHCtt?=
+ =?us-ascii?Q?vi/aXnqieFJeaVjUT72gioErN60cfZIWl/+l/Py/QbXlbpDCfopGYTb6No/z?=
+ =?us-ascii?Q?XLyTij5pqqt6GUJQPLju5ZfBzz+OYUTCDPrAPn7X7REScCqqKGTlzbJHduZy?=
+ =?us-ascii?Q?Cqwkm+j04emJjsmurdImKXKSEU5ksxNlAmlo+7RqzUNEUNAxP6rRoOeC1Mev?=
+ =?us-ascii?Q?D/n6Y/YpaEfESmdP7b2rcVNdrwneYz8NLs0KXgcaPWFVBOqlVunobH4fwDO3?=
+ =?us-ascii?Q?RniwkOCmAJK4yMyEghvZmzXF/bcly+pIxZEZHKkW+Z4rcPtIfCVpsJy0Qg+0?=
+ =?us-ascii?Q?bM1IsIdgsdzxLjCgRY0c+yxnYuYRzenzQD4wPNXDc8P9vG/pEMcDv1heY+F3?=
+ =?us-ascii?Q?Sk02pKgUpTe9WQ9e6UzHVpJMTehkJ4j6qxK2dMrP60DYFMNSJeSLW3BGW0LC?=
+ =?us-ascii?Q?/tZcoDXTFHzcKOW47vSlUacJmwPnljuC+qpRF6B+krx0e4arcdHGXGORHEW3?=
+ =?us-ascii?Q?uTK/x7hho7cv5zE2tH3dTXsAhZit2pfigip5jv06i/bge7zUDymaStsg4cf0?=
+ =?us-ascii?Q?LuMNrvpGEve2ItguO/CENxa3iQdt1QnyEC/4gwQPIouGWkvJIdnpD6P7TQv0?=
+ =?us-ascii?Q?GE3E8DEAx15qj6Nq7VquljM8nzZocp+l6oh8zGmRhwD+qS/957KU+wgRUm7A?=
+ =?us-ascii?Q?Vx1HSgAt4Lxcj9xGjMzeRLrddZsslXXiSCrsqrg8GVpHV4lVpz1EFzVnCo5T?=
+ =?us-ascii?Q?XPAmVU5lefdwTGMvwT4OoYNVQobwxHK4KpvEJD7XLJQ8v3hBkrtnTeUISA79?=
+ =?us-ascii?Q?Mg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64d3b616-3aba-4a59-afa2-08dc3dfcebfd
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 16:46:08.1498
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: El0evzYXZ1cSedyz6CVxR8d9+aD4saJ6YclW/FuLPY+AHy6bEOxwGUygGaQqXVnRp4DRkl3M/ah23qvAIB1Gf0quWIvY2TNkO4ay9O3mgZU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7172
+X-OriginatorOrg: intel.com
 
-On 2/28/24 9:37 PM, Stephen Hemminger wrote:
-> The 32 bit statistics are problematic since 32 bit value can
-> easily wraparound at high speed. Use 64 bit stats if available.
+On Mon, Mar 04, 2024 at 03:08:44PM -0800, Jesse Brandeburg wrote:
+> The ice driver would previously panic during suspend. This is caused
+> from the driver *only* calling the ice_vsi_free_q_vectors() function by
+> itself, when it is suspending. Since commit b3e7b3a6ee92 ("ice: prevent
+> NULL pointer deref during reload") the driver has zeroed out
+> num_q_vectors, and only restored it in ice_vsi_cfg_def().
 > 
-> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> This further causes the ice_rebuild() function to allocate a zero length
+> buffer, after which num_q_vectors is updated, and then the new value of
+> num_q_vectors is used to index into the zero length buffer, which
+> corrupts memory.
+> 
+> The fix entails making sure all the code referencing num_q_vectors only
+> does so after it has been reset via ice_vsi_cfg_def().
+> 
+> I didn't perform a full bisect, but I was able to test against 6.1.77
+> kernel and that ice driver works fine for suspend/resume with no panic,
+> so sometime since then, this problem was introduced.
+> 
+> Also clean up an un-needed init of a local variable in the function
+> being modified.
+> 
+> PANIC from 6.8.0-rc1:
+> 
+> [1026674.915596] PM: suspend exit
+> [1026675.664697] ice 0000:17:00.1: PTP reset successful
+> [1026675.664707] ice 0000:17:00.1: 2755 msecs passed between update to cached PHC time
+> [1026675.667660] ice 0000:b1:00.0: PTP reset successful
+> [1026675.675944] ice 0000:b1:00.0: 2832 msecs passed between update to cached PHC time
+> [1026677.137733] ixgbe 0000:31:00.0 ens787: NIC Link is Up 1 Gbps, Flow Control: None
+> [1026677.190201] BUG: kernel NULL pointer dereference, address: 0000000000000010
+> [1026677.192753] ice 0000:17:00.0: PTP reset successful
+> [1026677.192764] ice 0000:17:00.0: 4548 msecs passed between update to cached PHC time
+> [1026677.197928] #PF: supervisor read access in kernel mode
+> [1026677.197933] #PF: error_code(0x0000) - not-present page
+> [1026677.197937] PGD 1557a7067 P4D 0
+> [1026677.212133] ice 0000:b1:00.1: PTP reset successful
+> [1026677.212143] ice 0000:b1:00.1: 4344 msecs passed between update to cached PHC time
+> [1026677.212575]
+> [1026677.243142] Oops: 0000 [#1] PREEMPT SMP NOPTI
+> [1026677.247918] CPU: 23 PID: 42790 Comm: kworker/23:0 Kdump: loaded Tainted: G        W          6.8.0-rc1+ #1
+> [1026677.257989] Hardware name: Intel Corporation M50CYP2SBSTD/M50CYP2SBSTD, BIOS SE5C620.86B.01.01.0005.2202160810 02/16/2022
+> [1026677.269367] Workqueue: ice ice_service_task [ice]
+> [1026677.274592] RIP: 0010:ice_vsi_rebuild_set_coalesce+0x130/0x1e0 [ice]
+> [1026677.281421] Code: 0f 84 3a ff ff ff 41 0f b7 74 ec 02 66 89 b0 22 02 00 00 81 e6 ff 1f 00 00 e8 ec fd ff ff e9 35 ff ff ff 48 8b 43 30 49 63 ed <41> 0f b7 34 24 41 83 c5 01 48 8b 3c e8 66 89 b7 aa 02 00 00 81 e6
+> [1026677.300877] RSP: 0018:ff3be62a6399bcc0 EFLAGS: 00010202
+> [1026677.306556] RAX: ff28691e28980828 RBX: ff28691e41099828 RCX: 0000000000188000
+> [1026677.314148] RDX: 0000000000000000 RSI: 0000000000000010 RDI: ff28691e41099828
+> [1026677.321730] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+> [1026677.329311] R10: 0000000000000007 R11: ffffffffffffffc0 R12: 0000000000000010
+> [1026677.336896] R13: 0000000000000000 R14: 0000000000000000 R15: ff28691e0eaa81a0
+> [1026677.344472] FS:  0000000000000000(0000) GS:ff28693cbffc0000(0000) knlGS:0000000000000000
+> [1026677.353000] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [1026677.359195] CR2: 0000000000000010 CR3: 0000000128df4001 CR4: 0000000000771ef0
+> [1026677.366779] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> [1026677.374369] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> [1026677.381952] PKRU: 55555554
+> [1026677.385116] Call Trace:
+> [1026677.388023]  <TASK>
+> [1026677.390589]  ? __die+0x20/0x70
+> [1026677.394105]  ? page_fault_oops+0x82/0x160
+> [1026677.398576]  ? do_user_addr_fault+0x65/0x6a0
+> [1026677.403307]  ? exc_page_fault+0x6a/0x150
+> [1026677.407694]  ? asm_exc_page_fault+0x22/0x30
+> [1026677.412349]  ? ice_vsi_rebuild_set_coalesce+0x130/0x1e0 [ice]
+> [1026677.418614]  ice_vsi_rebuild+0x34b/0x3c0 [ice]
+> [1026677.423583]  ice_vsi_rebuild_by_type+0x76/0x180 [ice]
+> [1026677.429147]  ice_rebuild+0x18b/0x520 [ice]
+> [1026677.433746]  ? delay_tsc+0x8f/0xc0
+> [1026677.437630]  ice_do_reset+0xa3/0x190 [ice]
+> [1026677.442231]  ice_service_task+0x26/0x440 [ice]
+> [1026677.447180]  process_one_work+0x174/0x340
+> [1026677.451669]  worker_thread+0x27e/0x390
+> [1026677.455890]  ? __pfx_worker_thread+0x10/0x10
+> [1026677.460627]  kthread+0xee/0x120
+> [1026677.464235]  ? __pfx_kthread+0x10/0x10
+> [1026677.468445]  ret_from_fork+0x2d/0x50
+> [1026677.472476]  ? __pfx_kthread+0x10/0x10
+> [1026677.476671]  ret_from_fork_asm+0x1b/0x30
+> [1026677.481050]  </TASK>
+> 
+> Fixes: b3e7b3a6ee92 ("ice: prevent NULL pointer deref during reload")
+> Reported-by: Robert Elliott <elliott@hpe.com>
+> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+
+Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+
+Well, that refactor of config path introduced lots of issues. Could
+validation folks include a short list of tests they tried out against
+tested patch?
+
 > ---
->  misc/ifstat.c | 37 ++++++++++++++++++++++++++++++++-----
->  1 file changed, 32 insertions(+), 5 deletions(-)
+>  drivers/net/ethernet/intel/ice/ice_lib.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
 > 
-
-applied to iproute2-next
+> diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+> index 097bf8fd6bf0..0f5a92a6b1e6 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+> @@ -3238,7 +3238,7 @@ int ice_vsi_rebuild(struct ice_vsi *vsi, u32 vsi_flags)
+>  {
+>  	struct ice_vsi_cfg_params params = {};
+>  	struct ice_coalesce_stored *coalesce;
+> -	int prev_num_q_vectors = 0;
+> +	int prev_num_q_vectors;
+>  	struct ice_pf *pf;
+>  	int ret;
+>  
+> @@ -3252,13 +3252,6 @@ int ice_vsi_rebuild(struct ice_vsi *vsi, u32 vsi_flags)
+>  	if (WARN_ON(vsi->type == ICE_VSI_VF && !vsi->vf))
+>  		return -EINVAL;
+>  
+> -	coalesce = kcalloc(vsi->num_q_vectors,
+> -			   sizeof(struct ice_coalesce_stored), GFP_KERNEL);
+> -	if (!coalesce)
+> -		return -ENOMEM;
+> -
+> -	prev_num_q_vectors = ice_vsi_rebuild_get_coalesce(vsi, coalesce);
+> -
+>  	ret = ice_vsi_realloc_stat_arrays(vsi);
+>  	if (ret)
+>  		goto err_vsi_cfg;
+> @@ -3268,6 +3261,13 @@ int ice_vsi_rebuild(struct ice_vsi *vsi, u32 vsi_flags)
+>  	if (ret)
+>  		goto err_vsi_cfg;
+>  
+> +	coalesce = kcalloc(vsi->num_q_vectors,
+> +			   sizeof(struct ice_coalesce_stored), GFP_KERNEL);
+> +	if (!coalesce)
+> +		return -ENOMEM;
+> +
+> +	prev_num_q_vectors = ice_vsi_rebuild_get_coalesce(vsi, coalesce);
+> +
+>  	ret = ice_vsi_cfg_tc_lan(pf, vsi);
+>  	if (ret) {
+>  		if (vsi_flags & ICE_VSI_FLAG_INIT) {
+> 
+> base-commit: 6923134fc6b62d7909169b3ad913ab72ee04233a
+> -- 
+> 2.39.3
+> 
+> 
 
