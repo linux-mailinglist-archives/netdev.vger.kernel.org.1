@@ -1,82 +1,247 @@
-Return-Path: <netdev+bounces-77785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FA0B87302C
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:04:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BF98873033
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:08:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C754B287DF0
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:04:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B161DB24E20
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:08:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEBC5D470;
-	Wed,  6 Mar 2024 08:03:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A305CDF6;
+	Wed,  6 Mar 2024 08:07:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fctAOKTM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.rmail.be (mail.rmail.be [85.234.218.189])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 152305C057
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 08:03:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.234.218.189
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33075C8F2;
+	Wed,  6 Mar 2024 08:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709712233; cv=none; b=SNV+/mJT873FZSY+ACDImypZEpTLMolE6nJpBuYwLdrxfr8n5QtTVKPkPXlqBN6AH5Z21u7kuqGxXE76KYhZnzwJlti4RHR+p82340nJVfHVUrSNDrDH0Av/+dbb6CVtW9rRXTdS/fc7+9SYFFC890a0TszEH4Osc/x5zakOjgY=
+	t=1709712476; cv=none; b=sN7qM8fPrufRTZTgMs2xs+ry4OPTk879qAYiZJVEejuXkruH42OkxB5pGtX2OcB856MwqU3uk28+ejOQiGyVCjJ8EVaWwhctSpyUfTzcnREJyXBNOvZVATwuUwoduWdCkfDTotgYIhicYFDwPMBfprFOEIxJpTgI+zscf8E3jk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709712233; c=relaxed/simple;
-	bh=IXhbopC1Bk+7Fc83Ih3rvnZjSieTDFD/HP+fm5h8z6A=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=g/sHy5Z8EAF3szDnc7cnmnfhYumJMHcbatJkpdIB2EkZ76P5a7WG6UVLWCH052hrsSxcFAqWL/B52N6fdA8lALo0x3tPBf1Yh9kHvuMSof3sqJVr37ylneTOSzWF0EQGo6b1Kp5undU2d001uwGCKHLU3jk424ucpeYpZhME364=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rmail.be; spf=pass smtp.mailfrom=rmail.be; arc=none smtp.client-ip=85.234.218.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rmail.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rmail.be
-Received: from mail.rmail.be (domotica.rmail.be [10.238.9.4])
-	by mail.rmail.be (Postfix) with ESMTP id 017484C83F;
-	Wed,  6 Mar 2024 09:03:44 +0100 (CET)
+	s=arc-20240116; t=1709712476; c=relaxed/simple;
+	bh=WbMdSiodw9X+xm7fX4aN02k9Q+2ZypirLFDyETPYzbE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YXcpPML9JTQRYkuE9GjESj53FG3GwLIDaaHNawgakBSgWsjPF10D/ugFoFRqHLBE7YZxFl/sK4pEks2cwtU4Im2QgobioeirbUwLHv4avZ+psz+aHCx5sWl7WM1QbL6KqQsR0WA/5Ru5hkvzVDYmN/8I9q2jrkgnN+X6Wwjbus0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fctAOKTM; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPA id 6162A2000A;
+	Wed,  6 Mar 2024 08:07:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1709712466;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1hqiXywqPxinlmqbxEa5AKNjp6J6xlhWN58U0CT6W/o=;
+	b=fctAOKTMnH9sNZmAslIT2qUEzo3b9wOecb3i++oOuqVyI5rs/uh56093VF5GWP0MWCDPCD
+	az1vaf3hrtaAQXobTygYbVy0LEpPm/QVarFmoZzYhz7O+HhMuZQ8YxSZC53bRlEVyTZRXi
+	fm7vpeGUZwm3GSdskRlmgslFd/PUf4+lJZMplOSRLSot3szdoAKOlRbjM4D5IL4xn0sAdN
+	kPABG5MQe0C8qAVw05ciouMJjQiEyZxRtnC8Ymf3g4bVufHTQKeagOSsPpGK/u/HXP6Ntn
+	iAjcmrpLzoDDguqAQlXADE8kyFFHY/1nClKYVzIPYv3APMBLxpE7jx/4gDkRJQ==
+From: Herve Codina <herve.codina@bootlin.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Mark Brown <broonie@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: [PATCH v6 0/5] Add support for QMC HDLC
+Date: Wed,  6 Mar 2024 09:07:16 +0100
+Message-ID: <20240306080726.167338-1-herve.codina@bootlin.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 06 Mar 2024 09:03:44 +0100
-From: Maarten <maarten@rmail.be>
-To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, Broadcom
- internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
-Cc: Doug Berger <opendmb@gmail.com>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Phil Elwell <phil@raspberrypi.com>
-Subject: Re: [PATCH] net: bcmgenet: Reset RBUF on first open
-In-Reply-To: <20240305130728.5d879a7e@kernel.org>
-References: <20240224000025.2078580-1-maarten@rmail.be>
- <bc73b1e2-d99d-4ac2-9ae0-a55a8b271747@broadcom.com>
- <f189f3c9-0ea7-4863-aba7-1c7d0fe11ee2@gmail.com>
- <20240305071321.4f522fe8@kernel.org>
- <45ba80640e989541e142c32fb3520589@rmail.be>
- <20240305130728.5d879a7e@kernel.org>
-Message-ID: <42cc2d7ec8913a3a71e918e3f116c55e@rmail.be>
-X-Sender: maarten@rmail.be
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-Jakub Kicinski schreef op 2024-03-05 22:07:
-> On Tue, 05 Mar 2024 21:36:03 +0100 Maarten wrote:
->> > The patch has minor formatting issues (using spaces to indent).
->> > Once you've gain sufficient confidence that it doesn't cause issues -
->> > please mend that and repost.
->> 
->> I'm sorry, it was blatantly obvious and I missed it :-( . I had added
->> indent-with-non-tab to git core.whitespace , but it seems to only 
->> error
->> when a full 8 spaces are present in indentation. By any chance, is 
->> there
->> something to test this? In the main time, I'll do a git show -p --raw 
->> |
->> hexdump -C to check this .
->> 
->> I've fixed that on my git (and fixed some similar issues in other
->> patches) and will resend.
-> 
-> I'd rather you waited with the resend until Doug or Florian confirms
-> the change is okay. No point having the patch rot in patchwork until
-> then.
+Hi,
 
-Ok, hopefully it won't take too long for them to do their due diligence.
+This series introduces the QMC HDLC support.
+
+Patches were previously sent as part of a full feature series and were
+previously reviewed in that context:
+"Add support for QMC HDLC, framer infrastructure and PEF2256 framer" [1]
+
+In order to ease the merge, the full feature series has been split and
+needed parts were merged in v6.8-rc1:
+ - "Prepare the PowerQUICC QMC and TSA for the HDLC QMC driver" [2]
+ - "Add support for framer infrastructure and PEF2256 framer" [3]
+
+This series contains patches related to the QMC HDLC part (QMC HDLC
+driver):
+ - Introduce the QMC HDLC driver (patches 1 and 2)
+ - Add timeslots change support in QMC HDLC (patch 3)
+ - Add framer support as a framer consumer in QMC HDLC (patch 4)
+
+Compare to the original full feature series, a modification was done on
+patch 3 in order to use a coherent prefix in the commit title.
+
+I kept the patches unsquashed as they were previously sent and reviewed.
+Of course, I can squash them if needed.
+
+Compared to the previous iteration:
+  https://lore.kernel.org/linux-kernel/20240229141554.836867-1-herve.codina@bootlin.com/
+this v6 series mainly:
+- Adds missing header file inclusion.
+- Reworks loop in error handler.
+- Improves readability.
+- Adds 'Reviewed-by' tags.
+
+Best regards,
+Hervé
+
+[1]: https://lore.kernel.org/linux-kernel/20231115144007.478111-1-herve.codina@bootlin.com/
+[2]: https://lore.kernel.org/linux-kernel/20231205152116.122512-1-herve.codina@bootlin.com/
+[3]: https://lore.kernel.org/linux-kernel/20231128132534.258459-1-herve.codina@bootlin.com/
+
+Changes v5 -> v6
+  - Patch 1
+    Add missing header file inclusion.
+    Rework loop in qmc_hdlc_open() error handler.
+    Add 'Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>'
+
+  - Patch 2
+    No changes.
+
+  - Patch 3
+    Avoid breaking API calls in kernel-doc to improve readability.
+    Remove Andy's credit. Keep only his signed-off-by.
+
+  - Patch 4 and 5
+    Add	'Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>'.
+
+Changes v4 -> v5
+  - Patch 1
+    Update QMC_HDLC_RX_ERROR_FLAGS to improve readability.
+    Display an error message after releasing resources instead of
+    before.
+    Use 'struct device *dev' in probe().
+    Use dev_err_probe() in probe().
+    Do not print a message on -ENOMEM.
+    Use guard() and scoped_guard().
+
+  - Patch 3
+    Use '(). See' constructing in kernel-doc instead of '() (See ...'
+    Add 'Co-developed-by: Herve Codina <herve.codina@bootlin.com>'
+
+  - Patch 4
+    Use 'struct device *dev' in probe().
+    Use dev_err_probe() in probe().
+    Use '%64pb' instead of '%*pb' in printk formats.
+
+  - Patch 5
+    Use 'struct device *dev' in probe().
+    Use guard()
+
+Changes v3 -> v4
+  - Patch 1
+    Remove of.h and of_platform.h includes, add mod_devicetable.h.
+    Add a blank line in the includes list.
+
+  - Path 2
+    No changes.
+
+  - v3 patches 3 and 4 removed
+
+  - Patch 3 (new patch in v4)
+    Introduce bitmap_{scatter,gather}() based on the original patch done
+    by Andy Shevchenko.
+    Address comments already done on the original patch:
+    https://lore.kernel.org/lkml/20230926052007.3917389-3-andriy.shevchenko@linux.intel.com/
+      - Removed the returned values.
+      - Used 'unsigned int' for all indexes.
+      - Added a 'visual' description of the operations in kernel-doc.
+      - Described the relationship between bitmap_scatter() and
+        bitmap_gather().
+      - Moved bitmap_{scatter,gather}() to the bitmap.h file.
+      - Improved bitmap_{scatter,gather}() test.
+      - Reworked the commit log.
+
+  - Patch 4 (v3 patch 5)
+    Use bitmap_{scatter,gather}()
+
+  - Patches 5 (v3 patch 6)
+    No changes.
+
+Changes v2 -> v3
+  - Patch 1
+    Remove 'inline' function specifier from .c file.
+    Fix a bug introduced when added WARN_ONCE(). The warn condition must
+    be desc->skb (descriptor used) instead of !desc->skb.
+    Remove a lock/unlock section locking the entire qmc_hdlc_xmit()
+    function.
+
+  - Patch 5
+    Use bitmap_from_u64() everywhere instead of bitmap_from_arr32() and
+    bitmap_from_arr64().
+
+Changes v1 -> v2
+  - Patch 1
+    Use the same qmc_hdlc initialisation in qmc_hcld_recv_complete()
+    than the one present in qmc_hcld_xmit_complete().
+    Use WARN_ONCE()
+
+  - Patch 3 (new patch in v2)
+    Make bitmap_onto() available to users
+
+  - Patch 4 (new patch in v2)
+    Introduce bitmap_off()
+
+  - Patch 5 (patch 3 in v1)
+    Use bitmap_*() functions
+
+  - Patch 6 (patch 4 in v1)
+    No changes
+
+Changes compare to the full feature series:
+  - Patch 3
+    Use 'net: wan: fsl_qmc_hdlc:' as commit title prefix
+
+Patches extracted:
+  - Patch 1 : full feature series patch 7
+  - Patch 2 : full feature series patch 8
+  - Patch 3 : full feature series patch 20
+  - Patch 4 : full feature series patch 27
+
+Andy Shevchenko (1):
+  lib/bitmap: Introduce bitmap_scatter() and bitmap_gather() helpers
+
+Herve Codina (4):
+  net: wan: Add support for QMC HDLC
+  MAINTAINERS: Add the Freescale QMC HDLC driver entry
+  net: wan: fsl_qmc_hdlc: Add runtime timeslots changes support
+  net: wan: fsl_qmc_hdlc: Add framer support
+
+ MAINTAINERS                    |   7 +
+ drivers/net/wan/Kconfig        |  12 +
+ drivers/net/wan/Makefile       |   1 +
+ drivers/net/wan/fsl_qmc_hdlc.c | 791 +++++++++++++++++++++++++++++++++
+ include/linux/bitmap.h         | 101 +++++
+ lib/test_bitmap.c              |  42 ++
+ 6 files changed, 954 insertions(+)
+ create mode 100644 drivers/net/wan/fsl_qmc_hdlc.c
+
+-- 
+2.43.0
+
 
