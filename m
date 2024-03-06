@@ -1,101 +1,158 @@
-Return-Path: <netdev+bounces-78303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 617F3874A6C
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:12:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D9A78736A1
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:37:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DA9F2817E3
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:12:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDB8E281DC7
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 12:37:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC41823BF;
-	Thu,  7 Mar 2024 09:12:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cQmGF5ZA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 019C512CDB1;
+	Wed,  6 Mar 2024 12:37:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5400D82D8A
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 09:12:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E72878668;
+	Wed,  6 Mar 2024 12:37:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709802739; cv=none; b=io8lRo6fl6SCXXAYqGgEDMiNPgymgGdfoUkXPn8sHK95Qws6+Vp0qnZ7yjQCrMCmdOGMazD/RowIkIVpNELpxOdGvNso/AJvZBeSABZ4ULbMK23JqdbN4tGva1lU78PxssXoz4hyp3kIjJhV3ItcYLCb7EBqEnml71BJRhq/1As=
+	t=1709728667; cv=none; b=QpWkcgKPLc5Q1K5Vk5PO1NrQpp6hpoRlKWCD07ag9VSukTF2BFdyOhkI8znjGh5k8D50wHluq2C7xIQkuZgpMZAaMMdGnP3SLInIC0HzZ8cjE/afjJUh2jRfcay7J2Y8dAeq38TlSbkoomEQiTlUs1rPH9p7CDY+YtTJuU7lpKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709802739; c=relaxed/simple;
-	bh=9zcxcj/+/jwqDoQZFZMZGlm89mLjcAulqrwjQvaSNDc=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=gDQb5YGPc1X9NEv+sVw4h9ZZUZYfhxuypWSuXTV/IEU2Jezn12Wkiu67YUw3A384eoYr2wvLZcbaKFvOZ/a+c6jAfanqFkRErNm1ejfjL0czeVDDX7MA7ySxZXao/88WxaoWQdzmS2AFCoNNbQQUYlUtvoFT+ss9Pksu0bzqR1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cQmGF5ZA; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-33e162b1b71so598874f8f.1
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 01:12:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709802736; x=1710407536; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9zcxcj/+/jwqDoQZFZMZGlm89mLjcAulqrwjQvaSNDc=;
-        b=cQmGF5ZAgSipzFlLce8gpH8qsbn/UorXd0LrtTTrmjI2KzPZHB4kAP7Hi+KCfBtdrl
-         IZk29LSsthSGHaX0bXbz7mg3UPJmwlo+uoerhSItzhUD1+EnB3bFY5D8qQfEkzvL/N5f
-         6npXGoZJ8sI+i6lnJw/cW/FKhAM8LUJ9zH3/RB3Kpg0gNu0vjt7kjx234C15VDkrSCXA
-         7LuE58EezYoTBjuOW+H+o/fpxwuZdSo1Km3NV+AVbHKG8RZrmZ5Xe3Y0+RgzMPBrhj1x
-         Ni1hlR/cs2+0HV53R8mghlwuauBO0kNTgZITgSlRTYelNvfE8RxfsagRxlqNnNlblP6y
-         EsTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709802736; x=1710407536;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9zcxcj/+/jwqDoQZFZMZGlm89mLjcAulqrwjQvaSNDc=;
-        b=alg6T0hJsaXJZLTfWXu4WyKuG9vG1S5Uq+1PYu2bAMk/hRKtMpIuZ1NeHzImA6jfWV
-         ZlVN8Wgz+9hccQqvXtCHOrAxoHshJ18ev/GZinVU2AXLt/2CahxTeqvqaH7tGEjGFjQo
-         8+kleaCJOJPrlAVPYm4k6HSnA132161Pj64drtAj3ZbmKnbgIaBfTVIJgaC1XV1RVyBQ
-         CJUpowz47fkdxfDgNJwPSKJvgwGsBS0aJKemRKkz/2HrWHuYrIMmj4l/zZbwBgbKFUEg
-         nTjg1mKrFbA43lX//pAZdn+wNx6Yf/+O8fGTdZxCq+J51Hlx7ZV8RjPJvvyVu5GVjafz
-         Dg6w==
-X-Forwarded-Encrypted: i=1; AJvYcCUt1K2eh+fJ/wW/da00Bvj3BvoiNNlHDkOmNtlTvRWXeO+fyLre5t6RW19n6OeUura7gsmKlgH/xhXVRe8UscNHZZlJ3GjH
-X-Gm-Message-State: AOJu0YwQ2n/2loR4EELW0XszKupbw/XdnrVJHtx1fNt7US7phlNOn3CA
-	frOcHJu8Op/Gwp54oFsvADKH/nbC5oaP4oCiVKZyU6YAuUS6eZd0
-X-Google-Smtp-Source: AGHT+IEeUtPhPpaYn/k3jYckLGzfpuVIh4xBKZkl31XhGE0iOPR1urnbeh+gOFy08yh7xx720hE7+A==
-X-Received: by 2002:adf:9c86:0:b0:33d:731f:b750 with SMTP id d6-20020adf9c86000000b0033d731fb750mr11284153wre.54.1709802736298;
-        Thu, 07 Mar 2024 01:12:16 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:952f:caa6:b9c0:b4d8])
-        by smtp.gmail.com with ESMTPSA id by1-20020a056000098100b0033e22341942sm17014282wrb.78.2024.03.07.01.12.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Mar 2024 01:12:15 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  nicolas.dichtel@6wind.com,  jiri@resnulli.us
-Subject: Re: [PATCH net-next] tools: ynl: check for overflow of constructed
- messages
-In-Reply-To: <20240305185000.964773-1-kuba@kernel.org> (Jakub Kicinski's
-	message of "Tue, 5 Mar 2024 10:50:00 -0800")
-Date: Wed, 06 Mar 2024 12:31:12 +0000
-Message-ID: <m2jzmfh78v.fsf@gmail.com>
-References: <20240305185000.964773-1-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1709728667; c=relaxed/simple;
+	bh=H4l2DgnqyQlVDiFExqxtFkBp3iqUS/pZqNwziWPDq4U=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=qvMqvTdAUXSIB5KZiE4NvSAoivIkCipYaC+PQnluYCyaSQFfZj7mHmv0ogADWIdAx9G7DoQ+Sf5SgOwTdfhJ2SUXriTHo1/EmwhOPFmmTlCTieztvSc0OrSVo19EYP0PiHliIuFL7FINh7PP/aWg/0RQrsT1fBmRydN9T0Ml+fI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4TqX3L3NVrzNlbl;
+	Wed,  6 Mar 2024 20:35:58 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id ABDAC14011F;
+	Wed,  6 Mar 2024 20:37:36 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Wed, 6 Mar
+ 2024 20:37:36 +0800
+Subject: Re: [RFC PATCH net-next v6 00/15] Device Memory TCP
+To: Mina Almasry <almasrymina@google.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-alpha@vger.kernel.org>,
+	<linux-mips@vger.kernel.org>, <linux-parisc@vger.kernel.org>,
+	<sparclinux@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-media@vger.kernel.org>,
+	<dri-devel@lists.freedesktop.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Richard
+ Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky
+	<ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, Thomas
+ Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+	<James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>,
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
+	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
+	<arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+	<martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+	<john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
+	<sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	David Ahern <dsahern@kernel.org>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, Sumit
+ Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=c3=b6nig?=
+	<christian.koenig@amd.com>, Pavel Begunkov <asml.silence@gmail.com>, David
+ Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Shailend Chand
+	<shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel
+ Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, Praveen
+ Kaligineedi <pkaligineedi@google.com>
+References: <20240305020153.2787423-1-almasrymina@google.com>
+ <6208950d-6453-e797-7fc3-1dcf15b49dbe@huawei.com>
+ <CAHS8izMwTRyqUS0iRtErfAqDVsXRia5Ajx9PRK3vcfo8utJoUA@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <de633244-6d6e-f568-dc09-49b56abd0423@huawei.com>
+Date: Wed, 6 Mar 2024 20:37:35 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CAHS8izMwTRyqUS0iRtErfAqDVsXRia5Ajx9PRK3vcfo8utJoUA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-Jakub Kicinski <kuba@kernel.org> writes:
+On 2024/3/6 3:38, Mina Almasry wrote:
+> On Tue, Mar 5, 2024 at 4:54 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>
+>> On 2024/3/5 10:01, Mina Almasry wrote:
+>>
+>> ...
+>>
+>>>
+>>> Perf - page-pool benchmark:
+>>> ---------------------------
+>>>
+>>> bench_page_pool_simple.ko tests with and without these changes:
+>>> https://pastebin.com/raw/ncHDwAbn
+>>>
+>>> AFAIK the number that really matters in the perf tests is the
+>>> 'tasklet_page_pool01_fast_path Per elem'. This one measures at about 8
+>>> cycles without the changes but there is some 1 cycle noise in some
+>>> results.
+>>>
+>>> With the patches this regresses to 9 cycles with the changes but there
+>>> is 1 cycle noise occasionally running this test repeatedly.
+>>>
+>>> Lastly I tried disable the static_branch_unlikely() in
+>>> netmem_is_net_iov() check. To my surprise disabling the
+>>> static_branch_unlikely() check reduces the fast path back to 8 cycles,
+>>> but the 1 cycle noise remains.
+>>>
+>>
+>> The last sentence seems to be suggesting the above 1 ns regresses is caused
+>> by the static_branch_unlikely() checking?
+> 
+> Note it's not a 1ns regression, it's looks like maybe a 1 cycle
+> regression (slightly less than 1ns if I'm reading the output of the
+> test correctly):
+> 
+> # clean net-next
+> time_bench: Type:tasklet_page_pool01_fast_path Per elem: 8 cycles(tsc)
+> 2.993 ns (step:0)
+> 
+> # with patches
+> time_bench: Type:tasklet_page_pool01_fast_path Per elem: 9 cycles(tsc)
+> 3.679 ns (step:0)
+> 
+> # with patches and with diff that disables static branching:
 
-> Donald points out that we don't check for overflows.
-> Stash the length of the message on nlmsg_pid (nlmsg_seq would
-> do as well). This allows the attribute helpers to remain
-> self-contained (no extra arguments). Also let the put
-> helpers continue to return nothing. The error is checked
-> only in (newly introduced) ynl_msg_end().
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> time_bench: Type:tasklet_page_pool01_fast_path Per elem: 8 cycles(tsc)
+> 3.248 ns (step:0)
+> 
+> I do see noise in the test results between run and run, and any
+> regression (if any) is slightly obfuscated by the noise, so it's a bit
+> hard to make confident statements. So far it looks like a ~0.25ns
+> regression without static branch and about ~0.65ns with static branch.
+> 
+> Honestly when I saw all 3 results were within some noise I did not
+> investigate more, but if this looks concerning to you I can dig
+> further. I likely need to gather a few test runs to filter out the
+> noise and maybe investigate the assembly my compiler is generating to
+> maybe narrow down what changes there.
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+Yes, that is confusing enough that need more investigation.
+
+> 
 
