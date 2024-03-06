@@ -1,185 +1,117 @@
-Return-Path: <netdev+bounces-77735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 555D0872CF0
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 03:47:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 548E5872CFE
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 03:50:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2FB5B2490A
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 02:47:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 863B61C265C8
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 02:50:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209EDDDD4;
-	Wed,  6 Mar 2024 02:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10157C8C7;
+	Wed,  6 Mar 2024 02:50:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="RH95CX61"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fF3uHeOV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD4AD52E
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 02:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BB2635
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 02:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709693220; cv=none; b=rB0dMRkxDlagbi/H4dSmEaT/ur/8YAHiqNAwftYLCkVlrZ0LCuHwZuBXYrpSjnB0CZUYuP3tDxbVLPg4x0LPRxc0lx/Pvmv3W/di+KhVgSHq3QOhO33KWIJ4SGMZ3DdQD5KKFP9ohzJYO5VRmT8Bb30BwKhRmOxXwB7EsTd7uPg=
+	t=1709693438; cv=none; b=t3gUGf/alQDSEdCx4UqFxHb60MJgQlo2ARuVIKT2F83pnwLebsSXLFoK2lYbFlse116S/xSQrvBtBBbCkikU8jH999MWIhS55W2bhmXxYDO8yEC5sWe++nDUg8MMfjnAl08do926goF2HYRgS0z4OQAAheeqWjcPrP8zD/Z1yK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709693220; c=relaxed/simple;
-	bh=vgsULBah38khq6izlM1CG5mUxG895JBR5VzGpBHy3FY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VfPnDLXuNM9Q6Z4rHcgXEkEQJ2jtvxjsy+hAM9UqEy5Y6i5NEC4353G9XNGPIOa2K7oymoxEWfdXmeybh8tcAQ3TxzajCj7tZPjhLgWd9VJ0XoScd21SPJxx01NeNRTBkhtCVQkgt6CeMaUA/SGjVc1AfISfOTVBSS9emkFuQzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=RH95CX61; arc=none smtp.client-ip=209.85.210.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6e4de6fb7f9so2690672a34.0
-        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 18:46:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1709693217; x=1710298017; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W/AZhM1ardFsAGX29qTgbwwqhyfXbQstP0cTfps3sJk=;
-        b=RH95CX612YwxRLTNIu4v3zLtCu3aw3P0O5Xg9O0RfH8Z/hp9seSg/nGkaua/Aec2mt
-         qGI9bRFbbTxabTtQi3xGtF90fQzVxSqwH1lS2Rg2WmjU6EpO/A8STxSid0/vLmD7Apwu
-         hMOkSWTa8K6z8RDyvx1Vdz/l2gw3EHdLT4pYT/IQt7zxAH3pm4HvAmu1DK0YccC2v7fX
-         pAqLegabU1gggT7hI+WjI4Fp5Lrw9hf97XcshLS3mEKtKOeLo6DVidu5BryVC3v3u7BU
-         925rceimbjXK/QAEgca22Ma6vB9fB9+1j7ehWInrT4/BpX2fVfaPN5B9GQxtvuXasfbO
-         Bp+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709693217; x=1710298017;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W/AZhM1ardFsAGX29qTgbwwqhyfXbQstP0cTfps3sJk=;
-        b=PDQplMJBvnx2cUkzVEFRROCG3ANOxCFd2IAmnS0dzhluCfikulmxUkazL8GKVKYrgO
-         P4go/ki7ghU4SiSZCI7J5ezRNDQhIi9CS17sK5BUuiHebE2cjQwMJoh3yJIKzKhzBFlh
-         6AbTOBxdlCDd4BpXmmSsjM8WX0y/XNSU63uyFXm79WN+NpdfWsRjMtN3Vg9V82tQmebR
-         w/FsI48ZKDFK6xHuGpwdIZMkOKUzHoMdoZaanVnHGzcNi1rY9NRfFFvl5qJnVAPsDGah
-         WHCijHk29kQWzzJlopQh16fFyocLwNoa4sNJ5YvJBIIYn8nuMymCIMbO9W0Bi6i9xBqn
-         uqLQ==
-X-Gm-Message-State: AOJu0YyB9bKrTLjB90dtFSX4h5xTh/quDoc+jL4lZfZSPAWVaqQ+cZuq
-	8HgljoN6OUBC6ptbqXXOrgb65iSSTnXM+IErWdud/LdN0UrVT50ENYJBoRiceDM=
-X-Google-Smtp-Source: AGHT+IElGkSnHiGxc2lEze/zAWu5r0LLRyGowQ+sBx3sowtn7O6N/+zrQ759eeI/XO5+QBu0Nsc7Pw==
-X-Received: by 2002:a05:6870:461b:b0:21e:4a2a:f060 with SMTP id z27-20020a056870461b00b0021e4a2af060mr4180063oao.13.1709693216865;
-        Tue, 05 Mar 2024 18:46:56 -0800 (PST)
-Received: from [192.168.1.24] (71-212-18-124.tukw.qwest.net. [71.212.18.124])
-        by smtp.gmail.com with ESMTPSA id r16-20020a62e410000000b006e46047fe04sm9667498pfh.204.2024.03.05.18.46.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Mar 2024 18:46:56 -0800 (PST)
-Message-ID: <6562b8b0-6cc0-4652-b746-75549801c002@davidwei.uk>
-Date: Tue, 5 Mar 2024 18:46:55 -0800
+	s=arc-20240116; t=1709693438; c=relaxed/simple;
+	bh=4QiwYzyIDPh9dLyrpI5WBB5yIvFVCJxZeRDGkfcvOyM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ulpY6z8bU2wOcmKH5ZfxrmZh3tNVa6uoTKtwea8yggHyt6blNnvxmMg1yDPTtIbfExvs1l6RdJ1O3adVFTWRHZtYy5oBvSsqPXebVNycpDN05CxkScFI7ZYY/VfeH/VTLwaIeCHuYRbjASjTMSNH/QJGG7Vg56u0i2E91MzLMQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fF3uHeOV; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709693436; x=1741229436;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4QiwYzyIDPh9dLyrpI5WBB5yIvFVCJxZeRDGkfcvOyM=;
+  b=fF3uHeOVvzy5keoDa268JST6HHOqKbRy/f1M2kphFniR/B4KLqbXYgWd
+   Sdw/GKihuQu+0jgcgk2CYkm5fiy7Qc30o3q+SF/1kXt3QVhekR1KR046L
+   uxW2djdF/96lWsyWY+0J0x0WXTAhHTzomaMRX6DqJxAo0GlR9m733zdua
+   dWJcAtZ8+ye50hykue0qVez4/8BFfVtFH0AJag0p6ngvu99KZ/iu36XZ6
+   LYO9eADDK2zChe3B9GD9Jkx/IOs6cfg+Il1em6MLD8GJrtUr+7uQyYokp
+   ymX6y6Oz7vHNgpjnBWtyVlTnautVSiX1D8g0w5HIsFQvyjUYWGq6WdsP2
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="21741373"
+X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
+   d="scan'208";a="21741373"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 18:50:30 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
+   d="scan'208";a="14088531"
+Received: from jbrandeb-coyote30.jf.intel.com ([10.166.29.19])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2024 18:50:29 -0800
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	netdev@vger.kernel.org,
+	horms@kernel.org,
+	pmenzel@molgen.mpg.de
+Subject: [PATCH iwl-next v2 0/2] net: intel: cleanup power ops
+Date: Tue,  5 Mar 2024 18:50:20 -0800
+Message-Id: <20240306025023.800029-1-jesse.brandeburg@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v6 09/15] memory-provider: dmabuf devmem
- memory provider
-Content-Language: en-GB
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Pavel Begunkov <asml.silence@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-References: <20240305020153.2787423-1-almasrymina@google.com>
- <20240305020153.2787423-10-almasrymina@google.com>
- <383c4870-167f-4123-bbf3-928db1463e01@davidwei.uk>
- <CAHS8izP_PzDJVxycwZe_d_x10-SX4=Q-CWpKTjoOQ5dc2NSn3w@mail.gmail.com>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <CAHS8izP_PzDJVxycwZe_d_x10-SX4=Q-CWpKTjoOQ5dc2NSn3w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 2024-03-05 18:42, Mina Almasry wrote:
-> On Tue, Mar 5, 2024 at 6:28 PM David Wei <dw@davidwei.uk> wrote:
->>
->> On 2024-03-04 18:01, Mina Almasry wrote:
->>> +     if (pool->p.queue)
->>> +             binding = READ_ONCE(pool->p.queue->binding);
->>> +
->>> +     if (binding) {
->>> +             pool->mp_ops = &dmabuf_devmem_ops;
->>> +             pool->mp_priv = binding;
->>> +     }
->>
->> This is specific to TCP devmem. For ZC Rx we will need something more
->> generic to let us pass our own memory provider backend down to the page
->> pool.
->>
->> What about storing ops and priv void ptr in struct netdev_rx_queue
->> instead? Then we can both use it.
-> 
-> Yes, this is dmabuf specific, I was thinking you'd define your own
-> member of netdev_rx_queue, and then add something like this to
-> page_pool_init:
-> 
-> +       if (pool->p.queue)
-> +               io_uring_metadata = READ_ONCE(pool->p.queue->io_uring_metadata);
-> +
-> +       /* We don't support rx-queues that are configured for both
-> io_uring & dmabuf binding */
-> +       BUG_ON(io_uring_metadata && binding);
-> +
-> +       if (io_uring_metadata) {
-> +               pool->mp_ops = &io_uring_ops;
-> +               pool->mp_priv = io_uring_metadata;
-> +       }
-> 
-> I.e., we share the pool->mp_ops and the pool->mp_priv but we don't
-> really need to share the same netdev_rx_queue member. For me it's a
-> dma-buf specific data structure (netdev_dmabuf_binding) and for you
-> it's something else.
+Do a quick refactor of igb to clean up some unnecessary declarations,
+noticed while doing the real work of 2/2.
 
-This adds size to struct netdev_rx_queue and requires checks on whether
-both are set. There can be thousands of these structs at any one time so
-if we don't need to add size unnecessarily then that would be best.
+Follow that with a change of all the Intel drivers to use the current
+power management declaration APIs, to avoid complication and maintenance
+issues with CONFIG_PM=<m|y|n>. This is as per [1]
 
-We can disambiguate by comparing &mp_ops and then cast the void ptr to
-our impl specific objects.
+Mostly compile-tested only, the ice driver currently has a bug in it
+that causes a panic that is being fixed via -net.
 
-What do you not like about this approach?
+Changes in v2:
+- ice driver simple changes added which go with this series
+- igb compilation issues of the patch when standalone with CONFIG_PM=n
+  fixed by adding missing ifdef, which is then cleaned up in 2/2
 
-> 
-> page_pool_init() probably needs to validate that the queue is
-> configured for dma-buf or io_uring but not both. If it's configured
-> for both then the user is doing something funky we shouldn't support.
-> 
-> Perhaps I can make the intention clearer by renaming 'binding' to
-> something more specific to dma-buf like queue->dmabuf_binding, to make
-> it clear that this is the dma-buf binding and not some other binding
-> like io_uring?
-> 
+original v1:
+Link: https://lore.kernel.org/netdev/20240210220109.3179408-1-jesse.brandeburg@intel.com/
+
+[1] https://lore.kernel.org/netdev/20211207002102.26414-1-paul@crapouillou.net/
+
+Jesse Brandeburg (2):
+  igb: simplify pci ops declaration
+  net: intel: implement modern PM ops declarations
+
+ drivers/net/ethernet/intel/e100.c             |  8 +--
+ drivers/net/ethernet/intel/e1000/e1000_main.c | 14 ++---
+ drivers/net/ethernet/intel/e1000e/netdev.c    | 22 +++----
+ drivers/net/ethernet/intel/fm10k/fm10k_pci.c  | 10 ++--
+ drivers/net/ethernet/intel/i40e/i40e_main.c   | 10 ++--
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  8 +--
+ drivers/net/ethernet/intel/ice/ice_main.c     | 12 ++--
+ drivers/net/ethernet/intel/igb/igb_main.c     | 59 ++++++++-----------
+ drivers/net/ethernet/intel/igbvf/netdev.c     |  6 +-
+ drivers/net/ethernet/intel/igc/igc_main.c     | 24 +++-----
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  8 +--
+ .../net/ethernet/intel/ixgbevf/ixgbevf_main.c |  8 +--
+ 12 files changed, 78 insertions(+), 111 deletions(-)
+
+
+base-commit: 60d06425e04558be21634a719b5c60c9bd862c34
+-- 
+2.39.3
+
 
