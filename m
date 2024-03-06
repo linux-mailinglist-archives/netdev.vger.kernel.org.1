@@ -1,127 +1,99 @@
-Return-Path: <netdev+bounces-78053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A617873DA1
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:42:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29481873DB1
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:46:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3974E1C216A8
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:42:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D91F2282E34
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AAE213BAEE;
-	Wed,  6 Mar 2024 17:42:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A5613BAD7;
+	Wed,  6 Mar 2024 17:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="efxBbrOE"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LtT7u0aU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D183A139569;
-	Wed,  6 Mar 2024 17:42:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE58135A5B;
+	Wed,  6 Mar 2024 17:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709746933; cv=none; b=pOYD3BBPCU3L+zhGJ4p4OnRU7Glo2eKIMNCpKQCxAosAynjUhjKGWmUnteLFgeTj+oj11bGZrND/by/UCu4tw2GRnlDPADowvux2AHsvzmHFkrAvgWGZDrIL/TPAUpFJPRWg+KJmlI2CeyGVXzgI1xDgVGFpOncE2Wg/FKX5KE0=
+	t=1709747177; cv=none; b=lv3meiuCj0p9BugBFjOI4EI6btyxHcQVKZlmsB+yPUQJlMkoJN7iRjcWt7fhsoeec2h/zlnHaFX4FPlneo6FrP1HpiiyzNhL4YePY4NZqSECW76PS8n55M9DDEPViAPb55dnPnoP5PVbgVh53uyDaJisqEeBStlvnrp3toZ/rEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709746933; c=relaxed/simple;
-	bh=XCnhPj2fK38RW068ZA7Azta24iCeZaL58zBR3pb2O9c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sUeaaJUGRiYQN0dOiuyFCAs8ZwF48JV/8QwNhuCCVYeYn/ZAif5ijVQMjYSMzzgkyqlV1Gicz/br918Xke9LJU66kvoPrSY2C0nOiErAkFVY0ZO7B9Wix922Xgcv7jJUzsjiF90HP254w82Cf00iZujkB77BC0f35aKCW/riUb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=efxBbrOE; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6901114742bso393366d6.2;
-        Wed, 06 Mar 2024 09:42:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709746931; x=1710351731; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cP96RrcztrNAzMbEhfXoCNnB/B/rAwamum1tutFUVu8=;
-        b=efxBbrOEAxh/RB0JqEoOb3uQMVm/igqShZoBifbXkRurITEHjWPSx9yUVO+Q/EFFWm
-         WMRnnwi3dkMa5/HAdpJ3iOjKNl58UKcdI5Gn01LQDfGrzf3RYa+R4R3JAB3gVWDdaLQe
-         0HYu/Xe2BCrXYQWnPkVr+EObnJpjkcm+sb+5YfDtl79CYulPlk+We/w8lMjsHqcNHCCC
-         y8FU8hzCzbhugJRQ3e8Vsvu/iE6op4IgH/ErAyIXle9OmQh1BiQFZnige/trbKEUjYG6
-         Q+hHcIcp35D7BsBWM2I20qBdFrpm2S9sAKBS4lsKospNhioVpN1zXauzoEoYcxZNpYGI
-         rQpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709746931; x=1710351731;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cP96RrcztrNAzMbEhfXoCNnB/B/rAwamum1tutFUVu8=;
-        b=NO9kfp5YDZUyyNjQf7jo8kypVDwhwYc5SvM4c/lVeAIxHNPJ7T2Nae/O/M91m701tQ
-         96LGeLusxKtW1VFBpiDVCamv6duk0okBCpmdv3gz252sZSYX4/roe+ZAmYW4NAOXO345
-         ro3j8VhQp0JdAYtg2cgGyAvDxA+iIRF6TCcwT88MPideDq2dbctCtko/J9E1MxuKafhG
-         ZOKW4USfgKzil37i7ZcTSCIbPJ3VBn7fAC68bwfRT/GR6O1vvSjo+lvNa8wUQUQdOHo+
-         20MAyIl5x1n9y/vCTSF+lmY7Q879IPaY8nQZ4rV2NY982k+Slrhn7MU0Za6a1tAZn6qj
-         B/3w==
-X-Forwarded-Encrypted: i=1; AJvYcCW1oeqJyTSKNJF89P56X3vFd4TB8bxyGPOSrzd3UaQBwawgGf9oKRz6QuLPH9AQpgqZLjkmNLxcxwDbd03E6En1+2qVbfFSuM8WWBOc3cSmoDaxdveNmpiRNUcKOUMj+SEl7vmsAR1Z5A==
-X-Gm-Message-State: AOJu0Yzlz5V65eXK4HpX6gB8IrQ3K066ZCcCAfLXdRApU2RcxuL2fCmy
-	PFFWpnE4aM7nSnAZ0dzRVjhZCoyuXowsQj7gMYYH08TXoBa0bUM2
-X-Google-Smtp-Source: AGHT+IEdVVnjOkVxsshHgJLZVHna+BAO8gJvdt0HEpxKUw8ATSAgs42Yfrkygg+W6m2PVqJ1V92CMQ==
-X-Received: by 2002:ad4:4990:0:b0:690:7e04:7874 with SMTP id u16-20020ad44990000000b006907e047874mr5613328qvx.2.1709746930844;
-        Wed, 06 Mar 2024 09:42:10 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id kr9-20020a0562142b8900b0068fcd643b9dsm7654626qvb.22.2024.03.06.09.42.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Mar 2024 09:42:09 -0800 (PST)
-Message-ID: <fc8a079f-10f1-4b2e-abc1-0a043eb1876e@gmail.com>
-Date: Wed, 6 Mar 2024 09:42:02 -0800
+	s=arc-20240116; t=1709747177; c=relaxed/simple;
+	bh=VTEgi30FbwNlL4FbYg7JVPoXMEZ94IoTaaIvVhCiH2k=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mvmSkOMg8FQLcuX9Uh2bVj99FpblqyBb3u1jeanzzdgPbWWGmILxWD4KCj/qAZJ6PiH3nih2GwBAJu0J62BUSVQSB80+aVKuWYfx7G3AypnolKEK6x6iCXWNthuzBau/AjWS3fElN9MpuebT/wMYddmvk+ONS2w9TQDsBSJwCUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LtT7u0aU; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7D73E60004;
+	Wed,  6 Mar 2024 17:46:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1709747173;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Idele/8qXZRgSYp7F56voFjVrzpXCoT8VmNU5ueySCU=;
+	b=LtT7u0aUPYz/2P00L0hev/DeNZRJtF/aa0hlfQMSIWJ/xJLluah5IUILkRiNVDobjxMZz2
+	k19P5OupxpbdBocA4PFC/v6s4bDyhZc6EEh3qhk4BmQ8R66nPFINNs5T9T8JbKwnclj9dX
+	RL+4C8hpZgDDTvR51xwjWZuKp+GzK2//sbDwhcRJLDY+yhfk7q8EV8cvnSK5whU0Hoqhu6
+	VH1+bU9iG8o2foDne+gB8PI9RRwR3GhetzDj/+DLcATkoFC1Soh18En8d9N79SpS+dTq8K
+	ynJJh1sZpzRSSlYEVYn3hfss4fs+82d2lmgEYox1qUqyy1QqsMKMco7wO+TFRQ==
+Date: Wed, 6 Mar 2024 18:46:11 +0100
+From: Herve Codina <herve.codina@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Ratheesh Kannoth <rkannoth@marvell.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [EXTERNAL] Re: [PATCH v6 1/5] net: wan: Add support for QMC
+ HDLC
+Message-ID: <20240306184611.0cea20af@bootlin.com>
+In-Reply-To: <20240306082230.7ecf207b@kernel.org>
+References: <20240306080726.167338-2-herve.codina@bootlin.com>
+	<20240306105651.1210286-1-rkannoth@marvell.com>
+	<20240306143743.5732b298@bootlin.com>
+	<MWHPR1801MB191837C8907B39F67893F0BBD3212@MWHPR1801MB1918.namprd18.prod.outlook.com>
+	<20240306082230.7ecf207b@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: dwmac-imx: add nxp,phy-wol
-Content-Language: en-US
-To: Catalin Popescu <catalin.popescu@leica-geosystems.com>,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, shawnguo@kernel.org, s.hauer@pengutronix.de,
- kernel@pengutronix.de, festevam@gmail.com, xiaoning.wang@nxp.com,
- linux-imx@nxp.com, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- mcoquelin.stm32@gmail.com
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, imx@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- bsp-development.geo@leica-geosystems.com, m.felsch@pengutronix.de
-References: <20240306172409.878928-1-catalin.popescu@leica-geosystems.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20240306172409.878928-1-catalin.popescu@leica-geosystems.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-On 3/6/24 09:24, Catalin Popescu wrote:
-> Add support for PHY WOL capability to dwmac-imx MAC driver.
+Hi Jakub,
+
+On Wed, 6 Mar 2024 08:22:30 -0800
+Jakub Kicinski <kuba@kernel.org> wrote:
+
+> On Wed, 6 Mar 2024 16:01:48 +0000 Ratheesh Kannoth wrote:
+> > > > > +	struct qmc_hdlc_desc *desc = context;
+> > > > > +	struct net_device *netdev = desc->netdev;
+> > > > > +	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);    
+> > > > Reverse xmas tree    
+> > > 
+> > > The reverse xmas tree order cannot be used here.
+> > > qmc_hdlc depends on netdev, netdev depends on desc.
+> > >     
+> > ACK. Usually I get comments to split declaration and assignment for
+> > my patches in upstream.   
 > 
-> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-> ---
->   Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml | 6 ++++++
->   1 file changed, 6 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml b/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml
-> index 4c01cae7c93a..6cf373772eb1 100644
-> --- a/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml
-> +++ b/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml
-> @@ -71,6 +71,12 @@ properties:
->       description:
->         To select RMII reference clock from external.
->   
-> +  nxp,phy-wol:
-> +    $ref: /schemas/types.yaml#/definitions/flag
-> +    description:
-> +      If present, indicates that PHY supports WOL(Wake-On-LAN), and PHY WOL will be enabled.
-> +      Otherwise, MAC WOL is preferred.
+> Yup, that's our general preference, to split the init out of 
+> the definition.
 
-This is encoding a policy in Device Tree, which is not acceptable, see 
-my comment about your second patch.
+Does it mean that I need to update in a next iteration ?
 
-pw-bot: cr
--- 
-Florian
-
+Best regards,
+Hervé
 
