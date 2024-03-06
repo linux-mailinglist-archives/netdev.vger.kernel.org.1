@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-78097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEE358740E5
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 20:55:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 198E18740E6
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 20:55:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE9631C218F0
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 19:55:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8588E1F2318F
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 19:55:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D36F513DB9C;
-	Wed,  6 Mar 2024 19:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52D45140E29;
+	Wed,  6 Mar 2024 19:55:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BJxuDjob"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zf7NVxtj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06F8142627
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F08514039E
 	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 19:55:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709754918; cv=none; b=Z/vzYAHTLkxa2Wv8SJMicwZSoI8CpOBmOj7JlG0Pb30kNWpaTHGxWEYND3BGvYl9jhs8owBVvlPB3rc5A2C58wuf7edXDOhIhxwy5GC2ec/HkDvTPVB6lNjzhmeVM+5fBcsShHSnbhCVttY2gcao0JPyMwp5SNyXog0K0Nh1ayE=
+	t=1709754919; cv=none; b=ZldpTDH7Jorz2xgaamP9yfw+n7nrBt4BJcUxnASYj0N2crn1HID/jm/fe7AFT6yRBz7BESvzQsaQ1jTBxMJpkFn4+KJhqxFAvNUyy9aRnpqJ7m02LQucCx+6eb9qMw7Q7Cd9pyh0klW8AYfnJ3S3JcuyOjdYWmKcMupJj2LTem8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709754918; c=relaxed/simple;
-	bh=V6nM5VXdPmZSeagnpuD2OkE9T80kS8wkV7P+joAaK38=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m5DpXF6B230+osU49Ouv+iXeq9R3seNk0Jg6WNUy+BtQiw11KdkPjNrTmPPuV2U5frU/+0BdwgNGmtBFrlQFDPjochrxr1AI3pRijrma4CRrYI1+2a/X0Oprwc5u8r7y+zySYaRvDq3xcrBJyu6+6hmgrPXlevUUrN31l1YZbWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BJxuDjob; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCEAFC433C7;
-	Wed,  6 Mar 2024 19:55:17 +0000 (UTC)
+	s=arc-20240116; t=1709754919; c=relaxed/simple;
+	bh=3tl1Qe0DmP1JT87OTxGTe5Ns6dvfFV8P8aaZqJT1fRc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=did/EG/AsXoZBBEVxm+vlbQ34/obL8rO1A1MsbtPNy2ixnxgy7CFVsAbZwqFq/tCZKJEfX/ExNFzRHhcb8LeJNrETQgKgmAi2PIo0/Je9M9+1ynrhXySHHm3Qxs6nIND5ppqLTcgb7RdGC8TdkpXJku/RDy9wA/T1ppe7k6wVqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zf7NVxtj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B047C43394;
+	Wed,  6 Mar 2024 19:55:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709754918;
-	bh=V6nM5VXdPmZSeagnpuD2OkE9T80kS8wkV7P+joAaK38=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BJxuDjobc9lWyxFnTEfhtKPabx5vcrn2snmaKMhM3Z9oq4YIZjkCxAe3OSh5BHykA
-	 +Ss7388LCEtg4Mm5DHvWrsKMPytmNhcYQwAfQyYsuhk/+/gv2kEA+SQaZa97NKmn3J
-	 6tPl+ivBsN9DukU9hWFWjBau7fOqg7VD2C14v07rOJw/2y4rm58cXOf/CshGrES24s
-	 zQalbaVXuY2q4LgEnVP3tOPJTYaFL6cqcu1ul81OMnfabY2ja+jXNMn/d0MB9nFhLp
-	 kWIdWylCPD89acixdIOdilVy9jlJv6V5PWPSFTfHlIiLFaq6l2iFD+locVr6GKnIHo
-	 bVUWIGAQfMGGA==
+	bh=3tl1Qe0DmP1JT87OTxGTe5Ns6dvfFV8P8aaZqJT1fRc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Zf7NVxtj/DuvhYtZl5mqrmm8opIFJP37zaWV7IAYwk56scrqVZBu8I7xP5EL2ddlC
+	 JnjpZBNXvbdAspQGWtGdDatmXdRrThNWbrOQZ34OLxeBkHDAShho/1VdW7g+dpsjiX
+	 3KSbJg1gJHbDtWQ2sPEBJNRVnwRnmvcxv+4/lLOEvfJKF3d1M11phCbVp7hshLh9sX
+	 HWEf3c5H+H4/AfYQ1G465TE4/AaWJZeUoZfbFiWjPURSesr7bHFatotNk7roEvQVyH
+	 9NVR0zxMQnbJjdpSDscVgwz+iMV2PXzL1CpQWyj0plpbLC7JZAljYchxXckiDJ1vAu
+	 aa2CIAOcGCoHw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,10 +53,12 @@ Cc: netdev@vger.kernel.org,
 	sdf@google.com,
 	przemyslaw.kitszel@intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v3 0/3] netdev: add per-queue statistics
-Date: Wed,  6 Mar 2024 11:55:06 -0800
-Message-ID: <20240306195509.1502746-1-kuba@kernel.org>
+Subject: [PATCH net-next v3 1/3] netdev: add per-queue statistics
+Date: Wed,  6 Mar 2024 11:55:07 -0800
+Message-ID: <20240306195509.1502746-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240306195509.1502746-1-kuba@kernel.org>
+References: <20240306195509.1502746-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,47 +67,634 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi!
+The ethtool-nl family does a good job exposing various protocol
+related and IEEE/IETF statistics which used to get dumped under
+ethtool -S, with creative names. Queue stats don't have a netlink
+API, yet, and remain a lion's share of ethtool -S output for new
+drivers. Not only is that bad because the names differ driver to
+driver but it's also bug-prone. Intuitively drivers try to report
+only the stats for active queues, but querying ethtool stats
+involves multiple system calls, and the number of stats is
+read separately from the stats themselves. Worse still when user
+space asks for values of the stats, it doesn't inform the kernel
+how big the buffer is. If number of stats increases in the meantime
+kernel will overflow user buffer.
 
-Per queue stats keep coming up, so it's about time someone laid
-the foundation. This series adds the uAPI, a handful of stats
-and a sample support for bnxt. It's not very comprehensive in
-terms of stat types or driver support. The expectation is that
-the support will grow organically. If we have the basic pieces
-in place it will be easy for reviewers to request new stats,
-or use of the API in place of ethtool -S.
+Add a netlink API for dumping queue stats. Queue information is
+exposed via the netdev-genl family, so add the stats there.
+Support per-queue and sum-for-device dumps. Latter will be useful
+when subsequent patches add more interesting common stats than
+just bytes and packets.
 
-See patch 3 for sample output.
+The API does not currently distinguish between HW and SW stats.
+The expectation is that the source of the stats will either not
+matter much (good packets) or be obvious (skb alloc errors).
 
-v3:
- - remove the dump error handling, core does it now (b5a899154aa94)
- - fix ring mapping w/ XDP in bnxt
-v2: https://lore.kernel.org/all/20240229010221.2408413-1-kuba@kernel.org/
- - un-wrap short lines
- - s/stats/qstats/
-v1: https://lore.kernel.org/all/20240226211015.1244807-1-kuba@kernel.org/
- - rename projection -> scope
- - turn projection/scope into flags
- - remove the "netdev" scope since it's always implied
-rfc: https://lore.kernel.org/all/20240222223629.158254-1-kuba@kernel.org/
+Acked-by: Stanislav Fomichev <sdf@google.com>
+Reviewed-by: Amritha Nambiar <amritha.nambiar@intel.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ Documentation/netlink/specs/netdev.yaml |  84 ++++++++++
+ Documentation/networking/statistics.rst |  15 ++
+ include/linux/netdevice.h               |   3 +
+ include/net/netdev_queues.h             |  54 ++++++
+ include/uapi/linux/netdev.h             |  19 +++
+ net/core/netdev-genl-gen.c              |  12 ++
+ net/core/netdev-genl-gen.h              |   2 +
+ net/core/netdev-genl.c                  | 213 ++++++++++++++++++++++++
+ tools/include/uapi/linux/netdev.h       |  19 +++
+ 9 files changed, 421 insertions(+)
 
-Jakub Kicinski (3):
-  netdev: add per-queue statistics
-  netdev: add queue stat for alloc failures
-  eth: bnxt: support per-queue statistics
-
- Documentation/netlink/specs/netdev.yaml   |  91 +++++++++
- Documentation/networking/statistics.rst   |  15 ++
- drivers/net/ethernet/broadcom/bnxt/bnxt.c |  65 +++++++
- include/linux/netdevice.h                 |   3 +
- include/net/netdev_queues.h               |  56 ++++++
- include/uapi/linux/netdev.h               |  20 ++
- net/core/netdev-genl-gen.c                |  12 ++
- net/core/netdev-genl-gen.h                |   2 +
- net/core/netdev-genl.c                    | 214 ++++++++++++++++++++++
- tools/include/uapi/linux/netdev.h         |  20 ++
- 10 files changed, 498 insertions(+)
-
+diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+index 3addac970680..a1e48c3c84c9 100644
+--- a/Documentation/netlink/specs/netdev.yaml
++++ b/Documentation/netlink/specs/netdev.yaml
+@@ -74,6 +74,10 @@ name: netdev
+     name: queue-type
+     type: enum
+     entries: [ rx, tx ]
++  -
++    name: qstats-scope
++    type: flags
++    entries: [ queue ]
+ 
+ attribute-sets:
+   -
+@@ -265,6 +269,66 @@ name: netdev
+         doc: ID of the NAPI instance which services this queue.
+         type: u32
+ 
++  -
++    name: qstats
++    doc: |
++      Get device statistics, scoped to a device or a queue.
++      These statistics extend (and partially duplicate) statistics available
++      in struct rtnl_link_stats64.
++      Value of the `scope` attribute determines how statistics are
++      aggregated. When aggregated for the entire device the statistics
++      represent the total number of events since last explicit reset of
++      the device (i.e. not a reconfiguration like changing queue count).
++      When reported per-queue, however, the statistics may not add
++      up to the total number of events, will only be reported for currently
++      active objects, and will likely report the number of events since last
++      reconfiguration.
++    attributes:
++      -
++        name: ifindex
++        doc: ifindex of the netdevice to which stats belong.
++        type: u32
++        checks:
++          min: 1
++      -
++        name: queue-type
++        doc: Queue type as rx, tx, for queue-id.
++        type: u32
++        enum: queue-type
++      -
++        name: queue-id
++        doc: Queue ID, if stats are scoped to a single queue instance.
++        type: u32
++      -
++        name: scope
++        doc: |
++          What object type should be used to iterate over the stats.
++        type: uint
++        enum: qstats-scope
++      -
++        name: rx-packets
++        doc: |
++          Number of wire packets successfully received and passed to the stack.
++          For drivers supporting XDP, XDP is considered the first layer
++          of the stack, so packets consumed by XDP are still counted here.
++        type: uint
++        value: 8 # reserve some attr ids in case we need more metadata later
++      -
++        name: rx-bytes
++        doc: Successfully received bytes, see `rx-packets`.
++        type: uint
++      -
++        name: tx-packets
++        doc: |
++          Number of wire packets successfully sent. Packet is considered to be
++          successfully sent once it is in device memory (usually this means
++          the device has issued a DMA completion for the packet).
++        type: uint
++      -
++        name: tx-bytes
++        doc: Successfully sent bytes, see `tx-packets`.
++        type: uint
++
+ operations:
+   list:
+     -
+@@ -405,6 +469,26 @@ name: netdev
+           attributes:
+             - ifindex
+         reply: *napi-get-op
++    -
++      name: qstats-get
++      doc: |
++        Get / dump fine grained statistics. Which statistics are reported
++        depends on the device and the driver, and whether the driver stores
++        software counters per-queue.
++      attribute-set: qstats
++      dump:
++        request:
++          attributes:
++            - scope
++        reply:
++          attributes:
++            - ifindex
++            - queue-type
++            - queue-id
++            - rx-packets
++            - rx-bytes
++            - tx-packets
++            - tx-bytes
+ 
+ mcast-groups:
+   list:
+diff --git a/Documentation/networking/statistics.rst b/Documentation/networking/statistics.rst
+index 551b3cc29a41..75e017dfa825 100644
+--- a/Documentation/networking/statistics.rst
++++ b/Documentation/networking/statistics.rst
+@@ -41,6 +41,15 @@ If `-s` is specified once the detailed errors won't be shown.
+ 
+ `ip` supports JSON formatting via the `-j` option.
+ 
++Queue statistics
++~~~~~~~~~~~~~~~~
++
++Queue statistics are accessible via the netdev netlink family.
++
++Currently no widely distributed CLI exists to access those statistics.
++Kernel development tools (ynl) can be used to experiment with them,
++see `Documentation/userspace-api/netlink/intro-specs.rst`.
++
+ Protocol-specific statistics
+ ----------------------------
+ 
+@@ -147,6 +156,12 @@ Statistics are reported both in the responses to link information
+ requests (`RTM_GETLINK`) and statistic requests (`RTM_GETSTATS`,
+ when `IFLA_STATS_LINK_64` bit is set in the `.filter_mask` of the request).
+ 
++netdev (netlink)
++~~~~~~~~~~~~~~~~
++
++`netdev` generic netlink family allows accessing page pool and per queue
++statistics.
++
+ ethtool
+ -------
+ 
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index c41019f34179..5226a347f400 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2039,6 +2039,7 @@ enum netdev_reg_state {
+  *
+  *	@sysfs_rx_queue_group:	Space for optional per-rx queue attributes
+  *	@rtnl_link_ops:	Rtnl_link_ops
++ *	@stat_ops:	Optional ops for queue-aware statistics
+  *
+  *	@gso_max_size:	Maximum size of generic segmentation offload
+  *	@tso_max_size:	Device (as in HW) limit on the max TSO request size
+@@ -2419,6 +2420,8 @@ struct net_device {
+ 
+ 	const struct rtnl_link_ops *rtnl_link_ops;
+ 
++	const struct netdev_stat_ops *stat_ops;
++
+ 	/* for setting kernel sock attribute on TCP connection setup */
+ #define GSO_MAX_SEGS		65535u
+ #define GSO_LEGACY_MAX_SIZE	65536u
+diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
+index 8b8ed4e13d74..d633347eeda5 100644
+--- a/include/net/netdev_queues.h
++++ b/include/net/netdev_queues.h
+@@ -4,6 +4,60 @@
+ 
+ #include <linux/netdevice.h>
+ 
++struct netdev_queue_stats_rx {
++	u64 bytes;
++	u64 packets;
++};
++
++struct netdev_queue_stats_tx {
++	u64 bytes;
++	u64 packets;
++};
++
++/**
++ * struct netdev_stat_ops - netdev ops for fine grained stats
++ * @get_queue_stats_rx:	get stats for a given Rx queue
++ * @get_queue_stats_tx:	get stats for a given Tx queue
++ * @get_base_stats:	get base stats (not belonging to any live instance)
++ *
++ * Query stats for a given object. The values of the statistics are undefined
++ * on entry (specifically they are *not* zero-initialized). Drivers should
++ * assign values only to the statistics they collect. Statistics which are not
++ * collected must be left undefined.
++ *
++ * Queue objects are not necessarily persistent, and only currently active
++ * queues are queried by the per-queue callbacks. This means that per-queue
++ * statistics will not generally add up to the total number of events for
++ * the device. The @get_base_stats callback allows filling in the delta
++ * between events for currently live queues and overall device history.
++ * When the statistics for the entire device are queried, first @get_base_stats
++ * is issued to collect the delta, and then a series of per-queue callbacks.
++ * Only statistics which are set in @get_base_stats will be reported
++ * at the device level, meaning that unlike in queue callbacks, setting
++ * a statistic to zero in @get_base_stats is a legitimate thing to do.
++ * This is because @get_base_stats has a second function of designating which
++ * statistics are in fact correct for the entire device (e.g. when history
++ * for some of the events is not maintained, and reliable "total" cannot
++ * be provided).
++ *
++ * Device drivers can assume that when collecting total device stats,
++ * the @get_base_stats and subsequent per-queue calls are performed
++ * "atomically" (without releasing the rtnl_lock).
++ *
++ * Device drivers are encouraged to reset the per-queue statistics when
++ * number of queues change. This is because the primary use case for
++ * per-queue statistics is currently to detect traffic imbalance.
++ */
++struct netdev_stat_ops {
++	void (*get_queue_stats_rx)(struct net_device *dev, int idx,
++				   struct netdev_queue_stats_rx *stats);
++	void (*get_queue_stats_tx)(struct net_device *dev, int idx,
++				   struct netdev_queue_stats_tx *stats);
++	void (*get_base_stats)(struct net_device *dev,
++			       struct netdev_queue_stats_rx *rx,
++			       struct netdev_queue_stats_tx *tx);
++};
++
+ /**
+  * DOC: Lockless queue stopping / waking helpers.
+  *
+diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
+index 93cb411adf72..639ffa04c172 100644
+--- a/include/uapi/linux/netdev.h
++++ b/include/uapi/linux/netdev.h
+@@ -70,6 +70,10 @@ enum netdev_queue_type {
+ 	NETDEV_QUEUE_TYPE_TX,
+ };
+ 
++enum netdev_qstats_scope {
++	NETDEV_QSTATS_SCOPE_QUEUE = 1,
++};
++
+ enum {
+ 	NETDEV_A_DEV_IFINDEX = 1,
+ 	NETDEV_A_DEV_PAD,
+@@ -132,6 +136,20 @@ enum {
+ 	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
+ };
+ 
++enum {
++	NETDEV_A_QSTATS_IFINDEX = 1,
++	NETDEV_A_QSTATS_QUEUE_TYPE,
++	NETDEV_A_QSTATS_QUEUE_ID,
++	NETDEV_A_QSTATS_SCOPE,
++	NETDEV_A_QSTATS_RX_PACKETS = 8,
++	NETDEV_A_QSTATS_RX_BYTES,
++	NETDEV_A_QSTATS_TX_PACKETS,
++	NETDEV_A_QSTATS_TX_BYTES,
++
++	__NETDEV_A_QSTATS_MAX,
++	NETDEV_A_QSTATS_MAX = (__NETDEV_A_QSTATS_MAX - 1)
++};
++
+ enum {
+ 	NETDEV_CMD_DEV_GET = 1,
+ 	NETDEV_CMD_DEV_ADD_NTF,
+@@ -144,6 +162,7 @@ enum {
+ 	NETDEV_CMD_PAGE_POOL_STATS_GET,
+ 	NETDEV_CMD_QUEUE_GET,
+ 	NETDEV_CMD_NAPI_GET,
++	NETDEV_CMD_QSTATS_GET,
+ 
+ 	__NETDEV_CMD_MAX,
+ 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
+diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
+index be7f2ebd61b2..8d8ace9ef87f 100644
+--- a/net/core/netdev-genl-gen.c
++++ b/net/core/netdev-genl-gen.c
+@@ -68,6 +68,11 @@ static const struct nla_policy netdev_napi_get_dump_nl_policy[NETDEV_A_NAPI_IFIN
+ 	[NETDEV_A_NAPI_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
+ };
+ 
++/* NETDEV_CMD_QSTATS_GET - dump */
++static const struct nla_policy netdev_qstats_get_nl_policy[NETDEV_A_QSTATS_SCOPE + 1] = {
++	[NETDEV_A_QSTATS_SCOPE] = NLA_POLICY_MASK(NLA_UINT, 0x1),
++};
++
+ /* Ops table for netdev */
+ static const struct genl_split_ops netdev_nl_ops[] = {
+ 	{
+@@ -138,6 +143,13 @@ static const struct genl_split_ops netdev_nl_ops[] = {
+ 		.maxattr	= NETDEV_A_NAPI_IFINDEX,
+ 		.flags		= GENL_CMD_CAP_DUMP,
+ 	},
++	{
++		.cmd		= NETDEV_CMD_QSTATS_GET,
++		.dumpit		= netdev_nl_qstats_get_dumpit,
++		.policy		= netdev_qstats_get_nl_policy,
++		.maxattr	= NETDEV_A_QSTATS_SCOPE,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
+ };
+ 
+ static const struct genl_multicast_group netdev_nl_mcgrps[] = {
+diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
+index a47f2bcbe4fa..4db40fd5b4a9 100644
+--- a/net/core/netdev-genl-gen.h
++++ b/net/core/netdev-genl-gen.h
+@@ -28,6 +28,8 @@ int netdev_nl_queue_get_dumpit(struct sk_buff *skb,
+ 			       struct netlink_callback *cb);
+ int netdev_nl_napi_get_doit(struct sk_buff *skb, struct genl_info *info);
+ int netdev_nl_napi_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
++int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
++				struct netlink_callback *cb);
+ 
+ enum {
+ 	NETDEV_NLGRP_MGMT,
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index 918b109e0cf4..7fa75e13dc6d 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -8,6 +8,7 @@
+ #include <net/xdp.h>
+ #include <net/xdp_sock.h>
+ #include <net/netdev_rx_queue.h>
++#include <net/netdev_queues.h>
+ #include <net/busy_poll.h>
+ 
+ #include "netdev-genl-gen.h"
+@@ -460,6 +461,218 @@ int netdev_nl_queue_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ 	return err;
+ }
+ 
++#define NETDEV_STAT_NOT_SET		(~0ULL)
++
++static void netdev_nl_stats_add(void *_sum, const void *_add, size_t size)
++{
++	const u64 *add = _add;
++	u64 *sum = _sum;
++
++	while (size) {
++		if (*add != NETDEV_STAT_NOT_SET && *sum != NETDEV_STAT_NOT_SET)
++			*sum += *add;
++		sum++;
++		add++;
++		size -= 8;
++	}
++}
++
++static int netdev_stat_put(struct sk_buff *rsp, unsigned int attr_id, u64 value)
++{
++	if (value == NETDEV_STAT_NOT_SET)
++		return 0;
++	return nla_put_uint(rsp, attr_id, value);
++}
++
++static int
++netdev_nl_stats_write_rx(struct sk_buff *rsp, struct netdev_queue_stats_rx *rx)
++{
++	if (netdev_stat_put(rsp, NETDEV_A_QSTATS_RX_PACKETS, rx->packets) ||
++	    netdev_stat_put(rsp, NETDEV_A_QSTATS_RX_BYTES, rx->bytes))
++		return -EMSGSIZE;
++	return 0;
++}
++
++static int
++netdev_nl_stats_write_tx(struct sk_buff *rsp, struct netdev_queue_stats_tx *tx)
++{
++	if (netdev_stat_put(rsp, NETDEV_A_QSTATS_TX_PACKETS, tx->packets) ||
++	    netdev_stat_put(rsp, NETDEV_A_QSTATS_TX_BYTES, tx->bytes))
++		return -EMSGSIZE;
++	return 0;
++}
++
++static int
++netdev_nl_stats_queue(struct net_device *netdev, struct sk_buff *rsp,
++		      u32 q_type, int i, const struct genl_info *info)
++{
++	const struct netdev_stat_ops *ops = netdev->stat_ops;
++	struct netdev_queue_stats_rx rx;
++	struct netdev_queue_stats_tx tx;
++	void *hdr;
++
++	hdr = genlmsg_iput(rsp, info);
++	if (!hdr)
++		return -EMSGSIZE;
++	if (nla_put_u32(rsp, NETDEV_A_QSTATS_IFINDEX, netdev->ifindex) ||
++	    nla_put_u32(rsp, NETDEV_A_QSTATS_QUEUE_TYPE, q_type) ||
++	    nla_put_u32(rsp, NETDEV_A_QSTATS_QUEUE_ID, i))
++		goto nla_put_failure;
++
++	switch (q_type) {
++	case NETDEV_QUEUE_TYPE_RX:
++		memset(&rx, 0xff, sizeof(rx));
++		ops->get_queue_stats_rx(netdev, i, &rx);
++		if (!memchr_inv(&rx, 0xff, sizeof(rx)))
++			goto nla_cancel;
++		if (netdev_nl_stats_write_rx(rsp, &rx))
++			goto nla_put_failure;
++		break;
++	case NETDEV_QUEUE_TYPE_TX:
++		memset(&tx, 0xff, sizeof(tx));
++		ops->get_queue_stats_tx(netdev, i, &tx);
++		if (!memchr_inv(&tx, 0xff, sizeof(tx)))
++			goto nla_cancel;
++		if (netdev_nl_stats_write_tx(rsp, &tx))
++			goto nla_put_failure;
++		break;
++	}
++
++	genlmsg_end(rsp, hdr);
++	return 0;
++
++nla_cancel:
++	genlmsg_cancel(rsp, hdr);
++	return 0;
++nla_put_failure:
++	genlmsg_cancel(rsp, hdr);
++	return -EMSGSIZE;
++}
++
++static int
++netdev_nl_stats_by_queue(struct net_device *netdev, struct sk_buff *rsp,
++			 const struct genl_info *info,
++			 struct netdev_nl_dump_ctx *ctx)
++{
++	const struct netdev_stat_ops *ops = netdev->stat_ops;
++	int i, err;
++
++	if (!(netdev->flags & IFF_UP))
++		return 0;
++
++	i = ctx->rxq_idx;
++	while (ops->get_queue_stats_rx && i < netdev->real_num_rx_queues) {
++		err = netdev_nl_stats_queue(netdev, rsp, NETDEV_QUEUE_TYPE_RX,
++					    i, info);
++		if (err)
++			return err;
++		ctx->rxq_idx = i++;
++	}
++	i = ctx->txq_idx;
++	while (ops->get_queue_stats_tx && i < netdev->real_num_tx_queues) {
++		err = netdev_nl_stats_queue(netdev, rsp, NETDEV_QUEUE_TYPE_TX,
++					    i, info);
++		if (err)
++			return err;
++		ctx->txq_idx = i++;
++	}
++
++	ctx->rxq_idx = 0;
++	ctx->txq_idx = 0;
++	return 0;
++}
++
++static int
++netdev_nl_stats_by_netdev(struct net_device *netdev, struct sk_buff *rsp,
++			  const struct genl_info *info)
++{
++	struct netdev_queue_stats_rx rx_sum, rx;
++	struct netdev_queue_stats_tx tx_sum, tx;
++	const struct netdev_stat_ops *ops;
++	void *hdr;
++	int i;
++
++	ops = netdev->stat_ops;
++	/* Netdev can't guarantee any complete counters */
++	if (!ops->get_base_stats)
++		return 0;
++
++	memset(&rx_sum, 0xff, sizeof(rx_sum));
++	memset(&tx_sum, 0xff, sizeof(tx_sum));
++
++	ops->get_base_stats(netdev, &rx_sum, &tx_sum);
++
++	/* The op was there, but nothing reported, don't bother */
++	if (!memchr_inv(&rx_sum, 0xff, sizeof(rx_sum)) &&
++	    !memchr_inv(&tx_sum, 0xff, sizeof(tx_sum)))
++		return 0;
++
++	hdr = genlmsg_iput(rsp, info);
++	if (!hdr)
++		return -EMSGSIZE;
++	if (nla_put_u32(rsp, NETDEV_A_QSTATS_IFINDEX, netdev->ifindex))
++		goto nla_put_failure;
++
++	for (i = 0; i < netdev->real_num_rx_queues; i++) {
++		memset(&rx, 0xff, sizeof(rx));
++		if (ops->get_queue_stats_rx)
++			ops->get_queue_stats_rx(netdev, i, &rx);
++		netdev_nl_stats_add(&rx_sum, &rx, sizeof(rx));
++	}
++	for (i = 0; i < netdev->real_num_tx_queues; i++) {
++		memset(&tx, 0xff, sizeof(tx));
++		if (ops->get_queue_stats_tx)
++			ops->get_queue_stats_tx(netdev, i, &tx);
++		netdev_nl_stats_add(&tx_sum, &tx, sizeof(tx));
++	}
++
++	if (netdev_nl_stats_write_rx(rsp, &rx_sum) ||
++	    netdev_nl_stats_write_tx(rsp, &tx_sum))
++		goto nla_put_failure;
++
++	genlmsg_end(rsp, hdr);
++	return 0;
++
++nla_put_failure:
++	genlmsg_cancel(rsp, hdr);
++	return -EMSGSIZE;
++}
++
++int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
++				struct netlink_callback *cb)
++{
++	struct netdev_nl_dump_ctx *ctx = netdev_dump_ctx(cb);
++	const struct genl_info *info = genl_info_dump(cb);
++	struct net *net = sock_net(skb->sk);
++	struct net_device *netdev;
++	unsigned int scope;
++	int err = 0;
++
++	scope = 0;
++	if (info->attrs[NETDEV_A_QSTATS_SCOPE])
++		scope = nla_get_uint(info->attrs[NETDEV_A_QSTATS_SCOPE]);
++
++	rtnl_lock();
++	for_each_netdev_dump(net, netdev, ctx->ifindex) {
++		if (!netdev->stat_ops)
++			continue;
++
++		switch (scope) {
++		case 0:
++			err = netdev_nl_stats_by_netdev(netdev, skb, info);
++			break;
++		case NETDEV_QSTATS_SCOPE_QUEUE:
++			err = netdev_nl_stats_by_queue(netdev, skb, info, ctx);
++			break;
++		}
++		if (err < 0)
++			break;
++	}
++	rtnl_unlock();
++
++	return err;
++}
++
+ static int netdev_genl_netdevice_event(struct notifier_block *nb,
+ 				       unsigned long event, void *ptr)
+ {
+diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
+index 93cb411adf72..639ffa04c172 100644
+--- a/tools/include/uapi/linux/netdev.h
++++ b/tools/include/uapi/linux/netdev.h
+@@ -70,6 +70,10 @@ enum netdev_queue_type {
+ 	NETDEV_QUEUE_TYPE_TX,
+ };
+ 
++enum netdev_qstats_scope {
++	NETDEV_QSTATS_SCOPE_QUEUE = 1,
++};
++
+ enum {
+ 	NETDEV_A_DEV_IFINDEX = 1,
+ 	NETDEV_A_DEV_PAD,
+@@ -132,6 +136,20 @@ enum {
+ 	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
+ };
+ 
++enum {
++	NETDEV_A_QSTATS_IFINDEX = 1,
++	NETDEV_A_QSTATS_QUEUE_TYPE,
++	NETDEV_A_QSTATS_QUEUE_ID,
++	NETDEV_A_QSTATS_SCOPE,
++	NETDEV_A_QSTATS_RX_PACKETS = 8,
++	NETDEV_A_QSTATS_RX_BYTES,
++	NETDEV_A_QSTATS_TX_PACKETS,
++	NETDEV_A_QSTATS_TX_BYTES,
++
++	__NETDEV_A_QSTATS_MAX,
++	NETDEV_A_QSTATS_MAX = (__NETDEV_A_QSTATS_MAX - 1)
++};
++
+ enum {
+ 	NETDEV_CMD_DEV_GET = 1,
+ 	NETDEV_CMD_DEV_ADD_NTF,
+@@ -144,6 +162,7 @@ enum {
+ 	NETDEV_CMD_PAGE_POOL_STATS_GET,
+ 	NETDEV_CMD_QUEUE_GET,
+ 	NETDEV_CMD_NAPI_GET,
++	NETDEV_CMD_QSTATS_GET,
+ 
+ 	__NETDEV_CMD_MAX,
+ 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
 -- 
 2.44.0
 
