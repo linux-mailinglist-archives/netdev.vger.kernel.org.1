@@ -1,268 +1,82 @@
-Return-Path: <netdev+bounces-77784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 336F0873020
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:59:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FA0B87302C
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:04:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EC461F213B6
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 07:59:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C754B287DF0
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:04:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297E55CDF1;
-	Wed,  6 Mar 2024 07:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nAXrGGdB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEBC5D470;
+	Wed,  6 Mar 2024 08:03:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934945CDDC
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 07:59:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
+Received: from mail.rmail.be (mail.rmail.be [85.234.218.189])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 152305C057
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 08:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.234.218.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709711944; cv=none; b=W2i192IknteQwh02lLQJCw3Bsq0MLwrFf+QxIvA6iOllXMfhExCxVpwr/FM3q7Da/jv9CMDjDiQemiRqs7E/N1NdAT9yPU3WWVblWOMvypwtNXgYAEq4y9MeOdmNkz6DbpkUz7DQW8UL1Uc4LZAgPLpKQySO8oh2T1whqjtA1xk=
+	t=1709712233; cv=none; b=SNV+/mJT873FZSY+ACDImypZEpTLMolE6nJpBuYwLdrxfr8n5QtTVKPkPXlqBN6AH5Z21u7kuqGxXE76KYhZnzwJlti4RHR+p82340nJVfHVUrSNDrDH0Av/+dbb6CVtW9rRXTdS/fc7+9SYFFC890a0TszEH4Osc/x5zakOjgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709711944; c=relaxed/simple;
-	bh=4nTzqRh2Da9+8jGOqLVDfEZtt/wUSEj0nyjdCZP2Ywo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CMIs8xbqFRYuVd6g+x5+xAG6245VkF5971Iqvq5yF2NkM6c8NsbBANLGXr2MIJ/RIqw8ERqsoritkX62L65PCxh5OaBxHbObYLe5PZEduosd5dueqtVL1q+D13E+/HQR22hiJpapPjay456ZSY+zkzLe+Bmjc4PA0tnlOokexKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nAXrGGdB; arc=none smtp.client-ip=95.215.58.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <7aaeee73-4197-4ea8-834a-2265ef078bab@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709711938;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rMdKN/veBvBZl77DmaY151Schj3OAuh7OxlNW/BLu6g=;
-	b=nAXrGGdBbQdUdnkNDA0RBfdaM0nkRv2H/UfctRgaGjhMARmkjoODK6z6T5Ek4R6mb31PiN
-	nMhroCz5VA9f7LYxd6Tai65xSjh6m3soj7X7caiPOtItHpArT3l/ERx4PIrLWrqVqBCp4u
-	QV2T2p7Uwhiio13pBruGdoN4eu9koBU=
-Date: Tue, 5 Mar 2024 23:58:47 -0800
+	s=arc-20240116; t=1709712233; c=relaxed/simple;
+	bh=IXhbopC1Bk+7Fc83Ih3rvnZjSieTDFD/HP+fm5h8z6A=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=g/sHy5Z8EAF3szDnc7cnmnfhYumJMHcbatJkpdIB2EkZ76P5a7WG6UVLWCH052hrsSxcFAqWL/B52N6fdA8lALo0x3tPBf1Yh9kHvuMSof3sqJVr37ylneTOSzWF0EQGo6b1Kp5undU2d001uwGCKHLU3jk424ucpeYpZhME364=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rmail.be; spf=pass smtp.mailfrom=rmail.be; arc=none smtp.client-ip=85.234.218.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rmail.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rmail.be
+Received: from mail.rmail.be (domotica.rmail.be [10.238.9.4])
+	by mail.rmail.be (Postfix) with ESMTP id 017484C83F;
+	Wed,  6 Mar 2024 09:03:44 +0100 (CET)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v12 14/15] p4tc: add set of P4TC table kfuncs
-Content-Language: en-US
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: deb.chatterjee@intel.com, anjali.singhai@intel.com,
- namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com,
- Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, tomasz.osinski@intel.com,
- jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com,
- horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, daniel@iogearbox.net,
- victor@mojatatu.com, pctammela@mojatatu.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240225165447.156954-1-jhs@mojatatu.com>
- <20240225165447.156954-15-jhs@mojatatu.com>
- <9eff9a51-a945-48f6-9d14-a484b7c0d04c@linux.dev>
- <CAM0EoMniOaKn4W_WN9rmQZ1JY3qCugn34mmqCy9UdCTAj_tuTQ@mail.gmail.com>
- <f88b5f65-957e-4b5d-8959-d16e79372658@linux.dev>
- <CAM0EoMk=igKT5ZEwcfdQqP6O3u8tO7VOpkNsWE1b92ia2eZVpw@mail.gmail.com>
- <496c78b7-4e16-42eb-a2f4-99472cd764fd@linux.dev>
- <CAM0EoMmB0s5WzZ-CgGWBF9YdaWi7O0tHEj+C8zuryGhKz7+FpA@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAM0EoMmB0s5WzZ-CgGWBF9YdaWi7O0tHEj+C8zuryGhKz7+FpA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Date: Wed, 06 Mar 2024 09:03:44 +0100
+From: Maarten <maarten@rmail.be>
+To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, Broadcom
+ internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
+Cc: Doug Berger <opendmb@gmail.com>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Phil Elwell <phil@raspberrypi.com>
+Subject: Re: [PATCH] net: bcmgenet: Reset RBUF on first open
+In-Reply-To: <20240305130728.5d879a7e@kernel.org>
+References: <20240224000025.2078580-1-maarten@rmail.be>
+ <bc73b1e2-d99d-4ac2-9ae0-a55a8b271747@broadcom.com>
+ <f189f3c9-0ea7-4863-aba7-1c7d0fe11ee2@gmail.com>
+ <20240305071321.4f522fe8@kernel.org>
+ <45ba80640e989541e142c32fb3520589@rmail.be>
+ <20240305130728.5d879a7e@kernel.org>
+Message-ID: <42cc2d7ec8913a3a71e918e3f116c55e@rmail.be>
+X-Sender: maarten@rmail.be
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 3/5/24 4:30 AM, Jamal Hadi Salim wrote:
-> On Tue, Mar 5, 2024 at 2:40 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
->>
->> On 3/3/24 9:20 AM, Jamal Hadi Salim wrote:
->>
->>>>>>> +#define P4TC_MAX_PARAM_DATA_SIZE 124
->>>>>>> +
->>>>>>> +struct p4tc_table_entry_act_bpf {
->>>>>>> +     u32 act_id;
->>>>>>> +     u32 hit:1,
->>>>>>> +         is_default_miss_act:1,
->>>>>>> +         is_default_hit_act:1;
->>>>>>> +     u8 params[P4TC_MAX_PARAM_DATA_SIZE];
->>>>>>> +} __packed;
->>>>>>> +
->>>>>>> +struct p4tc_table_entry_act_bpf_kern {
->>>>>>> +     struct rcu_head rcu;
->>>>>>> +     struct p4tc_table_entry_act_bpf act_bpf;
->>>>>>> +};
->>>>>>> +
->>>>>>>      struct tcf_p4act {
->>>>>>>          struct tc_action common;
->>>>>>>          /* Params IDR reference passed during runtime */
->>>>>>>          struct tcf_p4act_params __rcu *params;
->>>>>>> +     struct p4tc_table_entry_act_bpf_kern __rcu *act_bpf;
->>>>>>>          u32 p_id;
->>>>>>>          u32 act_id;
->>>>>>>          struct list_head node;
->>>>>>> @@ -24,4 +40,39 @@ struct tcf_p4act {
->>>>>>>
->>>>>>>      #define to_p4act(a) ((struct tcf_p4act *)a)
->>>>>>>
->>>>>>> +static inline struct p4tc_table_entry_act_bpf *
->>>>>>> +p4tc_table_entry_act_bpf(struct tc_action *action)
->>>>>>> +{
->>>>>>> +     struct p4tc_table_entry_act_bpf_kern *act_bpf;
->>>>>>> +     struct tcf_p4act *p4act = to_p4act(action);
->>>>>>> +
->>>>>>> +     act_bpf = rcu_dereference(p4act->act_bpf);
->>>>>>> +
->>>>>>> +     return &act_bpf->act_bpf;
->>>>>>> +}
->>>>>>> +
->>>>>>> +static inline int
->>>>>>> +p4tc_table_entry_act_bpf_change_flags(struct tc_action *action, u32 hit,
->>>>>>> +                                   u32 dflt_miss, u32 dflt_hit)
->>>>>>> +{
->>>>>>> +     struct p4tc_table_entry_act_bpf_kern *act_bpf, *act_bpf_old;
->>>>>>> +     struct tcf_p4act *p4act = to_p4act(action);
->>>>>>> +
->>>>>>> +     act_bpf = kzalloc(sizeof(*act_bpf), GFP_KERNEL);
->>>>>>
->>>>>>
->>>>>> [ ... ]
->>
->>
->>>>>>> +static int
->>>>>>> +__bpf_p4tc_entry_create(struct net *net,
->>>>>>> +                     struct p4tc_table_entry_create_bpf_params *params,
->>>>>>> +                     void *key, const u32 key__sz,
->>>>>>> +                     struct p4tc_table_entry_act_bpf *act_bpf)
->>>>>>> +{
->>>>>>> +     struct p4tc_table_entry_key *entry_key = key;
->>>>>>> +     struct p4tc_pipeline *pipeline;
->>>>>>> +     struct p4tc_table *table;
->>>>>>> +
->>>>>>> +     if (!params || !key)
->>>>>>> +             return -EINVAL;
->>>>>>> +     if (key__sz != P4TC_ENTRY_KEY_SZ_BYTES(entry_key->keysz))
->>>>>>> +             return -EINVAL;
->>>>>>> +
->>>>>>> +     pipeline = p4tc_pipeline_find_byid(net, params->pipeid);
->>>>>>> +     if (!pipeline)
->>>>>>> +             return -ENOENT;
->>>>>>> +
->>>>>>> +     table = p4tc_tbl_cache_lookup(net, params->pipeid, params->tblid);
->>>>>>> +     if (!table)
->>>>>>> +             return -ENOENT;
->>>>>>> +
->>>>>>> +     if (entry_key->keysz != table->tbl_keysz)
->>>>>>> +             return -EINVAL;
->>>>>>> +
->>>>>>> +     return p4tc_table_entry_create_bpf(pipeline, table, entry_key, act_bpf,
->>>>>>> +                                        params->profile_id);
->>>>>>
->>>>>> My understanding is this kfunc will allocate a "struct
->>>>>> p4tc_table_entry_act_bpf_kern" object. If the bpf_p4tc_entry_delete() kfunc is
->>>>>> never called and the bpf prog is unloaded, how the act_bpf object will be
->>>>>> cleaned up?
->>>>>>
->>>>>
->>>>> The TC code takes care of this. Unloading the bpf prog does not affect
->>>>> the deletion, it is the TC control side that will take care of it. If
->>>>> we delete the pipeline otoh then not just this entry but all entries
->>>>> will be flushed.
->>>>
->>>> It looks like the "struct p4tc_table_entry_act_bpf_kern" object is allocated by
->>>> the bpf prog through kfunc and will only be useful for the bpf prog but not
->>>> other parts of the kernel. However, if the bpf prog is unloaded, these bpf
->>>> specific objects will be left over in the kernel until the tc pipeline (where
->>>> the act_bpf_kern object resided) is gone.
->>>>
->>>> It is the expectation on bpf prog (not only tc/xdp bpf prog) about resources
->>>> clean up that these bpf objects will be gone after unloading the bpf prog and
->>>> unpinning its bpf map.
->>>>
->>>
->>> The table (residing on the TC side) could be shared by multiple bpf
->>> programs. Entries are allocated on the TC side of the fence.
->>
->>
->>> IOW, the memory is not owned by the bpf prog but rather by pipeline.
->>
->> The struct p4tc_table_entry_act_(bpf_kern) object is allocated by
->> bpf_p4tc_entry_create() kfunc and only bpf prog can use it, no?
->> afaict, this is bpf objects.
->>
+Jakub Kicinski schreef op 2024-03-05 22:07:
+> On Tue, 05 Mar 2024 21:36:03 +0100 Maarten wrote:
+>> > The patch has minor formatting issues (using spaces to indent).
+>> > Once you've gain sufficient confidence that it doesn't cause issues -
+>> > please mend that and repost.
+>> 
+>> I'm sorry, it was blatantly obvious and I missed it :-( . I had added
+>> indent-with-non-tab to git core.whitespace , but it seems to only 
+>> error
+>> when a full 8 spaces are present in indentation. By any chance, is 
+>> there
+>> something to test this? In the main time, I'll do a git show -p --raw 
+>> |
+>> hexdump -C to check this .
+>> 
+>> I've fixed that on my git (and fixed some similar issues in other
+>> patches) and will resend.
 > 
-> Bear with me because i am not sure i am following.
-> When we looked at conntrack as guidance we noticed they do things
-> slightly differently. They have an allocate kfunc and an insert
-> function. If you have alloc then you need a complimentary release. The
-> existence of the release in conntrack, correct me if i am wrong, seems
-> to be based on the need to free the object if an insert fails. In our
-> case the insert does first allocate then inserts all in one operation.
-> If either fails it's not the concern of the bpf side to worry about
-> it. IOW, i see the ownership as belonging to the P4TC side  (it is
-> both allocated, updated and freed by that side). Likely i am missing
-> something..
+> I'd rather you waited with the resend until Doug or Florian confirms
+> the change is okay. No point having the patch rot in patchwork until
+> then.
 
-It is not the concern about the kfuncs may leak object.
-
-I think my question was, who can use the act_bpf_kern object when all tc bpf 
-prog is unloaded? If no one can use it, it should as well be cleaned up when the 
-bpf prog is unloaded.
-
-or the kernel p4 pipeline can use the act_bpf_kern object even when there is no 
-bpf prog loaded?
-
-
-> 
->>> We do have a "whodunnit" field, i.e we keep track of which entity
->>> added an entry and we are capable of deleting all entries when we
->>> detect a bpf program being deleted (this would be via deleting the tc
->>> filter). But my thinking is we should make that a policy decision as
->>> opposed to something which is default.
->>
->> afaik, this policy decision or cleanup upon tc filter delete has not been done
->> yet. I will leave it to you to figure out how to track what was allocated by a
->> particular bpf prog on the TC side. It is not immediately clear to me and I
->> probably won't have a good idea either.
->>
-> 
-> I am looking at the conntrack code and i dont see how they release
-> entries from the cotrack table when the bpf prog goes away.
-> 
->> Just to be clear that it is almost certain to be unacceptable to extend and make
->> changes on the bpf side in the future to handle specific resource
->> cleanup/tracking/sharing of the bpf objects allocated by these kfuncs. This
->> problem has already been solved and works for different bpf program types,
->> tc/cgroup/tracing...etc. Adding a refcnted bpf prog pointer alongside the
->> act_bpf_kern object will be a non-starter.
->>
->> I think multiple people have already commented that these kfuncs
->> (create/update/delete...) resemble the existing bpf map. If these kfuncs are
->> replaced with the bpf map ops, this bpf resource management has already been
->> handled and will be consistent with other bpf program types.
->>
->> I expect the act_bpf_kern object probably will grow in size over time also.
->> Considering this new p4 pipeline and table is residing on the TC side, I will
->> leave it up to others to decide if it is acceptable to have some unused bpf
->> objects left attached there.
-> 
-> There should be no dangling things at all.
-> Probably not a very good example, but this would be analogous to
-> pinning a map which is shared by many bpf progs. Deleting one or all
-> the bpf progs doesnt delete the contents of the bpf map, you have to
-> explicitly remove it. Deleting the pipeline will be equivalent to
-> deleting the map. IOW, resource cleanup is tied to the pipeline..
-
-bpf is also used by many subsystems (e.g. tracing/cgroup/...). The bpf users 
-have a common expectation on how bpf resources will be cleaned up when writing 
-bpf for different subsystems, i.e. map/link/pinned-file. Thus, p4 pipeline is 
-not the same as a pinned bpf map here. The p4-tc bpf user cannot depend on the 
-common bpf ecosystem to cleanup all resources.
-
-It is going back to how link/fd and the map ops discussion by others in the 
-earlier revisions which we probably don't want to redo here. I think I have been 
-making enough noise such that we don't have to discuss potential future changes 
-about how to release this resources when the bpf prog is unloaded.
+Ok, hopefully it won't take too long for them to do their due diligence.
 
