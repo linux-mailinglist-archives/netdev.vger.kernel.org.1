@@ -1,113 +1,115 @@
-Return-Path: <netdev+bounces-78121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1841687421A
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 22:38:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3421874224
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 22:44:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5E1D28AA2C
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 21:38:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 948C1B223E9
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 21:44:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C40CD1B299;
-	Wed,  6 Mar 2024 21:38:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="KZ6KszMb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E5B19478;
+	Wed,  6 Mar 2024 21:44:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7D51B59E;
-	Wed,  6 Mar 2024 21:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E851363C8;
+	Wed,  6 Mar 2024 21:44:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709761106; cv=none; b=mfR67WrKENzu/mlFFOM0IIvcNpe0Trtv5w6KcmQVd9XZPhcaNS5E1rL9sKpT7/a1PcjWZYqeewXWdqK/Cj6+vyyWOwR0snvzKqothrukrIe/u5QROnqsARDxHiCiYbmXhj5G6MYhyXCzOxPKJMOclsFn62EXYuHWL8UlkOgmgzA=
+	t=1709761476; cv=none; b=dQE9HZpEjUlgzIzjnYDzi8weAbVOgm1WMouGgaE7AWXTlWDlGalvrArSB6bzrXj8Vji+nG1ng3dyykw3jHIqx2OseqL7UqkNfzXeeEC10Mf4p7E5zyv15f6Z7wPWRErDjlSksSe8giVLDYy4248VQ2lOkPnR1lhTLGDI3XhlQYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709761106; c=relaxed/simple;
-	bh=4W+IyZmp2nty8iotsRjyeg4WhTJfRAhsyZstGwA4N4U=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lWGRbB8k1ST57SCpFInNSyfhq7Vcpe3InmU6U5Ohlu8iBEF7+EaE2Bm/RFmL9FeNU5a1SNDJ7KaZr2ouPianu01xlfnOIdd4YqXuHW1O5wk2sphsfCSJRdoxG4Rwz10IKrwT5XiOdDbfLjG8RpXXtDO2sgLNYhol/H24ncoLWvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=KZ6KszMb; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 426IER2R005433;
-	Wed, 6 Mar 2024 13:38:12 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=pfpt0220; bh=niTRz1p5
-	iJfYwIdigbEiv3g0kJXGAXGFbg4wuZ2clcc=; b=KZ6KszMbqgWYzDXbc3201E1T
-	HAeKDkQV5xuYhf3cXVca3fV08MRLRfnREdyLJV9NFTZpm2/IRupk9WqYMrjLhe6+
-	d8XFmgylb+rsoQOWEZUtCEanNihoMMEFill7sh05p+KmC+u8u9M3s9yac5hz1Pl1
-	mpn6H2AYC61bLYiBblDmZNwQHJW3yNRNOWGekTU5J+R/O4BwYWFK5J/t91wQGkjg
-	PAk8ekNDK/BdI9sagaUJLdQhlzvZ/s+51w69gyQxIFKOZT7fSCf60+eRXn2+IS+e
-	+7g7dItbj77RvcPo9iZdfMXV0OXI+OU8RO0qIj7+7MLnDNnMOqeg3tu+BcqY6w==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3wpp7bk1q8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 06 Mar 2024 13:38:12 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.12; Wed, 6 Mar 2024 13:38:11 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
- Transport; Wed, 6 Mar 2024 13:38:11 -0800
-Received: from rchintakuntla-lnx3.sclab.marvell.com (unknown [10.111.142.125])
-	by maili.marvell.com (Postfix) with ESMTP id A3DB33F707F;
-	Wed,  6 Mar 2024 13:38:10 -0800 (PST)
-From: Radha Mohan Chintakuntla <radhac@marvell.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <sgoutham@marvell.com>,
-        <lcherian@marvell.com>, <gakula@marvell.com>, <hkelam@marvell.com>,
-        <jerinj@marvell.com>, <sbhatta@marvell.com>
-CC: Radha Mohan Chintakuntla <radhac@marvell.com>
-Subject: [PATCH] octeontx2-af: Increase maximum BPID channels
-Date: Wed, 6 Mar 2024 13:38:06 -0800
-Message-ID: <20240306213806.431830-1-radhac@marvell.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1709761476; c=relaxed/simple;
+	bh=NykU08nLzEZ91K+MMjjKpK5S8+ge0fdkiC/HpzTY4is=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HUVk8frfhgt6GTahjMPK4oYL4JMbkaZ6RmuKUoNXCEouBpbMtjCW31k4aplEdmuVChdz3lmL27xpOvP4eCFmz4+0oc+BA9i/r1vavD4u4O1iiqZgM1zUR+PRYxXh02vxNjuxtmCcnnLpebTzdHRFjOeL1P9WWYDNBxl8OHpvzhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E95BC433F1;
+	Wed,  6 Mar 2024 21:44:34 +0000 (UTC)
+Date: Wed, 6 Mar 2024 16:46:26 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, kuba@kernel.org,
+ roopa@nvidia.com, razor@blackwall.org, bridge@lists.linux.dev,
+ netdev@vger.kernel.org, jiri@resnulli.us, ivecera@redhat.com,
+ mhiramat@kernel.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 net-next 4/4] net: switchdev: Add tracepoints
+Message-ID: <20240306164626.5a11f3cd@gandalf.local.home>
+In-Reply-To: <874jdjgmdd.fsf@waldekranz.com>
+References: <20240223114453.335809-1-tobias@waldekranz.com>
+	<20240223114453.335809-5-tobias@waldekranz.com>
+	<20240223103815.35fdf430@gandalf.local.home>
+	<4838ad92a359a10944487bbcb74690a51dd0a2f8.camel@redhat.com>
+	<87a5nkhnlv.fsf@waldekranz.com>
+	<20240228095648.646a6f1a@gandalf.local.home>
+	<877cihhb7y.fsf@waldekranz.com>
+	<20240306101557.2c56fbc6@gandalf.local.home>
+	<874jdjgmdd.fsf@waldekranz.com>
+X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 2rfgjSta9mSNriDQHLI_P7BwrRUQGQdG
-X-Proofpoint-GUID: 2rfgjSta9mSNriDQHLI_P7BwrRUQGQdG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-06_12,2024-03-05_01,2023-05-22_02
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Any NIX interface type can have maximum 256 channels. So increased the
-backpressure ID count to 256 so that it can cover cn9k and cn10k SoCs that
-have different NIX interface types with varied maximum channels.
+On Wed, 06 Mar 2024 21:02:06 +0100
+Tobias Waldekranz <tobias@waldekranz.com> wrote:
 
-Signed-off-by: Radha Mohan Chintakuntla <radhac@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/mbox.h | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+> On ons, mar 06, 2024 at 10:15, Steven Rostedt <rostedt@goodmis.org> wrote:
+> > On Mon, 04 Mar 2024 23:40:49 +0100
+> > Tobias Waldekranz <tobias@waldekranz.com> wrote:
+> >  
+> >> On ons, feb 28, 2024 at 09:56, Steven Rostedt <rostedt@goodmis.org> wrote:  
+> >> > On Wed, 28 Feb 2024 11:47:24 +0100
+> >> > Tobias Waldekranz <tobias@waldekranz.com> wrote:
+> >> >  
+> >> > The "trace_seq p" is a pointer to trace_seq descriptor that can build
+> >> > strings, and then you can use it to print a custom string in the trace
+> >> > output.    
+> >> 
+> >> Yes I managed to decode the hidden variable :) I also found
+> >> trace_seq_acquire() (and its macro alter ego __get_buf()), which would
+> >> let me keep the generic stringer functions. So far, so good.
+> >> 
+> >> I think the foundational problem remains though: TP_printk() is not
+> >> executed until a user reads from the trace_pipe; at which point the
+> >> object referenced by __entry->info may already be dead and
+> >> buried. Right?  
+> >
+> > Correct. You would need to load all the information into the event data
+> > itself, at the time of the event is triggered, that is needed to determine
+> > how to display it.  
+> 
+> Given that that is quite gnarly to do for the events I'm trying to
+> trace, because of the complex object graph, would it be acceptable to
+> format the message in the assign phase and store it as dynamic data?
+> I.e., what (I think) you suggested at the end of your first response.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index d5c4f810da61..223a2e39172c 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -1207,10 +1207,8 @@ struct nix_bp_cfg_req {
- 	/* bpid_per_chan = 1 assigns separate bp id for each channel */
- };
- 
--/* PF can be mapped to either CGX or LBK interface,
-- * so maximum 64 channels are possible.
-- */
--#define NIX_MAX_BPID_CHAN	64
-+/* Maximum channels any single NIX interface can have */
-+#define NIX_MAX_BPID_CHAN	256
- struct nix_bp_cfg_rsp {
- 	struct mbox_msghdr hdr;
- 	u16	chan_bpid[NIX_MAX_BPID_CHAN]; /* Channel and bpid mapping */
--- 
-2.34.1
+It's really up to what you want to do ;-)
 
+> 
+> My thinking is:
+> 
+> - Managing a duplicate (flattened) object graph, exclusively for use by
+>   these tracepoints, increases the effort to keep the tracing in sync
+>   with new additions to switchdev; which I think will result in
+>   developers simply avoiding it altogether. In other words: I'd rather
+>   have somewhat inefficient but simple flashlight, rather than a very
+>   efficient one that no one knows how to change the batteries in.
+> 
+> - This is typically not a very hot path. Most events are triggered by
+>   user configuration. Otherwise when new neighbors are discovered.
+> 
+> - __entry->info is still there for use by raw tracepoint consumers from
+>   userspace.
+
+How big is this info?
+
+-- Steve
 
