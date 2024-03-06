@@ -1,50 +1,82 @@
-Return-Path: <netdev+bounces-77889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 038688735FB
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:00:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 036D5873610
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:07:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B82C287A25
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 12:00:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 350561C2093E
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 12:07:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B658003D;
-	Wed,  6 Mar 2024 12:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AA7F7F7E6;
+	Wed,  6 Mar 2024 12:07:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jOnwqT5L"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="bzUTgSNe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19BC80030;
-	Wed,  6 Mar 2024 12:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4EC79DC8
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 12:07:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709726428; cv=none; b=TpsDGH5jKP2HPJxXzVulF6DWFZpyEQpAJmlM0EHm3zZ2L6gsSpUXxmy6tUCZe+kfZLkK6E9iuoJYMvmjiu0kC89t9OW+5LJNTEYYhbOrggOKk4rxdIt32AvVDd2Hv+tT/98cmPgD1aLkrlv+RvO9WPB+ooB9q8UKqjqCWMO39Ik=
+	t=1709726867; cv=none; b=KlXV5qDlph+USBO1BB0Ev5N03/NqKSJe/qQrD8zgZfc7zPkSat6C1RO3P2U7EemYekxPwhTs14Xun6PySgxtnetP6sw0GNBOSLOizzEARNf1+Oc+2dLdCo66oZ38lZRmV9jWD0M72mLpuzj9bJXMUbS0LUMYN+CAJ0IEeW/luBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709726428; c=relaxed/simple;
-	bh=UlT76hoWI/+CWtKU73Zz9E+7JQ1mESXPZqU9NcgzHsI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oi1zIsrV2Cm7QdnbD4g8/Yw22IcGRq9vw6aB0w5HKKB5mDIXBbISX6PvlHdZqaFK893x3OtYs4Y3I/HQZtQ3vHZWzi+ShsHxomJ0ONmiNn81a/n+q8PE1NYne13vKaJ/PLUlqlIPYBG7stGgYxKfDyjeLwjx8XbQSv6GGd0vNSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jOnwqT5L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5E778C43394;
-	Wed,  6 Mar 2024 12:00:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709726427;
-	bh=UlT76hoWI/+CWtKU73Zz9E+7JQ1mESXPZqU9NcgzHsI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jOnwqT5LUyu6p3D+KTyuZ0VuTCdLGSl3ybDRgaUsvhTRe+Rlt60mcow47p/Vf/7ZM
-	 huT0AgX8oijp8GX9olmNOtQMGLeOpVPw8nrJngqJe2nRslAImElAn5OH90aOpqwkoA
-	 Dh1Ps+Mpjl9ckhkJ63Rv70HjMfyPTGa+H0hQ0HEKegI2zMVXgZMEXY8X+7VW28mpAA
-	 Lieomfl1Q3J+Nxb7Ean9BvJto7knV7IUF0b/nFbb4OBXTO+NtOCYYgAPPZOSx9SWzK
-	 mIr4yJf2lDvpU92GN8FcVHiUw8d6ocU29mBzb4lD8RJvSD1lazPfV2Ew3EiA9hIlxv
-	 639usfhIfDN7Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 46C64D84BDB;
-	Wed,  6 Mar 2024 12:00:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709726867; c=relaxed/simple;
+	bh=gKIy+OnKR8wE5coT1dXcI7cYuJmShXMrEA3TIP5Qwy8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aei3B/1R8IyDoqx+6tLscjrh3jURByTjTtqkDWjSOTyvQZOASqyw15Lo6HecByIxJmBKjUUUEBgtbXHwOpzl8pBfyKnBL19rybY1tS1QjXw9ctBiiYmkqabVc5b9rSngyW10fvMqL5kl6hkcdZ2iyQDtujh71vY+/8SWLzbpWlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=bzUTgSNe; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-33e4d36f288so501899f8f.1
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 04:07:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709726863; x=1710331663; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wka276o41+zeKtHHUUyi26yDDzMh3zSIUNoSRmIt6Zk=;
+        b=bzUTgSNeb32JeK5pXiAi+GK/34aXK30l+Sdc1sOIIHgK63kJaOSPP4Mk4oH74iFULl
+         GRmDnGxZQ26CZOINQykw/NlkfYOuhosBrvRGwUSDEPZQ01Hz7syTTw348LVDjuEzICJ9
+         /eNq370Q0g6jnepIhWFLGPNEx7EqKPoiC4vKzhu/sldyavki08iX5pFepNvywCpH4gjq
+         ONx8BgjCr/kZ0vXLFJetvu4hlmzNEBwHSqW3eM0Ql5brkctMyVisxZSjzdnOwU3ZeQRc
+         6l5Sarw+3wokU26UdQUszpkyL6NflGPqX4Bynw58sOoX4ZJ+g/B0EK8vwRs2jXP0xiyX
+         ibRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709726863; x=1710331663;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wka276o41+zeKtHHUUyi26yDDzMh3zSIUNoSRmIt6Zk=;
+        b=bdLSxT33ah4CWWcWd7H5W1kyJPACYucyEmXB90QUMO0yCzw3EFtSs5AZ8V025ycg2f
+         JIA2mf1jNUnNzZftfo1+4H6TLuVYnglOYEyewYPBwzjrpeAcYdrr/+Pafwn1beGj9yCw
+         nvuI3MDl+J6s7oNRLw9gBVx0Shvhi02M9XWVRNY2+IzLPnAE08MKn/BY9oMKa0Ho3Tq4
+         WFnVluz/TcKrDQOHNOYJRGSWAypT5G744E22e7opmhrQPRgNLMWvfFwFJkVkxxPzL1cI
+         LyoU1a12Hd43vVa5t4D4WKsfysde8OoFVbFa4mT8QQLUNTYChre1nzW026cBWIqdPQl/
+         gFuA==
+X-Gm-Message-State: AOJu0YyL7tLpThAqftl5EGPpUJS4rT7NDxTjsS8PzYVYxm8hWRsX4DYh
+	rToZufEZ9pTqrqr4rqzFnB/y3eW7gyEI3JgJly9w90QuqgiFLk3M9ww2hzFtu67l8H5iUA//jAt
+	B
+X-Google-Smtp-Source: AGHT+IGZMbcrPHPkY6yKWlQtIjnSuKGP6Lf4tP5yG2MlajrGSbD8AUI3dCPyILWH0b87L7Fw76VAUQ==
+X-Received: by 2002:a05:6000:1e11:b0:33e:47fa:912a with SMTP id bj17-20020a0560001e1100b0033e47fa912amr7750359wrb.27.1709726863042;
+        Wed, 06 Mar 2024 04:07:43 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id l22-20020a05600c4f1600b004128f41a13fsm20950929wmq.38.2024.03.06.04.07.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Mar 2024 04:07:42 -0800 (PST)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	arkadiusz.kubalewski@intel.com,
+	vadim.fedorenko@linux.dev
+Subject: [patch net-next] dpll: spec: use proper enum for pin capabilities attribute
+Date: Wed,  6 Mar 2024 13:07:39 +0100
+Message-ID: <20240306120739.1447621-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,44 +84,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH V2] net/rds: fix WARNING in rds_conn_connect_if_down
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170972642728.4677.2906308095353738542.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Mar 2024 12:00:27 +0000
-References: <tencent_AFA7C146CBD2DFC65989A8EEDAAED20CB106@qq.com>
-In-Reply-To: <tencent_AFA7C146CBD2DFC65989A8EEDAAED20CB106@qq.com>
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: horms@kernel.org, allison.henderson@oracle.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- rds-devel@oss.oracle.com, santosh.shilimkar@oracle.com,
- syzbot+d4faee732755bba9838e@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com
 
-Hello:
+From: Jiri Pirko <jiri@nvidia.com>
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+The enum is defined, however the pin capabilities attribute does
+refer to it. Add this missing enum field.
 
-On Tue,  5 Mar 2024 08:13:08 +0800 you wrote:
-> If connection isn't established yet, get_mr() will fail, trigger connection after
-> get_mr().
-> 
-> Fixes: 584a8279a44a ("RDS: RDMA: return appropriate error on rdma map failures")
-> Reported-and-tested-by: syzbot+d4faee732755bba9838e@syzkaller.appspotmail.com
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> 
-> [...]
+This fixes ynl cli output:
 
-Here is the summary with links:
-  - [V2] net/rds: fix WARNING in rds_conn_connect_if_down
-    https://git.kernel.org/netdev/net/c/c055fc00c07b
+Example current output:
+$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml --do pin-get --json '{"id": 0}'
+{'capabilities': 4,
+ ...
+Example new output:
+$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml --do pin-get --json '{"id": 0}'
+{'capabilities': {'state-can-change'},
+ ...
 
-You are awesome, thank you!
+Fixes: 3badff3a25d8 ("dpll: spec: Add Netlink spec in YAML")
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+ Documentation/netlink/specs/dpll.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/netlink/specs/dpll.yaml b/Documentation/netlink/specs/dpll.yaml
+index 8dc1df5cfae7..95b0eb1486bf 100644
+--- a/Documentation/netlink/specs/dpll.yaml
++++ b/Documentation/netlink/specs/dpll.yaml
+@@ -312,6 +312,7 @@ attribute-sets:
+       -
+         name: capabilities
+         type: u32
++        enum: pin-capabilities
+       -
+         name: parent-device
+         type: nest
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.2
 
 
