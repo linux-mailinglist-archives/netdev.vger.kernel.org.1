@@ -1,200 +1,206 @@
-Return-Path: <netdev+bounces-77739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D133872D12
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 03:55:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DBD9A872D26
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 04:03:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CF0C28BD44
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 02:55:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4254D28DDEA
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 03:03:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B562511733;
-	Wed,  6 Mar 2024 02:54:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2BF4D266;
+	Wed,  6 Mar 2024 03:03:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FfspCDPZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u+/XNCAo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52FB912E6A
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 02:54:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACD9033D1
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 03:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709693685; cv=none; b=O/5u605t46S2vbCTNfhZrFPX5cPhMCN+qKJHqOWaIdLd/p9dMU6CFWVz+p/B9x8uTy40gUZdhjiQ9wg9vh/U6P8082pxYkXWuhbVXyqzdTtCK5aIw1iTIMMy+XNtR7dPq8s7zbhaZhEv0sA6SGzd9wgf5siTJKWwmJ+u4EPkrz0=
+	t=1709694184; cv=none; b=rFN3Y9kvKTOC66KqkyWPofY1PTQ0nEJUY65ePIGQtUYRa17BSEjQrNU6GVYEOOauWjP562Immokim68fTFW6svyV1sBTX0NYSJPp/K07YnOizbKwrqsWtruhPY8hsABiL1Zft4o4CCae5Lh7wkWkp5kqL7eT+0wgnglIW1FPlbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709693685; c=relaxed/simple;
-	bh=rCsQQP7xgQocqgJZyTCewEFa4pqWP3bm2r+qfnB/Kdw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kxE22pNkBvmAazxPhgFZ9GPMuDJFxsGDYjpuFeF91v4z93EkGUxYwC7ZVRMNPUoxvB8QxfwuiIoLpSGs/f2RgJDjXG+p15Mr08X6Cz7TLLAVcPD7+wFa3SfZvQ+FoPNf2asLKLxOQ1NIO8yj2rLNxA4iv1G/19In90q7qIljn4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FfspCDPZ; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a3122b70439so180185066b.3
-        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 18:54:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709693681; x=1710298481; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eS/C6JRe/LZxR5BB0/jvRViDTj3F8vBSe/WWRgNeFIA=;
-        b=FfspCDPZNW8S7Qf7wpydUp7nMkxbIvbEb4ID33aWUPwHOYvxyiL5+xjC/RGuYky5nJ
-         UXbu0gXQCFwnw50zF+4eh5urGT9USQAfcXkEasQoB328Tb8CE77MTWKT72cElYJh0wiU
-         E8M6JwS0IqClv/VPW882Nqjm33OxkixBNmv2B1WPXiL5arG8e00lOAa7AfTo3NB4z5xf
-         jcpIGJ9Llm7DNOCjp3Jw3H51L90Ew0/AcaBWuTDJDOQG4bdnCW1kNOzZmO/JeKseNhq8
-         VZCcpvUcpy7bLKHJluNjLXFu8vbMbxapQ9qoBZgzezbUe/OupdB7FZDjPG1+nCvQ0lcD
-         tgYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709693681; x=1710298481;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eS/C6JRe/LZxR5BB0/jvRViDTj3F8vBSe/WWRgNeFIA=;
-        b=xTtt3jbKpTtAySVWGvQHp39bfDRzREgmW87rEZQH7CEH1IRq24FvevvkgwA3mwmMsg
-         v4KLWFfSXRPwEOH3VcJ+xvjEaq4CldGEd5Lo6S7+LooZnRXiDIK3SbW/k51Q4ixK5ZMJ
-         cJp1UQZ11jxeEXhtCVWryfF4er42ANIqSiv+/AukOiFeVnY8NrS5alWpcakWaQogUBmw
-         iCYTqrcMEsUP5VhjFiGdu7Jy4+jA/xHArJGg7v0qs+aWgJmqBZV7hFf1pUChiKpc9NTV
-         f9XRA18QYbN9d0Wdg/iqkOt/qai71lvUps5Q2bAlGXiPYBb20vwGMzdyLSornQm3KltQ
-         nvcw==
-X-Gm-Message-State: AOJu0YxbesEQkcM3R1kYvBBC90NwFxBbTfyCuBq5Jo5rZJ73wsRV96se
-	RdR5G9uF/jQ7leMcvS+giZzyieZtnW9KR0p0INFIiG1fZKZmxBH0YQFlYEQ9MQozRTlc72qFJCZ
-	ubkmdEFfDjIUsXZZ5vFF6uhd6Q/n8QciiBM/o
-X-Google-Smtp-Source: AGHT+IEBCHh5at8F+COR4cGDllSpD2J7JpR+ODcNFG7XI5qKLEW8CmG66IZiYQuqBlnDkixdz9i/+yCx3p+Y4GqdUM0=
-X-Received: by 2002:a17:906:4551:b0:a45:270e:3617 with SMTP id
- s17-20020a170906455100b00a45270e3617mr5771839ejq.27.1709693680497; Tue, 05
- Mar 2024 18:54:40 -0800 (PST)
+	s=arc-20240116; t=1709694184; c=relaxed/simple;
+	bh=DS1UQpCEPjhhtTDpNkH3700X81Oxu/BdLApyhN+U3Hg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GcXNdfeZUwuNk+UWsf7w5QUw/5Nt8fM6dmoc3bzOPqlN7UVlJKL/fpgLsoKeGXGaF5p+RrlaBQrbvDiuTPVBQrH+gyT4Qtuy5kxm8UA4PsPg/YquCB1FUsfah6OqwT9K/ar18mXA1Hns/Wq0mHLsDanLIrEQEo3kK9ZpeVXT/Bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u+/XNCAo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12BA2C433C7;
+	Wed,  6 Mar 2024 03:03:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709694184;
+	bh=DS1UQpCEPjhhtTDpNkH3700X81Oxu/BdLApyhN+U3Hg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=u+/XNCAoBikCfxpXAzybtcN4Tn3MF3cfAkTL16h/fhJXk0adPzmevXy10QAw1RXhk
+	 NpGoazfopKec7JFtmDfjvWhGrBScf1C1+knv1i/vKSGY+rZQxKxFLpI8Ihw/fakODr
+	 1pHLthMNG51HjGkow3CIgg6NaRpsjLxRRIqNBSKSmAlzF7whEcyPHbLGjbUF/RYcNh
+	 53J2efA+7w1d9sYHIzBfeHs5PObeDvKNN6hJECICDsJBFDz/8YAX/tZih6sb8xwg08
+	 nkZAVEf9V94TyAXB53vWsaDsshH5JxYebB5RiQoGPzlIvcBGwl2tbVuYBUaTx5xlmn
+	 fVmF3rX9gYXlA==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: [pull request][net-next V5 00/15] mlx5 socket direct (Multi-PF)
+Date: Tue,  5 Mar 2024 19:02:43 -0800
+Message-ID: <20240306030258.16874-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240305020153.2787423-1-almasrymina@google.com>
- <20240305020153.2787423-10-almasrymina@google.com> <383c4870-167f-4123-bbf3-928db1463e01@davidwei.uk>
- <CAHS8izP_PzDJVxycwZe_d_x10-SX4=Q-CWpKTjoOQ5dc2NSn3w@mail.gmail.com> <6562b8b0-6cc0-4652-b746-75549801c002@davidwei.uk>
-In-Reply-To: <6562b8b0-6cc0-4652-b746-75549801c002@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 5 Mar 2024 18:54:28 -0800
-Message-ID: <CAHS8izOExbcxNSW8b5UUO=Y2se8ypZfaoyoviQvqR-WVZ=7s-g@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 09/15] memory-provider: dmabuf devmem
- memory provider
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 5, 2024 at 6:47=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
->
-> On 2024-03-05 18:42, Mina Almasry wrote:
-> > On Tue, Mar 5, 2024 at 6:28=E2=80=AFPM David Wei <dw@davidwei.uk> wrote=
-:
-> >>
-> >> On 2024-03-04 18:01, Mina Almasry wrote:
-> >>> +     if (pool->p.queue)
-> >>> +             binding =3D READ_ONCE(pool->p.queue->binding);
-> >>> +
-> >>> +     if (binding) {
-> >>> +             pool->mp_ops =3D &dmabuf_devmem_ops;
-> >>> +             pool->mp_priv =3D binding;
-> >>> +     }
-> >>
-> >> This is specific to TCP devmem. For ZC Rx we will need something more
-> >> generic to let us pass our own memory provider backend down to the pag=
-e
-> >> pool.
-> >>
-> >> What about storing ops and priv void ptr in struct netdev_rx_queue
-> >> instead? Then we can both use it.
-> >
-> > Yes, this is dmabuf specific, I was thinking you'd define your own
-> > member of netdev_rx_queue, and then add something like this to
-> > page_pool_init:
-> >
-> > +       if (pool->p.queue)
-> > +               io_uring_metadata =3D READ_ONCE(pool->p.queue->io_uring=
-_metadata);
-> > +
-> > +       /* We don't support rx-queues that are configured for both
-> > io_uring & dmabuf binding */
-> > +       BUG_ON(io_uring_metadata && binding);
-> > +
-> > +       if (io_uring_metadata) {
-> > +               pool->mp_ops =3D &io_uring_ops;
-> > +               pool->mp_priv =3D io_uring_metadata;
-> > +       }
-> >
-> > I.e., we share the pool->mp_ops and the pool->mp_priv but we don't
-> > really need to share the same netdev_rx_queue member. For me it's a
-> > dma-buf specific data structure (netdev_dmabuf_binding) and for you
-> > it's something else.
->
-> This adds size to struct netdev_rx_queue and requires checks on whether
-> both are set. There can be thousands of these structs at any one time so
-> if we don't need to add size unnecessarily then that would be best.
->
-> We can disambiguate by comparing &mp_ops and then cast the void ptr to
-> our impl specific objects.
->
-> What do you not like about this approach?
->
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-I was thinking it leaks page_pool specifics into a generic struct
-unrelated to the page pool like netdev_rx_queue. My mental model is
-that the rx-queue just says that it's bound to a dma-buf/io_uring
-unaware of page_pool internals, and the page pool internals figure out
-what to do from there.
+Support Socket-Direct multi-dev netdev.
 
-Currently netdev_rx_queue.h doesn't include net/page_pool/types.h for
-example because there is no dependency between netdev_rx_queue &
-page_pool, I think this change would add a dependency.
+V5:
+ - Address documentation comments from Przemek Kitszel.
 
-But I concede it does not matter much AFAICT, I can certainly change
-the netdev_rx_queue to hold the mp_priv & mp_ops directly and include
-net/page_pool/types.h if you prefer that. I'll look into applying this
-change in the next iteration if there are no objections.
+V4:
+- Improve documentation for better user observability and understanding
+  of the feature, in terms of queues and their expected NUMA/CPU/IRQ
+  affinity.
 
-> >
-> > page_pool_init() probably needs to validate that the queue is
-> > configured for dma-buf or io_uring but not both. If it's configured
-> > for both then the user is doing something funky we shouldn't support.
-> >
-> > Perhaps I can make the intention clearer by renaming 'binding' to
-> > something more specific to dma-buf like queue->dmabuf_binding, to make
-> > it clear that this is the dma-buf binding and not some other binding
-> > like io_uring?
-> >
+V3:
+- Fix documentation per Jakubs feedback.
+- Fix typos
+- Link new documentation in the networking index.rst
 
+V2:
+- Add documentation in a new patch.
+- Add debugfs in a new patch.
+- Add mlx5_ifc bit for MPIR cap check and use it before query.
 
+For more information please see tag log below.
 
---=20
+Please pull and let me know if there is any problem.
+
 Thanks,
-Mina
+Saeed.
+
+
+The following changes since commit 4166204d7ec26aee3d1f26847e88e4e41841fbe3:
+
+  net: tap: Remove generic .ndo_get_stats64 (2024-03-05 18:32:33 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-socket-direct-v3
+
+for you to fetch changes up to 23d8025212973dc6a42a341e550a8907bf7ede4a:
+
+  Documentation: networking: Add description for multi-pf netdev (2024-03-05 18:59:33 -0800)
+
+----------------------------------------------------------------
+Support Multi-PF netdev (Socket Direct)
+
+This series adds support for combining multiple devices (PFs) of the
+same port under one netdev instance. Passing traffic through different
+devices belonging to different NUMA sockets saves cross-numa traffic and
+allows apps running on the same netdev from different numas to still
+feel a sense of proximity to the device and achieve improved
+performance.
+
+We achieve this by grouping PFs together, and creating the netdev only
+once all group members are probed. Symmetrically, we destroy the netdev
+once any of the PFs is removed.
+
+The channels are distributed between all devices, a proper configuration
+would utilize the correct close numa when working on a certain app/cpu.
+
+We pick one device to be a primary (leader), and it fills a special
+role.  The other devices (secondaries) are disconnected from the network
+in the chip level (set to silent mode). All RX/TX traffic is steered
+through the primary to/from the secondaries.
+
+Currently, we limit the support to PFs only, and up to two devices
+(sockets).
+
+V5:
+ - Address documentation comments from Przemek Kitszel.
+
+V4:
+ - Improve documentation for better user observability and understanding
+   of the feature, in terms of queues and their expected NUMA/CPU/IRQ
+   affinity.
+
+V3:
+ - Fix documentation per Jakubs feedback.
+ - Fix typos
+ - Link new documentation in the networking index.rst
+
+V2:
+ - Add documentation in a new patch.
+ - Add debugfs in a new patch.
+ - Add mlx5_ifc bit for MPIR cap check and use it before query.
+
+----------------------------------------------------------------
+Tariq Toukan (15):
+      net/mlx5: Add MPIR bit in mcam_access_reg
+      net/mlx5: SD, Introduce SD lib
+      net/mlx5: SD, Implement basic query and instantiation
+      net/mlx5: SD, Implement devcom communication and primary election
+      net/mlx5: SD, Implement steering for primary and secondaries
+      net/mlx5: SD, Add informative prints in kernel log
+      net/mlx5: SD, Add debugfs
+      net/mlx5e: Create single netdev per SD group
+      net/mlx5e: Create EN core HW resources for all secondary devices
+      net/mlx5e: Let channels be SD-aware
+      net/mlx5e: Support cross-vhca RSS
+      net/mlx5e: Support per-mdev queue counter
+      net/mlx5e: Block TLS device offload on combined SD netdev
+      net/mlx5: Enable SD feature
+      Documentation: networking: Add description for multi-pf netdev
+
+ Documentation/networking/index.rst                 |   1 +
+ Documentation/networking/multi-pf-netdev.rst       | 174 +++++++
+ drivers/net/ethernet/mellanox/mlx5/core/Makefile   |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en.h       |   9 +-
+ .../net/ethernet/mellanox/mlx5/core/en/channels.c  |  10 +-
+ .../net/ethernet/mellanox/mlx5/core/en/channels.h  |   6 +-
+ .../ethernet/mellanox/mlx5/core/en/monitor_stats.c |  48 +-
+ .../net/ethernet/mellanox/mlx5/core/en/params.c    |   9 +-
+ .../net/ethernet/mellanox/mlx5/core/en/params.h    |   3 -
+ drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c   |  12 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/qos.c   |   8 +-
+ .../ethernet/mellanox/mlx5/core/en/reporter_rx.c   |   4 +-
+ .../ethernet/mellanox/mlx5/core/en/reporter_tx.c   |   3 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/rqt.c   | 123 ++++-
+ drivers/net/ethernet/mellanox/mlx5/core/en/rqt.h   |   9 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/rss.c   |  17 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/rss.h   |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/en/rx_res.c    |  62 ++-
+ .../net/ethernet/mellanox/mlx5/core/en/rx_res.h    |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/en/trap.c  |  11 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xsk/pool.c  |   6 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xsk/setup.c |   8 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ktls.c    |   2 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ktls.h    |   4 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c |   6 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c  | 176 +++++--
+ drivers/net/ethernet/mellanox/mlx5/core/en_stats.c |  39 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/lib/devcom.h   |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/lib/mlx5.h |  12 +
+ drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c   | 524 +++++++++++++++++++++
+ drivers/net/ethernet/mellanox/mlx5/core/lib/sd.h   |  38 ++
+ include/linux/mlx5/driver.h                        |   1 +
+ include/linux/mlx5/mlx5_ifc.h                      |   4 +-
+ 34 files changed, 1168 insertions(+), 173 deletions(-)
+ create mode 100644 Documentation/networking/multi-pf-netdev.rst
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/sd.h
 
