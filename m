@@ -1,140 +1,97 @@
-Return-Path: <netdev+bounces-77730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 774D2872CC3
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 03:29:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 721F8872CCA
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 03:30:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E47D5B260FC
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 02:29:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 991D5B21BE3
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 02:30:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73FCBDDBC;
-	Wed,  6 Mar 2024 02:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14721635;
+	Wed,  6 Mar 2024 02:30:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="tXzN2w3m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="daaYGYv2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C62BD272
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 02:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C7D173
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 02:30:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709692136; cv=none; b=n1NGd0VBQe9llzWfdiXN9jc4EFJv2V9mNJl7csHjicx6on2DrYUWFNijWViHm/Yz5Moi+c9FNyvdP177eS0kaQkCMKr598F/bpsrbMhFS60XL53wxynv6VfevbR31m7IV12OASpR3jorVqbr/JuYLwWT17cB9+5v7KSaOpQEBEk=
+	t=1709692251; cv=none; b=N4F7YWjkSd+QDJef6tLBoCchEd2W3MClfzygW6Xd0jGnBja4OnK+/vK8lusdhfxkwvuwhee1wEuS8yTf53e3LeIk6hA3dKXImq9ubc6SQfKMiqH2Zw6Q49HmKU7X7YqTrWN8m8WSU7Oe6AWPMJylO4k0F5O/z0fKK5Ohs0TIzqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709692136; c=relaxed/simple;
-	bh=m/4/IJpnreuZGBCjDFZuh5CJChe0Zp0mf+/fUUyVNyY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k6mAvMKijx7370rp7k8oS85jrUZb3FzACVQdKmmkasW0Y2DVYAyUXCKtNJV74ciHmWjFkOAm72DaYozt/dMFhZZQ8vjyMGqfFaQsCIll5rg47Hy5smeGdA+fdlW0P0yD3z8JTQGTE5Abx9q6ZITB/P/Pi/+k5hX7vTE7GChguw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=tXzN2w3m; arc=none smtp.client-ip=209.85.160.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-21e6be74db4so299118fac.2
-        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 18:28:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1709692133; x=1710296933; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=n9CloCqaM+25WoaR2YknpneBnZb2s33DuZ5EXKAJgUk=;
-        b=tXzN2w3mIA42+kxiYmI+IfLVus4l/QCyp13ANiYCaN2AX0ORMGh8eFZyBZrHwi5+ui
-         zNdIkjkiBk4A/hgNMWzvhoZCVZgub5eQsDzmq3IH7LIsjQRrvMfh2CRMGVf8ialf+Rus
-         nghzApmYQfTLUlMYRSXbb4x6B6akvEuK4rNb6WwQoK4aLQOK0EG+oA4Ab7xlOOeaibDg
-         nJSUHhZ9ODRVCyFEvPMgBTKDGO9DRMtkgCfGe4EIFAsUKHZm1wpITxZLA3udaKd58MVY
-         6IouXTOA0w+XUEzqhiMWwJtLgVug5qR8dVcL0sonjarAz3MYOIYP8a1XnRJ4sV8i2/vC
-         ncEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709692133; x=1710296933;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n9CloCqaM+25WoaR2YknpneBnZb2s33DuZ5EXKAJgUk=;
-        b=YolUdJbcxIy6hnwFnD7UGLK9TQoSY2hg8Y4tMvNwCWhc9Y5VpNbcxZY4MxPc8MijSV
-         2kycjJT6ps+d+TVHe033PV7FcVhpGuvKxdb90IopgcDwKbeqSj5j+NImyM5KxCVE9lGr
-         nQpJluFE1kITQmrtFK7i7ex01+bb/kmluWp0K/RBUjEJadXVclImPf34GNiw8W7zfVR2
-         5fTSxS5SFcHX0iSGXM40H/cRSluze4qZjuO7k0keZWmUdfbS94K0+3MkaS42w9mWWLul
-         u48uAhfrH7afBwjHX6p+v84S3wCoghXJ2AoiaHweUdq5IcSILlg4KG7LvA0Q1xOlycFZ
-         vGvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWPcsyJfXp0yilUy88eyLV9tCpuPJ2Bxd2X2liKwMxQXrJRccrp6IvsCChnFhTZWUrBPYAJuuinDsRCqNb+XWNXPcnmFtur
-X-Gm-Message-State: AOJu0YxK6wGNpW9b0GHFA9V64bl0APrX7DudaUhD+OUuXVBMMZSNqWAC
-	d5d+pOaIXy2PViAir7793ukF+r2I7+DlIWGvq0hhoq2kLt5uDIJQEuLqKDhKKfc=
-X-Google-Smtp-Source: AGHT+IHKixed8Mkgk+0mpRfXfdBzYVdPnWZ0ptxrRYAk7Gk8YnML1zfyWGAr7RcPhYJE96tLslzelg==
-X-Received: by 2002:a05:6870:1786:b0:220:8d17:6ebd with SMTP id r6-20020a056870178600b002208d176ebdmr3863595oae.42.1709692133363;
-        Tue, 05 Mar 2024 18:28:53 -0800 (PST)
-Received: from [192.168.1.24] (71-212-18-124.tukw.qwest.net. [71.212.18.124])
-        by smtp.gmail.com with ESMTPSA id x35-20020a056a0018a300b006e5bdc19842sm7873904pfh.73.2024.03.05.18.28.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Mar 2024 18:28:52 -0800 (PST)
-Message-ID: <383c4870-167f-4123-bbf3-928db1463e01@davidwei.uk>
-Date: Tue, 5 Mar 2024 18:28:51 -0800
+	s=arc-20240116; t=1709692251; c=relaxed/simple;
+	bh=R+uL8e+mJVmN5pFIMXNgq5buQ772ZpGqW/x7kVkjtl8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eX1NWkWE4T3UCg+Zm6REh/orcpgbse9EKhL3x7u2EU8sRjeR0HgaL6N5ZsqM33DJD7gHNrognvsWCBhVaa1ZCJAnvpPFQRycCro2la96d4tCA/2pD8rvOkhVoNwPlxqnyrHKlVT10UhqvEawS/hmxuZtWneyo5Qp3WFsiB1UlXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=daaYGYv2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25890C433C7;
+	Wed,  6 Mar 2024 02:30:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709692250;
+	bh=R+uL8e+mJVmN5pFIMXNgq5buQ772ZpGqW/x7kVkjtl8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=daaYGYv2uVLAtrRPBfJthUUtRMwABl4HhBzNCpbBI3HK8HUValZ+NOOrFVKRQoptK
+	 bFTSfGFeFWbyxFEEw9IebYbBLPWnf7OvWSVFt8ma0rx4qaSmDQWpGPYbWw6hVFwr7f
+	 kqxd+pP3BaUwMEQyVMxQyVz7X6MJ1y7zfdgvm4zb1Ek8hocKuKVnRmOT9nA/QsCqcG
+	 x1wg4NW+8TesVsNaDO3KexQRaMWh/m6vg+j4GA7Qc9YO+XR2AcUk8wO+FOyMEswRI+
+	 HzczbN6RIU6hUCGYQkD6fkMkBlkAA06drBffO8CZt7cSsiinl8nqgiMUxHa2GiEnlg
+	 gA/sdRLo2wgYw==
+Date: Tue, 5 Mar 2024 18:30:49 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: William Tu <witu@nvidia.com>
+Cc: netdev@vger.kernel.org, jiri@nvidia.com, bodong@nvidia.com,
+ tariqt@nvidia.com, yossiku@nvidia.com
+Subject: Re: [PATCH RFC v2 net-next 1/2] devlink: Add shared descriptor
+ eswitch attr
+Message-ID: <20240305183049.2f2b8490@kernel.org>
+In-Reply-To: <49a53cb9-e04d-4afa-86e8-15b975741e4d@nvidia.com>
+References: <20240301011119.3267-1-witu@nvidia.com>
+	<20240304203758.2fd0f6be@kernel.org>
+	<49a53cb9-e04d-4afa-86e8-15b975741e4d@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v6 09/15] memory-provider: dmabuf devmem
- memory provider
-Content-Language: en-GB
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Pavel Begunkov <asml.silence@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-References: <20240305020153.2787423-1-almasrymina@google.com>
- <20240305020153.2787423-10-almasrymina@google.com>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20240305020153.2787423-10-almasrymina@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 2024-03-04 18:01, Mina Almasry wrote:
-> +	if (pool->p.queue)
-> +		binding = READ_ONCE(pool->p.queue->binding);
-> +
-> +	if (binding) {
-> +		pool->mp_ops = &dmabuf_devmem_ops;
-> +		pool->mp_priv = binding;
-> +	}
+On Tue, 5 Mar 2024 16:27:50 -0800 William Tu wrote:
+> > Can we use bytes as the unit? Like the page pool. Descriptors don't
+> > mean much to the user.  
+> But how about the unit size? do we assume unit size = 1 page?
+> so page pool has
+> order: 2^order pages on allocation
+> pool_size: size of ptr_ring
+> 
+> How about we assume that order is 0, and let user set pool_size (number 
+> of page-size entries).
 
-This is specific to TCP devmem. For ZC Rx we will need something more
-generic to let us pass our own memory provider backend down to the page
-pool.
+Do you mean because the user doesn't know the granularity,
+e.g. we can't allocate 12345 bytes most likely?
 
-What about storing ops and priv void ptr in struct netdev_rx_queue
-instead? Then we can both use it.
+For shared buffer (the switch buffer configuration API)
+we report cell size IIRC. In ethtool a lot of drivers just
+round up to whatever they support. We could also treat 
+the user-configured value as "upper bound" and effectively
+round down but keep what the user configured exactly, when
+they read back. I like the last one the most, if it makes sense.
+
+> > Do we need this knob?
+> > Can we not assume that shared-pool-count == 0 means disabled?  
+> do you mean assume or not assume?
+
+Sorry for the double negation (:
+
+> I guess you mean assume, so use "shared-pool-count == 0" to indicate 
+> disable?
+> That will also work so we only need to introduce 1 attribute.
+
+SG!
 
