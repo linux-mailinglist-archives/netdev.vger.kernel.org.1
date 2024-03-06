@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-77999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 133E1873B79
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:02:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D7C9873B7A
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:02:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 361021C2330C
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:02:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 136331F25691
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:02:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5001313BACF;
-	Wed,  6 Mar 2024 16:00:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1357413BAE3;
+	Wed,  6 Mar 2024 16:00:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vhZl1x3t"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Pv5Vbu1l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E4813AA5E
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 16:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6774D13BAD0
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 16:00:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709740856; cv=none; b=dDPC7+vtoRuE0ftigL1Pg3S1RU1h9pMhWkxx8F2ANd9Tdbz11NdGNMd3RMpU3a4w13BSxw0V6NYtVTmHCzwbzZEnU7S4j5hLOJoRGvfmAzV4vWWsX3Womz8G4nNtHXjhqeGHY5zqoWFeUaQatO6LgCZBkQEwuxRQBG01R0+Pe7M=
+	t=1709740857; cv=none; b=TqGWlvp4vP9jt0gYduy1tfb7T245svF+30ldoAVQPxxHjfjAtq8osyi1KbWg0P0dXihXvoDDn11qGtwyz0FEj6xZKvOj8OCIvLItSt6WQulJoJb5hd6kkq7btc43X38D5jkulUeTgyQwTv4+bTpKh5VZM/sttLj+syTa3Wu8lMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709740856; c=relaxed/simple;
-	bh=UpOECQ3EsXx1llJf2/AC24w2jXjh4gJW+k6maZ5Axp4=;
+	s=arc-20240116; t=1709740857; c=relaxed/simple;
+	bh=KXKN08tlstmfKE8ZXAi8jqIBurtQLBC6PZjviSAZzAU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CvdeFL4DuuAwgBdgTfXerYuvCA/3W+ac3mit4II1O85Z1Tpg3x3liZNq8hCadLILHIPiYlexOnjT8M3gJzSkhteKExcZfEz+m9Puz7DakkfLR7xJEOCLm5bKm6erpwhHBiZdsTwkncBeuplOExsBOtUCRlTOu0ZbsGD7/OHx1ZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vhZl1x3t; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=cevaUkYwsnueAdlcJVw3DqrdmczKslkIRbj4wkwezG/TJBCNPYAIFvNDU/MldT6LUJvY9dx7NjNEInN5xcXyuN6q+X2f/SGjcPVGdkFRRytHiMAClvRRd/SCwDO5QayfAJSBGl+nEO3VCvP8DkGtTpx9hLKpOQhB1iTPRXkrW20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Pv5Vbu1l; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbe9e13775aso1878317276.1
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 08:00:54 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-609c800881fso36294117b3.0
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 08:00:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709740853; x=1710345653; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709740855; x=1710345655; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bzq8LB/+DmQPB8YTErAS3EzxbMbhKqJ8XJlWs7RBP3w=;
-        b=vhZl1x3t/ISO+qQPm1JrsMaLh+nEzu+pVXm1F9Q8FtHdjwiGS21aVnzlZb7ueWU9pJ
-         fjejxMZlQ9wyYkn5dOBtFjPq29C/sacQpaNPbqA7xYHx5pNl3tvX7SN6rpUkinTvqgA8
-         PHsjP5S0WtR/d8B+vczWxrp7+9DoF1WopBrfSpMkGsvoae7sTMu/5TTVPI9ocW3lM2Tz
-         Rjvbvr1UzCtR0mf7jLAQRfTK98x/0C9BgDJWG1hiKwfGgnYZvwSop23z4sQnXBqcq/5v
-         TSu4EZQhFsBxtqyl/SxIZ8RwDBTEMyXTUUVFhYbPna90MzcK8Vaso+752cFAcM47114B
-         QdpA==
+        bh=Caqqa5nak6NSJOsavnSGkyHAkf1ZcxluNQW5G1xrl1Y=;
+        b=Pv5Vbu1lPvSckOZvpkeOcYhK0Cs3uGS17UR3HvCEQ3axJVKeAmruUCGGIjTt3A4I8v
+         9XQ79465GSCyRp/PwdzQO+R8u8L6DWtuZkAHC1DMqEUomwob9Wc8SmJxP5O5CwUDgMNc
+         CJ50MZ0KtEXObrnqb4kPIl+KljRIGT1hnp8GTmy64hgkntTIVmKrDPNkIWcPSe8pV9AB
+         EsoTZJ/LlKSzAbsG56tHaAOJY1pMRoyO/hV08oQnTLzOYxWtVifyJFvBPP4TTMEIanNp
+         mx8Hg0R+wIKcqjF7Aq4V5yVNLLbWvkmrHNHFnzr0R/k4doAG33OlO5LHfmicjOK6tSuN
+         i23g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709740853; x=1710345653;
+        d=1e100.net; s=20230601; t=1709740855; x=1710345655;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bzq8LB/+DmQPB8YTErAS3EzxbMbhKqJ8XJlWs7RBP3w=;
-        b=qDrZqOzVc6PqvDY29RSZD5lmij5oaBJ8dY0WOub7luWUlTtrAHQ4cb0Ki00LWaYutr
-         pu47Qz3DYI0F+OPHXnwggBNTM/tEGCRv4uKGKzeAIuPVHTlcbXnAyZMNu4Zc+XuIyYlp
-         XCl2QRFVtobEH38im4CemMscpayTrnmIM7zk4r6b8FoIskPFp1mzpYlFAbFtc+xcMxHf
-         ByUWoj+Dda1K679rQcNOdWaPNP0UwEeY8stx+M19I85HjBt4p3f8flhJ95nIK+zS+fC5
-         rMd7C2KLUoYMlpljPxZjWLaI2i2TAC8SI2+uxNzvXth/Sgfskr5XDh+u9mNlS991v1yz
-         3OvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUKKP8niJUVmA123l9/gg0xqGJwP5zHExbmG67AtanhEQEuh9cXCiRKkj46gZnE1TXZ2z//HwU1sMa0ExADH+yuAzYRtufQ
-X-Gm-Message-State: AOJu0YzvJFPTSdE9qZCtbE/2LjlJtAQiFwI8gG7KWkFNOR+ouDmEm5+N
-	QcNzkhDrew7nvgtaTWXxltN/wsTz/u7k8LwabySJKkP4cwLVDCp0BN5l7uuLlt/ECqHnxWbx/KI
-	AXMZVVMh2dg==
-X-Google-Smtp-Source: AGHT+IGLXIFvoPvNLsXQqZoE+I9VDNHceFpYv8P+8C/18+bmievlR+3wlusQp78rMB6lL+i/XpbTSDsFgLxmMQ==
+        bh=Caqqa5nak6NSJOsavnSGkyHAkf1ZcxluNQW5G1xrl1Y=;
+        b=YcDjGhssku2Sk4u4d6KszRPqhgn+zfnY7DtVEKsCagtel5CeuKHbPuGP89SFbHSjbv
+         EoBrRU+wEdmZdUM8En2/4C5/ZraNJjZ7js+4WqKCi0Q6QXZ9/Ap1N+xymZvDv0+32Gk0
+         uiF03t2Dt962gHpFPxW1qUjUlvgfmiV4ZfzBrzcUO51hT9UUhxcmaPI7eXJrrGPdvnt0
+         va6hzFN7q0kj6JL3eAudWxu3irnN9mbbcruAAteLi10iiwdIBN2tQPXMswAPDMb0mGA1
+         ZpFnLsJz+SbdcbES2c+8JmXg3dDONcnv0F3+bFj9ZWPu7s/5UrFYDUWcD67K+8QYKskS
+         EjPg==
+X-Forwarded-Encrypted: i=1; AJvYcCVxBU0TylT+sAKEw5gs/53K96O/UonwFpKH8Snw1aQSJmj1vzDPxBJtBSb6jZ+BoqpB1JHTslnRJ8AEVmOuW95C5gLOH1uW
+X-Gm-Message-State: AOJu0Yy+FFnw2OUO2XroIfgbXZ3dxYb/8FqEpJo355yJY1Z9nz8J/GYc
+	ymBXOXNX3/NTzQOItooySg8nMl8QjLvj4pybiLW3Y0sXaTnm2v1KuiT9R1MX1AshOrn3s79kKYL
+	azRWJKYT3tw==
+X-Google-Smtp-Source: AGHT+IHL+ocLTe8ycY2hDxbZOo82Ej2Pn4w1Z0YW1EvqVGj5s5PO3Kos+6aT8XaSCfYxLc5EpOmdGXLxPZrE8A==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:df54:0:b0:dc6:53c3:bcbd with SMTP id
- w81-20020a25df54000000b00dc653c3bcbdmr3793723ybg.7.1709740853720; Wed, 06 Mar
- 2024 08:00:53 -0800 (PST)
-Date: Wed,  6 Mar 2024 16:00:21 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:7945:0:b0:609:22ea:f95e with SMTP id
+ u66-20020a817945000000b0060922eaf95emr4147243ywc.4.1709740855500; Wed, 06 Mar
+ 2024 08:00:55 -0800 (PST)
+Date: Wed,  6 Mar 2024 16:00:22 +0000
 In-Reply-To: <20240306160031.874438-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240306160031.874438-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240306160031.874438-9-edumazet@google.com>
-Subject: [PATCH v2 net-next 08/18] net: move dev_tx_weight to net_hotdata
+Message-ID: <20240306160031.874438-10-edumazet@google.com>
+Subject: [PATCH v2 net-next 09/18] net: move dev_rx_weight to net_hotdata
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -84,7 +84,7 @@ Cc: David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemb@google.com>,
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-dev_tx_weight is used in tx fast path.
+dev_rx_weight is read from process_backlog().
 
 Move it to net_hotdata for better cache locality.
 
@@ -92,95 +92,83 @@ Signed-off-by: Eric Dumazet <edumazet@google.com>
 Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
 Reviewed-by: David Ahern <dsahern@kernel.org>
 ---
- include/linux/netdevice.h  | 1 -
+ include/linux/netdevice.h  | 2 --
  include/net/hotdata.h      | 1 +
- net/core/dev.c             | 1 -
+ net/core/dev.c             | 3 +--
  net/core/hotdata.c         | 1 +
  net/core/sysctl_net_core.c | 2 +-
- net/sched/sch_generic.c    | 3 ++-
- 6 files changed, 5 insertions(+), 4 deletions(-)
+ 5 files changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 044d6f5b2ace3e2decd4296e01c8d3e200c6c7dc..c2a735edc44be95fbd4bbd1e234d883582bfde10 100644
+index c2a735edc44be95fbd4bbd1e234d883582bfde10..d3d4d1052ecb0bc704e9bb40fffbea85cfb6ab03 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -4788,7 +4788,6 @@ void dev_fetch_sw_netstats(struct rtnl_link_stats64 *s,
+@@ -4787,8 +4787,6 @@ void dev_fetch_sw_netstats(struct rtnl_link_stats64 *s,
+ 			   const struct pcpu_sw_netstats __percpu *netstats);
  void dev_get_tstats64(struct net_device *dev, struct rtnl_link_stats64 *s);
  
- extern int		dev_rx_weight;
--extern int		dev_tx_weight;
- 
+-extern int		dev_rx_weight;
+-
  enum {
  	NESTED_SYNC_IMM_BIT,
+ 	NESTED_SYNC_TODO_BIT,
 diff --git a/include/net/hotdata.h b/include/net/hotdata.h
-index d86d02f156fc350d508531d23b4fe06b2a27aca2..ffea9cc263e50e4eb69f4f60e2f10c256d9b633f 100644
+index ffea9cc263e50e4eb69f4f60e2f10c256d9b633f..e6595ed2c3be527fb90959984aca78349147f2eb 100644
 --- a/include/net/hotdata.h
 +++ b/include/net/hotdata.h
-@@ -21,6 +21,7 @@ struct net_hotdata {
- 	int			netdev_budget_usecs;
+@@ -22,6 +22,7 @@ struct net_hotdata {
  	int			tstamp_prequeue;
  	int			max_backlog;
-+	int			dev_tx_weight;
+ 	int			dev_tx_weight;
++	int			dev_rx_weight;
  };
  
  extern struct net_hotdata net_hotdata;
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 1b112c4db983c2d7cd280bc8c2ebc621ea3c6145..3f8d451f42fb9ba621f1ea19e784c7f0be0bf2d8 100644
+index 3f8d451f42fb9ba621f1ea19e784c7f0be0bf2d8..26676dbd6c8594371a4d30e0dd95d72342e226ca 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -4409,7 +4409,6 @@ int weight_p __read_mostly = 64;           /* old backlog weight */
+@@ -4408,7 +4408,6 @@ unsigned int sysctl_skb_defer_max __read_mostly = 64;
+ int weight_p __read_mostly = 64;           /* old backlog weight */
  int dev_weight_rx_bias __read_mostly = 1;  /* bias for backlog weight */
  int dev_weight_tx_bias __read_mostly = 1;  /* bias for output_queue quota */
- int dev_rx_weight __read_mostly = 64;
--int dev_tx_weight __read_mostly = 64;
+-int dev_rx_weight __read_mostly = 64;
  
  /* Called with irq disabled */
  static inline void ____napi_schedule(struct softnet_data *sd,
+@@ -5978,7 +5977,7 @@ static int process_backlog(struct napi_struct *napi, int quota)
+ 		net_rps_action_and_irq_enable(sd);
+ 	}
+ 
+-	napi->weight = READ_ONCE(dev_rx_weight);
++	napi->weight = READ_ONCE(net_hotdata.dev_rx_weight);
+ 	while (again) {
+ 		struct sk_buff *skb;
+ 
 diff --git a/net/core/hotdata.c b/net/core/hotdata.c
-index 35ed5a83ecc7ebda513fe4fafc596e053f0252c5..ec8c3b48e8fea57491c5870055cffb44c779db44 100644
+index ec8c3b48e8fea57491c5870055cffb44c779db44..c8a7a451c18a383d091e413a510d84d163473f2f 100644
 --- a/net/core/hotdata.c
 +++ b/net/core/hotdata.c
-@@ -16,5 +16,6 @@ struct net_hotdata net_hotdata __cacheline_aligned = {
- 
+@@ -17,5 +17,6 @@ struct net_hotdata net_hotdata __cacheline_aligned = {
  	.tstamp_prequeue = 1,
  	.max_backlog = 1000,
-+	.dev_tx_weight = 64,
+ 	.dev_tx_weight = 64,
++	.dev_rx_weight = 64,
  };
  EXPORT_SYMBOL(net_hotdata);
 diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
-index 8eaeeb289914258f90cf940e906d5c6be0cc0cd6..a30016a8660e09db89b3153e4103c185a800a2ef 100644
+index a30016a8660e09db89b3153e4103c185a800a2ef..8a4c698dad9c97636ca9cebfad925d4220e98f2a 100644
 --- a/net/core/sysctl_net_core.c
 +++ b/net/core/sysctl_net_core.c
-@@ -302,7 +302,7 @@ static int proc_do_dev_weight(struct ctl_table *table, int write,
+@@ -301,7 +301,7 @@ static int proc_do_dev_weight(struct ctl_table *table, int write,
+ 	ret = proc_dointvec(table, write, buffer, lenp, ppos);
  	if (!ret && write) {
  		weight = READ_ONCE(weight_p);
- 		WRITE_ONCE(dev_rx_weight, weight * dev_weight_rx_bias);
--		WRITE_ONCE(dev_tx_weight, weight * dev_weight_tx_bias);
-+		WRITE_ONCE(net_hotdata.dev_tx_weight, weight * dev_weight_tx_bias);
+-		WRITE_ONCE(dev_rx_weight, weight * dev_weight_rx_bias);
++		WRITE_ONCE(net_hotdata.dev_rx_weight, weight * dev_weight_rx_bias);
+ 		WRITE_ONCE(net_hotdata.dev_tx_weight, weight * dev_weight_tx_bias);
  	}
  	mutex_unlock(&dev_weight_mutex);
- 
-diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-index 9b3e9262040b6ef6516752c558c8997bf4054123..ff5336493777507242320d7e9214c637663f0734 100644
---- a/net/sched/sch_generic.c
-+++ b/net/sched/sch_generic.c
-@@ -27,6 +27,7 @@
- #include <net/sch_generic.h>
- #include <net/pkt_sched.h>
- #include <net/dst.h>
-+#include <net/hotdata.h>
- #include <trace/events/qdisc.h>
- #include <trace/events/net.h>
- #include <net/xfrm.h>
-@@ -409,7 +410,7 @@ static inline bool qdisc_restart(struct Qdisc *q, int *packets)
- 
- void __qdisc_run(struct Qdisc *q)
- {
--	int quota = READ_ONCE(dev_tx_weight);
-+	int quota = READ_ONCE(net_hotdata.dev_tx_weight);
- 	int packets;
- 
- 	while (qdisc_restart(q, &packets)) {
 -- 
 2.44.0.278.ge034bb2e1d-goog
 
