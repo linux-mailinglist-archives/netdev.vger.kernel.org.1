@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-77810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1A8887310B
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:46:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A58F987310E
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:47:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6821128C73A
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:46:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34FB7B2775C
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:47:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15B8D5D8F9;
-	Wed,  6 Mar 2024 08:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31595D8ED;
+	Wed,  6 Mar 2024 08:47:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="qISw/3ad"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="GDba/hMN"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC8CA5D8F6;
-	Wed,  6 Mar 2024 08:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D93602E641;
+	Wed,  6 Mar 2024 08:47:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709714784; cv=none; b=OdP8o8Nw1f9ebEZdFKwpLRgMzOFnqHJoCuGmXzgmOj6QRCu4aVtkitX4/Yv7pwvwSl1hEJ0YL05yewZSIXcUzdnl50ZKCNYjj2WJOVrrp8itL9kUDlklRsvzn3lSpvH/4NTUXeEEXmK5QUez1XQbL+He09PFkTWoH0SK7gsRwuU=
+	t=1709714858; cv=none; b=ruSriDnlyfh8Yu0KgCU1YFrnACUzXV72qsi5HUZMcI3tC4/jEELlTxhutg4FkcncYJ6+PjNDeM7YHW0AQCtUR/4GMUaDIyXw+TM8LDHUkDdaoLN24fhG/gIQA96O+Q6dj6nuHyS00BF88baB3clfid+0HGYvEP9HaOtwXWR1wyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709714784; c=relaxed/simple;
-	bh=jWw78X3DY/9+clhBevnZkRan4xkZOYNHU+sMDaAu0Hg=;
+	s=arc-20240116; t=1709714858; c=relaxed/simple;
+	bh=y75YYFxmcbFw4jJsqaiBwrNaZMabJFUxzrao5runQ4A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GoWBiMG+piATcYau2dlngJLF+rvHFiRr5H5Q5OUS2QJCrbPpevnLXDub0EkoVG+0fGF0fj/tB4pceeKAxBA5HArl34shrU3PBGs2uxWDuF7bhZeG5ammzgFyyh5cc3iBJmduLuegAcMuXEJ/jSj20WZ3L6nJY5M6PVXnx9z3g8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=qISw/3ad; arc=none smtp.client-ip=78.32.30.218
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dx2JEHS4WBRKUm32CG2WFN1IBUBStHFPZ6nE4nL5TZajEkNYWempyCMBwlDiT5/f3SgQWBUNh0iPGmK01bJMNFo/fupv3PaJSsZjbu6Z6XW5c/nKtKg3uQzrjUrYQV/uOF/Y5ooC26+3SPAznnTUjHkw0u6NHutNiot9VCWlUH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GDba/hMN; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,38 +37,40 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=YV684JLoXhEVSYW91JLAHlDvME2Fe6uLqObFzkEpzYo=; b=qISw/3ad6WY2+LQRr6DmXBbvwt
-	4766JgZKEO0JYJtnwhRfu2dhLezVW4H91KLnlDjClrbL/UJMfr3WfBU7C2G2gJawz+dJk8BMB7M7T
-	euJtpDOWE6HY4ixx/wCM58chLxdOTXSgf1T7wVydZn9xjCFFcaSyPIWjen8EhA/plsGOd7EdVDHOT
-	PGaCtaR3/Hclrv8BujYT72JVCcatPRGc/ZGzFO20vFs57JPE3yCoNy/nQTLV2s12QKwRdHl8FuLjX
-	7ok389xLhn0nPzehtZTNR/+zQDO+Q2s7AM8sNP+NSGZwQ0sROmCN6YfAUKxWKKRkc4xHLt7++VE/n
-	Ux1MyaNw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49658)
+	bh=v/9N1iM5TX6NtNle71vklmx0npL2usz7wNoysh2Fozw=; b=GDba/hMN1BQIUNaqMdZc52/JsE
+	lBc1Qoys5eenNO1iwbCxKSX8yJ9sfhtXEGI5HJGUF0uk/4nJxW4zuAc894m/Pkl6ANsbnTbUv866X
+	E5QInK3v8WFKKWyhu50VsMrn9hams4PmseHnWKMKjVxwT1ATIXSY+LowCV+9ltdYHy3jJnP7WpaB1
+	LU+LNplTp9mwXzcbJs4bQ0Iioic6u9ApMWvqjpzDLF7AE1Qvsn2Sn+wd816B/3iQwTABhKEUANHXK
+	O1rRF2rVgAGd7+8LbjXQAC7lpoKdev/Q6x1VdBasGmjG1urBGycTOs/jTCBfLhDwAk6mN18CjJe5+
+	iOoDha6A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38862)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1rhmug-00086D-0l;
-	Wed, 06 Mar 2024 08:46:10 +0000
+	id 1rhmw1-00086U-0p;
+	Wed, 06 Mar 2024 08:47:33 +0000
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rhmud-0006Dv-6L; Wed, 06 Mar 2024 08:46:07 +0000
-Date: Wed, 6 Mar 2024 08:46:07 +0000
+	id 1rhmw0-0006E2-3c; Wed, 06 Mar 2024 08:47:32 +0000
+Date: Wed, 6 Mar 2024 08:47:31 +0000
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
 To: Pawel Dembicki <paweldembicki@gmail.com>
 Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>,
-	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Claudiu Manoil <claudiu.manoil@nxp.com>,
 	Alexandre Belloni <alexandre.belloni@bootlin.com>,
 	UNGLinuxDriver@microchip.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6 02/16] net: dsa: vsc73xx: convert to PHYLINK
-Message-ID: <ZegtT6Rt7bGbn0sx@shell.armlinux.org.uk>
+Subject: Re: [PATCH net-next v6 03/16] net: dsa: vsc73xx: use macros for
+ rgmii recognition
+Message-ID: <Zegto1XwPTku59CD@shell.armlinux.org.uk>
 References: <20240301221641.159542-1-paweldembicki@gmail.com>
- <20240301221641.159542-3-paweldembicki@gmail.com>
+ <20240301221641.159542-4-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,24 +79,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240301221641.159542-3-paweldembicki@gmail.com>
+In-Reply-To: <20240301221641.159542-4-paweldembicki@gmail.com>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Mar 01, 2024 at 11:16:24PM +0100, Pawel Dembicki wrote:
-> This patch replaces the adjust_link api with the phylink apis that provide
-> equivalent functionality.
+On Fri, Mar 01, 2024 at 11:16:25PM +0100, Pawel Dembicki wrote:
+> It's preparation for future use. At this moment, the RGMII port is used
+> only for a connection to the MAC interface, but in the future, someone
+> could connect a PHY to it. Using the "phy_interface_mode_is_rgmii" macro
+> allows for the proper recognition of all RGMII modes.
 > 
-> The remaining functionality from the adjust_link is now covered in the
-> phylink_mac_link_* and phylink_mac_config.
-> 
-> Removes:
-> .adjust_link
-> Adds:
-> .phylink_mac_config
-> .phylink_mac_link_up
-> .phylink_mac_link_down
-> 
-> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> Suggested-by: Russell King <linux@armlinux.org.uk>
+
+Please change this to:
+
+Suggested-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+Also:
 
 Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
