@@ -1,115 +1,112 @@
-Return-Path: <netdev+bounces-77805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D6F98730DC
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:36:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 475C68730E6
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:38:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0439B1F25D08
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:36:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F23C8282C0C
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:38:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 461195D486;
-	Wed,  6 Mar 2024 08:36:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6AB05D755;
+	Wed,  6 Mar 2024 08:38:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s2eDjqv7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MYIh9gPa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A59433B9
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 08:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A255D730;
+	Wed,  6 Mar 2024 08:38:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709714214; cv=none; b=WaHHCr1BUwgLsOlbIo4T10uVL3xHa/igSOHVcXYkYBAMGwLMiWKgWG4xyffBBQRUVpfmWE01m7STlzk5ej1RAOL01A7LX9jwv834nDaNqLqx3zgUo/I5kO4Va4eAWSkxl0JkCNhR9+VfDHEnkUwtGXkQKBhG5+rYsAhE1izvXI8=
+	t=1709714322; cv=none; b=gaEif7Cm0nVA0BX+NXq7nJp5xCWvtn0apKxulVLDruFRZ9aZwiEZn6KUAtwpTPD7je4iaZbgLESli1nbnjQVqQy4mVsCB3nIE/KRFh88IUg1D8Kabk1LPLOOwF9ticgOD12FOyV9P2zHH6QkvQSQtCY6pfK9ALnx+0mssVp+SD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709714214; c=relaxed/simple;
-	bh=NNDsCpgXUqnTVgldDCq7tpB4bN5RG3gam93XXun2jNA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qHDiSzeM7W0OAP+v5/T0vbBG7JcpAUxRorv1EvhZc23dLWQQQe6Mm9wsffqOdTedvejh5FyGuQANsrg02rmSf4PQaOqUhahBBLoCFZoc29ZjrE9hjGDUrL+g8Oy9U0q8tBt8Y6j+m+UNXTbe4zHf+IzsclFASUpyj+dEUp+GkKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=s2eDjqv7; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-608ceccb5f4so43578807b3.3
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 00:36:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709714211; x=1710319011; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NNDsCpgXUqnTVgldDCq7tpB4bN5RG3gam93XXun2jNA=;
-        b=s2eDjqv7jqsJ4zBbZy7H4nbxPI3zMt1X+pz4RHClVdS1MZNJHO8R021QcnCTt+7A56
-         QuVBa8fxzE63hnE4Ga43xbAxaL3g6MUznnbxNDl7slrxP4c+jxadnA7ljZIGTiYydPcU
-         131GpF/Ca7ldFvE1G3ZzGEA5nytyXZuhNZj9g3wJpZlqbQjlHrzlIXbQ18sWsJlYmVzO
-         c/ylnQ9ip8AEJYmx6pRPz6rpjRQyJwoFSIfZQm7Bn39iNZPeXNdyogx3Z5d8DOzI7yhH
-         YM5nAHbPIpldnQ22DNxkG0LWYRKr5VCl0sJuQGWb21YfY4s0beZSO7iAVQODekk+Xo4z
-         9Qbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709714211; x=1710319011;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NNDsCpgXUqnTVgldDCq7tpB4bN5RG3gam93XXun2jNA=;
-        b=aCP4AXvszh1oPsM4WGAmQrgKQ53xBT5oewGIV58U114IglMyJUJNVN85u7XG+DHifr
-         XeOondzlXyiUUvC923cPVDBL005SjDQOO4DDmGZPMMkudzUs0TX0TKnTEf3IWDdPMIhk
-         5UagYNgn0Ykj/IJlwiZF3kgTmSUc2v8cz9yO9pjgQnahLSrPcnfxLzXm0Svm1fvYLyza
-         eo8VTKNfHuye74AERk09OkrDF3lSiIbbsVyqPH6qCv4y89KEH6uN+j0yPnE8yfF4OVnC
-         4JBqPC12PyWwVyOOcfiijL0g3uRj4Fta/w2B9T6lMiPliMWo8xvuvUMQzYfYiLCJ28EE
-         /FtQ==
-X-Gm-Message-State: AOJu0Yz5bGarpljpmissEmV0l2dp+wKnIF6mTG22o/vc9Hy2fxi5rxtb
-	JBhP5VMYYxXSIU8fzUYPkgBvGtD9qwmNRK1zbj6xV3vqmI+igndi4zYfDwOWmSlZTRYD6JZOVig
-	syeE7cPB+QgOcf15xwVcXMZ+HgeRukMldmfxR3A==
-X-Google-Smtp-Source: AGHT+IGLhNjtxQWwYkQUglxPcEa+RvZcCcxoSRdy5ObAW+Xzq2pgWa2jlr2vpOMdsBIBcGp+Eq2YbuY3bzzRUpIAt6o=
-X-Received: by 2002:a81:c211:0:b0:607:f4b9:11aa with SMTP id
- z17-20020a81c211000000b00607f4b911aamr14072266ywc.21.1709714211516; Wed, 06
- Mar 2024 00:36:51 -0800 (PST)
+	s=arc-20240116; t=1709714322; c=relaxed/simple;
+	bh=L6Cn4uTVTBHKqlz1yW8rNDu318FD8WsCh6wVNeDEbwk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=py43/CT1vw3kQUJPZ1qpxj7crDRCjN6DJVC/gcqT/b215nkwI7YNjlRwFXdQgSe7UgvpzKRzyQr0GAgpJcNOkJnJjLRWX8uaYoUqwYAPbgh4mRi5hs/z1NftPUHe5enGUe/qq7Jkc7xK5AJug3+x1QTa5+m5ri0O9JN4ZTUGDKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MYIh9gPa; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709714321; x=1741250321;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=L6Cn4uTVTBHKqlz1yW8rNDu318FD8WsCh6wVNeDEbwk=;
+  b=MYIh9gPa+lsUr9CMkOtLvXf2zJRusP9o/CxLdSbrkexdFrPSxntY4rM6
+   6PP94mIcTQFklmtQ6foJY1K1y1NJHCmCEOv+Rpkj17ZHHpcyaRWq5lfry
+   G9I1nfs5JYsQxV8Zq+xIsmfKOQ/9WhZr3CMYR8Zd/BxHgRAgnBSnouRNu
+   MeAog+Q4B5qnyd6d257cR9cBoSQeiyTUq4E0EgsBVP11AhKRlYEbDulA6
+   Y7iEEVxS/QnnaSUMMmvxisbIdd39ncRj0U5EabLWLl6yycjq+dwrC4+vh
+   njn9QXdTguyvom7O9bkR3HUeJ5bpowj/l7oKiyF3wK9XaryTwT+4vOvO+
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="21837365"
+X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
+   d="scan'208";a="21837365"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 00:38:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,207,1705392000"; 
+   d="scan'208";a="47210936"
+Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.12.48.215]) ([10.12.48.215])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 00:38:36 -0800
+Message-ID: <3d984c02-0154-4c72-92ee-16fa34d4b537@linux.intel.com>
+Date: Wed, 6 Mar 2024 10:38:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240301221641.159542-1-paweldembicki@gmail.com> <20240301221641.159542-17-paweldembicki@gmail.com>
-In-Reply-To: <20240301221641.159542-17-paweldembicki@gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 6 Mar 2024 09:36:40 +0100
-Message-ID: <CACRpkdbRrnHtknbQV_CEpWu_bsaZEdOEa-AmXWXp2Rs4bKXxTA@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 16/16] net: dsa: vsc73xx: start treating the
- BR_LEARNING flag
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [iwl-net v2 1/2] igc: Fix missing time sync
+ events
+Content-Language: en-US
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ intel-wired-lan@lists.osuosl.org
+Cc: sasha.neftin@intel.com, netdev@vger.kernel.org, richardcochran@gmail.com,
+ kurt@linutronix.de, jesse.brandeburg@intel.com,
+ linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ anthony.l.nguyen@intel.com, Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>
+References: <20240220235712.241552-1-vinicius.gomes@intel.com>
+ <20240220235712.241552-2-vinicius.gomes@intel.com>
+From: "naamax.meir" <naamax.meir@linux.intel.com>
+In-Reply-To: <20240220235712.241552-2-vinicius.gomes@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 1, 2024 at 11:18=E2=80=AFPM Pawel Dembicki <paweldembicki@gmail=
-.com> wrote:
+On 2/21/2024 01:57, Vinicius Costa Gomes wrote:
+> Fix "double" clearing of interrupts, which can cause external events
+> or timestamps to be missed.
+> 
+> The IGC_TSIRC Time Sync Interrupt Cause register can be cleared in two
+> ways, by either reading it or by writing '1' into the specific cause
+> bit. This is documented in section 8.16.1.
+> 
+> The following flow was used:
+>   1. read IGC_TSIRC into 'tsicr';
+>   2. handle the interrupts present in 'tsirc' and mark them in 'ack';
+>   3. write 'ack' into IGC_TSICR;
+> 
+> As both (1) and (3) will clear the interrupt cause, if the same
+> interrupt happens again between (1) and (3) it will be ignored,
+> causing events to be missed.
+> 
+> Remove the extra clear in (3).
+> 
+> Fixes: 2c344ae24501 ("igc: Add support for TX timestamping")
+> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+> Tested-by: Kurt Kanzenbach <kurt@linutronix.de> # Intel i225
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> ---
+>   drivers/net/ethernet/intel/igc/igc_main.c | 12 +-----------
+>   1 file changed, 1 insertion(+), 11 deletions(-)
 
-> This patch implements .port_pre_bridge_flags() and .port_bridge_flags(),
-> which are required for properly treating the BR_LEARNING flag. Also,
-> .port_stp_state_set() is tweaked and now disables learning for standalone
-> ports.
->
-> Disabling learning for standalone ports is required to avoid situations
-> where one port sees traffic originating from another, which could cause
-> invalid operations.
->
-> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
-
-This looks right to me:
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-
-I looked at all patches that I understand, the VLAN tag stuff needs to
-be reviewed by Vladimir who I think has a clear idea of how that should
-be done. You can add my Acked-by because I looked at them and they
-look right but I can't claim to have made a thorough review on those.
-
-Yours,
-Linus Walleij
+Tested-by: Naama Meir <naamax.meir@linux.intel.com>
 
