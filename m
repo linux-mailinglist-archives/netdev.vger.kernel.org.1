@@ -1,266 +1,328 @@
-Return-Path: <netdev+bounces-78036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C455C873CC4
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:59:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EE00873CD0
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:01:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A94A2860FB
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:59:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 926DB1C236E9
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEE6413BAF3;
-	Wed,  6 Mar 2024 16:59:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E38137935;
+	Wed,  6 Mar 2024 17:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="Im/Deftw"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="OSrE7Cdw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EBE713B7A9;
-	Wed,  6 Mar 2024 16:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B279F13BAF1
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 17:00:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709744340; cv=none; b=TOS/1EsJgtoWw897AqGKBwiRcfd2LH/gRq/rLZzWAyMXcxJjdV5ugShTF37IIaGG67FwPIXjIBgwR8xZoNiUToFkkBPmkATsLtvmYkDFto0aeT9w6Rao/XSMg7NLHazuQsWlLGm24gZrtoaflku4LZJE8fhlGcIad3iWWrdhFfE=
+	t=1709744413; cv=none; b=GyHI4DgD9DYg02XgJZNqajS7qGkk6upu/Da/TlgnH4BwSU9tiVNAQ0buIcKdnxTnoykNgCMaE+roJqNK+31Gdu360PnM8YXO31pLoCVP8dO3D+OPQSRR0hKq3BLa3Aj28aKU0P6AmgdjYiOPG0lphtv7CaYzH01c3QiZoF6uW9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709744340; c=relaxed/simple;
-	bh=t9n2dZYVeC1buZKVU4VXcqny92hIU4Tb9aHWrrBO6R8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hG4itf50mHGgvU6c2JDggsVJ3ZD3f6GWwd+jjl9JQw7AA5Uchsrfrqt5kcaR0wsr8dcuGhpmXDEPuWRzZxEITVnKYX4/49EinxpNxt/yjep0mFYhzE3Sbjc2V+vLY2/eq5TfuvFV2LfU0wL61esWR3DO3tEtH1YKDhrurulVp/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=Im/Deftw; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 316836030B;
-	Wed,  6 Mar 2024 16:58:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1709744330;
-	bh=t9n2dZYVeC1buZKVU4VXcqny92hIU4Tb9aHWrrBO6R8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Im/DeftwSy+dyGb5tEa5pokpdScyNvk2ENKizWYVlK46jVvpAuHTnli6Xh+YoFVXb
-	 FXFIYY9L0NX/eD65vFiN3S5MOGRwvy+qeqX+dLFuCAM57qKpqZQmPANHsZkbzj5MXF
-	 UBKksSy6aYRroUKhh6w1nbV2pU46NQAjgXlaU1di8zALVCTKYWIE2lYxCn5NpmcIXf
-	 QJI/cgJyDw3CwihywVaY0ezT7o2V3cFAg3PYWOpVemIKQ0E77R9CVhkPC72mbpxL3T
-	 uDUdKJzVG3VKe2/v73xuxQLjMuu9Rir/dYgMjqEN5Y9FEMQuFVwNSesJ2Hp3KDVPv/
-	 D3rgh0RC7wV+w==
-Received: by x201s (Postfix, from userid 1000)
-	id B10A9203A97; Wed,  6 Mar 2024 16:58:27 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Vlad Buslov <vladbu@nvidia.com>,
-	Marcelo Ricardo Leitner <mleitner@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	llu@fiberby.dk
-Subject: [PATCH net-next v3 3/3] net: sched: make skip_sw actually skip software
-Date: Wed,  6 Mar 2024 16:58:11 +0000
-Message-ID: <20240306165813.656931-4-ast@fiberby.net>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240306165813.656931-1-ast@fiberby.net>
-References: <20240306165813.656931-1-ast@fiberby.net>
+	s=arc-20240116; t=1709744413; c=relaxed/simple;
+	bh=i7q8FxhF1vVOcK6bokFQ/71N9MFzoOBybv77Vp99v6s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YlPmSM+oMK6YWnwShTnbOGw+rr9/kvs6LJLyLMv7TzHWQz8sq8qcARCohK543y+TJK+Nan1Y3L6UtGgVJha4aMn5pSPHt+RQTy6OLD5M1e3MhufBmmGI3R/OZL0gSc+M1cYQ17Akuh9MEvzizNQgNZfR63tgt6PRR1H8bFq4rU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=OSrE7Cdw; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-412e784060cso6856785e9.1
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 09:00:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709744409; x=1710349209; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SS0NRBHuVjXJEm0e2EQJiFfHLmy7AHC7SVYxOl3bBaY=;
+        b=OSrE7CdwsK2UeUe4dyulK+Ow/3abtwtKWxTEtlr6ODHp9tb29Wa0s8/+EeGLPxGb3y
+         UCweib280BbMtB53OLzmebQhgYIXW4vpiGRYzVUr0P7kgJv5gYfEXwDfMk1x3N68Jxri
+         sct2EFOp9Pj0KgxT50J8HZVyhXJhBLgHN/3jmkfMvd+6bGNKMpu9RRtd0xXAu0SVQueQ
+         ufkrUHI5qz41Cj+cwOoGIryIcjLtbJ1WkJucenawshO2Qhc03Uf/7v32+RN/pOeUwDVE
+         6DdXkH/RevvfnXqWpxa900+Wm1mg6+O/kQU/pS729XC/rj5xcYs2dxkSquG18D2fqzyL
+         Y8UQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709744409; x=1710349209;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SS0NRBHuVjXJEm0e2EQJiFfHLmy7AHC7SVYxOl3bBaY=;
+        b=RLaBM5PV8JSqZ8TMV74wktGTeOuESvI0hQQqeWC2ry2e7H1EIu0FxQrupQEpc3s8S1
+         z9K4U4uwxgXv6e6KJhaMH0Jq+il4cemoeWckXnlgzunLN6KznfQAXtiSJe8wLdr+0qy6
+         4g3YDNU4fqZG3JxhtJMXtGkZ00Q/4SOH2bj+rdJb2K/XNkRebPxJk4jdjCmjL96jj8vf
+         Y9gu/Slu1LQr/RhX7q0/jPoKGQPvhyFhXIV84558sZ9NGMbb2QM8WW1pbUAZk5wAh8wG
+         W3yvohL79RqZF/g4b2SWAOAPwewaGtzuvzFwVg1AsYtAZjXzbOOheUZglQK5/s7T1mm0
+         3WyA==
+X-Forwarded-Encrypted: i=1; AJvYcCXXKzzpCGj8vBxZz0aKKG6TH9IvBkah6eYWPte2tOzKAq8JN/yNmtudBxGcapvLQKuea+mO1TFiT6bJm11i0fxSGvVR8i9b
+X-Gm-Message-State: AOJu0Yzy3EaK09g9SUq1V5+5DBcqavpOPCWCNQoMHQDJqFdVZb1KlMdo
+	38SrlTtXtmzNwec079XGr3iadVSyPfpu+7qNF+31URRwDyrMq+GYOTDHbnRGfgg=
+X-Google-Smtp-Source: AGHT+IEwlxXfRGecyIlwJLY5axCnmYvHcaYij05RysgU+GJaiTlUs5/S/eVb1Riyqfl+ZemMD0AnfA==
+X-Received: by 2002:adf:a197:0:b0:33e:601e:3c21 with SMTP id u23-20020adfa197000000b0033e601e3c21mr408wru.19.1709744408660;
+        Wed, 06 Mar 2024 09:00:08 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id co17-20020a0560000a1100b0033e3ca55a4esm9270153wrb.21.2024.03.06.09.00.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Mar 2024 09:00:08 -0800 (PST)
+Date: Wed, 6 Mar 2024 18:00:05 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Michal Schmidt <mschmidt@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: Re: [PATCH net-next v2 1/3] ice: add ice_adapter for shared data
+ across PFs on the same NIC
+Message-ID: <ZeihFVgwBBLOZ4CL@nanopsycho>
+References: <20240306162907.84247-1-mschmidt@redhat.com>
+ <20240306162907.84247-2-mschmidt@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240306162907.84247-2-mschmidt@redhat.com>
 
-TC filters come in 3 variants:
-- no flag (try to process in hardware, but fallback to software))
-- skip_hw (do not process filter by hardware)
-- skip_sw (do not process filter by software)
+Wed, Mar 06, 2024 at 05:29:05PM CET, mschmidt@redhat.com wrote:
+>There is a need for synchronization between ice PFs on the same physical
+>adapter.
+>
+>Add a "struct ice_adapter" for holding data shared between PFs of the
+>same multifunction PCI device. The struct is refcounted - each ice_pf
+>holds a reference to it.
+>
+>Its first use will be for PTP. I expect it will be useful also to
+>improve the ugliness that is ice_prot_id_tbl.
+>
+>Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+>---
+> drivers/net/ethernet/intel/ice/Makefile      |  3 +-
+> drivers/net/ethernet/intel/ice/ice.h         |  2 +
+> drivers/net/ethernet/intel/ice/ice_adapter.c | 85 ++++++++++++++++++++
+> drivers/net/ethernet/intel/ice/ice_adapter.h | 22 +++++
+> drivers/net/ethernet/intel/ice/ice_main.c    |  8 ++
+> 5 files changed, 119 insertions(+), 1 deletion(-)
+> create mode 100644 drivers/net/ethernet/intel/ice/ice_adapter.c
+> create mode 100644 drivers/net/ethernet/intel/ice/ice_adapter.h
+>
+>diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
+>index cddd82d4ca0f..4fa09c321440 100644
+>--- a/drivers/net/ethernet/intel/ice/Makefile
+>+++ b/drivers/net/ethernet/intel/ice/Makefile
+>@@ -36,7 +36,8 @@ ice-y := ice_main.o	\
+> 	 ice_repr.o	\
+> 	 ice_tc_lib.o	\
+> 	 ice_fwlog.o	\
+>-	 ice_debugfs.o
+>+	 ice_debugfs.o  \
+>+	 ice_adapter.o
+> ice-$(CONFIG_PCI_IOV) +=	\
+> 	ice_sriov.o		\
+> 	ice_virtchnl.o		\
+>diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+>index 365c03d1c462..1ffecbdd361a 100644
+>--- a/drivers/net/ethernet/intel/ice/ice.h
+>+++ b/drivers/net/ethernet/intel/ice/ice.h
+>@@ -77,6 +77,7 @@
+> #include "ice_gnss.h"
+> #include "ice_irq.h"
+> #include "ice_dpll.h"
+>+#include "ice_adapter.h"
+> 
+> #define ICE_BAR0		0
+> #define ICE_REQ_DESC_MULTIPLE	32
+>@@ -544,6 +545,7 @@ struct ice_agg_node {
+> 
+> struct ice_pf {
+> 	struct pci_dev *pdev;
+>+	struct ice_adapter *adapter;
+> 
+> 	struct devlink_region *nvm_region;
+> 	struct devlink_region *sram_region;
+>diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
+>new file mode 100644
+>index 000000000000..b93b4db4c04c
+>--- /dev/null
+>+++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
+>@@ -0,0 +1,85 @@
+>+// SPDX-License-Identifier: GPL-2.0-only
+>+// SPDX-FileCopyrightText: Copyright Red Hat
+>+
+>+#include <linux/cleanup.h>
+>+#include <linux/mutex.h>
+>+#include <linux/pci.h>
+>+#include <linux/slab.h>
+>+#include <linux/xarray.h>
+>+#include "ice_adapter.h"
+>+
+>+static DEFINE_XARRAY(ice_adapters);
+>+
+>+static unsigned long ice_adapter_index(const struct pci_dev *pdev)
+>+{
+>+	unsigned int domain = pci_domain_nr(pdev->bus);
+>+
+>+	WARN_ON((unsigned long)domain >> (BITS_PER_LONG - 13));
+>+	return ((unsigned long)domain << 13) |
+>+	       ((unsigned long)pdev->bus->number << 5) |
+>+	       PCI_SLOT(pdev->devfn);
+>+}
+>+
+>+static struct ice_adapter *ice_adapter_new(void)
+>+{
+>+	struct ice_adapter *a;
+>+
+>+	a = kzalloc(sizeof(*a), GFP_KERNEL);
+>+	if (!a)
+>+		return NULL;
+>+
+>+	refcount_set(&a->refcount, 1);
+>+
+>+	return a;
+>+}
+>+
+>+static void ice_adapter_free(struct ice_adapter *a)
+>+{
+>+	kfree(a);
+>+}
+>+
+>+DEFINE_FREE(ice_adapter_free, struct ice_adapter*, if (_T) ice_adapter_free(_T))
+>+
+>+struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
+>+{
+>+	struct ice_adapter *ret, __free(ice_adapter_free) *a = NULL;
+>+	unsigned long index = ice_adapter_index(pdev);
+>+
+>+	a = ice_adapter_new();
 
-However skip_sw is implemented so that the skip_sw
-flag can first be checked, after it has been matched.
+Please consider some non-single-letter variable name.
 
-IMHO it's common when using skip_sw, to use it on all rules.
 
-So if all filters in a block is skip_sw filters, then
-we can bail early, we can thus avoid having to match
-the filters, just to check for the skip_sw flag.
+>+	if (!a)
+>+		return NULL;
+>+
+>+	xa_lock(&ice_adapters);
+>+	ret = __xa_cmpxchg(&ice_adapters, index, NULL, a, GFP_KERNEL);
 
-This patch adds a bypass, for when only TC skip_sw rules
-are used. The bypass is guarded by a static key, to avoid
-harming other workloads.
+This is atomic section, can't sleep.
 
-There are 3 ways that a packet from a skip_sw ruleset, can
-end up in the kernel path. Although the send packets to a
-non-existent chain way is only improved a few percents, then
-I believe it's worth optimizing the trap and fall-though
-use-cases.
 
- +----------------------------+--------+--------+--------+
- | Test description           | Pre-   | Post-  | Rel.   |
- |                            | kpps   | kpps   | chg.   |
- +----------------------------+--------+--------+--------+
- | basic forwarding + notrack | 3589.3 | 3587.9 |  1.00x |
- | switch to eswitch mode     | 3081.8 | 3094.7 |  1.00x |
- | add ingress qdisc          | 3042.9 | 3063.6 |  1.01x |
- | tc forward in hw / skip_sw |37024.7 |37028.4 |  1.00x |
- | tc forward in sw / skip_hw | 3245.0 | 3245.3 |  1.00x |
- +----------------------------+--------+--------+--------+
- | tests with only skip_sw rules below:                  |
- +----------------------------+--------+--------+--------+
- | 1 non-matching rule        | 2694.7 | 3058.7 |  1.14x |
- | 1 n-m rule, match trap     | 2611.2 | 3323.1 |  1.27x |
- | 1 n-m rule, goto non-chain | 2886.8 | 2945.9 |  1.02x |
- | 5 non-matching rules       | 1958.2 | 3061.3 |  1.56x |
- | 5 n-m rules, match trap    | 1911.9 | 3327.0 |  1.74x |
- | 5 n-m rules, goto non-chain| 2883.1 | 2947.5 |  1.02x |
- | 10 non-matching rules      | 1466.3 | 3062.8 |  2.09x |
- | 10 n-m rules, match trap   | 1444.3 | 3317.9 |  2.30x |
- | 10 n-m rules,goto non-chain| 2883.1 | 2939.5 |  1.02x |
- | 25 non-matching rules      |  838.5 | 3058.9 |  3.65x |
- | 25 n-m rules, match trap   |  824.5 | 3323.0 |  4.03x |
- | 25 n-m rules,goto non-chain| 2875.8 | 2944.7 |  1.02x |
- | 50 non-matching rules      |  488.1 | 3054.7 |  6.26x |
- | 50 n-m rules, match trap   |  484.9 | 3318.5 |  6.84x |
- | 50 n-m rules,goto non-chain| 2884.1 | 2939.7 |  1.02x |
- +----------------------------+--------+--------+--------+
+>+	if (xa_is_err(ret)) {
+>+		ret = NULL;
 
-perf top (25 n-m skip_sw rules - pre patch):
-  20.39%  [kernel]  [k] __skb_flow_dissect
-  16.43%  [kernel]  [k] rhashtable_jhash2
-  10.58%  [kernel]  [k] fl_classify
-  10.23%  [kernel]  [k] fl_mask_lookup
-   4.79%  [kernel]  [k] memset_orig
-   2.58%  [kernel]  [k] tcf_classify
-   1.47%  [kernel]  [k] __x86_indirect_thunk_rax
-   1.42%  [kernel]  [k] __dev_queue_xmit
-   1.36%  [kernel]  [k] nft_do_chain
-   1.21%  [kernel]  [k] __rcu_read_lock
+Why don't you propagate err through ERR_PTR() ?
 
-perf top (25 n-m skip_sw rules - post patch):
-   5.12%  [kernel]  [k] __dev_queue_xmit
-   4.77%  [kernel]  [k] nft_do_chain
-   3.65%  [kernel]  [k] dev_gro_receive
-   3.41%  [kernel]  [k] check_preemption_disabled
-   3.14%  [kernel]  [k] mlx5e_skb_from_cqe_mpwrq_nonlinear
-   2.88%  [kernel]  [k] __netif_receive_skb_core.constprop.0
-   2.49%  [kernel]  [k] mlx5e_xmit
-   2.15%  [kernel]  [k] ip_forward
-   1.95%  [kernel]  [k] mlx5e_tc_restore_tunnel
-   1.92%  [kernel]  [k] vlan_gro_receive
 
-Test setup:
- DUT: Intel Xeon D-1518 (2.20GHz) w/ Nvidia/Mellanox ConnectX-6 Dx 2x100G
- Data rate measured on switch (Extreme X690), and DUT connected as
- a router on a stick, with pktgen and pktsink as VLANs.
- Pktgen-dpdk was in range 36.6-37.7 Mpps across all tests.
- Full test data at https://files.fiberby.net/ast/2024/tc_skip_sw/v2_tests/
+>+		goto unlock;
+>+	}
+>+	if (ret) {
+>+		refcount_inc(&ret->refcount);
+>+		goto unlock;
+>+	}
+>+	ret = no_free_ptr(a);
+>+unlock:
+>+	xa_unlock(&ice_adapters);
+>+	return ret;
+>+}
+>+
+>+void ice_adapter_put(const struct pci_dev *pdev)
+>+{
+>+	unsigned long index = ice_adapter_index(pdev);
+>+	struct ice_adapter *a;
+>+
+>+	xa_lock(&ice_adapters);
+>+	a = xa_load(&ice_adapters, index);
+>+	if (WARN_ON(!a))
+>+		goto unlock;
+>+
+>+	if (!refcount_dec_and_test(&a->refcount))
+>+		goto unlock;
+>+
+>+	WARN_ON(__xa_erase(&ice_adapters, index) != a);
 
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
----
- include/net/pkt_cls.h     |  9 +++++++++
- include/net/sch_generic.h |  1 +
- net/core/dev.c            | 10 ++++++++++
- net/sched/cls_api.c       | 18 ++++++++++++++++++
- 4 files changed, 38 insertions(+)
+Nice paranoia level :)
 
-diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-index a4ee43f493bb..41297bd38dff 100644
---- a/include/net/pkt_cls.h
-+++ b/include/net/pkt_cls.h
-@@ -74,6 +74,15 @@ static inline bool tcf_block_non_null_shared(struct tcf_block *block)
- 	return block && block->index;
- }
- 
-+#ifdef CONFIG_NET_CLS_ACT
-+DECLARE_STATIC_KEY_FALSE(tcf_bypass_check_needed_key);
-+
-+static inline bool tcf_block_bypass_sw(struct tcf_block *block)
-+{
-+	return block && block->bypass_wanted;
-+}
-+#endif
-+
- static inline struct Qdisc *tcf_block_q(struct tcf_block *block)
- {
- 	WARN_ON(tcf_block_shared(block));
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index 7af0621db226..60b0fdf2b1ad 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -477,6 +477,7 @@ struct tcf_block {
- 	struct flow_block flow_block;
- 	struct list_head owner_list;
- 	bool keep_dst;
-+	bool bypass_wanted;
- 	atomic_t filtercnt; /* Number of filters */
- 	atomic_t skipswcnt; /* Number of skip_sw filters */
- 	atomic_t offloadcnt; /* Number of oddloaded filters */
-diff --git a/net/core/dev.c b/net/core/dev.c
-index fe054cbd41e9..b7c583f98e82 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -2057,6 +2057,11 @@ void net_dec_egress_queue(void)
- EXPORT_SYMBOL_GPL(net_dec_egress_queue);
- #endif
- 
-+#ifdef CONFIG_NET_CLS_ACT
-+DEFINE_STATIC_KEY_FALSE(tcf_bypass_check_needed_key);
-+EXPORT_SYMBOL(tcf_bypass_check_needed_key);
-+#endif
-+
- DEFINE_STATIC_KEY_FALSE(netstamp_needed_key);
- EXPORT_SYMBOL(netstamp_needed_key);
- #ifdef CONFIG_JUMP_LABEL
-@@ -3911,6 +3916,11 @@ static int tc_run(struct tcx_entry *entry, struct sk_buff *skb,
- 	if (!miniq)
- 		return ret;
- 
-+	if (static_branch_unlikely(&tcf_bypass_check_needed_key)) {
-+		if (tcf_block_bypass_sw(miniq->block))
-+			return ret;
-+	}
-+
- 	tc_skb_cb(skb)->mru = 0;
- 	tc_skb_cb(skb)->post_ct = false;
- 	tcf_set_drop_reason(skb, *drop_reason);
-diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-index 304a46ab0e0b..db0653993632 100644
---- a/net/sched/cls_api.c
-+++ b/net/sched/cls_api.c
-@@ -410,6 +410,23 @@ static void tcf_proto_get(struct tcf_proto *tp)
- 	refcount_inc(&tp->refcnt);
- }
- 
-+static void tcf_maintain_bypass(struct tcf_block *block)
-+{
-+	int filtercnt = atomic_read(&block->filtercnt);
-+	int skipswcnt = atomic_read(&block->skipswcnt);
-+	bool bypass_wanted = filtercnt > 0 && filtercnt == skipswcnt;
-+
-+	if (bypass_wanted != block->bypass_wanted) {
-+#ifdef CONFIG_NET_CLS_ACT
-+		if (bypass_wanted)
-+			static_branch_inc(&tcf_bypass_check_needed_key);
-+		else
-+			static_branch_dec(&tcf_bypass_check_needed_key);
-+#endif
-+		block->bypass_wanted = bypass_wanted;
-+	}
-+}
-+
- static void tcf_block_filter_cnt_update(struct tcf_block *block, bool *counted, bool add)
- {
- 	lockdep_assert_not_held(&block->cb_lock);
-@@ -424,6 +441,7 @@ static void tcf_block_filter_cnt_update(struct tcf_block *block, bool *counted,
- 			*counted = false;
- 		}
- 	}
-+	tcf_maintain_bypass(block);
- 	up_write(&block->cb_lock);
- }
- 
--- 
-2.43.0
 
+>+	ice_adapter_free(a);
+>+unlock:
+>+	xa_unlock(&ice_adapters);
+>+}
+>diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/ethernet/intel/ice/ice_adapter.h
+>new file mode 100644
+>index 000000000000..cb5a02eb24c1
+>--- /dev/null
+>+++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
+>@@ -0,0 +1,22 @@
+>+/* SPDX-License-Identifier: GPL-2.0-only */
+>+/* SPDX-FileCopyrightText: Copyright Red Hat */
+>+
+>+#ifndef _ICE_ADAPTER_H_
+>+#define _ICE_ADAPTER_H_
+>+
+>+#include <linux/refcount_types.h>
+>+
+>+struct pci_dev;
+>+
+>+/**
+>+ * struct ice_adapter - PCI adapter resources shared across PFs
+>+ * @refcount: Reference count. struct ice_pf objects hold the references.
+>+ */
+>+struct ice_adapter {
+>+	refcount_t refcount;
+>+};
+>+
+>+struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev);
+>+void ice_adapter_put(const struct pci_dev *pdev);
+>+
+>+#endif /* _ICE_ADAPTER_H */
+>diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+>index 8f73ba77e835..413219d81a12 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_main.c
+>+++ b/drivers/net/ethernet/intel/ice/ice_main.c
+>@@ -5093,6 +5093,7 @@ static int
+> ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
+> {
+> 	struct device *dev = &pdev->dev;
+>+	struct ice_adapter *adapter;
+> 	struct ice_pf *pf;
+> 	struct ice_hw *hw;
+> 	int err;
+>@@ -5145,7 +5146,12 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
+> 
+> 	pci_set_master(pdev);
+> 
+>+	adapter = ice_adapter_get(pdev);
+>+	if (!adapter)
+>+		return -ENOMEM;
+>+
+> 	pf->pdev = pdev;
+>+	pf->adapter = adapter;
+> 	pci_set_drvdata(pdev, pf);
+> 	set_bit(ICE_DOWN, pf->state);
+> 	/* Disable service task until DOWN bit is cleared */
+>@@ -5196,6 +5202,7 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
+> err_load:
+> 	ice_deinit(pf);
+> err_init:
+>+	ice_adapter_put(pdev);
+> 	pci_disable_device(pdev);
+> 	return err;
+> }
+>@@ -5302,6 +5309,7 @@ static void ice_remove(struct pci_dev *pdev)
+> 	ice_setup_mc_magic_wake(pf);
+> 	ice_set_wake(pf);
+> 
+>+	ice_adapter_put(pdev);
+> 	pci_disable_device(pdev);
+> }
+> 
+>-- 
+>2.43.2
+>
 
