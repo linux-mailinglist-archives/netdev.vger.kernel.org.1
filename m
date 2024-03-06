@@ -1,113 +1,218 @@
-Return-Path: <netdev+bounces-77780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B72B5872FB2
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:32:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 44F19872FD0
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:37:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8FD91C24F07
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 07:32:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67AF21C2137F
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 07:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D29F21CD1E;
-	Wed,  6 Mar 2024 07:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="Bnf+pGBR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD4BB5C8F9;
+	Wed,  6 Mar 2024 07:37:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-190c.mail.infomaniak.ch (smtp-190c.mail.infomaniak.ch [185.125.25.12])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F7835881
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 07:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9076517745;
+	Wed,  6 Mar 2024 07:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709710349; cv=none; b=o05IGgJ+OupxL5esB2AiiJ1MkX2XCNHQvld0A87P4XovoCQmKo2do55Gq1Vkw+lViqnc1uQgbUn0C42esVfNWhuuEREVQeWYdXvYPW4IXRWhHJ0PmlUdRRyNdAj/vtkE/BeH3vYyPeB8u/USsNsgPaJkEqzWps8PIrxtfx6QpiE=
+	t=1709710620; cv=none; b=V/weEFfm3CFJBu5NNr71bUDfqzhVQFhn409Hnc2wBOdxKFEwcWXc5+KQmMJnyCgLfeKEL58AlITn8d+KpeQ9MYXZOYN1tHDG5G5YS5hz1sQ4gzioJhslOkoESWNFQZHNLDWH7u7Ok2lsseSdJ7yt7Ahn10WlVjxgheYM3BDm5tA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709710349; c=relaxed/simple;
-	bh=jHtL5/BM5lZdwyQNewndmLOTlA78bq8Zp6YPa9Nivys=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BG1XYeTM1xAZq67u1S5DFdyZ6t08JdBFp5rtwOjyOmdPxNbqiEqmq21VdyR/NmAxzFiV8JxB2XeXgEzDsMh0JMxzRyHKyoeo2Y4bqHuKgK/THBepC9sL/HDRwLwC5vm8XKkaetRSxLQtETKeC+9iSId5N9+YgIb/bG3wxWtCe8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=Bnf+pGBR; arc=none smtp.client-ip=185.125.25.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4TqPK35KvxzMqCRH;
-	Wed,  6 Mar 2024 08:32:23 +0100 (CET)
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4TqPK31Q2Wz3Y;
-	Wed,  6 Mar 2024 08:32:23 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1709710343;
-	bh=jHtL5/BM5lZdwyQNewndmLOTlA78bq8Zp6YPa9Nivys=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Bnf+pGBRCM2oQmZ/Ndmfz09ggrMuO8bVAMRpw82pfQYm8+aSp6GxqB3TSue3nay+W
-	 LbcPAM0SW5uwFHuS0amH3R74dYgRrxfTViUtVTsZd3NdniYaJK/CPwjk2X9uYeWxKv
-	 gpBSk7PtlovH39NeEzG8AX8N8Y6VhBfyq7mLTF1o=
-Date: Wed, 6 Mar 2024 08:32:13 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, 
-	Kees Cook <keescook@chromium.org>, Mark Brown <broonie@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, Will Drewry <wad@chromium.org>, edumazet@google.com, 
-	jakub@cloudflare.com, pabeni@redhat.com, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-security-module@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] selftests/harness: Fix TEST_F()'s vfork handling
-Message-ID: <20240306.aepaGah0tie2@digikod.net>
-References: <20240305.sheeF9yain1O@digikod.net>
- <20240305201029.1331333-1-mic@digikod.net>
- <20240305122554.1e42c423@kernel.org>
- <20240306.Hei7aekahvaj@digikod.net>
+	s=arc-20240116; t=1709710620; c=relaxed/simple;
+	bh=9dgdi3onNdqBCuripreHkAtGlscINxvox0JMaGq1b64=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KDhQ1RpK/56EQUzsB3YEAico/CYYlpn8j1KaCxIBeW5ltwyyjb8JtNxAcA3lxtF7DaooMzIna+77LgDIMZNxgwccOppWtr8lB8XUtgs94cUiwqwqVdHkcQpo85ov2oxoXJy5dssUDJDCSDTMan7M4Tg+qexKNo1z/Xfao1pN6zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.224] (ip5f5aedd4.dynamic.kabel-deutschland.de [95.90.237.212])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 9829A61E5FE01;
+	Wed,  6 Mar 2024 08:36:07 +0100 (CET)
+Message-ID: <2ee68ccd-4c95-4d1e-ac12-9d792b84f699@molgen.mpg.de>
+Date: Wed, 6 Mar 2024 08:36:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v2 1/2] igb: simplify pci ops declaration
+Content-Language: en-US
+To: Heiner Kallweit <hkallweit1@gmail.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ horms@kernel.org, Alan Brady <alan.brady@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-pci@vger.kernel.org
+References: <20240306025023.800029-1-jesse.brandeburg@intel.com>
+ <20240306025023.800029-2-jesse.brandeburg@intel.com>
+ <788f0d6b-107b-4d7b-813d-89db82a78e59@molgen.mpg.de>
+ <8e2ef99f-1a3d-44b6-9b3d-c612e43a33c4@gmail.com>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <8e2ef99f-1a3d-44b6-9b3d-c612e43a33c4@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240306.Hei7aekahvaj@digikod.net>
-X-Infomaniak-Routing: alpha
 
-On Wed, Mar 06, 2024 at 08:25:45AM +0100, Mickaël Salaün wrote:
-> On Tue, Mar 05, 2024 at 12:25:54PM -0800, Jakub Kicinski wrote:
-> > On Tue,  5 Mar 2024 21:10:29 +0100 Mickaël Salaün wrote:
-> > > Always run fixture setup in the grandchild process, and by default also
-> > > run the teardown in the same process.  However, this change makes it
-> > > possible to run the teardown in a parent process when
-> > > _metadata->teardown_parent is set to true (e.g. in fixture setup).
-> > > 
-> > > Fix TEST_SIGNAL() by forwarding grandchild's signal to its parent.  Fix
-> > > seccomp tests by running the test setup in the parent of the test
-> > > thread, as expected by the related test code.  Fix Landlock tests by
-> > > waiting for the grandchild before processing _metadata.
-> > > 
-> > > Use of exit(3) in tests should be OK because the environment in which
-> > > the vfork(2) call happen is already dedicated to the running test (with
-> > > flushed stdio, setpgrp() call), see __run_test() and the call to fork(2)
-> > > just before running the setup/test/teardown.  Even if the test
-> > > configures its own exit handlers, they will not be run by the parent
-> > > because it never calls exit(3), and the test function either ends with a
-> > > call to _exit(2) or a signal.
-> > > 
-> > > Cc: David S. Miller <davem@davemloft.net>
-> > > Cc: Günther Noack <gnoack@google.com>
-> > > Cc: Jakub Kicinski <kuba@kernel.org>
-> > > Cc: Kees Cook <keescook@chromium.org>
-> > > Cc: Mark Brown <broonie@kernel.org>
-> > > Cc: Shuah Khan <shuah@kernel.org>
-> > > Cc: Will Drewry <wad@chromium.org>
-> > > Fixes: 0710a1a73fb4 ("selftests/harness: Merge TEST_F_FORK() into TEST_F()")
-> > > Link: https://lore.kernel.org/r/20240305201029.1331333-1-mic@digikod.net
+Dear Linux folks,
+
+
+Am 06.03.24 um 07:46 schrieb Heiner Kallweit:
+> On 06.03.2024 07:24, Paul Menzel wrote:
+>> [Cc: +linux-pci@vger.kernel.org]
+
+>> Am 06.03.24 um 03:50 schrieb Jesse Brandeburg:
+>>> The igb driver was pre-declaring tons of functions just so that it could
+>>> have an early declaration of the pci_driver struct.
+>>>
+>>> Delete a bunch of the declarations and move the struct to the bottom of the
+>>> file, after all the functions are declared.
+>>>
+>>> Reviewed-by: Alan Brady <alan.brady@intel.com>
+>>> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+>>> ---
+>>> v2: address compilation failure when CONFIG_PM=n, which is then updated
+>>>       in patch 2/2, fix alignment.
+>>>       changes in v1 reviewed by Simon Horman
+>>>       changes in v1 reviewed by Paul Menzel
+>>> v1: original net-next posting
+>>> ---
+>>>    drivers/net/ethernet/intel/igb/igb_main.c | 53 ++++++++++-------------
+>>>    1 file changed, 24 insertions(+), 29 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+>>> index 518298bbdadc..e749bf5164b8 100644
+>>> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+>>> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+>>> @@ -106,8 +106,6 @@ static int igb_setup_all_rx_resources(struct igb_adapter *);
+>>>    static void igb_free_all_tx_resources(struct igb_adapter *);
+>>>    static void igb_free_all_rx_resources(struct igb_adapter *);
+>>>    static void igb_setup_mrqc(struct igb_adapter *);
+>>> -static int igb_probe(struct pci_dev *, const struct pci_device_id *);
+>>> -static void igb_remove(struct pci_dev *pdev);
+>>>    static void igb_init_queue_configuration(struct igb_adapter *adapter);
+>>>    static int igb_sw_init(struct igb_adapter *);
+>>>    int igb_open(struct net_device *);
+>>> @@ -178,20 +176,6 @@ static int igb_vf_configure(struct igb_adapter *adapter, int vf);
+>>>    static int igb_disable_sriov(struct pci_dev *dev, bool reinit);
+>>>    #endif
+>>>    -static int igb_suspend(struct device *);
+>>> -static int igb_resume(struct device *);
+>>> -static int igb_runtime_suspend(struct device *dev);
+>>> -static int igb_runtime_resume(struct device *dev);
+>>> -static int igb_runtime_idle(struct device *dev);
+>>> -#ifdef CONFIG_PM
+>>> -static const struct dev_pm_ops igb_pm_ops = {
+>>> -    SET_SYSTEM_SLEEP_PM_OPS(igb_suspend, igb_resume)
+>>> -    SET_RUNTIME_PM_OPS(igb_runtime_suspend, igb_runtime_resume,
+>>> -            igb_runtime_idle)
+>>> -};
+>>> -#endif
+>>> -static void igb_shutdown(struct pci_dev *);
+>>> -static int igb_pci_sriov_configure(struct pci_dev *dev, int num_vfs);
+>>>    #ifdef CONFIG_IGB_DCA
+>>>    static int igb_notify_dca(struct notifier_block *, unsigned long, void *);
+>>>    static struct notifier_block dca_notifier = {
+>>> @@ -219,19 +203,6 @@ static const struct pci_error_handlers igb_err_handler = {
+>>>      static void igb_init_dmac(struct igb_adapter *adapter, u32 pba);
+>>>    -static struct pci_driver igb_driver = {
+>>> -    .name     = igb_driver_name,
+>>> -    .id_table = igb_pci_tbl,
+>>> -    .probe    = igb_probe,
+>>> -    .remove   = igb_remove,
+>>> -#ifdef CONFIG_PM
+>>> -    .driver.pm = &igb_pm_ops,
+>>> -#endif
+>>> -    .shutdown = igb_shutdown,
+>>> -    .sriov_configure = igb_pci_sriov_configure,
+>>> -    .err_handler = &igb_err_handler
+>>> -};
+>>> -
+>>>    MODULE_AUTHOR("Intel Corporation, <e1000-devel@lists.sourceforge.net>");
+>>>    MODULE_DESCRIPTION("Intel(R) Gigabit Ethernet Network Driver");
+>>>    MODULE_LICENSE("GPL v2");
+>>
+>> A lot of other drivers also have this at the end.
+>>
+>>> @@ -647,6 +618,8 @@ struct net_device *igb_get_hw_dev(struct e1000_hw *hw)
+>>>        return adapter->netdev;
+>>>    }
+>>>    +static struct pci_driver igb_driver;
+>>> +
+>>>    /**
+>>>     *  igb_init_module - Driver Registration Routine
+>>>     *
+>>> @@ -10170,4 +10143,26 @@ static void igb_nfc_filter_restore(struct igb_adapter *adapter)
+>>>          spin_unlock(&adapter->nfc_lock);
+>>>    }
+>>> +
+>>> +#ifdef CONFIG_PM
+>>> +static const struct dev_pm_ops igb_pm_ops = {
+>>> +    SET_SYSTEM_SLEEP_PM_OPS(igb_suspend, igb_resume)
+>>> +    SET_RUNTIME_PM_OPS(igb_runtime_suspend, igb_runtime_resume,
+>>> +               igb_runtime_idle)
+>>> +};
+>>> +#endif
+>>> +
+>>> +static struct pci_driver igb_driver = {
+>>> +    .name     = igb_driver_name,
+>>> +    .id_table = igb_pci_tbl,
+>>> +    .probe    = igb_probe,
+>>> +    .remove   = igb_remove,
+>>> +#ifdef CONFIG_PM
+>>> +    .driver.pm = &igb_pm_ops,
+>>> +#endif
+>>> +    .shutdown = igb_shutdown,
+>>> +    .sriov_configure = igb_pci_sriov_configure,
+>>> +    .err_handler = &igb_err_handler
+>>> +};
+>>> +
+>>>    /* igb_main.c */
+>>
+>> I looked through `drivers/` and .driver.pm is unguarded there.
+>> Example `drivers/video/fbdev/geode/gxfb_core.c`: >>
+>>      static const struct dev_pm_ops gxfb_pm_ops = {
+>>      #ifdef CONFIG_PM_SLEEP
+>>              .suspend        = gxfb_suspend,
+>>              .resume         = gxfb_resume,
+>>              .freeze         = NULL,
+>>              .thaw           = gxfb_resume,
+>>              .poweroff       = NULL,
+>>              .restore        = gxfb_resume,
+>>      #endif
+>>      };
+>>
+>>      static struct pci_driver gxfb_driver = {
+>>              .name           = "gxfb",
+>>              .id_table       = gxfb_id_table,
+>>              .probe          = gxfb_probe,
+>>              .remove         = gxfb_remove,
+>>              .driver.pm      = &gxfb_pm_ops,
+>>      };
+>>
+>> No idea, what driver follows the best practices though, and if it
+>> would belong into a separate commit.
 > 
-> Signed-off-by: Mickaël Salaün <mic@digikod.net>
+> The geode fbdev driver may be a bad example as it's ancient. There's
+> pm_sleep_ptr, SYSTEM_SLEEP_PM_OPS et al to avoid the conditional 
+> compiling and use of __maybe_unused. And yes, I also think this
+> should be a separate patch.
 
-Reported-by: Mark Brown <broonie@kernel.org>
+Sorry for the noise. I should looked at or remembered patch 2/2, doing 
+exactly that.
 
-> 
-> > 
-> > Your S-o-b is missing. Should be enough if you responded with it.
-> > 
-> > Code LGTM, thanks!
-> > 
+
+Kind regards,
+
+Paul
 
