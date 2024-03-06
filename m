@@ -1,128 +1,114 @@
-Return-Path: <netdev+bounces-77970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAFF1873A91
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:22:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 127A8873AA2
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:25:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 968FD2838A2
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:22:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2CF5283BAE
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7805A1350D8;
-	Wed,  6 Mar 2024 15:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A98E134733;
+	Wed,  6 Mar 2024 15:25:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c6JdyTqK"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="klx0W1/5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1E45DF1D;
-	Wed,  6 Mar 2024 15:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EF6131E4B
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 15:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709738547; cv=none; b=ulEk7mAn1Q2kGpBp+HE27einJKGvCMOFfG/vcUa42VEQp2439Sy1BVyWHStx4dPym5zuxiBW2xyKMfW5VvE99lAe1n4aqTUj2f/YQ9NkUkZOzeiKSCvCguUZNNUH+/qNkMRMupqs3CsD6dZsoaWq7WpziDxGpPb1TGqzM5aZpMM=
+	t=1709738743; cv=none; b=fCd49q0jK0zS0KxHUTVdn5O9csTvdkA7P2k6PtIivsVslei+IQL0METo6n/cVwNvOpK0AGq++KylSEo2FcNufQmpCGp26cckIpg64FlVho2n+0sSFjEyU4nL0Ky6yZ/GzmK9bUBArLqKUL0ax1M+D/s81jPsDt5p0FgbZGI4HZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709738547; c=relaxed/simple;
-	bh=1LgluQv1M0MpfLZxjv6T5+z/3k7YjbHLdzNPN3vfxrQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vGQrb9o7FEaweItTyXV72QmO03s7dXmiJrHxkPE5N2+gQk17Lio93rjkPBocnFajD8PLG/gW3Po0vm2IZzlJJW4ZAbeplx3IFEl63Kyq0auQU6OShLHElbPf5IIJigt39oT9EaXMngIElcTn2rJf0Vr66zbUKRWhk0Fuo4LXADo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c6JdyTqK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 485FBC433F1;
-	Wed,  6 Mar 2024 15:22:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709738546;
-	bh=1LgluQv1M0MpfLZxjv6T5+z/3k7YjbHLdzNPN3vfxrQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=c6JdyTqKkKCGVZO+Af70uAEJ2llNw5TNzY1aRj2xHJxozsPCsV1pgOOSipXDvyvq6
-	 GDThdToWSVOc2K8DbA+kXsJxWcmMSqGjFsbeFkXODveioXeAcIGuJDZ6AZcJjm9ayr
-	 HABbgzUMl+9BJSSxST3RY6mrbhlxactZcuGMjaIsYB80+X9bjUVUXxgyBbPl34vhvw
-	 GdnhXLPMMIGq6ToRkab8kNPm8wR/3/xKA0I9jxp99/AjIzOlf8flMBwF9jfLbWSbwJ
-	 rzw1wqDYtL4wT62bPQ3tTQWoO2vDAth/HtrW+NeAe3PGcG9agGH0tTqWXQ8eCOh038
-	 qMXHTOGI4c1TA==
-Date: Wed, 6 Mar 2024 07:22:25 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "almasrymina@google.com" <almasrymina@google.com>, "davem@davemloft.net"
- <davem@davemloft.net>, "herbert@gondor.apana.org.au"
- <herbert@gondor.apana.org.au>, Gal Pressman <gal@nvidia.com>,
- "dsahern@kernel.org" <dsahern@kernel.org>, "steffen.klassert@secunet.com"
- <steffen.klassert@secunet.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com"
- <edumazet@google.com>, "ian.kumlien@gmail.com" <ian.kumlien@gmail.com>,
- "Anatoli.Chechelnickiy@m.interpipe.biz"
- <Anatoli.Chechelnickiy@m.interpipe.biz>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>
-Subject: Re: [RFC] net: esp: fix bad handling of pages from page_pool
-Message-ID: <20240306072225.4a61e57c@kernel.org>
-In-Reply-To: <7fc334b847dc4d90af796f84a8663de9f43ede5d.camel@nvidia.com>
-References: <20240304094950.761233-1-dtatulea@nvidia.com>
-	<20240305190427.757b92b8@kernel.org>
-	<7fc334b847dc4d90af796f84a8663de9f43ede5d.camel@nvidia.com>
+	s=arc-20240116; t=1709738743; c=relaxed/simple;
+	bh=oOtHYr2Eyt041TkFpTgH7RlHgJIKFbcRLDUz9Den9Ug=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nRi0G1X7qJ+VF8Czn13RPMjKNZN/MJauwjMnhSIQD79Nvqm+SBK6/CbRnGsK2Za1IuYmhHq9ztPbfLBb4y2c7EQlfS9D/FgUfMX5cjGgJHJzMrzjOmUuh46miQqLwA5kf7fGVPuEWRWthftZcIKbBxH6R2bmer5u51cYQjVS9NY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=klx0W1/5; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-33da51fd636so3792863f8f.3
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 07:25:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709738739; x=1710343539; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oOtHYr2Eyt041TkFpTgH7RlHgJIKFbcRLDUz9Den9Ug=;
+        b=klx0W1/5Dokk3bFUh76jXcOxLS6+V0bCV1XL1GPETJnAmwFmaWM3umKEWso2JyrgYr
+         EtwGmDZUjvBpaJdwARFQBISRhyi9TzquZpcrKDBACV7GrzIjFDp6H3oiqGP8N/O/mt49
+         BWKd+NRGwmMsn74Laejo/Gr/sEzgPJVrf4OGhLF82LgjB0rOkT2wGUAaRJQYnC/4Jn8N
+         v4vN7JYGRkHVtmuWDaB/pkjlMN4ByPtw2311m4drZo9zhsupg9mJzHMNiZLtO5Z0IPrn
+         8DJy+RdWcjZxnKbM3UyJIqTT/EccwBMt7LZwB1hb/sB2zzFdTbP09yAa++ZNbU8Gk+Cm
+         wwlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709738739; x=1710343539;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oOtHYr2Eyt041TkFpTgH7RlHgJIKFbcRLDUz9Den9Ug=;
+        b=Mhf2Bz7Fdo3R3S1sJqSCAo5yc0bmoki+FnI3M0ReR/x2tbUBChUDh7tcBNKT62sGve
+         HC16Wzslo2R89ENy5iRGlL6cUhrVayvC7I5bud7xwUGReuI6CZILk6Lfr8LI7UozyC8p
+         hBUdRVE/4Q2+GACWZQPb5wcmBQoDDPxHW++OL0dmBv2MVhmp0Zv+D7psmO2vwHJTKXuA
+         ITDj0See1b8TEIl+GGvLDGtuNYEczsX5aPNpgbFGluzDTBjpM4Vl1yxQ/pOyIeO3aiTO
+         XGh0Ag7H9ps9dvMmZKosLf3OYt+Ssh8idDxpI80L2Xpco4z8pGZLfIn4CM2vK3XCM3Jc
+         9sXA==
+X-Gm-Message-State: AOJu0YzWdZhq1I+nk3tO/bXxxR4j2gOp4nCDZ3was4mz+hDoViY34NT7
+	3grjLMBaieSiA5La1762/AG0hcxO4+kVezKRX9WyNOj3Dte3eQ+h1Oqx++jvbbiIe2RAnNRSgPN
+	z
+X-Google-Smtp-Source: AGHT+IH/iz3S2HxHo8Tgs2qMofZI393AmB7cOp61sqROHmlvR0c/c1WSK+regY5KJAcSjMaIraLgsA==
+X-Received: by 2002:adf:eb4c:0:b0:33d:eec0:c5 with SMTP id u12-20020adfeb4c000000b0033deec000c5mr9812581wrn.9.1709738738919;
+        Wed, 06 Mar 2024 07:25:38 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id d15-20020a5d644f000000b0033e052be14fsm17795707wrw.98.2024.03.06.07.25.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Mar 2024 07:25:38 -0800 (PST)
+Date: Wed, 6 Mar 2024 16:25:34 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, arkadiusz.kubalewski@intel.com,
+	vadim.fedorenko@linux.dev
+Subject: Re: [patch net-next] dpll: spec: use proper enum for pin
+ capabilities attribute
+Message-ID: <ZeiK7gDRUZYA8378@nanopsycho>
+References: <20240306120739.1447621-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240306120739.1447621-1-jiri@resnulli.us>
 
-On Wed, 6 Mar 2024 13:05:14 +0000 Dragos Tatulea wrote:
-> On Tue, 2024-03-05 at 19:04 -0800, Jakub Kicinski wrote:
-> > On Mon, 4 Mar 2024 11:48:52 +0200 Dragos Tatulea wrote: =20
-> > > When the skb is reorganized during esp_output (!esp->inline), the pag=
-es
-> > > coming from the original skb fragments are supposed to be released ba=
-ck
-> > > to the system through put_page. But if the skb fragment pages are
-> > > originating from a page_pool, calling put_page on them will trigger a
-> > > page_pool leak which will eventually result in a crash. =20
-> >=20
-> > So it just does: skb_shinfo(skb)->nr_frags =3D 1;
-> > and assumes that's equivalent to owning a page ref on all the frags?
-> >  =20
-> My understanding is different: it sets nr_frags to 1 because it's swappin=
-g out
-> the old page frag in fragment 0 with the new xfrag page frag and will use=
- this
-> "new" skb from here. It does take a page reference for the xfrag page fra=
-g.
+Wed, Mar 06, 2024 at 01:07:39PM CET, jiri@resnulli.us wrote:
+>From: Jiri Pirko <jiri@nvidia.com>
+>
+>The enum is defined, however the pin capabilities attribute does
+>refer to it. Add this missing enum field.
+>
+>This fixes ynl cli output:
+>
+>Example current output:
+>$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml --do pin-get --json '{"id": 0}'
+>{'capabilities': 4,
+> ...
+>Example new output:
+>$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml --do pin-get --json '{"id": 0}'
+>{'capabilities': {'state-can-change'},
+> ...
+>
+>Fixes: 3badff3a25d8 ("dpll: spec: Add Netlink spec in YAML")
+>Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 
-Same understanding, I'm just bad at explaining :)
+Note that netdev/cc_maintainers fails as I didn't cc michal.michalik@intel.com
+on purpose, as the address bounces.
 
-> > Fix looks more or less good, we would need a new wrapper to avoid
-> > build issues without PAGE_POOL,=C2=A0
-> >  =20
-> Ack. Which component would be best location for this wrapper: page_pool?
-
-Hm, that's a judgment call.
-Part of me wants to put it next to napi_frag_unref(), since we
-basically need to factor out the insides of this function.
-When you post the patch the page pool crowd will give us
-their opinions.
-
-> > but I wonder if we wouldn't be better
-> > off changing the other side. Instead of "cutting off" the frags -
-> > walking them and dealing with various page types. Because Mina and co.
-> > will step onto this landmine as well. =20
-> The page frags are still stored and used in the sg scatterlist. If we rel=
-ease
-> them at the moment when the skb is "cut off", the pages in the sg will be
-> invalid. At least that's my understanding.
-
-I was thinking something along the lines of:
-
-	for each frag()
-		if (is_pp_page()) {
-			get_page();
-			page_pool_unref_page(1);
-		}
-
-so that it's trivial to insert another check for "is this a zero-copy"
-page in there, and error our. But on reflection the zero copy check may
-be better placed in __skb_to_sgvec(), so ignore this. Just respin
-what you got with a new helper.
+Btw, do we have a way to ignore such ccs? .get_maintainer.ignore looks
+like a good candidate, but is it okay to put closed emails there?
 
