@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-77857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BD31873383
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 11:05:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F281873385
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 11:05:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D0471C227A4
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 10:05:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A2C7281846
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 10:05:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D91F5F56B;
-	Wed,  6 Mar 2024 10:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A775EE8E;
+	Wed,  6 Mar 2024 10:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="rSwNOI0+"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="v2TUdgXb"
 X-Original-To: netdev@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F0D5EE8E
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 10:04:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706B35F86C
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 10:04:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709719496; cv=none; b=mlyM3IrvA6qyQD76nGvo+38px/QLBvLnDwX0hR/Oybul+SYTowhqxpGFwkfSBwja0nSwUjucgC6Gzj3GREFL3ruaROIwMQObk9+SPhHwraMXGj3gyB0bL0A02UOBJYcpqnd/uIoDh9NcwZivlo8uOR+Df8NuxPHg5hDAYnP+84c=
+	t=1709719499; cv=none; b=ql1n6fFQ+MdWcfwjVkTob8qQIFPoRoyrVCkRNMKdVONP08ha2WYQZ65N932SxJhRziHDImoC2xWgzvnPBaokaoPSvURmJaN7ELkRvBbNGHHwoddWM5tYjCATnCnKQwqsXxd4BiLQi2lmFL75NvGnTwOfYl1Gxvsgrs9sKdcH20E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709719496; c=relaxed/simple;
-	bh=eb/89zoLezhZh2GWT8FG/tMhWAZ5quNy/76J/6WYi+g=;
+	s=arc-20240116; t=1709719499; c=relaxed/simple;
+	bh=Rk+nnc5ZzxQrpmJ5WR+tIRNihS3t7XH+hLtKV6qcDMQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KCb3MFiyviNtjMnXmdR0ZC4S+b62P57XPK29wP3jnnBHADAZI26gp9T3HDwuwyKFtmr21xwI3ZdNxLGnG6zleL86Ol6+5iyZv7MpnGH0V0XoG0NM9VxnS2qV9cmY5xgbbO7zqsBLD/97mRM0x5dSXcUEM1cnQtDDcMgxnDn0Dyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=rSwNOI0+; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=gofq6vOFVjLfqE/hgmrYSkbkRENIuj0ZyUKNcrIJPh2bmUALSuLi/cGPtLhyy3N9ye/ggX6q0SqZVP2gVVjX+V7MxDkJmgnQgeLbtzUqmchxbB71uXG75bF9n/nZeLFz5jWMWlPtRXoyGXbsidNIMz+V+soWGOtlpvIcsylHTaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=v2TUdgXb; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id BC7CB20799;
-	Wed,  6 Mar 2024 11:04:52 +0100 (CET)
+	by a.mx.secunet.com (Postfix) with ESMTP id 08BE0207D5;
+	Wed,  6 Mar 2024 11:04:56 +0100 (CET)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id w1kDx9vWZaMK; Wed,  6 Mar 2024 11:04:51 +0100 (CET)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	with ESMTP id QZsSuxuVs3lt; Wed,  6 Mar 2024 11:04:52 +0100 (CET)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id E4FB620826;
-	Wed,  6 Mar 2024 11:04:44 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com E4FB620826
+	by a.mx.secunet.com (Postfix) with ESMTPS id 1C5262082B;
+	Wed,  6 Mar 2024 11:04:45 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 1C5262082B
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1709719484;
-	bh=Jd8b6CAdN5EUPhv+G9yyVNy0uzQDuqI3kXdZAwlqFm0=;
+	s=202301; t=1709719485;
+	bh=Q3DVRpKKAb/sEgnzGNOgSTByVSBUWReZzpQe9mBepTw=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=rSwNOI0+36tab4zt+Tb3vn6m/CAqEVH4qqee2WGrWy64dmAl68v0G/aG2VuvQY7m/
-	 LENqgeJLPY9gIFG1U9dyLTU0HCyWMFIKEZoMjcWQEm+9D+PdOYpBoWv1cB5vEDmMBu
-	 MCEaJprQ/SqtKoSXf2KIzzyTVOQ5M/UtoNwD1hG/FshUhKLxzsENZHjksPpLuYPqds
-	 tFpaOGIW1SJyQiSQi+cw9RDVDuxWlmTVUxsJswqdlM+bNL8h8kPvO9d/E5fq2RcdfO
-	 NkhqrL7sFU1yWtnvhjcB61nVK6lCrfl7UQu4GZ3UEZGCb1c6LWzaEvgmIwGKHgVkFP
-	 7D4COwKC5hZNA==
+	b=v2TUdgXbXYGkcpW/3OoLDdIs2N5cLZZ1VHe1ZXQgLIC89sa4yimAmxDsJKYfPMnzj
+	 XZmzMo3tSAwPC8xLuePLoQc/MI5KCv7kun2pK7iKhf5ofH81X3IUWYqJmTMVfMWEtt
+	 Ld2VexHNz/+h0mvcZIv3JGFdK9/JJipCdPbe/64n5cgXRw0EW97+/K17H2aHcm8qQ0
+	 WJOy5M2jlCXxw8sLToond8c59WoG17/WBYQO5aAR918wBN1vsoVGySKpKz4RuYkux/
+	 bkXM0naME7Nun4B1aECwqg6ongbjkauiMYjKdwx2ULpEUN9hkKWyaz6eTuf0B4YSN8
+	 s76OqXY5Vx63g==
 Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout1.secunet.com (Postfix) with ESMTP id D63B380004A;
-	Wed,  6 Mar 2024 11:04:44 +0100 (CET)
+	by mailout2.secunet.com (Postfix) with ESMTP id 0EBB580004A;
+	Wed,  6 Mar 2024 11:04:45 +0100 (CET)
 Received: from mbx-essen-02.secunet.de (10.53.40.198) by
  cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -66,14 +66,14 @@ Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 6 Mar
  2024 11:04:44 +0100
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id CED9731816A6; Wed,  6 Mar 2024 11:04:43 +0100 (CET)
+	id D2875318297D; Wed,  6 Mar 2024 11:04:43 +0100 (CET)
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 2/5] xfrm: Pass UDP encapsulation in TX packet offload
-Date: Wed, 6 Mar 2024 11:04:35 +0100
-Message-ID: <20240306100438.3953516-3-steffen.klassert@secunet.com>
+Subject: [PATCH 3/5] xfrm: Avoid clang fortify warning in copy_to_user_tmpl()
+Date: Wed, 6 Mar 2024 11:04:36 +0100
+Message-ID: <20240306100438.3953516-4-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240306100438.3953516-1-steffen.klassert@secunet.com>
 References: <20240306100438.3953516-1-steffen.klassert@secunet.com>
@@ -89,34 +89,56 @@ X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
  mbx-essen-02.secunet.de (10.53.40.198)
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-From: Leon Romanovsky <leonro@nvidia.com>
+From: Nathan Chancellor <nathan@kernel.org>
 
-In addition to citied commit in Fixes line, allow UDP encapsulation in
-TX path too.
+After a couple recent changes in LLVM, there is a warning (or error with
+CONFIG_WERROR=y or W=e) from the compile time fortify source routines,
+specifically the memset() in copy_to_user_tmpl().
 
-Fixes: 89edf40220be ("xfrm: Support UDP encapsulation in packet offload mode")
-CC: Steffen Klassert <steffen.klassert@secunet.com>
-Reported-by: Mike Yu <yumike@google.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+  In file included from net/xfrm/xfrm_user.c:14:
+  ...
+  include/linux/fortify-string.h:438:4: error: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror,-Wattribute-warning]
+    438 |                         __write_overflow_field(p_size_field, size);
+        |                         ^
+  1 error generated.
+
+While ->xfrm_nr has been validated against XFRM_MAX_DEPTH when its value
+is first assigned in copy_templates() by calling validate_tmpl() first
+(so there should not be any issue in practice), LLVM/clang cannot really
+deduce that across the boundaries of these functions. Without that
+knowledge, it cannot assume that the loop stops before i is greater than
+XFRM_MAX_DEPTH, which would indeed result a stack buffer overflow in the
+memset().
+
+To make the bounds of ->xfrm_nr clear to the compiler and add additional
+defense in case copy_to_user_tmpl() is ever used in a path where
+->xfrm_nr has not been properly validated against XFRM_MAX_DEPTH first,
+add an explicit bound check and early return, which clears up the
+warning.
+
+Cc: stable@vger.kernel.org
+Link: https://github.com/ClangBuiltLinux/linux/issues/1985
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+Reviewed-by: Kees Cook <keescook@chromium.org>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/xfrm/xfrm_device.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/xfrm/xfrm_user.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-index 3784534c9185..653e51ae3964 100644
---- a/net/xfrm/xfrm_device.c
-+++ b/net/xfrm/xfrm_device.c
-@@ -407,7 +407,7 @@ bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x)
- 	struct xfrm_dst *xdst = (struct xfrm_dst *)dst;
- 	struct net_device *dev = x->xso.dev;
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index ad01997c3aa9..444e58bc3f44 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -2017,6 +2017,9 @@ static int copy_to_user_tmpl(struct xfrm_policy *xp, struct sk_buff *skb)
+ 	if (xp->xfrm_nr == 0)
+ 		return 0;
  
--	if (!x->type_offload || x->encap)
-+	if (!x->type_offload)
- 		return false;
- 
- 	if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET ||
++	if (xp->xfrm_nr > XFRM_MAX_DEPTH)
++		return -ENOBUFS;
++
+ 	for (i = 0; i < xp->xfrm_nr; i++) {
+ 		struct xfrm_user_tmpl *up = &vec[i];
+ 		struct xfrm_tmpl *kp = &xp->xfrm_vec[i];
 -- 
 2.34.1
 
