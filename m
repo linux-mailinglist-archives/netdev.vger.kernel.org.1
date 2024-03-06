@@ -1,159 +1,118 @@
-Return-Path: <netdev+bounces-78190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 663538744C3
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:52:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E5DD8744C6
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:53:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89BD21C20810
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:52:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F7B01C20A69
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:52:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CB61C6B7;
-	Wed,  6 Mar 2024 23:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577EE1C6B7;
+	Wed,  6 Mar 2024 23:52:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Bwftwxeh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ca4LJIyU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041181AAA5
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 23:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90CBD1C290;
+	Wed,  6 Mar 2024 23:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709769136; cv=none; b=NypRA2OcPGINV2BSHpuvYkmf5m4XpsQw84wRTqjkrPOFub6Tv1gQndMTSBy82AHSJ6UwAgWfUD3BI/O8xFPCwnh7joLFVpkI9B+S4gT1ks2IZFMU594LvHFJDRa3XGPMOdTReMEWqca183R0rpKp/96NoVJyspbC++FUQWRuTxc=
+	t=1709769178; cv=none; b=rDfucHyHLlNCjCCgof4eoo5s8I4L4xY/r9ikVVj+jAKfmW3QR3GF8r5hhwiPGbcwlN+mUn7SZaQOpbMeBR7MpU2+EjV1vbRlz59ObJk++/3+KXQkz38dsA/nWoxJBEJkUMb8tccKR797iyEXXE60Dk2juohZmS0F19MnXH7qGPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709769136; c=relaxed/simple;
-	bh=HKuLgTVFRKaKDoqvDomRm/dSKx0b/g4r+MceYXqEzKA=;
+	s=arc-20240116; t=1709769178; c=relaxed/simple;
+	bh=1SvvByfg6c6eVlB8Y01vsD59/Z24m4ZoYgGxbnyuHcQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XGvz6mrasSVJ9wVkspPnp1Al1rD13S6FVBvolCJjrbWKW9e8SzpFXvdLYDB+Anh6XL5oDAPx59yoXyMp5E1gC4ce8rZ0auKje/RsjHOL0iqaRhf16Rt2pD+VyhCoFey1B6yGH/lqfVmkv7zpg+LnfgQIEnzJfw8/flDfBwvrFe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Bwftwxeh; arc=none smtp.client-ip=209.85.210.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-6e4eb1ec4e9so180347a34.3
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 15:52:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1709769134; x=1710373934; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ZEAVZcoYSQFZcvaftM2f/g9GOC1c60DgaQV+1wgZreQ=;
-        b=BwftwxehXmL5+X12BpMGO7AVdGn7ENPJuQO37XD8UvbxMs5R4ODUp+VOoF7Z5txQEh
-         syS7pEzNr56D6Au2fD6GvaGI2VNwFl4rp22QJ2O2fwJYG/IxYGgmIDMvHBDP86/oK4i7
-         roEAmc7XXuE35VIcYB13UGSySoCraUw+m+GTs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709769134; x=1710373934;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZEAVZcoYSQFZcvaftM2f/g9GOC1c60DgaQV+1wgZreQ=;
-        b=mVNYUNQUlFLqYzduR2bK6upEmDk1gyl9h5n1EyyWl49mv0u5DdyS2ChnoosgN4E9+X
-         Ba2B1BCaBbrl7+t5QpU+h7/Vyzp8xAKtbuyeRKymOPLWtkKGcZaVv08TfGDGOVFKr2+1
-         +M8iXCqpyyFu5K+PtEi2SJwyvZcBnZVSmjdKFkGyNG4tGOZA0+TXKMML3/ygcP4WLV99
-         zZUP/a4if9teMABm41WNJFwfSS6lIihBDjhYFghziQvC4Ucp6+ySjPJgWr+V28Eh/udw
-         yeDzORuwR8SjBKIRTv/NZaaj+YHnwm9xct5PqPQTQaoMPWu2rt/OBg2EkXz+fnMKFdV9
-         nikw==
-X-Forwarded-Encrypted: i=1; AJvYcCX9mpNUYwlQnmarB59teV/EMmYR3F/t1sOoMF/xvB9mZJV9jyFoixk7fTanTzVvh0uF//YZ4o/h/jzI05nykrp2/l3wcyCw
-X-Gm-Message-State: AOJu0YzExTpxvehHCKQdjrsN5sIs6JFODaOX7b3TkC6KFNSh/OeoZaWQ
-	oasygGVIaA39xaazIbrcsmYWXgtNlbLdgWxQm2f7eUbr2NEjGd2dTT+uvgO+rg==
-X-Google-Smtp-Source: AGHT+IGzQi4Hj1eR1TravKHp4tPRAiBWafpLp3PdehA3PNgOnJ+Bn3bpQz0p2gslmzv3nDrpdQZRtA==
-X-Received: by 2002:a9d:6b13:0:b0:6e4:fa90:3c79 with SMTP id g19-20020a9d6b13000000b006e4fa903c79mr5596220otp.22.1709769134215;
-        Wed, 06 Mar 2024 15:52:14 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id c11-20020a63da0b000000b005bd980cca56sm11450066pgh.29.2024.03.06.15.52.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Mar 2024 15:52:13 -0800 (PST)
-Date: Wed, 6 Mar 2024 15:52:13 -0800
-From: Kees Cook <keescook@chromium.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] overflow: Change DEFINE_FLEX to take __counted_by member
-Message-ID: <202403061551.00DAFE8B39@keescook>
-References: <20240306010746.work.678-kees@kernel.org>
- <9c2990f0-7407-49c6-9e3a-b92de82ea437@embeddedor.com>
- <bd21f7dc-9f89-40ee-895e-601c80165225@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ErEniBwLARN0qoF9yHf/htPdlgogkL2GrVzyvFYunm+/WjzVi+/Vn8eT1SC2KjpKZ9zCWX1VKU1At9WpUxBYaMKsK1jEdxwyrNfuiZp6KM+CWU/k60UorVwI/rMNEDGyjG+sd0zwjGqZ4Dy0trFI1sJTpuTwUHJ0OrsT1H5YBEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ca4LJIyU; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=gZEDHlbALjwDllMhSvFGjPdmGN7A0cnrj2b74eWzH0Y=; b=Ca4LJIyU8rwcuNlFo3LnpbP7sS
+	+GOeTLwQwV8yixop6/S8l2HF+vUtF8udkY6Tz/+bB9Zo5nFo8n0y4bfh8RQWCU602uEZEtjQcNbCs
+	AECk1WWd0bNJSJOPrzfkUrnYdh+hUa334wlAt9t7MMY01u6CNu9bY+FiP9bKDya95SAs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ri14b-009Xa9-PP; Thu, 07 Mar 2024 00:53:21 +0100
+Date: Thu, 7 Mar 2024 00:53:21 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, bryan.whitehead@microchip.com,
+	richardcochran@gmail.com, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net 3/3] net: lan743x: Address problems with wake option
+ flags configuration sequences
+Message-ID: <78d7e538-9fa0-490e-bcfb-0a5943ad80c9@lunn.ch>
+References: <20240226080934.46003-1-Raju.Lakkaraju@microchip.com>
+ <20240226080934.46003-4-Raju.Lakkaraju@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <bd21f7dc-9f89-40ee-895e-601c80165225@intel.com>
+In-Reply-To: <20240226080934.46003-4-Raju.Lakkaraju@microchip.com>
 
-On Wed, Mar 06, 2024 at 08:06:29AM +0100, Przemek Kitszel wrote:
-> On 3/6/24 04:25, Gustavo A. R. Silva wrote:
-> > 
-> > 
-> > On 05/03/24 19:07, Kees Cook wrote:
-> > > The norm should be flexible array structures with __counted_by
-> > > annotations, so DEFINE_FLEX() is updated to expect that. Rename
-> > > the non-annotated version to DEFINE_RAW_FLEX(), and update the few
-> > > existing users. Additionally add self-tests to validate syntax and
-> > > size calculations.
-> > > 
-> > > Signed-off-by: Kees Cook <keescook@chromium.org>
-> > > ---
-> > 
-> > [..]
-> 
-> Just a note that ice changes are purely mechanical, so this seems ok
-> to go via linux-hardening tree. And changes per-se are fine too :)
+On Mon, Feb 26, 2024 at 01:39:34PM +0530, Raju Lakkaraju wrote:
+> Wake options handling has been reworked as follows:
+> a. We only enable secure on magic packet when both secure and magic wol
+>    options are requested together.
 
-Thanks!
+So it appears unclear what should happen here.
 
-> 
-> > 
-> > > +/**
-> > > + * DEFINE_FLEX() - Define an on-stack instance of structure with a
-> > > trailing
-> > > + * flexible array member.
-> > > + *
-> > > + * @TYPE: structure type name, including "struct" keyword.
-> > > + * @NAME: Name for a variable to define.
-> > > + * @COUNTER: Name of the __counted_by member.
-> > > + * @MEMBER: Name of the array member.
-> > > + * @COUNT: Number of elements in the array; must be compile-time const.
-> > > + *
-> > > + * Define a zeroed, on-stack, instance of @TYPE structure with a
-> > > trailing
-> > > + * flexible array member.
-> > > + * Use __struct_size(@NAME) to get compile-time size of it afterwards.
-> > > + */
-> > > +#define DEFINE_FLEX(TYPE, NAME, COUNTER, MEMBER, COUNT)    \
-> > 
-> > Probably, swapping COUNTER and MEMBER is better?
-> 
-> right now we have usage scenario (from Kunits):
-> 	DEFINE_FLEX(struct foo, eight, counter, array, 8);
-> 
-> > 
-> >      DEFINE_FLEX(TYPE, NAME, MEMBER, COUNTER, COUNT)
-> 
-> usage would become:
-> 	DEFINE_FLEX(struct foo, eight, array, counter, 8);
-> 
-> which reads a bit better indeed, with the added benefit that we
-> go from broader to more specific:
-> whole struct -> array -> array size variable -> given array size
-> 
-> so +1 from me for the params swap
+https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/bcm-phy-lib.c#L909
 
-Sounds good. You and Gustavo have convinced me. :) I've sent a v2 now.
+WAKE_MAGICSECURE is a standalone option. You do not need
+WAKE_MAGIC. And even i you did request both WAKE_MAGIC and
+WAKE_MAGICSECURE, the WAKE_MAGIC would be ignored.
 
--- 
-Kees Cook
+https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/dp83822.c#L153
+
+WAKE_MAGICSECURE is a standalone option. You do not need
+WAKE_MAGIC. However, unlike the broadcom device, you can have both
+WAKE_MAGIC and WAKE_MAGICSECURE at the same time. They are not
+mutually exclusive.
+
+This also looks to be true for other dp8**** devices.
+
+https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/mscc/mscc_main.c#L318
+
+WAKE_MAGICSECURE is a standalone option. You do not need
+WAKE_MAGIC. Also, you can have both WAKE_MAGIC and WAKE_MAGICSECURE at
+the same time. They are not mutually exclusive.
+
+So i think your point a. above is questionable. Can the hardware
+support both magic and secure magic at the same time? If so, follow
+the TI way of doing it. If you cannot do both at the same time, and
+that is requested, you should probably return -EOPNOTSUPP. That is
+probably better than what the broadcom driver does, silently ignore
+WAKE_MAGIC.
+
+> b. If secure-on magic packet had been previously enabled, and a subsequent
+>    command does not include it, we add it. This was done to workaround a
+>    problem with the 'pm-suspend' application which is unaware of secure-on
+>    magic packet being enabled and can unintentionally disable it prior to
+>    putting the system into suspend.
+
+The kernel should not be working around broken userspace. But i also
+suspect this is to do with it being unclear if WOL options are
+incremental or not. Since it seems that they are not incremental, it
+does not matter if "If secure-on magic packet had been previously
+enable". pm-suspend is setting Wol how it wants it, which you say is
+plain magic. So magic is what the PHY driver should do. Feel free to
+submit patches to pm-suspend to make it understand secure magic, or
+not touch WoL at all with the assumption it has already been setup by
+something else.
+
+	  Andrew
 
