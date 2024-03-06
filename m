@@ -1,182 +1,323 @@
-Return-Path: <netdev+bounces-77917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B34287374F
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:05:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB898873756
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:06:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9700A1F2820D
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:05:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A25A02813E5
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:06:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70F5E86AE9;
-	Wed,  6 Mar 2024 13:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6185912FB0F;
+	Wed,  6 Mar 2024 13:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PEjDqaJC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aLYabXxi"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B235E3E48E;
-	Wed,  6 Mar 2024 13:05:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709730320; cv=fail; b=pNl/lsWbsyJ26aQ37qZsPL59e5Cl01MF/jFMlaaQTFI0wcG5U+9wHQkAv2N49mgi0QorkfVA9ded/pVf78QvL7xnIcSuU2vtH9K4l/tNFbjg29oyT40qN9x/ytPDo+rmrsdD9IBxBo/ZA9tfp1mem1WURsbk3XDX1ec3+LR3Rbg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709730320; c=relaxed/simple;
-	bh=99/cXbGK8H66CXp1ntcaeMHhfgMmS4M9FfBBYjS+qDs=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cmX8Yf1QpzszsboceFIqBARlIpP8IWnh7+Y0OJxEy1b5KXhMAhIh7iMTK/iZP/GZnoKRvnQlzXKBQZua7BJdY422rTPEPEDOoNsGc2bitb6WzVQLSyqu6ulpxAoCfOvRtsIV+EeqJ8Bn17WMqGdipWrT2rvqwQa7wVilFgWjWTk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PEjDqaJC; arc=fail smtp.client-ip=40.107.236.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VyRt6guFb46Pm/cQpSSLAMiCDJFG5WWv89N7zpop+QdGd74folhA8huzXmVeCMk3Lb4zld5DWtdd1DpnVd4thcPlDQl8/EwMhppKDVlmt1GznB5aqcYlWFKmn7QF6VptEN+AtNUTiowUJQEfgFwjPvg6DQHu/YGnPflgGCmaDDi7IyQzaT0zkYV4sthWsa5EBwHAv1RsWmt8QxBGX8U6uHms4MC6SSNt6ZgWISB15Hpxtef3s4z+TmES5KKgO92/jwEa/CE30rVclb8op7IEdASIOkYa7Glnc0iggx1a7Q4xtcp2jyRiZUkyLNf7SziqO0BrV3ixOeyoPRZdWczOaw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=99/cXbGK8H66CXp1ntcaeMHhfgMmS4M9FfBBYjS+qDs=;
- b=gL4mskHM0+5rbiHpX5hVTEH5T0Fxgnwrf+qBX50wSFjjqc65EvYOa8fBHbzIRtMsmwGT0WosILEUczaMm4uCtjnN0q3X/mUztbYPeQQKs+0xu1skz8XbS3QWmAo+QYKvawlTS+a6fs+ORd52hpDJAv/X0aQOQRhe9sz/RqTT+55jTHXb69ovAkAoW78+yPZ10ojkfsQpy7z8M7ozO+BUuxPtBn7wlTU0hT2xbCn24gQ22oCxkHwNmvpUjjNwyrHc7m3vdr/B33Z/IIjeCDxi40ra5ReAv18dN9fo5Gsf0PwUd12pbFkniA68tCOmqwe3vm+CnbaiFLBNgSLS7d4VPg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=99/cXbGK8H66CXp1ntcaeMHhfgMmS4M9FfBBYjS+qDs=;
- b=PEjDqaJC39yjtvC6WPiX0kL10LkkbbxB5du/ou3JJdBUUwONH/p1qgpuMFYT3jK7FC+EEGB0fqwqXZLbxeWlyoZk1k6o8C10DGT24UctnwJuMIoK25/6/Ybbebfa0/vYhHi4+X1Ehasr4Y1v5ZpiWh58wqam9dj5+FkYAJnW5kYwo4K+glYVBZGNUbL2oW8D6mHP2Dzvx518O5wH0F7kVaECz8kTFyx+e9HzK1Xs7nakkwYXtOXZEQBfD/C/H41P9GO246kVYJWO8Mxwnh/doP2dCymdQnYC1tdsbwMOQw45rRNVKVL/plJW9CycKuNuKB3A8UH4CpxHrPZWVlZOLw==
-Received: from DM6PR12MB5565.namprd12.prod.outlook.com (2603:10b6:5:1b6::13)
- by IA0PR12MB8423.namprd12.prod.outlook.com (2603:10b6:208:3dc::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Wed, 6 Mar
- 2024 13:05:14 +0000
-Received: from DM6PR12MB5565.namprd12.prod.outlook.com
- ([fe80::bfce:51e5:6c7b:98ae]) by DM6PR12MB5565.namprd12.prod.outlook.com
- ([fe80::bfce:51e5:6c7b:98ae%3]) with mapi id 15.20.7362.024; Wed, 6 Mar 2024
- 13:05:14 +0000
-From: Dragos Tatulea <dtatulea@nvidia.com>
-To: "kuba@kernel.org" <kuba@kernel.org>
-CC: "almasrymina@google.com" <almasrymina@google.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "herbert@gondor.apana.org.au"
-	<herbert@gondor.apana.org.au>, Gal Pressman <gal@nvidia.com>,
-	"dsahern@kernel.org" <dsahern@kernel.org>, "steffen.klassert@secunet.com"
-	<steffen.klassert@secunet.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com"
-	<edumazet@google.com>, "ian.kumlien@gmail.com" <ian.kumlien@gmail.com>,
-	"Anatoli.Chechelnickiy@m.interpipe.biz"
-	<Anatoli.Chechelnickiy@m.interpipe.biz>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: Re: [RFC] net: esp: fix bad handling of pages from page_pool
-Thread-Topic: [RFC] net: esp: fix bad handling of pages from page_pool
-Thread-Index: AQHabhlPr1Jip1r+TESj3iFnglf1YrEqCc2AgACn2oA=
-Date: Wed, 6 Mar 2024 13:05:14 +0000
-Message-ID: <7fc334b847dc4d90af796f84a8663de9f43ede5d.camel@nvidia.com>
-References: <20240304094950.761233-1-dtatulea@nvidia.com>
-	 <20240305190427.757b92b8@kernel.org>
-In-Reply-To: <20240305190427.757b92b8@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.50.4 (3.50.4-1.fc39) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR12MB5565:EE_|IA0PR12MB8423:EE_
-x-ms-office365-filtering-correlation-id: 3a72334a-af97-4ee2-e11a-08dc3dde1045
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- LpCRhJmX6NwSFXAX1Oqe8otIMfU4kwfbwMoCQPPimBZuzrPTYI0J/wU+xPZu9VFnU1gmJBvxQ4VB7vK6DAlT7rwvjO3P9fw9JMwkZeMLcBuhB9fN1aoAa4BJUUueqWy5j5/qNGta3N7a/f/MTqNY9y9LT+ZRntXL92/R1MHuGe152W6WtS81zbcYvsfBo8poufeFtSWgW4tKB0iuny63MYpPj8IZ5x2BoIOTNeCmaMJ2dnVOugo6no967Lqm6DKB5XC+0atDGiN+yWc32uVSt2N3Xas8unzZGO+iXeAPHADAhVzKrJK7rwGeGb02Y87cIMLNl/SRpNZlZP10jrS/fYq/ssb0LYf74d5g1apImmEooU77moFRvsFu8KkuHkpiROHPOcjQNeh8XcNy6oaqhA5RLFf7/X3zh79uLPsY5OxO6l18W6LkU+Ehuy/p3f7bu7pM3LxCmYm83uEjFgWcIzEOIpv3pwXOibY6vCLBOGA6cqPPAgCh5ahXecXcDIR4oJEZDq49Elgy6MVcXSyQ0BbZrvebbA0grjJTjmJDQDmKtpsfsBASPc8ndBtCuHXUznJiQ7noaAUKqOll5BHY93yBdcEoMfKtIcjH0+z7FHSiJlkbX5SO1Ana1H3klps2K/W2omuG5ImIGietXXp+UoRo5Tu//FKVlAh+hg+9+/KveZ+/g5l1MMxwhfDvvXV29aYpR1sVKG8x9bC/JyLmLrFT3IDvKYsi3qWuO9Zih2U=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB5565.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?eVVuOENpTkVMbWNLU0l6WTJTTE5wb3RURUZTR0FlL25CUEdybDJxM0lUd0dw?=
- =?utf-8?B?OEdjRndNY2xPeGU1MzhUL2ZuaFZIVGw2Y0pIdmdlemk5N1JTUzdtNkpuMkt0?=
- =?utf-8?B?ZUlrK20yeC80RTBFMEE5eVc0OEVld0RVdG1na0VSenZjemZxZldlb3hDZ1ZE?=
- =?utf-8?B?aXVhWmlLRFNSbnNZdFhnT294ZkYyUHlhbC8xUEJLemtHaWNaRUhCSkxWanA5?=
- =?utf-8?B?aWNJaVVpenRzVkllRUJPVkUyRDVYZWFCbkt5Mm5VcXBVZUV2OFhFUWdPcStz?=
- =?utf-8?B?bXlRdmNrWlQyVW85YmxHWkZCNXhoa1Z0YWlwMTRJR01GYkFJdENvL2RwNTlN?=
- =?utf-8?B?bEx3QzVJVFJOeUhTcTVSeDVOT0pYRnZoZGFkTGZvK3MvR3gybW5GY0JOU0tF?=
- =?utf-8?B?YnEvQ2xUdFJad0VRd0tneXBPTVQ0U2FEZ1BRbHFxRmFlMVhPUFZGY3NTWWhX?=
- =?utf-8?B?d2I1d1pnYmdKTjZWYitXaHg1L1dpd1hGdzMxV3o5UlJHOGRtM3hLU05rRS9w?=
- =?utf-8?B?QXJkUUkrT1RVWGxPMFlBN2tKc2UrZWNzME9mT2t3ZWVZTzl3T1l3amRNMENq?=
- =?utf-8?B?WVlRd1B6UjRmeDRqV21QL1hUVVlPWVJnMTVEOEEzQ2RUaEZ0dHFNQjlRNU5l?=
- =?utf-8?B?R01nWDc5Z2ozNWdldVFQQndiRzAxMGJwbE1DaGN5ZWtUQnBVOHFCNXBJNWVF?=
- =?utf-8?B?QzdFOSt5aVB3ZFFpb1owY0VUbFhobm5MenpnQWtwUzhNL0wzdVhqMUlzWTNR?=
- =?utf-8?B?NlJFU0ZZTXhGNjVSR1B2RzRYb3ByZDVvangxQW03T0lMQkZ1bUp6SEwvNkF1?=
- =?utf-8?B?cjBtY25HL05ndHNUeE4zYnFGUjhLUWVMNjRPRDdtYWxnZWl2aWRvdlFKTmk4?=
- =?utf-8?B?T0Nuc0J3WVJnLzFWQkZaRkhCTW0vY3o1eGFaaEtpSnRkSGpVM0pZNnljdVlF?=
- =?utf-8?B?WHRRbGdTaXFTbnR3d29CMmZFcWxJc3hWSzNYMXRleCtLSTZXdDdPaWhMMWNG?=
- =?utf-8?B?a3V0YXNYa0RzdjBFdzcvMW5BZmk1SFZtOSt3Y0phRUcwRmtQb1hhZFc1d0gr?=
- =?utf-8?B?ZjNURWE4dzFkUmFEazNMRXJ0Vm80MDRpVVVCbmMrWEJsVE1zM0p2Zm9vYUZh?=
- =?utf-8?B?WXNBbXVvdHBGQlcza2ZJK2dDMndZTGhPNlFaQXorQldPWnFJL3NnU0ZMNU1M?=
- =?utf-8?B?cWMrQ1JGemh0bGlOaDBjU2pDUmgrbmlGV25QbzN1cTllMXNId2lTUEh3b2dT?=
- =?utf-8?B?SFV1T2p1U1hodlZraDFuM1NaeXJrQ2ZaYnp4MHpUSWMyVWFYbnJ3MEZnVGhB?=
- =?utf-8?B?MmNIRW9EbEJsSUhYMHR6NDlDYitxMUJGLzd5b0xJa2VyOW9ubmVWOExrY1JX?=
- =?utf-8?B?dWkyWWlrMWZpYjNLTUlrVHVnSzJhRGlSNlBhZ3lJMG01SGlHM3UxdjJXK0J4?=
- =?utf-8?B?WWgrS3RkRjc5OGdJUHZrUGZtc0pORkErMDJBcjRuSlYxTHowV3pyUFAyZ1BC?=
- =?utf-8?B?RFYwancrQStRSTFzeGxIM1N2VXFHdlY5QkQxbXVtVEFKTzVXVzY0U0pqRVFm?=
- =?utf-8?B?RlViSThHaTVqTWlZeVVVU2E5UW5LWkhSNUh1LzhlYWk2OGNuOFJOUkc0T1E2?=
- =?utf-8?B?WlFLbjk0RlpyN3BMcVNVcXVrc3NFOVVkejdod3dTQUxhUjNUN1pqU2xyc0p4?=
- =?utf-8?B?UCt0MzNqeUptV3djSnZXajFqMU1yY3lrOFVKQmRBUS9CSWgybTJTaGhLTGJp?=
- =?utf-8?B?SlpUU0xFQk0zcGJZcE1TQTByMnFoSThweHFxZzgxMnFEcGZ6SnMrNUpGQWdX?=
- =?utf-8?B?MU5BZ3RnalVFN1U1eHlnZzFLdVZBUXFIZEJxOEc3TTJFS293ZmRTakZvelVv?=
- =?utf-8?B?TUpCZlUrbXpDdzV1VGdCTlZoc3hsb1o2R1I3MUhsL3R1WjBMN3B4NEdLUTBo?=
- =?utf-8?B?QmFGcnMyWWxDY2gxNnB1T1NJSk4zektGbmZrS2Z1UHk0RjE4NTNRdThJSXhH?=
- =?utf-8?B?eWhoSUtFZTIwMTNkSEl0UzhnZWxQTlZSSGdZb1Z5cU1kU3hYNlVQd2JONm5R?=
- =?utf-8?B?WExZSE0rK2VkYTRaeFZJNEZoaU54MGJOeFdVYUpoQTNaVFRMV2prY1lGdThF?=
- =?utf-8?B?Q0dQMVg1VHd1N05yNGg3UnVMNTNwVjZpc0JIV2ZiR0x6VGlHUWg5YUp3Nm9O?=
- =?utf-8?Q?9BBkZhiZkuqRt9j3LDCRJoOjOpc464MzosHVGK1F8ny7?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6C74CB93C43CCB49A5DDE6B86AE13070@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9296A5F566;
+	Wed,  6 Mar 2024 13:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709730377; cv=none; b=cB8oWrHwP303updni9Z5eD3TUd1fvpZEzE+B+jw26hEdAS9RPUFSv3IICzNykymwPUYfF7Xt6ezBaj7UpuIGfnTDzlP3cnKj0b7ef9r5nV9VEGMc+H5FBtmCb/xMaOdU+w3Sx7KLEwSHcIgWXwW05cdMAG7428VG6blrHdhNJ9s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709730377; c=relaxed/simple;
+	bh=ZaaYiFoVLdyewEKaT0gopyggjG7/3+GsnvfgJScPf/Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nB6HpQArDr2C81wilUxr5ukH9FRH/ki9dnjb0LNhGltR+Iimj8FJ2wagCkhfytbCaVsKC0aWdp0H8xuH/jtl7y/DTza/Som2CGNhSE4HV2dG3dl1hIDPVHrpb8CoDTMQC+2fvVKmnYntldOxgjOkiFwCgI0YTCFj+Fqniogaa84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aLYabXxi; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-60978479651so64410407b3.3;
+        Wed, 06 Mar 2024 05:06:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709730374; x=1710335174; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=R0Oi3DIHf6RcVnBQ6jfEGvzGhX4KFvOXX/NtautGKE4=;
+        b=aLYabXxiqWKPvyDsBD4iXIODM7CSwumQ7XGNUf5oBIodirPEg67Xi9yX2pc4pNZ23D
+         OG5vo9pjzauPW2gQhJdMfYCIPPPxphHF4LT6AN6Ffd4IUbacZN9dkOU1JKuXP5R6/SQu
+         YlFIZnnucrNirkgAdZD+G2dV8VTgX7Ev1ll5IiBnX4VToUN3UwZAToqGN30aFXrIrxhp
+         heru7jrthCQgECDt06VRl4TCw0407+toJZzH//aR8dAW4X/brDkrJwE/5jaytmK0nmh9
+         jdoKrxs00KZLY0IPwk7lzEI0aH/OXhlPIJgC416TEBmGC/iFAOGosv+0GgvqAYuKAHmg
+         sNnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709730374; x=1710335174;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R0Oi3DIHf6RcVnBQ6jfEGvzGhX4KFvOXX/NtautGKE4=;
+        b=m7/Vi2S8XN00fOwBTPBkY48GqQ+4/zZUfjvQEtMWvMZwgvjZFNkWpsuSsxo2USw+/t
+         1ZhRCKjzznCttN9ucNHIyRGRh8/QeKKxlPQX9zhZV+/iZVDQ73shSs06ewA6W+P1NPO+
+         Yxp0AVBloMpYEeIu7gKGFSPFKg90flIUtvOjNF0kAhGacQwdCwV2Yse4DJrwUU/hZfJE
+         hcW29yUfQzO8qGYWY45U5QecGHdOaAG8fVJYh80JW4xdKE9iE+xe9uw9Vg6u9F0Hrf4N
+         lXl8sOq8s/iE+bBVCPo/ec+sZNqQ/HOlA9y6N+ag7lC7qcitwGfnyMv/3E530xJFeJ59
+         +6Og==
+X-Forwarded-Encrypted: i=1; AJvYcCWags5BwvHwIWrsK6AhRRFSwHb9ABn8+Wivaq08eD69Yg+tbCNS8fBKZfJTccXBvvHq4/PTmiD7splWgno4jA4xZxz7F4DN96jxIHEZ7a6zg5xDPTdUsDqaNxGwscuUEpTaqd37
+X-Gm-Message-State: AOJu0Yx4u8cCPNjStxJx3G/zI7uqwpaKncH3A3l97EbWjjUwhi8lQuAA
+	BZnoyRRIX88NBXG0njRDU6vxexRTa551YIv6eCt+XC7GUjLyzQdm
+X-Google-Smtp-Source: AGHT+IE+aoLOnpZkLP/3EfQ+xyS+L+4GWolxGYGRGD6QvHKeBWbWI3i1ajDfNqpm2ci7qFy0mSU4Mg==
+X-Received: by 2002:a81:5b08:0:b0:609:bd7b:bb55 with SMTP id p8-20020a815b08000000b00609bd7bbb55mr7704201ywb.23.1709730374439;
+        Wed, 06 Mar 2024 05:06:14 -0800 (PST)
+Received: from localhost ([2601:344:8301:57f0:a708:4ac5:2d2f:c5bb])
+        by smtp.gmail.com with ESMTPSA id s123-20020a0de981000000b0060968d94177sm3683591ywe.15.2024.03.06.05.06.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Mar 2024 05:06:13 -0800 (PST)
+Date: Wed, 6 Mar 2024 05:06:12 -0800
+From: Yury Norov <yury.norov@gmail.com>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>,
+	Mark Brown <broonie@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v6 4/5] net: wan: fsl_qmc_hdlc: Add runtime timeslots
+ changes support
+Message-ID: <ZehqRMZwtazTf6P6@yury-ThinkPad>
+References: <20240306080726.167338-1-herve.codina@bootlin.com>
+ <20240306080726.167338-5-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB5565.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3a72334a-af97-4ee2-e11a-08dc3dde1045
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Mar 2024 13:05:14.4464
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kjyfcKhxzBQznsgehONOIJIEOWevAf2dJVH037takYBUAchYCfq0y4+BOOsWweAT1YmcNbnEstWsezmW6OIhUg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8423
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240306080726.167338-5-herve.codina@bootlin.com>
 
-T24gVHVlLCAyMDI0LTAzLTA1IGF0IDE5OjA0IC0wODAwLCBKYWt1YiBLaWNpbnNraSB3cm90ZToN
-Cj4gT24gTW9uLCA0IE1hciAyMDI0IDExOjQ4OjUyICswMjAwIERyYWdvcyBUYXR1bGVhIHdyb3Rl
-Og0KPiA+IFdoZW4gdGhlIHNrYiBpcyByZW9yZ2FuaXplZCBkdXJpbmcgZXNwX291dHB1dCAoIWVz
-cC0+aW5saW5lKSwgdGhlIHBhZ2VzDQo+ID4gY29taW5nIGZyb20gdGhlIG9yaWdpbmFsIHNrYiBm
-cmFnbWVudHMgYXJlIHN1cHBvc2VkIHRvIGJlIHJlbGVhc2VkIGJhY2sNCj4gPiB0byB0aGUgc3lz
-dGVtIHRocm91Z2ggcHV0X3BhZ2UuIEJ1dCBpZiB0aGUgc2tiIGZyYWdtZW50IHBhZ2VzIGFyZQ0K
-PiA+IG9yaWdpbmF0aW5nIGZyb20gYSBwYWdlX3Bvb2wsIGNhbGxpbmcgcHV0X3BhZ2Ugb24gdGhl
-bSB3aWxsIHRyaWdnZXIgYQ0KPiA+IHBhZ2VfcG9vbCBsZWFrIHdoaWNoIHdpbGwgZXZlbnR1YWxs
-eSByZXN1bHQgaW4gYSBjcmFzaC4NCj4gDQo+IFNvIGl0IGp1c3QgZG9lczogc2tiX3NoaW5mbyhz
-a2IpLT5ucl9mcmFncyA9IDE7DQo+IGFuZCBhc3N1bWVzIHRoYXQncyBlcXVpdmFsZW50IHRvIG93
-bmluZyBhIHBhZ2UgcmVmIG9uIGFsbCB0aGUgZnJhZ3M/DQo+IA0KTXkgdW5kZXJzdGFuZGluZyBp
-cyBkaWZmZXJlbnQ6IGl0IHNldHMgbnJfZnJhZ3MgdG8gMSBiZWNhdXNlIGl0J3Mgc3dhcHBpbmcg
-b3V0DQp0aGUgb2xkIHBhZ2UgZnJhZyBpbiBmcmFnbWVudCAwIHdpdGggdGhlIG5ldyB4ZnJhZyBw
-YWdlIGZyYWcgYW5kIHdpbGwgdXNlIHRoaXMNCiJuZXciIHNrYiBmcm9tIGhlcmUuIEl0IGRvZXMg
-dGFrZSBhIHBhZ2UgcmVmZXJlbmNlIGZvciB0aGUgeGZyYWcgcGFnZSBmcmFnLg0KDQo+IEZpeCBs
-b29rcyBtb3JlIG9yIGxlc3MgZ29vZCwgd2Ugd291bGQgbmVlZCBhIG5ldyB3cmFwcGVyIHRvIGF2
-b2lkDQo+IGJ1aWxkIGlzc3VlcyB3aXRob3V0IFBBR0VfUE9PTCzCoA0KPiANCkFjay4gV2hpY2gg
-Y29tcG9uZW50IHdvdWxkIGJlIGJlc3QgbG9jYXRpb24gZm9yIHRoaXMgd3JhcHBlcjogcGFnZV9w
-b29sPw0KDQo+IGJ1dCBJIHdvbmRlciBpZiB3ZSB3b3VsZG4ndCBiZSBiZXR0ZXINCj4gb2ZmIGNo
-YW5naW5nIHRoZSBvdGhlciBzaWRlLiBJbnN0ZWFkIG9mICJjdXR0aW5nIG9mZiIgdGhlIGZyYWdz
-IC0NCj4gd2Fsa2luZyB0aGVtIGFuZCBkZWFsaW5nIHdpdGggdmFyaW91cyBwYWdlIHR5cGVzLiBC
-ZWNhdXNlIE1pbmEgYW5kIGNvLg0KPiB3aWxsIHN0ZXAgb250byB0aGlzIGxhbmRtaW5lIGFzIHdl
-bGwuDQpUaGUgcGFnZSBmcmFncyBhcmUgc3RpbGwgc3RvcmVkIGFuZCB1c2VkIGluIHRoZSBzZyBz
-Y2F0dGVybGlzdC4gSWYgd2UgcmVsZWFzZQ0KdGhlbSBhdCB0aGUgbW9tZW50IHdoZW4gdGhlIHNr
-YiBpcyAiY3V0IG9mZiIsIHRoZSBwYWdlcyBpbiB0aGUgc2cgd2lsbCBiZQ0KaW52YWxpZC4gQXQg
-bGVhc3QgdGhhdCdzIG15IHVuZGVyc3RhbmRpbmcuDQoNClRoYW5rcywNCkRyYWdvcw0K
+On Wed, Mar 06, 2024 at 09:07:20AM +0100, Herve Codina wrote:
+> QMC channels support runtime timeslots changes but nothing is done at
+> the QMC HDLC driver to handle these changes.
+> 
+> Use existing IFACE ioctl in order to configure the timeslots to use.
+> 
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> Acked-by: Jakub Kicinski <kuba@kernel.org>
+> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> ---
+>  drivers/net/wan/fsl_qmc_hdlc.c | 151 ++++++++++++++++++++++++++++++++-
+>  1 file changed, 150 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hdlc.c
+> index 90063a92209e..31c0f32474a3 100644
+> --- a/drivers/net/wan/fsl_qmc_hdlc.c
+> +++ b/drivers/net/wan/fsl_qmc_hdlc.c
+> @@ -10,6 +10,7 @@
+>  #include <linux/array_size.h>
+>  #include <linux/bug.h>
+>  #include <linux/cleanup.h>
+> +#include <linux/bitmap.h>
+>  #include <linux/dma-mapping.h>
+>  #include <linux/device.h>
+>  #include <linux/err.h>
+> @@ -39,6 +40,7 @@ struct qmc_hdlc {
+>  	struct qmc_hdlc_desc tx_descs[8];
+>  	unsigned int tx_out;
+>  	struct qmc_hdlc_desc rx_descs[4];
+> +	u32 slot_map;
+>  };
+>  
+>  static struct qmc_hdlc *netdev_to_qmc_hdlc(struct net_device *netdev)
+> @@ -203,6 +205,144 @@ static netdev_tx_t qmc_hdlc_xmit(struct sk_buff *skb, struct net_device *netdev)
+>  	return NETDEV_TX_OK;
+>  }
+>  
+> +static int qmc_hdlc_xlate_slot_map(struct qmc_hdlc *qmc_hdlc,
+> +				   u32 slot_map, struct qmc_chan_ts_info *ts_info)
+> +{
+> +	DECLARE_BITMAP(ts_mask_avail, 64);
+> +	DECLARE_BITMAP(ts_mask, 64);
+> +	DECLARE_BITMAP(map, 64);
+> +
+> +	/* Tx and Rx available masks must be identical */
+> +	if (ts_info->rx_ts_mask_avail != ts_info->tx_ts_mask_avail) {
+> +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx, 0x%llx)\n",
+> +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
+> +		return -EINVAL;
+> +	}
+> +
+> +	bitmap_from_u64(ts_mask_avail, ts_info->rx_ts_mask_avail);
+> +	bitmap_from_u64(map, slot_map);
+> +	bitmap_scatter(ts_mask, map, ts_mask_avail, 64);
+
+We've got a BITMAP_FROM_U64() for this:
+
+	DECLARE_BITMAP(ts_mask_avail, 64) = { BITMAP_FROM_U64(ts_info->rx_ts_mask_avail) };
+	DECLARE_BITMAP(map, 64) = { BITMAP_FROM_U64(slot_map) };
+
+> +
+> +	if (bitmap_weight(ts_mask, 64) != bitmap_weight(map, 64)) {
+> +		dev_err(qmc_hdlc->dev, "Cannot translate timeslots %64pb -> (%64pb, %64pb)\n",
+> +			map, ts_mask_avail, ts_mask);
+> +		return -EINVAL;
+> +	}
+> +
+> +	bitmap_to_arr64(&ts_info->tx_ts_mask, ts_mask, 64);
+> +	ts_info->rx_ts_mask = ts_info->tx_ts_mask;
+> +	return 0;
+> +}
+> +
+> +static int qmc_hdlc_xlate_ts_info(struct qmc_hdlc *qmc_hdlc,
+> +				  const struct qmc_chan_ts_info *ts_info, u32 *slot_map)
+> +{
+> +	DECLARE_BITMAP(ts_mask_avail, 64);
+> +	DECLARE_BITMAP(ts_mask, 64);
+> +	DECLARE_BITMAP(map, 64);
+> +	u32 array32[2];
+
+NIT. Bad name. I'd suggest slot_array, or something.
+
+> +	/* Tx and Rx masks and available masks must be identical */
+> +	if (ts_info->rx_ts_mask_avail != ts_info->tx_ts_mask_avail) {
+> +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx, 0x%llx)\n",
+> +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
+> +		return -EINVAL;
+> +	}
+> +	if (ts_info->rx_ts_mask != ts_info->tx_ts_mask) {
+> +		dev_err(qmc_hdlc->dev, "tx and rx timeslots mismatch (0x%llx, 0x%llx)\n",
+> +			ts_info->rx_ts_mask, ts_info->tx_ts_mask);
+> +		return -EINVAL;
+> +	}
+> +
+> +	bitmap_from_u64(ts_mask_avail, ts_info->rx_ts_mask_avail);
+> +	bitmap_from_u64(ts_mask, ts_info->rx_ts_mask);
+
+Same as above, can you try using BITMAP_FROM_U64()?
+
+Thanks,
+Yury
+
+> +	bitmap_gather(map, ts_mask, ts_mask_avail, 64);
+> +
+> +	if (bitmap_weight(ts_mask, 64) != bitmap_weight(map, 64)) {
+> +		dev_err(qmc_hdlc->dev, "Cannot translate timeslots (%64pb, %64pb) -> %64pb\n",
+> +			ts_mask_avail, ts_mask, map);
+> +		return -EINVAL;
+> +	}
+> +
+> +	bitmap_to_arr32(array32, map, 64);
+> +	if (array32[1]) {
+> +		dev_err(qmc_hdlc->dev, "Slot map out of 32bit (%64pb, %64pb) -> %64pb\n",
+> +			ts_mask_avail, ts_mask, map);
+> +		return -EINVAL;
+> +	}
+> +
+> +	*slot_map = array32[0];
+> +	return 0;
+> +}
+> +
+> +static int qmc_hdlc_set_iface(struct qmc_hdlc *qmc_hdlc, int if_iface, const te1_settings *te1)
+> +{
+> +	struct qmc_chan_ts_info ts_info;
+> +	int ret;
+> +
+> +	ret = qmc_chan_get_ts_info(qmc_hdlc->qmc_chan, &ts_info);
+> +	if (ret) {
+> +		dev_err(qmc_hdlc->dev, "get QMC channel ts info failed %d\n", ret);
+> +		return ret;
+> +	}
+> +	ret = qmc_hdlc_xlate_slot_map(qmc_hdlc, te1->slot_map, &ts_info);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = qmc_chan_set_ts_info(qmc_hdlc->qmc_chan, &ts_info);
+> +	if (ret) {
+> +		dev_err(qmc_hdlc->dev, "set QMC channel ts info failed %d\n", ret);
+> +		return ret;
+> +	}
+> +
+> +	qmc_hdlc->slot_map = te1->slot_map;
+> +
+> +	return 0;
+> +}
+> +
+> +static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
+> +{
+> +	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);
+> +	te1_settings te1;
+> +
+> +	switch (ifs->type) {
+> +	case IF_GET_IFACE:
+> +		ifs->type = IF_IFACE_E1;
+> +		if (ifs->size < sizeof(te1)) {
+> +			if (!ifs->size)
+> +				return 0; /* only type requested */
+> +
+> +			ifs->size = sizeof(te1); /* data size wanted */
+> +			return -ENOBUFS;
+> +		}
+> +
+> +		memset(&te1, 0, sizeof(te1));
+> +
+> +		/* Update slot_map */
+> +		te1.slot_map = qmc_hdlc->slot_map;
+> +
+> +		if (copy_to_user(ifs->ifs_ifsu.te1, &te1, sizeof(te1)))
+> +			return -EFAULT;
+> +		return 0;
+> +
+> +	case IF_IFACE_E1:
+> +	case IF_IFACE_T1:
+> +		if (!capable(CAP_NET_ADMIN))
+> +			return -EPERM;
+> +
+> +		if (netdev->flags & IFF_UP)
+> +			return -EBUSY;
+> +
+> +		if (copy_from_user(&te1, ifs->ifs_ifsu.te1, sizeof(te1)))
+> +			return -EFAULT;
+> +
+> +		return qmc_hdlc_set_iface(qmc_hdlc, ifs->type, &te1);
+> +
+> +	default:
+> +		return hdlc_ioctl(netdev, ifs);
+> +	}
+> +}
+> +
+>  static int qmc_hdlc_open(struct net_device *netdev)
+>  {
+>  	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);
+> @@ -326,12 +466,13 @@ static const struct net_device_ops qmc_hdlc_netdev_ops = {
+>  	.ndo_open       = qmc_hdlc_open,
+>  	.ndo_stop       = qmc_hdlc_close,
+>  	.ndo_start_xmit = hdlc_start_xmit,
+> -	.ndo_siocwandev	= hdlc_ioctl,
+> +	.ndo_siocwandev = qmc_hdlc_ioctl,
+>  };
+>  
+>  static int qmc_hdlc_probe(struct platform_device *pdev)
+>  {
+>  	struct device *dev = &pdev->dev;
+> +	struct qmc_chan_ts_info ts_info;
+>  	struct qmc_hdlc *qmc_hdlc;
+>  	struct qmc_chan_info info;
+>  	hdlc_device *hdlc;
+> @@ -357,6 +498,14 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
+>  		return dev_err_probe(dev, -EINVAL, "QMC chan mode %d is not QMC_HDLC\n",
+>  				     info.mode);
+>  
+> +	ret = qmc_chan_get_ts_info(qmc_hdlc->qmc_chan, &ts_info);
+> +	if (ret)
+> +		return dev_err_probe(dev, ret, "get QMC channel ts info failed\n");
+> +
+> +	ret = qmc_hdlc_xlate_ts_info(qmc_hdlc, &ts_info, &qmc_hdlc->slot_map);
+> +	if (ret)
+> +		return ret;
+> +
+>  	qmc_hdlc->netdev = alloc_hdlcdev(qmc_hdlc);
+>  	if (!qmc_hdlc->netdev)
+>  		return -ENOMEM;
+> -- 
+> 2.43.0
 
