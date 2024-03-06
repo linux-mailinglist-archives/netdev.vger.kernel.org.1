@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-77761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F0FD872D74
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 04:20:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D7D6872D75
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 04:20:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A36D2883EB
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 03:20:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D39D1F24961
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 03:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B88C12E75;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7361401B;
 	Wed,  6 Mar 2024 03:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pVOkVR2b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZDu+qv48"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 328D9DF43;
-	Wed,  6 Mar 2024 03:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B120134B6
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 03:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709695229; cv=none; b=FFWyye9CfkgSvSR/1Ofqp7fBKZ/iGizRaa4CjzcjWpxSSbhhTCWMUMSyMtHyBogkB3LZSPIifOvpBnb8shLK3YAs0XINWBeo202rz7spFL/gOQwwgNkh+aDTMYE2Akp++ppowRdgjcIyFUD9WQYf8l8CATddQ5HJ6yADaBqnaEo=
+	t=1709695229; cv=none; b=gmQBsM+ic2Z8TO2oa9lXJs5XaLuTe1OtDgEFRxyrp2e1J6EV/1y+Tw00ePcMyIpxMF+PTxCw6cxRuKxbDhcGLt0R3500n+GRwsobKhQxU9iUYRzX9j9r0D8D51oY5BRwhESvKQJVeBg5it6nnZjeTkzphG3i6MiiAS+Y9vAfjQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709695229; c=relaxed/simple;
-	bh=VtOXsGaPWmEue4lEr3OdFcOU6LCRSF/qhkR0cK9mHKA=;
+	bh=+1YeLy86yh1K5cPEy/vwITdq+fVaIyFpQhwTGxaR/Z0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oeBKaiYLh6iBBBtHDRZPMQRh+yNKOxQorKypjfLfhrxCLOWZkEXbFBWsTS0NOug+KvxlteLod+b0Kbc7YdSg5kdbpb6JdmI9G2ac1ZllF51eI4G/Do+WQz88P5BOVoRE73goC7P/6m9QNKltWv1KwbL2SYHXE/Ty4kHqMBCPSsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pVOkVR2b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 014B8C43390;
-	Wed,  6 Mar 2024 03:20:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=dAvX3cNZP7MExG9Gw+alPufyZ98gzptqAMCjY5iQaNArHUon6cv5mpVrbzOn1iOSGBPFZrtCY9Qy+OOJ1VKrqsM6VTqb3ZcZigGgyxwrPdKnqkuws8MTK+nr1IgjITLHQjl4f+VkpF7rtNFHJqwqU9hb76j+LAQW88Vi/EtLhgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZDu+qv48; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 345C9C433B1;
+	Wed,  6 Mar 2024 03:20:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709695229;
-	bh=VtOXsGaPWmEue4lEr3OdFcOU6LCRSF/qhkR0cK9mHKA=;
+	bh=+1YeLy86yh1K5cPEy/vwITdq+fVaIyFpQhwTGxaR/Z0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pVOkVR2bLQl6aPlFwiYVuMTjGqEm0Do+0imT63XAH4SMthPkzsEEDArkuwGHoX+HZ
-	 K7y7mmoWQPZZqn28vUU2Li1qLn7Qc4Su/salrHv0GZTdMBh4QL1I4qEWzLfAT2R7b+
-	 Mzj7fDn7MoLt0P5DOJXy2JEMEEMsC2kHhoV7mjR9QoI7i51eq8FzFw78oEG/MuwaVX
-	 s/pI3vWrvlf8PqGQZrNuxJJdHupNr19G7m7SEdc1lEFAfOcF5ZMUzKW4ndLsIQfFiQ
-	 PdaCQ8bit0Gn38hd3QVWlemGA7Mvk+Cv6TmWGJre+vb+dSqWTJQJj4f9ZXmtWdRcLq
-	 tGP0KBZgxZP1A==
+	b=ZDu+qv48uA2FGIzDizHQhNam8gBRzvpY+SwVlRGEKDfLEaeQ2ypljMffYZ6fb5wRG
+	 xtlf5dXdOGoe8XfXu7+ouKhxAJybaw+buoR9qwvPT6oNDRiyFDjpbj/UYGHOHBjz2U
+	 YQlhjunp0AmiyqEOUhrmvv4ef+MpiSeEgXvbyYkNy/lT1mgUei5G/ctODia108N3EZ
+	 B4brA43wYSLSjTgNklmFw64GasEAa28LGnKzAEW0LMQuVtgKzSwhdiNOEn/F9lN4xL
+	 x7v9JrmBBtl/REUQTagmYZGySh4MepuyueedDlWH3c5U730+FqVDJWvnve0tMeYoUy
+	 CyCmfJ8gvux+A==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D982DC04D3F;
-	Wed,  6 Mar 2024 03:20:28 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 21EB0D84BDE;
+	Wed,  6 Mar 2024 03:20:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: dsa: microchip: fix register write order in
- ksz8_ind_write8()
+Subject: Re: [PATCH v2 net-next] ethtool: ignore unused/unreliable fields in
+ set_eee op
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170969522888.30303.17315909083697603983.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Mar 2024 03:20:28 +0000
-References: <20240304154135.161332-1-tobias.jakobi.compleo@gmail.com>
-In-Reply-To: <20240304154135.161332-1-tobias.jakobi.compleo@gmail.com>
-To: None <tobias.jakobi.compleo@gmail.com>
-Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
- f.fainelli@gmail.com, olteanv@gmail.com, o.rempel@pengutronix.de,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <170969522913.30303.10118184261588288842.git-patchwork-notify@kernel.org>
+Date: Wed, 06 Mar 2024 03:20:29 +0000
+References: <ad7ee11e-eb7a-4975-9122-547e13a161d8@gmail.com>
+In-Reply-To: <ad7ee11e-eb7a-4975-9122-547e13a161d8@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: andrew@lunn.ch, linux@armlinux.org.uk, pabeni@redhat.com, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  4 Mar 2024 16:41:35 +0100 you wrote:
-> From: "Tobias Jakobi (Compleo)" <tobias.jakobi.compleo@gmail.com>
-> 
-> This bug was noticed while re-implementing parts of the kernel
-> driver in userspace using spidev. The goal was to enable some
-> of the errata workarounds that Microchip describes in their
-> errata sheet [1].
+On Sat, 2 Mar 2024 15:18:27 +0100 you wrote:
+> This function is used with the set_eee() ethtool operation. Certain
+> fields of struct ethtool_keee() are relevant only for the get_eee()
+> operation. In addition, in case of the ioctl interface, we have no
+> guarantee that userspace sends sane values in struct ethtool_eee.
+> Therefore explicitly ignore all fields not needed for set_eee().
+> This protects from drivers trying to use unchecked and unreliable
+> data, relying on specific userspace behavior.
 > 
 > [...]
 
 Here is the summary with links:
-  - net: dsa: microchip: fix register write order in ksz8_ind_write8()
-    https://git.kernel.org/netdev/net/c/b7fb7729c94f
+  - [v2,net-next] ethtool: ignore unused/unreliable fields in set_eee op
+    https://git.kernel.org/netdev/net-next/c/344f7a465149
 
 You are awesome, thank you!
 -- 
