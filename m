@@ -1,106 +1,141 @@
-Return-Path: <netdev+bounces-77833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BA5E8732A9
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 10:37:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B62F8732B7
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 10:41:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E0AE1C209DA
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:37:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCEA91C2145C
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:41:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31F935DF05;
-	Wed,  6 Mar 2024 09:37:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00FD5DF29;
+	Wed,  6 Mar 2024 09:41:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="ePhbZDDN"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="FCVSiHNL"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA1845C5E9
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 09:36:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB885DF1F
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 09:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709717821; cv=none; b=dYz0ZCXlsV72ZIMuH3gVgGyfCGemqPQ0y1uXDwy6JCmcNsw0w+5pIYE8iFNiK/rd+TahxsBVbFv/dRC3cu2JJIlAehQi4CXRidby34ar5ml/tHuHFJ1Ta0M2mHbJv3ZW/oA+JkbTHAsF7uOKUPEHIQEkOdnjTGNVn38Ll28mtNo=
+	t=1709718063; cv=none; b=A6FoExQSPXF8ghxYTqCao/Aubw1Ctjz+gS6QyhxcuCf+DcZIXQRbd9EhnzBUmNMDs3GzBF4muF50lX7uxbAaj5tE4VcCOiDtX4SlcHlMMq9eLnRxr6wxvFSYLAB2plX1U6QIVvCVg+VwzeOXhkdRvxg33gcqCy2lUv3fXCMxZrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709717821; c=relaxed/simple;
-	bh=tCueLeJYiz2l9qMl1448xYobVOt6ryCPnk4FzJiaj6k=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=da7BiXDlauZRogc4mJ98N/iFpMg++S2qoHYvyQ4tqafMD8LnYLTM05lvRO5EMBtBVGWWxqBlqClDdj/bCGg4EZNpn27f4MSYsViWZT5f1EU92N3WbqhMf9C35RPjns9FsxdXaTTDJsLNYJQVkygBBcl4knOeOnPJantQgW3FI30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=ePhbZDDN; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 3A25920748;
-	Wed,  6 Mar 2024 10:36:50 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Tke5SrWUXCMM; Wed,  6 Mar 2024 10:36:49 +0100 (CET)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	s=arc-20240116; t=1709718063; c=relaxed/simple;
+	bh=HuKkNTiZyk4Zd71i9Vg6WLAsDuyNUnnPZnh/6FTXYa0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TIp0wm3rMPTtPebhzXyyGrudR9GjSrAq1+pPdMF5TZpuboQdVbdBSA4B4+2OytyuLF3QaqdyXePZq7uqGGsolNpXPfTMl1LI/GZrQocovTKalr0r5JHXRRtVDhMpbhFLTrZepOeBIKXOFt33tNpFiOOtJyrCz1vRVU4rU+hLrpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=FCVSiHNL; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id B71DB20539;
-	Wed,  6 Mar 2024 10:36:49 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com B71DB20539
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1709717809;
-	bh=IvXiDWZovdxPAm3s5YGREQ8CV6m4BMqnyvDbpPu0hsk=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=ePhbZDDN/ZXuFUGgyMJG8XPnNBGPlZwq3bkmwCYbPaiB5gEUSy/fquV456zSkSkGO
-	 8GA+zj7VzIqF5tqonWhF7aAgcpySpFcHqnlBX68dsZXrJsycrpCZStYDK67+jVoQZY
-	 q8FaUKeGljqbt6WzxrPRHTCgU/ZjzZGyoWApH+iDmiGm7migOq+4vkr0bz1lGdtt+D
-	 QvsYU1MJZuuFQQ4YF4ePoENyxNu9w5VGozzkb5vB0sxuDN6g36E3oeTatrtlDx8Bwx
-	 T6Upa2EV2zk/kSbrYCKlAiAL2cgirbpqIp5hOFPmKfdkhvfimnEn3cZwHTB4rJGw2M
-	 dkzkpCfZabIRA==
-Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout1.secunet.com (Postfix) with ESMTP id B2C4180004A;
-	Wed,  6 Mar 2024 10:36:49 +0100 (CET)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 6 Mar 2024 10:36:49 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 6 Mar
- 2024 10:36:49 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 2245D3181583; Wed,  6 Mar 2024 10:36:49 +0100 (CET)
-Date: Wed, 6 Mar 2024 10:36:49 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Mike Yu <yumike@google.com>
-CC: <netdev@vger.kernel.org>, <leonro@nvidia.com>, <stanleyjhu@google.com>,
-	<martinwu@google.com>, <chiachangwang@google.com>
-Subject: Re: [PATCH ipsec 0/2] Improve packet offload for dual stack
-Message-ID: <Zeg5MQlmC4Y4nuER@gauss3.secunet.de>
-References: <20240304122409.355875-1-yumike@google.com>
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 65FC387B3D;
+	Wed,  6 Mar 2024 10:40:52 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1709718053;
+	bh=r4vxK5hI9QERuH4Gca4Fpm2D/0m36xecnukYNX+OwaE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FCVSiHNLFlxLr4uzSIONjM0XbDCbtKwfc1H/j90OKQ3f9YCwYARB+v5QXUIvAdEwZ
+	 0daelvS7MsmivK7W1PVbdHmP/hIBOYZVWpRbFL9ZqNTo/jJ3OhZfIriBydqPnsnlGQ
+	 wc1hRI3H+jZLpN/d4AX2ROSByD/n4m6qpvqq4jJUnCKlAQTqfrv5MWKJQUzckNhR3v
+	 wLAb34iCg4ytXrI45mZFYdcr6ifWvDOAassgx96Bkwp3lHHWjCB99TfJiGq5zbLvQP
+	 t698MRtTtJB86LLMLHewmUP7CQd2UWCDpsf9kpBcsMwM4sMYxpFH1OVrm5Eo3C+ijF
+	 HCAB7JxmMbB3Q==
+From: Lukasz Majewski <lukma@denx.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	Tristram.Ha@microchip.com,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ravi Gunasekaran <r-gunasekaran@ti.com>,
+	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
+	Murali Karicheri <m-karicheri2@ti.com>,
+	Ziyang Xuan <william.xuanziyang@huawei.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Lukasz Majewski <lukma@denx.de>
+Subject: [PATCH v2] net: hsr: Use full string description when opening HSR network device
+Date: Wed,  6 Mar 2024 10:40:26 +0100
+Message-Id: <20240306094026.220195-1-lukma@denx.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240304122409.355875-1-yumike@google.com>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Mon, Mar 04, 2024 at 12:24:07PM +0000, Mike Yu wrote:
-> In the XFRM stack, whether a packet is forwarded to the IPv4
-> or IPv6 stack depends on the family field of the matched SA.
-> This does not completely work for IPsec packet offload in some
-> scenario, for example, sending an IPv6 packet that will be
-> encrypted and encapsulated as an IPv4 packet in HW.
-> 
-> Here are the patches to make IPsec packet offload work on the
-> mentioned scenario.
-> 
-> Mike Yu (2):
->   xfrm: fix xfrm child route lookup for packet offload
->   xfrm: set skb control buffer based on packet offload as well
+Up till now only single character ('A' or 'B') was used to provide
+information of HSR slave network device status.
 
-Applied, thanks a lot!
+As it is also possible and valid, that Interlink network device may
+be supported as well, the description must be more verbose. As a result
+the full string description is now used.
+
+Signed-off-by: Lukasz Majewski <lukma@denx.de>
+
+---
+Changes for v2:
+- Use const char * instead of char * - to assure that pointed string is
+  immutable (.rodata allocated).
+---
+ net/hsr/hsr_device.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+index 9d71b66183da..904cd8f8f830 100644
+--- a/net/hsr/hsr_device.c
++++ b/net/hsr/hsr_device.c
+@@ -142,30 +142,29 @@ static int hsr_dev_open(struct net_device *dev)
+ {
+ 	struct hsr_priv *hsr;
+ 	struct hsr_port *port;
+-	char designation;
++	const char *designation = NULL;
+ 
+ 	hsr = netdev_priv(dev);
+-	designation = '\0';
+ 
+ 	hsr_for_each_port(hsr, port) {
+ 		if (port->type == HSR_PT_MASTER)
+ 			continue;
+ 		switch (port->type) {
+ 		case HSR_PT_SLAVE_A:
+-			designation = 'A';
++			designation = "Slave A";
+ 			break;
+ 		case HSR_PT_SLAVE_B:
+-			designation = 'B';
++			designation = "Slave B";
+ 			break;
+ 		default:
+-			designation = '?';
++			designation = "Unknown";
+ 		}
+ 		if (!is_slave_up(port->dev))
+-			netdev_warn(dev, "Slave %c (%s) is not up; please bring it up to get a fully working HSR network\n",
++			netdev_warn(dev, "%s (%s) is not up; please bring it up to get a fully working HSR network\n",
+ 				    designation, port->dev->name);
+ 	}
+ 
+-	if (designation == '\0')
++	if (!designation)
+ 		netdev_warn(dev, "No slave devices configured\n");
+ 
+ 	return 0;
+-- 
+2.20.1
+
 
