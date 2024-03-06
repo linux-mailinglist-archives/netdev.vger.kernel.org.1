@@ -1,62 +1,59 @@
-Return-Path: <netdev+bounces-78055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D3D6873DD0
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:52:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C08A873E3D
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 19:12:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2A49B2338C
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:52:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D1A71C2092E
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:12:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B031D135401;
-	Wed,  6 Mar 2024 17:52:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8207F141997;
+	Wed,  6 Mar 2024 18:03:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNgkFwNj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="levKoCIE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877CD5CDE2;
-	Wed,  6 Mar 2024 17:52:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C4FA14198E
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 18:03:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709747526; cv=none; b=Tf9kC5jc4jXIt23wi1KQe3+Q7x6kqpN+tMDrLOKsl1Hb2pD2w1YHCPADZLo1GfQxV2I9CHNvKM4XcAaICMVZn51U+yBSJ1WGus7sfsighr1URcu2goblcmO2kQDuCWwF7i2TsjDY4ibDkBvEGse/Xw30glxHXTN8aBjtB+1AxTg=
+	t=1709748215; cv=none; b=NE7c4UmYMNzK+HNEeDApGezLpzcEunBs6nZdJDdAn3lUIqq1b74/59cKXiv3c6CCKum961ranoG7H6nrJ6fdsYwPNw/Do9KEuMCfL6K60hMFccDnpmguNzLXjhJg7+UeC9yo9X+GaN26vLw/uibmnsL0QJkZXSDbXbLowOvqD28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709747526; c=relaxed/simple;
-	bh=jgEqnyMEYTp0IrTDwRr0KVr2VswUj1JqQ0+266jhtlM=;
+	s=arc-20240116; t=1709748215; c=relaxed/simple;
+	bh=PHJUVwqfiNgw5vNIMKxIICyg1+WyBLjZ2Dq3h66vRdA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UjU9BbH0gbw66ay92JD9Z6MRV5dBZk+BBHs5CJ2TUBZTC4pSSzvY1VIYoXED1/+dal7BXORDRxr5bkJ6h8tQjGtw0zIzQMhb4gGxsWNEiHgjME4PhvBtV5aioRnvh0/KVNYwD3vI7Bm6GCP4aCQ71+h4j3iOKkypa3U5WLULLOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNgkFwNj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB9EAC433F1;
-	Wed,  6 Mar 2024 17:52:05 +0000 (UTC)
+	 MIME-Version:Content-Type; b=jZx7f/VedTNq3Oc2EDvNqeew8sShpG6x9bZBaFzCAHaqcbfpXwx0bZSdQQpsBb884H8p72Cu3577IBeFdUdo5iy4CiviDZ4D9unllHY3oQf8p92kLL+jAQrpWZrFVa0p+7ga1fpPgzSdb85gpba2o96yZpk5PAFNejyQNmC5k60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=levKoCIE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F74FC433C7;
+	Wed,  6 Mar 2024 18:03:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709747526;
-	bh=jgEqnyMEYTp0IrTDwRr0KVr2VswUj1JqQ0+266jhtlM=;
+	s=k20201202; t=1709748214;
+	bh=PHJUVwqfiNgw5vNIMKxIICyg1+WyBLjZ2Dq3h66vRdA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SNgkFwNjM9f6hkLDbZFwtoLQAcqD7MooHi0DYcg9Q1zc0riXtyrd84D9NCPSY11Va
-	 awkyccB/VTiowgOSLD2Nbn2zkpdPCtVPhRRAd5Hpy7kKAIwIPpkrA0PITYNm3e6/78
-	 kLgHlyJrdXcfAwDdG51qSaN20KgCVH2Wc8UJVuXGv4xgPQmgWDhyMJwv2cxW+XpKMk
-	 DDHR42nKbVSF/r3/YT7OYuDqiEcq5y3xAeHprU9uTS1N8vIfTLCyEBpdwqNzxVAd2r
-	 UdYkhPY1zyDFYSZIoQ0IWVlQ4DfySJav08uy+jsvPXc3sYuxOCi8gBVJve62/rKkOO
-	 Pnq+iQwXPIHBA==
-Date: Wed, 6 Mar 2024 09:52:05 -0800
+	b=levKoCIEBYD1YDSAIQ1VncM3YwSQkjuwKvSCZzxqM6gHLNwGHvUQHDXlRvz47RKJM
+	 1PS6dXKtgZvvXGgSTxZFGjuwKy1VhpRpm0SpHrF3DG/29zJgliX0L5RHtYGnGHsx0/
+	 UcxqeEhOLZUq3EBryca88unusJKGw7og0DWAZwht9Mn3sRcHr67j4vs0xW1bDNR/yf
+	 ZFJNN6BRqTl6EXCop2Y7n83knyHna5a46cQTL7tG6hzXn0LNJHwzXr2vCMR4xrOoJY
+	 YFaT0ueLCvhE55NoAh/15AaZ6QQ87wpzWl7YCzvmJpCXa2lJgc1XriBG7/doUi5sFZ
+	 31QSHwz9v2aOA==
+Date: Wed, 6 Mar 2024 10:03:33 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: Ratheesh Kannoth <rkannoth@marvell.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>
-Subject: Re: [EXTERNAL] Re: [PATCH v6 1/5] net: wan: Add support for QMC
- HDLC
-Message-ID: <20240306095205.5875d8ae@kernel.org>
-In-Reply-To: <20240306184611.0cea20af@bootlin.com>
-References: <20240306080726.167338-2-herve.codina@bootlin.com>
-	<20240306105651.1210286-1-rkannoth@marvell.com>
-	<20240306143743.5732b298@bootlin.com>
-	<MWHPR1801MB191837C8907B39F67893F0BBD3212@MWHPR1801MB1918.namprd18.prod.outlook.com>
-	<20240306082230.7ecf207b@kernel.org>
-	<20240306184611.0cea20af@bootlin.com>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jacob
+ Keller <jacob.e.keller@intel.com>, Jiri Pirko <jiri@resnulli.us>, Stanislav
+ Fomichev <sdf@google.com>, donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v2 3/5] tools/net/ynl: Fix c codegen for
+ array-nest
+Message-ID: <20240306100333.502fa911@kernel.org>
+In-Reply-To: <20240306125704.63934-4-donald.hunter@gmail.com>
+References: <20240306125704.63934-1-donald.hunter@gmail.com>
+	<20240306125704.63934-4-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,14 +63,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 6 Mar 2024 18:46:11 +0100 Herve Codina wrote:
-> > > ACK. Usually I get comments to split declaration and assignment for
-> > > my patches in upstream.     
-> > 
-> > Yup, that's our general preference, to split the init out of 
-> > the definition.  
+On Wed,  6 Mar 2024 12:57:02 +0000 Donald Hunter wrote:
+> ynl-gen-c generates e.g. 'calloc(mcast_groups, sizeof(*dst->mcast_groups))'
+> for array-nest attrs when it should be 'n_mcast_groups'.
 > 
-> Does it mean that I need to update in a next iteration ?
+> Add a 'n_' prefix in the generated code for array-nests.
 
-If you'd be so kind.
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
