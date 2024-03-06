@@ -1,138 +1,111 @@
-Return-Path: <netdev+bounces-77951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 127C0873935
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:33:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE1A7873943
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:34:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C28C12852B4
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:33:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF9081C2225A
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 14:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FDCD131745;
-	Wed,  6 Mar 2024 14:33:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76CEB130AD6;
+	Wed,  6 Mar 2024 14:34:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="s16FWTi3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DZ/mrAqT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C955B03B;
-	Wed,  6 Mar 2024 14:33:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD0D130E3F
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 14:34:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709735582; cv=none; b=KB0U8hA6mKvlEFmRw8FNXHJOsRuCh4m2Z9Wi+59xsUWXwiSolBYT4KxMUxQvw0KO87gkLGQVvo88LKzrU8DpXjZDQ2AlaVLuHWiULqWeDl/fjAfIF9UngPQbn547ithivExbmfKkX6fAnDtArtLEmnid5OsIpGyhPwrExrdeafI=
+	t=1709735657; cv=none; b=lTjJ1UDl6mUW2OHQUsEyYb/cyOutoBjNT4ChlADhCTFhkTdqOHpkBw2cJ+EfECDOdhpuQjDEtCsWZbIeyA00XExq9++rjl/Sbb7rqODVCq0MdIDGs8eIYTjwp9czqpegx4KK6zBN6LuEwWdRnpGymKahFAsw/meeah13U07QX2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709735582; c=relaxed/simple;
-	bh=I905vKeftySFbgrROZxaLKFefVcmyRrmDjClc6ZvYQk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ONXnO385iELWMWO65CO8moWIOO4wXyJ0AWDjlCFM6FyMJgrXrI3P5xM+XoqGOOULxZH1+Nz7/rI+49LbKkUo+vJvlogztNyqbjuMGAo6SwiTyNLnuYjkMXVxGf66TyRm7B3+6NlD2OiBFwMdIJMJGTSyVHGA5S6uXJvoKUvke+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=s16FWTi3; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from localhost (unknown [IPv6:2a02:8012:909b:0:c8aa:f3f:c939:97c8])
-	(Authenticated sender: tom)
-	by mail.katalix.com (Postfix) with ESMTPSA id 4B7237D94E;
-	Wed,  6 Mar 2024 14:32:59 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1709735579; bh=I905vKeftySFbgrROZxaLKFefVcmyRrmDjClc6ZvYQk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Disposition:In-Reply-To:From;
-	z=Date:=20Wed,=206=20Mar=202024=2014:32:59=20+0000|From:=20Tom=20Pa
-	 rkin=20<tparkin@katalix.com>|To:=20Gavrilov=20Ilia=20<Ilia.Gavrilo
-	 v@infotecs.ru>|Cc:=20James=20Chapman=20<jchapman@katalix.com>,=0D=
-	 0A=09"David=20S.=20Miller"=20<davem@davemloft.net>,=0D=0A=09Eric=2
-	 0Dumazet=20<edumazet@google.com>,=0D=0A=09Jakub=20Kicinski=20<kuba
-	 @kernel.org>,=20Paolo=20Abeni=20<pabeni@redhat.com>,=0D=0A=09"netd
-	 ev@vger.kernel.org"=20<netdev@vger.kernel.org>,=0D=0A=09"linux-ker
-	 nel@vger.kernel.org"=20<linux-kernel@vger.kernel.org>,=0D=0A=09"lv
-	 c-project@linuxtesting.org"=20<lvc-project@linuxtesting.org>|Subje
-	 ct:=20Re:=20[PATCH=20net-next]=20l2tp:=20fix=20incorrect=20paramet
-	 er=20validation=20in=20the=0D=0A=20pppol2tp_getsockopt()=20functio
-	 n|Message-ID:=20<Zeh+m84IESlWU1rE@katalix.com>|References:=20<2024
-	 0306095449.1782369-1-Ilia.Gavrilov@infotecs.ru>=0D=0A=20<ZehsL8sHd
-	 3vgplv1@katalix.com>=0D=0A=20<c9dd0486-aacc-4263-bcce-630fad445e72
-	 @infotecs.ru>|MIME-Version:=201.0|Content-Disposition:=20inline|In
-	 -Reply-To:=20<c9dd0486-aacc-4263-bcce-630fad445e72@infotecs.ru>;
-	b=s16FWTi33a53/Lbn2kOEYjOMgG6slLASmMaLLXB4SflD6sAQj6JNwkkNFnj1RaEsf
-	 KPw8elxDs9y9PJPB4Qc8EF6r+l9nPhf2BVWXi2TMuBgnPTfh4EZnAWTZeD3pWfCr9r
-	 q/EbigRn5GjaLsWcfxO+MS7mozHc+gTkcU3OkF8vm9sKpX5PJHIlY43+KkAXVevTUC
-	 BdMp9SeVQ76sVIHt4KQka0dbS6co+Mu/xZE435ng3juQrxGTyCnQumEqSNvjv2StqL
-	 VjY17AbwRs1I3zx7be1CejQd2u8iyPiIkbXNZUk1ogp+cSdn7OKkZtnrvDkeTzTJmV
-	 MUyHr/bIf1ilQ==
-Date: Wed, 6 Mar 2024 14:32:59 +0000
-From: Tom Parkin <tparkin@katalix.com>
-To: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-Cc: James Chapman <jchapman@katalix.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
-Subject: Re: [PATCH net-next] l2tp: fix incorrect parameter validation in the
- pppol2tp_getsockopt() function
-Message-ID: <Zeh+m84IESlWU1rE@katalix.com>
-References: <20240306095449.1782369-1-Ilia.Gavrilov@infotecs.ru>
- <ZehsL8sHd3vgplv1@katalix.com>
- <c9dd0486-aacc-4263-bcce-630fad445e72@infotecs.ru>
+	s=arc-20240116; t=1709735657; c=relaxed/simple;
+	bh=4K6n0+T/S6LGwEfBFR/QadcKdKE74eM9ZNsOf/TGf9s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=p2UJAR7oXy2TSh0v/OYQ9AIlqrlcFqLSyFFb9cSS1Qhhd0qKTKK9VvgXMrouINWphVOJ9sCfcsSaBSTyYxtqWE8pmplY5N1nNK0TjMjLHDZwtyCkKHngHEIUEAvtzIR3afHVTE7qsNNrPGqU1qTm433WNRA2NzAEYllNRwv3i2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DZ/mrAqT; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5673b5a356eso2294763a12.0
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 06:34:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709735654; x=1710340454; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/Oi5P3ot2tE3z9TBltK3p+v4L3IWL0dkDLVy0vtf3jA=;
+        b=DZ/mrAqTyAHa8NcdE8uWwn/UCuW4juZMCtJFCbeG15jM5sVNAEsHIDWlPK0wPrZCRj
+         E203PORtCb/Y59Zkabf8W+cCOwPRUM4y+se8UicxQrEHLv/zXOCAPfDUSwaPzt3VM4gD
+         GVRq8BLItsDwwd3c4+xU8DUR9IsJlgS3FA05qsUaK34aKN6HoaPv4TMFd1JcZjKlUk7p
+         8FjYEwdN4OMXKBzi4zemk3AtJ8pcA9TObzAvCRKey0rY9fSuGzyoo+OGue4ADKsqADTP
+         2vXFVLvZe9yBXjhbNjKHzrRAYefcWg+wsiptB6AReONlmT6lwPwSB7qz4FAGy23bBZYX
+         GTHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709735654; x=1710340454;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/Oi5P3ot2tE3z9TBltK3p+v4L3IWL0dkDLVy0vtf3jA=;
+        b=FOfEKVzvov1qwseXTdlzUm41clGDMLwxpn5lZQQrtFi1eZpO7z+eR4Ky5jjEkIJnPw
+         a/fvTjyy46Hc7/WBBuDNl8Pppp41/85ubWMw/tG2F6EBCo2MPCcOx28I69aFncu3f5kF
+         tpQJjyD6IxxsFbJbbl5g/z+F2osI6+izgeetEQ/xq+sT8BXDGGLur4Zl9z0qXkfHJl+L
+         1DirYExvkcgOgJfYisrFfeEzduPEtRUKpBi8IVMzcLgHSn/yEp4pMvelubYzoz3lUBUD
+         62vcu+MAoTOnhfWox2ejjNyqhqCu4lusJ5wFaA59cGyNRyEzBVGCBkMcTaQ7nIa80NbW
+         gaVg==
+X-Gm-Message-State: AOJu0Yznd442sLoZP3d9O9Azi7bEMA53vijXYmOP0VmULse3q+pGkibg
+	Puuy7bkZSSCxt6wnsd27Q48AfKtxgS3esyaZvYdqODUIn1IKxJFw
+X-Google-Smtp-Source: AGHT+IF2/C+cJFEvlMKIHRhnHvjS5+TB29BagwFdzgDuwnNTfswvHK0JuyWSH93h8f2K+9F9GV2Wkg==
+X-Received: by 2002:a50:8e45:0:b0:566:7250:9ea2 with SMTP id 5-20020a508e45000000b0056672509ea2mr11152857edx.34.1709735653778;
+        Wed, 06 Mar 2024 06:34:13 -0800 (PST)
+Received: from pc-de-david.. ([2a04:cec0:1024:d009:4baf:fe04:4380:e7b4])
+        by smtp.gmail.com with ESMTPSA id c28-20020a50d65c000000b00565a9c11987sm7293663edj.76.2024.03.06.06.34.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Mar 2024 06:34:13 -0800 (PST)
+From: David Gouarin <dgouarin@gmail.com>
+To: camelia.groza@nxp.com
+Cc: netdev@vger.kernel.org,
+	madalin.bucur@oss.nxp.com,
+	david.gouarin@thalesgroup.com,
+	David Gouarin <dgouarin@gmail.com>
+Subject: [PATCH 1/1] [PATCH net] dpaa_eth: fix XDP queue index
+Date: Wed,  6 Mar 2024 15:34:08 +0100
+Message-Id: <20240306143408.216299-1-dgouarin@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="KucCyUWbgIeZdCDv"
-Content-Disposition: inline
-In-Reply-To: <c9dd0486-aacc-4263-bcce-630fad445e72@infotecs.ru>
+Content-Transfer-Encoding: 8bit
 
+Make it possible to bind a XDP socket to a queue id.
+The DPAA FQ Id was passed to the XDP program in the XDP packet metadata
+which made it unusable with bpf_map_redirect.
+Instead of the DPAA FQ Id, initialise the XDP rx queue with the channel id.
 
---KucCyUWbgIeZdCDv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: David Gouarin <dgouarin@gmail.com>
+---
+ drivers/net/ethernet/freescale/dpaa/dpaa_eth.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On  Wed, Mar 06, 2024 at 13:46:07 +0000, Gavrilov Ilia wrote:
-> On 3/6/24 16:14, Tom Parkin wrote:
-> > As it stands right now in the l2tp_ppp.c code, I think the check on
-> > len will end up doing nothing, as you point out.
-> >=20
-> > So moving the len check to before the min_t() call may in theory
-> > possibly catch out (insane?) userspace code passing in negative
-> > numbers which may "work" with the current kernel code.
-> >=20
-> > I wonder whether its safer therefore to remove the len check
-> > altogether?
->=20
-> Thank you for answer.
->=20
-> In my opinion, it is better to leave the 'len' check. This way it will=20
-> be easier for the user to understand where the error is.
+diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+index dcbc598b11c6..988dc9237368 100644
+--- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
++++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+@@ -1154,7 +1154,7 @@ static int dpaa_fq_init(struct dpaa_fq *dpaa_fq, bool td_enable)
+ 	if (dpaa_fq->fq_type == FQ_TYPE_RX_DEFAULT ||
+ 	    dpaa_fq->fq_type == FQ_TYPE_RX_PCD) {
+ 		err = xdp_rxq_info_reg(&dpaa_fq->xdp_rxq, dpaa_fq->net_dev,
+-				       dpaa_fq->fqid, 0);
++				       dpaa_fq->channel, 0);
+ 		if (err) {
+ 			dev_err(dev, "xdp_rxq_info_reg() = %d\n", err);
+ 			return err;
+-- 
+2.34.1
 
-Fair enough.
-
-My concern was that in doing so we add a new behaviour which userspace
-may notice and care about, but realistically I'm probably being
-paranoid to imagine that any such userspace exists.
-
-Thanks for your work on l2tp_ppp.c :-)
-
-Reviewed-by: Tom Parkin <tparkin@katalix.com>
-
---KucCyUWbgIeZdCDv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEsUkgyDzMwrj81nq0lIwGZQq6i9AFAmXofpcACgkQlIwGZQq6
-i9CkFgf+K3wQZilPIrEC8XWG/QMYY830jKjb24y9bpobYe7BwUoQ3XZp5x1YT63f
-Exz8TcFjn1m5iPd8MbEBEGB+qXi8HTnuMQ+f4kexxp4qPeWnQa+wg/SFLm/Vv6E1
-gwrHDwzKvsdL0TSbSgftLl1DLl3u5jkHWOCGpi+9AryOPUPHj1ERcoKWKKehfz6f
-oEjzs6L6bW9p0FSyBYCqsdc18A0gwfqM/dq+bOhZfu81MTfhfIoXwCj15GwOssCX
-Td2p57H56NICX6ybUqNfNQMhAnXiQsto1iHTQA1s/HCEltRQzq/3pxC1NS8zDs0d
-i+E6S/XLXazXcxXF5DCpt4qYxsKRgg==
-=/a9+
------END PGP SIGNATURE-----
-
---KucCyUWbgIeZdCDv--
 
