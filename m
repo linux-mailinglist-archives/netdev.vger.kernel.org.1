@@ -1,124 +1,95 @@
-Return-Path: <netdev+bounces-77888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E02C8735F1
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 12:57:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 038688735FB
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:00:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52ECE1C21157
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 11:57:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B82C287A25
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 12:00:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0C9478682;
-	Wed,  6 Mar 2024 11:57:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B658003D;
+	Wed,  6 Mar 2024 12:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eFljGz+Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jOnwqT5L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B68E2D7B8;
-	Wed,  6 Mar 2024 11:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19BC80030;
+	Wed,  6 Mar 2024 12:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709726232; cv=none; b=Yhz2jCgzqIPL/+g7PAroMeCCvsaXfCMtHWA/4VvM12e26EwU6VTBSL2taLZJiCC2GtsOLfeBPAFtDuvxp6jjTkdgCoBg1cxzwYjdW1r0fQJmLXG8bL2fMHPvufn2mcCKtAMjb4/ie5B0yXuldeZseTmxbLv7xJ9jnzwD+Z4srBU=
+	t=1709726428; cv=none; b=TpsDGH5jKP2HPJxXzVulF6DWFZpyEQpAJmlM0EHm3zZ2L6gsSpUXxmy6tUCZe+kfZLkK6E9iuoJYMvmjiu0kC89t9OW+5LJNTEYYhbOrggOKk4rxdIt32AvVDd2Hv+tT/98cmPgD1aLkrlv+RvO9WPB+ooB9q8UKqjqCWMO39Ik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709726232; c=relaxed/simple;
-	bh=hlmHhTli9UgDXytybNg1lFQ0imkQVgEKhGeyjOGwQdQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DHFMnZBMXMtkA0e+0KYVUOsp8inCd/fCeukgV+ElzLIeY/1o1PSfwOkbLuymp7cxqyz4wzXunjUCaeE2cBaHelrm6e9bsobDNDfG2lCwT/Rz9sCdFZkuGM8u8YOS/jAQtxGhjvHVepwQw308z7OlEdmu3KoWUIwCQkyzEOfYAs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eFljGz+Z; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a4417fa396fso813843866b.1;
-        Wed, 06 Mar 2024 03:57:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709726229; x=1710331029; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hlmHhTli9UgDXytybNg1lFQ0imkQVgEKhGeyjOGwQdQ=;
-        b=eFljGz+ZfYfqljM36lueKzDbg/LQmgSsJ6UDBLXaOmUBmA6mI+bfQLrutWRo348t30
-         FNChKqqVgLEgQhA4fE538MlMzEreKfUOy2igYGyTpfio7nvJfMOQlte8UcW+beFc8PrR
-         N1I3hKlf5WrzmERDwFlgHH+Vec2elKUJ/osBdTrYyGXkgn/CSYE7JaqpWnYTG+5FS0gY
-         +VMzddiG76y4AHwzrEO38NhDSUXsl1K4yuOSQQMong/YCSRQKg/PfEgzpY3dAAcHdkbw
-         6dErCOk8LQpqcQ5a0/86M+w2kWWbpeRn0nJifq0O2lQeTK0t1UQ/ccdRgdxEN7D+Qw3k
-         JY5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709726229; x=1710331029;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hlmHhTli9UgDXytybNg1lFQ0imkQVgEKhGeyjOGwQdQ=;
-        b=fF6tFuexJ3774rWXC78P8xmKSuNDjUJowL94+8ZXLNwXDblmSASElmTkDpqZ56ahST
-         /nQ3ydmJzXHH1eJwMlKv7ypvlbzvO01c0MPwjIOTd/0fRYZopz1iwT2nfuUzLO2qTV+3
-         fumYb0SUxMhmDhmKbGE+x/wFx9pLOfhuJGA0LzhZIdfeEHOFAlsfHDBypMhTGBGdUH5o
-         Ks+I4x46ccWLuyFaV+C1n0EDdFW96v7P0L4HWacwoVAaS6Ay9L2HXt6XaZxUij35UT6n
-         lnW/q1Lks/4hZK2VRxLw367CboDj87csSLMIfEutB+xb6lfNUCdBykWkFbGcK+u5eUBP
-         sSBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXMxsP1Y5gUDTlsHBxpnU7EAWe7fuWpOWvpcBIQno2XMHqfbjTjruiDKDluynPlAvRlncesty2cLto1S0YDaOFe9MKzfqWZZn0OcMdPpMZk0ePP9dSMgX0uup9Lkj3kNwR451E2
-X-Gm-Message-State: AOJu0YyR/L7GprCgrB764m6gsEVGuJC6kMCfqHciBGVsqtfrRur6itAO
-	z2cZwEdfe63dghP4YfRJxMpht+2xMeACoryd9xw/d24AWbmGv8YBcN96JP5JnIzFzt5f0qDfTDe
-	8WiJN6ygcU6eKpjij5rvIqCLKVx8=
-X-Google-Smtp-Source: AGHT+IGailb4OIrLvE1WX5ySFLMib5+ATyLrDLu/T3dUqo47Kuy3gf5yns9q1SM68Rb/Rmse/NvV8cluWIWA6/2sJv0=
-X-Received: by 2002:a17:906:c20f:b0:a45:a9c2:85d7 with SMTP id
- d15-20020a170906c20f00b00a45a9c285d7mr3372797ejz.44.1709726229206; Wed, 06
- Mar 2024 03:57:09 -0800 (PST)
+	s=arc-20240116; t=1709726428; c=relaxed/simple;
+	bh=UlT76hoWI/+CWtKU73Zz9E+7JQ1mESXPZqU9NcgzHsI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=oi1zIsrV2Cm7QdnbD4g8/Yw22IcGRq9vw6aB0w5HKKB5mDIXBbISX6PvlHdZqaFK893x3OtYs4Y3I/HQZtQ3vHZWzi+ShsHxomJ0ONmiNn81a/n+q8PE1NYne13vKaJ/PLUlqlIPYBG7stGgYxKfDyjeLwjx8XbQSv6GGd0vNSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jOnwqT5L; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5E778C43394;
+	Wed,  6 Mar 2024 12:00:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709726427;
+	bh=UlT76hoWI/+CWtKU73Zz9E+7JQ1mESXPZqU9NcgzHsI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jOnwqT5LUyu6p3D+KTyuZ0VuTCdLGSl3ybDRgaUsvhTRe+Rlt60mcow47p/Vf/7ZM
+	 huT0AgX8oijp8GX9olmNOtQMGLeOpVPw8nrJngqJe2nRslAImElAn5OH90aOpqwkoA
+	 Dh1Ps+Mpjl9ckhkJ63Rv70HjMfyPTGa+H0hQ0HEKegI2zMVXgZMEXY8X+7VW28mpAA
+	 Lieomfl1Q3J+Nxb7Ean9BvJto7knV7IUF0b/nFbb4OBXTO+NtOCYYgAPPZOSx9SWzK
+	 mIr4yJf2lDvpU92GN8FcVHiUw8d6ocU29mBzb4lD8RJvSD1lazPfV2Ew3EiA9hIlxv
+	 639usfhIfDN7Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 46C64D84BDB;
+	Wed,  6 Mar 2024 12:00:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240306095430.1782163-1-Ilia.Gavrilov@infotecs.ru> <095ce1d0f2cd6771b30ab1d73ee6aa8e8460c7c8.camel@redhat.com>
-In-Reply-To: <095ce1d0f2cd6771b30ab1d73ee6aa8e8460c7c8.camel@redhat.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 6 Mar 2024 19:56:32 +0800
-Message-ID: <CAL+tcoBSkBG0SDnjDOzjqzpSFphrE-_Qyw_DcdcebHcRCU3xgw@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: fix incorrect parameter validation in the
- do_tcp_getsockopt() function
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>, Eric Dumazet <edumazet@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH V2] net/rds: fix WARNING in rds_conn_connect_if_down
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170972642728.4677.2906308095353738542.git-patchwork-notify@kernel.org>
+Date: Wed, 06 Mar 2024 12:00:27 +0000
+References: <tencent_AFA7C146CBD2DFC65989A8EEDAAED20CB106@qq.com>
+In-Reply-To: <tencent_AFA7C146CBD2DFC65989A8EEDAAED20CB106@qq.com>
+To: Edward Adam Davis <eadavis@qq.com>
+Cc: horms@kernel.org, allison.henderson@oracle.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ rds-devel@oss.oracle.com, santosh.shilimkar@oracle.com,
+ syzbot+d4faee732755bba9838e@syzkaller.appspotmail.com,
+ syzkaller-bugs@googlegroups.com
 
-Hello Paolo,
+Hello:
 
-On Wed, Mar 6, 2024 at 7:36=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On Wed, 2024-03-06 at 09:57 +0000, Gavrilov Ilia wrote:
-> > The 'len' variable can't be negative because all 'min_t' parameters
-> > cast to unsigned int, and then the minimum one is chosen.
->
-> The above is incorrect, as the 'len' variable is a signed integer
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-The 'len' variable should be converted to the non-negative value as
-this sentence:
+On Tue,  5 Mar 2024 08:13:08 +0800 you wrote:
+> If connection isn't established yet, get_mr() will fail, trigger connection after
+> get_mr().
+> 
+> Fixes: 584a8279a44a ("RDS: RDMA: return appropriate error on rdma map failures")
+> Reported-and-tested-by: syzbot+d4faee732755bba9838e@syzkaller.appspotmail.com
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> 
+> [...]
 
-len =3D min_t(unsigned int, len, sizeof(int));
+Here is the summary with links:
+  - [V2] net/rds: fix WARNING in rds_conn_connect_if_down
+    https://git.kernel.org/netdev/net/c/c055fc00c07b
 
-See the comments of min_t(): return minimum of two values, using the
-specified type.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-After executing the above code, it doesn't make sense to test if 'len
-< 0', I think.
 
-Thanks,
-Jason
-
->
->
-> The same applies to the following patches.
->
-> Cheers,
->
-> Paolo
->
->
 
