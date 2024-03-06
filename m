@@ -1,169 +1,268 @@
-Return-Path: <netdev+bounces-77783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04150872FE6
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:40:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 336F0873020
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:59:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F1AB1F214D1
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 07:40:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EC461F213B6
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 07:59:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 348EA5CDD7;
-	Wed,  6 Mar 2024 07:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297E55CDF1;
+	Wed,  6 Mar 2024 07:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y6oobY5C"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nAXrGGdB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691EE5C908
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 07:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934945CDDC
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 07:59:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709710826; cv=none; b=ssOHCSefwpAZafhr9JZGk/yYbv75HqRR/uB1FntLpy5mt3rLpkA0xjcHAHl4fxQg2/akJ8e5nqBl/ROgaj67tZwjWfSPcGxGKXlPSl7FhjTM9A0ugeOwiC1YRAf7uoCI7LyUPfAXHA/cTkqnX1Tu4tFjd4VBmJCTWpSYQ+FJTKc=
+	t=1709711944; cv=none; b=W2i192IknteQwh02lLQJCw3Bsq0MLwrFf+QxIvA6iOllXMfhExCxVpwr/FM3q7Da/jv9CMDjDiQemiRqs7E/N1NdAT9yPU3WWVblWOMvypwtNXgYAEq4y9MeOdmNkz6DbpkUz7DQW8UL1Uc4LZAgPLpKQySO8oh2T1whqjtA1xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709710826; c=relaxed/simple;
-	bh=QVLq+Gm+V9t85A12vsREyIHEMnBHst4n+Xq+IcVdUSw=;
+	s=arc-20240116; t=1709711944; c=relaxed/simple;
+	bh=4nTzqRh2Da9+8jGOqLVDfEZtt/wUSEj0nyjdCZP2Ywo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SV11mYt1E11IOkDk7/cAW5voiNCnW8NgGI75T3darKNloaGunG0Nyofjo12IvX7vkyMfn5ZG81lcqt2Ff8Cz6Tfc+rL9aO3kZRTG2kWky+Og6IIrO+ZQozqO8BTJJJPKx1KjDyHZc/xuBnp1A9TieYJyHTOk/19EMVWThdp8FPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Y6oobY5C; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a45aa7cb2b3so178995466b.3
-        for <netdev@vger.kernel.org>; Tue, 05 Mar 2024 23:40:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709710822; x=1710315622; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jekXDxYErb4VAUlKgbKLA8WJ/FN7SJA3Qr5o92TwKV0=;
-        b=Y6oobY5C0ss4Rs1udW3g02p1h+oEQznmrCi9eZaafVkYBeU2lRWCOi94ZD3liurZBn
-         ZV1TU9PIRXjvquyMb6/zyYsDknGIq++oYywPKARfpR5JJSMnDc8eAwkWfqyK3f6MIQoU
-         /UVXxfCXt/2XIpHqJmr/YryB7nJYrYn+WX1x0sKCWntUq6xK92/MGmbwhHX2MjqK6uJd
-         OFHaUZKQ/7faQlI94PDzoVQUIPHmIDlx0gp2rJfgLJcOJn+hHX6CrpYURQ21UeCVN6P0
-         vybP5MHAAe7Egjs/a2xxJAWTrzrGsyHDiWJpEmGfU+rY9KJfeLyfF++eAob2PkJC6v1m
-         LfjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709710822; x=1710315622;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jekXDxYErb4VAUlKgbKLA8WJ/FN7SJA3Qr5o92TwKV0=;
-        b=SEuekH19bsegsr9/XPeP4CfrYRM0QnBe+wOM1goyCryhXhCs3sMTbbveaDVvaV1l92
-         qVn/fTz1OEoLwi2+f5/p/tCbM2zs7+F9x5fWRYJfhhH5E43sSCGMJ9XaborCAerENLVo
-         nww4go+bVGgFvnr7oFwA/clXXTWrcMqfgKPSXnzY1dlrLYAIWO/N8H1FvSQwj9lZwH5Q
-         U9pqakA4HCOOQcctp3jdO6v6ooH2488AI0GuI5oqGrLPYYGOdkOzoDeA8WQ7zdKcEepm
-         bscVpV6MHI9qrCaSe2gyId4fjxSTCZdBNUl3c0UKfJ7Bw9g8e2tJ85F3EkyFdv06d6Vs
-         lMgw==
-X-Gm-Message-State: AOJu0YxDrd8S6uDCMCMRYdd/RPwG4iZT5Hs+HiP27RCUyqTBcFFb7VQO
-	C91Ro45wpDOJxAMvbV+fbH5g0RzDkGsnEXt83n+bMRyF866eZE4W+kGy2nytou0=
-X-Google-Smtp-Source: AGHT+IGbD+uuef3gNCsWrUl/QdPG7+grersJWGsXsyHYWEYG+GHosge7HenHOwsMo7xzaTv6SJgJFg==
-X-Received: by 2002:a17:906:fb0c:b0:a45:b2bc:3157 with SMTP id lz12-20020a170906fb0c00b00a45b2bc3157mr1457485ejb.23.1709710822618;
-        Tue, 05 Mar 2024 23:40:22 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.222.97])
-        by smtp.gmail.com with ESMTPSA id gq13-20020a170906e24d00b00a45621ded4bsm2851488ejb.146.2024.03.05.23.40.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Mar 2024 23:40:22 -0800 (PST)
-Message-ID: <68e3e9fd-a099-4e5c-afd7-cad8f4170590@linaro.org>
-Date: Wed, 6 Mar 2024 08:40:21 +0100
+	 In-Reply-To:Content-Type; b=CMIs8xbqFRYuVd6g+x5+xAG6245VkF5971Iqvq5yF2NkM6c8NsbBANLGXr2MIJ/RIqw8ERqsoritkX62L65PCxh5OaBxHbObYLe5PZEduosd5dueqtVL1q+D13E+/HQR22hiJpapPjay456ZSY+zkzLe+Bmjc4PA0tnlOokexKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nAXrGGdB; arc=none smtp.client-ip=95.215.58.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <7aaeee73-4197-4ea8-834a-2265ef078bab@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1709711938;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rMdKN/veBvBZl77DmaY151Schj3OAuh7OxlNW/BLu6g=;
+	b=nAXrGGdBbQdUdnkNDA0RBfdaM0nkRv2H/UfctRgaGjhMARmkjoODK6z6T5Ek4R6mb31PiN
+	nMhroCz5VA9f7LYxd6Tai65xSjh6m3soj7X7caiPOtItHpArT3l/ERx4PIrLWrqVqBCp4u
+	QV2T2p7Uwhiio13pBruGdoN4eu9koBU=
+Date: Tue, 5 Mar 2024 23:58:47 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 6/9] dt-bindings: net: hisi-femac: add binding
- for Hi3798MV200 FEMAC core
+Subject: Re: [PATCH net-next v12 14/15] p4tc: add set of P4TC table kfuncs
 Content-Language: en-US
-To: forbidden405@outlook.com, Yisen Zhuang <yisen.zhuang@huawei.com>,
- Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org
-References: <20240305-net-v8-0-166aaeea2107@outlook.com>
- <20240305-net-v8-6-166aaeea2107@outlook.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240305-net-v8-6-166aaeea2107@outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: deb.chatterjee@intel.com, anjali.singhai@intel.com,
+ namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com,
+ Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, tomasz.osinski@intel.com,
+ jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com,
+ horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, daniel@iogearbox.net,
+ victor@mojatatu.com, pctammela@mojatatu.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240225165447.156954-1-jhs@mojatatu.com>
+ <20240225165447.156954-15-jhs@mojatatu.com>
+ <9eff9a51-a945-48f6-9d14-a484b7c0d04c@linux.dev>
+ <CAM0EoMniOaKn4W_WN9rmQZ1JY3qCugn34mmqCy9UdCTAj_tuTQ@mail.gmail.com>
+ <f88b5f65-957e-4b5d-8959-d16e79372658@linux.dev>
+ <CAM0EoMk=igKT5ZEwcfdQqP6O3u8tO7VOpkNsWE1b92ia2eZVpw@mail.gmail.com>
+ <496c78b7-4e16-42eb-a2f4-99472cd764fd@linux.dev>
+ <CAM0EoMmB0s5WzZ-CgGWBF9YdaWi7O0tHEj+C8zuryGhKz7+FpA@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAM0EoMmB0s5WzZ-CgGWBF9YdaWi7O0tHEj+C8zuryGhKz7+FpA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 05/03/2024 08:51, Yang Xiwen via B4 Relay wrote:
-> From: Yang Xiwen <forbidden405@outlook.com>
+On 3/5/24 4:30 AM, Jamal Hadi Salim wrote:
+> On Tue, Mar 5, 2024 at 2:40 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>
+>> On 3/3/24 9:20 AM, Jamal Hadi Salim wrote:
+>>
+>>>>>>> +#define P4TC_MAX_PARAM_DATA_SIZE 124
+>>>>>>> +
+>>>>>>> +struct p4tc_table_entry_act_bpf {
+>>>>>>> +     u32 act_id;
+>>>>>>> +     u32 hit:1,
+>>>>>>> +         is_default_miss_act:1,
+>>>>>>> +         is_default_hit_act:1;
+>>>>>>> +     u8 params[P4TC_MAX_PARAM_DATA_SIZE];
+>>>>>>> +} __packed;
+>>>>>>> +
+>>>>>>> +struct p4tc_table_entry_act_bpf_kern {
+>>>>>>> +     struct rcu_head rcu;
+>>>>>>> +     struct p4tc_table_entry_act_bpf act_bpf;
+>>>>>>> +};
+>>>>>>> +
+>>>>>>>      struct tcf_p4act {
+>>>>>>>          struct tc_action common;
+>>>>>>>          /* Params IDR reference passed during runtime */
+>>>>>>>          struct tcf_p4act_params __rcu *params;
+>>>>>>> +     struct p4tc_table_entry_act_bpf_kern __rcu *act_bpf;
+>>>>>>>          u32 p_id;
+>>>>>>>          u32 act_id;
+>>>>>>>          struct list_head node;
+>>>>>>> @@ -24,4 +40,39 @@ struct tcf_p4act {
+>>>>>>>
+>>>>>>>      #define to_p4act(a) ((struct tcf_p4act *)a)
+>>>>>>>
+>>>>>>> +static inline struct p4tc_table_entry_act_bpf *
+>>>>>>> +p4tc_table_entry_act_bpf(struct tc_action *action)
+>>>>>>> +{
+>>>>>>> +     struct p4tc_table_entry_act_bpf_kern *act_bpf;
+>>>>>>> +     struct tcf_p4act *p4act = to_p4act(action);
+>>>>>>> +
+>>>>>>> +     act_bpf = rcu_dereference(p4act->act_bpf);
+>>>>>>> +
+>>>>>>> +     return &act_bpf->act_bpf;
+>>>>>>> +}
+>>>>>>> +
+>>>>>>> +static inline int
+>>>>>>> +p4tc_table_entry_act_bpf_change_flags(struct tc_action *action, u32 hit,
+>>>>>>> +                                   u32 dflt_miss, u32 dflt_hit)
+>>>>>>> +{
+>>>>>>> +     struct p4tc_table_entry_act_bpf_kern *act_bpf, *act_bpf_old;
+>>>>>>> +     struct tcf_p4act *p4act = to_p4act(action);
+>>>>>>> +
+>>>>>>> +     act_bpf = kzalloc(sizeof(*act_bpf), GFP_KERNEL);
+>>>>>>
+>>>>>>
+>>>>>> [ ... ]
+>>
+>>
+>>>>>>> +static int
+>>>>>>> +__bpf_p4tc_entry_create(struct net *net,
+>>>>>>> +                     struct p4tc_table_entry_create_bpf_params *params,
+>>>>>>> +                     void *key, const u32 key__sz,
+>>>>>>> +                     struct p4tc_table_entry_act_bpf *act_bpf)
+>>>>>>> +{
+>>>>>>> +     struct p4tc_table_entry_key *entry_key = key;
+>>>>>>> +     struct p4tc_pipeline *pipeline;
+>>>>>>> +     struct p4tc_table *table;
+>>>>>>> +
+>>>>>>> +     if (!params || !key)
+>>>>>>> +             return -EINVAL;
+>>>>>>> +     if (key__sz != P4TC_ENTRY_KEY_SZ_BYTES(entry_key->keysz))
+>>>>>>> +             return -EINVAL;
+>>>>>>> +
+>>>>>>> +     pipeline = p4tc_pipeline_find_byid(net, params->pipeid);
+>>>>>>> +     if (!pipeline)
+>>>>>>> +             return -ENOENT;
+>>>>>>> +
+>>>>>>> +     table = p4tc_tbl_cache_lookup(net, params->pipeid, params->tblid);
+>>>>>>> +     if (!table)
+>>>>>>> +             return -ENOENT;
+>>>>>>> +
+>>>>>>> +     if (entry_key->keysz != table->tbl_keysz)
+>>>>>>> +             return -EINVAL;
+>>>>>>> +
+>>>>>>> +     return p4tc_table_entry_create_bpf(pipeline, table, entry_key, act_bpf,
+>>>>>>> +                                        params->profile_id);
+>>>>>>
+>>>>>> My understanding is this kfunc will allocate a "struct
+>>>>>> p4tc_table_entry_act_bpf_kern" object. If the bpf_p4tc_entry_delete() kfunc is
+>>>>>> never called and the bpf prog is unloaded, how the act_bpf object will be
+>>>>>> cleaned up?
+>>>>>>
+>>>>>
+>>>>> The TC code takes care of this. Unloading the bpf prog does not affect
+>>>>> the deletion, it is the TC control side that will take care of it. If
+>>>>> we delete the pipeline otoh then not just this entry but all entries
+>>>>> will be flushed.
+>>>>
+>>>> It looks like the "struct p4tc_table_entry_act_bpf_kern" object is allocated by
+>>>> the bpf prog through kfunc and will only be useful for the bpf prog but not
+>>>> other parts of the kernel. However, if the bpf prog is unloaded, these bpf
+>>>> specific objects will be left over in the kernel until the tc pipeline (where
+>>>> the act_bpf_kern object resided) is gone.
+>>>>
+>>>> It is the expectation on bpf prog (not only tc/xdp bpf prog) about resources
+>>>> clean up that these bpf objects will be gone after unloading the bpf prog and
+>>>> unpinning its bpf map.
+>>>>
+>>>
+>>> The table (residing on the TC side) could be shared by multiple bpf
+>>> programs. Entries are allocated on the TC side of the fence.
+>>
+>>
+>>> IOW, the memory is not owned by the bpf prog but rather by pipeline.
+>>
+>> The struct p4tc_table_entry_act_(bpf_kern) object is allocated by
+>> bpf_p4tc_entry_create() kfunc and only bpf prog can use it, no?
+>> afaict, this is bpf objects.
+>>
 > 
-> HiSilicon FEMAC core is also found on Hi3798MV200 SoC. Document it in
-> binding.
+> Bear with me because i am not sure i am following.
+> When we looked at conntrack as guidance we noticed they do things
+> slightly differently. They have an allocate kfunc and an insert
+> function. If you have alloc then you need a complimentary release. The
+> existence of the release in conntrack, correct me if i am wrong, seems
+> to be based on the need to free the object if an insert fails. In our
+> case the insert does first allocate then inserts all in one operation.
+> If either fails it's not the concern of the bpf side to worry about
+> it. IOW, i see the ownership as belonging to the P4TC side  (it is
+> both allocated, updated and freed by that side). Likely i am missing
+> something..
+
+It is not the concern about the kfuncs may leak object.
+
+I think my question was, who can use the act_bpf_kern object when all tc bpf 
+prog is unloaded? If no one can use it, it should as well be cleaned up when the 
+bpf prog is unloaded.
+
+or the kernel p4 pipeline can use the act_bpf_kern object even when there is no 
+bpf prog loaded?
+
+
 > 
-> Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
-> ---
->  Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml | 1 +
->  1 file changed, 1 insertion(+)
+>>> We do have a "whodunnit" field, i.e we keep track of which entity
+>>> added an entry and we are capable of deleting all entries when we
+>>> detect a bpf program being deleted (this would be via deleting the tc
+>>> filter). But my thinking is we should make that a policy decision as
+>>> opposed to something which is default.
+>>
+>> afaik, this policy decision or cleanup upon tc filter delete has not been done
+>> yet. I will leave it to you to figure out how to track what was allocated by a
+>> particular bpf prog on the TC side. It is not immediately clear to me and I
+>> probably won't have a good idea either.
+>>
 > 
-> diff --git a/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml b/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
-> index ff6b090ed34e..4f51c5ec90b3 100644
-> --- a/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
-> +++ b/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
-> @@ -17,6 +17,7 @@ properties:
->      items:
->        - enum:
->            - hisilicon,hi3516cv300-femac
-> +          - hisilicon,hi3798mv200-femac
+> I am looking at the conntrack code and i dont see how they release
+> entries from the cotrack table when the bpf prog goes away.
+> 
+>> Just to be clear that it is almost certain to be unacceptable to extend and make
+>> changes on the bpf side in the future to handle specific resource
+>> cleanup/tracking/sharing of the bpf objects allocated by these kfuncs. This
+>> problem has already been solved and works for different bpf program types,
+>> tc/cgroup/tracing...etc. Adding a refcnted bpf prog pointer alongside the
+>> act_bpf_kern object will be a non-starter.
+>>
+>> I think multiple people have already commented that these kfuncs
+>> (create/update/delete...) resemble the existing bpf map. If these kfuncs are
+>> replaced with the bpf map ops, this bpf resource management has already been
+>> handled and will be consistent with other bpf program types.
+>>
+>> I expect the act_bpf_kern object probably will grow in size over time also.
+>> Considering this new p4 pipeline and table is residing on the TC side, I will
+>> leave it up to others to decide if it is acceptable to have some unused bpf
+>> objects left attached there.
+> 
+> There should be no dangling things at all.
+> Probably not a very good example, but this would be analogous to
+> pinning a map which is shared by many bpf progs. Deleting one or all
+> the bpf progs doesnt delete the contents of the bpf map, you have to
+> explicitly remove it. Deleting the pipeline will be equivalent to
+> deleting the map. IOW, resource cleanup is tied to the pipeline..
 
-Your driver suggests this is compatible with hi3516cv300 so make it
-compatible.
+bpf is also used by many subsystems (e.g. tracing/cgroup/...). The bpf users 
+have a common expectation on how bpf resources will be cleaned up when writing 
+bpf for different subsystems, i.e. map/link/pinned-file. Thus, p4 pipeline is 
+not the same as a pinned bpf map here. The p4-tc bpf user cannot depend on the 
+common bpf ecosystem to cleanup all resources.
 
-Best regards,
-Krzysztof
-
+It is going back to how link/fd and the map ops discussion by others in the 
+earlier revisions which we probably don't want to redo here. I think I have been 
+making enough noise such that we don't have to discuss potential future changes 
+about how to release this resources when the bpf prog is unloaded.
 
