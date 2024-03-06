@@ -1,94 +1,108 @@
-Return-Path: <netdev+bounces-77801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A3558730AD
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:27:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 275438730BF
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:32:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0683A28556D
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:27:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC8F11F272EC
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:32:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4315D48F;
-	Wed,  6 Mar 2024 08:27:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC34D5CDF1;
+	Wed,  6 Mar 2024 08:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GUNn94dG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A7F5CDF6
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 08:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35ED45B1F2
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 08:31:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709713626; cv=none; b=lSxixzynPmdXmZgfyyYrLdXyW4Uz14Hzy2TzhcsmZet25cPr/1760Czh36Ml54pkHWwGGqgDmu01d3Dl57cQJiNqy0AwRmXezIBkfIrjyHKmZLjcaPhcLWLLNOFDIXECxP1fqhGm8092CbEsVzY+0TogVUjHj3RZ5lL+9JcRtME=
+	t=1709713898; cv=none; b=W8QiIgMweObJrKQy0nSuci57LcffJHiFXXN9ExE9+K7pGxo3T/Oj6VQhxoMv4ZZFfqn2rv66j8dYJaXsM7BXCxBEKMOoXruVQbLRIxFdxSXAtXiMQnbBgIvhhdriFR7UZp2VwQ/BGEPIuavKgFEofn7+CW1mQrMoD8lnf7Dg+6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709713626; c=relaxed/simple;
-	bh=JlyL6DFG9I9DS9LmJAlSk/HEzmBIQT/HDz8liPmMN0E=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=Q9kpVUI+tmWH8rUWEMw5jaTGukwDmXZn1HodmhW21f32xLp8nfd+IcR5wwazfoH3CjIb+YDYalhLGLflZDaadxANbS3/qIWvxGuttf3Z81AlAdlPaPTs/YtSO84u6Vocu7Tj+NElhwnnaTtIIJ0HeWOOm6vqcTO1+V+m/xTJVcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-365810221f3so57257315ab.2
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 00:27:04 -0800 (PST)
+	s=arc-20240116; t=1709713898; c=relaxed/simple;
+	bh=jyJfCp5OfDLV0vJjPYvgRyGpn9ZGCSUjJg2Lp5gPxbI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SIVuoY00yOaJvnzk3L7jLRrlNgGMxlg6qcGFqKdfFIwH0nOaxTXN7rID9wI3zyFOsNgbf6zpP0UJCu17Gl0TncjjQpiQjP3WcFJOg8jLBok3qO0s8JDElcHW6iUnrkgF13WyQ2SUxrljsOnyrdFV03eam5xcBJmy854RtojRwmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GUNn94dG; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-608c40666e0so62660137b3.2
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 00:31:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1709713896; x=1710318696; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jyJfCp5OfDLV0vJjPYvgRyGpn9ZGCSUjJg2Lp5gPxbI=;
+        b=GUNn94dGRxdMLZdNrtL+U0o1POZRJ8qfYxFDTmVLBLa44TywyCQrj3mvf2vSdb7fUm
+         eZiufHlr0Wsk3K2iAgXsxLBl0XxrtHj9bb5A4LAXVGFoy6GwDt8FHopZc4XoEQ9gdYQf
+         jl/0+90/BMPriCrvUBP+i1SYsuV3fVb9VhUP5xyQbwtwNjJTo7dNBp8g4y5t73ehhKAJ
+         W3skDC/KFTfRiCbqlQZBeuzuvXWkWIWN8VNheZWfwzzY7D4hzAJxST/Vt1R9eD9soFEa
+         FNqoqGNyqUlxMdgstwEI1a8Cx0zTI0UcKO0zdNV2RLgenz33RAF+KgaW+zyZKqvWhVtM
+         RtpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709713624; x=1710318424;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wFky0MkM2gx1sgYAsTUNFhAzVnvGAsKVinHJIY9WMw8=;
-        b=ouSL6cSvrgVZ2yzzU9hhfafplJM4w2jSSAAv2pvoU2lert9YhxEUMorMQ/q+XQYY1u
-         isjwRvobCMuYNeJoRrPUdVtL54kIgqBPFGUyH49lfiQSsmI2HZ9cWLmjybdb3MjBseYW
-         EhQ7dMLtoNKS59nRuzHerPkbB3zDU3aHvcw/qkSALkz4mbWem+bLq2+JzBpH2hLDGqu+
-         mSsKqkGEvrDuMBMfWkPjCtydQO6/027YXKLzFt0S6TdqaWxMq3f6fUHtZnucPSbGqDdX
-         AvZ2UaZmuPxOEsHYRXUjADzRxD+Yxtvxu0+tE1HcqilLCpGwcI8SayQ25MQ+9r0/2Y4V
-         kphg==
-X-Forwarded-Encrypted: i=1; AJvYcCUPTI0E7AVZ6R6ON//9TtWd3jbyyBvNHk9Ix9udUefbKRpTrTB/0u4Olhc+B0U0Hq1weZol8Lnrx4ySz6+uX7iq3N9km/s8
-X-Gm-Message-State: AOJu0YzjPYTYNpaaeNiisP8oRAqXrMq05hzpI+tfvyV3fv6tN8ac58c9
-	OBORqgQCvk1bCdEkbVmbBIWoTnQ1Eu17UaWHdm++lwPbMgprNn3Sj8uxwX0bDKAPJtK608rcoV+
-	0HurY7sjcZn8oR5k9Ink4WLZqTeYihxLaFY5f738GKXht/2me1w4luYk=
-X-Google-Smtp-Source: AGHT+IHgyylix9GwtwXYsf7Xq6RBrR4Tb9F14qEFn1iDWpp1TrBRT1ITVHSPRlY+6AGoCx2u/CQ+yQp2J7M/jn2BnqkSxQGx1TAG
+        d=1e100.net; s=20230601; t=1709713896; x=1710318696;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jyJfCp5OfDLV0vJjPYvgRyGpn9ZGCSUjJg2Lp5gPxbI=;
+        b=MRGbp30ILTw8Sqn9z0SnfNKslloqfxaWH7Fp+LaW7FA7HD7U29K+AH1QiepSW7XwZQ
+         5gD9c7w5nWubJX6PqgUy+6aFtZ8ubNqnwKVmd/A6gxnCecM80leW/wEU+MGRvC5by31q
+         qdpkNMVnblNRPTbsI7uwG95OyvhzwwO5i7R9CSInRUgev7hYHmKkrmBEWwcGUych1wmB
+         TG22k3o3IT5cdjvMkVMtOcuR+OljW1657Cg2iYDUi3W/N2hk4Vt5qM5x9yGC+1baPahD
+         PJgBuHRilKLE+0XD+sXb+2HCAAxFoNiHRz7a9hLi1duVEkTv6y6gZ/QEKXmly+VMyCc4
+         Aq/w==
+X-Gm-Message-State: AOJu0YxC4AMDWfoj5eaA43ksrtYWTCFFtvw6PY5OYP2js8CyDrDMNnUx
+	ZGY+0eYSco3AtgpKG4SfvFiRq/5O2yXpbDMh/5oCyjNauOJ7U+QHkAGuQ9Xd/ajMLIXIbkfjzDD
+	5wY+T09PyK7OhuDakScr893gUhfA/id7laywhuA==
+X-Google-Smtp-Source: AGHT+IFe2cHdjC0zImLtE7dX7CjofAAtqRWjocUz6T7nhpqnCF+/HJ3jk1WHZkdRVj+sVVBs8P7hOIo9q8+hxeZwX9c=
+X-Received: by 2002:a81:ab4e:0:b0:609:356a:7b22 with SMTP id
+ d14-20020a81ab4e000000b00609356a7b22mr12125019ywk.22.1709713896313; Wed, 06
+ Mar 2024 00:31:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c8b:b0:365:1c10:9ce2 with SMTP id
- w11-20020a056e021c8b00b003651c109ce2mr882329ill.2.1709713624384; Wed, 06 Mar
- 2024 00:27:04 -0800 (PST)
-Date: Wed, 06 Mar 2024 00:27:04 -0800
-In-Reply-To: <000000000000a97e9f061287624c@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000003fde310612f9b943@google.com>
-Subject: Re: [syzbot] [net?] possible deadlock in team_port_change_check (2)
-From: syzbot <syzbot+3c47b5843403a45aef57@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, jiri@nvidia.com, 
-	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	liuhangbin@gmail.com, netdev@vger.kernel.org, nicolas.dichtel@6wind.com, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, xrivendell7@gmail.com
+References: <20240301221641.159542-1-paweldembicki@gmail.com> <20240301221641.159542-15-paweldembicki@gmail.com>
+In-Reply-To: <20240301221641.159542-15-paweldembicki@gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Wed, 6 Mar 2024 09:31:24 +0100
+Message-ID: <CACRpkdbUNtQqTADMmLn+RWHvxMakrVCpXtGShz-=2oiz0pLdCA@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 14/16] net: dsa: Define max num of bridges in
+ tag8021q implementation
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Vladimir Oltean <olteanv@gmail.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot has bisected this issue to:
+On Fri, Mar 1, 2024 at 11:18=E2=80=AFPM Pawel Dembicki <paweldembicki@gmail=
+.com> wrote:
 
-commit ec4ffd100ffb396eca13ebe7d18938ea80f399c3
-Author: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Date:   Mon Jan 8 09:41:02 2024 +0000
+> Max number of bridges in tag8021q implementation is strictly limited
+> by VBID size: 3 bits. But zero is reserved and only 7 values can be used.
+>
+> This patch adds define which describe maximum possible value.
+>
+> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 
-    Revert "net: rtnetlink: Enslave device before bringing it up"
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=163d5686180000
-start commit:   90d35da658da Linux 6.8-rc7
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=153d5686180000
-console output: https://syzkaller.appspot.com/x/log.txt?x=113d5686180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c11c5c676adb61f0
-dashboard link: https://syzkaller.appspot.com/bug?extid=3c47b5843403a45aef57
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=158ae1de180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=165f2732180000
-
-Reported-by: syzbot+3c47b5843403a45aef57@syzkaller.appspotmail.com
-Fixes: ec4ffd100ffb ("Revert "net: rtnetlink: Enslave device before bringing it up"")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Yours,
+Linus Walleij
 
