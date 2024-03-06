@@ -1,124 +1,169 @@
-Return-Path: <netdev+bounces-77988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EEF1873B30
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:52:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF817873B2A
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:51:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50AC01C21C30
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:52:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 688191F207C7
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:51:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C61135418;
-	Wed,  6 Mar 2024 15:51:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74FBE134CFA;
+	Wed,  6 Mar 2024 15:51:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I7Oueypm"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="KJwbupaz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0914E135415
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 15:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA9F5F875
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 15:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709740317; cv=none; b=Xh5UFN3Fx431CP32+T4mS65OcxjjTmofEdp9isAxYuX2QDrJN24tycshkz0XEvhNtSc0U8rvhBtzP5mvVfU6BCHMS/6VYEupQJrPSK3Kll1u0khc+pouCRELC03fMCkMoVE9xzzuKYwbSVsM0RExSLFGNElhk13wCzjeZOGr63c=
+	t=1709740287; cv=none; b=cQFt0rS58av5YTZmAmNccXhpebheYvRJRN9EO3IQgDNSBESR9YkXQaNNSDIcquMIfH/vRq+7cXrR7wjscnW+LMbCvy+iSpG3cTKQv39ndYvusj9YDo7BM5fz1d7Kykx0D4pWi0F9ZvlOBaWBXEztQbilOVfknxZ4XyUvtywPpPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709740317; c=relaxed/simple;
-	bh=FR0dKKQuF46zhdu8kuXkuJY++IVUQ4CHf0B59f9t5as=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=s6+8v7nSfGJfYtrVa8rBHkE2tPxX+o0ngzKNlTbzMKndeFbVdx4Ax1dw9O+2U5jVzq5vvYE3D+GWrWU2T3nS6nBQhjjYFqXBXSLcX359FO47OU2t2JSvciuO7j6TXsf7PTno2B21zX7GJQ/KS4++qdhRcwvIZ2sNFUDKkr/n05U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I7Oueypm; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6092bf785d7so21133677b3.0
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 07:51:55 -0800 (PST)
+	s=arc-20240116; t=1709740287; c=relaxed/simple;
+	bh=lT7DHS1+ZrIeoxIWf+5tmxvt7UaWZthd1lxaLMEZsVs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p3C9sLFoPM3GLpG96KNz8sjZi0MVukiR6yUZ0kmVRy+P2HQcVzSC5m5CbTng365/4CONahXhG7vic/UaCaD6KGqj6xAUbwsBuFbo3777/Fp1ZxQw3WMVWI1OVQ3S9R3dQk4mYdKmlEqD3aoOzqr5FxkpSWRp/wWapB5FK1912CM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=KJwbupaz; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a44628725e3so914424466b.0
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 07:51:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709740315; x=1710345115; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vjzeD8eTJa/7w1oHCjeATVvNohpTtFWC2/sFOcAke9o=;
-        b=I7OueypmLxfCiryUUNU0U7dOznVelFhYEevbvVGFEYzdn+17Uvs/3lOop4NQITlXrz
-         axFW/Wuyv2iIVVE5hZL0I+Ry+0dCp/b3s3ir9p4tHVI/x6Rm3uHJX3WUz/pUO3V9bFk4
-         Oy330L47SNBOrg/lERFH8asct29NAWfghIcVR0CTDT2Dd8ima7rLDns5XBualFGd4SxT
-         LYJ36NAQVqPQXu0qQyrufXhWhNzcSRt1rqipArqHyaI1f9OYA9t+wq4N93d63vuHS+b7
-         ppqFXQQXdOAzaehL4YtHWu3ww3w4NgRG1tRehqpvxuYjbmkF+nJAparEn/5cyn1ARv3z
-         dWTA==
+        d=openvpn.net; s=google; t=1709740284; x=1710345084; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=1mCPWLvgATFDRDHDGKQS0sRiuISFFBwMzXPj3W81CSo=;
+        b=KJwbupazdh0Mf4NejlRMxLfTMjm/Hh5xcyAo/qAcoiN+EQdMKPkzQ0GxjP7PWnUozu
+         oD+N0tNeuj6o5tw5n8Tbc/3KtACr6nz3wzzML9YQd+gsxREEesgXYYBiz3Ja9JTthpgn
+         neNPhB8RvmnLImm6v3gC5abKyqYmYERVOvGGNZzEL/so6lREWdfzcc9eH3hR8UiVnQqf
+         TeKkdEJw422s/JvzYGynqdxLNwSM4XLkMc+msyCVmKEr9vry7SojQOiXraA2M37RyMI3
+         KYHqoSvoGH/cGLgQTWL0n7a69Oz2acnNLRgyZSid7zQxkD3sJe8doQoMNqQs9NF8vv/e
+         xRqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709740315; x=1710345115;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vjzeD8eTJa/7w1oHCjeATVvNohpTtFWC2/sFOcAke9o=;
-        b=GrHPZGTh1iNL95Myn1sbUp+Bo6gNoSpCZ7Vln4FpkIc3aHCVPhcoNc8csUtjW3MwlC
-         uyTlX+W+VA9fsC9eZR0ieTA6byq1hPCSq3fG28573bD+aVHmaJ8K8a2jgK3y4uBx4RY+
-         oYN/SJZY3aZHHfsqtZG4rWuc89GdkqncxoQSbWN6vIuAWyDaGo23tpshz345bQTJeDZd
-         kxKFqhKyFq1VugFPJRr3ZsZ2AIJ2V0dbTvahldkUSnvj2+l+6smkVuqTEsCe/tw8X1Ew
-         Eufg72CfgEbFbxDli2TFwbMGal8iX+3yVaya48F6hb9yF+EmhedRTX23tWc2iVEcIKQ0
-         lp3A==
-X-Forwarded-Encrypted: i=1; AJvYcCUhAYHF1RfHOf/aw7q14yyic93SRLk76/RBbQbdMhlSkeF/TzZLGbnrrfMLB9dmfI/C38wAJ36S0eA7P9WaLsxB4P+of8BB
-X-Gm-Message-State: AOJu0Yx2tKYiCZloZbJqqvmxCeydbhrRAdvkoUk1oxmtoV419+/xa2sT
-	4Zjj2Yf40IUY2XeinvYE4CxuW3e+JPMrmIoUOrszEuucGtYSYVdL37/5lS34KI+vJfG88MznuSL
-	2Qxf925kU6g==
-X-Google-Smtp-Source: AGHT+IFbbVeZBU9i2bvMdywE7dyIxh4QtpE24FcKCICPMQU9n4qxSyHZp7Objde1kxm3FtnITrKabZv+h53oCw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:705:b0:dcd:b431:7f5b with SMTP
- id k5-20020a056902070500b00dcdb4317f5bmr3828933ybt.0.1709740315110; Wed, 06
- Mar 2024 07:51:55 -0800 (PST)
-Date: Wed,  6 Mar 2024 15:51:44 +0000
-In-Reply-To: <20240306155144.870421-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1709740284; x=1710345084;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1mCPWLvgATFDRDHDGKQS0sRiuISFFBwMzXPj3W81CSo=;
+        b=m6/wrK6RLEiGdoB9tGvzIvrIBIDmqy0bg2P29H9SaUPi6z9QqPXe1UF2kCq1XuyLAR
+         WZeo0EbL5fQIv1IvtxYch1ITp4rO4E7hK33nQYBUWoQvZHNBUYhoXLznrRiXs0Qj0JpZ
+         LX4msgjIqTEhwEbqeeNCtLXS5zGe5G/VBPI4MMi7uyEcgA783WjFEtTNlgH1kVuxomFY
+         vzueI2Hp9y69C5+vlcA0q4BDTZKj000llI9mnTLIkqsCzpmafCyWXNPbX4Iw9K8nDf79
+         DeEtn2IPQBk5NIS8Io+vRFW2rPY22/7rBQax2yQNvizQMI/bMX3Pi+iu2YpRwZlejLtE
+         MqQw==
+X-Gm-Message-State: AOJu0YzQ6w2E4+ftm/BY8kzK9I6h/Z5fe60kPbBPzG+D+AkHvpT2T90h
+	4jno5ICzk6xLTHQ9Ei86x5gTzV8b2y/Kp8DTKsLzKAVwZmbkWJH6FfCbVd+sIV0=
+X-Google-Smtp-Source: AGHT+IHkTz80kULdeWVJJnjdPNr1mHVv1VLIKjwkvAUJUgLN5pnCyre7oc3JpRs2+nNV31R1uLPKJA==
+X-Received: by 2002:a17:906:b00b:b0:a44:c583:dfc8 with SMTP id v11-20020a170906b00b00b00a44c583dfc8mr9233866ejy.48.1709740283742;
+        Wed, 06 Mar 2024 07:51:23 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:0:2746:4b81:593e:203b? ([2001:67c:2fbc:0:2746:4b81:593e:203b])
+        by smtp.gmail.com with ESMTPSA id jp19-20020a170906f75300b00a4573defc37sm2978222ejb.44.2024.03.06.07.51.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Mar 2024 07:51:23 -0800 (PST)
+Message-ID: <f0dbd495-5d27-46e5-a615-3e6bdcd0948b@openvpn.net>
+Date: Wed, 6 Mar 2024 16:51:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240306155144.870421-1-edumazet@google.com>
-X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240306155144.870421-5-edumazet@google.com>
-Subject: [PATCH net-next 4/4] ipv6: remove RTNL protection from inet6_dump_addr()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 02/22] net: introduce OpenVPN Data Channel
+ Offload (ovpn)
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>
+References: <20240304150914.11444-1-antonio@openvpn.net>
+ <20240304150914.11444-3-antonio@openvpn.net>
+ <1f63398d-7015-45b2-b7de-c6731a409a69@lunn.ch>
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <1f63398d-7015-45b2-b7de-c6731a409a69@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-We can now remove RTNL acquisition while running
-inet6_dump_addr(), inet6_dump_ifmcaddr()
-and inet6_dump_ifacaddr().
+On 04/03/2024 21:47, Andrew Lunn wrote:
+>> +		IN_DEV_CONF_SET(dev_v4, SEND_REDIRECTS, false);
+>> +		IPV4_DEVCONF_ALL(dev_net(dev), SEND_REDIRECTS) = false;
+> 
+> Wireguard has the same. How is Linux getting confused? Maybe we should
+> consider fixing this properly?
+> 
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv6/addrconf.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+I wanted to reply to this point individually.
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 82ba44a23bd7434e93e8a847f38cc72d8ce228a8..b72bdbb850a86a45b4ba7c83df2772f7214891e2 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -7459,15 +7459,18 @@ int __init addrconf_init(void)
- 		goto errout;
- 	err = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETADDR,
- 				   inet6_rtm_getaddr, inet6_dump_ifaddr,
--				   RTNL_FLAG_DOIT_UNLOCKED);
-+				   RTNL_FLAG_DOIT_UNLOCKED |
-+				   RTNL_FLAG_DUMP_UNLOCKED);
- 	if (err < 0)
- 		goto errout;
- 	err = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETMULTICAST,
--				   NULL, inet6_dump_ifmcaddr, 0);
-+				   NULL, inet6_dump_ifmcaddr,
-+				   RTNL_FLAG_DUMP_UNLOCKED);
- 	if (err < 0)
- 		goto errout;
- 	err = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETANYCAST,
--				   NULL, inet6_dump_ifacaddr, 0);
-+				   NULL, inet6_dump_ifacaddr,
-+				   RTNL_FLAG_DUMP_UNLOCKED);
- 	if (err < 0)
- 		goto errout;
- 	err = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETNETCONF,
+The reason for requiring this setting lies in the OpenVPN server acting 
+as relay point for hosts in the same subnet.
+
+Example: given the a.b.c.0/24 IP network, you will have .2 that in order 
+to talk to .3 must have its traffic relayed by .1 (the server).
+
+When the kernel sees this traffic it will send the ICMP redirects, 
+because it believes that .2 should directly talk to .3 without passing 
+through .1.
+
+It of course makes sense in a normal network with a classic broadcast 
+domain, but this is not the case in a VPN implemented as a start topology.
+
+Does it make sense?
+
+The only way I see to fix this globally is to have an extra flag in the 
+netdevice signaling this peculiarity and thus disabling ICMP redirects 
+automatically.
+
+Regards,
+
+
 -- 
-2.44.0.278.ge034bb2e1d-goog
-
+Antonio Quartulli
+OpenVPN Inc.
 
