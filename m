@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-78006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAF5E873B80
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:03:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AF62873B83
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:03:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90C1E1F27274
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:03:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8761A1F27323
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:03:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A4013DB9F;
-	Wed,  6 Mar 2024 16:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 749B21361C6;
+	Wed,  6 Mar 2024 16:01:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eIhtizzP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W1oUnGUy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF1713D31A
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 16:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA58913DBA8
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 16:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709740869; cv=none; b=nvnkTRyR83FHwrc/MwBZ4Ow9HmbZG4Z1A0U1II29Btrm2hH8wFv+Oj0DM8UZENrnWrw5Vt3rxwXp4eX7D0RXPFIcnSv3X9cQov38Tw+GGdk8LeiiUrOvNhoB36H93ISuBJ2H54ox60E/G4dV8BibWZ7a4RimVNLDiA47fYtLcqQ=
+	t=1709740871; cv=none; b=rMPMfwOzBbHyeT1hrxJ+tvTDuN/hCO3lOxS5a5JfMUGExlTf4Zcox49/DwIWj6gja1nH6dF+2gfr01z/Slriyx84a9prRqxkKzQQgDY84n6DchGPXmPgXtBfWREoMLGWxXVToeAQqxSTV9vuIaPQ828WJyhXiV+rcluOO/Tfbf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709740869; c=relaxed/simple;
-	bh=/eW15AbMiemK9oqz4ilGYw0a/HW/ZN6orQzNDLi+j2Y=;
+	s=arc-20240116; t=1709740871; c=relaxed/simple;
+	bh=bJ9aOpH+BaxXE35lQxVH4r4D5Eph3o4WWJ9g3/xoPEM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XK6KRqoT4rF3zPvJ9+sECEm5PSifUnOAarJbUTIr+wJQYY/2/9A/rxdYUM6TNH0CyUrbpFkYPRMwuYqctBB3NyIoVAD31ZtkLzSqyKbRDR641xAAgXxBOOMerzFTvpE4PuwIuKISDvyYuHXgzho5aWlSxHqSKJjx7qufmYZI8VY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eIhtizzP; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=BsmGoJYk96dq40EHkxs4RyHZRpHO7jTRRdNMpYYyqyxZswRBMrmeV4kn49AWvZ0l1vc8rx3KmwXm9PmoEeX06/MytfsOP4FxQl7lXEWLnkMvASzREDOUti+jY4soog4+JsJSJE3BcRME5kOjzlXvFacSmBFnPT8/4zUvpvgUkxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W1oUnGUy; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc64e0fc7c8so10474628276.2
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 08:01:07 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-609e2b87a6bso7428017b3.3
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 08:01:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709740867; x=1710345667; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709740869; x=1710345669; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=p2ukU5wCmt4sKFPMRc+fc8OauvFPCsq5nLlkABZEOnE=;
-        b=eIhtizzPeh70wE0/5Q8OL5DBHvRRZuqQiraTmlSO4yEU50gvIw+o5Jm0JRJ7AwNo/g
-         oBVW+0268t60kasJ3GZmrEq8eEt5QlmXGUO+NZoE1mfgVgob7tusCRxw8Zglg89cGCZq
-         AOixz7AO0pDks5cHvRo6B9AkHuY4HjU4C2X/2Ur/CeJrv7J+3X3UEoZIa0wcmloE/t2V
-         cEsk7fgsXkCQHVUA6W/UH+zH69vll4nnW3j2LDD9wbp8jzQF5dGekzkKz+HARRDisQN2
-         60vHPTgVoz9VGlb/NuMkp4k3k5JBiDoTjK4QNyq0SGSZUCt99bSHlp28y92zA6AwHHhG
-         JXEg==
+        bh=2R25cjMr9AGnx6ecTXh/eQZ9+fsMiqc+w/JGSBoEK8o=;
+        b=W1oUnGUyAGjJbxkxwnf2Ii7uZ7pv2iRNa6y331LZjMOguQlj4qdCTFU+YElBcu8UNY
+         yOh8BpWj5LQRqlqdv3zwJMu1ec6vpIo5JHoUAAaxCjq6O6SCFFGKv65Ss5TeQb15o/Px
+         gPygoeHDY0WPyF0rKY6AVmSKVyPR3CcnXjpmmPXMG2LvnlOluLtHMHFDgY3flEc/rP6C
+         KFscjL3kVFA7PZfgDdYJQZIxZfoJZhrndGnE+yP/AllLV8AD6MkhWAIM3iW8IuyEVycc
+         rwWBz0SKfDlsL1xYvLBzyTbwwoYjFHnFnvuaqaqsCXV5KKr60ZpdkiWZPy2ltgeTdA7C
+         AFqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709740867; x=1710345667;
+        d=1e100.net; s=20230601; t=1709740869; x=1710345669;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p2ukU5wCmt4sKFPMRc+fc8OauvFPCsq5nLlkABZEOnE=;
-        b=jWKBtG6HdfGChlEf3GYlc68Xd3T1HLZC4kdRiBTVjJjTVOF7RqGX1ZjX9thNAgcfbh
-         9e1d4BVbTk/a7WO+AYcRBERfA68gd2cxg2tcn3bW6AS9YddvxIwQ8IS+ZFeTnToNgx3s
-         qsklmbFVLFOZeF0yTFPRBSfjSKOfvlQvlM2FracVyJuhozFJ9/BisAlJc3qGqBK29Y5i
-         awL98uxj9WgsjBKjvzxpIBtce0TQfnxKlMOA8CR0RYVnHvNGXWESeNI3ggdjF2i6PTmp
-         n+L3mQstEwYM6WzoTVfImB5nHsVQrt21EvC2ZuFI/oHEs+j1LBD0A1InArKP7y0FhHd9
-         DmhA==
-X-Forwarded-Encrypted: i=1; AJvYcCV+RFIOnXF+m+JlTUOdUQlPDqwTKwXSrqY1J2BuG80Uh1Lb4pGiUqBo5NcMwqRj8VcE3Px0nYZOSEyOikFX/gckMEtu0Ep5
-X-Gm-Message-State: AOJu0YybU1vkarR12X48a0TdkPuNtSehbIIrfJW1zK5SyAPln1laNpoH
-	8nFd+qpoIP9IpFXXnJb8INgPouCaMjOYE7vMvH5SyNAbXh29q2ObdbnibkE3N8glueOBwpq0/hl
-	9BMa5gLUTlA==
-X-Google-Smtp-Source: AGHT+IFfgR5Q1V5r56+jQkxCYyYWXwrOOZfCPaoNQs5240C00aL+3LW1Iq+7rt8o8E8JPfE2KCubLeugHje2BA==
+        bh=2R25cjMr9AGnx6ecTXh/eQZ9+fsMiqc+w/JGSBoEK8o=;
+        b=G1q4wxwY2JmwH1MlY+ep8nJLjgktFCJHAukcLTOAx7JRmQjWMRslTGabgGMI1fjtzN
+         1jSFl3BiYBzDtWQlyEADIB/7flVBcLPJVbTT3B7MSNMWqV3aMQtLbr6P8u8qvZrvaa2r
+         vSKX/0XMJGsQicNnO+7kUH4Rnxgni3JfGD3cHa29G/KKVMrQYA84hiOdiI6WurCktaRF
+         1ow688g1NnocqPWDvj76pxmYZjuvu2u92knbzumJWrctqCPnvqNadw87NbABWv9vGyKd
+         Sy9rxtOmd6W1aYzPDUHohVz59Pr0tZ2UfClt3K22TeUXOA7zI0U0b9z/A8/iss2KOIrK
+         Vcpw==
+X-Forwarded-Encrypted: i=1; AJvYcCWaHP9KQ8/1xRKuYnH64t9wY6lpDg/xrUDoUT3d7nZXACeXpehBty0XZIwikOga4L8gwAIeIwJFwGEKMY3DRPVLKP6qV5Jq
+X-Gm-Message-State: AOJu0YylzekhitO3eitwfTa0Wsgp4t4iJcsilEY+8sa9N+ioCxu1lDg9
+	oLJxYokTSMDJ1eqGG+EbNalj+9476g0pGuqHwi202s3ebsQXmYFYm3xGVp1qUvRWpiFKFe4VRT1
+	95EeT+QYLdg==
+X-Google-Smtp-Source: AGHT+IGuH/+1sm8gr5pH6TpPwdyBiLAhBdAhs0+TbaxqCAinOgnH+MLmHW+UYQXq106TUoc8dPAXIVL5NDIyaQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:2206:b0:dc2:26f6:fbc8 with SMTP
- id dm6-20020a056902220600b00dc226f6fbc8mr649839ybb.7.1709740866795; Wed, 06
- Mar 2024 08:01:06 -0800 (PST)
-Date: Wed,  6 Mar 2024 16:00:28 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:7908:0:b0:609:2cab:1bd7 with SMTP id
+ u8-20020a817908000000b006092cab1bd7mr4361436ywc.1.1709740868862; Wed, 06 Mar
+ 2024 08:01:08 -0800 (PST)
+Date: Wed,  6 Mar 2024 16:00:29 +0000
 In-Reply-To: <20240306160031.874438-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240306160031.874438-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240306160031.874438-16-edumazet@google.com>
-Subject: [PATCH v2 net-next 15/18] ipv6: move inet6_ehash_secret and
- udp6_ehash_secret into net_hotdata
+Message-ID: <20240306160031.874438-17-edumazet@google.com>
+Subject: [PATCH v2 net-next 16/18] ipv6: move tcp_ipv6_hash_secret and
+ udp_ipv6_hash_secret to net_hotdata
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -85,10 +85,8 @@ Cc: David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemb@google.com>,
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-"struct inet6_protocol" has a 32bit hole in 32bit arches.
-
-Use it to store the 32bit secret used by UDP and TCP,
-to increase cache locality in rx path.
+Use a 32bit hole in "struct net_offload" to store
+the remaining 32bit secrets used by TCPv6 and UDPv6.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
@@ -96,67 +94,71 @@ Reviewed-by: David Ahern <dsahern@kernel.org>
 ---
  include/net/hotdata.h       | 2 ++
  include/net/protocol.h      | 1 +
- net/ipv6/inet6_hashtables.c | 2 +-
- net/ipv6/udp.c              | 1 -
- 4 files changed, 4 insertions(+), 2 deletions(-)
+ net/ipv6/inet6_hashtables.c | 6 ++----
+ net/ipv6/udp.c              | 2 --
+ 4 files changed, 5 insertions(+), 6 deletions(-)
 
 diff --git a/include/net/hotdata.h b/include/net/hotdata.h
-index 7a210ea6899c6af4e0424201cd265755ef460078..6d5cd967183a59271da1a27edfee1bc6bf155c1b 100644
+index 6d5cd967183a59271da1a27edfee1bc6bf155c1b..b0b847585f7e62245cee81a56b5a252051e07834 100644
 --- a/include/net/hotdata.h
 +++ b/include/net/hotdata.h
-@@ -38,6 +38,8 @@ struct net_hotdata {
- 
+@@ -39,7 +39,9 @@ struct net_hotdata {
  #define inet_ehash_secret	net_hotdata.tcp_protocol.secret
  #define udp_ehash_secret	net_hotdata.udp_protocol.secret
-+#define inet6_ehash_secret	net_hotdata.tcpv6_protocol.secret
-+#define udp6_ehash_secret	net_hotdata.udpv6_protocol.secret
+ #define inet6_ehash_secret	net_hotdata.tcpv6_protocol.secret
++#define tcp_ipv6_hash_secret	net_hotdata.tcpv6_offload.secret
+ #define udp6_ehash_secret	net_hotdata.udpv6_protocol.secret
++#define udp_ipv6_hash_secret	net_hotdata.udpv6_offload.secret
  
  extern struct net_hotdata net_hotdata;
  
 diff --git a/include/net/protocol.h b/include/net/protocol.h
-index 3ff26e66735cec98b08eadb1c3f129e011923cb0..213649d2ab098edc4eb9f44a5403540887c2b8ef 100644
+index 213649d2ab098edc4eb9f44a5403540887c2b8ef..b2499f88f8f8199de28555d0cbd6b4523325205b 100644
 --- a/include/net/protocol.h
 +++ b/include/net/protocol.h
-@@ -60,6 +60,7 @@ struct inet6_protocol {
- 			       __be32 info);
- 
- 	unsigned int	flags;	/* INET6_PROTO_xxx */
-+	u32		secret;
+@@ -70,6 +70,7 @@ struct inet6_protocol {
+ struct net_offload {
+ 	struct offload_callbacks callbacks;
+ 	unsigned int		 flags;	/* Flags used by IPv6 for now */
++	u32			 secret;
  };
- 
- #define INET6_PROTO_NOPOLICY	0x1
+ /* This should be set for any extension header which is compatible with GSO. */
+ #define INET6_PROTO_GSO_EXTHDR	0x1
 diff --git a/net/ipv6/inet6_hashtables.c b/net/ipv6/inet6_hashtables.c
-index b0e8d278e8a9b794d0001efdc0f43716f9a34f8f..0fee97f3166cf8326b3b714ac6bde48ca5188cec 100644
+index 0fee97f3166cf8326b3b714ac6bde48ca5188cec..2e81383b663b71b95719a295fd9629f1193e4225 100644
 --- a/net/ipv6/inet6_hashtables.c
 +++ b/net/ipv6/inet6_hashtables.c
-@@ -14,6 +14,7 @@
- #include <linux/random.h>
- 
- #include <net/addrconf.h>
-+#include <net/hotdata.h>
- #include <net/inet_connection_sock.h>
- #include <net/inet_hashtables.h>
- #include <net/inet6_hashtables.h>
-@@ -25,7 +26,6 @@ u32 inet6_ehashfn(const struct net *net,
+@@ -26,15 +26,13 @@ u32 inet6_ehashfn(const struct net *net,
  		  const struct in6_addr *laddr, const u16 lport,
  		  const struct in6_addr *faddr, const __be16 fport)
  {
--	static u32 inet6_ehash_secret __read_mostly;
- 	static u32 ipv6_hash_secret __read_mostly;
- 
+-	static u32 ipv6_hash_secret __read_mostly;
+-
  	u32 lhash, fhash;
+ 
+ 	net_get_random_once(&inet6_ehash_secret, sizeof(inet6_ehash_secret));
+-	net_get_random_once(&ipv6_hash_secret, sizeof(ipv6_hash_secret));
++	net_get_random_once(&tcp_ipv6_hash_secret, sizeof(tcp_ipv6_hash_secret));
+ 
+ 	lhash = (__force u32)laddr->s6_addr32[3];
+-	fhash = __ipv6_addr_jhash(faddr, ipv6_hash_secret);
++	fhash = __ipv6_addr_jhash(faddr, tcp_ipv6_hash_secret);
+ 
+ 	return __inet6_ehashfn(lhash, lport, fhash, fport,
+ 			       inet6_ehash_secret + net_hash_mix(net));
 diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 97d86909aabb6588d0bba901f6df1f23a4f2e561..1e1c67a51675e8534a953a6d4d63211388d95ca9 100644
+index 1e1c67a51675e8534a953a6d4d63211388d95ca9..80ad8f436b179d7279cbbd5108c3494a9773c0d8 100644
 --- a/net/ipv6/udp.c
 +++ b/net/ipv6/udp.c
-@@ -79,7 +79,6 @@ u32 udp6_ehashfn(const struct net *net,
+@@ -79,8 +79,6 @@ u32 udp6_ehashfn(const struct net *net,
  		 const struct in6_addr *faddr,
  		 const __be16 fport)
  {
--	static u32 udp6_ehash_secret __read_mostly;
- 	static u32 udp_ipv6_hash_secret __read_mostly;
- 
+-	static u32 udp_ipv6_hash_secret __read_mostly;
+-
  	u32 lhash, fhash;
+ 
+ 	net_get_random_once(&udp6_ehash_secret,
 -- 
 2.44.0.278.ge034bb2e1d-goog
 
