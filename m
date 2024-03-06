@@ -1,147 +1,139 @@
-Return-Path: <netdev+bounces-77964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77BD8873A52
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:10:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EF09873A6F
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:12:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B51F1C232F0
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:10:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A10311C204F7
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:12:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662F71353E2;
-	Wed,  6 Mar 2024 15:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394FA131745;
+	Wed,  6 Mar 2024 15:12:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="JnibbZ9/"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="U6GuLDw7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51AF8131744
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 15:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0647FBBD
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 15:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709737674; cv=none; b=mR92lKr6AroQOqpOYocHU6X6caos8G1gWdFDMdA3dWNJ9tWw6otacunnbD8aYpsyv38rTmcAOIxDKyVn9CF1n+ewD4+SIEPsn1NH9D4wTOyewoMFDAM0sQcPQ01jN7WUAYNdBjacQlQJAxIKzHmT+/lqidy8AcpzFxS7TZjXt3I=
+	t=1709737969; cv=none; b=dtD5aIK82TpPUXm5BrpZcKvwvUGtVQ8/JCtedBiymKeWtoKbQokANEfx2Z9WQVdcsToNqoCgNuuCyBEGYfpaxG7HFoROieVp3hICi2Bmtt0i0XxeoEogh0O/Bp8U7zr6VUUc6LpqA2rLntZR+3WeomcuvCBPnVhd24pkdVjpbc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709737674; c=relaxed/simple;
-	bh=d5bk0Re35JVK8/vwhugAPRbZQKNLXdX4Z3T29NVadME=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FBweWR3Z1LbMxXc7pwnUWMt2jMKXyY25i3rWDqOzPb9wB1oryN/d56+MloKkhsfzkbDIW42ClF14w1JiccOTLoL61qWWDYbUP80eTo+3lQhBLqJ6aIj3zHABkhTf3Li5lbq5w7bKs6UbF4+6E6jJ+npNS9NzBN8GxIofSySefjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=JnibbZ9/; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5654f700705so9609345a12.1
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 07:07:51 -0800 (PST)
+	s=arc-20240116; t=1709737969; c=relaxed/simple;
+	bh=4pwNsbjRBS8XeEKKfJsqtRtZb7NjFLl8TvS8Zykr0JA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uuLgAmLrP0RD4ogtnCLDN04aWIrNtNO/o+BW6+23gRe2lolq+0x/A9wkemz0fGLVycgWMRDortdBJvN2Eq7v69ukN0s4qwn+cpP4KXMd/HTr45JMMH/0bjTCdsGOlSpTA9HfX6Mm+vM/Qn4NGlV8qBILfPOHbB8BzrTgnetEhZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=U6GuLDw7; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-412f0655d81so10944835e9.2
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 07:12:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1709737670; x=1710342470; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=RfgWzwa5Q16piX4r4B08UV9l16CetyguRfHpgkGFhS4=;
-        b=JnibbZ9/+EiwvI3M7w9p6jubwojH4RgWFJ6yM2WBqpddXpAaZvJV65h4s7ywrcqBnJ
-         X3onNA3k1wyQy/hPzLqVL/A70TSqYJbM/bo0Y7ky0ibr9/Z6gGBMdVFqjhe86UwmVwaE
-         tHgby40WBRognGAYUJRKMBlTaASvWhKrpXAWbzwk3JXeOzUDKPhQ+P9jscPORtxararD
-         Z3PfeqJPxqBo9c+nyMv2nCPWB4fxW+zAE2sFAuUHkG/MKdx10G5xbdwf9qlmb8ZwCo1u
-         Zgte1R7c9GXJS0Py3593rK4rdJ5+hduZzp7/VBeqz2T2dHtEMtCanBZVJmi+kd4Kc+U2
-         vqSw==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709737964; x=1710342764; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8WFrTMhWZDJbGiqTg8tNNHHgTGFz0bEI2mqQkh8mZs8=;
+        b=U6GuLDw7T8qiV/ihm5Ym8a1Zw0Rejn+VtG6XYVHfuKB7s1xg6Ra1eEqF327fWwJnPz
+         fJl0d9SPqAfPpWnN+pQFyazJJHEUb6xeGNvAU5mTBYAU2yZl7d7bf9vLeAscU7wyLzcs
+         UByb9C9+Cmq9pTHbDHR09dOpNgxxYx1Xt5OjBIzOggDKAf6cz853IKD7I5wvIa83v+Hf
+         gygTL4mpvdMazk+IkvBNzFhOP8nG09O9Cp0WaXwuzannGTFt3ZxiqngFRcw6AHsDXtFX
+         5EqZoMQ19pMgjMRg6qCkekWf/X2SblUMnAeYLcf63KWnsR9m4Ep/PZlreP1GgnWcqpXg
+         8b0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709737670; x=1710342470;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RfgWzwa5Q16piX4r4B08UV9l16CetyguRfHpgkGFhS4=;
-        b=LLELK3EI/dp/jTjELhZLJfACuElrjJ56IXdE68l2cMmVVviAWTxP8VVsT9bb9wStlO
-         DTZZAEkLS0xhrzETZQ4GXnj8MJRSjirmn54uTUiSRDirTm3Ut+VANg4f2zz1JDQhQEA6
-         7Rd5f+ubkrgeXcnZM1w6rI9vtYWAdlJGtj8a7m4Ogv6HCjBPOfDJxtWa+Zt2JQpS7TUG
-         zZHqEFw2ZKMHWakcJfJOIOZJd2ei+Z6h0HP5j5yl9XkkHw4Lsg+o23F0us1vlDBbQpSM
-         oteZprswsSIkjKxUO9ZLTocpTuFtU5nKqOccWg5xA4glVAkRKHePYCAy0snQl/AvBl2x
-         d37Q==
-X-Gm-Message-State: AOJu0Yz41EfCvB3qC9KrKG3OuF+dQKbl17Z9+2opTCflEskN8tqlxVle
-	MQ5XAgDXlT00Z7SpDJncz4ya6J7BKxX4uRSA4kQv5H4aho0kn9OCzZ20XjsHjxw=
-X-Google-Smtp-Source: AGHT+IEgfB3mxJlD9O/pnFIYL2bKhLsbqZ0VqOWOhO+VOzPcuoOw7PqcclOtTFX2JOoJBOWc3C5AUQ==
-X-Received: by 2002:a05:6402:313a:b0:567:3436:b85b with SMTP id dd26-20020a056402313a00b005673436b85bmr6921178edb.12.1709737670607;
-        Wed, 06 Mar 2024 07:07:50 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:0:2746:4b81:593e:203b? ([2001:67c:2fbc:0:2746:4b81:593e:203b])
-        by smtp.gmail.com with ESMTPSA id ew5-20020a056402538500b005667a11b951sm7001148edb.86.2024.03.06.07.07.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Mar 2024 07:07:50 -0800 (PST)
-Message-ID: <50f35d4c-5306-422f-99c9-ac094d0b5eed@openvpn.net>
-Date: Wed, 6 Mar 2024 16:08:14 +0100
+        d=1e100.net; s=20230601; t=1709737964; x=1710342764;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8WFrTMhWZDJbGiqTg8tNNHHgTGFz0bEI2mqQkh8mZs8=;
+        b=EsZorxnnBo5DRO/fwkdtbUOV2B3GUvzCqauniTYCgkDC1qWABGG6ikTZNMkkq3wvF8
+         NgmbKZYSg/wBwF0dTW87nyYtNJTVHFBIPDCrP65JMJ8WLn/+Xq/8zAkaxvaoEDbAV0x9
+         uiVrqQr0irHttj3iCBDLvsXajE7fv/GDOlXAUFhyVmMaCYlQOfsDUP0vLFwktCwvOxkO
+         AQaIW7yM8eIgh8gNq7m2Loe9OvhgJr3XhPrrt+E8Qp/T0UG07Vx9a75sbaJD/p6ymS/1
+         duCcYRcsD516FL5tRsEAxi7jE79vedigmPAul5HQrvMEA6fpFJhuybGyobwJeeAQ7m5q
+         tQaA==
+X-Gm-Message-State: AOJu0Yx2D1Ta+GC1sETbqco4uOLM48+uJopsjKMTBIbHA1OxFcn4qtKb
+	IrQBKyg1NTat6XX18EqInzzhM+Ml3koG0QMwuLhXupdSiqXAr0x93ckf8yq1zD6JPBXchS7qcWp
+	1
+X-Google-Smtp-Source: AGHT+IFHqsz95nFay6L28h+N/f2iXncgk3vjHS6oE1DNlqT+M100hj00ZWelDrJmMdK4fx7uo2cmnQ==
+X-Received: by 2002:a05:600c:4e0b:b0:412:f6d0:5e43 with SMTP id b11-20020a05600c4e0b00b00412f6d05e43mr1293948wmq.5.1709737963581;
+        Wed, 06 Mar 2024 07:12:43 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id o38-20020a05600c512600b00412f478a90bsm2475879wms.48.2024.03.06.07.12.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Mar 2024 07:12:43 -0800 (PST)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: arkadiusz.kubalewski@intel.com,
+	vadim.fedorenko@linux.dev,
+	milena.olech@intel.com,
+	rrameshbabu@nvidia.com
+Subject: [patch net] dpll: fix dpll_xa_ref_*_del() for multiple registrations
+Date: Wed,  6 Mar 2024 16:12:40 +0100
+Message-ID: <20240306151240.1464884-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 07/22] ovpn: introduce the ovpn_socket object
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>
-References: <20240304150914.11444-1-antonio@openvpn.net>
- <20240304150914.11444-8-antonio@openvpn.net>
- <20240305145911.GJ2357@kernel.org>
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <20240305145911.GJ2357@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 05/03/2024 15:59, Simon Horman wrote:
-> nit: ./scripts/kernel-doc -none
->       complains that the fields of this structure are not
->       covered by it's Kernel doc.
-> 
+From: Jiri Pirko <jiri@nvidia.com>
 
-Thanks a lot for telling me about this other script.
-It's been a while since my last kernel submission..
+Currently, if there are multiple registrations of the same pin on the
+same dpll device, following warnings are observed:
+WARNING: CPU: 5 PID: 2212 at drivers/dpll/dpll_core.c:143 dpll_xa_ref_pin_del.isra.0+0x21e/0x230
+WARNING: CPU: 5 PID: 2212 at drivers/dpll/dpll_core.c:223 __dpll_pin_unregister+0x2b3/0x2c0
 
-Regards,
+The problem is, that in both dpll_xa_ref_dpll_del() and
+dpll_xa_ref_pin_del() registration is only removed from list in case the
+reference count drops to zero. That is wrong, the registration has to
+be removed always.
 
+To fix this, remove the registration from the list and free
+it unconditionally, instead of doing it only when the ref reference
+counter reaches zero.
+
+Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions")
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+ drivers/dpll/dpll_core.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+index 7f686d179fc9..c751a87c7a8e 100644
+--- a/drivers/dpll/dpll_core.c
++++ b/drivers/dpll/dpll_core.c
+@@ -129,9 +129,9 @@ static int dpll_xa_ref_pin_del(struct xarray *xa_pins, struct dpll_pin *pin,
+ 		reg = dpll_pin_registration_find(ref, ops, priv);
+ 		if (WARN_ON(!reg))
+ 			return -EINVAL;
++		list_del(&reg->list);
++		kfree(reg);
+ 		if (refcount_dec_and_test(&ref->refcount)) {
+-			list_del(&reg->list);
+-			kfree(reg);
+ 			xa_erase(xa_pins, i);
+ 			WARN_ON(!list_empty(&ref->registration_list));
+ 			kfree(ref);
+@@ -209,9 +209,9 @@ dpll_xa_ref_dpll_del(struct xarray *xa_dplls, struct dpll_device *dpll,
+ 		reg = dpll_pin_registration_find(ref, ops, priv);
+ 		if (WARN_ON(!reg))
+ 			return;
++		list_del(&reg->list);
++		kfree(reg);
+ 		if (refcount_dec_and_test(&ref->refcount)) {
+-			list_del(&reg->list);
+-			kfree(reg);
+ 			xa_erase(xa_dplls, i);
+ 			WARN_ON(!list_empty(&ref->registration_list));
+ 			kfree(ref);
 -- 
-Antonio Quartulli
-OpenVPN Inc.
+2.43.2
+
 
