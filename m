@@ -1,272 +1,237 @@
-Return-Path: <netdev+bounces-77701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC858872B46
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 00:51:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B06BD872B76
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 01:07:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF10A1C222D8
-	for <lists+netdev@lfdr.de>; Tue,  5 Mar 2024 23:51:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4EBA1C21886
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 00:07:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 278D812D773;
-	Tue,  5 Mar 2024 23:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E44D7323D;
+	Wed,  6 Mar 2024 00:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jhMz0r7j"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fVDcaIOA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8941EA74;
-	Tue,  5 Mar 2024 23:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC8F802
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 00:07:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709682679; cv=none; b=EdkjzKFDd1n9n9/oYqyt2XEGOJuFSnDeSSVtgNgQ2mNw+pHEiWcr1ix/y7/ymsrqMRyWQ3s9gf0FhsunkW6lPyyBXKm8rpO5K4PeuK93ox2gPwXfytBxD/v3+54CyYsMrY+FhHwsnSCG57f7C0Up2VThGKazKpSTyFA4S+djYjI=
+	t=1709683629; cv=none; b=HceQj0h8/Zz1/ZrkDlDlUvZeaxDLO+8ZUYHpmA8cwBMxKCpnGsBV3Aw7AXZjZ3HadgE0k/8ADRdttSzqPYkRW6Giqv1FbmZDTGauCow2DUO+AbREGVMTYfDzwY1EUrPwmJtulgL6ho70c+MwUPWmTtAhTuZfpN06RUdasvMWUKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709682679; c=relaxed/simple;
-	bh=IMhMdXwkFMCOeEanoT3+CPNZVWBZ30MRdahAPoSWoSg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MYstFX+xlqXs7aI4YmZct/cusOlge5Nwz0PrIg0tIsVBQeYHCp9sQNhEhmjYRCC38uSyEOgdTpdQR2+xOuJXwL0Na/MfP/TeIy2xmmQGVt9lLKDKxu17C+kKW72Ma8G4F+MZfxjxd6O0Ps6sTOV8u1h8f7IfcS++P1TG23bEUZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jhMz0r7j; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2995fa850ddso229348a91.0;
-        Tue, 05 Mar 2024 15:51:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709682677; x=1710287477; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Y00i9tEWvP8noYyCmA3iSFWknDYUO6IOTKvbT4q8GQA=;
-        b=jhMz0r7jfrnabc/gBsNMjQIZjI3u1d2n/HW8R5RqE0CjmTALScPyIvNNiMsiykId1W
-         WJ4eY91WiokfY+4mRoUJrQfzkfXbeKJQtxyzS3vmnXXuT9Px/aNauzCO22BwYKdLcQBf
-         Dv71sWln5rv7nGt84tlDP0qy49izthucE3ZvyOsO5MkwtpYKTdM3CO0ZglDDV9IbyO1r
-         cxL57xD9nmbsFgvwFC/aFUfHERtK30So9Fhlwygu8bNdmsI3lR7dAnTXtFMj8JBXXYY3
-         G1Wi382gKkjEXWDJigzD57OFrlRffuIxL8AKBCgHsbtvSMXwxqV3eDVpBWFNVH5GFMHD
-         286A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709682677; x=1710287477;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y00i9tEWvP8noYyCmA3iSFWknDYUO6IOTKvbT4q8GQA=;
-        b=Ny0FdQF17vS9+BNirf5A4YMlh6ey0NIYAlI36m4y2mfLPTZRKe4dMQKkFdniz2Xlfd
-         IxiJ8V2U9oV4AmFPDPsVkjzxwvGGL1S35dHG+Hiin3aHv7fZBkQoVi6oNVwHtSS2ag+I
-         n7VHagoAfszEQOWqoR7HY3tf+6ysZh4oyUm4YWXol/MuHSpb7agnxuVRsz8fWarD/cTr
-         z7DCdCnxvCr4rIZRMkO9g20aDb/G/gxf22MMa7oY1VjeJjbshaybcYgVfk+Hfv47Y6Yp
-         583ZmRxvuVsumz+RtWmqLhj4e6kTtDE0Hx4koxSXnTnhcfVaaeqPZhjPH5ka8nNGso40
-         hJJw==
-X-Forwarded-Encrypted: i=1; AJvYcCUB3enth6aMf4o/aBmxKdhmi4/QkkPr2dYkslBjVHValtJLS9wFt80lIxF4opyY+Dudjo2GrjEGmCXQg4i8FF6SvtA1Vg79zYqQx9OW2EbYNdGtSN+7RgM8JVs0N0KnYf0zEdf1
-X-Gm-Message-State: AOJu0YwvcY3uLWhm5UQXTiqo2/LASLXNK/F4aoEfsgMHm7V39D5wiSTV
-	or37q55qdthf5Xsnbj7drINeaVL5EAVAgP8UsYZAbpgtw329vDgi
-X-Google-Smtp-Source: AGHT+IEQA+OMqhbvrckikI6bBbkJ80fydnUXwNfORrFEt8GLd+Lg9FOvgAvmWCu/XLJGb4HFH3aKdA==
-X-Received: by 2002:a17:90b:794:b0:299:63bd:c17d with SMTP id l20-20020a17090b079400b0029963bdc17dmr5139870pjz.2.1709682676791;
-        Tue, 05 Mar 2024 15:51:16 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id l16-20020a17090aec1000b0029b69d136b5sm568461pjy.1.2024.03.05.15.51.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Mar 2024 15:51:16 -0800 (PST)
-Message-ID: <20e792ad-33ce-43a6-8ed0-8db6e1a25c27@gmail.com>
-Date: Tue, 5 Mar 2024 15:51:11 -0800
+	s=arc-20240116; t=1709683629; c=relaxed/simple;
+	bh=YHxWUegg/GDq2N8NRWgUY7fv8zPBdzuoIORPdAdcqzw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iSZtmYMrhtH7HCe7BTZE6PzhZli46J07/ulVTgXqdcxSMQOoFb5aCpBv/kNSWgMfKQzhsQspMYLCFCtOdUHGiGHo9siALCGJnw5gZat3JSIZuHVzUtq3i6vXRjSgQf88Pum+BceGYnLOSl+K07ViTS9LWS0jof+NpV7nZ1KjiAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fVDcaIOA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709683626;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xdQpR6nGNQSwgQzXohmRNIlmapAF5yuNDCp4QrQg6rc=;
+	b=fVDcaIOAraoN+vSIQrBKZ7k9++NRIRQnbAOquBTGa+gLeteXckIFgf5F8/0wiUoaIJ/oMP
+	6WexjrvY4EoeEqWqQzXjG2/rg1YeZYG6S2xzkJ9Q3vVA39LvMl2ypmPjwc+7bCryDBxQpp
+	8sHFl42vIV+Zt/LDbWuKK7CZmJI5v/0=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-665-WiZ4oU2zP_ufMSMVECWenA-1; Tue,
+ 05 Mar 2024 19:07:01 -0500
+X-MC-Unique: WiZ4oU2zP_ufMSMVECWenA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1E94A3C02450;
+	Wed,  6 Mar 2024 00:07:01 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.114])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B194E16A9B;
+	Wed,  6 Mar 2024 00:06:59 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Simon Horman <horms@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3 00/21] rxrpc: Miscellaneous changes and make use of MSG_SPLICE_PAGES
+Date: Wed,  6 Mar 2024 00:06:30 +0000
+Message-ID: <20240306000655.1100294-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 07/16] net: dsa: vsc73xx: Add vlan filtering
-Content-Language: en-US
-To: Pawel Dembicki <paweldembicki@gmail.com>, netdev@vger.kernel.org
-Cc: Linus Walleij <linus.walleij@linaro.org>, Simon Horman
- <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Claudiu Manoil <claudiu.manoil@nxp.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
- linux-kernel@vger.kernel.org
-References: <20240301221641.159542-1-paweldembicki@gmail.com>
- <20240301221641.159542-8-paweldembicki@gmail.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20240301221641.159542-8-paweldembicki@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On 3/1/24 14:16, Pawel Dembicki wrote:
-> This patch implements VLAN filtering for the vsc73xx driver.
-> 
-> After starting VLAN filtering, the switch is reconfigured from QinQ to
-> a simple VLAN aware mode. This is required because VSC73XX chips do not
-> support inner VLAN tag filtering.
-> 
-> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
-> ---
+Here are some changes to AF_RXRPC:
 
-[snip]
+ (1) Cache the transmission serial number of ACK and DATA packets in the
+     rxrpc_txbuf struct and log this in the retransmit tracepoint.
 
-> +static size_t
-> +vsc73xx_bridge_vlan_num_untagged(struct vsc73xx *vsc, int port, u16 ignored_vid)
-> +{
-> +	struct vsc73xx_bridge_vlan *vlan;
-> +	size_t num_untagged = 0;
-> +
-> +	list_for_each_entry(vlan, &vsc->vlans, list)
-> +		if ((vlan->portmask & BIT(port)) &&
-> +		    (vlan->untagged & BIT(port)) &&
-> +		    vlan->vid != ignored_vid)
-> +			num_untagged++;
-> +
-> +	return num_untagged;
-> +}
+ (2) Don't use atomics on rxrpc_txbuf::flags[*] and cache the intended wire
+     header flags there too to avoid duplication.
 
-You always use both helpers at the same time, so I would suggest 
-returning num_tagged and num_untagged by reference to have a single 
-linked list lookup.
+ (3) Cache the wire checksum in rxrpc_txbuf to make it easier to create
+     jumbo packets in future (which will require altering the wire header
+     to a jumbo header and restoring it back again for retransmission).
 
-> +
-> +static u16 vsc73xx_find_first_vlan_untagged(struct vsc73xx *vsc, int port)
-> +{
-> +	struct vsc73xx_bridge_vlan *vlan;
-> +
-> +	list_for_each_entry(vlan, &vsc->vlans, list)
-> +		if ((vlan->portmask & BIT(port)) &&
-> +		    (vlan->untagged & BIT(port)))
-> +			return vlan->vid;
-> +
-> +	return VLAN_N_VID;
-> +}
-> +
-> +static int
-> +vsc73xx_port_vlan_filtering(struct dsa_switch *ds, int port,
-> +			    bool vlan_filtering, struct netlink_ext_ack *extack)
-> +{
-> +	enum vsc73xx_port_vlan_conf port_vlan_conf = VSC73XX_VLAN_IGNORE;
-> +	struct vsc73xx *vsc = ds->priv;
-> +	bool store_untagged = false;
-> +	bool store_pvid = false;
-> +	u16 vid, vlan_untagged;
-> +
-> +	/* The swap processed below is required because vsc73xx is using
-> +	 * tag_8021q. When vlan_filtering is disabled, tag_8021q uses
-> +	 * pvid/untagged vlans for port recognition. The values configured for
-> +	 * vlans < 3072 are stored in storage table. When vlan_filtering is
-> +	 * enabled, we need to restore pvid/untagged from storage and keep
-> +	 * values used for tag_8021q.
-> +	 */
-> +	if (vlan_filtering) {
-> +		/* Use VLAN_N_VID to count all vlans */
-> +		size_t num_untagged =
-> +			vsc73xx_bridge_vlan_num_untagged(vsc, port, VLAN_N_VID);
-> +
-> +		port_vlan_conf = (num_untagged > 1) ?
-> +				 VSC73XX_VLAN_FILTER_UNTAG_ALL :
-> +				 VSC73XX_VLAN_FILTER;
-> +
-> +		vlan_untagged = vsc73xx_find_first_vlan_untagged(vsc, port);
-> +		if (vlan_untagged < VLAN_N_VID) {
-> +			store_untagged  = vsc73xx_port_get_untagged(vsc, port,
-> +								    &vid,
-> +								    false);
-> +			vsc73xx_vlan_change_untagged(vsc, port, vlan_untagged,
-> +						     true, false);
-> +			vsc->untagged_storage[port] = store_untagged ?
-> +						      vid : VLAN_N_VID;
-> +		}
-> +	} else {
-> +		vsc73xx_vlan_change_untagged(vsc, port,
-> +					     vsc->untagged_storage[port],
-> +					     vsc->untagged_storage[port] <
-> +					     VLAN_N_VID, false);
-> +	}
-> +
-> +	vsc73xx_set_vlan_conf(vsc, port, port_vlan_conf);
-> +
-> +	store_pvid = vsc73xx_port_get_pvid(vsc, port, &vid, false);
-> +	vsc73xx_vlan_change_pvid(vsc, port, vsc->pvid_storage[port],
-> +				 vsc->pvid_storage[port] < VLAN_N_VID, false);
-> +	vsc->pvid_storage[port] = store_pvid ? vid : VLAN_N_VID;
-> +
-> +	return 0;
-> +}
-> +
-> +static int vsc73xx_port_vlan_add(struct dsa_switch *ds, int port,
-> +				 const struct switchdev_obj_port_vlan *vlan,
-> +				 struct netlink_ext_ack *extack)
-> +{
-> +	bool untagged = vlan->flags & BRIDGE_VLAN_INFO_UNTAGGED;
-> +	bool pvid = vlan->flags & BRIDGE_VLAN_INFO_PVID;
-> +	struct dsa_port *dp = dsa_to_port(ds, port);
-> +	struct vsc73xx_bridge_vlan *vsc73xx_vlan;
-> +	size_t num_tagged, num_untagged;
-> +	struct vsc73xx *vsc = ds->priv;
-> +	int ret;
-> +	u16 vid;
-> +
-> +	/* Be sure to deny alterations to the configuration done by tag_8021q.
-> +	 */
-> +	if (vid_is_dsa_8021q(vlan->vid)) {
-> +		NL_SET_ERR_MSG_MOD(extack,
-> +				   "Range 3072-4095 reserved for dsa_8021q operation");
-> +		return -EBUSY;
-> +	}
-> +
-> +	/* The processed vlan->vid is excluded from the search because the VLAN
-> +	 * can be re-added with a different set of flags, so it's easiest to
-> +	 * ignore its old flags from the VLAN database software copy.
-> +	 */
-> +	num_tagged = vsc73xx_bridge_vlan_num_tagged(vsc, port, vlan->vid);
-> +	num_untagged = vsc73xx_bridge_vlan_num_untagged(vsc, port, vlan->vid);
-> +
-> +	/* VSC73XX allow only three untagged states: none, one or all */
-> +	if ((untagged && num_tagged > 0 && num_untagged > 0) ||
-> +	    (!untagged && num_untagged > 1)) {
-> +		NL_SET_ERR_MSG_MOD(extack,
-> +				   "Port can have only none, one or all untagged vlan");
-> +		return -EBUSY;
-> +	}
-> +
-> +	vsc73xx_vlan = vsc73xx_bridge_vlan_find(vsc, vlan->vid);
-> +
-> +	if (!vsc73xx_vlan) {
-> +		vsc73xx_vlan = kzalloc(sizeof(*vsc73xx_vlan), GFP_KERNEL);
-> +		if (!vsc73xx_vlan)
-> +			return -ENOMEM;
-> +
-> +		vsc73xx_vlan->vid = vlan->vid;
-> +		vsc73xx_vlan->portmask = BIT(port);
-> +		vsc73xx_vlan->untagged = untagged ? BIT(port) : 0;
-> +
-> +		INIT_LIST_HEAD(&vsc73xx_vlan->list);
-> +		list_add_tail(&vsc73xx_vlan->list, &vsc->vlans);
-> +	} else {
-> +		vsc73xx_vlan->portmask |= BIT(port);
-> +
-> +		if (untagged)
-> +			vsc73xx_vlan->untagged |= BIT(port);
-> +		else
-> +			vsc73xx_vlan->untagged &= ~BIT(port);
+ (4) Fix the protocol names in the wire ACK trailer struct.
 
-These assignments should be working even when you have a freshly 
-allocated VLAN entry, so you can just re-factor this a bit and have a 
-common set of assignments applying to an existing or freshly allocated 
-VLAN entry?
+ (5) Strip all the barriers and atomics out of the call timer tracking[*].
 
-> +	}
-> +
-> +	/* CPU port must be always tagged because port separation is based on
-> +	 * tag_8021q.
-> +	 */
-> +	if (port != CPU_PORT) {
+ (6) Remove atomic handling from call->tx_transmitted and
+     call->acks_prev_seq[*].
 
-Please reduce indentation here.
+ (7) Don't bother resetting the DF flag after UDP packet transmission.  To
+     change it, we now call directly into UDP code, so it's quick just to
+     set it every time.
 
-Have to admit the logic is a bit hard to follow, but that is also 
-because of my lack of understanding of the requirements surrounding the 
-use of tag_8021q.
--- 
-Florian
+ (8) Merge together the DF/non-DF branches of the DATA transmission to
+     reduce duplication in the code.
+
+ (9) Add a kvec array into rxrpc_txbuf and start moving things over to it.
+     This paves the way for using page frags.
+
+(10) Split (sub)packet preparation and timestamping out of the DATA
+     transmission function.  This helps pave the way for future jumbo
+     packet generation.
+
+(11) In rxkad, don't pick values out of the wire header stored in
+     rxrpc_txbuf, buf rather find them elsewhere so we can remove the wire
+     header from there.
+
+(12) Move rxrpc_send_ACK() to output.c so that it can be merged with
+     rxrpc_send_ack_packet().
+
+(13) Use rxrpc_txbuf::kvec[0] to access the wire header for the packet
+     rather than directly accessing the copy in rxrpc_txbuf.  This will
+     allow that to be removed to a page frag.
+
+(14) Switch from keeping the transmission buffers in rxrpc_txbuf allocated
+     in the slab to allocating them using page fragment allocators.  There
+     are separate allocators for DATA packets (which persist for a while)
+     and control packets (which are discarded immediately).
+
+     We can then turn on MSG_SPLICE_PAGES when transmitting DATA and ACK
+     packets.
+
+     We can also get rid of the RCU cleanup on rxrpc_txbufs, preferring
+     instead to release the page frags as soon as possible.
+
+(15) Parse received packets before handling timeouts as the former may
+     reset the latter.
+
+(16) Make sure we don't retransmit DATA packets after all the packets have
+     been ACK'd.
+
+(17) Differentiate traces for PING ACK transmission.
+
+(18) Switch to keeping timeouts as ktime_t rather than a number of jiffies
+     as the latter is too coarse a granularity.  Only set the call timer at
+     the end of the call event function from the aggregate of all the
+     timeouts, thereby reducing the number of timer calls made.  In future,
+     it might be possible to reduce the number of timers from one per call
+     to one per I/O thread and to use a high-precision timer.
+
+(19) Record RTT probes after successful transmission rather than recording
+     it before and then cancelling it after if unsuccessful[*].  This
+     allows a number of calls to get the current time to be removed.
+
+(20) Clean up the resend algorithm as there's now no need to walk the
+     transmission buffer under lock[*].  DATA packets can be retransmitted
+     as soon as they're found rather than being queued up and transmitted
+     when the locked is dropped.
+
+(21) When initially parsing a received ACK packet, extract some of the
+     fields from the ack info to the skbuff private data.  This makes it
+     easier to do path MTU discovery in the future when the call to which a
+     PING RESPONSE ACK refers has been deallocated.
+
+
+[*] Possible with the move of almost all code from softirq context to the
+    I/O thread.
+
+The patches are tagged here:
+
+	git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/rxrpc-iothread-20240305
+
+And can be found on this branch:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-iothread
+
+David
+
+Link: https://lore.kernel.org/r/20240301163807.385573-1-dhowells@redhat.com/ # v1
+Link: https://lore.kernel.org/r/20240304084322.705539-1-dhowells@redhat.com/ # v2
+
+Changes
+=======
+ver #3)
+ - Use passed-in gfp in rxkad_alloc_txbuf() rather than GFP_KRNEL.
+ - Adjust rxkad_alloc_txbuf()'s txb check to put return in if-statement.
+
+ver #2)
+ - Removed an unused variable.
+ - Use ktime_to_us() rather than dividing a ktime by 1000 in tracepoints.
+
+David Howells (21):
+  rxrpc: Record the Tx serial in the rxrpc_txbuf and retransmit trace
+  rxrpc: Convert rxrpc_txbuf::flags into a mask and don't use atomics
+  rxrpc: Note cksum in txbuf
+  rxrpc: Fix the names of the fields in the ACK trailer struct
+  rxrpc: Strip barriers and atomics off of timer tracking
+  rxrpc: Remove atomic handling on some fields only used in I/O thread
+  rxrpc: Do lazy DF flag resetting
+  rxrpc: Merge together DF/non-DF branches of data Tx function
+  rxrpc: Add a kvec[] to the rxrpc_txbuf struct
+  rxrpc: Split up the DATA packet transmission function
+  rxrpc: Don't pick values out of the wire header when setting up
+    security
+  rxrpc: Move rxrpc_send_ACK() to output.c with rxrpc_send_ack_packet()
+  rxrpc: Use rxrpc_txbuf::kvec[0] instead of rxrpc_txbuf::wire
+  rxrpc: Do zerocopy using MSG_SPLICE_PAGES and page frags
+  rxrpc: Parse received packets before dealing with timeouts
+  rxrpc: Don't permit resending after all Tx packets acked
+  rxrpc: Differentiate PING ACK transmission traces.
+  rxrpc: Use ktimes for call timeout tracking and set the timer lazily
+  rxrpc: Record probes after transmission and reduce number of time-gets
+  rxrpc: Clean up the resend algorithm
+  rxrpc: Extract useful fields from a received ACK to skb priv data
+
+ include/trace/events/rxrpc.h | 198 ++++++++--------
+ net/rxrpc/af_rxrpc.c         |  12 +-
+ net/rxrpc/ar-internal.h      |  88 ++++---
+ net/rxrpc/call_event.c       | 327 ++++++++++++--------------
+ net/rxrpc/call_object.c      |  56 ++---
+ net/rxrpc/conn_client.c      |   4 +-
+ net/rxrpc/conn_event.c       |  16 +-
+ net/rxrpc/conn_object.c      |   4 +
+ net/rxrpc/input.c            | 116 +++++----
+ net/rxrpc/insecure.c         |  11 +-
+ net/rxrpc/io_thread.c        |  11 +
+ net/rxrpc/local_object.c     |   3 +
+ net/rxrpc/misc.c             |   8 +-
+ net/rxrpc/output.c           | 441 +++++++++++++++++------------------
+ net/rxrpc/proc.c             |  10 +-
+ net/rxrpc/protocol.h         |   6 +-
+ net/rxrpc/rtt.c              |  36 +--
+ net/rxrpc/rxkad.c            |  57 ++---
+ net/rxrpc/sendmsg.c          |  63 ++---
+ net/rxrpc/sysctl.c           |  16 +-
+ net/rxrpc/txbuf.c            | 174 +++++++++++---
+ 21 files changed, 853 insertions(+), 804 deletions(-)
 
 
