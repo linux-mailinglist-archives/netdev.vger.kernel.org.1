@@ -1,134 +1,134 @@
-Return-Path: <netdev+bounces-78068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E6A4873FBA
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 19:38:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EA7C873FC1
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 19:39:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6013D1C2280F
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:38:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0F6E1C22DAD
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 511D513E7C1;
-	Wed,  6 Mar 2024 18:32:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jWQ0hRUm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DFCF143C60;
+	Wed,  6 Mar 2024 18:35:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D10F13774C
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 18:32:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9337E143C55
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 18:35:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709749941; cv=none; b=Cu/J1950DlDU4kcz4tMT5S6hTjnw9fmU8yKzVb7O+cs7Ht51SjLA2n47bade9g8sDrLZpZ2A2RBM9onrtwEnzsNX8VTEwFf47B0wvy1ydiSv5d/EkWudPiclhT/tCvMsewVcDFotXdAef73y21T02kRP1qShMJERIJqNuFRyrLU=
+	t=1709750153; cv=none; b=I4035jUNt39w6qdpOyWj+agkX9OBRTKRrMDrj0wxmAkHYJYd+ngl39YrhU0MO4TBqbwONAuoBjx9AVyDZ9HgjO5Zk+ewQZQx1ls6suipYiYw2YI4/p77mICMExlxVwAv5wlTQ4k+8pLFq2zy466kTELAkhZ2fn0wxRDmV87qy44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709749941; c=relaxed/simple;
-	bh=ojygEvnyVApcE1y/QhKKUDNO/RQe0ORdhTlEo55f6sU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RBsTtHXL5W2J4WtP2mA40DGtBPGZE3lk2qDG1tMk7iVTxmbx9n+o7x0AOrLk/SPFhg+hkecMtd7xYpZONL35XlK/7HlY8xe4aOMM6N0lBQZdxUoDcqznKW4Ak5nqh/t5xXfLh97HaELmC2MapFNOOmmvBoTltzNlkkC4Z+5ikFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jWQ0hRUm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75A69C433C7;
-	Wed,  6 Mar 2024 18:32:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709749940;
-	bh=ojygEvnyVApcE1y/QhKKUDNO/RQe0ORdhTlEo55f6sU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jWQ0hRUml73okKu+Zr6/Pss4OH4EoOnEsN8b+FfCYkQ9gYo1Nx1m0XHykOg1z8dM5
-	 teMMlS4gCFGAp1eBUI0Wsbuc/AVxGgLKfIhdn7aQ7ZcPrBbTL3vEtZHR+p5qIShFkB
-	 g72olS0ZjiMcRlJSmZNy3KIBCUfs6zIuCNjExZojZVcsBGWZCTeLLlGQKYmeHevH4u
-	 NuAh5v5qMqKGcEDxBxXlvVkJ2xq9x4oYdhudohtcbK784+iOPUzpQGDlrPVRHWU65N
-	 34aG7zE0q5AEsthflUv9m08MG284qLsZPc/nuHl3J3ATT95+1mwd0cxkvk1oVnZ7SQ
-	 Ovf6taraZiQbw==
-Date: Wed, 6 Mar 2024 10:32:19 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jacob
- Keller <jacob.e.keller@intel.com>, Jiri Pirko <jiri@resnulli.us>, Stanislav
- Fomichev <sdf@google.com>, donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v2 0/5] tools/net/ynl: Add support for nlctrl
- netlink family
-Message-ID: <20240306103219.0a2a29e0@kernel.org>
-In-Reply-To: <20240306125704.63934-1-donald.hunter@gmail.com>
-References: <20240306125704.63934-1-donald.hunter@gmail.com>
+	s=arc-20240116; t=1709750153; c=relaxed/simple;
+	bh=1vIIlOoXQqaRL43xN9hPITwtLtN+twVOgmkPslLsNSY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AgZQEflz7NUTXkXy1dz6wY27BOezFOGbt0n5W93RNspMqdmlHXI48sxJhYe8bY7RjHvL8mUEHqlw4cO4tpyk2+0jweGC9JQD0ccAH2TqFBwjKBUvBXVHP8jK7nhV4cGJHlgG9uI3Hg/jtvYJynoxAUQ+qKCAhCK19iuRaFqR87Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1rhw7D-0005KA-VB; Wed, 06 Mar 2024 19:35:43 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1rhw7C-004nYD-HC; Wed, 06 Mar 2024 19:35:42 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1rhw7C-000p5I-1P;
+	Wed, 06 Mar 2024 19:35:42 +0100
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH next] net: rfkill: gpio: Convert to platform remove callback returning void
+Date: Wed,  6 Mar 2024 19:35:38 +0100
+Message-ID: <20240306183538.88777-2-u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2029; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=1vIIlOoXQqaRL43xN9hPITwtLtN+twVOgmkPslLsNSY=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBl6Ld6SXNQ8RTQGV6ETDKHTmfaKrEzAajOf//vI aD7Twxafl6JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZei3egAKCRCPgPtYfRL+ TliWB/4/44bcLECBDXbTYdOrnui5QJtNtr/GO/rgOMROTbzVURUfiQFiqKq2+5VFqIptqQiyyB2 yrWVWkXmXIyuvb5TDcbgoZWWwxv+zCF7SrX7S3bFOn9kWPaDEdbQKCh6trAHBsz9XZa+RVgYa8w MYoRMLTDXVcPS9p0fJKXf0CFEgjdBzod6gkiX37Oj5ur7Hm+EhdLjif6enPC42LCIw2NBwoQq4D eJZk43wPzmBA5cAmtl802rhpxI2RA9WCBHO+GibMoD/bGX/fhI9QL+PWxfBr9wFGqyltcdLc9qM 2W02UJ4z5D/p1e5u0/+zb0hJjNET5bbA9cTak6GR9MHiyMiL
+X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed,  6 Mar 2024 12:56:59 +0000 Donald Hunter wrote:
-> This series adds a new YNL spec for the nlctrl family, plus some fixes
-> and enhancements for ynl.
-> 
-> Patch 1 fixes an extack decoding bug
-> Patch 2 gives cleaner netlink error reporting
-> Patch 3 fixes an array-nest codegen bug
-> Patch 4 adds nest-type-value support to ynl
-> Patch 5 contains the nlctrl spec
+The .remove() callback for a platform driver returns an int which makes
+many driver authors wrongly assume it's possible to do error handling by
+returning an error code. However the value returned is ignored (apart
+from emitting a warning) and this typically results in resource leaks.
 
-Somewhat incredibly the C seems to work, I tested with this sample:
+To improve here there is a quest to make the remove callback return
+void. In the first step of this quest all drivers are converted to
+.remove_new(), which already returns void. Eventually after all drivers
+are converted, .remove_new() will be renamed to .remove().
 
-// SPDX-License-Identifier: GPL-2.0
-#include <stdio.h>
-#include <string.h>
+Trivially convert this driver from always returning zero in the remove
+callback to the void returning variant.
 
-#include <ynl.h>
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+Hello,
 
-#include "nlctrl-user.h"
+this is merge window material. I'm unsure if I should put "net-next" or
+"next" or "wireless-next" into the subject line. I hope my choice
+doesn't make people angry :-)
 
-int main(int argc, char **argv)
-{
-	struct nlctrl_getfamily_list *fams;
-	struct ynl_error yerr;
-	struct ynl_sock *ys;
-	char *name;
+Best regards
+Uwe
 
-	ys = ynl_sock_create(&ynl_nlctrl_family, &yerr);
-	if (!ys) {
-		fprintf(stderr, "YNL: %s\n", yerr.msg);
-		return 1;
-	}
+ net/rfkill/rfkill-gpio.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-	printf("Select family ($name; or 0 = dump): ");
-	scanf("%ms", &name);
+diff --git a/net/rfkill/rfkill-gpio.c b/net/rfkill/rfkill-gpio.c
+index 4e32d659524e..84529886c2e6 100644
+--- a/net/rfkill/rfkill-gpio.c
++++ b/net/rfkill/rfkill-gpio.c
+@@ -156,14 +156,12 @@ static int rfkill_gpio_probe(struct platform_device *pdev)
+ 	return ret;
+ }
+ 
+-static int rfkill_gpio_remove(struct platform_device *pdev)
++static void rfkill_gpio_remove(struct platform_device *pdev)
+ {
+ 	struct rfkill_gpio_data *rfkill = platform_get_drvdata(pdev);
+ 
+ 	rfkill_unregister(rfkill->rfkill_dev);
+ 	rfkill_destroy(rfkill->rfkill_dev);
+-
+-	return 0;
+ }
+ 
+ #ifdef CONFIG_ACPI
+@@ -183,7 +181,7 @@ MODULE_DEVICE_TABLE(of, rfkill_of_match);
+ 
+ static struct platform_driver rfkill_gpio_driver = {
+ 	.probe = rfkill_gpio_probe,
+-	.remove = rfkill_gpio_remove,
++	.remove_new = rfkill_gpio_remove,
+ 	.driver = {
+ 		.name = "rfkill_gpio",
+ 		.acpi_match_table = ACPI_PTR(rfkill_acpi_match),
 
-	if (!name || !strcmp(name, "0")) {
-		fams = nlctrl_getfamily_dump(ys);
-		if (!fams)
-			goto err_close;
+base-commit: 11afac187274a6177a7ac82997f8691c0f469e41
+-- 
+2.43.0
 
-		ynl_dump_foreach(fams, f)
-			printf("%d: %s\n", f->family_id, f->family_name);
-		nlctrl_getfamily_list_free(fams);
-	} else {
-		struct nlctrl_getfamily_req *req;
-		struct nlctrl_getfamily_rsp *f;
-
-		req = nlctrl_getfamily_req_alloc();
-		nlctrl_getfamily_req_set_family_name(req, name);
-
-		f = nlctrl_getfamily(ys, req);
-		nlctrl_getfamily_req_free(req);
-		if (!f)
-			goto err_close;
-
-		printf("%d: %s\n", f->family_id, f->family_name);
-		nlctrl_getfamily_rsp_free(f);
-	}
-	free(name);
-
-	ynl_sock_destroy(ys);
-	return 0;
-
-err_close:
-	fprintf(stderr, "YNL: %s\n", ys->err.msg);
-	ynl_sock_destroy(ys);
-	return 2;
-}
 
