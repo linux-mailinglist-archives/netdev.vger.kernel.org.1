@@ -1,67 +1,58 @@
-Return-Path: <netdev+bounces-78012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E04D3873BBB
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:09:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6664873BCA
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:13:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D5EB1C20404
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:09:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13D951C212E3
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:13:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 784B3135A52;
-	Wed,  6 Mar 2024 16:09:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A356C135403;
+	Wed,  6 Mar 2024 16:13:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q8Ep8tS4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="czqlx4JO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E06C134435;
-	Wed,  6 Mar 2024 16:09:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8014960912
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 16:13:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709741373; cv=none; b=RWbMoeBH8jdlsZZ4E4AAzl/18yo8HALsLTexBZ2AgJutqtdZ/lZG+GEBKmH7DoWRVKcF/Jma7JeiGp6gnyHhcl+0nhvHkiSRcRv/MRjjzrKVFvGLNDBYl7pHc2NRiQhOt/jSZC1Ap/34KLuf0cKd+Fa8nk7pAyPb0A+zkY5GF3I=
+	t=1709741605; cv=none; b=iwAY8al/7cWe3WkMFnVs/Lch1zny1MKIXbH/aIzXXvIsDR50lJ2/+Ohwqe0/6t23AbJ/Wg/Qtj4xJO6M6Um5ZW8z3uFjL7ccfBqRrKL087kvhJZS1jFs3FVSLzrAkPrSIx1WsvmXlzpnXt4DnEvPGU/ALsHyaqiHHGezcR+O298=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709741373; c=relaxed/simple;
-	bh=hNWD+Zmz9092UXBeYAgMkfvemRul5fkYSRm6vD9xmnQ=;
+	s=arc-20240116; t=1709741605; c=relaxed/simple;
+	bh=xiNPVvq6XCN20WYZBLkKWC0Zz3ZQNRYQi0CBtTVTOpc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O41pFBVE0fwLiZzaow4nHRYn1AcHYsiz1sGR2CIdqVSfztdC3v4oQ9xK4GHOyyGydGPGl5vXYyd5VPZwU1vXE4Rsb41VX2IWLaKjnzPluf4LlMKLqfF07/KM6CrLovj0IQ84dl7hfuP1h5igIVuBSRZvUi/uLzqvUnPKdS30B1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q8Ep8tS4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54F6BC433C7;
-	Wed,  6 Mar 2024 16:09:32 +0000 (UTC)
+	 MIME-Version:Content-Type; b=JloP2hZAtYLnPh7WqMRgEnw4M6Be0NXlYGG5JoVmwh35AmCSoZLpEve/9s8N9jx9h0BAbsSEfS8iRBq79ex9/rdG1vhz+HP14TUdZHXJ1Z3ndeZDiL1KNW01t443DsuIyxQSnKfVXZvaN+yUiygrI2WvCMII/Q4MWUoTTuQ9IUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czqlx4JO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3C2FC433C7;
+	Wed,  6 Mar 2024 16:13:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709741372;
-	bh=hNWD+Zmz9092UXBeYAgMkfvemRul5fkYSRm6vD9xmnQ=;
+	s=k20201202; t=1709741604;
+	bh=xiNPVvq6XCN20WYZBLkKWC0Zz3ZQNRYQi0CBtTVTOpc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q8Ep8tS4wMTRZBk2LczwIkh160VwpnRxIQTpZI9ZQPDIKmjD8QgWdgZ6gDwCGswnr
-	 ud5/Y9+05pVZAbCVwOhyQXjIS3EhgYU0ySyne5/b3G7MLaKeFzhXLtkrS1doE8gRSM
-	 97zKmfabFDZ1/P8/EMfvgaFU4xFkyaBOfOMFir7qUu7OzmMRhcdja7RnAwkY2f6xGo
-	 +ZVXlYt2k7DnBoE0rO8v6Fflrkls9HMLMJ70IgKIIIvZZ+KF8RHQh8FyHOUjysiDzW
-	 c9zzKJEQCqBzzc/b36ZMEyArgz7H3OQB0W9Xi+oPnLNGPfUyTUta8ao/Vchl37rOAk
-	 3eZ5A32Ir31TQ==
-Date: Wed, 6 Mar 2024 08:09:31 -0800
+	b=czqlx4JOA5vDarQnP3mjkrZSuMc+Y5kkBYwbE6VfrH3HgWYeXzTtJextY90bl2ZEz
+	 j2nm4TTjSqpG+g+KkLiLtHXbOC4Vvupg6epst0TSMw3uHGnjQ86tA3bPumqZ8jTSB0
+	 Dld0rLHoJITwbL6qbv4Zj0K6C1rUZyTBTQSjMhT+VRwpn8Q3SH3VhTt6DdsVWZHgja
+	 /H+6Z4S/3BLXHyJfUSgYfEikg7rF1W1S4WGSVBZRac26f1wboWaJOLtXTzrz/LY7qM
+	 F3F5L6onuRMAe+oMoLgBoC81j9B6L2Su+KQaAbFXs6zcGESx2dnsKXcAr5W2lAj+zp
+	 yaVFC15MfxQVg==
+Date: Wed, 6 Mar 2024 08:13:22 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
- "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
- "dsahern@kernel.org" <dsahern@kernel.org>, Gal Pressman <gal@nvidia.com>,
- "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Leon
- Romanovsky <leonro@nvidia.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
- "edumazet@google.com" <edumazet@google.com>, "almasrymina@google.com"
- <almasrymina@google.com>, "Anatoli.Chechelnickiy@m.interpipe.biz"
- <Anatoli.Chechelnickiy@m.interpipe.biz>, "ian.kumlien@gmail.com"
- <ian.kumlien@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [RFC] net: esp: fix bad handling of pages from page_pool
-Message-ID: <20240306080931.2e24101b@kernel.org>
-In-Reply-To: <320ef2399e48ba0a8a11a3b258b7ad88384f42fb.camel@nvidia.com>
-References: <20240304094950.761233-1-dtatulea@nvidia.com>
-	<20240305190427.757b92b8@kernel.org>
-	<7fc334b847dc4d90af796f84a8663de9f43ede5d.camel@nvidia.com>
-	<20240306072225.4a61e57c@kernel.org>
-	<320ef2399e48ba0a8a11a3b258b7ad88384f42fb.camel@nvidia.com>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo
+ Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v2 00/22] Introducing OpenVPN Data Channel
+ Offload
+Message-ID: <20240306081322.6f230dc5@kernel.org>
+In-Reply-To: <31c1d654-c5b4-45a1-a8e3-48e631f915ab@openvpn.net>
+References: <20240304150914.11444-1-antonio@openvpn.net>
+	<20240305113032.55de3d28@kernel.org>
+	<31c1d654-c5b4-45a1-a8e3-48e631f915ab@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,24 +62,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 6 Mar 2024 16:00:46 +0000 Dragos Tatulea wrote:
-> > Hm, that's a judgment call.
-> > Part of me wants to put it next to napi_frag_unref(), since we
-> > basically need to factor out the insides of this function.
-> > When you post the patch the page pool crowd will give us
-> > their opinions.
->
-> Why not have napi_pp_put_page simply return false if CONFIG_PAGE_POOL is not
-> set?
+On Wed, 6 Mar 2024 16:44:41 +0100 Antonio Quartulli wrote:
+> >   - some basic set of tests (or mention that you'll run your own CI
+> >     and report results to us: https://netdev.bots.linux.dev/status.html)  
+> 
+> I currently have a small userspace tool (that implements the netlink 
+> APIs) and a script that by means of netns and this tool runs a bunch of 
+> tests.
+> 
+> Is there any requirement about how the test should work so that I can 
+> make it compatible with your harness? I will then push it to 
+> /tools/testing/selftests/ovpn so that you can pick it up.
 
-Without LTO it may still be a function call.
-Plus, subjectively, I think that it's a bit too much logic to encode in
-the caller (you must also check skb->pp_recycle, AFAIU)
-Maybe we should make skb_pp_recycle() take struct page and move it to
-skbuff.h ? Rename it to skb_page_unref() ?
+Standard kernel selftest rules apply, we try to keep it pretty vanilla.
+Test should exit with 0 on success, 1 on fail, and 4 on skip.
+Skip if there are any missing dependencies in the test environment.
 
-> Regarding stable would I need to send a separate fix that does the raw pp page
-> check without the API?
-
-You can put them in one patch, I reckon.
+This has more deets on how we execute the tests:
+https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
 
