@@ -1,115 +1,124 @@
-Return-Path: <netdev+bounces-78090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F9888740A6
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 20:42:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D128B8740A9
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 20:42:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DD0E2833A1
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 19:42:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D4451F22AB9
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 19:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9545F140362;
-	Wed,  6 Mar 2024 19:42:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78330140380;
+	Wed,  6 Mar 2024 19:42:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iaoNDqGS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B92A60250;
-	Wed,  6 Mar 2024 19:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48D0140E22
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 19:42:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709754126; cv=none; b=hsIy6g6AYEnx9e8sONAiQq5Oz0RHsmgSyOnqMID4YPUIFw55BEgN7Q1m3OluEz1aU1iCZk4/jXP3hMA6MWfqV3JQvV36MC+mffQJFVxHFbQnhbxdoJ22tikJPDvoQ9ayz7J7bSZJXyrB3z8BakktjUk+ByJ2+FbA+wb/A+BjdAY=
+	t=1709754135; cv=none; b=e2wWFyuNfXute24khNnxuhpAIwL+k3J1jxBjwh2XGArFMbUHTPLxVaC03Gq0jlFG5qSIb14ViRLmP1zV95piO4gvCOQeowYJXoweEXWNujh4/BNS/AA8cyaVmT/V/NAKc5qktkoc00yfXRmkiFmyXGBwQA6rQabzdod8yifSzFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709754126; c=relaxed/simple;
-	bh=whu07ooxW6kWeuVMdOr7djt4Zcxe2pjCyzB54JBEO24=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=YXPxFBkEmrXX00J/50kY/su3UKHnVT0/l96RlQ0IxifhnOX4S9UX3+lpIbZES4cR1gHJBP1U068p8/j2UINkHe9a2jr90eShUCbpDuRPEGHrUokpILaxrnH0ejezW9LZXJInyeCublyXxZWUCvmUKu3aROODm2VzYiZLTCntp+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.76.108) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 6 Mar
- 2024 22:41:46 +0300
-Subject: Re: [PATCH net-next] dt-bindings: net: renesas,etheravb: Add support
- for R-Car V4M
-To: Geert Uytterhoeven <geert+renesas@glider.be>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Sergei Shtylyov
-	<sergei.shtylyov@gmail.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, Thanh Quan <thanh.quan.xn@renesas.com>
-References: <0212b57ba1005bb9b5a922f8f25cc67a7bc15f30.1709631152.git.geert+renesas@glider.be>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <a20b154d-9d7a-9775-851a-860490be1f1f@omp.ru>
-Date: Wed, 6 Mar 2024 22:41:46 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1709754135; c=relaxed/simple;
+	bh=fz8sVULSokUEtg1apAJP0N1kFWc3PTDlmYeHhou+7FM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=qSdQO1z9uWNeMkICOFzyZppZsLvwP/ZMHPelWxq7p5Ha9HR4mtDXIROOSh4Y+wP5t56b5V2crrkz3ScsuzwlLW0QIW3TP/Ujoe75No2qnnU0h3n5MIFU4BzrqDd6jL79leL4tL44uMAt+LCEdL7oMsq7wamadTqg9vhvYAqHcHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iaoNDqGS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709754132;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=7NzAkrFfDtAG1W4IZ9k3+0Y5QZ/B1qwXKO/PPRafIn0=;
+	b=iaoNDqGS7trldiiJjrc6YpMHf4VTDK14rIfytZh3B3lPREwMrjiF5EBjHaVUozbcrr2A1H
+	if3bhMwVlMqUovSbxhy38CkHXSFcTVNKEECjxohuE9rURtm5YLPS4Ac4u1mPvTo/FFzMbL
+	A+fZz9otULlECxKLjILdosIItVJZ3Nk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-135-lhnnuKE-NN-TQ7tU0BGcmw-1; Wed, 06 Mar 2024 14:42:08 -0500
+X-MC-Unique: lhnnuKE-NN-TQ7tU0BGcmw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1825185A58C;
+	Wed,  6 Mar 2024 19:42:08 +0000 (UTC)
+Received: from tpad.localdomain (unknown [10.96.133.5])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D5B1BC041EF;
+	Wed,  6 Mar 2024 19:42:07 +0000 (UTC)
+Received: by tpad.localdomain (Postfix, from userid 1000)
+	id 3A5B04014ABF9; Wed,  6 Mar 2024 16:41:47 -0300 (-03)
+Date: Wed, 6 Mar 2024 16:41:47 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next -v4] net/core/dev.c: enable timestamp static key if
+ CPU isolation is configured
+Message-ID: <ZejG+1YF4Rk89Gc9@tpad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <0212b57ba1005bb9b5a922f8f25cc67a7bc15f30.1709631152.git.geert+renesas@glider.be>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 03/06/2024 19:21:53
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 184012 [Mar 06 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 9 0.3.9 e923e63e431b6489f12901471775b2d1b59df0ba
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.76.108 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;127.0.0.199:7.1.2;178.176.76.108:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.76.108
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/06/2024 19:26:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/6/2024 2:00:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-On 3/5/24 12:37 PM, Geert Uytterhoeven wrote:
 
-> From: Thanh Quan <thanh.quan.xn@renesas.com>
-> 
-> Document support for the Renesas Ethernet AVB (EtherAVB-IF) block in the
-> Renesas R-Car V4M (R8A779H0) SoC.
-> 
-> Signed-off-by: Thanh Quan <thanh.quan.xn@renesas.com>
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+For systems that use CPU isolation (via nohz_full), creating or destroying
+a socket with SO_TIMESTAMP, SO_TIMESTAMPNS or SO_TIMESTAMPING with flag
+SOF_TIMESTAMPING_RX_SOFTWARE will cause a static key to be enabled/disabled.
+This in turn causes undesired IPIs to isolated CPUs.
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+So enable the static key unconditionally, if CPU isolation is enabled,
+thus avoiding the IPIs.
 
-[...]
+Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
-MBR, Sergey
+---
+v2: mention SOF_TIMESTAMPING_OPT_TX_SWHW in the commit log (Willem de Bruijn / Paolo Abeni)
+v3: SOF_TIMESTAMPING_OPT_TX_SWHW is irrelevant (Willem de Bruijn)
+v4: additional changelog improvements (Willem de Bruijn)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index c588808be77f..15a32f5900e6 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -155,6 +155,7 @@
+ #include <net/netdev_rx_queue.h>
+ #include <net/page_pool/types.h>
+ #include <net/page_pool/helpers.h>
++#include <linux/sched/isolation.h>
+ 
+ #include "dev.h"
+ #include "net-sysfs.h"
+@@ -11851,3 +11852,14 @@ static int __init net_dev_init(void)
+ }
+ 
+ subsys_initcall(net_dev_init);
++
++static int __init net_dev_late_init(void)
++{
++	/* avoid static key IPIs to isolated CPUs */
++	if (housekeeping_enabled(HK_TYPE_MISC))
++		net_enable_timestamp();
++
++	return 0;
++}
++
++late_initcall(net_dev_late_init);
+
 
