@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-77910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14EA2873720
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:57:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9143873722
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:57:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7A111C2121F
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 12:57:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCA061C21A78
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 12:57:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B44E130E41;
-	Wed,  6 Mar 2024 12:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82AB6130AEB;
+	Wed,  6 Mar 2024 12:57:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KRQeQF2Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RFFo6g/v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6033B130AEB
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 12:57:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22FC86AE9
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 12:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709729833; cv=none; b=C7jgqPHJ9hzvK9x8D/a+bAiLUUXyw01LeYFZnUJXqE1cwm8Ri/d1TYC/tjPwTfvXJMZatkaXTT74/wiR+H8gzEedBcFG7ZYMfEFBRO7+iSWM7zzBbbDT4MvfuN2Ca/ZonDTs95Z1mOaA8fBIKAK7q3HF1Y/9xz0aHOap+vMHuvg=
+	t=1709729834; cv=none; b=beVehF0GfVSgGH+I2X9Wo5LnF+aOU6ee00Cynht1PzntreQaG7304gi0dYJthYEpA3snySR1fHOi+XyYWJVkRYKy8N6W9rjzTvPKOHoLd3Jfs1vJ8VI8iBg1ckyUf41bexczvD19Inu13iQP955LV81Xgp6Kd7Q+4xq4RbRFnGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709729833; c=relaxed/simple;
-	bh=dPoLKWVS4dABvAcIwjgCoLL1hJojn22hz99RFo/YbFI=;
+	s=arc-20240116; t=1709729834; c=relaxed/simple;
+	bh=nDCJ3eaSXIg6bwGEZ1SyaLIaxerMhudsN4/UrqnAu58=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=thXSD33hkerhJQb796ZZwWTp30rK7ojNFFhWy2FmnvDb/2FMqdFOdJjbnum2M+dPdRJ0YyimvaaRjk5ZOJ3SJKVg0EIwh2ORE5EG68dEknjhwpNwYZbsVQguqjQ848hVz6lpXlAF+xA9Z+RZst0lI7D7Iiuej/05yQauSUkR9ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KRQeQF2Y; arc=none smtp.client-ip=209.85.128.45
+	 MIME-Version; b=hb07Jqrw0D7+b4w//1nwDEn6m2ojuMAGJOKv0naieQj52p77Zlt2JGAeTS+E5L7imPa3+xCNKr6jfEHFCyuDjE5lhiUbXPQORdnCyYCc1HTr1/M2q9qjdtWIzIrOr0HlisLz3nBqmie3FBO8pLm7JBspvR/5I02jOnWmb1o0us8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RFFo6g/v; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-412eced6d1aso13892445e9.3
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 04:57:11 -0800 (PST)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-412f8d2b0fcso2702445e9.2
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 04:57:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709729829; x=1710334629; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1709729831; x=1710334631; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dzuU4+6cXvMlJeXmYFWKyXaVUJ9CABu9KBmAr9ervN0=;
-        b=KRQeQF2YbwXI7C0UX4XJ+tvC+NTWLAs5Dz5Gl2OS2Qzx00qLJEujj3evD0kBoC2Zhv
-         7tb4uWVsrlyf1mpeyjvRM1ZHBtKPJXsamaKzR2xfZ+j5Abp7xQgrttEUrN9wzkUUmId4
-         AqmtXCUIkAQFMfaElZRQFd66NJ+khbhioKwDK/HulP8Qz7Wl/nUrh36FeK6kBpBwOBoB
-         MewHPKz7ylgXrWrjPF3ILUOs5ajuEjBBX1k99heWg0Duf6foaYKiLye4AqHYlVPzyfuu
-         4hqMvOFV/4aPOXq5cN4qutkUeqwnYsB2IB1ZqShK2IJPhKOCy0hIRTehYcHSpAIsJ043
-         gtfw==
+        bh=KAD2BKLxK8AlKfwB8eeB8Ra1Y5lNbnQ/Edb//dSEFhQ=;
+        b=RFFo6g/vt9GWXjqy9pxWRjMYbFHjGJ62ojbYirmT6ztuAeIzEwklhmw95hZPBXS2F9
+         iQuYEeX2P64TrvF4DXoVDU0Ka0/J0cNa+34hm9YeAxGSALCJW60mvbvc5l6mEIfEj48e
+         Bijd5altbT4NKv+3pl3hJav4JeLR6B32UlAew9CjdxfaLp5mRlMrm6X/4nkYjCv/GFcl
+         lV3lf9S64gC/DXMMWQfjKxUiyOtUPuw4s4YPduL3Lmhlm1iXfWWIsgfJhqj7doNulrKR
+         jDAYEB2YmEwoX7r9NboIF2F3tGjKpOu72s3v+YRDwA2Gf0hzaCi0OEj68j4bDswDOUTz
+         4/Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709729829; x=1710334629;
+        d=1e100.net; s=20230601; t=1709729831; x=1710334631;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dzuU4+6cXvMlJeXmYFWKyXaVUJ9CABu9KBmAr9ervN0=;
-        b=WyD+y6lBR5ORAJV7T6MWPNiEMGpuEnmQ3m5x+lOPx6sl+UyH+0WTO/TIhZdvXgHYPH
-         j9ZvdZdSskhjgwcnxvUtgySz6IC1DqTS6UMiXnWeB0N28CS0BD56rolPKg9REsdTwt8u
-         4P1ibEWSx3EVoPbGCIFgqmIYNaUpBhduXIDq8EP/0izysysHNsRfDKQANZvEt4yZfEKl
-         Cwu7U5f1hh0NGEcnCr+Sg62VmBBVlENPjKIZxWQBP6Z5cc9W3N8C3ye/20oxdib1eskH
-         GbbZAzDZUia7I8DiyvwkeU17f6Hl0ucRvxn944lBX9VC6Tn+Szt+VIMVQyCT8WAjO497
-         bHxg==
-X-Gm-Message-State: AOJu0YzyeQJJdzW2KouCH/+aGmqsDt9V0x1+RkOjJtmA5B52z748yXRB
-	ZdyZ9qgrByFAljmXElSiAEqVDl0N0YwRSly/OkH8B9/pbYb8Z+s7hqrpPxVbaVU=
-X-Google-Smtp-Source: AGHT+IEFjZDOj5pcYYckR0TM1mO5SbDCcD44vUvc6RXz8jGUBYriII7JWeidBMrmigUiWmE0fjadIQ==
-X-Received: by 2002:a05:600c:4e90:b0:411:c9c0:eddf with SMTP id f16-20020a05600c4e9000b00411c9c0eddfmr12126146wmq.36.1709729829117;
-        Wed, 06 Mar 2024 04:57:09 -0800 (PST)
+        bh=KAD2BKLxK8AlKfwB8eeB8Ra1Y5lNbnQ/Edb//dSEFhQ=;
+        b=jZFqOHOA+QWJ1IZRBaWGS6wByxU+I4g1rCvSCj0pe55L0xytpTxI7ofrxUU5+JeQoX
+         QN7MV85hfQC1cOnhppUd00u6ReCz92x0r0PWc0P+8yDL1hdgBkbplUAUfz6oZiuGvifj
+         SC8ixhBoypLLm1kWZaTtEyR51yYm9w24IEQg7gticyYxlNkMVHDe1HuosZan4dPIelHP
+         1xyEJ1ggOCIs98va5mMj3LlZmWIem1ilDjK/r7IlamfOWgSJUORWu3jx3YmhSuNI8vMn
+         hiIU30hznqomEBEbiPD5S3i/4ympuNtF+HM20XI63FIq6E0BcWaFxBE8ZOekeHNDzFGH
+         dX5Q==
+X-Gm-Message-State: AOJu0Yw5otzsi9JwjMFXGX3GccVlCRzXq07msGn3rzeREKeKaMa3uG9N
+	cWMwCa7+w0xTeeatA42+lZzxJmeUo9IqK5k4Xvs8K5Jya2tdGyNNovexvGWWdg8=
+X-Google-Smtp-Source: AGHT+IEVChPT6nWDMZdDH0EuEjPwCtbpHQuyUZ1sOSwTG/0syG06xYdMsiq9nMZa6P1iQ8j7Tce6oQ==
+X-Received: by 2002:a05:600c:458b:b0:412:bd3e:9fee with SMTP id r11-20020a05600c458b00b00412bd3e9feemr11136501wmo.0.1709729830441;
+        Wed, 06 Mar 2024 04:57:10 -0800 (PST)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:503c:e93d:cfcc:281b])
-        by smtp.gmail.com with ESMTPSA id p7-20020a05600c358700b00412b6fbb9b5sm11857279wmq.8.2024.03.06.04.57.08
+        by smtp.gmail.com with ESMTPSA id p7-20020a05600c358700b00412b6fbb9b5sm11857279wmq.8.2024.03.06.04.57.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Mar 2024 04:57:08 -0800 (PST)
+        Wed, 06 Mar 2024 04:57:09 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -77,9 +77,9 @@ To: netdev@vger.kernel.org,
 	Stanislav Fomichev <sdf@google.com>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v2 1/5] tools/net/ynl: Fix extack decoding for netlink-raw
-Date: Wed,  6 Mar 2024 12:57:00 +0000
-Message-ID: <20240306125704.63934-2-donald.hunter@gmail.com>
+Subject: [PATCH net-next v2 2/5] tools/net/ynl: Report netlink errors without stacktrace
+Date: Wed,  6 Mar 2024 12:57:01 +0000
+Message-ID: <20240306125704.63934-3-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240306125704.63934-1-donald.hunter@gmail.com>
 References: <20240306125704.63934-1-donald.hunter@gmail.com>
@@ -91,48 +91,89 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Extack decoding was using a hard-coded msg header size of 20 but
-netlink-raw has a header size of 16.
+ynl does not handle NlError exceptions so they get reported like program
+failures. Handle the NlError exceptions and report the netlink errors
+more cleanly.
 
-Use a protocol specific msghdr_size() when decoding the attr offssets.
+Example now:
+
+Netlink error: No such file or directory
+nl_len = 44 (28) nl_flags = 0x300 nl_type = 2
+	error: -2	extack: {'bad-attr': '.op'}
+
+Example before:
+
+Traceback (most recent call last):
+  File "/home/donaldh/net-next/./tools/net/ynl/cli.py", line 81, in <module>
+    main()
+  File "/home/donaldh/net-next/./tools/net/ynl/cli.py", line 69, in main
+    reply = ynl.dump(args.dump, attrs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/donaldh/net-next/tools/net/ynl/lib/ynl.py", line 906, in dump
+    return self._op(method, vals, [], dump=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/donaldh/net-next/tools/net/ynl/lib/ynl.py", line 872, in _op
+    raise NlError(nl_msg)
+lib.ynl.NlError: Netlink error: No such file or directory
+nl_len = 44 (28) nl_flags = 0x300 nl_type = 2
+	error: -2	extack: {'bad-attr': '.op'}
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- tools/net/ynl/lib/ynl.py | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ tools/net/ynl/cli.py          | 18 +++++++++++-------
+ tools/net/ynl/lib/__init__.py |  4 ++--
+ 2 files changed, 13 insertions(+), 9 deletions(-)
 
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 239e22b7a85f..b810a478a304 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -353,6 +353,9 @@ class NetlinkProtocol:
-             raise Exception(f'Multicast group "{mcast_name}" not present in the spec')
-         return mcast_groups[mcast_name].value
+diff --git a/tools/net/ynl/cli.py b/tools/net/ynl/cli.py
+index e8a65fbc3698..f131e33ac3ee 100755
+--- a/tools/net/ynl/cli.py
++++ b/tools/net/ynl/cli.py
+@@ -6,7 +6,7 @@ import json
+ import pprint
+ import time
  
-+    def msghdr_size(self):
-+        return 16
-+
- 
- class GenlProtocol(NetlinkProtocol):
-     def __init__(self, family_name):
-@@ -378,6 +381,8 @@ class GenlProtocol(NetlinkProtocol):
-             raise Exception(f'Multicast group "{mcast_name}" not present in the family')
-         return self.genl_family['mcast'][mcast_name]
- 
-+    def msghdr_size(self):
-+        return super().msghdr_size() + 4
+-from lib import YnlFamily, Netlink
++from lib import YnlFamily, Netlink, NlError
  
  
- class SpaceAttrs:
-@@ -721,7 +726,7 @@ class YnlFamily(SpecFamily):
-             return
+ class YnlEncoder(json.JSONEncoder):
+@@ -66,12 +66,16 @@ def main():
+     if args.sleep:
+         time.sleep(args.sleep)
  
-         msg = self.nlproto.decode(self, NlMsg(request, 0, op.attr_set))
--        offset = 20 + self._struct_size(op.fixed_header)
-+        offset = self.nlproto.msghdr_size() + self._struct_size(op.fixed_header)
-         path = self._decode_extack_path(msg.raw_attrs, op.attr_set, offset,
-                                         extack['bad-attr-offs'])
-         if path:
+-    if args.do:
+-        reply = ynl.do(args.do, attrs, args.flags)
+-        output(reply)
+-    if args.dump:
+-        reply = ynl.dump(args.dump, attrs)
+-        output(reply)
++    try:
++        if args.do:
++            reply = ynl.do(args.do, attrs, args.flags)
++            output(reply)
++        if args.dump:
++            reply = ynl.dump(args.dump, attrs)
++            output(reply)
++    except NlError as e:
++        print(e)
++        exit(1)
+ 
+     if args.ntf:
+         ynl.check_ntf()
+diff --git a/tools/net/ynl/lib/__init__.py b/tools/net/ynl/lib/__init__.py
+index f7eaa07783e7..9137b83e580a 100644
+--- a/tools/net/ynl/lib/__init__.py
++++ b/tools/net/ynl/lib/__init__.py
+@@ -2,7 +2,7 @@
+ 
+ from .nlspec import SpecAttr, SpecAttrSet, SpecEnumEntry, SpecEnumSet, \
+     SpecFamily, SpecOperation
+-from .ynl import YnlFamily, Netlink
++from .ynl import YnlFamily, Netlink, NlError
+ 
+ __all__ = ["SpecAttr", "SpecAttrSet", "SpecEnumEntry", "SpecEnumSet",
+-           "SpecFamily", "SpecOperation", "YnlFamily", "Netlink"]
++           "SpecFamily", "SpecOperation", "YnlFamily", "Netlink", "NlError"]
 -- 
 2.42.0
 
