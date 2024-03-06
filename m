@@ -1,75 +1,74 @@
-Return-Path: <netdev+bounces-77974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18EC7873AAE
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:31:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9FB2873AB8
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:33:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 378E0B208DE
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:30:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51B071F24C83
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:33:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 847C51350C6;
-	Wed,  6 Mar 2024 15:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E79E1353E4;
+	Wed,  6 Mar 2024 15:33:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="d+3OYhKS"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Jx3BPlfq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E08C7FBBD
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 15:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37CBD1353F2
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 15:33:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709739054; cv=none; b=sKXSCijL8YbJloIr90LIAPp3g/N2grhx5PzzFkTH1u7Ab+6bvZJaWin8jEhM65kJ33bUfezAzoeF8KkF208vw+++vuCg8XvERrC4BTZY14pIdm9SMlJBQSS2qFMXIPS1HTlxmEwVoz2ekZXrkxy50GmN1tErlBVutnPqRLiBjg8=
+	t=1709739196; cv=none; b=SgT4wdW/pLWbg90h6Ae4dhkGqMKBfGzHmXFRF5qQFARpqjXEquJyYvesB9pZmFHVHN3fDiNSOwBFw+HqpTOr/YKmkMnjXq5EkibcBpsqizdL9Ej8zHlDw+Bh27x+7W6MdMGPwHZ9P+zB0/UlVnHZNjcbBrUH+Yz7lXW1da4S2dE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709739054; c=relaxed/simple;
-	bh=2+qaUSLGHOnZ0UEDP/W0AcOAmnAaie1sUkRN19UGt2o=;
+	s=arc-20240116; t=1709739196; c=relaxed/simple;
+	bh=imtkX9gBmdppgELF/cGN76NWkfppQ2dMry/8J2dVZRo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UpBGYThy7Dbfzq9RZy/JWPdVejHk8Sc8UBeni1FbSvGwl6XtLWL12rMUA6ZUOEf5WMnvQdd55dIo3N/p5nfJGEtGHYA67i7BI3xvEttOESYg6BdATf8cU5dLWOQYu2IuOohtymONWa8tFz2/gJkb8ruZKSypvzjJE7MGc6630bQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=d+3OYhKS; arc=none smtp.client-ip=209.85.208.47
+	 In-Reply-To:Content-Type; b=UWYo/+iqGb0CDw3Bqvi77Bk3wINZDfCDLXQTXvXqXeHpAkI1GHiwEs13AJxbunSKIjYyHwf3mL8n7PwRO3hV88/VgYslu1MmaioX9DgjHjJY3dQacw8AjUz4MAmCe7LmnesmbCnPUG7l+N6WCC6dKUOWiSDJk233OZ9zzNBxnyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Jx3BPlfq; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-563c403719cso9330979a12.2
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 07:30:52 -0800 (PST)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-565c6cf4819so1854103a12.1
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 07:33:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1709739051; x=1710343851; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1709739192; x=1710343992; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=82Ehdepy7y3ocqXPKl2WoMakc0rHqN/WJxyAo+5MaRc=;
-        b=d+3OYhKSUwEx18i145icteeS1zOvAvq9CJKj9ZCFwNyhC7vyzUxTgXzIQ9BQ+JKz2V
-         Q5fmBRbwVq9jRRgeqFccmsejHWrn/2G3vIWzw14dbB2x/tlG8rvLE/+8oHgvX2hIivQV
-         ksMSA6XHD6cIXTKgJPwqhMK5CkG2XFhB1XSjm88G4XZXjod8eSvNd6dcOwhKYHou6tgv
-         a4WMv8IJXCh9a1pTJvfHo6GTbip9eGQCXGZoEVpWQDmGDQzSR7pUtH92faKYKXkmp0Qs
-         l9J/07lNfw39nvb1wJ3PeTI8M07Zj/IxeDZe3Y+Zb5ikPEhYzuiFYk7ioOREG7qd4kuc
-         KllA==
+        bh=hFchKHynSlo3WjEfCn/qwGa2rnv1jG5UZW8Bbqxs7X8=;
+        b=Jx3BPlfqzI9rV1GM7reUlH8VJzoCGxqNjNQ10HL5cSq08SpFaNTkB68SChdH2BXhds
+         GqqsRsPasPWbo/Nnpr80qrjsokrEGQ3t+SfUuR1nItaCRhvmwc3x+arpJgP65EDBMPsh
+         NjUecGAQwM0ROth2BJt5aZC30UzzaO3Vqfw47fEL301tLzzcRxnlsNDLQymDTk4R2lu9
+         QyvAubO5t0pklHFx1D2ul2aAOgXQFu7NCCmZ+QGv54mLQBXK34f6GNaHxPsBx8CfckRl
+         UfIBRuZvliij/GPfR/mVgGND2CqYUfgJHStG++4tEPiZnApEBfX2iE41LgwIRpZ/0wuO
+         px/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709739051; x=1710343851;
+        d=1e100.net; s=20230601; t=1709739192; x=1710343992;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=82Ehdepy7y3ocqXPKl2WoMakc0rHqN/WJxyAo+5MaRc=;
-        b=QfuhFvPTJkPugXIaNWfnE95+nQilGcmN9+PcVqeBi+Bje+mqczR7fTwfjVrtcOCakx
-         y3+X1X8d0yHAWSgiy33AgZBgPGjH+89TFujGbQbk+sv926Jr/f6TdmtvuQ4mrE37/Vzd
-         9vfFDL+oVWUAkM1t+cZUMmc6JfsegxCSmI668Hr12PmCCSwYKtc8liuXbCDPM6PybNHn
-         BK3q6EEEL5eEWWjV7wVUVi1a9oqq82MnC9OPI4cKgBAFXpXAMwVPV7WCmAqnq2ufmUKT
-         nNqDv4gf3DAOd+6XikOtnSLJ4FN+5wLDN1V/9P/uBsN0ZufpZCMqr4sax9eU4kJR4zMJ
-         5FhQ==
-X-Gm-Message-State: AOJu0YwwHFfpkB7FPSxSlYDjPfZWzyXs9EdGO2Ys4Nq/pgvzLP1iynaC
-	bTPfK2Fkg0P1qYYMGssRNF0fucTE9AvHlW+4IYh+tbu1zaKAgKjxKCSdkolHItonV3sPkDcwlNw
-	j
-X-Google-Smtp-Source: AGHT+IFxUJezuAZJeQ6vpW3G+VolVhIMz2vTKuOssKYUTZdhXr303ZUl1SBMOty4QXrnYtYUqirI0Q==
-X-Received: by 2002:a17:906:fb8c:b0:a45:a7e5:fb98 with SMTP id lr12-20020a170906fb8c00b00a45a7e5fb98mr4072097ejb.27.1709739050663;
-        Wed, 06 Mar 2024 07:30:50 -0800 (PST)
+        bh=hFchKHynSlo3WjEfCn/qwGa2rnv1jG5UZW8Bbqxs7X8=;
+        b=WeaJObxsLgaaacevzcY7cRlNfEknHcuALDwp09pMjse1er5PlZADlME7h1wsHVxDZn
+         +c2Zq/0FU/MB/WTChjjJbitGM0hmLqZjULkV2+Xn35Pr0YcJ7OU85fGvouY51GzPWAJi
+         FEwfpUdm4XjjzubK0s0PRGXtCtSDzFfpUlY66tlP87zUUiPiWlZGxcIzOztQF/oBJotG
+         y8fWY08vKJmWE7XZHtDs72XfwbRxDqo7qJ5A9KEQuKboDG9BnpFX69q+IDYS/v5q4hQv
+         RGTzI4b6saodrS+rAE1izZIMmXob0kosKPNpMrTEypvzsh9QPqPfwrL/k478SwEIZK7B
+         /KOA==
+X-Gm-Message-State: AOJu0Yzn4NFYC2W/NDxEBa6ft7gWeOWdFSV/XC5UkwGCjdPjGWCHMYIQ
+	YL4zIk/w3GRXUOvVS/LNaxAP2T4INgrVVuieGIf5RodiGu/1uFQoTw5oiD6DvUk=
+X-Google-Smtp-Source: AGHT+IH1DvdOGRAkbECfCdsfVFIX0+ptC3/JFcuNvRfK10gMOl8eL5nH5Xc0Q+ZO+2VcFG82E2QV0A==
+X-Received: by 2002:a17:906:482:b0:a43:ffe1:7d1 with SMTP id f2-20020a170906048200b00a43ffe107d1mr5304445eja.17.1709739192351;
+        Wed, 06 Mar 2024 07:33:12 -0800 (PST)
 Received: from ?IPV6:2001:67c:2fbc:0:2746:4b81:593e:203b? ([2001:67c:2fbc:0:2746:4b81:593e:203b])
-        by smtp.gmail.com with ESMTPSA id f9-20020a170906560900b00a449076d0dbsm6082024ejq.53.2024.03.06.07.30.49
+        by smtp.gmail.com with ESMTPSA id br25-20020a170906d15900b00a44fcdf20d1sm4651519ejb.189.2024.03.06.07.33.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Mar 2024 07:30:50 -0800 (PST)
-Message-ID: <3ac53079-28c1-4032-a251-c792d2d35383@openvpn.net>
-Date: Wed, 6 Mar 2024 16:31:15 +0100
+        Wed, 06 Mar 2024 07:33:12 -0800 (PST)
+Message-ID: <e607c3d1-c096-4ccc-a6d6-40c33840b3df@openvpn.net>
+Date: Wed, 6 Mar 2024 16:33:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,15 +76,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 12/22] ovpn: implement TCP transport
+Subject: Re: [PATCH net-next v2 14/22] ovpn: implement peer lookup logic
 Content-Language: en-US
 To: Simon Horman <horms@kernel.org>
 Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
  Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
  Eric Dumazet <edumazet@google.com>
 References: <20240304150914.11444-1-antonio@openvpn.net>
- <20240304150914.11444-13-antonio@openvpn.net>
- <20240305151203.GL2357@kernel.org>
+ <20240304150914.11444-15-antonio@openvpn.net>
+ <20240305151626.GM2357@kernel.org>
 From: Antonio Quartulli <antonio@openvpn.net>
 Autocrypt: addr=antonio@openvpn.net; keydata=
  xsFNBFN3k+ABEADEvXdJZVUfqxGOKByfkExNpKzFzAwHYjhOb3MTlzSLlVKLRIHxe/Etj13I
@@ -127,49 +126,127 @@ Autocrypt: addr=antonio@openvpn.net; keydata=
  ify06RjcfKmutBiS7jNrNWDK7nOpAP4zMYxYTD9DP03i1MqmJjR9hD+RhBiB63Rsh/UqZ8iN
  VL3XJZMQ2E9SfVWyWYLTfb0Q8c4zhhtKwyOr6wvpEpkCH6uevqKx4YC5
 Organization: OpenVPN Inc.
-In-Reply-To: <20240305151203.GL2357@kernel.org>
+In-Reply-To: <20240305151626.GM2357@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 05/03/2024 16:12, Simon Horman wrote:
-> On Mon, Mar 04, 2024 at 04:09:03PM +0100, Antonio Quartulli wrote:
->> With this changem ovpn is allowed to communicate to peers also via TCP.
+On 05/03/2024 16:16, Simon Horman wrote:
+> On Mon, Mar 04, 2024 at 04:09:05PM +0100, Antonio Quartulli wrote:
+>> In a multi-peer scenario there are a number of situations when a
+>> specific peer needs to be looked up.
+>>
+>> We may want to lookup a peer by:
+>> 1. its ID
+>> 2. its VPN destination IP
+>> 3. its tranport IP/port couple
+> 
+> nit: transport
+> 
+>       checkpatch.pl --codespell is your friend here.
+
+Thanks for this hint too!
+
+> 
+>> For each of the above, there is a specific routing table referencing all
+>> peers for fast look up.
+>>
+>> Case 2. is a bit special in the sense that an outgoing packet may not be
+>> sent to the peer VPN IP directly, but rather to a network behind it. For
+>> this reason we first perform a nexthop lookup in the system routing
+>> table and then we use the retrieved nexthop as peer search key.
 >>
 >> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
 > 
 > ...
 > 
->> diff --git a/drivers/net/ovpn/tcp.c b/drivers/net/ovpn/tcp.c
->> new file mode 100644
->> index 000000000000..d810929bc470
->> --- /dev/null
->> +++ b/drivers/net/ovpn/tcp.c
->> @@ -0,0 +1,474 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*  OpenVPN data channel offload
+>> +/**
+>> + * ovpn_nexthop_lookup4() - looks up the IP of the nexthop for the given destination
 >> + *
->> + *  Copyright (C) 2019-2024 OpenVPN, Inc.
+>> + * Looks up in the IPv4 system routing table the IP of the nexthop to be used
+>> + * to reach the destination passed as argument. If no nexthop can be found, the
+>> + * destination itself is returned as it probably has to be used as nexthop.
 >> + *
->> + *  Author:	Antonio Quartulli <antonio@openvpn.net>
+>> + * @ovpn: the private data representing the current VPN session
+>> + * @dst: the destination to be looked up
+> 
+> I think you need to document @src instead of @dst here.
+
+Right
+
+> 
+>> + *
+>> + * Return the IP of the next hop if found or the dst itself otherwise
 >> + */
+>> +static __be32 ovpn_nexthop_lookup4(struct ovpn_struct *ovpn, __be32 src)
+>> +{
+>> +	struct rtable *rt;
+>> +	struct flowi4 fl = {
+>> +		.daddr = src
+>> +	};
 >> +
->> +#include "main.h"
->> +#include "ovpnstruct.h"
->> +#include "io.h"
->> +#include "peer.h"
->> +#include "proto.h"
->> +#include "skb.h"
+>> +	rt = ip_route_output_flow(dev_net(ovpn->dev), &fl, NULL);
+>> +	if (IS_ERR(rt)) {
+>> +		net_dbg_ratelimited("%s: no nexthop found for %pI4\n", ovpn->dev->name, &src);
+>> +		/* if we end up here this packet is probably going to be
+>> +		 * thrown away later
+>> +		 */
+>> +		return src;
+>> +	}
+>> +
+>> +	if (!rt->rt_uses_gateway)
+>> +		goto out;
+>> +
+>> +	src = rt->rt_gw4;
+>> +out:
+>> +	return src;
+>> +}
+>> +
+>> +/**
+>> + * ovpn_nexthop_lookup6() - looks up the IPv6 of the nexthop for the given destination
+>> + *
+>> + * Looks up in the IPv6 system routing table the IP of the nexthop to be used
+>> + * to reach the destination passed as argument. If no nexthop can be found, the
+>> + * destination itself is returned as it probably has to be used as nexthop.
+>> + *
+>> + * @ovpn: the private data representing the current VPN session
+>> + * @dst: the destination to be looked up
 > 
-> Hi Antonio,
+> And here.
+
+Right.
+
+
 > 
-> this breaks bisection because skb.h doesn't exist until the following
-> patch in this series.
+>> + *
+>> + * Return the IP of the next hop if found or the dst itself otherwise
+>> + */
+>> +static struct in6_addr ovpn_nexthop_lookup6(struct ovpn_struct *ovpn, struct in6_addr addr)
+>> +{
+>> +#if IS_ENABLED(CONFIG_IPV6)
+>> +	struct rt6_info *rt;
+>> +	struct flowi6 fl = {
+>> +		.daddr = addr,
+>> +	};
+>> +
+>> +	rt = (struct rt6_info *)ipv6_stub->ipv6_dst_lookup_flow(dev_net(ovpn->dev), NULL, &fl,
+>> +								NULL);
+>> +	if (IS_ERR(rt)) {
+>> +		net_dbg_ratelimited("%s: no nexthop found for %pI6\n", ovpn->dev->name, &addr);
+>> +		/* if we end up here this packet is probably going to be thrown away later */
+>> +		return addr;
+>> +	}
+>> +
+>> +	if (rt->rt6i_flags & RTF_GATEWAY)
+>> +		addr = rt->rt6i_gateway;
+>> +
+>> +	dst_release((struct dst_entry *)rt);
+>> +#endif
+>> +	return addr;
+>> +}
+> 
+> ...
 
-I must have overlooked this - I normally check that every single patch 
-does not break.
-
-Will fix it, although the whole ovpn code may just be merged as a single 
-patch at the end.
+Thanks a lot.
 
 Regards,
 
