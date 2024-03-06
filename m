@@ -1,199 +1,208 @@
-Return-Path: <netdev+bounces-77978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ACEA873AE9
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:39:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16B85873AF1
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:41:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32120288E7A
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:39:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 826781F29B04
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 15:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D5E1353FE;
-	Wed,  6 Mar 2024 15:39:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89BC81353FF;
+	Wed,  6 Mar 2024 15:41:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pXn4VxHh"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Q1P5apdf"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2059.outbound.protection.outlook.com [40.107.220.59])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36AF4133402
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 15:39:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709739561; cv=fail; b=WYLuhMWQyXIdzQe8pysqX8q4ZNCkZudHCzEzO6vGb64rdaW2DZb/UPvqcYtffF8kYewlc1r8D61meK/9PQf+b1WCHdN9nYnDjOsrsRZo2iBq2RaEfQsJiguhhSYTMndsFO2MjvA3eI1Kc4iAKVgbeHvQ8r3fbqhEzgne7Jd4eGQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709739561; c=relaxed/simple;
-	bh=9FQHYjZ3Z1Qa0S2UFsZpHZw5ztCJNF0wpCx9AM1PIhw=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 Content-Type:MIME-Version; b=OGl/C9pwsi1c5o3SuxxESw/IPa4jsJp4pJC7Vvpb28CDgeIwr9WTiFBxjdX0EZvdDA2IDaT8S7Ze1egEM8ZVF2zlyURtmyEUCZJQO7weBQW9qk0+NXudNX1aZX0KObPT1wJJIySbrZXVWgmnznWBiiRt2CyIE27rmqI24HFAabQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pXn4VxHh; arc=fail smtp.client-ip=40.107.220.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F+3dyUAhjdfBZiHjJzBunpLR4Hqk3Eip9WFQTuTT0fhGfHuD5OR8CaaBdqiobYq+DCPsUVYJViorLSAbi1BeCNtdVWtl8FMYZfI8UTW3zJOlyzgwBsi6IUepqHpLD1XtGLppNwvzo/NrlvWN1Dp9FJOXphfIGM51H3RnFrXQwhKyw/ateoZZJH+RYUoO2RqtNvXh1zOUK/+uFrOIfoPOmRlPijhn8PFfNFyRONS+zcYIA3Mv4fKpWY2L2IFPs9kQdmQevH/gk8RMDt+/0vVAL4vtqMnWWVsIWar07ta74G5byfUpK8YvSoA6Zwo7GBDxhslmGCbLne2iTTWB8+r9pQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tufnUD6247Zvjw3v7eBJGRHJua5o6EIAuclN7A0/1JA=;
- b=ltJ30GQU3ZgPHinaKwKVv3F3o6sRhcmCRXquBluF2NaGWAmXLZPmEjhiSHWTLa+yW+odcCjIWtfBO7QW1/ADKkT87FuQSq1riWnmR/sqxl5HUtSTYh3qh9EeDwcTYNiek5gYSLMkfTrMw+bX6PpCHcKiA0hfxEDrxdJFllfKd5aWEEh8/TJzZP7PaFgH75HRUHzbp3Po+WnP5yofjHWoWh2laJpUgdZGqzHZBxK7d3n90LToxwdDKkrewbKRZuhR9IZulgroGNCBCFgL6yRovk3QffP1rxM6SMU/18BgA1WmmGLsAoYRfoNLg+Jb4uc8dBeshfSYl7EQQlkikEtOBg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tufnUD6247Zvjw3v7eBJGRHJua5o6EIAuclN7A0/1JA=;
- b=pXn4VxHhJAOYSnzCbASSsm517a600cVxe08pEfSGUFyaOqI9L3HUXF6HPE3Um/IcI52WcNpLgOj4KyjogzC02K4vpIiYPVEWNe0DwF5rreQMQlwRwR75zRWk5Xbsm3J3aaTM9vDaITvrfBxJBeOYKPhFWFUpQLG64zZWjNL4CA35sjiApPrgqS5YmQUIm9gn+Grh3+4uaUWggja4uTxEwd8S3ehta62UnwVgHmcPJOeLd99vUuu9bNhYFmhjflzVDZ6C3Jc1VTNO27TYvNFoUfShIN0V7+0RedqU/rXStRwy3VYtUTZTngrQciPz4QTlHQLgJjL0VephJTQAvLnrQg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by SN7PR12MB6910.namprd12.prod.outlook.com (2603:10b6:806:262::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.40; Wed, 6 Mar
- 2024 15:39:15 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::459b:b6fe:a74c:5fbf]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::459b:b6fe:a74c:5fbf%6]) with mapi id 15.20.7362.019; Wed, 6 Mar 2024
- 15:39:14 +0000
-References: <20240306151240.1464884-1-jiri@resnulli.us>
- <87il1zs7vl.fsf@nvidia.com>
-User-agent: mu4e 1.10.8; emacs 28.2
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- arkadiusz.kubalewski@intel.com, vadim.fedorenko@linux.dev,
- milena.olech@intel.com
-Subject: Re: [patch net] dpll: fix dpll_xa_ref_*_del() for multiple
- registrations
-Date: Wed, 06 Mar 2024 07:38:07 -0800
-In-reply-to: <87il1zs7vl.fsf@nvidia.com>
-Message-ID: <87a5nbs732.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: BYAPR05CA0036.namprd05.prod.outlook.com
- (2603:10b6:a03:c0::49) To BYAPR12MB2743.namprd12.prod.outlook.com
- (2603:10b6:a03:61::28)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D861350DE
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 15:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709739703; cv=none; b=D3OArGPIsc2ImqxkWHd7PUjooPVEhYgyAfHPglXBkBDG08gobjFQQncGB+bYxstK9bWycGtUZIYyZq0LQxFZEe1aLsBR+g7YHQf6kPOmBH+Vyq7xYRfJa3oDmOSdualvnKjtxhU0Gy12MJYdBjmjnT5hdNfQS5zclMH4OmQPHXE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709739703; c=relaxed/simple;
+	bh=irfB5sNc51cmKkv4ekOxJzW6umvgRZJRmoYWJsdKmno=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Zz5KI//ChOR7KVSyMdeo054UZRkeycerpXqWZLFa5v9NkG5Vn+s28YYq9dxeZ9dPeH7cs+OcSZBPUNebyl7hCIxMjXJYV67JgJiGJeTd6JhLOA7zGAtgbA3CJQULstHpzsOTWTfY4Gxl4GDk3sELIGhohDw98ht8aqGNKAAdz64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Q1P5apdf; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a44d084bfe1so590075966b.1
+        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 07:41:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1709739699; x=1710344499; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q6p3705fgG5spcJJCmt/zGAtfFPKrsHhWDL+NxRal3E=;
+        b=Q1P5apdfv8/jMIuhJsb5VL6r9Fnl41uIHr/vDtJdWeC+rH7YvhaHbiB6vEGLU1aTnE
+         3nrtBL4VGu0I5Xf+0s3XpRH313O4wmTot5J4udPFinxWJPNX6RZ0/GmQsDP29JRisNSn
+         oPwSWxTurOwLO87G3MvpcGqh1tbtVkbyF0kHW1JKp9GfiXmsZDrRC8k/t47APThvMGdc
+         FtuY/nhu99AnRJejEnF39AdWoonS/LsRtBLa78WbKsSsQWHV+lifEYx01QoKVTNwtqQx
+         hq257ihED8UVOcJI42OM3aAL0uJArVfJdLpv/Zrbf4AII4PuIMAlWXlCcZAoW8ERrYKp
+         R6iA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709739699; x=1710344499;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q6p3705fgG5spcJJCmt/zGAtfFPKrsHhWDL+NxRal3E=;
+        b=Q+DseA/73wVD6MVpbxh22le4JOBtew6neiZjcvIrBnk6xhQ965qoW0ac/exfsyVhqg
+         WRI2/kFceB6bXR9ulcYocXgT2/ayOPJREjNjwFKohmKrCdWBU80Gh/WWZDaZw64ThHi1
+         +kzNp9nwksl8vBJ8Vv5z3vlCE0+97DFtKcl0Ms7Hl8URsbdU0YuCr6Iiu0YLfVJDeaJh
+         Hx60UFDuQFa59yNHYcdQdGN9I/qZY47cKnB16CBEq018iuwmXXq8zOLijgiOVwQps0QF
+         n5ipB5n+z78ptdBFTENAvyfRAhNjGbtt+KigI+pcC/UN5zkEMuXWQRunI33olrM3vOQZ
+         uIlw==
+X-Gm-Message-State: AOJu0YyPncIyrgxpSRfHRZpH4ZlawAKJX8nYMbZto1jhsZ+PV7FZ+iAn
+	O2JFrc+l/mMzt7a1DwEdiwBqlnKn4YVFNx4M95gB2tPQqR/NbZ+QLYIzowU+v4A=
+X-Google-Smtp-Source: AGHT+IE+kqIMu8UQMugqOn5GCbot+haSkhXmNeHBh74QR3i+/1fIymvuWpPu9gNheP+SDbokvR6SMQ==
+X-Received: by 2002:a17:906:d20a:b0:a44:505f:bfa9 with SMTP id w10-20020a170906d20a00b00a44505fbfa9mr9602377ejz.58.1709739699566;
+        Wed, 06 Mar 2024 07:41:39 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:0:2746:4b81:593e:203b? ([2001:67c:2fbc:0:2746:4b81:593e:203b])
+        by smtp.gmail.com with ESMTPSA id pv13-20020a170907208d00b00a451dc6055fsm4105706ejb.212.2024.03.06.07.41.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Mar 2024 07:41:39 -0800 (PST)
+Message-ID: <25cc6fba-d8e5-46c0-8c16-f71373328e7d@openvpn.net>
+Date: Wed, 6 Mar 2024 16:42:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|SN7PR12MB6910:EE_
-X-MS-Office365-Filtering-Correlation-Id: e43d216e-0200-4603-dbe6-08dc3df3939f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	MYjZzzIQssmzKVKHu640Bh3BPO1WtsWbqFnfnSNxwc1tVZQJDSD8SqRBf95EXmU1jtICnUe6GdwsF3PS8eVt2ZwYR3hy+IWsKmNb6XVZBTQR2w/dZcDB9sP1OLpOj+OSuffHWhAXiIDcDtE5DgWmURKWnr4xXbeI86vK4yUwvd4XFaxHF8/w1l4AxeupduWBfjb6L0EScKqsTBRsioOapqPxBAeJDqa3VoDh7ku0X+K1YBXogsbuYKSqoWUqkYR+t+K+tCK+ggfx7oypwEOqaLTMTNPJuoXpuSu8I6Bw6KP6RbRoYAWitURsc2GVZHGwNxAG9b37W/yiyCXv1Zk914FqaiGi1qtYsipmuAqK9kLmJhnK1jedw4D63xW6WINlRuk3WLSCr7+BL42Fdj7mE932gQDBsyydkXKcTiE8NdSWyVwOGcp+7OAMEwqNQTunSZUzrP6SpX/dye8Aq4K+D4B2zPQINfrmrckwXlu9cQ9s3p/1g7+rWGcdjTClv2quw+K9G3ftXa3RzGt2gbi9ksqqciDwXK2hMobxHVwlwMx0Uc+/xloyIXBWxGVgcDJxYoT/BJfTe0SPT7ThGPepQT6w9SG4NRIpWYTk03zKzozdL1AeJztcE+o3itc7gKViWnDMFeZfgFuPRrA3WfXrmACES3Lpvq/QVQhgn6wJ7F0=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?aTH280Op+OcGit11z0QobIZQH+zmCqgGUvfFI5klWDZLtdknHklEmtUFPeCr?=
- =?us-ascii?Q?RmsRyQE6aHx4huKsowXXkOUXqOSBdKT30c2b/PMUndvdtOXtOj4yil90tac/?=
- =?us-ascii?Q?zBEs5vCPLtaUTTjeHSnCsR1/dxiXSGJpK5dqrXXZBieBBaHuq0gIzTK8ihU7?=
- =?us-ascii?Q?/Yp2vp9vrPKZJSTQCAogksZYUdusAc1+4r9BN4AQkS3XNUjqSohRWWJGRnp0?=
- =?us-ascii?Q?8f+41etfAOt10PX6TrEeLfMPB3SEHb3VEy8/duLwVES6U6R9uUP7zacCGLas?=
- =?us-ascii?Q?eA5pjQdv0WfWVMVCzONCZIh7D68ADtucxSbHEQ1wbb600jT6YLfs6tFhtg2M?=
- =?us-ascii?Q?CmTU+FlTC2++AO1mJA1tfz/nUZ2qDQovuQsdIbnPFN3gIee7E1WNDwCRqHbI?=
- =?us-ascii?Q?W2gnK8mv0Hsx3yDNfeoPEqQXV8gdqGhmEZyln35T5eiCzGm1YY/HSZT3SEsZ?=
- =?us-ascii?Q?AwB66tDVsdhmKhj2SUU85BQhOloWngmqCysoqAuorq22m+aknVEuJRRzi7ie?=
- =?us-ascii?Q?HUNiSAZWa7rzgmhon6e8Zis7cXI6qaU4bSRZ69/aoMOIkNyAYr9nci5KjJre?=
- =?us-ascii?Q?YIbvLmE+9mGzqb0X7EA2dBp65Hg9vGu9AqE/6qOXiOcU9rroxY72m9xhO1iy?=
- =?us-ascii?Q?DRJ/x+2LbsIgeIOeavRisw4+o7XzRNHLuFQG4gWnFVBv1PWCw+t6b9yzluTz?=
- =?us-ascii?Q?P37b8Pa2UEkkeDyz52PFQZRgAb6RtbgJgxxAnhPfFrPKc0keuXr5e5KdNbNv?=
- =?us-ascii?Q?iE1zb53brrp0Bk0dQdq0UcQ6TWtix3zqwUd0IrmVZu/+oVM2DHOtcuF1vlxk?=
- =?us-ascii?Q?BPqgBVdxlilLbVN7xMEdUVscazRC1m0UDJUWGtAojgv8k5o/Jo5OhsK7T6Cb?=
- =?us-ascii?Q?0MFqgqc8gzlCyqqND1+EVf0UZXstgNtbjldq5sNBNPeP25JPTErOiYkrHyK7?=
- =?us-ascii?Q?4tzXSsqp5WK4oyjbmiWuRQ596u3IwzxGOtaogPTvZnLpjVz77+0zcS6ANohl?=
- =?us-ascii?Q?gI7/Nzm35UlWUPnaa27ZFh3NerrSdbngMrUurQEuZY5WEToj3vTUrCrAUKru?=
- =?us-ascii?Q?LYBBKz34wUcyhEzVc+nXZHdvbwo4J/p5jWkzhW9iWVE7UBluq4Fj3vPG99UH?=
- =?us-ascii?Q?YcS8y+olDrqD+FlQofmJoRF25myxZMsyV1e1mAOVyD9iCqMP4SJiVjfvke7H?=
- =?us-ascii?Q?DTAcBKTb7RTkEGuod2HAndIHPeVEdwNYenKQF8A4Ki7qSDTrStU35oAUaTYp?=
- =?us-ascii?Q?Sy6tTEsDzTignSB8X9afRKElBvZKHHyTg+Ha+TkEYxMzXTzSsq62v+XOiTj/?=
- =?us-ascii?Q?Tep1W/Y6nzMKQwKcM1SHuY+hOezO5NGLZMMGSey88aa34U+9HWQzNJOEmMJe?=
- =?us-ascii?Q?gilb2z+wdBZQcGEkfb9EJfEMU5eOs3LDPgOcKi95t00c+uafHUdtERUzZUUq?=
- =?us-ascii?Q?pAAEtQcuTX7w+5i2PzM5LAEZMH2CTLEpWY+O7O8vjDPQeRn8ICNiBINGi9Zc?=
- =?us-ascii?Q?4+f5n2yNPyezQb1cYEqcUNsdVo4CAbPuHbE9WGKrl8BzT3hTOw3nby22Fkhz?=
- =?us-ascii?Q?COtDqh9i7rrqS4lmuzQNKo3J/yIabUfZfMd9rfKbQeerNkGcG3/pHypCWCnU?=
- =?us-ascii?Q?3g=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e43d216e-0200-4603-dbe6-08dc3df3939f
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 15:39:14.3976
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Rcu1JvuHE4cH9OY8p/I7/JHYiHQzv8YKmE9FCqAYKy/nEtm6aupRP9QOrjcatgCcsdXoA8Kd1cP+nkwPingmeQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6910
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 22/22] ovpn: add basic ethtool support
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>
+References: <20240304150914.11444-1-antonio@openvpn.net>
+ <20240304150914.11444-23-antonio@openvpn.net>
+ <57e2274e-fa83-47c9-890b-bb3d2a62acb9@lunn.ch>
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <57e2274e-fa83-47c9-890b-bb3d2a62acb9@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-
-On Wed, 06 Mar, 2024 07:18:35 -0800 Rahul Rameshbabu <rrameshbabu@nvidia.com> wrote:
-> On Wed, 06 Mar, 2024 16:12:40 +0100 Jiri Pirko <jiri@resnulli.us> wrote:
->> From: Jiri Pirko <jiri@nvidia.com>
->>
->> Currently, if there are multiple registrations of the same pin on the
->> same dpll device, following warnings are observed:
->> WARNING: CPU: 5 PID: 2212 at drivers/dpll/dpll_core.c:143 dpll_xa_ref_pin_del.isra.0+0x21e/0x230
->> WARNING: CPU: 5 PID: 2212 at drivers/dpll/dpll_core.c:223 __dpll_pin_unregister+0x2b3/0x2c0
->>
->> The problem is, that in both dpll_xa_ref_dpll_del() and
->> dpll_xa_ref_pin_del() registration is only removed from list in case the
->> reference count drops to zero. That is wrong, the registration has to
->> be removed always.
->
-> What about the case where you have two functions/netdevs that refer to
-> the same DPLL device/pin and you only remove a single function? You have
-> another function/netdev left that now refers to the unregistered DPLL
-> device/pin.
->
-Actually, I see that being registered or not does not impact the use of
-existing DPLL device/pin references in other functions. I agree with
-this change.
->>
->> To fix this, remove the registration from the list and free
->> it unconditionally, instead of doing it only when the ref reference
->> counter reaches zero.
->>
->> Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions")
->> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+On 05/03/2024 00:04, Andrew Lunn wrote:
+> On Mon, Mar 04, 2024 at 04:09:13PM +0100, Antonio Quartulli wrote:
+>> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
 >> ---
->>  drivers/dpll/dpll_core.c | 8 ++++----
->>  1 file changed, 4 insertions(+), 4 deletions(-)
+>>   drivers/net/ovpn/main.c | 32 ++++++++++++++++++++++++++++++++
+>>   1 file changed, 32 insertions(+)
 >>
->> diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
->> index 7f686d179fc9..c751a87c7a8e 100644
->> --- a/drivers/dpll/dpll_core.c
->> +++ b/drivers/dpll/dpll_core.c
->> @@ -129,9 +129,9 @@ static int dpll_xa_ref_pin_del(struct xarray *xa_pins, struct dpll_pin *pin,
->>  		reg = dpll_pin_registration_find(ref, ops, priv);
->>  		if (WARN_ON(!reg))
->>  			return -EINVAL;
->> +		list_del(&reg->list);
->> +		kfree(reg);
->>  		if (refcount_dec_and_test(&ref->refcount)) {
->> -			list_del(&reg->list);
->> -			kfree(reg);
->>  			xa_erase(xa_pins, i);
->>  			WARN_ON(!list_empty(&ref->registration_list));
->>  			kfree(ref);
->> @@ -209,9 +209,9 @@ dpll_xa_ref_dpll_del(struct xarray *xa_dplls, struct dpll_device *dpll,
->>  		reg = dpll_pin_registration_find(ref, ops, priv);
->>  		if (WARN_ON(!reg))
->>  			return;
->> +		list_del(&reg->list);
->> +		kfree(reg);
->>  		if (refcount_dec_and_test(&ref->refcount)) {
->> -			list_del(&reg->list);
->> -			kfree(reg);
->>  			xa_erase(xa_dplls, i);
->>  			WARN_ON(!list_empty(&ref->registration_list));
->>  			kfree(ref);
+>> diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+>> index 95a94ccc99c1..9dfcf2580659 100644
+>> --- a/drivers/net/ovpn/main.c
+>> +++ b/drivers/net/ovpn/main.c
+>> @@ -13,6 +13,7 @@
+>>   #include "ovpnstruct.h"
+>>   #include "packet.h"
+>>   
+>> +#include <linux/ethtool.h>
+>>   #include <linux/genetlink.h>
+>>   #include <linux/module.h>
+>>   #include <linux/moduleparam.h>
+>> @@ -83,6 +84,36 @@ static const struct net_device_ops ovpn_netdev_ops = {
+>>   	.ndo_get_stats64        = dev_get_tstats64,
+>>   };
+>>   
+>> +static int ovpn_get_link_ksettings(struct net_device *dev,
+>> +				   struct ethtool_link_ksettings *cmd)
+>> +{
+>> +	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.supported, 0);
+>> +	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.advertising, 0);
+>> +	cmd->base.speed	= SPEED_1000;
+>> +	cmd->base.duplex = DUPLEX_FULL;
+>> +	cmd->base.port = PORT_TP;
+>> +	cmd->base.phy_address = 0;
+>> +	cmd->base.transceiver = XCVR_INTERNAL;
+>> +	cmd->base.autoneg = AUTONEG_DISABLE;
+> 
+> Why? It is a virtual device. Speed and duplex is meaningless. You
+> could run this over FDDI, HIPPI, or RFC 1149? So why PORT_TP?
 
-Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To be honest, I couldn't find any description to help me with deciding 
+what to set there and I just used a value I saw in other Ethernet drivers.
+
+Do you have any recommendation?
+For the other fields: do you think they make sense? The speed value is 
+always debatable...The actual speed depends on the transport interface 
+and there might be multiple involved. Maybe SPEED_UNKNOWN is more 
+appropriate?
+
+> 
+>> +static void ovpn_get_drvinfo(struct net_device *dev,
+>> +			     struct ethtool_drvinfo *info)
+>> +{
+>> +	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
+>> +	strscpy(info->version, DRV_VERSION, sizeof(info->version));
+> 
+> Please leave version untouched. The ethtool core will then fill it in
+> with something useful.
+
+will do!
+
+> 
+>> +	strscpy(info->bus_info, "ovpn", sizeof(info->bus_info));
+> 
+> This is also not accurate. There is no bus involved.
+
+Should I just leave it empty then?
+
+My concern is that a user expects $something and it will crash on my 
+empty string. But if empty is allowed, I will just go with it.
+
+
+Regards,
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
