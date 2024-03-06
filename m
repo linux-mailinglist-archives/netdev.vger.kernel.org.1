@@ -1,90 +1,113 @@
-Return-Path: <netdev+bounces-78161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F95C87439C
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:15:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D3FD8743BE
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:17:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3201B21949
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:15:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 699492860A9
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:17:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D9991C69A;
-	Wed,  6 Mar 2024 23:15:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3B61C6B2;
+	Wed,  6 Mar 2024 23:17:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Urqo3xJH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ENeW0deG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AAE1C2A1
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 23:15:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA3011C6A4;
+	Wed,  6 Mar 2024 23:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709766921; cv=none; b=ryNL8oiSJZHkXjr9vYc2bRCccILoJM0EjeI85Kbgr/8WxxdhEyWcXQ7r+V8pZ5Al/qc2Dqnk8AwuaWM9qw7uzNef1jiRq9jrp7Qi/6rIjg12Ea2V8/OzaokcJ0w42veUsFNFG2E5CLFQj/oeRqhQhjjDWmiVvB+0uamJ0K33uCQ=
+	t=1709767026; cv=none; b=fhLdY4j9NFWiMjD2qQF/0vBjXbui678BqEUJ1ZiAKdvg+9Hh6srbqZNC7QlWxkWILdCjSX+x4UNdzrq76ljekXODz9AhR/RtroNTwG68tpPZinr8MyrHjUXGVwXu06LOs4RpZC6onKXmVCQMO1605WEkv3qOG+tuCPRIbZcq0Q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709766921; c=relaxed/simple;
-	bh=6XH6cYTm8FuFdceO5emvTfn73LPBy8xch0Zz/xWXHCA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=LczdJByUToP0ZxjsThRbXg54PHLaHOZaZ85s8/tjptDpYAPb2MRwBbTe8vhPJw4i1dnwf9JXPBh2gWdZWSObQlhr/99AjPdvLoHO7JbQV5odDeXj7wWUl5lkXMVS/TbScPVqZNBoHIQQv/4yhFMSKHc/nBOldgHs8mK5wW7ZenA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Urqo3xJH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CC72C433F1;
-	Wed,  6 Mar 2024 23:15:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709766920;
-	bh=6XH6cYTm8FuFdceO5emvTfn73LPBy8xch0Zz/xWXHCA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=Urqo3xJH7drgVjvd8paUSycjD7iLX+IlzADgOv8vRcCNNEQi5FzlU4RCI/4aZvX15
-	 EhvgzggLJlmLYAPlUIRAyBA6B3INfPHth6AszYfZrw2SuUrK4OntCQtZsEczkfJSzv
-	 jBMgS34ysXG3n2XVsoGI7y2CZQ8sEkl64tQO2utisasz1TLsMZAarmRxi9vbFOHHGB
-	 IGDOD4kTczzF8rEAHWoXxjOXHnri5RB89UC/XA2NaN8Vk4cnSRx3N14T2ownvyol68
-	 O+rFaY5/bTsfL0nghkLPYxl8W1ubjH3kosTQ6JHAdDxPOUlXbw7KoN5DsTYfsWRRTK
-	 GPobCkWXF4TdQ==
-Date: Wed, 6 Mar 2024 17:15:18 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	horms@kernel.org, pmenzel@molgen.mpg.de,
-	Alan Brady <alan.brady@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Paul Cercueil <paul@crapouillou.net>
-Subject: Re: [PATCH iwl-next v2 1/2] igb: simplify pci ops declaration
-Message-ID: <20240306231518.GA589712@bhelgaas>
+	s=arc-20240116; t=1709767026; c=relaxed/simple;
+	bh=yETlT/1t8oXxCw07RT5USNl10PGwaQN7JjFz5rqRjBE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hjar6MQlq9Ill2gd5AUTbfnGYFAfsGMo5dYUwILoLhFkNPb+vdpJGLwxKK1zir9GcPTC1sZEEPGRufTqZccx0iHnp8IwtHIjyu+GImYYzPbshpj1B+MbmaUNTUsRgyTNjZ/rmitn/2hkg5r+xhlT2podokkiaaYNzVU2heRxsLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ENeW0deG; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6e5d7f1f25fso222068b3a.0;
+        Wed, 06 Mar 2024 15:17:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709767024; x=1710371824; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q8qZFVmivw2qoLXeTcWzu8ocoxB3n/4z6PQlau97p1Q=;
+        b=ENeW0deG2d5lu01eCBgJ3dcueTfTRHC81Q8jRhsV1pkyo9Gl5rCemVavJdaonWdb4P
+         iQgAcrktPzea0A6cKvx4/zTb0aSemnsaXtFBzkc2ArdUpneNziRnNtOuHWdvNBsoLfLS
+         uANExKmdogMGF/Fpdy4RKmdRKjmt6Rz+ZIlhmEkjLYPVgHlUU/eba3sAnDDSd5JtYIgK
+         m4L60RvlXyVM0+cXS2yV7S5ZfWfhAqXnoEmUil2FsCT9tjyxnDzwFPyyIf70UVpzy1kW
+         Gd2QINwlqhcfEpVt5/D2DbKgoB0D5N1EbBY2fLrTQY2sVq3tjxjjgsfoCAS+u3IRy08x
+         CewQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709767024; x=1710371824;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q8qZFVmivw2qoLXeTcWzu8ocoxB3n/4z6PQlau97p1Q=;
+        b=nM92WXBb0V6Id6039ILDQm4zaZTMR2SZHbEXe4cGsogjvWMeC/EMhIUpoH0Y2UDg2h
+         S7UkxmxjOFaGvvdzZkKW85k5+7Dm3cOqtnRBUVVllEcRrtDhmaQP8+xbHzBNNfWXiIcA
+         V6ircVybssp6v9WpslWGoAKp2anUGa2k4meMyhpQrO6bDf0m296zfrKOCbVIEjPE4Pyq
+         LSbJ+84ey4xPf5XxE5MjT6VZiBNsVinKxKVCXyLEnc/YRqgCpGujX9MA+mBrOJeLKI61
+         9CBqYpJOnD5PUTBb3LBQ8RCD6aHU27cyCAm2buq9KnIbtjPE0LB7ZO3c9dqFPPNpORGi
+         9/0A==
+X-Forwarded-Encrypted: i=1; AJvYcCW5BYSSrxnP4hfY044cegDOAq+1Ab7a2owD1x53pVFmw6F0+m7nYTOLbLHHByxYV7NifTNfzRF8cgxcIXhnlUZobD3pny1ezx7rpCWWgVFG2q+6nRga98E5VvOG0DhLzm0WxaaH
+X-Gm-Message-State: AOJu0YwNxFteTt5aO+ikczBdRInujajTnGPp/JHs5XYamheoTmZa8jVx
+	6fq/1u4N+jEQQEC1hmcC4MRnNU2865qosXvFh9u9Ho7gwIqRLAnw
+X-Google-Smtp-Source: AGHT+IGz1RtSKKjdv1Gd3H/wFiBP6CjCVtfu7R9kgKZxVDtzqP+oR8ruAJXwyLm5uBDpImEbFjidUA==
+X-Received: by 2002:a05:6a20:2590:b0:1a1:6dea:4fb7 with SMTP id k16-20020a056a20259000b001a16dea4fb7mr925667pzd.29.1709767023722;
+        Wed, 06 Mar 2024 15:17:03 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id gd10-20020a17090b0fca00b0029b22d8f5b4sm267293pjb.15.2024.03.06.15.17.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Mar 2024 15:17:03 -0800 (PST)
+Message-ID: <3c5dd644-2e9e-4961-9642-c06167c07e31@gmail.com>
+Date: Wed, 6 Mar 2024 15:16:58 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240306231410.GA589078@bhelgaas>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 15/16] net: dsa: vsc73xx: Add bridge support
+Content-Language: en-US
+To: Pawel Dembicki <paweldembicki@gmail.com>, netdev@vger.kernel.org
+Cc: Linus Walleij <linus.walleij@linaro.org>, Simon Horman
+ <horms@kernel.org>, Vladimir Oltean <olteanv@gmail.com>,
+ Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
+ linux-kernel@vger.kernel.org
+References: <20240301221641.159542-1-paweldembicki@gmail.com>
+ <20240301221641.159542-16-paweldembicki@gmail.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20240301221641.159542-16-paweldembicki@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 06, 2024 at 05:14:12PM -0600, Bjorn Helgaas wrote:
-> [+cc Paul for __maybe_unused cleanup]
+On 3/1/24 14:16, Pawel Dembicki wrote:
+> This patch adds bridge support for vsc73xx driver.
+> It introduce two functions for port_bridge_join and
+> vsc73xx_port_bridge_leave handling.
 > 
-> On Tue, Mar 05, 2024 at 06:50:21PM -0800, Jesse Brandeburg wrote:
-> > The igb driver was pre-declaring tons of functions just so that it could
-> > have an early declaration of the pci_driver struct.
-> > 
-> > Delete a bunch of the declarations and move the struct to the bottom of the
-> > file, after all the functions are declared.
+> Those functions implement forwarding adjust and use
+> dsa_tag_8021q_bridge_* api for adjust VLAN configuration.
 > 
-> Nice fix, that was always annoying.
-> 
-> Seems like there's an opportunity to drop some of the __maybe_unused
-> annotations:
-> 
->   static int __maybe_unused igb_suspend(struct device *dev)
-> 
-> after 1a3c7bb08826 ("PM: core: Add new *_PM_OPS macros, deprecate old ones").
-> 
-> I don't know if SET_RUNTIME_PM_OPS() makes __maybe_unused unnecessary
-> or not.
+> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
-Sorry, should have read 2/2 first ;)
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
+
 
