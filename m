@@ -1,134 +1,104 @@
-Return-Path: <netdev+bounces-77797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3CF0873077
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:17:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1588E87307D
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 09:18:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E5591F22E95
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:17:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5752286E72
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 08:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9884A5DF13;
-	Wed,  6 Mar 2024 08:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2335CDF1;
+	Wed,  6 Mar 2024 08:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V8Xw7+SB"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="onJBn04H";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="QDMtURgq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45895D8FE
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 08:16:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 168085CDC2
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 08:18:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709713016; cv=none; b=rEirKt3Vv8NVdRb1TGkElIzS80TRd6LssNfJQs3YUHKO+bFgX3f9LupJZVp89oE8Rh1ZHGpVDuZGnmvAH5jRFvZLIfQ2zdw5+5g8GeuayNDJXm28JpqTK/nUEA4KnPHj96hoQRW/ApQgWuQu5USZ1iC/sndDn/s58ot0lrIFopg=
+	t=1709713088; cv=none; b=BK+0rdP7+1DFPnO+1JtA7Tk4XHrs3ocicO+QT7FmlbYQSC0Gke5ij+PY92cnbr7eUaX+5AY+cdrNSp0opo9FyrOiM0LfUUsKYJslOjdjshvDFpDoHp0E+m7k7wh2o8TNji1EaryX4nr7wFemDSK/FtJFG8SjRA+6xzZiYAYXC4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709713016; c=relaxed/simple;
-	bh=IO0G01fjeFoKQavHxljn+OxdA/fMRHWzmgJlyEYmCss=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=FPFqhBXpxrDTg1vahPTuKVQe3XXlsKalsSjF0U7CGK5gKiu3Ha5o1t7YMmLYMjaoejCMwE0xWJMfbskJgJ5pvQLkjUsS/0UD3zxS0IQK8Lv0YzBQociggvszN5hI+xq1c+bQjeUiNMYCl8oBxppgCiWZfC+224mMK0uh34kPzPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=V8Xw7+SB; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-51321e71673so621176e87.2
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 00:16:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709713013; x=1710317813; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hUMpyp+aBvT4jutLW9xk5zk3hii55n3wtwwHJLBpTrY=;
-        b=V8Xw7+SB23pJyKpCdTZAeRVql212f62nSwBHuLQh3ydXJY7VxfHp2CLmcIBfSjJbrG
-         bzSKA6PouLSg9mYQ1ccNbWABwOlYnvjLeVB2QkStlICts6r61j/ClorgUS764TrFVsN+
-         dgpibjqM47ORFx7AU7auk575kgaWyw79KKoqxoY6+1jB1RmTpgk306ko8ewiQCAnvmO+
-         bt0SMkEhwUbX6zZl2StvyJg+WnOfqGyc5quxq9nV4STDIRmWGy+JCf5kw2sODaOod0nf
-         My9Lf3/4Mh3Rl2nxY3W7WOmqKz5nyp6bbnY8liuNKJ6QjIsJVreaigiT2qyq+IWi8Ey1
-         6trg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709713013; x=1710317813;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hUMpyp+aBvT4jutLW9xk5zk3hii55n3wtwwHJLBpTrY=;
-        b=nXqa8HHEc/twws8+8Cdmr77BfSti/LGnBHZlS9fxU2qzaEEqAeVr3aJrpTJSp4A6pD
-         m8YYtPtcfa0HIgED1QgWKgiZjvXw7ALfvh2hNZ3cZHfBkWqOLo0dCmXZc/DJIdX93iJM
-         Kxg9i+eehCwwI3DY5ClfxWeHNhQeYaywjom/5bcSoJThJHOyc3oj0FUYvYfkmdmguLS8
-         gU5Bh2be14mir8BEZhWX4nD84YfGis46dRaM0iGT+Gew+asQpMAAop1UHxBeWHJwkiHD
-         xU7ucsT+jSrodNtSzux4qC3rMtDDl/tSgWnXnKF9oeMUWEATpi9oMyTdEC2RnCSLFQfJ
-         Ax3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWW1vfgbOck7c9KQHIskGdM0oxXmRyDq8wRoAoM5MDcorYS2ksHONflWJLGy+ELHxb6VaLDahPXSgImzQxtljWn/7veIb8c
-X-Gm-Message-State: AOJu0YzU0La+joRwf2CVbTU4Lxfg2vERKeushpz7QL40l3a50ets4U73
-	liTaMtYlg6kyZPqtjMkWpY8OVhk9dAb2bO5B06GBnmaoDqRkc/+Ax7CL2JfLOIw=
-X-Google-Smtp-Source: AGHT+IHbn0SM7E/lVjSCZHRZwzRi0PDead5ffXoCFKJOGbm2VuIzaa+JgNKuc9Hp6zth2I1J6rcUHg==
-X-Received: by 2002:ac2:5e64:0:b0:513:4b90:aeaa with SMTP id a4-20020ac25e64000000b005134b90aeaamr2501286lfr.51.1709713013133;
-        Wed, 06 Mar 2024 00:16:53 -0800 (PST)
-Received: from umbar.lan ([192.130.178.91])
-        by smtp.gmail.com with ESMTPSA id s9-20020ac24649000000b00512dc23bedcsm2162366lfo.99.2024.03.06.00.16.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Mar 2024 00:16:52 -0800 (PST)
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Wed, 06 Mar 2024 10:16:48 +0200
-Subject: [PATCH RFC v2 4/4] arm64: dts: qcom: qrb4210-rb1: add
- firmware-name qualifier to WiFi node
+	s=arc-20240116; t=1709713088; c=relaxed/simple;
+	bh=8A5+4al8R3jb2cfpvpe3U34UpSI6gSX9iRW7qW3p9Ao=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LVkBHTTcEQ4uEGpsvcZE1Wc5oK2/uop0+nk2EcyLU3UgxopKvKeiYcw9V/563+NsPWNbWnguKu7VwCPoe1LoCnCSa7K/Urp6QBy9CsiZy6hnI+SLS42W1h/fqabr2DD9xot1VfepVYQA2mKqVZ757vU2ejF+uFyemExV4yTpDoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=onJBn04H; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=QDMtURgq; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 6 Mar 2024 09:18:02 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1709713083;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8A5+4al8R3jb2cfpvpe3U34UpSI6gSX9iRW7qW3p9Ao=;
+	b=onJBn04HF32gjYEK1zm5icRJPcttFm6fdRTQ3AkWNjG1WzyK1506Wo1N9/B1sU7vJMxNPU
+	HwhgkMpqYfUUbXRAU2SINJCv1Nj5Hdc1FugUGtIv/LHtWWYK43We9oTk7q2zc0kuAlViuv
+	aHQANpOGjOAqJNo/d9IaWIdV6pO6soJCY1OXIxAmNcEaTc3yNrGIMX63Rbhg5o9WWuiUAg
+	ycYXlHteyzYEAgQdt1vxK8mA0oZDQYciFlDdcX5diDlbbYdBpdHvA7/w/SZL27I5WzIzUG
+	+k5aA41N2ZvaxYtx4nVoDwPolvOOCLp5N0pVE7wa507XnhpIyhyhEZ20U0CE5g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1709713083;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8A5+4al8R3jb2cfpvpe3U34UpSI6gSX9iRW7qW3p9Ao=;
+	b=QDMtURgqxnJl3E2QuvK8rk7LEW8usiCEoL1BY4I+4teMeuc1RaxXUeLUuQkNjVuycQESht
+	rWo6nYqdymXobNDA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Wander Lairson Costa <wander@redhat.com>,
+	Yan Zhai <yan@cloudflare.com>
+Subject: Re: [PATCH v3 net-next 2/4] net: Allow to use SMP threads for
+ backlog NAPI.
+Message-ID: <20240306081802.4MgVOkad@linutronix.de>
+References: <20240228121000.526645-1-bigeasy@linutronix.de>
+ <20240228121000.526645-3-bigeasy@linutronix.de>
+ <c37223527d5b6bcf0ffce69c81f16fd0781fa2d6.camel@redhat.com>
+ <20240305103530.FEVh-64E@linutronix.de>
+ <20240305072334.59819960@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240306-wcn3990-firmware-path-v2-4-f89e98e71a57@linaro.org>
-References: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
-In-Reply-To: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
-To: Kalle Valo <kvalo@kernel.org>, Jeff Johnson <quic_jjohnson@quicinc.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh+dt@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konrad.dybcio@linaro.org>
-Cc: ath10k@lists.infradead.org, linux-wireless@vger.kernel.org, 
- netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-arm-msm@vger.kernel.org
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=788;
- i=dmitry.baryshkov@linaro.org; h=from:subject:message-id;
- bh=IO0G01fjeFoKQavHxljn+OxdA/fMRHWzmgJlyEYmCss=;
- b=owEBbQGS/pANAwAKAYs8ij4CKSjVAcsmYgBl6CZvOTjBZtoSgh4NQNDNl/WX7IZ1W1x6/faq7
- hbuBSPc+SqJATMEAAEKAB0WIQRMcISVXLJjVvC4lX+LPIo+Aiko1QUCZegmbwAKCRCLPIo+Aiko
- 1Ym/B/9ldUzS41jpPNUz625gZyscZqqwqmBt0uegSJU0zgfAndVYwH6MtJnzQoIibGDzAZm2fIH
- tpv7wOX+cp/LpxjYrpgSGgzENGZGSpZCqt3mBNpyOP/ViRa6Sr/LtaiyFIw+0HuXRsTSr8BdtPE
- ZpM613MAZjUpi23Cy+nVIEzjIo7A5i9euFCcr2mYOte34axrup9IpqSR/3L4RRRNhbedY+jQIKA
- KSjMbF1IWUXXEvrxHCp513J/jI6oUqS+UrPM03AsvSCS0NrteHdt/RslRVRHZtscgW6sbrpWo4n
- W+ETw/zQGAvUBdCg3FrWC/RSBr+3wHuXUCJRrf7mQMsYG3GT
-X-Developer-Key: i=dmitry.baryshkov@linaro.org; a=openpgp;
- fpr=8F88381DD5C873E4AE487DA5199BF1243632046A
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240305072334.59819960@kernel.org>
 
-Add firmware-name property to the WiFi device tree node to specify
-board-specific lookup directory.
+On 2024-03-05 07:23:34 [-0800], Jakub Kicinski wrote:
+> On Tue, 5 Mar 2024 11:35:30 +0100 Sebastian Andrzej Siewior wrote:
+> > I had RH benchmarking this and based on their 25Gbe and 50Gbe NICs and
+> > the results look good. If anything it looked a bit better with this on
+> > the 50Gbe NICs but since those NICs have RSS=E2=80=A6
+>=20
+> TBH if y'all tested this with iperf that's pretty meaningless.
+> The concern is not as much throughput on an idle system as it=20
+> is the fact that we involve scheduler with it's heuristics
+> for every NAPI run.
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
-Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
----
- arch/arm64/boot/dts/qcom/qrb4210-rb2.dts | 1 +
- 1 file changed, 1 insertion(+)
+Yeah, I thought so. According to RH, they don't have a RPS workload left
+since all their NICs use RSS now. That iperf test was the next best
+thing.=20
 
-diff --git a/arch/arm64/boot/dts/qcom/qrb4210-rb2.dts b/arch/arm64/boot/dts/qcom/qrb4210-rb2.dts
-index 7c19f874fa71..cf1d8d6f1546 100644
---- a/arch/arm64/boot/dts/qcom/qrb4210-rb2.dts
-+++ b/arch/arm64/boot/dts/qcom/qrb4210-rb2.dts
-@@ -632,6 +632,7 @@ &wifi {
- 	vdd-1.3-rfa-supply = <&vreg_l17a_1p3>;
- 	vdd-3.3-ch0-supply = <&vreg_l23a_3p3>;
- 	qcom,ath10k-calibration-variant = "Thundercomm_RB2";
-+	firmware-name = "qrb4210";
- 
- 	status = "okay";
- };
+> But I recognize that your access to production workloads may=20
+> be limited and you did more than most, so =F0=9F=A4=B7=EF=B8=8F
 
--- 
-2.39.2
-
+Sebastian
 
