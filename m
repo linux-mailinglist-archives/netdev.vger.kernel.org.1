@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-78139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE49F87436A
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:05:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A277C87436B
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:05:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BA091F2658B
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:05:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05307281AFC
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 23:05:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 654D71C68D;
-	Wed,  6 Mar 2024 23:04:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631041C69A;
+	Wed,  6 Mar 2024 23:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WA0zcjMC"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ralFxd3c"
 X-Original-To: netdev@vger.kernel.org
 Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2085.outbound.protection.outlook.com [40.107.92.85])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3C21C2A8
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 23:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBE91C2BE
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 23:04:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.85
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709766293; cv=fail; b=lPg8044dC6xlP4eCy/ddXtuq5OKO2+Sdh17Cq9hHhveBieJeukmjRb4rTTTTxEGUbFMJ6XMNYp4OCf7EN++LENHSn1tFnTw5QXC6opMnlvNVmBs2BpjcnomTekco6pn5lE9uI0IBod7GIfWxRZdN0Fq/NeBFtrqaE8Zyqv4qC+Q=
+	t=1709766295; cv=fail; b=pnsGRMJqXiCHAhAZm4S+qjLhayUMCZsQt/3peJ7II67wrPm+acGaNknOYY9QDffKb8H4co2Y4pfEJyRP2gNxISBmLWCjIk2jPC5D7xUt/v40tK8+62362l7srgTlB1l1zzPUMWuEsMvw5HmYLJ+dLKJfPpxwj4aIZB3FaDt8rOM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709766293; c=relaxed/simple;
-	bh=ryNbGUpeKEGDgqH+27ouvJ5e8YWd1Xt+Lkdv6kPFV5c=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=EXilpx29EPTMrguMfd3DdBCmSDfStOQHQY2mqx7vjLn8Q5sIa+Xa059KzrGpntERG/LS60977XOlULjKt2SQ4Gcrknq8KlC4UtZX2WF0q98Yg/UD2ZD6SICUJOduaEAEPc9pB9EzQzatFYtbWFcYgf8cZHN7Bq4rcxtIozDb0Kw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WA0zcjMC; arc=fail smtp.client-ip=40.107.92.85
+	s=arc-20240116; t=1709766295; c=relaxed/simple;
+	bh=LUBo5w/m8iudlwGknjlvGrFxnmeI0rL5pdx2hu5ERPU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=tZn4o0uHWJaHHMy+tU0iSHoLhxS2ul+5A6fsYrtKA7aC95GEwXpV8ABmRDfpNhGB4rr3u5BXThAHUUXUvQfIboEfKqEZzPSjo6zskwpkyrdhT2sAGMsf42r+CxzWAC7Hr0noS/WfH6an0NUpxKn86RJsZGJWTF4E23StgZCog74=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ralFxd3c; arc=fail smtp.client-ip=40.107.92.85
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B5GbjtY/JuUCrM6NNoSp0Kv+Xnl4dSmJQj/KdXJtF8HHNQfQBVC+0D2Hkb6sB9Lj1DCRaaCTxlIuvOCtoM4dRFYnYWyHOTCr1yW6kdI2tO+d5KZAU56ikcaV0pH4b1eeteznFpqoty6wvKL8C+Q7lweMmbRgM6aOaUiPkCsUr8jLzMyj5gNcrKIrcHUa6T/POW+9DP+sx/ZjwC5fF6Ji2MQ+aUUsI2vl5RDw1UNWHI4BK9vmxPI9X52dgBZxm7RPoQwq2SXBOQDZHmjKqqtE8dxBknzCc7Ns56NtqeWHaNeMQCS+sohdNbQcpZkERb94IfxZTgTO9JBUgITx7nQwpg==
+ b=WedE3uN7yQA5NhCbG1wVvU53j3HVxq/a/DJglx3P995sY5fDJsRoLENsLeSkKHCVoinDC42EdYbt4yGkAkY4xLUvzXO8Eu2afJ1ZGuG2jaK2dkIHC0cFdVVXJvoHn4IfVErj3mZGaCG3E4hA0o1qinJx4Kto2Kx69Sm2XXNyd4yHnQQjwCLokfLOX5EljYOc122eRCpVqepLFgg7ebip5eVkElpwAm2wqNBhU+K2kh4YCkHIlgNFSnin/CliXvkGZ1gXbmg9jBzqWwwuNwVzYBaQkRQEFzyXnwOHm+T2KzIOGRKhTk5fONwlSGoUViSHHoFX5D6Vjq7JvwDzq0gBLA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Np1Gc+PWUgwWUDWbMj2u2C0qvxXjMPdHpeRwwSEjT28=;
- b=k8ehj073f15b6NEbIfiibyY0hnZrkZsd6fLZiJGmfhc+PAvy/bpFBXdSHz415BG6q+MhTOnSmPeuvz/vh0Mf6OXx0SRRO1PyFHmqWmnmTDId5laUv0BDWWhlow1gu9jTd0lL6UC2CHx3NHQyMeUU3+6gVWmr/bCTZQMQHlVLrgFrvMZv2t18t9eBrEg5t/H7Toldhry2zOsedSVLwwtdyO/xWcOXm5geXxmj74Kd4gaEJ5HM2Nhx3VuUlpknhvrb7TXVms8Ajr6X9dn4BMGU7MbARqvNXQQmMR03WKOrJf/g1/hPml43P4mcaMxNKwXItCeAFJYttJJQ3tJePLWDTg==
+ bh=mO/7JEnRP/hBRJZ6XIZ+lXk/ZV8CjTZGp82uKXmk6BQ=;
+ b=PtpN6GJr26Eh2tW91hyB0mHSvqO1moG6HXk3llM4h1/BKVQ7p7hWg/fq8XwnVnai57NqebBN1MdQuQQpoGWhJlbV3EDkWTLmdzn7Uxay76Vk7ZphfgH+gl1hLWz6+lkt8xwdy/asJT4Fwyb5iJyqYlQ1MYsKyzwzcOC9GOlAnyqxAi+3Qcg2mMmOws1JrOF2iG24A9zRYOT6CNpysE1Hv65GG+x951EEzAvSi1yLgEaNVECk9+l74/kclFjRNJxlAwO8T/d0ducGAt0sWyzlrp9KeyObYUB6h8m9wXKfy3u10Nkj0IBuucOGohqu8UdvDCMLsGbmrChqpjZqY/5SFA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Np1Gc+PWUgwWUDWbMj2u2C0qvxXjMPdHpeRwwSEjT28=;
- b=WA0zcjMCtt55vwnhWtOmaVKxpJc2I3i3c5PxDcpDXZo05Yq+CcP/g3IlxavedOsc0L1I542P+ZKADEWXCCFEH6AfgUSCWv5IC1F9/IRDwc6/J1ZSsJHAEVU1WvBdKm/DyEweznQT0r+jQyw6gF0CWvK98h4SRXd37GYLfwsx9EpU0Lfr1XTsQy9MQ1QuXJXE8nqZioi0+8TLPJTUMD5XcVZFpQD8fFg+efEcLxeIj8NOKafKr+c6iy70a5G/+frAxRooqMdkWhQE2c6CDE7O6vq3/3TzOUCoAarAq7/AsG4EV4QGkZcTLqtz/Fe6dqiSon0shy9jvhw8w3SFHtpCoA==
+ bh=mO/7JEnRP/hBRJZ6XIZ+lXk/ZV8CjTZGp82uKXmk6BQ=;
+ b=ralFxd3chWdNBljJ2LIN1vkw9z8MyQ3LwlQiqW4LTXFsOVaTjDE+WCnbggH0VIevoCDMKSn1JiExoeNd6gRoThgLFgoycRe07N/uyFL0DNOsb/isioi2YrzNYqI/Occ24+g+Y6Wf8HY4o6qZQxU5A8upV/NcrMgNH4VQG2koCdK1CqUA+22M851jDeBZeoMO+EG6EOB1I/ZBMlkcmIm50RwP3NfJ7vCY9Cki7RmKkD2CeOCERX/NgcrWA4bry6IwzYectGn09GOzFE14+VuucuGblGbIM08iyVhb0bsoLe+G2N8SZuB8I77dIwzyPeozmjmCSozqsO7zY0dZd9cZ2w==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
  by DS0PR12MB8317.namprd12.prod.outlook.com (2603:10b6:8:f4::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.26; Wed, 6 Mar
- 2024 23:04:45 +0000
+ 2024 23:04:47 +0000
 Received: from BYAPR12MB2743.namprd12.prod.outlook.com
  ([fe80::459b:b6fe:a74c:5fbf]) by BYAPR12MB2743.namprd12.prod.outlook.com
  ([fe80::459b:b6fe:a74c:5fbf%6]) with mapi id 15.20.7362.019; Wed, 6 Mar 2024
- 23:04:45 +0000
+ 23:04:47 +0000
 From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 To: netdev@vger.kernel.org
 Cc: Gal Pressman <gal@nvidia.com>,
@@ -68,14 +69,16 @@ Cc: Gal Pressman <gal@nvidia.com>,
 	"Nabil S . Alramli" <dev@nalramli.com>,
 	Joe Damato <jdamato@fastly.com>,
 	Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: [PATCH RFC 0/6] net/mlx5e: Improve ethtool coalesce support and support per-queue configuration
-Date: Wed,  6 Mar 2024 15:04:16 -0800
-Message-ID: <20240306230439.647123-1-rrameshbabu@nvidia.com>
+Subject: [PATCH RFC 1/6] net/mlx5e: Move DIM function declarations to en/dim.h
+Date: Wed,  6 Mar 2024 15:04:17 -0800
+Message-ID: <20240306230439.647123-2-rrameshbabu@nvidia.com>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20240306230439.647123-1-rrameshbabu@nvidia.com>
+References: <20240306230439.647123-1-rrameshbabu@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR05CA0139.namprd05.prod.outlook.com
- (2603:10b6:a03:33d::24) To BYAPR12MB2743.namprd12.prod.outlook.com
+X-ClientProxiedBy: SJ0PR03CA0165.namprd03.prod.outlook.com
+ (2603:10b6:a03:338::20) To BYAPR12MB2743.namprd12.prod.outlook.com
  (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -85,105 +88,145 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|DS0PR12MB8317:EE_
-X-MS-Office365-Filtering-Correlation-Id: 780367e6-8e13-47a4-78dc-08dc3e31d033
+X-MS-Office365-Filtering-Correlation-Id: 6cd166b1-888f-4063-13ff-08dc3e31d07a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	Wm7bSaBOFn4P6Kj/MZBPpop/lK3XIDOB2nurR6OZHvpLslJ7bBoH87FRUsGHbLjNwgAXHLN9KwjsvmLUpP9XG5hATewYqFAL5xqQVp0N4PZtXA0EtT4sSOBqfgraknc7f0yp0PGVYxgDnxHqiBGdKE3+7O2NVyHjaDB5lSCi2zR/KHz8Y7/Ys8tQyU5DdKhmKKTlQiLVYg3zUojRps5OHrNHi+nWKno73zQiAXSju8BrXcVcw/+Z6s2oQMonkSWVZB6J7xtwboP0WS0HZk63g3RnCXZPI1Tawwjzo2EBWOYYbFt8dXecD6vWV0lnbLy6wyPpcAesmVuntjWiU5wXM/dysVkbKDhR922Lf58Wg1DANzijdybprl3VQAVNpRG9agjnjkdDyNdWpcnrlEnvCZCgeoLSXTEqm/cMP0mJ7BKAGgl9ksuoKU/wYcDusADSGnbbJ4VZhbB/b7rrCIP8JMQrbX8Jd5YibexSt2pME5tTNqtGV2ujgfRXkD8sQ3naDmdtEglk5lB58Oe4sRnSD6ZsnMPWo3Radxk+rWw+bTbPXiTqBMLq9kDuVKq9WTWf9huPpeDDE4kwuhSJSRJ/h7W8PAzq56ClrJDM1cKJTTwOmZF7ZCFVvBtdazrL2CeL9Spo6lidWo0le/xKKOhTC/r0qW5UCDV65tcjw1dUCGQ=
+	GuOJyFvlxDYCwT4p1Hbx2DirtOty8oke+jbIf9b0kLDBWwIpb31mGq5Rwd8LAhP/LF2//qnIJMbEzlAGfZEjvIlfJrR7Epb9pAH3DFM7WLBdqdFYZqIwfAmu3FIDzeJLNeAlVEm+0p+qqupVXhdh4Q9dvC64G7DiHudlEozx9d/vMjVx1HrpIBCVhVmFEV/4Z2sorh6oQvf0iyYtULA07JcoYhtbz/revI7GhpmIFZLJu/oWuEPpVZINg5YxoLvwYf7DK2rQCMCGY1KfLfh5e7g2nIxCPU6Cy4Di41T2+GI9xXHYJ6FEUHXPHy1bq1vmpbMKIr5pEjWYYcAd1EmnYHAOIYABscJ+8aPxqNVCy7+pTFquOEhGLR1uXVKLaHr10uYZShdjV/LQ6HIYoiY7odmBeePSlAcQuNDh0qpk654CkBRGxtmavdgmnqP7ckatKeDHfiPu/yfvin4Qp1jQ+ZpOWlw4JMhBaB2KMaYRtuYQAk9Vx3aGEcBy3jxzAQ0JWdp694bqOltxcEcQz/XaHoWycj7n9Q+vItnMBk7uU3/xLQ3sf82qZ7RxOGxtv+qMcsR0bf1Ilr02nrVhvnKlCFEc/10YGbtxCAju8CRhCuYrLqoLzuGTXq1x7YQ6SiPVHNkhG/WkOeAOupHYMRvUWw7Q8O1QPv+BZO55q56OnyY=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?KnQpFwo5L2xS/N8TNIylVBFTD1T9zgQ8jrz6X32S88+TgaIp4NTyE0vPz4ZW?=
- =?us-ascii?Q?kfgxpZU036qWSCJxLSIb9VK2lFfSO7a/e9WJmYwI5/4aBmTTrXWVKn76WCFc?=
- =?us-ascii?Q?OuafSM1JULEWGhVASxbpAlaBJudJwgfe+RKZFUZ059BBR//W9aD07p397Wqm?=
- =?us-ascii?Q?fICwyxz/dMMHHzFR8PTdXtKkOQDo/1V8VPH1sXc64FZSVXi4FaSupjlOn/od?=
- =?us-ascii?Q?Bq8ksig4xITp3WjjCj3RzzgL8fD69ZIPDyltcbrfPmu66/7bculvIJkOBpML?=
- =?us-ascii?Q?JWyazrX4sAZFT6H7X2FN0z3+BYZvPj0HXvQsvM6hBulqbo0Ok/xkrPZlLQNI?=
- =?us-ascii?Q?3+sAExgsgRl3gKX7xsveAYdCb6zRYyUkc1QA9I5552ltkm/uUHWJXdj7f7gb?=
- =?us-ascii?Q?Eg34NfzgYnI9s8aPtVNRMOCHtZAss1reDmT68K6Au7JVgH+R6zxQg8DZcjen?=
- =?us-ascii?Q?7Z6E2rcQg0LwhIvgXGyYanVM/7Uy2b98tI8//rSi6gZfCLOnpH/oYJrxHM8A?=
- =?us-ascii?Q?HuoFdejPb/CyhdCiEfuAhmE/Z9eZ2x+iy+O1FRnWkeeiTUTVNjRbHlAV5C8v?=
- =?us-ascii?Q?ojWjOAvddgLf98cFChRPnGOahupM7/Utm4qXRJxjajypxTfEGkZC5uxWt7AI?=
- =?us-ascii?Q?ay1bGqB904lpjpehZL+YYq/cajL6Wl/7FNyZXG04KkxBJ8ZWpQ7TxTrHL7uN?=
- =?us-ascii?Q?0j89il83d+qdv9tZdjCGJyBY6kwueykf8UW62LkgNR3y+lGAF3Jv6dhwR4wv?=
- =?us-ascii?Q?LOPkk6PoGXn/mVktNfS+4OHnnlu5T+mTpgulq7mwynOs5N3ilCtej1xhAdUe?=
- =?us-ascii?Q?06eGWjMKJdVQXHucIJzkGe6qI/eg618W/3AZzIgnRQDudDZxRbmNGDb2OOiA?=
- =?us-ascii?Q?lI2SAUZMa3ve/Tfl0mcpMNzq+oYk1MA92iVlN0YyYESYcY7jLDLiXHtGaint?=
- =?us-ascii?Q?Pisym5RfLGhGYg8j5xO5xOIcWDZoD/6K8CaxhahHo5Fc86yjCFD+HzOxnhL+?=
- =?us-ascii?Q?uwVgEs1KymqWtO1DQjtJL6GkR/Yu1OIb9FsQGIJRNdDdR40DC1qGhTkqpmAo?=
- =?us-ascii?Q?5wCzdErG4K07DVz7fyuuCr3CIyr8KvG9kO2kIVE+QLOEVtesPAWUeN7/zFHR?=
- =?us-ascii?Q?ky9mXvZ7cvGGb3lEmqTCMRciMdF+24DWsMpLximWQPSsFt2pX6KODiNDC/1N?=
- =?us-ascii?Q?UT8Gue46SKBawC/BXfD7BO7CiISJFATJpsMvPJN9YnPyFQZEuuMpVNp2LpzC?=
- =?us-ascii?Q?CcE6VwVSz9MVwlgeE/uSl6ZS4DOQQSXF+FNrnDhFVTEnUxipYQNCHwKfA/QE?=
- =?us-ascii?Q?DfHmKCwWBPEwIfBmi9uRomUe2B2l4bFW8h8wJRlkmCU1HdTuGhcGDCiLThFj?=
- =?us-ascii?Q?0iWqOYvNgGY6a8/XDYg/FszWKfKv4CKFmR4I8J6nAVA3/SlXrCItCUyoPT/w?=
- =?us-ascii?Q?PUK6Qgdg201W+9dweNryRBC3GR4GRGS/SKlV4MI7QiTSnrqGDlFNnWZ+y6sP?=
- =?us-ascii?Q?6plLDLAkLdHqH4AH00WbwcW+XrA/sToAw8ZZa/ZpD0YAF09xjeIUf6DsRCaD?=
- =?us-ascii?Q?jMzQDTTzq4NyEM29tPdjTih8wFALXm7VzNhUh199WjLcMZwHbm/uDug7gP7a?=
- =?us-ascii?Q?cg=3D=3D?=
+	=?us-ascii?Q?h3e8YAtkZMq75ZTgVV8DZnGg/IliRu5/FviJAENItVFJYjgvkZEk9db3JZT3?=
+ =?us-ascii?Q?jPYM1JLEvJJ09S5xMaX17MKvZCrxZRxImiJ+kpP/WTwKRGx7iDRCllk7S9EC?=
+ =?us-ascii?Q?6M3WmkIoiG1+6Dt2AfvBaDXvwg3gziz3NebyvEA69sOpaFZqFZvEbzF3v4oP?=
+ =?us-ascii?Q?CLKAmr883D3c4jsirzAAFoJRqN+kG622WChq4DcuO9viSnmk9PqOWEb7y6p8?=
+ =?us-ascii?Q?1lKQB+WoBUlAQ69zw5qxGllSJ7pFWbxM/zPp2NH2jvqiIeybjFoKavsI5K8/?=
+ =?us-ascii?Q?sNfWfdE4G18Heg/OBQGVE+SlXBw1Oeq6ASEsTgBagJ4DBbh6RNRUhYoNMpAu?=
+ =?us-ascii?Q?316U32qzjFZOUCWseomgOHCGJs7UDPdk+j9EXMMmXn7L0jzcNRpx6W3bGCzv?=
+ =?us-ascii?Q?8aeD44hLAivl/ZL++YNK73y6B/Y3s/mMop2HARLRPrQo4g/QZxRYi9nwmsup?=
+ =?us-ascii?Q?1T6r/UDJOrlDieqf8KT6oEmqpExFYBVat7R8sY15f+MVsm02Ci3fnG9zAakn?=
+ =?us-ascii?Q?jXWieYDC/hM//P2N2cm9/tIbpF1Z4YRvjQF4k/omT7kmrZrAQByYDZ0geDpy?=
+ =?us-ascii?Q?dVIzzpvbyKN+xR0b3AYqSudV86VcNiBfJ+iLRqiJWKv4UXNak6AoATZUJ5Gd?=
+ =?us-ascii?Q?mXgxpW+FhHhKc8ybDda8t2M6Y7iiCoi0u2HNCjfUzjc3OXtp6kskQso1fsrY?=
+ =?us-ascii?Q?gFmJEpsU012tI6PVwcUR5r0NmP4koC/nJQ6utueq0uehxPVx29A1oKbI0wLZ?=
+ =?us-ascii?Q?YWhueUQSBG8qQuptJedW9FEcKZ9+saPzG/qDkfDNms4l3imGzwkHPinAI2Zu?=
+ =?us-ascii?Q?3IqTeBrI98JG/50HFbT4yy7N22hLydMwLiXT7G84C77l0WUmqxmKt80CbOwr?=
+ =?us-ascii?Q?VdiH+YRSaesdbau4czFGmMKkUbWVQ67tZBhESo5or1ryOlUNT41a1aosImbc?=
+ =?us-ascii?Q?j069e68+eVDMROuLXeJ9Sz1q5HZI+t+tQtcZawkD6PqUVf/yfhdlk9HFAkw6?=
+ =?us-ascii?Q?KqAX1Puf9TeBenpjIr7/UkyLJdPdR6aAXr9atHDrqMoqQYst9f62lLIS9ZKk?=
+ =?us-ascii?Q?gOEnL1cBxcvnyyxlZe35SJcWqM8CLvNWF1K+LnX+LWp6B8gvWSdKam17/dZH?=
+ =?us-ascii?Q?QXWDUL8AjesXY+++qxnaUq5PcoGoWaDHH52OVE5YDlDa5Bg4ba8RQzXx/12+?=
+ =?us-ascii?Q?GQyC1q4n25jv5xTbdIQo7WOqX/d6CeC/RWNP1ZFYJa51LY7a0nNohbegg6T4?=
+ =?us-ascii?Q?avAEW4JxQnEM09+5DHFi9oATVZ7BvJMJJUz3/x/yRqfRe9IuvCw625d0wNxA?=
+ =?us-ascii?Q?9byQh+xXhDmCOI/y+uUukOv910guIVccE79c2pPT7ScFpkg18qXZDEuKntIi?=
+ =?us-ascii?Q?QCoZRkwH5NPXvU4XmbYCZ8ONZEgHoYDzqnK5pKE7J7JvAAvZXbUZrPWXplLY?=
+ =?us-ascii?Q?4hea1owlSsGuFQtB21ovSOaStxpW2eoi78ACDnEzE16iUBeTIosKmUfsytxS?=
+ =?us-ascii?Q?UswYvQ9mEsvYFwosvw056AQ3XpYJABkglVDeM3injFgHT/J0x9zbGW0CVTiA?=
+ =?us-ascii?Q?EhDmM8Do9l5MxShaDKDRP8qXfL6NtRlbww/mYiTOFb/aC3MmQ2v2qEU+bBbO?=
+ =?us-ascii?Q?Vw=3D=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 780367e6-8e13-47a4-78dc-08dc3e31d033
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6cd166b1-888f-4063-13ff-08dc3e31d07a
 X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 23:04:44.8592
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 23:04:45.2826
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cUUHIk9X/rC1Gjz+Dnlg/JxD6p8UYXwSpMbSw8KmM/C2Hn6jz5cgVjJf4+D+xbwnOMeDRhv0BQENp97u2Q2U7A==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 140rpmz07bebloQZxoFv9jQqx32XB9yd6S+ficN/UDlqiW/3iarFS9fK8nN3ZkWx6EdH9tOlple4YpWAcebX0g==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8317
 
-This series introduces enhancements for ethtool coalescing support.
+Create a header specifically for DIM-related declarations. Move existing
+DIM-specific functionality from en.h. Future DIM-related functionality will
+be declared in en/dim.h in subsequent patches.
 
-* We added support for on-the-fly cq_period_mode changes for mlx5 device MODIFY_CQ commands
-  - This removes the need to tear down and create new channels for reconfiguring coalescing
-* We also now support per-channel coalescing configuration.
-
-We noticed that mlx5 devices were in fact in some cases not being configured
-correctly based. Some cases include impacting tx queue coalescing parameters
-when adaptive-rx is tuned on from the off state, etc. We end up fixing these
-issues as well in this series and hope that now whatever state displayed in
-ethtool -c <ifname> reflects the device state. The exception is when DIM is
-enabled and the state can properly be observed using the per-channel coalescing
-options in ethtool.
-
-We would like to thank Joe Damato and Nabil Alramli for their submission to the
-mailing list that inspired the work on this series [1]. We would like to get
-their Signed-off-by trailers and accredit them as co-developers of this series.
-
-[1] https://lore.kernel.org/netdev/20230918222955.2066-1-dev@nalramli.com/
-
+Co-developed-by: Nabil S. Alramli <dev@nalramli.com>
+Co-developed-by: Joe Damato <jdamato@fastly.com>
 Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-
-Rahul Rameshbabu (6):
-  net/mlx5e: Move DIM function declarations to en/dim.h
-  net/mlx5e: Use DIM constants for CQ period mode parameter
-  net/mlx5e: Dynamically allocate DIM structure for SQs/RQs
-  net/mlx5e: Introduce per-channel coalescing parameters with global
-    coalescing support
-  net/mlx5e: Support updating coalescing configuration without resetting
-    channels
-  net/mlx5e: Implement ethtool callbacks for supporting per-queue
-    coalescing
-
- drivers/net/ethernet/mellanox/mlx5/core/en.h  |  36 +-
- .../ethernet/mellanox/mlx5/core/en/channels.c |  83 +++++
- .../ethernet/mellanox/mlx5/core/en/channels.h |   4 +
- .../net/ethernet/mellanox/mlx5/core/en/dim.h  |  45 +++
- .../ethernet/mellanox/mlx5/core/en/params.c   |  72 +---
- .../ethernet/mellanox/mlx5/core/en/params.h   |   5 -
- .../net/ethernet/mellanox/mlx5/core/en_dim.c  |  95 +++++-
- .../ethernet/mellanox/mlx5/core/en_ethtool.c  | 307 ++++++++++++++----
- .../net/ethernet/mellanox/mlx5/core/en_main.c | 209 ++++++++++--
- .../net/ethernet/mellanox/mlx5/core/en_rep.c  |  10 +-
- .../net/ethernet/mellanox/mlx5/core/en_txrx.c |   4 +-
- include/linux/mlx5/cq.h                       |   7 +-
- include/linux/mlx5/mlx5_ifc.h                 |   7 +-
- 13 files changed, 685 insertions(+), 199 deletions(-)
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/en.h      |  2 --
+ drivers/net/ethernet/mellanox/mlx5/core/en/dim.h  | 15 +++++++++++++++
+ drivers/net/ethernet/mellanox/mlx5/core/en_dim.c  |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/en_ethtool.c  |  1 +
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c |  1 +
+ 5 files changed, 18 insertions(+), 3 deletions(-)
  create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en/dim.h
 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+index 55c6ace0acd5..2df222348323 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+@@ -1219,8 +1219,6 @@ int mlx5e_netdev_change_profile(struct mlx5e_priv *priv,
+ void mlx5e_netdev_attach_nic_profile(struct mlx5e_priv *priv);
+ void mlx5e_set_netdev_mtu_boundaries(struct mlx5e_priv *priv);
+ void mlx5e_build_nic_params(struct mlx5e_priv *priv, struct mlx5e_xsk *xsk, u16 mtu);
+-void mlx5e_rx_dim_work(struct work_struct *work);
+-void mlx5e_tx_dim_work(struct work_struct *work);
+ 
+ void mlx5e_set_xdp_feature(struct net_device *netdev);
+ netdev_features_t mlx5e_features_check(struct sk_buff *skb,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/dim.h b/drivers/net/ethernet/mellanox/mlx5/core/en/dim.h
+new file mode 100644
+index 000000000000..cd2cf647c85a
+--- /dev/null
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/dim.h
+@@ -0,0 +1,15 @@
++/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
++/* Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved */
++
++#ifndef __MLX5_EN_DIM_H__
++#define __MLX5_EN_DIM_H__
++
++#include <linux/types.h>
++
++/* Forward declarations */
++struct work_struct;
++
++void mlx5e_rx_dim_work(struct work_struct *work);
++void mlx5e_tx_dim_work(struct work_struct *work);
++
++#endif /* __MLX5_EN_DIM_H__ */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_dim.c b/drivers/net/ethernet/mellanox/mlx5/core/en_dim.c
+index ca9cfbf57d8f..df692e29ab8a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_dim.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_dim.c
+@@ -30,8 +30,8 @@
+  * SOFTWARE.
+  */
+ 
+-#include <linux/dim.h>
+ #include "en.h"
++#include "en/dim.h"
+ 
+ static void
+ mlx5e_complete_dim_work(struct dim *dim, struct dim_cq_moder moder,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+index cc51ce16df14..9b3bfa643fd1 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+@@ -33,6 +33,7 @@
+ #include <linux/ethtool_netlink.h>
+ 
+ #include "en.h"
++#include "en/dim.h"
+ #include "en/port.h"
+ #include "en/params.h"
+ #include "en/ptp.h"
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index be809556b2e1..7721d7656aee 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -43,6 +43,7 @@
+ #include <net/xdp_sock_drv.h>
+ #include "eswitch.h"
+ #include "en.h"
++#include "en/dim.h"
+ #include "en/txrx.h"
+ #include "en_tc.h"
+ #include "en_rep.h"
 -- 
 2.42.0
 
