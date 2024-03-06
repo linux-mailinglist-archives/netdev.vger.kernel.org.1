@@ -1,97 +1,84 @@
-Return-Path: <netdev+bounces-77757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 895DF872D5E
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 04:10:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E398D872D64
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 04:15:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAFEA1C26646
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 03:10:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F73228B438
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 03:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A7411737;
-	Wed,  6 Mar 2024 03:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C198101D5;
+	Wed,  6 Mar 2024 03:14:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r2d585M6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HaoY3I0S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3BB101D5;
-	Wed,  6 Mar 2024 03:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74038DDA8;
+	Wed,  6 Mar 2024 03:14:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709694629; cv=none; b=GgMyGz4Rke12zXykWZ4mPCIfEkZ5E7DtlDbHLfVE2dmQNHP4X947tdmFuelkxAZvkOfaJg5m8OrxIR7XGWJeZGSMmRva/4QnozzQF7KsvlxuBxE7emt1n0wK+Mnsh5Njlk8mwSzHmjpCG1G/sRMstJ4QhRT+OvI0RwhSMHgng+Q=
+	t=1709694899; cv=none; b=GTdCdQ78im61o1qT5KtcY/A3OKI2vaUEYEj6Niw4IZP2bhkiAA6MACTsa3HBVxRd3UTYc6vVFjjQvzrr5Cc2PYZpvxARQh7MthjWhNTXGpUSfrL1amqAMaW5KHaM7G2Q5PspP6kAHdr3hTaEJddjOE+rBexqvogQohK1zd1u8KQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709694629; c=relaxed/simple;
-	bh=/YslR42HHcCT8sP2owzUHr13FtcYZuFcf1y1syHWAZg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aEkOIoIDmgJhds1ZalK/ADAz7kU81oPOhpBBUPbMcOv/NnvV0E6pb8PKp71fz7jtnxzEbR3SSMmr/yWA615pvpa8Zd+tdd1DVRdUdMUooa9zRBOWDNyPQwyuSjitdy0cBaqYShom/yIPtkLhnEVQXPAw6Ydx+x1a4CEkE7N7fhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r2d585M6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8EA3EC43390;
-	Wed,  6 Mar 2024 03:10:28 +0000 (UTC)
+	s=arc-20240116; t=1709694899; c=relaxed/simple;
+	bh=ADX2aLUl83Ht7eqwNw1wCGw/JUzgdAjweDaoeaKB7Mc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=T6KjvLSCealSrrewMZkbFORl7JfX2oCH/e5QsacHKLJnaV9ayQYrixX/eKHK+CTqb44tM0+m9hgah01MZv8QX0RF/7A1gxbdGOZa33P82wRWqhHbTYQOFKUImOE7ssi7rBBOBbKagzoGyy/pUp54d4BWid0y+7nYX6myVvPYaDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HaoY3I0S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8626AC433C7;
+	Wed,  6 Mar 2024 03:14:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709694628;
-	bh=/YslR42HHcCT8sP2owzUHr13FtcYZuFcf1y1syHWAZg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=r2d585M6FNt260vmjaiMeW6EVvSaH2z2yRcJKBO/D/hgpMl6TnuHo63A4kkuMiCDJ
-	 SXUHMEAbtCC122J6cs7g+dIpTU6WP/rb9Yo5FPJklTP8/1/rlF3AxH9Tu0OuuYC4XO
-	 AdQSidFW2plxVWMI/gcXApA2m/4ILTriD8l4boBulWrNMYogZz/X+Z2ByNsfWTtJlN
-	 SijJXcj5WQu48qiuhtSLknlqCViuR/ljg6hp217roVzp8vx3a+f83qMIJb2mbpAnLB
-	 GZOdves6jhRbUz4EhNiWBC/bciDVCPI8zFezUwAN5TwZXaIsHhkFLXcmMtdRaQa/BQ
-	 lITNDhWRIsGVw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7307DD9A4BB;
-	Wed,  6 Mar 2024 03:10:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1709694899;
+	bh=ADX2aLUl83Ht7eqwNw1wCGw/JUzgdAjweDaoeaKB7Mc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HaoY3I0S1NwcF2DBr3I9Cxc1FOlamxDp+JDDN8xxcm2o/mDu3zGWJinEZpq/kYoSu
+	 x5uXks4LYHCZBbNvMnvTBXpvdPAW5dLYSdQBEhsJ5Fsv7HB3yLOI0zrVS7JqqqKRjM
+	 ZXsoAEEPumhDKeMBs9i4vF0Cc3+yBcKYbaDea5kFLAAvK6D35rpzzQruUce1cKe47c
+	 DgMeNdh7CA/70d2o2ic7Ql5d9Q5rnfv20qyuGXY4RC3iGuKBwBj19FzwBh7pVl3Jpn
+	 ZcL+kl63zKt+3PinT/A9PCulnEqB9xXjnrLopTxUVT7xB0OeJxCAtN4twaoGGHuCwY
+	 4cyeFCzYLo/+A==
+Date: Tue, 5 Mar 2024 19:14:57 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Florian Fainelli <f.fainelli@gmail.com>, Paolo Abeni
+ <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>, Woojung Huh
+ <woojung.huh@microchip.com>, Arun Ramadoss <arun.ramadoss@microchip.com>,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net v2 1/1] net: dsa: microchip: make sure drive
+ strength configuration is not lost by soft reset
+Message-ID: <20240305191457.37419bd4@kernel.org>
+In-Reply-To: <20240305064802.2478971-1-o.rempel@pengutronix.de>
+References: <20240305064802.2478971-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] sock: Use unsafe_memcpy() for sock_copy()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170969462846.24513.2351243182107643239.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Mar 2024 03:10:28 +0000
-References: <20240304212928.make.772-kees@kernel.org>
-In-Reply-To: <20240304212928.make.772-kees@kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, netdev@vger.kernel.org, dsahern@kernel.org,
- kuniyu@amazon.com, wuyun.abel@bytedance.com, leitao@debian.org,
- alexander@mihalicyn.com, dhowells@redhat.com, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon,  4 Mar 2024 13:29:31 -0800 you wrote:
-> While testing for places where zero-sized destinations were still showing
-> up in the kernel, sock_copy() and inet_reqsk_clone() were found, which
-> are using very specific memcpy() offsets for both avoiding a portion of
-> struct sock, and copying beyond the end of it (since struct sock is really
-> just a common header before the protocol-specific allocation). Instead
-> of trying to unravel this historical lack of container_of(), just switch
-> to unsafe_memcpy(), since that's effectively what was happening already
-> (memcpy() wasn't checking 0-sized destinations while the code base was
-> being converted away from fake flexible arrays).
+On Tue,  5 Mar 2024 07:48:02 +0100 Oleksij Rempel wrote:
+> This driver has two separate reset sequence in different places:
+> - gpio/HW reset on start of ksz_switch_register()
+> - SW reset on start of ksz_setup()
 > 
-> [...]
+> The second one will overwrite drive strength configuration made in the
+> ksz_switch_register().
+> 
+> To fix it, move ksz_parse_drive_strength() from ksz_switch_register() to
+> ksz_setup().
+> 
+> Fixes: d67d7247f641 ("net: dsa: microchip: Add drive strength configuration")
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-Here is the summary with links:
-  - [v3] sock: Use unsafe_memcpy() for sock_copy()
-    https://git.kernel.org/netdev/net-next/c/ff73f8344e58
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Hm, this is much larger than I anticipated, and also doesn't apply,
+so there will be conflict with -next. Andrew, should we go back to
+the v1?
 
