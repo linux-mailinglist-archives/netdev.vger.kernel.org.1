@@ -1,147 +1,90 @@
-Return-Path: <netdev+bounces-77881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C3C7873576
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 12:15:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19D18873591
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 12:26:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A45A1C2273F
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 11:15:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3A651F27179
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 11:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB03762D9;
-	Wed,  6 Mar 2024 11:15:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875D47F7C7;
+	Wed,  6 Mar 2024 11:26:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vMmObzNl"
+	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="X8cOGGbd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mta-64-225.siemens.flowmailer.net (mta-64-225.siemens.flowmailer.net [185.136.64.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA3A3605B4;
-	Wed,  6 Mar 2024 11:15:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA157F7C0
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 11:26:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709723724; cv=none; b=hCtQ6QBl1FdgmYxD+XC/iE0smx1264tkWH/6WIRT8XSqixW5T2mZZm2jU6L8yQJrTRlHJ+Qs8Mv2kCa7mmZRIUWDUXYkQhFu9IHq5CRe+IWABKA6qhw0+rdaEGXK+C58rolARWsvaO9B+KVF/BiJdxDxqktEhzAsoPTwiqRU9UU=
+	t=1709724410; cv=none; b=RVpnuHwisgOSiyztxfTme889s1MftJM/NX8SD8roPNthfb90XD0iOwe6WNsbA5IFPwtWdcVCGjGjTadgTBiA9vowOBSjzyfrGfiad0Klr8Cx2OQQNvAVMp5LKzxL7iK1l/f6SdR/q5JhsnnZJ5lCwVgUKrnXApbDwucBsc5HJ6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709723724; c=relaxed/simple;
-	bh=YC1JZzUSGm90LAa8typocXvGi3dcuKhnwtfIEXMfegA=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=d/wZwqSry1aorr4MqKBU/boJ6BtOrGaowugjDpXeUNSLtNi744pjDv59RloXJkGrG+HKD9+Je/Xp3URdaiNCzIp2wwMSV9DhotxHKjT6S1QAdrthOJX56tY+KGoQQKwbfDnYoBvHwhv4h2/R/iIOZfHAX2ZnH2OMdSMoR2yKYIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vMmObzNl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02C5FC433C7;
-	Wed,  6 Mar 2024 11:15:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709723724;
-	bh=YC1JZzUSGm90LAa8typocXvGi3dcuKhnwtfIEXMfegA=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=vMmObzNlM9Tbn7pDK2KR94nuzJA+dkX/WTBV9JAHY7Zq6pgtm9EWAr8uauJqUg2Fw
-	 PQ2GNr12JQkL2VIlIu1gaL6rQsr1KJkhS/0Wau+AeicDKCWf8B4cpfRHDWaYzRdz9/
-	 jQWAkUJO+clPilmjGVk/JO8AKzdjmdVS1tQJb1DrLIyfr9VJgamMaI9kGkb/BcQWUC
-	 DNeXHgiEEikyZZBU1BOPHyjpN5gVdP2eeLh97OQyDR+CC/G3gJVqFIxNWjPgGpEEGq
-	 c8yYEAOZCz1kNUNwB7pD3+QUES9AnH4qu1uUyQoMAW7hhBHBkirC6CRXsFDinpVcKG
-	 S/KcJa5KFduBg==
-From: Kalle Valo <kvalo@kernel.org>
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: Jeff Johnson <quic_jjohnson@quicinc.com>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Rob Herring
- <robh+dt@kernel.org>,  Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley <conor+dt@kernel.org>,
-  Bjorn Andersson <andersson@kernel.org>,  Konrad Dybcio
- <konrad.dybcio@linaro.org>,  ath10k@lists.infradead.org,
-  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
-  devicetree@vger.kernel.org,  linux-arm-msm@vger.kernel.org,  Krzysztof
- Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: Re: [PATCH RFC v2 0/4] wifi: ath10k: support board-specific
- firmware overrides
-References: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
-	<87plw7hgt4.fsf@kernel.org>
-	<CAA8EJpr6fRfY5pNz6cXVTaNashqffy5_qLv9c35nkgjaDuSgyQ@mail.gmail.com>
-Date: Wed, 06 Mar 2024 13:15:18 +0200
-In-Reply-To: <CAA8EJpr6fRfY5pNz6cXVTaNashqffy5_qLv9c35nkgjaDuSgyQ@mail.gmail.com>
-	(Dmitry Baryshkov's message of "Wed, 6 Mar 2024 11:23:21 +0200")
-Message-ID: <87cys7hard.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1709724410; c=relaxed/simple;
+	bh=HMlyMITJFkzMJY77qP0c4A1Fs/35q1XK1MZEzoc/ZtE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BQuUW1MhrO7CiIq1c8G79GuFF7Ha4qNsWcBKBpjn848SFhlQ0zBAVKq5ndyisBZrJJptTH+ryQOuI+bdAUq+lhQGj0bq5pJKsDq0PFmPZZnik9uaXKjO0ZhQZDBG5Qps8WffrxAGelIYusLGC2GMQ/En+8InfZdHB4iAVsV0jj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=X8cOGGbd; arc=none smtp.client-ip=185.136.64.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-64-225.siemens.flowmailer.net with ESMTPSA id 20240306112638d3a2cba792c0a96513
+        for <netdev@vger.kernel.org>;
+        Wed, 06 Mar 2024 12:26:38 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=diogo.ivo@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
+ bh=OLMbXckz8O/uXhbuiDWRpfyCRS8JcwaLdYWHgg15Tug=;
+ b=X8cOGGbdaa8rVj9V+81QGW7uQV8ZLj+VBqUdsLS+dkdyN+jHx4+D7xw4CCwVE1X5FEZvkq
+ JXUMQran5pZEg0CwtTLp4J8bdx9dB/QRlf7fmAKaI96v9dWp3CagIWFmsldSn6P9OxP5Y+Vs
+ rXrU6NMmjvwDN5/Xu0RipXAcPf+sI=;
+Message-ID: <5cdaee2b-bf1d-4528-8578-b58ee3904095@siemens.com>
+Date: Wed, 6 Mar 2024 11:26:36 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Subject: Re: [PATCH net-next v4 05/10] net: ti: icssg-prueth: Add
+ SR1.0-specific description bits
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: danishanwar@ti.com, rogerq@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch,
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ jan.kiszka@siemens.com
+References: <20240305114045.388893-1-diogo.ivo@siemens.com>
+ <20240305114045.388893-6-diogo.ivo@siemens.com>
+ <ZecvKo1HDAXD0n7Q@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Diogo Ivo <diogo.ivo@siemens.com>
+In-Reply-To: <ZecvKo1HDAXD0n7Q@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-1320519:519-21489:flowmailer
 
-Dmitry Baryshkov <dmitry.baryshkov@linaro.org> writes:
+On 3/5/24 14:41, Russell King (Oracle) wrote:
+> On Tue, Mar 05, 2024 at 11:40:25AM +0000, Diogo Ivo wrote:
+>> +struct emac_tx_ts_response_sr1 {
+>> +	u32 lo_ts;
+>> +	u32 hi_ts;
+>> +	u32 reserved;
+>> +	u32 cookie;
+>> +};
+> 
+> In patch 10, this comes from skb->data, so seems to be a packet. Is the
+> data dependent on the host endian, or is it always little endian?
 
-> On Wed, 6 Mar 2024 at 11:04, Kalle Valo <kvalo@kernel.org> wrote:
->
->>
->> Dmitry Baryshkov <dmitry.baryshkov@linaro.org> writes:
->>
->> > On WCN3990 platforms actual firmware, wlanmdsp.mbn, is sideloaded to the
->> > modem DSP via the TQFTPserv. These MBN files are signed by the device
->> > vendor, can only be used with the particular SoC or device.
->> >
->> > Unfortunately different firmware versions come with different features.
->> > For example firmware for SDM845 doesn't use single-chan-info-per-channel
->> > feature, while firmware for QRB2210 / QRB4210 requires that feature.
->> >
->> > Allow board DT files to override the subdir of the fw dir used to lookup
->> > the firmware-N.bin file decribing corresponding WiFi firmware.
->> > For example, adding firmware-name = "qrb4210" property will make the
->> > driver look for the firmware-N.bin first in ath10k/WCN3990/hw1.0/qrb4210
->> > directory and then fallback to the default ath10k/WCN3990/hw1.0 dir.
->> >
->> > Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
->> > ---
->> > Changes in v2:
->> > - Fixed the comment about the default board name being NULL (Kalle)
->> > - Expanded commit message to provide examples for firmware paths (Kalle)
->> > - Added a note regarding board-2.bin to the commit message (Kalle)
->> > - Link to v1:
->> > https://lore.kernel.org/r/20240130-wcn3990-firmware-path-v1-0-826b93202964@linaro.org
->>
->> From my point of view this looks good now but let's see what others say.
->> Is there a specific reason why you marked this as RFC still?
->
-> No, I just forgot to remove it from the series settings, so you can
-> consider it as final.
+Since prueth_rx_mgm_rsp_thread() in patch 10 calls le32_to_cpu() on the data
+it gets from skb->data it seems likely that here the data is also __le32 and
+these calls should also be added so that we can use u32 data types. I will
+add these calls for next version unless there is some insight here that I am
+missing.
 
-Good, so let's ignore the RFC label for this v2.
-
-> I had one minor question in my head (but that's mostly for patches 3
-> and 4): in linux-firmware we will have ath10k/WCN3990/hw1.0/qcm2290
-> and make qrb4210 as a symlink to it. Is that fine from your POV? 
-
-Yes, I think using a symlink is a good idea.
-
-> Or should we use sensible device names (e.g. qcom-rb1)?
-
-I guess 'qcom-rb1' refers to 'Qualcomm Robotics RB1' board? In other
-words, the question is that should we use chipset specific names like
-'qcm2290' or product based names like 'qcom-rb1'?
-
-That's a good question for which I don't have a good answer :) I'm not
-very familiar with WCN3990 hardware and SoCs to have a full picture of
-all this, especially how the firmware images are signed or what
-different firmware branches there are etc.
-
-To be on the safe side using 'qcom-rb1' makes sense but on the other
-hand that means we need to update linux-firmware (basically add a new
-symlink) everytime a new product is added. But are there going to be
-that many new ath10k based products?
-
-Using 'qcm2290' is easier because for a new product then there only
-needs to be a change in DTS and no need to change anything
-linux-firmware. But here the risk is that if there's actually two
-different ath10k firmware branches for 'qcm2290'. If that ever happens
-(I hope not) I guess we could solve that by adding new 'qcm2290-foo'
-directory?
-
-But I don't really know, thoughts?
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Best regards,
+Diogo
 
