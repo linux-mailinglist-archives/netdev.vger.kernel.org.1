@@ -1,419 +1,226 @@
-Return-Path: <netdev+bounces-77897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A55708736BE
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:40:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6D458736CD
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:43:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B4A71F24A34
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 12:40:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA6931C20B5A
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 12:43:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F33126F1C;
-	Wed,  6 Mar 2024 12:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDDF283A17;
+	Wed,  6 Mar 2024 12:43:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="JUv8NE9P"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TZsUjQP3"
 X-Original-To: netdev@vger.kernel.org
-Received: from JPN01-OS0-obe.outbound.protection.outlook.com (mail-os0jpn01olkn2030.outbound.protection.outlook.com [40.92.98.30])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9187386621;
-	Wed,  6 Mar 2024 12:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.98.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7C622EF9
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 12:43:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709728846; cv=fail; b=E2gTKKNgMioPw+kYXuNkIT1kS+k9PhATlHvQg/SG9vPSPdPXh0CU++AErrUp5wsHuhXnwMaqo0izCQ8QJ+xo0dMQ+oDTx9iRiiK0gjftko/EJYijlEhakQyEQwDEivbp683muSyKDlOQaHMVwFxtlIP9ugvdSFDcegnpiqUOeKk=
+	t=1709728983; cv=fail; b=BAaqUDsKvZZ19MMpS4VWyAfknWe+M1UcsV/MFxYoiyE0ntQHdUTkWuRvYd2V3dgQKwAbh229dpvctdcgLYsIs6vrNqKDHv30IxjW0RqitGONQ0lsnEqe6PEf5+VyiQYoH7H5V7xGHlLHFQo1AKa73KXnAw8cCnl2uzLhBU+pbSk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709728846; c=relaxed/simple;
-	bh=0DIT8vRGbkFn4fFXdPdOaI/B43qMJw0kpX/v8gDJZf4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=sIy8IThQVtiAJofKkvEWmGKJVSxwd50f6YBUeMTPHAXyF3X1WQzYMUBE03v5Y1zAMg62LT7NITCg/KgqVpjEJyLNdN6fye7qMFbinSZJZu0NPaDdCJ1hfZn9Fuh7pxC3WoeFu1+3qNrm7OhP31obD4OB/inJnG2AW2H6MAzSpvk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=fail (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=JUv8NE9P reason="signature verification failed"; arc=fail smtp.client-ip=40.92.98.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	s=arc-20240116; t=1709728983; c=relaxed/simple;
+	bh=sOrSngbLtt1b1UUkkwWOFN36tfx/g2xe1QA9RwV1Bds=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=mb30CEUxoJOCK1DazL1M86kYqBICVG8MtmiGXiBWIpMI/EFTU13hIsRDeYzyxy69NecBBlH5x3WOMXrir42LYNLF4W+QmEWV3nqsVEjP0dQKwCTGbEWu/oTeRUwypW7JmeItqg1orBG7OpD5UUBk2bCcMrsrR4X/V8VAzMczgvI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TZsUjQP3; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709728983; x=1741264983;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=sOrSngbLtt1b1UUkkwWOFN36tfx/g2xe1QA9RwV1Bds=;
+  b=TZsUjQP3kbPy1yFnyJ0ObSxBc0j5oqfZxoYjQITyMHXzwjUG219waMps
+   ahOByNFU/A9wSIPAgbObNx8kfKC5QgO38eGloEW5wxWto0eqOB88MmzHx
+   +JeuBMCzYhRVEMdyWvbEW9AWvvbu/x/ZvmsQptfSnY7Su0GXfzhkXnNP9
+   gURv2t+VtVyLWqkK8R5IIB1gYriX7iB2OKL3vAL05xmfr6HNkRIMlHeen
+   lpz5cKByHEfKKFRftIKNmqjzyTHeKp9MCA3QiXX9NJyh4WqgltYDF3OVr
+   Whz4/5Qh3EAJISQYXOGidBONHlnPIwk1y0FcP0naYcBhtKfkFgKSUOuey
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11004"; a="4452628"
+X-IronPort-AV: E=Sophos;i="6.06,208,1705392000"; 
+   d="scan'208";a="4452628"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2024 04:43:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,208,1705392000"; 
+   d="scan'208";a="14395602"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Mar 2024 04:43:02 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 6 Mar 2024 04:43:00 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 6 Mar 2024 04:43:00 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 6 Mar 2024 04:43:00 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 6 Mar 2024 04:42:55 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iahnpr9nu8xXlAgDMRjcJbf/tpW4u1N42cN9Pub+sy2UAtpbMaCfPqcczpQSqs1zO16kYIv44UJvOlio7BQgNXTd3ouixMfiUnD8hFi45yHCmhiNBCo2JERcuDRWHjDgqwDXpDDeMnTfV+r/qHiSnweRAnmGjRX/bLs6pfShndVV53zx32PF+S9w6S6HvzpQAlXNM6rNQw4BtaWjcCyT6crWHqcXNRCenwSwKK1gOgacPtJqiuq5C//jlB2ODJU5ZdPwN6yTsTBsem3h+O4v2Jf+KQDu/wr1UeGqAVPbCmW08eP6AhjbzcOldlRLX/QWG7iTTgzu6BxxWjvLUOov7A==
+ b=V66w6c9vQjUcdWIxJcwhepNZNKxL5VMferuSb0ncX9wqqNiWUFPy4tb26cSd9+aiS4fxLoEFqqBS1LiA1DztxFn8VMVRtS5AzUdBCWc3bSb5iEO2rcVeyaNW2nGN4ZIUXegv/j/7DfD7Krq0c7fb/HBaWbq3jbPGjU+TtK7x/9ff3ZWM8urSLnv7jFLP0bPaVuvurJ4lmcF6sXFwe0Kxtg2QYVHG3uTuQDSu7mqQiBw1muv8LYTse1IVTR43L5NNf+ZVYhvg0+p+DV8MGfucTN6/qdJOcempAPqGW0vQODsLzl0Xzr4EYn9Cwr0axZamMvy6yJXh0kL6tFIkN712AA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=noGfxLvPbxnLpweiggOKmItIhD1pkDaIxw+XTK+txfs=;
- b=B+kZ2riVHA4zNthp4Zd3f9zpKQDcPfF0dittCohn34uhACNERnk0kxUVtIZct4+v3t5PFURcG65ZfeB8zFPjYAKLKSmCtXIBsfsigFQxteOslBWRRbrjsT4Ahj2gb107Q+K78pCV1NAbRIb5dJxvwn+AnuFVWoYmprCBSub640Hp6WuDGrDkEGVsBZiDeXOrVzGlql+wt3WbnJumkoadQO1TrHkWHIzIkFkPnABmKNrDgn64KcIboDQ15Ehpps/OoSG79VH0RaQaK4DsAd6rojJ9sQfPIwrt1VR0wpNUqwFCe779zdKkuIh6qFEF2C1lEgIW9NTWQ+6vurEudefmng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=noGfxLvPbxnLpweiggOKmItIhD1pkDaIxw+XTK+txfs=;
- b=JUv8NE9PAr63q9zXlRzBBSX78JZDrAA1GuvqKtVMvmlkkwe4oePg5egBVwSMdIaOUl1dJKo2wxrDV/F0UkSdc27DYjB/53kxOLh9KBsicmCt1wOwvw/I+FcbNCpbL2n9wyaRAY4RY8S3K5vDX8osZafqdR6KtNF0cDDXQ+DJzZlWGmASVWUCH2XZmsZf9nyT7ToM5wHn9zEwqgSEq0ZdTOxGMugn52aH5tBDLiLtlfe2UnlyeRrggJ4lZEcb3EuLSv7W+VScVxl8qmBiViJf/di2DNkcaimGwZEG4Zv3YkoIqKEYSGHDrDu5SdYHjtNP1LAdrviz9xSw9XedGN+W9Q==
-Received: from TYTP286MB3564.JPNP286.PROD.OUTLOOK.COM (2603:1096:400:39d::8)
- by TYCP286MB2880.JPNP286.PROD.OUTLOOK.COM (2603:1096:400:307::8) with
+ bh=OE6yUKt8v2f14AVcBY8mtHxuaqt+ZLmh3U95YB3TE9M=;
+ b=PfIi7X9lzz5I1MtosJS99dnu2uffxYJbAH2jRLCYBJUpwGhikEFjZuOZuiXJ0NIakR4nKWQGl+p2R2JJQsf6Wch5lkmYQhA/AF31nNf1cI/Hqhys4Lvzfgy5K1SDsJ7NKdgVmpbpUhqkCvkKW71PHf4tH2mUqDbq4f4aDadE4tJguzbhg3bwRQ5A/x0QwK69Ac32Xl7av2vUpCpObkFZ8VOlR7JklrzE+EN8CiLAx/XfNmGLWHDfI3aaWxGAraRf66C8NIW8sWo6W+OWaNHWhtV9HVJI/x38Wr/tC3BJKbAUlyx6ZdErVnIhPi+328u2GVYCL4Xtut5sgXX1s5i8yw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
+ by PH0PR11MB5189.namprd11.prod.outlook.com (2603:10b6:510:3d::23) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Wed, 6 Mar
- 2024 12:40:40 +0000
-Received: from TYTP286MB3564.JPNP286.PROD.OUTLOOK.COM
- ([fe80::8e48:6e1:f641:32b1]) by TYTP286MB3564.JPNP286.PROD.OUTLOOK.COM
- ([fe80::8e48:6e1:f641:32b1%7]) with mapi id 15.20.7362.019; Wed, 6 Mar 2024
- 12:40:40 +0000
-Date: Wed, 6 Mar 2024 20:40:37 +0800
-From: Dawei Li <set_pte_at@outlook.com>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
-	"npiggin@gmail.com" <npiggin@gmail.com>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	"alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3] powerpc: macio: Make remove callback of macio driver
- void returned
-Message-ID:
- <TYTP286MB356472357994D5EA49E2F5E3CA212@TYTP286MB3564.JPNP286.PROD.OUTLOOK.COM>
-References: <TYCP286MB232391520CB471E7C8D6EA84CAD19@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
- <3dc29701-239f-4a3b-b571-b9732975bd73@csgroup.eu>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3dc29701-239f-4a3b-b571-b9732975bd73@csgroup.eu>
-X-TMN: [Nh3sQUEUbpxaXXOwSoNdFxws6+REaLee]
-X-ClientProxiedBy: SI2PR02CA0040.apcprd02.prod.outlook.com
- (2603:1096:4:196::6) To TYTP286MB3564.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:400:39d::8)
-X-Microsoft-Original-Message-ID: <20240306124037.GA2466@wendao-VirtualBox>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.26; Wed, 6 Mar
+ 2024 12:42:53 +0000
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4434:a739:7bae:39a9]) by CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4434:a739:7bae:39a9%2]) with mapi id 15.20.7362.019; Wed, 6 Mar 2024
+ 12:42:53 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: Nebojsa Stevanovic <nebojsa.stevanovic@gcore.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Czapnik, Lukasz"
+	<lukasz.czapnik@intel.com>, "Lobakin, Aleksander"
+	<aleksander.lobakin@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>,
+	Christian Rohmann <christian.rohmann@inovex.de>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net] ice: fix stats being updated by
+ way too large values
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] ice: fix stats being updated
+ by way too large values
+Thread-Index: AQHaaYnAz/R7qB9htUmU8LnaXNW5kLEqtAFA
+Date: Wed, 6 Mar 2024 12:42:53 +0000
+Message-ID: <CYYPR11MB8429D4E0A65D26FDA606D421BD212@CYYPR11MB8429.namprd11.prod.outlook.com>
+References: <20240227143124.21015-1-przemyslaw.kitszel@intel.com>
+In-Reply-To: <20240227143124.21015-1-przemyslaw.kitszel@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|PH0PR11MB5189:EE_
+x-ms-office365-filtering-correlation-id: 9518fe62-5324-45a1-2a56-08dc3ddaf0e7
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: CL08JjT65G/KOS7vsdsjEJ2Fp1/kI1Rp9b6paLupawzi+Uh+6t3iIbykJ1JU1zROfIMp8CB9Oqnjkdz6ffQC+J3gDnDiPrUwv/MzttCr0iTlF7HfVcrA9tFsldjPreADff4PBQieWOpt3oRTv1lcbHk91Kt5NK0CFI0CRZI3zEtXXvQ4lCkK1owhmFbW72qi3Fk+Pt50TuBnA62XFmoxwgZwtn2GhG8OOQZMIONZ+hhfWmA8dAg2iCApkI3MaBJYfxehz2spVOaZvQKJbVP9ZRHDtB6heAbQQteOkqjo8tTv/12+bCKGW6djxDLtVHcyiOhHY3TSeLVWBKWQ1V8pl9ZsBqZfBH6xeVN84B78faHfqHsvRs7FjZ60kZl9uYxgWS64BtrR1BePIBeYvcR/5aor8ov0KL0tOEa3XHK3/wYWM4HKIz6UxpnheUAlx2MpQEZpsCrrela+B3LQ5mFzs/T4kdP2varoy4ql4UppbNVKt/3scXLd5eli010/UDbodQbeCQQbLMskOmPjXSHh0F3XVr1Ht8VjyRPxLnrDFHu7npd+xd9YCW/OrY1vwWTwSwfdhmkjzbm1vkomS9Ep6kwT49cl9XhoQeeFy5D5XTIGRJlItSVRvL29L1GHxxmJnjZ+h0nGpzOPVpqYsuWfZ1VeewJBU6s5r5RWzI3zgFZa02wuh8bLa+G+1sfeR5EE
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?IXrI/vLrjePbRKM+VfXTD8ih3zucoRaSX3k6TrA8F+tpmRS8xDZZtW+ngbVY?=
+ =?us-ascii?Q?5o/Lu1z5qolyAsQsmmh9PFRCbwoYdNIAHMTspZWysl7PV5O4QbKEVYQCKqvw?=
+ =?us-ascii?Q?9LjawbS6Nn8E1FaX1n67RQz4blKCSoXiFoxjQirXO2XR3O5suUg1xLvtNYOk?=
+ =?us-ascii?Q?Rp9agG/+/8u0IEuz22vQe0aWXiW6Xg6WnBNImLwjGonfHhSj9Fx4ujhrVte9?=
+ =?us-ascii?Q?51qK8BVS/9Jjkvw9K6/AjpA/TpXSmDm9UVGmjYpw0M0L23huNoGzlRSttzBD?=
+ =?us-ascii?Q?r8wPB7hjG4ehaSXoxkozh1VtPzxfO1Uem0WB4QbjO8Yc0tdMcWPHJu67KJ24?=
+ =?us-ascii?Q?2CzWuNQ5gsRVlhafGGbYVQ+LTUS6K/LAOh11PdtAZWTyQINaF0VUgoC+yE+A?=
+ =?us-ascii?Q?sjl8solv+Gqi7kzQGGv1JoIC05r0sDE3o5EsGMIpN61Hq0a4sEQsqoCV12lK?=
+ =?us-ascii?Q?nz47T0922P+QdxZSxsIiqCv4eD5qM5EkevXIyDHULi68zTyQLNMtBK9G82j/?=
+ =?us-ascii?Q?G9lo13DYbBpKctCK/h3f0tN6aH67l96Vyc/h6hwg77oroPF6zI61LJc+9av/?=
+ =?us-ascii?Q?vFEpknKvvHot6J//MXkSlJ0WmZ8SCi/+Z8MdtufmqYfcZvwOjLEM3rXS/0Ae?=
+ =?us-ascii?Q?JCr2GDu1rYAeQ6boZRrGwkz9umvX9fv+hjgfGsqGJTZIGBAVycDYW8WWoHKn?=
+ =?us-ascii?Q?dqbCjX1n3LkTfX8c7RaWg1Roop7GF2cNHBZIs89vT4deFkvjwrs54aNCqkt3?=
+ =?us-ascii?Q?ZcUQQ6GPT434aYfewKg3J6IVM2jlMEX+GEjErZoTkOb0bwVuu4OWDj8Ff93e?=
+ =?us-ascii?Q?8lwBoTOYJYmGPwByht4A7+ued6XcM128YWLhibi4DycaBcSqFuASTpLnNkdk?=
+ =?us-ascii?Q?O4rZBdDckw8vQBoZ/HxZmehp+Xz0PTFa0aIYfa8fOpxEtup166IaaNSmSyLh?=
+ =?us-ascii?Q?TKD43VES/sL3B+TBUplyfrbJer5B20Ux0ff5Q0AvX+61uSCb9j8GQqGUl4SN?=
+ =?us-ascii?Q?ci2knVJJmUbnx8V6QUyi8ivBLnGyNine1COreHKxr5yekZUQLSJe/jnuBiTj?=
+ =?us-ascii?Q?spj4s40qtJWb4OD6966Z7sMJ5Oe1iQ9shU2tSFlp33VTUSzsOr/+dBEiPhCC?=
+ =?us-ascii?Q?buCPxTWiNqLAWd6y9Chp686aZ2OmvxI+G5KnB2H7NoxEFF0lDTFxIJorwgtl?=
+ =?us-ascii?Q?Qh/FweuN9Mqmb4Gb563nyYlb2UJ9A6mGmylkWeIXOxbIbdDfKll1kMKjrgkh?=
+ =?us-ascii?Q?X5hIo+zq/jS+1IjCTU7qqaz4ZE59cpYVbeK8MmctoyfreNXgKRK4I7RZtIky?=
+ =?us-ascii?Q?IOG8chJ4MVuvVvRorezksFvXGMfoRrqDECWhr2aCE0XxP1shoezMjozwzqq6?=
+ =?us-ascii?Q?ybOu24g5V2VA6GcYpWYsApdCHlinjGSbtKrkcmZkl/pb1kxd23PHRqSTEOQC?=
+ =?us-ascii?Q?Jqy5zouL3J4IVEF0fwSm9VGwHsi9B8Qu2pXIGrtn6G4t0+ZqX+VL8Gf8M6sS?=
+ =?us-ascii?Q?gvKvOzF6MNoE8M8hssxSfw9w/8gn9PLTwxdCGodobgIbMdGd4JJGFvHVJiEc?=
+ =?us-ascii?Q?4HYCL3wn4Bka/DQtqGqr7VkWagLE8EWGhsiyvD09NgWSUWYGS7/q5dDiii41?=
+ =?us-ascii?Q?0w=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: TYTP286MB3564:EE_|TYCP286MB2880:EE_
-X-MS-Office365-Filtering-Correlation-Id: e92084cb-eb20-4297-f73d-08dc3ddaa149
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	mNc3gDI7HEWYdy9uSOU+QAsWz8a8yzdnHZUuW0hgIEFIhZdB1s9jv26Oq0ZqmY5ZLARFZwg04jDk1WGNH8NkJEld29lX9gd5eLAAVOuWNNG7fdCxIrVgT3/JCZst3sipPGfokCSOM7jaZMfGJKQlr1NzLkp32am3M8boXDQwgjZz49dnO62sDWrhlWfpkhM7h00NL4kw+lGuK9Xm93TLWY8WEEId5u4iXH+LDIzFyaz8YHr1L4yt1sIr8SutLJVsz9DJJStLYuDZJW5T/nve5zh3ocTXqzUG1AWfB63WQj2V3wlQ8IEh//ShvaJVPwBPsIoZYcUZ/zvBNTBSunLX0cJZ5gitHmg2kFJ/hqFMtPmQ/ibbYzAYSeB6l6DQyTECnhKFGmmanHFaLqwHm4hMU9cBB6qzwBjVF6xjhzh6zoXoMb2SIpQ/O+4RkpgYynMQ2MPePT0C5c9JKUQoSby4LydssNGeDYAEfTrlTiOCqM+SHO4oxzGOyDcTMc12NDj+3CTO2VxbRpZZ/2zv4gQ6np4tDXdMNI7uJ7LWlT12rLfTIodgsoSzwgsIr8kQoi+N2tJkj4dH8Yj7rvf3w7SD9ruQvxMs8HInTgoqSsJwa6g=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?iso-8859-1?Q?T3Bo20pNCVM2OdvWX1Y++BEykzr2r0JSnpquix8IRRlylEZKyKslXMz3Dh?=
- =?iso-8859-1?Q?l7ZqGjwcL+MYCZACLmjxL+XKAQ/XoviitNZNqVUvrXP69maYJ5ldANjjUp?=
- =?iso-8859-1?Q?++4YADg+7Cqf6JPDiIjon8rOA5pHUphKaSPkx9GPZh/rLs38yipE8fkoor?=
- =?iso-8859-1?Q?zJJdbdlJkSkekolM4LJ5BO+gSxs2iTsP3kyFZpSStHaDQCx0E8BTNv5ACj?=
- =?iso-8859-1?Q?F1YN9WKsYlxSjmaXo7VIrBq5DnHbiPCSmGfkg9UOA+5j+wZNkX7w8t6pT2?=
- =?iso-8859-1?Q?crWl4/3XgurxpygHqt9y2zczfAnp9NZRIr45V9b+C8Ih39VOQtmbhzq7Gh?=
- =?iso-8859-1?Q?fRNvFrUZAWU2wVflo06HLS5Qpk/xhwkMI5/3rWi/oMgioa3z5X8mf73BsK?=
- =?iso-8859-1?Q?kbxHAY0vRL/JEROEiO2UDoIxykU88cGOHanNqszWD6uofEmkcrGAM8m4PB?=
- =?iso-8859-1?Q?7otg6a1vGrNarOcbS76vvtNVaNjo09Cl7Qw7pL+AZLPxyIH/EqAUqR89Bf?=
- =?iso-8859-1?Q?HQl0vOfS2zReuq9/FsdCQZeK6zXoIs0u7lo7iFYQ+bR4WkjUE6Mq8Aab6g?=
- =?iso-8859-1?Q?pGShwur+nivRhHVxNEhQXawbd1z8vyrN5quEFYKM3csatteI47HFVNql/q?=
- =?iso-8859-1?Q?7mHHcdariX+awiuQ4BAPE4B77uAJQtX648PON79sl+w1ut4/9kpKX8shQV?=
- =?iso-8859-1?Q?gban8X7jSh8Keeut+VnR3ulE3lfk1lPbmIFeSr3lKxHEm4PETSTM2ZZK+v?=
- =?iso-8859-1?Q?fqtCHBul6Grdv4JPE+0NuB/cMrcsEVcvKDwm30hwBKgYxLNqZ+jWWDPvYn?=
- =?iso-8859-1?Q?SuF0/CE+J54+FQsqeM6iASN2DLhQ/UFW3RqalQNc89tCSGbjCnqh+uhklN?=
- =?iso-8859-1?Q?rUglgKqfTMqxK4paxyTABCqdfdifbqZ3cYBen0RuGRdJZn34zPO6jZDbXF?=
- =?iso-8859-1?Q?/qsZijOAPafP/I3vXmWeCOpOFMX/UOeAdyUxaeYstd0Hx9ZHX7fIh9msRL?=
- =?iso-8859-1?Q?CJ9XuSctLnYpI0utaadlrciAtyFULAYTIiEXG+DxB2fwqCRvfgae3YV1dd?=
- =?iso-8859-1?Q?mHJ9G3WW8FynLgqU99AEXGSLXVkJFjNbbVfFIiVvZoWGTbU6jYHTHHFtML?=
- =?iso-8859-1?Q?YmhEKlebmYaQav4vv5uTtfC++eO+BreSW2q2oaTYB6KahwgAleswsMtA34?=
- =?iso-8859-1?Q?b08Bii8M4pDE3o7LjS2H/t6YND1T5Pwi7pBsEVMkTFJbR7cb/YaoBxSSgR?=
- =?iso-8859-1?Q?YkgcLS2e5+Wbwa1p78NkwRvmE7q3GbFdtp2gym+V0=3D?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e92084cb-eb20-4297-f73d-08dc3ddaa149
-X-MS-Exchange-CrossTenant-AuthSource: TYTP286MB3564.JPNP286.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 12:40:40.2608
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8429.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9518fe62-5324-45a1-2a56-08dc3ddaf0e7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Mar 2024 12:42:53.3099
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYCP286MB2880
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: L9+T1s1AMqEr7sAwDf5Ve/9bhyzBgobzmvETAa6uj4He+USM+AZy5r28234+XrxybvcDAG+fB2Lk8q7wOla2wYOihyqkwyVXb0lJDy8c4wvskm2zfY93IXT1sTWry/hf
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5189
+X-OriginatorOrg: intel.com
 
-Hi Christophe,
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of P=
+rzemek Kitszel
+> Sent: Tuesday, February 27, 2024 8:01 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Nebojsa Stevanovic <nebojsa.stevanovic@gcore.com>; netdev@vger.kernel=
+.org; Czapnik, Lukasz <lukasz.czapnik@intel.com>; Lobakin, Aleksander <alek=
+sander.lobakin@intel.com>; Nguyen, Anthony L <anthony.l.nguyen@intel.com>; =
+Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; Keller, Jacob E <jacob.=
+e.keller@intel.com>; Christian Rohmann <christian.rohmann@inovex.de>
+> Subject: [Intel-wired-lan] [PATCH iwl-net] ice: fix stats being updated b=
+y way too large values
+>
+> Simplify stats accumulation logic to fix the case where we don't take
+> previous stat value into account, we should always respect it.
+>
+> Main netdev stats of our PF (Tx/Rx packets/bytes) were reported orders of
+> magnitude too big during OpenStack reconfiguration events, possibly other
+> reconfiguration cases too.
+>
+> The regression was reported to be between 6.1 and 6.2, so I was almost
+> certain that on of the two "preserve stats over reset" commits were the
+> culprit. While reading the code, it was found that in some cases we will
+> increase the stats by arbitrarily large number (thanks to ignoring "-prev=
+"
+> part of condition, after zeroing it).
+>
+> Note that this fixes also the case where we were around limits of u64, bu=
+t
+> that was not the regression reported.
+>
+> Full disclosure: I remember suggesting this particular piece of code to
+> Ben a few years ago, so blame on me.
+>
+> Fixes: 2fd5e433cd26 ("ice: Accumulate HW and Netdev statistics over reset=
+")
+> Reported-by: Nebojsa Stevanovic <nebojsa.stevanovic@gcore.com>
+> Link: https://lore.kernel.org/intel-wired-lan/VI1PR02MB439744DEDAA7B59B9A=
+2833FE912EA@VI1PR02MB4397.eurprd02.prod.outlook.com
+> Reported-by: Christian Rohmann <christian.rohmann@inovex.de>
+> Link: https://lore.kernel.org/intel-wired-lan/f38a6ca4-af05-48b1-a3e6-17e=
+f2054e525@inovex.de
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_main.c | 24 +++++++++++------------
+>  1 file changed, 11 insertions(+), 13 deletions(-)
+>
 
-On Tue, Feb 20, 2024 at 04:12:17PM +0000, Christophe Leroy wrote:
-> Hi Michael,
-> 
-> ping ?
-> 
-> Le 01/02/2023 à 15:36, Dawei Li a écrit :
-> > Commit fc7a6209d571 ("bus: Make remove callback return void") forces
-> > bus_type::remove be void-returned, it doesn't make much sense for any
-> > bus based driver implementing remove callbalk to return non-void to
-> > its caller.
-> > 
-> > This change is for macio bus based drivers.
-> > 
-> > Signed-off-by: Dawei Li <set_pte_at@outlook.com>
-> 
-> This patch is Acked , any special reason for not applying it ?
-> 
-> Note that it now conflicts with commit 1535d5962d79 ("wifi: remove 
-> orphaned orinoco driver") but resolution is trivial, just drop the 
-> changes to that file.
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
-Thanks for picking it up, hardly believe that it's been one year.
-
-Michael,
-
-I will respin V4 if it's needed.
-
-Thanks,
-
-   Dawei
-
-> 
-> Christophe
-> 
-> > ---
-> > v2 -> v3
-> > - Rebased on latest powerpc/next.
-> > - cc' to relevant subsysem lists.
-> > 
-> > v1 -> v2
-> > - Revert unneeded changes.
-> > - Rebased on latest powerpc/next.
-> > 
-> > v1
-> > - https://lore.kernel.org/all/TYCP286MB2323FCDC7ECD87F8D97CB74BCA189@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM/
-> > ---
-> >   arch/powerpc/include/asm/macio.h                | 2 +-
-> >   drivers/ata/pata_macio.c                        | 4 +---
-> >   drivers/macintosh/rack-meter.c                  | 4 +---
-> >   drivers/net/ethernet/apple/bmac.c               | 4 +---
-> >   drivers/net/ethernet/apple/mace.c               | 4 +---
-> >   drivers/net/wireless/intersil/orinoco/airport.c | 4 +---
-> >   drivers/scsi/mac53c94.c                         | 5 +----
-> >   drivers/scsi/mesh.c                             | 5 +----
-> >   drivers/tty/serial/pmac_zilog.c                 | 7 ++-----
-> >   sound/aoa/soundbus/i2sbus/core.c                | 4 +---
-> >   10 files changed, 11 insertions(+), 32 deletions(-)
-> > 
-> > diff --git a/arch/powerpc/include/asm/macio.h b/arch/powerpc/include/asm/macio.h
-> > index ff5fd82d9ff0..cb9c386dacf8 100644
-> > --- a/arch/powerpc/include/asm/macio.h
-> > +++ b/arch/powerpc/include/asm/macio.h
-> > @@ -125,7 +125,7 @@ static inline struct pci_dev *macio_get_pci_dev(struct macio_dev *mdev)
-> >   struct macio_driver
-> >   {
-> >   	int	(*probe)(struct macio_dev* dev, const struct of_device_id *match);
-> > -	int	(*remove)(struct macio_dev* dev);
-> > +	void	(*remove)(struct macio_dev *dev);
-> >   
-> >   	int	(*suspend)(struct macio_dev* dev, pm_message_t state);
-> >   	int	(*resume)(struct macio_dev* dev);
-> > diff --git a/drivers/ata/pata_macio.c b/drivers/ata/pata_macio.c
-> > index 9ccaac9e2bc3..653106716a4b 100644
-> > --- a/drivers/ata/pata_macio.c
-> > +++ b/drivers/ata/pata_macio.c
-> > @@ -1187,7 +1187,7 @@ static int pata_macio_attach(struct macio_dev *mdev,
-> >   	return rc;
-> >   }
-> >   
-> > -static int pata_macio_detach(struct macio_dev *mdev)
-> > +static void pata_macio_detach(struct macio_dev *mdev)
-> >   {
-> >   	struct ata_host *host = macio_get_drvdata(mdev);
-> >   	struct pata_macio_priv *priv = host->private_data;
-> > @@ -1202,8 +1202,6 @@ static int pata_macio_detach(struct macio_dev *mdev)
-> >   	ata_host_detach(host);
-> >   
-> >   	unlock_media_bay(priv->mdev->media_bay);
-> > -
-> > -	return 0;
-> >   }
-> >   
-> >   #ifdef CONFIG_PM_SLEEP
-> > diff --git a/drivers/macintosh/rack-meter.c b/drivers/macintosh/rack-meter.c
-> > index c28893e41a8b..f2f83c4f3af5 100644
-> > --- a/drivers/macintosh/rack-meter.c
-> > +++ b/drivers/macintosh/rack-meter.c
-> > @@ -523,7 +523,7 @@ static int rackmeter_probe(struct macio_dev* mdev,
-> >   	return rc;
-> >   }
-> >   
-> > -static int rackmeter_remove(struct macio_dev* mdev)
-> > +static void rackmeter_remove(struct macio_dev *mdev)
-> >   {
-> >   	struct rackmeter *rm = dev_get_drvdata(&mdev->ofdev.dev);
-> >   
-> > @@ -558,8 +558,6 @@ static int rackmeter_remove(struct macio_dev* mdev)
-> >   
-> >   	/* Get rid of me */
-> >   	kfree(rm);
-> > -
-> > -	return 0;
-> >   }
-> >   
-> >   static int rackmeter_shutdown(struct macio_dev* mdev)
-> > diff --git a/drivers/net/ethernet/apple/bmac.c b/drivers/net/ethernet/apple/bmac.c
-> > index 9e653e2925f7..292b1f9cd9e7 100644
-> > --- a/drivers/net/ethernet/apple/bmac.c
-> > +++ b/drivers/net/ethernet/apple/bmac.c
-> > @@ -1591,7 +1591,7 @@ bmac_proc_info(char *buffer, char **start, off_t offset, int length)
-> >   }
-> >   #endif
-> >   
-> > -static int bmac_remove(struct macio_dev *mdev)
-> > +static void bmac_remove(struct macio_dev *mdev)
-> >   {
-> >   	struct net_device *dev = macio_get_drvdata(mdev);
-> >   	struct bmac_data *bp = netdev_priv(dev);
-> > @@ -1609,8 +1609,6 @@ static int bmac_remove(struct macio_dev *mdev)
-> >   	macio_release_resources(mdev);
-> >   
-> >   	free_netdev(dev);
-> > -
-> > -	return 0;
-> >   }
-> >   
-> >   static const struct of_device_id bmac_match[] =
-> > diff --git a/drivers/net/ethernet/apple/mace.c b/drivers/net/ethernet/apple/mace.c
-> > index fd1b008b7208..e6350971c707 100644
-> > --- a/drivers/net/ethernet/apple/mace.c
-> > +++ b/drivers/net/ethernet/apple/mace.c
-> > @@ -272,7 +272,7 @@ static int mace_probe(struct macio_dev *mdev, const struct of_device_id *match)
-> >   	return rc;
-> >   }
-> >   
-> > -static int mace_remove(struct macio_dev *mdev)
-> > +static void mace_remove(struct macio_dev *mdev)
-> >   {
-> >   	struct net_device *dev = macio_get_drvdata(mdev);
-> >   	struct mace_data *mp;
-> > @@ -296,8 +296,6 @@ static int mace_remove(struct macio_dev *mdev)
-> >   	free_netdev(dev);
-> >   
-> >   	macio_release_resources(mdev);
-> > -
-> > -	return 0;
-> >   }
-> >   
-> >   static void dbdma_reset(volatile struct dbdma_regs __iomem *dma)
-> > diff --git a/drivers/net/wireless/intersil/orinoco/airport.c b/drivers/net/wireless/intersil/orinoco/airport.c
-> > index a890bfa0d5cc..276a06cdd1f5 100644
-> > --- a/drivers/net/wireless/intersil/orinoco/airport.c
-> > +++ b/drivers/net/wireless/intersil/orinoco/airport.c
-> > @@ -85,7 +85,7 @@ airport_resume(struct macio_dev *mdev)
-> >   	return err;
-> >   }
-> >   
-> > -static int
-> > +static void
-> >   airport_detach(struct macio_dev *mdev)
-> >   {
-> >   	struct orinoco_private *priv = dev_get_drvdata(&mdev->ofdev.dev);
-> > @@ -111,8 +111,6 @@ airport_detach(struct macio_dev *mdev)
-> >   
-> >   	macio_set_drvdata(mdev, NULL);
-> >   	free_orinocodev(priv);
-> > -
-> > -	return 0;
-> >   }
-> >   
-> >   static int airport_hard_reset(struct orinoco_private *priv)
-> > diff --git a/drivers/scsi/mac53c94.c b/drivers/scsi/mac53c94.c
-> > index f75928f7773e..42648ca9b8ed 100644
-> > --- a/drivers/scsi/mac53c94.c
-> > +++ b/drivers/scsi/mac53c94.c
-> > @@ -508,7 +508,7 @@ static int mac53c94_probe(struct macio_dev *mdev, const struct of_device_id *mat
-> >   	return rc;
-> >   }
-> >   
-> > -static int mac53c94_remove(struct macio_dev *mdev)
-> > +static void mac53c94_remove(struct macio_dev *mdev)
-> >   {
-> >   	struct fsc_state *fp = (struct fsc_state *)macio_get_drvdata(mdev);
-> >   	struct Scsi_Host *host = fp->host;
-> > @@ -526,11 +526,8 @@ static int mac53c94_remove(struct macio_dev *mdev)
-> >   	scsi_host_put(host);
-> >   
-> >   	macio_release_resources(mdev);
-> > -
-> > -	return 0;
-> >   }
-> >   
-> > -
-> >   static struct of_device_id mac53c94_match[] =
-> >   {
-> >   	{
-> > diff --git a/drivers/scsi/mesh.c b/drivers/scsi/mesh.c
-> > index 84b541a57b7b..cd2575b88c85 100644
-> > --- a/drivers/scsi/mesh.c
-> > +++ b/drivers/scsi/mesh.c
-> > @@ -1986,7 +1986,7 @@ static int mesh_probe(struct macio_dev *mdev, const struct of_device_id *match)
-> >   	return -ENODEV;
-> >   }
-> >   
-> > -static int mesh_remove(struct macio_dev *mdev)
-> > +static void mesh_remove(struct macio_dev *mdev)
-> >   {
-> >   	struct mesh_state *ms = (struct mesh_state *)macio_get_drvdata(mdev);
-> >   	struct Scsi_Host *mesh_host = ms->host;
-> > @@ -2013,11 +2013,8 @@ static int mesh_remove(struct macio_dev *mdev)
-> >   	macio_release_resources(mdev);
-> >   
-> >   	scsi_host_put(mesh_host);
-> > -
-> > -	return 0;
-> >   }
-> >   
-> > -
-> >   static struct of_device_id mesh_match[] =
-> >   {
-> >   	{
-> > diff --git a/drivers/tty/serial/pmac_zilog.c b/drivers/tty/serial/pmac_zilog.c
-> > index 13668ffdb1e7..d4640479c338 100644
-> > --- a/drivers/tty/serial/pmac_zilog.c
-> > +++ b/drivers/tty/serial/pmac_zilog.c
-> > @@ -1507,12 +1507,12 @@ static int pmz_attach(struct macio_dev *mdev, const struct of_device_id *match)
-> >    * That one should not be called, macio isn't really a hotswap device,
-> >    * we don't expect one of those serial ports to go away...
-> >    */
-> > -static int pmz_detach(struct macio_dev *mdev)
-> > +static void pmz_detach(struct macio_dev *mdev)
-> >   {
-> >   	struct uart_pmac_port	*uap = dev_get_drvdata(&mdev->ofdev.dev);
-> >   	
-> >   	if (!uap)
-> > -		return -ENODEV;
-> > +		return;
-> >   
-> >   	uart_remove_one_port(&pmz_uart_reg, &uap->port);
-> >   
-> > @@ -1523,11 +1523,8 @@ static int pmz_detach(struct macio_dev *mdev)
-> >   	dev_set_drvdata(&mdev->ofdev.dev, NULL);
-> >   	uap->dev = NULL;
-> >   	uap->port.dev = NULL;
-> > -	
-> > -	return 0;
-> >   }
-> >   
-> > -
-> >   static int pmz_suspend(struct macio_dev *mdev, pm_message_t pm_state)
-> >   {
-> >   	struct uart_pmac_port *uap = dev_get_drvdata(&mdev->ofdev.dev);
-> > diff --git a/sound/aoa/soundbus/i2sbus/core.c b/sound/aoa/soundbus/i2sbus/core.c
-> > index 51ed2f34b276..35f39727994d 100644
-> > --- a/sound/aoa/soundbus/i2sbus/core.c
-> > +++ b/sound/aoa/soundbus/i2sbus/core.c
-> > @@ -364,15 +364,13 @@ static int i2sbus_probe(struct macio_dev* dev, const struct of_device_id *match)
-> >   	return 0;
-> >   }
-> >   
-> > -static int i2sbus_remove(struct macio_dev* dev)
-> > +static void i2sbus_remove(struct macio_dev *dev)
-> >   {
-> >   	struct i2sbus_control *control = dev_get_drvdata(&dev->ofdev.dev);
-> >   	struct i2sbus_dev *i2sdev, *tmp;
-> >   
-> >   	list_for_each_entry_safe(i2sdev, tmp, &control->list, item)
-> >   		soundbus_remove_one(&i2sdev->sound);
-> > -
-> > -	return 0;
-> >   }
-> >   
-> >   #ifdef CONFIG_PM
 
