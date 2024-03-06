@@ -1,96 +1,99 @@
-Return-Path: <netdev+bounces-77767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23C7D872D93
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 04:40:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A84AD872E0B
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 05:39:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0EF728A637
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 03:40:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60396280BDA
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 04:39:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A09B1426F;
-	Wed,  6 Mar 2024 03:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5060E156C2;
+	Wed,  6 Mar 2024 04:39:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gqHlyNKO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kjqm1QAa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DAC2DDA8;
-	Wed,  6 Mar 2024 03:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4B814292
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 04:39:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709696429; cv=none; b=TNmGF7F7z1m0TDyReeVSo/IzafvmuB31chSjXWkiQ2UEdX1C6godLr6am1vjBHMWb2AWZlfAUDUCzUf11K3vVKaB6XdMvpmRzAj5bxdFrNm4g1cT4iPjcZGnWwjHkcMtNe3x+zfSDACv3Li/SvRihkiIpmENFN1i1jouU45AY1I=
+	t=1709699954; cv=none; b=MRQbtZBO3jbzL4nL1V1Jjs5AMLaV2YLkSSp78G2EMv62S8jVvbc0lvhOHl9kfFBrBRA4R89nfpAEvLz1FNUpYRXLIbk4aDJtmF2+zTlkmw8WO59r0+UpDgVK9qWwlhbItLEyVxuAnH7plKxwfQPD4KouE96N8SoNRTPwnk9dWmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709696429; c=relaxed/simple;
-	bh=tLUcs7AGu1cKfGjGrERuLZL6+BqOUOATWWsSl1GrJqk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YrJQYckOYKQXtmM8j10iJBgOv8T+PiBVLaxgU93EUNIEnXqQeDkz0bUe2FpgiGXHLHxsf+O8GQTuyUT9pasNvfIKwywzD7vBrH00sYFKPlYsWv1L69TigW94UDINCyECCeEzgr6sjoLQariX3uV9zvkCExykGmhmBf0qMHGAYbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gqHlyNKO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9B416C43390;
-	Wed,  6 Mar 2024 03:40:28 +0000 (UTC)
+	s=arc-20240116; t=1709699954; c=relaxed/simple;
+	bh=1VM2BhqFlCAYFP2rcYEkjNUc8BvTx9Rq6mowLJOwBHc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IAnCkoSDGNIrwWkUMFBbcAyUfFh6dDqsF/2S2Vvn8PRT1AUSZjAw199RtMtKrHFnE3rRetsUf73+JgE5s9bYyRPMwiRSCtgXk4jH1MeGkyrbW1f3+I2zeoxG5XUrfvDaat6AZQbeiQoEi0CBQbrGNEdbl1Ic7qJYnj5G75AAVsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kjqm1QAa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F637C433F1;
+	Wed,  6 Mar 2024 04:39:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709696428;
-	bh=tLUcs7AGu1cKfGjGrERuLZL6+BqOUOATWWsSl1GrJqk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gqHlyNKOqgW0dSiOOdkl2I+A7x9SG70qeWm053FSiqvsdu6TJ23aWYcE/5s9nPNLU
-	 YcPWBELMNpXYVEZfjTBKVUJetzCT433lRG9liN+bQwwktxCOCcSNHbguuwMMYROUcQ
-	 mi07kqXci/SNnGD9R0QGVaN6iGXip8UyWuDfrVIfQqIdD0G1trDSI1qOWjmuRDELpu
-	 stpv0gE/MBFGiV5IX/MuZlNJ+KAI5r+cvyOXtZhR/gXnzFBFYy+zPl0PMvj6Bnrpte
-	 tpFon6mGPqcy9wzoqa5HuMn5rhQDY1RwW1Eh7GKeLj9PV7B81s9ZtBs/IpBq+Cmlso
-	 L6rGumKovAj5w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7B51FD9A4B6;
-	Wed,  6 Mar 2024 03:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1709699953;
+	bh=1VM2BhqFlCAYFP2rcYEkjNUc8BvTx9Rq6mowLJOwBHc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Kjqm1QAazhCyJ3d3M8TWMJ3jvfnoRlwuJ4UrwpLyK8gzYu5ohoFDtbgk+OdD4wjne
+	 Sez0aoV6P0l2dQa/rdrGda5brfNg3f3EpOAdcsLwjwtvkuC5WM5O+J3x9WXhZzC9Yi
+	 TocS4RVPMpOU/Xu12s2UiTyghTm1864urJ5GJbs/RPAqKy42rIDX7F1HhDMdhpq4qn
+	 yWkGTgSkdIwZB8hGVTiyRNdOapWIQ9ZsDgdoiFH/6VCzm1qd85P8pnwIjWAPnMMD6A
+	 yleIKvW/cO6iXD0nStRAltVEyatY1DTu7MxuH1GBNvIIQ8sF/c4QlZKrVlwrlroNYe
+	 +zoejEWNKN7DA==
+Message-ID: <4cfe2f75-d492-4e22-b167-3eab5f3cdcdb@kernel.org>
+Date: Tue, 5 Mar 2024 21:39:11 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: avoid using SKIP(exit()) in harness
- fixure setup
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170969642850.9099.14198532225350311208.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Mar 2024 03:40:28 +0000
-References: <20240304233621.646054-1-kuba@kernel.org>
-In-Reply-To: <20240304233621.646054-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, broonie@kernel.org, ivan.orlov0322@gmail.com,
- perex@perex.cz, tiwai@suse.com, shuah@kernel.org, jglisse@redhat.com,
- akpm@linux-foundation.org, keescook@chromium.org,
- linux-sound@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mm@kvack.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 00/18] net: group together hot data
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>,
+ Soheil Hassas Yeganeh <soheil@google.com>,
+ Neal Cardwell <ncardwell@google.com>, eric.dumazet@gmail.com
+References: <20240305160413.2231423-1-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240305160413.2231423-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon,  4 Mar 2024 15:36:20 -0800 you wrote:
-> selftest harness uses various exit codes to signal test
-> results. Avoid calling exit() directly, otherwise tests
-> may get broken by harness refactoring (like the commit
-> under Fixes). SKIP() will instruct the harness that the
-> test shouldn't run, it used to not be the case, but that
-> has been fixed. So just return, no need to exit.
+On 3/5/24 9:03 AM, Eric Dumazet wrote:
+> While our recent structure reorganizations were focused
+> on increasing max throughput, there is still an
+> area where improvements are much needed.
 > 
-> [...]
+> In many cases, a cpu handles one packet at a time,
+> instead of a nice batch.
+> 
+> Hardware interrupt.
+>  -> Software interrupt.
+>    -> Network/Protocol stacks.
+> 
+> If the cpu was idle or busy in other layers,
+> it has to pull many cache lines.
+> 
+> This series adds a new net_hotdata structure, where
+> some critical (and read-mostly) data used in
+> rx and tx path is packed in a small number of cache lines.
+> 
+> Synthetic benchmarks will not see much difference,
+> but latency of single packet should improve.
+> 
+> net_hodata current size on 64bit is 416 bytes,
+> but might grow in the future.
+> 
+> Also move RPS definitions to a new include file.
+> 
 
-Here is the summary with links:
-  - [net-next] selftests: avoid using SKIP(exit()) in harness fixure setup
-    https://git.kernel.org/netdev/net-next/c/e3350ba4a5b7
+Interesting patch set. For the set:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
 
