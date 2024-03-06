@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-77902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-77903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F2138736E3
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:50:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F67E8736E4
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 13:50:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26B5A2845E8
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 12:50:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 538E81C20971
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 12:50:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66DBE84FAC;
-	Wed,  6 Mar 2024 12:50:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87EC480028;
+	Wed,  6 Mar 2024 12:50:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OE1B/9PU"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mIHAFs5c"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2063.outbound.protection.outlook.com [40.107.212.63])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2067.outbound.protection.outlook.com [40.107.220.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F57383A17
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 12:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB76C12C53E
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 12:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.67
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709729444; cv=fail; b=j/xA5AWHd5PDlx/IMUX81IeE1/a37mrduEQbB0t3/IBeqUHS2RVFipsImtLP0svU6473Y6YaqKfhHa4k2NmS7Cv74SIYEqmhI3Kff3HiTUOxsq29qSuNI5Nv7EC6KDCA2r+6Nu5aPFDjHi87YgMvCBH86NinOkVXFN0Wop3KtcI=
+	t=1709729446; cv=fail; b=Akxicl5TgbdfAQ26McjYs9fA1CzU8P/cPigJa2yCw1mzw1yLcXLeZoshXYyWZT1kreOkXIX7Q1WT88K+AIvSOg67woH2kd6Pqgb1GAi418X0Nb1ynQ/3EueQY37mQi/fkqNDo2J7hvN0cXS8nyqX/cLYLW4pj5zEJxru64oB48k=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709729444; c=relaxed/simple;
-	bh=gcEmvWJ2xAUpDohudtnhK2ACZt2MuDJkso9bJq/qQlw=;
+	s=arc-20240116; t=1709729446; c=relaxed/simple;
+	bh=rF2k8iez4zNo5D1ysII2kXAYyb+hrVdW4Gj3QYLEGCQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P3oOoTgCvaGKWQBfY6rC0pza5OMHVVxFBzxTVks/x+8Dbxce7GEJJjXLu1zU6npYUV97UE0epI+2f5Xv7e4oIunTETx0mxkVNZyRd5aDfVBOGM31QCaDgaEQgpdJfd6i1aT0mK1vtiRfziluOzU33juwAIXYJWRGp7TxJ2S9Y18=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OE1B/9PU; arc=fail smtp.client-ip=40.107.212.63
+	 MIME-Version:Content-Type; b=nkChPHehuIcSPi1Bj4hgEwRAO2OzqBLO/xontuD29oLarBEe8e8sZatFHSkIWW80ajSonGUQasCXSGqNFhX6u4qU2eu7kbFWxvJQWaPWj3pPPIq7lItL9naUGKyjiiSGrxea+DRKATf2e25Apx0PSSiALD5xA6mCMekdDgsnevw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mIHAFs5c; arc=fail smtp.client-ip=40.107.220.67
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bK0hzIaILTnNxVxDKOOTXBO9sP3V8pE3EQhX0FMu1y24gqVxGbAcNSsvsFc7tsTY9z36AtQF36C3M5HQwpq/59gosKej90V38bMfAZPd9gsDvFBxxGoaC0h06AGOxx6gNxB15N6JYIWdbRFrmb/sGyp8pznsfN9tu8od7WYWxHtOqkzkZTinulVWwSN6KNSqKn4WSApGuAK2g4EG4WjqX354Ym8duOICuQzvbK7a6oWI3WvviQF/Il3iYVHHLrxlixvYII8MTXdI02T8lddOosO+T7wElaiNEjJnC9UMapBmF6BCs61annNNYA3eyQQmTdvU7bc1Z7eHyaA+NTVOZA==
+ b=GOm6CkwAYLf1vIzrrVhM6E9myrwqJd72gFJpJ2htEtGqypfTq2OwokOnqc0mlt8mweF62+5V+ZloLCXXTDCWIGS3Ag209HiR9pP9HiPMbTvG1jqpofmKnNt9G18NRaprrMYOGVrwP63x5PVfVOV8l7x5ykqVFFtPsvL43B7Xg6ArKAu/gJodVq4Fppi4JGYU9xk+Lnrgr3TGAHYkcAALcQ9gX8lfg4fzQCBzD0rHYz+Zmhg1Zqp/ELFzoqV+9sy8Co2u/jq/CcUShl3EpuFecn/gm2WhvO9wprE53m2h+SQjkJDVbZSYmy+7LvFjicqDqRhUyj+d51MPOwRFApTN2A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aA/BOFop/K5jDNnT0tp8gmgLmajuWgwyaGXlsQNcwWQ=;
- b=lhMggf9TPtv+bTteuRiFSg9qIaiUSS2+Aj3btxToFY9NfvB7x21rqmDAj+ki2H8pyBEaPwDRIgUzCijbDBkHOyDokjHe+LA3j7tstIkN88fWVDMWdHNybEy4QvXmiZmMHkNhDgPz4IHKDaBMxCI8iDWsuvBlD0wB7HTXTS4X/FS+zoYX2nxZHxsXhVgN1na3z4zJ+DZ3PXqjeUodtIbuEmOYLnrBZWHQF/4wwfbTDM8ZdiJGjaaKMKv3KD8kZPKACzqM8HGlDjdRHazKQYNymJc23TftZjWdkwQJO0Xbjo/FFTcc2nr0PSIZPXhXvvQ+5hUlpMRwEZbqgtC/PLkExw==
+ bh=dXWiw2nFCTo7i0ddDdkQ/Q3QrDEBlUmug1FytdtHF/M=;
+ b=d05UbIVHA/Cz6TYcQ7jiCel0S6fdOAHA0Le2gmAKygf/v8nCs7IOVyw2Swij+eI3krHaIfjRkaXXhudqQOWpeIG5jd2fYLJiN4my+io174nL6eD6QsMZuDjalVqmy5tk2tZl4f2/fjI4h3VWcYFavE9pmV5kuCEf0oTOqvA78mIfnP05dJuDw+/xBx7Qi2xm3kG9/aLR8ytUA0R3U2UXQwsrO5gqQA31CvxfFeQFlDtWG/srDpqGNBsUEIgi8DrLT7Jy6/1rT2EnylZsrMmGPQcFvLkVfJ7oWcR10yR1rFw7mcQnCT2FGd8EW8FTZaRlOc2SsG+skIM+6u3TpjbKfw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aA/BOFop/K5jDNnT0tp8gmgLmajuWgwyaGXlsQNcwWQ=;
- b=OE1B/9PUtB2HreGJwmED/03SA8RcMJQekIwwYUgUhIyVZ2RLNj7WVEy4g7Z63dAZfb+FXeszsmho4OdYR8JIxTt819tEcc7OBmNNa4vNaceQolpSDwvCE5N+dDTi8FgWUboChrA7Axc55DLYwJUPtSLz1cfNQAKguoQCy/AUByE3aH+G4bgTxAg9/Z9Mg8Blc7iz/NeCQCbuT39Itf4Nes1D/1pHcJipS+/viodvneDGXFgG80TZq2w0PCURysV9SN61NNt6WYuvRV7prdcPZ1wWx3rZ03o2aWEBG+gDj0tMCkio4huf801z6g7KlKRRGswUtt0X6WHDmgJhPDGKUA==
-Received: from MW4PR03CA0220.namprd03.prod.outlook.com (2603:10b6:303:b9::15)
- by DS0PR12MB8502.namprd12.prod.outlook.com (2603:10b6:8:15b::16) with
+ bh=dXWiw2nFCTo7i0ddDdkQ/Q3QrDEBlUmug1FytdtHF/M=;
+ b=mIHAFs5cY0bELmBwVau1iX3LY3e49+ViFhagw63OOn4pIqH4tpSj3J8C2Qh/sMg8/STiKkEhAbj4CHi8FXQxXKWIf7sf0AgcGaLhTBNF+d5uhx4WwmaRTcJ3jcAklMk5IWTzmWv118Z7AqHd+7l5C1vdDY4++fOhGsT5ZFwZOSYkpvQObjLXcDEIny+h8kEgSkoDjkxCFMw6UZPLy2t8Tk03YrrlT9AjCcux00GpHnFwOLsAEbISvOlZs6PH9Z3MIRbA/ejGhMa+XxfjFv353OwHQg+3b865jbHLDHD03Y40OiDVUSklU267wnQENO07248TJtwcTnxHulrIaoQgsA==
+Received: from SA9PR13CA0153.namprd13.prod.outlook.com (2603:10b6:806:28::8)
+ by IA0PR12MB7749.namprd12.prod.outlook.com (2603:10b6:208:432::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.41; Wed, 6 Mar
- 2024 12:50:39 +0000
-Received: from MWH0EPF000A6732.namprd04.prod.outlook.com
- (2603:10b6:303:b9:cafe::81) by MW4PR03CA0220.outlook.office365.com
- (2603:10b6:303:b9::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.26 via Frontend
- Transport; Wed, 6 Mar 2024 12:50:39 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Wed, 6 Mar
+ 2024 12:50:40 +0000
+Received: from SA2PEPF00001509.namprd04.prod.outlook.com
+ (2603:10b6:806:28:cafe::2f) by SA9PR13CA0153.outlook.office365.com
+ (2603:10b6:806:28::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.6 via Frontend
+ Transport; Wed, 6 Mar 2024 12:50:40 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- MWH0EPF000A6732.mail.protection.outlook.com (10.167.249.24) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SA2PEPF00001509.mail.protection.outlook.com (10.167.242.41) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
  15.20.7362.11 via Frontend Transport; Wed, 6 Mar 2024 12:50:39 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 6 Mar 2024
- 04:50:13 -0800
+ 04:50:18 -0800
 Received: from yaviefel.mtl.com (10.126.230.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Wed, 6 Mar
- 2024 04:50:08 -0800
+ 2024 04:50:13 -0800
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -82,9 +82,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "David
  Ahern" <dsahern@kernel.org>, Simon Horman <horms@kernel.org>,
 	<mlxsw@nvidia.com>
-Subject: [PATCH net-next v4 2/7] net: nexthop: Add NHA_OP_FLAGS
-Date: Wed, 6 Mar 2024 13:49:16 +0100
-Message-ID: <b66eaea956cb860a38c7ea77bf8571e386de5221.1709727981.git.petrm@nvidia.com>
+Subject: [PATCH net-next v4 3/7] net: nexthop: Add nexthop group entry stats
+Date: Wed, 6 Mar 2024 13:49:17 +0100
+Message-ID: <0bb4e222c10fb1d2a84666a8b2b0725ef25d1fff.1709727981.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <cover.1709727981.git.petrm@nvidia.com>
 References: <cover.1709727981.git.petrm@nvidia.com>
@@ -100,179 +100,213 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000A6732:EE_|DS0PR12MB8502:EE_
-X-MS-Office365-Filtering-Correlation-Id: 05d69c0a-4924-4547-4007-08dc3ddc069f
+X-MS-TrafficTypeDiagnostic: SA2PEPF00001509:EE_|IA0PR12MB7749:EE_
+X-MS-Office365-Filtering-Correlation-Id: 271c99ad-7b61-41e4-15c2-08dc3ddc06f5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	SYxfuVnqPOnTEkCSp3D2Fq89TD2k2fRcQq3dWJypsjjAVig8z56Wizr2ym1rIDThiiLhFsJEFm4/4fTQGnCnUaD1XfgwAKmWd5oSSlavlKBcnyrAXcKZLWXqBv1e70utLT1lCQ0T6kGApvJ23S5EiZJkAnnDEHBrHg9bVoDfXQzOqRjAI08UUyE5aCH8/yV++noFyUTb3RECn7OUk1FRwr3fp0QIcU/8KxwqSX0pIW9SNwUBAsuFdr94mqOVv+Te4YcfSv+VLs/H+Oy2WA8JRHBx0L6r/P1b4Oudw7/hAS2bxFjup0LCnnJeu7sNiJb/iyPbYLKHIZfelUatwBd6/IUjbM/8xQ04Y2r/vr1k9Volo+XqAogV0+Sz2gh0hwE3ioanFaz0ZtKRt2xT6L/uuN/SEb+3PRg89OrdbJKCJ51KJLo5BzVmVN3Rqj8+hjVuu1ImgODdFn40z9qV0YOZSFJXyPFebHbgHk7FO3SPftYu/1aU0OSdiNFHv7SpG+zflSbV6okFN/a/gZXqeuVukOXLoP4ssbnkiyzXTX1mrWUbAp6NlJIRYfhIkmPOMeqUj8j4/lVtgUpH9Wb1GWjhuHNCjUpzkx9CNDuqsgf4XbfLHFX+xCZAqcZcva0tS07CRigmgdqroEfku3H/h2wWulR/avmYbZrcgrBrft//9lSxM7EjUTQzdH+5b9Dyl6yJDPvTvBne9JVGi23sxJyFO2le0YqfRzmYTVQgwx/psP7DAfU2/7eJy89cLhQd0fsa
+	sgSKXFyAPibjkdA5XeIadW4XhtP15MSzDr5MKTHUgFYLniV29BjVP0S3pZaj9lGQ/YbLaD6+9CVM32njqxFJHQ3czW74qwG8i3cXQ/mY3/SLF2uiTWx9JjqrY81glQAsLrto5n0ivsVQLN10GgOM0rfxaQfMw22Ep3AEqyRMphh4a8K6EFlkaK9nmiGAXEVma+d04nECZsplKS0KYf4qYFgRvAfWtkzElZqn0FhnMqhnB4NL7zG5pCHeDBtSlCkefM8YtJumbE8+5xllmEHxd9ZEzjUhX3Mo7qFoDnUtVnMQVYFZlHXyyq0cAeNPVdzwMLcSUeUinWDZsQQ6y6yweqJn3uDiY3ReqUndavx34VLZcfowYGePDVTUrHadblgDC8cMzLeN/qpPwdQMj/Utl5zKbW08AQhLkf1OXZ8QV58w7LBoXf2sQBtncOnpplDdCAv8as4S/bVT0+Y00Nkv2yz6/B5vUsAGMwTvDL92oEzF7Oagz/p9GEUPhDnOzBKur1C3F4WZLgbxezX6hRAUx1jk0YDO8sz5ehblCqnwNxBI7kh8bzpHyMxXgWO8kEoxh7RMkx27/LdXhLtq24dEubRfue1UVuaaaERNpMwd+HlGGOlrmFg9k1A1gZX45KOi5OT0yD+K//Y0xEScTJdYDKMXXZ7tBsRw8W2gF9Sr0G+PcC/ctoEIay/2wbvIWfeyHn7JUxAKAws9S32DmMNcYssfyUkAU8oG3s22zTubTuOaacI2LJrN2vNEDtUOBVsm
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(36860700004)(376005);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(36860700004)(376005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 12:50:39.2029
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 12:50:39.7342
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 05d69c0a-4924-4547-4007-08dc3ddc069f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 271c99ad-7b61-41e4-15c2-08dc3ddc06f5
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000A6732.namprd04.prod.outlook.com
+	SA2PEPF00001509.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8502
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7749
 
-In order to add per-nexthop statistics, but still not increase netlink
-message size for consumers that do not care about them, there needs to be a
-toggle through which the user indicates their desire to get the statistics.
-To that end, add a new attribute, NHA_OP_FLAGS. The idea is to be able to
-use the attribute for carrying of arbitrary operation-specific flags, i.e.
-not make it specific for get / dump.
+From: Ido Schimmel <idosch@nvidia.com>
 
-Add the new attribute to get and dump policies, but do not actually allow
-any flags yet -- those will come later as the flags themselves are defined.
-Add the necessary parsing code.
+Add nexthop group entry stats to count the number of packets forwarded
+via each nexthop in the group. The stats will be exposed to user space
+for better data path observability in the next patch.
 
+The per-CPU stats pointer is placed at the beginning of 'struct
+nh_grp_entry', so that all the fields accessed for the data path reside
+on the same cache line:
+
+struct nh_grp_entry {
+        struct nexthop *           nh;                   /*     0     8 */
+        struct nh_grp_entry_stats * stats;               /*     8     8 */
+        u8                         weight;               /*    16     1 */
+
+        /* XXX 7 bytes hole, try to pack */
+
+        union {
+                struct {
+                        atomic_t   upper_bound;          /*    24     4 */
+                } hthr;                                  /*    24     4 */
+                struct {
+                        struct list_head uw_nh_entry;    /*    24    16 */
+                        u16        count_buckets;        /*    40     2 */
+                        u16        wants_buckets;        /*    42     2 */
+                } res;                                   /*    24    24 */
+        };                                               /*    24    24 */
+        struct list_head           nh_list;              /*    48    16 */
+        /* --- cacheline 1 boundary (64 bytes) --- */
+        struct nexthop *           nh_parent;            /*    64     8 */
+
+        /* size: 72, cachelines: 2, members: 6 */
+        /* sum members: 65, holes: 1, sum holes: 7 */
+        /* last cacheline: 8 bytes */
+};
+
+Co-developed-by: Petr Machata <petrm@nvidia.com>
 Signed-off-by: Petr Machata <petrm@nvidia.com>
-Reviewed-by: David Ahern <dsahern@kernel.org>
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 ---
 
 Notes:
-    v4:
-    - s/nla_get_bitfield32/nla_get_u32/ in __nh_valid_dump_req().
-      Not sure how this crept back in, it was correct in v2 :-/
+    v3:
+    - Convert to u64_stats_t
     
     v2:
-    - Change OP_FLAGS to u32, enforce through NLA_POLICY_MASK
+    - Set err on nexthop_create_group() error path
 
- include/uapi/linux/nexthop.h |  3 +++
- net/ipv4/nexthop.c           | 24 ++++++++++++++++++++----
- 2 files changed, 23 insertions(+), 4 deletions(-)
+ include/net/nexthop.h |  6 ++++++
+ net/ipv4/nexthop.c    | 35 +++++++++++++++++++++++++++++++----
+ 2 files changed, 37 insertions(+), 4 deletions(-)
 
-diff --git a/include/uapi/linux/nexthop.h b/include/uapi/linux/nexthop.h
-index d8ffa8c9ca78..086444e2946c 100644
---- a/include/uapi/linux/nexthop.h
-+++ b/include/uapi/linux/nexthop.h
-@@ -60,6 +60,9 @@ enum {
- 	/* nested; nexthop bucket attributes */
- 	NHA_RES_BUCKET,
- 
-+	/* u32; operation-specific flags */
-+	NHA_OP_FLAGS,
-+
- 	__NHA_MAX,
+diff --git a/include/net/nexthop.h b/include/net/nexthop.h
+index 77e99cba60ad..6e6a36fee51e 100644
+--- a/include/net/nexthop.h
++++ b/include/net/nexthop.h
+@@ -95,8 +95,14 @@ struct nh_res_table {
+ 	struct nh_res_bucket	nh_buckets[] __counted_by(num_nh_buckets);
  };
  
++struct nh_grp_entry_stats {
++	u64_stats_t packets;
++	struct u64_stats_sync syncp;
++};
++
+ struct nh_grp_entry {
+ 	struct nexthop	*nh;
++	struct nh_grp_entry_stats __percpu	*stats;
+ 	u8		weight;
+ 
+ 	union {
 diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-index bcd4df2f1cad..576981f4ca49 100644
+index 576981f4ca49..92dc21a231f8 100644
 --- a/net/ipv4/nexthop.c
 +++ b/net/ipv4/nexthop.c
-@@ -41,6 +41,7 @@ static const struct nla_policy rtm_nh_policy_new[] = {
+@@ -480,6 +480,7 @@ static void nexthop_free_group(struct nexthop *nh)
+ 		struct nh_grp_entry *nhge = &nhg->nh_entries[i];
  
- static const struct nla_policy rtm_nh_policy_get[] = {
- 	[NHA_ID]		= { .type = NLA_U32 },
-+	[NHA_OP_FLAGS]		= NLA_POLICY_MASK(NLA_U32, 0),
- };
- 
- static const struct nla_policy rtm_nh_policy_del[] = {
-@@ -52,6 +53,7 @@ static const struct nla_policy rtm_nh_policy_dump[] = {
- 	[NHA_GROUPS]		= { .type = NLA_FLAG },
- 	[NHA_MASTER]		= { .type = NLA_U32 },
- 	[NHA_FDB]		= { .type = NLA_FLAG },
-+	[NHA_OP_FLAGS]		= NLA_POLICY_MASK(NLA_U32, 0),
- };
- 
- static const struct nla_policy rtm_nh_res_policy_new[] = {
-@@ -2971,7 +2973,7 @@ static int rtm_new_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
- }
- 
- static int nh_valid_get_del_req(const struct nlmsghdr *nlh,
--				struct nlattr **tb, u32 *id,
-+				struct nlattr **tb, u32 *id, u32 *op_flags,
- 				struct netlink_ext_ack *extack)
- {
- 	struct nhmsg *nhm = nlmsg_data(nlh);
-@@ -2992,6 +2994,11 @@ static int nh_valid_get_del_req(const struct nlmsghdr *nlh,
- 		return -EINVAL;
+ 		WARN_ON(!list_empty(&nhge->nh_list));
++		free_percpu(nhge->stats);
+ 		nexthop_put(nhge->nh);
  	}
  
-+	if (tb[NHA_OP_FLAGS])
-+		*op_flags = nla_get_u32(tb[NHA_OP_FLAGS]);
-+	else
-+		*op_flags = 0;
-+
- 	return 0;
+@@ -660,6 +661,16 @@ static int nla_put_nh_group_res(struct sk_buff *skb, struct nh_group *nhg)
+ 	return -EMSGSIZE;
  }
  
-@@ -3007,6 +3014,7 @@ static int rtm_del_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		.portid = NETLINK_CB(skb).portid,
- 	};
- 	struct nexthop *nh;
-+	u32 op_flags;
- 	int err;
- 	u32 id;
++static void nh_grp_entry_stats_inc(struct nh_grp_entry *nhge)
++{
++	struct nh_grp_entry_stats *cpu_stats;
++
++	cpu_stats = this_cpu_ptr(nhge->stats);
++	u64_stats_update_begin(&cpu_stats->syncp);
++	u64_stats_inc(&cpu_stats->packets);
++	u64_stats_update_end(&cpu_stats->syncp);
++}
++
+ static int nla_put_nh_group(struct sk_buff *skb, struct nh_group *nhg)
+ {
+ 	struct nexthop_grp *p;
+@@ -1182,6 +1193,7 @@ static struct nexthop *nexthop_select_path_fdb(struct nh_group *nhg, int hash)
+ 		if (hash > atomic_read(&nhge->hthr.upper_bound))
+ 			continue;
  
-@@ -3015,7 +3023,7 @@ static int rtm_del_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (err < 0)
- 		return err;
- 
--	err = nh_valid_get_del_req(nlh, tb, &id, extack);
-+	err = nh_valid_get_del_req(nlh, tb, &id, &op_flags, extack);
- 	if (err)
- 		return err;
- 
-@@ -3036,6 +3044,7 @@ static int rtm_get_nexthop(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- 	struct nlattr *tb[NHA_MAX + 1];
- 	struct sk_buff *skb = NULL;
- 	struct nexthop *nh;
-+	u32 op_flags;
- 	int err;
- 	u32 id;
- 
-@@ -3044,7 +3053,7 @@ static int rtm_get_nexthop(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- 	if (err < 0)
- 		return err;
- 
--	err = nh_valid_get_del_req(nlh, tb, &id, extack);
-+	err = nh_valid_get_del_req(nlh, tb, &id, &op_flags, extack);
- 	if (err)
- 		return err;
- 
-@@ -3080,6 +3089,7 @@ struct nh_dump_filter {
- 	bool group_filter;
- 	bool fdb_filter;
- 	u32 res_bucket_nh_id;
-+	u32 op_flags;
- };
- 
- static bool nh_dump_filtered(struct nexthop *nh,
-@@ -3151,6 +3161,11 @@ static int __nh_valid_dump_req(const struct nlmsghdr *nlh, struct nlattr **tb,
- 		return -EINVAL;
++		nh_grp_entry_stats_inc(nhge);
+ 		return nhge->nh;
  	}
  
-+	if (tb[NHA_OP_FLAGS])
-+		filter->op_flags = nla_get_u32(tb[NHA_OP_FLAGS]);
-+	else
-+		filter->op_flags = 0;
-+
- 	return 0;
+@@ -1191,7 +1203,7 @@ static struct nexthop *nexthop_select_path_fdb(struct nh_group *nhg, int hash)
+ 
+ static struct nexthop *nexthop_select_path_hthr(struct nh_group *nhg, int hash)
+ {
+-	struct nexthop *rc = NULL;
++	struct nh_grp_entry *nhge0 = NULL;
+ 	int i;
+ 
+ 	if (nhg->fdb_nh)
+@@ -1206,16 +1218,20 @@ static struct nexthop *nexthop_select_path_hthr(struct nh_group *nhg, int hash)
+ 		if (!nexthop_is_good_nh(nhge->nh))
+ 			continue;
+ 
+-		if (!rc)
+-			rc = nhge->nh;
++		if (!nhge0)
++			nhge0 = nhge;
+ 
+ 		if (hash > atomic_read(&nhge->hthr.upper_bound))
+ 			continue;
+ 
++		nh_grp_entry_stats_inc(nhge);
+ 		return nhge->nh;
+ 	}
+ 
+-	return rc ? : nhg->nh_entries[0].nh;
++	if (!nhge0)
++		nhge0 = &nhg->nh_entries[0];
++	nh_grp_entry_stats_inc(nhge0);
++	return nhge0->nh;
  }
  
-@@ -3474,6 +3489,7 @@ static int nh_valid_get_bucket_req(const struct nlmsghdr *nlh,
- 				   struct netlink_ext_ack *extack)
- {
- 	struct nlattr *tb[NHA_MAX + 1];
-+	u32 op_flags;
- 	int err;
+ static struct nexthop *nexthop_select_path_res(struct nh_group *nhg, int hash)
+@@ -1231,6 +1247,7 @@ static struct nexthop *nexthop_select_path_res(struct nh_group *nhg, int hash)
+ 	bucket = &res_table->nh_buckets[bucket_index];
+ 	nh_res_bucket_set_busy(bucket);
+ 	nhge = rcu_dereference(bucket->nh_entry);
++	nh_grp_entry_stats_inc(nhge);
+ 	return nhge->nh;
+ }
  
- 	err = nlmsg_parse(nlh, sizeof(struct nhmsg), tb, NHA_MAX,
-@@ -3481,7 +3497,7 @@ static int nh_valid_get_bucket_req(const struct nlmsghdr *nlh,
- 	if (err < 0)
- 		return err;
+@@ -1804,6 +1821,7 @@ static void remove_nh_grp_entry(struct net *net, struct nh_grp_entry *nhge,
+ 			newg->has_v4 = true;
  
--	err = nh_valid_get_del_req(nlh, tb, id, extack);
-+	err = nh_valid_get_del_req(nlh, tb, id, &op_flags, extack);
- 	if (err)
- 		return err;
+ 		list_del(&nhges[i].nh_list);
++		new_nhges[j].stats = nhges[i].stats;
+ 		new_nhges[j].nh_parent = nhges[i].nh_parent;
+ 		new_nhges[j].nh = nhges[i].nh;
+ 		new_nhges[j].weight = nhges[i].weight;
+@@ -1819,6 +1837,7 @@ static void remove_nh_grp_entry(struct net *net, struct nh_grp_entry *nhge,
+ 	rcu_assign_pointer(nhp->nh_grp, newg);
+ 
+ 	list_del(&nhge->nh_list);
++	free_percpu(nhge->stats);
+ 	nexthop_put(nhge->nh);
+ 
+ 	/* Removal of a NH from a resilient group is notified through
+@@ -2483,6 +2502,13 @@ static struct nexthop *nexthop_create_group(struct net *net,
+ 		if (nhi->family == AF_INET)
+ 			nhg->has_v4 = true;
+ 
++		nhg->nh_entries[i].stats =
++			netdev_alloc_pcpu_stats(struct nh_grp_entry_stats);
++		if (!nhg->nh_entries[i].stats) {
++			err = -ENOMEM;
++			nexthop_put(nhe);
++			goto out_no_nh;
++		}
+ 		nhg->nh_entries[i].nh = nhe;
+ 		nhg->nh_entries[i].weight = entry[i].weight + 1;
+ 		list_add(&nhg->nh_entries[i].nh_list, &nhe->grp_list);
+@@ -2522,6 +2548,7 @@ static struct nexthop *nexthop_create_group(struct net *net,
+ out_no_nh:
+ 	for (i--; i >= 0; --i) {
+ 		list_del(&nhg->nh_entries[i].nh_list);
++		free_percpu(nhg->nh_entries[i].stats);
+ 		nexthop_put(nhg->nh_entries[i].nh);
+ 	}
  
 -- 
 2.43.0
