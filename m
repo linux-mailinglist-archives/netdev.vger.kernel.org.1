@@ -1,74 +1,50 @@
-Return-Path: <netdev+bounces-78019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D22B873C48
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:30:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46C2C873C4A
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:30:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3252282876
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:30:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C65F2B22ABA
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 16:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB0A013A89D;
-	Wed,  6 Mar 2024 16:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70C9137934;
+	Wed,  6 Mar 2024 16:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NKSE2K7D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JNPyOQBt"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E94A13A246
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 16:30:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B158004B
+	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 16:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709742611; cv=none; b=thCs0D9aU9h6Pim5Vh1ATE8iZCyRS6kQEYOp7IlEdsLzab1DNLu/gDOtRyEaL7PPS6COX2s3OqafiZOmpim1ofID00AcVMHn7jjbUTmuoXMIoCV+NVbbtGMj0WNkjBeZSbosDANfOZTctnWiSuViElu5/yTe5leMPj3Qbnb4fIY=
+	t=1709742628; cv=none; b=IVddmrdiMlx80dyBRfOGxIPD6liVNlasNKD+3iYrhAfvbJEhzs9LSwavmlSE53AAbRZ2VjBKpzwp7BAgTXEqdrEeWbLNmIwstQvM0IyIht/Df4SgwbvrgKp7YuFQAxd1ws60Z/wcMLQ37nFBOcT4oXs2GZluJiBMhUfhR2XXKuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709742611; c=relaxed/simple;
-	bh=JaXAMgruNSSbD1f4FlCgFPf1bCTVECRO/0D250xzjKk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A89fnZlE1jlFhU/QYFg/VCIkbGQnXO0EAdyojlbCbSIIxcivBCbm35kzOvyGlhOLiLTpVQlkLIDgvQ+Y5C6u+7shzJwYOPukzdbEn9RetB0BhmJ4Vn0kYGpZvBMr2YEFKkQEtHb9U0y0Kl16JQ75Q3wmsQ5jj5kDro7ukdHXWtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NKSE2K7D; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709742609;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KTGE09xtnIme6+GRFUjACMeP0HPOQDGOO8CtxR+SQkQ=;
-	b=NKSE2K7D1QMYuUl4XXrFMaX7iDIxcLF94SKrcj7TPnWRQFjgh7SBJZPsvUmoOuAdb/NMR8
-	W95NZbr60GjPls5CzfER3w2a7FjOAtslhG8fJG4z/9VEUKcMQya+FLuXa+I89PreukpA1E
-	jrGybb5fldexLBKTQio9PFr1go1enZg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-100-WXPhzIXCON29OO9j5Q-ArA-1; Wed, 06 Mar 2024 11:30:04 -0500
-X-MC-Unique: WXPhzIXCON29OO9j5Q-ArA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0C004800266;
-	Wed,  6 Mar 2024 16:30:04 +0000 (UTC)
-Received: from toolbox.redhat.com (unknown [10.45.224.200])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D0C954073436;
-	Wed,  6 Mar 2024 16:30:01 +0000 (UTC)
-From: Michal Schmidt <mschmidt@redhat.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH net-next v2 3/3] ice: fold ice_ptp_read_time into ice_ptp_gettimex64
-Date: Wed,  6 Mar 2024 17:29:07 +0100
-Message-ID: <20240306162907.84247-4-mschmidt@redhat.com>
-In-Reply-To: <20240306162907.84247-1-mschmidt@redhat.com>
-References: <20240306162907.84247-1-mschmidt@redhat.com>
+	s=arc-20240116; t=1709742628; c=relaxed/simple;
+	bh=Z9T1libhnlCIsRPbznxn6R2x+UYfld6/Hvkh7oPPh90=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Icxq2YFxMBwHzTJnewDtL9AmruTK5xsXaYN5p0eiww0WsLBUJgFTD1oB3ZAj8aOcX4lQWQsHAWoQBADe8dmi5NtPD7kV+W9X9bf2BIRmWz6mQO7Am9DqvN1rR5shOMhejHBBOyCgAy+naw1j/MoCFA1hKxnqs3iGCnhdOa67qTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JNPyOQBt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 28C5AC433F1;
+	Wed,  6 Mar 2024 16:30:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709742628;
+	bh=Z9T1libhnlCIsRPbznxn6R2x+UYfld6/Hvkh7oPPh90=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JNPyOQBtlxQlTZzGODT5gvH9VG2sBmPQebOfs8k1EJsA75LtJzu0LwHuduHoH6Y4L
+	 d8+nyTgjPYBBaRYoIzy9bzZjA0CpR4huEwa56kCbiokL8a1sbFr/ow3Iw5NcYig9Cj
+	 AlqXBSdNwr0ymX+vjom/K4IMilGhR8qM9dcrPy/rIokj5QAOiDNUAKUpuWh5reDp5Z
+	 arhKV0LPfcAyHbVeq+3tqHbmjHjA74ojhDMZ7lnJ4FHcowmHp6dOjo/XslSlBM4tI3
+	 7mvK08Nt3tTSn2favhOAk8n/jnc3sGCtp3nwcSrsicDdJdFHH6dHFRy+oBIYqMRhUK
+	 6HbSxDn4qqzNQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0901AC3274B;
+	Wed,  6 Mar 2024 16:30:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,61 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+Subject: Re: [PATCH iproute2-next v3] iproute2: move generic_proc_open into lib
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170974262802.15464.12216033367377027459.git-patchwork-notify@kernel.org>
+Date: Wed, 06 Mar 2024 16:30:28 +0000
+References: <20240304141340.3563-1-dkirjanov@suse.de>
+In-Reply-To: <20240304141340.3563-1-dkirjanov@suse.de>
+To: Denis Kirjanov <kirjanov@gmail.com>
+Cc: stephen@networkplumber.org, dsahern@kernel.org, netdev@vger.kernel.org,
+ dkirjanov@suse.de
 
-This is a cleanup. It is unnecessary to have this function just to call
-another function.
+Hello:
 
-Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
----
- drivers/net/ethernet/intel/ice/ice_ptp.c | 25 +++---------------------
- 1 file changed, 3 insertions(+), 22 deletions(-)
+This patch was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 0875f37add78..0f17fc1181d2 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -1166,26 +1166,6 @@ static void ice_ptp_reset_cached_phctime(struct ice_pf *pf)
- 	ice_ptp_mark_tx_tracker_stale(&pf->ptp.port.tx);
- }
- 
--/**
-- * ice_ptp_read_time - Read the time from the device
-- * @pf: Board private structure
-- * @ts: timespec structure to hold the current time value
-- * @sts: Optional parameter for holding a pair of system timestamps from
-- *       the system clock. Will be ignored if NULL is given.
-- *
-- * This function reads the source clock registers and stores them in a timespec.
-- * However, since the registers are 64 bits of nanoseconds, we must convert the
-- * result to a timespec before we can return.
-- */
--static void
--ice_ptp_read_time(struct ice_pf *pf, struct timespec64 *ts,
--		  struct ptp_system_timestamp *sts)
--{
--	u64 time_ns = ice_ptp_read_src_clk_reg(pf, sts);
--
--	*ts = ns_to_timespec64(time_ns);
--}
--
- /**
-  * ice_ptp_write_init - Set PHC time to provided value
-  * @pf: Board private structure
-@@ -1926,9 +1906,10 @@ ice_ptp_gettimex64(struct ptp_clock_info *info, struct timespec64 *ts,
- 		   struct ptp_system_timestamp *sts)
- {
- 	struct ice_pf *pf = ptp_info_to_pf(info);
-+	u64 time_ns;
- 
--	ice_ptp_read_time(pf, ts, sts);
--
-+	time_ns = ice_ptp_read_src_clk_reg(pf, sts);
-+	*ts = ns_to_timespec64(time_ns);
- 	return 0;
- }
- 
+On Mon,  4 Mar 2024 09:13:40 -0500 you wrote:
+> the function has the same definition in ifstat and ss
+> 
+> v2: fix the typo in the chagelog
+> v3: rebase on master
+> 
+> Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
+> 
+> [...]
+
+Here is the summary with links:
+  - [iproute2-next,v3] iproute2: move generic_proc_open into lib
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=a9fce55334f7
+
+You are awesome, thank you!
 -- 
-2.43.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
