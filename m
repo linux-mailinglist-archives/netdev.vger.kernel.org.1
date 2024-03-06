@@ -1,151 +1,165 @@
-Return-Path: <netdev+bounces-78045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DAC3873D70
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:22:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B07C0873D75
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 18:24:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1B791C217F2
-	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:22:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3D1F1C21494
+	for <lists+netdev@lfdr.de>; Wed,  6 Mar 2024 17:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F010D13BACD;
-	Wed,  6 Mar 2024 17:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8628F13BAD1;
+	Wed,  6 Mar 2024 17:24:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ajQ8F1nr"
+	dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b="nUYB3w69"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2043.outbound.protection.outlook.com [40.107.237.43])
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2065.outbound.protection.outlook.com [40.107.105.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01C713BAF1
-	for <netdev@vger.kernel.org>; Wed,  6 Mar 2024 17:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D378605DC;
+	Wed,  6 Mar 2024 17:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.65
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709745743; cv=fail; b=jay22aubPAp5nuDbi0s4EUDibx7PqRLBMW2Oa6vHq/wd+vHawvSozqayvuIKk8uphWVObiIDpz8LIWSfkIi2fLKG1SEISgelYndQL2fHhnqeCXUFpPT8/GJY2O5gbnrgVrh7tTDAk0udyEPifuNC1huXFqou2zZF7/N7ajau3jU=
+	t=1709745856; cv=fail; b=ex0tRqGk3E7hVEzx7IDcNqvbKYB7eJPjD6mjl2KSr35MCqie5tl07GAF0gLP+sfWU8O9qviO3C2tjQxciEU4uHGgGFq1uu6dwHET8vKdfOqbO2ANnrd+cJmUq+3o7wdQa5imLDnGCrLEih9SjNK3g+Hp75kcaJz1odr/oQVbcGI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709745743; c=relaxed/simple;
-	bh=T2bcoYpQXKdiLY8i2q3YTeguTXvQJZkSRua9j4VJuyk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=cJfb4wevihGzxmUN2EPhuzBjteQGZG+BpDO0zgZJxc1V369QDkP9Yi4F3/S9Qqh6nFtcXkG+//HYx7cHN6yk3x5A281ZIrprzvBoBPSY73c8trTH3y90ZbTVdb+FF840bZUpQWIKB1TYA3cOr683tKfwxRwnl7Lp22LH4XqChFw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ajQ8F1nr; arc=fail smtp.client-ip=40.107.237.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1709745856; c=relaxed/simple;
+	bh=RgngnF///VPJb0YSM1SFRzIFtD+7xEZBFxcwX7gxwPk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=iKdhowBpjOCwBMmLpAf4ZpgQlIwNA8GBLiIZDjgZh9c/gPAYe0UGQJtTJrCJoyD6KNhsAwqRSpNtgrT6y1OCHtW1ptioRqQqPpyMYT7IEs5aF5F7pXtiE0kcA34Q/E4Rh258ZjJc6Izn3koCCEitfMgAKXzfNdh/qFVBSyrRBA8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com; spf=fail smtp.mailfrom=leica-geosystems.com; dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b=nUYB3w69; arc=fail smtp.client-ip=40.107.105.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=leica-geosystems.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=glnOLg5MxTI0H0+s0llARJwwUcy4ENJlWTKJVHINLfWfyB9dlnX9V86BHRBTFdYelB/LFdzLlAsbxhs+YI8KdqOw/sIP9UWM51+n1695jWGQ24JfTh6yYEK5wpFVXSHIQXH0iYv0HDCcw8PFTV2T01re3uu6/RqBnw34dPyu+TzQZp7HSlw2QJdUqgxteEZS7D6EokEL9tKfj8dIEvpFHbgYSnYQzB7+pH8YX25si07VhI45rvQd9Co2BBPdcBxapsdd7l6eC73XmaNNvs+Ylew5ygHo2iW9BLSZznGm78OiMn6LKY8qfN/2w6LheYCLg782NWcLn9q28ux1dFJ1Pg==
+ b=bH49yqx+71fXM6bmCEm+fNLw40f92AYozeXBgPmTFIYJS6Gi+8Kma/v4ir3jrS9qhD2AiH7kw93VR5BYbQZaMxoa2aYdg18bN5dYHjIGLkOe5KJVfnjeKZbspNhvFwwDSNLYv+71m7tAbjCxJxZEFUu+4M1dawo+vSAiG5aH5csrU3VPfkE2Kc/WFxf8V+9C15HvHChpUiAYLvWe/XUhkkaGC5pKU80C+PZRxAGJWXnEzv0KHYXOBpkQwVJgsAmUVsJO1ZQI0OeI2EDmBZrBHjfH7eCmoZxynKgw8XS6f5TW4VUc0BtIaolAQtpAmFpFCfPwUCKSEpeB8RoZBSNwdg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mzZfzJe6TTV9pG+wBtfhpJKTr0JxTnoBHnZiveRyrIo=;
- b=ZJ8B3StWnDDaZLD4FxAn4wILufxlRnQJjunTU2coRzZ8m4mjU8c3u1ONW6JNbyAyTRSdup1I5ipQO0QR2lAh/DYKHlhUFMCOMBjEvOoKLQOsRPUo5FSUC1NIPCBFK7EWubMEZHP1PToN3CDryDPlb2pYU9lJexhvlstQ3JE8so1Xt0lAZElnXeCgUYM58j/Qe2/X8ifOld6P93PCT91wsemw2n+ijTeflXHZ8alTNQ3uQ46yTGT/ItjOB4AUaXwZN7w5T7apyMc2kFt7zKQQzl+No6Ys2LlhOTH5V2hYsryge8xCb7W4KROvarSHgOfho0vZNu6idsBmxo20h94DlQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=1Sl16cHBNQAbXFgM02+tz761jWn2RvyeXV/YFlT1QP4=;
+ b=nT7mtss+MadhAYEmHw8PMLWUnPRjUzR8xLrTQ0IXaIR7XEc5NyIbVMU0xAURRAGClII1pPsxt7mxhNcIeS3Eys+dfaFITftluVNrZ5zDDT0Yaj3WpgVnu02ISyfPhbsRWAak2uKLl+qLoolVgBBHrS0mLWbIIUbiMbw+GpjCQwHVX7BU+p6toHJ8f+cuR8myNSPitr71Dp3KYSbihKscBuHKiXcVFflIWsdDD5REvK5w74fYTj1ZZIbpIAx6MWOKS0cIF0SigiFRDhcTa/LKLTxZX0m1/xR0LqCorxGXeMQa4vHoaPRYlbj1DNaqFHRHcmkBOCpJQsbf1GTiFn6gwA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 193.8.40.94) smtp.rcpttodomain=vger.kernel.org
+ smtp.mailfrom=leica-geosystems.com; dmarc=pass (p=reject sp=reject pct=100)
+ action=none header.from=leica-geosystems.com; dkim=none (message not signed);
+ arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leica-geosystems.com;
+ s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mzZfzJe6TTV9pG+wBtfhpJKTr0JxTnoBHnZiveRyrIo=;
- b=ajQ8F1nrsP7jSrI3A4RzJloHVMRvjVsQbl7t/nnG7DJP9CQfMOxvR+8/X0LwTixNV9J17hPamxnngnyyQmzOFwS2lHuGhhCc9Fl7a7mnhem4F0UULYvQba8/wi8jfiKdQ3yBg7DPa/tcYtKc+ezd5RymWVppdBj3dHnkcWEfCghqEuZ2FgTWXzwaA2ZVKYZX7n55EMPokBEyrg+R3xIgAuExf8keO2RxMVSLAM0r0sy6Cs1mQQkpmxh1rT4Aoll25ulvMH/4k1yWMk4vaNDB83FBwrS1zCsEoKZCfnmQGAE6g/c5WF6O/95IOBqivuT0juj3hylOlHFjv6ZxfhCljA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
- by MW3PR12MB4474.namprd12.prod.outlook.com (2603:10b6:303:2e::7) with
+ bh=1Sl16cHBNQAbXFgM02+tz761jWn2RvyeXV/YFlT1QP4=;
+ b=nUYB3w69Gke6HzaaUchh6znea0WAz2bq8xLihC6GoPNgVJhCnOvLybIyGcJAO6YV79wCnmTg5UuPpXlRcwau6quWyHHwlByPIG/fXmaBpkoEwgKYOSNhApD4GlSYvKviuLEB0UsY7xFu1BqmwV6FtnQAk8c50Qeq7nI4JIQ0FBE=
+Received: from AS8PR04CA0021.eurprd04.prod.outlook.com (2603:10a6:20b:310::26)
+ by AM9PR06MB8147.eurprd06.prod.outlook.com (2603:10a6:20b:3aa::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Wed, 6 Mar
- 2024 17:22:18 +0000
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::b93d:10a3:632:c543]) by CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::b93d:10a3:632:c543%4]) with mapi id 15.20.7362.019; Wed, 6 Mar 2024
- 17:22:17 +0000
-Date: Wed, 6 Mar 2024 19:22:12 +0200
-From: Ido Schimmel <idosch@nvidia.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@kernel.org>, mlxsw@nvidia.com
-Subject: Re: [PATCH net-next v4 2/7] net: nexthop: Add NHA_OP_FLAGS
-Message-ID: <ZeimRPbhmo4m012Z@shredder>
-References: <cover.1709727981.git.petrm@nvidia.com>
- <b66eaea956cb860a38c7ea77bf8571e386de5221.1709727981.git.petrm@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b66eaea956cb860a38c7ea77bf8571e386de5221.1709727981.git.petrm@nvidia.com>
-X-ClientProxiedBy: FR3P281CA0022.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:1c::10) To CY5PR12MB6179.namprd12.prod.outlook.com
- (2603:10b6:930:24::22)
+ 2024 17:24:11 +0000
+Received: from AM1PEPF000252DA.eurprd07.prod.outlook.com
+ (2603:10a6:20b:310:cafe::4a) by AS8PR04CA0021.outlook.office365.com
+ (2603:10a6:20b:310::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.39 via Frontend
+ Transport; Wed, 6 Mar 2024 17:24:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 193.8.40.94)
+ smtp.mailfrom=leica-geosystems.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=leica-geosystems.com;
+Received-SPF: Pass (protection.outlook.com: domain of leica-geosystems.com
+ designates 193.8.40.94 as permitted sender) receiver=protection.outlook.com;
+ client-ip=193.8.40.94; helo=hexagon.com; pr=C
+Received: from hexagon.com (193.8.40.94) by
+ AM1PEPF000252DA.mail.protection.outlook.com (10.167.16.52) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7362.11 via Frontend Transport; Wed, 6 Mar 2024 17:24:11 +0000
+Received: from aherlnxbspsrv01.lgs-net.com ([10.60.34.116]) by hexagon.com with Microsoft SMTPSVC(10.0.17763.1697);
+	 Wed, 6 Mar 2024 18:24:11 +0100
+From: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	shawnguo@kernel.org,
+	s.hauer@pengutronix.de,
+	kernel@pengutronix.de,
+	festevam@gmail.com,
+	xiaoning.wang@nxp.com,
+	linux-imx@nxp.com,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	mcoquelin.stm32@gmail.com
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	bsp-development.geo@leica-geosystems.com,
+	m.felsch@pengutronix.de,
+	Catalin Popescu <catalin.popescu@leica-geosystems.com>
+Subject: [PATCH net-next 1/2] dt-bindings: net: dwmac-imx: add nxp,phy-wol
+Date: Wed,  6 Mar 2024 18:24:08 +0100
+Message-Id: <20240306172409.878928-1-catalin.popescu@leica-geosystems.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-OriginalArrivalTime: 06 Mar 2024 17:24:11.0104 (UTC) FILETIME=[1A5B4E00:01DA6FEB]
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|MW3PR12MB4474:EE_
-X-MS-Office365-Filtering-Correlation-Id: f1557f4c-a1f0-4ac7-01a6-08dc3e01f8ec
+X-MS-TrafficTypeDiagnostic: AM1PEPF000252DA:EE_|AM9PR06MB8147:EE_
+Content-Type: text/plain
+X-MS-Office365-Filtering-Correlation-Id: 93792a1e-7ed4-4d92-66a5-08dc3e023d24
+X-SET-LOWER-SCL-SCANNER: YES
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	Ljm2QVGzS6iv+qhLNuVMZYkOBuIZm0xRvoSCjMc1OKy8BbJDWgmTxrSLRZj5Ls753odxv3MEajGPAFadCQ76VC35FIIC18KPILzqU29AMa0VX8lCZ5Ybb4XYK+qrag5DqMn2TE68XdsuAry/nHZSdkF1hD+puiIC6iRWsa4EHT7z4xIU3OVYfC0IT0ClqQNK5bAZ73TeAFXy4SyLYYkFqxHwUhbyD3xvp1VBrZWQDGZ6xEcl8jLeev2+ftDeJNbq29mG3Oiob0NIBuYNqVt/zkxRgVu/jAEUaL2bYR+TbgXLhPAYQ4VsriFDzAXUSIHWQpN9xr3DzlDrKTSgV0HkRp83HgqeErnzQgAxa1DquINV+WVDPj2mERHEdvxrQXgX5jP+52J+7Eh0sG2/0jAA6fih9V5VuSjQ2yypRCsmfeXhJJaCLZdDyqHjozzXwCzBZzyytFUTVHQjoaL/i5HE1+Vi8BvRHNq8femioweNADmVak+dwj9D1wzeAMZXIDPxbYKoBdUrJB1PwLU4AseIh5x1dmVM5TOzHGlL4R8z/PuRWnGZvc/ykLgosdffF5CCYBGvispr+prYq7hx+uZ57n5XqCfbR2tjcmiRWAVkmOOiIBkkzxKW1T2MM88HBBxwfe6nTQR4nlbZdxVKkA11LaknO29tE1EMG5yVMN4koSA=
+	vIIzsi2DgD3xpVWr6BllZ7nYJvOxyObliKpiafRIv/jyf1RxiDNiEngtQgVYXgw7nQVzUF0ipjwDz7PnVghmycso7bLTeMDppcdj+GOdADNhBcUHSvFePPUbD8XlJgyixBy1VwUf5m3aelC5VTujhnrzwK59P0woCchbIdSSdniTg/BLgOX8fgtSLC5ktjI+OEiNyjGh6UHS/1t1b9CL7YT9GWOSNmrPldZTwCUms96zRYIAlePOqOpfVl0FLU+7SRP5eHGwz5dj/P/N4uoT2emtZAgiVOh4fokxDJvbEwEfDD4F6w5ugfc/aYMSOvcOFy+DcG08T1jEcBWh88U6AJwjnUdL1EXVaG4DJAScReo+vxuAPqDJopr8r24GAHYZdJyHLtUuf9FLv6lMJQCaOuyjLzpyv3DLNNp+vUOr98m80G+rXzBh1jPj0yPbugEyWZVb4mw6AyEdPL5cje3HS3sKVKXRqrUVrq0pl6klRIclmRJk9cmyTMnu4Lne/cJnTIt3CBaXFK3hmglNMLM5kEVLiwEE7ecsgtP/4U6TXl0Bd2NsJchL6EEZc+UDOkmLBwc937n7BNYzqwx2DvSsJpqh4isV6LAOtTQqzqXOxDJWEY9gb0r5xm6G2M6jkOPt+ItarVneoDJXTe+UxewMv/HRG/BQtSyOkRBuT37MqJdJuJDhnD0oNTnMDSVn9k15jkrPxGy+3fyen8093xIf2lJH93ITSxcJQTAmLofh90DyPwTN1iEFfrDgZ4WRjexdauO3fSTD49kT112wkS47JA==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?CTJtSHDNtYMCoKi0avShTqxBkPB8AQD4K3lsISLgGvr0V1dnHzOB6dim/NW0?=
- =?us-ascii?Q?oGT+TWtSqPPwtwAuaeEX49ikHh/W6hE3kVIjnC1/OgXhLDf64H6en1jtSUBT?=
- =?us-ascii?Q?kpjOWQ/O5/xSoUWx9yR5L5CZ2euUf+5xvt8Mm+AWdrMwMPmifCXDO1Jld/rL?=
- =?us-ascii?Q?628TjdVDqhE9hig5x+Y4FetI1GcJxy2TlY2H3q39j0oNNPMnYuKnzHLJu7sx?=
- =?us-ascii?Q?3BFq/v1WekbfS7hwTok9qOhmruPmgoswgASJHyQJv7uTpJUnYIvB4PwPgEkk?=
- =?us-ascii?Q?YPxcHcIr/Jm3bHBgWgJ+txHoCfE2N2CyTGfYSbs/TdZAwiX+J9fDB1z11qEp?=
- =?us-ascii?Q?+wAWynexochth6FDbVtnMOTQo71PR9uCNmWOgEi4Wmrkb8ymHiTKYP7W8ANz?=
- =?us-ascii?Q?Uaru3YVQLfuN1NL9ZpZfkfIqwPd4UQfBN1Dl8vRxpd8nWK9UseQuD0Gti/U3?=
- =?us-ascii?Q?4vvEyh2A4UvaFT7Lb6o2QYnFKyrhnc/euFEGbpfAzlAcer4oELuO0O2E84fo?=
- =?us-ascii?Q?MDLjJk2IDRjS28ivbf3CyJKPRJryFe/gDDVOuIPDG7rRqGy2KZgVWCC5tBq+?=
- =?us-ascii?Q?gro1Y2ptGzjSQ9rnGpWRme7tw388O23FE2YOaSazWPJThkfWEqVqZjgdroVQ?=
- =?us-ascii?Q?ksJdagtLKrYcsjjhnqQ7BMWdVkGcEyji9otpWR5kFoBf0qnkA4KedLSV7lTz?=
- =?us-ascii?Q?45Yw+bQYCYoIEwmavcoZkA17Sg7th2SY0/sLEgZD9bEizTgF2WpksmYZulWx?=
- =?us-ascii?Q?i0nc8z+i7dAXtOtomr+Pn2/TbJ2JdNwk5dUeSkZ/xqXjsVtNNPlthBDVSSPF?=
- =?us-ascii?Q?NXDVZQqAGP+G9LmYu/CxkTMtIvrWUb/p3l/+AmcHoS+Tb67ZmYb/WOuj9z8e?=
- =?us-ascii?Q?kYI7YY/CmR4RYetkgT7li+Om1hYhDaBxqkeChZIPpxKoIFbkgnAnqDUWpyAg?=
- =?us-ascii?Q?Midrv73nOBeT8WBBkSC9T2wRJgsMmo0frIhAnogWy+V/9g5TrfKpRjHdgJ/b?=
- =?us-ascii?Q?9+4ayJ4QuV1P1aYVh5n8O1gVDADo3pCd7gZvbu4QYzAp3Kj+FfN1Gq+BZfW1?=
- =?us-ascii?Q?wt9l4BkwwU9IyyRxFJhP4jW+2vpX7Pd6SAWlx7c0A22v6pOrGGAEF+miwGq8?=
- =?us-ascii?Q?U428HyQg05i+VL/PMzMh8v2zxKPC66ntheAKadUeK2SkluVjTse/2j67q8zu?=
- =?us-ascii?Q?E4x50DmCDLVaYX2VjWs0b5xB5E8MxTsQyc0CW89wKFAyfJ1zIJucR5jH++9X?=
- =?us-ascii?Q?ZBB4WY6fJrONSdwpAjK7AYaEs/rhUOxMdYO6e/21+qF+s7Tjo76HiOWSRbiz?=
- =?us-ascii?Q?KgAGYahH9wBC0mzaH5grHFHACSEfjvwU5ntxhWXaCE0x5xIdmhQMx+/nrJih?=
- =?us-ascii?Q?PCGu9m7PoR9rB9F1s4IM78SuKTsnDY+DD0g4kYHu2GtE5xSWYZQHy88FJzQh?=
- =?us-ascii?Q?lygWbTIS3kxIGaWn2FCZ/ikRpv1+4DuHQZgcjsA6/fu2QudwX+c19rQSm/Kc?=
- =?us-ascii?Q?GKwsjm7P/EFCLGSdGvm4Fr/VAVHFyto/GBZkRyLGFuDb7b1b68oDQIGXhUUw?=
- =?us-ascii?Q?O1TxhrchHwu9b7gndp23QIGNVPAXzOPiisN5oMAS?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f1557f4c-a1f0-4ac7-01a6-08dc3e01f8ec
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 17:22:17.8586
+	CIP:193.8.40.94;CTRY:CH;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:hexagon.com;PTR:ahersrvdom50.leica-geosystems.com;CAT:NONE;SFS:(13230031)(376005)(82310400014)(36860700004)(921011);DIR:OUT;SFP:1101;
+X-OriginatorOrg: leica-geosystems.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 17:24:11.5639
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iV7ZxD9IfRJb/W20K0TuK8fJ2FGywTLnpqZoKK0WKlgmrdDIDQcW1n3evChRqP+YeUemG0HxM7FtTuVssjbndw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4474
+X-MS-Exchange-CrossTenant-Network-Message-Id: 93792a1e-7ed4-4d92-66a5-08dc3e023d24
+X-MS-Exchange-CrossTenant-Id: 1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a;Ip=[193.8.40.94];Helo=[hexagon.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM1PEPF000252DA.eurprd07.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR06MB8147
 
-On Wed, Mar 06, 2024 at 01:49:16PM +0100, Petr Machata wrote:
-> In order to add per-nexthop statistics, but still not increase netlink
-> message size for consumers that do not care about them, there needs to be a
-> toggle through which the user indicates their desire to get the statistics.
-> To that end, add a new attribute, NHA_OP_FLAGS. The idea is to be able to
-> use the attribute for carrying of arbitrary operation-specific flags, i.e.
-> not make it specific for get / dump.
-> 
-> Add the new attribute to get and dump policies, but do not actually allow
-> any flags yet -- those will come later as the flags themselves are defined.
-> Add the necessary parsing code.
-> 
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
-> Reviewed-by: David Ahern <dsahern@kernel.org>
+Add support for PHY WOL capability to dwmac-imx MAC driver.
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+---
+ Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml b/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml
+index 4c01cae7c93a..6cf373772eb1 100644
+--- a/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml
++++ b/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml
+@@ -71,6 +71,12 @@ properties:
+     description:
+       To select RMII reference clock from external.
+ 
++  nxp,phy-wol:
++    $ref: /schemas/types.yaml#/definitions/flag
++    description:
++      If present, indicates that PHY supports WOL(Wake-On-LAN), and PHY WOL will be enabled.
++      Otherwise, MAC WOL is preferred.
++
+ required:
+   - compatible
+   - clocks
+
+base-commit: 61996c073c9b070922ad3a36c981ca6ddbea19a5
+prerequisite-patch-id: 0000000000000000000000000000000000000000
+-- 
+2.34.1
+
 
