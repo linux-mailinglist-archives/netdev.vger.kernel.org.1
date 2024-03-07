@@ -1,114 +1,263 @@
-Return-Path: <netdev+bounces-78446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3273875253
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 15:51:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8734D875259
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 15:52:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 068841C21C24
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:51:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CC8E284070
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:52:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F3A912B144;
-	Thu,  7 Mar 2024 14:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC5412EBCF;
+	Thu,  7 Mar 2024 14:52:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VrKVEwwZ"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="GoX4+C50"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5714E1EB2B;
-	Thu,  7 Mar 2024 14:51:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2135D12C80A;
+	Thu,  7 Mar 2024 14:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709823112; cv=none; b=pn6W7cWrihbLHMzmMzcNFdG3e1zPVqc1z7/hqJp7t86xKNDz6JdHgUZGw8ohjn+fvi45GKL6ZMp8STPg8pDQ6CEoP8e0BjNFxIeXZt+jHcSGdOYGWVWEqQVCTjxd1VO1T7TuGJXp9c9Z42b2zKki1EyyfRij3Ci9v7gZW3q17Xc=
+	t=1709823135; cv=none; b=f7ttwL4OOSOYBTukfoT4ZT/m+TnVOqoqilGWdb51+2Sd+E5KdZ1KPZmnKRymhseC1fGIBHPnPpAzEvjeYnjJyY9wph0ImbxoyiepNV/n82qZdLRz6tG3S5DSKP2R2shG7CbT+j6tuWSHqwftoiv914FLtuEB5l9FKEXhWzVbEII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709823112; c=relaxed/simple;
-	bh=jmDXRT1UHHl9wuZwkCbShwjLFqFjqh3WNMPKmI4PmDg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=irKIyZjdAKVP28S2UqooRsddSXv9BwHFCsUC72Annj1Pc/IruICXu0QmQI6vkaZXKLMPYHkS5gqke7CKzcBbC1dTuGmZP52YsSwNECvQZIDW8FtDTa2Byzxjbzq0mQhPUy405JIb++3U8AVpw5Tj6uHHo6gX2IzwMT353zXu8CI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VrKVEwwZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6196C433F1;
-	Thu,  7 Mar 2024 14:51:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709823111;
-	bh=jmDXRT1UHHl9wuZwkCbShwjLFqFjqh3WNMPKmI4PmDg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VrKVEwwZDMVXu96zzJnPJ98MvmbYZPykuAClMNSXnd8VstCnROhLvCLwUYqkBDLdL
-	 EQuwthvZpj9Rchvva+eRiZRyOTqRU1xPUdWsKyEzSt1DnNRtw2DIFaCLDkv2ZE89MV
-	 CExqMzSxfYV9wvGb55cO/DSRs4OgfVcjGfIH+kjY0xieCLx8nTTCkXIG3xl8STRMVW
-	 nHjMnHLFiKmLnIH9WqX+qeu31/5LSelkS1TwxDcPsajp0w9zLHBBBjb2X/fgjZ4EQe
-	 YxKnFuevN/q2mBGUXl4KOyaGVaziIYB9B7VrrD5T8c9YMZHwokmCojR+3FZixo+oXr
-	 YKD8HIDX8J2dA==
-Date: Thu, 7 Mar 2024 14:51:46 +0000
-From: Simon Horman <horms@kernel.org>
-To: Radha Mohan Chintakuntla <radhac@marvell.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, sgoutham@marvell.com,
-	lcherian@marvell.com, gakula@marvell.com, hkelam@marvell.com,
-	jerinj@marvell.com, sbhatta@marvell.com
-Subject: Re: [PATCH] octeontx2-af: Increase maximum BPID channels
-Message-ID: <20240307145146.GB576211@kernel.org>
-References: <20240306213806.431830-1-radhac@marvell.com>
+	s=arc-20240116; t=1709823135; c=relaxed/simple;
+	bh=SVl7ghUZZvLmqoxnJx1TfVNS1aFO+cS/rPtTkMU4lFo=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=Bh9Rqhnzulkw8xEqf96zhLbvei7DZhey1IFF60+5YcBfvTC8hLq1LHzpwr8IZqps00BjKsKfvV1lnIy+zY1hLG+zPflg3aRSWg7pfDumwodB1OKczv7ntOwptrFhn0idoHYM9lqSf44ZPWhJWlcJPt4p+kVayphvXyRjs8TWdtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=GoX4+C50; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 8480E20B74C0; Thu,  7 Mar 2024 06:52:13 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8480E20B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1709823133;
+	bh=DQrX++fk8abFgdjKuqnBcAVgOubzkQFol/TFp+HA04s=;
+	h=From:To:Cc:Subject:Date:From;
+	b=GoX4+C50fDnqEqTDLUQhX0jEvb2nweO7wCtxXMQfyCEtiaV1gxyaO5Rap/o7qic9e
+	 eSjxHeK0NdFqJQmUANMTP0aRr6atuBQktgzhNaWQ9arYXkyfks1vS7OL/jvY3BNDeU
+	 Fu/oiiRVCDjsDR+0hLQxeYSHfjLYGp/3JLuk+i7w=
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: linux-kernel@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Michael Kelley <mikelley@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: [PATCH] net :mana : Add per-cpu stats for MANA device
+Date: Thu,  7 Mar 2024 06:52:12 -0800
+Message-Id: <1709823132-22411-1-git-send-email-shradhagupta@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240306213806.431830-1-radhac@marvell.com>
 
-On Wed, Mar 06, 2024 at 01:38:06PM -0800, Radha Mohan Chintakuntla wrote:
-> Any NIX interface type can have maximum 256 channels. So increased the
-> backpressure ID count to 256 so that it can cover cn9k and cn10k SoCs that
-> have different NIX interface types with varied maximum channels.
-> 
-> Signed-off-by: Radha Mohan Chintakuntla <radhac@marvell.com>
-> ---
->  drivers/net/ethernet/marvell/octeontx2/af/mbox.h | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> index d5c4f810da61..223a2e39172c 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> @@ -1207,10 +1207,8 @@ struct nix_bp_cfg_req {
->  	/* bpid_per_chan = 1 assigns separate bp id for each channel */
->  };
->  
-> -/* PF can be mapped to either CGX or LBK interface,
-> - * so maximum 64 channels are possible.
-> - */
-> -#define NIX_MAX_BPID_CHAN	64
-> +/* Maximum channels any single NIX interface can have */
-> +#define NIX_MAX_BPID_CHAN	256
->  struct nix_bp_cfg_rsp {
->  	struct mbox_msghdr hdr;
->  	u16	chan_bpid[NIX_MAX_BPID_CHAN]; /* Channel and bpid mapping */
+Extend 'ethtool -S' output for mana devices to include per-CPU packet
+stats
 
-Hi Radha,
+Built-on: Ubuntu22
+Tested-on: Ubuntu22
+Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 22 ++++++++++
+ .../ethernet/microsoft/mana/mana_ethtool.c    | 40 ++++++++++++++++++-
+ include/net/mana/mana.h                       | 12 ++++++
+ 3 files changed, 72 insertions(+), 2 deletions(-)
 
-looking over this, I am curious to know how out-of bounds access
-to chan_bpid is prevented. The bounds seems to be the
-the number of PF or VF rings. Which I assume is derived from
-the HW. But if so, what if the HW reports more than NIX_MAX_BPID_CHAN
-rings?
-
-On a different note, struct includes the following field:
-
-	u16 bpid[NIX_MAX_BPID_CHAN];
-
-But here the index used seems to be
-
-1. VLAN priority (which has maximum value of 8) if DCB is used
-2. 0 otherwise
-
-So perhaps fewer elements are needed?
-
-Apologies in advance if I'm on the wrong track here.
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 59287c6e6cee..b27ee6684936 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -224,6 +224,7 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ 	int gso_hs = 0; /* zero for non-GSO pkts */
+ 	u16 txq_idx = skb_get_queue_mapping(skb);
+ 	struct gdma_dev *gd = apc->ac->gdma_dev;
++	struct mana_pcpu_stats *pcpu_stats;
+ 	bool ipv4 = false, ipv6 = false;
+ 	struct mana_tx_package pkg = {};
+ 	struct netdev_queue *net_txq;
+@@ -234,6 +235,8 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ 	struct mana_cq *cq;
+ 	int err, len;
+ 
++	pcpu_stats = this_cpu_ptr(apc->pcpu_stats);
++
+ 	if (unlikely(!apc->port_is_up))
+ 		goto tx_drop;
+ 
+@@ -412,6 +415,12 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ 	tx_stats->bytes += len;
+ 	u64_stats_update_end(&tx_stats->syncp);
+ 
++	/* Also update the per-CPU stats */
++	u64_stats_update_begin(&pcpu_stats->syncp);
++	pcpu_stats->tx_packets++;
++	pcpu_stats->tx_bytes += len;
++	u64_stats_update_end(&pcpu_stats->syncp);
++
+ tx_busy:
+ 	if (netif_tx_queue_stopped(net_txq) && mana_can_tx(gdma_sq)) {
+ 		netif_tx_wake_queue(net_txq);
+@@ -425,6 +434,9 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ 	kfree(pkg.sgl_ptr);
+ tx_drop_count:
+ 	ndev->stats.tx_dropped++;
++	u64_stats_update_begin(&pcpu_stats->syncp);
++	pcpu_stats->tx_dropped++;
++	u64_stats_update_end(&pcpu_stats->syncp);
+ tx_drop:
+ 	dev_kfree_skb_any(skb);
+ 	return NETDEV_TX_OK;
+@@ -1505,6 +1517,8 @@ static void mana_rx_skb(void *buf_va, bool from_pool,
+ 	struct mana_stats_rx *rx_stats = &rxq->stats;
+ 	struct net_device *ndev = rxq->ndev;
+ 	uint pkt_len = cqe->ppi[0].pkt_len;
++	struct mana_pcpu_stats *pcpu_stats;
++	struct mana_port_context *apc;
+ 	u16 rxq_idx = rxq->rxq_idx;
+ 	struct napi_struct *napi;
+ 	struct xdp_buff xdp = {};
+@@ -1512,6 +1526,9 @@ static void mana_rx_skb(void *buf_va, bool from_pool,
+ 	u32 hash_value;
+ 	u32 act;
+ 
++	apc = netdev_priv(ndev);
++	pcpu_stats = this_cpu_ptr(apc->pcpu_stats);
++
+ 	rxq->rx_cq.work_done++;
+ 	napi = &rxq->rx_cq.napi;
+ 
+@@ -1570,6 +1587,11 @@ static void mana_rx_skb(void *buf_va, bool from_pool,
+ 		rx_stats->xdp_tx++;
+ 	u64_stats_update_end(&rx_stats->syncp);
+ 
++	u64_stats_update_begin(&pcpu_stats->syncp);
++	pcpu_stats->rx_packets++;
++	pcpu_stats->rx_bytes += pkt_len;
++	u64_stats_update_end(&pcpu_stats->syncp);
++
+ 	if (act == XDP_TX) {
+ 		skb_set_queue_mapping(skb, rxq_idx);
+ 		mana_xdp_tx(skb, ndev);
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+index ab2413d71f6c..e3aa47ead601 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+@@ -83,8 +83,9 @@ static int mana_get_sset_count(struct net_device *ndev, int stringset)
+ 	if (stringset != ETH_SS_STATS)
+ 		return -EINVAL;
+ 
+-	return ARRAY_SIZE(mana_eth_stats) + num_queues *
+-				(MANA_STATS_RX_COUNT + MANA_STATS_TX_COUNT);
++	return ARRAY_SIZE(mana_eth_stats) +
++	       (num_queues * (MANA_STATS_RX_COUNT + MANA_STATS_TX_COUNT)) +
++	       (num_present_cpus() * (MANA_STATS_RX_PCPU + MANA_STATS_TX_PCPU));
+ }
+ 
+ static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
+@@ -139,6 +140,19 @@ static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
+ 		sprintf(p, "tx_%d_mana_map_err", i);
+ 		p += ETH_GSTRING_LEN;
+ 	}
++
++	for (i = 0; i < num_present_cpus(); i++) {
++		sprintf(p, "cpu%d_rx_packets", i);
++		p += ETH_GSTRING_LEN;
++		sprintf(p, "cpu%d_rx_bytes", i);
++		p += ETH_GSTRING_LEN;
++		sprintf(p, "cpu%d_tx_packets", i);
++		p += ETH_GSTRING_LEN;
++		sprintf(p, "cpu%d_tx_bytes", i);
++		p += ETH_GSTRING_LEN;
++		sprintf(p, "cpu%d_tx_dropped", i);
++		p += ETH_GSTRING_LEN;
++	}
+ }
+ 
+ static void mana_get_ethtool_stats(struct net_device *ndev,
+@@ -222,6 +236,28 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
+ 		data[i++] = csum_partial;
+ 		data[i++] = mana_map_err;
+ 	}
++
++	for_each_possible_cpu(q) {
++		const struct mana_pcpu_stats *pcpu_stats =
++				per_cpu_ptr(apc->pcpu_stats, q);
++		u64 rx_packets, rx_bytes, tx_packets, tx_bytes, tx_dropped;
++		unsigned int start;
++
++		do {
++			start = u64_stats_fetch_begin(&pcpu_stats->syncp);
++			rx_packets = pcpu_stats->rx_packets;
++			tx_packets = pcpu_stats->tx_packets;
++			rx_bytes = pcpu_stats->rx_bytes;
++			tx_bytes = pcpu_stats->tx_bytes;
++			tx_dropped = pcpu_stats->tx_dropped;
++		} while (u64_stats_fetch_retry(&pcpu_stats->syncp, start));
++
++		data[i++] = rx_packets;
++		data[i++] = rx_bytes;
++		data[i++] = tx_packets;
++		data[i++] = tx_bytes;
++		data[i++] = tx_dropped;
++	}
+ }
+ 
+ static int mana_get_rxnfc(struct net_device *ndev, struct ethtool_rxnfc *cmd,
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 76147feb0d10..9a2414ee7f02 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -51,6 +51,8 @@ enum TRI_STATE {
+ /* Update this count whenever the respective structures are changed */
+ #define MANA_STATS_RX_COUNT 5
+ #define MANA_STATS_TX_COUNT 11
++#define MANA_STATS_RX_PCPU 2
++#define MANA_STATS_TX_PCPU 3
+ 
+ struct mana_stats_rx {
+ 	u64 packets;
+@@ -386,6 +388,15 @@ struct mana_ethtool_stats {
+ 	u64 rx_cqe_unknown_type;
+ };
+ 
++struct mana_pcpu_stats {
++	u64 rx_packets;
++	u64 rx_bytes;
++	u64 tx_packets;
++	u64 tx_bytes;
++	u64 tx_dropped;
++	struct u64_stats_sync syncp;
++};
++
+ struct mana_context {
+ 	struct gdma_dev *gdma_dev;
+ 
+@@ -449,6 +460,7 @@ struct mana_port_context {
+ 	bool port_st_save; /* Saved port state */
+ 
+ 	struct mana_ethtool_stats eth_stats;
++	struct mana_pcpu_stats __percpu *pcpu_stats;
+ };
+ 
+ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev);
+-- 
+2.34.1
 
 
