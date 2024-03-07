@@ -1,100 +1,118 @@
-Return-Path: <netdev+bounces-78427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44DAF87510E
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:56:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62CF5875131
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 15:03:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F050F1F21AB3
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 13:56:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AD782877D3
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEAF012D1F9;
-	Thu,  7 Mar 2024 13:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A5C12EBCB;
+	Thu,  7 Mar 2024 14:02:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="1cVUVPMR"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26015F86B;
-	Thu,  7 Mar 2024 13:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB73412E1FA;
+	Thu,  7 Mar 2024 14:02:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709819804; cv=none; b=uRNb0MTXqRB0+PZqQhs53L8BA8u9026xwqECMHddWPoDvPY6DaBvaR2+j4Cgf30KXPTuJdp05hSnickPaAp0U8/EnuYbCZjZIX7TeD8KBvYjtwENnm8BODubRBRA1/X8XAX/5UH8T6a65l9f5xpkr2tVVUeM/tbG2EErKmWIhwI=
+	t=1709820175; cv=none; b=Vr7G+bXpYQVVg8WjIcHjdPLYqOq3d4lgiMnqNt3nOZhbbk4bENmhqk2QagTqEvXlsq9qMo6Jd6kZ9w1A9MNHMvYlrxSR/N1dYNcGSM4dyXr2n3pfcbgSd7m+0EhjOkxRwjmo97fHrY1aVOqilcJ1gIfAaKCM+SK538hfljfqL1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709819804; c=relaxed/simple;
-	bh=eZunBR5IonjfmCLeU/OwM5mH/pBJdEWF78x9j91cTus=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=UwTSJbYenCYLZNOkOQffzCElPFYWn9j3O7im852Yl3iC9GSqaQgMKdVC2UMbfzsgbit9zork4a0lnZYzXXlAy+JwZtlpWkNtOmWtWouN8c1+sjsP1wjY8Df8xTr6dlABjFLr9OcIVX3h4/QQJaWYQqAYpYf6CK//CY89cninKYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Tr9lD5RKGz1h1ZX;
-	Thu,  7 Mar 2024 21:54:16 +0800 (CST)
-Received: from kwepemd100009.china.huawei.com (unknown [7.221.188.135])
-	by mail.maildlp.com (Postfix) with ESMTPS id ABF311A016E;
-	Thu,  7 Mar 2024 21:56:38 +0800 (CST)
-Received: from [10.67.109.184] (10.67.109.184) by
- kwepemd100009.china.huawei.com (7.221.188.135) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 7 Mar 2024 21:56:38 +0800
-Message-ID: <b4516819-8cc7-46eb-b4ea-9ffd1a0c51e6@huawei.com>
-Date: Thu, 7 Mar 2024 21:56:37 +0800
+	s=arc-20240116; t=1709820175; c=relaxed/simple;
+	bh=buSnnVcPm9q1IGlVOeLRFi6yISTc1DhJcXxXAaJLJPk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=duKy+Bo5Lx2siOZo5Plsr5zATXAIllYbDlEt3KMnaWcJYqZOuZu7VSZD4Nnxb+1hXIHg6IaRgHOmEFSrVNwpY3NDYdmd4HspYEsOEi5YOny6sCHFqVIB3xKF0MktFN/q+GW/3MQzUyS7zCd2OGIDSIz/H/l3JmNvUiSqq5ZdBxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=1cVUVPMR; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4279qDL1004218;
+	Thu, 7 Mar 2024 15:02:23 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=selector1; bh=gxYbWB4
+	fXb38xLpOEzgo56z8fvAXCuQ7VDTmsUnu2Mo=; b=1cVUVPMRBeF/QwnpIahXUla
+	MF6PHZtiUba895i14rt1G4DoQT4SFrxPqt5ak9XBOW2yp3zpobqP4PiTkMARpoge
+	GYJG7jUHdw0TkxcqOUaMi5a3XVlTukqvtyysXrS6eXVckTe4ii9AIwEgNtbJ+XHz
+	P8a/Dqlc9mz6xOJsYesPGAhDcQBFTb9kQfwp+Qivsl/AvTHlFtTPgng3BCsqw0sD
+	R8HGKyjPeUW8rmBomlyHu9c/pSa2Q7Jg+/v//kjQ/T6mpvNXU5/cj2mDRudSbCVx
+	kunb+d0OljShFcG/N7C3h13TUztJiUz8+R4X6U3TH7gpsw4sptd6IiRuyKO9/Vg=
+	=
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3wmej5dxs4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Mar 2024 15:02:23 +0100 (CET)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 0509E40044;
+	Thu,  7 Mar 2024 15:02:18 +0100 (CET)
+Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 6100327D0FC;
+	Thu,  7 Mar 2024 15:01:10 +0100 (CET)
+Received: from localhost (10.201.21.128) by SHFDAG1NODE2.st.com (10.75.129.70)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 7 Mar
+ 2024 15:01:09 +0100
+From: Christophe Roullier <christophe.roullier@foss.st.com>
+To: "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+        Mark
+ Brown <broonie@kernel.org>,
+        Christophe Roullier
+	<christophe.roullier@foss.st.com>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2 0/2] Add properties in dwmac-stm32 documentation
+Date: Thu, 7 Mar 2024 14:59:55 +0100
+Message-ID: <20240307135957.303481-1-christophe.roullier@foss.st.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf 1/2] xdp, bonding: Fix feature flags when there are no
- slave devs anymore
-Content-Language: en-US
-To: Daniel Borkmann <daniel@iogearbox.net>
-CC: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<magnus.karlsson@intel.com>, <prbatra.mail@gmail.com>, <toke@redhat.com>,
-	<kuba@kernel.org>
-References: <20240305090829.17131-1-daniel@iogearbox.net>
- <170968502778.5704.4519517843918140180.git-patchwork-notify@kernel.org>
-From: Pu Lehui <pulehui@huawei.com>
-In-Reply-To: <170968502778.5704.4519517843918140180.git-patchwork-notify@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemd100009.china.huawei.com (7.221.188.135)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE2.st.com
+ (10.75.129.70)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-07_08,2024-03-06_01,2023-05-22_02
 
+Introduce 2 new properties in dwamc-stm32 documentation
 
-On 2024/3/6 8:30, patchwork-bot+netdevbpf@kernel.org wrote:
-> Hello:
-> 
-> This series was applied to bpf/bpf.git (master)
-> by Alexei Starovoitov <ast@kernel.org>:
-> 
-> On Tue,  5 Mar 2024 10:08:28 +0100 you wrote:
->> Commit 9b0ed890ac2a ("bonding: do not report NETDEV_XDP_ACT_XSK_ZEROCOPY")
->> changed the driver from reporting everything as supported before a device
->> was bonded into having the driver report that no XDP feature is supported
->> until a real device is bonded as it seems to be more truthful given
->> eventually real underlying devices decide what XDP features are supported.
->>
->> The change however did not take into account when all slave devices get
->> removed from the bond device. In this case after 9b0ed890ac2a, the driver
->> keeps reporting a feature mask of 0x77, that is, NETDEV_XDP_ACT_MASK &
->> ~NETDEV_XDP_ACT_XSK_ZEROCOPY whereas it should have reported a feature
->> mask of 0.
->>
->> [...]
-> 
-> Here is the summary with links:
->    - [bpf,1/2] xdp, bonding: Fix feature flags when there are no slave devs anymore
->      https://git.kernel.org/bpf/bpf/c/f267f2628150
->    - [bpf,2/2] selftests/bpf: Fix up xdp bonding test wrt feature flags
->      https://git.kernel.org/bpf/bpf/c/0bfc0336e134
+ - phy-supply: to manage PHY regulator.
+ - st,ext-phyclk: is present since 2020 in driver so need to explain
+   it and avoid dtbs check issue : views/kernel/upstream/net-next/arch/arm/boot/dts/st/stm32mp157c-dk2.dtb: 
+ethernet@5800a000: Unevaluated properties are not allowed 
+('st,ext-phyclk' was unexpected) 
 
-I had encountered the same issue during riscv bpf selftest regression. 
-Happy to see this fixes.
+Christophe Roullier (2):
+  dt-bindings: net: add phy-supply property for stm32
+  dt-bindings: net: add new property st,ext-phyclk in documentation for
+    stm32
 
-> 
-> You are awesome, thank you!
+ Documentation/devicetree/bindings/net/stm32-dwmac.yaml | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+-- 
+2.25.1
+
 
