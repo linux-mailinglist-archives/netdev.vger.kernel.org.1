@@ -1,102 +1,99 @@
-Return-Path: <netdev+bounces-78356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D11EB874C36
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:21:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D47F9874C78
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:35:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59AF9B23F32
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:21:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 735FD1F238D3
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:35:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E7285276;
-	Thu,  7 Mar 2024 10:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40883DDC9;
+	Thu,  7 Mar 2024 10:35:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ttw7ww5y"
+	dkim=pass (2048-bit key) header.d=softline.com header.i=@softline.com header.b="OJ6F57S5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail03.softline.ru (mail03.softline.ru [185.31.132.229])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB571EEE6;
-	Thu,  7 Mar 2024 10:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E233185636;
+	Thu,  7 Mar 2024 10:35:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.31.132.229
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709806831; cv=none; b=hLPvTqH/mhbbNaSHTIidsWIclVkpYvsHPYEVVX5teQ4067r5GG+jICRg1BspwNRK9QN/YWFVhaKFe+aOnwrKIycIkaF4CsmNFjFY6pgC4KxS37Rc0AJD1FU/KJtr5jtAObk1ze15hZllmMZH6njv38WjB+OF9j7G3oM7SAUcvBQ=
+	t=1709807724; cv=none; b=Vr6tSzNalLH/76cu/ZZAfjQx13qIm2C9h/ydF3zeWlVVYl3R9ZuL+LjXVItXCpZdu9uJBBd3IGc10LiipPxgTn5zW6Ux/xlkpYvlMd8BL7oq5U/531wdnZXNjHzxygBEUoVBQfsliBmQe+JfdG/NZlCVuX2MjxLUHTLBXK1D7Ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709806831; c=relaxed/simple;
-	bh=u43Ll0cUlDP5oSFIx0/nXfUKDYLk2iLHFT+MSRWlBrE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bLtEwAnXLXsMIvMFYUtgvxmtBilegl2WY9WVWYOSgbKG98i4KpM8qOQj3Q9q+jry3rS7ottjWQrj4PRDIImd5b/9TzDKZ2QhEES1GfM0FbLSxkwJjn5nbXxGYLkWgSRJltJoTjXKG03x/RfUaATZMhN1EkSp9pdgTTKJu3FrItk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ttw7ww5y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6E8BFC433C7;
-	Thu,  7 Mar 2024 10:20:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709806830;
-	bh=u43Ll0cUlDP5oSFIx0/nXfUKDYLk2iLHFT+MSRWlBrE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ttw7ww5yGQ8TqD+HZgDU65tOF6LqtgUh/mlc2ngx/BYjWmm6B+SfvAEKz2pWjU6uH
-	 F6aeMPzTs9bSG2/BL5eh/WE+Cg9noS7uwxXfW2Bc8MCkj3bGW8mRNFgWrqhVYqpUfn
-	 02//NnoV3JpQNlqeQ5AeG/Tcp1/NFOmp2BC9w7iJGooGg0SFw/LQT8sS0XrJZmL104
-	 z5Gyb+aOIEB8GZQlUvqDXtUneNuVT1ctE93CIZuP/J7rmZ7Z/ltFK+HYTgHOAIJ6Lu
-	 cL/NS5QQ71B4936kvy6PKquJLBeIzsjqA150MRQQIUaAskkG88iYUPdzqIgYdYQK4H
-	 TNtlcGzV1mqmQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5914DC3274B;
-	Thu,  7 Mar 2024 10:20:30 +0000 (UTC)
+	s=arc-20240116; t=1709807724; c=relaxed/simple;
+	bh=GGNVKkgS6wBOf0BqLNzDi9ywxg4mj96PUG/i4B1ak6c=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=QrVf0OViThWTTIXpq8VixQqu1PCbzCbkoK+9kzI0wlX/O9hoE1MXjdblibjTJByUcbPpm13bYtItUcSWNcKQ8WQyexENLZSAgK4VsiH7gpLmfSvhatE2d+dOQl6KZN+BxLRpa3OjaggkWncDExjSUndbxXOZDnJpqKizZcSoYdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=softline.com; spf=pass smtp.mailfrom=softline.com; dkim=pass (2048-bit key) header.d=softline.com header.i=@softline.com header.b=OJ6F57S5; arc=none smtp.client-ip=185.31.132.229
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=softline.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=softline.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=softline.com;
+	s=relay; t=1709806874;
+	bh=GGNVKkgS6wBOf0BqLNzDi9ywxg4mj96PUG/i4B1ak6c=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=OJ6F57S5Q59/pbEAPruMYxu53IuGUxT+pZEuzRfiqqYEOvO4B+vf0DHIiL8KOkj2s
+	 9XSWMZUNrwTg71MVBhyCelgvoa3G/cpcH9+/VcokM/DBZdyAEEQHb+zMKoTJNeCTuy
+	 tODdgMesu3PPfGB5C3hhxgCq6m5p3B9Wu/NQNplapGeUbyh19cMUO4lRfqw6g5OrNR
+	 2xo+Q0cNlpyQ6wRyeOPJcC6EYCj5Hb1vZZUlL4OpateJc2rtvW85kxn128YJ8n8mn0
+	 NBsjERpSr6yBvqNTXV7zLZ764dACswt8bPbd03zsxWTzXQUGxfKENr+tK3DR0CVDd4
+	 ECWZlHm12kqzw==
+From: "Antipov, Dmitriy" <Dmitriy.Antipov@softline.com>
+To: "dmantipov@yandex.ru" <dmantipov@yandex.ru>, "gbayer@linux.ibm.com"
+	<gbayer@linux.ibm.com>, "guwen@linux.alibaba.com" <guwen@linux.alibaba.com>,
+	"wenjia@linux.ibm.com" <wenjia@linux.ibm.com>, "jaka@linux.ibm.com"
+	<jaka@linux.ibm.com>
+CC: "lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [lvc-project] [PATCH] [RFC] net: smc: fix fasync leak in
+ smc_release()
+Thread-Topic: [lvc-project] [PATCH] [RFC] net: smc: fix fasync leak in
+ smc_release()
+Thread-Index: AQHaZNb+eL3YMOb6v02FhrfSeOr3x7EXFu4AgBCQ6wCAAwYsAIAAOGyAgAEJXgCAAAaTAA==
+Date: Thu, 7 Mar 2024 10:21:13 +0000
+Message-ID: <4a65f2f04d502a770627ccaacd099fd6a9d7f43a.camel@softline.com>
+References: <20240221051608.43241-1-dmantipov@yandex.ru>
+	 <819353f3-f5f9-4a15-96a1-4f3a7fd6b33e@linux.alibaba.com>
+	 <659c7821842fca97513624b713ced72ab970cdfc.camel@softline.com>
+	 <19d7d71b-c911-45cc-9671-235d98720be6@linux.alibaba.com>
+	 <380043fa-3208-4856-92b1-be9c87caeeb6@yandex.ru>
+	 <2c9c9ffe-13c4-44b8-982a-a3b4070b8a11@linux.alibaba.com>
+	 <35584a9f-f4c2-423a-8bb8-2c729cedb6fe@yandex.ru>
+	 <93077cee-b81a-4690-9aa8-cc954f9be902@linux.ibm.com>
+In-Reply-To: <93077cee-b81a-4690-9aa8-cc954f9be902@linux.ibm.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
 Content-Type: text/plain; charset="utf-8"
+Content-ID: <2D33CF9DDBD4A8439D8844099EC38E68@softline.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/5] netfilter: nf_tables: disallow anonymous set with
- timeout flag
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170980683036.8281.10281573201075981874.git-patchwork-notify@kernel.org>
-Date: Thu, 07 Mar 2024 10:20:30 +0000
-References: <20240307021545.149386-2-pablo@netfilter.org>
-In-Reply-To: <20240307021545.149386-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
-
-On Thu,  7 Mar 2024 03:15:41 +0100 you wrote:
-> Anonymous sets are never used with timeout from userspace, reject this.
-> Exception to this rule is NFT_SET_EVAL to ensure legacy meters still work.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 761da2935d6e ("netfilter: nf_tables: add set timeout API support")
-> Reported-by: lonial con <kongln9170@gmail.com>
-> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,1/5] netfilter: nf_tables: disallow anonymous set with timeout flag
-    https://git.kernel.org/netdev/net/c/16603605b667
-  - [net,2/5] netfilter: nf_tables: reject constant set with timeout
-    https://git.kernel.org/netdev/net/c/5f4fc4bd5cdd
-  - [net,3/5] netfilter: nft_ct: fix l3num expectations with inet pseudo family
-    https://git.kernel.org/netdev/net/c/99993789966a
-  - [net,4/5] netfilter: nf_tables: mark set as dead when unbinding anonymous set with timeout
-    https://git.kernel.org/netdev/net/c/552705a3650b
-  - [net,5/5] netfilter: nf_conntrack_h323: Add protection for bmp length out of range
-    https://git.kernel.org/netdev/net/c/767146637efc
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+T24gVGh1LCAyMDI0LTAzLTA3IGF0IDEwOjU3ICswMTAwLCBKYW4gS2FyY2hlciB3cm90ZToNCg0K
+PiBXZSB0aGluayBpdCBtaWdodCBiZSBhbiBvcHRpb24gdG8gc2VjdXJlIHRoZSBwYXRoIGluIHRo
+aXMgZnVuY3Rpb24gd2l0aCANCj4gdGhlIHNtYy0+Y2xjc29ja19yZWxlYXNlX2xvY2suDQo+IA0K
+PiBgYGANCj4gCWxvY2tfc29jaygmc21jLT5zayk7DQo+IAlpZiAoc21jLT51c2VfZmFsbGJhY2sp
+IHsNCj4gCQlpZiAoIXNtYy0+Y2xjc29jaykgew0KPiAJCQlyZWxlYXNlX3NvY2soJnNtYy0+c2sp
+Ow0KPiAJCQlyZXR1cm4gLUVCQURGOw0KPiAJCX0NCj4gKwkJbXV0ZXhfbG9jaygmc21jLT5jbGNz
+b2NrX3JlbGVhc2VfbG9jayk7DQo+IAkJYW5zdyA9IHNtYy0+Y2xjc29jay0+b3BzLT5pb2N0bChz
+bWMtPmNsY3NvY2ssIGNtZCwgYXJnKTsNCj4gKwkJbXV0ZXhfdW5sb2NrKCZzbWMtPmNsY3NvY2tf
+cmVsZWFzZV9sb2NrKTsNCj4gCQlyZWxlYXNlX3NvY2soJnNtYy0+c2spOw0KPiAJCXJldHVybiBh
+bnN3Ow0KPiAJfQ0KPiBgYGANCj4gDQo+IFdoYXQgZG8geW8gdGhpbmsgYWJvdXQgdGhpcz8NCg0K
+WW91J3JlIHRyeWluZyB0byBmaXggaXQgb24gdGhlIHdyb25nIHBhdGguIEZJT0FTWU5DIGlzIGEg
+Z2VuZXJpYyByYXRoZXINCnRoYW4gcHJvdG9jb2wtc3BlY2lmaWMgdGhpbmcuIFNvIHVzZXJzcGFj
+ZSAnaW9jdGwoc29jaywgRklPQVNZTkMsIFtdKScNCmNhbGwgaXMgaGFuZGxlZCB3aXRoOg0KDQot
+PiBzeXNfaW9jdGwoKQ0KICAtPiBkb192ZnNfaW9jdGwoKQ0KICAgIC0+IGlvY3RsX2Zpb2FzeW5j
+KCkNCiAgICAgIC0+IGZpbHAtPmZfb3AtPmZhc3luYygpICh3aGljaCBpcyBzb2NrX2Zhc3luYygp
+IGZvciBhbGwgc29ja2V0cykNCg0KcmF0aGVyIHRoYW4gJ3NvY2stPm9wcy0+aW9jdGwoLi4uKScu
+DQoNCkRtaXRyeQ0KDQo=
 
