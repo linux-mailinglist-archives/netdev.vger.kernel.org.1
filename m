@@ -1,151 +1,205 @@
-Return-Path: <netdev+bounces-78294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5DEB874A45
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:00:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 358ED874A3D
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:59:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54EC61F21E82
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:00:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C5271C22281
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:59:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C157E82D7E;
-	Thu,  7 Mar 2024 09:00:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C30657D5;
+	Thu,  7 Mar 2024 08:59:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="mA6RNssZ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZmFAUEgm"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA891C2A3;
-	Thu,  7 Mar 2024 09:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D371C2A3;
+	Thu,  7 Mar 2024 08:59:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709802034; cv=none; b=i/o+oAilu9nGYMSpKASCyURGKtW7p69k9ZdTt0CR41FB/xaFiWElgSI8FJpWOYpCWTeoYxx0SFHuxCNN6IZaz+yxlXdZRfatzwrwgkldVGQPvbvsOAYG+Za6wpaSqoVTf9o/4glgvbNxQ917Pabg7G0FWGYBOs+ktWjM4cKnF5A=
+	t=1709801947; cv=none; b=JWSqMH0Os3tsII/RWfS3JL0zWWlU6bMh4UyyJqHwg3mLhjbDJbzr8TtbW+Ru0/NvvriHJloWpdIJtac67mwyaMvQnhgOL3vVanb0p8RRaPyupRF3A+B/xI4W4buDVc7FadaFFrm5n/YUYZE/ssYiICTP1vUoyAOmbMmyn8WQ3ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709802034; c=relaxed/simple;
-	bh=D+XnBoUlNb13Suw1Ih1OgTg0q9gGXzYmZySZbHByTx0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kFFBhFpObAg3VcRUFV0R8hjEo+DPJTdd9Mc92qTgE95SvKaLcY9EZmYJlVHTW04znPmk8W9rb3vbsT4SfatN+CIyEhUo5NarLeDT+2HBbv5SFeu7SPA9sF3TTpaQrzUV2zEjuAsyBKJEOnfnHS6EkYcK8BtseUA/hDTHcIZB128=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=mA6RNssZ; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1709802033; x=1741338033;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=D+XnBoUlNb13Suw1Ih1OgTg0q9gGXzYmZySZbHByTx0=;
-  b=mA6RNssZ4WJ4j2tb0jwdiLPYifUrWUyxeJzJ2ORf9eQZ4tfsVtf9QhoW
-   yKNVuK655QxhME9CHXYE1eh7q6FOwRYoGk1exjpSk7fGGUImCGLVcv8gp
-   3reA1Hlyc1Zp4e0eVaszwbTZJlfx3b2t9I4XqShM+QuPKdLWqmBqGFwnQ
-   abFPuPb5Z0nLYo1Ej5/CgfxccFNfhKPLz5aqafCAK/Ax1L2jcP2Xf4jh8
-   pvKuE8Hp6sK7XCN2gjN8DxCtECc2mpWZkdiezimm3Y8z7+Kf0tbtudbCX
-   ZJvAjFnKKyRLDGLz4Whi3hvNGy4NHtnVr5/c0N+FjPYVBGcr6SvdKr7fB
-   w==;
-X-CSE-ConnectionGUID: horeqPc5Q2+8sq6TPMg6+Q==
-X-CSE-MsgGUID: MAW95ikoRainf7EPVGLaSw==
-X-IronPort-AV: E=Sophos;i="6.06,211,1705388400"; 
-   d="scan'208";a="248099943"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Mar 2024 02:00:25 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 7 Mar 2024 02:00:21 -0700
-Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Thu, 7 Mar 2024 02:00:18 -0700
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <linux-kernel@vger.kernel.org>,
-	<bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>
-Subject: [PATCH net] net: lan743x: Add set RFE read fifo threshold for PCI1x1x chips
-Date: Thu, 7 Mar 2024 14:28:23 +0530
-Message-ID: <20240307085823.403831-1-Raju.Lakkaraju@microchip.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1709801947; c=relaxed/simple;
+	bh=MCYgMGtQJtqVbRnKxbazUlx9MGSIM/WNDXib9Lpb9HA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H2TTxrCJDFfZ61oabMVOqbzCsnZSsf+QzIWmIcXdVUDg6h13MvMN9wS37spUWCRdyTz3+wzPrWrw51QkbsUwO6b2s4ZDXgf3Vnk63T7CoNw2qd8j9yNKieG8mcrMBzcK5233VOj0ZV1i1+iFvsGbA+QnWs6mVZPLSKhOmGa9tMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZmFAUEgm; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4278W8Ed019975;
+	Thu, 7 Mar 2024 08:59:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Xv/Q0bS2Hu0DTbKJ03ULvckczUzm75J7LZWmXWcXLZg=;
+ b=ZmFAUEgm4bAvz9pQsQOx1v+YvK5fVhEDfo/3DD4XpirEAQh3CilA49yEUuUaVJpgO+XK
+ OgQ2P63NppbXoAzFu6Fzu//9H7AHDjVXXYXcJA9TUTPLmU9xlYNUlM3QeSWYHa5jrD0U
+ atkcYytkGdhgchWtCtHQOIGMa+7zNYsTQlwSOfHoTMKs5TED9cyFhZAp23dChoT6BqPl
+ xza3vf34rUWnbHQ36Lk+dgF2Jv4oGlMxFQ9/3jx873gstr1MpOx769kVJo5oNFEPXb2N
+ p5vpKw5R3xSGCK2qLutk2wGfSQ+4qdOy50ygD+OYDbqA7O+pGLLD1//yzP2wh1GgwNv0 tA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wqa5bgkrt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Mar 2024 08:59:01 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4278fbRl008404;
+	Thu, 7 Mar 2024 08:59:01 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wqa5bgkfb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Mar 2024 08:59:00 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4276N4Io031530;
+	Thu, 7 Mar 2024 08:58:55 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wmgnkc4bn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Mar 2024 08:58:55 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4278wpWr28049968
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 7 Mar 2024 08:58:53 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A8FD42004D;
+	Thu,  7 Mar 2024 08:58:51 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8A1442004B;
+	Thu,  7 Mar 2024 08:58:51 +0000 (GMT)
+Received: from [9.152.224.118] (unknown [9.152.224.118])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  7 Mar 2024 08:58:51 +0000 (GMT)
+Message-ID: <6e62fdbf-a5d1-4650-b0b1-2a2698ed2040@linux.ibm.com>
+Date: Thu, 7 Mar 2024 09:58:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [lvc-project] [PATCH] [RFC] net: smc: fix fasync leak in
+ smc_release()
+To: Dmitry Antipov <dmantipov@yandex.ru>, Wen Gu <guwen@linux.alibaba.com>,
+        "wenjia@linux.ibm.com" <wenjia@linux.ibm.com>
+Cc: "lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20240221051608.43241-1-dmantipov@yandex.ru>
+ <819353f3-f5f9-4a15-96a1-4f3a7fd6b33e@linux.alibaba.com>
+ <659c7821842fca97513624b713ced72ab970cdfc.camel@softline.com>
+ <19d7d71b-c911-45cc-9671-235d98720be6@linux.alibaba.com>
+ <380043fa-3208-4856-92b1-be9c87caeeb6@yandex.ru>
+ <2c9c9ffe-13c4-44b8-982a-a3b4070b8a11@linux.alibaba.com>
+ <35584a9f-f4c2-423a-8bb8-2c729cedb6fe@yandex.ru>
+From: Jan Karcher <jaka@linux.ibm.com>
+Organization: IBM - Network Linux on Z
+In-Reply-To: <35584a9f-f4c2-423a-8bb8-2c729cedb6fe@yandex.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ngf_jF_Cztk3SP8HgUlA7c8spmmYwxYj
+X-Proofpoint-ORIG-GUID: 1S1W1LwGtL_ecY16gINa2UoE3QKNwzEB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-07_05,2024-03-06_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 malwarescore=0 clxscore=1015 adultscore=0 impostorscore=0
+ mlxlogscore=999 suspectscore=0 phishscore=0 priorityscore=1501 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2403070064
 
-The RFE (Receive Filtering Engine) read fifo threshold hardware default should
-be overwritten to 3 for PCI1x1x Rev B0 devices to prevent lockup during some
-stress tests using frames that include VLAN tags.
-Rev C0 and later hardware already defaults to 3.
 
-Fixes: bb4f6bffe33c ("net: lan743x: Add PCI11010 / PCI11414 device IDs")
-Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
----
- drivers/net/ethernet/microchip/lan743x_main.c | 17 +++++++++++++++++
- drivers/net/ethernet/microchip/lan743x_main.h |  5 +++++
- 2 files changed, 22 insertions(+)
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-index 45e209a7d083..aec2d100ab87 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.c
-+++ b/drivers/net/ethernet/microchip/lan743x_main.c
-@@ -3272,6 +3272,22 @@ static void lan743x_full_cleanup(struct lan743x_adapter *adapter)
- 	lan743x_pci_cleanup(adapter);
- }
- 
-+static int pci11x1x_set_rfe_rd_fifo_threshold(struct lan743x_adapter *adapter)
-+{
-+	u16 rev = adapter->csr.id_rev & ID_REV_CHIP_REV_MASK_;
-+
-+	if (rev == ID_REV_CHIP_REV_PCI11X1X_B0_) {
-+		int misc_ctl;
-+
-+		misc_ctl = lan743x_csr_read(adapter, MISC_CTL_0);
-+		misc_ctl &= ~MISC_CTL_0_RFE_READ_FIFO_MASK_;
-+		misc_ctl |= (0x3 << MISC_CTL_0_RFE_READ_FIFO_SHIFT_);
-+		lan743x_csr_write(adapter, MISC_CTL_0, misc_ctl);
-+	}
-+
-+	return 0;
-+}
-+
- static int lan743x_hardware_init(struct lan743x_adapter *adapter,
- 				 struct pci_dev *pdev)
- {
-@@ -3287,6 +3303,7 @@ static int lan743x_hardware_init(struct lan743x_adapter *adapter,
- 		pci11x1x_strap_get_status(adapter);
- 		spin_lock_init(&adapter->eth_syslock_spinlock);
- 		mutex_init(&adapter->sgmii_rw_lock);
-+		pci11x1x_set_rfe_rd_fifo_threshold(adapter);
- 	} else {
- 		adapter->max_tx_channels = LAN743X_MAX_TX_CHANNELS;
- 		adapter->used_tx_channels = LAN743X_USED_TX_CHANNELS;
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
-index be79cb0ae5af..be0fe52e2ae1 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.h
-+++ b/drivers/net/ethernet/microchip/lan743x_main.h
-@@ -26,6 +26,7 @@
- #define ID_REV_CHIP_REV_MASK_		(0x0000FFFF)
- #define ID_REV_CHIP_REV_A0_		(0x00000000)
- #define ID_REV_CHIP_REV_B0_		(0x00000010)
-+#define ID_REV_CHIP_REV_PCI11X1X_B0_	(0x000000B0)
- 
- #define FPGA_REV			(0x04)
- #define FPGA_REV_GET_MINOR_(fpga_rev)	(((fpga_rev) >> 8) & 0x000000FF)
-@@ -311,6 +312,10 @@
- #define SGMII_CTL_LINK_STATUS_SOURCE_	BIT(8)
- #define SGMII_CTL_SGMII_POWER_DN_	BIT(1)
- 
-+#define MISC_CTL_0			(0x920)
-+#define MISC_CTL_0_RFE_READ_FIFO_MASK_	GENMASK(6, 4)
-+#define MISC_CTL_0_RFE_READ_FIFO_SHIFT_	(4)
-+
- /* Vendor Specific SGMII MMD details */
- #define SR_VSMMD_PCS_ID1		0x0004
- #define SR_VSMMD_PCS_ID2		0x0005
--- 
-2.34.1
+On 06/03/2024 19:07, Dmitry Antipov wrote:
+> 
+> Well, the whole picture is somewhat more complicated. Consider the
+> following diagram (an underlying kernel socket is in [], e.g. [smc->sk]):
+> 
+> Thread 0                        Thread 1
+> 
+> ioctl(sock, FIOASYNC, [1])
+> ...
+> sock = filp->private_data;
+> lock_sock(sock [smc->sk]);
+> sock_fasync(sock, ..., 1)       ; new fasync_struct linked to smc->sk
+> release_sock(sock [smc->sk]);
+>                                  ...
+>                                  lock_sock([smc->sk]);
+>                                  ...
+>                                  smc_switch_to_fallback()
+>                                  ...
+>                                  smc->clcsock->file->private_data = 
+> smc->clcsock;
+>                                  ...
+>                                  release_sock([smc->sk]);
+> ioctl(sock, FIOASYNC, [0])
+> ...
+> sock = filp->private_data;
+> lock_sock(sock [smc->clcsock]);
+> sock_fasync(sock, ..., 0)       ; nothing to unlink from smc->clcsock
+>                                  ; since fasync entry was linked to smc->sk
+> release_sock(sock [smc->clcsock]);
+>                                  ...
+>                                  close(sock [smc->clcsock]);
+>                                  __fput(...);
+>                                  file->f_op->fasync(sock, [0])   ; 
+> always failed -
+>                                                                  ; 
+> should use
+>                                                                  ; 
+> smc->sk instead
+>                                  file->f_op->release()
+>                                     ...
+>                                     smc_restore_fallback_changes()
+>                                     ...
+>                                     file->private_data = smc->sk.sk_socket;
 
+Thank you Dmitry for your detailed explanations.
+It helped me a lot trying to understand the problem.
+And I'm still in the progress of trying to understand it.
+ From my naive point of view:
+Would it help if we catch the ioctl and check if there is an active 
+fallback and either stall or route the ioctl to the correct socket?
+I've seen that there is an ioctl function handle in the proto_ops.
+So on a very abstract level we could do the following:
+1. Indicate an active Fallback at the start of the fallback to tcp.
+2. Catch ioctls.
+3. Check if there is an active fallback.
+	NO: Pass the ioctl.
+	YES: Wait for the fallback to complete and pass after.
+
+If this blocks too much we can obviously do some finer checks there.
+E.g.: Just check if the private data is already at attached to the socket.
+
+Do you think this would be a suiteable solution?
+I'm going to look into your proposal Dmitry to see how you solved the 
+problem and to understand it better.
+
+Thanks
+- Jan
+
+> 
+> That is, smc_restore_fallback_changes() restores filp->private_data to
+> smc->sk. If __fput() would have called file->f_op->release() _before_
+> file->f_op->fasync(), the fix would be as simple as adding
+> 
+> smc->sk.sk_socket->wq.fasync_list = smc->clcsock->wq.fasync_list;
+> 
+> to smc_restore_fallback_changes(). But since file->f_op->fasync() is called
+> before file->f_op->release(), the former always makes an attempt to 
+> unlink fasync
+> entry from smc->clcsock instead of smc->sk, thus introducing the memory 
+> leak.
+> 
+> And an idea with shared wait queue was intended in attempt to eliminate
+> this chicken-egg lookalike problem completely.
+> 
+> Dmitry
+> 
 
