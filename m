@@ -1,133 +1,99 @@
-Return-Path: <netdev+bounces-78516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E640875746
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 20:32:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2B53875754
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 20:37:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F630B22301
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 19:32:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DED52882AC
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 19:36:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F206137C36;
-	Thu,  7 Mar 2024 19:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08DCD136677;
+	Thu,  7 Mar 2024 19:36:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="H35LTl9r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tOA5lQQA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 789FB136991
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 19:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81EF135A56;
+	Thu,  7 Mar 2024 19:36:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709839948; cv=none; b=Brb8jimk3wjTnt2Oezom2oYG62uQ1rzH+9jQwoQ95rYQpaUjLhorV8eDutaK4FZHaGREKAp+Qf3FLkugfVR9Rbr3tJB83Dg6eLWDP89FL1s0pAqSeG0rwKx8ls2slfAxPbzDJ/wZX3+BqH6dAVLuZZfM5U/iD7fbMjIpCgUe7aU=
+	t=1709840215; cv=none; b=WuK7hxmoXh6ye7GAkAHbL9fm6TxW3WM3fdn3QBjvMxPrI+D4M9TAc2XmlNqZvxqYXWZnFzBuWabclwkUjjhYqEc/zOW2Gx/BrFTHzyw6k1od+/Iu2OOSf0cyfGnK+nPtWP59zVSJHA8erl/Abx6u2luLSREQTEdjbW59z/hEqR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709839948; c=relaxed/simple;
-	bh=7GcxakZLq2oKSdXj+ofXzEBmRC7bzIxUkfqgxs8FG00=;
-	h=From:Date:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=EcHs/qPJ+2GL8geBCrseoJDc6EIcrKwjbHuNHZLZpiVW/9HBPP/ahznl9xG67lK6cCzWblBvIj8ix3/WVTIxNeEIGRRydKHoM3/aTxokdEfB4xMQ+c2pV4A7wIvHV6FRK1yj+h7nPbD6/fEAa9heJHkocp8aUGkMjHIRDpHNyfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=H35LTl9r; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5d8ddbac4fbso1024761a12.0
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 11:32:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1709839946; x=1710444746; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:date:from
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=N9qoSXzYZPN9ruMFhEGa01LS4BMnI7rAvWb4nFTzmXc=;
-        b=H35LTl9rrbmwdPzJ9BEr5gsW4yRvPb0B1ueFvVOAbbFCM1oOUGvMzXBIBjTaInzwOZ
-         p1FgntUUc1QUgw45r9wD1UyX3tBagKyGJDc7/EqCUuAgNBWsLfkyFwlJiabT7weDLDb+
-         NjOG3U5WmJKpZcGN2Mft/gDtzpUx7IA18poQE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709839946; x=1710444746;
-        h=content-disposition:mime-version:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N9qoSXzYZPN9ruMFhEGa01LS4BMnI7rAvWb4nFTzmXc=;
-        b=gfmPBAnhAoVtmaNg6TmgE/31XvbyJ9DnIVISHZ23EyNNuQ9vAdt8kDAfZ8gJTtEMmz
-         XgE0vC5DB2ObvD/Efi/Lvx1KQU3bcEwvGHvLTvgDlo2xNIfArogvLUJxxWi5sytdF79G
-         gl9+/t7zMxvX6/yZ54phzDYsBhbQB5+hpJDj/CibRYgaMT2LHUqNo0pZU3w44Jj/RYUB
-         doCnLaFXdbQLjnuT0SV4mcVGKSWWw1dy3mPiaFIGM4IXOXOfnprYDgXVNY93Q918xQeR
-         SDTJPJfLoKvX6FeGZNi4/gdpnY/Vr7AM1g2zvNTTcFGuFPE1S6qqx6sczQz/PWC4wcxL
-         Ze+A==
-X-Forwarded-Encrypted: i=1; AJvYcCV8icbtRhch262aNipb2nBrI3XfxgvT5bm8o+mgTXeYflJnqBw0YLrnW2I1oXYiQjWebhVjcz4wkg7GFlWLhNQFLVzRtp0e
-X-Gm-Message-State: AOJu0YxDHOoYKlqF00IBkSJ6vOJ9sDxkg9VFKAljqa1BaI9gtmuQRvCa
-	RLTPrkeKW9Xt9G7TAy0Cma3RqtWUR2UtmJszJkgk1p+lZm6A2SFhqUHt6r/N8A==
-X-Google-Smtp-Source: AGHT+IGOLBi4Qz9QnVx9qVdy304kZfGTtm1ed+Ruod8ne2tyM8cAlmd20ukwkMkoXTBqPPYmDqQq1w==
-X-Received: by 2002:a17:90b:24d:b0:29b:9c8f:5ea2 with SMTP id fz13-20020a17090b024d00b0029b9c8f5ea2mr1766760pjb.40.1709839945732;
-        Thu, 07 Mar 2024 11:32:25 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id h24-20020a17090adb9800b0029a849e7268sm1908119pjv.28.2024.03.07.11.32.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Mar 2024 11:32:25 -0800 (PST)
-From: coverity-bot <keescook@chromium.org>
-X-Google-Original-From: coverity-bot <keescook+coverity-bot@chromium.org>
-Date: Thu, 7 Mar 2024 11:32:24 -0800
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: linux-rdma@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	syzbot+d4faee732755bba9838e@syzkaller.appspotmail.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	rds-devel@oss.oracle.com,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	linux-next@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Coverity: __rds_rdma_map(): Null pointer dereferences
-Message-ID: <202403071132.37BBF46E@keescook>
+	s=arc-20240116; t=1709840215; c=relaxed/simple;
+	bh=1KgGaAOEWbovalkj+qhFZ1YtOmYOmUKmUqLvlOtisHQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r1AoJp9tSiOKbvdeMDq9VY7qeGCiWJspkjjyZrLZDGx7GT1XULfFxXa+qAvAcAzJJZkvvnLlNFkhxsINRGbyaiGcFf/Ty5lI5D00JPab78dzT8weKNlwyLSdI6roElnlqLN+aIgxo1ftEwxitUngOqwg0RjNiSjLNWqWTf2kCRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tOA5lQQA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF3F2C433F1;
+	Thu,  7 Mar 2024 19:36:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709840215;
+	bh=1KgGaAOEWbovalkj+qhFZ1YtOmYOmUKmUqLvlOtisHQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tOA5lQQAX0B3LhpjtoXKJRjGQ85CeIUnjIZ0wkJcN5D+SORITfOESXruD0j0BFK/E
+	 0UKY9dgzyyXDFzMgO8Px+GltHCeGcnat3LXBWdjEoetCR4/yG4rNPwQr4QhN1pvkfw
+	 E3eHtLIlMHsJjwiwSjPVoO/UWqK1XN3oTD9xmJBjpxywjZocsZgd8uh+9yxFImk532
+	 bCNIQevs5HSINTFzWTo76AegUv9XbnEgBo1qitZJsAjpDqEheNrzKURhWUX36P6x2t
+	 9TZX3kCp85qoFhPhZtsGH+vT/1YFk/37Pd2qdLZ6aPLRejdf3M3usNwAEM/naXI2YQ
+	 ke5B1CuE3sIww==
+Message-ID: <5487d52a-31de-4422-b5ed-a59390d23ca0@kernel.org>
+Date: Thu, 7 Mar 2024 12:36:53 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v5] ipv6: fib6_rules: flush route cache when rule is
+ changed
+Content-Language: en-US
+To: Shiming Cheng <shiming.cheng@mediatek.com>, jiri@resnulli.us,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Lena Wang <lena.wang@mediatek.com>
+References: <20240307100157.29699-1-shiming.cheng@mediatek.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240307100157.29699-1-shiming.cheng@mediatek.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello!
+On 3/7/24 3:01 AM, Shiming Cheng wrote:
+> When rule policy is changed, ipv6 socket cache is not refreshed.
+> The sock's skb still uses a outdated route cache and was sent to
+> a wrong interface.
+> 
+> To avoid this error we should update fib node's version when
+> rule is changed. Then skb's route will be reroute checked as
+> route cache version is already different with fib node version.
+> The route cache is refreshed to match the latest rule.
+> 
+> Fixes: 101367c2f8c4 ("[IPV6]: Policy Routing Rules")
+> Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+> Signed-off-by: Lena Wang <lena.wang@mediatek.com>
+> ---
+> v5:
+>   - rebase on the top of latest net/main branch.
+> v4:
+>   - add "Fixes:" tag.
+>   - update subject as requested.
+> v3:
+>   - update patch description and name format in commit message.
+> v2:
+>   - modify flush function same way as ipv4 flush cache.
+>   - use tabs to aligh with existing code.
+> ---
+> ---
+>  net/ipv6/fib6_rules.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
 
-This is an experimental semi-automated report about issues detected by
-Coverity from a scan of next-20240307 as part of the linux-next scan project:
-https://scan.coverity.com/projects/linux-next-weekly-scan
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-You're getting this email because you were associated with the identified
-lines of code (noted below) that were touched by commits:
 
-  Wed Mar 6 11:58:42 2024 +0000
-    c055fc00c07b ("net/rds: fix WARNING in rds_conn_connect_if_down")
-
-Coverity reported the following:
-
-*** CID 1584247:  Null pointer dereferences  (FORWARD_NULL)
-net/rds/rdma.c:306 in __rds_rdma_map()
-300     			unpin_user_pages(pages, nr_pages);
-301     			kfree(sg);
-302     		}
-303     		ret = PTR_ERR(trans_private);
-304     		/* Trigger connection so that its ready for the next retry */
-305     		if (ret == -ENODEV)
-vvv     CID 1584247:  Null pointer dereferences  (FORWARD_NULL)
-vvv     Dereferencing null pointer "cp".
-306     			rds_conn_connect_if_down(cp->cp_conn);
-307     		goto out;
-308     	}
-309
-310     	mr->r_trans_private = trans_private;
-311
-
-If this is a false positive, please let us know so we can mark it as
-such, or teach the Coverity rules to be smarter. If not, please make
-sure fixes get into linux-next. :) For patches fixing this, please
-include these lines (but double-check the "Fixes" first):
-
-Reported-by: coverity-bot <keescook+coverity-bot@chromium.org>
-Addresses-Coverity-ID: 1584247 ("Null pointer dereferences")
-Fixes: c055fc00c07b ("net/rds: fix WARNING in rds_conn_connect_if_down")
-
-Thanks for your attention!
-
--- 
-Coverity-bot
 
