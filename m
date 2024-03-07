@@ -1,117 +1,93 @@
-Return-Path: <netdev+bounces-78229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88157874701
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:58:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D11C2874738
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 05:19:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 281E11F23684
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 03:58:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FA9D28637F
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 370A7101CA;
-	Thu,  7 Mar 2024 03:58:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66321168AB;
+	Thu,  7 Mar 2024 04:19:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="LZJLwZHW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aYvt4Iny"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B23F87484
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 03:57:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425CD13FF5
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 04:19:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709783881; cv=none; b=Nh8rSlOH/upBHKYXz41KiUuYjlOBuKoaKbkYH4/VDlpguJ9tH6Uji5SOd3Nz2v/q2N7SK4O2qJOBoDYV1J/o7MLv4dr1O5ZY+htaR7klbaTVmROK9y8ccj1xzzKryTGHizQVdTtT+Bi0u3oLdYWkNLP4e15/w4SESZrWgln0xCo=
+	t=1709785155; cv=none; b=LSGiYY3KptbbM6tE0BvAcjESmGd0EeAvPhm/mcNG4rNnyepTiHqTdckPjFl7gdHYs9sCAnTQb6iPQws9mJR+6N/00wKetfPl74Tnm5BrKsZRov8aBP0DW29lYqkzsNH0Ovcc6dBQQvISBL67NsZppNrOVoR/+w7ER8s4HSh4fwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709783881; c=relaxed/simple;
-	bh=GMgkp+yscZsRM1U8J6RkT4IGJ9uG4UFDIrOWZTNAWoM=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=l/1u9D5DhFQ6R3Ljsucco9ZswEwOttEdXmF56q5144WU1Vs5GFJhszs2t/3JgtH53v+fJyia8QFA19FHdrq+011godI8nERZFa0r6UoI2sjBm08hPr4c6AT4uFSha+j3g2TEEE+BPARaYeipJurRb4XQKmtkPONjj5ma+WbFq7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=LZJLwZHW; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1709783875; h=Message-ID:Subject:Date:From:To;
-	bh=NbVOwjRfy22DH84uegjWTqJAOzXJDeObfAkmRBzdswE=;
-	b=LZJLwZHWe2IAnB5dmsTopoIoJLQArLsTjj2CMbKd4BfuCnosIDAPGDDCc4uJBmsSf7GCUY/IKOdjuQVjXSqkeMjesIPCudraZfkfsGCkAy9TxsH8r+XzKjyIe6TZJ/Ng+ey8/RgCEav6319su/BLHSFxawbd40HQ5lO9jHI4YE4=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W1zJt4M_1709783873;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W1zJt4M_1709783873)
-          by smtp.aliyun-inc.com;
-          Thu, 07 Mar 2024 11:57:54 +0800
-Message-ID: <1709783855.0510879-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v3 0/3] netdev: add per-queue statistics
-Date: Thu, 7 Mar 2024 11:57:35 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,
- edumazet@google.com,
- pabeni@redhat.com,
- amritha.nambiar@intel.com,
- danielj@nvidia.com,
- mst@redhat.com,
- michael.chan@broadcom.com,
- sdf@google.com,
- przemyslaw.kitszel@intel.com,
- Jakub Kicinski <kuba@kernel.org>,
- davem@davemloft.net
-References: <20240306195509.1502746-1-kuba@kernel.org>
-In-Reply-To: <20240306195509.1502746-1-kuba@kernel.org>
+	s=arc-20240116; t=1709785155; c=relaxed/simple;
+	bh=7X0c5Kp8oObvc3ylbxUR9cCfhYtATZKxdxL8E+Sr77E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rmgaLRiIplTbAgHVamAcb6yS3M7htO0G9nD4j7sQ8An98oenfw4RwxUR3rASz82R0YIdkBJGPlwTz0+ISCHh+/hEuGjV9lJoF6CGe5mA1OgToPgTSxqNC7xyY1MkXKjwGEh2VFa4zYTp/pqlsganU8idzesCOnzTvAXDAtEkS4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aYvt4Iny; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62548C433F1;
+	Thu,  7 Mar 2024 04:19:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709785154;
+	bh=7X0c5Kp8oObvc3ylbxUR9cCfhYtATZKxdxL8E+Sr77E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aYvt4Inyl++1rcTsJ0a4Z8CvFUKeb9EFVyjY+A377cTscP3xGSoBoXVp/Ew+7Gtot
+	 QuYbZ7+i8KGJCx0UhuZIXEuPlkVBzcSlaKvMGmY6vd35+R+CBvqJV09sJObDDz626R
+	 mC1WP5B7TlxqjvoHhpoOfGCO8Us29fq3QfC3WevtMXD8RpTBwhjES8thupqG3xQTcD
+	 EzddlrBQGzYKkp9OpHUyzFIHdQHmSunkWnJ63ojFykmqKB3TER2QhmhNmXoidvAoMz
+	 YJI5wVomxBNAv0w0CKoMnFV/+OKsiD/iE4uqLDKCsOh6dzk2J1VkH90A7AG8+DeKqQ
+	 rxgo2CGtTQGtQ==
+Date: Wed, 6 Mar 2024 20:19:13 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jiri Pirko
+ <jiri@resnulli.us>, Michael Chan <michael.chan@broadcom.com>,
+ davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew.gospodarek@broadcom.com, richardcochran@gmail.com
+Subject: Re: [PATCH net-next 1/2] bnxt_en: Introduce devlink runtime driver
+ param to set ptp tx timeout
+Message-ID: <20240306201913.626a41f0@kernel.org>
+In-Reply-To: <CALs4sv123NSvtprMEqTxhHVjS6i1ZDgfOrx4z_cEnUyYuQP1Zg@mail.gmail.com>
+References: <20240229070202.107488-1-michael.chan@broadcom.com>
+	<20240229070202.107488-2-michael.chan@broadcom.com>
+	<ZeC61UannrX8sWDk@nanopsycho>
+	<20240229093054.0bd96a27@kernel.org>
+	<f1d31561-f5b5-486f-98e4-75ccc2723131@linux.dev>
+	<20240229174914.3a9cb61e@kernel.org>
+	<CALs4sv1WSJSxTM=cJ84RLkVjo7S8=xG+dR=FGXmDHUWrj7ZWSw@mail.gmail.com>
+	<20240301091857.5f79ba3d@kernel.org>
+	<CALs4sv123NSvtprMEqTxhHVjS6i1ZDgfOrx4z_cEnUyYuQP1Zg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Thu, 7 Mar 2024 09:20:44 +0530 Pavan Chebbi wrote:
+> > > As such timeouts are rare but still normal.  
+> >
+> > Normal, because...? Why do they happen?  
+> 
+> Excuse me for the late reply.
+> In my experience so far, it's primarily because of flow control and
+> how stressed the underlying HW queue is. (I am sure it's not unique to
+> our hardware alone)
+> Hence we wanted to accommodate cases where the expected wait time is
+> higher than what is default in the driver, for the packets to go out.
+> But it's disappointing to know that even private devlink params are
+> discouraged for such purposes.
+> I'd think that non-generic driver params in devlink serve exactly such
+> requirements and having such a knob would be useful for an advanced
+> user.
+> Not to mention, in my view, such additions to devlink would make it
+> more popular and would help in its wider adoption.
 
-For series:
-
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-
-On Wed,  6 Mar 2024 11:55:06 -0800, Jakub Kicinski <kuba@kernel.org> wrote:
-> Hi!
->
-> Per queue stats keep coming up, so it's about time someone laid
-> the foundation. This series adds the uAPI, a handful of stats
-> and a sample support for bnxt. It's not very comprehensive in
-> terms of stat types or driver support. The expectation is that
-> the support will grow organically. If we have the basic pieces
-> in place it will be easy for reviewers to request new stats,
-> or use of the API in place of ethtool -S.
->
-> See patch 3 for sample output.
->
-> v3:
->  - remove the dump error handling, core does it now (b5a899154aa94)
->  - fix ring mapping w/ XDP in bnxt
-> v2: https://lore.kernel.org/all/20240229010221.2408413-1-kuba@kernel.org/
->  - un-wrap short lines
->  - s/stats/qstats/
-> v1: https://lore.kernel.org/all/20240226211015.1244807-1-kuba@kernel.org/
->  - rename projection -> scope
->  - turn projection/scope into flags
->  - remove the "netdev" scope since it's always implied
-> rfc: https://lore.kernel.org/all/20240222223629.158254-1-kuba@kernel.org/
->
-> Jakub Kicinski (3):
->   netdev: add per-queue statistics
->   netdev: add queue stat for alloc failures
->   eth: bnxt: support per-queue statistics
->
->  Documentation/netlink/specs/netdev.yaml   |  91 +++++++++
->  Documentation/networking/statistics.rst   |  15 ++
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c |  65 +++++++
->  include/linux/netdevice.h                 |   3 +
->  include/net/netdev_queues.h               |  56 ++++++
->  include/uapi/linux/netdev.h               |  20 ++
->  net/core/netdev-genl-gen.c                |  12 ++
->  net/core/netdev-genl-gen.h                |   2 +
->  net/core/netdev-genl.c                    | 214 ++++++++++++++++++++++
->  tools/include/uapi/linux/netdev.h         |  20 ++
->  10 files changed, 498 insertions(+)
->
-> --
-> 2.44.0
->
->
+The problem can be solved more intelligently.
 
