@@ -1,105 +1,225 @@
-Return-Path: <netdev+bounces-78196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D2C8874518
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 01:19:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D95C5874520
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 01:26:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84D74285C18
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:19:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 081171C21D22
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:26:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1570393;
-	Thu,  7 Mar 2024 00:19:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB4C0634;
+	Thu,  7 Mar 2024 00:26:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0X3QnOym"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZMtfdC34"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB9336C;
-	Thu,  7 Mar 2024 00:19:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3557237E;
+	Thu,  7 Mar 2024 00:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709770780; cv=none; b=eukQlphtSufvw/pfMVyCAHpEvow1E/3FlVpDaVGNWVEmLbajDPEYwhIEtLI1V1hVh+9CzkEllehEWU9qOGfvaCsa0TQk3N5gwK28CLb5/3OZWAOIAn3PlaiZoCFmnF8R99RNUonpo/nbkrD5KwZhfjDtjkW4W8iaBIxBZUzsrSU=
+	t=1709771174; cv=none; b=mp4GatTzOLZPwslKIS6ppZSDtAhIkmYXUCBq49xT0CKsHNFHshtI11I1oTlebNTHdsJ6rKzWUYbLK867JyomGXIkUlBt+ACPPmX3StA0CpwqyORd+ulQp9uIm/qEkTqx8mp5kx5H3HMxEF2XKrKEUOo4FPv9+D0yquaHds7sxM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709770780; c=relaxed/simple;
-	bh=igeX+dtlvpZvheeyhlJx/Zlz+N19RU9rqrY0FQ0MO+U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D0GvQHUORVE7yHruGvvGevIVBzYeTkj63yR/wMqkKnjo86vMhhTwZkcxVfHoYSntdZE58VmbKKHwsF+qLxzKsuf5crjdiGZTYp1mVBxAGukM3GZ2RiY959TuuDTpHD+tqQ/evXPQFgd7PiJw/pCjsB1DUC0wUOQlahCUD3zH1/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0X3QnOym; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7QT0gBy9zGeu+xPHf2pGjhnuveV+gws6pSxdSpEf34U=; b=0X3QnOym49VvL5poDUUua87KpY
-	zIfFc3eXicEaBSGUMfM3IV5VtRFzBtzFB5HK9/EcOaSuIH4+7ZTOMwDbc3CBZlz3wWq1Z4IQyGuDc
-	5a0jsKrgej1J3goKHqUnDp+FdDj3bMPXKQtZr0SPLksNP4znAcrWsZ4oNuTAI69XdSTs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ri1UG-009Xho-A7; Thu, 07 Mar 2024 01:19:52 +0100
-Date: Thu, 7 Mar 2024 01:19:52 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
-	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, corbet@lwn.net,
-	linux-doc@vger.kernel.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
-	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
-	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
-	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
-	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
-	benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v3 03/12] net: ethernet: oa_tc6: implement
- register read operation
-Message-ID: <48b65759-6e69-46ef-a2ed-857d04eadac8@lunn.ch>
-References: <20240306085017.21731-1-Parthiban.Veerasooran@microchip.com>
- <20240306085017.21731-4-Parthiban.Veerasooran@microchip.com>
+	s=arc-20240116; t=1709771174; c=relaxed/simple;
+	bh=YCJ6CH0a0t3D5gSjseqFCfEhtvti/5UHRPkBNg5lPv4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c+xNcs4b1m0c1tNeksn/ohAzt40qdcabNUhJrUKNVHr+2iS4WiIWzRQt0VKEHZ1T+pzDsKhLD+DZwmMKCq6rsP+KGb0Jxyk4/Ufmk7IVLYAGePqxygg1KjKqZdovBd7cZ5jn8rljHLNHC4mkhLNiqeRkYwDLKS9cqYPgbsusUR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZMtfdC34; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-55a179f5fa1so499907a12.0;
+        Wed, 06 Mar 2024 16:26:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709771169; x=1710375969; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UKT1zaj6Eh3egPuYJiO+FIUKO65/GhPQVGH+8wAM2JE=;
+        b=ZMtfdC34g6LGUrifmd/wpmi07eskngIJ9SrQe7kkEEQKiZyTYJxcnjgUMNKPSmEkTm
+         /9MTfKEnMvnjqrCFjDsdpiRNau/ivFb8+pAZYrIPcdWT184sNKn7XYdTfpWpmvLIT+gH
+         j8AKhlQzORFMgF2ypEOjAMSiLvQIpHMoc+BLH4vVVgiXL+WTAfxVFlH/V5k5oqERv/gv
+         0s+JtOWsmeHQS75D+FEk1xBeImft41owv1zPzl81PF1XDGGcWQag9SH3k2GuDg7BYSix
+         AUV6VkeW5Kg3bBIcv9LPwKTH32tsp3gmHtSC4KNAqHsauH9HXoi+kWB11F1ReqoTTbDa
+         40FQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709771169; x=1710375969;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UKT1zaj6Eh3egPuYJiO+FIUKO65/GhPQVGH+8wAM2JE=;
+        b=KeTm108HrNeJ4xm7RVzMNplrxm6c3NjDt+64R4YG3dwoSToG+Tfih9/rrk+ZyNOUbJ
+         xv3OUif2/qCVABhUM6fsRqX/XAZryhJEWoRveFqvodCONOhDFQ/f9HZ5iI2FSQO21nNV
+         rK9bSJYSDWS77urn4DMm2J+ZDqFwCTF0W2bfv+sbcFX7R0IkZ2YnzELW0bnwtCaVmaO1
+         0wUT16HvUfgbvT/L60zckiFYqvLDryYek5ESrg2uI6w1/6r5P8q7Z0wGGcwieqKuwhfM
+         ejSE4jcHYB66r8mtWSw7NGaU944quxq6V7XUUnVkr9e04mAgl0qfqDQt8qbXR0w9Yg1z
+         TQfg==
+X-Forwarded-Encrypted: i=1; AJvYcCUQESg2xHmcJ9h5MpgAFDCadhbD+t1ugIERYgxcxHIQQ/5aST/QxenaB+mSvegA3NzZyCgdUK4EIY8qQ9Gu7O9RdG1HVwP3mJx/EW/RA+AB8XKHShdbZ/xkA9UHexPyNY3I45nkn0vYZhmdu5arNXYbstghe+guPUArnI5jjfHp
+X-Gm-Message-State: AOJu0YycSj18i8JLt+AO1m8/UwgEJQjV0rw+s5juN57cpxScRpwVdtar
+	e/pdnBveV/DqHB4WsF0a7rCkbKm3Cr26mB7KNzi2wkx5tBFN03L37vEmtWHo0+oiI/Cm5ecZvpB
+	9/LPWLtepMDeQQzSU4HgJnRkHKp4=
+X-Google-Smtp-Source: AGHT+IHSUuxOAd3FCTfADD0/0f8LI7wH0+oIlX2v8zLpdcMnw4cZbhCbYDbjbWu8kso/7/knQvSx/7EbcxT07EIffnI=
+X-Received: by 2002:a05:6402:40cc:b0:567:1458:caa with SMTP id
+ z12-20020a05640240cc00b0056714580caamr9536026edb.40.1709771169248; Wed, 06
+ Mar 2024 16:26:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240306085017.21731-4-Parthiban.Veerasooran@microchip.com>
+References: <20240301185855.944405-1-thepacketgeek@gmail.com> <8a3ccdc5445d0cfda36418dd50746f13f447bdaa.camel@redhat.com>
+In-Reply-To: <8a3ccdc5445d0cfda36418dd50746f13f447bdaa.camel@redhat.com>
+From: Matthew Wood <thepacketgeek@gmail.com>
+Date: Wed, 6 Mar 2024 16:25:58 -0800
+Message-ID: <CADvopvYwZWsCtx6Vg42VHczexmX=0n5ZN99QAX3S=1aKzMAAWA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] net: netconsole: Add continuation line prefix
+ to userdata messages
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Breno Leitao <leitao@debian.org>, 
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->  enum oa_tc6_register_op {
-> +	OA_TC6_CTRL_REG_READ = 0,
->  	OA_TC6_CTRL_REG_WRITE = 1,
->  };
+On Tue, Mar 5, 2024 at 4:14=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> On Fri, 2024-03-01 at 10:58 -0800, Matthew Wood wrote:
+> > Add a space (' ') prefix to every userdata line to match docs for
+> > dev-kmsg. To account for this extra character in each userdata entry,
+> > reduce userdata entry names (directory name) from 54 characters to 53.
+> >
+> > According to the dev-kmsg docs, a space is used for subsequent lines to
+> > mark them as continuation lines.
+> >
+> > > A line starting with ' ', is a continuation line, adding
+> > > key/value pairs to the log message, which provide the machine
+> > > readable context of the message, for reliable processing in
+> > > userspace.
+> >
+> > Testing for this patch::
+> >
+> >  cd /sys/kernel/config/netconsole && mkdir cmdline0
+> >  cd cmdline0
+> >  mkdir userdata/test && echo "hello" > userdata/test/value
+> >  mkdir userdata/test2 && echo "hello2" > userdata/test2/value
+> >  echo "message" > /dev/kmsg
+> >
+> > Outputs::
+> >
+> >  6.8.0-rc5-virtme,12,493,231373579,-;message
+> >   test=3Dhello
+> >   test2=3Dhello2
+> >
+> > And I confirmed all testing works as expected from the original patchse=
+t
+> >
+> > Fixes: df03f830d099 ("net: netconsole: cache userdata formatted string =
+in netconsole_target")
+> > Reviewed-by: Breno Leitao <leitao@debian.org>
+>
+> I guess the tag arrived off-list, because I can't see any sign of it on
+> the ML?!?
+>
+> > Signed-off-by: Matthew Wood <thepacketgeek@gmail.com>
+> > ---
+> >
+> > v1 -> v2:
+> > - Calculate 53 byte user data name from: entry length - formatting char=
+s - value length
+> > - Update docs to reflect 53 byte limit for user data name (director)
+> > v2 -> v3:
+> > - Added #define for userdata formatting character length (3)
+> > - Matched all #defines indent level
+> >
+> >  Documentation/networking/netconsole.rst |  8 ++++----
+> >  drivers/net/netconsole.c                | 14 +++++++++-----
+> >  2 files changed, 13 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/Documentation/networking/netconsole.rst b/Documentation/ne=
+tworking/netconsole.rst
+> > index b28c525e5d1e..d55c2a22ec7a 100644
+> > --- a/Documentation/networking/netconsole.rst
+> > +++ b/Documentation/networking/netconsole.rst
+> > @@ -180,7 +180,7 @@ Custom user data can be appended to the end of mess=
+ages with netconsole
+> >  dynamic configuration enabled. User data entries can be modified witho=
+ut
+> >  changing the "enabled" attribute of a target.
+> >
+> > -Directories (keys) under `userdata` are limited to 54 character length=
+, and
+> > +Directories (keys) under `userdata` are limited to 53 character length=
+, and
+> >  data in `userdata/<key>/value` are limited to 200 bytes::
+> >
+> >   cd /sys/kernel/config/netconsole && mkdir cmdline0
+> > @@ -197,8 +197,8 @@ Messages will now include this additional user data=
+::
+> >  Sends::
+> >
+> >   12,607,22085407756,-;This is a message
+> > - foo=3Dbar
+> > - qux=3Dbaz
+> > +  foo=3Dbar
+> > +  qux=3Dbaz
+> >
+> >  Preview the userdata that will be appended with::
+> >
+> > @@ -218,7 +218,7 @@ The `qux` key is omitted since it has no value::
+> >
+> >   echo "This is a message" > /dev/kmsg
+> >   12,607,22085407756,-;This is a message
+> > - foo=3Dbar
+> > +  foo=3Dbar
+> >
+> >  Delete `userdata` entries with `rmdir`::
+> >
+> > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> > index 0de108a1c0c8..8cc28aec59c8 100644
+> > --- a/drivers/net/netconsole.c
+> > +++ b/drivers/net/netconsole.c
+> > @@ -42,12 +42,16 @@ MODULE_AUTHOR("Maintainer: Matt Mackall <mpm@seleni=
+c.com>");
+> >  MODULE_DESCRIPTION("Console driver for network interfaces");
+> >  MODULE_LICENSE("GPL");
+> >
+> > -#define MAX_PARAM_LENGTH     256
+> > -#define MAX_USERDATA_NAME_LENGTH     54
+> > -#define MAX_USERDATA_VALUE_LENGTH    200
+> > +#define MAX_PARAM_LENGTH             256
+> > +/* characters used for formatting each userdata entry line (' ', '=3D'=
+, '\n') */
+> > +#define USERDATA_FORMAT_CHARS                3
+> >  #define MAX_USERDATA_ENTRY_LENGTH    256
+> > +#define MAX_USERDATA_VALUE_LENGTH    200
+> > +#define MAX_USERDATA_NAME_LENGTH     MAX_USERDATA_ENTRY_LENGTH - \
+> > +                                     MAX_USERDATA_VALUE_LENGTH - \
+> > +                                     USERDATA_FORMAT_CHARS
+>
+> AFAICS this is not what Breno asked, and checkpatch complains
+> rightfully. More importantly it's fragile: what will be the result of
+>
+>         MAX_USERDATA_NAME_LENGTH * 2
+>
+> ?
+>
+> At least some brackets are required:
+>
+> #define MAX_USERDATA_NAME_LENGTH        (MAX_USERDATA_ENTRY_LENGTH -
+>                                          MAX_USERDATA_VALUE_LENGTH - \
+>                                          USERDATA_FORMAT_CHARS)
+>
+> Thanks,
+>
+> Paolo
+>
 
-I thought it looked a little odd when the enum was added in the
-previous patch with the first value of 1, and only one value. Now it
-makes more sense.
-
-The actual value appears to not matter? It is always 
-
-> +	if (reg_op == OA_TC6_CTRL_REG_WRITE)
-
-So i would drop the numbering, and leave it to the compiler. The
-patches will then look less odd.
-
-> +static int oa_tc6_check_ctrl_read_reply(struct oa_tc6 *tc6, u8 size)
-> +{
-> +	u32 *tx_buf = tc6->spi_ctrl_tx_buf;
-> +	u32 *rx_buf = tc6->spi_ctrl_rx_buf + OA_TC6_CTRL_IGNORED_SIZE;
-> +
-> +	/* The echoed control read header must match with the one that was
-> +	 * transmitted.
-> +	 */
-> +	if (*tx_buf != *rx_buf)
-> +		return -ENODEV;
-
-Another case where -EPROTO might be better?
-
-	Andrew
+Thank you Paolo, great points. I will fix the macro and remove the
+Reviewed-by tag so Breno can reply on the ML
 
