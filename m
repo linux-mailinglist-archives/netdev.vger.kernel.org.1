@@ -1,143 +1,108 @@
-Return-Path: <netdev+bounces-78540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3917F8759D9
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 23:00:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 005DF875A0D
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 23:13:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E57632816CA
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 22:00:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 940FF1F21829
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 22:13:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C708313B7A4;
-	Thu,  7 Mar 2024 22:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5C8D13B7A7;
+	Thu,  7 Mar 2024 22:13:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VF1Ck7c8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oawyKyDk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D8B13B787
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 22:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92BC4F4FC
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 22:13:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709848820; cv=none; b=fKgzZYMomCqtfhPMQA9Cl0lqTbcY3nC1NM7r3C3kjF9qlSvf8lPnKxAQ+HlMmiCmutrvjBg428AUgAF7KSL97U3cAUCgKuXoS+86eQNQVzdI48b71Gx3nW6YogiI/V+OYCoKU4WpKEKqr41rHG/U/GDBy9g1Ltdc6TW2J8lHxi8=
+	t=1709849602; cv=none; b=F5+kTcHwV044IM5YItCFlYN4LJbnwVMLQgnfxu8zr65b8WQ/g4O1SVJNk96wC8ZT8OIshE8BjY24s9pGxAWqObGMu2e5LPyQ4sbysNTbX+5zCW9E6pjuqrkbX81YB/W+m87+5NRTKfCS+YfnSd0ZF01hkfy8zf6ZevnfzQKFXCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709848820; c=relaxed/simple;
-	bh=f9fMzSivZ97O3PcuJLnjYviveOJeY1wVqucvUp7Nk3k=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=crRFhCBXbK0vdWHu2mnWTqIgBvkLCGke8l8eyYbu8dLLmS/FlE2j1Bu2MgNIe0EGNN97hrI3rImvMjvqfdUCER7NJni9Kc9p/Ay7Xs84YvkD4m1k+t+/kUbfwLwxKkwlTtan7xZJuNMX+rfCbXlqlBv/gyWcbtDxUJ4vSHclEMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VF1Ck7c8; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-609fb719f48so14732447b3.2
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 14:00:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709848818; x=1710453618; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=P3Ml9Tln0cORlDTuYm4a4u43eZobvrdgLIcj4mCzi0E=;
-        b=VF1Ck7c8Zu5oyLZpFn4SkTfjpOsShrylc0GBcEQwbCx1fCiKTzTc93yWoqfYoMZENl
-         3vHQJ06HRzeTq5LLczkjs+TMDyG2fHUh/48+lOcCNo0Mo3LmUSNBDpiRhIW6PsnpR1yn
-         x84vsMD6lXKB9+0PoYZPcaIQBOFskL2kZJ3By6h8+KPNQMftsOtw3ewuevn8f1ibjRsy
-         vaTKu/hIGFUjln+JrLYug4tynlf9E6z2DwmBpBMoaPFk3Mjcw/lWgNEetaC70erqVJm5
-         xgbsBO6JvDdH6u4FNzq/C76J5Jtxo6F9az9mmua5eMippAI3qPmPDc3tEb/4g3S/l6MC
-         XwZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709848818; x=1710453618;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=P3Ml9Tln0cORlDTuYm4a4u43eZobvrdgLIcj4mCzi0E=;
-        b=fpoGLq9UCsIgMMYu5BBWn+tS7+/fI4Re1o8xCXC1NMXuZ5Hjm3QcKOZE9CXZ96m9Vm
-         DcIBBMPivjzJi0JWb2QRWGmL0OF5F5KcfKuq3HTESHn1tu+51UAR3xkOfNh6ALdGQjYO
-         M+6RT1RigpzHYt/B0BQapg9QAWigVpU3mwcWrqbGBOH98GYkXOjNujZp6A7Amf+Zw97t
-         9h6niNLsPYvpcMTqm5qrX7c9npKlO3V5umSxdVoGHJKN/8oyKWqcAwt/6HAGhovNuUGr
-         yOcEDL08UbzR6hFLYiwMEViB7wMFnGh9aSRP1mW/uKvgal+aBJFLM8hkHY3M4POH6Jlw
-         MwlA==
-X-Gm-Message-State: AOJu0YzRcZRB5vTcQ7oWFsJG8Vz4UHay10WHXuqdOc3/+jM5ViStWyDd
-	yAzSXgGauyjlFf3BccYpq+UDhMj/uKm0IXEMdSrAb+qqlvJqt60/cXC6J+fGyxG93tLCpo7UNze
-	T3tD6cY/6Hg==
-X-Google-Smtp-Source: AGHT+IGxb7gb+AL2ziserGPxW+IcZtRHXzv2b/jOdXNHZ3kENoPX822kCcVwhL/6skJcj6Ysc7H9ry4UjluyLA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:f0b:b0:dcd:2f2d:7a0f with SMTP
- id et11-20020a0569020f0b00b00dcd2f2d7a0fmr779910ybb.9.1709848818260; Thu, 07
- Mar 2024 14:00:18 -0800 (PST)
-Date: Thu,  7 Mar 2024 22:00:16 +0000
+	s=arc-20240116; t=1709849602; c=relaxed/simple;
+	bh=NXp/VJlSX5gWHOl16OxdGk1E+53DTXPzfL1k+98ff8Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HcyDOXuHm9AULzaBzsxctrLzKOAbJao6+DV+1As7AOq60M2o11GUr6LzqsqZskXKJySl8YOWTA1SkzyKbtgRhio+dgPCNcS4mY4SnuoFjSitu8ZNCKeknmqMOk+Eh6Oye2UGSSzbnt9hAPBOyXWV5ZwqEXfcXjmy0QBIwHLLnAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oawyKyDk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12D78C433F1;
+	Thu,  7 Mar 2024 22:13:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709849602;
+	bh=NXp/VJlSX5gWHOl16OxdGk1E+53DTXPzfL1k+98ff8Q=;
+	h=From:To:Cc:Subject:Date:From;
+	b=oawyKyDkln/LJvOxlq32IBziWWoNJG7Ef4tyyurpQhdndx5AQKeT8BuEjdxJxJzau
+	 Bu6KclCtTenayvuzG3ZJnB37bkk6exARH0CXBX1QRmygN+8LZUXYYF1NwqbjCBvILZ
+	 9yg5WMhz23R61mGBzBAbvRwOWFkPpqtCmU5ADINCSTk0RIKDQsAhiGGiL8PrTFBg7z
+	 AH7omr8ns0G2KNwXHFBk/2Gg0ZPd2qyCgNsYILdtOkF/cBP8mfl6x3kOYhKvUfq27L
+	 y3icf2hIoFO5t6vsK3o/hDam37zGw2bZsJgF6CKXrTaPsePIZyMhDZu5qE5M2XFdC+
+	 o5SUdsrteaDiA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	hawk@kernel.org
+Subject: [PATCH net-next] ynl: samples: fix recycling rate calculation
+Date: Thu,  7 Mar 2024 14:11:22 -0800
+Message-ID: <20240307221122.2094511-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240307220016.3147666-1-edumazet@google.com>
-Subject: [PATCH net-next] udp: no longer touch sk->sk_refcnt in early demux
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Martin KaFai Lau <kafai@fb.com>, Joe Stringer <joe@wand.net.nz>, 
-	Alexei Starovoitov <ast@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-After commits ca065d0cf80f ("udp: no longer use SLAB_DESTROY_BY_RCU")
-and 7ae215d23c12 ("bpf: Don't refcount LISTEN sockets in sk_assign()")
-UDP early demux no longer need to grab a refcount on the UDP socket.
+Running the page-pool sample on production machines under moderate
+networking load shows recycling rate higher than 100%:
 
-This save two atomic operations per incoming packet for connected
-sockets.
+$ page-pool
+    eth0[2]	page pools: 14 (zombies: 0)
+		refs: 89088 bytes: 364904448 (refs: 0 bytes: 0)
+		recycling: 100.3% (alloc: 1392:2290247724 recycle: 469289484:1828235386)
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Martin KaFai Lau <kafai@fb.com>
-Cc: Joe Stringer <joe@wand.net.nz>
-Cc: Alexei Starovoitov <ast@kernel.org>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
+Note that outstanding refs (89088) == slow alloc * cache size (1392 * 64)
+which means this machine is recycling page pool pages perfectly, not
+a single page has been released.
+
+The extra 0.3% is because sample ignores allocations from the ptr_ring.
+Treat those the same as alloc_fast, the ring vs cache alloc is
+already captured accurately enough by recycling stats.
+
+With the fix:
+
+$ page-pool
+    eth0[2]	page pools: 14 (zombies: 0)
+		refs: 89088 bytes: 364904448 (refs: 0 bytes: 0)
+		recycling: 100.0% (alloc: 1392:2331141604 recycle: 473625579:1857460661)
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/ipv4/udp.c | 5 +++--
- net/ipv6/udp.c | 5 +++--
- 2 files changed, 6 insertions(+), 4 deletions(-)
+CC: hawk@kernel.org
+---
+ tools/net/ynl/samples/page-pool.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index a8acea17b4e5344d022ae8f8eb674d1a36f8035a..e43ad1d846bdc2ddf5767606b78bbd055f692aa8 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -2570,11 +2570,12 @@ int udp_v4_early_demux(struct sk_buff *skb)
- 					     uh->source, iph->saddr, dif, sdif);
- 	}
+diff --git a/tools/net/ynl/samples/page-pool.c b/tools/net/ynl/samples/page-pool.c
+index 098b5190d0e5..332f281ee5cb 100644
+--- a/tools/net/ynl/samples/page-pool.c
++++ b/tools/net/ynl/samples/page-pool.c
+@@ -95,6 +95,8 @@ int main(int argc, char **argv)
  
--	if (!sk || !refcount_inc_not_zero(&sk->sk_refcnt))
-+	if (!sk)
- 		return 0;
- 
- 	skb->sk = sk;
--	skb->destructor = sock_efree;
-+	DEBUG_NET_WARN_ON_ONCE(sk_is_refcounted(sk));
-+	skb->destructor = sock_pfree;
- 	dst = rcu_dereference(sk->sk_rx_dst);
- 
- 	if (dst)
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 3f2249b4cd5f6a594dd9768e29f20f0d9a57faed..fad6667fad6644db8c679ae9b723ccda15edaede 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -1101,11 +1101,12 @@ void udp_v6_early_demux(struct sk_buff *skb)
- 	else
- 		return;
- 
--	if (!sk || !refcount_inc_not_zero(&sk->sk_refcnt))
-+	if (!sk)
- 		return;
- 
- 	skb->sk = sk;
--	skb->destructor = sock_efree;
-+	DEBUG_NET_WARN_ON_ONCE(sk_is_refcounted(sk));
-+	skb->destructor = sock_pfree;
- 	dst = rcu_dereference(sk->sk_rx_dst);
- 
- 	if (dst)
+ 		if (pp->_present.alloc_fast)
+ 			s->alloc_fast += pp->alloc_fast;
++		if (pp->_present.alloc_refill)
++			s->alloc_fast += pp->alloc_refill;
+ 		if (pp->_present.alloc_slow)
+ 			s->alloc_slow += pp->alloc_slow;
+ 		if (pp->_present.recycle_ring)
 -- 
-2.44.0.278.ge034bb2e1d-goog
+2.44.0
 
 
