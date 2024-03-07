@@ -1,168 +1,125 @@
-Return-Path: <netdev+bounces-78431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 718B2875187
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 15:11:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F1C58751A3
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 15:17:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F7661F26602
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:11:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE49F28743B
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:17:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C55012E1C8;
-	Thu,  7 Mar 2024 14:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F98B12D773;
+	Thu,  7 Mar 2024 14:17:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="wEHd8KSC"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E229512DD9F;
-	Thu,  7 Mar 2024 14:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B87712BF12;
+	Thu,  7 Mar 2024 14:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.244.183.115
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709820640; cv=none; b=hll+7dAAtUGeJur2kDcJ33E0oA2A+gTVj2jgXOb6clRTopNgIPx2VbBOiXNRH9v6r3Ru/ubPsoS2HS6+kIy0tAFjDqqN3pF95pDDHgmBU2IzMJ80ooEnEgs7qCRzpr6rkA4+gfZGzl74vdvibjEq0cedPGBEK0/UrebpFCa0cZU=
+	t=1709821065; cv=none; b=j83lBXDdY3YN0QyBv7UmYsuQH6xjNMCg0UCH3bZXRpUGg1V94xOshpmpwUkiW+8Tn7+j+RsHr+FoDqw8HR/W89aFxLcKww7zdD7VycQQ2lQrOKx6SpQySgYd8jpleRPV8dJ8AcMAFT9WBwtQHM+J0Vyy+81Cvmjwq++qPqfYpaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709820640; c=relaxed/simple;
-	bh=IG5hBWgdvIQIXiIi6nwGfY6sqdPdDNVJbUfK9RDSYrI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j6p9ZuyOHT7YjgFC5juYCpgCeKq3msB0guDGyEXsI9p5zGmJv4cEVoZ8fDqf6Uc63QRMuP/HiVuSD0YwqLxHg8PW5e3rXAb+5dvr8rIhBEaikVxb6en1K1de4VwmeZhQCAJh9o2g/F9LBJmHOaVLjJchCO4sR4ooVjzmk+vUbCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1riES1-0007l6-Ki; Thu, 07 Mar 2024 15:10:25 +0100
-Date: Thu, 7 Mar 2024 15:10:25 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Florian Westphal <fw@strlen.de>, edumazet@google.com,
-	pablo@netfilter.org, kadlec@netfilter.org, kuba@kernel.org,
-	pabeni@redhat.com, davem@davemloft.net,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next] netfilter: conntrack: avoid sending RST to
- reply out-of-window skb
-Message-ID: <20240307141025.GL4420@breakpoint.cc>
-References: <20240307090732.56708-1-kerneljasonxing@gmail.com>
- <20240307093310.GI4420@breakpoint.cc>
- <CAL+tcoAPi+greENaD8X6Scc97Fnhiqa62eUSn+JS98kqY+VA6A@mail.gmail.com>
- <20240307120054.GK4420@breakpoint.cc>
- <CAL+tcoBqBaHxSU9NQqVxhRzzsaJr4=0=imtyCo4p8+DuXPL5AA@mail.gmail.com>
+	s=arc-20240116; t=1709821065; c=relaxed/simple;
+	bh=BO/sS3iNltEei/NOaZXQFdewmgrTpD5zeAJZ1NGWfVc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=L/f6jsskll/3xPHwk9Zw9G1cf/9zYvpjIshGSQIEqBgbC8GppYZzOxBZa9+sPPYeCI/+lQN93W9UBJ84zUPayWpDLs6IBZAal9rznSzY0lIBasw5X2tJt1MPWHr6dQhXDaN3yFsSvatrPueEWalqyw2+htU5ePWyUgRwdKUFxOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=wEHd8KSC; arc=none smtp.client-ip=91.244.183.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infotecs.ru
+Received: from mx0.infotecs-nt (localhost [127.0.0.1])
+	by mx0.infotecs.ru (Postfix) with ESMTP id 4AB3314B179B;
+	Thu,  7 Mar 2024 17:17:33 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru 4AB3314B179B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
+	t=1709821053; bh=BO/sS3iNltEei/NOaZXQFdewmgrTpD5zeAJZ1NGWfVc=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=wEHd8KSCg81ZAv5MvDWDScZw7aqC9N4OVbsha0gOod/Qwt6AcZxCxK4DzilNBE2X/
+	 KsanJ5Xp+aU371+MIl20NA1zgbCVOgbe58BXo2IHJYfr66vt0Mrpu0daFfmN+e9t6T
+	 OjfCRo9sXcpfOic2MGthCN9XwgCNQefOmLxMTDvc=
+Received: from msk-exch-01.infotecs-nt (msk-exch-01.infotecs-nt [10.0.7.191])
+	by mx0.infotecs-nt (Postfix) with ESMTP id 480543128A3E;
+	Thu,  7 Mar 2024 17:17:33 +0300 (MSK)
+From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+To: Simon Horman <horms@kernel.org>
+CC: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "lvc-project@linuxtesting.org"
+	<lvc-project@linuxtesting.org>
+Subject: Re: [PATCH net-next] tcp: fix incorrect parameter validation in the
+ do_tcp_getsockopt() function
+Thread-Topic: [PATCH net-next] tcp: fix incorrect parameter validation in the
+ do_tcp_getsockopt() function
+Thread-Index: AQHacGscDaUt7YW/90u+fNTxajGHYrEsIFYA
+Date: Thu, 7 Mar 2024 14:17:32 +0000
+Message-ID: <5c65a5be-ba95-4420-b755-aabc5ae7559b@infotecs.ru>
+References: <20240306095430.1782163-1-Ilia.Gavrilov@infotecs.ru>
+ <095ce1d0f2cd6771b30ab1d73ee6aa8e8460c7c8.camel@redhat.com>
+ <e8b2287f-bf25-4a95-aef2-58067c893b4f@infotecs.ru>
+ <20240307084014.GH281974@kernel.org>
+In-Reply-To: <20240307084014.GH281974@kernel.org>
+Accept-Language: ru-RU, en-US
+Content-Language: ru-RU
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <928543079EBFE4409BBDA420FC8CB05C@infotecs.ru>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL+tcoBqBaHxSU9NQqVxhRzzsaJr4=0=imtyCo4p8+DuXPL5AA@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-KLMS-Rule-ID: 5
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2024/03/07 13:22:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2024/03/07 10:14:00 #24028863
+X-KLMS-AntiVirus-Status: Clean, skipped
 
-Jason Xing <kerneljasonxing@gmail.com> wrote:
-> On Thu, Mar 7, 2024 at 8:00 PM Florian Westphal <fw@strlen.de> wrote:
-> >
-> > Jason Xing <kerneljasonxing@gmail.com> wrote:
-> > > > This change disables most of the tcp_in_window() test, this will
-> > > > pretend everything is fine even though tcp_in_window says otherwise.
-> > >
-> > > Thanks for the information. It does make sense.
-> > >
-> > > What I've done is quite similar to nf_conntrack_tcp_be_liberal sysctl
-> > > knob which you also pointed out. It also pretends to ignore those
-> > > out-of-window skbs.
-> > >
-> > > >
-> > > > You could:
-> > > >  - drop invalid tcp packets in input hook
-> > >
-> > > How about changing the return value only as below? Only two cases will
-> > > be handled:
-> > >
-> > > diff --git a/net/netfilter/nf_conntrack_proto_tcp.c
-> > > b/net/netfilter/nf_conntrack_proto_tcp.c
-> > > index ae493599a3ef..c88ce4cd041e 100644
-> > > --- a/net/netfilter/nf_conntrack_proto_tcp.c
-> > > +++ b/net/netfilter/nf_conntrack_proto_tcp.c
-> > > @@ -1259,7 +1259,7 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
-> > >         case NFCT_TCP_INVALID:
-> > >                 nf_tcp_handle_invalid(ct, dir, index, skb, state);
-> > >                 spin_unlock_bh(&ct->lock);
-> > > -               return -NF_ACCEPT;
-> > > +               return -NF_DROP;
-> >
-> > Lets not do this.  conntrack should never drop packets and defer to ruleset
-> > whereever possible.
-> 
-> Hmm, sorry, it is against my understanding.
-> 
-> If we cannot return -NF_DROP, why have we already added some 'return
-> NF_DROP' in the nf_conntrack_handle_packet() function? And why does
-> this test statement exist?
-
-Sure we can drop.  But we should only do it if there is no better
-alternative.
-
-> nf_conntrack_in()
->   -> nf_conntrack_handle_packet()
->   -> if (ret <= 0) {
->          if (ret == -NF_DROP) NF_CT_STAT_INC_ATOMIC(state->net, drop);
-
-AFAICS this only happens when we receive syn for an existing conntrack
-that is being removed already so we'd expect next syn to create a new
-connection.  Feel free to send patches that replace drop with -accept
-where possible/where it makes sense, but I don't think the
-TCP_CONNTRACK_SYN_SENT one can reasonably be avoided.
-
-> My only purpose is not to let the TCP layer sending strange RST to the
-> right flow.
-
-AFAIU tcp layer is correct, no?  Out of the blue packet to some listener
-socket?
-
-> Besides, resorting to turning on nf_conntrack_tcp_be_liberal sysctl
-> knob seems odd to me though it can workaround :S
-
-I don't see a better alternative, other than -p tcp -m conntrack
---ctstate INVALID -j DROP rule, if you wish for tcp stack to not see
-such packets.
-
-> I would like to prevent sending such an RST as default behaviour.
-
-I don't see a way to make this work out of the box, without possible
-unwanted side effects.
-
-MAYBE we could drop IFF we check that the conntrack entry candidate
-that fails sequence validation has NAT translation applied to it, and
-thus the '-NF_ACCEPT' packet won't be translated.
-
-Not even compile tested:
-
-diff --git a/net/netfilter/nf_conntrack_proto_tcp.c b/net/netfilter/nf_conntrack_proto_tcp.c
---- a/net/netfilter/nf_conntrack_proto_tcp.c
-+++ b/net/netfilter/nf_conntrack_proto_tcp.c
-@@ -1256,10 +1256,14 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
-        case NFCT_TCP_IGNORE:
-                spin_unlock_bh(&ct->lock);
-                return NF_ACCEPT;
--       case NFCT_TCP_INVALID:
-+       case NFCT_TCP_INVALID: {
-+               verdict = -NF_ACCEPT;
-+               if (ct->status & IPS_NAT_MASK)
-+                       res = NF_DROP; /* skb would miss nat transformation */
-                nf_tcp_handle_invalid(ct, dir, index, skb, state);
-                spin_unlock_bh(&ct->lock);
--               return -NF_ACCEPT;
-+               return verdict;
-+       }
-        case NFCT_TCP_ACCEPT:
-                break;
-        }
-
-But I don't really see the advantage compared to doing drop decision in
-iptables/nftables ruleset.
-
-I also have a hunch that someone will eventually complain about this
-change in behavior.
+DQoNCg0K0KEg0YPQstCw0LbQtdC90LjQtdC8LA0K0JjQu9GM0Y8g0JPQsNCy0YDQuNC70L7Qsg0K
+0JLQtdC00YPRidC40Lkg0L/RgNC+0LPRgNCw0LzQvNC40YHRgg0K0J7RgtC00LXQuyDRgNCw0LfR
+gNCw0LHQvtGC0LrQuA0K0JDQniAi0JjQvdGE0L7QotC10JrQoSIg0LIg0LMuINCh0LDQvdC60YIt
+0J/QtdGC0LXRgNCx0YPRgNCzDQoxMjcyODcsINCzLiDQnNC+0YHQutCy0LAsINCh0YLQsNGA0YvQ
+uSDQn9C10YLRgNC+0LLRgdC60L4t0KDQsNC30YPQvNC+0LLRgdC60LjQuSDQv9GA0L7QtdC30LQs
+INC00L7QvCAxLzIzLCDRgdGC0YAuIDENClQ6ICs3IDQ5NSA3MzctNjEtOTIgKCDQtNC+0LEuIDQ5
+MjEpDQrQpDogKzcgNDk1IDczNy03Mi03OA0KDQoNCklsaWEuR2F2cmlsb3ZAaW5mb3RlY3MucnUN
+Cnd3dy5pbmZvdGVjcy5ydQ0KDQoNCk9uIDMvNy8yNCAxMTo0MCwgU2ltb24gSG9ybWFuIHdyb3Rl
+Og0KPiBPbiBXZWQsIE1hciAwNiwgMjAyNCBhdCAxMTo1NDo0MEFNICswMDAwLCBHYXZyaWxvdiBJ
+bGlhIHdyb3RlOg0KPj4gT24gMy82LzI0IDE0OjM2LCBQYW9sbyBBYmVuaSB3cm90ZToNCj4+PiBU
+aGUgYWJvdmUgaXMgaW5jb3JyZWN0LCBhcyB0aGUgJ2xlbicgdmFyaWFibGUgaXMgYSBzaWduZWQg
+aW50ZWdlcg0KPj4NCj4+IEkgbWVhbiwgaWYgJ2xlbicgaXMgbmVnYXRpdmUgdGhlbiBhZnRlciB0
+aGlzIGV4cHJlc3Npb24NCj4+IGxlbiA9IG1pbl90KHVuc2lnbmVkIGludCwgbGVuLCBzaXplb2Yo
+aW50KSk7DQo+PiB0aGUgJ2xlbicgdmFyaWFibGUgd2lsbCBiZSBlcXVhbCB0byBzaXplb2YoaW50
+KSA9PSA0DQo+PiBhbmQgdGhlIHN0YXRlbWVudA0KPj4gaWYgKGxlbiA8IDApIHJldHVybiAtRUlO
+VkFMOw0KPj4gbWlnaHQgYmUgdW5yZWFjaGFibGUgZHVyaW5nIHByb2dyYW0gZXhlY3V0aW9uLg0K
+Pg0KPiBIaSBHYXZyaWxvdiBhbmQgUGFvbG8sDQo+DQo+IEkgY291bGQgYmUgbWlzc2luZyBzb21l
+dGhpbmcgb2J2aW91cyBidXQgaXQgc2VlbXMgdG8gbWUgdGhhdCB0aGlzIGlzIGNvcnJlY3QuDQo+
+IEFsdGhvdWdoIHBlcmhhcHMgd2UgY291bGQgdHJ5IHJld29yZGluZyB0aGUgcGF0Y2ggZGVzY3Jp
+cHRpb24gdG8NCj4gbWFrZSB0aGluZ3MgYSBiaXQgY2xlYXJlci4gSGVyZSBpcyBteSBhdHRlbXB0
+IGF0IHRoYXQ6DQo+DQo+ICAgICBUaGUgJ2xlbicgdmFyaWFibGUgY2FuJ3QgYmUgbmVnYXRpdmUg
+d2hlbiBhc3NpZ25lZCB0aGUgcmVzdWx0IG9mDQo+ICAgICAnbWluX3QnIGJlY2F1c2UgYWxsICdt
+aW5fdCcgcGFyYW1ldGVycyBhcmUgY2FzdCB0byB1bnNpZ25lZCBpbnQsDQo+ICAgICBhbmQgdGhl
+biB0aGUgbWluaW11bSBvbmUgaXMgY2hvc2VuLg0KPg0KPiAgICAgVG8gZml4IHRoZSBsb2dpYywg
+Y2hlY2sgJ2xlbicgYXMgcmVhZCBmcm9tICdvcHRsZW4nLA0KPiAgICAgd2hlcmUgdGhlIHR5cGVz
+IG9mIHJlbGV2YW50IHZhcmlhYmxlcyBhcmUgKHNpZ25lZCkgaW50Lg0KPg0KPiBGV0lJVywgSSBz
+ZWUgZm91ciBzaW1pbGFyIHBhdGNoZXMgb24gbmV0ZGV2IHRoaXMgbW9ybmluZy4NCj4gSXQgZG9l
+cyBzZWVtIHRvIG1lIHRoYXQgdGhleSBhcmUgYWxsIHZhbGlkIGZpeGVzLg0KPiBCdXQgaWYgdGhl
+eSBuZWVkIHRvIGJlIHJlcG9zdGVkLCBvciB0aGVyZSBhcmUgbW9yZSBjb21pbmcsDQo+IHRoZW4g
+SSB0aGluayBpdCB3b3VsZCBiZSB1c2VmdWwgdG8gYnVuZGxlIHRoZW0gdXAsDQo+IHNheSBpbnRv
+IGJhdGNoZXMgb2YgMTAsIGFuZCBzZW5kIGFzIHBhdGNoLXNldHMuDQo+DQo+IFRoaXMgbWF5IGhl
+bHAgd2l0aCBmcmFnbWVudGF0aW9uIG9mIHJldmlldyBvZiB3aGF0IHNlZW1zDQo+IHRvIGJlIHRo
+ZSBzYW1lIGNoYW5nZSBpbiBtdWx0aXBsZSBwbGFjZXMuDQo+DQo+DQoNCkhpIFNpbW9uLCB0aGFu
+ayB5b3UgZm9yIHlvdXIgYW5zd2VyLg0KDQpJJ2xsIHJld29yZCB0aGUgcGF0Y2ggZGVzY3JpcHRp
+b24gYW5kIHJlcG9zdCBhIHNlcmllcyBvZiBwYXRjaGVzIGluIFYyLg0KSSBhbHNvIGZvdW5kIGEg
+Y291cGxlIG9mIHBsYWNlcyB3aXRoIHRoZSBzYW1lIHByb2JsZW0uDQo=
 
