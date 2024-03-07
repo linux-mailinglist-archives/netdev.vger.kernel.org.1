@@ -1,189 +1,79 @@
-Return-Path: <netdev+bounces-78495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FEE0875532
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 18:31:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78B2E875550
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 18:39:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A015A1C21380
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:31:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E6991F229E0
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:39:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD73130E29;
-	Thu,  7 Mar 2024 17:31:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48AE130ADE;
+	Thu,  7 Mar 2024 17:39:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="JXWx3fcS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nRsdZ59d"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39861130AF1;
-	Thu,  7 Mar 2024 17:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFD374262;
+	Thu,  7 Mar 2024 17:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709832706; cv=none; b=RRnSRX1waA97wAXiTMwUvE7ST/2XdbaQq2u7kSnEBfmhjbp/X20ZUm6oQTvTi7ml22mI5DTKHEFM0W4tWhwHeYXI6aFQLMsz5l4NyzSor1O0+8VxO9URrpjJmlAKM4e99tI30deVh84bOkzTcM35nz8OYYBrZDDdV6ZLKLQhaRY=
+	t=1709833142; cv=none; b=B4ygva9Es8BaQWSmex35mxuI+3OfAK9zQyQCP4MCFZDr3PuLfPyTOTxUK0UlY6wwyAdN50byi6SwDR4AZA/plw2mzTNq/aMIkkwZXFOovC9D/P/TKxtB3Dt6Kgu+YQQWaiDUDwB+DgcoeBhLyAbGoxr4i3QdLqBNxg5pd0SJZ/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709832706; c=relaxed/simple;
-	bh=Pw1wjnfdkstP4sMjq/SqSIfAkxHM4ROpPhW1adlHMZI=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=MDWyNvEjUmqvPxv7Uaq5B2Vz3L76Z4uIx5LL6iFzhA/P/jST/DGfDUVj2d6oVCo463fCad9k7jifgRkBum7kL7BaJaVM1MTlACkNz1cQofWGYkzaXe9vF/XOYeaJVUTKxgwyzyrH/xV1fECr/YkISD2KrQE3DQ2Jsz7ubFuZcw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=JXWx3fcS; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=6GKHuULFobI/veCzO71hJuFZMvHW2DBWIwJthjIFZt0=; b=JXWx3fcSvqEd2usjf0tQN1DMCi
-	vSO6xR4WJptmR2KKeHQgwZrwN8Kcxo2SsAwQYU3GqG1uUhHegfI3SUUIcj3xuPPVcnq4qvvd9Z59E
-	QEXIJexwsh/xmTHCzcD+vFT4djVEoZUoeVEOEWDbhnGjDhNOexCanK8oqtsXqubWrWGy58R7eCA5a
-	KMkwOmTd6RBHYUW7MOdrUMkaxa0IBDN9EMKZ1xegBgTvPlxJM2R9eO51SJIrfnnNNvBIZE0Kisxb1
-	7MM1fiEoUnsAibMICY+p3wL4QPlBDDx84amzwvLXj1OsBgSDB7e/8IGpBSO57JhZs1rwQ14crw6Zx
-	jCusX5Yw==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1riHZL-000J8N-R9; Thu, 07 Mar 2024 18:30:11 +0100
-Received: from [77.58.94.13] (helo=localhost.localdomain)
-	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1riHZI-0034Od-1I;
-	Thu, 07 Mar 2024 18:30:08 +0100
-Subject: Re: [PATCH bpf-next RESEND v2 1/2] bpf: Take return from
- set_memory_ro() into account with bpf_prog_lock_ro()
-To: Christophe Leroy <christophe.leroy@csgroup.eu>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Puranjay Mohan <puranjay12@gmail.com>, Tiezhu Yang <yangtiezhu@loongson.cn>,
- Hengqi Chen <hengqi.chen@gmail.com>, Huacai Chen <chenhuacai@kernel.org>,
- WANG Xuerui <kernel@xen0n.name>,
- Johan Almbladh <johan.almbladh@anyfinetworks.com>,
- Paul Burton <paulburton@kernel.org>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- Helge Deller <deller@gmx.de>, Ilya Leoshkevich <iii@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, "David S. Miller"
- <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Wang YanQing <udknight@gmail.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>
-Cc: bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
- linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
- linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
- netdev@vger.kernel.org,
- "linux-hardening @ vger . kernel . org" <linux-hardening@vger.kernel.org>,
- Kees Cook <keescook@chromium.org>
-References: <8f3b3823cce2177e5912ff5f2f11381a16db07db.1709279661.git.christophe.leroy@csgroup.eu>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <093da237-50c1-5898-1637-7a9a84e1076c@iogearbox.net>
-Date: Thu, 7 Mar 2024 18:30:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1709833142; c=relaxed/simple;
+	bh=hr92BOMDZVDn+AD/0IRZy/Gi/tOEZPuEgX7n0alB/Wc=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=q7LzcnJyq/ZtkFrB3/G+s3dOmHDuaqxbvJuAgt5FbbVXVutKpPH9Ad9fMjk/ssTy/BEmu8P9joIdHt3fe/+ZfEsasNMVU7jI2bFDFz8SlwDVN/b8KB+4iwjaYa9cod3Yd78SQFxtP04ELODTN/MNZL6SfT9Z84a5YdD0bsL+RBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nRsdZ59d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 82711C433F1;
+	Thu,  7 Mar 2024 17:39:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709833142;
+	bh=hr92BOMDZVDn+AD/0IRZy/Gi/tOEZPuEgX7n0alB/Wc=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=nRsdZ59d9dWwYxnwWTP8KXaCy3VhNlj/7m25bUZBU+ILfXiwGaULgl4Evfb3oBE1f
+	 eTQFVq5bf8gZvSehzy+DpMQhZ1rlOeVCHMQQaCb/pPVtImjKoR8USWbBdblh2UDn2E
+	 IgiV31ntJJbuOKi17lDNeMiJ0rEizqyKuam7fBUlGgLW1kCLCfPLX7SkiU+b1KNvub
+	 gGy0pAwtw3copgKzGONwLog44IgCpQnIPsW32XbZRd5hPWWIvJJi/o5s1BqSko4GNK
+	 we0a8PNLKZghk+fq+6v88LPkr960VNnkttEuUWxraqwVeilIaTtXVOFYM9WXHG0yEv
+	 IygFBR55QXfwQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 70A22C3274B;
+	Thu,  7 Mar 2024 17:39:02 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.8-rc8
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240307130604.485199-1-pabeni@redhat.com>
+References: <20240307130604.485199-1-pabeni@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240307130604.485199-1-pabeni@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.8-rc8
+X-PR-Tracked-Commit-Id: ba18deddd6d502da71fd6b6143c53042271b82bd
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: df4793505abd5df399bc6d9a4d8fe81761f557cd
+Message-Id: <170983314244.22258.3329669996541695126.pr-tracker-bot@kernel.org>
+Date: Thu, 07 Mar 2024 17:39:02 +0000
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <8f3b3823cce2177e5912ff5f2f11381a16db07db.1709279661.git.christophe.leroy@csgroup.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27207/Thu Mar  7 10:27:12 2024)
 
-On 3/1/24 8:57 AM, Christophe Leroy wrote:
-> set_memory_ro() can fail, leaving memory unprotected.
-> 
-> Check its return and take it into account as an error.
-> 
-> Link: https://github.com/KSPP/linux/issues/7
-> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> Cc: linux-hardening@vger.kernel.org <linux-hardening@vger.kernel.org>
-> Reviewed-by: Kees Cook <keescook@chromium.org>
-> ---
-> Sorry for the resend, I forgot to flag patch 2 as bpf-next
-> 
-> Note: next patch is autonomous, it is sent as a follow-up of this one to minimize risk of conflict on filter.h because the two changes are too close to each other.
-> 
-> v2: No modification (Just added link in patch message), patchwork discarded this series due to failed test of s390 but it seems unrelated, see https://lore.kernel.org/bpf/wvd5gzde5ejc2rzsbrtwqyof56uw5ea3rxntfrxtkdabzcuwt6@w7iczzhmay2i/T/#m2e61446f42d5dc3d78f2e0e8b7a783f15cfb109d
-> ---
->   include/linux/filter.h | 5 +++--
->   kernel/bpf/core.c      | 4 +++-
->   kernel/bpf/verifier.c  | 4 +++-
->   3 files changed, 9 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/linux/filter.h b/include/linux/filter.h
-> index 36cc29a2934c..7dd59bccaeec 100644
-> --- a/include/linux/filter.h
-> +++ b/include/linux/filter.h
-> @@ -884,14 +884,15 @@ bpf_ctx_narrow_access_offset(u32 off, u32 size, u32 size_default)
->   
->   #define bpf_classic_proglen(fprog) (fprog->len * sizeof(fprog->filter[0]))
->   
-> -static inline void bpf_prog_lock_ro(struct bpf_prog *fp)
-> +static inline int __must_check bpf_prog_lock_ro(struct bpf_prog *fp)
->   {
->   #ifndef CONFIG_BPF_JIT_ALWAYS_ON
->   	if (!fp->jited) {
->   		set_vm_flush_reset_perms(fp);
-> -		set_memory_ro((unsigned long)fp, fp->pages);
-> +		return set_memory_ro((unsigned long)fp, fp->pages);
->   	}
->   #endif
-> +	return 0;
->   }
->   
->   static inline void bpf_jit_binary_lock_ro(struct bpf_binary_header *hdr)
-> diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
-> index 71c459a51d9e..c49619ef55d0 100644
-> --- a/kernel/bpf/core.c
-> +++ b/kernel/bpf/core.c
-> @@ -2392,7 +2392,9 @@ struct bpf_prog *bpf_prog_select_runtime(struct bpf_prog *fp, int *err)
->   	}
->   
->   finalize:
-> -	bpf_prog_lock_ro(fp);
-> +	*err = bpf_prog_lock_ro(fp);
-> +	if (*err)
-> +		return fp;
->   
->   	/* The tail call compatibility check can only be done at
->   	 * this late stage as we need to determine, if we deal
-> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> index 1c34b91b9583..6ec134f76a11 100644
-> --- a/kernel/bpf/verifier.c
-> +++ b/kernel/bpf/verifier.c
-> @@ -19096,7 +19096,9 @@ static int jit_subprogs(struct bpf_verifier_env *env)
->   	 * bpf_prog_load will add the kallsyms for the main program.
->   	 */
->   	for (i = 1; i < env->subprog_cnt; i++) {
-> -		bpf_prog_lock_ro(func[i]);
-> +		err = bpf_prog_lock_ro(func[i]);
-> +		if (err)
-> +			goto out_free;
+The pull request you sent on Thu,  7 Mar 2024 14:06:04 +0100:
 
-How does the error path take out the subprogs from kallsyms in your case? Suppose some of
-the loop iterations succeed before we hit an error. I believe the subprogs still exist in
-kallsyms here.
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.8-rc8
 
->   		bpf_prog_kallsyms_add(func[i]);
->   	}
->   
-> 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/df4793505abd5df399bc6d9a4d8fe81761f557cd
 
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
