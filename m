@@ -1,111 +1,105 @@
-Return-Path: <netdev+bounces-78195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D07A88744F8
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 01:05:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D2C8874518
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 01:19:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E41F1C22292
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:05:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84D74285C18
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:19:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 265AB1848;
-	Thu,  7 Mar 2024 00:05:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1570393;
+	Thu,  7 Mar 2024 00:19:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XBSgwuyV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0X3QnOym"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39E21847
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 00:04:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB9336C;
+	Thu,  7 Mar 2024 00:19:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709769900; cv=none; b=ANIZaGk3ELe5zZgj8ix49WQI/OJpExtSwrGfAugr+YyrRd+GkTaSJ5yG1WIVgyjcIl/ZPS54P4LgdL9zWnlGU/HHWxoJqU8gB8i/SdMZJ+VlOClrDFdO49lY+4eUu2GofCXv/+pYB10qFpFy4ZMYxXtpUEBmh7f4C+hQ450hvgA=
+	t=1709770780; cv=none; b=eukQlphtSufvw/pfMVyCAHpEvow1E/3FlVpDaVGNWVEmLbajDPEYwhIEtLI1V1hVh+9CzkEllehEWU9qOGfvaCsa0TQk3N5gwK28CLb5/3OZWAOIAn3PlaiZoCFmnF8R99RNUonpo/nbkrD5KwZhfjDtjkW4W8iaBIxBZUzsrSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709769900; c=relaxed/simple;
-	bh=s+t/Cm0wIX7rMQXlybCJ0qw4TTpMaTxYylKKjaY6NMI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H40onzLYhBCRzvG3mx/MYE640XayRLRFGqdQ1kxCbPiTNgcSt5Aw7yn/AIcSplF9FU04C1S+5fGZbHNSASAYgglJEG60sPhL3zAxXIbUgH7w0z5rXnPHVY7fzw27Y2sn0FjEE6xSR9Uof/bkae5M8uAszu2+wdhIcBTa6TLFgWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XBSgwuyV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37E54C433C7;
-	Thu,  7 Mar 2024 00:04:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709769899;
-	bh=s+t/Cm0wIX7rMQXlybCJ0qw4TTpMaTxYylKKjaY6NMI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XBSgwuyVkK0BoMxa1Aeyhtp8nzxtY7PbpUE8i41wzbm8aLjktK7nAsx7UsYFPuFbK
-	 zsDCvtY5n/ITvnG5v/7JZe+cnZoRntGLV/CyJs3AytLOcmrpdcKD2TC9EtAJyx27L1
-	 +PSX0+RyrFDs91RtoAH4J1+qr02hEHICEQuFlOwvO53I/IIslaUduvpoIYtKWLqGYT
-	 FRhs0PRMD3okVMa7CFnn+QZy0QhEX8IG/tvSI6bKIr1sLqCkrBEpsyrytCnfncxW4x
-	 PdGRncgOI3BXct52vqmi9dSS3wepK1lVzBGVFIOMo3LMySB3hdQatMbyPYmNiInuzc
-	 J8rWVS9fzNFZw==
-Date: Wed, 6 Mar 2024 16:04:58 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jacob
- Keller <jacob.e.keller@intel.com>, Jiri Pirko <jiri@resnulli.us>, Stanislav
- Fomichev <sdf@google.com>, donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v2 5/5] doc/netlink/specs: Add spec for nlctrl
- netlink family
-Message-ID: <20240306160458.3605e8aa@kernel.org>
-In-Reply-To: <CAD4GDZwtD7v_zQzeGDu93sropHbRsRANUMJ-MAB1w+CZCMyXuQ@mail.gmail.com>
-References: <20240306125704.63934-1-donald.hunter@gmail.com>
-	<20240306125704.63934-6-donald.hunter@gmail.com>
-	<20240306103114.41a1cfb4@kernel.org>
-	<CAD4GDZwtD7v_zQzeGDu93sropHbRsRANUMJ-MAB1w+CZCMyXuQ@mail.gmail.com>
+	s=arc-20240116; t=1709770780; c=relaxed/simple;
+	bh=igeX+dtlvpZvheeyhlJx/Zlz+N19RU9rqrY0FQ0MO+U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D0GvQHUORVE7yHruGvvGevIVBzYeTkj63yR/wMqkKnjo86vMhhTwZkcxVfHoYSntdZE58VmbKKHwsF+qLxzKsuf5crjdiGZTYp1mVBxAGukM3GZ2RiY959TuuDTpHD+tqQ/evXPQFgd7PiJw/pCjsB1DUC0wUOQlahCUD3zH1/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0X3QnOym; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=7QT0gBy9zGeu+xPHf2pGjhnuveV+gws6pSxdSpEf34U=; b=0X3QnOym49VvL5poDUUua87KpY
+	zIfFc3eXicEaBSGUMfM3IV5VtRFzBtzFB5HK9/EcOaSuIH4+7ZTOMwDbc3CBZlz3wWq1Z4IQyGuDc
+	5a0jsKrgej1J3goKHqUnDp+FdDj3bMPXKQtZr0SPLksNP4znAcrWsZ4oNuTAI69XdSTs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ri1UG-009Xho-A7; Thu, 07 Mar 2024 01:19:52 +0100
+Date: Thu, 7 Mar 2024 01:19:52 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
+	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, corbet@lwn.net,
+	linux-doc@vger.kernel.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
+	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
+	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
+	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
+	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
+	benjamin.bigler@bernformulastudent.ch
+Subject: Re: [PATCH net-next v3 03/12] net: ethernet: oa_tc6: implement
+ register read operation
+Message-ID: <48b65759-6e69-46ef-a2ed-857d04eadac8@lunn.ch>
+References: <20240306085017.21731-1-Parthiban.Veerasooran@microchip.com>
+ <20240306085017.21731-4-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240306085017.21731-4-Parthiban.Veerasooran@microchip.com>
 
-On Wed, 6 Mar 2024 22:54:08 +0000 Donald Hunter wrote:
-> > I've used
-> >         enum-name:
-> > i.e. empty value in other places.
-> > Is using empty string more idiomatic?  
-> 
-> I got this when I tried to use an empty value, so I used '' everywhere instead.
-> 
-> jsonschema.exceptions.ValidationError: None is not of type 'string'
-> 
-> Failed validating 'type' in
-> schema['properties']['attribute-sets']['items']['properties']['enum-name']:
->     {'description': 'Name for the enum type of the attribute.',
->      'type': 'string'}
-> 
-> On instance['attribute-sets'][1]['enum-name']:
->     None
-> 
-> It turns out that the fix for that is a schema change:
-> 
-> --- a/Documentation/netlink/genetlink-legacy.yaml
-> +++ b/Documentation/netlink/genetlink-legacy.yaml
-> @@ -169,7 +169,7 @@ properties:
->            type: string
->          enum-name:
->            description: Name for the enum type of the attribute.
-> -          type: string
-> +          type: [ string, "null" ]
->          doc:
->            description: Documentation of the space.
->            type: string
-> 
-> I'll respin with a cleaned up nlctrl spec and fixes for the schemas.
+>  enum oa_tc6_register_op {
+> +	OA_TC6_CTRL_REG_READ = 0,
+>  	OA_TC6_CTRL_REG_WRITE = 1,
+>  };
 
-Hm, is this some new version of jsonschema perhaps?
-We use empty values all over the place:
+I thought it looked a little odd when the enum was added in the
+previous patch with the first value of 1, and only one value. Now it
+makes more sense.
 
-$ git grep 'enum-name:$' -- Documentation/netlink/specs/
-Documentation/netlink/specs/ethtool.yaml:    enum-name:
-Documentation/netlink/specs/fou.yaml:    enum-name:
-Documentation/netlink/specs/ovs_datapath.yaml:    enum-name:
-Documentation/netlink/specs/ovs_flow.yaml:    enum-name:
-Documentation/netlink/specs/ovs_flow.yaml:    enum-name:
+The actual value appears to not matter? It is always 
+
+> +	if (reg_op == OA_TC6_CTRL_REG_WRITE)
+
+So i would drop the numbering, and leave it to the compiler. The
+patches will then look less odd.
+
+> +static int oa_tc6_check_ctrl_read_reply(struct oa_tc6 *tc6, u8 size)
+> +{
+> +	u32 *tx_buf = tc6->spi_ctrl_tx_buf;
+> +	u32 *rx_buf = tc6->spi_ctrl_rx_buf + OA_TC6_CTRL_IGNORED_SIZE;
+> +
+> +	/* The echoed control read header must match with the one that was
+> +	 * transmitted.
+> +	 */
+> +	if (*tx_buf != *rx_buf)
+> +		return -ENODEV;
+
+Another case where -EPROTO might be better?
+
+	Andrew
 
