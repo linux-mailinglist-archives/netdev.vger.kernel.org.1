@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-78272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DB318749CF
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:36:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEAE48749D5
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:38:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F11081F24996
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:36:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CC951F22F49
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4B51C2A3;
-	Thu,  7 Mar 2024 08:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC7C71728;
+	Thu,  7 Mar 2024 08:37:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="I6vtqg3V"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NcX1Gai1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2852570CAA
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 08:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D704A8286B
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 08:37:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709800589; cv=none; b=mxsU05Y6U2AuFpT+m5tMM98IUPvCEH5huRGRFlgqsiuUClm3Q7LEI05wB7Jilr+8TTqFtSE23Ir6uL7b4vVTtyhH0/H0SXgN3Tj4dxGuIh5r3V9H0vi1+ooBznf5OwqhOQkpVYKY1L7piyJbrZkRPD/LKV/h/kyDk34aaWzEHsk=
+	t=1709800663; cv=none; b=oAsfPcGSH2PCfWVifzsxELTfEOCTJga7z5YPXUhd97ad+qbdsvjgq09rDXOJD67MTQEWJsk5pVy8YL7Sz6EqpMec32EPctduxfdqHrayXpMAri7FJPEoxn3R/lMWcaq/e7Hg2zmW01hDSPFWOdNcFx3NPYq5WnkdXnJnx9YvJ5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709800589; c=relaxed/simple;
-	bh=YIJyDIiYr+E/5bxQ0O/xBpenqUOxTDp7Iq6pitmMVuA=;
+	s=arc-20240116; t=1709800663; c=relaxed/simple;
+	bh=GmFtMoPOyiLH8bzORAZn8FvvjYhb2uYqXQ3UYQdZ7fA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IKW1dJwcnltlVjVUauaUqNIx9gDla5f8rXJUvifwmvejCv8Nv3GmiI/gfNhILhtD0PCaoB1oU0zFmsrH1oFrQwlRDWB0r81hVPa/dY8zfSs7B7GV9ek8GFRWcba6/cN+QUQmfVfFjN9NzUZG2oIPwzv+5FITMG8aPGrTZg5VIME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=I6vtqg3V; arc=none smtp.client-ip=209.85.128.47
+	 Content-Type:Content-Disposition:In-Reply-To; b=GInVPVsgA0weN+szm+GlhihGOhcYvUIXhTMSTO/bjOVNYHFMotJwo4JpAyNNIm+dlD2hGuqRGf1ML3OHB+FkuJI/zP9Sxco8zH780W9ipcim7i1sC8uCVJM79BNdA9A5BloOVKI2FGycr2d+ANKDAAYpJOwDyTDZDqPNZoAkPGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=NcX1Gai1; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-412fc5f5099so4922365e9.2
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 00:36:26 -0800 (PST)
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-512e4f4e463so837389e87.1
+        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 00:37:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709800585; x=1710405385; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709800660; x=1710405460; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CAc+kC0MFvkIafAcJxHHO/LYj1eLM3W27yzXh9fYe6w=;
-        b=I6vtqg3V0I5USuIvtjzzrLICm6oe0mbgzPk9RzLogC0B9rxES1Nfe7DQeKSBrO5BQ2
-         88XIODWN5/8PUQhcgqH4ZBrWiHNYNkJ6k1Bxb2GaaxCHvguhn5biA9EX4i9AhuqchTnW
-         5OUJ6Hf+L+ZqA9ML1lYEE2Xjc/PxEYcfTVZ5GVjeGkzlqD8P83t5OhpHZA0DSqSdoQTn
-         iSzU/xxlU0HjhHcwFOzk2Z9CbQC5unNk8enM3DG6D4fTjblQDYP4uzqke1195thbcT8X
-         RXsOuN/kN2zwSNKxIzj9sDcJ+bY+BiXVF3NlBrWSpx0cEJBdjaCfC2q0g7hLDBw7+GLZ
-         Xx2A==
+        bh=5S76SdU6JClwN911l2VaNXiJf3/Bi8ejPY+nnpIZVrQ=;
+        b=NcX1Gai1kvRs7VsEsakCPTxcn8SbG6OskUTVkb7OkuQurasa4ND4Ugm6CKzTwB+3Sc
+         YICsGOjf9J4YqFM5OYX/yZwiBVFtA9IAFSg3xT2QR9d0iipeUZLVKNoA/tPhHAT5purw
+         DgTsd7pNJngqfco5ZbqzlnL6eJtkovH+yXzUw54KBTi1nZei3KCMmtc2GHA2Ge/kO/um
+         zKpWClVQfZnd2PHJuD9+2+TbKzLII7TJqMpAYSVmwctfK481+gBB/craQ/pDR43be8G9
+         Uj9g+l3sUbroNwurige5HRnOKeWw6mN7r7uPl08VzbMZE8qcIcqSWHcX6LdsDzdC1cHO
+         E6GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709800585; x=1710405385;
+        d=1e100.net; s=20230601; t=1709800660; x=1710405460;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CAc+kC0MFvkIafAcJxHHO/LYj1eLM3W27yzXh9fYe6w=;
-        b=W0eYErWdlap9Gg4vVH9aR3htMwUZArS1hBjO8lirTVnDJA+WzZE75fb2IdI7kE1zbR
-         PlMD5BzOmvpD7kgo3x51C9jLxG7eiBEluP60ZM1zEbhFoTAwTHCazdoxaPpib6oPpZSv
-         raG3o3SZAGGcEct5cm7xe1lzzAodAyiwgS8QQ6zjcWtQhgZwPFiou38w7L59v7yNRxvc
-         h2zszWR2xUzC71qJaL8paWmtnkfIaepL7JPa15U3cc2wjYbuVNcft21t8XHarby3InO9
-         zx0HQz7NEYcZHc7fD9SvQZLnOe1nJymfF2rpffO6QHa/+RcGja3T9JR+0spoIj5UiKW/
-         0rAA==
-X-Gm-Message-State: AOJu0YyWRCJNWuF5NPtwAigfWWTvcCiQWG82QXd0Tlz32zNt8WYftGuK
-	WobHKEZUf4Z+mCgukoHwIwiPKqxMZ/S82+MZpaxxvo+IYR8SuOR2dYTFVMTDQko=
-X-Google-Smtp-Source: AGHT+IH2LRHWpsXBJgymVHDeG9E53lSQinDDC0B43A2KaqmMbS20RpD8KVl02bqUTtvoruglDoG+jQ==
-X-Received: by 2002:a5d:4c46:0:b0:33d:2f2f:e779 with SMTP id n6-20020a5d4c46000000b0033d2f2fe779mr13388232wrt.40.1709800585096;
-        Thu, 07 Mar 2024 00:36:25 -0800 (PST)
+        bh=5S76SdU6JClwN911l2VaNXiJf3/Bi8ejPY+nnpIZVrQ=;
+        b=ZZ1yvCd3CAMhLXrXXB69lXc4XBpenFl7kt5hajmbNf6KXYKnQcz8mmm+YAMOrNdyBn
+         88zIWxApRugLr3eD8M0JiVRXN/Cp6CVWJ/s1tUACPKrXoZveSwlvaoUgeRV5QkOHEJKN
+         9t9Csad4zrJqSUDZPPd/mXpS07Xxrloxp8T42aIbBpAn/ByREqMu42sYjJmiz0Pssevy
+         fcSjZb8uXmvddg48pmLjz5JyHCCtxJhaqP1JMTYQk4MU5dUdQwarVVrL8kPRJSH02dZT
+         RYqfFuEwvYrlD22DEGpYNYsR8GgIzTR/qEU31agCSg+QlkLDw7/uWlaMltGj2u8ipYe8
+         BeCA==
+X-Gm-Message-State: AOJu0YxB+0cMWfsBV3TQ3tohK0r/rvS+qZEhKOIA10bOZjv1QL7u+5Sf
+	N+erbf8FySORtvvuzss7j3Bpuh9NJY26tOW4meks01yBFpPc18OA4yERnbE0nh4=
+X-Google-Smtp-Source: AGHT+IFN5Hn+GwtpQHlI9yZI85LicQX+Z810R1A+nNxn30XL/dsjB+neJTLbfSdoKUI8HV+Z/Lo61g==
+X-Received: by 2002:a19:7614:0:b0:513:1e2a:f9c5 with SMTP id c20-20020a197614000000b005131e2af9c5mr942408lff.17.1709800659691;
+        Thu, 07 Mar 2024 00:37:39 -0800 (PST)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id bw1-20020a0560001f8100b0033d6bc17d0esm20148359wrb.74.2024.03.07.00.36.23
+        by smtp.gmail.com with ESMTPSA id v23-20020a05600c215700b00412e84e59d8sm1794174wml.44.2024.03.07.00.37.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Mar 2024 00:36:24 -0800 (PST)
-Date: Thu, 7 Mar 2024 09:36:21 +0100
+        Thu, 07 Mar 2024 00:37:39 -0800 (PST)
+Date: Thu, 7 Mar 2024 09:37:35 +0100
 From: Jiri Pirko <jiri@resnulli.us>
 To: William Tu <witu@nvidia.com>
 Cc: netdev@vger.kernel.org, jiri@nvidia.com, bodong@nvidia.com,
 	tariqt@nvidia.com, yossiku@nvidia.com, kuba@kernel.org
 Subject: Re: [PATCH RFC v3 iproute2-next] devlink: Add shared memory pool
  eswitch attribute
-Message-ID: <Zel8hfZw5nEFB-dN@nanopsycho>
+Message-ID: <Zel8zzXM18k3FnGL@nanopsycho>
 References: <20240306232922.8249-1-witu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -191,6 +191,14 @@ Thu, Mar 07, 2024 at 12:29:22AM CET, witu@nvidia.com wrote:
 > 	pr_err("                               [ inline-mode { none | link | network | transport } ]\n");
 > 	pr_err("                               [ encap-mode { none | basic } ]\n");
 >+	pr_err("                               [ spool-size { SIZE } ]\n");
+
+
+SIZE should not be in brackets, it's not an enum selection:
+	pr_err("                               [ spool-size SIZE ]\n");
+Same in man
+
+
+
 > 	pr_err("       devlink dev eswitch show DEV\n");
 > 	pr_err("       devlink dev param set DEV name PARAMETER value VALUE cmode { permanent | driverinit | runtime }\n");
 > 	pr_err("       devlink dev param show [DEV name PARAMETER]\n");
@@ -250,10 +258,6 @@ Thu, Mar 07, 2024 at 12:29:22AM CET, witu@nvidia.com wrote:
 >+.TP
 >+.BR spool-size " SIZE"
 >+Set the rx shared memory pool size in bytes.
-
-Be more verbose please. Describe the cmd line option properly.
-
-
 >+
 > .SS devlink dev param set  - set new value to devlink device configuration parameter
 > 
