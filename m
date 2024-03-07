@@ -1,216 +1,150 @@
-Return-Path: <netdev+bounces-78364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39E69874CC0
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:54:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 02567874CCC
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:57:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A135D1F240A2
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:54:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CB391F21C81
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:57:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A51D186AC5;
-	Thu,  7 Mar 2024 10:54:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFFEC86AC5;
+	Thu,  7 Mar 2024 10:57:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IdD8ojq3"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Tr7xuXde"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD6085637
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 10:54:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3357B125DC;
+	Thu,  7 Mar 2024 10:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709808888; cv=none; b=E3pNt8TOjF5y/Bs0ozneSbjo2LAUwM/Tua5EW3LAHDCqaw86HwumYgo4nGlr6jZdCb4YjcXAZyo4feB5XbDcpdJdEx1OpBrVO6QSzplfCCeLfiVtJAy23NTmw7qs0F22QXfcG5V20+vsobjEZKdE1VxbUuiEk5XVu7JJ6p/BiAQ=
+	t=1709809027; cv=none; b=X9ml+BxO846GxEtp0sZIIx1KTDOF0JeIKoiaToopa7dLFO4L1h6/IeKXNR+pbJij1c+aQjHeLSGsSdNRz7k5vDAVhgt9A/30fnl7RX+CkMGHSyGGd3b5dThqB5jUKZ7Be2HcA2UR3JuDVbHT3Vzf8BvNeOtn8yKLg2ClpIECqyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709808888; c=relaxed/simple;
-	bh=hFENZOecmZ2fiZ6Ikwhql99wba8osU4H003EBkgSnws=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F8s+pblWz7+Kt5U1uHcAOJX9RBx8Vx/ya0ogfWP8zxyvW57ed84u1KgL/gTg4phpNlCNrDJ7PePUEL/uJunL8sCviDz106LgoyX481BvDRDy8YLzPgcJHrgkjnDyT5kDFF91w/alI4PI3y0azkdtxUrCCa9kbhRYUwO1+eOtxBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IdD8ojq3; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a28a6cef709so118580366b.1
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 02:54:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709808885; x=1710413685; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=L92e8PXyuWLhf1oxm+/VjaGzKgXNS1PJSpZ6PcMT0dU=;
-        b=IdD8ojq3Zb0CugVzeo2ezkccm3AmH+WVDSicbqFNjla+sdoM1R5Y9dUqYwSs19/hrd
-         XEkFG8sU9A24tmdBb1omIBjahaQ7bX3hGA+NwtsXx6cPhIuLPYfBtsmGdtCA5mgar9G7
-         wgcFvqHq7GC4NEjfaYECIVLwvzve/qyFm+QJmH/KEF8wjo2m5auRvGqvgMKIpC09Cht2
-         FhyB6vgbLsIxESr6uDX2y7OpoG0YBugaJX4S6CiwmK6cSHrAjZA9rXHz5aMgaLPkg75p
-         iszKs9l721CRkML+ybbL3kIGuse3LrGm4cjDDFMRvmDQDWFUCgpDCbsBDp6UCpv5ujhJ
-         7Mog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709808885; x=1710413685;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L92e8PXyuWLhf1oxm+/VjaGzKgXNS1PJSpZ6PcMT0dU=;
-        b=KWeQBJPOCAGMgxjtJUmqgIs20nXwsMFecx+2tyu1l+XmwmvXVfxbs5dSwNy7cKJ9Ic
-         fDi7+cjwdLhwlVRaf+cE+fBxrxfdFC/6DPGUd46M21c+CNAL5vtV6C6AYcxeJx3kxWji
-         z13nPTnLkhIidKoa8DDQIUOYHHzcnehAF8dVp1fdwdTAJ821iMkQekkEV0Whv6gS2h9I
-         idCcwcbaHaii71yK/7NPNbno9UHdpWuU83JXu3M/HDbUyqk23zWnwuH/KY5CNBZrCmM7
-         mDFYoE2Td/7S2piUyPcj6NKuLOI//aI9iFhWy3jaRfED1Jrt9cBUZzzy2ApMPNF69czQ
-         QvIQ==
-X-Gm-Message-State: AOJu0Yx34JbYj2hu8JFiEQ0tDp2Zhe3EcIHGD89b39QVYBLxUFXjmG78
-	j+gm7ERmqIQF8kb4N5xOuNuse88zj1KYp7+6N0ynbVH7MgkAAepXeS7VbG50jG8=
-X-Google-Smtp-Source: AGHT+IGX6N7QAb3+6kthKk65wUR0Pc37C7ZfiplFTI7BuL4eC0f5BpvpsplXQ/9t573QnbWKr6EcXA==
-X-Received: by 2002:a17:906:6c8:b0:a45:6422:ea2a with SMTP id v8-20020a17090606c800b00a456422ea2amr7746920ejb.41.1709808884851;
-        Thu, 07 Mar 2024 02:54:44 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.222.97])
-        by smtp.gmail.com with ESMTPSA id me12-20020a170906aecc00b00a45af5df0f3sm2200401ejb.112.2024.03.07.02.54.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Mar 2024 02:54:44 -0800 (PST)
-Message-ID: <b9d41b76-cfdc-459c-a48b-2dd37358d495@linaro.org>
-Date: Thu, 7 Mar 2024 11:54:41 +0100
+	s=arc-20240116; t=1709809027; c=relaxed/simple;
+	bh=WM12WLtYAz2cxFua0kfokyW2yT1caSiNtxTO/r91NvY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=S4t35sYIxy9oaMX4cDsMoHSO4SLPYaZOHDzRHvOTKOW+7Djoz33edfHKtMwA/2JDdZj7+wjL4h7p6i2sCjsitehlmhdhG1X6aKGtcYCqEmE/WuWAPQc33UGQzO85sKT0STxNz2D10Ra7ZQjJhm4OWmYH0jdt1J45m2nTA+3m83c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Tr7xuXde; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4275jbOD008239;
+	Thu, 7 Mar 2024 02:56:58 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=3BqF1EAT
+	OqrJt33ZWiXXxcwocmc1ljkbIFVDyslFIyU=; b=Tr7xuXdeg+rnUJzwKY9nMzXp
+	L4l3o8YQV7IG2E264x6uPkPy4RlOTaInL8BKtFxlwj3B+dzfRrHoymwjwryKFe8H
+	V9QesUG63+yYbRaYZCVaoxsWDuHRvKEvhw+nWu7j3YrXgGbtC3ecSKUXYfxOGafv
+	wPlic/edeUr+sDsjRSxGOknSERvbXdQLNfpETmCv9vi3Qq+ar8xGjCflCKvIdeDs
+	/UY3TR0kKpjV5hhZjUrBZXbhPeo8OAbSqUi3zS/bkCSSwooXpJsqKimtAFyFs7Lv
+	xiSmT/53srabsgrc7FTNJN2fhhTInhQVrue6XHyy/hIyHYeZAdUgHt1VqKtCBw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3wq7q8ruux-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Mar 2024 02:56:58 -0800 (PST)
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 7 Mar
+ 2024 02:56:57 -0800
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH02.marvell.com (10.69.176.39) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.48; Thu, 7 Mar 2024 02:56:36 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
+ Transport; Thu, 7 Mar 2024 02:56:36 -0800
+Received: from hyd1425.marvell.com (unknown [10.29.37.83])
+	by maili.marvell.com (Postfix) with ESMTP id B17A03F7055;
+	Thu,  7 Mar 2024 02:56:32 -0800 (PST)
+From: Sai Krishna <saikrishnag@marvell.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <sgoutham@marvell.com>,
+        <lcherian@marvell.com>, <jerinj@marvell.com>, <gakula@marvell.com>,
+        <hkelam@marvell.com>, <sbhatta@marvell.com>
+CC: Sai Krishna <saikrishnag@marvell.com>
+Subject: [net PATCH] octeontx2-af: Fix devlink params
+Date: Thu, 7 Mar 2024 16:26:23 +0530
+Message-ID: <20240307105623.474757-1-saikrishnag@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 4/9] dt-bindings: net: convert hisi-femac.txt
- to YAML
-Content-Language: en-US
-To: Yang Xiwen <forbidden405@outlook.com>,
- Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
- <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org
-References: <20240305-net-v8-0-166aaeea2107@outlook.com>
- <20240305-net-v8-4-166aaeea2107@outlook.com>
- <66cf4c42-5b8e-41b8-bbdb-7fb2c6bb9e66@linaro.org>
- <SEZPR06MB69594BB6F24CF86E859D698196212@SEZPR06MB6959.apcprd06.prod.outlook.com>
- <66f578b4-5e1b-4cc3-b39c-3b61797cacd3@linaro.org>
- <SEZPR06MB695907832BFAF8108053976B96202@SEZPR06MB6959.apcprd06.prod.outlook.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzTRLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnp5c3p0b2Yua296bG93c2tpQGxpbmFyby5vcmc+wsGUBBMBCgA+FiEE
- m9B+DgxR+NWWd7dUG5NDfTtBYpsFAmI+BxMCGwMFCRRfreEFCwkIBwIGFQoJCAsCBBYCAwEC
- HgECF4AACgkQG5NDfTtBYptgbhAAjAGunRoOTduBeC7V6GGOQMYIT5n3OuDSzG1oZyM4kyvO
- XeodvvYv49/ng473E8ZFhXfrre+c1olbr1A8pnz9vKVQs9JGVa6wwr/6ddH7/yvcaCQnHRPK
- mnXyP2BViBlyDWQ71UC3N12YCoHE2cVmfrn4JeyK/gHCvcW3hUW4i5rMd5M5WZAeiJj3rvYh
- v8WMKDJOtZFXxwaYGbvFJNDdvdTHc2x2fGaWwmXMJn2xs1ZyFAeHQvrp49mS6PBQZzcx0XL5
- cU9ZjhzOZDn6Apv45/C/lUJvPc3lo/pr5cmlOvPq1AsP6/xRXsEFX/SdvdxJ8w9KtGaxdJuf
- rpzLQ8Ht+H0lY2On1duYhmro8WglOypHy+TusYrDEry2qDNlc/bApQKtd9uqyDZ+rx8bGxyY
- qBP6bvsQx5YACI4p8R0J43tSqWwJTP/R5oPRQW2O1Ye1DEcdeyzZfifrQz58aoZrVQq+innR
- aDwu8qDB5UgmMQ7cjDSeAQABdghq7pqrA4P8lkA7qTG+aw8Z21OoAyZdUNm8NWJoQy8m4nUP
- gmeeQPRc0vjp5JkYPgTqwf08cluqO6vQuYL2YmwVBIbO7cE7LNGkPDA3RYMu+zPY9UUi/ln5
- dcKuEStFZ5eqVyqVoZ9eu3RTCGIXAHe1NcfcMT9HT0DPp3+ieTxFx6RjY3kYTGLOwU0EVUNc
- NAEQAM2StBhJERQvgPcbCzjokShn0cRA4q2SvCOvOXD+0KapXMRFE+/PZeDyfv4dEKuCqeh0
- hihSHlaxTzg3TcqUu54w2xYskG8Fq5tg3gm4kh1Gvh1LijIXX99ABA8eHxOGmLPRIBkXHqJY
- oHtCvPc6sYKNM9xbp6I4yF56xVLmHGJ61KaWKf5KKWYgA9kfHufbja7qR0c6H79LIsiYqf92
- H1HNq1WlQpu/fh4/XAAaV1axHFt/dY/2kU05tLMj8GjeQDz1fHas7augL4argt4e+jum3Nwt
- yupodQBxncKAUbzwKcDrPqUFmfRbJ7ARw8491xQHZDsP82JRj4cOJX32sBg8nO2N5OsFJOcd
- 5IE9v6qfllkZDAh1Rb1h6DFYq9dcdPAHl4zOj9EHq99/CpyccOh7SrtWDNFFknCmLpowhct9
- 5ZnlavBrDbOV0W47gO33WkXMFI4il4y1+Bv89979rVYn8aBohEgET41SpyQz7fMkcaZU+ok/
- +HYjC/qfDxT7tjKXqBQEscVODaFicsUkjheOD4BfWEcVUqa+XdUEciwG/SgNyxBZepj41oVq
- FPSVE+Ni2tNrW/e16b8mgXNngHSnbsr6pAIXZH3qFW+4TKPMGZ2rZ6zITrMip+12jgw4mGjy
- 5y06JZvA02rZT2k9aa7i9dUUFggaanI09jNGbRA/ABEBAAHCwXwEGAEKACYCGwwWIQSb0H4O
- DFH41ZZ3t1Qbk0N9O0FimwUCYDzvagUJFF+UtgAKCRAbk0N9O0Fim9JzD/0auoGtUu4mgnna
- oEEpQEOjgT7l9TVuO3Qa/SeH+E0m55y5Fjpp6ZToc481za3xAcxK/BtIX5Wn1mQ6+szfrJQ6
- 59y2io437BeuWIRjQniSxHz1kgtFECiV30yHRgOoQlzUea7FgsnuWdstgfWi6LxstswEzxLZ
- Sj1EqpXYZE4uLjh6dW292sO+j4LEqPYr53hyV4I2LPmptPE9Rb9yCTAbSUlzgjiyyjuXhcwM
- qf3lzsm02y7Ooq+ERVKiJzlvLd9tSe4jRx6Z6LMXhB21fa5DGs/tHAcUF35hSJrvMJzPT/+u
- /oVmYDFZkbLlqs2XpWaVCo2jv8+iHxZZ9FL7F6AHFzqEFdqGnJQqmEApiRqH6b4jRBOgJ+cY
- qc+rJggwMQcJL9F+oDm3wX47nr6jIsEB5ZftdybIzpMZ5V9v45lUwmdnMrSzZVgC4jRGXzsU
- EViBQt2CopXtHtYfPAO5nAkIvKSNp3jmGxZw4aTc5xoAZBLo0OV+Ezo71pg3AYvq0a3/oGRG
- KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
- fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <SEZPR06MB695907832BFAF8108053976B96202@SEZPR06MB6959.apcprd06.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: ygj9CeR1aXefL178zpeNV2lhtwcXiihr
+X-Proofpoint-GUID: ygj9CeR1aXefL178zpeNV2lhtwcXiihr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-07_07,2024-03-06_01,2023-05-22_02
 
-On 07/03/2024 11:33, Yang Xiwen wrote:
-> On 3/7/2024 3:48 PM, Krzysztof Kozlowski wrote:
->> On 06/03/2024 10:28, Yang Xiwen wrote:
->>> On 3/6/2024 3:39 PM, Krzysztof Kozlowski wrote:
->>>> On 05/03/2024 08:51, Yang Xiwen via B4 Relay wrote:
->>>>> From: Yang Xiwen <forbidden405@outlook.com>
->>>>>
->>>>> Convert the old text binding to new YAML.
->>>>>
->>>>> While at it, make some changes to the binding:
->>>>> - The version numbers are not documented publicly. The version also does
->>>>> not change programming interface. Remove it until it's really needed.
->>>>> - A few clocks are missing in old binding file. Add them to match the real
->>>>> hardware.
->>>>>
->>>>> Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
->>>>> ---
->>>>>    .../bindings/net/hisilicon,hisi-femac.yaml         | 89 ++++++++++++++++++++++
->>>>>    .../devicetree/bindings/net/hisilicon-femac.txt    | 41 ----------
->>>>>    2 files changed, 89 insertions(+), 41 deletions(-)
->>>>>
->>>>> diff --git a/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml b/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
->>>>> new file mode 100644
->>>>> index 000000000000..ba207f2c9ae4
->>>>> --- /dev/null
->>>>> +++ b/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
->>>>> @@ -0,0 +1,89 @@
->>>>> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
->>>>> +%YAML 1.2
->>>>> +---
->>>>> +$id: http://devicetree.org/schemas/net/hisilicon,hisi-femac.yaml#
->>>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->>>>> +
->>>>> +title: Hisilicon Fast Ethernet MAC controller
->>>>> +
->>>>> +maintainers:
->>>>> +  - Yang Xiwen <forbidden405@foxmail.com>
->>>>> +
->>>>> +allOf:
->>>>> +  - $ref: ethernet-controller.yaml
->>>>> +
->>>>> +properties:
->>>>> +  compatible:
->>>>> +    items:
->>>>> +      - enum:
->>>>> +          - hisilicon,hi3516cv300-femac
->>>>> +      - const: hisilicon,hisi-femac
->>>> Drop this fallback, your later driver change does not use it, so neither
->>>> should have binding. Explain in commit msg, that old binding was
->>>> incorrect (we discussed it a lot) thus you are making such change during
->>>> conversion.
->>>
->>> What about deprecating "hisilicon,hisi-femac-vn" compatibles and
->>> introduce a new generic compatible "hisilicon,hisi-femac" instead? This
->>> way, We can keep backward compatibility.
->> What backward compatibility? Didn't you say bindings and driver are
->> broken and you are going to break ABI to fix them up?
-> 
-> 
-> Yes, indeed the old binding is broken. I'm just wondering why you say 
-> "hisilicon,hisi-femac" should be removed. The FEMAC core on both SoCs 
-> are compatible afaik.
+From: Sunil Goutham <sgoutham@marvell.com>
 
-You don't use that fallback. What is the point of having it? You express
-compatibility via SoC compatibles.
+Devlink param for adjusting NPC MCAM high zone
+area is in wrong param list and is not getting
+activated on CN10KA silicon.
+That patch fixes this issue.
 
+Fixes: dd7842878633 ("octeontx2-af: Add new devlink param to configure maximum usable NIX block LFs")
+Signed-off-by: Sunil Goutham <sgoutham@marvell.com>
+Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
+---
+ .../marvell/octeontx2/af/rvu_devlink.c        | 20 +++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-Best regards,
-Krzysztof
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
+index 1e6fbd98423d..96c04f7d93f8 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
+@@ -1235,8 +1235,8 @@ static int rvu_af_dl_dwrr_mtu_get(struct devlink *devlink, u32 id,
+ enum rvu_af_dl_param_id {
+ 	RVU_AF_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
+ 	RVU_AF_DEVLINK_PARAM_ID_DWRR_MTU,
+-	RVU_AF_DEVLINK_PARAM_ID_NPC_EXACT_FEATURE_DISABLE,
+ 	RVU_AF_DEVLINK_PARAM_ID_NPC_MCAM_ZONE_PERCENT,
++	RVU_AF_DEVLINK_PARAM_ID_NPC_EXACT_FEATURE_DISABLE,
+ 	RVU_AF_DEVLINK_PARAM_ID_NIX_MAXLF,
+ };
+ 
+@@ -1434,15 +1434,6 @@ static const struct devlink_param rvu_af_dl_params[] = {
+ 			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+ 			     rvu_af_dl_dwrr_mtu_get, rvu_af_dl_dwrr_mtu_set,
+ 			     rvu_af_dl_dwrr_mtu_validate),
+-};
+-
+-static const struct devlink_param rvu_af_dl_param_exact_match[] = {
+-	DEVLINK_PARAM_DRIVER(RVU_AF_DEVLINK_PARAM_ID_NPC_EXACT_FEATURE_DISABLE,
+-			     "npc_exact_feature_disable", DEVLINK_PARAM_TYPE_STRING,
+-			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+-			     rvu_af_npc_exact_feature_get,
+-			     rvu_af_npc_exact_feature_disable,
+-			     rvu_af_npc_exact_feature_validate),
+ 	DEVLINK_PARAM_DRIVER(RVU_AF_DEVLINK_PARAM_ID_NPC_MCAM_ZONE_PERCENT,
+ 			     "npc_mcam_high_zone_percent", DEVLINK_PARAM_TYPE_U8,
+ 			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+@@ -1457,6 +1448,15 @@ static const struct devlink_param rvu_af_dl_param_exact_match[] = {
+ 			     rvu_af_dl_nix_maxlf_validate),
+ };
+ 
++static const struct devlink_param rvu_af_dl_param_exact_match[] = {
++	DEVLINK_PARAM_DRIVER(RVU_AF_DEVLINK_PARAM_ID_NPC_EXACT_FEATURE_DISABLE,
++			     "npc_exact_feature_disable", DEVLINK_PARAM_TYPE_STRING,
++			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
++			     rvu_af_npc_exact_feature_get,
++			     rvu_af_npc_exact_feature_disable,
++			     rvu_af_npc_exact_feature_validate),
++};
++
+ /* Devlink switch mode */
+ static int rvu_devlink_eswitch_mode_get(struct devlink *devlink, u16 *mode)
+ {
+-- 
+2.25.1
 
 
