@@ -1,126 +1,208 @@
-Return-Path: <netdev+bounces-78504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 174B3875628
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 19:34:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A29D875668
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 19:52:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 477101C2107E
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 18:34:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CD9F1C20F32
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 18:52:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE09131731;
-	Thu,  7 Mar 2024 18:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F5B61353F9;
+	Thu,  7 Mar 2024 18:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GQCtuXXk"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A20C12F5A5;
-	Thu,  7 Mar 2024 18:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709836459; cv=none; b=XzcN4qiTPH4EVAAEuM/5uBm5m77w/hbh5j2sozz42PVybTOm6IWY1NGQ2G/oeF34QBLA6J3yH9+7JwfmT1cB7PNnVygtToGu+eXXYyBbCsW54tk+RIF5EuAyuEUiERqKjsApF+ODwODap6H4b0ZKICw4FJuD1gndN0G7v5ZyUjo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709836459; c=relaxed/simple;
-	bh=c3690T2hw5jOKdAJMsouSoyRHA+UMx5AeSXSfJrDW4U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JUYas+iKer7dSbBu9w/vQQ84q67AOKMmn7p6up/ZMqdKT/StohFnf08eG888qKC19eqgtizxaAHu7vybEA7wU4Ui9//fSSzsHnv8rdRjJOby93gxSYH8YhAldR9XT4LX4b9C5Dgn7FN1Nu3x3eCuhNFXJChc/veyxLHecCq8Rq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 835011FB;
-	Thu,  7 Mar 2024 10:34:52 -0800 (PST)
-Received: from FVFF77S0Q05N (unknown [10.57.69.155])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3450A3F762;
-	Thu,  7 Mar 2024 10:34:14 -0800 (PST)
-Date: Thu, 7 Mar 2024 18:34:11 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Joel Fernandes <joel@joelfernandes.org>, paulmck@kernel.org,
-	Steven Rostedt <rostedt@goodmis.org>
-Cc: Network Development <netdev@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>, rcu@vger.kernel.org,
-	kernel-team <kernel-team@cloudflare.com>
-Subject: Re: [PATCH] net: raise RCU qs after each threaded NAPI poll
-Message-ID: <ZeoIo1dOW11STQHb@FVFF77S0Q05N>
-References: <55900c6a-f181-4c5c-8de2-bca640c4af3e@paulmck-laptop>
- <10FC3F5F-AA33-4F81-9EB6-87EB2D41F3EE@joelfernandes.org>
- <99b2ccae-07f6-4350-9c55-25ec7ae065c0@paulmck-laptop>
- <CAEXW_YQ+40a1-hk5ZP+QJ54xniSutosC7MjMscJJy8fen-gU9Q@mail.gmail.com>
- <f1e77cd2-18b2-4ab1-8ce3-da2c6babbd53@paulmck-laptop>
- <CAEXW_YRDiTXJ_GwK5soSVno73yN9FUA5GjLYAOcCTtqQvPGcFA@mail.gmail.com>
- <fcaf6cad-9959-4b6d-a6e4-05ae1b2fabdc@joelfernandes.org>
- <Zenx_Q0UiwMbSAdP@FVFF77S0Q05N>
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7906182BB;
+	Thu,  7 Mar 2024 18:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709837574; cv=fail; b=gcXYTEW0a20hGQfdc0lLhz1xoZA0fyndCj0w9GFaH/z4yOaRlUKqQPUgKpvX4XRy71xhWuL2a5lnPh4p3drllSpxcz+NBfWTZfcZvnJ69B3/4AXWtEFGuJYUz6JV2fbkuAvf+R7vZEyGo55Bz70HoWu8aLEXma5tDF5tAjo1xJE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709837574; c=relaxed/simple;
+	bh=ZJnv5yGrKrJ0HXC+EnOJeMG+JZTb7JtRlrCU/7EpitY=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 Content-Type:MIME-Version; b=o3sh061V6+8Mcp4A9G60JzQlNRvyIx8KmgQYDuqcJULlCgFsvjn96COqgJ14k+WpB5XkoPbCeuxRcUlvtJKpjnHTegjSskjHUhJNYC3K0MygLWJGLKNNDT60vnYIGg0389DkHv1zCy5/am8ds+Ka1UcLrDWRNrJvctaDQq5enOw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=GQCtuXXk; arc=fail smtp.client-ip=40.107.236.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W7/yCux5+bLvWQvIh0Tch8/bo5fC9nEGptKsRRrc/NMjzj3uZNVq/iMpsVQ33oQltQ6GQsKmOQktCKcpwWOJZKVBxxQmnlQs9VteK59rvq/DcB3O9eev5ZWa6JXrn6uA4om3IekIjR3MQcwg0K7Qo0PS/znYU02M02v2NQKaRA6dGZnHrKFqGmkCWFyP+CA/kjfgF1Y+xpmWkpogQanLue+qseFNFaCMJOijAL++J0vFeG7OFtICtS56a82+iLsEjKQKjoRkuO5LHVzQW5J38TXOIUfyA58S8wY3KBVLNFjOJiPrBYJmTLzMSaACik8UNGwhXNRex64EA5NX0W7LuQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7+Y7s/RkZuGf10Ovd0Brp4qozHuzny08T2I8Ase4J4I=;
+ b=nTclPz7b+z6I4JvN3WvV5DgzDd63XLpCmTg5QlWC+Un42rBErQFFGUhO0X/K0APJzDdxRf0zYKzXSK8ufGXcQjBnUdQTLZ3kGcniEJCgw8tyjgEieshNNE4R6ZNTf1rAPaRO6dzxAcDPeENL4zFprlaHXbBhwhT53CAbF3ri0jdYU2zv0Vopof8C7YpKbLj6eWsrQxJQvf2N6/ZZ9hNVIdNTmlKRscjFLFY2895ILcAQV+2NKLZnPKGBYOyNZFJNsennzISj9yNeWh7sIRUA3M1wjpITSasjDQHdGCf7e+WjW14xq4SMJk5vVjTGgIYYxpDIoSxcfnoIcUsilvGZmQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7+Y7s/RkZuGf10Ovd0Brp4qozHuzny08T2I8Ase4J4I=;
+ b=GQCtuXXkw/M25UdxXTfTP2RSMpN7dq3GaExCWO5lwzioFU3n9hLjqUQKOzgm4GZ88izEFnizlLut1PaOGALX1f30w0Ihy0tkpsW/IgczH42OO8Uwe49lVu8uytKnm7s0eYvMWIUB7AEvAMtcAgDdG9Klow5XcdFe8Q6qT2EpKLB5a01qSXPVHq/tupHpKPrnGT+FXNb/sViQIx4sHecW6+e+VPdSA4g7i4Wbv/B4uYa5EqSsRzoronYah15g63hvN4K8ut5EHv6mqojCa1ULZHuLiAHuN6x0wtMOO5FeeFS/GhPeqr0gbNa8sugdWrbvH+NpFvWEaxVGvDTiuWN3hA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+ by PH8PR12MB7279.namprd12.prod.outlook.com (2603:10b6:510:221::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.27; Thu, 7 Mar
+ 2024 18:52:49 +0000
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::459b:b6fe:a74c:5fbf]) by BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::459b:b6fe:a74c:5fbf%6]) with mapi id 15.20.7362.024; Thu, 7 Mar 2024
+ 18:52:48 +0000
+References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
+ <20240223192658.45893-2-rrameshbabu@nvidia.com>
+ <abbff26c-c626-42ce-82a9-4dc983372de3@intel.com>
+ <875xyex10q.fsf@nvidia.com>
+ <a84df9ec-475d-4ffc-a975-a0911a57901e@intel.com>
+ <87il2evhtk.fsf@nvidia.com>
+ <ec969f62-a1bb-4287-a4eb-083201134bae@intel.com>
+User-agent: mu4e 1.10.8; emacs 28.2
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Saeed Mahameed <saeed@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan  Corbet <corbet@lwn.net>, Richard Cochran
+ <richardcochran@gmail.com>, Tariq  Toukan <tariqt@nvidia.com>, Gal
+ Pressman <gal@nvidia.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, Ahmed  Zaki
+ <ahmed.zaki@intel.com>, Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Hangbin Liu <liuhangbin@gmail.com>, Paul  Greenwalt
+ <paul.greenwalt@intel.com>, Justin Stitt <justinstitt@google.com>, Randy
+ Dunlap <rdunlap@infradead.org>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Kory Maincent
+ <kory.maincent@bootlin.com>, Wojciech Drewek <wojciech.drewek@intel.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Jiri Pirko <jiri@resnulli.us>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Dragos  Tatulea <dtatulea@nvidia.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v1 1/6] ethtool: add interface to read Tx
+ hardware timestamping statistics
+Date: Thu, 07 Mar 2024 10:47:16 -0800
+In-reply-to: <ec969f62-a1bb-4287-a4eb-083201134bae@intel.com>
+Message-ID: <87le6tvpq8.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: BYAPR05CA0084.namprd05.prod.outlook.com
+ (2603:10b6:a03:e0::25) To BYAPR12MB2743.namprd12.prod.outlook.com
+ (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zenx_Q0UiwMbSAdP@FVFF77S0Q05N>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|PH8PR12MB7279:EE_
+X-MS-Office365-Filtering-Correlation-Id: ec3da949-73f7-4900-c215-08dc3ed7c891
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	tIEc4xOZoUKVauaMhN2kHNFFFcN9a/gDP1ZkLUPEdqe+Sph2KB1pBspH1pihS57lPukaqSx2FULi/EfqE9pVR3IOLp97RbRJky35Bkmd8oW2V4bWXpEzLsF7UVIsg4V6qfMXgcy3r7/zMDCiHcJTr8t0PeSl4N+sghPM6J8K5NpbjSgbVbk49/TSdxCz9W5zKOmE/3t6FNFG665h3p/YMRdO3jlIKAxfDZejaOQiiSIUAhUyfQpBIZmfrih3OqNyABnVm+sI8mbB+bI3s1qHEuTYOdNM1R5f7P7gedFccnqnAbmlyH7f6ZNXHsnoPIM8fHm6W/pWp3R5N3qjcwQHkxvZ+gMl7Ax6rOmBvVlyK3vHiOfjpSlNqnEhkfuuoMHs04y5OVFlT+3fYjTOZL9NOHHlNxTfvjEtFsO2bUgutj1q1F87soWHeHVIyipLxzbMMmcRkclcZ7ncbXaZFefMuCF4O1jBNZnlDS/satc3Prw5k7MvRVVWtWKUcjIb3lpPvGn+ssvmn1kcls2p0fF2rjUyn0gkQheNnKaNHkfnURbxAUs3DXbQV9jUNMG5UR6Z5CW69/kqe15csjwCk/wBz/Ga2WeKhnCvkIfqJBUC4RIgQKHSNYE4IoecF2bwbgtAwIcMf/iT5w6XGEKL8yg9GI05tFINkM3/rWqM3TEB6pg=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?/DEtlcBv7rXzo9oDvLon1KKfI5sMSPsWErjH8h/h6gzirxb15cGb0oPIzbEu?=
+ =?us-ascii?Q?hici/iyEiniJ5joweR3M84FDN06bpISuADQse/vuR9Bn5+Z0xs/uefyfmwBP?=
+ =?us-ascii?Q?BGM8omCxUBdZmq7TS0gyOVKNGm8ORezaukRY7J+Hg3az2D3F5pNODY8wahck?=
+ =?us-ascii?Q?Evwe+6MwPj5DMlwojn2s4fyt6qMGQ/QTj5K+MG4UfJ2VDhvmRP4r5oUCgP31?=
+ =?us-ascii?Q?i6Kit3hxyzqb8X6prbdcfgRC7Kz2i3BSv/Xdq55Rdw6JB2lf9FGA5iqJDo4z?=
+ =?us-ascii?Q?8tCCUZT79NALMY1J4Z5FfYLIH4JqWYrdwU1t1Aw2csrjU/5pGSqf2VPl1Qo7?=
+ =?us-ascii?Q?XDPN59PZ1/APwZirXSEu7QAEXrkQveT55t7KXQ5sSxtqlIDAKtdVwRMOUp+H?=
+ =?us-ascii?Q?73LMcPpYz7DAvSuo0apKnG2d06UnInszHMh3/C3w6NYstqqHhi5sIhcxopOS?=
+ =?us-ascii?Q?ODTC+dFJw0IGrq9YrmOV4ZQogx2ixf7kaxYUe9rsFgG6Oyic7/CTRkXcDU6E?=
+ =?us-ascii?Q?GbBn6UCHcihm3h+rVGS4apmXVO7QG5O5wKMnqETdmEll+E+zQo2NfehVn+Va?=
+ =?us-ascii?Q?MqaBL5ca6SWek3x1LMbOtKYDuUWI6rK/lLzy72VAOJt6a7kVwgRoXO/SMkdP?=
+ =?us-ascii?Q?s5PfHVp77dGEh9DjMiv7BuK+XUE34bguwS5hn+wRSSj8BwGdh/JZXRQYfc8A?=
+ =?us-ascii?Q?FhFnsY7KFIVK4HqLHeIgMcuXi5Wi2TuWYJFOXCGGDJHStRDKBT2eLCKO/xJF?=
+ =?us-ascii?Q?wNVxbqJ58QN5QnSOIWvoaNP8FatByhldCtpXK4giWNNaQrJVvOHW9st08YUi?=
+ =?us-ascii?Q?/fToNsfj50Hivw8JbRXJOccCY1nKAPLDjL016381KSFD98gDQ+kFxHdJg9Hs?=
+ =?us-ascii?Q?v2dpz7icDtfWiDlDPAIC7hgqSMk9F272hlJP4S3TL4i1ERFJjgV7zre4n6w2?=
+ =?us-ascii?Q?1EGVFrk0OsGNf+SUrAN3V//ZocAIyj5jctm/0N9dWoz7NZX7W2t/C2fjbCeY?=
+ =?us-ascii?Q?REH5rg32frx/WJWeiC6yjEsu2jrvbzCppJRHoMGPsWQJultVFg7C4M1qrfy4?=
+ =?us-ascii?Q?lzKHF8fO2D2s1HgT5t5mlib3QEp3eUDhZwIsjjCXuJRFBbkBrfsYGZPAWEVF?=
+ =?us-ascii?Q?9kR7XX8PxWjrip4pwzDci8Kgl9RU8vWN2MA8q3k8GJzi0mtRogw7rxBpdDrY?=
+ =?us-ascii?Q?tWpRt/2ibOTZ0jn1tcizVazHiQGynfm5xIueDtoYzBEvr3Ty7e07dh6Bi76w?=
+ =?us-ascii?Q?BZR9QQ+ROPCwnJbLVVLGlHUbSIeiKXD5oUYTHsLIFlaTnA0bgbQvtqmS6La7?=
+ =?us-ascii?Q?V4s1kekwU0eHejflHe766+ta/EtO6ZarKLSzt/BLqOntqEinJYnzcl797IBF?=
+ =?us-ascii?Q?ngaQf60NoI8q9KA5Vrr/2QLQ0AMXpUM7lmmIuB7w1at9i4BKbWz6dY2TPdYT?=
+ =?us-ascii?Q?ZhIirst1E7TMI8sUDaAd/EMtpaEJWciMsQkxWclXJTRuIjYE5S8Zg/DKngkr?=
+ =?us-ascii?Q?loDTv/9bsbeV6TvST4JorbvlH9ByVLXLRpj5Ea9W29ouXX5cJEM1IPvWjlD/?=
+ =?us-ascii?Q?2csT+sFmlqcgSfY0eV4BlsEb1RtjocaLowRkdT9Xu+21slEnQIx6WBuJHkcI?=
+ =?us-ascii?Q?fw=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec3da949-73f7-4900-c215-08dc3ed7c891
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Mar 2024 18:52:48.5344
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JCoLjUrhYQBMdZLnjnS+4sVYS19E+lvP8pPQhlKX+MMdhJvcB2QjqW6tFy4gKleimYjAs4FfSj2B7/0WtkPT9g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7279
 
-On Thu, Mar 07, 2024 at 04:57:33PM +0000, Mark Rutland wrote:
-> On Mon, Mar 04, 2024 at 04:16:01AM -0500, Joel Fernandes wrote:
-> > On 3/2/2024 8:01 PM, Joel Fernandes wrote:
-> > Case 1: For !CONFIG_DYNAMIC_FTRACE update of ftrace_trace_function
-> > 
-> > This config is itself expected to be slow. However seeing what it does, it is
-> > trying to make sure the global function pointer "ftrace_trace_function" is
-> > updated and any readers of that pointers would have finished reading it. I don't
-> > personally think preemption has to be disabled across the entirety of the
-> > section that calls into this function. So sensitivity to preempt disabling
-> > should not be relevant for this case IMO, but lets see if ftrace folks disagree
-> > (on CC). It has more to do with, any callers of this function pointer are no
-> > longer calling into the old function.
-> 
-> I've been looking into this case for the last couple of days, and the short
-> story is that the existing code is broken today for PREEMPT_FULL, and the code
-> for CONFIG_DYNAMIC_FTRACE=y is similarly broken. A number of architectures have
-> also implemented the entry assembly incorrectly...
+Hi Jacob,
 
-> I believe our options are:
-> 
-> * Avoid the mismatch by construction:
-> 
->   - On architectures with trampolines, we could ensure that the list_ops gets
->     its own trampoline and that we *always* use a trampoline, never using a
->     common ftrace_caller. When we switch callers from one trampoline to another
->     they'd atomically get the new func+ops.
-> 
->     I reckon that might be a good option for x86-64?
-> 
->   - On architectures without trampolines we could 
->     require that that the ftrace_caller 
->     loads ops->func from the ops pointer.
->     
->     That'd mean removing the 'ftrace_trace_function' pointer and removing
->     patching of the call to the trace function (but the actual tracee callsites
->     would still be patched).
-> 
->     I'd be in favour of this for arm64 since that matches the way CALL_OPS
->     works; the only difference is we'd load a global ops pointer rather than a
->     per-callsite ops pointer.
-> 
-> * Use rcu_tasks_trace to synchronize updates?
+On Mon, 26 Feb, 2024 11:54:49 -0800 Jacob Keller <jacob.e.keller@intel.com> wrote:
+> On 2/23/2024 3:43 PM, Rahul Rameshbabu wrote:
+>> 
+>> On Fri, 23 Feb, 2024 14:48:51 -0800 Jacob Keller <jacob.e.keller@intel.com>
+>> wrote:
+>>> On 2/23/2024 2:21 PM, Rahul Rameshbabu wrote:
+>>>> Do you have any example of a case of skipping timestamp information that
+>>>> is not related to lack of delivery over time? I am wondering if this
+>>>> case is more like a hardware error or not. Or is it more like something
+>>>> along the lines of being busy/would impact line rate of timestamp
+>>>> information must be recorded?
+>>>>
+>>>
+>>> The main example for skipped is the event where all our slots are full
+>>> at point of timestamp request.
+>> 
+>> This is what I was guessing as the main (if not only reason). For this
+>> specific reason, I think a general "busy" stats counter makes sense.
+>> mlx5 does not need this counter, but I can see a lot of other hw
+>> implementations needing this. (The skipped counter name obviously should
+>> be left only in the ice driver. Just felt "busy" was easy to understand
+>> for generalized counters.)
+>
+> Yea, I don't expect this would be required for all hardware but it seems
+> like a common approach if you have limited slots for Tx timestamps
+> available.
+>
+Sorry to bump this thread once more, but I had a question regarding the
+Intel driver in regards to this. Instead of having a busy case when all
+the slots are full, would it make sense to stop the netdev queues in
+this case, we actually do this in mlx5 (though keep in mind that we have
+a dedicated queue just for port/phy timestamping that we start/stop).
 
-Having acquainted myself with the RCU flavours, I think the RCU Tasks Trace
-suggestion wouldn't help, but *some* flavour of RCU might give us what we need.
+Maybe in your case, you can have a mix of HW timestamping and non-HW
+timestamping in the same queue, which is why you have a busy case?
 
-That said, my preference is the "avoid the mismatch by construction" camp, as
-even if we need to wait for uses of the old func+ops to finish, we'd have fewer
-transitions (and consequently less patching) if we have:
+Wanted to inquire about this before sending out a RFC v2.
+>> 
+>> The reason why I prefer busy is that "skip" to me makes me think someone
+>> used SIOCSHWTSTAMP to filter which packets get timestamped which is very
+>> different from something like lack of resource availability.
+>> 
+>
+> Busy is fine with me.
+>
 
-	switch_to_new_ops();
-	wait_for_old_ops_usage_to_finish();
+--
+Thanks,
 
-... rather than:
-
-	switch_to_list_func();
-	wait_for_old_ops_usage_to_finish();
-	switch_to_new_ops();
-	ensure_new_ops_are_visible();
-	switch_to_new_func();
-
-Mark.
+Rahul Rameshbabu
 
