@@ -1,176 +1,138 @@
-Return-Path: <netdev+bounces-78421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFDFD875003
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:33:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F650875034
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:38:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ECD31C22812
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 13:33:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 913C91C203A8
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 13:38:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE37912CDB8;
-	Thu,  7 Mar 2024 13:33:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E28B412D1E6;
+	Thu,  7 Mar 2024 13:38:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gKi3U+vu"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="u9H8kAPv";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="5o+fsxtp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BE0812C80A;
-	Thu,  7 Mar 2024 13:33:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E43912C801;
+	Thu,  7 Mar 2024 13:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709818431; cv=none; b=lL9IhWIlrISsHvgaK/I/pr/nC0p+qJ/fz/5pHUmMEjqI2b8VsypYf78OniEys/h1tWYbujAZIjv32EhfmrZtFpmbK9qbV74B1I6f/KBfux3ruTxLXJc0FnQuELD46J4NUmqNsY4m+k1o9ZxbtSzcCE83cCKKUEclMEWYJPcsgSY=
+	t=1709818717; cv=none; b=tLyhsHtY3GwxI9icn6bzBL64dUFLf7+azPkkeltZtqCOqDjpBUEZmPn6RFj3Oy4Rs+nnTXeSyISvV5N+Y0gboFvhULKHr3/HAQrKPYHnuZs0aSyhPNSFA6tIrhk2ghNgfrAWv0HDYEJZrQMT+RJ5sIvCir+X95Z4z/zEonxDiD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709818431; c=relaxed/simple;
-	bh=IwLySBNWsXMkCQ48XQ//GUrFE/11iTOEtVXEuz0hLjs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=okHiG6l4sQDJH0p4Pl8Sc22IfKyJSCSQIMZ3bFL6on5v/tfcpv3ehK+8VFHnGMCWjlfs2vH+2ZjFQB8x4DVDCt7Ng6ivF2M75st7n3DZrs1ab5OCJayzpnzi81sr/O2XeYkM8ugFiDESeFtGFySiYzN43Ekxa3XCjTpyUMT7l38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gKi3U+vu; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-565b434f90aso1126191a12.3;
-        Thu, 07 Mar 2024 05:33:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709818428; x=1710423228; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qql4YrjVyR2zImJwqrdWfKUU+qwMnI9JUdCdxDlxHzs=;
-        b=gKi3U+vufi3vzCAWjKIUYJvUobImJCrzE7K+1g1Fz30jXMC/f06oegUhc/xOd1+1J4
-         32zXZWajaiSxEr+lVZQMxR2B1bHXcyd/MOO34IEvcvF5J2F2RSRBaN+2yQ0RLG6LruF1
-         IfsX5u60w3LNFOon6hGbC346D7t0OfJWG4jLhpKZEBJFncXM64LizqCDPbYvDKrfzTRt
-         skLC0rqWcLqd5g3Z2nu+2ktKg+LqqBjO0ZMLVNfKdstTZG9G1GMZ35Ni4owp5itwk4Ly
-         VgMbI2+JB0qwICeCmn/KtNPtsRn3E1PgOBR0Ce9nFlpv+Z13q31Juan6iP6BB3Xty3aG
-         XMuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709818428; x=1710423228;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qql4YrjVyR2zImJwqrdWfKUU+qwMnI9JUdCdxDlxHzs=;
-        b=TapE67TWPJamP6FVSPXrAqUq2UBZwxp7yKDpW/n1LCf3EOGVIiMc7kSlntGs84xSE+
-         prqzSbIYcQQ+zADqzLyoyr8VSDVQeFh6i7QlfFBTF2xg0QXHkuy0nbQxfzWJ4vF9+sf2
-         sCHSTWSHV7nflcgrygSjsyw2VHn5w/82aUnHKRn5ebY6GMwcnlEl9cfd1GlapIYOA8x7
-         krMWi9eCeoX6B06by0e+FxMeubxDFwRsh55gM9uoZbcujyOEKGoludj/FhzpxvDKa5JB
-         2AdmU11uT68wxkxrZBSwF7HN+TyJOznVKelLDk56wnqzkWGkUXjphQpUp2+IGIsm2xpQ
-         T1+w==
-X-Forwarded-Encrypted: i=1; AJvYcCUSSWI6MYqclU7bFtyHXGsVgE+rh27585natUhlhrlZLfi6LMGjv8L+g3n8wH8jLvUopHPpatR/3oGE0+ZDyRPXIEkzAM+8YCMI0k486sE9ftlmnY/hKplrWKqUR6r5ixLUbxJEphgw
-X-Gm-Message-State: AOJu0YzN1jsIvnrwyBTCvEzb+FgPNs3hsXAPpu0UH9YO2GgBiWjlvPJy
-	aF1qVga1O43jopRtolrorHPIj+7jJufckXFlpywPdq8yR1n/QrE6BgArt+VgAUiooF/5HdjO7xI
-	4lt6g1eZiyxcPAXR/pbZl4HxnzQc=
-X-Google-Smtp-Source: AGHT+IH/JuI+Fy9+dS09E0LZt+MQDxjnhTkFwrZ2MbaMeXyuBRXecO1C3mkePGmgpggMeoBCtg/L6grSHwh5rg080xY=
-X-Received: by 2002:a17:906:b04c:b0:a44:b91e:315b with SMTP id
- bj12-20020a170906b04c00b00a44b91e315bmr12094135ejb.68.1709818428158; Thu, 07
- Mar 2024 05:33:48 -0800 (PST)
+	s=arc-20240116; t=1709818717; c=relaxed/simple;
+	bh=pIgMBBvdlFq4jsZGTTvCeN0WxNn+N/qtdB4CfQxf4sk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=iRPpcAUzNjMgtP/Oj3ubwbZo+CP9Qx3J8d8XX12szQ4yMRlKhqGiu+/EsLHcub6cw9qPGHvPdTVO3/qWNBMiSrFEZKkoqotuI6aNjO9vEake5nHLdlrsof3/wu07NjPEcYZvglktTQ7F70WmxB4QbhwKm0QOqdbtY1zM7uN25AA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=u9H8kAPv; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=5o+fsxtp; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1709818714;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SB4kuCbnB1I2QFSjwFkPG9Zmio3lay0lzfUcc31gg7Q=;
+	b=u9H8kAPvhSJvJGtXtKSYHK4bcix7rnKNSjfap1gntl+bLs40s5fFCi6l4pmv5C4bQJXO83
+	TjSwSWlmO7kJ8xenqcUBW72vGyjmDzliF3kyWmtTWlac2mgILjH/1QcN4QOeMJTgnTu/tp
+	pNQPI2W1jXfPRS6WODxh8LcUw3N+0vl93CWfnJHNmK0s+bmPRfDRmogYXYDL29/d/NNxLc
+	dwFCOOll1/37QUIc9+IEAMCVQEnPPiEBUiTrRoI+YegqKoYrJKnWshzkRYZ6PofQ73VoyT
+	VoQwfEJE5fBn7ABUlNvih+ye2H/P6KweH8zmftvgStzsucgHeOsM5GZbpn6UKg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1709818714;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SB4kuCbnB1I2QFSjwFkPG9Zmio3lay0lzfUcc31gg7Q=;
+	b=5o+fsxtpkLCbJ0Ppn+2MGX95fwrdlBx5VYy77iOoFE5udU4LXZmCdpcc70zBfbDyEAyuP9
+	rhnGCkZZMP/lQ+Cg==
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Song Yoong Siang
+ <yoong.siang.song@intel.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran
+ <richardcochran@gmail.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev
+ <sdf@google.com>, Vinicius Costa Gomes <vinicius.gomes@intel.com>, Florian
+ Bezdeka <florian.bezdeka@siemens.com>, Andrii Nakryiko
+ <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko
+ <mykolal@fb.com>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh
+ <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ xdp-hints@xdp-project.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ linux-kselftest@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [xdp-hints] Re: [Intel-wired-lan] [PATCH iwl-next, v3 2/2] igc:
+ Add Tx hardware timestamp request for AF_XDP zero-copy packet
+In-Reply-To: <Zein8XvWkqj8VrHs@boxer>
+References: <20240303083225.1184165-1-yoong.siang.song@intel.com>
+ <20240303083225.1184165-3-yoong.siang.song@intel.com>
+ <Zein8XvWkqj8VrHs@boxer>
+Date: Thu, 07 Mar 2024 14:38:32 +0100
+Message-ID: <87a5nago13.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240307090732.56708-1-kerneljasonxing@gmail.com>
- <20240307093310.GI4420@breakpoint.cc> <CAL+tcoAPi+greENaD8X6Scc97Fnhiqa62eUSn+JS98kqY+VA6A@mail.gmail.com>
- <20240307120054.GK4420@breakpoint.cc>
-In-Reply-To: <20240307120054.GK4420@breakpoint.cc>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 7 Mar 2024 21:33:11 +0800
-Message-ID: <CAL+tcoBqBaHxSU9NQqVxhRzzsaJr4=0=imtyCo4p8+DuXPL5AA@mail.gmail.com>
-Subject: Re: [PATCH net-next] netfilter: conntrack: avoid sending RST to reply
- out-of-window skb
-To: Florian Westphal <fw@strlen.de>
-Cc: edumazet@google.com, pablo@netfilter.org, kadlec@netfilter.org, 
-	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-On Thu, Mar 7, 2024 at 8:00=E2=80=AFPM Florian Westphal <fw@strlen.de> wrot=
-e:
+--=-=-=
+Content-Type: text/plain
+
+Hi Maciej,
+
+On Wed Mar 06 2024, Maciej Fijalkowski wrote:
+> On Sun, Mar 03, 2024 at 04:32:25PM +0800, Song Yoong Siang wrote:
+>> -	tstamp->skb = NULL;
+>> +	/* Copy the tx hardware timestamp into xdp metadata or skb */
+>> +	if (tstamp->buffer_type == IGC_TX_BUFFER_TYPE_XSK)
 >
-> Jason Xing <kerneljasonxing@gmail.com> wrote:
-> > > This change disables most of the tcp_in_window() test, this will
-> > > pretend everything is fine even though tcp_in_window says otherwise.
-> >
-> > Thanks for the information. It does make sense.
-> >
-> > What I've done is quite similar to nf_conntrack_tcp_be_liberal sysctl
-> > knob which you also pointed out. It also pretends to ignore those
-> > out-of-window skbs.
-> >
-> > >
-> > > You could:
-> > >  - drop invalid tcp packets in input hook
-> >
-> > How about changing the return value only as below? Only two cases will
-> > be handled:
-> >
-> > diff --git a/net/netfilter/nf_conntrack_proto_tcp.c
-> > b/net/netfilter/nf_conntrack_proto_tcp.c
-> > index ae493599a3ef..c88ce4cd041e 100644
-> > --- a/net/netfilter/nf_conntrack_proto_tcp.c
-> > +++ b/net/netfilter/nf_conntrack_proto_tcp.c
-> > @@ -1259,7 +1259,7 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
-> >         case NFCT_TCP_INVALID:
-> >                 nf_tcp_handle_invalid(ct, dir, index, skb, state);
-> >                 spin_unlock_bh(&ct->lock);
-> > -               return -NF_ACCEPT;
-> > +               return -NF_DROP;
+> I believe this should also be protected with xp_tx_metadata_enabled()
+> check. We recently had following bugfix, PTAL:
 >
-> Lets not do this.  conntrack should never drop packets and defer to rules=
-et
-> whereever possible.
-
-Hmm, sorry, it is against my understanding.
-
-If we cannot return -NF_DROP, why have we already added some 'return
-NF_DROP' in the nf_conntrack_handle_packet() function? And why does
-this test statement exist?
-
-nf_conntrack_in()
-  -> nf_conntrack_handle_packet()
-  -> if (ret <=3D 0) {
-         if (ret =3D=3D -NF_DROP) NF_CT_STAT_INC_ATOMIC(state->net, drop);
-
+> https://lore.kernel.org/bpf/20240222-stmmac_xdp-v2-1-4beee3a037e4@linutronix.de/
 >
-> > >  - set nf_conntrack_tcp_be_liberal=3D1
-> >
-> > Sure, it can workaround this case, but I would like to refuse the
-> > out-of-window in netfilter or TCP layer as default instead of turning
-> > on this sysctl knob. If I understand wrong, please correct me.
->
-> Thats contradictory, you make a patch to always accept, then another
-> patch to always drop such packets?
+> I'll take a deeper look at patch tomorrow, might be the case that you've
+> addressed that or you were aware of this issue but anyways wanted to bring
+> it up. Just check that you don't break standard XDP/AF_XDP traffic :)
 
-My only purpose is not to let the TCP layer sending strange RST to the
-right flow.
-
-Besides, resorting to turning on nf_conntrack_tcp_be_liberal sysctl
-knob seems odd to me though it can workaround :S
-
-I would like to prevent sending such an RST as default behaviour.
-
-I wonder why we have to send RST at last due to out-of-window skbs. It
-should not happen, right? As I said before, It can be set as default
-without relying on some sysctl knob.
-
-Forgive my superficial knowledge :(
-
->
-> You can get the drop behaviour via '-m conntrack --ctstate DROP' in
-> prerouting or inut hooks.
->
-> You can get the 'accept + do nat processing' via
-> nf_conntrack_tcp_be_liberal=3D1.
-
-Sure. Just turning on the sysctl knob can be helpful because I've
-tested it in production. After all, it roughly returns NFCT_TCP_ACCEPT
-in nf_tcp_log_invalid() without considering those various
-out-of-window cases.
+This one doesn't crash standard AF_XDP traffic. Don't know why, but it
+seems to work.
 
 Thanks,
-Jason
+Kurt
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmXpw1gTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgl4bD/9QHm43zCKRDfGU+Xr7XPWXNlbFxEIr
+2rXt5ujhN1t6VfmaiOY3QyCuU7C+9lI/LR8J8IIzSw3quIIALtrgzjukPYgw8ICh
+JoS0P18HMJbpIAWKCLOTZ5jry4Vhg7nB1ONwWCyZeJnxcUdmKgXhc7hyEBDcr7Is
+VMqjvME3qsOb1WgoYVxUZO1/jjGQURn98O5nee29HuXzMSnUWB0l0OkldTgT7gt5
+jT7yAyh66lei+9D+n6kEs23R2Gx6BmKw6SXLqj7Iq3t6Fe5B836Yc2oiustThPJ4
+Mannvof2SnRdzsGEouBwumk95f24ssI3JXc8zKXAaGo+h9NdgJKtc+muz5ctgnLz
+Z8mEAJHmaGcFi9XBC2LZsmNozox9rZMR/KRO6xTtZv+sKodNecZoYfriF0pZ+bu0
+ky36jP84qoO58SBWtrBkSJYpPtmRZ78gR6Chn6idT9BxO/RcCNSxntGaS7xDwlb9
+5DvxYJ5Saq4EEZFYl+YTDxwqohSwBFDjYhcw2qhWxMY85H8H9xjgVp//bxCSVexh
+kPt9RBERHc5GGMBc3h9l2iodmfaEPJdKJ03gqOwoRYd1by7RtO6WcSDUpxhSIthq
+Wi5XZqKBB+IoM0N8zTZD/B1veZH/FWco6rEqhVr1DPfMsgP7l/8zbabERu28L3VP
+V0gtgB9MKcXqGw==
+=5vqC
+-----END PGP SIGNATURE-----
+--=-=-=--
 
