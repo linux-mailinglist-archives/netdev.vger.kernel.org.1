@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-78233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E30A87475D
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 05:40:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 475CE87476C
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 05:41:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02D1AB219B6
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:40:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC14FB23699
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:41:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62303134AC;
-	Thu,  7 Mar 2024 04:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02DA1D530;
+	Thu,  7 Mar 2024 04:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MUclku5i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eSyFmpNc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379F05227;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A7AD14F7F;
 	Thu,  7 Mar 2024 04:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709786431; cv=none; b=crIzk2BrY7jAw0wE8ET6M8u6CmDujK0+6Wpds8qcfR70tbRDEYJt0Bz30joVivEQIRdAAKeMPO0pU+lDYBVYkR9i3gXdwqq3c3kiMbXbkTAzyewTfVDzjNFDO06wjZ7R2ZFhY56BM/Xjd9+r2js6IpT+8LoX8QwXP8uD/OzGX1w=
+	t=1709786431; cv=none; b=XTjPsQA4XJbr8/FFlFSs/znC8d1mN3/KWjkDbpnVLv5uWGqRDuCHQ/fMvAHPN6FG7czT6SS7F7AfP4PSr7a4xY3eGoPNtGvbChAAefDCYJAzh96XSuHEj812VlgTwgGv4zGnsyTOueXjPHM+Cxqf44fIACfrGeEgX/S4z93VFro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709786431; c=relaxed/simple;
-	bh=RP4hy+R35jLPZPDVIpeZNpzZRzY9gWkWN21185TXQ9M=;
+	bh=EEYqOx9Zfjrv+CfUDIOl3n6VMgScQyeeuqGf9tFXIos=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RaqFA6G3RaKdH0mUpo8GhHXMVPk8Y6VCMijaUUYvS18JbaJ92NZW4NbTniuBJgkp7IID8aptfJNM7S1xoatT9P7DWvj9C7Fcu4fD9hf8RhzGn/DpCG5Zuzl2pNF+nQ5g2YTgk4eSFHKWIYX8hB1GsafQfqAx/Pj/Uir6OUZPGws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MUclku5i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EE46DC43330;
-	Thu,  7 Mar 2024 04:40:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=n++Qw7KSbcai2B2Fnh//gLXeNb5excgzHutzxhHsLFZkga4pOmOyUTm44tCFc9tkNWD0oDEekPUTVmzmgFOju+MsaxOtbA4EgSQWKZ0ASbGFNH/fOd42Oc8xA2kVsGxBrceka389zxZnp7vraDndgX9xnb/XwGyaLy5JZM6QFEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eSyFmpNc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 31E19C32780;
+	Thu,  7 Mar 2024 04:40:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709786431;
-	bh=RP4hy+R35jLPZPDVIpeZNpzZRzY9gWkWN21185TXQ9M=;
+	bh=EEYqOx9Zfjrv+CfUDIOl3n6VMgScQyeeuqGf9tFXIos=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MUclku5inUZbx0b9kXs3PcEGBifb3QEaZfvxz16YmxjaW694i9VzBCBEzBdZmlj+j
-	 dcSD0urZHFXm3ekmv762VD6YFPlX8wt/FiYuvpYtbIac8+LBWuGwELMekPKjZLRd9S
-	 QkBlVgsWwS98NAw8T7YAQCEP/DSkmmX0k4xJc116xmPghWli/cZ2WtkR9qmwlCdwhF
-	 qOQ25KU8oKvA1KP5mly8an3ALQ8fyY1FCVN+zTnQRFt4l2VK8TLfSA2Vdlu9FX4A4t
-	 3icGb934mKJiwrFQEdaV45oWh9zoO56DPjU1VJZcdR6Q1xYSD5s0s0FHWFAjfrDfnN
-	 1EeWeGCvW9DSg==
+	b=eSyFmpNcc8y0vx7LR+IVHns8tM9OaMrMmX0mw63chzsTbTQs1xmHVnoagr5zcQPfi
+	 lRWsWwuvRnPf0OTiqq78/C9+SkudN/9eWmY7nNXgCt2rbLf+BZTshJ0dI0uPIOYFU+
+	 RJwECIuJfVR6znnDDWUwVUEnGvRiwAl0XgWBI0v+HKBhk+uYaH0A7K2CfMrnjAnn40
+	 Tz7LduaEnCPvH4BJ1lcCTsu11HDjiYA2oI+nBSU2OESLiHTyQX/afF9yS2mtOc1zc+
+	 bu2gEQpEtiMFYQgg2fQVKOlqgGnjuuqcLXL4JzlbCHzW1OF7UK8/mopD22dbRMHiNe
+	 S8gkHlL7tijew==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D7B0DD88F80;
-	Thu,  7 Mar 2024 04:40:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0C3AFD9A4BB;
+	Thu,  7 Mar 2024 04:40:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/3] net: gtp: Leverage core stats allocator
+Subject: Re: [PATCH net-next] dt-bindings: net: renesas,etheravb: Add support for
+ R-Car V4M
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170978643088.7855.4668701544499499077.git-patchwork-notify@kernel.org>
-Date: Thu, 07 Mar 2024 04:40:30 +0000
-References: <20240305121524.2254533-1-leitao@debian.org>
-In-Reply-To: <20240305121524.2254533-1-leitao@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: pablo@netfilter.org, laforge@gnumonks.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org,
- dsahern@kernel.org, osmocom-net-gprs@lists.osmocom.org
+ <170978643104.7855.7910521326706587697.git-patchwork-notify@kernel.org>
+Date: Thu, 07 Mar 2024 04:40:31 +0000
+References: <0212b57ba1005bb9b5a922f8f25cc67a7bc15f30.1709631152.git.geert+renesas@glider.be>
+In-Reply-To: <0212b57ba1005bb9b5a922f8f25cc67a7bc15f30.1709631152.git.geert+renesas@glider.be>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ sergei.shtylyov@gmail.com, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org,
+ thanh.quan.xn@renesas.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  5 Mar 2024 04:15:21 -0800 you wrote:
-> With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
-> convert veth & vrf"), stats allocation could be done on net core
-> instead of in this driver.
+On Tue,  5 Mar 2024 10:37:18 +0100 you wrote:
+> From: Thanh Quan <thanh.quan.xn@renesas.com>
 > 
-> With this new approach, the driver doesn't have to bother with error
-> handling (allocation failure checking, making sure free happens in the
-> right spot, etc). This is core responsibility now.
+> Document support for the Renesas Ethernet AVB (EtherAVB-IF) block in the
+> Renesas R-Car V4M (R8A779H0) SoC.
+> 
+> Signed-off-by: Thanh Quan <thanh.quan.xn@renesas.com>
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/3] net: gtp: Leverage core stats allocator
-    https://git.kernel.org/netdev/net-next/c/660e5aaea11d
-  - [net-next,2/3] net: gtp: Remove generic .ndo_get_stats64
-    https://git.kernel.org/netdev/net-next/c/13957a0b0708
-  - [net-next,3/3] net: gtp: Move net_device assigned in setup
-    https://git.kernel.org/netdev/net-next/c/81154bb83c44
+  - [net-next] dt-bindings: net: renesas,etheravb: Add support for R-Car V4M
+    https://git.kernel.org/netdev/net-next/c/d66206296176
 
 You are awesome, thank you!
 -- 
