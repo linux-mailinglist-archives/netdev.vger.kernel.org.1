@@ -1,209 +1,276 @@
-Return-Path: <netdev+bounces-78478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F32E0875469
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:45:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D023875476
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:49:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8CCD282016
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 16:45:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00D9F284C40
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 16:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BBCC12FB26;
-	Thu,  7 Mar 2024 16:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F53912FF7D;
+	Thu,  7 Mar 2024 16:49:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="XGux2vwq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T3NO9kW9"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2087.outbound.protection.outlook.com [40.107.7.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD1012FF81
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 16:45:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.7.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709829904; cv=fail; b=j82QV0M9v+WYpVvktUpIKE8zg4kGWvF+nJeDz8z8C8O8jEPc6hOo0tOQM6FnAM8iufhj2av3tpyFoyrhR8PBdEblAPcvvipwLTEgdjnWtm1vhRhXwk7hw8GadExkHJDpUePU+/+bzMU1C4G8fNP/iJQTyI09iP4oWIFZU1mpX9g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709829904; c=relaxed/simple;
-	bh=M37oIrI55u0eMFnZGOb79adHzSWRY6Gz/4d7vH6mCP8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Xq3CQInMBxhvfTJmgGUrvbxFXDsUqHHH4VF2m0qea3JyLVLCOxyRnZa92wy8KHJUICh2uyybIzjoHnbOWD9KFNkk+FzK2v9D9FY+fIY2ep4sqLaOusaMgNQKycCbpK5C/3K9ljswPePcbI39aa2Q1UgGqy8jPL15TGaudO1tYHA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=XGux2vwq; arc=fail smtp.client-ip=40.107.7.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dV6dmbgny+cKvWq70MHV85x+D8HJkzFcYhoFjALlfqud7HkXRC1Qh/DnRLeg9rMqCA2JiKwMCEoDIrwZvJrI0PnXkmeZXNXx6vA/0yPpd8fUWVKZMLMHQipZP65/sbaQKeAa8hYRlg/JfnW5CFMzx25QyTNa1ptOW+6H4lylatYGviOxLNKgcuoEp3GdVHzZl50fSGuAW/GRzemexfFFsXy1VTuYQr05gJwhZ5zodjbtk5ICPs3s7IsPqbsqJLPhZG9y/r1NejEUxLS0lsHDF7145nWfrtM/bveEq8vDLx5oOJ8J4PPTas1E8lj4u50oebYAH7UxIdCVe8q5JeY68A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sfL90XERuzHoV58hTsBx7leVDp0gZsVoAFVTbt0aU4A=;
- b=KqBWAEWSRoHk3TpvuoKzvXxJbVy/yhdRUDET2/P+WQ/5dFTuliqml1P48II9+FmvY/i2NotcfvvFuMTDftk5X9kqZiUjs8A2l0y0SqcHtToW35GQcDcj/WcWl6pn77SKO9buGfms/qqZn1c3AkYFozee4xFqJkDLC60OeStlL+FBYOfvxJnxYzMPhzDkiLCyOLF88dpSAjukPkeByh0zdbMXhuhk3+rRjkfhqv/qsc7kWCMtrqpGEF7LxoPHX777cT5hATWotmDOpDyAFmczdmAU1dU+CvxnqJNzwJj3yRtJ+eN3jDwpqigPYeS8+tTDNdlPE264LSidHzRrKmoFgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector2-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sfL90XERuzHoV58hTsBx7leVDp0gZsVoAFVTbt0aU4A=;
- b=XGux2vwqtGXUBruv/sHFmtgdgWZpNUUokTU7XlHn23vBg7/ZdWIs7GCiTvUS8ABIbpu81NQT37P/7EGoqeW4jTFdl85D69GlEWWCyvGlzM9ISt5zTHaOzQaopb7HJvtZj3PCwfGZzdBVjX4ZGylZiosBINx2LARoOOwAXwJwHJA=
-Received: from AM9PR04MB8506.eurprd04.prod.outlook.com (2603:10a6:20b:431::16)
- by AM7PR04MB7190.eurprd04.prod.outlook.com (2603:10a6:20b:115::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.26; Thu, 7 Mar
- 2024 16:44:59 +0000
-Received: from AM9PR04MB8506.eurprd04.prod.outlook.com
- ([fe80::b6dd:f421:80e4:8436]) by AM9PR04MB8506.eurprd04.prod.outlook.com
- ([fe80::b6dd:f421:80e4:8436%7]) with mapi id 15.20.7339.035; Thu, 7 Mar 2024
- 16:44:58 +0000
-From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-To: Andrew Lunn <andrew@lunn.ch>, "Jan Petrous (OSS)"
-	<jan.petrous@oss.nxp.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Heiner Kallweit
-	<hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: RE: [RFC PATCH net-next] net: phy: Don't suspend/resume device not in
- use
-Thread-Topic: [RFC PATCH net-next] net: phy: Don't suspend/resume device not
- in use
-Thread-Index: AdpwpO6oyjLCya8IQ/aUYHLqJLKzwQABsguAAAApU5A=
-Date: Thu, 7 Mar 2024 16:44:58 +0000
-Message-ID:
- <AM9PR04MB8506A1FC6679E96B34F21E94E2202@AM9PR04MB8506.eurprd04.prod.outlook.com>
-References:
- <AM9PR04MB8506772CFCC05CE71C383A6AE2202@AM9PR04MB8506.eurprd04.prod.outlook.com>
- <c5238a4e-b4b1-484a-87f3-ea942b6aa04a@lunn.ch>
-In-Reply-To: <c5238a4e-b4b1-484a-87f3-ea942b6aa04a@lunn.ch>
-Accept-Language: cs-CZ, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM9PR04MB8506:EE_|AM7PR04MB7190:EE_
-x-ms-office365-filtering-correlation-id: 524c15fb-cdf3-4a5b-0cc4-08dc3ec5ed28
-x-ms-exchange-sharedmailbox-routingagent-processed: True
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- yzM5hAuYUM9/K+o6jGkCBx4t3bR4gMrMjebkESsp4qdDWrGD6OIlp8U8v3wDYfRGI5wNFsBWQDEs2ML/PbEKupmHBtnS5iZ1QmpUnTgYWeZW4/NX22amQn7KhIvRReYCqBCk0H1aumfOeW7zCZbcSXT3Pe+Fdlj3ehqu0xvYNMRDoS1Z4R4y0ZUlaFVNhjbiSEmzOtWMJqMLf/WhbI+qCjfltVGyoCJsLU2pVxXp+UDkq7/vIVB/+vOPnqT4GpYEHBnAKKeJtohtVxtbg7Ksg0lRr/TD+T9w4ucAFVpcS119hbQs16ycxyQxH872/mY7klpnKWU3xMnsZmDFnowNF70XQ3S34cqi8jy3Gq+3ZJnkJpjpphTp0ImOdQrtqKBJJsJNNYrpndGGsp8qwmlVaZtDNqOlPTBnLpehK85X7BvXwx/sEFIQtKc3Q2VzY0Np3fEQL6q02Zmm66lQZHV/fk7iYxhsco6ha5IO3ru7Y4EVFv8pJEewdwPy5psXP1OJupQ7zDpstvp0N3GZx42ZRIWLP9S8biEnd0bJjKuYfL/INHaPgYpggrWpM5sQ/I5emYGezaPw1pC7tyCx+f9FmUQFm0Y+qo9hAGXT9dW15J7upB6Hx0lFqJuzWUIQdEpoN/Gpyy9Pi+0POFEH7seVU+6fS5/WXkds43mOp8zRTudPG466mXfS8CB0uRFgCng3KrIdpFedRE5HeIex7NYZBy/ZEc+Pd9agUbgFGleeL+o=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8506.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?nAAI4RcaTTaVJ/f8htrtWS+1AyBJThIQP578bV01GOljuA2ZhJSNmkpl3DNv?=
- =?us-ascii?Q?pKr3ohZLHnVna8/XIlTuGniNf4hoi5eXGXoG+hAuxwEXlgXL1zoaIi8TLDi+?=
- =?us-ascii?Q?jW4HJz8TLW8Be/NRR9EjOqU170/06/aCWsAUwjQWuAlpme7Sqi8n2l0t0xIT?=
- =?us-ascii?Q?ddcXMiAnj1QOwoVp0HofuV43g1zHHVllml/8gMsXCC/1A8J8GFEcE/hWKXme?=
- =?us-ascii?Q?X1yEbJuGu/K8SPQTHano+9YhjOu7RzN42WZCBbaVcNuEMgC+1acoyX6vV6CL?=
- =?us-ascii?Q?k6I6V7flIOND3NJPnSvIdkR0NsIYKHnL2o6B9b2sN4zFv1oIvqlFKz+QJXuz?=
- =?us-ascii?Q?1vxnta/OogF2g+2Ur6LlsJy1JwuKWgHtgBqvooXK8vpb5IbkSFbGAk7UAtlb?=
- =?us-ascii?Q?hV75aDICp7SRYPv7v0i0Org8x+PN0bVCrtI2Yx3/2le6qy2veJxQkuawK/nf?=
- =?us-ascii?Q?LgsPfroU72dUcZHiTpz8A/LjoN0HI6L0kaS/jZUzFKvuwxqK31k+WlyC6HUc?=
- =?us-ascii?Q?IDSW6Zpyx2QiBSUDrJJlTjNpCZ2sgPOE0g9e8D0rOVpReLz7B8abKuQtpRcs?=
- =?us-ascii?Q?YCr36t85BAdBJZolc49sJQgEmt8WzJnkehxIINCAyG1RNOHzr3yJC4ahk4uH?=
- =?us-ascii?Q?yXROWiZeKeTzG4v6ZJrWR0TTlC+cJ6bOVuZZyQw2QnFX4EJtrTc1DFCmOtOP?=
- =?us-ascii?Q?psAh7bqb+mW0FvXS4jiHjq2eJ4HRPdg50Z/ogyJRRrdnPbiBWhmprjviz+rJ?=
- =?us-ascii?Q?xPpLXAdPEHZo0BNQTyHkwjneNcv98sZ14VU1e4mJfTJqev26qBK3cBWYz6Sc?=
- =?us-ascii?Q?TE6Hihghouj/6Ekqj5+YmcgPZl7wx1fmWDIID2iBjDK7IOdfHvl8DTCrFvi6?=
- =?us-ascii?Q?ODRJpJxAfk295dqwQUR3T9E3yrPemRCDJuTi/MPPiRFXaJSOHqSpeBHhLfdl?=
- =?us-ascii?Q?2gld7/WqCkQptg0TZP8BgySfNX3APrAP3qrewu3SuMbnoK+HFoAQBtUExpog?=
- =?us-ascii?Q?IZmmz/sE8/RJ+MJoSUf8Px0UHaz9BJbKWFesaMZ/vh9fdqXnFStrNUei6OiY?=
- =?us-ascii?Q?freY+M0p7Oc7KpfnheqXZGbmLB0ayqrEGwdNOUALooFpLj6Smn61Qkr4w+QD?=
- =?us-ascii?Q?7qml6xJF9oJC6uJlQmBNqMSkXXTkFgtHbPpPEb2TFMH4wOjpgIcsoIvewP6f?=
- =?us-ascii?Q?gxtwj19/Ka/Z9vKt3mO5xLHrd/4q2eugM7Dz5kptY8XEjucL+JYeZCK9k1Og?=
- =?us-ascii?Q?B3lfrFTahnbe30jD+KpzxZHJ2WLvZeGr1jT+keT6hkknoGbgsEew0W4DUFBd?=
- =?us-ascii?Q?UQPFsv49SNI1DHRSBYOr2zdcEo2AIEIu9N49UJhsvYfX3bnqQZEj6c8AAWyW?=
- =?us-ascii?Q?44IBnxyGFtpnxxqD6DO60joejTblSEuNfUVoLfwEYszgircgdjMS5rD0aPi9?=
- =?us-ascii?Q?gBNQmi2/3EjQthwHlGjeCpJUwod85JhFXq6SCl6EthVmq/SjNEkx1Os9bzFj?=
- =?us-ascii?Q?aFrco8LbATxHBZlH1mp2Cyf5LqbRL8MJKhliecTRNlwLdaoFXUVp5int9KRA?=
- =?us-ascii?Q?IlGiQMAB5X+ukAWdzNi0fOz3ww82quGKwvWgPQyz?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C341B12F59B;
+	Thu,  7 Mar 2024 16:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709830144; cv=none; b=o0ytPi7a01qDsWyeKZ25V4Ksp3oqNjakmuCIOwxRVi4PIzkcrHonaTztoZ4Ys15PFsZkB/EpaTpY+FrDvtFwj76DEQA226NgSg2lvHeAsDzo7gaQuDGTPtJBlemtG5T4WGPmnV0vzXR3tNP6VWot3OCWEwl0aK2G1ed4kW/qV2A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709830144; c=relaxed/simple;
+	bh=IV04XMutDqMAi27h60naVerg2jYHbb6d6Ibqs6QXWDc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MCUyk35k2AQ5x4grLbSu7LElKEYvGI1737ck6yHhctCCJkVcUXWtkdJ6QikwPs1gIVml4nNfOBNRt1pvcRLQ528MP0C9yP/qlxN0Kc4kNes22SJdc7JYswgM1ZnkdweBTbTMWInoBhbMcGVusk5V7TyziSDS9Q05Kze7+muFhWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T3NO9kW9; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a441d7c6125so127360166b.2;
+        Thu, 07 Mar 2024 08:49:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709830141; x=1710434941; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1XwLtyvBA6RDV5qqCSNmuKb5cUB038y/Fs8OWv6CO+I=;
+        b=T3NO9kW96O4pfopNeWtJpBcYknPrsjxK85tgioEGdRtQriM1CpGwZV+GxUvEriBZzJ
+         mDojXmWZwzechVly9pv8RYm3JNrM0SqzAhuG5aaEeJR83HrdbMLLyF3ssHUJkKCrDpql
+         GlJZ7FCB189RzsOSZiihDXUPAKVhT4u3NfgLqdcHhnZdq9NooJaDCeCLE9CWKjh+fhzo
+         7gTw+05aKHeuAPfsR1tpo+jRVZ6X7mVzkH2VNXqDGyZhq4zVj+rIJuA2XLGtBozgMzu2
+         ze8bjMmJaARiu+wDvLoEkqq1gtHIki0H/udEoUK4Pn2tepqwoJSxen7k5QHZVnGgse3/
+         O2Mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709830141; x=1710434941;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1XwLtyvBA6RDV5qqCSNmuKb5cUB038y/Fs8OWv6CO+I=;
+        b=VAbMPKSQy4S5UaZvSZpCeHzmXptrlrD14iGvEF/czECaqaol/sKazwLsiYh2wwWmeT
+         x+Ho7v+j3njAwcW+d5K/yZ+7o7aNngaodlU7EY4dXOHYRCOotmZ/x6AZA+iqnHX4H4bb
+         TRLMoyIwEdnqV8GieWNlve69JwMFP0rmEjuHHBfhiFumFDPMZZIup8yLLUi8CdtTL6Ps
+         +4IGFYXn6cTSChEUdMpBTvqQxtc7DSlM5mgsKKjYr647UT4h8baoKJ0QQqEKb+u8tZIQ
+         Dpo9C9z+Jwm22Ji8KgdXfT+N5GVoBYRsBa3VkOrFUZTAokTs57qw6OS5BQ0VRx1XfDOo
+         u1tg==
+X-Forwarded-Encrypted: i=1; AJvYcCV654/cJFMQl8cWJZFcY0F/tWfsMe1FupGVxdOQenSsvOrDwtyPbWrJ5l9aySIPbSxpS0ptKMdRgAZ/+28COw9Er3kqmEIdMrb24sXFJU7um7rM636a3KkSIP+7JUrjCYQaUw==
+X-Gm-Message-State: AOJu0YxE5Nv8JXwH/uYFPZHeTu28eieG/WxW6QN8qej+xJCQM60jWiz7
+	e2vS5LI6Cf/uqI2YXhX3O178gUL6NmE9w5vH0Vjfzp6NBCHEUbL3
+X-Google-Smtp-Source: AGHT+IHT8E+D1Qa4UDaI8Mcx/e5WQOgcxjqNulcWb7sXqRpu7+ZJUkgg2NC83SoZBfZGeKGl22SHUA==
+X-Received: by 2002:a17:906:6d11:b0:a45:c4ca:57a1 with SMTP id m17-20020a1709066d1100b00a45c4ca57a1mr2698695ejr.22.1709830140459;
+        Thu, 07 Mar 2024 08:49:00 -0800 (PST)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id w8-20020a170906b18800b00a43fe2d3062sm8457173ejy.158.2024.03.07.08.48.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Mar 2024 08:48:59 -0800 (PST)
+Message-ID: <6e6e408d-3dbb-4e80-ae27-d3aaafb34b06@gmail.com>
+Date: Thu, 7 Mar 2024 17:48:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8506.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 524c15fb-cdf3-4a5b-0cc4-08dc3ec5ed28
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Mar 2024 16:44:58.7770
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pK7ppxtgWCBd+aNeuK9qHg3c/YXJd32ZZX1eRmaoz1GI3BWG5j/5QBefAJm1T0PfeAD1c3MRet5reJ2TZOd6sA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB7190
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 2/2] net: phy: air_en8811h: Add the Airoha
+ EN8811H PHY driver
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>, Lucien Jheng
+ <lucien.jheng@airoha.com>, Zhi-Jun You <hujy652@protonmail.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org
+References: <20240302183835.136036-1-ericwouds@gmail.com>
+ <20240302183835.136036-3-ericwouds@gmail.com>
+ <89f237e0-75d4-4690-9d43-903e087e4f46@lunn.ch>
+ <b27e44db-d9c5-49f0-8b81-2f55cfaacb4d@gmail.com>
+ <99541533-625e-4ffb-b980-b2bcd016cfeb@lunn.ch>
+Content-Language: en-US
+From: Eric Woudstra <ericwouds@gmail.com>
+In-Reply-To: <99541533-625e-4ffb-b980-b2bcd016cfeb@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
->=20
-> > Because such device didn't go through attach process, internal
-> > parameters like phy_dev->interface is set to the default value, which
-> > is not correct for some drivers. Ie. Aquantia PHY AQR107 doesn't
-> > support PHY_INTERFACE_MODE_GMII and trying to use phy_init_hw()
-> > in mdio_bus_phy_resume() ends up with the following error caused
-> > by initial check of supported interfaces in aqr107_config_init():
-> >
-> > [   63.927708] Aquantia AQR113C stmmac-0:08: PM: failed to resume: erro=
-r -
-> 19']
-> >
-> > Signed-off-by: Jan Petrous <jan.petrous@oss.nxp.com>
-> > ---
-> >  drivers/net/phy/phy_device.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> >
-> > diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.=
-c
-> > index 3611ea64875e..30c03ac6b84c 100644
-> > --- a/drivers/net/phy/phy_device.c
-> > +++ b/drivers/net/phy/phy_device.c
-> > @@ -311,6 +311,10 @@ static __maybe_unused int
-> mdio_bus_phy_suspend(struct device *dev)
-> >  {
-> >         struct phy_device *phydev =3D to_phy_device(dev);
-> >
-> > +       /* Don't suspend device if not in use state */
-> > +       if (phydev->state <=3D PHY_READY)
-> > +               return 0;
-> > +
-> >         if (phydev->mac_managed_pm)
-> >                 return 0;
->=20
-> If nothing is using it, suspending it does however make sense. It is
-> consuming power, which could be saved by suspending it. It makes the
-> code asymmetrical, but i would throw this hunk away.
 
-Yes, I also thought about still having possibility to suspend it, even not =
-used.
-I'm ok with removal the hunk.
 
->=20
-> >
-> > @@ -344,6 +348,10 @@ static __maybe_unused int
-> mdio_bus_phy_resume(struct device *dev)
-> >         struct phy_device *phydev =3D to_phy_device(dev);
-> >         int ret;
-> >
-> > +       /* Don't resume device which wasn't previously in use state */
-> > +       if (phydev->state <=3D PHY_READY)
-> > +               return 0;
-> > +
->=20
-> This is the real fix to your problem. phy_attach_direct() also does a
-> phy_resume(), so if the device does come along and claim the PHY after
-> the resume, it looks like this should work, without the matching
-> suspend.
+On 3/5/24 14:54, Andrew Lunn wrote:
+> On Tue, Mar 05, 2024 at 09:13:41AM +0100, Eric Woudstra wrote:
+>>
+>> Hi Andrew,
+>>
+>> First of all, thanks for taking the time to look at the code so
+>> extensively.
+>>
+>> On 3/3/24 18:29, Andrew Lunn wrote:
+>>>> +enum {
+>>>> +	AIR_PHY_LED_DUR_BLINK_32M,
+>>>> +	AIR_PHY_LED_DUR_BLINK_64M,
+>>>> +	AIR_PHY_LED_DUR_BLINK_128M,
+>>>> +	AIR_PHY_LED_DUR_BLINK_256M,
+>>>> +	AIR_PHY_LED_DUR_BLINK_512M,
+>>>> +	AIR_PHY_LED_DUR_BLINK_1024M,
+>>>
+>>> DUR meaning duration? It has a blinks on for a little over a
+>>> kilometre? So a wave length of a little over 2 kilometres, or a
+>>> frequency of around 0.0005Hz :-)
+>>
+>> It is the M for milliseconds. I can add a comment to clarify this.
+> 
+> Or just add an S. checkpatch does not like camElcAse. So ms will call
+> a warning. But from context we know it is not mega seconds.
 
-Well, I like symmetry, this was the reason I checked both PM directions.
-But you are right, it works for me with resume hunk only.
+I'll add it.
 
-Thanks.
-/Jan
+>>>> +static int __air_buckpbus_reg_write(struct phy_device *phydev,
+>>>> +				    u32 pbus_address, u32 pbus_data,
+>>>> +				    bool set_mode)
+>>>> +{
+>>>> +	int ret;
+>>>> +
+>>>> +	if (set_mode) {
+>>>> +		ret = __phy_write(phydev, AIR_BPBUS_MODE,
+>>>> +				  AIR_BPBUS_MODE_ADDR_FIXED);
+>>>> +		if (ret < 0)
+>>>> +			return ret;
+>>>> +	}
+>>>
+>>> What does set_mode mean?
+>>
+>> I use this boolean to prevent writing the same value twice to the
+>> AIR_BPBUS_MODE register, when doing an atomic modify operation. The
+>> AIR_BPBUS_MODE is already set in the read operation, so it does not
+>> need to be set again to the same value at the write operation.
+>> Sadly, the address registers for read and write are different, so
+>> I could not optimize the modify operation any more.
+> 
+> So there is the potential to have set_mode true when not actually
+> performing a read/modify/write. Maybe have a dedicated modify
+> function, and don't expose set_mode?
 
+I'll write a dedicated modify function.
+
+
+>>>> +static int en8811h_load_firmware(struct phy_device *phydev)
+>>>> +{
+>>>> +	struct device *dev = &phydev->mdio.dev;
+>>>> +	const struct firmware *fw1, *fw2;
+>>>> +	int ret;
+>>>> +
+>>>> +	ret = request_firmware_direct(&fw1, EN8811H_MD32_DM, dev);
+>>>> +	if (ret < 0)
+>>>> +		return ret;
+>>>> +
+>>>> +	ret = request_firmware_direct(&fw2, EN8811H_MD32_DSP, dev);
+>>>> +	if (ret < 0)
+>>>> +		goto en8811h_load_firmware_rel1;
+>>>> +
+>>>
+>>> How big are these firmwares? This will map the entire contents into
+>>> memory. There is an alternative interface which allows you to get the
+>>> firmware in chunks. I the firmware is big, just getting 4K at a time
+>>> might be better, especially if this is an OpenWRT class device.
+>>
+>> The file sizes are 131072 and 16384 bytes. If you think this is too big,
+>> I could look into using the alternative interface.
+> 
+> What class of device is this? 128K for a PC is nothing. For an OpenWRT
+> router with 128M of RAM, it might be worth using the other API.
+
+So far, I only know of the BananaPi-R3mini, which I am using. It has 2GB
+of ram. It should be ok.
+
+>>>> +static int en8811h_restart_host(struct phy_device *phydev)
+>>>> +{
+>>>> +	int ret;
+>>>> +
+>>>> +	ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
+>>>> +				     EN8811H_FW_CTRL_1_START);
+>>>> +	if (ret < 0)
+>>>> +		return ret;
+>>>> +
+>>>> +	return air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
+>>>> +				     EN8811H_FW_CTRL_1_FINISH);
+>>>> +}
+>>>
+>>> What is host in this context?
+>>
+>> This is the EN8811H internal host to the PHY.
+> 
+> That is a very PHY centric view of the world. I would say the host is
+> what is running Linux. I assume this is the datahsheets naming? Maybe
+> cpu, or mcu is a better name?
+
+I'll rename host to mcu.
+
+>>> Vendors do like making LED control unique. I've not seen any other MAC
+>>> or PHY where you can blink for activity at a given speed. You cannot
+>>> have 10 and 100 at the same time, so why are there different bits for
+>>> them?
+>>>
+>>> I _think_ this can be simplified
+>>> ...
+>>> Does this work?
+>>
+>> I started out with that, but the hardware can do more. It allows
+>> for a setup as described:
+>>
+>>  100M link up triggers led0, only led0 blinking on traffic
+>> 1000M link up triggers led1, only led1 blinking on traffic
+>> 2500M link up triggers led0 and led1, both blinking on traffic
+>>
+>> #define AIR_DEFAULT_TRIGGER_LED0 (BIT(TRIGGER_NETDEV_LINK_2500) | \
+>> 				 BIT(TRIGGER_NETDEV_LINK_100)  | \
+>> 				 BIT(TRIGGER_NETDEV_RX)        | \
+>> 				 BIT(TRIGGER_NETDEV_TX))
+>> #define AIR_DEFAULT_TRIGGER_LED1 (BIT(TRIGGER_NETDEV_LINK_2500) | \
+>> 				 BIT(TRIGGER_NETDEV_LINK_1000) | \
+>> 				 BIT(TRIGGER_NETDEV_RX)        | \
+>> 				 BIT(TRIGGER_NETDEV_TX))
+>>
+>> With the simpler code and just the slightest traffic, both leds
+>> are blinking and no way to read the speed anymore from the leds.
+>>
+>> So I modified it to make the most use of the possibilities of the
+>> EN881H hardware. The EN8811H can then be used with a standard 2-led
+>> rj45 socket.
+> 
+> The idea is that we first have Linux blink the LEDs in software. This
+> is controlled via the files in /sys/class/leds/FOO/{link|rx|tx}
+> etc. If the hardware can do the same blink pattern, it can then be
+> offloaded to the hardware.
+> 
+> If you disable hardware offload, just have set brightness, can you do
+> the same pattern?
+> 
+> As i said, vendors do all sorts of odd things with LEDs. I would
+> prefer we have a common subset most PHY support, and not try to
+> support every strange mode.
+
+Then I will keep this part of the code as in
+mt798x_phy_led_hw_control_set(), only adding 2500Mbps.
+
+>>> +	/* Select mode 1, the only mode supported */
+> 
+>> Maybe a comment about what mode 1 actually is?
+
+After consulting Airoha, I can change it to:
+
++	/* Select mode 1, the only mode supported.
++	 * The en8811h configures the SerDes as fixed hsgmii.
++	 */
+
+Best Regards,
+
+Eric Woudstra
 
