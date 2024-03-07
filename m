@@ -1,109 +1,101 @@
-Return-Path: <netdev+bounces-78326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 235E1874B5C
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:54:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 79F83874BBC
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:03:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D25B4281520
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:54:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3668C284DA6
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32C085266;
-	Thu,  7 Mar 2024 09:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="pAROI+NQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F738527A;
+	Thu,  7 Mar 2024 09:58:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A93EE85265;
-	Thu,  7 Mar 2024 09:54:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7014085267
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 09:58:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709805247; cv=none; b=TW8wB/3b5PkyNkb75M4RDJN4p051MqW0y2VQV3Evh9gT2Xpw1xDqdqMr64vwArvU6o6I/6SF+dNUQ7eqEUB0T9y2CdLEV9skOSVrwTHP6PDVCrEQWmPgxKZt+IdBsKR5JduPgiUQZUdjGNbQVFnZqmA9VH7igthxMKIK1zjCH2c=
+	t=1709805502; cv=none; b=BH2h0sqLyukiLGt3ncJV5Zqn9XZfhYtL9FClZ7YRXU4fqL6euqTr4X1bPyharU3GmIiGAuNKzIeGGJ9s8NsFqPyB/1bMfdOL+i8uMSCT3K1yQyepkyi1vpHwfnMR/YIo/p9EGrFm2vliDGjAURRjV8sUfLU9ooGhqbMQSkCBF84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709805247; c=relaxed/simple;
-	bh=0SnMAXaV9sTSjk/IyJvoJM+DoU/obkmhOdV/QOy3nVA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q+CruSCoblOKoX+qk0z8P23RZ/VJJSqTW+t4t22aGewFg56mC6Tn3T1kovkfOLwEOnftJU2x7l5A41/e2UFUCD/Br5VozSbx89hHursYCNTZwlPOv6D0Mbot7aJWy2hGIERTpBj5bLIV9GKnLm8Rj4M2G+rGv4D6vfBdAZhKpgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=pAROI+NQ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=8Wd64duwC2fsuB7URl1NXnnq7MkV0J65J9GZP0R8Zyg=; b=pAROI+NQ6k0gEPLDCZC9vSq2a2
-	NvhwoJhDMUZzsSH3Z1u3sllij5F1bZoFdp4psANIE+slOl5DQQvlUT3Avzp1OIkzXjP1/nJvlZBhy
-	ipu+8AAk4VbrKOpoLinBncLOrXZ0jpXquDJsN62igLplPPvIacodJ9VrRCcsQylURkD5HvpzDONBC
-	Z8LGF9CvJOtRX685zHd6T3avF2i/cUSHMmFfrp8UK+xC2aKDWjlhxMbTOapsrN+ykuE5fqnxUvDD8
-	6uL+FngsruGxYHV6Ypfhj7FIfIR+BVHaBR+F33R4BE+8mVYCyEwU6/QFTTndvO4pHds+yrwkrzGX1
-	vhKUIq7w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36770)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1riARf-0000tY-09;
-	Thu, 07 Mar 2024 09:53:47 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1riARb-0007AW-U5; Thu, 07 Mar 2024 09:53:43 +0000
-Date: Thu, 7 Mar 2024 09:53:43 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: =?iso-8859-1?Q?K=E9vin_L'h=F4pital?= <kevin.lhopital@savoirfairelinux.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Dan Murphy <dmurphy@ti.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
-Subject: Re: [PATCH] net: phy: fix phy_get_internal_delay accessing an empty
- array
-Message-ID: <ZemOp4MGP/UK31wq@shell.armlinux.org.uk>
-References: <20240307085254.183905-1-kevin.lhopital@savoirfairelinux.com>
+	s=arc-20240116; t=1709805502; c=relaxed/simple;
+	bh=Qyh+h4jhi9Lhsya4hOv3cUPrixqn3zOUzE7Q/Rch0Xc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hRbk/UfPUOX8PY+rB/wFKIDpRlAi8DSzQIlMyY//NqoGlVpvBBiGiV3sV1Ux6Eo3zOmonQnA/jZiYA2kgB7e5BigTgkz2SwGkAbwBezxuj/evnA/OokH8KHJ8O9NMs3XxZEqw7WeRS/Gf4S1i81+hHC0nYk8wX7uLkfx22X32OA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=52.59.177.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: bizesmtp87t1709805485t1afzgrf
+X-QQ-Originating-IP: VSClAvOlVRVxC8vtvM0bAmz4z3qvGROgn+xEiBkrSI8=
+Received: from localhost.localdomain ( [220.184.149.201])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 07 Mar 2024 17:57:57 +0800 (CST)
+X-QQ-SSF: 01400000000000O0Z000000A0000000
+X-QQ-FEAT: IcCSTr/hHjMoU0QmD2ljNxKpgqeYrbEP4XjV3Sx4zYNYeTVaJy4vlcRmhF+jQ
+	v7raCrDEmSyABpk0MGrA+71VgnZlZ57Nv165gW7maLHWGUwZw6Vbz12o3nGdLAHzbqY4uTt
+	O4CSngzq5p4vQZqle8I3p2lquDrIEusPZAgyiliJFvdRTbC5Ztx93t2uOmDq35GsA+w7lPq
+	sOvPr/5OdxYuM3EvR4QV3BB4P7R3IQo1KPePJ5AbC6CRliYGwcXFIFJTo3sVLyWh0MF98zy
+	4O6QDPzEcsGIjm3e3wkHmXJsChY2XhP81omjeo8JVoX2csnhe3AzGVhs3rudbG46AnxYVpY
+	Y+Od4dWvOL7J04j4+sZZY9TiYqGQvJsVUrS5+C778bRGBR8W5psKOYnGASHqh90iW1TWSbi
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 8886319570888759429
+From: Mengyuan Lou <mengyuanlou@net-swift.com>
+To: netdev@vger.kernel.org
+Cc: jiawenwu@trustnetic.com,
+	Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: [PATCH net-next 0/5] add sriov support for wangxun NICs
+Date: Thu,  7 Mar 2024 17:54:55 +0800
+Message-ID: <DA3033FE3CCBBB84+20240307095755.7130-1-mengyuanlou@net-swift.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240307085254.183905-1-kevin.lhopital@savoirfairelinux.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrgz:qybglogicsvrgz6a-1
 
-On Thu, Mar 07, 2024 at 09:52:54AM +0100, Kévin L'hôpital wrote:
-> The phy_get_internal_delay function could try to access to an empty
-> array in the case that the driver is calling phy_get_internal_delay
-> without defining delay_values and rx-internal-delay-ps or
-> tx-internal-delay-ps is defined to 0 in the device-tree.
-> This will lead to "unable to handle kernel NULL pointer dereference at
-> virtual address 0". To avoid this kernel oops, the test should be delay
-> >= 0. As there is already delay < 0 test just before, the test could
-> only be size == 0.
-> 
-> Fixes: 92252eec913b ("net: phy: Add a helper to return the index for of the internal delay")
-> Signed-off-by: Kévin L'hôpital <kevin.lhopital@savoirfairelinux.com>
-> Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+Add sriov_configure for ngbe and txgbe drivers.
+Reallocate queue and irq resources when sriov is enabled.
+Add wx_msg_task in interrupts handler, which is used to process the
+configuration sent by vfs.
+Add wx_ping_vf for wx_pf to tell vfs about pf link change.
 
-The sign-offs look wrong to me. They indicate the path that the patch is
-taking to be merged into mainline. Who is the author of this patch and
-who is passing it along? If it's co-development, then there is a specific
-tag for that.
+Mengyuan Lou (5):
+  net: libwx: Add malibox api for wangxun pf drivers
+  net: libwx: Add sriov api for wangxun nics
+  net: libwx: Add msg task api
+  net: ngbe: add sriov ops support
+  net: txgbe: add sriov ops support
 
-For the actual patch itself:
-
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-
-Thanks!
+ drivers/net/ethernet/wangxun/libwx/Makefile   |    2 +-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  312 ++++-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.h    |    6 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  149 ++-
+ drivers/net/ethernet/wangxun/libwx/wx_mbx.c   |  190 +++
+ drivers/net/ethernet/wangxun/libwx/wx_mbx.h   |   86 ++
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 1103 +++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.h |   16 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  111 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   60 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |   10 +
+ drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |    2 +
+ .../net/ethernet/wangxun/txgbe/txgbe_irq.c    |   25 +-
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   26 +
+ .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |    8 +
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   |    4 +-
+ 16 files changed, 2078 insertions(+), 32 deletions(-)
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_mbx.c
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_mbx.h
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_sriov.c
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_sriov.h
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.2
+
 
