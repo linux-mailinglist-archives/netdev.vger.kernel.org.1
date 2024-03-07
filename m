@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-78240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 966A9874776
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 05:50:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05804874779
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 05:50:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E974287A4D
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:50:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99E9F1F256FC
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD54171A4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFA721B7E4;
 	Thu,  7 Mar 2024 04:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bwu9z77S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lNDPk3CN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E783D6B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E809125D5;
 	Thu,  7 Mar 2024 04:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709787028; cv=none; b=eXJ+5f1+DgXNxiZRVw0Igwrp7yElFzMi27CYTY7XsTr87jqxMw9XrObJmLC3JSHuoJkEIA3UpVqDt0Zh2QJNtNlMQ9YZEOKA5rQGBOc+N8g9vpQZ63lxihqlZ6NOAOUVwtOpklq8xHNpn7mgTpIW+7Trth0ZL04U3xt5vka0/xU=
+	t=1709787028; cv=none; b=G5by6/2F05LUo9nPW6ECZNTQJA9wGcGDb0OYyM57SzYWoHpv0ndLAeo5cruAZQ5Yvii5wueeku6gPttnL+rofnIair2UxwdaY8l6DHt6qiz/bYazvu6AUWf/zzDLLCJmRImyxEVivgmTBC8VJBVUTHzzgSeclXtOlvOLovFSdq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709787028; c=relaxed/simple;
-	bh=X5d+n8yY7yu891hIsAhkVV4aNq8U3dmq+Nmcr6tPkDU=;
+	bh=728qXOa0GYyTnUAIWAElvi6CSw0RIuoe8mh+TMh/UCY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=IK3/9kEnaZ9wex5QNzir/YxD4Fp9wJd9eYDpwezog1NqU+lG9WNIqSHgmr8jP3oNdFh5Jr7DZC2A/PBRQiIaNVoGUS+A65YOzPRVL7zroaEZbdjE05fTpGOe9+a7qU04MqERnCn01mDGls90ZQW5ExGcc/e/6iOrPb+TqrPkXBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bwu9z77S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E9635C43390;
+	 In-Reply-To:To:Cc; b=qvKjs3/Qk0NjK27wY9C+nDbE3YMrUJ9JN5El8VQwOxUHSJZjHO6iVe24Vv+zuZTs6XgIZ7RWrHAjqbh5R8h58RTszLyZIWCIP5Zy7frq0jFIiyHqCPvq04GbEvU7THzTqOQM/tqkmj99MlAHJ4ta+y87oWvs3GXOZccjXBO9ldA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lNDPk3CN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F22E2C43394;
 	Thu,  7 Mar 2024 04:50:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709787028;
-	bh=X5d+n8yY7yu891hIsAhkVV4aNq8U3dmq+Nmcr6tPkDU=;
+	bh=728qXOa0GYyTnUAIWAElvi6CSw0RIuoe8mh+TMh/UCY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bwu9z77SiLG8qlMHg4yJThEf5C7IEK9Btn4QGu8dEaCIL4aa/rCUTsNxiOSpoiZ8V
-	 09VR6PHiWS+70yZ0+RQzxmNPyDAuCONbQhXqdbgcvZCF97ZHSboYKyfp0ex/muFu75
-	 OHDGefbSiZaHF724ZukHl/0jcG6rfbQV1xQ2kjgqZmTAmK5q6/XYFRqQ+s/1Hrj2oB
-	 uW1vyu5/CfhLIV4tmu2rsBcfVtcYMUIsc2mc7vIWRNZP+Rqrym4RGR9Btx8dFsVn7g
-	 FwpGxD/v3j4w6hSgq6nZkcjxf4VA8lbG4e63V9urYv/aWwnkYWyRKXlGSrDuAB2nr+
-	 WWe9xxWd8zw0A==
+	b=lNDPk3CN8ykpil4lCxbnCkeYZGmkpL3zNads34pSOAmSDCJZWATS+itZ5m6f3Qtij
+	 dhX6oRBQORW/moFW9eXldoZFhPB3t/I+j3dsa4h0vPbNkIq7etATkD1AVuB81Xvh9H
+	 VP9Ypy/a82gi/Fdfwkn4+u2d/jfpEv+LH2J/F6DMz+eCKvfRWvhT/y2KAUu4XGO1cT
+	 euRlSRGh+TbaLWwdWuqPC+APXV2tSYJcksOc9AKCS0Aq4Yhn/JjqyNqwXKmUTFs3u6
+	 B0rCJ9u/iqQzuVrrBZcf29t9HWnvFZltMftLU6is/3Sm/bg0+ROMoEN5ACXAeFu/ab
+	 lLVdzRHc9tXWg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C7827C04D3F;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D352DD9A4B5;
 	Thu,  7 Mar 2024 04:50:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,39 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] mlxbf_gige: add support to display pause frame
- counters
+Subject: Re: [PATCH net-next v3] net: phy: qca807x: fix compilation when
+ CONFIG_GPIOLIB is not set
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170978702781.12804.10600811373220093437.git-patchwork-notify@kernel.org>
+ <170978702785.12804.17752027810406406175.git-patchwork-notify@kernel.org>
 Date: Thu, 07 Mar 2024 04:50:27 +0000
-References: <20240305212137.3525-1-davthompson@nvidia.com>
-In-Reply-To: <20240305212137.3525-1-davthompson@nvidia.com>
-To: David Thompson <davthompson@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- asmaa@nvidia.com
+References: <20240305142113.795005-1-robimarko@gmail.com>
+In-Reply-To: <20240305142113.795005-1-robimarko@gmail.com>
+To: Robert Marko <robimarko@gmail.com>
+Cc: andersson@kernel.org, konrad.dybcio@linaro.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ansuelsmth@gmail.com, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lkp@intel.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 5 Mar 2024 16:21:37 -0500 you wrote:
-> This patch updates the mlxbf_gige driver to support the
-> "get_pause_stats()" callback, which enables display of
-> pause frame counters via "ethtool -I -a oob_net0".
+On Tue,  5 Mar 2024 15:20:33 +0100 you wrote:
+> Kernel bot has discovered that if CONFIG_GPIOLIB is not set compilation
+> will fail.
 > 
-> The pause frame counters are only enabled if the "counters_en"
-> bit is asserted in the LLU general config register. The driver
-> will only report stats, and thus overwrite the default stats
-> state of ETHTOOL_STAT_NOT_SET, if "counters_en" is asserted.
+> Upon investigation the issue is that qca807x_gpio() is guarded by a
+> preprocessor check but then it is called under
+> if (IS_ENABLED(CONFIG_GPIOLIB)) in the probe call so the compiler will
+> error out since qca807x_gpio() has not been declared if CONFIG_GPIOLIB has
+> not been set.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] mlxbf_gige: add support to display pause frame counters
-    https://git.kernel.org/netdev/net-next/c/c22341619852
+  - [net-next,v3] net: phy: qca807x: fix compilation when CONFIG_GPIOLIB is not set
+    https://git.kernel.org/netdev/net-next/c/1677293ed891
 
 You are awesome, thank you!
 -- 
