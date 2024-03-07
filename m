@@ -1,319 +1,168 @@
-Return-Path: <netdev+bounces-78460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32FD98753A0
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 16:45:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13FA1875394
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 16:43:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A953B28091
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 15:44:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 372791C212F3
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 15:43:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A09AD12F377;
-	Thu,  7 Mar 2024 15:44:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D47812DDBE;
+	Thu,  7 Mar 2024 15:43:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b="ENdd9zFV"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OJer+8w5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp2-kfki.kfki.hu (smtp2-kfki.kfki.hu [148.6.0.51])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2085.outbound.protection.outlook.com [40.107.237.85])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41D2912F398;
-	Thu,  7 Mar 2024 15:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709826269; cv=none; b=CJOukvX88VDcwaKcMzkVqhQHh/z+ov1k+84BWvo1TJvtJNUxqPXZydGmpVxv4xZx75XP+8QwWpkBlDC8CyNTd7hKiFyemFMFMLkyrGCHDVCXJlDXH9q96Rz8y8mLupw3ImYzjp0L1rfHNFnGCbFW7xyD/PamPJxi3gVpCKb2wuQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709826269; c=relaxed/simple;
-	bh=m4xfA+vapXshimeVlokT2rpklewP5if2aNHL20DnHPY=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=XeOoRH0tBxsAENNCi0PRbNNFq0/JfvhOYqvuqy47/v7S3Lehh4dXvUQJLHUoJ6bMdkqyRbINSNv9VyVEUbXmiXufXpsxIZ4aF+vpTaxuawD3CJ+/uqH4gkjP9AXIMazY5axq37bkJqhLkmoeV7/8RE3NmKIJNOcEK8n0GG9bUX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu; spf=pass smtp.mailfrom=blackhole.kfki.hu; dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b=ENdd9zFV; arc=none smtp.client-ip=148.6.0.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blackhole.kfki.hu
-Received: from localhost (localhost [127.0.0.1])
-	by smtp2.kfki.hu (Postfix) with ESMTP id 30672CC02B8;
-	Thu,  7 Mar 2024 16:34:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	blackhole.kfki.hu; h=mime-version:references:message-id
-	:in-reply-to:from:from:date:date:received:received:received
-	:received; s=20151130; t=1709825676; x=1711640077; bh=zY8puOsLD8
-	FbTRsEZsJ2gxMQoYs/FDAEYPFtq38F5XY=; b=ENdd9zFVDLeUyq1Pu3L1IVcLCi
-	iPdLRqNxP3Cg6i+pa4qbk2HIrLPhHvUlOgaqSjrfNrgOvIIkRbRkIH8PhKIXvQ0O
-	AEAn3KgcFP3/NIhRdZkMOePyhwYKGcKIBRfjvRQu9zaRvlSkOCjTYcCI2/kyjdxM
-	kpx2kGZobp3lhUrws=
-X-Virus-Scanned: Debian amavisd-new at smtp2.kfki.hu
-Received: from smtp2.kfki.hu ([127.0.0.1])
-	by localhost (smtp2.kfki.hu [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP; Thu,  7 Mar 2024 16:34:36 +0100 (CET)
-Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [148.6.240.2])
-	by smtp2.kfki.hu (Postfix) with ESMTP id 1086DCC010E;
-	Thu,  7 Mar 2024 16:34:35 +0100 (CET)
-Received: by blackhole.kfki.hu (Postfix, from userid 1000)
-	id C2D31343167; Thu,  7 Mar 2024 16:34:35 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by blackhole.kfki.hu (Postfix) with ESMTP id C0E85343166;
-	Thu,  7 Mar 2024 16:34:35 +0100 (CET)
-Date: Thu, 7 Mar 2024 16:34:35 +0100 (CET)
-From: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
-To: Jason Xing <kerneljasonxing@gmail.com>
-cc: Florian Westphal <fw@strlen.de>, edumazet@google.com, 
-    Pablo Neira Ayuso <pablo@netfilter.org>, kuba@kernel.org, 
-    pabeni@redhat.com, David Miller <davem@davemloft.net>, 
-    netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-    netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next] netfilter: conntrack: avoid sending RST to
- reply out-of-window skb
-In-Reply-To: <CAL+tcoDUyFU9wT8gzOcDqW7hWfR-7Sg8Tky9QsY_b05gP4uZ1Q@mail.gmail.com>
-Message-ID: <1cf0cef4-c972-9f8d-7095-66516eafb85c@blackhole.kfki.hu>
-References: <20240307090732.56708-1-kerneljasonxing@gmail.com> <20240307093310.GI4420@breakpoint.cc> <CAL+tcoAPi+greENaD8X6Scc97Fnhiqa62eUSn+JS98kqY+VA6A@mail.gmail.com> <20240307120054.GK4420@breakpoint.cc> <CAL+tcoBqBaHxSU9NQqVxhRzzsaJr4=0=imtyCo4p8+DuXPL5AA@mail.gmail.com>
- <20240307141025.GL4420@breakpoint.cc> <CAL+tcoDUyFU9wT8gzOcDqW7hWfR-7Sg8Tky9QsY_b05gP4uZ1Q@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807431EEEA
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 15:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.85
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709826213; cv=fail; b=TDPDOm2fY9Xuie+KYtZRfNaQtGmdBIqtZrFVQENzPXcFc0y0sTBeay9pXzZQ76F3yuFAv8s56NuXH30ZZ+bEuioC7pdVHXgCvkAJj8kIwWi1FxMvg9QxB3OPiD/DYdCwy49ewwJ6O3vPHK/SzC38TmJAImJx38alWkx6cJex/ZQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709826213; c=relaxed/simple;
+	bh=5CspZ+jhaOkSifnEmKgEHZRX/M9ApeGsqZhyYdgmP6g=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 Content-Type:MIME-Version; b=KdfzOJe/tWUVol8vYzmycg7SiBP8iZ7d6wRW7jWmTGOZf1qRhAC01tHz/x5+u4aDLkAi/p8xOi/6Boht/swOAI20MMGs35z8yEI5i3zVUPBmODv0xJJG+XpQdl91MQWmxHyu/5wjxTIHzuxvNKNF4AkUUQ8odDgGMq/yCZH4+fM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OJer+8w5; arc=fail smtp.client-ip=40.107.237.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ELu8mdUEYaAszBfeX09bg+SERcec2AyDlvZSo0s6OmmOphu2++6+39+vhlJpMg1svhljYZR4NBPax0/OV62/XZSuNv/d0wPxFlu9HNE2SP6kT0OJqN/9UWVD5P9qbRWVBKI8FhplM14WF3/XWB8SznpZeweBBnUaa6RXFYKv/+2zJVe47NTtAJBZZOp6XZwuU8DoWIwYjLm81lG3AUD0pDqazE3yl4dcJEQ3VGtQ8XWg2TaAIm2Xti+soBex60aVMvNMFj+zG4GQa7s6FSB0KaiiDw7ihDGPRJbEhLaSqyoK37AXjK1DPbSBYk5CMD8qTbCUg+Zd0CwinTfOhcFVtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=e9wG5H5aY5zB+vyh+IA0b/wmbpSbkGXDx48TrfQ8At0=;
+ b=AvKUrtdnu35ptNVXnzCyrb6brtJMxpmLYpout7I6dkH3CblFKIsxeOjTLjH2lh7Pw6KARqTTuWIzLf5xDFhXyhkFJRijOKkMdfrK3iK32kWKfNOG/0o8sh1BEcRh/Pk5LSMLU/t88oqjefl8Op7VPijgJB8mEjX4PBpltaKgUJd12UnhVDPrnczfL0txmShsSpb8KfSjhsHew44/vYH8zKKkkHVLL+3LN5oQHk1HFRaZO/NgdPiR3ITbxlpmMhxvtHN1/vfGeWMSM5uMKkmWMswbcvA3+R45Pmbn9HvzEJKCWtA8/d1Sq/uwK79wu7S+T+4HarzL3uxLV8zTJUvO+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=e9wG5H5aY5zB+vyh+IA0b/wmbpSbkGXDx48TrfQ8At0=;
+ b=OJer+8w5D3tEUtw7rx6YDGXNQKdP3HycTW5FDgUFzNIw5m6d/9r3cBMGpZ/zPQn8jaz+U2rpBU367oYcVNsH/aJiaHE9tbXfPhnD7pql8tuaC1q7z3egWeRNQcdW9KkHaeeILZNUyXtLRc2KiBaiNChhcrAIWQOdIBjNfMYaiGAFVB4jv8smHyzfMl39rfEqEwreDku1vZ/LxXRFeFsNjbAocueCTP7fS/Fqev+h/N8dIsKIU6VXUToAPizli8cFpHwItUNMbIaM2ij3XrDjApZNsAiBTxSrkk2CAlcZtUa9+X6FUQFOQD6fCQUPs/i4Fnl0HIbAMetFlgo4r/swbg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
+ by SJ0PR12MB5633.namprd12.prod.outlook.com (2603:10b6:a03:428::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Thu, 7 Mar
+ 2024 15:43:27 +0000
+Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
+ ([fe80::aa05:b8a0:7d5:b463]) by SJ1PR12MB6075.namprd12.prod.outlook.com
+ ([fe80::aa05:b8a0:7d5:b463%3]) with mapi id 15.20.7362.019; Thu, 7 Mar 2024
+ 15:43:27 +0000
+From: Aurelien Aptel <aaptel@nvidia.com>
+To: Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
+ chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
+Cc: Boris Pismenny <borisp@nvidia.com>, aurelien.aptel@gmail.com,
+ smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
+ yorayz@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com,
+ brauner@kernel.org
+Subject: Re: [PATCH v23 05/20] nvme-tcp: Add DDP offload control path
+In-Reply-To: <7a2c3491-bd2a-4104-8371-f5b98bbd7355@grimberg.me>
+References: <20240228125733.299384-1-aaptel@nvidia.com>
+ <20240228125733.299384-6-aaptel@nvidia.com>
+ <7a2c3491-bd2a-4104-8371-f5b98bbd7355@grimberg.me>
+Date: Thu, 07 Mar 2024 17:43:24 +0200
+Message-ID: <253plw6ujxf.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: FR0P281CA0082.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:1e::21) To SJ1PR12MB6075.namprd12.prod.outlook.com
+ (2603:10b6:a03:45e::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="110363376-266227853-1709825675=:817479"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|SJ0PR12MB5633:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7b0f1f39-0847-4a95-9d25-08dc3ebd54c5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	l1y0R4Ry+Kaw1D2C1PF50m+WpFja7SIJWP9mwBn3abiqKQ/dWVxqYS8BtlHaHJzhz2+gJ3Mx4FBok/J9OrvEk6bmatHO+Hft3X+wDtvnIyAEQRLfB+ftsOn+xdr4q9XE8WragC/Ar4RESsNZa8HoHL7m6t27Ux4/lsDHtoh8DyT8MqB1aujFzVp2odEM7L0JNk4qE80fCbmjwQWHQrBq1aJ03XU6ndYtdNKpryajqJPBJ8Hsk/oHRUoMaYdO1j0iEVFuQgnqEZHHdMc+AJR83vgR+rdcoN/69ACi2PMY2sCf+6iCm1J+3EfRqwvQ22wHXyCFujuJsQsyfqHK9jnHCIRgm8XtAyn4alNQiXRsh3I0RT2dhEzYf3vYu9Gj4YANzlStwFr4SwD8C1W4xjfKnHvPiFpSBsH57sJdIL3DKi10lpOFlLynf5+jkhQv6yBRB6OQLvcTKnWTtM30mlH7jkLhls/Sty2dChvf7vr93wMoyUuRhZi42ZZQuCODSOWDpkgPRPRad5RDlQpEK3A/C9obMENpu6nAEt/YxVgd4MusDOop9qoj7SSEDRJPfwOvoMJ/1NOgCMRdBhD4caWXLj6A3CyJwj/MpNWuEMwsVlfjK2xT+XGn0mcyKMGLW2Nswuo6q6xaumTYwjL1MGAXhUsqKWQoQe3DHJVvv3SPWHo=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?eOwonKqtbEeuh3/sBcE8M0m95San2rsKbs8CRwY0TEDDda8U4o82grH6fNS/?=
+ =?us-ascii?Q?hgRjpbvq/EdENZNSwrBbfDPGys7COh/W8TBJbV/dvXCc8m83QB4KVhc1BoXZ?=
+ =?us-ascii?Q?c7L6RkfFSIUsUOZaG6JjqV6PKl6rSt5twfGwp2+tiObqIgimroT15dpRbTBk?=
+ =?us-ascii?Q?BTLSdX6IlgORhA98tOfFJCTNmWDEG2m6LCTRYPNz5oROedP+5bVO7LdIDI2L?=
+ =?us-ascii?Q?sCNaTHFErj2fGbi3uDSAWXHG3GFf7v4bVueU+TmbQupcSgc0hXDmvteEWqLa?=
+ =?us-ascii?Q?RUroAux6csw7dY9sV/uI+ppRGzbT5MTwE/q9uGmuznPmL1z1pkwkUs96e1d3?=
+ =?us-ascii?Q?3zoHKX0mG7ihwwab5prtlu8jnuwNsl363Ndc6028StqCFj6X9RUkhWfkZnru?=
+ =?us-ascii?Q?2zmDExkmhbB3R6njZqHK2dR0D4OO6MGLqQaKt7Q16WKX43wQdjCbWMwtpj7c?=
+ =?us-ascii?Q?VefCaVoTlrrKDBT8xbZDI8DezXaBpFMSlLP483FSfoysdJ4hb4F01NLUKDjs?=
+ =?us-ascii?Q?AWTkBX38Pc5VqiG7ULtSbkfl8vu324V2ZyntDWDOSGmX4cFea296z2tDskCp?=
+ =?us-ascii?Q?PeAI9iRBFla0ai95FiubBlg+T46OAehmTQiuexkiLqHOCo32pUeKxj0tYifn?=
+ =?us-ascii?Q?s1iCVwyMSWtZY3hhka2o3OUWO0sTtUHcD0dT73LO5jnybQUSSMNCbGm79eFf?=
+ =?us-ascii?Q?eo4d4ViJUmAm2/xYT3+FB6yyrSUISUVsGgUU0BXjVLohokLkIKHdtlh27GqN?=
+ =?us-ascii?Q?a/hcdqrjquB5nhMxgSQ7H5N1vOirU/Xbo/3brlVenaDRYiJDzRhyNyUi+Zi1?=
+ =?us-ascii?Q?5qpxGPF3n8JP8HqEOlChbpk0lj3TKRAYo6G64YTpecTOyZ8+SRo7H2HozW0g?=
+ =?us-ascii?Q?7S21scLn2zlEquc5la1GBe93FqhdEIs9BhEDgc+SaHeOKJgxoPl4gFl4NU/s?=
+ =?us-ascii?Q?ri5eP76xBJR2QmvDqYpjijVRiC5laUuZwlBsn6S1kpRWpKO4CtOVlWAxUIQu?=
+ =?us-ascii?Q?5koOgIbthJgY91QJWrLhxwSEi9gegz0+gBmP1ewn3CNETYKI+Fon3cM8pfcm?=
+ =?us-ascii?Q?szoLpjKu+Rpsmj9k58L0v4VhHiiNrouqcBC8WhQ/+jVxUisFOfIOA+MHXLYT?=
+ =?us-ascii?Q?40VrRrXjwHQhjDmMAOYPbZIaK+PAhshaGnkSFjwM2l+ySmS5DhOGOz7f8Tk4?=
+ =?us-ascii?Q?XjxmjaX4QqgjiAMkOZ3n0Tlq+ZeRwP9aj6o8nw2E3HY6CwQ/1kEMYdOKoFix?=
+ =?us-ascii?Q?7rQNwBJqE1yzrq7IEuBLMDCx8lke2hXnpfqwa7iXEblRq+xbDVJDfTxoVsaY?=
+ =?us-ascii?Q?UMjgmVKzWiY7R4gpNOVLf8zlw/8RJDa0HHg+FTUQ35iEhuLvetfPPfUyXzZy?=
+ =?us-ascii?Q?ljFWlc8K2lE7Jh1g1j+/y15ZH+4vaeg56UVCAV8KgBtQC8HVP6MPdywQFtqm?=
+ =?us-ascii?Q?FLdOxXeBsoswWi/oQxfzvjYvT/J22/wLVmGFnfged+C/d8tUGTGsKyOhZgRn?=
+ =?us-ascii?Q?dGigd/dNLfyTB1+0TFnR2tjZbZu5Oif2Trdt5sXuty8RwB73bljqpY+Am3Pm?=
+ =?us-ascii?Q?CuynJo0R98OCGIaKarKSsWL+srVR0lC6Tk01uRWY?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b0f1f39-0847-4a95-9d25-08dc3ebd54c5
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Mar 2024 15:43:27.3859
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kJ1XOczXMpZ16PncRoiujtxAIfsHzAHr2Rv+/mLPIGpxp2MJoT5DYbtWIE8gUA0jMHjGjcAVX6W4t32Q2Z/4qQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5633
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
---110363376-266227853-1709825675=:817479
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, 7 Mar 2024, Jason Xing wrote:
-
-> On Thu, Mar 7, 2024 at 10:10=E2=80=AFPM Florian Westphal <fw@strlen.de>=
- wrote:
-> >
-> > Jason Xing <kerneljasonxing@gmail.com> wrote:
-> > > On Thu, Mar 7, 2024 at 8:00=E2=80=AFPM Florian Westphal <fw@strlen.=
-de> wrote:
-> > > >
-> > > > Jason Xing <kerneljasonxing@gmail.com> wrote:
-> > > > > > This change disables most of the tcp_in_window() test, this w=
-ill
-> > > > > > pretend everything is fine even though tcp_in_window says oth=
-erwise.
-> > > > >
-> > > > > Thanks for the information. It does make sense.
-> > > > >
-> > > > > What I've done is quite similar to nf_conntrack_tcp_be_liberal =
-sysctl
-> > > > > knob which you also pointed out. It also pretends to ignore tho=
-se
-> > > > > out-of-window skbs.
-> > > > >
-> > > > > >
-> > > > > > You could:
-> > > > > >  - drop invalid tcp packets in input hook
-> > > > >
-> > > > > How about changing the return value only as below? Only two cas=
-es will
-> > > > > be handled:
-> > > > >
-> > > > > diff --git a/net/netfilter/nf_conntrack_proto_tcp.c
-> > > > > b/net/netfilter/nf_conntrack_proto_tcp.c
-> > > > > index ae493599a3ef..c88ce4cd041e 100644
-> > > > > --- a/net/netfilter/nf_conntrack_proto_tcp.c
-> > > > > +++ b/net/netfilter/nf_conntrack_proto_tcp.c
-> > > > > @@ -1259,7 +1259,7 @@ int nf_conntrack_tcp_packet(struct nf_con=
-n *ct,
-> > > > >         case NFCT_TCP_INVALID:
-> > > > >                 nf_tcp_handle_invalid(ct, dir, index, skb, stat=
-e);
-> > > > >                 spin_unlock_bh(&ct->lock);
-> > > > > -               return -NF_ACCEPT;
-> > > > > +               return -NF_DROP;
-> > > >
-> > > > Lets not do this.  conntrack should never drop packets and defer =
-to ruleset
-> > > > whereever possible.
-> > >
-> > > Hmm, sorry, it is against my understanding.
-> > >
-> > > If we cannot return -NF_DROP, why have we already added some 'retur=
-n
-> > > NF_DROP' in the nf_conntrack_handle_packet() function? And why does
-> > > this test statement exist?
-> >
-> > Sure we can drop.  But we should only do it if there is no better
-> > alternative.
-> >
-> > > nf_conntrack_in()
-> > >   -> nf_conntrack_handle_packet()
-> > >   -> if (ret <=3D 0) {
-> > >          if (ret =3D=3D -NF_DROP) NF_CT_STAT_INC_ATOMIC(state->net,=
- drop);
-> >
-> > AFAICS this only happens when we receive syn for an existing conntrac=
-k
-> > that is being removed already so we'd expect next syn to create a new
->=20
-> Sorry, I've double-checked this part and found out there is no chance
-> to return '-NF_DROP' for nf_conntrack_handle_packet(). It might return
-> 'NF_DROP' (see link [1]) instead. The if-else statements seem like
-> dead code.
->=20
-> [1]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git=
-/tree/net/netfilter/nf_conntrack_proto_tcp.c#:~:text=3D%2DNF_REPEAT%3B-,r=
-eturn%20NF_DROP%3B,-%7D%0A%09%09fallthrough%3B
->=20
-> > connection.  Feel free to send patches that replace drop with -accept
-> > where possible/where it makes sense, but I don't think the
-> > TCP_CONNTRACK_SYN_SENT one can reasonably be avoided.
->=20
-> Oh, are you suggesting replacing NF_DROP with -NF_ACCEPT in
-> nf_conntrack_dccp_packet()?
->=20
-> There are three points where nf_conntrack_handle_packet() returns NF_DR=
-OP:
-> 1) one (syn_sent case) exists in nf_conntrack_tcp_packet(). As you
-> said, it's not necessary to change.
-> 2) another two exist in nf_conntrack_dccp_packet() which should be the
-> same as nf_conntrack_tcp_packet() handles.
->=20
-> The patch goes like this:
-> diff --git a/net/netfilter/nf_conntrack_proto_dccp.c
-> b/net/netfilter/nf_conntrack_proto_dccp.c
-> index e2db1f4ec2df..ebc4f733bb2e 100644
-> --- a/net/netfilter/nf_conntrack_proto_dccp.c
-> +++ b/net/netfilter/nf_conntrack_proto_dccp.c
-> @@ -525,7 +525,7 @@ int nf_conntrack_dccp_packet(struct nf_conn *ct,
-> struct sk_buff *skb,
->=20
->         dh =3D skb_header_pointer(skb, dataoff, sizeof(*dh), &_dh.dh);
->         if (!dh)
-> -               return NF_DROP;
-> +               return -NF_ACCEPT;
->=20
->         if (dccp_error(dh, skb, dataoff, state))
->                 return -NF_ACCEPT;
-> @@ -533,7 +533,7 @@ int nf_conntrack_dccp_packet(struct nf_conn *ct,
-> struct sk_buff *skb,
->         /* pull again, including possible 48 bit sequences and subtype =
-header */
->         dh =3D dccp_header_pointer(skb, dataoff, dh, &_dh);
->         if (!dh)
-> -               return NF_DROP;
-> +               return -NF_ACCEPT;
->=20
->         type =3D dh->dccph_type;
->         if (!nf_ct_is_confirmed(ct) && !dccp_new(ct, skb, dh, state))
->=20
-> >
-> > > My only purpose is not to let the TCP layer sending strange RST to =
-the
-> > > right flow.
-> >
-> > AFAIU tcp layer is correct, no?  Out of the blue packet to some liste=
-ner
-> > socket?
->=20
-> Allow me to finish the full sentence: my only purpose is not to let
-> the TCP layer send strange RST to the _established_ socket due to
-> receiving strange out-of-window skbs.
-
-I don't understand why do you want to modify conntrack at all: conntrack=20
-itself does not send RST packets. And the TCP layer don't send RST packet=
-s=20
-to out of window ones either.
-
-The only possibility I see for such packets is an iptables/nftables rule=20
-which rejects packets classified as INVALID by conntrack.
-
-As Florian suggested, why don't you change that rule?
-
-The conntrack states are not fine-grained to express different TCP states=
-=20
-which covered with INVALID. It was never a good idea to reject INVALID=20
-packets or let them through (leaking internal addresses).
-
-Best regards,
-Jozsef
-
-> > > Besides, resorting to turning on nf_conntrack_tcp_be_liberal sysctl
-> > > knob seems odd to me though it can workaround :S
-> >
-> > I don't see a better alternative, other than -p tcp -m conntrack
-> > --ctstate INVALID -j DROP rule, if you wish for tcp stack to not see
-> > such packets.
-> >
-> > > I would like to prevent sending such an RST as default behaviour.
-> >
-> > I don't see a way to make this work out of the box, without possible
-> > unwanted side effects.
-> >
-> > MAYBE we could drop IFF we check that the conntrack entry candidate
-> > that fails sequence validation has NAT translation applied to it, and
-> > thus the '-NF_ACCEPT' packet won't be translated.
-> >
-> > Not even compile tested:
-> >
-> > diff --git a/net/netfilter/nf_conntrack_proto_tcp.c b/net/netfilter/n=
-f_conntrack_proto_tcp.c
-> > --- a/net/netfilter/nf_conntrack_proto_tcp.c
-> > +++ b/net/netfilter/nf_conntrack_proto_tcp.c
-> > @@ -1256,10 +1256,14 @@ int nf_conntrack_tcp_packet(struct nf_conn *c=
-t,
-> >         case NFCT_TCP_IGNORE:
-> >                 spin_unlock_bh(&ct->lock);
-> >                 return NF_ACCEPT;
-> > -       case NFCT_TCP_INVALID:
-> > +       case NFCT_TCP_INVALID: {
-> > +               verdict =3D -NF_ACCEPT;
-> > +               if (ct->status & IPS_NAT_MASK)
-> > +                       res =3D NF_DROP; /* skb would miss nat transf=
-ormation */
->=20
-> Above line, I guess, should be 'verdict =3D NF_DROP'? Then this skb
-> would be dropped in nf_hook_slow() eventually and would not be passed
-> to the TCP layer.
->=20
-> >                 nf_tcp_handle_invalid(ct, dir, index, skb, state);
-> >                 spin_unlock_bh(&ct->lock);
-> > -               return -NF_ACCEPT;
-> > +               return verdict;
-> > +       }
-> >         case NFCT_TCP_ACCEPT:
-> >                 break;
-> >         }
->=20
-> Great! I think your draft patch makes sense really, which takes NAT
-> into consideration.
->=20
-> >
-> > But I don't really see the advantage compared to doing drop decision =
-in
-> > iptables/nftables ruleset.
->=20
-> From our views, especially to kernel developers, you're right: we
-> could easily turn on that knob or add a drop policy to prevent it
-> happening. Actually I did this in production to prevent such a case.
-> It surely works.
->=20
-> But from the views of normal users and those who do not understand how
-> it works in the kernel, it looks strange: people may ask why we get
-> some unknown RSTs in flight?
+Sagi Grimberg <sagi@grimberg.me> writes:
+>> +
+>> +static int nvme_tcp_offload_socket(struct nvme_tcp_queue *queue)
+>> +{
+>> +     struct ulp_ddp_config config = {.type = ULP_DDP_NVME};
+>> +     int ret;
+>> +
+>> +     config.nvmeotcp.pfv = NVME_TCP_PFV_1_0;
+>> +     config.nvmeotcp.cpda = 0;
+>> +     config.nvmeotcp.dgst =
+>> +             queue->hdr_digest ? NVME_TCP_HDR_DIGEST_ENABLE : 0;
+>> +     config.nvmeotcp.dgst |=
+>> +             queue->data_digest ? NVME_TCP_DATA_DIGEST_ENABLE : 0;
+>> +     config.nvmeotcp.queue_size = queue->ctrl->ctrl.sqsize + 1;
+>> +     config.nvmeotcp.queue_id = nvme_tcp_queue_id(queue);
 >
-> > I also have a hunch that someone will eventually complain about this
-> > change in behavior.
->=20
-> Well, I still think the patch you suggested is proper and don't know
-> why people could complain about it.
->=20
-> Thanks for your patience :)
->=20
-> Thanks,
-> Jason
->=20
+> I forget, why is the queue_id needed? it does not travel the wire outside
+> of the connect cmd.
 
---=20
-E-mail  : kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
-PGP key : https://wigner.hu/~kadlec/pgp_public_key.txt
-Address : Wigner Research Centre for Physics
-          H-1525 Budapest 114, POB. 49, Hungary
---110363376-266227853-1709825675=:817479--
+You're right it is not needed, we will remove it.
+
+>> +static void nvme_tcp_ddp_apply_limits(struct nvme_tcp_ctrl *ctrl)
+>> +{
+>> +     ctrl->ctrl.max_segments = ctrl->ddp_limits.max_ddp_sgl_len;
+>> +     ctrl->ctrl.max_hw_sectors =
+>> +             ctrl->ddp_limits.max_ddp_sgl_len << (ilog2(SZ_4K) - SECTOR_SHIFT);
+>
+> I think you can use NVME_CTRL_PAGE_SHIFT instead of ilog2(SZ_4K)?
+
+Yes both seems to be 12. We will use NVME_CTRL_PAGE_SHIFT.
+
+Thanks
 
