@@ -1,150 +1,112 @@
-Return-Path: <netdev+bounces-78405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36FAD874F05
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 13:29:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A56A9874F1A
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 13:32:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5E001F24726
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 12:29:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D56811C216E1
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 12:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA00112AAEA;
-	Thu,  7 Mar 2024 12:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A15FE128361;
+	Thu,  7 Mar 2024 12:32:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="lBx1+QuJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22FAE12AACD;
-	Thu,  7 Mar 2024 12:28:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78F384FD5;
+	Thu,  7 Mar 2024 12:32:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709814540; cv=none; b=mVsUI2yIbxTepVrcHzJ8w6hCyG9Nl0i1Gj3d1r3aqMADbvhq+J3egyDNp/vVm7JENPTxh4Q+XrZAeVtvhaWuUvOq3WZehv+WwtUB6lfSNauoL01VkT3Q/SCKVfcwrcJbPeplqBnCs+AQ8IuQA89Rcq64AIoncAkveks2NbiwCsU=
+	t=1709814742; cv=none; b=qlrHjZF5gfMHB129LSyAWWqP2IoxSWOf210cWLZpG6im0mcsxbpDRKZ/wH/+4QTofWegGoXm0PSqWYJDQ20yNU069sTvF5x7u2OzfIF9J3u8Fx54earuwfFVlU9Ep75b/KRcRVbzS6RN5tyUW48IHEQlcqYJ0AChMc3b94KyOaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709814540; c=relaxed/simple;
-	bh=dVNW0oddv3N048br45hJLhMcLswgKfiqOYg11zbnmDY=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=duOmoVWd+uH22Ri9A9KQ+Zqc3JUsBDOQMbY8VWfhHTyxEM5HOU7+fj+DFB2qaJq+U/f/oyGVWoltkzVpP/yLnd4DHKkMtxGHOIHtl+FmUwDUDe7us2LIt+ykRcVN40xavccGLC6qFpvxJdlSGHaltsSKuRrUlRAa2/xGPaFXAnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Tr7pr2kmCz1xq8c;
-	Thu,  7 Mar 2024 20:27:16 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 43254140336;
-	Thu,  7 Mar 2024 20:28:55 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Thu, 7 Mar
- 2024 20:28:54 +0800
-Subject: Re: [RFC PATCH net-next v1 1/2] net: mirror skb frag ref/unref
- helpers
-To: Mina Almasry <almasrymina@google.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>
-CC: Mirko Lindner <mlindner@marvell.com>, Stephen Hemminger
-	<stephen@networkplumber.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Tariq Toukan <tariqt@nvidia.com>, Boris Pismenny
-	<borisp@nvidia.com>, John Fastabend <john.fastabend@gmail.com>, Dragos
- Tatulea <dtatulea@nvidia.com>
-References: <20240306235922.282781-1-almasrymina@google.com>
- <20240306235922.282781-2-almasrymina@google.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <8ef17e46-3d14-e010-c721-6fca3d57f78f@huawei.com>
-Date: Thu, 7 Mar 2024 20:28:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	s=arc-20240116; t=1709814742; c=relaxed/simple;
+	bh=CnKV7YkmwKVN45OVgq9HMp191oP0lkB4cDHb6peK+T4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=qSXw9glSI9pQzgAlZWw01fjMjQRLCoYzV23qVcUHioZC0HVjAXzgiDk9IEn3fvtI04niI/Hp8XJ3kLK8YOx/xl3LthwwB8UvrfrVCjtioVkV7NSWpGB2J32Y6dVJTbGOLtyTmvsS4k7e3p+6CmBWYuyk9U5TOBXTK9pp7uauiK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=lBx1+QuJ; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1709814736;
+	bh=CnKV7YkmwKVN45OVgq9HMp191oP0lkB4cDHb6peK+T4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=lBx1+QuJTEVHApTpCCDU+EV1Aykxe0USdn1M5qeFxUu86nOmkjduBDq8dT3o7qXpm
+	 oS8/qBbiILsQJC5KQx/qJRP/+1Rtwj+Mvna+PmMaQHKiOOUzj3K4BfsAnCXpYBeO5i
+	 sIHi1sZKR2G1jRkcILr1PE7EJZw85kHZ0/HyQZD5Je+4MUjufb3f6fIkyubjPbz8re
+	 /xYRYrDhHsNlHZi8hwJ5D8xkg2qXwM8ii3IePd37e1Jh7QAPge7a0+jwCSZNdI+ZOe
+	 Y4f3knEgXbFr14hWz3pvmzLU64Pzxk2jZ5fbpD4Fd7BcqwRmHFTOSol/RnqeVlE3F0
+	 mpc6I8Pch7Hkg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Tr7wZ6z4Xz4wc8;
+	Thu,  7 Mar 2024 23:32:14 +1100 (AEDT)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: Dawei Li <set_pte_at@outlook.com>, Christophe Leroy
+ <christophe.leroy@csgroup.eu>
+Cc: "npiggin@gmail.com" <npiggin@gmail.com>, "linuxppc-dev@lists.ozlabs.org"
+ <linuxppc-dev@lists.ozlabs.org>, "linux-ide@vger.kernel.org"
+ <linux-ide@vger.kernel.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-wireless@vger.kernel.org"
+ <linux-wireless@vger.kernel.org>, "linux-scsi@vger.kernel.org"
+ <linux-scsi@vger.kernel.org>, "linux-serial@vger.kernel.org"
+ <linux-serial@vger.kernel.org>, "alsa-devel@alsa-project.org"
+ <alsa-devel@alsa-project.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3] powerpc: macio: Make remove callback of macio driver
+ void returned
+In-Reply-To: <TYTP286MB356472357994D5EA49E2F5E3CA212@TYTP286MB3564.JPNP286.PROD.OUTLOOK.COM>
+References: <TYCP286MB232391520CB471E7C8D6EA84CAD19@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
+ <3dc29701-239f-4a3b-b571-b9732975bd73@csgroup.eu>
+ <TYTP286MB356472357994D5EA49E2F5E3CA212@TYTP286MB3564.JPNP286.PROD.OUTLOOK.COM>
+Date: Thu, 07 Mar 2024 23:32:14 +1100
+Message-ID: <87bk7qnrxt.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240306235922.282781-2-almasrymina@google.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 2024/3/7 7:59, Mina Almasry wrote:
+Dawei Li <set_pte_at@outlook.com> writes:
+> Hi Christophe,
+>
+> On Tue, Feb 20, 2024 at 04:12:17PM +0000, Christophe Leroy wrote:
+>> Hi Michael,
+>>=20
+>> ping ?
+>>=20
+>> Le 01/02/2023 =C3=A0 15:36, Dawei Li a =C3=A9crit=C2=A0:
+>> > Commit fc7a6209d571 ("bus: Make remove callback return void") forces
+>> > bus_type::remove be void-returned, it doesn't make much sense for any
+>> > bus based driver implementing remove callbalk to return non-void to
+>> > its caller.
+>> >=20
+>> > This change is for macio bus based drivers.
+>> >=20
+>> > Signed-off-by: Dawei Li <set_pte_at@outlook.com>
+>>=20
+>> This patch is Acked , any special reason for not applying it ?
+>>=20
+>> Note that it now conflicts with commit 1535d5962d79 ("wifi: remove=20
+>> orphaned orinoco driver") but resolution is trivial, just drop the=20
+>> changes to that file.
+>
+> Thanks for picking it up, hardly believe that it's been one year.
+>
+> Michael,
+>
+> I will respin V4 if it's needed.
 
-...
+No that's fine, I'll sort it out.
 
->  
->  int skb_pp_cow_data(struct page_pool *pool, struct sk_buff **pskb,
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index 1f918e602bc4..6d234faa9d9e 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -1006,6 +1006,21 @@ int skb_cow_data_for_xdp(struct page_pool *pool, struct sk_buff **pskb,
->  EXPORT_SYMBOL(skb_cow_data_for_xdp);
->  
->  #if IS_ENABLED(CONFIG_PAGE_POOL)
-> +bool napi_pp_get_page(struct page *page)
-> +{
-> +
-> +	struct page *head_page;
-> +
-> +	head_page = compound_head(page);
-> +
-> +	if (!is_pp_page(page))
-
-I would use the head_page for is_pp_page(), I am not sure it
-matters that much, but I believe it is the precedent.
-
-Maybe do the below and remove head_page varible:
-page = compound_head(page);
-
-> +		return false;
-> +
-> +	page_pool_ref_page(head_page);
-> +	return true;
-> +}
-> +EXPORT_SYMBOL(napi_pp_get_page);
-> +
-
-...
-
-> -
->  static void skb_kfree_head(void *head, unsigned int end_offset)
->  {
->  	if (end_offset == SKB_SMALL_HEAD_HEADROOM)
-> @@ -4199,7 +4183,7 @@ int skb_shift(struct sk_buff *tgt, struct sk_buff *skb, int shiftlen)
->  			to++;
->  
->  		} else {
-> -			__skb_frag_ref(fragfrom);
-> +			__skb_frag_ref(fragfrom, skb->pp_recycle);
->  			skb_frag_page_copy(fragto, fragfrom);
->  			skb_frag_off_copy(fragto, fragfrom);
->  			skb_frag_size_set(fragto, todo);
-> @@ -4849,7 +4833,7 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
->  			}
->  
->  			*nskb_frag = (i < 0) ? skb_head_frag_to_page_desc(frag_skb) : *frag;
-> -			__skb_frag_ref(nskb_frag);
-> +			__skb_frag_ref(nskb_frag, nskb->pp_recycle);
->  			size = skb_frag_size(nskb_frag);
->  
->  			if (pos < offset) {
-> @@ -5980,10 +5964,8 @@ bool skb_try_coalesce(struct sk_buff *to, struct sk_buff *from,
->  	/* if the skb is not cloned this does nothing
->  	 * since we set nr_frags to 0.
->  	 */
-> -	if (skb_pp_frag_ref(from)) {
-I guess it worth mentioning that skb->pp_recycle is only checked once,
-and skb->pp_recycle is checked for every frag after this patch.
-
-> -		for (i = 0; i < from_shinfo->nr_frags; i++)
-> -			__skb_frag_ref(&from_shinfo->frags[i]);
-> -	}
-> +	for (i = 0; i < from_shinfo->nr_frags; i++)
-> +		__skb_frag_ref(&from_shinfo->frags[i], from->pp_recycle);
->  
->  	to->truesize += delta;
->  	to->len += len;
-> 
+cheers
 
