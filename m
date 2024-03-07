@@ -1,180 +1,280 @@
-Return-Path: <netdev+bounces-78270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EB4E8749A5
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:30:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D51F08749C3
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:36:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F118F1F24303
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:30:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32678B2388A
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:36:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D15C657C2;
-	Thu,  7 Mar 2024 08:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92CF82D87;
+	Thu,  7 Mar 2024 08:35:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b="P7HlYMsT"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="f3AdrA00"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2069.outbound.protection.outlook.com [40.107.247.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE590651AC;
-	Thu,  7 Mar 2024 08:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.247.69
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709800222; cv=fail; b=Ln1lZbSyCbpV4yiLv+tq5Bt1RSoSjvFWHAZtgHwd/JgSW9N7tNHR6OA0wQ+7ca8o1iaeo4bOV0c7+3XsqcJI06ULf4xtT7RYPQALnwvrEMgm0Mb0UD7OgxP0lZ2IIUJ1MWTXnZGRrTgPROyJ41QAJRLt/kc12+6otR44hJUh2Jc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709800222; c=relaxed/simple;
-	bh=V4racZ1pY5wspDEeP0GAkxXVje0HNsvILBhGcC+0+dc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=J53ckHu+YnxCy3RASsBLNn+wFg3qa47KZImLfMmVaRvrSxP9QUN/gahbNFzthpyfUxNwArapXPV+s5inxfH/YRrs1uZGK1aTHEUYDYkRMiqSSbFHyZ8RRCuu176MLAR/zqlbUfFH2e6MKwA3gqa2ZeqtL1xmOyDMqPd/fhIJ8m0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com; spf=fail smtp.mailfrom=leica-geosystems.com; dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b=P7HlYMsT; arc=fail smtp.client-ip=40.107.247.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=leica-geosystems.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hV3WobzcB9GNwcX/bN9aRKOFJrva89Cj52DYNnqN8rgqvq6TpoWlJUuMi2GdGxZNaZ+sX5TGwlc91XVudHariD10ddtY0Ep12kpCviELXypBm/7QwnD7DGAs+bgIBe8lxflDEv5xoPJlHiUUVzuJSjQupgwayV5pDwGzfDyz7S9TFkQKyK3uHORTh+s4lsLZYpX2OvWTkIlBEXb0sUVMhTr/3f6AC29+1MC53wPcRpTAs79McpFJ24VcCnxbkg3qB44EEGiAcRPsWU6OS7XTQiB7jXP79CTPy5TT3CIg9/2VjxuEYWLKo3jBSLs4gVKVZPzy7FjAJr61s9CjEkS38A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=V4racZ1pY5wspDEeP0GAkxXVje0HNsvILBhGcC+0+dc=;
- b=lrj6YIOBD2bBt5TuPqzoJT19xDS0rufGvnxoM1e/XAv8fI4quAbeDnZ8b7UQ/Dye3C3F8NJANBICDGiPNJUuVJGNqtTAm7TmyW+TfEBFh4ABY+/YpPDrkLVQvyv/k7u4fsJce2J1KYyt/nktG7iIDQeg5q8efZJ9v/qsUpcPzpWEIGmf/BeGYqf10rUx641HZz9nyzB/KPBAhXEf6SHSRGBp4pa5JdWOJDb5IkisWdBv+BHSBlcBQA5dKco/8lFiAK1jWw5HJFAQijTq3ptNOstIO/zrhJ2nSSguj1bZO3w/V71rsE3IF0ATqcdgUDOQDceIfWm7jR65mtEGVN0jmQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=leica-geosystems.com; dmarc=pass action=none
- header.from=leica-geosystems.com; dkim=pass header.d=leica-geosystems.com;
- arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leica-geosystems.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V4racZ1pY5wspDEeP0GAkxXVje0HNsvILBhGcC+0+dc=;
- b=P7HlYMsTIwKy13TS3+eiZly42zv05vCDVyjEf19I04HOKaDSIEIDPCmhEl//TleyYX9WHNIYQ8gOs6lG5tGiCpD2sfNO1g7H53T3nx/BdLT4+fTmZGeGohyBqO1ku6DV6rmqqike/rael+zSx0YLSPgqda657m30OK/KnCzjgFE=
-Received: from VE1PR06MB6911.eurprd06.prod.outlook.com (2603:10a6:800:1a4::13)
- by AM9PR06MB7203.eurprd06.prod.outlook.com (2603:10a6:20b:2cb::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Thu, 7 Mar
- 2024 08:30:18 +0000
-Received: from VE1PR06MB6911.eurprd06.prod.outlook.com
- ([fe80::9256:56bc:4cd2:d41]) by VE1PR06MB6911.eurprd06.prod.outlook.com
- ([fe80::9256:56bc:4cd2:d41%2]) with mapi id 15.20.7362.019; Thu, 7 Mar 2024
- 08:30:17 +0000
-From: POPESCU Catalin <catalin.popescu@leica-geosystems.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "hkallweit1@gmail.com" <hkallweit1@gmail.com>, "linux@armlinux.org.uk"
-	<linux@armlinux.org.uk>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>,
-	"m.felsch@pengutronix.de" <m.felsch@pengutronix.de>
-Subject: Re: [PATCH net-next] net: phy: dp8382x: keep WOL setting across
- suspends
-Thread-Topic: [PATCH net-next] net: phy: dp8382x: keep WOL setting across
- suspends
-Thread-Index: AQHab+nNNjxI3+NV+Uir0lLTLIYJU7ErVY4AgACd/IA=
-Date: Thu, 7 Mar 2024 08:30:17 +0000
-Message-ID: <b53818a7-66a4-4c7a-b687-efaea6cb9e4e@leica-geosystems.com>
-References: <20240306171446.859750-1-catalin.popescu@leica-geosystems.com>
- <8de1d4e3-6d80-45a5-a638-48451d9b5c15@lunn.ch>
-In-Reply-To: <8de1d4e3-6d80-45a5-a638-48451d9b5c15@lunn.ch>
-Accept-Language: en-CH, en-US
-Content-Language: aa
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=leica-geosystems.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: VE1PR06MB6911:EE_|AM9PR06MB7203:EE_
-x-ms-office365-filtering-correlation-id: ac9b8f14-5c9d-48b8-e177-08dc3e80d1e0
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- 6PCatqbQhp0tL/CucdI/ye4tWANqT6ouixeK3dxY9gOdlJy3H0VOMW4JpAA0CeoVq8HjverKunavegDhMIJ5ZP/quhdGLl+PijEe47UHMG0/P0gZLy3HEYLI/NV1b1ByZY1FKugzk/Qr1YuUBeHYQeSvwAfz+rKRsxpcR+z6E25g0+xgtYDZww6kwevC4nRq1WZK7NC22WqCEjIfr/mrTsYIGarGSB5/UVW6r+yH7Jc4NA7YzvAiyCynusWiNekK4XPrK520YpwwM+WaUlMAgKjlX5RPG6pXfyipGWZXIXeAHjXiOZqXH466S8RlmiY7K8XQhYM7CHLGVbp7JXCtywynUdUZldigHbUtcvgVh7YIc+YiwBO0Ug6b3gtgy7mcNojGoVC66Cmlsq2OCi/sRxfMDc0vP8UuEQN+4Ro2FqvXcKFTAckhEgwTgJon0Ni0TP+jMEyJ+H2GGQpbAWzFrxt4qngc5N3MedEwFLLGFDJQqRbeGuyBpQVA3h2gOPDTfTuQLvSe63Wd4HTSAVY52FHGM/8cboH1iX0Sne+IQW4ObaPFLda5sHhqGuvUZcdn0PjSKKu60SXOmZ+cNgAhDcXDJpf/Rmzo+346NX0/q3/kwJ1apM/1Sm+bA6o6oQSjmQ3rXDqHoTr5ol8g3fOyvnYRylvh8rO/Zy0UphsyKgVbuyrj/14LW+3NnI8JxMEcMC/YOVU1Izj/72pQ0LKirg==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR06MB6911.eurprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?M1ViNVhINGZmN0xyYSs1bFdEOUF4WVNrczI2NmZ1NUxmdkJVOVhzVjdhQXJo?=
- =?utf-8?B?SHN5UjQ3eEVTQTlYakFLY0ZlNERHa3F6Q214dEMvQ3MvMXJyWHcyWkVIMUxI?=
- =?utf-8?B?M00rbFhjZXdBbHkzRU5HdU5abHl2WDJoRTFyT3lETmhpQUxyZzUyRXlkUTVu?=
- =?utf-8?B?YlhRNzZHMklGY2dCREYzTWJEOGYxWVNnZ0FIUmJyTmN3Ujd2Vm1wRHRJcGEr?=
- =?utf-8?B?TWFUWU53aFVlcC9BWFlqTkZFTE12dTNtZ1Yxcm4wNlpVMVhFOHlMb0FyT2tj?=
- =?utf-8?B?TVpEUTNiQUp4Tm1wRUVzRW9XVFBvNUFGK1dnMzdQdDJ5Sy9VK291SjBhUjFT?=
- =?utf-8?B?d0o2bWNoN3NGazhLZHpMRjd2NXdQN3dxbjZOazdUbWsrakgrZDN4L3J1Yjd1?=
- =?utf-8?B?blliQ2lPdkpBMTlYM0RMN3BXN2VaK0xIVEFRMUpOZnZMV2Z3WlFEU2lrbHdZ?=
- =?utf-8?B?ZTV5Y1JNSEN0Slp1Q24xc2lmd1MzTVNVMVNIY0c0U0lsdy9qTHVJOGJ0L1FI?=
- =?utf-8?B?b1I1OWtqdENDeHhCRzNwb0VtRVYrdCtFMDFtODd4VFIrdzMzdEhjakNETzdx?=
- =?utf-8?B?VkI3REJ1SUVyeE5MS1VtaEM4SVExR1JoSERqQnlBSElRdlo1UHlldjJBQVU0?=
- =?utf-8?B?T2FodlBYR3pZbGNzRDY1Y29LcllBL2RJbmpjS1gxYzE3dDFwNm1UdXp6Zmt6?=
- =?utf-8?B?aUhxazg4QnYzODFXZUkxQTkyWFpROUxKcUFpUzlOZ1B1S2hqN0x0VDRvOXls?=
- =?utf-8?B?NC9lR0xGVktidDB5b2F5VmhJQmswc2IvVTFoeXlXeGZMdEtyRlh1VWpKWUhh?=
- =?utf-8?B?elNxM21XaSs0YnVwcG0wY29VZzdhSkRVaWQvc0JHck80V0NHNTJ4T2F1b1Az?=
- =?utf-8?B?ejQySzUwNy9kejRqTVNFMS9SczVHNEdtUjhxREFNWEtSc1R1MU12b2hGYkFq?=
- =?utf-8?B?bnpxOHpZZVZjYXFKNnNlbVdUY0tOMXd3TnhUVllENFNYWkJLcm5maW1CTXoz?=
- =?utf-8?B?WjdyWGVJbnlhc0VBc3FmeFBQTit0bkx1UFVleFNHTmE1SFVXRURHVE8wR3Uy?=
- =?utf-8?B?WXorb2pFZ3RiVUVYc1UzMXRzY2dDeE43UkM4YXhrUnZhWk4ySThNT1hzcjEy?=
- =?utf-8?B?MFArbXVqVTBsUzBCUmJDUW84WmV4cjZBaUhYeHRlU0E1cjYrdFdxVlNXRHk0?=
- =?utf-8?B?QlFvWkVKVU5samZmVzl4WXE2R0JOY0ZoMzdkVTRiNnMwMkFYSEF2ZHROTXoy?=
- =?utf-8?B?T1BzQThNVTZhVFppcnJDRWJ0aUhMcVRPTjgzZG1sSS9SM2oweVRyM0hndmJH?=
- =?utf-8?B?a2JBNmZrOTd6ZlovT2hlMkFLbUlMUW1PT205blNxeGRVVkpmQzlwZjIrOWhv?=
- =?utf-8?B?SDhUZkFYUnZRRWdUVlkwVzVSK01GWlFqTlkxdWpyNXd6b25EZjlhVm9CZ0hr?=
- =?utf-8?B?eDF6ang3aUFvVHNwVWtkV3ZpUGRTM0RodTVTeWNWZ0ROa1JlckhvNXJ6TE5X?=
- =?utf-8?B?VkVhK0V1UkR3WnhFcVc1a3M1MW5kNlY1TUZhQkY3KytwZTNPL3Yya3U4UWtL?=
- =?utf-8?B?aUdvelRsdm85OWZnVmpYcVp3cHB4M09raDZZc01qUlVrRExVeGZsVXlMQjNn?=
- =?utf-8?B?RmxzZHByV3dvb1A3QlRWNFRVSW5YTTVIbHJqQUN2VWx6NWEycUdpOEo1SnJS?=
- =?utf-8?B?VEhXeTQzTlFBSFVsdXUzc01GZzhvallUM2Zqc0lDOS9RbmY5WHhrT2orYm03?=
- =?utf-8?B?NnBaWmRWaHBVK2VOWnFlQURDZ1RIYkQ5T2dzMUFRbTJEUW82VExKNzk3Tzds?=
- =?utf-8?B?THFzQ3VoRUdqYjhuUmlLL1FrYkNzUnlWVGxPT3FBVWJPTkhGYkpEanJ1Mjhz?=
- =?utf-8?B?UnJmY2J6a09sMlB3TUErb01KNitkMUt2N05wS0l6eDNDZm41QWNsSzFwbk5B?=
- =?utf-8?B?VDdWYUpPUnBkM1hLTjB0U1dXb3JtNm0wbUt4Z1hSNkZ3U3lSVHlJVXl1UTM3?=
- =?utf-8?B?MUJQSzB5QUVzWmthUTNrZHVYOHZrVDMxeEQwcW5nUGVRb04zYmlvN3g3RFli?=
- =?utf-8?B?dlN3WEN2d2UyNy9BMFFHUVhCYmQ0ZzE4UHMxZnM4d1pXZ3djRG1VNGQvQmtt?=
- =?utf-8?B?SnFaY3g2Tld4RjR3cStKMDYraXUwd3VuWHp6UVkzOVV6L2h3dktYaEtVRWEv?=
- =?utf-8?B?VEE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <834F263360178C4299CC08F0E4D5ED2B@eurprd06.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561C182D7A
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 08:35:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709800546; cv=none; b=f6CvGA+GqKuyrc2050jzGml8a+SQY2WyWMLeMauHZ7qXiabaZo5Z0nYY/utw8wEGYJILW0M1iK6DYjSYMGebAgZLxIqqkZsgYZJEXwm83ST9S+SAQuyqNgWYpnwgkz6gH/l19yXhMIodzZ19xjbFvpOgfzSnKTf8oaviDXKS37g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709800546; c=relaxed/simple;
+	bh=W3TKnfGFSbRnqXKIeTJeO+s0nVZ9/0NYzuqNQRows+k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ERD3zSk0b8nbKRKW8F6N7dYBNJhDQrQl4EdIjnSPhxQ5271Fv2vBb4gUTCmpFp/56q4tmP8Z1q6cq7+Gxh43ax2rjihNlUpcrrMIFewV6B/0YmfbnRhw2Dkj8IpO1m7misEUJMq7jCR+m6kowgxqy85jRMYdXiP+1LEnrttmKRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=f3AdrA00; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2d21cdbc85bso7172141fa.2
+        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 00:35:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709800542; x=1710405342; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=P+bXBJixQOUsop2TJKZ58GCIYbvqkD+ezDVnGT61Olk=;
+        b=f3AdrA00hD91/zHYiGvhtypxEkcsNOcZEk4AotUb68tjHxD8sIiAQ72eaI3P2lqLVI
+         lPXFEeR1/OGtAPLoJdEv1MmJ6jlKDJ/ettQEfuSBRlpVsu1gHrQYyuzXOOozrC+0bD++
+         426oIxnWV3rfJsuJiAnqixnUeG7flCy70HHrHIjgLNgrrLDJubO8KoHEJp5zZROd01ko
+         l2S0lSLeR8fg6iToMbiJFkN7C8JfH+LqD7OveMGc+izKLBwCHfRJTun3Q5ACpw2h0dGX
+         4pCPOeytzdiRGoM6sHkzAvl8yQru3XaqYl1Jf2XCpxN4b+wdExrqNTLiiSN+3lu9+Zmc
+         Ksng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709800542; x=1710405342;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P+bXBJixQOUsop2TJKZ58GCIYbvqkD+ezDVnGT61Olk=;
+        b=NaGWFZ8Sx7sp/rr6mZ6VkPw93Kf7R+iApqswejbMd7iaL6LKthq7C3ArWDBEfAdDr8
+         Oo3oP45Rwz6USvpQgjhGub+6egGA2qf8F8Uqhd3knxfRtJlqszcJC99M1Xb4vDrcByzn
+         +SdS5Cco12t5E7boD79PHxbrbGIzVjx99jXfLC/BXJwl0+hk9kbqvmj5LiuOOd343ytB
+         /YAuDoJ+bVMuikWJMSCi1RXZPqmJcQA8GHsuHCbART/jSmK0TkanzMXqjxJHDvktmR64
+         n4YOxqi27Md7r8yO5zAjaV2GH5PFKNOElrp3+peHsq2EDw9rrQiUALX2lVxM8Da02x1E
+         YXkg==
+X-Gm-Message-State: AOJu0Yw/FaCdP/ejkojYQ2JbdZi9llAH0IeJw7pR7dq5aBSj57XhAcaV
+	y/bXvQel4kl2L2U1NoHAgPMh0epl+f3fsr7L15E7EehariLVELAsDzEo+eEdp+Q=
+X-Google-Smtp-Source: AGHT+IEc5Or50maI4OA0EUo0VoeQmuXpjXjSMufMtXHGHGCENFlZK+bpqzV7FYMhodkCXmmDIueoUA==
+X-Received: by 2002:a2e:be23:0:b0:2d2:5668:3a40 with SMTP id z35-20020a2ebe23000000b002d256683a40mr974616ljq.4.1709800542066;
+        Thu, 07 Mar 2024 00:35:42 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id cr14-20020a05600004ee00b0033dd06e628asm19644957wrb.27.2024.03.07.00.35.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Mar 2024 00:35:41 -0800 (PST)
+Date: Thu, 7 Mar 2024 09:35:38 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: William Tu <witu@nvidia.com>
+Cc: netdev@vger.kernel.org, jiri@nvidia.com, bodong@nvidia.com,
+	tariqt@nvidia.com, yossiku@nvidia.com, kuba@kernel.org
+Subject: Re: [PATCH RFC v3 net-next 1/2] devlink: Add shared memory pool
+ eswitch attribute
+Message-ID: <Zel8WpMczric0fz3@nanopsycho>
+References: <20240306231253.8100-1-witu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: leica-geosystems.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: VE1PR06MB6911.eurprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ac9b8f14-5c9d-48b8-e177-08dc3e80d1e0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Mar 2024 08:30:17.7325
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5vllOtkNl4aqJJTNqvR/xJLxLzLaQc3lVLUI03e+GU2PuraAltL85lNjyKU+NlN2mG4ORwyrsy+1fcDhH/ELBxIMf9Pt7YWCOc98lQi23vT5cSzVkevlBij0g8p0jR84
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR06MB7203
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240306231253.8100-1-witu@nvidia.com>
 
-T24gMDcuMDMuMjQgMDA6MDQsIEFuZHJldyBMdW5uIHdyb3RlOg0KPiBUaGlzIGVtYWlsIGlzIG5v
-dCBmcm9tIEhleGFnb27igJlzIE9mZmljZSAzNjUgaW5zdGFuY2UuIFBsZWFzZSBiZSBjYXJlZnVs
-IHdoaWxlIGNsaWNraW5nIGxpbmtzLCBvcGVuaW5nIGF0dGFjaG1lbnRzLCBvciByZXBseWluZyB0
-byB0aGlzIGVtYWlsLg0KPg0KPg0KPiBPbiBXZWQsIE1hciAwNiwgMjAyNCBhdCAwNjoxNDo0NlBN
-ICswMTAwLCBDYXRhbGluIFBvcGVzY3Ugd3JvdGU6DQo+PiBVbmxpa2Ugb3RoZXIgZXRoZXJuZXQg
-UEhZcyBmcm9tIFRJLCBQSFkgZHA4MzgyMnggaGFzIFdPTCBlbmFibGVkDQo+PiBhdCByZXNldC4N
-Cj4gVGhpcyBpcyByYXRoZXIgb2RkIGJlaGF2aW91ci4gSXMgdGhpcyBzdGF0ZWQgaW4gdGhlIGRh
-dGFzaGVldD8NClllcy4gSSd2ZSBjaGVja2VkIGFsbCBUSSBldGhlcm5ldCBQSFlzIGRhdGFzaGVl
-dHMgdGhhdCBhcmUgc3VwcG9ydGVkIGJ5IA0KbGludXggYW5kIHRoZXkgYWxsLCBidXQgZHA4Mzgy
-eCwgaGF2ZSBXT0wgZGlzYWJsZWQgYnkgZGVmYXVsdC4gSGVuY2UsIA0KZHA4MzgyMi5jIGlzIHRo
-ZSBvbmx5IGRyaXZlciB0aGF0IGZvcmNlZnVsbHkgZGlzYWJsZSBXT0wgYXQgaW5pdC4NCj4NCj4+
-IEBAIC01NzIsMTEgKzU4NCwxNyBAQCBzdGF0aWMgaW50IGRwODM4MjZfY29uZmlnX2luaXQoc3Ry
-dWN0IHBoeV9kZXZpY2UgKnBoeWRldikNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgcmV0dXJu
-IHJldDsNCj4+ICAgICAgICB9DQo+Pg0KPj4gKyAgICAgaWYgKGRwODM4MjItPndvbF9lbmFibGVk
-KQ0KPj4gKyAgICAgICAgICAgICByZXR1cm4gMDsNCj4+ICAgICAgICByZXR1cm4gZHA4MzgyeF9k
-aXNhYmxlX3dvbChwaHlkZXYpOw0KPj4gICB9DQo+Pg0KPj4gICBzdGF0aWMgaW50IGRwODM4Mnhf
-Y29uZmlnX2luaXQoc3RydWN0IHBoeV9kZXZpY2UgKnBoeWRldikNCj4+ICAgew0KPj4gKyAgICAg
-c3RydWN0IGRwODM4MjJfcHJpdmF0ZSAqZHA4MzgyMiA9IHBoeWRldi0+cHJpdjsNCj4+ICsNCj4+
-ICsgICAgIGlmIChkcDgzODIyLT53b2xfZW5hYmxlZCkNCj4+ICsgICAgICAgICAgICAgcmV0dXJu
-IDA7DQo+PiAgICAgICAgcmV0dXJuIGRwODM4MnhfZGlzYWJsZV93b2wocGh5ZGV2KTsNCj4gU2lu
-Y2UgaXQgaXMgcmF0aGVyIG9kZCBiZWhhdmlvdXIsIHRoZXJlIG1pZ2h0IGJlIHNvbWUgQklPU2Vz
-IHdoaWNoDQo+IGRpc2FibGUgV29MLiBTbyBpIHdvdWxkIG5vdCByZWx5IG9uIGl0IGJlaW5nIGVu
-YWJsZWQgYnkNCj4gZGVmYXVsdC4gRXhwbGljaXRseSBlbmFibGUgaXQuDQpJIHNlZSwgSSdsbCBt
-YWtlIHRoZSBjaGFuZ2UuDQo+DQo+ICAgICAgQW5kcmV3DQo+DQo+IC0tLQ0KPiBwdy1ib3Q6IGNy
-DQoNCg0K
+Thu, Mar 07, 2024 at 12:12:52AM CET, witu@nvidia.com wrote:
+>Add eswitch attribute spool_size for shared memory pool size.
+>
+>When using switchdev mode, the representor ports handles the slow path
+>traffic, the traffic that can't be offloaded will be redirected to the
+>representor port for processing. Memory consumption of the representor
+>port's rx buffer can grow to several GB when scaling to 1k VFs reps.
+>For example, in mlx5 driver, each RQ, with a typical 1K descriptors,
+>consumes 3MB of DMA memory for packet buffer in WQEs, and with four
+>channels, it consumes 4 * 3MB * 1024 = 12GB of memory. And since rep
+>ports are for slow path traffic, most of these rx DMA memory are idle.
+>
+>Add spool_size configuration, allowing multiple representor ports
+>to share a rx memory buffer pool. When enabled, individual representor
+>doesn't need to allocate its dedicated rx buffer, but just pointing
+>its rq to the memory pool. This could make the memory being better
+>utilized. The spool_size represents the number of bytes of the memory
+>pool. Users can adjust it based on how many reps, total system
+>memory, or performance expectation.
+>
+>An example use case:
+>$ devlink dev eswitch set pci/0000:08:00.0 mode switchdev \
+>  spool-size 4096000
+>$ devlink dev eswitch show pci/0000:08:00.0
+>  pci/0000:08:00.0: mode legacy inline-mode none encap-mode basic \
+>  spool-size 4096000
+>
+>Disable the shared memory pool by setting spool_size to 0.
+>
+>Signed-off-by: William Tu <witu@nvidia.com>
+>---
+>v3: feedback from Jakub
+>- introduce 1 attribute instead of 2
+>- use spool_size == 0 to disable
+>- spool_size as byte unit, not counts
+>
+>Question about ENODOCS:
+>where to add this? the only document about devlink attr is at iproute2
+>Do I add a new file Documentation/networking/devlink/devlink-eswitch-attr.rst?
+
+Yeah. Please document the existing attrs as well while you are at it.
+
+
+>---
+> Documentation/netlink/specs/devlink.yaml |  4 ++++
+> include/net/devlink.h                    |  3 +++
+> include/uapi/linux/devlink.h             |  1 +
+> net/devlink/dev.c                        | 21 +++++++++++++++++++++
+> net/devlink/netlink_gen.c                |  5 +++--
+> 5 files changed, 32 insertions(+), 2 deletions(-)
+>
+>diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
+>index cf6eaa0da821..cb46fa9d6664 100644
+>--- a/Documentation/netlink/specs/devlink.yaml
+>+++ b/Documentation/netlink/specs/devlink.yaml
+>@@ -429,6 +429,9 @@ attribute-sets:
+>         name: eswitch-encap-mode
+>         type: u8
+>         enum: eswitch-encap-mode
+>+      -
+>+        name: eswitch-spool-size
+>+        type: u32
+>       -
+>         name: resource-list
+>         type: nest
+>@@ -1555,6 +1558,7 @@ operations:
+>             - eswitch-mode
+>             - eswitch-inline-mode
+>             - eswitch-encap-mode
+>+            - eswitch-spool-size
+> 
+>     -
+>       name: eswitch-set
+>diff --git a/include/net/devlink.h b/include/net/devlink.h
+>index 9ac394bdfbe4..164c543dd7ca 100644
+>--- a/include/net/devlink.h
+>+++ b/include/net/devlink.h
+>@@ -1327,6 +1327,9 @@ struct devlink_ops {
+> 	int (*eswitch_encap_mode_set)(struct devlink *devlink,
+> 				      enum devlink_eswitch_encap_mode encap_mode,
+> 				      struct netlink_ext_ack *extack);
+>+	int (*eswitch_spool_size_get)(struct devlink *devlink, u32 *p_size);
+>+	int (*eswitch_spool_size_set)(struct devlink *devlink, u32 size,
+>+				      struct netlink_ext_ack *extack);
+> 	int (*info_get)(struct devlink *devlink, struct devlink_info_req *req,
+> 			struct netlink_ext_ack *extack);
+> 	/**
+>diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+>index 130cae0d3e20..cbe51be7a08a 100644
+>--- a/include/uapi/linux/devlink.h
+>+++ b/include/uapi/linux/devlink.h
+>@@ -614,6 +614,7 @@ enum devlink_attr {
+> 
+> 	DEVLINK_ATTR_REGION_DIRECT,		/* flag */
+> 
+>+	DEVLINK_ATTR_ESWITCH_SPOOL_SIZE,	/* u32 */
+> 	/* add new attributes above here, update the policy in devlink.c */
+
+While at it, could you please update this comment? It should say:
+ 	/* Add new attributes above here, update the spec in
+	 * Documentation/netlink/specs/devlink.yaml and re-generate
+	 * net/devlink/netlink_gen.c. */
+As a separate patch please.
+
+
+> 
+> 	__DEVLINK_ATTR_MAX,
+>diff --git a/net/devlink/dev.c b/net/devlink/dev.c
+>index 19dbf540748a..561874424db7 100644
+>--- a/net/devlink/dev.c
+>+++ b/net/devlink/dev.c
+>@@ -633,6 +633,7 @@ static int devlink_nl_eswitch_fill(struct sk_buff *msg, struct devlink *devlink,
+> {
+> 	const struct devlink_ops *ops = devlink->ops;
+> 	enum devlink_eswitch_encap_mode encap_mode;
+>+	u32 spool_size;
+> 	u8 inline_mode;
+> 	void *hdr;
+> 	int err = 0;
+>@@ -674,6 +675,15 @@ static int devlink_nl_eswitch_fill(struct sk_buff *msg, struct devlink *devlink,
+> 			goto nla_put_failure;
+> 	}
+> 
+>+	if (ops->eswitch_spool_size_get) {
+>+		err = ops->eswitch_spool_size_get(devlink, &spool_size);
+>+		if (err)
+>+			goto nla_put_failure;
+>+		err = nla_put_u32(msg, DEVLINK_ATTR_ESWITCH_SPOOL_SIZE, spool_size);
+>+		if (err)
+>+			goto nla_put_failure;
+>+	}
+>+
+> 	genlmsg_end(msg, hdr);
+> 	return 0;
+> 
+>@@ -708,10 +718,21 @@ int devlink_nl_eswitch_set_doit(struct sk_buff *skb, struct genl_info *info)
+> 	struct devlink *devlink = info->user_ptr[0];
+> 	const struct devlink_ops *ops = devlink->ops;
+> 	enum devlink_eswitch_encap_mode encap_mode;
+>+	u32 spool_size;
+> 	u8 inline_mode;
+> 	int err = 0;
+> 	u16 mode;
+> 
+>+	if (info->attrs[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE]) {
+>+		if (!ops->eswitch_spool_size_set)
+
+Fill up extack msg here please.
+
+
+>+			return -EOPNOTSUPP;
+>+		spool_size = nla_get_u32(info->attrs[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE]);
+>+		err = ops->eswitch_spool_size_set(devlink, spool_size,
+>+						  info->extack);
+>+		if (err)
+>+			return err;
+>+	}
+>+
+> 	if (info->attrs[DEVLINK_ATTR_ESWITCH_MODE]) {
+> 		if (!ops->eswitch_mode_set)
+> 			return -EOPNOTSUPP;
+>diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
+>index c81cf2dd154f..acbf484b28a2 100644
+>--- a/net/devlink/netlink_gen.c
+>+++ b/net/devlink/netlink_gen.c
+>@@ -194,12 +194,13 @@ static const struct nla_policy devlink_eswitch_get_nl_policy[DEVLINK_ATTR_DEV_NA
+> };
+> 
+> /* DEVLINK_CMD_ESWITCH_SET - do */
+>-static const struct nla_policy devlink_eswitch_set_nl_policy[DEVLINK_ATTR_ESWITCH_ENCAP_MODE + 1] = {
+>+static const struct nla_policy devlink_eswitch_set_nl_policy[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE + 1] = {
+> 	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
+> 	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
+> 	[DEVLINK_ATTR_ESWITCH_MODE] = NLA_POLICY_MAX(NLA_U16, 1),
+> 	[DEVLINK_ATTR_ESWITCH_INLINE_MODE] = NLA_POLICY_MAX(NLA_U16, 3),
+> 	[DEVLINK_ATTR_ESWITCH_ENCAP_MODE] = NLA_POLICY_MAX(NLA_U8, 1),
+>+	[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE] = { .type = NLA_U32, },
+> };
+> 
+> /* DEVLINK_CMD_DPIPE_TABLE_GET - do */
+>@@ -787,7 +788,7 @@ const struct genl_split_ops devlink_nl_ops[74] = {
+> 		.doit		= devlink_nl_eswitch_set_doit,
+> 		.post_doit	= devlink_nl_post_doit,
+> 		.policy		= devlink_eswitch_set_nl_policy,
+>-		.maxattr	= DEVLINK_ATTR_ESWITCH_ENCAP_MODE,
+>+		.maxattr	= DEVLINK_ATTR_ESWITCH_SPOOL_SIZE,
+> 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+> 	},
+> 	{
+>-- 
+>2.38.1
+>
+>
 
