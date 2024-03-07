@@ -1,99 +1,136 @@
-Return-Path: <netdev+bounces-78205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5135087457B
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 02:07:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C457B87458D
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 02:13:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5D281F2644C
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 01:07:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65D24B2246D
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 01:13:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B24E8F4FC;
-	Thu,  7 Mar 2024 01:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31EC54A28;
+	Thu,  7 Mar 2024 01:13:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3EgwL5aR"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 669C54689;
-	Thu,  7 Mar 2024 01:06:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8E9441F;
+	Thu,  7 Mar 2024 01:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709773583; cv=none; b=mZNgo4Dlha8vQEpzzaTYlJU+qE3gDjIvbSyfYJUhCyGmoQmiSZT7jbCm3sPiKgnklCqsEPmqKlt6b3to/B0J71oUtDnBgO4JlW+ic/w1gCP3LfsHzlONAS0SLOworzAVgtAxico3w+xfVa59zUYL1AZ0ApdK22OSHtqNV6UlqEE=
+	t=1709773992; cv=none; b=RBiOLc9LzT2RGOHUCqNwl3/mEwMf+2ueSV0T9XI3MQXSJ+ZzPklAscwYuYkw2JLdSlsE3NfZ+CSGHa0V6DPX+r2khwqaRbn82/3bT1ugHdf9oVG9M7lFNYN44wA3NO44hsjKOtOf6I5HHQEwf1Ep6NNLyruWQUhQSwiIuGBn1ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709773583; c=relaxed/simple;
-	bh=asqUl2zK5gi5IDYq3bhuT50zBVPJICKW9k0bXYg8Jak=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uZMvMoX+VY5brQ59ym+DZKVMdsi4RuqdVtbt1A3GMn+i3eEQRKWAek4iD/r1gp/2U/m6MXKVAwS5oRbKtwsqhHBfLR11M9uP/nXQ34x6NW0zTSG2YEKsZbLVuALz3n+R+RoK8tXhlaki3VFSKv2Cp0nolZDvTFBcGmBlWOwTTT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4TqrgD1XC9zNlsk;
-	Thu,  7 Mar 2024 09:04:40 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 015CA18007D;
-	Thu,  7 Mar 2024 09:06:19 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.2) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 7 Mar 2024 09:06:18 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net 8/8] net: hns3: add checking for vf id of mailbox
-Date: Thu, 7 Mar 2024 09:01:15 +0800
-Message-ID: <20240307010115.3054770-9-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20240307010115.3054770-1-shaojijie@huawei.com>
-References: <20240307010115.3054770-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1709773992; c=relaxed/simple;
+	bh=de5ZxAMOpyhXT1T1JXFC47CP0MDYZQKgsWVDcCrzfKA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ea+PzW0nKyy86QCjwLbrnW4NepvgFseE1cDBHiHcQRc2IBrV+mmsFU2sCqEHc7I6Cv752j6VnNXJL43m1LRszcuzksSdthf1cCuvUJ9IGxU3dvgfKC8EgXudsLfYR0xIA00uzKwyWjtv95/Q7fGUiJVbX5JND2kJmpyb8SaWH9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3EgwL5aR; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5sGcklaR+Uln4FMN2IExD3g52cHOSe/gl+dclElMBzY=; b=3EgwL5aRkD3ZspkODCgvMOs2F0
+	CnMNXkVS2G1a/Xb0vAnpC/2Qv86zbsN8r4VMq4C0xXqdvfiM4bgc0dteoTwl2pNPJSjDGybNI7jyo
+	worW4tIwuPDd3rMAwuLmmoZixnIlKbDq+DNbYoBQ5hdLjiQNtHVZrGMkrSchiQ6GU9O8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ri2K4-009XtG-NZ; Thu, 07 Mar 2024 02:13:24 +0100
+Date: Thu, 7 Mar 2024 02:13:24 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
+	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, corbet@lwn.net,
+	linux-doc@vger.kernel.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
+	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
+	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
+	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
+	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
+	benjamin.bigler@bernformulastudent.ch
+Subject: Re: [PATCH net-next v3 06/12] net: ethernet: oa_tc6: implement
+ internal PHY initialization
+Message-ID: <8c2b95f4-75a7-4d6d-ab9c-9c3498c040d8@lunn.ch>
+References: <20240306085017.21731-1-Parthiban.Veerasooran@microchip.com>
+ <20240306085017.21731-7-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240306085017.21731-7-Parthiban.Veerasooran@microchip.com>
 
-From: Jian Shen <shenjian15@huawei.com>
+> +/* PHY Clause 22 and 29 registers base address and mask */
+> +#define OA_TC6_PHY_STD_REG_ADDR_BASE		0xFF00
+> +#define OA_TC6_PHY_STD_REG_ADDR_MASK		0x3F
 
-Add checking for vf id of mailbox, in order to avoid array
-out-of-bounds risk.
+[Goes and looks a 802.3]
 
-Signed-off-by: Jian Shen <shenjian15@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Clause 29 is "System considerations for multisegment 100BASE-T networks"
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c
-index 4b0d07ca2505..d4a0e0be7a72 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c
-@@ -1123,10 +1123,11 @@ void hclge_mbx_handler(struct hclge_dev *hdev)
- 		req = (struct hclge_mbx_vf_to_pf_cmd *)desc->data;
- 
- 		flag = le16_to_cpu(crq->desc[crq->next_to_use].flag);
--		if (unlikely(!hnae3_get_bit(flag, HCLGE_CMDQ_RX_OUTVLD_B))) {
-+		if (unlikely(!hnae3_get_bit(flag, HCLGE_CMDQ_RX_OUTVLD_B) ||
-+			     req->mbx_src_vfid > hdev->num_req_vfs)) {
- 			dev_warn(&hdev->pdev->dev,
--				 "dropped invalid mailbox message, code = %u\n",
--				 req->msg.code);
-+				 "dropped invalid mailbox message, code = %u, vfid = %u\n",
-+				 req->msg.code, req->mbx_src_vfid);
- 
- 			/* dropping/not processing this invalid message */
- 			crq->desc[crq->next_to_use].flag = 0;
--- 
-2.30.0
+I don't see any mention of registers in there.
 
+TC6 says:
+
+"Clause 22 standard registers and Clause 22 extended registers (Clause
+29) are directly mapped into MMS 0 as shown in Table 7."
+
+Going back to 802.3, we have 22.2.4:
+
+The MII basic register set consists of two registers referred to as
+the Control register (Register 0) and the Status register (Register
+1). All PHYs that provide an MII Management Interface shall
+incorporate the basic register set. All PHYs that provide a GMII shall
+incorporate an extended basic register set consisting of the Control
+register (Register 0), Status register (Register 1), and Extended
+Status register (Register 15). The status and control functions
+defined here are considered basic and fundamental to 100 Mb/s and 1000
+Mb/s PHYs. Registers 2 through 14 are part of the extended register
+set. The format of Registers 4 through 10 are defined for the specific
+Auto-Negotiation protocol used (Clause 28 or Clause 37). The format of
+these registers is selected by the bit settings of Registers 1 and 15.
+
+So clause 29 is not making much sense here. Can anybody explain it?
+
+> +static int oa_tc6_mdiobus_register(struct oa_tc6 *tc6)
+> +{
+> +	int ret;
+> +
+> +	tc6->mdiobus = mdiobus_alloc();
+> +	if (!tc6->mdiobus) {
+> +		netdev_err(tc6->netdev, "MDIO bus alloc failed\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	tc6->mdiobus->priv = tc6;
+> +	tc6->mdiobus->read = oa_tc6_mdiobus_direct_read;
+> +	tc6->mdiobus->write = oa_tc6_mdiobus_direct_write;
+
+This might get answered in later patches. PLCA registers are in C45
+address space, VEND1 if i remember correctly. You don't provide any
+C45 access methods here. Does TC6 specify that C45 over C22 must be
+implemented?
+
+The standard does say:
+
+Vendor specific registers may be mapped into MMS 10 though MMS
+15. When directly mapped, PHY vendor specific registers in MMD 30 or
+MMD 31 would be mapped into the vendor specific MMS 10 through MMS 15.
+
+So i'm thinking you might need to provide C45 access, at least MMD 30,
+via MMS 10-15?
+
+    Andrew
 
