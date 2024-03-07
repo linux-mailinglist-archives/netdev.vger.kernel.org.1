@@ -1,59 +1,68 @@
-Return-Path: <netdev+bounces-78343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2E8C874BC0
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:04:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F31A9874B8D
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:58:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A811281E15
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:04:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6AF11B22B6E
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5738562D;
-	Thu,  7 Mar 2024 09:58:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 098B88626A;
+	Thu,  7 Mar 2024 09:55:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="II/qh+bD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg156.qq.com (smtpbg156.qq.com [15.184.82.18])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9341A85288
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 09:58:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.82.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B02885274;
+	Thu,  7 Mar 2024 09:55:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709805517; cv=none; b=Qu1srt/06R8AwUyBHbln4cVVRbBiCCedU66OzxrhJ3bi8nZPQiTSOowfFc1I+GXAhRa6c3UyQ1qWNKyCZlfIax9gWWOIDpAoPUUK7qOGnlOrdsfJ1qc5ZX9CRuu8LpS+vUCfDBYHziaaddFigDV9diGWS71Lbns/beiq5qxyR6o=
+	t=1709805352; cv=none; b=fWhzt5IEh+4dkniBJE+HIpHWAB9tm4s+GKh9IxycY0NDrrvldkIt+39NeZFghTiQRzbV8noNa4E+EZZQEQdYBFIZuA0j3aRzHpk9zhJwtykw0Xijgi8sfJ1r584LbCimdKxpe0DyDiohACoZJTIJ2IhtQzQFX7r5rvZRt3CIzRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709805517; c=relaxed/simple;
-	bh=K8zz6tgOXM6F0foJkrRPPkbfUsLEGErbxYhcsLqbM6U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HV2ux/+L1T+NuGVyQ15x4jLlKjEXnwPacJXmb6CtK1XGnbHaW3Yfhtakq3hQabYCk85jvOTlU3YB7h0q3BvvfXlktHv7G3Z64qt1R5hzSsa+hVKFGR3VA1bkOUkzrPp7QkT8exK3mayaFQGdVrnXGkbhHp/VNDwfKoKFY3gr+/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=15.184.82.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: bizesmtp87t1709805506tsb7322a
-X-QQ-Originating-IP: V/IfdNHBYct3MOdpt1pkbzsuEfU0WGbLT5STb+Oz+Uo=
-Received: from localhost.localdomain ( [220.184.149.201])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 07 Mar 2024 17:58:24 +0800 (CST)
-X-QQ-SSF: 01400000000000O0Z000000A0000000
-X-QQ-FEAT: tSQw27OYC22I5oirikSoNk6cB9/hcOctBn5aukkst59XGgvWReTbSvQ0JFBCi
-	wPElsQmm/WXj3437pn5t+2DuhwWcR19h8+6Vm+T1UKr6tZ1UteRtMUF0it5/LUOGoxKmBP9
-	F5TN+o3/DU/FuNlzZ9Dyy+hrpZEyTauPMSu9LP8RQq6+dYZsKZqBNeTGi8MUGW9p9aY8Y87
-	wyQvV/SQtibkjTBMvwaKJMXZrG27k25Z416IVj4iYhkwcaejdYa6rA0Rx9xd9Haf2dmRT6k
-	qR24XiVPmO7CoW2DbRcFrJohc7ZEL+fSPGFxxS02CgDjs/UexuQyJH2gWXghSMO2FU85K1c
-	e0rvApBduh7cp16W3/Wpj4t14itNe1BwwapUOxso2BxyQCdGAq/wn5DwBuBpEA+leg/7dPJ
-	eNCzuzcl01usg9Rtfhyn1JqfnZ2uV2nH
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 1328032972463655884
-From: Mengyuan Lou <mengyuanlou@net-swift.com>
-To: netdev@vger.kernel.org
-Cc: jiawenwu@trustnetic.com,
-	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next 5/5] net: txgbe: add sriov ops support
-Date: Thu,  7 Mar 2024 17:55:00 +0800
-Message-ID: <9EE1617D3660870B+20240307095755.7130-6-mengyuanlou@net-swift.com>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20240307095755.7130-1-mengyuanlou@net-swift.com>
-References: <20240307095755.7130-1-mengyuanlou@net-swift.com>
+	s=arc-20240116; t=1709805352; c=relaxed/simple;
+	bh=Y706E7+wSwhpUpSD+ADfvCTxNz2v6+Eha2xgKpULnwI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=g5jI9R38P/XGmpNkQFo9cGbLOJsXLSpPmy2bPKf3J6cPA1sSTTl89Q3hF823zYbpXx99Ivq5YS+LPlAK6XYKxUflWNF/Tb81D1+7dRkjPwydEJWqSMg/z/PvbdV0cVUyfB49BIct77vWHgGMzcqCSjQhBvHnkLVQIdCbhYxRET8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=II/qh+bD; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1709805340; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=fBaq6BITkcfyNDc5Epq7WVlMR7CHOylhALsk2kShEKY=;
+	b=II/qh+bDvrxrUxWV1C3JC7oDjJZCwh0z9pMdh73a2AnWOVyxHSIneEdzQWTDCdRpYOomlMJsTavhMAwQOZSftJMHHBwbst2WqRi/qhW+KM8+4oK1WnHgqK9pZs0+aR4BifZsSpCTMmqZejlbIGUO1fzfeycRn1CspqWQq6NPvHA=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0W2-G9yn_1709805336;
+Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W2-G9yn_1709805336)
+          by smtp.aliyun-inc.com;
+          Thu, 07 Mar 2024 17:55:40 +0800
+From: Wen Gu <guwen@linux.alibaba.com>
+To: wintera@linux.ibm.com,
+	twinkler@linux.ibm.com,
+	hca@linux.ibm.com,
+	gor@linux.ibm.com,
+	agordeev@linux.ibm.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	wenjia@linux.ibm.com,
+	jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com,
+	svens@linux.ibm.com,
+	alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v2 00/11] net/smc: SMC intra-OS shortcut with loopback-ism
+Date: Thu,  7 Mar 2024 17:55:25 +0800
+Message-Id: <20240307095536.29648-1-guwen@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,226 +70,212 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrgz:qybglogicsvrgz6a-1
 
-Add sriov_configure for driver ops.
-Add ndo_set_vf_spoofchk and ndo_set_vf_link_state for
-txgbe netdev ops.
-Add mailbox handler wx_msg_task for txgbe.
+This patch set acts as the second part of the new version of [1] (The first
+part can be referred from [2]), the updated things of this version are listed
+at the end.
 
-Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
----
- .../net/ethernet/wangxun/txgbe/txgbe_irq.c    | 25 +++++++++++++++---
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 26 +++++++++++++++++++
- .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |  8 ++++++
- .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  4 ++-
- 4 files changed, 59 insertions(+), 4 deletions(-)
+- Background
 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-index b3e3605d1edb..e6be98865c2d 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-@@ -7,6 +7,7 @@
- #include "../libwx/wx_type.h"
- #include "../libwx/wx_lib.h"
- #include "../libwx/wx_hw.h"
-+#include "../libwx/wx_sriov.h"
- #include "txgbe_type.h"
- #include "txgbe_phy.h"
- #include "txgbe_irq.h"
-@@ -176,6 +177,24 @@ static const struct irq_domain_ops txgbe_misc_irq_domain_ops = {
- 	.map = txgbe_misc_irq_domain_map,
- };
- 
-+static irqreturn_t txgbe_irq_handler(int irq, void *data)
-+{
-+	struct txgbe *txgbe = data;
-+	struct wx *wx = txgbe->wx;
-+	u32 eicr;
-+
-+	eicr = wx_misc_isb(wx, WX_ISB_MISC) & TXGBE_PX_MISC_IEN_MASK;
-+	if (!eicr)
-+		return IRQ_NONE;
-+	txgbe->eicr = eicr;
-+	if (eicr & TXGBE_PX_MISC_IC_VF_MBOX) {
-+		wx_msg_task(txgbe->wx);
-+		wx_intr_enable(wx, TXGBE_INTR_MISC);
-+	}
-+
-+	return IRQ_WAKE_THREAD;
-+}
-+
- static irqreturn_t txgbe_misc_irq_handle(int irq, void *data)
- {
- 	struct txgbe *txgbe = data;
-@@ -184,7 +203,7 @@ static irqreturn_t txgbe_misc_irq_handle(int irq, void *data)
- 	unsigned int sub_irq;
- 	u32 eicr;
- 
--	eicr = wx_misc_isb(wx, WX_ISB_MISC);
-+	eicr = txgbe->eicr;
- 	if (eicr & TXGBE_PX_MISC_GPIO) {
- 		sub_irq = irq_find_mapping(txgbe->misc.domain, TXGBE_IRQ_GPIO);
- 		handle_nested_irq(sub_irq);
-@@ -226,7 +245,7 @@ int txgbe_setup_misc_irq(struct txgbe *txgbe)
- 	struct wx *wx = txgbe->wx;
- 	int hwirq, err;
- 
--	txgbe->misc.nirqs = 2;
-+	txgbe->misc.nirqs = TXGBE_IRQ_MAX;
- 	txgbe->misc.domain = irq_domain_add_simple(NULL, txgbe->misc.nirqs, 0,
- 						   &txgbe_misc_irq_domain_ops, txgbe);
- 	if (!txgbe->misc.domain)
-@@ -241,7 +260,7 @@ int txgbe_setup_misc_irq(struct txgbe *txgbe)
- 	else
- 		txgbe->misc.irq = wx->pdev->irq;
- 
--	err = request_threaded_irq(txgbe->misc.irq, NULL,
-+	err = request_threaded_irq(txgbe->misc.irq, txgbe_irq_handler,
- 				   txgbe_misc_irq_handle,
- 				   IRQF_ONESHOT,
- 				   wx->netdev->name, txgbe);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index bd4624d14ca0..fffbb92acdb2 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -14,6 +14,8 @@
- #include "../libwx/wx_type.h"
- #include "../libwx/wx_lib.h"
- #include "../libwx/wx_hw.h"
-+#include "../libwx/wx_mbx.h"
-+#include "../libwx/wx_sriov.h"
- #include "txgbe_type.h"
- #include "txgbe_hw.h"
- #include "txgbe_phy.h"
-@@ -99,6 +101,12 @@ static void txgbe_up_complete(struct wx *wx)
- 
- 	/* enable transmits */
- 	netif_tx_start_all_queues(netdev);
-+
-+	/* Set PF Reset Done bit so PF/VF Mail Ops can work */
-+	wr32m(wx, WX_CFG_PORT_CTL, WX_CFG_PORT_CTL_PFRSTD,
-+	      WX_CFG_PORT_CTL_PFRSTD);
-+	/* update setting rx tx for all active vfs */
-+	wx_set_all_vfs(wx);
- }
- 
- static void txgbe_reset(struct wx *wx)
-@@ -144,6 +152,16 @@ static void txgbe_disable_device(struct wx *wx)
- 		wx_err(wx, "%s: invalid bus lan id %d\n",
- 		       __func__, wx->bus.func);
- 
-+	if (wx->num_vfs) {
-+		/* Clear EITR Select mapping */
-+		wr32(wx, WX_PX_ITRSEL, 0);
-+		/* Mark all the VFs as inactive */
-+		for (i = 0 ; i < wx->num_vfs; i++)
-+			wx->vfinfo[i].clear_to_send = 0;
-+		/* update setting rx tx for all active vfs */
-+		wx_set_all_vfs(wx);
-+	}
-+
- 	if (!(((wx->subsystem_device_id & WX_NCSI_MASK) == WX_NCSI_SUP) ||
- 	      ((wx->subsystem_device_id & WX_WOL_MASK) == WX_WOL_SUP))) {
- 		/* disable mac transmiter */
-@@ -269,6 +287,10 @@ static int txgbe_sw_init(struct wx *wx)
- 	wx->tx_work_limit = TXGBE_DEFAULT_TX_WORK;
- 	wx->rx_work_limit = TXGBE_DEFAULT_RX_WORK;
- 
-+	wx->mbx.size = WX_VXMAILBOX_SIZE;
-+	wx->setup_tc = txgbe_setup_tc;
-+	set_bit(0, &wx->fwd_bitmask);
-+
- 	return 0;
- }
- 
-@@ -433,6 +455,8 @@ static const struct net_device_ops txgbe_netdev_ops = {
- 	.ndo_get_stats64        = wx_get_stats64,
- 	.ndo_vlan_rx_add_vid    = wx_vlan_rx_add_vid,
- 	.ndo_vlan_rx_kill_vid   = wx_vlan_rx_kill_vid,
-+	.ndo_set_vf_spoofchk    = wx_ndo_set_vf_spoofchk,
-+	.ndo_set_vf_link_state	= wx_ndo_set_vf_link_state,
- };
- 
- /**
-@@ -694,6 +718,7 @@ static void txgbe_remove(struct pci_dev *pdev)
- 	struct net_device *netdev;
- 
- 	netdev = wx->netdev;
-+	wx_disable_sriov(wx);
- 	unregister_netdev(netdev);
- 
- 	txgbe_remove_phy(txgbe);
-@@ -715,6 +740,7 @@ static struct pci_driver txgbe_driver = {
- 	.probe    = txgbe_probe,
- 	.remove   = txgbe_remove,
- 	.shutdown = txgbe_shutdown,
-+	.sriov_configure = wx_pci_sriov_configure,
- };
- 
- module_pci_driver(txgbe_driver);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-index 93295916b1d2..22402a6d2f50 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-@@ -16,6 +16,7 @@
- #include "../libwx/wx_type.h"
- #include "../libwx/wx_lib.h"
- #include "../libwx/wx_hw.h"
-+#include "../libwx/wx_sriov.h"
- #include "txgbe_type.h"
- #include "txgbe_phy.h"
- #include "txgbe_hw.h"
-@@ -179,6 +180,9 @@ static void txgbe_mac_link_down(struct phylink_config *config,
- 	struct wx *wx = phylink_to_wx(config);
- 
- 	wr32m(wx, WX_MAC_TX_CFG, WX_MAC_TX_CFG_TE, 0);
-+	wx->speed = 0;
-+	/* ping all the active vfs to let them know we are going down */
-+	wx_ping_all_vfs_with_link_status(wx, false);
- }
- 
- static void txgbe_mac_link_up(struct phylink_config *config,
-@@ -215,6 +219,10 @@ static void txgbe_mac_link_up(struct phylink_config *config,
- 	wr32(wx, WX_MAC_PKT_FLT, WX_MAC_PKT_FLT_PR);
- 	wdg = rd32(wx, WX_MAC_WDG_TIMEOUT);
- 	wr32(wx, WX_MAC_WDG_TIMEOUT, wdg);
-+
-+	wx->speed = speed;
-+	/* ping all the active vfs to let them know we are going up */
-+	wx_ping_all_vfs_with_link_status(wx, true);
- }
- 
- static int txgbe_mac_prepare(struct phylink_config *config, unsigned int mode,
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-index 1b4ff50d5857..28717788c348 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-@@ -71,12 +71,13 @@
- #define TXGBE_PX_MISC_ETH_LK                    BIT(18)
- #define TXGBE_PX_MISC_ETH_AN                    BIT(19)
- #define TXGBE_PX_MISC_INT_ERR                   BIT(20)
-+#define TXGBE_PX_MISC_IC_VF_MBOX                BIT(23)
- #define TXGBE_PX_MISC_GPIO                      BIT(26)
- #define TXGBE_PX_MISC_IEN_MASK                            \
- 	(TXGBE_PX_MISC_ETH_LKDN | TXGBE_PX_MISC_DEV_RST | \
- 	 TXGBE_PX_MISC_ETH_EVENT | TXGBE_PX_MISC_ETH_LK | \
- 	 TXGBE_PX_MISC_ETH_AN | TXGBE_PX_MISC_INT_ERR |   \
--	 TXGBE_PX_MISC_GPIO)
-+	 TXGBE_PX_MISC_IC_VF_MBOX | TXGBE_PX_MISC_GPIO)
- 
- /* Port cfg registers */
- #define TXGBE_CFG_PORT_ST                       0x14404
-@@ -195,6 +196,7 @@ struct txgbe {
- 	struct gpio_chip *gpio;
- 	unsigned int gpio_irq;
- 	unsigned int link_irq;
-+	u32 eicr;
- };
- 
- #endif /* _TXGBE_TYPE_H_ */
+SMC-D is now used in IBM z with ISM function to optimize network interconnect
+for intra-CPC communications. Inspired by this, we try to make SMC-D available
+on the non-s390 architecture through a software-implemented Emulated-ISM device,
+that is the loopback-ism device here, to accelerate inter-process or
+inter-containers communication within the same OS instance.
+
+- Design
+
+This patch set includes 3 parts:
+
+ - Patch #1-#2: some prepare work for loopback-ism.
+ - Patch #3-#7: implement loopback-ism device. Noted that loopback-ism now
+   serves only SMC and no userspace interface exposed.
+ - Patch #10-#15: memory copy optimization for intra-OS scenario.
+
+The loopback-ism device is designed as an ISMv2 device and not be limited to
+a specific net namespace, ends of both inter-process connection (1/1' in diagram
+below) or inter-container connection (2/2' in diagram below) can find the same
+available loopback-ism and choose it during the CLC handshake.
+
+ Container 1 (ns1)                              Container 2 (ns2)
+ +-----------------------------------------+    +-------------------------+
+ | +-------+      +-------+      +-------+ |    |        +-------+        |
+ | | App A |      | App B |      | App C | |    |        | App D |<-+     |
+ | +-------+      +---^---+      +-------+ |    |        +-------+  |(2') |
+ |     |127.0.0.1 (1')|             |192.168.0.11       192.168.0.12|     |
+ |  (1)|   +--------+ | +--------+  |(2)   |    | +--------+   +--------+ |
+ |     `-->|   lo   |-` |  eth0  |<-`      |    | |   lo   |   |  eth0  | |
+ +---------+--|---^-+---+-----|--+---------+    +-+--------+---+-^------+-+
+              |   |           |                                  |
+ Kernel       |   |           |                                  |
+ +----+-------v---+-----------v----------------------------------+---+----+
+ |    |                            TCP                               |    |
+ |    |                                                              |    |
+ |    +--------------------------------------------------------------+    |
+ |                                                                        |
+ |                           +--------------+                             |
+ |                           | smc loopback |                             |
+ +---------------------------+--------------+-----------------------------+
+
+loopback-ism device creates DMBs (shared memory) for each connection peer.
+Since data transfer occurs within the same kernel, the sndbuf of each peer
+is only a descriptor and point to the same memory region as peer DMB, so that
+the data copy from sndbuf to peer DMB can be avoided in loopback-ism case.
+
+ Container 1 (ns1)                              Container 2 (ns2)
+ +-----------------------------------------+    +-------------------------+
+ | +-------+                               |    |        +-------+        |
+ | | App C |-----+                         |    |        | App D |        |
+ | +-------+     |                         |    |        +-^-----+        |
+ |               |                         |    |          |              |
+ |           (2) |                         |    |     (2') |              |
+ |               |                         |    |          |              |
+ +---------------|-------------------------+    +----------|--------------+
+                 |                                         |
+ Kernel          |                                         |
+ +---------------|-----------------------------------------|--------------+
+ | +--------+ +--v-----+                           +--------+ +--------+  |
+ | |dmb_desc| |snd_desc|                           |dmb_desc| |snd_desc|  |
+ | +-----|--+ +--|-----+                           +-----|--+ +--------+  |
+ | +-----|--+    |                                 +-----|--+             |
+ | | DMB C  |    +---------------------------------| DMB D  |             |
+ | +--------+                                      +--------+             |
+ |                                                                        |
+ |                           +--------------+                             |
+ |                           | smc loopback |                             |
+ +---------------------------+--------------+-----------------------------+
+
+- Benchmark Test
+
+ * Test environments:
+      - VM with Intel Xeon Platinum 8 core 2.50GHz, 16 GiB mem.
+      - SMC sndbuf/DMB size 1MB.
+
+ * Test object:
+      - TCP: run on TCP loopback.
+      - SMC lo: run on SMC loopback-ism.
+
+1. ipc-benchmark (see [3])
+
+ - ./<foo> -c 1000000 -s 100
+
+                            TCP                  SMC-lo
+Message
+rate (msg/s)              79287                  148946(+87.86%)
+
+2. sockperf
+
+ - serv: <smc_run> taskset -c <cpu> sockperf sr --tcp
+ - clnt: <smc_run> taskset -c <cpu> sockperf { tp | pp } --tcp --msg-size={ 64000 for tp | 14 for pp } -i 127.0.0.1 -t 30
+
+                            TCP                  SMC-lo
+Bandwidth(MBps)         5053.47                 8195.07(+62.17%)
+Latency(us)               6.108                   3.404(-44.27%)
+
+3. nginx/wrk
+
+ - serv: <smc_run> nginx
+ - clnt: <smc_run> wrk -t 8 -c 1000 -d 30 http://127.0.0.1:80
+
+                           TCP                   SMC-lo
+Requests/s           178187.56                247970.92(+39.16%)
+
+4. redis-benchmark
+
+ - serv: <smc_run> redis-server
+ - clnt: <smc_run> redis-benchmark -h 127.0.0.1 -q -t set,get -n 400000 -c 200 -d 1024
+
+                           TCP                   SMC-lo
+GET(Requests/s)       89067.02                123877.36(+39.08%)
+SET(Requests/s)       87700.07                131319.77(+49.73%)
+
+
+Change log:
+
+v2->v1:
+- All the patches: changed the term virtual-ISM to Emulated-ISM as defined by SMCv2.1.
+- Patch #3: optimized the description of SMC_LO config. Avoid exposing loopback-ism
+  to sysfs and remove all the knobs until future definition clear.
+- Patch #3: try to make lockdep happy by using read_lock_bh() in smc_lo_move_data().
+- Patch #6: defaultly use physical contiguous DMB buffers.
+- Patch #11: defaultly enable DMB no-copy for loopback-ism and free the DMB in
+  unregister_dmb or detach_dmb when dmb_node->refcnt reaches 0, instead of using
+  wait_event to keep waiting in unregister_dmb.
+
+v1->RFC:
+- Patch #9: merge rx_bytes and tx_bytes as xfer_bytes statistics:
+  /sys/devices/virtual/smc/loopback-ism/xfer_bytes
+- Patch #10: add support_dmb_nocopy operation to check if SMC-D device supports
+  merging sndbuf with peer DMB.
+- Patch #13 & #14: introduce loopback-ism device control of DMB memory type and
+  control of whether to merge sndbuf and DMB. They can be respectively set by:
+  /sys/devices/virtual/smc/loopback-ism/dmb_type
+  /sys/devices/virtual/smc/loopback-ism/dmb_copy
+  The motivation for these two control is that a performance bottleneck was
+  found when using vzalloced DMB and sndbuf is merged with DMB, and there are
+  many CPUs and CONFIG_HARDENED_USERCOPY is set [4]. The bottleneck is caused
+  by the lock contention in vmap_area_lock [5] which is involved in memcpy_from_msg()
+  or memcpy_to_msg(). Currently, Uladzislau Rezki is working on mitigating the
+  vmap lock contention [6]. It has significant effects, but using virtual memory
+  still has additional overhead compared to using physical memory.
+  So this new version provides controls of dmb_type and dmb_copy to suit
+  different scenarios.
+- Some minor changes and comments improvements.
+
+RFC->old version([1]):
+Link: https://lore.kernel.org/netdev/1702214654-32069-1-git-send-email-guwen@linux.alibaba.com/
+- Patch #1: improve the loopback-ism dump, it shows as follows now:
+  # smcd d
+  FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
+  0000 0     loopback-ism  ffff   No        0
+- Patch #3: introduce the smc_ism_set_v2_capable() helper and set
+  smc_ism_v2_capable when ISMv2 or virtual ISM is registered,
+  regardless of whether there is already a device in smcd device list.
+- Patch #3: loopback-ism will be added into /sys/devices/virtual/smc/loopback-ism/.
+- Patch #8: introduce the runtime switch /sys/devices/virtual/smc/loopback-ism/active
+  to activate or deactivate the loopback-ism.
+- Patch #9: introduce the statistics of loopback-ism by
+  /sys/devices/virtual/smc/loopback-ism/{{tx|rx}_tytes|dmbs_cnt}.
+- Some minor changes and comments improvements.
+
+[1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+[2] https://lore.kernel.org/netdev/20231219142616.80697-1-guwen@linux.alibaba.com/
+[3] https://github.com/goldsborough/ipc-bench
+[4] https://lore.kernel.org/all/3189e342-c38f-6076-b730-19a6efd732a5@linux.alibaba.com/
+[5] https://lore.kernel.org/all/238e63cd-e0e8-4fbf-852f-bc4d5bc35d5a@linux.alibaba.com/
+[6] https://lore.kernel.org/all/20240102184633.748113-1-urezki@gmail.com/
+
+Wen Gu (11):
+  net/smc: adapt SMC-D device dump for Emulated-ISM
+  net/smc: decouple ism_client from SMC-D DMB registration
+  net/smc: introduce loopback-ism for SMC intra-OS shortcut
+  net/smc: implement ID-related operations of loopback-ism
+  net/smc: implement some unsupported operations of loopback-ism
+  net/smc: implement DMB-related operations of loopback-ism
+  net/smc: register loopback-ism into SMC-D device list
+  net/smc: add operations to merge sndbuf with peer DMB
+  net/smc: attach or detach ghost sndbuf to peer DMB
+  net/smc: adapt cursor update when sndbuf and peer DMB are merged
+  net/smc: implement DMB-merged operations of loopback-ism
+
+ drivers/s390/net/ism_drv.c |   2 +-
+ include/net/smc.h          |   7 +-
+ net/smc/Kconfig            |  13 +
+ net/smc/Makefile           |   2 +-
+ net/smc/af_smc.c           |  28 ++-
+ net/smc/smc_cdc.c          |  58 ++++-
+ net/smc/smc_cdc.h          |   1 +
+ net/smc/smc_core.c         |  61 ++++-
+ net/smc/smc_core.h         |   1 +
+ net/smc/smc_ism.c          |  71 +++++-
+ net/smc/smc_ism.h          |   5 +
+ net/smc/smc_loopback.c     | 469 +++++++++++++++++++++++++++++++++++++
+ net/smc/smc_loopback.h     |  52 ++++
+ 13 files changed, 741 insertions(+), 29 deletions(-)
+ create mode 100644 net/smc/smc_loopback.c
+ create mode 100644 net/smc/smc_loopback.h
+
 -- 
-2.43.2
+2.32.0.3.g01195cf9f
 
 
