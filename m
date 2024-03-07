@@ -1,65 +1,54 @@
-Return-Path: <netdev+bounces-78227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68F3D8746FB
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:54:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D2E68746FF
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:57:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB7E72859B3
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 03:54:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80EB32833A3
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 03:57:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1721910A34;
-	Thu,  7 Mar 2024 03:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE71107A0;
+	Thu,  7 Mar 2024 03:57:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NpIiOPLI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="frLLRRI7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D6C17EF;
-	Thu,  7 Mar 2024 03:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC8DE634
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 03:57:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709783642; cv=none; b=jzsuN1X3RJXhLIno9uzzqXl0Fm8tXI0MqQI6s7hHa2j8Bcv/3Hmqvk4Z6HksR+249FbF44h0MZNnTC1q3hbFdsu3/9KIgvbrovuwxqMO5BQuomHUWB+bm+WPZGAC+JqIloMNL530EgBXUfRSZlau8Ug5UEmW1v3ZqtEKimqtmrw=
+	t=1709783848; cv=none; b=YS/8bY5CXoRT6Uc+O20O0lKSoN7jRv/UBvZl2+N5mZlJCSpnYhhh5gPgCHBi1YsA/pwt6i3A3OqZ549Vjxo9PxhBEwc1tUsi/O71c9gwIzZeOkJBciu8F1ob6zovsEUS1rBGJ6URFLvwjiErcd16wPM64MhooIMPaDUd9YTYj64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709783642; c=relaxed/simple;
-	bh=iSpHqEag2Fld1WLfW4PXYjSa646zc+x1ABtd6XNLjsU=;
+	s=arc-20240116; t=1709783848; c=relaxed/simple;
+	bh=Y26aSEmErH/XB3xGI32wpwBip+1x2Rb56/F5Geiv3lI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H6D6UIi7IPuXa5cBwYPoZtVszo/A+ordgVP5hZhX/BLOjDdwpjI+l2hMikeCQH95fGa8LkkCuPx5dY0896p8khqAfoEEr2tvvFOg5PQCs4W9gVcQulybPJvLohh02zup7J5fxkIxKydzR48zvws35ljOOJNnVIClNnvkdjYmDy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NpIiOPLI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2CABC433C7;
-	Thu,  7 Mar 2024 03:54:00 +0000 (UTC)
+	 MIME-Version:Content-Type; b=tYiZt8Av022tzMX1YTdOcQMRyPx5buoQb8yaHGG/rTfhrH80RTP/Ot8agLcQUbsWD9eOI2XmHgtj7TaiyyOy2ldk3zcNjjZoTwBjfk0jGVt4Pbh7BorBQ0/9XISy6KVnBfSWP/if2J3UKf9xTmOzdf+AdjOtCaDWGw7UsoiDKCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=frLLRRI7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49EE6C433F1;
+	Thu,  7 Mar 2024 03:57:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709783641;
-	bh=iSpHqEag2Fld1WLfW4PXYjSa646zc+x1ABtd6XNLjsU=;
+	s=k20201202; t=1709783847;
+	bh=Y26aSEmErH/XB3xGI32wpwBip+1x2Rb56/F5Geiv3lI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NpIiOPLI/8nsHeQhmmwcc6IgmuKb/seG+hgs5nmxnNsIaX8JeS0rW7/fzwPSOK+tO
-	 r2amgOahfzA9gG9tDDHCffVjSjI4XJurNCxyxqxMMn8HoC4A/4vaZy+0t3HJwEkMhk
-	 UPQM/VcK3PFuT/G+6itsuu0V0L2QYzzWmq1GkbafHtDaqcDX15EGC3afepvt0gT8vs
-	 XQ7HXyl/8sXobX5PpbbYtRzrPmeTxag8y0dNwcbI+kQaAz8tstVuE+ppweiFmUdF9K
-	 I0I6fWZu2OVkEsI3UZ0qP0t9ALRFE0y8nbzJfF0D+TvlvcJu4n5zQx1Kstq7h4LE1q
-	 g/MawhybuI/kQ==
-Date: Wed, 6 Mar 2024 19:53:59 -0800
+	b=frLLRRI7xH4ottelCbgbKdXai/IfVdGdfICxGjwRliJ5dAVwpBROvfVEUWVjXzW+S
+	 dfMuBkyG9bKeoui3hSyHVKJ+UzjUBzRWVliJ5Ry7Qz0tHK3c8u6K9tY+23Wjni8aTx
+	 VRcx5o+bc4LIuCzZTT4Xoij06Ulk6yohPDfM5bd8y01Ry+NYkWj721vvGrhXtHMMtW
+	 /FHvUtbQPXeomccIXpz+Rmj9Yk2hMAVkO6qvoXGYiAAnIpK7UEQVmfv51wYfAp2nde
+	 JDI7T6V+y7X71CXOalGp09GCKHSBfFHR9IYASyDkAYPWMpejAVuSN2qlBBEBmx/xu9
+	 t+glcDZmUIdUA==
+Date: Wed, 6 Mar 2024 19:57:26 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
- "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
- "dsahern@kernel.org" <dsahern@kernel.org>, "steffen.klassert@secunet.com"
- <steffen.klassert@secunet.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
- "edumazet@google.com" <edumazet@google.com>, "almasrymina@google.com"
- <almasrymina@google.com>, Leon Romanovsky <leonro@nvidia.com>, Gal Pressman
- <gal@nvidia.com>, "Anatoli.Chechelnickiy@m.interpipe.biz"
- <Anatoli.Chechelnickiy@m.interpipe.biz>, "ian.kumlien@gmail.com"
- <ian.kumlien@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH v2] net: esp: fix bad handling of pages from
- page_pool
-Message-ID: <20240306195359.1afb26d2@kernel.org>
-In-Reply-To: <9ac9ffa9d11907dcb4a300bf4e81545b7acc40d6.camel@nvidia.com>
-References: <20240306190822.390086-1-dtatulea@nvidia.com>
-	<9ac9ffa9d11907dcb4a300bf4e81545b7acc40d6.camel@nvidia.com>
+To: Ben Greear <greearb@candelatech.com>
+Cc: netdev <netdev@vger.kernel.org>
+Subject: Re: Process level networking stats.
+Message-ID: <20240306195726.11a981cb@kernel.org>
+In-Reply-To: <a76c79ce-8707-f9be-14fe-79e7728f9225@candelatech.com>
+References: <a76c79ce-8707-f9be-14fe-79e7728f9225@candelatech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,39 +58,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 6 Mar 2024 19:09:58 +0000 Dragos Tatulea wrote:
-> > Changes in v2:
-> > - Added napi_page_unref api based on discussion in v1 [0].
-> > 
-> > [0]https://lore.kernel.org/netdev/CAHS8izOoO-EovwMwAm9tLYetwikNPxC0FKyVGu1TPJWSz4bGoA@mail.gmail.com/T/#t
-> >   
-> Jakub, are you sure that it is ok to have all this in a single patch?
+On Wed, 6 Mar 2024 14:57:55 -0800 Ben Greear wrote:
+> I am interested in a relatively straight-forward way to know the tx/rx bytes
+> sent/received by a process. 
 
-Yup.
-
-> > ---
-> >  include/linux/skbuff.h | 10 +++++++---
-> >  net/ipv4/esp4.c        | 16 ++++++++++------
-> >  net/ipv6/esp6.c        | 16 ++++++++++------
-> >  3 files changed, 27 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> > index 696e7680656f..009603db2a43 100644
-> > --- a/include/linux/skbuff.h
-> > +++ b/include/linux/skbuff.h
-> > @@ -3453,10 +3453,8 @@ int skb_cow_data_for_xdp(struct page_pool *pool, struct sk_buff **pskb,
-> >  bool napi_pp_put_page(struct page *page, bool napi_safe);
-> >  
-> >  static inline void
-> > -napi_frag_unref(skb_frag_t *frag, bool recycle, bool napi_safe)
-> > +napi_page_unref(struct page *page, bool recycle, bool napi_safe)
-
-I'd call it skb_page_unref()
-
-The napi_ prefix will just confuse people, because we don't have to be
-in NAPI context at all when calling this. As long as "napi_safe" is
-correctly set to false.  So let's use skb_ as the prefix.
-
-And I'd pass skb to this, not "bool recycle" so that the caller doesn't
-have to know the weird details..
+What is "relatively straight-forward"? :)
+You could out the process in a cgroup and use cgroup hooks
 
