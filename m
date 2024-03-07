@@ -1,91 +1,168 @@
-Return-Path: <netdev+bounces-78484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C48668754C5
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 18:01:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F098754D7
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 18:08:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 641B51F2286F
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:01:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE479284C9E
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FDDA12FF94;
-	Thu,  7 Mar 2024 17:01:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018ED12FF9B;
+	Thu,  7 Mar 2024 17:08:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V05fzXYX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KEWhWjVK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E89F912FF7C;
-	Thu,  7 Mar 2024 17:01:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDBF612DDBE;
+	Thu,  7 Mar 2024 17:08:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709830908; cv=none; b=o0gxhTx+Y1BWLGRrVxMd6iaoMTZ1NgoaT6OnSpIV2KXvoZTC6txKHcH1jm/leaRuGUMkUdk0LnpXrYKRW8tG90PWqZa5LkxbUUKzw6JhtA79/HDgeEvzKYJAvmwlT3asZMQm7VsUGuSdeD7afwoQw51tIr2FyAeydyGVsU1dM2s=
+	t=1709831321; cv=none; b=Dftxcn9d8SRIPH+AZFBAa3FMuTG39Wi/+v8KWyu/EMuSN2xcBsS+gmTxJ1VR0T0PhU6JngkQzYJKbf8OCQOwQM9pCNHZJ3Cy23qdDPxoMjd3a59kGErux7uDiW4DJ13UzzHeyMG5GA5OIetrCPy+QfM0d+PdqHHqmCcB6q/fmHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709830908; c=relaxed/simple;
-	bh=7G4vPcy1mVijMS9YptzTs4Sy9VY1PByVCAyawRbldZo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ttkpggNCg8EBOJC0M5fVV4tc32asURq42SX8MhOMW4ej1N/rLBfKUFc1omxgCsBc7WVFO0re9+td2aZcjVcmgzRkLSeenhH4r1xbBm3jebj+c5lmVtlGRf57mcusf4qW95YLojCjGcNp2P9cul9SE9yerw0i4v/bg22bZTm7VzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V05fzXYX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94FAEC433F1;
-	Thu,  7 Mar 2024 17:01:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709830907;
-	bh=7G4vPcy1mVijMS9YptzTs4Sy9VY1PByVCAyawRbldZo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=V05fzXYXPZJtUZZkphCUMCbcmNTYxpe5srx+UWvP1T0xxlIrhwkrlFqnCihMnLfRw
-	 mW1+jEfwzbc4uzz672NEfHJ9q1yUTmrzpvdawpMZVsM8khCyt6WqHDK4tMQh/5/0Dz
-	 3P17nayM+w019SlqInHJRrmrRbVc6NnC/xg3Cu8XeVHkJhSDGEb7noBhMAWOCJlpzf
-	 t6xm9DHf4fX+IkQPD4l7qkm8Uz64u/6vBJIozxfdHxS/sB1D50E1cRzyTyWLCEOlNB
-	 nx8x8+trQODCI8eFY2DxsbuF2pEfMFl1LJHkxlHrLyzplpH/sapqinQqOBnfXgc9NA
-	 5n+MloVbNUYBg==
-Date: Thu, 7 Mar 2024 09:01:45 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>, Shradha Gupta
- <shradhagupta@microsoft.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
- <linux-hyperv@vger.kernel.org>, "linux-rdma@vger.kernel.org"
- <linux-rdma@vger.kernel.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Ajay Sharma <sharmaajay@microsoft.com>, Leon
- Romanovsky <leon@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, KY Srinivasan
- <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
- <decui@microsoft.com>, Long Li <longli@microsoft.com>, Michael Kelley
- <mikelley@microsoft.com>
-Subject: Re: [PATCH] net :mana : Add per-cpu stats for MANA device
-Message-ID: <20240307090145.2fc7aa2e@kernel.org>
-In-Reply-To: <DM6PR21MB14817597567C638DEF020FE3CA202@DM6PR21MB1481.namprd21.prod.outlook.com>
-References: <1709823132-22411-1-git-send-email-shradhagupta@linux.microsoft.com>
-	<20240307072923.6cc8a2ba@kernel.org>
-	<DM6PR21MB14817597567C638DEF020FE3CA202@DM6PR21MB1481.namprd21.prod.outlook.com>
+	s=arc-20240116; t=1709831321; c=relaxed/simple;
+	bh=JXl2uazT63Iyfp3B6864Ck7/1RQX0rkbSuPryxHAo0Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=loCZEV8HoQeUjiveMgdc/zVgZOmVfWvQzc1Ek3vV6/WIbl6WL99Ruebk+Rj0uvKtqHNneK7V43E+1WXHEkBQ6t8DV641PSXne9PAdRJQICzPvdGCj49uefx5gUNX4mYuM6WGR9tQVukS1GPWoWPxCEDI8rjTDjm2EfJ+qveDO1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KEWhWjVK; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5k0dUR2rE2fxeaqvwbqJwiFlYYiMm6GdJ7apm0o5Iao=; b=KEWhWjVKEPumuzv+FC9Okoz2rs
+	sFQizONg4p1DYUBmD7SY/D7PHP2LWvDMYhY4s1W381ZZsl7MiX1oJHkBcEe/jjLKYhN7XBgv/tY6N
+	n24mGeuswskJ2SFIpb0Kc3GglnZXQM7ne/YzhuyCW6er60H3yukn3ZevfzRcTKofH2zk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1riHEi-009bZV-K1; Thu, 07 Mar 2024 18:08:52 +0100
+Date: Thu, 7 Mar 2024 18:08:52 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
+	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, corbet@lwn.net,
+	linux-doc@vger.kernel.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
+	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
+	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
+	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
+	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
+	benjamin.bigler@bernformulastudent.ch
+Subject: Re: [PATCH net-next v3 08/12] net: ethernet: oa_tc6: implement
+ transmit path to transfer tx ethernet frames
+Message-ID: <208fb61b-4740-46bf-8c70-29ab59cbb965@lunn.ch>
+References: <20240306085017.21731-1-Parthiban.Veerasooran@microchip.com>
+ <20240306085017.21731-9-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240306085017.21731-9-Parthiban.Veerasooran@microchip.com>
 
-On Thu, 7 Mar 2024 15:49:15 +0000 Haiyang Zhang wrote:
-> > > Extend 'ethtool -S' output for mana devices to include per-CPU packet
-> > > stats  
-> > 
-> > But why? You already have per queue stats.  
-> Yes. But the q to cpu binding is dynamic, we also want the per-CPU stat 
-> to analyze the CPU usage by counting the packets and bytes on each CPU.
+> @@ -55,6 +77,14 @@
+>  						(OA_TC6_CTRL_MAX_REGISTERS *\
+>  						OA_TC6_CTRL_REG_VALUE_SIZE) +\
+>  						OA_TC6_CTRL_IGNORED_SIZE)
+> +#define OA_TC6_CHUNK_PAYLOAD_SIZE		64
+> +#define OA_TC6_DATA_HEADER_SIZE			4
+> +#define OA_TC6_CHUNK_SIZE			(OA_TC6_DATA_HEADER_SIZE +\
+> +						OA_TC6_CHUNK_PAYLOAD_SIZE)
+> +#define OA_TC6_TX_SKB_QUEUE_SIZE		100
 
-Dynamic is a bit of an exaggeration, right? On a well-configured system
-each CPU should use a single queue assigned thru XPS. And for manual
-debug bpftrace should serve the purpose quite well.
+So you keep up to 100 packets in a queue. If use assume typical MTU
+size packets, that is 1,238,400 bits. At 10Mbps, that is 120ms of
+traffic. That is quite a lot of latency when a high priority packet is
+added to the tail of the queue and needs to wait for all the other
+packets to be sent first.
 
-Please note that you can't use num_present_cpus() to size stats in
-ethtool -S , you have to use possible_cpus(), because the retrieval
-of the stats is done in a multi-syscall fashion and there are no
-explicit lengths in the API. So you must always report all possible
-stats, not just currently active :(
+Chunks are 64 bytes. So in practice, you only ever need two
+packets. You need to be able to fill a chunk with the final part of
+one packet, and the beginning of the next. So i would try using a much
+smaller queue size. That will allow Linux queue disciplines to give
+you the high priority packets first which you send with low latency.
+
+> +static void oa_tc6_add_tx_skb_to_spi_buf(struct oa_tc6 *tc6)
+> +{
+> +	enum oa_tc6_data_start_valid_info start_valid = OA_TC6_DATA_START_INVALID;
+> +	enum oa_tc6_data_end_valid_info end_valid = OA_TC6_DATA_END_INVALID;
+> +	__be32 *tx_buf = tc6->spi_data_tx_buf + tc6->spi_data_tx_buf_offset;
+> +	u16 remaining_length = tc6->tx_skb->len - tc6->tx_skb_offset;
+> +	u8 *tx_skb_data = tc6->tx_skb->data + tc6->tx_skb_offset;
+> +	u8 end_byte_offset = 0;
+> +	u16 length_to_copy;
+> +
+> +	/* Set start valid if the current tx chunk contains the start of the tx
+> +	 * ethernet frame.
+> +	 */
+> +	if (!tc6->tx_skb_offset)
+> +		start_valid = OA_TC6_DATA_START_VALID;
+> +
+> +	/* If the remaining tx skb length is more than the chunk payload size of
+> +	 * 64 bytes then copy only 64 bytes and leave the ongoing tx skb for
+> +	 * next tx chunk.
+> +	 */
+> +	length_to_copy = min_t(u16, remaining_length, OA_TC6_CHUNK_PAYLOAD_SIZE);
+> +
+> +	/* Copy the tx skb data to the tx chunk payload buffer */
+> +	memcpy(tx_buf + 1, tx_skb_data, length_to_copy);
+> +	tc6->tx_skb_offset += length_to_copy;
+
+You probably need a call to skb_linearize() somewhere. You assume the
+packet data is contiguous. It can in fact be split into multiple
+segments. skb_linearize() will convert it to a single buffer.
+
+> +static int oa_tc6_try_spi_transfer(struct oa_tc6 *tc6)
+> +{
+> +	int ret;
+> +
+> +	while (true) {
+> +		u16 spi_length = 0;
+> +
+> +		tc6->spi_data_tx_buf_offset = 0;
+> +
+> +		if (tc6->tx_skb || !skb_queue_empty(&tc6->tx_skb_q))
+> +			spi_length = oa_tc6_prepare_spi_tx_buf_for_tx_skbs(tc6);
+> +
+> +		if (spi_length == 0)
+> +			break;
+> +
+> +		ret = oa_tc6_spi_transfer(tc6, OA_TC6_DATA_HEADER, spi_length);
+> +		if (ret) {
+> +			netdev_err(tc6->netdev,
+> +				   "SPI data transfer failed. Restart the system: %d\n",
+> +				   ret);
+
+What does Restart the system mean?
+
+> +static int oa_tc6_spi_thread_handler(void *data)
+> +{
+> +	struct oa_tc6 *tc6 = data;
+> +	int ret;
+> +
+> +	while (likely(!kthread_should_stop())) {
+> +		/* This kthread will be waken up if there is a tx skb */
+> +		wait_event_interruptible(tc6->spi_wq,
+> +					 !skb_queue_empty(&tc6->tx_skb_q) ||
+> +					 kthread_should_stop());
+> +		ret = oa_tc6_try_spi_transfer(tc6);
+
+Shouldn't you check why you have been woken up? It seems more logical
+to test here for kthread_should_stop() rather than have
+oa_tc6_try_spi_transfer() handle there is not actually a packet to be
+sent.
+
+	Andrew
 
