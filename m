@@ -1,65 +1,64 @@
-Return-Path: <netdev+bounces-78439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 337398751C1
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 15:25:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 291C98751B7
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 15:24:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FD401C21D56
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:25:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8E4F281D8E
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:24:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7989512FB3C;
-	Thu,  7 Mar 2024 14:23:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA7D12E1C4;
+	Thu,  7 Mar 2024 14:23:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="CSKC6bon"
+	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="KaI0YFnB"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18F412F398;
-	Thu,  7 Mar 2024 14:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26C512DD9D;
+	Thu,  7 Mar 2024 14:23:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.244.183.115
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709821437; cv=none; b=WJzlJUUEl/OH+mHmMmZ/vAplUwQvv3TlSmTceJTlqViv3VPpFXwSSlCvHetjdy0Ck69iiEaLdxnaf908+C7aDpoQhgDo9Psf6+4BbBm+xvW+9V3qT0WmbHvtVPhRt0szabn015U5QvjsnrcQbkLlUrVvYh6TrCIuAw9bh50DThg=
+	t=1709821434; cv=none; b=g47yxNeQ1np9TDMKLsdDV8TFIH1WuwgNCxX/TgJOxiEidhOeDxJ4tMtxiKyVeQsQqnJ2HporFi1tBmhFUXdHmXBDICxb+al95pmyQFSAFxVa/+Jr0hDbrT293IGH/otgHTHEl3unTw4KCLEOFuQyUw14rUzHisMdKZyFE4XyvWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709821437; c=relaxed/simple;
-	bh=vtO1NLo5DUmetb6YbznmKN592S3ILscEX8TxvmHk+mM=;
+	s=arc-20240116; t=1709821434; c=relaxed/simple;
+	bh=ChQXRpwQELyvHAFX/iadZ4yeeIBqSARJLP39NfiniaQ=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=JhoV89O2m5DPjF2IyHNii1qKoTKDe3DX4Shy+lBv2g2MvJ40qvXWAOblkBRZAGVeSH0a7/uwrBMBkHDG6dpFxgnzt9eY2M9gMf54WRruOg8Z4SiDKBkvcDhr55aumHBPB01tKEZjYYRJODR5AZEZtKLWBTubLs8E/mCjkB47bbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=CSKC6bon; arc=none smtp.client-ip=91.244.183.115
+	 Content-Type:MIME-Version; b=L7/yjUFtpNgo6rVPT8Ho3u5qSyJCQmUjRlAD+5Z5Zd1jabZBAcB2vQy2ZB1nuaDaWQ+S6JCo4h0iYfrEbb7tr/Bz38E116JlYalNp4DxAvh3lnUb/Lp4p+dYWTVx17XDpOhiHVNo5xZ4ixZ7BftuFz0O7PTHO5JNOkqiYl+cR/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=KaI0YFnB; arc=none smtp.client-ip=91.244.183.115
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infotecs.ru
 Received: from mx0.infotecs-nt (localhost [127.0.0.1])
-	by mx0.infotecs.ru (Postfix) with ESMTP id 645FA14CD2C1;
-	Thu,  7 Mar 2024 17:23:51 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru 645FA14CD2C1
+	by mx0.infotecs.ru (Postfix) with ESMTP id C7DF914CD2A0;
+	Thu,  7 Mar 2024 17:23:50 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru C7DF914CD2A0
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
-	t=1709821431; bh=TH5DEcHLIXFsRrfmZsIlzESb7JbDicH3qRJLGnlj6io=;
+	t=1709821431; bh=JlK7qCntpJ/p8v06/wnF7QlyRzkrv0bD0v63q5kAbLQ=;
 	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=CSKC6bonPljDwT3yx3aRwX2VOnIFebvFMfc8W3Je1y75GndH5uCu9+Qm5tULHif98
-	 ExnPzMWxYYjLPEmSQoo6dgI5+fwQSyGVs4XIJ+wuVLyob84qrQZOuCh6ysmRF50htN
-	 zM/YIQMiAvcFzinAbhKliDCNSXfMk2LeMLlf3INw=
+	b=KaI0YFnBZFhtKtNC82wEzOLMnENDbn71eu2VlZYqsZUi/Fwd/XUUOf8Cq/RkxdL6j
+	 vA6iIwOfzmHNwcaqMc2+bbPzw+Tr8c83faAcKg1m+7Ci3s6MlURQq/Cbnwr62tBGbP
+	 Su8XlyTdaKq3p3y3NkmhUpv8M0KNW7NqQY/O7Dpc=
 Received: from msk-exch-02.infotecs-nt (msk-exch-02.infotecs-nt [10.0.7.192])
-	by mx0.infotecs-nt (Postfix) with ESMTP id 60E2231923B0;
-	Thu,  7 Mar 2024 17:23:51 +0300 (MSK)
+	by mx0.infotecs-nt (Postfix) with ESMTP id C5CC431923B6;
+	Thu,  7 Mar 2024 17:23:50 +0300 (MSK)
 From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-To: Martin Schiller <ms@dev.tdt.de>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	"linux-x25@vger.kernel.org" <linux-x25@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
-Subject: [PATCH net-next v2 6/6] net/x25: fix incorrect parameter validation
- in the x25_getsockopt() function
-Thread-Topic: [PATCH net-next v2 6/6] net/x25: fix incorrect parameter
- validation in the x25_getsockopt() function
-Thread-Index: AQHacJsTcTQB2aBL6kWXuOtcpnTzVg==
+To: "David S. Miller" <davem@davemloft.net>
+CC: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Simon
+ Horman" <horms@kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "lvc-project@linuxtesting.org"
+	<lvc-project@linuxtesting.org>
+Subject: [PATCH net-next v2 3/6] ipmr: fix incorrect parameter validation in
+ the ip_mroute_getsockopt() function
+Thread-Topic: [PATCH net-next v2 3/6] ipmr: fix incorrect parameter validation
+ in the ip_mroute_getsockopt() function
+Thread-Index: AQHacJsTKFrMydi/2ECGLiuYnS8e1w==
 Date: Thu, 7 Mar 2024 14:23:50 +0000
-Message-ID: <20240307142030.2708698-7-Ilia.Gavrilov@infotecs.ru>
+Message-ID: <20240307142030.2708698-4-Ilia.Gavrilov@infotecs.ru>
 References: <20240307142030.2708698-1-Ilia.Gavrilov@infotecs.ru>
 In-Reply-To: <20240307142030.2708698-1-Ilia.Gavrilov@infotecs.ru>
 Accept-Language: ru-RU, en-US
@@ -83,39 +82,39 @@ X-KLMS-AntiPhishing: Clean, bases: 2024/03/07 13:22:00
 X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2024/03/07 10:14:00 #24028863
 X-KLMS-AntiVirus-Status: Clean, skipped
 
-The 'len' variable can't be negative when assigned the result of
+The 'olr' variable can't be negative when assigned the result of
 'min_t' because all 'min_t' parameters are cast to unsigned int,
 and then the minimum one is chosen.
 
-To fix the logic, check 'len' as read from 'optlen',
+To fix the logic, check 'olr' as read from 'optlen',
 where the types of relevant variables are (signed) int.
 
 Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 Signed-off-by: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
 ---
- net/x25/af_x25.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+V2:
+ - reword the patch description
+ net/ipv4/ipmr.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/x25/af_x25.c b/net/x25/af_x25.c
-index f7a7c7798c3b..d18d51412cc0 100644
---- a/net/x25/af_x25.c
-+++ b/net/x25/af_x25.c
-@@ -460,12 +460,12 @@ static int x25_getsockopt(struct socket *sock, int le=
-vel, int optname,
- 	if (get_user(len, optlen))
- 		goto out;
+diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+index 362229836510..b53c36c473a5 100644
+--- a/net/ipv4/ipmr.c
++++ b/net/ipv4/ipmr.c
+@@ -1603,9 +1603,11 @@ int ip_mroute_getsockopt(struct sock *sk, int optnam=
+e, sockptr_t optval,
 =20
--	len =3D min_t(unsigned int, len, sizeof(int));
--
- 	rc =3D -EINVAL;
- 	if (len < 0)
- 		goto out;
-=20
-+	len =3D min_t(unsigned int, len, sizeof(int));
+ 	if (copy_from_sockptr(&olr, optlen, sizeof(int)))
+ 		return -EFAULT;
+-	olr =3D min_t(unsigned int, olr, sizeof(int));
+ 	if (olr < 0)
+ 		return -EINVAL;
 +
- 	rc =3D -EFAULT;
- 	if (put_user(len, optlen))
- 		goto out;
++	olr =3D min_t(unsigned int, olr, sizeof(int));
++
+ 	if (copy_to_sockptr(optlen, &olr, sizeof(int)))
+ 		return -EFAULT;
+ 	if (copy_to_sockptr(optval, &val, olr))
 --=20
 2.39.2
 
