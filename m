@@ -1,71 +1,49 @@
-Return-Path: <netdev+bounces-78313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC769874AE0
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:31:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9667B874AE8
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:33:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75AE8287D26
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:31:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3727FB230A8
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:33:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 284B7839FD;
-	Thu,  7 Mar 2024 09:31:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B75F83A11;
+	Thu,  7 Mar 2024 09:33:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A16142044
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 09:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F48C42047;
+	Thu,  7 Mar 2024 09:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709803883; cv=none; b=nCvV8FIw+g8M1a1ptmxbKw15UvzRL+zEDdUpewDqwem/rlYETkTzG6WEJE+nJxcjNMrdEHSsIf0bfeRwjKiDG3qRelePA5bosRS8GUvZ4voC+3Z5KWO5qQNe8qbZn5b6eABXiJ8GtEu9uK+mpW20kN30EcOaFx6DQv6tV6sl9wQ=
+	t=1709804006; cv=none; b=PznqXD0k8RUxWMQenmgz7PVK018TnJaja5XRR/FulNJR2pbVqnjE0f1Qyno5mLVYtu1RWae9hviCq8bvaJGYoBTdK4Pejc92GE5iz5bLbfK5JqnZFI4lAqD/NKvdJINErO/YA0AHsyvHpGwHbda+krFNysBRY1cLL2qE1GqTShQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709803883; c=relaxed/simple;
-	bh=ocCX6usaz8QdfkRCgd1MS9hwZTu/JQeu3kQGFhIWJaI=;
+	s=arc-20240116; t=1709804006; c=relaxed/simple;
+	bh=I1Omnfc692Sx83UTzgWLksTLou/ItHvR6ZJVyogwNMQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fX5h+IwYMymYXco3/2qclhEkGfApqvu3mOxIA1pp77NlPKWl1W6dR65QIbw1uxAvcbZ5UXpSAno+N9ts39cCWZSdqBnRb+sst84NfQ0ZrqGfvVT34wZvcifVKhKHERc67khubxvgnDbWZUSAO5JWbgoZHHJVVhsteuNPaYJYq24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d311081954so6544251fa.2
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 01:31:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709803880; x=1710408680;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=txzqTrLakv/r2+E61MB9WWywMRbCkC28EGRtkqu1OMU=;
-        b=aOBXTbuUuDIPJ5CxldwgrhCmx7YBM7pK4zDYYWLU663jP01HiHIQP2rtVO4zp54nDq
-         ltEMB3Au9QSio6gurdeOpft6ov3zzp/BI1Ji5TThn890oUvjUhI6d+xwyyY+IPmydStb
-         5J+kmWXLha1oNCqg3MXINZZ0y5Hkp6ddL+3wgLDl25pKyfcibWqYzSS29JC0FRoEu4fe
-         KabtWuShMbR06/JR79u1xZFBwd7b9fo8YtPX65J/H32ws7JfoX47gexSQ39vruBTrz9y
-         X7rilrVbVTO05K3RPGiX0G6d3Rrnmoxz4SzUsQQaWphQkvLeaCOI0I3u9aDG09nYKQ9n
-         MeyA==
-X-Gm-Message-State: AOJu0YxWWkD7I3Vk2v0aO74hIztiR4hPB2v9jpuiEZVbg9tNM9U4c79U
-	vcMBjb1QQB30htfVG3kXOtPwevii8aFmAjhzt/CKlqjs9SVGvsKG
-X-Google-Smtp-Source: AGHT+IHRL11Dv+iss/kO4aZWDBMFOn3vTcpZatBr5LSm/2gmbU7//LBjCZsU3cqCUyOTxsSxSacljA==
-X-Received: by 2002:a05:651c:220c:b0:2d3:36d6:aeae with SMTP id y12-20020a05651c220c00b002d336d6aeaemr1126802ljq.5.1709803879495;
-        Thu, 07 Mar 2024 01:31:19 -0800 (PST)
-Received: from gmail.com (fwdproxy-lla-120.fbsv.net. [2a03:2880:30ff:78::face:b00c])
-        by smtp.gmail.com with ESMTPSA id p8-20020a05640243c800b00567fd12c7f8sm1130900edc.60.2024.03.07.01.31.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Mar 2024 01:31:19 -0800 (PST)
-Date: Thu, 7 Mar 2024 01:31:16 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Donald Hunter <donald.hunter@gmail.com>, kuba@kernel.org
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>, Stanislav Fomichev <sdf@google.com>,
-	donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v3 2/6] tools/net/ynl: Report netlink errors
- without stacktrace
-Message-ID: <ZemJZPySuUyGlMTu@gmail.com>
-References: <20240306231046.97158-1-donald.hunter@gmail.com>
- <20240306231046.97158-3-donald.hunter@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=eANAyJipgwMGtyWdeNSGPz0uGpIVhd66OAmoDSLjlK/zE3lNuaJ7XOkVyffHOdHD+8U9DVuBNPciEW6b1dpelcW7Az9hieevxDi0vkF+X0vq36lRXHpouiu3tC08oFdd02sBtE8cZ+dH0KLhc2hj9y4Wvb3HvO1IZNfH4+d+zqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1riA7i-0005hU-0g; Thu, 07 Mar 2024 10:33:10 +0100
+Date: Thu, 7 Mar 2024 10:33:10 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: edumazet@google.com, pablo@netfilter.org, kadlec@netfilter.org,
+	fw@strlen.de, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next] netfilter: conntrack: avoid sending RST to
+ reply out-of-window skb
+Message-ID: <20240307093310.GI4420@breakpoint.cc>
+References: <20240307090732.56708-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,51 +52,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240306231046.97158-3-donald.hunter@gmail.com>
+In-Reply-To: <20240307090732.56708-1-kerneljasonxing@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Hello Donald,
-
-On Wed, Mar 06, 2024 at 11:10:42PM +0000, Donald Hunter wrote:
-> ynl does not handle NlError exceptions so they get reported like program
-> failures. Handle the NlError exceptions and report the netlink errors
-> more cleanly.
+Jason Xing <kerneljasonxing@gmail.com> wrote:
+> client_ip:client_port <--> server_ip:b_port
 > 
-> Example now:
+> Then, some strange skbs from client or gateway, say, out-of-window
+> skbs are sent to the server_ip:a_port (not b_port) due to DNAT
+> clearing skb->_nfct value in nf_conntrack_in() function. Why?
+> Because the tcp_in_window() considers the incoming skb as an
+> invalid skb by returning NFCT_TCP_INVALID.
+
+So far everything is as intended.
+
+> I think, even we have set DNAT policy, it would be better if the
+> whole process/behaviour adheres to the original TCP behaviour.
 > 
-> Netlink error: No such file or directory
-> nl_len = 44 (28) nl_flags = 0x300 nl_type = 2
-> 	error: -2	extack: {'bad-attr': '.op'}
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  net/netfilter/nf_conntrack_proto_tcp.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
 > 
-> Example before:
-> 
-> Traceback (most recent call last):
->   File "/home/donaldh/net-next/./tools/net/ynl/cli.py", line 81, in <module>
->     main()
->   File "/home/donaldh/net-next/./tools/net/ynl/cli.py", line 69, in main
->     reply = ynl.dump(args.dump, attrs)
->             ^^^^^^^^^^^^^^^^^^^^^^^^^^
->   File "/home/donaldh/net-next/tools/net/ynl/lib/ynl.py", line 906, in dump
->     return self._op(method, vals, [], dump=True)
->            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->   File "/home/donaldh/net-next/tools/net/ynl/lib/ynl.py", line 872, in _op
->     raise NlError(nl_msg)
-> lib.ynl.NlError: Netlink error: No such file or directory
-> nl_len = 44 (28) nl_flags = 0x300 nl_type = 2
-> 	error: -2	extack: {'bad-attr': '.op'}
+> diff --git a/net/netfilter/nf_conntrack_proto_tcp.c b/net/netfilter/nf_conntrack_proto_tcp.c
+> index ae493599a3ef..3f3e620f3969 100644
+> --- a/net/netfilter/nf_conntrack_proto_tcp.c
+> +++ b/net/netfilter/nf_conntrack_proto_tcp.c
+> @@ -1253,13 +1253,11 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
+>  	res = tcp_in_window(ct, dir, index,
+>  			    skb, dataoff, th, state);
+>  	switch (res) {
+> -	case NFCT_TCP_IGNORE:
+> -		spin_unlock_bh(&ct->lock);
+> -		return NF_ACCEPT;
+>  	case NFCT_TCP_INVALID:
+>  		nf_tcp_handle_invalid(ct, dir, index, skb, state);
+> +	case NFCT_TCP_IGNORE:
+>  		spin_unlock_bh(&ct->lock);
+> -		return -NF_ACCEPT;
+> +		return NF_ACCEPT;
 
-Basically this is just hidding the stack, which may make it harder for
-someone not used to the code to find the problem.
+This looks wrong.  -NF_ACCEPT means 'pass packet, but its not part
+of the connection' (packet will match --ctstate INVALID check).
 
-Usually fatal exception is handled to make the error more meaningful,
-i.e, better than just the exception message + stack. Hidding the stack
-and exitting may make the error less meaningful.
+This change disables most of the tcp_in_window() test, this will
+pretend everything is fine even though tcp_in_window says otherwise.
 
-On a different topic, I am wondering if we want to add type hitting for
-these python program. They make the review process easier, and the
-development a bit more structured. (Maybe that is what we expect from
-upcoming new python code in netdev?!)
+You could:
+ - drop invalid tcp packets in input hook
+ - set nf_conntrack_tcp_be_liberal=1
 
-If that is where we want to go, this is *not*, by any mean, a blocker to
-this code. Maybe something we can add to our public ToDo list (CC:
-Jakub).
+both will avoid this 'rst' issue.
 
