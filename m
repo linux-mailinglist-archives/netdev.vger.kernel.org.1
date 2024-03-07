@@ -1,81 +1,134 @@
-Return-Path: <netdev+bounces-78223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60402874616
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 03:26:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D6418746AF
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:20:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 441161C21462
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 02:26:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D2BA1F25BD1
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 03:20:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D1051FBB;
-	Thu,  7 Mar 2024 02:26:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31DDBDF55;
+	Thu,  7 Mar 2024 03:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y+n6kyrL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XZ2Wm8Q7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6978B1C2D
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 02:26:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48283E576;
+	Thu,  7 Mar 2024 03:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709778381; cv=none; b=G9BwhGnJ68V5orPUP3vBPuDBFUE6R+0u8GMVF/jyaoNad4gv6aNWI7UIeoiKW8qCeHHjvfaxR5OinIS5UTVlihG4u+TS7sXNEfu+ObBrssK5sFFdenO3ASIqMwLDrjkve9RcBG68r5IJI8fyZtzOj++QNzYfj88mBPIiK1UUZT0=
+	t=1709781634; cv=none; b=dkf9rtLYuj0ps8GbpyUVG1hxX3BUiyow5AVy4o3Th7HWb2nenbfY466HGyOj4Etn5SPDqJr9xfxhqt3AAX1gkvel0Q23X+fITOl3P6RI1BnUIMvyh0MMp978KJxsRcHzVm02e2b+6mQ3rtw5U2QvN8/kwF6+m8x9Tg8jWIWDNHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709778381; c=relaxed/simple;
-	bh=liBnoDdr/ufHPtAp499JfDlHm7qj9Q34SpdqUE9U53U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tj/9CQwOqwXpUpUa6tj+x9cItsVhqj+GcF7VbMQljPZLe4Ag9nE1DZZX4X155pe2PSkpseCfPr0K8BbGP0Pg5lf/80ATk77uGAJL9k6bbNZ45gtHsl9Vt5B12kaG78ysSmv7wBRUA6/A8q4mUr5u9AjAlUOQlwDty2VNP8whAtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y+n6kyrL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00633C433C7;
-	Thu,  7 Mar 2024 02:26:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709778381;
-	bh=liBnoDdr/ufHPtAp499JfDlHm7qj9Q34SpdqUE9U53U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Y+n6kyrL1D+RfUKZIJPePSL/SiEU4qcCWohnPHNfu35E73OJ6G6ygGzyUdXc1ol57
-	 z4D++BoHi4nVnjLVZO1ib7JzKO8rlYBxrgG6EwjTvE7cQYrtXqqbszICyyf3oFipfX
-	 pyhTspvuXZ+2esGWydJRMEt69g5KWdJnHJPhezR/a+p/VJs7bP+wFnAvk//prefhci
-	 BPU+03ntYOrMIzHU9xwo1rPNTHIaPrhlFtvLQdgPmYATBqydm4xINr3Id+5ERoMvok
-	 oW4b8QixUM0ZROzwFubxv9xsrFIDJ0k7pdfeG8IGoeq8tsuYvhT8AQqO5hv7OjjHjE
-	 j5zKF5f/sTkuA==
-Date: Wed, 6 Mar 2024 18:26:20 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jacob
- Keller <jacob.e.keller@intel.com>, Jiri Pirko <jiri@resnulli.us>, Stanislav
- Fomichev <sdf@google.com>, donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v3 5/6] doc/netlink: Allow empty enum-name in
- ynl specs
-Message-ID: <20240306182620.5bc5ecc2@kernel.org>
-In-Reply-To: <20240306231046.97158-6-donald.hunter@gmail.com>
-References: <20240306231046.97158-1-donald.hunter@gmail.com>
-	<20240306231046.97158-6-donald.hunter@gmail.com>
+	s=arc-20240116; t=1709781634; c=relaxed/simple;
+	bh=Ti6YAh/NMgGQsnsVPl5LkxAkyP+ZOzDYD3+Aqwls+Fg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ddl7aPBXrA6oKdsulsNHwXqGZZYo8HPkFW1DH6TJuIJOON+aA4RwXOP1BBsStyAX4jlfedTrMeSb7GEArsGQaD/0UI4hoty5pWWwAUGi2GGTRUbeGJRyvGncZB+nI6RHi5oPomaZqGMKs1UJLbI+Wb1JqnfG5lWgtEwBV5a7sq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XZ2Wm8Q7; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-33e122c8598so175362f8f.1;
+        Wed, 06 Mar 2024 19:20:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709781630; x=1710386430; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=08ZvxkU8o27HBaf+3etQV0wPvLqge6KNPGX713iuBK8=;
+        b=XZ2Wm8Q7VcruMaGFm5oy5wbv7NBKD3/50G49ys5PEh5dcVBNF2fdtW5C3V8ZU0bJH6
+         ZtEHUf2SPqhyZ1tHZzTrHl4HXzMrwNZoM9bJTc9aBZBVrmCsB/iB2fvKb8t4mEv9VIzS
+         rmu5Y66a3Lm2O+QX60ARSqdEZ+Hmpe+/RBOoxdVLKYsfoDxT5S0bH8ggU+Uh0cpxSpKx
+         S4vWSs7rSZVJOEo//DPd3zJ649oRiIpZE26J4RW89lFQ/cFuKCE9ASp7FTGVJr1gS3no
+         NjKNHTUbTk2UMDdPVnmqnbyIxsJ6NGJO+/trLLeufVeV0ugH/sEbRlknBZPPYIUe3EJJ
+         dCcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709781630; x=1710386430;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=08ZvxkU8o27HBaf+3etQV0wPvLqge6KNPGX713iuBK8=;
+        b=WK/EscbNUGyCwdz6ANeBtmrfqlRXHXghXDr4FPntKGjWsjwC12GrqSt0bgnnKKqKK9
+         dGylglCetK6zi28AzHpcGejVyzef2gTqt6yyMxWUfV8T2MiyyP9oK4pKyAD1xRsT3mVP
+         EtjgkUtW2ci8Tyypx1MP/w0Fb9Bs/YihJMP1UFdRvS4pUnZKnDWRhNCDybtBj/ZSkQmZ
+         2Vx0RfpPIOmHNfckLa5gWfwEHasQw49/c+BYuE1NDsF3BwTnC5rhgKkEXvthv/NfGjVC
+         4SfGPFMWRxBnY1FgNRFFQQKJ/TAYoOxmefD7NsB6mkCANUJksv3qhNUMkh1w7ZlazWa/
+         txeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUzAVSrwv1AjpbJYwzuSS1tV65g2rISQPhNppilU2aP6N2V4oy0p8YJpNaRGljiv77fj9lBT3sffyZyp7PikFRKljGvciCImDViU8GhJzDqynDwy/hLSqWAa24PlPUJZJdHzhQWtQHssejAlNi1JJ6kbfFW/jEiYxXXviJInm8kd5pcDlnSeyEVKFg6SeFO1K0QZKGnhw==
+X-Gm-Message-State: AOJu0YwRRu+KF5XYOnM64+Svn0cmn0D1Ue/5kUayufVwW2FcJtCBJJQR
+	IFAJcjo8BvEaKSNvtKVnlXjO+vfYuydJ4I77WdSZnXaBq4Ruiw6T6NN76MLQb9PSLjGR0S3PNwF
+	LadhFMOjuUtNc4K2SV0+i6MzBzB/wvoct
+X-Google-Smtp-Source: AGHT+IFjaP2GBdB8DtmUnLCZsfrF61QII3WlzmZDWuRLmnC1wDfvWJwkerifgTREyQcvLifYGD6e/slTjJWDNkjIPMA=
+X-Received: by 2002:adf:b643:0:b0:33d:7385:d929 with SMTP id
+ i3-20020adfb643000000b0033d7385d929mr14853839wre.0.1709781630370; Wed, 06 Mar
+ 2024 19:20:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240307123619.159f1c4c@canb.auug.org.au>
+In-Reply-To: <20240307123619.159f1c4c@canb.auug.org.au>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 6 Mar 2024 19:20:19 -0800
+Message-ID: <CAADnVQKy848BOi42kJh5dDpFsVuyktAgFds3byptANGpOkbXZw@mail.gmail.com>
+Subject: Re: linux-next: manual merge of the bpf-next tree with the mm-stable tree
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Networking <netdev@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>, "Uladzislau Rezki (Sony)" <urezki@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed,  6 Mar 2024 23:10:45 +0000 Donald Hunter wrote:
-> Update the ynl schemas to allow the specification of empty enum names
-> for all enum code generation.
+On Wed, Mar 6, 2024 at 5:36=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.org.=
+au> wrote:
+>
+> Hi all,
+>
+> Today's linux-next merge of the bpf-next tree got a conflict in:
+>
+>   mm/vmalloc.c
+>
+> between commit:
+>
+>   8e1d743f2c26 ("mm: vmalloc: support multiple nodes in vmallocinfo")
+>
+> from the mm-stable tree and commit:
+>
+>   e6f798225a31 ("mm: Introduce VM_SPARSE kind and vm_area_[un]map_pages()=
+.")
+>
+> from the bpf-next tree.
+>
+> I fixed it up (I think - see below) and can carry the fix as necessary.
+> This is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
 
-Does ethtool.yaml work for you without this change? 
-It has an empty enum.
+...
 
-IDK how the check the exact schema version, I have:
+>
+>  -      if (v->flags & VM_USERMAP)
+>  -              seq_puts(m, " user");
+>  +                      if (v->flags & VM_IOREMAP)
+>  +                              seq_puts(m, " ioremap");
+>
+>  -      if (v->flags & VM_DMA_COHERENT)
+>  -              seq_puts(m, " dma-coherent");
+> ++                      if (v->flags & VM_SPARSE)
+> ++                              seq_puts(m, " sparse");
+> +
 
-$ rpm -qa | grep jsonschema
-python3-jsonschema-specifications-2023.7.1-1.fc39.noarch
-python3-jsonschema-4.19.1-1.fc39.noarch
+Indent change across the loop makes the conflict look big,
+but it's actually trivial and resolution looks correct.
 
-The patch seems legit, but would be good to note for posterity 
-what made this fail out of the sudden.
+Thanks!
 
