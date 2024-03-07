@@ -1,133 +1,125 @@
-Return-Path: <netdev+bounces-78348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A64A874BDF
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:07:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31552874BF5
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:09:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB807B21771
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:07:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 549D11C20D6C
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:09:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1BD812A17C;
-	Thu,  7 Mar 2024 10:03:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E19D1292CE;
+	Thu,  7 Mar 2024 10:06:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Qj8U/JRm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ap6V7M73"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E64129A9D;
-	Thu,  7 Mar 2024 10:03:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D9B1292C1;
+	Thu,  7 Mar 2024 10:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709805816; cv=none; b=ksxWS8TEOw104dXSl4G8RT+Ere0fZUcMVyL+8CxoNS0ZhipOEF26jtgiizBy/+GiBfe2a7Cbx/UFIZ7LDtd2CLEIZtprKZPjlHF+nUB4kervKElGG8kLhMQja+4FuHVC9DMJU+eUybjlr8cN4gCeqk0lEXVlwRhKROEhBS6js4Q=
+	t=1709806015; cv=none; b=dv/g2lD9aWKRjZ79URRULkrb+gzYshQ8BJpyL2a7M2QVkybeYxC+c3aEUfqwRfdRRa81gimlhB8GpzOfHkKtkJWxoCOLcBuke/VtsU34d7mXRvR8ZavIxDWD8s5esGjAxZ7Jr7A7eeyTxCNNPhm2ieDMEBE/GNY6My9PrJJDDJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709805816; c=relaxed/simple;
-	bh=ZmM/KDvL4dsGZN7+nQnXpHO7MKx8VXGPnCH7JpgtyqY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jLY0LYDRBbKLFei3Y4AUzpAjTrT9BohKrrPMIJyuRMTzIYwtkEeHrS9d5a2InMdvfWhUicNS9A9guNUDztO83qnlAQavGrlPIAYmO98hGIbli792pPMmOSrTraLi9iYxZfbv1KWHRyzrVa2o3qPtPgioesJRl/yRHpj2uaiOKdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Qj8U/JRm; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 52EB5C000E;
-	Thu,  7 Mar 2024 10:03:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709805807;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=d/AxLRpsUHIVLv5pAaSheWeekhAHfnPjwxXQfah+6YU=;
-	b=Qj8U/JRmx+7EoLMa7KGqnsUrERG4eKO3WkyNvqdMaHf+F+FS51elY5zNcM83F7cBUVVo3H
-	TIALt9cEtANxEtLjHm6wipmzdgXMrEsHTyCA4Jr6sRlLX10Lps6MMIVb7O0y9hnw9x3anP
-	AUWCeDHdFvCPKGQZSUdBwn5lE9PtNMs6WbrlwMDOo/wuz3yu5bI5ENuBOtI+TPbwZDK3kT
-	CO7vJ88N3r9yNKo2KfCL+ypGZ0D2z2rzi/tx8UHhGuAJ3DDIbkGI3Dspz496RQ8p6hnO82
-	TZXJYQ9GFvUxD9M6zY0MzrlZOufVcpJfayMu9Dnr4t3b7Oim0c6UQSBGBwuoug==
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: thomas.petazzoni@bootlin.com,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: [PATCH net-next] ptp: Move from simple ida to xarray
-Date: Thu,  7 Mar 2024 11:03:26 +0100
-Message-Id: <20240307100327.887758-1-kory.maincent@bootlin.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1709806015; c=relaxed/simple;
+	bh=8ix+DtleFB6ZlJBt/yYcZLhNl0FOKjRVkyS681gcIVU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VSU37kHP0y0Q5ZTxwZ83+EkYo1fE7JVT3y6rHwo1uNCQmSg5CIKJWfUnHtz63rpMKkV+kekxmPqrjPGWbi+IvL6jiSHkfEO1yHmWppT0ydCJEF8NCW2uI2kQj6ymXGKTNZoZnpjNk6cTy8uryQh8Jqkh6qVm4eqVpqUmNXhyMYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ap6V7M73; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D5A8C433C7;
+	Thu,  7 Mar 2024 10:06:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709806014;
+	bh=8ix+DtleFB6ZlJBt/yYcZLhNl0FOKjRVkyS681gcIVU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ap6V7M73103CwlFFkQarLa2zlMQvNaW6MPGbmbg/hFCXJB2SnMNVwE5vF7dt5Htjo
+	 Pka2DebBLed4VR3JbPQPx+fVvBk6bs7eJN3wRm4AnSd9fXUl8qoiePrnCKrnjXCJP6
+	 d0Nen6HQuE+2YAAaqywAtJ/wmXwCKP8FbqFYMtrlkkb7OMlCszQfVlIM9qsY8Jk3DT
+	 gf1Vb9QuOW3SDfFLDX79NZvn20WW3fkF+BLpS0MFhM8lnfBQWwzBBAcuKaz5acVuoE
+	 EUHJYu/PwogdvCDuFYKdiGJuQ5M+MnB5Q1TgWl8jOCji7hc2cVacBR1z2kSJRZLG3e
+	 y72+HkwCD/hUg==
+Date: Thu, 7 Mar 2024 10:06:50 +0000
+From: Simon Horman <horms@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Jiri Pirko <jiri@resnulli.us>, Ivan Vecera <ivecera@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v1 1/1]  net: bridge: switchdev: Improve error
+ message clarity for switchdev_port_obj_add/del_deffered operations
+Message-ID: <20240307100650.GK281974@kernel.org>
+References: <20240306132130.2720721-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240306132130.2720721-1-o.rempel@pengutronix.de>
 
-Move from simple ida to xarray for storing and loading the ptp_clock
-pointer. This prepares support for future hardware timestamp selection by
-being able to link the ptp clock index to its pointer.
+On Wed, Mar 06, 2024 at 02:21:30PM +0100, Oleksij Rempel wrote:
+> Enhance the error reporting mechanism in the switchdev framework to
+> provide more informative and user-friendly error messages.
+> 
+> Following feedback from users struggling to understand the implications
+> of error messages like "failed (err=-28) to add object (id=2)", this
+> update aims to clarify what operation failed and how this might impact
+> the system or network.
+> 
+> With this change, error messages now include a description of the failed
+> operation, the specific object involved, and a brief explanation of the
+> potential impact on the system. This approach helps administrators and
+> developers better understand the context and severity of errors,
+> facilitating quicker and more effective troubleshooting.
+> 
+> Example of the improved logging:
+> 
+> [   70.516446] ksz-switch spi0.0 uplink: Failed to add Port Multicast
+>                Database entry (object id=2) with error: -ENOSPC (-28).
+> [   70.516446] Failure in updating the port's Multicast Database could
+>                lead to multicast forwarding issues.
+> [   70.516446] Current HW/SW setup lacks sufficient resources.
+> 
+> This comprehensive update includes handling for a range of switchdev
+> object IDs, ensuring that most operations within the switchdev framework
+> benefit from clearer error reporting.
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
+>  net/switchdev/switchdev.c | 106 ++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 102 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/switchdev/switchdev.c b/net/switchdev/switchdev.c
+> index c9189a970eec3..d5a30b626fd9c 100644
+> --- a/net/switchdev/switchdev.c
+> +++ b/net/switchdev/switchdev.c
+> @@ -244,6 +244,106 @@ static int switchdev_port_obj_notify(enum switchdev_notifier_type nt,
+>  	return 0;
+>  }
+>  
+> +static void switchdev_obj_id_to_helpful_msg(struct net_device *dev,
+> +					    enum switchdev_obj_id obj_id,
+> +					    int err, bool add)
+> +{
+> +	char *action = add ? "add" : "del";
+> +	char *reason = "";
+> +	char *problem;
+> +	char *obj_str;
 
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
----
- drivers/ptp/ptp_clock.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+Hi Oleksij,
 
-diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-index 3aaf1a3430c5..392c880d9f34 100644
---- a/drivers/ptp/ptp_clock.c
-+++ b/drivers/ptp/ptp_clock.c
-@@ -31,7 +31,7 @@ struct class *ptp_class;
- 
- static dev_t ptp_devt;
- 
--static DEFINE_IDA(ptp_clocks_map);
-+static DEFINE_XARRAY_ALLOC(ptp_clocks_map);
- 
- /* time stamp event queue operations */
- 
-@@ -201,7 +201,7 @@ static void ptp_clock_release(struct device *dev)
- 	bitmap_free(tsevq->mask);
- 	kfree(tsevq);
- 	debugfs_remove(ptp->debugfs_root);
--	ida_free(&ptp_clocks_map, ptp->index);
-+	xa_erase(&ptp_clocks_map, ptp->index);
- 	kfree(ptp);
- }
- 
-@@ -246,11 +246,10 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
- 	if (ptp == NULL)
- 		goto no_memory;
- 
--	index = ida_alloc_max(&ptp_clocks_map, MINORMASK, GFP_KERNEL);
--	if (index < 0) {
--		err = index;
-+	err = xa_alloc(&ptp_clocks_map, &index, ptp, xa_limit_31b,
-+		       GFP_KERNEL);
-+	if (err)
- 		goto no_slot;
--	}
- 
- 	ptp->clock.ops = ptp_clock_ops;
- 	ptp->info = info;
-@@ -378,7 +377,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
- 	list_del(&queue->qlist);
- 	kfree(queue);
- no_memory_queue:
--	ida_free(&ptp_clocks_map, index);
-+	xa_erase(&ptp_clocks_map, index);
- no_slot:
- 	kfree(ptp);
- no_memory:
-@@ -511,7 +510,7 @@ static void __exit ptp_exit(void)
- {
- 	class_destroy(ptp_class);
- 	unregister_chrdev_region(ptp_devt, MINORMASK + 1);
--	ida_destroy(&ptp_clocks_map);
-+	xa_destroy(&ptp_clocks_map);
- }
- 
- static int __init ptp_init(void)
--- 
-2.25.1
+I think the above variables could be const.
+That not withstanding, this looks good to me.
 
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+...
 
