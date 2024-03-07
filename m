@@ -1,204 +1,185 @@
-Return-Path: <netdev+bounces-78321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D0B1874B0F
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:38:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8461D874B10
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:39:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90DD7B242C0
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:38:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B67721C209F4
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A7DE83A19;
-	Thu,  7 Mar 2024 09:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C4FC83CA4;
+	Thu,  7 Mar 2024 09:39:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SeBuudHd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XfXRQltR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4BFB63131;
-	Thu,  7 Mar 2024 09:38:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E963477F32;
+	Thu,  7 Mar 2024 09:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709804321; cv=none; b=rdaMhHU+WqiFN6sluWW1Xe1OBpdL2UuAb/1Y1Jlz6yaqqCypmk/1CqIo7wuZNfZtiKmLaw0lXIli7l5NxaJ8syEz12hZEniiFC8d/5bNCg7o7ilqjtfoim8sYZgoxdaOrpkaMHTD1ImBXhGMrTm2lBcDi/c1VKO2qv1QqmipOLk=
+	t=1709804349; cv=none; b=Zvm62815O4zWiWGCpYHtAae5gr++PHHl3dI6NnLZcTq8NHaj3viTKiEKujpcvBtu/EY98O0If0bvwPpkMsFBJ7CgCJU8Na1txCptuqu0mRLIiaffRc4QFy03vP/RlnHmCyys91hAFQtPaijflOjLwGK1hvar1hB5MwcYIAO+3l4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709804321; c=relaxed/simple;
-	bh=xTNG64NUeu3Pi0ukeRGdAHjZW+GOBxINbviyFE3CpJU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kGV7MAsDRuyx2VEw6nQIDtxObZIqgRfhPXfAz8XipwIWrp9pb7C7qFzn8SirZjviEnyC+gtHHB8t0EO4gKM3YSwZ0sCdvmAM6cLgtse3LwABMqVp4ZYj4rlqjS1gVhwhEW3190oHu0UoTQN494NJykvNkYg8oUCFdvMf0NjNM/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=de.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SeBuudHd; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=de.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4279Zods024906;
-	Thu, 7 Mar 2024 09:38:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=yIF8fgJn/2EXgV/JqKdS0P4gJ8Q++q59OerkCFc6Jlo=;
- b=SeBuudHdRJr9qI5X4aR9dxuzzuipIQp8GQ3FyB+3ObPhgUsp9Cd0ANHOJJiP+NFow2RI
- EVYdi6mjNlGwvscm5WVOpBYOa1/4GlUaw+FmfjSYGZymsMbtKDee8tFe7djMAT3L0fnC
- MPnzJoKDAdQPa6Pr5V7Am8BtfQXwFAE+s599mshGIGAGv+mtHLT04oksi0EVa35tFDPE
- M3rpCRe5nu4E6iVGsYCA2ekUZLnRVntUh7XYgBQCcJmQMB7M499tr2teqD0S7KDzBH76
- 7dNHcyRk1BEKB8u6ul+4gsQafSMDdiiJdPgMfxoG0SgLLLTomwXRwgXhe68fvIn+vSv9 lg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wqakhrm3m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Mar 2024 09:38:36 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4279aNRE027801;
-	Thu, 7 Mar 2024 09:38:35 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wqakhrm31-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Mar 2024 09:38:35 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4279FcNq010898;
-	Thu, 7 Mar 2024 09:38:34 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wmh52m7vj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Mar 2024 09:38:34 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4279cTVJ28246574
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 7 Mar 2024 09:38:31 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3B7772004D;
-	Thu,  7 Mar 2024 09:38:28 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2A7D720043;
-	Thu,  7 Mar 2024 09:38:28 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu,  7 Mar 2024 09:38:28 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
-	id E5082E01AE; Thu,  7 Mar 2024 10:38:27 +0100 (CET)
-From: Alexandra Winter <wintera@linux.ibm.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>
-Subject: [PATCH net v2] s390/qeth: handle deferred cc1
-Date: Thu,  7 Mar 2024 10:38:27 +0100
-Message-Id: <20240307093827.2307279-1-wintera@linux.ibm.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1709804349; c=relaxed/simple;
+	bh=pQfO9MkGegbpJaVePbtheGM5NzjGuY54SIXm9ZQ1w7A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qKK2+lYNP7UNbLx1ZFC7x0of9/Nh/mkpdgthLHKteUJ0AmtDSgBj5tc9wKtoXG4w/HBsOcGKQ9lF1lwXrzbHLs0Tgr+WpcHqcsnhLa0VwqYoTCH+0L+t0/uHxAcrRqmJgHAWIsGoEmfjo+xWksZnvvjVnFLVLUHRrBWbay69qRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XfXRQltR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61CFAC433F1;
+	Thu,  7 Mar 2024 09:39:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709804348;
+	bh=pQfO9MkGegbpJaVePbtheGM5NzjGuY54SIXm9ZQ1w7A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XfXRQltREYb2dzSNMAa4ZPGIV175P+OVFx/w9mvjRBqPct/iSj5UvhGTLX2NTogw8
+	 UoBX++mstCpz6Oqnfj1utGiKE4hJWOz+qG3BI9rf2KhSkKZYWc5oJYBV6knrti6un6
+	 OsHJM3pmGrP+SYsQNiTkxvP8/P+N4Sg4bYpnw4+y6IHrHAOOqA3O2YG5ytdTeTTfW5
+	 HIKOimuo5i8Qp8s6hmudOARqJiTd0KMpOtX6Z3o5Um+1YEBxWFspmFtpiEf3J1vhCY
+	 mc/5NmcMADKW5rkC9Z19l1+qdKuXR+6Y94UCqzJ0FmQEHBaLe4JpxEvGlReZnz+bO4
+	 k076Lhpzufx4A==
+Date: Thu, 7 Mar 2024 09:39:03 +0000
+From: Simon Horman <horms@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 00/21] rxrpc: Miscellaneous changes and make
+ use of MSG_SPLICE_PAGES
+Message-ID: <20240307093903.GJ281974@kernel.org>
+References: <20240306000655.1100294-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: livEwX96MRIYDaRIWbvP0jfokhyybLPV
-X-Proofpoint-ORIG-GUID: 54_21jW5VardP6FxG9k0yZQ8q2RD-l7f
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-07_06,2024-03-06_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 phishscore=0 spamscore=0 priorityscore=1501 suspectscore=0
- impostorscore=0 clxscore=1015 adultscore=0 mlxscore=0 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2403070069
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240306000655.1100294-1-dhowells@redhat.com>
 
-The IO subsystem expects a driver to retry a ccw_device_start, when the
-subsequent interrupt response block (irb) contains a deferred
-condition code 1.
+On Wed, Mar 06, 2024 at 12:06:30AM +0000, David Howells wrote:
+> Here are some changes to AF_RXRPC:
+> 
+>  (1) Cache the transmission serial number of ACK and DATA packets in the
+>      rxrpc_txbuf struct and log this in the retransmit tracepoint.
+> 
+>  (2) Don't use atomics on rxrpc_txbuf::flags[*] and cache the intended wire
+>      header flags there too to avoid duplication.
+> 
+>  (3) Cache the wire checksum in rxrpc_txbuf to make it easier to create
+>      jumbo packets in future (which will require altering the wire header
+>      to a jumbo header and restoring it back again for retransmission).
+> 
+>  (4) Fix the protocol names in the wire ACK trailer struct.
+> 
+>  (5) Strip all the barriers and atomics out of the call timer tracking[*].
+> 
+>  (6) Remove atomic handling from call->tx_transmitted and
+>      call->acks_prev_seq[*].
+> 
+>  (7) Don't bother resetting the DF flag after UDP packet transmission.  To
+>      change it, we now call directly into UDP code, so it's quick just to
+>      set it every time.
+> 
+>  (8) Merge together the DF/non-DF branches of the DATA transmission to
+>      reduce duplication in the code.
+> 
+>  (9) Add a kvec array into rxrpc_txbuf and start moving things over to it.
+>      This paves the way for using page frags.
+> 
+> (10) Split (sub)packet preparation and timestamping out of the DATA
+>      transmission function.  This helps pave the way for future jumbo
+>      packet generation.
+> 
+> (11) In rxkad, don't pick values out of the wire header stored in
+>      rxrpc_txbuf, buf rather find them elsewhere so we can remove the wire
+>      header from there.
+> 
+> (12) Move rxrpc_send_ACK() to output.c so that it can be merged with
+>      rxrpc_send_ack_packet().
+> 
+> (13) Use rxrpc_txbuf::kvec[0] to access the wire header for the packet
+>      rather than directly accessing the copy in rxrpc_txbuf.  This will
+>      allow that to be removed to a page frag.
+> 
+> (14) Switch from keeping the transmission buffers in rxrpc_txbuf allocated
+>      in the slab to allocating them using page fragment allocators.  There
+>      are separate allocators for DATA packets (which persist for a while)
+>      and control packets (which are discarded immediately).
+> 
+>      We can then turn on MSG_SPLICE_PAGES when transmitting DATA and ACK
+>      packets.
+> 
+>      We can also get rid of the RCU cleanup on rxrpc_txbufs, preferring
+>      instead to release the page frags as soon as possible.
+> 
+> (15) Parse received packets before handling timeouts as the former may
+>      reset the latter.
+> 
+> (16) Make sure we don't retransmit DATA packets after all the packets have
+>      been ACK'd.
+> 
+> (17) Differentiate traces for PING ACK transmission.
+> 
+> (18) Switch to keeping timeouts as ktime_t rather than a number of jiffies
+>      as the latter is too coarse a granularity.  Only set the call timer at
+>      the end of the call event function from the aggregate of all the
+>      timeouts, thereby reducing the number of timer calls made.  In future,
+>      it might be possible to reduce the number of timers from one per call
+>      to one per I/O thread and to use a high-precision timer.
+> 
+> (19) Record RTT probes after successful transmission rather than recording
+>      it before and then cancelling it after if unsuccessful[*].  This
+>      allows a number of calls to get the current time to be removed.
+> 
+> (20) Clean up the resend algorithm as there's now no need to walk the
+>      transmission buffer under lock[*].  DATA packets can be retransmitted
+>      as soon as they're found rather than being queued up and transmitted
+>      when the locked is dropped.
+> 
+> (21) When initially parsing a received ACK packet, extract some of the
+>      fields from the ack info to the skbuff private data.  This makes it
+>      easier to do path MTU discovery in the future when the call to which a
+>      PING RESPONSE ACK refers has been deallocated.
+> 
+> 
+> [*] Possible with the move of almost all code from softirq context to the
+>     I/O thread.
+> 
+> The patches are tagged here:
+> 
+> 	git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/rxrpc-iothread-20240305
+> 
+> And can be found on this branch:
+> 
+> 	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-iothread
+> 
+> David
+> 
+> Link: https://lore.kernel.org/r/20240301163807.385573-1-dhowells@redhat.com/ # v1
+> Link: https://lore.kernel.org/r/20240304084322.705539-1-dhowells@redhat.com/ # v2
+> 
+> Changes
+> =======
+> ver #3)
+>  - Use passed-in gfp in rxkad_alloc_txbuf() rather than GFP_KRNEL.
 
-Symptoms before this commit:
-On the read channel we always trigger the next read anyhow, so no
-different behaviour here.
-On the write channel we may experience timeout errors, because the
-expected reply will never be received without the retry.
-Other callers of qeth_send_control_data() may wrongly assume that the ccw
-was successful, which may cause problems later.
+Hi David,
 
-Note that since
-commit 2297791c92d0 ("s390/cio: dont unregister subchannel from child-drivers")
-and
-commit 5ef1dc40ffa6 ("s390/cio: fix invalid -EBUSY on ccw_device_start")
-deferred CC1s are more likely to occur. See the commit message of the
-latter for more background information.
+Thanks for the update above.
+For the record, I don't have anything to flag in this revision of the patchset.
 
-Fixes: 2297791c92d0 ("s390/cio: dont unregister subchannel from child-drivers")
-Reference-ID: LTC205042
-Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
----
-v1->v2: correct patch format
+>  - Adjust rxkad_alloc_txbuf()'s txb check to put return in if-statement.
+> 
+> ver #2)
+>  - Removed an unused variable.
+>  - Use ktime_to_us() rather than dividing a ktime by 1000 in tracepoints.
 
- drivers/s390/net/qeth_core_main.c | 36 +++++++++++++++++++++++++++++--
- 1 file changed, 34 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/s390/net/qeth_core_main.c b/drivers/s390/net/qeth_core_main.c
-index cf8506d0f185..bc6f3f1f25ba 100644
---- a/drivers/s390/net/qeth_core_main.c
-+++ b/drivers/s390/net/qeth_core_main.c
-@@ -1179,6 +1179,19 @@ static int qeth_check_irb_error(struct qeth_card *card, struct ccw_device *cdev,
- 	}
- }
- 
-+/**
-+ *	qeth_irq() - qeth interrupt handler
-+ *	@cdev: ccw device
-+ *	@intparm: expect pointer to iob
-+ *	@irb: Interruption Response Block
-+ *
-+ *	In the good path:
-+ *	corresponding qeth channel is locked with last used iob as active_cmd.
-+ *	But this function is also called for error interrupts.
-+ *
-+ *	Caller ensures that:
-+ *	Interrupts are disabled; ccw device lock is held;
-+ */
- static void qeth_irq(struct ccw_device *cdev, unsigned long intparm,
- 		struct irb *irb)
- {
-@@ -1220,11 +1233,10 @@ static void qeth_irq(struct ccw_device *cdev, unsigned long intparm,
- 		iob = (struct qeth_cmd_buffer *) (addr_t)intparm;
- 	}
- 
--	qeth_unlock_channel(card, channel);
--
- 	rc = qeth_check_irb_error(card, cdev, irb);
- 	if (rc) {
- 		/* IO was terminated, free its resources. */
-+		qeth_unlock_channel(card, channel);
- 		if (iob)
- 			qeth_cancel_cmd(iob, rc);
- 		return;
-@@ -1276,6 +1288,26 @@ static void qeth_irq(struct ccw_device *cdev, unsigned long intparm,
- 		}
- 	}
- 
-+	if (scsw_cmd_is_valid_cc(&irb->scsw) && irb->scsw.cmd.cc == 1 && iob) {
-+		/* channel command hasn't started: retry.
-+		 * active_cmd is still set to last iob
-+		 */
-+		QETH_CARD_TEXT(card, 2, "irqcc1");
-+		rc = ccw_device_start_timeout(cdev, __ccw_from_cmd(iob),
-+					      (addr_t)iob, 0, 0, iob->timeout);
-+		if (rc) {
-+			QETH_DBF_MESSAGE(2,
-+					 "ccw retry on %x failed, rc = %i\n",
-+					 CARD_DEVID(card), rc);
-+			QETH_CARD_TEXT_(card, 2, " err%d", rc);
-+			qeth_unlock_channel(card, channel);
-+			qeth_cancel_cmd(iob, rc);
-+		}
-+		return;
-+	}
-+
-+	qeth_unlock_channel(card, channel);
-+
- 	if (iob) {
- 		/* sanity check: */
- 		if (irb->scsw.cmd.count > iob->length) {
--- 
-2.40.1
-
+...
 
