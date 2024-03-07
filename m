@@ -1,177 +1,211 @@
-Return-Path: <netdev+bounces-78275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77A808749E4
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:41:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A23138749EA
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:42:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BD531C20F31
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:41:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD73C1C210AC
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:42:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF6B80632;
-	Thu,  7 Mar 2024 08:40:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3D2C82880;
+	Thu,  7 Mar 2024 08:42:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Kdsc8+dF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O+4gX0pl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C459B657D5
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 08:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFDD46350B
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 08:42:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709800858; cv=none; b=XKYlSFZ1JkepRoc5c7ylDjmCDfUkuKvUACIQsUj8XzlnomV2rtlfl4h7C/Rvp4U+UoxlZ7WSNBbsyMkVV9f12Jint9d4h2I2NldeiMBvWi/Xnq+tk7/Dz+6JAMKYbHhrEVgQkUA0qP5cgA63v8pc8L+jfxcIM6TH8nxPnYyxXNo=
+	t=1709800956; cv=none; b=WZUJAQ9nFSB4MLqZ2P8CNyNHqNHXbaZxDp5IuEqv/CtifWhvHLMn7xrDRzrOvmzTxdX7I7oczuGGsZFxbQN+89cJwiPyRI1UWHPoA+nqq8vzBbYXnE5rVOjiX06D7Ry+r42YjegigBvzhvMLAUdffoe4kgBx/Tsl583ij//asN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709800858; c=relaxed/simple;
-	bh=cPLxyqvAL7wfpbvIkyBxmVw/NxtkWQVZW4gLPM0tAlY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NwpeBXYBeawyOaeH4RDU4IfQ3jAPGMUmKQSWr6VEAaZ0bIk+GAAhAF8FmfHD9Al7cmpOi++WkuCKivX7qq25+fn74s3g82JayIZW/bpoHFvfi9bU/wMJpz4EoeXNfkV6eTdi0sKv13hSP6UiCGvZddsMQ7HaJiI+hyfucIYXd+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Kdsc8+dF; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-33dcad9e3a2so268134f8f.3
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 00:40:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709800855; x=1710405655; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yiOzY7a8j9txhnJCOmgAdef/ZGnUNTok5QcVhJzqb2E=;
-        b=Kdsc8+dFOwkJA8mNNizIRe4mWpisVnvYk5UDVG6V/b+/TBW7R2A69TdPkqPYK6YaNU
-         SH1k5NISEcAo9WWJDll531KAGUy/EO4mq/Mhzrsh+coBMWH3biEgk/8yMihFsFQOhGQY
-         Jw0zOAc0ewOIddzvx4SPp9Ro0YWqBrVwDmUbbMggpNcP3xh6XDXRONHRWlsgfKN7h6EC
-         DYKBw68UqF0DGrw9ZKdURs3oMCozxiYzZLSEwLFvaODnyPSM8ImL1ZJcqpxVLVFW9yEb
-         tTPCt2b6pCC9Zgf8MzWMB9xa/SSTgxdmShtJYSexfMCmxvuEGo54I09OekwL2gT8PGeC
-         8MGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709800855; x=1710405655;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yiOzY7a8j9txhnJCOmgAdef/ZGnUNTok5QcVhJzqb2E=;
-        b=si2tzOu/XCAHJj2aEc1a8L51Erm8qatly+R91/SQpFeKXaA4Y/KeCpAn2OGmH1bb4/
-         NERMVsG38VgM4rUBlkVXoQArHsguCCm1YMRccxbkKS2OPQXpR1kkEPkl9s3RVJ1Oti1r
-         7pacQYxwTna9gUAm0/x4MPoOAWBgKHkTK7+P8CA9ivg7RLBQzSGCRw2IURkEARY8NeUm
-         ht/rKLGYCVbNdyhkcmIThv6HSzgmS4o0Za4H+8EBCO+NDykOfK2mUjofyFid2X5XFKbt
-         Owv7alsTPhsDTFVeSUncqBv0exN6lbzgTfVQfy3ABYHYeofcvJWv0znDeIEX0lrl+JMW
-         x0WQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXgicv8Yz4Yp2tSHRndHpU3EZZokid4s0ApSD2Ash8WrSJpUl1tYK6fFxs+fOypKpvjV9Qe5qoD7cdH5Kh+kDwqEAUhOEkb
-X-Gm-Message-State: AOJu0YxBIHDmn1jCyAbXi6agEMqxAotttujEGd3jKN9YV3dfDIHFlWvx
-	IdHGKcM8Q5w2R2a1GX4zK2z5/wrZ84CkCnRAaPBtq1etmOJhw0zWdQP3OYyMt+k=
-X-Google-Smtp-Source: AGHT+IEyOip3lme7AF40iXYARjT0Rs5oTV8AIOMgpQGDUpFMbAKThzLBhgLQHbhHADbjcP4Jx1WYUw==
-X-Received: by 2002:adf:f74d:0:b0:33e:cc6:a998 with SMTP id z13-20020adff74d000000b0033e0cc6a998mr10934244wrp.6.1709800854848;
-        Thu, 07 Mar 2024 00:40:54 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id p18-20020adf9d92000000b0033e18f5714esm17554457wre.59.2024.03.07.00.40.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Mar 2024 00:40:54 -0800 (PST)
-Date: Thu, 7 Mar 2024 09:40:51 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Louis Peens <louis.peens@corigine.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Fei Qin <fei.qin@corigine.com>,
-	netdev@vger.kernel.org, oss-drivers@corigine.com
-Subject: Re: [PATCH net-next v2 1/4] devlink: add two info version tags
-Message-ID: <Zel9k5uliEyi9ZTp@nanopsycho>
-References: <20240228075140.12085-1-louis.peens@corigine.com>
- <20240228075140.12085-2-louis.peens@corigine.com>
- <Zd8js1wsTCxSLYxy@nanopsycho>
- <20240228203235.22b5f122@kernel.org>
- <Zel4F74EqG2YMf+w@LouisNoVo>
+	s=arc-20240116; t=1709800956; c=relaxed/simple;
+	bh=3cWmWtmCimOSev/Te+FQdJngcOhKMHLDmIv6DPLCPWA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oUKpz6JCStyXPRFBIhLEzqnYRvmBhqVGd6W2HyEhM9jHNQ3bWCBCJ0Xq/cNiSh1oleujmDz2yJs3BzrGLSvIG8aMYMtVItkf6kPI9604t3k71YJO6tF4jNTqUIljDXBFTxua30ZUTmQaS+rCXl9Jk1mkSqxFELPysYVjS5pAJtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O+4gX0pl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FF47C433C7;
+	Thu,  7 Mar 2024 08:42:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709800956;
+	bh=3cWmWtmCimOSev/Te+FQdJngcOhKMHLDmIv6DPLCPWA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=O+4gX0plSrXNS02q2OLxtQuYxJxuP8D/+owIMAQoRUXhdhAVATlqosvEjkSyMmJGq
+	 uFcWtRGbwvjpAZOrrgD872KdOf1z4C/uTo2rG7e+Dh+85mwLv9ERGCyTZZK2Uqy9ZK
+	 TDvVV32lMU2+sIH3oy7l44oY9wNKDKF28qA7T8lHHAmoB96JZG4Ae5lG/TX1WP/Gpo
+	 xF7LL2hZ1xpO1wXpN+n+68a/LaFs9SPcotaX+2gr4WpDvT0y864KmJupBfw3SpPdAO
+	 Nd0A4eBGrXaZ0pUlp79BQifl2vSzrN9IWfODJuV8y5A2XTT0IiKQyrn3zl4Dze44Gi
+	 QkwgDVih/qn8w==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: [pull request][net-next V6 00/15] mlx5 socket direct (Multi-PF) 
+Date: Thu,  7 Mar 2024 00:42:14 -0800
+Message-ID: <20240307084229.500776-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zel4F74EqG2YMf+w@LouisNoVo>
+Content-Transfer-Encoding: 8bit
 
-Thu, Mar 07, 2024 at 09:17:27AM CET, louis.peens@corigine.com wrote:
->On Wed, Feb 28, 2024 at 08:32:35PM -0800, Jakub Kicinski wrote:
->> On Wed, 28 Feb 2024 13:14:43 +0100 Jiri Pirko wrote:
->> > >+/* Part number for entire product */
->> > >+#define DEVLINK_INFO_VERSION_GENERIC_PART_NUMBER       "part_number"  
->> > 
->> > /* Part number, identifier of board design */
->> > #define DEVLINK_INFO_VERSION_GENERIC_BOARD_ID   "board.id"
->> > 
->> > Isn't this what you are looking for?
->> 
->> My memory is fading but AFAIR when I added the other IDs, back in my
->> Netronome days, the expectation was that they would be combined
->> together to form the part number.
->> 
->> Not sure why they need a separate one now, maybe they lost the docs,
->> maybe requirements changed. Would be good to know... :)
->Hi Jiri, Jakub, sorry for the delay in coming back to this. It did
->indeed trigger a bit of an internal discussion about which number is
->where and for what purpose. More detail at the end.
->> 
->> > "part_number" without domain (boards/asic/fw) does not look correct to
->> > me. "Product" sounds very odd.
->> 
->> I believe Part Number is what PCI VPD calls it.
->This is indeed where the decision to use "part_number" is coming from.
->> 
->> In addition to Jiri's questions:
->> 
->> > +/* Model of the board */
->> > +#define DEVLINK_INFO_VERSION_GENERIC_BOARD_MODEL       "board.model"
->> 
->> What's the difference between this and:
->> 
->>  board.id
->>  --------
->>  
->>  Unique identifier of the board design.
->> 
->> ? One is AMDA the other one is code name?
->> You gotta provide more guidance how the two differ...
->Carefully looking at this again revealed that "board.model" is indeed
->the code name, and it probably shouldn't be a generic field. Or if it is
->it should named better, and be called something like
->'DEVLINK_INFO_VERSION_GENERIC_BOARD_CODENAME' instead. I do not know why
->this was added in the first place, maybe it was a requirement at some
->point, and I'm hesitant to just remove the user visible field now. But I
->am happy to keep it local to the driver - it was moved based on Jiri's
->suggestion - should have provided a better explanation then.
->
->"board.id" is not the same thing as "part_number", or at least not closely
->related anymore. Perhaps it was previously, but I can't find any
->information on this.
->
->"board.id" is the AMDA number, something like AMDA2001-1003, and it gets
->combined with a few other fields to generate the product_id, exposed as
->the devlink serial_number field. The AMDA number that is provided in the
->"board.id" field is still used to identify firmware names from the
->driver side.
->
->"part_number" looks like this: CGX11-A2PSNM. This is a number that is
->printed on the board, and also a field that can get exposed over BMC by
->products that supports this.
->
->While Fei was preparing the patch there was discussion about using
->"board.id" instead for the part_number as they do seem quite similar in
->purpose. The reason why we proposed a new field instead was that the
->information in "board.id" can still be helpful for identification. If
->there are some scripts out there that uses the "board.id" field, for
->example to build up a firmware pathname, replacing it with the
->"part_number" will break those.
->
->V1 of the series did also have the "part_number" in the driver only,
->Jiri requested moving it to devlink itself.
->
->Proposal for V3 - Move both fields back to driver-only, and greatly
->improve the commit message to explain the difference. Does this sound
->reasonable?
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-Why the "part_number" is specific to you? You say it is a board
-attribute, why don't you have:
+Support Socket-Direct multi-dev netdev.
 
-#define DEVLINK_INFO_VERSION_GENERIC_BOARD_PART_NUMBER       "board.part_number"
-?
+V6:
+- Address documentation comments from Jakub.
 
+V5:
+ - Address documentation comments from Przemek Kitszel.
+
+V4:
+- Improve documentation for better user observability and understanding
+  of the feature, in terms of queues and their expected NUMA/CPU/IRQ
+  affinity.
+
+V3:
+- Fix documentation per Jakubs feedback.
+- Fix typos
+- Link new documentation in the networking index.rst
+
+V2:
+- Add documentation in a new patch.
+- Add debugfs in a new patch.
+- Add mlx5_ifc bit for MPIR cap check and use it before query.
+
+For more information please see tag log below.
+
+Please pull and let me know if there is any problem.
+
+Thanks,
+Saeed.
+
+The following changes since commit d7933a2c7f87667a87a2c0d0c5a1617c414c6024:
+
+  ethtool: remove ethtool_eee_use_linkmodes (2024-03-06 20:40:20 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-socket-direct-v3
+
+for you to fetch changes up to 77d9ec3f6c8cc592c7e2a1a741f39512198555af:
+
+  Documentation: networking: Add description for multi-pf netdev (2024-03-07 00:40:40 -0800)
+
+----------------------------------------------------------------
+Support Multi-PF netdev (Socket Direct)
+
+This series adds support for combining multiple devices (PFs) of the
+same port under one netdev instance. Passing traffic through different
+devices belonging to different NUMA sockets saves cross-numa traffic and
+allows apps running on the same netdev from different numas to still
+feel a sense of proximity to the device and achieve improved
+performance.
+
+We achieve this by grouping PFs together, and creating the netdev only
+once all group members are probed. Symmetrically, we destroy the netdev
+once any of the PFs is removed.
+
+The channels are distributed between all devices, a proper configuration
+would utilize the correct close numa when working on a certain app/cpu.
+
+We pick one device to be a primary (leader), and it fills a special
+role.  The other devices (secondaries) are disconnected from the network
+in the chip level (set to silent mode). All RX/TX traffic is steered
+through the primary to/from the secondaries.
+
+Currently, we limit the support to PFs only, and up to two devices
+(sockets).
+
+V6:
+- Address documentation comments from Jakub.
+
+V5:
+ - Address documentation comments from Przemek Kitszel.
+
+V4:
+ - Improve documentation for better user observability and understanding
+   of the feature, in terms of queues and their expected NUMA/CPU/IRQ
+   affinity.
+
+V3:
+ - Fix documentation per Jakubs feedback.
+ - Fix typos
+ - Link new documentation in the networking index.rst
+
+V2:
+ - Add documentation in a new patch.
+ - Add debugfs in a new patch.
+ - Add mlx5_ifc bit for MPIR cap check and use it before query.
+
+----------------------------------------------------------------
+Tariq Toukan (15):
+      net/mlx5: Add MPIR bit in mcam_access_reg
+      net/mlx5: SD, Introduce SD lib
+      net/mlx5: SD, Implement basic query and instantiation
+      net/mlx5: SD, Implement devcom communication and primary election
+      net/mlx5: SD, Implement steering for primary and secondaries
+      net/mlx5: SD, Add informative prints in kernel log
+      net/mlx5: SD, Add debugfs
+      net/mlx5e: Create single netdev per SD group
+      net/mlx5e: Create EN core HW resources for all secondary devices
+      net/mlx5e: Let channels be SD-aware
+      net/mlx5e: Support cross-vhca RSS
+      net/mlx5e: Support per-mdev queue counter
+      net/mlx5e: Block TLS device offload on combined SD netdev
+      net/mlx5: Enable SD feature
+      Documentation: networking: Add description for multi-pf netdev
+
+ Documentation/networking/index.rst                 |   1 +
+ Documentation/networking/multi-pf-netdev.rst       | 174 +++++++
+ drivers/net/ethernet/mellanox/mlx5/core/Makefile   |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en.h       |   9 +-
+ .../net/ethernet/mellanox/mlx5/core/en/channels.c  |  10 +-
+ .../net/ethernet/mellanox/mlx5/core/en/channels.h  |   6 +-
+ .../ethernet/mellanox/mlx5/core/en/monitor_stats.c |  48 +-
+ .../net/ethernet/mellanox/mlx5/core/en/params.c    |   9 +-
+ .../net/ethernet/mellanox/mlx5/core/en/params.h    |   3 -
+ drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c   |  12 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/qos.c   |   8 +-
+ .../ethernet/mellanox/mlx5/core/en/reporter_rx.c   |   4 +-
+ .../ethernet/mellanox/mlx5/core/en/reporter_tx.c   |   3 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/rqt.c   | 123 ++++-
+ drivers/net/ethernet/mellanox/mlx5/core/en/rqt.h   |   9 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/rss.c   |  17 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/rss.h   |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/en/rx_res.c    |  62 ++-
+ .../net/ethernet/mellanox/mlx5/core/en/rx_res.h    |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/en/trap.c  |  11 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xsk/pool.c  |   6 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xsk/setup.c |   8 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ktls.c    |   2 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ktls.h    |   4 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c |   6 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c  | 176 +++++--
+ drivers/net/ethernet/mellanox/mlx5/core/en_stats.c |  39 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/lib/devcom.h   |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/lib/mlx5.h |  12 +
+ drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c   | 524 +++++++++++++++++++++
+ drivers/net/ethernet/mellanox/mlx5/core/lib/sd.h   |  38 ++
+ include/linux/mlx5/driver.h                        |   1 +
+ include/linux/mlx5/mlx5_ifc.h                      |   4 +-
+ 34 files changed, 1168 insertions(+), 173 deletions(-)
+ create mode 100644 Documentation/networking/multi-pf-netdev.rst
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/sd.h
 
