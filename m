@@ -1,147 +1,210 @@
-Return-Path: <netdev+bounces-78480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92CA1875482
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:50:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CE638875483
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:50:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F54B1F238A2
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 16:50:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A22E1F2331A
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 16:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F8C012FB0D;
-	Thu,  7 Mar 2024 16:50:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39FBE12F5AD;
+	Thu,  7 Mar 2024 16:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WjXNF9eE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V1osucTv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A802312F393;
-	Thu,  7 Mar 2024 16:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1CD1DA37;
+	Thu,  7 Mar 2024 16:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709830215; cv=none; b=TjXaSt5bq0RTKLFJHZWtnc34pXa9VSLGbLSESE3sfSMgivFI8AV56bvcTrhAA0wmLjpMH7ues7qJh4xV9fGCg+ePCkp3cslQmBFID78XBhMA2eJGxwmT6edHRqiDqmWjLuqa0nDNW4DlnVGHSlqesinT5siw17chAPDcFaYuRQY=
+	t=1709830223; cv=none; b=dHyqSierylRWk5Y7/Li1MujvYJZ6Fhtg22QpqLOSIMiKTI+6a246Mt4OcCRj+zN2SXA+eoM9lvMU1bbj+YaKz5TlGydRlf82jeGhcKfBykp3wBhDyUOpeaoaK1ONl5RV9FJo3RAG6nIFtDTf5nviIFQtvZbX8vcBHQEuxXJePDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709830215; c=relaxed/simple;
-	bh=CvAcob+7Pk9boKq7ZlSX4MkNBemZUhNAsJyEPgtNrIA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kZsRA4IZk7geBTsWabOttpy0DF4LLR59mO42dH5nVNntjgBLj6E7gmHTCykAfhRDCeeToP8R2FFVaHpFKDh10WuW9nDY+DaU3hzjVFnd72nhYKGzIzxKvwNgbmpkQNAssIxUz0FX0RUF6o26VvtEizgQ655c87Goy+tvUGNGGSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WjXNF9eE; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a3fb8b0b7acso152873566b.2;
-        Thu, 07 Mar 2024 08:50:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709830212; x=1710435012; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NT/VOy+aRsDPVRaEqPCeisR++CzOY34r3g6Ighk1PRs=;
-        b=WjXNF9eExM/u11ppPQsXHApsnav0ksF0ZF+GOLXFv/a9f4Joh9UPgZs7HEBRCEIt+5
-         QooD02EJEYNTs8f26oWqHfADF9i1wnBDcXg2xsfFfPsoocmcTmVWSkNitimxZAUAfaV6
-         CpBLlK1hHpJp+vTzb9/MyXoFW6uTRlYR7FABAiL/dBZX4er9JTzbOmT3k5UnibGduadY
-         NJ92AnuYpmRxO63E2cvMrqVikekRXCGtDr2L3Oft5N4MhshnhUpa98lvixCrWYXkuzWT
-         XYt5C2lGHfizNFzzzt99GlJjDd5UmR93RU2F8JAuDXdjWPssUNeJxblofYBlvpiayKN9
-         NVIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709830212; x=1710435012;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NT/VOy+aRsDPVRaEqPCeisR++CzOY34r3g6Ighk1PRs=;
-        b=qFeJ7UB12wSoZ9FmyOq24aKPgo1gNdt3qfTTEDY0ATWH4iaYSGaXMkVpalVvjlQkMd
-         jvVQbVLrztowa+z0PcxyTaMLB1Vl4EcBsYJub9I1BgqdN6u1ByRJx4cNfwPiyfA3VBGP
-         IauUd2d/+rL1fwbgIWWbJ/FDxAbAaX/8nyu9DLMEv+L9L4nRa0LSu0gbGhMQvijAbzXg
-         Ae7MCyhK6i7hqfCLzxSLirrK6JbNbZ5I7ZOIBgWnBITIU+Fu2/on5Pkk/iQIBskB7Puj
-         jJpUHVN4R5AnrJKUWV3Yvs14UNRNtB0iM/RChHAWrOdvLJwhu9LrLIKZj392iOC+DAPb
-         z3gg==
-X-Forwarded-Encrypted: i=1; AJvYcCUzf0HzkE0jOqNCjx3hGmIs+ydQBGNW11W5bgb/c0JuqfDrI/09i2dSPCgzX8dXstXmiwGCVgIAmOqscHsYX/zjzVooiBkdVyawmKDSvu21+kmB6nQKJBaosfBPoBS2eap5VA==
-X-Gm-Message-State: AOJu0YzT6m4GsIbIeXmY/slct0Mnmla2v/d3fUKqGUmef1n/fwh9FkxR
-	xzCYT4IpJ663pDTlJWQ4FpXkQX1OIEXB58+NIMWXjXAFoI0zr4Jb
-X-Google-Smtp-Source: AGHT+IGXPi46bJDG29C4iIKa4gvtpe4Fj8xSI3og1Ulou8scbdB2zMQb+8sJ+gujXJEB9cqgH5maFg==
-X-Received: by 2002:a17:906:7c8:b0:a3e:792f:3955 with SMTP id m8-20020a17090607c800b00a3e792f3955mr13153472ejc.62.1709830211680;
-        Thu, 07 Mar 2024 08:50:11 -0800 (PST)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id w8-20020a170906b18800b00a43fe2d3062sm8457173ejy.158.2024.03.07.08.50.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Mar 2024 08:50:11 -0800 (PST)
-Message-ID: <f483c036-3b35-46d1-830e-37741b32d7e1@gmail.com>
-Date: Thu, 7 Mar 2024 17:50:08 +0100
+	s=arc-20240116; t=1709830223; c=relaxed/simple;
+	bh=lHR56V/CodyEaIm3onpnKKQD1mT9eLVoJRYt25cfX0c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SJCjGoDssDE1+DGneOUPtadTr5uHss+W7ZVfkl7d/rBKYCoL0YlPlVA+5x1miFcjkaQmRkdjVFQhh0qfIyDQnq7ANFPdixf4FQpHbDquOtVjv7MM8mFUogefHvR8bYa6wdhsMTNvvU3sqd+CTuKintY9Pa9KeTFVvQKwIczVbqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V1osucTv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13502C43394;
+	Thu,  7 Mar 2024 16:50:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709830222;
+	bh=lHR56V/CodyEaIm3onpnKKQD1mT9eLVoJRYt25cfX0c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=V1osucTvjHURTZv3n8pEZmmxRSeo0uSxeoLhilH3IQFKra8aTlTsuH4yc5w1jhEsE
+	 4Fx0FbXpwnh4fsj44LzocdqbU65ryv+cDwg+KwpvYFaQxzJ2KfUXfxgjyaX2QAvXnm
+	 MW5aW3l0xHbVvZHnm/MvhRhN3oeLQJtxhr+AXwFbizyimKLX//7zQympipZIUFRQ+t
+	 hLt4Fn7m1w2HX1kMyOhL+Bkk35WqsHN/u2gfoF+YlcsNwkAVjHF1+pU1l0Gyagv23M
+	 /B9CykPDnYhlzsPt5bzZNsKu1qlb4YHYFUlmEdV5rYY7uTvliMZxsHWmlOxBK5qe5L
+	 SdICx32Zr8NOA==
+Date: Thu, 7 Mar 2024 08:50:21 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason
+ Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ virtualization@lists.linux.dev, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Michael Chan <michael.chan@broadcom.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Shannon Nelson <shannon.nelson@amd.com>
+Subject: Re: [PATCH net-next v3 3/6] virtio_net: support device stats
+Message-ID: <20240307085021.1081777d@kernel.org>
+In-Reply-To: <20240227080303.63894-4-xuanzhuo@linux.alibaba.com>
+References: <20240227080303.63894-1-xuanzhuo@linux.alibaba.com>
+	<20240227080303.63894-4-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 2/2] net: phy: air_en8811h: Add the Airoha
- EN8811H PHY driver
-Content-Language: en-US
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>, Lucien Jheng
- <lucien.jheng@airoha.com>, Zhi-Jun You <hujy652@protonmail.com>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org
-References: <20240302183835.136036-1-ericwouds@gmail.com>
- <20240302183835.136036-3-ericwouds@gmail.com>
- <e056b4ac-fffb-41d9-a357-898e35e6d451@lunn.ch>
- <aeb9f17c-ea94-4362-aeda-7d94c5845462@gmail.com>
- <Zebf5UvqWjVyunFU@shell.armlinux.org.uk>
- <0184291e-a3c7-4e54-8c75-5b8654d582b4@lunn.ch>
- <ZecrGTsBZ9VgsGZ+@shell.armlinux.org.uk>
-From: Eric Woudstra <ericwouds@gmail.com>
-In-Reply-To: <ZecrGTsBZ9VgsGZ+@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
+CC: Willem and some driver folks for more input, context: extending
+https://lore.kernel.org/all/20240306195509.1502746-1-kuba@kernel.org/
+to cover virtio stats.
 
+On Tue, 27 Feb 2024 16:03:00 +0800 Xuan Zhuo wrote:
+> +static const struct virtnet_stat_desc virtnet_stats_rx_basic_desc[] = {
+> +	VIRTNET_STATS_DESC(rx, basic, packets),
+> +	VIRTNET_STATS_DESC(rx, basic, bytes),
 
-On 3/5/24 15:24, Russell King (Oracle) wrote:
-> On Tue, Mar 05, 2024 at 03:06:45PM +0100, Andrew Lunn wrote:
->>> The only way I can see around this problem would be to look up the
->>> PHY in order to get a pointer to the struct phy_device in the network
->>> device's probe function, and attach the PHY there _before_ you register
->>> the network device. You can then return EPROBE_DEFER and, because you
->>> are returning it in a .probe function, the probe will be retried once
->>> other probes in the system (such as your PHY driver) have finished.
->>> This also means that userspace doesn't see the appearance of the
->>> non-functional network device until it's ready, and thus can use
->>> normal hotplug mechanisms to notice the network device.
->>
->> What i'm thinking is we add another op to phy_driver dedicated to
->> firmware download. We let probe run as is, so the PHY is registered
->> and available. But if the firmware op is set, we start a thread and
->> call the op in it. Once the op exits, we signal a completion event.
->> phy_attach_direct() would then wait on the completion.
-> 
-> That's really not good, because phy_attach_direct() can be called
-> from .ndo_open, which will result in the rtnl lock being held while
-> we wait - so this is not much better than having the firmware load
-> in .config_init.
-> 
-> If we drop the lock, then we need to audit what the effect of that
-> would be - for example, if the nic is being opened, it may mean
-> that another attempt to open the nic could be started. Or it may
-> mean that an attempt to configure the nic down could be started.
-> Then the original open proceeds and state is now messed up.
-> 
-> I do get the feeling that trying to work around "I don't want the
-> firmware in the initramfs" is creating more problems and pain than
-> it's worth.
+Covered.
 
-Then I'll move it to .probe().
+> +	VIRTNET_STATS_DESC(rx, basic, notifications),
+> +	VIRTNET_STATS_DESC(rx, basic, interrupts),
 
-Best regards,
+I haven't seen HW devices count interrupts coming from a specific
+queue (there's usually a lot more queues than IRQs these days),
+let's keep these in ethtool -S for now, unless someone has a HW use
+case.
 
-Eric Woudstra
+> +	VIRTNET_STATS_DESC(rx, basic, drops),
+> +	VIRTNET_STATS_DESC(rx, basic, drop_overruns),
+
+These are important, but we need to make sure we have a good definition
+for vendors to follow...
+
+drops I'd define as "sum of all packets which came into the device, but
+never left it, including but not limited to: packets dropped due to
+lack of buffer space, processing errors, explicitly set policies and
+packet filters." 
+Call it hw-rx-drops ?
+
+overruns is a bit harder to precisely define. I was thinking of
+something more broad, like: "packets dropped due to transient lack of
+resources, such as buffer space, host descriptors etc."
+
+For context why not just go with virtio spec definition of "no
+descriptors" - for HW devices, what exact point in the pipeline drops
+depends on how back pressure is configured/implemented, and fetching
+descriptors is high latency, so differentiating between "PCIe is slow"
+and "host didn't post descriptors" is hard in practice.
+Call it hw-rx-drop-overruns ?
+
+> +static const struct virtnet_stat_desc virtnet_stats_tx_basic_desc[] = {
+> +	VIRTNET_STATS_DESC(tx, basic, packets),
+> +	VIRTNET_STATS_DESC(tx, basic, bytes),
+> +
+> +	VIRTNET_STATS_DESC(tx, basic, notifications),
+> +	VIRTNET_STATS_DESC(tx, basic, interrupts),
+> +
+> +	VIRTNET_STATS_DESC(tx, basic, drops),
+
+These 5 same as rx.
+
+> +	VIRTNET_STATS_DESC(tx, basic, drop_malformed),
+
+These I'd call hw-tx-drop-errors, "packets dropped because they were
+invalid or malformed"?
+
+> +static const struct virtnet_stat_desc virtnet_stats_rx_csum_desc[] = {
+> +	VIRTNET_STATS_DESC(rx, csum, csum_valid),
+
+I think in kernel parlance that would translate to CHECKSUM_UNNECESSARY?
+So let's call it rx-csum-unnecessary ?
+I'd skip the hw- prefix for this one, it doesn't matter to the user if
+the HW or SW counted it.
+
+> +	VIRTNET_STATS_DESC(rx, csum, needs_csum),
+
+Hm, I think this is a bit software/virt device specific, presumably
+rx-csum-partial for the kernel, up to you whether to make it ethtool -S
+or netlink.
+
+> +	VIRTNET_STATS_DESC(rx, csum, csum_none),
+> +	VIRTNET_STATS_DESC(rx, csum, csum_bad),
+
+These two make sense as is in netlink, should be fairly commonly
+reported by devices. Maybe add a note in "bad" that packets with
+bad csum are not discarded, but still delivered to the stack.
+
+> +static const struct virtnet_stat_desc virtnet_stats_tx_csum_desc[] = {
+> +	VIRTNET_STATS_DESC(tx, csum, needs_csum),
+> +	VIRTNET_STATS_DESC(tx, csum, csum_none),
+
+tx- version of what names we pick for rx-, netlink seems appropriate.
+
+> +static const struct virtnet_stat_desc virtnet_stats_rx_gso_desc[] = {
+> +	VIRTNET_STATS_DESC(rx, gso, gso_packets),
+> +	VIRTNET_STATS_DESC(rx, gso, gso_bytes),
+
+I used the term "GSO" in conversations about Rx and it often confuses
+people. Let's use "GRO", so hw-gro-packets, and hw-gro-bytes ?
+Or maybe coalesce? "hw-rx-coalesce" ? That's quite a bit longer..
+
+Ah, and please mention in the doc that these counters "do not cover LRO
+i.e. any coalescing implementation which doesn't follow GRO rules".
+
+> +	VIRTNET_STATS_DESC(rx, gso, gso_packets_coalesced),
+
+hw-gro-wire-packets ?
+No strong preference on the naming, but I find that saying -wire
+makes it 100% clear to everyone what the meaning is.
+
+> +	VIRTNET_STATS_DESC(rx, gso, gso_bytes_coalesced),
+
+The documentation in the virtio spec seems to be identical 
+to the one for gso_packets, which gotta be unintentional?
+I'm guessing this is hw-gro-wire-bytes? I.e. headers counted
+multiple times?
+
+> +static const struct virtnet_stat_desc virtnet_stats_tx_gso_desc[] = {
+> +	VIRTNET_STATS_DESC(tx, gso, gso_packets),
+> +	VIRTNET_STATS_DESC(tx, gso, gso_bytes),
+> +	VIRTNET_STATS_DESC(tx, gso, gso_segments),
+> +	VIRTNET_STATS_DESC(tx, gso, gso_segments_bytes),
+
+these 4 make sense as mirror of the Rx
+
+> +	VIRTNET_STATS_DESC(tx, gso, gso_packets_noseg),
+> +	VIRTNET_STATS_DESC(tx, gso, gso_bytes_noseg),
+
+Not sure what these are :) unless someone knows what it is and that
+HW devices report it, let's keep them in ethtool -S ?
+
+> +static const struct virtnet_stat_desc virtnet_stats_rx_speed_desc[] = {
+> +	VIRTNET_STATS_DESC(rx, speed, packets_allowance_exceeded),
+
+hw-rx-drop-ratelimits ?
+"Allowance exceeded" is a bit of a mouthful to me, perhaps others
+disagree. The description from the virtio spec is quite good.
+
+> +	VIRTNET_STATS_DESC(rx, speed, bytes_allowance_exceeded),
+
+No strong preference whether to expose this as a standard stat or
+ethtool -S, we don't generally keep byte counters for drops, so
+this would be special.
+
+> +static const struct virtnet_stat_desc virtnet_stats_tx_speed_desc[] = {
+> +	VIRTNET_STATS_DESC(tx, speed, packets_allowance_exceeded),
+> +	VIRTNET_STATS_DESC(tx, speed, packets_allowance_exceeded),
+
+same as rx
 
