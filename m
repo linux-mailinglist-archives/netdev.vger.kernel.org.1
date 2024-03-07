@@ -1,99 +1,122 @@
-Return-Path: <netdev+bounces-78517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2B53875754
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 20:37:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47D82875792
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 20:53:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DED52882AC
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 19:36:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7955E1C221C8
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 19:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08DCD136677;
-	Thu,  7 Mar 2024 19:36:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tOA5lQQA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10DAB137C36;
+	Thu,  7 Mar 2024 19:51:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81EF135A56;
-	Thu,  7 Mar 2024 19:36:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D095137C39;
+	Thu,  7 Mar 2024 19:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709840215; cv=none; b=WuK7hxmoXh6ye7GAkAHbL9fm6TxW3WM3fdn3QBjvMxPrI+D4M9TAc2XmlNqZvxqYXWZnFzBuWabclwkUjjhYqEc/zOW2Gx/BrFTHzyw6k1od+/Iu2OOSf0cyfGnK+nPtWP59zVSJHA8erl/Abx6u2luLSREQTEdjbW59z/hEqR8=
+	t=1709841092; cv=none; b=bByI9k6A/CBG6KO200GOB/SKwjkyNOxrJJyBdo7VwZ0SXNTTsb4KIulq1+7zGy2IKZRDDoLwGr2+BV6QQ9RgkoDT2p/+CERf/Zme7AldrY42eIbYLt5T+5MlRN+DXDD56AsD3O7/f9lvFcFNH0quw8Va+3bery4sjPhkrK1v7HM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709840215; c=relaxed/simple;
-	bh=1KgGaAOEWbovalkj+qhFZ1YtOmYOmUKmUqLvlOtisHQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r1AoJp9tSiOKbvdeMDq9VY7qeGCiWJspkjjyZrLZDGx7GT1XULfFxXa+qAvAcAzJJZkvvnLlNFkhxsINRGbyaiGcFf/Ty5lI5D00JPab78dzT8weKNlwyLSdI6roElnlqLN+aIgxo1ftEwxitUngOqwg0RjNiSjLNWqWTf2kCRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tOA5lQQA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF3F2C433F1;
-	Thu,  7 Mar 2024 19:36:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709840215;
-	bh=1KgGaAOEWbovalkj+qhFZ1YtOmYOmUKmUqLvlOtisHQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=tOA5lQQAX0B3LhpjtoXKJRjGQ85CeIUnjIZ0wkJcN5D+SORITfOESXruD0j0BFK/E
-	 0UKY9dgzyyXDFzMgO8Px+GltHCeGcnat3LXBWdjEoetCR4/yG4rNPwQr4QhN1pvkfw
-	 E3eHtLIlMHsJjwiwSjPVoO/UWqK1XN3oTD9xmJBjpxywjZocsZgd8uh+9yxFImk532
-	 bCNIQevs5HSINTFzWTo76AegUv9XbnEgBo1qitZJsAjpDqEheNrzKURhWUX36P6x2t
-	 9TZX3kCp85qoFhPhZtsGH+vT/1YFk/37Pd2qdLZ6aPLRejdf3M3usNwAEM/naXI2YQ
-	 ke5B1CuE3sIww==
-Message-ID: <5487d52a-31de-4422-b5ed-a59390d23ca0@kernel.org>
-Date: Thu, 7 Mar 2024 12:36:53 -0700
+	s=arc-20240116; t=1709841092; c=relaxed/simple;
+	bh=a1xb1mMQy8YqL8oScQ6h8lSK/elVzB3caUVbGFJlCSM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UfDljUVKDbuDiyydz7Dp6egD6gDJnjHMjE4fDI2TnjyGEpeF+7+qK/T7NECooWSlNKdD/eQuh83v+C9WhYwxV5MQMs72V3xKfTMVYBG5keOxZwsy4HTRtZgPBm/srFwa1gHbFNuI7TVsa0c+qJTmX48/ti8L5J3mkcFm6fmCk3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; arc=none smtp.client-ip=78.47.171.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+Received: from localhost.localdomain (unknown [45.118.184.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@sostec.de)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id 37CC3C08B2;
+	Thu,  7 Mar 2024 20:51:25 +0100 (CET)
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-wpan@vger.kernel.org,
+	alex.aring@gmail.com,
+	miquel.raynal@bootlin.com,
+	netdev@vger.kernel.org
+Subject: pull-request: ieee802154-next 2024-03-07
+Date: Thu,  7 Mar 2024 20:51:05 +0100
+Message-ID: <20240307195105.292085-1-stefan@datenfreihafen.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v5] ipv6: fib6_rules: flush route cache when rule is
- changed
-Content-Language: en-US
-To: Shiming Cheng <shiming.cheng@mediatek.com>, jiri@resnulli.us,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Lena Wang <lena.wang@mediatek.com>
-References: <20240307100157.29699-1-shiming.cheng@mediatek.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240307100157.29699-1-shiming.cheng@mediatek.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 3/7/24 3:01 AM, Shiming Cheng wrote:
-> When rule policy is changed, ipv6 socket cache is not refreshed.
-> The sock's skb still uses a outdated route cache and was sent to
-> a wrong interface.
-> 
-> To avoid this error we should update fib node's version when
-> rule is changed. Then skb's route will be reroute checked as
-> route cache version is already different with fib node version.
-> The route cache is refreshed to match the latest rule.
-> 
-> Fixes: 101367c2f8c4 ("[IPV6]: Policy Routing Rules")
-> Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
-> Signed-off-by: Lena Wang <lena.wang@mediatek.com>
-> ---
-> v5:
->   - rebase on the top of latest net/main branch.
-> v4:
->   - add "Fixes:" tag.
->   - update subject as requested.
-> v3:
->   - update patch description and name format in commit message.
-> v2:
->   - modify flush function same way as ipv4 flush cache.
->   - use tabs to aligh with existing code.
-> ---
-> ---
->  net/ipv6/fib6_rules.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
+Hello Dave, Jakub, Paolo.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+A little late, but hopefully still in time.
 
+An update from ieee802154 for your *net-next* tree:
 
+Various cross tree patches for ieee802154v drivers and a resource leak
+fix for ieee802154 llsec.
+
+Andy Shevchenko changed GPIO header usage for at86rf230 and mcr20a to
+only include needed headers.
+
+Bo Liu converted the at86rf230, mcr20a and mrf24j40 driver regmap
+support to use the maple tree register cache.
+
+Fedor Pchelkin fixed a resource leak in the llsec key deletion path.
+
+Ricardo B. Marliere made wpan_phy_class const.
+
+Tejun Heo removed WQ_UNBOUND from a workqueue call in ca8210.
+
+regards
+Stefan Schmidt
+
+The following changes since commit 2373699560a754079579b7722b50d1d38de1960e:
+
+  mac802154: Avoid new associations while disassociating (2023-12-15 11:14:57 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan-next.git tags/ieee802154-for-net-next-2024-03-07
+
+for you to fetch changes up to b2d23256615c8f8b3215f0155b0234f0e310dfde:
+
+  ieee802154: cfg802154: make wpan_phy_class constant (2024-03-06 21:23:10 +0100)
+
+----------------------------------------------------------------
+Andy Shevchenko (2):
+      ieee802154: at86rf230: Replace of_gpio.h by proper one
+      ieee802154: mcr20a: Remove unused of_gpio.h
+
+Bo Liu (3):
+      net: ieee802154: at86rf230: convert to use maple tree register cache
+      net: ieee802154: mcr20a: convert to use maple tree register cache
+      net: ieee802154: mrf24j40: convert to use maple tree register cache
+
+Fedor Pchelkin (1):
+      mac802154: fix llsec key resources release in mac802154_llsec_key_del
+
+Ricardo B. Marliere (1):
+      ieee802154: cfg802154: make wpan_phy_class constant
+
+Tejun Heo (1):
+      ieee802154: ca8210: Drop spurious WQ_UNBOUND from alloc_ordered_workqueue() call
+
+ drivers/net/ieee802154/at86rf230.c |  5 ++---
+ drivers/net/ieee802154/ca8210.c    | 10 ++--------
+ drivers/net/ieee802154/mcr20a.c    |  5 ++---
+ drivers/net/ieee802154/mrf24j40.c  |  4 ++--
+ include/net/cfg802154.h            |  1 +
+ net/ieee802154/sysfs.c             |  2 +-
+ net/ieee802154/sysfs.h             |  2 +-
+ net/mac802154/llsec.c              | 18 +++++++++++++-----
+ 8 files changed, 24 insertions(+), 23 deletions(-)
 
