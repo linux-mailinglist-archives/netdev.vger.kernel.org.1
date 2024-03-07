@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-78286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 099FD8749F4
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:43:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A47E48749F5
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:43:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D0A41C21D98
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:43:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C86021C21ED6
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BC583A1C;
-	Thu,  7 Mar 2024 08:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC0483CA3;
+	Thu,  7 Mar 2024 08:42:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N4cgg8rs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IMAcujbm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7116283A18
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 08:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6906783CA0
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 08:42:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709800967; cv=none; b=kMkm/NeQmR5aSLVMH3xhAVbRUjP8J05dMdDC+cn+3dMyOKXpZ5RzF15VnwPIrYfCR5SQJ05daStiwRfCUzbAj4Gwn3J36/XQ0Cf87FhM3EJO8UCc70ylHpcZDtcI7qSpwCqmkPiJ3O9/SLLwtbPo3tvcmuVAkhJQ5JgGVIbpB8A=
+	t=1709800968; cv=none; b=t/jmkuglM5GJSKdnb06anTARAGjDXgEXZr8L70M6lsLMKm5Pmh1sM96OHUj7G7GaVMqyGYE+WwWAYY6z2aa8hzyo1l9z0OE7LzxwvlnLok5sRse5RRuXy0WVWQDVshuPjQevFuv04EP64Cosaok0Cl6QEfP5iDceSotNnvZ7zng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709800967; c=relaxed/simple;
-	bh=pRQ/ud/bi13jrPzSsbQnDkNT+BxMdS3THrbWri/f57w=;
+	s=arc-20240116; t=1709800968; c=relaxed/simple;
+	bh=5Vb3j8j1QYNBZ3YithQP4qpzyl1tKhiVEagkOUJDsPI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lVmKzLfunIjkKkHZNVSRKhOjWARy9+xzIJ2E22MQYBM8YP6HlQW/VTsxFe9iUyDnixM8unpqbnWfHa2zuxEhyNATuw20XbpaDBTOlcYc0svVVImNurvcOMzN+pSrcHVwaD3qkkATZShBlUUtCPZAZNaWd3hEKNZ1E8iiMbUtNZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N4cgg8rs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB82EC43394;
-	Thu,  7 Mar 2024 08:42:46 +0000 (UTC)
+	 MIME-Version; b=ZgzRYH+kWUdYG+tVxdDWvp0IS0kT8ChrttMEmguA/mI242qp+EhM0l7Wb2ANmqGDnWrkR1VMO1QyPOOHN38hYa8wA7vDyPgnzEQSIW4X6DwqcBXIMGiX1Ir6ipUteBAHSB4n7OxuUP20PBehFmrBQqQ9GV35tcASuzaD4wLGIJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IMAcujbm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB70BC43390;
+	Thu,  7 Mar 2024 08:42:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709800966;
-	bh=pRQ/ud/bi13jrPzSsbQnDkNT+BxMdS3THrbWri/f57w=;
+	s=k20201202; t=1709800968;
+	bh=5Vb3j8j1QYNBZ3YithQP4qpzyl1tKhiVEagkOUJDsPI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=N4cgg8rstTUxlHuMZfXL9RS6AR8OasW8hRDwj+3NURD6mgtHJ260RTuS61WGWLT6y
-	 TMyZnl1boca1/C3pAERyu3cElf/uutaPfsDf5kuKEPB58GVsG0TRojRAoa84QxTl4/
-	 rQOtakIgj1CVLvnYxFBEcbxhhLGFldYDGucn5J5ODC9Ou3jWJOxvpIq9jzD/QFG4eH
-	 6NEthRRMhjBN+HgbeBS6iKnh8fCiSym9b3jgM4WVYSiMy0AcfBn2i6jQSjPQtHdEHC
-	 5TMjzKo4nt5lfBaKu/qqH65vHLNlG7Pl4ReUdXaj6S4XrCahgiZNsCTBPabp/7GH8B
-	 Q+zlJ5SQlLwuw==
+	b=IMAcujbmDqCFImQac+oM/1NyPZRIFBXfZHvpxVYncavxRbb7iAlIL10l33LDP0Ytq
+	 B4vAyjt8Yiy8XZ+hVpjJQ2scJVwNAYr81f9QGkK3NASiV47ePjN9kB01BQcL9S2g92
+	 7PqoC7suo75wql6indp7S5LVp3Tj0i24m58gUmQEZA3kVXQbfCrdCPfPbDVCvGskJC
+	 kcLF4obKbbpd679tb7ca8i4YejUnK2uy9GZzxb8HuLDcSFSvnWKxb5pvgLrjMbpmvH
+	 v+xPQ0db38VqHvnDuFFWI/O3dcXFlzh8AObizQtpMdFf+t8bsjgnqomAmbHKiseZT/
+	 uXQV6TcVTTfYQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -51,9 +51,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>
-Subject: [net-next V6 10/15] net/mlx5e: Let channels be SD-aware
-Date: Thu,  7 Mar 2024 00:42:24 -0800
-Message-ID: <20240307084229.500776-11-saeed@kernel.org>
+Subject: [net-next V6 11/15] net/mlx5e: Support cross-vhca RSS
+Date: Thu,  7 Mar 2024 00:42:25 -0800
+Message-ID: <20240307084229.500776-12-saeed@kernel.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240307084229.500776-1-saeed@kernel.org>
 References: <20240307084229.500776-1-saeed@kernel.org>
@@ -67,278 +67,681 @@ Content-Transfer-Encoding: 8bit
 
 From: Tariq Toukan <tariqt@nvidia.com>
 
-Distribute the channels between the different SD-devices to acheive
-local numa node performance on multiple numas.
+Implement driver support for the HW feature that allows RX steering of
+one device to target other device's RQs.
 
-Each channel works against one specific mdev, creating all datapath
-queues against it.
-
-We distribute channels to mdevs in a round-robin policy.
-
-Example for 2 mdevs and 6 channels:
-+-------+---------+
-| ch ix | mdev ix |
-+-------+---------+
-|   0   |    0    |
-|   1   |    1    |
-|   2   |    0    |
-|   3   |    1    |
-|   4   |    0    |
-|   5   |    1    |
-+-------+---------+
-
-This round-robin distribution policy is preferred over another suggested
-intuitive distribution, in which we first distribute one half of the
-channels to mdev #0 and then the second half to mdev #1.
-
-We prefer round-robin for a reason: it is less influenced by changes in
-the number of channels. The mapping between channel index and mdev is
-fixed, no matter how many channels the user configures. As the channel
-stats are persistent to channels closure, changing the mapping every
-single time would turn the accumulative stats less representing of the
-channel's history.
-
-Per-channel objects should stop using the primary mdev (priv->mdev)
-directly, and instead move to using their own channel's mdev.
+In SD multi-pf netdev mode, we set the secondaries into silent mode,
+disconnecting them from the network. This feature is then used to steer
+traffic from the primary to the secondaries.
 
 Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 Reviewed-by: Gal Pressman <gal@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en.h  |  1 +
- .../ethernet/mellanox/mlx5/core/en/params.c   |  2 +-
- .../net/ethernet/mellanox/mlx5/core/en/qos.c  |  8 ++---
- .../mellanox/mlx5/core/en/reporter_rx.c       |  4 +--
- .../mellanox/mlx5/core/en/reporter_tx.c       |  3 +-
- .../ethernet/mellanox/mlx5/core/en/xsk/pool.c |  6 ++--
- .../mellanox/mlx5/core/en_accel/ktls_rx.c     |  6 ++--
- .../net/ethernet/mellanox/mlx5/core/en_main.c | 32 ++++++++++++-------
- 8 files changed, 35 insertions(+), 27 deletions(-)
+ .../ethernet/mellanox/mlx5/core/en/channels.c |  10 +-
+ .../ethernet/mellanox/mlx5/core/en/channels.h |   6 +-
+ .../net/ethernet/mellanox/mlx5/core/en/rqt.c  | 123 ++++++++++++++----
+ .../net/ethernet/mellanox/mlx5/core/en/rqt.h  |   9 +-
+ .../net/ethernet/mellanox/mlx5/core/en/rss.c  |  17 +--
+ .../net/ethernet/mellanox/mlx5/core/en/rss.h  |   4 +-
+ .../ethernet/mellanox/mlx5/core/en/rx_res.c   |  62 ++++++---
+ .../ethernet/mellanox/mlx5/core/en/rx_res.h   |   1 +
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |   2 +
+ .../net/ethernet/mellanox/mlx5/core/en_tc.c   |   2 +-
+ 10 files changed, 179 insertions(+), 57 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-index 6c143088e247..f6e78c465c7a 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-@@ -792,6 +792,7 @@ struct mlx5e_channel {
- 	struct hwtstamp_config    *tstamp;
- 	DECLARE_BITMAP(state, MLX5E_CHANNEL_NUM_STATES);
- 	int                        ix;
-+	int                        vec_ix;
- 	int                        cpu;
- 	/* Sync between icosq recovery and XSK enable/disable. */
- 	struct mutex               icosq_recovery_lock;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-index 5757f4f10c12..8b99cc11f138 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-@@ -688,7 +688,7 @@ void mlx5e_build_create_cq_param(struct mlx5e_create_cq_param *ccp, struct mlx5e
- 		.napi = &c->napi,
- 		.ch_stats = c->stats,
- 		.node = cpu_to_node(c->cpu),
--		.ix = c->ix,
-+		.ix = c->vec_ix,
- 	};
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/channels.c b/drivers/net/ethernet/mellanox/mlx5/core/en/channels.c
+index 48581ea3adcb..874a1016623c 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/channels.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/channels.c
+@@ -23,20 +23,26 @@ bool mlx5e_channels_is_xsk(struct mlx5e_channels *chs, unsigned int ix)
+ 	return test_bit(MLX5E_CHANNEL_STATE_XSK, c->state);
  }
  
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c
-index 34adf8c3f81a..e87e26f2c669 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c
-@@ -122,8 +122,8 @@ int mlx5e_open_qos_sq(struct mlx5e_priv *priv, struct mlx5e_channels *chs,
- 
- 	memset(&param_sq, 0, sizeof(param_sq));
- 	memset(&param_cq, 0, sizeof(param_cq));
--	mlx5e_build_sq_param(priv->mdev, params, &param_sq);
--	mlx5e_build_tx_cq_param(priv->mdev, params, &param_cq);
-+	mlx5e_build_sq_param(c->mdev, params, &param_sq);
-+	mlx5e_build_tx_cq_param(c->mdev, params, &param_cq);
- 	err = mlx5e_open_cq(c->mdev, params->tx_cq_moderation, &param_cq, &ccp, &sq->cq);
- 	if (err)
- 		goto err_free_sq;
-@@ -176,7 +176,7 @@ int mlx5e_activate_qos_sq(void *data, u16 node_qid, u32 hw_id)
- 	 */
- 	smp_wmb();
- 
--	qos_dbg(priv->mdev, "Activate QoS SQ qid %u\n", node_qid);
-+	qos_dbg(sq->mdev, "Activate QoS SQ qid %u\n", node_qid);
- 	mlx5e_activate_txqsq(sq);
- 
- 	return 0;
-@@ -190,7 +190,7 @@ void mlx5e_deactivate_qos_sq(struct mlx5e_priv *priv, u16 qid)
- 	if (!sq) /* Handle the case when the SQ failed to open. */
- 		return;
- 
--	qos_dbg(priv->mdev, "Deactivate QoS SQ qid %u\n", qid);
-+	qos_dbg(sq->mdev, "Deactivate QoS SQ qid %u\n", qid);
- 	mlx5e_deactivate_txqsq(sq);
- 
- 	priv->txq2sq[mlx5e_qid_from_qos(&priv->channels, qid)] = NULL;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
-index 4358798d6ce1..25d751eba99b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
-@@ -294,8 +294,8 @@ static void mlx5e_rx_reporter_diagnose_generic_rq(struct mlx5e_rq *rq,
- 
- 	params = &priv->channels.params;
- 	rq_sz = mlx5e_rqwq_get_size(rq);
--	real_time =  mlx5_is_real_time_rq(priv->mdev);
--	rq_stride = BIT(mlx5e_mpwqe_get_log_stride_size(priv->mdev, params, NULL));
-+	real_time =  mlx5_is_real_time_rq(rq->mdev);
-+	rq_stride = BIT(mlx5e_mpwqe_get_log_stride_size(rq->mdev, params, NULL));
- 
- 	mlx5e_health_fmsg_named_obj_nest_start(fmsg, "RQ");
- 	devlink_fmsg_u8_pair_put(fmsg, "type", params->rq_wq_type);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
-index 6b44ddce14e9..0ab9db319530 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
-@@ -219,7 +219,6 @@ mlx5e_tx_reporter_build_diagnose_output_sq_common(struct devlink_fmsg *fmsg,
- 						  struct mlx5e_txqsq *sq, int tc)
+-void mlx5e_channels_get_regular_rqn(struct mlx5e_channels *chs, unsigned int ix, u32 *rqn)
++void mlx5e_channels_get_regular_rqn(struct mlx5e_channels *chs, unsigned int ix, u32 *rqn,
++				    u32 *vhca_id)
  {
- 	bool stopped = netif_xmit_stopped(sq->txq);
--	struct mlx5e_priv *priv = sq->priv;
- 	u8 state;
+ 	struct mlx5e_channel *c = mlx5e_channels_get(chs, ix);
+ 
+ 	*rqn = c->rq.rqn;
++	if (vhca_id)
++		*vhca_id = MLX5_CAP_GEN(c->mdev, vhca_id);
+ }
+ 
+-void mlx5e_channels_get_xsk_rqn(struct mlx5e_channels *chs, unsigned int ix, u32 *rqn)
++void mlx5e_channels_get_xsk_rqn(struct mlx5e_channels *chs, unsigned int ix, u32 *rqn,
++				u32 *vhca_id)
+ {
+ 	struct mlx5e_channel *c = mlx5e_channels_get(chs, ix);
+ 
+ 	WARN_ON_ONCE(!test_bit(MLX5E_CHANNEL_STATE_XSK, c->state));
+ 
+ 	*rqn = c->xskrq.rqn;
++	if (vhca_id)
++		*vhca_id = MLX5_CAP_GEN(c->mdev, vhca_id);
+ }
+ 
+ bool mlx5e_channels_get_ptp_rqn(struct mlx5e_channels *chs, u32 *rqn)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/channels.h b/drivers/net/ethernet/mellanox/mlx5/core/en/channels.h
+index 637ca90daaa8..6715aa9383b9 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/channels.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/channels.h
+@@ -10,8 +10,10 @@ struct mlx5e_channels;
+ 
+ unsigned int mlx5e_channels_get_num(struct mlx5e_channels *chs);
+ bool mlx5e_channels_is_xsk(struct mlx5e_channels *chs, unsigned int ix);
+-void mlx5e_channels_get_regular_rqn(struct mlx5e_channels *chs, unsigned int ix, u32 *rqn);
+-void mlx5e_channels_get_xsk_rqn(struct mlx5e_channels *chs, unsigned int ix, u32 *rqn);
++void mlx5e_channels_get_regular_rqn(struct mlx5e_channels *chs, unsigned int ix, u32 *rqn,
++				    u32 *vhca_id);
++void mlx5e_channels_get_xsk_rqn(struct mlx5e_channels *chs, unsigned int ix, u32 *rqn,
++				u32 *vhca_id);
+ bool mlx5e_channels_get_ptp_rqn(struct mlx5e_channels *chs, u32 *rqn);
+ 
+ #endif /* __MLX5_EN_CHANNELS_H__ */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.c b/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.c
+index 7b8ff7a71003..bcafb4bf9415 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.c
+@@ -4,6 +4,33 @@
+ #include "rqt.h"
+ #include <linux/mlx5/transobj.h>
+ 
++static bool verify_num_vhca_ids(struct mlx5_core_dev *mdev, u32 *vhca_ids,
++				unsigned int size)
++{
++	unsigned int max_num_vhca_id = MLX5_CAP_GEN_2(mdev, max_rqt_vhca_id);
++	int i;
++
++	/* Verify that all vhca_ids are in range [0, max_num_vhca_ids - 1] */
++	for (i = 0; i < size; i++)
++		if (vhca_ids[i] >= max_num_vhca_id)
++			return false;
++	return true;
++}
++
++static bool rqt_verify_vhca_ids(struct mlx5_core_dev *mdev, u32 *vhca_ids,
++				unsigned int size)
++{
++	if (!vhca_ids)
++		return true;
++
++	if (!MLX5_CAP_GEN(mdev, cross_vhca_rqt))
++		return false;
++	if (!verify_num_vhca_ids(mdev, vhca_ids, size))
++		return false;
++
++	return true;
++}
++
+ void mlx5e_rss_params_indir_init_uniform(struct mlx5e_rss_params_indir *indir,
+ 					 unsigned int num_channels)
+ {
+@@ -13,19 +40,38 @@ void mlx5e_rss_params_indir_init_uniform(struct mlx5e_rss_params_indir *indir,
+ 		indir->table[i] = i % num_channels;
+ }
+ 
++static void fill_rqn_list(void *rqtc, u32 *rqns, u32 *vhca_ids, unsigned int size)
++{
++	unsigned int i;
++
++	if (vhca_ids) {
++		MLX5_SET(rqtc, rqtc, rq_vhca_id_format, 1);
++		for (i = 0; i < size; i++) {
++			MLX5_SET(rqtc, rqtc, rq_vhca[i].rq_num, rqns[i]);
++			MLX5_SET(rqtc, rqtc, rq_vhca[i].rq_vhca_id, vhca_ids[i]);
++		}
++	} else {
++		for (i = 0; i < size; i++)
++			MLX5_SET(rqtc, rqtc, rq_num[i], rqns[i]);
++	}
++}
+ static int mlx5e_rqt_init(struct mlx5e_rqt *rqt, struct mlx5_core_dev *mdev,
+-			  u16 max_size, u32 *init_rqns, u16 init_size)
++			  u16 max_size, u32 *init_rqns, u32 *init_vhca_ids, u16 init_size)
+ {
++	int entry_sz;
+ 	void *rqtc;
+ 	int inlen;
  	int err;
+ 	u32 *in;
+-	int i;
++
++	if (!rqt_verify_vhca_ids(mdev, init_vhca_ids, init_size))
++		return -EOPNOTSUPP;
  
-@@ -227,7 +226,7 @@ mlx5e_tx_reporter_build_diagnose_output_sq_common(struct devlink_fmsg *fmsg,
- 	devlink_fmsg_u32_pair_put(fmsg, "txq ix", sq->txq_ix);
- 	devlink_fmsg_u32_pair_put(fmsg, "sqn", sq->sqn);
+ 	rqt->mdev = mdev;
+ 	rqt->size = max_size;
  
--	err = mlx5_core_query_sq_state(priv->mdev, sq->sqn, &state);
-+	err = mlx5_core_query_sq_state(sq->mdev, sq->sqn, &state);
- 	if (!err)
- 		devlink_fmsg_u8_pair_put(fmsg, "HW state", state);
+-	inlen = MLX5_ST_SZ_BYTES(create_rqt_in) + sizeof(u32) * init_size;
++	entry_sz = init_vhca_ids ? MLX5_ST_SZ_BYTES(rq_vhca) : MLX5_ST_SZ_BYTES(rq_num);
++	inlen = MLX5_ST_SZ_BYTES(create_rqt_in) + entry_sz * init_size;
+ 	in = kvzalloc(inlen, GFP_KERNEL);
+ 	if (!in)
+ 		return -ENOMEM;
+@@ -33,10 +79,9 @@ static int mlx5e_rqt_init(struct mlx5e_rqt *rqt, struct mlx5_core_dev *mdev,
+ 	rqtc = MLX5_ADDR_OF(create_rqt_in, in, rqt_context);
  
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/pool.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/pool.c
-index ebada0c5af3c..db776e515b6a 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/pool.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/pool.c
-@@ -6,10 +6,10 @@
- #include "setup.h"
- #include "en/params.h"
+ 	MLX5_SET(rqtc, rqtc, rqt_max_size, rqt->size);
+-
+ 	MLX5_SET(rqtc, rqtc, rqt_actual_size, init_size);
+-	for (i = 0; i < init_size; i++)
+-		MLX5_SET(rqtc, rqtc, rq_num[i], init_rqns[i]);
++
++	fill_rqn_list(rqtc, init_rqns, init_vhca_ids, init_size);
  
--static int mlx5e_xsk_map_pool(struct mlx5e_priv *priv,
-+static int mlx5e_xsk_map_pool(struct mlx5_core_dev *mdev,
- 			      struct xsk_buff_pool *pool)
+ 	err = mlx5_core_create_rqt(rqt->mdev, in, inlen, &rqt->rqtn);
+ 
+@@ -49,7 +94,7 @@ int mlx5e_rqt_init_direct(struct mlx5e_rqt *rqt, struct mlx5_core_dev *mdev,
  {
--	struct device *dev = mlx5_core_dma_dev(priv->mdev);
-+	struct device *dev = mlx5_core_dma_dev(mdev);
+ 	u16 max_size = indir_enabled ? indir_table_size : 1;
  
- 	return xsk_pool_dma_map(pool, dev, DMA_ATTR_SKIP_CPU_SYNC);
+-	return mlx5e_rqt_init(rqt, mdev, max_size, &init_rqn, 1);
++	return mlx5e_rqt_init(rqt, mdev, max_size, &init_rqn, NULL, 1);
  }
-@@ -89,7 +89,7 @@ static int mlx5e_xsk_enable_locked(struct mlx5e_priv *priv,
- 	if (unlikely(!mlx5e_xsk_is_pool_sane(pool)))
- 		return -EINVAL;
  
--	err = mlx5e_xsk_map_pool(priv, pool);
-+	err = mlx5e_xsk_map_pool(mlx5_sd_ch_ix_get_dev(priv->mdev, ix), pool);
- 	if (unlikely(err))
- 		return err;
+ static int mlx5e_bits_invert(unsigned long a, int size)
+@@ -63,7 +108,8 @@ static int mlx5e_bits_invert(unsigned long a, int size)
+ 	return inv;
+ }
  
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
-index 9b597cb24598..65ccb33edafb 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
-@@ -267,7 +267,7 @@ resync_post_get_progress_params(struct mlx5e_icosq *sq,
- 		goto err_out;
+-static int mlx5e_calc_indir_rqns(u32 *rss_rqns, u32 *rqns, unsigned int num_rqns,
++static int mlx5e_calc_indir_rqns(u32 *rss_rqns, u32 *rqns, u32 *rss_vhca_ids, u32 *vhca_ids,
++				 unsigned int num_rqns,
+ 				 u8 hfunc, struct mlx5e_rss_params_indir *indir)
+ {
+ 	unsigned int i;
+@@ -82,30 +128,42 @@ static int mlx5e_calc_indir_rqns(u32 *rss_rqns, u32 *rqns, unsigned int num_rqns
+ 			 */
+ 			return -EINVAL;
+ 		rss_rqns[i] = rqns[ix];
++		if (vhca_ids)
++			rss_vhca_ids[i] = vhca_ids[ix];
  	}
  
--	pdev = mlx5_core_dma_dev(sq->channel->priv->mdev);
-+	pdev = mlx5_core_dma_dev(sq->channel->mdev);
- 	buf->dma_addr = dma_map_single(pdev, &buf->progress,
- 				       PROGRESS_PARAMS_PADDED_SIZE, DMA_FROM_DEVICE);
- 	if (unlikely(dma_mapping_error(pdev, buf->dma_addr))) {
-@@ -425,14 +425,12 @@ void mlx5e_ktls_handle_get_psv_completion(struct mlx5e_icosq_wqe_info *wi,
- {
- 	struct mlx5e_ktls_rx_resync_buf *buf = wi->tls_get_params.buf;
- 	struct mlx5e_ktls_offload_context_rx *priv_rx;
--	struct mlx5e_ktls_rx_resync_ctx *resync;
- 	u8 tracker_state, auth_state, *ctx;
- 	struct device *dev;
- 	u32 hw_seq;
+ 	return 0;
+ }
  
- 	priv_rx = buf->priv_rx;
--	resync = &priv_rx->resync;
--	dev = mlx5_core_dma_dev(resync->priv->mdev);
-+	dev = mlx5_core_dma_dev(sq->channel->mdev);
- 	if (unlikely(test_bit(MLX5E_PRIV_RX_FLAG_DELETING, priv_rx->flags)))
- 		goto out;
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index c6c406c18b54..8d9b0cdb4e01 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -2529,14 +2529,20 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
- 			      struct xsk_buff_pool *xsk_pool,
- 			      struct mlx5e_channel **cp)
+ int mlx5e_rqt_init_indir(struct mlx5e_rqt *rqt, struct mlx5_core_dev *mdev,
+-			 u32 *rqns, unsigned int num_rqns,
++			 u32 *rqns, u32 *vhca_ids, unsigned int num_rqns,
+ 			 u8 hfunc, struct mlx5e_rss_params_indir *indir)
  {
--	int cpu = mlx5_comp_vector_get_cpu(priv->mdev, ix);
- 	struct net_device *netdev = priv->netdev;
-+	struct mlx5_core_dev *mdev;
- 	struct mlx5e_xsk_param xsk;
- 	struct mlx5e_channel *c;
- 	unsigned int irq;
-+	int vec_ix;
-+	int cpu;
+-	u32 *rss_rqns;
++	u32 *rss_rqns, *rss_vhca_ids = NULL;
  	int err;
  
--	err = mlx5_comp_irqn_get(priv->mdev, ix, &irq);
-+	mdev = mlx5_sd_ch_ix_get_dev(priv->mdev, ix);
-+	vec_ix = mlx5_sd_ch_ix_get_vec_ix(mdev, ix);
-+	cpu = mlx5_comp_vector_get_cpu(mdev, vec_ix);
-+
-+	err = mlx5_comp_irqn_get(mdev, vec_ix, &irq);
- 	if (err)
- 		return err;
- 
-@@ -2549,18 +2555,19 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
+ 	rss_rqns = kvmalloc_array(indir->actual_table_size, sizeof(*rss_rqns), GFP_KERNEL);
+ 	if (!rss_rqns)
  		return -ENOMEM;
  
- 	c->priv     = priv;
--	c->mdev     = priv->mdev;
-+	c->mdev     = mdev;
- 	c->tstamp   = &priv->tstamp;
- 	c->ix       = ix;
-+	c->vec_ix   = vec_ix;
- 	c->cpu      = cpu;
--	c->pdev     = mlx5_core_dma_dev(priv->mdev);
-+	c->pdev     = mlx5_core_dma_dev(mdev);
- 	c->netdev   = priv->netdev;
--	c->mkey_be  = cpu_to_be32(priv->mdev->mlx5e_res.hw_objs.mkey);
-+	c->mkey_be  = cpu_to_be32(mdev->mlx5e_res.hw_objs.mkey);
- 	c->num_tc   = mlx5e_get_dcb_num_tc(params);
- 	c->xdp      = !!params->xdp_prog;
- 	c->stats    = &priv->channel_stats[ix]->ch;
- 	c->aff_mask = irq_get_effective_affinity_mask(irq);
--	c->lag_port = mlx5e_enumerate_lag_port(priv->mdev, ix);
-+	c->lag_port = mlx5e_enumerate_lag_port(mdev, ix);
- 
- 	netif_napi_add(netdev, &c->napi, mlx5e_napi_poll);
- 	netif_napi_set_irq(&c->napi, irq);
-@@ -2943,15 +2950,18 @@ static MLX5E_DEFINE_PREACTIVATE_WRAPPER_CTX(mlx5e_update_netdev_queues);
- static void mlx5e_set_default_xps_cpumasks(struct mlx5e_priv *priv,
- 					   struct mlx5e_params *params)
- {
--	struct mlx5_core_dev *mdev = priv->mdev;
--	int num_comp_vectors, ix, irq;
--
--	num_comp_vectors = mlx5_comp_vectors_max(mdev);
-+	int ix;
- 
- 	for (ix = 0; ix < params->num_channels; ix++) {
-+		int num_comp_vectors, irq, vec_ix;
-+		struct mlx5_core_dev *mdev;
+-	err = mlx5e_calc_indir_rqns(rss_rqns, rqns, num_rqns, hfunc, indir);
++	if (vhca_ids) {
++		rss_vhca_ids = kvmalloc_array(indir->actual_table_size, sizeof(*rss_vhca_ids),
++					      GFP_KERNEL);
++		if (!rss_vhca_ids) {
++			kvfree(rss_rqns);
++			return -ENOMEM;
++		}
++	}
 +
-+		mdev = mlx5_sd_ch_ix_get_dev(priv->mdev, ix);
-+		num_comp_vectors = mlx5_comp_vectors_max(mdev);
- 		cpumask_clear(priv->scratchpad.cpumask);
-+		vec_ix = mlx5_sd_ch_ix_get_vec_ix(mdev, ix);
++	err = mlx5e_calc_indir_rqns(rss_rqns, rqns, rss_vhca_ids, vhca_ids, num_rqns, hfunc, indir);
+ 	if (err)
+ 		goto out;
  
--		for (irq = ix; irq < num_comp_vectors; irq += params->num_channels) {
-+		for (irq = vec_ix; irq < num_comp_vectors; irq += params->num_channels) {
- 			int cpu = mlx5_comp_vector_get_cpu(mdev, irq);
+-	err = mlx5e_rqt_init(rqt, mdev, indir->max_table_size, rss_rqns,
++	err = mlx5e_rqt_init(rqt, mdev, indir->max_table_size, rss_rqns, rss_vhca_ids,
+ 			     indir->actual_table_size);
  
- 			cpumask_set_cpu(cpu, priv->scratchpad.cpumask);
+ out:
++	kvfree(rss_vhca_ids);
+ 	kvfree(rss_rqns);
+ 	return err;
+ }
+@@ -126,15 +184,20 @@ void mlx5e_rqt_destroy(struct mlx5e_rqt *rqt)
+ 	mlx5_core_destroy_rqt(rqt->mdev, rqt->rqtn);
+ }
+ 
+-static int mlx5e_rqt_redirect(struct mlx5e_rqt *rqt, u32 *rqns, unsigned int size)
++static int mlx5e_rqt_redirect(struct mlx5e_rqt *rqt, u32 *rqns, u32 *vhca_ids,
++			      unsigned int size)
+ {
+-	unsigned int i;
++	int entry_sz;
+ 	void *rqtc;
+ 	int inlen;
+ 	u32 *in;
+ 	int err;
+ 
+-	inlen = MLX5_ST_SZ_BYTES(modify_rqt_in) + sizeof(u32) * size;
++	if (!rqt_verify_vhca_ids(rqt->mdev, vhca_ids, size))
++		return -EINVAL;
++
++	entry_sz = vhca_ids ? MLX5_ST_SZ_BYTES(rq_vhca) : MLX5_ST_SZ_BYTES(rq_num);
++	inlen = MLX5_ST_SZ_BYTES(modify_rqt_in) + entry_sz * size;
+ 	in = kvzalloc(inlen, GFP_KERNEL);
+ 	if (!in)
+ 		return -ENOMEM;
+@@ -143,8 +206,8 @@ static int mlx5e_rqt_redirect(struct mlx5e_rqt *rqt, u32 *rqns, unsigned int siz
+ 
+ 	MLX5_SET(modify_rqt_in, in, bitmask.rqn_list, 1);
+ 	MLX5_SET(rqtc, rqtc, rqt_actual_size, size);
+-	for (i = 0; i < size; i++)
+-		MLX5_SET(rqtc, rqtc, rq_num[i], rqns[i]);
++
++	fill_rqn_list(rqtc, rqns, vhca_ids, size);
+ 
+ 	err = mlx5_core_modify_rqt(rqt->mdev, rqt->rqtn, in, inlen);
+ 
+@@ -152,17 +215,21 @@ static int mlx5e_rqt_redirect(struct mlx5e_rqt *rqt, u32 *rqns, unsigned int siz
+ 	return err;
+ }
+ 
+-int mlx5e_rqt_redirect_direct(struct mlx5e_rqt *rqt, u32 rqn)
++int mlx5e_rqt_redirect_direct(struct mlx5e_rqt *rqt, u32 rqn, u32 *vhca_id)
+ {
+-	return mlx5e_rqt_redirect(rqt, &rqn, 1);
++	return mlx5e_rqt_redirect(rqt, &rqn, vhca_id, 1);
+ }
+ 
+-int mlx5e_rqt_redirect_indir(struct mlx5e_rqt *rqt, u32 *rqns, unsigned int num_rqns,
++int mlx5e_rqt_redirect_indir(struct mlx5e_rqt *rqt, u32 *rqns, u32 *vhca_ids,
++			     unsigned int num_rqns,
+ 			     u8 hfunc, struct mlx5e_rss_params_indir *indir)
+ {
+-	u32 *rss_rqns;
++	u32 *rss_rqns, *rss_vhca_ids = NULL;
+ 	int err;
+ 
++	if (!rqt_verify_vhca_ids(rqt->mdev, vhca_ids, num_rqns))
++		return -EINVAL;
++
+ 	if (WARN_ON(rqt->size != indir->max_table_size))
+ 		return -EINVAL;
+ 
+@@ -170,13 +237,23 @@ int mlx5e_rqt_redirect_indir(struct mlx5e_rqt *rqt, u32 *rqns, unsigned int num_
+ 	if (!rss_rqns)
+ 		return -ENOMEM;
+ 
+-	err = mlx5e_calc_indir_rqns(rss_rqns, rqns, num_rqns, hfunc, indir);
++	if (vhca_ids) {
++		rss_vhca_ids = kvmalloc_array(indir->actual_table_size, sizeof(*rss_vhca_ids),
++					      GFP_KERNEL);
++		if (!rss_vhca_ids) {
++			kvfree(rss_rqns);
++			return -ENOMEM;
++		}
++	}
++
++	err = mlx5e_calc_indir_rqns(rss_rqns, rqns, rss_vhca_ids, vhca_ids, num_rqns, hfunc, indir);
+ 	if (err)
+ 		goto out;
+ 
+-	err = mlx5e_rqt_redirect(rqt, rss_rqns, indir->actual_table_size);
++	err = mlx5e_rqt_redirect(rqt, rss_rqns, rss_vhca_ids, indir->actual_table_size);
+ 
+ out:
++	kvfree(rss_vhca_ids);
+ 	kvfree(rss_rqns);
+ 	return err;
+ }
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.h b/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.h
+index 77fba3ebd18d..e0bc30308c77 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rqt.h
+@@ -20,7 +20,7 @@ void mlx5e_rss_params_indir_init_uniform(struct mlx5e_rss_params_indir *indir,
+ 					 unsigned int num_channels);
+ 
+ struct mlx5e_rqt {
+-	struct mlx5_core_dev *mdev;
++	struct mlx5_core_dev *mdev; /* primary */
+ 	u32 rqtn;
+ 	u16 size;
+ };
+@@ -28,7 +28,7 @@ struct mlx5e_rqt {
+ int mlx5e_rqt_init_direct(struct mlx5e_rqt *rqt, struct mlx5_core_dev *mdev,
+ 			  bool indir_enabled, u32 init_rqn, u32 indir_table_size);
+ int mlx5e_rqt_init_indir(struct mlx5e_rqt *rqt, struct mlx5_core_dev *mdev,
+-			 u32 *rqns, unsigned int num_rqns,
++			 u32 *rqns, u32 *vhca_ids, unsigned int num_rqns,
+ 			 u8 hfunc, struct mlx5e_rss_params_indir *indir);
+ void mlx5e_rqt_destroy(struct mlx5e_rqt *rqt);
+ 
+@@ -38,8 +38,9 @@ static inline u32 mlx5e_rqt_get_rqtn(struct mlx5e_rqt *rqt)
+ }
+ 
+ u32 mlx5e_rqt_size(struct mlx5_core_dev *mdev, unsigned int num_channels);
+-int mlx5e_rqt_redirect_direct(struct mlx5e_rqt *rqt, u32 rqn);
+-int mlx5e_rqt_redirect_indir(struct mlx5e_rqt *rqt, u32 *rqns, unsigned int num_rqns,
++int mlx5e_rqt_redirect_direct(struct mlx5e_rqt *rqt, u32 rqn, u32 *vhca_id);
++int mlx5e_rqt_redirect_indir(struct mlx5e_rqt *rqt, u32 *rqns, u32 *vhca_ids,
++			     unsigned int num_rqns,
+ 			     u8 hfunc, struct mlx5e_rss_params_indir *indir);
+ 
+ #endif /* __MLX5_EN_RQT_H__ */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rss.c b/drivers/net/ethernet/mellanox/mlx5/core/en/rss.c
+index c1545a2e8d6d..5f742f896600 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/rss.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rss.c
+@@ -74,7 +74,7 @@ struct mlx5e_rss {
+ 	struct mlx5e_tir *tir[MLX5E_NUM_INDIR_TIRS];
+ 	struct mlx5e_tir *inner_tir[MLX5E_NUM_INDIR_TIRS];
+ 	struct mlx5e_rqt rqt;
+-	struct mlx5_core_dev *mdev;
++	struct mlx5_core_dev *mdev; /* primary */
+ 	u32 drop_rqn;
+ 	bool inner_ft_support;
+ 	bool enabled;
+@@ -473,21 +473,22 @@ int mlx5e_rss_obtain_tirn(struct mlx5e_rss *rss,
+ 	return 0;
+ }
+ 
+-static int mlx5e_rss_apply(struct mlx5e_rss *rss, u32 *rqns, unsigned int num_rqns)
++static int mlx5e_rss_apply(struct mlx5e_rss *rss, u32 *rqns, u32 *vhca_ids, unsigned int num_rqns)
+ {
+ 	int err;
+ 
+-	err = mlx5e_rqt_redirect_indir(&rss->rqt, rqns, num_rqns, rss->hash.hfunc, &rss->indir);
++	err = mlx5e_rqt_redirect_indir(&rss->rqt, rqns, vhca_ids, num_rqns, rss->hash.hfunc,
++				       &rss->indir);
+ 	if (err)
+ 		mlx5e_rss_warn(rss->mdev, "Failed to redirect RQT %#x to channels: err = %d\n",
+ 			       mlx5e_rqt_get_rqtn(&rss->rqt), err);
+ 	return err;
+ }
+ 
+-void mlx5e_rss_enable(struct mlx5e_rss *rss, u32 *rqns, unsigned int num_rqns)
++void mlx5e_rss_enable(struct mlx5e_rss *rss, u32 *rqns, u32 *vhca_ids, unsigned int num_rqns)
+ {
+ 	rss->enabled = true;
+-	mlx5e_rss_apply(rss, rqns, num_rqns);
++	mlx5e_rss_apply(rss, rqns, vhca_ids, num_rqns);
+ }
+ 
+ void mlx5e_rss_disable(struct mlx5e_rss *rss)
+@@ -495,7 +496,7 @@ void mlx5e_rss_disable(struct mlx5e_rss *rss)
+ 	int err;
+ 
+ 	rss->enabled = false;
+-	err = mlx5e_rqt_redirect_direct(&rss->rqt, rss->drop_rqn);
++	err = mlx5e_rqt_redirect_direct(&rss->rqt, rss->drop_rqn, NULL);
+ 	if (err)
+ 		mlx5e_rss_warn(rss->mdev, "Failed to redirect RQT %#x to drop RQ %#x: err = %d\n",
+ 			       mlx5e_rqt_get_rqtn(&rss->rqt), rss->drop_rqn, err);
+@@ -568,7 +569,7 @@ int mlx5e_rss_get_rxfh(struct mlx5e_rss *rss, u32 *indir, u8 *key, u8 *hfunc)
+ 
+ int mlx5e_rss_set_rxfh(struct mlx5e_rss *rss, const u32 *indir,
+ 		       const u8 *key, const u8 *hfunc,
+-		       u32 *rqns, unsigned int num_rqns)
++		       u32 *rqns, u32 *vhca_ids, unsigned int num_rqns)
+ {
+ 	bool changed_indir = false;
+ 	bool changed_hash = false;
+@@ -608,7 +609,7 @@ int mlx5e_rss_set_rxfh(struct mlx5e_rss *rss, const u32 *indir,
+ 	}
+ 
+ 	if (changed_indir && rss->enabled) {
+-		err = mlx5e_rss_apply(rss, rqns, num_rqns);
++		err = mlx5e_rss_apply(rss, rqns, vhca_ids, num_rqns);
+ 		if (err) {
+ 			mlx5e_rss_copy(rss, old_rss);
+ 			goto out;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rss.h b/drivers/net/ethernet/mellanox/mlx5/core/en/rss.h
+index d1d0bc350e92..d0df98963c8d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/rss.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rss.h
+@@ -39,7 +39,7 @@ int mlx5e_rss_obtain_tirn(struct mlx5e_rss *rss,
+ 			  const struct mlx5e_packet_merge_param *init_pkt_merge_param,
+ 			  bool inner, u32 *tirn);
+ 
+-void mlx5e_rss_enable(struct mlx5e_rss *rss, u32 *rqns, unsigned int num_rqns);
++void mlx5e_rss_enable(struct mlx5e_rss *rss, u32 *rqns, u32 *vhca_ids, unsigned int num_rqns);
+ void mlx5e_rss_disable(struct mlx5e_rss *rss);
+ 
+ int mlx5e_rss_packet_merge_set_param(struct mlx5e_rss *rss,
+@@ -47,7 +47,7 @@ int mlx5e_rss_packet_merge_set_param(struct mlx5e_rss *rss,
+ int mlx5e_rss_get_rxfh(struct mlx5e_rss *rss, u32 *indir, u8 *key, u8 *hfunc);
+ int mlx5e_rss_set_rxfh(struct mlx5e_rss *rss, const u32 *indir,
+ 		       const u8 *key, const u8 *hfunc,
+-		       u32 *rqns, unsigned int num_rqns);
++		       u32 *rqns, u32 *vhca_ids, unsigned int num_rqns);
+ struct mlx5e_rss_params_hash mlx5e_rss_get_hash(struct mlx5e_rss *rss);
+ u8 mlx5e_rss_get_hash_fields(struct mlx5e_rss *rss, enum mlx5_traffic_types tt);
+ int mlx5e_rss_set_hash_fields(struct mlx5e_rss *rss, enum mlx5_traffic_types tt,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c
+index b23e224e3763..a86eade9a9e0 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c
+@@ -8,7 +8,7 @@
+ #define MLX5E_MAX_NUM_RSS 16
+ 
+ struct mlx5e_rx_res {
+-	struct mlx5_core_dev *mdev;
++	struct mlx5_core_dev *mdev; /* primary */
+ 	enum mlx5e_rx_res_features features;
+ 	unsigned int max_nch;
+ 	u32 drop_rqn;
+@@ -19,6 +19,7 @@ struct mlx5e_rx_res {
+ 	struct mlx5e_rss *rss[MLX5E_MAX_NUM_RSS];
+ 	bool rss_active;
+ 	u32 *rss_rqns;
++	u32 *rss_vhca_ids;
+ 	unsigned int rss_nch;
+ 
+ 	struct {
+@@ -34,6 +35,13 @@ struct mlx5e_rx_res {
+ 
+ /* API for rx_res_rss_* */
+ 
++static u32 *get_vhca_ids(struct mlx5e_rx_res *res, int offset)
++{
++	bool multi_vhca = res->features & MLX5E_RX_RES_FEATURE_MULTI_VHCA;
++
++	return multi_vhca ? res->rss_vhca_ids + offset : NULL;
++}
++
+ void mlx5e_rx_res_rss_update_num_channels(struct mlx5e_rx_res *res, u32 nch)
+ {
+ 	int i;
+@@ -85,8 +93,11 @@ int mlx5e_rx_res_rss_init(struct mlx5e_rx_res *res, u32 *rss_idx, unsigned int i
+ 		return PTR_ERR(rss);
+ 
+ 	mlx5e_rss_set_indir_uniform(rss, init_nch);
+-	if (res->rss_active)
+-		mlx5e_rss_enable(rss, res->rss_rqns, res->rss_nch);
++	if (res->rss_active) {
++		u32 *vhca_ids = get_vhca_ids(res, 0);
++
++		mlx5e_rss_enable(rss, res->rss_rqns, vhca_ids, res->rss_nch);
++	}
+ 
+ 	res->rss[i] = rss;
+ 	*rss_idx = i;
+@@ -153,10 +164,12 @@ static void mlx5e_rx_res_rss_enable(struct mlx5e_rx_res *res)
+ 
+ 	for (i = 0; i < MLX5E_MAX_NUM_RSS; i++) {
+ 		struct mlx5e_rss *rss = res->rss[i];
++		u32 *vhca_ids;
+ 
+ 		if (!rss)
+ 			continue;
+-		mlx5e_rss_enable(rss, res->rss_rqns, res->rss_nch);
++		vhca_ids = get_vhca_ids(res, 0);
++		mlx5e_rss_enable(rss, res->rss_rqns, vhca_ids, res->rss_nch);
+ 	}
+ }
+ 
+@@ -200,6 +213,7 @@ int mlx5e_rx_res_rss_get_rxfh(struct mlx5e_rx_res *res, u32 rss_idx,
+ int mlx5e_rx_res_rss_set_rxfh(struct mlx5e_rx_res *res, u32 rss_idx,
+ 			      const u32 *indir, const u8 *key, const u8 *hfunc)
+ {
++	u32 *vhca_ids = get_vhca_ids(res, 0);
+ 	struct mlx5e_rss *rss;
+ 
+ 	if (rss_idx >= MLX5E_MAX_NUM_RSS)
+@@ -209,7 +223,8 @@ int mlx5e_rx_res_rss_set_rxfh(struct mlx5e_rx_res *res, u32 rss_idx,
+ 	if (!rss)
+ 		return -ENOENT;
+ 
+-	return mlx5e_rss_set_rxfh(rss, indir, key, hfunc, res->rss_rqns, res->rss_nch);
++	return mlx5e_rss_set_rxfh(rss, indir, key, hfunc, res->rss_rqns, vhca_ids,
++				  res->rss_nch);
+ }
+ 
+ int mlx5e_rx_res_rss_get_hash_fields(struct mlx5e_rx_res *res, u32 rss_idx,
+@@ -280,11 +295,13 @@ struct mlx5e_rss *mlx5e_rx_res_rss_get(struct mlx5e_rx_res *res, u32 rss_idx)
+ 
+ static void mlx5e_rx_res_free(struct mlx5e_rx_res *res)
+ {
++	kvfree(res->rss_vhca_ids);
+ 	kvfree(res->rss_rqns);
+ 	kvfree(res);
+ }
+ 
+-static struct mlx5e_rx_res *mlx5e_rx_res_alloc(struct mlx5_core_dev *mdev, unsigned int max_nch)
++static struct mlx5e_rx_res *mlx5e_rx_res_alloc(struct mlx5_core_dev *mdev, unsigned int max_nch,
++					       bool multi_vhca)
+ {
+ 	struct mlx5e_rx_res *rx_res;
+ 
+@@ -298,6 +315,15 @@ static struct mlx5e_rx_res *mlx5e_rx_res_alloc(struct mlx5_core_dev *mdev, unsig
+ 		return NULL;
+ 	}
+ 
++	if (multi_vhca) {
++		rx_res->rss_vhca_ids = kvcalloc(max_nch, sizeof(*rx_res->rss_vhca_ids), GFP_KERNEL);
++		if (!rx_res->rss_vhca_ids) {
++			kvfree(rx_res->rss_rqns);
++			kvfree(rx_res);
++			return NULL;
++		}
++	}
++
+ 	return rx_res;
+ }
+ 
+@@ -424,10 +450,11 @@ mlx5e_rx_res_create(struct mlx5_core_dev *mdev, enum mlx5e_rx_res_features featu
+ 		    const struct mlx5e_packet_merge_param *init_pkt_merge_param,
+ 		    unsigned int init_nch)
+ {
++	bool multi_vhca = features & MLX5E_RX_RES_FEATURE_MULTI_VHCA;
+ 	struct mlx5e_rx_res *res;
+ 	int err;
+ 
+-	res = mlx5e_rx_res_alloc(mdev, max_nch);
++	res = mlx5e_rx_res_alloc(mdev, max_nch, multi_vhca);
+ 	if (!res)
+ 		return ERR_PTR(-ENOMEM);
+ 
+@@ -504,10 +531,11 @@ static void mlx5e_rx_res_channel_activate_direct(struct mlx5e_rx_res *res,
+ 						 struct mlx5e_channels *chs,
+ 						 unsigned int ix)
+ {
++	u32 *vhca_id = get_vhca_ids(res, ix);
+ 	u32 rqn = res->rss_rqns[ix];
+ 	int err;
+ 
+-	err = mlx5e_rqt_redirect_direct(&res->channels[ix].direct_rqt, rqn);
++	err = mlx5e_rqt_redirect_direct(&res->channels[ix].direct_rqt, rqn, vhca_id);
+ 	if (err)
+ 		mlx5_core_warn(res->mdev, "Failed to redirect direct RQT %#x to RQ %#x (channel %u): err = %d\n",
+ 			       mlx5e_rqt_get_rqtn(&res->channels[ix].direct_rqt),
+@@ -519,7 +547,7 @@ static void mlx5e_rx_res_channel_deactivate_direct(struct mlx5e_rx_res *res,
+ {
+ 	int err;
+ 
+-	err = mlx5e_rqt_redirect_direct(&res->channels[ix].direct_rqt, res->drop_rqn);
++	err = mlx5e_rqt_redirect_direct(&res->channels[ix].direct_rqt, res->drop_rqn, NULL);
+ 	if (err)
+ 		mlx5_core_warn(res->mdev, "Failed to redirect direct RQT %#x to drop RQ %#x (channel %u): err = %d\n",
+ 			       mlx5e_rqt_get_rqtn(&res->channels[ix].direct_rqt),
+@@ -534,10 +562,12 @@ void mlx5e_rx_res_channels_activate(struct mlx5e_rx_res *res, struct mlx5e_chann
+ 	nch = mlx5e_channels_get_num(chs);
+ 
+ 	for (ix = 0; ix < chs->num; ix++) {
++		u32 *vhca_id = get_vhca_ids(res, ix);
++
+ 		if (mlx5e_channels_is_xsk(chs, ix))
+-			mlx5e_channels_get_xsk_rqn(chs, ix, &res->rss_rqns[ix]);
++			mlx5e_channels_get_xsk_rqn(chs, ix, &res->rss_rqns[ix], vhca_id);
+ 		else
+-			mlx5e_channels_get_regular_rqn(chs, ix, &res->rss_rqns[ix]);
++			mlx5e_channels_get_regular_rqn(chs, ix, &res->rss_rqns[ix], vhca_id);
+ 	}
+ 	res->rss_nch = chs->num;
+ 
+@@ -554,7 +584,7 @@ void mlx5e_rx_res_channels_activate(struct mlx5e_rx_res *res, struct mlx5e_chann
+ 		if (!mlx5e_channels_get_ptp_rqn(chs, &rqn))
+ 			rqn = res->drop_rqn;
+ 
+-		err = mlx5e_rqt_redirect_direct(&res->ptp.rqt, rqn);
++		err = mlx5e_rqt_redirect_direct(&res->ptp.rqt, rqn, NULL);
+ 		if (err)
+ 			mlx5_core_warn(res->mdev, "Failed to redirect direct RQT %#x to RQ %#x (PTP): err = %d\n",
+ 				       mlx5e_rqt_get_rqtn(&res->ptp.rqt),
+@@ -573,7 +603,7 @@ void mlx5e_rx_res_channels_deactivate(struct mlx5e_rx_res *res)
+ 		mlx5e_rx_res_channel_deactivate_direct(res, ix);
+ 
+ 	if (res->features & MLX5E_RX_RES_FEATURE_PTP) {
+-		err = mlx5e_rqt_redirect_direct(&res->ptp.rqt, res->drop_rqn);
++		err = mlx5e_rqt_redirect_direct(&res->ptp.rqt, res->drop_rqn, NULL);
+ 		if (err)
+ 			mlx5_core_warn(res->mdev, "Failed to redirect direct RQT %#x to drop RQ %#x (PTP): err = %d\n",
+ 				       mlx5e_rqt_get_rqtn(&res->ptp.rqt),
+@@ -584,10 +614,12 @@ void mlx5e_rx_res_channels_deactivate(struct mlx5e_rx_res *res)
+ void mlx5e_rx_res_xsk_update(struct mlx5e_rx_res *res, struct mlx5e_channels *chs,
+ 			     unsigned int ix, bool xsk)
+ {
++	u32 *vhca_id = get_vhca_ids(res, ix);
++
+ 	if (xsk)
+-		mlx5e_channels_get_xsk_rqn(chs, ix, &res->rss_rqns[ix]);
++		mlx5e_channels_get_xsk_rqn(chs, ix, &res->rss_rqns[ix], vhca_id);
+ 	else
+-		mlx5e_channels_get_regular_rqn(chs, ix, &res->rss_rqns[ix]);
++		mlx5e_channels_get_regular_rqn(chs, ix, &res->rss_rqns[ix], vhca_id);
+ 
+ 	mlx5e_rx_res_rss_enable(res);
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.h b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.h
+index 82aaba8a82b3..7b1a9f0f1874 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.h
+@@ -18,6 +18,7 @@ struct mlx5e_rss_params_hash;
+ enum mlx5e_rx_res_features {
+ 	MLX5E_RX_RES_FEATURE_INNER_FT = BIT(0),
+ 	MLX5E_RX_RES_FEATURE_PTP = BIT(1),
++	MLX5E_RX_RES_FEATURE_MULTI_VHCA = BIT(2),
+ };
+ 
+ /* Setup */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 8d9b0cdb4e01..8cc636cf995a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -5389,6 +5389,8 @@ static int mlx5e_init_nic_rx(struct mlx5e_priv *priv)
+ 	features = MLX5E_RX_RES_FEATURE_PTP;
+ 	if (mlx5_tunnel_inner_ft_supported(mdev))
+ 		features |= MLX5E_RX_RES_FEATURE_INNER_FT;
++	if (mlx5_get_sd(priv->mdev))
++		features |= MLX5E_RX_RES_FEATURE_MULTI_VHCA;
+ 
+ 	priv->rx_res = mlx5e_rx_res_create(priv->mdev, features, priv->max_nch, priv->drop_rq.rqn,
+ 					   &priv->channels.params.packet_merge,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+index 9fb2c057bd78..080d79d80dd6 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+@@ -766,7 +766,7 @@ static int mlx5e_hairpin_create_indirect_rqt(struct mlx5e_hairpin *hp)
+ 		return err;
+ 
+ 	mlx5e_rss_params_indir_init_uniform(&indir, hp->num_channels);
+-	err = mlx5e_rqt_init_indir(&hp->indir_rqt, mdev, hp->pair->rqn, hp->num_channels,
++	err = mlx5e_rqt_init_indir(&hp->indir_rqt, mdev, hp->pair->rqn, NULL, hp->num_channels,
+ 				   mlx5e_rx_res_get_current_hash(priv->rx_res).hfunc,
+ 				   &indir);
+ 
 -- 
 2.44.0
 
