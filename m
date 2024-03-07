@@ -1,197 +1,221 @@
-Return-Path: <netdev+bounces-78350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E879B874BF8
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:09:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29D9C874BFE
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:10:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E2B72823CF
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:09:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F9612828AB
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32A751292F9;
-	Thu,  7 Mar 2024 10:07:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB37127B7B;
+	Thu,  7 Mar 2024 10:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zpUPK5qX"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="V9XPk3fB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7750583A06
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 10:07:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709806041; cv=none; b=JvN2lZzruYkdWL4PWyXgjY5+6nMzSH/+QDAYVMc8QRdOCKK0MTcW4fbChEqyU8WufK/1zVRmpEP+4eiVK0X767WOWmlAqA31KcNjtVhqANDYSIahKs5JFjIPJ8PsZ3H66mnjMEKPrDae7rqsIy8yR7Guea4CMfck78MRMfjEMJ0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709806041; c=relaxed/simple;
-	bh=sL1t0wZJ/4BUdsV0oUGVLrx/AHkbVdk6NuuF6Ke74Xk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ncamBVBS/3PtO9u9N+kL6Cc3lq3v1WXtaKsvB1yEHDtobFMVNNKxrVBrRdDciEue1o0mQjmVhDihaoKYHx5ilcH/R2cqrJGaB3lLdhUU4JdZnrXW422+jHhtNINPce8nQ+SYsTKyujWhXgfSJL2Ko+tKZk2U1+HILQiVhhIa5MI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zpUPK5qX; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d9a541b720aso1312916276.0
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 02:07:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709806038; x=1710410838; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ZYPK0MH2AVxZzL4N8oDmNmEYVrGo+kdYBVUpEuHWhwU=;
-        b=zpUPK5qXEQ/qPemXdotQ7GQm5nV8BdJ2mX7De1nNzlNxMcgnVtymX8zKjoaoASYw4J
-         RYvo1MDkvGLDhpY29CaL2ojlUGTNsSTsAlZUOC9x6NNiiS0iD/Ex4wo+IddZb//78Qwx
-         FCDzsuvqJGNtTsF0PZ0ci+I7dHSkUxxXCnl7zjMJJZJurgHVHNAQUVuurHB/Wz+sOXv5
-         WajSTdCa3p5igRX1wkdWB9N5xS7SHbqYZhinHZZue1mrxjVmudriME13auUH/TsX8oh0
-         Xxhb4VKWNmrgI9027kMkWDokiWqemnWmvrfdKmGsSR/7A55+qo2nYdVfnri4Xz3KcnN8
-         Aq7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709806038; x=1710410838;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZYPK0MH2AVxZzL4N8oDmNmEYVrGo+kdYBVUpEuHWhwU=;
-        b=SHhDCtg5wtvIsN5zZhGzJ3yGcMnylPjBvF5dHT25/mjFuMhxmkjYf3wo0eVYxybDHz
-         DKFGT9AV9c9dx9VgGMCjW0XF9XBiIk0VuiU14gqx0fxjnvmZ30edgyedN+d/HpSh2pFt
-         THYnxzFZPiAneEVEcIOKFGx2vpQBn+TitL2U3bzTAVLECCquNoSQpsIIhEIS1UchZtYb
-         hxvRTfnFCy3/8kO2fmTOihInuWRPuKky6v1UMmRZ3zahaf1GnX2duVsa+ESK8ueFDfbQ
-         gYFBFJghMca9GvOgm+tWBDzRGibSOfw97qFEMU/AZMAAbc8olbnMDieSOH0UKQpO9weN
-         Is/w==
-X-Forwarded-Encrypted: i=1; AJvYcCXaRI3e33lBy1u7PPiWX6Vu14LSz8a79B3s5Uc2MxaSMw20fc+cvP1r9bv4LHgA57iW1+ot3zjLvPILozkdoUe5vEJp0vZK
-X-Gm-Message-State: AOJu0Yypqr/91EBP2flpFZ1G2xrZA6pgIhej3kwhpVouBPBtqErtMojJ
-	5tJk/G+Q9i44jcBl+/HXzkpGnAX7WkAtwKpni1SWg0t/JTkGsWyhggPxDBH3SUOkfSFl7P+AK83
-	z09T02LLXpQ==
-X-Google-Smtp-Source: AGHT+IGPT0iNiF8RUKosm7Wn9/3amwYVj4h2LdQ1nvMQ4g52K0z/L+SbF9Tz0hexRvRwhygObhRhFX3ZxXq9Ug==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1004:b0:dc7:42:ecd with SMTP id
- w4-20020a056902100400b00dc700420ecdmr4391862ybt.6.1709806038424; Thu, 07 Mar
- 2024 02:07:18 -0800 (PST)
-Date: Thu,  7 Mar 2024 10:07:16 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CBD83CA7
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 10:09:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.168.131
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709806168; cv=fail; b=XkZzGCjOp1iKHOYcPM7yGSAkrA3DWBd+c3wbe9JWZ3rPVkdhWnZhX4QNgz+UlzqLDEFPU2sGz+2cQeQdkE+v0pgVwrOQpkfGDWn9fzJRXucAMsfW6RtugQH1Ylzgwl4HIitFsR6mbCdmFLyJ8/msAfUOBgWKafqtIb1Xk8/XZOY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709806168; c=relaxed/simple;
+	bh=2A++8BBoC/R/OoqYqiQp7lslUaMtWabBf0sjPtmStAc=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=mcuILIq4S+gsvMKs0Ag+aGu6t0ZF+qoBAIjEo3WkwlTVoDW/dtvr0tQfdxDFoMPP08fHhyN1x/+bHyQ/aSnKKQGdiNy954bSwOayR2putRO3KfsOO92rII+pNx0nL0QOkgkfdfiFKKC5d7u8ef2WrIxBTfEFg/cbH90JJMiLYu4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=V9XPk3fB; arc=fail smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4279OrGM025090;
+	Thu, 7 Mar 2024 10:09:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id:content-type
+	:content-transfer-encoding:mime-version; s=qcppdkim1; bh=SdrrizE
+	sOEqEwA93UXBWBTFDTbxepnMp29CDufEW0Qs=; b=V9XPk3fBBVaHZgJ8HDnagNM
+	N1jjZlw5ix3hEseTMG5Gf7c307h2NrG/xyXfVAbos8QNRVOCIFEWwyEGdQT77Vm6
+	tLSf/0fzNtIKHDOKn8iCHHMFXqkQaScKh0YWaJpmeUA2g7sWtMELUc6MtzfcQMFF
+	Bi//I2Z7d5+FgE+7f6jsSV02jsnELLeZdA0hhRJJQBteLxPaKqS9uHLJBuj4tsOz
+	0vjFuXSbizsXWliI87IjkS2T4uf1ojBpK5qp+CtqpZ6tockVt8y7zENWD5A/CToI
+	DbAUKiuT7fSvNejrVuB3Dn8+EPIt7YAmJXIBYjGwetDdTHkXuHUDJzHRytyX/Ng=
+	=
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2169.outbound.protection.outlook.com [104.47.58.169])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wq7hurjwy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Mar 2024 10:09:23 +0000 (GMT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SvlqdeStl7rX8P8REfpQbO+SvcGcsrWg0SpvG7seUF0hDMFI563EABqGkbjFzkilo7Alqt38Do/P830wHc+ZeGiGceOt0ifzFDTsjMlUhaRXmiMCwicx/5Gwf559Hcn6iHMEyOBgRkNoh+JHbzLUCQpcrtGDGdg/enuCqiOjCKCSwo4vvQ79tuI4pqofjaOeNS3T2Ej6505PKA2o317er/uNFs385pvmkSDraHHrz4I3sgzhgRO8h7w+xh/L4SAixsU8HztbyQHagE0LVZSiecsjyI03/sKwTJEZHWJ9Bf/qHeiyCKukbc4mwd9Hun+qm2wWqTKX4NcCLaUlQUe+vA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SdrrizEsOEqEwA93UXBWBTFDTbxepnMp29CDufEW0Qs=;
+ b=md4eox7TehEQWqaIaj9fjKZItlMt/NM+e4W89cYB7YOoaDVZUEQJ/KEyXqO6EjkEMs3V4ukyYA06iEWB/xYVFtyFjmnDprA18EbfjijGu/cEqpVpVOshS1gXF3ACtBtZVHl4VsCdhuqmQ/G5Z8l7V8FhsNoyGJ6Gz+EB6WiYSdsx7acpd6JtyVpX0Sw/wU6/VzgKkWrDaG45nHar/HfRb1S3d+By++uGChGtB7XYT7SRzip1MV5Upp1H2GpYrJAzX2mFoKBoZvxc7HW/O/GqzD1J/xMeKts+o3eguSRZbf2nfeoqQ0Jfzf//DJHWMLMeNCFgyrGSjumgKZ1PLxeg3A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+Received: from CY8PR02MB9567.namprd02.prod.outlook.com (2603:10b6:930:77::15)
+ by SN7PR02MB9330.namprd02.prod.outlook.com (2603:10b6:806:34f::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Thu, 7 Mar
+ 2024 10:09:18 +0000
+Received: from CY8PR02MB9567.namprd02.prod.outlook.com
+ ([fe80::7a26:6c6d:8ed0:e100]) by CY8PR02MB9567.namprd02.prod.outlook.com
+ ([fe80::7a26:6c6d:8ed0:e100%4]) with mapi id 15.20.7362.024; Thu, 7 Mar 2024
+ 10:09:18 +0000
+From: "Sagar Dhoot (QUIC)" <quic_sdhoot@quicinc.com>
+To: "mkubecek@suse.cz" <mkubecek@suse.cz>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "Nagarjuna Chaganti (QUIC)" <quic_nchagant@quicinc.com>,
+        "Priya Tripathi
+ (QUIC)" <quic_ppriyatr@quicinc.com>
+Subject: Ethtool query: Reset advertised speed modes if speed value is not
+ passed in "set_link_ksettings"
+Thread-Topic: Ethtool query: Reset advertised speed modes if speed value is
+ not passed in "set_link_ksettings"
+Thread-Index: Adpwd4LZ0sghOKL6QDSCL099ROM8fA==
+Date: Thu, 7 Mar 2024 10:09:18 +0000
+Message-ID: 
+ <CY8PR02MB95678EBD09E287FBE73076B9F9202@CY8PR02MB9567.namprd02.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CY8PR02MB9567:EE_|SN7PR02MB9330:EE_
+x-ms-office365-filtering-correlation-id: 2c7745c1-7c4b-4408-9583-08dc3e8ea6c2
+x-ld-processed: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ t/lv1wy6+NRS8sCv38H/Z9eXJ3xXu6yUFWUUADBSHjrgUCQgBg6N9tFHnetRwnwPDgL2aV9X13N9lQiVXjIyt5nrx3/KMQ1xYdX9maeNxHGoOVnUxnn7+h4IVTKmo9KGj1qrkCTVwzIFpN2FyaOihZq2gSUxEunyb2/sY1HXR1HdGeY8YZ7XxXmaergBvIt6VNVqxMc0W//8rjbc1zcGotof3jl3zNQfO+J0lNfhMYWkqFt/6jqo1jA1eXaOOyOS4qmJ2e4GH/6f0CeLhRoQv87PF1C7BGQ8MOvT1VukhLmY2m5iAZXtUblPmai9mW6A+D5lIXDsfwKUQFwCM9j6vj4m7H3iWVCd8xswHTzBrO+XBMndZpmSaUVGmjtF7U+eBoOEdk0mSwOhZ6vSw3C78rh7tM+xFkJxdSogELu+hqIwvkUHs5B8Z0aFVTTgGrIvMYRYmkm6MCPx2gntovd6EXowdaQrfdTRe0LbWAnJ0b9phZlNfKW2uF6VSiRa/g14ZGbkhxeYU6ivrKIEGL2EI7ueDEE9TUqKxS7cVXoA2+nvSSMiowSbR98Nke4zwR7pULxhHNMBIWsuPL5FGL6jequOvC+6hyQ0TWAV6+b7VL8IlxmyeRz+iCjByzARltF4rZTpz+8eY+ZSLW08uQVqP35nfq9O+7QM/prptsFBS6Ie+YwzlEjmC0RjpU7Uk2msndo49p+aXBRm8CPQe//ibSrgIzIA8j+o0EPsk0qhqA4=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR02MB9567.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?0AV5jM01yHa3n5ulyHgltzpPzM6BCK60IDU1w1g3kMuW5H58QQp0cvQZK6Xv?=
+ =?us-ascii?Q?eVJodvU6CuOsKjrO/zon3pJDwQ4co1urJwUvGa52Q/woR5/xj0VFYA1Peyp+?=
+ =?us-ascii?Q?NA66fhH5wVxCW/9GV1BAzuVGnjaPYKeODYaA4FyGJ93Bu4Oj1uOYbd1O06Tr?=
+ =?us-ascii?Q?MndlCptSZHUAQBjgThrgzKKE3TXRQGp4koyIxb68oBHfbG9Pt7YAtoVcRsYS?=
+ =?us-ascii?Q?g1Wp1LspokjNQ+S7nt+HCXAueTlIbrFGm4/3DpAosAsE/uAhMjaXT8Tge7I1?=
+ =?us-ascii?Q?p2KBV2oMfhPbOqRm/9Q8aepoPLrObZc2qjwaRYFj/oAOiIoqq+WvxqSI6t4y?=
+ =?us-ascii?Q?5wIRcCtSytpiC1ssyPmQHcz6GCCBYowtrT/wGNuR8ZwcEsTJvds6190MVbBA?=
+ =?us-ascii?Q?C5MZvOl4cD22XBhtXCFdpxZNcaO+EAM3SZ3cv0uJUA7mHTPGibRHuR39HA6y?=
+ =?us-ascii?Q?u+LOuUiuF9SMrs3vJsBpwiYCqQStr2Uu251pjz6IpfP8BWgImZ97+Z5AqfAK?=
+ =?us-ascii?Q?G3KRvgOfFxe24w9k486DB0uIc0P3LBD70DcxD1K39oYjqUfT9m7XCg4y4Gji?=
+ =?us-ascii?Q?O6pUb6kHmjUpzGG8p475GLwRE1KFeTIpWFGOXqIsrJ8JhR1IHQKXeSrR4U6Z?=
+ =?us-ascii?Q?H7Z870HGWx9aH8EY+GbvV8E6xkGD8KNZsz0ptUe8tvujMvduPK4NkAurRTY5?=
+ =?us-ascii?Q?fr8p14bUUUBEI1WHHQCG2/9VgHFjzFeqNpGODMLirm7lJDky9FkcmI14yzGr?=
+ =?us-ascii?Q?re+d0cIeaPew6t2fxxqJlHXkamq9DMMmlDrYGicTcMeR8eMWuHIudIYHet2m?=
+ =?us-ascii?Q?XHiZ3qr0bwy75RDy3j+uSIHEOOgk275ZxhfwBz+qT0Sc4BsoELXbyiq5ZpTo?=
+ =?us-ascii?Q?ONFZ59EGzUdrFoNVqsyQgNX+MAS02h1XaN4/qoTPuqCSVcHaxlal5ilhRus7?=
+ =?us-ascii?Q?itj3uYhWRzXxexgz0/246MU+AFY4a7U37WMMaHycj/WUeEwYoCOKdaKaBJx/?=
+ =?us-ascii?Q?+FyUlvPGoBpn8r4g3w/3LMBMAg295iyO7OXl4zHqq7NNIyI4HSvpxjBOreJg?=
+ =?us-ascii?Q?OrJUjU2DOQ6Fh/UofUNR2bMGF0bkCr5AuMStNMxvWPELnmUmfFI5+mPygXZb?=
+ =?us-ascii?Q?LnJ552ENlLNg2MfR7M6bPP3ezSqtgVLNZ9p+l42GGbdNPkZUM1TgyPUqRAaK?=
+ =?us-ascii?Q?/qdXdTYteDYFwJXE9Tq4W7e86tHFv0yMctL3H1fVkBmRf5Ondk+p7f0tN/Zp?=
+ =?us-ascii?Q?8JJ/IVqcSFtOETxbswAuJrebOQB+RV35zj1r8bMKAz8HG5EROshzP7VYKTm+?=
+ =?us-ascii?Q?6pV8vo7FYa9E/Qsmk55X7RuZfQTAGa1KfHv5WPi2OZbrGbyVs4BaY/g/zVoS?=
+ =?us-ascii?Q?M8hjqGn1dr96M0J6JX0zOPUbBGGtzTG0HkFIwkRAEk17OcZsAYz0lO41Onf1?=
+ =?us-ascii?Q?tm1Xjh6mUS842GVw+6hYTkoGLzm5lTRGga8ADty9KLOTFFPKKDK5ZdQcqp8c?=
+ =?us-ascii?Q?ZWs23SdAClb66HD3jNyFkJ4vcy1HV6Mgw93LE904kx8PKPn0mE2LIPTgHArx?=
+ =?us-ascii?Q?fFcbts9Hi5uQu6cyhcBdxcEjpFBr7lOYYuQnKBOO?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240307100716.1901381-1-edumazet@google.com>
-Subject: [PATCH net] net: ip_tunnel: make sure to pull inner header in ip_tunnel_rcv()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	6qOy0M1WmWOugkYIuj5xP/WtO4Jni/z6OfAISlZ4HDLLtIHXpc+4S7y/bfn4BSpW4MCyfweBD1GPoxDVttTHsdExnk7gwCB1WqLQYEHLxK7sS6dOJpBrP7Ux8LF7m9iyAMNvnmyJ5qHS+e2yzsz6n5FibieIxglVJejaH6xFC+Y8wc9bQ7fRdPeCj01Wg/gCWAmMkuij3lwUuhq+/estCHVXQaZyUdsgxK/jUpZmOdkkDyz+EqWOepu8zz6ZSDhz/qyZwlBo55MgwZ+q7BFvraOT4uT5nP5QUQxywrsKXYXHQtgcBAQ4lwn5QvEwfDIRcMT+ZYBJOL/aAAIvcZCS/SxHqi63M4QYb08nwwo29dChPCTafl3iK8+wMFvn8+bjTQwOKCQmo0Rw+pKpQKm3+c3bVC3JMIHG0TA8FsFLk5puvglkzuXCNDmH58r5k7kN5ktUQF2y9UQhWQdO1HxIxjXjt6c7X1lOeBi0C0YynSgNqtnVDvoqGeHI9A5X5LXLnf0Lpjq9Xfw8WaCv2OD0lINWM/LwInLdaY93DdKkR8hZM0uHm9opvreGgtcevI6d7DFJIx3ErgNUyI/YUeXP2xgrN/+msmQlpvd52cN+69W2Zk6IlQjPDTHbTKhxJF0W
+X-OriginatorOrg: quicinc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR02MB9567.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2c7745c1-7c4b-4408-9583-08dc3e8ea6c2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Mar 2024 10:09:18.3229
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: +5oYoXDkDmh60geeuWasiWyOIHyBNWQF6aKaN/jTOqYlU4blTkyDCTxrxsxahXnfuf+KUye2Iyr6ZmNPrTxl0g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR02MB9330
+X-Proofpoint-GUID: B7T3kA8V5G7ATVokds5pEjb72Ie1bb4g
+X-Proofpoint-ORIG-GUID: B7T3kA8V5G7ATVokds5pEjb72Ie1bb4g
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-07_06,2024-03-06_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ clxscore=1015 phishscore=0 priorityscore=1501 mlxlogscore=957 mlxscore=0
+ spamscore=0 malwarescore=0 impostorscore=0 lowpriorityscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2402120000 definitions=main-2403070074
 
-Apply the same fix than ones found in :
+Hi Michal and Team,
 
-8d975c15c0cd ("ip6_tunnel: make sure to pull inner header in __ip6_tnl_rcv()")
-1ca1ba465e55 ("geneve: make sure to pull inner header in geneve_rx()")
+We are developing an Ethernet driver here in Qualcomm and have a query w.r.=
+t one of the limitations that we have observed with ethtool.
 
-We have to save skb->network_header in a temporary variable
-in order to be able to recompute the network_header pointer
-after a pskb_inet_may_pull() call.
+Requirement:
+	- We are trying to manage the advertised speed modes based on the input fr=
+om "ethtool -s" command, and trying to support options like "speed", "auton=
+eg" and "lanes".
+	- By default, the "get_link_ksettings" will publish all the supported/adve=
+rtised speed modes.
+	- If the speed is modified using "set_link_ksettings", we will limit the a=
+dvertised speed mode corresponding to the speed being passed in the ethtool=
+ command.
+	- And if in the subsequent "set_link_ksettings" command, if the speed is n=
+ot provided, we want to reset and go back to the default state(i.e. again p=
+ublish all the supported/advertised speed modes).
 
-pskb_inet_may_pull() makes sure the needed headers are in skb->head.
+Detailed issue sequence and the commands executed:
+1. "ethtool eth_interface"
+	a. Assuming eth_interface is the interface name.
+	b. By default, the "get_link_ksettings" will publish all the supported/adv=
+ertised speed modes. Let's say we support 10G and 25G. In that case both sp=
+eed modes will be advertised in the ethtool output.
+2. "ethtool -s eth_interface speed 25000 autoneg off"
+	a. "set_link_ksettings" will be called and speed value will be passed as 2=
+5G.
+	b. Advertised speed mode will be restricted to 25G.
+	c. Link comes up fine with 25G.
+3. "ethtool eth_interface"
+	a. "get_link_ksettings" will publish the link as up with 25G in the ethtoo=
+l output. Advertised speed mode will be set to 25G and 10G will not be incl=
+uded in that list.
+4. "ethtool -s eth_interface autoneg off"
+	a. "get_link_ksettings" will be called and as per our implementation, as t=
+he link as up, we will return the speed as 25G.
+	b. "set_link_ksettings" will be called and speed will still be provided as=
+ 25G(from step 4a), even though the user has not provided any speed value i=
+n the ethtool command.
+	c. We will still restrict the advertised speed to 25G. Whereas the expecta=
+tion was that we reset back to a combination of 10G and 25G again.
 
-syzbot reported:
-BUG: KMSAN: uninit-value in __INET_ECN_decapsulate include/net/inet_ecn.h:253 [inline]
- BUG: KMSAN: uninit-value in INET_ECN_decapsulate include/net/inet_ecn.h:275 [inline]
- BUG: KMSAN: uninit-value in IP_ECN_decapsulate include/net/inet_ecn.h:302 [inline]
- BUG: KMSAN: uninit-value in ip_tunnel_rcv+0xed9/0x2ed0 net/ipv4/ip_tunnel.c:409
-  __INET_ECN_decapsulate include/net/inet_ecn.h:253 [inline]
-  INET_ECN_decapsulate include/net/inet_ecn.h:275 [inline]
-  IP_ECN_decapsulate include/net/inet_ecn.h:302 [inline]
-  ip_tunnel_rcv+0xed9/0x2ed0 net/ipv4/ip_tunnel.c:409
-  __ipgre_rcv+0x9bc/0xbc0 net/ipv4/ip_gre.c:389
-  ipgre_rcv net/ipv4/ip_gre.c:411 [inline]
-  gre_rcv+0x423/0x19f0 net/ipv4/ip_gre.c:447
-  gre_rcv+0x2a4/0x390 net/ipv4/gre_demux.c:163
-  ip_protocol_deliver_rcu+0x264/0x1300 net/ipv4/ip_input.c:205
-  ip_local_deliver_finish+0x2b8/0x440 net/ipv4/ip_input.c:233
-  NF_HOOK include/linux/netfilter.h:314 [inline]
-  ip_local_deliver+0x21f/0x490 net/ipv4/ip_input.c:254
-  dst_input include/net/dst.h:461 [inline]
-  ip_rcv_finish net/ipv4/ip_input.c:449 [inline]
-  NF_HOOK include/linux/netfilter.h:314 [inline]
-  ip_rcv+0x46f/0x760 net/ipv4/ip_input.c:569
-  __netif_receive_skb_one_core net/core/dev.c:5534 [inline]
-  __netif_receive_skb+0x1a6/0x5a0 net/core/dev.c:5648
-  netif_receive_skb_internal net/core/dev.c:5734 [inline]
-  netif_receive_skb+0x58/0x660 net/core/dev.c:5793
-  tun_rx_batched+0x3ee/0x980 drivers/net/tun.c:1556
-  tun_get_user+0x53b9/0x66e0 drivers/net/tun.c:2009
-  tun_chr_write_iter+0x3af/0x5d0 drivers/net/tun.c:2055
-  call_write_iter include/linux/fs.h:2087 [inline]
-  new_sync_write fs/read_write.c:497 [inline]
-  vfs_write+0xb6b/0x1520 fs/read_write.c:590
-  ksys_write+0x20f/0x4c0 fs/read_write.c:643
-  __do_sys_write fs/read_write.c:655 [inline]
-  __se_sys_write fs/read_write.c:652 [inline]
-  __x64_sys_write+0x93/0xd0 fs/read_write.c:652
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
+So basically, we are trying to understand if there is a way in "set_link_ks=
+ettings" to differentiate if the speed value was passed by the user, or not=
+. In short, a way to differentiate between:
+	- Speed value explicitly passed by user via ethtool command as seen in ste=
+p 2a.
+		v/s
+	- Speed value not set by user but still being passed after queried with "g=
+et_link_ksettings" in step 4b.
 
-Uninit was created at:
-  __alloc_pages+0x9a6/0xe00 mm/page_alloc.c:4590
-  alloc_pages_mpol+0x62b/0x9d0 mm/mempolicy.c:2133
-  alloc_pages+0x1be/0x1e0 mm/mempolicy.c:2204
-  skb_page_frag_refill+0x2bf/0x7c0 net/core/sock.c:2909
-  tun_build_skb drivers/net/tun.c:1686 [inline]
-  tun_get_user+0xe0a/0x66e0 drivers/net/tun.c:1826
-  tun_chr_write_iter+0x3af/0x5d0 drivers/net/tun.c:2055
-  call_write_iter include/linux/fs.h:2087 [inline]
-  new_sync_write fs/read_write.c:497 [inline]
-  vfs_write+0xb6b/0x1520 fs/read_write.c:590
-  ksys_write+0x20f/0x4c0 fs/read_write.c:643
-  __do_sys_write fs/read_write.c:655 [inline]
-  __se_sys_write fs/read_write.c:652 [inline]
-  __x64_sys_write+0x93/0xd0 fs/read_write.c:652
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-Fixes: c54419321455 ("GRE: Refactor GRE tunneling code.")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/ip_tunnel.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+Can you please help investigate this query and let us know if you need any =
+further details. Thanks in advance!
 
-diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
-index 1b6981de3f29514dac72161be02f3ac6e4625551..7af36e4f1647d8f2b6a19baa2e072e628170452c 100644
---- a/net/ipv4/ip_tunnel.c
-+++ b/net/ipv4/ip_tunnel.c
-@@ -378,7 +378,7 @@ int ip_tunnel_rcv(struct ip_tunnel *tunnel, struct sk_buff *skb,
- 		  bool log_ecn_error)
- {
- 	const struct iphdr *iph = ip_hdr(skb);
--	int err;
-+	int nh, err;
- 
- #ifdef CONFIG_NET_IPGRE_BROADCAST
- 	if (ipv4_is_multicast(iph->daddr)) {
-@@ -404,8 +404,21 @@ int ip_tunnel_rcv(struct ip_tunnel *tunnel, struct sk_buff *skb,
- 		tunnel->i_seqno = ntohl(tpi->seq) + 1;
- 	}
- 
-+	/* Save offset of outer header relative to skb->head,
-+	 * because we are going to reset the network header to the inner header
-+	 * and might change skb->head.
-+	 */
-+	nh = skb_network_header(skb) - skb->head;
-+
- 	skb_set_network_header(skb, (tunnel->dev->type == ARPHRD_ETHER) ? ETH_HLEN : 0);
- 
-+	if (!pskb_inet_may_pull(skb)) {
-+		DEV_STATS_INC(tunnel->dev, rx_length_errors);
-+		DEV_STATS_INC(tunnel->dev, rx_errors);
-+		goto drop;
-+	}
-+	iph = (struct iphdr *)(skb->head + nh);
-+
- 	err = IP_ECN_decapsulate(iph, skb);
- 	if (unlikely(err)) {
- 		if (log_ecn_error)
--- 
-2.44.0.278.ge034bb2e1d-goog
+
+Thanks,
+Sagar
 
 
