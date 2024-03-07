@@ -1,334 +1,237 @@
-Return-Path: <netdev+bounces-78335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00152874B9F
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:00:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB07A874BB6
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:03:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A1A8284820
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:00:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C7B0B24E52
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:03:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4351112CDB0;
-	Thu,  7 Mar 2024 09:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3A5412B169;
+	Thu,  7 Mar 2024 09:58:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="BrHgl4oH"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qeSYLCoP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B42512CDA5;
-	Thu,  7 Mar 2024 09:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED57412B166;
+	Thu,  7 Mar 2024 09:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709805370; cv=none; b=jdOpZaBRUwM27a47Ob5dfOFhiJF7LhDny/LQ5whCQXR//64CJR3l1bNvKotWuXIwqgkU0w9EqAbwN7HDZGVloB45tcodypn2OcrBPcGIYUtdioKtHHanoI/YHZbYWW4l/TPr+Q4fV6vDEf8DLHO7v0Q6bFrUXXZJVTr9lxqPrGc=
+	t=1709805481; cv=none; b=I4KvxEyizlN7tXly6fbQAE6ghJh1XYbwfrjDgABxlZ9qswv3aD7MzZVhRwboB+dYv37O2OjbIo67q9wSUkpRBr8iZgEaOzQQ/kPMDrEsHh8rkoNKg9fXVBGtLbiqgkyLeP+q3FCiTv59O7rALFVGY5a6J8y6lHW1FajqjMIMcJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709805370; c=relaxed/simple;
-	bh=r9ynUyNwuaAraBQrB6g6AiLMJHHVsRdHoISqka/UdYE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dsOBEE2U7D+0E2FA2iaoID8MxQEwr0PkE31tZwQMO6GFi29wsgcQFtJqfWZiKlUEjAOjXVcQ0uTJcwrvwTdmgKfswXvQkP6RrChVS4uP+g3Vvj+72Xhw7gAUmuHKsCHKoIQ7p7y83kkrsYwbWnPLvUlBbxxhonIjhRVdxCSNXdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=BrHgl4oH; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1709805365; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=57tNxaCG7lrGDX+5Lxm1v4EurawfrxZMeQiUcDOKJSg=;
-	b=BrHgl4oHMaEqt9ZQD7IC4UnWFxAh4ErehCrIaLE5Uz2xD8D6qh1KXJw19c2hSwiz8gZtoBFeA31LPE29PNVXGT1RCR2l4BMvfj0Mr0TyJf8e9PD0hZFn8VkhJ2T4Xu6PWNut9Wwi/o/FbtJfA+btkAgS23Uo+JM4Bx97Yr7hmhk=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R781e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0W2-Ke2X_1709805363;
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W2-Ke2X_1709805363)
-          by smtp.aliyun-inc.com;
-          Thu, 07 Mar 2024 17:56:04 +0800
-From: Wen Gu <guwen@linux.alibaba.com>
-To: wintera@linux.ibm.com,
-	twinkler@linux.ibm.com,
-	hca@linux.ibm.com,
-	gor@linux.ibm.com,
-	agordeev@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	wenjia@linux.ibm.com,
-	jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com,
-	svens@linux.ibm.com,
-	alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2 11/11] net/smc: implement DMB-merged operations of loopback-ism
-Date: Thu,  7 Mar 2024 17:55:36 +0800
-Message-Id: <20240307095536.29648-12-guwen@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20240307095536.29648-1-guwen@linux.alibaba.com>
-References: <20240307095536.29648-1-guwen@linux.alibaba.com>
+	s=arc-20240116; t=1709805481; c=relaxed/simple;
+	bh=30t+lE0eDqy1IesYkT90zU7R1FkcFFB9A8lw7Tbwp9Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pjuqzzKu1upCY4PWcmlw3xqsAFqKhkjFvQtLdwh5vDvib6/gOhv9ZLOBa+rmuZb3LXQN4dti8OZ3nr01/nR5gKaLp8mdRi4jCBRUp3K0+3IPwtEtbwkg59kVvvtkuO/oE5ArGqDiEEwlPvWqcyN2z8Os8U1Oup14nVzAkapcNRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qeSYLCoP; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4279UOHh031820;
+	Thu, 7 Mar 2024 09:57:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=JpThu3/0XXibQG8w84m928pgTbIJWF564H9ZQ50NLzs=;
+ b=qeSYLCoPOqt++Wp295qTONpqGvSI5wNeW7HUa1zwk+4KzRMqwrKkr0eVZykw82uJ6OeB
+ Qbi0+CLmOHswFwpZZGWlx2QFZ1w16SR2lq/jm43e09I7MM9CIBEi/tIhy1qA/VNawnW+
+ NAcPtpkaPtg8gLkOtGM0IY7E1V6C/XyF6mId0XmiXdDQYkFM0qwHivve4roAPt17RWMX
+ +9Ln6QrC6Sa26XkKVZ1fkkF8jJeRwObbGywLuHfUzVgOxl6OyctISbBvCyNA+SkWBAfv
+ IZnMWu8xR5Ud8c1CzmE8MV/4isyAqit1ojsOGwcuXcTidT8iN//wcIB3WnTxpFVEqSu9 4Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wqb0t8hmx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Mar 2024 09:57:55 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4279vnlU002778;
+	Thu, 7 Mar 2024 09:57:50 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wqb0t8hku-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Mar 2024 09:57:49 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42795INS010917;
+	Thu, 7 Mar 2024 09:57:46 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wmh52mb4g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Mar 2024 09:57:46 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4279vfwE38994418
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 7 Mar 2024 09:57:43 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 21B6D2004E;
+	Thu,  7 Mar 2024 09:57:41 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EB46420049;
+	Thu,  7 Mar 2024 09:57:40 +0000 (GMT)
+Received: from [9.152.224.118] (unknown [9.152.224.118])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  7 Mar 2024 09:57:40 +0000 (GMT)
+Message-ID: <93077cee-b81a-4690-9aa8-cc954f9be902@linux.ibm.com>
+Date: Thu, 7 Mar 2024 10:57:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [lvc-project] [PATCH] [RFC] net: smc: fix fasync leak in
+ smc_release()
+To: Dmitry Antipov <dmantipov@yandex.ru>, Wen Gu <guwen@linux.alibaba.com>,
+        "wenjia@linux.ibm.com" <wenjia@linux.ibm.com>,
+        Gerd Bayer <gbayer@linux.ibm.com>
+Cc: "lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20240221051608.43241-1-dmantipov@yandex.ru>
+ <819353f3-f5f9-4a15-96a1-4f3a7fd6b33e@linux.alibaba.com>
+ <659c7821842fca97513624b713ced72ab970cdfc.camel@softline.com>
+ <19d7d71b-c911-45cc-9671-235d98720be6@linux.alibaba.com>
+ <380043fa-3208-4856-92b1-be9c87caeeb6@yandex.ru>
+ <2c9c9ffe-13c4-44b8-982a-a3b4070b8a11@linux.alibaba.com>
+ <35584a9f-f4c2-423a-8bb8-2c729cedb6fe@yandex.ru>
+From: Jan Karcher <jaka@linux.ibm.com>
+Organization: IBM - Network Linux on Z
+In-Reply-To: <35584a9f-f4c2-423a-8bb8-2c729cedb6fe@yandex.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: NWGaxKYtLJPX7pnmCP7qpPW3o0LapsYO
+X-Proofpoint-ORIG-GUID: ijN01u90P7BbOd1hYe04JLdomuYIkIum
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-07_06,2024-03-06_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=999 mlxscore=0 clxscore=1015 bulkscore=0 spamscore=0
+ adultscore=0 phishscore=0 malwarescore=0 priorityscore=1501
+ lowpriorityscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2311290000 definitions=main-2403070072
 
-This implements operations related to merging sndbuf with peer DMB in
-loopback-ism. The DMB won't be freed until no sndbuf is attached to it.
 
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
----
- net/smc/smc_loopback.c | 136 +++++++++++++++++++++++++++++++++++------
- net/smc/smc_loopback.h |   3 +
- 2 files changed, 119 insertions(+), 20 deletions(-)
 
-diff --git a/net/smc/smc_loopback.c b/net/smc/smc_loopback.c
-index 6828e0ad3e90..7e772f3772de 100644
---- a/net/smc/smc_loopback.c
-+++ b/net/smc/smc_loopback.c
-@@ -21,6 +21,7 @@
- 
- #if IS_ENABLED(CONFIG_SMC_LO)
- #define SMC_LO_V2_CAPABLE	0x1 /* loopback-ism acts as ISMv2 */
-+#define SMC_LO_SUPPORT_NOCOPY	0x1
- #define SMC_DMA_ADDR_INVALID	(~(dma_addr_t)0)
- 
- static const char smc_lo_dev_name[] = "loopback-ism";
-@@ -82,6 +83,7 @@ static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
- 		goto err_node;
- 	}
- 	dmb_node->dma_addr = SMC_DMA_ADDR_INVALID;
-+	refcount_set(&dmb_node->refcnt, 1);
- 
- again:
- 	/* add new dmb into hash table */
-@@ -95,6 +97,7 @@ static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
- 	}
- 	hash_add(ldev->dmb_ht, &dmb_node->list, dmb_node->token);
- 	write_unlock(&ldev->dmb_ht_lock);
-+	atomic_inc(&ldev->dmb_cnt);
- 
- 	dmb->sba_idx = dmb_node->sba_idx;
- 	dmb->dmb_tok = dmb_node->token;
-@@ -111,13 +114,29 @@ static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
- 	return rc;
- }
- 
-+static void __smc_lo_unregister_dmb(struct smc_lo_dev *ldev,
-+				    struct smc_lo_dmb_node *dmb_node)
-+{
-+	/* remove dmb from hash table */
-+	write_lock(&ldev->dmb_ht_lock);
-+	hash_del(&dmb_node->list);
-+	write_unlock(&ldev->dmb_ht_lock);
-+
-+	clear_bit(dmb_node->sba_idx, ldev->sba_idx_mask);
-+	kvfree(dmb_node->cpu_addr);
-+	kfree(dmb_node);
-+
-+	if (atomic_dec_and_test(&ldev->dmb_cnt))
-+		wake_up(&ldev->ldev_release);
-+}
-+
- static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
- {
- 	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
- 	struct smc_lo_dev *ldev = smcd->priv;
- 
--	/* remove dmb from hash table */
--	write_lock(&ldev->dmb_ht_lock);
-+	/* find dmb from hash table */
-+	read_lock(&ldev->dmb_ht_lock);
- 	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb->dmb_tok) {
- 		if (tmp_node->token == dmb->dmb_tok) {
- 			dmb_node = tmp_node;
-@@ -125,16 +144,76 @@ static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
- 		}
- 	}
- 	if (!dmb_node) {
--		write_unlock(&ldev->dmb_ht_lock);
-+		read_unlock(&ldev->dmb_ht_lock);
- 		return -EINVAL;
- 	}
--	hash_del(&dmb_node->list);
--	write_unlock(&ldev->dmb_ht_lock);
-+	read_unlock(&ldev->dmb_ht_lock);
- 
--	clear_bit(dmb_node->sba_idx, ldev->sba_idx_mask);
--	kfree(dmb_node->cpu_addr);
--	kfree(dmb_node);
-+	if (refcount_dec_and_test(&dmb_node->refcnt))
-+		__smc_lo_unregister_dmb(ldev, dmb_node);
-+	return 0;
-+}
-+
-+static int smc_lo_support_dmb_nocopy(struct smcd_dev *smcd)
-+{
-+	return SMC_LO_SUPPORT_NOCOPY;
-+}
-+
-+static int smc_lo_attach_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
-+{
-+	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
-+	struct smc_lo_dev *ldev = smcd->priv;
- 
-+	/* find dmb_node according to dmb->dmb_tok */
-+	read_lock(&ldev->dmb_ht_lock);
-+	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb->dmb_tok) {
-+		if (tmp_node->token == dmb->dmb_tok) {
-+			dmb_node = tmp_node;
-+			break;
-+		}
-+	}
-+	if (!dmb_node) {
-+		read_unlock(&ldev->dmb_ht_lock);
-+		return -EINVAL;
-+	}
-+	read_unlock(&ldev->dmb_ht_lock);
-+
-+	if (!refcount_inc_not_zero(&dmb_node->refcnt))
-+		/* the dmb is being unregistered, but has
-+		 * not been removed from the hash table.
-+		 */
-+		return -EINVAL;
-+
-+	/* provide dmb information */
-+	dmb->sba_idx = dmb_node->sba_idx;
-+	dmb->dmb_tok = dmb_node->token;
-+	dmb->cpu_addr = dmb_node->cpu_addr;
-+	dmb->dma_addr = dmb_node->dma_addr;
-+	dmb->dmb_len = dmb_node->len;
-+	return 0;
-+}
-+
-+static int smc_lo_detach_dmb(struct smcd_dev *smcd, u64 token)
-+{
-+	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
-+	struct smc_lo_dev *ldev = smcd->priv;
-+
-+	/* find dmb_node according to dmb->dmb_tok */
-+	read_lock(&ldev->dmb_ht_lock);
-+	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, token) {
-+		if (tmp_node->token == token) {
-+			dmb_node = tmp_node;
-+			break;
-+		}
-+	}
-+	if (!dmb_node) {
-+		read_unlock(&ldev->dmb_ht_lock);
-+		return -EINVAL;
-+	}
-+	read_unlock(&ldev->dmb_ht_lock);
-+
-+	if (refcount_dec_and_test(&dmb_node->refcnt))
-+		__smc_lo_unregister_dmb(ldev, dmb_node);
- 	return 0;
- }
- 
-@@ -170,8 +249,22 @@ static int smc_lo_move_data(struct smcd_dev *smcd, u64 dmb_tok,
- {
- 	struct smc_lo_dmb_node *rmb_node = NULL, *tmp_node;
- 	struct smc_lo_dev *ldev = smcd->priv;
--
--	read_lock(&ldev->dmb_ht_lock);
-+	struct smc_connection *conn;
-+
-+	if (!sf)
-+		/* since sndbuf is merged with peer DMB, there is
-+		 * no need to copy data from sndbuf to peer DMB.
-+		 */
-+		return 0;
-+
-+	/* read_lock_bh() is used here just to make lockdep
-+	 * happy, because spin_(un)lock_bh(&conn->send_lock) wraps
-+	 * smc_lo_move_data() and if we use read_lock() here, lockdep
-+	 * will complain about SOFTIRQ-safe -> SOFTIRQ-unsafe lock
-+	 * order detected, but in fact ldev->dmb_ht_lock will never
-+	 * be held in bh context.
-+	 */
-+	read_lock_bh(&ldev->dmb_ht_lock);
- 	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb_tok) {
- 		if (tmp_node->token == dmb_tok) {
- 			rmb_node = tmp_node;
-@@ -182,19 +275,14 @@ static int smc_lo_move_data(struct smcd_dev *smcd, u64 dmb_tok,
- 		read_unlock(&ldev->dmb_ht_lock);
- 		return -EINVAL;
- 	}
--	read_unlock(&ldev->dmb_ht_lock);
-+	read_unlock_bh(&ldev->dmb_ht_lock);
- 
- 	memcpy((char *)rmb_node->cpu_addr + offset, data, size);
- 
--	if (sf) {
--		struct smc_connection *conn =
--			smcd->conn[rmb_node->sba_idx];
--
--		if (conn && !conn->killed)
--			smcd_cdc_rx_handler(conn);
--		else
--			return -EPIPE;
--	}
-+	conn = smcd->conn[rmb_node->sba_idx];
-+	if (!conn || conn->killed)
-+		return -EPIPE;
-+	smcd_cdc_rx_handler(conn);
- 	return 0;
- }
- 
-@@ -226,6 +314,9 @@ static const struct smcd_ops lo_ops = {
- 	.query_remote_gid = smc_lo_query_rgid,
- 	.register_dmb = smc_lo_register_dmb,
- 	.unregister_dmb = smc_lo_unregister_dmb,
-+	.support_dmb_nocopy = smc_lo_support_dmb_nocopy,
-+	.attach_dmb = smc_lo_attach_dmb,
-+	.detach_dmb = smc_lo_detach_dmb,
- 	.add_vlan_id = smc_lo_add_vlan_id,
- 	.del_vlan_id = smc_lo_del_vlan_id,
- 	.set_vlan_required = smc_lo_set_vlan_required,
-@@ -304,12 +395,17 @@ static int smc_lo_dev_init(struct smc_lo_dev *ldev)
- 	smc_lo_generate_id(ldev);
- 	rwlock_init(&ldev->dmb_ht_lock);
- 	hash_init(ldev->dmb_ht);
-+	atomic_set(&ldev->dmb_cnt, 0);
-+	init_waitqueue_head(&ldev->ldev_release);
-+
- 	return smcd_lo_register_dev(ldev);
- }
- 
- static void smc_lo_dev_exit(struct smc_lo_dev *ldev)
- {
- 	smcd_lo_unregister_dev(ldev);
-+	if (atomic_read(&ldev->dmb_cnt))
-+		wait_event(ldev->ldev_release, !atomic_read(&ldev->dmb_cnt));
- }
- 
- static void smc_lo_dev_release(struct device *dev)
-diff --git a/net/smc/smc_loopback.h b/net/smc/smc_loopback.h
-index 24ab9d747613..9156a6c37e65 100644
---- a/net/smc/smc_loopback.h
-+++ b/net/smc/smc_loopback.h
-@@ -30,6 +30,7 @@ struct smc_lo_dmb_node {
- 	u32 sba_idx;
- 	void *cpu_addr;
- 	dma_addr_t dma_addr;
-+	refcount_t refcnt;
- };
- 
- struct smc_lo_dev {
-@@ -37,9 +38,11 @@ struct smc_lo_dev {
- 	struct device dev;
- 	u16 chid;
- 	struct smcd_gid local_gid;
-+	atomic_t dmb_cnt;
- 	rwlock_t dmb_ht_lock;
- 	DECLARE_BITMAP(sba_idx_mask, SMC_LO_MAX_DMBS);
- 	DECLARE_HASHTABLE(dmb_ht, SMC_LO_DMBS_HASH_BITS);
-+	wait_queue_head_t ldev_release;
- };
- #endif
- 
--- 
-2.32.0.3.g01195cf9f
+On 06/03/2024 19:07, Dmitry Antipov wrote:
+> On 3/6/24 17:45, Wen Gu wrote:
+> 
+>> IIUC, the fallback (or more precisely the private_data change) 
+>> essentially
+>> always happens when the lock_sock(smc->sk) is held, except in 
+>> smc_listen_work()
+>> or smc_listen_decline(), but at that moment, userspace program can not 
+>> yet
+>> acquire this new socket to add fasync entries to the fasync_list.
+>>
+>> So IMHO, the above patch should work, since it checks the private_data 
+>> under
+>> the lock_sock(sk). But if I missed something, please correct me.
+> 
+> Well, the whole picture is somewhat more complicated. Consider the
+> following diagram (an underlying kernel socket is in [], e.g. [smc->sk]):
+> 
+> Thread 0                        Thread 1
+> 
+> ioctl(sock, FIOASYNC, [1])
+> ...
+> sock = filp->private_data;
+> lock_sock(sock [smc->sk]);
+> sock_fasync(sock, ..., 1)       ; new fasync_struct linked to smc->sk
+> release_sock(sock [smc->sk]);
+>                                  ...
+>                                  lock_sock([smc->sk]);
+>                                  ...
+>                                  smc_switch_to_fallback()
+>                                  ...
+>                                  smc->clcsock->file->private_data = 
+> smc->clcsock;
+>                                  ...
+>                                  release_sock([smc->sk]);
+> ioctl(sock, FIOASYNC, [0])
+> ...
+> sock = filp->private_data;
+> lock_sock(sock [smc->clcsock]);
+> sock_fasync(sock, ..., 0)       ; nothing to unlink from smc->clcsock
+>                                  ; since fasync entry was linked to smc->sk
+> release_sock(sock [smc->clcsock]);
+>                                  ...
+>                                  close(sock [smc->clcsock]);
+>                                  __fput(...);
+>                                  file->f_op->fasync(sock, [0])   ; 
+> always failed -
+>                                                                  ; 
+> should use
+>                                                                  ; 
+> smc->sk instead
+>                                  file->f_op->release()
+>                                     ...
+>                                     smc_restore_fallback_changes()
+>                                     ...
+>                                     file->private_data = smc->sk.sk_socket;
+> 
+> That is, smc_restore_fallback_changes() restores filp->private_data to
+> smc->sk. If __fput() would have called file->f_op->release() _before_
+> file->f_op->fasync(), the fix would be as simple as adding
+> 
+> smc->sk.sk_socket->wq.fasync_list = smc->clcsock->wq.fasync_list;
+> 
+> to smc_restore_fallback_changes(). But since file->f_op->fasync() is called
+> before file->f_op->release(), the former always makes an attempt to 
+> unlink fasync
+> entry from smc->clcsock instead of smc->sk, thus introducing the memory 
+> leak.
+> 
+> And an idea with shared wait queue was intended in attempt to eliminate
+> this chicken-egg lookalike problem completely.
+> 
+> Dmitry
+> 
 
+Me and Gerd had another look at this.
+The infrastructure for what i proposed in the last E-Mail regarding the 
+ioctl function handler is already there (af_smc.c#smc_ioctl).
+There we already check if we are in a active fallback to send the ioctls 
+to the clcsock instead of the sk socket.
+
+```
+	lock_sock(&smc->sk);
+	if (smc->use_fallback) {
+		if (!smc->clcsock) {
+			release_sock(&smc->sk);
+			return -EBADF;
+		}
+		answ = smc->clcsock->ops->ioctl(smc->clcsock, cmd, arg);
+		release_sock(&smc->sk);
+		return answ;
+	}
+```
+
+We think it might be an option to secure the path in this function with 
+the smc->clcsock_release_lock.
+
+```
+	lock_sock(&smc->sk);
+	if (smc->use_fallback) {
+		if (!smc->clcsock) {
+			release_sock(&smc->sk);
+			return -EBADF;
+		}
++		mutex_lock(&smc->clcsock_release_lock);
+		answ = smc->clcsock->ops->ioctl(smc->clcsock, cmd, arg);
++		mutex_unlock(&smc->clcsock_release_lock);
+		release_sock(&smc->sk);
+		return answ;
+	}
+```
+
+What do yo think about this?
+I'm going to test this idea and see if we canget rid of the leak this way.
+
+Thanks
+- Jan & Gerd
 
