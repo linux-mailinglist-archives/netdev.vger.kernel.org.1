@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-78239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25A9287476B
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 05:41:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 966A9874776
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 05:50:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D387A286BAA
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:41:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E974287A4D
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02AC1D52C;
-	Thu,  7 Mar 2024 04:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD54171A4;
+	Thu,  7 Mar 2024 04:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n2Th6j+B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bwu9z77S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62AE1BC56;
-	Thu,  7 Mar 2024 04:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E783D6B;
+	Thu,  7 Mar 2024 04:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709786431; cv=none; b=QfT5mGgzlVGh4Fm+NohN3NcDpQ2UoRL8eiSFi/yE0NhKVmwzKzFOdV1ikp2kCN0x0rG1YAqctm3dO7eGpLk2zNe4o53YXF1+vr+I+nU5cE1nP++oRNV7jH9mD3is/t+qql+Vm1LZuvp6L6FSSZyvN/UMnllwYysgH136oeqcor4=
+	t=1709787028; cv=none; b=eXJ+5f1+DgXNxiZRVw0Igwrp7yElFzMi27CYTY7XsTr87jqxMw9XrObJmLC3JSHuoJkEIA3UpVqDt0Zh2QJNtNlMQ9YZEOKA5rQGBOc+N8g9vpQZ63lxihqlZ6NOAOUVwtOpklq8xHNpn7mgTpIW+7Trth0ZL04U3xt5vka0/xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709786431; c=relaxed/simple;
-	bh=oWQ8k864w4vkTmNo/1e1A064OVjilSU6x9OOmcthMuY=;
+	s=arc-20240116; t=1709787028; c=relaxed/simple;
+	bh=X5d+n8yY7yu891hIsAhkVV4aNq8U3dmq+Nmcr6tPkDU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JLWT8pPvFVGErY1VCNwUCrZaI5++h1WluUXS19ZUW5ly1uonib47SlFiOgt+YkWHKoJmVe4Xd/Cc2ZskqC1rVliTCg7+CAKsxdtiCuzgL3mQANKkplm/BjFbpLXClZmWadZQNijXwF0gwZSwZ2tqwam11vVckqatozmWKoW2x9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n2Th6j+B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2B73DC41606;
-	Thu,  7 Mar 2024 04:40:31 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=IK3/9kEnaZ9wex5QNzir/YxD4Fp9wJd9eYDpwezog1NqU+lG9WNIqSHgmr8jP3oNdFh5Jr7DZC2A/PBRQiIaNVoGUS+A65YOzPRVL7zroaEZbdjE05fTpGOe9+a7qU04MqERnCn01mDGls90ZQW5ExGcc/e/6iOrPb+TqrPkXBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bwu9z77S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E9635C43390;
+	Thu,  7 Mar 2024 04:50:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709786431;
-	bh=oWQ8k864w4vkTmNo/1e1A064OVjilSU6x9OOmcthMuY=;
+	s=k20201202; t=1709787028;
+	bh=X5d+n8yY7yu891hIsAhkVV4aNq8U3dmq+Nmcr6tPkDU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=n2Th6j+BGGCGrFm7Zi7vNUbTWrWuWjzILTLUC+1KTW01BP9KHNhVW1c6Bz8eePbVE
-	 c0zh/KsI4EJLHABIOCLgLEkrvqySve7YSQcQG9ujskKG4UEexiCj5cbxP3+Arujgo2
-	 hYY/CxGkMK5l2KO8UiMi2EcmNCanuN5VSIHSL7Y0ULpA+CNB44VlZYOdTrD1RJT38M
-	 ECCOCh+kWwD7oGuhwyAm8f0QR85+0fE0IWJQrOCO7qQxaj1+6/ojNY+a6pqJGMxnOa
-	 yFAk9mVzX7fl9TseTdJZm8IaPSsK8jVOV/McATqnj2+q7TfczFRN6a5H5BDP8oaKL7
-	 lBuVezuxpgP0g==
+	b=bwu9z77SiLG8qlMHg4yJThEf5C7IEK9Btn4QGu8dEaCIL4aa/rCUTsNxiOSpoiZ8V
+	 09VR6PHiWS+70yZ0+RQzxmNPyDAuCONbQhXqdbgcvZCF97ZHSboYKyfp0ex/muFu75
+	 OHDGefbSiZaHF724ZukHl/0jcG6rfbQV1xQ2kjgqZmTAmK5q6/XYFRqQ+s/1Hrj2oB
+	 uW1vyu5/CfhLIV4tmu2rsBcfVtcYMUIsc2mc7vIWRNZP+Rqrym4RGR9Btx8dFsVn7g
+	 FwpGxD/v3j4w6hSgq6nZkcjxf4VA8lbG4e63V9urYv/aWwnkYWyRKXlGSrDuAB2nr+
+	 WWe9xxWd8zw0A==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 014A8D88F81;
-	Thu,  7 Mar 2024 04:40:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C7827C04D3F;
+	Thu,  7 Mar 2024 04:50:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/4] mptcp: some clean-up patches
+Subject: Re: [PATCH net-next v2] mlxbf_gige: add support to display pause frame
+ counters
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170978643100.7855.15154832484312373588.git-patchwork-notify@kernel.org>
-Date: Thu, 07 Mar 2024 04:40:31 +0000
-References: <20240305-upstream-net-next-20240304-mptcp-misc-cleanup-v1-0-c436ba5e569b@kernel.org>
-In-Reply-To: <20240305-upstream-net-next-20240304-mptcp-misc-cleanup-v1-0-c436ba5e569b@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- tanggeliang@kylinos.cn, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <170978702781.12804.10600811373220093437.git-patchwork-notify@kernel.org>
+Date: Thu, 07 Mar 2024 04:50:27 +0000
+References: <20240305212137.3525-1-davthompson@nvidia.com>
+In-Reply-To: <20240305212137.3525-1-davthompson@nvidia.com>
+To: David Thompson <davthompson@nvidia.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ asmaa@nvidia.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 05 Mar 2024 12:04:29 +0100 you wrote:
-> Here are some clean-up patches for MPTCP:
+On Tue, 5 Mar 2024 16:21:37 -0500 you wrote:
+> This patch updates the mlxbf_gige driver to support the
+> "get_pause_stats()" callback, which enables display of
+> pause frame counters via "ethtool -I -a oob_net0".
 > 
-> - Patch 1 drops duplicated header inclusions.
-> 
-> - Patch 2 updates PM 'set_flags' interface, to make it more similar to
->   others.
+> The pause frame counters are only enabled if the "counters_en"
+> bit is asserted in the LLU general config register. The driver
+> will only report stats, and thus overwrite the default stats
+> state of ETHTOOL_STAT_NOT_SET, if "counters_en" is asserted.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/4] mptcp: drop duplicate header inclusions
-    https://git.kernel.org/netdev/net-next/c/d5dfbfa2f88e
-  - [net-next,2/4] mptcp: update set_flags interfaces
-    https://git.kernel.org/netdev/net-next/c/6a42477fe449
-  - [net-next,3/4] mptcp: set error messages for set_flags
-    https://git.kernel.org/netdev/net-next/c/a4d68b160240
-  - [net-next,4/4] mptcp: drop lookup_by_id in lookup_addr
-    https://git.kernel.org/netdev/net-next/c/af250c27ea1c
+  - [net-next,v2] mlxbf_gige: add support to display pause frame counters
+    https://git.kernel.org/netdev/net-next/c/c22341619852
 
 You are awesome, thank you!
 -- 
