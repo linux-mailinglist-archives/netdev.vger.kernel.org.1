@@ -1,568 +1,253 @@
-Return-Path: <netdev+bounces-78424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA30D8750C8
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:50:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F40E8750FB
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:53:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D3DE1F24E1B
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 13:50:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3586528C7EB
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 13:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE4D12D1F8;
-	Thu,  7 Mar 2024 13:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6CC85F86B;
+	Thu,  7 Mar 2024 13:53:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fZxNKzgs"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="nUSUXMUI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D455212D771
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 13:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6555912C7F2;
+	Thu,  7 Mar 2024 13:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709819059; cv=none; b=ULTcOrG8+Zw6ukUvte0ALwJDZG0J5b+Ug8reU5d/i7JLr3RDnkadP1w3U4ix0HnkAS6JOguyoC7Lvyu9Rlkj6n+3KcpQdcICEGLnRNDbQnoToAnk1g27E51i0xfNfiOio/SLZiamn5PzPO0kYJ3CHh7blkMhLzVoAbTE4m4AU+U=
+	t=1709819600; cv=none; b=P+21ZX9F4qTtqMsVSd4Z+qvQorVT/amrgfz05mbOWUK6AuFWDhyeqHf32PQWhyHToCoi7t+4n7tLFhLoFb9TBlJkmFoI51EM/nQGyMsgf6OE1440Th/2gyc618/KoB73nI2z3a9XlNlEjC9VZx/fhH48YWDsp8eaDoCJ/iUhFfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709819059; c=relaxed/simple;
-	bh=bABTGwyQ/hBURPNJDJX6P7RGrT2JQC+NhyrX6HpkRFo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=amWFBfzR689R5LPp2GLzPYyvf/agvc3ZCiu5Zxg6bnmTkww2XZLnFxp+nK4SkzKzZVFuETQd5atSHD8HRlWgC2yx/rWC0k//KfL2AiEAZB73F21nU0K2cSdGjYLh5GkPIikfzYBkW+O7JU0vhTuP+zlWyPJChUe9nKtQXvbn+4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fZxNKzgs; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2d288bac3caso11419571fa.2
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 05:44:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709819055; x=1710423855; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=nh8tGHd3mhSQ+G1vdIvKu8uM3eUI0tBA78hlyXOB+Qg=;
-        b=fZxNKzgsjDtC605YHb2Wc03hDxMws4LpjZVGgbJvp6e57qQVsu8gTl5nB0PIt9MWH5
-         FO/i8wnfxYaR/QzwBQDxrZZmchgxsRITsHJ5+YbAB0JersamzboZorZdta3y56E2Ugt5
-         GcuTMZIBNa0ocgcHwZATbZ3OTdcgM1iPWYaaFfr4n3txMNTH3I5U0RrU3UUct6zfCjn5
-         CM1gfRGkPMYsga0Zz4JTcROtxVKwRMCksA+NiLjW9Sa3qJmjmdILy72qZwVzTaY9UZGG
-         nS/A4LKyfL6PuynOknck+G596y8FxAkQSlSqEVdlQ6+WjMGfjbrKYSFLgfyub9iLD2jf
-         b6nQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709819055; x=1710423855;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nh8tGHd3mhSQ+G1vdIvKu8uM3eUI0tBA78hlyXOB+Qg=;
-        b=kf4khl4G0zDhB6s22IG2kDXzNN2cxRiPoy6tFwTljUwZyt9pi/AEYzsC6/+CxzkJWZ
-         C5Yi8yGkh7b2kbc0jJlghIf/HqF0jDUKdWA9QFk/NjaDy7ZQydipeXVp5U4vu2V/F8RA
-         9X7A7x0Rq38yy+ajzp/oialDRtX+LCKk8paT5C/q+Qq2AQvCCstRbgtEe5Md/97AjOw/
-         7NxOt/rvVBDQSdm8VqPYImstUULfWYZKIlkCM4yPozDZU0IlklCiFY2cq/4fRXqZkctv
-         XqEJZU4iT7x478bXzIpc0vXqQisD50ZcxjPDiAKTvNQGMwDwAwunzwK4k+6SEcQ74TT7
-         IVYg==
-X-Forwarded-Encrypted: i=1; AJvYcCWg7x0pOPuSaT9Nw+ek/KcRUyoh8MW/ZR85CuXAfBC9Picx4j9Pr5IHmED7U2RiuVnP+QrE8rJOQcxCncYl2dbRVcuZ6cjH
-X-Gm-Message-State: AOJu0YxIjUDEVysKqGhtXMeg2gVF4UqP0c7MkwtpvuZeqEf2pNIlwsDW
-	whbwgjbA4UBcscI5Y/kLzNP392IqRxR5v8feA98NCUJshR1t49bs
-X-Google-Smtp-Source: AGHT+IE2ZxJmtYqD/mtx4w3pFBh7zIdYb1PvHFE5NUq+reQfTap4GMnIJ6HqJsaA2F0W0DDPhZzbeQ==
-X-Received: by 2002:a2e:8552:0:b0:2d3:fca:dae8 with SMTP id u18-20020a2e8552000000b002d30fcadae8mr1419928ljj.16.1709819054477;
-        Thu, 07 Mar 2024 05:44:14 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id a19-20020a2e9813000000b002d2e419d9besm2912943ljj.65.2024.03.07.05.44.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Mar 2024 05:44:13 -0800 (PST)
-Date: Thu, 7 Mar 2024 16:44:11 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH net-next v8 05/11] net: stmmac: dwmac-loongson: Add
- Loongson-specific register definitions
-Message-ID: <xmlv2ry7gvyxwocnt73nvri367yzvg2ynrvpswexj7ppxsqahc@dhyhnzpb23ys>
-References: <cover.1706601050.git.siyanteng@loongson.cn>
- <e7e265e2d9d2f9d18d4633d037305cef3c5a18ca.1706601050.git.siyanteng@loongson.cn>
- <2gemgo5ghmtp3pmbi2mkdh4ll7lfncnkqe7xrr3ke3dhjkjsas@m2mfy5zlsmca>
- <544951f8-e910-40cd-8cb7-6fafc00f0bf6@loongson.cn>
- <sa5yimnaij2ucthjeouvgjsqmt2o54ye6pd6se5362lycqppvw@vf7rmdhlq6xd>
- <8986e189-2099-4d27-bd7c-d9c098530f1b@loongson.cn>
- <elp4xrucwj6yexhbh2huoq4n4n4zrdtdditpdmt5ikfz5hffau@wdpaoabvnfpr>
- <63005488-ece8-4ef6-9e31-b1980c2fab61@loongson.cn>
+	s=arc-20240116; t=1709819600; c=relaxed/simple;
+	bh=gbfAZncSAe9yaExC15PNGrV33fDzMphCXQlhmNGOnb4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=scuq5Y+sAQbRDiefBXC2vyfxHLEcBi6ieeI2ob1ujMy3UJ26o4rtLA4igDvU2Ol/HbIJV6xL8pShbzEmJAESWRFtlqcrytf4qsjDs4alhEWUaKdgvjm7WHHGNIMQYXS/vjQOTkeu1NLHPhtz6pfCGtUaGZKn1ez8eve1HNwhdko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=nUSUXMUI; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1709819595; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=oVF3U97q4XEf0h3GuE808su/wdER1LzXjPWhGor+4X8=;
+	b=nUSUXMUIfGwdYmmKzwn1b36f5VOIgL5TswFz3kBJwwExdZMwY4crwtFXPYR1Eeqi1RQugi2buswNKP5Xk6t6Ki9QjhYxSJeSyFHHYc3jLd6nsj/ZT9+vAbpeadm5mXfZ+T4If+3M5e9qyVfSGux0B0/Oq13569o2iWh3aMelD4w=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0W2-l.zc_1709819593;
+Received: from 30.221.132.59(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W2-l.zc_1709819593)
+          by smtp.aliyun-inc.com;
+          Thu, 07 Mar 2024 21:53:14 +0800
+Message-ID: <a88a0731-6cbe-4987-b1e9-afa51f9ab057@linux.alibaba.com>
+Date: Thu, 7 Mar 2024 21:53:13 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [lvc-project] [PATCH] [RFC] net: smc: fix fasync leak in
+ smc_release()
+To: Dmitry Antipov <dmantipov@yandex.ru>,
+ "wenjia@linux.ibm.com" <wenjia@linux.ibm.com>
+Cc: "lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
+ "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "jaka@linux.ibm.com" <jaka@linux.ibm.com>
+References: <20240221051608.43241-1-dmantipov@yandex.ru>
+ <819353f3-f5f9-4a15-96a1-4f3a7fd6b33e@linux.alibaba.com>
+ <659c7821842fca97513624b713ced72ab970cdfc.camel@softline.com>
+ <19d7d71b-c911-45cc-9671-235d98720be6@linux.alibaba.com>
+ <380043fa-3208-4856-92b1-be9c87caeeb6@yandex.ru>
+ <2c9c9ffe-13c4-44b8-982a-a3b4070b8a11@linux.alibaba.com>
+ <35584a9f-f4c2-423a-8bb8-2c729cedb6fe@yandex.ru>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <35584a9f-f4c2-423a-8bb8-2c729cedb6fe@yandex.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <63005488-ece8-4ef6-9e31-b1980c2fab61@loongson.cn>
 
-On Thu, Mar 07, 2024 at 09:15:50PM +0800, Yanteng Si wrote:
-> Hi Serge,
-> 
-> 
-> Sorry for keeping you waiting for so long.
-> 
-> 在 2024/2/24 02:50, Serge Semin 写道:
-> > On Fri, Feb 23, 2024 at 04:16:07PM +0800, Yanteng Si wrote:
-> > > Hi Serge,
-> > > 
-> > > 在 2024/2/22 21:59, Serge Semin 写道:
-> > > > On Thu, Feb 22, 2024 at 09:39:49PM +0800, Yanteng Si wrote:
-> > > > > 在 2024/2/6 02:17, Serge Semin 写道:
-> > > > > > On Tue, Jan 30, 2024 at 04:48:17PM +0800, Yanteng Si wrote:
-> > > > > > > There are two types of Loongson DWGMAC. The first type shares the same
-> > > > > > > register definitions and has similar logic as dwmac1000. The second type
-> > > > > > > uses several different register definitions, we think it is necessary to
-> > > > > > > distinguish rx and tx, so we split these bits into two.
-> > > > > > > 
-> > > > > > > Simply put, we split some single bit fields into double bits fileds:
-> > > > > > > 
-> > > > > > >         Name              Tx          Rx
-> > > > > > > 
-> > > > > > > DMA_INTR_ENA_NIE = 0x00040000 | 0x00020000;
-> > > > > > > DMA_INTR_ENA_AIE = 0x00010000 | 0x00008000;
-> > > > > > > DMA_STATUS_NIS   = 0x00040000 | 0x00020000;
-> > > > > > > DMA_STATUS_AIS   = 0x00010000 | 0x00008000;
-> > > > > > > DMA_STATUS_FBI   = 0x00002000 | 0x00001000;
-> > > > > > > 
-> > > > > > > Therefore, when using, TX and RX must be set at the same time.
-> > > > > > > 
-> > > > > > > How to use them:
-> > > > > > > 1. Create the Loongson GNET-specific
-> > > > > > > stmmac_dma_ops.dma_interrupt()
-> > > > > > > stmmac_dma_ops.init_chan()
-> > > > > > > methods in the dwmac-loongson.c driver. Adding all the
-> > > > > > > Loongson-specific macros
-> > > > > > > 
-> > > > > > > 2. Create a Loongson GNET-specific platform setup method with the next
-> > > > > > > semantics:
-> > > > > > >       + allocate stmmac_dma_ops instance and initialize it with
-> > > > > > >         dwmac1000_dma_ops.
-> > > > > > >       + override the stmmac_dma_ops.{dma_interrupt, init_chan} with
-> > > > > > >         the pointers to the methods defined in 2.
-> > > > > > >       + allocate mac_device_info instance and initialize the
-> > > > > > >         mac_device_info.dma field with a pointer to the new
-> > > > > > >         stmmac_dma_ops instance.
-> > > > > > >       + initialize mac_device_info in a way it's done in
-> > > > > > >         dwmac1000_setup().
-> > > > > > > 
-> > > > > > > 3. Initialize plat_stmmacenet_data.setup() with the pointer to the
-> > > > > > > method created in 2.
-> > > > > > > 
-> > > > > > > Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> > > > > > > Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> > > > > > > Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> > > > > > > ---
-> > > > > > >     .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 248 ++++++++++++++++++
-> > > > > > >     1 file changed, 248 insertions(+)
-> > > > > > > 
-> > > > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > > > > > index e7ce027cc14e..3b3578318cc1 100644
-> > > > > > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > > > > > @@ -8,6 +8,193 @@
-> > > > > > >     #include <linux/device.h>
-> > > > > > >     #include <linux/of_irq.h>
-> > > > > > >     #include "stmmac.h"
-> > > > > > > +#include "dwmac_dma.h"
-> > > > > > > +#include "dwmac1000.h"
-> > > > > > > +
-> > > > > > > +#define DMA_INTR_ENA_NIE_TX_LOONGSON 0x00040000	/* Normal Loongson Tx Summary */
-> > > > > > > +#define DMA_INTR_ENA_NIE_RX_LOONGSON 0x00020000	/* Normal Loongson Rx Summary */
-> > > > > > > +#define DMA_INTR_NORMAL_LOONGSON	(DMA_INTR_ENA_NIE_TX_LOONGSON | \
-> > > > > > > +			 DMA_INTR_ENA_NIE_RX_LOONGSON | DMA_INTR_ENA_RIE | \
-> > > > > > > +			 DMA_INTR_ENA_TIE)
-> > > > > > > +
-> > > > > > > +#define DMA_INTR_ENA_AIE_TX_LOONGSON 0x00010000	/* Abnormal Loongson Tx Summary */
-> > > > > > > +#define DMA_INTR_ENA_AIE_RX_LOONGSON 0x00008000	/* Abnormal Loongson Rx Summary */
-> > > > > > > +
-> > > > > > > +#define DMA_INTR_ABNORMAL_LOONGSON	(DMA_INTR_ENA_AIE_TX_LOONGSON | \
-> > > > > > > +				DMA_INTR_ENA_AIE_RX_LOONGSON | DMA_INTR_ENA_FBE | \
-> > > > > > > +				DMA_INTR_ENA_UNE)
-> > > > > > > +
-> > > > > > > +#define DMA_INTR_DEFAULT_MASK_LOONGSON	(DMA_INTR_NORMAL_LOONGSON | DMA_INTR_ABNORMAL_LOONGSON)
-> > > > > > > +
-> > > > > > > +#define DMA_STATUS_NIS_TX_LOONGSON	0x00040000	/* Normal Loongson Tx Interrupt Summary */
-> > > > > > > +#define DMA_STATUS_NIS_RX_LOONGSON	0x00020000	/* Normal Loongson Rx Interrupt Summary */
-> > > > > > > +
-> > > > > > > +#define DMA_STATUS_AIS_TX_LOONGSON	0x00010000	/* Abnormal Loongson Tx Interrupt Summary */
-> > > > > > > +#define DMA_STATUS_AIS_RX_LOONGSON	0x00008000	/* Abnormal Loongson Rx Interrupt Summary */
-> > > > > > > +
-> > > > > > > +#define DMA_STATUS_FBI_TX_LOONGSON	0x00002000	/* Fatal Loongson Tx Bus Error Interrupt */
-> > > > > > > +#define DMA_STATUS_FBI_RX_LOONGSON	0x00001000	/* Fatal Loongson Rx Bus Error Interrupt */
-> > > > > > > +
-> > > > > > > +#define DMA_STATUS_MSK_COMMON_LOONGSON		(DMA_STATUS_NIS_TX_LOONGSON | \
-> > > > > > > +					 DMA_STATUS_NIS_RX_LOONGSON | DMA_STATUS_AIS_TX_LOONGSON | \
-> > > > > > > +					 DMA_STATUS_AIS_RX_LOONGSON | DMA_STATUS_FBI_TX_LOONGSON | \
-> > > > > > > +					 DMA_STATUS_FBI_RX_LOONGSON)
-> > > > > > Max 80 chars per line please.
-> > > > > OK,
-> > > > > > > +
-> > > > > > > +#define DMA_STATUS_MSK_RX_LOONGSON		(DMA_STATUS_ERI | \
-> > > > > > > +					 DMA_STATUS_RWT | \
-> > > > > > > +					 DMA_STATUS_RPS | \
-> > > > > > > +					 DMA_STATUS_RU | \
-> > > > > > > +					 DMA_STATUS_RI | \
-> > > > > > > +					 DMA_STATUS_OVF | \
-> > > > > > > +					 DMA_STATUS_MSK_COMMON_LOONGSON)
-> > > > > > > +
-> > > > > > > +#define DMA_STATUS_MSK_TX_LOONGSON		(DMA_STATUS_ETI | \
-> > > > > > > +					 DMA_STATUS_UNF | \
-> > > > > > > +					 DMA_STATUS_TJT | \
-> > > > > > > +					 DMA_STATUS_TU | \
-> > > > > > > +					 DMA_STATUS_TPS | \
-> > > > > > > +					 DMA_STATUS_TI | \
-> > > > > > > +					 DMA_STATUS_MSK_COMMON_LOONGSON)
-> > > > > > > +
-> > > > > > > +struct loongson_data {
-> > > > > > > +	struct device *dev;
-> > > > > > > +	u32 lgmac_version;
-> > > > > > > +	struct stmmac_dma_ops dwlgmac_dma_ops;
-> > > > > > Just figured out we can do without this field being added to the
-> > > > > > private data. See my note in the loongson_setup() method.
-> > > > > > 
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +static void dwlgmac_dma_init_channel(struct stmmac_priv *priv,
-> > > > > > The "dwlgmac_" prefix is confusing. There is the DW XLGMAC IP-core for
-> > > > > > which the "dwxlgmac_" is more appropriate and "x" is easy to miss
-> > > > > > should your version of the prefix is met. Consider changing it to
-> > > > > > something like "loongson_gnet_".
-> > > > > OK,
-> > > > > > > +				     void __iomem *ioaddr,
-> > > > > > > +				     struct stmmac_dma_cfg *dma_cfg, u32 chan)
-> > > > > > > +{
-> > > > > > > +	u32 value;
-> > > > > > > +	int txpbl = dma_cfg->txpbl ?: dma_cfg->pbl;
-> > > > > > > +	int rxpbl = dma_cfg->rxpbl ?: dma_cfg->pbl;
-> > > > > > > +
-> > > > > > > +	/* common channel control register config */
-> > > > > > > +	value = readl(ioaddr + DMA_CHAN_BUS_MODE(chan));
-> > > > > > > +
-> > > > > > > +	/* Set the DMA PBL (Programmable Burst Length) mode.
-> > > > > > > +	 *
-> > > > > > > +	 * Note: before stmmac core 3.50 this mode bit was 4xPBL, and
-> > > > > > > +	 * post 3.5 mode bit acts as 8*PBL.
-> > > > > > > +	 */
-> > > > > > > +	if (dma_cfg->pblx8)
-> > > > > > > +		value |= DMA_BUS_MODE_MAXPBL;
-> > > > > > > +	value |= DMA_BUS_MODE_USP;
-> > > > > > > +	value &= ~(DMA_BUS_MODE_PBL_MASK | DMA_BUS_MODE_RPBL_MASK);
-> > > > > > > +	value |= (txpbl << DMA_BUS_MODE_PBL_SHIFT);
-> > > > > > > +	value |= (rxpbl << DMA_BUS_MODE_RPBL_SHIFT);
-> > > > > > > +
-> > > > > > > +	/* Set the Fixed burst mode */
-> > > > > > > +	if (dma_cfg->fixed_burst)
-> > > > > > > +		value |= DMA_BUS_MODE_FB;
-> > > > > > > +
-> > > > > > > +	/* Mixed Burst has no effect when fb is set */
-> > > > > > > +	if (dma_cfg->mixed_burst)
-> > > > > > > +		value |= DMA_BUS_MODE_MB;
-> > > > > > > +
-> > > > > > > +	value |= DMA_BUS_MODE_ATDS;
-> > > > > > > +
-> > > > > > > +	if (dma_cfg->aal)
-> > > > > > > +		value |= DMA_BUS_MODE_AAL;
-> > > > > > > +
-> > > > > > > +	writel(value, ioaddr + DMA_BUS_MODE);
-> > > > > > > +
-> > > > > > > +	/* Mask interrupts by writing to CSR7 */
-> > > > > > > +	writel(DMA_INTR_DEFAULT_MASK_LOONGSON, ioaddr + DMA_INTR_ENA);
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static int dwlgmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > > > > > The same note as above.
-> > > > > > 
-> > > > > > > +				 struct stmmac_extra_stats *x, u32 chan, u32 dir)
-> > > > > > > +{
-> > > > > > > +	struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[chan];
-> > > > > > > +	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
-> > > > > > > +	int ret = 0;
-> > > > > > > +	/* read the status register (CSR5) */
-> > > > > > > +	u32 nor_intr_status;
-> > > > > > > +	u32 abnor_intr_status;
-> > > > > > > +	u32 fb_intr_status;
-> > > > > > Reverse xmas tree please.
-> > > > > > 
-> > > > > > > +	u32 intr_status = readl(ioaddr + DMA_CHAN_STATUS(chan));
-> > > > > > Please move the initialization into a separate statement.
-> > > > > OK,
-> > > > > > > +
-> > > > > > > +#ifdef DWMAC_DMA_DEBUG
-> > > > > > > +	/* Enable it to monitor DMA rx/tx status in case of critical problems */
-> > > > > > > +	pr_debug("%s: [CSR5: 0x%08x]\n", __func__, intr_status);
-> > > > > > > +	show_tx_process_state(intr_status);
-> > > > > > > +	show_rx_process_state(intr_status);
-> > > > > > > +#endif
-> > > > > > This will cause a build-error if DWMAC_DMA_DEBUG is defined. Just drop
-> > > > > > it.
-> > > > > > OK,
-> > > > > > > +
-> > > > > > > +	if (dir == DMA_DIR_RX)
-> > > > > > > +		intr_status &= DMA_STATUS_MSK_RX_LOONGSON;
-> > > > > > > +	else if (dir == DMA_DIR_TX)
-> > > > > > > +		intr_status &= DMA_STATUS_MSK_TX_LOONGSON;
-> > > > > > > +
-> > > > > > > +	nor_intr_status = intr_status & (DMA_STATUS_NIS_TX_LOONGSON |
-> > > > > > > +		DMA_STATUS_NIS_RX_LOONGSON);
-> > > > > > > +	abnor_intr_status = intr_status & (DMA_STATUS_AIS_TX_LOONGSON |
-> > > > > > > +		DMA_STATUS_AIS_RX_LOONGSON);
-> > > > > > > +	fb_intr_status = intr_status & (DMA_STATUS_FBI_TX_LOONGSON |
-> > > > > > > +		DMA_STATUS_FBI_RX_LOONGSON);
-> > > > > > > +
-> > > > > > > +	/* ABNORMAL interrupts */
-> > > > > > > +	if (unlikely(abnor_intr_status)) {
-> > > > > > > +		if (unlikely(intr_status & DMA_STATUS_UNF)) {
-> > > > > > > +			ret = tx_hard_error_bump_tc;
-> > > > > > > +			x->tx_undeflow_irq++;
-> > > > > > > +		}
-> > > > > > > +		if (unlikely(intr_status & DMA_STATUS_TJT))
-> > > > > > > +			x->tx_jabber_irq++;
-> > > > > > > +
-> > > > > > > +		if (unlikely(intr_status & DMA_STATUS_OVF))
-> > > > > > > +			x->rx_overflow_irq++;
-> > > > > > > +
-> > > > > > > +		if (unlikely(intr_status & DMA_STATUS_RU))
-> > > > > > > +			x->rx_buf_unav_irq++;
-> > > > > > > +		if (unlikely(intr_status & DMA_STATUS_RPS))
-> > > > > > > +			x->rx_process_stopped_irq++;
-> > > > > > > +		if (unlikely(intr_status & DMA_STATUS_RWT))
-> > > > > > > +			x->rx_watchdog_irq++;
-> > > > > > > +		if (unlikely(intr_status & DMA_STATUS_ETI))
-> > > > > > > +			x->tx_early_irq++;
-> > > > > > > +		if (unlikely(intr_status & DMA_STATUS_TPS)) {
-> > > > > > > +			x->tx_process_stopped_irq++;
-> > > > > > > +			ret = tx_hard_error;
-> > > > > > > +		}
-> > > > > > > +		if (unlikely(intr_status & fb_intr_status)) {
-> > > > > > > +			x->fatal_bus_error_irq++;
-> > > > > > > +			ret = tx_hard_error;
-> > > > > > > +		}
-> > > > > > > +	}
-> > > > > > > +	/* TX/RX NORMAL interrupts */
-> > > > > > > +	if (likely(nor_intr_status)) {
-> > > > > > > +		if (likely(intr_status & DMA_STATUS_RI)) {
-> > > > > > > +			u32 value = readl(ioaddr + DMA_INTR_ENA);
-> > > > > > > +			/* to schedule NAPI on real RIE event. */
-> > > > > > > +			if (likely(value & DMA_INTR_ENA_RIE)) {
-> > > > > > > +				u64_stats_update_begin(&rxq_stats->syncp);
-> > > > > > > +				rxq_stats->rx_normal_irq_n++;
-> > > > > > > +				u64_stats_update_end(&rxq_stats->syncp);
-> > > > > > > +				ret |= handle_rx;
-> > > > > > > +			}
-> > > > > > > +		}
-> > > > > > > +		if (likely(intr_status & DMA_STATUS_TI)) {
-> > > > > > > +			u64_stats_update_begin(&txq_stats->syncp);
-> > > > > > > +			txq_stats->tx_normal_irq_n++;
-> > > > > > > +			u64_stats_update_end(&txq_stats->syncp);
-> > > > > > > +			ret |= handle_tx;
-> > > > > > > +		}
-> > > > > > > +		if (unlikely(intr_status & DMA_STATUS_ERI))
-> > > > > > > +			x->rx_early_irq++;
-> > > > > > > +	}
-> > > > > > > +	/* Optional hardware blocks, interrupts should be disabled */
-> > > > > > > +	if (unlikely(intr_status &
-> > > > > > > +		     (DMA_STATUS_GPI | DMA_STATUS_GMI | DMA_STATUS_GLI)))
-> > > > > > > +		pr_warn("%s: unexpected status %08x\n", __func__, intr_status);
-> > > > > > > +
-> > > > > > > +	/* Clear the interrupt by writing a logic 1 to the CSR5[15-0] */
-> > > > > > > +	writel((intr_status & 0x7ffff), ioaddr + DMA_CHAN_STATUS(chan));
-> > > > > > > +
-> > > > > > > +	return ret;
-> > > > > > > +}
-> > > > > > >     struct stmmac_pci_info {
-> > > > > > >     	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
-> > > > > > > @@ -121,6 +308,48 @@ static struct stmmac_pci_info loongson_gmac_pci_info = {
-> > > > > > >     	.config = loongson_gmac_config,
-> > > > > > >     };
-> > > > > > > +static struct mac_device_info *loongson_setup(void *apriv)
-> > > > > > Consider using the GNET-specific prefix, like "loongson_gnet_".
-> > > > > > 
-> > > > > > > +{
-> > > > > > > +	struct stmmac_priv *priv = apriv;
-> > > > > > > +	struct mac_device_info *mac;
-> > > > > > > +	struct loongson_data *ld;
-> > > > > > > +
-> > > > > > > +	mac = devm_kzalloc(priv->device, sizeof(*mac), GFP_KERNEL);
-> > > > > > > +	if (!mac)
-> > > > > > > +		return NULL;
-> > > > > > What about devm_kzalloc()-ing the stmmac_dma_ops instance here and
-> > > > > > initializing it as it's done in the probe method? Thus ...
-> > > > > > 
-> > > > > > > +
-> > > > > > > +	ld = priv->plat->bsp_priv;
-> > > > > > > +	mac->dma = &ld->dwlgmac_dma_ops;
-> > > > > > ... this can be replaced with:
-> > > > > > 
-> > > > > > 	mac->dma = devm_kzalloc(priv->device, sizeof(*mac->dma), GFP_KERNEL);
-> > > > > > 	if (!mac->dma)
-> > > > > > 		return -ENOMEM;
-> > > > > Great, but It seems that we cannot return an int value here.
-> > > > Just
-> > > > 		return NULL;
-> > > OK,
-> > > > then.
-> > > > 
-> > > > > > 	*mac->dma = dwmac1000_dma_ops;
-> > > > > > 	mac->dma->init_chan = loongson_gnet_dma_init_channel;
-> > > > > > 	mac->dma->dma_interrupt = loongson_gnet_dma_interrupt;
-> > > It seems that we still cannot do this because：
-> > > structmac_device_info{
-> > > ...
-> > > conststructstmmac_mmc_ops*mmc;
-> > > ...
-> > > }
-> > > some errors output:
-> > > error: assignment of read-only location '*mac->dma'
-> > > error: assignment of member 'init_chan' in read-only object
-> > > ...
-> > No, we can. Just use a temporary non-const pointer to stmmac_dma_ops:
-> > 
-> > +static struct mac_device_info *loongson_gnet_setup(void *apriv)
-> > +{
-> > +	struct stmmac_priv *priv = apriv;
-> > +	struct mac_device_info *mac;
-> > +	struct stmmac_dma_ops *dma;
-> > +	struct loongson_data *ld;
-> > +
-> > +	mac = devm_kzalloc(priv->device, sizeof(*mac), GFP_KERNEL);
-> > +	if (!mac)
-> > +		return NULL;
-> > +
-> > +	dma = devm_kzalloc(priv->device, sizeof(*dma), GFP_KERNEL);
-> > +	if (!mac->dma)
-> 
 
-> We have already modified it according to this comment. By the way, this
-> should be "if (!mac)",
 
-if (!dma)
+On 2024/3/7 02:07, Dmitry Antipov wrote:
+> On 3/6/24 17:45, Wen Gu wrote:
+> 
+>> IIUC, the fallback (or more precisely the private_data change) essentially
+>> always happens when the lock_sock(smc->sk) is held, except in smc_listen_work()
+>> or smc_listen_decline(), but at that moment, userspace program can not yet
+>> acquire this new socket to add fasync entries to the fasync_list.
+>>
+>> So IMHO, the above patch should work, since it checks the private_data under
+>> the lock_sock(sk). But if I missed something, please correct me.
+> 
+> Well, the whole picture is somewhat more complicated. Consider the
+> following diagram (an underlying kernel socket is in [], e.g. [smc->sk]):
+> 
+> Thread 0                        Thread 1
+> 
+> ioctl(sock, FIOASYNC, [1])
+> ...
+> sock = filp->private_data;
+> lock_sock(sock [smc->sk]);
+> sock_fasync(sock, ..., 1)       ; new fasync_struct linked to smc->sk
+> release_sock(sock [smc->sk]);
+>                                  ...
+>                                  lock_sock([smc->sk]);
+>                                  ...
+>                                  smc_switch_to_fallback()
+>                                  ...
+>                                  smc->clcsock->file->private_data = smc->clcsock;
+>                                  ...
+>                                  release_sock([smc->sk]);
+> ioctl(sock, FIOASYNC, [0])
+> ...
+> sock = filp->private_data;
+> lock_sock(sock [smc->clcsock]);
+> sock_fasync(sock, ..., 0)       ; nothing to unlink from smc->clcsock
+>                                  ; since fasync entry was linked to smc->sk
+> release_sock(sock [smc->clcsock]);
 
-but you were right. My hand-written code was incorrect in that part.
 
--Serge(y)
+I don't understand why the fasync entry now can't be removed from
+clcsock->wq.fasync_list? since the fasync entry has been moved to
+clcsock->wq.fasync_list during fallback.
 
+The process you described above is:
+
+1) An fasync entry was added into smc->sk.sk_socket->wq.fasync_list;
+2) then fallback occurs, and the fasync entry is moved to clcsock->wq.fasync_list,
+    and file->private_data is changed to smc->clcsock;
+3) lastly we removed the fasync entry from clcsock->wq.fasync_list.
+
+
+It can be reproduced by follows, right?
+
+#include <signal.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <stdio.h>
+
+int main (int argc, char *argv[])
+{
+         struct msghdr msg = { 0 };
+         int sock;
+         int on;
+
+         sock = socket(AF_SMC, SOCK_STREAM, 0);
+
+         /* add fasync entry */
+         on = 1;
+         ioctl(sock, FIOASYNC, &on);
+
+         /* fallback */
+         sendmsg(sock, &msg, MSG_FASTOPEN);
+
+         /* remove fasync entry */
+         on = 0;
+         ioctl(sock, FIOASYNC, &on);
+
+         close(sock);
+         return 0;
+}
+
+and I added some prints in the kernel for quick debug:
+
+diff --git a/fs/fcntl.c b/fs/fcntl.c
+index c80a6acad742..79b8e435c380 100644
+--- a/fs/fcntl.c
++++ b/fs/fcntl.c
+@@ -880,6 +880,7 @@ int fasync_remove_entry(struct file *filp, struct fasync_struct **fapp)
+                 call_rcu(&fa->fa_rcu, fasync_free_rcu);
+                 filp->f_flags &= ~FASYNC;
+                 result = 1;
++               pr_warn("%s: wq->fasync_list %pK, fasync entry %pK\n", __func__, &(*fapp), fa);
+                 break;
+         }
+         spin_unlock(&fasync_lock);
+@@ -932,6 +933,7 @@ struct fasync_struct *fasync_insert_entry(int fd, struct file *filp, struct fasy
+         new->fa_next = *fapp;
+         rcu_assign_pointer(*fapp, new);
+         filp->f_flags |= FASYNC;
++       pr_warn("%s: wq->fasync_list %pK, fasync entry %pK\n", __func__, &(*fapp), new);
+
+  out:
+         spin_unlock(&fasync_lock);
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index 4b52b3b159c0..3b9737d42dbd 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -925,6 +925,9 @@ static int smc_switch_to_fallback(struct smc_sock *smc, int reason_code)
+                 smc->clcsock->wq.fasync_list =
+                         smc->sk.sk_socket->wq.fasync_list;
+                 smc->sk.sk_socket->wq.fasync_list = NULL;
++               pr_warn("%s: smc->sk wq.fasync_list %pK, clcsock->wq.fasync_list %pK\n",
++                       __func__, &smc->sk.sk_socket->wq.fasync_list,
++                       &smc->clcsock->wq.fasync_list);
+
+                 /* There might be some wait entries remaining
+                  * in smc sk->sk_wq and they should be woken up
+
+
+
+ran the reproducer, and dmesg shows:
+
+[] fasync_insert_entry: wq->fasync_list ffff96fdc0425e98, fasync entry ffff96fdccc62690
+[] smc: smc_switch_to_fallback: smc->sk wq.fasync_list ffff96fdc0425e98, clcsock->wq.fasync_list ffff96fdc0426ed8
+[] fasync_remove_entry: wq->fasync_list ffff96fdc0426ed8, fasync entry ffff96fdccc62690
+
+It shows that
+1. an fasync entry ffff96fdccc62690 is added into ffff96fdc0425e98 (smc->sk wq.fasync_list)
+2. then fallback, all the fasync entris in smc->sk wq.fasync_list will be moved to clcsock->wq.fasync_list.
+3. then the fasync entry ffff96fdccc62690 (the one in #1) is removed from ffff96fdc0426ed8 (clcsock->wq.fasync_list)
+
+What's wrong with this?
+
+
+
+
+In fact, I think what does cause this leak (maybe one of causes) is the race
+I discribed through the diagram in
+https://lore.kernel.org/netdev/19d7d71b-c911-45cc-9671-235d98720be6@linux.alibaba.com/
+
+1) sock_fasync() got the filp->private_data->wq (that is smc->sk.sk_socket->wq)
+    and record it in 'wq';
+2) meanwhile, fallback occurs and filp->private_data changed, and from now on,
+    user can only operate the clcsock based on file->private_data;
+3) (race here) and sock_fasync() keep going and add an entry to 'wq'->fasync_list
+    (that is smc->sk.sk_socket->wq); This fasync entry is the one that we can't
+    removed later, since we start to operate clcsock after fallback.
+
+
+Thanks!
+
+>                                  ...
+>                                  close(sock [smc->clcsock]);
+>                                  __fput(...);
+>                                  file->f_op->fasync(sock, [0])   ; always failed -
+>                                                                  ; should use
+>                                                                  ; smc->sk instead
+>                                  file->f_op->release()
+>                                     ...
+>                                     smc_restore_fallback_changes()
+>                                     ...
+>                                     file->private_data = smc->sk.sk_socket;
 > 
-> otherwise the following part of the code will not work:
+> That is, smc_restore_fallback_changes() restores filp->private_data to
+> smc->sk. If __fput() would have called file->f_op->release() _before_
+> file->f_op->fasync(), the fix would be as simple as adding
 > 
-> > +		return NULL;
-> > +
-> > +	*dma = dwmac1000_dma_ops;
-> > +	dma->init_chan = loongson_gnet_dma_init_channel;
-> > +	dma->dma_interrupt = loongson_gnet_dma_interrupt;
-> > +	mac->dma = dma;
-> > +
-> > +	...
+> smc->sk.sk_socket->wq.fasync_list = smc->clcsock->wq.fasync_list;
 > 
-> Tomorrow I will continue to modify other patches based on your comment.
+> to smc_restore_fallback_changes(). But since file->f_op->fasync() is called
+> before file->f_op->release(), the former always makes an attempt to unlink fasync
+> entry from smc->clcsock instead of smc->sk, thus introducing the memory leak.
 > 
-> Thanks,
+> And an idea with shared wait queue was intended in attempt to eliminate
+> this chicken-egg lookalike problem completely.
 > 
-> Yanteng
-> 
-> > 
-> > -Serge(y)
-> > 
-> > > Thanks,
-> > > Yanteng
-> > > > > > > +
-> > > > > > > +	/* Pre-initialize the respective "mac" fields as it's done in
-> > > > > > > +	 * dwmac1000_setup()
-> > > > > > > +	 */
-> > > > > > > +	priv->dev->priv_flags |= IFF_UNICAST_FLT;
-> > > > > > > +	mac->pcsr = priv->ioaddr;
-> > > > > > > +	mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
-> > > > > > > +	mac->unicast_filter_entries = priv->plat->unicast_filter_entries;
-> > > > > > > +	mac->mcast_bits_log2 = 0;
-> > > > > > > +
-> > > > > > > +	if (mac->multicast_filter_bins)
-> > > > > > > +		mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
-> > > > > > > +
-> > > > > > > +	mac->link.duplex = GMAC_CONTROL_DM;
-> > > > > > > +	mac->link.speed10 = GMAC_CONTROL_PS;
-> > > > > > > +	mac->link.speed100 = GMAC_CONTROL_PS | GMAC_CONTROL_FES;
-> > > > > > > +	mac->link.speed1000 = 0;
-> > > > > > > +	mac->link.speed_mask = GMAC_CONTROL_PS | GMAC_CONTROL_FES;
-> > > > > > > +	mac->mii.addr = GMAC_MII_ADDR;
-> > > > > > > +	mac->mii.data = GMAC_MII_DATA;
-> > > > > > > +	mac->mii.addr_shift = 11;
-> > > > > > > +	mac->mii.addr_mask = 0x0000F800;
-> > > > > > > +	mac->mii.reg_shift = 6;
-> > > > > > > +	mac->mii.reg_mask = 0x000007C0;
-> > > > > > > +	mac->mii.clk_csr_shift = 2;
-> > > > > > > +	mac->mii.clk_csr_mask = GENMASK(5, 2);
-> > > > > > > +
-> > > > > > > +	return mac;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > >     static int loongson_dwmac_probe(struct pci_dev *pdev,
-> > > > > > >     				const struct pci_device_id *id)
-> > > > > > >     {
-> > > > > > > @@ -129,6 +358,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
-> > > > > > >     	struct stmmac_pci_info *info;
-> > > > > > >     	struct stmmac_resources res;
-> > > > > > >     	struct device_node *np;
-> > > > > > > +	struct loongson_data *ld;
-> > > > > > reverse xmas tree order please.
-> > > > > > 
-> > > > > > >     	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
-> > > > > > >     	if (!plat)
-> > > > > > > @@ -145,6 +375,10 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
-> > > > > > >     	if (!plat->dma_cfg)
-> > > > > > >     		return -ENOMEM;
-> > > > > > > +	ld = devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
-> > > > > > > +	if (!ld)
-> > > > > > > +		return -ENOMEM;
-> > > > > > > +
-> > > > > > >     	np = dev_of_node(&pdev->dev);
-> > > > > > >     	plat->mdio_node = of_get_child_by_name(np, "mdio");
-> > > > > > >     	if (plat->mdio_node) {
-> > > > > > > @@ -197,6 +431,20 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
-> > > > > > >     	if (ret)
-> > > > > > >     		goto err_disable_device;
-> > > > > > > +	ld->dev = &pdev->dev;
-> > > > > > > +	ld->lgmac_version = readl(res.addr + GMAC_VERSION) & 0xff;
-> > > > > > AFAICS the lgmac_version is unused in out of the probe() method
-> > > > > > context. What about locally defining it?
-> > > > > OK,
-> > > > > > > +
-> > > > > > > +	/* Activate loongson custom ip */
-> > > > > > > +	if (ld->lgmac_version < DWMAC_CORE_3_50) {
-> > > > > > Please define a new macro for the GNET MAC.
-> > > > > OK.
-> > > > > > > +		ld->dwlgmac_dma_ops = dwmac1000_dma_ops;
-> > > > > > > +		ld->dwlgmac_dma_ops.init_chan = dwlgmac_dma_init_channel;
-> > > > > > > +		ld->dwlgmac_dma_ops.dma_interrupt = dwlgmac_dma_interrupt;
-> > > > > > See my comment in the loongson_setup() method.
-> > > > > This will introduce a compilation warning:
-> > > > > 
-> > > > > warning: returning 'int' from a function with return type 'struct
-> > > > > mac_device_info *' makes pointer from integer without a cast
-> > > > > [-Wint-conversion]
-> > > > >     418 |                 return -ENOMEM;
-> > > > stmmac_hwif_init() expects priv->plat->setup(priv) returning NULL
-> > > > if something wrong. As I suggested above just return NULL then if
-> > > > mac_device_info couldn't be allocated.
-> > > > 
-> > > > -Serge(y)
-> > > > 
-> > > > > Thanks,
-> > > > > 
-> > > > > Yanteng
-> > > > > 
-> > > > > > -Serge(y)
-> > > > > > 
-> > > > > > > +
-> > > > > > > +		plat->setup = loongson_setup;
-> > > > > > > +	}
-> > > > > > > +
-> > > > > > > +	plat->bsp_priv = ld;
-> > > > > > > +
-> > > > > > >     	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
-> > > > > > >     	if (ret)
-> > > > > > >     		goto err_disable_device;
-> > > > > > > -- 
-> > > > > > > 2.31.4
-> > > > > > > 
-> 
+> Dmitry
 
