@@ -1,80 +1,72 @@
-Return-Path: <netdev+bounces-78527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DA508758F0
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 21:59:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B708875920
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 22:16:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0EA51F2213E
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 20:59:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 106B9285E6F
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 21:16:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5C413A256;
-	Thu,  7 Mar 2024 20:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5108D13B2BD;
+	Thu,  7 Mar 2024 21:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OXhpBD0B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vp96pegr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C451139597
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 20:59:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B84313AA52
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 21:16:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709845179; cv=none; b=KxX8BTNoP8bOU/8+k5tACH7tFae3lPr9URW5kyjuz1xsuyqEi4JUyDr1bVNNnPVdAhyc/jfvnNtl/CFWDcitTeno6lkQbUk/t2pkh7Fs4FCOWZyGUaIFg5WE+VKaTDL9wAaBWvyJrGStt26krFKBRl5JsNi94qQLIViiUIKjc3Q=
+	t=1709846177; cv=none; b=XetOiHRFCbI0uj4uKMwstgXdj7B759klNip15/f4u5z2awmVQXDQ2whhRMsAORxOWoM+UDcaQ9CKe7uPkQwwDp+r39o09D7/k6agCxAR6MvkDTd/Vi33DsS1ve2tpKsw3Mx8ekFdSiCGwA9xCOc/ltX45+Qvhhn9IhoKkL2Qjxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709845179; c=relaxed/simple;
-	bh=M71wyK4rA8dTBNQOdAZrnaf/Nd7F0d9mNgjJmo9Usug=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VlWDgRfQAr3zJoRWEO6bvUwfVaXRSlvtwkSxqhvqc0D/wNBxGQmgT02ONPoqMYWpq5kT6VqKDuD81detAsN0Fe7QRrlkyTy9rzZplmz2UNr/EG6jh9cg0dcguhbeKj98Ba9R0Z1ngWJ46SFumoWKn/W5l6KPLQlugsWwnab8xtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OXhpBD0B; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709845173;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bifhLCWZ9SRinNQtW2a737RoJZugUxnSf8lBMCsZPSs=;
-	b=OXhpBD0BWprxYsyxsKQauUoj2WEmcPJgDY/eIFI3UpqGB78oIkEKUCN6/kxJQ4lQZaX81A
-	cLOvwF7pwyGipYiFkUYBjPmoMQiKXo1CAefhdTS67jCD3liIJQe9V9JMbuQvjOR+OT0h9o
-	/rmdrxsyDaePDqMcdiGaU2mYTKV6Yf0=
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
- [209.85.161.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-692-1egyrg_sORaTQ0eZvKMYGQ-1; Thu, 07 Mar 2024 15:59:32 -0500
-X-MC-Unique: 1egyrg_sORaTQ0eZvKMYGQ-1
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-5a1202521easo152273eaf.2
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 12:59:32 -0800 (PST)
+	s=arc-20240116; t=1709846177; c=relaxed/simple;
+	bh=nGQJpZX7FTD3lHVGs17tekaUU4cZr4AFm9j7cjZuiGg=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=pvIKUolBdHZhm++oxRD0yp3rEvQD9xqx9iqimX6oeBILk0i0JcnhbPKEMqES7A9tyVouWnt7fUL7m9d2kU/D+3o0ty1TcTyNcauOlT+0sBRJ5lM4W1SLCO18SKH4f7YY8yY4k8fwtXXUDRQoS50i2tT/e/bSgOXmPbMjjGUE/wY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vp96pegr; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a28a6cef709so28255466b.1
+        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 13:16:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709846173; x=1710450973; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/YDm1Npn/BBarhhdz44KEsh/OFcNAUPbz4zZKd6czpo=;
+        b=Vp96pegrRg8LOAhwJDPES3m6zGn5+92Z0z2A/E+bJ2K3VAXvSu5NCT9z4DliBtKHCT
+         rqeRFgeGeJUDv5c3NMgnbItO8hGKL1dAH/KxhPae7CXASnYcPj0iFuoOSSY1tAzbJGx8
+         MO0zGf4CAe67Fd2B1+Fh7YbegonIclRkYNDq1Ug2LMfOmsO3JXoTE5mJlkRCHj1m69Yt
+         L9ECaGSKR6drovK6O7VpDJ/reV0gHo8kfwvs2MtNzvcF4emUFZ5t7ll8loy0BdrHAUa0
+         Hw8gpMgOHyCajEEHEsaNZBBKrEHtqhQMxYIQbQ264dh2qemEWXorU2lrZ857hJ3ijyeY
+         Spvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709845171; x=1710449971;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1709846173; x=1710450973;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bifhLCWZ9SRinNQtW2a737RoJZugUxnSf8lBMCsZPSs=;
-        b=Ra/0PHsTZhGqP2EO4rNJIlqzEvGJV0SedSnIkpwS5H2lf34/A6v4UtOOGj/eRYcCnE
-         t8lZlg32lNQvhFg13yzEWtXMmMLC7VuJFnaMJ+GBMedLQYMKEFvtsBY/bh6rdNBHNvzV
-         7cLCdR1SrFMwJ76kJvGfcuITNsgeo+7l7zMz2xC6iZPc6gvXpUvO8GDrc5TO0LsgjALZ
-         Uirgx0+UhGGoUwXWC6bDVzUQHtVOnslsIzR35PQmNyKi+HbQ3P3GY7P2gsekGUE1brkA
-         XvWrRqNk3G72okVnVQXH0Ph8CMJ5UsCYg/waKBciXh3dOLh+vqwmEOk7dT7m9Af6aDPQ
-         602A==
-X-Forwarded-Encrypted: i=1; AJvYcCWsmX410Q8QDA3RyA/XUor432mVl3N5AR3lJYStXZ+U78z/o+76cutsfDPryhBagjsiq9USmc8BGzBCHjxhvhoxt4vI1WXs
-X-Gm-Message-State: AOJu0Yx8kRsVrsCQWeF+8zBUXEaNe1iBhO2baRiBSA60t0OGu9VIyaYC
-	vLZ1LRcsdjHNRzbHUKlIcrm/k69icOVOagxuzVpRIUA9AEKcJF646YXtJSU5ze+ec8vTWMalVtG
-	21GAsR7g4J6yZKGPBZAqgISuOVZxLprv9HOt63D7Y3o6ED31xq2oOWg==
-X-Received: by 2002:a05:6358:724b:b0:17b:f319:9449 with SMTP id i11-20020a056358724b00b0017bf3199449mr10630578rwa.7.1709845171365;
-        Thu, 07 Mar 2024 12:59:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFH6aTbnKUUF6lNOdkr66pdn36uJgDTDBzWV9uean8o2VO5YMsvPVcvUah4Jxy39sKE7dyQ9g==
-X-Received: by 2002:a05:6358:724b:b0:17b:f319:9449 with SMTP id i11-20020a056358724b00b0017bf3199449mr10630567rwa.7.1709845171044;
-        Thu, 07 Mar 2024 12:59:31 -0800 (PST)
-Received: from [192.168.1.132] ([193.177.210.103])
-        by smtp.gmail.com with ESMTPSA id lq9-20020a0562145b8900b0069055b05705sm7976363qvb.132.2024.03.07.12.59.29
+        bh=/YDm1Npn/BBarhhdz44KEsh/OFcNAUPbz4zZKd6czpo=;
+        b=aiBIimLyKO9nolGXZhKx7bLue3UhcpiZXp/IKqyYg3kUHzjK9+5I0KI15Yp3RjQ/j5
+         DdoJ8vhstB/Pc0TiQiIxf8W6fK3kVDd0KwYfGnF2GL1Al60uRllkpznePJD+IO8Sg4Vs
+         jhz3CFbZnZCI7ooGjXm67NHY8UyDwfehT0APjOIUEr0Ab5cIsKhZSlSty4BDdcLeaT2p
+         mpZXnGkVNEoof0wV8Ubiasr690PlZVTQrWoC1nK9QZ8SrFmiavuuJJXENvgSVKLLOKRX
+         sM/0NMNG+9kjLvs8yaBQ4Rm6PuFaHjTXkYUAMftDsYLmNxKXLAg/f9eqQ9uitd9OuEu0
+         5KeQ==
+X-Gm-Message-State: AOJu0Yzi/r2ID/9z1vQfF+J+NgpJSCzuGf6oahafrYqsurtdtZ/Xqf2r
+	j4yZmpM8H/mqgX7rxiF5Kvrhs/x5i8za2jzFIxZ/kjQZgu78TG7R
+X-Google-Smtp-Source: AGHT+IFXtpAeROyXqVQEh2vaKmVosFdkK1DSc9v+TmofosXGAdq3T/oS9ExzvnzWCPcok+OEIw+H0Q==
+X-Received: by 2002:a17:906:b888:b0:a45:2a53:d6b9 with SMTP id hb8-20020a170906b88800b00a452a53d6b9mr9580823ejb.62.1709846173216;
+        Thu, 07 Mar 2024 13:16:13 -0800 (PST)
+Received: from ?IPV6:2a01:c22:6ea8:7500:7cdb:1fd3:51b6:fa25? (dynamic-2a01-0c22-6ea8-7500-7cdb-1fd3-51b6-fa25.c22.pool.telefonica.de. [2a01:c22:6ea8:7500:7cdb:1fd3:51b6:fa25])
+        by smtp.googlemail.com with ESMTPSA id lf7-20020a170907174700b00a44d66a16efsm6535676ejc.2.2024.03.07.13.16.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Mar 2024 12:59:30 -0800 (PST)
-Message-ID: <6d4da824-a33f-42ae-88ef-be094f563684@redhat.com>
-Date: Thu, 7 Mar 2024 21:59:23 +0100
+        Thu, 07 Mar 2024 13:16:12 -0800 (PST)
+Message-ID: <de37bf30-61dd-49f9-b645-2d8ea11ddb5d@gmail.com>
+Date: Thu, 7 Mar 2024 22:16:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,139 +74,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/4] net: openvswitch: Add sample multicasting.
-To: Ilya Maximets <i.maximets@ovn.org>, netdev@vger.kernel.org,
- dev@openvswitch.org
-Cc: cmi@nvidia.com, yotam.gi@gmail.com, aconole@redhat.com,
- echaudro@redhat.com, horms@kernel.org, Dumitru Ceara <dceara@redhat.com>
-References: <20240307151849.394962-1-amorenoz@redhat.com>
- <4dcf82da-c6ad-47c1-8308-3f87820aeb1b@ovn.org>
 Content-Language: en-US
-From: Adrian Moreno <amorenoz@redhat.com>
-In-Reply-To: <4dcf82da-c6ad-47c1-8308-3f87820aeb1b@ovn.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To: Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] net: phy: simplify a check in phy_check_link_status
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
+ sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
+ MVE4yNwdS+UsPeCF/6CQQTzHc+n7DomE7fjJD5J1hOJjqz2XWe71fTvYXzxCFLwXXbBiqDC9
+ dNqOe5odPsa4TsWZ09T33g5n2nzTJs4Zw8fCy8rLqix/raVsqr8fw5qM66MVtdmEljFaJ9N8
+ /W56qGCp+H8Igk/F7CjlbWXiOlKHA25mPTmbVp7VlFsvsmMokr/imQr+0nXtmvYVaKEUwY2g
+ 86IU6RAOuA8E0J5bD/BeyZdMyVEtX1kT404UJZekFytJZrDZetwxM/cAH+1fMx4z751WJmxQ
+ J7mIXSPuDfeJhRDt9sGM6aRVfXbZt+wBogxyXepmnlv9K4A13z9DVLdKLrYUiu9/5QEl6fgI
+ kPaXlAZmJsQfoKbmPqCHVRYj1lpQtDM/2/BO6gHASflWUHzwmBVZbS/XRs64uJO8CB3+V3fa
+ cIivllReueGCMsHh6/8wgPAyopXOWOxbLsZ291fmZqIR0L5Y6b2HvdFN1Xhc+YrQ8TKK+Z4R
+ mJRDh0wNQ8Gm89g92/YkHji4jIWlp2fwzCcx5+lZCQ1XdqAiHQARAQABzSZIZWluZXIgS2Fs
+ bHdlaXQgPGhrYWxsd2VpdDFAZ21haWwuY29tPsLBjgQTAQgAOBYhBGxfqY/yOyXjyjJehXLe
+ ig9U8DoMBQJf9GRVAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEHLeig9U8DoMSycQ
+ AJbfg8HZEK0ljV4M8nvdaiNixWAufrcZ+SD8zhbxl8GispK4F3Yo+20Y3UoZ7FcIidJWUUJL
+ axAOkpI/70YNhlqAPMsuudlAieeYZKjIv1WV5ucNZ3VJ7dC+dlVqQdAr1iD869FZXvy91KhJ
+ wYulyCf+s4T9YgmLC6jLMBZghKIf1uhSd0NzjyCqYWbk2ZxByZHgunEShOhHPHswu3Am0ftt
+ ePaYIHgZs+Vzwfjs8I7EuW/5/f5G9w1vibXxtGY/GXwgGGHRDjFM7RSprGOv4F5eMGh+NFUJ
+ TU9N96PQYMwXVxnQfRXl8O6ffSVmFx4H9rovxWPKobLmqQL0WKLLVvA/aOHCcMKgfyKRcLah
+ 57vGC50Ga8oT2K1g0AhKGkyJo7lGXkMu5yEs0m9O+btqAB261/E3DRxfI1P/tvDZpLJKtq35
+ dXsj6sjvhgX7VxXhY1wE54uqLLHY3UZQlmH3QF5t80MS7/KhxB1pO1Cpcmkt9hgyzH8+5org
+ +9wWxGUtJWNP7CppY+qvv3SZtKJMKsxqk5coBGwNkMms56z4qfJm2PUtJQGjA65XWdzQACib
+ 2iaDQoBqGZfXRdPT0tC1H5kUJuOX4ll1hI/HBMEFCcO8++Bl2wcrUsAxLzGvhINVJX2DAQaF
+ aNetToazkCnzubKfBOyiTqFJ0b63c5dqziAgzsFNBF/0ZFUBEADF8UEZmKDl1w/UxvjeyAeX
+ kghYkY3bkK6gcIYXdLRfJw12GbvMioSguvVzASVHG8h7NbNjk1yur6AONfbUpXKSNZ0skV8V
+ fG+ppbaY+zQofsSMoj5gP0amwbwvPzVqZCYJai81VobefTX2MZM2Mg/ThBVtGyzV3NeCpnBa
+ 8AX3s9rrX2XUoCibYotbbxx9afZYUFyflOc7kEpc9uJXIdaxS2Z6MnYLHsyVjiU6tzKCiVOU
+ KJevqvzPXJmy0xaOVf7mhFSNQyJTrZpLa+tvB1DQRS08CqYtIMxRrVtC0t0LFeQGly6bOngr
+ ircurWJiJKbSXVstLHgWYiq3/GmCSx/82ObeLO3PftklpRj8d+kFbrvrqBgjWtMH4WtK5uN5
+ 1WJ71hWJfNchKRlaJ3GWy8KolCAoGsQMovn/ZEXxrGs1ndafu47yXOpuDAozoHTBGvuSXSZo
+ ythk/0EAuz5IkwkhYBT1MGIAvNSn9ivE5aRnBazugy0rTRkVggHvt3/7flFHlGVGpBHxFUwb
+ /a4UjJBPtIwa4tWR8B1Ma36S8Jk456k2n1id7M0LQ+eqstmp6Y+UB+pt9NX6t0Slw1NCdYTW
+ gJezWTVKF7pmTdXszXGxlc9kTrVUz04PqPjnYbv5UWuDd2eyzGjrrFOsJEi8OK2d2j4FfF++
+ AzOMdW09JVqejQARAQABwsF2BBgBCAAgFiEEbF+pj/I7JePKMl6Fct6KD1TwOgwFAl/0ZFUC
+ GwwACgkQct6KD1TwOgxUfg//eAoYc0Vm4NrxymfcY30UjHVD0LgSvU8kUmXxil3qhFPS7KA+
+ y7tgcKLHOkZkXMX5MLFcS9+SmrAjSBBV8omKoHNo+kfFx/dUAtz0lot8wNGmWb+NcHeKM1eb
+ nwUMOEa1uDdfZeKef/U/2uHBceY7Gc6zPZPWgXghEyQMTH2UhLgeam8yglyO+A6RXCh+s6ak
+ Wje7Vo1wGK4eYxp6pwMPJXLMsI0ii/2k3YPEJPv+yJf90MbYyQSbkTwZhrsokjQEaIfjrIk3
+ rQRjTve/J62WIO28IbY/mENuGgWehRlTAbhC4BLTZ5uYS0YMQCR7v9UGMWdNWXFyrOB6PjSu
+ Trn9MsPoUc8qI72mVpxEXQDLlrd2ijEWm7Nrf52YMD7hL6rXXuis7R6zY8WnnBhW0uCfhajx
+ q+KuARXC0sDLztcjaS3ayXonpoCPZep2Bd5xqE4Ln8/COCslP7E92W1uf1EcdXXIrx1acg21
+ H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
+ lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
+ OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+Handling case err == 0 in the other branch allows to simplify the
+code. In addition I assume in "err & phydev->eee_cfg.tx_lpi_enabled"
+it should have been a logical and operator. It works as expected also
+with the bitwise and, but using a bitwise and with a bool value looks
+ugly to me.
 
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/phy/phy.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On 3/7/24 17:54, Ilya Maximets wrote:
-> On 3/7/24 16:18, Adrian Moreno wrote:
->> ** Background **
->> Currently, OVS supports several packet sampling mechanisms (sFlow,
->> per-bridge IPFIX, per-flow IPFIX). These end up being translated into a
->> userspace action that needs to be handled by ovs-vswitchd's handler
->> threads only to be forwarded to some third party application that
->> will somehow process the sample and provide observability on the
->> datapath.
->>
->> The fact that sampled traffic share netlink sockets and handler thread
->> time with upcalls, apart from being a performance bottleneck in the
->> sample extraction itself, can severely compromise the datapath,
->> yielding this solution unfit for highly loaded production systems.
->>
->> Users are left with little options other than guessing what sampling
->> rate will be OK for their traffic pattern and system load and dealing
->> with the lost accuracy.
->>
->> ** Proposal **
->> In this RFC, I'd like to request feedback on an attempt to fix this
->> situation by adding a flag to the userspace action to indicate the
->> upcall should be sent to a netlink multicast group instead of unicasted
->> to ovs-vswitchd.
->>
->> This would allow for other processes to read samples directly, freeing
->> the netlink sockets and handler threads to process packet upcalls.
->>
->> ** Notes on tc-offloading **
->> I am aware of the efforts being made to offload the sample action with
->> the help of psample.
->> I did consider using psample to multicast the samples. However, I
->> found a limitation that I'd like to discuss:
->> I would like to support OVN-driven per-flow (IPFIX) sampling because
->> it allows OVN to insert two 32-bit values (obs_domain_id and
->> ovs_point_id) that can be used to enrich the sample with "high level"
->> controller metadata (see debug_drop_domain_id NBDB option in ovn-nb(5)).
->>
->> The existing fields in psample_metadata are not enough to carry this
->> information. Would it be possible to extend this struct to make room for
->> some extra "application-specific" metadata?
->>
->> ** Alternatives **
->> An alternative approach that I'm considering (apart from using psample
->> as explained above) is to use a brand-new action. This lead to a cleaner
->> separation of concerns with existing userspace action (used for slow
->> paths and OFP_CONTROLLER actions) and cleaner statistics.
->> Also, ovs-vswitchd could more easily make the layout of this
->> new userdata part of the public API, allowing third party sample
->> collectors to decode it.
->>
->> I am currently exploring this alternative but wanted to send the RFC to
->> get some early feedback, guidance or ideas.
-> 
-> 
-> Hi, Adrian.  Thanks for the patches!
-> 
-
-Thanks for the quick feedback.
-Also adding Dumitru who I missed to include in the original CC list.
-
-> Though I'm not sure if broadcasting is generally the best approach.
-> These messages contain opaque information that is not actually
-> parsable by any other entity than a process that created the action.
-> And I don't think the structure of these opaque fields should become
-> part of uAPI in neither kernel nor OVS in userspace.
-> 
-
-I understand this can be cumbersome, specially given the opaque field is 
-currently also used for some purely-internal OVS actions (e.g: CONTROLLER).
-
-However, for features such as OVN-driven per-flow sampling, where OVN-generated 
-identifiers are placed in obs_domain_id and obs_point_id, it would be _really_ 
-useful if this opaque value could be somehow decoded by external programs.
-
-Two ideas come to mind to try to alleviate the potential maintainability issues:
-- As I suggested, using a new action maybe makes things easier. By splitting the 
-current "user_action_cookie" in two, one for internal actions and one for 
-"observability" actions, we could expose the latter in the OVS userspace API 
-without having to expose the former.
-- Exposing functions in OVS that decode the opaque value. Third party 
-applications could link against, say, libopenvswitch.so and use it to extract 
-obs_{domain,point}_ids.
-
-What do you think?
-
-> The userspace() action already has a OVS_USERSPACE_ATTR_PID argument.
-> And it is not actually used when OVS_DP_F_DISPATCH_UPCALL_PER_CPU is
-> enabled.  All known users of OVS_DP_F_DISPATCH_UPCALL_PER_CPU are
-> setting the OVS_USERSPACE_ATTR_PID to UINT32_MAX, which is not a pid
-> that kernel could generate.
-> 
-> So, with a minimal and pretty much backward compatible change in
-> output_userspace() function, we can honor OVS_USERSPACE_ATTR_PID if
-> it's not U32_MAX.  This way userspace process can open a separate
-> socket and configure sampling to redirect all packets there while
-> normal MISS upcalls would still arrive to per-cpu sockets.  This
-> should cover the performance concern.
->
-
-Do you mean creating a new thread to process samples or using handlers?
-The latter would still have performance impact and the former would likely fail 
-to process all samples in a timely manner if there are many.
-
-Besides, the current userspace tc-offloading series uses netlink broadcast with 
-psample, can't we do the same for non-offloaded actions? It enable building 
-external observability applications without overloading OVS.
-
-
-> For the case without per-cpu dispatch, the feature comes for free
-> if userspace application wants to use it.  However, there is no
-> currently supported version of OVS that doesn't use per-cpu dispatch
-> when available.
->  > What do you think?
->  > Best regards, Ilya Maximets.
-> 
-
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index c3a0a5ee5..c4236564c 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -985,10 +985,10 @@ static int phy_check_link_status(struct phy_device *phydev)
+ 		phydev->state = PHY_RUNNING;
+ 		err = genphy_c45_eee_is_active(phydev,
+ 					       NULL, NULL, NULL);
+-		if (err < 0)
++		if (err <= 0)
+ 			phydev->enable_tx_lpi = false;
+ 		else
+-			phydev->enable_tx_lpi = (err & phydev->eee_cfg.tx_lpi_enabled);
++			phydev->enable_tx_lpi = phydev->eee_cfg.tx_lpi_enabled;
+ 
+ 		phy_link_up(phydev);
+ 	} else if (!phydev->link && phydev->state != PHY_NOLINK) {
 -- 
-Adrián Moreno
+2.44.0
 
 
