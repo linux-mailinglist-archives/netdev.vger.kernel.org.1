@@ -1,289 +1,91 @@
-Return-Path: <netdev+bounces-78309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22956874A8B
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:18:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2F84874A99
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:19:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59CB9B23C3B
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:18:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 742571F220E9
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:19:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F0B82D98;
-	Thu,  7 Mar 2024 09:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7906883CB7;
+	Thu,  7 Mar 2024 09:19:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00DC839EA
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 09:18:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32EC839F4;
+	Thu,  7 Mar 2024 09:19:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709803091; cv=none; b=oT8vz82+YCl54VTa393Y/YaMw8BCC9jSmQh3Fsfa5FRg4LE9iuxCTlPVxDntrbQmYIm9zokFKnAApO151G1EXfomvIitHkVMxU/WT77SrpOnT0KkQWHPfVPb3IBnL8mI4V9pXJkgPFarFpFM7B8N+xUjJpkTSEEdKlrnaDEJjSs=
+	t=1709803171; cv=none; b=UZt+PSwBKxk9QALJ7RQ+E2HTGpGhaPjcAHCNllUorh9jvQghtel/XJFt5G9JYXueWuhwekTaT25FJwIAvcKeb2AsTcyqdADJGzK+1Rx3+FWZvYrmScw5LhYfeQGbL8SzaIt4zjGm3LlXyn5l9Z4uCTcgRW0oTy6GfHgj0Ce7Dr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709803091; c=relaxed/simple;
-	bh=oY6Ix2tRTCQm1iO8TkMeuP+Q/mj/JCg6X8/TmmwBO28=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UCxJkZ0l8+lhjHOnp6MrU7RzuCv1zTeVZa2pBzer5VrdkmVuGJCvw6zflcvJSqnx99aApCgTIB+xRkZY+GQWceBsb0eubVw+jQv+wrq8I6jiQw0FRyvEv7ycv5iwmAGy+wSlYOpHaZl9TthQuypCQbuXZWIvI02qrcikvgsDadI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+	s=arc-20240116; t=1709803171; c=relaxed/simple;
+	bh=eQ4YiS6NQgEI0/5JNHw57o9eklne/wPcEXGDdoUR0P0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gLriM/G69/e0JUyla5AAarHH+vlQfKR1iozwHRGhdue0F+D0sJ8iS8T+Gc0QsX5MkmF8F4Vfyi+ib2ORbZYNSvBOvDiuYF7b+3t70QWUoP6laHMVEVurtStSYAU/5H7B2eUm4RC47wmkmU5mx7i7aW2Vh5zdZ0tdAFYFiZuZoFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5132bd70e7dso170780e87.1
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 01:18:09 -0800 (PST)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a45606c8444so77816266b.3;
+        Thu, 07 Mar 2024 01:19:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709803088; x=1710407888;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1709803168; x=1710407968;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2jYCYIkiLKOmH3hbqFdCsnIQYuJXKlJhi19cZlr5ON8=;
-        b=N9b99+pbHyOvPKYqe10uxtv1+nerslrQPS0Ocbh3Xrtw4xHUFy8+V5T+jDU9oN5+HW
-         +TVU7cihd7KyfBRALtVHQILj46l94L+LvnKM9Gu/pdhfHPdIKd/QtOI3RlWzet8phbRn
-         3wFfafpvniFEoixNzEwYjV0ySRaI4khuHtvmLFkt6evl5hyRN1bmyT+NgWbNZ+t6ksOA
-         doeIrx9dAvf6G4dfYMCHc8fS9RHASZr8iNHFKx061/3LimNuIsSaLOmdRHafI8va/wvj
-         6AEXlwdq59Dpit+Nn6P1XMVyc7MiyxwDsb4Yl4TOOOKeVum8Zqkvw/uIEUyx/o7KUysP
-         fjZw==
-X-Forwarded-Encrypted: i=1; AJvYcCWzIziHjfnMP1ha9OAiwOFx/LD1WJ+BMOoQOEhYVcLu1DFyQnml8nkxQrJ0QNLoa7khdt3dLzTXVc3JE8Jk65Lf5dPIpIug
-X-Gm-Message-State: AOJu0YxGCTARta2CElKB6QXPIT2J3f7nFl20QBq/8nMkkj2wNxTIo4Ar
-	SpewTRgw0hnSmKORiUaigGyqSpuzUWuYUmlFpTqnGyr0JRqo5HEj
-X-Google-Smtp-Source: AGHT+IF7wqY42WTgiTtIvAx5OyS1uQdFyLA+BiVAmSiZ3OAEcCIBjGOAnMKh5E/fHC/RqFQXo1+CNQ==
-X-Received: by 2002:a19:771c:0:b0:513:30fd:2991 with SMTP id s28-20020a19771c000000b0051330fd2991mr923434lfc.0.1709803087808;
-        Thu, 07 Mar 2024 01:18:07 -0800 (PST)
-Received: from [10.100.102.74] (46-117-80-176.bb.netvision.net.il. [46.117.80.176])
-        by smtp.gmail.com with ESMTPSA id c6-20020a05600c0a4600b00412f2136793sm2061506wmq.44.2024.03.07.01.18.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Mar 2024 01:18:07 -0800 (PST)
-Message-ID: <91318572-af38-464c-9c7a-4f6d1f642eee@grimberg.me>
-Date: Thu, 7 Mar 2024 11:18:05 +0200
+        bh=RcMYRCTYmBdwjjxBMVHv7nDqpJkI2KJP97kVGpj1vF0=;
+        b=FlLTLbOQ9IOuDl5hYvIzBMR8/bFVO7imEnPTXVpj8C6uPZLt7Em3M9AE381C61EK/F
+         Gl2cp5KWbgVqqWJxCnNRJC92F3K/q170Kbw3mDocPQBnfnJL5zh9TYgHWVklEj4lao+z
+         f+8MAq5VFWX7wlPCppzPE9l67ytSV/kCcxEfx4igLbqGIzmfjdKG6QtBYZ3OK6Td+VqX
+         4NgDJ5G0Z5Dd4Y/lG7IlWLiawdI0Z/f2Nn7kdBmlnDcsVoBO8aN9yvW2NYiITytuvpKt
+         ExTS8/mb2Jr5yzzFroK3UjUeznm63Knr0StdQ4OcEwad14HNIzq3FKSrM4s7t7PFZ3ZP
+         6xvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUC+9a3BNmOz21iz8LVkMDFKyRhb5nGIIERiavvfkRnT4raqGP59RURSA0lWRvqOYdeNl9mBB09OoS4nW9t2p7R4yx6IZ2vjkXBM0It6+qfiA8I7uQJHh0OSeIZqZwCjnmtsAU9
+X-Gm-Message-State: AOJu0Yx/9kUoNjMZUAITvXOHhbyFIMvsTArYOULbZC5q8moRohVUNq7o
+	P6fg/qw7/KjttU2S1yk7oxEbZqaT/vOrenx+/X8eJJ2i6zwLs4zGl2Erv6Oj
+X-Google-Smtp-Source: AGHT+IE9e4KtBH24njgLcbSzNO6CmSzT4l/PaSKJ92fkeR+rlUv1HhUa6y0xJT9HU92eG2mrCEZfng==
+X-Received: by 2002:a17:907:76fa:b0:a43:b472:9a57 with SMTP id kg26-20020a17090776fa00b00a43b4729a57mr12388945ejc.62.1709803167754;
+        Thu, 07 Mar 2024 01:19:27 -0800 (PST)
+Received: from gmail.com (fwdproxy-lla-112.fbsv.net. [2a03:2880:30ff:70::face:b00c])
+        by smtp.gmail.com with ESMTPSA id tj10-20020a170907c24a00b00a4452ed413asm7884686ejc.16.2024.03.07.01.19.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Mar 2024 01:19:27 -0800 (PST)
+Date: Thu, 7 Mar 2024 01:19:25 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: gaoxingwang <gaoxingwang1@huawei.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	liaichun@huawei.com, yanan@huawei.com
+Subject: Re: [PATCH] net: fix print in skb_panic()
+Message-ID: <ZemGnXjAbkG02NTg@gmail.com>
+References: <20240307061143.989505-1-gaoxingwang1@huawei.com>
+ <CANn89iKJSGek0vKtH-0QhFgZ9S4Cb1jTmpTq1ZmUFd0G0+b3ng@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v23 07/20] nvme-tcp: RX DDGST offload
-Content-Language: en-US
-To: Aurelien Aptel <aaptel@nvidia.com>, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
- chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
-Cc: Yoray Zack <yorayz@nvidia.com>, aurelien.aptel@gmail.com,
- smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
- borisp@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com
-References: <20240228125733.299384-1-aaptel@nvidia.com>
- <20240228125733.299384-8-aaptel@nvidia.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20240228125733.299384-8-aaptel@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iKJSGek0vKtH-0QhFgZ9S4Cb1jTmpTq1ZmUFd0G0+b3ng@mail.gmail.com>
 
+On Thu, Mar 07, 2024 at 07:29:47AM +0100, Eric Dumazet wrote:
+> On Thu, Mar 7, 2024 at 7:12 AM gaoxingwang <gaoxingwang1@huawei.com> wrote:
+> >
+> > skb->len and sz are printed as negative numbers during the panic:
+> > skbuff: skb_under_panic: text:ffffffff8e2d3eac len:-1961180312 put:-1961180408 head:ffff88800b6ac000 data:ffff887f804ffe78 tail:0x1e0 end:0xec0 dev:team0
+> >
+> 
+> This was on purpose.
+> 
+> I prefer the negative values, I find this more useful to immediately
+> spot the issue.
 
-
-On 28/02/2024 14:57, Aurelien Aptel wrote:
-> From: Yoray Zack <yorayz@nvidia.com>
->
-> Enable rx side of DDGST offload when supported.
->
-> At the end of the capsule, check if all the skb bits are on, and if not
-> recalculate the DDGST in SW and check it.
->
-> Signed-off-by: Yoray Zack <yorayz@nvidia.com>
-> Signed-off-by: Boris Pismenny <borisp@nvidia.com>
-> Signed-off-by: Ben Ben-Ishay <benishay@nvidia.com>
-> Signed-off-by: Or Gerlitz <ogerlitz@nvidia.com>
-> Signed-off-by: Shai Malin <smalin@nvidia.com>
-> Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
-> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-> Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> ---
->   drivers/nvme/host/tcp.c | 96 ++++++++++++++++++++++++++++++++++++++---
->   1 file changed, 91 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-> index b7cfe14661d6..2eebd9d2aee5 100644
-> --- a/drivers/nvme/host/tcp.c
-> +++ b/drivers/nvme/host/tcp.c
-> @@ -143,6 +143,7 @@ enum nvme_tcp_queue_flags {
->   	NVME_TCP_Q_LIVE		= 1,
->   	NVME_TCP_Q_POLLING	= 2,
->   	NVME_TCP_Q_OFF_DDP	= 3,
-> +	NVME_TCP_Q_OFF_DDGST_RX = 4,
->   };
->   
->   enum nvme_tcp_recv_state {
-> @@ -180,6 +181,7 @@ struct nvme_tcp_queue {
->   	 *   is pending (ULP_DDP_RESYNC_PENDING).
->   	 */
->   	atomic64_t		resync_tcp_seq;
-> +	bool			ddp_ddgst_valid;
->   #endif
->   
->   	/* send state */
-> @@ -393,6 +395,46 @@ nvme_tcp_get_ddp_netdev_with_limits(struct nvme_tcp_ctrl *ctrl)
->   	return NULL;
->   }
->   
-> +static inline bool nvme_tcp_ddp_ddgst_ok(struct nvme_tcp_queue *queue)
-> +{
-> +	return queue->ddp_ddgst_valid;
-> +}
-> +
-> +static inline void nvme_tcp_ddp_ddgst_update(struct nvme_tcp_queue *queue,
-> +					     struct sk_buff *skb)
-> +{
-> +	if (queue->ddp_ddgst_valid)
-> +		queue->ddp_ddgst_valid = skb_is_ulp_crc(skb);
-> +}
-> +
-> +static void nvme_tcp_ddp_ddgst_recalc(struct ahash_request *hash,
-> +				      struct request *rq,
-> +				      __le32 *ddgst)
-> +{
-> +	struct nvme_tcp_request *req;
-> +
-> +	req = blk_mq_rq_to_pdu(rq);
-> +	if (!req->offloaded) {
-> +		/* if we have DDGST_RX offload but DDP was skipped
-> +		 * because it's under the min IO threshold then the
-> +		 * request won't have an SGL, so we need to make it
-> +		 * here
-> +		 */
-> +		if (nvme_tcp_ddp_alloc_sgl(req, rq))
-> +			return;
-> +	}
-> +
-> +	ahash_request_set_crypt(hash, req->ddp.sg_table.sgl, (u8 *)ddgst,
-> +				req->data_len);
-> +	crypto_ahash_digest(hash);
-> +	if (!req->offloaded) {
-> +		/* without DDP, ddp_teardown() won't be called, so
-> +		 * free the table here
-> +		 */
-> +		sg_free_table_chained(&req->ddp.sg_table, SG_CHUNK_SIZE);
-> +	}
-> +}
-> +
->   static bool nvme_tcp_resync_request(struct sock *sk, u32 seq, u32 flags);
->   static void nvme_tcp_ddp_teardown_done(void *ddp_ctx);
->   static const struct ulp_ddp_ulp_ops nvme_tcp_ddp_ulp_ops = {
-> @@ -478,6 +520,10 @@ static int nvme_tcp_offload_socket(struct nvme_tcp_queue *queue)
->   		return ret;
->   
->   	set_bit(NVME_TCP_Q_OFF_DDP, &queue->flags);
-> +	if (queue->data_digest &&
-> +	    ulp_ddp_is_cap_active(queue->ctrl->ddp_netdev,
-> +				  ULP_DDP_CAP_NVME_TCP_DDGST_RX))
-> +		set_bit(NVME_TCP_Q_OFF_DDGST_RX, &queue->flags);
->   
->   	return 0;
->   }
-> @@ -485,6 +531,7 @@ static int nvme_tcp_offload_socket(struct nvme_tcp_queue *queue)
->   static void nvme_tcp_unoffload_socket(struct nvme_tcp_queue *queue)
->   {
->   	clear_bit(NVME_TCP_Q_OFF_DDP, &queue->flags);
-> +	clear_bit(NVME_TCP_Q_OFF_DDGST_RX, &queue->flags);
->   	ulp_ddp_sk_del(queue->ctrl->ddp_netdev, queue->sock->sk);
->   }
->   
-> @@ -593,6 +640,20 @@ static void nvme_tcp_resync_response(struct nvme_tcp_queue *queue,
->   				     struct sk_buff *skb, unsigned int offset)
->   {}
->   
-> +static inline bool nvme_tcp_ddp_ddgst_ok(struct nvme_tcp_queue *queue)
-> +{
-> +	return false;
-> +}
-> +
-> +static inline void nvme_tcp_ddp_ddgst_update(struct nvme_tcp_queue *queue,
-> +					     struct sk_buff *skb)
-> +{}
-> +
-> +static void nvme_tcp_ddp_ddgst_recalc(struct ahash_request *hash,
-> +				      struct request *rq,
-> +				      __le32 *ddgst)
-> +{}
-> +
->   #endif
->   
->   static void nvme_tcp_init_iter(struct nvme_tcp_request *req,
-> @@ -853,6 +914,9 @@ static void nvme_tcp_init_recv_ctx(struct nvme_tcp_queue *queue)
->   	queue->pdu_offset = 0;
->   	queue->data_remaining = -1;
->   	queue->ddgst_remaining = 0;
-> +#ifdef CONFIG_ULP_DDP
-> +	queue->ddp_ddgst_valid = true;
-> +#endif
->   }
->   
->   static void nvme_tcp_error_recovery(struct nvme_ctrl *ctrl)
-> @@ -1118,6 +1182,9 @@ static int nvme_tcp_recv_data(struct nvme_tcp_queue *queue, struct sk_buff *skb,
->   		nvme_cid_to_rq(nvme_tcp_tagset(queue), pdu->command_id);
->   	struct nvme_tcp_request *req = blk_mq_rq_to_pdu(rq);
->   
-> +	if (test_bit(NVME_TCP_Q_OFF_DDGST_RX, &queue->flags))
-> +		nvme_tcp_ddp_ddgst_update(queue, skb);
-> +
->   	while (true) {
->   		int recv_len, ret;
->   
-> @@ -1146,7 +1213,8 @@ static int nvme_tcp_recv_data(struct nvme_tcp_queue *queue, struct sk_buff *skb,
->   		recv_len = min_t(size_t, recv_len,
->   				iov_iter_count(&req->iter));
->   
-> -		if (queue->data_digest)
-> +		if (queue->data_digest &&
-> +		    !test_bit(NVME_TCP_Q_OFF_DDGST_RX, &queue->flags))
->   			ret = skb_copy_and_hash_datagram_iter(skb, *offset,
->   				&req->iter, recv_len, queue->rcv_hash);
->   		else
-> @@ -1188,8 +1256,11 @@ static int nvme_tcp_recv_ddgst(struct nvme_tcp_queue *queue,
->   	char *ddgst = (char *)&queue->recv_ddgst;
->   	size_t recv_len = min_t(size_t, *len, queue->ddgst_remaining);
->   	off_t off = NVME_TCP_DIGEST_LENGTH - queue->ddgst_remaining;
-> +	struct request *rq;
->   	int ret;
->   
-> +	if (test_bit(NVME_TCP_Q_OFF_DDGST_RX, &queue->flags))
-> +		nvme_tcp_ddp_ddgst_update(queue, skb);
->   	ret = skb_copy_bits(skb, *offset, &ddgst[off], recv_len);
->   	if (unlikely(ret))
->   		return ret;
-> @@ -1200,9 +1271,25 @@ static int nvme_tcp_recv_ddgst(struct nvme_tcp_queue *queue,
->   	if (queue->ddgst_remaining)
->   		return 0;
->   
-> +	rq = nvme_cid_to_rq(nvme_tcp_tagset(queue),
-> +			    pdu->command_id);
-> +
-> +	if (test_bit(NVME_TCP_Q_OFF_DDGST_RX, &queue->flags)) {
-> +		/*
-> +		 * If HW successfully offloaded the digest
-> +		 * verification, we can skip it
-> +		 */
-> +		if (nvme_tcp_ddp_ddgst_ok(queue))
-> +			goto out;
-> +		/*
-> +		 * Otherwise we have to recalculate and verify the
-> +		 * digest with the software-fallback
-> +		 */
-> +		nvme_tcp_ddp_ddgst_recalc(queue->rcv_hash, rq,
-> +					  &queue->exp_ddgst);
-> +	}
-> +
->   	if (queue->recv_ddgst != queue->exp_ddgst) {
-> -		struct request *rq = nvme_cid_to_rq(nvme_tcp_tagset(queue),
-> -					pdu->command_id);
->   		struct nvme_tcp_request *req = blk_mq_rq_to_pdu(rq);
->   
->   		req->status = cpu_to_le16(NVME_SC_DATA_XFER_ERROR);
-> @@ -1213,9 +1300,8 @@ static int nvme_tcp_recv_ddgst(struct nvme_tcp_queue *queue,
->   			le32_to_cpu(queue->exp_ddgst));
->   	}
->   
-> +out:
-
-Nit: you can rename the label to ddgst_valid: or ddgst_ok:
-
-Other than that,
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+I missed this reply, sorry. Please ignore my previous reviewed-by. I
+didn't have this context.
 
