@@ -1,263 +1,146 @@
-Return-Path: <netdev+bounces-78497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54E65875561
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 18:42:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4E49875581
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 18:49:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BB45283F94
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:42:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FEF528694E
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:49:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D64F2131731;
-	Thu,  7 Mar 2024 17:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B51EC130E44;
+	Thu,  7 Mar 2024 17:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L9eY9P8G"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A284413175A;
-	Thu,  7 Mar 2024 17:40:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5DB12FB2B;
+	Thu,  7 Mar 2024 17:49:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709833247; cv=none; b=H5OTgoc5Va03rq7wAIZTwfBq9p3HzVMAvXCNhGa4ibuxVkKaAQl14ck2r1YaNHCHYpRq4aX41VRyyo3jllwbM2tYC3DdCKek5XUhfRfBIrIe85kaFu5yhFiZmmdRsHIkOg9yH7jm9xHMqc+pVrBKn3Hb3opBWCv3ht0iMkPDkRI=
+	t=1709833743; cv=none; b=QlUPijXGlEAuY8A1xdq7h5pvGNMrOjxQuSRAwZBF4r3Nno8fWJAmHOzFKFzCIkkxCxPcvpPOk/+8JcesXM7TedJs+tjlko5uR7oy6j0F3cYWNj1zJjVtmIPrTQW608ZUQjizrhMOpFl5uu2TFP+bUtWPJLreZWL+NkO0gKRzzno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709833247; c=relaxed/simple;
-	bh=pZ2j2s3WtUj49vUlud/FK5nDjMVZQXuPbVSbWNHdK0Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NrC5rzf1gLumK0spEVf/5JulZBLMv/F53Zkx32Ai2j17ula6YNLsGgl07pMxsWa9LCPhkFs029new+jDiL/c6Y0Y+GMUyoCNMrMv+YJdgW9FK3rri7h5pTuJEn5hohFk3nb4Xi2o/qfhdRlubf8xGvoWtWyHMVb/IlfkfhU54Ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1riHj8-0004Mx-0y;
-	Thu, 07 Mar 2024 17:40:18 +0000
-Date: Thu, 7 Mar 2024 17:40:08 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Lucien Jheng <lucien.jheng@airoha.com>,
-	Zhi-Jun You <hujy652@protonmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 2/2] net: phy: air_en8811h: Add the Airoha
- EN8811H PHY driver
-Message-ID: <Zen7-M2uAaXH8ucj@makrotopia.org>
-References: <20240302183835.136036-1-ericwouds@gmail.com>
- <20240302183835.136036-3-ericwouds@gmail.com>
- <89f237e0-75d4-4690-9d43-903e087e4f46@lunn.ch>
- <b27e44db-d9c5-49f0-8b81-2f55cfaacb4d@gmail.com>
- <99541533-625e-4ffb-b980-b2bcd016cfeb@lunn.ch>
- <6e6e408d-3dbb-4e80-ae27-d3aaafb34b06@gmail.com>
+	s=arc-20240116; t=1709833743; c=relaxed/simple;
+	bh=SWaaB0XQCIhzAS6EmdUMQf+lLQWEmTzrwTE2/ASS73A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AbUPgOgRq8h8XoeitHtziEpt2PIMU7lJdmLHyB1OIcsCJO3T9WJuUsbBJ2hxyiCekXw6wi8yhbO+im0qDh5gBN+Gfhp9kwBgrYJKGABW0uPZbGTk8kfnjT1UEESmQ+MerDOLhC0cU2F22E0x/AFq3cLozCNeMkaY1sLmsZ9XCTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L9eY9P8G; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-42ee7fa077bso5066731cf.3;
+        Thu, 07 Mar 2024 09:49:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709833741; x=1710438541; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3azFskcK1Kr594pn4cAjp31V8LFrQG4+hgU7A9RDIXk=;
+        b=L9eY9P8GPvIGZ/1AOuhnZEwuBhpYq56SeoWY1rLiw87s+jgS3BBHoi7yJvP1jgb++y
+         s8vK3J4LizPptbc+OgZ/o0E+xHvH9rcCNXde+hMRqFjdtj4DGF+ep+iMSkxkbXXEFxrv
+         AeqYtGINbZrwyeExt2bzwDETTVUsYViEI7umLKHjQgX7HjdwSPLgVBDpT7vTFOp6s//T
+         GdlGxEwbma+TjI5bN+Lk+5kVfM+bSO//fP77Deq8RLZGaUulVp1PQX8r3amZ5r7hKNza
+         vzDYa/aRVSrgDwq5/nE7sWvgswRUcqiHnUzisfEnKRUgGN+aSoS60hafHd3GBrmkVK5O
+         Ju5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709833741; x=1710438541;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3azFskcK1Kr594pn4cAjp31V8LFrQG4+hgU7A9RDIXk=;
+        b=EhxOCExzdQjIEW+Qq6EiHvdRQgACrBDPsGyaSNEsr63ZoHkzjFWvTqK5bqvoQfF1sQ
+         L3aLA60Td+5iPW6lzWk/dGWEb89fUbv9OvHN4izFRTkXtLKfyxZjgkTVtyu7A509tTD1
+         8A9jzC8kePe/p7kmMxm0CRNl0YrD8mP+Lhf44bUyA0jacMMerpwYLUg0MmRqBZqDBlft
+         rW8/2M3pcFAKFGcf7+VbEwuxD2qlyeQT9WVM/GAqAO08aEeYphQtPOcfW/71LiSvUuo2
+         bmfGCMXwfx+e3vZ88NcPdyMO1uvq2hUHEIST94xZ+i1UrmS1OpiohIOo3Mu1EMPtrjwk
+         Y1Xw==
+X-Forwarded-Encrypted: i=1; AJvYcCVrXTwBU+83xKFF1EzF8veIrgJ/zYBqEbjN0csQXidimZay5WRidUowZ3mI/VEEEq4fv5l7+fuf7L7CAsOFnoMrCUMY/dpCwbbu8fuSGywDGHxVwNly91p4AiYjleNHThsUD370jkmqTrX/U1w3b52MHyM9mBKoPpAp
+X-Gm-Message-State: AOJu0YxMIw2eZhgdYm9nZ+2rZKeKYMmuXVr+linQ4Rit+DfOhKSMqs63
+	BIrikzMJeF2hyZ4qSXFVxxM52MVmeNAVJe2pNiOfnpGN6U16GYeb4QN7GWWI17lrWawSg+2Z9Zu
+	xOYlXzemiM/WbeoPzaYjTQ8SkPKksMU1OLV3fGw==
+X-Google-Smtp-Source: AGHT+IFtJCet5o1lyZnRcTyn4EgVIYVJsxWpjc8YqORCDIgVR49weziOGhMcQg3AfHy5K2m4sfmNZwGAEqxGK2ey/9E=
+X-Received: by 2002:a05:622a:15d6:b0:42e:da48:fbb3 with SMTP id
+ d22-20020a05622a15d600b0042eda48fbb3mr8812751qty.41.1709833740937; Thu, 07
+ Mar 2024 09:49:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6e6e408d-3dbb-4e80-ae27-d3aaafb34b06@gmail.com>
+References: <ZeiNxaq3jzloO9l6@boxer> <20240307142402.906681-1-dgouarin@gmail.com>
+ <ZenidKFF/gQefijz@boxer>
+In-Reply-To: <ZenidKFF/gQefijz@boxer>
+From: david gouarin <dgouarin@gmail.com>
+Date: Thu, 7 Mar 2024 18:48:50 +0100
+Message-ID: <CAH3uZAwOBeuV9FQpFJ5-S-j5HDWpxR5vvXKzUoq_UTOenz6=XQ@mail.gmail.com>
+Subject: Re: [PATCH net v2] dpaa_eth: fix XDP queue index
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: david.gouarin@thalesgroup.com, Madalin Bucur <madalin.bucur@nxp.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Camelia Groza <camelia.groza@nxp.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 07, 2024 at 05:48:56PM +0100, Eric Woudstra wrote:
-> 
-> 
-> On 3/5/24 14:54, Andrew Lunn wrote:
-> > On Tue, Mar 05, 2024 at 09:13:41AM +0100, Eric Woudstra wrote:
-> >>
-> >> Hi Andrew,
-> >>
-> >> First of all, thanks for taking the time to look at the code so
-> >> extensively.
-> >>
-> >> On 3/3/24 18:29, Andrew Lunn wrote:
-> >>>> +enum {
-> >>>> +	AIR_PHY_LED_DUR_BLINK_32M,
-> >>>> +	AIR_PHY_LED_DUR_BLINK_64M,
-> >>>> +	AIR_PHY_LED_DUR_BLINK_128M,
-> >>>> +	AIR_PHY_LED_DUR_BLINK_256M,
-> >>>> +	AIR_PHY_LED_DUR_BLINK_512M,
-> >>>> +	AIR_PHY_LED_DUR_BLINK_1024M,
-> >>>
-> >>> DUR meaning duration? It has a blinks on for a little over a
-> >>> kilometre? So a wave length of a little over 2 kilometres, or a
-> >>> frequency of around 0.0005Hz :-)
-> >>
-> >> It is the M for milliseconds. I can add a comment to clarify this.
-> > 
-> > Or just add an S. checkpatch does not like camElcAse. So ms will call
-> > a warning. But from context we know it is not mega seconds.
-> 
-> I'll add it.
-> 
-> >>>> +static int __air_buckpbus_reg_write(struct phy_device *phydev,
-> >>>> +				    u32 pbus_address, u32 pbus_data,
-> >>>> +				    bool set_mode)
-> >>>> +{
-> >>>> +	int ret;
-> >>>> +
-> >>>> +	if (set_mode) {
-> >>>> +		ret = __phy_write(phydev, AIR_BPBUS_MODE,
-> >>>> +				  AIR_BPBUS_MODE_ADDR_FIXED);
-> >>>> +		if (ret < 0)
-> >>>> +			return ret;
-> >>>> +	}
-> >>>
-> >>> What does set_mode mean?
-> >>
-> >> I use this boolean to prevent writing the same value twice to the
-> >> AIR_BPBUS_MODE register, when doing an atomic modify operation. The
-> >> AIR_BPBUS_MODE is already set in the read operation, so it does not
-> >> need to be set again to the same value at the write operation.
-> >> Sadly, the address registers for read and write are different, so
-> >> I could not optimize the modify operation any more.
-> > 
-> > So there is the potential to have set_mode true when not actually
-> > performing a read/modify/write. Maybe have a dedicated modify
-> > function, and don't expose set_mode?
-> 
-> I'll write a dedicated modify function.
-> 
-> 
-> >>>> +static int en8811h_load_firmware(struct phy_device *phydev)
-> >>>> +{
-> >>>> +	struct device *dev = &phydev->mdio.dev;
-> >>>> +	const struct firmware *fw1, *fw2;
-> >>>> +	int ret;
-> >>>> +
-> >>>> +	ret = request_firmware_direct(&fw1, EN8811H_MD32_DM, dev);
-> >>>> +	if (ret < 0)
-> >>>> +		return ret;
-> >>>> +
-> >>>> +	ret = request_firmware_direct(&fw2, EN8811H_MD32_DSP, dev);
-> >>>> +	if (ret < 0)
-> >>>> +		goto en8811h_load_firmware_rel1;
-> >>>> +
-> >>>
-> >>> How big are these firmwares? This will map the entire contents into
-> >>> memory. There is an alternative interface which allows you to get the
-> >>> firmware in chunks. I the firmware is big, just getting 4K at a time
-> >>> might be better, especially if this is an OpenWRT class device.
-> >>
-> >> The file sizes are 131072 and 16384 bytes. If you think this is too big,
-> >> I could look into using the alternative interface.
-> > 
-> > What class of device is this? 128K for a PC is nothing. For an OpenWRT
-> > router with 128M of RAM, it might be worth using the other API.
-> 
-> So far, I only know of the BananaPi-R3mini, which I am using. It has 2GB
-> of ram. It should be ok.
+Le jeu. 7 mars 2024 =C3=A0 16:51, Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> a =C3=A9crit :
+>
+> On Thu, Mar 07, 2024 at 03:24:02PM +0100, David Gouarin wrote:
+> > Make it possible to bind a XDP socket to a queue id.
+> > The DPAA FQ Id was passed to the XDP program in the XDP packet metadata
+> > which made it unusable with bpf_map_redirect.
+>
+> I think that referring to a member from xdp_rxq_info struct as 'packet
+> metadata' is confusing. I was trying to find a place where you are
+> actually storing this id at xdp_buff::data_meta. This is not happening
+> AFAICT. Thing is that xsk_rcv_check() picks xdp->rxq->queue_index which
+> holds fqid which is not related to queue number, right?
 
-Most normal consumer devices don't have 2 GiB like the R3 mini.
-However, it's safe to assume that boards which come with EN8811H will
-also come with 256 MiB of RAM or more, and keeping 144kiB in RAM
-doesn't hurt too much imho.
+Correct. I have used the term xdp metadata because that is the terminology
+used in the xdp program (struct xdp_md).
+I should have said instead :
+The DPAA FQ Id was passed to the XDP program in the xdp_rxq_info->queue_ind=
+ex
+instead of the queue number [...]
 
-> 
-> >>>> +static int en8811h_restart_host(struct phy_device *phydev)
-> >>>> +{
-> >>>> +	int ret;
-> >>>> +
-> >>>> +	ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
-> >>>> +				     EN8811H_FW_CTRL_1_START);
-> >>>> +	if (ret < 0)
-> >>>> +		return ret;
-> >>>> +
-> >>>> +	return air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
-> >>>> +				     EN8811H_FW_CTRL_1_FINISH);
-> >>>> +}
-> >>>
-> >>> What is host in this context?
-> >>
-> >> This is the EN8811H internal host to the PHY.
-> > 
-> > That is a very PHY centric view of the world. I would say the host is
-> > what is running Linux. I assume this is the datahsheets naming? Maybe
-> > cpu, or mcu is a better name?
-> 
-> I'll rename host to mcu.
-> 
-> >>> Vendors do like making LED control unique. I've not seen any other MAC
-> >>> or PHY where you can blink for activity at a given speed. You cannot
-> >>> have 10 and 100 at the same time, so why are there different bits for
-> >>> them?
-> >>>
-> >>> I _think_ this can be simplified
-> >>> ...
-> >>> Does this work?
-> >>
-> >> I started out with that, but the hardware can do more. It allows
-> >> for a setup as described:
-> >>
-> >>  100M link up triggers led0, only led0 blinking on traffic
-> >> 1000M link up triggers led1, only led1 blinking on traffic
-> >> 2500M link up triggers led0 and led1, both blinking on traffic
-> >>
-> >> #define AIR_DEFAULT_TRIGGER_LED0 (BIT(TRIGGER_NETDEV_LINK_2500) | \
-> >> 				 BIT(TRIGGER_NETDEV_LINK_100)  | \
-> >> 				 BIT(TRIGGER_NETDEV_RX)        | \
-> >> 				 BIT(TRIGGER_NETDEV_TX))
-> >> #define AIR_DEFAULT_TRIGGER_LED1 (BIT(TRIGGER_NETDEV_LINK_2500) | \
-> >> 				 BIT(TRIGGER_NETDEV_LINK_1000) | \
-> >> 				 BIT(TRIGGER_NETDEV_RX)        | \
-> >> 				 BIT(TRIGGER_NETDEV_TX))
-> >>
-> >> With the simpler code and just the slightest traffic, both leds
-> >> are blinking and no way to read the speed anymore from the leds.
-> >>
-> >> So I modified it to make the most use of the possibilities of the
-> >> EN881H hardware. The EN8811H can then be used with a standard 2-led
-> >> rj45 socket.
-> > 
-> > The idea is that we first have Linux blink the LEDs in software. This
-> > is controlled via the files in /sys/class/leds/FOO/{link|rx|tx}
-> > etc. If the hardware can do the same blink pattern, it can then be
-> > offloaded to the hardware.
-> > 
-> > If you disable hardware offload, just have set brightness, can you do
-> > the same pattern?
-> > 
-> > As i said, vendors do all sorts of odd things with LEDs. I would
-> > prefer we have a common subset most PHY support, and not try to
-> > support every strange mode.
-> 
-> Then I will keep this part of the code as in
-> mt798x_phy_led_hw_control_set(), only adding 2500Mbps.
-> 
-> >>> +	/* Select mode 1, the only mode supported */
-> > 
-> >> Maybe a comment about what mode 1 actually is?
-> 
-> After consulting Airoha, I can change it to:
-> 
-> +	/* Select mode 1, the only mode supported.
-> +	 * The en8811h configures the SerDes as fixed hsgmii.
+Maciej please forgive me for the double send and formatting mistakes,
+kernel mailing lists are new to me.
 
-They probably mean 2500Base-X when they say HSGMII.
-
-HSGMII is an undefined thing. The name would kinda suggest that it
-would be similar to SGMII semantics, ie. in-band status which covers
-speed and duplex. This is not the case for the EN8811H which just uses
-2500Base-X and pause-frames to adapt for link speeds less than 2500M.
-
-'mode 1' hence probably means '2500Base-X with rate adaptation'.
-
-
-> +	 */
-> 
-> Best Regards,
-> 
-> Eric Woudstra
+>
+> > Instead of the DPAA FQ Id, initialise the XDP rx queue with the channel=
+ id.
+> >
+> > Fixes: d57e57d0cd04 ("dpaa_eth: add XDP_TX support")
+> >
+> > Signed-off-by: David Gouarin <dgouarin@gmail.com>
+> > ---
+> > v2: add Fixes: in description
+> > ---
+> >  drivers/net/ethernet/freescale/dpaa/dpaa_eth.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c b/drivers/n=
+et/ethernet/freescale/dpaa/dpaa_eth.c
+> > index dcbc598b11c6..988dc9237368 100644
+> > --- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+> > +++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+> > @@ -1154,7 +1154,7 @@ static int dpaa_fq_init(struct dpaa_fq *dpaa_fq, =
+bool td_enable)
+> >       if (dpaa_fq->fq_type =3D=3D FQ_TYPE_RX_DEFAULT ||
+> >           dpaa_fq->fq_type =3D=3D FQ_TYPE_RX_PCD) {
+> >               err =3D xdp_rxq_info_reg(&dpaa_fq->xdp_rxq, dpaa_fq->net_=
+dev,
+> > -                                    dpaa_fq->fqid, 0);
+> > +                                    dpaa_fq->channel, 0);
+> >               if (err) {
+> >                       dev_err(dev, "xdp_rxq_info_reg() =3D %d\n", err);
+> >                       return err;
+> > --
+> > 2.34.1
+> >
 
