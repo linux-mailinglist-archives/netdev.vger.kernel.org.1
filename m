@@ -1,168 +1,205 @@
-Return-Path: <netdev+bounces-78485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3F098754D7
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 18:08:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 562058754E9
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 18:11:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE479284C9E
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:08:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1404B20DB9
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:11:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018ED12FF9B;
-	Thu,  7 Mar 2024 17:08:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75DE7130ACB;
+	Thu,  7 Mar 2024 17:11:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KEWhWjVK"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="O18NOmG3"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02olkn2024.outbound.protection.outlook.com [40.92.43.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDBF612DDBE;
-	Thu,  7 Mar 2024 17:08:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709831321; cv=none; b=Dftxcn9d8SRIPH+AZFBAa3FMuTG39Wi/+v8KWyu/EMuSN2xcBsS+gmTxJ1VR0T0PhU6JngkQzYJKbf8OCQOwQM9pCNHZJ3Cy23qdDPxoMjd3a59kGErux7uDiW4DJ13UzzHeyMG5GA5OIetrCPy+QfM0d+PdqHHqmCcB6q/fmHc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709831321; c=relaxed/simple;
-	bh=JXl2uazT63Iyfp3B6864Ck7/1RQX0rkbSuPryxHAo0Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=loCZEV8HoQeUjiveMgdc/zVgZOmVfWvQzc1Ek3vV6/WIbl6WL99Ruebk+Rj0uvKtqHNneK7V43E+1WXHEkBQ6t8DV641PSXne9PAdRJQICzPvdGCj49uefx5gUNX4mYuM6WGR9tQVukS1GPWoWPxCEDI8rjTDjm2EfJ+qveDO1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KEWhWjVK; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5k0dUR2rE2fxeaqvwbqJwiFlYYiMm6GdJ7apm0o5Iao=; b=KEWhWjVKEPumuzv+FC9Okoz2rs
-	sFQizONg4p1DYUBmD7SY/D7PHP2LWvDMYhY4s1W381ZZsl7MiX1oJHkBcEe/jjLKYhN7XBgv/tY6N
-	n24mGeuswskJ2SFIpb0Kc3GglnZXQM7ne/YzhuyCW6er60H3yukn3ZevfzRcTKofH2zk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1riHEi-009bZV-K1; Thu, 07 Mar 2024 18:08:52 +0100
-Date: Thu, 7 Mar 2024 18:08:52 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
-	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, corbet@lwn.net,
-	linux-doc@vger.kernel.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
-	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
-	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
-	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
-	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
-	benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v3 08/12] net: ethernet: oa_tc6: implement
- transmit path to transfer tx ethernet frames
-Message-ID: <208fb61b-4740-46bf-8c70-29ab59cbb965@lunn.ch>
-References: <20240306085017.21731-1-Parthiban.Veerasooran@microchip.com>
- <20240306085017.21731-9-Parthiban.Veerasooran@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D7412FB0D;
+	Thu,  7 Mar 2024 17:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.43.24
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709831507; cv=fail; b=X+7BMhPJeqnoOqLNcFSCrMUzQhoo+77F1HqiNlgzYVmx/c6Aq1zHMwOg29OOTiIWpaMRS3NzzqZSdBbk8pxRVnvkCiSN4raN8aXjVFPMom96wmD2jIUgkcVyo/tdtbCeyYqiGwRdkqkpTkTIRswr8R0HTYA7+PeJgi5SbLN6YVM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709831507; c=relaxed/simple;
+	bh=Ug5BaFYwQpY5dJpOzzj6zgR5yhv9vGCwAPBoiiCJOJo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=JX9Uh2u43yRCgFum5TdIM9f2FVSoK4sgXeYMP3W6lQOgyeK9mzmvjmwGVVvHTdYue9fdHWYGJWEieCFFZJwCqQSm+CPGmaAII4dRFqsM6J8o24RxCakKpbwCX0T0q83yo+z4w3OtaPQ5KA4OyONQeHLQxpJKLVFWIsDAFh/c+Zk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=O18NOmG3; arc=fail smtp.client-ip=40.92.43.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GrnxwZ4jSkA79IptxOrL+0MZbK7tyynvco/nw6e6QxuD/YvMFjblNw19wEaRdTj8tNgwrnbAeuCV+7v9WCiLI+dYvnTOPt2Cs+l7jeA8hxYl9k1qV8qI5kcrRY/fvBTggQHSei/tE5HVo9iR8gCxMNdRaK31hjcoE+gYlx80Op8jKjU3RFi+mHJRpqIrR+YQkNWxRQmAU6a/qCx3ENhBfIG04BYvM+RKdXULhkqwi5NNlbJJ4Bdp3tj3SFykJXk/9KjSmnwba0rRLNCd4Q+c1lHk5Vz6sm+PxaiWqGhJFVgEICWsw8+9OP2ZDyYVXArldsCFgAGNITX9W/rBumegSg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jyEw3+TZ8Cb/DL7MMUUI+H4SQ8Mo3kN2cAfnrECi7UA=;
+ b=M93Cx3ei5FgXxiJ6wWYO0VHxUkn66uzDVU6Ec0T4DDJleCUuV3ndfMoDSqRSiw1VDNPXNh6mMlp6TEdNfJYQU+hKOfYp3cRyrTy8vWxsL9nQW9muYm66//o6iDuGIcK16xKH0KtsZkCwORkd2oVAHBMk7Vzi+qfLdDc6waFwpHeprMJ5V8torJK88reT0QfmX3gRFoOdc98S3U0IcDHd/T4T7V5HL5RJNJnToxnH47h+2QfXED17C39DCqz4xat/Xgz5dztJAuQssJo1djI0TffItvKJRN7tlXb5nqOR7snokbyKpRkt9en4QqUEK+HAqmntfSctdwkr5zPThfJm7w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jyEw3+TZ8Cb/DL7MMUUI+H4SQ8Mo3kN2cAfnrECi7UA=;
+ b=O18NOmG3Zk99dIPDSr+o/BfbLKvbqs4sDPegexGM68bCZttKD3re+E4yWp/Pkp4ROE80iIWcT8DeXEkbv2P4HZ26IrEb2HynAF4ZmcEps8OrVjk/JUMztL/mvMiZRMBkQZlCwJt3tVBrhlpNati3or7vVJrpjBz4RfqEBGDqKUtKAVxOwI7+1wb9bxyyNdYonSN2UOjfpT6GIooXG/SdeWJt4EasJ4Tr4Z9ZL5iPgRhT+3iUMspcKQg/CFo0sQoM15sRfCPG36PKLbphxGk4WZEwBhLEd68GBGsryJ1xvnJu7rH6ejggQoqhLw3e9TFdTUUnslWiaYfrS9C904uP7g==
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
+ by LV3PR02MB10150.namprd02.prod.outlook.com (2603:10b6:408:197::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.39; Thu, 7 Mar
+ 2024 17:11:42 +0000
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::67a9:f3c0:f57b:86dd]) by SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::67a9:f3c0:f57b:86dd%5]) with mapi id 15.20.7362.024; Thu, 7 Mar 2024
+ 17:11:42 +0000
+From: Michael Kelley <mhklinux@outlook.com>
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>, "kys@microsoft.com"
+	<kys@microsoft.com>, "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>, "decui@microsoft.com"
+	<decui@microsoft.com>, "linux-hyperv@vger.kernel.org"
+	<linux-hyperv@vger.kernel.org>, "gregkh@linuxfoundation.org"
+	<gregkh@linuxfoundation.org>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC: "sathyanarayanan.kuppuswamy@linux.intel.com"
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, "elena.reshetova@intel.com"
+	<elena.reshetova@intel.com>
+Subject: RE: [RFC RFT PATCH 0/4] Handle  set_memory_XXcrypted() errors in
+ hyperv
+Thread-Topic: [RFC RFT PATCH 0/4] Handle  set_memory_XXcrypted() errors in
+ hyperv
+Thread-Index: AQHaZTRXjdPXYbhP4karQ0dDTiSBNbEjNf9QgAlhAAA=
+Date: Thu, 7 Mar 2024 17:11:41 +0000
+Message-ID:
+ <SN6PR02MB4157AFF080839DB55294F5E9D4202@SN6PR02MB4157.namprd02.prod.outlook.com>
+References: <20240222021006.2279329-1-rick.p.edgecombe@intel.com>
+ <SN6PR02MB41575BD90488B63426A5CAB4D45E2@SN6PR02MB4157.namprd02.prod.outlook.com>
+In-Reply-To:
+ <SN6PR02MB41575BD90488B63426A5CAB4D45E2@SN6PR02MB4157.namprd02.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-tmn: [5PYBSSLBB9owHJIEI6l2DZKlq2VXLzCP]
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|LV3PR02MB10150:EE_
+x-ms-office365-filtering-correlation-id: ca2c74d8-7fa0-454c-386c-08dc3ec9a8b7
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ lLiq/D11Ksn/zRK7JqfGWm8q9wjy4Cxmohs7SUAvqXeqdu5DRHAELZn9ZGjajhdbUGKOXjZYSX8MrwgbhGsLnYMxYCdIXcxC67+b/do2Qp4UBAFeUUpAvrb5YA8Rf4VVh2oj99HZRM7tbDhhGTC2p+Eu31m2MafBVeOshc9UMLlc+A3/Y2M/6WCMcqc/WQVOA1DYUldg+gehjC2NJ+0xEG+avfDy0Y7xOi9JBl6+CEepICfFKE4gTvp/kHXZ6CO73fBlSeXy8R6wVdyeReCbm7nju9yZ1nHfwl2gVon5X+XbJGsS16GQFlPZSh2te+xUrDFE3CafD3EwMFJ6OqILLyGEu74IbB+4sH3iEa8gtD7aMAyKOw0jvK2i0yaeYf8xn8hXmE0j5jKO9IX3WavYfJT154fSgKQRvQRfs0RBrAc/XDLEVENuyKzlCWwEFt0l8vzvXmmSPVcYeM8DkNvL6/QT9tkncdjLYx0VwkfFcpXkX+FPwLdtwkAjlUTMaukI8Yr1yPlWgLxJfrId65W3vPoJwKRqxcKJ//ySRDcvbCEQonkG5UIqgckiPfZs0G5K
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?EO+MFclRxBiWZmd+3al1ovZRJCH0si8Dn9BgPZFyZQY/57xcV+7NLqt4d9Ql?=
+ =?us-ascii?Q?G/0MU8phe0fQhAwrqeTUJGwFO+b/z9F84E24cAHBL5I1W5mW4vpJR7+4Dzdi?=
+ =?us-ascii?Q?cOMvoiJGSnBg1WPS2yHczmoGO5b2DF77r6OE0SO418tK60CH2P9Lg+HgPS1X?=
+ =?us-ascii?Q?tl8JvCmk5mPe/9sYkKJEa9EMZdbZ7frdtxvvlpLibe4Op6g7z3alRDi2m/gm?=
+ =?us-ascii?Q?3kRXEnUKpWa+q8JvlzXIiEPdy/3/NiIutisrIk+Fz2nDwyfp9Ab0NB1mWuPE?=
+ =?us-ascii?Q?RqSJDwnlJPOWVtjLLT/DEUoK4JL/BN+Sc8BTQOZyGja/fI9RmWFOTpQVdM99?=
+ =?us-ascii?Q?8d3KeL9y1t50WGMvsfOejHcckPC9WcErdNSPxPOgaAhqgfWpysQdTILMJ3IC?=
+ =?us-ascii?Q?+FUTiJCx0lL4no2J6Soidq74QARErxs/YTs9lVg+uTbRZXZVRAJjSVtSkYdI?=
+ =?us-ascii?Q?SIjS5YHhyMvIjRahAcWMEtUnyXt1vS4jZFWifLpf5Kh9hXEwFgRy/YRTCkwR?=
+ =?us-ascii?Q?Q5nK8W+bAzeR/EXaG6EMTRq1OPEOiTjXkly6/2ukGWLPOaOxD7auRbxUK2uF?=
+ =?us-ascii?Q?C4KNxY5lfWpnnnqZ9AH32K1+aKh+JNStlSydHNNZaNRiBhtNVJj6I6lGzdsO?=
+ =?us-ascii?Q?cvB1MEH95fCdOADTfX9tQkeA2//F5vh8KUwozkjTAcwsZcUzGiaQbOotm4bU?=
+ =?us-ascii?Q?BYyKo/ir+wrBf6J3mQzCklYMO4V+dZ9hXSCQJnnKXBXPiTZF9a/QAEJ3WQXF?=
+ =?us-ascii?Q?7EmgNWsG8blTC2oWwnpAd9q7XHRXkfw0VNW2vsK1GpdurQUYX+pFdrjIPajC?=
+ =?us-ascii?Q?ZgP164j6z8c99Par0iOXVD221qSU/wwBOB1VGNM8vNjtSpeYcuw2fNdxBv1e?=
+ =?us-ascii?Q?lI2kmUNdu1yuviWkirs6jV1qNyB25CQE4LCOTmBizqXAaxc5tXt1dmPPIQYv?=
+ =?us-ascii?Q?NXTuTKKEbcI0MFWTOPvnnDd2OvrSe/PTV+y3BO/ioe9jOFQktgsCIylOeDHR?=
+ =?us-ascii?Q?z/w6orQ3fpGv9Xhd8tso5/HBQ9zVyDH7xVyDf3b8tuXKRJmVSKJNY4oRSNNr?=
+ =?us-ascii?Q?AFwJieRr1WAxYYArcth+t2kSwlmykJ9TLzgm/UjW9eAjTS/Gr6qybe1gl58A?=
+ =?us-ascii?Q?m/seVAZ5nGGavlIif3eOyRsVqSEQskH6Ks4IRJxvkmsyz3jUnOw0sms/BUMc?=
+ =?us-ascii?Q?l5qcyoZ8TYCpLXrItKEdf3B+7BtCx7KfnPVYAA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240306085017.21731-9-Parthiban.Veerasooran@microchip.com>
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca2c74d8-7fa0-454c-386c-08dc3ec9a8b7
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Mar 2024 17:11:41.9311
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR02MB10150
 
-> @@ -55,6 +77,14 @@
->  						(OA_TC6_CTRL_MAX_REGISTERS *\
->  						OA_TC6_CTRL_REG_VALUE_SIZE) +\
->  						OA_TC6_CTRL_IGNORED_SIZE)
-> +#define OA_TC6_CHUNK_PAYLOAD_SIZE		64
-> +#define OA_TC6_DATA_HEADER_SIZE			4
-> +#define OA_TC6_CHUNK_SIZE			(OA_TC6_DATA_HEADER_SIZE +\
-> +						OA_TC6_CHUNK_PAYLOAD_SIZE)
-> +#define OA_TC6_TX_SKB_QUEUE_SIZE		100
+From: Michael Kelley <mhklinux@outlook.com> Sent: Friday, March 1, 2024 11:=
+00 AM
+> >
+> > IMPORTANT NOTE:
+> > I don't have a setup to test tdx hyperv changes. These changes are comp=
+ile
+> > tested only. Previously Michael Kelley suggested some folks at MS might=
+ be
+> > able to help with this.
+>=20
+> Thanks for doing these changes.  Overall they look pretty good,
+> modulo a few comments.  The "decrypted" flag in the vmbus_gpadl
+> structure is a good way to keep track of the encryption status of
+> the associated memory.
+>=20
+> The memory passed to the gpadl (Guest Physical Address Descriptor
+> List) functions may allocated and freed directly by the driver, as in
+> the netvsc and UIO cases.  You've handled that case. But memory
+> may also be allocated by vmbus_alloc_ring() and freed by
+> vmbus_free_ring().  Your patch set needs an additional change
+> to check the "decrypted" flag in vmbus_free_ring().
+>=20
+> In reviewing the code, I also see some unrelated memory freeing
+> issues in error paths.  They are outside the scope of your changes.
+> I'll make a note of these for future fixing.
+>=20
+> For testing, I'll do two things:
+>=20
+> 1) Verify that the non-error paths still work correctly with the
+> changes.  That should be relatively straightforward as the
+> changes are pretty much confined to the error paths.
+>=20
+> 2) Hack set_memory_encrypted() to always fail.  I hope Linux
+> still boots in that case, but just leaks some memory.  Then if
+> I unbind a Hyper-V synthetic device, that should exercise the
+> path where set_memory_encrypted() is called.  Failures
+> should be handled cleanly, albeit while leaking the memory.
+>=20
+> I should be able to test in a normal VM, a TDX VM, and an
+> SEV-SNP VM.
+>=20
 
-So you keep up to 100 packets in a queue. If use assume typical MTU
-size packets, that is 1,238,400 bits. At 10Mbps, that is 120ms of
-traffic. That is quite a lot of latency when a high priority packet is
-added to the tail of the queue and needs to wait for all the other
-packets to be sent first.
+Rick --
 
-Chunks are 64 bytes. So in practice, you only ever need two
-packets. You need to be able to fill a chunk with the final part of
-one packet, and the beginning of the next. So i would try using a much
-smaller queue size. That will allow Linux queue disciplines to give
-you the high priority packets first which you send with low latency.
+Using your patches plus the changes in my comments, I've
+done most of the testing described above. The normal
+paths work, and when I hack set_memory_encrypted()
+to fail, the error paths correctly did not free the memory.
+I checked both the ring buffer memory and the additional
+vmalloc memory allocated by the netvsc driver and the uio
+driver.  The memory status can be checked after-the-fact
+via /proc/vmmallocinfo and /proc/buddyinfo since these
+are mostly large allocations. As expected, the drivers
+output their own error messages after the failures to
+teardown the GPADLs.
 
-> +static void oa_tc6_add_tx_skb_to_spi_buf(struct oa_tc6 *tc6)
-> +{
-> +	enum oa_tc6_data_start_valid_info start_valid = OA_TC6_DATA_START_INVALID;
-> +	enum oa_tc6_data_end_valid_info end_valid = OA_TC6_DATA_END_INVALID;
-> +	__be32 *tx_buf = tc6->spi_data_tx_buf + tc6->spi_data_tx_buf_offset;
-> +	u16 remaining_length = tc6->tx_skb->len - tc6->tx_skb_offset;
-> +	u8 *tx_skb_data = tc6->tx_skb->data + tc6->tx_skb_offset;
-> +	u8 end_byte_offset = 0;
-> +	u16 length_to_copy;
-> +
-> +	/* Set start valid if the current tx chunk contains the start of the tx
-> +	 * ethernet frame.
-> +	 */
-> +	if (!tc6->tx_skb_offset)
-> +		start_valid = OA_TC6_DATA_START_VALID;
-> +
-> +	/* If the remaining tx skb length is more than the chunk payload size of
-> +	 * 64 bytes then copy only 64 bytes and leave the ongoing tx skb for
-> +	 * next tx chunk.
-> +	 */
-> +	length_to_copy = min_t(u16, remaining_length, OA_TC6_CHUNK_PAYLOAD_SIZE);
-> +
-> +	/* Copy the tx skb data to the tx chunk payload buffer */
-> +	memcpy(tx_buf + 1, tx_skb_data, length_to_copy);
-> +	tc6->tx_skb_offset += length_to_copy;
+I did not test the vmbus_disconnect() path since that
+effectively kills the VM.
 
-You probably need a call to skb_linearize() somewhere. You assume the
-packet data is contiguous. It can in fact be split into multiple
-segments. skb_linearize() will convert it to a single buffer.
+I tested in a normal VM, and in an SEV-SNP VM.  I didn't
+specifically test in a TDX VM, but given that Hyper-V CoCo
+guests run with a paravisor, the guest sees the same thing
+either way.
 
-> +static int oa_tc6_try_spi_transfer(struct oa_tc6 *tc6)
-> +{
-> +	int ret;
-> +
-> +	while (true) {
-> +		u16 spi_length = 0;
-> +
-> +		tc6->spi_data_tx_buf_offset = 0;
-> +
-> +		if (tc6->tx_skb || !skb_queue_empty(&tc6->tx_skb_q))
-> +			spi_length = oa_tc6_prepare_spi_tx_buf_for_tx_skbs(tc6);
-> +
-> +		if (spi_length == 0)
-> +			break;
-> +
-> +		ret = oa_tc6_spi_transfer(tc6, OA_TC6_DATA_HEADER, spi_length);
-> +		if (ret) {
-> +			netdev_err(tc6->netdev,
-> +				   "SPI data transfer failed. Restart the system: %d\n",
-> +				   ret);
-
-What does Restart the system mean?
-
-> +static int oa_tc6_spi_thread_handler(void *data)
-> +{
-> +	struct oa_tc6 *tc6 = data;
-> +	int ret;
-> +
-> +	while (likely(!kthread_should_stop())) {
-> +		/* This kthread will be waken up if there is a tx skb */
-> +		wait_event_interruptible(tc6->spi_wq,
-> +					 !skb_queue_empty(&tc6->tx_skb_q) ||
-> +					 kthread_should_stop());
-> +		ret = oa_tc6_try_spi_transfer(tc6);
-
-Shouldn't you check why you have been woken up? It seems more logical
-to test here for kthread_should_stop() rather than have
-oa_tc6_try_spi_transfer() handle there is not actually a packet to be
-sent.
-
-	Andrew
+Michael
 
