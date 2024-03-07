@@ -1,121 +1,133 @@
-Return-Path: <netdev+bounces-78493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD8CA8754FD
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 18:14:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE73687551F
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 18:26:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AF971C21552
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:14:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A959F286983
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:26:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910D812FF9B;
-	Thu,  7 Mar 2024 17:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE944130E21;
+	Thu,  7 Mar 2024 17:26:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZeAhcUQv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ayz90ujO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8E21EB40
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 17:14:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC4E130ADF
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 17:26:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709831677; cv=none; b=kKYKPsJ5NMmkVumtuPTS0ehBHJz0JhRIqoKyX+y91sWD0RRWWB1QV5ZO60KUwtpTLrjrOYEpDZpAY6D9nBAheDXNuyVHaXyFEdskrDAwzu6+ELvnNkbLBmlWceYjybKEZYO+q8SBZKkyvKpsI2m0IpCtw12myTHSASM7TaOv1ms=
+	t=1709832386; cv=none; b=nn6Q3ovtN7PV0tldJxr07yi+ArrRsH4tP2H0oi54CwN94yIRBgDTCbEXUsSW1a0nVn8YmloxRBcY9S3z9lsqYWm26T3Mom3b+937KjO581XTPLDgG/NImme1uKGhYKlFBrrANUVbHMQY3JSJNuxGu4C88IqrXae1Xvm3r8gPak4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709831677; c=relaxed/simple;
-	bh=RHYXIvGJo8q/LIBWiLq20XUcVqSjEGZKfomR2XrwR+c=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Jrvp+0cTuOBzMUwKsdG4mjnjp/Cc+f2mFBSMkaA8PW6ka1whcp8uqeLtcIJPRBbC9zMMbJIM89WxOCUuOXEAOvY6O8tL/hwpHqtnagAbhDJg8g0/T+PT3x96EQxB23eDFuYAZ+tU9tRMRdkEYgR6YKgswD25FQcVFrZecCiOAjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZeAhcUQv; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709831674;
+	s=arc-20240116; t=1709832386; c=relaxed/simple;
+	bh=4VKRPFROZxhfecLCGFPUt9H94MPeeXyOxYoh30MmVek=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qgthapmpf5TcEAFReGUbPCQnrKM0yRAGQ63U/t4xkF71RybjQotutln8NBQ+ajMtvyc+RmM0EzXvauPiW/k91MV38Gr248WyKpCGpIWIJuja0WlpP44OMozT1wL6pAVoEstHZdQZIg6nUQSiUDHx6mnDCkEwaxZw4xHqEvfVePc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ayz90ujO; arc=none smtp.client-ip=91.218.175.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <49ca7920-d429-434a-aede-1a200e8d5ce8@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1709832381;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=NG816kiSDpgCjmlRtzxBd0pgqG2tGupf4H8p5jd/PSY=;
-	b=ZeAhcUQvJyD8ImiBHyO1Y6AtLcPEl5VBtorXCuS1qTF2Kwk4vJj0TavL9TMA88bl+Xwmh/
-	NUF0CuK2ERJFo/qBWwZvl4YQmSEuNoNmnT80+zLII/qUEQxp8xFZes1Uh7J+3hFds84v4z
-	TQeTy/pm1uWZrHq4NGiNrXNn5Y7umvU=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-668-AO8X13KGOb2-QP-mwOuRKA-1; Thu,
- 07 Mar 2024 12:14:30 -0500
-X-MC-Unique: AO8X13KGOb2-QP-mwOuRKA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0BDBF3C0BE2D;
-	Thu,  7 Mar 2024 17:14:30 +0000 (UTC)
-Received: from tpad.localdomain (unknown [10.96.133.5])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C931F17AA6;
-	Thu,  7 Mar 2024 17:14:29 +0000 (UTC)
-Received: by tpad.localdomain (Postfix, from userid 1000)
-	id 8CEA840AD6D54; Thu,  7 Mar 2024 14:14:03 -0300 (-03)
-Date: Thu, 7 Mar 2024 14:14:03 -0300
-From: Marcelo Tosatti <mtosatti@redhat.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next -v5] net/core/dev.c: enable timestamp static key if
- CPU isolation is configured
-Message-ID: <Zen126EYArNCxIYz@tpad>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=typJzsyCZ7d0N2AWtsRnRkkZEuqyJ1S5uCH3hrAdMlA=;
+	b=Ayz90ujO9VGGPBPBUzhJG/0z3frrtSSosfU6bd3HdfMioTtavGW2EUkG1Ej2q8KtTF8siq
+	RiawcerkWVH1IqmUaJplOxSyFkFQ6Pu5Pbk+Kpe8G0KcewTfjN36YOsuCYE3oGj2f4d4Q5
+	tQ5GrYK9qaIeKxKrjhRKtUdwZsGwHTM=
+Date: Thu, 7 Mar 2024 12:26:00 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+Subject: Re: [RESEND2 PATCH net v4 2/2] soc: fsl: qbman: Use raw spinlock for
+ cgr_lock
+Content-Language: en-US
+To: Christophe Leroy <christophe.leroy@csgroup.eu>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Roy Pledge
+ <roy.pledge@nxp.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "stable@vger.kernel.org" <stable@vger.kernel.org>,
+ Li Yang <leoyang.li@nxp.com>, Scott Wood <oss@buserror.net>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Camelia Groza <camelia.groza@nxp.com>,
+ Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+References: <20240222170749.2607485-1-sean.anderson@linux.dev>
+ <20240222170749.2607485-2-sean.anderson@linux.dev>
+ <53b401d7-934c-4937-ab83-6732af47668d@csgroup.eu>
+ <34da1e7b-029e-410b-8735-a10d6d267e2b@linux.dev>
+ <6764b9c5-b61a-4f20-a41a-125d5015a3e6@linux.dev>
+ <63ab7b62-853c-4996-a493-465283252d5a@csgroup.eu>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <63ab7b62-853c-4996-a493-465283252d5a@csgroup.eu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
+On 3/5/24 17:18, Christophe Leroy wrote:
+> 
+> 
+> Le 05/03/2024 à 19:14, Sean Anderson a écrit :
+>> [Vous ne recevez pas souvent de courriers de sean.anderson@linux.dev. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
+>> 
+>> Hi,
+>> 
+>> On 2/23/24 11:02, Sean Anderson wrote:
+>>> On 2/23/24 00:38, Christophe Leroy wrote:
+>>>> Le 22/02/2024 à 18:07, Sean Anderson a écrit :
+>>>>> [Vous ne recevez pas souvent de courriers de sean.anderson@linux.dev. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
+>>>>>
+>>>>> cgr_lock may be locked with interrupts already disabled by
+>>>>> smp_call_function_single. As such, we must use a raw spinlock to avoid
+>>>>> problems on PREEMPT_RT kernels. Although this bug has existed for a
+>>>>> while, it was not apparent until commit ef2a8d5478b9 ("net: dpaa: Adjust
+>>>>> queue depth on rate change") which invokes smp_call_function_single via
+>>>>> qman_update_cgr_safe every time a link goes up or down.
+>>>>
+>>>> Why a raw spinlock to avoid problems on PREEMPT_RT, can you elaborate ?
+>>>
+>>> smp_call_function always runs its callback in hard IRQ context, even on
+>>> PREEMPT_RT, where spinlocks can sleep. So we need to use raw spinlocks
+>>> to ensure we aren't waiting on a sleeping task. See the first bug report
+>>> for more discussion.
+>>>
+>>> In the longer term it would be better to switch to some other
+>>> abstraction.
+>> 
+>> Does this make sense to you?
+> 
+> Yes that fine, thanks for the clarification. Maybe you can explain that 
+> in the patch description in case you send a v5.
 
-For systems that use CPU isolation (via nohz_full), creating or destroying
-a socket with SO_TIMESTAMP, SO_TIMESTAMPNS or SO_TIMESTAMPING with flag
-SOF_TIMESTAMPING_RX_SOFTWARE will cause a static key to be enabled/disabled.
-This in turn causes undesired IPIs to isolated CPUs.
+Hm, I thought I put this description in the commit message already.
+Maybe something like
 
-So enable the static key unconditionally, if CPU isolation is enabled,
-thus avoiding the IPIs.
+| smp_call_function always runs its callback in hard IRQ context, even on
+| PREEMPT_RT, where spinlocks can sleep. So we need to use a raw spinlock
+| for cgr_lock to ensure we aren't waiting on a sleeping task.
+| 
+| Although this bug has existed for a while, it was not apparent until
+| commit ef2a8d5478b9 ("net: dpaa: Adjust queue depth on rate change")
+| which invokes smp_call_function_single via qman_update_cgr_safe every
+| time a link goes up or down.
 
-Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+would be clearer.
 
----
-v2: mention SOF_TIMESTAMPING_OPT_TX_SWHW in the commit log (Willem de Bruijn / Paolo Abeni)
-v3: SOF_TIMESTAMPING_OPT_TX_SWHW is irrelevant (Willem de Bruijn)
-v4: additional changelog improvements (Willem de Bruijn)
-v5: late initcall not necessary, can use subsys initcall (Willem de Bruijn)
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 0d548431f3fa..7832793b2980 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -153,6 +153,7 @@
- #include <linux/prandom.h>
- #include <linux/once_lite.h>
- #include <net/netdev_rx_queue.h>
-+#include <linux/sched/isolation.h>
- 
- #include "dev.h"
- #include "net-sysfs.h"
-@@ -11596,6 +11597,10 @@ static int __init net_dev_init(void)
- 				       NULL, dev_cpu_dead);
- 	WARN_ON(rc < 0);
- 	rc = 0;
-+
-+	/* avoid static key IPIs to isolated CPUs */
-+	if (housekeeping_enabled(HK_TYPE_MISC))
-+		net_enable_timestamp();
- out:
- 	return rc;
- }
-
+--Sean
 
