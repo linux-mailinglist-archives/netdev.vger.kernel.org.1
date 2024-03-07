@@ -1,75 +1,59 @@
-Return-Path: <netdev+bounces-78222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22B69874608
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 03:16:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60402874616
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 03:26:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB5E41F229B7
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 02:16:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 441161C21462
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 02:26:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F067168BE;
-	Thu,  7 Mar 2024 02:16:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D1051FBB;
+	Thu,  7 Mar 2024 02:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2haLrco"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y+n6kyrL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47BB415EA6;
-	Thu,  7 Mar 2024 02:16:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6978B1C2D
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 02:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709777762; cv=none; b=nLsIkrYbZHkrdlbFfW9jaqZD2KNuEmkYRz94OPiQsSVPFxKKSOoi9ufOUfCzwyXey/radYFcfr86dcER1+JtXupXaEQKC5lWPyl+cp9uw0+bskbOhzADs3DolB5uQ2uwenl9xfPYwK46yAYpUP3E8PiMgdYPVx0rHThD2TGlCZM=
+	t=1709778381; cv=none; b=G9BwhGnJ68V5orPUP3vBPuDBFUE6R+0u8GMVF/jyaoNad4gv6aNWI7UIeoiKW8qCeHHjvfaxR5OinIS5UTVlihG4u+TS7sXNEfu+ObBrssK5sFFdenO3ASIqMwLDrjkve9RcBG68r5IJI8fyZtzOj++QNzYfj88mBPIiK1UUZT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709777762; c=relaxed/simple;
-	bh=Cw89We1aTAVBbcBRos65D+qMVJWNLUVeKILK2DWf540=;
+	s=arc-20240116; t=1709778381; c=relaxed/simple;
+	bh=liBnoDdr/ufHPtAp499JfDlHm7qj9Q34SpdqUE9U53U=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T9jx8jzZ3kv1NM891tfP4ujUR+0oxkAKbi0rB577DSa3HnPKRGjmfKmqTrfQI0qyg9cFYMfQqDwCOCza2eUgtEllnJb8Wb7aHwO2oAJVM/a5Xus03Uuexn7X1LkFZC0IvHZABmnYVKFOJJdEX5NLORd/cgBpcoviKhhWubLNzbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2haLrco; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59B1BC43390;
-	Thu,  7 Mar 2024 02:16:01 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Tj/9CQwOqwXpUpUa6tj+x9cItsVhqj+GcF7VbMQljPZLe4Ag9nE1DZZX4X155pe2PSkpseCfPr0K8BbGP0Pg5lf/80ATk77uGAJL9k6bbNZ45gtHsl9Vt5B12kaG78ysSmv7wBRUA6/A8q4mUr5u9AjAlUOQlwDty2VNP8whAtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y+n6kyrL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00633C433C7;
+	Thu,  7 Mar 2024 02:26:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709777761;
-	bh=Cw89We1aTAVBbcBRos65D+qMVJWNLUVeKILK2DWf540=;
+	s=k20201202; t=1709778381;
+	bh=liBnoDdr/ufHPtAp499JfDlHm7qj9Q34SpdqUE9U53U=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=e2haLrcoYyKOlH2ZZ7Rf2CK7O15Lo2E4Oo5/0FMZRY1/4m0vAJc7leeijC1NOZL/Q
-	 VFqcSJcgHOooJ/oa6qlbuQ4Ae6kYuqlId0zP2V4BKXfRz7qldYKowGfkO0SC0LHa9b
-	 rCUh6zs2WQYuNhvgy05KaFAW3UzmQfdupjgIo4nyNIT6iwWozWi6D0gmspUrvORIPF
-	 4Ka4+bjiQR8ADhwLoCSpt3VlxbFfeRlynSh1LA1Ye/sA/O9fu1GmVl63FgJTgZ+6R6
-	 gmAm5XzUS7RlaaZi7B16Yg8ARBnUcqZcbvfJC1sTgYhXR4TwttR4QEgZjm8R1Vh/VA
-	 O20Ji8xeC+9Kw==
-Date: Wed, 6 Mar 2024 18:16:00 -0800
+	b=Y+n6kyrL1D+RfUKZIJPePSL/SiEU4qcCWohnPHNfu35E73OJ6G6ygGzyUdXc1ol57
+	 z4D++BoHi4nVnjLVZO1ib7JzKO8rlYBxrgG6EwjTvE7cQYrtXqqbszICyyf3oFipfX
+	 pyhTspvuXZ+2esGWydJRMEt69g5KWdJnHJPhezR/a+p/VJs7bP+wFnAvk//prefhci
+	 BPU+03ntYOrMIzHU9xwo1rPNTHIaPrhlFtvLQdgPmYATBqydm4xINr3Id+5ERoMvok
+	 oW4b8QixUM0ZROzwFubxv9xsrFIDJ0k7pdfeG8IGoeq8tsuYvhT8AQqO5hv7OjjHjE
+	 j5zKF5f/sTkuA==
+Date: Wed, 6 Mar 2024 18:26:20 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Liang Chen <liangchen.linux@gmail.com>, Yunsheng Lin
- <linyunsheng@huawei.com>, Dragos Tatulea <dtatulea@nvidia.com>,
- "davem@davemloft.net" <davem@davemloft.net>, "herbert@gondor.apana.org.au"
- <herbert@gondor.apana.org.au>, Gal Pressman <gal@nvidia.com>,
- "dsahern@kernel.org" <dsahern@kernel.org>, "steffen.klassert@secunet.com"
- <steffen.klassert@secunet.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
- Leon Romanovsky <leonro@nvidia.com>, "edumazet@google.com"
- <edumazet@google.com>, "ian.kumlien@gmail.com" <ian.kumlien@gmail.com>,
- "Anatoli.Chechelnickiy@m.interpipe.biz"
- <Anatoli.Chechelnickiy@m.interpipe.biz>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>
-Subject: Re: [RFC] net: esp: fix bad handling of pages from page_pool
-Message-ID: <20240306181600.5af8ef5f@kernel.org>
-In-Reply-To: <CAHS8izOoO-EovwMwAm9tLYetwikNPxC0FKyVGu1TPJWSz4bGoA@mail.gmail.com>
-References: <20240304094950.761233-1-dtatulea@nvidia.com>
-	<20240305190427.757b92b8@kernel.org>
-	<7fc334b847dc4d90af796f84a8663de9f43ede5d.camel@nvidia.com>
-	<20240306072225.4a61e57c@kernel.org>
-	<320ef2399e48ba0a8a11a3b258b7ad88384f42fb.camel@nvidia.com>
-	<20240306080931.2e24101b@kernel.org>
-	<CAHS8izMw_hxdoNDoCZs8T7c5kmX=0Lwqw_dboSj7z1LqtS-WKA@mail.gmail.com>
-	<9a78b37abdf40daafd9936299ea2c08f936ad3d5.camel@nvidia.com>
-	<20240306094133.7075c39f@kernel.org>
-	<CAHS8izN436pn3SndrzsCyhmqvJHLyxgCeDpWXA4r1ANt3RCDLQ@mail.gmail.com>
-	<CAHS8izOoO-EovwMwAm9tLYetwikNPxC0FKyVGu1TPJWSz4bGoA@mail.gmail.com>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jacob
+ Keller <jacob.e.keller@intel.com>, Jiri Pirko <jiri@resnulli.us>, Stanislav
+ Fomichev <sdf@google.com>, donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v3 5/6] doc/netlink: Allow empty enum-name in
+ ynl specs
+Message-ID: <20240306182620.5bc5ecc2@kernel.org>
+In-Reply-To: <20240306231046.97158-6-donald.hunter@gmail.com>
+References: <20240306231046.97158-1-donald.hunter@gmail.com>
+	<20240306231046.97158-6-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,38 +63,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 6 Mar 2024 10:46:45 -0800 Mina Almasry wrote:
-> Gah, nevermind, skb_pp_frag_ref() actually returns -EINVAL if
-> !skb->pp_recycle, and in the call site we do a skb_frag_ref() on this
-> error, so all in all we end up doing a get_page/put_page pair. Sorry
-> for the noise.
-> 
-> So we're supposed to:
-> - !skb->pp_recycle && is_pp_page()
-> ref via get_page
-> unref via put_page
-> 
-> Very subtle stuff (for me at least). I'll try to propose some cleanup
-> to make this a bit simpler using helpers that handle all these subtle
-> details internally so that the call sites don't have to do this
-> special handling.
+On Wed,  6 Mar 2024 23:10:45 +0000 Donald Hunter wrote:
+> Update the ynl schemas to allow the specification of empty enum names
+> for all enum code generation.
 
-Sure, although complexity is complexity, we can only do so much to hide
-it.
+Does ethtool.yaml work for you without this change? 
+It has an empty enum.
 
-For pp_recycle - the problem is when we added page pool pages, hardly
-anything in the upper layers of the stack was made pp aware. So we can
-end up with someone doing
+IDK how the check the exact schema version, I have:
 
-	get_page(page);
-	skb_fill_page_desc(skb, page);
+$ rpm -qa | grep jsonschema
+python3-jsonschema-specifications-2023.7.1-1.fc39.noarch
+python3-jsonschema-4.19.1-1.fc39.noarch
 
-on a PP page.
-
-You probably inspected a lot of those cases for the ZC work, and they
-can be fixed up to do a "pp-aware get()", but until then we need
-skb->pp_recycle. pp_recycle kinda denotes whether whoever constructed
-the skb was PP aware.
-
-So, yes, definitely a good long term goal, but not in a fix :)
+The patch seems legit, but would be good to note for posterity 
+what made this fail out of the sudden.
 
