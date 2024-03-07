@@ -1,144 +1,151 @@
-Return-Path: <netdev+bounces-78304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6B79874A6D
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:12:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5DEB874A45
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:00:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 043721C226E4
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:12:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54EC61F21E82
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E0E839E7;
-	Thu,  7 Mar 2024 09:12:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C157E82D7E;
+	Thu,  7 Mar 2024 09:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lhp8Jz7L"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="mA6RNssZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B3D82D66
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 09:12:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA891C2A3;
+	Thu,  7 Mar 2024 09:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709802741; cv=none; b=ojhT9LNTAOaN6ROBkLWBRD7SLo6cclaaY5GNjxRPShvfSJHvErWXV5wbGx9kqVNYXGr/EuUGXz5AfJS23UNJn6hHWfylV2/FmRFO1x7gzom+iUalv5eM4osD+DPJtoeuFaScBeON4UTIwsKIjkP0ff4UOURHqBprCHBi9syze9E=
+	t=1709802034; cv=none; b=i/o+oAilu9nGYMSpKASCyURGKtW7p69k9ZdTt0CR41FB/xaFiWElgSI8FJpWOYpCWTeoYxx0SFHuxCNN6IZaz+yxlXdZRfatzwrwgkldVGQPvbvsOAYG+Za6wpaSqoVTf9o/4glgvbNxQ917Pabg7G0FWGYBOs+ktWjM4cKnF5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709802741; c=relaxed/simple;
-	bh=FdiV7fjV6ZMjTiBpAFllNtXjS8Z2MyeA5Q3IRV8Eey0=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=gm8OeyYMSBdNGVw3xiU/xo7noUmsMC/ASUbLCtIwPNymtMbLrncT0KALD6dJ8WvTnyvcI3MYbc1NHv8F+MQXSgPVJlzKnserN8bq5zy6uyxh14owdVhQrXV7XJNstAUQCO3A/Qe8vTVTx4IH4D8NpurR+im27cKh3aYlh9O4xUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lhp8Jz7L; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-512ed314881so643624e87.2
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 01:12:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709802738; x=1710407538; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BlzAS1QIl3bUAl44ril6592URuR6LZQsuSR547DwpDA=;
-        b=lhp8Jz7LAvaQBFXB8VWPGDdVQb6SLTQG7AQdbdCUhzO3A7l9ds8rm2HCItf0705m/l
-         GSHMbhCqDJSACGjkYSv35OmebfnV3cIzjLfRKm3a1MdqBoBxlO+gaCeI2cg4sKwEl7qw
-         SoP6zCKnPE16VK5KsUH/7OS2QSO19Ysab53aEM38wBc0TKaZedwtj0fP8FDmEluUbRAx
-         JO9EgQE5lHmy+7wp0z/EClDWH5oMH0XvGFSQixAQBEo0qutk765KDr4u6eUk7qQnoUpa
-         pKocn9+Zr1ep+5hWESWSEfnpUx4NvDYYCOuUe5M8cYl4nw8tbyhKaxUJiy0AvZQ+DChJ
-         1vOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709802738; x=1710407538;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BlzAS1QIl3bUAl44ril6592URuR6LZQsuSR547DwpDA=;
-        b=CWQSUAVbdfziQzHJkIcpYbdb2iEBHfU4t92eQ64TMiRnNCnSvwqL0GeX9gHCnJHFJZ
-         4ABjdFpx710FuR0aFtHQvY5qFERXXAguOaLOiW6K5cvAfWOfwUMT/NR0AmdR2MFtofWQ
-         GGbXtCYAdzgqJURg3Tm5UK5BCyrg9GEP3umKpSy3A8fpY53+cl3j0g2jH1dal8+H2Gii
-         Ph57oVxk6gRWd33+c5bgD18fsdTVzAM5gqR98Bxjj1ooI1zlThKJNrSZTYIoOTXv6FAW
-         A0uknyAfcTFFvzxgsq5wnOynRULz2IzrBYYbM63qu1pJGjpD3+xKkbyNaNmFB9ct0ZoK
-         1xSg==
-X-Gm-Message-State: AOJu0YzmrOhGeiJhdq9Ax1AuijUdS1pdcBr5bH8a6/l6ZRIEgXEpIg0d
-	VW0IFWtjxmbGXIrbNIs+HoJ7GBdL2FbcJMHWx54BS4rJtzWEK6EX
-X-Google-Smtp-Source: AGHT+IGOts3OBa7ujLi+Aalr9OEmXndj6cVbtNkVAMx4iiIupjk79IzhBoUx2cGQ2M5hmu4CRp+1EQ==
-X-Received: by 2002:ac2:5f69:0:b0:513:3e94:7ca3 with SMTP id c9-20020ac25f69000000b005133e947ca3mr923333lfc.48.1709802737778;
-        Thu, 07 Mar 2024 01:12:17 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:952f:caa6:b9c0:b4d8])
-        by smtp.gmail.com with ESMTPSA id n4-20020a05600c4f8400b00412ff941abasm1974562wmq.21.2024.03.07.01.12.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Mar 2024 01:12:17 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Jacob
- Keller <jacob.e.keller@intel.com>,  Jiri Pirko <jiri@resnulli.us>,
-  Stanislav Fomichev <sdf@google.com>,  donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v2 5/5] doc/netlink/specs: Add spec for nlctrl
- netlink family
-In-Reply-To: <20240306160458.3605e8aa@kernel.org> (Jakub Kicinski's message of
-	"Wed, 6 Mar 2024 16:04:58 -0800")
-Date: Thu, 07 Mar 2024 08:58:00 +0000
-Message-ID: <m2frx2h10n.fsf@gmail.com>
-References: <20240306125704.63934-1-donald.hunter@gmail.com>
-	<20240306125704.63934-6-donald.hunter@gmail.com>
-	<20240306103114.41a1cfb4@kernel.org>
-	<CAD4GDZwtD7v_zQzeGDu93sropHbRsRANUMJ-MAB1w+CZCMyXuQ@mail.gmail.com>
-	<20240306160458.3605e8aa@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1709802034; c=relaxed/simple;
+	bh=D+XnBoUlNb13Suw1Ih1OgTg0q9gGXzYmZySZbHByTx0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kFFBhFpObAg3VcRUFV0R8hjEo+DPJTdd9Mc92qTgE95SvKaLcY9EZmYJlVHTW04znPmk8W9rb3vbsT4SfatN+CIyEhUo5NarLeDT+2HBbv5SFeu7SPA9sF3TTpaQrzUV2zEjuAsyBKJEOnfnHS6EkYcK8BtseUA/hDTHcIZB128=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=mA6RNssZ; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1709802033; x=1741338033;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=D+XnBoUlNb13Suw1Ih1OgTg0q9gGXzYmZySZbHByTx0=;
+  b=mA6RNssZ4WJ4j2tb0jwdiLPYifUrWUyxeJzJ2ORf9eQZ4tfsVtf9QhoW
+   yKNVuK655QxhME9CHXYE1eh7q6FOwRYoGk1exjpSk7fGGUImCGLVcv8gp
+   3reA1Hlyc1Zp4e0eVaszwbTZJlfx3b2t9I4XqShM+QuPKdLWqmBqGFwnQ
+   abFPuPb5Z0nLYo1Ej5/CgfxccFNfhKPLz5aqafCAK/Ax1L2jcP2Xf4jh8
+   pvKuE8Hp6sK7XCN2gjN8DxCtECc2mpWZkdiezimm3Y8z7+Kf0tbtudbCX
+   ZJvAjFnKKyRLDGLz4Whi3hvNGy4NHtnVr5/c0N+FjPYVBGcr6SvdKr7fB
+   w==;
+X-CSE-ConnectionGUID: horeqPc5Q2+8sq6TPMg6+Q==
+X-CSE-MsgGUID: MAW95ikoRainf7EPVGLaSw==
+X-IronPort-AV: E=Sophos;i="6.06,211,1705388400"; 
+   d="scan'208";a="248099943"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Mar 2024 02:00:25 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 7 Mar 2024 02:00:21 -0700
+Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Thu, 7 Mar 2024 02:00:18 -0700
+From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <linux-kernel@vger.kernel.org>,
+	<bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>
+Subject: [PATCH net] net: lan743x: Add set RFE read fifo threshold for PCI1x1x chips
+Date: Thu, 7 Mar 2024 14:28:23 +0530
+Message-ID: <20240307085823.403831-1-Raju.Lakkaraju@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-Jakub Kicinski <kuba@kernel.org> writes:
+The RFE (Receive Filtering Engine) read fifo threshold hardware default should
+be overwritten to 3 for PCI1x1x Rev B0 devices to prevent lockup during some
+stress tests using frames that include VLAN tags.
+Rev C0 and later hardware already defaults to 3.
 
-> On Wed, 6 Mar 2024 22:54:08 +0000 Donald Hunter wrote:
->> > I've used
->> >         enum-name:
->> > i.e. empty value in other places.
->> > Is using empty string more idiomatic?  
->> 
->> I got this when I tried to use an empty value, so I used '' everywhere instead.
->> 
->> jsonschema.exceptions.ValidationError: None is not of type 'string'
->> 
->> Failed validating 'type' in
->> schema['properties']['attribute-sets']['items']['properties']['enum-name']:
->>     {'description': 'Name for the enum type of the attribute.',
->>      'type': 'string'}
->> 
->> On instance['attribute-sets'][1]['enum-name']:
->>     None
->> 
->> It turns out that the fix for that is a schema change:
->> 
->> --- a/Documentation/netlink/genetlink-legacy.yaml
->> +++ b/Documentation/netlink/genetlink-legacy.yaml
->> @@ -169,7 +169,7 @@ properties:
->>            type: string
->>          enum-name:
->>            description: Name for the enum type of the attribute.
->> -          type: string
->> +          type: [ string, "null" ]
->>          doc:
->>            description: Documentation of the space.
->>            type: string
->> 
->> I'll respin with a cleaned up nlctrl spec and fixes for the schemas.
->
-> Hm, is this some new version of jsonschema perhaps?
-> We use empty values all over the place:
->
-> $ git grep 'enum-name:$' -- Documentation/netlink/specs/
-> Documentation/netlink/specs/ethtool.yaml:    enum-name:
-> Documentation/netlink/specs/fou.yaml:    enum-name:
-> Documentation/netlink/specs/ovs_datapath.yaml:    enum-name:
-> Documentation/netlink/specs/ovs_flow.yaml:    enum-name:
-> Documentation/netlink/specs/ovs_flow.yaml:    enum-name:
+Fixes: bb4f6bffe33c ("net: lan743x: Add PCI11010 / PCI11414 device IDs")
+Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+---
+ drivers/net/ethernet/microchip/lan743x_main.c | 17 +++++++++++++++++
+ drivers/net/ethernet/microchip/lan743x_main.h |  5 +++++
+ 2 files changed, 22 insertions(+)
 
-Ah, sorry I should have said that enum-name in definitions already had
-'type: [ string, "null" ]'. It was missing from enum-name in attribute
-sets and operations. It turns out that all the existing usage was for
-definitions.
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index 45e209a7d083..aec2d100ab87 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -3272,6 +3272,22 @@ static void lan743x_full_cleanup(struct lan743x_adapter *adapter)
+ 	lan743x_pci_cleanup(adapter);
+ }
+ 
++static int pci11x1x_set_rfe_rd_fifo_threshold(struct lan743x_adapter *adapter)
++{
++	u16 rev = adapter->csr.id_rev & ID_REV_CHIP_REV_MASK_;
++
++	if (rev == ID_REV_CHIP_REV_PCI11X1X_B0_) {
++		int misc_ctl;
++
++		misc_ctl = lan743x_csr_read(adapter, MISC_CTL_0);
++		misc_ctl &= ~MISC_CTL_0_RFE_READ_FIFO_MASK_;
++		misc_ctl |= (0x3 << MISC_CTL_0_RFE_READ_FIFO_SHIFT_);
++		lan743x_csr_write(adapter, MISC_CTL_0, misc_ctl);
++	}
++
++	return 0;
++}
++
+ static int lan743x_hardware_init(struct lan743x_adapter *adapter,
+ 				 struct pci_dev *pdev)
+ {
+@@ -3287,6 +3303,7 @@ static int lan743x_hardware_init(struct lan743x_adapter *adapter,
+ 		pci11x1x_strap_get_status(adapter);
+ 		spin_lock_init(&adapter->eth_syslock_spinlock);
+ 		mutex_init(&adapter->sgmii_rw_lock);
++		pci11x1x_set_rfe_rd_fifo_threshold(adapter);
+ 	} else {
+ 		adapter->max_tx_channels = LAN743X_MAX_TX_CHANNELS;
+ 		adapter->used_tx_channels = LAN743X_USED_TX_CHANNELS;
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
+index be79cb0ae5af..be0fe52e2ae1 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.h
++++ b/drivers/net/ethernet/microchip/lan743x_main.h
+@@ -26,6 +26,7 @@
+ #define ID_REV_CHIP_REV_MASK_		(0x0000FFFF)
+ #define ID_REV_CHIP_REV_A0_		(0x00000000)
+ #define ID_REV_CHIP_REV_B0_		(0x00000010)
++#define ID_REV_CHIP_REV_PCI11X1X_B0_	(0x000000B0)
+ 
+ #define FPGA_REV			(0x04)
+ #define FPGA_REV_GET_MINOR_(fpga_rev)	(((fpga_rev) >> 8) & 0x000000FF)
+@@ -311,6 +312,10 @@
+ #define SGMII_CTL_LINK_STATUS_SOURCE_	BIT(8)
+ #define SGMII_CTL_SGMII_POWER_DN_	BIT(1)
+ 
++#define MISC_CTL_0			(0x920)
++#define MISC_CTL_0_RFE_READ_FIFO_MASK_	GENMASK(6, 4)
++#define MISC_CTL_0_RFE_READ_FIFO_SHIFT_	(4)
++
+ /* Vendor Specific SGMII MMD details */
+ #define SR_VSMMD_PCS_ID1		0x0004
+ #define SR_VSMMD_PCS_ID2		0x0005
+-- 
+2.34.1
+
 
