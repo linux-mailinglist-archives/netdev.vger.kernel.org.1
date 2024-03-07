@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-78451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD4888752FD
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 16:19:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 386528752FE
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 16:19:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6169C1F23CB5
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 15:19:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4ED2E1C240A2
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 15:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B27F812F365;
-	Thu,  7 Mar 2024 15:19:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 037AE12F37C;
+	Thu,  7 Mar 2024 15:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YRu90bBu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gH2GygwX"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CE212EBEE
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 15:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE3B12F372
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 15:19:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709824741; cv=none; b=Wxg4AHTn/2CJrT5ZKyBVvs7XjDOPQKR1SzzaXewV1GujPbyrnmxUy03d0k06Ajokf8EhJJsFvCndXbzWf65SrE/SOVcqUlL5RVcQWrE63QNK52EeNFsdkms+BrhY4we6Hn7NonrawEQBFh5YD6TnGX7YhZt2ny+/6X0uMfsp2U8=
+	t=1709824743; cv=none; b=ZP4Cn/rQ33w569it0BIeB9l3Ch4xFFfBUifhHQaerlrzw7zmAjf6Jx74usRnZTFpY8ZCzQOEbIAooLWzPUDImU6YTJfV3YdYbcSA0HlK8DZMUzbw6D1eGyd04vqqU86J+cwm+w6WZw/t4YDEIQHH83+eNaIBsf9KOxM28S4O++M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709824741; c=relaxed/simple;
-	bh=eYbBcgQQpHaHj17bq7luIYk3vIVeQHh8Pm7j5u26JuE=;
+	s=arc-20240116; t=1709824743; c=relaxed/simple;
+	bh=sFGcwT4zSlXTAgrD64IPFUcwbdDcIM4g2pBbRPOSOvc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RmKWYyv94ZbwrkB/ZDraKAAs6vkvBO3Sfcnbhb+E5xgiImzeAYPwmK0qSwBQcBbd2E6g5mkDmwf94b5XxPvtlPndX7bPiw/+985BRO9jfdYRTXmb7JRwm0qfqlgEAUR7UUZhwLlYNVGfuIjYuwxrwVYsGO50d/s1dhhAXh5Gc38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YRu90bBu; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=kN4uNxAOy8deYMkZjCETJMEO0AOda8Aq82VUKAiefskw2IxuLUxDyVaVWl9xy30vauVqptskmCciJ9U3rlOBokUBJ3Ei7uiI/nyMuanOTXPlfY6GLZuJcgzSG5ZteP2cVJLWHsR9Pgw/e8P2FKpbgJYyXpBBdoQhsOclS0Bhk7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gH2GygwX; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709824738;
+	s=mimecast20190719; t=1709824741;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=m3QHk3gZDzu+lQdUT48rZodxOgOgf1lVBanw+R4FyF4=;
-	b=YRu90bBuGpiXf33ppRpCf+P67I+W+x0LfciZkYOWCM16zZHeIndIAYvVEgaLsGyTxR56BF
-	SwmXjCVYHwhIqc5fo5opr7vFRq2DzBojozEFeUdyAJoiS4a8NfRzHqfCFaKvZzt99Ffrlx
-	oUQZ1ajyY6Wehdgwkn+FLEbX5BdLKO8=
+	bh=tgWIo+01yUmFTfU9I51yM2BY83EjFcVmrwEVieX5L6k=;
+	b=gH2GygwXnTuyqFETcNPw8J7kY//YPj4FoppZuYJUTmrtXrpMshxCM2Qdxbj3v7QhP0gFe7
+	m3kmg8gGd6OnjJ/t+7wTD2kqMKwXHNnCzdVcGPGL0vmwKeT62rf2sGG34qg7bKOffwHxlA
+	WmDhBFsC8ZGrEkGYeY/iFdZSsHPZe8c=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-634-qx3w7DA5NSiU9Qemm0VdHQ-1; Thu,
- 07 Mar 2024 10:18:55 -0500
-X-MC-Unique: qx3w7DA5NSiU9Qemm0VdHQ-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-590-sam_km4wNbaX2iHTQBUDhg-1; Thu,
+ 07 Mar 2024 10:18:56 -0500
+X-MC-Unique: sam_km4wNbaX2iHTQBUDhg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B1BF93830092;
-	Thu,  7 Mar 2024 15:18:54 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 710EF29AB42E;
+	Thu,  7 Mar 2024 15:18:56 +0000 (UTC)
 Received: from antares.redhat.com (unknown [10.39.194.51])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3A4172166B33;
-	Thu,  7 Mar 2024 15:18:53 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id EF6A12166B33;
+	Thu,  7 Mar 2024 15:18:54 +0000 (UTC)
 From: Adrian Moreno <amorenoz@redhat.com>
 To: netdev@vger.kernel.org,
 	dev@openvswitch.org
@@ -65,9 +65,9 @@ Cc: Adrian Moreno <amorenoz@redhat.com>,
 	aconole@redhat.com,
 	echaudro@redhat.com,
 	horms@kernel.org
-Subject: [RFC PATCH 1/4] net:openvswitch: Support multicasting userspace ...
-Date: Thu,  7 Mar 2024 16:18:45 +0100
-Message-ID: <20240307151849.394962-2-amorenoz@redhat.com>
+Subject: [RFC PATCH 2/4] openvswitch:trace: Add ovs_dp_monitor tracepoint.
+Date: Thu,  7 Mar 2024 16:18:46 +0100
+Message-ID: <20240307151849.394962-3-amorenoz@redhat.com>
 In-Reply-To: <20240307151849.394962-1-amorenoz@redhat.com>
 References: <20240307151849.394962-1-amorenoz@redhat.com>
 Precedence: bulk
@@ -79,158 +79,128 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-actions.
+The existing dp_upcall tracepoint was intented to provide visibility on
+flow-misses (what we typically refer as upcalls). It's used to measure
+things like upcall latency.
 
-Some userspace actions, such as the ones derived from OFP_CONTROLLER
-action or slow path, have to be handled by ovs-vswitchd, so they are
-unicasted through the netlink socket that corresponds.
+However, if a monitoring userspace action (such as IPFIX) is
+multicasted, using the same tracepoint will only add confusion as
+ovs-vswithcd will not receive this upcall.
 
-However, some other userspace actions require little processing by
-ovs-vswitchd and their end consumer is typically some external entity.
-This is the case for IPFIX sampling which can provide very useful
-observability on the OVS datapath.
-
-Having these samples share the netlink socket and the userspace
-cpu time with flow misses can easily lead to higher latency and packet
-drops. This is clearly a price too high to pay for observability.
-
-In order to allow observability applications safely consume data that
-include OVN metadata, this patch makes the existing "ovs_packet"
-netlink family also contain a multicast group and adds a new attribute
-to the userspace action so that ovs-vswitchd can indicate that an
-action must be multicasted.
+In order to make things clearer, create a new tracepoint called
+"ovs_dp_monitor" and use it instead of the existing one for multicasted
+packets.
 
 Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 ---
- include/uapi/linux/openvswitch.h |  6 +++++-
- net/openvswitch/actions.c        |  5 +++++
- net/openvswitch/datapath.c       | 14 +++++++++++++-
- net/openvswitch/datapath.h       |  1 +
- net/openvswitch/flow_netlink.c   |  6 ++++--
- 5 files changed, 28 insertions(+), 4 deletions(-)
+ net/openvswitch/datapath.c          |  6 ++-
+ net/openvswitch/openvswitch_trace.h | 71 +++++++++++++++++++++++++++++
+ 2 files changed, 76 insertions(+), 1 deletion(-)
 
-diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
-index efc82c318fa2..77525a1c648a 100644
---- a/include/uapi/linux/openvswitch.h
-+++ b/include/uapi/linux/openvswitch.h
-@@ -144,6 +144,7 @@ struct ovs_vport_stats {
- /* Packet transfer. */
- 
- #define OVS_PACKET_FAMILY "ovs_packet"
-+#define OVS_PACKET_MCGROUP "ovs_packet"
- #define OVS_PACKET_VERSION 0x1
- 
- enum ovs_packet_cmd {
-@@ -678,7 +679,8 @@ struct sample_arg {
- /**
-  * enum ovs_userspace_attr - Attributes for %OVS_ACTION_ATTR_USERSPACE action.
-  * @OVS_USERSPACE_ATTR_PID: u32 Netlink PID to which the %OVS_PACKET_CMD_ACTION
-- * message should be sent.  Required.
-+ * message should be sent. If the PID is 0, the message will be sent to the
-+ * "ovs_packet" netlink multicast group. Required.
-  * @OVS_USERSPACE_ATTR_USERDATA: If present, its variable-length argument is
-  * copied to the %OVS_PACKET_CMD_ACTION message as %OVS_PACKET_ATTR_USERDATA.
-  * @OVS_USERSPACE_ATTR_EGRESS_TUN_PORT: If present, u32 output port to get
-@@ -692,6 +694,8 @@ enum ovs_userspace_attr {
- 	OVS_USERSPACE_ATTR_EGRESS_TUN_PORT,  /* Optional, u32 output port
- 					      * to get tunnel info. */
- 	OVS_USERSPACE_ATTR_ACTIONS,   /* Optional flag to get actions. */
-+	OVS_USERSPACE_ATTR_MCAST,     /* Optional flag to send the packet to
-+					 the "ovs_packet" multicast group. */
- 	__OVS_USERSPACE_ATTR_MAX
- };
- 
-diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index 6fcd7e2ca81f..c5774613faeb 100644
---- a/net/openvswitch/actions.c
-+++ b/net/openvswitch/actions.c
-@@ -1004,6 +1004,11 @@ static int output_userspace(struct datapath *dp, struct sk_buff *skb,
- 			break;
- 		}
- 
-+		case OVS_USERSPACE_ATTR_MCAST: {
-+			upcall.portid = MCAST_PID;
-+			break;
-+		}
-+
- 		} /* End of switch. */
- 	}
- 
 diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
-index 11c69415c605..15bad6f4b645 100644
+index 15bad6f4b645..5a2c0b3b4112 100644
 --- a/net/openvswitch/datapath.c
 +++ b/net/openvswitch/datapath.c
-@@ -70,6 +70,10 @@ static const struct genl_multicast_group ovs_dp_vport_multicast_group = {
- 	.name = OVS_VPORT_MCGROUP,
- };
+@@ -316,12 +316,16 @@ int ovs_dp_upcall(struct datapath *dp, struct sk_buff *skb,
+ 		  const struct dp_upcall_info *upcall_info,
+ 		  uint32_t cutlen)
+ {
++	const bool mcast = upcall_info->portid == MCAST_PID;
+ 	struct dp_stats_percpu *stats;
+ 	int err;
  
-+static const struct genl_multicast_group ovs_dp_packet_multicast_group = {
-+	.name = OVS_PACKET_MCGROUP,
-+};
+-	if (trace_ovs_dp_upcall_enabled())
++	if (!mcast && trace_ovs_dp_upcall_enabled())
+ 		trace_ovs_dp_upcall(dp, skb, key, upcall_info);
+ 
++	if (mcast && trace_ovs_dp_monitor_enabled())
++		trace_ovs_dp_monitor(dp, skb, key, upcall_info);
 +
- /* Check if need to build a reply message.
-  * OVS userspace sets the NLM_F_ECHO flag if it needs the reply. */
- static bool ovs_must_notify(struct genl_family *family, struct genl_info *info,
-@@ -577,7 +581,13 @@ static int queue_userspace_packet(struct datapath *dp, struct sk_buff *skb,
+ 	if (upcall_info->portid == 0) {
+ 		err = -ENOTCONN;
+ 		goto err;
+diff --git a/net/openvswitch/openvswitch_trace.h b/net/openvswitch/openvswitch_trace.h
+index 3eb35d9eb700..76e9612e3555 100644
+--- a/net/openvswitch/openvswitch_trace.h
++++ b/net/openvswitch/openvswitch_trace.h
+@@ -148,6 +148,77 @@ TRACE_EVENT(ovs_dp_upcall,
+ 		  __entry->upcall_mru)
+ );
  
- 	((struct nlmsghdr *) user_skb->data)->nlmsg_len = user_skb->len;
- 
--	err = genlmsg_unicast(ovs_dp_get_net(dp), user_skb, upcall_info->portid);
-+	if (upcall_info->portid == MCAST_PID)
-+		err = genlmsg_multicast_netns(&dp_packet_genl_family,
-+			ovs_dp_get_net(dp), user_skb, 0, 0, GFP_KERNEL);
-+	else
-+		err = genlmsg_unicast(ovs_dp_get_net(dp),
-+				      user_skb, upcall_info->portid);
++TRACE_EVENT(ovs_dp_monitor,
 +
- 	user_skb = NULL;
- out:
- 	if (err)
-@@ -717,6 +727,8 @@ static struct genl_family dp_packet_genl_family __ro_after_init = {
- 	.small_ops = dp_packet_genl_ops,
- 	.n_small_ops = ARRAY_SIZE(dp_packet_genl_ops),
- 	.resv_start_op = OVS_PACKET_CMD_EXECUTE + 1,
-+	.mcgrps = &ovs_dp_packet_multicast_group,
-+	.n_mcgrps = 1,
- 	.module = THIS_MODULE,
- };
++	TP_PROTO(struct datapath *dp, struct sk_buff *skb,
++		 const struct sw_flow_key *key,
++		 const struct dp_upcall_info *upcall_info),
++
++	TP_ARGS(dp, skb, key, upcall_info),
++
++	TP_STRUCT__entry(
++		__field(	void *,		dpaddr			)
++		__string(	dp_name,	ovs_dp_name(dp)		)
++		__string(	dev_name,	skb->dev->name		)
++		__field(	void *,		skbaddr			)
++		__field(	unsigned int,	len			)
++		__field(	unsigned int,	data_len		)
++		__field(	unsigned int,	truesize		)
++		__field(	u8,		nr_frags		)
++		__field(	u16,		gso_size		)
++		__field(	u16,		gso_type		)
++		__field(	u32,		ovs_flow_hash		)
++		__field(	u32,		recirc_id		)
++		__field(	const void *,	keyaddr			)
++		__field(	u16,		key_eth_type		)
++		__field(	u8,		key_ct_state		)
++		__field(	u8,		key_ct_orig_proto	)
++		__field(	u16,		key_ct_zone		)
++		__field(	unsigned int,	flow_key_valid		)
++		__field(	u32,		upcall_port		)
++		__field(	void *,		upcall_udata		)
++		__field(	u16,		upcall_ulen		)
++	),
++
++	TP_fast_assign(
++		__entry->dpaddr = dp;
++		__assign_str(dp_name, ovs_dp_name(dp));
++		__assign_str(dev_name, skb->dev->name);
++		__entry->skbaddr = skb;
++		__entry->len = skb->len;
++		__entry->data_len = skb->data_len;
++		__entry->truesize = skb->truesize;
++		__entry->nr_frags = skb_shinfo(skb)->nr_frags;
++		__entry->gso_size = skb_shinfo(skb)->gso_size;
++		__entry->gso_type = skb_shinfo(skb)->gso_type;
++		__entry->ovs_flow_hash = key->ovs_flow_hash;
++		__entry->recirc_id = key->recirc_id;
++		__entry->keyaddr = key;
++		__entry->key_eth_type = key->eth.type;
++		__entry->key_ct_state = key->ct_state;
++		__entry->key_ct_orig_proto = key->ct_orig_proto;
++		__entry->key_ct_zone = key->ct_zone;
++		__entry->flow_key_valid =  !(key->mac_proto & SW_FLOW_KEY_INVALID);
++		__entry->upcall_port = upcall_info->portid;
++		__entry->upcall_udata = upcall_info->userdata ?
++			nla_data(upcall_info->userdata): NULL;
++		__entry->upcall_ulen = upcall_info->userdata ?
++			nla_len(upcall_info->userdata): 0;
++	),
++
++	TP_printk("dpaddr=%p dp_name=%s dev=%s skbaddr=%p len=%u data_len=%u truesize=%u nr_frags=%d gso_size=%d gso_type=%#x ovs_flow_hash=0x%08x recirc_id=0x%08x keyaddr=%p eth_type=0x%04x ct_state=%02x ct_orig_proto=%02x ct_zone=%04x flow_key_valid=%d upcall_port=%u upcall_udata=%p upcall_ulen=%d",
++		  __entry->dpaddr, __get_str(dp_name), __get_str(dev_name),
++		  __entry->skbaddr, __entry->len, __entry->data_len,
++		  __entry->truesize, __entry->nr_frags, __entry->gso_size,
++		  __entry->gso_type, __entry->ovs_flow_hash,
++		  __entry->recirc_id, __entry->keyaddr, __entry->key_eth_type,
++		  __entry->key_ct_state, __entry->key_ct_orig_proto,
++		  __entry->key_ct_zone,
++		  __entry->flow_key_valid,
++		  __entry->upcall_port,
++		  __entry->upcall_udata, __entry->upcall_ulen)
++);
++
+ #endif /* _TRACE_OPENVSWITCH_H */
  
-diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath.h
-index 0cd29971a907..d0b1b8afafbb 100644
---- a/net/openvswitch/datapath.h
-+++ b/net/openvswitch/datapath.h
-@@ -124,6 +124,7 @@ struct ovs_skb_cb {
- };
- #define OVS_CB(skb) ((struct ovs_skb_cb *)(skb)->cb)
- 
-+#define MCAST_PID 0xFFFFFFFF
- /**
-  * struct dp_upcall - metadata to include with a packet to send to userspace
-  * @cmd: One of %OVS_PACKET_CMD_*.
-diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
-index ebc5728aab4e..4c95fa1aa15d 100644
---- a/net/openvswitch/flow_netlink.c
-+++ b/net/openvswitch/flow_netlink.c
-@@ -3043,6 +3043,8 @@ static int validate_userspace(const struct nlattr *attr)
- 		[OVS_USERSPACE_ATTR_PID] = {.type = NLA_U32 },
- 		[OVS_USERSPACE_ATTR_USERDATA] = {.type = NLA_UNSPEC },
- 		[OVS_USERSPACE_ATTR_EGRESS_TUN_PORT] = {.type = NLA_U32 },
-+		[OVS_USERSPACE_ATTR_ACTIONS] = {.type = NLA_FLAG },
-+		[OVS_USERSPACE_ATTR_MCAST] = {.type = NLA_FLAG },
- 	};
- 	struct nlattr *a[OVS_USERSPACE_ATTR_MAX + 1];
- 	int error;
-@@ -3052,8 +3054,8 @@ static int validate_userspace(const struct nlattr *attr)
- 	if (error)
- 		return error;
- 
--	if (!a[OVS_USERSPACE_ATTR_PID] ||
--	    !nla_get_u32(a[OVS_USERSPACE_ATTR_PID]))
-+	if (!a[OVS_USERSPACE_ATTR_MCAST] && (!a[OVS_USERSPACE_ATTR_PID] ||
-+	    !nla_get_u32(a[OVS_USERSPACE_ATTR_PID])))
- 		return -EINVAL;
- 
- 	return 0;
+ /* This part must be outside protection */
 -- 
 2.44.0
 
