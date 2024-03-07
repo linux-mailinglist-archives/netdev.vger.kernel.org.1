@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-78414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FDC7874FDB
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:22:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D15C7874FE4
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:24:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF52228389B
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 13:22:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 701D91F22C97
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 13:24:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D48912C553;
-	Thu,  7 Mar 2024 13:22:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE10912C80A;
+	Thu,  7 Mar 2024 13:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NS0qDYMY"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nblXYr5c"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0509A129A98;
-	Thu,  7 Mar 2024 13:22:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4069C12C7EA;
+	Thu,  7 Mar 2024 13:24:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709817726; cv=none; b=ndl2XnXnMczd09DEBS2G8zcTXojNIPd4JCMvRaRIDUMPPw/jv0cIrD64gtbMtpkK8fGWE1Gei9mIbDGtWckrqytq1pJekuHM0N721G2BkTsC1z5MH/JxBX7WK4S+LSrIAmYdE6fk8gtBBPWUGvThmMo2aXU9SbC9NWf3LctuH1Y=
+	t=1709817857; cv=none; b=gNQnk/BInLVg/u/Rp1rNw8AEm+fMj83XR3wf/6Dr/eDCSJWz+DvaDXI35sU3XHsWDHk1PRx5obCHgkCfZwkUvMdR+D8ny5R6Yu+LGszyN+lEbaqE8K1ubD4M+MHDMT1gsReOB9GhTsOOtKCO3Z/jsb5OQ7YyBHjN9cKMuT98M90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709817726; c=relaxed/simple;
-	bh=w2MkkM7a8PG5sSCI7iTEMgtD4tpClgb1lVwK2p69wa0=;
+	s=arc-20240116; t=1709817857; c=relaxed/simple;
+	bh=K5VjnAhLqgcIrKuBmbdYdluHgmQTNkIbBXmGWTbBaDM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gRopV+l9UhaFto6Fs+VsjY8tQC+5HMEBatY8l5QzO0Y4lJww0Y2GZ+iktO62VPc9RcFU2rKrPZX4grQtZo5fMGgykyo1WwNhrfw/GFz+cy+7WfhKnjBWRv1iOCjcWhX/W+yUEyDymVk6YL2rOcEMf4/CE2O+xS0oP49a44EjWz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NS0qDYMY; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=V1rOXdkZaWdR54teLRsHV3Z2zLdpBF3kg+RAhRlaQeG1vs1A65tgij8R9lzGxtv8/GXMQRBDvLC1EKnULBMyVnTxLZ0t0s28eOtz5QZHtcknp35XZdG2w4I2cwdkrjNJGJSCPsRUfCPxd7a1NbxpVMfF76FZKL7NHjT8o/3v04E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nblXYr5c; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=2adjiSztGzfYM9T4lx+mXU7akcr/eZ53zqRB/d3naCg=; b=NS0qDYMYyfSg/DYyBW0xzZV6ke
-	O5nAjui8RFwzJMoYUkx/9X+X1rylXwKUHbQF1h1POAX8BoZEODQnlVDeKWQo53ajra4vj97Rt7eXD
-	kqB4a0NOvWQdq1Ihs2tuNw9oVYkEBYLlVr9OiOjB7ZAFLQgYqRFd6cPn30NZWNi5m16M=;
+	bh=pUbIJXM5q/s25N6bZHP6NwQ+8ibrrNHeuJIIUXveGVM=; b=nblXYr5cqdijK1j9uYJ8V5aytH
+	Wm8KwgVeGS2NgSlv9HDNnpu701KVqvKW30l9Ctoz2sT2ZjU5zut5XIMreSzf24xTXuZADDCOjTcQG
+	mfsKOJJjDqtq0vksRCI7PmUsD9Jw7yQBtm2J+KwabRrrjrwDVBkPwOgC0qSQiQzsxpjc=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1riDhR-009aTZ-0R; Thu, 07 Mar 2024 14:22:17 +0100
-Date: Thu, 7 Mar 2024 14:22:16 +0100
+	id 1riDjg-009aVk-T9; Thu, 07 Mar 2024 14:24:36 +0100
+Date: Thu, 7 Mar 2024 14:24:36 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Parthiban.Veerasooran@microchip.com
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -57,13 +57,13 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
 	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
 	benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v3 03/12] net: ethernet: oa_tc6: implement
- register read operation
-Message-ID: <d2f254b9-7e7a-46ed-a979-00bdf92899ac@lunn.ch>
+Subject: Re: [PATCH net-next v3 04/12] net: ethernet: oa_tc6: implement
+ software reset
+Message-ID: <31a09423-276a-415b-a7b8-4aab04021a82@lunn.ch>
 References: <20240306085017.21731-1-Parthiban.Veerasooran@microchip.com>
- <20240306085017.21731-4-Parthiban.Veerasooran@microchip.com>
- <48b65759-6e69-46ef-a2ed-857d04eadac8@lunn.ch>
- <83e0b340-521e-4d60-90bb-92d2ca6f5abe@microchip.com>
+ <20240306085017.21731-5-Parthiban.Veerasooran@microchip.com>
+ <4e56f5c2-3d5c-4dda-8a37-01c1dbce27d7@lunn.ch>
+ <bff71d0b-49d0-4a4c-98c1-7df7056c4268@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,48 +72,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <83e0b340-521e-4d60-90bb-92d2ca6f5abe@microchip.com>
+In-Reply-To: <bff71d0b-49d0-4a4c-98c1-7df7056c4268@microchip.com>
 
-On Thu, Mar 07, 2024 at 07:04:20AM +0000, Parthiban.Veerasooran@microchip.com wrote:
-> Hi Andrew,
-> 
-> On 07/03/24 5:49 am, Andrew Lunn wrote:
-> > EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+> >> +static int oa_tc6_read_sw_reset_status(struct oa_tc6 *tc6)
+> >> +{
+> >> +     u32 regval;
+> >> +     int ret;
+> >> +
+> >> +     ret = oa_tc6_read_register(tc6, OA_TC6_REG_STATUS0, &regval);
+> >> +     if (ret)
+> >> +             return 0;
+> >> +
+> >> +     return regval;
 > > 
-> >>   enum oa_tc6_register_op {
-> >> +     OA_TC6_CTRL_REG_READ = 0,
-> >>        OA_TC6_CTRL_REG_WRITE = 1,
-> >>   };
-> > 
-> > I thought it looked a little odd when the enum was added in the
-> > previous patch with the first value of 1, and only one value. Now it
-> > makes more sense.
-> Ok.
-> > 
-> > The actual value appears to not matter? It is always
-> > 
-> >> +     if (reg_op == OA_TC6_CTRL_REG_WRITE)
-> > 
-> > So i would drop the numbering, and leave it to the compiler. The
-> > patches will then look less odd.
-> "drop the numbering", do you refer to this patch alone or previous patch 
-> also? If it is for this patch alone then it makes sense as they are 
-> going to be 0 and 1 anyway. But if we drop the numbering in the previous 
-> patch it will become 0 which will create an issue in the below line as 
-> it needs 1,
-> 
-> FIELD_PREP(OA_TC6_CTRL_HEADER_WRITE, reg_op)
+> > The function name does not really fit what the function does. The
+> > function returns OA_TC6_REG_STATUS0. I assume it has more bits in it
+> > than just STATUS0_RESETC. So either this function should be called
+> > oa_tc6_read_status0, or you should mask regval with STATUS0_RESETC, so
+> > that it does actually return the sw reset status.
+> Ok, as we do the masking in the calling function readx_poll_timeout, as 
+> you suggested I will change the function name as oa_tc6_read_status0 in 
+> the next version.
 
-That is why i asked: 
-
-> The actual value appears to not matter? It is always
-> 
-> +     if (reg_op == OA_TC6_CTRL_REG_WRITE)
-
-So the actual value does matter, so keep it in the previous patch.
-Does the value of OA_TC6_CTRL_REG_READ matter? Is it also used in
-FIELD_PREP etc? If not, taking away the = 0 will emphasise that 
-OA_TC6_CTRL_REG_WRITE has to be 1.
+O.K. And i think some of the later patches can them make use of this
+generic function.
 
 	Andrew
 
