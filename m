@@ -1,150 +1,179 @@
-Return-Path: <netdev+bounces-78366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02567874CCC
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:57:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DD43874CEC
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 12:03:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CB391F21C81
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:57:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C16471C20D66
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:03:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFFEC86AC5;
-	Thu,  7 Mar 2024 10:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF6D5126F39;
+	Thu,  7 Mar 2024 11:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Tr7xuXde"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SITmI/nl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3357B125DC;
-	Thu,  7 Mar 2024 10:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265CC126F3E;
+	Thu,  7 Mar 2024 11:03:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709809027; cv=none; b=X9ml+BxO846GxEtp0sZIIx1KTDOF0JeIKoiaToopa7dLFO4L1h6/IeKXNR+pbJij1c+aQjHeLSGsSdNRz7k5vDAVhgt9A/30fnl7RX+CkMGHSyGGd3b5dThqB5jUKZ7Be2HcA2UR3JuDVbHT3Vzf8BvNeOtn8yKLg2ClpIECqyw=
+	t=1709809405; cv=none; b=I/SULZjeXlp6zTVwOMMlEHZcq7CXueQnuZngYZ84YAeV+FvWW1y82Qxq5XqQGuPGfujxO2de//TT53d+Rm2FupYjNiX7tYFqEzS1+z/L7YvaupF832EcEcWgVUz1qlfKNdGFR+cqlNcgIqV9RQQ8gpqqFUc8wo4d0fb+cySvGtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709809027; c=relaxed/simple;
-	bh=WM12WLtYAz2cxFua0kfokyW2yT1caSiNtxTO/r91NvY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=S4t35sYIxy9oaMX4cDsMoHSO4SLPYaZOHDzRHvOTKOW+7Djoz33edfHKtMwA/2JDdZj7+wjL4h7p6i2sCjsitehlmhdhG1X6aKGtcYCqEmE/WuWAPQc33UGQzO85sKT0STxNz2D10Ra7ZQjJhm4OWmYH0jdt1J45m2nTA+3m83c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Tr7xuXde; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4275jbOD008239;
-	Thu, 7 Mar 2024 02:56:58 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=pfpt0220; bh=3BqF1EAT
-	OqrJt33ZWiXXxcwocmc1ljkbIFVDyslFIyU=; b=Tr7xuXdeg+rnUJzwKY9nMzXp
-	L4l3o8YQV7IG2E264x6uPkPy4RlOTaInL8BKtFxlwj3B+dzfRrHoymwjwryKFe8H
-	V9QesUG63+yYbRaYZCVaoxsWDuHRvKEvhw+nWu7j3YrXgGbtC3ecSKUXYfxOGafv
-	wPlic/edeUr+sDsjRSxGOknSERvbXdQLNfpETmCv9vi3Qq+ar8xGjCflCKvIdeDs
-	/UY3TR0kKpjV5hhZjUrBZXbhPeo8OAbSqUi3zS/bkCSSwooXpJsqKimtAFyFs7Lv
-	xiSmT/53srabsgrc7FTNJN2fhhTInhQVrue6XHyy/hIyHYeZAdUgHt1VqKtCBw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3wq7q8ruux-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Mar 2024 02:56:58 -0800 (PST)
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 7 Mar
- 2024 02:56:57 -0800
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH02.marvell.com (10.69.176.39) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Thu, 7 Mar 2024 02:56:36 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
- Transport; Thu, 7 Mar 2024 02:56:36 -0800
-Received: from hyd1425.marvell.com (unknown [10.29.37.83])
-	by maili.marvell.com (Postfix) with ESMTP id B17A03F7055;
-	Thu,  7 Mar 2024 02:56:32 -0800 (PST)
-From: Sai Krishna <saikrishnag@marvell.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <sgoutham@marvell.com>,
-        <lcherian@marvell.com>, <jerinj@marvell.com>, <gakula@marvell.com>,
-        <hkelam@marvell.com>, <sbhatta@marvell.com>
-CC: Sai Krishna <saikrishnag@marvell.com>
-Subject: [net PATCH] octeontx2-af: Fix devlink params
-Date: Thu, 7 Mar 2024 16:26:23 +0530
-Message-ID: <20240307105623.474757-1-saikrishnag@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1709809405; c=relaxed/simple;
+	bh=lr5QfvyeHSz2s2SXgcvZ/Nkd1rlA5CoPETZmIHJ4zzo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bUoRtlRaezLtEeCZvOOlkoqJPWCL/4crhPetClsN/CwwvpOgw7hxlcB7l36hsSi2xMQT33IZZ+BwRK50SUP9uPrtVdSOkM0pU5NVx3YkqjLVxJeQNBMUBl0Uwm+34jZbQtHpU3lW3I2+49sb0zSfC8vuleyNDNPHgdgjqS2wfVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SITmI/nl; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a458b6d9cfeso109923866b.2;
+        Thu, 07 Mar 2024 03:03:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709809402; x=1710414202; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5zhqtRAm8w6jqfP54KE1UneGc3bnJLKdcri76cg8nS4=;
+        b=SITmI/nltixrLpAzr3HHvrWtm43Fzm/X6N3FbkvGAR8Pcm48ZgBH1BDnEfOIK9P3w8
+         kD1Xq1TxXqcViulcNWsHu8uK4v9Ap3iMJHHNUSf4hPqN6cHCsJziiIzBe8SXtlhp8zyt
+         GPCB+8K6Q38d3loAOLT2O1PZi1WuVsMfrhw3+AJpeNz19rKNE7waxvQm91H8HZO7NebX
+         RWv2WWqYA2qw4I6gPvnnjBJEzvN6/jHy3UNjTqcIedl53mnLAIbo9llVn6HLefyvbYMd
+         C7ogKOz8E4k5wNHGTuBOM8oN4My0VjSUCKkIDlnVyOgNeiH1HMD4Sm91UkVxZfH0fhUo
+         L+WA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709809402; x=1710414202;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5zhqtRAm8w6jqfP54KE1UneGc3bnJLKdcri76cg8nS4=;
+        b=HLaqdJUTSvFb6RWegjJrEH2SWXmvnV9v7siDLBb1yJaDLniMwAkFUx16uDQOkZaVj/
+         RY8BhMoI6WPjroQ9i8XTcSCiJ7PUX7To0t2z1+wBzsmMXJe2ZfBstjc38aXwUfW6e+Y/
+         owqPq2DTli0XliFR3wYIxp5H88ev0RKWiKiGuk2R527Zo+kyaazidrVd919OHsGsiUIB
+         01R65UKRt/r+NuIk7Z8AqND867b53uFFdap76qVdBZy1jALLFhJX/SgTvOUahFqy64kn
+         MMoELgTubZnaLmz0c+v6GRkQZlHT/yG1JkGJtZzqmZ2k2Yw8XuqF6dudC5IL53L+J3TV
+         Z03g==
+X-Forwarded-Encrypted: i=1; AJvYcCUNpJSwWL3pImZcEpLCcFbpNA+vijMDB8Ondezufpu4reoJIXtxrkWrClNserq2C38FKVzFiF/z7YKquTI1fZwxPuc6swVAEhbFkZt7aQG8q9wkqVzMyy1QS7KYfB3iYzl9MXcFiJ3P
+X-Gm-Message-State: AOJu0YwmYws7cY/DxCOk7BWR1dQP5PbIHL9Bfn4Z+kmJmci4Gtg6SbOW
+	yEoqb3xLXwDCEsZFk4CED34arcGz5IFJhGf5OOXoS5RKJz3/V98p2/+QBcV5iOgm7Ky7lAtMKwr
+	aU4z2vBJKHG5yhDOLhEdZ/J+SgHc=
+X-Google-Smtp-Source: AGHT+IE0fk20Kh8J3ynUyep2F2vqvTqwcWjMKAgXoycbCjRgz8BgoTwdMq29vCKsbD2kpSvWKsa7ssggNbuAjlqT1H0=
+X-Received: by 2002:a17:906:135b:b0:a44:74f6:a004 with SMTP id
+ x27-20020a170906135b00b00a4474f6a004mr12377807ejb.26.1709809402188; Thu, 07
+ Mar 2024 03:03:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: ygj9CeR1aXefL178zpeNV2lhtwcXiihr
-X-Proofpoint-GUID: ygj9CeR1aXefL178zpeNV2lhtwcXiihr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-07_07,2024-03-06_01,2023-05-22_02
+References: <20240307090732.56708-1-kerneljasonxing@gmail.com> <20240307093310.GI4420@breakpoint.cc>
+In-Reply-To: <20240307093310.GI4420@breakpoint.cc>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 7 Mar 2024 19:02:45 +0800
+Message-ID: <CAL+tcoAPi+greENaD8X6Scc97Fnhiqa62eUSn+JS98kqY+VA6A@mail.gmail.com>
+Subject: Re: [PATCH net-next] netfilter: conntrack: avoid sending RST to reply
+ out-of-window skb
+To: Florian Westphal <fw@strlen.de>
+Cc: edumazet@google.com, pablo@netfilter.org, kadlec@netfilter.org, 
+	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Sunil Goutham <sgoutham@marvell.com>
+Hello Florian,
 
-Devlink param for adjusting NPC MCAM high zone
-area is in wrong param list and is not getting
-activated on CN10KA silicon.
-That patch fixes this issue.
+On Thu, Mar 7, 2024 at 5:33=E2=80=AFPM Florian Westphal <fw@strlen.de> wrot=
+e:
+>
+> Jason Xing <kerneljasonxing@gmail.com> wrote:
+> > client_ip:client_port <--> server_ip:b_port
+> >
+> > Then, some strange skbs from client or gateway, say, out-of-window
+> > skbs are sent to the server_ip:a_port (not b_port) due to DNAT
+> > clearing skb->_nfct value in nf_conntrack_in() function. Why?
+> > Because the tcp_in_window() considers the incoming skb as an
+> > invalid skb by returning NFCT_TCP_INVALID.
+>
+> So far everything is as intended.
+>
+> > I think, even we have set DNAT policy, it would be better if the
+> > whole process/behaviour adheres to the original TCP behaviour.
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> >  net/netfilter/nf_conntrack_proto_tcp.c | 6 ++----
+> >  1 file changed, 2 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/net/netfilter/nf_conntrack_proto_tcp.c b/net/netfilter/nf_=
+conntrack_proto_tcp.c
+> > index ae493599a3ef..3f3e620f3969 100644
+> > --- a/net/netfilter/nf_conntrack_proto_tcp.c
+> > +++ b/net/netfilter/nf_conntrack_proto_tcp.c
+> > @@ -1253,13 +1253,11 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
+> >       res =3D tcp_in_window(ct, dir, index,
+> >                           skb, dataoff, th, state);
+> >       switch (res) {
+> > -     case NFCT_TCP_IGNORE:
+> > -             spin_unlock_bh(&ct->lock);
+> > -             return NF_ACCEPT;
+> >       case NFCT_TCP_INVALID:
+> >               nf_tcp_handle_invalid(ct, dir, index, skb, state);
+> > +     case NFCT_TCP_IGNORE:
+> >               spin_unlock_bh(&ct->lock);
+> > -             return -NF_ACCEPT;
+> > +             return NF_ACCEPT;
+>
+> This looks wrong.  -NF_ACCEPT means 'pass packet, but its not part
+> of the connection' (packet will match --ctstate INVALID check).
+>
+> This change disables most of the tcp_in_window() test, this will
+> pretend everything is fine even though tcp_in_window says otherwise.
 
-Fixes: dd7842878633 ("octeontx2-af: Add new devlink param to configure maximum usable NIX block LFs")
-Signed-off-by: Sunil Goutham <sgoutham@marvell.com>
-Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
----
- .../marvell/octeontx2/af/rvu_devlink.c        | 20 +++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+Thanks for the information. It does make sense.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
-index 1e6fbd98423d..96c04f7d93f8 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
-@@ -1235,8 +1235,8 @@ static int rvu_af_dl_dwrr_mtu_get(struct devlink *devlink, u32 id,
- enum rvu_af_dl_param_id {
- 	RVU_AF_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
- 	RVU_AF_DEVLINK_PARAM_ID_DWRR_MTU,
--	RVU_AF_DEVLINK_PARAM_ID_NPC_EXACT_FEATURE_DISABLE,
- 	RVU_AF_DEVLINK_PARAM_ID_NPC_MCAM_ZONE_PERCENT,
-+	RVU_AF_DEVLINK_PARAM_ID_NPC_EXACT_FEATURE_DISABLE,
- 	RVU_AF_DEVLINK_PARAM_ID_NIX_MAXLF,
- };
- 
-@@ -1434,15 +1434,6 @@ static const struct devlink_param rvu_af_dl_params[] = {
- 			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
- 			     rvu_af_dl_dwrr_mtu_get, rvu_af_dl_dwrr_mtu_set,
- 			     rvu_af_dl_dwrr_mtu_validate),
--};
--
--static const struct devlink_param rvu_af_dl_param_exact_match[] = {
--	DEVLINK_PARAM_DRIVER(RVU_AF_DEVLINK_PARAM_ID_NPC_EXACT_FEATURE_DISABLE,
--			     "npc_exact_feature_disable", DEVLINK_PARAM_TYPE_STRING,
--			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
--			     rvu_af_npc_exact_feature_get,
--			     rvu_af_npc_exact_feature_disable,
--			     rvu_af_npc_exact_feature_validate),
- 	DEVLINK_PARAM_DRIVER(RVU_AF_DEVLINK_PARAM_ID_NPC_MCAM_ZONE_PERCENT,
- 			     "npc_mcam_high_zone_percent", DEVLINK_PARAM_TYPE_U8,
- 			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
-@@ -1457,6 +1448,15 @@ static const struct devlink_param rvu_af_dl_param_exact_match[] = {
- 			     rvu_af_dl_nix_maxlf_validate),
- };
- 
-+static const struct devlink_param rvu_af_dl_param_exact_match[] = {
-+	DEVLINK_PARAM_DRIVER(RVU_AF_DEVLINK_PARAM_ID_NPC_EXACT_FEATURE_DISABLE,
-+			     "npc_exact_feature_disable", DEVLINK_PARAM_TYPE_STRING,
-+			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
-+			     rvu_af_npc_exact_feature_get,
-+			     rvu_af_npc_exact_feature_disable,
-+			     rvu_af_npc_exact_feature_validate),
-+};
-+
- /* Devlink switch mode */
- static int rvu_devlink_eswitch_mode_get(struct devlink *devlink, u16 *mode)
- {
--- 
-2.25.1
+What I've done is quite similar to nf_conntrack_tcp_be_liberal sysctl
+knob which you also pointed out. It also pretends to ignore those
+out-of-window skbs.
 
+>
+> You could:
+>  - drop invalid tcp packets in input hook
+
+How about changing the return value only as below? Only two cases will
+be handled:
+
+diff --git a/net/netfilter/nf_conntrack_proto_tcp.c
+b/net/netfilter/nf_conntrack_proto_tcp.c
+index ae493599a3ef..c88ce4cd041e 100644
+--- a/net/netfilter/nf_conntrack_proto_tcp.c
++++ b/net/netfilter/nf_conntrack_proto_tcp.c
+@@ -1259,7 +1259,7 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
+        case NFCT_TCP_INVALID:
+                nf_tcp_handle_invalid(ct, dir, index, skb, state);
+                spin_unlock_bh(&ct->lock);
+-               return -NF_ACCEPT;
++               return -NF_DROP;
+        case NFCT_TCP_ACCEPT:
+                break;
+        }
+
+Then it will be dropped naturally in nf_hook_slow().
+
+>  - set nf_conntrack_tcp_be_liberal=3D1
+
+Sure, it can workaround this case, but I would like to refuse the
+out-of-window in netfilter or TCP layer as default instead of turning
+on this sysctl knob. If I understand wrong, please correct me.
+
+Thanks,
+Jason
+
+>
+> both will avoid this 'rst' issue.
 
