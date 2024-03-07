@@ -1,90 +1,103 @@
-Return-Path: <netdev+bounces-78201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E103C87453C
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 01:43:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3053C874580
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 02:07:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96BBC1F23C84
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:43:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE22A1F218BA
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 01:07:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC301849;
-	Thu,  7 Mar 2024 00:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hoTrwCOd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE521B947;
+	Thu,  7 Mar 2024 01:06:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C4B4C61;
-	Thu,  7 Mar 2024 00:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10134E554;
+	Thu,  7 Mar 2024 01:06:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709772220; cv=none; b=SlIyeStSi47nSQxe8laz5MBvaStGk9etTvMRZy2+T4teWQPgaCAlLnAaB429RUHrfAx+cXFOwZWnkaB+0+Sa6C9n+cR9nrXtKl+ClXhk2JSjui8Sg05kYw8GXAWuYJkiVcIex1eJvyVz4ffwSsBp9bwj9Dcf47iurVHN7POP3z4=
+	t=1709773584; cv=none; b=qY1T7gx6NlOvfqncx/0KkXblokHw3Px6AGjCOj1NIMEH3E8JRQzYKnpvkByqjPJV/8cwURmkF0C5x65YmrRF5wEb64wfp6KDlZmoANn7vmbiBSq66U2UVBFB16B234tkzJFO3d+Vn03HO8VM3QBFK+nJiFAe30P7Tckp7iS0MJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709772220; c=relaxed/simple;
-	bh=kICLgy5fS3zt0bLA8x8it0pE/DQMWVqNdsaAekk7NzI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sYSv2WmKlBVJN4Em3gom0wvMN7GUADMDHILpfDUI6l6XHkj528g9MoqXUoVCvdYgj0xtz1f+lsc63NKaiobacKyLQ/KLhmlbtXBsOOV2MwW+x2Bk4RaN4AIXqpCQqEDN0frlXwZbW1jy0+oNUvNZ8vak60l6Z61PnJQXqXIDovA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hoTrwCOd; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=wzCCuxsPBHXyXjRm5k2orXDzl3Uzi7tXXzCApNzY6Cs=; b=hoTrwCOdOWG9dzlrFUXg7GpQ2E
-	abQbgLeREA0rh6a2A4JZHI3yI9dyJtPUqiNfONa5MERXDSrnO3VUCwdsQOoYQE8i1AkGqlDPW9Xxz
-	BeInsjquEol0rJObi8PNjrDre/BAK7QmsBVfQsKAzQ1uQnHcr+aGyKFFRuBGaWaUGB6U=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ri1rX-009XnQ-IA; Thu, 07 Mar 2024 01:43:55 +0100
-Date: Thu, 7 Mar 2024 01:43:55 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
-	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, corbet@lwn.net,
-	linux-doc@vger.kernel.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
-	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
-	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
-	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
-	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
-	benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v3 05/12] net: ethernet: oa_tc6: implement error
- interrupts unmasking
-Message-ID: <ea217697-fdb8-4112-ae84-62f566cdc375@lunn.ch>
-References: <20240306085017.21731-1-Parthiban.Veerasooran@microchip.com>
- <20240306085017.21731-6-Parthiban.Veerasooran@microchip.com>
+	s=arc-20240116; t=1709773584; c=relaxed/simple;
+	bh=nlN01KDBSH4+Pka9XVMq7JUSeBb/MIozDu4QRGEyP1Q=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GWPviuffmdq/xfgzuMZFJxTz5XAMc5iLld3s1k7ZGgsTF9t26bkt6NUaS2CSmeKblqm+DMEI6JJwB0zZotsV+YGhV7waXjvz1rjvZ50N/NZGU3p8KVHGh0WjUkxDM0HPqpvWblOqDnQt4GFLps1yhoT1to+OFEG60y6c7Ny6wqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TqrfK0Rtzz1h1Gw;
+	Thu,  7 Mar 2024 09:03:53 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 831691402E0;
+	Thu,  7 Mar 2024 09:06:14 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.2) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 7 Mar 2024 09:06:13 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net 0/8] There are some bugfix for the HNS3 ethernet driver
+Date: Thu, 7 Mar 2024 09:01:07 +0800
+Message-ID: <20240307010115.3054770-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240306085017.21731-6-Parthiban.Veerasooran@microchip.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Wed, Mar 06, 2024 at 02:20:10PM +0530, Parthiban Veerasooran wrote:
-> This will unmask the following error interrupts from the MAC-PHY.
->   tx protocol error
->   rx buffer overflow error
->   loss of frame error
+There are some bugfix for the HNS3 ethernet driver
 
-The standard seems to call it "Loss of framing". To me as a network
-person, a frame is an L2 Ethernet packet. However, framing is
-something completely different, being able to synchronise a bitstream
-with some sort of markers, e.g. E1 to know where the 32 slots are.
+Hao Lan (2):
+  net: hns3: add new 200G link modes for hisilicon device
+  net: hns3: Disable SerDes serial loopback for HiLink H60
 
-In this context, we are not talking about packets, but the SPI bit
-stream. So it would be good to use framing, not frame.
+Jian Shen (1):
+  net: hns3: add checking for vf id of mailbox
 
-	Andrew
+Jie Wang (1):
+  net: hns3: fix port duplex configure error in IMP reset
+
+Jijie Shao (2):
+  net: hns3: fix wrong judgment condition issue
+  net: hns3: fix delete tc fail issue
+
+Peiyang Wang (1):
+  net: hns3: fix reset timeout under full functions and queues
+
+Yonglong Liu (1):
+  net: hns3: fix kernel crash when 1588 is received on HIP08 devices
+
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  2 +
+ .../hns3/hns3_common/hclge_comm_cmd.c         |  2 +-
+ .../hns3/hns3_common/hclge_comm_cmd.h         |  2 +-
+ .../net/ethernet/hisilicon/hns3/hns3_dcbnl.c  |  2 +-
+ .../ethernet/hisilicon/hns3/hns3_debugfs.c    |  2 +
+ .../hisilicon/hns3/hns3pf/hclge_cmd.h         |  3 +-
+ .../hisilicon/hns3/hns3pf/hclge_dcb.c         |  2 +
+ .../hisilicon/hns3/hns3pf/hclge_main.c        | 44 +++++++++++++------
+ .../hisilicon/hns3/hns3pf/hclge_main.h        | 11 ++++-
+ .../hisilicon/hns3/hns3pf/hclge_mbx.c         |  7 +--
+ .../hisilicon/hns3/hns3pf/hclge_ptp.c         |  2 +-
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_tm.c | 16 +++++++
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_tm.h |  1 +
+ 13 files changed, 74 insertions(+), 22 deletions(-)
+
+-- 
+2.30.0
+
 
