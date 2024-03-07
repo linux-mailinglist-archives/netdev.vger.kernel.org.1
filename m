@@ -1,289 +1,149 @@
-Return-Path: <netdev+bounces-78449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB70C8752CD
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 16:11:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 189CB875301
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 16:20:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F5D02861B6
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 15:11:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B859B22E86
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 15:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 244CE12EBCC;
-	Thu,  7 Mar 2024 15:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6012F12EBE0;
+	Thu,  7 Mar 2024 15:18:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g/7cIgNT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eKh3M309"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2479112DDBA;
-	Thu,  7 Mar 2024 15:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E3F3EA8A
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 15:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709824309; cv=none; b=TQfCBoZtILyBlm4xk79aI1hrQ77Hp4d1BSuMUayDZo5kDRf5IPu9TfpzyOov1ujJM08tlI9o8r0G8lEBXZ5TXceAwlBBHnxgs2Gziak59zvpkLjw5qCwS6kRqwOUd2HvmZBmrYuCAXk5ovTFSj2q0hS1H4ZOT3eBNvp0B7ujH3k=
+	t=1709824739; cv=none; b=MeXxVldt0L/dLDODqe39rFmWgjwoLAtP9y/tDhQYXx4Zzj5eFtbYfXzJrB87lzCXc3g8LrnQJTsRdp5UhZX0LWWRX2TGyEW4yzX0a0fSFWbB78cF5wcYgtMQk1yOAJaMN6lrIy6F4vtSHO+DGv0zDzjUOr8pRgZgN3V8huSl8yI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709824309; c=relaxed/simple;
-	bh=/jHvJYtv7vNkrPtTuZEtvpS9K5s7T5AM3JrNgTNncVg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rcGdgibt+MqteEswN7G4zTmk34Zl0zJH6Bd516e5ZRLbgT7r/vSmxzi/gToEZzMA64gKsLaqa1ed7M8HDXCSU0hHKSlYq9Pc2OXxu6nKPQZPhBdhI8Z+WhJhaEOTLnYH3MevfT8zNLhhNwQU+HThYyKxra5DjfgPeY6Py1ZaPAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g/7cIgNT; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a2f22bfb4e6so166135766b.0;
-        Thu, 07 Mar 2024 07:11:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709824305; x=1710429105; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HFJi3jo0LgevKIzk0+N4RWGbEKZ+VBjlFB4Rpe2um1Y=;
-        b=g/7cIgNTPjEiQYN2jWk9UFslSTUFiF9mTEDFqQyDyckvW0pRgK5p1j6SgMhzEFY/Wb
-         03/6TS1ji8915XBcGlt6tfPe01rz6KAfqhF7Ek6Rj4GsUAupdISVumojZy30nqfL5dm8
-         FAKX3FH9bmrIFuqIwYLXSZtujT84VFbXZP12xiyIQ/lmZ2daTFrglzCXSRD0M1YwySED
-         xdrWIwojLkI6D9uaEofuB7Gne+66SOHLNY1cduTPCA8c1UVbEwnQMzEnAweMnJw15Qsu
-         1YtXBhCIZidTKMilGkDSBbBhMfpSoceoEtIeEUo5f4+ITdab928Yk21uDyE7tWTazhoz
-         v1EQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709824305; x=1710429105;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HFJi3jo0LgevKIzk0+N4RWGbEKZ+VBjlFB4Rpe2um1Y=;
-        b=sGCZDCRFIHNRKCzEASXvaNag0bWYO42MlmQGi00YEzi4kkxgIsEPrkPd6kUiu8oHuR
-         t9PU7OmgeE6FtW1NgEh4TwsywGxRPH96PgrPXyjsXggKtbHTJi7/FNuW+41nVtKS2FJa
-         MJLQqwn6/e/2LwoUiXTV/gNv8G5oTHUXhwEHqSLn5QxWDr1CKSaNXbIqtN6/eyX+cN86
-         RQtXbEIS8BwzfSDUceyR/MbtAHrXPEXrMoFMBLly2lvMNwauYUZvdhOyL8/9bKuqhAhI
-         lweoHsIElrJpQGsjcyNSa8EcnT/fqhmo17KakbAtFFG00klwUTv3UFXolqVIxCpwg76J
-         gW6w==
-X-Forwarded-Encrypted: i=1; AJvYcCXGWqLw/vxdu+FfdVwHnDARsbd5tBeKCm63dpiULrvu7kuAGZ5NnwKGX+a0Ka4VyXBYmNnH6lP5JU7zwARizAIlU/gFpgmd+k4uiQaDOPF6mqiIsYvx0jxj7hna56Z2PTpM4Sv6ZYwD
-X-Gm-Message-State: AOJu0YziJ3bbm76NRDIFnuJeW+0jV+r3Ylw8q/KLUAQLv6ub3MQ9+y5Z
-	wrAZ5G2x5iz/PYpylm8n6ILKx2FzqTEFH6ygC847ZZ8YH9t6XlDOkvoYlHE6SwmL8WbPbQDfAkm
-	Edw1MSQsPgcqV/jIRE9NGv8VN4c4NoXn1thJOPA==
-X-Google-Smtp-Source: AGHT+IF7xUPTaqMWaCtoYEur0e4am8/rq8nUIvaHyTSFhNhujhIe+4bfxOINdjjJdij4uSn1K0q+IYWpT5FWcaLY7Y8=
-X-Received: by 2002:a17:906:3c13:b0:a44:2563:c5dd with SMTP id
- h19-20020a1709063c1300b00a442563c5ddmr12116103ejg.45.1709824305124; Thu, 07
- Mar 2024 07:11:45 -0800 (PST)
+	s=arc-20240116; t=1709824739; c=relaxed/simple;
+	bh=Mt4C1C+cniKS6/Ys3xXoGDF/0d72evyN3wdOXo+RvH8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GeSp5Lb8LT/p5T8uD3Tgl1WV9B0CKsoNDz9GVMBx6qeWg+nsnNVKkj9oZc2np9s7tsRW/uZCwBDMMZL1lBCDvjdFQbw0gK/pDyI9Cs9U6xCXn7M09BWxQ50j5VPncKkK9ro+AFgNT+3ifalG5kADD3ooYeNnwV8kVqTGq/uzurU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eKh3M309; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709824736;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0O4mtCGZglWTpIIXyB/w4rG5wVMIkjav10Yw4fgpp7E=;
+	b=eKh3M309u98xRCOMBU1aPWm58NGAr9FVLtnJtB5hLs6vpOZX14a3G6ZZEkuySebfDvQs6L
+	iEH8SlT6ntNENa5IYNawUL4DqvZX6X2O257RRXEiGyl53QKkqpenZAKp6In0PN/t1j+iGZ
+	WDFVEvjvD7Pw9qXvMloXxk8e0v1oGkU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-28-SFuYo9SJMfipAb__9ufRaQ-1; Thu, 07 Mar 2024 10:18:53 -0500
+X-MC-Unique: SFuYo9SJMfipAb__9ufRaQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EF6EB932D22;
+	Thu,  7 Mar 2024 15:18:52 +0000 (UTC)
+Received: from antares.redhat.com (unknown [10.39.194.51])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6D3E82166B33;
+	Thu,  7 Mar 2024 15:18:51 +0000 (UTC)
+From: Adrian Moreno <amorenoz@redhat.com>
+To: netdev@vger.kernel.org,
+	dev@openvswitch.org
+Cc: Adrian Moreno <amorenoz@redhat.com>,
+	cmi@nvidia.com,
+	yotam.gi@gmail.com,
+	i.maximets@ovn.org,
+	aconole@redhat.com,
+	echaudro@redhat.com,
+	horms@kernel.org
+Subject: [RFC PATCH 0/4] net: openvswitch: Add sample multicasting.
+Date: Thu,  7 Mar 2024 16:18:44 +0100
+Message-ID: <20240307151849.394962-1-amorenoz@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240307090732.56708-1-kerneljasonxing@gmail.com>
- <20240307093310.GI4420@breakpoint.cc> <CAL+tcoAPi+greENaD8X6Scc97Fnhiqa62eUSn+JS98kqY+VA6A@mail.gmail.com>
- <20240307120054.GK4420@breakpoint.cc> <CAL+tcoBqBaHxSU9NQqVxhRzzsaJr4=0=imtyCo4p8+DuXPL5AA@mail.gmail.com>
- <20240307141025.GL4420@breakpoint.cc>
-In-Reply-To: <20240307141025.GL4420@breakpoint.cc>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 7 Mar 2024 23:11:07 +0800
-Message-ID: <CAL+tcoDUyFU9wT8gzOcDqW7hWfR-7Sg8Tky9QsY_b05gP4uZ1Q@mail.gmail.com>
-Subject: Re: [PATCH net-next] netfilter: conntrack: avoid sending RST to reply
- out-of-window skb
-To: Florian Westphal <fw@strlen.de>
-Cc: edumazet@google.com, pablo@netfilter.org, kadlec@netfilter.org, 
-	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-On Thu, Mar 7, 2024 at 10:10=E2=80=AFPM Florian Westphal <fw@strlen.de> wro=
-te:
->
-> Jason Xing <kerneljasonxing@gmail.com> wrote:
-> > On Thu, Mar 7, 2024 at 8:00=E2=80=AFPM Florian Westphal <fw@strlen.de> =
-wrote:
-> > >
-> > > Jason Xing <kerneljasonxing@gmail.com> wrote:
-> > > > > This change disables most of the tcp_in_window() test, this will
-> > > > > pretend everything is fine even though tcp_in_window says otherwi=
-se.
-> > > >
-> > > > Thanks for the information. It does make sense.
-> > > >
-> > > > What I've done is quite similar to nf_conntrack_tcp_be_liberal sysc=
-tl
-> > > > knob which you also pointed out. It also pretends to ignore those
-> > > > out-of-window skbs.
-> > > >
-> > > > >
-> > > > > You could:
-> > > > >  - drop invalid tcp packets in input hook
-> > > >
-> > > > How about changing the return value only as below? Only two cases w=
-ill
-> > > > be handled:
-> > > >
-> > > > diff --git a/net/netfilter/nf_conntrack_proto_tcp.c
-> > > > b/net/netfilter/nf_conntrack_proto_tcp.c
-> > > > index ae493599a3ef..c88ce4cd041e 100644
-> > > > --- a/net/netfilter/nf_conntrack_proto_tcp.c
-> > > > +++ b/net/netfilter/nf_conntrack_proto_tcp.c
-> > > > @@ -1259,7 +1259,7 @@ int nf_conntrack_tcp_packet(struct nf_conn *c=
-t,
-> > > >         case NFCT_TCP_INVALID:
-> > > >                 nf_tcp_handle_invalid(ct, dir, index, skb, state);
-> > > >                 spin_unlock_bh(&ct->lock);
-> > > > -               return -NF_ACCEPT;
-> > > > +               return -NF_DROP;
-> > >
-> > > Lets not do this.  conntrack should never drop packets and defer to r=
-uleset
-> > > whereever possible.
-> >
-> > Hmm, sorry, it is against my understanding.
-> >
-> > If we cannot return -NF_DROP, why have we already added some 'return
-> > NF_DROP' in the nf_conntrack_handle_packet() function? And why does
-> > this test statement exist?
->
-> Sure we can drop.  But we should only do it if there is no better
-> alternative.
->
-> > nf_conntrack_in()
-> >   -> nf_conntrack_handle_packet()
-> >   -> if (ret <=3D 0) {
-> >          if (ret =3D=3D -NF_DROP) NF_CT_STAT_INC_ATOMIC(state->net, dro=
-p);
->
-> AFAICS this only happens when we receive syn for an existing conntrack
-> that is being removed already so we'd expect next syn to create a new
+** Background **
+Currently, OVS supports several packet sampling mechanisms (sFlow,
+per-bridge IPFIX, per-flow IPFIX). These end up being translated into a
+userspace action that needs to be handled by ovs-vswitchd's handler
+threads only to be forwarded to some third party application that
+will somehow process the sample and provide observability on the
+datapath.
 
-Sorry, I've double-checked this part and found out there is no chance
-to return '-NF_DROP' for nf_conntrack_handle_packet(). It might return
-'NF_DROP' (see link [1]) instead. The if-else statements seem like
-dead code.
+The fact that sampled traffic share netlink sockets and handler thread
+time with upcalls, apart from being a performance bottleneck in the
+sample extraction itself, can severely compromise the datapath,
+yielding this solution unfit for highly loaded production systems.
 
-[1]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tre=
-e/net/netfilter/nf_conntrack_proto_tcp.c#:~:text=3D%2DNF_REPEAT%3B-,return%=
-20NF_DROP%3B,-%7D%0A%09%09fallthrough%3B
+Users are left with little options other than guessing what sampling
+rate will be OK for their traffic pattern and system load and dealing
+with the lost accuracy.
 
-> connection.  Feel free to send patches that replace drop with -accept
-> where possible/where it makes sense, but I don't think the
-> TCP_CONNTRACK_SYN_SENT one can reasonably be avoided.
+** Proposal **
+In this RFC, I'd like to request feedback on an attempt to fix this
+situation by adding a flag to the userspace action to indicate the
+upcall should be sent to a netlink multicast group instead of unicasted
+to ovs-vswitchd.
 
-Oh, are you suggesting replacing NF_DROP with -NF_ACCEPT in
-nf_conntrack_dccp_packet()?
+This would allow for other processes to read samples directly, freeing
+the netlink sockets and handler threads to process packet upcalls.
 
-There are three points where nf_conntrack_handle_packet() returns NF_DROP:
-1) one (syn_sent case) exists in nf_conntrack_tcp_packet(). As you
-said, it's not necessary to change.
-2) another two exist in nf_conntrack_dccp_packet() which should be the
-same as nf_conntrack_tcp_packet() handles.
+** Notes on tc-offloading **
+I am aware of the efforts being made to offload the sample action with
+the help of psample.
+I did consider using psample to multicast the samples. However, I
+found a limitation that I'd like to discuss:
+I would like to support OVN-driven per-flow (IPFIX) sampling because
+it allows OVN to insert two 32-bit values (obs_domain_id and
+ovs_point_id) that can be used to enrich the sample with "high level"
+controller metadata (see debug_drop_domain_id NBDB option in ovn-nb(5)).
 
-The patch goes like this:
-diff --git a/net/netfilter/nf_conntrack_proto_dccp.c
-b/net/netfilter/nf_conntrack_proto_dccp.c
-index e2db1f4ec2df..ebc4f733bb2e 100644
---- a/net/netfilter/nf_conntrack_proto_dccp.c
-+++ b/net/netfilter/nf_conntrack_proto_dccp.c
-@@ -525,7 +525,7 @@ int nf_conntrack_dccp_packet(struct nf_conn *ct,
-struct sk_buff *skb,
+The existing fields in psample_metadata are not enough to carry this
+information. Would it be possible to extend this struct to make room for
+some extra "application-specific" metadata?
 
-        dh =3D skb_header_pointer(skb, dataoff, sizeof(*dh), &_dh.dh);
-        if (!dh)
--               return NF_DROP;
-+               return -NF_ACCEPT;
+** Alternatives **
+An alternative approach that I'm considering (apart from using psample
+as explained above) is to use a brand-new action. This lead to a cleaner
+separation of concerns with existing userspace action (used for slow
+paths and OFP_CONTROLLER actions) and cleaner statistics.
+Also, ovs-vswitchd could more easily make the layout of this
+new userdata part of the public API, allowing third party sample
+collectors to decode it.
 
-        if (dccp_error(dh, skb, dataoff, state))
-                return -NF_ACCEPT;
-@@ -533,7 +533,7 @@ int nf_conntrack_dccp_packet(struct nf_conn *ct,
-struct sk_buff *skb,
-        /* pull again, including possible 48 bit sequences and subtype head=
-er */
-        dh =3D dccp_header_pointer(skb, dataoff, dh, &_dh);
-        if (!dh)
--               return NF_DROP;
-+               return -NF_ACCEPT;
+I am currently exploring this alternative but wanted to send the RFC to
+get some early feedback, guidance or ideas.
 
-        type =3D dh->dccph_type;
-        if (!nf_ct_is_confirmed(ct) && !dccp_new(ct, skb, dh, state))
+Adrian Moreno (4):
+  net:openvswitch: Support multicasting userspace ...
+  openvswitch:trace: Add ovs_dp_monitor tracepoint.
+  net:openvswitch: Avoid extra copy if no listeners.
+  net:openvswitch: Add multicasted packets to stats
 
->
-> > My only purpose is not to let the TCP layer sending strange RST to the
-> > right flow.
->
-> AFAIU tcp layer is correct, no?  Out of the blue packet to some listener
-> socket?
+ include/uapi/linux/openvswitch.h    |  8 +++-
+ net/openvswitch/actions.c           |  5 ++
+ net/openvswitch/datapath.c          | 33 ++++++++++++--
+ net/openvswitch/datapath.h          |  1 +
+ net/openvswitch/flow_netlink.c      |  6 ++-
+ net/openvswitch/openvswitch_trace.h | 71 +++++++++++++++++++++++++++++
+ net/openvswitch/vport.c             |  8 ++++
+ net/openvswitch/vport.h             |  1 +
+ 8 files changed, 125 insertions(+), 8 deletions(-)
 
-Allow me to finish the full sentence: my only purpose is not to let
-the TCP layer send strange RST to the _established_ socket due to
-receiving strange out-of-window skbs.
+-- 
+2.44.0
 
->
-> > Besides, resorting to turning on nf_conntrack_tcp_be_liberal sysctl
-> > knob seems odd to me though it can workaround :S
->
-> I don't see a better alternative, other than -p tcp -m conntrack
-> --ctstate INVALID -j DROP rule, if you wish for tcp stack to not see
-> such packets.
->
-> > I would like to prevent sending such an RST as default behaviour.
->
-> I don't see a way to make this work out of the box, without possible
-> unwanted side effects.
->
-> MAYBE we could drop IFF we check that the conntrack entry candidate
-> that fails sequence validation has NAT translation applied to it, and
-> thus the '-NF_ACCEPT' packet won't be translated.
->
-> Not even compile tested:
->
-> diff --git a/net/netfilter/nf_conntrack_proto_tcp.c b/net/netfilter/nf_co=
-nntrack_proto_tcp.c
-> --- a/net/netfilter/nf_conntrack_proto_tcp.c
-> +++ b/net/netfilter/nf_conntrack_proto_tcp.c
-> @@ -1256,10 +1256,14 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
->         case NFCT_TCP_IGNORE:
->                 spin_unlock_bh(&ct->lock);
->                 return NF_ACCEPT;
-> -       case NFCT_TCP_INVALID:
-> +       case NFCT_TCP_INVALID: {
-> +               verdict =3D -NF_ACCEPT;
-> +               if (ct->status & IPS_NAT_MASK)
-> +                       res =3D NF_DROP; /* skb would miss nat transforma=
-tion */
-
-Above line, I guess, should be 'verdict =3D NF_DROP'? Then this skb
-would be dropped in nf_hook_slow() eventually and would not be passed
-to the TCP layer.
-
->                 nf_tcp_handle_invalid(ct, dir, index, skb, state);
->                 spin_unlock_bh(&ct->lock);
-> -               return -NF_ACCEPT;
-> +               return verdict;
-> +       }
->         case NFCT_TCP_ACCEPT:
->                 break;
->         }
-
-Great! I think your draft patch makes sense really, which takes NAT
-into consideration.
-
->
-> But I don't really see the advantage compared to doing drop decision in
-> iptables/nftables ruleset.
-
-From our views, especially to kernel developers, you're right: we
-could easily turn on that knob or add a drop policy to prevent it
-happening. Actually I did this in production to prevent such a case.
-It surely works.
-
-But from the views of normal users and those who do not understand how
-it works in the kernel, it looks strange: people may ask why we get
-some unknown RSTs in flight?
-
->
-> I also have a hunch that someone will eventually complain about this
-> change in behavior.
-
-Well, I still think the patch you suggested is proper and don't know
-why people could complain about it.
-
-Thanks for your patience :)
-
-Thanks,
-Jason
 
