@@ -1,253 +1,106 @@
-Return-Path: <netdev+bounces-78425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F40E8750FB
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:53:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40EFA875100
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:54:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3586528C7EB
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 13:53:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 725A01C23750
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 13:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6CC85F86B;
-	Thu,  7 Mar 2024 13:53:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="nUSUXMUI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BDEB12CDBA;
+	Thu,  7 Mar 2024 13:54:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6555912C7F2;
-	Thu,  7 Mar 2024 13:53:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A0B12B154;
+	Thu,  7 Mar 2024 13:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.237.72.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709819600; cv=none; b=P+21ZX9F4qTtqMsVSd4Z+qvQorVT/amrgfz05mbOWUK6AuFWDhyeqHf32PQWhyHToCoi7t+4n7tLFhLoFb9TBlJkmFoI51EM/nQGyMsgf6OE1440Th/2gyc618/KoB73nI2z3a9XlNlEjC9VZx/fhH48YWDsp8eaDoCJ/iUhFfQ=
+	t=1709819652; cv=none; b=Ij8o8yLOcjqtyjUPqDJrePcWFrDMV0w+xn2IZcPMe3s8x7yA/4K3Lv+K76yNY8d/tFE46HZK2xaqn8rQbHLX7a1noQlyOnD95FX42IraJnPoUsSwlCC2AXxK7C0mqEV9zof6SebWQ4IcrJxCCCDLyMmr26syWQC7fsgNF/6Gpg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709819600; c=relaxed/simple;
-	bh=gbfAZncSAe9yaExC15PNGrV33fDzMphCXQlhmNGOnb4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=scuq5Y+sAQbRDiefBXC2vyfxHLEcBi6ieeI2ob1ujMy3UJ26o4rtLA4igDvU2Ol/HbIJV6xL8pShbzEmJAESWRFtlqcrytf4qsjDs4alhEWUaKdgvjm7WHHGNIMQYXS/vjQOTkeu1NLHPhtz6pfCGtUaGZKn1ez8eve1HNwhdko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=nUSUXMUI; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1709819595; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=oVF3U97q4XEf0h3GuE808su/wdER1LzXjPWhGor+4X8=;
-	b=nUSUXMUIfGwdYmmKzwn1b36f5VOIgL5TswFz3kBJwwExdZMwY4crwtFXPYR1Eeqi1RQugi2buswNKP5Xk6t6Ki9QjhYxSJeSyFHHYc3jLd6nsj/ZT9+vAbpeadm5mXfZ+T4If+3M5e9qyVfSGux0B0/Oq13569o2iWh3aMelD4w=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0W2-l.zc_1709819593;
-Received: from 30.221.132.59(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W2-l.zc_1709819593)
-          by smtp.aliyun-inc.com;
-          Thu, 07 Mar 2024 21:53:14 +0800
-Message-ID: <a88a0731-6cbe-4987-b1e9-afa51f9ab057@linux.alibaba.com>
-Date: Thu, 7 Mar 2024 21:53:13 +0800
+	s=arc-20240116; t=1709819652; c=relaxed/simple;
+	bh=1rXdRG/mrYNFZsk4vvEvOgen0D6usXjQoOIkIJ9EU8A=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=CrFhvfS1URDBkuGrxyxIz5+1KNgQKu18JEZEGzNIggr6zcw4K1OzY2up3uZP4GKgHMwn2OsVtiytkit+oZlLTDgjAlFCxAaH7RdmUhK+cxzBf0clvD8YBPuc4SlLBJh+lwpIsQ5781jNp+IrA6hQcaeIgn/aAWqalU29Jewr9GQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=52.237.72.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from ubuntu.localdomain (unknown [106.117.76.127])
+	by mail-app4 (Coremail) with SMTP id cS_KCgCHHcPfxulloikAAA--.553S2;
+	Thu, 07 Mar 2024 21:53:44 +0800 (CST)
+From: Duoming Zhou <duoming@zju.edu.cn>
+To: linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	oss-drivers@corigine.com,
+	christophe.jaillet@wanadoo.fr,
+	horms@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	louis.peens@corigine.com,
+	Duoming Zhou <duoming@zju.edu.cn>
+Subject: [PATCH] nfp: flower: handle acti_netdevs allocation failure
+Date: Thu,  7 Mar 2024 21:53:35 +0800
+Message-Id: <20240307135335.19306-1-duoming@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cS_KCgCHHcPfxulloikAAA--.553S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tFy7Zw4DWr15tr4fCw1kuFg_yoW8GrWxpF
+	WDGFyUZa1kJw13ta1UJw4IgFyF9a4vqFyjgF1fAws5uF9Yq3ZrKrs5KFWUG3WYyrWrG3Wf
+	ZFWYva47WF1kG3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9a14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxV
+	W8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xf
+	McIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7
+	v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF
+	7I0E8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026x
+	CaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_
+	JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r
+	1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_
+	Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8Jr
+	UvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwINAWXou1MR+gA3s0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [lvc-project] [PATCH] [RFC] net: smc: fix fasync leak in
- smc_release()
-To: Dmitry Antipov <dmantipov@yandex.ru>,
- "wenjia@linux.ibm.com" <wenjia@linux.ibm.com>
-Cc: "lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
- "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "jaka@linux.ibm.com" <jaka@linux.ibm.com>
-References: <20240221051608.43241-1-dmantipov@yandex.ru>
- <819353f3-f5f9-4a15-96a1-4f3a7fd6b33e@linux.alibaba.com>
- <659c7821842fca97513624b713ced72ab970cdfc.camel@softline.com>
- <19d7d71b-c911-45cc-9671-235d98720be6@linux.alibaba.com>
- <380043fa-3208-4856-92b1-be9c87caeeb6@yandex.ru>
- <2c9c9ffe-13c4-44b8-982a-a3b4070b8a11@linux.alibaba.com>
- <35584a9f-f4c2-423a-8bb8-2c729cedb6fe@yandex.ru>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <35584a9f-f4c2-423a-8bb8-2c729cedb6fe@yandex.ru>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
+The kmalloc_array() in nfp_fl_lag_do_work() will return null, if
+the physical memory has run out. As a result, if we dereference
+the acti_netdevs, the null pointer dereference bugs will happen.
 
+This patch adds a check to judge whether allocation failure occurs.
+If it happens, the delayed work will be rescheduled and try again.
 
-On 2024/3/7 02:07, Dmitry Antipov wrote:
-> On 3/6/24 17:45, Wen Gu wrote:
-> 
->> IIUC, the fallback (or more precisely the private_data change) essentially
->> always happens when the lock_sock(smc->sk) is held, except in smc_listen_work()
->> or smc_listen_decline(), but at that moment, userspace program can not yet
->> acquire this new socket to add fasync entries to the fasync_list.
->>
->> So IMHO, the above patch should work, since it checks the private_data under
->> the lock_sock(sk). But if I missed something, please correct me.
-> 
-> Well, the whole picture is somewhat more complicated. Consider the
-> following diagram (an underlying kernel socket is in [], e.g. [smc->sk]):
-> 
-> Thread 0                        Thread 1
-> 
-> ioctl(sock, FIOASYNC, [1])
-> ...
-> sock = filp->private_data;
-> lock_sock(sock [smc->sk]);
-> sock_fasync(sock, ..., 1)       ; new fasync_struct linked to smc->sk
-> release_sock(sock [smc->sk]);
->                                  ...
->                                  lock_sock([smc->sk]);
->                                  ...
->                                  smc_switch_to_fallback()
->                                  ...
->                                  smc->clcsock->file->private_data = smc->clcsock;
->                                  ...
->                                  release_sock([smc->sk]);
-> ioctl(sock, FIOASYNC, [0])
-> ...
-> sock = filp->private_data;
-> lock_sock(sock [smc->clcsock]);
-> sock_fasync(sock, ..., 0)       ; nothing to unlink from smc->clcsock
->                                  ; since fasync entry was linked to smc->sk
-> release_sock(sock [smc->clcsock]);
+Fixes: bb9a8d031140 ("nfp: flower: monitor and offload LAG groups")
+Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
+---
+ drivers/net/ethernet/netronome/nfp/flower/lag_conf.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
+diff --git a/drivers/net/ethernet/netronome/nfp/flower/lag_conf.c b/drivers/net/ethernet/netronome/nfp/flower/lag_conf.c
+index 361d7c495e2..07759296c71 100644
+--- a/drivers/net/ethernet/netronome/nfp/flower/lag_conf.c
++++ b/drivers/net/ethernet/netronome/nfp/flower/lag_conf.c
+@@ -337,6 +337,13 @@ static void nfp_fl_lag_do_work(struct work_struct *work)
+ 
+ 		acti_netdevs = kmalloc_array(entry->slave_cnt,
+ 					     sizeof(*acti_netdevs), GFP_KERNEL);
++		if (!acti_netdevs) {
++			nfp_flower_cmsg_warn(priv->app,
++					     "memory allocate failed\n");
++			schedule_delayed_work(&lag->work,
++					      NFP_FL_LAG_DELAY);
++			continue;
++		}
+ 
+ 		/* Include sanity check in the loop. It may be that a bond has
+ 		 * changed between processing the last notification and the
+-- 
+2.17.1
 
-I don't understand why the fasync entry now can't be removed from
-clcsock->wq.fasync_list? since the fasync entry has been moved to
-clcsock->wq.fasync_list during fallback.
-
-The process you described above is:
-
-1) An fasync entry was added into smc->sk.sk_socket->wq.fasync_list;
-2) then fallback occurs, and the fasync entry is moved to clcsock->wq.fasync_list,
-    and file->private_data is changed to smc->clcsock;
-3) lastly we removed the fasync entry from clcsock->wq.fasync_list.
-
-
-It can be reproduced by follows, right?
-
-#include <signal.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <stdio.h>
-
-int main (int argc, char *argv[])
-{
-         struct msghdr msg = { 0 };
-         int sock;
-         int on;
-
-         sock = socket(AF_SMC, SOCK_STREAM, 0);
-
-         /* add fasync entry */
-         on = 1;
-         ioctl(sock, FIOASYNC, &on);
-
-         /* fallback */
-         sendmsg(sock, &msg, MSG_FASTOPEN);
-
-         /* remove fasync entry */
-         on = 0;
-         ioctl(sock, FIOASYNC, &on);
-
-         close(sock);
-         return 0;
-}
-
-and I added some prints in the kernel for quick debug:
-
-diff --git a/fs/fcntl.c b/fs/fcntl.c
-index c80a6acad742..79b8e435c380 100644
---- a/fs/fcntl.c
-+++ b/fs/fcntl.c
-@@ -880,6 +880,7 @@ int fasync_remove_entry(struct file *filp, struct fasync_struct **fapp)
-                 call_rcu(&fa->fa_rcu, fasync_free_rcu);
-                 filp->f_flags &= ~FASYNC;
-                 result = 1;
-+               pr_warn("%s: wq->fasync_list %pK, fasync entry %pK\n", __func__, &(*fapp), fa);
-                 break;
-         }
-         spin_unlock(&fasync_lock);
-@@ -932,6 +933,7 @@ struct fasync_struct *fasync_insert_entry(int fd, struct file *filp, struct fasy
-         new->fa_next = *fapp;
-         rcu_assign_pointer(*fapp, new);
-         filp->f_flags |= FASYNC;
-+       pr_warn("%s: wq->fasync_list %pK, fasync entry %pK\n", __func__, &(*fapp), new);
-
-  out:
-         spin_unlock(&fasync_lock);
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 4b52b3b159c0..3b9737d42dbd 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -925,6 +925,9 @@ static int smc_switch_to_fallback(struct smc_sock *smc, int reason_code)
-                 smc->clcsock->wq.fasync_list =
-                         smc->sk.sk_socket->wq.fasync_list;
-                 smc->sk.sk_socket->wq.fasync_list = NULL;
-+               pr_warn("%s: smc->sk wq.fasync_list %pK, clcsock->wq.fasync_list %pK\n",
-+                       __func__, &smc->sk.sk_socket->wq.fasync_list,
-+                       &smc->clcsock->wq.fasync_list);
-
-                 /* There might be some wait entries remaining
-                  * in smc sk->sk_wq and they should be woken up
-
-
-
-ran the reproducer, and dmesg shows:
-
-[] fasync_insert_entry: wq->fasync_list ffff96fdc0425e98, fasync entry ffff96fdccc62690
-[] smc: smc_switch_to_fallback: smc->sk wq.fasync_list ffff96fdc0425e98, clcsock->wq.fasync_list ffff96fdc0426ed8
-[] fasync_remove_entry: wq->fasync_list ffff96fdc0426ed8, fasync entry ffff96fdccc62690
-
-It shows that
-1. an fasync entry ffff96fdccc62690 is added into ffff96fdc0425e98 (smc->sk wq.fasync_list)
-2. then fallback, all the fasync entris in smc->sk wq.fasync_list will be moved to clcsock->wq.fasync_list.
-3. then the fasync entry ffff96fdccc62690 (the one in #1) is removed from ffff96fdc0426ed8 (clcsock->wq.fasync_list)
-
-What's wrong with this?
-
-
-
-
-In fact, I think what does cause this leak (maybe one of causes) is the race
-I discribed through the diagram in
-https://lore.kernel.org/netdev/19d7d71b-c911-45cc-9671-235d98720be6@linux.alibaba.com/
-
-1) sock_fasync() got the filp->private_data->wq (that is smc->sk.sk_socket->wq)
-    and record it in 'wq';
-2) meanwhile, fallback occurs and filp->private_data changed, and from now on,
-    user can only operate the clcsock based on file->private_data;
-3) (race here) and sock_fasync() keep going and add an entry to 'wq'->fasync_list
-    (that is smc->sk.sk_socket->wq); This fasync entry is the one that we can't
-    removed later, since we start to operate clcsock after fallback.
-
-
-Thanks!
-
->                                  ...
->                                  close(sock [smc->clcsock]);
->                                  __fput(...);
->                                  file->f_op->fasync(sock, [0])   ; always failed -
->                                                                  ; should use
->                                                                  ; smc->sk instead
->                                  file->f_op->release()
->                                     ...
->                                     smc_restore_fallback_changes()
->                                     ...
->                                     file->private_data = smc->sk.sk_socket;
-> 
-> That is, smc_restore_fallback_changes() restores filp->private_data to
-> smc->sk. If __fput() would have called file->f_op->release() _before_
-> file->f_op->fasync(), the fix would be as simple as adding
-> 
-> smc->sk.sk_socket->wq.fasync_list = smc->clcsock->wq.fasync_list;
-> 
-> to smc_restore_fallback_changes(). But since file->f_op->fasync() is called
-> before file->f_op->release(), the former always makes an attempt to unlink fasync
-> entry from smc->clcsock instead of smc->sk, thus introducing the memory leak.
-> 
-> And an idea with shared wait queue was intended in attempt to eliminate
-> this chicken-egg lookalike problem completely.
-> 
-> Dmitry
 
