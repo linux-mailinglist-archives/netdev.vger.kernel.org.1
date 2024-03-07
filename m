@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-78280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08DE58749EE
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:43:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62ABE8749EF
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:43:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73FC2B20B4D
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:43:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E56F61F231AC
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:43:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AAFC82D99;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC057839E3;
 	Thu,  7 Mar 2024 08:42:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K4vRsHht"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bilUYYII"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD1582D91
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 08:42:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B7882D9F
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 08:42:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709800961; cv=none; b=iLaG4gjU+L9W6XJGTKP+J4413Ca3vWXhEWb2WRSriVL/IVXkBHVuQojqBvqvzyTMSMMhhOLd8gTS3XDukAYoy77KdzvviiT/sGvwooQNWtGBBFyYVwMMarfL4aSb2N8ZdARF0Nkz421J/zjqnjYeIDGi0A6fiQKDwkMPiquWKTA=
+	t=1709800961; cv=none; b=CXbEMY75ypbHwt85FFXb0Un2GpgAxqyH445DsNMV/mkHLV17Y9GZCqPB1MXmdDFz1NOKbLXbma134sYjhaz4JZwvm4sdIdmwRFkSa1tb7TZ05Sgjf3vJO+Ben1uB+7teHsrSzKK315g5e6i+ACuABXx4Tm9xIY8o95ZIVoAOO9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709800961; c=relaxed/simple;
-	bh=TLEaEnGee89sHH+/0uCJ3U/3sxpd3f66tUfmBkzfMYY=;
+	bh=4OfjKWFH98qyfHCXLFFiqMv66xTHYql8fDysOK3Md48=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rpQbaa622XC9H+rW5cg+PGeujWA0bri4GG/6J8SW7bQE6jjijNIemx/nYG3sLWpAUjKh8O1NzJ30/V2ftWraJ7VxN+Y0x5mVniCDcQxydBCS8AOpzfoRDROJhdJRA3pdjPQzXSw6gSIfxX0nYTPykg8uahIPQwzfiw8h48JVmv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K4vRsHht; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A1A7C433C7;
-	Thu,  7 Mar 2024 08:42:40 +0000 (UTC)
+	 MIME-Version; b=Ox5E0lf5t9pXNnyQlh9f+MgMDTbWWH+604d8Kn1NXhTDxATidB7kbjYXWjmpSd2Z1WD/75ULpjTpErGn8leSKkm6iCAYrmYQtWbu3eeg5D/zMHIbuOIz0kDoDssBuOFOM/wYs1WdrTr4MX7xS2jqM1tlG4UFdtlQ626taasIW/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bilUYYII; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EC34C43601;
+	Thu,  7 Mar 2024 08:42:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709800960;
-	bh=TLEaEnGee89sHH+/0uCJ3U/3sxpd3f66tUfmBkzfMYY=;
+	s=k20201202; t=1709800961;
+	bh=4OfjKWFH98qyfHCXLFFiqMv66xTHYql8fDysOK3Md48=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=K4vRsHhtfUl+Y+Vs7vuZMBlnlqkqUsCCz55vDI2RjrOutNRchxls4ROfJjQCdJC7y
-	 zALWB8To6MNsILtf7pKLyJLDTf9OM5qFyUSaAEv4HU9UfkchJNZGGru13SacSkaYxg
-	 GhSp+6M/v0ozjNSOMux/ZGAzzPZEsfmtVeypjKiOds1wtdJ7bwC3md6gW4gO5Z44K5
-	 rOrAbB6HR1dA/Mjev1ZvHR7FvktmWhLBKwe+e0n26mGUZ9Qly57mGr68cUtGmae+fy
-	 7D8mtj8foj/7JeDI5pNGykeNvKG9l8R9wNR+Lj/Rv3rtGjaTu020rzTRCf2FI8U489
-	 EtEpgZUj62Zlg==
+	b=bilUYYIIuf/ZHJQBioHveQ/Vc5t6973mTO5LD7TkzaEcNLZvREHsxWsVqbOUkrBpi
+	 FMgOgjlBftwgF60qG6d4XZ1gR/f76Miw+vg6QsPSEyn8+hmIZXN+P3DGwyy8cU6fvb
+	 7rMUbBmjJ9QuH4+oo7gTue6+SB+NEI4dnbckgTvrVxEapEYKrBGutVxL9m0+l3IoJV
+	 Vx7+s/386Nib9gfREMAgpqp6g/3uIZl7sX1webKWDUsDLpSaNVmZJ55KgEqT2K9uFK
+	 sWO20iFNKUMGqnrGAMpgxIUFiSGmVy6zxyJi+QYazU654fDmBbQdcRResFyUPBjUnU
+	 /6Ezp0UXI8hXQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -51,9 +51,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>
-Subject: [net-next V6 04/15] net/mlx5: SD, Implement devcom communication and primary election
-Date: Thu,  7 Mar 2024 00:42:18 -0800
-Message-ID: <20240307084229.500776-5-saeed@kernel.org>
+Subject: [net-next V6 05/15] net/mlx5: SD, Implement steering for primary and secondaries
+Date: Thu,  7 Mar 2024 00:42:19 -0800
+Message-ID: <20240307084229.500776-6-saeed@kernel.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240307084229.500776-1-saeed@kernel.org>
 References: <20240307084229.500776-1-saeed@kernel.org>
@@ -67,210 +67,276 @@ Content-Transfer-Encoding: 8bit
 
 From: Tariq Toukan <tariqt@nvidia.com>
 
-Use devcom to communicate between the different devices. Add a new
-devcom component type for this.
+Implement the needed SD steering adjustments for the primary and
+secondaries.
 
-Each device registers itself to the devcom component <SD, group ID>.
-Once all devices of a component are registered, the component becomes
-ready, and a primary device is elected.
+While the SD multiple PFs are used to avoid cross-numa memory, when it
+comes to chip level all traffic goes only through the primary device.
+The secondaries are forced to silent mode, to guarantee they are not
+involved in any unexpected ingress/egress traffic.
 
-In principle, any of the devices can act as a primary, they are all
-capable, and a random election would've worked. However, we aim to
-achieve predictability and consistency, hence each group always choses
-the same device, with the lowest PCI BUS number, as primary.
+In RX, secondary devices will not have steering objects. Traffic will be
+steered from the primary device to the RQs of a secondary device using
+advanced cross-vhca RX steering capabilities.
+
+In TX, the primary creates a new TX flow table, which is aliased by the
+secondaries.
 
 Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../ethernet/mellanox/mlx5/core/lib/devcom.h  |   1 +
- .../net/ethernet/mellanox/mlx5/core/lib/sd.c  | 122 +++++++++++++++++-
- 2 files changed, 121 insertions(+), 2 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/lib/sd.c  | 185 +++++++++++++++++-
+ 1 file changed, 184 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/devcom.h b/drivers/net/ethernet/mellanox/mlx5/core/lib/devcom.h
-index ec32b686f586..d58032dd0df7 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/devcom.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/devcom.h
-@@ -10,6 +10,7 @@ enum mlx5_devcom_component {
- 	MLX5_DEVCOM_ESW_OFFLOADS,
- 	MLX5_DEVCOM_MPV,
- 	MLX5_DEVCOM_HCA_PORTS,
-+	MLX5_DEVCOM_SD_GROUP,
- 	MLX5_DEVCOM_NUM_COMPONENTS,
- };
- 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
-index b1f86549af1c..3059a3750f82 100644
+index 3059a3750f82..76c2426c2498 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
-@@ -14,6 +14,16 @@
- struct mlx5_sd {
- 	u32 group_id;
- 	u8 host_buses;
-+	struct mlx5_devcom_comp_dev *devcom;
-+	bool primary;
-+	union {
-+		struct { /* primary */
-+			struct mlx5_core_dev *secondaries[MLX5_SD_MAX_GROUP_SZ - 1];
-+		};
-+		struct { /* secondary */
-+			struct mlx5_core_dev *primary_dev;
-+		};
-+	};
- };
+@@ -4,6 +4,7 @@
+ #include "lib/sd.h"
+ #include "mlx5_core.h"
+ #include "lib/mlx5.h"
++#include "fs_cmd.h"
+ #include <linux/mlx5/vport.h>
  
- static int mlx5_sd_get_host_buses(struct mlx5_core_dev *dev)
-@@ -26,13 +36,29 @@ static int mlx5_sd_get_host_buses(struct mlx5_core_dev *dev)
- 	return sd->host_buses;
+ #define sd_info(__dev, format, ...) \
+@@ -19,9 +20,11 @@ struct mlx5_sd {
+ 	union {
+ 		struct { /* primary */
+ 			struct mlx5_core_dev *secondaries[MLX5_SD_MAX_GROUP_SZ - 1];
++			struct mlx5_flow_table *tx_ft;
+ 		};
+ 		struct { /* secondary */
+ 			struct mlx5_core_dev *primary_dev;
++			u32 alias_obj_id;
+ 		};
+ 	};
+ };
+@@ -78,6 +81,21 @@ struct mlx5_core_dev *mlx5_sd_ch_ix_get_dev(struct mlx5_core_dev *primary, int c
+ 	return mlx5_sd_primary_get_peer(primary, mdev_idx);
  }
  
-+static struct mlx5_core_dev *mlx5_sd_get_primary(struct mlx5_core_dev *dev)
++static bool ft_create_alias_supported(struct mlx5_core_dev *dev)
 +{
-+	struct mlx5_sd *sd = mlx5_get_sd(dev);
++	u64 obj_allowed = MLX5_CAP_GEN_2_64(dev, allowed_object_for_other_vhca_access);
++	u32 obj_supp = MLX5_CAP_GEN_2(dev, cross_vhca_object_to_object_supported);
 +
-+	if (!sd)
-+		return dev;
++	if (!(obj_supp &
++	    MLX5_CROSS_VHCA_OBJ_TO_OBJ_SUPPORTED_LOCAL_FLOW_TABLE_ROOT_TO_REMOTE_FLOW_TABLE))
++		return false;
 +
-+	return sd->primary ? dev : sd->primary_dev;
++	if (!(obj_allowed & MLX5_ALLOWED_OBJ_FOR_OTHER_VHCA_ACCESS_FLOW_TABLE))
++		return false;
++
++	return true;
 +}
 +
- struct mlx5_core_dev *
- mlx5_sd_primary_get_peer(struct mlx5_core_dev *primary, int idx)
+ static bool mlx5_sd_is_supported(struct mlx5_core_dev *dev, u8 host_buses)
  {
-+	struct mlx5_sd *sd;
-+
- 	if (idx == 0)
- 		return primary;
+ 	/* Feature is currently implemented for PFs only */
+@@ -88,6 +106,24 @@ static bool mlx5_sd_is_supported(struct mlx5_core_dev *dev, u8 host_buses)
+ 	if (host_buses > MLX5_SD_MAX_GROUP_SZ)
+ 		return false;
  
--	return NULL;
-+	if (idx >= mlx5_sd_get_host_buses(primary))
-+		return NULL;
++	/* Disconnect secondaries from the network */
++	if (!MLX5_CAP_GEN(dev, eswitch_manager))
++		return false;
++	if (!MLX5_CAP_GEN(dev, silent_mode))
++		return false;
 +
-+	sd = mlx5_get_sd(primary);
-+	return sd->secondaries[idx - 1];
++	/* RX steering from primary to secondaries */
++	if (!MLX5_CAP_GEN(dev, cross_vhca_rqt))
++		return false;
++	if (host_buses > MLX5_CAP_GEN_2(dev, max_rqt_vhca_id))
++		return false;
++
++	/* TX steering from secondaries to primary */
++	if (!ft_create_alias_supported(dev))
++		return false;
++	if (!MLX5_CAP_FLOWTABLE_NIC_TX(dev, reset_root_to_default))
++		return false;
++
+ 	return true;
  }
  
- int mlx5_sd_ch_ix_get_dev_ix(struct mlx5_core_dev *dev, int ch_ix)
-@@ -139,15 +165,93 @@ static void sd_cleanup(struct mlx5_core_dev *dev)
- 	kfree(sd);
+@@ -230,10 +266,122 @@ static void sd_unregister(struct mlx5_core_dev *dev)
+ 	mlx5_devcom_unregister_component(sd->devcom);
  }
  
-+static int sd_register(struct mlx5_core_dev *dev)
++static int sd_cmd_set_primary(struct mlx5_core_dev *primary, u8 *alias_key)
 +{
-+	struct mlx5_devcom_comp_dev *devcom, *pos;
-+	struct mlx5_core_dev *peer, *primary;
-+	struct mlx5_sd *sd, *primary_sd;
-+	int err, i;
++	struct mlx5_cmd_allow_other_vhca_access_attr allow_attr = {};
++	struct mlx5_sd *sd = mlx5_get_sd(primary);
++	struct mlx5_flow_table_attr ft_attr = {};
++	struct mlx5_flow_namespace *nic_ns;
++	struct mlx5_flow_table *ft;
++	int err;
 +
-+	sd = mlx5_get_sd(dev);
-+	devcom = mlx5_devcom_register_component(dev->priv.devc, MLX5_DEVCOM_SD_GROUP,
-+						sd->group_id, NULL, dev);
-+	if (!devcom)
-+		return -ENOMEM;
++	nic_ns = mlx5_get_flow_namespace(primary, MLX5_FLOW_NAMESPACE_EGRESS);
++	if (!nic_ns)
++		return -EOPNOTSUPP;
 +
-+	sd->devcom = devcom;
++	ft = mlx5_create_flow_table(nic_ns, &ft_attr);
++	if (IS_ERR(ft)) {
++		err = PTR_ERR(ft);
++		return err;
++	}
++	sd->tx_ft = ft;
++	memcpy(allow_attr.access_key, alias_key, ACCESS_KEY_LEN);
++	allow_attr.obj_type = MLX5_GENERAL_OBJECT_TYPES_FLOW_TABLE_ALIAS;
++	allow_attr.obj_id = (ft->type << FT_ID_FT_TYPE_OFFSET) | ft->id;
 +
-+	if (mlx5_devcom_comp_get_size(devcom) != sd->host_buses)
-+		return 0;
-+
-+	mlx5_devcom_comp_lock(devcom);
-+	mlx5_devcom_comp_set_ready(devcom, true);
-+	mlx5_devcom_comp_unlock(devcom);
-+
-+	if (!mlx5_devcom_for_each_peer_begin(devcom)) {
-+		err = -ENODEV;
-+		goto err_devcom_unreg;
++	err = mlx5_cmd_allow_other_vhca_access(primary, &allow_attr);
++	if (err) {
++		mlx5_core_err(primary, "Failed to allow other vhca access err=%d\n",
++			      err);
++		mlx5_destroy_flow_table(ft);
++		return err;
 +	}
 +
-+	primary = dev;
-+	mlx5_devcom_for_each_peer_entry(devcom, peer, pos)
-+		if (peer->pdev->bus->number < primary->pdev->bus->number)
-+			primary = peer;
++	return 0;
++}
 +
-+	primary_sd = mlx5_get_sd(primary);
-+	primary_sd->primary = true;
-+	i = 0;
-+	/* loop the secondaries */
-+	mlx5_devcom_for_each_peer_entry(primary_sd->devcom, peer, pos) {
-+		struct mlx5_sd *peer_sd = mlx5_get_sd(peer);
++static void sd_cmd_unset_primary(struct mlx5_core_dev *primary)
++{
++	struct mlx5_sd *sd = mlx5_get_sd(primary);
 +
-+		primary_sd->secondaries[i++] = peer;
-+		peer_sd->primary = false;
-+		peer_sd->primary_dev = primary;
++	mlx5_destroy_flow_table(sd->tx_ft);
++}
++
++static int sd_secondary_create_alias_ft(struct mlx5_core_dev *secondary,
++					struct mlx5_core_dev *primary,
++					struct mlx5_flow_table *ft,
++					u32 *obj_id, u8 *alias_key)
++{
++	u32 aliased_object_id = (ft->type << FT_ID_FT_TYPE_OFFSET) | ft->id;
++	u16 vhca_id_to_be_accessed = MLX5_CAP_GEN(primary, vhca_id);
++	struct mlx5_cmd_alias_obj_create_attr alias_attr = {};
++	int ret;
++
++	memcpy(alias_attr.access_key, alias_key, ACCESS_KEY_LEN);
++	alias_attr.obj_id = aliased_object_id;
++	alias_attr.obj_type = MLX5_GENERAL_OBJECT_TYPES_FLOW_TABLE_ALIAS;
++	alias_attr.vhca_id = vhca_id_to_be_accessed;
++	ret = mlx5_cmd_alias_obj_create(secondary, &alias_attr, obj_id);
++	if (ret) {
++		mlx5_core_err(secondary, "Failed to create alias object err=%d\n",
++			      ret);
++		return ret;
 +	}
 +
-+	mlx5_devcom_for_each_peer_end(devcom);
++	return 0;
++}
++
++static void sd_secondary_destroy_alias_ft(struct mlx5_core_dev *secondary)
++{
++	struct mlx5_sd *sd = mlx5_get_sd(secondary);
++
++	mlx5_cmd_alias_obj_destroy(secondary, sd->alias_obj_id,
++				   MLX5_GENERAL_OBJECT_TYPES_FLOW_TABLE_ALIAS);
++}
++
++static int sd_cmd_set_secondary(struct mlx5_core_dev *secondary,
++				struct mlx5_core_dev *primary,
++				u8 *alias_key)
++{
++	struct mlx5_sd *primary_sd = mlx5_get_sd(primary);
++	struct mlx5_sd *sd = mlx5_get_sd(secondary);
++	int err;
++
++	err = mlx5_fs_cmd_set_l2table_entry_silent(secondary, 1);
++	if (err)
++		return err;
++
++	err = sd_secondary_create_alias_ft(secondary, primary, primary_sd->tx_ft,
++					   &sd->alias_obj_id, alias_key);
++	if (err)
++		goto err_unset_silent;
++
++	err = mlx5_fs_cmd_set_tx_flow_table_root(secondary, sd->alias_obj_id, false);
++	if (err)
++		goto err_destroy_alias_ft;
++
 +	return 0;
 +
-+err_devcom_unreg:
-+	mlx5_devcom_comp_lock(sd->devcom);
-+	mlx5_devcom_comp_set_ready(sd->devcom, false);
-+	mlx5_devcom_comp_unlock(sd->devcom);
-+	mlx5_devcom_unregister_component(sd->devcom);
++err_destroy_alias_ft:
++	sd_secondary_destroy_alias_ft(secondary);
++err_unset_silent:
++	mlx5_fs_cmd_set_l2table_entry_silent(secondary, 0);
 +	return err;
 +}
 +
-+static void sd_unregister(struct mlx5_core_dev *dev)
++static void sd_cmd_unset_secondary(struct mlx5_core_dev *secondary)
 +{
-+	struct mlx5_sd *sd = mlx5_get_sd(dev);
-+
-+	mlx5_devcom_comp_lock(sd->devcom);
-+	mlx5_devcom_comp_set_ready(sd->devcom, false);
-+	mlx5_devcom_comp_unlock(sd->devcom);
-+	mlx5_devcom_unregister_component(sd->devcom);
++	mlx5_fs_cmd_set_tx_flow_table_root(secondary, 0, true);
++	sd_secondary_destroy_alias_ft(secondary);
++	mlx5_fs_cmd_set_l2table_entry_silent(secondary, 0);
 +}
 +
  int mlx5_sd_init(struct mlx5_core_dev *dev)
  {
-+	struct mlx5_sd *sd = mlx5_get_sd(dev);
- 	int err;
++	struct mlx5_core_dev *primary, *pos, *to;
+ 	struct mlx5_sd *sd = mlx5_get_sd(dev);
+-	int err;
++	u8 alias_key[ACCESS_KEY_LEN];
++	int err, i;
  
  	err = sd_init(dev);
  	if (err)
- 		return err;
+@@ -247,8 +395,33 @@ int mlx5_sd_init(struct mlx5_core_dev *dev)
+ 	if (err)
+ 		goto err_sd_cleanup;
  
-+	sd = mlx5_get_sd(dev);
-+	if (!sd)
++	if (!mlx5_devcom_comp_is_ready(sd->devcom))
 +		return 0;
 +
-+	err = sd_register(dev);
++	primary = mlx5_sd_get_primary(dev);
++
++	for (i = 0; i < ACCESS_KEY_LEN; i++)
++		alias_key[i] = get_random_u8();
++
++	err = sd_cmd_set_primary(primary, alias_key);
 +	if (err)
-+		goto err_sd_cleanup;
++		goto err_sd_unregister;
++
++	mlx5_sd_for_each_secondary(i, primary, pos) {
++		err = sd_cmd_set_secondary(pos, primary, alias_key);
++		if (err)
++			goto err_unset_secondaries;
++	}
 +
  	return 0;
-+
-+err_sd_cleanup:
-+	sd_cleanup(dev);
-+	return err;
- }
  
++err_unset_secondaries:
++	to = pos;
++	mlx5_sd_for_each_secondary_to(i, primary, to, pos)
++		sd_cmd_unset_secondary(pos);
++	sd_cmd_unset_primary(primary);
++err_sd_unregister:
++	sd_unregister(dev);
+ err_sd_cleanup:
+ 	sd_cleanup(dev);
+ 	return err;
+@@ -257,10 +430,20 @@ int mlx5_sd_init(struct mlx5_core_dev *dev)
  void mlx5_sd_cleanup(struct mlx5_core_dev *dev)
-@@ -157,6 +261,7 @@ void mlx5_sd_cleanup(struct mlx5_core_dev *dev)
+ {
+ 	struct mlx5_sd *sd = mlx5_get_sd(dev);
++	struct mlx5_core_dev *primary, *pos;
++	int i;
+ 
  	if (!sd)
  		return;
  
-+	sd_unregister(dev);
- 	sd_cleanup(dev);
- }
- 
-@@ -164,5 +269,18 @@ struct auxiliary_device *mlx5_sd_get_adev(struct mlx5_core_dev *dev,
- 					  struct auxiliary_device *adev,
- 					  int idx)
- {
--	return adev;
-+	struct mlx5_sd *sd = mlx5_get_sd(dev);
-+	struct mlx5_core_dev *primary;
-+
-+	if (!sd)
-+		return adev;
-+
 +	if (!mlx5_devcom_comp_is_ready(sd->devcom))
-+		return NULL;
++		goto out;
 +
 +	primary = mlx5_sd_get_primary(dev);
-+	if (dev == primary)
-+		return adev;
-+
-+	return &primary->priv.adev[idx]->adev;
++	mlx5_sd_for_each_secondary(i, primary, pos)
++		sd_cmd_unset_secondary(pos);
++	sd_cmd_unset_primary(primary);
++out:
+ 	sd_unregister(dev);
+ 	sd_cleanup(dev);
  }
 -- 
 2.44.0
