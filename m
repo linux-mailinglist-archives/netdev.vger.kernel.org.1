@@ -1,210 +1,182 @@
-Return-Path: <netdev+bounces-78481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE638875483
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:50:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A39B48754A9
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 17:53:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A22E1F2331A
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 16:50:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36EEF1F2323C
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 16:53:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39FBE12F5AD;
-	Thu,  7 Mar 2024 16:50:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V1osucTv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B895B12FB0D;
+	Thu,  7 Mar 2024 16:53:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1CD1DA37;
-	Thu,  7 Mar 2024 16:50:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80DF312F398
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 16:53:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709830223; cv=none; b=dHyqSierylRWk5Y7/Li1MujvYJZ6Fhtg22QpqLOSIMiKTI+6a246Mt4OcCRj+zN2SXA+eoM9lvMU1bbj+YaKz5TlGydRlf82jeGhcKfBykp3wBhDyUOpeaoaK1ONl5RV9FJo3RAG6nIFtDTf5nviIFQtvZbX8vcBHQEuxXJePDo=
+	t=1709830431; cv=none; b=eVfoSjWx9VxyqFpFfTTTNlmIlGZLsqArwg3K1kFIT75Cy+T14N3tylepd70Qwbhpt4OJa7Liu3ATZc6PQKdB57ig4zcbuPzBKqyt2UUgrYizLfLqQnVXe75e7KJPaGrctvVM+0kn9YsyC2gr0X61NHPF55ZK+YUbes5nlim/BQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709830223; c=relaxed/simple;
-	bh=lHR56V/CodyEaIm3onpnKKQD1mT9eLVoJRYt25cfX0c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SJCjGoDssDE1+DGneOUPtadTr5uHss+W7ZVfkl7d/rBKYCoL0YlPlVA+5x1miFcjkaQmRkdjVFQhh0qfIyDQnq7ANFPdixf4FQpHbDquOtVjv7MM8mFUogefHvR8bYa6wdhsMTNvvU3sqd+CTuKintY9Pa9KeTFVvQKwIczVbqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V1osucTv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13502C43394;
-	Thu,  7 Mar 2024 16:50:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709830222;
-	bh=lHR56V/CodyEaIm3onpnKKQD1mT9eLVoJRYt25cfX0c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=V1osucTvjHURTZv3n8pEZmmxRSeo0uSxeoLhilH3IQFKra8aTlTsuH4yc5w1jhEsE
-	 4Fx0FbXpwnh4fsj44LzocdqbU65ryv+cDwg+KwpvYFaQxzJ2KfUXfxgjyaX2QAvXnm
-	 MW5aW3l0xHbVvZHnm/MvhRhN3oeLQJtxhr+AXwFbizyimKLX//7zQympipZIUFRQ+t
-	 hLt4Fn7m1w2HX1kMyOhL+Bkk35WqsHN/u2gfoF+YlcsNwkAVjHF1+pU1l0Gyagv23M
-	 /B9CykPDnYhlzsPt5bzZNsKu1qlb4YHYFUlmEdV5rYY7uTvliMZxsHWmlOxBK5qe5L
-	 SdICx32Zr8NOA==
-Date: Thu, 7 Mar 2024 08:50:21 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason
- Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux.dev, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Tariq Toukan <tariqt@nvidia.com>,
- Michael Chan <michael.chan@broadcom.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Shannon Nelson <shannon.nelson@amd.com>
-Subject: Re: [PATCH net-next v3 3/6] virtio_net: support device stats
-Message-ID: <20240307085021.1081777d@kernel.org>
-In-Reply-To: <20240227080303.63894-4-xuanzhuo@linux.alibaba.com>
-References: <20240227080303.63894-1-xuanzhuo@linux.alibaba.com>
-	<20240227080303.63894-4-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1709830431; c=relaxed/simple;
+	bh=ZIpC9uyp6tNEYhIVrsUT/RV13rX6lIEXbzIsxIFisDg=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=WeCrvof2xKkpcrnbFiciRZy27GOufMopwmrDzaF7kbnRKSWWyZPYRd3oMs6XwdZ+sgP1Pt8i3Uxo0b3u/SfkT6DhgsJkzy+cSLcGSvRIkh10HyDqp7IUYctpT5W+2vS0KAsIQEGM0fNQa3SNwffQqfrKDQCCZKwA1Updx8B3ZsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9EE381BF20A;
+	Thu,  7 Mar 2024 16:53:38 +0000 (UTC)
+Message-ID: <4dcf82da-c6ad-47c1-8308-3f87820aeb1b@ovn.org>
+Date: Thu, 7 Mar 2024 17:54:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Cc: i.maximets@ovn.org, cmi@nvidia.com, yotam.gi@gmail.com,
+ aconole@redhat.com, echaudro@redhat.com, horms@kernel.org
+Subject: Re: [RFC PATCH 0/4] net: openvswitch: Add sample multicasting.
+Content-Language: en-US
+To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org,
+ dev@openvswitch.org
+References: <20240307151849.394962-1-amorenoz@redhat.com>
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <20240307151849.394962-1-amorenoz@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GND-Sasl: i.maximets@ovn.org
 
-CC: Willem and some driver folks for more input, context: extending
-https://lore.kernel.org/all/20240306195509.1502746-1-kuba@kernel.org/
-to cover virtio stats.
+On 3/7/24 16:18, Adrian Moreno wrote:
+> ** Background **
+> Currently, OVS supports several packet sampling mechanisms (sFlow,
+> per-bridge IPFIX, per-flow IPFIX). These end up being translated into a
+> userspace action that needs to be handled by ovs-vswitchd's handler
+> threads only to be forwarded to some third party application that
+> will somehow process the sample and provide observability on the
+> datapath.
+> 
+> The fact that sampled traffic share netlink sockets and handler thread
+> time with upcalls, apart from being a performance bottleneck in the
+> sample extraction itself, can severely compromise the datapath,
+> yielding this solution unfit for highly loaded production systems.
+> 
+> Users are left with little options other than guessing what sampling
+> rate will be OK for their traffic pattern and system load and dealing
+> with the lost accuracy.
+> 
+> ** Proposal **
+> In this RFC, I'd like to request feedback on an attempt to fix this
+> situation by adding a flag to the userspace action to indicate the
+> upcall should be sent to a netlink multicast group instead of unicasted
+> to ovs-vswitchd.
+> 
+> This would allow for other processes to read samples directly, freeing
+> the netlink sockets and handler threads to process packet upcalls.
+> 
+> ** Notes on tc-offloading **
+> I am aware of the efforts being made to offload the sample action with
+> the help of psample.
+> I did consider using psample to multicast the samples. However, I
+> found a limitation that I'd like to discuss:
+> I would like to support OVN-driven per-flow (IPFIX) sampling because
+> it allows OVN to insert two 32-bit values (obs_domain_id and
+> ovs_point_id) that can be used to enrich the sample with "high level"
+> controller metadata (see debug_drop_domain_id NBDB option in ovn-nb(5)).
+> 
+> The existing fields in psample_metadata are not enough to carry this
+> information. Would it be possible to extend this struct to make room for
+> some extra "application-specific" metadata?
+> 
+> ** Alternatives **
+> An alternative approach that I'm considering (apart from using psample
+> as explained above) is to use a brand-new action. This lead to a cleaner
+> separation of concerns with existing userspace action (used for slow
+> paths and OFP_CONTROLLER actions) and cleaner statistics.
+> Also, ovs-vswitchd could more easily make the layout of this
+> new userdata part of the public API, allowing third party sample
+> collectors to decode it.
+> 
+> I am currently exploring this alternative but wanted to send the RFC to
+> get some early feedback, guidance or ideas.
 
-On Tue, 27 Feb 2024 16:03:00 +0800 Xuan Zhuo wrote:
-> +static const struct virtnet_stat_desc virtnet_stats_rx_basic_desc[] = {
-> +	VIRTNET_STATS_DESC(rx, basic, packets),
-> +	VIRTNET_STATS_DESC(rx, basic, bytes),
 
-Covered.
+Hi, Adrian.  Thanks for the patches!
 
-> +	VIRTNET_STATS_DESC(rx, basic, notifications),
-> +	VIRTNET_STATS_DESC(rx, basic, interrupts),
+Though I'm not sure if broadcasting is generally the best approach.
+These messages contain opaque information that is not actually
+parsable by any other entity than a process that created the action.
+And I don't think the structure of these opaque fields should become
+part of uAPI in neither kernel nor OVS in userspace.
 
-I haven't seen HW devices count interrupts coming from a specific
-queue (there's usually a lot more queues than IRQs these days),
-let's keep these in ethtool -S for now, unless someone has a HW use
-case.
+The userspace() action already has a OVS_USERSPACE_ATTR_PID argument.
+And it is not actually used when OVS_DP_F_DISPATCH_UPCALL_PER_CPU is
+enabled.  All known users of OVS_DP_F_DISPATCH_UPCALL_PER_CPU are
+setting the OVS_USERSPACE_ATTR_PID to UINT32_MAX, which is not a pid
+that kernel could generate.
 
-> +	VIRTNET_STATS_DESC(rx, basic, drops),
-> +	VIRTNET_STATS_DESC(rx, basic, drop_overruns),
+So, with a minimal and pretty much backward compatible change in
+output_userspace() function, we can honor OVS_USERSPACE_ATTR_PID if
+it's not U32_MAX.  This way userspace process can open a separate
+socket and configure sampling to redirect all packets there while
+normal MISS upcalls would still arrive to per-cpu sockets.  This
+should cover the performance concern.
 
-These are important, but we need to make sure we have a good definition
-for vendors to follow...
+For the case without per-cpu dispatch, the feature comes for free
+if userspace application wants to use it.  However, there is no
+currently supported version of OVS that doesn't use per-cpu dispatch
+when available.
 
-drops I'd define as "sum of all packets which came into the device, but
-never left it, including but not limited to: packets dropped due to
-lack of buffer space, processing errors, explicitly set policies and
-packet filters." 
-Call it hw-rx-drops ?
+What do you think?
 
-overruns is a bit harder to precisely define. I was thinking of
-something more broad, like: "packets dropped due to transient lack of
-resources, such as buffer space, host descriptors etc."
-
-For context why not just go with virtio spec definition of "no
-descriptors" - for HW devices, what exact point in the pipeline drops
-depends on how back pressure is configured/implemented, and fetching
-descriptors is high latency, so differentiating between "PCIe is slow"
-and "host didn't post descriptors" is hard in practice.
-Call it hw-rx-drop-overruns ?
-
-> +static const struct virtnet_stat_desc virtnet_stats_tx_basic_desc[] = {
-> +	VIRTNET_STATS_DESC(tx, basic, packets),
-> +	VIRTNET_STATS_DESC(tx, basic, bytes),
-> +
-> +	VIRTNET_STATS_DESC(tx, basic, notifications),
-> +	VIRTNET_STATS_DESC(tx, basic, interrupts),
-> +
-> +	VIRTNET_STATS_DESC(tx, basic, drops),
-
-These 5 same as rx.
-
-> +	VIRTNET_STATS_DESC(tx, basic, drop_malformed),
-
-These I'd call hw-tx-drop-errors, "packets dropped because they were
-invalid or malformed"?
-
-> +static const struct virtnet_stat_desc virtnet_stats_rx_csum_desc[] = {
-> +	VIRTNET_STATS_DESC(rx, csum, csum_valid),
-
-I think in kernel parlance that would translate to CHECKSUM_UNNECESSARY?
-So let's call it rx-csum-unnecessary ?
-I'd skip the hw- prefix for this one, it doesn't matter to the user if
-the HW or SW counted it.
-
-> +	VIRTNET_STATS_DESC(rx, csum, needs_csum),
-
-Hm, I think this is a bit software/virt device specific, presumably
-rx-csum-partial for the kernel, up to you whether to make it ethtool -S
-or netlink.
-
-> +	VIRTNET_STATS_DESC(rx, csum, csum_none),
-> +	VIRTNET_STATS_DESC(rx, csum, csum_bad),
-
-These two make sense as is in netlink, should be fairly commonly
-reported by devices. Maybe add a note in "bad" that packets with
-bad csum are not discarded, but still delivered to the stack.
-
-> +static const struct virtnet_stat_desc virtnet_stats_tx_csum_desc[] = {
-> +	VIRTNET_STATS_DESC(tx, csum, needs_csum),
-> +	VIRTNET_STATS_DESC(tx, csum, csum_none),
-
-tx- version of what names we pick for rx-, netlink seems appropriate.
-
-> +static const struct virtnet_stat_desc virtnet_stats_rx_gso_desc[] = {
-> +	VIRTNET_STATS_DESC(rx, gso, gso_packets),
-> +	VIRTNET_STATS_DESC(rx, gso, gso_bytes),
-
-I used the term "GSO" in conversations about Rx and it often confuses
-people. Let's use "GRO", so hw-gro-packets, and hw-gro-bytes ?
-Or maybe coalesce? "hw-rx-coalesce" ? That's quite a bit longer..
-
-Ah, and please mention in the doc that these counters "do not cover LRO
-i.e. any coalescing implementation which doesn't follow GRO rules".
-
-> +	VIRTNET_STATS_DESC(rx, gso, gso_packets_coalesced),
-
-hw-gro-wire-packets ?
-No strong preference on the naming, but I find that saying -wire
-makes it 100% clear to everyone what the meaning is.
-
-> +	VIRTNET_STATS_DESC(rx, gso, gso_bytes_coalesced),
-
-The documentation in the virtio spec seems to be identical 
-to the one for gso_packets, which gotta be unintentional?
-I'm guessing this is hw-gro-wire-bytes? I.e. headers counted
-multiple times?
-
-> +static const struct virtnet_stat_desc virtnet_stats_tx_gso_desc[] = {
-> +	VIRTNET_STATS_DESC(tx, gso, gso_packets),
-> +	VIRTNET_STATS_DESC(tx, gso, gso_bytes),
-> +	VIRTNET_STATS_DESC(tx, gso, gso_segments),
-> +	VIRTNET_STATS_DESC(tx, gso, gso_segments_bytes),
-
-these 4 make sense as mirror of the Rx
-
-> +	VIRTNET_STATS_DESC(tx, gso, gso_packets_noseg),
-> +	VIRTNET_STATS_DESC(tx, gso, gso_bytes_noseg),
-
-Not sure what these are :) unless someone knows what it is and that
-HW devices report it, let's keep them in ethtool -S ?
-
-> +static const struct virtnet_stat_desc virtnet_stats_rx_speed_desc[] = {
-> +	VIRTNET_STATS_DESC(rx, speed, packets_allowance_exceeded),
-
-hw-rx-drop-ratelimits ?
-"Allowance exceeded" is a bit of a mouthful to me, perhaps others
-disagree. The description from the virtio spec is quite good.
-
-> +	VIRTNET_STATS_DESC(rx, speed, bytes_allowance_exceeded),
-
-No strong preference whether to expose this as a standard stat or
-ethtool -S, we don't generally keep byte counters for drops, so
-this would be special.
-
-> +static const struct virtnet_stat_desc virtnet_stats_tx_speed_desc[] = {
-> +	VIRTNET_STATS_DESC(tx, speed, packets_allowance_exceeded),
-> +	VIRTNET_STATS_DESC(tx, speed, packets_allowance_exceeded),
-
-same as rx
+Best regards, Ilya Maximets.
 
