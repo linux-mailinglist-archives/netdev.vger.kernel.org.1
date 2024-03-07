@@ -1,205 +1,134 @@
-Return-Path: <netdev+bounces-78261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51A5D87490C
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:49:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBB8C874938
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:07:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 746661C204F3
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 07:49:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1EBE1F21A51
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:07:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BBDB633E9;
-	Thu,  7 Mar 2024 07:48:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E086311B;
+	Thu,  7 Mar 2024 08:06:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D8MgwQsk"
+	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="EFqBmGUl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8619E6312F
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 07:48:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036B563126;
+	Thu,  7 Mar 2024 08:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709797726; cv=none; b=W1pLzOB35I64it5Vs3/tQYm/v8NV8XBPflJc2IEJf/Ew7KVfqCowFsA21PtPm9F5+00qGSuwhaKfebd8q3/8isvizqq05sTQ7eHkrE+13a6MlPlHixID0ue19ELmRtiivgwW4nGk/gSPtWL2jjMjcrzwhUN2a9rsIOBwfYOro/c=
+	t=1709798816; cv=none; b=mu/E5YiRbby5lxVhNoPxFzezTlqESIBml0daQpDI70HwDZX0xM5XW5Tz1QLwmqleA/eXimQGYssckt4IW7ia24bP+ACd44i3A6DakSGGBJYsOOeIjMEY8O0xUt34U399j4KWG1IAphqS1dwWEtlXp8bRhpGPPwvpEpA+BwQc1ZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709797726; c=relaxed/simple;
-	bh=jFQDXvGLp7p9vbgk3JL45+aqTnlwztWMeH8uOV/OvQw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QdZgHKlRHtQOUgjCeg5NlY6AGVFe75R2ODPmklfsS/gw5udky9i8J2eiruogB3bmLqNqduBt1xVOHTu/8GA21psaA312YWjiC0tvGL8G2L82bv4TGpgzPZmHH18M2Ox9EsnCV61gKbY5be5FrqiWsHSESfIpo0y2QVtRvktmLow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=D8MgwQsk; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a28a6cef709so89294266b.1
-        for <netdev@vger.kernel.org>; Wed, 06 Mar 2024 23:48:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709797723; x=1710402523; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=E5FrdVWeE9Ji8keRga1zHmD6NeczS9crX8d/3FFqO1E=;
-        b=D8MgwQskx5ZmQjkhTseCn501SB6oEjRQTBMOyluRbzA2QvHmvyI+NGVQLMkxkymgg8
-         1QJR+mB57pjf0aXGuEdGND9G3Ud9js4RsiTUbbtMDOJjVIXiK9qq0zic+xxcmCA8spbG
-         Or1GIqOrE2bFWi6/vnPoVGx+3BOqqzYuq6oBPJgxPEXT7UjgPiwBSmiKSjhXJfswGu6f
-         mGM0mLToV2SwOdLjXx1cKT89Bk+UnBe5MrdctNvCY3RAq7sRXpmQcw3LlG27b822mO+N
-         oaStRezgdlZ6NvN3p/FDBRfJT5Y7OrZxHGzt3GjCIfsrqqFgfgbJ/fvXOC5Ph3p//NI1
-         QQ5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709797723; x=1710402523;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E5FrdVWeE9Ji8keRga1zHmD6NeczS9crX8d/3FFqO1E=;
-        b=i55aKbUpSmYVNhE1z9WdJ0HIn7nFnnp5/cDgj8Ge4t2vmbn7Trh9/0ANsY+KL+aGXo
-         710H+P7wzhHSQn9I6aC7lVvrdjXwIDLmYHnMPg5almwnuoXEDtddZUsSHc3/3Sc4lp0D
-         cajdvo7OVGdeSjtf8xk0835n7ffOREBWzE1Md0Bmb4B7fgg0CUgDFHl4K/3RGJFDdorU
-         BCVUI+6fOXeWXrlarXahtuCJQbgbcaVEDtd+fTcSaTo3jvYXbmAzTcS/D2JPW1j97Ews
-         UwgYbMfYPs452b2ulPnyUbwiQhCAxpYNjvEOrmMX1q5H8+lA4fGWgz2Jxl0BFAvsljpX
-         akIg==
-X-Gm-Message-State: AOJu0YzxZqwEkjgBLGKpHthlJ+xpC3/FYrZgDU60e/zhx+sDnxx3Eime
-	htuq50WR9H5S2BclbQWzRespoRXTFQQAebcfasWAZW7iHym8Y1lJIeoh2sUZj1g=
-X-Google-Smtp-Source: AGHT+IFPaVLeT7/HA8AHTsJEb61jX7OAF91GsQxpDYTjXrFZIvYX0U2Xry9PQ1zs9dOnPWI1zfHLZQ==
-X-Received: by 2002:a17:906:a2cf:b0:a3f:33b2:5ce2 with SMTP id by15-20020a170906a2cf00b00a3f33b25ce2mr12791329ejb.35.1709797722846;
-        Wed, 06 Mar 2024 23:48:42 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.222.97])
-        by smtp.gmail.com with ESMTPSA id ju22-20020a170906e91600b00a45c18345e0sm1181462ejb.163.2024.03.06.23.48.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Mar 2024 23:48:42 -0800 (PST)
-Message-ID: <66f578b4-5e1b-4cc3-b39c-3b61797cacd3@linaro.org>
-Date: Thu, 7 Mar 2024 08:48:40 +0100
+	s=arc-20240116; t=1709798816; c=relaxed/simple;
+	bh=HmxSxu3e+YBIQn4IRhQm21ZwDOa4fcx36CXpkhLBFqU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ec1mzkNyBKJrEoKkcGPrk/45/oSBjapLDun66cSiGez2nR/ZMVyoe5t7d9OJ78n9PHw8pCqAlYum0QgPtGYjWULTvNxcyKnWMHlLn0G2W+nl7qameDMRsdOWvpWIaNUAD9CObCCEmi7WoScYOsWrDEw2SnWcXAYAQmWOinl5fw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=EFqBmGUl; arc=none smtp.client-ip=109.73.34.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
+Received: from mx1.t-argos.ru (localhost [127.0.0.1])
+	by mx1.t-argos.ru (Postfix) with ESMTP id 84F44100002;
+	Thu,  7 Mar 2024 11:06:30 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
+	t=1709798790; bh=aUbJGmH1J/w83lr18xfMtIo/u0AqnmbG6WscZrXzHMw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=EFqBmGUlS4eWXOhHWubd6nr1fPqd6ikC43Q8PYy8w7eSFJL56CQLx7uKsphDkE4aD
+	 eMmCiZyp6SGBhGJpjs6cBMf3fPcHklgjYRxC6lobxzwL1VUmmPAThzEjguQTK/Lz2V
+	 u5GDFZkxfSdtbqK6sMFAzZpaOzG6t+dFHiHf9xigdt2MhooXL9wtR1CsNm446CCCnB
+	 3Dre8hIEA9fgHSrBkEr+HFg0cW6YMSDKV1NP41J4J0L6XBXFeDJhSTQJKcJS1ha73k
+	 GzjzkTjwagOGYaAFu2JlLlEc2OBsGS99Sc5lQ4/hDkY5ZA0zGMLq6CbQzCNFKaSNMh
+	 eO8OWG9R/9x8w==
+Received: from mx1.t-argos.ru.ru (mail.t-argos.ru [172.17.13.212])
+	by mx1.t-argos.ru (Postfix) with ESMTP;
+	Thu,  7 Mar 2024 11:05:24 +0300 (MSK)
+Received: from localhost.localdomain (172.17.215.6) by ta-mail-02
+ (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 7 Mar 2024
+ 11:05:03 +0300
+From: Aleksandr Mishin <amishin@t-argos.ru>
+To: Madalin Bucur <madalin.bucur@nxp.com>
+CC: Aleksandr Mishin <amishin@t-argos.ru>, Sean Anderson
+	<sean.anderson@seco.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Igal Liberman <igal.liberman@freescale.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>
+Subject: [PATCH] fsl/fman: Add array size check
+Date: Thu, 7 Mar 2024 11:04:52 +0300
+Message-ID: <20240307080452.13278-1-amishin@t-argos.ru>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 4/9] dt-bindings: net: convert hisi-femac.txt
- to YAML
-Content-Language: en-US
-To: Yang Xiwen <forbidden405@outlook.com>,
- Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
- <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org
-References: <20240305-net-v8-0-166aaeea2107@outlook.com>
- <20240305-net-v8-4-166aaeea2107@outlook.com>
- <66cf4c42-5b8e-41b8-bbdb-7fb2c6bb9e66@linaro.org>
- <SEZPR06MB69594BB6F24CF86E859D698196212@SEZPR06MB6959.apcprd06.prod.outlook.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <SEZPR06MB69594BB6F24CF86E859D698196212@SEZPR06MB6959.apcprd06.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
+ (172.17.13.212)
+X-KSMG-Rule-ID: 1
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 184020 [Mar 07 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.3
+X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 9 0.3.9 e923e63e431b6489f12901471775b2d1b59df0ba, {Tracking_from_domain_doesnt_match_to}, mx1.t-argos.ru.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;t-argos.ru:7.1.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/03/07 07:53:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/03/07 06:26:00 #24026065
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On 06/03/2024 10:28, Yang Xiwen wrote:
-> On 3/6/2024 3:39 PM, Krzysztof Kozlowski wrote:
->> On 05/03/2024 08:51, Yang Xiwen via B4 Relay wrote:
->>> From: Yang Xiwen <forbidden405@outlook.com>
->>>
->>> Convert the old text binding to new YAML.
->>>
->>> While at it, make some changes to the binding:
->>> - The version numbers are not documented publicly. The version also does
->>> not change programming interface. Remove it until it's really needed.
->>> - A few clocks are missing in old binding file. Add them to match the real
->>> hardware.
->>>
->>> Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
->>> ---
->>>   .../bindings/net/hisilicon,hisi-femac.yaml         | 89 ++++++++++++++++++++++
->>>   .../devicetree/bindings/net/hisilicon-femac.txt    | 41 ----------
->>>   2 files changed, 89 insertions(+), 41 deletions(-)
->>>
->>> diff --git a/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml b/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
->>> new file mode 100644
->>> index 000000000000..ba207f2c9ae4
->>> --- /dev/null
->>> +++ b/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
->>> @@ -0,0 +1,89 @@
->>> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
->>> +%YAML 1.2
->>> +---
->>> +$id: http://devicetree.org/schemas/net/hisilicon,hisi-femac.yaml#
->>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->>> +
->>> +title: Hisilicon Fast Ethernet MAC controller
->>> +
->>> +maintainers:
->>> +  - Yang Xiwen <forbidden405@foxmail.com>
->>> +
->>> +allOf:
->>> +  - $ref: ethernet-controller.yaml
->>> +
->>> +properties:
->>> +  compatible:
->>> +    items:
->>> +      - enum:
->>> +          - hisilicon,hi3516cv300-femac
->>> +      - const: hisilicon,hisi-femac
->> Drop this fallback, your later driver change does not use it, so neither
->> should have binding. Explain in commit msg, that old binding was
->> incorrect (we discussed it a lot) thus you are making such change during
->> conversion.
-> 
-> 
-> What about deprecating "hisilicon,hisi-femac-vn" compatibles and 
-> introduce a new generic compatible "hisilicon,hisi-femac" instead? This 
-> way, We can keep backward compatibility.
+In fman_register_intr() and fman_unregister_intr()
+get_module_event() is assigned to event which is then used
+as array index without size check.
+Fix this bug by adding a check of event.
 
-What backward compatibility? Didn't you say bindings and driver are
-broken and you are going to break ABI to fix them up?
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Best regards,
-Krzysztof
+Fixes: 414fd46e7762 (fsl/fman: Add FMan support)
+Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+---
+ drivers/net/ethernet/freescale/fman/fman.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/freescale/fman/fman.c b/drivers/net/ethernet/freescale/fman/fman.c
+index d96028f01770..902d05ffff1b 100644
+--- a/drivers/net/ethernet/freescale/fman/fman.c
++++ b/drivers/net/ethernet/freescale/fman/fman.c
+@@ -2054,7 +2054,10 @@ void fman_register_intr(struct fman *fman, enum fman_event_modules module,
+ 	int event = 0;
+ 
+ 	event = get_module_event(module, mod_id, intr_type);
+-	WARN_ON(event >= FMAN_EV_CNT);
++	if (event >= FMAN_EV_CNT) {
++		WARN_ON(event >= FMAN_EV_CNT);
++		return;
++	}
+ 
+ 	/* register in local FM structure */
+ 	fman->intr_mng[event].isr_cb = isr_cb;
+@@ -2079,7 +2082,10 @@ void fman_unregister_intr(struct fman *fman, enum fman_event_modules module,
+ 	int event = 0;
+ 
+ 	event = get_module_event(module, mod_id, intr_type);
+-	WARN_ON(event >= FMAN_EV_CNT);
++	if (event >= FMAN_EV_CNT) {
++		WARN_ON(event >= FMAN_EV_CNT);
++		return;
++	}
+ 
+ 	fman->intr_mng[event].isr_cb = NULL;
+ 	fman->intr_mng[event].src_handle = NULL;
+-- 
+2.30.2
 
 
