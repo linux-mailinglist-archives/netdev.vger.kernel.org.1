@@ -1,116 +1,158 @@
-Return-Path: <netdev+bounces-78254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A31BA87485F
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 07:58:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 012CD874867
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:01:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F0242866C4
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 06:58:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E2B21F23F31
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 07:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBBA1CD1E;
-	Thu,  7 Mar 2024 06:58:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 244581D54F;
+	Thu,  7 Mar 2024 07:01:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7lsQXAl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B2D1CD2D;
-	Thu,  7 Mar 2024 06:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F11C1D529;
+	Thu,  7 Mar 2024 07:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709794713; cv=none; b=UJE7dTOvCS4cGJnct66WPFu5HEBQUecQ1gD/WFbFZ/zmvVSXZv6BloGmRhV5MMSb0PsX8JoK48CNbak9Z4Hepy/EmpncmJghW8YuEBhIiPluReaB1eOiPYpwYqS42Ia4YVwZ0J2y1X+D/Wdq2q1mmgaVs6NH64W056Sky+bv4MM=
+	t=1709794882; cv=none; b=i70S09rL9BoqnPyxKCnDP2/nwTyUYOryZxedWpwzm7AMrfDOBdxCPH4t4CT0twI/yJyNdeIjUAgytXrhBt106VHzk5zUWZzcqaqoUgtx4gPLqrdKCwpKwMSNig/LFLoBUSm/A3oU2F/xFh7L/S0lbdDSO9KLt4lX1ncJQT3gozs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709794713; c=relaxed/simple;
-	bh=Wt7lhglpodByb4CJI8Cl6YkErPTUMOpVoSpfMcFq5RM=;
-	h=MIME-Version:Content-Type:Date:From:To:Cc:Subject:In-Reply-To:
-	 References:Message-ID; b=RPoTGlOS//Pn3gx69+TTYjXmH3i/y/gmvnKGs3sBxxFEKTLgK//4YbOtukziGMZRZdO9XUT0oaaeESb0SAKym+4civhLYAQxfTs63PTWKxk9eJofioXuQI59k2xLnby8pQ1tNIc/LybDJRkitPczk4rR+4wFYzKarAEsPERxGyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=194.37.255.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
-Received: from [127.0.0.1] (helo=localhost)
-	by relay.expurgate.net with smtp (Exim 4.92)
-	(envelope-from <prvs=5810c20468=ms@dev.tdt.de>)
-	id 1ri7hj-000o8L-6v; Thu, 07 Mar 2024 07:58:11 +0100
-Received: from [195.243.126.94] (helo=securemail.tdt.de)
-	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ms@dev.tdt.de>)
-	id 1ri7hh-00AuCb-V3; Thu, 07 Mar 2024 07:58:09 +0100
-Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id 7D5BF240049;
-	Thu,  7 Mar 2024 07:58:09 +0100 (CET)
-Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id E6FB1240040;
-	Thu,  7 Mar 2024 07:58:08 +0100 (CET)
-Received: from mail.dev.tdt.de (localhost [IPv6:::1])
-	by mail.dev.tdt.de (Postfix) with ESMTP id 2DE01361C1;
-	Thu,  7 Mar 2024 07:58:08 +0100 (CET)
+	s=arc-20240116; t=1709794882; c=relaxed/simple;
+	bh=43aEq9C39A8hDzjssPpDD+NB6N195l1L/QFKz3eMy3M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PARDgnTSbiryT/Ihety3KoJarEx9g/ETqIdWXBe09ZycB/etPBc8Crs95t7vFC8joVvWOiclV4eL+3b0x5NB94CL5XENhttV/EdZKHvIGIIgv1mt4kPSdkRqoLkQJ38BYfQbar9tIBjH5Tu2Lej2+2hVrGCZNP5V3bBgZjbkIGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X7lsQXAl; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6e64a9df6c3so388419b3a.3;
+        Wed, 06 Mar 2024 23:01:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709794879; x=1710399679; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aeJ+JntwKW4wdQtAHs36UWp64DtpgAOAPqSLV/Dt1Q0=;
+        b=X7lsQXAlfi7dOtHpxJ81nlpz7UG77bYVcrR9x4Wd2MIGuYdmQf0D93ACe1jmNu6q5E
+         ARKgrbUd6UI/gzQQz5ge+6OeH5Vg+M5ETi5QzCIlmC/jVwSVDTV7bDpXdHZ/Kst5ILaL
+         /16Fi7IQOwEX+a+5ryKxtgQu9h2mmc5TNHd24lzA6OG/PLCbFH3+sK/pYLufLkL7HNRU
+         JAKuNN1rD/PbtxfFoBi/iLqvv/v0wIFcxCRzPiDmz3WdcKpTZZEUVmLAucVCoSPR9Vwh
+         lxLn6cW/viYQgfqjSUwPWBbQXKXKPjvea7Y8yChKL9V+AMx0dDunFKKuurzb7IqvW8Dk
+         uYpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709794879; x=1710399679;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aeJ+JntwKW4wdQtAHs36UWp64DtpgAOAPqSLV/Dt1Q0=;
+        b=CBCAG84X63lZ3/t9wdzokA9NPambieXMpGkFLsnd/LDWYJoBida3k83J9Tj7uA9CxH
+         rHsPUgN2b70ufNJ8IC9Ci1XxQoCG6Kis54VbyoYImt9RqmHpxnQt5B5Q2x1LtjWW7JKs
+         zSQcelJHkOZfyM5I+UndNuK/tSnNWN+ddz1Ryan5rw6UcUaTvESZi0BX+RsmAkiV6lPt
+         kV2vztJSimNlRhWTd41+9V4Slkwly7ZUaFibnLoneQxTSHOFTF6GWdMkZQajJ8xGffE1
+         RFtpxNasfnddgisci41l/PA1pQuDeauJJfThi/zBkwUpneH9UbFOns7enZ6hYXn+GkJg
+         yNhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWN1Vn3LEE6eITtQnx1H+LkothMH+BuNAI0xSQPNH0nKnq9zM+/KMuB5CT3ow9Vh5IBzxhNeyc2Jzo3SzvgiuifXUtjh3PCD8auEhjB
+X-Gm-Message-State: AOJu0Yy59DR+iMhVMhWfMWBNGkqdVy+iZBnWUj53igMNk9imFZCapRRN
+	5OmmxMRNH2Y4afE7wEpHIWgSbnkR+IGtmp4Dp7kO9UrWbyQXkQNMOkAU+Sm8SWo=
+X-Google-Smtp-Source: AGHT+IFqMEll30/fJhZZ6rDkCi3tTt4kyBuoteYxhg1Q6Sx0Bctg+bVk2O5ur1zhrC4aokS4SgXGZA==
+X-Received: by 2002:a05:6a21:999d:b0:1a1:5144:79ab with SMTP id ve29-20020a056a21999d00b001a1514479abmr7352893pzb.10.1709794879369;
+        Wed, 06 Mar 2024 23:01:19 -0800 (PST)
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id y23-20020a17090264d700b001dcdfcbf245sm13246885pli.119.2024.03.06.23.01.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Mar 2024 23:01:18 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH net-next] Doc: netlink: support unterminated-ok
+Date: Thu,  7 Mar 2024 15:01:06 +0800
+Message-ID: <20240307070106.1784076-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Thu, 07 Mar 2024 07:58:08 +0100
-From: Martin Schiller <ms@dev.tdt.de>
-To: Justin Swartz <justin.swartz@risingedge.co.za>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, linux-x25@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: x25: remove dead links from Kconfig
-Organization: TDT AG
-In-Reply-To: <20240306112659.25375-1-justin.swartz@risingedge.co.za>
-References: <20240305193024.6bcfa98f@kernel.org>
- <20240306112659.25375-1-justin.swartz@risingedge.co.za>
-Message-ID: <345ce600c11ab1eb7618fd4c7fcd268d@dev.tdt.de>
-X-Sender: ms@dev.tdt.de
-User-Agent: Roundcube Webmail/1.3.17
-X-purgate-ID: 151534::1709794690-1BF9DB6F-6A7F1771/0/0
-X-purgate: clean
-X-purgate-type: clean
+Content-Transfer-Encoding: 8bit
 
-On 2024-03-06 12:26, Justin Swartz wrote:
-> Remove the "You can read more about X.25 at" links provided in
-> Kconfig as they have not pointed at any relevant pages for quite
-> a while.
-> 
-> An old copy of https://www.sangoma.com/tutorials/x25/ can be
-> retrieved via https://archive.org/web/ but nothing useful seems
-> to have been preserved for http://docwiki.cisco.com/wiki/X.25
-> 
-> For the sake of necromancy and those who really did want to
-> read more about X.25, a previous incarnation of Kconfig included
-> a link to:
-> http://www.cisco.com/univercd/cc/td/doc/product/software/ios11/cbook/cx25.htm
-> 
-> Which can still be read at:
-> https://web.archive.org/web/20071013101232/http://cisco.com/en/US/docs/ios/11_0/router/configuration/guide/cx25.html
-> 
-> Signed-off-by: Justin Swartz <justin.swartz@risingedge.co.za>
-> ---
->  net/x25/Kconfig | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/net/x25/Kconfig b/net/x25/Kconfig
-> index 68729aa3a..dc72302cb 100644
-> --- a/net/x25/Kconfig
-> +++ b/net/x25/Kconfig
-> @@ -17,8 +17,6 @@ config X25
->  	  if you want that) and the lower level data link layer protocol LAPB
->  	  (say Y to "LAPB Data Link Driver" below if you want that).
-> 
-> -	  You can read more about X.25 at 
-> <https://www.sangoma.com/tutorials/x25/> and
-> -	  <http://docwiki.cisco.com/wiki/X.25>.
->  	  Information about X.25 for Linux is contained in the files
->  	  <file:Documentation/networking/x25.rst> and
->  	  <file:Documentation/networking/x25-iface.rst>.
+ynl-gen-c.py supports check unterminated-ok, but the yaml schemas don't
+have this key. Add this to the yaml files.
 
-Acked-by: Martin Schiller <ms@dev.tdt.de>
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+ Documentation/netlink/genetlink-c.yaml      | 3 +++
+ Documentation/netlink/genetlink-legacy.yaml | 3 +++
+ Documentation/netlink/genetlink.yaml        | 3 +++
+ Documentation/netlink/netlink-raw.yaml      | 3 +++
+ 4 files changed, 12 insertions(+)
+
+diff --git a/Documentation/netlink/genetlink-c.yaml b/Documentation/netlink/genetlink-c.yaml
+index c58f7153fcf8..7094d619cbb6 100644
+--- a/Documentation/netlink/genetlink-c.yaml
++++ b/Documentation/netlink/genetlink-c.yaml
+@@ -208,6 +208,9 @@ properties:
+                   exact-len:
+                     description: Exact length for a string or a binary attribute.
+                     $ref: '#/$defs/len-or-define'
++                  unterminated-ok:
++                    description: Allow the string to not use terminator.
++                    type: boolean
+               sub-type: *attr-type
+               display-hint: &display-hint
+                 description: |
+diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
+index 938703088306..aceb72175365 100644
+--- a/Documentation/netlink/genetlink-legacy.yaml
++++ b/Documentation/netlink/genetlink-legacy.yaml
+@@ -251,6 +251,9 @@ properties:
+                   exact-len:
+                     description: Exact length for a string or a binary attribute.
+                     $ref: '#/$defs/len-or-define'
++                  unterminated-ok:
++                    description: Allow the string to not use terminator.
++                    type: boolean
+               sub-type: *attr-type
+               display-hint: *display-hint
+               # Start genetlink-c
+diff --git a/Documentation/netlink/genetlink.yaml b/Documentation/netlink/genetlink.yaml
+index 3283bf458ff1..f6d5ea44bf86 100644
+--- a/Documentation/netlink/genetlink.yaml
++++ b/Documentation/netlink/genetlink.yaml
+@@ -175,6 +175,9 @@ properties:
+                   exact-len:
+                     description: Exact length for a string or a binary attribute.
+                     $ref: '#/$defs/len-or-define'
++                  unterminated-ok:
++                    description: Allow the string to not use terminator.
++                    type: boolean
+               sub-type: *attr-type
+               display-hint: &display-hint
+                 description: |
+diff --git a/Documentation/netlink/netlink-raw.yaml b/Documentation/netlink/netlink-raw.yaml
+index ac4e05415f2f..0e105f21080b 100644
+--- a/Documentation/netlink/netlink-raw.yaml
++++ b/Documentation/netlink/netlink-raw.yaml
+@@ -270,6 +270,9 @@ properties:
+                   exact-len:
+                     description: Exact length for a string or a binary attribute.
+                     $ref: '#/$defs/len-or-define'
++                  unterminated-ok:
++                    description: Allow the string to not use terminator.
++                    type: boolean
+               sub-type: *attr-type
+               display-hint: *display-hint
+               # Start genetlink-c
+-- 
+2.43.0
+
 
