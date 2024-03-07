@@ -1,95 +1,128 @@
-Return-Path: <netdev+bounces-78371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9CA9874D0B
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 12:10:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C976874D40
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 12:19:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 747D02842CD
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:10:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28319283C76
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:19:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF71127B69;
-	Thu,  7 Mar 2024 11:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6632C128378;
+	Thu,  7 Mar 2024 11:19:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JWzhpeWr"
+	dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b="GMAzmmP3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.savoirfairelinux.com (mail.savoirfairelinux.com [208.88.110.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79BE86AC5;
-	Thu,  7 Mar 2024 11:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86BAA839E3;
+	Thu,  7 Mar 2024 11:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.88.110.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709809829; cv=none; b=knDj8PJpBACrAXbmZ2h/K/23DBCWa2p2yCWAVMuN9vMtQ9MGIU5jtnSUfGUdFh+VxYVetf8NSmmurTq/iFXkGtJ2TY1ySqCCVHZFUHB9f1bQkyIUjazcs7ECXerGSeHdnCDcFqqge0OxApnhPgUWMOW3PXMwM/+Qh10DmLAL1/E=
+	t=1709810395; cv=none; b=HRGnPid+o57ThiFR88Dwh4XEwDBp1ojHA2fZniJmxMkN+D7ouqbwHhYDsV4JPdHZ5l3vlwU3A3UqdeHldxB7+kGdHsRpg/QFiBIBhopfewOsi4nkq8RZI1ZptDG58fQ+rE1h5hzfChOoL1RgDDjIePBRnBd23TlZ6XDWjNLCgw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709809829; c=relaxed/simple;
-	bh=3C9xoeam283PUe/HcVMxnUvsIgDvsXGE4yT2Hi7mErE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bqe2CyawOHNRGE6Af0N+7O6lLjMRTp+od+QzyrVFYVkCBvciDHN7Otjj9Ory3PvpLnYcg8Xto9ShO/H41snxGj1+IRS+LjJA++bm3SwrzQO0ChkFFi63CRtOtpUzr2JpgikUYxFO2CGtpOrHdbyU73rbIUm2QtUw1TCxo+GsL/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JWzhpeWr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5D457C43390;
-	Thu,  7 Mar 2024 11:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709809829;
-	bh=3C9xoeam283PUe/HcVMxnUvsIgDvsXGE4yT2Hi7mErE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JWzhpeWrJ3Oq7K/XOVqrBYc74eaIDnWL9kVQtW2a/R+oT6TGsKCmPTGswCjXwG/Lm
-	 XobEZSKyHjy7iYSDgx25TrgSsw6S7tzLuA9YyhU929n/B7zstXqPYYif9o8hGB5wZO
-	 F08A+sHK586TETtOwgHfCl2Fpu4+l7FwTgxcuq7JscReDd93DuSyg0L9WsqFVlMEBD
-	 xiMHqBuTFOcfn2nU/rHPyn4d8LaupQRwxC1kWMsPlzzIbvXKR2+eX+wDHYcyY0gMyP
-	 j4y/LsuZzCCjtxkfAEA7IuJR9FL05v9mn10I8Yl4ba7mKJHXfwqfIGBpCFvAU8Ax2T
-	 JiQUgf/pFWziw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 447DBD84BD7;
-	Thu,  7 Mar 2024 11:10:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709810395; c=relaxed/simple;
+	bh=QbV5WjqAjW2pbLLQ+buUKTQxRQ8ErN6ci83Pq7iTb6U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=qBw0QFBfwQluBiY3d9Ftz6lJb1DbK+UNzEQ7ypZvQom5wUv2IkQPuviyQkjyKRT1X9Q/qCUpp++IiuKXcJIstTSF3pAsEWJlyWpeDVzL6QdE2mXz1IgnA8Z2FxnkC5zDtYx2K32hevkG/Azt/4Fbf5vE/OBMRVv9vSNCgPCHZ3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com; spf=pass smtp.mailfrom=savoirfairelinux.com; dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b=GMAzmmP3; arc=none smtp.client-ip=208.88.110.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=savoirfairelinux.com
+Received: from localhost (localhost [127.0.0.1])
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id 037A29C498B;
+	Thu,  7 Mar 2024 06:19:51 -0500 (EST)
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+ by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id 2WSTG1iEmFg8; Thu,  7 Mar 2024 06:19:50 -0500 (EST)
+Received: from localhost (localhost [127.0.0.1])
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id 4DCE59C4AC5;
+	Thu,  7 Mar 2024 06:19:50 -0500 (EST)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.savoirfairelinux.com 4DCE59C4AC5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=savoirfairelinux.com; s=DFC430D2-D198-11EC-948E-34200CB392D2;
+	t=1709810390; bh=ZL5kJeBt2AJwIW7XKBPvdhgd1Q+WZ+LRmadNaYy5kfU=;
+	h=From:To:Date:Message-Id:MIME-Version;
+	b=GMAzmmP3afMD5YbbLFlL9s9JzhNRXr8c7HaXOlDrM8JHgqMqEj4ftSJoQAZxFWXet
+	 bWFuBntAVjH5QVHvyqpV13M43k0cljoVebk9e/7NXg+lVZZ8iKCXG+5OCAylUjxSOG
+	 KmXAf6xR3qKD66FRBPl7SnC7C5cZR540P4faERS6dOmXZKWZYxWLob+MnHWmwI1mp6
+	 DSrLRvNlYeWTHf2YX6d9oniTMHJ8aps6yNl8bR8daUA4JxvCvzRWvNVqEAtM4cJKJk
+	 MIEX3l0I/TyTrj702sV0jrSjDsAwsPjX9CHhwuTQRKWIsvqhF3U7QvDrYmZ8iOQkO1
+	 8q3stLix4j+mg==
+X-Virus-Scanned: amavis at mail.savoirfairelinux.com
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+ by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id g5bDPnKGjSwG; Thu,  7 Mar 2024 06:19:50 -0500 (EST)
+Received: from gerard.rennes.sfl (lmontsouris-657-1-69-118.w80-15.abo.wanadoo.fr [80.15.101.118])
+	by mail.savoirfairelinux.com (Postfix) with ESMTPSA id ADD7F9C498B;
+	Thu,  7 Mar 2024 06:19:48 -0500 (EST)
+From: =?UTF-8?q?K=C3=A9vin=20L=27h=C3=B4pital?= <kevin.lhopital@savoirfairelinux.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Dan Murphy <dmurphy@ti.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	=?UTF-8?q?K=C3=A9vin=20L=27h=C3=B4pital?= <kevin.lhopital@savoirfairelinux.com>,
+	Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>
+Subject: [PATCH v2] net: phy: fix phy_get_internal_delay accessing an empty array
+Date: Thu,  7 Mar 2024 12:19:06 +0100
+Message-Id: <20240307111906.297749-1-kevin.lhopital@savoirfairelinux.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net V3] net: pds_core: Fix possible double free in error
- handling path
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170980982927.5477.544521045314815654.git-patchwork-notify@kernel.org>
-Date: Thu, 07 Mar 2024 11:10:29 +0000
-References: <20240306105714.20597-1-hyperlyzcs@gmail.com>
-In-Reply-To: <20240306105714.20597-1-hyperlyzcs@gmail.com>
-To: Yongzhi Liu <hyperlyzcs@gmail.com>
-Cc: pabeni@redhat.com, shannon.nelson@amd.com, brett.creeley@amd.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jitxie@tencent.com,
- huntazhang@tencent.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+The phy_get_internal_delay function could try to access to an empty
+array in the case that the driver is calling phy_get_internal_delay
+without defining delay_values and rx-internal-delay-ps or
+tx-internal-delay-ps is defined to 0 in the device-tree.
+This will lead to "unable to handle kernel NULL pointer dereference at
+virtual address 0". To avoid this kernel oops, the test should be delay
+>=3D 0. As there is already delay < 0 test just before, the test could
+only be size =3D=3D 0.
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Fixes: 92252eec913b ("net: phy: Add a helper to return the index for of t=
+he internal delay")
+Co-developed-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoi=
+rfairelinux.com>
+Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirf=
+airelinux.com>
+Signed-off-by: K=C3=A9vin L'h=C3=B4pital <kevin.lhopital@savoirfairelinux=
+.com>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+V1 -> V2: Fixed Signed-off-by tags
 
-On Wed,  6 Mar 2024 18:57:14 +0800 you wrote:
-> When auxiliary_device_add() returns error and then calls
-> auxiliary_device_uninit(), Callback function pdsc_auxbus_dev_release
-> calls kfree(padev) to free memory. We shouldn't call kfree(padev)
-> again in the error handling path.
-> 
-> Fix this by cleaning up the redundant kfree() and putting
-> the error handling back to where the errors happened.
-> 
-> [...]
+ drivers/net/phy/phy_device.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Here is the summary with links:
-  - [net,V3] net: pds_core: Fix possible double free in error handling path
-    https://git.kernel.org/netdev/net/c/ba18deddd6d5
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 3611ea64875e..3ad9bbf65cbe 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -2959,7 +2959,7 @@ s32 phy_get_internal_delay(struct phy_device *phyde=
+v, struct device *dev,
+ 	if (delay < 0)
+ 		return delay;
+=20
+-	if (delay && size =3D=3D 0)
++	if (size =3D=3D 0)
+ 		return delay;
+=20
+ 	if (delay < delay_values[0] || delay > delay_values[size - 1]) {
+--=20
+2.34.1
 
 
