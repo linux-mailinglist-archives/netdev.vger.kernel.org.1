@@ -1,83 +1,118 @@
-Return-Path: <netdev+bounces-78323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53730874B1E
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:41:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88C8F874B0B
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:38:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5C501F2B514
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:41:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4240028277B
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B05E84A39;
-	Thu,  7 Mar 2024 09:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D50C283CAC;
+	Thu,  7 Mar 2024 09:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fsAE79VR"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QqVJDRYo"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD5B77F32
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 09:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6878A839FB;
+	Thu,  7 Mar 2024 09:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709804437; cv=none; b=Kkhu98ddFSz2Zo6Qq+itgPgl7buejV8ctxvZAXCWY35SgdUq4XiFg22VHaEv0KHpmelOkOpyqRAphGPpE8SzgOPzbiefVDQsMsr8dxqS9D2dXUZ8ULfKsebHajwDZA46j/JWwy0M+L4VYeWKNXJP3+N7tlVkzA0EtlnyePXvwXU=
+	t=1709804293; cv=none; b=gdVTeXxyZuDw5rnbsCx4tVSTTFwjbrufAwe3QESgpqV9irFs9xmqjxbliGtRnXDAk00hP6MpqiEJLd83xhbl9CuywjJOeY4dgD6BuUnO18WafBjEDIgI95KUzppqz7QxBdYm9IFPF0cDaRchbIdKx4psUwtBmqFaSkXyfltAzmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709804437; c=relaxed/simple;
-	bh=sE2MgIluro/5GG8b2oMEEjpgLO/QMcuGU+5yLQuJPq8=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=mrcszRZ8AL/deVGmnkxfKWb7ATsQLl716VyZiUTIXEQ5BQL5l2yQvTRWk9CWRjXBmBsuqVbxviYMxmpTOawqLZpwhB/5in+u6rDEm9U++mResmZzkVx6cxhc2WaSuUcWrFb/MX4pWmxdH0+SxiujKyL6Ui9ZRBdZxhFM+EdCtn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fsAE79VR; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1709804432; h=Message-ID:Subject:Date:From:To;
-	bh=sE2MgIluro/5GG8b2oMEEjpgLO/QMcuGU+5yLQuJPq8=;
-	b=fsAE79VR36K0L4zrdqI6ta6nXz1OZ95uOjZCWNgACUcrqrFA6A9luiUQAJLUjA/j+Koo5sedxDHsXEqSqDKrkTvutaBHxh3XsftT9W1BsyDb3dbus3f/oFH+xHhsXwOLNSm6gu62+4Svautba7Wj+mKHXKs70OL+kyJbQVzZ7Qg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W2-KXx8_1709804430;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W2-KXx8_1709804430)
-          by smtp.aliyun-inc.com;
-          Thu, 07 Mar 2024 17:40:31 +0800
-Message-ID: <1709804195.5639746-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v3 5/6] virtio_net: add the total stats field
-Date: Thu, 7 Mar 2024 17:36:35 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Jason  Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric  Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux.dev
-References: <20240227080303.63894-1-xuanzhuo@linux.alibaba.com>
- <20240227080303.63894-6-xuanzhuo@linux.alibaba.com>
- <20240227065424.2548eccd@kernel.org>
-In-Reply-To: <20240227065424.2548eccd@kernel.org>
+	s=arc-20240116; t=1709804293; c=relaxed/simple;
+	bh=DibnNY796LQYxeRFpjwvSuqIkZLq9V4WTOvt1QT/C+Q=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=O9vIih7UDdNtngwB3c0z1rK6HCHJ7Cw3UBxmvX9noUOb6ZCy1XKIkTxCkTin15yU2wkeCr5OKrLUmT94glLGDyRKscaVxRIFxcPPzMBTh8L+5bgiED1oI+dAVSz8UIDWdnf6p4Zqhkxvb0NnEXPL5cu5z/8yYwDkACNO4OLwh7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QqVJDRYo; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4279RCYN015474;
+	Thu, 7 Mar 2024 09:38:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ODgVjKqkBlf6CS46T2yRBBTXmDr+cpiPqwVnyv0RLCk=;
+ b=QqVJDRYoTIzQaxELsHjuErfrBtfMUJKtNo+eGKOTZxYyIe4z4enem3dqP9K9nAoZ/6UB
+ rTg0K9ee+vEawy5CXwL7coxByQooRl3rE4+OM/+kBvr8r1uuNuCGz7Fz7g6H7ZzOWuTF
+ 2fXhxi7oz+4YmPlYT94mvYTVi+xRo94wMNz2OrbJzLkPjta27LXrBmnif0iBVeEp4MmF
+ RAWmU4ltqbMLkUqFJ1aspDnoTmTaa/Zdu6K6YpU+ODWY0nfGpAjpr3Tkhw+z3snCpq/t
+ XwbGgKd9m0ZjZoi/owaZ76lcm/W1E9AheHcjofxw3hDGH9SjK50rgNkGJz66vIM1UPK6 dg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wqay9r8gw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Mar 2024 09:38:09 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4279SQlV022070;
+	Thu, 7 Mar 2024 09:38:09 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wqay9r8gc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Mar 2024 09:38:09 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4276h8DU010881;
+	Thu, 7 Mar 2024 09:38:08 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wmh52m7tb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Mar 2024 09:38:07 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4279c2R739125436
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 7 Mar 2024 09:38:04 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 741D920043;
+	Thu,  7 Mar 2024 09:38:02 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 44D722004D;
+	Thu,  7 Mar 2024 09:38:02 +0000 (GMT)
+Received: from [9.152.224.128] (unknown [9.152.224.128])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  7 Mar 2024 09:38:02 +0000 (GMT)
+Message-ID: <8fe1d752-9cd3-449e-8bf8-e53cd9d6b875@linux.ibm.com>
+Date: Thu, 7 Mar 2024 10:38:02 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] s390/qeth: handle deferred cc1
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>
+References: <20240306163420.1005843-1-wintera@linux.ibm.com>
+Content-Language: en-US
+In-Reply-To: <20240306163420.1005843-1-wintera@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: qcfZkVAcbyfhfXroV6PWz2l8wlAVp43X
+X-Proofpoint-ORIG-GUID: kdIS5WbfK1JXGewlVq5TqLpfIOpdEAzv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-07_06,2024-03-06_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=575
+ lowpriorityscore=0 phishscore=0 suspectscore=0 malwarescore=0
+ clxscore=1011 adultscore=0 priorityscore=1501 bulkscore=0 impostorscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2403070069
 
-On Tue, 27 Feb 2024 06:54:24 -0800, Jakub Kicinski <kuba@kernel.org> wrote:
-> On Tue, 27 Feb 2024 16:03:02 +0800 Xuan Zhuo wrote:
-> > Now, we just show the stats of every queue.
-> >
-> > But for the user, the total values of every stat may are valuable.
->
-> Please wait for this API to get merged:
-> https://lore.kernel.org/all/20240226211015.1244807-1-kuba@kernel.org/
-> A lot of the stats you're adding here can go into the new API.
-> More drivers can report things like number of LSO / GRO packets.
 
 
-In this patch set, I just see two for tx, three for rx.
-And what stats do you want to put into this API?
-
-And on the other side, how should we judge whether a stat is placed in this api
-or the interface of ethtool -S?
-
-Thanks.
+patch does not apply. I will send a v2. 
+I'm very sorry for the noise.
+Note to self: DO NOT edit the patchfile last minute!
 
