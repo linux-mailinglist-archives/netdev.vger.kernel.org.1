@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-78238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 475CE87476C
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 05:41:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25A9287476B
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 05:41:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC14FB23699
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:41:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D387A286BAA
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:41:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02DA1D530;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02AC1D52C;
 	Thu,  7 Mar 2024 04:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eSyFmpNc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n2Th6j+B"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A7AD14F7F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62AE1BC56;
 	Thu,  7 Mar 2024 04:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709786431; cv=none; b=XTjPsQA4XJbr8/FFlFSs/znC8d1mN3/KWjkDbpnVLv5uWGqRDuCHQ/fMvAHPN6FG7czT6SS7F7AfP4PSr7a4xY3eGoPNtGvbChAAefDCYJAzh96XSuHEj812VlgTwgGv4zGnsyTOueXjPHM+Cxqf44fIACfrGeEgX/S4z93VFro=
+	t=1709786431; cv=none; b=QfT5mGgzlVGh4Fm+NohN3NcDpQ2UoRL8eiSFi/yE0NhKVmwzKzFOdV1ikp2kCN0x0rG1YAqctm3dO7eGpLk2zNe4o53YXF1+vr+I+nU5cE1nP++oRNV7jH9mD3is/t+qql+Vm1LZuvp6L6FSSZyvN/UMnllwYysgH136oeqcor4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709786431; c=relaxed/simple;
-	bh=EEYqOx9Zfjrv+CfUDIOl3n6VMgScQyeeuqGf9tFXIos=;
+	bh=oWQ8k864w4vkTmNo/1e1A064OVjilSU6x9OOmcthMuY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=n++Qw7KSbcai2B2Fnh//gLXeNb5excgzHutzxhHsLFZkga4pOmOyUTm44tCFc9tkNWD0oDEekPUTVmzmgFOju+MsaxOtbA4EgSQWKZ0ASbGFNH/fOd42Oc8xA2kVsGxBrceka389zxZnp7vraDndgX9xnb/XwGyaLy5JZM6QFEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eSyFmpNc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 31E19C32780;
+	 In-Reply-To:To:Cc; b=JLWT8pPvFVGErY1VCNwUCrZaI5++h1WluUXS19ZUW5ly1uonib47SlFiOgt+YkWHKoJmVe4Xd/Cc2ZskqC1rVliTCg7+CAKsxdtiCuzgL3mQANKkplm/BjFbpLXClZmWadZQNijXwF0gwZSwZ2tqwam11vVckqatozmWKoW2x9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n2Th6j+B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2B73DC41606;
 	Thu,  7 Mar 2024 04:40:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709786431;
-	bh=EEYqOx9Zfjrv+CfUDIOl3n6VMgScQyeeuqGf9tFXIos=;
+	bh=oWQ8k864w4vkTmNo/1e1A064OVjilSU6x9OOmcthMuY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eSyFmpNcc8y0vx7LR+IVHns8tM9OaMrMmX0mw63chzsTbTQs1xmHVnoagr5zcQPfi
-	 lRWsWwuvRnPf0OTiqq78/C9+SkudN/9eWmY7nNXgCt2rbLf+BZTshJ0dI0uPIOYFU+
-	 RJwECIuJfVR6znnDDWUwVUEnGvRiwAl0XgWBI0v+HKBhk+uYaH0A7K2CfMrnjAnn40
-	 Tz7LduaEnCPvH4BJ1lcCTsu11HDjiYA2oI+nBSU2OESLiHTyQX/afF9yS2mtOc1zc+
-	 bu2gEQpEtiMFYQgg2fQVKOlqgGnjuuqcLXL4JzlbCHzW1OF7UK8/mopD22dbRMHiNe
-	 S8gkHlL7tijew==
+	b=n2Th6j+BGGCGrFm7Zi7vNUbTWrWuWjzILTLUC+1KTW01BP9KHNhVW1c6Bz8eePbVE
+	 c0zh/KsI4EJLHABIOCLgLEkrvqySve7YSQcQG9ujskKG4UEexiCj5cbxP3+Arujgo2
+	 hYY/CxGkMK5l2KO8UiMi2EcmNCanuN5VSIHSL7Y0ULpA+CNB44VlZYOdTrD1RJT38M
+	 ECCOCh+kWwD7oGuhwyAm8f0QR85+0fE0IWJQrOCO7qQxaj1+6/ojNY+a6pqJGMxnOa
+	 yFAk9mVzX7fl9TseTdJZm8IaPSsK8jVOV/McATqnj2+q7TfczFRN6a5H5BDP8oaKL7
+	 lBuVezuxpgP0g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0C3AFD9A4BB;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 014A8D88F81;
 	Thu,  7 Mar 2024 04:40:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,41 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] dt-bindings: net: renesas,etheravb: Add support for
- R-Car V4M
+Subject: Re: [PATCH net-next 0/4] mptcp: some clean-up patches
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170978643104.7855.7910521326706587697.git-patchwork-notify@kernel.org>
+ <170978643100.7855.15154832484312373588.git-patchwork-notify@kernel.org>
 Date: Thu, 07 Mar 2024 04:40:31 +0000
-References: <0212b57ba1005bb9b5a922f8f25cc67a7bc15f30.1709631152.git.geert+renesas@glider.be>
-In-Reply-To: <0212b57ba1005bb9b5a922f8f25cc67a7bc15f30.1709631152.git.geert+renesas@glider.be>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- sergei.shtylyov@gmail.com, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org,
- thanh.quan.xn@renesas.com
+References: <20240305-upstream-net-next-20240304-mptcp-misc-cleanup-v1-0-c436ba5e569b@kernel.org>
+In-Reply-To: <20240305-upstream-net-next-20240304-mptcp-misc-cleanup-v1-0-c436ba5e569b@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ tanggeliang@kylinos.cn, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  5 Mar 2024 10:37:18 +0100 you wrote:
-> From: Thanh Quan <thanh.quan.xn@renesas.com>
+On Tue, 05 Mar 2024 12:04:29 +0100 you wrote:
+> Here are some clean-up patches for MPTCP:
 > 
-> Document support for the Renesas Ethernet AVB (EtherAVB-IF) block in the
-> Renesas R-Car V4M (R8A779H0) SoC.
+> - Patch 1 drops duplicated header inclusions.
 > 
-> Signed-off-by: Thanh Quan <thanh.quan.xn@renesas.com>
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> - Patch 2 updates PM 'set_flags' interface, to make it more similar to
+>   others.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] dt-bindings: net: renesas,etheravb: Add support for R-Car V4M
-    https://git.kernel.org/netdev/net-next/c/d66206296176
+  - [net-next,1/4] mptcp: drop duplicate header inclusions
+    https://git.kernel.org/netdev/net-next/c/d5dfbfa2f88e
+  - [net-next,2/4] mptcp: update set_flags interfaces
+    https://git.kernel.org/netdev/net-next/c/6a42477fe449
+  - [net-next,3/4] mptcp: set error messages for set_flags
+    https://git.kernel.org/netdev/net-next/c/a4d68b160240
+  - [net-next,4/4] mptcp: drop lookup_by_id in lookup_addr
+    https://git.kernel.org/netdev/net-next/c/af250c27ea1c
 
 You are awesome, thank you!
 -- 
