@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-78232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05D6C874758
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 05:30:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C756874761
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 05:40:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F766B21BFD
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:30:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D178FB216C0
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05435817;
-	Thu,  7 Mar 2024 04:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83A4517BAB;
+	Thu,  7 Mar 2024 04:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cBKV3b4h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZwfjyQb9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20231BF31;
-	Thu,  7 Mar 2024 04:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C856AB6;
+	Thu,  7 Mar 2024 04:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709785830; cv=none; b=R1mG+zuMABeJBlHRMSaJcRjjQK4XgCHqbMxCR2yOKdvChYo6mjNfWRaeuCZ51RptAwhxcYixonYeu7XUUNH3OX1xah2Tmhg92YFWze8E422aAy98QCFXhEaUTYRv2HZL9IZUM7BRs/lrL5e4DyEsHlBErWKccYU00TjHgHc8a6M=
+	t=1709786431; cv=none; b=it9Y6OaPeffQRtEW+3TrdxfdC5lZWLP7utpi2nMV5SKgqOV2+kZPW21EvaQzHl5AVwapODV39u9gafKsW1fcVnq1cF68U27ywUk8mXhgJr0Bl689O7BMZU6xHCVc6jebFsNDlq36Ind0FQYRPMtqAzFupUPoL4g35+rsggYK8vA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709785830; c=relaxed/simple;
-	bh=iffEfLmA7cwx+ct1DNqjmZkXXJTmO8J6oqYcHM5Lz+0=;
+	s=arc-20240116; t=1709786431; c=relaxed/simple;
+	bh=F/D0AFTQA1rWt7M3FC23pO3tjkdfYMe57HcF5/pb1wQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SRqang5BVZzbCUK696p1yYURZPQXJga/ZhHXrcUZvITzRrXkhz4feuVd4FNdKmUGmcq0Gk+PJud0IOa+ldkeaAF5QriUa/aXdOysu4pb9nyTYNvN14pVEd1YOpgAv+tr7VOrgc3hz8wNptjLlwNKJ8T3tMUFTzK1qu+/psYbSa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cBKV3b4h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4A5D3C43390;
-	Thu,  7 Mar 2024 04:30:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=pbDaTzP76moJBQM7eQsAjOvLhXG4dAllEeZbyRUIYzbHz4YRnKdhak+NxFONU7c46/bsRRIiG+8+Ji+9BPQsgckXT4PHnLy24FWRocF12xXakJ5wJZjzbf0pyaJZmWUmhpZQHofk3tebYR17CyYs8B6hWzk3sem8OiJ4R/JztEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZwfjyQb9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E5B41C433A6;
+	Thu,  7 Mar 2024 04:40:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709785830;
-	bh=iffEfLmA7cwx+ct1DNqjmZkXXJTmO8J6oqYcHM5Lz+0=;
+	s=k20201202; t=1709786431;
+	bh=F/D0AFTQA1rWt7M3FC23pO3tjkdfYMe57HcF5/pb1wQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cBKV3b4h82w+mkBzUmdQtKwLQ9jh1e2UP6dH+Hc8XAGumyjgYSvOMqgcmtZ2rSh2M
-	 LZDe3PR1OJIHHBrnQNbz8bJM22wWo2v9andFB+D9bJCh75rCGnKlRRQU8objX4P2pj
-	 uRO5a8aAyQiZ8LKOAIsvQmmeshic51oVDLvlCEeXwED6eAmtCnstIxwT6sazUr95HT
-	 SWq97AT6Zp6kAiE/55bMO1P9pnH6Mh8R9UzpbHNZ/ZPFiGd6QFj4YE42MeCrOHeTkX
-	 w8rxXyBQzdk1IUrq09rTbCPE8TKD7smVp6VrwEt/ePW9byKNpi3/K63xhB+lDY7jgd
-	 eOkZexcjaeAYw==
+	b=ZwfjyQb9/swVE8cnMGrLb6i+49kwhEEATXm8c+Gi4shi0vtohL98VXUbMgSm6ude0
+	 /qxKgSTtrIYPb0U95k/XWFzHKU4l/Iuu4Q+xj9GfTN1iv3wx8rHB8AV3KvvvBHkF3n
+	 nJQT72PO2d2pygkcH/H408BSQxkS28+5P4s1l2UXCWFDOB2ywtbKD/1YcE6hh4guZd
+	 bLRwCV4FtBru6EpPPG+bMtvMNbFSwPTgi0APDSf6Y/yfU82rcPTQ+I8oBBSgU1U5Hh
+	 AML0OAeVkijqGdIAhCk9wvTRETrZsfkaxCWrpMXyvSUCre843NYjWNxv6rD/fZ9ReN
+	 ZuStzMGeWq7lA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2C34FC04D3F;
-	Thu,  7 Mar 2024 04:30:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CEC70D9A4B5;
+	Thu,  7 Mar 2024 04:40:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf 2024-03-06
+Subject: Re: [PATCH] sr9800: Add check for usbnet_get_endpoints
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170978583017.1930.14993526259352753718.git-patchwork-notify@kernel.org>
-Date: Thu, 07 Mar 2024 04:30:30 +0000
-References: <20240306220309.13534-1-daniel@iogearbox.net>
-In-Reply-To: <20240306220309.13534-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+ <170978643084.7855.4814216830505306381.git-patchwork-notify@kernel.org>
+Date: Thu, 07 Mar 2024 04:40:30 +0000
+References: <20240305075927.261284-1-nichen@iscas.ac.cn>
+In-Reply-To: <20240305075927.261284-1-nichen@iscas.ac.cn>
+To: Chen Ni <nichen@iscas.ac.cn>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, justinstitt@google.com, andrew@lunn.ch,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  6 Mar 2024 23:03:09 +0100 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
+On Tue,  5 Mar 2024 07:59:27 +0000 you wrote:
+> Add check for usbnet_get_endpoints() and return the error if it fails
+> in order to transfer the error.
 > 
-> The following pull-request contains BPF updates for your *net* tree.
-> 
-> We've added 5 non-merge commits during the last 1 day(s) which contain
-> a total of 5 files changed, 77 insertions(+), 4 deletions(-).
-> 
-> [...]
+> Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+> ---
+>  drivers/net/usb/sr9800.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
 Here is the summary with links:
-  - pull-request: bpf 2024-03-06
-    https://git.kernel.org/netdev/net/c/d3eee81fd611
+  - sr9800: Add check for usbnet_get_endpoints
+    https://git.kernel.org/netdev/net-next/c/07161b2416f7
 
 You are awesome, thank you!
 -- 
