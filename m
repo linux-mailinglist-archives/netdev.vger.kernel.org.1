@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-78271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D51F08749C3
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:36:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DB318749CF
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:36:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32678B2388A
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:36:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F11081F24996
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 08:36:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92CF82D87;
-	Thu,  7 Mar 2024 08:35:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4B51C2A3;
+	Thu,  7 Mar 2024 08:36:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="f3AdrA00"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="I6vtqg3V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561C182D7A
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 08:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2852570CAA
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 08:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709800546; cv=none; b=f6CvGA+GqKuyrc2050jzGml8a+SQY2WyWMLeMauHZ7qXiabaZo5Z0nYY/utw8wEGYJILW0M1iK6DYjSYMGebAgZLxIqqkZsgYZJEXwm83ST9S+SAQuyqNgWYpnwgkz6gH/l19yXhMIodzZ19xjbFvpOgfzSnKTf8oaviDXKS37g=
+	t=1709800589; cv=none; b=mxsU05Y6U2AuFpT+m5tMM98IUPvCEH5huRGRFlgqsiuUClm3Q7LEI05wB7Jilr+8TTqFtSE23Ir6uL7b4vVTtyhH0/H0SXgN3Tj4dxGuIh5r3V9H0vi1+ooBznf5OwqhOQkpVYKY1L7piyJbrZkRPD/LKV/h/kyDk34aaWzEHsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709800546; c=relaxed/simple;
-	bh=W3TKnfGFSbRnqXKIeTJeO+s0nVZ9/0NYzuqNQRows+k=;
+	s=arc-20240116; t=1709800589; c=relaxed/simple;
+	bh=YIJyDIiYr+E/5bxQ0O/xBpenqUOxTDp7Iq6pitmMVuA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ERD3zSk0b8nbKRKW8F6N7dYBNJhDQrQl4EdIjnSPhxQ5271Fv2vBb4gUTCmpFp/56q4tmP8Z1q6cq7+Gxh43ax2rjihNlUpcrrMIFewV6B/0YmfbnRhw2Dkj8IpO1m7misEUJMq7jCR+m6kowgxqy85jRMYdXiP+1LEnrttmKRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=f3AdrA00; arc=none smtp.client-ip=209.85.208.175
+	 Content-Type:Content-Disposition:In-Reply-To; b=IKW1dJwcnltlVjVUauaUqNIx9gDla5f8rXJUvifwmvejCv8Nv3GmiI/gfNhILhtD0PCaoB1oU0zFmsrH1oFrQwlRDWB0r81hVPa/dY8zfSs7B7GV9ek8GFRWcba6/cN+QUQmfVfFjN9NzUZG2oIPwzv+5FITMG8aPGrTZg5VIME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=I6vtqg3V; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2d21cdbc85bso7172141fa.2
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 00:35:44 -0800 (PST)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-412fc5f5099so4922365e9.2
+        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 00:36:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709800542; x=1710405342; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1709800585; x=1710405385; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=P+bXBJixQOUsop2TJKZ58GCIYbvqkD+ezDVnGT61Olk=;
-        b=f3AdrA00hD91/zHYiGvhtypxEkcsNOcZEk4AotUb68tjHxD8sIiAQ72eaI3P2lqLVI
-         lPXFEeR1/OGtAPLoJdEv1MmJ6jlKDJ/ettQEfuSBRlpVsu1gHrQYyuzXOOozrC+0bD++
-         426oIxnWV3rfJsuJiAnqixnUeG7flCy70HHrHIjgLNgrrLDJubO8KoHEJp5zZROd01ko
-         l2S0lSLeR8fg6iToMbiJFkN7C8JfH+LqD7OveMGc+izKLBwCHfRJTun3Q5ACpw2h0dGX
-         4pCPOeytzdiRGoM6sHkzAvl8yQru3XaqYl1Jf2XCpxN4b+wdExrqNTLiiSN+3lu9+Zmc
-         Ksng==
+        bh=CAc+kC0MFvkIafAcJxHHO/LYj1eLM3W27yzXh9fYe6w=;
+        b=I6vtqg3V0I5USuIvtjzzrLICm6oe0mbgzPk9RzLogC0B9rxES1Nfe7DQeKSBrO5BQ2
+         88XIODWN5/8PUQhcgqH4ZBrWiHNYNkJ6k1Bxb2GaaxCHvguhn5biA9EX4i9AhuqchTnW
+         5OUJ6Hf+L+ZqA9ML1lYEE2Xjc/PxEYcfTVZ5GVjeGkzlqD8P83t5OhpHZA0DSqSdoQTn
+         iSzU/xxlU0HjhHcwFOzk2Z9CbQC5unNk8enM3DG6D4fTjblQDYP4uzqke1195thbcT8X
+         RXsOuN/kN2zwSNKxIzj9sDcJ+bY+BiXVF3NlBrWSpx0cEJBdjaCfC2q0g7hLDBw7+GLZ
+         Xx2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709800542; x=1710405342;
+        d=1e100.net; s=20230601; t=1709800585; x=1710405385;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=P+bXBJixQOUsop2TJKZ58GCIYbvqkD+ezDVnGT61Olk=;
-        b=NaGWFZ8Sx7sp/rr6mZ6VkPw93Kf7R+iApqswejbMd7iaL6LKthq7C3ArWDBEfAdDr8
-         Oo3oP45Rwz6USvpQgjhGub+6egGA2qf8F8Uqhd3knxfRtJlqszcJC99M1Xb4vDrcByzn
-         +SdS5Cco12t5E7boD79PHxbrbGIzVjx99jXfLC/BXJwl0+hk9kbqvmj5LiuOOd343ytB
-         /YAuDoJ+bVMuikWJMSCi1RXZPqmJcQA8GHsuHCbART/jSmK0TkanzMXqjxJHDvktmR64
-         n4YOxqi27Md7r8yO5zAjaV2GH5PFKNOElrp3+peHsq2EDw9rrQiUALX2lVxM8Da02x1E
-         YXkg==
-X-Gm-Message-State: AOJu0Yw/FaCdP/ejkojYQ2JbdZi9llAH0IeJw7pR7dq5aBSj57XhAcaV
-	y/bXvQel4kl2L2U1NoHAgPMh0epl+f3fsr7L15E7EehariLVELAsDzEo+eEdp+Q=
-X-Google-Smtp-Source: AGHT+IEc5Or50maI4OA0EUo0VoeQmuXpjXjSMufMtXHGHGCENFlZK+bpqzV7FYMhodkCXmmDIueoUA==
-X-Received: by 2002:a2e:be23:0:b0:2d2:5668:3a40 with SMTP id z35-20020a2ebe23000000b002d256683a40mr974616ljq.4.1709800542066;
-        Thu, 07 Mar 2024 00:35:42 -0800 (PST)
+        bh=CAc+kC0MFvkIafAcJxHHO/LYj1eLM3W27yzXh9fYe6w=;
+        b=W0eYErWdlap9Gg4vVH9aR3htMwUZArS1hBjO8lirTVnDJA+WzZE75fb2IdI7kE1zbR
+         PlMD5BzOmvpD7kgo3x51C9jLxG7eiBEluP60ZM1zEbhFoTAwTHCazdoxaPpib6oPpZSv
+         raG3o3SZAGGcEct5cm7xe1lzzAodAyiwgS8QQ6zjcWtQhgZwPFiou38w7L59v7yNRxvc
+         h2zszWR2xUzC71qJaL8paWmtnkfIaepL7JPa15U3cc2wjYbuVNcft21t8XHarby3InO9
+         zx0HQz7NEYcZHc7fD9SvQZLnOe1nJymfF2rpffO6QHa/+RcGja3T9JR+0spoIj5UiKW/
+         0rAA==
+X-Gm-Message-State: AOJu0YyWRCJNWuF5NPtwAigfWWTvcCiQWG82QXd0Tlz32zNt8WYftGuK
+	WobHKEZUf4Z+mCgukoHwIwiPKqxMZ/S82+MZpaxxvo+IYR8SuOR2dYTFVMTDQko=
+X-Google-Smtp-Source: AGHT+IH2LRHWpsXBJgymVHDeG9E53lSQinDDC0B43A2KaqmMbS20RpD8KVl02bqUTtvoruglDoG+jQ==
+X-Received: by 2002:a5d:4c46:0:b0:33d:2f2f:e779 with SMTP id n6-20020a5d4c46000000b0033d2f2fe779mr13388232wrt.40.1709800585096;
+        Thu, 07 Mar 2024 00:36:25 -0800 (PST)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id cr14-20020a05600004ee00b0033dd06e628asm19644957wrb.27.2024.03.07.00.35.40
+        by smtp.gmail.com with ESMTPSA id bw1-20020a0560001f8100b0033d6bc17d0esm20148359wrb.74.2024.03.07.00.36.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Mar 2024 00:35:41 -0800 (PST)
-Date: Thu, 7 Mar 2024 09:35:38 +0100
+        Thu, 07 Mar 2024 00:36:24 -0800 (PST)
+Date: Thu, 7 Mar 2024 09:36:21 +0100
 From: Jiri Pirko <jiri@resnulli.us>
 To: William Tu <witu@nvidia.com>
 Cc: netdev@vger.kernel.org, jiri@nvidia.com, bodong@nvidia.com,
 	tariqt@nvidia.com, yossiku@nvidia.com, kuba@kernel.org
-Subject: Re: [PATCH RFC v3 net-next 1/2] devlink: Add shared memory pool
+Subject: Re: [PATCH RFC v3 iproute2-next] devlink: Add shared memory pool
  eswitch attribute
-Message-ID: <Zel8WpMczric0fz3@nanopsycho>
-References: <20240306231253.8100-1-witu@nvidia.com>
+Message-ID: <Zel8hfZw5nEFB-dN@nanopsycho>
+References: <20240306232922.8249-1-witu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,9 +82,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240306231253.8100-1-witu@nvidia.com>
+In-Reply-To: <20240306232922.8249-1-witu@nvidia.com>
 
-Thu, Mar 07, 2024 at 12:12:52AM CET, witu@nvidia.com wrote:
+Thu, Mar 07, 2024 at 12:29:22AM CET, witu@nvidia.com wrote:
 >Add eswitch attribute spool_size for shared memory pool size.
 >
 >When using switchdev mode, the representor ports handles the slow path
@@ -115,64 +115,111 @@ Thu, Mar 07, 2024 at 12:12:52AM CET, witu@nvidia.com wrote:
 >
 >Signed-off-by: William Tu <witu@nvidia.com>
 >---
->v3: feedback from Jakub
->- introduce 1 attribute instead of 2
->- use spool_size == 0 to disable
->- spool_size as byte unit, not counts
+>v3:
+>- change to 1 attributes and rename to spool-size
 >
->Question about ENODOCS:
->where to add this? the only document about devlink attr is at iproute2
->Do I add a new file Documentation/networking/devlink/devlink-eswitch-attr.rst?
-
-Yeah. Please document the existing attrs as well while you are at it.
-
-
+>v2: feedback from Stephen
+>- add man page, send to iproute2-next
 >---
-> Documentation/netlink/specs/devlink.yaml |  4 ++++
-> include/net/devlink.h                    |  3 +++
-> include/uapi/linux/devlink.h             |  1 +
-> net/devlink/dev.c                        | 21 +++++++++++++++++++++
-> net/devlink/netlink_gen.c                |  5 +++--
-> 5 files changed, 32 insertions(+), 2 deletions(-)
+> devlink/devlink.c            | 25 +++++++++++++++++++++++--
+> include/uapi/linux/devlink.h |  1 +
+> man/man8/devlink-dev.8       |  6 ++++++
+> 3 files changed, 30 insertions(+), 2 deletions(-)
 >
->diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
->index cf6eaa0da821..cb46fa9d6664 100644
->--- a/Documentation/netlink/specs/devlink.yaml
->+++ b/Documentation/netlink/specs/devlink.yaml
->@@ -429,6 +429,9 @@ attribute-sets:
->         name: eswitch-encap-mode
->         type: u8
->         enum: eswitch-encap-mode
->+      -
->+        name: eswitch-spool-size
->+        type: u32
->       -
->         name: resource-list
->         type: nest
->@@ -1555,6 +1558,7 @@ operations:
->             - eswitch-mode
->             - eswitch-inline-mode
->             - eswitch-encap-mode
->+            - eswitch-spool-size
+>diff --git a/devlink/devlink.c b/devlink/devlink.c
+>index dbeb6e397e8e..5ad789caa934 100644
+>--- a/devlink/devlink.c
+>+++ b/devlink/devlink.c
+>@@ -309,6 +309,7 @@ static int ifname_map_update(struct ifname_map *ifname_map, const char *ifname)
+> #define DL_OPT_PORT_FN_RATE_TX_PRIORITY	BIT(55)
+> #define DL_OPT_PORT_FN_RATE_TX_WEIGHT	BIT(56)
+> #define DL_OPT_PORT_FN_CAPS	BIT(57)
+>+#define DL_OPT_ESWITCH_SPOOL_SIZE	BIT(58)
 > 
->     -
->       name: eswitch-set
->diff --git a/include/net/devlink.h b/include/net/devlink.h
->index 9ac394bdfbe4..164c543dd7ca 100644
->--- a/include/net/devlink.h
->+++ b/include/net/devlink.h
->@@ -1327,6 +1327,9 @@ struct devlink_ops {
-> 	int (*eswitch_encap_mode_set)(struct devlink *devlink,
-> 				      enum devlink_eswitch_encap_mode encap_mode,
-> 				      struct netlink_ext_ack *extack);
->+	int (*eswitch_spool_size_get)(struct devlink *devlink, u32 *p_size);
->+	int (*eswitch_spool_size_set)(struct devlink *devlink, u32 size,
->+				      struct netlink_ext_ack *extack);
-> 	int (*info_get)(struct devlink *devlink, struct devlink_info_req *req,
-> 			struct netlink_ext_ack *extack);
-> 	/**
+> struct dl_opts {
+> 	uint64_t present; /* flags of present items */
+>@@ -375,6 +376,7 @@ struct dl_opts {
+> 	const char *linecard_type;
+> 	bool selftests_opt[DEVLINK_ATTR_SELFTEST_ID_MAX + 1];
+> 	struct nla_bitfield32 port_fn_caps;
+>+	uint32_t eswitch_spool_size;
+> };
+> 
+> struct dl {
+>@@ -630,6 +632,7 @@ static const enum mnl_attr_data_type devlink_policy[DEVLINK_ATTR_MAX + 1] = {
+> 	[DEVLINK_ATTR_ESWITCH_MODE] = MNL_TYPE_U16,
+> 	[DEVLINK_ATTR_ESWITCH_INLINE_MODE] = MNL_TYPE_U8,
+> 	[DEVLINK_ATTR_ESWITCH_ENCAP_MODE] = MNL_TYPE_U8,
+>+	[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE] = MNL_TYPE_U32,
+> 	[DEVLINK_ATTR_DPIPE_TABLES] = MNL_TYPE_NESTED,
+> 	[DEVLINK_ATTR_DPIPE_TABLE] = MNL_TYPE_NESTED,
+> 	[DEVLINK_ATTR_DPIPE_TABLE_NAME] = MNL_TYPE_STRING,
+>@@ -1672,6 +1675,7 @@ static const struct dl_args_metadata dl_args_required[] = {
+> 	{DL_OPT_LINECARD,	      "Linecard index expected."},
+> 	{DL_OPT_LINECARD_TYPE,	      "Linecard type expected."},
+> 	{DL_OPT_SELFTESTS,            "Test name is expected"},
+>+	{DL_OPT_ESWITCH_SPOOL_SIZE,   "E-Switch shared memory pool size expected."},
+> };
+> 
+> static int dl_args_finding_required_validate(uint64_t o_required,
+>@@ -1895,6 +1899,13 @@ static int dl_argv_parse(struct dl *dl, uint64_t o_required,
+> 			if (err)
+> 				return err;
+> 			o_found |= DL_OPT_ESWITCH_ENCAP_MODE;
+>+		} else if (dl_argv_match(dl, "spool-size") &&
+>+			   (o_all & DL_OPT_ESWITCH_SPOOL_SIZE)) {
+>+			dl_arg_inc(dl);
+>+			err = dl_argv_uint32_t(dl, &opts->eswitch_spool_size);
+>+			if (err)
+>+				return err;
+>+			o_found |= DL_OPT_ESWITCH_SPOOL_SIZE;
+> 		} else if (dl_argv_match(dl, "path") &&
+> 			   (o_all & DL_OPT_RESOURCE_PATH)) {
+> 			dl_arg_inc(dl);
+>@@ -2547,6 +2558,9 @@ static void dl_opts_put(struct nlmsghdr *nlh, struct dl *dl)
+> 	if (opts->present & DL_OPT_ESWITCH_ENCAP_MODE)
+> 		mnl_attr_put_u8(nlh, DEVLINK_ATTR_ESWITCH_ENCAP_MODE,
+> 				opts->eswitch_encap_mode);
+>+	if (opts->present & DL_OPT_ESWITCH_SPOOL_SIZE)
+>+		mnl_attr_put_u32(nlh, DEVLINK_ATTR_ESWITCH_SPOOL_SIZE,
+>+				 opts->eswitch_spool_size);
+> 	if ((opts->present & DL_OPT_RESOURCE_PATH) && opts->resource_id_valid)
+> 		mnl_attr_put_u64(nlh, DEVLINK_ATTR_RESOURCE_ID,
+> 				 opts->resource_id);
+>@@ -2707,6 +2721,7 @@ static void cmd_dev_help(void)
+> 	pr_err("       devlink dev eswitch set DEV [ mode { legacy | switchdev } ]\n");
+> 	pr_err("                               [ inline-mode { none | link | network | transport } ]\n");
+> 	pr_err("                               [ encap-mode { none | basic } ]\n");
+>+	pr_err("                               [ spool-size { SIZE } ]\n");
+> 	pr_err("       devlink dev eswitch show DEV\n");
+> 	pr_err("       devlink dev param set DEV name PARAMETER value VALUE cmode { permanent | driverinit | runtime }\n");
+> 	pr_err("       devlink dev param show [DEV name PARAMETER]\n");
+>@@ -3194,7 +3209,12 @@ static void pr_out_eswitch(struct dl *dl, struct nlattr **tb)
+> 			     eswitch_encap_mode_name(mnl_attr_get_u8(
+> 				    tb[DEVLINK_ATTR_ESWITCH_ENCAP_MODE])));
+> 	}
+>-
+>+	if (tb[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE]) {
+>+		check_indent_newline(dl);
+>+		print_uint(PRINT_ANY, "spool-size", "spool-size %u",
+>+			   mnl_attr_get_u32(
+>+				    tb[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE]));
+>+	}
+> 	pr_out_handle_end(dl);
+> }
+> 
+>@@ -3239,7 +3259,8 @@ static int cmd_dev_eswitch_set(struct dl *dl)
+> 	err = dl_argv_parse(dl, DL_OPT_HANDLE,
+> 			    DL_OPT_ESWITCH_MODE |
+> 			    DL_OPT_ESWITCH_INLINE_MODE |
+>-			    DL_OPT_ESWITCH_ENCAP_MODE);
+>+			    DL_OPT_ESWITCH_ENCAP_MODE |
+>+			    DL_OPT_ESWITCH_SPOOL_SIZE);
+> 	if (err)
+> 		return err;
+> 
 >diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
->index 130cae0d3e20..cbe51be7a08a 100644
+>index e77170199815..c750e29a1c5c 100644
 >--- a/include/uapi/linux/devlink.h
 >+++ b/include/uapi/linux/devlink.h
 >@@ -614,6 +614,7 @@ enum devlink_attr {
@@ -181,98 +228,36 @@ Yeah. Please document the existing attrs as well while you are at it.
 > 
 >+	DEVLINK_ATTR_ESWITCH_SPOOL_SIZE,	/* u32 */
 > 	/* add new attributes above here, update the policy in devlink.c */
-
-While at it, could you please update this comment? It should say:
- 	/* Add new attributes above here, update the spec in
-	 * Documentation/netlink/specs/devlink.yaml and re-generate
-	 * net/devlink/netlink_gen.c. */
-As a separate patch please.
-
-
 > 
 > 	__DEVLINK_ATTR_MAX,
->diff --git a/net/devlink/dev.c b/net/devlink/dev.c
->index 19dbf540748a..561874424db7 100644
->--- a/net/devlink/dev.c
->+++ b/net/devlink/dev.c
->@@ -633,6 +633,7 @@ static int devlink_nl_eswitch_fill(struct sk_buff *msg, struct devlink *devlink,
-> {
-> 	const struct devlink_ops *ops = devlink->ops;
-> 	enum devlink_eswitch_encap_mode encap_mode;
->+	u32 spool_size;
-> 	u8 inline_mode;
-> 	void *hdr;
-> 	int err = 0;
->@@ -674,6 +675,15 @@ static int devlink_nl_eswitch_fill(struct sk_buff *msg, struct devlink *devlink,
-> 			goto nla_put_failure;
-> 	}
+>diff --git a/man/man8/devlink-dev.8 b/man/man8/devlink-dev.8
+>index e9d091df48d8..081cc8740f8b 100644
+>--- a/man/man8/devlink-dev.8
+>+++ b/man/man8/devlink-dev.8
+>@@ -34,6 +34,8 @@ devlink-dev \- devlink device configuration
+> .BR inline-mode " { " none " | " link " | " network " | " transport " } "
+> ] [
+> .BR encap-mode " { " none " | " basic " } "
+>+] [
+>+.BR spool-size " { SIZE } "
+> ]
 > 
->+	if (ops->eswitch_spool_size_get) {
->+		err = ops->eswitch_spool_size_get(devlink, &spool_size);
->+		if (err)
->+			goto nla_put_failure;
->+		err = nla_put_u32(msg, DEVLINK_ATTR_ESWITCH_SPOOL_SIZE, spool_size);
->+		if (err)
->+			goto nla_put_failure;
->+	}
+> .ti -8
+>@@ -151,6 +153,10 @@ Set eswitch encapsulation support
+> .I basic
+> - Enable encapsulation support
+> 
+>+.TP
+>+.BR spool-size " SIZE"
+>+Set the rx shared memory pool size in bytes.
+
+Be more verbose please. Describe the cmd line option properly.
+
+
 >+
-> 	genlmsg_end(msg, hdr);
-> 	return 0;
+> .SS devlink dev param set  - set new value to devlink device configuration parameter
 > 
->@@ -708,10 +718,21 @@ int devlink_nl_eswitch_set_doit(struct sk_buff *skb, struct genl_info *info)
-> 	struct devlink *devlink = info->user_ptr[0];
-> 	const struct devlink_ops *ops = devlink->ops;
-> 	enum devlink_eswitch_encap_mode encap_mode;
->+	u32 spool_size;
-> 	u8 inline_mode;
-> 	int err = 0;
-> 	u16 mode;
-> 
->+	if (info->attrs[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE]) {
->+		if (!ops->eswitch_spool_size_set)
-
-Fill up extack msg here please.
-
-
->+			return -EOPNOTSUPP;
->+		spool_size = nla_get_u32(info->attrs[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE]);
->+		err = ops->eswitch_spool_size_set(devlink, spool_size,
->+						  info->extack);
->+		if (err)
->+			return err;
->+	}
->+
-> 	if (info->attrs[DEVLINK_ATTR_ESWITCH_MODE]) {
-> 		if (!ops->eswitch_mode_set)
-> 			return -EOPNOTSUPP;
->diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
->index c81cf2dd154f..acbf484b28a2 100644
->--- a/net/devlink/netlink_gen.c
->+++ b/net/devlink/netlink_gen.c
->@@ -194,12 +194,13 @@ static const struct nla_policy devlink_eswitch_get_nl_policy[DEVLINK_ATTR_DEV_NA
-> };
-> 
-> /* DEVLINK_CMD_ESWITCH_SET - do */
->-static const struct nla_policy devlink_eswitch_set_nl_policy[DEVLINK_ATTR_ESWITCH_ENCAP_MODE + 1] = {
->+static const struct nla_policy devlink_eswitch_set_nl_policy[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE + 1] = {
-> 	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
-> 	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
-> 	[DEVLINK_ATTR_ESWITCH_MODE] = NLA_POLICY_MAX(NLA_U16, 1),
-> 	[DEVLINK_ATTR_ESWITCH_INLINE_MODE] = NLA_POLICY_MAX(NLA_U16, 3),
-> 	[DEVLINK_ATTR_ESWITCH_ENCAP_MODE] = NLA_POLICY_MAX(NLA_U8, 1),
->+	[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE] = { .type = NLA_U32, },
-> };
-> 
-> /* DEVLINK_CMD_DPIPE_TABLE_GET - do */
->@@ -787,7 +788,7 @@ const struct genl_split_ops devlink_nl_ops[74] = {
-> 		.doit		= devlink_nl_eswitch_set_doit,
-> 		.post_doit	= devlink_nl_post_doit,
-> 		.policy		= devlink_eswitch_set_nl_policy,
->-		.maxattr	= DEVLINK_ATTR_ESWITCH_ENCAP_MODE,
->+		.maxattr	= DEVLINK_ATTR_ESWITCH_SPOOL_SIZE,
-> 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
-> 	},
-> 	{
+> .TP
 >-- 
 >2.38.1
 >
