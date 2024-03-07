@@ -1,226 +1,293 @@
-Return-Path: <netdev+bounces-78551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B32A2875B0F
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 00:23:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF8AC875B31
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 00:46:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5CBF1C21404
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 23:23:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3AD01C20BA7
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 23:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C92F3FB2F;
-	Thu,  7 Mar 2024 23:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2A34644F;
+	Thu,  7 Mar 2024 23:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pMTkFiVX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="gf4QFrwz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from omta34.uswest2.a.cloudfilter.net (omta34.uswest2.a.cloudfilter.net [35.89.44.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E993D988;
-	Thu,  7 Mar 2024 23:22:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF942D050
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 23:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709853781; cv=none; b=a3QAOard40B9YDxtx35gQbgbodCuRC+K5XgWLVuA0hgn35axWinGL6TuYXi8i5mJ3K9WHJAbKIDg0C6Tp6TxEhpkDQW+xLtZzZKFwtzTUgOKpbiYqVea232TQh2yjHcyAF3VQ+jJXXTzjyw41qrJBFpNqjivgKEZfUhf6m0gnJ4=
+	t=1709855213; cv=none; b=gk2Q/+Nc8cSKdbx81Y838fRT5GS6eMWsM+5V5JnkLsiCTK/QtwT7ScFm9vKgl2ukXdCrBIKfiu6FucR74WtPwaVtaJsc40kfXDVMLPQp0cff/fJvImdHrRoVM4JPNGyBA07YFVPLXPVgSdyw2r2+awcbpEMhmJ9pSpEu1VfYz4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709853781; c=relaxed/simple;
-	bh=4WM+wUvnbTHRz2eV4XY6elFPBHAxwoIPaDIQkdWcSrw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OIWdd6BCPLFPn0jg68yocZJ9p3YfPbnhMEwaXAuXC27uKSHiMDQhiPjkiMNQD1s2o5jlKksIPZt27atm8zefkdDll53bs6DaA2y7gnvHEvT3xcSQVGTEILakxiZlTMOkaWlhVX7NT2QMvWNK/7uZHVJHA8DeK1r8jIChlHhTciU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=pMTkFiVX; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1709853780; x=1741389780;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=U0RPgy773C5+DdQUYA3mfjmJjSMNNGTss/mkPhGk2xE=;
-  b=pMTkFiVX8C1v/tkYWPsEbX6NUTwc+a7hv+P5NvJqxk5Etiy3P4XMcNbs
-   U78/a64Tpg5ENEruq3X33QBq1YZ1CnFzn7wOH10VfX/ABGvv7FthiZphU
-   V7R2dVlrq7R1FthBI+WnOPoVnW2EnG92OyqV6P9WIurvlL25oCCKZv/dE
-   A=;
-X-IronPort-AV: E=Sophos;i="6.07,107,1708387200"; 
-   d="scan'208";a="386316208"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2024 23:22:57 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:62963]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.15.174:2525] with esmtp (Farcaster)
- id dd357180-69a5-4fd5-806b-b1330ee8de68; Thu, 7 Mar 2024 23:22:56 +0000 (UTC)
-X-Farcaster-Flow-ID: dd357180-69a5-4fd5-806b-b1330ee8de68
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 7 Mar 2024 23:22:55 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.101.47) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 7 Mar 2024 23:22:52 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Allison Henderson <allison.henderson@oracle.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<rds-devel@oss.oracle.com>, syzkaller <syzkaller@googlegroups.com>
-Subject: [PATCH v4 net 2/2] rds: tcp: Fix use-after-free of net in reqsk_timer_handler().
-Date: Thu, 7 Mar 2024 15:21:51 -0800
-Message-ID: <20240307232151.55963-3-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240307232151.55963-1-kuniyu@amazon.com>
-References: <20240307232151.55963-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1709855213; c=relaxed/simple;
+	bh=wF6nOFCqocpsBSgk2lYQp+fzFod97LPq/8M/FHS/q0s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pGGYYXqjLa82QxKn9YQ+QD6KQIsEFtkdyenZw9GzaPbXcYqi15OFBZhfYYV070V2iylBIV5/FDYMEFFFC4qS9jcbuxUTYoW9h2R5jz6eKhoaE5x+i1la1dxQ5UxVqbOxuDcNqYIP5wuUGSBAA9iW5/MXEHIU8/uoUacripxkoxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=gf4QFrwz; arc=none smtp.client-ip=35.89.44.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-5009a.ext.cloudfilter.net ([10.0.29.176])
+	by cmsmtp with ESMTPS
+	id i7GXrorzcHXmAiNRlrh9LH; Thu, 07 Mar 2024 23:46:45 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id iNRkrfEAB3BJtiNRkrzq5Z; Thu, 07 Mar 2024 23:46:44 +0000
+X-Authority-Analysis: v=2.4 cv=Ap3o3v9P c=1 sm=1 tr=0 ts=65ea51e4
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=VhncohosazJxI00KdYJ/5A==:17
+ a=IkcTkHD0fZMA:10 a=K6JAEmCyrfEA:10 a=wYkD_t78qR0A:10 a=VwQbUJbxAAAA:8
+ a=_DmBcgav1riKsY_yCuwA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=AjGcO6oz07-iQ99wixmX:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=7z7q2oC1uoCR6VrsF8fDkT9utXrmRySUy35G6DBhC1U=; b=gf4QFrwz4lDtNHm7liWxG8HSKB
+	vgRIhxQ9/oZkTzEJNqtoFlrcqyEatYSfZUTcuA0wZzejMZ4n7B1WvF6Kz5EhWTbYc0nZgsynniLAm
+	rUjD3tds3mZCQQBsHgRGgk5D+SdDSOEhEiuYTqjyX/e/+iuGT0rbr3iUtAByIgHN/hrw+hxPHzd+n
+	RIxz8JLIsBvGm/LMb30T3g+nXSHNSQPV8V1WIDK/mfj+DXRifkWZOFg0S0dbKADGqThapGSupPGcp
+	FGp+8jgaS0DynQFlkPpwJbvoKny/GBmmfON9iH31qx6sCCjycJr9EzmqO3KvurdmfNKm04GEgl0Rd
+	hUgWAd2g==;
+Received: from [201.172.172.225] (port=50666 helo=[192.168.15.10])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1riNRi-000vqt-1f;
+	Thu, 07 Mar 2024 17:46:42 -0600
+Message-ID: <82c1dc9e-d5b6-40e3-9d81-d18cc270724b@embeddedor.com>
+Date: Thu, 7 Mar 2024 17:46:39 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH][next] net/smc: Avoid -Wflex-array-member-not-at-end
+ warnings
+Content-Language: en-US
+To: Jan Karcher <jaka@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Wenjia Zhang <wenjia@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>,
+ Tony Lu <tonylu@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ Kees Cook <keescook@chromium.org>
+References: <ZeIhOT44ON5rjPiP@neat>
+ <71aa847b-2edc-44a2-beb7-3610bf744937@linux.alibaba.com>
+ <1cb9a110-c877-4420-9b23-1e7980f1300a@linux.ibm.com>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <1cb9a110-c877-4420-9b23-1e7980f1300a@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA004.ant.amazon.com (10.13.139.9) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 201.172.172.225
+X-Source-L: No
+X-Exim-ID: 1riNRi-000vqt-1f
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.15.10]) [201.172.172.225]:50666
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 4
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfCqzu2je4zy9YE88vjYqMCRUuATRf5cy5z5uBGyB91a/vnGon6PF7Tjqt7pqaFsxYlyNuACVJHC7K69OI3RfhUrKDb+Ydhwbkon69MsdWqgXy41EnCz6
+ vk0DP20hGqscFdBv90pnfHucEofu7CJBUhNRSTN+K+Uz8Io4uRaBRf217bZ3YwELagLyor07KaUUOsVBhExSEB82qwra5hIYT4g=
 
-syzkaller reported a warning of netns tracker [0] followed by KASAN
-splat [1] and another ref tracker warning [1].
 
-syzkaller could not find a repro, but in the log, the only suspicious
-sequence was as follows:
 
-  18:26:22 executing program 1:
-  r0 = socket$inet6_mptcp(0xa, 0x1, 0x106)
-  ...
-  connect$inet6(r0, &(0x7f0000000080)={0xa, 0x4001, 0x0, @loopback}, 0x1c) (async)
+On 3/7/24 02:17, Jan Karcher wrote:
+> 
+> 
+> On 04/03/2024 10:00, Wen Gu wrote:
+>>
+>>
+>> On 2024/3/2 02:40, Gustavo A. R. Silva wrote:
+>>> -Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
+>>> ready to enable it globally.
+>>>
+>>> There are currently a couple of objects in `struct smc_clc_msg_proposal_area`
+>>> that contain a couple of flexible structures:
+>>>
+> 
+> Thank you Gustavo for the proposal.
+> I had to do some reading to better understand what's happening and how your patch solves this.
+> 
+>>> struct smc_clc_msg_proposal_area {
+>>>     ...
+>>>     struct smc_clc_v2_extension             pclc_v2_ext;
+>>>     ...
+>>>     struct smc_clc_smcd_v2_extension        pclc_smcd_v2_ext;
+>>>     ...
+>>> };
+>>>
+>>> So, in order to avoid ending up with a couple of flexible-array members
+>>> in the middle of a struct, we use the `struct_group_tagged()` helper to
+>>> separate the flexible array from the rest of the members in the flexible
+>>> structure:
+>>>
+>>> struct smc_clc_smcd_v2_extension {
+>>>          struct_group_tagged(smc_clc_smcd_v2_extension_hdr, hdr,
+>>>                              u8 system_eid[SMC_MAX_EID_LEN];
+>>>                              u8 reserved[16];
+>>>          );
+>>>          struct smc_clc_smcd_gid_chid gidchid[];
+>>> };
+>>>
+>>> With the change described above, we now declare objects of the type of
+>>> the tagged struct without embedding flexible arrays in the middle of
+>>> another struct:
+>>>
+>>> struct smc_clc_msg_proposal_area {
+>>>          ...
+>>>          struct smc_clc_v2_extension_hdr        pclc_v2_ext;
+>>>          ...
+>>>          struct smc_clc_smcd_v2_extension_hdr    pclc_smcd_v2_ext;
+>>>          ...
+>>> };
+>>>
+>>> We also use `container_of()` when we need to retrieve a pointer to the
+>>> flexible structures.
+>>>
+>>> So, with these changes, fix the following warnings:
+>>>
+>>> In file included from net/smc/af_smc.c:42:
+>>> net/smc/smc_clc.h:186:49: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+>>>    186 |         struct smc_clc_v2_extension             pclc_v2_ext;
+>>>        |                                                 ^~~~~~~~~~~
+>>> net/smc/smc_clc.h:188:49: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+>>>    188 |         struct smc_clc_smcd_v2_extension pclc_smcd_v2_ext;
+>>>        |                                                 ^~~~~~~~~~~~~~~~
+>>>
+>>> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+>>> ---
+>>>   net/smc/smc_clc.c |  5 +++--
+>>>   net/smc/smc_clc.h | 24 ++++++++++++++----------
+>>>   2 files changed, 17 insertions(+), 12 deletions(-)
+>>>
+>>> diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
+>>> index e55026c7529c..3094cfa1c458 100644
+>>> --- a/net/smc/smc_clc.c
+>>> +++ b/net/smc/smc_clc.c
+>>> @@ -853,8 +853,9 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
+>>>       pclc_smcd = &pclc->pclc_smcd;
+>>>       pclc_prfx = &pclc->pclc_prfx;
+>>>       ipv6_prfx = pclc->pclc_prfx_ipv6;
+>>> -    v2_ext = &pclc->pclc_v2_ext;
+>>> -    smcd_v2_ext = &pclc->pclc_smcd_v2_ext;
+>>> +    v2_ext = container_of(&pclc->pclc_v2_ext, struct smc_clc_v2_extension, _hdr);
+>>> +    smcd_v2_ext = container_of(&pclc->pclc_smcd_v2_ext,
+>>> +                   struct smc_clc_smcd_v2_extension, hdr);
+>>>       gidchids = pclc->pclc_gidchids;
+>>>       trl = &pclc->pclc_trl;
+>>> diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
+>>> index 7cc7070b9772..5b91a1947078 100644
+>>> --- a/net/smc/smc_clc.h
+>>> +++ b/net/smc/smc_clc.h
+>>> @@ -134,12 +134,14 @@ struct smc_clc_smcd_gid_chid {
+>>>                */
+>>>   struct smc_clc_v2_extension {
+>>> -    struct smc_clnt_opts_area_hdr hdr;
+>>> -    u8 roce[16];        /* RoCEv2 GID */
+>>> -    u8 max_conns;
+>>> -    u8 max_links;
+>>> -    __be16 feature_mask;
+>>> -    u8 reserved[12];
+>>> +    struct_group_tagged(smc_clc_v2_extension_hdr, _hdr,
+>>> +        struct smc_clnt_opts_area_hdr hdr;
+>>> +        u8 roce[16];        /* RoCEv2 GID */
+>>> +        u8 max_conns;
+>>> +        u8 max_links;
+>>> +        __be16 feature_mask;
+>>> +        u8 reserved[12];
+>>> +    );
+>>>       u8 user_eids[][SMC_MAX_EID_LEN];
+>>>   };
+>>> @@ -159,8 +161,10 @@ struct smc_clc_msg_smcd {    /* SMC-D GID information */
+>>>   };
+>>>   struct smc_clc_smcd_v2_extension {
+>>> -    u8 system_eid[SMC_MAX_EID_LEN];
+>>> -    u8 reserved[16];
+>>> +    struct_group_tagged(smc_clc_smcd_v2_extension_hdr, hdr,
+>>> +        u8 system_eid[SMC_MAX_EID_LEN];
+>>> +        u8 reserved[16];
+>>> +    );
+>>>       struct smc_clc_smcd_gid_chid gidchid[];
+>>>   };
+>>> @@ -183,9 +187,9 @@ struct smc_clc_msg_proposal_area {
+>>>       struct smc_clc_msg_smcd            pclc_smcd;
+>>>       struct smc_clc_msg_proposal_prefix    pclc_prfx;
+>>>       struct smc_clc_ipv6_prefix pclc_prfx_ipv6[SMC_CLC_MAX_V6_PREFIX];
+>>> -    struct smc_clc_v2_extension        pclc_v2_ext;
+>>> +    struct smc_clc_v2_extension_hdr        pclc_v2_ext;
+>>>       u8            user_eids[SMC_CLC_MAX_UEID][SMC_MAX_EID_LEN];
+>>> -    struct smc_clc_smcd_v2_extension    pclc_smcd_v2_ext;
+>>> +    struct smc_clc_smcd_v2_extension_hdr    pclc_smcd_v2_ext;
+>>>       struct smc_clc_smcd_gid_chid
+>>>                   pclc_gidchids[SMCD_CLC_MAX_V2_GID_ENTRIES];
+>>>       struct smc_clc_msg_trail        pclc_trl;
+>>
+>> Thank you! Gustavo. This patch can fix this warning well, just the name
+>> '*_hdr' might not be very accurate, but I don't have a good idea ATM.
+> 
+> I agree. Should we chose this option we should come up for a better name.
+> 
+>>
+>> Besides, I am wondering if this can be fixed by moving
+>> user_eids of smc_clc_msg_proposal_area into smc_clc_v2_extension,
+>> and
+>> pclc_gidchids of smc_clc_msg_proposal_area into smc_clc_smcd_v2_extension.
+>>
+>> so that we can avoid to use the flexible-array in smc_clc_v2_extension
+>> and smc_clc_smcd_v2_extension.
+> 
+> I like the idea and put some thought into it. The only thing that is not perfectly clean IMO is the following:
+> By the current definition it is easily visible that we are dealing with a variable sized array. If we move them into the structs one could think they are always 
+> at their MAX size which they are not.
+> E.g.: An incoming proposal can have 0 UEIDs indicated by the eid_cnt.
+> That said nothing a comment can't fix.
+> 
+>  From what i have seen the offset and length calculations regarding the "real" size of those structs is fine with your proposal.
+> 
+> Can you verify that your changes also resolve the warnings?
 
-The notable thing here is 0x4001 in connect(), which is RDS_TCP_PORT.
+I can confirm that the changes Wen Gu is proposing also resolve the warnings.
 
-So, the scenario would be:
+Wen,
 
-  1. unshare(CLONE_NEWNET) creates a per netns tcp listener in
-      rds_tcp_listen_init().
-  2. syz-executor connect()s to it and creates a reqsk.
-  3. syz-executor exit()s immediately.
-  4. netns is dismantled.  [0]
-  5. reqsk timer is fired, and UAF happens while freeing reqsk.  [1]
-  6. listener is freed after RCU grace period.  [2]
+If you send a proper patch, you can include the following tags:
 
-Basically, reqsk assumes that the listener guarantees netns safety
-until all reqsk timers are expired by holding the listener's refcount.
-However, this was not the case for kernel sockets.
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Build-tested-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
-Commit 740ea3c4a0b2 ("tcp: Clean up kernel listener's reqsk in
-inet_twsk_purge()") fixed this issue only for per-netns ehash.
+Thanks!
+--
+Gustavo
 
-Let's apply the same fix for the global ehash.
-
-[0]:
-ref_tracker: net notrefcnt@0000000065449cc3 has 1/1 users at
-     sk_alloc (./include/net/net_namespace.h:337 net/core/sock.c:2146)
-     inet6_create (net/ipv6/af_inet6.c:192 net/ipv6/af_inet6.c:119)
-     __sock_create (net/socket.c:1572)
-     rds_tcp_listen_init (net/rds/tcp_listen.c:279)
-     rds_tcp_init_net (net/rds/tcp.c:577)
-     ops_init (net/core/net_namespace.c:137)
-     setup_net (net/core/net_namespace.c:340)
-     copy_net_ns (net/core/net_namespace.c:497)
-     create_new_namespaces (kernel/nsproxy.c:110)
-     unshare_nsproxy_namespaces (kernel/nsproxy.c:228 (discriminator 4))
-     ksys_unshare (kernel/fork.c:3429)
-     __x64_sys_unshare (kernel/fork.c:3496)
-     do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
-     entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:129)
-...
-WARNING: CPU: 0 PID: 27 at lib/ref_tracker.c:179 ref_tracker_dir_exit (lib/ref_tracker.c:179)
-
-[1]:
-BUG: KASAN: slab-use-after-free in inet_csk_reqsk_queue_drop (./include/net/inet_hashtables.h:180 net/ipv4/inet_connection_sock.c:952 net/ipv4/inet_connection_sock.c:966)
-Read of size 8 at addr ffff88801b370400 by task swapper/0/0
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-Call Trace:
- <IRQ>
- dump_stack_lvl (lib/dump_stack.c:107 (discriminator 1))
- print_report (mm/kasan/report.c:378 mm/kasan/report.c:488)
- kasan_report (mm/kasan/report.c:603)
- inet_csk_reqsk_queue_drop (./include/net/inet_hashtables.h:180 net/ipv4/inet_connection_sock.c:952 net/ipv4/inet_connection_sock.c:966)
- reqsk_timer_handler (net/ipv4/inet_connection_sock.c:979 net/ipv4/inet_connection_sock.c:1092)
- call_timer_fn (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./include/trace/events/timer.h:127 kernel/time/timer.c:1701)
- __run_timers.part.0 (kernel/time/timer.c:1752 kernel/time/timer.c:2038)
- run_timer_softirq (kernel/time/timer.c:2053)
- __do_softirq (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./include/trace/events/irq.h:142 kernel/softirq.c:554)
- irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632 kernel/softirq.c:644)
- sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1076 (discriminator 14))
- </IRQ>
-
-Allocated by task 258 on cpu 0 at 83.612050s:
- kasan_save_stack (mm/kasan/common.c:48)
- kasan_save_track (mm/kasan/common.c:68)
- __kasan_slab_alloc (mm/kasan/common.c:343)
- kmem_cache_alloc (mm/slub.c:3813 mm/slub.c:3860 mm/slub.c:3867)
- copy_net_ns (./include/linux/slab.h:701 net/core/net_namespace.c:421 net/core/net_namespace.c:480)
- create_new_namespaces (kernel/nsproxy.c:110)
- unshare_nsproxy_namespaces (kernel/nsproxy.c:228 (discriminator 4))
- ksys_unshare (kernel/fork.c:3429)
- __x64_sys_unshare (kernel/fork.c:3496)
- do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
- entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:129)
-
-Freed by task 27 on cpu 0 at 329.158864s:
- kasan_save_stack (mm/kasan/common.c:48)
- kasan_save_track (mm/kasan/common.c:68)
- kasan_save_free_info (mm/kasan/generic.c:643)
- __kasan_slab_free (mm/kasan/common.c:265)
- kmem_cache_free (mm/slub.c:4299 mm/slub.c:4363)
- cleanup_net (net/core/net_namespace.c:456 net/core/net_namespace.c:446 net/core/net_namespace.c:639)
- process_one_work (kernel/workqueue.c:2638)
- worker_thread (kernel/workqueue.c:2700 kernel/workqueue.c:2787)
- kthread (kernel/kthread.c:388)
- ret_from_fork (arch/x86/kernel/process.c:153)
- ret_from_fork_asm (arch/x86/entry/entry_64.S:250)
-
-The buggy address belongs to the object at ffff88801b370000
- which belongs to the cache net_namespace of size 4352
-The buggy address is located 1024 bytes inside of
- freed 4352-byte region [ffff88801b370000, ffff88801b371100)
-
-[2]:
-WARNING: CPU: 0 PID: 95 at lib/ref_tracker.c:228 ref_tracker_free (lib/ref_tracker.c:228 (discriminator 1))
-Modules linked in:
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-RIP: 0010:ref_tracker_free (lib/ref_tracker.c:228 (discriminator 1))
-...
-Call Trace:
-<IRQ>
- __sk_destruct (./include/net/net_namespace.h:353 net/core/sock.c:2204)
- rcu_core (./arch/x86/include/asm/preempt.h:26 kernel/rcu/tree.c:2165 kernel/rcu/tree.c:2433)
- __do_softirq (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./include/trace/events/irq.h:142 kernel/softirq.c:554)
- irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632 kernel/softirq.c:644)
- sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1076 (discriminator 14))
-</IRQ>
-
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Fixes: 467fa15356ac ("RDS-TCP: Support multiple RDS-TCP listen endpoints, one per netns.")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/ipv4/tcp_minisocks.c | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index 9e85f2a0bddd..0ecc7311dc6c 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -398,10 +398,6 @@ void tcp_twsk_purge(struct list_head *net_exit_list, int family)
- 			/* Even if tw_refcount == 1, we must clean up kernel reqsk */
- 			inet_twsk_purge(net->ipv4.tcp_death_row.hashinfo, family);
- 		} else if (!purged_once) {
--			/* The last refcount is decremented in tcp_sk_exit_batch() */
--			if (refcount_read(&net->ipv4.tcp_death_row.tw_refcount) == 1)
--				continue;
--
- 			inet_twsk_purge(&tcp_hashinfo, family);
- 			purged_once = true;
- 		}
--- 
-2.30.2
-
+> 
+> [...]
+> 
+>>   };
+>>
+>>
+>> Thanks!
+>> Wen Gu
+> 
+> Thanks you
+> - Jan
 
