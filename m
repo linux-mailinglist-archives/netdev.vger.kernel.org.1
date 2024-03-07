@@ -1,92 +1,107 @@
-Return-Path: <netdev+bounces-78226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24B878746F7
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:52:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68F3D8746FB
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 04:54:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 562491C21A9F
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 03:52:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB7E72859B3
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 03:54:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534AAE554;
-	Thu,  7 Mar 2024 03:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1721910A34;
+	Thu,  7 Mar 2024 03:54:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KRB2zUwC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NpIiOPLI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26A3C1804E;
-	Thu,  7 Mar 2024 03:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D6C17EF;
+	Thu,  7 Mar 2024 03:54:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709783519; cv=none; b=JWHQGTP55WBB94F5IZ9BrmzNoh929p9fYpaltpR/yz97nbpZEpdt3xPFWgL4V1MC+ImsoVVtuW/j2cEccP2RqlwzkEM6y9cJIJi3E9tYRtRSDAgrdDL5HL8PUhB18hARuP6Xx42dYCddtdp2y3uchsKx4Pmt9rtmveS52eSgFXg=
+	t=1709783642; cv=none; b=jzsuN1X3RJXhLIno9uzzqXl0Fm8tXI0MqQI6s7hHa2j8Bcv/3Hmqvk4Z6HksR+249FbF44h0MZNnTC1q3hbFdsu3/9KIgvbrovuwxqMO5BQuomHUWB+bm+WPZGAC+JqIloMNL530EgBXUfRSZlau8Ug5UEmW1v3ZqtEKimqtmrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709783519; c=relaxed/simple;
-	bh=+piZR5lNiVVbQ2xJt07TajT/lnGyNU30/lVKD13475A=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fl82++UCUF41QXfhTouLel8eWDMKzEo99DgIWs83Y3AOuHqs0wAY8lfQMSyiMiOgYO9XUp5On8MSZC0ZTJwY9xwGqgn9+keJp/8QP2nn1g1ukusYFj6eFs1KFSwjKOWqfiC3JdHORte1oC57Ev/rwflCN7rSwvN8HlDLjRDbfHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KRB2zUwC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 86E91C43390;
-	Thu,  7 Mar 2024 03:51:58 +0000 (UTC)
+	s=arc-20240116; t=1709783642; c=relaxed/simple;
+	bh=iSpHqEag2Fld1WLfW4PXYjSa646zc+x1ABtd6XNLjsU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H6D6UIi7IPuXa5cBwYPoZtVszo/A+ordgVP5hZhX/BLOjDdwpjI+l2hMikeCQH95fGa8LkkCuPx5dY0896p8khqAfoEEr2tvvFOg5PQCs4W9gVcQulybPJvLohh02zup7J5fxkIxKydzR48zvws35ljOOJNnVIClNnvkdjYmDy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NpIiOPLI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2CABC433C7;
+	Thu,  7 Mar 2024 03:54:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709783518;
-	bh=+piZR5lNiVVbQ2xJt07TajT/lnGyNU30/lVKD13475A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KRB2zUwCzSm2V+3Rp+380sHq0ocNyiGrcRE3jMAZDTYbU2x/W3bXJbo78hqsCUSSv
-	 eLmqouHPogy7KdLrCD71SEF3k+oSOVeYyBs8WsvOoeJdx+VubUEqsP/tVH9PCgjiNA
-	 NRUAV2iDbQ6XsDll7yInM0mh3Eox9Tn6QZL4/36C6DV3KDbhezKjWZrRfeV9Zsy3fg
-	 /hkhwMjoJ2SqSVU2sRDHPRRhVJBUIgXdKBH6tby35NpslSTLGJDO+uXUIFlpxdnOdn
-	 +Nh8sDYKM6nY7TUP0Kf4EcSNka6UJiKvuTpzviRrK5fO8OAmpTHQ5oNf/KAh4jHJxM
-	 dgCe26RwcDHXg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6E62DD9A4BB;
-	Thu,  7 Mar 2024 03:51:58 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1709783641;
+	bh=iSpHqEag2Fld1WLfW4PXYjSa646zc+x1ABtd6XNLjsU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NpIiOPLI/8nsHeQhmmwcc6IgmuKb/seG+hgs5nmxnNsIaX8JeS0rW7/fzwPSOK+tO
+	 r2amgOahfzA9gG9tDDHCffVjSjI4XJurNCxyxqxMMn8HoC4A/4vaZy+0t3HJwEkMhk
+	 UPQM/VcK3PFuT/G+6itsuu0V0L2QYzzWmq1GkbafHtDaqcDX15EGC3afepvt0gT8vs
+	 XQ7HXyl/8sXobX5PpbbYtRzrPmeTxag8y0dNwcbI+kQaAz8tstVuE+ppweiFmUdF9K
+	 I0I6fWZu2OVkEsI3UZ0qP0t9ALRFE0y8nbzJfF0D+TvlvcJu4n5zQx1Kstq7h4LE1q
+	 g/MawhybuI/kQ==
+Date: Wed, 6 Mar 2024 19:53:59 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+ "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+ "dsahern@kernel.org" <dsahern@kernel.org>, "steffen.klassert@secunet.com"
+ <steffen.klassert@secunet.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "edumazet@google.com" <edumazet@google.com>, "almasrymina@google.com"
+ <almasrymina@google.com>, Leon Romanovsky <leonro@nvidia.com>, Gal Pressman
+ <gal@nvidia.com>, "Anatoli.Chechelnickiy@m.interpipe.biz"
+ <Anatoli.Chechelnickiy@m.interpipe.biz>, "ian.kumlien@gmail.com"
+ <ian.kumlien@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH v2] net: esp: fix bad handling of pages from
+ page_pool
+Message-ID: <20240306195359.1afb26d2@kernel.org>
+In-Reply-To: <9ac9ffa9d11907dcb4a300bf4e81545b7acc40d6.camel@nvidia.com>
+References: <20240306190822.390086-1-dtatulea@nvidia.com>
+	<9ac9ffa9d11907dcb4a300bf4e81545b7acc40d6.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2024-02-28
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170978351844.12718.15913227332108763470.git-patchwork-notify@kernel.org>
-Date: Thu, 07 Mar 2024 03:51:58 +0000
-References: <20240228145644.2269088-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240228145644.2269088-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 6 Mar 2024 19:09:58 +0000 Dragos Tatulea wrote:
+> > Changes in v2:
+> > - Added napi_page_unref api based on discussion in v1 [0].
+> > 
+> > [0]https://lore.kernel.org/netdev/CAHS8izOoO-EovwMwAm9tLYetwikNPxC0FKyVGu1TPJWSz4bGoA@mail.gmail.com/T/#t
+> >   
+> Jakub, are you sure that it is ok to have all this in a single patch?
 
-This pull request was applied to bluetooth/bluetooth-next.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
+Yup.
 
-On Wed, 28 Feb 2024 09:56:43 -0500 you wrote:
-> The following changes since commit 4adfc94d4aeca1177e1188ba83c20ed581523fe1:
-> 
->   Documentations: correct net_cachelines title for struct inet_sock (2024-02-28 11:25:37 +0000)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-02-28
-> 
-> [...]
+> > ---
+> >  include/linux/skbuff.h | 10 +++++++---
+> >  net/ipv4/esp4.c        | 16 ++++++++++------
+> >  net/ipv6/esp6.c        | 16 ++++++++++------
+> >  3 files changed, 27 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> > index 696e7680656f..009603db2a43 100644
+> > --- a/include/linux/skbuff.h
+> > +++ b/include/linux/skbuff.h
+> > @@ -3453,10 +3453,8 @@ int skb_cow_data_for_xdp(struct page_pool *pool, struct sk_buff **pskb,
+> >  bool napi_pp_put_page(struct page *page, bool napi_safe);
+> >  
+> >  static inline void
+> > -napi_frag_unref(skb_frag_t *frag, bool recycle, bool napi_safe)
+> > +napi_page_unref(struct page *page, bool recycle, bool napi_safe)
 
-Here is the summary with links:
-  - pull request: bluetooth 2024-02-28
-    https://git.kernel.org/bluetooth/bluetooth-next/c/244b96c2310e
+I'd call it skb_page_unref()
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+The napi_ prefix will just confuse people, because we don't have to be
+in NAPI context at all when calling this. As long as "napi_safe" is
+correctly set to false.  So let's use skb_ as the prefix.
 
-
+And I'd pass skb to this, not "bool recycle" so that the caller doesn't
+have to know the weird details..
 
