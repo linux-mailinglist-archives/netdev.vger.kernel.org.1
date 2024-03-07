@@ -1,148 +1,133 @@
-Return-Path: <netdev+bounces-78355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE414874C1C
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:17:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A64A874BDF
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:07:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAB021C23BE6
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:17:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB807B21771
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:07:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C67884FDF;
-	Thu,  7 Mar 2024 10:17:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1BD812A17C;
+	Thu,  7 Mar 2024 10:03:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="lSEvMPEx"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Qj8U/JRm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45EB84FD6;
-	Thu,  7 Mar 2024 10:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E64129A9D;
+	Thu,  7 Mar 2024 10:03:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709806621; cv=none; b=Eb27wrbByjUp+ybvmjgPcu7w61Sd0R1/rC7QLadn7zbKR80KYjEEfgurcybHU/UQvI6K1h/EsM4TOJ3VjlEzmlMawWAiCTZJhmIl+P70529iF460poqgrUBO6MKQdRdecD9mSr38kcOiVHu2QnUH/xCQez/OeIGXirHT8EoNdC4=
+	t=1709805816; cv=none; b=ksxWS8TEOw104dXSl4G8RT+Ere0fZUcMVyL+8CxoNS0ZhipOEF26jtgiizBy/+GiBfe2a7Cbx/UFIZ7LDtd2CLEIZtprKZPjlHF+nUB4kervKElGG8kLhMQja+4FuHVC9DMJU+eUybjlr8cN4gCeqk0lEXVlwRhKROEhBS6js4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709806621; c=relaxed/simple;
-	bh=CBvML9deNEoVuOxgFHt894b8D/T7VwNGXZ72n2fnEGk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ld7vLG/+4FioG6YyAcHeKelR44loby0lN0jos0X81YggHkZZCXa6+hyXiUGvyExgE2BlPy65G47161obfogCEHM6B5xwgDZVLGeEctSVdvezRHuZeZqP4oUiWp+1LR0nn3ccrvax2r0Si228M5plSlrDUFEVpj4xbKdFZ/doHXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=lSEvMPEx; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: cddb3408dc6b11ee935d6952f98a51a9-20240307
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=GNmxSGYpJmxhMAuFxxVg2HZd9oC6HzlD9GPrSS1SIWE=;
-	b=lSEvMPExLls0XBvOq74qx6NbOhQoDKVYMaKFGLL0/XhNS+1XUjxjuAPvYbn0PxreQR+NTKGZ5+uDpWkA3HSrG3EZUTM9NGDpyMUq5EW/7pKQ0S/OBwl/MbWTC6ZCu5JHevP7UVPYfQVdAbVf8nb/i0aC/eRn5uH//m2R0fVMnyk=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.37,REQID:abd6cb84-9936-4260-aead-1c3f5273dc6c,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:6f543d0,CLOUDID:c5522190-e2c0-40b0-a8fe-7c7e47299109,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_ULN,TF_CID_SPAM_SNR
-X-UUID: cddb3408dc6b11ee935d6952f98a51a9-20240307
-Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw02.mediatek.com
-	(envelope-from <shiming.cheng@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1161080659; Thu, 07 Mar 2024 18:16:46 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- MTKMBS14N1.mediatek.inc (172.21.101.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Thu, 7 Mar 2024 18:16:44 +0800
-Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Thu, 7 Mar 2024 18:16:44 +0800
-From: Shiming Cheng <shiming.cheng@mediatek.com>
-To: <jiri@resnulli.us>, <dsahern@kernel.org>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <shiming.cheng@mediatek.com>,
-	<netdev@vger.kernel.org>, Lena Wang <lena.wang@mediatek.com>
-Subject: [PATCH net v5] ipv6: fib6_rules: flush route cache when rule is changed
-Date: Thu, 7 Mar 2024 18:01:57 +0800
-Message-ID: <20240307100157.29699-1-shiming.cheng@mediatek.com>
-X-Mailer: git-send-email 2.18.0
+	s=arc-20240116; t=1709805816; c=relaxed/simple;
+	bh=ZmM/KDvL4dsGZN7+nQnXpHO7MKx8VXGPnCH7JpgtyqY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jLY0LYDRBbKLFei3Y4AUzpAjTrT9BohKrrPMIJyuRMTzIYwtkEeHrS9d5a2InMdvfWhUicNS9A9guNUDztO83qnlAQavGrlPIAYmO98hGIbli792pPMmOSrTraLi9iYxZfbv1KWHRyzrVa2o3qPtPgioesJRl/yRHpj2uaiOKdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Qj8U/JRm; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 52EB5C000E;
+	Thu,  7 Mar 2024 10:03:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1709805807;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=d/AxLRpsUHIVLv5pAaSheWeekhAHfnPjwxXQfah+6YU=;
+	b=Qj8U/JRmx+7EoLMa7KGqnsUrERG4eKO3WkyNvqdMaHf+F+FS51elY5zNcM83F7cBUVVo3H
+	TIALt9cEtANxEtLjHm6wipmzdgXMrEsHTyCA4Jr6sRlLX10Lps6MMIVb7O0y9hnw9x3anP
+	AUWCeDHdFvCPKGQZSUdBwn5lE9PtNMs6WbrlwMDOo/wuz3yu5bI5ENuBOtI+TPbwZDK3kT
+	CO7vJ88N3r9yNKo2KfCL+ypGZ0D2z2rzi/tx8UHhGuAJ3DDIbkGI3Dspz496RQ8p6hnO82
+	TZXJYQ9GFvUxD9M6zY0MzrlZOufVcpJfayMu9Dnr4t3b7Oim0c6UQSBGBwuoug==
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: thomas.petazzoni@bootlin.com,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: [PATCH net-next] ptp: Move from simple ida to xarray
+Date: Thu,  7 Mar 2024 11:03:26 +0100
+Message-Id: <20240307100327.887758-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-AS-Result: No-10--5.420700-8.000000
-X-TMASE-MatchedRID: vb/S/ihWjLlKgFU/G9flJJD6BbDN9+jOYQXxsZnRwoIXdhT0BAdFzmpH
-	KtkQBynKwfZWztcZK6Yg/ZeU3y59o8wrDggcQ6d1USn3o+eoUmxbAoaK+wS4jeO53bHtM9W3W7r
-	SImiJ0foLOqNjXz20+KWlAHXodmZtAM0/G7XUdePil2r2x2PwtYfsPVs/8Vw6RTck7NznBP+zYM
-	Za9F0/9/UhSex6m6QxGb/srZoSOzUM8jMXjBF+sBRFJJyf5BJeGEkIgdGU7nX6C0ePs7A07fhmF
-	HnZFzVqzgENzz9gYA0kfIe+qt5DPoTKqZFxYL9iMFacFnZRXmbKYWGeeDVJ285OyOT3zBST91kE
-	KsLI3jRD7oKmUHyhTQvsrGP8HT8wSZrfNhP3sgUBh9AgBSEFrJm+YJspVvj2xkvrHlT8euJ0YHK
-	n7N1oOA==
-X-TM-AS-User-Approved-Sender: No
-X-TM-AS-User-Blocked-Sender: No
-X-TMASE-Result: 10--5.420700-8.000000
-X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-SNTS-SMTP:
-	8442A3A0F195FC5417423452CC46597761296B23CA6257E32AA4AD90FAE1D1452000:8
-X-MTK: N
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: kory.maincent@bootlin.com
 
-When rule policy is changed, ipv6 socket cache is not refreshed.
-The sock's skb still uses a outdated route cache and was sent to
-a wrong interface.
+Move from simple ida to xarray for storing and loading the ptp_clock
+pointer. This prepares support for future hardware timestamp selection by
+being able to link the ptp clock index to its pointer.
 
-To avoid this error we should update fib node's version when
-rule is changed. Then skb's route will be reroute checked as
-route cache version is already different with fib node version.
-The route cache is refreshed to match the latest rule.
-
-Fixes: 101367c2f8c4 ("[IPV6]: Policy Routing Rules")
-Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
-Signed-off-by: Lena Wang <lena.wang@mediatek.com>
----
-v5:
-  - rebase on the top of latest net/main branch.
-v4:
-  - add "Fixes:" tag.
-  - update subject as requested.
-v3:
-  - update patch description and name format in commit message.
-v2:
-  - modify flush function same way as ipv4 flush cache.
-  - use tabs to aligh with existing code.
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
 ---
- net/ipv6/fib6_rules.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/ptp/ptp_clock.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/net/ipv6/fib6_rules.c b/net/ipv6/fib6_rules.c
-index 7523c4baef35..52c04f0ac498 100644
---- a/net/ipv6/fib6_rules.c
-+++ b/net/ipv6/fib6_rules.c
-@@ -449,6 +449,11 @@ static size_t fib6_rule_nlmsg_payload(struct fib_rule *rule)
- 	       + nla_total_size(16); /* src */
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 3aaf1a3430c5..392c880d9f34 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -31,7 +31,7 @@ struct class *ptp_class;
+ 
+ static dev_t ptp_devt;
+ 
+-static DEFINE_IDA(ptp_clocks_map);
++static DEFINE_XARRAY_ALLOC(ptp_clocks_map);
+ 
+ /* time stamp event queue operations */
+ 
+@@ -201,7 +201,7 @@ static void ptp_clock_release(struct device *dev)
+ 	bitmap_free(tsevq->mask);
+ 	kfree(tsevq);
+ 	debugfs_remove(ptp->debugfs_root);
+-	ida_free(&ptp_clocks_map, ptp->index);
++	xa_erase(&ptp_clocks_map, ptp->index);
+ 	kfree(ptp);
  }
  
-+static void fib6_rule_flush_cache(struct fib_rules_ops *ops)
-+{
-+	rt_genid_bump_ipv6(ops->fro_net);
-+}
-+
- static const struct fib_rules_ops __net_initconst fib6_rules_ops_template = {
- 	.family			= AF_INET6,
- 	.rule_size		= sizeof(struct fib6_rule),
-@@ -461,6 +466,7 @@ static const struct fib_rules_ops __net_initconst fib6_rules_ops_template = {
- 	.compare		= fib6_rule_compare,
- 	.fill			= fib6_rule_fill,
- 	.nlmsg_payload		= fib6_rule_nlmsg_payload,
-+	.flush_cache		= fib6_rule_flush_cache,
- 	.nlgroup		= RTNLGRP_IPV6_RULE,
- 	.owner			= THIS_MODULE,
- 	.fro_net		= &init_net,
+@@ -246,11 +246,10 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	if (ptp == NULL)
+ 		goto no_memory;
+ 
+-	index = ida_alloc_max(&ptp_clocks_map, MINORMASK, GFP_KERNEL);
+-	if (index < 0) {
+-		err = index;
++	err = xa_alloc(&ptp_clocks_map, &index, ptp, xa_limit_31b,
++		       GFP_KERNEL);
++	if (err)
+ 		goto no_slot;
+-	}
+ 
+ 	ptp->clock.ops = ptp_clock_ops;
+ 	ptp->info = info;
+@@ -378,7 +377,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	list_del(&queue->qlist);
+ 	kfree(queue);
+ no_memory_queue:
+-	ida_free(&ptp_clocks_map, index);
++	xa_erase(&ptp_clocks_map, index);
+ no_slot:
+ 	kfree(ptp);
+ no_memory:
+@@ -511,7 +510,7 @@ static void __exit ptp_exit(void)
+ {
+ 	class_destroy(ptp_class);
+ 	unregister_chrdev_region(ptp_devt, MINORMASK + 1);
+-	ida_destroy(&ptp_clocks_map);
++	xa_destroy(&ptp_clocks_map);
+ }
+ 
+ static int __init ptp_init(void)
 -- 
-2.18.0
+2.25.1
 
 
