@@ -1,163 +1,190 @@
-Return-Path: <netdev+bounces-78529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A913387592E
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 22:23:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FBA587593F
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 22:30:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F2D5B21526
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 21:23:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07A201F2458A
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 21:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57D9F13B783;
-	Thu,  7 Mar 2024 21:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 052DB13B79F;
+	Thu,  7 Mar 2024 21:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QCA+Cyhe"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cnKPdaBG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D9413AA52
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 21:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5AE13B78F
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 21:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709846609; cv=none; b=HPJ5u4dAy+r+L6Obx/I0dMeWZJiNIeB9eQcKI4kfcz8z6Q5gojOxdVAuQBsP37JdEZlEudA7XLaJaUrccHmI1KZRq9tMWrAii+sDQ1PjzAbLZQru+KQKklSELrkdTz8Bz4cIN5dSfuhIUCX8ZbCAweJaeKzkW5miQOwUB6fROew=
+	t=1709846999; cv=none; b=bTDt/5xQdcVspwku6eGpE9zVzo2UhsfwlLem0Dj5B1Y5553qq5W45vrnv94zQEbOiNXt0uk6xLkuodDdGCJr/CyhVNwIMNRCgwJcCBaYdcKwwdLEgKReVO4SUOwXqRL3I6tNYxOApPfJ/J9CjwPE9ExwM8tnIRFpwDYYc9jCPTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709846609; c=relaxed/simple;
-	bh=r4hzgq2gqFUl21FMalBkfojSC7eOwnIy4YqjOkQZHqA=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=RG73JYc3nN10lDSTRRkLkN7hYk2BLm1qZ8Ph1CSGF3HcMsOkJDaqyrU9fuyyLZ+aBbYdzvwGA0HcyLxI0UjrSYmBMhw9l2Mu6cSvyTjD4LhIX2b4NJnULiVy4k+0EbbM8ToO1N8d7/OpCPQhtYT6GTKVYtnRd7LI2LQ5EIPLnQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QCA+Cyhe; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-568241f40e9so165031a12.0
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 13:23:27 -0800 (PST)
+	s=arc-20240116; t=1709846999; c=relaxed/simple;
+	bh=sUZxtGNHFx4zLodxUdWUhxGzSh51kPJIzM5f+5HerXM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lQGapol8WQ9R8eifXpb+49c49ucTx6wgQsjB9743ZmbGXTWOF2FqC2dRpEN4WvVW/uRirsTv21tA39KhVux7EgfQcKJie/tgisNDP4tbWpOc/TOiFCB1uBsieNg587anDgpSdtv8aTNpIMOcgkEHNI0jJNhpTz8wMUUchxNAzLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cnKPdaBG; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-29b7164eef6so159209a91.2
+        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 13:29:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709846606; x=1710451406; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KImqZa51+XSN3WJS6gBtSyo61swhpc2F/4j17rTXrvA=;
-        b=QCA+CyheEPTn8Xj/iY7aIHf3SChOEkpttZtJSVHI9D0gfq4lYq1CuSUe4NDnZiClsS
-         bDYQjik7YKTANKme+R/kOulgkBnU0Z+O1088pHEVd5RDY8Fo8Ck3WfgCevfvXU9S/Oeu
-         6nX2Lntx2x3dmZVY/EFr2B+8PuCWXqNQ/zmLlawL+/V4WkvhugHgWXyHLhZyDFDUodm4
-         CokPCV3qSZnqEH2AgaslrQTsKG6XLulROWss1erYZUvFaCqJLRtcZqbxmntYq1ylsZuj
-         LIJTAUdJ6S5dT6lnnUZlM+X1+HdyNdqpniEEgLW2n5R6C7Dk7oNHXeKEu3korUIlO/cH
-         FUuQ==
+        d=broadcom.com; s=google; t=1709846997; x=1710451797; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+YZLpG094wphSKZXLLG7LA5wMsC4o/YJbeoOf2hZChI=;
+        b=cnKPdaBGegPp5BJwBrCzKS/yjHJL+AyfEgciWTVR+NexL5lmQabES6W9rHdHJDY2+F
+         nc4aOWgUnhAkrD9ZPitvsN/zQJ06h4XEbt/jGZc+grTlFLcjmyzhT/zBe/JfF1heAlXg
+         emPr6JKJu/UxgU1LFFt7dbtRQJR/YdzV7R9Zk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709846606; x=1710451406;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KImqZa51+XSN3WJS6gBtSyo61swhpc2F/4j17rTXrvA=;
-        b=AQD+lnCWFMqnPHhN+56/iNyI95LOjTp49+KyLzOo2x/pbCIj/4w1E7ObWEOnsPyKb8
-         TRoQf3MND8dmd3AXm/eLlEa1rsih+YkPUNLJzEoDLEL8l6vphsMEvKvkLFLPrOPmqvek
-         rQZ90A4iNKqXAmSuEZ2qauU8FKbTbYGWvJ3d8YJjL+UKidGwGA6lvOgfg36NaiCHM1ja
-         ICe4TNeMiQ3UzsXcqeHai1ahiVtnGe8Zj1RUrWn+4wXApRT+wzLcnbpleDZwmK/n8lEK
-         oJifEMPjg/H1V8jDbi5/cje9Ms/l9yEZxcciYp2j63FPh7Usx4sL/ma0V2rH3AkAVZG4
-         OEfw==
-X-Gm-Message-State: AOJu0Yw6+LbXbf3YPh2wZx9PhyD+K11Hbw3THN4uMristuwoGN/TFfpl
-	41JhDEqkon28rCa18YuzPqS1uWaBiJYJyfNeH42asuHBKkPbRCi7
-X-Google-Smtp-Source: AGHT+IF9rF2BTgwNwywy4jlTf+5rSShK60fgO+6uU7X8JQngeLJWpOL9Q9HDFSV4LCLsf/x8+3ctaA==
-X-Received: by 2002:a50:c30e:0:b0:566:bf36:60d4 with SMTP id a14-20020a50c30e000000b00566bf3660d4mr665932edb.35.1709846605536;
-        Thu, 07 Mar 2024 13:23:25 -0800 (PST)
-Received: from ?IPV6:2a01:c22:6ea8:7500:7cdb:1fd3:51b6:fa25? (dynamic-2a01-0c22-6ea8-7500-7cdb-1fd3-51b6-fa25.c22.pool.telefonica.de. [2a01:c22:6ea8:7500:7cdb:1fd3:51b6:fa25])
-        by smtp.googlemail.com with ESMTPSA id i17-20020aa7c9d1000000b00567566227a5sm4769173edt.18.2024.03.07.13.23.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Mar 2024 13:23:25 -0800 (PST)
-Message-ID: <92462328-5c9b-4d82-9ce4-ea974cda4900@gmail.com>
-Date: Thu, 7 Mar 2024 22:23:20 +0100
+        d=1e100.net; s=20230601; t=1709846997; x=1710451797;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+YZLpG094wphSKZXLLG7LA5wMsC4o/YJbeoOf2hZChI=;
+        b=hZIFJ30J/jal7jfgQ1AAhRyo9HS3AzXkFdeZ7HLGK3dYQX+Qv+RYBxpi57LzRFKmhk
+         JNZRb3fZmdeXnmgdmdy5oGraegaFjKNu5mCOHtqYIqUzOSMLvAZkOwPZEwzCv3MJ0orl
+         bNILV+CpWLmm6+MUU6BK+h77Ai/1w4kecQQSwx/6s8ucvWh+lvFLvdxKD1x9l8oz16xV
+         FKEgmqFUyAC0tm0mP2Qju2vPcmkLXNCmrpCyuQH1238YVHT6f6d1rbjkkpfbiwYBvQ4c
+         klokJsfXQqjbY058tDQLacU/24FrPng0vHJVKyQAkGc880IgM0kum9CKra7dtj+9Q2EO
+         lA6A==
+X-Forwarded-Encrypted: i=1; AJvYcCUnnjolaVu5OF74/0uVQtYEdApfM4RKI0PTj417/Dls3AxuQHLQ8oIhCEZUbrTUuoRwZl/Db+697Jdm7tetbecsuy5ayKSt
+X-Gm-Message-State: AOJu0YxVU4XTSjl3/t0i35ZCcAijkRDAMZpKd2eMGannP8NoJ8Qnq6L8
+	5dDIsKT6C4vzWON3E+PTUdELkZ/zMansQuJSsESjGMsPxRcCKtYIi5BDSNa5/g==
+X-Google-Smtp-Source: AGHT+IEzz+bckUTxMNcu0RwZK0XnBSiwtoTYqhjpphfi8E+fSD4mV1nsz9A9Yr4VpADTNeEUBC8JoQ==
+X-Received: by 2002:a17:90a:a606:b0:29a:a3a6:dde7 with SMTP id c6-20020a17090aa60600b0029aa3a6dde7mr17873626pjq.18.1709846997354;
+        Thu, 07 Mar 2024 13:29:57 -0800 (PST)
+Received: from amakhalov-build-vm.eng.vmware.com ([64.186.27.43])
+        by smtp.gmail.com with ESMTPSA id y12-20020a17090abd0c00b00299db19a81asm1991021pjr.56.2024.03.07.13.29.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Mar 2024 13:29:57 -0800 (PST)
+From: Alexey Makhalov <alexey.makhalov@broadcom.com>
+To: linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	bp@alien8.de,
+	hpa@zytor.com,
+	dave.hansen@linux.intel.com,
+	mingo@redhat.com,
+	tglx@linutronix.de
+Cc: x86@kernel.org,
+	netdev@vger.kernel.org,
+	richardcochran@gmail.com,
+	linux-input@vger.kernel.org,
+	dmitry.torokhov@gmail.com,
+	zackr@vmware.com,
+	linux-graphics-maintainer@vmware.com,
+	pv-drivers@vmware.com,
+	namit@vmware.com,
+	timothym@vmware.com,
+	akaher@vmware.com,
+	jsipek@vmware.com,
+	dri-devel@lists.freedesktop.org,
+	daniel@ffwll.ch,
+	airlied@gmail.com,
+	tzimmermann@suse.de,
+	mripard@kernel.org,
+	maarten.lankhorst@linux.intel.com,
+	horms@kernel.org,
+	kirill.shutemov@linux.intel.com
+Subject: [PATCH v7 0/7] VMware hypercalls enhancements
+Date: Thu,  7 Mar 2024 13:29:42 -0800
+Message-Id: <20240307212949.4166120-1-alexey.makhalov@broadcom.com>
+X-Mailer: git-send-email 2.39.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] r8169: switch to new function phy_support_eee
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Switch to new function phy_support_eee. This allows to simplify
-the code because data->tx_lpi_enabled is now populated by
-phy_ethtool_get_eee().
+VMware hypercalls invocations were all spread out across the kernel
+implementing same ABI as in-place asm-inline. With encrypted memory
+and confidential computing it became harder to maintain every changes
+in these hypercall implementations.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/realtek/r8169_main.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Intention of this patchset is to introduce arch independent VMware
+hypercall API layer other subsystems such as device drivers can call
+to, while hiding architecture specific implementation behind.
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 0d2cbb32c..5c879a5c8 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -2079,7 +2079,6 @@ static int rtl8169_get_eee(struct net_device *dev, struct ethtool_keee *data)
- 		return ret;
- 
- 	data->tx_lpi_timer = r8169_get_tx_lpi_timer_us(tp);
--	data->tx_lpi_enabled = data->tx_lpi_timer ? data->eee_enabled : false;
- 
- 	return 0;
- }
-@@ -5174,7 +5173,7 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
- 
- 	tp->phydev->mac_managed_pm = true;
- 	if (rtl_supports_eee(tp))
--		phy_advertise_eee_all(tp->phydev);
-+		phy_support_eee(tp->phydev);
- 	phy_support_asym_pause(tp->phydev);
- 
- 	/* PHY will be woken up in rtl_open() */
+Second patch introduces the vmware_hypercall low and high bandwidth
+families of functions, with little enhancements there.
+Sixth patch adds tdx hypercall support
+
+arm64 implementation of vmware_hypercalls is in drivers/gpu/drm/
+vmwgfx/vmwgfx_msg_arm64.h and going to be moved to arch/arm64 with
+a separate patchset with the introduction of VMware Linux guest
+support for arm64.
+
+No functional changes in drivers/input/mouse/vmmouse.c and
+drivers/ptp/ptp_vmw.c
+
+v6->v7 changes (only in patch 7):
+- Addressed comments from H. Peter Anvin:
+  1. Removed vmware_tdx_hypercall_args(), moved args handling inside
+     vmware_tdx_hypercall().
+  2. Added pr_warn_once() for !hypervisor_is_type(X86_HYPER_VMWARE) case.
+- Added ack by Dave Hansen.
+
+v5->v6 change:
+- Added ack by Kirill A. Shutemov in patch 7. 
+
+v4->v5 changes:
+  [patch 2]:
+- Fixed the problem reported by Simon Horman where build fails after
+  patch 2 application. Do not undefine VMWARE_HYPERCALL for now, and
+  update vmwgfx, vmmouse and ptp_vmw code for new VMWARE_HYPERCALL macro.
+- Introduce new patch 6 to undefine VMWARE_HYPERCALL, which is safe to do
+  after patches 3 to 5.
+- [patch 7 (former patch 6)]: Add missing r15 (CPL) initialization.
+
+v3->v4 changes: (no functional changes in patches 1-5)
+  [patch 2]:
+- Added the comment with VMware hypercall ABI description.
+  [patch 6]:
+- vmware_tdx_hypercall_args remove in6/out6 arguments as excessive.
+- vmware_tdx_hypercall return ULONG_MAX on error to mimic bad hypercall
+  command error from the hypervisor.
+- Replaced pr_warn by pr_warn_once as pointed by Kirill Shutemov.
+- Fixed the warning reported by Intel's kernel test robot.
+- Added the comment describing VMware TDX hypercall ABI.
+
+v2->v3 changes: (no functional changes in patches 1-5)
+- Improved commit message in patches 1, 2 and 5 as was suggested by
+  Borislav Petkov.
+- To address Dave Hansen's concern, patch 6 was reorganized to avoid
+  exporting bare __tdx_hypercall and to make exported vmware_tdx_hypercall
+  VMWare guest specific.
+
+v1->v2 changes (no functional changes):
+- Improved commit message in patches 2 and 5.
+- Added Reviewed-by for all patches.
+- Added Ack from Dmitry Torokhov in patch 4. No fixes regarding reported
+  by Simon Horman gcc error in this patch.
+
+Alexey Makhalov (7):
+  x86/vmware: Move common macros to vmware.h
+  x86/vmware: Introduce VMware hypercall API
+  ptp/vmware: Use VMware hypercall API
+  input/vmmouse: Use VMware hypercall API
+  drm/vmwgfx: Use VMware hypercall API
+  x86/vmware: Undefine VMWARE_HYPERCALL
+  x86/vmware: Add TDX hypercall support
+
+ arch/x86/include/asm/vmware.h             | 331 +++++++++++++++++++---
+ arch/x86/kernel/cpu/vmware.c              | 144 +++++-----
+ drivers/gpu/drm/vmwgfx/vmwgfx_msg.c       | 173 ++++-------
+ drivers/gpu/drm/vmwgfx/vmwgfx_msg_arm64.h | 197 +++++++++----
+ drivers/gpu/drm/vmwgfx/vmwgfx_msg_x86.h   | 185 ------------
+ drivers/input/mouse/vmmouse.c             |  76 ++---
+ drivers/ptp/ptp_vmw.c                     |  12 +-
+ 7 files changed, 593 insertions(+), 525 deletions(-)
+
 -- 
-2.44.0
+2.39.0
 
 
