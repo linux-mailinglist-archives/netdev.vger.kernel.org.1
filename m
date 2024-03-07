@@ -1,281 +1,107 @@
-Return-Path: <netdev+bounces-78301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 352D1874A69
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:11:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55388874A6A
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 10:11:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5938E1C236AC
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:11:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BF831F23155
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 09:11:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78FD482D87;
-	Thu,  7 Mar 2024 09:11:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9369682D8A;
+	Thu,  7 Mar 2024 09:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ijDEtdOe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D8D1C2A3
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 09:11:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F7D745FE;
+	Thu,  7 Mar 2024 09:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709802695; cv=none; b=aDt+x0Z2I037tMAgdhnd2D+ZvOWu8soA/6Eb7allbK4JIreyqiDMXGT6zKZ1OgGhcBJofrhbO4XHJlE8uOm7dOuWQAanbRrlCB311equz95UB5MJAaD4PSNV2ucoucFz+S3c1W31FV55u+JsN6fPbITHHBJs6HonoVFnMERp5LY=
+	t=1709802705; cv=none; b=JxJeVJ6p+y45mQ26ID8M0nV7HjmFw5GrJfFQafjCKGWnMNzji35y9DzgUEfLOgR5eNbQpz9dCeDITA917GvKiF4wVVvZylMNothljKtzgbrvWcAUoyjvPh3QVtZwcHE/T+voKImShQ98cQHOS95Tn/3o2QpK92gzLWijNVOmZCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709802695; c=relaxed/simple;
-	bh=PD6+hEJVEL+joCZ8ukO8+KpMDk7DMbQf/hB+cGOleBc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fEqef00Kg36XWz9jU6VIhn/qQYYZ87xFhGZ5MvUJ+Ww+GNZajHpJtgt1KTH70SRSDbjuWzEgv9XmURPVrm5inwuBFg38DhnTEk2r/kFjTldWYo+Y2gJ+fDILMUYn1N3s3vaRdRRK+2QMPicENwar8z3ZS1b62AJLnO4dtZVy7Yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+	s=arc-20240116; t=1709802705; c=relaxed/simple;
+	bh=GqcWhzUq4Dw3rkQz7rWUm08eRDTv4UBtcaaqj6KiMiQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=sqsqKWXYXsXZ5pJgYmPCxlBV0irH4/wpsq9UibAXTxQ2WpAClI9klItV8w1l74OVOQ4SfIF5D0P6jL0ib/0W8v9hLD6vI6ycPlI5kDfoL5espcAav3GOpG2gjHI/yBd8um/iviwZmOG09JbGRW7CycPu97PAosYaJYOngINs4i0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ijDEtdOe; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-412b30be60dso264415e9.0
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 01:11:33 -0800 (PST)
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7810827e54eso47896785a.2;
+        Thu, 07 Mar 2024 01:11:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709802702; x=1710407502; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YWbZC5CZoCpm0ayz+A9GPh5eqXUdsbwM1bBGofTxuiw=;
+        b=ijDEtdOeJF2mmC+3wKaq3Kj5U37/YKhRvWWDbcikNl4JavZPTksssRBL8UGvUGryFO
+         5+QSxwSqzbH3Dzx8cFqBQ/OIJ+Q0pDxW/YeuCWSotRgkxms7L3RAz6wc2+yk77ehRZsQ
+         wS0cJ/7dhelwYU41925BCWALR3ZpkrltVUJxPp93ylQp/3nxBCQR1jSZj3liNQ4DBrr8
+         SOrd0Xzq15aS1Zkj/j2hWKOT3Aj7lftd+8Hxcd7CrGrr+FMXsTNLwxP1SX0yUbv76a5I
+         /puagcgCRtD1aeRtpaBfhxUc0D2OTrsQcehbPgSIiWAbNvqc289XP0J7+KfC7AaaBDy0
+         Jqqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709802692; x=1710407492;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sV3KILdFqbeFakxvfHcfUPh4TO4RadSbVMLMqsrWXCE=;
-        b=YHH0hGxsntHKE/4cvWR1IO2WuMicTdXsr1uBQvofcNolwWZRenGnTXTh8mpJXd44Ar
-         souc636TyLDXex0CDdv0tLiL7/zhWb2kwOkOBkfPQKF39v8AK4fWSymyWPBPk1fotbiv
-         NIQWR+sts5jko36vLnlF5ILlaZ3bQsokBQB7SthxLX1N6DzlQ87M+kQz3xrY72JgFO5g
-         T9e2Bxs23ovih3vlISzoqm5OPwoOLVyutC5faH80P9fx87Xm0yRSgrR2FfJF1j+Xk+to
-         pT82Z5hAE2tivpT55mnVrzczeoGAXHIVrQZZBZ+jM8K+Y5xAKrCdCIi2lFChHEwRfJ7/
-         P9RA==
-X-Forwarded-Encrypted: i=1; AJvYcCW6vsF5mThjq0iOqrYArhwAGPgSABZMIs7Yf/eM6cvWjotafVycZo9Ijuv+8qFVGvxidGEHQb/j353fuHduFuOZP1tHHLxC
-X-Gm-Message-State: AOJu0YwrRY0G9lSNX43qrZrL57puTDTfwBWnGOjk2pxxdT0ZA6TvDIDE
-	wgC2+/pCcwEz3sstsnQSlYl5y0vV+2aLKs+aCpEJAodtgq6xKv0P
-X-Google-Smtp-Source: AGHT+IH5hk5HWDcCvZj69/cVtnB8bv0xOEaLSP0SK26TFBSl19Jr2zcxrzmQ4QQIvUus+UHDocxLUw==
-X-Received: by 2002:a05:600c:3b26:b0:412:b7bc:bad with SMTP id m38-20020a05600c3b2600b00412b7bc0badmr926633wms.2.1709802691801;
-        Thu, 07 Mar 2024 01:11:31 -0800 (PST)
-Received: from [10.100.102.74] (46-117-80-176.bb.netvision.net.il. [46.117.80.176])
-        by smtp.gmail.com with ESMTPSA id q8-20020a05600c46c800b00413099fc248sm1996099wmo.3.2024.03.07.01.11.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Mar 2024 01:11:31 -0800 (PST)
-Message-ID: <40a01a90-b91f-4526-a404-462de3ffa38a@grimberg.me>
-Date: Thu, 7 Mar 2024 11:11:29 +0200
+        d=1e100.net; s=20230601; t=1709802702; x=1710407502;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=YWbZC5CZoCpm0ayz+A9GPh5eqXUdsbwM1bBGofTxuiw=;
+        b=SHOAzzqPG700XKBAnRCh780zlYA3riY2gRfdWgFpEeVaNanfdf4s9q2L6+/bLoDYO+
+         pfAij1PQt3nhR60jn5tepUw+i8NBjnnjP2c+wtCWt5HoYYyPrpckI7kRxC0HulMgeGKQ
+         JQz/x6QSIZD/5Dr3ETv4/42t/L+JIgq2rlW8IcZscnK3AT+tU5PXw7840JVNgAx7Kh8G
+         IvC6YrMlrHPKuLe/ra9sA6Hj3fkf+oi1+i7YZd53GYD/F1riiC4sO8BZq3FblWjM6hOv
+         5XUw0KCnizDUpWsyRBGS4fRpEh5HBjnnPxpY6079RGVMyog1FoQLWXAXA2DAhHmbmz/5
+         baEw==
+X-Forwarded-Encrypted: i=1; AJvYcCXam/vcvQhrvaM50IMoAwUOyqw+rXr0mscieX5tWXAqxdSUrChFrcTH0zfvYLIt1SXrbv2ZY/5VAYouH0/oLd2Xr13Wydk/DtRPKCa43lYnVN9F0gEd3YF6ouZb+SGHI/1SZsJH
+X-Gm-Message-State: AOJu0YxanWwbsDm1Oym9h4RNGyLqXQBsEDQm7g1OBzSWN6vXahq7f933
+	MmuLuOoCXzaxleMmGjMOR5xw7o5qJVnZVSzAZMl8D2aIfNgdanj1
+X-Google-Smtp-Source: AGHT+IFJQSCJDprsiO3pn3kn1HCcHKfOqzyDpFhlHBGAdRG6WX/Fqb7qCbE/gAVTJNahphESYsTMQg==
+X-Received: by 2002:a05:620a:198c:b0:788:49fc:d74c with SMTP id bm12-20020a05620a198c00b0078849fcd74cmr445453qkb.44.1709802702677;
+        Thu, 07 Mar 2024 01:11:42 -0800 (PST)
+Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
+        by smtp.gmail.com with ESMTPSA id u10-20020ae9c00a000000b00788292846besm4044188qkk.89.2024.03.07.01.11.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Mar 2024 01:11:42 -0800 (PST)
+Date: Thu, 07 Mar 2024 04:11:42 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+ "lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
+Message-ID: <65e984ce3175a_f5b79294a8@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240306095436.1782250-1-Ilia.Gavrilov@infotecs.ru>
+References: <20240306095436.1782250-1-Ilia.Gavrilov@infotecs.ru>
+Subject: Re: [PATCH net-next] udp: fix incorrect parameter validation in the
+ udp_lib_getsockopt() function
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v23 06/20] nvme-tcp: Add DDP data-path
-Content-Language: en-US
-To: Aurelien Aptel <aaptel@nvidia.com>, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
- chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
-Cc: Boris Pismenny <borisp@nvidia.com>, aurelien.aptel@gmail.com,
- smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
- yorayz@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com
-References: <20240228125733.299384-1-aaptel@nvidia.com>
- <20240228125733.299384-7-aaptel@nvidia.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20240228125733.299384-7-aaptel@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
+Gavrilov Ilia wrote:
+> The 'len' variable can't be negative because all 'min_t' parameters
+> cast to unsigned int, and then the minimum one is chosen.
+> 
+> To fix it, move the if statement higher.
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
 
-
-On 28/02/2024 14:57, Aurelien Aptel wrote:
-> From: Boris Pismenny <borisp@nvidia.com>
->
-> Introduce the NVMe-TCP DDP data-path offload.
-> Using this interface, the NIC hardware will scatter TCP payload directly
-> to the BIO pages according to the command_id in the PDU.
-> To maintain the correctness of the network stack, the driver is expected
-> to construct SKBs that point to the BIO pages.
->
-> The data-path interface contains two routines: setup/teardown.
-> The setup provides the mapping from command_id to the request buffers,
-> while the teardown removes this mapping.
->
-> For efficiency, we introduce an asynchronous nvme completion, which is
-> split between NVMe-TCP and the NIC driver as follows:
-> NVMe-TCP performs the specific completion, while NIC driver performs the
-> generic mq_blk completion.
->
-> Signed-off-by: Boris Pismenny <borisp@nvidia.com>
-> Signed-off-by: Ben Ben-Ishay <benishay@nvidia.com>
-> Signed-off-by: Or Gerlitz <ogerlitz@nvidia.com>
-> Signed-off-by: Yoray Zack <yorayz@nvidia.com>
-> Signed-off-by: Shai Malin <smalin@nvidia.com>
-> Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
-> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-> Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> ---
->   drivers/nvme/host/tcp.c | 135 ++++++++++++++++++++++++++++++++++++++--
->   1 file changed, 130 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-> index 86a9ad9f679b..b7cfe14661d6 100644
-> --- a/drivers/nvme/host/tcp.c
-> +++ b/drivers/nvme/host/tcp.c
-> @@ -120,6 +120,10 @@ struct nvme_tcp_request {
->   	struct llist_node	lentry;
->   	__le32			ddgst;
->   
-> +	/* ddp async completion */
-> +	__le16			nvme_status;
-> +	union nvme_result	result;
-> +
->   	struct bio		*curr_bio;
->   	struct iov_iter		iter;
->   
-> @@ -127,6 +131,11 @@ struct nvme_tcp_request {
->   	size_t			offset;
->   	size_t			data_sent;
->   	enum nvme_tcp_send_state state;
-> +
-> +#ifdef CONFIG_ULP_DDP
-> +	bool			offloaded;
-> +	struct ulp_ddp_io	ddp;
-> +#endif
->   };
->   
->   enum nvme_tcp_queue_flags {
-> @@ -333,6 +342,25 @@ static inline size_t nvme_tcp_pdu_last_send(struct nvme_tcp_request *req,
->   
->   #ifdef CONFIG_ULP_DDP
->   
-> +static bool nvme_tcp_is_ddp_offloaded(const struct nvme_tcp_request *req)
-> +{
-> +	return req->offloaded;
-> +}
-> +
-> +static int nvme_tcp_ddp_alloc_sgl(struct nvme_tcp_request *req, struct request *rq)
-> +{
-> +	int ret;
-> +
-> +	req->ddp.sg_table.sgl = req->ddp.first_sgl;
-> +	ret = sg_alloc_table_chained(&req->ddp.sg_table,
-> +				     blk_rq_nr_phys_segments(rq),
-> +				     req->ddp.sg_table.sgl, SG_CHUNK_SIZE);
-> +	if (ret)
-> +		return -ENOMEM;
-> +	req->ddp.nents = blk_rq_map_sg(rq->q, rq, req->ddp.sg_table.sgl);
-> +	return 0;
-> +}
-> +
->   static struct net_device *
->   nvme_tcp_get_ddp_netdev_with_limits(struct nvme_tcp_ctrl *ctrl)
->   {
-> @@ -366,10 +394,68 @@ nvme_tcp_get_ddp_netdev_with_limits(struct nvme_tcp_ctrl *ctrl)
->   }
->   
->   static bool nvme_tcp_resync_request(struct sock *sk, u32 seq, u32 flags);
-> +static void nvme_tcp_ddp_teardown_done(void *ddp_ctx);
->   static const struct ulp_ddp_ulp_ops nvme_tcp_ddp_ulp_ops = {
->   	.resync_request		= nvme_tcp_resync_request,
-> +	.ddp_teardown_done	= nvme_tcp_ddp_teardown_done,
->   };
->   
-> +static void nvme_tcp_teardown_ddp(struct nvme_tcp_queue *queue,
-> +				  struct request *rq)
-> +{
-> +	struct net_device *netdev = queue->ctrl->ddp_netdev;
-> +	struct nvme_tcp_request *req = blk_mq_rq_to_pdu(rq);
-> +
-> +	ulp_ddp_teardown(netdev, queue->sock->sk, &req->ddp, rq);
-> +	sg_free_table_chained(&req->ddp.sg_table, SG_CHUNK_SIZE);
-> +}
-> +
-> +static void nvme_tcp_ddp_teardown_done(void *ddp_ctx)
-> +{
-> +	struct request *rq = ddp_ctx;
-> +	struct nvme_tcp_request *req = blk_mq_rq_to_pdu(rq);
-> +
-> +	if (!nvme_try_complete_req(rq, req->nvme_status, req->result))
-> +		nvme_complete_rq(rq);
-> +}
-> +
-> +static void nvme_tcp_setup_ddp(struct nvme_tcp_queue *queue,
-> +			       struct request *rq)
-> +{
-> +	struct net_device *netdev = queue->ctrl->ddp_netdev;
-> +	struct nvme_tcp_request *req = blk_mq_rq_to_pdu(rq);
-> +	int ret;
-> +
-> +	if (rq_data_dir(rq) != READ ||
-> +	    queue->ctrl->ddp_threshold > blk_rq_payload_bytes(rq))
-> +		return;
-> +
-> +	/*
-> +	 * DDP offload is best-effort, errors are ignored.
-> +	 */
-> +
-> +	req->ddp.command_id = nvme_cid(rq);
-> +	ret = nvme_tcp_ddp_alloc_sgl(req, rq);
-> +	if (ret)
-> +		goto err;
-> +
-> +	ret = ulp_ddp_setup(netdev, queue->sock->sk, &req->ddp);
-> +	if (ret) {
-> +		sg_free_table_chained(&req->ddp.sg_table, SG_CHUNK_SIZE);
-> +		goto err;
-> +	}
-> +
-> +	/* if successful, sg table is freed in nvme_tcp_teardown_ddp() */
-> +	req->offloaded = true;
-> +
-> +	return;
-> +err:
-> +	WARN_ONCE(ret, "ddp setup failed (queue 0x%x, cid 0x%x, ret=%d)",
-> +		  nvme_tcp_queue_id(queue),
-> +		  nvme_cid(rq),
-> +		  ret);
-> +}
-> +
->   static int nvme_tcp_offload_socket(struct nvme_tcp_queue *queue)
->   {
->   	struct ulp_ddp_config config = {.type = ULP_DDP_NVME};
-> @@ -473,6 +559,11 @@ static bool nvme_tcp_resync_request(struct sock *sk, u32 seq, u32 flags)
->   
->   #else
->   
-> +static bool nvme_tcp_is_ddp_offloaded(const struct nvme_tcp_request *req)
-> +{
-> +	return false;
-> +}
-> +
->   static struct net_device *
->   nvme_tcp_get_ddp_netdev_with_limits(struct nvme_tcp_ctrl *ctrl)
->   {
-> @@ -490,6 +581,14 @@ static int nvme_tcp_offload_socket(struct nvme_tcp_queue *queue)
->   static void nvme_tcp_unoffload_socket(struct nvme_tcp_queue *queue)
->   {}
->   
-> +static void nvme_tcp_setup_ddp(struct nvme_tcp_queue *queue,
-> +			       struct request *rq)
-> +{}
-> +
-> +static void nvme_tcp_teardown_ddp(struct nvme_tcp_queue *queue,
-> +				  struct request *rq)
-> +{}
-> +
->   static void nvme_tcp_resync_response(struct nvme_tcp_queue *queue,
->   				     struct sk_buff *skb, unsigned int offset)
->   {}
-> @@ -765,6 +864,24 @@ static void nvme_tcp_error_recovery(struct nvme_ctrl *ctrl)
->   	queue_work(nvme_reset_wq, &to_tcp_ctrl(ctrl)->err_work);
->   }
->   
-> +static void nvme_tcp_complete_request(struct request *rq,
-> +				      __le16 status,
-> +				      union nvme_result result,
-> +				      __u16 command_id)
-> +{
-> +	struct nvme_tcp_request *req = blk_mq_rq_to_pdu(rq);
-> +
-> +	if (nvme_tcp_is_ddp_offloaded(req)) {
-> +		req->nvme_status = status;
-
-this can just be called req->status I think.
-
-> +		req->result = result;
-
-I think it will be cleaner to always capture req->result and req->status
-regardless of ddp offload.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
