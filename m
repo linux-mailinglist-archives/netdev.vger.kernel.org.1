@@ -1,128 +1,90 @@
-Return-Path: <netdev+bounces-78200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CD97874537
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 01:41:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E103C87453C
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 01:43:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34A82287389
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:41:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96BBC1F23C84
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 00:43:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 403371391;
-	Thu,  7 Mar 2024 00:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC301849;
+	Thu,  7 Mar 2024 00:43:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="KU46e9cx"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hoTrwCOd"
 X-Original-To: netdev@vger.kernel.org
-Received: from omta036.useast.a.cloudfilter.net (omta036.useast.a.cloudfilter.net [44.202.169.35])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A21F17EF
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 00:41:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C4B4C61;
+	Thu,  7 Mar 2024 00:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709772067; cv=none; b=Z8TXDtG0XTCgsHSn4xM+dhmlzQTbPnxbVbL+PI/TRKfTdnhnwvH7Vc6AEIU8atnOZzKWvwpb+yKVXKOrJULwXZUshdSB4ClE3zAKcGeiRabD/nkkqtLywdkIXWGBGxxws8h4oik79EtRBXIbJnpbOVaZ8Qn4v/IM6ImbstDW1gA=
+	t=1709772220; cv=none; b=SlIyeStSi47nSQxe8laz5MBvaStGk9etTvMRZy2+T4teWQPgaCAlLnAaB429RUHrfAx+cXFOwZWnkaB+0+Sa6C9n+cR9nrXtKl+ClXhk2JSjui8Sg05kYw8GXAWuYJkiVcIex1eJvyVz4ffwSsBp9bwj9Dcf47iurVHN7POP3z4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709772067; c=relaxed/simple;
-	bh=EbCRrC7D836n3/gfVrkt21cUTLd++USvTDfHPhMW0+w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VRneLRgWpxO9xtPfO2gePTrzfWVCGeokQCThd0Jv7lgcPllrxaxfU34ccatVHKKqQuh8j460ZY4tK4ZVL1zu+NIMNU1u3K4AJz7OPvSNQMX5FzKsSQQ1foOp+V2+2XxtvZ/mFZPHZlvyajHY83ooRzXF3aeV5yXOolm3ec2vLSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=KU46e9cx; arc=none smtp.client-ip=44.202.169.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
-Received: from eig-obgw-5006a.ext.cloudfilter.net ([10.0.29.179])
-	by cmsmtp with ESMTPS
-	id hzbFrIfK6uh6si1omrWm8c; Thu, 07 Mar 2024 00:41:04 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id i1olrMohSllZli1omrDY62; Thu, 07 Mar 2024 00:41:04 +0000
-X-Authority-Analysis: v=2.4 cv=dfaG32Xe c=1 sm=1 tr=0 ts=65e90d20
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=VhncohosazJxI00KdYJ/5A==:17
- a=IkcTkHD0fZMA:10 a=K6JAEmCyrfEA:10 a=wYkD_t78qR0A:10 a=cm27Pg_UAAAA:8
- a=VwQbUJbxAAAA:8 a=vznqr7mipjY0YkA7v-cA:9 a=QEXdDO2ut3YA:10
- a=xmb-EsYY8bH0VWELuYED:22 a=AjGcO6oz07-iQ99wixmX:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=5BVrUIvBfOEk6nFXkFrEkJGrcbLKTx3N+QLOz2Ii6fA=; b=KU46e9cxXRHxCpm2jlbl/bYAGv
-	3QO4r2zEV4/MVLI/+DgJSKHhOuGD6putlxEfPmr3mE+S72URrEbonRTC5l4C6arewij3hE0bDSYcr
-	4fICckYkdF4Q+Kpk01lNNNSvoot+pNWMwiY5D1Pqv6N0imQAeYgbUXUkAgIBrjW62oGjouS4oAF2h
-	MrWsRiT5oqzyi9wsKutmBFsyQ1V3eBHiFWbqi3qcfloky9O81heGE8bRHZG6b+9PuNTJMCHOuMDa/
-	qre1mj//RwuYb4dnyBSx4HOBF03/5MkX4uimbVSS+FvdB2WI55CEp2IFgRS3zxNmMmBTCfOTALUKv
-	b1fCumUg==;
-Received: from [201.172.172.225] (port=38044 helo=[192.168.15.10])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96.2)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1ri1oj-003fVW-27;
-	Wed, 06 Mar 2024 18:41:01 -0600
-Message-ID: <22b99862-5889-4acb-96e5-7552c06e362b@embeddedor.com>
-Date: Wed, 6 Mar 2024 18:40:59 -0600
+	s=arc-20240116; t=1709772220; c=relaxed/simple;
+	bh=kICLgy5fS3zt0bLA8x8it0pE/DQMWVqNdsaAekk7NzI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sYSv2WmKlBVJN4Em3gom0wvMN7GUADMDHILpfDUI6l6XHkj528g9MoqXUoVCvdYgj0xtz1f+lsc63NKaiobacKyLQ/KLhmlbtXBsOOV2MwW+x2Bk4RaN4AIXqpCQqEDN0frlXwZbW1jy0+oNUvNZ8vak60l6Z61PnJQXqXIDovA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hoTrwCOd; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=wzCCuxsPBHXyXjRm5k2orXDzl3Uzi7tXXzCApNzY6Cs=; b=hoTrwCOdOWG9dzlrFUXg7GpQ2E
+	abQbgLeREA0rh6a2A4JZHI3yI9dyJtPUqiNfONa5MERXDSrnO3VUCwdsQOoYQE8i1AkGqlDPW9Xxz
+	BeInsjquEol0rJObi8PNjrDre/BAK7QmsBVfQsKAzQ1uQnHcr+aGyKFFRuBGaWaUGB6U=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ri1rX-009XnQ-IA; Thu, 07 Mar 2024 01:43:55 +0100
+Date: Thu, 7 Mar 2024 01:43:55 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
+	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, corbet@lwn.net,
+	linux-doc@vger.kernel.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
+	ruanjinjie@huawei.com, steen.hegelund@microchip.com,
+	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
+	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
+	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
+	benjamin.bigler@bernformulastudent.ch
+Subject: Re: [PATCH net-next v3 05/12] net: ethernet: oa_tc6: implement error
+ interrupts unmasking
+Message-ID: <ea217697-fdb8-4112-ae84-62f566cdc375@lunn.ch>
+References: <20240306085017.21731-1-Parthiban.Veerasooran@microchip.com>
+ <20240306085017.21731-6-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] overflow: Change DEFINE_FLEX to take __counted_by
- member
-Content-Language: en-US
-To: Kees Cook <keescook@chromium.org>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-hardening@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
- linux-kernel@vger.kernel.org
-References: <20240306235128.it.933-kees@kernel.org>
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <20240306235128.it.933-kees@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 201.172.172.225
-X-Source-L: No
-X-Exim-ID: 1ri1oj-003fVW-27
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.15.10]) [201.172.172.225]:38044
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 4
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfAcFRfG2v1af3Cu5MByrEljmymlgx1ZthD4VxS8jEP6x6PnoYyRbY59IeYZ0/nMExc0NebIZtr4E2jj5nx7h72+vjL2aUIST+J8tCQKVrbbirFagvIc3
- 9yd6nWCPIOWRbpY2LuMhwrAn0aDzDM9nPna7h+VSGSnJ34Tgf+/C2pqE/Nd6ntLL8iqMGS9j/EQaQpQtZHIfLiqdNkxp8fqVCXk=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240306085017.21731-6-Parthiban.Veerasooran@microchip.com>
 
+On Wed, Mar 06, 2024 at 02:20:10PM +0530, Parthiban Veerasooran wrote:
+> This will unmask the following error interrupts from the MAC-PHY.
+>   tx protocol error
+>   rx buffer overflow error
+>   loss of frame error
 
+The standard seems to call it "Loss of framing". To me as a network
+person, a frame is an L2 Ethernet packet. However, framing is
+something completely different, being able to synchronise a bitstream
+with some sort of markers, e.g. E1 to know where the 32 slots are.
 
-On 3/6/24 17:51, Kees Cook wrote:
-> The norm should be flexible array structures with __counted_by
-> annotations, so DEFINE_FLEX() is updated to expect that. Rename
-> the non-annotated version to DEFINE_RAW_FLEX(), and update the
-> few existing users.
-> 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+In this context, we are not talking about packets, but the SPI bit
+stream. So it would be good to use framing, not frame.
 
-LGTM:
-
-Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-
-Thanks!
--- 
-Gustavo
+	Andrew
 
