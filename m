@@ -1,106 +1,100 @@
-Return-Path: <netdev+bounces-78426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40EFA875100
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:54:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44DAF87510E
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 14:56:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 725A01C23750
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 13:54:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F050F1F21AB3
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 13:56:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BDEB12CDBA;
-	Thu,  7 Mar 2024 13:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEAF012D1F9;
+	Thu,  7 Mar 2024 13:56:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A0B12B154;
-	Thu,  7 Mar 2024 13:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.237.72.81
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26015F86B;
+	Thu,  7 Mar 2024 13:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709819652; cv=none; b=Ij8o8yLOcjqtyjUPqDJrePcWFrDMV0w+xn2IZcPMe3s8x7yA/4K3Lv+K76yNY8d/tFE46HZK2xaqn8rQbHLX7a1noQlyOnD95FX42IraJnPoUsSwlCC2AXxK7C0mqEV9zof6SebWQ4IcrJxCCCDLyMmr26syWQC7fsgNF/6Gpg8=
+	t=1709819804; cv=none; b=uRNb0MTXqRB0+PZqQhs53L8BA8u9026xwqECMHddWPoDvPY6DaBvaR2+j4Cgf30KXPTuJdp05hSnickPaAp0U8/EnuYbCZjZIX7TeD8KBvYjtwENnm8BODubRBRA1/X8XAX/5UH8T6a65l9f5xpkr2tVVUeM/tbG2EErKmWIhwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709819652; c=relaxed/simple;
-	bh=1rXdRG/mrYNFZsk4vvEvOgen0D6usXjQoOIkIJ9EU8A=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=CrFhvfS1URDBkuGrxyxIz5+1KNgQKu18JEZEGzNIggr6zcw4K1OzY2up3uZP4GKgHMwn2OsVtiytkit+oZlLTDgjAlFCxAaH7RdmUhK+cxzBf0clvD8YBPuc4SlLBJh+lwpIsQ5781jNp+IrA6hQcaeIgn/aAWqalU29Jewr9GQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=52.237.72.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from ubuntu.localdomain (unknown [106.117.76.127])
-	by mail-app4 (Coremail) with SMTP id cS_KCgCHHcPfxulloikAAA--.553S2;
-	Thu, 07 Mar 2024 21:53:44 +0800 (CST)
-From: Duoming Zhou <duoming@zju.edu.cn>
-To: linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	oss-drivers@corigine.com,
-	christophe.jaillet@wanadoo.fr,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	louis.peens@corigine.com,
-	Duoming Zhou <duoming@zju.edu.cn>
-Subject: [PATCH] nfp: flower: handle acti_netdevs allocation failure
-Date: Thu,  7 Mar 2024 21:53:35 +0800
-Message-Id: <20240307135335.19306-1-duoming@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:cS_KCgCHHcPfxulloikAAA--.553S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tFy7Zw4DWr15tr4fCw1kuFg_yoW8GrWxpF
-	WDGFyUZa1kJw13ta1UJw4IgFyF9a4vqFyjgF1fAws5uF9Yq3ZrKrs5KFWUG3WYyrWrG3Wf
-	ZFWYva47WF1kG3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9a14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxV
-	W8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xf
-	McIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7
-	v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF
-	7I0E8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026x
-	CaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_
-	JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r
-	1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_
-	Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8Jr
-	UvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwINAWXou1MR+gA3s0
+	s=arc-20240116; t=1709819804; c=relaxed/simple;
+	bh=eZunBR5IonjfmCLeU/OwM5mH/pBJdEWF78x9j91cTus=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=UwTSJbYenCYLZNOkOQffzCElPFYWn9j3O7im852Yl3iC9GSqaQgMKdVC2UMbfzsgbit9zork4a0lnZYzXXlAy+JwZtlpWkNtOmWtWouN8c1+sjsP1wjY8Df8xTr6dlABjFLr9OcIVX3h4/QQJaWYQqAYpYf6CK//CY89cninKYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Tr9lD5RKGz1h1ZX;
+	Thu,  7 Mar 2024 21:54:16 +0800 (CST)
+Received: from kwepemd100009.china.huawei.com (unknown [7.221.188.135])
+	by mail.maildlp.com (Postfix) with ESMTPS id ABF311A016E;
+	Thu,  7 Mar 2024 21:56:38 +0800 (CST)
+Received: from [10.67.109.184] (10.67.109.184) by
+ kwepemd100009.china.huawei.com (7.221.188.135) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Thu, 7 Mar 2024 21:56:38 +0800
+Message-ID: <b4516819-8cc7-46eb-b4ea-9ffd1a0c51e6@huawei.com>
+Date: Thu, 7 Mar 2024 21:56:37 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf 1/2] xdp, bonding: Fix feature flags when there are no
+ slave devs anymore
+Content-Language: en-US
+To: Daniel Borkmann <daniel@iogearbox.net>
+CC: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<magnus.karlsson@intel.com>, <prbatra.mail@gmail.com>, <toke@redhat.com>,
+	<kuba@kernel.org>
+References: <20240305090829.17131-1-daniel@iogearbox.net>
+ <170968502778.5704.4519517843918140180.git-patchwork-notify@kernel.org>
+From: Pu Lehui <pulehui@huawei.com>
+In-Reply-To: <170968502778.5704.4519517843918140180.git-patchwork-notify@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemd100009.china.huawei.com (7.221.188.135)
 
-The kmalloc_array() in nfp_fl_lag_do_work() will return null, if
-the physical memory has run out. As a result, if we dereference
-the acti_netdevs, the null pointer dereference bugs will happen.
 
-This patch adds a check to judge whether allocation failure occurs.
-If it happens, the delayed work will be rescheduled and try again.
+On 2024/3/6 8:30, patchwork-bot+netdevbpf@kernel.org wrote:
+> Hello:
+> 
+> This series was applied to bpf/bpf.git (master)
+> by Alexei Starovoitov <ast@kernel.org>:
+> 
+> On Tue,  5 Mar 2024 10:08:28 +0100 you wrote:
+>> Commit 9b0ed890ac2a ("bonding: do not report NETDEV_XDP_ACT_XSK_ZEROCOPY")
+>> changed the driver from reporting everything as supported before a device
+>> was bonded into having the driver report that no XDP feature is supported
+>> until a real device is bonded as it seems to be more truthful given
+>> eventually real underlying devices decide what XDP features are supported.
+>>
+>> The change however did not take into account when all slave devices get
+>> removed from the bond device. In this case after 9b0ed890ac2a, the driver
+>> keeps reporting a feature mask of 0x77, that is, NETDEV_XDP_ACT_MASK &
+>> ~NETDEV_XDP_ACT_XSK_ZEROCOPY whereas it should have reported a feature
+>> mask of 0.
+>>
+>> [...]
+> 
+> Here is the summary with links:
+>    - [bpf,1/2] xdp, bonding: Fix feature flags when there are no slave devs anymore
+>      https://git.kernel.org/bpf/bpf/c/f267f2628150
+>    - [bpf,2/2] selftests/bpf: Fix up xdp bonding test wrt feature flags
+>      https://git.kernel.org/bpf/bpf/c/0bfc0336e134
 
-Fixes: bb9a8d031140 ("nfp: flower: monitor and offload LAG groups")
-Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
----
- drivers/net/ethernet/netronome/nfp/flower/lag_conf.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+I had encountered the same issue during riscv bpf selftest regression. 
+Happy to see this fixes.
 
-diff --git a/drivers/net/ethernet/netronome/nfp/flower/lag_conf.c b/drivers/net/ethernet/netronome/nfp/flower/lag_conf.c
-index 361d7c495e2..07759296c71 100644
---- a/drivers/net/ethernet/netronome/nfp/flower/lag_conf.c
-+++ b/drivers/net/ethernet/netronome/nfp/flower/lag_conf.c
-@@ -337,6 +337,13 @@ static void nfp_fl_lag_do_work(struct work_struct *work)
- 
- 		acti_netdevs = kmalloc_array(entry->slave_cnt,
- 					     sizeof(*acti_netdevs), GFP_KERNEL);
-+		if (!acti_netdevs) {
-+			nfp_flower_cmsg_warn(priv->app,
-+					     "memory allocate failed\n");
-+			schedule_delayed_work(&lag->work,
-+					      NFP_FL_LAG_DELAY);
-+			continue;
-+		}
- 
- 		/* Include sanity check in the loop. It may be that a bond has
- 		 * changed between processing the last notification and the
--- 
-2.17.1
-
+> 
+> You are awesome, thank you!
 
