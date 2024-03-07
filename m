@@ -1,114 +1,116 @@
-Return-Path: <netdev+bounces-78221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16EC3874606
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 03:16:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22B69874608
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 03:16:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DF771F21629
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 02:16:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB5E41F229B7
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 02:16:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D0F5C89;
-	Thu,  7 Mar 2024 02:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F067168BE;
+	Thu,  7 Mar 2024 02:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2haLrco"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C19CEADA;
-	Thu,  7 Mar 2024 02:15:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47BB415EA6;
+	Thu,  7 Mar 2024 02:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709777760; cv=none; b=Hd/cdWGV8dnECHQXsELWMmE+igP3WjeQRroCAHJnldIZ6EWSxKwIf9yhVJZgmSYkD378cNaoukx6xxqbB4he+BcckouwvDKoPwaOlXq4dqXD2wwzwb/4eOOgNJvfZH7Yueo0r7BIyb6W+YYtN3r4kDQxJ8X652ShzswqmfgdP/o=
+	t=1709777762; cv=none; b=nLsIkrYbZHkrdlbFfW9jaqZD2KNuEmkYRz94OPiQsSVPFxKKSOoi9ufOUfCzwyXey/radYFcfr86dcER1+JtXupXaEQKC5lWPyl+cp9uw0+bskbOhzADs3DolB5uQ2uwenl9xfPYwK46yAYpUP3E8PiMgdYPVx0rHThD2TGlCZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709777760; c=relaxed/simple;
-	bh=wvhSu0XwaGGRsXWfDOypN5y0/NMuLc+Zdd3HHS+Xim4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gotNryFMHmwx/0NmYIrvNt9MKiM0zSsVgixTeLl4r4E3gsLBZZgqk3HHKZD+3MogmcdkaurYd4gcaxgFBy9k740KdeOhKQJ3VMJrJ4yJgzJVX0T1JEIaL1wwlScwuD7NgrzRzHWR/4FmedjL1kXtbZ1XESIhDwJZLzNsAbMBvy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de
-Subject: [PATCH net 5/5] netfilter: nf_conntrack_h323: Add protection for bmp length out of range
-Date: Thu,  7 Mar 2024 03:15:45 +0100
-Message-Id: <20240307021545.149386-6-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240307021545.149386-1-pablo@netfilter.org>
-References: <20240307021545.149386-1-pablo@netfilter.org>
+	s=arc-20240116; t=1709777762; c=relaxed/simple;
+	bh=Cw89We1aTAVBbcBRos65D+qMVJWNLUVeKILK2DWf540=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=T9jx8jzZ3kv1NM891tfP4ujUR+0oxkAKbi0rB577DSa3HnPKRGjmfKmqTrfQI0qyg9cFYMfQqDwCOCza2eUgtEllnJb8Wb7aHwO2oAJVM/a5Xus03Uuexn7X1LkFZC0IvHZABmnYVKFOJJdEX5NLORd/cgBpcoviKhhWubLNzbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2haLrco; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59B1BC43390;
+	Thu,  7 Mar 2024 02:16:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709777761;
+	bh=Cw89We1aTAVBbcBRos65D+qMVJWNLUVeKILK2DWf540=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=e2haLrcoYyKOlH2ZZ7Rf2CK7O15Lo2E4Oo5/0FMZRY1/4m0vAJc7leeijC1NOZL/Q
+	 VFqcSJcgHOooJ/oa6qlbuQ4Ae6kYuqlId0zP2V4BKXfRz7qldYKowGfkO0SC0LHa9b
+	 rCUh6zs2WQYuNhvgy05KaFAW3UzmQfdupjgIo4nyNIT6iwWozWi6D0gmspUrvORIPF
+	 4Ka4+bjiQR8ADhwLoCSpt3VlxbFfeRlynSh1LA1Ye/sA/O9fu1GmVl63FgJTgZ+6R6
+	 gmAm5XzUS7RlaaZi7B16Yg8ARBnUcqZcbvfJC1sTgYhXR4TwttR4QEgZjm8R1Vh/VA
+	 O20Ji8xeC+9Kw==
+Date: Wed, 6 Mar 2024 18:16:00 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Liang Chen <liangchen.linux@gmail.com>, Yunsheng Lin
+ <linyunsheng@huawei.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+ "davem@davemloft.net" <davem@davemloft.net>, "herbert@gondor.apana.org.au"
+ <herbert@gondor.apana.org.au>, Gal Pressman <gal@nvidia.com>,
+ "dsahern@kernel.org" <dsahern@kernel.org>, "steffen.klassert@secunet.com"
+ <steffen.klassert@secunet.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ Leon Romanovsky <leonro@nvidia.com>, "edumazet@google.com"
+ <edumazet@google.com>, "ian.kumlien@gmail.com" <ian.kumlien@gmail.com>,
+ "Anatoli.Chechelnickiy@m.interpipe.biz"
+ <Anatoli.Chechelnickiy@m.interpipe.biz>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>
+Subject: Re: [RFC] net: esp: fix bad handling of pages from page_pool
+Message-ID: <20240306181600.5af8ef5f@kernel.org>
+In-Reply-To: <CAHS8izOoO-EovwMwAm9tLYetwikNPxC0FKyVGu1TPJWSz4bGoA@mail.gmail.com>
+References: <20240304094950.761233-1-dtatulea@nvidia.com>
+	<20240305190427.757b92b8@kernel.org>
+	<7fc334b847dc4d90af796f84a8663de9f43ede5d.camel@nvidia.com>
+	<20240306072225.4a61e57c@kernel.org>
+	<320ef2399e48ba0a8a11a3b258b7ad88384f42fb.camel@nvidia.com>
+	<20240306080931.2e24101b@kernel.org>
+	<CAHS8izMw_hxdoNDoCZs8T7c5kmX=0Lwqw_dboSj7z1LqtS-WKA@mail.gmail.com>
+	<9a78b37abdf40daafd9936299ea2c08f936ad3d5.camel@nvidia.com>
+	<20240306094133.7075c39f@kernel.org>
+	<CAHS8izN436pn3SndrzsCyhmqvJHLyxgCeDpWXA4r1ANt3RCDLQ@mail.gmail.com>
+	<CAHS8izOoO-EovwMwAm9tLYetwikNPxC0FKyVGu1TPJWSz4bGoA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Lena Wang <lena.wang@mediatek.com>
+On Wed, 6 Mar 2024 10:46:45 -0800 Mina Almasry wrote:
+> Gah, nevermind, skb_pp_frag_ref() actually returns -EINVAL if
+> !skb->pp_recycle, and in the call site we do a skb_frag_ref() on this
+> error, so all in all we end up doing a get_page/put_page pair. Sorry
+> for the noise.
+> 
+> So we're supposed to:
+> - !skb->pp_recycle && is_pp_page()
+> ref via get_page
+> unref via put_page
+> 
+> Very subtle stuff (for me at least). I'll try to propose some cleanup
+> to make this a bit simpler using helpers that handle all these subtle
+> details internally so that the call sites don't have to do this
+> special handling.
 
-UBSAN load reports an exception of BRK#5515 SHIFT_ISSUE:Bitwise shifts
-that are out of bounds for their data type.
+Sure, although complexity is complexity, we can only do so much to hide
+it.
 
-vmlinux   get_bitmap(b=75) + 712
-<net/netfilter/nf_conntrack_h323_asn1.c:0>
-vmlinux   decode_seq(bs=0xFFFFFFD008037000, f=0xFFFFFFD008037018, level=134443100) + 1956
-<net/netfilter/nf_conntrack_h323_asn1.c:592>
-vmlinux   decode_choice(base=0xFFFFFFD0080370F0, level=23843636) + 1216
-<net/netfilter/nf_conntrack_h323_asn1.c:814>
-vmlinux   decode_seq(f=0xFFFFFFD0080371A8, level=134443500) + 812
-<net/netfilter/nf_conntrack_h323_asn1.c:576>
-vmlinux   decode_choice(base=0xFFFFFFD008037280, level=0) + 1216
-<net/netfilter/nf_conntrack_h323_asn1.c:814>
-vmlinux   DecodeRasMessage() + 304
-<net/netfilter/nf_conntrack_h323_asn1.c:833>
-vmlinux   ras_help() + 684
-<net/netfilter/nf_conntrack_h323_main.c:1728>
-vmlinux   nf_confirm() + 188
-<net/netfilter/nf_conntrack_proto.c:137>
+For pp_recycle - the problem is when we added page pool pages, hardly
+anything in the upper layers of the stack was made pp aware. So we can
+end up with someone doing
 
-Due to abnormal data in skb->data, the extension bitmap length
-exceeds 32 when decoding ras message then uses the length to make
-a shift operation. It will change into negative after several loop.
-UBSAN load could detect a negative shift as an undefined behaviour
-and reports exception.
-So we add the protection to avoid the length exceeding 32. Or else
-it will return out of range error and stop decoding.
+	get_page(page);
+	skb_fill_page_desc(skb, page);
 
-Fixes: 5e35941d9901 ("[NETFILTER]: Add H.323 conntrack/NAT helper")
-Signed-off-by: Lena Wang <lena.wang@mediatek.com>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/nf_conntrack_h323_asn1.c | 4 ++++
- 1 file changed, 4 insertions(+)
+on a PP page.
 
-diff --git a/net/netfilter/nf_conntrack_h323_asn1.c b/net/netfilter/nf_conntrack_h323_asn1.c
-index e697a824b001..540d97715bd2 100644
---- a/net/netfilter/nf_conntrack_h323_asn1.c
-+++ b/net/netfilter/nf_conntrack_h323_asn1.c
-@@ -533,6 +533,8 @@ static int decode_seq(struct bitstr *bs, const struct field_t *f,
- 	/* Get fields bitmap */
- 	if (nf_h323_error_boundary(bs, 0, f->sz))
- 		return H323_ERROR_BOUND;
-+	if (f->sz > 32)
-+		return H323_ERROR_RANGE;
- 	bmp = get_bitmap(bs, f->sz);
- 	if (base)
- 		*(unsigned int *)base = bmp;
-@@ -589,6 +591,8 @@ static int decode_seq(struct bitstr *bs, const struct field_t *f,
- 	bmp2_len = get_bits(bs, 7) + 1;
- 	if (nf_h323_error_boundary(bs, 0, bmp2_len))
- 		return H323_ERROR_BOUND;
-+	if (bmp2_len > 32)
-+		return H323_ERROR_RANGE;
- 	bmp2 = get_bitmap(bs, bmp2_len);
- 	bmp |= bmp2 >> f->sz;
- 	if (base)
--- 
-2.30.2
+You probably inspected a lot of those cases for the ZC work, and they
+can be fixed up to do a "pp-aware get()", but until then we need
+skb->pp_recycle. pp_recycle kinda denotes whether whoever constructed
+the skb was PP aware.
 
+So, yes, definitely a good long term goal, but not in a fix :)
 
