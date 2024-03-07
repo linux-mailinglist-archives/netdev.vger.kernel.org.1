@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-78388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F09CB874D9C
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 12:38:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DFEF874D9D
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 12:39:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF88E1C20B0D
-	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:38:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1ED31B23AAA
+	for <lists+netdev@lfdr.de>; Thu,  7 Mar 2024 11:39:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B1C129A84;
-	Thu,  7 Mar 2024 11:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC5512A156;
+	Thu,  7 Mar 2024 11:36:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p3/YH6w7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pBRou20e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05FC9128378
-	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 11:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488101292C0
+	for <netdev@vger.kernel.org>; Thu,  7 Mar 2024 11:36:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709811390; cv=none; b=HfnvHwZySCyMChkXaPChO47c2mF2thCPpZotnxjYkVbjWiHv8aQ6+ZQS1TZ8iP6JzZCXgMGpFC/9RVDMmxKt0uw0QmtZivq8X+pyPyGNZXHt+S1btx8AkwKP9r6GS27NBMJhEI1GABBbAn3nJhYT5SYCIyJzJ930urXAKTnidiE=
+	t=1709811414; cv=none; b=eopxMtu0WVejBwQBQ6oXz9JCWhNlcv/AE5TVYsyJq8v1Kxb0dZMAxN0rm0rKziEK2DyB83S7tj3VM9NOUN0MP00SgD/GcPWuk1LCfgX23cdMLeNDUYvK08dj0X0hpu67JQVqDd2Sq0tw56JBh/3Daaocsau9jPkRES5JdHyNfo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709811390; c=relaxed/simple;
-	bh=z/APOdaKVCW0nV+fzkJMoIJM49ECU0kgRk9+jVDwdgY=;
+	s=arc-20240116; t=1709811414; c=relaxed/simple;
+	bh=csE9+Fb1qbDL7EQ9gqnLFCsH8i1dvljsRV4NNfkRqIA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OBgVbDy+pf0677wT63ZTZ0LvI/BMe9Ks9me4f8HCau8j3Yj0240c45P8YUqRRKqgl01pl7V9mCZl5xBPFldT0vq17+mLF0rAbQJ/4jF/tCKXp1Y2/bP0U3UPxHinFYIiHhpJb6cEW9yUBfT0PYreoNpfVrqdPfGmYppT1VQUWKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p3/YH6w7; arc=none smtp.client-ip=209.85.208.41
+	 To:Cc:Content-Type; b=mOpob6omde0LMrE85m+ueBbT4pmx90nHOCLuc2R08oGkmtFqvn1JmG4Pbfmjjt49/UWw7l8OxTlFoiVhxo+wREv3zxzFH3HoLR5/ok1hmohDtbJV5qqBFjmqt0FllC618fZjHLkB0RUSXzRJpuA81yqM6DHoeIj/TAhOWLvJQfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pBRou20e; arc=none smtp.client-ip=209.85.208.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5681b7f338aso3361a12.0
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 03:36:28 -0800 (PST)
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5681b7f338aso3367a12.0
+        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 03:36:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709811387; x=1710416187; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1709811411; x=1710416211; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=z/APOdaKVCW0nV+fzkJMoIJM49ECU0kgRk9+jVDwdgY=;
-        b=p3/YH6w7V3ni0kAfCB554OLE3gcBjcfTMFxfwadffcDXkPR4L+rRSSI0iJUaYNNp4W
-         FYmACN8wNxeIC046XUIc4BPXx9WAYEUyoBnQ2haXqgys/OWu/Z3gr/iBmxHbF9w2OTXS
-         ewPQrNZCiSi+mftOEHTMJyOvNMunw92QiSrPCLuEeYIACXxkR2ZWCjoF8hLDXpZ2gJMc
-         7RFRbH0hLRJliuoTG0D6Ks951o2bxg+nhA/x53J0ZdXQmpzRvmy28dOpDe7hKUJT3aR7
-         wnumfMvIBRzwFJXhc66m0xlhTZDjDv/IAUT4buWMz/IVRdaK+FgGDPLqenm84jJ9sE5/
-         O9/w==
+        bh=csE9+Fb1qbDL7EQ9gqnLFCsH8i1dvljsRV4NNfkRqIA=;
+        b=pBRou20eRvrRPp746txBjnKlQFWBt8vYvN75U4XCRO+Tci3eivtClA5fp6MSomAw4O
+         LNrJ2+L/sTDgbsrbqMF6Fv5zE+QwiMH3TbxScQ1ULbn26pwHqCTdcYTYGPzI5ZVBo6e/
+         obMMDCiXNtb9d1Xv4E1+2ppxBOLXFKHlksG1FmVSHZOJ5gSKQkUkIcb1708pdZ+UetnF
+         JxmJjNsk6VcVrMySB9sHtPWczffiwzUXc9HTEWB1Ilzb2Yq17NR1JnhO4VD/grW/lKI/
+         7pw1TOEjBHGNkbg0GjBUHyAMH/KQHeGXfKDYyVLR+PMepPCTBqhu4hEayxb+amQtwhRr
+         s5xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709811387; x=1710416187;
+        d=1e100.net; s=20230601; t=1709811411; x=1710416211;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=z/APOdaKVCW0nV+fzkJMoIJM49ECU0kgRk9+jVDwdgY=;
-        b=fUcHXQyJm/HaHXmLpCIdLuqO9EMNezgDoiaY7vLd+vzyCoDOIZsFvuGgSAjNpQDg97
-         Lk3uit/c7Z2qo5KXFn2WGy+oV/Mf3pYvNYESjUKLNXcOu2l7Yxs3ajfQ1RZlWMbX03Xq
-         m8FpElFHQoAP07fy820p+h4yEdkGZDFfd/rAc1BTcEgSMe2XNACVohsw9UBFeTWgF7tm
-         eUGIoObURxEO3gM/9tMDSfbsb41i4FaLRprXXC5gru9hCHNxHx6yb2pfGuhc6Tz7wzeu
-         k2JPZRizSNbN3MAosKxwWnRma+QcMWvQv2smdGeaOLGzkVT3KvSfdoCHGJ7l8VjLnIHk
-         EBQA==
-X-Forwarded-Encrypted: i=1; AJvYcCXqmTEW4uFYyYaa8ChbL5KrQDFK/n4q1yG9VuMuVlVwN91kB7aYufuOEI8EnSEcfecKEe+llk5oheVAr+u5AF9z+/BlE2E5
-X-Gm-Message-State: AOJu0YyTprKpMfP7dp8sC3TR2wDpu7Rlo2Ke06QXlAJ0Z9U/8E2Jwvnr
-	FGJGsIXUh5fAsrClI68kUQToTGR2pe1g9YcaX82alOa10lBsF0skNgCNzJjrRZh2Wji0GwmbM3t
-	5eQIQ0Uea7SSoJCq0c548htiqJDoiQ5lqEccb
-X-Google-Smtp-Source: AGHT+IGhKpaFISh6h77rzCFM8kMEcKQujZVf7FZR95JZO09BK+PBIzQ0T/DBA/25M6CBax+euiF805iv0p6iHRNTWsc=
+        bh=csE9+Fb1qbDL7EQ9gqnLFCsH8i1dvljsRV4NNfkRqIA=;
+        b=kJZ2BHSzQqA86iuPUOBd3Wug/fPgf6X3HdkqAYRAWkjs5Tng80frq8pZeExZtqNdlb
+         KdSdqz5WqmkY4pBIYGOodjPs7s1al6QR17M9AsxUsR1y1M5GeFB3Q6k3xe4J5IOp2ocW
+         C14sOcf18hCgl8dIvRVOUT0zxqbBqPKUC1RMRPnViZKQjKNHXzRJwAIO4kC582nR7Ae5
+         cYgAgACHCK3t5Ev6MJrXIbcNvo/1aCTW+c146S5G2EzEjhYUpWK9QInnmEeB8AmFy+48
+         kuajyRLvHUYdlYvGwUt7rsZstWL+imbwfb8FpUKn6Y/kuKxtvcLVJGWQ5f824PHdgKfl
+         0/Hg==
+X-Forwarded-Encrypted: i=1; AJvYcCXIiPJWLjKE3QMNuhODgxopxGws79EkxMF69pxuGlQ9zW/Z88VPA3ngBYVecZgZl5ImwLSxvmHfE/jE4ACIDDlGipJll/RJ
+X-Gm-Message-State: AOJu0Yz3SnXnI6cjR9ZRwcHpajr+Xb1pEAI42cLMsaAQnRKH9yWMJs8b
+	HEtg82noXjBVDT4Smwi4QqFcdUuL+N5JP6LDo1t8AZ6skDjw+FjT9813o7GGN7wFoknekVtmCCB
+	LziBUXizMjQ0pO2r1ZvLquQisqVNedv+MeTS/
+X-Google-Smtp-Source: AGHT+IFN+ugPG1MFVDNGu8EIOU8XjifORKg5Yakb5vpTZ17CLf2qhGejlG3OgPc/1FIj1oKxaSdO9DDiVGzlPE1EaXA=
 X-Received: by 2002:aa7:df92:0:b0:567:f511:3815 with SMTP id
- b18-20020aa7df92000000b00567f5113815mr149020edy.3.1709811386941; Thu, 07 Mar
- 2024 03:36:26 -0800 (PST)
+ b18-20020aa7df92000000b00567f5113815mr149183edy.3.1709811411456; Thu, 07 Mar
+ 2024 03:36:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240304092934.76698-1-kerneljasonxing@gmail.com> <20240304092934.76698-2-kerneljasonxing@gmail.com>
-In-Reply-To: <20240304092934.76698-2-kerneljasonxing@gmail.com>
+References: <20240304092934.76698-1-kerneljasonxing@gmail.com> <20240304092934.76698-3-kerneljasonxing@gmail.com>
+In-Reply-To: <20240304092934.76698-3-kerneljasonxing@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 7 Mar 2024 12:36:13 +0100
-Message-ID: <CANn89i+LCcumU32pHt2oUnpA19hvgy7YJ7us0brcpL7Szx8tcw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/2] tcp: add tracing of skb/skaddr in
- tcp_event_sk_skb class
+Date: Thu, 7 Mar 2024 12:36:40 +0100
+Message-ID: <CANn89i+xg_rSeaVNo__FdZkV46_CEhM8c2Gpr+i-GsWnqatAiQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/2] tcp: add tracing of skbaddr in
+ tcp_event_skb class
 To: Jason Xing <kerneljasonxing@gmail.com>
 Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com, rostedt@goodmis.org, 
 	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
@@ -90,12 +90,8 @@ om> wrote:
 >
 > From: Jason Xing <kernelxing@tencent.com>
 >
-> Printing the addresses can help us identify the exact skb/sk
-> for those system in which it's not that easy to run BPF program.
-> As we can see, it already fetches those, then use it directly
-> and it will print like below:
->
-> ...tcp_retransmit_skb: skbaddr=3DXXX skaddr=3DXXX family=3DAF_INET...
+> Use the existing parameter and print the address of skbaddr
+> as other trace functions do.
 >
 > Signed-off-by: Jason Xing <kernelxing@tencent.com>
 
