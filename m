@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-78600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E57B875D6B
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 06:01:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6B80875D5C
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 06:00:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7C65B22C3C
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:01:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B7FB283B5F
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:00:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4170F2C1A6;
-	Fri,  8 Mar 2024 05:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94AA2E832;
+	Fri,  8 Mar 2024 05:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CgyYhFY8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A4EeYdmP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D7931A82
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E982E633
 	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 05:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709874038; cv=none; b=Cvq0BVc1pfuCF+UZHDwUg2mfITvm+Peg2vxkd4ZRGTY0HlueLOcec3wL5SVaQzvUjLVzmRgGPmj6tptrGKCHCCJlvLoTeGKa0K6q7wNgyoaEr6vPlQvxIM34mTnTpNQAUF2mFKCv10CCMV8i0M91b/cp0SwlJOYs++sZwBNsh4w=
+	t=1709874037; cv=none; b=RSvjdOztwmdSCE0wtZVHZbFtCYN1MAemz69/5kc6vyihIJQrToHT/wp1oHtLObvnGzc8Cqovq7bjYMNiGsJv4wQovVoykYHW+xX5pHGI+HezKLATqZeS+7ODyUf1K0PG6ZsmMdOc+RHm+LhL+FR5nyqGPLQHmHObhwl8XCftSMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709874038; c=relaxed/simple;
-	bh=NrVR4CCfYvZu7uLzOz9Be6YSKk5klhVD6CtmjQrivGU=;
+	s=arc-20240116; t=1709874037; c=relaxed/simple;
+	bh=cE+F1Jf5tH6SLAYPQ3zCyX63V//LMt8FP9uN6r4x/X4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FshOMtXXThQRcibksLKEFYrj6ng3kRjbBoqIOuW2alDk6+q+e9oJfr7PF5lXxUa5xWqczdGuz4MV3WeVmaZciAC2nOENrLhFuL6HTHTLaVWgQuK8IX+Dum6TbYGxcA/XCET6ciBfF2XHZFwLwl7WppPix3R2C6x3F6KkTVaxXNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CgyYhFY8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C38EBC32780;
+	 In-Reply-To:To:Cc; b=fKCT/2XhLasSOT0zPgmvX+UQS5IGBNowk6NTe9hGyVZ7uPstj9/ojUafK7BPj//lHLp67FV0KTs83Oa+ykEzUZAoQmZZEzl0rDn+MsYRNCJlR8SiRLxZwJaJRfe2Is3F3pWBk8MNsOFv3G7zcL7DLivBv8FsLmkxp0xVWnvMD28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A4EeYdmP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4A92CC43390;
 	Fri,  8 Mar 2024 05:00:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709874037;
-	bh=NrVR4CCfYvZu7uLzOz9Be6YSKk5klhVD6CtmjQrivGU=;
+	bh=cE+F1Jf5tH6SLAYPQ3zCyX63V//LMt8FP9uN6r4x/X4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CgyYhFY83n1KBN1wY3/cfEo/i/ZOk5sl9DKFlOWNw+975nrSbt56IqeFRBtq1/GLU
-	 i4dbth6EH65nJc4Gzw2KG4mq2nyYSVFvSdImM1j2yrt0I+nyAWbhsTaxrapj1yESGk
-	 kHCq2IYitOqMVvQhXPUMUiA5ci3S1gM3VLpB4SF26X5zSo4IIU4YqIvjfnmiINcf7O
-	 ojXjKG+zxhSyxpNtjGW+zvL6wyjTYub3G2ykKM9IYywLVYAlTLu9eCg6OG/6ZPqqxp
-	 RL+mIr8li4ZcLTZvFaYAITpq4qB8BO11W9qlgjj0lxjVF5CfT6ZrwFMCs+OYdF+VFi
-	 1tmCpf4H9BpMg==
+	b=A4EeYdmPiu6BHEwo3UmbrbLdl2zy6FWvz1S1gYnCWHm2jwzcH5dTUam0+YxmhvYw4
+	 IexfSSjfp0NoVV+SiPDQkUf4ObPGzsiZkzj9NAFLbBUDVwPx7Khhy+vZoQqZjZb0Ji
+	 9Ll2b4TzeTCAojpv1DrGVzG5tPCvxMpwAm/3Ds9CAFpzFwt2pw8TNpLBKEqNPt4XS9
+	 RrRshif7l4GjfujbUpe4Lya+QWzQ1iq4/eCruWgK/xO2eZ8L6mco/xPGGfmOyFCVED
+	 GxGAJ762D9zXBLI8nHRAS93A8oTinaH8rhFmA8uA1XfLQoQDKj8xD4gZKX0EptjXTl
+	 oml6oAevhDrZw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B13B2D84BDD;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 30F58D84BDA;
 	Fri,  8 Mar 2024 05:00:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] mpls: Do not orphan the skb
+Subject: Re: [PATCH net-next v3 0/6] tools/net/ynl: Add support for nlctrl netlink
+ family
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170987403772.8362.3274190846184456765.git-patchwork-notify@kernel.org>
+ <170987403719.8362.3858488476279704879.git-patchwork-notify@kernel.org>
 Date: Fri, 08 Mar 2024 05:00:37 +0000
-References: <20240306181117.77419-1-cpaasch@apple.com>
-In-Reply-To: <20240306181117.77419-1-cpaasch@apple.com>
-To: Christoph Paasch <cpaasch@apple.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, roopa@nvidia.com,
- cmtaylor@apple.com
+References: <20240306231046.97158-1-donald.hunter@gmail.com>
+In-Reply-To: <20240306231046.97158-1-donald.hunter@gmail.com>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, jacob.e.keller@intel.com,
+ jiri@resnulli.us, sdf@google.com, donald.hunter@redhat.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 06 Mar 2024 10:11:17 -0800 you wrote:
-> We observed that TCP-pacing was falling back to the TCP-layer pacing
-> instead of utilizing sch_fq for the pacing. This causes significant
-> CPU-usage due to the hrtimer running on a per-TCP-connection basis.
+On Wed,  6 Mar 2024 23:10:40 +0000 you wrote:
+> This series adds a new YNL spec for the nlctrl family, plus some fixes
+> and enhancements for ynl.
 > 
-> The issue is that mpls_xmit() calls skb_orphan() and thus sets
-> skb->sk to NULL. Which implies that many of the goodies of TCP won't
-> work. Pacing falls back to TCP-layer pacing. TCP Small Queues does not
-> work, ...
+> Patch 1 fixes an extack decoding bug
+> Patch 2 gives cleaner netlink error reporting
+> Patch 3 fixes an array-nest codegen bug
+> Patch 4 adds nest-type-value support to ynl
+> Patch 5 fixes the ynl schemas to allow empty enum-name attrs
+> Patch 6 contains the nlctrl spec
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] mpls: Do not orphan the skb
-    https://git.kernel.org/netdev/net-next/c/8edbd3960150
+  - [net-next,v3,1/6] tools/net/ynl: Fix extack decoding for netlink-raw
+    https://git.kernel.org/netdev/net-next/c/cecbc52c46e2
+  - [net-next,v3,2/6] tools/net/ynl: Report netlink errors without stacktrace
+    https://git.kernel.org/netdev/net-next/c/771b7012e5f3
+  - [net-next,v3,3/6] tools/net/ynl: Fix c codegen for array-nest
+    https://git.kernel.org/netdev/net-next/c/6fe7de5e9c08
+  - [net-next,v3,4/6] tools/net/ynl: Add nest-type-value decoding
+    https://git.kernel.org/netdev/net-next/c/b6e6a76dec33
+  - [net-next,v3,5/6] doc/netlink: Allow empty enum-name in ynl specs
+    https://git.kernel.org/netdev/net-next/c/bc52b39309c3
+  - [net-next,v3,6/6] doc/netlink/specs: Add spec for nlctrl netlink family
+    https://git.kernel.org/netdev/net-next/c/768e044a5fd4
 
 You are awesome, thank you!
 -- 
