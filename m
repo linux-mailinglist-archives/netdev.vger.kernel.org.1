@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-78848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0E41876C56
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 22:20:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01BA3876C57
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 22:20:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65877B20ECC
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 21:20:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31E2F1C2163F
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 21:20:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0AF5F879;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9245FB98;
 	Fri,  8 Mar 2024 21:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ttkDhhhw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TYQQLM1W"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDDAF5F56A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4560E5FB8D
 	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 21:20:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709932836; cv=none; b=rydwdSFdFE+vI/EXsfIb/C0bxV1cs0ubNtqG6Pc9d14t3sWvVstP8mwT1w3z1OnFF8ppKjUzXGu+6lC18p+r5rhH8h+mzCxI9TpgwDFfozU2c6oVocwGfWx3BVGRGU1ubsP9HpuvyaLSrpGZ+jKgG/TSOMd9UGbpsaTq+q3BQxw=
+	t=1709932836; cv=none; b=MD44WV0a1PtgovxvRWZPxKT7nPdAsmga1m9SuKp6utV/IofrW8A21kjSza+1P73tbUxF2+eHTyYhS+ERi4gdnom6mQXaNPLH4ZJb9Osxyv9Sa768Y7h7m66GXBAUdnbSOJEMlwCFicA1KL4ZXm8d2H2Lh9JLqMDjRF83YqYl1vQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709932836; c=relaxed/simple;
-	bh=idcW0njKGXLSQuG+r/fW91F9NRdIyGTgJXht6dwcQOU=;
+	bh=7+78oklhsNOulD6tNX/NINjtFsppNoyIJ3KugelH/z4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YoJP4T1klcA6CX+bEg5Ncz5e6Q1NHhYy97U9nwEXA9AMbtopOaMZHLyg+rnCxv7sQZP4zFvMraZzElojV2z1gQF+nMghkQOT7IpszUDrdNiRiI3CseHhrBz/RJuxXR3unirvvsA+vQvt2wJRiOnqs8hwvT2xJqcV1A3ydzzkdn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ttkDhhhw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 80209C433F1;
+	 In-Reply-To:To:Cc; b=Ig8Tn7WIy9Oes1dlXMej+44MOjzw4aMEfQAWGXdfzvpmonbE+JXwqaHy1viJ2zKZkknNu0+FTWbCk9ScucHp64QU0vzm8OIS/88K6DCpis07TbVIB1/wpr40EOtQiZRNZMMVXMvyZwEK920b8qEIDm3xCujGm/zCSag5lCKqMxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TYQQLM1W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9FE1EC43330;
 	Fri,  8 Mar 2024 21:20:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709932835;
-	bh=idcW0njKGXLSQuG+r/fW91F9NRdIyGTgJXht6dwcQOU=;
+	bh=7+78oklhsNOulD6tNX/NINjtFsppNoyIJ3KugelH/z4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ttkDhhhwfocTAiRMpi7C1CV5cZ96ULlnqaOIp5W6Y10ILxMM8J3b+z7k05KdYutIY
-	 FSW/L8cMTOouOnX+vwFbnmcrOnCu8PQdSKzHjMY6+yrgd3i0KGJ66H74UW1wOcK4xD
-	 E46Xwr6abd92LMp0ZOl2iguwoFDq/5+OG7JsCDrld2YfaZ4LT20688EliIDznOjuH9
-	 w6GJjol6bow5UBKKLk9afe/Yp1QhTsnkMjNqwU7DkC7jamDHcdOZp5qEWkZhNyvPhA
-	 yilQXZMY5gs3XnSWo3BtXeYkl8xocf6J8W8zDc6NnpAhmRcENMj57HrEbXh7lLsm1/
-	 +qZz7SrB5dMuw==
+	b=TYQQLM1WLHktwrI+VSy3Xcjf8/KncPafIWM1LNpy6PkuwQOkW+LdQNuKL9FnkJATx
+	 eCtGawc8+xLwMfyf+FEt8eJ4HBdtvjgtc9TUszsjEWCiit3+T3ZEe1fa+bNQzn+79e
+	 Y+R3pxSHXg8j1eMD447Q0hTsSFmidQlKwc8wUjxYv5n/SB5i3BQspamWfDVeKtYx49
+	 LZY3JcWOlXpPfJAU6C2RKVCoeiomgS59uC7zwqjDF1oQY42m1OB1CDxIgHhOS059aO
+	 RyBMThCHgzdGZeny+dg5AY9Elh4HVsk9n5CG+T4t30XE0hv+r6mYu5De++CSxg7fPB
+	 lrDzQYds3Avyg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 65601C59A4C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 82ADED84BDC;
 	Fri,  8 Mar 2024 21:20:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,35 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: add skb_data_unref() helper
+Subject: Re: [PATCH net-next] nexthop: Simplify dump error handling
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170993283541.29743.10698098060752281245.git-patchwork-notify@kernel.org>
+ <170993283553.29743.15411416591840690669.git-patchwork-notify@kernel.org>
 Date: Fri, 08 Mar 2024 21:20:35 +0000
-References: <20240307123446.2302230-1-edumazet@google.com>
-In-Reply-To: <20240307123446.2302230-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20240307154727.3555462-1-idosch@nvidia.com>
+In-Reply-To: <20240307154727.3555462-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org, petrm@nvidia.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  7 Mar 2024 12:34:46 +0000 you wrote:
-> Similar to skb_unref(), add skb_data_unref() to save an expensive
-> atomic operation (and cache line dirtying) when last reference
-> on shinfo->dataref is released.
+On Thu, 7 Mar 2024 17:47:27 +0200 you wrote:
+> The only error that can happen during a nexthop dump is insufficient
+> space in the skb caring the netlink messages (EMSGSIZE). If this happens
+> and some messages were already filled in, the nexthop code returns the
+> skb length to signal the netlink core that more objects need to be
+> dumped.
 > 
-> I saw this opportunity on hosts with RAW sockets accidentally
-> bound to UDP protocol, forcing an skb_clone() on all received packets.
+> After commit b5a899154aa9 ("netlink: handle EMSGSIZE errors in the
+> core") there is no need to handle this error in the nexthop code as it
+> is now handled in the core.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: add skb_data_unref() helper
-    https://git.kernel.org/netdev/net-next/c/1cface552a5b
+  - [net-next] nexthop: Simplify dump error handling
+    https://git.kernel.org/netdev/net-next/c/5d9b7cb383bb
 
 You are awesome, thank you!
 -- 
