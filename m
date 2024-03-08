@@ -1,112 +1,210 @@
-Return-Path: <netdev+bounces-78580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8C45875D0F
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:13:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F7CF875D12
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:15:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E8681F21EB8
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 04:13:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 396821F21E97
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 04:15:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02A652C6B6;
-	Fri,  8 Mar 2024 04:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24FB92C842;
+	Fri,  8 Mar 2024 04:15:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DRsKILWZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AiIJRki2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C30B2C84C
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 04:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0802C68D
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 04:15:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709871221; cv=none; b=uXYtS2ubgIcXXTuCybrqLlRci1seVeSBVIipzNDrcQ254BitADfLXdk/mCjSY/+N9frZhtvySjGAVqHSu5tH80WzVrkAoyGlTCFWGfS200tk9FOeUrXikHZRHfKQxQQywSE6DtPW/LOknEST/Wgf3LbqKxeBXEWbkaVmBYsxyQM=
+	t=1709871351; cv=none; b=EBTN4RtNU8GyG3LgSe7C+An/iJ08CqEVr3o7AU5YnayBc8N8z7J4Nfqt6knPwTYa9QtuNKIN59zDXUXM2mYhd95ILunGUHICWEaUk3zfoTd69+8p8owMeVzVDyl6ePqy+Ks1KmzvtyoTRNujffu4Sb3OS9ZqAuyNr8fcT+8/Swo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709871221; c=relaxed/simple;
-	bh=6cCu9noNfsTelcwsDs/0viN465rqITcLD2PA0NmOv0Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PLQyAX7ktoDjyb2ZVhyQZDwOE8WcoLkQw8/OREuhWEJ1D67U2sYm8Du2tV8NyGFC9NYpmryWdw8TJDqSNElAmlKojaFNX5+OW78cbB7IEkbbS2fyGUGkz9rQu9nMkJTtNejZIXVjDbN6mYHiQ8k9S/0BwHodmNt0wGp6BK+TDXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DRsKILWZ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=gMEXu6lSO9ojuU1BuF2tW84JYWPuDcSBpJXsxVnFE38=; b=DRsKILWZ1NlE5MmCb4JkP/C/H4
-	WyhCulib8i2LPORgSiUtOyY1EIDHx8ftRiognKM/Ksoi9HcnrfDUpzX8RhJ8XwXvLaBCJ2qfAfqpK
-	p/fCaBEaEC5YorYqhDEKS9FXiAGfI95X06CLDRex+zWGP1k5WBN0n02LJ+Dnqr3CMRvA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1riRcV-009j3Z-FN; Fri, 08 Mar 2024 05:14:07 +0100
-Date: Fri, 8 Mar 2024 05:14:07 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Sagar Dhoot (QUIC)" <quic_sdhoot@quicinc.com>
-Cc: "mkubecek@suse.cz" <mkubecek@suse.cz>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"Nagarjuna Chaganti (QUIC)" <quic_nchagant@quicinc.com>,
-	"Priya Tripathi (QUIC)" <quic_ppriyatr@quicinc.com>
-Subject: Re: Ethtool query: Reset advertised speed modes if speed value is
- not passed in "set_link_ksettings"
-Message-ID: <945530a2-c8e9-49fd-95ce-b39388bd9a95@lunn.ch>
-References: <CY8PR02MB95678EBD09E287FBE73076B9F9202@CY8PR02MB9567.namprd02.prod.outlook.com>
+	s=arc-20240116; t=1709871351; c=relaxed/simple;
+	bh=F/Qpmes2HGB6EVODxpgYogeabifpxO1cqXahOhyFwm0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X8iBoMuaeQahh6Oo+Viq6vDKuNRq8SyS0JjnBGFStfUcma3DalHy95Ge1Ikkx+eqeuqaAVqu7LA+WIQnUHkUMdfV7gPWYIUJcwRS73DplSJ5B7OoOrHt588XH7PM9Xk2lZ5vhvAQExICISWgj3i4Cn8NwF/a7G7ykIMiRy7aAaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AiIJRki2; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1dc0e5b223eso3041165ad.1
+        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 20:15:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709871348; x=1710476148; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6RliGD4xondvaJ5HudSmz0tFa3GsMzAHhg1qB2Kwjlg=;
+        b=AiIJRki2CxPoAWSropzvdxoYW7K0VHaivEGNe+F7qEra+Sd8+N0zH64sH3BxMcHJHd
+         PER163J4u6kx0xfwaM3EYKVreRAV33wHOudKWkdKWmkxpNXA7ch8vIAb9jxpkT08cLla
+         P+BXcnoPe0moRU2v+H/VyFLYFiEkLiGTX360z1WCGthILLfSCunExNpi0F1148fZ4jjW
+         OeV4x78hQBy+cOWqAA1MXn0RQ7QiCSal1+aXG4/8FCdTgVd2u4T8Pmqu52Kih58+VqP/
+         Fq3ypnrCQCRPKDsKLXqpPeLinUghXp+5cK1OrBEoxJwci75FrpT5Iyt/0TU4GnfatqRx
+         vkRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709871348; x=1710476148;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6RliGD4xondvaJ5HudSmz0tFa3GsMzAHhg1qB2Kwjlg=;
+        b=KLFaxxrinOvt4QYdQIsi1rbErYzmFNNGDUwIxjLzuK6vMt20w/UhMqsvsLCwb9bv/K
+         te0xKjy8MGsxdlvAdqEi850ArY2oFA4g13CCJp0UwPQ2rvDR06YH8BgS8ju1MCdOL/hg
+         tIKQM5j8ud31K+R8LsZdIRIlx9IT4GPnWnRKv3oerDOVJmeoJfTai0A7i/hqBnYJqdVT
+         /Img1RDSl9FYFWyWrQTIljpcm8hZLpKTvKZo4aAed5sL9r+mgC+zir3Qu42WoieRz2lX
+         h8fQumnPeF7yEji0ojQi7FO6EfYWDnwNcx3s5yXsReJ6H0coBD+kMhwdCJWNGSy0EQXs
+         KFSQ==
+X-Gm-Message-State: AOJu0YyHY63aZtjlGQ/MRNM28ec8UfiZSKSBvtn4ZbJAVGzoXWFXX808
+	d2RCiPM1CDzIA4tVXgtDp7dIiqHq5NYyEi+K9pZeOjnrOcmm/uwC1il8EBL3ojbhTg==
+X-Google-Smtp-Source: AGHT+IEGn9JhE7vZ2TlQd8qFfdKgVoYb0eyyHYIuzOU5Qk/956vCEdZpo46lYlb9wEsfJXeqAtm9Nw==
+X-Received: by 2002:a17:902:d546:b0:1dd:66d4:4d46 with SMTP id z6-20020a170902d54600b001dd66d44d46mr1260236plf.66.1709871348137;
+        Thu, 07 Mar 2024 20:15:48 -0800 (PST)
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id kx4-20020a170902f94400b001d9aa663282sm15476187plb.266.2024.03.07.20.15.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Mar 2024 20:15:47 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Subject: [PATCH net-next] doc/netlink/specs: Add vlan attr in rt_link spec
+Date: Fri,  8 Mar 2024 12:15:18 +0800
+Message-ID: <20240308041518.3047900-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CY8PR02MB95678EBD09E287FBE73076B9F9202@CY8PR02MB9567.namprd02.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 07, 2024 at 10:09:18AM +0000, Sagar Dhoot (QUIC) wrote:
-> Hi Michal and Team,
-> 
-> We are developing an Ethernet driver here in Qualcomm and have a query w.r.t one of the limitations that we have observed with ethtool.
+With command:
+ # ./tools/net/ynl/cli.py \
+ --spec Documentation/netlink/specs/rt_link.yaml \
+ --do getlink --json '{"ifname": "eno1.2"}'
 
-Hi Sagar
+Before:
+Exception: No message format for 'vlan' in sub-message spec 'linkinfo-data-msg'
 
-Please configure your mail client to wrap emails to a little less than
-80 characters.
+After:
+ 'linkinfo': {'data': {'flag': {'flags': {'bridge-binding',
+                                          'gvrp',
+                                          'reorder-hdr'},
+                                'mask': 4294967295},
+                       'id': 2,
+                       'protocol': 129},
+              'kind': 'vlan'},
 
-> Detailed issue sequence and the commands executed:
-> 1. "ethtool eth_interface"
-> 	a. Assuming eth_interface is the interface name.
-> 	b. By default, the "get_link_ksettings" will publish all the supported/advertised speed modes. Let's say we support 10G and 25G. In that case both speed modes will be advertised in the ethtool output.
-> 2. "ethtool -s eth_interface speed 25000 autoneg off"
-> 	a. "set_link_ksettings" will be called and speed value will be passed as 25G.
-> 	b. Advertised speed mode will be restricted to 25G.
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+Not sure if there is a proper way to show the mask and protocol
+---
+ Documentation/netlink/specs/rt_link.yaml | 69 ++++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
 
-autoneg is off. So advertised does not matter. You are not advertising
-anything. You force the PHY and MAC to a specific speed. You should
-not touch your local copy of what the PHY is advertising at this
-point. You just disable advertisement in the PHY. The link partner
-should then see that autoneg is off, and drop the link. You then need
-to configure the partner in the same way, so both ends are forced to
-the same mode. The link should then come up.
+diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/netlink/specs/rt_link.yaml
+index 8e4d19adee8c..5559ea18ccc7 100644
+--- a/Documentation/netlink/specs/rt_link.yaml
++++ b/Documentation/netlink/specs/rt_link.yaml
+@@ -729,6 +729,42 @@ definitions:
+       -
+         name: filter-mask
+         type: u32
++  -
++    name: ifla-vlan-flags
++    type: struct
++    members:
++      -
++        name: flags
++        type: u32
++        enum: vlan-flags
++        enum-as-flags: true
++      -
++        name: mask
++        type: u32
++  -
++    name: vlan-flags
++    type: flags
++    entries:
++      -
++        name: reorder-hdr
++      -
++        name: gvrp
++      -
++        name: loose-binding
++      -
++        name: mvrp
++      -
++        name: bridge-binding
++  -
++    name: ifla-vlan-qos-mapping
++    type: struct
++    members:
++      -
++        name: from
++        type: u32
++      -
++        name: to
++        type: u32
+ 
+ 
+ attribute-sets:
+@@ -1507,6 +1543,36 @@ attribute-sets:
+       -
+         name: num-disabled-queues
+         type: u32
++  -
++    name: linkinfo-vlan-attrs
++    name-prefix: ifla-vlan-
++    attributes:
++      -
++        name: id
++        type: u16
++      -
++        name: flag
++        type: binary
++        struct: ifla-vlan-flags
++      -
++        name: egress-qos
++        type: nest
++        nested-attributes: ifla-vlan-qos
++      -
++        name: ingress-qos
++        type: nest
++        nested-attributes: ifla-vlan-qos
++      -
++        name: protocol
++        type: u16
++  -
++    name: ifla-vlan-qos
++    name-prefix: ifla-vlan-qos
++    attributes:
++      -
++        name: mapping
++        type: binary
++        struct: ifla-vlan-qos-mapping
+   -
+     name: linkinfo-vrf-attrs
+     name-prefix: ifla-vrf-
+@@ -1666,6 +1732,9 @@ sub-messages:
+       -
+         value: tun
+         attribute-set: linkinfo-tun-attrs
++      -
++        value: vlan
++        attribute-set: linkinfo-vlan-attrs
+       -
+         value: vrf
+         attribute-set: linkinfo-vrf-attrs
+-- 
+2.43.0
 
-> 	c. Link comes up fine with 25G.
-> 3. "ethtool eth_interface"
-> 	a. "get_link_ksettings" will publish the link as up with 25G in the ethtool output. Advertised speed mode will be set to 25G and 10G will not be included in that list.
-
-Nope. I would expect advertised to be still 10G and 25G. All you have
-done is disable the PHY from advertisement anything.
-
-When you re-enable autoneg, the PHY should then advertise it can do
-25G and 40G to the link peer.
-
-> 4. "ethtool -s eth_interface autoneg off"
-> 	a. "get_link_ksettings" will be called and as per our implementation, as the link as up, we will return the speed as 25G.
-
-So you have turned autoneg off, but not specified how the MAC/PHY
-should be forced. Defaulting to the last link speed seems sensible.
-
-Maybe you are mixing up advertise on/off with advertise N which allows
-you to limit what link modes the PHY will advertise it supports?
-
-       Andrew
 
