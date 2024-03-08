@@ -1,91 +1,72 @@
-Return-Path: <netdev+bounces-78702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 195ED876341
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:25:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3A2C876354
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:28:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99AF0B22B44
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:25:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C34CB20A8F
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A80EC5674B;
-	Fri,  8 Mar 2024 11:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HS/hzBYo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4926455E50;
+	Fri,  8 Mar 2024 11:27:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3144156743
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 11:25:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C84843ADD;
+	Fri,  8 Mar 2024 11:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709897119; cv=none; b=h4uk+hUoCpfHgTWGz6PTbak6XVn6qyuJIqFA007pHPoD2gCkldj//H44mR+JjF9x4uPBL81sZv7DYMpxIhgWNs/r08r05wLyoSfP/Ny/5eD97IeVfXrwH7Ltf/QaV6vsLJEdXM5C0xt1/3psdywET02nwOT8T+FIfIJ7xL80wKc=
+	t=1709897278; cv=none; b=oGD+bT/M2QlnOWptuLdTjT7lxDadK4jTSN19m5fRhezzOxROacIjJxsHAWkwqoy8p3jHge/4gjZbzSt0bV21SVdUDEEnMoRIQLmhNQ+IF/lA5rj24RBJDfwKVDBrG+klL+hXpE4f/dFUSGvlvrVbHQ4hjah6hXRA72qI997d584=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709897119; c=relaxed/simple;
-	bh=Luvsy+WOnkG5qwVTfDfExXvIyB7rY3PNoN5HeFz1GrA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FCq+OpDJ1UM17rr7aItJtNeVCkOsENX8hM7JS480VE0zv3HFh4hhkl8G9J4Th+rGjH1/uLPxhGWrWxy4LaMVYt0Uu3BzNmHxbJfnqX0lpSY4yUQMGo1w279xIXMLkWHwh46POdaAkx9envVBGN76a6CwuFDtYuTt5SZ+rUEa7x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HS/hzBYo; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1709897278; c=relaxed/simple;
+	bh=VTPH+JNJ6CLElaJAbYKAkCfrHM9O2J1kjTRfhjSjd2k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Yhn9b9xymdgg67basWLTtntrD7hYrDqdKKmL+vtsJ8+Jr0Z0FZG6jGpDiNkhzrkWa4Jgmav8n/IzRDLfqJOejPw9B1/s9jVHCMzDsbtRtrJhJxs1t4O96984cZl/KEx+4K8seQzsmGbn6zW4Ps3c7UC4h1ZxqEzl7xvhLoGrk/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1dcc7f4717fso5900435ad.0
-        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 03:25:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709897117; x=1710501917; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cXvQs0Wk+UfdeZ/dr1xV6h7P5P/4xSbgdWXCtbE0DXA=;
-        b=HS/hzBYohxRfL4pMdHmDEytz1kvnpeIY8a1b3ageZoSOhMxaRM9XhRtpdYoXyaUeh2
-         ueq6CDlEelm7ZBzMaiMEKjvHI7qOSDOnLe2F7o6c26E3NJlrqVqBKZfiBN0kk07AYxsL
-         Pfw0cpzKTvzhiYlh6Szyv+wcAJkbQMfsW3/CIn8oXWlATBz10aPTTdw1zbWLNKskGbCS
-         u7kLY+x6E5YpTpHA+w28+vLRjuu6zT4l17St/Myk6rzDbDJNtZ234+hSBzvQyRcIZmqF
-         +Dr4WG5dHcwo3+/RUVOUUzRuIMd+73vRJTm2O4JF0d+XdkY9o8iTJTLt4rGkO96Z8vU4
-         tq/w==
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-56682b85220so891521a12.1;
+        Fri, 08 Mar 2024 03:27:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709897117; x=1710501917;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cXvQs0Wk+UfdeZ/dr1xV6h7P5P/4xSbgdWXCtbE0DXA=;
-        b=qZLuiA6Z4CUQqgF4EfrTj8b3u9ORg1EJ2mSvsJIDQnYENfWSiR+Tnp+Sw6eSwt39M/
-         A4j9BgIgXXxVRUwfseY0bo0lFn0zJEio+FJaAH4J139jDaKaQ3AU3kn9gXJ+ouI8O5QK
-         IsWayZdfAsqlTlBiUZ273+UTzmRUfBufhTV+/6kTOLa0h3q7e+Xy8sOyMoyygKyjezK4
-         gYebI5XM+Npn/eivmrlS3T4Ed2hpvw0La3WZ8MJrz0XQMADUrlbUmCMqnSVqO1QNP69D
-         mN86fO9tekNHg7Fk4MTBIUU5fHyBL2CxKF24eLdfb960SofvfZVoo7GzQ6vn3+wnTUna
-         1sSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUuWbRYS/ItTR0DVXuAjWTWW6LeOvNs5Ed2A+9a3zd1DaPU3IFxmTvcnCr/SGJ0p9ld4NlNVlWcM6wNOizHb9NgWpDSS2aL
-X-Gm-Message-State: AOJu0YzsTAExhLQWsEGvZMsHaHHwNirAnUJqMYCFYBeiK7QohQo4Xofb
-	lSBQT+cAvYwThGCORVEGSoPmAt/p5GvZCmU3Fm3aecvqLDyeKjOX
-X-Google-Smtp-Source: AGHT+IFFQ/0l4f/zaDEvYCTncyZ1WnhaATXM7WfOwj8dMyzIDUDLSi8bXOQb1X+6McLld5Oh6BOAEA==
-X-Received: by 2002:a17:902:ce09:b0:1dd:6e47:862e with SMTP id k9-20020a170902ce0900b001dd6e47862emr614753plg.63.1709897117518;
-        Fri, 08 Mar 2024 03:25:17 -0800 (PST)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id q7-20020a17090311c700b001db608b54a9sm16049806plh.23.2024.03.08.03.25.14
+        d=1e100.net; s=20230601; t=1709897275; x=1710502075;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qI+9EY7tzIYxs5Vpyz3cprJUSGJAHgHmPUUQiiDZ9PQ=;
+        b=ODsEJ032NnZBoZdH7jGISAQEuQkpag8Dss+A27EalCe+wyv8HxLRAdNlJHFC4so+dX
+         dZzbzEV8J1HTu8hSdGs6jMOMHJ2ixE9Mryef+eEzFM/IH4RU2hubq1xQ2Qfb1vn3+grX
+         1h2TGIeuKNwLt1fH1Rm/pFlTPAm7dqz0DSEtJnsId906u95EGMlQZSDioEkXF3/RLAYt
+         5P0dZuJRyC2lqSq+4FrS6nSw7AdTZn0w+YcBF+ss40DU0bPRsg/+D8OSk+W9VTkbzw9G
+         kgIBEzkjtN+Go71LCkAi/kxmODZ836PSEnPTMPjrONnrhsx8DpgodWy9+8IAdu3hFvtl
+         SzQA==
+X-Forwarded-Encrypted: i=1; AJvYcCWr0Z+6p/7REFyjnaBZ6PPY2vL0FWBj+MluNKVLX9hJfOkf2NskTGiXvmWxg7S++MT7BvqM5AAxQA0S99rO+yMUJu+0U59+6b8na6ex
+X-Gm-Message-State: AOJu0Ywu4y04BrynpkfvEphX1Adhx6wkYFR3a3elWpoDHaqni+oBKCq5
+	qDHu+ZTsMwGqpH2ov+WEsepwdI2Q0FvDx6jp7CHSOmUYEbtes6Jt
+X-Google-Smtp-Source: AGHT+IGdfwim53dOX/d0wdKqBpr8eVBgLopTYvjp5ZHw8PeZ2UdHS3kSBFamwUgpLKpuECK067aZsQ==
+X-Received: by 2002:a17:907:11c1:b0:a44:1b9e:b977 with SMTP id va1-20020a17090711c100b00a441b9eb977mr14202779ejb.19.1709897274658;
+        Fri, 08 Mar 2024 03:27:54 -0800 (PST)
+Received: from localhost (fwdproxy-lla-002.fbsv.net. [2a03:2880:30ff:2::face:b00c])
+        by smtp.gmail.com with ESMTPSA id gb42-20020a170907962a00b00a441a7a75b5sm9146201ejc.209.2024.03.08.03.27.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Mar 2024 03:25:17 -0800 (PST)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
+        Fri, 08 Mar 2024 03:27:54 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	horms@kernel.org,
 	dsahern@kernel.org,
-	matttbe@kernel.org,
-	martineau@kernel.org,
-	geliang@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net
-Cc: mptcp@lists.linux.dev,
-	netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next 2/2] tcp: annotate a data-race around sysctl_tcp_wmem[0]
-Date: Fri,  8 Mar 2024 19:25:04 +0800
-Message-Id: <20240308112504.29099-3-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240308112504.29099-1-kerneljasonxing@gmail.com>
-References: <20240308112504.29099-1-kerneljasonxing@gmail.com>
+	wireguard@lists.zx2c4.com (open list:WIREGUARD SECURE NETWORK TUNNEL)
+Subject: [PATCH net-next v2 1/2] wireguard: Leverage core stats allocator
+Date: Fri,  8 Mar 2024 03:27:44 -0800
+Message-ID: <20240308112746.2290505-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,30 +75,73 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jason Xing <kernelxing@tencent.com>
+With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
+convert veth & vrf"), stats allocation could be done on net core
+instead of in this driver.
 
-When reading wmem[0], it could be changed concurrently without
-READ_ONCE() protection. So add one annotation here.
+With this new approach, the driver doesn't have to bother with error
+handling (allocation failure checking, making sure free happens in the
+right spot, etc). This is core responsibility now.
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
+Remove the allocation in the wireguard driver and leverage the network
+core allocation instead.
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+--
+Changelog:
+
+v2:
+	* Setting dev->pcpu_stat_type was missing in v1 patch.
 ---
- net/ipv4/tcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/wireguard/device.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index c5b83875411a..e3904c006e63 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -975,7 +975,7 @@ int tcp_wmem_schedule(struct sock *sk, int copy)
- 	 * Use whatever is left in sk->sk_forward_alloc and tcp_wmem[0]
- 	 * to guarantee some progress.
- 	 */
--	left = sock_net(sk)->ipv4.sysctl_tcp_wmem[0] - sk->sk_wmem_queued;
-+	left = READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_wmem[0]) - sk->sk_wmem_queued;
- 	if (left > 0)
- 		sk_forced_mem_schedule(sk, min(left, copy));
- 	return min(copy, sk->sk_forward_alloc);
+diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.c
+index deb9636b0ecf..6aa071469e1c 100644
+--- a/drivers/net/wireguard/device.c
++++ b/drivers/net/wireguard/device.c
+@@ -262,7 +262,6 @@ static void wg_destruct(struct net_device *dev)
+ 	rcu_barrier(); /* Wait for all the peers to be actually freed. */
+ 	wg_ratelimiter_uninit();
+ 	memzero_explicit(&wg->static_identity, sizeof(wg->static_identity));
+-	free_percpu(dev->tstats);
+ 	kvfree(wg->index_hashtable);
+ 	kvfree(wg->peer_hashtable);
+ 	mutex_unlock(&wg->device_update_lock);
+@@ -297,6 +296,7 @@ static void wg_setup(struct net_device *dev)
+ 	dev->hw_enc_features |= WG_NETDEV_FEATURES;
+ 	dev->mtu = ETH_DATA_LEN - overhead;
+ 	dev->max_mtu = round_down(INT_MAX, MESSAGE_PADDING_MULTIPLE) - overhead;
++	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+ 
+ 	SET_NETDEV_DEVTYPE(dev, &device_type);
+ 
+@@ -331,14 +331,10 @@ static int wg_newlink(struct net *src_net, struct net_device *dev,
+ 	if (!wg->index_hashtable)
+ 		goto err_free_peer_hashtable;
+ 
+-	dev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
+-	if (!dev->tstats)
+-		goto err_free_index_hashtable;
+-
+ 	wg->handshake_receive_wq = alloc_workqueue("wg-kex-%s",
+ 			WQ_CPU_INTENSIVE | WQ_FREEZABLE, 0, dev->name);
+ 	if (!wg->handshake_receive_wq)
+-		goto err_free_tstats;
++		goto err_free_index_hashtable;
+ 
+ 	wg->handshake_send_wq = alloc_workqueue("wg-kex-%s",
+ 			WQ_UNBOUND | WQ_FREEZABLE, 0, dev->name);
+@@ -397,8 +393,6 @@ static int wg_newlink(struct net *src_net, struct net_device *dev,
+ 	destroy_workqueue(wg->handshake_send_wq);
+ err_destroy_handshake_receive:
+ 	destroy_workqueue(wg->handshake_receive_wq);
+-err_free_tstats:
+-	free_percpu(dev->tstats);
+ err_free_index_hashtable:
+ 	kvfree(wg->index_hashtable);
+ err_free_peer_hashtable:
 -- 
-2.37.3
+2.43.0
 
 
