@@ -1,42 +1,43 @@
-Return-Path: <netdev+bounces-78734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 875C48764A2
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 14:03:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFD7D8764A1
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 14:03:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4844CB21C14
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 13:03:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 368C81F2298E
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 13:03:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01D124B29;
-	Fri,  8 Mar 2024 13:02:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F291F61C;
+	Fri,  8 Mar 2024 13:02:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="IFBRGxs0"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="j+co84vl"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2075.outbound.protection.outlook.com [40.107.220.75])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2082.outbound.protection.outlook.com [40.107.93.82])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E383C1EEE8
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 13:02:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.75
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82AD61D52B
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 13:02:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.82
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709902966; cv=fail; b=RmgTNUiFNnd2EsMYkx+SuGih0EVhYVaSygzI8IhGeK5AZFHe2OyleVR0RZU5LNXrj+oaGkPB9irGieaQCYGNsPvT/o1+dkOiakCRMeSB0q6P/bpGnQb30oQXf73Is6UJN07I6fbJfdUKszlN/3HbtG8EpxPga4dNTWPEv9UTzzA=
+	t=1709902965; cv=fail; b=I3uIICLaNnE5D3C6jiVl7IND4R/D9d4Zd/vgW3MYNANev8kt1iwBokgZcfHHTDslPO5x81NQuq37d+4zQjsVWF5RWQJPSZ48Y3SkBI6oglyfSVI3hoV19ShbhV6hPXwJ/32mkPLBHH5s36WUBjC0by/wZEyZPjY043v2bu5Fbb8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709902966; c=relaxed/simple;
-	bh=z5Kz8cJa32fQF1PWHBKjvN+PSRPmJoMbL/O9/9Q2dTQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZW+sjJoIYPalh+qHCP6KEGCH6bkqb/s0LAgoExAKlEEIoPyV7XOzsAL6YGHzNKwHk3MpH8XUzJJEQfg93WzW0rqr3SmGSjo3dY5z9q8tX/u1A2mmwJHAcikKl00lDDrKsaABcUXaBLLo5Bx8697cE5xIh5aAuUGja6jg/ZMeK94=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=IFBRGxs0; arc=fail smtp.client-ip=40.107.220.75
+	s=arc-20240116; t=1709902965; c=relaxed/simple;
+	bh=i/zLVAjd+HIIUnIHAKKYbe9G8RroMajIYOAwe2trn64=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=n0jmdUH6WJ3EBmY4IBH7mNPtnEbUfAaXHP7jxeKf2x9xJ5SFr4B9QfwEmP697umKDVYU/5vfGzeDhVY1bKJjxCQc1LMgrMYeKyygU9LR+yqz5C+eAXEkBp4lrc8s7Krj0BawprYjqCheIVf5bG5qMRqZjQHyLatTdMy/jI+U6ps=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=j+co84vl; arc=fail smtp.client-ip=40.107.93.82
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BtmtuwHKa9ZxuaKkzZrT47agRDQHKOx+5BYlCaAx5SdlhSibaSEruMXsSY3hsQJLFPoU+ujFfvO8bjeDFyR/S0o7Z4CLj42+LVofgbM6Fl59Z5vX1rGDaPC9jX37Dz+fB1LSAC8Scc14lytu3WJCTMWq/6PpcWlNUb8py5gfZEisC45s0iDlckw4Nx3MpSIiIAThBMXgaAnSRUSOEJTU9dorIG5YAsRTi446ykoB6ylN2SwvlyMz/hbgNXdKRaqqAX2fP2kVhTmoiCnXRBxAN4yoIch5J7vU4oM/UX7pzWONdf/i7evTW/VsrApTnGhc/Y86WfBCqmNJtddwzuHcvA==
+ b=jrNPqg8Nf+uP6SzFLzxSKcdjwW4U63La41afJ8XJHYWXZo3njGllPe5zEheleaNaxFP0VDu0tIOtFd3KfS/BmDCFbpQWNkU51WdtoRbVaTIkY7TP6A+lqTQDlZGBjLgZxR/ZIemd7JsA9N24L9eMT7htBo/S1OfvIrs2hZ1CszTCKk2lHphYXIj1w2Cj+hsulhgwW/p6Ib/jcA7HPmMqMSML62YutOPTjknP7GKyweq8fR+Ng6yA0sNKLFOhyCIgwzh2V1VeQKOX7QRHya/cKXCj/0cKdR4yq6ckMOT8/xcCFW9uXfDp9U0k31euHA0wDkXrj7s5RQuVnfZKx4vaqg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4tEd0rEd4bWzBUuup3XBBXt8QS8mRoxqs1cFJnbXTtU=;
- b=cPMwUOo3f4lqaRtz6R1KayrTRMKmvL8MVM42MGnSVcDJsliQHMKf5+PZCp/+g8d6ZV+S2BBgyQWkvhXKgrz5XGrCzIMSBjyl7ZP362YZ9Eofmkj0caljmYWyHdMo8BGlTI5Ke3h4msCbMr84ktkOJPzCTo9Jixax07gy0GV26uSq4EaClhTGPdrZS9ONAjlXezBPujUT0lnR7W+gybCSyicPN3gp0zmqjrysXjC7TaBEElnrqk5GWrkQE2iOEUH5QjpDb8FSqXJQnVM+gw+Y/PvlqyVmxDiTwGKLFb/xRgGI0ZqA3ExfzNQhALsqyMfMynjlW3QEO9ncznL+uMaWng==
+ bh=OFw7jw7ZrThWZUex5cp7RA0Vpi5zHOOtr0jlqf+H0B4=;
+ b=SblbmWvqwZoX5cdp8D+YrLUUbCvNCwyzgu1SAz2zGw/sY8imvcPa0c8GpgvcVzu1tlbt6UoNxRNa6Cu5B4kmPggEfMpGjDbKnmXzdsRLPElsABnijqj7sYHlvWR4vnTKPwn+wXYF2a2w25W3x5UVD/+whXm/J1JBRUzkqYf/4NBkIXm7WFUuIT5hJke8GjtVALavSG2JIjVxziJJqDif1mRZEEoSJThG6/eS3uSGkKKUOHtwwQHavWUcFTiwcOrgTlD+O+9s4gogm/OkBPV8d9nws28FBI3SlAWHZ+nAwyGsM4epg3YZT/oB3w+iHq2PGh7ivUUJS/jYDAUOPOxOsw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -44,17 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4tEd0rEd4bWzBUuup3XBBXt8QS8mRoxqs1cFJnbXTtU=;
- b=IFBRGxs0cdjA1jT2QJsoKVlBtPnpxYbs8c/ZLvwI7T5JAwb8CV5VGp0786/pBZmc7+Uzw07Cpv9UBSQwuVdz6K+mrYBwfZn4pbMx2ABblyf2iT9+ZbLjP5Wp1OaFN7k5AJe+bxWi72Be1b+sMWdGGyAJy0+Xwpjr4GGqYKJNX7+kfhdRzlFe/ou7/rBPyMjxXb4+25Nc3v3faZKCv2m5LwxGSvtgy1ncWnL18q2cOGIgETs5MuYNc1KgGoxQ+tfI7LMh0Az8O6R8Fx4r2tqOoI5u3gAAJjT1iug0ozKXhtWpymJc8UP9OPcIQh4wtRMlnnJvIjmlyMmrG13QimK7Jg==
-Received: from DM6PR07CA0067.namprd07.prod.outlook.com (2603:10b6:5:74::44) by
- LV2PR12MB5821.namprd12.prod.outlook.com (2603:10b6:408:17a::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7362.27; Fri, 8 Mar 2024 13:02:36 +0000
-Received: from DS1PEPF0001709D.namprd05.prod.outlook.com
- (2603:10b6:5:74:cafe::df) by DM6PR07CA0067.outlook.office365.com
- (2603:10b6:5:74::44) with Microsoft SMTP Server (version=TLS1_2,
+ bh=OFw7jw7ZrThWZUex5cp7RA0Vpi5zHOOtr0jlqf+H0B4=;
+ b=j+co84vlyQXQYVCSvarkzTgar5qc6ZdX9eLC9NbrAevl/MOB1SiP5ri3mjYP8BIKEXFc8SZbfQL8mFHJei8OMHdcSzxyMjPwe/yGt3lDFseSRcczYUUmptPyigSapic0hwVJWuRWoH8DvuYyFTXugGkoOH94P65CrDGWLWpU9/rJvMcUC4RHOIkGf9DfmCIaaaK7gzv9gSmxclmIH0FG4YWFissXmxY3a7iTf+DaXJAPHQerju7aWl1HUPKbjJF0yFZPTBB4F8Y+lyUGbeddNkvjLuHr2c8nxCs26Wfshycm7VMAuhEfBMhLLtYGEJvL5TEXpQYQKFG6TON9VdY7tQ==
+Received: from DS7PR03CA0089.namprd03.prod.outlook.com (2603:10b6:5:3bb::34)
+ by PH7PR12MB6538.namprd12.prod.outlook.com (2603:10b6:510:1f1::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Fri, 8 Mar
+ 2024 13:02:40 +0000
+Received: from DS1PEPF0001709C.namprd05.prod.outlook.com
+ (2603:10b6:5:3bb:cafe::8f) by DS7PR03CA0089.outlook.office365.com
+ (2603:10b6:5:3bb::34) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.29 via Frontend
- Transport; Fri, 8 Mar 2024 13:02:36 +0000
+ Transport; Fri, 8 Mar 2024 13:02:40 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -62,17 +64,17 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- DS1PEPF0001709D.mail.protection.outlook.com (10.167.18.107) with Microsoft
+ DS1PEPF0001709C.mail.protection.outlook.com (10.167.18.106) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7362.11 via Frontend Transport; Fri, 8 Mar 2024 13:02:36 +0000
+ 15.20.7386.12 via Frontend Transport; Fri, 8 Mar 2024 13:02:39 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 8 Mar 2024
- 05:02:17 -0800
+ 05:02:22 -0800
 Received: from localhost.localdomain (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Fri, 8 Mar
- 2024 05:02:13 -0800
+ 2024 05:02:18 -0800
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -80,10 +82,12 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "David
  Ahern" <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>,
 	<mlxsw@nvidia.com>
-Subject: [PATCH net-next 00/11] mlxsw: Support for nexthop group statistics
-Date: Fri, 8 Mar 2024 13:59:44 +0100
-Message-ID: <cover.1709901020.git.petrm@nvidia.com>
+Subject: [PATCH net-next 01/11] net: nexthop: Initialize NH group ID in resilient NH group notifiers
+Date: Fri, 8 Mar 2024 13:59:45 +0100
+Message-ID: <025fef095dcfb408042568bb5439da014d47239e.1709901020.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.43.2
+In-Reply-To: <cover.1709901020.git.petrm@nvidia.com>
+References: <cover.1709901020.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,81 +100,52 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0001709D:EE_|LV2PR12MB5821:EE_
-X-MS-Office365-Filtering-Correlation-Id: 06c85d33-0181-496d-02a7-08dc3f7006d7
+X-MS-TrafficTypeDiagnostic: DS1PEPF0001709C:EE_|PH7PR12MB6538:EE_
+X-MS-Office365-Filtering-Correlation-Id: 071b823d-77b6-49b7-322c-08dc3f7008e6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	eGJyK9FDCzP2aqoDcJce6W9qtEd8L0gKETqhZKt67VhWakvk0mxVi46OkBLpqLXGHJVB4ZewjB6IUizEGC2AJ8qN3XID0aI32jrQcKAIq9XSfkQDVGWBEZTbxWBkGvR7a6kfHeVGpYnbrHlQfwuXhh7jEqghIhP4CswFVmmRdwtNkOB6gN+KZICc+2iUasRZ1nL5GSsB12iw6K2XzDUA6hXT6UgswgN1enyp/4qoDcDw3sq1MYwnunt4oLs4zsqtQKH9EwDsbW3pACBMhcP0EjIeeULdVjgkM/DChp1RI5mES62ES0ICf3w/L7d2ufeV3f7agPrQh7bTBRnPcML2KplBYHP5sT1aE1qen86990phEa1JUTXTsMrXnkE5+2WMQC6h4vGtgIvO98/yPL9XcqMZNGRQX8s4c1pX++MvQsz4qhPWtXORTNqlRrtNL0xyh8qsPfd19rro0cMLV23BZUa62BtiANkF8efPbOoBz68Eirnfe0xJj7ix/PSG4LDOuI0zmv6ZNQrdUr0nVcm8P5jbTG5zo2wKt46nb3EfxQLhUR25uEki3nY/S9rxoR/vBJzeCsvp7iHpHk5ATrpKguB/FSan5qYwEsHLPx7y/+iTM0OflgffxtAgLrJN42KCER47MwAzkWl8HNLWP4FEaD+FrMPQpN0R9X80OCa4CntbyT+Exfqz4A9wl40MZ3vvF8Gh9EsOGv1h492QhcHUg4lqw5COiNWnPo6Iv7zGEldfSKTwI4GoQGDW+iU0O+8Q
+	ZYv5TR9wOKEdqnYUKpBUkHAyRrs3nUV/VPxCbRzx+5+kF98ptdzdv1XNKkPPcWDvgDf0AJxJO21I0w4Ln38ItMa6aWq+fviyODyv1PknVTPHg4QSQOmLgoosZSaeqism58p/XuP267k1RYZswEj6EVAa6o+zEA3fzDpt3uTrDgRMWEM0UMpDYg9dqFNtQIgSIgweZm4woEVu5E8djOBetmbZPDe2HUaS7mu5SWzkvphhEicGm/RtRaTEWcKCYuAFh1UnU4oZl5iLvMp0fhiFopGAY5J2Fmhui8vcR7pfjfOKFPAf0EU8hVYWYdCt9h/OgGKr0T9YE1rLv2G+GCGwLdpOLFuvAefdVOOIJG9YZ6TyjkL2BVRBkQg++HVFpVscQpzHmIHljI/LnQKL6ii7lYkEpC54B+T4CHIS7rUzvRt61fk8TNYfwvzOMZUNRy2YEh20XjuE/WkpeuVTUfc/SXn53kMWhC2iwNmOGHIfgkhK941mw9vy0Rz/6/P5MJ7yVIRNQFwn61wNXzbADQzHhgjsfZ4PjOBvD415LWff2yEEIIy850vdcR5Oc1Ean4OGpMDSOT211bIEPsaYD08npjonEdFUzOx3q7iITkm/kezmB6FzCUN+zBpFUrcZTeiUWvHer6ZDK+rjHy0+eHZiP9MlkDHByhE7muAxDOtqtUaSIx9yDx94XHyDdXFlMbA2Le/lMp2MJ/GxaMAlR3p4zMc6X5Vf4CO375TA9vbbQQiLofVxZ0gGzrTEWnIhnJph
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(1800799015)(36860700004)(376005)(82310400014);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(1800799015)(82310400014)(376005)(36860700004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2024 13:02:36.1846
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2024 13:02:39.6396
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 06c85d33-0181-496d-02a7-08dc3f7006d7
+X-MS-Exchange-CrossTenant-Network-Message-Id: 071b823d-77b6-49b7-322c-08dc3f7008e6
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF0001709D.namprd05.prod.outlook.com
+	DS1PEPF0001709C.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5821
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6538
 
-ECMP is a fundamental component in L3 designs. However, it's fragile. Many
-factors influence whether an ECMP group will operate as intended: hash
-policy (i.e. the set of fields that contribute to ECMP hash calculation),
-neighbor validity, hash seed (which might lead to polarization) or the type
-of ECMP group used (hash-threshold or resilient).
+The NEXTHOP_EVENT_RES_TABLE_PRE_REPLACE notifier currently keeps the group
+ID unset. That makes it impossible to look up the group for which the
+notifier is intended. This is not an issue at the moment, because the only
+client is netdevsim, and that just so that it veto replacements, which is a
+static property not tied to a particular group. But for any practical use,
+the ID is necessary. Set it.
 
-At the same time, collection of statistics that would help an operator
-determine that the group performs as desired, is difficult.
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+---
+ net/ipv4/nexthop.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Support for nexthop group statistics and their HW collection has been
-introduced recently. In this patch set, add HW stats collection support
-to mlxsw.
-
-This patchset progresses as follows:
-
-- Patches #1 and #2 add nexthop IDs to notifiers.
-- Patches #3 and #4 are code-shaping.
-- Patches #5, #6 and #7 adjust the flow counter code.
-- Patches #8 and #9 add HW nexthop counters.
-- Patch #10 adjusts the HW counter code to allow sharing the same counter
-  for several resilient group buckets with the same NH ID.
-- Patch #11 adds a selftest.
-
-Petr Machata (11):
-  net: nexthop: Initialize NH group ID in resilient NH group notifiers
-  net: nexthop: Have all NH notifiers carry NH ID
-  mlxsw: spectrum_router: Rename two functions
-  mlxsw: spectrum_router: Have mlxsw_sp_nexthop_counter_enable() return
-    int
-  mlxsw: spectrum: Allow fetch-and-clear of flow counters
-  mlxsw: spectrum_router: Avoid allocating NH counters twice
-  mlxsw: spectrum_router: Add helpers for nexthop counters
-  mlxsw: spectrum_router: Track NH ID's of group members
-  mlxsw: spectrum_router: Support nexthop group hardware statistics
-  mlxsw: spectrum_router: Share nexthop counters in resilient groups
-  selftests: forwarding: Add a test for NH group stats
-
- .../net/ethernet/mellanox/mlxsw/spectrum.c    |   8 +-
- .../net/ethernet/mellanox/mlxsw/spectrum.h    |   4 +-
- .../ethernet/mellanox/mlxsw/spectrum_acl.c    |   2 +-
- .../ethernet/mellanox/mlxsw/spectrum_dpipe.c  |  22 +-
- .../mellanox/mlxsw/spectrum_mr_tcam.c         |   2 +-
- .../ethernet/mellanox/mlxsw/spectrum_router.c | 312 ++++++++++++++++--
- .../ethernet/mellanox/mlxsw/spectrum_router.h |   6 +-
- include/net/nexthop.h                         |   2 +-
- net/ipv4/nexthop.c                            |   3 +-
- .../testing/selftests/net/forwarding/Makefile |   1 +
- tools/testing/selftests/net/forwarding/lib.sh |  34 ++
- .../net/forwarding/router_mpath_nh.sh         |  13 +
- .../net/forwarding/router_mpath_nh_lib.sh     | 129 ++++++++
- .../net/forwarding/router_mpath_nh_res.sh     |  13 +
- 14 files changed, 505 insertions(+), 46 deletions(-)
- create mode 100644 tools/testing/selftests/net/forwarding/router_mpath_nh_lib.sh
-
+diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+index e34466751d7b..0548d1b46708 100644
+--- a/net/ipv4/nexthop.c
++++ b/net/ipv4/nexthop.c
+@@ -407,6 +407,7 @@ static int call_nexthop_res_table_notifiers(struct net *net, struct nexthop *nh,
+ 	struct nh_notifier_info info = {
+ 		.net = net,
+ 		.extack = extack,
++		.id = nh->id,
+ 	};
+ 	struct nh_group *nhg;
+ 	int err;
 -- 
 2.43.0
 
