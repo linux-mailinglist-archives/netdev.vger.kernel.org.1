@@ -1,134 +1,96 @@
-Return-Path: <netdev+bounces-78602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0203D875D70
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 06:10:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D33B7875D91
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 06:31:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F009B22765
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:10:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B62E283CF1
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:31:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA0133987;
-	Fri,  8 Mar 2024 05:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B6132E84A;
+	Fri,  8 Mar 2024 05:31:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m0X7bSyg"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="PTfa9+jt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7433E2E65B;
-	Fri,  8 Mar 2024 05:10:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F8032564;
+	Fri,  8 Mar 2024 05:31:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709874641; cv=none; b=TWoqOZXqcT2x2zRsWOsatXdDEM6MX56ffRaVt+Umm21Bd6mWO+06Dh1BvusC9BTCl2rp7RqI2Ym6hFcPQMiwIhlOYkl7TKqREtSFL83/IjM8Vy2RPK3MFoGffYos1cPdqfiCgJN0KMmwOq1/gUOxcXwSdpa0WFbMAmxuwvklYIs=
+	t=1709875865; cv=none; b=XGNas+N2e3NOLOB41tmxc6zTx4NHVA+cKlPy0ZxNbMtTh4iIQnTGqzPn+nCSbpQCvzqHgIEB8AoRvEavIGeY+Hp+mHeNkkhtn6nfDOPDxm1xLFOGRnG74Th6N5J6KCZC2eQCkvPl7nXO/MWL+8m/GKdxz/X/17k7TdJ7f0RITO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709874641; c=relaxed/simple;
-	bh=HztKOIg4+66lGu7czS+0k1V+1CxY0EBqO13dTWTKoBQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=I9T5vU+P8QUtxNhvwHWjWuCqwXQ2qM7zO0dzEt5cE1YbNFtUPh3H1jkE76ImZF5jSbdVBivDznxMRUcUZkr62kmw4I+Ap4VYWjgKMmRdqCJH6McbUE9vutZbiWdfedSSxmpWxDLara78FgXdwiIGaob1I8A3Va7hecIcl0pA0DM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m0X7bSyg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EDABAC43390;
-	Fri,  8 Mar 2024 05:10:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709874641;
-	bh=HztKOIg4+66lGu7czS+0k1V+1CxY0EBqO13dTWTKoBQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=m0X7bSygxms7Saliz5w6r+X1fdN5mTyVR8IszbQvetGR5fdl9DNihlDV1QTZO9Z3M
-	 m8gbbBzbwSCYtNKAnieS18N6hJZLbe/inag3MG+2RtcKYnR0oxPbi4fYR+t7eMPIpP
-	 z3//AglzOt+grvT1UYRH87qHvUjIgJXz8rgLlqaLHKlrZaS2xmKq2/7V7GkCGe653Q
-	 xcDkmfxzkuQjhXfx2en/vvBFDdCRmAW22JVRKZRalEEdYNaAx0QYsf90B0+WfAT7da
-	 iTc9B3xesi16KHeQPrCMdiJTEjO3Knv4+GPpJtrSntsOmRoUFX3OKgORiwAwJdbWrI
-	 xZo8xFPnHhF7A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D34E4D84BBF;
-	Fri,  8 Mar 2024 05:10:40 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709875865; c=relaxed/simple;
+	bh=4QA+qfkTVt82T4MJ6mB+KmRrnBaFSpMS1IGiL/1JjJ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nMoSf8/pMBCSoPeCal5+i+72QuACjYleabrCtrwzpSTT7Lc6yj/Dqs9ViKsSEhMlpmlazWy04NxI1tAJJOK8PoVlil6zwIMCmVUFFONfZFQpRF5UdJYIxAYUVlpxdJHRyzoY6affHUFACS/nVJP4jy7NRxeLgVvpKWJBnZuRA1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=PTfa9+jt; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 238CE20B74C0; Thu,  7 Mar 2024 21:30:56 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 238CE20B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1709875856;
+	bh=u2kPWb3IsqjyN6FSEPkizuq4H3ww/4ROAGYubZNDML8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PTfa9+jt0Q6hKwjBdaXtnHtFyd5ME7DtKa/Q8PYhW+s6pOgjSxmzLDFquvbnH1yh7
+	 4oaRwleRRtKqtNLao+7oXEFtJ67BPVLXXgglcbspIIUogItaQ2qhuJVT9N9+697WD0
+	 vnRBA/gNCCbPWUJF689KDtyKXn9qEWGZjtVTqdr8=
+Date: Thu, 7 Mar 2024 21:30:56 -0800
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Haiyang Zhang <haiyangz@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	KY Srinivasan <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
+	Michael Kelley <mikelley@microsoft.com>
+Subject: Re: [PATCH] net :mana : Add per-cpu stats for MANA device
+Message-ID: <20240308053056.GA16944@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1709823132-22411-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <20240307072923.6cc8a2ba@kernel.org>
+ <DM6PR21MB14817597567C638DEF020FE3CA202@DM6PR21MB1481.namprd21.prod.outlook.com>
+ <20240307090145.2fc7aa2e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 00/21] rxrpc: Miscellaneous changes and make use
- of MSG_SPLICE_PAGES
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170987464085.14945.491149931271263670.git-patchwork-notify@kernel.org>
-Date: Fri, 08 Mar 2024 05:10:40 +0000
-References: <20240306000655.1100294-1-dhowells@redhat.com>
-In-Reply-To: <20240306000655.1100294-1-dhowells@redhat.com>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, marc.dionne@auristor.com, horms@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240307090145.2fc7aa2e@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Hello:
+Thanks for the comments, I am sending out a newer version with these fixes.
 
-This series was applied to netdev/net-next.git (main)
-by David Howells <dhowells@redhat.com>:
-
-On Wed,  6 Mar 2024 00:06:30 +0000 you wrote:
-> Here are some changes to AF_RXRPC:
+On Thu, Mar 07, 2024 at 09:01:45AM -0800, Jakub Kicinski wrote:
+> On Thu, 7 Mar 2024 15:49:15 +0000 Haiyang Zhang wrote:
+> > > > Extend 'ethtool -S' output for mana devices to include per-CPU packet
+> > > > stats  
+> > > 
+> > > But why? You already have per queue stats.  
+> > Yes. But the q to cpu binding is dynamic, we also want the per-CPU stat 
+> > to analyze the CPU usage by counting the packets and bytes on each CPU.
 > 
->  (1) Cache the transmission serial number of ACK and DATA packets in the
->      rxrpc_txbuf struct and log this in the retransmit tracepoint.
+> Dynamic is a bit of an exaggeration, right? On a well-configured system
+> each CPU should use a single queue assigned thru XPS. And for manual
+> debug bpftrace should serve the purpose quite well.
 > 
->  (2) Don't use atomics on rxrpc_txbuf::flags[*] and cache the intended wire
->      header flags there too to avoid duplication.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v3,01/21] rxrpc: Record the Tx serial in the rxrpc_txbuf and retransmit trace
-    https://git.kernel.org/netdev/net-next/c/ba132d841d56
-  - [net-next,v3,02/21] rxrpc: Convert rxrpc_txbuf::flags into a mask and don't use atomics
-    https://git.kernel.org/netdev/net-next/c/12bdff73a147
-  - [net-next,v3,03/21] rxrpc: Note cksum in txbuf
-    https://git.kernel.org/netdev/net-next/c/41b8debba79c
-  - [net-next,v3,04/21] rxrpc: Fix the names of the fields in the ACK trailer struct
-    https://git.kernel.org/netdev/net-next/c/17469ae0582a
-  - [net-next,v3,05/21] rxrpc: Strip barriers and atomics off of timer tracking
-    https://git.kernel.org/netdev/net-next/c/d73f3a748875
-  - [net-next,v3,06/21] rxrpc: Remove atomic handling on some fields only used in I/O thread
-    https://git.kernel.org/netdev/net-next/c/693f9c13ec89
-  - [net-next,v3,07/21] rxrpc: Do lazy DF flag resetting
-    https://git.kernel.org/netdev/net-next/c/d32636982ce9
-  - [net-next,v3,08/21] rxrpc: Merge together DF/non-DF branches of data Tx function
-    https://git.kernel.org/netdev/net-next/c/1ac6a8536c2c
-  - [net-next,v3,09/21] rxrpc: Add a kvec[] to the rxrpc_txbuf struct
-    https://git.kernel.org/netdev/net-next/c/ff342bdc59f4
-  - [net-next,v3,10/21] rxrpc: Split up the DATA packet transmission function
-    https://git.kernel.org/netdev/net-next/c/44125d5aadda
-  - [net-next,v3,11/21] rxrpc: Don't pick values out of the wire header when setting up security
-    https://git.kernel.org/netdev/net-next/c/a1c9af4d4467
-  - [net-next,v3,12/21] rxrpc: Move rxrpc_send_ACK() to output.c with rxrpc_send_ack_packet()
-    https://git.kernel.org/netdev/net-next/c/99afb28c676c
-  - [net-next,v3,13/21] rxrpc: Use rxrpc_txbuf::kvec[0] instead of rxrpc_txbuf::wire
-    https://git.kernel.org/netdev/net-next/c/8985f2b09b33
-  - [net-next,v3,14/21] rxrpc: Do zerocopy using MSG_SPLICE_PAGES and page frags
-    https://git.kernel.org/netdev/net-next/c/49489bb03a50
-  - [net-next,v3,15/21] rxrpc: Parse received packets before dealing with timeouts
-    https://git.kernel.org/netdev/net-next/c/3e0b83ee535d
-  - [net-next,v3,16/21] rxrpc: Don't permit resending after all Tx packets acked
-    https://git.kernel.org/netdev/net-next/c/a711d976e1cd
-  - [net-next,v3,17/21] rxrpc: Differentiate PING ACK transmission traces.
-    https://git.kernel.org/netdev/net-next/c/12a66e77c499
-  - [net-next,v3,18/21] rxrpc: Use ktimes for call timeout tracking and set the timer lazily
-    https://git.kernel.org/netdev/net-next/c/153f90a066dd
-  - [net-next,v3,19/21] rxrpc: Record probes after transmission and reduce number of time-gets
-    https://git.kernel.org/netdev/net-next/c/4d267ad6fd56
-  - [net-next,v3,20/21] rxrpc: Clean up the resend algorithm
-    https://git.kernel.org/netdev/net-next/c/37473e416234
-  - [net-next,v3,21/21] rxrpc: Extract useful fields from a received ACK to skb priv data
-    https://git.kernel.org/netdev/net-next/c/4b68137a20bc
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> Please note that you can't use num_present_cpus() to size stats in
+> ethtool -S , you have to use possible_cpus(), because the retrieval
+> of the stats is done in a multi-syscall fashion and there are no
+> explicit lengths in the API. So you must always report all possible
+> stats, not just currently active :(
 
