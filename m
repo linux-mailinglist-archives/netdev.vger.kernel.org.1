@@ -1,100 +1,183 @@
-Return-Path: <netdev+bounces-78613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67EFB875E05
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 07:43:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6B0B875E3F
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 08:09:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95FA71C20C76
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 06:43:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CECBC1C209C3
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 07:09:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 099121DFC6;
-	Fri,  8 Mar 2024 06:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E00F4EB20;
+	Fri,  8 Mar 2024 07:09:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OUPC7K6E"
 X-Original-To: netdev@vger.kernel.org
-Received: from bg4.exmail.qq.com (bg4.exmail.qq.com [43.155.65.254])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C483818E01
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 06:42:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.155.65.254
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665F42E3E4
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 07:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709880179; cv=none; b=X8X2/n/Tnsd9mSNomdD+7oti+pmMgS4xctVJxzjxD9j7tzx5HDU+IKtyUcixYdvJHnAtvAeexOlqcrKAuxwbu17q0tXmdN2O8PpbyAbRs78lMogQKbF3ZhGx1ZaCJZBPBeMvmwtv/bs7vMJDZQ3NTqbBnk3k7X1upm4N/vkhJIk=
+	t=1709881787; cv=none; b=hq7jChi/1YBqIsg/eW+rMiZHxh6ghy3q/a8TlFSNwwdVh4wGhNnzzJcPIVrdsXszDcgjY/UoxrCMRq3o6YOJLghSLJbuJZoQhErhODI+ExpSCcAKUgIbd5t7FfaAhxdqC8pn/3y80RHWrRHa2I0iGkZB2GQAXTUjElfnNl7+3kI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709880179; c=relaxed/simple;
-	bh=5stAt59YGls7zMn74cgJa2r+rx2wRufjNvoLmeCRdRM=;
-	h=From:To:Subject:Mime-Version:Content-Type:Date:Message-ID; b=ncDv0ud7Lhwpcekxo2neqS8a3Eb5HMoagkiG+Y+q6N/odxRPXFidJIc9n1ldjDxmr9bTIc9LSqqK4WFSJGSohovMwdRPaEwtpeIANfBdZIf54Cu74pKTAbRnPe2zSZjS9G2O9kLNXkT6zHWgcc1YTZ4vdwXnDuzxHcLloX94UDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn; spf=pass smtp.mailfrom=smail.nju.edu.cn; arc=none smtp.client-ip=43.155.65.254
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=smail.nju.edu.cn
-X-QQ-GoodBg: 2
-X-BAN-DOWNLOAD: 1
-X-BAN-SHARE: 1
-X-QQ-SSF: 00400000000000F0
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-X-QQ-FEAT: zT6n3Y95oi2xquFErfnCkEp8VuRLP1VcUW2G0Wh9aCyZjlGIoceYdQdF3Vtnu
-	Vf5hhl03TNVh75SrF8+K6VNeRYdXWHTgYJGAn8US6of9Z26G2Y20aJ2vX2+sNlV9BDp8lQA
-	4npV8DSqDr29hFZZcxtVbN+r8odju2hwhHV7Kmx17AnMZfVVLGXtpTjWJHHDCveXmvKao//
-	gw5Q4jlfNxAaZhZGpRz9idSkheGNifSDl+hZpzlI/c4pp/U1EYqllcNtzldg5NoTm0nunpC
-	DJK+GTkyUTY72BVeZN4chc03pOn5cNU3Xg0XBVpJDNhlP5EZ9sP1uCD+y6gjPrDvqFifXND
-	mjy6jwTeumye0sEKQvOROxwV9JaeunBTUDoEHwEptBMTOHV4flxbp1Tg3hsEQ==
-X-QQ-BUSINESS-ORIGIN: 2
-X-QQ-Originating-IP: 4jBzVGpm81IRMlxRDdKE1KQwjU3Z1dzII4Df080VjvU=
-X-QQ-STYLE: 
-X-QQ-mid: t7gz7a-0t1709880163t844016
-From: "=?utf-8?B?6ZmI5ZiJ5piA?=" <jiayunchen@smail.nju.edu.cn>
-To: "=?utf-8?B?bmV0ZGV2?=" <netdev@vger.kernel.org>
-Subject: puzzling features on ip change/replace
+	s=arc-20240116; t=1709881787; c=relaxed/simple;
+	bh=mt5juNmxFPZItUGuRgQBpgDa/wZnjA+jgsD8MmL7HE8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
+	 In-Reply-To:Content-Type; b=PbnBV9ZHW8e8r0YmDzfv2M54Cr5fx6z0O40YA+wsGUtr7hJFHjxrAk6c8vp8gyUH+hqxafJPLyolKeAiZloPshbxt9SFVa47q4pMB/kEka4gPO1L8m1qpw+MCa3d13RjiRVxRMXigEe8NegastNKIz2RMT72dkFjJgz88jw3MVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OUPC7K6E; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-563c595f968so2261187a12.0
+        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 23:09:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709881784; x=1710486584; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:cc:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=k02gYfyctG7UhqmaOEeRXx4vOANBTHWSjCuz4Vo/MBk=;
+        b=OUPC7K6EWNOydAKjBEzkiuRUV+DU2SxQMFn0POMCHFALlxDnkA2OVzccuL4lwW0OPx
+         bbgJlZ4nJz7Dd5cSsIW2wa0EcW0VWFe6tJdb2m+W2RpI0tNZAffeXR0g5UzyZpgQGWk0
+         6UnyNEcEL+Xrm3peOC3pXmtFsrnSFIRcy4DojjWSDSkCIWF5dNuFcWxZJOsRI5YopipY
+         4DLSj4hlZb0W3arUUDFNCRZlVE9btFNPJpq+hS+tgv02aA3p3VQseAObOJzlKs3RBvwF
+         zRhoAHBa3X2B5QNMHTSLVZcTQD6jYCvK3w6O+aPyvMaArkWLwVrEsz7hL/GfKoIeRb7Y
+         ZgZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709881784; x=1710486584;
+        h=content-transfer-encoding:in-reply-to:cc:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=k02gYfyctG7UhqmaOEeRXx4vOANBTHWSjCuz4Vo/MBk=;
+        b=TMg/360nagRowF0ahVCv/pSv9qDUX4dloymm2TJC8VYfJ/Ag/4T+jUHHL9zGbXJnRA
+         PxOgIc/D/QJyENnDWT+GIRpNEL3PzNC27s87QHr65eRGx28F2xQWj54LDDYb6imtUEK1
+         +Aim1vO4W1zXspOMwrpUUOWdYimBy19FhjisSwm+WmwWJxWZqOjoZ1HxwC5EK5BueHbV
+         DsSgDr3MLdTEdXj4PhT/bAGaLxa9Ab4RAqGdIGQmqPhMBFbQ8oW3TwRXFh7q6+72k4e7
+         s/AOBDGJyu4tGWMGyzecR+ItAe9C9RjURkRKoINpppGTdcLvUQDs4el4PueAvyFZI0gu
+         u9iQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW08D7X4cwq0+FqNUgvEeIdHE3WVQXUYzHJVS4ZJjifyZ+9oQpE5DLsdOisFAhT6F6gzjWT1UhAS7ZoXrf2AdnCtzkZp2YZ
+X-Gm-Message-State: AOJu0YxkzujtLIHblGMfnaIVnaGYF51EmgGJn3qDqcOOtgWEMEvelOzi
+	OfnCbQP/wDdm5cLM/2zBgFPlNMfmpyBHxry7EliaH48xPUjMWEvS
+X-Google-Smtp-Source: AGHT+IFlXBa4Xu5ZNzcfgyMp1nfsFP8ZKR4AKZwwtDOIx9R5SEzPw6nTEALmT8Vn2iSqAxRZO3c4HA==
+X-Received: by 2002:a50:ab4b:0:b0:567:6a67:664e with SMTP id t11-20020a50ab4b000000b005676a67664emr1231803edc.34.1709881783341;
+        Thu, 07 Mar 2024 23:09:43 -0800 (PST)
+Received: from ?IPV6:2a01:c22:6e92:f300:e409:d134:8118:e48a? (dynamic-2a01-0c22-6e92-f300-e409-d134-8118-e48a.c22.pool.telefonica.de. [2a01:c22:6e92:f300:e409:d134:8118:e48a])
+        by smtp.googlemail.com with ESMTPSA id d8-20020a05640208c800b005682f8b62a6sm168200edz.97.2024.03.07.23.09.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Mar 2024 23:09:42 -0800 (PST)
+Message-ID: <793cc4d3-aaa8-4027-8212-9a090a44c2e4@gmail.com>
+Date: Fri, 8 Mar 2024 08:09:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-Date: Fri, 8 Mar 2024 14:42:42 +0800
-X-Priority: 3
-Message-ID: <tencent_35777FB65087C7C646A80431@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-X-BIZMAIL-ID: 354667509582755388
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1])
-	by smtp.qq.com (ESMTP) with SMTP
-	id ; Fri, 08 Mar 2024 14:42:44 +0800 (CST)
-Feedback-ID: t:smail.nju.edu.cn:qybglogicsvrgz:qybglogicsvrgz5a-1
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: phy: simplify a check in phy_check_link_status
+To: Ratheesh Kannoth <rkannoth@marvell.com>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>
+References: <20240308045058.1221154-1-rkannoth@marvell.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+In-Reply-To: <20240308045058.1221154-1-rkannoth@marvell.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-SGkgYWxsLA0KDQpJIGFtIHRlc3Rpbmcgc29tZSBiYXNpYyBmZWF0dXJlcyBmb3IgaXByb3V0
-ZTIuIFdoZW4gSSB0ZXN0IHRoZSB1c2FnZSBvZiAnaXAgY2hhbmdlJywgdGhlIG1hbnVhbCBz
-ZWVtcyBub3QgdG8gb2ZmZXIgZW5vdWdoIGluZm9ybWF0aW9uLg0KDQpUaGUgc3lub3BzaXMg
-dGVsbHMgdGhhdDoNCg0KYGBgDQogaXAgYWRkcmVzcyB7IGFkZCB8IGNoYW5nZSB8IHJlcGxh
-Y2UgfSBJRkFERFIgZGV2IElGTkFNRSBbDQogICAgICAgICAgICAgICBMSUZFVElNRSBdIFsg
-Q09ORkZMQUctTElTVCBdDQpgYGANCg0KYW5kIElGQUREUiBjYW4gYmUgaW1wZWxlbWVudGVk
-IGFzOg0KDQpgYGANCklGQUREUiA6PSBQUkVGSVggfCBBRERSIHBlZXIgUFJFRklYIFsgYnJv
-YWRjYXN0IEFERFIgXSBbIGFueWNhc3QNCiAgICAgICAgICAgICAgIEFERFIgXSBbIGxhYmVs
-IExBQkVMIF0gWyBzY29wZSBTQ09QRS1JRCBdIFsgcHJvdG8NCiAgICAgICAgICAgICAgIEFE
-RFJQUk9UTyBdDQpgYGANCg0KU28gSSBhbSBjb25mdXNpbmcgYWJvdXQgd2hldGhlciBwYXJ0
-cyBvZiBJRkFERFIgY2FuIGJlIGNoYW5nZWQgdGhyb3VnaCAnaXAgY2hhbmdlJyBjb21tYW5k
-IG9yICdpcCBjaGFuZ2UnIGNvbW1hbmQgY2FuIG9ubHkgY2hhbmdlIHRoZSBMSUZFVElNRT8N
-Cg0KSGVyZSBpcyBteSB0ZXN0IHNjZW5hcmlvOg0KDQpgYGANCmlwIGFkZHIgYWRkIDEuMS4x
-LjEvMzIgZGV2IGV0aDAgbGFiZWwgZXRoMDpYICMgdGhpcyBjb21tYW5kIHdvcmtzLCBhZGRp
-bmcgYSBuZXcgaXAgYWRkciB0byBldGgwIHdpdGggbGFiZWwgWCwgZXhpdGVkIHdpdGggMA0K
-DQppcCBhZGRyIGFkZCAyLjIuMi4yLzMyIGRldiBldGgwIGxhYmVsIGV0aDA6WQ0KDQppcCBh
-ZGRyIGNoYW5nZSAxLjEuMS4xLzMyIGRldiBldGgwIGxhYmVsIGV0aDA6WSAjIHRoaXMgY29t
-bWFuZCBhbHNvIGV4aXRzIHdpdGggMCwgYnV0IGl0IHRha2VzIG5vIGVmZmVjdCBpbiBmYWN0
-Lg0KYGBgDQoNCkFuZCB3aGVuIEkgdHJ5IHRvIGNoZWNrIHRoZSBpbmZvOg0KDQpgYGANCmlw
-IGFkZHIgc2hvdyBkZXYgZXRoMCBsYWJlbCBldGgwOlkgIyBpdCBzaG93cyB0aGUgaXAgMi4y
-LjIuMi8zMiBvbmx5Lg0KYGBgDQoNCkl0J3MgbmF0dXJhbCB0byBtYW5hZ2UgdGhlIGlwIGFk
-ZHJlc3MgdGhyb3VnaCB0aGUgbGFiZWwgaW4gdGhlIHJlYWwgc2NlbmFyaW9zLCBidXQgdGhp
-cyBiZWhhdmlvciByZWFsbHkgcHV6emxlcy4gQXQgbGVhc3QsIGl0IHNob3VsZCBkaXNwbGF5
-IHNvbWUgZXJyb3IgbWVzc2FnZSBpZiB0aGUgY2hhbmdlIGNvbW1hbmQgaXMgZmFpbGVkLCBy
-YXRoZXIgdGhhbiBwcmV0ZW5kIHRoYXQgbm90aGluZyBoYXBwZW5lZCBhbmQgZXhpdCAwIHNs
-aWdodGx5Lg0KDQpNYXliZSBJIGNhbiBwdWxsIGEgcGF0Y2ggb24gZG9jdW1lbnRhdGlvbiB0
-byBleHBsYWluIHRoaXM/IE9yIGZpeCB0aGUgcmV0dXJuIGNvZGUgZm9yIG15IHRoaXJkIGNv
-bW1hbmQ/DQoNCg0KQ2hlZXJzLA0KQ2hlbiBKaWF5dW4=
+On 08.03.2024 05:50, Ratheesh Kannoth wrote:
+> On 2024-03-08 at 02:46:12, Heiner Kallweit (hkallweit1@gmail.com) wrote:
+>> Handling case err == 0 in the other branch allows to simplify the
+>> code. In addition I assume in "err & phydev->eee_cfg.tx_lpi_enabled"
+>> it should have been a logical and operator. It works as expected also
+>> with the bitwise and, but using a bitwise and with a bool value looks
+>> ugly to me.
+>>
+>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+>> ---
+>>  drivers/net/phy/phy.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+>> index c3a0a5ee5..c4236564c 100644
+>> --- a/drivers/net/phy/phy.c
+>> +++ b/drivers/net/phy/phy.c
+>> @@ -985,10 +985,10 @@ static int phy_check_link_status(struct phy_device *phydev)
+>>  		phydev->state = PHY_RUNNING;
+>>  		err = genphy_c45_eee_is_active(phydev,
+>>  					       NULL, NULL, NULL);
+> IMO, better to rename "err" to "ret", and do if (ret == true). OR,
+> we should fix syntax of genphy_c45_eee_is_active() to return bool (true/false)
+> than doing this, because function name suggest so , xxx_is_active(). err == 0, norm is
+> for success case.
+> 
+Return value of genphy_c45_eee_is_active() is tristate int:
+<0: error
+ 0: eee not active
+ 1: eee active (implicit cast from bool to int)
+
+This tristate behavior isn't unusual, you can find it with other phylib
+functions too, another example are several of the rpm functions.
+So both, 0 and 1, are success cases (from a technical perspective).
+
+>> -		if (err < 0)
+>> +		if (err <= 0)
+>>  			phydev->enable_tx_lpi = false;
+>>  		else
+>> -			phydev->enable_tx_lpi = (err & phydev->eee_cfg.tx_lpi_enabled);
+>> +			phydev->enable_tx_lpi = phydev->eee_cfg.tx_lpi_enabled;
+>>
+>>  		phy_link_up(phydev);
+>>  	} else if (!phydev->link && phydev->state != PHY_NOLINK) {
+>> --
+>> 2.44.0
 
 
