@@ -1,183 +1,154 @@
-Return-Path: <netdev+bounces-78696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE9E78762C1
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:09:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F08978762C6
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:11:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1F6E1C2108F
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:09:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 693D61F25E08
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:11:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F4154746;
-	Fri,  8 Mar 2024 11:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE6955C20;
+	Fri,  8 Mar 2024 11:11:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Pp/2CHnD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G4mAjaH0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B771B55C34;
-	Fri,  8 Mar 2024 11:09:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96BB255C27
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 11:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709896176; cv=none; b=khGRxWyPJIW2nZGLD4dlM6OJlvAohYAOUZiT48t56zxvUgALwcJUpWOCs394QQZOWpGRs2ZzGnQGzApqUAcfEE6Gx6TSHv/IYjB2iGVj570ENlHdAiDGnWEBa3AhdHJQspsbWWO5zB3BBuSiKanZaUmibSAsrMlbAuRnC6l0bwY=
+	t=1709896265; cv=none; b=Q273FmyxbEG8VKP9QlXLivApMG6yEVAryyaIPUj9+Yee4Eet59FiLjJA19hhMFHE92YRwCqGcOhfj+DntUOOWIdrnRmqhiU9dAYDvhyUN6n9OSZQKLYgVb0xCKa5znQh//W02oxRM3MAJmn/5Q+r9FlEry2v2H8ePbXI1MVvRQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709896176; c=relaxed/simple;
-	bh=uhF7KeuFS5kvVj74c+K5uPLZQLXkKWbLmov+lBPwnxk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a9bn5Z/IGRD1mKKM72ehkU7eqjfLmuxUfFvwqivAc0C3jp+dXzZZvNdhbFKkx/HKWFwgi0ysqri9MszxZq1lZ+fBPmnsdWqmeTRqiW2GFp7I4KX/rxzPFIU7X2OOoEddwHwU20QYTt4yHQlKtR0jYZdaNOnhvMcubanOzBnJVkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Pp/2CHnD; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 428AvAxu006147;
-	Fri, 8 Mar 2024 11:09:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=gyDQg7SwnM6C8Lf//yiK9B+QJkkbKBHdWa1O2wRLrkQ=;
- b=Pp/2CHnDKRhACe2XruLb1PYYN3uAKfGb12w2nU5D01NMgAJWMoSsAfdkoEuAfAvqR2hl
- 28ZFl6SdIvFSLDLvbRgmdr4Mq6AP17gd+SNgbXzqGWBFJGk9td1zQhl8BHabRgMX0noQ
- 3g1YDSOSXpQq1k17BlA6ml4UlkwbG3q4cQxeo7/GM5qC5kyk0qgSfp7mNUbHvolPhveD
- 47R2teS/ctPBsB/Kc28vKU7jIi9epnUTZNlwmCMu+QI80cvWHrmA+eUPBmni1ikbB1WY
- 5zkFd6RMTHBcd00hwEk1dmJffJ7jGrafLNjwgtpJZhJuU5zXZ7oATs+GbQL3xgUgO9o9 6A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wr1cdr6r6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 Mar 2024 11:09:31 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 428B9K6G008895;
-	Fri, 8 Mar 2024 11:09:30 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wr1cdr6qq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 Mar 2024 11:09:30 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 428B963T026183;
-	Fri, 8 Mar 2024 11:09:29 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wmfepc05a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 Mar 2024 11:09:29 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 428B9NHR49611072
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 8 Mar 2024 11:09:25 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9FE3F2004E;
-	Fri,  8 Mar 2024 11:09:23 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E21F42004B;
-	Fri,  8 Mar 2024 11:09:22 +0000 (GMT)
-Received: from osiris (unknown [9.171.32.39])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri,  8 Mar 2024 11:09:22 +0000 (GMT)
-Date: Fri, 8 Mar 2024 12:09:21 +0100
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>
-Subject: Re: [PATCH net v2] s390/qeth: handle deferred cc1
-Message-ID: <20240308110921.26074-D-hca@linux.ibm.com>
-References: <20240307093827.2307279-1-wintera@linux.ibm.com>
+	s=arc-20240116; t=1709896265; c=relaxed/simple;
+	bh=wwy1/eEaLzMW7pgDTgWx/d0pxPnpOewhYdhwlMBZjq4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=UylJfdutmZxktjGjEJ0ZHiZ+tIln7SLj9zFGHE/gcZaJ749pYMtnUxviIHXbDpl9Hg+Q0LKe20gS/JaJckRq4WRH2u4ugZJfzmHcdHx8P3Co/pVtCGxZxTSHH+gTMnn1Ja4UmrDZiMMYF4zW8C6pYuw+bhTWozEeWQ/iNkZ2miQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G4mAjaH0; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709896259;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=r5du8dMiTLiH2n8xTrt2xFjkE47VcUGqyd0Kdnpb9VM=;
+	b=G4mAjaH0nSmbPM161+gykppc/9jz9iuJME94WEfUxDl/9kz4I3qnQFhbMrzN4+mkHBtYih
+	9FEMRtg2So7lJEtSvHP4PF/n/sZzVGSDSbEyuoCY/3nZWboDLAgMTD6pQAlQkyN224jFGo
+	4RX8cIPFGbU5jefc9GpP2ES0zou8SCE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-178-xD8JbdJOP9KYBLQO_O9ETQ-1; Fri, 08 Mar 2024 06:10:58 -0500
+X-MC-Unique: xD8JbdJOP9KYBLQO_O9ETQ-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33e78387a4fso134297f8f.0
+        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 03:10:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709896257; x=1710501057;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=r5du8dMiTLiH2n8xTrt2xFjkE47VcUGqyd0Kdnpb9VM=;
+        b=m3+vMuHI4Y70t1tOHrvyGrL/1oKCHSwNE9v/ETb6bQBqgDgQSZxHIeTj8AwswHkXE+
+         3CvI36EKfxhfR9I+exR6WzRug0i1D8gKT/KNZTDrNrWty9pSScHP4p2C8k/+iM/RTP/+
+         XV3C8egMwNbhBeE+r5Or6pvjkK3CM1Bfpt2kH7mtV05Tnnha9DgcU8dTVxwmk8hnypad
+         SELFOltTS8L6Ml0pHjI5borfyLv5yMJhJVr/yuAKW9gl3gwZqOYvCZAvjD++7Yjze+IB
+         v1UYvKoZXdbjHXjEym8B9GhqCGJ0pW9xXoqcsJYV7SpcUt/95/lzDKkGrRwPIHEKYkZ4
+         dayg==
+X-Forwarded-Encrypted: i=1; AJvYcCWe/z0SUmgu9o2NFDrJo2sfYbCocdDp2Oa/UhULktCNH1RKUtAp12gm8W7oWg8kfzC0rVzvb/ZCvOb92mzxLILsl1l6Qsgm
+X-Gm-Message-State: AOJu0Yxiz+LVnKOrqRlZJR3hWEyWHlZYusARud+jKYnr2Ygof7ayaAlB
+	Mfi/5X7Rr5idQtdzclq1RzM+B39lbl+7i7CVJ21n/DGclq9zWoz0gCyY77NtrG1L2K3mXv2jkJe
+	dNOVaSRi2g/jHVnz9pBy8Jo8NILDHyuYbCDK8lbkgAgjtWKFuo49gwg==
+X-Received: by 2002:adf:e950:0:b0:33e:142f:7cb6 with SMTP id m16-20020adfe950000000b0033e142f7cb6mr1126460wrn.0.1709896257046;
+        Fri, 08 Mar 2024 03:10:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHGbMU5V19DYGtUSF8Zp0NfJm8r1W7l9D1Dpu88YV2NfYT6/cZbNFhpaX4OuTi4ki+u47/B1w==
+X-Received: by 2002:adf:e950:0:b0:33e:142f:7cb6 with SMTP id m16-20020adfe950000000b0033e142f7cb6mr1126442wrn.0.1709896256674;
+        Fri, 08 Mar 2024 03:10:56 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-226-193.dyn.eolo.it. [146.241.226.193])
+        by smtp.gmail.com with ESMTPSA id n8-20020a056000170800b0033e2291fbc0sm19408970wrc.68.2024.03.08.03.10.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Mar 2024 03:10:56 -0800 (PST)
+Message-ID: <3eb282be85ab035e36c80d73949c33868e698d43.camel@redhat.com>
+Subject: Re: [PATCH net-next] udp: no longer touch sk->sk_refcnt in early
+ demux
+From: Paolo Abeni <pabeni@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>,  netdev@vger.kernel.org, eric.dumazet@gmail.com, Martin
+ KaFai Lau <kafai@fb.com>,  Joe Stringer <joe@wand.net.nz>, Alexei
+ Starovoitov <ast@kernel.org>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ Florian Westphal <fw@strlen.de>
+Date: Fri, 08 Mar 2024 12:10:54 +0100
+In-Reply-To: <CANn89iJ+1Y9a9DmR54QUO4S1NRX_yMQaJwsVqU0dr_0c5J4_ZQ@mail.gmail.com>
+References: <20240307220016.3147666-1-edumazet@google.com>
+	 <d149f4511c39f39fa6dc8e7c7324962434ae82e9.camel@redhat.com>
+	 <CANn89iJ+1Y9a9DmR54QUO4S1NRX_yMQaJwsVqU0dr_0c5J4_ZQ@mail.gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240307093827.2307279-1-wintera@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: _eAgk7EIxsmeHJeydRVBBSbQ6aM_z0yp
-X-Proofpoint-ORIG-GUID: Yp8HqP6l1nxQxE7qXywvtKgPC9xCMIEC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-08_08,2024-03-06_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- adultscore=0 bulkscore=0 mlxlogscore=882 priorityscore=1501 clxscore=1011
- impostorscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2403080088
 
-On Thu, Mar 07, 2024 at 10:38:27AM +0100, Alexandra Winter wrote:
-> The IO subsystem expects a driver to retry a ccw_device_start, when the
-> subsequent interrupt response block (irb) contains a deferred
-> condition code 1.
-> 
-> Symptoms before this commit:
-> On the read channel we always trigger the next read anyhow, so no
-> different behaviour here.
-> On the write channel we may experience timeout errors, because the
-> expected reply will never be received without the retry.
-> Other callers of qeth_send_control_data() may wrongly assume that the ccw
-> was successful, which may cause problems later.
-> 
-> Note that since
-> commit 2297791c92d0 ("s390/cio: dont unregister subchannel from child-drivers")
-> and
-> commit 5ef1dc40ffa6 ("s390/cio: fix invalid -EBUSY on ccw_device_start")
-> deferred CC1s are more likely to occur. See the commit message of the
-> latter for more background information.
-> 
-> Fixes: 2297791c92d0 ("s390/cio: dont unregister subchannel from child-drivers")
-> Reference-ID: LTC205042
-> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-> ---
-> v1->v2: correct patch format
-> 
->  drivers/s390/net/qeth_core_main.c | 36 +++++++++++++++++++++++++++++--
->  1 file changed, 34 insertions(+), 2 deletions(-)
+On Fri, 2024-03-08 at 10:21 +0100, Eric Dumazet wrote:
+> > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > > index a8acea17b4e5344d022ae8f8eb674d1a36f8035a..e43ad1d846bdc2ddf5767=
+606b78bbd055f692aa8 100644
+> > > --- a/net/ipv4/udp.c
+> > > +++ b/net/ipv4/udp.c
+> > > @@ -2570,11 +2570,12 @@ int udp_v4_early_demux(struct sk_buff *skb)
+> > >                                            uh->source, iph->saddr, di=
+f, sdif);
+> > >       }
+> > >=20
+> > > -     if (!sk || !refcount_inc_not_zero(&sk->sk_refcnt))
+> > > +     if (!sk)
+> > >               return 0;
+> > >=20
+> > >       skb->sk =3D sk;
+> > > -     skb->destructor =3D sock_efree;
+> > > +     DEBUG_NET_WARN_ON_ONCE(sk_is_refcounted(sk));
+> > > +     skb->destructor =3D sock_pfree;
+> >=20
+> > I *think* that the skb may escape the current rcu section if e.g. if
+> > matches a nf dup target in the input tables.
+>=20
+> You mean the netfilter queueing stuff perhaps ?
+>=20
+> This is already safe, it uses a refcount_inc_not_zero(&sk->sk_refcnt):
+>=20
+> if (skb_sk_is_prefetched(skb)) {
+>     struct sock *sk =3D skb->sk;
+>=20
+>     if (!sk_is_refcounted(sk)) {
+>              if (!refcount_inc_not_zero(&sk->sk_refcnt))
+>                    return -ENOTCONN;
+>=20
+>         /* drop refcount on skb_orphan */
+>         skb->destructor =3D sock_edemux;
+>     }
+> }
+>=20
+> I would think a duplicate can not duplicate skb->sk in general, or must a=
+lso
+> attempt an refcount_inc_not_zero(&sk->sk_refcnt) and use a related destru=
+ctor.
 
-This patch seems to introduce a reference count problem, which results
-in use-after-free reports like the one below. So, please ignore the
-patch - this needs to be sorted out first.
+Right, looks safe.
 
-[  553.017253] ------------[ cut here ]------------
-[  553.017255] refcount_t: addition on 0; use-after-free.
-[  553.017269] WARNING: CPU: 12 PID: 115746 at lib/refcount.c:25 refcount_warn_saturate+0x10e/0x130
-[  553.017275] Modules linked in: kvm algif_hash af_alg nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip_set nf_tables nfnetlink dm_service_time mlx5_ib ib_uverbs ib_core uvdevice
-+s390_trng eadm_sch vfio_ccw mdev vfio_iommu_type1 vfio sch_fq_codel loop configfs lcs ctcm fsm zfcp scsi_transport_fc mlx5_core ghash_s390 prng chacha_s390 libchacha aes_s390 des_s390 libdes sha3_512_s390 sha3_256_s390 sha512_s390 sha256_s390 sha1_s390 sha_common scsi_dh_rdac scsi_dh_emc scsi_dh_alua pkey
-+zcrypt rng_core dm_multipath autofs4
-[  553.017331] Unloaded tainted modules: test_klp_state3(K):1 test_klp_state2(K):4 test_klp_state(K):3 test_klp_callbacks_demo2(K):2 test_klp_callbacks_demo(K):12 test_klp_atomic_replace(K):2 test_klp_livepatch(K):6 [last unloaded: kvm]
-[  553.017405] CPU: 12 PID: 115746 Comm: qeth_recover Tainted: G        W     K    6.8.0-20240305.rc7.git1.570c73d6a3df.300.fc39.s390x #1
-[  553.017408] Hardware name: IBM 8561 T01 701 (LPAR)
-[  553.017409] Krnl PSW : 0404c00180000000 00000001a53cad02 (refcount_warn_saturate+0x112/0x130)
-[  553.017413]            R:0 T:1 IO:0 EX:0 Key:0 M:1 W:0 P:0 AS:3 CC:0 PM:0 RI:0 EA:3
-[  553.017415] Krnl GPRS: c000000000000027 0000000000000023 000000000000002a 0000000100000000
-[  553.017417]            00000004b38e0900 0000000000000000 0000000095dfc2c0 0000000000001000
-[  553.017419]            00000001a563eb58 000000009938d818 0000000000001007 000000009938d800
-[  553.017421]            0000000095dfac00 0000000000000000 00000001a53cacfe 000003800f24bc10
-[  553.017426] Krnl Code: 00000001a53cacf2: c020004f67d8        larl    %r2,00000001a5db7ca2
-                          00000001a53cacf8: c0e5ffc262b4        brasl   %r14,00000001a4c17260
-                         #00000001a53cacfe: af000000            mc      0,0
-                         >00000001a53cad02: a7f4ff9a            brc     15,00000001a53cac36
-                          00000001a53cad06: 92014008            mvi     8(%r4),1
-                          00000001a53cad0a: c020004f67f6        larl    %r2,00000001a5db7cf6
-                          00000001a53cad10: c0e5ffc262a8        brasl   %r14,00000001a4c17260
-                          00000001a53cad16: af000000            mc      0,0
-[  553.017439] Call Trace:
-[  553.017440]  [<00000001a53cad02>] refcount_warn_saturate+0x112/0x130
-[  553.017443] ([<00000001a53cacfe>] refcount_warn_saturate+0x10e/0x130)
-[  553.017445]  [<00000001a563db88>] __qeth_issue_next_read+0x270/0x288
-[  553.017448]  [<00000001a563dc38>] qeth_mpc_initialize.constprop.0+0x98/0x738
-[  553.017449]  [<00000001a564007e>] qeth_hardsetup_card+0x36e/0xb38
-[  553.017451]  [<00000001a56408d8>] qeth_set_online+0x90/0x3a0
-[  553.017453]  [<00000001a5640d04>] qeth_do_reset+0x11c/0x1f8
-[  553.017455]  [<00000001a4c47f30>] kthread+0x120/0x128
-[  553.017458]  [<00000001a4bc3014>] __ret_from_fork+0x3c/0x58
-[  553.017460]  [<00000001a58d717a>] ret_from_fork+0xa/0x30
-[  553.017463] Last Breaking-Event-Address:
-[  553.017464]  [<00000001a4c172de>] __warn_printk+0x7e/0xf0
-[  553.017467] ---[ end trace 0000000000000000 ]---
-[  553.017474] qeth 0.0.bd00: The qeth device driver failed to recover an error on the device
-[  553.018615] qeth 0.0.bd00: The qeth device driver failed to recover an error on the device
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+
 
