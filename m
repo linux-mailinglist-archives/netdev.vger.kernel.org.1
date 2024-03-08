@@ -1,113 +1,126 @@
-Return-Path: <netdev+bounces-78657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56929876003
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:46:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6F4A876037
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:52:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 874EC1C22770
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 08:46:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BF001F276DA
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 08:52:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A26E537FE;
-	Fri,  8 Mar 2024 08:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WmPwPTqp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 166B4535D7;
+	Fri,  8 Mar 2024 08:51:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5615535C8;
-	Fri,  8 Mar 2024 08:45:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E883535A9
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 08:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709887503; cv=none; b=VQjRosF8Ep15CLno0MpfLKwtLn6OdqkgmxK61wPEc7WAaXX2t4edzGyW6M7GnCWGySirRkZdIhfc7pqwXgHRNtgP51T3kH4AQwIfRvQv/h26ISzMKuj5UVbVjISvgWP8Y6psOCcrT58H9BLf1pJYFpP2PkfMhrDUTNYA2i5iNIw=
+	t=1709887919; cv=none; b=uq4sJqBwOTEwGQZA/5IN+Vh3AkExwUh02uqUfd43beL5aCd1qI8/XPSO+paKyBEn3ZH/zGDLlkUAbd87/WYR6GUpAcxkZrAlU0cAXyRxaN4q19HsGjPiMEiI+SUQJeo/JBgsg1LvT+mRnbmMQM1rCAJfXdMH0wksKjZ/SdmZChA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709887503; c=relaxed/simple;
-	bh=WIfKrII/q5Cy4fnBaoGorSTt/WCJneNDItG3lsR+aqM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=R4IpfzlDjlH8/x0q4qtzIA/CHVZV3Ou2lsBvYHGWAIl3jPQW+YF0XULz8FzoCLFlj8TcdwJxeGJyoEm//SrU8l7byTLJzJ6jqaKUlF4LObknJpCc3YRrSkOaoIgk3QSWG5UR1VQjzbINx0qgZFBExvQMyUH0pkA0WWWrdEB3YCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WmPwPTqp; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-33e742ca96bso714365f8f.3;
-        Fri, 08 Mar 2024 00:45:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709887500; x=1710492300; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hHn/aiaeEqq5HNrZZ6UGDx6LpcyY5jbRWNKamKPcfsY=;
-        b=WmPwPTqp8VCTqReQ0Bf9LWAnjsQvXtEuoe2AVTkr6FRcWQO+qvufNOx7TCQZ9CE7EN
-         xLDYzvseEETs9/S5ftdm+YUD89bTE3B+76XUuVyCFV0xPi5BkM41lwVIwNNaoXQm4NcV
-         qABMjXk8B6NKhLD96Dd2eDsBNhbI2XkX1z1cgI1KQMt4TdU6pngBjlEQmhl+ZMRvgcfk
-         N1aFMIY7OhyePj52IvtMkkNFrP69MmTFfa+JzqM4YHR6t77AqHJHV6NGzYBBHX5BVC2x
-         xel6n2Vtm6wcnGQIV5zIVOq/3TN+5gUABOr/UYA8pWhm77RbpW4PX+Puvf4fVAb24yRg
-         tIMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709887500; x=1710492300;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hHn/aiaeEqq5HNrZZ6UGDx6LpcyY5jbRWNKamKPcfsY=;
-        b=onzByKv5ncHKEKB9mBiqgtNJYrzYFxMJJ40h3GoxrBWqFgRo4qXIpFAl6AVXf0gbaq
-         Hh1u/qLXiuI3Srn6adHJNI5hP9qPU6Dul7Cu2LUwa3MgEOARhUnMIT9PoUl/NPHzjSG6
-         NQHqlXoPdPnT1bruS2GvvjNnv9psih5Ic8ujKchFCbSN09TsKx6YV9s22RUDbKNCYXGi
-         oBkBkrFCk+NFPX8O4/HXw+qZ8AKSriVmnLT16Ap4l3w6Dtfkc4YaEOskmJ+etOuLVYYQ
-         hoYj1AX09DOxyGEYGKh/QOVzllYe3xewMRtebDP5AbuchXGlOcXMDnT3Ur9mH9m7vScD
-         5i+g==
-X-Forwarded-Encrypted: i=1; AJvYcCUWP09oX875VT5JEsc95uKtS+2o0tEvXZzzqroNv56AAGWUE6uKpTvPoWx4Vuqid0uQdhO0+8rfEs/tyHIO2jHlEANQtpKku1GDzkC3eTvf4V5QtF785IH75YabLtKMzyEZV9xF
-X-Gm-Message-State: AOJu0Ywh8hnc1WkaGvlx37j0Up+NucKlJaPqjrU4sla+p7ufM7NYXhaf
-	b5pCxW3yr0INleKf11YDr77/LZb84O+LuqQ29l5oyYXtEBjpl1Ht
-X-Google-Smtp-Source: AGHT+IEaPCezIBMexsJ1m8k8liW6LsShUPZYXPBXqhksit7ulmPugMafosBC+eD0gvo63Jc4wBZFvg==
-X-Received: by 2002:a5d:4645:0:b0:33e:754e:7f75 with SMTP id j5-20020a5d4645000000b0033e754e7f75mr1108804wrs.16.1709887500073;
-        Fri, 08 Mar 2024 00:45:00 -0800 (PST)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id y1-20020adff6c1000000b0033e699fc6b4sm3089078wrp.69.2024.03.08.00.44.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Mar 2024 00:44:59 -0800 (PST)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1709887919; c=relaxed/simple;
+	bh=vxJz5nig+xzWSq3zj1PqQI4wZdRZNABdHWk6GEKgk7U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mANEek8I7nkfO5FIRgqBppapFi0gfv9LYKA/rty8eCXf9iWzfxm1AD0DK6KQ/SiSAUXyryp8MeX6RrBBkw3iDnGWJ6TLBWZXcRb1IeBe4lKBZCQKUA9lY2LsJTWGkWdPBX7lEEwZ6neS22YbW8oo38VcWY1hnLLyYpPrdnFiKpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1riVxG-0006vt-Qf; Fri, 08 Mar 2024 09:51:50 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1riVxF-0056ND-Fz; Fri, 08 Mar 2024 09:51:49 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1riVxF-00245c-1K;
+	Fri, 08 Mar 2024 09:51:49 +0100
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: Herve Codina <herve.codina@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] tools: ynl: Fix spelling mistake "Constructred" -> "Constructed"
-Date: Fri,  8 Mar 2024 08:44:58 +0000
-Message-Id: <20240308084458.2045266-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.2
+	netdev@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH] net: wan: framer/pef2256: Convert to platform remove callback returning void
+Date: Fri,  8 Mar 2024 09:51:09 +0100
+Message-ID:  <9684419fd714cc489a3ef36d838d3717bb6aec6d.1709886922.git.u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1996; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=vxJz5nig+xzWSq3zj1PqQI4wZdRZNABdHWk6GEKgk7U=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBl6tGAzII8sdXD/tAwHLrLK0K3K6EaeEFyysFGh ByYQWIDAYWJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZerRgAAKCRCPgPtYfRL+ TsQWB/47ez8M5T6UiA9K6BYBQc3o4PNXowrdvgKiBr07KeCyelxGxVNXs7LLFt9hNBFKQF2F+M7 VSNS07EEQlLr4BtmJan8aTnmliwnfhqjISRBKqZpsYAT7FCUpU99ZJlLZme+wt5siPAhFiqU9xp qj9mdAaSXRRebu1+azUgxgju1U9a2R+P78SxVNLMcT3xOwV1+nFFAs+m91b1Epb4t1q1y2Y9ZiN abVqRhe0WOoCbWq59WkNHdU4PqYDkkEFp7+yccpI1uQhbIyJD+ehPPE/fUKTxjPjH0enM7ZZebW atD6MsyE/lSoPCxpAS1ZhE7aLcm4VzevFZ99Zl/quISSqG+8
+X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-There is a spelling mistake in an error message. Fix it.
+The .remove() callback for a platform driver returns an int which makes
+many driver authors wrongly assume it's possible to do error handling by
+returning an error code. However the value returned is ignored (apart
+from emitting a warning) and this typically results in resource leaks.
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+To improve here there is a quest to make the remove callback return
+void. In the first step of this quest all drivers are converted to
+.remove_new(), which already returns void. Eventually after all drivers
+are converted, .remove_new() will be renamed to .remove().
+
+Trivially convert this driver from always returning zero in the remove
+callback to the void returning variant.
+
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- tools/net/ynl/lib/ynl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/wan/framer/pef2256/pef2256.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
-index b9e77af5af5f..4b9c091fc86b 100644
---- a/tools/net/ynl/lib/ynl.c
-+++ b/tools/net/ynl/lib/ynl.c
-@@ -423,7 +423,7 @@ static int ynl_msg_end(struct ynl_sock *ys, struct nlmsghdr *nlh)
- 	}
- 	if (nlh->nlmsg_pid == YNL_MSG_OVERFLOW) {
- 		yerr(ys, YNL_ERROR_INPUT_TOO_BIG,
--		     "Constructred message longer than internal buffer");
-+		     "Constructed message longer than internal buffer");
- 		return -EMSGSIZE;
- 	}
+diff --git a/drivers/net/wan/framer/pef2256/pef2256.c b/drivers/net/wan/framer/pef2256/pef2256.c
+index 4f81053ee4f0..413a3c1d15bb 100644
+--- a/drivers/net/wan/framer/pef2256/pef2256.c
++++ b/drivers/net/wan/framer/pef2256/pef2256.c
+@@ -838,7 +838,7 @@ static int pef2256_probe(struct platform_device *pdev)
+ 	return 0;
+ }
  
+-static int pef2256_remove(struct platform_device *pdev)
++static void pef2256_remove(struct platform_device *pdev)
+ {
+ 	struct pef2256 *pef2256 = platform_get_drvdata(pdev);
+ 
+@@ -849,8 +849,6 @@ static int pef2256_remove(struct platform_device *pdev)
+ 	pef2256_write8(pef2256, PEF2256_IMR3, 0xff);
+ 	pef2256_write8(pef2256, PEF2256_IMR4, 0xff);
+ 	pef2256_write8(pef2256, PEF2256_IMR5, 0xff);
+-
+-	return 0;
+ }
+ 
+ static const struct of_device_id pef2256_id_table[] = {
+@@ -865,7 +863,7 @@ static struct platform_driver pef2256_driver = {
+ 		.of_match_table = pef2256_id_table,
+ 	},
+ 	.probe = pef2256_probe,
+-	.remove = pef2256_remove,
++	.remove_new = pef2256_remove,
+ };
+ module_platform_driver(pef2256_driver);
+ 
+
+base-commit: 8ffc8b1bbd505e27e2c8439d326b6059c906c9dd
 -- 
-2.39.2
+2.43.0
 
 
