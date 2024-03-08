@@ -1,94 +1,83 @@
-Return-Path: <netdev+bounces-78582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76365875D17
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:20:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36F65875D1D
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:24:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 310BE282114
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 04:20:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB84F1F21D2D
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 04:24:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241352C859;
-	Fri,  8 Mar 2024 04:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14782C857;
+	Fri,  8 Mar 2024 04:24:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="reIT9Mmx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FGHrFJjO"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [67.231.154.164])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 444012C85C
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 04:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.154.164
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FE72C6B6;
+	Fri,  8 Mar 2024 04:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709871633; cv=none; b=Hrh4iWBLq5NxS++aocFl7CMvf25uWSPwv+B5MHZdTWOlfVhDnLk9LhYoPcX8v/HYuuXlKlRK6N5nzOryMzkDCcLEcT7zk0+fdH9iB9SXZHuV06oKxv4lT7K3OoizmYmKYzvmV6oGYxwK5Q6Q//U4FX1acEikQITg7eE4b6rtbxk=
+	t=1709871852; cv=none; b=A0e/fCevvI4nFHLag50kJGOuanZE5A6lsqlSC1HE2MM2Pm0NwS1JAXDcXxR4s1pze4Us7vpKvEuAHaEeDxQwe5uc12zvUKW2KLkvL9Z8BPwZ5nlWSYR6tmvAekUxUyfN81+TWhKOpC9OrerOjZ+FXvYerf1v6UiCj8g7WDE23XE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709871633; c=relaxed/simple;
-	bh=3sPbcPHAeQvwgylDirUV1Ww/86KYlekUeG4vTlyjMh4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hJD7AdXJJZnidvnSVmd/m5We+GTlt1sRszefuHhY7Si5ZgrgRVRiuoQ1MBG32asL1MtTYLoOKlGwRZsisMDDLqEturIzpDN2SPM3eUAZ3IRZ/3bNibeX1qn0fBvcL3DW83K9jW9wg74TKMazppUUfrS5s67hnH18fm94EwrsZcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=reIT9Mmx; arc=none smtp.client-ip=67.231.154.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from mail3.candelatech.com (mail2.candelatech.com [208.74.158.173])
-	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id BA23180064;
-	Fri,  8 Mar 2024 04:20:28 +0000 (UTC)
-Received: from [192.168.1.23] (unknown [98.97.34.142])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mail3.candelatech.com (Postfix) with ESMTPSA id E512B13C2B0;
-	Thu,  7 Mar 2024 20:20:26 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com E512B13C2B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
-	s=default; t=1709871628;
-	bh=3sPbcPHAeQvwgylDirUV1Ww/86KYlekUeG4vTlyjMh4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=reIT9MmxIyuGdWJ9O5kDshVj8LWyaaquF48XdFwIxGdOPyjCxX7HfnGue4QXIhzgU
-	 EKGx6oNtFLdSSOWVcL2uZbZnnNqFVePa8My7ssIk4CTop1zuOt1Bz3VYJ/Q4um/QTX
-	 NWe6ZbR9CQGe3BRCbl2dykIN5TtAO8SFrYnHs4IA=
-Message-ID: <efc8358d-e666-4ee6-95d1-a6ccae6949d9@candelatech.com>
-Date: Thu, 7 Mar 2024 20:20:23 -0800
+	s=arc-20240116; t=1709871852; c=relaxed/simple;
+	bh=BGBLixuXPGuuA+n3MUis9zLgUWGUfR0TjhRnP9RUYyA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aAh0EhWGV4///tYqtYgdiMWi9FXmJ2rojgJs59Ctt6FauJ2zM+pSHgaJG9BU5iZrbgzylQCGls756/FbUDI8hkm+3BVDPVBsLZgEfsJPqHIzX4dYSKNVg4gyqowQcgY4qW3VhQ7HakXfErqa2kqMwbnnUvLPS2LPN4+Vjkghe9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FGHrFJjO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4CA7C433C7;
+	Fri,  8 Mar 2024 04:24:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709871852;
+	bh=BGBLixuXPGuuA+n3MUis9zLgUWGUfR0TjhRnP9RUYyA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FGHrFJjOdLNAVPlVV2y72PZHt3Zdq4NO6a+2+jAPscXe8XtPmN7Tw5MpgAwOpfnIs
+	 I0WUyIL5s1vqJaI0IX0Ki8W6r8zuEby3COUU1JpXiKWJaF95D/irATYgjmIIuebnUk
+	 RdorUU4amsEI8+zINNVQZ0VogYecAyLAkxiT2NSMv+EK97eBBx7qk4plSZotGlcRuE
+	 QMjS28xC/h7VJcLhked9kTMwFyrqXfWM/AC/oCbULkfXCD/KXxL370woS29Y5YOYf2
+	 w0HOiVvaibuTBsPk+i/iAwk5Cak0nZIRub8G4aTliPs++t3bSwIHhT50zGU6OgzYpl
+	 i9TuBjrxV3FlQ==
+Date: Thu, 7 Mar 2024 20:24:10 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Florian Fainelli
+ <f.fainelli@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean
+ <olteanv@gmail.com>, Woojung Huh <woojung.huh@microchip.com>, Arun Ramadoss
+ <arun.ramadoss@microchip.com>, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net v1 1/1] net: dsa: microchip: make sure drive
+ strength configuration is not lost by soft reset
+Message-ID: <20240307202410.65595460@kernel.org>
+In-Reply-To: <20240304135612.814404-1-o.rempel@pengutronix.de>
+References: <20240304135612.814404-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Process level networking stats.
-Content-Language: en-MW
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev <netdev@vger.kernel.org>
-References: <a76c79ce-8707-f9be-14fe-79e7728f9225@candelatech.com>
- <20240306195726.11a981cb@kernel.org>
-From: Ben Greear <greearb@candelatech.com>
-Organization: Candela Technologies
-In-Reply-To: <20240306195726.11a981cb@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-MDID: 1709871629-2a2eTsLp6Qc3
-X-MDID-O:
- us5;at1;1709871629;2a2eTsLp6Qc3;<greearb@candelatech.com>;734049c21285abfbb55dd56ad4f9dd58
 
-On 3/6/24 19:57, Jakub Kicinski wrote:
-> On Wed, 6 Mar 2024 14:57:55 -0800 Ben Greear wrote:
->> I am interested in a relatively straight-forward way to know the tx/rx bytes
->> sent/received by a process.
+On Mon,  4 Mar 2024 14:56:12 +0100 Oleksij Rempel wrote:
+> This driver has two separate reset sequence in different places:
+> - gpio/HW reset on start of ksz_switch_register()
+> - SW reset on start of ksz_setup()
 > 
-> What is "relatively straight-forward"? :)
-> You could out the process in a cgroup and use cgroup hooks
+> The second one will overwrite drive strength configuration made in the
+> ksz_switch_register().
 > 
+> To fix it, move ksz_parse_drive_strength() from ksz_switch_register() to
+> ksz_setup().
+> 
+> Fixes: d67d7247f641 ("net: dsa: microchip: Add drive strength configuration")
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-The main thing is that I don't want to try to do it with packet capture.
-Thanks for the suggestion of using cgroups.  I will look into that.
-
-Thanks,
-Ben
-
--- 
-Ben Greear <greearb@candelatech.com>
-Candela Technologies Inc  http://www.candelatech.com
-
+Applied, thanks!
 
