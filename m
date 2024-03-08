@@ -1,188 +1,127 @@
-Return-Path: <netdev+bounces-78655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE543875FDB
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:43:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4490B875FF0
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:45:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CC8BB24646
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 08:43:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D66F71F240C9
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 08:45:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 926F1210E4;
-	Fri,  8 Mar 2024 08:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B527B54663;
+	Fri,  8 Mar 2024 08:42:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PkBicxYG"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="i9+FQsaY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A71ACA78
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 08:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DAB954776;
+	Fri,  8 Mar 2024 08:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709887232; cv=none; b=KUfP8OH30O4qLynfZkNI4P+oaU8/Feoh6LbXn7f5cRQq1nl3MudCwrKraUaIDox14mV7klNzcsHCCsVMEVWZkaVQIWO7bWfZDyvWNYf3USQ5Cxeix5T7InINHY5g1AHYPsaSckl940bAi6NhHl6fiRzOGGWzFzxRE/l6kvST82Q=
+	t=1709887343; cv=none; b=RmGngrbsbtkYewznxKYAOYub+grlxwGhiDTsOrJ9yoSkhskLD2rHIkyQv3wx552YRoZFgJyvpduRP3ihXWJU04/mSOkUDty5ftOtsxa1q3zDblmYn0H4sfYh9NhiIDd+xdNrFSESvv6RyMr6qXZLx+Czy/aA9RCyyqU/MDVjytI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709887232; c=relaxed/simple;
-	bh=jhR+iJEyLfwXJt+pv2aQP77bdMTnIIcuEvrJoiRZqyw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QMrYzohrbHEDcYYiGPOuS4EgzRtRX2ZRIAwWriSMYVmuxpadxdUF0TPMwGbsnnZ0ZtWwbtmEcDTwE2m8dZzfIU7FP/dpTcGTcZ7iqY5BxfDRwfiC6oe2f/z5T3Nne7tL5VS84zsL8qUwRW9iyZRysJWO0TX9MZiHuDNz/NKcV9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PkBicxYG; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a45cdb790dfso211158066b.3
-        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 00:40:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709887229; x=1710492029; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hzxF1h1dl7Hl8wIe8pHpp/AKqcp2HMl3cbqc/j6le+I=;
-        b=PkBicxYGEndGGapWBiQA79ZqpUCxfHydGc5wnH529QVSELjIPgn8nXcqSfjG0i+2dq
-         OyTwRztUQTcUEDkg0UZpLOeCF4YY3YMlSY/pSfrSj9lNdA8GeOIPphk1KHAKTAAwfKDx
-         pUWINV+WKwEHsUasd4d4OfisQyqgnZ8gw585TPbFhYkG0AydlaQSA31v4loRr+Uwoqs5
-         vhgaETpEV2znr47wWHiJP/CKTARsud5ObaHeeOGTcawriAozSdiu4K67MUI5PGP3Y0sH
-         STozlyCJsSNCTIzXjNVjS9fyoS/E0WmTiFlA2XPRV4sPm3oq201v6y9dQDYDhOZWMG15
-         tI3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709887229; x=1710492029;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hzxF1h1dl7Hl8wIe8pHpp/AKqcp2HMl3cbqc/j6le+I=;
-        b=ow+YnUBgZ85+F98ApY5CgCJVcNFIcONXc8roSag3QPHpxWCVslJEYxcieTn0ZCfEIa
-         9+SMYGvEthnYUhG5pU+jjngPEJjkNXz/lBAk3HxT0Thlc5zunwB9fKMAH3y78bnm3PuG
-         r9ZMjGHi2z45+NJiRFdsuFTDtNatHkOIGt8DJs2V+BLWSbmwfyXp7qHbx4efp9F9Qwgb
-         UB3n6YYi/pwPj2ua1llhBgUXeZkbmS35uFMQe79R2pH/iF/YeqrN6oivqxx/PvsTRB2w
-         OmJCpvbbXE9ODy4tdjAmHseruIh3Cd3lITr0o6jRPsTGXRjXlNxObGWsngGi8TJzSTJB
-         6HbQ==
-X-Gm-Message-State: AOJu0Yxf3AI3RwW61IkdoE8pDoD63ErgijjE+mNFEIQUi5QHI4d7p6nJ
-	cpxOXINNRSYzoopIdj2e61rhQQrhnUJBPMUjvZfr1sWSqx9egpE5jqq3TYd+XP0=
-X-Google-Smtp-Source: AGHT+IEGJ+X/LQs3coFx22VHbN3VTCOv6zSRCWaTiSe606aBql+8bDPuE0C4EoroN7BbFhogonXlvw==
-X-Received: by 2002:a17:906:ad9:b0:a45:ad2c:6f57 with SMTP id z25-20020a1709060ad900b00a45ad2c6f57mr6804094ejf.56.1709887228921;
-        Fri, 08 Mar 2024 00:40:28 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.222.97])
-        by smtp.gmail.com with ESMTPSA id z18-20020a170906241200b00a457e8d1083sm4670485eja.96.2024.03.08.00.40.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Mar 2024 00:40:28 -0800 (PST)
-Message-ID: <247d20b7-51ea-43af-ba00-faa2f1395a2d@linaro.org>
-Date: Fri, 8 Mar 2024 09:40:26 +0100
+	s=arc-20240116; t=1709887343; c=relaxed/simple;
+	bh=s88irfz7m+sRHWvnmgLwOPyx6mqYwlkGAi77IMc7hR0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kdHKNvXJbu2ByUJ5bLvPgzVu7+5He//xxegfX7yD9RLiINjmzLvmo3u+NLPmbCGBSaOpS9swTryyGP9L2u81dVpWYG9eJ7EG1fVtHQYPE5OpbYG5IfsPEfcGqCb3ugAtRAY7oodqDRe530ZdBPVuQL9XvMNvRc1Ki2YmHTJsxmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=i9+FQsaY; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 6FC3220799;
+	Fri,  8 Mar 2024 09:42:12 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 72PgWZLeFruj; Fri,  8 Mar 2024 09:42:11 +0100 (CET)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 0C753201A1;
+	Fri,  8 Mar 2024 09:42:11 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 0C753201A1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1709887331;
+	bh=h+QvIqcEOBZeX3HX3jXFcru8qdY9Nqf6U5ZFLW+/S2g=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=i9+FQsaY5oKqrd/LN9XIiEpRHIFSSfxLQf0QsZbXTDN5/PBBf9Bx2fwpo/E+BtQpm
+	 VqYstTpRiLnJVKmsWozA5txWtj47LuMYh6fNr8nsUl8ewDB02LHmZs5H4gwqNbIQbC
+	 CyBFcVIb2LlI6GDrW+QJWIXGIXgcu//oeGRdZ8qvVWAVPtS+toUPsR5Nk1jpY/zG2L
+	 e5it12+5PGCW8eXrE2UZvU8HnzG7Z4tsXdcAk0O3p/8kE1BmKXqpcHcaCbn8oA3Vkm
+	 VYW1tlMDdlTV5gohaqX5Zkyh+5pbpuBOS+FsZPFdTfP5c6Vkg4r9jldmgzK2fj/Ag/
+	 a38ZyaPWsvCMA==
+Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
+	by mailout1.secunet.com (Postfix) with ESMTP id EF23380004A;
+	Fri,  8 Mar 2024 09:42:10 +0100 (CET)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 8 Mar 2024 09:42:10 +0100
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 8 Mar
+ 2024 09:42:10 +0100
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 2511F3184110; Fri,  8 Mar 2024 09:42:10 +0100 (CET)
+Date: Fri, 8 Mar 2024 09:42:10 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+CC: <almasrymina@google.com>, Herbert Xu <herbert@gondor.apana.org.au>, "David
+ S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, "Matteo
+ Croce" <mcroce@microsoft.com>, Jesper Dangaard Brouer <brouer@redhat.com>,
+	<leonro@nvidia.com>, <gal@nvidia.com>, <stable@vger.kernel.org>, "Anatoli N .
+ Chechelnickiy" <Anatoli.Chechelnickiy@m.interpipe.biz>, Ian Kumlien
+	<ian.kumlien@gmail.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH net v2] net: esp: fix bad handling of pages from page_pool
+Message-ID: <ZerPYroeK/pltA9I@gauss3.secunet.de>
+References: <20240307182946.821568-1-dtatulea@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 6/9] dt-bindings: net: hisi-femac: add binding
- for Hi3798MV200 FEMAC core
-Content-Language: en-US
-To: Yang Xiwen <forbidden405@outlook.com>,
- Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
- <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org
-References: <20240307-net-v9-0-6e0cf3e6584d@outlook.com>
- <20240307-net-v9-6-6e0cf3e6584d@outlook.com>
- <272fcc64-a22c-4f19-8172-d1959276547e@linaro.org>
- <SEZPR06MB695939C120C504830B04430A96272@SEZPR06MB6959.apcprd06.prod.outlook.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <SEZPR06MB695939C120C504830B04430A96272@SEZPR06MB6959.apcprd06.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240307182946.821568-1-dtatulea@nvidia.com>
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On 08/03/2024 09:02, Yang Xiwen wrote:
-> On 3/8/2024 4:01 PM, Krzysztof Kozlowski wrote:
->> On 07/03/2024 12:34, Yang Xiwen via B4 Relay wrote:
->>> From: Yang Xiwen <forbidden405@outlook.com>
->>>
->>> HiSilicon FEMAC core is also found on Hi3798MV200 SoC. Document it in
->>> binding.
->>>
->>> Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
->>>
->>> # Conflicts:
->>> #	Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
->> Drop
->>
->>> ---
->>>   Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml | 1 +
->>>   1 file changed, 1 insertion(+)
->>>
->>> diff --git a/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml b/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
->>> index 5cd2331668bc..4f8a07864eb4 100644
->>> --- a/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
->>> +++ b/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
->>> @@ -16,6 +16,7 @@ properties:
->>>     compatible:
->>>       enum:
->>>         - hisilicon,hi3516cv300-femac
->>> +      - hisilicon,hi3798mv200-femac
->> As I asked two or three or four times: please express compatibility
->> (oneOf, items). Your driver suggests that they are compatible. If they
->> are not compatible, mention it in commit msg, but so far it suggests
->> they are compatible.
+On Thu, Mar 07, 2024 at 08:28:58PM +0200, Dragos Tatulea wrote:
+> When the skb is reorganized during esp_output (!esp->inline), the pages
+> coming from the original skb fragments are supposed to be released back
+> to the system through put_page. But if the skb fragment pages are
+> originating from a page_pool, calling put_page on them will trigger a
+> page_pool leak which will eventually result in a crash.
 > 
+> This leak can be easily observed when using CONFIG_DEBUG_VM and doing
+> ipsec + gre (non offloaded) forwarding:
+
+...
+
+> The suggested fix is to introduce a new wrapper (skb_page_unref) that
+> covers page refcounting for page_pool pages as well.
 > 
-> They are compatible as far as i see.
+> Cc: stable@vger.kernel.org
+> Fixes: 6a5bcd84e886 ("page_pool: Allow drivers to hint on SKB recycling")
+> Reported-and-tested-by: Anatoli N.Chechelnickiy <Anatoli.Chechelnickiy@m.interpipe.biz>
+> Reported-by: Ian Kumlien <ian.kumlien@gmail.com>
+> Link: https://lore.kernel.org/netdev/CAA85sZvvHtrpTQRqdaOx6gd55zPAVsqMYk_Lwh4Md5knTq7AyA@mail.gmail.com
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
+> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
-Sorry, that's not a Schroedinger's cat. Either it seems compatible or it
-is not. You cannot say here "compatible as far as I see" and in second
-thread say "If we are not going to keep backward compatibility".
+This patch does not apply to the ipsec tree. Can you please rebase onto:
 
-Hardware is fixed, released, done.
+git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec.git
 
-Best regards,
-Krzysztof
-
+Thanks!
 
