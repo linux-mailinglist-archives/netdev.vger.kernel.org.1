@@ -1,30 +1,30 @@
-Return-Path: <netdev+bounces-78691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3018E876275
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:54:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FA5D87626C
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:50:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8789284426
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 10:54:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 922B6B21264
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 10:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0025F55C0B;
-	Fri,  8 Mar 2024 10:54:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7515576D;
+	Fri,  8 Mar 2024 10:50:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4672014A82
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 10:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC59754FB0
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 10:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709895274; cv=none; b=QREbrb1i47qaA2tV2s7enoIyxLCfHmtvBCKycYsKjjbdy8w91zKqJi0kaXiPdXtds+U777U3ms3UPQJLB8TFyfDhdl0ZMkzO74BMw63H4pgxq7B5E2xmBPZAWPctHRw6QZ03QW8iMJsiiSCtJp9tIYFjqsgXtQrHuGenafEP708=
+	t=1709895034; cv=none; b=LEgAolA37ThaLOGsCBo78DsY3q1ZZr7RROaWSPqvKBTjzz7YZXSJii4WYhbOJkdB+Fu8MZwMi4B2g9oCZN5XuHAvtlqssfAHrUDVZ/Ou5h+2/qSaU4H4d5PmOvZiE71PrJqhgJHnLB0BkuBphpTzj/z8tBZbFVtB+iPYunFFMWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709895274; c=relaxed/simple;
-	bh=XYyAbukvO6V6EJGXOTJSyoZD5mAk75e5vecVWiM95Ek=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MQ+X6M3kxosCpAnBkIol8gQMjNLa6Z70iXFaJXsFv2rHDeltdnk3oKYCkFsNCW4v7Cq8KAITM3PLvugbMHAFcsBfWe6wBIl7UEGg0mhAygZlaATX4oy+aQ7IULf4S6hwY2X6+qZUbsMUgEx+ZLlGkplaYBx/9ervv/4uqrsyYsc=
+	s=arc-20240116; t=1709895034; c=relaxed/simple;
+	bh=GIWMlaYR05jwrmjmwXUaBfAlmloZULLT6JrTrW07M4E=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZGg9b7C4qlvgD09Wdi8xSfw5juXTqv9PnPAwwR0Z3Xk/g9jP5MmwYTu2r4gYfoXVYOKwE4gWQJYMANAquuBzX8wwN618nwE0Juqs5wj30h1sk2fEHQEveGm5FbWLOuJv8K6ygLPu/mcx5r+Q2kCKuRBJHMpIXBhoqP2k7GYvC0E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -32,34 +32,34 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1riXl9-0008OM-Oq; Fri, 08 Mar 2024 11:47:27 +0100
+	id 1riXo1-0002Bb-5q; Fri, 08 Mar 2024 11:50:25 +0100
 Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ore@pengutronix.de>)
-	id 1riXl8-0057Ot-97; Fri, 08 Mar 2024 11:47:26 +0100
+	id 1riXo0-0057PD-2k; Fri, 08 Mar 2024 11:50:24 +0100
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1riXl8-00AhUu-0h;
-	Fri, 08 Mar 2024 11:47:26 +0100
+	id 1riXo0-00Ai9M-03;
+	Fri, 08 Mar 2024 11:50:24 +0100
 From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jiri Pirko <jiri@resnulli.us>,
-	Ivan Vecera <ivecera@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
+To: "David S. Miller" <davem@davemloft.net>,
 	Andrew Lunn <andrew@lunn.ch>,
 	Eric Dumazet <edumazet@google.com>,
 	Florian Fainelli <f.fainelli@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>
 Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Simon Horman <horms@kernel.org>,
 	kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2 1/1] net: bridge: switchdev: Improve error message clarity for switchdev_port_obj_add/del_deffered operations
-Date: Fri,  8 Mar 2024 11:47:24 +0100
-Message-Id: <20240308104725.2550469-1-o.rempel@pengutronix.de>
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: [PATCH net-next v1 1/1] net: dsa: microchip: add regmap_range for KSZ9563 chip
+Date: Fri,  8 Mar 2024 11:50:21 +0100
+Message-Id: <20240308105021.2552975-1-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,173 +73,152 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Enhance the error reporting mechanism in the switchdev framework to
-provide more informative and user-friendly error messages.
-
-Following feedback from users struggling to understand the implications
-of error messages like "failed (err=-28) to add object (id=2)", this
-update aims to clarify what operation failed and how this might impact
-the system or network.
-
-With this change, error messages now include a description of the failed
-operation, the specific object involved, and a brief explanation of the
-potential impact on the system. This approach helps administrators and
-developers better understand the context and severity of errors,
-facilitating quicker and more effective troubleshooting.
-
-Example of the improved logging:
-
-[   70.516446] ksz-switch spi0.0 uplink: Failed to add Port Multicast
-               Database entry (object id=2) with error: -ENOSPC (-28).
-[   70.516446] Failure in updating the port's Multicast Database could
-               lead to multicast forwarding issues.
-[   70.516446] Current HW/SW setup lacks sufficient resources.
-
-This comprehensive update includes handling for a range of switchdev
-object IDs, ensuring that most operations within the switchdev framework
-benefit from clearer error reporting.
+Add register validation for KSZ9563.
 
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Reviewed-by: Simon Horman <horms@kernel.org>
 ---
-changes v2:
-- make all variables const
-- add Reviewed-by: Simon Horman <horms@kernel.org>
+ drivers/net/dsa/microchip/ksz_common.c | 121 +++++++++++++++++++++++++
+ 1 file changed, 121 insertions(+)
 
- net/switchdev/switchdev.c | 106 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 102 insertions(+), 4 deletions(-)
-
-diff --git a/net/switchdev/switchdev.c b/net/switchdev/switchdev.c
-index c9189a970eec3..de4a7505ceb4d 100644
---- a/net/switchdev/switchdev.c
-+++ b/net/switchdev/switchdev.c
-@@ -244,6 +244,106 @@ static int switchdev_port_obj_notify(enum switchdev_notifier_type nt,
- 	return 0;
- }
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 030b167764b39..2308be3bdc9d8 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -666,6 +666,125 @@ static const struct regmap_access_table ksz8563_register_set = {
+ 	.n_yes_ranges = ARRAY_SIZE(ksz8563_valid_regs),
+ };
  
-+static void switchdev_obj_id_to_helpful_msg(struct net_device *dev,
-+					    enum switchdev_obj_id obj_id,
-+					    int err, bool add)
-+{
-+	const char *action = add ? "add" : "del";
-+	const char *reason = "";
-+	const char *problem;
-+	const char *obj_str;
++static const struct regmap_range ksz9563_valid_regs[] = {
++	regmap_reg_range(0x0000, 0x0003),
++	regmap_reg_range(0x0006, 0x0006),
++	regmap_reg_range(0x000f, 0x000f),
++	regmap_reg_range(0x0010, 0x001f),
++	regmap_reg_range(0x0100, 0x0100),
++	regmap_reg_range(0x0104, 0x0107),
++	regmap_reg_range(0x010d, 0x010d),
++	regmap_reg_range(0x0110, 0x0113),
++	regmap_reg_range(0x0120, 0x012b),
++	regmap_reg_range(0x0201, 0x0201),
++	regmap_reg_range(0x0210, 0x0213),
++	regmap_reg_range(0x0300, 0x0300),
++	regmap_reg_range(0x0302, 0x030b),
++	regmap_reg_range(0x030e, 0x031b),
++	regmap_reg_range(0x0320, 0x032b),
++	regmap_reg_range(0x0330, 0x0336),
++	regmap_reg_range(0x0338, 0x033b),
++	regmap_reg_range(0x033e, 0x033e),
++	regmap_reg_range(0x0340, 0x035f),
++	regmap_reg_range(0x0370, 0x0370),
++	regmap_reg_range(0x0378, 0x0378),
++	regmap_reg_range(0x037c, 0x037d),
++	regmap_reg_range(0x0390, 0x0393),
++	regmap_reg_range(0x0400, 0x040e),
++	regmap_reg_range(0x0410, 0x042f),
++	regmap_reg_range(0x0500, 0x0519),
++	regmap_reg_range(0x0520, 0x054b),
++	regmap_reg_range(0x0550, 0x05b3),
 +
-+	switch (obj_id) {
-+	case SWITCHDEV_OBJ_ID_UNDEFINED:
-+		obj_str = "Undefined object";
-+		problem = "Attempted operation is undefined, indicating a "
-+			  "possible programming error.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_PORT_VLAN:
-+		obj_str = "VLAN entry";
-+		problem = "Failure in VLAN settings on this port might disrupt "
-+		          "network segmentation or traffic isolation, affecting\n"
-+		          "network partitioning.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_PORT_MDB:
-+		obj_str = "Port Multicast Database entry";
-+		problem = "Failure in updating the port's Multicast Database "
-+			  "could lead to multicast forwarding issues.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_HOST_MDB:
-+		obj_str = "Host Multicast Database entry";
-+		problem = "Failure in updating the host's Multicast Database"
-+		          "may impact multicast group memberships or\n"
-+			  "traffic delivery, affecting multicast communication.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_MRP:
-+		obj_str = "Media Redundancy Protocol configuration for port";
-+		problem = "Failure to set MRP ring ID on this port prevents"
-+			  "communication with the specified redundancy ring,\n"
-+			  "resulting in an inability to engage in MRP-based "
-+			  "network operations.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_RING_TEST_MRP:
-+		obj_str = "MRP Test Frame Operations for port";
-+		problem = "Failure to generate/monitor MRP test frames may lead"
-+			  "to inability to assess the ring's operational\n"
-+			  "integrity and fault response, hindering proactive "
-+			  "network management.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_RING_ROLE_MRP:
-+		obj_str = "MRP Ring Role Configuration";
-+		problem = "Improper MRP ring role configuration may create "
-+		          "conflicts in the ring, disrupting communication\n"
-+			  "for all participants, or isolate the local system "
-+			  "from the ring, hindering its ability to communicate "
-+			  "with other participants.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_RING_STATE_MRP:
-+		obj_str = "MRP Ring State Configuration";
-+		problem = "Failure to correctly set the MRP ring state can "
-+		          "result in network loops or leave segments without\n"
-+			  "communication. In a Closed state, it maintains loop "
-+			  "prevention by blocking one MRM port, while an Open\n"
-+			  "state activates in response to failures, changing "
-+			  "port states to preserve network connectivity.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_IN_TEST_MRP:
-+		obj_str = "MRP_InTest Frame Generation Configuration";
-+		problem = "Failure in managing MRP_InTest frame generation can "
-+			  "misjudge the interconnection ring's state, leading\n"
-+			  "to incorrect blocking or unblocking of the I/C port."
-+			  "This misconfiguration might result in unintended\n"
-+			  "network loops or isolate critical network segments, "
-+			  "compromising network integrity and reliability.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_IN_ROLE_MRP:
-+		obj_str = "Interconnection Ring Role Configuration";
-+		problem = "Failure in incorrect assignment of interconnection "
-+			  "ring roles (MIM/MIC) can impair the formation of the\n"
-+			  "interconnection rings.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_IN_STATE_MRP:
-+		obj_str = "Interconnection Ring State Configuration";
-+		problem = "Failure in updating the interconnection ring state "
-+			  "can lead in case of Open state to incorrect blocking\n"
-+			  "or unblocking of the I/C port, resulting in unintended"
-+			  "network loops or isolation of critical network\n";
-+		break;
-+	default:
-+		obj_str = "Unknown object";
-+		problem	= "Indicating a possible programming error.\n";
-+	}
++	/* port 1 */
++	regmap_reg_range(0x1000, 0x1001),
++	regmap_reg_range(0x1004, 0x100b),
++	regmap_reg_range(0x1013, 0x1013),
++	regmap_reg_range(0x1017, 0x1017),
++	regmap_reg_range(0x101b, 0x101b),
++	regmap_reg_range(0x101f, 0x1021),
++	regmap_reg_range(0x1030, 0x1030),
++	regmap_reg_range(0x1100, 0x1115),
++	regmap_reg_range(0x111a, 0x111f),
++	regmap_reg_range(0x1120, 0x112b),
++	regmap_reg_range(0x1134, 0x113b),
++	regmap_reg_range(0x113c, 0x113f),
++	regmap_reg_range(0x1400, 0x1401),
++	regmap_reg_range(0x1403, 0x1403),
++	regmap_reg_range(0x1410, 0x1417),
++	regmap_reg_range(0x1420, 0x1423),
++	regmap_reg_range(0x1500, 0x1507),
++	regmap_reg_range(0x1600, 0x1612),
++	regmap_reg_range(0x1800, 0x180f),
++	regmap_reg_range(0x1900, 0x1907),
++	regmap_reg_range(0x1914, 0x191b),
++	regmap_reg_range(0x1a00, 0x1a03),
++	regmap_reg_range(0x1a04, 0x1a07),
++	regmap_reg_range(0x1b00, 0x1b01),
++	regmap_reg_range(0x1b04, 0x1b04),
++	regmap_reg_range(0x1c00, 0x1c05),
++	regmap_reg_range(0x1c08, 0x1c1b),
 +
-+	switch (err) {
-+	case -ENOSPC:
-+		reason = "Current HW/SW setup lacks sufficient resources.\n";
-+		break;
-+	}
++	/* port 2 */
++	regmap_reg_range(0x2000, 0x2001),
++	regmap_reg_range(0x2004, 0x200b),
++	regmap_reg_range(0x2013, 0x2013),
++	regmap_reg_range(0x2017, 0x2017),
++	regmap_reg_range(0x201b, 0x201b),
++	regmap_reg_range(0x201f, 0x2021),
++	regmap_reg_range(0x2030, 0x2030),
++	regmap_reg_range(0x2100, 0x2115),
++	regmap_reg_range(0x211a, 0x211f),
++	regmap_reg_range(0x2120, 0x212b),
++	regmap_reg_range(0x2134, 0x213b),
++	regmap_reg_range(0x213c, 0x213f),
++	regmap_reg_range(0x2400, 0x2401),
++	regmap_reg_range(0x2403, 0x2403),
++	regmap_reg_range(0x2410, 0x2417),
++	regmap_reg_range(0x2420, 0x2423),
++	regmap_reg_range(0x2500, 0x2507),
++	regmap_reg_range(0x2600, 0x2612),
++	regmap_reg_range(0x2800, 0x280f),
++	regmap_reg_range(0x2900, 0x2907),
++	regmap_reg_range(0x2914, 0x291b),
++	regmap_reg_range(0x2a00, 0x2a03),
++	regmap_reg_range(0x2a04, 0x2a07),
++	regmap_reg_range(0x2b00, 0x2b01),
++	regmap_reg_range(0x2b04, 0x2b04),
++	regmap_reg_range(0x2c00, 0x2c05),
++	regmap_reg_range(0x2c08, 0x2c1b),
 +
-+	netdev_err(dev, "Failed to %s %s (object id=%d) with error: %pe (%d).\n%s%s\n",
-+		   action, obj_str, obj_id, ERR_PTR(err), err, problem, reason);
-+}
++	/* port 3 */
++	regmap_reg_range(0x3000, 0x3001),
++	regmap_reg_range(0x3013, 0x3013),
++	regmap_reg_range(0x3017, 0x3017),
++	regmap_reg_range(0x301b, 0x301b),
++	regmap_reg_range(0x301f, 0x3020),
++	regmap_reg_range(0x3030, 0x3030),
++	regmap_reg_range(0x3300, 0x3301),
++	regmap_reg_range(0x3303, 0x3303),
++	regmap_reg_range(0x3400, 0x3401),
++	regmap_reg_range(0x3403, 0x3403),
++	regmap_reg_range(0x3410, 0x3417),
++	regmap_reg_range(0x3420, 0x3423),
++	regmap_reg_range(0x3500, 0x3507),
++	regmap_reg_range(0x3600, 0x3612),
++	regmap_reg_range(0x3800, 0x380f),
++	regmap_reg_range(0x3900, 0x3907),
++	regmap_reg_range(0x3914, 0x391b),
++	regmap_reg_range(0x3a00, 0x3a03),
++	regmap_reg_range(0x3a04, 0x3a07),
++	regmap_reg_range(0x3b00, 0x3b01),
++	regmap_reg_range(0x3b04, 0x3b04),
++	regmap_reg_range(0x3c00, 0x3c05),
++	regmap_reg_range(0x3c08, 0x3c1b),
++};
 +
- static void switchdev_port_obj_add_deferred(struct net_device *dev,
- 					    const void *data)
- {
-@@ -254,8 +354,7 @@ static void switchdev_port_obj_add_deferred(struct net_device *dev,
- 	err = switchdev_port_obj_notify(SWITCHDEV_PORT_OBJ_ADD,
- 					dev, obj, NULL);
- 	if (err && err != -EOPNOTSUPP)
--		netdev_err(dev, "failed (err=%d) to add object (id=%d)\n",
--			   err, obj->id);
-+		switchdev_obj_id_to_helpful_msg(dev, obj->id, err, true);
- 	if (obj->complete)
- 		obj->complete(dev, err, obj->complete_priv);
- }
-@@ -304,8 +403,7 @@ static void switchdev_port_obj_del_deferred(struct net_device *dev,
++static const struct regmap_access_table ksz9563_register_set = {
++	.yes_ranges = ksz9563_valid_regs,
++	.n_yes_ranges = ARRAY_SIZE(ksz9563_valid_regs),
++};
++
+ static const struct regmap_range ksz9477_valid_regs[] = {
+ 	regmap_reg_range(0x0000, 0x0003),
+ 	regmap_reg_range(0x0006, 0x0006),
+@@ -1475,6 +1594,8 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 		.supports_rgmii = {false, false, true},
+ 		.internal_phy = {true, true, false},
+ 		.gbit_capable = {true, true, true},
++		.wr_table = &ksz9563_register_set,
++		.rd_table = &ksz9563_register_set,
+ 	},
  
- 	err = switchdev_port_obj_del_now(dev, obj);
- 	if (err && err != -EOPNOTSUPP)
--		netdev_err(dev, "failed (err=%d) to del object (id=%d)\n",
--			   err, obj->id);
-+		switchdev_obj_id_to_helpful_msg(dev, obj->id, err, false);
- 	if (obj->complete)
- 		obj->complete(dev, err, obj->complete_priv);
- }
+ 	[KSZ8567] = {
 -- 
 2.39.2
 
