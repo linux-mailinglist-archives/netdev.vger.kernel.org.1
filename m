@@ -1,142 +1,189 @@
-Return-Path: <netdev+bounces-78817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5F92876ABF
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 19:27:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E853876AED
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 19:52:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C96E1F2171E
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 18:27:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0E8EB214CF
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 18:52:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7DCD5A4E0;
-	Fri,  8 Mar 2024 18:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D92FD2BD0F;
+	Fri,  8 Mar 2024 18:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="cDFpGCdz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11023014.outbound.protection.outlook.com [52.101.61.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D9658ACD
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 18:27:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709922427; cv=none; b=UEbBoVAytOpBpb0olXVkRSEEg6BoUFAhl2//t7xd1XQYA3bm92Y9XyegUtYkwOEJohA9rqsEtWG77OrksR3iDXnnKQNm9xcFOrqaVJ36MUkrr4HLgAfGC/kvVTEezrn9olD+vsi0zZiDvGMOOtSwzXjCz5RMGuzD6eP1QJUUVuQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709922427; c=relaxed/simple;
-	bh=iXwzuacBofH6bC0a7oSO4vPfo6ryJTiF/nYh3txbJ74=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZBvpK/Rpj1bY/MiL6Isi0qywglLbBp4UNGMYOn9uJ/BzuM0GI/lqz6WZOKNH96VHXWgdcFCTavR00JU5Bxa3BoRUoENxXRhgu/8Jlj6wpVYafR8HL/fU+RVqhyGDwqwtd2XR6uX+R8PfZM1VwqgIAT2zMHV4qiuPNb9ZXbYDNEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-563cb3ba9daso2715970a12.3
-        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 10:27:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709922424; x=1710527224;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+0coDjj/W9udBP2f8Zrmu98g7Pbpaq8D0hcKcPmgdTQ=;
-        b=jC/enb+2cf8Kl3g9iysQH/RIIUNomGDzWdBT/vw8Jfxgt7AiIFzMtBq1u1MVyRhUk1
-         Cl4c31+MTF1yn40Le7usrcGza/5GUPRDmPfYOW/nFWsPSfk910wQ31F5BpmieZAUGf+X
-         UiQPuX75NAMF7ebrVKfqO7JREKCYxw9/vm3LS19Ki1d2oTy1YltWT1DGFyuVPnbMM39Q
-         FCjXynH+LFpZrm8k4H4X6vV39qZ1dy8NWRk1NdW4m8kRbAXb3EzCcxmCjHG8VTymu3YF
-         ZiFVVvFs/r25AkqHwmADG1i+kNzDcUzPCRHXOBTuyZJAeVLK6dcdRdFeNpdVkqkLucdO
-         mm9A==
-X-Forwarded-Encrypted: i=1; AJvYcCXppZznD0TyU6hEITxzOoFzsBKpqftMZK/B3Yxv7Fl+SpD5k8F5WHbEszEqUBtLVbluzCKCEenltNm7q8ufjkahkMRqnwfU
-X-Gm-Message-State: AOJu0YwvUx1EMwiKdwSvwAvfzb0Dk5FnESq9GQTdHuomQnkmtBsQ98yI
-	H+HUmPrf14PGuOuJKnQn8eN4ucVe44DsXJbKYb0OVORLVDY65kY2
-X-Google-Smtp-Source: AGHT+IH/WnY2LO42tEbDz1T9ia8NVW+AGNk2DaR8awcZxQxPjdzeLWM4Mtsq1JLD9ZYCx/vEzO+Knw==
-X-Received: by 2002:a05:6402:907:b0:568:3362:cccf with SMTP id g7-20020a056402090700b005683362cccfmr53812edz.7.1709922423857;
-        Fri, 08 Mar 2024 10:27:03 -0800 (PST)
-Received: from gmail.com (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
-        by smtp.gmail.com with ESMTPSA id i5-20020a0564020f0500b00567f780d4a2sm25446eda.78.2024.03.08.10.27.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Mar 2024 10:27:03 -0800 (PST)
-Date: Fri, 8 Mar 2024 10:27:01 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>, michel@michel-slm.name
-Cc: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>, Stanislav Fomichev <sdf@google.com>,
-	donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v3 2/6] tools/net/ynl: Report netlink errors
- without stacktrace
-Message-ID: <ZetYdY7DXcElIKwa@gmail.com>
-References: <20240306231046.97158-1-donald.hunter@gmail.com>
- <20240306231046.97158-3-donald.hunter@gmail.com>
- <ZemJZPySuUyGlMTu@gmail.com>
- <CAD4GDZyvvSPV_-nZsB1rUb1wK6i-Z_DuK=PPLP4BTnfC1CLz3Q@mail.gmail.com>
- <20240307075815.19641934@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219B0125DC;
+	Fri,  8 Mar 2024 18:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709923924; cv=fail; b=ExO2fO+fhdAFANGEob9p6LMfjYyozzPxR+zP/XOpDsV9uPHHTUyH4SUdVS5mgabpoGCWcT63SA4t5JutLVzp8YkBeEEsVMgJyPfW4FSTEHm3sI6PxosnQOZfqLrCLZAPI8411rnY95bSEsyzhZNf+9SvPAqMPgAZtGuJeLCaB4M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709923924; c=relaxed/simple;
+	bh=U52M96RnkF2PcfijJnTK5nnOr/o+ylc0qNlNVqu0Euo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=acAMsT53xslZi3tYgAm9MwDwHCLa3Be1F25rZ75V+PZop3RSe07jyshabSwnTfKdQ+v0+Ewt6/lNgmkqBU8kOghggAhRJDPq1nHdOo9mf4kmegR1MGUyLE+XR6ZTOTfZbPS3LnNp64s/TONChJCQJ/qLi3w0zS7Zm+hiBh5Rpjg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=cDFpGCdz; arc=fail smtp.client-ip=52.101.61.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nbAcQJFU81VOheA/ybNLT4FqSZM+OODvuS2OaiDjrYTvM6GQ6H8qei6HkUugh06+CwNsiG1X56Vu7r8Cy2JgIwYW8gQJN/zpa7WN5LdHuMP09mcPRutsBZb7hhUbrb/EKUAL/j5Q/6QvzqveoWeXs3PNsbKsrIWA/2KM4K6+kbvE6HqRbiPTVdA1n7RMs5Pd2mq5xNYrnCXpwCK1QDlr0argjmWfaUXq2g2TLjNg7tv+ehtWfEZCvf7aX74L76zywI5bbXls0wFZP3+nboFcdOR+yl9oCDS9G/jyYTdElCvG2Iakr47kUzzzApCyvrd/BXqpSp0EW42arfGCcn8QUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=U52M96RnkF2PcfijJnTK5nnOr/o+ylc0qNlNVqu0Euo=;
+ b=eowuO7WeTDGefJGQOkDFuptAmOaeBQdZhTPYRUDalG49uQTBFbgjjgAZIkRZx6nEqi+3RxtVDtLZwVpjp6iL1UaYsHVe4T43tYQGilFCqjD4zJ8LCvYY+UjmC8Kzv9v7Je845pL9LBzLlxkX5ZFuifkevbgPOawdvJHXzBIe0+oKA7T5hjfs7S4VZ6wSL8E4y0WLWUWItlTERB+6BgmDHAdWXEZvYYMy2TYoKvWRPUz/L+XxPCLR0KG/ZTrlKeJ9czrkQoo6si4pQDnoO3yHOpIb4RNvaW12yVIHKPhDXQMCruk3Vlb4PdO03/AwKAYuN+uimEN75IHoPh+EjBEZLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=U52M96RnkF2PcfijJnTK5nnOr/o+ylc0qNlNVqu0Euo=;
+ b=cDFpGCdzVbBPpn84VkX9PSLC/7aeHKL8/duI6OdZVouob/sWazNDJIPorO2lii23VAahV+Ct0r6dJvv8M4ic/4ya6m4ZH4lU/uAIWYDv4VM7EidnVZgUgM5R8j+o2dzU7GLZCSMQhxNHvNYHlTYhHzHF1M4mCv2Jlm8uQLNh7EU=
+Received: from CH2PR21MB1480.namprd21.prod.outlook.com (2603:10b6:610:87::22)
+ by MN0PR21MB3532.namprd21.prod.outlook.com (2603:10b6:208:3d3::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.9; Fri, 8 Mar
+ 2024 18:51:58 +0000
+Received: from CH2PR21MB1480.namprd21.prod.outlook.com
+ ([fe80::70d6:9c52:d97e:3401]) by CH2PR21MB1480.namprd21.prod.outlook.com
+ ([fe80::70d6:9c52:d97e:3401%4]) with mapi id 15.20.7386.011; Fri, 8 Mar 2024
+ 18:51:58 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Shradha Gupta <shradhagupta@linux.microsoft.com>, Shradha Gupta
+	<shradhagupta@microsoft.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
+	<linux-hyperv@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, Ajay Sharma <sharmaajay@microsoft.com>, Leon Romanovsky
+	<leon@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Sebastian Andrzej
+ Siewior <bigeasy@linutronix.de>, KY Srinivasan <kys@microsoft.com>, Wei Liu
+	<wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Long Li
+	<longli@microsoft.com>, Michael Kelley <mikelley@microsoft.com>
+Subject: RE: [PATCH] net :mana : Add per-cpu stats for MANA device
+Thread-Topic: [PATCH] net :mana : Add per-cpu stats for MANA device
+Thread-Index: AQHacJ8N8LLwvYYKc0y/h+tCzJvDjrEsZziAgAADR7CAABaHgIABr8IA
+Date: Fri, 8 Mar 2024 18:51:58 +0000
+Message-ID:
+ <CH2PR21MB1480D3ACADFFD2FC3B1BB7ECCA272@CH2PR21MB1480.namprd21.prod.outlook.com>
+References:
+ <1709823132-22411-1-git-send-email-shradhagupta@linux.microsoft.com>
+	<20240307072923.6cc8a2ba@kernel.org>
+	<DM6PR21MB14817597567C638DEF020FE3CA202@DM6PR21MB1481.namprd21.prod.outlook.com>
+ <20240307090145.2fc7aa2e@kernel.org>
+In-Reply-To: <20240307090145.2fc7aa2e@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=66baa000-a4f2-41ac-aba7-061aa502efdf;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2024-03-08T18:47:03Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH2PR21MB1480:EE_|MN0PR21MB3532:EE_
+x-ms-office365-filtering-correlation-id: a97457e4-70f2-4827-2ec5-08dc3fa0d559
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ Ar34XH/qcjhC2ytFSb29cg1t5Hjw2Ws0v4817X6GPCbSZ9tqq1F87LHTzNuLCnnysomL5a12WAr6P08E5VvggiU74aa+JSjaCcZ06wxYqt5z34dJWg9Ux46OEGERpg9SLWZeqtQvCkLvEMQ96U7Q3OmpoQvWxJ8HAJJ54bJP8jtwbIRgYuZ2x3F26+74S5RJqccAvI8BLdwXwFIOcE+9vi8qerdfGWZe4E+me9mb4lNVLqSMSodWBUWmKNY61dgVc+0Y4h251pk7rKZwjcL9bkth9hfCL7OpYkp0a3WZEFAJ5M99Vm2pie9apbxoOBmuepqcghFgmndDGBx/QWiQqccL+qLT7rOeZTfAkTmA8jp7JlpIpLqlI+LMKVvy5gjZP7UhZNZ+C39Jt8ISp2SzU+7Viek+k7ZtqrMX3YR5lLI1HWjhRW1HXeRU5Nw/lVIemfhyJTS47OTs3cRb6YJU5XBtnE7FBpyVVbTM4aSMT7LgAHbSg7vcHYjYZVpGyGfX4ojTEqwiFNZhgP2CZBBvuYUp3TfN4TeVD/48mDo6W6p/1pXEZ/QPGbeZwRxlqVFY2i9WyK1aUI76K3yd4qWjH5psnzlM0f6fC4ch2IY987y27jrPsAbPwYr8GkF/MeZEmOQ9rDAu3WEWMza4fu3QfBFNJhJD/kqqakOTtnhEIiTAHw2wjKWCbTGsE4GmRtBMhU+UjqIQLRlFYZX07i+W6AqAZYZsOflzR73rsTV1rzI=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR21MB1480.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?m7FEnFjdWais9FT5c3VfJ3DKgUdxJOgGWn749hUPeHV5ivLjsEy4XV1Xe4mZ?=
+ =?us-ascii?Q?gahIHME7wuXQ19LMWxehcWqw8cUWRF8XiNvxzCFqQC8lzM/tyDS0HCC/ZnOD?=
+ =?us-ascii?Q?kPg87IEV0FePOt4INGlci8WznM8J4kz1HG/tpatsdSzyckE6wGdnAzlelVJr?=
+ =?us-ascii?Q?W0yqLHKrmNA7UhTNzqh4m22N96BHkvykzAB1WGCiMgnSJnNFiJ9T5Li+DAKA?=
+ =?us-ascii?Q?hM5y8HqQAQg+12SEUvuC/Z7EpgOze5F92GOQaeKOEFN/QDwpF+sAHtRdBsRb?=
+ =?us-ascii?Q?A9dYj6kmyJrKFN7olM6p9JVx858lmdkBlvsdyeq4CjBKKSteHkpVgRYW+pI+?=
+ =?us-ascii?Q?JrcfqpT65icxpQsq82aEKmGXqobtykrF9sJYLsTEBH9KHUT88tTJo96/EuVK?=
+ =?us-ascii?Q?+bgNSnMdRWR9GrYSe3bO5H4LA0g6msjOMaobkAPHlVIXKmNsqio6APpszWj2?=
+ =?us-ascii?Q?/DMcoJg/6CkUw/icrLFcHytQNSFKfRBXp5ibJ51lKHwQ9ca1O8IWQKsCVqVZ?=
+ =?us-ascii?Q?oqllqDhTgqU6/pNFbP388Acj7QbwfC6FuHiepqb4Qi8xCqXdzpCaM98BmPUy?=
+ =?us-ascii?Q?PL1bC1Az0Txe/1SyLMSQCmyPSphKBrRsxfqsd6cIfZ+zN1qvWn+ZQyiwRJfo?=
+ =?us-ascii?Q?VTWeV5mTnVdCuEUEwWSsX9EEBTDweCfWY2VVouQEnFdYyBOrRxozw2hosGjm?=
+ =?us-ascii?Q?fTxgQmdB6TKlV46A7LYzRgP8f1ku9aNJsFdKE3DTfBXjdlIOK1gbWk6z6/J+?=
+ =?us-ascii?Q?mNf1+gnNkEmUh5Q31zQvQbNxedHu40MA4hBp+wSQMyQgqlkL8F5Rm/9jbjfh?=
+ =?us-ascii?Q?OHuhpIf5vWxIBRpsTrUomVonPw+r0dgkqLBzAnPi7aruG0rxdaRJ+cj3SUe8?=
+ =?us-ascii?Q?ww8XfxbC7YB0wIYgywrD9NpUsaalgZ1m0+nG6kMpDbU61TDMxONZ3XNnxHZ3?=
+ =?us-ascii?Q?N/B4Vm74NSuCopVuxHf0T34Ib8m4ubulYR9Ixu8ZJhPRH0AafjQ4WD1er+5L?=
+ =?us-ascii?Q?3yFky7xsrdSWeyMj+ihHPFslCvu1uUnMkJYlNKHVdUS9Whh8nxzNI5H4p5vt?=
+ =?us-ascii?Q?UAaCGaz55VLJCRLbZUcsqJX0RBvpxaalk0Dqb/TM1Za6AN40jFnCIpKjEHWG?=
+ =?us-ascii?Q?PYOfas5laIkZcUt3pBrnzFjz1osKMIH+qrvX5swpl+21mW4qwmoH4njLBzC1?=
+ =?us-ascii?Q?o08sTzTC3ju8JKpiyXsxNwbuFiqSSGbzaaZmfElo5HBE12gBqXYxCT33lEfe?=
+ =?us-ascii?Q?Bdx+wOQwZ/A3WpIlwDIjZ3KX0UriQM2HInotXjk57odc9uPOTuaXuwfe9e9q?=
+ =?us-ascii?Q?zcOOrOgNcA5Yt5oqpRlSdvD0EG+aeDJFv0ApNewJBOmfa72KVxNIf+l5wzpj?=
+ =?us-ascii?Q?IOq7nsNQl/Rw8CPN+cjaxihVbF0wqOoDoj6fzX5+ybf0LfJiAGhr9L4Cv6ln?=
+ =?us-ascii?Q?RI2VJ0j9wJHy6aTAtL7dk9kD2XMF8Kbe5YhGBi8IXlSQPBPg5nmK6xQym1lq?=
+ =?us-ascii?Q?xb6hjVUbGNFbtrI/OIvTnQEAQqxaHU35l0YMBxpNlc99W3SYF2X2YaV9Fupa?=
+ =?us-ascii?Q?LQnSfT6X61M6GQUuQtcqUVkMZ8/isHdDOs1iptaD?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240307075815.19641934@kernel.org>
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR21MB1480.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a97457e4-70f2-4827-2ec5-08dc3fa0d559
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Mar 2024 18:51:58.6119
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xe+cmbwTP1uRnFi6Ef5QKLQ4iY8sMPFtsuqpygnVxQjnCoWnwFeOj4+ZdOhOFvACi5FClWR+ZOjEe1kpYcCxbQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR21MB3532
 
-On Thu, Mar 07, 2024 at 07:58:15AM -0800, Jakub Kicinski wrote:
-> On Thu, 7 Mar 2024 11:56:59 +0000 Donald Hunter wrote:
-> > > Basically this is just hidding the stack, which may make it harder for
-> > > someone not used to the code to find the problem.
+
+
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Thursday, March 7, 2024 12:02 PM
+> To: Haiyang Zhang <haiyangz@microsoft.com>
+> Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>; Shradha Gupta
+> <shradhagupta@microsoft.com>; linux-kernel@vger.kernel.org; linux-
+> hyperv@vger.kernel.org; linux-rdma@vger.kernel.org;
+> netdev@vger.kernel.org; Eric Dumazet <edumazet@google.com>; Paolo Abeni
+> <pabeni@redhat.com>; Ajay Sharma <sharmaajay@microsoft.com>; Leon
+> Romanovsky <leon@kernel.org>; Thomas Gleixner <tglx@linutronix.de>;
+> Sebastian Andrzej Siewior <bigeasy@linutronix.de>; KY Srinivasan
+> <kys@microsoft.com>; Wei Liu <wei.liu@kernel.org>; Dexuan Cui
+> <decui@microsoft.com>; Long Li <longli@microsoft.com>; Michael Kelley
+> <mikelley@microsoft.com>
+> Subject: Re: [PATCH] net :mana : Add per-cpu stats for MANA device
+>=20
+> On Thu, 7 Mar 2024 15:49:15 +0000 Haiyang Zhang wrote:
+> > > > Extend 'ethtool -S' output for mana devices to include per-CPU
+> packet
+> > > > stats
 > > >
-> > > Usually fatal exception is handled to make the error more meaningful,
-> > > i.e, better than just the exception message + stack. Hidding the stack
-> > > and exitting may make the error less meaningful.  
-> > 
-> > NlError is used to report a usage error reported by netlink as opposed
-> > to a fatal exception. My thinking here is that it is better UX to
-> > report netlink error responses without the stack trace precisely
-> > because they are not exceptional. An NlError is not ynl program
-> > breakage or subsystem breakage, it's e.g. nlctrl telling you that you
-> > requested an op that does not exist.
-> 
-> Right, I think the YNL library should still throw, but since this is
-> a case of "kernel gave us this specific error in response" the stack
-> trace adds relatively little for the CLI.
-> 
-> > > On a different topic, I am wondering if we want to add type hitting for
-> > > these python program. They make the review process easier, and the
-> > > development a bit more structured. (Maybe that is what we expect from
-> > > upcoming new python code in netdev?!)  
-> > 
-> > It's a good suggestion. I have never used python type hints so I'll
-> > need to learn about them. I defer to the netdev maintainers about
-> > whether this is something they want.
-> 
-> I'm far from a Python expert, so up to you :)
-> I used type hints a couple of times in the past, they are somewhat
-> useful, but didn't feel useful enough to bother. Happy for someone
-> else to do the work, tho :)
+> > > But why? You already have per queue stats.
+> > Yes. But the q to cpu binding is dynamic, we also want the per-CPU stat
+> > to analyze the CPU usage by counting the packets and bytes on each CPU.
+>=20
+> Dynamic is a bit of an exaggeration, right? On a well-configured system
+> each CPU should use a single queue assigned thru XPS. And for manual
+> debug bpftrace should serve the purpose quite well.
 
-I am a big fan of type hitting, since it help in reviewing code, as also
-with tooling that help you to find problems, since the function returns
-and arguments now have a type.
+Some programs, like irqbalancer can dynamically change the CPU affinity,=20
+so we want to add the per-CPU counters for better understanding of the CPU=
+=20
+usage.
 
-What are the top 3 python scripts we have in network today? I can try to
-find some time to help.
+Thanks,
+- Haiyang
 
-> FWIW I reckon that trying to get the CLI ready for distro packaging 
-> may be higher prio. Apart from basic requirements to packaging python
-> code (I have no idea what they are), we should probably extend the
-> script to search some system paths? My thinking is that if someone
-> installs the CLI as an RPM, they should be able to use it like this:
-> 
->  $ ynl-cli --family nlctrl \
-> 	--do getfamily --json '{"family-name": "nlctrl"}'
-> 
-> the --family would be used instead of --spec and look for the exact
-> spec file in /usr/share/.../specs/ and probably also imply --no-schema,
-> since hopefully the schema is already validated during development,
-> and no point wasting time validating it on every user invocation.
-> 
-> WDYT?
-
-This is a good idea. I've had a chat with Michel, and he can help with
-the distro part. Adding him in the CC.
 
