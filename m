@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-78676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 440AC8761DA
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:20:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A46FC8761DB
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:20:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 759DC1C21DD8
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 10:20:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D68151C20890
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 10:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC7AB54661;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD9D54729;
 	Fri,  8 Mar 2024 10:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lKTtGtuJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uQ0ZkX/P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8954B53E06
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 10:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8958053E1A;
+	Fri,  8 Mar 2024 10:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709893231; cv=none; b=GRvKxX3KvRh5538Zni3uD4siRwuK5N5QTyvYrdJYrRJDD0w7UcQDDgPqChrISDcKyPOHt1uGoiwyTAJ+uPOBWHA2EqW3yGI3/ahCzLDVcskHZWj6fNZssQe11RwrFo12vQJJZrHU6l513nRlPJPiOw7MAUOvZqQXng5ihphsaLo=
+	t=1709893231; cv=none; b=Z1RUqnKbfMcwErq+oQApa+FvPOBg1uoXE30K4mMM2TEvWnpyE/7syfN+LhuTZiRnp4cktm2CLt21d3H8eC4hNm85bnztcsM+tUUjvV877VDFxsD6is36R9K2/YF/cF6qRahQVxnDX/kMchLbRsamxPcWhBQ9FneeSuh7xHLqGrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709893231; c=relaxed/simple;
-	bh=MTUw0UQXC+QXB90Ymz9uX7gvoM/OTXgQGSnJEL2th8E=;
+	bh=YqlPywJD3XMNMCdoVOYKpvfNURY2E+g3zmeAf8v9w6c=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DeU0kKvwySnTpczaZAkfWBnioQ5VfNzuump4Xw5VZii8mbsp+vnsQWUarVgQkMGbPteqwbxKaDwTWulQ0skcoKEpCH4542QqsvGBmWNYkLYoOGpAMC5qtnLx/cneFmehRoSmRl5NUcodSBZlc2Uq3xA+2MGXUPohmBGJw6FWZsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lKTtGtuJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 20FE4C433F1;
+	 In-Reply-To:To:Cc; b=J/6yUEljrP9mm8ECeYx0MjG/DI/nkAPAsTylvJbxvFtEDhba0UFXfDmthfxmHRsLS7uuRV6vCJ4Ce9CeedKkZ3/uyUR3+GxOKoh7+7O8/VtlwQHN09xLB24x30ftTbkayzHUShfJRVYG9RjShOK500z5bjlVNBV+A6bvAHB+HNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uQ0ZkX/P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2C49BC43394;
 	Fri,  8 Mar 2024 10:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709893231;
-	bh=MTUw0UQXC+QXB90Ymz9uX7gvoM/OTXgQGSnJEL2th8E=;
+	bh=YqlPywJD3XMNMCdoVOYKpvfNURY2E+g3zmeAf8v9w6c=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lKTtGtuJ42gTWuXo79bB4pIhwsdyUyE8Vmr6+8fns5SoIPDAVHizNVmyo4lBl/Xsm
-	 9/9ksvXtFq8Lc2doDm3fIA7VS5n9YRUxQBmlM7vOF3mV3qN1pUaW/bjccq6sqGpMbT
-	 bJT6nrnCSzjv3o14WjyxPj8KErHBEdAtdpKDdX023Ia2JSs+s/mm8Y8m9GyKpOL2LK
-	 d5q1AYLdd5wxATLtdoCWMSxC7KnQfAq31YYNt1hw6Ex0DZfwydJvD/IM+9lFeuvVcw
-	 K44Oelbb3NtBSdj9F0h2OzjV2pXHtH54RpBpIwpwU6WI2kruLbSY6ykKSlCOGXGV0X
-	 l2aelV6U0R4Kg==
+	b=uQ0ZkX/PKS2gNK1UG2EranIWLS0/DdWwqEbIoqD4pqbXEKc1dgJ5IDuwS9UCjnqMx
+	 miqxbiuk0kNWUE4hViS+Kk2B3wXY8QlP1wtWAgFk1B8u8YY4bQCblR7bfIBbz3Fh3Y
+	 0n6LRp3IA6+TEHHW6cq2NVt+HHOAFfl5lQHLPgpc7qI2wNbnNp3pR6kCwO7kZjDA4P
+	 yvvsQv+XfWQ3pAK1OXEekYkfu6hNJ4yT7zuv4DpxbgtycgtfqeD2Om7YGL/naZJ3NT
+	 nsrXD2nS9sFifj6rWuKdSOFGT73YSKh0HXt2hjDnJzvm/NHpWszP0ODb0YPgTmE6N3
+	 4AOkxZeS3YDJA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 05CE7C59A4C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 12758D84BDB;
 	Fri,  8 Mar 2024 10:20:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,39 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: ip_tunnel: make sure to pull inner header in
- ip_tunnel_rcv()
+Subject: Re: [net PATCH] octeontx2-af: Fix devlink params
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170989323101.6327.17930625965752277936.git-patchwork-notify@kernel.org>
+ <170989323107.6327.11751670957207804135.git-patchwork-notify@kernel.org>
 Date: Fri, 08 Mar 2024 10:20:31 +0000
-References: <20240307100716.1901381-1-edumazet@google.com>
-In-Reply-To: <20240307100716.1901381-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- dsahern@kernel.org, netdev@vger.kernel.org, eric.dumazet@gmail.com,
- syzkaller@googlegroups.com
+References: <20240307105623.474757-1-saikrishnag@marvell.com>
+In-Reply-To: <20240307105623.474757-1-saikrishnag@marvell.com>
+To: Sai Krishna Gajula <saikrishnag@marvell.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ sgoutham@marvell.com, lcherian@marvell.com, jerinj@marvell.com,
+ gakula@marvell.com, hkelam@marvell.com, sbhatta@marvell.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu,  7 Mar 2024 10:07:16 +0000 you wrote:
-> Apply the same fix than ones found in :
+On Thu, 7 Mar 2024 16:26:23 +0530 you wrote:
+> From: Sunil Goutham <sgoutham@marvell.com>
 > 
-> 8d975c15c0cd ("ip6_tunnel: make sure to pull inner header in __ip6_tnl_rcv()")
-> 1ca1ba465e55 ("geneve: make sure to pull inner header in geneve_rx()")
-> 
-> We have to save skb->network_header in a temporary variable
-> in order to be able to recompute the network_header pointer
-> after a pskb_inet_may_pull() call.
+> Devlink param for adjusting NPC MCAM high zone
+> area is in wrong param list and is not getting
+> activated on CN10KA silicon.
+> That patch fixes this issue.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: ip_tunnel: make sure to pull inner header in ip_tunnel_rcv()
-    https://git.kernel.org/netdev/net/c/b0ec2abf9826
+  - [net] octeontx2-af: Fix devlink params
+    https://git.kernel.org/netdev/net/c/fc1b2901e0fe
 
 You are awesome, thank you!
 -- 
