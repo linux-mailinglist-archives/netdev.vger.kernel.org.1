@@ -1,403 +1,920 @@
-Return-Path: <netdev+bounces-78726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F25D87645B
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 13:33:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 728A9876467
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 13:38:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05EFE2825EE
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:33:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8E831F22A00
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:38:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 642B163CF;
-	Fri,  8 Mar 2024 12:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87CCD14F98;
+	Fri,  8 Mar 2024 12:38:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="s/ch8c3j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ff1gm9Dp"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A99A817;
-	Fri,  8 Mar 2024 12:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45453FD4;
+	Fri,  8 Mar 2024 12:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709901220; cv=none; b=f++HJKTJL2zPpBR22r2nZRTh8titHZeWc4ARfejbr/nMXQ6lqEq5Y27P+n4auLfd5wWjk7csboMOTskBc/W/6gzCVg2inbtCo1qKGH5gbOUAd9Rh5iuq4otmQN7LuuyRiuHocTStQ/XiOf8LjK/HqEdvjDl003VB1dHw+3O3rkI=
+	t=1709901512; cv=none; b=X510cooT7nM+PCaIgXs7Ji6PD410P0AzjtW2Ti7ccjIgdeishEeypgZ5JDoG/Sth2Hv4Zv1Vg0LCU2kiB4nKYnE73FmnFRauTPYcuqZKRtO7TKrHtvHP+xfI1cxlszSZigfXlMOtHXdkuE5nH4oKaFsCzshCThaUoLmzhDdVmrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709901220; c=relaxed/simple;
-	bh=/ef0cTS38lWM5VQoqXtXY6cdKzYMyrYFXnzah2yRMu8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=rqsMQFMDwbrZxXaLqLdJNf1/4mo7vJ1cysxFhulNeX/GrRnYPiKM+F86bwdPTYyF0jT5zHmz7J/I25LCRt5IbmL5X+QNG+/DJqN6WSk4nD/Mcb1nSQyU42OGXZGmo0mtkfDL9i5LtReeCQitjqyKmZ0YzYIo+PHOvydd6blVnRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=s/ch8c3j; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=/ef0cTS38lWM5VQoqXtXY6cdKzYMyrYFXnzah2yRMu8=; b=s/ch8c3jYkMP02ZxB03PDKfhPw
-	Y8yR4+ryExRYPxoVdfZJWUGQVwgz8S/tbSWZNqmUQweMj1b+TxF7VDMczf9Iv92iOzJKGi1cXzg9i
-	jir0yINVvbSe2LgYGjWTs5uuy6tuyxICpSs+N0L/JW6nBt4w2sGh2nEmkJ+s2nd8/20L/7xSf17vz
-	03Div0Vd8CHiSSw48oJiEIYgOKqq/Z1vu/YYR4UW1DQ36K4RuoLGH6L00Pf7mEvufIM0G+zLCzTJh
-	UuY852jZE3RFsiqw/bBfNoujhGNx4nrxhBq/D+0hhvhitO1ATilCm3VI53DyPx3rbOKQRZSSYBWto
-	jBZ2q8ZA==;
-Received: from [2001:8b0:10b:5:c6ce:88bc:1e6a:da42] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1riZPd-0000000BUmL-3Odp;
-	Fri, 08 Mar 2024 12:33:24 +0000
-Message-ID: <667c8d944ce9ea5c570b82b1858a70cc67b2f3e4.camel@infradead.org>
-Subject: Re: [RFC PATCH v3 0/7] Add virtio_rtc module and related changes
-From: David Woodhouse <dwmw2@infradead.org>
-To: Peter Hilber <peter.hilber@opensynergy.com>,
- linux-kernel@vger.kernel.org,  virtualization@lists.linux.dev,
- virtio-dev@lists.oasis-open.org,  linux-arm-kernel@lists.infradead.org,
- linux-rtc@vger.kernel.org,  "virtio-comment@lists.oasis-open.org"
- <virtio-comment@lists.oasis-open.org>
-Cc: "Christopher S. Hall" <christopher.s.hall@intel.com>, Jason Wang
- <jasowang@redhat.com>, John Stultz <jstultz@google.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, Richard Cochran
- <richardcochran@gmail.com>, Stephen Boyd <sboyd@kernel.org>, Thomas
- Gleixner <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marc
- Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Daniel
- Lezcano <daniel.lezcano@linaro.org>, Alessandro Zummo
- <a.zummo@towertech.it>,  Alexandre Belloni <alexandre.belloni@bootlin.com>,
- "Ridoux, Julien" <ridouxj@amazon.com>
-Date: Fri, 08 Mar 2024 12:33:20 +0000
-In-Reply-To: <204c6339-e80d-4a98-8d07-a11eeb729497@opensynergy.com>
-References: <20231218073849.35294-1-peter.hilber@opensynergy.com>
-	 <0e21e3e2be26acd70b5575b9932b3a911c9fe721.camel@infradead.org>
-	 <204c6339-e80d-4a98-8d07-a11eeb729497@opensynergy.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-/Vg2r2b0Ohk48lHKnk9t"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1709901512; c=relaxed/simple;
+	bh=HSOdXPyL9FrKPvC80E57oiqcB9+Roc7ZUYMBUoCc6Co=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X4TOtnh+e0hB/qIsyiRxZQK00duucM/h8Rjds6lkBXGIjq4mgbHv+HUJdz58FztnrIFsaiQCo0q+mrS/z1TOl7mKmj/7LZ6hn7s01IZJnuqeiheGEIfhKyK3/C9eCDhV1MXjrxnLRNHUTtTme1IPAzrTZgDQoQHpYD2R+E3Gah0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ff1gm9Dp; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a45ecef71deso73723766b.2;
+        Fri, 08 Mar 2024 04:38:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709901508; x=1710506308; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ohVnEUh4D9mAq5jiJ48ejhs5oQ6S+LIDRY+0Ap4F1QU=;
+        b=Ff1gm9Dp/da1hnpw1RKKXorPTFb0hzHp6UygcyOPQ4kji06A5tMj8j8eRtcpbDfCD2
+         H+mkBzZkCwKq3nmvope3dmQUWxzEVRE2/HpqOLpkpXZa0Viy1g7NbEIKADnEz9D30ubv
+         wOecdNQa+7YA+kvbYBvu9gaTdJHuDZd8VaYrGOaDC56czsSlwXaE4JpOhCFxpOYytchD
+         ppjrbioicGB3Z7U803+8JCPNA+PgDFoK3NNIDvnwveLyWWUp0TbeYx/yCQObUOOT547j
+         VRwMTJp/nqu532WbJXrj5B1uB1JWQQp3TGOq/eRl4ecMZznF/vxJ9gnDMOosvUdS20nL
+         9MDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709901508; x=1710506308;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ohVnEUh4D9mAq5jiJ48ejhs5oQ6S+LIDRY+0Ap4F1QU=;
+        b=QVyLhaoLG0h6kJHKjie0iAky8e18p4tD21vaqSi1mDEeAnYOJNNHbyxqGcMBTNj5F1
+         8kzPpOuXwWW1gUvEo0iwNiKVuKUvuzP48BPrN/RqgJs3clEjG8aZk+xn7nQVf/k8RIHc
+         oDrk1M059j1xlL2IUQsGxM+QIYFfXwTOGL7G/Go3KD34OxyqN1AZQH2BLLTf9QP+xLap
+         jETsi0gsMquNnCf2GgZRXLOMgJicFqagxo/iubXEUwn9EJbTmwp/eSFRVOSbrphBqbLE
+         ZJL/lI+iUhl0EuuL4PbwAYOs/jdlDW6fkxo9u/irMtQNd531DnN6hEo2MZphgZT/DK+u
+         8p1g==
+X-Forwarded-Encrypted: i=1; AJvYcCVyfGg8GOG2VYLokjCo5LcDPpWTQWfLNOkaOGz5EtuURLhS370KCzMYvoy31UFLJish2WUuxaJIuGcQk2wO0FMhh1kFAcUG6Wt4Gz43
+X-Gm-Message-State: AOJu0Ywpwn9Jv+QwJ+5oqTpxCtoP5XmUSoK1iHrZmAuWGRQhz/XRHpAO
+	mU/CMDATjrGETK3iGCGftu1u9Dzv5HnQrwG27tcu5q6OL3rjq3a1
+X-Google-Smtp-Source: AGHT+IE4Of/SS7YIi2QBM6vtahCIkmWISI2BbOPorADw73ZHw1oOl8DMBMRJCDc6hQl6/YViRFrNPQ==
+X-Received: by 2002:a17:906:4c58:b0:a45:ad29:725c with SMTP id d24-20020a1709064c5800b00a45ad29725cmr6691407ejw.62.1709901507771;
+        Fri, 08 Mar 2024 04:38:27 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d207:f600::b2c])
+        by smtp.gmail.com with ESMTPSA id fi7-20020a170906da0700b00a44a859fd9dsm7972713ejb.174.2024.03.08.04.38.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Mar 2024 04:38:26 -0800 (PST)
+Date: Fri, 8 Mar 2024 14:38:24 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>,
+	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v6 07/16] net: dsa: vsc73xx: Add vlan filtering
+Message-ID: <20240308123824.kyenmgm4pouambus@skbuf>
+References: <20240301221641.159542-1-paweldembicki@gmail.com>
+ <20240301221641.159542-8-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240301221641.159542-8-paweldembicki@gmail.com>
 
+On Fri, Mar 01, 2024 at 11:16:29PM +0100, Pawel Dembicki wrote:
+> +static int
+> +vsc73xx_write_vlan_table_entry(struct vsc73xx *vsc, u16 vid, u8 portmap)
+> +{
+> +	int ret;
+> +
+> +	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_VLANTIDX, vid);
+> +
+> +	ret = vsc73xx_wait_for_vlan_table_cmd(vsc);
+> +	if (ret)
+> +		return ret;
+> +
+> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_VLANACCESS,
+> +			    VSC73XX_VLANACCESS_VLAN_TBL_CMD_MASK |
+> +			    VSC73XX_VLANACCESS_VLAN_SRC_CHECK |
+> +			    VSC73XX_VLANACCESS_VLAN_PORT_MASK,
+> +			    VSC73XX_VLANACCESS_VLAN_TBL_CMD_WRITE_ENTRY |
+> +			    VSC73XX_VLANACCESS_VLAN_SRC_CHECK |
+> +			    (portmap << VSC73XX_VLANACCESS_VLAN_PORT_MASK_SHIFT)
+> +			    );
 
---=-/Vg2r2b0Ohk48lHKnk9t
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Close the parenthesis on the previous line.
 
-On Fri, 2024-03-08 at 11:32 +0100, Peter Hilber wrote:
-> On 07.03.24 15:02, David Woodhouse wrote:
-> > On Mon, 2023-12-18 at 08:38 +0100, Peter Hilber wrote:
-> > > RFC v3 updates
-> > > --------------
-> > >=20
-> > > This series implements a driver for a virtio-rtc device conforming to=
- spec
-> > > RFC v3 [1]. It now includes an RTC class driver with alarm, in additi=
-on to
-> > > the PTP clock driver already present before.
-> > >=20
-> > > This patch series depends on the patch series "treewide: Use clocksou=
-rce id
-> > > for get_device_system_crosststamp()" [3]. Pull [4] to get the combine=
-d
-> > > series on top of mainline.
-> > >=20
-> > > Overview
-> > > --------
-> > >=20
-> > > This patch series adds the virtio_rtc module, and related bugfixes. T=
-he
-> > > virtio_rtc module implements a driver compatible with the proposed Vi=
-rtio
-> > > RTC device specification [1]. The Virtio RTC (Real Time Clock) device
-> > > provides information about current time. The device can provide diffe=
-rent
-> > > clocks, e.g. for the UTC or TAI time standards, or for physical time
-> > > elapsed since some past epoch.=20
-> >=20
-> > Hm, should we allow UTC? If you tell me the time in UTC, then
-> > (sometimes) I still don't actually know what the time is, because some
-> > UTC seconds occur twice. UTC only makes sense if you provide the TAI
-> > offset, surely? Should the virtio_rtc specification make it mandatory
-> > to provide such?
-> >=20
-> > Otherwise you're just designing it to allow crappy hypervisors to
-> > expose incomplete information.
-> >=20
->=20
-> Hi David,
->=20
-> (adding virtio-comment@lists.oasis-open.org=C2=A0for spec discussion),
->=20
-> thank you for your insightful comments. I think I take a broadly similar
-> view. The reason why the current spec and driver is like this is that I
-> took a pragmatic approach at first and only included features which work
-> out-of-the-box for the current Linux ecosystem.
->=20
-> The current virtio_rtc features work similar to ptp_kvm, and therefore ca=
-n
-> work out-of-the-box with time sync daemons such as chrony.
->=20
-> As of RFC spec v3, UTC clock only is allowed. If mandating a TAI clock as
-> well, I am afraid that
->=20
-> - in some (embedded) scenarios, the TAI clock may not be available
->=20
-> - crappy hypervisors will pass off the UTC clock as the TAI clock.
->=20
-> For the same reasons, I am also not sure about adding a *mandatory* TAI
-> offset to each readout. I don't know user-space software which would
-> leverage this already (at least not through the PTP clock interface). And
-> why would such software not go straight for the TAI clock instead?
->=20
-> How about adding a requirement to the spec that the virtio-rtc device
-> SHOULD expose the TAI clock whenever it is available - would this address
-> your concerns?
+> +
+> +	return vsc73xx_wait_for_vlan_table_cmd(vsc);
+> +}
+> +
+> +static int
+> +vsc73xx_update_vlan_table(struct vsc73xx *vsc, int port, u16 vid, bool set)
+> +{
+> +	u8 portmap;
+> +	int ret;
+> +
+> +	ret = vsc73xx_read_vlan_table_entry(vsc, vid, &portmap);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (set)
+> +		portmap |= BIT(port);
+> +	else
+> +		portmap &= ~BIT(port);
+> +
+> +	return vsc73xx_write_vlan_table_entry(vsc, vid, portmap);
+> +}
+> +
+>  static int vsc73xx_setup(struct dsa_switch *ds)
+>  {
+>  	struct vsc73xx *vsc = ds->priv;
+> @@ -598,7 +714,7 @@ static int vsc73xx_setup(struct dsa_switch *ds)
+>  		      VSC73XX_MACACCESS,
+>  		      VSC73XX_MACACCESS_CMD_CLEAR_TABLE);
+>  
+> -	/* Clear VLAN table */
+> +	/* Set VLAN table to default values */
+>  	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+>  		      VSC73XX_VLANACCESS,
+>  		      VSC73XX_VLANACCESS_VLAN_TBL_CMD_CLEAR_TABLE);
+> @@ -627,6 +743,9 @@ static int vsc73xx_setup(struct dsa_switch *ds)
+>  	vsc73xx_write(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_GMIIDELAY,
+>  		      VSC73XX_GMIIDELAY_GMII0_GTXDELAY_2_0_NS |
+>  		      VSC73XX_GMIIDELAY_GMII0_RXDELAY_2_0_NS);
+> +	/* Ingess VLAN reception mask (table 145) */
+> +	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_VLANMASK,
+> +		      0x5f);
 
-I think that would be too easy for implementors to miss, or decide not
-to obey. Or to get *wrong*, by exposing a TAI clock but actually
-putting UTC in it.
+It would have been nice for this to be expressed more symbolically than
+the magic number 0x5f. Also, is it correct for vsc7398 (8 ports)?
 
-I think I prefer to mandate the tai_offset field with the UTC clock.
-Crappy implementations will just set it to zero, but at least that
-gives a clear signal to the guests that it's *their* problem to
-resolve.
+>  	/* IP multicast flood mask (table 144) */
+>  	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_IFLODMSK,
+>  		      0xff);
+> @@ -639,6 +758,12 @@ static int vsc73xx_setup(struct dsa_switch *ds)
+>  
+>  	udelay(4);
+>  
+> +	/* Clear VLAN table */
+> +	for (i = 0; i < VLAN_N_VID; i++)
+> +		vsc73xx_write_vlan_table_entry(vsc, i, 0);
+> +
+> +	INIT_LIST_HEAD(&vsc->vlans);
+> +
+>  	return 0;
+>  }
+>  
+> @@ -1029,6 +1154,443 @@ static void vsc73xx_phylink_get_caps(struct dsa_switch *dsa, int port,
+>  	config->mac_capabilities = MAC_SYM_PAUSE | MAC_10 | MAC_100 | MAC_1000;
+>  }
+>  
+> +static void
+> +vsc73xx_set_vlan_conf(struct vsc73xx *vsc, int port,
+> +		      enum vsc73xx_port_vlan_conf port_vlan_conf)
+> +{
+> +	u32 val = 0;
+> +
+> +	if (port_vlan_conf == VSC73XX_VLAN_IGNORE)
+> +		val = VSC73XX_CAT_VLAN_MISC_VLAN_TCI_IGNORE_ENA |
+> +		      VSC73XX_CAT_VLAN_MISC_VLAN_KEEP_TAG_ENA;
+> +
+> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_CAT_VLAN_MISC,
+> +			    VSC73XX_CAT_VLAN_MISC_VLAN_TCI_IGNORE_ENA |
+> +			    VSC73XX_CAT_VLAN_MISC_VLAN_KEEP_TAG_ENA, val);
+> +
+> +	val = (port_vlan_conf == VSC73XX_VLAN_FILTER) ?
+> +	      VSC73XX_TXUPDCFG_TX_INSERT_TAG : 0;
+> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_TXUPDCFG,
+> +			    VSC73XX_TXUPDCFG_TX_INSERT_TAG, val);
+> +}
+> +
+> +static int
+> +vsc73xx_vlan_change_untagged(struct vsc73xx *vsc, int port, u16 vid, bool set,
+> +			     bool operate_on_storage)
+> +{
+> +	u32 val = 0;
+> +
+> +	if (operate_on_storage) {
+> +		vsc->untagged_storage[port] = set ? vid : VLAN_N_VID;
+> +		return 0;
+> +	}
+> +
+> +	if (set)
+> +		val = VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_ENA |
+> +		      ((vid << VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_SHIFT) &
+> +		       VSC73XX_TXUPDCFG_TX_UNTAGGED_VID);
+> +
+> +	return vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				   VSC73XX_TXUPDCFG,
+> +				   VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_ENA |
+> +				   VSC73XX_TXUPDCFG_TX_UNTAGGED_VID, val);
+> +}
+> +
+> +static int vsc73xx_vlan_change_pvid(struct vsc73xx *vsc, int port, u16 vid,
+> +				    bool set, bool operate_on_storage)
+> +{
+> +	int ret;
+> +	u32 val;
+> +
+> +	if (operate_on_storage) {
+> +		vsc->pvid_storage[port] = set ? vid : VLAN_N_VID;
+> +		return 0;
+> +	}
+> +
+> +	val = set ? 0 : VSC73XX_CAT_DROP_UNTAGGED_ENA;
+> +	vid = set ? vid : 0;
 
+Why overwrite "vid" to 0 if deleting the PVID? Does it even matter, since
+you're setting VSC73XX_CAT_DROP_UNTAGGED_ENA? Or is it just due to the
+weird calling convention, where "vid" does not even matter when set==false,
+but some callers pass weird values like VLAN_N_VID, and you want to
+avoid programming the HW with that? If so, see the more detailed
+suggestion below.
 
+> +
+> +	ret = vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				  VSC73XX_CAT_DROP,
+> +				  VSC73XX_CAT_DROP_UNTAGGED_ENA, val);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				   VSC73XX_CAT_PORT_VLAN,
+> +				   VSC73XX_CAT_PORT_VLAN_VLAN_VID,
+> +				   vid & VSC73XX_CAT_PORT_VLAN_VLAN_VID);
+> +}
+> +
+> +static bool vsc73xx_port_get_pvid(struct vsc73xx *vsc, int port, u16 *vid,
+> +				  bool operate_on_storage)
+> +{
+> +	u32 val;
+> +
+> +	if (operate_on_storage) {
+> +		if (vsc->pvid_storage[port] < VLAN_N_VID) {
+> +			*vid = vsc->pvid_storage[port];
+> +			return true;
+> +		}
+> +		return false;
+> +	}
+> +
+> +	vsc73xx_read(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_CAT_DROP, &val);
+> +	if (val & VSC73XX_CAT_DROP_UNTAGGED_ENA)
+> +		return false;
+> +
+> +	vsc73xx_read(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_CAT_PORT_VLAN, &val);
+> +	*vid = val & VSC73XX_CAT_PORT_VLAN_VLAN_VID;
+> +
+> +	return true;
+> +}
+> +
+> +static bool vsc73xx_tag_8021q_active(struct dsa_port *dp)
+> +{
+> +	return !dsa_port_is_vlan_filtering(dp);
+> +}
 
+This and vsc73xx_port_get_untagged() are a bit misplaced in terms of
+ordering. I guess you'd want the functions which handle the untagged
+VLAN to be grouped together, then the functions which handle the PVID,
+then the rest.
 
-> > > PTP clock interface
-> > > -------------------
-> > >=20
-> > > virtio_rtc exposes clocks as PTP clocks to userspace, similar to ptp_=
-kvm.
-> > > If both the Virtio RTC device and this driver have special support fo=
-r the
-> > > current clocksource, time synchronization programs can use
-> > > cross-timestamping using ioctl PTP_SYS_OFFSET_PRECISE2 aka
-> > > PTP_SYS_OFFSET_PRECISE. Similar to ptp_kvm, system time synchronizati=
-on
-> > > with single-digit ns precision is possible with a quiescent reference=
- clock
-> > > (from the Virtio RTC device). This works even when the Virtio device
-> > > response is slow compared to ptp_kvm hypercalls.
-> >=20
-> > Is PTP the right mechanism for this? As I understand it, PTP is a way
-> > to precisely synchronize one clock with another. But in the case of
-> > virt guests synchronizing against the host, it isn't really *another*
-> > clock. It really is the *same* underlying clock. As the host clock
-> > varies with temperature, for example, so does the guest clock. The only
-> > difference is an offset and (on x86 perhaps) a mathematical scaling of
-> > the frequency.
-> >=20
-> > I was looking at this another way, when I came across this virtio-rtc
-> > work.
-> >=20
-> > My idea was just for the hypervisor to expose its own timekeeping
-> > information =E2=80=94 the counter/TSC value and TAI time at a given mom=
-ent,
-> > frequency of the counter, and the precision of both that frequency
-> > (=C2=B1PPM) and the TAI timestamp (=C2=B1=C2=B5s).
-> >=20
-> > By putting that in a host/guest shared data structure with a seqcount
-> > for lockless updates, we can update it as time synchronization on the
-> > host is refined, and we can even cleanly handle live migration where
-> > the guest ends up on a completely different host. It allows for use
-> > cases which *really* care (e.g. timestamping financial transactions) to
-> > ensure that there is never even a moment of getting *wrong* timestamps
-> > if they haven't yet resynced after a migration.
->=20
-> I considered a similar approach as well, but integrating that with the
-> kernel timekeeping seemed too much effort for the first step. However,
-> reading the clock from user space would be much simpler.
+> +
+> +static bool vsc73xx_port_get_untagged(struct vsc73xx *vsc, int port, u16 *vid,
+> +				      bool operate_on_storage)
+> +{
+> +	u32 val;
+> +
+> +	if (operate_on_storage) {
+> +		if (vsc->untagged_storage[port] < VLAN_N_VID) {
+> +			*vid = vsc->untagged_storage[port];
+> +			return true;
+> +		}
+> +		return false;
+> +	}
+> +
+> +	vsc73xx_read(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_TXUPDCFG, &val);
+> +	if (!(val & VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_ENA))
+> +		return false;
+> +
+> +	*vid = (val & VSC73XX_TXUPDCFG_TX_UNTAGGED_VID) >>
+> +		VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_SHIFT;
+> +
+> +	return true;
+> +}
+> +
+> +static struct vsc73xx_bridge_vlan *
+> +vsc73xx_bridge_vlan_find(struct vsc73xx *vsc, u16 vid)
+> +{
+> +	struct vsc73xx_bridge_vlan *vlan;
+> +
+> +	list_for_each_entry(vlan, &vsc->vlans, list)
+> +		if (vlan->vid == vid)
+> +			return vlan;
+> +
+> +	return NULL;
+> +}
+> +
+> +static size_t
+> +vsc73xx_bridge_vlan_num_tagged(struct vsc73xx *vsc, int port, u16 ignored_vid)
+> +{
+> +	struct vsc73xx_bridge_vlan *vlan;
+> +	size_t num_tagged = 0;
+> +
+> +	list_for_each_entry(vlan, &vsc->vlans, list)
+> +		if ((vlan->portmask & BIT(port)) &&
+> +		    !(vlan->untagged & BIT(port)) &&
+> +		    vlan->vid != ignored_vid)
+> +			num_tagged++;
+> +
+> +	return num_tagged;
+> +}
+> +
+> +static size_t
+> +vsc73xx_bridge_vlan_num_untagged(struct vsc73xx *vsc, int port, u16 ignored_vid)
+> +{
+> +	struct vsc73xx_bridge_vlan *vlan;
+> +	size_t num_untagged = 0;
+> +
+> +	list_for_each_entry(vlan, &vsc->vlans, list)
+> +		if ((vlan->portmask & BIT(port)) &&
+> +		    (vlan->untagged & BIT(port)) &&
+> +		    vlan->vid != ignored_vid)
+> +			num_untagged++;
+> +
+> +	return num_untagged;
+> +}
+> +
+> +static u16 vsc73xx_find_first_vlan_untagged(struct vsc73xx *vsc, int port)
+> +{
+> +	struct vsc73xx_bridge_vlan *vlan;
+> +
+> +	list_for_each_entry(vlan, &vsc->vlans, list)
+> +		if ((vlan->portmask & BIT(port)) &&
+> +		    (vlan->untagged & BIT(port)))
+> +			return vlan->vid;
+> +
+> +	return VLAN_N_VID;
+> +}
+> +
+> +static int
+> +vsc73xx_port_vlan_filtering(struct dsa_switch *ds, int port,
+> +			    bool vlan_filtering, struct netlink_ext_ack *extack)
+> +{
+> +	enum vsc73xx_port_vlan_conf port_vlan_conf = VSC73XX_VLAN_IGNORE;
+> +	struct vsc73xx *vsc = ds->priv;
+> +	bool store_untagged = false;
+> +	bool store_pvid = false;
+> +	u16 vid, vlan_untagged;
+> +
+> +	/* The swap processed below is required because vsc73xx is using
+> +	 * tag_8021q. When vlan_filtering is disabled, tag_8021q uses
+> +	 * pvid/untagged vlans for port recognition. The values configured for
+> +	 * vlans < 3072 are stored in storage table. When vlan_filtering is
+> +	 * enabled, we need to restore pvid/untagged from storage and keep
+> +	 * values used for tag_8021q.
+> +	 */
+> +	if (vlan_filtering) {
+> +		/* Use VLAN_N_VID to count all vlans */
+> +		size_t num_untagged =
+> +			vsc73xx_bridge_vlan_num_untagged(vsc, port, VLAN_N_VID);
+> +
+> +		port_vlan_conf = (num_untagged > 1) ?
+> +				 VSC73XX_VLAN_FILTER_UNTAG_ALL :
+> +				 VSC73XX_VLAN_FILTER;
+> +
+> +		vlan_untagged = vsc73xx_find_first_vlan_untagged(vsc, port);
+> +		if (vlan_untagged < VLAN_N_VID) {
+> +			store_untagged  = vsc73xx_port_get_untagged(vsc, port,
 
-Right. In fact my *first* use case was userspace, specifically in the
-context of https://github.com/aws/clock-bound =E2=80=94 but anything we des=
-ign
-for this absolutely has to be usable for kernel timekeeping too.
+A single space before =.
 
-It's also critical to solve the Live Migration problem.
+> +								    &vid,
+> +								    false);
+> +			vsc73xx_vlan_change_untagged(vsc, port, vlan_untagged,
+> +						     true, false);
+> +			vsc->untagged_storage[port] = store_untagged ?
+> +						      vid : VLAN_N_VID;
+> +		}
+> +	} else {
+> +		vsc73xx_vlan_change_untagged(vsc, port,
+> +					     vsc->untagged_storage[port],
+> +					     vsc->untagged_storage[port] <
+> +					     VLAN_N_VID, false);
+> +	}
+> +
+> +	vsc73xx_set_vlan_conf(vsc, port, port_vlan_conf);
+> +
+> +	store_pvid = vsc73xx_port_get_pvid(vsc, port, &vid, false);
+> +	vsc73xx_vlan_change_pvid(vsc, port, vsc->pvid_storage[port],
+> +				 vsc->pvid_storage[port] < VLAN_N_VID, false);
+> +	vsc->pvid_storage[port] = store_pvid ? vid : VLAN_N_VID;
+> +
+> +	return 0;
+> +}
+> +
+> +static int vsc73xx_port_vlan_add(struct dsa_switch *ds, int port,
+> +				 const struct switchdev_obj_port_vlan *vlan,
+> +				 struct netlink_ext_ack *extack)
+> +{
+> +	bool untagged = vlan->flags & BRIDGE_VLAN_INFO_UNTAGGED;
+> +	bool pvid = vlan->flags & BRIDGE_VLAN_INFO_PVID;
+> +	struct dsa_port *dp = dsa_to_port(ds, port);
+> +	struct vsc73xx_bridge_vlan *vsc73xx_vlan;
+> +	size_t num_tagged, num_untagged;
+> +	struct vsc73xx *vsc = ds->priv;
+> +	int ret;
+> +	u16 vid;
+> +
+> +	/* Be sure to deny alterations to the configuration done by tag_8021q.
+> +	 */
+> +	if (vid_is_dsa_8021q(vlan->vid)) {
+> +		NL_SET_ERR_MSG_MOD(extack,
+> +				   "Range 3072-4095 reserved for dsa_8021q operation");
+> +		return -EBUSY;
+> +	}
+> +
+> +	/* The processed vlan->vid is excluded from the search because the VLAN
+> +	 * can be re-added with a different set of flags, so it's easiest to
+> +	 * ignore its old flags from the VLAN database software copy.
+> +	 */
+> +	num_tagged = vsc73xx_bridge_vlan_num_tagged(vsc, port, vlan->vid);
+> +	num_untagged = vsc73xx_bridge_vlan_num_untagged(vsc, port, vlan->vid);
+> +
+> +	/* VSC73XX allow only three untagged states: none, one or all */
+> +	if ((untagged && num_tagged > 0 && num_untagged > 0) ||
+> +	    (!untagged && num_untagged > 1)) {
+> +		NL_SET_ERR_MSG_MOD(extack,
+> +				   "Port can have only none, one or all untagged vlan");
+> +		return -EBUSY;
+> +	}
+> +
+> +	vsc73xx_vlan = vsc73xx_bridge_vlan_find(vsc, vlan->vid);
+> +
+> +	if (!vsc73xx_vlan) {
+> +		vsc73xx_vlan = kzalloc(sizeof(*vsc73xx_vlan), GFP_KERNEL);
+> +		if (!vsc73xx_vlan)
+> +			return -ENOMEM;
+> +
+> +		vsc73xx_vlan->vid = vlan->vid;
+> +		vsc73xx_vlan->portmask = BIT(port);
+> +		vsc73xx_vlan->untagged = untagged ? BIT(port) : 0;
+> +
+> +		INIT_LIST_HEAD(&vsc73xx_vlan->list);
+> +		list_add_tail(&vsc73xx_vlan->list, &vsc->vlans);
+> +	} else {
+> +		vsc73xx_vlan->portmask |= BIT(port);
+> +
+> +		if (untagged)
+> +			vsc73xx_vlan->untagged |= BIT(port);
+> +		else
+> +			vsc73xx_vlan->untagged &= ~BIT(port);
+> +	}
+> +
+> +	/* CPU port must be always tagged because port separation is based on
+> +	 * tag_8021q.
+> +	 */
+> +	if (port != CPU_PORT) {
+> +		bool operate_on_storage = vsc73xx_tag_8021q_active(dp);
+> +
+> +		if (!operate_on_storage) {
+> +			enum vsc73xx_port_vlan_conf port_vlan_conf =
+> +							VSC73XX_VLAN_FILTER;
+> +
+> +			if (num_tagged == 0 && untagged)
+> +				port_vlan_conf = VSC73XX_VLAN_FILTER_UNTAG_ALL;
+> +			vsc73xx_set_vlan_conf(vsc, port, port_vlan_conf);
+> +
+> +			if (port_vlan_conf == VSC73XX_VLAN_FILTER) {
+> +				if (untagged) {
+> +					ret = vsc73xx_vlan_change_untagged(vsc,
+> +									   port,
+> +									   vlan->vid,
+> +									   true,
+> +									   false);
+> +					if (ret)
+> +						goto err;
+> +				} else if (num_untagged == 1) {
+> +					vid = vsc73xx_find_first_vlan_untagged(vsc,
+> +									       port);
+> +					ret = vsc73xx_vlan_change_untagged(vsc,
+> +									   port,
+> +									   vid,
+> +									   true,
+> +									   false);
+> +					if (ret)
+> +						goto err;
+> +				}
+> +			}
+> +		}
+> +
+> +		if (pvid) {
+> +			ret = vsc73xx_vlan_change_pvid(vsc, port, vlan->vid,
+> +						       true,
+> +						       operate_on_storage);
+> +			if (ret)
+> +				goto err;
+> +		} else if (vsc73xx_port_get_pvid(vsc, port, &vid, false) &&
+> +			   vid == vlan->vid) {
+> +			vsc73xx_vlan_change_pvid(vsc, port, 0, false, false);
+> +		} else if (vsc->pvid_storage[port] == vlan->vid) {
+> +			vsc73xx_vlan_change_pvid(vsc, port, 0, false, true);
+> +		}
+> +	}
+> +
+> +	ret = vsc73xx_update_vlan_table(vsc, port, vlan->vid, true);
+> +	if (!ret)
+> +		return 0;
+> +err:
+> +	list_del(&vsc73xx_vlan->list);
+> +	kfree(vsc73xx_vlan);
+> +	return ret;
+> +}
+> +
+> +static int vsc73xx_port_vlan_del(struct dsa_switch *ds, int port,
+> +				 const struct switchdev_obj_port_vlan *vlan)
+> +{
+> +	struct vsc73xx_bridge_vlan *vsc73xx_vlan;
+> +	size_t num_tagged, num_untagged;
+> +	struct vsc73xx *vsc = ds->priv;
+> +	bool operate_on_storage;
+> +	int ret;
+> +	u16 vid;
+> +
+> +	num_tagged = vsc73xx_bridge_vlan_num_tagged(vsc, port, vlan->vid);
+> +	num_untagged = vsc73xx_bridge_vlan_num_untagged(vsc, port, vlan->vid);
+> +
+> +	ret = vsc73xx_update_vlan_table(vsc, port, vlan->vid, false);
+> +	if (ret)
+> +		return ret;
+> +
+> +	operate_on_storage = vsc73xx_tag_8021q_active(dsa_to_port(ds, port));
+> +
+> +	if (!operate_on_storage) {
+> +		enum vsc73xx_port_vlan_conf port_vlan_conf =
+> +							VSC73XX_VLAN_FILTER;
+> +
+> +		if (num_tagged == 0)
+> +			port_vlan_conf = VSC73XX_VLAN_FILTER_UNTAG_ALL;
+> +		vsc73xx_set_vlan_conf(vsc, port, port_vlan_conf);
+> +
+> +		if (num_untagged <= 1) {
+> +			vid = vsc73xx_find_first_vlan_untagged(vsc, port);
+> +			vsc73xx_vlan_change_untagged(vsc, port, vid,
+> +						     num_untagged, false);
+> +		}
+> +	} else if (vsc->untagged_storage[port] == vlan->vid) {
+> +		vsc73xx_vlan_change_untagged(vsc, port, 0, false, true);
 
-But is it so hard to integrate into the kernel timekeeping? My plan
-would have given us effectively an infinite number of cross-reads of
-the realtime clock vs. TSC. You don't have to actually read from a
-virtio device; you just read the TSC and do the maths, using the values
-in the shared memory region. Couldn't that be used to present a PTP
-device to the guest kernel just the same as you do at the moment?
+The fact that the "vid" argument (here 0) is ignored when "set" is false
+makes the calling convention confusing, and thus the caller itself.
 
-You could probably even simulate PPS with it. Typically with PPS we
-have to catch the hardware interrupt and then read the TSC as soon as
-possible thereafter. With this, you'd be able to *calculate* the TSC
-value at the start of the next second, and wouldn't have to suffer the
-real hardware latency :)
+I would have probably written 2 wrappers on top of
+vsc73xx_vlan_change_untagged() as follows:
+	- vsc73xx_vlan_set_untagged(), which eliminates the "set"
+	  argument from callers (implicitly true)
+	- vsc73xx_vlan_del_untagged(), which eliminates the "set"
+	  argument (implicitly false) and the "vid" argument (unused)
 
-> >=20
-> > Now I'm trying to work out if I should attempt to reconcile with your
-> > existing virtio-rtc work, or just decide that virtio-rtc isn't trying
-> > to solve the actual problem that we have, and go ahead with something
-> > different... ?
-> >=20
->=20
-> We are certainly interested into the discussed, say, "virtual timekeeper"
-> mechanism, which would also solve a lot of problems for us (especially if
-> it would be integrated with kernel timekeeping). Even without Linux kerne=
-l
-> timekeeping, the virtual timekeeper would be useful to us for guests with
-> simpler timekeeping, and potentially for user space applications.
->=20
-> Our current intent is to at first try to upstream the current (RFC spec v=
-3)
-> feature set. I think the virtual timekeeper would be suitable as an
-> optional feature of virtio_rtc (with Virtio, this could easily be added
-> after initial upstreaming). It is also possible to have a virtio-rtc devi=
-ce
-> only implement the virtual timekeeper, but not the other clock reading
-> methods, if these are of no interest.
+Same for vsc73xx_vlan_change_pvid().
 
-Yeah, that might make sense. I was thinking of a simple ACPI/DT device
-exposing a page of memory and *maybe* an interrupt for when an update
-happens. (With the caveat that the interrupt would always occur too
-late by definition, so it's no substitute for using the seqlock
-correctly in applications that *really* care and are going to get fined
-millions of dollars for mis-timestamping their transactions.)
+This will force you to eliminate the complex expressions given to the
+"set" argument, like "vsc->untagged_storage[port] < VLAN_N_VID", and
+transform them into "if (vsc->untagged_storage[port] < VLAN_N_VID) set() else del()",
+which is probably a good thing in terms of readability.
 
-But using the virtio-rtc device as the vehicle for that shared memory
-page is reasonable too. It's not even mutually exclusive; we could
-expose the *same* data structure in memory via whatever mechanisms we
-wanted.
+Something like this:
 
-One other thing to note is I think we're being very na=C3=AFve about the TS=
-C
-on x86 hosts. Theoretically, the TSC for every vCPU might run at a
-different frequency, and even if they run at the same frequency they
-might be offset from each other. I'm happy to be na=C3=AFve but I think we
-should be *explicitly* so, and just say for example that it's defined
-against vCPU0 so if other vCPUs are different then all bets are off.=20
+diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
+index 05dbeec8eb63..464d74c891d7 100644
+--- a/drivers/net/dsa/vitesse-vsc73xx-core.c
++++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
+@@ -1205,6 +1205,20 @@ vsc73xx_vlan_change_untagged(struct vsc73xx *vsc, int port, u16 vid, bool set,
+ 				   VSC73XX_TXUPDCFG_TX_UNTAGGED_VID, val);
+ }
+ 
++static int vsc73xx_vlan_set_untagged(struct vsc73xx *vsc, int port, u16 vid,
++				     bool operate_on_storage)
++{
++	return vsc73xx_vlan_change_untagged(vsc, port, vid, true,
++					    operate_on_storage);
++}
++
++static int vsc73xx_vlan_del_untagged(struct vsc73xx *vsc, int port,
++				     bool operate_on_storage)
++{
++	return vsc73xx_vlan_change_untagged(vsc, port, 0, false,
++					    operate_on_storage);
++}
++
+ static int vsc73xx_vlan_change_pvid(struct vsc73xx *vsc, int port, u16 vid,
+ 				    bool set, bool operate_on_storage)
+ {
+@@ -1231,6 +1245,20 @@ static int vsc73xx_vlan_change_pvid(struct vsc73xx *vsc, int port, u16 vid,
+ 				   vid & VSC73XX_CAT_PORT_VLAN_VLAN_VID);
+ }
+ 
++static int vsc73xx_vlan_set_pvid(struct vsc73xx *vsc, int port, u16 vid,
++				 bool operate_on_storage)
++{
++	return vsc73xx_vlan_change_pvid(vsc, port, vid, true,
++					operate_on_storage);
++}
++
++static int vsc73xx_vlan_del_pvid(struct vsc73xx *vsc, int port,
++				 bool operate_on_storage)
++{
++	return vsc73xx_vlan_change_pvid(vsc, port, 0, false,
++					operate_on_storage);
++}
++
+ static bool vsc73xx_port_get_pvid(struct vsc73xx *vsc, int port, u16 *vid,
+ 				  bool operate_on_storage)
+ {
+@@ -1367,23 +1395,25 @@ vsc73xx_port_vlan_filtering(struct dsa_switch *ds, int port,
+ 			store_untagged  = vsc73xx_port_get_untagged(vsc, port,
+ 								    &vid,
+ 								    false);
+-			vsc73xx_vlan_change_untagged(vsc, port, vlan_untagged,
+-						     true, false);
++			vsc73xx_vlan_set_untagged(vsc, port, vlan_untagged,
++						  false);
+ 			vsc->untagged_storage[port] = store_untagged ?
+ 						      vid : VLAN_N_VID;
+ 		}
++	} else if (vsc->untagged_storage[port] < VLAN_N_VID) {
++		vsc73xx_vlan_set_untagged(vsc, port, vsc->untagged_storage[port],
++					  false);
+ 	} else {
+-		vsc73xx_vlan_change_untagged(vsc, port,
+-					     vsc->untagged_storage[port],
+-					     vsc->untagged_storage[port] <
+-					     VLAN_N_VID, false);
++		vsc73xx_vlan_del_untagged(vsc, port, false);
+ 	}
+ 
+ 	vsc73xx_set_vlan_conf(vsc, port, port_vlan_conf);
+ 
+ 	store_pvid = vsc73xx_port_get_pvid(vsc, port, &vid, false);
+-	vsc73xx_vlan_change_pvid(vsc, port, vsc->pvid_storage[port],
+-				 vsc->pvid_storage[port] < VLAN_N_VID, false);
++	if (vsc->pvid_storage[port] < VLAN_N_VID)
++		vsc73xx_vlan_set_pvid(vsc, port, vsc->pvid_storage[port], false);
++	else
++		vsc73xx_vlan_del_pvid(vsc, port, false);
+ 	vsc->pvid_storage[port] = store_pvid ? vid : VLAN_N_VID;
+ 
+ 	return 0;
+@@ -1463,21 +1493,16 @@ static int vsc73xx_port_vlan_add(struct dsa_switch *ds, int port,
+ 
+ 			if (port_vlan_conf == VSC73XX_VLAN_FILTER) {
+ 				if (untagged) {
+-					ret = vsc73xx_vlan_change_untagged(vsc,
+-									   port,
+-									   vlan->vid,
+-									   true,
+-									   false);
++					ret = vsc73xx_vlan_set_untagged(vsc, port,
++									vlan->vid,
++									false);
+ 					if (ret)
+ 						goto err;
+ 				} else if (num_untagged == 1) {
+ 					vid = vsc73xx_find_first_vlan_untagged(vsc,
+ 									       port);
+-					ret = vsc73xx_vlan_change_untagged(vsc,
+-									   port,
+-									   vid,
+-									   true,
+-									   false);
++					ret = vsc73xx_vlan_set_untagged(vsc, port,
++									vid, false);
+ 					if (ret)
+ 						goto err;
+ 				}
+@@ -1485,16 +1510,15 @@ static int vsc73xx_port_vlan_add(struct dsa_switch *ds, int port,
+ 		}
+ 
+ 		if (pvid) {
+-			ret = vsc73xx_vlan_change_pvid(vsc, port, vlan->vid,
+-						       true,
+-						       operate_on_storage);
++			ret = vsc73xx_vlan_set_pvid(vsc, port, vlan->vid,
++						    operate_on_storage);
+ 			if (ret)
+ 				goto err;
+ 		} else if (vsc73xx_port_get_pvid(vsc, port, &vid, false) &&
+ 			   vid == vlan->vid) {
+-			vsc73xx_vlan_change_pvid(vsc, port, 0, false, false);
++			vsc73xx_vlan_del_pvid(vsc, port, false);
+ 		} else if (vsc->pvid_storage[port] == vlan->vid) {
+-			vsc73xx_vlan_change_pvid(vsc, port, 0, false, true);
++			vsc73xx_vlan_del_pvid(vsc, port, true);
+ 		}
+ 	}
+ 
+@@ -1534,19 +1558,20 @@ static int vsc73xx_port_vlan_del(struct dsa_switch *ds, int port,
+ 			port_vlan_conf = VSC73XX_VLAN_FILTER_UNTAG_ALL;
+ 		vsc73xx_set_vlan_conf(vsc, port, port_vlan_conf);
+ 
+-		if (num_untagged <= 1) {
++		if (num_untagged == 1) {
+ 			vid = vsc73xx_find_first_vlan_untagged(vsc, port);
+-			vsc73xx_vlan_change_untagged(vsc, port, vid,
+-						     num_untagged, false);
++			vsc73xx_vlan_set_untagged(vsc, port, vid, false);
++		} else if (num_untagged == 0) {
++			vsc73xx_vlan_del_untagged(vsc, port, false);
+ 		}
+ 	} else if (vsc->untagged_storage[port] == vlan->vid) {
+-		vsc73xx_vlan_change_untagged(vsc, port, 0, false, true);
++		vsc73xx_vlan_del_untagged(vsc, port, true);
+ 	}
+ 
+ 	if (vsc73xx_port_get_pvid(vsc, port, &vid, false) && vid == vlan->vid)
+-		vsc73xx_vlan_change_pvid(vsc, port, 0, false, false);
++		vsc73xx_vlan_del_pvid(vsc, port, false);
+ 	else if (vsc->pvid_storage[port] == vlan->vid)
+-		vsc73xx_vlan_change_pvid(vsc, port, 0, false, true);
++		vsc73xx_vlan_del_pvid(vsc, port, true);
+ 
+ 	vsc73xx_vlan = vsc73xx_bridge_vlan_find(vsc, vlan->vid);
+ 
+@@ -1574,11 +1599,9 @@ static int vsc73xx_tag_8021q_vlan_add(struct dsa_switch *ds, int port, u16 vid,
+ 	operate_on_storage = !vsc73xx_tag_8021q_active(dsa_to_port(ds, port));
+ 
+ 	if (untagged)
+-		vsc73xx_vlan_change_untagged(vsc, port, vid, true,
+-					     operate_on_storage);
++		vsc73xx_vlan_set_untagged(vsc, port, vid, operate_on_storage);
+ 	if (pvid)
+-		vsc73xx_vlan_change_pvid(vsc, port, vid, true,
+-					 operate_on_storage);
++		vsc73xx_vlan_set_pvid(vsc, port, vid, operate_on_storage);
+ 
+ 	return vsc73xx_update_vlan_table(vsc, port, vid, true);
+ }
 
-We *can* cope with TSC frequencies changing. Fundamentally, that's the
-whole *point*; NTP calibrates itself as the underlying frequency does
-change due to temperature changes, etc. =E2=80=94 so a deliberate frequency
-scaling, or even a live migration, are just a slightly special case of
-the same thing.
+> +	}
+> +
+> +	if (vsc73xx_port_get_pvid(vsc, port, &vid, false) && vid == vlan->vid)
+> +		vsc73xx_vlan_change_pvid(vsc, port, 0, false, false);
+> +	else if (vsc->pvid_storage[port] == vlan->vid)
+> +		vsc73xx_vlan_change_pvid(vsc, port, 0, false, true);
+> +
+> +	vsc73xx_vlan = vsc73xx_bridge_vlan_find(vsc, vlan->vid);
+> +
+> +	if (vsc73xx_vlan) {
+> +		vsc73xx_vlan->portmask &= ~BIT(port);
+> +
+> +		if (vsc73xx_vlan->portmask)
+> +			return 0;
+> +
+> +		list_del(&vsc73xx_vlan->list);
+> +		kfree(vsc73xx_vlan);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int vsc73xx_port_setup(struct dsa_switch *ds, int port)
+> +{
+> +	struct vsc73xx *vsc = ds->priv;
+> +
+> +	/* Those bits are responsible for MTU only. Kernel take care about MTU,
 
-One thing I have added to the memory region is a migration counter. In
-the ideal case, guests will be happy just to use the hypervisor's
-synchronization. But in some cases the guests may want to do NTP (or
-PPS, PTP or something else) for themselves, to have more precise
-timekeeping than the host. Even if the host is advertising itself as
-stratum 16, the guest still needs to know of *migration*, because it
-has to consider itself unsynchronized when that happens.
+takes care
 
---=-/Vg2r2b0Ohk48lHKnk9t
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+> +	 * let's enable +8 bytes frame length unconditionally.
+> +	 */
+> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_MAC_CFG,
+> +			    VSC73XX_MAC_CFG_VLAN_AWR |
+> +			    VSC73XX_MAC_CFG_VLAN_DBLAWR,
+> +			    VSC73XX_MAC_CFG_VLAN_AWR |
+> +			    VSC73XX_MAC_CFG_VLAN_DBLAWR);
+> +
+> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_CAT_DROP,
+> +			    VSC73XX_CAT_DROP_TAGGED_ENA |
+> +			    VSC73XX_CAT_DROP_UNTAGGED_ENA,
+> +			    VSC73XX_CAT_DROP_UNTAGGED_ENA);
+> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_TXUPDCFG,
+> +			    VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_ENA |
+> +			    VSC73XX_TXUPDCFG_TX_UNTAGGED_VID, 0);
+> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_CAT_PORT_VLAN,
+> +			    VSC73XX_CAT_PORT_VLAN_VLAN_VID, 0);
+> +
+> +	if (port == CPU_PORT)
+> +		vsc73xx_set_vlan_conf(vsc, port, VSC73XX_VLAN_FILTER);
+> +	else
+> +		vsc73xx_set_vlan_conf(vsc, port, VSC73XX_VLAN_IGNORE);
+> +
+> +	/* Initially, there is no backup VLAN configuration to keep track of, so
+> +	 * configure the storage values out of range
+> +	 */
+> +	vsc->pvid_storage[port] = VLAN_N_VID;
+> +	vsc->untagged_storage[port] = VLAN_N_VID;
+> +
+> +	return 0;
+> +}
+> +
+>  static void vsc73xx_refresh_fwd_map(struct dsa_switch *ds, int port, u8 state)
+>  {
+>  	struct dsa_port *other_dp, *dp = dsa_to_port(ds, port);
+> @@ -1123,11 +1685,15 @@ static const struct dsa_switch_ops vsc73xx_ds_ops = {
+>  	.get_strings = vsc73xx_get_strings,
+>  	.get_ethtool_stats = vsc73xx_get_ethtool_stats,
+>  	.get_sset_count = vsc73xx_get_sset_count,
+> +	.port_setup = vsc73xx_port_setup,
+>  	.port_enable = vsc73xx_port_enable,
+>  	.port_disable = vsc73xx_port_disable,
+>  	.port_change_mtu = vsc73xx_change_mtu,
+>  	.port_max_mtu = vsc73xx_get_max_mtu,
+>  	.port_stp_state_set = vsc73xx_port_stp_state_set,
+> +	.port_vlan_filtering = vsc73xx_port_vlan_filtering,
+> +	.port_vlan_add = vsc73xx_port_vlan_add,
+> +	.port_vlan_del = vsc73xx_port_vlan_del,
+>  	.phylink_get_caps = vsc73xx_phylink_get_caps,
+>  };
+>  
+> diff --git a/drivers/net/dsa/vitesse-vsc73xx.h b/drivers/net/dsa/vitesse-vsc73xx.h
+> index e7b08599a625..facc50f1e320 100644
+> --- a/drivers/net/dsa/vitesse-vsc73xx.h
+> +++ b/drivers/net/dsa/vitesse-vsc73xx.h
+> @@ -25,6 +25,17 @@
+>   * @addr: MAC address used in flow control frames
+>   * @ops: Structure with hardware-dependent operations
+>   * @priv: Pointer to the configuration interface structure
+> + * @pvid_storage: Storage table with PVID configured for other state of
+> + *	vlan_filtering. It has two alternating roles: it stores the PVID when
+> + *	configured by the bridge but VLAN filtering is off, and it stores the
+> + *	PVID necessary for tag_8021q operation when bridge VLAN filtering is
+> + *	enabled.
+> + * @untagged_storage: Storage table with eggres untagged VLAN configured for
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMzA4MTIzMzIwWjAvBgkqhkiG9w0BCQQxIgQgOjhIHSWt
-p6n12nI5wmjr3lWoHazfLZdKSSSPllwUE3swgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBUPw4kBnN8L/YheIEdRUae8eNlT+npnOF8
-3EWIR1YJkT3eY0lPNED4/IR+T4yjwfOZUrboJ3UFmC7JRLMQ6TQVXLE7lqlXL14y0fN9M+utOSrZ
-OOh2uMbqccaBghFWceCKD/cBwPAbCDUDXSNgXxA+peDrSdAu7QM4XFshvyWLa1hwOWfQrauzTNre
-Y2x0KrWydOL/7ghYvdUk+Tnz+XLUityzrkve3uOEYt09i9x6mwqfcXE+V5kgEVhGI6Iw8bAeNoXp
-YavaIcmijjtEo62867BcvjLYqH4T0EvNxyAb7MzOmBm6piKzBBM90AVsK+z15tdG3sVJ+8gjwjSa
-q2ZReiWN3ZP3xEHlMNx9JnX4+So4Yatm+mmc14S7CGKv1bMOsuBE7NfdRGSNMYlcWAN5P72nNr12
-GG+TMwTA363HOyDON3NY6vK/CMtjfTfUX8LNhsgOa/f9BAKGBTTBcvPiSu50kpPJkw3cvLJaDo95
-LDwcpHmlefMKdV0KkR4jYXHNj6HQLMQDlKMULS3L9zz58+ns6vXn6TWjST9XbLt9dCOOhY9TsNkE
-yCP0qxjrzowmdzO4jCKXnzJpmIZIDIzi+3wf9KJIKwG5GCq9GI9/u2PFHz0EMlK3xcYjUgUyvfzm
-L6EddjFPzfBdiAvuF5Padruy9IdhRVnd1niYBpZ3BQAAAAAAAA==
+egress
 
+> + *	other state of vlan_filtering.Keep VID necessary for tag8021q operations
 
---=-/Vg2r2b0Ohk48lHKnk9t--
+Space between "vlan_filtering." and "Keep".
+tag_8021q
+
+> + *	when vlan filtering is enabled.
+> + * @vlans: List of configured vlans. Contains port mask and untagged status of
+> + *	every vlan configured in port vlan operation. It doesn't cover tag_8021q
+> + *	vlans.
+>   */
+>  struct vsc73xx {
+>  	struct device			*dev;
+> @@ -35,6 +46,9 @@ struct vsc73xx {
+>  	u8				addr[ETH_ALEN];
+>  	const struct vsc73xx_ops	*ops;
+>  	void				*priv;
+> +	u16				pvid_storage[VSC73XX_MAX_NUM_PORTS];
+> +	u16				untagged_storage[VSC73XX_MAX_NUM_PORTS];
+> +	struct list_head		vlans;
+>  };
+>  
+>  /**
+> @@ -49,6 +63,21 @@ struct vsc73xx_ops {
+>  		     u32 val);
+>  };
+>  
+> +/**
+> + * struct vsc73xx_bridge_vlan - VSC73xx driver structure which keeps vlan
+> + *	database copy
+> + * @vid: VLAN number
+> + * @portmask: each bit represends one port
+
+represents
+
+> + * @untagged: each bit represends one port configured with @vid untagged
+
+represents
+
+> + * @list: list structure
+> + */
+> +struct vsc73xx_bridge_vlan {
+> +	u16 vid;
+> +	u8 portmask;
+> +	u8 untagged;
+> +	struct list_head list;
+> +};
+> +
+>  int vsc73xx_is_addr_valid(u8 block, u8 subblock);
+>  int vsc73xx_probe(struct vsc73xx *vsc);
+>  void vsc73xx_remove(struct vsc73xx *vsc);
+> -- 
+> 2.34.1
+> 
 
