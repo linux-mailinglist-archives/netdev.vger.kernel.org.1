@@ -1,299 +1,227 @@
-Return-Path: <netdev+bounces-78559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE78C875B75
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 01:17:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07BEF875B80
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 01:22:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 235FE1F21EB0
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 00:17:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0634283268
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 00:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60CB6163;
-	Fri,  8 Mar 2024 00:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C4B5163;
+	Fri,  8 Mar 2024 00:20:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gaEfJ6OR"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="OLsfkccd"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2087.outbound.protection.outlook.com [40.107.243.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864DB363
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 00:17:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709857030; cv=fail; b=B3sYpbHuxNlFdMF1dDJpjM709+ElVfl6hv5lNjztxGlzEWrYHQb8V0u6W8h8CtLNLMijM6XS70BOEWXfpfIaHQ9yORgKobcEND0UAcJsWB0/Dg4rvU6O92Pp7CsADcdt9zByhBKCDwBTTcNhyARCH8tl2Wlt+xu9hDXK6Lnb0AI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709857030; c=relaxed/simple;
-	bh=QL7GPIy4hSoL187h7FQfz8YPfh9lKX4oaIOFtB1tIVc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=WtuoUA327PTk8nb1tY9pzrYG8ByXdMyJlmBcG+hL9PpFt5YoG0YJsiUu0vQQtLTKbFlAWPGbaRcor6B1qZaOroIw1aPSZv9dUJOtRyvjusDYjg1JKlXOGGeuMiidpfSm1AErnVJHdksVI1ycPVzBhhHyiEUWenhcATjgOTUJNOQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gaEfJ6OR; arc=fail smtp.client-ip=40.107.243.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NSSG8rBO7csvAiW6lB4PLRitfe+UTF90n1S6aPTOPCi/BsRbb4jdk8exvwd9gu6WaF5aor+2uIMgqx3VGdrZAAADbkHgRrZ8/AIkZwNuCtzmhSTNtPkwOPGA0dq35slyNQ8hg7HurQmpHtPu4GL7Vk8+ra7IkCTxySsmi8EgI1vrGh9OtTzld1Rx3wTnNYtJUP0XBeEmrGgQzGWHQVuIfQoECHh87dCwNX0wWB7p5iGYaFxiNaIkTKos48BlxsdeyUZrSV9UbcnnF6YTtI6dAKxAW+wCCXzF71ckbEigy8GexO8JdsJo8L0JkFbkQSpBOznsSRDUdHk+Wzpg89Jn3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3CgDu6acfleW8FoSfw5k0Pp6/H1OfyepPEamQAsPJUE=;
- b=MZS2RVRS3tvT5Ff8cSOooSg7huyF4KCFxv+WsFnqw0dR0/+vnKXoc2EW+IBp7yXHdtfXXbbT/+1JXuB7/0eYryf3V8aPsmJBo64OXCKox3bCOWBsm76qkOrbEBcGLUPDC0yOiLqPcJMHegGHFEGgSQwUh0Nzb9Tdlk7SWwyVyRUeUMHaFH90B2TF8TFF6cNJz03DLgaVBqmnsBsrsCNSUQiDmZ/pDjbe4onEVKEjkQTEVeMJlKcTeEIvpsubfchTtgxLRrP6g4DByFRgufxsBQxn0eGOQYly/wxdFJGPNO3DBDw6EXctRr3vxKarI6P40iRDTwv8XE06f1WGIJd4iA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3CgDu6acfleW8FoSfw5k0Pp6/H1OfyepPEamQAsPJUE=;
- b=gaEfJ6ORXw9FZ0EmQwVUtXuJPP80ByYBIixfR9QDZcgenCRrbORbIEbvjSBd1RovtR4wFv6Qkzq8FMwrk6QSkh/wHxERS4KFC01ZwSmnQmEIHG2iE9EjuKvN5K4Iggz4OKlT4EgnDkthAWVuaSOpDN8pglJVSryBEzqzvUyN8O9w0Pev0YLuWZLb6IBFyH71pTsgjPiURT3HUNbPbYVbp66XuFVRzLW6IHff51EV5pFU/HbnjXpURNnYXsWwSU5xFTVbAt/ZSfPEsvNqG4TpTIWJvmmxZzq30mHLjv/HH9KyGj8RKfJRkhN0Jt9wwbgwCrKYZLY8m+L7ACrNKglE2g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from PH8PR12MB7110.namprd12.prod.outlook.com (2603:10b6:510:22e::11)
- by SA0PR12MB4448.namprd12.prod.outlook.com (2603:10b6:806:94::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.27; Fri, 8 Mar
- 2024 00:17:02 +0000
-Received: from PH8PR12MB7110.namprd12.prod.outlook.com
- ([fe80::b610:d12a:cca7:703c]) by PH8PR12MB7110.namprd12.prod.outlook.com
- ([fe80::b610:d12a:cca7:703c%4]) with mapi id 15.20.7339.035; Fri, 8 Mar 2024
- 00:17:01 +0000
-Message-ID: <247ec113-ca48-4b95-b714-73a35e7b5802@nvidia.com>
-Date: Thu, 7 Mar 2024 16:16:59 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v3 net-next 1/2] devlink: Add shared memory pool
- eswitch attribute
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, jiri@nvidia.com, bodong@nvidia.com,
- tariqt@nvidia.com, yossiku@nvidia.com, kuba@kernel.org
-References: <20240306231253.8100-1-witu@nvidia.com>
- <Zel8WpMczric0fz3@nanopsycho>
-Content-Language: en-US
-From: William Tu <witu@nvidia.com>
-In-Reply-To: <Zel8WpMczric0fz3@nanopsycho>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0064.namprd03.prod.outlook.com
- (2603:10b6:303:b6::9) To PH8PR12MB7110.namprd12.prod.outlook.com
- (2603:10b6:510:22e::11)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94042363
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 00:20:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709857241; cv=none; b=YTZDzPmCgTSU8AaYxtDLEWYndr6Gtz+rhkKW1710DtJdXwtMdw/yP5IBrRNw7DoI4+uVRO2/fv9rd2nCuNPYQ689eh0+iUQmZk803N4V7mxPaPC7VRhnP5PNHHH888xU+PkhZEOBfdkuRiFoyszbf7fu1WBeG3nA3N+tvyfFJg8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709857241; c=relaxed/simple;
+	bh=VXsFh+GIlxGPFrDIggLsXOeRtcpCk5AKprcpE5fkvyg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E+BAfAxDNhBQL+Xdk7L0QMDRbvAoNtwOHDOdNtZLP7Z++gNYF1VrOsG3qakBbLHO0+RxjTBAeY7Lyot+aPrEbXh9s5WjanMVGejeqBLsV9+LXsD/U9ZnJZroMJJmESDjkrSLuFjcN4I+McK27OKPZxzF2b+n7l5/3yekjgvNLJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=OLsfkccd; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d29aad15a5so2770471fa.3
+        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 16:20:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1709857236; x=1710462036; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=dtqbo4Rz0t5XAMAOzOvejGMeqGxtyx0LZp7Qlf2R2ak=;
+        b=OLsfkccdoMivwv92rdoV6721K89LlXyTlA8fHq96n80YEmpRKxcNseUrACIYIgNUHI
+         0dIbRegxoOHwMnWGWXWW5Xyl6Jep1qqj5BCnrBElPPfhH2KBImBOzUOWH5VcXtQPI1//
+         SZ6AMzWAjcCWN9tpSeI4xxKbg9dVyMOcTdPf5K5t2ChxeNawgjhi+xSxStKchXomEcJw
+         AccZTwOO01bU1p9YZP3yeqB1PBr3Wsknk2QQ5Xn7dD73Zavgulx9mUj8Earajn15tjrQ
+         eENW1Wd+TYG5M4Oh1pmuauL2tfQONVYfW/qpBRYZ3Nu22E67OqVErk4pUWI7dI1HrVLV
+         TP0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709857236; x=1710462036;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dtqbo4Rz0t5XAMAOzOvejGMeqGxtyx0LZp7Qlf2R2ak=;
+        b=Bnw3uA7Jbo+DGQqzA7eNFIqksIRGfd53jgY1GLQJLT+aFCYMPTwJFk2XEfEO9arIzh
+         z59yvb8D28XjB2K33qmuHw8rYgQaLrYWfo7Z0TvSP5xVnxkWQnpl2V4QOVFwK4QZ00qN
+         KsQGMxfpTHraEJ1L02KBxpn1JUr7THU/89sj/gz7tdBkEnp7ins2rsUT2RHAp8FmBQfH
+         I+xtlBoThWki/PyRLPKJfl1l3PzbqL1sCrZng7wbxZ+YtvWg9G3+kaKG+tv9uzVsNpTk
+         wC6B4EkMXJevUmyLJTQ/12hkjdG01yrZmI7Hlr4EO5/HWwsX1NeBnMqoIQU8OuSvUUvF
+         WDZg==
+X-Gm-Message-State: AOJu0Yx462ZA4b8M+99fjn2jlfbwvekknLPRdoyc8+JXSvEJjU3duhB7
+	hhxqPdYsuN9FmCpN2Ni4TJjt/MnnzYszgN4Tg/qAUUrspNQJO3Ufcu5Tqb7Wquo=
+X-Google-Smtp-Source: AGHT+IFozVmkm5F9Dq+D2o6gLGUbEsrn4KJ7kpGPlc0Rxgvr+NlwOVkQlsSsXX3uyxYAUjiCopY4nA==
+X-Received: by 2002:a2e:909a:0:b0:2d3:aa05:47d6 with SMTP id l26-20020a2e909a000000b002d3aa0547d6mr2511641ljg.31.1709857236581;
+        Thu, 07 Mar 2024 16:20:36 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:0:460d:9497:9f21:53e7? ([2001:67c:2fbc:0:460d:9497:9f21:53e7])
+        by smtp.gmail.com with ESMTPSA id g16-20020a056402321000b00567e27c72c4sm2453744eda.62.2024.03.07.16.20.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Mar 2024 16:20:36 -0800 (PST)
+Message-ID: <97577da6-ab0d-474c-ab43-60958287d1e4@openvpn.net>
+Date: Fri, 8 Mar 2024 01:21:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR12MB7110:EE_|SA0PR12MB4448:EE_
-X-MS-Office365-Filtering-Correlation-Id: aaeccb2a-5962-4579-8d85-08dc3f05137f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	7VTM+45753/OvywnGzBSB9vS5HOU5Q/8c4jHCtobwSR75PUDl6yFghMRTggP5D+qD9aPJbQN4B+zn+5Iie3lWovaYeUElXD81hIwnakzQhsmnWsXfLKc/JHh/M+8KFM9cOgWwlXYhF6600wwJUcq7jy2d6ghwKK7eyKtcKiSIGu2WPaxcN7TH2zf0fpFl4v9g5KchCKxd2QErpapOgklePvPivVK7uMCK+Fqyblr4wewvS+fcZzIQrGl2IDkreZYh9z4B7IuTwgJuJ56NIrj6jj5MgYcE6olfS8yrYCzMj/qBF8UDg/8kwr9Y+ICsw87OH6litib+nXQyeMX4DutV4enkEMOW5MRtu8YtEYIXFA7UvFK3Bw4hLtnyjmgqja37wuEzIa4wD8Ya9fvtBM9ag9r8B9Fh3qly5A1obQuNzwW64zpulC/VcrquDeN1CCrv63pl8jnpAW7yfA+dRXfwOxWJohnrhsSg68vE2Xyd0x0H3jjpJzggC6ka0jKqACXxF/ED6rTdiDIuGwL2awN+rOdmjMZucXl0SukT1cy8kf3Yl2TM3Hh0QBMqopvjM64UibtE6nA8SamVkZWdlHypilHno1lUVmII9QOzvrWNkG/7EwlmRqzAwGX7Zng6WgtQGlkQRk91dgPQKqKsVURz12zXNV8OS4PgGPNM7gMyO8=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR12MB7110.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TTV2U3RiTHp2NU1lb0NrWDNBMEF4L2pSYmNPcSs4WTUzZ2RzWDlwZjVMWUd0?=
- =?utf-8?B?R3hYaS9Mdzd2QlkwRVg2VER6Z1FyazdSNVFMdnpZQVZpRkZ5S0xUcytvMjZv?=
- =?utf-8?B?bXY4UFE1MEtiYTNlK0JXRXV5QnFCaHVFZ09kem52N0xIbU9YZ1JFWS9VMjJs?=
- =?utf-8?B?c00rMTUxTE1Ka3VQWXdTVllQbWp0WmxCYVhmQjEvSEtoQ2FCaDloQ3d4dmlx?=
- =?utf-8?B?T2pXbWUwVnF0cGo0K3NheGtnbzVXdUhRd1hBM2szL1JLN3VQbHlSMFJlV0sv?=
- =?utf-8?B?aFZIZHdwQy9zcjdsSmtLVGIrK0xNQkdUL242NjFCVlR2NjR4dnliY0lvbmxp?=
- =?utf-8?B?TDVnKzRnUUdtMmdPZERXbHBmV3NSQWZvbFNnMUt2Mnk2ZzRneDhLYUFJdXJW?=
- =?utf-8?B?MXpRTFhFWnZFYWh0L3VEUVdWY0wvajJwVVN6U0hGbWkyeUJiVVBSWmZ5RXBY?=
- =?utf-8?B?bU5oUXFxUlZYOUJVbHNIQmFUa21CdzlyZ2traFJ5aWNTSEs2YTZIS0o4Q2Ex?=
- =?utf-8?B?bktYMFU5cUFJR1dPeTNxME5RNitwQy9nK3N2d3FBcHhzZzRyZHpEQkdDRndI?=
- =?utf-8?B?RC9mQkU1ZnUwcUdnOTR0aWp3a3IvMlYzNG82ZmtES3ZBWVFUcFRlM1lTbVNa?=
- =?utf-8?B?T1N4WnBtSS94VTRtMTRyQnZlcllPV3pSQUpvNTB5bk5QUDlyVzZ6OWJHbXIz?=
- =?utf-8?B?N0N5eHN1MFJJTENQSHpOVDdoQnp3dWxYNUF0dk9QUFBnQkZsekFZZUpzVXd4?=
- =?utf-8?B?TThaVDV0eUNSUjJHS3FmVGNId3hGdmkrQndEZmJVck9XSS9WeXVwYU11V0JZ?=
- =?utf-8?B?ZnI4andLMjJZNTN0bXpMdFRVRi91V2o3R1JzdDNlemZJYXdvSXEvT1ZOR2dk?=
- =?utf-8?B?T1prSjFFMUxoc05XTTdEYUxQUmxidTNVY3pORk9GblEzT2VCbnd0WE00cmw3?=
- =?utf-8?B?SmpNeFVLWXcxOERzSGpicVFWRThiWldEVDhUUGxJRXhhajlqTkpJQWkzV2RY?=
- =?utf-8?B?eHpCRFhQcUppemNSR1RnRHFONFJIcmhpTjZrb0Y0NUlub0pxdCtLRlQ2TEoz?=
- =?utf-8?B?d2sveWZDc1d2THVlYmlmTWZwaHp2NFEra0dKR0xRL2lNV2ZNODRROXVkNmMx?=
- =?utf-8?B?cTFhMXZBNHYydWhQaHFBdVE3RUd6Y003WWY3Q3ZzWUdmRStLRnYyNVQ1Qm9a?=
- =?utf-8?B?d1ZGT1U3TkVZYVZzZk04OFBHdGxqTWtNVmViV0JnVHBUQzNIWWxYRVhkN0Zx?=
- =?utf-8?B?aXhPV3BSa2FqOWpVL05nRW80VDNyQlMyOVBJMWhvZ1NQM1hXandrWFJ5bEht?=
- =?utf-8?B?N01qb2F6S3lwbXQzZUxRRDgvWkhWK0VQTUxhS3pMdERycHpnaHExMUFZeit4?=
- =?utf-8?B?NTlhbGEvK2Q2SjdkeENOUWI3QlVzcWx0UjlIU1NLSlVmRkFabVVBU3hrUldQ?=
- =?utf-8?B?L1BCcmg2aFh1MEYxa2xNZmtDNkt6NlpPOVd3WlZaSHJLS01lMU80eStHd09U?=
- =?utf-8?B?SkZwekZxRWdjekhNcGR3SkZta3J1ekVXSlVveEdzSEFuZzB1MEVmUFNNSGtS?=
- =?utf-8?B?akUxTW1ENnRjSTYyeHJiQ1pBdVA4cU12QVQrZmYyb25jMVY2N3lMblpCRDBw?=
- =?utf-8?B?Rml6Qnl2cFJ1b05nL3BMQnZ0bm81Nkhoa1lydW9oNS9GaDRVY29qd2RZaDh2?=
- =?utf-8?B?YWNnWUVzWC9rMXZYVWx6L3JqckJDZnNhTjdHMGdwZFZyT1BDcWlLa0JmYTYv?=
- =?utf-8?B?S21ZWTBqeGhNUzN3cE1Nb2VmWmY3S1lrT0Z5SGxod1JKY1pzdkp4cWptODhx?=
- =?utf-8?B?OXNxUnNRSkdKdWEzQ3JLKzJjRzBKMVpyYjVzWm5hRUVLRjdTN2ZVcHRnRWZS?=
- =?utf-8?B?cG9VSkl3d24zWEwyYnlCczUzMWV5cmRYbEdUai9hWC9BSGhBU00vL1BBNG05?=
- =?utf-8?B?MWlOOVNOOU5rNTlITHBJUWdSZlVGbWlRWUl4aFBZRCtkR2JwazVxQ1VZcnJI?=
- =?utf-8?B?Z0JjVndLRmRKczZtMy8xc0VaS0ZrRStFWGdQK1dJckZENzlOQ2FnNEYyNk1y?=
- =?utf-8?B?S0FyNG5qRVNOMVNhbTQ2Y2QvaElGRkFCQzZ5V0p3ZzZ2R2Ird1NiSlhzeDJR?=
- =?utf-8?Q?Ki3rfegPyMvYsaH3SxTsbvbGq?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aaeccb2a-5962-4579-8d85-08dc3f05137f
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR12MB7110.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2024 00:17:01.5948
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: l4CxsYoyWQ9TXpe6geZJ1HHe67HlfNhmr79BJFnWtya/GwcL6DLbUs4Jv8z+90s6
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4448
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 22/22] ovpn: add basic ethtool support
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>
+References: <20240304150914.11444-1-antonio@openvpn.net>
+ <20240304150914.11444-23-antonio@openvpn.net>
+ <57e2274e-fa83-47c9-890b-bb3d2a62acb9@lunn.ch>
+ <25cc6fba-d8e5-46c0-8c16-f71373328e7d@openvpn.net>
+ <01adab06-78c9-421e-bd3f-453e948f5bbb@lunn.ch>
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <01adab06-78c9-421e-bd3f-453e948f5bbb@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 06/03/2024 20:40, Andrew Lunn wrote:
+> On Wed, Mar 06, 2024 at 04:42:03PM +0100, Antonio Quartulli wrote:
+>> On 05/03/2024 00:04, Andrew Lunn wrote:
+>>> On Mon, Mar 04, 2024 at 04:09:13PM +0100, Antonio Quartulli wrote:
+>>>> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+>>>> ---
+>>>>    drivers/net/ovpn/main.c | 32 ++++++++++++++++++++++++++++++++
+>>>>    1 file changed, 32 insertions(+)
+>>>>
+>>>> diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+>>>> index 95a94ccc99c1..9dfcf2580659 100644
+>>>> --- a/drivers/net/ovpn/main.c
+>>>> +++ b/drivers/net/ovpn/main.c
+>>>> @@ -13,6 +13,7 @@
+>>>>    #include "ovpnstruct.h"
+>>>>    #include "packet.h"
+>>>> +#include <linux/ethtool.h>
+>>>>    #include <linux/genetlink.h>
+>>>>    #include <linux/module.h>
+>>>>    #include <linux/moduleparam.h>
+>>>> @@ -83,6 +84,36 @@ static const struct net_device_ops ovpn_netdev_ops = {
+>>>>    	.ndo_get_stats64        = dev_get_tstats64,
+>>>>    };
+>>>> +static int ovpn_get_link_ksettings(struct net_device *dev,
+>>>> +				   struct ethtool_link_ksettings *cmd)
+>>>> +{
+>>>> +	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.supported, 0);
+>>>> +	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.advertising, 0);
+>>>> +	cmd->base.speed	= SPEED_1000;
+>>>> +	cmd->base.duplex = DUPLEX_FULL;
+>>>> +	cmd->base.port = PORT_TP;
+>>>> +	cmd->base.phy_address = 0;
+>>>> +	cmd->base.transceiver = XCVR_INTERNAL;
+>>>> +	cmd->base.autoneg = AUTONEG_DISABLE;
+>>>
+>>> Why? It is a virtual device. Speed and duplex is meaningless. You
+>>> could run this over FDDI, HIPPI, or RFC 1149? So why PORT_TP?
+>>
+>> To be honest, I couldn't find any description to help me with deciding what
+>> to set there and I just used a value I saw in other Ethernet drivers.
+>>
+>> Do you have any recommendation?
+>> For the other fields: do you think they make sense? The speed value is
+>> always debatable...The actual speed depends on the transport interface and
+>> there might be multiple involved. Maybe SPEED_UNKNOWN is more appropriate?
+> 
+> Turn it around. What is your use case? What is using this information?
+> I would just not implement this function. But maybe you know of
+> something which actually requires it?
 
+At the moment there is nothing on my side requiring this function.
 
-On 3/7/24 12:35 AM, Jiri Pirko wrote:
-> External email: Use caution opening links or attachments
->
->
-> Thu, Mar 07, 2024 at 12:12:52AM CET, witu@nvidia.com wrote:
->> Add eswitch attribute spool_size for shared memory pool size.
->>
->> When using switchdev mode, the representor ports handles the slow path
->> traffic, the traffic that can't be offloaded will be redirected to the
->> representor port for processing. Memory consumption of the representor
->> port's rx buffer can grow to several GB when scaling to 1k VFs reps.
->> For example, in mlx5 driver, each RQ, with a typical 1K descriptors,
->> consumes 3MB of DMA memory for packet buffer in WQEs, and with four
->> channels, it consumes 4 * 3MB * 1024 = 12GB of memory. And since rep
->> ports are for slow path traffic, most of these rx DMA memory are idle.
->>
->> Add spool_size configuration, allowing multiple representor ports
->> to share a rx memory buffer pool. When enabled, individual representor
->> doesn't need to allocate its dedicated rx buffer, but just pointing
->> its rq to the memory pool. This could make the memory being better
->> utilized. The spool_size represents the number of bytes of the memory
->> pool. Users can adjust it based on how many reps, total system
->> memory, or performance expectation.
->>
->> An example use case:
->> $ devlink dev eswitch set pci/0000:08:00.0 mode switchdev \
->>   spool-size 4096000
->> $ devlink dev eswitch show pci/0000:08:00.0
->>   pci/0000:08:00.0: mode legacy inline-mode none encap-mode basic \
->>   spool-size 4096000
->>
->> Disable the shared memory pool by setting spool_size to 0.
->>
->> Signed-off-by: William Tu <witu@nvidia.com>
->> ---
->> v3: feedback from Jakub
->> - introduce 1 attribute instead of 2
->> - use spool_size == 0 to disable
->> - spool_size as byte unit, not counts
->>
->> Question about ENODOCS:
->> where to add this? the only document about devlink attr is at iproute2
->> Do I add a new file Documentation/networking/devlink/devlink-eswitch-attr.rst?
-> Yeah. Please document the existing attrs as well while you are at it.
-done.
->
->
->> ---
->> Documentation/netlink/specs/devlink.yaml |  4 ++++
->> include/net/devlink.h                    |  3 +++
->> include/uapi/linux/devlink.h             |  1 +
->> net/devlink/dev.c                        | 21 +++++++++++++++++++++
->> net/devlink/netlink_gen.c                |  5 +++--
->> 5 files changed, 32 insertions(+), 2 deletions(-)
->>
->> diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
->> index cf6eaa0da821..cb46fa9d6664 100644
->> --- a/Documentation/netlink/specs/devlink.yaml
->> +++ b/Documentation/netlink/specs/devlink.yaml
->> @@ -429,6 +429,9 @@ attribute-sets:
->>          name: eswitch-encap-mode
->>          type: u8
->>          enum: eswitch-encap-mode
->> +      -
->> +        name: eswitch-spool-size
->> +        type: u32
->>        -
->>          name: resource-list
->>          type: nest
->> @@ -1555,6 +1558,7 @@ operations:
->>              - eswitch-mode
->>              - eswitch-inline-mode
->>              - eswitch-encap-mode
->> +            - eswitch-spool-size
->>
->>      -
->>        name: eswitch-set
->> diff --git a/include/net/devlink.h b/include/net/devlink.h
->> index 9ac394bdfbe4..164c543dd7ca 100644
->> --- a/include/net/devlink.h
->> +++ b/include/net/devlink.h
->> @@ -1327,6 +1327,9 @@ struct devlink_ops {
->>        int (*eswitch_encap_mode_set)(struct devlink *devlink,
->>                                      enum devlink_eswitch_encap_mode encap_mode,
->>                                      struct netlink_ext_ack *extack);
->> +      int (*eswitch_spool_size_get)(struct devlink *devlink, u32 *p_size);
->> +      int (*eswitch_spool_size_set)(struct devlink *devlink, u32 size,
->> +                                    struct netlink_ext_ack *extack);
->>        int (*info_get)(struct devlink *devlink, struct devlink_info_req *req,
->>                        struct netlink_ext_ack *extack);
->>        /**
->> diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
->> index 130cae0d3e20..cbe51be7a08a 100644
->> --- a/include/uapi/linux/devlink.h
->> +++ b/include/uapi/linux/devlink.h
->> @@ -614,6 +614,7 @@ enum devlink_attr {
->>
->>        DEVLINK_ATTR_REGION_DIRECT,             /* flag */
->>
->> +      DEVLINK_ATTR_ESWITCH_SPOOL_SIZE,        /* u32 */
->>        /* add new attributes above here, update the policy in devlink.c */
-> While at it, could you please update this comment? It should say:
->          /* Add new attributes above here, update the spec in
->           * Documentation/netlink/specs/devlink.yaml and re-generate
->           * net/devlink/netlink_gen.c. */
-> As a separate patch please.
-done.
->
->>        __DEVLINK_ATTR_MAX,
->> diff --git a/net/devlink/dev.c b/net/devlink/dev.c
->> index 19dbf540748a..561874424db7 100644
->> --- a/net/devlink/dev.c
->> +++ b/net/devlink/dev.c
->> @@ -633,6 +633,7 @@ static int devlink_nl_eswitch_fill(struct sk_buff *msg, struct devlink *devlink,
->> {
->>        const struct devlink_ops *ops = devlink->ops;
->>        enum devlink_eswitch_encap_mode encap_mode;
->> +      u32 spool_size;
->>        u8 inline_mode;
->>        void *hdr;
->>        int err = 0;
->> @@ -674,6 +675,15 @@ static int devlink_nl_eswitch_fill(struct sk_buff *msg, struct devlink *devlink,
->>                        goto nla_put_failure;
->>        }
->>
->> +      if (ops->eswitch_spool_size_get) {
->> +              err = ops->eswitch_spool_size_get(devlink, &spool_size);
->> +              if (err)
->> +                      goto nla_put_failure;
->> +              err = nla_put_u32(msg, DEVLINK_ATTR_ESWITCH_SPOOL_SIZE, spool_size);
->> +              if (err)
->> +                      goto nla_put_failure;
->> +      }
->> +
->>        genlmsg_end(msg, hdr);
->>        return 0;
->>
->> @@ -708,10 +718,21 @@ int devlink_nl_eswitch_set_doit(struct sk_buff *skb, struct genl_info *info)
->>        struct devlink *devlink = info->user_ptr[0];
->>        const struct devlink_ops *ops = devlink->ops;
->>        enum devlink_eswitch_encap_mode encap_mode;
->> +      u32 spool_size;
->>        u8 inline_mode;
->>        int err = 0;
->>        u16 mode;
->>
->> +      if (info->attrs[DEVLINK_ATTR_ESWITCH_SPOOL_SIZE]) {
->> +              if (!ops->eswitch_spool_size_set)
-> Fill up extack msg here please.
->
-Will do it in next version, thanks
-William
+I thought it was recommended to provide an implementation so that any 
+potential user would be happy (some monitoring tool? some other module 
+in the kernel?)
 
+But if you think there is no meaningful use case for it, then I think it 
+makes sense to just drop it, as we are filling it with random/virtual 
+values.
+
+> 
+>>>> +	strscpy(info->bus_info, "ovpn", sizeof(info->bus_info));
+>>>
+>>> This is also not accurate. There is no bus involved.
+>>
+>> Should I just leave it empty then?
+>>
+>> My concern is that a user expects $something and it will crash on my empty
+>> string. But if empty is allowed, I will just go with it.
+> 
+> Empty is allowed. The bridge uses "N/A", which i would say is also
+> correct. tun/tap does however use "tun", so "ovpn" is not that
+> different i supposes.
+
+I just grepped through the kernel and I can see various patterns.
+I also found:
+
+  899         strscpy(info->bus_info, "batman", sizeof(info->bus_info));
+
+:-)
+
+All in all, I agree we can sick to "ovpn".
+
+Regards,
+
+> 
+> 	Andrew
+> 
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
