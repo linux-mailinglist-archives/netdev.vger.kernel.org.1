@@ -1,194 +1,193 @@
-Return-Path: <netdev+bounces-78745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E43788764B7
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 14:07:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DE528764BB
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 14:08:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3C6D1C2134B
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 13:07:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 134AE28516D
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 13:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 390261D545;
-	Fri,  8 Mar 2024 13:07:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC121D547;
+	Fri,  8 Mar 2024 13:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GPVCStoj"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="Yh3pZan2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04olkn2020.outbound.protection.outlook.com [40.92.74.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F13B17551
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 13:07:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709903238; cv=none; b=XAz1xdppt+iZuYd+/6637l+thnFgumvlkSrZZMuKiUZIIsLbyyNBjuQtmNYq4ImE1VjGtR6UZ7S/x1Po+noyXILdqIHlkeQcAnCXO69y9FQ2rMPlL4IKaEPxZRBnQOxEIkFAGVYlvWM0OkD3lszA0VNNuYZcqxpJyJFJLFlDpb0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709903238; c=relaxed/simple;
-	bh=O8SpvgGHknW7h+/G/DuKh/q+/zHaAs+5CxTIXtQpHoI=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=Niqa4EF+B0OlXkR6Aubc8KhJKimjuyKp36g7CVU6lKzj9fOq0FEOsaSv+tvGYUqSI3vneLXgMuxWGU8pfxoxEmQ81jjNVL47CaDChwd4ASE409n8oIHuJ2YA7D+UXAqTAWONbXv3ZzWY61vrUAHOpImL08jFPjFSDjrROCBi6v8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GPVCStoj; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-412e6ba32easo6004435e9.0
-        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 05:07:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709903235; x=1710508035; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1qnmjYs+hXRwuDIo+nyxVzB52WPrsNDH/aV8VWOQSJM=;
-        b=GPVCStojVuCj7B+rOUBXRxXU8pbuTb28/RId8NyTbHiLfyJrKWm7G5hhJbuedRaHlH
-         0d52TTSXq4WLVZ+DQBK/521A+Oq3++v9ML4U/MZwEVHsrb+f+yUpFm92pVchL8YuOI7P
-         KE/sTGjZkQTQ73wkT7TVRgmNruWqnkkv9bwdkHCw9zCXgChZM6aHu68iyDYTFLHbtmwH
-         wx57LF3syAFDw926jqLB0cD61ocKqJ2PccSnwa4eMxo8zUGalqoGd2EzImXyjiDERXc4
-         AZ6y4iUWaNmfYYllD1CHZ4B+hQpUywF4n4DhDtqIQznRdfP6l+6ZxsJGyjlA0v8yllv/
-         V+Lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709903235; x=1710508035;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1qnmjYs+hXRwuDIo+nyxVzB52WPrsNDH/aV8VWOQSJM=;
-        b=Mf9m5LrB91XgEb6TlLqHehNLzZ86da1bg8vMrCfC4WmPtIEuc+mlyQki4h/GdW4azA
-         KWKjHAS3tHSWtXQt+5KQd9iGPNM8DzQKKyZTsJYkL71Vvz1PQ6cqbqE7ktsxS9H1BaOw
-         3HVSuJqWR7ByZnizpadx03QR4z5OV7pAV3xpwXfJC5OKe/IedGbCjGs3RWVN0Lyrgs+4
-         gdV9jX3cjv3T/OQ+Iqdar42m6u+KnZYmPV7nDEr3ofSjb5whprpNi6LedfN57GlCQlgx
-         YzS/whscKKOluhrEsvhG+qrHw3rDbFV1x2N6uTy4eMUipBlB9NPamsv05qD6AABSwhH4
-         boDQ==
-X-Gm-Message-State: AOJu0YyagE7pPxfWUZSIlAQHFqxESROj7emmySVMmKbPHrr1Z8L8n4Qc
-	p79lkrP7/dmY12dP4iq4st6FdHrjlyi98io10NkpN9M17j6DfEpg
-X-Google-Smtp-Source: AGHT+IH86MTecfWFPwy7bEh9SGR9Z3igEDgrZkSPiLkV8IanSJv03Az6pQpFFJ+M1r4KLdylsV5VFQ==
-X-Received: by 2002:a05:600c:3586:b0:412:ee8b:dead with SMTP id p6-20020a05600c358600b00412ee8bdeadmr8215520wmq.34.1709903234587;
-        Fri, 08 Mar 2024 05:07:14 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:f870:9393:cd1b:d379])
-        by smtp.gmail.com with ESMTPSA id p42-20020a05600c1daa00b00412e6de503csm6147528wms.25.2024.03.08.05.07.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Mar 2024 05:07:13 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>,  Jacob Keller <jacob.e.keller@intel.com>,  Jiri
- Pirko <jiri@resnulli.us>
-Subject: Re: [PATCH net-next] doc/netlink/specs: Add vlan attr in rt_link spec
-In-Reply-To: <20240308041518.3047900-1-liuhangbin@gmail.com> (Hangbin Liu's
-	message of "Fri, 8 Mar 2024 12:15:18 +0800")
-Date: Fri, 08 Mar 2024 13:05:45 +0000
-Message-ID: <m2sf10g9g6.fsf@gmail.com>
-References: <20240308041518.3047900-1-liuhangbin@gmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492481CD06;
+	Fri,  8 Mar 2024 13:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.74.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709903295; cv=fail; b=JG6vgMcLN2jUkvu9tjeVX4DqbT84jOQS547JkuDG70ZxigONC04xMVU9A/yzxmvI9/2ruyWZ0hhxm6mf+5xrRmQ+TQz+zf9Jk2cnSSXHWz8m5R71VlzPlhRuFxHKjjbS973OzjvjYNzZzp3UcE3VuDLUDTEK3JCXL5tO/alLW2U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709903295; c=relaxed/simple;
+	bh=JeQwoqLYiVeyV+3baROZxz/Sk+j2fgc8ITTbDLMBCrc=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Rn+4fYM5wWch+5/0T23MtopQ0lCpB4TIYVHG4J26a10n4ZdrWuvWuQI7fFEdghDgvR4jcnhwH9NWWdMQ4VC2F89QTuZWjbO8jcJC5ET56l8F7h1a7nCgJrROU7E/P/eSCmLOVm+0zUG3JeMuOhqFHhkE4gUQ35tV0Rt8IAx9DeI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=Yh3pZan2; arc=fail smtp.client-ip=40.92.74.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ChEYlC0Fbc6CCeKn/DyIGKYv9DxWV3aainKHjNCJDLIBt3OhgNIqcbjCnBHnymggDm1J/EywvmRth2pBq9GxhX0Oezo06KaX/Plhn9/HAcJi1XCOEdf9BGaVcbe3x/w56KP+/20Z/Mlild6jCt290/iQvcRYaWLlRa2bcrJzbGmQhfdXE7k7oNZN4HsinatEniWs98/dB+14ApLl6dYN0bvztdQ/mpTAxDrNWHDg+R8SwHbhjzUH3tQXweOqlMxL3Rk57Wr0mt1qVdjajK1XGO47gVuj6d0LOTsAjqTOSTiWHUJnG5J3WnrPRWNQMMDw6R4glJyAcV9N7TVTHB1cQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FiYA2Xas9rmR6UR6ocGlQ9axajmHXjBn4fc6kz0dHXw=;
+ b=hS9SbHpzENDL9LnqPO1o8JJuhfsXbNFzHrSvYbh/9DalY4ju6jG21lzHaxxh5BOrRLshjFJ0VWC+5AXl+9heEhCJgrrEwdOXnGOVHMzmVhlE/GAJ/qvGIMx4AvTd8r2MACXeCE5sy6U/9HSRvlX42XBId3OSMA8kOozVAQbvoLPUy8WXy2Ff8TiOtsjPraNjGT1ZsJTZ3sZgLLxflaBDiT2lPw+V8I4EBcpifsXPM9ObU3jRz+zdNSvrC6MN7G7udYyAzntQfyubkL36O44QTwgkVcTEa7Ir6t+YHlcq3eI/gDILXPvY6lrevvtRHl3e7IYbn2P1ELC5ZPkIFq3WYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FiYA2Xas9rmR6UR6ocGlQ9axajmHXjBn4fc6kz0dHXw=;
+ b=Yh3pZan2OvhqbXBSbveTT5TY3TU089TAHoP4Bqe3Vx/sWdFtoWHo7SEwfiSlJe1RMXLx8iN6xQKpQlTQ2+doyiwjBJTRUfCHdArJFQyxUDqI8ERigBDe2pRqP7Fi5CREfflzi4xYRjjWacvHOEcs08bu6uVteljb7lNEBt6CH9qAD3hPXv8AIVWFjkEud335y0DCoWrSJ1slheLehBLvuk44kvYkiCKEjx21QRINbfwIws0XfKIm2X4a2zlfa7OrqSla8QAOBOwqmXROXGszDosvNmTpWUljuCn+TInF4Dl6DDDP4Lk/dI5XpZLP7ylGJ4PUP5BmVuIiV/iydsZYdw==
+Received: from AM6PR03MB5848.eurprd03.prod.outlook.com (2603:10a6:20b:e4::10)
+ by PAVPR03MB10177.eurprd03.prod.outlook.com (2603:10a6:102:32a::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Fri, 8 Mar
+ 2024 13:08:10 +0000
+Received: from AM6PR03MB5848.eurprd03.prod.outlook.com
+ ([fe80::58d5:77b7:b985:3a18]) by AM6PR03MB5848.eurprd03.prod.outlook.com
+ ([fe80::58d5:77b7:b985:3a18%7]) with mapi id 15.20.7362.028; Fri, 8 Mar 2024
+ 13:08:10 +0000
+From: Juntong Deng <juntong.deng@outlook.com>
+To: willemdebruijn.kernel@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3] net/packet: Add getsockopt support for PACKET_COPY_THRESH
+Date: Fri,  8 Mar 2024 13:06:36 +0000
+Message-ID:
+ <AM6PR03MB58487A9704FD150CF76F542899272@AM6PR03MB5848.eurprd03.prod.outlook.com>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [rWDDBPyATA4xNMx1o8BEcMZ6S+Mi8TKU]
+X-ClientProxiedBy: LO4P123CA0676.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:351::14) To AM6PR03MB5848.eurprd03.prod.outlook.com
+ (2603:10a6:20b:e4::10)
+X-Microsoft-Original-Message-ID:
+ <20240308130636.34343-1-juntong.deng@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM6PR03MB5848:EE_|PAVPR03MB10177:EE_
+X-MS-Office365-Filtering-Correlation-Id: 79ecd0c6-bbba-4c2b-637e-08dc3f70ce28
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	UZDLL53z8/5XrTn4yMR73G0TwEtSfKYn3cVHozuoM1gbh8FmPOKhY3Q86kU15fxPJS8zktaiGU+NxY2YQOwCHiY0zMn1Qrlqo6XdCo5z/4ofL2hGPSis0/Cl0GXP+DsIzP5nECLwGvviVHU2D1E9x2NK5x6CHTYA3D0g7lphKDdKr+yemoyVhMSv6hn7PI9GEbtRQ5TudNy+yMGCcX7lQUT9ZJNDza20mUYf3m1bibpicv/lTxLzzKLo56Jeg6WoWPzBQBB+isU40u3X5OJb7q+m+ho41WlXKoudNrx3/8UFZZKGo7CcVGNCAavJWsqDVRWfgJ5lj4rul8t/53N2d6izb8d2gOIvmu2r7/+L0as5xiucvJISiuxPryO2CSFQyw80zVT98EqZON/qzeiocH8CzaDmdfj48TX2xjcpoFe3OChcne+f/QEW2US/qWKMvIxBaZE/Tq9YlSWWkuT2NhHkSs3xSFxierPUwUo6sJYh7BFoxFEZ00PLMrftEUHJ0FtHHpkigpdECnLEUIec4qAtfisqFMnFVyny3R5SUmWQxeKAn3JXJNpNvvXu3OU9
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?tiwq55SIoAr8TtzlTT1CeH5+51K+Pz4gIboz+4Zn64GQGyZ+53JHdINbex+T?=
+ =?us-ascii?Q?UwOL63SR3UnNu6Kvi5kDPwC5ZmnVA6GVNMgNTazPmhnA5F0e8tppH9WDOQdw?=
+ =?us-ascii?Q?LsBFOH9fwZIy3B1s9iIg/08Xci4nK2Up6ULNPYI96AhwnsBXwAoGAtA6njXj?=
+ =?us-ascii?Q?2/Ucw9BLW+KNUNF5YvXUevjvN+HrIHC/BwuQovnwx7VnBeUxyX6EtDicTKi+?=
+ =?us-ascii?Q?VPcX624wvtSaDBwthJOJkEc5FHAEvZGSWsssGhr/3poYhnkphewE7o4LAq7E?=
+ =?us-ascii?Q?SDtcPYyw3t5VXte/81BvlPEz0T8CjqQzC338fw9S5ceqK/b/77XZT+kR0408?=
+ =?us-ascii?Q?drtEJUo3G9dWYR2LYF9QJFgs+eqNvEfn3xmnSHFeXTt/x59Y948xgh+DniVj?=
+ =?us-ascii?Q?p2LQqiLhz7dsnF4LB4ow0Evp4QeHrHdhk5nKRMLstcJDUHOLY2j/LiLecV/+?=
+ =?us-ascii?Q?qCZiKv3gbPMXvxHFrqxTOmiU94RWZVX9Jnzne91CayNbJPA1qh6ePf3XJ/xk?=
+ =?us-ascii?Q?+JceQfaHMvOTZ2XGSZO81m3VyG9W81SfiZjnreTbbdAcSCWrVrsv2mg0e8Kl?=
+ =?us-ascii?Q?T65el7xhiJEVPSLL++Q8zbRH5qklanjfOYnhhS1psGL8YxkJPneHUIdzRvUR?=
+ =?us-ascii?Q?gw3HnC0YxtPxCTcnlY5YRYo0qgkd/GoGZMeniLgpX4Rke/wCUVtq0kfv5lJh?=
+ =?us-ascii?Q?ybaQLv14FrtcpiTUxlDAp4mXC8gPQyJKBNI9x6ozn/sFdJegCHoTLeoaN2Lh?=
+ =?us-ascii?Q?/9u9vYaDvj0uo0Uoxgmr+gyt4CXveoVTbqXW1abWXezK/eVmqpixkN0DkLFo?=
+ =?us-ascii?Q?gzmUI7dO7Z37aB766EO/LqQLwSuXVtggOIGId4HMmeLJRatMk2n734wkqbL9?=
+ =?us-ascii?Q?HLRo8BFvJJNwoeN8mQOhAHXa62vu+eQrWqXgV4y9ZGUus7vRlZQoCHo81Jib?=
+ =?us-ascii?Q?xviz74cg9+9fAFRFEKyyrlLiWsjOsa2codRW2e0FEtjs63boMYibJStIHyI9?=
+ =?us-ascii?Q?TgW5jvymo+3FHKWCKENbezOKK/XnNkTjiFI1VybZdqsyU//XdGCBPF8SwpSr?=
+ =?us-ascii?Q?oSrLl01U5j19RB3f6C9ZuJeZCCgp87E3wG9hB/n8PYNZ9/9ltdPSR4HBxAgw?=
+ =?us-ascii?Q?7+pfnzuDITVT8BVTDxzAvj0XJf3Leoq9vE8BO7egO3fnpklI133NZrjJz4Rq?=
+ =?us-ascii?Q?6zY8JMeUhvcTyRwGjWkehnnmOUJu9VnrRsROGqiVTxxyv2n79L/vznQ22AZ1?=
+ =?us-ascii?Q?2QvEt+MYeRtxxDmD5iHR?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 79ecd0c6-bbba-4c2b-637e-08dc3f70ce28
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR03MB5848.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2024 13:08:10.8914
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAVPR03MB10177
 
-Hangbin Liu <liuhangbin@gmail.com> writes:
+Currently getsockopt does not support PACKET_COPY_THRESH,
+and we are unable to get the value of PACKET_COPY_THRESH
+socket option through getsockopt.
 
-> With command:
->  # ./tools/net/ynl/cli.py \
->  --spec Documentation/netlink/specs/rt_link.yaml \
->  --do getlink --json '{"ifname": "eno1.2"}'
->
-> Before:
-> Exception: No message format for 'vlan' in sub-message spec 'linkinfo-data-msg'
->
-> After:
->  'linkinfo': {'data': {'flag': {'flags': {'bridge-binding',
->                                           'gvrp',
->                                           'reorder-hdr'},
->                                 'mask': 4294967295},
->                        'id': 2,
->                        'protocol': 129},
->               'kind': 'vlan'},
->
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
-> Not sure if there is a proper way to show the mask and protocol
+This patch adds getsockopt support for PACKET_COPY_THRESH.
 
-Using display-hint, e.g. display-hint: hex, is intended to tell the ynl
-cli to render output in a human readable way. Unfortunately it currently
-only works for binary attributes.
+In addition, this patch converts access to copy_thresh to
+READ_ONCE/WRITE_ONCE.
 
-It can be done like this:
+Signed-off-by: Juntong Deng <juntong.deng@outlook.com>
+---
+V2 -> V3: Fix pdiag_put_info().
 
-      -
-        name: mask
-        type: binary
-        len: 4
-        display-hint: hex
+V1 -> V2: Use READ_ONCE/WRITE_ONCE.
 
-./tools/net/ynl/cli.py \
---spec Documentation/netlink/specs/rt_link.yaml \
---do getlink --json '{"ifname": "wlan0.8"}' --output-json | jq -C '.linkinfo'
-{
-  "kind": "vlan",
-  "data": {
-    "protocol": 33024,
-    "id": 8,
-    "flag": {
-      "flags": [
-        "reorder-hdr"
-      ],
-      "mask": "ff ff ff ff"
-    }
-  }
-}
+ net/packet/af_packet.c | 7 +++++--
+ net/packet/diag.c      | 2 +-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-But it seems wrong to change the struct definition for this. We should
-patch ynl to support hex rendering of integers.
+diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+index 0db31ca4982d..61270826b9ac 100644
+--- a/net/packet/af_packet.c
++++ b/net/packet/af_packet.c
+@@ -2318,7 +2318,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	}
+ 	if (po->tp_version <= TPACKET_V2) {
+ 		if (macoff + snaplen > po->rx_ring.frame_size) {
+-			if (po->copy_thresh &&
++			if (READ_ONCE(po->copy_thresh) &&
+ 			    atomic_read(&sk->sk_rmem_alloc) < sk->sk_rcvbuf) {
+ 				if (skb_shared(skb)) {
+ 					copy_skb = skb_clone(skb, GFP_ATOMIC);
+@@ -3836,7 +3836,7 @@ packet_setsockopt(struct socket *sock, int level, int optname, sockptr_t optval,
+ 		if (copy_from_sockptr(&val, optval, sizeof(val)))
+ 			return -EFAULT;
+ 
+-		pkt_sk(sk)->copy_thresh = val;
++		WRITE_ONCE(pkt_sk(sk)->copy_thresh, val);
+ 		return 0;
+ 	}
+ 	case PACKET_VERSION:
+@@ -4090,6 +4090,9 @@ static int packet_getsockopt(struct socket *sock, int level, int optname,
+ 	case PACKET_VNET_HDR_SZ:
+ 		val = READ_ONCE(po->vnet_hdr_sz);
+ 		break;
++	case PACKET_COPY_THRESH:
++		val = READ_ONCE(pkt_sk(sk)->copy_thresh);
++		break;
+ 	case PACKET_VERSION:
+ 		val = po->tp_version;
+ 		break;
+diff --git a/net/packet/diag.c b/net/packet/diag.c
+index b3bd2f6c2bf7..47f69f3dbf73 100644
+--- a/net/packet/diag.c
++++ b/net/packet/diag.c
+@@ -17,7 +17,7 @@ static int pdiag_put_info(const struct packet_sock *po, struct sk_buff *nlskb)
+ 	pinfo.pdi_index = po->ifindex;
+ 	pinfo.pdi_version = po->tp_version;
+ 	pinfo.pdi_reserve = po->tp_reserve;
+-	pinfo.pdi_copy_thresh = po->copy_thresh;
++	pinfo.pdi_copy_thresh = READ_ONCE(po->copy_thresh);
+ 	pinfo.pdi_tstamp = READ_ONCE(po->tp_tstamp);
+ 
+ 	pinfo.pdi_flags = 0;
+-- 
+2.39.2
 
-For the protocol, you'd need to add an enum of ethernet protocol
-numbers, from the info in include/uapi/linux/if_ether.h
-
-> +  -
-> +    name: linkinfo-vlan-attrs
-> +    name-prefix: ifla-vlan-
-> +    attributes:
-> +      -
-> +        name: id
-> +        type: u16
-> +      -
-> +        name: flag
-> +        type: binary
-> +        struct: ifla-vlan-flags
-> +      -
-> +        name: egress-qos
-> +        type: nest
-> +        nested-attributes: ifla-vlan-qos
-> +      -
-> +        name: ingress-qos
-> +        type: nest
-> +        nested-attributes: ifla-vlan-qos
-> +      -
-> +        name: protocol
-> +        type: u16
-
-The protocol value is in big endian format, so it is actually 33024
-(0x8100) not 129. You need to add byte-order: big-endian
-
-> +  -
-> +    name: ifla-vlan-qos
-> +    name-prefix: ifla-vlan-qos
-> +    attributes:
-> +      -
-> +        name: mapping
-> +        type: binary
-> +        struct: ifla-vlan-qos-mapping
->    -
->      name: linkinfo-vrf-attrs
->      name-prefix: ifla-vrf-
-> @@ -1666,6 +1732,9 @@ sub-messages:
->        -
->          value: tun
->          attribute-set: linkinfo-tun-attrs
-> +      -
-> +        value: vlan
-> +        attribute-set: linkinfo-vlan-attrs
->        -
->          value: vrf
->          attribute-set: linkinfo-vrf-attrs
 
