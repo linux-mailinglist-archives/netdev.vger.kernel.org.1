@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-78712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40C448763A0
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:48:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F31D8763A1
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:48:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A24D1282A69
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:48:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE62A1F21CA4
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:48:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E70E856471;
-	Fri,  8 Mar 2024 11:47:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99AD156478;
+	Fri,  8 Mar 2024 11:47:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RpKf8mlb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nqOXtCoV"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2797F5730B
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 11:47:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF0CD57862
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 11:47:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709898460; cv=none; b=hDlkt/sV5UV/SizpL29YiOPkDiYlYoaNq/Njqz/iSehbG1cGpQFh+49K2FQ++HForiKdpU4gZWYg3sToGM+wobM8LfOTONIABWuVrkjGBZjtIdFDLT8N76jo0yLGVQ4LbQ7baJ7ymcXGs2l5aIIPLm9CeUU5xim0Anu60N/9Sck=
+	t=1709898462; cv=none; b=nfqpzBViDykP5aD/P1bjRKkpq1J1YHBp1ddO2xalsPV1e3Cx8lF1whEpyNIruRLcsGC+YkMStMuWdCvIveqTsfWLCxJhctG62vJLVeHShF2Aw1rbAHqABhq5Yr5wjo2MNqUzDy8JqbH2KRAd+AJjnus50Avh8YkSCtAroRQ9Ezs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709898460; c=relaxed/simple;
-	bh=hmvvG+IN0jDRAlrV0IJG7funIm+rGn7Eo2MgzVmVgLE=;
+	s=arc-20240116; t=1709898462; c=relaxed/simple;
+	bh=xrqszmw5n1di3u6Z+qwhci18ZzNwfrL+n4H5laMJDrg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=p06M1DNx/4BQkKlSLY8xHoAQpi/yoJnEWPqhnl7TpE+ymlDtXFrPALz1GxfaYAfSBa16tgDG/Y85uj2/orbvmfblsyO5Kq7Y4ocdb4M88L/kf60ICPf6naQA0g3HZJAKH4kM1r9etHKEkcbaHz2FUQybOLL7zF4strDhi3B+mHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RpKf8mlb; arc=none smtp.client-ip=192.198.163.15
+	 MIME-Version; b=V3535DTD2UcM5/3IqQf7NjbdHMK0jAByo+GWI2NT7d8gZlvQwOO9+MAusQLFmBOtMtfUZBstaTIWqWvgAL6DrX23LqglxFMX94tYLbruY5509TEJqyoR0Ajqc/6NojHtB8Ycc4CTDhRWM2iEKviG0L1UEqW9hcsrIPcR+rnjQTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nqOXtCoV; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709898459; x=1741434459;
+  t=1709898461; x=1741434461;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=hmvvG+IN0jDRAlrV0IJG7funIm+rGn7Eo2MgzVmVgLE=;
-  b=RpKf8mlbZjxX0TJqtvVFyeuiQkx5HDgEuWyx3G/zuIPwZofc0sPLYgzv
-   b5obOteWXpUmZOWR9uotIxDswgogds6KLHdRSqHm4WReetuYGmnfitZFk
-   Z3MF91dhjWMOyY+m2+Byl0B2W1HJnmOq32doSf5fsm2sus6vzr9D4BOgl
-   toD4B9L+N/dqlDFD6QqLonnA3AjU0p5/wzdF7O0v1tNKPt+gOdaEEwC6m
-   DtQXRy/Yx95WbCbgwd0xWyeX7BjF1t3ijINLq0YfXHCCifowGnKcsgLb1
-   IqhSZMDHBtpNBEvHHZpLBN5nXWzhCN1MZPc+QOQjHrvGuJ9fwm1xiDK9H
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11006"; a="4782414"
+  bh=xrqszmw5n1di3u6Z+qwhci18ZzNwfrL+n4H5laMJDrg=;
+  b=nqOXtCoVCUcp/9WbBpQiQS5aNDesKZ2pdHHt3o08PpKqolRAysf31Oa2
+   unIxcFkw9ayGLSBYHw2NilIEl05lTuiONQ05xHw715SFL6QiHnG3FvSiv
+   Hg0xa2UoxVGRJnU3BVokVYqGoEuzbG434tJ8ZkVAL/XZCjwOJSMtywjv5
+   6O5x3xaorqYUvAvtH7Y51IRfgvhtboXZ41bt/SVLnTdo2OQDpnAMfLYSH
+   h4MoCIY/WgeKlmZbZ1nELJmKQY40wJMnAr57ryoO67K03RUl6xWNG8eB3
+   PT0N3daLz3QvFy296w/HnBEtKHU7zGxEZvoeZU5U5S0L25T4N8b6EL7aJ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11006"; a="4782417"
 X-IronPort-AV: E=Sophos;i="6.07,109,1708416000"; 
-   d="scan'208";a="4782414"
+   d="scan'208";a="4782417"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2024 03:47:38 -0800
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2024 03:47:40 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,109,1708416000"; 
-   d="scan'208";a="10849515"
+   d="scan'208";a="10849526"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa006.jf.intel.com with ESMTP; 08 Mar 2024 03:47:35 -0800
+  by orviesa006.jf.intel.com with ESMTP; 08 Mar 2024 03:47:38 -0800
 Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id AC2C934970;
-	Fri,  8 Mar 2024 11:47:32 +0000 (GMT)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id B0722312EB;
+	Fri,  8 Mar 2024 11:47:35 +0000 (GMT)
 From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -70,9 +70,9 @@ Cc: netdev@vger.kernel.org,
 	michal.wilczynski@intel.com,
 	lukasz.czapnik@intel.com,
 	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-next v7 3/6] ice: Adjust the VSI/Aggregator layers
-Date: Fri,  8 Mar 2024 06:39:16 -0500
-Message-Id: <20240308113919.11787-4-mateusz.polchlopek@intel.com>
+Subject: [Intel-wired-lan] [PATCH iwl-next v7 4/6] ice: Enable switching default Tx scheduler topology
+Date: Fri,  8 Mar 2024 06:39:17 -0500
+Message-Id: <20240308113919.11787-5-mateusz.polchlopek@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20240308113919.11787-1-mateusz.polchlopek@intel.com>
 References: <20240308113919.11787-1-mateusz.polchlopek@intel.com>
@@ -84,115 +84,166 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Raj Victor <victor.raj@intel.com>
+From: Michal Wilczynski <michal.wilczynski@intel.com>
 
-Adjust the VSI/Aggregator layers based on the number of logical layers
-supported by the FW. Currently the VSI and Aggregator layers are
-fixed based on the 9 layer scheduler tree layout. Due to performance
-reasons the number of layers of the scheduler tree is changing from
-9 to 5. It requires a readjustment of these VSI/Aggregator layer values.
+Introduce support for Tx scheduler topology change, based on user
+selection, from default 9-layer to 5-layer.
+Change requires NVM (version 3.20 or newer) and DDP package (OS Package
+1.3.30 or newer - available for over a year in linux-firmware, since
+commit aed71f296637 in linux-firmware ("ice: Update package to 1.3.30.0"))
+https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/commit/?id=aed71f296637
 
-Signed-off-by: Raj Victor <victor.raj@intel.com>
-Co-developed-by: Michal Wilczynski <michal.wilczynski@intel.com>
+Enable 5-layer topology switch in init path of the driver. To accomplish
+that upload of the DDP package needs to be delayed, until change in Tx
+topology is finished. To trigger the Tx change user selection should be
+changed in NVM using devlink. Then the platform should be rebooted.
+
 Signed-off-by: Michal Wilczynski <michal.wilczynski@intel.com>
+Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_sched.c | 37 +++++++++++-----------
- 1 file changed, 19 insertions(+), 18 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_main.c | 102 ++++++++++++++++++----
+ 1 file changed, 83 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
-index d174a4eeb899..1ac3686328ae 100644
---- a/drivers/net/ethernet/intel/ice/ice_sched.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sched.c
-@@ -1128,12 +1128,11 @@ u8 ice_sched_get_vsi_layer(struct ice_hw *hw)
- 	 *     5 or less       sw_entry_point_layer
- 	 */
- 	/* calculate the VSI layer based on number of layers. */
--	if (hw->num_tx_sched_layers > ICE_VSI_LAYER_OFFSET + 1) {
--		u8 layer = hw->num_tx_sched_layers - ICE_VSI_LAYER_OFFSET;
--
--		if (layer > hw->sw_entry_point_layer)
--			return layer;
--	}
-+	if (hw->num_tx_sched_layers == ICE_SCHED_9_LAYERS)
-+		return hw->num_tx_sched_layers - ICE_VSI_LAYER_OFFSET;
-+	else if (hw->num_tx_sched_layers == ICE_SCHED_5_LAYERS)
-+		/* qgroup and VSI layers are same */
-+		return hw->num_tx_sched_layers - ICE_QGRP_LAYER_OFFSET;
- 	return hw->sw_entry_point_layer;
- }
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index cc1957c592b2..cbcd10e37fc3 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4417,11 +4417,11 @@ static char *ice_get_opt_fw_name(struct ice_pf *pf)
+ /**
+  * ice_request_fw - Device initialization routine
+  * @pf: pointer to the PF instance
++ * @firmware: double pointer to firmware struct
+  */
+-static void ice_request_fw(struct ice_pf *pf)
++static int ice_request_fw(struct ice_pf *pf, const struct firmware **firmware)
+ {
+ 	char *opt_fw_filename = ice_get_opt_fw_name(pf);
+-	const struct firmware *firmware = NULL;
+ 	struct device *dev = ice_pf_to_dev(pf);
+ 	int err = 0;
  
-@@ -1150,13 +1149,10 @@ u8 ice_sched_get_agg_layer(struct ice_hw *hw)
- 	 *     7 or less       sw_entry_point_layer
+@@ -4430,29 +4430,91 @@ static void ice_request_fw(struct ice_pf *pf)
+ 	 * and warning messages for other errors.
  	 */
- 	/* calculate the aggregator layer based on number of layers. */
--	if (hw->num_tx_sched_layers > ICE_AGG_LAYER_OFFSET + 1) {
--		u8 layer = hw->num_tx_sched_layers - ICE_AGG_LAYER_OFFSET;
+ 	if (opt_fw_filename) {
+-		err = firmware_request_nowarn(&firmware, opt_fw_filename, dev);
+-		if (err) {
+-			kfree(opt_fw_filename);
+-			goto dflt_pkg_load;
+-		}
 -
--		if (layer > hw->sw_entry_point_layer)
--			return layer;
--	}
--	return hw->sw_entry_point_layer;
-+	if (hw->num_tx_sched_layers == ICE_SCHED_9_LAYERS)
-+		return hw->num_tx_sched_layers - ICE_AGG_LAYER_OFFSET;
-+	else
-+		return hw->sw_entry_point_layer;
+-		/* request for firmware was successful. Download to device */
+-		ice_load_pkg(firmware, pf);
++		err = firmware_request_nowarn(firmware, opt_fw_filename, dev);
+ 		kfree(opt_fw_filename);
+-		release_firmware(firmware);
+-		return;
++		if (!err)
++			return err;
++	}
++	err = request_firmware(firmware, ICE_DDP_PKG_FILE, dev);
++	if (err)
++		dev_err(dev, "The DDP package file was not found or could not be read. Entering Safe Mode\n");
++
++	return err;
++}
++
++/**
++ * ice_init_tx_topology - performs Tx topology initialization
++ * @hw: pointer to the hardware structure
++ * @firmware: pointer to firmware structure
++ */
++static int
++ice_init_tx_topology(struct ice_hw *hw, const struct firmware *firmware)
++{
++	u8 num_tx_sched_layers = hw->num_tx_sched_layers;
++	struct ice_pf *pf = hw->back;
++	struct device *dev;
++	u8 *buf_copy;
++	int err;
++
++	dev = ice_pf_to_dev(pf);
++	/* ice_cfg_tx_topo buf argument is not a constant,
++	 * so we have to make a copy
++	 */
++	buf_copy = kmemdup(firmware->data, firmware->size, GFP_KERNEL);
++
++	err = ice_cfg_tx_topo(hw, buf_copy, firmware->size);
++	if (!err) {
++		if (hw->num_tx_sched_layers > num_tx_sched_layers)
++			dev_info(dev, "Tx scheduling layers switching feature disabled\n");
++		else
++			dev_info(dev, "Tx scheduling layers switching feature enabled\n");
++		/* if there was a change in topology ice_cfg_tx_topo triggered
++		 * a CORER and we need to re-init hw
++		 */
++		ice_deinit_hw(hw);
++		err = ice_init_hw(hw);
++
++		return err;
++	} else if (err == -EIO) {
++		dev_info(dev, "DDP package does not support Tx scheduling layers switching feature - please update to the latest DDP package and try again\n");
++	}
++
++	return 0;
++}
++
++/**
++ * ice_init_ddp_config - DDP related configuration
++ * @hw: pointer to the hardware structure
++ * @pf: pointer to pf structure
++ *
++ * This function loads DDP file from the disk, then initializes Tx
++ * topology. At the end DDP package is loaded on the card.
++ */
++static int ice_init_ddp_config(struct ice_hw *hw, struct ice_pf *pf)
++{
++	struct device *dev = ice_pf_to_dev(pf);
++	const struct firmware *firmware = NULL;
++	int err;
++
++	err = ice_request_fw(pf, &firmware);
++	if (err) {
++		dev_err(dev, "Fail during requesting FW: %d\n", err);
++		return err;
+ 	}
+ 
+-dflt_pkg_load:
+-	err = request_firmware(&firmware, ICE_DDP_PKG_FILE, dev);
++	err = ice_init_tx_topology(hw, firmware);
+ 	if (err) {
+-		dev_err(dev, "The DDP package file was not found or could not be read. Entering Safe Mode\n");
+-		return;
++		dev_err(dev, "Fail during initialization of Tx topology: %d\n",
++			err);
++		release_firmware(firmware);
++		return err;
+ 	}
+ 
+-	/* request for firmware was successful. Download to device */
++	/* Download firmware to device */
+ 	ice_load_pkg(firmware, pf);
+ 	release_firmware(firmware);
++
++	return 0;
  }
  
  /**
-@@ -1510,10 +1506,11 @@ ice_sched_get_free_qparent(struct ice_port_info *pi, u16 vsi_handle, u8 tc,
- {
- 	struct ice_sched_node *vsi_node, *qgrp_node;
- 	struct ice_vsi_ctx *vsi_ctx;
-+	u8 qgrp_layer, vsi_layer;
- 	u16 max_children;
--	u8 qgrp_layer;
+@@ -4625,9 +4687,11 @@ int ice_init_dev(struct ice_pf *pf)
  
- 	qgrp_layer = ice_sched_get_qgrp_layer(pi->hw);
-+	vsi_layer = ice_sched_get_vsi_layer(pi->hw);
- 	max_children = pi->hw->max_children[qgrp_layer];
+ 	ice_init_feature_support(pf);
  
- 	vsi_ctx = ice_get_vsi_ctx(pi->hw, vsi_handle);
-@@ -1524,6 +1521,12 @@ ice_sched_get_free_qparent(struct ice_port_info *pi, u16 vsi_handle, u8 tc,
- 	if (!vsi_node)
- 		return NULL;
+-	ice_request_fw(pf);
++	err = ice_init_ddp_config(hw, pf);
++	if (err)
++		return err;
  
-+	/* If the queue group and VSI layer are same then queues
-+	 * are all attached directly to VSI
-+	 */
-+	if (qgrp_layer == vsi_layer)
-+		return vsi_node;
-+
- 	/* get the first queue group node from VSI sub-tree */
- 	qgrp_node = ice_sched_get_first_node(pi, vsi_node, qgrp_layer);
- 	while (qgrp_node) {
-@@ -3199,7 +3202,7 @@ ice_sched_add_rl_profile(struct ice_port_info *pi,
- 	u8 profile_type;
- 	int status;
- 
--	if (layer_num >= ICE_AQC_TOPO_MAX_LEVEL_NUM)
-+	if (!pi || layer_num >= pi->hw->num_tx_sched_layers)
- 		return NULL;
- 	switch (rl_type) {
- 	case ICE_MIN_BW:
-@@ -3215,8 +3218,6 @@ ice_sched_add_rl_profile(struct ice_port_info *pi,
- 		return NULL;
- 	}
- 
--	if (!pi)
--		return NULL;
- 	hw = pi->hw;
- 	list_for_each_entry(rl_prof_elem, &pi->rl_prof_list[layer_num],
- 			    list_entry)
-@@ -3446,7 +3447,7 @@ ice_sched_rm_rl_profile(struct ice_port_info *pi, u8 layer_num, u8 profile_type,
- 	struct ice_aqc_rl_profile_info *rl_prof_elem;
- 	int status = 0;
- 
--	if (layer_num >= ICE_AQC_TOPO_MAX_LEVEL_NUM)
-+	if (layer_num >= pi->hw->num_tx_sched_layers)
- 		return -EINVAL;
- 	/* Check the existing list for RL profile */
- 	list_for_each_entry(rl_prof_elem, &pi->rl_prof_list[layer_num],
+-	/* if ice_request_fw fails, ICE_FLAG_ADV_FEATURES bit won't be
++	/* if ice_init_ddp_config fails, ICE_FLAG_ADV_FEATURES bit won't be
+ 	 * set in pf->state, which will cause ice_is_safe_mode to return
+ 	 * true
+ 	 */
 -- 
 2.38.1
 
