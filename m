@@ -1,181 +1,175 @@
-Return-Path: <netdev+bounces-78752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 812C3876549
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 14:28:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0A3C87655D
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 14:33:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8EAECB2468B
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 13:28:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2ED511C21698
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 13:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B742209E;
-	Fri,  8 Mar 2024 13:28:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9677A381C7;
+	Fri,  8 Mar 2024 13:33:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W+Oq4h2P"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2PV1xcV7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A05717EF;
-	Fri,  8 Mar 2024 13:28:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EC936132;
+	Fri,  8 Mar 2024 13:32:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709904484; cv=none; b=ZR9qr95VGXW75MXFX/ojhFLIVJ1d7ikeb3iPKK096wnf0WkEMWUZ5kGte0PCgoucebYFEf/L3S64JKHrSp8wFkkCIqO8XM8DZMyDKXOYujofMoKT3xexSgMi74QK+ofP7/cG48vVxkJPDoarEFPE+KS4CeoYFK58iUNnW5Uek9U=
+	t=1709904781; cv=none; b=PZGsISfSOBWUyvaqiy0I+Fej3v4idHF8hAK7G7g/IoX4t8me+fE3rys0wmoUJezwta6E6UTmj6u3i8S21n0SoqvwBTX7e8yD+S+YghbAR70AV1E0tq5fffLfI+8NzYqdEuiYWAU/n/1KSzADMtmSnwSUQf5/bp1Gk8RFqoe0qS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709904484; c=relaxed/simple;
-	bh=hhKhXs9ZdVSehKaqBwJ8DY9Txa1P8L0TLTB+9MUW46w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bsragfGSF7Ore3PmRO0U7V3IFt7zRO76mhi2nnYB6qH2X2Lf92vPu9F6uSyj2O22KuJsFDq4qA2K/Ltcg2aWfct1HoseFbaGOg5YqHYWvUDrRLNCv454WFpm+0Fcrzyg3AHS3p5aSu0Q8oRrRbAP35umpL/cS2TpPJP2E+oEEzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W+Oq4h2P; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a44e3176120so288107166b.1;
-        Fri, 08 Mar 2024 05:28:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709904481; x=1710509281; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kuKXTIvJNfdKUyXVvaiWe2kMamo2ZJzl393Ve5lqrIg=;
-        b=W+Oq4h2PwAdon7TynwZlu3cOMDeJTxS9sBiwk9A6XKYio0bZ7uxTpLT73fbRz2CC4G
-         mbdWyN11XbCdOfdY2E/yAiLT2H4bXXi8CfVxGklK8DCxpd8W/TJisw4dVIX8MW1/AeIt
-         Ap6PIXmdbzeYY2lsozMRNSsZF4oOs28IlBSCy/RvE5zd8p6wVOTdJ4V2MDugiTq7IY+1
-         C+nTLzOa4RykEjMe2EOFhBQ8ZnXBNDLmQ+u1wj1uvZeTTTYMTXFHqG+RcyEIPfH0Z6Lb
-         9lAaU2Fw9ti36YuJL60lM3ZKDZNZWfoHsBaRdxjp70rbrnk8ZW/FBZSMsSPzw2tnrKTq
-         ZTrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709904481; x=1710509281;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kuKXTIvJNfdKUyXVvaiWe2kMamo2ZJzl393Ve5lqrIg=;
-        b=GXPn8jR0XQ9ymHfw+SoKcqCfmSKPfp8CWYL0DHxj9FwITzewXgEuzsIYrd+dxLtwo0
-         5jH9H/bSQ2fnY3lHtUl7JO8w04Z2HZMtjfxna/IrDbpMiAn9maJyqZcpuT7ejQx6LK/E
-         7jwbIQZ55lUenMZMWFCOZsJbwcSKjSBuFecMJftiV5sxknLW+PHAntVQxh+3loPGkaxU
-         kBOS1puttN1RdqvZJArdiOpMwxPorOBfPfL4/kpTQI3dsO7ODFjkQbmKxk9GOjEFNmeJ
-         7Ulq/zPyXkVl719WLCa/QWLDZo3N/yKiWotkgq3cRyEqeZzNmsXPHcTNeMVykoBta3Cf
-         QTvw==
-X-Forwarded-Encrypted: i=1; AJvYcCXEeUKF5AWUYAqv/JIrlWYMBp9z3RJV0YwBF9nblw938zn1aP1VLfKPDMSRUZFfyg43xb7WgH9FL6uRf2Kv+vSlFaga+sDeGyOzM4IqKKk/bJqlsWNGQOLWeUtgLioxeq2JlrrD
-X-Gm-Message-State: AOJu0YzKlUn+smgPJkVV4R/2a2XHhV2DSG7nMGHxisQtT03/hxxRUQBh
-	csxtbNF1AYFZz3tz8ephve/yP1tX3udzrUwmIypno2BkMIlVlWXPfaQcOUYfN+TCtIMWRCXgOay
-	baRfFJmxndpkDCq1IvPR+eGxW2C0=
-X-Google-Smtp-Source: AGHT+IGfevllGJN8BvruE7IUSutHQU80j5biB/RycxPcwKQdSVfbblazy+sCUBWBe07Hx9mSCbyLGszaU7R+Xa5azyI=
-X-Received: by 2002:a17:906:39da:b0:a44:e2e0:bda8 with SMTP id
- i26-20020a17090639da00b00a44e2e0bda8mr12604487eje.0.1709904480790; Fri, 08
- Mar 2024 05:28:00 -0800 (PST)
+	s=arc-20240116; t=1709904781; c=relaxed/simple;
+	bh=Vv/Jufa5OVNBfy5C9TR6DMNWeexhQbgcJrBdXPQc34M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LxjZ5Ep/ztX2rrIZ5hnauYLkHBNnsvCYd1u/T7VxTi3Gk3iCNxujbpCum2UYZH3Fx4wx/4rpttqPoxwArF32HT9WlFMxOIYcbtgXMg8QV/gg0FQE8tRENUjIDmi18YXfUO4zz0C7S5sBV0ImKG1pnYrVG7EgH8khlS+9kpz6Axs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2PV1xcV7; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=XLhNZiOAtOVRkJtnzxKeO+RebX+VweC9Qi0gKqLYSug=; b=2P
+	V1xcV7e67+qNS5SLuC5sqbbw9rDlaK2j5FirbwEh1W6qRIWu1x6badEuka4IXZdSywzw2SKUs9+2P
+	DsBNlPo/f9QfW7v7AkNLkJ7q81VaZdsoviLrpbgxojk3QieSoy+8/gUI+xPrG1FPEEuVGClV3wi6r
+	EBff0q/VkXEAGmU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1riaLY-009lXx-Kv; Fri, 08 Mar 2024 14:33:12 +0100
+Date: Fri, 8 Mar 2024 14:33:12 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban.Veerasooran@microchip.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
+	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, corbet@lwn.net,
+	linux-doc@vger.kernel.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, Horatiu.Vultur@microchip.com,
+	ruanjinjie@huawei.com, Steen.Hegelund@microchip.com,
+	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
+	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
+	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
+	benjamin.bigler@bernformulastudent.ch
+Subject: Re: [PATCH net-next v3 06/12] net: ethernet: oa_tc6: implement
+ internal PHY initialization
+Message-ID: <8de7a4bb-a127-4771-97dd-038f08fcce9d@lunn.ch>
+References: <20240306085017.21731-1-Parthiban.Veerasooran@microchip.com>
+ <20240306085017.21731-7-Parthiban.Veerasooran@microchip.com>
+ <8c2b95f4-75a7-4d6d-ab9c-9c3498c040d8@lunn.ch>
+ <eeb57938-e21e-406d-a835-93c6fb19b161@microchip.com>
+ <7ddbe599-187e-401f-b508-4dc62bca8374@lunn.ch>
+ <e9bc573e-61f0-484a-b1fb-b5100eb9ee0a@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <AM6PR03MB58483266DF047DA017C540CD99272@AM6PR03MB5848.eurprd03.prod.outlook.com>
- <CANn89i+TboBh3S3tegSqZJvjTCCi_Sa+o3iwETygFw5GqjJPsw@mail.gmail.com>
- <CAL+tcoDpZNqU9eJ0oyTyBrcHxnqR_HoGbqy0wznmyczpR05XtA@mail.gmail.com> <AM6PR03MB5848654CAA0174407FD4DE7299272@AM6PR03MB5848.eurprd03.prod.outlook.com>
-In-Reply-To: <AM6PR03MB5848654CAA0174407FD4DE7299272@AM6PR03MB5848.eurprd03.prod.outlook.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 8 Mar 2024 21:27:24 +0800
-Message-ID: <CAL+tcoAwPv7bquhmaUr_NckEfQbp2xuNNOSswtmxRHHVCiY9+A@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net/packet: Add getsockopt support for PACKET_COPY_THRESH
-To: Juntong Deng <juntong.deng@outlook.com>
-Cc: Eric Dumazet <edumazet@google.com>, willemdebruijn.kernel@gmail.com, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e9bc573e-61f0-484a-b1fb-b5100eb9ee0a@microchip.com>
 
-On Fri, Mar 8, 2024 at 9:19=E2=80=AFPM Juntong Deng <juntong.deng@outlook.c=
-om> wrote:
->
-> On 2024/3/8 21:11, Jason Xing wrote:
-> > On Fri, Mar 8, 2024 at 8:56=E2=80=AFPM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> >>
-> >> On Fri, Mar 8, 2024 at 1:43=E2=80=AFPM Juntong Deng <juntong.deng@outl=
-ook.com> wrote:
-> >>>
-> >>> Currently getsockopt does not support PACKET_COPY_THRESH,
-> >>> and we are unable to get the value of PACKET_COPY_THRESH
-> >>> socket option through getsockopt.
-> >>>
-> >>> This patch adds getsockopt support for PACKET_COPY_THRESH.
-> >>>
-> >>> In addition, this patch converts access to copy_thresh to
-> >>> READ_ONCE/WRITE_ONCE.
-> >>>
-> >>> Signed-off-by: Juntong Deng <juntong.deng@outlook.com>
-> >>> ---
-> >>> V1 -> V2: Use READ_ONCE/WRITE_ONCE.
-> >>>
-> >>>   net/packet/af_packet.c | 7 +++++--
-> >>>   1 file changed, 5 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> >>> index 0db31ca4982d..61270826b9ac 100644
-> >>> --- a/net/packet/af_packet.c
-> >>> +++ b/net/packet/af_packet.c
-> >>> @@ -2318,7 +2318,7 @@ static int tpacket_rcv(struct sk_buff *skb, str=
-uct net_device *dev,
-> >>>          }
-> >>>          if (po->tp_version <=3D TPACKET_V2) {
-> >>>                  if (macoff + snaplen > po->rx_ring.frame_size) {
-> >>> -                       if (po->copy_thresh &&
-> >>> +                       if (READ_ONCE(po->copy_thresh) &&
-> >>>                              atomic_read(&sk->sk_rmem_alloc) < sk->sk=
-_rcvbuf) {
-> >>>                                  if (skb_shared(skb)) {
-> >>>                                          copy_skb =3D skb_clone(skb, =
-GFP_ATOMIC);
-> >>> @@ -3836,7 +3836,7 @@ packet_setsockopt(struct socket *sock, int leve=
-l, int optname, sockptr_t optval,
-> >>>                  if (copy_from_sockptr(&val, optval, sizeof(val)))
-> >>>                          return -EFAULT;
-> >>>
-> >>> -               pkt_sk(sk)->copy_thresh =3D val;
-> >>> +               WRITE_ONCE(pkt_sk(sk)->copy_thresh, val);
-> >>>                  return 0;
-> >>>          }
-> >>>          case PACKET_VERSION:
-> >>> @@ -4090,6 +4090,9 @@ static int packet_getsockopt(struct socket *soc=
-k, int level, int optname,
-> >>>          case PACKET_VNET_HDR_SZ:
-> >>>                  val =3D READ_ONCE(po->vnet_hdr_sz);
-> >>>                  break;
-> >>> +       case PACKET_COPY_THRESH:
-> >>> +               val =3D READ_ONCE(pkt_sk(sk)->copy_thresh);
-> >>> +               break;
-> >>>          case PACKET_VERSION:
-> >>>                  val =3D po->tp_version;
-> >>>                  break;
-> >>> --
-> >>> 2.39.2
-> >>>
-> >>
-> >> I think you forgot to change net/packet/diag.c pdiag_put_info()
-> >>
-> >
-> > Ah, he updated his patch so soon even without taking a break.
-> >
-> > I just replied to the v1 thread with three changes made.
-> >
-> > Juntong, you could check your v1 patch thread and you will see the
-> > missing point.
-> >
-> > Thanks,
-> > Jason
->
-> Hi Jason,
->
-> Thanks, I have fixed this in the v3 patch.
+> Ok, as per the table 6 in the spec, PHY C45 registers are mapped in the 
+> MMS like below,
+> 
+> PHY – PCS Registers (MMD 3)  --->  MMS 2
+> PHY – PMA/PMD Registers (MMD 1)  --->   MMS 3
+> PHY – Vendor Specific and PLCA Registers (MMD 31)  --->  MMS 4
+> PHY – Auto-Negotiation Registers (MMD 7)  --->  MMS 5
+> PHY – Power Unit (MMD 13)  --->  MMS 6
+> 
+> MMD 13 for PHY - Power Unit is not defined in the mdio.h. So in the 
+> below code I have defined it locally (MDIO_MMD_POWER_UNIT). May be 
+> needed to do this in the mdio.h file when coming to this patch.
 
-The patch itself looks good to me.
+Yes, please add it to mdio.h
 
-But next time please do not post the patch too often, you have to wait
-around 24 hour at least. We need to obey the rule. Then you have
-plenty of time to collect/rethink about those suggestions...
+> /* PHY – Clause 45 registers memory map selector (MMS) as per table 6 in 
+> the OPEN Alliance specification.
+>   */
+> #define OA_TC6_PHY_PCS_MMS2                     2       /* MMD 3 */
+> #define OA_TC6_PHY_PMA_PMD_MMS3                 3       /* MMD 1 */
+> #define OA_TC6_PHY_VS_PLCA_MMS4                 4       /* MMD 31 */
+> #define OA_TC6_PHY_AUTO_NEG_MMS5                5       /* MMD 7 */
+> #define OA_TC6_PHY_POWER_UNIT_MMS6              6       /* MMD 13 */
+> 
+> /* MDIO Manageable Device (MMD) for PHY Power Unit */
+> #define MDIO_MMD_POWER_UNIT                     13      /* PHY Power Unit */
+> 
+> static int oa_tc6_mdiobus_read_c45(struct mii_bus *bus, int addr, int 
+> devnum, int regnum)
+> { 
+> 
+>          struct oa_tc6 *tc6 = bus->priv; 
+> 
+>          u32 regval; 
+> 
+>          bool ret; 
+> 
+>          u32 mms; 
+> 
+>  
+> 
+>          if (devnum == MDIO_MMD_PCS) 
+> 
+>                  mms = OA_TC6_PHY_PCS_MMS2; 
+> 
+>          else if (devnum == MDIO_MMD_PMAPMD) 
+> 
+>                  mms = OA_TC6_PHY_PMA_PMD_MMS3; 
+> 
+>          else if (devnum == MDIO_MMD_VEND2) 
+> 
+>                  mms = OA_TC6_PHY_VS_PLCA_MMS4; 
+> 
+>          else if (devnum == MDIO_MMD_AN) 
+> 
+>                  mms = OA_TC6_PHY_AUTO_NEG_MMS5; 
+> 
+>          else if (devnum == MDIO_MMD_POWER_UNIT) 
+> 
+>                  mms = OA_TC6_PHY_POWER_UNIT_MMS6; 
 
-Thanks,
-Jason
+I would probably use a switch statement.
+
+> 
+>          else 
+> 
+>                  return -ENOTSUPP; 
+
+802.3 says:
+
+  If a device supports the MDIO interface it shall respond to all
+  possible register addresses for the device and return a value of
+  zero for undefined and unsupported registers. Writes to undefined
+  registers and read-only registers shall have no effect. The
+  operation of an MMD shall not be affected by writes to reserved and
+  unsupported register bits, and such register bits shall return a
+  value of zero when read.
+
+So maybe return 0. ENOTSUPP is wrong, that is an NFS only error
+code. The generic one is EOPNOTSUPP. I would say -EOPNOTSUPP is also
+O.K.
+
+>          ret = oa_tc6_read_register(tc6, (mms << 16) | regnum, &regval); 
+> 
+>          if (ret) 
+> 
+>                  return -ENODEV; 
+
+oa_tc6_read_register() should return an error code, so return whatever
+is returns. Don't overwrite error codes. It makes it harder to track
+errors through the call stack.
+
+       Andrew
+
 
