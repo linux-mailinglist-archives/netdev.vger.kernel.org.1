@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-78694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E5528762A8
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:03:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 718FF8762BB
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:07:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78E0BB23868
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:03:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 127161F23A9D
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:07:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2030A55E50;
-	Fri,  8 Mar 2024 11:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E12D655C3A;
+	Fri,  8 Mar 2024 11:07:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="QeuYMBtl"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="VpGnF9Ei"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE6E5577A
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 11:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808DB56748
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 11:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709895640; cv=none; b=tiTCKDaPFd7iTNMzxXQ/dT3H+QjtEfiTQS4XUYjkB8kzoSENxxoj93E9Daaf5l1ht/5RpkvCwFsSUFnn5kgwukwFQJ5kE1/iwnYX77lPUp+c9uE/eokNipot5pGlEk1lHHDlnTXj4hntPS1I+fSyQgbBJIFgCqmq6IRr+VG/jKA=
+	t=1709896026; cv=none; b=JAsgjudbzwxf/+DHaZQwRuY+3HALG0UPwRQtyzhcX3wocnSUSh5Us+lnkcEky3+LxZFUV80gMBEbqpNAfVb28pOc664/+2VhZ/vz9Bo2/vZbtvgAtoHwle6jnnCnDsk939ff3CD5LMu/jnt6tn6bCgzvrRIIVFmJiGj7zEXZi70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709895640; c=relaxed/simple;
-	bh=nQoA/CGsWy613Da9LIbVYHocsWukzagE4y+OS8CdNEM=;
+	s=arc-20240116; t=1709896026; c=relaxed/simple;
+	bh=MRkohaLiUN5BHehj7WGOvVOkQISIlM4qrD0qErutq8M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GPVzMrTYaK7Gqfk4D6vSiTucQ3W7DAfo9SjW+yr81ozqg51rszaVMeDXLLfNlBaQiQWHKZl6XX9Oq6pxQuaiUQRC43UELJBhfWumXK7zvvaXRicmPSNRfvPsljz2PYaed51ET2dNT2vZcXlGA6NsyA1RmzSOx7uyW05+HGgIBQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=QeuYMBtl; arc=none smtp.client-ip=209.85.208.48
+	 In-Reply-To:Content-Type; b=twE7lGK5XpKb1rrY7XbGNaiwMQwPpa29oRrp0kJcsqjlPXtJ9WJBS4SoJDTeo8mK250VM4ANYGdh/nqi1Dr9g8j9cm7DbDrY6NhYAyD3jmFfKjCAJIsYAqN/4Xaqa/wCMPG5YmGUpHOvTjhHNBi546GEDEdAM5h2CJLlIyIDhv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=VpGnF9Ei; arc=none smtp.client-ip=209.85.208.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56657bcd555so2342509a12.3
-        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 03:00:37 -0800 (PST)
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-567fbbd723cso805995a12.3
+        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 03:07:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1709895636; x=1710500436; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1709896023; x=1710500823; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=sinDYr6ag43N86WtOtol/lHGxZkw0LGgOOG07U08Xc0=;
-        b=QeuYMBtlp+1qn2dRuliDTAxXtHW1xDJebzmlZDXCdj40AOHRUXvjVTFID61p0/GAiF
-         c2lz3NlHY6CuvEoeaKoW/fE44Xox23en7k0RI8es4sd6wDTOZhGOfC9s26xsB8S9xaYn
-         HSeQYTx66KL/CRkqDCOkEoH5OODM1WKyFn2yPkRGpLjruLWSKPnCJUVPZBdZzlA9cxV5
-         FKTUsKwjH8nKMgt65dZJcpUKW3vmmkptKhwZNVLPyyrH/oASZLsrWq31qPKqsgOFXn77
-         G25LAx4ZijtcgBDRedeK8k3aONqkZDjxj7OB5fTRLO0m52Ygy+x77Wi/k5vcdzDBxjJJ
-         iSgg==
+        bh=ROhx7Xti2+zZ0lJ/c08/MIW8BW30JDS2gYndLq8QZ6Y=;
+        b=VpGnF9EiaE1/cedpOUF/sTkhSDPELZ4v7kSyQWn30NjL79tDOPKMDJZfAizM3zwHKg
+         lzNGy4D54bXoz9Jdh/BaLlw0Q0/WCF6slKDrytR/ExGBFENkQvRvHdLvqgt0Qlat0hBQ
+         bKyXeEgoyuwG8UTrue7cR5gtzbzgifjRiIshiSEkhR/g+sqO4ZaQwdXR5VUO+1OTIbNG
+         xCVehjlbx5mdWptTXWHZkZKeOQ8XQVYB8RovPJWSM0pJqOPANGblOlSBO4ZoFJ7Z9m8h
+         kZG0uS/P2S5D6+zSj510rRTCtu+IzkVBsxDwm36JhAIklE+v3dCMrzVkxNjK1SO/2VdN
+         G5UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709895636; x=1710500436;
+        d=1e100.net; s=20230601; t=1709896023; x=1710500823;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sinDYr6ag43N86WtOtol/lHGxZkw0LGgOOG07U08Xc0=;
-        b=ZccDOtGFcozRASHvXDjPhZHk+KXeqzcogWr9EGEYBxNKNpUZ138WNqn0uyTBY40Btl
-         Th6304iWJUrskrIILCTc2rkserGD6RtlUffL7b7ymZLQfhYFBr+HUFtn6R0LyWx//FIc
-         AnObZd0v4dyAWNK8iVpnkkngy5IbDQynGOwkLJN0ZcWrvAJQU8RGcY1sNJ+Ydnqli/Os
-         HqTALqaf14/Np2Nf2aYyap5vgvEVQXpvwmT+K2UsCsd66fsLtvca/C+7PJt5XkLNkRT7
-         XpAlyJOsG6QZCmw5Y8C4t/oyZjZOf9TNw2qUMVZjNvmEqrWArQ1OwFhwK/mI5BIw9CMC
-         fDgg==
-X-Gm-Message-State: AOJu0YxXG0WsZ9thDN/tRMeUhLiTAKpSO+bReX9UBHfwygVbggg3awIK
-	p0Y81uH0MqMgjHAO40t0ovzougmP4vNSRRhksBvq8kecqOk9LNpGw6jYSiO5050=
-X-Google-Smtp-Source: AGHT+IFejud5FBgNp6Ox3ZNpenDLDcRp4UOCa8bPEBLdR+FwFAtjjDp02VTXE6ptt3HXR2dnq6DpQg==
-X-Received: by 2002:a50:d483:0:b0:566:a526:21ea with SMTP id s3-20020a50d483000000b00566a52621eamr1730368edi.33.1709895636082;
-        Fri, 08 Mar 2024 03:00:36 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:0:b873:e280:4c85:26d8? ([2001:67c:2fbc:0:b873:e280:4c85:26d8])
-        by smtp.gmail.com with ESMTPSA id u23-20020a50c057000000b00565af2ea649sm9411496edd.14.2024.03.08.03.00.32
+        bh=ROhx7Xti2+zZ0lJ/c08/MIW8BW30JDS2gYndLq8QZ6Y=;
+        b=wiBXBjboM0DrKaZLi8htNr4AqKlfDdtXM6yXFLNHBqFBf/D9ZdJKpPGMAT/hXXj5Ax
+         fC3HQ9I4FI6vEpsNOwHt+b3cV9LIn1IupgtSfjJZmKBDX8jqA3pGnxLaGN5dnsxk2mzh
+         u3ndOpR5x0l55wfBKG1fDw9PbXTecOyDegHA2QRm6KpmEaBegjJIc7spfkRQO3AC6RTv
+         hf0u3KIO6bX1yImfBsXP7sswRkq0ythdz9CNkqQ6oMQeSMHRnEuv3ryLUEOwaZfTnF2p
+         b/iakgJEdZ/SJSYhqNxL8NbexgAWtga6/kA8T8iaw+gUNNo0WS4Hq1zRgXpL9IWvIQUO
+         8WYA==
+X-Gm-Message-State: AOJu0YwFZl3fnaE7PsS/V5ZdLZOYnjIsfmFa3ocl9EBhj2uomxW0rQHT
+	0fTwL51Em27oR/4SmiO2y7+Jyqr8HR0/+3vUk4H7olBtYXSydpVxihVTcX8ILsM=
+X-Google-Smtp-Source: AGHT+IFmNOo+FsyLImY+hRFnRsZtrbdxFYnJLHOCisKQtFfDjdq04SXoboOaQD9AsLcfhmfyHSskUA==
+X-Received: by 2002:a50:9f61:0:b0:565:bb25:bb7b with SMTP id b88-20020a509f61000000b00565bb25bb7bmr1899248edf.6.1709896022820;
+        Fri, 08 Mar 2024 03:07:02 -0800 (PST)
+Received: from [192.168.182.20] ([151.59.116.198])
+        by smtp.gmail.com with ESMTPSA id es14-20020a056402380e00b00566d9c8e6cesm7788958edb.21.2024.03.08.03.07.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Mar 2024 03:00:33 -0800 (PST)
-Message-ID: <88c29b7e-9541-47b3-974f-04c49ce24d2c@openvpn.net>
-Date: Fri, 8 Mar 2024 12:00:58 +0100
+        Fri, 08 Mar 2024 03:07:02 -0800 (PST)
+Message-ID: <28f8785d-65c3-49df-aacb-c80bc19b0a2b@openvpn.net>
+Date: Fri, 8 Mar 2024 12:07:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,15 +76,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 06/22] ovpn: introduce the ovpn_peer object
+Subject: Re: [PATCH net-next v2 09/22] ovpn: implement basic RX path (UDP)
 Content-Language: en-US
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
  Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
  Eric Dumazet <edumazet@google.com>
 References: <20240304150914.11444-1-antonio@openvpn.net>
- <20240304150914.11444-7-antonio@openvpn.net>
- <3ee0ece4-c612-41d5-b5b9-743a849d8aef@lunn.ch>
+ <20240304150914.11444-10-antonio@openvpn.net>
+ <0dcf1824-5819-4280-828d-46cf5bce3527@lunn.ch>
 From: Antonio Quartulli <antonio@openvpn.net>
 Autocrypt: addr=antonio@openvpn.net; keydata=
  xsFNBFN3k+ABEADEvXdJZVUfqxGOKByfkExNpKzFzAwHYjhOb3MTlzSLlVKLRIHxe/Etj13I
@@ -126,42 +126,89 @@ Autocrypt: addr=antonio@openvpn.net; keydata=
  ify06RjcfKmutBiS7jNrNWDK7nOpAP4zMYxYTD9DP03i1MqmJjR9hD+RhBiB63Rsh/UqZ8iN
  VL3XJZMQ2E9SfVWyWYLTfb0Q8c4zhhtKwyOr6wvpEpkCH6uevqKx4YC5
 Organization: OpenVPN Inc.
-In-Reply-To: <3ee0ece4-c612-41d5-b5b9-743a849d8aef@lunn.ch>
+In-Reply-To: <0dcf1824-5819-4280-828d-46cf5bce3527@lunn.ch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 08/03/2024 03:04, Andrew Lunn wrote:
->> +static inline bool ovpn_peer_hold(struct ovpn_peer *peer)
+On 08/03/2024 03:17, Andrew Lunn wrote:
+>> +++ b/drivers/net/ovpn/io.c
+>> @@ -53,6 +53,113 @@ int ovpn_struct_init(struct net_device *dev)
+>>   	return 0;
+>>   }
+>>   
+>> +/* Called after decrypt to write IP packet to tun netdev.
+>> + * This method is expected to manage/free skb.
+> 
+> tun?
+> 
+> The userspace implementation uses tun, but being in the kernel, don't
+> you just pass it to the stack?
+
+Sorry - this is just me being used to refer to the tunnel interface as 
+"tun".
+
+Whenever you read "tun", I actually refer to the interface created by 
+ovpn. This is totally unrelated to the tun module.
+
+But I agree that this doesn't make sense for anybody other than me.
+
+I will get rid of any word "tun" in the comments/doc.
+
+> 
+>> + */
+>> +static void ovpn_netdev_write(struct ovpn_peer *peer, struct sk_buff *skb)
 >> +{
->> +	return kref_get_unless_zero(&peer->refcount);
+>> +	/* packet integrity was verified on the VPN layer - no need to perform
+>> +	 * any additional check along the stack
+>> +	 */
+>> +	skb->ip_summed = CHECKSUM_UNNECESSARY;
+>> +	skb->csum_level = ~0;
+>> +
+>> +	/* skb hash for transport packet no longer valid after decapsulation */
+>> +	skb_clear_hash(skb);
+>> +
+>> +	/* post-decrypt scrub -- prepare to inject encapsulated packet onto tun
+>> +	 * interface, based on __skb_tunnel_rx() in dst.h
+>> +	 */
+>> +	skb->dev = peer->ovpn->dev;
+>> +	skb_set_queue_mapping(skb, 0);
+>> +	skb_scrub_packet(skb, true);
+>> +
+>> +	skb_reset_network_header(skb);
+>> +	skb_reset_transport_header(skb);
+>> +	skb_probe_transport_header(skb);
+>> +	skb_reset_inner_headers(skb);
+>> +
+>> +	/* update per-cpu RX stats with the stored size of encrypted packet */
+>> +
+>> +	/* we are in softirq context - hence no locking nor disable preemption needed */
+>> +	dev_sw_netstats_rx_add(peer->ovpn->dev, skb->len);
+>> +
+>> +	/* cause packet to be "received" by tun interface */
+>> +	napi_gro_receive(&peer->napi, skb);
 >> +}
 >> +
->> +static inline void ovpn_peer_put(struct ovpn_peer *peer)
+>> +int ovpn_napi_poll(struct napi_struct *napi, int budget)
 >> +{
->> +	kref_put(&peer->refcount, ovpn_peer_release_kref);
->> +}
+>> +	struct ovpn_peer *peer = container_of(napi, struct ovpn_peer, napi);
+>> +	struct sk_buff *skb;
+>> +	int work_done = 0;
+>> +
+>> +	if (unlikely(budget <= 0))
+>> +		return 0;
+>> +	/* this function should schedule at most 'budget' number of
+>> +	 * packets for delivery to the tun interface.
 > 
-> It is reasonably normal in the kernel to use _get() which takes a
-> reference on something and _put() to release it.
+> More tun. Did you copy code from the tun driver?
 
-I think I got inspired by dev_hold(), but I agree that _get() is more 
-appropriate.
+Same as above.
 
-Will change that.
-
-> 
->> +struct ovpn_peer *ovpn_peer_lookup_transp_addr(struct ovpn_struct *ovpn, struct sk_buff *skb);
->> +struct ovpn_peer *ovpn_peer_lookup_by_dst(struct ovpn_struct *ovpn, struct sk_buff *skb);
->> +struct ovpn_peer *ovpn_peer_lookup_by_src(struct ovpn_struct *ovpn, struct sk_buff *skb);
->> +struct ovpn_peer *ovpn_peer_lookup_id(struct ovpn_struct *ovpn, u32 peer_id);
-> 
-> All these look to take a reference on the peer. So maybe replace
-> lookup by get? It should then be easier to check there is a matching
-> put to every get.
-
-Alright, will do!
+Thanks for nothing those.
 
 Regards,
+
+> 
+>       Andrew
 
 -- 
 Antonio Quartulli
