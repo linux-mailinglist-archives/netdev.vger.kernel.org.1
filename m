@@ -1,134 +1,97 @@
-Return-Path: <netdev+bounces-78708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8DCF87637B
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:43:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05E768763A4
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:50:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 743BF2827AC
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:43:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA37E1F212AB
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DAC35645C;
-	Fri,  8 Mar 2024 11:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B963656449;
+	Fri,  8 Mar 2024 11:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PIGjsZ1G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n1JiNqKU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F10A56456;
-	Fri,  8 Mar 2024 11:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95CA755E78
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 11:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709898215; cv=none; b=VeWjlU27QlWYtX0gG6ytCiY9EoElEoDqytIC/i/n7/RFs6rfEtNq1JWPjxwbaEdTzdlFFrXFDQHg7gVT81IS1JsZ8J8yPUEGHebFy/vMvU454cDwqm1CxgU+lNPCq8YYqKKrLzxTDZD1d+CQ1viS3Z8W03ziTXZCqmkvFTYR/wo=
+	t=1709898632; cv=none; b=L6GZIygPa7sKuX2ArWYQMOWfHXAZ70OjX6h9xoSWJcwhjEkD480BR03sATLTIWQB5qZUYzWWyHG/Qur3GrjEzDlRfHFMpM1gCKtLLkGQgSvzHKEhhrQDDvTir6VUfk1zBV1v4v4TnB2Biba43RXAYWJxEGds9oJf1I7k+Ywj1f8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709898215; c=relaxed/simple;
-	bh=BLq4lE0ORuBLkjW/aMxstNNMbjhuSScW2T/odBK1an8=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=exfK3B6ArnlnQjk3zy84lhFXK1tpWJOFUU8LTy8bjRY5u/343VPoKmJPFpokLu44nzlxo6Rq0ngIpwMKx2CfjyekxIAcgkRvgR7080lARnZcTZqatsd313dAPAPtsa4Zgud5ovU6+j7+2cQ1zJppYP2dEAiCVe62K8n3wZ3IuKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PIGjsZ1G; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-78810ba2ff1so38570885a.3;
-        Fri, 08 Mar 2024 03:43:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709898212; x=1710503012; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=964gVKcSuC5DAvgCgp/Gwi4YKzK2yMuQXH05ybowodM=;
-        b=PIGjsZ1G3KL/USsCQYH09g7Iw2EFGlH2twvIs8X/qANiXOQHpyoWepXpc/6VifH2DO
-         3nmQdBoHiPR8tzgouFHHw05kW3BBQXGvDFGifhfsJ7jCZfcMISaPkphKpk9M5hFNaS2W
-         5lugZi5Cuq8My/zSE6WCslxbcKCy/hdiNP/9C68193AhrpTHVbjBnyvONtJjlaJH2ZRD
-         0AKdgo2zo73onRVIimpZP83nMyE0fnSGHKtuLx1/QbRWokyQN/tgfzuJER07Qma3gCan
-         NxwHQzdNc14R2gPmTwn3hyhFn5zZHIxozU2hrQLE7r8q1u5c5Kw3bmCcdX3mlz1o1MVW
-         cw3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709898212; x=1710503012;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=964gVKcSuC5DAvgCgp/Gwi4YKzK2yMuQXH05ybowodM=;
-        b=nqJ62rG46ZzqbqktDmsolwzviHM44CVyokPjQ4n+7qpMEimMWMYPap8vmULmh/yOAr
-         fxVinLVa5lRrlDcozVXbGabitDegP+y718w8Bt1x9Jc2dzhUijfjD/cnxItU45po2NKJ
-         mgVw86jG8o8Ifi1f99F2gLaxKp/zXO/7r4HTRzLjjANCLVXmBVG8CQllRqD6Rm/HM0lq
-         3KL2ThTnDPNKAG+/dwoK+CupnyEcXOeJkJMyUnC2agB62KUA+xDNh0P2UiGXVoeLzOsX
-         uL5CCehHk0hIxImGpXTC+BaFpoZbmTfN8Fvk78+/ecdia/AuPEWJpC+Ik1PtXCKxDNsJ
-         RJQA==
-X-Forwarded-Encrypted: i=1; AJvYcCU/kXhKRaP4fibk9u15Zfdr4u2lhwH7iO2EByp0IZ6ImOeZJ7Hdrp9fz10tdplEWqK3S6XleMB3ubWU1jFrBZ0Iu17PNmNd8aDZe8uU
-X-Gm-Message-State: AOJu0Yw4OeVAWdrPlCL7VrOAimLxaE6b9ml30Z9+/ffbcraUOOv2YoE4
-	K3kfHwo+v98o0preOn8/4NXD/ZUXc7HYbq28qegj4beow6x15fFX
-X-Google-Smtp-Source: AGHT+IG9tNInw+XrpOoh3PlFf4hk1pHn7wcFWE3peYGy4458jYHEYVeeTreamQQu18vK0HYLrF+Dtg==
-X-Received: by 2002:a05:620a:95a:b0:788:3207:bc3 with SMTP id w26-20020a05620a095a00b0078832070bc3mr11364161qkw.8.1709898212290;
-        Fri, 08 Mar 2024 03:43:32 -0800 (PST)
-Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
-        by smtp.gmail.com with ESMTPSA id d4-20020a37c404000000b00788253714cbsm5494285qki.58.2024.03.08.03.43.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Mar 2024 03:43:31 -0800 (PST)
-Date: Fri, 08 Mar 2024 06:43:31 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Juntong Deng <juntong.deng@outlook.com>, 
- willemdebruijn.kernel@gmail.com, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com
-Cc: netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <65eaf9e336d07_133b25294db@willemb.c.googlers.com.notmuch>
-In-Reply-To: <AM6PR03MB5848595A20BB5D958C2D9DE299272@AM6PR03MB5848.eurprd03.prod.outlook.com>
-References: <AM6PR03MB5848595A20BB5D958C2D9DE299272@AM6PR03MB5848.eurprd03.prod.outlook.com>
-Subject: Re: [PATCH net-next] net/packet: Add getsockopt support for
- PACKET_COPY_THRESH
+	s=arc-20240116; t=1709898632; c=relaxed/simple;
+	bh=nHwWm3lY0C7P+EG9PJyATKkY5E4gTT7zAl4X3aHbtOI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=q38GEUt6NdnArDmcrdcHhi6+4b1dDW6hFaSgqQXkthMZCe9vXxU7eDn91vPk7SYUdO8cVBx/X3BadJnBdxn0EJosU6NYiUIVCcHw5yxBtcd5f+oFFu99ix6G8kkI4kMZtowCX5CrAjwm4FeJG+MeIj35Pmr5pVVZpwAg2QRbmfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n1JiNqKU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 09C08C433C7;
+	Fri,  8 Mar 2024 11:50:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709898631;
+	bh=nHwWm3lY0C7P+EG9PJyATKkY5E4gTT7zAl4X3aHbtOI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=n1JiNqKUqee5MCfFE5eQjxNzQPAnv8KKZEtbdKXk1qlQ0GXKVtxq3OCfIyNPZEZe0
+	 fd0lOJ3f7ARhNu0O6Dqehud/i/4QNqoiKS+tYug0GL/fNT61jF04Bo+a6+hm0oiw5o
+	 KIO6HVP0HHMr3i+5oBTXIDfSGtUHLsj2T3gGG2jqfXYhrQXilGEaOOboAwuUDikg7M
+	 vBtuyAasYxe3rY77RVVdqMOyF6BMMcs44Isgae9LmkFUqYyr00WmIY6XsWfo3TGKOo
+	 tHVrFcfPVU+HCrX9qcybzE/fPOgPGsqwwqjtjDYkb3Q34SWI22E4WLJh0QpAIK0K2s
+	 I0GiQV5Q++JUA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E4BD8D84BB7;
+	Fri,  8 Mar 2024 11:50:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/3][pull request] Intel Wired LAN Driver Updates
+ 2024-03-06 (iavf, i40e, ixgbe)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170989863093.27866.3949525843486958539.git-patchwork-notify@kernel.org>
+Date: Fri, 08 Mar 2024 11:50:30 +0000
+References: <20240306215615.970308-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20240306215615.970308-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org
 
-Juntong Deng wrote:
-> Currently getsockopt does not support PACKET_COPY_THRESH,
-> and we are unable to get the value of PACKET_COPY_THRESH
-> socket option through getsockopt.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
+
+On Wed,  6 Mar 2024 13:56:10 -0800 you wrote:
+> This series contains updates to iavf, i40e, and ixgbe drivers.
 > 
-> This patch adds getsockopt support for PACKET_COPY_THRESH.
+> Alexey Kodanev removes duplicate calls related to cloud filters on iavf
+> and unnecessary null checks on i40e.
 > 
-> Signed-off-by: Juntong Deng <juntong.deng@outlook.com>
-> ---
->  net/packet/af_packet.c | 3 +++
->  1 file changed, 3 insertions(+)
+> Maciej adds helper functions for common code relating to updating
+> statistics for ixgbe.
 > 
-> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> index 0db31ca4982d..65042edd1a97 100644
-> --- a/net/packet/af_packet.c
-> +++ b/net/packet/af_packet.c
-> @@ -4090,6 +4090,9 @@ static int packet_getsockopt(struct socket *sock, int level, int optname,
->  	case PACKET_VNET_HDR_SZ:
->  		val = READ_ONCE(po->vnet_hdr_sz);
->  		break;
-> +	case PACKET_COPY_THRESH:
-> +		val = pkt_sk(sk)->copy_thresh;
-> +		break;
+> [...]
 
-This is probably a good opportunity to use READ_ONCE/WRITE_ONCE for
-this variable that can be modified and read concurrently.
+Here is the summary with links:
+  - [net-next,1/3] iavf: drop duplicate iavf_{add|del}_cloud_filter() calls
+    https://git.kernel.org/netdev/net-next/c/c49172f7a8cf
+  - [net-next,2/3] i40e: remove unnecessary qv_info ptr NULL checks
+    https://git.kernel.org/netdev/net-next/c/60e4caf36b88
+  - [net-next,3/3] ixgbe: pull out stats update to common routines
+    https://git.kernel.org/netdev/net-next/c/836aeaf73aa1
 
-Alternatively I can fix up all three locations in a follow-on patch.
-
-No concerns with adding the getsockopt itself.
-
->  	case PACKET_VERSION:
->  		val = po->tp_version;
->  		break;
-> -- 
-> 2.39.2
-> 
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
