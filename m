@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-78870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4EAC876D25
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 23:32:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D3F93876D27
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 23:32:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99680282E3F
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 22:32:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A4D8282F18
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 22:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7D31BC3E;
-	Fri,  8 Mar 2024 22:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8DA22F0F;
+	Fri,  8 Mar 2024 22:32:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="W06bhtfR"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FdeZZ3Ht"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2069.outbound.protection.outlook.com [40.107.92.69])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2077.outbound.protection.outlook.com [40.107.94.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E1D93D68
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 22:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B36A17C8B
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 22:32:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.77
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709937124; cv=fail; b=oRY/ETw9KGmck2lUUycxojZ2gte8lzP0U5UDoDpEBGGQzuqcHjQgUjXP5vvwW61BABHrXLEX5fTUi/w88BXex+nsh2wpEQ8Iao0aFa7tFL7BV3kJfhTtmMYD43KBk12asj0tWbr/10XzA4Wl5+WAe2rhRpZ5g9C2bLE4v+OVM/0=
+	t=1709937126; cv=fail; b=DXSh7KN9JyL7ql/1xiFarN/1VKMRm1z9z5tQD9fZHbFobfShw3XoMG8XNQ+fgs73GCVYZ1fiX5UFV2s/umEcvodPFpoiTZMqFRvP/6qfpnE+olDuUbt1MMwMW/LK8OtPNfrFVRuv4VPjggWi6KcuRNlgw8Lmdyx+s0HsmMs4+wo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709937124; c=relaxed/simple;
-	bh=vLk73zB5+EHu2ZrT5ztLeZIeGngXHicK5m0ccYPfUIM=;
+	s=arc-20240116; t=1709937126; c=relaxed/simple;
+	bh=WcaYpHIw+ry4CIad+KziRU6GugajNsL9W6zwWKShGAc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O3M7UoMOp+L8DElcsGkdfYQJOZjhK0r8rb6J3fkwlUsTxCp6m9D9498fT6hNm6RzhNAeTifyKvYxrXYh4KB14fF/DTeuMqyuLsg88jDGDvYfmiFG1uIuD+o7TbKu/uM1uv5vyDPkYwRDjD0eesc51DxTIFFHF4ep3B8M53BpW98=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=W06bhtfR; arc=fail smtp.client-ip=40.107.92.69
+	 MIME-Version:Content-Type; b=CK2Y4b6B3jfLPGMEbyN8GM+P4hnZ9a1QjGcYeDROY5uR6TfPjBsco4aqad78WneoisthzNeGv5ImHH1vlmsQSeH3O9RoaCr05kk/LNMLATmHYe2PlcTWEFUCFBC558AxvVCVNngmpiQpBDgV7AZUpGN6d27M2ywzINE6hiSsjAM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FdeZZ3Ht; arc=fail smtp.client-ip=40.107.94.77
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Wj35fd12cOToSBL8TD3MwR9Xi+FqM5tELXJrPnJ/0SrrwyYv/F8r2H9y5t7yMyChRrOaOtwv15GfvVBDoOmyelTetCezH7ybUtrJTGC5PpFBen5/SUC4M/1v/30U0jp/H9c8k2pE0afMlMdaaqb6+9hD7z5vo83UOg163+sr/cxtVSduEEVLUQhwRKpWqnv3AXGw6n/aDYTFSf03o8hALi8jW7oSg3GIyXjRMGk5hCScGk2l+WNHfEK2lE6Luk2YpQqRaLXjkkMTNLEK5LUlWzKQqfrwPuSK2bbiSkduBFWDVw9P/wMZBjiIViQM3sUA0JhC0GQHQkLnZMMG/h4duQ==
+ b=Aea+9RGX3akiSHkfO0dAw6YtQE93F2al2Lr5J+gBAMCS29zmqIweGa78ZCMlFwpWqTAc1oLDrHrAipGYR+Bx0OYY7KxY4uT/iMJXa7bAV1XVBAIQ+Anf+VqSPelCdFWFyiSYQfxZK5xhcnDRwCcBCE4QgOqRwwrhW6auYF7m7MVuKOrqQNlSbSFW4IrCC/P47p2G75nyxaRys+Iv9GTl6uKsLP0zahurOpTpPVdX+UbjCaekU37VXREiwJ1CB3vW4AFtRQFFbfde/XSoC4dTZh6p+qCgTMjZX5URvSjGWTcKLgeqvBOMdbvem0/AK4nsrssO489Q9a8BVVdUnmjlNw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f15yH0p3kTwsijqV+gBHTcxTr38OGz4050w/r0vCpkk=;
- b=Uq330KEO6/f+bHrdpn7mSz4JoK4UadNcer7z9gmju4Hv3UZqC15RtCOrClEennibttvLtsTB3i83+m41nuZhQHQ8QB25gjb0OQ99X62BLXHMUk3/g1/gPOueMy61lIdHU9clB/6LCg4GdzwwnEUQwgzOcO14p8TU9TDfX+znG4AGsFCffgJhpQHPy3cX4/lzOkH2+xqFemk5GspDUDy9EB7siuh+aauYYi7t9qbhZzjuigzo5aip7Mhh80Nv7R2tKkndMSDnV7AlMN0udKX4IMIaUs9jdcYzO7guJ+dvfZqEJJ5Ogrh7NjnPV16njpBAK3PaXe22AJTrWMOldvn1IQ==
+ bh=W0S0cmg2HgDK5qvBdiLfwlpkKH2CrhkQrfRxdy9x85c=;
+ b=XjRGGdHgbyzkP/VHKGst4D4BJoHoXK4wQDO3faesOCJhWi7zCzHPQYwK9hSKAWNygGYe4pePBXPJDsujxuTXRTyXcGF5HoE25MP+/cEcFnaRRT4bNAhWiESzpbauH2ldD84zDQUyx0D/0SgdyL8hlxITJx/H55PZ+QdRKam/NZnPJafhaci/cyW+riE0iPuYofFVeSBaROwA3BJqri/ZBUA58uOMkwwgJ6GCuTTmprol9bI7hNT8i+PZmCy/f90hYxNemwLt80Pw4eLSMI4tVGO7eNbmBUcbf/5vVd/bUs38OzFNmGbPXRcskuuUDbOna0jPy1UGa9BrGc9/Otqn6w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=f15yH0p3kTwsijqV+gBHTcxTr38OGz4050w/r0vCpkk=;
- b=W06bhtfRTBq0Eruu9SO+We27JlfiHf9ll0/zp8ZtLlLGwqdUFuKwY/iZrgDaWPWrnRMf0cFlWGWg8VospOHET4pUDMeYW9xxqIWce8EfneRIzUWdeY/j2AH6wuKcgkRqiThzT6qS4Tt/PQAGSDL+EZLJWrZd5Q2MHQvXep0j2IIM8s1UwABrnRbCzNWJA/MqCxaxxctUb+WWUYZrOqmQQrp5AOtVdydPr9BKRp0mB1udKSxzoL/YjEAaSeRriDzRuiu9COxCMQwngoe2FllgbevBBRCPIbH3147EiJ1FLqDuSZFVky0ewMWoL4oMEqn1+gQzC0c+t1VwlzfW88d0ww==
-Received: from SJ0PR13CA0136.namprd13.prod.outlook.com (2603:10b6:a03:2c6::21)
- by DS0PR12MB8816.namprd12.prod.outlook.com (2603:10b6:8:14f::22) with
+ bh=W0S0cmg2HgDK5qvBdiLfwlpkKH2CrhkQrfRxdy9x85c=;
+ b=FdeZZ3Htd9rcDPvncbKJB93KhCL69T6QzEW3Nm7Z1sAjsJLIVhHpd9MR7Xt9EFYvNdeHMk7v9BqkHfBvpzbGWhQfy/R7f/28XzcUg6GALFxsr+OaiLjP56C+ucvrbBm4ECQ860I0t9uNfFiehWO9IrkHZWAJVGHfq1J3q+aySx62fVE3EU9z8HtBzUba8zG1EDOoeKp+NHK4rSs/9A/+0+9wesNn5oCosVun3my28jass0dEPDBlu+MFoe9dhVmbw2rtX7z1+F83L0R1uGOluzLHh3D8JvQfmW4vmdO79lTk8e1+VjCR86xDvsUvcVH9Hp7piQix/7dEZIebZv+06w==
+Received: from SJ0PR03CA0299.namprd03.prod.outlook.com (2603:10b6:a03:39e::34)
+ by PH0PR12MB8099.namprd12.prod.outlook.com (2603:10b6:510:29d::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.26; Fri, 8 Mar
- 2024 22:31:58 +0000
-Received: from SJ5PEPF000001CD.namprd05.prod.outlook.com
- (2603:10b6:a03:2c6:cafe::72) by SJ0PR13CA0136.outlook.office365.com
- (2603:10b6:a03:2c6::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.10 via Frontend
- Transport; Fri, 8 Mar 2024 22:31:58 +0000
+ 2024 22:32:01 +0000
+Received: from SJ5PEPF000001CC.namprd05.prod.outlook.com
+ (2603:10b6:a03:39e:cafe::e2) by SJ0PR03CA0299.outlook.office365.com
+ (2603:10b6:a03:39e::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.28 via Frontend
+ Transport; Fri, 8 Mar 2024 22:32:00 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -64,25 +64,25 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- SJ5PEPF000001CD.mail.protection.outlook.com (10.167.242.42) with Microsoft
+ SJ5PEPF000001CC.mail.protection.outlook.com (10.167.242.41) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7362.11 via Frontend Transport; Fri, 8 Mar 2024 22:31:58 +0000
+ 15.20.7362.11 via Frontend Transport; Fri, 8 Mar 2024 22:32:00 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 8 Mar 2024
- 14:31:44 -0800
+ 14:31:48 -0800
 Received: from yaviefel.mtl.com (10.126.230.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Fri, 8 Mar
- 2024 14:31:41 -0800
+ 2024 14:31:45 -0800
 From: Petr Machata <petrm@nvidia.com>
 To: David Ahern <dsahern@kernel.org>, Stephen Hemminger
 	<stephen@networkplumber.org>, <netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
 	<mlxsw@nvidia.com>
-Subject: [PATCH iproute2-next 1/4] libnetlink: Add rta_getattr_uint()
-Date: Fri, 8 Mar 2024 23:29:06 +0100
-Message-ID: <501f27b908eed65e94b569e88ee8a6396db71932.1709934897.git.petrm@nvidia.com>
+Subject: [PATCH iproute2-next 2/4] ip: ipnexthop: Support dumping next hop group stats
+Date: Fri, 8 Mar 2024 23:29:07 +0100
+Message-ID: <d28e3c81f9a6f57efc21c1275d9bbe659ea6abe5.1709934897.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <cover.1709934897.git.petrm@nvidia.com>
 References: <cover.1709934897.git.petrm@nvidia.com>
@@ -98,52 +98,216 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001CD:EE_|DS0PR12MB8816:EE_
-X-MS-Office365-Filtering-Correlation-Id: b16b7a93-789d-4ece-cd6a-08dc3fbf910b
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001CC:EE_|PH0PR12MB8099:EE_
+X-MS-Office365-Filtering-Correlation-Id: 10aa978d-9f27-413c-edeb-08dc3fbf9271
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	6PhPqXIhIHA182j7f4EKYwQeQHUdbvv2govisD3R7yXql206XgGOMNyz1zAMpp9rE/bsJ/JLbgWjfHhzhaux6+BYPFF+5S9k/ApdIZaOzzbphY9sHJkrfnAKWNXRD/fjUXDeUaJLbpwBSWbjMecqUb1mh+oTl9/sMlKVHwLFb43vYBdUp+hcIR7ROGrwC1iDBSxPcQwEXCv98JZVbwzOV6IqvACmwJ6PhxBQgsp8G0bCXnx5pTb3HI5F0bPKXupOCOEZlxeVcYidgObUMVoXUjLAEeJ3jmzm5KyRJ1rqkh8qZwvlMXCrIN2owKCU+q4Os9dz8yiQTWUhGxvlVLrY9itX64M4f8P36JwFzwRuAbC3RM4dGCBLZ7XmhIsXxjb5mhONg8H9ZjwIw3hIU5kJmCkIsvVCoZS1URq/VGC2FuWFNdVNZoxu7BX3q9qFhIVZz9rpC9kjnrs3Svol/W5BDygn+ubiFD3488TgfloVuM14wHVo14qe60In58va12JU9lI/LEeOXYVNJB3LwxRi7d7CKk0XrSCWXZHsXQMVLmIQBHXS50SDE0Oyqsz0jb/esBKqzH2leDXhhmGp3uuuAPDMshahMREzkN+sY2mQ5mf9fjbJHINl+xX16Lt12+D27F53GxodRTbT0B44HyW9DuPKGzc5sRphxhnXUU+g1rxhzhR1X/hOJ4itwIkudzal+pWbglnm2QBcklx6YMbRYqzA5bsee9JT+/p7kuHQPkUN+g8WaR5nSbnraGjRZFV+
+	U2jNgMbI/ghX7dwrm/32UgOz6fi13J+ZzHgoJrnzUgP3ktDgquXjVJXuG5OPIcZwuKaIV04c/4wCN/0s2ZY8j3rY0rfO8aS6vheyHhfUOM2Y7aboh1KTmvsecoBNa0kzopcSWBobQmN1XUiXpD4T9WZapbnm3CpiDI9gB9MZtns9/abs04DhUga7f/82jqRN+0ZZwFhEHm5Gxx2mdUCqc/btqYSO099sbtlzzf/s/mJ2Tu2OUWn1vgDu+aoGxpIetNAsuxdHh8Gd4GvZuLuZ1Tj+q2fBRbSBtNZSPcLwHSLgsVWFcwu6j03shLT612fquMMnYdf3CQQAxSILuYWXB+cH+GA8qBAa2MX6qWcT5cM1REs/SOS+J0ZTfEQ2mhnyxr7zMtdp/TqDCAp7Dk+ah6wjz3sMC3AgyjfcZy5UlfFL1thDZohBZpn8pc6dy6dFqLgA8lY9efBqVEr9t7VZJsZhs5s9tHyQ0OUeohePhwVSHtjO5y/F21SetQyMO4yZfaKUChJKrGG4G9fgdvvyFCZfxLq3vD8fcJU1MB1o2CPbYCWVoe2uTgJ0rwFtuJb6qcw9OGaMxqDT6acoaxNPuuH2V6xA23RT6FHOoMlCZG123dlkacRz5DdQiqWAzzHvhT83wdMuJrz8t7fg1bZaSBowEVZ9PMeNQwfCRk5l8Y0eo6WtWso5Zd8x8dv+Sdw8vAZstTRgiiaaJLXBD98Mg1wfTHQnBgWzzmZpsPd7VDArSNj2VGf3V+9KJOI9B6OS
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(376005)(36860700004)(1800799015);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(1800799015)(36860700004)(82310400014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2024 22:31:58.4228
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2024 22:32:00.7698
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b16b7a93-789d-4ece-cd6a-08dc3fbf910b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 10aa978d-9f27-413c-edeb-08dc3fbf9271
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001CD.namprd05.prod.outlook.com
+	SJ5PEPF000001CC.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8816
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8099
 
-NLA_UINT attributes have a 4- or 8-byte payload. Add a function to extract
-these.
+Next hop group stats allow verification of balancedness of a next hop
+group. The feature was merged in kernel commit 7cf497e5a122 ("Merge branch
+'nexthop-group-stats'"). Add to ip the corresponding support. The
+statistics are requested if "ip nexthop" is started with -s.
 
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 ---
- include/libnetlink.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ ip/ipnexthop.c | 87 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ ip/nh_common.h |  6 ++++
+ 2 files changed, 93 insertions(+)
 
-diff --git a/include/libnetlink.h b/include/libnetlink.h
-index ad7e7127..a1233659 100644
---- a/include/libnetlink.h
-+++ b/include/libnetlink.h
-@@ -260,6 +260,12 @@ static inline __u64 rta_getattr_u64(const struct rtattr *rta)
- 	memcpy(&tmp, RTA_DATA(rta), sizeof(__u64));
- 	return tmp;
+diff --git a/ip/ipnexthop.c b/ip/ipnexthop.c
+index e946d6f9..8aa89546 100644
+--- a/ip/ipnexthop.c
++++ b/ip/ipnexthop.c
+@@ -25,6 +25,7 @@ static struct {
+ 	unsigned int fdb;
+ 	unsigned int id;
+ 	unsigned int nhid;
++	unsigned int op_flags;
+ } filter;
+ 
+ enum {
+@@ -92,6 +93,14 @@ static int nh_dump_filter(struct nlmsghdr *nlh, int reqlen)
+ 			return err;
+ 	}
+ 
++	if (filter.op_flags) {
++		__u32 op_flags = filter.op_flags;
++
++		err = addattr32(nlh, reqlen, NHA_OP_FLAGS, op_flags);
++		if (err)
++			return err;
++	}
++
+ 	return 0;
  }
-+static inline __u64 rta_getattr_uint(const struct rtattr *rta)
+ 
+@@ -296,6 +305,31 @@ static void parse_nh_res_group_rta(const struct rtattr *res_grp_attr,
+ 	}
+ }
+ 
++static void parse_nh_group_stats_rta(const struct rtattr *grp_stats_attr,
++				     struct nh_entry *nhe)
 +{
-+	if (RTA_PAYLOAD(rta) == sizeof(__u32))
-+		return rta_getattr_u32(rta);
-+	return rta_getattr_u64(rta);
++	const struct rtattr *pos;
++	int i = 0;
++
++	rtattr_for_each_nested(pos, grp_stats_attr) {
++		struct nh_grp_stats *nh_grp_stats = &nhe->nh_grp_stats[i++];
++		struct rtattr *tb[NHA_GROUP_STATS_ENTRY_MAX + 1];
++		struct rtattr *rta;
++
++		parse_rtattr_nested(tb, NHA_GROUP_STATS_ENTRY_MAX, pos);
++
++		if (tb[NHA_GROUP_STATS_ENTRY_ID]) {
++			rta = tb[NHA_GROUP_STATS_ENTRY_ID];
++			nh_grp_stats->nh_id = rta_getattr_u32(rta);
++		}
++
++		if (tb[NHA_GROUP_STATS_ENTRY_PACKETS]) {
++			rta = tb[NHA_GROUP_STATS_ENTRY_PACKETS];
++			nh_grp_stats->packets = rta_getattr_uint(rta);
++		}
++	}
 +}
- static inline __s32 rta_getattr_s32(const struct rtattr *rta)
++
+ static void print_nh_res_group(const struct nha_res_grp *res_grp)
  {
- 	return *(__s32 *)RTA_DATA(rta);
+ 	struct timeval tv;
+@@ -343,8 +377,33 @@ static void print_nh_res_bucket(FILE *fp, const struct rtattr *res_bucket_attr)
+ 	close_json_object();
+ }
+ 
++static void print_nh_grp_stats(const struct nh_entry *nhe)
++{
++	int i;
++
++	if (!show_stats)
++		return;
++
++	open_json_array(PRINT_JSON, "group_stats");
++	print_string(PRINT_FP, NULL, "\n  stats:\n", NULL);
++	for (i = 0; i < nhe->nh_groups_cnt; i++) {
++		open_json_object(NULL);
++
++		print_uint(PRINT_ANY, "id", "    id %u",
++			   nhe->nh_grp_stats[i].nh_id);
++		print_u64(PRINT_ANY, "packets", " packets %llu",
++			  nhe->nh_grp_stats[i].packets);
++
++		if (i != nhe->nh_groups_cnt - 1)
++			print_string(PRINT_FP, NULL, "\n", NULL);
++		close_json_object();
++	}
++	close_json_array(PRINT_JSON, NULL);
++}
++
+ static void ipnh_destroy_entry(struct nh_entry *nhe)
+ {
++	free(nhe->nh_grp_stats);
+ 	free(nhe->nh_encap);
+ 	free(nhe->nh_groups);
+ }
+@@ -418,6 +477,16 @@ static int ipnh_parse_nhmsg(FILE *fp, const struct nhmsg *nhm, int len,
+ 		nhe->nh_has_res_grp = true;
+ 	}
+ 
++	if (tb[NHA_GROUP_STATS]) {
++		nhe->nh_grp_stats = calloc(nhe->nh_groups_cnt,
++					   sizeof(*nhe->nh_grp_stats));
++		if (!nhe->nh_grp_stats) {
++			err = -ENOMEM;
++			goto out_err;
++		}
++		parse_nh_group_stats_rta(tb[NHA_GROUP_STATS], nhe);
++	}
++
+ 	nhe->nh_blackhole = !!tb[NHA_BLACKHOLE];
+ 	nhe->nh_fdb = !!tb[NHA_FDB];
+ 
+@@ -484,9 +553,23 @@ static void __print_nexthop_entry(FILE *fp, const char *jsobj,
+ 	if (nhe->nh_fdb)
+ 		print_null(PRINT_ANY, "fdb", "fdb", NULL);
+ 
++	if (nhe->nh_grp_stats)
++		print_nh_grp_stats(nhe);
++
+ 	close_json_object();
+ }
+ 
++static __u32 ipnh_get_op_flags(void)
++{
++	__u32 op_flags = 0;
++
++	if (show_stats) {
++		op_flags |= NHA_OP_FLAG_DUMP_STATS;
++	}
++
++	return op_flags;
++}
++
+ static int  __ipnh_get_id(struct rtnl_handle *rthp, __u32 nh_id,
+ 			  struct nlmsghdr **answer)
+ {
+@@ -500,8 +583,10 @@ static int  __ipnh_get_id(struct rtnl_handle *rthp, __u32 nh_id,
+ 		.n.nlmsg_type	= RTM_GETNEXTHOP,
+ 		.nhm.nh_family	= preferred_family,
+ 	};
++	__u32 op_flags = ipnh_get_op_flags();
+ 
+ 	addattr32(&req.n, sizeof(req), NHA_ID, nh_id);
++	addattr32(&req.n, sizeof(req), NHA_OP_FLAGS, op_flags);
+ 
+ 	return rtnl_talk(rthp, &req.n, answer);
+ }
+@@ -1093,6 +1178,8 @@ static int ipnh_list_flush(int argc, char **argv, int action)
+ 		argc--; argv++;
+ 	}
+ 
++	filter.op_flags = ipnh_get_op_flags();
++
+ 	if (action == IPNH_FLUSH)
+ 		return ipnh_flush(all);
+ 
+diff --git a/ip/nh_common.h b/ip/nh_common.h
+index 4d6677e6..e2f74ec5 100644
+--- a/ip/nh_common.h
++++ b/ip/nh_common.h
+@@ -13,6 +13,11 @@ struct nha_res_grp {
+ 	__u64			unbalanced_time;
+ };
+ 
++struct nh_grp_stats {
++	__u32			nh_id;
++	__u64			packets;
++};
++
+ struct nh_entry {
+ 	struct hlist_node	nh_hash;
+ 
+@@ -44,6 +49,7 @@ struct nh_entry {
+ 
+ 	int			nh_groups_cnt;
+ 	struct nexthop_grp	*nh_groups;
++	struct nh_grp_stats	*nh_grp_stats;
+ };
+ 
+ void print_cache_nexthop_id(FILE *fp, const char *fp_prefix, const char *jsobj,
 -- 
 2.43.0
 
