@@ -1,148 +1,160 @@
-Return-Path: <netdev+bounces-78639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31043875F4D
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:21:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 586F8875F55
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:22:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1480282900
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 08:21:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 776D51C2042B
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 08:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E37251C4D;
-	Fri,  8 Mar 2024 08:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4660750A79;
+	Fri,  8 Mar 2024 08:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="06Gxd8YT";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="uhzvUWlR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GSM2byJi"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36942C1A2;
-	Fri,  8 Mar 2024 08:20:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01922B9CD
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 08:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709886062; cv=fail; b=hNuE3C9Xx40YrwRAEF+CkgXX2w8HB8ywXEUhs3FjXefkCVKpPK/JTs9oe9HAb9uF+3i51LIoYWmtJDkFORzyzOEV3S5ryI3tgA0EO5/HWZWKdarPZzqyLNOW4f5CS5lrTWmtpRXdmlzm7MPPTsXTVJSvAAl7Q4psJrCSy0/ZECk=
+	t=1709886129; cv=fail; b=b6+5gI1MCltLuBey9KI8sNIzIzZ8je2R4t0BwhixsnB6As8aOo7kdIqCey52vKNz9Nx+rL/eQHTu4lgZ5wKBNdx631SXetq7KVEUuQB6hgTilt3WMK3x2r6Qgzk2KdBr7TCmdCZslJXULAkIbn+5CrGWLvpSar6L/XzGiJxNX7Q=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709886062; c=relaxed/simple;
-	bh=shGfC6ovW3GcePjyfCjCzBnHpmeQ4X7tqp2yrWBwyNg=;
+	s=arc-20240116; t=1709886129; c=relaxed/simple;
+	bh=jfvqX8zXB3vA2j74iDQ4mnIVieEEB8jZF0ECuvyBWdQ=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=GhiBF9ylbkF2H+yhcqmjBAOUt8n5ZVbkReiIP3zEt1LNQyxy/azBVTHnS3V7NYmNTC1SLFCYfhh83TPs8PNu+lh52P+ZR7VPdGLEqmjGRt+PerfmIFCre788hlQ43NsEfV7MrypMMVY13/KlcCzZcDYXP8EFKxh8las8RXGC5Ng=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=06Gxd8YT; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=uhzvUWlR; arc=fail smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	 Content-Type:MIME-Version; b=WYololkC2N9inrjMDn6rSzVKTBNGuVWW9yT7DVF1ehnBBuYS2KyIzdp6iI2U462Dn2edp/T1KbK2lWyK3FCGBcEhyiAYS6yWCFw3eYXT52oUgabu5CfxHBLrNj6PNoMHD5n5ifYvnmKX0QXvaBj8UKfTOWOSRCpBf+UfyL3zGcQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GSM2byJi; arc=fail smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1709886060; x=1741422060;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709886127; x=1741422127;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=shGfC6ovW3GcePjyfCjCzBnHpmeQ4X7tqp2yrWBwyNg=;
-  b=06Gxd8YTuRsQM4ET74QMV22uxxJG4eOQ2/puN2Zqx9c6TGmCbT7UsRgZ
-   RSRbG3yOxz1MUSOYaD2/br698TA9RayfTpx5ffnrEYzTrG3b6xAjV9RXE
-   48E+Z94z9q1vsjBXKnSXX+yGSpNhMvJjSreYxkXql6Lou1cxx/2iYdKOa
-   2xrdCLx/d2XCJr8PaaBo8UCXE46HmvGibzWPJGaWPwpWhz2DLKPjmRxxR
-   MYbJNSHadyRryTm9fkAXggoeI3VP94nZMNX7KZCe6ennBIuddfnuBO40M
-   Zl05BEXnfKGBNMvddZizJRZinG0h2TXjRQJ157EWfGH3tsM4/2f77yGFk
+  bh=jfvqX8zXB3vA2j74iDQ4mnIVieEEB8jZF0ECuvyBWdQ=;
+  b=GSM2byJi0EWSO91sL6kbMxBIkiWljGJNVUrllHzVP6bnCKheUpjthO5g
+   SuXI2IuCj0Vc5BQWVmOJfAfAGBMOjAC1uBwD3WdX26WiCogVTLMGVxNvL
+   Tj4vu5hVQUgA4q2ivigMzkFq5I+T8HnPZbGkMj+p3TVcG02o+5Zdt9mAA
+   v+2desbD/eUq28MMBRMUpvtaMeFqh9Ld+4ZiTzk9mTIs3WjP1A4Pxsn4t
+   vEl86/zLokHQKxbJs0oMMrPZveX6ochrCvo3IRBgVnVY9s1dKsAF8ooE8
+   Epe8Z1m8qNUnmsznVm6PGsmIb42EU9eEPCFvG2llkNmEko6ehpWK4S0gX
    g==;
-X-CSE-ConnectionGUID: 0/qjvn9kRN6kFqJGeJ/4jw==
-X-CSE-MsgGUID: ziq6ayKkTiK1B2fUZF+qQA==
-X-IronPort-AV: E=Sophos;i="6.07,108,1708412400"; 
-   d="scan'208";a="17928132"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Mar 2024 01:20:58 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+X-IronPort-AV: E=McAfee;i="6600,9927,11006"; a="15739158"
+X-IronPort-AV: E=Sophos;i="6.07,108,1708416000"; 
+   d="scan'208";a="15739158"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2024 00:22:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,108,1708416000"; 
+   d="scan'208";a="15088758"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 08 Mar 2024 00:22:06 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 8 Mar 2024 01:20:55 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.151) with Microsoft SMTP Server
+ 15.1.2507.35; Fri, 8 Mar 2024 00:22:05 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 8 Mar 2024 01:20:55 -0700
+ 15.1.2507.35; Fri, 8 Mar 2024 00:22:05 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Fri, 8 Mar 2024 00:22:05 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 8 Mar 2024 00:22:05 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SCxYPspsc84Fisic2Z1LvNU3L2JixIaA3cGmk7RtZ+ZINeJsVIc2XQ7mlbG+9CBm+Q5jsj9L+SJtcae64KtVF09AQsagOF59B5DytU+7KzrK+ggKk45dAqY/+53iLcPtCAzAGc/ZgiRgfqXNXmm90hxBXQIDdQ7maukYJdxdNq3zYjHocXIo+abbJu2YkZSQZP5SYAjGQQsOX17fWvA70+HH1iCSljBO89vVmdCFS+2jNvINqsd48NCNN0FCLI3gbVmxlUXZhLbWevMz6ikS9Nt36xRk543cZkImT+OSyvyKR8bzHUwW/KKjo21jm5ra4kOAWx4iFeEd6sKtKZp4eg==
+ b=JlwUTQjBiMU7SGnJKyad98+Maos1sDcKOZ4EPVJU3y10UH5o+TGRZJ597s5EC5Vw9FDmn92pMtRwcGlqBotirrvtq4HQbLPpH9gywczo2DCIBWrQ5Ztq1cbPUq81qpQt0fMyawkC3lYVtXXFDEmYruyEI4TQMJTc/RsJx7emVgwNSlAjEeWghG0tg270tySEFYjETJOxhEGtRmsOdy6OA2EdkMY/1CuH9yFJKHS4BS3rUOw8lQ1hB3wdtJt/EFc95FeDCGMCDhIjzJKhmFmWzHebWCP1ni5U0hziZU36W0yCGkXY1dT44/R92RjOyP6+XxXfF9wytFegdNvUPESyww==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=M4eCrPoJkBgBnPnz7yTWvWHDqW4NsDsE37ysV8ND4cI=;
- b=mKejoV36LDeGZpwiQTNPEnjlf3M07/Ua+DyVWfOCQ/H8sUN2UU5HfuCti8BY0KSTzZX3v2RubTxUy5ZE+6TK1+Nf1898wOtxgjeQ5MvpsTNCpgX8FqM65ESMKxz68uxOF6u83hMcNhWdYUp6hkXaD0cj2BBi7K0TFSfNT4bzYkr+i0oNdptEdICFRCayPu9aEv99cYo22pQ01TG+1/ZNXFD1OsNNghGrkLa+w+f1O5bFsoqeWQcjGVsGiXK3qFMFGkTx6iqDHm7abZSdCdhYi7WZcJs6ezGz+pQc8u6iOMwxJDmDLXrQB8L5wFFmRy7myeojv/c5wC5zc0lyJsRWxQ==
+ bh=5C+b6xH6vYsf9Yi9ElPbOaju5XKqfogiODXw/wGjfgQ=;
+ b=HWkPiXhpQiMsxh5nD8qoG5at090jFScbjBs6Ug/RKQlK2vQQyRAbD8PkqFzK4/dU17ayhUUPK3W5AwMSbxG7SJUEF3aqRWybScStnD5MpxjqO2j2tdJVAzK3mf185KUsAs419sLuuXp0MLP2nmMF0SMCdvcAkyn0Z1c2FsPA3t/cM1WeskVTlPsMejAwgb8lHEiGzy2eeg6xuLgTQr64B1PJhGTBSemg/GXAfh+P01GXqfM/VYVmRU2XBEim/WZ7pDivX5E/fIVUOuSJnvdd3nGO8JrmeKPZwn9mef7UTuy5NRqHB2NwskK3dLrnsEdkxqt1HyGmNAe22j1fkqv7xg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=M4eCrPoJkBgBnPnz7yTWvWHDqW4NsDsE37ysV8ND4cI=;
- b=uhzvUWlRWpEi7kt+jGKYUGxjwO5QtJl5wjrwMd6qIXEsRaX05He1hVRSGNOdDEGZw5Aif73FYpXDIC5zZ8GnjbJ79XNwe9MkSA3/3H1ZjkjYIkA3ijNu2lloJ45xhBvRHtEnnVl9yyAtNELW1mZEuk2SyfVd9bHt27XpOY/wWOBunQrHymB59nZNEsfwJq9hHzMWS88CbmDv+cK2PHDg/Mrw1vhVUZed8dqHE12SbyCQ+EMojlI1Au/RjP4ufuX66uaiU4Toqa6vby2d5LJUVmxphrnyz7mxwv9XxvR/5YlcQE87idHIrwuodPDncr1Xk9er6NdPYLjhIIzA8Lg5Zw==
-Received: from LV8PR11MB8700.namprd11.prod.outlook.com (2603:10b6:408:201::22)
- by DS0PR11MB7213.namprd11.prod.outlook.com (2603:10b6:8:132::9) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CO1PR11MB5009.namprd11.prod.outlook.com (2603:10b6:303:9e::11)
+ by MN0PR11MB6232.namprd11.prod.outlook.com (2603:10b6:208:3c3::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.6; Fri, 8 Mar
- 2024 08:20:51 +0000
-Received: from LV8PR11MB8700.namprd11.prod.outlook.com
- ([fe80::bef5:e3b9:4214:8eda]) by LV8PR11MB8700.namprd11.prod.outlook.com
- ([fe80::bef5:e3b9:4214:8eda%6]) with mapi id 15.20.7386.006; Fri, 8 Mar 2024
- 08:20:51 +0000
-From: <Raju.Lakkaraju@microchip.com>
-To: <andrew@lunn.ch>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <Bryan.Whitehead@microchip.com>,
-	<richardcochran@gmail.com>, <UNGLinuxDriver@microchip.com>
-Subject: RE: [PATCH net 3/3] net: lan743x: Address problems with wake option
- flags configuration sequences
-Thread-Topic: [PATCH net 3/3] net: lan743x: Address problems with wake option
- flags configuration sequences
-Thread-Index: AQHaaIt96K5hsZSvW06kwmptrB0k3LErcdiAgAIeqGA=
-Date: Fri, 8 Mar 2024 08:20:51 +0000
-Message-ID: <LV8PR11MB87008454A629EE15B9CE14099F272@LV8PR11MB8700.namprd11.prod.outlook.com>
-References: <20240226080934.46003-1-Raju.Lakkaraju@microchip.com>
- <20240226080934.46003-4-Raju.Lakkaraju@microchip.com>
- <78d7e538-9fa0-490e-bcfb-0a5943ad80c9@lunn.ch>
-In-Reply-To: <78d7e538-9fa0-490e-bcfb-0a5943ad80c9@lunn.ch>
-Accept-Language: en-GB, en-US
+ 2024 08:21:55 +0000
+Received: from CO1PR11MB5009.namprd11.prod.outlook.com
+ ([fe80::b792:3207:f838:98a1]) by CO1PR11MB5009.namprd11.prod.outlook.com
+ ([fe80::b792:3207:f838:98a1%4]) with mapi id 15.20.7386.009; Fri, 8 Mar 2024
+ 08:21:55 +0000
+From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
+To: "Zou, Steven" <steven.zou@intel.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>
+CC: "Sokolowski, Jan" <jan.sokolowski@intel.com>, "jiri@resnulli.us"
+	<jiri@resnulli.us>, "daniel.machon@microchip.com"
+	<daniel.machon@microchip.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Zou, Steven" <steven.zou@intel.com>, "Brandeburg,
+ Jesse" <jesse.brandeburg@intel.com>, "Staikov, Andrii"
+	<andrii.staikov@intel.com>, "Lobakin, Aleksander"
+	<aleksander.lobakin@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "horms@kernel.org" <horms@kernel.org>, "Ertman,
+ David M" <david.m.ertman@intel.com>, "Fijalkowski, Maciej"
+	<maciej.fijalkowski@intel.com>, "andriy.shevchenko@linux.intel.com"
+	<andriy.shevchenko@linux.intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net] ice: Refactor FW data type and
+ fix bitmap casting issue
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] ice: Refactor FW data type and
+ fix bitmap casting issue
+Thread-Index: AQHaWWrAzGAqJ0YuE0KvK0OXYI+ff7EtsGyQ
+Date: Fri, 8 Mar 2024 08:21:55 +0000
+Message-ID: <CO1PR11MB50096F0FA34CBC6F632DEE0B96272@CO1PR11MB5009.namprd11.prod.outlook.com>
+References: <20240207014959.24012-1-steven.zou@intel.com>
+In-Reply-To: <20240207014959.24012-1-steven.zou@intel.com>
+Accept-Language: en-IN, en-US
 Content-Language: en-US
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
+ header.d=none;dmarc=none action=none header.from=intel.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV8PR11MB8700:EE_|DS0PR11MB7213:EE_
-x-ms-office365-filtering-correlation-id: 7b69500e-7218-4633-2fce-08dc3f48aad6
+x-ms-traffictypediagnostic: CO1PR11MB5009:EE_|MN0PR11MB6232:EE_
+x-ms-office365-filtering-correlation-id: e0cef37a-8a87-4c3a-3f14-08dc3f48d0de
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: HenGR9fIlkdDAi8ADp0ZuyneNb5ko9vBB055lxOh2KwqB+8tQGE4YpGpU4CTZ8ijxI2dW1zazhcyJjGV6iYt+ytARYcdNdMen3BiVXmY9jtxNpcSK6wPnXu2d1ayU7sTDdpKsAnTsyxvl8KzA5xn+4UM7MrvY8EygTlpeeZBFWbCHf8mud8z57ZeVt3Ke6gcO1WUKKBkly7zGyVA3n26b/8oP+sw1L6Jx6H8tcBjYgbIlMHiK/EMe4xXVa6qxIzKLoAWwxk+5aUrL/CYeXwhCc3tu6OYrwkzMq7oZi+d4hLaibxT2CqwVui75hwUopiaoyrtcAOc3qDTCDq0K3juWvhbDcyTmWObeZRTuvqK2G5hM+ixlJvMBni7GIfNkl3LZoKsfhQupwYCNfiBHRqkCmPf+Q37MX8h0Y8ytFetUJnvZvT57zsRVzioF7ZJvm2bX4GFVWgkn8ADjq1U7A27f4qX6jrJq3r8K09rwQgiaJrHsY4UJg8dDqxbPb6VCFEzGNAQe3oSKH4+/PILSBcJGqi3NgYJ8BwCbeG/KIXoI2pDqP+RD95nhNGYcpjq8TD1pf5yo4Asd7bLQeQOmmwKiq6nl4PVoFzhyJVlXX/l1buu2qxB3fXNOo6QZF1bsbBgvrvNNpfdqnmxRO7InufWAvvm3N9ePINODeeKgRpCNoLwr2vXZ07Xdeq4qL4CWrwp
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR11MB8700.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(38070700009);DIR:OUT;SFP:1101;
+x-microsoft-antispam-message-info: JqKX/dObijouXCt1fLb83FbPa+9Fcnjb8rv4NcvoPlfMkxAJiSmeRM4Wo6jS6w0hug4gCMqWPsIcCC9Lu5RghpfOlaCRzSyvi/WgT7Wb5qY6b62QoyzIoSm9sXQfDRvA5JY4XK+g/usERXIr+9dvlXd5WQptyLHi0cRfXZm+iUGOw4NGkh6CdQ7V2MLu9Bk+R5hvneUdtQl+qtwjzY1P1HeosuZ2AQPlES4MTI/7jpmovScf3ogrG0XUmdfJx1Kvd71dR08yZAiSJcxIJB7AL403+e5gIlwBCrYbgLHz7rvNxcN5LNS1hCuO6DgboY+cKjX8GQRpg6OOpEY69I33zeRksDSdkFcJklm5w9+Fai4vtGVNzk+tdLY+rdAnmNeQZlFK80NseDNLYsZqUI37/XVB0nr8q157QG5j/l/tu5SumyU30ZDeHA2YG0FLO3X8Ba3731gprvZ7Y2sB7viZzvVKSj0GBiB4LPUs7Is3O2pHCxn2O1EqqpoXCD+b6nsCpj1sgfHBlGJn+lJ8jf28oCeOyPg5h7hn5jH2oY/GpErF0K6hDi9VZZPfaxdG0dnRCjFLofJLNIXRQkZ5EHv52G2HcErq10Ig6Nfc7S9Gk8Jum/a6zSds6QRxyLIrNud3pcNwoLS/16SbRPKQkWGyVTOZ/WmArFFzeoig8NXQV7MrOKs/Tx/lgEULTK6L9jObg36ELxa2pz3zZOHspBGEcQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5009.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(38070700009);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?cMhQVJhbBD60p8KuaK6oLuSnH0MK1Id4Ex394pL9CRV8yZo/nu5fbr8pNHwG?=
- =?us-ascii?Q?Fq5GLVl4nVQzB53jfkvIB0jTlMUPwVQvA9WAS6DXKGzjVKZ3H9IQK8I824e7?=
- =?us-ascii?Q?+KDZI9Q7Gbe8RCpYdETEt2sqP7GUmOZQHplblFkIDiTimMyx9aCA71Gk7u0f?=
- =?us-ascii?Q?tQDZKRSwGCT5W5o4d3qCectwhtEtm44BcV8TDAcnZ8AFREwkpijTrv77X9hF?=
- =?us-ascii?Q?K8w+/6lIngjOD7fDh6brwlGiF+GkvwA5NsPhfalcM83M9mQn/5k9qcP/UUUD?=
- =?us-ascii?Q?gWewYjQCs1sANv0elLz8D681URhIIinOUZoBc1lc4RT0qj6XPVLrdh/3xMwU?=
- =?us-ascii?Q?L4FhIPsBa62ysr8YIOp5YYf3MSgWdpzOpSBBif672vYs1GM5JZdel1dl65VG?=
- =?us-ascii?Q?ZCEUlBXkaZCiG504fagreYx61UQIMq8IntmUv88p7zoSiwI4PqtzquMMkzFX?=
- =?us-ascii?Q?EuvezGLi25MIWDuHm6slsm6CPkRdAKsAttALxOkg3nWARXMRLEkF4XzmXMWc?=
- =?us-ascii?Q?3TdFgvnNhGZyxY3iCvSZhD7Ubgh2KYLyTSbwmOUl40XvBwWsn9rMiaw2K9yG?=
- =?us-ascii?Q?7mO8Vsr5ubJSP7WX/gsIbl17w10vnLMlZJtOyYM++fe6xubDFFpTYTsvo7zF?=
- =?us-ascii?Q?StklFXN91r9D7+zcV5ju1N0QvXP2QrQcHfU4XXAfzdmZbHXFjJBOAoU1FXpL?=
- =?us-ascii?Q?AYu/UoXr9zFD4m+y3rmVGF0/Xeb+E22Jtpr2Ug+sabd/eMmg4SnVlyR8JH4G?=
- =?us-ascii?Q?uiJjv2eFtA/SQ3GHT6Lig5htVNEqdTq9wTZVTf2OuIXHmr9zMTG9Wkg342LK?=
- =?us-ascii?Q?mHk4RyBYAxfGBo+ygLjr0LcMTnu6S3NxcSg2zam6yQx/Ae2TaZPjpIQ3FB4f?=
- =?us-ascii?Q?TIXkQ78XNT3hpKYXfgVqUqBoHbXpPjzv2FMtfpGItrDd/IoBmQE6aTAbVEdf?=
- =?us-ascii?Q?+Aflwin69KxUA6q5QhSBRv1ip5KHnYOL8IGuIgee13R4SoA7Tym31i/Zn2o5?=
- =?us-ascii?Q?G7uZ6mVGiSaEP8Y189e3jbc7VONIB0HEnJcN9ptENoa3mInkZ8TKNRaCxs+0?=
- =?us-ascii?Q?QlRylkWbWz/xsYVAZa8zytB+GjizLwhC6X6BcMJhZZ1RWoIyrE54QNGD8lFh?=
- =?us-ascii?Q?LJdgcZ3sX/5ahkf6a/RX3NAAUGtc6zke+Qo5NH+47lg5A0t94vOYLwDGqEe1?=
- =?us-ascii?Q?FLMRtgoeIrhK3eCLoa67x2jEOlE6tDnD+98MuOLNJ1I/Ee+X2mScFP7dUhZS?=
- =?us-ascii?Q?gROt19ABXxsbozJBTYV5vaS2VwCO027eRE+d2Jm1HXLf2Qn/g88OA0QWmYrt?=
- =?us-ascii?Q?y0l5On00Y5xb1MfYS78ipzXWWYBW2r0+1PBUw1UhRIs/vHGZZUhg6AaVoXvQ?=
- =?us-ascii?Q?l8g/ciYjXz1YupW5ETFkc5qHALtmojXQzflCjFyY4ENgTI6kDI7m+Jp+0okq?=
- =?us-ascii?Q?mOIxvCsRHwM7WKgbgIy5ef5odoUxfBgQFe83mi2P1sziNDfDDOBBkHj49mwA?=
- =?us-ascii?Q?3oMEgHOdh+8z1hCjCvVsesnxEj7vCOvePw3MPibgBRvekX9mPIsXAWIPqnH9?=
- =?us-ascii?Q?aqNPfnvMDpzVWKLWu/lzFM1Ao+XSrxiw/p3QtlY2WgvrN0xyzjGz0PCqz9jb?=
- =?us-ascii?Q?4Q=3D=3D?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?qGmfqeXAUL7fCEUUgaubkE/MzUKaK/r4Ffc9pJX6QKFP0xMZjtdNlb1mBtoQ?=
+ =?us-ascii?Q?ZbwxPuKFRdVOGX/OUA6mDfaad02GfF4U79yq2m3aJgo6uiI3537V0zxk0+b8?=
+ =?us-ascii?Q?sFDq7SqH/rbga4ZXssU/lLTk/RVxZhsbIIvT4R065VaXW/8uFmv/KnqtPcVV?=
+ =?us-ascii?Q?TRACLKqkN0kGPLasoIoaXG5GClgtW822mtKWwjKxsQiwQkreSZFqiIWPb7wY?=
+ =?us-ascii?Q?rMzgTczDyiEUzs0yu37Ni+UcOmPFOyuRV+zJo2fMyx/LHoot7iB29WaTK5xw?=
+ =?us-ascii?Q?4hQZ1aOA0Qq2i3bFosSal+3FwIUB15qz+/3mdqr0Wa/HKaY0gnLT0Dp6tKQ2?=
+ =?us-ascii?Q?fsnqugoSTrI4Ok1azi+R3oMPcJR09Jl02FNZxaA6RnOh+U2teu7Zm8iARd28?=
+ =?us-ascii?Q?vVE7JwUUrbxnA/mRIrylWGJuG6WRAX3TPyeqaypF34T2mxTBuIYCk0tv57Es?=
+ =?us-ascii?Q?5ijJI3cY8bZtaXIcBBm8VJOZ6kZoUUE8wuImryYzf9mVWSEN3/1zdoeHt1Df?=
+ =?us-ascii?Q?qBffu4LoleM3bfSSkRH8Off+eoazm+XJTXCOPo03wCap6oVTcMrjXQz0kb/2?=
+ =?us-ascii?Q?YPYPqz65jQJRfOmixKcj2nxr+oE2K+wFokS1XD+nae0r9+KU00BWyZ6AOghM?=
+ =?us-ascii?Q?87TasVYq3s4g6HnAFwMAGaEv1aPkNiti5qi4O7ZLqYi9U4z9CI6xjeipOSR2?=
+ =?us-ascii?Q?iUtbB0HJ2728qV5ocjVLMwPNrbRoLCuJdElT0cXefOd1Y1JmBBxLycTkSrI6?=
+ =?us-ascii?Q?JUTCIQXyg57jN0Puje4LUWJFAtnouEw37WQkqGNieXYzrboykoIWuPlR1uNl?=
+ =?us-ascii?Q?WTFzSiuv69mm0BU24pZg53uH67f7wY3lr86w1vJnWfdSi5Lnhl1WZWGtCvOG?=
+ =?us-ascii?Q?6PhF5rRUoDbIx3AUoMAtY/NapTC/0aeJ+o+/B7ELIswoQqyFE9e5Cib23gTO?=
+ =?us-ascii?Q?98DoC8Qf2vHD9Xhdkup6A48O60TyEeIfC8ghVFGDZSy1ifezqxE8YJXJc3rQ?=
+ =?us-ascii?Q?pJIC+bFF3veFpXwWh+wvuy4gCbDed2CyWsOry5dRzo9YtZvVfIqqQw55Z2z/?=
+ =?us-ascii?Q?15Ok+c5AVsycDSaUmoq8cE0/mertDTTCRsn+lzsUxJ3T93a23XsS+w3LMezk?=
+ =?us-ascii?Q?eOqXFT+zUS8gamWxqwTckK+L658at8Ruu6CVAQjHeTgS93WphJY7fAPqLOKl?=
+ =?us-ascii?Q?oejVzwheopu/rT3PmvMqbPlKbq08ew54nZDwvK3pf2/yuzw4H7+XetZ8Y+nv?=
+ =?us-ascii?Q?T/PYpSSROd7SmQqSSvJfl6qcB8JG0B+GV7nj7Ufivygju6va/8X7jlivGcI5?=
+ =?us-ascii?Q?3Y5id9WoIkyOhpJyRYGP7hQeD/hbEOv6Rqi0qMOcsHoBG3e8guOwdmXPssQU?=
+ =?us-ascii?Q?qaQnAjjQbGsfyGnbDz9CFv2S5PHFjOkD8tZVxWFXyeLnbFp2x6wAuU4rDLdd?=
+ =?us-ascii?Q?jX8TlU6Ixok7o8M1NuEh2bkOahP2qea1tgUI5+TozmLG6ww5lnlksqYgXRJV?=
+ =?us-ascii?Q?AtFfHvtEIn+DPXAczSQmC5nh0qrySzMJHiRoDUJpN7QGzjUwYwkw996h/1E1?=
+ =?us-ascii?Q?EGipDU/Pky17U6z6rCcQ0Z05D1fQmHHRaQ8A6RUB?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -152,106 +164,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR11MB8700.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7b69500e-7218-4633-2fce-08dc3f48aad6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Mar 2024 08:20:51.5611
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5009.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e0cef37a-8a87-4c3a-3f14-08dc3f48d0de
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Mar 2024 08:21:55.3691
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kc0MI4GE6KoLy4basn4uoSnMQ33SmTZvknixkX0g6JnhQ3DKZquiUKZjY8KNPHZK4Z4/8QFn9njNw3UnvXhIP4zzxpMaxzpWDZjv82WJELs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7213
-
-Hi Andrew,
-
-Thank you for valuable information.
+X-MS-Exchange-CrossTenant-userprincipalname: tTueRau8njmPP0tuqWXmeJe2S1nf5LvsR9As0Ti8HyWA3y2+xoFCrU53MbDDsXfe7LlcHk1xvZDZBjji11JBGnGtklI0G+TVmYz+oZ2nA+w=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6232
+X-OriginatorOrg: intel.com
 
 > -----Original Message-----
-> From: Andrew Lunn <andrew@lunn.ch>
-> Sent: Thursday, March 7, 2024 5:23 AM
-> To: Raju Lakkaraju - I30499 <Raju.Lakkaraju@microchip.com>
-> Cc: netdev@vger.kernel.org; davem@davemloft.net; kuba@kernel.org; linux-
-> kernel@vger.kernel.org; Bryan Whitehead - C21958
-> <Bryan.Whitehead@microchip.com>; richardcochran@gmail.com;
-> UNGLinuxDriver <UNGLinuxDriver@microchip.com>
-> Subject: Re: [PATCH net 3/3] net: lan743x: Address problems with wake opt=
-ion
-> flags configuration sequences
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Steven Zou
+> Sent: Wednesday, February 7, 2024 7:20 AM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Sokolowski, Jan <jan.sokolowski@intel.com>; jiri@resnulli.us;
+> daniel.machon@microchip.com; netdev@vger.kernel.org; Zou, Steven
+> <steven.zou@intel.com>; Brandeburg, Jesse <jesse.brandeburg@intel.com>;
+> Staikov, Andrii <andrii.staikov@intel.com>; Lobakin, Aleksander
+> <aleksander.lobakin@intel.com>; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; horms@kernel.org; Ertman, David M
+> <david.m.ertman@intel.com>; Fijalkowski, Maciej
+> <maciej.fijalkowski@intel.com>; andriy.shevchenko@linux.intel.com; Kitsze=
+l,
+> Przemyslaw <przemyslaw.kitszel@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-net] ice: Refactor FW data type and=
+ fix
+> bitmap casting issue
 >=20
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e
-> content is safe
+> According to the datasheet, the recipe association data is an 8-byte litt=
+le-
+> endian value. It is described as 'Bitmap of the recipe indexes associated=
+ with
+> this profile', it is from 24 to 31 byte area in FW.
+> Therefore, it is defined to '__le64 recipe_assoc' in struct
+> ice_aqc_recipe_to_profile. And then fix the bitmap casting issue, as we m=
+ust
+> never ever use castings for bitmap type.
 >=20
-> On Mon, Feb 26, 2024 at 01:39:34PM +0530, Raju Lakkaraju wrote:
-> > Wake options handling has been reworked as follows:
-> > a. We only enable secure on magic packet when both secure and magic wol
-> >    options are requested together.
+> Fixes: 1e0f9881ef79 ("ice: Flesh out implementation of support for SRIOV =
+on
+> bonded interface")
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Reviewed-by: Andrii Staikov <andrii.staikov@intel.com>
+> Reviewed-by: Jan Sokolowski <jan.sokolowski@intel.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Steven Zou <steven.zou@intel.com>
+> ---
+>  .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  3 ++-
+>  drivers/net/ethernet/intel/ice/ice_lag.c      |  4 ++--
+>  drivers/net/ethernet/intel/ice/ice_switch.c   | 24 +++++++++++--------
+>  drivers/net/ethernet/intel/ice/ice_switch.h   |  4 ++--
+>  4 files changed, 20 insertions(+), 15 deletions(-)
 >=20
-> So it appears unclear what should happen here.
->=20
-> https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/bcm-phy-
-> lib.c#L909
->=20
-> WAKE_MAGICSECURE is a standalone option. You do not need WAKE_MAGIC.
-> And even i you did request both WAKE_MAGIC and WAKE_MAGICSECURE,
-> the WAKE_MAGIC would be ignored.
->=20
-> https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/dp83822.c#=
-L153
->=20
-> WAKE_MAGICSECURE is a standalone option. You do not need WAKE_MAGIC.
-> However, unlike the broadcom device, you can have both WAKE_MAGIC and
-> WAKE_MAGICSECURE at the same time. They are not mutually exclusive.
->=20
-> This also looks to be true for other dp8**** devices.
->=20
-> https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/mscc/mscc_=
-mai
-> n.c#L318
->=20
-> WAKE_MAGICSECURE is a standalone option. You do not need WAKE_MAGIC.
-> Also, you can have both WAKE_MAGIC and WAKE_MAGICSECURE at the same
-> time. They are not mutually exclusive.
->=20
-> So i think your point a. above is questionable. Can the hardware support =
-both
-> magic and secure magic at the same time? If so, follow the TI way of doin=
-g it.
-
-Yes. I will do.
-
-> If you cannot do both at the same time, and that is requested, you should
-> probably return -EOPNOTSUPP. That is probably better than what the
-> broadcom driver does, silently ignore WAKE_MAGIC.
->=20
-> > b. If secure-on magic packet had been previously enabled, and a
-> subsequent
-> >    command does not include it, we add it. This was done to workaround =
-a
-> >    problem with the 'pm-suspend' application which is unaware of secure=
--on
-> >    magic packet being enabled and can unintentionally disable it prior =
-to
-> >    putting the system into suspend.
->=20
-
-Ok. I will try to fix in 'pm-suspend' application
-
-> The kernel should not be working around broken userspace. But i also
-> suspect this is to do with it being unclear if WOL options are incrementa=
-l or
-> not. Since it seems that they are not incremental, it does not matter if =
-"If
-> secure-on magic packet had been previously enable". pm-suspend is setting
-> Wol how it wants it, which you say is plain magic. So magic is what the P=
-HY
-> driver should do. Feel free to submit patches to pm-suspend to make it
-> understand secure magic, or not touch WoL at all with the assumption it h=
-as
-> already been setup by something else.
->=20
->           Andrew
-
-Thanks,
-Raju
+Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
 
