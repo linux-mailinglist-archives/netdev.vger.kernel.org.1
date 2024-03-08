@@ -1,136 +1,107 @@
-Return-Path: <netdev+bounces-78787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F17E876773
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 16:32:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DBA5876774
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 16:33:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A07D81C216C7
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 15:32:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB717281A30
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 15:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA6B1EB5B;
-	Fri,  8 Mar 2024 15:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 519051EA84;
+	Fri,  8 Mar 2024 15:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DCv66hvw"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="11d0XEBa";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DKJZhap6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435A71DFDE
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 15:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2EFC1DDF1
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 15:33:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709911920; cv=none; b=Olkw31XnNcWdiWcmhooHlwSDulBAks+9TG2EE/ULjWA7QAOMGqu3CHbBJDZmzy9q19umoT8neBDwGeQGstvKO6lEfNn2b5KcMNN4eoz1uHrpscuC+wI5m83Gd8HrE9cSX32yTSlaT6Ro0pANTBbx9O2Xr2a87Pr6ZpMHz9oiaGw=
+	t=1709911987; cv=none; b=s7hPu7rohwAGFVi4BXpk8FyPASDdettwIDn1uy/CKxUujB3D2jMUfdLjNxQDXJUqqlbytLAJnxTn8SsszXnqflPFjGduVTfclBWuOs9V7R9zFVyioJ3elABN8NQV0U9TW1HP/pHeOea7o/JXP/PL7DC8px9eCB2JtvIuhtlnrg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709911920; c=relaxed/simple;
-	bh=p1EO7kVrg56+MwSgyZyPZie7DWCh7bb5MSs9kMAaez8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=UyKehxedyk3sgAJoVRtyyIPWl5ajWtTitgRGAD1Sm5XDyviaoteRWJVKVas0RtdXy8TK1Ye5N2SxuUWKtPunbUthEvQG+x3SQFoPnBInOgGWeqg11/Z2GHgqyorTrVb3wGmobB+1rlgF8sk5D1Ucs+HiuSUGfdyk2G+T8/sU1t8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DCv66hvw; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709911918;
+	s=arc-20240116; t=1709911987; c=relaxed/simple;
+	bh=v38IQMRHfiIXADWouHoAAKPP5mZnl9dnbH0Ocw5TjMg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zjd1PosyhEez4nSJowjqdrHPmfxgPno8l5Mki0loZuYW4ifWcuamb9foY35vM33YpZhLigGf6XGdWvYOOAJnLm+5eKdxiB3RU8u6OAQzxDF1n/AGMgaFr8Dq7Y26B0dqn+nRssgsF0D4ZnhwYGL7jPFdZA5VVQ9uZvE352IN91A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=11d0XEBa; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DKJZhap6; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Fri, 8 Mar 2024 16:33:02 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1709911983;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2CqJ8OyjV3bRv8zx+Stypoq4TfLAXAS+4CTsGsgxPUA=;
-	b=DCv66hvwKs7IT0hlVv+o6u4SLvwXiEGqA7WMTqQFx+e83VaPt/XKPBfjKVIlKpWz1W4DZy
-	vzp3/0l3RP2vkKQrZNVpgi+hHkzE/IpsfXYgnCszWlVMfk3s5CHURpYDiNqdaqqGZXAF2J
-	JdAwoxEuGbkl5VoVolRLMIzuiT2kFHU=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-519-iaB1TxLMMq6mrGeOkM4JeA-1; Fri, 08 Mar 2024 10:31:55 -0500
-X-MC-Unique: iaB1TxLMMq6mrGeOkM4JeA-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-56734247b02so1069511a12.0
-        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 07:31:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709911914; x=1710516714;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2CqJ8OyjV3bRv8zx+Stypoq4TfLAXAS+4CTsGsgxPUA=;
-        b=ZUKjf0JNngtvOJZBPKiAid/UMBS9TwiMubB0fAGAyqKa78t9IAuwswfAe3O9h30tGf
-         3frwrbyuKoZ7PvHOMCzjFwT4bAyjA+hc4oTN7euvxv+L0xSzj8JlJTLgm4OKa+5r0uob
-         BMpLL9LmmWFvmFL2xdHK9suNfcelG7WMPB8lDXjgVuDnnLDhbfY3V4jP6+K///K1V1e8
-         1bOhdAlqfVGw4s6q9CLim0UB9BVguZOuWJl1Myrz8gljNI+RXK4LtdE8VtcQiYi9zI7M
-         pUNGb2Tztud/CCyCngk6n0fQOFTmnQ+iQaHWwoqS7mEYQYyyPwsJAuL175scayls0+wI
-         uZVw==
-X-Forwarded-Encrypted: i=1; AJvYcCWDFOhuNL/E7i/GhD3T/6jTbplmFeq6d/tRKnOPPHtzv+yoNhOCUJC1JtBkaAkHmCg8reW/Iusmr6IqCtSXipR/pZViNWRC
-X-Gm-Message-State: AOJu0YzMwb9JgNNrA6zvbodbe5pitUqyuRsmf84drYvlbPmLDgg1bmL0
-	HA8MBTflXq7O+0w7Qjv3AeH1sZDCXvPhBUKkXmKEu86Zt74d/YKJ14a0atbL5WAXwxFMQ+PEFki
-	L01HXdq5g0FpCHOlKjFXo6lP7bWUDrT7h7+/MZTJN75qNoZgUyLbCYQ==
-X-Received: by 2002:a50:a419:0:b0:566:981d:aef5 with SMTP id u25-20020a50a419000000b00566981daef5mr2165702edb.24.1709911914527;
-        Fri, 08 Mar 2024 07:31:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGL8kvpXqtJq4hcVEInZ6+w/P2h+DZ7MoaE+AVDWrTwqHEdFQsj/q0lkaal7tLxpcRt3CXGmw==
-X-Received: by 2002:a50:a419:0:b0:566:981d:aef5 with SMTP id u25-20020a50a419000000b00566981daef5mr2165683edb.24.1709911914125;
-        Fri, 08 Mar 2024 07:31:54 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id g3-20020a056402180300b00566ea8e9f38sm7760865edy.40.2024.03.08.07.31.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Mar 2024 07:31:53 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 73617112F574; Fri,  8 Mar 2024 16:31:53 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Sergey Ryazanov
- <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, Antonio Quartulli <antonio@openvpn.net>
-Subject: Re: [PATCH net-next v2 08/22] ovpn: implement basic TX path (UDP)
-In-Reply-To: <20240304150914.11444-9-antonio@openvpn.net>
-References: <20240304150914.11444-1-antonio@openvpn.net>
- <20240304150914.11444-9-antonio@openvpn.net>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 08 Mar 2024 16:31:53 +0100
-Message-ID: <87ttlgrb86.fsf@toke.dk>
+	bh=v38IQMRHfiIXADWouHoAAKPP5mZnl9dnbH0Ocw5TjMg=;
+	b=11d0XEBazxZVTOs/f8KCNTIwqmYy4CNpjLiyLEnYkQapzMnyQ98CGb8OKXsoZvgDo8fqLb
+	h3EP4/T8lGnFvwxAjJl0hexGzZNjm/SfSQU0cxrd2l6+yT/YV8vY1l3yfX1m/0Yy/Kxxx/
+	/RssjkUjRMSRVPJzs2ARwTrGDP2Bz2ZOxv5oeJMWKqM6BX8Tg2LT2qm0RTP67ppLnsNQz1
+	c6ut95z0UlPZ+4y1/vxTZevK+aTZ/s7Rgs7aVhy+vNwBPqT2JGdL4ijEks6nP1/7i8F+mu
+	NNbY+RzwQXp3Cp6En0avP0iLepsMQPG/EwNki3dHFkai/dB7FSC4qz0NTqK0zQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1709911983;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=v38IQMRHfiIXADWouHoAAKPP5mZnl9dnbH0Ocw5TjMg=;
+	b=DKJZhap6p5AbgggdVdjjre4+/ZMKDiaSQ62VSryr3KbgG1wvLgGpjzRpByEaQ1zRV+RJep
+	LcRQQ7ryO7Iu32Bg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Wander Lairson Costa <wander@redhat.com>,
+	Yan Zhai <yan@cloudflare.com>
+Subject: Re: [PATCH v4 net-next 0/4] net: Provide SMP threads for backlog NAPI
+Message-ID: <20240308153302.AmmDp45Q@linutronix.de>
+References: <20240305120002.1499223-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240305120002.1499223-1-bigeasy@linutronix.de>
 
-Antonio Quartulli <antonio@openvpn.net> writes:
+On 2024-03-05 12:53:18 [+0100], To netdev@vger.kernel.org wrote:
+> The RPS code and "deferred skb free" both send IPI/ function call
+> to a remote CPU in which a softirq is raised. This leads to a warning on
+> PREEMPT_RT because raising softiqrs from function call led to undesired
+> behaviour in the past. I had duct tape in RT for the "deferred skb free"
+> and Wander Lairson Costa reported the RPS case.
+>=20
+> This series only provides support for SMP threads for backlog NAPI, I
+> did not attach a patch to make it default and remove the IPI related
+> code to avoid confusion. I can post it for reference it asked.
+>=20
+> The RedHat performance team was so kind to provide some testing here.
+> The series (with the IPI code removed) has been tested and no regression
+> vs without the series has been found. For testing iperf3 was used on 25G
+> interface, provided by mlx5, ix40e or ice driver and RPS was enabled. I
+> can provide the individual test results if needed.
+>=20
+> Changes:
+> - v3=E2=80=A6v4 https://lore.kernel.org/all/20240228121000.526645-1-bigea=
+sy@linutronix.de/
 
-> +/* send skb to connected peer, if any */
-> +static void ovpn_queue_skb(struct ovpn_struct *ovpn, struct sk_buff *skb, struct ovpn_peer *peer)
-> +{
-> +	int ret;
-> +
-> +	if (likely(!peer))
-> +		/* retrieve peer serving the destination IP of this packet */
-> +		peer = ovpn_peer_lookup_by_dst(ovpn, skb);
-> +	if (unlikely(!peer)) {
-> +		net_dbg_ratelimited("%s: no peer to send data to\n", ovpn->dev->name);
-> +		goto drop;
-> +	}
-> +
-> +	ret = ptr_ring_produce_bh(&peer->tx_ring, skb);
-> +	if (unlikely(ret < 0)) {
-> +		net_err_ratelimited("%s: cannot queue packet to TX ring\n", peer->ovpn->dev->name);
-> +		goto drop;
-> +	}
-> +
-> +	if (!queue_work(ovpn->crypto_wq, &peer->encrypt_work))
-> +		ovpn_peer_put(peer);
-> +
-> +	return;
-> +drop:
-> +	if (peer)
-> +		ovpn_peer_put(peer);
-> +	kfree_skb_list(skb);
-> +}
-
-So this puts packets on a per-peer 1024-packet FIFO queue with no
-backpressure? That sounds like a pretty terrible bufferbloat situation.
-Did you do any kind of latency-under-load testing of this, such as
-running the RRUL test[0] through it?
-
--Toke
-
-[0] https://flent.org/tests.html#the-realtime-response-under-load-rrul-test
-
+The v4 is marked as "Changes Requested". Is there anything for me to do?
+I've been asked to rebase v3 on top of net-next which I did with v4. It
+still applies onto net-next as of today.
+=20
+Sebastian
 
