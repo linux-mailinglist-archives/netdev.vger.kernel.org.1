@@ -1,179 +1,327 @@
-Return-Path: <netdev+bounces-78873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36F38876D28
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 23:32:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C21A876D2E
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 23:35:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A39391F216BD
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 22:32:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD47F2819A3
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 22:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E04441CD04;
-	Fri,  8 Mar 2024 22:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6586F22F0F;
+	Fri,  8 Mar 2024 22:35:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="INw+VA+D"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TSnI3pTh"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2079.outbound.protection.outlook.com [40.107.244.79])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2041.outbound.protection.outlook.com [40.107.92.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D272717C8B
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 22:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2750015AF;
+	Fri,  8 Mar 2024 22:35:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709937130; cv=fail; b=lQ1JV5KseHnyXM3/jL5c3MqzQ84iHM9xR4/Qky/QPUeR8hk9zE7RHfF4govZVhkj0Ci8vTtlQg0KHGEaz4pibRvlqhk+NBM0MYSwNVnRgg8smeBC6rOFZExKhzKzuOcSlxo2kGl/UXAaHuzINIntgv9cfEz8LMjpKZYxtTD51qI=
+	t=1709937317; cv=fail; b=knG0s9qmix3Pf+u/NyI81pW8Mq1C+yTvYq9nyc4u+2UorNDPM14tMXwBYWQOaG7tJi4JdXpGGcFreXW+Jn7IpdkcxYJdSpY2Jh7/1rbEUAzO6vZRUGBNSJ0MFOjAJJddEWzcEyhr2S+hGi6IRDgCGqwD3eg1YN4mQyctWy/ZuWg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709937130; c=relaxed/simple;
-	bh=Z9uk9O2tFDg7Y4zWFGMRL87dCnjCMTvUMK65pFu8Eco=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qkwZiOcngEMSp/9PLgtbOl9R6iKtHWTIakQ7SlDUshDu2L7gYXonnBpMlbzQMwmg4D8bOu+zmt07739bCABuStToQWURQ/mHZ1qNF/U9wtgExisou7q6HS3/54pE4U1HwMIGF7uYLTfg4tDs7vlNGxH7kpLbk6jp7tmI58eUgs4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=INw+VA+D; arc=fail smtp.client-ip=40.107.244.79
+	s=arc-20240116; t=1709937317; c=relaxed/simple;
+	bh=5N3zDJi0CboX7wY2vG/1skbjWTUJrLaM5AnyBAdZZEM=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 Content-Type:MIME-Version; b=ZvLXe2cDg7IRegsJvoQ7z2IMTg1nJlNSDnrlu+U9L8Z4UxIkfYRdukA0yI7KAtxdokSGWEaqQNVqGdvhOIhQ/GryZ2Pz9HQ7m7FkLcbBdmzpzr/t4RVjBRhZFAWFXy4f4wy7mneu3rPyBuU2gLUYk6BTEzn0exPpnPcIHpCib44=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TSnI3pTh; arc=fail smtp.client-ip=40.107.92.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j0QFVKqqEsvRa4mSmRWY62k8r73waS0bVz+CrrIQJSrt80RGPmVyogIPbyP0lFBQqRwT37jw6RepVpW8UgZ5Bjd4SQGrFZoV1UeO1/ZezLdVlhawr59HszfvruU0zDiZ+geMV7a5kYFpP6bOW7PNbf4O2psXKOd09odOlEdNrVzUe3Vur1OIBjjJxkCjFPwGA3dduV5sv/awHdbd+qEsnHLF3PAb4SdoPbFIU780OCxu7Q2urMaxcqOo0+boEPuHaFrxRGRRFOmARvBeeNlFb9J9u50nsCA79zgRdRduGVnt5rC91Yplk8xKncX0FDEPgDVsNdCd040zxuEkUSWDdA==
+ b=MCxkTRG97TDSBKrY0GThuwXIABlpI4qZsjqY35WYVRG7d4lhmQZnrCEPxVUfEPj1RdeLamY6nnsVprG3x56oyf1XkEO0wF4UGw7rRiuTdPc0O5uY4hnlVzw8PzppdjtDB+fg0cg9MVd0PXJ3AAVVcNpBzNcfmnCwK9sYOxEKwWL3Y4GC9PODVbm9WSHL9LN0lVBgudzvMAmfRj38IW00O5y5Xu9VsdKwQ/uhyvNyURv8QPXrbot8ffoj33ZE+82pFIElu2OoAstSfIDg1dFz/3Q9WRIkSd6DmWO97JcI0uxMqG1ipD4pDcwswi9EE/gQcVGKJqF/YaRJ4L1cIt5zPA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ldj6yuXukJoNqfN7SxeZD4+2+Ju2VkuLTlWtzV13eas=;
- b=Z6CfVrrAyqViwjDuWESg81fPs8k/FrkQnd3jEnot/q4GvQN9mCkGJF4w0Ir8sLbvi7zB+Qcg+dNRLf/TlUntqNgeh7WPqLxxRL16NG4mT1I74xR5zyRGl1vYoBOqsW8w75uoZ3Xj1cuJ7JgpodyQAz/pa2cjpwKYTgkDVHlMlb4uFn5+dUlBOLG6jc21M9w8ZVNSkT29Ui76K9f7FcAEfeFfJgYzGCLcK1X4+XyWChxnMRnPHj0YPG6aRD77CxDPWI5dksuo8zXuu5079PS4e5KA0HzRNsHlhb17KQRDlzMvVqmCVqNcP7OxO8EX5G4yl+1/cJxkHqYEe/IpKCQIzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
+ bh=KBAbvkyFEZCSHALqZi4y9RxDoKyc/o3csqdSNOeX8s0=;
+ b=WM2cALviSs0C16uu21Q/2qCZXDotNftuMsDJunps/43BO+is4QzK5etLdPasgWqbPAvY52bLlH/P59vJBAUJPVGDPbQHzqv+AKQ34JV52VRQMNg7EqyLki5jKit9K6p/QI1m5c4KKtJOgUuNHK/8uSYH4OvJ3oTKgHbou4HpW3GKhtrSTUhkjR0gOVSKpRJdSbimst7GYt71sXDTrJ8jNf1Jz/ivft2gvNd+WhAsMc8h9RgDbbBj12wKW76N1gftULIEXp/J0qPc9zleMJChBEbVu5d8ukFZI8IVPy0KjrIJQkqaNsJR0u/9+CSPo6ORdMUrqTNG/zSa9Tg+kB/osQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ldj6yuXukJoNqfN7SxeZD4+2+Ju2VkuLTlWtzV13eas=;
- b=INw+VA+D7fBS2ObXAXL9vhvbN8VuO9lFT5aTUZFrK3DraIEirDF2PmDiJHVUUVSSA/CtRCuXFytJ8d1w77GNWQeOCoJGwEXB0qDJ56xnMgZ2bFsS+tXB6ne25gwudt3tk0Jb3ypGI9JUq6hpe0TaUenn83irBrR8NJ344vxqtvbjCyap48U3ZV+/wsB9IHHPYxt1ybbDaq80NifMEWPBWZnGGS1cc2seirxCb281sqlQYXmMB+qrwnVV1PC/pk4PxqKhO0QpBQ8e++SMYHrTRI+4U1f8QWFQs6CrqLMWfxCO4Nmkh3U+1WRUBk4NiTN5bnqcpu2aL//cbAPa//Zw0g==
-Received: from SJ0PR13CA0076.namprd13.prod.outlook.com (2603:10b6:a03:2c4::21)
- by MN0PR12MB5953.namprd12.prod.outlook.com (2603:10b6:208:37c::15) with
+ bh=KBAbvkyFEZCSHALqZi4y9RxDoKyc/o3csqdSNOeX8s0=;
+ b=TSnI3pThsJ4SuF5juSuYOpRdcVB27t2eZA0DhjVLz0lYsXswOzQDdKkwTjtnzp7E3fqZ8j1jKk0FEzl0K9HbydGgrmEKOwmLCLpfuM9VE9IsRe+LeNgtg9qPvWU4TWLVktOvuunSLJAmzri2NYRNJ4YMuDnw/BOWUkgc6KUFjICUlSwoLed6DEbV9xyJ6aUjWcpvXKuBHX25kXARF+Us1P8ilmJ2y1yVar0VVhk13jSuKGQ/KJOsWCzBMgORL1AXP+rfxhBNDjomXsVDED2k+nYdWpwRf73oCn2hPKjBFo9OtNu91YCTJcmy2GynL9q4VXav2EwnOV/yWAzqObIUjw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+ by CYYPR12MB8871.namprd12.prod.outlook.com (2603:10b6:930:c2::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.31; Fri, 8 Mar
- 2024 22:32:06 +0000
-Received: from SJ5PEPF000001CE.namprd05.prod.outlook.com
- (2603:10b6:a03:2c4:cafe::35) by SJ0PR13CA0076.outlook.office365.com
- (2603:10b6:a03:2c4::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.12 via Frontend
- Transport; Fri, 8 Mar 2024 22:32:05 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ5PEPF000001CE.mail.protection.outlook.com (10.167.242.38) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7362.11 via Frontend Transport; Fri, 8 Mar 2024 22:32:05 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 8 Mar 2024
- 14:31:54 -0800
-Received: from yaviefel.mtl.com (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Fri, 8 Mar
- 2024 14:31:51 -0800
-From: Petr Machata <petrm@nvidia.com>
-To: David Ahern <dsahern@kernel.org>, Stephen Hemminger
-	<stephen@networkplumber.org>, <netdev@vger.kernel.org>
-CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	<mlxsw@nvidia.com>
-Subject: [PATCH iproute2-next 4/4] ip: ipnexthop: Allow toggling collection of nexthop group HW statistics
-Date: Fri, 8 Mar 2024 23:29:09 +0100
-Message-ID: <1bc19123247e0ffb7e08083244846407966e972c.1709934897.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <cover.1709934897.git.petrm@nvidia.com>
-References: <cover.1709934897.git.petrm@nvidia.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.27; Fri, 8 Mar
+ 2024 22:35:11 +0000
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::459b:b6fe:a74c:5fbf]) by BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::459b:b6fe:a74c:5fbf%6]) with mapi id 15.20.7362.024; Fri, 8 Mar 2024
+ 22:35:11 +0000
+References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
+ <20240223192658.45893-2-rrameshbabu@nvidia.com>
+ <abbff26c-c626-42ce-82a9-4dc983372de3@intel.com>
+ <875xyex10q.fsf@nvidia.com>
+ <a84df9ec-475d-4ffc-a975-a0911a57901e@intel.com>
+ <87il2evhtk.fsf@nvidia.com>
+ <ec969f62-a1bb-4287-a4eb-083201134bae@intel.com>
+ <87le6tvpq8.fsf@nvidia.com>
+ <d030d02d-150d-4337-a063-69da28049548@intel.com>
+ <87edcljnp0.fsf@nvidia.com>
+ <b2862eca-bff1-4def-9ac2-2ee426d3c6dd@intel.com>
+User-agent: mu4e 1.10.8; emacs 28.2
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Saeed Mahameed <saeed@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan  Corbet <corbet@lwn.net>, Richard Cochran
+ <richardcochran@gmail.com>, Tariq  Toukan <tariqt@nvidia.com>, Gal
+ Pressman <gal@nvidia.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, Ahmed Zaki
+ <ahmed.zaki@intel.com>, Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Hangbin Liu <liuhangbin@gmail.com>, Paul  Greenwalt
+ <paul.greenwalt@intel.com>, Justin Stitt <justinstitt@google.com>, Randy
+ Dunlap <rdunlap@infradead.org>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Kory Maincent
+ <kory.maincent@bootlin.com>, Wojciech Drewek <wojciech.drewek@intel.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Jiri Pirko <jiri@resnulli.us>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Dragos  Tatulea <dtatulea@nvidia.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v1 1/6] ethtool: add interface to read Tx
+ hardware timestamping statistics
+Date: Fri, 08 Mar 2024 14:30:24 -0800
+In-reply-to: <b2862eca-bff1-4def-9ac2-2ee426d3c6dd@intel.com>
+Message-ID: <877cice4ip.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR03CA0293.namprd03.prod.outlook.com
+ (2603:10b6:a03:39e::28) To BYAPR12MB2743.namprd12.prod.outlook.com
+ (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001CE:EE_|MN0PR12MB5953:EE_
-X-MS-Office365-Filtering-Correlation-Id: a32698a3-8466-4e6b-cd70-08dc3fbf952f
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|CYYPR12MB8871:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7a4a5e08-fc92-4b66-ea38-08dc3fc00405
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	VXykeO6Kif+7gv+kRazb1yXx6w/AWtxr63fFAiiBQHd/W0yeIepNc2E2oT2A7MwcnHOGHxeeCUVhMBgrBh4BFUcksO9F7lW2wIGXIz4XhVkw1EaHJAjDMIQmCZWKxOYSVRqABiW7HSu/IrUzBLV2tNsSNrjqwHcVQ2dTB0sAwm1Cb4o9MYBDI01kI9jdDLucHIdvzQBNyLwbDqD+dI9HAarJr1pJEUNEpyIcDb75B4t7utLhy7aOOCQ1Eq0tL6qB8PjhvevvZ3u4POrokZrNwOzam3EykkyIyGB4GggPyT3IdbB4WVx7unKIx9l6QG0Yk9jXpAlm+lTxC6vPDkcaRmJyGDi6aQApGY9gZ7o/Tr/4eJIf8gwWvgB+HHJd2DG8G3FiYmRCwkbql0C808o2be+HG1cHJ7LdRWQ0n6zupOksCf9bOmXJ1YKVhybd8gX4mxRKd4sjTYfoT7YXBKzqgQkpfUAFuL+EyJKUzPDmdwHrjV2kQBZPbBqo4Igm0Wm8UrJEDi1xRJAsOMeXptNDJSLsnrBgnjKYhg8vVcX+0yEm09BilMfe4IqzrdEuN6gagvWiwqVm0TQZOw3Ng3/mBJ3oNP6FfgJaxffO0zVLylqzQqqJTsrER3LCiRJXcnxyyo/pGpFx4cKd9cEgIcFpK6eQ5YKij3G4FhL2VdBAnSSao/k7VzaNEcvnYeApiLr9HDskARHT09MdiJtTyBAKT3Y7GP1MfnjsAK0olPJeQUH2NXYOLnxP+viFLB6T7tID
+	RIfANj589rT0hjmpLkPdByx49TVWFVc586YbqFIdbsoerBymfmZIb802OWU71KohZsbKkSh3UGl+plo70xEu+tK+x1jDnLUxkC660V43JuwASKtHdAobznHzz90oBpw74++4tIfQf6ggoNbNVlWti/041FCgQgL4KoFBO6wJkCN6Jeej7BiaqHCI5EllTEE7aMh90TiqPQ3sb7C/d4HOAfo2GfZdQqIs/XtvdFph7ysnQgQDitiLfSJYbvuzKmlkmpam9jPyllurWhKz+4gX4jkLX5pc5kDdZ4uiXGYIq4nJuBolM7DdUYXivv76nDcfsRZtqr5CizhGRjqD9F5eY49yC7yWp7pwaOzSROurHOCfGYKtw2FcPWaj0vrgZvgBR2f/8boBm62a+/oU0dKTUDpQuhL51A1ZTVUVPWZ8sPddOv+v024a5h9T7od5fHMNM/K/8MhaE6RkSJxzd/IQJowdBu04Ua7ugvbEio20bBhy+faJjZubzshVYaVMzyb3qHFEUC8DhCNTSFcycRRvmmFzQzIwx26lbXhTfta1/jE1qPFaOpeJvTXfaebjkroOaGkmIV8D6wgK2U9isSEVvbXFBpxX5Ho0X9okjpHS9zsoFsz+jcrXZ346i7BveXUVV/SpSRzYDxf6po0TzzHd5RpdiJ07OfhG05SNeBiQIcU=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(82310400014)(1800799015)(376005);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?xHkv6e6SRrtONUR3zU4O5/tzNL37AMSTQjzv46iAbue1wolXdxnE1RP/AgbE?=
+ =?us-ascii?Q?ND4CQ97146hft06EDpKnK3yir04AM/Cgo4xiutkjvOgdbhtl7qv4lVDig92d?=
+ =?us-ascii?Q?GVybhWdK4s1rZJTK/FFg1LIMiqt6ZCRt1goBw1e0bgCXq2Grw6jSZYWakTPL?=
+ =?us-ascii?Q?3RTDVTw0z0y82+haTiSYdog6GztWPjbKMXdjQDnP3D0YVwc51+JYbnMhXPgo?=
+ =?us-ascii?Q?HoDVfSELUCCGQ1UY7n8Zr0Rtx7XquzhLkbQojnyPoEZ1vFUuK0Qgvtm7XDFq?=
+ =?us-ascii?Q?4TsXrgudZ91+Oto288jjR/+DPriqIo92y6mJIytxsP+XbLR7AQveH1ufHDBl?=
+ =?us-ascii?Q?tHc11UPpvXix/sRrKyhDvtbNYJNJcmlouLl2VCh3v4Qu9oaCT1cPll666ASA?=
+ =?us-ascii?Q?Fj2PE759cGqXHF89ZeQlLKgxrSsnOHcEcbSl8cODKl+0BIcAKV4sGkIPhviY?=
+ =?us-ascii?Q?1mZC39VOMuuTQcHROkPB4kiatVRuZ3CLh9EItH+o+L25o5Xyz4YxGou5BjGC?=
+ =?us-ascii?Q?jYzuJ0xgS9/fvUbHgnmaKc2fS/T0zQL7k+tTzRYZeageDX39mjkRao8phhNL?=
+ =?us-ascii?Q?K74yaPUuiZZi734VIy8a/754vP5KJeHpq7R9RhT2GETeFfsNqGXk0VFjjqBd?=
+ =?us-ascii?Q?UlduJ2ZM2A9z9l9SIkyZJIUcMVjqbQhfTK+vrXghyo7b75j6fTrM9NNGUocX?=
+ =?us-ascii?Q?4CsDEgO801U8sVpUJf/JWro4ggpLPqpXeuEeK4UE3dl+4Qv9tT7UxJxx0knk?=
+ =?us-ascii?Q?MAu6oMuhN7oPUOb9pvUP/70fo08NY9uHosnOBdXtsSFJNZjf/h9GvlqovMFx?=
+ =?us-ascii?Q?NPh4EcyH9Ib1ajl8v+/8JZwlm/pguNs1w2HMttQYjMZEfUMkb59lG69vQi1u?=
+ =?us-ascii?Q?+dC4A/ztmLIPuSWcqUErqLwVpAmXE/jFsvwIsbHAT47gN53ryta0E/Hja787?=
+ =?us-ascii?Q?30UY26L8rskIkFLEGEQ/QYrtqGEyTLWXwuzhNx7eKjT42IETTosO35vYyZos?=
+ =?us-ascii?Q?D+KaYZwPyfb8pBP3xwOHgePXE7a4pxLo3MIWNsDvSdnkISXnhW3lPVUGCorb?=
+ =?us-ascii?Q?Z4aqiT71PRP9ve2ndXiW5ERm1TX3fGtS7JYZZhAg4lP206M15sZLs5kuNT1f?=
+ =?us-ascii?Q?WOW8sdAzTgeSUP5NOWN6JAV9vDOX1HRCilrMyBDT6hDRvGCQCKVwZ7szPgc/?=
+ =?us-ascii?Q?DJWUadmNoF9bjtPbf849nZYSNDzKNbERULHbQ+FmbgGg159vUwJIlmumZPE+?=
+ =?us-ascii?Q?PIEVYJW6nigMvyekcNvCGbg1yX1bwu+zQF/F0/8PO4Cj2Pg+qJ3HxLLRoZVF?=
+ =?us-ascii?Q?1wml4sDRzfhQ5Rx4izdGEiz6TfmwzLTUBWmjIvVOM9Nz7zIKw78ktzuRBxjT?=
+ =?us-ascii?Q?cruhKg5yqsGlBqbL3JQX3Fza1vSAbo7LSsHOk00WI0Ul/FZMbkUwo2MlGzOM?=
+ =?us-ascii?Q?622z/KwapBeDY0EzEj3eOqL57I2c14WGyrMDY7PBcrElBS6HBDjYBHcWAZ87?=
+ =?us-ascii?Q?k/hHwbJN5oj0dPNigN9ayyr36yre8L2bYBrKFBaGjGHC6l28shYtt2eS9CbV?=
+ =?us-ascii?Q?wyHwRXj7sXGnSqE4hdKg8sSqtIibYbrIZBdrfBmz2uEUY+lhOCuJN+UE5cWO?=
+ =?us-ascii?Q?jg=3D=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2024 22:32:05.3852
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7a4a5e08-fc92-4b66-ea38-08dc3fc00405
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2024 22:35:11.4992
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a32698a3-8466-4e6b-cd70-08dc3fbf952f
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001CE.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5953
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1+gpGFbrohkRJxwj0X5+ndxVXFxzZ8uOkYb+su4xe7hMVl6CMNSUdekBIy7/sBxcRa6WKNMEZxh5z7M9tod1jA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8871
 
-Besides SW datapath stats, the kernel also support collecting statistics
-from HW datapath, for nexthop groups offloaded to HW. Since collection of
-these statistics may consume HW resources, there is an interface to request
-that the HW stats be recorded. Add this toggle to "ip nexthop".
 
-Signed-off-by: Petr Machata <petrm@nvidia.com>
----
- ip/ipnexthop.c        | 12 ++++++++++++
- man/man8/ip-nexthop.8 |  2 ++
- 2 files changed, 14 insertions(+)
+On Fri, 08 Mar, 2024 14:28:01 -0800 Jacob Keller <jacob.e.keller@intel.com> wrote:
+> On 3/7/2024 9:09 PM, Rahul Rameshbabu wrote:
+>> 
+>> On Thu, 07 Mar, 2024 19:29:08 -0800 Jacob Keller <jacob.e.keller@intel.com> wrote:
+>>> On 3/7/2024 10:47 AM, Rahul Rameshbabu wrote:
+>>>> Hi Jacob,
+>>>>
+>>>> On Mon, 26 Feb, 2024 11:54:49 -0800 Jacob Keller <jacob.e.keller@intel.com> wrote:
+>>>>> On 2/23/2024 3:43 PM, Rahul Rameshbabu wrote:
+>>>>>>
+>>>>>> On Fri, 23 Feb, 2024 14:48:51 -0800 Jacob Keller <jacob.e.keller@intel.com>
+>>>>>> wrote:
+>>>>>>> On 2/23/2024 2:21 PM, Rahul Rameshbabu wrote:
+>>>>>>>> Do you have any example of a case of skipping timestamp information that
+>>>>>>>> is not related to lack of delivery over time? I am wondering if this
+>>>>>>>> case is more like a hardware error or not. Or is it more like something
+>>>>>>>> along the lines of being busy/would impact line rate of timestamp
+>>>>>>>> information must be recorded?
+>>>>>>>>
+>>>>>>>
+>>>>>>> The main example for skipped is the event where all our slots are full
+>>>>>>> at point of timestamp request.
+>>>>>>
+>>>>>> This is what I was guessing as the main (if not only reason). For this
+>>>>>> specific reason, I think a general "busy" stats counter makes sense.
+>>>>>> mlx5 does not need this counter, but I can see a lot of other hw
+>>>>>> implementations needing this. (The skipped counter name obviously should
+>>>>>> be left only in the ice driver. Just felt "busy" was easy to understand
+>>>>>> for generalized counters.)
+>>>>>
+>>>>> Yea, I don't expect this would be required for all hardware but it seems
+>>>>> like a common approach if you have limited slots for Tx timestamps
+>>>>> available.
+>>>>>
+>>>> Sorry to bump this thread once more, but I had a question regarding the
+>>>> Intel driver in regards to this. Instead of having a busy case when all
+>>>> the slots are full, would it make sense to stop the netdev queues in
+>>>> this case, we actually do this in mlx5 (though keep in mind that we have
+>>>> a dedicated queue just for port/phy timestamping that we start/stop).
+>>>>
+>>>> Maybe in your case, you can have a mix of HW timestamping and non-HW
+>>>> timestamping in the same queue, which is why you have a busy case?
+>>>>
+>>>
+>>> We don't use a dedicated queue. The issue isn't queue capacity so much
+>>> as it is the number of slots in the PHY for where it can save the
+>>> timestamp data.
+>> 
+>> In mlx5, we use a dedicated queue just for the purpose of HW
+>> timestamping because we actually do have a similar slot mechanism. We
+>> call it metadata. We have a limit of 256 entries. We steer PTP traffic
+>> specifically (though we will be changing this to any HW timestamped
+>> traffic with the work Kory is doing) to this queue by matching against
+>> the protocol and port. All other traffic goes to the normal queues that
+>> cannot consume the timestamping slots. When all the slots are occupied,
+>> we stop the timestamping queue rather than throwing some busy error.
+>> 
+>>>
+>>> In practice the most common application (ptp4l) synchronously waits for
+>>> timestamps, and only has one outstanding at a time. Likely due to
+>>> limitations with original hardware that only supported one outstanding
+>>> Tx timestamp.
+>>>
+>>>> Wanted to inquire about this before sending out a RFC v2.
+>>>
+>>> That's actually an interesting approach to change to a dedicated queue
+>>> which we could lock and start/stop it when the indexes are full. How
+>>> does that interact with the stack UDP and Ethernet stacks? Presumably
+>>> when you go to transmit, you'd need to pick a queue and if its stopped
+>>> you'd have to drop or tell the stack?
+>> 
+>> Let me share a pointer in mlx5 for how we do the queue selection. Like I
+>> mentioned, we steer ptp traffic specifically, but we can change this to
+>> just steer any skb that indicates hw timestamping.
+>> 
+>> *
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.h?id=3aaa8ce7a3350d95b241046ae2401103a4384ba2#n71
+>> 
+>> Then, here is how we manage stopping and waking the queue (we tell the
+>> core stack about this so we do not have to drop traffic due to some kind
+>> of busy state because our metadata/slots are all consumed).
+>> 
+>
+> Makes sense.
+>
+>> *
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c?id=3aaa8ce7a3350d95b241046ae2401103a4384ba2#n775
+>> *
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c?id=3aaa8ce7a3350d95b241046ae2401103a4384ba2#n257
+>> *
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c?id=3aaa8ce7a3350d95b241046ae2401103a4384ba2#n397
+>> 
+>>>
+>>> I think I remember someone experimenting with returning NETDEV_TX_BUSY
+>>> when the slots were full, but in practice this caused a lot of issues.
+>>> None of the other devices we have with only a single slot (one set of
+>>> registers, ixgbe, i40e, igb, e1000) did that either.
+>> 
+>> So we experimented that even with a single slot (we had reasons for
+>> testing this), the dedicated queue for timestamping worked out nicely. I
+>> really would suggest investigating this model since I think it might
+>> play out nicely for the Intel family.
+>> 
+>>>
+>>> If this queue model behaves in a sane way (or if we can communicate
+>>> something similar by reporting back up the stack without needing a
+>>> dedicated queue?) that could be better than the current situation.
+>> 
+>> I personally really like the dedicated queue in the device drivers, but
+>> if we want to instead model this slot management work in the core netdev
+>> stack, I do not think that is a bad endeavor either (when slots are
+>> full, hw timestamping traffic is held back till they become available).
+>> I do think the netif_tx_wake_queue/netif_tx_stop_queue + dedicated HW
+>> timestamping queue does work out nicely.
+>
+> Ok so if I understand this right, .ndo_select_queue has the stack pick a
+> queue, and we'd implement this to use the SKB flag. Then whenever the
+> slots for the queue are full we issue netif_tx_stop_queue, and whenever
+> the slots are released and we have slots open again we issue
+> netif_tx_wake_queue..
 
-diff --git a/ip/ipnexthop.c b/ip/ipnexthop.c
-index 573f1abb..74685c49 100644
---- a/ip/ipnexthop.c
-+++ b/ip/ipnexthop.c
-@@ -56,6 +56,7 @@ static void usage(void)
- 		"        [ encap ENCAPTYPE ENCAPHDR ] |\n"
- 		"        group GROUP [ fdb ] [ type TYPE [ TYPE_ARGS ] ] }\n"
- 		"GROUP := [ <id[,weight]>/<id[,weight]>/... ]\n"
-+		"         [ hw_stats {off|on} ]\n"
- 		"TYPE := { mpath | resilient }\n"
- 		"TYPE_ARGS := [ RESILIENT_ARGS ]\n"
- 		"RESILIENT_ARGS := [ buckets BUCKETS ] [ idle_timer IDLE ]\n"
-@@ -1100,6 +1101,17 @@ static int ipnh_modify(int cmd, unsigned int flags, int argc, char **argv)
- 			if (rtnl_rtprot_a2n(&prot, *argv))
- 				invarg("\"protocol\" value is invalid\n", *argv);
- 			req.nhm.nh_protocol = prot;
-+		} else if (!strcmp(*argv, "hw_stats")) {
-+			bool hw_stats;
-+			int ret;
-+
-+			NEXT_ARG();
-+			hw_stats = parse_on_off("hw_stats", *argv, &ret);
-+			if (ret)
-+				return ret;
-+
-+			addattr32(&req.n, sizeof(req), NHA_HW_STATS_ENABLE,
-+				  hw_stats);
- 		} else if (strcmp(*argv, "help") == 0) {
- 			usage();
- 		} else {
-diff --git a/man/man8/ip-nexthop.8 b/man/man8/ip-nexthop.8
-index f81a5910..aad68696 100644
---- a/man/man8/ip-nexthop.8
-+++ b/man/man8/ip-nexthop.8
-@@ -68,6 +68,8 @@ ip-nexthop \- nexthop object management
- .BR fdb " ] | "
- .B  group
- .IR GROUP " [ "
-+.BR hw_stats " { "
-+.BR on " | " off " }  ] [ "
- .BR fdb " ] [ "
- .B type
- .IR TYPE " [ " TYPE_ARGS " ] ] }"
--- 
-2.43.0
+Your summary here is correct.
 
+>
+> While the queue is stopped, the stack basically just buffers requests
+> and doesn't try to call the ndo_do_xmit routine for that queue until the
+> queue is ready again?
+
+Yes, that's right. Because of this, you can avoid needing to report a
+busy state and just let the stack buffer till the device backpressure
+for timestamping resources is released (timestamp information is
+retrieved from the device, making the slots available).
+
+>
+> Using a dedicated queue has some other advantages in that it could be
+> programmed with different priority both from the hardware side (prefer
+> packets waiting in the timestamp queue) and from the software side
+> (prioritize CPUs running the threads for processing it). That could be
+> useful in some applications too...
+>
+>> 
+>> Let me know your thoughts on this. If you think it's an interesting idea
+>> to explore, lets not add the busy counter now in this series. I already
+>> dropped the late counter. We can add the busy counter later on if you
+>> feel this model I have shared is not viable for Intel. I wanted to avoid
+>> introducing too many counters pre-emptively that might not actually be
+>> consumed widely. I had a thought that what you presented with slots is
+>> very similar to what we have with metadata in mlx5, so I thought that
+>> maybe handling the management of these slots in a different way with
+>> something like a dedicated queue for HW timestamping could make the
+>> design cleaner.
+>> 
+>
+> I think I agree with the queue model, though I'm not sure when I could
+> get to working on implementing this. I'm fine with dropping the busy
+> counter from this series.
+
+No worries. If you are interested in further discussion or any kind of
+RFC review, I am open to this. If you feel this model is not
+satisfactory in the future, we can discuss this and then look at adding
+the busy counter.
+
+--
+Thanks,
+
+Rahul Rameshbabu
 
