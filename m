@@ -1,97 +1,112 @@
-Return-Path: <netdev+bounces-78716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05E768763A4
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:50:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3B5E8763D4
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:57:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA37E1F212AB
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:50:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A25C2820F6
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:57:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B963656449;
-	Fri,  8 Mar 2024 11:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F12A56467;
+	Fri,  8 Mar 2024 11:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n1JiNqKU"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="O/Id0pPJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95CA755E78
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 11:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72C355E67;
+	Fri,  8 Mar 2024 11:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709898632; cv=none; b=L6GZIygPa7sKuX2ArWYQMOWfHXAZ70OjX6h9xoSWJcwhjEkD480BR03sATLTIWQB5qZUYzWWyHG/Qur3GrjEzDlRfHFMpM1gCKtLLkGQgSvzHKEhhrQDDvTir6VUfk1zBV1v4v4TnB2Biba43RXAYWJxEGds9oJf1I7k+Ywj1f8=
+	t=1709899056; cv=none; b=mexZ3/LiHtvHSU9myQvsZaA07VCIMLBIMQ4wUJdKBZS4zGxe8YO+DgeH/V5CvbseK+SRv8CuIF0ph+Cq4FpuQGHhKXxZniw9LTbwPa/sNrUqdJXHRpnvESsNhjg8rA2hOXGD6+xdR78SEra/zb98A27RRmH1M2NtMJmv1kFVukw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709898632; c=relaxed/simple;
-	bh=nHwWm3lY0C7P+EG9PJyATKkY5E4gTT7zAl4X3aHbtOI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=q38GEUt6NdnArDmcrdcHhi6+4b1dDW6hFaSgqQXkthMZCe9vXxU7eDn91vPk7SYUdO8cVBx/X3BadJnBdxn0EJosU6NYiUIVCcHw5yxBtcd5f+oFFu99ix6G8kkI4kMZtowCX5CrAjwm4FeJG+MeIj35Pmr5pVVZpwAg2QRbmfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n1JiNqKU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 09C08C433C7;
-	Fri,  8 Mar 2024 11:50:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709898631;
-	bh=nHwWm3lY0C7P+EG9PJyATKkY5E4gTT7zAl4X3aHbtOI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=n1JiNqKUqee5MCfFE5eQjxNzQPAnv8KKZEtbdKXk1qlQ0GXKVtxq3OCfIyNPZEZe0
-	 fd0lOJ3f7ARhNu0O6Dqehud/i/4QNqoiKS+tYug0GL/fNT61jF04Bo+a6+hm0oiw5o
-	 KIO6HVP0HHMr3i+5oBTXIDfSGtUHLsj2T3gGG2jqfXYhrQXilGEaOOboAwuUDikg7M
-	 vBtuyAasYxe3rY77RVVdqMOyF6BMMcs44Isgae9LmkFUqYyr00WmIY6XsWfo3TGKOo
-	 tHVrFcfPVU+HCrX9qcybzE/fPOgPGsqwwqjtjDYkb3Q34SWI22E4WLJh0QpAIK0K2s
-	 I0GiQV5Q++JUA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E4BD8D84BB7;
-	Fri,  8 Mar 2024 11:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1709899056; c=relaxed/simple;
+	bh=DzlNhTdtaAPy9EN5c8XbLQyzGsKEJ42CHwm+9COqjpI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PECQLDtRhLD+BD1mVspFkF8mYzOek2TtWxqCZTqSbmQQodqKd2aWgGGUmKGJ6I07I6sZeh38zOdXExTyHNqsLqnXJ1czkeL9UXyevYtdtWkwjGW0Ras7CsEQmqSgvjX1NYN6r/xtDn1CQvTnN+aY8lV06cwM/rYGZuZHJ+9oL64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=O/Id0pPJ; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 428AQPZV000972;
+	Fri, 8 Mar 2024 03:57:28 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	pfpt0220; bh=csPbFyhLfxTSJpj883qo9hObBQB7Y+/gUU7b/QaiEf4=; b=O/I
+	d0pPJ3EmDZ8SPw43qHL5l+0GMAZFwVXgvZHgrRei5jrwnadRui55tr5Ui9HcYnNn
+	yaOe2/k5oYYk2OhVEBhtHLO0F6ii7ILbVW8CZ63ghbDwiD3ps4j1AQlCtC4QBJjA
+	U1p9zp6qLV9VXPgF9kJLpCdecyH/f7qPM9S1z5iQmUodcsoHmF3zmyFWmsrv8d2l
+	/BK99C7JGrjgfIX8MoBJCqh+LSrM3jLwRD2p7YsqnBs0n653rgPHRY35ouuqkLCf
+	3yiNPay8ulam/82w2fKhd3fk1vkEJNa+uN9VRQiAhmgho1L3n1KV++YW+up97AS3
+	9EdprAvqF89nI2+L5/w==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3wr0x0071u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Mar 2024 03:57:27 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Fri, 8 Mar 2024 03:57:26 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
+ Transport; Fri, 8 Mar 2024 03:57:26 -0800
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 7B4BD5B6928;
+	Fri,  8 Mar 2024 03:57:23 -0800 (PST)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>
+Subject: [net PATCH] octeontx2-pf: Do not use HW TSO when gso_size < 16bytes
+Date: Fri, 8 Mar 2024 17:27:22 +0530
+Message-ID: <20240308115722.14671-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3][pull request] Intel Wired LAN Driver Updates
- 2024-03-06 (iavf, i40e, ixgbe)
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170989863093.27866.3949525843486958539.git-patchwork-notify@kernel.org>
-Date: Fri, 08 Mar 2024 11:50:30 +0000
-References: <20240306215615.970308-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20240306215615.970308-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org
+Content-Type: text/plain
+X-Proofpoint-GUID: Frwh1QSJLHuf3asZq6_AMxAcMf1xhOLE
+X-Proofpoint-ORIG-GUID: Frwh1QSJLHuf3asZq6_AMxAcMf1xhOLE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-08_08,2024-03-06_01,2023-05-22_02
 
-Hello:
+Hardware doesn't support packet segmentation when segment size
+is < 16 bytes. Hence add an additional check and use SW 
+segmentation in such case.
 
-This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+Fixes: 86d7476078b8 ("octeontx2-pf: TCP segmentation offload support").
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-On Wed,  6 Mar 2024 13:56:10 -0800 you wrote:
-> This series contains updates to iavf, i40e, and ixgbe drivers.
-> 
-> Alexey Kodanev removes duplicate calls related to cloud filters on iavf
-> and unnecessary null checks on i40e.
-> 
-> Maciej adds helper functions for common code relating to updating
-> statistics for ixgbe.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,1/3] iavf: drop duplicate iavf_{add|del}_cloud_filter() calls
-    https://git.kernel.org/netdev/net-next/c/c49172f7a8cf
-  - [net-next,2/3] i40e: remove unnecessary qv_info ptr NULL checks
-    https://git.kernel.org/netdev/net-next/c/60e4caf36b88
-  - [net-next,3/3] ixgbe: pull out stats update to common routines
-    https://git.kernel.org/netdev/net-next/c/836aeaf73aa1
-
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+index f828d32737af..2ac56abb3a0e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+@@ -967,6 +967,13 @@ static bool is_hw_tso_supported(struct otx2_nic *pfvf,
+ {
+ 	int payload_len, last_seg_size;
+ 
++	/* Due to hw issue segment size less than 16 bytes
++	 * are not supported. Hence do not offload such TSO
++	 * segments.
++	 */
++	if (skb_shinfo(skb)->gso_size < 16)
++		return false;
++
+ 	if (test_bit(HW_TSO, &pfvf->hw.cap_flag))
+ 		return true;
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
