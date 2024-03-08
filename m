@@ -1,188 +1,194 @@
-Return-Path: <netdev+bounces-78665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7761876108
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 10:38:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51473875E6B
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 08:26:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B7EE282600
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:38:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB7F7283FF9
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 07:26:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EBA152F7F;
-	Fri,  8 Mar 2024 09:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D284EB49;
+	Fri,  8 Mar 2024 07:26:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Ccsno1JB";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="90oYvb9s";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Ccsno1JB";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="90oYvb9s"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XwUo+9qo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB25B22F0F
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 09:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709890693; cv=none; b=ZeSEsC+Oapt9B4thbvii4ON/GmOxRcL26tcM5jjZVA6Hv652Q5aA2/sXU8jpLwBNFVD2Ln0GViYAZifRMU5+APX5HPlRq3aF/1en/H4A9TUbRBorhmlPhAAWSwPAM5vj0GFmi34M1UaPE4EkvPZ6DaOUBMjB41lGS3SZeDG8YyY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709890693; c=relaxed/simple;
-	bh=7cPWq8PidDWpME3nuqSCElVzBmJ1vDhz0swL9iTH5Bo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q9KooFAP+BpUJoXAmnlwrWruQjRt3UGwrtgQVnAHISCPfDjEqhb/4SoeqV7dCegtTqfBDzK5oihfVnjrKo+vV8Pu3lx/fL+S4TG951xrKy8uLZqFequNbreNaAKjtpXmobJy9VD0rQvl756SCxn/1BPq9pILjuLUegX4DX7KE8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Ccsno1JB; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=90oYvb9s; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Ccsno1JB; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=90oYvb9s; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from lion.mk-sys.cz (unknown [10.100.225.114])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 8167734879;
-	Fri,  8 Mar 2024 07:15:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1709882144; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4y/KyuaciNXjMkUvqRU6b/zZAmnW+SMlaxNEMG7wFdw=;
-	b=Ccsno1JBWYK03N44CMBwStAjZIXYf78Dz1jo4+g39UkbcpXfcf68j5kmyciKAZZio06F1Y
-	aaq42WRCKAkHjxvnnAmNDsekPCfRKo7CF0VGzAuAtwpFjkRj1ocKbTFQDQRNrCW4bGJv+b
-	pk7g+AhBz+HI/nmjKr8ZbCJ9wML7osY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1709882144;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4y/KyuaciNXjMkUvqRU6b/zZAmnW+SMlaxNEMG7wFdw=;
-	b=90oYvb9sz1InD2oloCDfNamSmPENxW5+ltICi/yag4MEHTsMsdoIzlK3yUVMsxO1K80ez4
-	b87xZwhvbHwOe9Dg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1709882144; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4y/KyuaciNXjMkUvqRU6b/zZAmnW+SMlaxNEMG7wFdw=;
-	b=Ccsno1JBWYK03N44CMBwStAjZIXYf78Dz1jo4+g39UkbcpXfcf68j5kmyciKAZZio06F1Y
-	aaq42WRCKAkHjxvnnAmNDsekPCfRKo7CF0VGzAuAtwpFjkRj1ocKbTFQDQRNrCW4bGJv+b
-	pk7g+AhBz+HI/nmjKr8ZbCJ9wML7osY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1709882144;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4y/KyuaciNXjMkUvqRU6b/zZAmnW+SMlaxNEMG7wFdw=;
-	b=90oYvb9sz1InD2oloCDfNamSmPENxW5+ltICi/yag4MEHTsMsdoIzlK3yUVMsxO1K80ez4
-	b87xZwhvbHwOe9Dg==
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id 6F5822013C; Fri,  8 Mar 2024 08:15:44 +0100 (CET)
-Date: Fri, 8 Mar 2024 08:15:44 +0100
-From: Michal Kubecek <mkubecek@suse.cz>
-To: "Sagar Dhoot (QUIC)" <quic_sdhoot@quicinc.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"Nagarjuna Chaganti (QUIC)" <quic_nchagant@quicinc.com>,
-	"Priya Tripathi (QUIC)" <quic_ppriyatr@quicinc.com>
-Subject: Re: Ethtool query: Reset advertised speed modes if speed value is
- not passed in "set_link_ksettings"
-Message-ID: <20240308071544.dnh47hijov3aqbzu@lion.mk-sys.cz>
-References: <CY8PR02MB95678EBD09E287FBE73076B9F9202@CY8PR02MB9567.namprd02.prod.outlook.com>
- <945530a2-c8e9-49fd-95ce-b39388bd9a95@lunn.ch>
- <CY8PR02MB956757D131ED149C97F7D0DBF9272@CY8PR02MB9567.namprd02.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339F74EB46
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 07:25:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709882761; cv=fail; b=R8imhUPt+gJhKds94dNVhaq3c8NqOazCRspqol16fOcT7ut7eiFOHRZ+2qJgs7wm2oKU9pQnN9JaVNmw7gcMz1Jwxr5PQMpKbkC2u5mX9JqfWpEqOWzrtd4FzRuV3BqogjwthoF1Tsf/oixb7FjkTVtkfdIPISYuOIJsgzqKEMo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709882761; c=relaxed/simple;
+	bh=Upfn1DSq+dGJoX1ZBFVANHp0PzKXZ5lDD5reun/HQ+Y=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=AAbVcKpOnvj6wJIDgsV7PnyMUX+RRoB7VhCvW+sQk8DWIYgsiQI4Chr+9zjfuNENNUiGEKuASAEKypWQ+Ibens3QXUgmh+lWIr/Cit2t5ZldrkTnPqxJBq5Bisil5WSTJeM2UkY8LvTnRzk2pedKxFk3JhSp+P0NUwByCLXFulE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XwUo+9qo; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709882759; x=1741418759;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Upfn1DSq+dGJoX1ZBFVANHp0PzKXZ5lDD5reun/HQ+Y=;
+  b=XwUo+9qogKm7LhV9XhC6LxHGbES9vQescePky6hKkZiBUcF/lWp5HJPu
+   r88z1EX2RhpsLrV9IFTUL93K1MyptFqG9QtZViAP66s8gxKGB8angNyb5
+   ETih+shpHel2gFCjNYXetrU/4v0UXiDcyIR9fwlntgTIjel02yLBOUREm
+   dBAfVu5qoGPj65Nygpf3cPcQZLSt1WV7ITOHjG2tT51RoeuvScuYnagYT
+   /ZG4aDRnR19qZRU+R/FNtX70sshZ8cHJlpO5+FBoVP0MEpq/d3U7vZG9/
+   CSfdKO+7Vm+Jmi3VRDSSGW2Cmp22dApqrSkaY+iNvnqzgwIl0CxFqHoT7
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11006"; a="4730859"
+X-IronPort-AV: E=Sophos;i="6.07,108,1708416000"; 
+   d="scan'208";a="4730859"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2024 23:25:58 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,108,1708416000"; 
+   d="scan'208";a="15072391"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Mar 2024 23:25:59 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 7 Mar 2024 23:25:58 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 7 Mar 2024 23:25:58 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 7 Mar 2024 23:25:57 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mGTafgz13rOhPT2OmtHQkBtDE9CxOCiw5C7tizqidEnP9OjwpdB55AY3p2+jbs+FiQMAl4dv35pfFZCuJiN5KD0JrmjwJcHt/9mhzEQksqu0GasF1LleBKteKpVnPZM5iPQDrqabs2iTl3zG9X9nBabwcJAlfgKYUh9FR7TAuJIuvGWFOya55YeTof7E56XuqCywxTAQuCRfQsgtiulNdIql51Mflbn8EJMfjQcehubE8d4xiBlvp4iTSNQd/YaqLpPI/XxziRTEIWBekFJ0KbgPiQDYSUug2TIP7Ds/2FucpMWhIu4YaGSux/PNIBVAxBf5x23qdsC09chqNgautw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qifejmYkWeGWdgNy2UbC15QFIlhPYjxguuFZuE0daao=;
+ b=nPFfMCoStIVGPzLOgHs3+kaNINfWI2E7XnIQYoqCm5271qZ6uO8cVay+NwjHXUYWDpBVBvJ5k1BSTGi3RWeZFpWl8x5SExgmBnbENv1gjQQXesnAMFD1l9/6iWEbWQCUeElRSqL03U+DJ0xkzPntDcyaCr/374lAeVwYDcoALVBBG3sqR6OqdcxXp3pQYlvlyzTfl58eEOOSBtwg4Pew1egov2HzIaSmiN8nW5dlux2MHGyrd5xpUVRbfy/sJZlLhWkoJVnwwo+RGfZVv967Z3zd8XA7qeKpaVW4xsyhPh//ntW+qOCbLInsqWbXc6dBoWHmFF/HRmIolqUvFYr3Bw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21)
+ by PH7PR11MB7098.namprd11.prod.outlook.com (2603:10b6:510:20d::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.8; Fri, 8 Mar
+ 2024 07:25:55 +0000
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::66c9:72ce:62ab:73c2]) by PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::66c9:72ce:62ab:73c2%6]) with mapi id 15.20.7386.005; Fri, 8 Mar 2024
+ 07:25:55 +0000
+From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Szycik, Marcin"
+	<marcin.szycik@intel.com>, "Drewek, Wojciech" <wojciech.drewek@intel.com>,
+	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "horms@kernel.org" <horms@kernel.org>, Marcin
+ Szycik <marcin.szycik@linux.intel.com>
+Subject: RE: [iwl-next v3 1/8] ice: remove eswitch changing queues algorithm
+Thread-Topic: [iwl-next v3 1/8] ice: remove eswitch changing queues algorithm
+Thread-Index: AQHaa86bEuO+Cq0VgkSXcrV+vUOmGLEtfAhQ
+Date: Fri, 8 Mar 2024 07:25:55 +0000
+Message-ID: <PH0PR11MB50134E2BFB524C07D4FB135296272@PH0PR11MB5013.namprd11.prod.outlook.com>
+References: <20240301115414.502097-1-michal.swiatkowski@linux.intel.com>
+ <20240301115414.502097-2-michal.swiatkowski@linux.intel.com>
+In-Reply-To: <20240301115414.502097-2-michal.swiatkowski@linux.intel.com>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5013:EE_|PH7PR11MB7098:EE_
+x-ms-office365-filtering-correlation-id: ba039e9a-babd-4edc-febe-08dc3f40fe52
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: NyL2ioBycktO9EiVQrRUVP52uJrxFl488jV+DhhRoaspTEBUEpEE15IaQqxcLK479TFgKB/DrBZnzEI8uWFyix8O9ZTxVY6A6k8HW066fCK0alWDjBRKVvGV7TpAxKW4zICcsOWd5kY3ge3nVi/qIfI++5YCQSN4P+rNnJcMk07O+G/bKClosVpfMS2TCNCFI28JUOO3Kcmq4d5aybz+/uHaeiz2oCvuJxkku6flw15yzU+gphC6veO2bpxBc0HlGnSaAI601tNy7QDDFVAHWZ/w9sfGzHVdCAsqMWA3XujF7fN3K/1Hk7n5FtUbMcb4YXXv8FRN3y2hZn9esS/0Z8LHcictuZrMl01n0AXduAfTnq993yKqtfmty7GLvpuREW87A7bVzVRMh+5WBUyJtR57qXA+CXZQ/TlakRklL3qlHCuw4vAKfrIXMUYMfcxnKcF8QbnX8YGmIMvbzcPpxzAhUQIDGM9h5mg1SttpB4XJiUwCPe4+Xhm7y4RZn9ueB/Ajs1oRP2C9c02w03gjN/sqmAkMWl8p3zeeDFZRZjmR1ARgLPS/EWHppG4afdI9LTcqWjKUDUM1OQdjVKYo3lBXBjp45Xq2LRPccF1vHGkPhbmWN/g6MRdQ6c1g0yKRe0m75jCEnhhCmwKrjlAAWcar9YcwblOgfEYUKKhnkFPoBk4+1pI9gJ2whru5bRj6B0h3PzyiorEVZtSsWxslmA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5013.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?2CePzUEp/jDpGzDr4EIVoleeIQwp5pv3hSQcyOFjKHjeDrzvnQo0EN/s2P5j?=
+ =?us-ascii?Q?tz9oU1Bq39zhuoL593DKbUipNCqDycNYCJzV31L67UHtF1JqdQBj+Jctp4Dz?=
+ =?us-ascii?Q?xaxTA24JG/CoCXnMcDllhKQrgRiz0O9z82bE4CaxaRAYjd2UddAeIKRn5TWQ?=
+ =?us-ascii?Q?CeliBxBmRTs5Vr3vs9hCQAQIkpYHBqiAafxRSRjd2ljPIY21+VXVeiYgOMFK?=
+ =?us-ascii?Q?wJDcZcPH73E7qdAIOgk+EP2UcntxS7TMQ4sWH/z2bJuCTQaEnOOSBzH6IrCB?=
+ =?us-ascii?Q?k583z/mqVhrkHwWbkNmkrJJxYJ/fkTClIBVc7wR6yiTrNnNJvT8LfGbsFTUo?=
+ =?us-ascii?Q?OMZlEWp0NIgHd9uAmf0R3AyPb1a0zsu3p6eyO5kcw0x2ywF9BLskkusqje0Z?=
+ =?us-ascii?Q?UIehUOsmVrtZtMQPsz43wNJcbazpBSm3dbp6H9wKkt5OyjVROnbwIAm586mC?=
+ =?us-ascii?Q?cIWjBAykZX89yzd8Y7PzUNq28nsjbWDgkJiaLwecJ1R7aIOQm8AI14NBZpqA?=
+ =?us-ascii?Q?pUO6SOtvjtX3oS2Ll1ADrAhiCFBOeBSJUTTrotYt73+4L93y3fN6XzrXgKD/?=
+ =?us-ascii?Q?6vZ22F2eiu4lJJC60B2Xl6EMlKkRvumn9qsHVUV6TQ4jnGKgvW8jlvss23bo?=
+ =?us-ascii?Q?ldwndza8HUjhj535UvPZaqc42WOUpVnZ2nr3IIxNMcPNB3XxTNFxBwUAcXE4?=
+ =?us-ascii?Q?pZZY9NuUft9xGD5qERMRUs9qTs4QWSuKZHewIe8L0PYcP6jU651XbjYSsHVM?=
+ =?us-ascii?Q?xe+RNHvIaINvoB+URaUJE8Q02lDXWPUv7YQVgQ8/QSSnMlU5J3ZfUdzx0V8B?=
+ =?us-ascii?Q?yV0dnrWQAtmqeZ1RlAhPFYeGFduiZ/r+tHHXULa4gaZ+l5djlknlxWkfv1Jt?=
+ =?us-ascii?Q?x09wx1MnSF1U0aNb0KdCOUSVMZ5v+INRNDcnlo9xp9dZFNjpe2MQhELc/h1y?=
+ =?us-ascii?Q?+/Md44U4hP3A2km2XTFWPIsP5ouMlXQ2onUiRYOGG9jsvbRS9kq7F2PDh1+k?=
+ =?us-ascii?Q?mOm8L7k/58Ur5/gqo1tvfsnAeEQWa73r4Qv+krHOkQ9imoRqG5oczkBrhLNj?=
+ =?us-ascii?Q?SYuKcGPcddTeDa5NoWZzKsL4Rf+fzytwiUZh2pZG7c75J/2QAyUzgmOUAPrJ?=
+ =?us-ascii?Q?rBKMce9j/9nRdu/YDmiBTzrMAA/uLQho6Ww3+YOQ5oijVUi5HSwro0KSASsB?=
+ =?us-ascii?Q?0CfeYYPTbQbVWLptemSSNJyuoGERWy0AR3Q30sHsOK64aFWj5TQMmV8M3qA1?=
+ =?us-ascii?Q?2b8IqqzJvnwW01pg+GoTzQiQHWiUbax5geRz6Kv8wXr4hUwfCxBCnkwii/kx?=
+ =?us-ascii?Q?R38ZNpaEpqKi2I+1otKUo8Tq254m8fIVO6fdC80ExBs5DZ/Q/+KbOEMJeUms?=
+ =?us-ascii?Q?dVQcD1Jru0/F1ACx6EngOKQireN6WQbEX7nAMmTdAIXhRurTWY464Jr0pOfK?=
+ =?us-ascii?Q?CE5j0NoI1VnyaKBM/uWm7/Y/mHp192eJsplz2VyVPIsWiKlFTy+ld82ZZQG0?=
+ =?us-ascii?Q?uQRXipyPoruQdam4qM1YI7lnmGhn8BbuIxBR/uIXOYN7RbujwBmKn1v10QSm?=
+ =?us-ascii?Q?l5UG5T/B6oqVC2EdzShbUH48+at12kWQ7/eHmjoxzYKlLKp8EUEv2DbnrTAx?=
+ =?us-ascii?Q?Sg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="lrv3letzv62idca3"
-Content-Disposition: inline
-In-Reply-To: <CY8PR02MB956757D131ED149C97F7D0DBF9272@CY8PR02MB9567.namprd02.prod.outlook.com>
-X-Spam-Level: 
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spamd-Result: default: False [-5.20 / 50.00];
-	 ARC_NA(0.00)[];
-	 TO_DN_EQ_ADDR_SOME(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	 RCPT_COUNT_FIVE(0.00)[5];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 SIGNED_PGP(-2.00)[];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 RCVD_COUNT_ZERO(0.00)[0];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+,1:+,2:~];
-	 BAYES_HAM(-3.00)[100.00%]
-X-Spam-Score: -5.20
-X-Spam-Flag: NO
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5013.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ba039e9a-babd-4edc-febe-08dc3f40fe52
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Mar 2024 07:25:55.6558
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zoy18UO5Sxy6xPnWFVoGK3S7EgZ7Xq93TqIm/4ucKcGUgoA1QxYTMuvwlRC+tx6W+6j3bS5H035x6LF06PV9JW8d5S3ETBP3o22tP+eu3Y4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7098
+X-OriginatorOrg: intel.com
 
-
---lrv3letzv62idca3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Mar 08, 2024 at 06:33:00AM +0000, Sagar Dhoot (QUIC) wrote:
-> Hi Andrew,
+> -----Original Message-----
+> From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Sent: Friday, March 1, 2024 5:24 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Szycik, Marcin <marcin.szycik@intel.com>;
+> Drewek, Wojciech <wojciech.drewek@intel.com>; Samudrala, Sridhar
+> <sridhar.samudrala@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; horms@kernel.org; Buvaneswaran, Sujai
+> <sujai.buvaneswaran@intel.com>; Michal Swiatkowski
+> <michal.swiatkowski@linux.intel.com>; Marcin Szycik
+> <marcin.szycik@linux.intel.com>
+> Subject: [iwl-next v3 1/8] ice: remove eswitch changing queues algorithm
 >=20
-> Thanks for the quick response. Maybe I have put up a confusing scenario.
+> Changing queues used by eswitch will be done through PF netdev.
+> There is no need to reserve queues if the number of used queues is known.
 >=20
-> Let me rephrase with autoneg on.
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice.h         |  6 ----
+>  drivers/net/ethernet/intel/ice/ice_eswitch.c | 34 --------------------
+> drivers/net/ethernet/intel/ice/ice_eswitch.h |  4 ---
+>  drivers/net/ethernet/intel/ice/ice_sriov.c   |  3 --
+>  4 files changed, 47 deletions(-)
 >=20
-> 1. "ethtool eth_interface"
-> 2. "ethtool -s eth_interface speed 25000 autoneg on"
-> 3. "ethtool -s eth_interface autoneg on"
->=20
-> Once the link is up at step 2, "get_link_ksettings" will return the
-> speed as 25G. And if "set_link_ksettings" is invoked at step 3, it
-> will still pass the speed value as 25G retrieved with
-> "get_link_ksettings", even though the speed was not explicitly
-> specified in the ethtool command. So, after step2, if I must go back
-> to the default state i.e., advertise all the supported speed=20
-> modes, is there any way to do so?
-
-IIRC this is backward compatible with how the ioctl interface behaves.
-The logic is that if a parameter is omitted, it is supposed to be
-preserved; thus the third command simply means "enable the
-autonegotiation" and don't do anything else (which is a no-op in this
-case).
-
-But I agree that it would be convenient to have a shortcut for "enable
-the autonegotiation with all supported modes". On the command line it
-could be e.g. something like
-
-  ethtool -s $iface autoneg on advertise all
-
-or
-
-  ethtool -s $iface autoneg on advertise supported
-
-On the implementation level, the problem is that IIRC we have no easy
-way to express such request in current netlink API. It could be emulated
-by querying the modes first (which returns both advertised and supported
-modes) and requesting supported modes to be advertised but that's not
-very practical. So probably the best solution would be introducing a new
-flag and using the complicated way as a fallback if the kernel does not
-support it.
-
-Michal
-
---lrv3letzv62idca3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmXquxwACgkQ538sG/LR
-dpU0YggAkkI1KS52Tdlbt9cZEWdmhu8yQVElkKlCCkbmmZaSZTcw5oDG2FhblwgM
-WxMpHdFFDUvg1QWKVXLsuBGcU329zj96u1oxvgQ5g3f0MDM65qFdN8jgumY5bXoN
-/RSPcpW5aJmHzG3/temf2uOODTp8pjccRBLBtPz+1BFIOc+pAlJDxorgofmFb20x
-cw8RnOEyDZjxyOvXylnGMvOjUjjLic/Wh7Nj+V4ATANjq/OP62hn7sqG2bHQQrou
-0YUJbIy0euJgZ2INX92SozLHYb9onZanYGLaM7KV6vgnn02AJtPe1B+HuVXpJZxm
-PpnasBruGtntziJ4g0ngLaNLsyXIjA==
-=02t6
------END PGP SIGNATURE-----
-
---lrv3letzv62idca3--
+Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
 
