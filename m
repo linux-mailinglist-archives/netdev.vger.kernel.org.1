@@ -1,155 +1,203 @@
-Return-Path: <netdev+bounces-78806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41DD8876A01
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 18:36:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B992C876A0E
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 18:37:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0DCB1F222E2
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 17:36:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70C14283CC2
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 17:37:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD98636132;
-	Fri,  8 Mar 2024 17:34:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D256C3309E;
+	Fri,  8 Mar 2024 17:37:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pdN8uy+7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7B55D464
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 17:34:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFEC15646D
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 17:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709919270; cv=none; b=XZ4XVXSwTHkTAy+p8onT4l15GuQi3RFrGVDi6UF5kL6+vDgSr4c57sPGGZKfCYKBJdbg91Lyz2kvanyVpTUwlLp52rhb3/Y+4rmPFwxQG9CbTsnbHWbHC8K+iTkoJ8PDKEMK3cTEwm30lrrFAh4OO4fzZocKLx9vvLVwuB2gWeU=
+	t=1709919420; cv=none; b=lubAEoL6RfyPT7fROL4w2GISnM8Z/4/hTAt/YXHdZVxTu4OxeYEe+88pboTt0LHjvI+o7JUhdZ4+ZaNpi8HkU6jdNQlBZ2WR+MsFtLijbyAfuy1zmTsX5UR1YyMTp2vgw/XcQRF5hL0pVjBTCUCN/Auo7viL1KMQEibLPxut4nU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709919270; c=relaxed/simple;
-	bh=8e9/e9NFm5ntuPCTH/0anSEfGQKkPWqlsbkyI1OBVHU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=WfUtbBBeSutHtHYLLm9gwy3c1AD5ruPWW+eYOV7w+wLUSt/MQWNwhkk82/p0a2I6rnsWVjlCmB0ev2WV8kNw9aI0dZk0ttz+Tx1ZQOtTa7Q9mIEIyR2wz8tH4esyA7CBuDIsts8/zdIVBxf2J3pEY9iFTfJ5p3EIZNr3sXjyxSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c874fb29b9so251062239f.3
-        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 09:34:28 -0800 (PST)
+	s=arc-20240116; t=1709919420; c=relaxed/simple;
+	bh=l8ig6M9gcnemk3m+1mdkbFeLLXHKjO71JU9tHp2LBn0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mUKm2905QBVORoZmR8XMdzAPRmiJbHIP8He9tRAlnkKFig1VJ05cCZoeDFKRITBbs9EVrIAiiZ1zHrJEF8yqspNChF9Usw1DBY/ZnRXDtLEyjpqD+2YWixut/1RE4X2ESw9es/30P1wfPEq4UoxS4Tk4V4MLFxoWnwuqLjc6B6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pdN8uy+7; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-566b160f6eeso11470a12.1
+        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 09:36:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709919417; x=1710524217; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L1BX4eo9ip+KEtjNM1Gly2femqk+NvdyZ2sHleIDLI8=;
+        b=pdN8uy+7L+XbVx1WURRUnD5h/dbTjhG99qVltJdv2iJ9s7Bc2J9bQCoyAQqw0k/S7Y
+         zSkTYvLQUt79n93kp0/zqC6LRyeOB89jQBNQzdsTAPiiAB9X/DiMO1FYwv1cV+P4kf0Z
+         E9IFsFVlZNELC7m+AqN6o7bfxkPVS99cNSYf1o8WLvQp55PfNvriLvo37xNTffjBskHa
+         UrEpYxs+aT9cPzqm2onDUhiDq6IGaaLZQn8ZMN9sR1dqsQODxmb5FnVmb92S2FQJSnc9
+         xISejMaKHX/2+dEn2RXUtqu45kkiSZiXEd4xLDM8YDPWwkMgum+0S8YKUard95kFfoQr
+         q8+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709919268; x=1710524068;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3PxTyDbGvCgebErQBNv/Wuktri5b5uOMubf1v6wI+Rk=;
-        b=Qq6e+16f3H38Z1K0v3Z8j51bGCcvIhO5qrK56SRpuTRFoMzDc1W6ffI76st//y+ql5
-         mtsI6FaqvRaFkGhNKjPgcQMr/xkLgxVHZjfL6p/gbFre8dpA8SS+L5qqi9mU4DUjPuJL
-         iwSDPXzk6zDq+4RWzSaKxTC/F1izCcqYUFYLMPqnuoqU2f1TVTVUbiQnTccPppM4t7DU
-         laD/Fp3hahaJYMfi8DRL8oJ01eWJ58OJ3fU41AvyQOWaidc65spBbMoLvFMJKqlmec1o
-         IGmiS2HbhLF4tc6N/QMYHLZwUs4GAQYmt5tmrRg3B9msf2NcZ44F3XQmEEMpiIY5V1E4
-         H0nA==
-X-Forwarded-Encrypted: i=1; AJvYcCV/2OqEhMmrddxNFSILOKixNsBalGhT+TtcEmwRM9SjE8Ap00uiVW2kEVyeQSfGtZC/ql8r7ubg9LzIow1h+2UC0wt6mf9r
-X-Gm-Message-State: AOJu0Yyt+48/QYQMl31HPMzYmOVyeuCyb/njL9SkQMGTViWSGX7a5a41
-	18pyjjA2WK3zaV86z9Wr1+8WpH160m4RkHBK6EhJrxSlfGuRpZUIkjRaHg0LwPjpf0P06txqH9k
-	+2W67LPzcIM1PIcwVApBQCILVWlR3DabxtTP2zFPldkZr6O79o8x/YnA=
-X-Google-Smtp-Source: AGHT+IGKOvplZ3C2VE4bK9k+BTiEDF/fOksVRR7zDG2cmmTkQ34nJIglWHpJL6Ea7GUZTj2aurqZFRiEl4MX2uSY89ezbjAGDjRQ
+        d=1e100.net; s=20230601; t=1709919417; x=1710524217;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=L1BX4eo9ip+KEtjNM1Gly2femqk+NvdyZ2sHleIDLI8=;
+        b=X3JnYkBirsD2KWh6WPp9luq+UG7MmdiGJ13EsDnH0EY3SiYcPdeGuAXCjPyRCEzUPF
+         MxW9Xoug2FFKaROSxFT9d94ZHMFJPaO+D5tUJxDz99crjix/2x93JiLmwFdVpj1JVr3A
+         Ea7rZSjHjAA644kfZrKD6LGhjeS3WXBM6frJNsK/FOiEWlZsZr0MzF5HgDryt83RXNXv
+         o9SOnIuf8aR1PZI/KtzChKv8mIRoIALWYzbJWmrUyczR+UbVtf5mM1PrE+s+zXvba1yl
+         lvGFciEhUt33i/HgaaWTDTiEFFerKNXRRUkAg4Ofv65zXGj/wvkaBFj6+2A8nPVh4YQz
+         aiSg==
+X-Forwarded-Encrypted: i=1; AJvYcCXfFPMyFiGI7qYJ2ttXOudFAnGBCYKjPYOAYFpurTmvCp7zhPY23L4OiW4uwrObasLsiaW2lOXIqkVObVVUVLEx1ErqHjFP
+X-Gm-Message-State: AOJu0YwanPD4E4h/iCLkv98Xmk/vHjFjDh1ImPVsdDb9PC4oy7FSFGmF
+	TgjeYnG+acHsdBy1js0bEIYR7toyc8UXUUdvGK/dqdhsvvnOF1Jl1z8psLXyFB1TLbFTPuXjg/F
+	fJB70PDEryHpVMIIKlWI2pis06RC5mV24Bj9/sHeGh9xWOvhFTAd/
+X-Google-Smtp-Source: AGHT+IGl1hYC4CfQ2KvqCm0EMC8nd3+j8n1jTiwvjdE8DyirSHqPOzsLuM+BSUM4Smz7h5AqzM46IdnAFhbwwWgdO00=
+X-Received: by 2002:a05:6402:349:b0:568:257a:482f with SMTP id
+ r9-20020a056402034900b00568257a482fmr280416edw.3.1709919416893; Fri, 08 Mar
+ 2024 09:36:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:1604:b0:7c8:65ae:84fd with SMTP id
- x4-20020a056602160400b007c865ae84fdmr150802iow.0.1709919268281; Fri, 08 Mar
- 2024 09:34:28 -0800 (PST)
-Date: Fri, 08 Mar 2024 09:34:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000094b65a0613299ae7@google.com>
-Subject: [syzbot] [net?] WARNING in sk_nulls_del_node_init_rcu
-From: syzbot <syzbot+12c506c1aae251e70449@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <00000000000094b65a0613299ae7@google.com>
+In-Reply-To: <00000000000094b65a0613299ae7@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 8 Mar 2024 18:36:45 +0100
+Message-ID: <CANn89iKXHAoJqVkxSGtFep3Ww+A-v9NeExzgfTKubVo7wYX7_Q@mail.gmail.com>
+Subject: Re: [syzbot] [net?] WARNING in sk_nulls_del_node_init_rcu
+To: syzbot <syzbot+12c506c1aae251e70449@syzkaller.appspotmail.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Fri, Mar 8, 2024 at 6:34=E2=80=AFPM syzbot
+<syzbot+12c506c1aae251e70449@syzkaller.appspotmail.com> wrote:
+>
+> Hello,
+>
+> syzbot found the following issue on:
+>
+> HEAD commit:    c055fc00c07b net/rds: fix WARNING in rds_conn_connect_if_=
+d..
+> git tree:       net
+> console output: https://syzkaller.appspot.com/x/log.txt?x=3D16aa17f218000=
+0
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dfad652894fc96=
+962
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3D12c506c1aae251e=
+70449
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
+ian) 2.40
+>
+> Unfortunately, I don't have any reproducer for this issue yet.
+>
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/c39eb6fb3ad1/dis=
+k-c055fc00.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/110f1226eb89/vmlinu=
+x-c055fc00.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/1303e2df5cc4/b=
+zImage-c055fc00.xz
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the comm=
+it:
+> Reported-by: syzbot+12c506c1aae251e70449@syzkaller.appspotmail.com
+>
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+> R13: 000000000000000b R14: 00007f3b817abf80 R15: 00007ffd3beb57b8
+>  </TASK>
+> ------------[ cut here ]------------
+> WARNING: CPU: 0 PID: 23948 at include/net/sock.h:799 sk_nulls_del_node_in=
+it_rcu+0x166/0x1a0 include/net/sock.h:799
+> Modules linked in:
+> CPU: 0 PID: 23948 Comm: syz-executor.2 Not tainted 6.8.0-rc6-syzkaller-00=
+159-gc055fc00c07b #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 01/25/2024
+> RIP: 0010:sk_nulls_del_node_init_rcu+0x166/0x1a0 include/net/sock.h:799
+> Code: e8 7f 71 c6 f7 83 fb 02 7c 25 e8 35 6d c6 f7 4d 85 f6 0f 95 c0 5b 4=
+1 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc e8 1b 6d c6 f7 90 <0f> 0b 90 eb b2=
+ e8 10 6d c6 f7 4c 89 e7 be 04 00 00 00 e8 63 e7 d2
+> RSP: 0018:ffffc900032d7848 EFLAGS: 00010246
+> RAX: ffffffff89cd0035 RBX: 0000000000000001 RCX: 0000000000040000
+> RDX: ffffc90004de1000 RSI: 000000000003ffff RDI: 0000000000040000
+> RBP: 1ffff1100439ac26 R08: ffffffff89ccffe3 R09: 1ffff1100439ac28
+> R10: dffffc0000000000 R11: ffffed100439ac29 R12: ffff888021cd6140
+> R13: dffffc0000000000 R14: ffff88802a9bf5c0 R15: ffff888021cd6130
+> FS:  00007f3b823f16c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f3b823f0ff8 CR3: 000000004674a000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  __inet_hash_connect+0x140f/0x20b0 net/ipv4/inet_hashtables.c:1139
+>  dccp_v6_connect+0xcb9/0x1480 net/dccp/ipv6.c:956
+>  __inet_stream_connect+0x262/0xf30 net/ipv4/af_inet.c:678
+>  inet_stream_connect+0x65/0xa0 net/ipv4/af_inet.c:749
+>  __sys_connect_file net/socket.c:2048 [inline]
+>  __sys_connect+0x2df/0x310 net/socket.c:2065
+>  __do_sys_connect net/socket.c:2075 [inline]
+>  __se_sys_connect net/socket.c:2072 [inline]
+>  __x64_sys_connect+0x7a/0x90 net/socket.c:2072
+>  do_syscall_64+0xf9/0x240
+>  entry_SYSCALL_64_after_hwframe+0x6f/0x77
+> RIP: 0033:0x7f3b8167dda9
+> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f=
+7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff=
+ ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007f3b823f10c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+> RAX: ffffffffffffffda RBX: 00007f3b817abf80 RCX: 00007f3b8167dda9
+> RDX: 000000000000001c RSI: 0000000020000040 RDI: 0000000000000003
+> RBP: 00007f3b823f1120 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+> R13: 000000000000000b R14: 00007f3b817abf80 R15: 00007ffd3beb57b8
+>  </TASK>
+>
+>
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+>
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+>
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+>
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+>
+> If you want to undo deduplication, reply with:
+> #syz undup
 
-syzbot found the following issue on:
+CC Kuniyuki, because this is probably caused by
 
-HEAD commit:    c055fc00c07b net/rds: fix WARNING in rds_conn_connect_if_d..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=16aa17f2180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fad652894fc96962
-dashboard link: https://syzkaller.appspot.com/bug?extid=12c506c1aae251e70449
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+commit 66b60b0c8c4a163b022a9f0ad6769b0fd3dc662f
+Author: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date:   Wed Feb 14 11:13:08 2024 -0800
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/c39eb6fb3ad1/disk-c055fc00.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/110f1226eb89/vmlinux-c055fc00.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1303e2df5cc4/bzImage-c055fc00.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+12c506c1aae251e70449@syzkaller.appspotmail.com
-
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 000000000000000b R14: 00007f3b817abf80 R15: 00007ffd3beb57b8
- </TASK>
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 23948 at include/net/sock.h:799 sk_nulls_del_node_init_rcu+0x166/0x1a0 include/net/sock.h:799
-Modules linked in:
-CPU: 0 PID: 23948 Comm: syz-executor.2 Not tainted 6.8.0-rc6-syzkaller-00159-gc055fc00c07b #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-RIP: 0010:sk_nulls_del_node_init_rcu+0x166/0x1a0 include/net/sock.h:799
-Code: e8 7f 71 c6 f7 83 fb 02 7c 25 e8 35 6d c6 f7 4d 85 f6 0f 95 c0 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc e8 1b 6d c6 f7 90 <0f> 0b 90 eb b2 e8 10 6d c6 f7 4c 89 e7 be 04 00 00 00 e8 63 e7 d2
-RSP: 0018:ffffc900032d7848 EFLAGS: 00010246
-RAX: ffffffff89cd0035 RBX: 0000000000000001 RCX: 0000000000040000
-RDX: ffffc90004de1000 RSI: 000000000003ffff RDI: 0000000000040000
-RBP: 1ffff1100439ac26 R08: ffffffff89ccffe3 R09: 1ffff1100439ac28
-R10: dffffc0000000000 R11: ffffed100439ac29 R12: ffff888021cd6140
-R13: dffffc0000000000 R14: ffff88802a9bf5c0 R15: ffff888021cd6130
-FS:  00007f3b823f16c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f3b823f0ff8 CR3: 000000004674a000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __inet_hash_connect+0x140f/0x20b0 net/ipv4/inet_hashtables.c:1139
- dccp_v6_connect+0xcb9/0x1480 net/dccp/ipv6.c:956
- __inet_stream_connect+0x262/0xf30 net/ipv4/af_inet.c:678
- inet_stream_connect+0x65/0xa0 net/ipv4/af_inet.c:749
- __sys_connect_file net/socket.c:2048 [inline]
- __sys_connect+0x2df/0x310 net/socket.c:2065
- __do_sys_connect net/socket.c:2075 [inline]
- __se_sys_connect net/socket.c:2072 [inline]
- __x64_sys_connect+0x7a/0x90 net/socket.c:2072
- do_syscall_64+0xf9/0x240
- entry_SYSCALL_64_after_hwframe+0x6f/0x77
-RIP: 0033:0x7f3b8167dda9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f3b823f10c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 00007f3b817abf80 RCX: 00007f3b8167dda9
-RDX: 000000000000001c RSI: 0000000020000040 RDI: 0000000000000003
-RBP: 00007f3b823f1120 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 000000000000000b R14: 00007f3b817abf80 R15: 00007ffd3beb57b8
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+    dccp/tcp: Unhash sk from ehash for tb2 alloc failure after
+check_estalblished().
 
