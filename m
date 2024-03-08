@@ -1,216 +1,183 @@
-Return-Path: <netdev+bounces-78695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 718FF8762BB
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:07:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE9E78762C1
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:09:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 127161F23A9D
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:07:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1F6E1C2108F
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:09:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E12D655C3A;
-	Fri,  8 Mar 2024 11:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F4154746;
+	Fri,  8 Mar 2024 11:09:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="VpGnF9Ei"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Pp/2CHnD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808DB56748
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 11:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B771B55C34;
+	Fri,  8 Mar 2024 11:09:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709896026; cv=none; b=JAsgjudbzwxf/+DHaZQwRuY+3HALG0UPwRQtyzhcX3wocnSUSh5Us+lnkcEky3+LxZFUV80gMBEbqpNAfVb28pOc664/+2VhZ/vz9Bo2/vZbtvgAtoHwle6jnnCnDsk939ff3CD5LMu/jnt6tn6bCgzvrRIIVFmJiGj7zEXZi70=
+	t=1709896176; cv=none; b=khGRxWyPJIW2nZGLD4dlM6OJlvAohYAOUZiT48t56zxvUgALwcJUpWOCs394QQZOWpGRs2ZzGnQGzApqUAcfEE6Gx6TSHv/IYjB2iGVj570ENlHdAiDGnWEBa3AhdHJQspsbWWO5zB3BBuSiKanZaUmibSAsrMlbAuRnC6l0bwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709896026; c=relaxed/simple;
-	bh=MRkohaLiUN5BHehj7WGOvVOkQISIlM4qrD0qErutq8M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=twE7lGK5XpKb1rrY7XbGNaiwMQwPpa29oRrp0kJcsqjlPXtJ9WJBS4SoJDTeo8mK250VM4ANYGdh/nqi1Dr9g8j9cm7DbDrY6NhYAyD3jmFfKjCAJIsYAqN/4Xaqa/wCMPG5YmGUpHOvTjhHNBi546GEDEdAM5h2CJLlIyIDhv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=VpGnF9Ei; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-567fbbd723cso805995a12.3
-        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 03:07:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1709896023; x=1710500823; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ROhx7Xti2+zZ0lJ/c08/MIW8BW30JDS2gYndLq8QZ6Y=;
-        b=VpGnF9EiaE1/cedpOUF/sTkhSDPELZ4v7kSyQWn30NjL79tDOPKMDJZfAizM3zwHKg
-         lzNGy4D54bXoz9Jdh/BaLlw0Q0/WCF6slKDrytR/ExGBFENkQvRvHdLvqgt0Qlat0hBQ
-         bKyXeEgoyuwG8UTrue7cR5gtzbzgifjRiIshiSEkhR/g+sqO4ZaQwdXR5VUO+1OTIbNG
-         xCVehjlbx5mdWptTXWHZkZKeOQ8XQVYB8RovPJWSM0pJqOPANGblOlSBO4ZoFJ7Z9m8h
-         kZG0uS/P2S5D6+zSj510rRTCtu+IzkVBsxDwm36JhAIklE+v3dCMrzVkxNjK1SO/2VdN
-         G5UQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709896023; x=1710500823;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ROhx7Xti2+zZ0lJ/c08/MIW8BW30JDS2gYndLq8QZ6Y=;
-        b=wiBXBjboM0DrKaZLi8htNr4AqKlfDdtXM6yXFLNHBqFBf/D9ZdJKpPGMAT/hXXj5Ax
-         fC3HQ9I4FI6vEpsNOwHt+b3cV9LIn1IupgtSfjJZmKBDX8jqA3pGnxLaGN5dnsxk2mzh
-         u3ndOpR5x0l55wfBKG1fDw9PbXTecOyDegHA2QRm6KpmEaBegjJIc7spfkRQO3AC6RTv
-         hf0u3KIO6bX1yImfBsXP7sswRkq0ythdz9CNkqQ6oMQeSMHRnEuv3ryLUEOwaZfTnF2p
-         b/iakgJEdZ/SJSYhqNxL8NbexgAWtga6/kA8T8iaw+gUNNo0WS4Hq1zRgXpL9IWvIQUO
-         8WYA==
-X-Gm-Message-State: AOJu0YwFZl3fnaE7PsS/V5ZdLZOYnjIsfmFa3ocl9EBhj2uomxW0rQHT
-	0fTwL51Em27oR/4SmiO2y7+Jyqr8HR0/+3vUk4H7olBtYXSydpVxihVTcX8ILsM=
-X-Google-Smtp-Source: AGHT+IFmNOo+FsyLImY+hRFnRsZtrbdxFYnJLHOCisKQtFfDjdq04SXoboOaQD9AsLcfhmfyHSskUA==
-X-Received: by 2002:a50:9f61:0:b0:565:bb25:bb7b with SMTP id b88-20020a509f61000000b00565bb25bb7bmr1899248edf.6.1709896022820;
-        Fri, 08 Mar 2024 03:07:02 -0800 (PST)
-Received: from [192.168.182.20] ([151.59.116.198])
-        by smtp.gmail.com with ESMTPSA id es14-20020a056402380e00b00566d9c8e6cesm7788958edb.21.2024.03.08.03.07.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Mar 2024 03:07:02 -0800 (PST)
-Message-ID: <28f8785d-65c3-49df-aacb-c80bc19b0a2b@openvpn.net>
-Date: Fri, 8 Mar 2024 12:07:25 +0100
+	s=arc-20240116; t=1709896176; c=relaxed/simple;
+	bh=uhF7KeuFS5kvVj74c+K5uPLZQLXkKWbLmov+lBPwnxk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a9bn5Z/IGRD1mKKM72ehkU7eqjfLmuxUfFvwqivAc0C3jp+dXzZZvNdhbFKkx/HKWFwgi0ysqri9MszxZq1lZ+fBPmnsdWqmeTRqiW2GFp7I4KX/rxzPFIU7X2OOoEddwHwU20QYTt4yHQlKtR0jYZdaNOnhvMcubanOzBnJVkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Pp/2CHnD; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 428AvAxu006147;
+	Fri, 8 Mar 2024 11:09:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=gyDQg7SwnM6C8Lf//yiK9B+QJkkbKBHdWa1O2wRLrkQ=;
+ b=Pp/2CHnDKRhACe2XruLb1PYYN3uAKfGb12w2nU5D01NMgAJWMoSsAfdkoEuAfAvqR2hl
+ 28ZFl6SdIvFSLDLvbRgmdr4Mq6AP17gd+SNgbXzqGWBFJGk9td1zQhl8BHabRgMX0noQ
+ 3g1YDSOSXpQq1k17BlA6ml4UlkwbG3q4cQxeo7/GM5qC5kyk0qgSfp7mNUbHvolPhveD
+ 47R2teS/ctPBsB/Kc28vKU7jIi9epnUTZNlwmCMu+QI80cvWHrmA+eUPBmni1ikbB1WY
+ 5zkFd6RMTHBcd00hwEk1dmJffJ7jGrafLNjwgtpJZhJuU5zXZ7oATs+GbQL3xgUgO9o9 6A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wr1cdr6r6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Mar 2024 11:09:31 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 428B9K6G008895;
+	Fri, 8 Mar 2024 11:09:30 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wr1cdr6qq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Mar 2024 11:09:30 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 428B963T026183;
+	Fri, 8 Mar 2024 11:09:29 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wmfepc05a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Mar 2024 11:09:29 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 428B9NHR49611072
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 8 Mar 2024 11:09:25 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9FE3F2004E;
+	Fri,  8 Mar 2024 11:09:23 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E21F42004B;
+	Fri,  8 Mar 2024 11:09:22 +0000 (GMT)
+Received: from osiris (unknown [9.171.32.39])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri,  8 Mar 2024 11:09:22 +0000 (GMT)
+Date: Fri, 8 Mar 2024 12:09:21 +0100
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>
+Subject: Re: [PATCH net v2] s390/qeth: handle deferred cc1
+Message-ID: <20240308110921.26074-D-hca@linux.ibm.com>
+References: <20240307093827.2307279-1-wintera@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 09/22] ovpn: implement basic RX path (UDP)
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>
-References: <20240304150914.11444-1-antonio@openvpn.net>
- <20240304150914.11444-10-antonio@openvpn.net>
- <0dcf1824-5819-4280-828d-46cf5bce3527@lunn.ch>
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <0dcf1824-5819-4280-828d-46cf5bce3527@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240307093827.2307279-1-wintera@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: _eAgk7EIxsmeHJeydRVBBSbQ6aM_z0yp
+X-Proofpoint-ORIG-GUID: Yp8HqP6l1nxQxE7qXywvtKgPC9xCMIEC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-08_08,2024-03-06_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ adultscore=0 bulkscore=0 mlxlogscore=882 priorityscore=1501 clxscore=1011
+ impostorscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2403080088
 
-On 08/03/2024 03:17, Andrew Lunn wrote:
->> +++ b/drivers/net/ovpn/io.c
->> @@ -53,6 +53,113 @@ int ovpn_struct_init(struct net_device *dev)
->>   	return 0;
->>   }
->>   
->> +/* Called after decrypt to write IP packet to tun netdev.
->> + * This method is expected to manage/free skb.
+On Thu, Mar 07, 2024 at 10:38:27AM +0100, Alexandra Winter wrote:
+> The IO subsystem expects a driver to retry a ccw_device_start, when the
+> subsequent interrupt response block (irb) contains a deferred
+> condition code 1.
 > 
-> tun?
+> Symptoms before this commit:
+> On the read channel we always trigger the next read anyhow, so no
+> different behaviour here.
+> On the write channel we may experience timeout errors, because the
+> expected reply will never be received without the retry.
+> Other callers of qeth_send_control_data() may wrongly assume that the ccw
+> was successful, which may cause problems later.
 > 
-> The userspace implementation uses tun, but being in the kernel, don't
-> you just pass it to the stack?
-
-Sorry - this is just me being used to refer to the tunnel interface as 
-"tun".
-
-Whenever you read "tun", I actually refer to the interface created by 
-ovpn. This is totally unrelated to the tun module.
-
-But I agree that this doesn't make sense for anybody other than me.
-
-I will get rid of any word "tun" in the comments/doc.
-
+> Note that since
+> commit 2297791c92d0 ("s390/cio: dont unregister subchannel from child-drivers")
+> and
+> commit 5ef1dc40ffa6 ("s390/cio: fix invalid -EBUSY on ccw_device_start")
+> deferred CC1s are more likely to occur. See the commit message of the
+> latter for more background information.
 > 
->> + */
->> +static void ovpn_netdev_write(struct ovpn_peer *peer, struct sk_buff *skb)
->> +{
->> +	/* packet integrity was verified on the VPN layer - no need to perform
->> +	 * any additional check along the stack
->> +	 */
->> +	skb->ip_summed = CHECKSUM_UNNECESSARY;
->> +	skb->csum_level = ~0;
->> +
->> +	/* skb hash for transport packet no longer valid after decapsulation */
->> +	skb_clear_hash(skb);
->> +
->> +	/* post-decrypt scrub -- prepare to inject encapsulated packet onto tun
->> +	 * interface, based on __skb_tunnel_rx() in dst.h
->> +	 */
->> +	skb->dev = peer->ovpn->dev;
->> +	skb_set_queue_mapping(skb, 0);
->> +	skb_scrub_packet(skb, true);
->> +
->> +	skb_reset_network_header(skb);
->> +	skb_reset_transport_header(skb);
->> +	skb_probe_transport_header(skb);
->> +	skb_reset_inner_headers(skb);
->> +
->> +	/* update per-cpu RX stats with the stored size of encrypted packet */
->> +
->> +	/* we are in softirq context - hence no locking nor disable preemption needed */
->> +	dev_sw_netstats_rx_add(peer->ovpn->dev, skb->len);
->> +
->> +	/* cause packet to be "received" by tun interface */
->> +	napi_gro_receive(&peer->napi, skb);
->> +}
->> +
->> +int ovpn_napi_poll(struct napi_struct *napi, int budget)
->> +{
->> +	struct ovpn_peer *peer = container_of(napi, struct ovpn_peer, napi);
->> +	struct sk_buff *skb;
->> +	int work_done = 0;
->> +
->> +	if (unlikely(budget <= 0))
->> +		return 0;
->> +	/* this function should schedule at most 'budget' number of
->> +	 * packets for delivery to the tun interface.
+> Fixes: 2297791c92d0 ("s390/cio: dont unregister subchannel from child-drivers")
+> Reference-ID: LTC205042
+> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+> ---
+> v1->v2: correct patch format
 > 
-> More tun. Did you copy code from the tun driver?
+>  drivers/s390/net/qeth_core_main.c | 36 +++++++++++++++++++++++++++++--
+>  1 file changed, 34 insertions(+), 2 deletions(-)
 
-Same as above.
+This patch seems to introduce a reference count problem, which results
+in use-after-free reports like the one below. So, please ignore the
+patch - this needs to be sorted out first.
 
-Thanks for nothing those.
-
-Regards,
-
-> 
->       Andrew
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
+[  553.017253] ------------[ cut here ]------------
+[  553.017255] refcount_t: addition on 0; use-after-free.
+[  553.017269] WARNING: CPU: 12 PID: 115746 at lib/refcount.c:25 refcount_warn_saturate+0x10e/0x130
+[  553.017275] Modules linked in: kvm algif_hash af_alg nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip_set nf_tables nfnetlink dm_service_time mlx5_ib ib_uverbs ib_core uvdevice
++s390_trng eadm_sch vfio_ccw mdev vfio_iommu_type1 vfio sch_fq_codel loop configfs lcs ctcm fsm zfcp scsi_transport_fc mlx5_core ghash_s390 prng chacha_s390 libchacha aes_s390 des_s390 libdes sha3_512_s390 sha3_256_s390 sha512_s390 sha256_s390 sha1_s390 sha_common scsi_dh_rdac scsi_dh_emc scsi_dh_alua pkey
++zcrypt rng_core dm_multipath autofs4
+[  553.017331] Unloaded tainted modules: test_klp_state3(K):1 test_klp_state2(K):4 test_klp_state(K):3 test_klp_callbacks_demo2(K):2 test_klp_callbacks_demo(K):12 test_klp_atomic_replace(K):2 test_klp_livepatch(K):6 [last unloaded: kvm]
+[  553.017405] CPU: 12 PID: 115746 Comm: qeth_recover Tainted: G        W     K    6.8.0-20240305.rc7.git1.570c73d6a3df.300.fc39.s390x #1
+[  553.017408] Hardware name: IBM 8561 T01 701 (LPAR)
+[  553.017409] Krnl PSW : 0404c00180000000 00000001a53cad02 (refcount_warn_saturate+0x112/0x130)
+[  553.017413]            R:0 T:1 IO:0 EX:0 Key:0 M:1 W:0 P:0 AS:3 CC:0 PM:0 RI:0 EA:3
+[  553.017415] Krnl GPRS: c000000000000027 0000000000000023 000000000000002a 0000000100000000
+[  553.017417]            00000004b38e0900 0000000000000000 0000000095dfc2c0 0000000000001000
+[  553.017419]            00000001a563eb58 000000009938d818 0000000000001007 000000009938d800
+[  553.017421]            0000000095dfac00 0000000000000000 00000001a53cacfe 000003800f24bc10
+[  553.017426] Krnl Code: 00000001a53cacf2: c020004f67d8        larl    %r2,00000001a5db7ca2
+                          00000001a53cacf8: c0e5ffc262b4        brasl   %r14,00000001a4c17260
+                         #00000001a53cacfe: af000000            mc      0,0
+                         >00000001a53cad02: a7f4ff9a            brc     15,00000001a53cac36
+                          00000001a53cad06: 92014008            mvi     8(%r4),1
+                          00000001a53cad0a: c020004f67f6        larl    %r2,00000001a5db7cf6
+                          00000001a53cad10: c0e5ffc262a8        brasl   %r14,00000001a4c17260
+                          00000001a53cad16: af000000            mc      0,0
+[  553.017439] Call Trace:
+[  553.017440]  [<00000001a53cad02>] refcount_warn_saturate+0x112/0x130
+[  553.017443] ([<00000001a53cacfe>] refcount_warn_saturate+0x10e/0x130)
+[  553.017445]  [<00000001a563db88>] __qeth_issue_next_read+0x270/0x288
+[  553.017448]  [<00000001a563dc38>] qeth_mpc_initialize.constprop.0+0x98/0x738
+[  553.017449]  [<00000001a564007e>] qeth_hardsetup_card+0x36e/0xb38
+[  553.017451]  [<00000001a56408d8>] qeth_set_online+0x90/0x3a0
+[  553.017453]  [<00000001a5640d04>] qeth_do_reset+0x11c/0x1f8
+[  553.017455]  [<00000001a4c47f30>] kthread+0x120/0x128
+[  553.017458]  [<00000001a4bc3014>] __ret_from_fork+0x3c/0x58
+[  553.017460]  [<00000001a58d717a>] ret_from_fork+0xa/0x30
+[  553.017463] Last Breaking-Event-Address:
+[  553.017464]  [<00000001a4c172de>] __warn_printk+0x7e/0xf0
+[  553.017467] ---[ end trace 0000000000000000 ]---
+[  553.017474] qeth 0.0.bd00: The qeth device driver failed to recover an error on the device
+[  553.018615] qeth 0.0.bd00: The qeth device driver failed to recover an error on the device
 
