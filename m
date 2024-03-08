@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-78609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3CE9875DD8
+	by mail.lfdr.de (Postfix) with ESMTPS id 14E45875DD7
 	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 07:00:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 686DDB21AA1
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 06:00:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CE95B21A50
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 06:00:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781FC33CC4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 671DF32C9C;
 	Fri,  8 Mar 2024 06:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="miiRDQzD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BO3I75CE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557FB32C89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437BF28E2B
 	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 06:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709877638; cv=none; b=DfjXxanPeibkKqBoZWovye9ilW0+DYKzCRJ4GM+xnOAy4MasmLi1235GEvooXXhQm2YEM46woZ/72MdZNIGYGpjSCl/KfHHYjSacR40TVW1S3y2hwKWvlvV5ll3DBuEAOmdg0NMx/aSqszUst/zDDQ/G/aKxYIp26Cg4S6vObwk=
+	t=1709877638; cv=none; b=MDRATu6Hisi48wuL736ljczGNXBkgIa/ddXTyCh6/1jTIZIF8TBUg/LmifErdNYZslB8rVKUaxhGwByzCT2+KDtw0DlNkTzwEpZujK66TIeEfcVf5zWwZ1Dl7d+isl5y7r4S7OxxYQsfAmdc7QKthOWlhxpggJ2jMLRbv9/L58c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709877638; c=relaxed/simple;
-	bh=QBb6N3e9Wdxsv3v6HpayO9kNXmOqSbgR2AnEan4hsj4=;
+	bh=3s/fjQ5DkQa/0EUFA1E0vpXY7ZPadMtPM8Kou3cbKwg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=n5uyRvVoZsXsY34SF8xM3+qqPkt/EguM59J7/d6OgOgZd0UJyzPq+YTrILYlsQWWJ3Z1xrcmwxCighIWvZY/sh53ohuhaYbX7TSUOFMs1bcGioriJGvvM4D4TGMbI8o/svWlLgTSMzawZoBe3xeAIeIZuekP+k1kEkolRJoMzTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=miiRDQzD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1D3BBC433C7;
+	 In-Reply-To:To:Cc; b=XnHZZDwO6Rg0YKah5D08gsBFq7W+Vydqu6B9fXm0reLwQSKzFzUVKZTNWBSQVZOrKojspE9GbeqnkBhC8KW+Z/PA3AOFpE2XIlp4sW8/X7IsaOTP85IeUFMqGZ1mF2QnKCVA/mlRX7dJEaSUuG55DloDE0MT99n1pfbNk6Mu0ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BO3I75CE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 115E8C43390;
 	Fri,  8 Mar 2024 06:00:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709877638;
-	bh=QBb6N3e9Wdxsv3v6HpayO9kNXmOqSbgR2AnEan4hsj4=;
+	bh=3s/fjQ5DkQa/0EUFA1E0vpXY7ZPadMtPM8Kou3cbKwg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=miiRDQzDbxFOECeLNEcixGAjrxRE4WdW3SPByTHv2ry4e43jToaJHR7uW5RgFJaTj
-	 7zR26oNzDyNKpjpWAwITeI0SdBVh9CVRodbRhwduIGYl4ksxmrl7G+DlTLymu77Hpk
-	 XKWmiwKGtmjuR6lif1+oE+tu5tOCfjLX0OI9BYzC0sz3wJJl5Pbg3TJI0Y4lo/6vdG
-	 Mki14+SHIqN9nLhBrVKa6EB5KIUnQdpVT4JlyJ4EZ16AyqFMfCxpRwKh6Ta+r3cPLS
-	 1F0r0sj7wwFd6NI48SbV9RCGyZFO55sPPxfLT36AD8KXB5IRk12Q0Fp0NQ0BIayitn
-	 MNuiPVFsHqfjw==
+	b=BO3I75CEO0U79Q/TmOZEiREKLHvCBdr8Z2gdMMNqkeG+N6Q98Ch1X6PAUCkXNriwK
+	 cEFUGBgznHDGoUnlcydNN6pdFzJiXPIjcvM6WINdgGh7shnIFI51MkoWi2CAprPsL3
+	 4tdJHgMASZbeM4R/xBIsEI6gPuMM95YRjVJNBuNFpR1+v8Luf+QAvUn4mzoFy05YYT
+	 nqMNSoQYOgAZ8+dtUgZKvNhmkHlqJWczeYKzEsEzPgGT2Gv1nDBIoJnxb9nq6nKMsi
+	 doL4bNoImHKbchF2AEM163IwizQ3WJYYJ6Dc7MfBEJi9kv0uGGOd1GDsXB36/N0EWr
+	 UqhHgXeI2mlKQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F0C01D84BBF;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E6F7DD84BDA;
 	Fri,  8 Mar 2024 06:00:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,44 +52,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/3] netdev: add per-queue statistics
+Subject: Re: [PATCH v2 net-next 00/18] net: group together hot data
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170987763798.6902.7717910992204174114.git-patchwork-notify@kernel.org>
+ <170987763794.6902.14828523993086840984.git-patchwork-notify@kernel.org>
 Date: Fri, 08 Mar 2024 06:00:37 +0000
-References: <20240306195509.1502746-1-kuba@kernel.org>
-In-Reply-To: <20240306195509.1502746-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, amritha.nambiar@intel.com, danielj@nvidia.com,
- mst@redhat.com, michael.chan@broadcom.com, sdf@google.com,
- przemyslaw.kitszel@intel.com
+References: <20240306160031.874438-1-edumazet@google.com>
+In-Reply-To: <20240306160031.874438-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, willemb@google.com, soheil@google.com,
+ ncardwell@google.com, netdev@vger.kernel.org, eric.dumazet@gmail.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  6 Mar 2024 11:55:06 -0800 you wrote:
-> Hi!
+On Wed,  6 Mar 2024 16:00:13 +0000 you wrote:
+> While our recent structure reorganizations were focused
+> on increasing max throughput, there is still an
+> area where improvements are much needed.
 > 
-> Per queue stats keep coming up, so it's about time someone laid
-> the foundation. This series adds the uAPI, a handful of stats
-> and a sample support for bnxt. It's not very comprehensive in
-> terms of stat types or driver support. The expectation is that
-> the support will grow organically. If we have the basic pieces
-> in place it will be easy for reviewers to request new stats,
-> or use of the API in place of ethtool -S.
+> In many cases, a cpu handles one packet at a time,
+> instead of a nice batch.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,1/3] netdev: add per-queue statistics
-    https://git.kernel.org/netdev/net-next/c/ab63a2387cb9
-  - [net-next,v3,2/3] netdev: add queue stat for alloc failures
-    https://git.kernel.org/netdev/net-next/c/92f8b1f5ca0f
-  - [net-next,v3,3/3] eth: bnxt: support per-queue statistics
-    https://git.kernel.org/netdev/net-next/c/af7b3b4adda5
+  - [v2,net-next,01/18] net: introduce struct net_hotdata
+    https://git.kernel.org/netdev/net-next/c/2658b5a8a4ee
+  - [v2,net-next,02/18] net: move netdev_budget and netdev_budget to net_hotdata
+    https://git.kernel.org/netdev/net-next/c/ae6e22f7b7f0
+  - [v2,net-next,03/18] net: move netdev_tstamp_prequeue into net_hotdata
+    https://git.kernel.org/netdev/net-next/c/f59b5416c396
+  - [v2,net-next,04/18] net: move ptype_all into net_hotdata
+    https://git.kernel.org/netdev/net-next/c/0b91fa4bfb1c
+  - [v2,net-next,05/18] net: move netdev_max_backlog to net_hotdata
+    https://git.kernel.org/netdev/net-next/c/edbc666cdcbf
+  - [v2,net-next,06/18] net: move ip_packet_offload and ipv6_packet_offload to net_hotdata
+    https://git.kernel.org/netdev/net-next/c/61a0be1a5342
+  - [v2,net-next,07/18] net: move tcpv4_offload and tcpv6_offload to net_hotdata
+    https://git.kernel.org/netdev/net-next/c/0139806eebd6
+  - [v2,net-next,08/18] net: move dev_tx_weight to net_hotdata
+    https://git.kernel.org/netdev/net-next/c/26722dc74bf0
+  - [v2,net-next,09/18] net: move dev_rx_weight to net_hotdata
+    https://git.kernel.org/netdev/net-next/c/71c0de9bac9c
+  - [v2,net-next,10/18] net: move skbuff_cache(s) to net_hotdata
+    https://git.kernel.org/netdev/net-next/c/aa70d2d16f28
+  - [v2,net-next,11/18] udp: move udpv4_offload and udpv6_offload to net_hotdata
+    https://git.kernel.org/netdev/net-next/c/6a55ca6b0122
+  - [v2,net-next,12/18] ipv6: move tcpv6_protocol and udpv6_protocol to net_hotdata
+    https://git.kernel.org/netdev/net-next/c/4ea0875b9d89
+  - [v2,net-next,13/18] inet: move tcp_protocol and udp_protocol to net_hotdata
+    https://git.kernel.org/netdev/net-next/c/571bf020be9c
+  - [v2,net-next,14/18] inet: move inet_ehash_secret and udp_ehash_secret into net_hotdata
+    https://git.kernel.org/netdev/net-next/c/6e0735723ab4
+  - [v2,net-next,15/18] ipv6: move inet6_ehash_secret and udp6_ehash_secret into net_hotdata
+    https://git.kernel.org/netdev/net-next/c/5af674bb90a0
+  - [v2,net-next,16/18] ipv6: move tcp_ipv6_hash_secret and udp_ipv6_hash_secret to net_hotdata
+    https://git.kernel.org/netdev/net-next/c/df51b8456415
+  - [v2,net-next,17/18] net: introduce include/net/rps.h
+    https://git.kernel.org/netdev/net-next/c/490a79faf95e
+  - [v2,net-next,18/18] net: move rps_sock_flow_table to net_hotdata
+    https://git.kernel.org/netdev/net-next/c/ce7f49ab7415
 
 You are awesome, thank you!
 -- 
