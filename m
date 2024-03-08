@@ -1,111 +1,145 @@
-Return-Path: <netdev+bounces-78756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F4488765B1
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 14:54:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C0438765BA
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 14:56:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C2F0282714
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 13:54:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C4DD1C20B04
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 13:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D2EA3BBE0;
-	Fri,  8 Mar 2024 13:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 500F623767;
+	Fri,  8 Mar 2024 13:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="UodPQ+YM"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="juRy3gWb"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E45936132;
-	Fri,  8 Mar 2024 13:54:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF0738387
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 13:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709906074; cv=none; b=fZi61mHXFjCY883suy4HpHmlTnukK03C9hGwSXcxGk77WGFGif42ITtqFKZ3k7eK34IlefYgabJn5M6n9JlNsFvR+T18tNrm7Wk+zQvOJooS+kl4luhAXkdF5yrtz6pv0UUHxfWUXYAmx4nwvHgupg/BMbRbSY8IUNT+PhJ50EU=
+	t=1709906166; cv=none; b=UyxcOWNHdayihLaBfOT9Ahr+FeLHl2ruXtLMLx3WyRleqGCOyGNPVYRC61t51oyLygdpZM3/U9z06XVdLc7W8f9qaFzW8lF60XLC5AcriNqLnzMFCxvFKRoRT36fgrn9g27VrZF0xVqaa2XBMGnu3yR9C3WEnCkHc9qZhkYjPEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709906074; c=relaxed/simple;
-	bh=aG3+CKOKqnEHD8zClL8ksocZPjrpA9A3lAGAuXz771A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nijpqiRRhEYbdZv22TCT2JvkTrC3KMNVEI/EUgeBkka+SUlZe6dajFn/VHwGY1nBb/uTEJgpPZcEmUS5Ren3tXI9/D0ojBSI/G6OS92Sb3rckI9I+VwiDLN6X8EaQJP3CaZHwnzlZmZFSWY680CrZ8fQK6+8o86+k1uUkLHbHSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UodPQ+YM; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7B17DE0002;
-	Fri,  8 Mar 2024 13:54:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709906069;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aG3+CKOKqnEHD8zClL8ksocZPjrpA9A3lAGAuXz771A=;
-	b=UodPQ+YMKvaHGMrbgD52PyzC/shaIII3K4mzJfXghCFjJAz3b/IFhvAThZwQXjyACBXHha
-	7PeNTGCYtLn/YiWLh8dUBvMAOTBmMgQSQtD1E2FONBy5M6OymFCrz/SUkLhqzMZP9pq+Su
-	iPZJ+iFlIc3JJrBRWbg/vYxR1s2Fa+iAUnTVBrdvKoT8YPstN8VwW9jTiQ2wnY0x66q1fq
-	0LMRLL2NA/p6hauDHdeu+hN1Egxg9GEmAL/fMW+dt2cwZWYN7kQVAhmxX9G36O3RwoApaN
-	adFQ1GcSTefB34p5Z2EXZNsvNV7jkVylsGWvZymQGshKMoj/k3rFfsceBxxJdw==
-Date: Fri, 8 Mar 2024 14:54:26 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
- Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v5 00/17] net: Add support for Power over
- Ethernet (PoE)
-Message-ID: <20240308145426.7eb4b043@kmaincent-XPS-13-7390>
-In-Reply-To: <CAM0EoM=Q3hdXSHNADKX=erJQJWT4Jz0XeAD8kMYHv_VGagvPQA@mail.gmail.com>
-References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
-	<CAM0EoM=Q3hdXSHNADKX=erJQJWT4Jz0XeAD8kMYHv_VGagvPQA@mail.gmail.com>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1709906166; c=relaxed/simple;
+	bh=jwqxhOdS5M9NP9yW+JCwh/2VuGMq9kNefZwXxNE3FWA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mrt3XP/2jJaISxbwkGY8zAqiUX1dcduCGdDUygLRTQAIVw5WeCDtsIElD8Z5H5lLzEjhVoi8oXRNImOZ1ck4btPIaISNVIrT7bRcdYg6IXXuquHJ7cakC5Z7DE+Ahp0MU9NJadouf9l6sDNaWiHvxNi3QmQZCdYCvMZYYpfQLkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=juRy3gWb; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=cyDzGGnplDHenq/0riLCEFvoHYTLvOAG3G8mTfhOCdc=; b=ju
+	Ry3gWb+P+ob5sTkGM1CpF4jm1VhL9Drm0ZlGirM0Yk4tTkWrsOJonts2YR0Lp7Mo7a1+bURVkR06l
+	3RgFVAyKn+4LHU8Vz+8ZzkYIz7GoVynR/aKTlFLscuLoTe7ImsZLsyn7ruXKvW51ZD/O7b60j9qDu
+	EHbV1flarwwFh/s=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1riai6-009mlR-9A; Fri, 08 Mar 2024 14:56:30 +0100
+Date: Fri, 8 Mar 2024 14:56:30 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Sagar Dhoot (QUIC)" <quic_sdhoot@quicinc.com>
+Cc: "mkubecek@suse.cz" <mkubecek@suse.cz>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Nagarjuna Chaganti (QUIC)" <quic_nchagant@quicinc.com>,
+	"Priya Tripathi (QUIC)" <quic_ppriyatr@quicinc.com>
+Subject: Re: Ethtool query: Reset advertised speed modes if speed value is
+ not passed in "set_link_ksettings"
+Message-ID: <fb8b2333-cde2-4ec4-9382-f3a563954d06@lunn.ch>
+References: <CY8PR02MB95678EBD09E287FBE73076B9F9202@CY8PR02MB9567.namprd02.prod.outlook.com>
+ <945530a2-c8e9-49fd-95ce-b39388bd9a95@lunn.ch>
+ <CY8PR02MB956757D131ED149C97F7D0DBF9272@CY8PR02MB9567.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CY8PR02MB956757D131ED149C97F7D0DBF9272@CY8PR02MB9567.namprd02.prod.outlook.com>
 
-On Tue, 27 Feb 2024 10:31:05 -0500
-Jamal Hadi Salim <jhs@mojatatu.com> wrote:
+On Fri, Mar 08, 2024 at 06:33:00AM +0000, Sagar Dhoot (QUIC) wrote:
+> Hi Andrew,
+> 
+> Thanks for the quick response. Maybe I have put up a confusing scenario.
+> 
+> Let me rephrase with autoneg on.
+> 
+> 1. "ethtool eth_interface"
+> 2. "ethtool -s eth_interface speed 25000 autoneg on"
 
-> On Tue, Feb 27, 2024 at 9:43=E2=80=AFAM Kory Maincent <kory.maincent@boot=
-lin.com>
-> wrote:
-> >
-> > This patch series aims at adding support for PoE (Power over Ethernet),
-> > based on the already existing support for PoDL (Power over Data Line)
-> > implementation. In addition, it adds support for two specific PoE
-> > controller, the Microchip PD692x0 and the TI TPS23881.
-> >
-> > This patch series is sponsored by Dent Project
-> > <dentproject@linuxfoundation.org>. =20
->=20
-> Sorry, couldnt resist because it sounded like a commercial;-> And
-> likely i am out of touch. I am all for giving credit but does it have
-> to be explicitly called out as "this patch is sponsored by X"?
+phylib will ignore speed if autoneg is on
 
-Hello Jamal,
+https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/phy.c#L1044
 
-I will remove the line and add it in the From field as suggested by Jakub.
-It seems to be the usual way to do it.
+It only copies speed/duplex when autoneg is off.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+	if (autoneg == AUTONEG_DISABLE) {
+		phydev->speed = speed;
+		phydev->duplex = duplex;
+	}
+
+When configuring the PHY:
+
+https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/phy_device.c#L2234
+
+	if (AUTONEG_ENABLE != phydev->autoneg)
+		return genphy_setup_forced(phydev);
+
+So we only force the PHY when autoneg is off, and it is
+genphy_setup_forced() which uses this speed/duplex.
+
+If you are trying to influence the link mode while autoneg is
+enabled, you should be using advertise N
+
+          advertise N
+                  Sets the speed and  duplex  advertised  by  autonegotiation.
+                  The  argument is a hexadecimal value using one or a combina‐
+                  tion of the following values:
+                  0x001                          10baseT Half
+                  0x002                          10baseT Full
+                  0x100000000000000000000000     10baseT1L Full
+                  0x8000000000000000000000000    10baseT1S Full
+                  0x10000000000000000000000000   10baseT1S Half
+                  0x20000000000000000000000000   10baseT1S_P2MP Half
+                  0x004                          100baseT Half
+                  0x008                          100baseT Full
+
+I think the hexadecimal part is out of date and you can now also use
+symbolic names.
+
+Another thing to think about. What does the speed here actually mean:
+
+> 2. "ethtool -s eth_interface speed 25000 autoneg on"
+
+phylib assumes it is the baseT speed:
+
+        ETHTOOL_LINK_MODE_10baseT_Half_BIT      = 0,
+        ETHTOOL_LINK_MODE_10baseT_Full_BIT      = 1,
+        ETHTOOL_LINK_MODE_100baseT_Half_BIT     = 2,
+        ETHTOOL_LINK_MODE_100baseT_Full_BIT     = 3,
+        ETHTOOL_LINK_MODE_1000baseT_Half_BIT    = 4,
+        ETHTOOL_LINK_MODE_1000baseT_Full_BIT    = 5,
+
+However, what does 25000 mean? We currently don't have a
+25000BaseT. So how do you decide which of the following to select:
+
+        ETHTOOL_LINK_MODE_25000baseCR_Full_BIT  = 31,
+        ETHTOOL_LINK_MODE_25000baseKR_Full_BIT  = 32,
+        ETHTOOL_LINK_MODE_25000baseSR_Full_BIT  = 33,
+
+This is where advertise N is much better, an actual linkmode, not just
+a speed.
+
+	 Andrew
+
 
