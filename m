@@ -1,216 +1,121 @@
-Return-Path: <netdev+bounces-78833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38A2B876B64
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 20:53:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17CB5876B7B
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 21:01:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EF111F21A39
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 19:53:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACBD21F219EE
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 20:01:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BCE35B5BF;
-	Fri,  8 Mar 2024 19:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4BC45A7BE;
+	Fri,  8 Mar 2024 20:01:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FQIcIjit"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="qBty96za"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF0F5A7B8
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 19:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2020050A80;
+	Fri,  8 Mar 2024 20:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709927617; cv=none; b=rCMSkoWZMp0TqHEd/Rez96s+JbNJZ4EGT1I0HqAjeAxGfvVJBDndoCsqMNK1DNDeWEjxto8DkNAd7BKGHRtx37s10O/8AGudBYB4l39OjjPPGMaM5g7k0/316s+IvqKdXrmsp3Ws+vHHY7yWGxY8GuSYv9JRO9oheITelxAHR0k=
+	t=1709928111; cv=none; b=mFhyR5D7pHQPMvcFqcNfgDXpuSB9eyiQVCl4XWdm5ncEHbsea+EtASJu3ue34mjihR0w6JHAf3PigWDEtD2g3pFMEDpZtA7AMGaTGJz8BbFrDcdXjOMBMhCPBznrdYCXOc4ADro5PjsNNTzNusdmQbHculxbxwdyWqsPjS4CDvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709927617; c=relaxed/simple;
-	bh=+JPchmRbdEWp2hPvsQ8mwR8SsWihb9svN/keL3PqCmM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mlUAmJri1kYI5CTY6evnqUhos91P01Ir0DgBSvPuPh4CHrlBoEuEiWfEsKQm4b+x8CNA577Bh6HCdYHR2X6RaRXXul33JTvxbOqLuDlGzEOitLf7CyxD5YILbKCpx4O0qpIZJDXqPXj8gXXAJ5LWrXgj95hvMEuWYyGSGRPpKR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FQIcIjit; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a26ed1e05c7so366146866b.2
-        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 11:53:34 -0800 (PST)
+	s=arc-20240116; t=1709928111; c=relaxed/simple;
+	bh=sBi3PsrW8eEUjbFvqncGAmduFUQfT43kVhLc+5lLatE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PKdKsXvD3i9sIsRMlkYAC6cHhXoR1i4RqYW5y6vhYyB+v0J/i6OE2NDrD+FFgBaUEdvH5eBNCzCdAHpS7PQMAevsr6DbGiGPId5Ec5o7cG1WnrklFrN+tUW+IyX6VQUhEdYmNQfXAGvJuQvy7/eQDYyDr55qL8I7AYwcHHA48YY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=qBty96za; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709927613; x=1710532413; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Pd2ZoV00c/hvjjV6TuUocydSDT4SN2a80zpBvuI43a4=;
-        b=FQIcIjitCXslDz2GbbUrP/Dl2A1fHjodIwfcVwX7edPGJjzUe6ft0Dzx4S5sFwe1Vh
-         g88zviT2eLf5PmHmjVJB2aNpgv9n3ocJvS72MSrLxPfMODNwXkIqGml7VkVhyDJXPZ65
-         MjMUs4Lqmk59C5q9pviF7lrr5HVfpNnp9VtqWc7ZvnuMI0EGx3Q5NM/4uZGay3xcEJFy
-         qYcxb+eRfAcYnwP/UVfmW9ErY4qC/DPOwckI+rRsS39kszwhkv8lEpCyJ9PUorpE+Wmk
-         8YbTN6+zdx0SrM+L7muhYuk5uJr4h+Hit4pCKYkJfFmlBE74LLcVw8ZHHf4d82NY4qR1
-         jV5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709927613; x=1710532413;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Pd2ZoV00c/hvjjV6TuUocydSDT4SN2a80zpBvuI43a4=;
-        b=cuTX8gMH5b/kKdbqKzqHc1jSwIpI6YQDNb8B/z9fDwzGpX6evKPH6RfzalzCTw6q7J
-         dxXcDnoTkrkJPU3/2MqDtZE0mX45TtEu+n5YQuK10li11m+7knubM2Nl31shLVrbYhAp
-         RPxK6euVpfBer4IMUtOjSMktQgr6RnNSmrGUnh5ex9Nj6vsBCJ57DTV+kqDiw6exFhHj
-         N6sz82hrsZYkySwSo4uQqGhAfccN25J9O35KgfnhJy0OoMXLIZahueJ2o4gOwOes1RDO
-         5GPwRSlRUcYCH4IEpUOQNuM8Cm2BYpPQZJmGMqxTREnzFTTzbl1yPg/IGDipYC6dWjpM
-         eHIw==
-X-Gm-Message-State: AOJu0Yz4EQAHceT7wTp3qKnPjjs900jNO6x8HTmcC59pTUKuyAhPG1bX
-	aFTTA1gVNK8kZewsHjjNnn7A9zM9a1WcoA0GbccO3XM3oLQSCqf5qeAXXfU57YkQ6G8ducV2CRO
-	/HmUKCQjnk+Yl8V+MbvoVksMgl8mm3sDyq0Xg
-X-Google-Smtp-Source: AGHT+IGdfTizwHQnCpRk5GeSjOHjssHLcb+cVFlrr45NHBDRApEdAye6AN9i0+rO/lWinEjVvgcrkAuNBm/bbSNX5ic=
-X-Received: by 2002:a17:907:76d7:b0:a3e:9aa3:7024 with SMTP id
- kf23-20020a17090776d700b00a3e9aa37024mr57660ejc.34.1709927612751; Fri, 08 Mar
- 2024 11:53:32 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1709928110; x=1741464110;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=FKQFu6C9LJsQVEJ6RUl3kiPedrxmDdWQ52fWqWvlQAI=;
+  b=qBty96zafyhfOovPIl8zPJDth2hy2RB7SLb+GGrxEZx6VX6CvP6DHZVw
+   jbAd70LnJ1zFK2am0sKJMwWD+/zBFc1pB+swqkdxfsCS4PuQFl3cfxhZT
+   gmdQKq8+bSbDkrzqFrGlqfVGCOg37s4Tc2Vh5ECFSo6aX2E/pylwqwRck
+   w=;
+X-IronPort-AV: E=Sophos;i="6.07,110,1708387200"; 
+   d="scan'208";a="402621794"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2024 20:01:43 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:36409]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.222:2525] with esmtp (Farcaster)
+ id 2a404405-6cc4-48d2-a6e7-b39807168e1e; Fri, 8 Mar 2024 20:01:41 +0000 (UTC)
+X-Farcaster-Flow-ID: 2a404405-6cc4-48d2-a6e7-b39807168e1e
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 8 Mar 2024 20:01:35 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.142.235.16) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 8 Mar 2024 20:01:33 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Allison Henderson <allison.henderson@oracle.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<rds-devel@oss.oracle.com>
+Subject: [PATCH v5 net 0/2] tcp/rds: Fix use-after-free around kernel TCP reqsk.
+Date: Fri, 8 Mar 2024 12:01:20 -0800
+Message-ID: <20240308200122.64357-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240305020153.2787423-1-almasrymina@google.com>
- <20240305020153.2787423-3-almasrymina@google.com> <15625bac-dfec-4c4e-a828-d11424f7aced@davidwei.uk>
-In-Reply-To: <15625bac-dfec-4c4e-a828-d11424f7aced@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 8 Mar 2024 11:53:18 -0800
-Message-ID: <CAHS8izMC=q_DuR94i-NCKFVsW0JadX7NEbDfyT8PfG3tBwPv-Q@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 02/15] net: page_pool: create hooks for
- custom page providers
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWA002.ant.amazon.com (10.13.139.39) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Mar 7, 2024 at 8:57=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
->
-> On 2024-03-04 18:01, Mina Almasry wrote:
-> > From: Jakub Kicinski <kuba@kernel.org>
-> >
-> > The page providers which try to reuse the same pages will
-> > need to hold onto the ref, even if page gets released from
-> > the pool - as in releasing the page from the pp just transfers
-> > the "ownership" reference from pp to the provider, and provider
-> > will wait for other references to be gone before feeding this
-> > page back into the pool.
-> >
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> >
-> > ---
-> >
-> > This is implemented by Jakub in his RFC:
-> > https://lore.kernel.org/netdev/f8270765-a27b-6ccf-33ea-cda097168d79@red=
-hat.com/T/
-> >
-> > I take no credit for the idea or implementation; I only added minor
-> > edits to make this workable with device memory TCP, and removed some
-> > hacky test code. This is a critical dependency of device memory TCP
-> > and thus I'm pulling it into this series to make it revewable and
-> > mergeable.
-> >
-> > RFC v3 -> v1
-> > - Removed unusued mem_provider. (Yunsheng).
-> > - Replaced memory_provider & mp_priv with netdev_rx_queue (Jakub).
-> >
-> > ---
-> >  include/net/page_pool/types.h | 12 ++++++++++
-> >  net/core/page_pool.c          | 43 +++++++++++++++++++++++++++++++----
-> >  2 files changed, 50 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/include/net/page_pool/types.h b/include/net/page_pool/type=
-s.h
-> > index 5e43a08d3231..ffe5f31fb0da 100644
-> > --- a/include/net/page_pool/types.h
-> > +++ b/include/net/page_pool/types.h
-> > @@ -52,6 +52,7 @@ struct pp_alloc_cache {
-> >   * @dev:     device, for DMA pre-mapping purposes
-> >   * @netdev:  netdev this pool will serve (leave as NULL if none or mul=
-tiple)
-> >   * @napi:    NAPI which is the sole consumer of pages, otherwise NULL
-> > + * @queue:   struct netdev_rx_queue this page_pool is being created fo=
-r.
-> >   * @dma_dir: DMA mapping direction
-> >   * @max_len: max DMA sync memory size for PP_FLAG_DMA_SYNC_DEV
-> >   * @offset:  DMA sync address offset for PP_FLAG_DMA_SYNC_DEV
-> > @@ -64,6 +65,7 @@ struct page_pool_params {
-> >               int             nid;
-> >               struct device   *dev;
-> >               struct napi_struct *napi;
-> > +             struct netdev_rx_queue *queue;
-> >               enum dma_data_direction dma_dir;
-> >               unsigned int    max_len;
-> >               unsigned int    offset;
-> > @@ -126,6 +128,13 @@ struct page_pool_stats {
-> >  };
-> >  #endif
-> >
-> > +struct memory_provider_ops {
-> > +     int (*init)(struct page_pool *pool);
-> > +     void (*destroy)(struct page_pool *pool);
-> > +     struct page *(*alloc_pages)(struct page_pool *pool, gfp_t gfp);
-> > +     bool (*release_page)(struct page_pool *pool, struct page *page);
-> > +};
->
-> Separate question as I try to adapt bnxt to this and your queue
-> configuration API.
->
-> How does GVE handle the need to allocate kernel pages for headers and
-> dmabuf for payloads?
->
-> Reading the code, struct gve_rx_ring is the main per-ring object with a
-> page pool. gve_queue_page_lists are filled with page pool netmem
-> allocations from the page pool in gve_alloc_queue_page_list(). Are these
-> strictly used for payloads only?
->
+syzkaller reported an warning of netns ref tracker for RDS TCP listener,
+which commit 740ea3c4a0b2 ("tcp: Clean up kernel listener's reqsk in
+inet_twsk_purge()") fixed for per-netns ehash.
 
-You're almost correct. We actually don't use the gve queue page lists
-for devmem TCP, that's an unrelated GVE feature/code path for low
-memory VMs. The code in effect is the !qpl code. In that code, for
-incoming RX packets we allocate a new or recycled netmem from the page
-pool in gve_alloc_page_dqo(). These buffers are used for payload only
-in the case where header split is enabled. In the case header split is
-disabled, these buffers are used for the entire incoming packet.
+This series fixes the bug in the partial fix and fixes the reported bug
+in the global ehash.
 
-> I found a struct gve_header_buf in both gve_rx_ring and struct
-> gve_per_rx_queue_mem_dpo. This is allocated in gve_rx_queue_mem_alloc()
-> using dma_alloc_coherent(). Is this where GVE stores headers?
->
 
-Yes, this is where GVE stores headers.
+Changes:
+  v5:
+    * Reuse the correct logic for reqsk in inet_twsk_purge().
 
-> IOW, GVE only uses page pool to allocate memory for QPLs, and QPLs are
-> used by the device for split payloads. Is my understanding correct?
->
+  v4: https://lore.kernel.org/netdev/20240307232151.55963-1-kuniyu@amazon.com/
+    * Add sk_family/refcnt check in inet_twsk_purge().
 
---=20
-Thanks,
-Mina
+  v3: https://lore.kernel.org/netdev/20240307224423.53315-1-kuniyu@amazon.com/
+    * Drop patch 2, 3, 5
+    * Fix uaf by iterating ehash and purging reqsk during netns dismantle.
+
+  v2: https://lore.kernel.org/netdev/20240227011041.97375-1-kuniyu@amazon.com/
+    * Add patch 1, 3, 5
+    * Use __sock_create() instead of converting socket
+    * Drop Sowmini from CC as it's bounced (patchwork may complain)
+
+  v1: https://lore.kernel.org/netdev/20240223172448.94084-1-kuniyu@amazon.com/
+
+
+Eric Dumazet (1):
+  tcp: Fix NEW_SYN_RECV handling in inet_twsk_purge()
+
+Kuniyuki Iwashima (1):
+  rds: tcp: Fix use-after-free of net in reqsk_timer_handler().
+
+ net/ipv4/inet_timewait_sock.c | 41 ++++++++++++++++-------------------
+ net/ipv4/tcp_minisocks.c      |  4 ----
+ 2 files changed, 19 insertions(+), 26 deletions(-)
+
+-- 
+2.30.2
+
 
