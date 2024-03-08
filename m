@@ -1,184 +1,150 @@
-Return-Path: <netdev+bounces-78636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16DF4875F20
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:10:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47C11875F31
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:13:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71230B20D3A
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 08:10:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA2BC282647
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 08:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 085B350A73;
-	Fri,  8 Mar 2024 08:10:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81AB650A64;
+	Fri,  8 Mar 2024 08:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e9XJY2rx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DbBZ1p47"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304C050A64
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 08:10:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11598D29E
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 08:13:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709885405; cv=none; b=tYprCS5sd0W9C1BsBmWjOBBEgRA/skwqyJtzEZ3jXww6JFHGk2bMZ0ZBM5rrR4f4M6pqRTkqnJ+Cxzd2Qx9utj1q+p5rLbmAPWQJVL4O8HCdhSBalul6UldXlGcI/DsWfZ1/vo92gyS+Rgy+NY1nqp4f0Qu6JELmbR/MQUCDWyg=
+	t=1709885588; cv=none; b=A13bZqVO5+9EyslJ+0cQQNGOqyH2S+IyM4S42eTnGn3GQotpCyhUiu07k1e5LiGW1uR9xN65xsdcHdeX9DI98P8yhXXPfY9FTK7cpjFQW2+yz2TeSf6YZpL7TdaddY1k2pcbd6RyG1Bwc/VjkhShTngSG9WT8GpdxtgsICWOU7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709885405; c=relaxed/simple;
-	bh=9mjnKLHYyXFjuLf5DtKrapUwViHfXrN+glwIBsdYD5Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aidhLE1YmJ0mmRtPaHvNTl5XBhTfqqZP1qj7AqxaJwEhaKG6cNlYyMauviQ4z0dtTBNzKu5Yl9aHw2Wm3OI4xoGW7soE5bngIDLDxDnrpfh9uF3Kd/aXT61xP/8rtL55B2kNezgQJgCeo+b8H7V9J2qxGsyDUOSJo61VX4MIeh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=e9XJY2rx; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a293f2280c7so293822466b.1
-        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 00:10:03 -0800 (PST)
+	s=arc-20240116; t=1709885588; c=relaxed/simple;
+	bh=IRsSUUMYtqpUTFfMIKBN7pi4AnZoM4FnlAPk5FSQCCE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UYd+5Fod0v5uMpNBe8n9X/BYiVNmnA8Ja4iiooq2KgQQ8/sjenCBmE8aA32f0N1Dj1AaKMHyPdExpFgFH4D/7ZiSnABtXCfP486brdFt6hTehnX8MsoZsysa4HPiSr6aitZC/BEJ8qH/zPww+Ay4ftaTfWwUKOmevSGjunCwdhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DbBZ1p47; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1dc0e5b223eso4001445ad.1
+        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 00:13:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709885402; x=1710490202; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ieOl+nO/4ShX81O2rZIqhD66gRry0XDM/crFPDhd5iQ=;
-        b=e9XJY2rxgY065NteYVIGSc5QToWf0IzOZSE2rF/ppxlk+U5rMhOsUjgQRsYb+xl9F8
-         U6yZV1B7qut7daLqQWeCG07+LiF1w7QbWXFFcXnzKG7eMFnvrA6DZ8nUFWUMEz+OQ3WM
-         zmVUnS/RGKcOSfK8Qmn7QHSEPZo5M47IHdi2O+KKKC01F4i7bP2vMgwy3Mn1H+YHjf//
-         s4GwnBFei0Dgx+rxhkoiv81UCCRjnihfSNY+aAjUlqq1y0BmS/uOZGRmgzdzKehCGdQh
-         NsM5Wf2swt52TxaCQw3e3vPRsg6CHEWtV24ugSc3pJN3TDtusJ85uKty2KJWXkulZ5P7
-         t0FA==
+        d=gmail.com; s=20230601; t=1709885586; x=1710490386; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ADuoz+NHSLnx3Z/LvVNYADt8qJhfL8IK9fVTemGS3v0=;
+        b=DbBZ1p47FttdPgGdlT9ZJv55lt7OctXh91DenLfyW1jPVDyGudow4nqb9DK1x1WC0W
+         6DYy71RePnvhkRNiV89/062en4AefebJajOWyQYmKnoPT0dOFCcICCtRlS2uxWeKbOGV
+         4aRsiPxre4G34X8Ouj4qFucc0q/MWpD5crhDaY0DAHuIUR2KMvDrTsDlvq/uH9cejRO4
+         Qp5wdkh9nvTmnBTqNwiYloimD/3/6lgX+HQYYe5LjzXSMSfnGvR4mfqYqa4/STlbGnHH
+         xA/vWkFNiByojgj+oXuedNjDm9RU8U6/cDTFcFpNqLtWBS8sM76ah3L1gKdgXrWJO4uS
+         d5gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709885402; x=1710490202;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ieOl+nO/4ShX81O2rZIqhD66gRry0XDM/crFPDhd5iQ=;
-        b=stZYdRc44vVG172KQ0lyaHap47vJeElox4y2M2Psy+nIYn/MikMezvwvxxT2YEj1Ii
-         F/fOgPKRffP0LwX0Wopuv2WmdDIiS3BUWJe0eFhyNrkFvDqRC5OlIvSsq7/VIt6f4gVW
-         NmCln7aVkfKUZfDu4lEFw5ATf/OxC4LhbFeZRYodfx/ptUbKPGWER4figkPGe4Ay8QIT
-         7AzsyibW8K1fGWPcX2lHr08UQ43bZUHMBKqmoJoDy6URaCDzzstkhGYPZ3Ztz5mJlPSu
-         ivZ152FB0Gu5Y4+alD5G7KEE+Tg61Vi7Y0gbY9LWfJSCPBtTrj0teWoIGr+pf2vcpaV4
-         ZRSw==
-X-Gm-Message-State: AOJu0YyLlVbCENZa9usK1uQULpGNNCf/qxXMOHGE9bfRB5ak3CPbFnrJ
-	Vtf3VWsRAJ5vVdbGG7dKldo8RHRKk5x/dM61EDlIU8N88trdiLNfEQHWPZICpbM=
-X-Google-Smtp-Source: AGHT+IHGpXto4nWrzNuAL5hJWGeHiaklD7rmRsAzuU9U2d7GJmxIazfEPKA//Y/bvWhAr6PmbwdAUQ==
-X-Received: by 2002:a17:907:d301:b0:a45:f4d9:d911 with SMTP id vg1-20020a170907d30100b00a45f4d9d911mr191393ejc.34.1709885402548;
-        Fri, 08 Mar 2024 00:10:02 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.222.97])
-        by smtp.gmail.com with ESMTPSA id wk15-20020a170907054f00b00a4519304f8bsm6090542ejb.14.2024.03.08.00.10.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Mar 2024 00:10:02 -0800 (PST)
-Message-ID: <1cdbe5b8-ed3a-46a6-bc73-6bf35e3305f2@linaro.org>
-Date: Fri, 8 Mar 2024 09:09:59 +0100
+        d=1e100.net; s=20230601; t=1709885586; x=1710490386;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ADuoz+NHSLnx3Z/LvVNYADt8qJhfL8IK9fVTemGS3v0=;
+        b=EjMb3BzHrvpvzHUkJBzJWw8xPQYHSRfk4OCt425EQzWeALIiyw7O9puvUkhFEKNxHk
+         55Xp+zrMFM0tKKzTZhz7wL048psk5Qq0YtAUIEBGhBUmQPUewGWPnIgFGUQ9k6EAPdzf
+         zXIy3+9tjBbeH9rUNTcCu+QTjc0fMONZV1qzS47u0RS2Nb687NoriyegUjOa/E7/emdT
+         ixoRLqYpOJez5ZZyM6V1j/qa8GwgwfaBT4IavL7OTbHyOqgEBlZLL6FnWR/45/JH1UuL
+         1Amvk2Ppa8Ua4o7JhWhd5C+NUShhs5BNR8tmlhyC3AkdvsTCOZC8Akg+cC/siLs6odzY
+         zW/g==
+X-Gm-Message-State: AOJu0YwL3cBNcU3Kb5xGPgWLZrXQiw+PWiPC1JXf5sfRcD7LnHyUca+v
+	VLwAYwxfyihk1BvlTNAGx+UyYbty/mhVXkf4Ro+qiM1kIBk+LSt/+7aD3QNjkupVtg==
+X-Google-Smtp-Source: AGHT+IGEBjaHjbiKaBToiZTMXKEhOM5clHu325qOwLZtNjnb9KT3AdrEFAD4Q47FDa+JcJNv2JLIkg==
+X-Received: by 2002:a17:902:650c:b0:1d9:4ede:66b5 with SMTP id b12-20020a170902650c00b001d94ede66b5mr9098636plk.15.1709885585916;
+        Fri, 08 Mar 2024 00:13:05 -0800 (PST)
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id n7-20020a170903110700b001dc9893b03bsm15698271plh.272.2024.03.08.00.13.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Mar 2024 00:13:05 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv2 net-next] netlink: specs: support unterminated-ok
+Date: Fri,  8 Mar 2024 16:12:39 +0800
+Message-ID: <20240308081239.3281710-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 8/9] net: hisi_femac: add support for
- hisi_femac core on Hi3798MV200
-Content-Language: en-US
-To: Yang Xiwen <forbidden405@outlook.com>,
- Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
- <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org
-References: <20240307-net-v9-0-6e0cf3e6584d@outlook.com>
- <20240307-net-v9-8-6e0cf3e6584d@outlook.com>
- <37ebeeca-e53b-445b-9fa7-53a1b7a4dcd3@linaro.org>
- <SEZPR06MB695921BD3235F62E5D37E61F96272@SEZPR06MB6959.apcprd06.prod.outlook.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <SEZPR06MB695921BD3235F62E5D37E61F96272@SEZPR06MB6959.apcprd06.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 08/03/2024 09:07, Yang Xiwen wrote:
-> On 3/8/2024 4:02 PM, Krzysztof Kozlowski wrote:
->> On 07/03/2024 12:34, Yang Xiwen via B4 Relay wrote:
->>> From: Yang Xiwen <forbidden405@outlook.com>
->>>
->>> Register the sub MDIO bus if it is found. Also implement the internal
->>> PHY reset procedure as needed.
->> ...
->>
->>>   
->>> @@ -946,6 +991,7 @@ static int hisi_femac_drv_resume(struct platform_device *pdev)
->>>   
->>>   static const struct of_device_id hisi_femac_match[] = {
->>>   	{.compatible = "hisilicon,hi3516cv300-femac",},
->>> +	{.compatible = "hisilicon,hi3798mv200-femac",},
->>
->> Why do you keep growing this table?
-> 
-> 
-> I'm completely confused. Don't I need to keep binding and driver 
-> compatible ids sync?
-> 
-> 
-> The FEMAC cores on 2 SoCs are compatible afaik. That's why i want to add 
-> a generic "hisilicon,hisi-femac" compatible. Though i know nothing about 
-> the mysterious version numbers (v1, v2 etc..) documented in the old 
-> binding, so i want them to be removed. Instead only keep one generic 
-> fallback compatible.
-> 
-> 
-> Do you mean that i broke the backward compatibility for 
-> "hisilicon,hi3516cv300-femac"?
+ynl-gen-c.py supports check unterminated-ok, but the yaml schemas don't
+have this key. Add this to the yaml files.
 
-No. I meant, use one as fallback and only fallback needs to be in the
-device ID table. There are dozens if not hundreds of such examples in
-the tree.
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+v2: update subject, expand the doc and leave the change out of
+    genetlink spec. (Jakub Kicinski)
+---
+ Documentation/netlink/genetlink-c.yaml      | 5 +++++
+ Documentation/netlink/genetlink-legacy.yaml | 5 +++++
+ Documentation/netlink/netlink-raw.yaml      | 5 +++++
+ 3 files changed, 15 insertions(+)
 
-Best regards,
-Krzysztof
+diff --git a/Documentation/netlink/genetlink-c.yaml b/Documentation/netlink/genetlink-c.yaml
+index c58f7153fcf8..3b5e910f3606 100644
+--- a/Documentation/netlink/genetlink-c.yaml
++++ b/Documentation/netlink/genetlink-c.yaml
+@@ -208,6 +208,11 @@ properties:
+                   exact-len:
+                     description: Exact length for a string or a binary attribute.
+                     $ref: '#/$defs/len-or-define'
++                  unterminated-ok:
++                    description: |
++                      For string attributes, do not check whether attribute
++                      contains the terminating null character.
++                    type: boolean
+               sub-type: *attr-type
+               display-hint: &display-hint
+                 description: |
+diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
+index 938703088306..0f48c14a33d2 100644
+--- a/Documentation/netlink/genetlink-legacy.yaml
++++ b/Documentation/netlink/genetlink-legacy.yaml
+@@ -251,6 +251,11 @@ properties:
+                   exact-len:
+                     description: Exact length for a string or a binary attribute.
+                     $ref: '#/$defs/len-or-define'
++                  unterminated-ok:
++                    description: |
++                      For string attributes, do not check whether attribute
++                      contains the terminating null character.
++                    type: boolean
+               sub-type: *attr-type
+               display-hint: *display-hint
+               # Start genetlink-c
+diff --git a/Documentation/netlink/netlink-raw.yaml b/Documentation/netlink/netlink-raw.yaml
+index ac4e05415f2f..aa37af9f8a8c 100644
+--- a/Documentation/netlink/netlink-raw.yaml
++++ b/Documentation/netlink/netlink-raw.yaml
+@@ -270,6 +270,11 @@ properties:
+                   exact-len:
+                     description: Exact length for a string or a binary attribute.
+                     $ref: '#/$defs/len-or-define'
++                  unterminated-ok:
++                    description: |
++                      For string attributes, do not check whether attribute
++                      contains the terminating null character.
++                    type: boolean
+               sub-type: *attr-type
+               display-hint: *display-hint
+               # Start genetlink-c
+-- 
+2.43.0
 
 
