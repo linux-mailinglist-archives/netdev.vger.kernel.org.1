@@ -1,110 +1,155 @@
-Return-Path: <netdev+bounces-78705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B78F876356
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:28:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80FA4876367
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:37:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 069FF282AAC
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:28:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 376A02814B7
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:37:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91965646B;
-	Fri,  8 Mar 2024 11:27:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A4255E67;
+	Fri,  8 Mar 2024 11:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="Vv2UMVph"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05olkn2067.outbound.protection.outlook.com [40.92.91.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD9B55C3A;
-	Fri,  8 Mar 2024 11:27:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709897279; cv=none; b=aCHbJKjCF3jyhu2pqqzFmfhckkn7FL98LZyILPk7PESYT8gXA3vx/XqFQKvr+Y2exMBAUBOGiLW3Upe385U0c775H3iir7UlfqMpH4BSwQ07pvZsPBakioc9q3n17JcF2umWE6PGddzzPkbTU9UXjn8VCpH8B/gSGDLOz93bF6Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709897279; c=relaxed/simple;
-	bh=/g/Mfdc4MOlaQh7mJ4NTTfyFqcqbzrjornoQPooxZu4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D54RPeEn1sX6iD9+uG7uzlz51xFpqvy3OFD7NgdETjpSnsHW13e09fDkNXPbOP56klQ228K/bAOkw3hitRQqCpSXovwbT0XPGmRVrdBBk1Luet5idtfjxyQqiadn9rEL0gLGHvDHKkziX3STlrvtEwUbDTn9NRX5M1Ti1eg0Nyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a450bedffdfso266432266b.3;
-        Fri, 08 Mar 2024 03:27:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709897276; x=1710502076;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O2tYchlzzh0DWN5u11fzPiUQLbsNm+gor451RXEwI+Y=;
-        b=PVPHjOT3MKt85aU2YWv0c+bPRzToW7/Qw+gC3pvqO3H4osC2vqj2E53YDr52LAqUUl
-         jvlfFOdnn74ZarK3RGtoAZDzD/q8AK50oQOXrapccDXni/tJt3C0L+8fki10/Es32UoM
-         DdONwlXi7ajjd7omvbEwqn87KY6lHq1neSSQRVuNY+dvaC6MtlbV1k3CTDh7l5ANgvRc
-         lYDi1bTyDIOpc7u37PlAWOUA0zjZzelqHHce1S0hlBuProSFcanpr2SFrUqa+SSKJd3e
-         hMK3TjqSKl7zrMLmGsiKGBHsvAQsbK43ncr2o3rh6fEqnt9dIhOtM5Y79VbM+bli6R+5
-         IsMA==
-X-Forwarded-Encrypted: i=1; AJvYcCVInzHgrEY0Md5n4sbeCr4o/3YPgRoAItvH9pCS2nh4cuvMRyCcfo5zenigbW2EDiX4Qg4/ECbWI52cyY92e6Fcmxwge25QnVnx0X10
-X-Gm-Message-State: AOJu0YyyU68uX0RrLQMcqvzlF+VtXD+CxIsMgHgbsEcPzqdfGdfL7ZuI
-	yO7W9ZWx/AovxG5mj2SKohFY7pYOH5UEYsUNuDDZsbATR2j0gRw1
-X-Google-Smtp-Source: AGHT+IExIjq/3gTAAba1u39o8IWU9zZ2Oe9BqI1GRzXLIcpP/kx/b/AaCO9kcs8m3n31QLxpnNoezA==
-X-Received: by 2002:a17:906:4888:b0:a45:b1cf:42f6 with SMTP id v8-20020a170906488800b00a45b1cf42f6mr6172173ejq.9.1709897276329;
-        Fri, 08 Mar 2024 03:27:56 -0800 (PST)
-Received: from localhost (fwdproxy-lla-118.fbsv.net. [2a03:2880:30ff:76::face:b00c])
-        by smtp.gmail.com with ESMTPSA id p22-20020a17090635d600b00a45f2dc6795sm339290ejb.137.2024.03.08.03.27.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Mar 2024 03:27:56 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93015578A;
+	Fri,  8 Mar 2024 11:37:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.91.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709897847; cv=fail; b=H6Sz7dHEf5046NIMdM7y3T8BJJGXeVPtVCpDX4UNMgideYcqIR2DtA7N8X6Y6WKT/82t8/pQAlrotuFOd8SpANIP59VTymIdxKBQzvWCWLNsmr44I3GXp8OkIX3Fq7JU8QkuRRc5b/2JASOBfGBrxS6mWtWKTjXBnDXzT6EWqhk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709897847; c=relaxed/simple;
+	bh=5W8OQsTkb8zlsQtLe8dbiSIO5acTornZARWuIWrGn08=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Ddi6pTeCHmTzYbvWGA4Mgl4B5Ef5PLksszA20nSBaGY6f5fImlBXGD5J4lCTAmlbjFAVjNeemv+ObK805GGeqqk0si0M2uESH4/tVF2zz2IEOk5M8TuqJButTdOCR+DXCbnRYHTAvjNsi6JemyT2gdbyP2Kgc86duKvJ/WMz7Dw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=Vv2UMVph; arc=fail smtp.client-ip=40.92.91.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jiSX6wHNlh/tEJEIztC7Tsan90A6Vg6W/wtAeF2ZoKKmLa37UgGm19Q4kD2S9cTAQd8npYoXwW+lahl9jm8boBUxh8v6wuPeiTl659P5hSztsgnIBWwNemYiYgJ9brWSTL+zt/JgrmDsaNsocxKvL0QOzymrK04ktro5bXMXscM2ngMmSvaVWI9aTlvnhwuzi0ZUNajtDPXTtSr0e44Yr25AlnB4MgTTPGAnOusGIEF4X+BpM6ZRF4YAzIeVltNFQQ+qlN+TZEj4LUF6kVrW+eJqiHR2XPqMjxe5TimGt1ii3Q9eS5QZUlYoJx6SXND1kjdM/nqAcgvIByJAGccl+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oZPjAIqUphboDKkP5eYqFo5/dKb7IepaomOF1h29P14=;
+ b=AVcTwUpUOKCje3fR9Qh/pDCO/nY7JaBlnZOJQZJTlXasGd9vPES4S0sd0ij45UcGFj0pF9ynXmyYn9EZL3F2RfSqlv0dwTwufeTMTN8+rn3nDA8YJa43aIS5tJhtC2zN1IMrlhEjWb7KH6FWxRAsg9NqGOYnv4NUmxO8Ha5qxLLmHxl5blcx+CM5d2WFjmbHgog683eMqsHD1PpSj+ZuRX3cT8/YJdlhgAyHpCRkCf+u9gBlRQ62X+TmX8kTCVjCMw61A0lA2hESxSa6rbI8d3a9FSu6v4NuvKmyjOhereeEOmBfIBOk9UzNDD+qRRPOTzp2ABUqn1mCNbyDxfxS7g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oZPjAIqUphboDKkP5eYqFo5/dKb7IepaomOF1h29P14=;
+ b=Vv2UMVphRPmn/zyUN0aSRdc9NQfqZzaf++W8b6fKCN7QEDQPkxQ59Xib8qnTARizdUiwFrQrAWl9iwv9TVE+A7SCiVNMfcrg3l/aGvHanx+7jJrT234xsPhjdL828LpSHRl51oYHrfW/Lms+6T1Cx3TCglUCuoMBoHFGqHiOcD5KBMNXl4WQP6TkptkPAIzRZfwp4o8N5pBZuAiSI0Bq6yWkI+kFkG+3ShH/OL3+C4wV7go0yoz0rmcLi3LSaoBpswUIyQrtq4+GXYLFhO5pJNHI5Lx44uM1b2B2Tqtwou1MsBYX1xVRJcUTDV4JyjzR4lYQUokHCAQ1gD/H3G+8AQ==
+Received: from AM6PR03MB5848.eurprd03.prod.outlook.com (2603:10a6:20b:e4::10)
+ by AM7PR03MB6309.eurprd03.prod.outlook.com (2603:10a6:20b:131::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.27; Fri, 8 Mar
+ 2024 11:37:23 +0000
+Received: from AM6PR03MB5848.eurprd03.prod.outlook.com
+ ([fe80::58d5:77b7:b985:3a18]) by AM6PR03MB5848.eurprd03.prod.outlook.com
+ ([fe80::58d5:77b7:b985:3a18%7]) with mapi id 15.20.7362.028; Fri, 8 Mar 2024
+ 11:37:23 +0000
+From: Juntong Deng <juntong.deng@outlook.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
 	horms@kernel.org,
-	dsahern@kernel.org,
-	wireguard@lists.zx2c4.com (open list:WIREGUARD SECURE NETWORK TUNNEL)
-Subject: [PATCH net-next v2 2/2] wireguard: Remove generic .ndo_get_stats64
-Date: Fri,  8 Mar 2024 03:27:45 -0800
-Message-ID: <20240308112746.2290505-2-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240308112746.2290505-1-leitao@debian.org>
-References: <20240308112746.2290505-1-leitao@debian.org>
+	Liam.Howlett@oracle.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net/netlink: Add getsockopt support for NETLINK_LISTEN_ALL_NSID
+Date: Fri,  8 Mar 2024 11:33:04 +0000
+Message-ID:
+ <AM6PR03MB58482322B7B335308DA56FE599272@AM6PR03MB5848.eurprd03.prod.outlook.com>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [JA9sT5KNrvqKZHaox87B830FOKZqk6E/]
+X-ClientProxiedBy: LO4P123CA0111.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:192::8) To AM6PR03MB5848.eurprd03.prod.outlook.com
+ (2603:10a6:20b:e4::10)
+X-Microsoft-Original-Message-ID:
+ <20240308113304.12061-1-juntong.deng@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM6PR03MB5848:EE_|AM7PR03MB6309:EE_
+X-MS-Office365-Filtering-Correlation-Id: 264ea03d-b2f2-4bc8-6a50-08dc3f641f1b
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	nhzAW36gHmOkEbNg2oKhDSFeQZ/i/bXWKLdToFjxkxuyoWI32soe9Lm03dBBFzwpgNjwddG7Gq/LsXTsJr6OOwUl0qufcEDS4cAKM2kZNfqgdOP54agrXrGea7YSo2hv4dv28IF4FK35pi5d56h2pdlyBaiE0OEP4GbKsFnXqxZvFJgPl72dnqEZxMPFIKPjcBM+a+dALOfuQrCngkbs2Yx/MBPUE+u5oeMPIDfDqXyRN8eVlv47utw8nRgZD3fn2ja2rlgYKFn+kpN3EcAW8XAu+716AFkmRZN//oO8/SPveXKM+KIh9yj/jBhfXsi2iH7tGeDbh1PmVbXQVNHzjlr0JZTXklVJS5789yTaHpIdtt04bcnrA6AzbTJZ3tjU7mjtqvKd3DUUybQBoOC3lSfka7J5Y9aQnfu0d2uXdLkU16LgapVEaVgZAZz6STRtNSpTZx6h2K8f29xF1vGWYo0SptwHZyjDr5t02jsW1gVb/hWXSsHCTenLVWgamXALkNLDEQgPo7sve+EWYLijD0V8U6G0GbsifNdELw/ji4U132bMYQxJvw9BkCrDi0SY
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?912d1s8w57kiceH+niu2NFreFRPUKtBnfThF111yNW4cSbVubR9khLC5hNWf?=
+ =?us-ascii?Q?mWiquniLovu1apxzIvGGAJ2S/bcCbchw0SNl6eTRMmfdRvsfSI7oBmHWvF/+?=
+ =?us-ascii?Q?k/A0OwIXd9t+rZakai9AA33oDXidBlZpvwpEpwuDgHPz6lNKWX7xU/8xhBsh?=
+ =?us-ascii?Q?WormD6ch+kk/Fs+WT5ajiTohNufRfN7Xk05EC19ol6o21rXy4RjSonNe3fm0?=
+ =?us-ascii?Q?Ddis78Tn+gJcPJD5MCksl4MlM8/ccs20z4Y+d3XtA/2bnqqS2OEia/Q7Mx/M?=
+ =?us-ascii?Q?oZXjsUyFvs9S8KSLRuEQHfXsjLAybA63wnvWWPeCubIkE4Cn6NA4A7DQiRWs?=
+ =?us-ascii?Q?1wG4ipGWXlPkodHfgzMEPEe/edNU55GtmroYtf8hP5Qf7MDAZOA6RPS/QIoF?=
+ =?us-ascii?Q?fzh7uji3Elxhk2A/d3HUfETihKZ9TB0JNQqMomgr/QYzob+MOspvwi8ihyoJ?=
+ =?us-ascii?Q?dTAJqLm0Ap6uHKHadL+Vnp5MlRV6EzvuQn6dGkfEIlurad1CMV1B0LTvzJ5o?=
+ =?us-ascii?Q?7kww2DSwaS2gILYiu8SF7svrs2CV40gC+hQkklcVjkrZLvfSYuJKWLBTcOtW?=
+ =?us-ascii?Q?HR6rT6JrlEWkJ0cA2p5kahlRw/58yHhD64RIz6ac1s+wdvi09vVvHVsjiM2q?=
+ =?us-ascii?Q?KhApkJ7A7kbYbZ+hEas+hyv+H8NEiwT9ZtelvlmJalWfgbqKu0LIZ2A6d0Ss?=
+ =?us-ascii?Q?wIP1QKuVu1HrgZf+dRp0UO6DfelVjVJVxR3Ec9t7J7ABQ7/RH+RbAJ8p0ZAL?=
+ =?us-ascii?Q?cCf+IlOoRnsHkjVGNgwa55WQaoaYk5YwUPvap5xsZo6VhZa/5pvqp8fyXNpK?=
+ =?us-ascii?Q?KdBQaOZdV9nf13jtheVhKFjPKar/ZofR8k4lVxlwi+Eqbg/1m3SzvGpyJ5D6?=
+ =?us-ascii?Q?cYClokB+VR8r1toL1iRia2QphwINZQv/cjEX7IkjKqrqem7UCUKu/KCH6Cdr?=
+ =?us-ascii?Q?uC8gVsqTLpyYYZ4EIWkl4RfjWMEHpxb7D4UJEfMmuhvbCC0y4ZRLmSaB+vW9?=
+ =?us-ascii?Q?hQaPGhPDTPk39i+7x0ZOiwTDwNwXb+J4Y7GZueWsrGE33/5oa/eH++Uj/euJ?=
+ =?us-ascii?Q?/IhOcb7v2cmfnrBpor5O3SGCYZv9uWo35OW31BTH/iKI9HdGuC2ujEcIALnM?=
+ =?us-ascii?Q?BgV5M+lcclmeKwC371p/eMOM5rtZPZNczkGdXV/ul4iXU/ZIVs7dKBvoEZmL?=
+ =?us-ascii?Q?l+VDrIKxDrsHq4n7U0fJ7Rx11VMM8cibnyETMEJT4jaJ7+iUhZNeUvVOGe1Z?=
+ =?us-ascii?Q?C1YaNNKfZgwKrVMLBDJ2?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 264ea03d-b2f2-4bc8-6a50-08dc3f641f1b
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR03MB5848.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2024 11:37:23.3006
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR03MB6309
 
-Commit 3e2f544dd8a33 ("net: get stats64 if device if driver is
-configured") moved the callback to dev_get_tstats64() to net core, so,
-unless the driver is doing some custom stats collection, it does not
-need to set .ndo_get_stats64.
+Currently getsockopt does not support NETLINK_LISTEN_ALL_NSID,
+and we are unable to get the value of NETLINK_LISTEN_ALL_NSID
+socket option through getsockopt.
 
-Since this driver is now relying in NETDEV_PCPU_STAT_TSTATS, then, it
-doesn't need to set the dev_get_tstats64() generic .ndo_get_stats64
-function pointer.
+This patch adds getsockopt support for NETLINK_LISTEN_ALL_NSID.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
+Signed-off-by: Juntong Deng <juntong.deng@outlook.com>
 ---
- drivers/net/wireguard/device.c | 1 -
- 1 file changed, 1 deletion(-)
+ net/netlink/af_netlink.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.c
-index 6aa071469e1c..3feb36ee5bfb 100644
---- a/drivers/net/wireguard/device.c
-+++ b/drivers/net/wireguard/device.c
-@@ -237,7 +237,6 @@ static const struct net_device_ops netdev_ops = {
- 	.ndo_open		= wg_open,
- 	.ndo_stop		= wg_stop,
- 	.ndo_start_xmit		= wg_xmit,
--	.ndo_get_stats64	= dev_get_tstats64
- };
- 
- static void wg_destruct(struct net_device *dev)
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index da846212fb9b..7554803218a2 100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -1773,6 +1773,9 @@ static int netlink_getsockopt(struct socket *sock, int level, int optname,
+ 		netlink_unlock_table();
+ 		return err;
+ 	}
++	case NETLINK_LISTEN_ALL_NSID:
++		flag = NETLINK_F_LISTEN_ALL_NSID;
++		break;
+ 	case NETLINK_CAP_ACK:
+ 		flag = NETLINK_F_CAP_ACK;
+ 		break;
 -- 
-2.43.0
+2.39.2
 
 
