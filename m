@@ -1,75 +1,50 @@
-Return-Path: <netdev+bounces-78687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AE3387620E
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:34:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D7B0876245
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:40:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29F0E1F2327E
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 10:34:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9964EB20D13
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 10:40:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D0855C15;
-	Fri,  8 Mar 2024 10:34:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2489321106;
+	Fri,  8 Mar 2024 10:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eeA1qsD4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAEE55763;
-	Fri,  8 Mar 2024 10:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 005CCDF5B
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 10:40:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709894075; cv=none; b=GotWKK4JFqwE6AIHQT5G7t7UBZMzBdwJlTt+fhOhlCNuMBMUJTHsqw0Fi3PFHkwdxvthkBCyl4//XkIdw7pInCkdjYfMnXy5JAMcD4GAsx8GuPHvbCZbZn1ek3l+a3KzjjT+yHSadP0a9Jwf1BW+0MNK865Rce0+LjWeET+d6E4=
+	t=1709894433; cv=none; b=igtc0zhHC/q3H7JYFtRMfGxi8JjqIShLVcG+wzdO1IKcB0h8Ri8TvhuEYM2cNkqbADZ9yhxfLEGrqpJWCkHNXXHckUSStu10/jsbV09oIcLgpOP2gAgZvl6nI+55rQCqqL8FGTMFMJalzxnLCX+qOV/2eK3oiXr89373VXR2DAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709894075; c=relaxed/simple;
-	bh=L8Si9CnBE7auR3o9dfsZriAtTIYD0Jv4aUOcF2/X0Lg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ROfMMrtmSUl3aMoQ873eZY/LuX/X78PWgRTuy72YPZSNtuTysHvZRPm2mAvQJIMyeSGyT+ISYcZSt6OAsKqDZSdwpFF73BG3mtaBqkaJrjMidkxFIZujIYyePAhDoDsXWoL0aIfcJMnh/aqOrfxOi+AZYjE8VuhYqlmSDJ2I+KU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5683247fd0fso327288a12.3;
-        Fri, 08 Mar 2024 02:34:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709894072; x=1710498872;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XagB2LkBSV5q8D6u6Fwx7UufMS0bw8vTRFIb2KLQwug=;
-        b=YtsfScbC4yDafWCM51YUAcrcGuP8YB0AyHCo4+Q3R0U5dWfXoQdUL1SG5Y0byulks7
-         uGypgjakUZoLh7wlH7519KVhmaVuU5dbIeYSYcTRJmt9SJq39BaGlzZGC7P/daH/dc92
-         ERCsyh062DfVno8zff5yeh/1caOX+Qlx7VU/FDQJloaBeqb+kkvPPSbtEdOAcS+pO8CI
-         XwUwRJZBLxaD7eJ8EIySn/hFxyjeotrJVuNMfN52gxsc8ykMWQaQ4nd+/QYN2o54DPoS
-         16rIgAtP+H/zkiwJIfXduAsb1KqvJnhKE/iAuUerAG+GaraJKR+qMHi8hpMYDphP41oS
-         nLlg==
-X-Forwarded-Encrypted: i=1; AJvYcCVK9I7enObfkytyccw3oot6ZZpOCKfs5dLIzb7YuZdno5kVjKZOZ9adI8BhX8nZHOcdNCeDcJOJat14PGRuyikt+mYdmio4Yjy0Eytj
-X-Gm-Message-State: AOJu0Yx+wa4z1mqQFKB50l0QThbCf7A5E9hsEl0ehXtf7lwkopE6z0m6
-	KIFr70AIVKn2UCjsqDcf+hDB3MBcQ+2OECeDQTO8sB/W+KoJXTmW
-X-Google-Smtp-Source: AGHT+IGyNSLodNc0h4ktHrVIEYbbfZTb0oilAJIHPaJ7ue0mB7a++vK8N5tq65PuSeYnwlaBf4byHQ==
-X-Received: by 2002:a17:906:c7c3:b0:a3e:34e8:626f with SMTP id dc3-20020a170906c7c300b00a3e34e8626fmr14919878ejb.66.1709894072325;
-        Fri, 08 Mar 2024 02:34:32 -0800 (PST)
-Received: from localhost (fwdproxy-lla-120.fbsv.net. [2a03:2880:30ff:78::face:b00c])
-        by smtp.gmail.com with ESMTPSA id p16-20020a170906229000b00a442979e5e5sm9133311eja.220.2024.03.08.02.34.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Mar 2024 02:34:32 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	horms@kernel.org,
-	dsahern@kernel.org,
-	wireguard@lists.zx2c4.com (open list:WIREGUARD SECURE NETWORK TUNNEL)
-Subject: [PATCH net-next 2/2] wireguard: Remove generic .ndo_get_stats64
-Date: Fri,  8 Mar 2024 02:34:18 -0800
-Message-ID: <20240308103419.1771177-2-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240308103419.1771177-1-leitao@debian.org>
-References: <20240308103419.1771177-1-leitao@debian.org>
+	s=arc-20240116; t=1709894433; c=relaxed/simple;
+	bh=CyktlwD6TQZxTz73Uyl6CtWKRIwoK8xfLb810xbZrjI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BbYRheW9z+ONuQcsKpxfKQBO8dIs+m7Gdd1fg0iR+4iFXumw9muk2wmCclQNJ7FJIe9cpe7lHCsZN9XND20zqS0AV8Vz7GqgR3ZywlIkqNr1S/H9HgCaBbAhRfFH+su6QpholJE3kxGgbH9CR3gmtsE4340Bh7m98xkzyoGrnSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eeA1qsD4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8DCA6C433F1;
+	Fri,  8 Mar 2024 10:40:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709894432;
+	bh=CyktlwD6TQZxTz73Uyl6CtWKRIwoK8xfLb810xbZrjI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eeA1qsD4cUsMgsqfIOc/UwnYguDHEcxfecIzDNZXpJg+XDqq4oUv6JmGWvn46I0DZ
+	 UUfte/H+iB/724RgVRmeLoNMU9VUvi029qMpsUsQtGYQszMppETukqx8dQFUbHD+ul
+	 qmCAcpfk4RtZJucIuqguLpTYBhLdcawrTK+YWZofpQ3A+TEU+ZbgYoQLBvEsgt/AHM
+	 Bf9xBsRZ3Uil82fjgnJ6UNyu2hDwrx8LUHtiWS2yEj4TF+YCy+c0eMb+9bdBktnHHu
+	 tH9ch84aOvUhAERMpIMUBOU+yoV7E7jlUR+SaZDhTE/arN+2FPZ7WXsGRbOf+bYGJ6
+	 3qSBDcOZuQzeA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 726B2D84BB7;
+	Fri,  8 Mar 2024 10:40:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,34 +52,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v4 0/7] Support for nexthop group statistics
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170989443245.19391.9620032948431105004.git-patchwork-notify@kernel.org>
+Date: Fri, 08 Mar 2024 10:40:32 +0000
+References: <cover.1709727981.git.petrm@nvidia.com>
+In-Reply-To: <cover.1709727981.git.petrm@nvidia.com>
+To: Petr Machata <petrm@nvidia.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, idosch@nvidia.com,
+ dsahern@kernel.org, horms@kernel.org, mlxsw@nvidia.com
 
-Commit 3e2f544dd8a33 ("net: get stats64 if device if driver is
-configured") moved the callback to dev_get_tstats64() to net core, so,
-unless the driver is doing some custom stats collection, it does not
-need to set .ndo_get_stats64.
+Hello:
 
-Since this driver is now relying in NETDEV_PCPU_STAT_TSTATS, then, it
-doesn't need to set the dev_get_tstats64() generic .ndo_get_stats64
-function pointer.
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/wireguard/device.c | 1 -
- 1 file changed, 1 deletion(-)
+On Wed, 6 Mar 2024 13:49:14 +0100 you wrote:
+> ECMP is a fundamental component in L3 designs. However, it's fragile. Many
+> factors influence whether an ECMP group will operate as intended: hash
+> policy (i.e. the set of fields that contribute to ECMP hash calculation),
+> neighbor validity, hash seed (which might lead to polarization) or the type
+> of ECMP group used (hash-threshold or resilient).
+> 
+> At the same time, collection of statistics that would help an operator
+> determine that the group performs as desired, is difficult.
+> 
+> [...]
 
-diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.c
-index cb025ba8f60d..0f7ed274fdf7 100644
---- a/drivers/net/wireguard/device.c
-+++ b/drivers/net/wireguard/device.c
-@@ -237,7 +237,6 @@ static const struct net_device_ops netdev_ops = {
- 	.ndo_open		= wg_open,
- 	.ndo_stop		= wg_stop,
- 	.ndo_start_xmit		= wg_xmit,
--	.ndo_get_stats64	= dev_get_tstats64
- };
- 
- static void wg_destruct(struct net_device *dev)
+Here is the summary with links:
+  - [net-next,v4,1/7] net: nexthop: Adjust netlink policy parsing for a new attribute
+    https://git.kernel.org/netdev/net-next/c/2118f9390d83
+  - [net-next,v4,2/7] net: nexthop: Add NHA_OP_FLAGS
+    https://git.kernel.org/netdev/net-next/c/a207eab1039b
+  - [net-next,v4,3/7] net: nexthop: Add nexthop group entry stats
+    https://git.kernel.org/netdev/net-next/c/f4676ea74b85
+  - [net-next,v4,4/7] net: nexthop: Expose nexthop group stats to user space
+    https://git.kernel.org/netdev/net-next/c/95fedd768591
+  - [net-next,v4,5/7] net: nexthop: Add hardware statistics notifications
+    https://git.kernel.org/netdev/net-next/c/5877786fcf52
+  - [net-next,v4,6/7] net: nexthop: Add ability to enable / disable hardware statistics
+    https://git.kernel.org/netdev/net-next/c/746c19a52ec5
+  - [net-next,v4,7/7] net: nexthop: Expose nexthop group HW stats to user space
+    https://git.kernel.org/netdev/net-next/c/5072ae00aea4
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
