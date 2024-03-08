@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-78675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2753E8761D9
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:20:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7265A8761DC
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:20:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCA591F21AEC
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 10:20:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13DBD1F21B05
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 10:20:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9413353E3B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFDCC54746;
 	Fri,  8 Mar 2024 10:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HUeB2VSz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ITcpoBDk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB084F5F9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894F253E02;
 	Fri,  8 Mar 2024 10:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709893231; cv=none; b=nEYIvdmX8om0k5gMy9PhwrGkGB9XviSs41WJ8BCnhOUzfArAtZZ9vVepaqoWBGER4PvCVqkC1yHrIBmLJ3OhUm+IXk8BV/7E8JsWGj/Q276er7bBdrsYoG6ddTxvHijC7Cgvf3dde/+sRTDBekjD9/HwKdxZEZI2rsrBz4ET+Ww=
+	t=1709893231; cv=none; b=gBGhefgSjLzH2i7cX6NF9yn2XY0B3+123KlLy0RjrzFUGa8zYvwGpLffQ7UqSdwXPh7Y0UqfCK1zlgYQsJufPvH8nnZL6EgSNabFohQNq2b2mqMwzFEgP9Dj32G2jpWv+upNvHGLHy1Cqdnpax8c2kCces64Iu/BESS+0lmjkow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709893231; c=relaxed/simple;
-	bh=FdfTPt0yKjeUfkUPkG1nIroPC69DZK4OHUJS0wvPRGI=;
+	bh=4/oZal4/5iKFtxf9Y3vrEaP+XdcROgnJfuGVAdN4iIY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QTQLIJonBpTXwc6bUts2ZevaVbN5Hr9mKgn8fnvYrizgHy8t/u6VRRyjL1Kc14pi0YkFk98tTbL/wsTjUn4ivIN5in1x6ovAPTYHNcdGPvGRTNTwNKiFY7xk2MyXOy4oAHbgrclUPlQO40lMeatcXAAV/cFwDhuVgvhOhhuiBjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HUeB2VSz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 43C69C433B2;
+	 In-Reply-To:To:Cc; b=YV2a/MXQ3743uUeGcQHAf4HKbAWCHbSQ/giILevUQYVi7pbfGVa6Kfhw8g9JR2pMQS6nHsF7XI+xBefMA27mKSFA3RTgREk3mhcFd7PTQDo+84XlK3pIr5Nxujp0ndvDFdBmQELwo3rQsRItKNsOWQzYOvsCncuPvew2UUe/U10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ITcpoBDk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 39EA0C433B1;
 	Fri,  8 Mar 2024 10:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709893231;
-	bh=FdfTPt0yKjeUfkUPkG1nIroPC69DZK4OHUJS0wvPRGI=;
+	bh=4/oZal4/5iKFtxf9Y3vrEaP+XdcROgnJfuGVAdN4iIY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HUeB2VSzgMkt1CvW1ertNGGllRTTM9XlBN6Vv3884mkFJ8pUv62C+EFo7UVGsxn7u
-	 wAFBQwkjiN8gN4hYu2qsqhCevi3yw/QAn5aQ9TC75glVouGLT1/BBL8BsL/9eP8Qk6
-	 Lw2OsvanYHPTpk37xa9m0XorDFrDCC8uZpCoYy3Mbp50hHYdVFVPo6GMRDAZLJpKL9
-	 ZB3ENaj3gYxiC4XDof5w1mlvLGwxFB2Oj9lJuiSTtm0pfHBqUNMntDUNMqIi0iHBz0
-	 0N2AFEcKBWg5ZZ82Dq9eui6ubLfOwwm6pSJCux7D7VNxRudvNR9Gv49YZMeVDWxPK6
-	 ddOwQBzev/eUg==
+	b=ITcpoBDkCSBG2hVY5GL3uvWs0td1mLBcoyzv97k8ZMjQIBBWBX5VYyNyVPkC1+OxT
+	 SjGS1jqMU13mzXaxo0NxvFIQQvsqilOaalrRpPMZnK8uBWBBMNAbWsfHSRYeTrlFUg
+	 /CWI6qu5XpJK+7kCvE6+eutaRmNlCL3Dfa2MKwBeho9vD3JSsblZFtusROfsRflMF8
+	 u6/81PAYDRUVfquViW7+z+GkCaVhakw83DnxJBbca6mgHveuX4ZpjG3liAmvW3dKBR
+	 6M1edN1/zcDE1odt/48tjKl/n2S1VKfnejfK2BDgLm/XkHjYkK6/NmcEQZxhSPs31E
+	 NHF4wZ1Nw6CYQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2A288D84BDD;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1D688D84BBF;
 	Fri,  8 Mar 2024 10:20:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,41 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] net: phy: fix phy_get_internal_delay accessing an empty
- array
+Subject: Re: [PATCH net v5] ipv6: fib6_rules: flush route cache when rule is
+ changed
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170989323116.6327.2942452458797503240.git-patchwork-notify@kernel.org>
+ <170989323111.6327.13031133027277965133.git-patchwork-notify@kernel.org>
 Date: Fri, 08 Mar 2024 10:20:31 +0000
-References: <20240307111906.297749-1-kevin.lhopital@savoirfairelinux.com>
-In-Reply-To: <20240307111906.297749-1-kevin.lhopital@savoirfairelinux.com>
-To: =?utf-8?q?K=C3=A9vin_L=27h=C3=B4pital_=3Ckevin=2Elhopital=40savoirfairelinux?=@codeaurora.org,
-	=?utf-8?q?=2Ecom=3E?=@codeaurora.org
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- dmurphy@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- enguerrand.de-ribaucourt@savoirfairelinux.com, rmk+kernel@armlinux.org.uk
+References: <20240307100157.29699-1-shiming.cheng@mediatek.com>
+In-Reply-To: <20240307100157.29699-1-shiming.cheng@mediatek.com>
+To: Shiming Cheng <shiming.cheng@mediatek.com>
+Cc: jiri@resnulli.us, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, davem@davemloft.net, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, lena.wang@mediatek.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu,  7 Mar 2024 12:19:06 +0100 you wrote:
-> The phy_get_internal_delay function could try to access to an empty
-> array in the case that the driver is calling phy_get_internal_delay
-> without defining delay_values and rx-internal-delay-ps or
-> tx-internal-delay-ps is defined to 0 in the device-tree.
-> This will lead to "unable to handle kernel NULL pointer dereference at
-> virtual address 0". To avoid this kernel oops, the test should be delay
-> >= 0. As there is already delay < 0 test just before, the test could
-> only be size == 0.
+On Thu, 7 Mar 2024 18:01:57 +0800 you wrote:
+> When rule policy is changed, ipv6 socket cache is not refreshed.
+> The sock's skb still uses a outdated route cache and was sent to
+> a wrong interface.
+> 
+> To avoid this error we should update fib node's version when
+> rule is changed. Then skb's route will be reroute checked as
+> route cache version is already different with fib node version.
+> The route cache is refreshed to match the latest rule.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] net: phy: fix phy_get_internal_delay accessing an empty array
-    https://git.kernel.org/netdev/net/c/4469c0c5b14a
+  - [net,v5] ipv6: fib6_rules: flush route cache when rule is changed
+    https://git.kernel.org/netdev/net/c/c4386ab4f6c6
 
 You are awesome, thank you!
 -- 
