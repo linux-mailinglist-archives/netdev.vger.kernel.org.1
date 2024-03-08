@@ -1,76 +1,74 @@
-Return-Path: <netdev+bounces-78553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4A92875B5E
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 01:01:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F2B7875B65
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 01:08:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 413C31F2146C
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 00:01:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 329361C20CCE
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 00:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86215364;
-	Fri,  8 Mar 2024 00:01:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C565F163;
+	Fri,  8 Mar 2024 00:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="ZTWzXoct"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="e8OlHtfI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 196EE184
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 00:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D74D179
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 00:07:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709856097; cv=none; b=oVVR2LdjvixPDf7W8Y8Bcy+J6vqlUsa4idxIB1FDAqJcRgRjm/4bcCzFsHVmIkXkFpFtQxre0x31eSI9sVvPDfFyxx4phws3jXxK0MRPijT0DpeOKIF9MYIH6F6kdVMj1pFKzHxn59Ff91u3rURi8BwCD71n6kWHpwUBEymVB1Y=
+	t=1709856480; cv=none; b=A+OZwq9Cw/HLNdjuBmoHqwsOBN+ElLgim3/WMPZo1wQCOAHFVQ/mHXUrSMAXlA3uqaQckQRx3pdVDjGqSPF/gyBomjflHCNGsnP5A94ESzlipJ/gjZ5XvRcMJ4zJSaVioCC9XIbYMOyjeCxz9KB1gca89q6s5u84PfedBhtjMOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709856097; c=relaxed/simple;
-	bh=BQgVTX1XrhQirUYpGWnlm/YpEHkVQmJOw3sr0JEv3FE=;
+	s=arc-20240116; t=1709856480; c=relaxed/simple;
+	bh=8AkWK/d7GsbY/m6D0pIzblhuCXW01MyOynE+rX8tYJw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ikZwEh4I0btTY2NcnuweUcH+t8/eBmuqxpjMbWTus5lb8goGIjyxvGU1L1JKeYnV8ydFSJvhy3B/XOnFDMVE8fGm3FZdvWWGsbduwQY5d6O38YkGilcmXHmit1G7duGtoDRpcDlU1EgsMCnNDQPhepse1hGQAdIhES6aizHu7H0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=ZTWzXoct; arc=none smtp.client-ip=209.85.208.46
+	 In-Reply-To:Content-Type; b=c0Yrb6SPWJYXnjiAjDYd5oIK2/Tq1k49Hl13T1Lga0KwiaFl+2Awr8ZeH1W9HDORXaa6sMMZjE4yKRIwW47F3h8DpshXpKKN8T8+KSa2Fz0bsKs93gsHY41F7uwfc3KCFzXcTNIEaiIgyYjIumd5DyWoOlnhNZ30ApGpPhVk0rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=e8OlHtfI; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-567fbbd7658so1647468a12.2
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 16:01:34 -0800 (PST)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-56829f41f81so304363a12.2
+        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 16:07:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1709856093; x=1710460893; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1709856477; x=1710461277; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=DPhEXD9ojiu59TcMBYHbdGKnNXR2tNwaQDJP2dPhCGY=;
-        b=ZTWzXoctHAG9r0aoMK+sjFkXsYnvQiJZ0eSHXP0LOKSnF4Z7kTY6Ep+p2jOdDzdDMC
-         klXcK3iVT0MzmVtJeVDkfvi7vhGwWyvULW4Nb+MOwDtXwIjSSgGiAtDgexxSzw0l9CI5
-         KAQKFQL9+wRH6uI2PXMT6/9ZXpXkuzst1A80J+ZUVQRPrmFl4NjRJn6CCLWtNPPaJesM
-         Z6qX720vSllH7J7ywNX9McK+1jUwBebQc6+soGcL47Le2h2cCnXwXCrLFiaG5Vkz5D0S
-         iM9cYp9hdKpH+pkxcKDGzDKOFtBhRFqSylnh8noYnJJJ0HyX7x+I1GyjXzqZ47Yaik7A
-         hgUw==
+        bh=W/SgjPb5JtOPtVxFT1xzLEWNZZkMTE1/xZIAtxriWHE=;
+        b=e8OlHtfIvbFsWPSF2mF6tNyIcFQAQRmmeycCMNFumUOTNBD1JqBnvMpwv/fI/B0djW
+         Gyy2zrV/RHdyRFaNLyvstDf1THcEBBUG9h+8Db0dtvOVAOuf7pBbFYr9WMYF+g3JBVsz
+         +3Z30zXRes3SyOFgBFqSmwkhC8K70rmvSU6OtEcSrcOhfh136VuBGAnuxS9JJ94Mmp0A
+         cR0gyNshtEDG9DHlC9WUQ/N6XJh+Mf+Q3+tGSaSouhA81yCrSzuRpuymO0q3dPcGcGVR
+         HJNbxWkPBoH/CCb8z+2Ednyk7lL7jx0T3d59pNKbd9xGR1y8uHtU9Q0ML6swsayh9r0M
+         GgQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709856093; x=1710460893;
+        d=1e100.net; s=20230601; t=1709856477; x=1710461277;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DPhEXD9ojiu59TcMBYHbdGKnNXR2tNwaQDJP2dPhCGY=;
-        b=kgcD+u5IgK14mJfEoOyma9MAfH6jGFfd+ghi6UKeX21EXdDd5UnJ3XlY5NbDvGQ4qK
-         oxwy+mQo8o4o9hl8xUDq94vkTyf6DyemIeE4oS0/8dZ3ahBWaspe37Gif0rD/pUI1P3C
-         2VyM4N/cEN0OiDkTthDWYMhmdfUWXmYuqUxlyLoBKYfTWgKmFwqKAlkLGJ3EkF/ijJY/
-         kBEkqnKVd6FYsJ51oL/laL+aa1OmVJwVBEktRTelclNpiMVK83lUnHCU4O5pGwtsHNsu
-         4x0QsHm1L9toX7RYwH3MOr6nqT8QcTTkFIGv0o6eWcHwz9Gg0VOYRghxkq2v6mExEsgy
-         iCAw==
-X-Forwarded-Encrypted: i=1; AJvYcCWEQBHedPn97XF7hYDo4FJhIKUNzI0yUOnr6/FG96cYZgOv8bXQH4Q7DrIcmWCeCU5I0RogZdB8DlqWL4EzGGe+JTB2nLXq
-X-Gm-Message-State: AOJu0YwW/gGhz/8PquCOSq8/o8WNmkBw4N1oI/AcLv7sC2nKGC56TBrr
-	/OVsV+CvS1ibKiSlXuoH2eHP6UBbt2UKx285Z0rXzG4Znuptq1oeCPeyp1SnaxvhOxAw5TMMlJQ
-	9
-X-Google-Smtp-Source: AGHT+IHo+hkmpLM69HIl/OtyuHSXWakda9fWrqYC56CujewVkbBubHz4DpdjyikVFRUyD80JqigWeA==
-X-Received: by 2002:a50:bb2c:0:b0:567:a8f7:2233 with SMTP id y41-20020a50bb2c000000b00567a8f72233mr697459ede.40.1709856093043;
-        Thu, 07 Mar 2024 16:01:33 -0800 (PST)
+        bh=W/SgjPb5JtOPtVxFT1xzLEWNZZkMTE1/xZIAtxriWHE=;
+        b=UT0XGyR0V1cUMdajKc+oQUw4dA+gcIqHQuwcIkSjg/wbwn8TNP+26g6Xz4bgLgz0HC
+         mtQjjSt5sFIL/rVhh8W7TRHW+pqQf7LjPbj3/yDovdRMseCySevdUJsBytG+zd4j4/Hd
+         WMn0xWKo+SHGx9m8Sjj7DLudYPhgE59FZocsk1gi+6pSJRQydRPG8EvfT7JmrUyhyxVJ
+         z11qg/Pfp6d1gKX2kAYiqYCO8XfPvN5M4mLvOygDahn4eRmUauPNS4uHpNQkF8NRKiSy
+         JhWTQqs1Bh6WX8IA2SFJzekhUOhMhvmzn1AhThV9jFYQqp/dr5QH3iqN1R3NaqsfT4P7
+         jMeQ==
+X-Gm-Message-State: AOJu0YyfVJ7XeQ6ZY9kUZFeiU1yM/MVIAd+W7ONU1t0LcSp06l9Pa2fF
+	EpB7RVqnfEoUdGUGdV5GTQqoAqpEDkfW1kxurdYquOW7WM0IaP9iWDQQuNsPm4c=
+X-Google-Smtp-Source: AGHT+IE9d5yA8OwUV6IiUxWVPpPfG9HDykT0djvDj5kJKvpLOmBoVaZ/KMy50hmOBM17jhMCPwTAmg==
+X-Received: by 2002:a17:906:40c7:b0:a45:6ef8:1e3b with SMTP id a7-20020a17090640c700b00a456ef81e3bmr8959258ejk.14.1709856476655;
+        Thu, 07 Mar 2024 16:07:56 -0800 (PST)
 Received: from ?IPV6:2001:67c:2fbc:0:460d:9497:9f21:53e7? ([2001:67c:2fbc:0:460d:9497:9f21:53e7])
-        by smtp.gmail.com with ESMTPSA id el8-20020a056402360800b00566d6e30f1fsm7448863edb.31.2024.03.07.16.01.31
+        by smtp.gmail.com with ESMTPSA id w9-20020a1709064a0900b00a44f0d99d58sm6297382eju.208.2024.03.07.16.07.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Mar 2024 16:01:32 -0800 (PST)
-Message-ID: <f5906a82-36f5-4e9a-8fca-d8bc65ca5fff@openvpn.net>
-Date: Fri, 8 Mar 2024 01:01:56 +0100
+        Thu, 07 Mar 2024 16:07:56 -0800 (PST)
+Message-ID: <d896bbd8-2709-4834-a637-f982fc51fc57@openvpn.net>
+Date: Fri, 8 Mar 2024 01:08:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,20 +76,20 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 03/22] ovpn: add basic netlink support
+Subject: Re: [PATCH net-next v2 04/22] ovpn: add basic interface
+ creation/destruction/management routines
 Content-Language: en-US
 To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
  Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
  Eric Dumazet <edumazet@google.com>
 References: <20240304150914.11444-1-antonio@openvpn.net>
- <20240304150914.11444-4-antonio@openvpn.net>
- <e0375bdb-8ef8-4a46-a5cf-351d77840874@lunn.ch>
- <f546e063-a69d-4c77-81d2-045acf7e6e4f@openvpn.net>
- <d52c6ff5-dd0d-41d1-be6f-272d58ccf010@lunn.ch>
- <20240305113900.5ed37041@kernel.org>
- <5f7f088c-426a-493b-9840-02f3003a7381@openvpn.net>
- <8033ea62-7ecf-4703-9d7b-d18f66751b8c@lunn.ch>
+ <20240304150914.11444-5-antonio@openvpn.net>
+ <e89be898-bcbd-41f9-aaae-037e6f88069e@lunn.ch>
+ <48188b78-9238-44cc-ab2f-efdddad90066@openvpn.net>
+ <540ab521-5dab-44fa-b6b4-2114e376cbfa@lunn.ch>
+ <a9341fa0-bca0-4764-b272-9691ad84b9f2@openvpn.net>
+ <b3499947-f4b6-4974-9cc4-b2ff98fa20fc@lunn.ch>
 From: Antonio Quartulli <antonio@openvpn.net>
 Autocrypt: addr=antonio@openvpn.net; keydata=
  xsFNBFN3k+ABEADEvXdJZVUfqxGOKByfkExNpKzFzAwHYjhOb3MTlzSLlVKLRIHxe/Etj13I
@@ -133,58 +131,67 @@ Autocrypt: addr=antonio@openvpn.net; keydata=
  ify06RjcfKmutBiS7jNrNWDK7nOpAP4zMYxYTD9DP03i1MqmJjR9hD+RhBiB63Rsh/UqZ8iN
  VL3XJZMQ2E9SfVWyWYLTfb0Q8c4zhhtKwyOr6wvpEpkCH6uevqKx4YC5
 Organization: OpenVPN Inc.
-In-Reply-To: <8033ea62-7ecf-4703-9d7b-d18f66751b8c@lunn.ch>
+In-Reply-To: <b3499947-f4b6-4974-9cc4-b2ff98fa20fc@lunn.ch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 06/03/2024 20:10, Andrew Lunn wrote:
->>>> Right, so this in general makes sense. The only question i have now
->>>> is, should you be using rtnl_link_stats64. That is the standard
->>>> structure for interface statistics.
+On 06/03/2024 20:31, Andrew Lunn wrote:
+> On Wed, Mar 06, 2024 at 03:49:50PM +0100, Antonio Quartulli wrote:
+>> On 05/03/2024 17:27, Andrew Lunn wrote:
+>>>>>> +void ovpn_iface_destruct(struct ovpn_struct *ovpn, bool unregister_netdev)
+>>>>>> +{
+>>>>>> +	ASSERT_RTNL();
+>>>>>> +
+>>>>>> +	netif_carrier_off(ovpn->dev);
+>>>>>
+>>>>> You often see virtual devices turn their carrier off in there
+>>>>> probe/create function, because it is unclear what state it is in after
+>>>>> register_netdevice().
+>>>>
+>>>> Are you suggesting to turn it off both here and in the create function?
+>>>> Or should I remove the invocation above?
+>>>
+>>> I noticed it in the _destruct function and went back to look at
+>>> create. You probably want it in both, unless as part of destruct, you
+>>> first disconnect all peers, which should set the carrier to off when
+>>> the last peer disconnects?
 >>
->> @Andrew: do you see how I could return/send this object per-peer to
->> userspace?
->> I think the whole interface stats logic is based on the one-stats-per-device
->> concept. Hence, I thought it was meaningful to just send my own stats via
->> netlink.
+>> I think keeping the carrier on while no peer is connected is better for
+>> OpenVPN.
 > 
-> Ah, interesting. I never looked at the details for
-> rtnl_link_stats64. It is buried in the middle of ifinfo. So not very
-> reusable :-(
+> I then have to wounder what carrier actually means?
 > 
-> Idea #2:
-> 
-> A peer is not that different to an interface queue. Jakub recently
-> posted some code for that:
-> 
-> https://lwn.net/ml/netdev/20240229010221.2408413-2-kuba@kernel.org/
-> 
-> Maybe there are ideas you can borrow from there.
-> 
-> But lets look at this from another direction. What are the use cases
-> for these statistics? Does the userspace daemon need them, e.g. to
-> detect a peer which is idle and should be disconnected? Are they
-> exported via an SNMP MIB?
+> Some routing protocols will kick off determining routes when the
+> carrier goes down. Can you put team/bonding on top of openvpn? If the
+> peer has gone, you want team to fall over to the active backup?
 
-Yes, they are used by userspace. Main usecases are:
-* inactivity timeout (if configured, when less than N bytes are 
-transferred in a given time the client will be disconnected)
-* stats reporting during connection (during the life of a peer, stats 
-can be periodically pulled by the user for reporting purposes)
-* stats reporting at disconnection (stats are pulled upon disconnection 
-in order to report the total traffic related to a peer)
+IIRC team/bonding requires a L2 interface, but ovpn creates a L3 device.
+So I don't think this case applies here.
 
-These stats can be reported via a status file or via the "management 
-interface" (an interactive interface that can be used to issue live 
-commands to a running openvpn daemon).
+To be honest we don't have any real concept for the carrier off.
+Especially on a server, I hardly believe it would be any useful.
 
-How this data is actually used is up to the user.
+However, on a client or on a p2p link, where there is exactly one remote 
+host on the other side, it may make sense to turn the carrier off when 
+that remote peer is lost.
+
+There is an extra detail to consider: if the user wants to, the ovpn 
+device should remain configured (with all IPs and routes) even if 
+openvpn has fully disconnected and it is attempting a reconnection to 
+another server. Reason being avoiding data leaks by accidentally 
+removing routes to the tunnel (traffic that should go through the tunnel 
+would rather go to the local network).
+
+With all this being said, it may make sense to just keep the carrier on 
+all time long.
+
+Should we come up with something smarter in the future, we can still 
+improve this behaviour.
 
 Regards,
 
 > 
-> 	Andrew
-> 
+>       Andrew
 
 -- 
 Antonio Quartulli
