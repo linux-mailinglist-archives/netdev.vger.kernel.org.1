@@ -1,137 +1,186 @@
-Return-Path: <netdev+bounces-78576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97F70875CD8
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 04:44:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17C48875CFE
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 04:58:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 444A81F21E39
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 03:44:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 922C1B21D4C
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 03:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A292C1BC;
-	Fri,  8 Mar 2024 03:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA9992C6B7;
+	Fri,  8 Mar 2024 03:58:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ivXA3Gky"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZADXQRtg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86422B9CD;
-	Fri,  8 Mar 2024 03:44:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820532C190;
+	Fri,  8 Mar 2024 03:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709869475; cv=none; b=Ih5Kp3FrIdDwRxPfZnUj+oKDQqad17x7Wk+rbo+cJBWqyTiLMP9x0jUeOegbEvQ4SJVddCW4DVPMPDOKHx6k8fag+wynJ60Cd+QwqLeGfr3y8zJ7scMBB9L1rHWW0iwpUMJ2Lkzkb7XW8bn3HBucD2ApxWOaPFwgvxMWQiPDDGY=
+	t=1709870312; cv=none; b=jE+T3TVAaPGExfSWnw0azJsuKJv6Bjo+gI36j3pWmCSKe4ARCHTLXDsgj4JP3sjbwK8SLd38XPcNSv/m2BuQducyNYDZyGxZIqXLlpcTcQHV0eD51T5mRDnSWpe85OIp17ysvLqxuQ7eE3KVPts7BGaS2Qw+ohIVEqxv59smoKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709869475; c=relaxed/simple;
-	bh=uEVg+4YZG4VxUZEymDtNlS89+tL+uuSkO21k6vxYSFo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LifySytjjkGnLT8lA0X6/7ihUxKJh+EyohgMJBchtDalBKdOS90XjwKwXsGNL7w9XghqAH70H3I2aQE9wzru1TYYLke33Bf5qulCQSqVyfNPzag98YqCrIfaUm/VgewbSlZ5Aadc81M8mQUoXPp/Lb8jdB4FZRdeuR/RtLRUSXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ivXA3Gky; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a44665605f3so234300966b.2;
-        Thu, 07 Mar 2024 19:44:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709869472; x=1710474272; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zGnHCoLaz/ffyd8p+UJOwvgRfMr4bDhvjC0IW5sSUmM=;
-        b=ivXA3GkyH2i+iJ5zqsbX+6jlhLePSuBZT2OxiSMvuOEFHBC0DA3Dmx/tcFPNdI3uE5
-         18uTQXqVyq8YeusFbnNBrMdaU7aveF2ZIG/vSqLIDSarNFc+VZ8ynI4LBRuTRaROCfxi
-         /0hTn12z0dqQwOthyVLxZO9L8Q/h1UtD/WfoTJRb9wN6AXRq1ISSOh68xePlFc2g4/6+
-         0WRKffOLy+/V4XxpeWm9oCRjNjFEsFjlaDApHyjFZdiAesyxdhJ7CkWB/FLG09b4eOaK
-         h1Hj6Rr7WCWbO+xm/Owj5e046wU3jhmI7lMA1Jsm+F2/5518+d5T+1s/8hvVtT87Qp2p
-         2ZPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709869472; x=1710474272;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zGnHCoLaz/ffyd8p+UJOwvgRfMr4bDhvjC0IW5sSUmM=;
-        b=L9vsqTYDs5lFsQUhYwy9aBvOUkSHLo8CpP2CmWF4qWtA3ebK2ly13aUnnQXTTRa832
-         57wE5gW7ZUgN9UU6sZpmYAxlsXaPBR3l17ij/EwOUIFn8CPhvBHAq2rZzzJbcrCe9O1Z
-         l3BO4qEPqDfwIgpzd5SicWJNdj7sWRqvWb7denohqH7MhrvMYpZis3C+VXRavrckiDHJ
-         HfuPBpTar+rVsTpmYffL4T/8F8EUfzPRTrOyBSfVDmYKPGSBzJvZSOGb8BSyHpUA0Ptl
-         cp18K2/3QZ6au/KedTmyA8WJgOf2cyBTb8ZIETqtnJzt+WCcBwnD10Ra7mG20UHj+Laf
-         07Dg==
-X-Forwarded-Encrypted: i=1; AJvYcCV6s7egCOwrNZCeoyXlqiP+cKtViFzt1NifCU/5CRK1WrNd3A0IYJdk8L9e4U7r8bX7ORg0DtLFrLKV1PMLyYgFbmGDKBIgbrQFJLtckS8vjfgsBlpVBs3eCnbR1rQXO1QYKwoJ
-X-Gm-Message-State: AOJu0Yz+b6UhirHGS1oxZ2IKJt7Mfdjk5lFbilidEAiEcmnjWlqVfhDZ
-	dBnSbZUuvlLcWQF+GwG1Wl7kUsVV0uMsD6u+JrK5wzVTda6fqaBH2U2EakfykQeBvZ+sXwhRlCI
-	VeWRn5LlmDis/IIbBxMPGgL+1k+c=
-X-Google-Smtp-Source: AGHT+IGs4S6wwKbMWKdIpz+c1GGDOqI49NUGplbX7bK57SKGLHJagITjG8I7HR458HKMMjGUu1yCZ3WdTF+B8SVA9nQ=
-X-Received: by 2002:a17:906:27d9:b0:a45:c8cb:b8b6 with SMTP id
- k25-20020a17090627d900b00a45c8cbb8b6mr3210989ejc.17.1709869471823; Thu, 07
- Mar 2024 19:44:31 -0800 (PST)
+	s=arc-20240116; t=1709870312; c=relaxed/simple;
+	bh=mF6Wbp6MtxfNFDHq0iHrXjjYNWZxisqag9vARhbWvOU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aKAPJFYD9DEFLLVE4606nXAd8E8OxP0B5e30PgkuP9WQk26yef/Lj4H8OIVd/PflCyZlyWEZjTE1w90LkK9HjdMXqCFyHZtOszITWqhhg0AhoR6QlXF0+tG/p8xz3o1k1FdFKCfWoCk1Y7RuhFuz2gwJu3tQ2IO6cXm9FwMgva4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZADXQRtg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCA81C433F1;
+	Fri,  8 Mar 2024 03:58:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709870312;
+	bh=mF6Wbp6MtxfNFDHq0iHrXjjYNWZxisqag9vARhbWvOU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZADXQRtggZVF7jCXRnr/Nx++UqGw2O1E+U/KttSTtzSSlM9bBjttGEo/A8hRic7ge
+	 O+gDFK9MJBHmJ2YDam/9YZE3gp0xxBazL1mTi5MDwug/eJk53dwV/etCOw6KZlAWuN
+	 2i1Oe8pKYSCdgSopwQohIoatN4yPvCX5Cuzbnr/d5jvVAjw1Ie2U1uJLT8OtOKVyTs
+	 N5lwkQbIk4pRTkVTCTO3QA4II1m8BzPZ9ti7U330EoXvcxzor4u0v+kBt/tUSkRAKp
+	 tt8z4/H4M6CWk2MTdlJfmcAQM/5mZHnYRX7fG89CTjTzKp4ec7OLIdHAisaNLAPPMH
+	 kRchFPzFcbV0A==
+Date: Thu, 7 Mar 2024 19:58:28 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>, Richard Henderson
+ <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+ Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer
+ <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>,
+ Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
+ <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, Sumit
+ Semwal <sumit.semwal@linaro.org>, "Christian =?UTF-8?B?S8O2bmln?="
+ <christian.koenig@amd.com>, Pavel Begunkov <asml.silence@gmail.com>, David
+ Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
+ <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
+ Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeelb@google.com>,
+ Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
+ <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, Kaiyuan
+ Zhang <kaiyuanz@google.com>
+Subject: Re: [RFC PATCH net-next v6 05/15] netdev: support binding dma-buf
+ to netdevice
+Message-ID: <20240307195828.183a76c2@kernel.org>
+In-Reply-To: <20240305020153.2787423-6-almasrymina@google.com>
+References: <20240305020153.2787423-1-almasrymina@google.com>
+	<20240305020153.2787423-6-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240307142030.2708698-1-Ilia.Gavrilov@infotecs.ru> <20240307142030.2708698-2-Ilia.Gavrilov@infotecs.ru>
-In-Reply-To: <20240307142030.2708698-2-Ilia.Gavrilov@infotecs.ru>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 8 Mar 2024 11:43:54 +0800
-Message-ID: <CAL+tcoC+ysfwDSJfuavL_8-3+nUbEAkruy3iuiHU7LizesicRw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/6] tcp: fix incorrect parameter validation
- in the do_tcp_getsockopt() function
-To: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-Cc: Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 7, 2024 at 10:44=E2=80=AFPM Gavrilov Ilia <Ilia.Gavrilov@infote=
-cs.ru> wrote:
->
-> The 'len' variable can't be negative when assigned the result of
-> 'min_t' because all 'min_t' parameters are cast to unsigned int,
-> and then the minimum one is chosen.
->
-> To fix the logic, check 'len' as read from 'optlen',
-> where the types of relevant variables are (signed) int.
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+On Mon,  4 Mar 2024 18:01:40 -0800 Mina Almasry wrote:
+> +	if (!dev || !dev->netdev_ops)
+> +		return -EINVAL;
 
-For the patch itself, please feel free to add:
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+too defensive
 
-I notice that you use Fixes meanwhile you target net-next. I'm not
-sure if it's proper.
-
-> ---
-> V2:
->  - reword the patch description
->
->  net/ipv4/tcp.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index c82dc42f57c6..a4f418592314 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -4010,11 +4010,11 @@ int do_tcp_getsockopt(struct sock *sk, int level,
->         if (copy_from_sockptr(&len, optlen, sizeof(int)))
->                 return -EFAULT;
->
-> -       len =3D min_t(unsigned int, len, sizeof(int));
-> -
->         if (len < 0)
->                 return -EINVAL;
->
-> +       len =3D min_t(unsigned int, len, sizeof(int));
+> +	if (!dev->netdev_ops->ndo_queue_stop ||
+> +	    !dev->netdev_ops->ndo_queue_mem_free ||
+> +	    !dev->netdev_ops->ndo_queue_mem_alloc ||
+> +	    !dev->netdev_ops->ndo_queue_start)
+> +		return -EOPNOTSUPP;
 > +
->         switch (optname) {
->         case TCP_MAXSEG:
->                 val =3D tp->mss_cache;
-> --
-> 2.39.2
->
+> +	new_mem = dev->netdev_ops->ndo_queue_mem_alloc(dev, rxq_idx);
+> +	if (!new_mem)
+> +		return -ENOMEM;
+> +
+> +	err = dev->netdev_ops->ndo_queue_stop(dev, rxq_idx, &old_mem);
+> +	if (err)
+> +		goto err_free_new_mem;
+> +
+> +	err = dev->netdev_ops->ndo_queue_start(dev, rxq_idx, new_mem);
+> +	if (err)
+> +		goto err_start_queue;
+> +
+> +	dev->netdev_ops->ndo_queue_mem_free(dev, old_mem);
+
+nice :)
+
+> +	rxq = __netif_get_rx_queue(dev, rxq_idx);
+> +
+> +	if (rxq->binding)
+
+nit: a few places have an empty line between call and error check
+
+> +		return -EEXIST;
+
+> +	if (!capable(CAP_NET_ADMIN))
+> +		return -EPERM;
+
+this can be a flag on the netlink policy, no?
+
+	flags: [ admin-perm ]
+
+on the op
+
+> +	dmabuf = dma_buf_get(dmabuf_fd);
+> +	if (IS_ERR_OR_NULL(dmabuf))
+> +		return -EBADFD;
+
+
+> +	hdr = genlmsg_put(rsp, info->snd_portid, info->snd_seq,
+
+genlmsg_iput()
+
+> +static int netdev_netlink_notify(struct notifier_block *nb, unsigned long state,
+> +				 void *_notify)
+> +{
+> +	struct netlink_notify *notify = _notify;
+> +	struct netdev_dmabuf_binding *rbinding;
+> +
+> +	if (state != NETLINK_URELEASE || notify->protocol != NETLINK_GENERIC)
+> +		return NOTIFY_DONE;
+> +
+> +	rtnl_lock();
+> +
+> +	list_for_each_entry(rbinding, &netdev_rbinding_list, list) {
+> +		if (rbinding->owner_nlportid == notify->portid) {
+> +			netdev_unbind_dmabuf(rbinding);
+> +			break;
+> +		}
+> +	}
+> +
+> +	rtnl_unlock();
+> +
+> +	return NOTIFY_OK;
+> +}
+
+While you were not looking we added three new members to the netlink
+family:
+
+ * @sock_priv_size: the size of per-socket private memory
+ * @sock_priv_init: the per-socket private memory initializer
+ * @sock_priv_destroy: the per-socket private memory destructor
+
+You should be able to associate state with a netlink socket
+and have it auto-destroyed if the socket closes.
+LMK if that doesn't work for you, I was hoping it would fit nicely.
+
+I just realized now that the code gen doesn't know how to spit
+those members out, but I'll send a patch tomorrow, you can hack
+it manually until that gets in.
 
