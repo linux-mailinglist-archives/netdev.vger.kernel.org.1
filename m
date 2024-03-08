@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-78592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ED95875D60
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 06:00:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85409875D67
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 06:01:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CF45B21D53
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:00:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B70921C20DCA
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:01:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96932E84A;
-	Fri,  8 Mar 2024 05:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 374213BBCE;
+	Fri,  8 Mar 2024 05:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="it4GNfm5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TXo6oWW2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5DF62E620
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 05:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECEA12E85A;
+	Fri,  8 Mar 2024 05:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709874037; cv=none; b=gfTU0rcznkJrvgEUJmBO2RFHAaXGsXth4D+R8TjvQSUe1U8a2kNJrxi+fjxCbkv/WXzbjPfki68pqfFa4hxpgwSZQc4cIFpdS9+U6dsWLJFrZpBRhFvNlhgCgdSWnywBxSyRC3QZ8LpnOxdEPJgxCuprViR3Ozc/gluMc2ue+OY=
+	t=1709874038; cv=none; b=m0Z9Nazr9EqF973vn060Z4pNOtOIYgy8rPUzVZi9H6T39wWlQFsJMnt5gYeIFTgw6Oog2TeUhAImig2inmZ8RR9o4GLqHD3t0ZDe1/F7aiSgKqp0K3R36Z291TCzJBSDidPka0bhomO0nrr+3amIaYdCPMGwz83IJ/OwcMRxymI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709874037; c=relaxed/simple;
-	bh=uXq/NgQzwEeGRkDGXKRm5gd75hVf6jsft69U4uAKTBY=;
+	s=arc-20240116; t=1709874038; c=relaxed/simple;
+	bh=5C1CPdakz9h1M2QOj502KAmjWGdW2B9uCUojD3Ao9+Y=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FNpfWlbD+LptA1A1LdBCiwva/4RkNZd/Kb0n4SM5BnClbWSQPNcvtXfyfvSC6bjx+nn08m07gIgC0REpafs88en8704SKbCZzw6hE53ZRarTfNbXsWgH9RxkZcda0gJq4x5Kf7ZjERe7tNJtKyrObUhAKlIRPE6LQi9yaBzwWCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=it4GNfm5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5ED8AC43394;
+	 In-Reply-To:To:Cc; b=E8Vu0uzyYln1VTmuzjMh20NLX5xlADxGgeFVxGnwwjHp8QhBqCWfmp18/K5xKPUBlno0QJkElsreyNvw/F4mCx95awBoFUzqQcAwoibpIqN8XGPeHhX4YAaxFIoNVovVzdrZRomnlr6NZhwdP72mKbsW4ZBm1Iqs5AzfCDwezcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TXo6oWW2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A6ACBC41679;
 	Fri,  8 Mar 2024 05:00:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709874037;
-	bh=uXq/NgQzwEeGRkDGXKRm5gd75hVf6jsft69U4uAKTBY=;
+	bh=5C1CPdakz9h1M2QOj502KAmjWGdW2B9uCUojD3Ao9+Y=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=it4GNfm5b5kNlVJm9RYpetgcTv5+/ZoVvgb6wEhh32oAD6MS6GpID1RQAceV6MbCh
-	 K7vcDK0QJdW6dhd98EgawB438R3K7wO/R/JABcgEc2W5rahvIYwpt4hbhLsFoaqxsy
-	 kFNkTNjEC4vQe2DVrLeovcFX+IgdU+di9i1DQer3hsWeowVOpxL75kRCcat+kezhVk
-	 3S+MDExL47lnNJBC5oAse8lrO6hiF+fqR8aB2N3Q/PjHb9mO6sGeq2jdOs/B0cHbfR
-	 cCvYFjUtpV54vteJww5B6L76wo7yrlO8ZfS+jgPGEFUWgb71+Mhyt9iWCB/mYuIyYs
-	 nNrPk5ZtGdHHg==
+	b=TXo6oWW2vAR9lVW8YGthY+5zGlfYYyXeLgw6zuhy0hYkm++pynxyA494DbjAwzOCL
+	 ERtCkdjHSNEj3dISDN3sk5ie/KiAOtYztve1G6dDeHZvbgfstcFU8P6Yoyf+sbNbd3
+	 ijpuxV72NkstXBd+Wvs6/g1wJYbBnCpOikbOcFnAm5PFHf4yB2Oav/h8+yaHvd4Vyh
+	 uJ8d5wKTmdiy5LIL2apS/A25ML2HgM8VgSC/FQ1dBMS43cvULYw+ECtbJMKV/vaDQs
+	 koxwj/TfP8jFUZoH1R8wWSxWu1GdQH/xgllf2H1AwFtNfI4BWe8I1z/pRvpaEQ9tmS
+	 lpCyV5XBt7KUg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3E20CD84BD9;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 92B9DD84BD9;
 	Fri,  8 Mar 2024 05:00:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phy: marvell: add comment about
- m88e1111_config_init_1000basex()
+Subject: Re: [PATCH 0/2] isdn: constify struct class usage
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170987403724.8362.12061050499541104983.git-patchwork-notify@kernel.org>
+ <170987403759.8362.17894165442379063106.git-patchwork-notify@kernel.org>
 Date: Fri, 08 Mar 2024 05:00:37 +0000
-References: <E1rhos4-003yuQ-5p@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1rhos4-003yuQ-5p@rmk-PC.armlinux.org.uk>
-To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org
+References: <20240305-class_cleanup-isdn-v1-0-6f0edca75b61@marliere.net>
+In-Reply-To: <20240305-class_cleanup-isdn-v1-0-6f0edca75b61@marliere.net>
+To: Ricardo B. Marliere <ricardo@marliere.net>
+Cc: isdn@linux-pingi.de, gregkh@linuxfoundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 06 Mar 2024 10:51:36 +0000 you wrote:
-> The comment in m88e1111_config_init_1000basex() is wrong - it claims
-> that Autoneg will be enabled, but this doesn't actually happen.
+On Tue, 05 Mar 2024 17:04:46 -0300 you wrote:
+> This is a simple and straight forward cleanup series that aims to make the
+> class structures in isdn constant. This has been possible since 2023 [1].
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  drivers/net/phy/marvell.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+> [1]: https://lore.kernel.org/all/2023040248-customary-release-4aec@gregkh/
+> 
+> Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] net: phy: marvell: add comment about m88e1111_config_init_1000basex()
-    https://git.kernel.org/netdev/net-next/c/8fc80c9d8c0a
+  - [1/2] isdn: mISDN: make elements_class constant
+    https://git.kernel.org/netdev/net-next/c/479b4bc867b9
+  - [2/2] isdn: capi: make capi_class constant
+    https://git.kernel.org/netdev/net-next/c/12fbd67ea3f4
 
 You are awesome, thank you!
 -- 
