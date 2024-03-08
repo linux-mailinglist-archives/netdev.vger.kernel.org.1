@@ -1,71 +1,78 @@
-Return-Path: <netdev+bounces-78792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 766D18767D5
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 16:55:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FA2E87681E
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 17:10:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADDF5B210F4
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 15:55:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D18901C21F49
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 16:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 429DE1F93E;
-	Fri,  8 Mar 2024 15:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 403FE25774;
+	Fri,  8 Mar 2024 16:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CsV/vZBW"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49F81DFE8;
-	Fri,  8 Mar 2024 15:55:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E31B567A;
+	Fri,  8 Mar 2024 16:10:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709913320; cv=none; b=TF2P5hKrMrtKoKqjNWmcdvMKCm0XqvuQTYdSYAQy2RSK2kQZ/wX58qM8t64Oi9TI42fBE439y76UMA3Jlw8jilskiL5+0C2q8f/QNQzWChjO/6s8rH1YTqbXQpw9VOym3tl4/5WTAe1dODiE9TTDtpXJH6KbL3hIPe6fDK/J2qI=
+	t=1709914226; cv=none; b=gGm0NapA/J7o//GHCfb/MiR1NE9dlA9GjtsJiRPma0VMw4Zh1ODQHBIy/IyppVP/zxnbVuwexCqt73uBbfpJWnj5sd8Ib4uM/RbZVPIiSQ0YVzqVPo8NN1XmNs72OnFNdZuU4PGHzvbTVCcgieMYxotdXabstSWMaFVjT2fhzUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709913320; c=relaxed/simple;
-	bh=4aCBrDzbrxkls0geNxwqOGYmmPlNrUHv/ManABWlWw8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kU9GH0obCxWZMNBrdWM9OtYmfUtmxhnGm7i8Non7flsptkAO7iPacYSAk9ZDgrItf9Ql37mkSAYqVcV0sqyH4znRNgJkdSd2VFICeF2iHhvjTDSJ0okBX75wiCRlakChfCeJQYfwow3hInVLh2Wkx4JvnNNK+mwIuXzNFHiML+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1ricYw-0000Tr-1G; Fri, 08 Mar 2024 16:55:10 +0100
-Date: Fri, 8 Mar 2024 16:55:10 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Lena Wang =?utf-8?B?KOeOi+WonCk=?= <Lena.Wang@mediatek.com>
-Cc: "fw@strlen.de" <fw@strlen.de>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"pablo@netfilter.org" <pablo@netfilter.org>,
-	"kadlec@netfilter.org" <kadlec@netfilter.org>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>
-Subject: Re: [PATCH net v3] netfilter: Add protection for bmp length out of
- range
-Message-ID: <20240308155510.GE22451@breakpoint.cc>
-References: <571b3e3f7191b5f67792d1090fc537bf4045c522.camel@mediatek.com>
- <e1f1a2ebbbf95d6aa8d2a12811ce379f438ab21b.camel@mediatek.com>
+	s=arc-20240116; t=1709914226; c=relaxed/simple;
+	bh=KmsqKvGg1bfnD6ZWCtDSJd3r55FEshEujbRcG6v2Tmk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YL2BJBZ3yuJ4BjK8uq37I4PoFlZaG0Pn08KK6fkq7PGmcEpDwv/KgbluqchJNGkq8aPyxPrVy+oGlAZUPuDVWYmArT9C0fKGCSsxyVf6cqJ2IeDvm/ntWAGPYAuldhQOgD/ISRZoRQcRbKyr9W7iLXqngDhLc/QmXPl4Wzl3JzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CsV/vZBW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ADB6C433C7;
+	Fri,  8 Mar 2024 16:10:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709914225;
+	bh=KmsqKvGg1bfnD6ZWCtDSJd3r55FEshEujbRcG6v2Tmk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CsV/vZBWwqNZq6COaZEWyHqD5mMFn3HoreLxtd9kU6LJnmyh7I6ZLuU+pNyeaSYDG
+	 vtTjWNqDvlOcEK5136OtQIBlGXXBLC5OguE20zjk4sFUa8dAyZcl1VA4Ajh0E7oPxv
+	 8JvOpwt4c0OUOij+oe3rGx2r85ddYBGc/+o7LCIq61K5zmzp7ks9lS+ZbC5vW1NKco
+	 zD0ek4qKbzlqkNRaSLmpqDBZeZy6PoFVDsiefaeKNSu1xMCsWNghH1x9CyvoHZc2gE
+	 oqXEY5DrpvtifFlJdCAcCHd3uaXtO7F320LV4s2zDeWEBJynm7MFnJzWsj20FBsxut
+	 2HXGTYRml1cSg==
+Date: Fri, 8 Mar 2024 08:10:24 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ajay Sharma
+ <sharmaajay@microsoft.com>, Leon Romanovsky <leon@kernel.org>, Thomas
+ Gleixner <tglx@linutronix.de>, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang
+ Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, Long Li <longli@microsoft.com>, Shradha Gupta
+ <shradhagupta@microsoft.com>
+Subject: Re: [PATCH v2] net :mana : Add per-cpu stats for MANA device
+Message-ID: <20240308081024.6fde961f@kernel.org>
+In-Reply-To: <1709894671-1018-1-git-send-email-shradhagupta@linux.microsoft.com>
+References: <1709894671-1018-1-git-send-email-shradhagupta@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e1f1a2ebbbf95d6aa8d2a12811ce379f438ab21b.camel@mediatek.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Lena Wang (王娜) <Lena.Wang@mediatek.com> wrote:
-> the patch is not applied and it may be due to format error with
-> evolution. I will try to resend v4 version with git send-mail.
+On Fri,  8 Mar 2024 02:44:31 -0800 Shradha Gupta wrote:
+> Extend 'ethtool -S' output for mana devices to include per-CPU packet
+> stats
 
-Its applied:
-
-767146637efc ("netfilter: nf_conntrack_h323: Add protection for
-bmp length out of range")
+You haven't answered the questions on v1 and haven't addressed all 
+the feedback.
+-- 
+pw-bot: cr
+pv-bot: feedback
 
