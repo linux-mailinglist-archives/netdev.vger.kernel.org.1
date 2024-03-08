@@ -1,279 +1,90 @@
-Return-Path: <netdev+bounces-78563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45C9B875B93
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 01:43:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13E49875BBD
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 02:00:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A85F41F21D25
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 00:43:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BCC81C20E78
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 01:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF2663C1;
-	Fri,  8 Mar 2024 00:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88625210EC;
+	Fri,  8 Mar 2024 00:59:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h/QuucnA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kY31fV2d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE927470;
-	Fri,  8 Mar 2024 00:42:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645C524208
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 00:59:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709858582; cv=none; b=pZERfqZDYj9HoXVtE2kgaz1wP3dlQk4/plKER33vPyIZnVg84/LMgdptPy4UWXXYdGMbikR7jrGELmtQR7FpGGO+Fsa2+81Dr9QM3X8hZX+WO655RBBcnupjS59x8bToiAwWBKyYQW+PrO5t6dDQ+dLmvcm/WZQfoWjnm59bRbA=
+	t=1709859559; cv=none; b=kF9sevJ9ok8xH5w3c/w0tPMa+Zsv4hp3QhT3GdpwiVdJP01ekjxKorYeV7k984M81y5nbUQ4D4GXOJlG5ZU3OFQ2SH+h8owROoxLOf+T5HaAT+zFft4Df7bXydLQEI+2Dpq52QxeQA0Y2OWiN7uuCXAYQqqEsah/UHcQKLHux1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709858582; c=relaxed/simple;
-	bh=3NEG6TNj7KsFoTEvmnkdQHLT3ZPCDsEdozgYR6CjZtQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MQ/WTxlUGyseRncgrs0PZC9we1Fov7sRQxGbLmPdTpzDFx9fsj3vR44weK3lfOyX2wAfGS+vhdJv3QLya3k19goB+oal7QiDi9/tDlwAugIQuJIcuK6/dOyWjtUd8eFj09xt0fn48lCQdLFMZKvpfuULEqBA7qhBPErJa7pfcd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h/QuucnA; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-567bac94719so322497a12.0;
-        Thu, 07 Mar 2024 16:42:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709858578; x=1710463378; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wYvQtqEyJB+URroCRC8pQOSdeHppTkKZaU1WCC5rpUs=;
-        b=h/QuucnAbMcZBcUoCeKLMrmMcKxPty1oDpQKgWHqdHu0FX1wrd3lEjP6lf2SN0c8oz
-         mXmmJJibI3lrb9WL6+qUoywlfcM1DQGctlItnRF/Sto8Zh7de/1GzsELxEzZTK4W7kkv
-         vh4fmzMr1URIBuxCWvx9P7GqO2j0VZQw86oKHqllkVySQQny0siRMhpyW/hreHJvQN2y
-         JYPAYmdDZAtB8h4jySj088y/za6FeVCGSt8pF20roU8LLQsf3tjnZ/yPyQRAZ9XzwFzb
-         FvlAAY0nX4WD0LxyGaGa+lt/Q3qGoJSObN+rGBBq4E7BYzaQlIKOH2eDnLZtVCuOrL8t
-         GlhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709858578; x=1710463378;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wYvQtqEyJB+URroCRC8pQOSdeHppTkKZaU1WCC5rpUs=;
-        b=I+B/qXDZ+jrkK3oliLRyxmP3p91955r615vwEtrfKpZpVHC6Tu9hF3wOhXA9lgcGJ2
-         g5YtwoTRrBVsrT1IWpGMCR9cNWeTY5F4noJ1NC1fGAadeZV87BYjFe/zJIAJIelnwd4m
-         6i0niZ0Sq0l/spnvjnlHjzNoBdx1z19aS9wdEnRv0NVt2vzZxrdjEGbUht4PRNrYt9Z2
-         0BJXGM8zV0GOzsfHsWdmwlYFSOTTNkM7M+/2k10gqkhhN0BQ4J5GRygdIBb7ctSPL25x
-         g6LxD2EOIIHJsgWVaVJeD5ixm5fjQhbdhEl2c8jqgvKjf02O/kjMZWPSIoBCYxFbX9dQ
-         DyLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVtvZpTH02ksZJxa7AY6nhU9Mfq/RXv54biwuz6pzv1x4xG7MDVTzHXMEJDJLfRTvq9mW/2TH2mn1NQjlkXkQF7r9VdBguB/mIzYdMTU3/0eNG4gncb9GYCZeaA2qckJOzTwsVQY+LG
-X-Gm-Message-State: AOJu0Ywx6CjTRrtX/crEtVV6A9tZRJzSmpaWE/KGs07FilPmvy5BKdDL
-	h7hSMmAFR5Xj8TLaGZlCURGkHWjvUrG7BUR9km91Llki9WsXkRjWAzPJRJ2tC8f5aTwYM+dxi8d
-	uV7ufywne51y7TfIk9cEpBql9zmg=
-X-Google-Smtp-Source: AGHT+IFgPm3Vx3eCeRo828gl5p0zzcm1Y75zw1kGYKt2C6e5P0rt9hWDeKEXQwsMFV5wa7KzlxHqWsTkHaYTWwCz8aM=
-X-Received: by 2002:a17:906:3b81:b0:a43:86f3:af37 with SMTP id
- u1-20020a1709063b8100b00a4386f3af37mr13061731ejf.53.1709858577767; Thu, 07
- Mar 2024 16:42:57 -0800 (PST)
+	s=arc-20240116; t=1709859559; c=relaxed/simple;
+	bh=Klk11SlhhvsmE6syTmr18qqVAISLa1l7ujAX0jGrfPc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Al8UzIMAYA6CK9gtLu+eFh8ME7epRvlU3AmbbglIrcmA6F750SnyqWzUqGfC4It2OwgLq9MIuiRLJ753t/hD35O8acjgETiR7FZpIvyMAooOU2UxnFI9S1lj3mEZTPB7l6sYPy6W8uc7N023sgYDQ4zYdYsDhdPnKp43Y3suQLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kY31fV2d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A57EBC433C7;
+	Fri,  8 Mar 2024 00:59:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709859559;
+	bh=Klk11SlhhvsmE6syTmr18qqVAISLa1l7ujAX0jGrfPc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kY31fV2dh8AIYlbfaZV73a5QUjW1A26oVgP2S/BOQ3A1OZzjnDgkUkvp3RdoTFAQd
+	 bYAUSrOfim36KZkGNTecZlZOdzarHrOFCSuvsXcSliMEuztfaxRWzd0PRWUnGX7hXU
+	 6wMjuVFPgtQXni31gscOrxNcKHMGfcVheAfQBOpgs9TAkcZhpUK2sLc1OiV06UxvmS
+	 85EuxM4fP+795h9KsIZWI0H1XobEHoQP+s/S2/B+bAxwQLLA/P3c/vXGeLRN+x+Tnn
+	 ckdaNaeH9DQtpGPUKVgcBOsOv5zrqVira14P+TfyVWXdxL0xscqfw0b2hf1WyqOitj
+	 2UOgPeLiXVuWA==
+Date: Thu, 7 Mar 2024 16:59:17 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Louis Peens <louis.peens@corigine.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, David Miller <davem@davemloft.net>, Paolo
+ Abeni <pabeni@redhat.com>, Fei Qin <fei.qin@corigine.com>,
+ netdev@vger.kernel.org, oss-drivers@corigine.com
+Subject: Re: [PATCH net-next v2 1/4] devlink: add two info version tags
+Message-ID: <20240307165917.70acd8f1@kernel.org>
+In-Reply-To: <Zeml4L6EUmlCHU37@nanopsycho>
+References: <20240228075140.12085-1-louis.peens@corigine.com>
+	<20240228075140.12085-2-louis.peens@corigine.com>
+	<Zd8js1wsTCxSLYxy@nanopsycho>
+	<20240228203235.22b5f122@kernel.org>
+	<Zel4F74EqG2YMf+w@LouisNoVo>
+	<Zel9k5uliEyi9ZTp@nanopsycho>
+	<Zemfzkv4/FevHHfS@LouisNoVo>
+	<Zeml4L6EUmlCHU37@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240307090732.56708-1-kerneljasonxing@gmail.com>
- <20240307093310.GI4420@breakpoint.cc> <CAL+tcoAPi+greENaD8X6Scc97Fnhiqa62eUSn+JS98kqY+VA6A@mail.gmail.com>
- <20240307120054.GK4420@breakpoint.cc> <CAL+tcoBqBaHxSU9NQqVxhRzzsaJr4=0=imtyCo4p8+DuXPL5AA@mail.gmail.com>
- <20240307141025.GL4420@breakpoint.cc> <CAL+tcoDUyFU9wT8gzOcDqW7hWfR-7Sg8Tky9QsY_b05gP4uZ1Q@mail.gmail.com>
- <1cf0cef4-c972-9f8d-7095-66516eafb85c@blackhole.kfki.hu> <CAL+tcoBwmnPO8y7zDvi3h0Y_QzKpj=fjnxiOuQYP_OBzoh=qEA@mail.gmail.com>
- <55a00270-6750-ca72-f20c-4be84afa0c3b@blackhole.kfki.hu>
-In-Reply-To: <55a00270-6750-ca72-f20c-4be84afa0c3b@blackhole.kfki.hu>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 8 Mar 2024 08:42:20 +0800
-Message-ID: <CAL+tcoBWGEtirQXUKtQ7EnveXc_T3aOCydG_uGUmew4x56hifw@mail.gmail.com>
-Subject: Re: [PATCH net-next] netfilter: conntrack: avoid sending RST to reply
- out-of-window skb
-To: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
-Cc: Florian Westphal <fw@strlen.de>, edumazet@google.com, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, kuba@kernel.org, pabeni@redhat.com, 
-	David Miller <davem@davemloft.net>, netfilter-devel@vger.kernel.org, 
-	coreteam@netfilter.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 8, 2024 at 3:00=E2=80=AFAM Jozsef Kadlecsik
-<kadlec@blackhole.kfki.hu> wrote:
->
-> On Thu, 7 Mar 2024, Jason Xing wrote:
->
-> > > > Allow me to finish the full sentence: my only purpose is not to let
-> > > > the TCP layer send strange RST to the _established_ socket due to
-> > > > receiving strange out-of-window skbs.
-> > >
-> > > I don't understand why do you want to modify conntrack at all: conntr=
-ack
-> > > itself does not send RST packets. And the TCP layer don't send RST pa=
-ckets
-> > > to out of window ones either.
+On Thu, 7 Mar 2024 12:32:48 +0100 Jiri Pirko wrote:
+> >I don't know if it is specific to us, that's the thing, maybe it is,
+> >maybe it isn't. What I do know in our case is that "part_number" and
+> >"board.id" is not the same thing, so we would prefer to have both visible.
+> >I cannot comment if that is the case for others, if the concensus is
+> >that others will find this helpful we don't mind adding it to devlink,
+> >as we've done from v1 to v2 - exact naming disussion aside.
 > >
-> > To normal TCP flow, you're right because the TCP layer doesn't send RST
-> > to out-of-window skbs.
+> >Updated proposal after this comment, V3 would then be:
+> >1) Keep "board.model" (the codename) local like it currently exist
+> >in-tree.
+> >2) Do still add "part_number" to devlink, but call it "board.part_number".
+> >Looking at the existing options it probably does fit the closest with
+> >board, it's not "fw", and I don't think it's "asic" either.
 > >
-> > But the DNAT policy on the server should have converted the port of
-> > incoming skb from A_port to B_port as my description in this patch said=
-.
-> >
-> > It actually doesn't happen. The conntrack clears the skb->_nfct value
-> > after returning -NF_ACCEPT in nf_conntrack_tcp_packet() and then DNAT
-> > would not convert the A_port to B_port.
->
-> The packet is INVALID therefore it's not NATed. I don't think that could
-> simply be changed in netfilter.
+> >Does this sound like the right track?  
+> 
+> Okay.
 
-Well, what would you suggest ? :)
-
->
-> > So the TCP layer is not able to look up the correct socket (client_ip,
-> > client_port, server_ip, B_port) because A_port doesn't match B_port,
-> > then an RST would be sent to the client.
->
-> Yes, if you let the packet continue to traverse the stack.
-
-Yes!
-
->
-> > > The only possibility I see for such packets is an iptables/nftables r=
-ule
-> > > which rejects packets classified as INVALID by conntrack.
-> > >
-> > > As Florian suggested, why don't you change that rule?
-> >
-> > As I said, just for the workaround method, only turning on that sysctl
-> > knob can solve the issue.
->
-> Sorry, but why? If you drop the packet by a rule, then there's no need to
-> use the sysctl setting and there's no unwanted RST packets.
-
-Oh, I was trying to clarify that using some knob can work around which
-is not my original intention, but I don't seek a workaround method. I
-didn't use --cstate INVALID to drop those INVALID packets in
-production, which I feel should work.
-
-For this particular case, I feel it's not that good to ask
-users/customers to add more rules or turn on sysctl knob to prevent
-seeing such RSTs.
-
-Instead I thought we could naturally stop sending such RSTs as default
-without asking other people to change something. People shouldn't see
-the RSTs really. That's why I wrote this patch.
-
-I hope I'm right... :S
-
-Thanks,
-Jason
-
->
-> Best regards,
-> Jozsef
->
-> > > The conntrack states are not fine-grained to express different TCP st=
-ates
-> > > which covered with INVALID. It was never a good idea to reject INVALI=
-D
-> > > packets or let them through (leaking internal addresses).
-> > >
-> > > Best regards,
-> > > Jozsef
-> > >
-> > > > > > Besides, resorting to turning on nf_conntrack_tcp_be_liberal sy=
-sctl
-> > > > > > knob seems odd to me though it can workaround :S
-> > > > >
-> > > > > I don't see a better alternative, other than -p tcp -m conntrack
-> > > > > --ctstate INVALID -j DROP rule, if you wish for tcp stack to not =
-see
-> > > > > such packets.
-> > > > >
-> > > > > > I would like to prevent sending such an RST as default behaviou=
-r.
-> > > > >
-> > > > > I don't see a way to make this work out of the box, without possi=
-ble
-> > > > > unwanted side effects.
-> > > > >
-> > > > > MAYBE we could drop IFF we check that the conntrack entry candida=
-te
-> > > > > that fails sequence validation has NAT translation applied to it,=
- and
-> > > > > thus the '-NF_ACCEPT' packet won't be translated.
-> > > > >
-> > > > > Not even compile tested:
-> > > > >
-> > > > > diff --git a/net/netfilter/nf_conntrack_proto_tcp.c b/net/netfilt=
-er/nf_conntrack_proto_tcp.c
-> > > > > --- a/net/netfilter/nf_conntrack_proto_tcp.c
-> > > > > +++ b/net/netfilter/nf_conntrack_proto_tcp.c
-> > > > > @@ -1256,10 +1256,14 @@ int nf_conntrack_tcp_packet(struct nf_con=
-n *ct,
-> > > > >         case NFCT_TCP_IGNORE:
-> > > > >                 spin_unlock_bh(&ct->lock);
-> > > > >                 return NF_ACCEPT;
-> > > > > -       case NFCT_TCP_INVALID:
-> > > > > +       case NFCT_TCP_INVALID: {
-> > > > > +               verdict =3D -NF_ACCEPT;
-> > > > > +               if (ct->status & IPS_NAT_MASK)
-> > > > > +                       res =3D NF_DROP; /* skb would miss nat tr=
-ansformation */
-> > > >
-> > > > Above line, I guess, should be 'verdict =3D NF_DROP'? Then this skb
-> > > > would be dropped in nf_hook_slow() eventually and would not be pass=
-ed
-> > > > to the TCP layer.
-> > > >
-> > > > >                 nf_tcp_handle_invalid(ct, dir, index, skb, state)=
-;
-> > > > >                 spin_unlock_bh(&ct->lock);
-> > > > > -               return -NF_ACCEPT;
-> > > > > +               return verdict;
-> > > > > +       }
-> > > > >         case NFCT_TCP_ACCEPT:
-> > > > >                 break;
-> > > > >         }
-> > > >
-> > > > Great! I think your draft patch makes sense really, which takes NAT
-> > > > into consideration.
-> > > >
-> > > > >
-> > > > > But I don't really see the advantage compared to doing drop decis=
-ion in
-> > > > > iptables/nftables ruleset.
-> > > >
-> > > > From our views, especially to kernel developers, you're right: we
-> > > > could easily turn on that knob or add a drop policy to prevent it
-> > > > happening. Actually I did this in production to prevent such a case=
-.
-> > > > It surely works.
-> > > >
-> > > > But from the views of normal users and those who do not understand =
-how
-> > > > it works in the kernel, it looks strange: people may ask why we get
-> > > > some unknown RSTs in flight?
-> > > >
-> > > > > I also have a hunch that someone will eventually complain about t=
-his
-> > > > > change in behavior.
-> > > >
-> > > > Well, I still think the patch you suggested is proper and don't kno=
-w
-> > > > why people could complain about it.
-> > > >
-> > > > Thanks for your patience :)
-> > > >
-> > > > Thanks,
-> > > > Jason
-> > > >
-> > >
-> > > --
-> > > E-mail  : kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
-> > > PGP key : https://wigner.hu/~kadlec/pgp_public_key.txt
-> > > Address : Wigner Research Centre for Physics
-> > >           H-1525 Budapest 114, POB. 49, Hungary
-> >
->
-> --
-> E-mail  : kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
-> PGP key : https://wigner.hu/~kadlec/pgp_public_key.txt
-> Address : Wigner Research Centre for Physics
->           H-1525 Budapest 114, POB. 49, Hungary
++1 
 
